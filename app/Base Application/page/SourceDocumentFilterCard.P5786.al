@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.WarehouseMgt.Document;
+
 page 5786 "Source Document Filter Card"
 {
     Caption = 'Source Document Filter Card';
@@ -273,21 +277,13 @@ page 5786 "Source Document Filter Card"
         WhseReceiptHeader: Record "Warehouse Receipt Header";
         DataCaption: Text[250];
         RequestType: Option Receive,Ship;
-        [InDataSet]
         SalesOrdersEnable: Boolean;
-        [InDataSet]
         PurchaseReturnOrdersEnable: Boolean;
-        [InDataSet]
         OutboundTransfersEnable: Boolean;
-        [InDataSet]
         PurchaseOrdersEnable: Boolean;
-        [InDataSet]
         SalesReturnOrdersEnable: Boolean;
-        [InDataSet]
         InboundTransfersEnable: Boolean;
-        [InDataSet]
         ShippingAgentCodeFilterEnable: Boolean;
-        [InDataSet]
         ShippingAgentServiceFilterEnable: Boolean;
 
     procedure SetOneCreatedShptHeader(WhseShptHeader2: Record "Warehouse Shipment Header")

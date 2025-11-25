@@ -1,4 +1,6 @@
 #if not CLEAN21
+namespace System.Integration.PowerBI;
+
 codeunit 6305 "Set Power BI User Config"
 {
     ObsoleteState = Pending;

@@ -43,19 +43,19 @@ table 737 "VAT Return Period"
         {
             Caption = 'VAT Return No.';
             Editable = false;
-            TableRelation = IF ("VAT Return No." = FILTER(<> '')) "VAT Report Header"."No." WHERE("VAT Report Config. Code" = CONST("VAT Return"),
-                                                                                                "No." = FIELD("VAT Return No."));
+            TableRelation = if ("VAT Return No." = filter(<> '')) "VAT Report Header"."No." where("VAT Report Config. Code" = const("VAT Return"),
+                                                                                                "No." = field("VAT Return No."));
             ValidateTableRelation = false;
 
             trigger OnLookup()
             begin
-                DrillDownVATReturn();
+                Rec.DrillDownVATReturn();
             end;
         }
         field(21; "VAT Return Status"; Option)
         {
-            CalcFormula = Lookup("VAT Report Header".Status WHERE("VAT Report Config. Code" = CONST("VAT Return"),
-                                                                   "No." = FIELD("VAT Return No.")));
+            CalcFormula = Lookup("VAT Report Header".Status where("VAT Report Config. Code" = const("VAT Return"),
+                                                                   "No." = field("VAT Return No.")));
             Caption = 'VAT Return Status';
             Editable = false;
             FieldClass = FlowField;

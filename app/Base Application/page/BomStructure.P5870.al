@@ -1,3 +1,12 @@
+﻿namespace Microsoft.InventoryMgt.BOM;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM.Tree;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Document;
+
 page 5870 "BOM Structure"
 {
     Caption = 'BOM Structure';
@@ -44,7 +53,7 @@ page 5870 "BOM Structure"
             repeater(Group)
             {
                 Caption = 'Lines';
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 ShowAsTree = true;
                 field(Type; Rec.Type)
                 {
@@ -285,12 +294,12 @@ page 5870 "BOM Structure"
     var
         DummyBOMWarningLog: Record "BOM Warning Log";
     begin
-        IsParentExpr := not "Is Leaf";
+        IsParentExpr := not Rec."Is Leaf";
 
-        HasWarning := not IsLineOk(false, DummyBOMWarningLog);
+        HasWarning := not Rec.IsLineOk(false, DummyBOMWarningLog);
 
-        if Type = Type::Item then
-            "Low-Level Code" := Indentation;
+        if Rec.Type = Rec.Type::Item then
+            Rec."Low-Level Code" := Rec.Indentation;
     end;
 
     trigger OnOpenPage()
@@ -303,9 +312,7 @@ page 5870 "BOM Structure"
         AsmHeader: Record "Assembly Header";
         ProdOrderLine: Record "Prod. Order Line";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
-        [InDataSet]
         IsParentExpr: Boolean;
-        [InDataSet]
         HasWarning: Boolean;
 
         CouldNotFindBOMLevelsErr: Label 'Could not find items with BOM levels.';
@@ -378,7 +385,7 @@ page 5870 "BOM Structure"
     var
         TempBOMWarningLog: Record "BOM Warning Log" temporary;
     begin
-        if IsLineOk(true, TempBOMWarningLog) then
+        if Rec.IsLineOk(true, TempBOMWarningLog) then
             Message(Text001)
         else
             PAGE.RunModal(PAGE::"BOM Warning Log", TempBOMWarningLog);
@@ -388,7 +395,7 @@ page 5870 "BOM Structure"
     var
         TempBOMWarningLog: Record "BOM Warning Log" temporary;
     begin
-        if AreAllLinesOk(TempBOMWarningLog) then
+        if Rec.AreAllLinesOk(TempBOMWarningLog) then
             Message(Text001)
         else
             PAGE.RunModal(PAGE::"BOM Warning Log", TempBOMWarningLog);
@@ -398,14 +405,14 @@ page 5870 "BOM Structure"
     var
         Item: Record Item;
     begin
-        TestField(Type, Type::Item);
+        Rec.TestField(Type, Rec.Type::Item);
 
-        Item.Get("No.");
-        Item.SetFilter("No.", "No.");
-        Item.SetRange("Date Filter", 0D, "Needed by Date");
-        Item.SetFilter("Variant Filter", "Variant Code");
+        Item.Get(Rec."No.");
+        Item.SetFilter("No.", Rec."No.");
+        Item.SetRange("Date Filter", 0D, Rec."Needed by Date");
+        Item.SetFilter("Variant Filter", Rec."Variant Code");
         if ShowBy <> ShowBy::Item then
-            Item.SetFilter("Location Filter", "Location Code");
+            Item.SetFilter("Location Filter", Rec."Location Code");
 
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, AvailType);
     end;

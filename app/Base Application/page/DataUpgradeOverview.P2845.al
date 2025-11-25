@@ -44,7 +44,7 @@ page 2845 "Data Upgrade Overview"
         if TempDocumentEntry.FindSet() then
             repeat
                 Rec := TempDocumentEntry;
-                Insert();
+                Rec.Insert();
             until TempDocumentEntry.Next() = 0;
     end;
 }

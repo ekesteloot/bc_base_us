@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Setup;
+
+using Microsoft.HumanResources.Employee;
+
 table 5202 Qualification
 {
     Caption = 'Qualification';
@@ -18,8 +22,8 @@ table 5202 Qualification
         }
         field(3; "Qualified Employees"; Boolean)
         {
-            CalcFormula = Exist ("Employee Qualification" WHERE("Qualification Code" = FIELD(Code),
-                                                                "Employee Status" = CONST(Active)));
+            CalcFormula = Exist("Employee Qualification" where("Qualification Code" = field(Code),
+                                                                "Employee Status" = const(Active)));
             Caption = 'Qualified Employees';
             Editable = false;
             FieldClass = FlowField;

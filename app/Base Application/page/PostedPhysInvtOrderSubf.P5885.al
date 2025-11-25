@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.History;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 5885 "Posted Phys. Invt. Order Subf."
 {
     AutoSplitKey = true;
@@ -149,54 +153,54 @@ page 5885 "Posted Phys. Invt. Order Subf."
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
                 }
             }
@@ -219,7 +223,7 @@ page 5885 "Posted Phys. Invt. Order Subf."
 
                     trigger OnAction()
                     begin
-                        ShowPostPhysInvtRecordingLines();
+                        Rec.ShowPostPhysInvtRecordingLines();
                     end;
                 }
                 action(Dimensions)
@@ -232,7 +236,7 @@ page 5885 "Posted Phys. Invt. Order Subf."
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 group("Item &Tracking Lines")
@@ -247,7 +251,7 @@ page 5885 "Posted Phys. Invt. Order Subf."
 
                         trigger OnAction()
                         begin
-                            ShowPostExpPhysInvtTrackLines();
+                            Rec.ShowPostExpPhysInvtTrackLines();
                         end;
                     }
                     action(ItemTrackingEntries)
@@ -259,7 +263,7 @@ page 5885 "Posted Phys. Invt. Order Subf."
 
                         trigger OnAction()
                         begin
-                            ShowPostedItemTrackingLines();
+                            Rec.ShowPostedItemTrackingLines();
                         end;
                     }
                 }

@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.Posting;
+
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+
 codeunit 1024 "Job Jnl.-B.Post+Print"
 {
     TableNo = "Job Journal Batch";
@@ -6,7 +11,7 @@ codeunit 1024 "Job Jnl.-B.Post+Print"
     begin
         JobJnlBatch.Copy(Rec);
         Code();
-        Copy(JobJnlBatch);
+        Rec.Copy(JobJnlBatch);
     end;
 
     var

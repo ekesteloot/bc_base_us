@@ -1,3 +1,8 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.Sales.Document;
+using System.Utilities;
+
 codeunit 1322 "Correct PstdSalesInv (Yes/No)"
 {
     Permissions = TableData "Sales Invoice Header" = rm,

@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using System.Security.User;
+
 page 168 "Service Ledger Entries Preview"
 {
     Caption = 'Service Ledger Entries Preview';
@@ -222,13 +227,13 @@ page 168 "Service Ledger Entries Preview"
                     ToolTip = 'Specifies the bin where the items are picked or put away.';
                     Visible = false;
                 }
-                field(Prepaid; Prepaid)
+                field(Prepaid; Rec.Prepaid)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies whether the service contract or contract-related service order was prepaid.';
                     Visible = false;
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies contract-related service ledger entries.';
@@ -242,7 +247,7 @@ page 168 "Service Ledger Entries Preview"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field(Amount; Rec.Amount)
@@ -321,7 +326,7 @@ page 168 "Service Ledger Entries Preview"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -334,7 +339,7 @@ page 168 "Service Ledger Entries Preview"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }

@@ -1,3 +1,11 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.WIP;
+
 table 1017 "Job Buffer"
 {
     Caption = 'Job Buffer';

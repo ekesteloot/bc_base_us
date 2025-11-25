@@ -1,3 +1,7 @@
+namespace Microsoft.CostAccounting.Journal;
+
+using Microsoft.CostAccounting.Posting;
+
 page 1135 "Cost Journal Batches"
 {
     Caption = 'Cost Journal Batches';
@@ -91,7 +95,7 @@ page 1135 "Cost Journal Batches"
 
     trigger OnInit()
     begin
-        SetRange("Journal Template Name");
+        Rec.SetRange("Journal Template Name");
     end;
 
     trigger OnOpenPage()

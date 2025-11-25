@@ -29,10 +29,10 @@ page 9082 "Customer Statistics FactBox"
                     DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
                     CustLedgEntry: Record "Cust. Ledger Entry";
                 begin
-                    DtldCustLedgEntry.SetRange("Customer No.", "No.");
-                    CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
-                    CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
-                    CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
+                    DtldCustLedgEntry.SetRange("Customer No.", Rec."No.");
+                    Rec.CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                    Rec.CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                    Rec.CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
                     CustLedgEntry.DrillDownOnEntries(DtldCustLedgEntry);
                 end;
             }
@@ -182,10 +182,10 @@ page 9082 "Customer Statistics FactBox"
                     DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
                     CustLedgEntry: Record "Cust. Ledger Entry";
                 begin
-                    DtldCustLedgEntry.SetFilter("Customer No.", "No.");
-                    CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
-                    CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
-                    CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
+                    DtldCustLedgEntry.SetFilter("Customer No.", Rec."No.");
+                    Rec.CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                    Rec.CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                    Rec.CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
                     CustLedgEntry.DrillDownOnOverdueEntries(DtldCustLedgEntry);
                 end;
             }
@@ -201,7 +201,7 @@ page 9082 "Customer Statistics FactBox"
                     AccountingPeriod: Record "Accounting Period";
                 begin
                     CustLedgEntry.Reset();
-                    CustLedgEntry.SetRange("Customer No.", "No.");
+                    CustLedgEntry.SetRange("Customer No.", Rec."No.");
                     CustLedgEntry.SetRange(
                       "Posting Date", AccountingPeriod.GetFiscalYearStartDate(WorkDate()), AccountingPeriod.GetFiscalYearEndDate(WorkDate()));
                     PAGE.RunModal(PAGE::"Customer Ledger Entries", CustLedgEntry);
@@ -226,12 +226,12 @@ page 9082 "Customer Statistics FactBox"
         CustomerNo: Code[20];
         CustomerNoFilter: Text;
     begin
-        FilterGroup(4);
+        Rec.FilterGroup(4);
         // Get the customer number and set the current customer number
-        CustomerNoFilter := GetFilter("No.");
+        CustomerNoFilter := Rec.GetFilter("No.");
         if (CustomerNoFilter = '') then begin
-            FilterGroup(0);
-            CustomerNoFilter := GetFilter("No.");
+            Rec.FilterGroup(0);
+            CustomerNoFilter := Rec.GetFilter("No.");
         end;
 
         CustomerNo := CopyStr(CustomerNoFilter, 1, MaxStrLen(CustomerNo));
@@ -327,7 +327,7 @@ page 9082 "Customer Statistics FactBox"
     local procedure SetFilterLastPaymentDateEntry(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
         CustLedgerEntry.SetCurrentKey("Document Type", "Customer No.", "Posting Date", "Currency Code");
-        CustLedgerEntry.SetRange("Customer No.", "No.");
+        CustLedgerEntry.SetRange("Customer No.", Rec."No.");
         CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Payment);
         CustLedgerEntry.SetRange(Reversed, false);
     end;
@@ -335,7 +335,7 @@ page 9082 "Customer Statistics FactBox"
     local procedure SetFilterRefundEntry(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
         CustLedgerEntry.SetCurrentKey("Document Type", "Customer No.", "Posting Date", "Currency Code");
-        CustLedgerEntry.SetRange("Customer No.", "No.");
+        CustLedgerEntry.SetRange("Customer No.", Rec."No.");
         CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Refund);
         CustLedgerEntry.SetRange(Reversed, false);
     end;

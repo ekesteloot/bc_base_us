@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Document;
+
 report 5904 "Service Tasks"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceTasks.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceTasks.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Tasks';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5904 "Service Tasks"
     {
         dataitem("Service Item Line"; "Service Item Line")
         {
-            DataItemTableView = SORTING("Response Date", "Response Time", Priority);
+            DataItemTableView = sorting("Response Date", "Response Time", Priority);
             RequestFilterFields = "Repair Status Code", "Response Date", "Response Time", "Resource Filter", "Allocation Status Filter";
             column(TodayFormat; Format(Today, 0, 4))
             {

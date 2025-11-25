@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Payables;
+
+using System.Security.User;
+
 page 129 "Detailed Vend. Entries Preview"
 {
     Caption = 'Detailed Vend. Ledg. Entries Preview';
@@ -106,7 +110,7 @@ page 129 "Detailed Vend. Entries Preview"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -121,7 +125,7 @@ page 129 "Detailed Vend. Entries Preview"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Unapplied; Unapplied)
+                field(Unapplied; Rec.Unapplied)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the entry has been unapplied (undone) from the Unapply Vendor Entries window by the entry no. shown in the Unapplied by Entry No. field.';
@@ -152,7 +156,7 @@ page 129 "Detailed Vend. Entries Preview"
         if TempDtldVendLedgEntry.FindSet() then
             repeat
                 Rec := TempDtldVendLedgEntry;
-                Insert();
+                Rec.Insert();
             until TempDtldVendLedgEntry.Next() = 0;
     end;
 }

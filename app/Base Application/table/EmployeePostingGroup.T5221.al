@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 5221 "Employee Posting Group"
 {
     Caption = 'Employee Posting Group';

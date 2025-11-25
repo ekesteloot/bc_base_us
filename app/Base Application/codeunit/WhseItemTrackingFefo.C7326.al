@@ -1,3 +1,13 @@
+namespace Microsoft.WarehouseMgt.Tracking;
+
+#if not CLEAN23
+using Microsoft.InventoryMgt.Ledger;
+#endif
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Ledger;
+
 codeunit 7326 "Whse. Item Tracking FEFO"
 {
 
@@ -35,7 +45,9 @@ codeunit 7326 "Whse. Item Tracking FEFO"
         QtyReservedFromItemLedger: Query "Qty. Reserved From Item Ledger";
         NonReservedQtyLotSN: Decimal;
         IsHandled: Boolean;
+#if not CLEAN23        
         UseLegacyImplementation: Boolean;
+#endif
     begin
         IsHandled := false;
         OnBeforeSummarizeInventoryFEFO(Location, ItemNo, VariantCode, HasExpirationDate, IsHandled,
@@ -43,13 +55,14 @@ codeunit 7326 "Whse. Item Tracking FEFO"
         if IsHandled then
             exit;
 
-        UseLegacyImplementation := true;
+#if not CLEAN23
+        UseLegacyImplementation := false;
         OnSummarizeInventoryFEFOLegacyImplementation(UseLegacyImplementation);
         if UseLegacyImplementation then begin
             SummarizeInventoryFEFO_LegacyImplementation(Location, ItemNo, VariantCode, HasExpirationDate);
             exit;
         end;
-
+#endif
         SummarizedStockByItemTrkg.SetSKUFilters(ItemNo, VariantCode, Location.Code);
         SummarizedStockByItemTrkg.SetRange(Open, true);
         SummarizedStockByItemTrkg.SetRange(Positive, true);
@@ -78,10 +91,13 @@ codeunit 7326 "Whse. Item Tracking FEFO"
         end;
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by the new implementation based on queries.', '23.0')]
     local procedure SummarizeInventoryFEFO_LegacyImplementation(Location: Record Location; ItemNo: Code[20]; VariantCode: Code[10]; HasExpirationDate: Boolean)
     var
         ItemLedgEntry: Record "Item Ledger Entry";
         ItemTrackingSetup: Record "Item Tracking Setup";
+        IsHandled: Boolean;
         NonReservedQtyLotSN: Decimal;
     begin
         with ItemLedgEntry do begin
@@ -128,6 +144,7 @@ codeunit 7326 "Whse. Item Tracking FEFO"
         end;
     end;
 
+    [Obsolete('Removed as unused in the new implementation of SummarizeInventoryFEFO function.', '23.0')]
     local procedure CalcReservedFromILEWithItemTracking(ItemLedgerEntryNo: Integer) ReservedQty: Decimal
     var
         ReservationEntry: Record "Reservation Entry";
@@ -148,6 +165,7 @@ codeunit 7326 "Whse. Item Tracking FEFO"
                     ReservedQty += ReservationEntry."Quantity (Base)";
             until ReservationEntry.Next() = 0;
     end;
+#endif    
 
     local procedure CalcNonRegisteredQtyOutstanding(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; WhseItemTrackingSetup: Record "Item Tracking Setup"; HasExpirationDate: Boolean): Decimal
     var
@@ -387,19 +405,24 @@ codeunit 7326 "Whse. Item Tracking FEFO"
     begin
     end;
 
+#if not CLEAN23
+    [Obsolete('Removed as unused in the new implementation of SummarizeInventoryFEFO function.', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnSummarizeInventoryFEFOOnBeforeInsertEntrySummaryFEFO(var TempGlobalEntrySummary: Record "Entry Summary" temporary; ItemLedgerEntry: Record "Item Ledger Entry")
     begin
     end;
 
+    [Obsolete('Removed as unused in the new implementation of SummarizeInventoryFEFO function.', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnSummarizeInventoryFEFOOnAfterItemLedgEntrySetFilters(var ItemLedgerEntry: Record "Item Ledger Entry"; ItemNo: Code[20]; HasExpirationDate: Boolean)
     begin
     end;
 
+    [Obsolete('Removed as unused in the new implementation of SummarizeInventoryFEFO function.', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnSummarizeInventoryFEFOLegacyImplementation(var UseLegacyImplementation: Boolean)
     begin
     end;
+#endif
 }
 

@@ -1,3 +1,15 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using System.Text;
+
 page 18 "G/L Account List"
 {
     Caption = 'G/L Account List';
@@ -96,8 +108,8 @@ page 18 "G/L Account List"
             part(Control1905532107; "Dimensions FactBox")
             {
                 ApplicationArea = Dimensions;
-                SubPageLink = "Table ID" = CONST(15),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(15),
+                              "No." = field("No.");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -127,9 +139,9 @@ page 18 "G/L Account List"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     RunObject = Page "General Ledger Entries";
-                    RunPageLink = "G/L Account No." = FIELD("No.");
-                    RunPageView = SORTING("G/L Account No.")
-                                  ORDER(Descending);
+                    RunPageLink = "G/L Account No." = field("No.");
+                    RunPageView = sorting("G/L Account No.")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -139,8 +151,8 @@ page 18 "G/L Account List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -149,8 +161,8 @@ page 18 "G/L Account List"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(15),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(15),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -160,9 +172,9 @@ page 18 "G/L Account List"
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     ToolTip = 'View additional information about a general ledger account, this supplements the Description field.';
                 }
                 action("Receivables-Payables")
@@ -184,7 +196,7 @@ page 18 "G/L Account List"
                     var
                         CalcGLAccWhereUsed: Codeunit "Calc. G/L Acc. Where-Used";
                     begin
-                        CalcGLAccWhereUsed.CheckGLAcc("No.");
+                        CalcGLAccWhereUsed.CheckGLAcc(Rec."No.");
                     end;
                 }
             }
@@ -198,10 +210,10 @@ page 18 "G/L Account List"
                     Caption = 'G/L &Account Balance';
                     Image = GLAccountBalance;
                     RunObject = Page "G/L Account Balance";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter");
                     ToolTip = 'View a summary of the debit and credit balances for different time periods, for the account that you select in the chart of accounts.';
                 }
                 action("G/L &Balance")
@@ -360,9 +372,7 @@ page 18 "G/L Account List"
 
     var
         ExtendedPriceEnabled: Boolean;
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     procedure SetSelection(var GLAcc: Record "G/L Account")
@@ -381,8 +391,8 @@ page 18 "G/L Account List"
 
     local procedure FormatLine()
     begin
-        NameIndent := Indentation;
-        Emphasize := "Account Type" <> "Account Type"::Posting;
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
     end;
 }
 

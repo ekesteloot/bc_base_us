@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
 table 5719 "Nonstock Item Setup"
 {
     Caption = 'Nonstock Item Setup';

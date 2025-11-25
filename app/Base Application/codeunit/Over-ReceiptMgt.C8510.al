@@ -1,3 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Vendor;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Request;
+using System.Environment.Configuration;
+
 codeunit 8510 "Over-Receipt Mgt."
 {
     trigger OnRun()
@@ -29,6 +42,20 @@ codeunit 8510 "Over-Receipt Mgt."
         exit(PurchaseLine.Quantity = WarehouseReceiptLine.Quantity);
     end;
 
+    procedure IsQuantityUpdatedFromInvtPutAwayOverReceipt(PurchaseLine: Record "Purchase Line"): Boolean
+    var
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        WhseManagement: Codeunit "Whse. Management";
+    begin
+        if not IsOverReceiptAllowed() then
+            exit(false);
+        WhseManagement.SetSourceFilterForWhseActivityLine(
+            WarehouseActivityLine, Database::"Purchase Line", PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", PurchaseLine."Line No.", true);
+        if WarehouseActivityLine.FindFirst() then
+            exit(PurchaseLine.Quantity = WarehouseActivityLine.Quantity);
+        exit(false);
+    end;
+
     procedure UpdatePurchaseLineOverReceiptQuantityFromWarehouseReceiptLine(WarehouseReceiptLine: Record "Warehouse Receipt Line")
     var
         PurchaseLine: Record "Purchase Line";
@@ -40,6 +67,21 @@ codeunit 8510 "Over-Receipt Mgt."
             PurchaseLine.Validate("Over-Receipt Quantity", WarehouseReceiptLine."Over-Receipt Quantity");
             PurchaseLine.Modify();
         end;
+    end;
+
+    procedure UpdatePurchaseLineOverReceiptQuantityFromWarehouseActivityLine(WarehouseActivityLine: Record "Warehouse Activity Line")
+    var
+        PurchaseLine: Record "Purchase Line";
+    begin
+        if not IsOverReceiptAllowed() then
+            exit;
+        PurchaseLine.SetLoadFields(PurchaseLine."Over-Receipt Code", PurchaseLine."Over-Receipt Quantity");
+        if PurchaseLine.Get(WarehouseActivityLine."Source Subtype", WarehouseActivityLine."Source No.", WarehouseActivityLine."Source Line No.") then
+            if (PurchaseLine."Over-Receipt Code" <> WarehouseActivityLine."Over-Receipt Code") or (PurchaseLine."Over-Receipt Quantity" <> WarehouseActivityLine."Over-Receipt Quantity") then begin
+                PurchaseLine.Validate("Over-Receipt Code", WarehouseActivityLine."Over-Receipt Code");
+                PurchaseLine.Validate("Over-Receipt Quantity", WarehouseActivityLine."Over-Receipt Quantity");
+                PurchaseLine.Modify();
+            end;
     end;
 
     procedure VerifyOverReceiptQuantity(PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line")
@@ -67,7 +109,7 @@ codeunit 8510 "Over-Receipt Mgt."
         ShouldCallError := OverReceiptQtyBase > MaxOverReceiptQtyAllowed;
         OnVerifyOverReceiptQuantityOnAfterCalcShouldCallError(PurchaseLine, OverReceiptQtyBase, MaxOverReceiptQtyAllowed, ShouldCallError);
         if ShouldCallError then
-            Error(StrSubstNo(OverReceiptQuantityErr, MaxOverReceiptQtyAllowed));
+            Error(OverReceiptQuantityErr, MaxOverReceiptQtyAllowed);
     end;
 
     procedure GetDefaultOverReceiptCode(PurchaseLine: Record "Purchase Line") DefaultOverReceiptCode: Code[20]

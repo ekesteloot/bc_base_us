@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 query 5401 "Pending Prod. Orders - by Cost"
 {
     Caption = 'Pending Prod. Orders - by Cost';
@@ -7,7 +11,7 @@ query 5401 "Pending Prod. Orders - by Cost"
     {
         dataitem(Prod_Order_Line; "Prod. Order Line")
         {
-            DataItemTableFilter = Status = FILTER(Planned | "Firm Planned" | Released);
+            DataItemTableFilter = Status = filter(Planned | "Firm Planned" | Released);
             column(Item_No; "Item No.")
             {
             }

@@ -1,7 +1,15 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Ledger;
+using Microsoft.ServiceMgt.Pricing;
+
 report 6080 "Serv. Pricing Profitability"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServPricingProfitability.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServPricingProfitability.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Pricing Profitability';
     UsageCategory = ReportsAndAnalysis;
@@ -62,8 +70,8 @@ report 6080 "Serv. Pricing Profitability"
             }
             dataitem("Serv. Price Group Setup"; "Serv. Price Group Setup")
             {
-                DataItemLink = "Service Price Group Code" = FIELD(Code);
-                DataItemTableView = SORTING("Service Price Group Code");
+                DataItemLink = "Service Price Group Code" = field(Code);
+                DataItemTableView = sorting("Service Price Group Code");
                 PrintOnlyIfDetail = true;
                 RequestFilterFields = "Adjustment Type", "Starting Date";
                 column(AdjmtType_ServPriceGrpSetup; "Adjustment Type")
@@ -119,8 +127,8 @@ report 6080 "Serv. Pricing Profitability"
                 }
                 dataitem("Service Shipment Item Line"; "Service Shipment Item Line")
                 {
-                    DataItemLink = "Service Price Group Code" = FIELD("Service Price Group Code");
-                    DataItemTableView = SORTING("Service Price Group Code", "Adjustment Type", "Base Amount to Adjust", "Customer No.");
+                    DataItemLink = "Service Price Group Code" = field("Service Price Group Code");
+                    DataItemTableView = sorting("Service Price Group Code", "Adjustment Type", "Base Amount to Adjust", "Customer No.");
                     RequestFilterFields = "Customer No.";
                     column(CustNo_ServShpItemLine; "Customer No.")
                     {

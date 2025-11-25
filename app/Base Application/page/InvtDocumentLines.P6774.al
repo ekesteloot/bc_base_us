@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 6774 "Invt. Document Lines"
 {
     Caption = 'Invt. Document Lines';
@@ -81,54 +85,54 @@ page 6774 "Invt. Document Lines"
                 field("ShortcutDimCode[3]"; ShortcutDimCode[3])
                 {
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 3';
                     Visible = false;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 4';
                     Visible = false;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 5';
                     Visible = false;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 6';
                     Visible = false;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 7';
                     Visible = false;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 8';
                     Visible = false;
                 }
@@ -154,7 +158,7 @@ page 6774 "Invt. Document Lines"
 
                     trigger OnAction()
                     begin
-                        InvtDocHeader.Get("Document Type", "Document No.");
+                        InvtDocHeader.Get(Rec."Document Type", Rec."Document No.");
                         case Rec."Document Type" of
                             Rec."Document Type"::Receipt:
                                 PAGE.Run(PAGE::"Invt. Receipt", InvtDocHeader);
@@ -179,7 +183,7 @@ page 6774 "Invt. Document Lines"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item &Tracking Lines';
-                    ShortCutKey = 'Ctrl+Alt+I'; 
+                    ShortCutKey = 'Ctrl+Alt+I';
                     Image = ItemTrackingLines;
                     ToolTip = 'View or edit serial numbers and lot numbers that are assigned to the item on the document or journal line.';
 

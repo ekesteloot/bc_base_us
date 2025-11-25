@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Setup;
+
 enum 9658 "Report Selection Usage Vendor"
 {
     Extensible = true;

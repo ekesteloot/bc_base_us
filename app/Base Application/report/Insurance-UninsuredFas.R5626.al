@@ -1,7 +1,13 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+
 report 5626 "Insurance - Uninsured FAs"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/InsuranceUninsuredFAs.rdlc';
+    RDLCLayout = './FixedAssets/Insurance/InsuranceUninsuredFAs.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Uninsured Fixed Assets';
     UsageCategory = ReportsAndAnalysis;

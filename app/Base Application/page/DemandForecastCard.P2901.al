@@ -1,3 +1,11 @@
+namespace Microsoft.Manufacturing.Forecast;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using System.Text;
+using System.Utilities;
+
 page 2901 "Demand Forecast Card"
 {
     Caption = 'Demand Forecast Overview';
@@ -279,29 +287,10 @@ page 2901 "Demand Forecast Card"
     }
 
     trigger OnOpenPage()
-#if not CLEAN20
-    var
-        FeatureTelemetry: Codeunit "Feature Telemetry";
-#endif
     begin
         IsEditable := CurrPage.Editable;
         SetMatrixColumns("Matrix Page Step Type"::Initial);
-#if not CLEAN20
-        FeatureTelemetry.LogUsage('0000G9P', 'New Demand Forecast Page', 'Open Page');
-#endif
     end;
-#if not CLEAN20
-    trigger OnModifyRecord(): Boolean
-    var
-        FeatureTelemetry: Codeunit "Feature Telemetry";
-    begin
-        if Rec."Forecast By Locations" and not xRec."Forecast By Locations" then
-            FeatureTelemetry.LogUsage('0000G9Q', 'New Demand Forecast Page', 'Forecasted by locations');
-        if Rec."Forecast By Variants" and not xRec."Forecast By Variants" then
-            FeatureTelemetry.LogUsage('0000G9R', 'New Demand Forecast Page', 'Forecasted by variants');
-        exit(true);
-    end;
-#endif
 
     trigger OnAfterGetRecord()
     begin

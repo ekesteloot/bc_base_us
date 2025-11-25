@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1211 "Data Exch Def List"
 {
     AdditionalSearchTerms = 'file import,file export,data import,data export,data stream,transfer,ecommerce';
@@ -14,7 +16,7 @@ page 1211 "Data Exch Def List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code that identifies the data exchange setup.';

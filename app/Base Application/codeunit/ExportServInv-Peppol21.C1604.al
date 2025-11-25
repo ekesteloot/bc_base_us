@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Peppol;
+
+using Microsoft.ServiceMgt.History;
+
 codeunit 1604 "Export Serv. Inv. - PEPPOL 2.1"
 {
     TableNo = "Record Export Buffer";
@@ -26,25 +30,5 @@ codeunit 1604 "Export Serv. Inv. - PEPPOL 2.1"
         SalesInvoicePEPPOL.SetDestination(OutStr);
         SalesInvoicePEPPOL.Export();
     end;
-
-#if not CLEAN20
-    [Scope('OnPrem')]
-    [Obsolete('Replaced by GenerateXMLFile with OutStream parameter.', '20.0')]
-    procedure GenerateXMLFile(ServiceInvoiceHeader: Record "Service Invoice Header"): Text[250]
-    var
-        PEPPOLManagement: Codeunit "PEPPOL Management";
-        OutFile: File;
-        OutStream: OutStream;
-        XmlServerPath: Text;
-    begin
-        PEPPOLManagement.InitializeXMLExport(OutFile, XmlServerPath);
-
-        OutFile.CreateOutStream(OutStream);
-        GenerateXMLFile(ServiceInvoiceHeader, OutStream);
-        OutFile.Close();
-
-        exit(CopyStr(XmlServerPath, 1, 250));
-    end;
-#endif
 }
 

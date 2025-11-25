@@ -1,3 +1,8 @@
+namespace Microsoft.Intercompany.GLAccount;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using System.Telemetry;
+
 table 410 "IC G/L Account"
 {
     Caption = 'IC G/L Account';

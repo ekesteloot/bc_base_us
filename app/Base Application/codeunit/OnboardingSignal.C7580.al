@@ -1,7 +1,8 @@
-// ------------------------------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
-// ------------------------------------------------------------------------------------------------
+﻿namespace System.Feedback;
+
+using System.Environment;
+using System.Telemetry;
+
 
 codeunit 7580 "Onboarding Signal"
 {
@@ -27,6 +28,7 @@ codeunit 7580 "Onboarding Signal"
             NavApp.GetCallerModuleInfo(CallerModuleInfo);
 
             OnboardingSignal.Init();
+            OnboardingSignal."No." := 0;
             OnboardingSignal."Company Name" := CompanyName;
             OnboardingSignal."Onboarding Signal Type" := OnboardingSignalType;
             OnboardingSignal."Onboarding Completed" := false;

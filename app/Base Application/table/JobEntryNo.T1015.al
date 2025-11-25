@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
 table 1015 "Job Entry No."
 {
     Caption = 'Job Entry No.';

@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Segment;
+
+using System.Security.User;
+
 page 5141 "Saved Segment Criteria List"
 {
     Caption = 'Saved Segment Criteria List';
@@ -13,7 +17,7 @@ page 5141 "Saved Segment Criteria List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code of the saved segment criteria.';
@@ -33,7 +37,7 @@ page 5141 "Saved Segment Criteria List"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("No. of Actions"; Rec."No. of Actions")

@@ -1,7 +1,12 @@
+namespace Microsoft.CashFlow.Reports;
+
+using Microsoft.CashFlow.Forecast;
+using System.Utilities;
+
 report 846 "Cash Flow Date List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/CashFlow/CashFlowDateList.rdlc';
+    RDLCLayout = './CashFlow/Reports/CashFlowDateList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Cash Flow Date List';
     UsageCategory = ReportsAndAnalysis;
@@ -34,7 +39,7 @@ report 846 "Cash Flow Date List"
             }
             dataitem(EditionPeriod; "Integer")
             {
-                DataItemTableView = SORTING(Number) ORDER(Ascending);
+                DataItemTableView = sorting(Number) order(Ascending);
                 column(NewCFSumTotal; NewCFSumTotal)
                 {
                 }
@@ -294,9 +299,9 @@ report 846 "Cash Flow Date List"
                     CurrentDateTo := 0D;
                 end;
             else begin
-                    CurrentDateFrom := CurrentDateTo + 1;
-                    CurrentDateTo := CalcDate(Interval, CurrentDateFrom) - 1;
-                end
+                CurrentDateFrom := CurrentDateTo + 1;
+                CurrentDateTo := CalcDate(Interval, CurrentDateFrom) - 1;
+            end
         end;
 
         CashFlowForecast.CalculateAllAmounts(CurrentDateFrom, CurrentDateTo, Values, CFSumTotal);

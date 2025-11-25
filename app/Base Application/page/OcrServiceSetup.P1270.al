@@ -44,7 +44,7 @@ page 1270 "OCR Service Setup"
 
                         trigger OnValidate()
                         begin
-                            SavePassword("Password Key", Password);
+                            Rec.SavePassword(Rec."Password Key", Password);
                             if Password <> '' then
                                 CheckEncryption();
                         end;
@@ -60,7 +60,7 @@ page 1270 "OCR Service Setup"
 
                         trigger OnValidate()
                         begin
-                            SavePassword("Authorization Key", AuthorizationKey);
+                            Rec.SavePassword(Rec."Authorization Key", AuthorizationKey);
                             if AuthorizationKey <> '' then
                                 CheckEncryption();
                         end;
@@ -97,7 +97,7 @@ page 1270 "OCR Service Setup"
                         Editable = false;
                         ToolTip = 'Specifies the last time when the master data was synched.';
                     }
-                    field(Enabled; Enabled)
+                    field(Enabled; Rec.Enabled)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies if the service is enabled.';
@@ -187,7 +187,7 @@ page 1270 "OCR Service Setup"
 
                 trigger OnAction()
                 begin
-                    SetURLsToDefault();
+                    Rec.SetURLsToDefault();
                 end;
             }
             action(TestConnection)
@@ -230,8 +230,8 @@ page 1270 "OCR Service Setup"
                 var
                     ReadSoftOCRMasterDataSync: Codeunit "ReadSoft OCR Master Data Sync";
                 begin
-                    Clear("Master Data Last Sync");
-                    Modify();
+                    Clear(Rec."Master Data Last Sync");
+                    Rec.Modify();
                     ReadSoftOCRMasterDataSync.SyncMasterData(false, false);
                 end;
             }
@@ -239,13 +239,13 @@ page 1270 "OCR Service Setup"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Job Queue Entry';
-                Enabled = Enabled;
+                Enabled = Rec.Enabled;
                 Image = JobListSetup;
                 ToolTip = 'View or edit the jobs that automatically process the incoming and outgoing electronic documents.';
 
                 trigger OnAction()
                 begin
-                    ShowJobQueueEntry();
+                    Rec.ShowJobQueueEntry();
                 end;
             }
         }
@@ -323,8 +323,8 @@ page 1270 "OCR Service Setup"
 
     trigger OnAfterGetCurrRecord()
     begin
-        UpdateEncryptedField("Password Key", Password);
-        UpdateEncryptedField("Authorization Key", AuthorizationKey);
+        UpdateEncryptedField(Rec."Password Key", Password);
+        UpdateEncryptedField(Rec."Authorization Key", AuthorizationKey);
     end;
 
     trigger OnAfterGetRecord()
@@ -337,19 +337,19 @@ page 1270 "OCR Service Setup"
         FeatureTelemetry: Codeunit "Feature Telemetry";
         OCRServiceMgt: Codeunit "OCR Service Mgt.";
     begin
-        Reset();
+        Rec.Reset();
         FeatureTelemetry.LogUptake('0000IMM', OCRServiceMgt.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::Discovered);
-        if not Get() then begin
-            Init();
-            Insert(true);
-            SetURLsToDefault();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert(true);
+            Rec.SetURLsToDefault();
         end;
         UpdateBasedOnEnable();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if not Enabled then
+        if not Rec.Enabled then
             if not Confirm(StrSubstNo(EnableServiceQst, CurrPage.Caption), true) then
                 exit(false);
     end;
@@ -368,28 +368,28 @@ page 1270 "OCR Service Setup"
 
     local procedure UpdateBasedOnEnable()
     begin
-        EditableByNotEnabled := (not Enabled) and CurrPage.Editable;
+        EditableByNotEnabled := (not Rec.Enabled) and CurrPage.Editable;
         ShowEnableWarning := '';
-        if CurrPage.Editable and Enabled then
+        if CurrPage.Editable and Rec.Enabled then
             ShowEnableWarning := EnabledWarningTok;
         UpdateBasedOnSyncEnable();
     end;
 
     local procedure UpdateBasedOnSyncEnable()
     begin
-        EditableBySyncEnabled := "Master Data Sync Enabled" and Enabled;
+        EditableBySyncEnabled := Rec."Master Data Sync Enabled" and Rec.Enabled;
         if EditableBySyncEnabled then
             exit;
-        if "Master Data Last Sync" = 0DT then
+        if Rec."Master Data Last Sync" = 0DT then
             exit;
-        Clear("Master Data Last Sync");
-        Modify();
+        Clear(Rec."Master Data Last Sync");
+        Rec.Modify();
     end;
 
     local procedure DrilldownCode()
     begin
         if Confirm(DisableEnableQst, true) then begin
-            Enabled := false;
+            Rec.Enabled := false;
             UpdateBasedOnEnable();
             CurrPage.Update();
         end;

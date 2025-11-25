@@ -9,7 +9,7 @@ page 27045 "SAT International Trade Terms"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for this entry according to the SAT internatoinal trade terms definition.';

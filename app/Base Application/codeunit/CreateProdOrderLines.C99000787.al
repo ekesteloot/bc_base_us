@@ -1,3 +1,12 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Family;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Sales.Document;
+
 codeunit 99000787 "Create Prod. Order Lines"
 {
     Permissions = TableData Item = r,
@@ -768,13 +777,6 @@ codeunit 99000787 "Create Prod. Order Lines"
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Event is never raised', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyOnProdOrderSourceTypeEnumExtension(var ProductionOrder: Record "Production Order")
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsReplSystemProdOrder(SalesLine: Record "Sales Line"; var ReplanSystemProdOrder: Boolean; var IsHandled: Boolean);
     begin

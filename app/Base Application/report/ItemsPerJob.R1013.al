@@ -1,7 +1,7 @@
 report 1013 "Items per Job"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/ItemsperJob.rdlc';
+    RDLCLayout = './ProjectMgt/Jobs/Reports/ItemsperJob.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Items per Job';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +10,7 @@ report 1013 "Items per Job"
     {
         dataitem(Job; Job)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Posting Date Filter";
             column(TodayFormatted; Format(Today))
@@ -75,7 +75,7 @@ report 1013 "Items per Job"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(ActNo1_JobBuffer; TempJobBuffer."Account No. 1")
                 {
                 }

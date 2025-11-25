@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 table 2151 "Upd Analysis View Entry Buffer"
 {
     TableType = Temporary;

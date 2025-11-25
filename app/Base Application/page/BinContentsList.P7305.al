@@ -1,7 +1,9 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 7305 "Bin Contents List"
 {
     Caption = 'Bin Contents List';
-    DataCaptionExpression = GetCaption();
+    DataCaptionExpression = Rec.GetCaption();
     Editable = false;
     PageType = List;
     SourceTable = "Bin Content";
@@ -58,17 +60,17 @@ page 7305 "Bin Contents List"
                     ToolTip = 'Specifies the bin ranking.';
                     Visible = false;
                 }
-                field(Default; Default)
+                field(Default; Rec.Default)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if the bin is the default bin for the associated item.';
                 }
-                field("Fixed"; Fixed)
+                field("Fixed"; Rec.Fixed)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies that the item (bin content) has been associated with this bin, and that the bin should normally contain the item.';
                 }
-                field(Dedicated; Dedicated)
+                field(Dedicated; Rec.Dedicated)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if the bin is used as a dedicated bin, which means that its bin content is available only to certain resources.';
@@ -79,7 +81,7 @@ page 7305 "Bin Contents List"
                     ToolTip = 'Specifies the warehouse class code. Only items with the same warehouse class can be stored in this bin.';
                     Visible = false;
                 }
-                field(CalcQtyUOM; CalcQtyUOM())
+                field(CalcQtyUOM; Rec.CalcQtyUOM())
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Quantity';
@@ -91,7 +93,7 @@ page 7305 "Bin Contents List"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies how many units of the item, in the base unit of measure, are stored in the bin.';
                 }
-                field(CalcQtyAvailToTakeUOM; CalcQtyAvailToTakeUOM())
+                field(CalcQtyAvailToTakeUOM; Rec.CalcQtyAvailToTakeUOM())
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Available Qty. to Take';
@@ -161,9 +163,9 @@ page 7305 "Bin Contents List"
     trigger OnOpenPage()
     begin
         if Initialized then begin
-            FilterGroup(2);
-            SetRange("Location Code", LocationCode);
-            FilterGroup(0);
+            Rec.FilterGroup(2);
+            Rec.SetRange("Location Code", LocationCode);
+            Rec.FilterGroup(0);
         end;
     end;
 

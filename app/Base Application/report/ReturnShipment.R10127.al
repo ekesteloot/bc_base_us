@@ -8,7 +8,7 @@ report 10127 "Return Shipment"
     {
         dataitem("Return Shipment Header"; "Return Shipment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Buy-from Vendor No.", "Pay-to Vendor No.", "No. Printed";
             RequestFilterHeading = 'Return Shipment';
@@ -77,10 +77,10 @@ report 10127 "Return Shipment"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyAddress1; CompanyAddress[1])
                     {
                     }
@@ -182,9 +182,9 @@ report 10127 "Return Shipment"
                     }
                     dataitem("Return Shipment Line"; "Return Shipment Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Return Shipment Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(ItemNumberToPrint; ItemNumberToPrint)
                         {
                         }
@@ -283,6 +283,7 @@ report 10127 "Return Shipment"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Purchaser Code" = '' then
                     Clear(SalesPurchPerson)
@@ -403,7 +404,6 @@ report 10127 "Return Shipment"
         LogInteraction: Boolean;
         Text000: Label 'COPY';
         Text009: Label 'VOID SHIPMENT';
-        [InDataSet]
         LogInteractionEnable: Boolean;
         FromCaptionLbl: Label 'From:';
         ReceiveByCaptionLbl: Label 'Receive By';

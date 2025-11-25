@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.RoleCenters;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 table 9057 "Job Cue"
 {
     Caption = 'Job Cue';
@@ -10,63 +15,63 @@ table 9057 "Job Cue"
         }
         field(2; "Jobs w/o Resource"; Integer)
         {
-            CalcFormula = Count (Job WHERE("Scheduled Res. Qty." = FILTER(0)));
+            CalcFormula = Count(Job where("Scheduled Res. Qty." = filter(0)));
             Caption = 'Jobs w/o Resource';
             Editable = false;
             FieldClass = FlowField;
         }
         field(3; "Upcoming Invoices"; Integer)
         {
-            CalcFormula = Count (Job WHERE(Status = FILTER(Planning | Quote | Open),
-                                           "Next Invoice Date" = FIELD("Date Filter")));
+            CalcFormula = Count(Job where(Status = filter(Planning | Quote | Open),
+                                           "Next Invoice Date" = field("Date Filter")));
             Caption = 'Upcoming Invoices';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Invoices Due - Not Created"; Integer)
         {
-            CalcFormula = Count (Job WHERE(Status = CONST(Open),
-                                           "Next Invoice Date" = FIELD("Date Filter2")));
+            CalcFormula = Count(Job where(Status = const(Open),
+                                           "Next Invoice Date" = field("Date Filter2")));
             Caption = 'Invoices Due - Not Created';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; "WIP Not Posted"; Integer)
         {
-            CalcFormula = Count (Job WHERE("WIP Entries Exist" = CONST(true)));
+            CalcFormula = Count(Job where("WIP Entries Exist" = const(true)));
             Caption = 'WIP Not Posted';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Completed - WIP Not Calculated"; Integer)
         {
-            CalcFormula = Count (Job WHERE(Status = FILTER(Completed),
-                                           "WIP Completion Calculated" = CONST(false),
-                                           "WIP Completion Posted" = CONST(false)));
+            CalcFormula = Count(Job where(Status = filter(Completed),
+                                           "WIP Completion Calculated" = const(false),
+                                           "WIP Completion Posted" = const(false)));
             Caption = 'Completed - WIP Not Calculated';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; "Available Resources"; Integer)
         {
-            CalcFormula = Count (Resource WHERE("Qty. on Order (Job)" = FILTER(0),
-                                                "Qty. Quoted (Job)" = FILTER(0),
-                                                "Qty. on Service Order" = FILTER(0),
-                                                "Date Filter" = FIELD("Date Filter")));
+            CalcFormula = Count(Resource where("Qty. on Order (Job)" = filter(0),
+                                                "Qty. Quoted (Job)" = filter(0),
+                                                "Qty. on Service Order" = filter(0),
+                                                "Date Filter" = field("Date Filter")));
             Caption = 'Available Resources';
             Editable = false;
             FieldClass = FlowField;
         }
         field(8; "Unassigned Resource Groups"; Integer)
         {
-            CalcFormula = Count ("Resource Group" WHERE("No. of Resources Assigned" = FILTER(0)));
+            CalcFormula = Count("Resource Group" where("No. of Resources Assigned" = filter(0)));
             Caption = 'Unassigned Resource Groups';
             Editable = false;
             FieldClass = FlowField;
         }
         field(9; "Jobs Over Budget"; Integer)
         {
-            CalcFormula = Count (Job WHERE("Over Budget" = FILTER(= true)));
+            CalcFormula = Count(Job where("Over Budget" = filter(= true)));
             Caption = 'Jobs Over Budget';
             Editable = false;
             FieldClass = FlowField;

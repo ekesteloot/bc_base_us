@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+
 table 7132 "Item Budget Name"
 {
     Caption = 'Item Budget Name';

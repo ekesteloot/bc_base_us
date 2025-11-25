@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.BOM;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.StandardCost;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 page 36 "Assembly BOM"
 {
     AutoSplitKey = true;
@@ -22,7 +29,7 @@ page 36 "Assembly BOM"
 
                     trigger OnValidate()
                     begin
-                        IsEmptyOrItem := Type in [Type::" ", Type::Item];
+                        IsEmptyOrItem := Rec.Type in [Rec.Type::" ", Rec.Type::Item];
                     end;
                 }
                 field("No."; Rec."No.")
@@ -34,8 +41,8 @@ page 36 "Assembly BOM"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field("Variant Code"; Rec."Variant Code")
@@ -49,8 +56,8 @@ page 36 "Assembly BOM"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field(Description; Rec.Description)
@@ -78,7 +85,7 @@ page 36 "Assembly BOM"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies which service item the component on the line is used in.';
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the position of the component on the bill of material.';
@@ -122,7 +129,7 @@ page 36 "Assembly BOM"
             part(Control18; "Assembly Item - Details")
             {
                 ApplicationArea = Assembly;
-                SubPageLink = "No." = FIELD("Parent Item No.");
+                SubPageLink = "No." = field("Parent Item No.");
             }
             systempart(Control17; Links)
             {
@@ -137,14 +144,14 @@ page 36 "Assembly BOM"
             part(Control13; "Component - Item Details")
             {
                 ApplicationArea = Assembly;
-                SubPageLink = "No." = FIELD("No.");
-                Visible = Type = Type::Item;
+                SubPageLink = "No." = field("No.");
+                Visible = Rec.Type = Rec.Type::Item;
             }
             part(Control9; "Component - Resource Details")
             {
                 ApplicationArea = Assembly;
-                SubPageLink = "No." = FIELD("No.");
-                Visible = Type = Type::Resource;
+                SubPageLink = "No." = field("No.");
+                Visible = Rec.Type = Rec.Type::Resource;
             }
         }
     }
@@ -165,7 +172,7 @@ page 36 "Assembly BOM"
                     Item: Record Item;
                     BOMStructure: Page "BOM Structure";
                 begin
-                    Item.Get("Parent Item No.");
+                    Item.Get(Rec."Parent Item No.");
                     BOMStructure.InitItem(Item);
                     BOMStructure.Run();
                 end;
@@ -174,7 +181,7 @@ page 36 "Assembly BOM"
             {
                 ApplicationArea = Assembly;
                 Caption = 'E&xplode BOM';
-                Enabled = "Assembly BOM";
+                Enabled = Rec."Assembly BOM";
                 Image = ExplodeBOM;
                 RunObject = Codeunit "BOM-Explode BOM";
                 ToolTip = 'Insert new lines for the components on the bill of materials, for example to sell the parent item as a kit. CAUTION: The line for the parent item will be deleted and represented by a description only. To undo, you must delete the component lines and add a line the parent item again.';
@@ -190,7 +197,7 @@ page 36 "Assembly BOM"
                 var
                     CalcStdCost: Codeunit "Calculate Standard Cost";
                 begin
-                    CalcStdCost.CalcItem("Parent Item No.", true)
+                    CalcStdCost.CalcItem(Rec."Parent Item No.", true)
                 end;
             }
             action(CalcUnitPrice)
@@ -204,7 +211,7 @@ page 36 "Assembly BOM"
                 var
                     CalcStdCost: Codeunit "Calculate Standard Cost";
                 begin
-                    CalcStdCost.CalcAssemblyItemPrice("Parent Item No.")
+                    CalcStdCost.CalcAssemblyItemPrice(Rec."Parent Item No.")
                 end;
             }
             action("Cost Shares")
@@ -219,7 +226,7 @@ page 36 "Assembly BOM"
                     Item: Record Item;
                     BOMCostShares: Page "BOM Cost Shares";
                 begin
-                    Item.Get("Parent Item No.");
+                    Item.Get(Rec."Parent Item No.");
                     BOMCostShares.InitItem(Item);
                     BOMCostShares.Run();
                 end;
@@ -230,8 +237,8 @@ page 36 "Assembly BOM"
                 Caption = 'Where-Used';
                 Image = Track;
                 RunObject = Page "Where-Used List";
-                RunPageLink = "No." = FIELD("No.");
-                RunPageView = SORTING(Type, "No.");
+                RunPageLink = "No." = field("No.");
+                RunPageView = sorting(Type, "No.");
                 ToolTip = 'View a list of BOMs in which the item is used.';
             }
             action(View)
@@ -246,12 +253,12 @@ page 36 "Assembly BOM"
                     Item: Record Item;
                     Resource: Record Resource;
                 begin
-                    if Type = Type::Item then begin
-                        Item.Get("No.");
+                    if Rec.Type = Rec.Type::Item then begin
+                        Item.Get(Rec."No.");
                         PAGE.Run(PAGE::"Item Card", Item)
                     end else
-                        if Type = Type::Resource then begin
-                            Resource.Get("No.");
+                        if Rec.Type = Rec.Type::Resource then begin
+                            Resource.Get(Rec."No.");
                             PAGE.Run(PAGE::"Resource Card", Resource);
                         end
                 end;
@@ -270,11 +277,11 @@ page 36 "Assembly BOM"
                 var
                     BOMComponent: Record "BOM Component";
                 begin
-                    if not "Assembly BOM" then
+                    if not Rec."Assembly BOM" then
                         exit;
 
                     Commit();
-                    BOMComponent.SetRange("Parent Item No.", "No.");
+                    BOMComponent.SetRange("Parent Item No.", Rec."No.");
                     PAGE.Run(PAGE::"Assembly BOM", BOMComponent);
                     CurrPage.Update();
                 end;
@@ -325,27 +332,26 @@ page 36 "Assembly BOM"
 
     trigger OnAfterGetCurrRecord()
     begin
-        IsEmptyOrItem := Type in [Type::" ", Type::Item];
+        IsEmptyOrItem := Rec.Type in [Rec.Type::" ", Rec.Type::Item];
     end;
 
     trigger OnAfterGetRecord()
     var
         Item: Record Item;
     begin
-        IsEmptyOrItem := Type in [Type::" ", Type::Item];
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+        IsEmptyOrItem := Rec.Type in [Rec.Type::" ", Rec.Type::Item];
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         CheckMandatoryRecFieldsBeforePageInsert();
 
-        IsEmptyOrItem := Type in [Type::" ", Type::Item];
+        IsEmptyOrItem := Rec.Type in [Rec.Type::" ", Rec.Type::Item];
     end;
 
     var
-        [InDataSet]
         IsEmptyOrItem: Boolean;
         VariantCodeMandatory: Boolean;
 

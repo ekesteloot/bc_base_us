@@ -1,4 +1,8 @@
 #if not CLEAN21
+namespace Microsoft.ProjectMgt.Jobs.Pricing;
+
+using Microsoft.Pricing.Calculation;
+
 page 1013 "Job G/L Account Prices"
 {
     Caption = 'Job G/L Account Prices';

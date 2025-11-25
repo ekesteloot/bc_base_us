@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Interaction;
+using System.Security.AccessControl;
+
 table 5075 "Logged Segment"
 {
     Caption = 'Logged Segment';
@@ -20,16 +26,16 @@ table 5075 "Logged Segment"
         }
         field(4; "No. of Interactions"; Integer)
         {
-            CalcFormula = Count("Interaction Log Entry" WHERE("Logged Segment Entry No." = FIELD("Entry No."),
-                                                               Canceled = FIELD(Canceled)));
+            CalcFormula = count("Interaction Log Entry" where("Logged Segment Entry No." = field("Entry No."),
+                                                               Canceled = field(Canceled)));
             Caption = 'No. of Interactions';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; "No. of Campaign Entries"; Integer)
         {
-            CalcFormula = Count("Campaign Entry" WHERE("Register No." = FIELD("Entry No."),
-                                                        Canceled = FIELD(Canceled)));
+            CalcFormula = count("Campaign Entry" where("Register No." = field("Entry No."),
+                                                        Canceled = field(Canceled)));
             Caption = 'No. of Campaign Entries';
             Editable = false;
             FieldClass = FlowField;
@@ -43,8 +49,6 @@ table 5075 "Logged Segment"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(8; Canceled; Boolean)
         {

@@ -10,7 +10,7 @@ report 10081 "Return Authorization"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Return Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Return Order"));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.", "Ship-to Code", "No. Printed";
             RequestFilterHeading = 'Return Order';
@@ -22,12 +22,12 @@ report 10081 "Return Authorization"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE("Document Type" = CONST("Return Order"));
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where("Document Type" = const("Return Order"));
                 dataitem(SalesLineComments; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Return Order"), "Print On Return Authorization" = CONST(true));
+                    DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Return Order"), "Print On Return Authorization" = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -69,8 +69,8 @@ report 10081 "Return Authorization"
             }
             dataitem("Sales Comment Line"; "Sales Comment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Return Order"), "Print On Return Authorization" = CONST(true), "Document Line No." = CONST(0));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Return Order"), "Print On Return Authorization" = const(true), "Document Line No." = const(0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -109,10 +109,10 @@ report 10081 "Return Authorization"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyAddress_1_; CompanyAddress[1])
                     {
                     }
@@ -271,7 +271,7 @@ report 10081 "Return Authorization"
                     }
                     dataitem(SalesLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(TempSalesLine__No__; TempSalesLine."No.")
                         {
                         }
@@ -363,6 +363,7 @@ report 10081 "Return Authorization"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Salesperson Code" = '' then
                     Clear(SalesPurchPerson)
@@ -490,7 +491,6 @@ report 10081 "Return Authorization"
         LogInteraction: Boolean;
         TaxRegNo: Text[30];
         TaxRegLabel: Text[30];
-        [InDataSet]
         LogInteractionEnable: Boolean;
         SoldCaptionLbl: Label 'Sold';
         To_CaptionLbl: Label 'To:';

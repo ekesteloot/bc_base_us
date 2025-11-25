@@ -1,7 +1,14 @@
+namespace Microsoft.WarehouseMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+
 report 7322 "Inventory Put-away List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Putaway/InventoryPutawayList.rdlc';
+    RDLCLayout = './WarehouseMgt/Reports/InventoryPutawayList.rdlc';
     AccessByPermission = TableData Location = R;
     ApplicationArea = Warehouse;
     Caption = 'Inventory Put-away List';
@@ -62,8 +69,8 @@ report 7322 "Inventory Put-away List"
             }
             dataitem("Purchase Line"; "Purchase Line")
             {
-                DataItemLink = "No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Location Code" = FIELD("Location Filter"), "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Bin Code" = FIELD("Bin Filter");
-                DataItemTableView = SORTING("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Expected Receipt Date") WHERE(Type = CONST(Item), "Document Type" = CONST(Order), "Qty. to Receive" = FILTER(<> 0));
+                DataItemLink = "No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter"), "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"), "Bin Code" = field("Bin Filter");
+                DataItemTableView = sorting("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Expected Receipt Date") where(Type = const(Item), "Document Type" = const(Order), "Qty. to Receive" = filter(<> 0));
                 RequestFilterFields = "Expected Receipt Date", "Location Code";
                 RequestFilterHeading = 'Purchase Order Line';
                 column(UOMCode_PurchLine; "Unit of Measure Code")

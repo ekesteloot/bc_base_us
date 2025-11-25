@@ -1,7 +1,9 @@
+namespace Microsoft.FixedAssets.Insurance;
+
 report 5624 "Insurance - Coverage Details"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/InsuranceCoverageDetails.rdlc';
+    RDLCLayout = './FixedAssets/Insurance/InsuranceCoverageDetails.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset Insurance Coverage Details';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +12,7 @@ report 5624 "Insurance - Coverage Details"
     {
         dataitem(Insurance; Insurance)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "FA Class Code", "FA Subclass Code", "Date Filter";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -72,7 +74,7 @@ report 5624 "Insurance - Coverage Details"
             }
             dataitem("Ins. Coverage Ledger Entry"; "Ins. Coverage Ledger Entry")
             {
-                DataItemTableView = SORTING("Insurance No.", "Disposed FA", "Posting Date");
+                DataItemTableView = sorting("Insurance No.", "Disposed FA", "Posting Date");
                 column(Ins__Coverage_Ledger_Entry__Posting_Date_; Format("Posting Date"))
                 {
                 }
@@ -131,7 +133,7 @@ report 5624 "Insurance - Coverage Details"
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'New Page per Insurance No.';
-                        ToolTip = 'Specifies if each insurance number information is printed on a new page if you have chosen two or more insurance numbers to be included in the report.';
+                        ToolTip = 'Specifies if you want the report to print data for each insurance policy on a separate page.';
                     }
                 }
             }

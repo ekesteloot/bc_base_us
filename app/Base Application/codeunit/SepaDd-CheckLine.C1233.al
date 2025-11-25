@@ -1,10 +1,15 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Customer;
+
 codeunit 1233 "SEPA DD-Check Line"
 {
     TableNo = "Direct Debit Collection Entry";
 
     trigger OnRun()
     begin
-        DeletePaymentFileErrors();
+        Rec.DeletePaymentFileErrors();
         CheckCollectionEntry(Rec);
     end;
 

@@ -1,3 +1,15 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Reports;
+using Microsoft.WarehouseMgt.Structure;
+using System.Utilities;
+
 codeunit 7380 "Phys. Invt. Count.-Management"
 {
 
@@ -587,6 +599,7 @@ codeunit 7380 "Phys. Invt. Count.-Management"
         Window: Dialog;
         ZeroQty: Boolean;
         CalcQtyExpected: Boolean;
+        IncludeItemWithNoTransaction: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -595,7 +608,7 @@ codeunit 7380 "Phys. Invt. Count.-Management"
             exit;
 
         CalcPhysInvtOrderCountRep.RunModal();
-        if not CalcPhysInvtOrderCountRep.GetRequest(ZeroQty, CalcQtyExpected) then
+        if not CalcPhysInvtOrderCountRep.GetRequest(ZeroQty, CalcQtyExpected, IncludeItemWithNoTransaction) then
             exit;
 
         Window.Open(Text000, TempPhysInvtItemSelection."Item No.");
@@ -606,7 +619,7 @@ codeunit 7380 "Phys. Invt. Count.-Management"
               TempPhysInvtItemSelection."Phys Invt Counting Period Code",
               TempPhysInvtItemSelection."Phys Invt Counting Period Type");
             CalcPhysInvtOrderLinesRep.SetHideValidationDialog(true);
-            CalcPhysInvtOrderLinesRep.InitializeRequest(ZeroQty, CalcQtyExpected);
+            CalcPhysInvtOrderLinesRep.InitializeRequest(ZeroQty, CalcQtyExpected, IncludeItemWithNoTransaction);
             CalcPhysInvtOrderLinesRep.UseRequestPage(false);
             Item.SetRange("No.", TempPhysInvtItemSelection."Item No.");
             if TempPhysInvtItemSelection."Phys Invt Counting Period Type" =

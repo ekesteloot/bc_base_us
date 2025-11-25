@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.Remittance;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Purchases.Vendor;
+using System.Email;
+
 table 2224 "Remit Address"
 {
     Caption = 'Remit Address';
@@ -40,11 +46,9 @@ table 2224 "Remit Address"
         field(7; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
 #pragma warning disable AA0139
@@ -96,11 +100,9 @@ table 2224 "Remit Address"
         field(91; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
 #pragma warning disable AA0139

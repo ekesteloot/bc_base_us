@@ -1,4 +1,14 @@
-﻿page 5972 "Posted Service Credit Memo"
+﻿namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Document;
+
+page 5972 "Posted Service Credit Memo"
 {
     Caption = 'Posted Service Credit Memo';
     DeleteAllowed = false;
@@ -39,7 +49,7 @@
                         Editable = false;
                         ToolTip = 'Specifies the name of the customer to whom you shipped the service on the credit memo.';
                     }
-                    field(Address; Address)
+                    field(Address; Rec.Address)
                     {
                         ApplicationArea = Service;
                         Editable = false;
@@ -51,7 +61,7 @@
                         Editable = false;
                         ToolTip = 'Specifies additional address information.';
                     }
-                    field(City; City)
+                    field(City; Rec.City)
                     {
                         ApplicationArea = Service;
                         Editable = false;
@@ -61,7 +71,7 @@
                     {
                         ShowCaption = false;
                         Visible = IsSellToCountyVisible;
-                        field(County; County)
+                        field(County; Rec.County)
                         {
                             ApplicationArea = Service;
                             Editable = false;
@@ -182,7 +192,7 @@
             part(ServCrMemoLines; "Posted Serv. Cr. Memo Subform")
             {
                 ApplicationArea = Service;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group(Invoicing)
             {
@@ -438,11 +448,11 @@
 
                     trigger OnAssistEdit()
                     begin
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", "Posting Date");
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", Rec."Posting Date");
                         ChangeExchangeRate.Editable(false);
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            "Currency Factor" := ChangeExchangeRate.GetParameter();
-                            Modify();
+                            Rec."Currency Factor" := ChangeExchangeRate.GetParameter();
+                            Rec.Modify();
                         end;
                         Clear(ChangeExchangeRate);
                     end;
@@ -548,10 +558,10 @@
                     trigger OnAction()
                     begin
                         OnBeforeCalculateSalesTaxStatistics(Rec);
-                        if "Tax Area Code" = '' then
-                            PAGE.RunModal(PAGE::"Service Credit Memo Statistics", Rec, "No.")
+                        if Rec."Tax Area Code" = '' then
+                            PAGE.RunModal(PAGE::"Service Credit Memo Statistics", Rec, Rec."No.")
                         else
-                            PAGE.RunModal(PAGE::"Service Credit Memo Stats.", Rec, "No.");
+                            PAGE.RunModal(PAGE::"Service Credit Memo Stats.", Rec, Rec."No.");
                     end;
                 }
                 action("Co&mments")
@@ -560,9 +570,9 @@
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Service Comment Sheet";
-                    RunPageLink = Type = CONST(General),
-                                  "Table Name" = CONST("Service Cr.Memo Header"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = Type = const(General),
+                                  "Table Name" = const("Service Cr.Memo Header"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -576,7 +586,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -593,8 +603,8 @@
                     begin
                         TempServDocLog.Reset();
                         TempServDocLog.DeleteAll();
-                        TempServDocLog.CopyServLog(TempServDocLog."Document Type"::"Credit Memo".AsInteger(), "Pre-Assigned No.");
-                        TempServDocLog.CopyServLog(TempServDocLog."Document Type"::"Credit Memo".AsInteger(), "No.");
+                        TempServDocLog.CopyServLog(TempServDocLog."Document Type"::"Credit Memo".AsInteger(), Rec."Pre-Assigned No.");
+                        TempServDocLog.CopyServLog(TempServDocLog."Document Type"::"Credit Memo".AsInteger(), Rec."No.");
 
                         TempServDocLog.Reset();
                         TempServDocLog.SetCurrentKey("Change Date", "Change Time");
@@ -619,7 +629,7 @@
 
                     trigger OnAction()
                     begin
-                        RequestStampEDocument();
+                        Rec.RequestStampEDocument();
                     end;
                 }
                 action("Export E-Document as &XML")
@@ -630,7 +640,7 @@
 
                     trigger OnAction()
                     begin
-                        ExportEDocument();
+                        Rec.ExportEDocument();
                     end;
                 }
                 action(ExportEDocumentPDF)
@@ -641,7 +651,7 @@
 
                     trigger OnAction()
                     begin
-                        ExportEDocumentPDF();
+                        Rec.ExportEDocumentPDF();
                     end;
                 }
                 action(CFDIRelationDocuments)
@@ -650,9 +660,9 @@
                     Caption = 'CFDI Relation Documents';
                     Image = Allocations;
                     RunObject = Page "CFDI Relation Documents";
-                    RunPageLink = "Document Table ID" = CONST(5994),
-                                  "Document No." = FIELD("No."),
-                                  "Customer No." = FIELD("Bill-to Customer No.");
+                    RunPageLink = "Document Table ID" = const(5994),
+                                  "Document No." = field("No."),
+                                  "Customer No." = field("Bill-to Customer No.");
                     RunPageMode = View;
                     ToolTip = 'View or add CFDI relation documents for the record.';
                 }
@@ -664,7 +674,7 @@
 
                     trigger OnAction()
                     begin
-                        CancelEDocument();
+                        Rec.CancelEDocument();
                     end;
                 }
             }
@@ -707,7 +717,7 @@
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action(ActivityLog)
@@ -719,7 +729,7 @@
 
                 trigger OnAction()
                 begin
-                    ShowActivityLog();
+                    Rec.ShowActivityLog();
                 end;
             }
         }
@@ -764,28 +774,28 @@
 
     trigger OnAfterGetCurrRecord()
     begin
-        DocExchStatusStyle := GetDocExchStatusStyle();
-        DocExchStatusVisible := "Document Exchange Status" <> "Document Exchange Status"::"Not Sent";
+        DocExchStatusStyle := Rec.GetDocExchStatusStyle();
+        DocExchStatusVisible := Rec."Document Exchange Status" <> Rec."Document Exchange Status"::"Not Sent";
     end;
 
     trigger OnAfterGetRecord()
     begin
-        DocExchStatusStyle := GetDocExchStatusStyle();
-        SellToContact.GetOrClear("Contact No.");
-        BillToContact.GetOrClear("Bill-to Contact No.");
+        DocExchStatusStyle := Rec.GetDocExchStatusStyle();
+        SellToContact.GetOrClear(Rec."Contact No.");
+        BillToContact.GetOrClear(Rec."Bill-to Contact No.");
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        if Find(Which) then
+        if Rec.Find(Which) then
             exit(true);
-        SetRange("No.");
-        exit(Find(Which));
+        Rec.SetRange("No.");
+        exit(Rec.Find(Which));
     end;
 
     trigger OnOpenPage()
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
         ActivateFields();
     end;
@@ -801,16 +811,15 @@
         IsSellToCountyVisible: Boolean;
         IsShipToCountyVisible: Boolean;
         IsBillToCountyVisible: Boolean;
-        [InDataSet]
         VATDateEnabled: Boolean;
 
     local procedure ActivateFields()
     var
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
-        IsSellToCountyVisible := FormatAddress.UseCounty("Country/Region Code");
-        IsShipToCountyVisible := FormatAddress.UseCounty("Ship-to Country/Region Code");
-        IsBillToCountyVisible := FormatAddress.UseCounty("Bill-to Country/Region Code");
+        IsSellToCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
+        IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
+        IsBillToCountyVisible := FormatAddress.UseCounty(Rec."Bill-to Country/Region Code");
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
     end;
 

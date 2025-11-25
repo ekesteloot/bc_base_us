@@ -1,4 +1,23 @@
-﻿codeunit 1012 "Job Jnl.-Post Line"
+﻿namespace Microsoft.ProjectMgt.Jobs.Posting;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Sales.Customer;
+using Microsoft.WarehouseMgt.Journal;
+
+codeunit 1012 "Job Jnl.-Post Line"
 {
     Permissions = TableData "Job Ledger Entry" = rimd,
                   TableData "Job Register" = rimd,

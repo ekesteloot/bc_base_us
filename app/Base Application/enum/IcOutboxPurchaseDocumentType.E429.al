@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Outbox;
+
 enum 429 "IC Outbox Purchase Document Type"
 {
     Extensible = true;

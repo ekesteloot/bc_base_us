@@ -1,3 +1,8 @@
+﻿namespace System.Diagnostics;
+
+using System.DataAdministration;
+using System.Security.User;
+
 page 595 "Change Log Entries"
 {
     AdditionalSearchTerms = 'user log,user activity,track';
@@ -36,7 +41,7 @@ page 595 "Change Log Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Table No."; Rec."Table No.")
@@ -55,8 +60,8 @@ page 595 "Change Log Entries"
                     var
                         MonitorSensitiveFieldData: Codeunit "Monitor Sensitive Field Data";
                     begin
-                        if not IsNullGuid("Changed Record SystemId") then
-                            MonitorSensitiveFieldData.OpenChangedRecordPage("Table No.", "Field No.", "Changed Record SystemId");
+                        if not IsNullGuid(Rec."Changed Record SystemId") then
+                            MonitorSensitiveFieldData.OpenChangedRecordPage(Rec."Table No.", Rec."Field No.", Rec."Changed Record SystemId");
                     end;
                 }
                 field("Primary Key"; Rec."Primary Key")
@@ -145,7 +150,7 @@ page 595 "Change Log Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the value that the field had before a user made changes to the field.';
                 }
-                field("Old Value Local"; GetLocalOldValue())
+                field("Old Value Local"; Rec.GetLocalOldValue())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Old Value (Local)';
@@ -156,7 +161,7 @@ page 595 "Change Log Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the value that the field had after a user made changes to the field.';
                 }
-                field("New Value Local"; GetLocalNewValue())
+                field("New Value Local"; Rec.GetLocalNewValue())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'New Value (Local)';

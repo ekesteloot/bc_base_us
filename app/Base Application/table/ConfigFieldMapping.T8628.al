@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8628 "Config. Field Mapping"
 {
     Caption = 'Config. Field Mapping';
@@ -18,7 +22,7 @@ table 8628 "Config. Field Mapping"
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(3; "Field ID"; Integer)
         {

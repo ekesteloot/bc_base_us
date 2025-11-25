@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.BOM;
+
 page 37 "Where-Used List"
 {
     Caption = 'Where-Used List';
@@ -35,7 +37,7 @@ page 37 "Where-Used List"
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the position of the component on the bill of material.';

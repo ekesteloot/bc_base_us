@@ -1,3 +1,22 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Enums;
+using Microsoft.Intercompany.Partner;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Contract;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 100 "Calc. G/L Acc. Where-Used"
 {
 
@@ -32,39 +51,39 @@ codeunit 100 "Calc. G/L Acc. Where-Used"
     begin
         with GLAccWhereUsed do
             case "Table ID" of
-                DATABASE::Currency:
+                Enum::TableID::Currency.AsInteger():
                     begin
                         Currency.Code := CopyStr("Key 1", 1, MaxStrLen(Currency.Code));
                         PAGE.Run(0, Currency);
                     end;
-                DATABASE::"Gen. Journal Template":
+                Enum::TableID::"Gen. Journal Template".AsInteger():
                     begin
                         GenJnlTemplate.Name := CopyStr("Key 1", 1, MaxStrLen(GenJnlTemplate.Name));
                         PAGE.Run(PAGE::"General Journal Templates", GenJnlTemplate);
                     end;
-                DATABASE::"Gen. Journal Batch":
+                Enum::TableID::"Gen. Journal Batch".AsInteger():
                     begin
                         GenJnlBatch."Journal Template Name" := CopyStr("Key 1", 1, MaxStrLen(GenJnlBatch."Journal Template Name"));
                         GenJnlBatch.Name := CopyStr("Key 2", 1, MaxStrLen(GenJnlBatch.Name));
                         GenJnlBatch.SetRange("Journal Template Name", GenJnlBatch."Journal Template Name");
                         PAGE.Run(0, GenJnlBatch);
                     end;
-                DATABASE::"Customer Posting Group":
+                Enum::TableID::"Customer Posting Group".AsInteger():
                     begin
                         CustPostingGr.Code := CopyStr("Key 1", 1, MaxStrLen(CustPostingGr.Code));
                         PAGE.Run(0, CustPostingGr);
                     end;
-                DATABASE::"Vendor Posting Group":
+                Enum::TableID::"Vendor Posting Group".AsInteger():
                     begin
                         VendPostingGr.Code := CopyStr("Key 1", 1, MaxStrLen(VendPostingGr.Code));
                         PAGE.Run(0, VendPostingGr);
                     end;
-                DATABASE::"Job Posting Group":
+                Enum::TableID::"Job Posting Group".AsInteger():
                     begin
                         JobPostingGr.Code := CopyStr("Key 1", 1, MaxStrLen(JobPostingGr.Code));
                         PAGE.Run(0, JobPostingGr);
                     end;
-                DATABASE::"Gen. Jnl. Allocation":
+                Enum::TableID::"Gen. Jnl. Allocation".AsInteger():
                     begin
                         GenJnlAlloc."Journal Template Name" := CopyStr("Key 1", 1, MaxStrLen(GenJnlAlloc."Journal Template Name"));
                         GenJnlAlloc."Journal Batch Name" := CopyStr("Key 2", 1, MaxStrLen(GenJnlAlloc."Journal Batch Name"));
@@ -75,7 +94,7 @@ codeunit 100 "Calc. G/L Acc. Where-Used"
                         GenJnlAlloc.SetRange("Journal Line No.", GenJnlAlloc."Journal Line No.");
                         PAGE.Run(PAGE::Allocations, GenJnlAlloc);
                     end;
-                DATABASE::"General Posting Setup":
+                Enum::TableID::"General Posting Setup".AsInteger():
                     begin
                         GenPostingSetup."Gen. Bus. Posting Group" :=
                           CopyStr("Key 1", 1, MaxStrLen(GenPostingSetup."Gen. Bus. Posting Group"));
@@ -83,12 +102,12 @@ codeunit 100 "Calc. G/L Acc. Where-Used"
                           CopyStr("Key 2", 1, MaxStrLen(GenPostingSetup."Gen. Prod. Posting Group"));
                         PAGE.Run(0, GenPostingSetup);
                     end;
-                DATABASE::"Bank Account Posting Group":
+                Enum::TableID::"Bank Account Posting Group".AsInteger():
                     begin
                         BankAccPostingGr.Code := CopyStr("Key 1", 1, MaxStrLen(BankAccPostingGr.Code));
                         PAGE.Run(0, BankAccPostingGr);
                     end;
-                DATABASE::"VAT Posting Setup":
+                Enum::TableID::"VAT Posting Setup".AsInteger():
                     begin
                         VATPostingSetup."VAT Bus. Posting Group" :=
                           CopyStr("Key 1", 1, MaxStrLen(VATPostingSetup."VAT Bus. Posting Group"));
@@ -96,12 +115,12 @@ codeunit 100 "Calc. G/L Acc. Where-Used"
                           CopyStr("Key 2", 1, MaxStrLen(VATPostingSetup."VAT Prod. Posting Group"));
                         PAGE.Run(0, VATPostingSetup);
                     end;
-                DATABASE::"FA Posting Group":
+                Enum::TableID::"FA Posting Group".AsInteger():
                     begin
                         FAPostingGr.Code := CopyStr("Key 1", 1, MaxStrLen(FAPostingGr.Code));
                         PAGE.Run(PAGE::"FA Posting Group Card", FAPostingGr);
                     end;
-                DATABASE::"FA Allocation":
+                Enum::TableID::"FA Allocation".AsInteger():
                     begin
                         FAAlloc.Code := CopyStr("Key 1", 1, MaxStrLen(FAAlloc.Code));
                         Evaluate(FAAlloc."Allocation Type", "Key 2");
@@ -111,31 +130,31 @@ codeunit 100 "Calc. G/L Acc. Where-Used"
                         OnShowSetupFormOnBeforeFAAllocationRunPage(FAAlloc, GLAccWhereUsed);
                         PAGE.Run(0, FAAlloc);
                     end;
-                DATABASE::"Inventory Posting Setup":
+                Enum::TableID::"Inventory Posting Setup".AsInteger():
                     begin
                         InventoryPostingSetup."Location Code" := CopyStr("Key 1", 1, MaxStrLen(InventoryPostingSetup."Location Code"));
                         InventoryPostingSetup."Invt. Posting Group Code" :=
                           CopyStr("Key 2", 1, MaxStrLen(InventoryPostingSetup."Invt. Posting Group Code"));
                         PAGE.Run(PAGE::"Inventory Posting Setup", InventoryPostingSetup);
                     end;
-                DATABASE::"Service Contract Account Group":
+                Enum::TableID::"Service Contract Account Group".AsInteger():
                     begin
                         ServiceContractAccGr.Code := CopyStr("Key 1", 1, MaxStrLen(ServiceContractAccGr.Code));
                         PAGE.Run(0, ServiceContractAccGr);
                     end;
-                DATABASE::"IC Partner":
+                Enum::TableID::"IC Partner".AsInteger():
                     begin
                         ICPartner.Code := CopyStr("Key 1", 1, MaxStrLen(ICPartner.Code));
                         PAGE.Run(0, ICPartner);
                     end;
-                DATABASE::"Payment Method":
+                Enum::TableID::"Payment Method".AsInteger():
                     begin
                         PaymentMethod.Code := CopyStr("Key 1", 1, MaxStrLen(PaymentMethod.Code));
                         PAGE.Run(0, PaymentMethod);
                     end;
-                DATABASE::"Sales & Receivables Setup":
+                Enum::TableID::"Sales & Receivables Setup".AsInteger():
                     PAGE.Run(PAGE::"Sales & Receivables Setup");
-                DATABASE::"Purchases & Payables Setup":
+                Enum::TableID::"Purchases & Payables Setup".AsInteger():
                     PAGE.Run(PAGE::"Purchases & Payables Setup");
                 else
                     OnShowExtensionPage(GLAccWhereUsed);
@@ -271,27 +290,27 @@ codeunit 100 "Calc. G/L Acc. Where-Used"
 
     local procedure FillTableBuffer(var TableBuffer: Record "Integer"): Boolean
     begin
-        AddTable(TableBuffer, DATABASE::Currency);
-        AddTable(TableBuffer, DATABASE::"Gen. Journal Template");
-        AddTable(TableBuffer, DATABASE::"Gen. Journal Batch");
-        AddTable(TableBuffer, DATABASE::"Customer Posting Group");
-        AddTable(TableBuffer, DATABASE::"Vendor Posting Group");
-        AddTable(TableBuffer, DATABASE::"Job Posting Group");
-        AddTable(TableBuffer, DATABASE::"Gen. Jnl. Allocation");
-        AddTable(TableBuffer, DATABASE::"General Posting Setup");
-        AddTable(TableBuffer, DATABASE::"Bank Account Posting Group");
-        AddTable(TableBuffer, DATABASE::"VAT Posting Setup");
-        AddTable(TableBuffer, DATABASE::"FA Posting Group");
-        AddTable(TableBuffer, DATABASE::"FA Allocation");
-        AddTable(TableBuffer, DATABASE::"Inventory Posting Setup");
-        AddTable(TableBuffer, DATABASE::"Service Contract Account Group");
-        AddTable(TableBuffer, DATABASE::"IC Partner");
-        AddTable(TableBuffer, DATABASE::"Payment Method");
-        AddTable(TableBuffer, DATABASE::"Sales & Receivables Setup");
-        AddTable(TableBuffer, DATABASE::"Purchases & Payables Setup");
-        AddTable(TableBuffer, DATABASE::"Employee Posting Group");
-        AddTable(TableBuffer, DATABASE::"Business Unit");
-        AddTable(TableBuffer, DATABASE::"Cash Flow Setup");
+        AddTable(TableBuffer, Enum::TableID::Currency.AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Gen. Journal Template".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Gen. Journal Batch".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Customer Posting Group".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Vendor Posting Group".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Job Posting Group".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Gen. Jnl. Allocation".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"General Posting Setup".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Bank Account Posting Group".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"VAT Posting Setup".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"FA Posting Group".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"FA Allocation".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Inventory Posting Setup".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Service Contract Account Group".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"IC Partner".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Payment Method".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Sales & Receivables Setup".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Purchases & Payables Setup".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Employee Posting Group".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Business Unit".AsInteger());
+        AddTable(TableBuffer, Enum::TableID::"Cash Flow Setup".AsInteger());
 
         AddCountryTables(TableBuffer);
 
@@ -325,7 +344,7 @@ codeunit 100 "Calc. G/L Acc. Where-Used"
         TempGLAccWhereUsed."Table Name" := RecRef.Caption;
 
         TableRelationsMetadata.SetRange("Table ID", TableID);
-        TableRelationsMetadata.SetRange("Related Table ID", DATABASE::"G/L Account");
+        TableRelationsMetadata.SetRange("Related Table ID", Enum::TableID::"G/L Account");
         if TableRelationsMetadata.FindSet() then
             repeat
                 Field.Get(TableRelationsMetadata."Table ID", TableRelationsMetadata."Field No.");

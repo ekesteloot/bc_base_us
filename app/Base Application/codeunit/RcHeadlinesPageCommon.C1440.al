@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 codeunit 1440 "RC Headlines Page Common"
 {
 

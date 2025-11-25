@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Document;
+
+using System.Utilities;
+
 codeunit 94 "Blnkt Purch Ord. to Ord. (Y/N)"
 {
     TableNo = "Purchase Header";
@@ -10,7 +14,7 @@ codeunit 94 "Blnkt Purch Ord. to Ord. (Y/N)"
         if IsOnRunHandled(Rec) then
             exit;
 
-        TestField("Document Type", "Document Type"::"Blanket Order");
+        Rec.TestField("Document Type", Rec."Document Type"::"Blanket Order");
         if not ConfirmManagement.GetResponseOrDefault(Text000, true) then
             exit;
 
@@ -19,7 +23,7 @@ codeunit 94 "Blnkt Purch Ord. to Ord. (Y/N)"
 
         OnAfterCreatePurchOrder(PurchOrderHeader, SkipMessage);
         if not SkipMessage then
-            Message(Text001, PurchOrderHeader."No.", "No.");
+            Message(Text001, PurchOrderHeader."No.", Rec."No.");
     end;
 
     var

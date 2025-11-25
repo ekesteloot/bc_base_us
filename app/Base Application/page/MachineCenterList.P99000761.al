@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.MachineCenter;
+
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Comment;
+using Microsoft.Manufacturing.Reports;
+
 page 99000761 "Machine Center List"
 {
     ApplicationArea = Manufacturing, Planning;
@@ -30,12 +36,12 @@ page 99000761 "Machine Center List"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the number of the work center to assign this machine center to.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the capacity of the machine center.';
                 }
-                field(Efficiency; Efficiency)
+                field(Efficiency; Rec.Efficiency)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the efficiency factor as a percentage of the machine center.';
@@ -130,10 +136,10 @@ page 99000761 "Machine Center List"
                     Caption = 'Capacity Ledger E&ntries';
                     Image = CapacityLedger;
                     RunObject = Page "Capacity Ledger Entries";
-                    RunPageLink = Type = CONST("Machine Center"),
-                                  "No." = FIELD("No."),
-                                  "Posting Date" = FIELD("Date Filter");
-                    RunPageView = SORTING(Type, "No.", "Work Shift Code", "Item No.", "Posting Date");
+                    RunPageLink = Type = const("Machine Center"),
+                                  "No." = field("No."),
+                                  "Posting Date" = field("Date Filter");
+                    RunPageView = sorting(Type, "No.", "Work Shift Code", "Item No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                 }
@@ -143,8 +149,8 @@ page 99000761 "Machine Center List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Manufacturing Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Machine Center"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Machine Center"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Lo&ad")
@@ -153,8 +159,8 @@ page 99000761 "Machine Center List"
                     Caption = 'Lo&ad';
                     Image = WorkCenterLoad;
                     RunObject = Page "Machine Center Load";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = SORTING("No.");
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = sorting("No.");
                     ToolTip = 'View the availability of the machine or work center, including its the capacity, the allocated quantity, availability after orders, and the load in percent of its total capacity.';
                 }
                 action(Statistics)
@@ -163,9 +169,9 @@ page 99000761 "Machine Center List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Machine Center Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Work Shift Filter" = FIELD("Work Shift Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Work Shift Filter" = field("Work Shift Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -188,9 +194,9 @@ page 99000761 "Machine Center List"
                     Caption = 'A&bsence';
                     Image = WorkCenterAbsence;
                     RunObject = Page "Capacity Absence";
-                    RunPageLink = "Capacity Type" = CONST("Machine Center"),
-                                  "No." = FIELD("No."),
-                                  Date = FIELD("Date Filter");
+                    RunPageLink = "Capacity Type" = const("Machine Center"),
+                                  "No." = field("No."),
+                                  Date = field("Date Filter");
                     ToolTip = 'View which working days are not available. ';
                 }
                 action("Ta&sk List")
@@ -199,11 +205,11 @@ page 99000761 "Machine Center List"
                     Caption = 'Ta&sk List';
                     Image = TaskList;
                     RunObject = Page "Machine Center Task List";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = SORTING(Type, "No.")
-                                  WHERE(Type = CONST("Machine Center"),
-                                        Status = FILTER(.. Released),
-                                        "Routing Status" = FILTER(<> Finished));
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = sorting(Type, "No.")
+                                  where(Type = const("Machine Center"),
+                                        Status = filter(.. Released),
+                                        "Routing Status" = filter(<> Finished));
                     ToolTip = 'View the list of operations that are scheduled for the machine center.';
                 }
             }

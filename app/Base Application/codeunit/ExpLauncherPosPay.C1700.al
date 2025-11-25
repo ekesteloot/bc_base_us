@@ -1,3 +1,10 @@
+namespace Microsoft.BankMgt.PositivePay;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Setup;
+using System.IO;
+
 codeunit 1700 "Exp. Launcher Pos. Pay"
 {
     Permissions = TableData "Check Ledger Entry" = rimd,

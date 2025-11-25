@@ -1,3 +1,15 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.ExtendedText;
+
 page 16 "Chart of Accounts"
 {
     ApplicationArea = Basic, Suite;
@@ -51,7 +63,7 @@ page 16 "Chart of Accounts"
                     AboutText = 'Tap or click on amounts to drill down and see the underlying entries to learn what is behind the numbers for insight and troubleshooting.';
                     Visible = AmountVisible;
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = Basic, Suite;
                     BlankZero = true;
@@ -87,7 +99,7 @@ page 16 "Chart of Accounts"
                     ToolTip = 'Specifies whether you will be able to post directly or only indirectly to this general ledger account.';
                     Visible = false;
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
@@ -219,8 +231,8 @@ page 16 "Chart of Accounts"
             part(Control1905532107; "Dimensions FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Table ID" = CONST(15),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(15),
+                              "No." = field("No.");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -250,8 +262,8 @@ page 16 "Chart of Accounts"
                     Caption = 'Ledger E&ntries';
                     Image = GLRegisters;
                     RunObject = Page "General Ledger Entries";
-                    RunPageLink = "G/L Account No." = FIELD("No.");
-                    RunPageView = SORTING("G/L Account No.");
+                    RunPageLink = "G/L Account No." = field("No.");
+                    RunPageView = sorting("G/L Account No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -261,8 +273,8 @@ page 16 "Chart of Accounts"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 group(Dimensions)
@@ -275,8 +287,8 @@ page 16 "Chart of Accounts"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(15),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(15),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -294,7 +306,7 @@ page 16 "Chart of Accounts"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(GLAcc);
-                            DefaultDimMultiple.SetMultiRecord(GLAcc, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(GLAcc, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -308,7 +320,7 @@ page 16 "Chart of Accounts"
 
                         trigger OnAction()
                         begin
-                            SetFilter("Dimension Set ID Filter", DimensionSetIDFilter.LookupFilter());
+                            Rec.SetFilter("Dimension Set ID Filter", DimensionSetIDFilter.LookupFilter());
                         end;
                     }
                 }
@@ -318,9 +330,9 @@ page 16 "Chart of Accounts"
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     ToolTip = 'View additional information that has been added to the description for the current account.';
                 }
                 action("Receivables-Payables")
@@ -342,7 +354,7 @@ page 16 "Chart of Accounts"
                     var
                         CalcGLAccWhereUsed: Codeunit "Calc. G/L Acc. Where-Used";
                     begin
-                        CalcGLAccWhereUsed.CheckGLAcc("No.");
+                        CalcGLAccWhereUsed.CheckGLAcc(Rec."No.");
                     end;
                 }
             }
@@ -356,10 +368,10 @@ page 16 "Chart of Accounts"
                     Caption = 'G/L &Account Balance';
                     Image = GLAccountBalance;
                     RunObject = Page "G/L Account Balance";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter");
                     ToolTip = 'View a summary of the debit and credit balances for different time periods, for the account that you select in the chart of accounts.';
                 }
                 action("G/L &Balance")
@@ -368,9 +380,9 @@ page 16 "Chart of Accounts"
                     Caption = 'G/L &Balance';
                     Image = GLBalance;
                     RunObject = Page "G/L Balance";
-                    RunPageLink = "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter");
+                    RunPageLink = "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter");
                     RunPageOnRec = true;
                     ToolTip = 'View a summary of the debit and credit balances for all the accounts in the chart of accounts, for the time period that you select.';
                 }
@@ -388,11 +400,11 @@ page 16 "Chart of Accounts"
                     Caption = 'G/L Account Balance/Bud&get';
                     Image = Period;
                     RunObject = Page "G/L Account Balance/Budget";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter"),
-                                  "Budget Filter" = FIELD("Budget Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter"),
+                                  "Budget Filter" = field("Budget Filter");
                     ToolTip = 'View a summary of the debit and credit balances and the budgeted amounts for different time periods for the current account.';
                 }
                 action("G/L Balance/B&udget")
@@ -401,10 +413,10 @@ page 16 "Chart of Accounts"
                     Caption = 'G/L Balance/B&udget';
                     Image = ChartOfAccounts;
                     RunObject = Page "G/L Balance/Budget";
-                    RunPageLink = "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter"),
-                                  "Budget Filter" = FIELD("Budget Filter");
+                    RunPageLink = "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter"),
+                                  "Budget Filter" = field("Budget Filter");
                     RunPageOnRec = true;
                     ToolTip = 'View a summary of the debit and credit balances and the budgeted amounts for different time periods for the current account.';
                 }
@@ -479,11 +491,11 @@ page 16 "Chart of Accounts"
                     var
                         PostedDocsWithNoIncBuf: Record "Posted Docs. With No Inc. Buf.";
                     begin
-                        if "Account Type" = "Account Type"::Posting then
-                            PostedDocsWithNoIncBuf.SetRange("G/L Account No. Filter", "No.")
+                        if Rec."Account Type" = Rec."Account Type"::Posting then
+                            PostedDocsWithNoIncBuf.SetRange("G/L Account No. Filter", Rec."No.")
                         else
-                            if Totaling <> '' then
-                                PostedDocsWithNoIncBuf.SetFilter("G/L Account No. Filter", Totaling)
+                            if Rec.Totaling <> '' then
+                                PostedDocsWithNoIncBuf.SetFilter("G/L Account No. Filter", Rec.Totaling)
                             else
                                 exit;
                         PAGE.Run(PAGE::"Posted Docs. With No Inc. Doc.", PostedDocsWithNoIncBuf);
@@ -721,9 +733,9 @@ page 16 "Chart of Accounts"
 
     trigger OnAfterGetRecord()
     begin
-        NoEmphasize := "Account Type" <> "Account Type"::Posting;
-        NameIndent := Indentation;
-        NameEmphasize := "Account Type" <> "Account Type"::Posting;
+        NoEmphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
+        NameIndent := Rec.Indentation;
+        NameEmphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
     end;
 
     trigger OnInit()
@@ -733,7 +745,7 @@ page 16 "Chart of Accounts"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetupNewGLAcc(xRec, BelowxRec);
+        Rec.SetupNewGLAcc(xRec, BelowxRec);
     end;
 
     trigger OnOpenPage()
@@ -743,11 +755,8 @@ page 16 "Chart of Accounts"
 
     var
         DimensionSetIDFilter: Page "Dimension Set ID Filter";
-        [InDataSet]
         NoEmphasize: Boolean;
-        [InDataSet]
         NameEmphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
         AmountVisible: Boolean;
         DebitCreditVisible: Boolean;

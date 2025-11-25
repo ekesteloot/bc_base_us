@@ -1,3 +1,12 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Reports;
+using System.Text;
+
 page 5915 "Service Tasks"
 {
     ApplicationArea = Service;
@@ -6,7 +15,7 @@ page 5915 "Service Tasks"
     PageType = Worksheet;
     SaveValues = true;
     SourceTable = "Service Item Line";
-    SourceTableView = SORTING("Response Date", "Response Time", Priority);
+    SourceTableView = sorting("Response Date", "Response Time", Priority);
     UsageCategory = Tasks;
 
     layout
@@ -34,14 +43,14 @@ page 5915 "Service Tasks"
 
                     trigger OnValidate()
                     begin
-                        FilterGroup(2);
-                        TempTextFilter := GetFilter("Resource Filter");
-                        FilterGroup(0);
+                        Rec.FilterGroup(2);
+                        TempTextFilter := Rec.GetFilter("Resource Filter");
+                        Rec.FilterGroup(0);
                         SetResourceFilter();
                         if not TestFilter() then begin
                             ResourceFilter := TempTextFilter;
                             SetResourceFilter();
-                            Error(Text000, TableCaption);
+                            Error(Text000, Rec.TableCaption);
                         end;
                         ResourceFilterOnAfterValidate();
                     end;
@@ -64,14 +73,14 @@ page 5915 "Service Tasks"
 
                     trigger OnValidate()
                     begin
-                        FilterGroup(2);
-                        TempTextFilter := GetFilter("Resource Group Filter");
-                        FilterGroup(0);
+                        Rec.FilterGroup(2);
+                        TempTextFilter := Rec.GetFilter("Resource Group Filter");
+                        Rec.FilterGroup(0);
                         SetResourceGroupFilter();
                         if not TestFilter() then begin
                             ResourceGroupFilter := TempTextFilter;
                             SetResourceGroupFilter();
-                            Error(Text000, TableCaption);
+                            Error(Text000, Rec.TableCaption);
                         end;
                         ResourceGroupFilterOnAfterVali();
                     end;
@@ -84,14 +93,14 @@ page 5915 "Service Tasks"
 
                     trigger OnValidate()
                     begin
-                        FilterGroup(2);
-                        TempTextFilter := GetFilter("Response Date");
-                        FilterGroup(0);
+                        Rec.FilterGroup(2);
+                        TempTextFilter := Rec.GetFilter("Response Date");
+                        Rec.FilterGroup(0);
                         SetRespDateFilter();
                         if not TestFilter() then begin
                             RespDateFilter := TempTextFilter;
                             SetRespDateFilter();
-                            Error(Text000, TableCaption);
+                            Error(Text000, Rec.TableCaption);
                         end;
                         RespDateFilterOnAfterValidate();
                     end;
@@ -105,12 +114,12 @@ page 5915 "Service Tasks"
 
                     trigger OnValidate()
                     begin
-                        TempAllocationStatus := "Allocation Status Filter";
+                        TempAllocationStatus := Rec."Allocation Status Filter";
                         SetAllocationFilter();
                         if not TestFilter() then begin
                             AllocationStatus := TempAllocationStatus;
                             SetAllocationFilter();
-                            Error(Text000, TableCaption);
+                            Error(Text000, Rec.TableCaption);
                         end;
                         AllocationStatusOnAfterValidat();
                     end;
@@ -148,14 +157,14 @@ page 5915 "Service Tasks"
 
                     trigger OnValidate()
                     begin
-                        FilterGroup(2);
-                        TempTextFilter := GetFilter("Document No.");
-                        FilterGroup(0);
+                        Rec.FilterGroup(2);
+                        TempTextFilter := Rec.GetFilter("Document No.");
+                        Rec.FilterGroup(0);
                         SetServOrderFilter();
                         if not TestFilter() then begin
                             ServOrderFilter := TempTextFilter;
                             SetServOrderFilter();
-                            Error(Text000, TableCaption());
+                            Error(Text000, Rec.TableCaption());
                         end;
                         ServOrderFilterOnAfterValidate();
                     end;
@@ -178,14 +187,14 @@ page 5915 "Service Tasks"
 
                     trigger OnValidate()
                     begin
-                        FilterGroup(2);
-                        TempTextFilter := GetFilter("Repair Status Code");
-                        FilterGroup(0);
+                        Rec.FilterGroup(2);
+                        TempTextFilter := Rec.GetFilter("Repair Status Code");
+                        Rec.FilterGroup(0);
                         SetRepStatFilter();
                         if not TestFilter() then begin
                             RepairStatusFilter := TempTextFilter;
                             SetRepStatFilter();
-                            Error(Text000, TableCaption);
+                            Error(Text000, Rec.TableCaption);
                         end;
                         RepairStatusFilterOnAfterValid();
                     end;
@@ -205,7 +214,7 @@ page 5915 "Service Tasks"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the estimated time when service should start on this service item.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the service priority for this item.';
@@ -277,9 +286,9 @@ page 5915 "Service Tasks"
                     trigger OnAssistEdit()
                     begin
                         Clear(ItemLedgerEntry);
-                        ItemLedgerEntry.SetRange("Item No.", "Item No.");
-                        ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
-                        ItemLedgerEntry.SetRange("Serial No.", "Serial No.");
+                        ItemLedgerEntry.SetRange("Item No.", Rec."Item No.");
+                        ItemLedgerEntry.SetRange("Variant Code", Rec."Variant Code");
+                        ItemLedgerEntry.SetRange("Serial No.", Rec."Serial No.");
                         PAGE.Run(PAGE::"Item Ledger Entries", ItemLedgerEntry);
                     end;
                 }
@@ -289,7 +298,7 @@ page 5915 "Service Tasks"
                     ToolTip = 'Specifies a description of this service item.';
                     Visible = false;
                 }
-                field(Warranty; Warranty)
+                field(Warranty; Rec.Warranty)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that warranty on either parts or labor exists for this item.';
@@ -308,7 +317,7 @@ page 5915 "Service Tasks"
             group(Control44)
             {
                 ShowCaption = false;
-                field(Description2; Description)
+                field(Description2; Rec.Description)
                 {
                     ApplicationArea = Service;
                     Editable = false;
@@ -351,7 +360,7 @@ page 5915 "Service Tasks"
                     var
                         PageManagement: Codeunit "Page Management";
                     begin
-                        if ServHeader.Get("Document Type", "Document No.") then begin
+                        if ServHeader.Get(Rec."Document Type", Rec."Document No.") then begin
                             PageManagement.PageRunModal(ServHeader);
 
                             if ServOrderFilter <> '' then begin
@@ -372,10 +381,10 @@ page 5915 "Service Tasks"
                     Caption = '&Item Worksheet';
                     Image = ItemWorksheet;
                     RunObject = Page "Service Item Worksheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "Document No." = FIELD("Document No."),
-                                  "Line No." = FIELD("Line No."),
-                                  "Resource Filter" = FIELD("Resource Filter");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "Document No." = field("Document No."),
+                                  "Line No." = field("Line No."),
+                                  "Resource Filter" = field("Resource Filter");
                     ToolTip = 'View or edit information about service items, such as repair status, fault comments and codes, and cost. In this window, you can update information on the items such as repair status and fault and resolution codes. You can also enter new service lines for resource hours, for the use of spare parts and for specific service costs.';
                 }
             }
@@ -397,9 +406,9 @@ page 5915 "Service Tasks"
                     trigger OnAction()
                     begin
                         Clear(ServItemLine);
-                        FilterGroup(2);
-                        ServItemLine.SetView(GetView());
-                        FilterGroup(0);
+                        Rec.FilterGroup(2);
+                        ServItemLine.SetView(Rec.GetView());
+                        Rec.FilterGroup(0);
                         ServItemLine.SetRange("No. of Allocations");
                         ServItemLine.SetRange("No. of Active/Finished Allocs");
 
@@ -417,9 +426,9 @@ page 5915 "Service Tasks"
                     trigger OnAction()
                     begin
                         Clear(ServItemLine);
-                        ServItemLine.SetRange("Document Type", "Document Type");
-                        ServItemLine.SetRange("Document No.", "Document No.");
-                        ServItemLine.SetRange("Line No.", "Line No.");
+                        ServItemLine.SetRange("Document Type", Rec."Document Type");
+                        ServItemLine.SetRange("Document No.", Rec."Document No.");
+                        ServItemLine.SetRange("Line No.", Rec."Line No.");
                         REPORT.Run(REPORT::"Service Item Worksheet", true, true, ServItemLine);
                     end;
                 }
@@ -443,12 +452,12 @@ page 5915 "Service Tasks"
 
     trigger OnAfterGetRecord()
     begin
-        ServHeader.Get("Document Type", "Document No.");
+        ServHeader.Get(Rec."Document Type", Rec."Document No.");
 
         if not Cust.Get(ServHeader."Customer No.") then
             Clear(Cust);
 
-        CalcFields("No. of Active/Finished Allocs");
+        Rec.CalcFields("No. of Active/Finished Allocs");
     end;
 
     trigger OnOpenPage()
@@ -499,35 +508,35 @@ page 5915 "Service Tasks"
 
     procedure SetRepStatFilter()
     begin
-        FilterGroup(2);
-        SetFilter("Repair Status Code", RepairStatusFilter);
-        RepairStatusFilter := GetFilter("Repair Status Code");
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetFilter("Repair Status Code", RepairStatusFilter);
+        RepairStatusFilter := Rec.GetFilter("Repair Status Code");
+        Rec.FilterGroup(0);
     end;
 
     procedure SetRespDateFilter()
     var
         FilterTokens: Codeunit "Filter Tokens";
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         FilterTokens.MakeDateFilter(RespDateFilter);
-        SetFilter("Response Date", RespDateFilter);
-        RespDateFilter := GetFilter("Response Date");
-        FilterGroup(0);
+        Rec.SetFilter("Response Date", RespDateFilter);
+        RespDateFilter := Rec.GetFilter("Response Date");
+        Rec.FilterGroup(0);
     end;
 
     procedure SetDocFilter()
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         case DocFilter of
             DocFilter::Order:
-                SetRange("Document Type", "Document Type"::Order);
+                Rec.SetRange("Document Type", Rec."Document Type"::Order);
             DocFilter::Quote:
-                SetRange("Document Type", "Document Type"::Quote);
+                Rec.SetRange("Document Type", Rec."Document Type"::Quote);
             DocFilter::All:
-                SetRange("Document Type");
+                Rec.SetRange("Document Type");
         end;
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     procedure SetDocFilterHeader(var ServHeader: Record "Service Header")
@@ -548,90 +557,90 @@ page 5915 "Service Tasks"
 
     procedure SetServOrderFilter()
     begin
-        FilterGroup(2);
-        SetFilter("Document No.", ServOrderFilter);
-        ServOrderFilter := GetFilter("Document No.");
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetFilter("Document No.", ServOrderFilter);
+        ServOrderFilter := Rec.GetFilter("Document No.");
+        Rec.FilterGroup(0);
     end;
 
     procedure SetResourceFilter()
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         if ResourceFilter <> '' then begin
-            SetFilter("No. of Active/Finished Allocs", '>0');
-            SetFilter("Resource Filter", ResourceFilter);
-            ResourceFilter := GetFilter("Resource Filter");
+            Rec.SetFilter("No. of Active/Finished Allocs", '>0');
+            Rec.SetFilter("Resource Filter", ResourceFilter);
+            ResourceFilter := Rec.GetFilter("Resource Filter");
         end else begin
             if ResourceGroupFilter = '' then
-                SetRange("No. of Active/Finished Allocs");
-            SetRange("Resource Filter");
+                Rec.SetRange("No. of Active/Finished Allocs");
+            Rec.SetRange("Resource Filter");
         end;
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     procedure SetResourceGroupFilter()
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         if ResourceGroupFilter <> '' then begin
-            SetFilter("No. of Active/Finished Allocs", '>0');
-            SetFilter("Resource Group Filter", ResourceGroupFilter);
-            ResourceGroupFilter := GetFilter("Resource Group Filter");
+            Rec.SetFilter("No. of Active/Finished Allocs", '>0');
+            Rec.SetFilter("Resource Group Filter", ResourceGroupFilter);
+            ResourceGroupFilter := Rec.GetFilter("Resource Group Filter");
         end else begin
             if ResourceFilter = '' then
-                SetRange("No. of Active/Finished Allocs");
-            SetRange("Resource Group Filter");
+                Rec.SetRange("No. of Active/Finished Allocs");
+            Rec.SetRange("Resource Group Filter");
         end;
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     procedure SetAllocationFilter()
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         case AllocationStatus of
             AllocationStatus::" ":
                 begin
-                    SetRange("Allocation Status Filter");
-                    SetRange("No. of Allocations");
+                    Rec.SetRange("Allocation Status Filter");
+                    Rec.SetRange("No. of Allocations");
                 end;
             AllocationStatus::Nonactive:
                 begin
-                    SetRange("Allocation Status Filter", "Allocation Status Filter"::Nonactive);
-                    SetFilter("No. of Allocations", '>0');
+                    Rec.SetRange("Allocation Status Filter", Rec."Allocation Status Filter"::Nonactive);
+                    Rec.SetFilter("No. of Allocations", '>0');
                 end;
             AllocationStatus::Active:
                 begin
-                    SetRange("Allocation Status Filter", "Allocation Status Filter"::Active);
-                    SetFilter("No. of Allocations", '>0');
+                    Rec.SetRange("Allocation Status Filter", Rec."Allocation Status Filter"::Active);
+                    Rec.SetFilter("No. of Allocations", '>0');
                 end;
             AllocationStatus::Finished:
                 begin
-                    SetRange("Allocation Status Filter", "Allocation Status Filter"::Finished);
-                    SetFilter("No. of Allocations", '>0');
+                    Rec.SetRange("Allocation Status Filter", Rec."Allocation Status Filter"::Finished);
+                    Rec.SetFilter("No. of Allocations", '>0');
                 end;
             AllocationStatus::Canceled:
                 begin
-                    SetRange("Allocation Status Filter", "Allocation Status Filter"::Canceled);
-                    SetFilter("No. of Allocations", '>0');
+                    Rec.SetRange("Allocation Status Filter", Rec."Allocation Status Filter"::Canceled);
+                    Rec.SetFilter("No. of Allocations", '>0');
                 end;
             AllocationStatus::"Reallocation Needed":
                 begin
-                    SetRange("Allocation Status Filter", "Allocation Status Filter"::"Reallocation Needed");
-                    SetFilter("No. of Allocations", '>0');
+                    Rec.SetRange("Allocation Status Filter", Rec."Allocation Status Filter"::"Reallocation Needed");
+                    Rec.SetFilter("No. of Allocations", '>0');
                 end;
         end;
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     local procedure TestFilter(): Boolean
     begin
         if ServOrderFilter <> '' then begin
-            FilterGroup(2);
-            if GetRangeMin("Document No.") = GetRangeMax("Document No.") then
-                if IsEmpty() then begin
-                    FilterGroup(0);
+            Rec.FilterGroup(2);
+            if Rec.GetRangeMin("Document No.") = Rec.GetRangeMax("Document No.") then
+                if Rec.IsEmpty() then begin
+                    Rec.FilterGroup(0);
                     exit(false);
                 end;
-            FilterGroup(0);
+            Rec.FilterGroup(0);
         end;
         exit(true);
     end;

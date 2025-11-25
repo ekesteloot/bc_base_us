@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ServiceMgt.Document;
+
 table 1877 "VAT Setup Posting Groups"
 {
     Caption = 'VAT Setup Posting Groups';

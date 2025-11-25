@@ -1,3 +1,12 @@
+namespace Microsoft.CashFlow.Account;
+
+using Microsoft.CashFlow.Comment;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CashFlow.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Foundation.Comment;
+
 table 841 "Cash Flow Account"
 {
     Caption = 'Cash Flow Account';
@@ -32,8 +41,8 @@ table 841 "Cash Flow Account"
         }
         field(5; Comment; Boolean)
         {
-            CalcFormula = Exist("Cash Flow Account Comment" WHERE("Table Name" = CONST("Cash Flow Account"),
-                                                                   "No." = FIELD("No.")));
+            CalcFormula = exist("Cash Flow Account Comment" where("Table Name" = const("Cash Flow Account"),
+                                                                   "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -80,12 +89,12 @@ table 841 "Cash Flow Account"
         }
         field(13; Amount; Decimal)
         {
-            CalcFormula = Sum("Cash Flow Forecast Entry"."Amount (LCY)" WHERE("Cash Flow Account No." = FIELD("No."),
-                                                                               "Cash Flow Account No." = FIELD(FILTER(Totaling)),
-                                                                               "Cash Flow Forecast No." = FIELD("Cash Flow Forecast Filter"),
-                                                                               "Cash Flow Date" = FIELD("Date Filter"),
-                                                                               "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                               "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+            CalcFormula = sum("Cash Flow Forecast Entry"."Amount (LCY)" where("Cash Flow Account No." = field("No."),
+                                                                               "Cash Flow Account No." = field(FILTER(Totaling)),
+                                                                               "Cash Flow Forecast No." = field("Cash Flow Forecast Filter"),
+                                                                               "Cash Flow Date" = field("Date Filter"),
+                                                                               "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                               "Global Dimension 2 Code" = field("Global Dimension 2 Filter")));
             Caption = 'Amount';
             FieldClass = FlowField;
         }
@@ -94,23 +103,21 @@ table 841 "Cash Flow Account"
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
         }
         field(30; "Global Dimension 2 Filter"; Code[20])
         {
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
         }
         field(34; Totaling; Text[250])
         {
             Caption = 'Totaling';
             TableRelation = "Cash Flow Account";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -134,8 +141,6 @@ table 841 "Cash Flow Account"
         {
             Caption = 'G/L Account Filter';
             TableRelation = "G/L Account";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnLookup()

@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Contact;
+
 page 5071 "Web Source Launch"
 {
     Caption = 'Web Source Launch';

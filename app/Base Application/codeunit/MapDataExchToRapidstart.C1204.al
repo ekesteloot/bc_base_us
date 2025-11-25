@@ -1,3 +1,6 @@
+namespace System.IO;
+
+
 codeunit 1204 "Map Data Exch. To RapidStart"
 {
 

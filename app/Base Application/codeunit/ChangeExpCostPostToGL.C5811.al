@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Setup;
+
 codeunit 5811 "Change Exp. Cost Post. to G/L"
 {
     Permissions = TableData "Value Entry" = rm,

@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+
 codeunit 246 "Item Jnl.-Explode BOM"
 {
     TableNo = "Item Journal Line";
@@ -12,27 +18,26 @@ codeunit 246 "Item Jnl.-Explode BOM"
         if IsHandled then
             exit;
 
-        TestField("Item No.");
-        CalcFields("Reserved Qty. (Base)");
-        TestField("Reserved Qty. (Base)", 0);
-        FromBOMComp.SetRange("Parent Item No.", "Item No.");
+        CheckItemJournalLine(Rec);
+
+        FromBOMComp.SetRange("Parent Item No.", Rec."Item No.");
         FromBOMComp.SetRange(Type, FromBOMComp.Type::Item);
         NoOfBOMComp := FromBOMComp.Count();
         if NoOfBOMComp = 0 then
             Error(
               Text000,
-              "Item No.");
+              Rec."Item No.");
 
         Selection := StrMenu(Text003, 2);
         if Selection = 0 then
             exit;
 
         ToItemJnlLine.Reset();
-        ToItemJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-        ToItemJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
-        ToItemJnlLine.SetRange("Document No.", "Document No.");
-        ToItemJnlLine.SetRange("Posting Date", "Posting Date");
-        ToItemJnlLine.SetRange("Entry Type", "Entry Type");
+        ToItemJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+        ToItemJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+        ToItemJnlLine.SetRange("Document No.", Rec."Document No.");
+        ToItemJnlLine.SetRange("Posting Date", Rec."Posting Date");
+        ToItemJnlLine.SetRange("Entry Type", Rec."Entry Type");
         ToItemJnlLine := Rec;
 
         LineSpacing := GetItemJnlLineSpacing(Rec, ToItemJnlLine);
@@ -49,52 +54,49 @@ codeunit 246 "Item Jnl.-Explode BOM"
                 ToItemJnlLine."Unit of Measure Code" := FromBOMComp."Unit of Measure Code";
                 ToItemJnlLine."Qty. per Unit of Measure" :=
                   UOMMgt.GetQtyPerUnitOfMeasure(Item, FromBOMComp."Unit of Measure Code");
-                ToItemJnlLine.Quantity := Round("Quantity (Base)" * FromBOMComp."Quantity per", 0.00001);
+                ToItemJnlLine.Quantity := Round(Rec."Quantity (Base)" * FromBOMComp."Quantity per", 0.00001);
                 if ToItemJnlLine.Quantity > 0 then
                     if ItemCheckAvail.ItemJnlCheckLine(ToItemJnlLine) then
                         ItemCheckAvail.RaiseUpdateInterruptedError();
             until FromBOMComp.Next() = 0;
 
-        ToItemJnlLine := Rec;
-        ToItemJnlLine.Init();
-        ToItemJnlLine.Description := Description;
-        ToItemJnlLine.Modify();
+        InitParentItemLine(Rec);
 
         FromBOMComp.Reset();
-        FromBOMComp.SetRange("Parent Item No.", "Item No.");
+        FromBOMComp.SetRange("Parent Item No.", Rec."Item No.");
         FromBOMComp.SetRange(Type, FromBOMComp.Type::Item);
         FromBOMComp.Find('-');
-        NextLineNo := "Line No.";
+        NextLineNo := Rec."Line No.";
 
         repeat
             ToItemJnlLine.Init();
-            ToItemJnlLine."Journal Template Name" := "Journal Template Name";
-            ToItemJnlLine."Document No." := "Document No.";
-            ToItemJnlLine."Document Date" := "Document Date";
-            ToItemJnlLine."Posting Date" := "Posting Date";
-            ToItemJnlLine."External Document No." := "External Document No.";
-            ToItemJnlLine."Entry Type" := "Entry Type";
-            ToItemJnlLine."Location Code" := "Location Code";
+            ToItemJnlLine."Journal Template Name" := Rec."Journal Template Name";
+            ToItemJnlLine."Document No." := Rec."Document No.";
+            ToItemJnlLine."Document Date" := Rec."Document Date";
+            ToItemJnlLine."Posting Date" := Rec."Posting Date";
+            ToItemJnlLine."External Document No." := Rec."External Document No.";
+            ToItemJnlLine."Entry Type" := Rec."Entry Type";
+            ToItemJnlLine."Location Code" := Rec."Location Code";
             NextLineNo := NextLineNo + LineSpacing;
             OnBeforeAssignToItemJnlLineNo(Rec, NextLineNo);
             ToItemJnlLine."Line No." := NextLineNo;
-            ToItemJnlLine."Drop Shipment" := "Drop Shipment";
-            ToItemJnlLine."Source Code" := "Source Code";
-            ToItemJnlLine."Reason Code" := "Reason Code";
+            ToItemJnlLine."Drop Shipment" := Rec."Drop Shipment";
+            ToItemJnlLine."Source Code" := Rec."Source Code";
+            ToItemJnlLine."Reason Code" := Rec."Reason Code";
             ToItemJnlLine.Validate("Item No.", FromBOMComp."No.");
             ToItemJnlLine.Validate("Variant Code", FromBOMComp."Variant Code");
             ToItemJnlLine.Validate("Unit of Measure Code", FromBOMComp."Unit of Measure Code");
             ToItemJnlLine.Validate(
               Quantity,
-              Round("Quantity (Base)" * FromBOMComp."Quantity per", 0.00001));
+              Round(Rec."Quantity (Base)" * FromBOMComp."Quantity per", 0.00001));
             ToItemJnlLine.Description := FromBOMComp.Description;
             OnBeforeToItemJnlLineInsert(ToItemJnlLine, Rec, NextLineNo);
             ToItemJnlLine.Insert();
 
             if Selection = 1 then begin
-                ToItemJnlLine."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
-                ToItemJnlLine."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
-                ToItemJnlLine."Dimension Set ID" := "Dimension Set ID";
+                ToItemJnlLine."Shortcut Dimension 1 Code" := Rec."Shortcut Dimension 1 Code";
+                ToItemJnlLine."Shortcut Dimension 2 Code" := Rec."Shortcut Dimension 2 Code";
+                ToItemJnlLine."Dimension Set ID" := Rec."Dimension Set ID";
                 ToItemJnlLine.Modify();
             end;
         until FromBOMComp.Next() = 0;
@@ -131,6 +133,24 @@ codeunit 246 "Item Jnl.-Explode BOM"
             LineSpacing := 10000;
     end;
 
+    local procedure CheckItemJournalLine(ItemJournalLine: Record "Item Journal Line")
+    begin
+        ItemJournalLine.TestField("Item No.");
+        ItemJournalLine.CalcFields("Reserved Qty. (Base)");
+        ItemJournalLine.TestField("Reserved Qty. (Base)", 0);
+
+        OnAfterCheckItemJournalLine(ItemJournalLine);
+    end;
+
+    local procedure InitParentItemLine(var FromItemJournalLine: Record "Item Journal Line")
+    begin
+        ToItemJnlLine := FromItemJournalLine;
+        ToItemJnlLine.Init();
+        ToItemJnlLine.Description := FromItemJournalLine.Description;
+        OnBeforeToItemJournalLineModify(ToItemJnlLine, FromItemJournalLine);
+        ToItemJnlLine.Modify();
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAssignToItemJnlLineNo(FromItemJournalLine: Record "Item Journal Line"; var NextLineNo: Integer)
     begin
@@ -153,6 +173,16 @@ codeunit 246 "Item Jnl.-Explode BOM"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFromBOMCompSetFilters(var FromBOMComponent: Record "BOM Component")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCheckItemJournalLine(ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeToItemJournalLineModify(var ToItemJournalLine: Record "Item Journal Line"; FromItemJournalLine: Record "Item Journal Line")
     begin
     end;
 }

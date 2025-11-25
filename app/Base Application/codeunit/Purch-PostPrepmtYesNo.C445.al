@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using System.Utilities;
+
 codeunit 445 "Purch.-Post Prepmt. (Yes/No)"
 {
     EventSubscriberInstance = Manual;

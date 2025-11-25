@@ -68,6 +68,8 @@ page 2631 "Statistical Account Card"
         {
             group("A&ccount")
             {
+                Caption = 'Account';
+
                 action(Dimensions)
                 {
                     ApplicationArea = Dimensions;

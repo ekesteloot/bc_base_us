@@ -1,3 +1,18 @@
+namespace Microsoft.ProjectMgt.RoleCenters;
+
+#if CLEAN21
+using Microsoft.Pricing.Reports;
+using Microsoft.Pricing.Worksheet;
+#endif
+using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ProjectMgt.Resources.Setup;
+#if CLEAN21
+using Microsoft.Purchases.Pricing;
+#endif
+using Microsoft.Shared.Navigate;
+
 page 8906 "Resource Manager Role Center"
 {
     Caption = 'Resource Manager Role Center';
@@ -27,7 +42,7 @@ page 8906 "Resource Manager Role Center"
                     ApplicationArea = Jobs;
                     Caption = 'Resource Price Changes';
                     Image = ResourcePrice;
-                    RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(493)); // "Resource Price Changes";
+                    RunPageView = where("Object Type" = const(Page), "Object ID" = const(493)); // "Resource Price Changes";
                     RunObject = Page "Role Center Page Dispatcher";
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -150,7 +165,7 @@ page 8906 "Resource Manager Role Center"
                     {
                         ApplicationArea = Jobs;
                         Caption = 'Resource - Price List';
-                        RunPageView = WHERE("Object Type" = CONST(Report), "Object ID" = CONST(1115)); // "Resource - Price List";
+                        RunPageView = where("Object Type" = const(Report), "Object ID" = const(1115)); // "Resource - Price List";
                         RunObject = Page "Role Center Page Dispatcher";
                         ObsoleteState = Pending;
                         ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -192,7 +207,7 @@ page 8906 "Resource Manager Role Center"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Resource Costs';
-                        RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(203)); // "Resource Costs";
+                        RunPageView = where("Object Type" = const(Page), "Object ID" = const(203)); // "Resource Costs";
                         RunObject = Page "Role Center Page Dispatcher";
                         ObsoleteState = Pending;
                         ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -203,7 +218,7 @@ page 8906 "Resource Manager Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Resource Prices';
                         AccessByPermission = TableData "Resource" = R;
-                        RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(204)); // "Resource Prices";
+                        RunPageView = where("Object Type" = const(Page), "Object ID" = const(204)); // "Resource Prices";
                         RunObject = Page "Role Center Page Dispatcher";
                         ObsoleteState = Pending;
                         ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';

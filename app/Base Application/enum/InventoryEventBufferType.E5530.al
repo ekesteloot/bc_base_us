@@ -1,4 +1,6 @@
-﻿enum 5530 "Inventory Event Buffer Type"
+﻿namespace Microsoft.InventoryMgt.Availability;
+
+enum 5530 "Inventory Event Buffer Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

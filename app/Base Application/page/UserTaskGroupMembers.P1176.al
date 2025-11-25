@@ -24,13 +24,13 @@ page 1176 "User Task Group Members"
                         User: Record User;
                         Users: Page Users;
                     begin
-                        if User.Get("User Security ID") then
+                        if User.Get(Rec."User Security ID") then
                             Users.SetRecord(User);
 
                         Users.LookupMode := true;
                         if Users.RunModal() = ACTION::LookupOK then begin
                             Users.GetRecord(User);
-                            "User Security ID" := User."User Security ID";
+                            Rec."User Security ID" := User."User Security ID";
                             CurrPage.Update(true);
                         end;
                     end;

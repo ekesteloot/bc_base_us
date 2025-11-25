@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Security.User;
+
 page 2584 "Dim Correct Posted Ledg Entr"
 {
     PageType = ListPart;

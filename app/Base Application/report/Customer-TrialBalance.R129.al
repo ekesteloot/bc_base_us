@@ -1,7 +1,12 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Customer;
+
 report 129 "Customer - Trial Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/CustomerTrialBalance.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerTrialBalance.rdlc';
     AdditionalSearchTerms = 'payment due,order status';
     ApplicationArea = Basic, Suite;
     Caption = 'Customer - Trial Balance';
@@ -13,7 +18,7 @@ report 129 "Customer - Trial Balance"
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("Customer Posting Group");
+            DataItemTableView = sorting("Customer Posting Group");
             RequestFilterFields = "No.", "Date Filter", "Customer Posting Group";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

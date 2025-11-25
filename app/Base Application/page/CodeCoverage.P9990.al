@@ -1,3 +1,10 @@
+﻿namespace System.TestTools.CodeCoverage;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Tooling;
+
 page 9990 "Code Coverage"
 {
     ApplicationArea = All;
@@ -26,7 +33,7 @@ page 9990 "Code Coverage"
 
                     trigger OnValidate()
                     begin
-                        SetFilter("Object ID", ObjectIdFilter);
+                        Rec.SetFilter("Object ID", ObjectIdFilter);
                         TotalCoveragePercent := CodeCoverageMgt.ObjectsCoverage(Rec, TotalNoofLines, TotalLinesHit) * 100;
                         CurrPage.Update(false);
                     end;
@@ -39,7 +46,7 @@ page 9990 "Code Coverage"
 
                     trigger OnValidate()
                     begin
-                        SetFilter("Object Type", ObjectTypeFilter);
+                        Rec.SetFilter("Object Type", ObjectTypeFilter);
                         TotalCoveragePercent := CodeCoverageMgt.ObjectsCoverage(Rec, TotalNoofLines, TotalLinesHit);
                         CurrPage.Update(false);
                     end;
@@ -90,25 +97,25 @@ page 9990 "Code Coverage"
                     StyleExpr = CoveragePercentStyle;
                     ToolTip = 'Specifies the percentage applied to the code coverage line.';
                 }
-                field(LineType; "Line Type")
+                field(LineType; Rec."Line Type")
                 {
                     ApplicationArea = All;
                     Caption = 'Line Type';
                     ToolTip = 'Specifies the line type, when tracking which part of the application code has been exercised during test activity.';
                 }
-                field(ObjectType; "Object Type")
+                field(ObjectType; Rec."Object Type")
                 {
                     ApplicationArea = All;
                     Caption = 'Object Type';
                     ToolTip = 'Specifies the average coverage of all code lines inside the object, when tracking which part of the application code has been exercised during test activity.';
                 }
-                field(ObjectID; "Object ID")
+                field(ObjectID; Rec."Object ID")
                 {
                     ApplicationArea = All;
                     Caption = 'Object ID';
                     ToolTip = 'Specifies the ID of the object.';
                 }
-                field(LineNo; "Line No.")
+                field(LineNo; Rec."Line No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Line No.';
@@ -215,7 +222,7 @@ page 9990 "Code Coverage"
                     ObjectIdFilter := '10000..99999|1000000..98999999';
                     AllObj.SetFilter("Object ID", ObjectIdFilter);
                     CodeCoverageInclude(AllObj);
-                    SetFilter("Object ID", ObjectIdFilter)
+                    Rec.SetFilter("Object ID", ObjectIdFilter)
                 end;
             }
         }
@@ -295,17 +302,17 @@ page 9990 "Code Coverage"
         LinesNotHit := 0;
         Indent := 2;
 
-        CodeLine := Line;
+        CodeLine := Rec.Line;
 
-        case "Line Type" of
-            "Line Type"::Object:
+        case Rec."Line Type" of
+            Rec."Line Type"::Object:
                 // Sum object coverage
                 begin
                     CoveragePercent := CodeCoverageMgt.ObjectCoverage(Rec, NoofLines, LinesHit) * 100;
                     LinesNotHit := NoofLines - LinesHit;
                     Indent := 0
                 end;
-            "Line Type"::"Trigger/Function":
+            Rec."Line Type"::"Trigger/Function":
                 // Sum method coverage
                 begin
                     CoveragePercent := CodeCoverageMgt.FunctionCoverage(Rec, NoofLines, LinesHit) * 100;
@@ -313,7 +320,7 @@ page 9990 "Code Coverage"
                     Indent := 1
                 end
             else
-                if "No. of Hits" > 0 then
+                if Rec."No. of Hits" > 0 then
                     CoveragePercent := 100
                 else
                     CoveragePercent := 0;
@@ -352,10 +359,8 @@ page 9990 "Code Coverage"
         LinesHit: Integer;
         LinesNotHit: Integer;
         Indent: Integer;
-        [InDataSet]
         CodeCoverageRunning: Boolean;
         CodeLine: Text[1024];
-        [InDataSet]
         NoofLines: Integer;
         CoveragePercent: Decimal;
         TotalNoofLines: Integer;
@@ -369,7 +374,7 @@ page 9990 "Code Coverage"
 
     local procedure SetStyles()
     begin
-        if "Line Type" = "Line Type"::Empty then
+        if Rec."Line Type" = Rec."Line Type"::Empty then
             CoveragePercentStyle := 'Standard'
         else
             if CoveragePercent < RequiredCoveragePercent then

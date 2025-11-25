@@ -1,7 +1,13 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+
 report 309 "Vendor - Purchase List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/VendorPurchaseList.rdlc';
+    RDLCLayout = './Purchases/Reports/VendorPurchaseList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor Purchase List';
     UsageCategory = ReportsAndAnalysis;

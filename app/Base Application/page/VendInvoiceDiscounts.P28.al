@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 page 28 "Vend. Invoice Discounts"
 {
     Caption = 'Vend. Invoice Discounts';
@@ -12,7 +14,7 @@ page 28 "Vend. Invoice Discounts"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the contents of the Invoice Disc. Code field on the vendor card.';

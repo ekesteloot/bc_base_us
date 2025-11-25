@@ -1,3 +1,8 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.Foundation.Address;
+using Microsoft.HumanResources.Comment;
+
 page 5203 "Alternative Address Card"
 {
     Caption = 'Alternative Address Card';
@@ -13,7 +18,7 @@ page 5203 "Alternative Address Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the employee''s alternate address.';
@@ -23,7 +28,7 @@ page 5203 "Alternative Address Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the employee''s last name.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an alternate address for the employee.';
@@ -37,7 +42,7 @@ page 5203 "Alternative Address Card"
                 {
                     ShowCaption = false;
                     Visible = IsCountyVisible;
-                    field(County; County)
+                    field(County; Rec.County)
                     {
                         ApplicationArea = Basic, Suite;
                     }
@@ -47,7 +52,7 @@ page 5203 "Alternative Address Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the postal code.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the alternate address.';
@@ -59,7 +64,7 @@ page 5203 "Alternative Address Card"
 
                     trigger OnValidate()
                     begin
-                        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                     end;
                 }
                 field("Phone No."; Rec."Phone No.")
@@ -119,9 +124,9 @@ page 5203 "Alternative Address Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Human Resource Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Alternative Address"),
-                                  "No." = FIELD("Employee No."),
-                                  "Alternative Address Code" = FIELD(Code);
+                    RunPageLink = "Table Name" = const("Alternative Address"),
+                                  "No." = field("Employee No."),
+                                  "Alternative Address Code" = field(Code);
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -130,7 +135,7 @@ page 5203 "Alternative Address Card"
 
     trigger OnOpenPage()
     begin
-        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
     end;
 
     var
@@ -142,8 +147,8 @@ page 5203 "Alternative Address Card"
 
     procedure Caption(): Text
     begin
-        if Employee.Get("Employee No.") then
-            exit("Employee No." + ' ' + Employee.FullName() + ' ' + Code);
+        if Employee.Get(Rec."Employee No.") then
+            exit(Rec."Employee No." + ' ' + Employee.FullName() + ' ' + Rec.Code);
 
         exit(Text000);
     end;

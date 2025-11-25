@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 2586 "Dim Corr Find by Dimension"
 {
     PageType = Worksheet;
@@ -22,7 +26,7 @@ page 2586 "Dim Corr Find by Dimension"
                 {
                     ApplicationArea = All;
                     Caption = 'Dimension Value Code';
-                    TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
+                    TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"));
                     ToolTip = 'Specifies the value code of the dimension.';
 
                     trigger OnValidate()

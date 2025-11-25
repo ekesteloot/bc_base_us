@@ -8,7 +8,7 @@ report 10077 "Sales Shipment NA"
     {
         dataitem("Sales Shipment Header"; "Sales Shipment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.", "Ship-to Code", "No. Printed";
             RequestFilterHeading = 'Sales Shipment';
@@ -17,12 +17,12 @@ report 10077 "Sales Shipment NA"
             }
             dataitem("Sales Shipment Line"; "Sales Shipment Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 dataitem(SalesLineComments; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST(Shipment), "Print On Shipment" = CONST(true));
+                    DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const(Shipment), "Print On Shipment" = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -49,8 +49,8 @@ report 10077 "Sales Shipment NA"
             }
             dataitem("Sales Comment Line"; "Sales Comment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST(Shipment), "Print On Shipment" = CONST(true), "Document Line No." = CONST(0));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const(Shipment), "Print On Shipment" = const(true), "Document Line No." = const(0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -70,10 +70,10 @@ report 10077 "Sales Shipment NA"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -244,7 +244,7 @@ report 10077 "Sales Shipment NA"
                     }
                     dataitem(SalesShptLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(SalesShptLineNumber; Number)
                         {
                         }
@@ -298,7 +298,7 @@ report 10077 "Sales Shipment NA"
                         }
                         dataitem(AsmLoop; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(PostedAsmLineItemNo; BlanksForIndent() + PostedAsmLine."No.")
                             {
                             }
@@ -433,6 +433,7 @@ report 10077 "Sales Shipment NA"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Salesperson Code" = '' then
                     Clear(SalesPurchPerson)
@@ -618,9 +619,6 @@ report 10077 "Sales Shipment NA"
         OrderLine: Record "Sales Line";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyInformation: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         CompanyInfo: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         TempSalesShipmentLine: Record "Sales Shipment Line" temporary;
@@ -661,7 +659,6 @@ report 10077 "Sales Shipment NA"
         TaxRegNo: Text;
         TaxRegLabel: Text;
         Text009: Label 'VOID SHIPMENT';
-        [InDataSet]
         LogInteractionEnable: Boolean;
         DisplayAssemblyInformation: Boolean;
         AsmHeaderExists: Boolean;
@@ -684,6 +681,11 @@ report 10077 "Sales Shipment NA"
         ShippedCaptionLbl: Label 'Shipped';
         OrderedCaptionLbl: Label 'Ordered';
         BackOrderedCaptionLbl: Label 'Back Ordered';
+
+    protected var
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     procedure InitLogInteraction()
     begin

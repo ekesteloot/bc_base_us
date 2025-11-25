@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Document;
+
 page 6566 "Invt. Shipments"
 {
     ApplicationArea = Basic, Suite;
@@ -7,7 +9,7 @@ page 6566 "Invt. Shipments"
     Editable = false;
     PageType = List;
     SourceTable = "Invt. Document Header";
-    SourceTableView = WHERE("Document Type" = CONST(Shipment));
+    SourceTableView = where("Document Type" = const(Shipment));
     UsageCategory = Lists;
 
     layout

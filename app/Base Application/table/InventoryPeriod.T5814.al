@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 table 5814 "Inventory Period"
 {
     Caption = 'Inventory Period';

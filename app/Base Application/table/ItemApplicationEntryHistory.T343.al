@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using System.Security.AccessControl;
+
 table 343 "Item Application Entry History"
 {
     Caption = 'Item Application Entry History';
@@ -52,8 +56,6 @@ table 343 "Item Application Entry History"
             Caption = 'Created By User';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(27; "Last Modified Date"; DateTime)
         {
@@ -64,8 +66,6 @@ table 343 "Item Application Entry History"
             Caption = 'Last Modified By User';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(29; "Deleted Date"; DateTime)
         {
@@ -76,8 +76,6 @@ table 343 "Item Application Entry History"
             Caption = 'Deleted By User';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(5800; "Cost Application"; Boolean)
         {

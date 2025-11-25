@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Insurance;
+
 table 5630 "Insurance Type"
 {
     Caption = 'Insurance Type';

@@ -103,8 +103,8 @@ report 10165 "List Price Sheet V16"
             }
             dataitem("Sales Price"; "Price List Line")
             {
-                DataItemLink = "Asset No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter");
-                DataItemTableView = SORTING("Asset Type", "Asset No.", "Source Type", "Source No.", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity") WHERE("Price Type" = CONST(Sale), "Asset Type" = CONST(Item), Status = CONST(Active));
+                DataItemLink = "Asset No." = field("No."), "Variant Code" = field("Variant Filter");
+                DataItemTableView = sorting("Asset Type", "Asset No.", "Source Type", "Source No.", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity") where("Price Type" = const(Sale), "Asset Type" = const(Item), Status = const(Active));
                 column(Sales_Price__Unit_of_Measure_Code_; "Unit of Measure Code")
                 {
                 }
@@ -167,7 +167,7 @@ report 10165 "List Price Sheet V16"
             }
             dataitem(NoSalesPrice; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(Sales_Price___Unit_Price_; "Sales Price"."Unit Price")
                 {
                 }
@@ -352,7 +352,6 @@ report 10165 "List Price Sheet V16"
         CampNo: Code[20];
         AnySalesPriceFound: Boolean;
         ShowSourceType: Integer;
-        [InDataSet]
         SourceNoCtrlEnable: Boolean;
         CurrReport_PAGENOCaptionLbl: Label 'Page';
 }

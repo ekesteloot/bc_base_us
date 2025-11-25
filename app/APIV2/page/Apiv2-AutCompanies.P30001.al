@@ -19,27 +19,27 @@ page 30001 "APIV2 - Aut. Companies"
         {
             repeater(Group)
             {
-                field(id; Id)
+                field(id; Rec.Id)
                 {
                     Caption = 'Id';
                     Editable = false;
                 }
-                field(name; Name)
+                field(name; Rec.Name)
                 {
                     Caption = 'Name';
                     Editable = false;
                 }
-                field(evaluationCompany; "Evaluation Company")
+                field(evaluationCompany; Rec."Evaluation Company")
                 {
                     Caption = 'Evaluation Company';
                     Editable = false;
                 }
-                field(displayName; "Display Name")
+                field(displayName; Rec."Display Name")
                 {
                     Caption = 'Display Name';
                     NotBlank = true;
                 }
-                field(businessProfileId; "Business Profile Id")
+                field(businessProfileId; Rec."Business Profile Id")
                 {
                     Caption = 'Business ProfileId';
                 }
@@ -53,8 +53,8 @@ page 30001 "APIV2 - Aut. Companies"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        Name := COPYSTR("Display Name", 1, MAXSTRLEN(Name));
-        "Evaluation Company" := false;
+        Rec.Name := COPYSTR(Rec."Display Name", 1, MAXSTRLEN(Rec.Name));
+        Rec."Evaluation Company" := false;
     end;
 
     trigger OnOpenPage()

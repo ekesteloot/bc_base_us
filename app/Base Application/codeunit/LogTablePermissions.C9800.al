@@ -1,4 +1,8 @@
 #if not CLEAN21
+namespace System.Security.AccessControl;
+
+using System;
+
 codeunit 9800 "Log Table Permissions"
 {
     EventSubscriberInstance = Manual;

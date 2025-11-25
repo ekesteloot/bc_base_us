@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Setup;
+
 table 5957 "Service Zone"
 {
     Caption = 'Service Zone';

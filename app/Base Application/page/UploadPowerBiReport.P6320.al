@@ -1,3 +1,8 @@
+﻿namespace System.Integration.PowerBI;
+
+using System.IO;
+using System.Utilities;
+
 /// <summary>
 /// Allows users to upload report files to Business Central, which will automatically deploy them to Power BI.
 /// </summary>
@@ -122,7 +127,7 @@ page 6320 "Upload Power BI Report"
     trigger OnClosePage()
     begin
         if PowerBIReportSynchronizer.UserNeedsToSynchronize('') then
-            PowerBIServiceMgt.SynchronizeReportsInBackground();
+            PowerBIServiceMgt.SynchronizeReportsInBackground('');
     end;
 
     var

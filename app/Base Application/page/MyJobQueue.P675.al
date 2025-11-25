@@ -1,3 +1,5 @@
+namespace System.Threading;
+
 page 675 "My Job Queue"
 {
     Caption = 'My Job Queue';
@@ -5,7 +7,7 @@ page 675 "My Job Queue"
     PageType = ListPart;
     RefreshOnActivate = true;
     SourceTable = "Job Queue Entry";
-    SourceTableView = SORTING("Last Ready State");
+    SourceTableView = sorting("Last Ready State");
 
     layout
     {
@@ -93,7 +95,7 @@ page 675 "My Job Queue"
 
                 trigger OnAction()
                 begin
-                    ShowErrorMessage();
+                    Rec.ShowErrorMessage();
                 end;
             }
             action(Cancel)
@@ -105,7 +107,7 @@ page 675 "My Job Queue"
 
                 trigger OnAction()
                 begin
-                    Cancel();
+                    Rec.Cancel();
                 end;
             }
             action(Restart)
@@ -117,7 +119,7 @@ page 675 "My Job Queue"
 
                 trigger OnAction()
                 begin
-                    Restart();
+                    Rec.Restart();
                 end;
             }
             action(ShowRecord)
@@ -129,7 +131,7 @@ page 675 "My Job Queue"
 
                 trigger OnAction()
                 begin
-                    LookupRecordToProcess();
+                    Rec.LookupRecordToProcess();
                 end;
             }
             action(ScheduleReport)
@@ -159,16 +161,15 @@ page 675 "My Job Queue"
 
     trigger OnAfterGetRecord()
     begin
-        StatusIsError := Status = Status::Error;
+        StatusIsError := Rec.Status = Rec.Status::Error;
     end;
 
     trigger OnOpenPage()
     begin
-        SetRange("User ID", UserId);
+        Rec.SetRange("User ID", UserId);
     end;
 
     var
-        [InDataSet]
         StatusIsError: Boolean;
 #if not CLEAN21
         DeprecatedFuncTxt: Label 'This function has been deprecated.';

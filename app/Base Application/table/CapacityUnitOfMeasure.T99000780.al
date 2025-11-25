@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 table 99000780 "Capacity Unit of Measure"
 {
     Caption = 'Capacity Unit of Measure';

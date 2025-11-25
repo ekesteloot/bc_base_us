@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Journal;
+
 enum 83 "Item Journal Template Type"
 {
     Extensible = true;

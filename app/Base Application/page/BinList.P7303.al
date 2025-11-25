@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 7303 "Bin List"
 {
     Caption = 'Bin List';
@@ -25,22 +27,22 @@ page 7303 "Bin List"
                     ToolTip = 'Specifies the code of the zone in which the bin is located.';
                     Visible = false;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a code that uniquely describes the bin.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a description of the bin.';
                 }
-                field(Empty; Empty)
+                field(Empty; Rec.Empty)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies that the bin Specifies no items.';
                 }
-                field(Default; Default)
+                field(Default; Rec.Default)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if the bin is the default bin for an item.';
@@ -87,7 +89,7 @@ page 7303 "Bin List"
                     ToolTip = 'Specifies the maximum weight that this bin can hold.';
                     Visible = false;
                 }
-                field(Dedicated; Dedicated)
+                field(Dedicated; Rec.Dedicated)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies that quantities in the bin are protected from being picked for other demands.';

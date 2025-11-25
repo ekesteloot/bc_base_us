@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 codeunit 1503 "Workflow Record Management"
 {
     SingleInstance = true;

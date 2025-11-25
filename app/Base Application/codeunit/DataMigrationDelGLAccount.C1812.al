@@ -1,3 +1,16 @@
+﻿namespace System.Integration;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 codeunit 1812 "Data Migration Del G/L Account"
 {
 

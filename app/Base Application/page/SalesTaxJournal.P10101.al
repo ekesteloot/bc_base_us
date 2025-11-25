@@ -75,7 +75,7 @@ page 10101 "Sales Tax Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field(Description; Rec.Description)
@@ -90,8 +90,8 @@ page 10101 "Sales Tax Journal"
 
                     trigger OnValidate()
                     begin
-                        case "GST/HST" of
-                            "GST/HST"::Acquisition:
+                        case Rec."GST/HST" of
+                            Rec."GST/HST"::Acquisition:
                                 Error(Text002);
                         end;
                     end;
@@ -125,7 +125,7 @@ page 10101 "Sales Tax Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
             }
@@ -151,7 +151,7 @@ page 10101 "Sales Tax Journal"
                     Editable = false;
                     ToolTip = 'Specifies the name of the balancing account.';
                 }
-                field(Balance; Balance + "Balance (LCY)" - xRec."Balance (LCY)")
+                field(Balance; Balance + Rec."Balance (LCY)" - xRec."Balance (LCY)")
                 {
                     ApplicationArea = All;
                     AutoFormatType = 1;
@@ -160,7 +160,7 @@ page 10101 "Sales Tax Journal"
                     ToolTip = 'Specifies the customer''s balance. ';
                     Visible = BalanceVisible;
                 }
-                field(TotalBalance; TotalBalance + "Balance (LCY)" - xRec."Balance (LCY)")
+                field(TotalBalance; TotalBalance + Rec."Balance (LCY)" - xRec."Balance (LCY)")
                 {
                     ApplicationArea = All;
                     AutoFormatType = 1;
@@ -191,7 +191,7 @@ page 10101 "Sales Tax Journal"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -267,7 +267,7 @@ page 10101 "Sales Tax Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Post Sales Tax Jnl", Rec);
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -282,7 +282,7 @@ page 10101 "Sales Tax Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Post- Print Sales Tax Jnl", Rec);
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -309,7 +309,7 @@ page 10101 "Sales Tax Journal"
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
         AfterGetCurrentRecord();
     end;
 
@@ -322,7 +322,7 @@ page 10101 "Sales Tax Journal"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         UpdateBalance();
-        SetUpNewLine(xRec, Balance, BelowxRec);
+        Rec.SetUpNewLine(xRec, Balance, BelowxRec);
         Clear(ShortcutDimCode);
         Clear(AccName);
         AfterGetCurrentRecord();
@@ -333,9 +333,9 @@ page 10101 "Sales Tax Journal"
         JnlSelected: Boolean;
     begin
         BalAccName := '';
-        OpenedFromBatch := ("Journal Batch Name" <> '') and ("Journal Template Name" = '');
+        OpenedFromBatch := (Rec."Journal Batch Name" <> '') and (Rec."Journal Template Name" = '');
         if OpenedFromBatch then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             GenJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
             exit;
         end;
@@ -362,9 +362,7 @@ page 10101 "Sales Tax Journal"
         ShortcutDimCode: array[8] of Code[20];
         OpenedFromBatch: Boolean;
         Text002: Label '"GST/HST" can not be Acquisition in Sales Tax Journal Line.';
-        [InDataSet]
         BalanceVisible: Boolean;
-        [InDataSet]
         TotalBalanceVisible: Boolean;
         Text19039985: Label 'Account Name';
 

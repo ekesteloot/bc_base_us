@@ -1,3 +1,14 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+
 codeunit 227 "VendEntry-Apply Posted Entries"
 {
     EventSubscriberInstance = Manual;
@@ -52,18 +63,6 @@ codeunit 227 "VendEntry-Apply Posted Entries"
         CannotUnapplyExchRateErr: Label 'You cannot unapply the entry with the posting date %1, because the exchange rate for the additional reporting currency has been changed.';
         CannotUnapplyInReversalErr: Label 'You cannot unapply Vendor Ledger Entry No. %1 because the entry is part of a reversal.';
         CannotApplyClosedEntriesErr: Label 'One or more of the entries that you selected is closed. You cannot apply closed entries.';
-
-#if not CLEAN20
-    [Obsolete('Replaced by Apply(VendLedgEntry, ApplyUnapplyParameters)', '20.0')]
-    procedure Apply(VendLedgEntry: Record "Vendor Ledger Entry"; DocumentNo: Code[20]; ApplicationDate: Date): Boolean
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        exit(Apply(VendLedgEntry, ApplyUnapplyParameters));
-    end;
-#endif
 
     procedure Apply(VendLedgEntry: Record "Vendor Ledger Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters"): Boolean
     var
@@ -288,34 +287,10 @@ codeunit 227 "VendEntry-Apply Posted Entries"
         OnAfterUnApplyVendor(DtldVendLedgEntry);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by PostUnApplyVendor(DtldVendLedgEntry2; ApplyUnapplyParameters', '20.0')]
-    procedure PostUnApplyVendor(DtldVendLedgEntry2: Record "Detailed Vendor Ledg. Entry"; DocNo: Code[20]; PostingDate: Date)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocNo;
-        ApplyUnapplyParameters."Posting Date" := PostingDate;
-        PostUnApplyVendorCommit(DtldVendLedgEntry2, ApplyUnapplyParameters, true);
-    end;
-#endif
-
     procedure PostUnApplyVendor(DtldVendLedgEntry2: Record "Detailed Vendor Ledg. Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     begin
         PostUnApplyVendorCommit(DtldVendLedgEntry2, ApplyUnapplyParameters, true);
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by PostUnApplyVendorCommit()', '20.0')]
-    procedure PostUnApplyVendorCommit(DtldVendLedgEntry2: Record "Detailed Vendor Ledg. Entry"; DocNo: Code[20]; PostingDate: Date; CommitChanges: Boolean)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocNo;
-        ApplyUnapplyParameters."Posting Date" := PostingDate;
-        PostUnApplyVendorCommit(DtldVendLedgEntry2, ApplyUnapplyParameters, CommitChanges);
-    end;
-#endif
 
     procedure PostUnApplyVendorCommit(DtldVendLedgEntry2: Record "Detailed Vendor Ledg. Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters"; CommitChanges: Boolean)
     var
@@ -563,18 +538,6 @@ codeunit 227 "VendEntry-Apply Posted Entries"
         exit(LastTransactionNo);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by PreviewApply(VendorLedgerEntry; ApplyUnapplyParameters)', '20.0')]
-    procedure PreviewApply(VendorLedgerEntry: Record "Vendor Ledger Entry"; DocumentNo: Code[20]; ApplicationDate: Date)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        PreviewApply(VendorLedgerEntry, ApplyUnapplyParameters);
-    end;
-#endif
-
     procedure PreviewApply(VendorLedgerEntry: Record "Vendor Ledger Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     var
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
@@ -589,18 +552,6 @@ codeunit 227 "VendEntry-Apply Posted Entries"
         GenJnlPostPreview.Preview(VendEntryApplyPostedEntries, VendorLedgerEntry);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by W1 implementation of PreviewUnapply(DetailedVendorLedgEntry; ApplyUnapplyParameters)', '20.0')]
-    procedure PreviewUnapply(DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry"; DocumentNo: Code[20]; ApplicationDate: Date)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        PreviewUnapply(DetailedVendorLedgEntry, ApplyUnapplyParameters);
-    end;
-#endif
-
     procedure PreviewUnapply(DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     var
         VendorLedgerEntry: Record "Vendor Ledger Entry";
@@ -612,36 +563,11 @@ codeunit 227 "VendEntry-Apply Posted Entries"
         GenJnlPostPreview.Preview(VendEntryApplyPostedEntries, VendorLedgerEntry);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by SetApplyContext(ApplyUnapplyParameters)', '20.0')]
-    procedure SetApplyContext(ApplicationDate: Date; DocumentNo: Code[20])
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        SetApplyContext(ApplyUnapplyParameters);
-    end;
-#endif
-
     procedure SetApplyContext(ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     begin
         ApplyUnapplyParametersContext := ApplyUnapplyParameters;
         RunOptionPreviewContext := RunOptionPreview::Apply;
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by SetUnapplyContext(DetailedVendorLedgEntry; ApplyUnapplyParameters)', '20.0')]
-    procedure SetUnapplyContext(var DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry"; ApplicationDate: Date; DocumentNo: Code[20])
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        DetailedVendorLedgEntryPreviewContext := DetailedVendorLedgEntry;
-        RunOptionPreviewContext := RunOptionPreview::Unapply;
-    end;
-#endif
 
     procedure SetUnapplyContext(var DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     begin

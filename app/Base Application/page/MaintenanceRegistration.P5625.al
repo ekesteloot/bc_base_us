@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Maintenance;
+
+using Microsoft.FixedAssets.FixedAsset;
+
 page 5625 "Maintenance Registration"
 {
     AutoSplitKey = true;
@@ -29,7 +33,7 @@ page 5625 "Maintenance Registration"
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies the number of the vendor who services the fixed asset for this entry.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies a comment for the service, repairs or maintenance to be performed on the fixed asset.';
@@ -75,8 +79,8 @@ page 5625 "Maintenance Registration"
     var
         FixedAsset: Record "Fixed Asset";
     begin
-        FixedAsset.Get("FA No.");
-        "Maintenance Vendor No." := FixedAsset."Maintenance Vendor No.";
+        FixedAsset.Get(Rec."FA No.");
+        Rec."Maintenance Vendor No." := FixedAsset."Maintenance Vendor No.";
     end;
 }
 

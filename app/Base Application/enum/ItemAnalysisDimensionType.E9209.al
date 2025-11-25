@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 enum 9209 "Item Analysis Dimension Type"
 {
     AssignmentCompatibility = true;

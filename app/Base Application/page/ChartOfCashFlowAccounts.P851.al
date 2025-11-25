@@ -1,3 +1,8 @@
+namespace Microsoft.CashFlow.Account;
+
+using Microsoft.CashFlow.Comment;
+using Microsoft.CashFlow.Forecast;
+
 page 851 "Chart of Cash Flow Accounts"
 {
     ApplicationArea = Basic, Suite;
@@ -36,7 +41,7 @@ page 851 "Chart of Cash Flow Accounts"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the purpose of the cash flow account. Newly created cash flow accounts are automatically assigned the Entry account type, but you can change this.';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
@@ -102,8 +107,8 @@ page 851 "Chart of Cash Flow Accounts"
                     Caption = 'Entries';
                     Image = Entries;
                     RunObject = Page "Cash Flow Forecast Entries";
-                    RunPageLink = "Cash Flow Account No." = FIELD("No.");
-                    RunPageView = SORTING("Cash Flow Account No.");
+                    RunPageLink = "Cash Flow Account No." = field("No.");
+                    RunPageView = sorting("Cash Flow Account No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the entries that exist for the cash flow account. ';
                 }
@@ -113,8 +118,8 @@ page 851 "Chart of Cash Flow Accounts"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Cash Flow Comment";
-                    RunPageLink = "Table Name" = CONST("Cash Flow Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Cash Flow Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -156,22 +161,19 @@ page 851 "Chart of Cash Flow Accounts"
     end;
 
     var
-        [InDataSet]
         NoEmphasize: Boolean;
-        [InDataSet]
         NameEmphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     local procedure NoOnFormat()
     begin
-        NoEmphasize := "Account Type" <> "Account Type"::Entry;
+        NoEmphasize := Rec."Account Type" <> Rec."Account Type"::Entry;
     end;
 
     local procedure NameOnFormat()
     begin
-        NameIndent := Indentation;
-        NameEmphasize := "Account Type" <> "Account Type"::Entry;
+        NameIndent := Rec.Indentation;
+        NameEmphasize := Rec."Account Type" <> Rec."Account Type"::Entry;
     end;
 }
 

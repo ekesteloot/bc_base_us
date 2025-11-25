@@ -1,3 +1,8 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 189 "Suggest Reminder Lines"
 {
     Caption = 'Suggest Reminder Lines';
@@ -7,7 +12,7 @@ report 189 "Suggest Reminder Lines"
     {
         dataitem("Reminder Header"; "Reminder Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Reminder';
 
@@ -71,7 +76,7 @@ report 189 "Suggest Reminder Lines"
         }
         dataitem(CustLedgEntry2; "Cust. Ledger Entry")
         {
-            DataItemTableView = SORTING("Customer No.");
+            DataItemTableView = sorting("Customer No.");
             RequestFilterFields = "Document Type";
 
             trigger OnPreDataItem()
@@ -81,7 +86,7 @@ report 189 "Suggest Reminder Lines"
         }
         dataitem(CustLedgEntryLineFeeOn; "Cust. Ledger Entry")
         {
-            DataItemTableView = SORTING("Entry No.") ORDER(Ascending);
+            DataItemTableView = sorting("Entry No.") order(Ascending);
             RequestFilterFields = "Document Type";
             RequestFilterHeading = 'Apply Fee per Line On';
 

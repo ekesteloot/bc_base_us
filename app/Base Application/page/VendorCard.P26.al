@@ -1,3 +1,40 @@
+﻿namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Comment;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Reports;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Receivables;
+using System.Automation;
+using System.Email;
+using System.Environment;
+#if not CLEAN22
+using System.Environment.Configuration;
+#endif
+using System.Integration.Word;
+using System.Privacy;
+using System.Utilities;
+
 page 26 "Vendor Card"
 {
     Caption = 'Vendor Card';
@@ -24,7 +61,7 @@ page 26 "Vendor Card"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -47,7 +84,7 @@ page 26 "Vendor Card"
                     ToolTip = 'Specifies an additional part of the name.';
                     Visible = false;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies which transactions with the vendor that cannot be processed, for example a vendor that is declared insolvent.';
@@ -71,7 +108,7 @@ page 26 "Vendor Card"
 
                     trigger OnDrillDown()
                     begin
-                        OpenVendorLedgerEntries(false);
+                        Rec.OpenVendorLedgerEntries(false);
                     end;
                 }
                 field(BalanceAsCustomer; BalanceAsCustomer)
@@ -103,7 +140,7 @@ page 26 "Vendor Card"
 
                     trigger OnDrillDown()
                     begin
-                        OpenVendorLedgerEntries(true);
+                        Rec.OpenVendorLedgerEntries(true);
                     end;
                 }
                 field("Document Sending Profile"; Rec."Document Sending Profile")
@@ -155,7 +192,7 @@ page 26 "Vendor Card"
                 group(AddressDetails)
                 {
                     Caption = 'Address';
-                    field(Address; Address)
+                    field(Address; Rec.Address)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the vendor''s address.';
@@ -172,10 +209,10 @@ page 26 "Vendor Card"
 
                         trigger OnValidate()
                         begin
-                            IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                            IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                         end;
                     }
-                    field(City; City)
+                    field(City; Rec.City)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the vendor''s city.';
@@ -184,7 +221,7 @@ page 26 "Vendor Card"
                     {
                         ShowCaption = false;
                         Visible = IsCountyVisible;
-                        field(County; County)
+                        field(County; Rec.County)
                         {
                             ApplicationArea = Basic, Suite;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -208,7 +245,7 @@ page 26 "Vendor Card"
                         trigger OnDrillDown()
                         begin
                             CurrPage.Update(true);
-                            DisplayMap();
+                            Rec.DisplayMap();
                         end;
                     }
                 }
@@ -217,7 +254,7 @@ page 26 "Vendor Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the vendor''s telephone number.';
                 }
-                field(MobilePhoneNo; "Mobile Phone No.")
+                field(MobilePhoneNo; Rec."Mobile Phone No.")
                 {
                     Caption = 'Mobile Phone No.';
                     ApplicationArea = Basic, Suite;
@@ -253,6 +290,12 @@ page 26 "Vendor Card"
                     Importance = Additional;
                     ToolTip = 'Specifies the language that is used when translating specified text on documents to foreign business partner, such as an item description on an order confirmation.';
                 }
+                field("Format Region"; Rec."Format Region")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the region format to be used on printouts for this vendor.';
+                }
                 group(Contact)
                 {
                     Caption = 'Contact';
@@ -262,7 +305,7 @@ page 26 "Vendor Card"
                         Caption = 'Primary Contact Code';
                         ToolTip = 'Specifies the primary contact number for the vendor.';
                     }
-                    field(Control16; Contact)
+                    field(Control16; Rec.Contact)
                     {
                         ApplicationArea = Basic, Suite;
                         Editable = ContactEditable;
@@ -293,7 +336,7 @@ page 26 "Vendor Card"
                     ToolTip = 'Specifies the Economic Operators Registration and Identification number that is used when you exchange information with the customs authorities due to trade into or out of the European Union.';
                     Visible = false;
                 }
-                field(GLN; GLN)
+                field(GLN; Rec.GLN)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
@@ -418,7 +461,7 @@ page 26 "Vendor Card"
                     Importance = Promoted;
                     ToolTip = 'Specifies how to make payment, such as with bank transfer, cash, or check.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the importance of the vendor when suggesting payments using the Suggest Vendor Payments function.';
@@ -432,7 +475,7 @@ page 26 "Vendor Card"
                     var
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        if "Block Payment Tolerance" then begin
+                        if Rec."Block Payment Tolerance" then begin
                             if ConfirmManagement.GetResponseOrDefault(Text002, true) then
                                 PaymentToleranceMgt.DelTolVendLedgEntry(Rec);
                         end else begin
@@ -565,7 +608,7 @@ page 26 "Vendor Card"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        TestField("Base Calendar Code");
+                        Rec.TestField("Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(Rec);
                     end;
                 }
@@ -582,48 +625,48 @@ page 26 "Vendor Card"
             part(Control82; "Vendor Picture")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = NOT IsOfficeAddin;
             }
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::Vendor),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::Vendor),
+                              "No." = field("No.");
             }
             part(VendorStatisticsFactBox; "Vendor Statistics FactBox")
             {
                 ApplicationArea = All;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
             }
             part(AgedAccPayableChart; "Aged Acc. Payable Chart")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = IsOfficeAddin;
             }
             part(VendorHistBuyFromFactBox; "Vendor Hist. Buy-from FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
             }
             part(VendorHistPayToFactBox; "Vendor Hist. Pay-to FactBox")
             {
                 ApplicationArea = All;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                 Visible = false;
             }
             part(WorkflowStatus; "Workflow Status FactBox")
@@ -660,8 +703,8 @@ page 26 "Vendor Card"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(23),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(23),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -671,7 +714,7 @@ page 26 "Vendor Card"
                     Caption = 'Bank Accounts';
                     Image = BankAccount;
                     RunObject = Page "Vendor Bank Account List";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'View or set up the vendor''s bank accounts. You can set up any number of bank accounts for each vendor.';
                 }
                 action(ContactBtn)
@@ -684,7 +727,7 @@ page 26 "Vendor Card"
 
                     trigger OnAction()
                     begin
-                        ShowContact();
+                        Rec.ShowContact();
                     end;
                 }
                 action(OrderAddresses)
@@ -693,7 +736,7 @@ page 26 "Vendor Card"
                     Caption = 'Order &Addresses';
                     Image = Addresses;
                     RunObject = Page "Order Address List";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'View a list of alternate order addresses for the vendor.';
                 }
                 action("&Locations")
@@ -701,7 +744,7 @@ page 26 "Vendor Card"
                     Caption = '&Locations';
                     Image = Warehouse;
                     RunObject = Page "Vendor Locations";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'View the location for the vendor.';
                 }
                 action(RemitAddresses)
@@ -710,7 +753,7 @@ page 26 "Vendor Card"
                     Caption = 'Remit Addresses';
                     Image = Addresses;
                     RunObject = Page "Remit Address List";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'View a list of alternate remit addresses for the vendor.';
                 }
                 action("Co&mments")
@@ -719,8 +762,8 @@ page 26 "Vendor Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Vendor),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Vendor),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(ApprovalEntries)
@@ -733,7 +776,7 @@ page 26 "Vendor Card"
 
                     trigger OnAction()
                     begin
-                        ApprovalsMgmt.OpenApprovalEntriesPage(RecordId);
+                        ApprovalsMgmt.OpenApprovalEntriesPage(Rec.RecordId);
                     end;
                 }
                 action("Item References")
@@ -743,9 +786,9 @@ page 26 "Vendor Card"
                     Caption = 'Item References';
                     Image = Change;
                     RunObject = Page "Item References";
-                    RunPageLink = "Reference Type" = CONST(Vendor),
-                                  "Reference Type No." = FIELD("No.");
-                    RunPageView = SORTING("Reference Type", "Reference Type No.");
+                    RunPageLink = "Reference Type" = const(Vendor),
+                                  "Reference Type No." = field("No.");
+                    RunPageView = sorting("Reference Type", "Reference Type No.");
                     ToolTip = 'Set up a customer''s or vendor''s own identification of the selected item. Item references to the customer''s item number means that the item number is automatically shown on sales documents instead of the number that you use.';
                 }
                 action(VendorReportSelections)
@@ -760,7 +803,7 @@ page 26 "Vendor Card"
                         CustomReportSelection: Record "Custom Report Selection";
                     begin
                         CustomReportSelection.SetRange("Source Type", DATABASE::Vendor);
-                        CustomReportSelection.SetRange("Source No.", "No.");
+                        CustomReportSelection.SetRange("Source No.", Rec."No.");
                         PAGE.RunModal(PAGE::"Vendor Report Selections", CustomReportSelection);
                     end;
                 }
@@ -792,8 +835,8 @@ page 26 "Vendor Card"
                     Caption = 'Items';
                     Image = Item;
                     RunObject = Page "Vendor Item Catalog";
-                    RunPageLink = "Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Vendor No.", "Item No.");
+                    RunPageLink = "Vendor No." = field("No.");
+                    RunPageView = sorting("Vendor No.", "Item No.");
                     ToolTip = 'Open the list of items that you trade in.';
                 }
                 action("Invoice &Discounts")
@@ -802,7 +845,7 @@ page 26 "Vendor Card"
                     Caption = 'Invoice &Discounts';
                     Image = CalculateInvoiceDiscount;
                     RunObject = Page "Vend. Invoice Discounts";
-                    RunPageLink = Code = FIELD("Invoice Disc. Code");
+                    RunPageLink = Code = field("Invoice Disc. Code");
                     ToolTip = 'Set up different discounts that are applied to invoices for the vendor. An invoice discount is automatically granted to the vendor when the total on a sales invoice exceeds a certain amount.';
                 }
                 action(PriceLists)
@@ -817,7 +860,7 @@ page 26 "Vendor Card"
                     var
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        PriceUXManagement.ShowPriceLists(Rec, "Price Amount Type"::Any);
+                        PriceUXManagement.ShowPriceLists(Rec, Enum::"Price Amount Type"::Any);
                     end;
                 }
                 action(PriceLines)
@@ -836,7 +879,7 @@ page 26 "Vendor Card"
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Price);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Price);
                     end;
                 }
                 action(DiscountLines)
@@ -855,7 +898,7 @@ page 26 "Vendor Card"
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Discount);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
 #if not CLEAN21
@@ -887,8 +930,8 @@ page 26 "Vendor Card"
                     Image = Price;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Purchase Prices";
-                    RunPageLink = "Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Vendor No.");
+                    RunPageLink = "Vendor No." = field("No.");
+                    RunPageView = sorting("Vendor No.");
                     ToolTip = 'View or set up different prices for items that you buy from the vendor. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -901,8 +944,8 @@ page 26 "Vendor Card"
                     Image = LineDiscount;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Purchase Line Discounts";
-                    RunPageLink = "Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Vendor No.");
+                    RunPageLink = "Vendor No." = field("No.");
+                    RunPageView = sorting("Vendor No.");
                     ToolTip = 'View or set up different discounts for items that you buy from the vendor. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -915,8 +958,8 @@ page 26 "Vendor Card"
                     Caption = 'Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Purchase Prepmt. Percentages";
-                    RunPageLink = "Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Vendor No.");
+                    RunPageLink = "Vendor No." = field("No.");
+                    RunPageView = sorting("Vendor No.");
                     ToolTip = 'View or edit the percentages of the price that can be paid as a prepayment. ';
                 }
                 action("Recurring Purchase Lines")
@@ -925,7 +968,7 @@ page 26 "Vendor Card"
                     Caption = 'Recurring Purchase Lines';
                     Image = CodesList;
                     RunObject = Page "Standard Vendor Purchase Codes";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'View or edit recurring purchase lines for the vendor.';
                 }
                 action("Mapping Text to Account")
@@ -934,7 +977,7 @@ page 26 "Vendor Card"
                     Caption = 'Mapping Text to Account';
                     Image = MapAccounts;
                     RunObject = Page "Text-to-Account Mapping Wksh.";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'Page mapping text to account';
                 }
             }
@@ -948,8 +991,8 @@ page 26 "Vendor Card"
                     Caption = 'Quotes';
                     Image = Quote;
                     RunObject = Page "Purchase Quotes";
-                    RunPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Buy-from Vendor No.");
+                    RunPageLink = "Buy-from Vendor No." = field("No.");
+                    RunPageView = sorting("Document Type", "Buy-from Vendor No.");
                     ToolTip = 'View a list of ongoing purchase quotes.';
                 }
                 action(Orders)
@@ -958,8 +1001,8 @@ page 26 "Vendor Card"
                     Caption = 'Orders';
                     Image = Document;
                     RunObject = Page "Purchase Order List";
-                    RunPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Buy-from Vendor No.");
+                    RunPageLink = "Buy-from Vendor No." = field("No.");
+                    RunPageView = sorting("Document Type", "Buy-from Vendor No.");
                     ToolTip = 'View a list of ongoing purchase orders for the vendor.';
                 }
                 action("Return Orders")
@@ -968,8 +1011,8 @@ page 26 "Vendor Card"
                     Caption = 'Return Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Purchase Return Order List";
-                    RunPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Buy-from Vendor No.");
+                    RunPageLink = "Buy-from Vendor No." = field("No.");
+                    RunPageView = sorting("Document Type", "Buy-from Vendor No.");
                     ToolTip = 'Open the list of ongoing return orders.';
                 }
                 action("Blanket Orders")
@@ -978,8 +1021,8 @@ page 26 "Vendor Card"
                     Caption = 'Blanket Orders';
                     Image = BlanketOrder;
                     RunObject = Page "Blanket Purchase Orders";
-                    RunPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Buy-from Vendor No.");
+                    RunPageLink = "Buy-from Vendor No." = field("No.");
+                    RunPageView = sorting("Document Type", "Buy-from Vendor No.");
                     ToolTip = 'Open the list of ongoing blanket orders.';
                 }
             }
@@ -993,9 +1036,9 @@ page 26 "Vendor Card"
                     Caption = 'Ledger E&ntries';
                     Image = VendorLedger;
                     RunObject = Page "Vendor Ledger Entries";
-                    RunPageLink = "Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Vendor No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Vendor No." = field("No.");
+                    RunPageView = sorting("Vendor No.")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -1005,9 +1048,9 @@ page 26 "Vendor Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Vendor Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -1017,9 +1060,9 @@ page 26 "Vendor Card"
                     Caption = 'Purchases';
                     Image = Purchase;
                     RunObject = Page "Vendor Purchases";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'Shows a summary of vendor ledger entries. You select the time interval in the View by field. The Period column on the left contains a series of dates that are determined by the time interval you have selected.';
                 }
                 action("Entry Statistics")
@@ -1028,10 +1071,10 @@ page 26 "Vendor Card"
                     Caption = 'Entry Statistics';
                     Image = EntryStatistics;
                     RunObject = Page "Vendor Entry Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'View entry statistics for the record.';
                 }
                 action("1099 Statistics")
@@ -1040,7 +1083,7 @@ page 26 "Vendor Card"
                     Caption = '1099 Statistics';
                     Image = Statistics1099;
                     RunObject = Page "Vendor 1099 Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'Shift+F11';
                     ToolTip = 'View the vendor 1099 statistics that you can use to create 1099 reports and generate the files necessary to submit 1099 information to the Internal Revenue Service (IRS). This information is required to report paid vendor income.';
                 }
@@ -1050,10 +1093,10 @@ page 26 "Vendor Card"
                     Caption = 'Statistics by C&urrencies';
                     Image = Currencies;
                     RunObject = Page "Vend. Stats. by Curr. Lines";
-                    RunPageLink = "Vendor Filter" = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "Vendor Filter" = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Date Filter" = field("Date Filter");
                     ToolTip = 'View statistics for vendors that use multiple currencies.';
                 }
                 action("Item &Tracking Entries")
@@ -1067,7 +1110,7 @@ page 26 "Vendor Card"
                     var
                         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
                     begin
-                        ItemTrackingDocMgt.ShowItemTrackingForEntity(2, "No.", '', '', '');
+                        ItemTrackingDocMgt.ShowItemTrackingForEntity(2, Rec."No.", '', '', '');
                     end;
                 }
                 action("Sent Emails")
@@ -1090,7 +1133,7 @@ page 26 "Vendor Card"
                 Caption = 'Dataverse';
                 Image = Administration;
                 Visible = CRMIntegrationEnabled or CDSIntegrationEnabled;
-                Enabled = (BlockedFilterApplied and (Blocked = Blocked::" ")) or not BlockedFilterApplied;
+                Enabled = (BlockedFilterApplied and (Rec.Blocked = Rec.Blocked::" ")) or not BlockedFilterApplied;
                 action(CDSGotoAccount)
                 {
                     ApplicationArea = Suite;
@@ -1102,7 +1145,7 @@ page 26 "Vendor Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CDSSynchronizeNow)
@@ -1117,7 +1160,7 @@ page 26 "Vendor Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.UpdateOneNow(RecordId);
+                        CRMIntegrationManagement.UpdateOneNow(Rec.RecordId);
                     end;
                 }
                 group(Coupling)
@@ -1137,7 +1180,7 @@ page 26 "Vendor Card"
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(DeleteCDSCoupling)
@@ -1153,7 +1196,7 @@ page 26 "Vendor Card"
                         var
                             CRMCouplingManagement: Codeunit "CRM Coupling Management";
                         begin
-                            CRMCouplingManagement.RemoveCoupling(RecordId);
+                            CRMCouplingManagement.RemoveCoupling(Rec.RecordId);
                         end;
                     }
                 }
@@ -1168,7 +1211,7 @@ page 26 "Vendor Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -1183,7 +1226,7 @@ page 26 "Vendor Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Category6;
                 RunObject = Page "Blanket Purchase Order";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new blanket purchase order for the vendor.';
             }
@@ -1195,7 +1238,7 @@ page 26 "Vendor Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Category6;
                 RunObject = Page "Purchase Quote";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase quote for the vendor.';
             }
@@ -1205,7 +1248,7 @@ page 26 "Vendor Card"
                 Caption = 'Purchase Invoice';
                 Image = NewPurchaseInvoice;
                 RunObject = Page "Purchase Invoice";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase invoice for items or services.';
                 Visible = NOT IsOfficeAddin;
@@ -1216,7 +1259,7 @@ page 26 "Vendor Card"
                 Caption = 'Purchase Order';
                 Image = Document;
                 RunObject = Page "Purchase Order";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase order.';
                 Visible = NOT IsOfficeAddin;
@@ -1227,7 +1270,7 @@ page 26 "Vendor Card"
                 Caption = 'Purchase Credit Memo';
                 Image = CreditMemo;
                 RunObject = Page "Purchase Credit Memo";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase credit memo to revert a posted purchase invoice.';
                 Visible = NOT IsOfficeAddin;
@@ -1240,7 +1283,7 @@ page 26 "Vendor Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Category6;
                 RunObject = Page "Purchase Return Order";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase return order for the vendor.';
             }
@@ -1254,7 +1297,7 @@ page 26 "Vendor Card"
 
                 trigger OnAction()
                 begin
-                    CreateAndShowNewInvoice();
+                    Rec.CreateAndShowNewInvoice();
                 end;
             }
             action(NewPurchaseOrderAddin)
@@ -1267,7 +1310,7 @@ page 26 "Vendor Card"
 
                 trigger OnAction()
                 begin
-                    CreateAndShowNewPurchaseOrder();
+                    Rec.CreateAndShowNewPurchaseOrder();
                 end;
             }
             action(NewPurchaseCrMemoAddin)
@@ -1280,7 +1323,7 @@ page 26 "Vendor Card"
 
                 trigger OnAction()
                 begin
-                    CreateAndShowNewCreditMemo();
+                    Rec.CreateAndShowNewCreditMemo();
                 end;
             }
         }
@@ -1301,7 +1344,7 @@ page 26 "Vendor Card"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ApproveRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.ApproveRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Reject)
@@ -1316,7 +1359,7 @@ page 26 "Vendor Card"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.RejectRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.RejectRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Delegate)
@@ -1331,7 +1374,7 @@ page 26 "Vendor Card"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.DelegateRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.DelegateRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Comment)
@@ -1383,7 +1426,7 @@ page 26 "Vendor Card"
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
                         ApprovalsMgmt.OnCancelVendorApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
                 group(Flow)
@@ -1396,9 +1439,9 @@ page 26 "Vendor Card"
                         Caption = 'Create a Power Automate approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
-                        Visible = IsSaaS and PowerAutomateTemplatesEnabled;
+                        Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
 #else
-                        Visible = IsSaaS;
+                        Visible = IsSaaS and IsPowerAutomatePrivacyNoticeApproved;
 #endif
                         CustomActionType = FlowTemplateGallery;
                         FlowTemplateCategoryName = 'd365bc_approval_vendor';
@@ -1410,7 +1453,7 @@ page 26 "Vendor Card"
                         Caption = 'Create a Power Automate approval flow';
                         Image = Flow;
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
-                        Visible = IsSaaS and not PowerAutomateTemplatesEnabled;
+                        Visible = IsSaaS and not PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
                         ObsoleteReason = 'This action will be handled by platform as part of the CreateFlowFromTemplate customaction';
                         ObsoleteState = Pending;
                         ObsoleteTag = '22.0';
@@ -1503,7 +1546,7 @@ page 26 "Vendor Card"
                     var
                         TempMergeDuplicatesBuffer: Record "Merge Duplicates Buffer" temporary;
                     begin
-                        TempMergeDuplicatesBuffer.Show(DATABASE::Vendor, "No.");
+                        TempMergeDuplicatesBuffer.Show(DATABASE::Vendor, Rec."No.");
                     end;
                 }
             }
@@ -1530,10 +1573,10 @@ page 26 "Vendor Card"
                 Caption = 'Pay Vendor';
                 Image = SuggestVendorPayments;
                 RunObject = Page "Vendor Ledger Entries";
-                RunPageLink = "Vendor No." = FIELD("No."),
-                              "Remaining Amount" = FILTER(< 0),
-                              "Applies-to ID" = FILTER(''),
-                              "Document Type" = FILTER(Invoice);
+                RunPageLink = "Vendor No." = field("No."),
+                              "Remaining Amount" = filter(< 0),
+                              "Applies-to ID" = filter(''),
+                              "Document Type" = filter(Invoice);
                 ToolTip = 'Opens vendor ledger entries with invoices that have not been paid yet.';
             }
             action(WordTemplate)
@@ -1586,7 +1629,7 @@ page 26 "Vendor Card"
 
                     trigger OnAction()
                     begin
-                        OfficeMgt.InitiateSendToIncomingDocuments("No.");
+                        OfficeMgt.InitiateSendToIncomingDocuments(Rec."No.");
                     end;
                 }
                 action(SendToOCR)
@@ -1601,7 +1644,7 @@ page 26 "Vendor Card"
 
                     trigger OnAction()
                     begin
-                        OfficeMgt.InitiateSendToOCR("No.");
+                        OfficeMgt.InitiateSendToOCR(Rec."No.");
                     end;
                 }
                 action(SendIncomingDocApprovalRequest)
@@ -1615,7 +1658,7 @@ page 26 "Vendor Card"
 
                     trigger OnAction()
                     begin
-                        OfficeMgt.InitiateSendApprovalRequest("No.");
+                        OfficeMgt.InitiateSendApprovalRequest(Rec."No.");
                     end;
                 }
             }
@@ -1739,7 +1782,7 @@ page 26 "Vendor Card"
 
                 trigger OnAction()
                 begin
-                    ItemVendor.SetRange("Vendor No.", "No.");
+                    ItemVendor.SetRange("Vendor No.", Rec."No.");
                     REPORT.RunModal(REPORT::"Item/Vendor Catalog", true, true, ItemVendor);
                 end;
             }
@@ -2014,24 +2057,26 @@ page 26 "Vendor Card"
         else
             StartBackgroundCalculations();
         ActivateFields();
-        OpenApprovalEntriesExistCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
-        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(RecordId);
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        OpenApprovalEntriesExistCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(Rec.RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
+        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
 
-        if "No." <> '' then
-            CurrPage.AgedAccPayableChart.PAGE.UpdateChartForVendor("No.");
+        if Rec."No." <> '' then
+            CurrPage.AgedAccPayableChart.PAGE.UpdateChartForVendor(Rec."No.");
         if Rec.GetFilter("Date Filter") = '' then
-            SetRange("Date Filter", 0D, WorkDate());
+            Rec.SetRange("Date Filter", 0D, WorkDate());
         CRMIsCoupledToRecord := CRMIntegrationEnabled or CDSIntegrationEnabled;
         if CRMIsCoupledToRecord then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
     end;
 
     trigger OnInit()
     begin
         ContactEditable := true;
+
+        IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
 
 #if not CLEAN22
         InitPowerAutomateTemplateVisibility();
@@ -2043,7 +2088,7 @@ page 26 "Vendor Card"
         DocumentNoVisibility: Codeunit DocumentNoVisibility;
     begin
         if GuiAllowed then
-            if "No." = '' then
+            if Rec."No." = '' then
                 if DocumentNoVisibility.VendorNoSeriesIsDefault() then
                     NewMode := true;
     end;
@@ -2131,6 +2176,8 @@ page 26 "Vendor Card"
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         FormatAddress: Codeunit "Format Address";
+        PrivacyNotice: Codeunit "Privacy Notice";
+        PrivacyNoticeRegistrations: Codeunit "Privacy Notice Registrations";
         Text001: Label 'Do you want to allow payment tolerance for entries that are currently open?';
         Text002: Label 'Do you want to remove payment tolerance from entries that are currently open?';
         PageBckGrndTaskStartedTxt: Label 'Page Background Task to calculate vendor statistics for vendor %1 started.', Locked = true, Comment = '%1 = Customer No.';
@@ -2142,13 +2189,13 @@ page 26 "Vendor Card"
         OpenApprovalEntriesExist: Boolean;
         ShowWorkflowStatus: Boolean;
         ShowMapLbl: Label 'Show on Map';
-        IsOfficeAddin: Boolean;
         CanCancelApprovalForRecord: Boolean;
         UseVAT: Boolean;
         SendToOCREnabled: Boolean;
         SendToOCRVisible: Boolean;
         SendToIncomingDocEnabled: Boolean;
         SendIncomingDocApprovalRequestVisible: Boolean;
+        IsPowerAutomatePrivacyNoticeApproved: Boolean;
         SendToIncomingDocumentVisible: Boolean;
         NoFieldVisible: Boolean;
         NewMode: Boolean;
@@ -2167,8 +2214,8 @@ page 26 "Vendor Card"
         BackgroundTaskId: Integer;
 
     protected var
-        [InDataSet]
         ContactEditable: Boolean;
+        IsOfficeAddin: Boolean;
 
     [TryFunction]
     local procedure TryGetDictionaryValueFromKey(var DictionaryToLookIn: Dictionary of [Text, Text]; KeyToSearchFor: Text; var ReturnValue: Text)
@@ -2200,7 +2247,7 @@ page 26 "Vendor Card"
     var
         Vendor: Record Vendor;
     begin
-        Vendor.SetRange("No.", "No.");
+        Vendor.SetRange("No.", Rec."No.");
         REPORT.RunModal(ReportNumber, true, true, Vendor);
     end;
 

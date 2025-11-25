@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 page 35 "Item Translations"
 {
     Caption = 'Item Translations';

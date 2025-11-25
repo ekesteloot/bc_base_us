@@ -10,7 +10,7 @@ report 10103 "Vendor Account Detail"
     {
         dataitem(Header; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(Vendor_Account_DetailCaption; Vendor_Account_DetailCaptionLbl)
             {
             }
@@ -205,8 +205,8 @@ report 10103 "Vendor Account Detail"
                 }
                 dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
                 {
-                    DataItemLink = "Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                    DataItemTableView = SORTING("Vendor No.", "Currency Code", "Posting Date");
+                    DataItemLink = "Vendor No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                    DataItemTableView = sorting("Vendor No.", "Currency Code", "Posting Date");
                     RequestFilterFields = "Document Type", Open;
                     column(Vendor_Ledger_Entry__Posting_Date_; "Posting Date")
                     {
@@ -279,7 +279,7 @@ report 10103 "Vendor Account Detail"
                     }
                     dataitem(OtherInfo; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Vendor_Ledger_Entry___Entry_No__; "Vendor Ledger Entry"."Entry No.")
                         {
                         }
@@ -360,7 +360,7 @@ report 10103 "Vendor Account Detail"
                     }
                     dataitem(AppliedEntries; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DocNo_Control81; DocNo)
                         {
                         }

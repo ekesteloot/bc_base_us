@@ -1,3 +1,6 @@
+#if not CLEAN23
+namespace System.Integration.PowerBI;
+
 page 6316 "Content Pack Setup Wizard"
 {
     // // Wizard page to walk the user through connecting PBI content packs to their NAV data.
@@ -5,6 +8,9 @@ page 6316 "Content Pack Setup Wizard"
 
     Caption = 'Connector Setup Information';
     PageType = NavigatePage;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'Instead, follow the Business Central documentation page "Building Power BI Reports to Display Dynamics 365 Business Central Data" available at https://learn.microsoft.com/en-gb/dynamics365/business-central/across-how-use-financials-data-source-powerbi';
+    ObsoleteTag = '23.0';
 
     layout
     {
@@ -41,3 +47,4 @@ page 6316 "Content Pack Setup Wizard"
     }
 }
 
+#endif

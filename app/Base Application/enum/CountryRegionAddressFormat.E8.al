@@ -1,4 +1,6 @@
-﻿enum 8 "Country/Region Address Format"
+﻿namespace Microsoft.Foundation.Address;
+
+enum 8 "Country/Region Address Format"
 {
     Extensible = true;
     AssignmentCompatibility = true;

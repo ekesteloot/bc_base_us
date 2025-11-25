@@ -1,4 +1,21 @@
-﻿codeunit 5815 "Undo Sales Shipment Line"
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.History;
+using Microsoft.AssemblyMgt.Posting;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+
+codeunit 5815 "Undo Sales Shipment Line"
 {
     Permissions = TableData "Sales Line" = rimd,
                   TableData "Sales Shipment Line" = rimd,
@@ -480,7 +497,7 @@
         SalesLine: Record "Sales Line";
         AssemblyHeader: Record "Assembly Header";
     begin
-        SalesLine.Get("Sales Document Type"::Order, SalesShipmentLine2."Order No.", SalesShipmentLine2."Order Line No.");
+        SalesLine.Get(Enum::"Sales Document Type"::Order, SalesShipmentLine2."Order No.", SalesShipmentLine2."Order Line No.");
 
         if SalesLine.AsmToOrderExists(AssemblyHeader) and (AssemblyHeader.Status = AssemblyHeader.Status::Released) then begin
             AssemblyHeader.Status := AssemblyHeader.Status::Open;

@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 enum 524 "Report Selection Usage Reminder"
 {
     Extensible = true;

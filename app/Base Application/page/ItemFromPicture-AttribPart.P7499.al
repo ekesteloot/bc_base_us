@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item.Picture;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Attribute;
+
 page 7499 "Item From Picture-Attrib Part"
 {
     Caption = 'Item Attribute Values';
@@ -19,7 +24,7 @@ page 7499 "Item From Picture-Attrib Part"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Attribute';
                     ToolTip = 'Specifies the item attribute.';
-                    TableRelation = "Item Attribute".Name WHERE(Blocked = CONST(false));
+                    TableRelation = "Item Attribute".Name where(Blocked = const(false));
 
                     trigger OnValidate()
                     var
@@ -40,8 +45,8 @@ page 7499 "Item From Picture-Attrib Part"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Value';
                     ToolTip = 'Specifies the value of the item attribute.';
-                    TableRelation = IF ("Attribute Type" = CONST(Option)) "Item Attribute Value".Value WHERE("Attribute ID" = FIELD("Attribute ID"),
-                                                                                                            Blocked = CONST(false));
+                    TableRelation = if ("Attribute Type" = const(Option)) "Item Attribute Value".Value where("Attribute ID" = field("Attribute ID"),
+                                                                                                            Blocked = const(false));
 
                     trigger OnValidate()
                     var

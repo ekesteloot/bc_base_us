@@ -1,3 +1,14 @@
+﻿namespace Microsoft.ServiceMgt.RoleCenters;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Loaner;
+using Microsoft.ServiceMgt.Reports;
+using System.Security.User;
+using System.Threading;
+
 page 9017 "Service Technician Role Center"
 {
     Caption = 'Outbound Technician - Customer Service';
@@ -96,7 +107,7 @@ page 9017 "Service Technician Role Center"
                 ApplicationArea = Service;
                 Caption = 'In Process';
                 RunObject = Page "Service Orders";
-                RunPageView = WHERE(Status = FILTER("In Process"));
+                RunPageView = where(Status = filter("In Process"));
                 ToolTip = 'View ongoing service orders. ';
             }
             action("Service Item Lines")
@@ -149,9 +160,6 @@ page 9017 "Service Technician Role Center"
                 ApplicationArea = Service;
                 Caption = 'Service &Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Service Order";
                 RunPageMode = Create;
                 ToolTip = 'Create a new service order to perform service on a customer''s item.';
@@ -161,9 +169,6 @@ page 9017 "Service Technician Role Center"
                 ApplicationArea = Service;
                 Caption = '&Loaner';
                 Image = Loaner;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Loaner Card";
                 RunPageMode = Create;
                 ToolTip = 'View or select from items that you lend out temporarily to customers to replace items that they have in service.';

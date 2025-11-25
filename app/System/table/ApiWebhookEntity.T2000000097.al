@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Integration;
+
+using System.Reflection;
+
 table 2000000097 "API Webhook Entity"
 {
     Caption = 'API Webhook Entity';

@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Setup;
+
 codeunit 74 "Purch.-Get Receipt"
 {
     TableNo = "Purchase Line";
@@ -365,6 +370,25 @@ codeunit 74 "Purch.-Get Receipt"
         PurchRcptLine.TestField("VAT Bus. Posting Group", PurchHeader."VAT Bus. Posting Group");
     end;
 
+    procedure GetPurchOrderInvoices(var TempPurchInvHeader: Record "Purch. Inv. Header" temporary; OrderNo: Code[20])
+    var
+        PurchInvHeader: Record "Purch. Inv. Header";
+        PurchInvoicesByOrder: Query "Purchase Invoices By Order";
+    begin
+        TempPurchInvHeader.Reset();
+        TempPurchInvHeader.DeleteAll();
+
+        PurchInvoicesByOrder.SetRange(Order_No_, OrderNo);
+        PurchInvoicesByOrder.SetFilter(Quantity, '<>0');
+        PurchInvoicesByOrder.Open();
+
+        while PurchInvoicesByOrder.Read() do begin
+            PurchInvHeader.Get(PurchInvoicesByOrder.Document_No_);
+            TempPurchInvHeader := PurchInvHeader;
+            TempPurchInvHeader.Insert();
+        end;
+    end;
+
     local procedure CopyDocumentAttachments(var PurchRcptLine2: Record "Purch. Rcpt. Line"; var PurchaseLine: Record "Purchase Line")
     var
         OrderPurchaseLine: Record "Purchase Line";
@@ -379,7 +403,6 @@ codeunit 74 "Purch.-Get Receipt"
         if OrderPurchaseLine.Get(OrderPurchaseLine."Document Type"::Order, PurchRcptLine2."Order No.", PurchRcptLine2."Order Line No.") then
             DocumentAttachmentMgmt.CopyAttachments(OrderPurchaseLine, PurchaseLine);
     end;
-
 
     local procedure CopyDocumentAttachments(OrderNoList: List of [Code[20]]; var PurchaseHeader: Record "Purchase Header")
     var

@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using Microsoft.BankMgt.PaymentExport;
+using System.Reflection;
+
 codeunit 1269 "Export Mapping"
 {
     Permissions = TableData "Data Exch." = rimd;

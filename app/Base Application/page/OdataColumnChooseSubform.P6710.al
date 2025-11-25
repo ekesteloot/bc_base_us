@@ -1,3 +1,9 @@
+﻿namespace System.Integration;
+
+using System;
+using System.Apps;
+using System.Reflection;
+
 page 6710 "OData Column Choose SubForm"
 {
     Caption = 'OData Column Choose SubForm';
@@ -13,7 +19,7 @@ page 6710 "OData Column Choose SubForm"
         {
             repeater(Group)
             {
-                field(Include; Include)
+                field(Include; Rec.Include)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the field name that is selected in the data set.';
@@ -76,7 +82,7 @@ page 6710 "OData Column Choose SubForm"
         ApplicationObjectMetadata: Record "Application Object Metadata";
         inStream: InStream;
     begin
-        if FindFirst() then
+        if Rec.FindFirst() then
             exit;
 
         ActionType := InActionType;
@@ -110,14 +116,14 @@ page 6710 "OData Column Choose SubForm"
 
     procedure GetColumns(var TempTenantWebServiceColumns: Record "Tenant Web Service Columns" temporary)
     begin
-        SetRange(Include, true);
-        if FindFirst() then
+        Rec.SetRange(Include, true);
+        if Rec.FindFirst() then
             repeat
                 TempTenantWebServiceColumns.TransferFields(Rec);
                 TempTenantWebServiceColumns.Insert();
 
-            until Next() = 0;
-        Reset();
+            until Rec.Next() = 0;
+        Rec.Reset();
     end;
 
     local procedure InitColumnsForQuery(queryStream: InStream)
@@ -175,20 +181,20 @@ page 6710 "OData Column Choose SubForm"
         if ColumnList.Contains(FieldNo) then
             exit;
 
-        Init();
-        Validate("Data Item", TableNo);
-        Validate("Field Number", FieldNo);
-        Validate("Field Name", CopyStr(FieldName, 1));
+        Rec.Init();
+        Rec.Validate("Data Item", TableNo);
+        Rec.Validate("Field Number", FieldNo);
+        Rec.Validate("Field Name", CopyStr(FieldName, 1));
         if (ActionType = ActionType::"Create a copy of an existing data set") or
            (ActionType = ActionType::"Edit an existing data set")
         then begin
             if SourceColumnExists(TableNo, FieldNo) then
-                Include := true;
+                Rec.Include := true;
         end else
-            Include := IncludeParam;
+            Rec.Include := IncludeParam;
         repeat
-            "Entry ID" := "Entry ID" + 1;
-        until Insert(true);
+            Rec."Entry ID" := Rec."Entry ID" + 1;
+        until Rec.Insert(true);
 
         ColumnList.Add(FieldNo);
     end;
@@ -196,7 +202,7 @@ page 6710 "OData Column Choose SubForm"
     procedure DeleteColumns()
     begin
         Clear(Rec);
-        DeleteAll();
+        Rec.DeleteAll();
     end;
 
     local procedure SourceColumnExists(TableNo: Integer; FieldNumber: Integer): Boolean
@@ -234,8 +240,8 @@ page 6710 "OData Column Choose SubForm"
     var
         FieldRef: FieldRef;
     begin
-        if not Include then begin
-            FieldRef := RecRef.Field("Field Number");
+        if not Rec.Include then begin
+            FieldRef := RecRef.Field(Rec."Field Number");
             if FieldRef.GetFilter <> '' then
                 Error(CheckFieldErr);
         end;

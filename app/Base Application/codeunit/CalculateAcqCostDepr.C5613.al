@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+
 codeunit 5613 "Calculate Acq. Cost Depr."
 {
     Permissions = TableData "FA Ledger Entry" = rimd;

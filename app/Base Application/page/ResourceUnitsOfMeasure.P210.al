@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.Integration.Dataverse;
+
 page 210 "Resource Units of Measure"
 {
     Caption = 'Resource Units of Measure';
@@ -18,7 +22,7 @@ page 210 "Resource Units of Measure"
                     ToolTip = 'Specifies the number of the resource.';
                     Visible = false;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Jobs;
                     Style = Strong;
@@ -232,7 +236,7 @@ page 210 "Resource Units of Measure"
     var
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
     begin
-        if Res.Get("Resource No.") then
+        if Res.Get(Rec."Resource No.") then
             ResBaseUOM := Res."Base Unit of Measure";
         CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled() and CRMIntegrationManagement.IsUnitGroupMappingEnabled();
     end;
@@ -246,7 +250,7 @@ page 210 "Resource Units of Measure"
 
     local procedure SetStyle()
     begin
-        if Code = ResBaseUOM then
+        if Rec.Code = ResBaseUOM then
             StyleName := 'Strong'
         else
             StyleName := '';

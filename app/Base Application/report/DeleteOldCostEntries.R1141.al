@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Ledger;
+
 report 1141 "Delete Old Cost Entries"
 {
     Caption = 'Delete Old Cost Entries';

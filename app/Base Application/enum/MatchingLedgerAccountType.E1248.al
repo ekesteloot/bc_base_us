@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 enum 1248 "Matching Ledger Account Type"
 {
     Extensible = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Ledger;
+
 enum 5908 "Service Ledger Entry Entry Type"
 {
     Extensible = true;

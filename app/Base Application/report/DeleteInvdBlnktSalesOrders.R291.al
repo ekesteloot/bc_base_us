@@ -10,7 +10,7 @@ report 291 "Delete Invd Blnkt Sales Orders"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Blanket Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Blanket Order"));
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.";
             RequestFilterHeading = 'Blanket Sales Order';
 

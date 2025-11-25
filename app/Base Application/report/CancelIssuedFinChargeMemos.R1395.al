@@ -1,3 +1,8 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.Utilities;
+
 report 1395 "Cancel Issued Fin.Charge Memos"
 {
     AdditionalSearchTerms = 'cancel issued fin. charge memo';
@@ -146,9 +151,7 @@ report 1395 "Cancel Issued Fin.Charge Memos"
         UseSameDocumentNo: Boolean;
         UseSamePostingDate: Boolean;
         NewPostingDate: Date;
-        [InDataSet]
         NewPostingDateEnabled: Boolean;
-        [InDataSet]
         IsJournalTemplNameVisible: Boolean;
         SpecifyPostingDateErr: Label 'You must specify a posting date.';
         ShowNotCancelledFinChargeMemosQst: Label 'One or more of the selected issued finance charge memos could not be canceled.\\Do you want to see a list of the issued finance charge memos that were not canceled?';

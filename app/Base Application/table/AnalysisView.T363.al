@@ -1,3 +1,15 @@
+﻿namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Utilities;
+
 table 363 "Analysis View"
 {
     Caption = 'Analysis View';
@@ -76,11 +88,9 @@ table 363 "Analysis View"
         field(9; "Account Filter"; Code[250])
         {
             Caption = 'Account Filter';
-            TableRelation = IF ("Account Source" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Account Source" = CONST("Cash Flow Account")) "Cash Flow Account";
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Account Source" = const("G/L Account")) "G/L Account"
+            else
+            if ("Account Source" = const("Cash Flow Account")) "Cash Flow Account";
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -195,8 +205,6 @@ table 363 "Analysis View"
         {
             Caption = 'Business Unit Filter';
             TableRelation = "Business Unit";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -731,7 +739,7 @@ table 363 "Analysis View"
             Error(Text013);
     end;
 
-    procedure AnalysisviewBudgetReset()
+    procedure AnalysisViewBudgetReset()
     var
         AnalysisViewBudgetEntry2: Record "Analysis View Budget Entry";
     begin
@@ -740,7 +748,7 @@ table 363 "Analysis View"
         "Last Budget Entry No." := 0;
     end;
 
-    local procedure ValidateModify(FieldName: Text)
+    procedure ValidateModify(FieldName: Text)
     var
         Question: Text;
     begin

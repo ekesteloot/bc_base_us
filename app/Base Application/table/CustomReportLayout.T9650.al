@@ -15,16 +15,18 @@ table 9650 "Custom Report Layout"
         field(2; "Report ID"; Integer)
         {
             Caption = 'Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
-        field(3; "Report Name"; Text[80])
+#pragma warning disable AS0086
+        field(3; "Report Name"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Report ID")));
             Caption = 'Report Name';
             Editable = false;
             FieldClass = FlowField;
         }
+#pragma warning restore AS0086
         field(4; "Company Name"; Text[30])
         {
             Caption = 'Company Name';
@@ -141,7 +143,7 @@ table 9650 "Custom Report Layout"
     local procedure SetUpdated()
     begin
         "Last Modified" := RoundDateTime(CurrentDateTime);
-        "Last Modified by User" := UserId;
+        "Last Modified by User" := CopyStr(UserId(), 1, 50);
     end;
 
     procedure InitBuiltInLayout(ReportID: Integer; LayoutType: Option): Code[20]
@@ -210,42 +212,10 @@ table 9650 "Custom Report Layout"
                 InitBuiltInLayout(ReportLayoutLookup.SelectedReportID(), Type::RDLC.AsInteger());
 
             LayoutSelected := ReportLayoutLookup.SelectedAddWordLayot() OR ReportLayoutLookup.SelectedAddRdlcLayot();
-            IF (NOT LayoutSelected) AND (NOT ReportLayoutLookup.InitCustomTypeLayouts()) THEN
+            if (NOT LayoutSelected) AND (NOT ReportLayoutLookup.InitCustomTypeLayouts()) THEN
                 MESSAGE(NoLayoutSelectedMsg);
         end;
     end;
-
-#if not CLEAN20
-    [Scope('OnPrem')]
-    [Obsolete('This procedure is replaced by the report event FetchReportLayoutByCode. Subscribe to it to retrieve a selected custom layout.', '20.0')]
-    procedure GetCustomRdlc(ReportID: Integer) RdlcTxt: Text
-    var
-        ReportLayoutSelection: Record "Report Layout Selection";
-        InStream: InStream;
-        CustomLayoutCode: Code[20];
-    begin
-        // Temporarily selected layout for Design-time report execution?
-        if ReportLayoutSelection.GetTempLayoutSelected() <> '' then
-            CustomLayoutCode := ReportLayoutSelection.GetTempLayoutSelected()
-        else  // Normal selection
-            if ReportLayoutSelection.HasCustomLayout(ReportID) = 1 then
-                CustomLayoutCode := ReportLayoutSelection."Custom Report Layout Code";
-
-        OnGetCustomRdlcOnAfterSelectCustomLayoutCode(ReportID, CustomLayoutCode);
-
-        if (CustomLayoutCode <> '') and Get(CustomLayoutCode) then begin
-            TestField(Type, Type::RDLC);
-            if UpdateReportLayout(true, false) then
-                Commit(); // Save the updated layout
-            RdlcTxt := GetLayout();
-        end else begin
-            REPORT.RdlcLayout(ReportID, InStream);
-            InStream.Read(RdlcTxt);
-        end;
-
-        OnAfterReportGetCustomRdlc(ReportID, RdlcTxt);
-    end;
-#endif
 
     procedure CopyReportLayout(): Code[20]
     var
@@ -307,7 +277,7 @@ table 9650 "Custom Report Layout"
         if FileName = '' then
             exit;
 
-        ImportLayoutBlob(TempBlob, UpperCase(FileMgt.GetExtension(FileName)));
+        ImportLayoutBlob(TempBlob, CopyStr(UpperCase(FileMgt.GetExtension(FileName)), 1, 30));
     end;
 
     [Scope('OnPrem')]
@@ -555,7 +525,7 @@ table 9650 "Custom Report Layout"
 
         ReportLayoutSelection.SetTempLayoutSelected(Code);
         REPORT.RunModal("Report ID");
-        ReportLayoutSelection.SetTempLayoutSelected('');
+        ReportLayoutSelection.ClearTempLayoutSelected();
     end;
 
     [Scope('OnPrem')]
@@ -999,20 +969,6 @@ table 9650 "Custom Report Layout"
         if CanModify() then
             Rec.Modify();
     end;
-
-#if not CLEAN20
-    [IntegrationEvent(false, false)]
-    [Obsolete('This event is replaced by the report event FetchReportLayoutByCode. Subscribe to it to retrieve a selected custom layout.', '20.0')]
-    local procedure OnAfterReportGetCustomRdlc(ReportId: Integer; var RdlcText: Text)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('This event is replaced by the report event SelectReportLayoutCode. Subscribe to it to select a custom layout.', '20.0')]
-    local procedure OnGetCustomRdlcOnAfterSelectCustomLayoutCode(ReportID: Integer; var CustomLayoutCode: Code[20])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCanBeModified(var CustomReportLayout: Record "Custom Report Layout"; var IsHandled: Boolean)

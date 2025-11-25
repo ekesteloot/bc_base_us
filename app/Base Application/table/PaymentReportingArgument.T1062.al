@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Integration;
+
 #pragma warning disable AS0109
 table 1062 "Payment Reporting Argument"
 #pragma warning restore AS0109

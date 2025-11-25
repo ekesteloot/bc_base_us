@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+
 page 6034 "Service Credit Memo Statistics"
 {
     Caption = 'Service Credit Memo Statistics';
@@ -16,7 +22,7 @@ page 6034 "Service Credit Memo Statistics"
                 field(Amount; CustAmount + InvDiscAmount)
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Amount';
                     ToolTip = 'Specifies the net amount of all the lines in the posted service credit memo. ';
@@ -24,7 +30,7 @@ page 6034 "Service Credit Memo Statistics"
                 field(InvDiscAmount; InvDiscAmount)
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     ToolTip = 'Specifies the invoice discount amount for the entire service credit memo. If there is a check mark in the Calc. Inv. Discount field in the Sales & Receivables Setup window, the discount was calculated automatically.';
@@ -32,7 +38,7 @@ page 6034 "Service Credit Memo Statistics"
                 field(CustAmount; CustAmount)
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total net amount less any invoice discount amount for the posted service invoice. The amount does not include VAT.';
@@ -40,7 +46,7 @@ page 6034 "Service Credit Memo Statistics"
                 field(VATAmount; VATAmount)
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = '3,' + Format(VATAmountText);
                     Caption = 'VAT Amount';
@@ -49,7 +55,7 @@ page 6034 "Service Credit Memo Statistics"
                 field(AmountInclVAT; AmountInclVAT)
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total Incl. VAT';
                     ToolTip = 'Specifies the total amount on the service credit memo, including VAT, which has been posted to the customer''s account.';
@@ -147,7 +153,7 @@ page 6034 "Service Credit Memo Statistics"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupAdjmtValueEntries();
+                        Rec.LookupAdjmtValueEntries();
                     end;
                 }
             }
@@ -202,18 +208,18 @@ page 6034 "Service Credit Memo Statistics"
         if IsHandled then
             exit;
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             Currency.InitRoundingPrecision()
         else
-            Currency.Get("Currency Code");
+            Currency.Get(Rec."Currency Code");
 
-        ServCrMemoLine.SetRange("Document No.", "No.");
+        ServCrMemoLine.SetRange("Document No.", Rec."No.");
 
         if ServCrMemoLine.Find('-') then
             repeat
                 CustAmount := CustAmount + ServCrMemoLine.Amount;
                 AmountInclVAT := AmountInclVAT + ServCrMemoLine."Amount Including VAT";
-                if "Prices Including VAT" then
+                if Rec."Prices Including VAT" then
                     InvDiscAmount := InvDiscAmount + ServCrMemoLine."Inv. Discount Amount" / (1 + ServCrMemoLine."VAT %" / 100)
                 else
                     InvDiscAmount := InvDiscAmount + ServCrMemoLine."Inv. Discount Amount";
@@ -242,12 +248,12 @@ page 6034 "Service Credit Memo Statistics"
         else
             VATAmountText := StrSubstNo(Text001, VATpercentage);
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             AmountLCY := CustAmount
         else
             AmountLCY :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                WorkDate(), "Currency Code", CustAmount, "Currency Factor");
+                WorkDate(), Rec."Currency Code", CustAmount, Rec."Currency Factor");
 
         ProfitLCY := AmountLCY - CostLCY;
         if AmountLCY <> 0 then
@@ -258,7 +264,7 @@ page 6034 "Service Credit Memo Statistics"
         if AmountLCY <> 0 then
             AdjProfitPct := Round(100 * AdjProfitLCY / AmountLCY, 0.1);
 
-        if Cust.Get("Bill-to Customer No.") then
+        if Cust.Get(Rec."Bill-to Customer No.") then
             Cust.CalcFields("Balance (LCY)")
         else
             Clear(Cust);
@@ -276,7 +282,7 @@ page 6034 "Service Credit Memo Statistics"
 
         ServCrMemoLine.CalcVATAmountLines(Rec, TempVATAmountLine);
         CurrPage.Subform.PAGE.SetTempVATAmountLine(TempVATAmountLine);
-        CurrPage.Subform.PAGE.InitGlobals("Currency Code", false, false, false, false, "VAT Base Discount %");
+        CurrPage.Subform.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var

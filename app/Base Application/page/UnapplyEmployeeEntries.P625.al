@@ -1,3 +1,9 @@
+namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.HumanResources.Employee;
+using System.Security.User;
+
 page 625 "Unapply Employee Entries"
 {
     Caption = 'Unapply Employee Entries';
@@ -259,14 +265,14 @@ page 625 "Unapply Employee Entries"
             DtldEmplLedgEntry.SetRange("Transaction No.", DtldEmplLedgEntry2."Transaction No.");
         end;
         DtldEmplLedgEntry.SetRange("Employee No.", DtldEmplLedgEntry2."Employee No.");
-        DeleteAll();
+        Rec.DeleteAll();
         if DtldEmplLedgEntry.Find('-') then
             repeat
                 if (DtldEmplLedgEntry."Entry Type" <> DtldEmplLedgEntry."Entry Type"::"Initial Entry") and
                    not DtldEmplLedgEntry.Unapplied
                 then begin
                     Rec := DtldEmplLedgEntry;
-                    Insert();
+                    Rec.Insert();
                 end;
             until DtldEmplLedgEntry.Next() = 0;
     end;
@@ -275,7 +281,7 @@ page 625 "Unapply Employee Entries"
     var
         EmployeeLedgerEntry: Record "Employee Ledger Entry";
     begin
-        if EmployeeLedgerEntry.Get("Employee Ledger Entry No.") then;
+        if EmployeeLedgerEntry.Get(Rec."Employee Ledger Entry No.") then;
         exit(EmployeeLedgerEntry."Document No.");
     end;
 

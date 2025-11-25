@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 codeunit 5610 "Calculate Depreciation"
 {
 

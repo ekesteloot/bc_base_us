@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+
 codeunit 91 "Purch.-Post (Yes/No)"
 {
     EventSubscriberInstance = Manual;
@@ -9,7 +15,7 @@ codeunit 91 "Purch.-Post (Yes/No)"
     begin
         OnBeforeOnRun(Rec);
 
-        if not Find() then
+        if not Rec.Find() then
             Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
 
         PurchaseHeader.Copy(Rec);

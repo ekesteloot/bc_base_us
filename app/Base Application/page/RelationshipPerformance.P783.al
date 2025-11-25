@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Opportunity;
+
+using System;
+using System.Visualization;
+
 page 783 "Relationship Performance"
 {
     Caption = 'Top 5 Opportunities';

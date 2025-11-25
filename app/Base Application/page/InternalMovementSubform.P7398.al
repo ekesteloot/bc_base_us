@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7398 "Internal Movement Subform"
 {
     Caption = 'Lines';
@@ -142,7 +147,7 @@ page 7398 "Internal Movement Subform"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
     end;
 
     var
@@ -152,7 +157,7 @@ page 7398 "Internal Movement Subform"
     var
         InternalMovementHeader: Record "Internal Movement Header";
     begin
-        if InternalMovementHeader.Get("No.") then
+        if InternalMovementHeader.Get(Rec."No.") then
             exit(InternalMovementHeader."Sorting Method");
     end;
 
@@ -160,12 +165,12 @@ page 7398 "Internal Movement Subform"
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", "From Bin Code");
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", Rec."From Bin Code");
     end;
 
     local procedure OpenItemTrackingLinesForm()
     begin
-        OpenItemTrackingLines();
+        Rec.OpenItemTrackingLines();
     end;
 
     local procedure ItemNoOnAfterValidate()

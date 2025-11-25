@@ -1,4 +1,54 @@
-﻿table 38 "Purchase Header"
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Shared.Archive;
+using Microsoft.WarehouseMgt.Request;
+using System.Environment.Configuration;
+using System.Globalization;
+using System.Reflection;
+using System.Security.User;
+using System.Threading;
+using System.Utilities;
+
+table 38 "Purchase Header"
 {
     Caption = 'Purchase Header';
     DataCaptionFields = "No.", "Buy-from Vendor Name";
@@ -16,14 +66,8 @@
             TableRelation = Vendor;
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateBuyFromVendorNo(Rec, xRec, CurrFieldNo, SkipBuyFromContact, IsHandled);
-                if IsHandled then
-                    exit;
-
+                OnBeforeValidateBuyFromVendorNo(Rec, xRec, CurrFieldNo, SkipBuyFromContact);
                 if "No." = '' then
                     InitRecord();
                 TestStatusOpen();
@@ -120,7 +164,7 @@
                 OnValidateBuyFromVendorNoOnAfterUpdateBuyFromCont(Rec, xRec, CurrFieldNo, SkipBuyFromContact);
 
                 if (xRec."Buy-from Vendor No." <> '') and (xRec."Buy-from Vendor No." <> "Buy-from Vendor No.") then
-                    RecallModifyAddressNotification(GetModifyVendorAddressNotificationId());
+                    Rec.RecallModifyAddressNotification(GetModifyVendorAddressNotificationId());
             end;
         }
         field(3; "No."; Code[20])
@@ -199,6 +243,7 @@
                 "Currency Code" := Vend."Currency Code";
                 "Invoice Disc. Code" := Vend."Invoice Disc. Code";
                 "Language Code" := Vend."Language Code";
+                "Format Region" := Vend."Format Region";
                 SetPurchaserCode(Vend."Purchaser Code", "Purchaser Code");
                 "IRS 1099 Code" := Vend."IRS 1099 Code";
                 Validate("Payment Terms Code");
@@ -235,7 +280,7 @@
 
                 OnValidatePayToVendorNoOnBeforeRecallModifyAddressNotification(Rec, xRec, Vend);
                 if (xRec."Pay-to Vendor No." <> '') and (xRec."Pay-to Vendor No." <> "Pay-to Vendor No.") then
-                    RecallModifyAddressNotification(GetModifyPayToVendorAddressNotificationId());
+                    Rec.RecallModifyAddressNotification(GetModifyPayToVendorAddressNotificationId());
             end;
         }
         field(5; "Pay-to Name"; Text[100])
@@ -291,11 +336,9 @@
         field(9; "Pay-to City"; Text[30])
         {
             Caption = 'Pay-to City';
-            TableRelation = IF ("Pay-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Pay-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Pay-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Pay-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Pay-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Pay-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -342,7 +385,7 @@
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Sell-to Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Sell-to Customer No."));
 
             trigger OnValidate()
             var
@@ -406,11 +449,9 @@
         field(17; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -459,9 +500,16 @@
 
             trigger OnValidate()
             var
+                PurchasesPayablesSetup: Record "Purchases & Payables Setup";
                 SkipJobCurrFactorUpdate: Boolean;
+                IsHandled: Boolean;
                 NeedUpdateCurrencyFactor: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidatePostingDate(Rec, xRec, CurrFieldNo, IsHandled);
+                if IsHandled then
+                    exit;
+
                 TestField("Posting Date");
                 TestNoSeriesDate(
                   "Posting No.", "Posting No. Series",
@@ -477,7 +525,10 @@
                 GLSetup.UpdateVATDate("Posting Date", Enum::"VAT Reporting Date"::"Posting Date", "VAT Reporting Date");
                 Validate("VAT Reporting Date");
 
-                if "Incoming Document Entry No." = 0 then
+                PurchasesPayablesSetup.SetLoadFields("Link Doc. Date To Posting Date");
+                PurchasesPayablesSetup.GetRecordOnce();
+
+                if ("Incoming Document Entry No." = 0) and PurchasesPayablesSetup."Link Doc. Date To Posting Date" then
                     ValidateDocumentDateWithPostingDate();
 
                 if ("Document Type" in ["Document Type"::Invoice, "Document Type"::"Credit Memo"]) and
@@ -550,7 +601,7 @@
                         if not IsHandled then
                             "Due Date" := CalcDate(PaymentTerms."Due Date Calculation", "Document Date");
                         IsHandled := false;
-                        OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(Rec, xRec, FieldNo("Payment Terms Code"), CurrFieldNo, IsHandled);
+                        OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(Rec, xRec, FieldNo("Payment Terms Code"), CurrFieldNo, IsHandled, UpdateDocumentDate);
                         if not IsHandled then
                             "Pmt. Discount Date" := CalcDate(PaymentTerms."Discount Date Calculation", "Document Date");
                         if not UpdateDocumentDate then
@@ -625,7 +676,7 @@
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             var
@@ -703,24 +754,24 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(31; "Vendor Posting Group"; Code[20])
@@ -882,6 +933,11 @@
                 MessageIfPurchLinesExist(FieldCaption("Language Code"));
             end;
         }
+        field(42; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(43; "Purchaser Code"; Code[20])
         {
             Caption = 'Purchaser Code';
@@ -894,7 +950,7 @@
             begin
                 ValidatePurchaserOnPurchHeader(Rec, false, false);
 
-                ApprovalEntry.SetRange("Table ID", DATABASE::"Purchase Header");
+                ApprovalEntry.SetRange("Table ID", Enum::TableID::"Purchase Header");
                 ApprovalEntry.SetRange("Document Type", EnumAssignmentMgt.GetPurchApprovalDocumentType("Document Type"));
                 ApprovalEntry.SetRange("Document No.", "No.");
                 ApprovalEntry.SetFilter(Status, '%1|%2', ApprovalEntry.Status::Created, ApprovalEntry.Status::Open);
@@ -910,9 +966,9 @@
         }
         field(46; Comment; Boolean)
         {
-            CalcFormula = Exist("Purch. Comment Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                             "No." = FIELD("No."),
-                                                             "Document Line No." = CONST(0)));
+            CalcFormula = exist("Purch. Comment Line" where("Document Type" = field("Document Type"),
+                                                             "No." = field("No."),
+                                                             "Document Line No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -1010,9 +1066,9 @@
         field(55; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
 
             trigger OnValidate()
             begin
@@ -1035,9 +1091,9 @@
         }
         field(56; "Recalculate Invoice Disc."; Boolean)
         {
-            CalcFormula = Exist("Purchase Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                       "Document No." = FIELD("No."),
-                                                       "Recalculate Invoice Disc." = CONST(true)));
+            CalcFormula = exist("Purchase Line" where("Document Type" = field("Document Type"),
+                                                       "Document No." = field("No."),
+                                                       "Recalculate Invoice Disc." = const(true)));
             Caption = 'Recalculate Invoice Disc.';
             Editable = false;
             FieldClass = FlowField;
@@ -1056,20 +1112,20 @@
         }
         field(60; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Purchase Line".Amount WHERE("Document Type" = FIELD("Document Type"),
-                                                            "Document No." = FIELD("No.")));
+            CalcFormula = sum("Purchase Line".Amount where("Document Type" = field("Document Type"),
+                                                            "Document No." = field("No.")));
             Caption = 'Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(61; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Purchase Line"."Amount Including VAT" WHERE("Document Type" = FIELD("Document Type"),
-                                                                            "Document No." = FIELD("No.")));
+            CalcFormula = sum("Purchase Line"."Amount Including VAT" where("Document Type" = field("Document Type"),
+                                                                            "Document No." = field("No.")));
             Caption = 'Amount Including VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -1302,11 +1358,9 @@
         field(83; "Buy-from City"; Text[30])
         {
             Caption = 'Buy-from City';
-            TableRelation = IF ("Buy-from Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Buy-from Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Buy-from Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Buy-from Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Buy-from Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Buy-from Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -1350,11 +1404,9 @@
         field(85; "Pay-to Post Code"; Code[20])
         {
             Caption = 'Pay-to Post Code';
-            TableRelation = IF ("Pay-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Pay-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Pay-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Pay-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Pay-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Pay-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -1393,7 +1445,7 @@
             var
                 FormatAddress: Codeunit "Format Address";
             begin
-                if not FormatAddress.UseCounty("Pay-to Country/Region Code") then
+                if not FormatAddress.UseCounty(Rec."Pay-to Country/Region Code") then
                     "Pay-to County" := '';
                 ModifyPayToVendorAddress();
             end;
@@ -1401,11 +1453,9 @@
         field(88; "Buy-from Post Code"; Code[20])
         {
             Caption = 'Buy-from Post Code';
-            TableRelation = IF ("Buy-from Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Buy-from Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Buy-from Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Buy-from Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Buy-from Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Buy-from Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -1449,7 +1499,7 @@
             var
                 FormatAddress: Codeunit "Format Address";
             begin
-                if not FormatAddress.UseCounty("Buy-from Country/Region Code") then
+                if not FormatAddress.UseCounty(Rec."Buy-from Country/Region Code") then
                     "Buy-from County" := '';
                 UpdatePayToAddressFromBuyFromAddress(FieldNo("Pay-to Country/Region Code"));
                 ModifyVendorAddress();
@@ -1458,11 +1508,9 @@
         field(91; "Ship-to Post Code"; Code[20])
         {
             Caption = 'Ship-to Post Code';
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -1505,7 +1553,7 @@
         field(95; "Order Address Code"; Code[10])
         {
             Caption = 'Order Address Code';
-            TableRelation = "Order Address".Code WHERE("Vendor No." = FIELD("Buy-from Vendor No."));
+            TableRelation = "Order Address".Code where("Vendor No." = field("Buy-from Vendor No."));
 
             trigger OnValidate()
             var
@@ -1976,7 +2024,7 @@
                         if not IsHandled then
                             "Prepayment Due Date" := CalcDate(PaymentTerms."Due Date Calculation", "Document Date");
                         IsHandled := false;
-                        OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(Rec, xRec, FieldNo("Prepmt. Payment Terms Code"), CurrFieldNo, IsHandled);
+                        OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(Rec, xRec, FieldNo("Prepmt. Payment Terms Code"), CurrFieldNo, IsHandled, UpdateDocumentDate);
                         if not IsHandled then
                             "Prepmt. Pmt. Discount Date" := CalcDate(PaymentTerms."Discount Date Calculation", "Document Date");
                         if not UpdateDocumentDate then
@@ -2036,9 +2084,9 @@
             var
                 JobQueueEntry: Record "Job Queue Entry";
             begin
-                if "Job Queue Status" = "Job Queue Status"::" " then
+                if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                     exit;
-                JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
             end;
         }
         field(161; "Job Queue Entry ID"; Guid)
@@ -2079,7 +2127,7 @@
         field(178; "Journal Templ. Name"; Code[10])
         {
             Caption = 'Journal Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Purchases));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Purchases));
 
             trigger OnValidate()
             begin
@@ -2101,15 +2149,15 @@
         }
         field(300; "A. Rcd. Not Inv. Ex. VAT (LCY)"; Decimal)
         {
-            CalcFormula = Sum("Purchase Line"."A. Rcd. Not Inv. Ex. VAT (LCY)" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                      "Document No." = FIELD("No.")));
+            CalcFormula = sum("Purchase Line"."A. Rcd. Not Inv. Ex. VAT (LCY)" where("Document Type" = field("Document Type"),
+                                                                                      "Document No." = field("No.")));
             Caption = 'Amount Received Not Invoiced (LCY)';
             FieldClass = FlowField;
         }
         field(301; "Amt. Rcd. Not Invoiced (LCY)"; Decimal)
         {
-            CalcFormula = Sum("Purchase Line"."Amt. Rcd. Not Invoiced (LCY)" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                    "Document No." = FIELD("No.")));
+            CalcFormula = sum("Purchase Line"."Amt. Rcd. Not Invoiced (LCY)" where("Document Type" = field("Document Type"),
+                                                                                    "Document No." = field("No.")));
             Caption = 'Amount Received Not Invoiced (LCY) Incl. VAT';
             FieldClass = FlowField;
         }
@@ -2121,7 +2169,7 @@
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
 
             trigger OnValidate()
@@ -2132,22 +2180,22 @@
         field(1000; "Remit-to Code"; Code[20])
         {
             Caption = 'Remit-to Code';
-            TableRelation = "Remit Address".Code WHERE("Vendor No." = FIELD("Buy-from Vendor No."));
+            TableRelation = "Remit Address".Code where("Vendor No." = field("Buy-from Vendor No."));
         }
         field(1305; "Invoice Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Purchase Line"."Inv. Discount Amount" WHERE("Document No." = FIELD("No."),
-                                                                            "Document Type" = FIELD("Document Type")));
+            CalcFormula = sum("Purchase Line"."Inv. Discount Amount" where("Document No." = field("No."),
+                                                                            "Document Type" = field("Document Type")));
             Caption = 'Invoice Discount Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5043; "No. of Archived Versions"; Integer)
         {
-            CalcFormula = Max("Purchase Header Archive"."Version No." WHERE("Document Type" = FIELD("Document Type"),
-                                                                             "No." = FIELD("No."),
-                                                                             "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence")));
+            CalcFormula = max("Purchase Header Archive"."Version No." where("Document Type" = field("Document Type"),
+                                                                             "No." = field("No."),
+                                                                             "Doc. No. Occurrence" = field("Doc. No. Occurrence")));
             Caption = 'No. of Archived Versions';
             Editable = false;
             FieldClass = FlowField;
@@ -2295,21 +2343,21 @@
         }
         field(5751; "Partially Invoiced"; Boolean)
         {
-            CalcFormula = Exist("Purchase Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                       "Document No." = FIELD("No."),
-                                                       Type = FILTER(<> " "),
-                                                       "Location Code" = FIELD("Location Filter"),
-                                                       "Quantity Invoiced" = FILTER(<> 0)));
+            CalcFormula = exist("Purchase Line" where("Document Type" = field("Document Type"),
+                                                       "Document No." = field("No."),
+                                                       Type = filter(<> " "),
+                                                       "Location Code" = field("Location Filter"),
+                                                       "Quantity Invoiced" = filter(<> 0)));
             Caption = 'Partially Invoiced';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5752; "Completely Received"; Boolean)
         {
-            CalcFormula = Min("Purchase Line"."Completely Received" WHERE("Document Type" = FIELD("Document Type"),
-                                                                           "Document No." = FIELD("No."),
-                                                                           Type = FILTER(<> " "),
-                                                                           "Location Code" = FIELD("Location Filter")));
+            CalcFormula = min("Purchase Line"."Completely Received" where("Document Type" = field("Document Type"),
+                                                                           "Document No." = field("No."),
+                                                                           Type = filter(<> " "),
+                                                                           "Location Code" = field("Location Filter")));
             Caption = 'Completely Received';
             Editable = false;
             FieldClass = FlowField;
@@ -2481,10 +2529,10 @@
         }
         field(9001; "Pending Approvals"; Integer)
         {
-            CalcFormula = Count("Approval Entry" WHERE("Table ID" = CONST(38),
-                                                        "Document Type" = FIELD("Document Type"),
-                                                        "Document No." = FIELD("No."),
-                                                        Status = FILTER(Open | Created)));
+            CalcFormula = count("Approval Entry" where("Table ID" = const(38),
+                                                        "Document Type" = field("Document Type"),
+                                                        "Document No." = field("No."),
+                                                        Status = filter(Open | Created)));
             Caption = 'Pending Approvals';
             FieldClass = FlowField;
         }
@@ -2499,7 +2547,7 @@
         field(10017; "Provincial Tax Area Code"; Code[20])
         {
             Caption = 'Provincial Tax Area Code';
-            TableRelation = "Tax Area" WHERE("Country/Region" = CONST(CA));
+            TableRelation = "Tax Area" where("Country/Region" = const(CA));
 
             trigger OnValidate()
             begin
@@ -2641,12 +2689,12 @@
           Rec, PurchRcptHeader, PurchInvHeader, PurchCrMemoHeader,
           ReturnShptHeader, PurchInvHeaderPrepmt, PurchCrMemoHeaderPrepmt);
         Validate("Applies-to ID", '');
-        Validate("Incoming Document Entry No.", 0);
+        Rec.Validate("Incoming Document Entry No.", 0);
 
         DeleteRecordInApprovalRequest();
         PurchLine.LockTable();
 
-        WhseRequest.SetRange("Source Type", DATABASE::"Purchase Line");
+        WhseRequest.SetRange("Source Type", Enum::TableID::"Purchase Line");
         WhseRequest.SetRange("Source Subtype", "Document Type");
         WhseRequest.SetRange("Source No.", "No.");
         WhseRequest.DeleteAll(true);
@@ -2854,7 +2902,6 @@
     begin
         GetPurchSetup();
         IsHandled := false;
-        SkipInitialization := false;
         OnBeforeInitRecord(Rec, IsHandled, xRec, PurchSetup, GLSetup, SkipInitialization);
         if SkipInitialization then
             exit;
@@ -3056,7 +3103,7 @@
             exit;
 
         "Doc. No. Occurrence" :=
-            ArchiveManagement.GetNextOccurrenceNo(DATABASE::"Purchase Header", "Document Type".AsInteger(), "No.");
+            ArchiveManagement.GetNextOccurrenceNo(Enum::TableID::"Purchase Header".AsInteger(), Rec."Document Type".AsInteger(), Rec."No.");
     end;
 
     local procedure GetPostingNoSeriesCode() PostingNos: Code[20]
@@ -3219,7 +3266,7 @@
         NoOfSelected := PurchaseHeader.Count();
         PurchaseHeader.SetFilter(Status, '<>%1', PurchaseHeader.Status::Released);
         NoOfSkipped := NoOfSelected - PurchaseHeader.Count;
-        BatchProcessingMgt.BatchProcess(PurchaseHeader, Codeunit::"Purchase Manual Release", "Error Handling Options"::"Show Error", NoOfSelected, NoOfSkipped);
+        BatchProcessingMgt.BatchProcess(PurchaseHeader, Codeunit::"Purchase Manual Release", Enum::"Error Handling Options"::"Show Error", NoOfSelected, NoOfSkipped);
     end;
 
     internal procedure PerformManualRelease()
@@ -3241,7 +3288,7 @@
         NoOfSelected := PurchaseHeader.Count();
         PurchaseHeader.SetFilter(Status, '<>%1', PurchaseHeader.Status::Open);
         NoOfSkipped := NoOfSelected - PurchaseHeader.Count;
-        BatchProcessingMgt.BatchProcess(PurchaseHeader, Codeunit::"Purchase Manual Reopen", "Error Handling Options"::"Show Error", NoOfSelected, NoOfSkipped);
+        BatchProcessingMgt.BatchProcess(PurchaseHeader, Codeunit::"Purchase Manual Reopen", Enum::"Error Handling Options"::"Show Error", NoOfSelected, NoOfSkipped);
     end;
 
     procedure RecreatePurchLines(ChangedFieldName: Text[100])
@@ -3609,7 +3656,7 @@
             exit;
 
         if "Currency Code" <> '' then begin
-            if "Posting Date" <> 0D then
+            if Rec."Posting Date" <> 0D then
                 CurrencyDate := "Posting Date"
             else
                 CurrencyDate := WorkDate();
@@ -3669,7 +3716,7 @@
     var
         "Field": Record "Field";
     begin
-        Field.SetRange(TableNo, DATABASE::"Purchase Header");
+        Field.SetRange(TableNo, Enum::TableID::"Purchase Header");
         Field.SetRange("Field Caption", ChangedFieldName);
         Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
         Field.Find('-');
@@ -3721,8 +3768,8 @@
         if not PurchLinesExist() then
             exit;
 
-        if not Field.Get(DATABASE::"Purchase Header", ChangedFieldNo) then
-            Field.Get(DATABASE::"Purchase Line", ChangedFieldNo);
+        if not Field.Get(Enum::TableID::"Purchase Header", ChangedFieldNo) then
+            Field.Get(Enum::TableID::"Purchase Line", ChangedFieldNo);
 
         if AskQuestion then begin
             Question := StrSubstNo(Text032, Field."Field Caption");
@@ -3836,50 +3883,6 @@
                 Error('');
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        OldDimSetID: Integer;
-        IsHandled: Boolean;
-        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-    begin
-        IsHandled := false;
-        OnBeforeCreateDim(Rec, IsHandled, DefaultDimSource, CurrFieldNo);
-        if IsHandled then
-            exit;
-
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        TableID[2] := Type2;
-        No[2] := No2;
-        TableID[3] := Type3;
-        No[3] := No3;
-        TableID[4] := Type4;
-        No[4] := No4;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        OldDimSetID := "Dimension Set ID";
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup.Purchases, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-
-        OnCreateDimOnBeforeUpdateLines(Rec, xRec, CurrFieldNo);
-
-        if (OldDimSetID <> "Dimension Set ID") and PurchLinesExist() then begin
-            Modify();
-            UpdateAllLineDim("Dimension Set ID", OldDimSetID);
-        end;
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
@@ -3892,9 +3895,6 @@
             exit;
 
         SourceCodeSetup.Get();
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -3905,7 +3905,7 @@
 
         OnCreateDimOnBeforeUpdateLines(Rec, xRec, CurrFieldNo);
 
-        if (OldDimSetID <> "Dimension Set ID") and (OldDimSetID <> 0) and guiallowed then
+        if (OldDimSetID <> "Dimension Set ID") and (OldDimSetID <> 0) and GuiAllowed and not GetHideValidationDialog() then
             if CouldDimensionsBeKept() then
                 if not ConfirmKeepExistingDimensions(OldDimSetID) then begin
                     "Dimension Set ID" := OldDimSetID;
@@ -3931,7 +3931,7 @@
         Confirmed := Confirm(DoYouWantToKeepExistingDimensionsQst);
     end;
 
-    local procedure CouldDimensionsBeKept() Result: Boolean;
+    procedure CouldDimensionsBeKept() Result: Boolean;
     var
         IsHandled: Boolean;
     begin
@@ -4060,7 +4060,7 @@
 
         if PurchLine.FindSet() then begin
             ReservMgt.DeleteDocumentReservation(
-                DATABASE::"Purchase Line", "Document Type".AsInteger(), "No.", GetHideValidationDialog());
+                Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "No.", GetHideValidationDialog());
             repeat
                 PurchLine.SuspendStatusCheck(true);
                 PurchLine.Delete(true);
@@ -4530,7 +4530,7 @@
             FilterGroup(0);
         end;
 
-        SetRange("Date Filter", 0D, WorkDate());
+        Rec.SetRange("Date Filter", 0D, WorkDate());
         OnAfterSetSecurityFilterOnRespCenter(Rec);
     end;
 
@@ -4710,7 +4710,7 @@
         if IsHandled then
             exit(true);
 
-        if not IncomingDocument.Get("Incoming Document Entry No.") then
+        if not IncomingDocument.Get(Rec."Incoming Document Entry No.") then
             exit(true);
 
         if IncomingDocument."Amount Incl. VAT" = 0 then
@@ -4861,10 +4861,10 @@
         if IsHandled then
             exit;
 
-        DimMgt.AddDimSource(DefaultDimSource, Database::"G/L Account", SourcePurchaseLine."No.");
-        DimMgt.AddDimSource(DefaultDimSource, Database::Job, SourcePurchaseLine."Job No.");
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", SourcePurchaseLine."Responsibility Center");
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", SourcePurchaseLine."Work Center No.");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"G/L Account".AsInteger(), SourcePurchaseLine."No.");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), SourcePurchaseLine."Job No.");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center".AsInteger(), SourcePurchaseLine."Responsibility Center");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), SourcePurchaseLine."Work Center No.");
     end;
 
     local procedure CollectParamsInBufferForCreateDimSet(var TempPurchaseLine: Record "Purchase Line" temporary; PurchaseLine: Record "Purchase Line")
@@ -4877,7 +4877,7 @@
         if not TempPurchaseLine.FindFirst() then begin
             GenPostingSetup.Get(PurchaseLine."Gen. Bus. Posting Group", PurchaseLine."Gen. Prod. Posting Group");
             GenPostingSetup.TestField("Purch. Prepayments Account");
-            DefaultDimension.SetRange("Table ID", DATABASE::"G/L Account");
+            DefaultDimension.SetRange("Table ID", Enum::TableID::"G/L Account");
             DefaultDimension.SetRange("No.", GenPostingSetup."Purch. Prepayments Account");
             CollectParamsInBufferForCreateDimSetOnBeforeInsertTempPurchaseLineInBuffer(GenPostingSetup, DefaultDimension);
             InsertTempPurchaseLineInBuffer(TempPurchaseLine, PurchaseLine,
@@ -5042,7 +5042,7 @@
 
     procedure SetStatus(NewStatus: Option)
     begin
-        Status := "Purchase Document Status".FromInteger(NewStatus);
+        Status := Enum::"Purchase Document Status".FromInteger(NewStatus);
         Modify();
     end;
 
@@ -5090,7 +5090,7 @@
             Result := Confirm(ConfirmChangeQst, false, GetUpdatedFieldCaption(UpdatingFieldNo));
     end;
 
-    local procedure GetUpdatedFieldCaption(UpdatingFieldNo: Integer): Text
+    procedure GetUpdatedFieldCaption(UpdatingFieldNo: Integer): Text
     var
         RecRef: RecordRef;
         FldRef: FieldRef;
@@ -5400,16 +5400,10 @@
             exit(true);
     end;
 
-    procedure ConfirmCloseUnposted() Result: Boolean
+    procedure ConfirmCloseUnposted(): Boolean
     var
         InstructionMgt: Codeunit "Instruction Mgt.";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeConfirmCloseUnposted(Rec, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         if PurchLinesExist() then
             if InstructionMgt.IsUnpostedEnabledForRecord(Rec) then
                 exit(InstructionMgt.ShowConfirm(DocumentNotPostedClosePageQst, InstructionMgt.QueryPostOnCloseCode()));
@@ -5715,7 +5709,7 @@
         if IsHandled then
             exit;
 
-        Validate("Ship-to Code", '');
+        Rec.Validate("Ship-to Code", '');
     end;
 
     procedure OnAfterValidateBuyFromVendorNo(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header")
@@ -6212,7 +6206,7 @@
 
         ReportUsage := ReportSelectionsUsage.AsInteger();
         OnAfterGetReportSelectionsUsageFromDocumentType(Rec, ReportUsage, DocTxt);
-        ReportSelectionsUsage := "Report Selection Usage".FromInteger(ReportUsage);
+        ReportSelectionsUsage := Enum::"Report Selection Usage".FromInteger(ReportUsage);
     end;
 
     procedure CanCalculateTax(): Boolean
@@ -6245,6 +6239,7 @@
     var
         CurrentPurchLine: Record "Purchase Line";
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         Resource: Record Resource;
     begin
         CurrentPurchLine.SetCurrentKey("Document Type", "Document No.", Type);
@@ -6262,6 +6257,12 @@
                         begin
                             Item.Get(CurrentPurchLine."No.");
                             Item.TestField(Blocked, false);
+
+                            if CurrentPurchLine."Variant Code" <> '' then begin
+                                ItemVariant.SetLoadFields(Blocked);
+                                ItemVariant.Get(CurrentPurchLine."No.", CurrentPurchLine."Variant Code");
+                                ItemVariant.TestField(Blocked, false);
+                            end
                         end;
                     CurrentPurchLine.Type::Resource:
                         begin
@@ -6371,7 +6372,7 @@
             exit;
 
         Contact.Get(ContactNo);
-        if ContactBusinessRelation.FindByRelation("Contact Business Relation Link to Table"::Vendor, VendorNo) then
+        if ContactBusinessRelation.FindByRelation(Enum::"Contact Business Relation Link to Table"::Vendor, VendorNo) then
             if (ContactBusinessRelation."Contact No." <> Contact."Company No.") and (ContactBusinessRelation."Contact No." <> Contact."No.") then
                 Error(Text038, Contact."No.", Contact.Name, VendorNo);
     end;
@@ -6599,11 +6600,11 @@
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
-        DimMgt.AddDimSource(DefaultDimSource, Database::Vendor, Rec."Pay-to Vendor No.", FieldNo = Rec.FieldNo("Pay-to Vendor No."));
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Purchaser Code", FieldNo = Rec.FieldNo("Purchaser Code"));
-        DimMgt.AddDimSource(DefaultDimSource, Database::Campaign, Rec."Campaign No.", FieldNo = Rec.FieldNo("Campaign No."));
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
-        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Vendor.AsInteger(), Rec."Pay-to Vendor No.", FieldNo = Rec.FieldNo("Pay-to Vendor No."));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Salesperson/Purchaser".AsInteger(), Rec."Purchaser Code", FieldNo = Rec.FieldNo("Purchaser Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Campaign.AsInteger(), Rec."Campaign No.", FieldNo = Rec.FieldNo("Campaign No."));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center".AsInteger(), Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;
@@ -6624,47 +6625,28 @@
         OnAfterPurchaseLinesEditable(Rec, IsEditable);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
+    internal procedure GetQtyReservedFromStockState() Result: Enum "Reservation From Stock"
     var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
+        PurchaseLineLocal: Record "Purchase Line";
+        PurchLineReserve: Codeunit "Purch. Line-Reserve";
+        QtyReservedFromStock: Decimal;
     begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Purchase Header", DefaultDimSource, TableID, No);
+        QtyReservedFromStock := PurchLineReserve.GetReservedQtyFromInventory(Rec);
+
+        PurchaseLineLocal.SetRange("Document Type", "Document Type");
+        PurchaseLineLocal.SetRange("Document No.", "No.");
+        PurchaseLineLocal.SetRange(Type, PurchaseLineLocal.Type::Item);
+        PurchaseLineLocal.CalcSums("Outstanding Qty. (Base)");
+
+        case QtyReservedFromStock of
+            0:
+                exit(Result::None);
+            PurchaseLineLocal."Outstanding Qty. (Base)":
+                exit(Result::Full);
+            else
+                exit(Result::Partial);
+        end;
     end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Purchase Header", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDimTableIDs(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Purchase Header") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDimTableIDs(var PurchaseHeader: Record "Purchase Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var PurchaseHeader: Record "Purchase Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
@@ -6936,13 +6918,6 @@
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var PurchaseHeader: Record "Purchase Header"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateShortcutDimCode(var PurchHeader: Record "Purchase Header"; xPurchHeader: Record "Purchase Header"; FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
@@ -7287,7 +7262,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateBuyFromVendorNo(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CallingFieldNo: Integer; var SkipBuyFromContact: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeValidateBuyFromVendorNo(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CallingFieldNo: Integer; var SkipBuyFromContact: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidatePostingDate(var PurchaseHeader: Record "Purchase Header"; xPurchaseHeader: Record "Purchase Header"; CallingFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
@@ -7567,7 +7547,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header"; CalledByFieldNo: Integer; CallingFieldNo: Integer; var IsHandled: Boolean)
+    local procedure OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(var PurchaseHeader: Record "Purchase Header"; var xPurchaseHeader: Record "Purchase Header"; CalledByFieldNo: Integer; CallingFieldNo: Integer; var IsHandled: Boolean; var UpdateDocumentDate: Boolean)
     begin
     end;
 
@@ -7923,11 +7903,6 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateSellToCustomerNo(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeConfirmCloseUnposted(var PurchaseHeader: Record "Purchase Header"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

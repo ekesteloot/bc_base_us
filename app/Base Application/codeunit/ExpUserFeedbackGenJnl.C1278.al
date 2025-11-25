@@ -1,3 +1,10 @@
+namespace System.IO;
+
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 codeunit 1278 "Exp. User Feedback Gen. Jnl."
 {
     Permissions = TableData "Payment Export Data" = rimd;
@@ -9,7 +16,7 @@ codeunit 1278 "Exp. User Feedback Gen. Jnl."
         GenJnlLine: Record "Gen. Journal Line";
         PaymentExportData: Record "Payment Export Data";
     begin
-        GenJnlLine.SetRange("Data Exch. Entry No.", "Entry No.");
+        GenJnlLine.SetRange("Data Exch. Entry No.", Rec."Entry No.");
         GenJnlLine.FindFirst();
 
         CreditTransferRegister.SetRange("From Bank Account No.", GenJnlLine."Bal. Account No.");
@@ -17,7 +24,7 @@ codeunit 1278 "Exp. User Feedback Gen. Jnl."
         SetFileOnCreditTransferRegister(Rec, CreditTransferRegister);
         SetExportFlagOnGenJnlLine(GenJnlLine);
 
-        PaymentExportData.SetRange("Data Exch Entry No.", "Entry No.");
+        PaymentExportData.SetRange("Data Exch Entry No.", Rec."Entry No.");
         PaymentExportData.DeleteAll(true);
     end;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Family;
+
 page 99000792 "Family Lines"
 {
     AutoSplitKey = true;

@@ -1,4 +1,6 @@
-﻿enum 5601 "FA Ledger Entry FA Posting Type"
+﻿namespace Microsoft.FixedAssets.Ledger;
+
+enum 5601 "FA Ledger Entry FA Posting Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

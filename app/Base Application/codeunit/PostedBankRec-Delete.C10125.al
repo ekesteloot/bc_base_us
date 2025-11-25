@@ -7,17 +7,17 @@ codeunit 10125 "Posted Bank Rec.-Delete"
 
     trigger OnRun()
     begin
-        PostedBankRecLines.SetRange("Bank Account No.", "Bank Account No.");
-        PostedBankRecLines.SetRange("Statement No.", "Statement No.");
+        PostedBankRecLines.SetRange("Bank Account No.", Rec."Bank Account No.");
+        PostedBankRecLines.SetRange("Statement No.", Rec."Statement No.");
         PostedBankRecLines.DeleteAll();
 
         BankRecCommentLines.SetRange("Table Name", BankRecCommentLines."Table Name"::"Posted Bank Rec.");
-        BankRecCommentLines.SetRange("Bank Account No.", "Bank Account No.");
-        BankRecCommentLines.SetRange("No.", "Statement No.");
+        BankRecCommentLines.SetRange("Bank Account No.", Rec."Bank Account No.");
+        BankRecCommentLines.SetRange("No.", Rec."Statement No.");
         BankRecCommentLines.DeleteAll();
 
         OnRunOnBeforeDelete(Rec);
-        Delete();
+        Rec.Delete();
     end;
 
     var

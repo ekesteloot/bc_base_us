@@ -1,7 +1,24 @@
-﻿codeunit 5986 "Serv-Amounts Mgt."
+﻿namespace Microsoft.ServiceMgt.Posting;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+#if not CLEAN23
+using Microsoft.FinancialMgt.ReceivablesPayables;
+#endif
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Document;
+#if not CLEAN23
+using Microsoft.ServiceMgt.Pricing;
+#endif
+using System.Environment.Configuration;
+
+codeunit 5986 "Serv-Amounts Mgt."
 {
     Permissions = TableData "General Posting Setup" = rimd,
-#if not CLEAN20
+#if not CLEAN23
                   TableData "Invoice Post. Buffer" = rimd,
 #endif
                   TableData "VAT Amount Line" = rimd,
@@ -19,7 +36,7 @@
         TempServiceLineForSpread: Record "Service Line" temporary;
         DimBufMgt: Codeunit "Dimension Buffer Management";
         UOMMgt: Codeunit "Unit of Measure Management";
-#if not CLEAN20
+#if not CLEAN23
         FALineNo: Integer;
 #endif
         RoundingLineNo: Integer;
@@ -27,7 +44,7 @@
         Text017: Label '%1% VAT';
         RoundingLineIsInserted: Boolean;
         IsInitialized: Boolean;
-#if not CLEAN20
+#if not CLEAN23
         TaxOption: Option ,VAT,SalesTax;
         USText003: Label 'You must enter a value in %1 for %2 %3 if you want to post discounts for that line.', Comment = '%1 = field name of Gen. Prod. Posting Group, %2 = field name of Line No., %3 = value of Line No.';
         SalesTaxCalculationOverridden: Boolean;
@@ -52,7 +69,7 @@
         IsInitialized := false;
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by FillInvoicePostBuffer().', '19.0')]
     procedure FillInvPostingBuffer(var InvPostingBuffer: array[2] of Record "Invoice Post. Buffer" temporary; var ServiceLine: Record "Service Line"; var ServiceLineACY: Record "Service Line"; ServiceHeader: Record "Service Header")
     var
@@ -68,7 +85,7 @@
 #endif
 
 #pragma warning disable AS0072
-#if not CLEAN20 
+#if not CLEAN23 
     [Obsolete('Replaced by new implementation in ServicePostInvoice codeunit', '20.0')]
     procedure FillInvoicePostBuffer(var TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary; var ServiceLine: Record "Service Line"; var ServiceLineACY: Record "Service Line"; ServiceHeader: Record "Service Header")
     var
@@ -839,7 +856,7 @@
     end;
 
 #pragma warning disable AS0072
-#if not CLEAN20 
+#if not CLEAN23 
     [Obsolete('Replaced by new implementation in Service Post Invoice codeunit', '20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnFillInvPostingBuffer(var SalesTaxCalculationOverridden: Boolean; var ServiceLine: Record "Service Line"; var ServiceLineACY: Record "Service Line"; var TotalAmount: Decimal; var TotalAmountACY: Decimal; var TotalVAT: Decimal; var TotalVATACY: Decimal)
@@ -863,7 +880,7 @@
     begin
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by new implementation event in codeunit ServicePostInvoice', '20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterFillInvoicePostBuffer(var InvoicePostBuffer: Record "Invoice Post. Buffer"; ServiceLine: Record "Service Line"; var TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary; SuppressCommit: Boolean; ServiceLineACY: Record "Service Line")
@@ -871,7 +888,7 @@
     end;
 #endif
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by new implementation event in codeunit ServicePostInvoice', '20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterFillInvoicePostBufferProcedure(var InvoicePostBuffer: Record "Invoice Post. Buffer"; ServiceLine: Record "Service Line"; var TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary; SuppressCommit: Boolean; ServiceLineACY: Record "Service Line")
@@ -889,7 +906,7 @@
     begin
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by new implementation event in codeunit ServicePostInvoice', '20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateInvPostBuffer(var InvoicePostBuffer: Record "Invoice Post. Buffer"; var TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary)
@@ -897,7 +914,7 @@
     end;
 #endif
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by event OnBeforeFillInvoicePostBuffer().', '19.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFillInvPostingBuffer(var InvPostingBuffer: array[2] of Record "Invoice Post. Buffer"; var ServiceLine: Record "Service Line"; var ServiceLineACY: Record "Service Line"; ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
@@ -905,7 +922,7 @@
     end;
 #endif
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by new implementation event in codeunit ServicePostInvoice', '20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFillInvoicePostBuffer(var TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary; var ServiceLine: Record "Service Line"; var ServiceLineACY: Record "Service Line"; ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
@@ -923,7 +940,7 @@
     begin
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by new implementation event in codeunit ServicePostInvoice', '20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInvPostingBufferCalcInvoiceDiscountAmount(var InvoicePostBuffer: Record "Invoice Post. Buffer"; var ServiceLine: Record "Service Line"; var ServiceLineACY: Record "Service Line"; ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
@@ -931,7 +948,7 @@
     end;
 #endif
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by new implementation event in codeunit ServicePostInvoice', '20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInvPostingBufferCalcLineDiscountAmount(var InvoicePostBuffer: Record "Invoice Post. Buffer"; var ServiceLine: Record "Service Line"; var ServiceLineACY: Record "Service Line"; ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
@@ -944,7 +961,7 @@
     begin
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by new implementation event in codeunit ServicePostInvoice', '20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateInvPostBuffer(var InvoicePostBuffer: Record "Invoice Post. Buffer")

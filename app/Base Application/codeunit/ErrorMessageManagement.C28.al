@@ -1,3 +1,7 @@
+namespace System.Utilities;
+
+using System.Reflection;
+
 codeunit 28 "Error Message Management"
 {
 

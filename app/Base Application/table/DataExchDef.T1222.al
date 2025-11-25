@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using Microsoft.BankMgt.PositivePay;
+using System.Reflection;
+
 table 1222 "Data Exch. Def"
 {
     Caption = 'Data Exch. Def';
@@ -22,7 +27,7 @@ table 1222 "Data Exch. Def"
         field(4; "Reading/Writing XMLport"; Integer)
         {
             Caption = 'Reading/Writing XMLport';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(XMLport));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(XMLport));
         }
         field(5; "Header Lines"; Integer)
         {
@@ -59,27 +64,27 @@ table 1222 "Data Exch. Def"
         field(14; "Ext. Data Handling Codeunit"; Integer)
         {
             Caption = 'Ext. Data Handling Codeunit';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Codeunit));
         }
         field(15; "Reading/Writing Codeunit"; Integer)
         {
             Caption = 'Reading/Writing Codeunit';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Codeunit));
         }
         field(16; "Validation Codeunit"; Integer)
         {
             Caption = 'Validation Codeunit';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Codeunit));
         }
         field(17; "Data Handling Codeunit"; Integer)
         {
             Caption = 'Data Handling Codeunit';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Codeunit));
         }
         field(18; "User Feedback Codeunit"; Integer)
         {
             Caption = 'User Feedback Codeunit';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Codeunit));
         }
         field(19; "Custom Column Separator"; Text[10])
         {

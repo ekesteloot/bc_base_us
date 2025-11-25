@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Purchases.Payables;
+
 codeunit 9083 "Calculate Vendor Stats."
 {
     trigger OnRun()

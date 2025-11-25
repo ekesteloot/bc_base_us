@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
 codeunit 273 "Res. Jnl.-B.Post"
 {
     TableNo = "Res. Journal Batch";

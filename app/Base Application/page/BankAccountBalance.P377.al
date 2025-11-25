@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.BankAccount;
+
+using Microsoft.Foundation.Enums;
+
 page 377 "Bank Account Balance"
 {
     Caption = 'Bank Account Balance';

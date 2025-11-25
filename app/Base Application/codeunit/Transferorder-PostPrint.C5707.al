@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.InventoryMgt.Setup;
+
 codeunit 5707 "TransferOrder-Post + Print"
 {
     TableNo = "Transfer Header";
@@ -88,7 +92,7 @@ codeunit 5707 "TransferOrder-Post + Print"
             end;
     end;
 
-    local procedure PrintShipment(DocNo: Code[20])
+    procedure PrintShipment(DocNo: Code[20])
     var
         TransShptHeader: Record "Transfer Shipment Header";
         IsHandled: Boolean;
@@ -104,7 +108,7 @@ codeunit 5707 "TransferOrder-Post + Print"
         end;
     end;
 
-    local procedure PrintReceipt(DocNo: Code[20])
+    procedure PrintReceipt(DocNo: Code[20])
     var
         TransRcptHeader: Record "Transfer Receipt Header";
         IsHandled: Boolean;
@@ -120,7 +124,7 @@ codeunit 5707 "TransferOrder-Post + Print"
         end;
     end;
 
-    local procedure PrintDirectTransfer(DocNo: Code[20])
+    procedure PrintDirectTransfer(DocNo: Code[20])
     var
         DirectTransHeader: Record "Direct Trans. Header";
         IsHandled: Boolean;

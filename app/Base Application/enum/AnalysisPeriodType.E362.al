@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 362 "Analysis Period Type"
 {
     Extensible = true;

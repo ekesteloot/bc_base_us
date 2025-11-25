@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Tracking;
+
 page 5899 "Phys. Invt. Tracking Lines"
 {
     Caption = 'Phys. Invt. Tracking Lines';
@@ -42,7 +44,7 @@ page 5899 "Phys. Invt. Tracking Lines"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        TempPhysInvtTracking.SetView(GetView());
+        TempPhysInvtTracking.SetView(Rec.GetView());
         TempPhysInvtTracking := Rec;
         if not TempPhysInvtTracking.Find(Which) then
             exit(false);

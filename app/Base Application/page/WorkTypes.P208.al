@@ -13,7 +13,7 @@ page 208 "Work Types"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies a code to identify the work type.';

@@ -1,7 +1,13 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.History;
+using System.Utilities;
+
 report 124 "Sales Invoice Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/SalesInvoiceNos.rdlc';
+    RDLCLayout = './Sales/Reports/SalesInvoiceNos.rdlc';
     Caption = 'Sales Invoice Nos.';
     ObsoleteState = Pending;
     ObsoleteReason = 'Infrequently used report.';
@@ -11,7 +17,7 @@ report 124 "Sales Invoice Nos."
     {
         dataitem("Sales Invoice Header"; "Sales Invoice Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Posted Sales Invoice';
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
@@ -58,7 +64,7 @@ report 124 "Sales Invoice Nos."
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorText_Number_; ErrorText[Number])
                 {
                 }
@@ -84,8 +90,8 @@ report 124 "Sales Invoice Nos."
             }
             dataitem(SalesInvHeader; "Sales Invoice Header")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("No.");
                 column(SalesInvHeader__User_ID_; "User ID")
                 {
                 }

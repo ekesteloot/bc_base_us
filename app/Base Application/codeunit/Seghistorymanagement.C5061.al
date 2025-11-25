@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Segment;
+
 codeunit 5061 SegHistoryManagement
 {
 

@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Posting;
+
+using Microsoft.FinancialMgt.ReceivablesPayables;
+
 enum 815 "Sales Invoice Posting" implements "Invoice Posting"
 {
     Extensible = true;

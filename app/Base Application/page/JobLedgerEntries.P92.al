@@ -1,3 +1,10 @@
+namespace Microsoft.ProjectMgt.Jobs.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 92 "Job Ledger Entries"
 {
     ApplicationArea = Jobs;
@@ -6,8 +13,8 @@ page 92 "Job Ledger Entries"
     Editable = false;
     PageType = List;
     SourceTable = "Job Ledger Entry";
-    SourceTableView = SORTING("Job No.", "Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Job No.", "Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -233,7 +240,7 @@ page 92 "Job Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -279,7 +286,7 @@ page 92 "Job Ledger Entries"
                     Editable = false;
                     ToolTip = 'Specifies the number of the entry, as assigned from the specified number series when the entry was created.';
                 }
-                field(Adjusted; Adjusted)
+                field(Adjusted; Rec.Adjusted)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies whether a job ledger entry has been modified or adjusted. The value in this field is inserted by the Adjust Cost - Item Entries batch job. The Adjusted check box is selected if applicable.';
@@ -398,7 +405,7 @@ page 92 "Job Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
                 action("<Action28>")
@@ -413,7 +420,7 @@ page 92 "Job Ledger Entries"
                         JobUsageLink: Record "Job Usage Link";
                         JobPlanningLine: Record "Job Planning Line";
                     begin
-                        JobUsageLink.SetRange("Entry No.", "Entry No.");
+                        JobUsageLink.SetRange("Entry No.", Rec."Entry No.");
 
                         if JobUsageLink.FindSet() then
                             repeat
@@ -465,7 +472,7 @@ page 92 "Job Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

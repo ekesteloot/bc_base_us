@@ -1,4 +1,6 @@
-﻿enum 48 "Invt. Posting Buffer Account Type"
+﻿namespace Microsoft.InventoryMgt.Costing;
+
+enum 48 "Invt. Posting Buffer Account Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

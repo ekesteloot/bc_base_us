@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5057 "Contact Alt. Address List"
 {
     Caption = 'Contact Alt. Address List';
@@ -14,7 +16,7 @@ page 5057 "Contact Alt. Address List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the alternate address.';
@@ -30,7 +32,7 @@ page 5057 "Contact Alt. Address List"
                     ToolTip = 'Specifies the additional part of the company name for the alternate address.';
                     Visible = false;
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the alternate address of the contact.';
@@ -41,7 +43,7 @@ page 5057 "Contact Alt. Address List"
                     ToolTip = 'Specifies additional address information.';
                     Visible = false;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the city of the contact''s alternate address.';
@@ -53,7 +55,7 @@ page 5057 "Contact Alt. Address List"
                     ToolTip = 'Specifies the postal code.';
                     Visible = false;
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the county for the contact''s alternate address.';
@@ -113,8 +115,8 @@ page 5057 "Contact Alt. Address List"
                     Caption = 'Date Ranges';
                     Image = DateRange;
                     RunObject = Page "Alt. Addr. Date Ranges";
-                    RunPageLink = "Contact No." = FIELD("Contact No."),
-                                  "Contact Alt. Address Code" = FIELD(Code);
+                    RunPageLink = "Contact No." = field("Contact No."),
+                                  "Contact Alt. Address Code" = field(Code);
                     ToolTip = 'Specify date ranges that apply to the contact''s alternate address.';
                 }
             }

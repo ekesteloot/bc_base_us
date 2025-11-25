@@ -1,7 +1,9 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 7304 "Bin Content"
 {
     Caption = 'Bin Content';
-    DataCaptionExpression = GetCaption();
+    DataCaptionExpression = Rec.GetCaption();
     DelayedInsert = true;
     PageType = List;
     SourceTable = "Bin Content";
@@ -45,19 +47,18 @@ page 7304 "Bin Content"
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the bin ranking.';
-                    Visible = false;
                 }
-                field("Fixed"; Fixed)
+                field("Fixed"; Rec.Fixed)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies that the item (bin content) has been associated with this bin, and that the bin should normally contain the item.';
                 }
-                field(Default; Default)
+                field(Default; Rec.Default)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if the bin is the default bin for the associated item.';
                 }
-                field(Dedicated; Dedicated)
+                field(Dedicated; Rec.Dedicated)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if the bin is used as a dedicated bin, which means that its bin content is available only to certain resources.';
@@ -79,7 +80,7 @@ page 7304 "Bin Content"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(CalcQtyUOM; CalcQtyUOM())
+                field(CalcQtyUOM; Rec.CalcQtyUOM())
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Quantity';
@@ -144,7 +145,7 @@ page 7304 "Bin Content"
                     ToolTip = 'Specifies how many item units, in the base unit of measure, will be posted on journal lines as positive quantities.';
                     Visible = false;
                 }
-                field(CalcQtyAvailToTakeUOM; CalcQtyAvailToTakeUOM())
+                field(CalcQtyAvailToTakeUOM; Rec.CalcQtyAvailToTakeUOM())
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Available Qty. to Take';
@@ -191,10 +192,10 @@ page 7304 "Bin Content"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         if xRec."Location Code" <> '' then
-            "Location Code" := xRec."Location Code";
+            Rec."Location Code" := xRec."Location Code";
         if xRec."Unit of Measure Code" <> '' then
-            "Unit of Measure Code" := xRec."Unit of Measure Code";
-        SetUpNewLine();
+            Rec."Unit of Measure Code" := xRec."Unit of Measure Code";
+        Rec.SetUpNewLine();
     end;
 }
 

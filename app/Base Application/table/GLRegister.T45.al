@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
+using Microsoft.FinancialMgt.VAT;
+using System.Security.AccessControl;
+
 table 45 "G/L Register"
 {
     Caption = 'G/L Register';
@@ -14,15 +19,11 @@ table 45 "G/L Register"
         {
             Caption = 'From Entry No.';
             TableRelation = "G/L Entry";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(3; "To Entry No."; Integer)
         {
             Caption = 'To Entry No.';
             TableRelation = "G/L Entry";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(4; "Creation Date"; Date)
         {
@@ -38,8 +39,6 @@ table 45 "G/L Register"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(7; "Journal Batch Name"; Code[10])
         {
@@ -49,15 +48,11 @@ table 45 "G/L Register"
         {
             Caption = 'From VAT Entry No.';
             TableRelation = "VAT Entry";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(9; "To VAT Entry No."; Integer)
         {
             Caption = 'To VAT Entry No.';
             TableRelation = "VAT Entry";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(10; Reversed; Boolean)
         {

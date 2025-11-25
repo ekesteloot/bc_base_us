@@ -1,3 +1,13 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.CrossDock;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+
 page 5768 "Warehouse Receipt"
 {
     Caption = 'Warehouse Receipt';
@@ -20,7 +30,7 @@ page 5768 "Warehouse Receipt"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -33,7 +43,7 @@ page 5768 "Warehouse Receipt"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         CurrPage.SaveRecord();
-                        LookupLocation(Rec);
+                        Rec.LookupLocation(Rec);
                         CurrPage.Update(true);
                         SetBinFieldsVisibility(true);
                     end;
@@ -107,8 +117,8 @@ page 5768 "Warehouse Receipt"
                 ApplicationArea = Warehouse;
                 Editable = IsReceiptLinesEditable;
                 Enabled = IsReceiptLinesEditable;
-                SubPageLink = "No." = FIELD("No.");
-                SubPageView = SORTING("No.", "Sorting Sequence No.");
+                SubPageLink = "No." = field("No.");
+                SubPageView = sorting("No.", "Sorting Sequence No.");
             }
         }
         area(factboxes)
@@ -117,7 +127,7 @@ page 5768 "Warehouse Receipt"
             {
                 ApplicationArea = Warehouse;
                 Provider = WhseReceiptLines;
-                SubPageLink = "No." = FIELD("Item No.");
+                SubPageLink = "No." = field("Item No.");
                 Visible = true;
             }
             systempart(Control1900383207; Links)
@@ -147,9 +157,9 @@ page 5768 "Warehouse Receipt"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Whse. Receipt"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Whse. Receipt"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Posted &Whse. Receipts")
@@ -158,8 +168,8 @@ page 5768 "Warehouse Receipt"
                     Caption = 'Posted &Whse. Receipts';
                     Image = PostedReceipts;
                     RunObject = Page "Posted Whse. Receipt List";
-                    RunPageLink = "Whse. Receipt No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Receipt No.");
+                    RunPageLink = "Whse. Receipt No." = field("No.");
+                    RunPageView = sorting("Whse. Receipt No.");
                     ToolTip = 'View the quantity that has been posted as received.';
                 }
             }
@@ -244,7 +254,7 @@ page 5768 "Warehouse Receipt"
                         CrossDockOpp: Record "Whse. Cross-Dock Opportunity";
                         CrossDockMgt: Codeunit "Whse. Cross-Dock Management";
                     begin
-                        CrossDockMgt.CalculateCrossDockLines(CrossDockOpp, '', "No.", "Location Code");
+                        CrossDockMgt.CalculateCrossDockLines(CrossDockOpp, '', Rec."No.", Rec."Location Code");
                     end;
                 }
             }
@@ -425,9 +435,7 @@ page 5768 "Warehouse Receipt"
 
     var
         WhseDocPrint: Codeunit "Warehouse Document-Print";
-        [InDataSet]
         IsReceiptLinesEditable: Boolean;
-        [InDataSet]
         HideBinFields: Boolean;
         LocationCodeWhenHideBinLastChecked: Code[20];
 
@@ -450,7 +458,7 @@ page 5768 "Warehouse Receipt"
         if (Rec."Location Code" = LocationCodeWhenHideBinLastChecked) then
             exit(false);
 
-        if "Location Code" <> '' then
+        if Rec."Location Code" <> '' then
             HideBinFieldsLocal := not Rec.BinCodeMandatory();
 
         LocationCodeWhenHideBinLastChecked := Rec."Location Code";

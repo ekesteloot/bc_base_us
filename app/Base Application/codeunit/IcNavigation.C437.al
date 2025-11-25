@@ -247,4 +247,3 @@ codeunit 437 "IC Navigation"
     begin
     end;
 }
-

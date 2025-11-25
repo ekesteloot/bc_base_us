@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
+using Microsoft.Integration.Dataverse;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 page 5341 "CRM Account List"
 {
     ApplicationArea = Suite;
@@ -6,7 +16,7 @@ page 5341 "CRM Account List"
     Editable = false;
     PageType = List;
     SourceTable = "CRM Account";
-    SourceTableView = SORTING(Name);
+    SourceTableView = sorting(Name);
     UsageCategory = Lists;
 
     layout
@@ -23,43 +33,43 @@ page 5341 "CRM Account List"
                     StyleExpr = FirstColumnStyle;
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_PrimaryContactName; Address1_PrimaryContactName)
+                field(Address1_PrimaryContactName; Rec.Address1_PrimaryContactName)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Primary Contact Name';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(CustomerTypeCode; CustomerTypeCode)
+                field(CustomerTypeCode; Rec.CustomerTypeCode)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Relationship Type';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_Line1; Address1_Line1)
+                field(Address1_Line1; Rec.Address1_Line1)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Street 1';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_Line2; Address1_Line2)
+                field(Address1_Line2; Rec.Address1_Line2)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Street 2';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_PostalCode; Address1_PostalCode)
+                field(Address1_PostalCode; Rec.Address1_PostalCode)
                 {
                     ApplicationArea = Suite;
                     Caption = 'ZIP/Postal Code';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_City; Address1_City)
+                field(Address1_City; Rec.Address1_City)
                 {
                     ApplicationArea = Suite;
                     Caption = 'City';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_Country; Address1_Country)
+                field(Address1_Country; Rec.Address1_Country)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Country/Region';
@@ -104,7 +114,7 @@ page 5341 "CRM Account List"
 
                 trigger OnAction()
                 begin
-                    MarkedOnly(true);
+                    Rec.MarkedOnly(true);
                 end;
             }
             action(ShowAll)
@@ -116,7 +126,7 @@ page 5341 "CRM Account List"
 
                 trigger OnAction()
                 begin
-                    MarkedOnly(false);
+                    Rec.MarkedOnly(false);
                 end;
             }
         }
@@ -145,33 +155,33 @@ page 5341 "CRM Account List"
         RecordID: RecordID;
         EmptyRecordID: RecordID;
     begin
-        if CRMIntegrationRecord.FindRecordIDFromID(AccountId, DATABASE::Customer, RecordID) then
-            if CurrentlyCoupledCRMAccount.AccountId = AccountId then begin
+        if CRMIntegrationRecord.FindRecordIDFromID(Rec.AccountId, DATABASE::Customer, RecordID) then
+            if CurrentlyCoupledCRMAccount.AccountId = Rec.AccountId then begin
                 Coupled := 'Current';
                 FirstColumnStyle := 'Strong';
-                Mark(true);
+                Rec.Mark(true);
             end else begin
                 Coupled := 'Yes';
                 FirstColumnStyle := 'Subordinate';
-                Mark(false);
+                Rec.Mark(false);
             end;
 
         if RecordID = EmptyRecordID then
-            if CRMIntegrationRecord.FindRecordIDFromID(AccountId, DATABASE::Vendor, RecordID) then
-                if CurrentlyCoupledCRMAccount.AccountId = AccountId then begin
+            if CRMIntegrationRecord.FindRecordIDFromID(Rec.AccountId, DATABASE::Vendor, RecordID) then
+                if CurrentlyCoupledCRMAccount.AccountId = Rec.AccountId then begin
                     Coupled := 'Current';
                     FirstColumnStyle := 'Strong';
-                    Mark(true);
+                    Rec.Mark(true);
                 end else begin
                     Coupled := 'Yes';
                     FirstColumnStyle := 'Subordinate';
-                    Mark(false);
+                    Rec.Mark(false);
                 end;
 
         if RecordID = EmptyRecordID then begin
             Coupled := 'No';
             FirstColumnStyle := 'None';
-            Mark(true);
+            Rec.Mark(true);
         end;
     end;
 
@@ -185,9 +195,9 @@ page 5341 "CRM Account List"
     var
         LookupCRMTables: Codeunit "Lookup CRM Tables";
     begin
-        FilterGroup(4);
-        SetView(LookupCRMTables.GetIntegrationTableMappingView(DATABASE::"CRM Account"));
-        FilterGroup(0);
+        Rec.FilterGroup(4);
+        Rec.SetView(LookupCRMTables.GetIntegrationTableMappingView(DATABASE::"CRM Account"));
+        Rec.FilterGroup(0);
     end;
 
     var

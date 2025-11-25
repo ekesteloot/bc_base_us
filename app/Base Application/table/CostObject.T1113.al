@@ -1,3 +1,11 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 table 1113 "Cost Object"
 {
     Caption = 'Cost Object';
@@ -9,8 +17,6 @@ table 1113 "Cost Object"
         {
             Caption = 'Code';
             NotBlank = true;
-            //This property is currently not supported
-            //TestTableRelation = false;
             //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
             //ValidateTableRelation = false;
 
@@ -39,10 +45,10 @@ table 1113 "Cost Object"
         field(5; "Net Change"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum("Cost Entry".Amount WHERE("Cost Object Code" = FIELD(Code),
-                                                         "Cost Object Code" = FIELD(FILTER(Totaling)),
-                                                         "Cost Type No." = FIELD("Cost Type Filter"),
-                                                         "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Cost Entry".Amount where("Cost Object Code" = field(Code),
+                                                         "Cost Object Code" = field(FILTER(Totaling)),
+                                                         "Cost Type No." = field("Cost Type Filter"),
+                                                         "Posting Date" = field("Date Filter")));
             Caption = 'Net Change';
             Editable = false;
             FieldClass = FlowField;
@@ -50,10 +56,10 @@ table 1113 "Cost Object"
         field(6; "Balance at Date"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum("Cost Entry".Amount WHERE("Cost Object Code" = FIELD(Code),
-                                                         "Cost Object Code" = FIELD(FILTER(Totaling)),
-                                                         "Cost Type No." = FIELD("Cost Type Filter"),
-                                                         "Posting Date" = FIELD(UPPERLIMIT("Date Filter"))));
+            CalcFormula = sum("Cost Entry".Amount where("Cost Object Code" = field(Code),
+                                                         "Cost Object Code" = field(FILTER(Totaling)),
+                                                         "Cost Type No." = field("Cost Type Filter"),
+                                                         "Posting Date" = field(UPPERLIMIT("Date Filter"))));
             Caption = 'Balance at Date';
             Editable = false;
             FieldClass = FlowField;

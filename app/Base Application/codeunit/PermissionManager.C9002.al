@@ -1,3 +1,15 @@
+﻿namespace System.Security.AccessControl;
+
+using Microsoft.FinancialMgt.RoleCenters;
+using System.Azure.Identity;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Reflection;
+using System.Security.Encryption;
+using System.Security.User;
+using System.Telemetry;
+
 codeunit 9002 "Permission Manager"
 {
 #if not CLEAN22
@@ -285,25 +297,17 @@ codeunit 9002 "Permission Manager"
     [Scope('OnPrem')]
     procedure GetDefaultProfileID(UserSecurityID: Guid; var AllProfile: Record "All Profile")
     var
-        UsersInPlans: Query "Users in Plans";
-        Plan: Query Plan;
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
+        RoleCenterFromPlans: Query "Role Center from Plans";
     begin
-        UsersInPlans.SetRange(User_Security_ID, UserSecurityID);
-        if UsersInPlans.Open() then
-            while UsersInPlans.Read() do begin
-                // NOTE: if in the future we support multiple plans per user, we need here to specify which plan to choose
-                Plan.SetFilter(Plan_ID, UsersInPlans.Plan_ID);
-                if Plan.Open() then
-                    if Plan.Read() then begin
-                        AllProfile.SetRange("Role Center ID", Plan.Role_Center_ID);
-                        if AllProfile.FindFirst() then begin
-                            Session.LogMessage('0000DUK', StrSubstNo(FoundProfileFromPlanTxt, AllProfile."Profile ID"), Verbosity::Normal, DataClassification::CustomerContent, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryTxt);
-                            exit;
-                        end;
-                    end;
-
-                Clear(Plan);
+        RoleCenterFromPlans.SetRange(User_Security_ID, UserSecurityID);
+        if RoleCenterFromPlans.Open() then
+            while RoleCenterFromPlans.Read() do begin
+                AllProfile.SetRange("Role Center ID", RoleCenterFromPlans.Role_Center_ID);
+                if AllProfile.FindFirst() then begin
+                    Session.LogMessage('0000DUK', StrSubstNo(FoundProfileFromPlanTxt, AllProfile."Profile ID"), Verbosity::Normal, DataClassification::CustomerContent, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryTxt);
+                    exit;
+                end;
             end;
 
         Session.LogMessage('0000DUL', NoProfileFromPlanTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', TelemetryCategoryTxt);
@@ -342,29 +346,29 @@ codeunit 9002 "Permission Manager"
 #endif
     end;
 
-    procedure GenerateHashForPermissionSet(PermissionSetId: Code[20]): Text[250]
+    procedure GenerateHashForPermissionSet(PermissionSetId: Code[30]): Text[250]
     var
-        Permission: Record Permission;
+        MetadataPermission: Record "Metadata Permission";
         CryptographyManagement: Codeunit "Cryptography Management";
         InputText: Text;
         ObjectType: Integer;
     begin
         InputText += PermissionSetId;
-        Permission.SetRange("Role ID", PermissionSetId);
-        if Permission.FindSet() then
+        MetadataPermission.SetRange("Role ID", PermissionSetId);
+        if MetadataPermission.FindSet() then
             repeat
-                ObjectType := Permission."Object Type";
+                ObjectType := MetadataPermission."Object Type";
                 InputText += Format(ObjectType);
-                InputText += Format(Permission."Object ID");
-                if ObjectType = Permission."Object Type"::"Table Data" then begin
-                    InputText += GetCharRepresentationOfPermission(Permission."Read Permission");
-                    InputText += GetCharRepresentationOfPermission(Permission."Insert Permission");
-                    InputText += GetCharRepresentationOfPermission(Permission."Modify Permission");
-                    InputText += GetCharRepresentationOfPermission(Permission."Delete Permission");
+                InputText += Format(MetadataPermission."Object ID");
+                if ObjectType = MetadataPermission."Object Type"::"Table Data" then begin
+                    InputText += GetCharRepresentationOfPermission(MetadataPermission."Read Permission");
+                    InputText += GetCharRepresentationOfPermission(MetadataPermission."Insert Permission");
+                    InputText += GetCharRepresentationOfPermission(MetadataPermission."Modify Permission");
+                    InputText += GetCharRepresentationOfPermission(MetadataPermission."Delete Permission");
                 end else
-                    InputText += GetCharRepresentationOfPermission(Permission."Execute Permission");
-                InputText += Format(Permission."Security Filter", 0, 9);
-            until Permission.Next() = 0;
+                    InputText += GetCharRepresentationOfPermission(MetadataPermission."Execute Permission");
+                InputText += Format(MetadataPermission."Security Filter", 0, 9);
+            until MetadataPermission.Next() = 0;
 
         exit(CopyStr(CryptographyManagement.GenerateHash(InputText, 2), 1, 250)); // 2 corresponds to SHA256
     end;
@@ -388,15 +392,15 @@ codeunit 9002 "Permission Manager"
 
     procedure IsFirstPermissionHigherThanSecond(First: Option; Second: Option): Boolean
     var
-        Permission: Record Permission;
+        MetadataPermission: Record "Metadata Permission";
     begin
         case First of
-            Permission."Read Permission"::" ":
+            MetadataPermission."Read Permission"::" ":
                 exit(false);
-            Permission."Read Permission"::Indirect:
-                exit(Second = Permission."Read Permission"::" ");
-            Permission."Read Permission"::Yes:
-                exit(Second in [Permission."Read Permission"::Indirect, Permission."Read Permission"::" "]);
+            MetadataPermission."Read Permission"::Indirect:
+                exit(Second = MetadataPermission."Read Permission"::" ");
+            MetadataPermission."Read Permission"::Yes:
+                exit(Second in [MetadataPermission."Read Permission"::Indirect, MetadataPermission."Read Permission"::" "]);
         end;
     end;
 

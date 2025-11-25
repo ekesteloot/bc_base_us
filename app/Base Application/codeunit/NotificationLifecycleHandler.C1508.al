@@ -1,3 +1,22 @@
+﻿namespace System.Environment.Configuration;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Posting;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Posting;
+
 codeunit 1508 "Notification Lifecycle Handler"
 {
 

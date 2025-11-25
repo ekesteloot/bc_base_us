@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 enum 5094 "Opportunity Table Type"
 {
     Extensible = true;

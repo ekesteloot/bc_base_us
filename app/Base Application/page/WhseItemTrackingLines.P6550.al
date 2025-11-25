@@ -1,3 +1,14 @@
+namespace Microsoft.WarehouseMgt.Tracking;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Worksheet;
+
 page 6550 "Whse. Item Tracking Lines"
 {
     // Function button Line exist in two overlayed versions to make dynamic show/hide/enable of
@@ -133,6 +144,7 @@ page 6550 "Whse. Item Tracking Lines"
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies the same as the field in the Item Tracking Lines window.';
+                    ExtendedDatatype = Barcode;
 
                     trigger OnAssistEdit()
                     var
@@ -141,7 +153,7 @@ page 6550 "Whse. Item Tracking Lines"
                         if ColorOfQuantityArray[1] = 0 then
                             MaxQuantity := UndefinedQtyArray[1];
 
-                        Rec.LookUpTrackingSummary(Rec, "Item Tracking Type"::"Serial No.", MaxQuantity, -1, true);
+                        Rec.LookUpTrackingSummary(Rec, Enum::"Item Tracking Type"::"Serial No.", MaxQuantity, -1, true);
                         CurrPage.Update();
                         CalculateSums();
                     end;
@@ -157,11 +169,13 @@ page 6550 "Whse. Item Tracking Lines"
                     Editable = NewSerialNoEditable;
                     ToolTip = 'Specifies a new serial number that replaces the number in the Serial No. field, when you post the warehouse item reclassification journal.';
                     Visible = NewSerialNoVisible;
+                    ExtendedDatatype = Barcode;
                 }
                 field("Lot No."; Rec."Lot No.")
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies the same as the field in the Item Tracking Lines window.';
+                    ExtendedDatatype = Barcode;
 
                     trigger OnAssistEdit()
                     var
@@ -170,7 +184,7 @@ page 6550 "Whse. Item Tracking Lines"
                         if ColorOfQuantityArray[1] = 0 then
                             MaxQuantity := UndefinedQtyArray[1];
 
-                        Rec.LookUpTrackingSummary(Rec, "Item Tracking Type"::"Lot No.", MaxQuantity, -1, true);
+                        Rec.LookUpTrackingSummary(Rec, Enum::"Item Tracking Type"::"Lot No.", MaxQuantity, -1, true);
                         CurrPage.Update();
                         CalculateSums();
                     end;
@@ -186,12 +200,14 @@ page 6550 "Whse. Item Tracking Lines"
                     Editable = NewLotNoEditable;
                     ToolTip = 'Specifies a new lot number that replaces the number in the Lot No. field, when you post the warehouse item reclassification journal.';
                     Visible = NewLotNoVisible;
+                    ExtendedDatatype = Barcode;
                 }
                 field("Package No."; Rec."Package No.")
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies a new package number that replaces the package number, when you post the warehouse item reclassification journal.';
                     Visible = PackageTrackingVisible;
+                    ExtendedDatatype = Barcode;
 
                     trigger OnAssistEdit()
                     var
@@ -200,7 +216,7 @@ page 6550 "Whse. Item Tracking Lines"
                         if ColorOfQuantityArray[1] = 0 then
                             MaxQuantity := UndefinedQtyArray[1];
 
-                        Rec.LookUpTrackingSummary(Rec, "Item Tracking Type"::"Package No.", MaxQuantity, -1, true);
+                        Rec.LookUpTrackingSummary(Rec, Enum::"Item Tracking Type"::"Package No.", MaxQuantity, -1, true);
                         CurrPage.Update();
                         CalculateSums();
                     end;
@@ -216,6 +232,7 @@ page 6550 "Whse. Item Tracking Lines"
                     Editable = NewPackageNoEditable;
                     ToolTip = 'Specifies a new package number that replaces the number in the Package No. field, when you post the warehouse item reclassification journal.';
                     Visible = NewPackageNoVisible;
+                    ExtendedDatatype = Barcode;
                 }
                 field("Expiration Date"; Rec."Expiration Date")
                 {
@@ -601,39 +618,22 @@ page 6550 "Whse. Item Tracking Lines"
         UndefinedQtyArray: array[2] of Decimal;
         SourceQuantityArray: array[2] of Decimal;
         ColorOfQuantityArray: array[2] of Integer;
-        [InDataSet]
         Handle1Visible: Boolean;
-        [InDataSet]
         Handle2Visible: Boolean;
-        [InDataSet]
         Handle3Visible: Boolean;
-        [InDataSet]
         QtyToHandleBaseVisible: Boolean;
-        [InDataSet]
         NewSerialNoVisible: Boolean;
-        [InDataSet]
         NewLotNoVisible: Boolean;
-        [InDataSet]
         NewPackageNoVisible: Boolean;
-        [InDataSet]
         NewExpirationDateVisible: Boolean;
-        [InDataSet]
         ButtonLineReclassVisible: Boolean;
-        [InDataSet]
         ButtonLineVisible: Boolean;
-        [InDataSet]
         QtyToHandleBaseEditable: Boolean;
-        [InDataSet]
         NewSerialNoEditable: Boolean;
-        [InDataSet]
         NewLotNoEditable: Boolean;
-        [InDataSet]
         NewPackageNoEditable: Boolean;
-        [InDataSet]
         NewExpirationDateEditable: Boolean;
-        [InDataSet]
         ExpirationDateEditable: Boolean;
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     local procedure GetTextCaption(): Text[30]
@@ -641,10 +641,10 @@ page 6550 "Whse. Item Tracking Lines"
         PostedWhseRcptLine: Record "Posted Whse. Receipt Line";
         WhseShipmentLine: Record "Warehouse Shipment Line";
     begin
-        case "Source Type" of
-            DATABASE::"Posted Whse. Receipt Line":
+        case Rec."Source Type" of
+            Enum::TableID::"Posted Whse. Receipt Line".AsInteger():
                 exit(PostedWhseRcptLine.TableCaption());
-            DATABASE::"Warehouse Shipment Line":
+            Enum::TableID::"Warehouse Shipment Line".AsInteger():
                 exit(WhseShipmentLine.TableCaption());
             else
                 exit(Text001);
@@ -674,7 +674,7 @@ page 6550 "Whse. Item Tracking Lines"
     var
         SetAccess: Boolean;
     begin
-        SetAccess := FormSourceType <> DATABASE::"Warehouse Journal Line";
+        SetAccess := FormSourceType <> Enum::TableID::"Warehouse Journal Line".AsInteger();
         Handle1Visible := SetAccess;
         Handle2Visible := SetAccess;
         Handle3Visible := SetAccess;
@@ -707,25 +707,25 @@ page 6550 "Whse. Item Tracking Lines"
             SetRange("Qty. per Unit of Measure", WhseWorksheetLine."Qty. per Unit of Measure");
 
             case SourceType of
-                DATABASE::"Posted Whse. Receipt Line",
-                DATABASE::"Warehouse Shipment Line",
-                DATABASE::"Whse. Internal Put-away Line",
-                DATABASE::"Whse. Internal Pick Line",
-                DATABASE::"Assembly Line",
-                DATABASE::"Internal Movement Line":
+                Enum::TableID::"Posted Whse. Receipt Line".AsInteger(),
+                Enum::TableID::"Warehouse Shipment Line".AsInteger(),
+                Enum::TableID::"Whse. Internal Put-away Line".AsInteger(),
+                Enum::TableID::"Whse. Internal Pick Line".AsInteger(),
+                Enum::TableID::"Assembly Line".AsInteger(),
+                Enum::TableID::"Internal Movement Line".AsInteger():
                     begin
                         SetRange("Source ID", WhseWorksheetLine."Whse. Document No.");
                         SetRange("Source Ref. No.", WhseWorksheetLine."Whse. Document Line No.");
                     end;
-                DATABASE::"Prod. Order Component":
+                Enum::TableID::"Prod. Order Component".AsInteger():
                     begin
                         SetRange("Source Subtype", WhseWorksheetLine."Source Subtype");
                         SetRange("Source ID", WhseWorksheetLine."Source No.");
                         SetRange("Source Prod. Order Line", WhseWorksheetLine."Source Line No.");
                         SetRange("Source Ref. No.", WhseWorksheetLine."Source Subline No.");
                     end;
-                DATABASE::"Whse. Worksheet Line",
-                DATABASE::"Warehouse Journal Line":
+                Enum::TableID::"Whse. Worksheet Line".AsInteger(),
+                Enum::TableID::"Warehouse Journal Line".AsInteger():
                     begin
                         SetRange("Source Batch Name", WhseWorksheetLine."Worksheet Template Name");
                         SetRange("Source ID", WhseWorksheetLine.Name);
@@ -760,9 +760,9 @@ page 6550 "Whse. Item Tracking Lines"
           (WhseWorksheetLine."Qty. (Base)" < 0) or
           Reclass or
           (FormSourceType in
-           [DATABASE::"Whse. Worksheet Line",
-            DATABASE::"Posted Whse. Receipt Line",
-            DATABASE::"Whse. Internal Put-away Line"]));
+           [Enum::TableID::"Whse. Worksheet Line".AsInteger(),
+            Enum::TableID::"Posted Whse. Receipt Line".AsInteger(),
+            Enum::TableID::"Whse. Internal Put-away Line".AsInteger()]));
     end;
 
     procedure CalculateSums()
@@ -852,7 +852,7 @@ page 6550 "Whse. Item Tracking Lines"
                 exit(true);
 
         case FormSourceType of
-            DATABASE::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component".AsInteger():
                 begin
                     ProdOrderComp.Get(TempSourceWhseItemTrackingLine."Source Subtype", TempSourceWhseItemTrackingLine."Source ID",
                       TempSourceWhseItemTrackingLine."Source Prod. Order Line", TempSourceWhseItemTrackingLine."Source Ref. No.");
@@ -866,7 +866,7 @@ page 6550 "Whse. Item Tracking Lines"
                         TempSourceWhseItemTrackingLine."Source Ref. No.",
                         TempSourceWhseItemTrackingLine, QuantityBase, DueDate);
                 end;
-            DATABASE::"Warehouse Shipment Line":
+            Enum::TableID::"Warehouse Shipment Line".AsInteger():
                 begin
                     WhseShptLine.Get(TempSourceWhseItemTrackingLine."Source ID", TempSourceWhseItemTrackingLine."Source Ref. No.");
                     QuantityBase := WhseShptLine."Qty. (Base)";
@@ -939,7 +939,7 @@ page 6550 "Whse. Item Tracking Lines"
         Rec."Location Code" := WhseWorksheetLine."Location Code";
         Rec."Item No." := WhseWorksheetLine."Item No.";
         Rec."Variant Code" := WhseWrkshLine."Variant Code";
-        if (Rec."Expiration Date" <> 0D) and (FormSourceType = DATABASE::"Internal Movement Line") then
+        if (Rec."Expiration Date" <> 0D) and (FormSourceType = Enum::TableID::"Internal Movement Line".AsInteger()) then
             Rec.InitExpirationDate();
         if WhseItemTrackingLine2.FindLast() then;
         Rec."Entry No." := WhseItemTrackingLine2."Entry No." + 1;

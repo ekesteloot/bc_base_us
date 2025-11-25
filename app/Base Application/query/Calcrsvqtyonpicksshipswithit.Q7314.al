@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Availability;
+
+using Microsoft.InventoryMgt.Tracking;
+
 query 7314 CalcRsvQtyOnPicksShipsWithIT
 {
     QueryType = Normal;

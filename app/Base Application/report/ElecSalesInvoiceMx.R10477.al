@@ -9,7 +9,7 @@ report 10477 "Elec. Sales Invoice MX"
     {
         dataitem("Sales Invoice Header"; "Sales Invoice Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.", "Ship-to Code", "No. Printed";
             RequestFilterHeading = 'Sales Invoice';
@@ -22,12 +22,12 @@ report 10477 "Elec. Sales Invoice MX"
             }
             dataitem("Sales Invoice Line"; "Sales Invoice Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 dataitem(SalesLineComments; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Posted Invoice"), "Print On Invoice" = CONST(true));
+                    DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Posted Invoice"), "Print On Invoice" = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -73,8 +73,8 @@ report 10477 "Elec. Sales Invoice MX"
             }
             dataitem("Sales Comment Line"; "Sales Comment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Posted Invoice"), "Print On Invoice" = CONST(true), "Document Line No." = CONST(0));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Posted Invoice"), "Print On Invoice" = const(true), "Document Line No." = const(0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -113,10 +113,10 @@ report 10477 "Elec. Sales Invoice MX"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2_Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -371,7 +371,7 @@ report 10477 "Elec. Sales Invoice MX"
                     }
                     dataitem(SalesInvLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(AmountExclInvDisc; AmountExclInvDisc)
                         {
                         }
@@ -473,7 +473,7 @@ report 10477 "Elec. Sales Invoice MX"
                         }
                         dataitem(AsmLoop; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(TempPostedAsmLineUnitofMeasureCode; GetUOMText(TempPostedAsmLine."Unit of Measure Code"))
                             {
                             }
@@ -593,7 +593,7 @@ report 10477 "Elec. Sales Invoice MX"
                     }
                     dataitem(OriginalStringLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(OriginalStringText; OriginalStringText)
                         {
                         }
@@ -619,7 +619,7 @@ report 10477 "Elec. Sales Invoice MX"
                     }
                     dataitem(DigitalSignaturePACLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DigitalSignaturePACText; DigitalSignaturePACText)
                         {
                         }
@@ -645,7 +645,7 @@ report 10477 "Elec. Sales Invoice MX"
                     }
                     dataitem(DigitalSignatureLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DigitalSignatureText; DigitalSignatureText)
                         {
                         }
@@ -671,7 +671,7 @@ report 10477 "Elec. Sales Invoice MX"
                     }
                     dataitem(QRCode; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Sales_Invoice_Header___QR_Code_; "Sales Invoice Header"."QR Code")
                         {
                         }
@@ -726,6 +726,7 @@ report 10477 "Elec. Sales Invoice MX"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Salesperson Code" = '' then
                     Clear(SalesPurchPerson)
@@ -744,7 +745,7 @@ report 10477 "Elec. Sales Invoice MX"
                 FormatAddress.SalesInvBillTo(BillToAddress, "Sales Invoice Header");
                 FormatAddress.SalesInvShipTo(ShipToAddress, ShipToAddress, "Sales Invoice Header");
 
-                if Customer."CFDI Customer Name" <> '' then 
+                if Customer."CFDI Customer Name" <> '' then
                     BillToAddressName := Customer."CFDI Customer Name"
                 else
                     BillToAddressName := BillToAddress[1];
@@ -901,9 +902,6 @@ report 10477 "Elec. Sales Invoice MX"
         ShipmentMethod: Record "Shipment Method";
         PaymentTerms: Record "Payment Terms";
         SalesPurchPerson: Record "Salesperson/Purchaser";
-        CompanyInformation: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         Customer: Record Customer;
         OrderLine: Record "Sales Line";
@@ -953,7 +951,6 @@ report 10477 "Elec. Sales Invoice MX"
         Text012: Label 'You can not sign or send or print a deleted document.';
         Text013: Label '%1, %2';
         DigitalSignaturePACTextUnbounded: Text;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         DisplayAssemblyInformation: Boolean;
         BillCaptionLbl: Label 'Bill-To:';
@@ -1007,6 +1004,11 @@ report 10477 "Elec. Sales Invoice MX"
         UnitOfMeasureCodeLbl: Label 'UoM';
         SATClassificationLbl: Label 'Classification';
         SATClassification: Code[10];
+
+    protected var
+        CompanyInformation: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     procedure InitLogInteraction()
     begin

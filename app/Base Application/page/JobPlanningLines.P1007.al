@@ -1,3 +1,14 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.WarehouseMgt.Activity;
+using System.Email;
+using System.Security.User;
+
 page 1007 "Job Planning Lines"
 {
     AutoSplitKey = true;
@@ -98,8 +109,8 @@ page 1007 "Job Planning Lines"
                         Item: Record "Item";
                     begin
                         NoOnAfterValidate();
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field(Description; Rec.Description)
@@ -107,6 +118,12 @@ page 1007 "Job Planning Lines"
                     ApplicationArea = Jobs;
                     Editable = DescriptionEditable;
                     ToolTip = 'Specifies the name of the resource, item, or G/L account to which this entry applies. You can change the description.';
+                }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Jobs;
+                    ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
                 }
                 field("Price Calculation Method"; Rec."Price Calculation Method")
                 {
@@ -145,8 +162,8 @@ page 1007 "Job Planning Lines"
                         Item: Record "Item";
                     begin
                         VariantCodeOnAfterValidate();
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field("Location Code"; Rec."Location Code")
@@ -192,7 +209,7 @@ page 1007 "Job Planning Lines"
                         UnitofMeasureCodeOnAfterValidate();
                     end;
                 }
-                field(ReserveName; Reserve)
+                field(ReserveName; Rec.Reserve)
                 {
                     ApplicationArea = Reservation;
                     ToolTip = 'Specifies whether or not a reservation can be made for items on the current line. The field is not applicable if the Type field is set to Resource, Cost, or G/L Account.';
@@ -378,7 +395,7 @@ page 1007 "Job Planning Lines"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownJobInvoices();
+                        Rec.DrillDownJobInvoices();
                     end;
                 }
                 field("Qty. to Transfer to Invoice"; Rec."Qty. to Transfer to Invoice")
@@ -395,7 +412,7 @@ page 1007 "Job Planning Lines"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownJobInvoices();
+                        Rec.DrillDownJobInvoices();
                     end;
                 }
                 field("Qty. to Invoice"; Rec."Qty. to Invoice")
@@ -411,7 +428,7 @@ page 1007 "Job Planning Lines"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownJobInvoices();
+                        Rec.DrillDownJobInvoices();
                     end;
                 }
                 field("Invoiced Cost Amount (LCY)"; Rec."Invoiced Cost Amount (LCY)")
@@ -422,7 +439,7 @@ page 1007 "Job Planning Lines"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownJobInvoices();
+                        Rec.DrillDownJobInvoices();
                     end;
                 }
                 field("User ID"; Rec."User ID")
@@ -435,7 +452,7 @@ page 1007 "Job Planning Lines"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Serial No."; Rec."Serial No.")
@@ -474,7 +491,7 @@ page 1007 "Job Planning Lines"
                     ToolTip = 'Specifies that an entry has been created by Business Central and is related to a job ledger entry. The check box is selected automatically.';
                     Visible = false;
                 }
-                field(Overdue; Overdue())
+                field(Overdue; Rec.Overdue())
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Overdue';
@@ -537,11 +554,11 @@ page 1007 "Job Planning Lines"
                     var
                         JobLedgerEntry: Record "Job Ledger Entry";
                         JobUsageLink: Record "Job Usage Link";
+                        JobLedgerEntries: Page "Job Ledger Entries";
                     begin
-                        JobUsageLink.SetRange("Job No.", "Job No.");
-                        JobUsageLink.SetRange("Job Task No.", "Job Task No.");
-                        JobUsageLink.SetRange("Line No.", "Line No.");
-
+                        JobUsageLink.SetRange("Job No.", Rec."Job No.");
+                        JobUsageLink.SetRange("Job Task No.", Rec."Job Task No.");
+                        JobUsageLink.SetRange("Line No.", Rec."Line No.");
                         if JobUsageLink.FindSet() then
                             repeat
                                 JobLedgerEntry.Get(JobUsageLink."Entry No.");
@@ -549,7 +566,9 @@ page 1007 "Job Planning Lines"
                             until JobUsageLink.Next() = 0;
 
                         JobLedgerEntry.MarkedOnly(true);
-                        PAGE.Run(PAGE::"Job Ledger Entries", JobLedgerEntry);
+                        Clear(JobLedgerEntries);
+                        JobLedgerEntries.SetTableView(JobLedgerEntry);
+                        JobLedgerEntries.Run();
                     end;
                 }
                 action("&Reservation Entries")
@@ -562,7 +581,7 @@ page 1007 "Job Planning Lines"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
                 separator(Action133)
@@ -577,7 +596,7 @@ page 1007 "Job Planning Lines"
 
                     trigger OnAction()
                     begin
-                        ShowOrderPromisingLine();
+                        Rec.ShowOrderPromisingLine();
                     end;
                 }
                 action(SendToCalendar)
@@ -597,9 +616,9 @@ page 1007 "Job Planning Lines"
                     Caption = 'Put-away/Pick Lines/Movement Lines';
                     Image = PutawayLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Source Type" = FILTER(167),
-                                  "Source Subtype" = CONST("0"),
-                                  "Source No." = FIELD("Job No."),
+                    RunPageLink = "Source Type" = filter(167),
+                                  "Source Subtype" = const("0"),
+                                  "Source No." = field("Job No."),
                                   "Source Line No." = field("Job Contract Entry No.");
                     ToolTip = 'View the list of ongoing inventory put-aways, picks, or movements for the job.';
                 }
@@ -661,8 +680,8 @@ page 1007 "Job Planning Lines"
                     Caption = '&Open Job Journal';
                     Image = Journals;
                     RunObject = Page "Job Journal";
-                    RunPageLink = "Job No." = FIELD("Job No."),
-                                  "Job Task No." = FIELD("Job Task No.");
+                    RunPageLink = "Job No." = field("Job No."),
+                                  "Job Task No." = field("Job Task No.");
                     ToolTip = 'Open the job journal, for example, to post usage for a job.';
                 }
                 separator(Action16)
@@ -730,7 +749,7 @@ page 1007 "Job Planning Lines"
 
                     trigger OnAction()
                     begin
-                        ShowReservation();
+                        Rec.ShowReservation();
                     end;
                 }
                 action("Order &Tracking")
@@ -742,7 +761,7 @@ page 1007 "Job Planning Lines"
 
                     trigger OnAction()
                     begin
-                        ShowTracking();
+                        Rec.ShowTracking();
                     end;
                 }
                 separator(Action130)
@@ -761,7 +780,7 @@ page 1007 "Job Planning Lines"
                     begin
                         DemandOverview.SetCalculationParameter(true);
 
-                        DemandOverview.Initialize(0D, 3, "Job No.", '', '');
+                        DemandOverview.Initialize(0D, 3, Rec."Job No.", '', '');
                         DemandOverview.RunModal();
                     end;
                 }
@@ -888,8 +907,8 @@ page 1007 "Job Planning Lines"
     var
         Item: Record Item;
     begin
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
     end;
 
     trigger OnInit()
@@ -922,9 +941,9 @@ page 1007 "Job Planning Lines"
 
     trigger OnModifyRecord(): Boolean
     begin
-        if "System-Created Entry" then begin
+        if Rec."System-Created Entry" then begin
             if Confirm(Text001, false) then
-                "System-Created Entry" := false
+                Rec."System-Created Entry" := false
             else
                 Error('');
         end;
@@ -932,18 +951,18 @@ page 1007 "Job Planning Lines"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
     end;
 
     trigger OnOpenPage()
     var
         Job: Record Job;
     begin
-        FilterGroup := 2;
+        Rec.FilterGroup := 2;
         if Rec.GetFilter("Job No.") <> '' then
             if Job.Get(Rec.GetRangeMin("Job No.")) then
                 CurrPage.Editable(not (Job.Blocked = Job.Blocked::All));
-        FilterGroup := 0;
+        Rec.FilterGroup := 0;
     end;
 
     var
@@ -954,39 +973,22 @@ page 1007 "Job Planning Lines"
         VariantCodeMandatory: Boolean;
 
     protected var
-        [InDataSet]
         JobTaskNoVisible: Boolean;
-        [InDataSet]
         PlanningDateEditable: Boolean;
-        [InDataSet]
         CurrencyDateEditable: Boolean;
-        [InDataSet]
         DocumentNoEditable: Boolean;
-        [InDataSet]
         TypeEditable: Boolean;
-        [InDataSet]
         NoEditable: Boolean;
-        [InDataSet]
         DescriptionEditable: Boolean;
-        [InDataSet]
         UnitOfMeasureCodeEditable: Boolean;
-        [InDataSet]
         VariantCodeEditable: Boolean;
-        [InDataSet]
         LocationCodeEditable: Boolean;
-        [InDataSet]
         BinCodeEditable: Boolean;
-        [InDataSet]
         WorkTypeCodeEditable: Boolean;
-        [InDataSet]
         UnitPriceEditable: Boolean;
-        [InDataSet]
         LineDiscountAmountEditable: Boolean;
-        [InDataSet]
         LineDiscountPctEditable: Boolean;
-        [InDataSet]
         LineAmountEditable: Boolean;
-        [InDataSet]
         UnitCostEditable: Boolean;
         CanSendToCalendar: Boolean;
 
@@ -995,13 +997,13 @@ page 1007 "Job Planning Lines"
         JobPlanningLine: Record "Job Planning Line";
         JobCreateInvoice: Codeunit "Job Create-Invoice";
     begin
-        TestField("Line No.");
+        Rec.TestField("Line No.");
         JobPlanningLine.Copy(Rec);
         CurrPage.SetSelectionFilter(JobPlanningLine);
         JobCreateInvoice.CreateSalesInvoice(JobPlanningLine, CrMemo)
     end;
 
-    local procedure SetEditable(Edit: Boolean)
+    protected procedure SetEditable(Edit: Boolean)
     begin
         PlanningDateEditable := Edit;
         CurrencyDateEditable := Edit;
@@ -1028,11 +1030,11 @@ page 1007 "Job Planning Lines"
 
     local procedure PerformAutoReserve()
     begin
-        if (Reserve = Reserve::Always) and
-           ("Remaining Qty. (Base)" <> 0)
+        if (Rec.Reserve = Rec.Reserve::Always) and
+           (Rec."Remaining Qty. (Base)" <> 0)
         then begin
             CurrPage.SaveRecord();
-            AutoReserve();
+            Rec.AutoReserve();
             CurrPage.Update(false);
         end;
     end;
@@ -1044,13 +1046,13 @@ page 1007 "Job Planning Lines"
 
     protected procedure PlanningDateOnAfterValidate()
     begin
-        if "Planning Date" <> xRec."Planning Date" then
+        if Rec."Planning Date" <> xRec."Planning Date" then
             PerformAutoReserve();
     end;
 
     protected procedure NoOnAfterValidate()
     begin
-        if "No." <> xRec."No." then
+        if Rec."No." <> xRec."No." then
             PerformAutoReserve();
 
         OnAfterNoOnAfterValidate(Rec);
@@ -1058,19 +1060,19 @@ page 1007 "Job Planning Lines"
 
     protected procedure VariantCodeOnAfterValidate()
     begin
-        if "Variant Code" <> xRec."Variant Code" then
+        if Rec."Variant Code" <> xRec."Variant Code" then
             PerformAutoReserve();
     end;
 
     protected procedure LocationCodeOnAfterValidate()
     begin
-        if "Location Code" <> xRec."Location Code" then
+        if Rec."Location Code" <> xRec."Location Code" then
             PerformAutoReserve();
     end;
 
     protected procedure BinCodeOnAfterValidate()
     begin
-        if "Bin Code" <> xRec."Bin Code" then
+        if Rec."Bin Code" <> xRec."Bin Code" then
             PerformAutoReserve();
     end;
 
@@ -1087,7 +1089,7 @@ page 1007 "Job Planning Lines"
     protected procedure QuantityOnAfterValidate()
     begin
         PerformAutoReserve();
-        if (Type = Type::Item) and (Quantity <> xRec.Quantity) then
+        if (Rec.Type = Rec.Type::Item) and (Rec.Quantity <> xRec.Quantity) then
             CurrPage.Update(true);
     end;
 

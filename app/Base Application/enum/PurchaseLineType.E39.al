@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Document;
+
 enum 39 "Purchase Line Type"
 {
     Extensible = true;
@@ -9,4 +11,5 @@ enum 39 "Purchase Line Type"
     value(3; "Resource") { Caption = 'Resource'; }
     value(4; "Fixed Asset") { Caption = 'Fixed Asset'; }
     value(5; "Charge (Item)") { Caption = 'Charge (Item)'; }
+    value(10; "Allocation Account") { Caption = 'Allocation Account'; }
 }

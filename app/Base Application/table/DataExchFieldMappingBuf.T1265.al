@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 1265 "Data Exch. Field Mapping Buf."
 {
     Caption = 'Data Exch. Field Mapping Buf.';

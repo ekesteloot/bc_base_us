@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Utilities;
+
 codeunit 1277 "Exp. External Data Gen. Jnl."
 {
     Permissions = TableData "Data Exch." = rimd;
@@ -7,12 +11,12 @@ codeunit 1277 "Exp. External Data Gen. Jnl."
     var
         TempBlob: Codeunit "Temp Blob";
     begin
-        CalcFields("File Content");
-        if not "File Content".HasValue() then
-            Error(ExternalContentErr, FieldCaption("File Content"));
+        Rec.CalcFields("File Content");
+        if not Rec."File Content".HasValue() then
+            Error(ExternalContentErr, Rec.FieldCaption("File Content"));
 
-        TempBlob.FromRecord(Rec, FieldNo("File Content"));
-        ExportToFile(Rec, TempBlob, "Data Exch. Def Code" + ' ' + "Data Exch. Line Def Code" + TxtExtTok);
+        TempBlob.FromRecord(Rec, Rec.FieldNo("File Content"));
+        ExportToFile(Rec, TempBlob, Rec."Data Exch. Def Code" + ' ' + Rec."Data Exch. Line Def Code" + TxtExtTok);
     end;
 
     var

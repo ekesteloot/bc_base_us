@@ -1,3 +1,9 @@
+﻿namespace System.Xml;
+
+using System;
+using System.IO;
+using System.Utilities;
+
 codeunit 6223 "OpenXML Management"
 {
 

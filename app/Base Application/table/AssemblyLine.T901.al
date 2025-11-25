@@ -1,3 +1,22 @@
+﻿namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 table 901 "Assembly Line"
 {
     Caption = 'Assembly Line';
@@ -18,7 +37,7 @@ table 901 "Assembly Line"
         field(2; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Assembly Header"."No." WHERE("Document Type" = FIELD("Document Type"));
+            TableRelation = "Assembly Header"."No." where("Document Type" = field("Document Type"));
 
             trigger OnValidate()
             begin
@@ -53,16 +72,16 @@ table 901 "Assembly Line"
         field(11; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(Item)) Item WHERE(Type = FILTER(Inventory | "Non-Inventory"))
-            ELSE
-            IF (Type = CONST(Resource)) Resource;
+            TableRelation = if (Type = const(Item)) Item where(Type = filter(Inventory | "Non-Inventory"))
+            else
+            if (Type = const(Resource)) Resource;
 
             trigger OnValidate()
             begin
                 "Location Code" := '';
                 TestField("Consumed Quantity", 0);
                 CalcFields("Reserved Quantity");
-                WhseValidateSourceLine.AssemblyLineVerifyChange(Rec, xRec);
+                AssemblyWarehouseMgt.AssemblyLineVerifyChange(Rec, xRec);
                 if "No." <> '' then
                     CheckItemAvailable(FieldNo("No."));
                 VerifyReservationChange(Rec, xRec);
@@ -90,8 +109,7 @@ table 901 "Assembly Line"
         field(12; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."),
-                                                                             Code = FIELD("Variant Code"));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."), Code = field("Variant Code"));
 
             trigger OnValidate()
             var
@@ -101,16 +119,17 @@ table 901 "Assembly Line"
                 TestField("Consumed Quantity", 0);
                 CalcFields("Reserved Quantity");
                 TestField("Reserved Quantity", 0);
-                WhseValidateSourceLine.AssemblyLineVerifyChange(Rec, xRec);
+                AssemblyWarehouseMgt.AssemblyLineVerifyChange(Rec, xRec);
                 CheckItemAvailable(FieldNo("Variant Code"));
                 VerifyReservationChange(Rec, xRec);
                 TestStatusOpen();
 
-                if "Variant Code" = '' then begin
+                if Rec."Variant Code" = '' then begin
                     GetItemResource();
                     Description := Item.Description;
                     "Description 2" := Item."Description 2"
                 end else begin
+                    ItemVariant.SetLoadFields(Description, "Description 2", Blocked);
                     ItemVariant.Get("No.", "Variant Code");
                     Description := ItemVariant.Description;
                     "Description 2" := ItemVariant."Description 2";
@@ -162,13 +181,13 @@ table 901 "Assembly Line"
         field(20; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             begin
                 TestField(Type, Type::Item);
 
-                WhseValidateSourceLine.AssemblyLineVerifyChange(Rec, xRec);
+                AssemblyWarehouseMgt.AssemblyLineVerifyChange(Rec, xRec);
                 CheckItemAvailable(FieldNo("Location Code"));
                 VerifyReservationChange(Rec, xRec);
                 TestStatusOpen();
@@ -184,30 +203,30 @@ table 901 "Assembly Line"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(22; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(23; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnLookup()
             var
@@ -306,7 +325,7 @@ table 901 "Assembly Line"
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
-                WhseValidateSourceLine.AssemblyLineVerifyChange(Rec, xRec);
+                AssemblyWarehouseMgt.AssemblyLineVerifyChange(Rec, xRec);
 
                 Quantity := UOMMgt.RoundAndValidateQty(Quantity, "Qty. Rounding Precision", FieldCaption(Quantity));
 
@@ -387,7 +406,7 @@ table 901 "Assembly Line"
                 if IsHandled then
                     exit;
 
-                WhseValidateSourceLine.AssemblyLineVerifyChange(Rec, xRec);
+                AssemblyWarehouseMgt.AssemblyLineVerifyChange(Rec, xRec);
 
                 "Quantity to Consume" := UOMMgt.RoundAndValidateQty("Quantity to Consume", "Qty. Rounding Precision", FieldCaption("Quantity to Consume"));
 
@@ -410,13 +429,13 @@ table 901 "Assembly Line"
         }
         field(48; "Reserved Quantity"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("Document No."),
-                                                                   "Source Ref. No." = FIELD("Line No."),
-                                                                   "Source Type" = CONST(901),
+            CalcFormula = - sum("Reservation Entry".Quantity where("Source ID" = field("Document No."),
+                                                                   "Source Ref. No." = field("Line No."),
+                                                                   "Source Type" = const(901),
 #pragma warning disable AL0603
-                                                                   "Source Subtype" = FIELD("Document Type"),
+                                                                   "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                                                   "Reservation Status" = CONST(Reservation)));
+                                                                   "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -424,13 +443,13 @@ table 901 "Assembly Line"
         }
         field(49; "Reserved Qty. (Base)"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("Document No."),
-                                                                            "Source Ref. No." = FIELD("Line No."),
-                                                                            "Source Type" = CONST(901),
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Document No."),
+                                                                            "Source Ref. No." = field("Line No."),
+                                                                            "Source Type" = const(901),
 #pragma warning disable AL0603
-                                                                            "Source Subtype" = FIELD("Document Type"),
+                                                                            "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                                                            "Reservation Status" = CONST(Reservation)));
+                                                                            "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -443,10 +462,10 @@ table 901 "Assembly Line"
         }
         field(51; "Substitution Available"; Boolean)
         {
-            CalcFormula = Exist("Item Substitution" WHERE(Type = CONST(Item),
-                                                           "Substitute Type" = CONST(Item),
-                                                           "No." = FIELD("No."),
-                                                           "Variant Code" = FIELD("Variant Code")));
+            CalcFormula = exist("Item Substitution" where(Type = const(Item),
+                                                           "Substitute Type" = const(Item),
+                                                           "No." = field("No."),
+                                                           "Variant Code" = field("Variant Code")));
             Caption = 'Substitution Available';
             Editable = false;
             FieldClass = FlowField;
@@ -499,7 +518,7 @@ table 901 "Assembly Line"
                     exit;
 
                 TestStatusOpen();
-                WhseValidateSourceLine.AssemblyLineVerifyChange(Rec, xRec);
+                AssemblyWarehouseMgt.AssemblyLineVerifyChange(Rec, xRec);
                 if Type = Type::" " then
                     Error(Text99000002, FieldCaption("Quantity per"), FieldCaption(Type), Type::" ");
                 RoundQty("Quantity per");
@@ -572,15 +591,15 @@ table 901 "Assembly Line"
         field(80; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
-            IF (Type = CONST(Resource)) "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
+            if (Type = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("No."));
 
             trigger OnValidate()
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
             begin
-                WhseValidateSourceLine.AssemblyLineVerifyChange(Rec, xRec);
+                AssemblyWarehouseMgt.AssemblyLineVerifyChange(Rec, xRec);
                 TestStatusOpen();
 
                 GetItemResource();
@@ -628,7 +647,7 @@ table 901 "Assembly Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -640,18 +659,18 @@ table 901 "Assembly Line"
         }
         field(7301; "Pick Qty."; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding" WHERE("Activity Type" = FILTER(<> "Put-away"),
-                                                                                  "Source Type" = CONST(901),
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding" where("Activity Type" = filter(<> "Put-away"),
+                                                                                  "Source Type" = const(901),
 #pragma warning disable AL0603
-                                                                                  "Source Subtype" = FIELD("Document Type"),
+                                                                                  "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                                                                  "Source No." = FIELD("Document No."),
-                                                                                  "Source Line No." = FIELD("Line No."),
-                                                                                  "Source Subline No." = CONST(0),
-                                                                                  "Unit of Measure Code" = FIELD("Unit of Measure Code"),
-                                                                                  "Action Type" = FILTER(" " | Place),
-                                                                                  "Original Breakbulk" = CONST(false),
-                                                                                  "Breakbulk No." = CONST(0)));
+                                                                                  "Source No." = field("Document No."),
+                                                                                  "Source Line No." = field("Line No."),
+                                                                                  "Source Subline No." = const(0),
+                                                                                  "Unit of Measure Code" = field("Unit of Measure Code"),
+                                                                                  "Action Type" = filter(" " | Place),
+                                                                                  "Original Breakbulk" = const(false),
+                                                                                  "Breakbulk No." = const(0)));
             Caption = 'Pick Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -659,18 +678,18 @@ table 901 "Assembly Line"
         }
         field(7302; "Pick Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding (Base)" WHERE("Activity Type" = FILTER(<> "Put-away"),
-                                                                                         "Source Type" = CONST(901),
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding (Base)" where("Activity Type" = filter(<> "Put-away"),
+                                                                                         "Source Type" = const(901),
 #pragma warning disable AL0603
-                                                                                         "Source Subtype" = FIELD("Document Type"),
+                                                                                         "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                                                                         "Source No." = FIELD("Document No."),
-                                                                                         "Source Line No." = FIELD("Line No."),
-                                                                                         "Source Subline No." = CONST(0),
-                                                                                         "Unit of Measure Code" = FIELD("Unit of Measure Code"),
-                                                                                         "Action Type" = FILTER(" " | Place),
-                                                                                         "Original Breakbulk" = CONST(false),
-                                                                                         "Breakbulk No." = CONST(0)));
+                                                                                         "Source No." = field("Document No."),
+                                                                                         "Source Line No." = field("Line No."),
+                                                                                         "Source Subline No." = const(0),
+                                                                                         "Unit of Measure Code" = field("Unit of Measure Code"),
+                                                                                         "Action Type" = filter(" " | Place),
+                                                                                         "Original Breakbulk" = const(false),
+                                                                                         "Breakbulk No." = const(0)));
             Caption = 'Pick Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -724,7 +743,7 @@ table 901 "Assembly Line"
         ItemTrackingMgt: Codeunit "Item Tracking Management";
     begin
         TestStatusOpen();
-        WhseValidateSourceLine.AssemblyLineDelete(Rec);
+        AssemblyWarehouseMgt.AssemblyLineDelete(Rec);
         WhseAssemblyRelease.DeleteLine(Rec);
         AssemblyLineReserve.DeleteLine(Rec);
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
@@ -742,7 +761,7 @@ table 901 "Assembly Line"
 
     trigger OnModify()
     begin
-        WhseValidateSourceLine.AssemblyLineVerifyChange(Rec, xRec);
+        AssemblyWarehouseMgt.AssemblyLineVerifyChange(Rec, xRec);
         VerifyReservationChange(Rec, xRec);
     end;
 
@@ -758,10 +777,9 @@ table 901 "Assembly Line"
         StockkeepingUnit: Record "Stockkeeping Unit";
         GLSetup: Record "General Ledger Setup";
         ItemSubstMgt: Codeunit "Item Subst.";
-        WhseValidateSourceLine: Codeunit "Whse. Validate Source Line";
+        AssemblyWarehouseMgt: Codeunit "Assembly Warehouse Mgt.";
         AssemblyLineReserve: Codeunit "Assembly Line-Reserve";
         GLSetupRead: Boolean;
-        StatusCheckSuspended: Boolean;
         TestReservationDateConflict: Boolean;
         SkipVerificationsThatChangeDatabase: Boolean;
 
@@ -774,6 +792,9 @@ table 901 "Assembly Line"
         Text050: Label 'Due Date %1 is before work date %2.';
         Text99000002: Label 'You cannot change %1 when %2 is ''%3''.';
         AvailabilityPageTitleLbl: Label 'The available inventory for item %1 is lower than the entered quantity at this location.', Comment = '%1=Item No.';
+
+    protected var
+        StatusCheckSuspended: Boolean;
 
     procedure InitRemainingQty()
     begin
@@ -1098,7 +1119,7 @@ table 901 "Assembly Line"
             if not FullAutoReservation and (CurrFieldNo <> 0) then
                 if Confirm(Text001, true) then begin
                     Commit();
-                    ShowReservation();
+                    Rec.ShowReservation();
                     Find();
                 end;
         end;
@@ -1129,7 +1150,7 @@ table 901 "Assembly Line"
         TestReservationDateConflict := NewTestReservationDateConflict;
     end;
 
-    procedure GetHeader()
+    procedure GetHeader(): Record "Assembly Header"
     var
         IsHandled: Boolean;
     begin
@@ -1139,7 +1160,9 @@ table 901 "Assembly Line"
             exit;
 
         if (AssemblyHeader."No." <> "Document No.") and ("Document No." <> '') then
-            AssemblyHeader.Get("Document Type", "Document No.");
+            AssemblyHeader.Get(Rec."Document Type", Rec."Document No.");
+
+        exit(AssemblyHeader)
     end;
 
     procedure GetRemainingQty(var RemainingQty: Decimal; var RemainingQtyBase: Decimal)
@@ -1203,56 +1226,6 @@ table 901 "Assembly Line"
         OnAfterShowDimensions(Rec);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20]; HeaderDimensionSetID: Integer)
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        AssemblySetup: Record "Assembly Setup";
-        DimMgt: Codeunit DimensionManagement;
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        DimensionSetIDArr: array[10] of Integer;
-        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-    begin
-        if SkipVerificationsThatChangeDatabase then
-            exit;
-
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        AssemblySetup.Get();
-        case AssemblySetup."Copy Component Dimensions from" of
-            AssemblySetup."Copy Component Dimensions from"::"Order Header":
-                begin
-                    DimensionSetIDArr[1] :=
-                      DimMgt.GetRecDefaultDimID(
-                        Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup.Assembly,
-                        "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code",
-                        0, 0);
-                    DimensionSetIDArr[2] := HeaderDimensionSetID;
-                end;
-            AssemblySetup."Copy Component Dimensions from"::"Item/Resource Card":
-                begin
-                    DimensionSetIDArr[2] :=
-                      DimMgt.GetRecDefaultDimID(
-                        Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup.Assembly,
-                        "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code",
-                        0, 0);
-                    DimensionSetIDArr[1] := HeaderDimensionSetID;
-                end;
-        end;
-
-        "Dimension Set ID" :=
-          DimMgt.GetCombinedDimensionSetID(DimensionSetIDArr, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; HeaderDimensionSetID: Integer)
     var
         SourceCodeSetup: Record "Source Code Setup";
@@ -1268,9 +1241,6 @@ table 901 "Assembly Line"
         OnBeforeCreateDim(Rec, CurrFieldNo, DefaultDimSource, HeaderDimensionSetID, IsHandled);
         if not IsHandled then begin
             SourceCodeSetup.Get();
-#if not CLEAN20
-            RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
             "Shortcut Dimension 1 Code" := '';
             "Shortcut Dimension 2 Code" := '';
@@ -1328,7 +1298,7 @@ table 901 "Assembly Line"
     var
         DimMgt: Codeunit DimensionManagement;
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure ShowItemSub()
@@ -1648,7 +1618,7 @@ table 901 "Assembly Line"
     begin
         if "Bin Code" <> '' then begin
             GetLocation(Location, "Location Code");
-            if not Location."Directed Put-away and Pick" then
+            if not Location."Check Whse. Class" then
                 exit;
 
             if BinContent.Get(
@@ -1846,7 +1816,7 @@ table 901 "Assembly Line"
             VerifyReservationDateConflict(Rec);
 
         CheckItemAvailable(FieldNo("Due Date"));
-        WhseValidateSourceLine.AssemblyLineVerifyChange(Rec, xRec);
+        AssemblyWarehouseMgt.AssemblyLineVerifyChange(Rec, xRec);
 
         if ("Due Date" < WorkDate()) and ShowDueDateBeforeWorkDateMsg then
             Message(Text050, "Due Date", WorkDate());
@@ -1974,47 +1944,38 @@ table 901 "Assembly Line"
         OnAfterInitTableValuePair(TableValuePair, FieldNo, Rec);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
+    procedure SetAssemblyHeader(NewAssemblyHeader: Record "Assembly Header")
+    begin
+        AssemblyHeader := NewAssemblyHeader;
+    end;
+
+    procedure CheckIfAssemblyLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock") Result: Boolean
     var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
+        QtyReservedFromStock: Decimal;
     begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Assembly Line", DefaultDimSource, TableID, No);
+        Result := true;
+
+        if not Rec.IsInventoriableItem() then
+            exit(true);
+
+        if ReservedFromStock = ReservedFromStock::" " then
+            exit(true);
+
+        QtyReservedFromStock := AssemblyLineReserve.GetReservedQtyFromInventory(Rec);
+
+        case ReservedFromStock of
+            ReservedFromStock::Full:
+                if QtyToPost <> QtyReservedFromStock then
+                    Result := false;
+            ReservedFromStock::"Full and Partial":
+                if QtyReservedFromStock = 0 then
+                    Result := false;
+            else
+                OnCheckIfAssemblyLineMeetsReservedFromStockSetting(QtyToPost, ReservedFromStock, Result);
+        end;
+
+        exit(Result);
     end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Assembly Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDimTableIDs(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Assembly Line") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDimTableIDs(var AssemblyLine: Record "Assembly Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var AssemblyLine: Record "Assembly Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
@@ -2035,14 +1996,6 @@ table 901 "Assembly Line"
     local procedure OnAfterCopyFromResource(var AssemblyLine: Record "Assembly Line"; Resource: Record Resource; AssemblyHeader: Record "Assembly Header")
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var AssemblyLine: Record "Assembly Line"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFilterLinesWithItemToPlan(var AssemblyLine: Record "Assembly Line"; Item: Record Item; DocumentType: Option)
@@ -2236,6 +2189,11 @@ table 901 "Assembly Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDim(var AssemblyLine: Record "Assembly Line"; CallingFieldNo: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; HeaderDimensionSetID: Integer; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckIfAssemblyLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock"; var Result: Boolean)
     begin
     end;
 }

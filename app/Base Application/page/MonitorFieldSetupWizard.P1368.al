@@ -1,3 +1,13 @@
+﻿namespace System.Diagnostics;
+
+using System.Email;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Privacy;
+using System.Security.AccessControl;
+using System.Security.User;
+using System.Utilities;
+
 page 1368 "Monitor Field Setup Wizard"
 {
     Caption = 'Field Monitoring Assisted Setup Guide';

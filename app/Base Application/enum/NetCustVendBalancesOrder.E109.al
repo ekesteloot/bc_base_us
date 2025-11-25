@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
 enum 109 "Net Cust/Vend Balances Order"
 {
     Extensible = true;

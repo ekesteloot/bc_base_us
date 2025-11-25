@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
 enum 1048 "Job Planning Line Status"
 {
     Extensible = true;

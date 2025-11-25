@@ -1,3 +1,5 @@
+namespace System.Threading;
+
 page 3846 "Scheduled Task JQ Factbox"
 {
     PageType = CardPart;

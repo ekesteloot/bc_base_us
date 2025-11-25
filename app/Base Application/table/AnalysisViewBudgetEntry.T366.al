@@ -1,3 +1,11 @@
+﻿namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+
 table 366 "Analysis View Budget Entry"
 {
     Caption = 'Analysis View Budget Entry';

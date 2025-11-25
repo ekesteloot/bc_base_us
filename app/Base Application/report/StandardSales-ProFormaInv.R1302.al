@@ -1,15 +1,13 @@
 report 1302 "Standard Sales - Pro Forma Inv"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/Document/StandardSalesProFormaInv.rdlc';
-    WordLayout = './StandardSalesProFormaInv.docx';
     Caption = 'Pro Forma Invoice';
+    DefaultRenderingLayout = "StandardSalesProFormaInv.rdlc";
 
     dataset
     {
         dataitem(Header; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.");
+            DataItemTableView = sorting("Document Type", "No.");
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
             RequestFilterHeading = 'Pro Forma Invoice';
             column(DocumentDate; Format("Document Date", 0, 4))
@@ -123,7 +121,7 @@ report 1302 "Standard Sales - Pro Forma Inv"
             column(DocumentNo; "No.")
             {
             }
-            column(CompanyLegalOffice; CompanyInformation.GetLegalOffice())
+            column(CompanyLegalOffice; LegalOfficeTxt)
             {
             }
             column(SalesPersonName; SalespersonPurchaserName)
@@ -153,7 +151,7 @@ report 1302 "Standard Sales - Pro Forma Inv"
             column(ExternalDocumentNoLbl; FieldCaption("External Document No."))
             {
             }
-            column(CompanyLegalOfficeLbl; CompanyInformation.GetLegalOfficeLbl())
+            column(CompanyLegalOfficeLbl; LegalOfficeLbl)
             {
             }
             column(SalesPersonLbl; SalesPersonLblText)
@@ -228,9 +226,9 @@ report 1302 "Standard Sales - Pro Forma Inv"
             column(ShowWorkDescription; ShowWorkDescription) { }
             dataitem(Line; "Sales Line")
             {
-                DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                 DataItemLinkReference = Header;
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 column(ItemDescription; Description)
                 {
                 }
@@ -312,7 +310,7 @@ report 1302 "Standard Sales - Pro Forma Inv"
             }
             dataitem(WorkDescriptionLines; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 .. 99999));
+                DataItemTableView = sorting(Number) where(Number = filter(1 .. 99999));
                 column(WorkDescriptionLineNumber; Number) { }
                 column(WorkDescriptionLine; WorkDescriptionLine) { }
 
@@ -365,7 +363,8 @@ report 1302 "Standard Sales - Pro Forma Inv"
 
             trigger OnAfterGetRecord()
             begin
-                CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code"); 
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatDocumentFields(Header);
                 if SellToContact.Get("Sell-to Contact No.") then;
                 if BillToContact.Get("Bill-to Contact No.") then;
@@ -388,14 +387,43 @@ report 1302 "Standard Sales - Pro Forma Inv"
         }
     }
 
+    rendering
+    {
+        layout("StandardSalesProFormaInv.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/Document/StandardSalesProFormaInv.rdlc';
+            Caption = 'Standard Sales Proforma Invoice (RDLC)';
+            Summary = 'The Standard Sales Proforma Invoice (RDLC) provides a detailed layout.';
+        }
+        layout("StandardSalesProFormaInv.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/Document/StandardSalesProFormaInv.docx';
+            Caption = 'Standard Sales Proforma Invoice (Word)';
+            Summary = 'The Standard Sales Proforma Invoice (Word) provides a basic layout.';
+        }
+    }
+
     labels
     {
     }
 
     trigger OnInitReport()
+    var
+        IsHandled: Boolean;
     begin
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
+
+        IsHandled := false;
+        OnInitReportForGlobalVariable(IsHandled, LegalOfficeTxt, LegalOfficeLbl);
+#if not CLEAN23
+        if not IsHandled then begin
+            LegalOfficeTxt := CompanyInformation.GetLegalOffice();
+            LegalOfficeLbl := CompanyInformation.GetLegalOfficeLbl();
+        end;
+#endif
     end;
 
     var
@@ -408,7 +436,6 @@ report 1302 "Standard Sales - Pro Forma Inv"
         TotalWeightLbl: Label 'Total Weight';
         SalespersonPurchaserName: Text;
         ShipmentMethodDescription: Text;
-
         DocumentTitleLbl: Label 'Pro Forma Invoice';
         PageLbl: Label 'Page';
         DeclartionLbl: Label 'For customs purposes only.';
@@ -421,6 +448,7 @@ report 1302 "Standard Sales - Pro Forma Inv"
         BillToContactPhoneNoLbl: Label 'Bill-to Contact Phone No.';
         BillToContactMobilePhoneNoLbl: Label 'Bill-to Contact Mobile Phone No.';
         BillToContactEmailLbl: Label 'Bill-to Contact E-Mail';
+        LegalOfficeTxt, LegalOfficeLbl : Text;
 
     protected var
         CompanyInformation: Record "Company Information";
@@ -527,6 +555,11 @@ report 1302 "Standard Sales - Pro Forma Inv"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeLineOnAfterGetRecord(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitReportForGlobalVariable(var IsHandled: Boolean; var LegalOfficeTxt: Text; var LegalOfficeLbl: Text)
     begin
     end;
 }

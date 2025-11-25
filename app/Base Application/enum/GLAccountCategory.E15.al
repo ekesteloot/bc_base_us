@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
 enum 15 "G/L Account Category"
 {
     Extensible = false;

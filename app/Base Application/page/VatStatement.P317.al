@@ -22,7 +22,7 @@ page 317 "VAT Statement"
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
-                    exit(VATStmtManagement.LookupName(GetRangeMax("Statement Template Name"), CurrentStmtName, Text));
+                    exit(VATStmtManagement.LookupName(Rec.GetRangeMax("Statement Template Name"), CurrentStmtName, Text));
                 end;
 
                 trigger OnValidate()
@@ -100,7 +100,7 @@ page 317 "VAT Statement"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether amounts on the VAT statement will be calculated with their original sign or with the sign reversed.';
                 }
-                field(Control22; Print)
+                field(Control22; Rec.Print)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the VAT statement line will be printed on the report that contains the finished VAT statement.';
@@ -146,8 +146,8 @@ page 317 "VAT Statement"
                     Caption = 'P&review';
                     Image = View;
                     RunObject = Page "VAT Statement Preview";
-                    RunPageLink = "Statement Template Name" = FIELD("Statement Template Name"),
-                                  Name = FIELD("Statement Name");
+                    RunPageLink = "Statement Template Name" = field("Statement Template Name"),
+                                  Name = field("Statement Name");
                     ToolTip = 'Preview the VAT statement report.';
                 }
             }
@@ -211,9 +211,9 @@ page 317 "VAT Statement"
         if IsHandled then
             exit;
 
-        OpenedFromBatch := ("Statement Name" <> '') and ("Statement Template Name" = '');
+        OpenedFromBatch := (Rec."Statement Name" <> '') and (Rec."Statement Template Name" = '');
         if OpenedFromBatch then begin
-            CurrentStmtName := "Statement Name";
+            CurrentStmtName := Rec."Statement Name";
             VATStmtManagement.OpenStmt(CurrentStmtName, Rec);
             exit;
         end;

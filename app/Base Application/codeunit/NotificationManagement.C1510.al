@@ -1,3 +1,20 @@
+﻿namespace System.Environment.Configuration;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using System.Automation;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.User;
+
 codeunit 1510 "Notification Management"
 {
     Permissions = TableData "Overdue Approval Entry" = ri,

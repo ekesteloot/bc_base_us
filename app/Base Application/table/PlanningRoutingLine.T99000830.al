@@ -1,3 +1,13 @@
+﻿namespace Microsoft.Manufacturing.Routing;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+
 table 99000830 "Planning Routing Line"
 {
     Caption = 'Planning Routing Line';
@@ -16,13 +26,13 @@ table 99000830 "Planning Routing Line"
         field(2; "Worksheet Batch Name"; Code[10])
         {
             Caption = 'Worksheet Batch Name';
-            TableRelation = IF ("Worksheet Template Name" = FILTER(<> '')) "Requisition Wksh. Name".Name WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"));
+            TableRelation = if ("Worksheet Template Name" = filter(<> '')) "Requisition Wksh. Name".Name where("Worksheet Template Name" = field("Worksheet Template Name"));
         }
         field(3; "Worksheet Line No."; Integer)
         {
             Caption = 'Worksheet Line No.';
-            TableRelation = "Requisition Line"."Line No." WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                                                 "Journal Batch Name" = FIELD("Worksheet Batch Name"));
+            TableRelation = "Requisition Line"."Line No." where("Worksheet Template Name" = field("Worksheet Template Name"),
+                                                                 "Journal Batch Name" = field("Worksheet Batch Name"));
         }
         field(4; "Operation No."; Code[10])
         {
@@ -77,9 +87,9 @@ table 99000830 "Planning Routing Line"
         field(8; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST("Work Center")) "Work Center"
-            ELSE
-            IF (Type = CONST("Machine Center")) "Machine Center";
+            TableRelation = if (Type = const("Work Center")) "Work Center"
+            else
+            if (Type = const("Machine Center")) "Machine Center";
 
             trigger OnValidate()
             begin
@@ -446,11 +456,9 @@ table 99000830 "Planning Routing Line"
                 Validate("Ending Time");
             end;
         }
-        field(76; "Unit Cost Calculation"; Option)
+        field(76; "Unit Cost Calculation"; Enum "Unit Cost Calculation Type")
         {
             Caption = 'Unit Cost Calculation';
-            OptionCaption = 'Time,Units';
-            OptionMembers = Time,Units;
         }
         field(77; "Input Quantity"; Decimal)
         {

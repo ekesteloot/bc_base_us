@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 page 5186 "Interaction Template Setup"
 {
     ApplicationArea = RelationshipMgmt;
@@ -221,10 +223,10 @@ page 5186 "Interaction Template Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Apps;
+
 /// <summary>
 /// This table contains installed applications.
 /// </summary>
@@ -17,8 +23,8 @@ table 2000000400 "Inplace Installed Application"
         field(1; "Runtime Package ID"; Guid)
         {
             Caption = 'Runtime Package ID';
-        }      
-      
+        }
+
         /// <summary>
         /// The Emit version
         /// </summary>
@@ -27,7 +33,7 @@ table 2000000400 "Inplace Installed Application"
             Caption = 'Emit Version';
         }
 
-         /// <summary>
+        /// <summary>
         /// The identifier context of inplace publishing
         /// </summary>
         field(3; ID; Guid)
@@ -41,7 +47,7 @@ table 2000000400 "Inplace Installed Application"
         key(Key1; "Runtime Package ID", "Emit Version", ID)
         {
             Clustered = true;
-        }      
+        }
     }
 
     fieldgroups

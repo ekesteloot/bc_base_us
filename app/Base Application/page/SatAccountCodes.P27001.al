@@ -10,7 +10,7 @@ page 27001 "SAT Account Codes"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the SAT account.';

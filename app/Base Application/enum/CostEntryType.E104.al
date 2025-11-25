@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Costing;
+
 enum 104 "Cost Entry Type"
 {
     Extensible = true;

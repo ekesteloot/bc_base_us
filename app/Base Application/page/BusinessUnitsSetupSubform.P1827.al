@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Consolidation;
+
 page 1827 "Business Units Setup Subform"
 {
     Caption = 'Business Units Setup Subform';
@@ -13,7 +15,7 @@ page 1827 "Business Units Setup Subform"
         {
             repeater(Group)
             {
-                field(Include; Include)
+                field(Include; Rec.Include)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the business unit is include on the subform.';

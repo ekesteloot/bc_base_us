@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
 enum 49 "Invoice Posting Line Type"
 {
     Extensible = true;

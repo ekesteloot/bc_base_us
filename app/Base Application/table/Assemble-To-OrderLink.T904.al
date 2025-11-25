@@ -1,3 +1,24 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.AssemblyMgt.History;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Journal;
+using System.Utilities;
+
 table 904 "Assemble-to-Order Link"
 {
     Caption = 'Assemble-to-Order Link';
@@ -15,10 +36,8 @@ table 904 "Assemble-to-Order Link"
         field(2; "Assembly Document No."; Code[20])
         {
             Caption = 'Assembly Document No.';
-            TableRelation = "Assembly Header" WHERE("Document Type" = FIELD("Assembly Document Type"),
-                                                     "No." = FIELD("Assembly Document No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Assembly Header" where("Document Type" = field("Assembly Document Type"),
+                                                     "No." = field("Assembly Document No."));
             ValidateTableRelation = false;
         }
         field(11; Type; Enum "Assemble-to-Order Link Type")
@@ -32,9 +51,9 @@ table 904 "Assemble-to-Order Link"
         field(13; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = IF (Type = CONST(Sale)) "Sales Line"."Document No." WHERE("Document Type" = FIELD("Document Type"),
-                                                                                     "Document No." = FIELD("Document No."),
-                                                                                     "Line No." = FIELD("Document Line No."));
+            TableRelation = if (Type = const(Sale)) "Sales Line"."Document No." where("Document Type" = field("Document Type"),
+                                                                                     "Document No." = field("Document No."),
+                                                                                     "Line No." = field("Document Line No."));
         }
         field(14; "Document Line No."; Integer)
         {
@@ -871,7 +890,7 @@ table 904 "Assemble-to-Order Link"
             exit;
 
         if GetATOLink(AssemblyHeader) then begin
-            SalesHeader.Get("Document Type", "Document No.");
+            SalesHeader.Get(Rec."Document Type", Rec."Document No.");
             case "Document Type" of
                 "Document Type"::Quote:
                     PAGE.RunModal(PAGE::"Sales Quote", SalesHeader);
@@ -1000,7 +1019,7 @@ table 904 "Assemble-to-Order Link"
         exit(ShowAsmWarning);
     end;
 
-    local procedure TransAvailBOMCompToAsmLines(var ToAsmHeader: Record "Assembly Header"; var ToAsmLine: Record "Assembly Line"): Boolean
+    procedure TransAvailBOMCompToAsmLines(var ToAsmHeader: Record "Assembly Header"; var ToAsmLine: Record "Assembly Line"): Boolean
     var
         BOMComponent: Record "BOM Component";
         ShowAsmWarning: Boolean;

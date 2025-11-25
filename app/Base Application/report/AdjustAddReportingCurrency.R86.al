@@ -1,4 +1,18 @@
-﻿report 86 "Adjust Add. Reporting Currency"
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+
+report 86 "Adjust Add. Reporting Currency"
 {
     Caption = 'Adjust Add. Reporting Currency';
     Permissions = TableData "G/L Entry" = rim,
@@ -14,7 +28,7 @@
     {
         dataitem("VAT Entry"; "VAT Entry")
         {
-            DataItemTableView = SORTING(Type, Closed) WHERE(Type = FILTER(Purchase .. Sale));
+            DataItemTableView = sorting(Type, Closed) where(Type = filter(Purchase .. Sale));
 
             trigger OnAfterGetRecord()
             begin
@@ -53,7 +67,7 @@
         }
         dataitem("G/L Entry"; "G/L Entry")
         {
-            DataItemTableView = SORTING("Entry No.");
+            DataItemTableView = sorting("Entry No.");
 
             trigger OnAfterGetRecord()
             var
@@ -133,7 +147,7 @@
         }
         dataitem("Value Entry"; "Value Entry")
         {
-            DataItemTableView = SORTING("Item No.");
+            DataItemTableView = sorting("Item No.");
 
             trigger OnAfterGetRecord()
             var
@@ -172,7 +186,7 @@
         }
         dataitem("Job Ledger Entry"; "Job Ledger Entry")
         {
-            DataItemTableView = SORTING("Job No.", "Posting Date");
+            DataItemTableView = sorting("Job No.", "Posting Date");
 
             trigger OnAfterGetRecord()
             begin
@@ -193,7 +207,7 @@
         }
         dataitem("Prod. Order Line"; "Prod. Order Line")
         {
-            DataItemTableView = SORTING(Status, "Prod. Order No.", "Line No.");
+            DataItemTableView = sorting(Status, "Prod. Order No.", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -214,7 +228,7 @@
         }
         dataitem("Cost Entry"; "Cost Entry")
         {
-            DataItemTableView = SORTING("Entry No.");
+            DataItemTableView = sorting("Entry No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -530,16 +544,6 @@
             end;
         end;
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by new W1 version of InsertGLEntry()', '20.0')]
-    procedure InsertGLEntry(PostingDate: Date; DocumentDate: Date; DocumentType: Integer; DocumentNo: Code[20]; GLAccountNo: Code[20]; JnlBatchName: Code[10]; ReasonCode: Code[10]; AddCurrAmount: Decimal)
-    begin
-        GenJnlBatch."Journal Template Name" := '';
-        GenJnlBatch.Name := JnlBatchName;
-        InsertGLEntry(PostingDate, DocumentDate, DocumentType, DocumentNo, GLAccountNo, ReasonCode, AddCurrAmount);
-    end;
-#endif
 
     procedure InsertGLEntry(PostingDate: Date; DocumentDate: Date; DocumentType: Integer; DocumentNo: Code[20]; GLAccountNo: Code[20]; ReasonCode: Code[10]; AddCurrAmount: Decimal)
     var

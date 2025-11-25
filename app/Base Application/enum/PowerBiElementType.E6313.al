@@ -1,3 +1,5 @@
+namespace System.Integration.PowerBI;
+
 /// <summary>
 /// Enum that lists the possible types of elements returned by API calls to Power BI, when discovering the Power BI reports.
 /// </summary>
@@ -12,8 +14,18 @@ enum 6313 "Power BI Element Type"
 
     value(10; Workspace)
     {
+        Caption = 'Workspace';
     }
     value(20; "Report")
     {
+        Caption = 'Report';
+    }
+    value(30; Dashboard)
+    {
+        Caption = 'Dashboard';
+    }
+    value(35; "Dashboard Tile")
+    {
+        Caption = 'Dashboard Tile';
     }
 }

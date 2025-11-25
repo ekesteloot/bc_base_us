@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.ProjectMgt.Jobs.Pricing;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 table 1012 "Job Resource Price"
 {
     Caption = 'Job Resource Price';
@@ -8,7 +18,7 @@ table 1012 "Job Resource Price"
     ObsoleteTag = '16.0';
 #else
     ObsoleteState = Removed;
-    ObsoleteTag = '22.0';
+    ObsoleteTag = '24.0';
 #endif    
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
 
@@ -29,7 +39,7 @@ table 1012 "Job Resource Price"
         field(2; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
 
             trigger OnValidate()
             begin
@@ -57,9 +67,9 @@ table 1012 "Job Resource Price"
         field(4; "Code"; Code[20])
         {
             Caption = 'Code';
-            TableRelation = IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST("Group(Resource)")) "Resource Group";
+            TableRelation = if (Type = const(Resource)) Resource
+            else
+            if (Type = const("Group(Resource)")) "Resource Group";
 
             trigger OnValidate()
             var
@@ -95,7 +105,7 @@ table 1012 "Job Resource Price"
         }
         field(6; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
 

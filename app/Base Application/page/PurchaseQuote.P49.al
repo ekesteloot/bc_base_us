@@ -1,10 +1,28 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Shared.Archive;
+using System.Automation;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Privacy;
+using System.Security.User;
+
 page 49 "Purchase Quote"
 {
     Caption = 'Purchase Quote';
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";
-    SourceTableView = WHERE("Document Type" = FILTER(Quote));
+    SourceTableView = where("Document Type" = filter(Quote));
 
     layout
     {
@@ -22,7 +40,7 @@ page 49 "Purchase Quote"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -37,7 +55,7 @@ page 49 "Purchase Quote"
                     trigger OnValidate()
                     begin
                         IsPurchaseLinesEditable := Rec.PurchaseLinesEditable();
-                        OnAfterValidateBuyFromVendorNo(Rec, xRec);
+                        Rec.OnAfterValidateBuyFromVendorNo(Rec, xRec);
                         CurrPage.Update();
                     end;
                 }
@@ -51,7 +69,7 @@ page 49 "Purchase Quote"
 
                     trigger OnValidate()
                     begin
-                        OnAfterValidateBuyFromVendorNo(Rec, xRec);
+                        Rec.OnAfterValidateBuyFromVendorNo(Rec, xRec);
                         CurrPage.Update();
                     end;
 
@@ -118,7 +136,7 @@ page 49 "Purchase Quote"
 
                         trigger OnValidate()
                         begin
-                            IsBuyFromCountyVisible := FormatAddress.UseCounty("Buy-from Country/Region Code");
+                            IsBuyFromCountyVisible := FormatAddress.UseCounty(Rec."Buy-from Country/Region Code");
                         end;
                     }
                     field("Buy-from Contact No."; Rec."Buy-from Contact No.")
@@ -130,7 +148,7 @@ page 49 "Purchase Quote"
 
                         trigger OnLookup(var Text: Text): Boolean
                         begin
-                            if not BuyfromContactLookup() then
+                            if not Rec.BuyfromContactLookup() then
                                 exit(false);
                             Text := Rec."Buy-from Contact No.";
                             CurrPage.Update();
@@ -175,7 +193,7 @@ page 49 "Purchase Quote"
                 {
                     ApplicationArea = Suite;
                     Caption = 'Contact';
-                    Editable = "Buy-from Vendor No." <> '';
+                    Editable = Rec."Buy-from Vendor No." <> '';
                     ToolTip = 'Specifies the contact person at the vendor who delivered the items.';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -267,13 +285,25 @@ page 49 "Purchase Quote"
                     StyleExpr = StatusStyleTxt;
                     ToolTip = 'Specifies whether the record is open, waiting to be approved, invoiced for prepayment, or released to the next stage of processing.';
                 }
+                field("Language Code"; Rec."Language Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the language to be used on printouts for this document.';
+                    Visible = false;
+                }
+                field("Format Region"; Rec."Format Region")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the format to be used on printouts for this document.';
+                    Visible = false;
+                }
             }
             part(PurchLines; "Purchase Quote Subform")
             {
                 ApplicationArea = Suite;
                 Editable = IsPurchaseLinesEditable;
                 Enabled = IsPurchaseLinesEditable;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
                 UpdatePropagation = Both;
             }
             group("Invoice Details")
@@ -288,9 +318,9 @@ page 49 "Purchase Quote"
                     trigger OnAssistEdit()
                     begin
                         Clear(ChangeExchangeRate);
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", WorkDate());
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
                             SaveInvoiceDiscountAmount();
                         end;
                         Clear(ChangeExchangeRate);
@@ -524,7 +554,7 @@ page 49 "Purchase Quote"
 
                                 trigger OnValidate()
                                 begin
-                                    IsShipToCountyVisible := FormatAddress.UseCounty("Ship-to Country/Region Code");
+                                    IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
                                 end;
                             }
                             field("Ship-to Contact"; Rec."Ship-to Contact")
@@ -551,7 +581,7 @@ page 49 "Purchase Quote"
                         trigger OnValidate()
                         begin
                             if PayToOptions = PayToOptions::"Default (Vendor)" then
-                                Validate("Pay-to Vendor No.", "Buy-from Vendor No.");
+                                Rec.Validate("Pay-to Vendor No.", Rec."Buy-from Vendor No.");
                         end;
                     }
                     group(Control67)
@@ -569,9 +599,9 @@ page 49 "Purchase Quote"
 
                             trigger OnValidate()
                             begin
-                                if GetFilter("Pay-to Vendor No.") = xRec."Pay-to Vendor No." then
-                                    if "Pay-to Vendor No." <> xRec."Pay-to Vendor No." then
-                                        SetRange("Pay-to Vendor No.");
+                                if Rec.GetFilter("Pay-to Vendor No.") = xRec."Pay-to Vendor No." then
+                                    if Rec."Pay-to Vendor No." <> xRec."Pay-to Vendor No." then
+                                        Rec.SetRange("Pay-to Vendor No.");
 
                                 CurrPage.Update();
                             end;
@@ -580,8 +610,8 @@ page 49 "Purchase Quote"
                         {
                             ApplicationArea = Basic, Suite;
                             Caption = 'Address';
-                            Editable = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
-                            Enabled = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
+                            Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
+                            Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the address of the vendor that you received the invoice from.';
@@ -590,8 +620,8 @@ page 49 "Purchase Quote"
                         {
                             ApplicationArea = Basic, Suite;
                             Caption = 'Address 2';
-                            Editable = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
-                            Enabled = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
+                            Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
+                            Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies an additional part of the address of the vendor that the invoice was received from.';
@@ -604,8 +634,8 @@ page 49 "Purchase Quote"
                             {
                                 ApplicationArea = Basic, Suite;
                                 Caption = 'County';
-                                Editable = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
-                                Enabled = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
+                                Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
+                                Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                                 Importance = Additional;
                                 QuickEntry = false;
                                 ToolTip = 'Specifies the county of the vendor on the purchase document.';
@@ -615,8 +645,8 @@ page 49 "Purchase Quote"
                         {
                             ApplicationArea = Basic, Suite;
                             Caption = 'Post Code';
-                            Editable = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
-                            Enabled = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
+                            Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
+                            Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the post code of the vendor that you received the invoice from.';
@@ -625,8 +655,8 @@ page 49 "Purchase Quote"
                         {
                             ApplicationArea = Basic, Suite;
                             Caption = 'City';
-                            Editable = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
-                            Enabled = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
+                            Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
+                            Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the city of the vendor that you received the invoice from.';
@@ -635,23 +665,23 @@ page 49 "Purchase Quote"
                         {
                             ApplicationArea = Basic, Suite;
                             Caption = 'Country/Region';
-                            Editable = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
-                            Enabled = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
+                            Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
+                            Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the country/region in the vendor''s address.';
 
                             trigger OnValidate()
                             begin
-                                IsPayToCountyVisible := FormatAddress.UseCounty("Pay-to Country/Region Code");
+                                IsPayToCountyVisible := FormatAddress.UseCounty(Rec."Pay-to Country/Region Code");
                             end;
                         }
                         field("Pay-to Contact No."; Rec."Pay-to Contact No.")
                         {
                             ApplicationArea = Suite;
                             Caption = 'Contact No.';
-                            Editable = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
-                            Enabled = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
+                            Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
+                            Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                             Importance = Additional;
                             ToolTip = 'Specifies the number of the customer associated with the purchase quote.';
                         }
@@ -659,8 +689,8 @@ page 49 "Purchase Quote"
                         {
                             ApplicationArea = Basic, Suite;
                             Caption = 'Contact';
-                            Editable = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
-                            Enabled = (PayToOptions = PayToOptions::"Custom Address") OR ("Buy-from Vendor No." <> "Pay-to Vendor No.");
+                            Editable = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
+                            Enabled = (PayToOptions = PayToOptions::"Custom Address") or (Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.");
                             ToolTip = 'Specifies the contact person at the vendor that you received the invoice from.';
                         }
                         field(PayToContactPhoneNo; PayToContact."Phone No.")
@@ -711,7 +741,7 @@ page 49 "Purchase Quote"
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the code of the port of entry where the items pass into your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the destination country or region for the purpose of Intrastat reporting.';
@@ -724,42 +754,42 @@ page 49 "Purchase Quote"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Purchase Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Purchase Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(Control13; "Pending Approval FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Table ID" = CONST(38),
-                              "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No."),
+                SubPageLink = "Table ID" = const(38),
+                              "Document Type" = field("Document Type"),
+                              "Document No." = field("No."),
                               Status = const(Open);
                 Visible = OpenApprovalEntriesExistForCurrUser;
             }
             part(Control1901138007; "Vendor Details FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Buy-from Vendor No."),
+                SubPageLink = "No." = field("Buy-from Vendor No."),
                               "Date Filter" = field("Date Filter");
                 Visible = false;
             }
             part(Control1904651607; "Vendor Statistics FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Pay-to Vendor No."),
+                SubPageLink = "No." = field("Pay-to Vendor No."),
                               "Date Filter" = field("Date Filter");
             }
             part(Control1903435607; "Vendor Hist. Buy-from FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Buy-from Vendor No."),
+                SubPageLink = "No." = field("Buy-from Vendor No."),
                               "Date Filter" = field("Date Filter");
             }
             part(Control1906949207; "Vendor Hist. Pay-to FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Pay-to Vendor No."),
+                SubPageLink = "No." = field("Pay-to Vendor No."),
                               "Date Filter" = field("Date Filter");
                 Visible = false;
             }
@@ -767,9 +797,9 @@ page 49 "Purchase Quote"
             {
                 ApplicationArea = Suite;
                 Provider = PurchLines;
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("Document No."),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("Document No."),
+                              "Line No." = field("Line No.");
             }
             part(ApprovalFactBox; "Approval FactBox")
             {
@@ -820,7 +850,7 @@ page 49 "Purchase Quote"
 
                     trigger OnAction()
                     begin
-                        OpenDocumentStatistics();
+                        Rec.OpenDocumentStatistics();
                         CurrPage.PurchLines.Page.ForceTotalsCalculation();
                     end;
                 }
@@ -828,11 +858,11 @@ page 49 "Purchase Quote"
                 {
                     ApplicationArea = Suite;
                     Caption = 'Vendor';
-                    Enabled = "Buy-from Vendor No." <> '';
+                    Enabled = Rec."Buy-from Vendor No." <> '';
                     Image = Vendor;
                     RunObject = Page "Vendor Card";
-                    RunPageLink = "No." = FIELD("Buy-from Vendor No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "No." = field("Buy-from Vendor No."),
+                                  "Date Filter" = field("Date Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
                 }
@@ -842,9 +872,9 @@ page 49 "Purchase Quote"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -852,14 +882,14 @@ page 49 "Purchase Quote"
                     AccessByPermission = TableData Dimension = R;
                     ApplicationArea = Dimensions;
                     Caption = 'Dimensions';
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = Dimensions;
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -914,7 +944,7 @@ page 49 "Purchase Quote"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ApproveRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.ApproveRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Reject)
@@ -929,7 +959,7 @@ page 49 "Purchase Quote"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.RejectRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.RejectRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Delegate)
@@ -944,7 +974,7 @@ page 49 "Purchase Quote"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.DelegateRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.DelegateRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Comment)
@@ -1044,7 +1074,7 @@ page 49 "Purchase Quote"
                 {
                     ApplicationArea = Suite;
                     Caption = 'Re&open';
-                    Enabled = Status <> Status::Open;
+                    Enabled = Rec.Status <> Rec.Status::Open;
                     Image = ReOpen;
                     ToolTip = 'Reopen the document to change it after it has been approved. Approved documents have the Released status and must be opened before they can be changed';
 
@@ -1073,7 +1103,7 @@ page 49 "Purchase Quote"
                     begin
                         ApproveCalcInvDisc();
                         PurchCalcDiscByType.ResetRecalculateInvoiceDisc(Rec);
-                        RecalculateTaxesOnLines;
+                        Rec.RecalculateTaxesOnLines;
                     end;
                 }
                 separator(Action144)
@@ -1102,14 +1132,14 @@ page 49 "Purchase Quote"
                     ApplicationArea = Suite;
                     Caption = 'Copy Document';
                     Ellipsis = true;
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = CopyDocument;
                     ToolTip = 'Copy document lines and header information from another sales document to this document. You can copy a posted sales invoice into a new sales invoice to quickly create a similar document.';
 
                     trigger OnAction()
                     begin
-                        CopyDocument();
-                        if Get("Document Type", "No.") then;
+                        Rec.CopyDocument();
+                        if Rec.Get(Rec."Document Type", Rec."No.") then;
                         CurrPage.PurchLines.Page.ForceTotalsCalculation();
                         CurrPage.Update();
                     end;
@@ -1143,7 +1173,7 @@ page 49 "Purchase Quote"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            IncomingDocument.ShowCardFromEntryNo("Incoming Document Entry No.");
+                            IncomingDocument.ShowCardFromEntryNo(Rec."Incoming Document Entry No.");
                         end;
                     }
                     action(SelectIncomingDoc)
@@ -1158,7 +1188,7 @@ page 49 "Purchase Quote"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            Validate("Incoming Document Entry No.", IncomingDocument.SelectIncomingDocument("Incoming Document Entry No.", RecordId));
+                            Rec.Validate("Incoming Document Entry No.", IncomingDocument.SelectIncomingDocument(Rec."Incoming Document Entry No.", Rec.RecordId));
                         end;
                     }
                     action(IncomingDocAttachFile)
@@ -1166,7 +1196,7 @@ page 49 "Purchase Quote"
                         ApplicationArea = Suite;
                         Caption = 'Create Incoming Document from File';
                         Ellipsis = true;
-                        Enabled = ("Incoming Document Entry No." = 0) AND ("No." <> '');
+                        Enabled = (Rec."Incoming Document Entry No." = 0) and (Rec."No." <> '');
                         Image = Attach;
                         ToolTip = 'Create an incoming document from a file that you select from the disk. The file will be attached to the incoming document record.';
 
@@ -1189,10 +1219,10 @@ page 49 "Purchase Quote"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            if IncomingDocument.Get("Incoming Document Entry No.") then
+                            if IncomingDocument.Get(Rec."Incoming Document Entry No.") then
                                 IncomingDocument.RemoveLinkToRelatedRecord();
-                            "Incoming Document Entry No." := 0;
-                            Modify(true);
+                            Rec."Incoming Document Entry No." := 0;
+                            Rec.Modify(true);
                         end;
                     }
                 }
@@ -1204,7 +1234,7 @@ page 49 "Purchase Quote"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Send A&pproval Request';
-                    Enabled = NOT OpenApprovalEntriesExist;
+                    Enabled = NOT OpenApprovalEntriesExist AND CanRequestApprovalForFlow;
                     Image = SendApprovalRequest;
                     ToolTip = 'Request approval of the document.';
 
@@ -1220,16 +1250,37 @@ page 49 "Purchase Quote"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Cancel Approval Re&quest';
-                    Enabled = CanCancelApprovalForRecord;
+                    Enabled = CanCancelApprovalForRecord OR CanCancelApprovalForFlow;
                     Image = CancelApprovalRequest;
                     ToolTip = 'Cancel the approval request.';
 
                     trigger OnAction()
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        WorkflowWebhookManagementgt: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelPurchaseApprovalRequest(Rec);
+                        WorkflowWebhookManagementgt.FindAndCancel(Rec.RecordId);
                     end;
+                }
+            }
+            group(Flow)
+            {
+                Caption = 'Power Automate';
+                Image = Flow;
+
+                customaction(CreateFlowFromTemplate)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Create a Power Automate approval flow';
+                    ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
+#if not CLEAN22
+                    Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
+#else
+                    Visible = IsSaaS and IsPowerAutomatePrivacyNoticeApproved;
+#endif
+                    CustomActionType = FlowTemplateGallery;
+                    FlowTemplateCategoryName = 'd365bc_approval_purchaseQuote';
                 }
             }
             group("Make Order")
@@ -1415,52 +1466,52 @@ page 49 "Purchase Quote"
     begin
         SetControlAppearance();
         CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
-        CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(RecordId);
-        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(RecordId);
-        StatusStyleTxt := GetStatusStyleText();
+        CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(Rec.RecordId);
+        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
+        StatusStyleTxt := Rec.GetStatusStyleText();
     end;
 
     trigger OnAfterGetRecord()
     begin
         CalculateCurrentShippingAndPayToOption();
-        BuyFromContact.GetOrClear("Buy-from Contact No.");
-        PayToContact.GetOrClear("Pay-to Contact No.");
-        CurrPage.IncomingDocAttachFactBox.Page.SetCurrentRecordID(RecordId);
+        BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
+        PayToContact.GetOrClear(Rec."Pay-to Contact No.");
+        CurrPage.IncomingDocAttachFactBox.Page.SetCurrentRecordID(Rec.RecordId);
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SaveRecord();
-        exit(ConfirmDeletion());
+        exit(Rec.ConfirmDeletion());
     end;
 
     trigger OnInit()
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
     begin
         ShowShippingOptionsWithLocation := ApplicationAreaMgmtFacade.IsLocationEnabled() or ApplicationAreaMgmtFacade.IsAllDisabled();
+        IsSaaS := EnvironmentInformation.IsSaaS();
+        IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
+#if not CLEAN22
+        InitPowerAutomateTemplateVisibility();
+#endif
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Responsibility Center" := UserMgt.GetPurchasesFilter();
+        Rec."Responsibility Center" := UserMgt.GetPurchasesFilter();
 
-        if (not DocNoVisible) and ("No." = '') then
-            SetBuyFromVendorFromFilter();
+        if (not DocNoVisible) and (Rec."No." = '') then
+            Rec.SetBuyFromVendorFromFilter();
 
         CalculateCurrentShippingAndPayToOption();
     end;
 
     trigger OnOpenPage()
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeOpenPage(IsHandled);
-        if IsHandled then
-            exit;
-
         Rec.SetSecurityFilterOnRespCenter();
 
-        SetRange("Date Filter", 0D, WorkDate());
+        Rec.SetRange("Date Filter", 0D, WorkDate());
 
         ActivateFields();
 
@@ -1477,24 +1528,26 @@ page 49 "Purchase Quote"
         ArchiveManagement: Codeunit ArchiveManagement;
         PurchCalcDiscByType: Codeunit "Purch - Calc Disc. By Type";
         FormatAddress: Codeunit "Format Address";
+        PrivacyNotice: Codeunit "Privacy Notice";
+        PrivacyNoticeRegistrations: Codeunit "Privacy Notice Registrations";
         ChangeExchangeRate: Page "Change Exchange Rate";
-        [InDataSet]
         StatusStyleTxt: Text;
         HasIncomingDocument: Boolean;
         DocNoVisible: Boolean;
         OpenApprovalEntriesExistForCurrUser: Boolean;
+        IsPowerAutomatePrivacyNoticeApproved: Boolean;
         OpenApprovalEntriesExist: Boolean;
         ShowWorkflowStatus: Boolean;
         CanCancelApprovalForRecord: Boolean;
+        CanCancelApprovalForFlow: Boolean;
+        CanRequestApprovalForFlow: Boolean;
+        IsSaaS: Boolean;
         ShowShippingOptionsWithLocation: Boolean;
         IsBuyFromCountyVisible: Boolean;
         IsPayToCountyVisible: Boolean;
         IsShipToCountyVisible: Boolean;
-        [InDataSet]
         IsPurchaseLinesEditable: Boolean;
-        [InDataSet]
         IsJournalTemplateNameVisible: Boolean;
-        [InDataSet]
         IsPaymentMethodCodeVisible: Boolean;
 
     protected var
@@ -1503,15 +1556,31 @@ page 49 "Purchase Quote"
 
     protected procedure ActivateFields()
     begin
-        IsBuyFromCountyVisible := FormatAddress.UseCounty("Buy-from Country/Region Code");
-        IsPayToCountyVisible := FormatAddress.UseCounty("Pay-to Country/Region Code");
-        IsShipToCountyVisible := FormatAddress.UseCounty("Ship-to Country/Region Code");
+        IsBuyFromCountyVisible := FormatAddress.UseCounty(Rec."Buy-from Country/Region Code");
+        IsPayToCountyVisible := FormatAddress.UseCounty(Rec."Pay-to Country/Region Code");
+        IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
         GLSetup.Get();
         IsJournalTemplateNameVisible := GLSetup."Journal Templ. Name Mandatory";
         IsPaymentMethodCodeVisible := not GLSetup."Hide Payment Method Code";
 
         OnAfterActivateFields();
     end;
+
+#if not CLEAN22
+    var
+        PowerAutomateTemplatesEnabled: Boolean;
+        PowerAutomateTemplatesFeatureLbl: Label 'PowerAutomateTemplates', Locked = true;
+
+    local procedure InitPowerAutomateTemplateVisibility()
+    var
+        FeatureKey: Record "Feature Key";
+    begin
+        PowerAutomateTemplatesEnabled := true;
+        if FeatureKey.Get(PowerAutomateTemplatesFeatureLbl) then
+            if FeatureKey.Enabled <> FeatureKey.Enabled::"All Users" then
+                PowerAutomateTemplatesEnabled := false;
+    end;
+#endif
 
 #if not CLEAN21
     local procedure SetPurchaseLinesAvailability()
@@ -1560,17 +1629,20 @@ page 49 "Purchase Quote"
         DocumentNoVisibility: Codeunit DocumentNoVisibility;
         DocType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order",Reminder,FinChMemo;
     begin
-        DocNoVisible := DocumentNoVisibility.PurchaseDocumentNoIsVisible(DocType::Quote, "No.");
+        DocNoVisible := DocumentNoVisibility.PurchaseDocumentNoIsVisible(DocType::Quote, Rec."No.");
     end;
 
     local procedure SetControlAppearance()
     var
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+        WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
-        OpenApprovalEntriesExistForCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
-        HasIncomingDocument := "Incoming Document Entry No." <> 0;
+        OpenApprovalEntriesExistForCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(Rec.RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+
+        HasIncomingDocument := Rec."Incoming Document Entry No." <> 0;
         IsPurchaseLinesEditable := Rec.PurchaseLinesEditable();
 #if not CLEAN21
         SetPurchaseLinesAvailability();
@@ -1584,9 +1656,9 @@ page 49 "Purchase Quote"
         case ShipToOptions of
             ShipToOptions::"Default (Company Address)",
           ShipToOptions::"Custom Address":
-                Validate("Location Code", '');
+                Rec.Validate("Location Code", '');
             ShipToOptions::Location:
-                Validate("Location Code");
+                Rec.Validate("Location Code");
         end;
 
         OnAfterValidateShipToOptions(Rec, ShipToOptions);
@@ -1594,20 +1666,20 @@ page 49 "Purchase Quote"
 
     local procedure CalculateCurrentShippingAndPayToOption()
     begin
-        if "Location Code" <> '' then
+        if Rec."Location Code" <> '' then
             ShipToOptions := ShipToOptions::Location
         else
-            if ShipToAddressEqualsCompanyShipToAddress() then
+            if Rec.ShipToAddressEqualsCompanyShipToAddress() then
                 ShipToOptions := ShipToOptions::"Default (Company Address)"
             else
                 ShipToOptions := ShipToOptions::"Custom Address";
 
         case true of
-            ("Pay-to Vendor No." = "Buy-from Vendor No.") and BuyFromAddressEqualsPayToAddress():
+            (Rec."Pay-to Vendor No." = Rec."Buy-from Vendor No.") and Rec.BuyFromAddressEqualsPayToAddress():
                 PayToOptions := PayToOptions::"Default (Vendor)";
-            ("Pay-to Vendor No." = "Buy-from Vendor No.") and (not BuyFromAddressEqualsPayToAddress()):
+            (Rec."Pay-to Vendor No." = Rec."Buy-from Vendor No.") and (not Rec.BuyFromAddressEqualsPayToAddress()):
                 PayToOptions := PayToOptions::"Custom Address";
-            "Pay-to Vendor No." <> "Buy-from Vendor No.":
+            Rec."Pay-to Vendor No." <> Rec."Buy-from Vendor No.":
                 PayToOptions := PayToOptions::"Another Vendor";
         end;
 
@@ -1639,11 +1711,6 @@ page 49 "Purchase Quote"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateShipToOptions(var PurchaseHeader: Record "Purchase Header"; ShipToOptions: Option)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenPage(var IsHandled: Boolean)
     begin
     end;
 }

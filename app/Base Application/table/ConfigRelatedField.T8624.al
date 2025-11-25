@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8624 "Config. Related Field"
 {
     Caption = 'Config. Related Field';
@@ -15,16 +19,16 @@ table 8624 "Config. Related Field"
         }
         field(3; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup (Field.FieldName WHERE(TableNo = FIELD("Table ID"),
-                                                        "No." = FIELD("Field ID")));
+            CalcFormula = Lookup (Field.FieldName where(TableNo = field("Table ID"),
+                                                        "No." = field("Field ID")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Field Caption"; Text[250])
         {
-            CalcFormula = Lookup (Field."Field Caption" WHERE(TableNo = FIELD("Table ID"),
-                                                              "No." = FIELD("Field ID")));
+            CalcFormula = Lookup (Field."Field Caption" where(TableNo = field("Table ID"),
+                                                              "No." = field("Field ID")));
             Caption = 'Field Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -33,12 +37,12 @@ table 8624 "Config. Related Field"
         {
             Caption = 'Relation Table ID';
             Editable = false;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(9; "Relation Table Name"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Name" WHERE("Object Type" = CONST(Table),
-                                                                        "Object ID" = FIELD("Relation Table ID")));
+            CalcFormula = Lookup (AllObjWithCaption."Object Name" where("Object Type" = const(Table),
+                                                                        "Object ID" = field("Relation Table ID")));
             Caption = 'Relation Table Name';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,8 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 page 5850 "Posted Sales Document Lines"
 {
     Caption = 'Posted Sales Document Lines';
@@ -71,28 +76,28 @@ page 5850 "Posted Sales Document Lines"
                                 x0CurrentMenuTypeOptOnValidate();
                         end;
                     }
-                    field("STRSUBSTNO('(%1)',""No. of Pstd. Shipments"")"; StrSubstNo('(%1)', "No. of Pstd. Shipments"))
+                    field("STRSUBSTNO('(%1)',""No. of Pstd. Shipments"")"; StrSubstNo('(%1)', Rec."No. of Pstd. Shipments"))
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = '&Posted Shipments';
                         Editable = false;
                         ToolTip = 'Specifies the lines that represent posted shipments.';
                     }
-                    field(NoOfPostedInvoices; StrSubstNo('(%1)', "No. of Pstd. Invoices" - NoOfPostedPrepmtInvoices()))
+                    field(NoOfPostedInvoices; StrSubstNo('(%1)', Rec."No. of Pstd. Invoices" - NoOfPostedPrepmtInvoices()))
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Posted I&nvoices';
                         Editable = false;
                         ToolTip = 'Specifies the lines that represent posted invoices.';
                     }
-                    field("STRSUBSTNO('(%1)',""No. of Pstd. Return Receipts"")"; StrSubstNo('(%1)', "No. of Pstd. Return Receipts"))
+                    field("STRSUBSTNO('(%1)',""No. of Pstd. Return Receipts"")"; StrSubstNo('(%1)', Rec."No. of Pstd. Return Receipts"))
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Posted Ret&urn Receipts';
                         Editable = false;
                         ToolTip = 'Specifies the lines that represent posted return receipts.';
                     }
-                    field(NoOfPostedCrMemos; StrSubstNo('(%1)', "No. of Pstd. Credit Memos" - NoOfPostedPrepmtCrMemos()))
+                    field(NoOfPostedCrMemos; StrSubstNo('(%1)', Rec."No. of Pstd. Credit Memos" - NoOfPostedPrepmtCrMemos()))
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Posted Cr. &Memos';
@@ -112,29 +117,29 @@ page 5850 "Posted Sales Document Lines"
                 part(PostedInvoices; "Get Post.Doc - S.InvLn Subform")
                 {
                     ApplicationArea = All;
-                    SubPageLink = "Sell-to Customer No." = FIELD("No.");
-                    SubPageView = SORTING("Sell-to Customer No.");
+                    SubPageLink = "Sell-to Customer No." = field("No.");
+                    SubPageView = sorting("Sell-to Customer No.");
                     Visible = PostedInvoicesVisible;
                 }
                 part(PostedShpts; "Get Post.Doc - S.ShptLn Sbfrm")
                 {
                     ApplicationArea = All;
-                    SubPageLink = "Sell-to Customer No." = FIELD("No.");
-                    SubPageView = SORTING("Sell-to Customer No.");
+                    SubPageLink = "Sell-to Customer No." = field("No.");
+                    SubPageView = sorting("Sell-to Customer No.");
                     Visible = PostedShptsVisible;
                 }
                 part(PostedCrMemos; "Get Post.Doc-S.Cr.MemoLn Sbfrm")
                 {
                     ApplicationArea = All;
-                    SubPageLink = "Sell-to Customer No." = FIELD("No.");
-                    SubPageView = SORTING("Sell-to Customer No.");
+                    SubPageLink = "Sell-to Customer No." = field("No.");
+                    SubPageView = sorting("Sell-to Customer No.");
                     Visible = PostedCrMemosVisible;
                 }
                 part(PostedReturnRcpts; "Get Pst.Doc-RtrnRcptLn Subform")
                 {
                     ApplicationArea = All;
-                    SubPageLink = "Sell-to Customer No." = FIELD("No.");
-                    SubPageView = SORTING("Sell-to Customer No.");
+                    SubPageLink = "Sell-to Customer No." = field("No.");
+                    SubPageView = sorting("Sell-to Customer No.");
                     Visible = PostedReturnRcptsVisible;
                 }
             }
@@ -147,7 +152,7 @@ page 5850 "Posted Sales Document Lines"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields(
+        Rec.CalcFields(
           "No. of Pstd. Shipments", "No. of Pstd. Invoices",
           "No. of Pstd. Return Receipts", "No. of Pstd. Credit Memos");
         CurrentMenuTypeOpt := CurrentMenuType;
@@ -162,7 +167,7 @@ page 5850 "Posted Sales Document Lines"
     begin
         CurrentMenuType := 1;
         ChangeSubMenu(CurrentMenuType);
-        SetRange("No.", "No.");
+        Rec.SetRange("No.", Rec."No.");
     end;
 
     var
@@ -178,15 +183,10 @@ page 5850 "Posted Sales Document Lines"
 
     protected var
         ToSalesHeader: Record "Sales Header";
-        [InDataSet]
         PostedShptsVisible: Boolean;
-        [InDataSet]
         PostedInvoicesVisible: Boolean;
-        [InDataSet]
         PostedReturnRcptsVisible: Boolean;
-        [InDataSet]
         PostedCrMemosVisible: Boolean;
-        [InDataSet]
         ShowRevLineEnable: Boolean;
         CurrentMenuType: Integer;
 
@@ -209,7 +209,7 @@ page 5850 "Posted Sales Document Lines"
                     CurrPage.PostedShpts.PAGE.GetSelectedLine(FromSalesShptLine);
                     CopyDocMgt.SetProperties(false, false, false, false, true, true, OriginalQuantity);
                     CopyDocMgt.CopySalesLinesToDoc(
-                      "Sales Document Type From"::"Posted Shipment".AsInteger(), ToSalesHeader,
+                      Enum::"Sales Document Type From"::"Posted Shipment".AsInteger(), ToSalesHeader,
                       FromSalesShptLine, FromSalesInvLine, FromReturnRcptLine, FromSalesCrMemoLine, LinesNotCopied, MissingExCostRevLink);
                 end;
             1:
@@ -217,7 +217,7 @@ page 5850 "Posted Sales Document Lines"
                     CurrPage.PostedInvoices.PAGE.GetSelectedLine(FromSalesInvLine);
                     CopyDocMgt.SetProperties(false, false, false, false, true, true, OriginalQuantity);
                     CopyDocMgt.CopySalesLinesToDoc(
-                      "Sales Document Type From"::"Posted Invoice".AsInteger(), ToSalesHeader,
+                      Enum::"Sales Document Type From"::"Posted Invoice".AsInteger(), ToSalesHeader,
                       FromSalesShptLine, FromSalesInvLine, FromReturnRcptLine, FromSalesCrMemoLine, LinesNotCopied, MissingExCostRevLink);
                 end;
             2:
@@ -225,7 +225,7 @@ page 5850 "Posted Sales Document Lines"
                     CurrPage.PostedReturnRcpts.PAGE.GetSelectedLine(FromReturnRcptLine);
                     CopyDocMgt.SetProperties(false, false, false, false, true, true, OriginalQuantity);
                     CopyDocMgt.CopySalesLinesToDoc(
-                      "Sales Document Type From"::"Posted Return Receipt".AsInteger(), ToSalesHeader,
+                      Enum::"Sales Document Type From"::"Posted Return Receipt".AsInteger(), ToSalesHeader,
                       FromSalesShptLine, FromSalesInvLine, FromReturnRcptLine, FromSalesCrMemoLine, LinesNotCopied, MissingExCostRevLink);
                 end;
             3:
@@ -233,7 +233,7 @@ page 5850 "Posted Sales Document Lines"
                     CurrPage.PostedCrMemos.PAGE.GetSelectedLine(FromSalesCrMemoLine);
                     CopyDocMgt.SetProperties(false, false, false, false, true, true, OriginalQuantity);
                     CopyDocMgt.CopySalesLinesToDoc(
-                      "Sales Document Type From"::"Posted Credit Memo".AsInteger(), ToSalesHeader,
+                      Enum::"Sales Document Type From"::"Posted Credit Memo".AsInteger(), ToSalesHeader,
                       FromSalesShptLine, FromSalesInvLine, FromReturnRcptLine, FromSalesCrMemoLine, LinesNotCopied, MissingExCostRevLink);
                 end;
         end;
@@ -349,7 +349,7 @@ page 5850 "Posted Sales Document Lines"
     var
         SalesInvHeader: Record "Sales Invoice Header";
     begin
-        SalesInvHeader.SetRange("Sell-to Customer No.", "No.");
+        SalesInvHeader.SetRange("Sell-to Customer No.", Rec."No.");
         SalesInvHeader.SetRange("Prepayment Invoice", true);
         exit(SalesInvHeader.Count);
     end;
@@ -358,7 +358,7 @@ page 5850 "Posted Sales Document Lines"
     var
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
     begin
-        SalesCrMemoHeader.SetRange("Sell-to Customer No.", "No.");
+        SalesCrMemoHeader.SetRange("Sell-to Customer No.", Rec."No.");
         SalesCrMemoHeader.SetRange("Prepayment Credit Memo", true);
         exit(SalesCrMemoHeader.Count);
     end;

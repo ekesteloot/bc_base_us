@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Location;
+
+using Microsoft.InventoryMgt.Item;
+
 report 5706 "Create Stockkeeping Unit"
 {
     AdditionalSearchTerms = 'create sku';
@@ -10,7 +14,7 @@ report 5706 "Create Stockkeeping Unit"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Inventory Posting Group", "Location Filter", "Variant Filter";
 
             trigger OnAfterGetRecord()

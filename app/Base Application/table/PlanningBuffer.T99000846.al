@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Planning;
+
+using Microsoft.InventoryMgt.Item;
+
 table 99000846 "Planning Buffer"
 {
     Caption = 'Planning Buffer';

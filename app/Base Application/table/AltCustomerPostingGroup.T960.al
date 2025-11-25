@@ -1,4 +1,6 @@
-﻿table 960 "Alt. Customer Posting Group"
+﻿namespace Microsoft.Sales.Customer;
+
+table 960 "Alt. Customer Posting Group"
 {
     Caption = 'Alternative Customer Posting Group';
     ReplicateData = true;

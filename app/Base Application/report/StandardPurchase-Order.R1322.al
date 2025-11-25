@@ -1,9 +1,28 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Shared.Archive;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 1322 "Standard Purchase - Order"
 {
-    RDLCLayout = './PurchasesPayables/StandardPurchaseOrder.rdlc';
-    WordLayout = './StandardPurchaseOrder.docx';
     Caption = 'Purchase - Order';
-    DefaultLayout = Word;
+    DefaultRenderingLayout = "StandardPurchaseOrder.docx";
     EnableHyperlinks = true;
     PreviewMode = PrintLayout;
     WordMergeDataItem = "Purchase Header";
@@ -12,7 +31,7 @@ report 1322 "Standard Purchase - Order"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Standard Purchase - Order';
             column(CompanyAddress1; CompanyAddr[1])
@@ -117,16 +136,16 @@ report 1322 "Standard Purchase - Order"
             column(CompanyVATRegistrationNo_Lbl; CompanyInfo.GetVATRegistrationNumberLbl())
             {
             }
-            column(CompanyLegalOffice; CompanyInfo.GetLegalOffice())
+            column(CompanyLegalOffice; LegalOfficeTxt)
             {
             }
-            column(CompanyLegalOffice_Lbl; CompanyInfo.GetLegalOfficeLbl())
+            column(CompanyLegalOffice_Lbl; LegalOfficeLbl)
             {
             }
-            column(CompanyCustomGiro; CompanyInfo.GetCustomGiro())
+            column(CompanyCustomGiro; CustomGiroTxt)
             {
             }
-            column(CompanyCustomGiro_Lbl; CompanyInfo.GetCustomGiroLbl())
+            column(CompanyCustomGiro_Lbl; CustomGiroLbl)
             {
             }
             column(DocType_PurchHeader; "Document Type")
@@ -464,8 +483,8 @@ report 1322 "Standard Purchase - Order"
             }
             dataitem("Purchase Line"; "Purchase Line")
             {
-                DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
                 column(LineNo_PurchLine; "Line No.")
                 {
                 }
@@ -683,7 +702,7 @@ report 1322 "Standard Purchase - Order"
             }
             dataitem(Totals; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(VATAmountText; TempVATAmountLine.VATAmountText())
                 {
                 }
@@ -771,7 +790,7 @@ report 1322 "Standard Purchase - Order"
             }
             dataitem(TaxBreakdown; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(BreakdownTitle; BreakdownTitle)
                 {
                 }
@@ -802,7 +821,7 @@ report 1322 "Standard Purchase - Order"
             }
             dataitem(VATCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(VATAmtLineVATBase; TempVATAmountLine."VAT Base")
                 {
                     AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -850,7 +869,7 @@ report 1322 "Standard Purchase - Order"
             }
             dataitem(VATCounterLCY; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(VALExchRate; VALExchRate)
                 {
                 }
@@ -898,7 +917,7 @@ report 1322 "Standard Purchase - Order"
             }
             dataitem(PrepmtLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(PrepmtLineAmount; PrepmtLineAmount)
                 {
                     AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -966,7 +985,7 @@ report 1322 "Standard Purchase - Order"
             }
             dataitem(PrepmtVATCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(PrepmtVATAmtLineVATAmt; TempPrepmtVATAmountLine."VAT Amount")
                 {
                     AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -1005,7 +1024,7 @@ report 1322 "Standard Purchase - Order"
             }
             dataitem(LetterText; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(GreetingText; GreetingLbl)
                 {
                 }
@@ -1025,6 +1044,7 @@ report 1322 "Standard Purchase - Order"
                 TotalSubTotal := 0;
                 TotalInvoiceDiscountAmount := 0;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 Clear(BreakdownTitle);
@@ -1107,16 +1127,46 @@ report 1322 "Standard Purchase - Order"
         end;
     }
 
+    rendering
+    {
+        layout("StandardPurchaseOrder.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Purchases/Document/StandardPurchaseOrder.rdlc';
+            Caption = 'Standard Purchase Order (RDLC)';
+            Summary = 'The Standard Purchase Order (RDLC) provides a detailed layout.';
+        }
+        layout("StandardPurchaseOrder.docx")
+        {
+            Type = Word;
+            LayoutFile = './Purchases/Document/StandardPurchaseOrder.docx';
+            Caption = 'Standard Purchase Order (Word)';
+            Summary = 'The Standard Purchase Order (Word) provides a basic layout.';
+        }
+        layout("StandardPurchaseOrderEmail.docx")
+        {
+            Type = Word;
+            LayoutFile = './Purchases/Document/StandardPurchaseOrderEmail.docx';
+            Caption = 'Standard Purchase Order Email (Word)';
+            Summary = 'The Standard Purchase Order Email (Word) provides an email body layout.';
+        }
+    }
+
     labels
     {
     }
 
     trigger OnInitReport()
+    var
+        IsHandled: Boolean;
     begin
         GLSetup.Get();
         CompanyInfo.Get();
         PurchSetup.Get();
         CompanyInfo.CalcFields(Picture);
+
+        IsHandled := false;
+        OnInitReportForGlobalVariable(IsHandled, LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl);
     end;
 
     trigger OnPostReport()
@@ -1141,10 +1191,7 @@ report 1322 "Standard Purchase - Order"
         TempPurchLine: Record "Purchase Line" temporary;
         TempSalesTaxAmtLine: Record "Sales Tax Amount Line" temporary;
         TaxArea: Record "Tax Area";
-        RespCenter: Record "Responsibility Center";
         CurrExchRate: Record "Currency Exchange Rate";
-        BuyFromContact: Record Contact;
-        PayToContact: Record Contact;
         Language: Codeunit Language;
         FormatAddr: Codeunit "Format Address";
         FormatDocument: Codeunit "Format Document";
@@ -1170,13 +1217,9 @@ report 1322 "Standard Purchase - Order"
         PrepmtTotalAmountInclVAT: Decimal;
         PrepmtLineAmount: Decimal;
         AllowInvDisctxt: Text[30];
-        TotalSubTotal: Decimal;
-        TotalAmount: Decimal;
-        TotalInvoiceDiscountAmount: Decimal;
         CompanyLogoPosition: Integer;
         ItemNo: Text;
         TaxAmount: Decimal;
-
         VATAmountSpecificationLbl: Label 'VAT Amount Specification in ';
         LocalCurrentyLbl: Label 'Local Currency';
         ExchangeRateLbl: Label 'Exchange rate: %1/%2', Comment = '%1 = CurrExchRate."Relational Exch. Rate Amount", %2 = CurrExchRate."Exchange Rate Amount"';
@@ -1271,8 +1314,12 @@ report 1322 "Standard Purchase - Order"
         RequestedReceiptDateLbl: Label 'Requested Receipt Date';
         ExpectedReceiptDateLbl: Label 'Expected Receipt Date';
         PlannedReceiptDateLbl: Label 'Planned Receipt Date';
+        LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl : Text;
 
     protected var
+        ResponsibilityCenter: Record "Responsibility Center";
+        BuyFromContact: Record Contact;
+        PayToContact: Record Contact;
         CompanyInfo: Record "Company Information";
         PurchSetup: Record "Purchases & Payables Setup";
         ShipmentMethod: Record "Shipment Method";
@@ -1295,27 +1342,26 @@ report 1322 "Standard Purchase - Order"
         TotalText: Text[50];
         TotalInclVATText: Text[50];
         TotalExclVATText: Text[50];
-
         ArchiveDocument: Boolean;
         LogInteraction: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
+        TotalSubTotal, TotalAmount, TotalInvoiceDiscountAmount : Decimal;
 
     procedure InitializeRequest(LogInteractionParam: Boolean)
     begin
         LogInteraction := LogInteractionParam;
     end;
 
-    local procedure IsReportInPreviewMode(): Boolean
+    protected procedure IsReportInPreviewMode(): Boolean
     var
         MailManagement: Codeunit "Mail Management";
     begin
-        exit(CurrReport.Preview or MailManagement.IsHandlingGetEmailBody());
+        exit(CurrReport.Preview() or MailManagement.IsHandlingGetEmailBody());
     end;
 
     local procedure FormatAddressFields(var PurchaseHeader: Record "Purchase Header")
     begin
-        FormatAddr.GetCompanyAddr(PurchaseHeader."Responsibility Center", RespCenter, CompanyInfo, CompanyAddr);
+        FormatAddr.GetCompanyAddr(PurchaseHeader."Responsibility Center", ResponsibilityCenter, CompanyInfo, CompanyAddr);
         FormatAddr.PurchHeaderBuyFrom(BuyFromAddr, PurchaseHeader);
         if PurchaseHeader."Buy-from Vendor No." <> PurchaseHeader."Pay-to Vendor No." then
             FormatAddr.PurchHeaderPayTo(VendAddr, PurchaseHeader);
@@ -1340,7 +1386,7 @@ report 1322 "Standard Purchase - Order"
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Purch. Ord.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch. Ord.") <> '';
     end;
 
     local procedure FormatBreakdownAmounts(BreakdownLabel: Text; BreakdownAmount: Decimal): Text
@@ -1359,6 +1405,11 @@ report 1322 "Standard Purchase - Order"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterFormatDocumentFields(var PurchaseHeader: Record "Purchase Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitReportForGlobalVariable(var IsHandled: Boolean; var LegalOfficeTxt: Text; var LegalOfficeLbl: Text; var CustomGiroTxt: Text; var CustomGiroLbl: Text)
     begin
     end;
 }

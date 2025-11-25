@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.WarehouseMgt.Journal;
+
 page 7373 "Bin Creation Wksh. Name List"
 {
     Caption = 'Bin Creation Wksh. Name List';
@@ -14,12 +18,12 @@ page 7373 "Bin Creation Wksh. Name List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a name for the worksheet.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a description for the worksheet.';
@@ -79,18 +83,18 @@ page 7373 "Bin Creation Wksh. Name List"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        if Find(Which) then begin
+        if Rec.Find(Which) then begin
             BinCreateName := Rec;
             while true do begin
-                if WMSManagement.LocationIsAllowed("Location Code") then
+                if WMSManagement.LocationIsAllowed(Rec."Location Code") then
                     exit(true);
-                if Next(1) = 0 then begin
+                if Rec.Next(1) = 0 then begin
                     Rec := BinCreateName;
-                    if Find(Which) then
+                    if Rec.Find(Which) then
                         while true do begin
-                            if WMSManagement.LocationIsAllowed("Location Code") then
+                            if WMSManagement.LocationIsAllowed(Rec."Location Code") then
                                 exit(true);
-                            if Next(-1) = 0 then
+                            if Rec.Next(-1) = 0 then
                                 exit(false);
                         end;
                 end;
@@ -109,14 +113,14 @@ page 7373 "Bin Creation Wksh. Name List"
 
         BinCreateName := Rec;
         repeat
-            NextSteps := Next(Steps / Abs(Steps));
-            if WMSManagement.LocationIsAllowed("Location Code") then begin
+            NextSteps := Rec.Next(Steps / Abs(Steps));
+            if WMSManagement.LocationIsAllowed(Rec."Location Code") then begin
                 RealSteps := RealSteps + NextSteps;
                 BinCreateName := Rec;
             end;
         until (NextSteps = 0) or (RealSteps = Steps);
         Rec := BinCreateName;
-        Find();
+        Rec.Find();
         exit(RealSteps);
     end;
 
@@ -135,9 +139,9 @@ page 7373 "Bin Creation Wksh. Name List"
         BinCreateTemplate: Record "Bin Creation Wksh. Template";
     begin
         if not CurrPage.LookupMode then
-            if GetFilter("Worksheet Template Name") <> '' then
-                if GetRangeMin("Worksheet Template Name") = GetRangeMax("Worksheet Template Name") then
-                    if BinCreateTemplate.Get(GetRangeMin("Worksheet Template Name")) then
+            if Rec.GetFilter("Worksheet Template Name") <> '' then
+                if Rec.GetRangeMin("Worksheet Template Name") = Rec.GetRangeMax("Worksheet Template Name") then
+                    if BinCreateTemplate.Get(Rec.GetRangeMin("Worksheet Template Name")) then
                         exit(BinCreateTemplate.Name + ' ' + BinCreateTemplate.Description);
     end;
 }

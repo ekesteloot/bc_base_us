@@ -1,3 +1,12 @@
+namespace Microsoft.CostAccounting.Setup;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 codeunit 1100 "Cost Account Mgt"
 {
     Permissions = TableData "G/L Account" = rm,

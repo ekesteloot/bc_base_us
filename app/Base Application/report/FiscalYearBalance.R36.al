@@ -1,7 +1,14 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 report 36 "Fiscal Year Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/FiscalYearBalance.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/FiscalYearBalance.rdlc';
     AdditionalSearchTerms = 'closing balance';
     ApplicationArea = Basic, Suite;
     Caption = 'Fiscal Year Balance';
@@ -11,7 +18,7 @@ report 36 "Fiscal Year Balance"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Account Type", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(STRSUBSTNO_Text000_PeriodStartingDate_PeriodEndingDate_; StrSubstNo(Text000, PeriodStartingDate, PeriodEndingDate))
             {
@@ -195,7 +202,7 @@ report 36 "Fiscal Year Balance"
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
 
                 trigger OnPreDataItem()
                 begin
@@ -204,7 +211,7 @@ report 36 "Fiscal Year Balance"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(G_L_Account___No__; "G/L Account"."No.")
                 {
                 }

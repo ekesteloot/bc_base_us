@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 codeunit 5853 "Invt. Doc.-Post (Yes/No)"
 {
     TableNo = "Invt. Document Header";

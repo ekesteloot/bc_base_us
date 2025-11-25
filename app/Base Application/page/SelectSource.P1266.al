@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1266 "Select Source"
 {
     Caption = 'Select Source';
@@ -15,7 +17,7 @@ page 1266 "Select Source"
         {
             repeater(Group)
             {
-                IndentationColumn = Depth;
+                IndentationColumn = Rec.Depth;
                 IndentationControls = Name;
                 ShowAsTree = true;
                 field(Name; Rec.Name)
@@ -25,7 +27,7 @@ page 1266 "Select Source"
                     StyleExpr = StyleText;
                     ToolTip = 'Specifies the name of the imported record.';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Example Value';
@@ -54,7 +56,7 @@ page 1266 "Select Source"
 
     local procedure SetStyle()
     begin
-        if HasChildNodes() then
+        if Rec.HasChildNodes() then
             StyleText := 'Strong'
         else
             StyleText := '';

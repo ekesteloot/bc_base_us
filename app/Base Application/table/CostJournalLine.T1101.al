@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Journal;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 table 1101 "Cost Journal Line"
 {
     Caption = 'Cost Journal Line';
@@ -47,7 +52,7 @@ table 1101 "Cost Journal Line"
         field(9; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Cost Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Cost Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
         }
         field(11; "Bal. Cost Type No."; Code[20])
         {

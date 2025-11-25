@@ -1,3 +1,11 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Comment;
+using Microsoft.Manufacturing.Reports;
+
 page 99000754 "Work Center Card"
 {
     Caption = 'Work Center Card';
@@ -19,7 +27,7 @@ page 99000754 "Work Center Card"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -45,7 +53,7 @@ page 99000754 "Work Center Card"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies an alternate name that you can use to search for the record in question when you cannot remember the value in the Name field.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -128,13 +136,13 @@ page 99000754 "Work Center Card"
                     Importance = Promoted;
                     ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     Importance = Promoted;
                     ToolTip = 'Specifies the capacity of the work center.';
                 }
-                field(Efficiency; Efficiency)
+                field(Efficiency; Rec.Efficiency)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the efficiency factor as a percentage of the work center.';
@@ -229,9 +237,9 @@ page 99000754 "Work Center Card"
                     Caption = 'Capacity Ledger E&ntries';
                     Image = CapacityLedger;
                     RunObject = Page "Capacity Ledger Entries";
-                    RunPageLink = "Work Center No." = FIELD("No."),
-                                  "Posting Date" = FIELD("Date Filter");
-                    RunPageView = SORTING("Work Center No.", "Work Shift Code", "Posting Date");
+                    RunPageLink = "Work Center No." = field("No."),
+                                  "Posting Date" = field("Date Filter");
+                    RunPageView = sorting("Work Center No.", "Work Shift Code", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                 }
@@ -241,8 +249,8 @@ page 99000754 "Work Center Card"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(99000754),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(99000754),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -252,8 +260,8 @@ page 99000754 "Work Center Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Manufacturing Comment Sheet";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = WHERE("Table Name" = CONST("Work Center"));
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = where("Table Name" = const("Work Center"));
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Lo&ad")
@@ -262,8 +270,8 @@ page 99000754 "Work Center Card"
                     Caption = 'Lo&ad';
                     Image = WorkCenterLoad;
                     RunObject = Page "Work Center Load";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Work Shift Filter" = FIELD("Work Shift Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Work Shift Filter" = field("Work Shift Filter");
                     ToolTip = 'View the availability of the machine or work center, including its capacity, the allocated quantity, availability after orders, and the load in percent of its total capacity.';
                 }
                 action(Statistics)
@@ -272,9 +280,9 @@ page 99000754 "Work Center Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Work Center Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Work Shift Filter" = FIELD("Work Shift Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Work Shift Filter" = field("Work Shift Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -297,10 +305,10 @@ page 99000754 "Work Center Card"
                     Caption = 'A&bsence';
                     Image = WorkCenterAbsence;
                     RunObject = Page "Capacity Absence";
-                    RunPageLink = "Capacity Type" = CONST("Work Center"),
-                                  "No." = FIELD("No."),
-                                  Date = FIELD("Date Filter");
-                    RunPageView = SORTING("Capacity Type", "No.", Date, "Starting Time");
+                    RunPageLink = "Capacity Type" = const("Work Center"),
+                                  "No." = field("No."),
+                                  Date = field("Date Filter");
+                    RunPageView = sorting("Capacity Type", "No.", Date, "Starting Time");
                     ToolTip = 'View which working days are not available. ';
                 }
                 action("Ta&sk List")
@@ -309,11 +317,11 @@ page 99000754 "Work Center Card"
                     Caption = 'Ta&sk List';
                     Image = TaskList;
                     RunObject = Page "Work Center Task List";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = SORTING(Type, "No.")
-                                  WHERE(Type = CONST("Work Center"),
-                                        Status = FILTER(.. Released),
-                                        "Routing Status" = FILTER(<> Finished));
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = sorting(Type, "No.")
+                                  where(Type = const("Work Center"),
+                                        Status = filter(.. Released),
+                                        "Routing Status" = filter(<> Finished));
                     ToolTip = 'View the list of operations that are scheduled for the work center.';
                 }
             }
@@ -386,19 +394,16 @@ page 99000754 "Work Center Card"
     end;
 
     var
-        [InDataSet]
         OpenShopFloorBinCodeEnable: Boolean;
-        [InDataSet]
         ToProductionBinCodeEnable: Boolean;
-        [InDataSet]
         FromProductionBinCodeEnable: Boolean;
 
     local procedure UpdateEnabled()
     var
         Location: Record Location;
     begin
-        if "Location Code" <> '' then
-            Location.Get("Location Code");
+        if Rec."Location Code" <> '' then
+            Location.Get(Rec."Location Code");
 
         OpenShopFloorBinCodeEnable := Location."Bin Mandatory";
         ToProductionBinCodeEnable := Location."Bin Mandatory";

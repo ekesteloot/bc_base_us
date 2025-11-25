@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5068 "Industry Group Contacts"
 {
     Caption = 'Industry Group Contacts';

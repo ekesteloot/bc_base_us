@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.InventoryMgt.History;
+
 report 5850 "Copy Invt. Document"
 {
     Caption = 'Copy Invt. Document';
@@ -65,14 +69,34 @@ report 5850 "Copy Invt. Document"
 
                         trigger OnValidate()
                         begin
-                            RecalculateLines := true;
+                            if not IncludeHeader then
+                                RecalculateLines := true;
                         end;
+                    }
+                    field(CopyAsCorrection2; CopyAsCorrection)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Copy as Correction';
+                        ToolTip = 'Specifies that new document will be marked as Correction.';
+                        Editable = IncludeHeader;
+                    }
+                    field(CopyItemTracking2; CopyItemTracking)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Copy Item Tracking values';
+                        ToolTip = 'Specifies that Item Tracking data will be copied to new document lines.';
+                        Editable = not CopyItemTrackingNotEditable;
                     }
                     field(AutoFillAppliesFields2; AutoFillAppliesFields)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Specify appl. entries';
                         ToolTip = 'Specifies that apply to/from numbers will be copied to new document lines.';
+
+                        trigger OnValidate()
+                        begin
+                            ValidateAutoFillApplies();
+                        end;
                     }
                 }
             }
@@ -103,6 +127,8 @@ report 5850 "Copy Invt. Document"
                     DocNo := '';
             end;
             ValidateDocNo();
+
+            ValidateAutoFillApplies();
         end;
     }
 
@@ -112,7 +138,12 @@ report 5850 "Copy Invt. Document"
 
     trigger OnPreReport()
     begin
+
+        CheckInputParameters();
+
         CopyInvtDocMgt.SetProperties(IncludeHeader, RecalculateLines, false, false, AutoFillAppliesFields);
+        CopyInvtDocMgt.CopyAsCorrection(CopyAsCorrection);
+        CopyInvtDocMgt.SetCopyItemTracking(CopyItemTracking);
         CopyInvtDocMgt.CopyItemDoc(DocType, DocNo, InvtDocHeader);
     end;
 
@@ -127,6 +158,9 @@ report 5850 "Copy Invt. Document"
         IncludeHeader: Boolean;
         RecalculateLines: Boolean;
         AutoFillAppliesFields: Boolean;
+        CopyItemTracking: Boolean;
+        CopyAsCorrection: Boolean;
+        CopyItemTrackingNotEditable: Boolean;
         ConvertInvtDocumentTypeFromErr: Label 'Value %1 cannot be converted to enum Invt. Document Type.', Comment = '%1 = document type enum value';
 
     procedure SetInvtDocHeader(var NewInvtDocHeader: Record "Invt. Document Header")
@@ -206,6 +240,17 @@ report 5850 "Copy Invt. Document"
     local procedure ValidateIncludeHeader()
     begin
         RecalculateLines := not IncludeHeader;
+        CopyAsCorrection := false;
+    end;
+
+    local procedure ValidateAutoFillApplies()
+    begin
+        if AutoFillAppliesFields then begin
+            CopyItemTrackingNotEditable := true;
+            CopyItemTracking := true;
+        end
+        else
+            CopyItemTrackingNotEditable := false;
     end;
 
     local procedure ConvertInvtDocumentTypeFrom(InvtDocumentTypeFrom: Enum "Invt. Doc. Document Type From"): Enum "Invt. Doc. Document Type"
@@ -224,6 +269,40 @@ report 5850 "Copy Invt. Document"
                     error(ConvertInvtDocumentTypeFromErr, InvtDocumentTypeFrom);
             end;
         end;
+    end;
+
+    local procedure CheckInputParameters()
+    var
+        UpdateAutoFillAppliesFields: Boolean;
+    begin
+        if not AutoFillAppliesFields then
+            exit;
+
+        case DocType of
+            DocType::Receipt, DocType::Shipment:
+                UpdateAutoFillAppliesFields := true;
+
+            DocType::"Posted Receipt":
+                begin
+                    if InvtDocHeader."Document Type" = InvtDocHeader."Document Type"::Receipt then
+                        UpdateAutoFillAppliesFields := (InvtDocHeader.Correction or CopyAsCorrection) = FromInvtRcptHeader.Correction;
+
+                    if InvtDocHeader."Document Type" = InvtDocHeader."Document Type"::Shipment then
+                        UpdateAutoFillAppliesFields := (InvtDocHeader.Correction or CopyAsCorrection) <> FromInvtRcptHeader.Correction;
+                end;
+
+            DocType::"Posted Shipment":
+                begin
+                    if InvtDocHeader."Document Type" = InvtDocHeader."Document Type"::Receipt then
+                        UpdateAutoFillAppliesFields := (InvtDocHeader.Correction or CopyAsCorrection) <> FromInvtRcptHeader.Correction;
+
+                    if InvtDocHeader."Document Type" = InvtDocHeader."Document Type"::Shipment then
+                        UpdateAutoFillAppliesFields := (InvtDocHeader.Correction or CopyAsCorrection) = FromInvtRcptHeader.Correction;
+                end;
+        end;
+
+        if UpdateAutoFillAppliesFields then
+            AutoFillAppliesFields := false;
     end;
 
     [IntegrationEvent(true, false)]

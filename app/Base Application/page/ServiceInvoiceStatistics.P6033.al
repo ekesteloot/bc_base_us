@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+
 page 6033 "Service Invoice Statistics"
 {
     Caption = 'Service Invoice Statistics';
@@ -16,7 +22,7 @@ page 6033 "Service Invoice Statistics"
                 field(Amount; CustAmount + InvDiscAmount)
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Amount';
                     ToolTip = 'Specifies the net amount of all the lines in the posted service invoice. ';
@@ -24,7 +30,7 @@ page 6033 "Service Invoice Statistics"
                 field(InvDiscAmount; InvDiscAmount)
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     ToolTip = 'Specifies the invoice discount amount for the entire service invoice. If there is a check mark in the Calc. Inv. Discount field in the Sales & Receivables Setup window, the discount was calculated automatically.';
@@ -32,7 +38,7 @@ page 6033 "Service Invoice Statistics"
                 field(CustAmount; CustAmount)
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total net amount less any invoice discount amount for the posted service invoice. The amount does not include VAT.';
@@ -40,7 +46,7 @@ page 6033 "Service Invoice Statistics"
                 field(VATAmount; VATAmount)
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = '3,' + Format(VATAmountText);
                     Caption = 'VAT Amount';
@@ -49,7 +55,7 @@ page 6033 "Service Invoice Statistics"
                 field(AmountInclVAT; AmountInclVAT)
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total Incl. VAT';
                     ToolTip = 'Specifies the total amount, including VAT, that has been posted as invoiced to the customer''s account.';
@@ -147,7 +153,7 @@ page 6033 "Service Invoice Statistics"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupAdjmtValueEntries();
+                        Rec.LookupAdjmtValueEntries();
                     end;
                 }
             }
@@ -202,18 +208,18 @@ page 6033 "Service Invoice Statistics"
         if IsHandled then
             exit;
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             currency.InitRoundingPrecision()
         else
-            currency.Get("Currency Code");
+            currency.Get(Rec."Currency Code");
 
-        ServInvLine.SetRange("Document No.", "No.");
+        ServInvLine.SetRange("Document No.", Rec."No.");
 
         if ServInvLine.Find('-') then
             repeat
                 CustAmount := CustAmount + ServInvLine.Amount;
                 AmountInclVAT := AmountInclVAT + ServInvLine."Amount Including VAT";
-                if "Prices Including VAT" then
+                if Rec."Prices Including VAT" then
                     InvDiscAmount := InvDiscAmount + ServInvLine."Inv. Discount Amount" / (1 + ServInvLine."VAT %" / 100)
                 else
                     InvDiscAmount := InvDiscAmount + ServInvLine."Inv. Discount Amount";
@@ -242,12 +248,12 @@ page 6033 "Service Invoice Statistics"
         else
             VATAmountText := StrSubstNo(Text001, VATPercentage);
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             AmountLCY := CustAmount
         else
             AmountLCY :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                WorkDate(), "Currency Code", CustAmount, "Currency Factor");
+                WorkDate(), Rec."Currency Code", CustAmount, Rec."Currency Factor");
 
         ProfitLCY := AmountLCY - CostLCY;
         if AmountLCY <> 0 then
@@ -258,7 +264,7 @@ page 6033 "Service Invoice Statistics"
         if AmountLCY <> 0 then
             AdjProfitPct := Round(100 * AdjProfitLCY / AmountLCY, 0.1);
 
-        if Cust.Get("Bill-to Customer No.") then
+        if Cust.Get(Rec."Bill-to Customer No.") then
             Cust.CalcFields("Balance (LCY)")
         else
             Clear(Cust);
@@ -276,7 +282,7 @@ page 6033 "Service Invoice Statistics"
 
         ServInvLine.CalcVATAmountLines(Rec, TempVATAmountLine);
         CurrPage.Subform.PAGE.SetTempVATAmountLine(TempVATAmountLine);
-        CurrPage.Subform.PAGE.InitGlobals("Currency Code", false, false, false, false, "VAT Base Discount %");
+        CurrPage.Subform.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var

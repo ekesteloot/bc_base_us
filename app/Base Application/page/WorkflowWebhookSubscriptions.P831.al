@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 831 "Workflow Webhook Subscriptions"
 {
     Caption = 'workflowWebhookSubscriptions', Locked = true;
@@ -20,7 +22,7 @@ page 831 "Workflow Webhook Subscriptions"
                     begin
                         // runs on inserting new entry into the table
                         // entry comes as base64 encoded string but need to be stored as BLOB
-                        SetNotificationUrl(NotificationURLTxt);
+                        Rec.SetNotificationUrl(NotificationURLTxt);
                     end;
                 }
                 field(conditions; ConditionsTxt)
@@ -33,34 +35,34 @@ page 831 "Workflow Webhook Subscriptions"
                     begin
                         // runs on inserting new entry into the table
                         // entry comes as base64 encoded string but need to be stored as BLOB
-                        SetConditions(ConditionsTxt);
+                        Rec.SetConditions(ConditionsTxt);
                     end;
                 }
-                field(eventCode; "Event Code")
+                field(eventCode; Rec."Event Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Event Code', Locked = true;
                     ToolTip = 'Specifies the event code for the workflow.';
                 }
-                field(clientType; "Client Type")
+                field(clientType; Rec."Client Type")
                 {
                     ApplicationArea = All;
                     Caption = 'Client Type', Locked = true;
                     ToolTip = 'Specifies the client type';
                 }
-                field(clientId; "Client Id")
+                field(clientId; Rec."Client Id")
                 {
                     ApplicationArea = All;
                     Caption = 'Client Id', Locked = true;
                     ToolTip = 'Specifies the id for the client from Power Automate.';
                 }
-                field(enabled; Enabled)
+                field(enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     Caption = 'Enabled', Locked = true;
                     ToolTip = 'Specifies if the subscription is enabled.';
                 }
-                field(id; Id)
+                field(id; Rec.Id)
                 {
                     ApplicationArea = All;
                     Caption = 'Id', Locked = true;
@@ -78,8 +80,8 @@ page 831 "Workflow Webhook Subscriptions"
     begin
         // runs on get record
         // need to return encoded string
-        ConditionsTxt := GetConditions();
-        NotificationURLTxt := GetNotificationUrl();
+        ConditionsTxt := Rec.GetConditions();
+        NotificationURLTxt := Rec.GetNotificationUrl();
     end;
 
     var

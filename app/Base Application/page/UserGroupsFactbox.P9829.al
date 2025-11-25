@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 page 9829 "User Groups FactBox"
 {
     Caption = 'User Groups';
@@ -14,7 +16,7 @@ page 9829 "User Groups FactBox"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'specifies a code for the user group.';

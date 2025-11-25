@@ -1,9 +1,30 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Archive;
+using System.Email;
+using System.Globalization;
+using System.Text;
+using System.Utilities;
+
 report 1305 "Standard Sales - Order Conf."
 {
-    RDLCLayout = './SalesReceivables/Document/StandardSalesOrderConf.rdlc';
-    WordLayout = './StandardSalesOrderConf.docx';
     Caption = 'Sales - Confirmation';
-    DefaultLayout = Word;
+    DefaultRenderingLayout = "StandardSalesOrderConf.docx";
     PreviewMode = PrintLayout;
     WordMergeDataItem = Header;
 
@@ -11,7 +32,7 @@ report 1305 "Standard Sales - Order Conf."
     {
         dataitem(Header; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
             RequestFilterHeading = 'Sales Order';
             column(CompanyAddress1; CompanyAddr[1])
@@ -110,19 +131,19 @@ report 1305 "Standard Sales - Order Conf."
             column(CompanyVATRegistrationNo_Lbl; CompanyInfo.GetVATRegistrationNumberLbl())
             {
             }
-            column(CompanyLegalOffice; CompanyInfo.GetLegalOffice())
+            column(CompanyLegalOffice; LegalOfficeTxt)
             {
             }
-            column(CompanyLegalOffice_Lbl; CompanyInfo.GetLegalOfficeLbl())
+            column(CompanyLegalOffice_Lbl; LegalOfficeLbl)
             {
             }
-            column(CompanyCustomGiro; CompanyInfo.GetCustomGiro())
+            column(CompanyCustomGiro; CustomGiroTxt)
             {
             }
-            column(CompanyCustomGiro_Lbl; CompanyInfo.GetCustomGiroLbl())
+            column(CompanyCustomGiro_Lbl; CustomGiroLbl)
             {
             }
-            column(CompanyLegalStatement; GetLegalStatement())
+            column(CompanyLegalStatement; LegalStatementLbl)
             {
             }
             column(CustomerAddress1; CustAddr[1])
@@ -409,9 +430,9 @@ report 1305 "Standard Sales - Order Conf."
             }
             dataitem(Line; "Sales Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
+                DataItemLink = "Document No." = field("No.");
                 DataItemLinkReference = Header;
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 UseTemporary = true;
                 column(LineNo_Line; "Line No.")
                 {
@@ -529,7 +550,7 @@ report 1305 "Standard Sales - Order Conf."
                 }
                 dataitem(AssemblyLine; "Assembly Line")
                 {
-                    DataItemTableView = SORTING("Document No.", "Line No.");
+                    DataItemTableView = sorting("Document No.", "Line No.");
                     column(LineNo_AssemblyLine; "No.")
                     {
                     }
@@ -607,7 +628,7 @@ report 1305 "Standard Sales - Order Conf."
             }
             dataitem(WorkDescriptionLines; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 .. 99999));
+                DataItemTableView = sorting(Number) where(Number = filter(1 .. 99999));
                 column(WorkDescriptionLineNumber; Number)
                 {
                 }
@@ -636,7 +657,7 @@ report 1305 "Standard Sales - Order Conf."
             }
             dataitem(VATAmountLine; "VAT Amount Line")
             {
-                DataItemTableView = SORTING("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
+                DataItemTableView = sorting("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
                 UseTemporary = true;
                 column(InvoiceDiscountAmount_VATAmountLine; "Invoice Discount Amount")
                 {
@@ -740,7 +761,7 @@ report 1305 "Standard Sales - Order Conf."
             }
             dataitem(VATClauseLine; "VAT Amount Line")
             {
-                DataItemTableView = SORTING("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
+                DataItemTableView = sorting("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
                 UseTemporary = true;
                 column(VATIdentifier_VATClauseLine; "VAT Identifier")
                 {
@@ -777,7 +798,7 @@ report 1305 "Standard Sales - Order Conf."
             }
             dataitem(ReportTotalsLine; "Report Totals Buffer")
             {
-                DataItemTableView = SORTING("Line No.");
+                DataItemTableView = sorting("Line No.");
                 UseTemporary = true;
                 column(Description_ReportTotalsLine; Description)
                 {
@@ -804,7 +825,7 @@ report 1305 "Standard Sales - Order Conf."
             }
             dataitem(USReportTotalsLine; "Report Totals Buffer")
             {
-                DataItemTableView = SORTING("Line No.");
+                DataItemTableView = sorting("Line No.");
                 UseTemporary = true;
                 column(Description_USReportTotalsLine; Description)
                 {
@@ -829,7 +850,7 @@ report 1305 "Standard Sales - Order Conf."
             }
             dataitem(LetterText; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(GreetingText; GreetingLbl)
                 {
                 }
@@ -852,7 +873,7 @@ report 1305 "Standard Sales - Order Conf."
             }
             dataitem(Totals; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(TotalNetAmount; TotalAmount)
                 {
                     AutoFormatExpression = Header."Currency Code";
@@ -946,6 +967,7 @@ report 1305 "Standard Sales - Order Conf."
                 OnHeaderOnAfterGetRecordOnAfterUpdateNoPrinted(IsReportInPreviewMode(), Header);
 
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 CalcFields("Work Description");
@@ -1054,17 +1076,59 @@ report 1305 "Standard Sales - Order Conf."
         end;
     }
 
+    rendering
+    {
+        layout("StandardSalesOrderConf.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/Document/StandardSalesOrderConf.rdlc';
+            Caption = 'Standard Sales Order Confirmation (RDLC)';
+            Summary = 'Detailed layout with all fields.';
+        }
+        layout("StandardSalesOrderConf.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/Document/StandardSalesOrderConf.docx';
+            Caption = 'Standard Sales Order Confirmation (Word)';
+            Summary = 'Simple layout with most necessary fields.';
+        }
+        layout("StandardOrderConfirmationEmail.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/Document/StandardOrderConfirmationEmail.docx';
+            Caption = 'Standard Sales Order Confirmation Email (Word)';
+            Summary = 'Layout intended for an email body.';
+        }
+    }
+
     labels
     {
     }
 
     trigger OnInitReport()
+    var
+        SalesHeader: Record "Sales Header";
+        IsHandled: Boolean;
     begin
         GLSetup.Get();
         CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
         SalesSetup.Get();
         CompanyInfo.VerifyAndSetPaymentInfo();
+
+        if SalesHeader.GetLegalStatement() <> '' then
+            LegalStatementLbl := SalesHeader.GetLegalStatement();
+
+        IsHandled := false;
+        OnInitReportForGlobalVariable(IsHandled, LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl, LegalStatementLbl);
+#if not CLEAN23
+        if not IsHandled then begin
+            LegalOfficeTxt := CompanyInfo.GetLegalOffice();
+            LegalOfficeLbl := CompanyInfo.GetLegalOfficeLbl();
+            CustomGiroTxt := CompanyInfo.GetCustomGiro();
+            CustomGiroLbl := CompanyInfo.GetCustomGiroLbl();
+        end;
+#endif
     end;
 
     trigger OnPostReport()
@@ -1101,7 +1165,6 @@ report 1305 "Standard Sales - Order Conf."
     var
         GLSetup: Record "General Ledger Setup";
         CompanyBankAccount: Record "Bank Account";
-        CompanyInfo: Record "Company Information";
         DummyCompanyInfo: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         Cust: Record Customer;
@@ -1119,7 +1182,6 @@ report 1305 "Standard Sales - Order Conf."
         MoreLines: Boolean;
         CopyText: Text[30];
         TransHeaderAmount: Decimal;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         AsmInfoExistsForLine: Boolean;
         CompanyLogoPosition: Integer;
@@ -1130,7 +1192,6 @@ report 1305 "Standard Sales - Order Conf."
         PmtDiscText: Text;
         ShowWorkDescription: Boolean;
         WorkDescriptionLine: Text;
-
         CompanyInfoBankAccNoLbl: Label 'Account No.';
         CompanyInfoBankNameLbl: Label 'Bank';
         CompanyInfoGiroNoLbl: Label 'Giro No.';
@@ -1177,8 +1238,10 @@ report 1305 "Standard Sales - Order Conf."
         UnitPriceLbl: Label 'Unit Price';
         LineAmountLbl: Label 'Line Amount';
         SalespersonLbl2: Label 'Salesperson';
+        LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl, LegalStatementLbl : Text;
 
     protected var
+        CompanyInfo: Record "Company Information";
         PaymentTerms: Record "Payment Terms";
         PaymentMethod: Record "Payment Method";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -1206,14 +1269,12 @@ report 1305 "Standard Sales - Order Conf."
         FormattedQuantity: Text;
         FormattedUnitPrice: Text;
         FormattedVATPct: Text;
-
         SalesPersonText: Text[50];
         ShowShippingAddr: Boolean;
         VATBaseLCY: Decimal;
         VATAmountLCY: Decimal;
         TotalVATBaseLCY: Decimal;
         TotalVATAmountLCY: Decimal;
-
         PaymentTermsDescLbl: Label 'Payment Terms';
         PaymentMethodDescLbl: Label 'Payment Method';
         SalesConfirmationLbl: Label 'Order Confirmation';
@@ -1223,7 +1284,7 @@ report 1305 "Standard Sales - Order Conf."
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Ord. Cnfrmn.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Ord. Cnfrmn.") <> '';
     end;
 
     local procedure DocumentCaption() DocCaption: Text[250]
@@ -1239,11 +1300,11 @@ report 1305 "Standard Sales - Order Conf."
         DisplayAssemblyInformation := DisplayAsmInfo;
     end;
 
-    local procedure IsReportInPreviewMode(): Boolean
+    protected procedure IsReportInPreviewMode(): Boolean
     var
         MailManagement: Codeunit "Mail Management";
     begin
-        exit(CurrReport.Preview or MailManagement.IsHandlingGetEmailBody());
+        exit(CurrReport.Preview() or MailManagement.IsHandlingGetEmailBody());
     end;
 
     local procedure FormatDocumentFields(SalesHeader: Record "Sales Header")
@@ -1362,6 +1423,11 @@ report 1305 "Standard Sales - Order Conf."
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFormatDocumentFields(var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitReportForGlobalVariable(var IsHandled: Boolean; var LegalOfficeTxt: Text; var LegalOfficeLbl: Text; var CustomGiroTxt: Text; var CustomGiroLbl: Text; var LegalStatementLbl: Text)
     begin
     end;
 

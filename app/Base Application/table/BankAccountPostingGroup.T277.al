@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.BankAccount;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 277 "Bank Account Posting Group"
 {
     Caption = 'Bank Account Posting Group';
@@ -56,13 +60,6 @@ table 277 "Bank Account Posting Group"
             GLAcc.Get(AccNo);
             GLAcc.CheckGLAcc();
         end;
-    end;
-
-    [Obsolete('Get the value from the "G/L Account No. field directly."', '18.0')]
-    procedure GetGLBankAccountNo(): Code[20]
-    begin
-        TestField("G/L Account No.");
-        exit("G/L Account No.");
     end;
 }
 

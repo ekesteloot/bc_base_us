@@ -1,3 +1,16 @@
+namespace Microsoft.ServiceMgt.Setup;
+
+using Microsoft.CRM.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Posting;
+using Microsoft.ServiceMgt.Pricing;
+#if not CLEAN23
+using System.Telemetry;
+#endif
+
 table 5911 "Service Mgt. Setup"
 {
     Caption = 'Service Mgt. Setup';
@@ -294,13 +307,19 @@ table 5911 "Service Mgt. Setup"
             Caption = 'Allow Multiple Posting Groups';
             DataClassification = SystemMetadata;
 
-#if not CLEAN20
             trigger OnValidate()
-            begin
-                if "Allow Multiple Posting Groups" then
-                    CheckMultiplePostingGroupsNotAllowed();
-            end;
+#if not CLEAN23
+            var
+                FeatureTelemetry: Codeunit "Feature Telemetry";
+                FeatureKeyManagement: Codeunit "Feature Key Management";
 #endif
+            begin
+#if not CLEAN23
+                if "Allow Multiple Posting Groups" then
+                    FeatureTelemetry.LogUptake(
+                        '0000JRB', FeatureKeyManagement.GetAllowMultipleCustVendPostingGroupsFeatureKey(), Enum::"Feature Uptake Status"::Discovered);
+#endif
+            end;
         }
         field(176; "Check Multiple Posting Groups"; enum "Posting Group Change Method")
         {
@@ -310,22 +329,22 @@ table 5911 "Service Mgt. Setup"
         field(200; "Serv. Inv. Template Name"; Code[10])
         {
             Caption = 'Serv. Invoice Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
         }
         field(201; "Serv. Contr. Inv. Templ. Name"; Code[10])
         {
             Caption = 'Serv. Contract Invoice Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
         }
         field(202; "Serv. Contr. Cr.M. Templ. Name"; Code[10])
         {
             Caption = 'Serv. Contract Cr. Memo Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
         }
         field(203; "Serv. Cr. Memo Templ. Name"; Code[10])
         {
             Caption = 'Serv. Cr. Memo Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
         }
         field(210; "Copy Line Descr. to G/L Entry"; Boolean)
         {
@@ -336,29 +355,8 @@ table 5911 "Service Mgt. Setup"
         {
             Caption = 'Invoice Posting Setup';
             ObsoleteReason = 'Replaced by direct selection of posting interface in codeunits.';
-#if CLEAN20
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-
-            trigger OnValidate()
-            var
-                AllObjWithCaption: Record AllObjWithCaption;
-                EnvironmentInfo: Codeunit "Environment Information";
-                InvoicePostingInterface: Interface "Invoice Posting";
-            begin
-                if "Invoice Posting Setup" <> "Service Invoice Posting"::"Invoice Posting (Default)" then begin
-                    if EnvironmentInfo.IsProduction() then
-                        error(InvoicePostingNotAllowedErr);
-
-                    AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Codeunit, "Invoice Posting Setup".AsInteger());
-                    InvoicePostingInterface := "Invoice Posting Setup";
-                    InvoicePostingInterface.Check(Database::"Service Header");
-                end;
-            end;
-#endif
         }
         field(950; "Copy Time Sheet to Order"; Boolean)
         {
@@ -390,10 +388,6 @@ table 5911 "Service Mgt. Setup"
     }
 
     var
-#if not CLEAN20
-        InvoicePostingNotAllowedErr: Label 'Use of alternative invoice posting interfaces in production environment is currently not allowed.';
-        MultiplePostingGroupsNotAllowedErr: Label 'Use of multiple posting groups in production environment is currently not allowed.';
-#endif        
         RecordHasBeenRead: Boolean;
 
     trigger OnInsert()
@@ -408,15 +402,5 @@ table 5911 "Service Mgt. Setup"
         Get();
         RecordHasBeenRead := true;
     end;
-
-#if not CLEAN20
-    internal procedure CheckMultiplePostingGroupsNotAllowed(): Text
-    var
-        EnvironmentInformation: Codeunit "Environment Information";
-    begin
-        if EnvironmentInformation.IsSaas() and EnvironmentInformation.IsProduction() then
-            error(MultiplePostingGroupsNotAllowedErr);
-    end;
-#endif
 }
 

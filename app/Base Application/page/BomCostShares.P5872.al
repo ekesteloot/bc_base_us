@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.BOM;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.BOM.Tree;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Document;
+
 page 5872 "BOM Cost Shares"
 {
     Caption = 'BOM Cost Shares';
@@ -45,7 +52,7 @@ page 5872 "BOM Cost Shares"
             repeater(Group)
             {
                 Caption = 'Lines';
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 ShowAsTree = true;
                 field(Type; Rec.Type)
                 {
@@ -331,9 +338,9 @@ page 5872 "BOM Cost Shares"
     var
         DummyBOMWarningLog: Record "BOM Warning Log";
     begin
-        IsParentExpr := not "Is Leaf";
+        IsParentExpr := not Rec."Is Leaf";
 
-        HasWarning := not IsLineOk(false, DummyBOMWarningLog);
+        HasWarning := not Rec.IsLineOk(false, DummyBOMWarningLog);
     end;
 
     trigger OnOpenPage()
@@ -345,9 +352,7 @@ page 5872 "BOM Cost Shares"
         Item: Record Item;
         AsmHeader: Record "Assembly Header";
         ProdOrderLine: Record "Prod. Order Line";
-        [InDataSet]
         IsParentExpr: Boolean;
-        [InDataSet]
         HasWarning: Boolean;
 
         Text000: Label 'None of the items in the filter have a BOM.';
@@ -390,7 +395,7 @@ page 5872 "BOM Cost Shares"
         IsHandled := false;
         ShowByOption := ShowBy.AsInteger();
         OnBeforeRefreshPage(Rec, Item, AsmHeader, ProdOrderLine, ShowByOption, ItemFilter, IsHandled);
-        ShowBy := "BOM Structure Show By".FromInteger(ShowByOption);
+        ShowBy := Enum::"BOM Structure Show By".FromInteger(ShowByOption);
         if IsHandled then
             exit;
 
@@ -423,13 +428,13 @@ page 5872 "BOM Cost Shares"
     var
         Item: Record Item;
     begin
-        TestField(Type, Type::Item);
+        Rec.TestField(Type, Rec.Type::Item);
 
-        Item.Get("No.");
-        Item.SetRange("No.", "No.");
-        Item.SetFilter("Variant Filter", "Variant Code");
+        Item.Get(Rec."No.");
+        Item.SetRange("No.", Rec."No.");
+        Item.SetFilter("Variant Filter", Rec."Variant Code");
         if ShowBy <> ShowBy::Item then
-            Item.SetFilter("Location Filter", "Location Code");
+            Item.SetFilter("Location Filter", Rec."Location Code");
 
         REPORT.Run(REPORT::"BOM Cost Share Distribution", true, true, Item);
     end;
@@ -438,7 +443,7 @@ page 5872 "BOM Cost Shares"
     var
         TempBOMWarningLog: Record "BOM Warning Log" temporary;
     begin
-        if IsLineOk(true, TempBOMWarningLog) then
+        if Rec.IsLineOk(true, TempBOMWarningLog) then
             Message(Text001)
         else
             PAGE.RunModal(PAGE::"BOM Warning Log", TempBOMWarningLog);
@@ -448,7 +453,7 @@ page 5872 "BOM Cost Shares"
     var
         TempBOMWarningLog: Record "BOM Warning Log" temporary;
     begin
-        if AreAllLinesOk(TempBOMWarningLog) then
+        if Rec.AreAllLinesOk(TempBOMWarningLog) then
             Message(Text001)
         else
             PAGE.RunModal(PAGE::"BOM Warning Log", TempBOMWarningLog);

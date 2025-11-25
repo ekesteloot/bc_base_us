@@ -9,7 +9,7 @@ report 85 "Copy - VAT Posting Setup"
     {
         dataitem("VAT Posting Setup"; "VAT Posting Setup")
         {
-            DataItemTableView = SORTING("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+            DataItemTableView = sorting("VAT Bus. Posting Group", "VAT Prod. Posting Group");
 
             trigger OnAfterGetRecord()
             var

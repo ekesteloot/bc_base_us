@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Task;
+
 enum 5080 "Task Type"
 {
     Extensible = true;

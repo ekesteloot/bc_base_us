@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.History;
+
 page 1350 "Posted Sales Shipment - Update"
 {
     Caption = 'Posted Sales Shipment - Update';
@@ -99,11 +101,11 @@ page 1350 "Posted Sales Shipment - Update"
     local procedure RecordChanged() IsChanged: Boolean
     begin
         IsChanged :=
-          ("Shipping Agent Code" <> xSalesShipmentHeader."Shipping Agent Code") or
-          ("Package Tracking No." <> xSalesShipmentHeader."Package Tracking No.") or
-          ("Shipping Agent Service Code" <> xSalesShipmentHeader."Shipping Agent Service Code") or
-          ("CFDI Cancellation Reason Code" <> xSalesShipmentHeader."CFDI Cancellation Reason Code") or
-          ("Substitution Document No." <> xSalesShipmentHeader."Substitution Document No.");
+          (Rec."Shipping Agent Code" <> xSalesShipmentHeader."Shipping Agent Code") or
+          (Rec."Package Tracking No." <> xSalesShipmentHeader."Package Tracking No.") or
+          (Rec."Shipping Agent Service Code" <> xSalesShipmentHeader."Shipping Agent Service Code") or
+          (Rec."CFDI Cancellation Reason Code" <> xSalesShipmentHeader."CFDI Cancellation Reason Code") or
+          (Rec."Substitution Document No." <> xSalesShipmentHeader."Substitution Document No.");
 
         OnAfterRecordChanged(Rec, xSalesShipmentHeader, IsChanged);
     end;
@@ -111,7 +113,7 @@ page 1350 "Posted Sales Shipment - Update"
     procedure SetRec(SalesShipmentHeader: Record "Sales Shipment Header")
     begin
         Rec := SalesShipmentHeader;
-        Insert();
+        Rec.Insert();
     end;
 
     [IntegrationEvent(false, false)]

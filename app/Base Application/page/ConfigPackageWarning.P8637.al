@@ -1,7 +1,13 @@
+namespace System.IO;
+
+using System.Environment;
+using System.Utilities;
+
 /// <summary> 
 /// This page is meant to inform users that importing and applying Configuration packages may affect the system's performance.
 /// </summary>
 /// <remarks>This page is not meant to be used by extensions.</remarks>
+
 page 8637 "Config. Package Warning"
 {
     Caption = ' ';
@@ -150,7 +156,6 @@ page 8637 "Config. Package Warning"
         MediaRepository: Record "Media Repository";
         MediaResources: Record "Media Resources";
         TopBannerVisible: Boolean;
-        [InDataSet]
         Confirmation: Boolean;
         IsAcknowledged: Boolean;
         IsImportContext: Boolean;

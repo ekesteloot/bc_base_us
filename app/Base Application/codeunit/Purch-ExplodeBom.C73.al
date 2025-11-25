@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.Sales.Document;
+
 codeunit 73 "Purch.-Explode BOM"
 {
     TableNo = "Purchase Line";
@@ -11,37 +19,22 @@ codeunit 73 "Purch.-Explode BOM"
         if IsHandled then
             exit;
 
-        TestField(Type, Type::Item);
-        TestField("Quantity Received", 0);
-        TestField("Return Qty. Shipped", 0);
+        PurchHeader := Rec.GetPurchHeader();
+        PurchHeader.TestStatusOpen();
+        CheckPurchaseLine(Rec);
 
-        CalcFields("Reserved Qty. (Base)");
-        TestField("Reserved Qty. (Base)", 0);
-        if "Sales Order No." <> '' then
-            Error(
-              Text000,
-              "Sales Order No.");
-
-        PurchHeader.Get("Document Type", "Document No.");
-        PurchHeader.TestField(Status, PurchHeader.Status::Open);
-        FromBOMComp.SetRange("Parent Item No.", "No.");
+        FromBOMComp.SetRange("Parent Item No.", Rec."No.");
         NoOfBOMComp := FromBOMComp.Count();
         if NoOfBOMComp = 0 then
             Error(
               Text001,
-              "No.");
+              Rec."No.");
 
         Selection := GetSelection(Rec);
         if Selection = 0 then
             exit;
 
-        ToPurchLine := Rec;
-        ToPurchLine.Init();
-        ToPurchLine.Description := Description;
-        ToPurchLine."Description 2" := "Description 2";
-        OnRunOnBeforeToPurchLineModify(ToPurchLine, Rec);
-        ToPurchLine.Modify();
-
+        InitParentItemLine(Rec);
         if TransferExtendedText.PurchCheckIfAnyExtText(ToPurchLine, false) then
             TransferExtendedText.InsertPurchExtText(ToPurchLine);
 
@@ -134,13 +127,7 @@ codeunit 73 "Purch.-Explode BOM"
                                 ToPurchLine.Validate("Variant Code", FromBOMComp."Variant Code");
                                 ToPurchLine.Validate("Unit of Measure Code", FromBOMComp."Unit of Measure Code");
                                 ToPurchLine."Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, ToPurchLine."Unit of Measure Code");
-                                ToPurchLine.Validate(
-                                  Quantity,
-                                  Round(
-                                    "Quantity (Base)" * FromBOMComp."Quantity per" *
-                                    UOMMgt.GetQtyPerUnitOfMeasure(
-                                      Item, ToPurchLine."Unit of Measure Code") / ToPurchLine."Qty. per Unit of Measure",
-                                    UOMMgt.QtyRndPrecision()));
+                                ToPurchLine.Validate(Quantity, Round("Quantity (Base)" * FromBOMComp."Quantity per", UOMMgt.QtyRndPrecision()));
                             end;
                         FromBOMComp.Type::Resource:
                             begin
@@ -150,13 +137,7 @@ codeunit 73 "Purch.-Explode BOM"
                                 ToPurchLine.Validate("Variant Code", FromBOMComp."Variant Code");
                                 ToPurchLine.Validate("Unit of Measure Code", FromBOMComp."Unit of Measure Code");
                                 ToPurchLine."Qty. per Unit of Measure" := UOMMgt.GetResQtyPerUnitOfMeasure(Resource, ToPurchLine."Unit of Measure Code");
-                                ToPurchLine.Validate(
-                                  Quantity,
-                                  Round(
-                                    "Quantity (Base)" * FromBOMComp."Quantity per" *
-                                    UOMMgt.GetResQtyPerUnitOfMeasure(
-                                      Resource, ToPurchLine."Unit of Measure Code") / ToPurchLine."Qty. per Unit of Measure",
-                                    UOMMgt.QtyRndPrecision()));
+                                ToPurchLine.Validate(Quantity, Round("Quantity (Base)" * FromBOMComp."Quantity per", UOMMgt.QtyRndPrecision()));
                             end;
                     end;
 
@@ -212,6 +193,29 @@ codeunit 73 "Purch.-Explode BOM"
         end;
     end;
 
+    local procedure CheckPurchaseLine(PurchaseLine: Record "Purchase Line")
+    begin
+        PurchaseLine.TestField(Type, PurchaseLine.Type::Item);
+        PurchaseLine.TestField("Quantity Received", 0);
+        PurchaseLine.TestField("Return Qty. Shipped", 0);
+
+        PurchaseLine.CalcFields("Reserved Qty. (Base)");
+        PurchaseLine.TestField("Reserved Qty. (Base)", 0);
+        if PurchaseLine."Sales Order No." <> '' then
+            Error(Text000, PurchaseLine."Sales Order No.");
+        OnAfterCheckPurchaseLine(PurchaseLine);
+    end;
+
+    local procedure InitParentItemLine(var FromPurchaseLine: Record "Purchase Line")
+    begin
+        ToPurchLine := FromPurchaseLine;
+        ToPurchLine.Init();
+        ToPurchLine.Description := FromPurchaseLine.Description;
+        ToPurchLine."Description 2" := FromPurchaseLine."Description 2";
+        OnRunOnBeforeToPurchLineModify(ToPurchLine, FromPurchaseLine);
+        ToPurchLine.Modify();
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterOnRun(ToPurchLine: Record "Purchase Line"; PurchLine: Record "Purchase Line")
     begin
@@ -249,6 +253,11 @@ codeunit 73 "Purch.-Explode BOM"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnBeforeToPurchLineModify(var ToPurchLine: Record "Purchase Line"; RecPurchLine: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCheckPurchaseLine(PurchaseLine: Record "Purchase Line")
     begin
     end;
 }

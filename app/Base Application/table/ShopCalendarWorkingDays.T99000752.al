@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Capacity;
+
+using Microsoft.Manufacturing.Setup;
+
 table 99000752 "Shop Calendar Working Days"
 {
     Caption = 'Shop Calendar Working Days';

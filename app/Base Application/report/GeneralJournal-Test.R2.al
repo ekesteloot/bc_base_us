@@ -1,7 +1,39 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Intercompany.BankAccount;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Security.User;
+using System.Utilities;
+
 report 2 "General Journal - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/GeneralJournalTest.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/GeneralJournalTest.rdlc';
     Caption = 'General Journal - Test';
     PreviewMode = PrintLayout;
 
@@ -9,7 +41,7 @@ report 2 "General Journal - Test"
     {
         dataitem("Gen. Journal Batch"; "Gen. Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             column(JnlTmplName_GenJnlBatch; "Journal Template Name")
             {
             }
@@ -24,7 +56,7 @@ report 2 "General Journal - Test"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 PrintOnlyIfDetail = true;
                 column(JnlTemplateName_GenJnlBatch; "Gen. Journal Batch"."Journal Template Name")
                 {
@@ -97,9 +129,9 @@ report 2 "General Journal - Test"
                 }
                 dataitem("Gen. Journal Line"; "Gen. Journal Line")
                 {
-                    DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
+                    DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
                     DataItemLinkReference = "Gen. Journal Batch";
-                    DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+                    DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
                     RequestFilterFields = "Posting Date";
                     column(PostingDate_GenJnlLine; Format("Posting Date"))
                     {
@@ -169,7 +201,7 @@ report 2 "General Journal - Test"
                     }
                     dataitem(DimensionLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -202,8 +234,8 @@ report 2 "General Journal - Test"
                     }
                     dataitem("Gen. Jnl. Allocation"; "Gen. Jnl. Allocation")
                     {
-                        DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD("Journal Batch Name"), "Journal Line No." = FIELD("Line No.");
-                        DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Journal Line No.", "Line No.");
+                        DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field("Journal Batch Name"), "Journal Line No." = field("Line No.");
+                        DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Journal Line No.", "Line No.");
                         column(AccountNo_GenJnlAllocation; "Account No.")
                         {
                         }
@@ -248,7 +280,7 @@ report 2 "General Journal - Test"
                         }
                         dataitem(DimensionLoopAllocations; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(AllocationDimText; AllocationDimText)
                             {
                             }
@@ -282,7 +314,7 @@ report 2 "General Journal - Test"
                     }
                     dataitem(ErrorLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorTextNumber; ErrorText[Number])
                         {
                         }
@@ -700,7 +732,7 @@ report 2 "General Journal - Test"
                 }
                 dataitem(ReconcileLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(GLAccNetChangeNo; GLAccNetChange."No.")
                     {
                     }
@@ -945,7 +977,7 @@ report 2 "General Journal - Test"
     begin
         with GenJnlLine2 do
             if GenJnlTemplate.Recurring then begin
-                if "Recurring Method" = "Gen. Journal Recurring Method"::" " then
+                if "Recurring Method" = "Recurring Method"::" " then
                     AddError(StrSubstNo(Text002, FieldCaption("Recurring Method")));
                 if Format("Recurring Frequency") = '' then
                     AddError(StrSubstNo(Text002, FieldCaption("Recurring Frequency")));
@@ -976,7 +1008,7 @@ report 2 "General Journal - Test"
                             FieldCaption("Bal. Account Type"), "Bal. Account Type"));
                 end;
             end else begin
-                if "Recurring Method" <> "Gen. Journal Recurring Method"::" " then
+                if "Recurring Method" <> "Recurring Method"::" " then
                     AddError(StrSubstNo(Text009, FieldCaption("Recurring Method")));
                 if Format("Recurring Frequency") <> '' then
                     AddError(StrSubstNo(Text009, FieldCaption("Recurring Frequency")));
@@ -1020,7 +1052,7 @@ report 2 "General Journal - Test"
     local procedure MakeRecurringTexts(var GenJnlLine2: Record "Gen. Journal Line")
     begin
         with GenJnlLine2 do
-            if ("Posting Date" <> 0D) and ("Account No." <> '') and ("Recurring Method" <> "Gen. Journal Recurring Method"::" ") then
+            if ("Posting Date" <> 0D) and ("Account No." <> '') and ("Recurring Method" <> "Recurring Method"::" ") then
                 AccountingPeriod.MakeRecurringTexts("Posting Date", "Document No.", Description);
     end;
 
@@ -1154,11 +1186,11 @@ report 2 "General Journal - Test"
             No[1] := "Account No.";
             TableID[2] := DimMgt.TypeToTableID1("Bal. Account Type".AsInteger());
             No[2] := "Bal. Account No.";
-            TableID[3] := DATABASE::Job;
+            TableID[3] := Enum::TableID::Job.AsInteger();
             No[3] := "Job No.";
-            TableID[4] := DATABASE::"Salesperson/Purchaser";
+            TableID[4] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
             No[4] := "Salespers./Purch. Code";
-            TableID[5] := DATABASE::Campaign;
+            TableID[5] := Enum::TableID::Campaign.AsInteger();
             No[5] := "Campaign No.";
             SkipCheck := false;
             OnAfterAssignDimTableID(GenJournalLine, TableID, No, SkipCheck);
@@ -1337,7 +1369,7 @@ report 2 "General Journal - Test"
                 CustPosting := true;
                 TestPostingType();
 
-                if "Recurring Method" = "Gen. Journal Recurring Method"::" " then
+                if "Recurring Method" = "Recurring Method"::" " then
                     if "Document Type" in
                        ["Document Type"::Invoice, "Document Type"::"Credit Memo",
                         "Document Type"::"Finance Charge Memo", "Document Type"::Reminder]
@@ -1429,7 +1461,7 @@ report 2 "General Journal - Test"
                 VendPosting := true;
                 TestPostingType();
 
-                if "Recurring Method" = "Gen. Journal Recurring Method"::" " then
+                if "Recurring Method" = "Recurring Method"::" " then
                     if "Document Type" in
                        ["Document Type"::Invoice, "Document Type"::"Credit Memo",
                         "Document Type"::"Finance Charge Memo", "Document Type"::Reminder]
@@ -1760,7 +1792,7 @@ report 2 "General Journal - Test"
                     AddError(StrSubstNo(TempErrorText, FieldCaption("Insurance No.")));
                 if "Budgeted FA No." <> '' then
                     AddError(StrSubstNo(TempErrorText, FieldCaption("Budgeted FA No.")));
-                if "Recurring Method" <> "Gen. Journal Recurring Method"::" " then
+                if "Recurring Method" <> "Recurring Method"::" " then
                     AddError(StrSubstNo(TempErrorText, FieldCaption("Recurring Method")));
                 if "FA Posting Type" = "FA Posting Type"::Maintenance then
                     AddError(StrSubstNo(TempErrorText, "FA Posting Type"));
@@ -2011,7 +2043,7 @@ report 2 "General Journal - Test"
             if DeprBook."Allow Identical Document No." then
                 exit;
 
-            FAJnlLine."FA Posting Type" := "FA Journal Line FA Posting Type".FromInteger("FA Posting Type".AsInteger() - 1);
+            FAJnlLine."FA Posting Type" := Enum::"FA Journal Line FA Posting Type".FromInteger("FA Posting Type".AsInteger() - 1);
             if "FA Posting Type" <> "FA Posting Type"::Maintenance then begin
                 OldFALedgEntry.SetCurrentKey(
                   "FA No.", "Depreciation Book Code", "FA Posting Category", "FA Posting Type", "Document No.");
@@ -2138,7 +2170,7 @@ report 2 "General Journal - Test"
                                     AddError(StrSubstNo(Text032, ICGLAccount.FieldCaption(Blocked), false,
                                         FieldCaption("IC Partner G/L Acc. No."), "IC Partner G/L Acc. No."));
 
-                            if "IC Account Type" = "IC Journal Account Type"::"Bank Account" then
+                            if "IC Account Type" = "IC Account Type"::"Bank Account" then
                                 if ICBankAccount.Get("IC Account No.", CurrentICPartner) then
                                     if ICBankAccount.Blocked then
                                         AddError(StrSubstNo(Text032, ICGLAccount.FieldCaption(Blocked), false,
@@ -2171,13 +2203,13 @@ report 2 "General Journal - Test"
                         if "IC Account No." = '' then
                             AddError(StrSubstNo(Text002, FieldCaption("IC Account No.")))
                         else begin
-                            if "IC Account Type" = "IC Journal Account Type"::"G/L Account" then
+                            if "IC Account Type" = "IC Account Type"::"G/L Account" then
                                 if ICGLAccount.Get("IC Account No.") then
                                     if ICGLAccount.Blocked then
                                         AddError(StrSubstNo(Text032, ICGLAccount.FieldCaption(Blocked), false,
                                             FieldCaption("IC Account No."), "IC Account No."));
 
-                            if "IC Account Type" = "IC Journal Account Type"::"Bank Account" then
+                            if "IC Account Type" = "IC Account Type"::"Bank Account" then
                                 if ICBankAccount.Get("IC Account No.", CurrentICPartner) then
                                     if ICBankAccount.Blocked then
                                         AddError(StrSubstNo(Text032, ICGLAccount.FieldCaption(Blocked), false,

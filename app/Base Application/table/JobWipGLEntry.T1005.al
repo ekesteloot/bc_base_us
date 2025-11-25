@@ -1,3 +1,10 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.ProjectMgt.Jobs.Job;
+
 table 1005 "Job WIP G/L Entry"
 {
     Caption = 'Job WIP G/L Entry';
@@ -102,13 +109,13 @@ table 1005 "Job WIP G/L Entry"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(61; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -118,7 +125,7 @@ table 1005 "Job WIP G/L Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])

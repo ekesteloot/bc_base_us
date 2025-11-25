@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+
 page 376 "Job Journal Reconcile"
 {
     Caption = 'Job Journal Reconcile';
@@ -43,7 +47,7 @@ page 376 "Job Journal Reconcile"
 
     trigger OnAfterGetRecord()
     begin
-        FormatLine(Format("Unit of Measure Code"));
+        FormatLine(Format(Rec."Unit of Measure Code"));
     end;
 
     trigger OnOpenPage()
@@ -70,13 +74,13 @@ page 376 "Job Journal Reconcile"
 
             InsertUnitOfMeasureQty();
             InsertWorkTypeQty();
-            Init();
-            "Is Total" := true;
-            "Unit of Measure Code" := '';
-            "Line Type" := "Line Type"::Total;
-            "Work Type Code" := '';
-            Quantity := TotalQty;
-            Insert();
+            Rec.Init();
+            Rec."Is Total" := true;
+            Rec."Unit of Measure Code" := '';
+            Rec."Line Type" := Rec."Line Type"::Total;
+            Rec."Work Type Code" := '';
+            Rec.Quantity := TotalQty;
+            Rec.Insert();
 
             TotalQty := 0;
         end;
@@ -89,7 +93,6 @@ page 376 "Job Journal Reconcile"
         TotalQty: Decimal;
         OldUnitOfMeasureCode: Text[10];
         OldWorkTypeCode: Code[10];
-        [InDataSet]
         Emphasize: Boolean;
 
         Text000: Label 'Total %1';
@@ -104,25 +107,25 @@ page 376 "Job Journal Reconcile"
 
     local procedure InsertUnitOfMeasureQty()
     begin
-        Init();
-        "Is Total" := false;
-        "Unit of Measure Code" := OldUnitOfMeasureCode;
-        "Line Type" := "Line Type"::Total;
-        "Work Type Code" := '';
-        Quantity := UnitOfMeasureQty;
-        Insert();
+        Rec.Init();
+        Rec."Is Total" := false;
+        Rec."Unit of Measure Code" := OldUnitOfMeasureCode;
+        Rec."Line Type" := Rec."Line Type"::Total;
+        Rec."Work Type Code" := '';
+        Rec.Quantity := UnitOfMeasureQty;
+        Rec.Insert();
         UnitOfMeasureQty := 0;
     end;
 
     local procedure InsertWorkTypeQty()
     begin
-        Init();
-        "Is Total" := false;
-        "Unit of Measure Code" := OldUnitOfMeasureCode;
-        "Line Type" := 0;
-        "Work Type Code" := OldWorkTypeCode;
-        Quantity := WorkTypeQty;
-        Insert();
+        Rec.Init();
+        Rec."Is Total" := false;
+        Rec."Unit of Measure Code" := OldUnitOfMeasureCode;
+        Rec."Line Type" := 0;
+        Rec."Work Type Code" := OldWorkTypeCode;
+        Rec.Quantity := WorkTypeQty;
+        Rec.Insert();
         WorkTypeQty := 0;
     end;
 
@@ -136,7 +139,7 @@ page 376 "Job Journal Reconcile"
 
     local procedure FormatLine(Text: Text[1024])
     begin
-        if "Line Type" = "Line Type"::Total then begin
+        if Rec."Line Type" = Rec."Line Type"::Total then begin
             Emphasize := true;
             Text := StrSubstNo(Text000, Text);
         end;

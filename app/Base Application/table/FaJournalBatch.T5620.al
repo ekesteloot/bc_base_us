@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.Foundation.NoSeries;
+
 table 5620 "FA Journal Batch"
 {
     Caption = 'FA Journal Batch';
@@ -71,7 +75,7 @@ table 5620 "FA Journal Batch"
         }
         field(22; Recurring; Boolean)
         {
-            CalcFormula = Lookup("FA Journal Template".Recurring WHERE(Name = FIELD("Journal Template Name")));
+            CalcFormula = Lookup("FA Journal Template".Recurring where(Name = field("Journal Template Name")));
             Caption = 'Recurring';
             Editable = false;
             FieldClass = FlowField;

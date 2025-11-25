@@ -14,7 +14,7 @@ page 424 "Customer Bank Account List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code to identify this customer bank account.';
@@ -47,7 +47,7 @@ page 424 "Customer Bank Account List"
                     ToolTip = 'Specifies the fax number associated with the address.';
                     Visible = false;
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank employee regularly contacted in connection with this bank account.';
@@ -64,7 +64,7 @@ page 424 "Customer Bank Account List"
                     ToolTip = 'Specifies the SWIFT code (international bank identifier code) of the bank where the customer has the account.';
                     Visible = false;
                 }
-                field(IBAN; IBAN)
+                field(IBAN; Rec.IBAN)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account''s international bank account number.';
@@ -108,8 +108,8 @@ page 424 "Customer Bank Account List"
                 Caption = 'Direct Debit Mandates';
                 Image = MakeAgreement;
                 RunObject = Page "SEPA Direct Debit Mandates";
-                RunPageLink = "Customer No." = FIELD("Customer No."),
-                              "Customer Bank Account Code" = FIELD(Code);
+                RunPageLink = "Customer No." = field("Customer No."),
+                              "Customer Bank Account Code" = field(Code);
                 Scope = Repeater;
                 ToolTip = 'View or edit direct-debit mandates that you set up to reflect agreements with customers to collect invoice payments from their bank account.';
             }

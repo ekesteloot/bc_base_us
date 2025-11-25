@@ -1,3 +1,9 @@
+﻿namespace System.Security.User;
+
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Utilities;
+
 table 1170 "User Task"
 {
     Caption = 'User Task';
@@ -20,7 +26,7 @@ table 1170 "User Task"
             Caption = 'Created By';
             DataClassification = EndUserPseudonymousIdentifiers;
             Editable = false;
-            TableRelation = User."User Security ID" WHERE("License Type" = CONST("Full User"));
+            TableRelation = User."User Security ID" where("License Type" = const("Full User"));
         }
         field(4; "Created DateTime"; DateTime)
         {
@@ -30,7 +36,7 @@ table 1170 "User Task"
         field(5; "Assigned To"; Guid)
         {
             Caption = 'Assigned To';
-            TableRelation = User."User Security ID" WHERE("License Type" = CONST("Full User"));
+            TableRelation = User."User Security ID" where("License Type" = const("Full User"));
 
             trigger OnValidate()
             var
@@ -56,7 +62,7 @@ table 1170 "User Task"
         {
             Caption = 'Completed By';
             DataClassification = EndUserPseudonymousIdentifiers;
-            TableRelation = User."User Security ID" WHERE("License Type" = CONST("Full User"));
+            TableRelation = User."User Security ID" where("License Type" = const("Full User"));
 
             trigger OnValidate()
             begin
@@ -134,21 +140,21 @@ table 1170 "User Task"
         }
         field(14; "Created By User Name"; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("Created By")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("Created By")));
             Caption = 'User Created By';
             Editable = false;
             FieldClass = FlowField;
         }
         field(15; "Assigned To User Name"; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("Assigned To")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("Assigned To")));
             Caption = 'User Assigned To';
             Editable = false;
             FieldClass = FlowField;
         }
         field(16; "Completed By User Name"; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("Completed By")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("Completed By")));
             Caption = 'User Completed By';
             Editable = false;
             FieldClass = FlowField;
@@ -162,7 +168,7 @@ table 1170 "User Task"
         field(18; "Object ID"; Integer)
         {
             Caption = 'Object ID';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = FIELD("Object Type"));
+            TableRelation = AllObj."Object ID" where("Object Type" = field("Object Type"));
         }
         field(19; "Parent ID"; Integer)
         {
@@ -212,6 +218,10 @@ table 1170 "User Task"
         }
         key(Key2; "Assigned To", "User Task Group Assigned To", "Percent Complete", "Due DateTime")
         {
+        }
+        key(Key3; "User Task Group Assigned To")
+        {
+            IncludedFields = "Percent Complete", "Due DateTime", "Assigned To";
         }
     }
 

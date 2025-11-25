@@ -5,8 +5,8 @@ page 658 "Approval Entries"
     Editable = false;
     PageType = List;
     SourceTable = "Approval Entry";
-    SourceTableView = SORTING("Table ID", "Document Type", "Document No.", "Date-Time Sent for Approval")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Table ID", "Document Type", "Document No.", "Date-Time Sent for Approval")
+                      order(Ascending);
     UsageCategory = Lists;
 
     layout
@@ -57,7 +57,7 @@ page 658 "Approval Entries"
                     Caption = 'To Approve';
                     ToolTip = 'Specifies the record that you are requested to approve.';
                 }
-                field(Details; RecordDetails())
+                field(Details; Rec.RecordDetails())
                 {
                     ApplicationArea = Suite;
                     Caption = 'Details';
@@ -82,7 +82,7 @@ page 658 "Approval Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Sender ID");
+                        UserMgt.DisplayUserInformation(Rec."Sender ID");
                     end;
                 }
                 field("Salespers./Purch. Code"; Rec."Salespers./Purch. Code")
@@ -99,7 +99,7 @@ page 658 "Approval Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Approver ID");
+                        UserMgt.DisplayUserInformation(Rec."Approver ID");
                     end;
                 }
                 field("Currency Code"; Rec."Currency Code")
@@ -136,10 +136,10 @@ page 658 "Approval Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Last Modified By User ID");
+                        UserMgt.DisplayUserInformation(Rec."Last Modified By User ID");
                     end;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies whether there are comments relating to the approval of the record. If you want to read the comments, choose the field to open the Approval Comment Sheet window.';
@@ -193,7 +193,7 @@ page 658 "Approval Entries"
 
                     trigger OnAction()
                     begin
-                        ShowRecord();
+                        Rec.ShowRecord();
                     end;
                 }
                 action(Comments)
@@ -209,9 +209,9 @@ page 658 "Approval Entries"
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                         RecRef: RecordRef;
                     begin
-                        RecRef.Get("Record ID to Approve");
+                        RecRef.Get(Rec."Record ID to Approve");
                         Clear(ApprovalsMgmt);
-                        ApprovalsMgmt.GetApprovalCommentForWorkflowStepInstanceID(RecRef, "Workflow Step Instance ID");
+                        ApprovalsMgmt.GetApprovalCommentForWorkflowStepInstanceID(RecRef, Rec."Workflow Step Instance ID");
                     end;
                 }
                 action("O&verdue Entries")
@@ -223,8 +223,8 @@ page 658 "Approval Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter(Status, '%1|%2', Status::Created, Status::Open);
-                        SetFilter("Due Date", '<%1', Today);
+                        Rec.SetFilter(Status, '%1|%2', Rec.Status::Created, Rec.Status::Open);
+                        Rec.SetFilter("Due Date", '<%1', Today);
                     end;
                 }
                 action("All Entries")
@@ -236,8 +236,8 @@ page 658 "Approval Entries"
 
                     trigger OnAction()
                     begin
-                        SetRange(Status);
-                        SetRange("Due Date");
+                        Rec.SetRange(Status);
+                        Rec.SetRange("Due Date");
                     end;
                 }
             }
@@ -297,8 +297,8 @@ page 658 "Approval Entries"
         RecRef: RecordRef;
     begin
         ShowChangeFactBox := CurrPage.Change.PAGE.SetFilterFromApprovalEntry(Rec);
-        DelegateEnable := CanCurrentUserEdit();
-        ShowRecCommentsEnabled := RecRef.Get("Record ID to Approve");
+        DelegateEnable := Rec.CanCurrentUserEdit();
+        ShowRecCommentsEnabled := RecRef.Get(Rec."Record ID to Approve");
     end;
 
     trigger OnAfterGetRecord()
@@ -307,12 +307,12 @@ page 658 "Approval Entries"
         if FormatField(Rec) then
             Overdue := Overdue::Yes;
 
-        RecordIDText := Format("Record ID to Approve", 0, 1);
+        RecordIDText := Format(Rec."Record ID to Approve", 0, 1);
     end;
 
     trigger OnOpenPage()
     begin
-        MarkAllWhereUserisApproverOrSender();
+        Rec.MarkAllWhereUserisApproverOrSender();
     end;
 
     var
@@ -337,7 +337,7 @@ page 658 "Approval Entries"
 
     local procedure FormatField(ApprovalEntry: Record "Approval Entry"): Boolean
     begin
-        if Status in [Status::Created, Status::Open] then begin
+        if Rec.Status in [Rec.Status::Created, Rec.Status::Open] then begin
             if ApprovalEntry."Due Date" < Today then
                 exit(true);
 

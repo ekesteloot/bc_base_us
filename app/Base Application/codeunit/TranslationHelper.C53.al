@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using System.Globalization;
+using System.Reflection;
+
 codeunit 53 "Translation Helper"
 {
     // The codeunit is designed to clean the defined functions from codunit 43 (Language Management).

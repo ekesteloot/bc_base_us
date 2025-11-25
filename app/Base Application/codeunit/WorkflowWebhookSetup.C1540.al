@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Reflection;
+
 codeunit 1540 "Workflow Webhook Setup"
 {
 

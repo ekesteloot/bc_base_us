@@ -8,7 +8,7 @@ report 10409 "Bank Account - Reconcile"
     {
         dataitem("Bank Account"; "Bank Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Bank Acc. Posting Group", "Date Filter";
             column(PeriodBankAccDateFilte; 'Period: ' + BankAccDateFilter)
@@ -58,8 +58,8 @@ report 10409 "Bank Account - Reconcile"
             }
             dataitem(Withdrawals; "Bank Account Ledger Entry")
             {
-                DataItemLink = "Bank Account No." = FIELD("No.");
-                DataItemTableView = SORTING("Bank Account No.", "Posting Date");
+                DataItemLink = "Bank Account No." = field("No.");
+                DataItemTableView = sorting("Bank Account No.", "Posting Date");
                 column(Amount_Withdrawals; Amount)
                 {
                 }
@@ -95,8 +95,8 @@ report 10409 "Bank Account - Reconcile"
                 }
                 dataitem("Check Ledger Entry"; "Check Ledger Entry")
                 {
-                    DataItemLink = "Bank Account No." = FIELD("Bank Account No."), "Bank Account Ledger Entry No." = FIELD("Entry No.");
-                    DataItemTableView = SORTING("Bank Account No.", "Check Date") WHERE("Entry Status" = CONST(Posted));
+                    DataItemLink = "Bank Account No." = field("Bank Account No."), "Bank Account Ledger Entry No." = field("Entry No.");
+                    DataItemTableView = sorting("Bank Account No.", "Check Date") where("Entry Status" = const(Posted));
                     column(CheckNo_CheckLedgEntry; "Check No.")
                     {
                     }
@@ -154,8 +154,8 @@ report 10409 "Bank Account - Reconcile"
             }
             dataitem(Deposits; "Bank Account Ledger Entry")
             {
-                DataItemLink = "Bank Account No." = FIELD("No.");
-                DataItemTableView = SORTING("Bank Account No.", "Posting Date");
+                DataItemLink = "Bank Account No." = field("No.");
+                DataItemTableView = sorting("Bank Account No.", "Posting Date");
                 column(Amount_Deposits; Amount)
                 {
                 }
@@ -201,8 +201,8 @@ report 10409 "Bank Account - Reconcile"
             }
             dataitem(Adjustments; "Bank Account Ledger Entry")
             {
-                DataItemLink = "Bank Account No." = FIELD("No.");
-                DataItemTableView = SORTING("Bank Account No.", "Posting Date");
+                DataItemLink = "Bank Account No." = field("No.");
+                DataItemTableView = sorting("Bank Account No.", "Posting Date");
                 column(Amount_Adjustments; Amount)
                 {
                 }
@@ -247,7 +247,7 @@ report 10409 "Bank Account - Reconcile"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 MaxIteration = 1;
                 column(WithdrawAmount; WithdrawAmount)
                 {

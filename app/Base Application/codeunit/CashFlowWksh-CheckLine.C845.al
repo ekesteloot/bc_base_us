@@ -1,3 +1,7 @@
+namespace Microsoft.CashFlow.Worksheet;
+
+using Microsoft.CashFlow.Account;
+
 codeunit 845 "Cash Flow Wksh.- Check Line"
 {
 

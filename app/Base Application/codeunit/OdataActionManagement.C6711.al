@@ -1,3 +1,7 @@
+namespace System.Integration;
+
+using System;
+
 codeunit 6711 "OData Action Management"
 {
 

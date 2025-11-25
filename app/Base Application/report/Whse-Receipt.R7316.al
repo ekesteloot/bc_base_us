@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.InventoryMgt.Location;
+using System.Utilities;
+
 report 7316 "Whse. - Receipt"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Receipt/WhseReceipt.rdlc';
+    RDLCLayout = './WarehouseMgt/Document/WhseReceipt.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Receipt';
     UsageCategory = Documents;
@@ -10,14 +19,14 @@ report 7316 "Whse. - Receipt"
     {
         dataitem("Warehouse Receipt Header"; "Warehouse Receipt Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             column(No_WhseRcptHeader; "No.")
             {
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(CompanyName; COMPANYPROPERTY.DisplayName())
                 {
                 }
@@ -50,9 +59,9 @@ report 7316 "Whse. - Receipt"
                 }
                 dataitem("Warehouse Receipt Line"; "Warehouse Receipt Line")
                 {
-                    DataItemLink = "No." = FIELD("No.");
+                    DataItemLink = "No." = field("No.");
                     DataItemLinkReference = "Warehouse Receipt Header";
-                    DataItemTableView = SORTING("No.", "Line No.");
+                    DataItemTableView = sorting("No.", "Line No.");
                     column(ShelfNo_WhseRcptLine; "Shelf No.")
                     {
                         IncludeCaption = true;
@@ -110,7 +119,7 @@ report 7316 "Whse. - Receipt"
 
     requestpage
     {
-        Caption = 'Warehouse Posted Receipt';
+        Caption = 'Warehouse Receipt';
 
         layout
         {

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5053 "Contact Statistics"
 {
     Caption = 'Contact Statistics';

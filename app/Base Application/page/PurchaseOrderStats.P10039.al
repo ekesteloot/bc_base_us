@@ -17,7 +17,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalPurchLine[1].""Line Amount"""; TotalPurchLine[1]."Line Amount")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text002, false);
                     Caption = 'Amount';
@@ -27,7 +27,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalPurchLine[1].""Inv. Discount Amount"""; TotalPurchLine[1]."Inv. Discount Amount")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     Editable = false;
@@ -41,7 +41,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalAmount1[1]"; TotalAmount1[1])
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, false);
                     Caption = 'Total';
@@ -56,7 +56,7 @@ page 10039 "Purchase Order Stats."
                 field(TaxAmount; VATAmount[1])
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Tax Amount';
                     Editable = false;
@@ -65,7 +65,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalAmount2[1]"; TotalAmount2[1])
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, true);
                     Caption = 'Total Incl. Tax';
@@ -175,7 +175,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalPurchLine[2].""Line Amount"""; TotalPurchLine[2]."Line Amount")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text002, false);
                     Caption = 'Amount';
@@ -185,7 +185,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalPurchLine[2].""Inv. Discount Amount"""; TotalPurchLine[2]."Inv. Discount Amount")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     Editable = false;
@@ -199,7 +199,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalAmount1[2]"; TotalAmount1[2])
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, false);
                     Caption = 'Total';
@@ -214,7 +214,7 @@ page 10039 "Purchase Order Stats."
                 field("VATAmount[2]"; VATAmount[2])
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Tax Amount';
                     Editable = false;
@@ -223,7 +223,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalAmount2[2]"; TotalAmount2[2])
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, true);
                     Caption = 'Total Incl. Tax';
@@ -332,7 +332,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalPurchLine[3].""Line Amount"""; TotalPurchLine[3]."Line Amount")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text002, false);
                     Caption = 'Amount';
@@ -342,7 +342,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalPurchLine[3].""Inv. Discount Amount"""; TotalPurchLine[3]."Inv. Discount Amount")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     Editable = false;
@@ -351,7 +351,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalAmount1[3]"; TotalAmount1[3])
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, false);
                     Caption = 'Total';
@@ -361,7 +361,7 @@ page 10039 "Purchase Order Stats."
                 field("VATAmount[3]"; VATAmount[3])
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Tax Amount';
                     Editable = false;
@@ -370,7 +370,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalAmount2[3]"; TotalAmount2[3])
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, true);
                     Caption = 'Total Incl. Tax';
@@ -479,7 +479,7 @@ page 10039 "Purchase Order Stats."
                 field(PrepmtTotalAmount; PrepmtTotalAmount)
                 {
                     ApplicationArea = Prepayments;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text006, false);
 
@@ -491,7 +491,7 @@ page 10039 "Purchase Order Stats."
                 field(PrepmtVATAmount; PrepmtVATAmount)
                 {
                     ApplicationArea = Prepayments;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = Format(PrepmtVATAmountText);
                     Caption = 'Prepayment Amount Invoiced';
@@ -501,7 +501,7 @@ page 10039 "Purchase Order Stats."
                 field(PrepmtTotalAmount2; PrepmtTotalAmount2)
                 {
                     ApplicationArea = Prepayments;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text006, true);
                     Caption = 'Prepmt. Amount Invoiced';
@@ -511,7 +511,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalPurchLine[1].""Prepmt. Amt. Inv."""; TotalPurchLine[1]."Prepmt. Amt. Inv.")
                 {
                     ApplicationArea = Prepayments;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text007, false);
                     Editable = false;
@@ -526,7 +526,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalPurchLine[1].""Prepmt Amt Deducted"""; TotalPurchLine[1]."Prepmt Amt Deducted")
                 {
                     ApplicationArea = Prepayments;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text008, false);
                     Editable = false;
@@ -541,7 +541,7 @@ page 10039 "Purchase Order Stats."
                 field("TotalPurchLine[1].""Prepmt Amt to Deduct"""; TotalPurchLine[1]."Prepmt Amt to Deduct")
                 {
                     ApplicationArea = Prepayments;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text009, false);
                     Editable = false;
@@ -587,14 +587,14 @@ page 10039 "Purchase Order Stats."
         PrevPrintOrder: Integer;
         PrevTaxPercent: Decimal;
     begin
-        CurrPage.Caption(StrSubstNo(Text000, "Document Type"));
+        CurrPage.Caption(StrSubstNo(Text000, Rec."Document Type"));
 
-        if PrevNo = "No." then
+        if PrevNo = Rec."No." then
             exit;
-        PrevNo := "No.";
-        FilterGroup(2);
-        SetRange("No.", PrevNo);
-        FilterGroup(0);
+        PrevNo := Rec."No.";
+        Rec.FilterGroup(2);
+        Rec.SetRange("No.", PrevNo);
+        Rec.FilterGroup(0);
 
         Clear(PurchLine);
         Clear(TotalPurchLine);
@@ -622,24 +622,24 @@ page 10039 "Purchase Order Stats."
                 1:
                     begin
                         TempSalesTaxLine1.DeleteAll();
-                        SalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
+                        SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
                         SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine1);
                     end;
                 2:
                     begin
                         TempSalesTaxLine2.DeleteAll();
-                        SalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
+                        SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
                         SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine2);
                     end;
                 3:
                     begin
                         TempSalesTaxLine3.DeleteAll();
-                        SalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
+                        SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
                         SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine3);
                     end;
             end;
 
-            if Status = Status::Open then
+            if Rec.Status = Rec.Status::Open then
                 SalesTaxCalculate.DistTaxOverPurchLines(TempPurchLine);
             PurchPost.SumPurchLinesTemp(
               Rec, TempPurchLine, i - 1, TotalPurchLine[i], TotalPurchLineLCY[i],
@@ -687,13 +687,13 @@ page 10039 "Purchase Order Stats."
           Pct(TotalPurchLine[1]."Prepmt. Amt. Inv.", PrepmtTotalAmount);
         PrepmtDeductedPct :=
           Pct(TotalPurchLine[1]."Prepmt Amt Deducted", TotalPurchLine[1]."Prepmt. Amt. Inv.");
-        if "Prices Including VAT" then begin
+        if Rec."Prices Including VAT" then begin
             PrepmtTotalAmount2 := PrepmtTotalAmount;
             PrepmtTotalAmount := PrepmtTotalAmount + PrepmtVATAmount;
         end else
             PrepmtTotalAmount2 := PrepmtTotalAmount + PrepmtVATAmount;
 
-        if Vend.Get("Pay-to Vendor No.") then
+        if Vend.Get(Rec."Pay-to Vendor No.") then
             Vend.CalcFields("Balance (LCY)")
         else
             Clear(Vend);
@@ -710,13 +710,13 @@ page 10039 "Purchase Order Stats."
         PurchSetup.Get();
         NullTab := -1;
         AllowInvDisc :=
-          not (PurchSetup."Calc. Inv. Discount" and VendInvDiscRecExists("Invoice Disc. Code"));
+          not (PurchSetup."Calc. Inv. Discount" and VendInvDiscRecExists(Rec."Invoice Disc. Code"));
         AllowVATDifference :=
           PurchSetup."Allow VAT Difference" and
-          not ("Document Type" in ["Document Type"::Quote, "Document Type"::"Blanket Order"]);
-        VATLinesFormIsEditable := AllowVATDifference or AllowInvDisc or ("Tax Area Code" <> '');
+          not (Rec."Document Type" in [Rec."Document Type"::Quote, Rec."Document Type"::"Blanket Order"]);
+        VATLinesFormIsEditable := AllowVATDifference or AllowInvDisc or (Rec."Tax Area Code" <> '');
         CurrPage.Editable := VATLinesFormIsEditable;
-        TaxArea.Get("Tax Area Code");
+        TaxArea.Get(Rec."Tax Area Code");
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -787,26 +787,26 @@ page 10039 "Purchase Order Stats."
         TotalAmount1[IndexNo] :=
           TotalPurchLine[IndexNo]."Line Amount" - TotalPurchLine[IndexNo]."Inv. Discount Amount";
         VATAmount[IndexNo] := VATAmountLine.GetTotalTaxAmountFCY();
-        if "Prices Including VAT" then
+        if Rec."Prices Including VAT" then
             TotalAmount2[IndexNo] := TotalPurchLine[IndexNo].Amount
         else
             TotalAmount2[IndexNo] := TotalAmount1[IndexNo] + VATAmount[IndexNo];
 
-        if "Prices Including VAT" then
+        if Rec."Prices Including VAT" then
             TotalPurchLineLCY[IndexNo].Amount := TotalAmount2[IndexNo]
         else
             TotalPurchLineLCY[IndexNo].Amount := TotalAmount1[IndexNo];
-        if "Currency Code" <> '' then begin
-            if ("Document Type" in ["Document Type"::"Blanket Order", "Document Type"::Quote]) and
-               ("Posting Date" = 0D)
+        if Rec."Currency Code" <> '' then begin
+            if (Rec."Document Type" in [Rec."Document Type"::"Blanket Order", Rec."Document Type"::Quote]) and
+               (Rec."Posting Date" = 0D)
             then
                 UseDate := WorkDate
             else
-                UseDate := "Posting Date";
+                UseDate := Rec."Posting Date";
 
             TotalPurchLineLCY[IndexNo].Amount :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                UseDate, "Currency Code", TotalPurchLineLCY[IndexNo].Amount, "Currency Factor");
+                UseDate, Rec."Currency Code", TotalPurchLineLCY[IndexNo].Amount, Rec."Currency Factor");
         end;
     end;
 
@@ -834,7 +834,7 @@ page 10039 "Purchase Order Stats."
     begin
         case StatisticsTab of
             StatisticsTab::General, StatisticsTab::Invoicing:
-                if Status = Status::Open then begin
+                if Rec.Status = Rec.Status::Open then begin
                     if EnvironmentInfo.IsSaaS() then
                         VATLinesForm.Editable := VATLinesFormIsEditable
                     else
@@ -869,9 +869,9 @@ page 10039 "Purchase Order Stats."
             exit;
 
         if ModifiedIndexNo = 1 then
-            InvDiscBaseAmount := TempSalesTaxLine1.GetTotalInvDiscBaseAmount(false, "Currency Code")
+            InvDiscBaseAmount := TempSalesTaxLine1.GetTotalInvDiscBaseAmount(false, Rec."Currency Code")
         else
-            InvDiscBaseAmount := TempSalesTaxLine2.GetTotalInvDiscBaseAmount(false, "Currency Code");
+            InvDiscBaseAmount := TempSalesTaxLine2.GetTotalInvDiscBaseAmount(false, Rec."Currency Code");
 
         if InvDiscBaseAmount = 0 then
             Error(Text003, TempSalesTaxLine2.FieldCaption("Inv. Disc. Base Amount"));
@@ -902,30 +902,30 @@ page 10039 "Purchase Order Stats."
                 if (i = 1) or not PartialInvoicing then
                     if IndexNo[i] = 1 then begin
                         TempSalesTaxLine1.SetInvoiceDiscountAmount(
-                          "Inv. Discount Amount", "Currency Code", "Prices Including VAT", "VAT Base Discount %");
+                          "Inv. Discount Amount", "Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %");
                     end else
                         TempSalesTaxLine2.SetInvoiceDiscountAmount(
-                          "Inv. Discount Amount", "Currency Code", "Prices Including VAT", "VAT Base Discount %");
+                          "Inv. Discount Amount", "Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %");
 
                 if (i = 2) and PartialInvoicing then
                     if IndexNo[i] = 1 then begin
                         InvDiscBaseAmount := TempSalesTaxLine2.GetTotalInvDiscBaseAmount(false, "Currency Code");
                         if InvDiscBaseAmount = 0 then
                             TempSalesTaxLine1.SetInvoiceDiscountPercent(
-                              0, "Currency Code", "Prices Including VAT", false, "VAT Base Discount %")
+                              0, "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %")
                         else
                             TempSalesTaxLine1.SetInvoiceDiscountPercent(
                               100 * TempSalesTaxLine2.GetTotalInvDiscAmount() / InvDiscBaseAmount,
-                              "Currency Code", "Prices Including VAT", false, "VAT Base Discount %");
+                              "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %");
                     end else begin
                         InvDiscBaseAmount := TempSalesTaxLine1.GetTotalInvDiscBaseAmount(false, "Currency Code");
                         if InvDiscBaseAmount = 0 then
                             TempSalesTaxLine2.SetInvoiceDiscountPercent(
-                              0, "Currency Code", "Prices Including VAT", false, "VAT Base Discount %")
+                              0, "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %")
                         else
                             TempSalesTaxLine2.SetInvoiceDiscountPercent(
                               100 * TempSalesTaxLine1.GetTotalInvDiscAmount() / InvDiscBaseAmount,
-                              "Currency Code", "Prices Including VAT", false, "VAT Base Discount %");
+                              "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %");
                     end;
             end;
 
@@ -937,9 +937,9 @@ page 10039 "Purchase Order Stats."
         else
             VATLinesForm.SetTempTaxAmountLine(TempSalesTaxLine2);
 
-        "Invoice Discount Calculation" := "Invoice Discount Calculation"::Amount;
-        "Invoice Discount Value" := TotalPurchLine[1]."Inv. Discount Amount";
-        Modify();
+        Rec."Invoice Discount Calculation" := Rec."Invoice Discount Calculation"::Amount;
+        Rec."Invoice Discount Value" := TotalPurchLine[1]."Inv. Discount Amount";
+        Rec.Modify();
         UpdateTaxonPurchLines;
     end;
 
@@ -956,17 +956,17 @@ page 10039 "Purchase Order Stats."
           Pct(TotalPurchLine[1]."Prepmt. Amt. Inv.", PrepmtTotalAmount);
         PrepmtDeductedPct :=
           Pct(TotalPurchLine[1]."Prepmt Amt Deducted", TotalPurchLine[1]."Prepmt. Amt. Inv.");
-        if "Prices Including VAT" then begin
+        if Rec."Prices Including VAT" then begin
             PrepmtTotalAmount2 := PrepmtTotalAmount;
             PrepmtTotalAmount := PrepmtTotalAmount + PrepmtVATAmount;
         end else
             PrepmtTotalAmount2 := PrepmtTotalAmount + PrepmtVATAmount;
-        Modify();
+        Rec.Modify();
     end;
 
     local procedure GetCaptionClass(FieldCaption: Text[100]; ReverseCaption: Boolean): Text[80]
     begin
-        if "Prices Including VAT" xor ReverseCaption then
+        if Rec."Prices Including VAT" xor ReverseCaption then
             exit('2,1,' + FieldCaption);
 
         exit('2,0,' + FieldCaption);
@@ -979,8 +979,8 @@ page 10039 "Purchase Order Stats."
         GetVATSpecification(ActiveTab);
 
         PurchLine.Reset();
-        PurchLine.SetRange("Document Type", "Document Type");
-        PurchLine.SetRange("Document No.", "No.");
+        PurchLine.SetRange("Document Type", Rec."Document Type");
+        PurchLine.SetRange("Document No.", Rec."No.");
         PurchLine.FindFirst();
 
         if TempSalesTaxLine1.GetAnyLineModified() then begin
@@ -988,7 +988,7 @@ page 10039 "Purchase Order Stats."
             SalesTaxCalculate.PutSalesTaxAmountLineTable(
               TempSalesTaxLine1,
               "Sales Tax Document Area"::Purchase.AsInteger(),
-              "Document Type".AsInteger(), "No.");
+              Rec."Document Type".AsInteger(), Rec."No.");
             SalesTaxCalculate.DistTaxOverPurchLines(PurchLine);
             SalesTaxCalculate.SaveTaxDifferences();
         end;
@@ -997,7 +997,7 @@ page 10039 "Purchase Order Stats."
             SalesTaxCalculate.PutSalesTaxAmountLineTable(
               TempSalesTaxLine2,
               "Sales Tax Document Area"::Purchase.AsInteger(),
-              "Document Type".AsInteger(), "No.");
+              Rec."Document Type".AsInteger(), Rec."No.");
             SalesTaxCalculate.DistTaxOverPurchLines(PurchLine);
             SalesTaxCalculate.SaveTaxDifferences();
         end;
@@ -1019,7 +1019,7 @@ page 10039 "Purchase Order Stats."
         if not AllowInvDisc then
             Error(
               Text005,
-              VendInvDisc.TableCaption(), FieldCaption("Invoice Disc. Code"), "Invoice Disc. Code");
+              VendInvDisc.TableCaption(), Rec.FieldCaption("Invoice Disc. Code"), Rec."Invoice Disc. Code");
     end;
 
     local procedure Pct(Numerator: Decimal; Denominator: Decimal): Decimal
@@ -1034,8 +1034,8 @@ page 10039 "Purchase Order Stats."
         Clear(VATLinesForm);
         VATLinesForm.SetTempTaxAmountLine(VATLinesToDrillDown);
         VATLinesForm.InitGlobals(
-          "Currency Code", AllowVATDifference, AllowVATDifference and ThisTabAllowsVATEditing,
-          "Prices Including VAT", AllowInvDisc, "VAT Base Discount %");
+          Rec."Currency Code", AllowVATDifference, AllowVATDifference and ThisTabAllowsVATEditing,
+          Rec."Prices Including VAT", AllowInvDisc, Rec."VAT Base Discount %");
         SetEditableForVATLinesForm(ActiveTab);
         VATLinesForm.RunModal();
         VATLinesForm.GetTempTaxAmountLine(VATLinesToDrillDown);

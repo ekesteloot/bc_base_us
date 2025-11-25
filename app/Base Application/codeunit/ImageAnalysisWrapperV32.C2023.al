@@ -1,3 +1,11 @@
+﻿namespace System.AI;
+
+using System;
+using System.Date;
+using System.Environment;
+using System.IO;
+using System.Utilities;
+
 codeunit 2023 "Image Analysis Wrapper V3.2" implements "Image Analysis Provider"
 {
     Access = Internal;
@@ -28,55 +36,17 @@ codeunit 2023 "Image Analysis Wrapper V3.2" implements "Image Analysis Provider"
     [TryFunction]
     local procedure TryInvokeAnalysisInternal(var JSONManagement: Codeunit "JSON Management"; BaseUrl: Text; ImageAnalysisKey: Text; ImagePath: Text; ImageAnalysisTypes: List of [Enum "Image Analysis Type"]; LanguageId: Integer)
     var
-        FileManagement: Codeunit "File Management";
-        File: DotNet File;
-        FileStream: DotNet FileStream;
-        JsonResult: DotNet JObject;
-        MessageText: Text;
         PostUrl: Text;
         Language: Text[10];
-        HttpResponseMessage: HttpResponseMessage;
         HttpRequestMessage: HttpRequestMessage;
-        ContentHttpHeaders: HttpHeaders;
-        HttpHeaders: HttpHeaders;
-        RequestHttpContent: HttpContent;
-        ResponseHttpContent: HttpContent;
-        HttpClient: HttpClient;
-        HttpContentText: Text;
     begin
         If not TryGetImageAnalysisUserLanguage(LanguageId, Language, ImageAnalysisTypes) then
             Error(UnsupportedLanguageErr);
 
-        HttpRequestMessage.Method('POST');
         PostUrl := BuildUri(BaseUrl, Language, ImageAnalysisTypes);
-        HttpRequestMessage.SetRequestUri(PostUrl);
-
-        HttpRequestMessage.GetHeaders(HttpHeaders);
-        HttpHeaders.Add('Accept', 'application/json');
-        HttpHeaders.Add('Ocp-Apim-Subscription-Key', ImageAnalysisKey);
-
-        FileManagement.IsAllowedPath(ImagePath, false);
-        FileStream := File.OpenRead(ImagePath);
-        RequestHttpContent.WriteFrom(FileStream);
-        HttpRequestMessage.Content := RequestHttpContent;
-        HttpRequestMessage.Content.GetHeaders(ContentHttpHeaders);
-        ContentHttpHeaders.Remove('Content-Type');
-        ContentHttpHeaders.Add('Content-Type', 'application/octet-stream');
-
-        HttpClient.Send(HttpRequestMessage, HttpResponseMessage);
-
-        ResponseHttpContent := HttpResponseMessage.Content;
-        ResponseHttpContent.ReadAs(HttpContentText);
-        JSONManagement.InitializeObject(HttpContentText);
-
-        FileStream.Dispose();
-
-        if not HttpResponseMessage.IsSuccessStatusCode then begin
-            JSONManagement.GetJSONObject(JsonResult);
-            JSONManagement.GetStringPropertyValueFromJObjectByName(JsonResult, 'message', MessageText);
-            LastError := StrSubstNo(CognitiveServicesErr, ComputerVisionApiTxt, MessageText, HttpResponseMessage.HttpStatusCode);
-            Error('');
-        end;
+        PrepareRequest(HttpRequestMessage, PostUrl, ImageAnalysisKey);
+        AddContent(HttpRequestMessage, ImagePath);
+        SendRequest(HttpRequestMessage, JSONManagement);
 
         LogCorrelationToTelemetry(JSONManagement);
     end;
@@ -148,6 +118,74 @@ codeunit 2023 "Image Analysis Wrapper V3.2" implements "Image Analysis Provider"
         UriBuilder.AddQueryParameter(VisualFeaturesQueryParameterTxt, ImageAnalysisManagement.ToCommaSeparatedList(ImageAnalysisTypes));
         UriBuilder.GetUri(Uri);
         exit(Uri.GetAbsoluteUri());
+    end;
+
+    [NonDebuggable]
+    local procedure PrepareRequest(var HttpRequestMsg: HttpRequestMessage; PostUrl: Text; ImageAnalysisKey: Text)
+    var
+        HttpHeaders: HttpHeaders;
+    begin
+        HttpRequestMsg.Method('POST');
+        HttpRequestMsg.SetRequestUri(PostUrl);
+
+        HttpRequestMsg.GetHeaders(HttpHeaders);
+        HttpHeaders.Add('Accept', 'application/json');
+        HttpHeaders.Add('Ocp-Apim-Subscription-Key', ImageAnalysisKey);
+    end;
+
+    [NonDebuggable]
+    local procedure AddContent(var HttpRequestMsg: HttpRequestMessage; ImagePath: Text)
+    var
+        FileManagement: Codeunit "File Management";
+        File: DotNet File;
+        FileStream: DotNet FileStream;
+        RequestHttpContent: HttpContent;
+        ContentHttpHeaders: HttpHeaders;
+    begin
+        FileManagement.IsAllowedPath(ImagePath, false);
+        FileStream := File.OpenRead(ImagePath);
+        RequestHttpContent.WriteFrom(FileStream);
+        HttpRequestMsg.Content := RequestHttpContent;
+        HttpRequestMsg.Content.GetHeaders(ContentHttpHeaders);
+        ContentHttpHeaders.Remove('Content-Type');
+        ContentHttpHeaders.Add('Content-Type', 'application/octet-stream');
+
+        FileStream.Dispose();
+    end;
+
+    [NonDebuggable]
+    local procedure SendRequest(HttpRequestMsg: HttpRequestMessage; var JSONManagement: Codeunit "JSON Management")
+    var
+        ImageAnalysisManagement: Codeunit "Image Analysis Management";
+        JsonResult: DotNet JObject;
+        HttpResponseMessage: HttpResponseMessage;
+        ResponseHttpContent: HttpContent;
+        HttpClient: HttpClient;
+        HttpStatusCode: Integer;
+        Handled: Boolean;
+        HttpContentText: Text;
+        MessageText: Text;
+        IsSuccessStatusCode: Boolean;
+    begin
+        ImageAnalysisManagement.OnBeforeSendImageAnalysisRequest(HttpRequestMsg.Content(), HttpRequestMsg.GetRequestUri(), HttpStatusCode, HttpContentText, Handled);
+        if Handled then
+            IsSuccessStatusCode := HttpStatusCode = 200
+        else begin
+            HttpClient.Send(HttpRequestMsg, HttpResponseMessage);
+            HttpStatusCode := HttpResponseMessage.HttpStatusCode;
+            IsSuccessStatusCode := HttpResponseMessage.IsSuccessStatusCode();
+            ResponseHttpContent := HttpResponseMessage.Content;
+            ResponseHttpContent.ReadAs(HttpContentText);
+        end;
+
+        JSONManagement.InitializeObject(HttpContentText);
+
+        if not IsSuccessStatusCode then begin
+            JSONManagement.GetJSONObject(JsonResult);
+            JSONManagement.GetStringPropertyValueFromJObjectByName(JsonResult, 'message', MessageText);
+            LastError := StrSubstNo(CognitiveServicesErr, ComputerVisionApiTxt, MessageText, HttpStatusCode);
+            Error('');
+        end;
     end;
 
     procedure IsLanguageSupported(AnalysisTypes: List of [Enum "Image Analysis Type"]; LanguageId: Integer): Boolean

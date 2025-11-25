@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 1509 "WF Event/Response Combination"
 {
     Caption = 'WF Event/Response Combination';
@@ -14,9 +16,9 @@ table 1509 "WF Event/Response Combination"
         field(2; "Function Name"; Code[128])
         {
             Caption = 'Function Name';
-            TableRelation = IF (Type = CONST(Event)) "Workflow Event"
-            ELSE
-            IF (Type = CONST(Response)) "Workflow Response";
+            TableRelation = if (Type = const(Event)) "Workflow Event"
+            else
+            if (Type = const(Response)) "Workflow Response";
         }
         field(3; "Predecessor Type"; Option)
         {
@@ -27,9 +29,9 @@ table 1509 "WF Event/Response Combination"
         field(4; "Predecessor Function Name"; Code[128])
         {
             Caption = 'Predecessor Function Name';
-            TableRelation = IF ("Predecessor Type" = CONST(Event)) "Workflow Event"
-            ELSE
-            IF ("Predecessor Type" = CONST(Response)) "Workflow Response";
+            TableRelation = if ("Predecessor Type" = const(Event)) "Workflow Event"
+            else
+            if ("Predecessor Type" = const(Response)) "Workflow Response";
         }
     }
 

@@ -1,6 +1,17 @@
-﻿codeunit 432 Consolidate
+﻿namespace Microsoft.FinancialMgt.Consolidation;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+
+codeunit 432 Consolidate
 {
-    Permissions = TableData "G/L Entry" = rimd;
+    Permissions = TableData "G/L Entry" = rimd,
+                    tabledata "Analysis View" = r;
     TableNo = "Business Unit";
 
     trigger OnRun()
@@ -13,22 +24,22 @@
         OnBeforeOnRun(Rec);
 
         BusUnit := Rec;
-        if NormalDate(EndingDate) - NormalDate(StartingDate) + 1 > ArrayLen(RoundingResiduals) then
+        if not ValidateMaxNumberOfDaysInConsolidation(StartingDate, EndingDate) then
             ReportError(StrSubstNo(Text008, ArrayLen(RoundingResiduals)));
 
-        if ("Starting Date" <> 0D) or ("Ending Date" <> 0D) then begin
-            if "Starting Date" = 0D then
+        if (Rec."Starting Date" <> 0D) or (Rec."Ending Date" <> 0D) then begin
+            if Rec."Starting Date" = 0D then
                 ReportError(StrSubstNo(
-                    Text033, FieldCaption("Starting Date"),
-                    FieldCaption("Ending Date"), "Company Name"));
-            if "Ending Date" = 0D then
+                    Text033, Rec.FieldCaption("Starting Date"),
+                    Rec.FieldCaption("Ending Date"), Rec."Company Name"));
+            if Rec."Ending Date" = 0D then
                 ReportError(StrSubstNo(
-                    Text033, FieldCaption("Ending Date"),
-                    FieldCaption("Starting Date"), "Company Name"));
-            if "Starting Date" > "Ending Date" then
+                    Text033, Rec.FieldCaption("Ending Date"),
+                    Rec.FieldCaption("Starting Date"), Rec."Company Name"));
+            if Rec."Starting Date" > Rec."Ending Date" then
                 ReportError(StrSubstNo(
-                    Text032, FieldCaption("Starting Date"),
-                    FieldCaption("Ending Date"), "Company Name"));
+                    Text032, Rec.FieldCaption("Starting Date"),
+                    Rec.FieldCaption("Ending Date"), Rec."Company Name"));
         end;
 
         ConsolidatingClosingDate :=
@@ -56,8 +67,8 @@
             ClearPreviousConsolidation();
         end;
 
-        if ("Last Balance Currency Factor" <> 0) and
-           ("Balance Currency Factor" <> "Last Balance Currency Factor")
+        if (Rec."Last Balance Currency Factor" <> 0) and
+           (Rec."Balance Currency Factor" <> Rec."Last Balance Currency Factor")
         then begin
             UpdatePhase(Text019);
             UpdatePriorPeriodBalances();
@@ -276,6 +287,16 @@
         end;
 
         ShowAnalysisViewEntryMessage();
+    end;
+
+    internal procedure ValidateMaxNumberOfDaysInConsolidation(StartDate: Date; EndDate: Date): Boolean
+    begin
+        exit(NormalDate(EndDate) - NormalDate(StartDate) + 1 <= MaxNumberOfDaysInConsolidation());
+    end;
+
+    internal procedure MaxNumberOfDaysInConsolidation(): Integer
+    begin
+        exit(ArrayLen(RoundingResiduals));
     end;
 
     var
@@ -1430,6 +1451,16 @@
         TempGLEntry.Reset();
         TempGLEntry.DeleteAll();
         TempSubsidGLEntry.SetRange("G/L Account No.", TempSubsidGLAcc."No.");
+    end;
+
+    internal procedure GetGLAccounts(var TempGLAccount: Record "G/L Account" temporary)
+    begin
+        if not TempSubsidGLAcc.FindSet() then
+            exit;
+        repeat
+            TempGLAccount.TransferFields(TempSubsidGLAcc);
+            TempGLAccount.Insert();
+        until TempSubsidGLAcc.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]

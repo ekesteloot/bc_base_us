@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 468 "Workflow Webhook Notification"
 {
     Caption = 'Workflow Webhook Notification';

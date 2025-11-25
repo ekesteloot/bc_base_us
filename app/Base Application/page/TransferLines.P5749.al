@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
 page 5749 "Transfer Lines"
 {
     Caption = 'Transfer Lines';
@@ -90,7 +92,7 @@ page 5749 "Transfer Lines"
                     var
                         TransferHeader: Record "Transfer Header";
                     begin
-                        TransferHeader.Get("Document No.");
+                        TransferHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Transfer Order", TransferHeader);
                     end;
                 }

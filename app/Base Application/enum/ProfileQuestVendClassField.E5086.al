@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 enum 5086 "Profile Quest. Vend. Class. Field"
 {
     Extensible = true;

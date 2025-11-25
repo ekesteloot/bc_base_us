@@ -1,3 +1,9 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Vendor;
+
 page 149 "Vendor Posting Group Card"
 {
     Caption = 'Vendor Posting Group Card';
@@ -11,7 +17,7 @@ page 149 "Vendor Posting Group Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an identifier for the vendor posting group.';
@@ -112,7 +118,7 @@ page 149 "Vendor Posting Group Card"
 
     trigger OnOpenPage()
     begin
-        SetAccountVisibility(PmtToleranceVisible, PmtDiscountVisible, InvRoundingVisible, ApplnRoundingVisible);
+        Rec.SetAccountVisibility(PmtToleranceVisible, PmtDiscountVisible, InvRoundingVisible, ApplnRoundingVisible);
     end;
 
     var

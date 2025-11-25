@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Foundation.Company;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Security.User;
+using System.Utilities;
+
 page 357 Companies
 {
     ApplicationArea = Basic, Suite;
@@ -27,8 +34,8 @@ page 357 Companies
 
                         if (CompanyNameVar <> xRec.Name) and (xRec.Name <> '') then
                             if SoftwareAsAService then
-                                Error(RenameNotAllowedErr, FieldCaption("Display Name"));
-                        Validate(Name, CompanyNameVar);
+                                Error(RenameNotAllowedErr, Rec.FieldCaption("Display Name"));
+                        Rec.Validate(Name, CompanyNameVar);
                     end;
 
                 }
@@ -56,7 +63,7 @@ page 357 Companies
                     var
                         AssistedCompanySetupStatus: Record "Assisted Company Setup Status";
                     begin
-                        AssistedCompanySetupStatus.SetEnabled(Name, EnableAssistedCompanySetup, false);
+                        AssistedCompanySetupStatus.SetEnabled(Rec.Name, EnableAssistedCompanySetup, false);
                     end;
                 }
                 field(SetupStatus; SetupStatus)
@@ -70,7 +77,7 @@ page 357 Companies
                     var
                         AssistedCompanySetupStatus: Record "Assisted Company Setup Status";
                     begin
-                        AssistedCompanySetupStatus.DrillDownSetupStatus(Name);
+                        AssistedCompanySetupStatus.DrillDownSetupStatus(Rec.Name);
                     end;
                 }
                 field(CompanyCreatedDateTime; CompanyCreatedDateTime)
@@ -177,16 +184,16 @@ page 357 Companies
     begin
         EnableAssistedCompanySetup := false;
         SetupStatus := SetupStatus::" ";
-        CompanyNameVar := CopyStr(Name, 1, MaxStrLen(CompanyNameVar));
+        CompanyNameVar := CopyStr(Rec.Name, 1, MaxStrLen(CompanyNameVar));
         PageInEditmode := CurrPage.Editable;
         if ApplicationAreaMgmt.IsAdvancedExperienceEnabled() then
             CompanyCreatedDateTime := GetCompanyCreatedDateTime();
 
-        if not AssistedCompanySetupStatus.Get(Name) then
+        if not AssistedCompanySetupStatus.Get(Rec.Name) then
             exit;
 
         EnableAssistedCompanySetup := AssistedCompanySetupStatus.Enabled;
-        SetupStatus := AssistedCompanySetupStatus.GetCompanySetupStatusValue(Name);
+        SetupStatus := AssistedCompanySetupStatus.GetCompanySetupStatusValue(Rec.Name);
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -195,7 +202,7 @@ page 357 Companies
         CompanyInformationMgt: Codeunit "Company Information Mgt.";
     begin
         OnBeforeDeleteRecord(Rec);
-        if SoftwareAsAService and (Count = 1) then begin
+        if SoftwareAsAService and (Rec.Count = 1) then begin
             Message(DeleteLastCompanyMsg);
             Error('');
         end;
@@ -258,7 +265,7 @@ page 357 Companies
     var
         CompanyInformation: Record "Company Information";
     begin
-        if CompanyInformation.ChangeCompany(Name) then
+        if CompanyInformation.ChangeCompany(Rec.Name) then
             if CompanyInformation.ReadPermission then
                 if CompanyInformation.Get() then
                     exit(CompanyInformation."Created DateTime");

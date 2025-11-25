@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Setup;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+
 page 462 "Resources Setup"
 {
     AccessByPermission = TableData Resource = R;
@@ -69,10 +73,10 @@ page 462 "Resources Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

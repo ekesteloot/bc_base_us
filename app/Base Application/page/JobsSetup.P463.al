@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.Setup;
+
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Jobs.Job;
+
 page 463 "Jobs Setup"
 {
     AccessByPermission = TableData Job = R;
@@ -32,7 +37,6 @@ page 463 "Jobs Setup"
                     ApplicationArea = Jobs;
                     Caption = 'Allow Budget/Billable Lines Def';
                     ToolTip = 'Specifies whether job lines can be of type Both Budget and Billable by default. Select this check box if you want to apply this setting to all new jobs that you create.';
-                    Visible = JobSimplificationAvailable;
                 }
                 field("Default WIP Method"; Rec."Default WIP Method")
                 {
@@ -54,7 +58,6 @@ page 463 "Jobs Setup"
                     ApplicationArea = Jobs;
                     Importance = Additional;
                     ToolTip = 'Specifies the position of your company logo on business letters and documents.';
-                    Visible = JobSimplificationAvailable;
                 }
                 field("Document No. Is Job No."; Rec."Document No. Is Job No.")
                 {
@@ -117,27 +120,19 @@ page 463 "Jobs Setup"
     {
     }
 
-    trigger OnInit()
-    var
-        Job: Record Job;
-    begin
-        JobSimplificationAvailable := Job.IsJobSimplificationAvailable();
-    end;
-
     trigger OnOpenPage()
     var
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
         ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
     end;
 
     var
         ExtendedPriceEnabled: Boolean;
-        JobSimplificationAvailable: Boolean;
 }
 

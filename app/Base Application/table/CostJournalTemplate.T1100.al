@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Journal;
+
+using Microsoft.CostAccounting.Reports;
+using System.Reflection;
+
 table 1100 "Cost Journal Template"
 {
     Caption = 'Cost Journal Template';
@@ -30,12 +35,12 @@ table 1100 "Cost Journal Template"
         field(7; "Posting Report ID"; Integer)
         {
             Caption = 'Posting Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(8; "Posting Report Caption"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Posting Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Posting Report ID")));
             Caption = 'Posting Report Caption';
             Editable = false;
             FieldClass = FlowField;

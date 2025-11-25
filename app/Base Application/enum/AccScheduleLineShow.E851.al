@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
 enum 851 "Acc. Schedule Line Show"
 {
     Extensible = true;

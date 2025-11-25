@@ -1,3 +1,9 @@
+﻿namespace System.IO;
+
+using System;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 491 "Memory Mapped File"
 {
 

@@ -1,4 +1,20 @@
-﻿table 5200 Employee
+﻿namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.BankMgt.Setup;
+using Microsoft.CostAccounting.Account;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Comment;
+using Microsoft.HumanResources.Payables;
+using Microsoft.HumanResources.Setup;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ProjectMgt.Resources.Setup;
+using System.Email;
+
+table 5200 Employee
 {
     Caption = 'Employee';
     DataCaptionFields = "No.", "First Name", "Middle Name", "Last Name";
@@ -67,11 +83,9 @@
         field(10; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -92,11 +106,9 @@
         field(11; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -144,7 +156,7 @@
         field(16; "Alt. Address Code"; Code[10])
         {
             Caption = 'Alt. Address Code';
-            TableRelation = "Alternative Address".Code WHERE("Employee No." = FIELD("No."));
+            TableRelation = "Alternative Address".Code where("Employee No." = field("No."));
         }
         field(17; "Alt. Address Start Date"; Date)
         {
@@ -248,30 +260,30 @@
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(37; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(38; "Resource No."; Code[20])
         {
             Caption = 'Resource No.';
-            TableRelation = Resource WHERE(Type = CONST(Person));
+            TableRelation = Resource where(Type = const(Person));
 
             trigger OnValidate()
             begin
@@ -283,8 +295,8 @@
         }
         field(39; Comment; Boolean)
         {
-            CalcFormula = Exist("Human Resource Comment Line" WHERE("Table Name" = CONST(Employee),
-                                                                     "No." = FIELD("No.")));
+            CalcFormula = exist("Human Resource Comment Line" where("Table Name" = const(Employee),
+                                                                     "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -304,14 +316,14 @@
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(43; "Global Dimension 2 Filter"; Code[20])
         {
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(44; "Cause of Absence Filter"; Code[10])
         {
@@ -321,9 +333,9 @@
         }
         field(45; "Total Absence (Base)"; Decimal)
         {
-            CalcFormula = Sum("Employee Absence"."Quantity (Base)" WHERE("Employee No." = FIELD("No."),
-                                                                          "Cause of Absence Code" = FIELD("Cause of Absence Filter"),
-                                                                          "From Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Employee Absence"."Quantity (Base)" where("Employee No." = field("No."),
+                                                                          "Cause of Absence Code" = field("Cause of Absence Filter"),
+                                                                          "From Date" = field("Date Filter")));
             Caption = 'Total Absence (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -406,10 +418,10 @@
         field(59; Balance; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Employee Ledger Entry".Amount WHERE("Employee No." = FIELD("No."),
-                                                                              "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                              "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                              "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Detailed Employee Ledger Entry".Amount where("Employee No." = field("No."),
+                                                                              "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                              "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                              "Posting Date" = field("Date Filter")));
             Caption = 'Balance';
             Editable = false;
             FieldClass = FlowField;

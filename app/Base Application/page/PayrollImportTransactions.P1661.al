@@ -86,29 +86,29 @@ page 1661 "Payroll Import Transactions"
                             TempImportGLTransaction: Record "Import G/L Transaction" temporary;
                             ImportGLTransaction: Record "Import G/L Transaction";
                         begin
-                            if "G/L Account" <> '' then begin
-                                ImportGLTransaction.SetRange("App ID", "App ID");
-                                ImportGLTransaction.SetRange("External Account", "External Account");
-                                ImportGLTransaction.SetRange("G/L Account", "G/L Account");
+                            if Rec."G/L Account" <> '' then begin
+                                ImportGLTransaction.SetRange("App ID", Rec."App ID");
+                                ImportGLTransaction.SetRange("External Account", Rec."External Account");
+                                ImportGLTransaction.SetRange("G/L Account", Rec."G/L Account");
                                 if ImportGLTransaction.IsEmpty() then begin
-                                    ImportGLTransaction."App ID" := "App ID";
-                                    ImportGLTransaction."G/L Account" := "G/L Account";
-                                    ImportGLTransaction."External Account" := "External Account";
+                                    ImportGLTransaction."App ID" := Rec."App ID";
+                                    ImportGLTransaction."G/L Account" := Rec."G/L Account";
+                                    ImportGLTransaction."External Account" := Rec."External Account";
                                     ImportGLTransaction.Insert();
                                 end
                             end else
                                 if xRec."G/L Account" <> '' then begin
-                                    ImportGLTransaction.SetRange("App ID", "App ID");
-                                    ImportGLTransaction.SetRange("External Account", "External Account");
+                                    ImportGLTransaction.SetRange("App ID", Rec."App ID");
+                                    ImportGLTransaction.SetRange("External Account", Rec."External Account");
                                     ImportGLTransaction.SetRange("G/L Account", xRec."G/L Account");
                                     ImportGLTransaction.DeleteAll();
                                 end;
                             TempImportGLTransaction := Rec;
-                            SetRange("External Account", "External Account");
-                            ModifyAll("G/L Account", "G/L Account");
-                            SetRange("External Account");
+                            Rec.SetRange("External Account", Rec."External Account");
+                            Rec.ModifyAll("G/L Account", Rec."G/L Account");
+                            Rec.SetRange("External Account");
                             Rec := TempImportGLTransaction;
-                            Find();
+                            Rec.Find();
                         end;
                     }
                     field("G/L Account Name"; Rec."G/L Account Name")
@@ -177,7 +177,7 @@ page 1661 "Payroll Import Transactions"
                 begin
                     NextStep(true);
                     if Step = 0 then
-                        DeleteAll();
+                        Rec.DeleteAll();
                 end;
             }
             action(ActionNext)
@@ -197,10 +197,10 @@ page 1661 "Payroll Import Transactions"
                                 if TempImportGLTransaction.FindSet() then
                                     repeat
                                         Rec := TempImportGLTransaction;
-                                        Insert();
+                                        Rec.Insert();
                                     until TempImportGLTransaction.Next() = 0;
-                                if FindFirst() then begin
-                                    SetCurrentKey("Entry No.");
+                                if Rec.FindFirst() then begin
+                                    Rec.SetCurrentKey("Entry No.");
                                     NextStep(false);
                                 end;
                             end;
@@ -264,7 +264,7 @@ page 1661 "Payroll Import Transactions"
     begin
         Step := Step::Start;
         EnableControls();
-        SetCurrentKey("Entry No.");
+        Rec.SetCurrentKey("Entry No.");
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -329,7 +329,7 @@ page 1661 "Payroll Import Transactions"
         if NewGenJournalLine.FindLast() then
             NextLinieNo := NewGenJournalLine."Line No.";
 
-        if FindSet() then begin
+        if Rec.FindSet() then begin
             repeat
                 NewGenJournalLine.Init();
                 NewGenJournalLine."Journal Template Name" := GenJournalLine."Journal Template Name";
@@ -339,12 +339,12 @@ page 1661 "Payroll Import Transactions"
                 NewGenJournalLine.Insert();
                 NewGenJournalLine.SetUpNewLine(GenJournalLine, 0, false);
                 NewGenJournalLine.Validate("Account Type", NewGenJournalLine."Account Type"::"G/L Account");
-                NewGenJournalLine.Validate("Account No.", "G/L Account");
-                NewGenJournalLine.Validate("Posting Date", "Transaction Date");
-                NewGenJournalLine.Validate(Amount, Amount);
-                NewGenJournalLine.Validate(Description, Description);
+                NewGenJournalLine.Validate("Account No.", Rec."G/L Account");
+                NewGenJournalLine.Validate("Posting Date", Rec."Transaction Date");
+                NewGenJournalLine.Validate(Amount, Rec.Amount);
+                NewGenJournalLine.Validate(Description, Rec.Description);
                 NewGenJournalLine.Modify();
-            until Next() = 0;
+            until Rec.Next() = 0;
 
             GenJournalLine := NewGenJournalLine;
             GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"Payroll Import Transactions");
@@ -430,16 +430,16 @@ page 1661 "Payroll Import Transactions"
         ImportGLTransaction: Record "Import G/L Transaction";
         TempImportGLTransaction: Record "Import G/L Transaction" temporary;
     begin
-        ImportGLTransaction.SetRange("App ID", "App ID");
+        ImportGLTransaction.SetRange("App ID", Rec."App ID");
         if ImportGLTransaction.FindFirst() then
             if Confirm(ResetLinksQst) then begin
                 ImportGLTransaction.DeleteAll();
                 TempImportGLTransaction := Rec;
-                if FindSet() then
+                if Rec.FindSet() then
                     repeat
-                        "G/L Account" := '';
-                        Modify();
-                    until Next() = 0;
+                        Rec."G/L Account" := '';
+                        Rec.Modify();
+                    until Rec.Next() = 0;
                 Rec := TempImportGLTransaction;
                 CurrPage.Update();
             end;

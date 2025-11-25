@@ -1,4 +1,15 @@
-﻿codeunit 1206 "Pmt Export Mgt Gen. Jnl Line"
+﻿namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.IO;
+
+codeunit 1206 "Pmt Export Mgt Gen. Jnl Line"
 {
     Permissions = TableData "Vendor Ledger Entry" = rm,
                   TableData "Gen. Journal Line" = rm,

@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Request;
+
 enum 7310 "Warehouse Destination Type"
 {
     Extensible = true;

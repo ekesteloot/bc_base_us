@@ -80,8 +80,8 @@
         SkipWarningNotification: Boolean;
         SkipOldInvoiceDesc: Boolean;
         IsBlockedErr: Label '%1 %2 is blocked.', Comment = '%1 - type of entity, e.g. Item; %2 - entity''s No.';
-        IsSalesBlockedItemErr: Label 'You cannot sell item %1 because the Sales Blocked check box is selected on the item card.', Comment = '%1 - Item No.';
-        IsPurchBlockedItemErr: Label 'You cannot purchase item %1 because the Purchasing Blocked check box is selected on the item card.', Comment = '%1 - Item No.';
+        IsSalesBlockedItemErr: Label 'You cannot sell %1 %2 because the %3 check box is selected on the %1 card.', Comment = '%1 - Table Caption (item/variant), %2 - Entity Code, %3 - Field Caption';
+        IsPurchBlockedItemErr: Label 'You cannot purchase %1 %2 because the %3 check box is selected on the %1 card.', Comment = '%1 - Table Caption (item/variant), %2 - Entity Code, %3 - Field Caption';
         FAIsInactiveErr: Label 'Fixed asset %1 is inactive.', Comment = '%1 - fixed asset no.';
         DirectPostingErr: Label 'G/L account %1 does not allow direct posting.', Comment = '%1 - g/l account no.';
         SalesErrorContextMsg: Label 'Copying sales document %1', Comment = '%1 - document no.';
@@ -1500,7 +1500,7 @@
         if not CopyThisLine then
             exit(false);
 
-        if IsEntityBlocked(Database::"Sales Line", ToSalesHeader.IsCreditDocType(), FromSalesLine.Type.AsInteger(), FromSalesLine."No.") then begin
+        if IsEntityBlocked(Database::"Sales Line", ToSalesHeader.IsCreditDocType(), FromSalesLine.Type.AsInteger(), FromSalesLine."No.", FromSalesLine."Variant Code") then begin
             LinesNotCopied := LinesNotCopied + 1;
             exit(false);
         end;
@@ -1909,7 +1909,7 @@
         then
             exit(false);
 
-        if IsEntityBlocked(Database::"Purchase Line", ToPurchHeader.IsCreditDocType(), FromPurchLine.Type.AsInteger(), FromPurchLine."No.") then begin
+        if IsEntityBlocked(Database::"Purchase Line", ToPurchHeader.IsCreditDocType(), FromPurchLine.Type.AsInteger(), FromPurchLine."No.", FromPurchLine."Variant Code") then begin
             LinesNotCopied := LinesNotCopied + 1;
             exit(false);
         end;
@@ -1970,7 +1970,7 @@
         end;
 
         IsHandled := false;
-        OnCopyPurchDocLineOnBeforeCopyThisLine(ToPurchLine, FromPurchLine, MoveNegLines, FromPurchDocType, LinesNotCopied, CopyThisLine, Result, IsHandled, ToPurchHeader, RecalculateLines);
+        OnCopyPurchDocLineOnBeforeCopyThisLine(ToPurchLine, FromPurchLine, MoveNegLines, FromPurchDocType, LinesNotCopied, CopyThisLine, Result, IsHandled, ToPurchHeader);
         if IsHandled then
             exit(Result);
 
@@ -2565,7 +2565,7 @@
                 OnCheckCopyFromSalesHeaderAvailOnAfterSetFilters(FromSalesLine, FromSalesHeader, ToSalesHeader);
                 if FromSalesLine.FindSet() then
                     repeat
-                        if not IsItemBlocked(FromSalesLine."No.") then begin
+                        if not IsItemOrVariantBlocked(FromSalesLine."No.", FromSalesLine."Variant Code") then begin
                             ToSalesLine.CopyFromSalesLine(FromSalesLine);
                             if "Document Type" = "Document Type"::Order then
                                 ToSalesLine."Outstanding Quantity" := FromSalesLine.Quantity - FromSalesLine."Qty. to Assemble to Order";
@@ -2609,7 +2609,7 @@
             OnCheckCopyFromSalesShptAvailOnAfterSetFilters(FromSalesShptLine, FromSalesShptHeader, ToSalesHeader);
             if FromSalesShptLine.FindSet() then
                 repeat
-                    if not IsItemBlocked(FromSalesShptLine."No.") then begin
+                    if not IsItemOrVariantBlocked(FromSalesShptLine."No.", FromSalesShptLine."Variant Code") then begin
                         CopyFromSalesShptLine(FromSalesShptLine);
                         if "Document Type" = "Document Type"::Order then
                             if FromSalesShptLine.AsmToShipmentExists(FromPostedAsmHeader) then
@@ -2651,7 +2651,7 @@
             OnCheckCopyFromSalesInvoiceAvailOnAfterSetFilters(FromSalesInvLine, FromSalesInvHeader, ToSalesHeader);
             if FromSalesInvLine.FindSet() then
                 repeat
-                    if not IsItemBlocked(FromSalesInvLine."No.") then begin
+                    if not IsItemOrVariantBlocked(FromSalesInvLine."No.", FromSalesInvLine."Variant Code") then begin
                         CopyFromSalesInvLine(FromSalesInvLine);
                         CheckCopyFromSalesInvoiceAvailOnBeforeCheckItemAvailability(ToSalesLine, FromSalesInvLine, ToSalesHeader, FromSalesInvHeader);
                         CheckItemAvailability(ToSalesHeader, ToSalesLine);
@@ -2678,7 +2678,7 @@
             OnCheckCopyFromSalesRetRcptAvailOnAfterSetFilters(FromReturnRcptLine, FromReturnRcptHeader, ToSalesHeader);
             if FromReturnRcptLine.FindSet() then
                 repeat
-                    if not IsItemBlocked(FromReturnRcptLine."No.") then begin
+                    if not IsItemOrVariantBlocked(FromReturnRcptLine."No.", FromReturnRcptLine."Variant Code") then begin
                         CopyFromReturnRcptLine(FromReturnRcptLine);
                         CheckItemAvailability(ToSalesHeader, ToSalesLine);
                         OnCheckCopyFromSalesRetRcptAvailOnAfterCheckItemAvailability(
@@ -2705,7 +2705,7 @@
             OnCheckCopyFromSalesCrMemoAvailOnAfterSetFilters(FromSalesCrMemoLine, FromSalesCrMemoHeader, ToSalesHeader);
             if FromSalesCrMemoLine.FindSet() then
                 repeat
-                    if not IsItemBlocked(FromSalesCrMemoLine."No.") then begin
+                    if not IsItemOrVariantBlocked(FromSalesCrMemoLine."No.", FromSalesCrMemoLine."Variant Code") then begin
                         CopyFromSalesCrMemoLine(FromSalesCrMemoLine);
                         OnCheckCopyFromSalesCrMemoAvailOnBeforeCheckItemAvailability(FromSalesCrMemoLine, ToSalesLine);
                         CheckItemAvailability(ToSalesHeader, ToSalesLine);
@@ -3242,7 +3242,7 @@
                               DeferralTypeForSalesDoc("Sales Document Type From"::"Posted Invoice".AsInteger()), "Shipment No.", "Return Receipt Line No.",
                               ToSalesLine."Document Type".AsInteger(), ToSalesLine."Document No.", ToSalesLine."Line No.");
                         FromSalesInvLine.Get("Shipment No.", "Return Receipt Line No.");
-                        OnCopySalesInvLinesToDocOnAfterCopySalesPostedDeferrals(FromSalesInvLine, NextLineNo, ToSalesLine, TempSalesLineBuf);
+                        OnCopySalesInvLinesToDocOnAfterCopySalesPostedDeferrals(FromSalesInvLine, NextLineNo);
 
                         // copy item charges
                         if Type = Type::"Charge (Item)" then begin
@@ -3648,7 +3648,7 @@
             exit(false);
 
         with ItemLedgEntry do begin
-            OneRecord := Count() = 1;
+            OneRecord := count() = 1;
             FindSet();
             if Quantity >= 0 then begin
                 TempSalesLineBuf."Document No." := "Document No.";
@@ -4137,7 +4137,7 @@
                                 "Return Shipment Line No.", ToPurchLine."Document Type".AsInteger(), ToPurchLine."Document No.", ToPurchLine."Line No.");
                         FromPurchInvLine.Get("Receipt No.", "Return Shipment Line No.");
 
-                        OnCopyPurchInvLinesToDocOnBeforeCopyItemCharges(FromPurchInvLine, NextLineNo, ToPurchLine, TempDocPurchaseLine);
+                        OnCopyPurchInvLinesToDocOnBeforeCopyItemCharges(FromPurchInvLine, NextLineNo);
 
                         // copy item charges
                         if Type = Type::"Charge (Item)" then begin
@@ -4575,7 +4575,7 @@
             exit(false);
 
         with ItemLedgEntry do begin
-            OneRecord := Count() = 1;
+            OneRecord := count() = 1;
             FindSet();
             if Quantity <= 0 then begin
                 FromPurchLineBuf."Document No." := "Document No.";
@@ -4808,18 +4808,27 @@
     end;
 
     [Scope('OnPrem')]
+    [Obsolete('Use the new implementation of IsEntityBlocked, which adds support for Item Variants', '23.0')]
     procedure IsEntityBlocked(TableNo: Integer; CreditDocType: Boolean; Type: Option; EntityNo: Code[20]) EntityIsBlocked: Boolean
+    begin
+        exit(IsEntityBlocked(TableNo, CreditDocType, Type, EntityNo, ''));
+    end;
+
+    [Scope('OnPrem')]
+    procedure IsEntityBlocked(TableNo: Integer; CreditDocType: Boolean; Type: Option; EntityNo: Code[20]; EntityCode: Code[10]) EntityIsBlocked: Boolean
     var
         GLAccount: Record "G/L Account";
         FixedAsset: Record "Fixed Asset";
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         Resource: Record Resource;
         ForwardLinkMgt: Codeunit "Forward Link Mgt.";
         MessageType: Option Error,Warning,Information;
         BlockedForSalesPurch: Boolean;
         IsHandled: Boolean;
+        ItemItemVariantLbl: Label '%1 %2', Comment = '%1 - Item No., %2 - Variant Code';
     begin
-        OnBeforeIsEntityBlocked(TableNo, CreditDocType, Type, EntityNo, EntityIsBlocked, IsHandled);
+        OnBeforeIsEntityBlocked(TableNo, CreditDocType, Type, EntityNo, EntityIsBlocked, IsHandled, EntityCode);
         if IsHandled then
             exit(EntityIsBlocked);
 
@@ -4827,6 +4836,7 @@
             MessageType := MessageType::Error
         else
             MessageType := MessageType::Warning;
+
         case Type of
             "Sales Line Type"::"G/L Account".AsInteger():
                 if GLAccount.Get(EntityNo) then begin
@@ -4848,24 +4858,56 @@
                             Item, Item.FieldNo(Blocked), ForwardLinkMgt.GetHelpCodeForBlockedItem());
                         exit(true);
                     end;
-                    case TableNo of
-                        database::"Sales Line":
-                            if Item."Sales Blocked" and not CreditDocType then begin
-                                BlockedForSalesPurch := true;
+
+                    if not CreditDocType then
+                        case TableNo of
+                            Database::"Sales Line":
+                                if Item."Sales Blocked" then begin
+                                    BlockedForSalesPurch := true;
+                                    ErrorMessageMgt.LogMessage(
+                                        MessageType, 0, StrSubstNo(IsSalesBlockedItemErr, Item.TableCaption(), Item."No.", Item.FieldCaption("Sales Blocked")), Item,
+                                        Item.FieldNo("Sales Blocked"), ForwardLinkMgt.GetHelpCodeForBlockedItem());
+                                end;
+                            Database::"Purchase Line":
+                                if Item."Purchasing Blocked" then begin
+                                    BlockedForSalesPurch := true;
+                                    ErrorMessageMgt.LogMessage(
+                                        MessageType, 0, StrSubstNo(IsPurchBlockedItemErr, Item.TableCaption(), Item."No.", Item.FieldCaption("Purchasing Blocked")), Item,
+                                        Item.FieldNo("Purchasing Blocked"), ForwardLinkMgt.GetHelpCodeForBlockedItem());
+                                end;
+                            else
+                                BlockedForSalesPurch := false;
+                        end;
+
+                    if not BlockedForSalesPurch then
+                        if (EntityCode <> '') and ItemVariant.Get(EntityNo, EntityCode) then begin
+                            if ItemVariant.Blocked then begin
                                 ErrorMessageMgt.LogMessage(
-                                    MessageType, 0, StrSubstNo(IsSalesBlockedItemErr, Item."No."), Item,
-                                    Item.FieldNo("Sales Blocked"), ForwardLinkMgt.GetHelpCodeForBlockedItem());
+                                    MessageType, 0, StrSubstNo(IsBlockedErr, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, ItemVariant."Item No.", ItemVariant.Code)),
+                                    ItemVariant, ItemVariant.FieldNo(Blocked), ForwardLinkMgt.GetHelpCodeForBlockedItem());
+                                exit(true);
                             end;
-                        database::"Purchase Line":
-                            if Item."Purchasing Blocked" and not CreditDocType then begin
-                                BlockedForSalesPurch := true;
-                                ErrorMessageMgt.LogMessage(
-                                    MessageType, 0, StrSubstNo(IsPurchBlockedItemErr, Item."No."), Item,
-                                    Item.FieldNo("Purchasing Blocked"), ForwardLinkMgt.GetHelpCodeForBlockedItem());
-                            end;
-                        else
-                            BlockedForSalesPurch := false;
-                    end;
+
+                            if not CreditDocType then
+                                case TableNo of
+                                    Database::"Sales Line":
+                                        if ItemVariant."Sales Blocked" then begin
+                                            BlockedForSalesPurch := true;
+                                            ErrorMessageMgt.LogMessage(
+                                                MessageType, 0,
+                                                StrSubstNo(IsSalesBlockedItemErr, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, ItemVariant."Item No.", ItemVariant.Code), ItemVariant.FieldCaption("Sales Blocked")),
+                                                ItemVariant, ItemVariant.FieldNo("Sales Blocked"), ForwardLinkMgt.GetHelpCodeForBlockedItem());
+                                        end;
+                                    Database::"Purchase Line":
+                                        if ItemVariant."Purchasing Blocked" then begin
+                                            BlockedForSalesPurch := true;
+                                            ErrorMessageMgt.LogMessage(
+                                                MessageType, 0,
+                                                StrSubstNo(IsPurchBlockedItemErr, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, ItemVariant."Item No.", ItemVariant.Code), ItemVariant.FieldCaption("Purchasing Blocked")),
+                                                ItemVariant, ItemVariant.FieldNo("Purchasing Blocked"), ForwardLinkMgt.GetHelpCodeForBlockedItem());
+                                        end;
+                                end;
+                        end;
                     exit(BlockedForSalesPurch);
                 end;
             "Sales Line Type"::Resource.AsInteger():
@@ -4890,11 +4932,17 @@
         end;
     end;
 
-    local procedure IsItemBlocked(ItemNo: Code[20]): Boolean
+    local procedure IsItemOrVariantBlocked(ItemNo: Code[20]; VariantCode: Code[10]): Boolean
     var
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
     begin
-        exit(Item.Get(ItemNo) and Item.Blocked);
+        if (Item.Get(ItemNo) and Item.Blocked) then
+            exit(true);
+        if VariantCode <> '' then begin
+            ItemVariant.SetLoadFields(Blocked);
+            exit(ItemVariant.Get(ItemNo, VariantCode) and ItemVariant.Blocked);
+        end;
     end;
 
     local procedure IsSplitItemLedgEntry(OrgItemLedgEntry: Record "Item Ledger Entry"): Boolean
@@ -7668,7 +7716,7 @@
         exit(true);
     end;
 
-    local procedure InitSalesLineFields(var ToSalesLine: Record "Sales Line")
+    procedure InitSalesLineFields(var ToSalesLine: Record "Sales Line")
     var
         IsHandled: Boolean;
     begin
@@ -7729,7 +7777,7 @@
         OnAfterInitSalesLineFields(ToSalesLine);
     end;
 
-    local procedure InitJobFieldsForSalesLine(var SalesLine: Record "Sales Line")
+    procedure InitJobFieldsForSalesLine(var SalesLine: Record "Sales Line")
     var
         IsHandled: Boolean;
     begin
@@ -7743,7 +7791,7 @@
         SalesLine."Job Contract Entry No." := 0;
     end;
 
-    local procedure InitPurchLineFields(var ToPurchLine: Record "Purchase Line")
+    procedure InitPurchLineFields(var ToPurchLine: Record "Purchase Line")
     begin
         OnBeforeInitPurchLineFields(ToPurchLine);
 
@@ -7961,7 +8009,7 @@
         OnAfterTransferFieldsFromCrMemoToInv(ToSalesHeader, FromSalesCrMemoHeader, CopyJobData);
     end;
 
-    local procedure CopyShippingInfoPurchOrder(var ToPurchaseHeader: Record "Purchase Header"; FromPurchaseHeader: Record "Purchase Header")
+    procedure CopyShippingInfoPurchOrder(var ToPurchaseHeader: Record "Purchase Header"; FromPurchaseHeader: Record "Purchase Header")
     begin
         if (ToPurchaseHeader."Document Type" = ToPurchaseHeader."Document Type"::Order) and
            (FromPurchaseHeader."Document Type" = FromPurchaseHeader."Document Type"::Order)
@@ -8431,7 +8479,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsEntityBlocked(TableNo: Integer; CreditDocType: Boolean; Type: Option; EntityNo: Code[20]; var EntityIsBlocked: Boolean; var IsHandled: Boolean);
+    local procedure OnBeforeIsEntityBlocked(TableNo: Integer; CreditDocType: Boolean; Type: Option; EntityNo: Code[20]; var EntityIsBlocked: Boolean; var IsHandled: Boolean; EntityCode: Code[10]);
     begin
     end;
 
@@ -10025,7 +10073,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyPurchInvLinesToDocOnBeforeCopyItemCharges(FromPurchInvLine: Record "Purch. Inv. Line"; NextLineNo: Integer; var ToPurchaseLine: Record "Purchase Line"; TempPurchaseLineBuf: Record "Purchase Line" temporary)
+    local procedure OnCopyPurchInvLinesToDocOnBeforeCopyItemCharges(FromPurchInvLine: Record "Purch. Inv. Line"; NextLineNo: Integer)
     begin
     end;
 
@@ -10055,7 +10103,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyPurchDocLineOnBeforeCopyThisLine(var ToPurchLine: Record "Purchase Line"; var FromPurchLine: Record "Purchase Line"; MoveNegLines: Boolean; FromPurchDocType: Enum "Purchase Document Type From"; var LinesNotCopied: Integer; var CopyThisLine: Boolean; var Result: Boolean; var IsHandled: Boolean; ToPurchaseHeader: Record "Purchase Header"; var RecalculateLines: Boolean)
+    local procedure OnCopyPurchDocLineOnBeforeCopyThisLine(var ToPurchLine: Record "Purchase Line"; var FromPurchLine: Record "Purchase Line"; MoveNegLines: Boolean; FromPurchDocType: Enum "Purchase Document Type From"; var LinesNotCopied: Integer; var CopyThisLine: Boolean; var Result: Boolean; var IsHandled: Boolean; ToPurchaseHeader: Record "Purchase Header")
     begin
     end;
 
@@ -10065,7 +10113,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopySalesInvLinesToDocOnAfterCopySalesPostedDeferrals(var FromSalesInvLine: Record "Sales Invoice Line"; NextLineNo: Integer; var ToSalesLine: Record "Sales Line"; var TempSalesLineBuf: Record "Sales Line" temporary)
+    local procedure OnCopySalesInvLinesToDocOnAfterCopySalesPostedDeferrals(var FromSalesInvLine: Record "Sales Invoice Line"; NextLineNo: Integer)
     begin
     end;
 
@@ -10334,3 +10382,4 @@
     begin
     end;
 }
+

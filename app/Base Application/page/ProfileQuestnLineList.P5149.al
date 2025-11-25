@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5149 "Profile Questn. Line List"
 {
     AutoSplitKey = true;
@@ -20,7 +22,7 @@ page 5149 "Profile Questn. Line List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the number of the profile questionnaire line. This field is used internally by the program.';
                 }
-                field(Question; Question())
+                field(Question; Rec.Question())
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Question';

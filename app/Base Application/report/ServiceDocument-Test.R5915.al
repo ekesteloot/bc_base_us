@@ -1,14 +1,35 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Posting;
+using Microsoft.ServiceMgt.Pricing;
+using Microsoft.ServiceMgt.Setup;
+using System.Security.User;
+using System.Utilities;
+
 report 5915 "Service Document - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Document/ServiceDocumentTest.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceDocumentTest.rdlc';
     Caption = 'Service Document - Test';
 
     dataset
     {
         dataitem("Service Header"; "Service Header")
         {
-            DataItemTableView = WHERE("Document Type" = FILTER(<> Quote));
+            DataItemTableView = where("Document Type" = filter(<> Quote));
             RequestFilterFields = "Document Type", "No.";
             RequestFilterHeading = 'Service Document';
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
@@ -25,7 +46,7 @@ report 5915 "Service Document - Test"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(STRSUBSTNO_Text014_ServiceHeaderFilter_; StrSubstNo(Text014, ServiceHeaderFilter))
                 {
                 }
@@ -364,7 +385,7 @@ report 5915 "Service Document - Test"
                 }
                 dataitem(DimensionLoop1; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(DimText; DimText)
                     {
                     }
@@ -387,7 +408,7 @@ report 5915 "Service Document - Test"
                 }
                 dataitem(HeaderErrorCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -407,13 +428,13 @@ report 5915 "Service Document - Test"
                 }
                 dataitem(CopyLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     dataitem("Service Line"; "Service Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Service Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -424,7 +445,7 @@ report 5915 "Service Document - Test"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(Service_Line__Type; "Service Line".Type)
                         {
                         }
@@ -588,7 +609,7 @@ report 5915 "Service Document - Test"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(DimText_Control159; DimText)
                             {
                             }
@@ -617,7 +638,7 @@ report 5915 "Service Document - Test"
                         }
                         dataitem(LineErrorCounter; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(ErrorText_Number__Control97; ErrorText[Number])
                             {
                             }
@@ -756,14 +777,14 @@ report 5915 "Service Document - Test"
                                     AddError(DimMgt.GetDimCombErr());
 
                                 if Type = Type::Cost then begin
-                                    TableID[1] := DATABASE::"G/L Account";
+                                    TableID[1] := Enum::TableID::"G/L Account".AsInteger();
                                     if ServCost.Get("No.") then
                                         No[1] := ServCost."Account No.";
                                 end else begin
                                     TableID[1] := DimMgt.TypeToTableID5(Type.AsInteger());
                                     No[1] := "No.";
                                 end;
-                                TableID[2] := DATABASE::Job;
+                                TableID[2] := Enum::TableID::Job.AsInteger();
                                 No[2] := "Job No.";
                                 if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
                                     AddError(DimMgt.GetDimValuePostingErr());
@@ -811,7 +832,7 @@ report 5915 "Service Document - Test"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmountLine__VAT_Amount_; TempVATAmountLine."VAT Amount")
                         {
                             AutoFormatExpression = "Service Header"."Currency Code";
@@ -1206,11 +1227,11 @@ report 5915 "Service Document - Test"
                 if not DimMgt.CheckDimIDComb("Dimension Set ID") then
                     AddError(DimMgt.GetDimCombErr());
 
-                TableID[1] := DATABASE::Customer;
+                TableID[1] := Enum::TableID::Customer.AsInteger();
                 No[1] := "Bill-to Customer No.";
-                TableID[3] := DATABASE::"Salesperson/Purchaser";
+                TableID[3] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
                 No[3] := "Salesperson Code";
-                TableID[4] := DATABASE::"Responsibility Center";
+                TableID[4] := Enum::TableID::"Responsibility Center".AsInteger();
                 No[4] := "Responsibility Center";
 
                 if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
@@ -1383,7 +1404,7 @@ report 5915 "Service Document - Test"
         Text004: Label 'Total %1';
         Text005: Label 'Total %1 Incl. VAT';
         Text006: Label '%1 must be specified.';
-        Text007: Label '%1 must be %2 for %3 %4.';
+        MustBeForErr: Label '%1 must be %2 for %3 %4.';
         Text008: Label '%1 %2 does not exist.';
         Text009: Label '%1 must not be a closing date.';
         Text014: Label 'Service Document: %1';
@@ -1486,7 +1507,7 @@ report 5915 "Service Document - Test"
                     repeat
                         DimMgt.GetDimensionSet(TempPostedDimSetEntry, ServiceShptLine."Dimension Set ID");
                         if not DimMgt.CheckDimIDConsistency(
-                             TempDimSetEntry, TempPostedDimSetEntry, DATABASE::"Service Line", DATABASE::"Service Shipment Line")
+                             TempDimSetEntry, TempPostedDimSetEntry, Enum::TableID::"Service Line".AsInteger(), Enum::TableID::"Service Shipment Line".AsInteger())
                         then
                             AddError(DimMgt.GetDocDimConsistencyErr());
 
@@ -1610,6 +1631,9 @@ report 5915 "Service Document - Test"
     end;
 
     local procedure CheckType(ServiceLine2: Record "Service Line")
+    var
+        ItemVariant: Record "Item Variant";
+        ItemItemVariantLbl: Label '%1 %2', Comment = '%1 - Item No., %2 - Variant Code';
     begin
         OnBeforeCheckType(ServiceLine2, ErrorCounter, ErrorText);
         with ServiceLine2 do
@@ -1622,9 +1646,9 @@ report 5915 "Service Document - Test"
                         if "No." <> '' then
                             if GLAcc.Get("No.") then begin
                                 if GLAcc.Blocked then
-                                    AddError(StrSubstNo(Text007, GLAcc.FieldCaption(Blocked), false, GLAcc.TableCaption(), "No."));
+                                    AddError(StrSubstNo(MustBeForErr, GLAcc.FieldCaption(Blocked), false, GLAcc.TableCaption(), "No."));
                                 if not GLAcc."Direct Posting" and ("Line No." <= OrigMaxLineNo) then
-                                    AddError(StrSubstNo(Text007, GLAcc.FieldCaption("Direct Posting"), true, GLAcc.TableCaption(), "No."));
+                                    AddError(StrSubstNo(MustBeForErr, GLAcc.FieldCaption("Direct Posting"), true, GLAcc.TableCaption(), "No."));
                             end else
                                 AddError(StrSubstNo(Text008, GLAcc.TableCaption(), "No."));
                     end;
@@ -1636,7 +1660,18 @@ report 5915 "Service Document - Test"
                         if "No." <> '' then
                             if Item.Get("No.") then begin
                                 if Item.Blocked then
-                                    AddError(StrSubstNo(Text007, Item.FieldCaption(Blocked), false, Item.TableCaption(), "No."));
+                                    AddError(StrSubstNo(MustBeForErr, Item.FieldCaption(Blocked), false, Item.TableCaption(), "No."));
+
+                                if ServiceLine2."Variant Code" <> '' then begin
+                                    ItemVariant.SetLoadFields(Blocked);
+                                    if ItemVariant.Get(ServiceLine2."No.", ServiceLine2."Variant Code") then begin
+                                        if ItemVariant.Blocked then
+                                            AddError(StrSubstNo(MustBeForErr, ItemVariant.FieldCaption(Blocked), false, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, ServiceLine2."No.", ServiceLine2."Variant Code")));
+                                    end else
+                                        AddError(StrSubstNo(Text008, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, ServiceLine2."No.", ServiceLine2."Variant Code")));
+                                end;
+
+
                                 if Item.Reserve = Item.Reserve::Always then begin
                                     CalcFields("Reserved Quantity");
                                     if "Document Type" = "Document Type"::"Credit Memo" then begin
@@ -1657,9 +1692,9 @@ report 5915 "Service Document - Test"
                         if "No." <> '' then
                             if Res.Get("No.") then begin
                                 if Res."Privacy Blocked" then
-                                    AddError(StrSubstNo(Text007, Res.FieldCaption("Privacy Blocked"), false, Res.TableCaption(), "No."));
+                                    AddError(StrSubstNo(MustBeForErr, Res.FieldCaption("Privacy Blocked"), false, Res.TableCaption(), "No."));
                                 if Res.Blocked then
-                                    AddError(StrSubstNo(Text007, Res.FieldCaption(Blocked), false, Res.TableCaption(), "No."));
+                                    AddError(StrSubstNo(MustBeForErr, Res.FieldCaption(Blocked), false, Res.TableCaption(), "No."));
                             end else
                                 AddError(StrSubstNo(Text008, Res.TableCaption(), "No."));
                     end;

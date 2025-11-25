@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Telemetry;
+using System.Utilities;
+
 codeunit 19 "Gen. Jnl.-Post Preview"
 {
 
@@ -131,12 +139,12 @@ codeunit 19 "Gen. Jnl.-Post Preview"
         if not TempDocumentEntry.IsEmpty() then begin
             GLSetup.Get();
             case GLSetup."Posting Preview Type" of
-                "Posting Preview Type"::Standard:
+                Enum::"Posting Preview Type"::Standard:
                     begin
                         GLPostingPreview.Set(TempDocumentEntry, PostingPreviewEventHandler);
                         GLPostingPreview.Run();
                     end;
-                "Posting Preview Type"::Extended:
+                Enum::"Posting Preview Type"::Extended:
                     begin
                         ExtendedGLPostingPreview.Set(TempDocumentEntry, PostingPreviewEventHandler);
                         ExtendedGLPostingPreview.Run();

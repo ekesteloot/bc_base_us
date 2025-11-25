@@ -8,7 +8,7 @@ report 10074 "Sales Invoice NA"
     {
         dataitem("Sales Invoice Header"; "Sales Invoice Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.", "Ship-to Code", "No. Printed";
             RequestFilterHeading = 'Sales Invoice';
@@ -17,12 +17,12 @@ report 10074 "Sales Invoice NA"
             }
             dataitem("Sales Invoice Line"; "Sales Invoice Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 dataitem(SalesLineComments; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Posted Invoice"), "Print On Invoice" = CONST(true));
+                    DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Posted Invoice"), "Print On Invoice" = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -70,8 +70,8 @@ report 10074 "Sales Invoice NA"
             }
             dataitem("Sales Comment Line"; "Sales Comment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Posted Invoice"), "Print On Invoice" = CONST(true), "Document Line No." = CONST(0));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Posted Invoice"), "Print On Invoice" = const(true), "Document Line No." = const(0));
                 column(DisplayAdditionalFeeNote; DisplayAdditionalFeeNote)
                 {
                 }
@@ -113,10 +113,10 @@ report 10074 "Sales Invoice NA"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -296,7 +296,7 @@ report 10074 "Sales Invoice NA"
                     }
                     dataitem(SalesInvLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(AmountExclInvDisc; AmountExclInvDisc)
                         {
                         }
@@ -410,7 +410,7 @@ report 10074 "Sales Invoice NA"
                         }
                         dataitem(AsmLoop; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(TempPostedAsmLineUOMCode; GetUOMText(TempPostedAsmLine."Unit of Measure Code"))
                             {
                             }
@@ -517,7 +517,7 @@ report 10074 "Sales Invoice NA"
                     }
                     dataitem(LineFee; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = filter(1 ..));
                         column(LineFeeCaptionLbl; TempLineFeeNoteOnReportHist.ReportText)
                         {
                         }
@@ -569,6 +569,7 @@ report 10074 "Sales Invoice NA"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Salesperson Code" = '' then
                     Clear(SalesPurchPerson)
@@ -801,9 +802,6 @@ report 10074 "Sales Invoice NA"
         PaymentTerms: Record "Payment Terms";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyInformation: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         Customer: Record Customer;
         OrderLine: Record "Sales Line";
@@ -858,7 +856,6 @@ report 10074 "Sales Invoice NA"
         DocumentText: Text[20];
         USText000: Label 'INVOICE';
         USText001: Label 'PREPAYMENT REQUEST';
-        [InDataSet]
         LogInteractionEnable: Boolean;
         DisplayAssemblyInformation: Boolean;
         BillCaptionLbl: Label 'Bill';
@@ -892,6 +889,11 @@ report 10074 "Sales Invoice NA"
         AmountSubjecttoSalesTaxCaption: Text;
         AmountExemptfromSalesTaxCaption: Text;
         DisplayAdditionalFeeNote: Boolean;
+
+    protected var
+        CompanyInfo3: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     procedure InitLogInteraction()
     begin

@@ -1,3 +1,5 @@
+namespace System.Tooling;
+
 table 888 "SmartList Designer Setup"
 {
     Access = Internal;

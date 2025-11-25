@@ -1,4 +1,14 @@
-#if not CLEAN21
+﻿#if not CLEAN21
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Sales.Customer;
+using System.Environment;
+using System.Text;
+
 page 7002 "Sales Prices"
 {
     Caption = 'Sales Prices';
@@ -145,7 +155,7 @@ page 7002 "Sales Prices"
                         CurrencyCodeFilterOnAfterValid();
                     end;
                 }
-                field(SystemId; SystemId)
+                field(SystemId; Rec.SystemId)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies system id to provide OData capabilities.';
@@ -181,7 +191,7 @@ page 7002 "Sales Prices"
 
                     trigger OnValidate()
                     begin
-                        SalesCodeControlEditable := SetSalesCodeEditable("Sales Type");
+                        SalesCodeControlEditable := SetSalesCodeEditable(Rec."Sales Type");
                     end;
                 }
                 field("Sales Code"; Rec."Sales Code")
@@ -300,9 +310,9 @@ page 7002 "Sales Prices"
 
                 trigger OnAction()
                 begin
-                    Reset();
+                    Rec.Reset();
                     UpdateBasicRecFilters();
-                    Evaluate(StartingDateFilter, GetFilter("Starting Date"));
+                    Evaluate(StartingDateFilter, Rec.GetFilter("Starting Date"));
                     SetEditableFields();
                 end;
             }
@@ -339,7 +349,7 @@ page 7002 "Sales Prices"
 
     trigger OnAfterGetCurrRecord()
     begin
-        SalesCodeControlEditable := SetSalesCodeEditable("Sales Type");
+        SalesCodeControlEditable := SetSalesCodeEditable(Rec."Sales Type");
         OnAfterGetCurrRecordOnAfterCalcSalesCodeControlEditable(Rec, SalesCodeControlEditable);
     end;
 
@@ -378,7 +388,6 @@ page 7002 "Sales Prices"
         PageCaption: Text;
         Text000: Label 'All Customers';
         Text001: Label 'No %1 within the filter %2.';
-        [InDataSet]
         SalesCodeFilterCtrlEnable: Boolean;
         IsOnMobile: Boolean;
         IsLookupMode: Boolean;
@@ -394,22 +403,22 @@ page 7002 "Sales Prices"
 
     local procedure GetRecFilters()
     begin
-        if GetFilters <> '' then
+        if Rec.GetFilters() <> '' then
             UpdateBasicRecFilters();
 
-        Evaluate(StartingDateFilter, GetFilter("Starting Date"));
+        Evaluate(StartingDateFilter, Rec.GetFilter("Starting Date"));
     end;
 
     local procedure UpdateBasicRecFilters()
     begin
-        if GetFilter("Sales Type") <> '' then
+        if Rec.GetFilter("Sales Type") <> '' then
             SalesTypeFilter := GetSalesTypeFilter()
         else
             SalesTypeFilter := SalesTypeFilter::None;
 
-        SalesCodeFilter := GetFilter("Sales Code");
-        ItemNoFilter := GetFilter("Item No.");
-        CurrencyCodeFilter := GetFilter("Currency Code");
+        SalesCodeFilter := Rec.GetFilter("Sales Code");
+        ItemNoFilter := Rec.GetFilter("Item No.");
+        CurrencyCodeFilter := Rec.GetFilter("Currency Code");
     end;
 
     procedure SetRecFilters()
@@ -417,9 +426,9 @@ page 7002 "Sales Prices"
         SalesCodeFilterCtrlEnable := true;
 
         if SalesTypeFilter <> SalesTypeFilter::None then
-            SetRange("Sales Type", SalesTypeFilter)
+            Rec.SetRange("Sales Type", SalesTypeFilter)
         else
-            SetRange("Sales Type");
+            Rec.SetRange("Sales Type");
 
         if SalesTypeFilter in [SalesTypeFilter::"All Customers", SalesTypeFilter::None] then begin
             SalesCodeFilterCtrlEnable := false;
@@ -427,24 +436,24 @@ page 7002 "Sales Prices"
         end;
 
         if SalesCodeFilter <> '' then
-            SetFilter("Sales Code", SalesCodeFilter)
+            Rec.SetFilter("Sales Code", SalesCodeFilter)
         else
-            SetRange("Sales Code");
+            Rec.SetRange("Sales Code");
 
         if StartingDateFilter <> '' then
-            SetFilter("Starting Date", StartingDateFilter)
+            Rec.SetFilter("Starting Date", StartingDateFilter)
         else
-            SetRange("Starting Date");
+            Rec.SetRange("Starting Date");
 
         if ItemNoFilter <> '' then
-            SetFilter("Item No.", ItemNoFilter)
+            Rec.SetFilter("Item No.", ItemNoFilter)
         else
-            SetRange("Item No.");
+            Rec.SetRange("Item No.");
 
         if CurrencyCodeFilter <> '' then
-            SetFilter("Currency Code", CurrencyCodeFilter)
+            Rec.SetFilter("Currency Code", CurrencyCodeFilter)
         else
-            SetRange("Currency Code");
+            Rec.SetRange("Currency Code");
 
         case SalesTypeFilter of
             SalesTypeFilter::Customer:
@@ -567,53 +576,53 @@ page 7002 "Sales Prices"
 
     local procedure GetSalesTypeFilter(): Integer
     begin
-        case GetFilter("Sales Type") of
-            Format("Sales Type"::Customer):
+        case Rec.GetFilter("Sales Type") of
+            Format(Rec."Sales Type"::Customer):
                 exit(0);
-            Format("Sales Type"::"Customer Price Group"):
+            Format(Rec."Sales Type"::"Customer Price Group"):
                 exit(1);
-            Format("Sales Type"::"All Customers"):
+            Format(Rec."Sales Type"::"All Customers"):
                 exit(2);
-            Format("Sales Type"::Campaign):
+            Format(Rec."Sales Type"::Campaign):
                 exit(3);
         end;
     end;
 
     local procedure SetSalesCodeEditable(SalesType: Enum "Sales Price Type"): Boolean
     begin
-        exit(SalesType <> "Sales Type"::"All Customers");
+        exit(SalesType <> Rec."Sales Type"::"All Customers");
     end;
 
     local procedure SetEditableFields()
     begin
-        SalesTypeControlEditable := GetFilter("Sales Type") = '';
+        SalesTypeControlEditable := Rec.GetFilter("Sales Type") = '';
         SalesCodeControlEditable :=
-          SalesCodeControlEditable and (GetFilter("Sales Code") = '');
+          SalesCodeControlEditable and (Rec.GetFilter("Sales Code") = '');
     end;
 
     local procedure FilterLines()
     var
         FilterPageBuilder: FilterPageBuilder;
     begin
-        FilterPageBuilder.AddTable(TableCaption, DATABASE::"Sales Price");
+        FilterPageBuilder.AddTable(Rec.TableCaption, DATABASE::"Sales Price");
 
-        FilterPageBuilder.SetView(TableCaption, GetView());
-        if GetFilter("Sales Type") = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo("Sales Type"));
-        if GetFilter("Sales Code") = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo("Sales Code"));
-        if GetFilter("Item No.") = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo("Item No."));
-        if GetFilter("Starting Date") = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo("Starting Date"));
-        if GetFilter("Currency Code") = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo("Currency Code"));
+        FilterPageBuilder.SetView(Rec.TableCaption, Rec.GetView());
+        if Rec.GetFilter("Sales Type") = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo("Sales Type"));
+        if Rec.GetFilter("Sales Code") = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo("Sales Code"));
+        if Rec.GetFilter("Item No.") = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo("Item No."));
+        if Rec.GetFilter("Starting Date") = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo("Starting Date"));
+        if Rec.GetFilter("Currency Code") = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo("Currency Code"));
 
         if FilterPageBuilder.RunModal() then
-            SetView(FilterPageBuilder.GetView(TableCaption));
+            Rec.SetView(FilterPageBuilder.GetView(Rec.TableCaption));
 
         UpdateBasicRecFilters();
-        Evaluate(StartingDateFilter, GetFilter("Starting Date"));
+        Evaluate(StartingDateFilter, Rec.GetFilter("Starting Date"));
         SetEditableFields();
     end;
 
@@ -637,7 +646,7 @@ page 7002 "Sales Prices"
         SalesPrices.SetTableView(SalesPrice);
         if SalesPrices.RunModal() = ACTION::LookupOK then begin
             SalesPrices.GetSelectionFilter(SelectedSalesPrice);
-            CopySalesPriceToCustomersSalesPrice(SelectedSalesPrice, CopyToCustomerNo);
+            Rec.CopySalesPriceToCustomersSalesPrice(SelectedSalesPrice, CopyToCustomerNo);
         end;
     end;
 

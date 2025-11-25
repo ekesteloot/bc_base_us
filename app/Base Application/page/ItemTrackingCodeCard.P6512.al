@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 page 6512 "Item Tracking Code Card"
 {
     Caption = 'Item Tracking Code Card';

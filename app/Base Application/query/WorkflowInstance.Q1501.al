@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 query 1501 "Workflow Instance"
 {
     Caption = 'Workflow Instance';

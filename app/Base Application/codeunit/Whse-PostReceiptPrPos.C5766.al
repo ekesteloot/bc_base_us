@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.History;
+
 codeunit 5766 "Whse.-Post Receipt + Pr. Pos."
 {
     TableNo = "Warehouse Receipt Line";

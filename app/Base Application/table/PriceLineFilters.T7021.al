@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Source;
+using System.Reflection;
+
 table 7021 "Price Line Filters"
 {
 #pragma warning disable AS0034

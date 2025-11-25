@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Setup;
+
 page 1200 "Bank Export/Import Setup"
 {
     AdditionalSearchTerms = 'data exchange definition setup,bank file import setup,bank file export setup,bank transfer setup,amc yodlee feed stream setup';
@@ -13,7 +15,7 @@ page 1200 "Bank Export/Import Setup"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ShowMandatory = true;
@@ -24,7 +26,7 @@ page 1200 "Bank Export/Import Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank export/import setup.';
                 }
-                field(Direction; Direction)
+                field(Direction; Rec.Direction)
                 {
                     ApplicationArea = Basic, Suite;
                     ShowMandatory = true;

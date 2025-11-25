@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Interaction;
+using System.Security.User;
+
 page 5139 "Logged Segments"
 {
     ApplicationArea = RelationshipMgmt;
@@ -14,7 +20,7 @@ page 5139 "Logged Segments"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Canceled; Canceled)
+                field(Canceled; Rec.Canceled)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies that the interaction has been canceled.';
@@ -38,7 +44,7 @@ page 5139 "Logged Segments"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Segment No."; Rec."Segment No.")
@@ -92,8 +98,8 @@ page 5139 "Logged Segments"
                     Caption = 'Interaction Log E&ntry';
                     Image = Interaction;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Logged Segment Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Logged Segment Entry No.");
+                    RunPageLink = "Logged Segment Entry No." = field("Entry No.");
+                    RunPageView = sorting("Logged Segment Entry No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
@@ -103,8 +109,8 @@ page 5139 "Logged Segments"
                     Caption = '&Campaign Entry';
                     Image = CampaignEntries;
                     RunObject = Page "Campaign Entries";
-                    RunPageLink = "Register No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Register No.");
+                    RunPageLink = "Register No." = field("Entry No.");
+                    RunPageView = sorting("Register No.");
                     ToolTip = 'View all the different actions and interactions that are linked to a campaign. When you post a sales or purchase order that is linked to a campaign or when you create an interaction as part of a campaign, it is recorded in the Campaign Entries window.';
                 }
             }
@@ -140,7 +146,7 @@ page 5139 "Logged Segments"
                     var
                         InteractLogEntry: Record "Interaction Log Entry";
                     begin
-                        InteractLogEntry.SetRange("Logged Segment Entry No.", "Entry No.");
+                        InteractLogEntry.SetRange("Logged Segment Entry No.", Rec."Entry No.");
                         REPORT.Run(REPORT::"Resend Attachments", true, false, InteractLogEntry);
                     end;
                 }

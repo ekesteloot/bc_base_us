@@ -1,3 +1,10 @@
+namespace Microsoft.WarehouseMgt.Setup;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using System.Reflection;
+
 table 7355 "Report Selection Warehouse"
 {
     Caption = 'Report Selection Warehouse';
@@ -16,7 +23,7 @@ table 7355 "Report Selection Warehouse"
         field(3; "Report ID"; Integer)
         {
             Caption = 'Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
             trigger OnValidate()
             begin
                 CalcFields("Report Caption");
@@ -24,8 +31,8 @@ table 7355 "Report Selection Warehouse"
         }
         field(4; "Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Report ID")));
             Caption = 'Report Caption';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Ledger;
+
+using System.Security.User;
+
 page 5931 "Service Register"
 {
     ApplicationArea = Service;
@@ -33,7 +37,7 @@ page 5931 "Service Register"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("From Entry No."; Rec."From Entry No.")

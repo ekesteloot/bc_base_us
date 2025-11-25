@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
+using System.Globalization;
+
 page 7505 "Item Attr. Value Translations"
 {
     Caption = 'Item Attribute Value Translations';
@@ -43,7 +47,7 @@ page 7505 "Item Attr. Value Translations"
     var
         ItemAttributeValue: Record "Item Attribute Value";
     begin
-        if ItemAttributeValue.Get("Attribute ID", ID) then
+        if ItemAttributeValue.Get(Rec."Attribute ID", Rec.ID) then
             DynamicCaption := ItemAttributeValue.Value
         else
             DynamicCaption := '';

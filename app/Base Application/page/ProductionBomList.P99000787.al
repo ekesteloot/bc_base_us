@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.Manufacturing.Comment;
+using Microsoft.Manufacturing.Reports;
+
 page 99000787 "Production BOM List"
 {
     AdditionalSearchTerms = 'bill of materials';
@@ -92,8 +97,8 @@ page 99000787 "Production BOM List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Manufacturing Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Production BOM Header"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Production BOM Header"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Versions)
@@ -104,7 +109,7 @@ page 99000787 "Production BOM List"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     RunObject = Page "Prod. BOM Version List";
-                    RunPageLink = "Production BOM No." = FIELD("No.");
+                    RunPageLink = "Production BOM No." = field("No.");
                     ToolTip = 'View any alternate versions of the production BOM.';
                 }
                 action("Ma&trix per Version")

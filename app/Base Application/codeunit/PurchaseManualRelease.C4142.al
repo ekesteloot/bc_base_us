@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Document;
+
 codeunit 4142 "Purchase Manual Release"
 {
     TableNo = "Purchase Header";

@@ -1,3 +1,7 @@
+namespace System.Diagnostics;
+
+using System.Reflection;
+
 page 594 "Change Log Setup (Field) List"
 {
     Caption = 'Change Log Setup (Field) List';
@@ -127,10 +131,10 @@ page 594 "Change Log Setup (Field) List"
 
     trigger OnOpenPage()
     begin
-        FilterGroup(2);
-        SetRange(Class, Class::Normal);
-        FilterGroup(0);
-        PageCaption := Format(TableNo) + ' ' + TableName;
+        Rec.FilterGroup(2);
+        Rec.SetRange(Class, Rec.Class::Normal);
+        Rec.FilterGroup(0);
+        PageCaption := Format(Rec.TableNo) + ' ' + Rec.TableName;
     end;
 
     var
@@ -142,11 +146,8 @@ page 594 "Change Log Setup (Field) List"
         InsVisible: Boolean;
         ModVisible: Boolean;
         DelVisible: Boolean;
-        [InDataSet]
         LogInsertionVisible: Boolean;
-        [InDataSet]
         LogModificationVisible: Boolean;
-        [InDataSet]
         LogDeletionVisible: Boolean;
         PageCaption: Text[250];
         PageIsEditable: Boolean;
@@ -183,10 +184,12 @@ page 594 "Change Log Setup (Field) List"
 
     local procedure GetRec()
     begin
-        if not ChangeLogSetupField.Get(TableNo, "No.") then begin
+        if not ChangeLogSetupField.Get(Rec.TableNo, Rec."No.") then begin
             ChangeLogSetupField.Init();
-            ChangeLogSetupField."Table No." := TableNo;
-            ChangeLogSetupField."Field No." := "No.";
+            ChangeLogSetupField."Table No." := Rec.TableNo;
+            ChangeLogSetupField."Table Caption" := Rec.TableName;
+            ChangeLogSetupField."Field No." := Rec."No.";
+            ChangeLogSetupField."Field Caption" := Rec."Field Caption";
         end;
     end;
 

@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Outlook;
+
+using System;
+
 codeunit 1631 "Office Host Management"
 {
     var
@@ -86,15 +90,6 @@ codeunit 1631 "Office Host Management"
         exit(Result);
     end;
 
-#if not CLEAN20
-    [Obsolete('Please use GetEmailAndAttachments which uses RecordRef instead of Vendor number.', '20.0')]
-    [Scope('OnPrem')]
-    procedure GetEmailAndAttachments(var TempExchangeObject: Record "Exchange Object" temporary; "Action": Option InitiateSendToOCR,InitiateSendToIncomingDocuments,InitiateSendToWorkFlow,InitiateSendToAttachments; VendorNumber: Code[20])
-    begin
-        OnGetEmailAndAttachments(TempExchangeObject, Action, VendorNumber);
-    end;
-#endif
-
     [Scope('OnPrem')]
     procedure GetEmailAndAttachments(var TempExchangeObject: Record "Exchange Object" temporary; "Action": Option InitiateSendToOCR,InitiateSendToIncomingDocuments,InitiateSendToWorkFlow,InitiateSendToAttachments; RecRef: RecordRef)
     begin
@@ -182,14 +177,6 @@ codeunit 1631 "Office Host Management"
     local procedure OnEmailHasAttachments(var Result: Boolean)
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Please use OnGetEmailAndAttachmentsForEntity which uses RecordRef instead of Vendor number.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnGetEmailAndAttachments(var TempExchangeObject: Record "Exchange Object" temporary; "Action": Option InitiateSendToOCR,InitiateSendToIncomingDocuments,InitiateSendToWorkFlow; VendorNumber: Code[20])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnGetEmailAndAttachmentsForEntity(var TempExchangeObject: Record "Exchange Object" temporary; "Action": Option InitiateSendToOCR,InitiateSendToIncomingDocuments,InitiateSendToWorkFlow; RecRef: RecordRef)

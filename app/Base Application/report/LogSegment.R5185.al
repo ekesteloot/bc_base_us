@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Segment;
+
 report 5185 "Log Segment"
 {
     Caption = 'Log Segment';
@@ -7,12 +9,12 @@ report 5185 "Log Segment"
     {
         dataitem("Segment Header"; "Segment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
 
             trigger OnAfterGetRecord()
             begin
                 OnBeforeLogSegment("Segment Header");
-                SegManagement.LogSegment("Segment Header", Send, FollowUpValue);
+                SegManagement.LogSegment("Segment Header", Send, FollowUp);
             end;
 
             trigger OnPreDataItem()
@@ -39,7 +41,7 @@ report 5185 "Log Segment"
                         Enabled = DeliverEnable;
                         ToolTip = 'Specifies if you want to deliver the attachments and send them by e-mail or fax, or print them when you choose OK.';
                     }
-                    field(FollowUp; FollowUpValue)
+                    field(FollowUp; FollowUp)
                     {
                         ApplicationArea = RelationshipMgmt;
                         Caption = 'Create Follow-up Segment';
@@ -77,8 +79,7 @@ report 5185 "Log Segment"
         SegManagement: Codeunit SegManagement;
         SegmentNo: Code[20];
         Send: Boolean;
-        FollowUpValue: Boolean;
-        [InDataSet]
+        FollowUp: Boolean;
         DeliverEnable: Boolean;
 
     procedure SetSegmentNo(SegmentFilter: Code[20])
@@ -89,7 +90,7 @@ report 5185 "Log Segment"
     procedure InitializeRequest(SendFrom: Boolean; FollowUpFrom: Boolean)
     begin
         Send := SendFrom;
-        FollowUpValue := FollowUpFrom;
+        FollowUp := FollowUpFrom;
     end;
 
     [IntegrationEvent(false, false)]

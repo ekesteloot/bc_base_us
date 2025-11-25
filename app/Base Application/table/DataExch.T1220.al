@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Utilities;
+
 table 1220 "Data Exch."
 {
     Caption = 'Data Exch.';
@@ -28,7 +32,7 @@ table 1220 "Data Exch."
         field(5; "Data Exch. Line Def Code"; Code[20])
         {
             Caption = 'Data Exch. Line Def Code';
-            TableRelation = "Data Exch. Line Def".Code WHERE("Data Exch. Def Code" = FIELD("Data Exch. Def Code"));
+            TableRelation = "Data Exch. Line Def".Code where("Data Exch. Def Code" = field("Data Exch. Def Code"));
         }
         field(6; "Table Filters"; BLOB)
         {

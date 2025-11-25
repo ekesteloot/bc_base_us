@@ -1,3 +1,15 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 table 7331 "Whse. Internal Put-away Header"
 {
     Caption = 'Whse. Internal Put-away Header';
@@ -21,7 +33,7 @@ table 7331 "Whse. Internal Put-away Header"
         field(2; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             begin
@@ -53,7 +65,7 @@ table 7331 "Whse. Internal Put-away Header"
         {
             Caption = 'Assigned User ID';
             DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "Warehouse Employee" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = "Warehouse Employee" where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -83,9 +95,9 @@ table 7331 "Whse. Internal Put-away Header"
         }
         field(7; Comment; Boolean)
         {
-            CalcFormula = Exist("Warehouse Comment Line" WHERE("Table Name" = CONST("Internal Put-away"),
-                                                                Type = CONST(" "),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = exist("Warehouse Comment Line" where("Table Name" = const("Internal Put-away"),
+                                                                Type = const(" "),
+                                                                "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -93,10 +105,10 @@ table 7331 "Whse. Internal Put-away Header"
         field(8; "From Bin Code"; Code[20])
         {
             Caption = 'From Bin Code';
-            TableRelation = IF ("From Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("From Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                                    "Zone Code" = FIELD("From Zone Code"));
+            TableRelation = if ("From Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("From Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                                    "Zone Code" = field("From Zone Code"));
 
             trigger OnValidate()
             var
@@ -127,7 +139,7 @@ table 7331 "Whse. Internal Put-away Header"
         field(9; "From Zone Code"; Code[10])
         {
             Caption = 'From Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -385,7 +397,7 @@ table 7331 "Whse. Internal Put-away Header"
         WhseCommentLine.DeleteAll();
 
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          DATABASE::"Whse. Internal Put-away Line", 0, "No.", '', 0, 0, '', false);
+          Enum::TableID::"Whse. Internal Put-away Line".AsInteger(), 0, "No.", '', 0, 0, '', false);
     end;
 
     procedure CheckPutawayRequired(LocationCode: Code[10])

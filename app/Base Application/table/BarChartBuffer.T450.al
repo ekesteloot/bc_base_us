@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 450 "Bar Chart Buffer"
 {
     Caption = 'Bar Chart Buffer';

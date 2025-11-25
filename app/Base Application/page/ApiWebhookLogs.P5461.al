@@ -14,10 +14,10 @@ page 5461 "API Webhook Logs"
     ODataKeyFields = ID;
     PageType = API;
     SourceTable = "Activity Log";
-    SourceTableView = SORTING("Activity Date")
+    SourceTableView = sorting("Activity Date")
                       ORDER(Descending)
-                      WHERE("Table No Filter" = CONST(2000000095),
-                            Context = CONST('APIWEBHOOK'));
+                      where("Table No Filter" = const(2000000095),
+                            Context = const('APIWEBHOOK'));
 
     layout
     {
@@ -25,19 +25,25 @@ page 5461 "API Webhook Logs"
         {
             repeater(Group)
             {
-                field(time; "Activity Date")
+                field(id; Rec.ID)
+                {
+                    ApplicationArea = All;
+                    Caption = 'ID', Locked = true;
+                    ToolTip = 'Specifies the activity ID.';
+                }
+                field(time; Rec."Activity Date")
                 {
                     ApplicationArea = All;
                     Caption = 'time', Locked = true;
                     ToolTip = 'Specifies the activity time.';
                 }
-                field(status; Status)
+                field(status; Rec.Status)
                 {
                     ApplicationArea = All;
                     Caption = 'status', Locked = true;
                     ToolTip = 'Specifies the activity status.';
                 }
-                field(message; Description)
+                field(message; Rec.Description)
                 {
                     ApplicationArea = All;
                     Caption = 'message', Locked = true;
@@ -62,11 +68,11 @@ page 5461 "API Webhook Logs"
         ContentInStream: InStream;
         TextLine: Text;
     begin
-        if not "Detailed Info".HasValue() then
-            Details := "Activity Message"
+        if not Rec."Detailed Info".HasValue() then
+            Details := Rec."Activity Message"
         else begin
             Details := '';
-            "Detailed Info".CreateInStream(ContentInStream);
+            Rec."Detailed Info".CreateInStream(ContentInStream);
             while not ContentInStream.EOS() do begin
                 ContentInStream.ReadText(TextLine);
                 Details += TextLine;
@@ -76,7 +82,7 @@ page 5461 "API Webhook Logs"
 
     trigger OnOpenPage()
     begin
-        SetAutoCalcFields("Detailed Info");
+        Rec.SetAutoCalcFields("Detailed Info");
     end;
 
     var

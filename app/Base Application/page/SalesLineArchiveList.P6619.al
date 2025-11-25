@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Archive;
+
 page 6619 "Sales Line Archive List"
 {
     Caption = 'Sales Line Archive List';
@@ -112,15 +114,15 @@ page 6619 "Sales Line Archive List"
                     var
                         SalesHeaderArchive: Record "Sales Header Archive";
                     begin
-                        SalesHeaderArchive.Get("Document Type", "Document No.", "Doc. No. Occurrence", "Version No.");
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        SalesHeaderArchive.Get(Rec."Document Type", Rec."Document No.", Rec."Doc. No. Occurrence", Rec."Version No.");
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 PAGE.Run(PAGE::"Sales Order Archive", SalesHeaderArchive);
-                            "Document Type"::Quote:
+                            Rec."Document Type"::Quote:
                                 PAGE.Run(PAGE::"Sales Quote Archive", SalesHeaderArchive);
-                            "Document Type"::"Blanket Order":
+                            Rec."Document Type"::"Blanket Order":
                                 PAGE.Run(PAGE::"Blanket Sales Order Archive", SalesHeaderArchive);
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 PAGE.Run(PAGE::"Sales Return Order Archive", SalesHeaderArchive);
                         end;
                     end;

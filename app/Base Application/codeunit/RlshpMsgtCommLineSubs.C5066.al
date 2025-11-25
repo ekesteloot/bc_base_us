@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Comment;
+
+using Microsoft.CRM.Contact;
+
 codeunit 5066 "Rlshp. Msgt. Comm. Line Subs"
 {
 

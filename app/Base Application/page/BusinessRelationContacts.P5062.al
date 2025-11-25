@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.CRM.Contact;
+
 page 5062 "Business Relation Contacts"
 {
     Caption = 'Business Relation Contacts';
@@ -58,21 +62,21 @@ page 5062 "Business Relation Contacts"
     var
         Contact: Record Contact;
     begin
-        Contact.TouchContact("Contact No.")
+        Contact.TouchContact(Rec."Contact No.")
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     var
         Contact: Record Contact;
     begin
-        Contact.TouchContact("Contact No.")
+        Contact.TouchContact(Rec."Contact No.")
     end;
 
     trigger OnModifyRecord(): Boolean
     var
         Contact: Record Contact;
     begin
-        Contact.TouchContact("Contact No.")
+        Contact.TouchContact(Rec."Contact No.")
     end;
 }
 

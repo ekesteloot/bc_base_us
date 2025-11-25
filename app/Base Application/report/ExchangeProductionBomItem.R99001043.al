@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+using System.Utilities;
+
 report 99001043 "Exchange Production BOM Item"
 {
     ApplicationArea = Manufacturing;
@@ -9,7 +14,7 @@ report 99001043 "Exchange Production BOM Item"
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             MaxIteration = 1;
 
             trigger OnPostDataItem()
@@ -154,7 +159,7 @@ report 99001043 "Exchange Production BOM Item"
         }
         dataitem(RecertifyLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             MaxIteration = 1;
 
             trigger OnPreDataItem()
@@ -415,9 +420,7 @@ report 99001043 "Exchange Production BOM Item"
         Recertify: Boolean;
         CopyRoutingLink: Boolean;
         DeleteExcComp: Boolean;
-        [InDataSet]
         CreateNewVersionEditable: Boolean;
-        [InDataSet]
         DeleteExchangedComponentEditab: Boolean;
 
         Text000: Label 'You must enter a Starting Date.';

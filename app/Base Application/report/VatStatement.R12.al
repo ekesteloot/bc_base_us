@@ -10,7 +10,7 @@ report 12 "VAT Statement"
     {
         dataitem("VAT Statement Name"; "VAT Statement Name")
         {
-            DataItemTableView = SORTING("Statement Template Name", Name);
+            DataItemTableView = sorting("Statement Template Name", Name);
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Statement Template Name", Name;
             column(StmtName1_VatStmtName; "Statement Template Name")
@@ -21,8 +21,8 @@ report 12 "VAT Statement"
             }
             dataitem("VAT Statement Line"; "VAT Statement Line")
             {
-                DataItemLink = "Statement Template Name" = FIELD("Statement Template Name"), "Statement Name" = FIELD(Name);
-                DataItemTableView = SORTING("Statement Template Name", "Statement Name") WHERE(Print = CONST(true));
+                DataItemLink = "Statement Template Name" = field("Statement Template Name"), "Statement Name" = field(Name);
+                DataItemTableView = sorting("Statement Template Name", "Statement Name") where(Print = const(true));
                 RequestFilterFields = "Row No.";
                 column(Heading; Heading)
                 {

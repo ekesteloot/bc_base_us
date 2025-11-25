@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using Microsoft.Foundation.Enums;
+
 page 1507 "WF Event/Response Combinations"
 {
     ApplicationArea = Suite;

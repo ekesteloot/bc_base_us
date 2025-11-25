@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using System.Environment;
+using System.Security.User;
+
 report 6665 "Batch Post Purch. Ret. Orders"
 {
     Caption = 'Batch Post Purch. Ret. Orders';
@@ -7,7 +15,7 @@ report 6665 "Batch Post Purch. Ret. Orders"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Return Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Return Order"));
             RequestFilterFields = "No.", Status;
             RequestFilterHeading = 'Purchase Return Order';
 
@@ -20,7 +28,7 @@ report 6665 "Batch Post Purch. Ret. Orders"
                 PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::Ship, ShipReq);
                 PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::Print, PrintDoc);
                 PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Replace VAT Date", ReplaceVATDateReq);
-                PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"VAT Date", VATDateReq);    
+                PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"VAT Date", VATDateReq);
                 PurchaseBatchPostMgt.RunBatch("Purchase Header", ReplacePostingDate, PostingDateReq, ReplaceDocumentDate, CalcInvDisc, false, InvReq);
 
                 CurrReport.Break();
@@ -81,7 +89,7 @@ report 6665 "Batch Post Purch. Ret. Orders"
                         begin
                             if ReplacePostingDate then
                                 Message(Text003);
-                            
+
                             if VATReportingDateMgt.IsVATDateUsageSetToPostingDate() then
                                 ReplaceVATDateReq := ReplacePostingDate;
                             UpdateVATDate();
@@ -160,7 +168,7 @@ report 6665 "Batch Post Purch. Ret. Orders"
                 ReplaceVATDateReq := ReplacePostingDate;
                 VATDateReq := PostingDateReq;
             end;
-            if ClientTypeManagement.GetCurrentClientType() = ClientType::Background then 
+            if ClientTypeManagement.GetCurrentClientType() = ClientType::Background then
                 exit;
             PurchasesPayablesSetup.Get();
             CalcInvDisc := PurchasesPayablesSetup."Calc. Inv. Discount";
@@ -184,14 +192,13 @@ report 6665 "Batch Post Purch. Ret. Orders"
         Text003: Label 'The exchange rate associated with the new posting date on the purchase header will not apply to the purchase lines.';
 
     protected var
-        PostingDateReq, VATDateReq: Date;
+        PostingDateReq, VATDateReq : Date;
         ShipReq: Boolean;
         InvReq: Boolean;
-        ReplacePostingDate, ReplaceVATDateReq: Boolean;
+        ReplacePostingDate, ReplaceVATDateReq : Boolean;
         ReplaceDocumentDate: Boolean;
         CalcInvDisc: Boolean;
         PrintDoc: Boolean;
-        [InDataSet]
         PrintDocVisible: Boolean;
         VATDateEnabled: Boolean;
         PostInvoiceEditable: Boolean;

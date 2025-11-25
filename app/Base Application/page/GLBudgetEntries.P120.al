@@ -1,3 +1,12 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Utilities;
+
 page 120 "G/L Budget Entries"
 {
     AdditionalSearchTerms = 'general ledger budget entries';
@@ -22,7 +31,7 @@ page 120 "G/L Budget Entries"
                     Editable = false;
                     ToolTip = 'Specifies the name of the G/L budget that the entry belongs to.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the date of the budget entry.';
@@ -138,7 +147,7 @@ page 120 "G/L Budget Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -152,7 +161,7 @@ page 120 "G/L Budget Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -177,7 +186,7 @@ page 120 "G/L Budget Entries"
     var
         GLBudgetEntry: Record "G/L Budget Entry";
     begin
-        if "Entry No." < LowestModifiedEntryNo then begin
+        if Rec."Entry No." < LowestModifiedEntryNo then begin
             CurrPage.SetSelectionFilter(GLBudgetEntry);
             GLBudgetEntry.SetCurrentKey("Entry No.");
             GLBudgetEntry.Ascending(true);
@@ -207,8 +216,8 @@ page 120 "G/L Budget Entries"
 
     trigger OnModifyRecord(): Boolean
     begin
-        if "Entry No." < LowestModifiedEntryNo then begin
-            LowestModifiedEntryNo := "Entry No.";
+        if Rec."Entry No." < LowestModifiedEntryNo then begin
+            LowestModifiedEntryNo := Rec."Entry No.";
             UpdateAnalysisView.SetLastBudgetEntryNo(LowestModifiedEntryNo - 1);
         end;
         exit(true);
@@ -216,51 +225,51 @@ page 120 "G/L Budget Entries"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        if GetFilter("Budget Name") <> '' then
-            "Budget Name" := GetRangeMin("Budget Name");
-        if GLBudgetName.Name <> "Budget Name" then
-            GLBudgetName.Get("Budget Name");
-        if GetFilter("G/L Account No.") <> '' then
-            "G/L Account No." := GetFirstGLAcc(GetFilter("G/L Account No."));
-        Date := GetFirstDate(GetFilter(Date));
-        "User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
+        if Rec.GetFilter("Budget Name") <> '' then
+            Rec."Budget Name" := Rec.GetRangeMin("Budget Name");
+        if GLBudgetName.Name <> Rec."Budget Name" then
+            GLBudgetName.Get(Rec."Budget Name");
+        if Rec.GetFilter("G/L Account No.") <> '' then
+            Rec."G/L Account No." := GetFirstGLAcc(Rec.GetFilter("G/L Account No."));
+        Rec.Date := GetFirstDate(Rec.GetFilter(Date));
+        Rec."User ID" := CopyStr(UserId(), 1, MaxStrLen(Rec."User ID"));
 
-        if GetFilter("Global Dimension 1 Code") <> '' then
-            "Global Dimension 1 Code" :=
-              GetFirstDimValue(GLSetup."Global Dimension 1 Code", GetFilter("Global Dimension 1 Code"));
+        if Rec.GetFilter("Global Dimension 1 Code") <> '' then
+            Rec."Global Dimension 1 Code" :=
+              GetFirstDimValue(GLSetup."Global Dimension 1 Code", Rec.GetFilter("Global Dimension 1 Code"));
 
-        if GetFilter("Global Dimension 2 Code") <> '' then
-            "Global Dimension 2 Code" :=
-              GetFirstDimValue(GLSetup."Global Dimension 2 Code", GetFilter("Global Dimension 2 Code"));
+        if Rec.GetFilter("Global Dimension 2 Code") <> '' then
+            Rec."Global Dimension 2 Code" :=
+              GetFirstDimValue(GLSetup."Global Dimension 2 Code", Rec.GetFilter("Global Dimension 2 Code"));
 
-        if GetFilter("Budget Dimension 1 Code") <> '' then
-            "Budget Dimension 1 Code" :=
-              GetFirstDimValue(GLBudgetName."Budget Dimension 1 Code", GetFilter("Budget Dimension 1 Code"));
+        if Rec.GetFilter("Budget Dimension 1 Code") <> '' then
+            Rec."Budget Dimension 1 Code" :=
+              GetFirstDimValue(GLBudgetName."Budget Dimension 1 Code", Rec.GetFilter("Budget Dimension 1 Code"));
 
-        if GetFilter("Budget Dimension 2 Code") <> '' then
-            "Budget Dimension 2 Code" :=
-              GetFirstDimValue(GLBudgetName."Budget Dimension 2 Code", GetFilter("Budget Dimension 2 Code"));
+        if Rec.GetFilter("Budget Dimension 2 Code") <> '' then
+            Rec."Budget Dimension 2 Code" :=
+              GetFirstDimValue(GLBudgetName."Budget Dimension 2 Code", Rec.GetFilter("Budget Dimension 2 Code"));
 
-        if GetFilter("Budget Dimension 3 Code") <> '' then
-            "Budget Dimension 3 Code" :=
-              GetFirstDimValue(GLBudgetName."Budget Dimension 3 Code", GetFilter("Budget Dimension 3 Code"));
+        if Rec.GetFilter("Budget Dimension 3 Code") <> '' then
+            Rec."Budget Dimension 3 Code" :=
+              GetFirstDimValue(GLBudgetName."Budget Dimension 3 Code", Rec.GetFilter("Budget Dimension 3 Code"));
 
-        if GetFilter("Budget Dimension 4 Code") <> '' then
-            "Budget Dimension 4 Code" :=
-              GetFirstDimValue(GLBudgetName."Budget Dimension 4 Code", GetFilter("Budget Dimension 4 Code"));
+        if Rec.GetFilter("Budget Dimension 4 Code") <> '' then
+            Rec."Budget Dimension 4 Code" :=
+              GetFirstDimValue(GLBudgetName."Budget Dimension 4 Code", Rec.GetFilter("Budget Dimension 4 Code"));
 
-        if GetFilter("Business Unit Code") <> '' then
-            "Business Unit Code" := GetFirstBusUnit(GetFilter("Business Unit Code"));
+        if Rec.GetFilter("Business Unit Code") <> '' then
+            Rec."Business Unit Code" := GetFirstBusUnit(Rec.GetFilter("Business Unit Code"));
     end;
 
     trigger OnOpenPage()
     var
         GLBudgetName: Record "G/L Budget Name";
     begin
-        if GetFilter("Budget Name") = '' then
+        if Rec.GetFilter("Budget Name") = '' then
             GLBudgetName.Init()
         else begin
-            CopyFilter("Budget Name", GLBudgetName.Name);
+            Rec.CopyFilter("Budget Name", GLBudgetName.Name);
             GLBudgetName.FindFirst();
         end;
         CurrPage.Editable := not GLBudgetName.Blocked;
@@ -285,29 +294,17 @@ page 120 "G/L Budget Entries"
         UpdateAnalysisView: Codeunit "Update Analysis View";
         DimensionSetIDFilter: Page "Dimension Set ID Filter";
         LowestModifiedEntryNo: Integer;
-        [InDataSet]
         GlobalDimension1CodeVisible: Boolean;
-        [InDataSet]
         GlobalDimension2CodeVisible: Boolean;
-        [InDataSet]
         BudgetDimension1CodeVisible: Boolean;
-        [InDataSet]
         BudgetDimension2CodeVisible: Boolean;
-        [InDataSet]
         BudgetDimension3CodeVisible: Boolean;
-        [InDataSet]
         BudgetDimension4CodeVisible: Boolean;
-        [InDataSet]
         GlobalDimension1CodeEnable: Boolean;
-        [InDataSet]
         GlobalDimension2CodeEnable: Boolean;
-        [InDataSet]
         BudgetDimension1CodeEnable: Boolean;
-        [InDataSet]
         BudgetDimension2CodeEnable: Boolean;
-        [InDataSet]
         BudgetDimension3CodeEnable: Boolean;
-        [InDataSet]
         BudgetDimension4CodeEnable: Boolean;
 
     local procedure GetFirstGLAcc(GLAccFilter: Text[250]): Code[20]

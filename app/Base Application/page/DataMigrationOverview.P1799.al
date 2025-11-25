@@ -1,3 +1,13 @@
+﻿namespace System.Integration;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Reflection;
+using System.Threading;
+
 page 1799 "Data Migration Overview"
 {
     ApplicationArea = Basic, Suite;
@@ -60,12 +70,12 @@ page 1799 "Data Migration Overview"
                     var
                         JobQueueLogEntry: Record "Job Queue Log Entry";
                     begin
-                        if Status = Status::Failed then begin
+                        if Rec.Status = Rec.Status::Failed then begin
                             JobQueueLogEntry.SetRange("Object ID to Run", CODEUNIT::"Data Migration Mgt.");
                             JobQueueLogEntry.SetRange("Object Type to Run", JobQueueLogEntry."Object Type to Run"::Codeunit);
                             PAGE.Run(PAGE::"Job Queue Log Entries", JobQueueLogEntry);
                         end else
-                            if Status = Status::"Completed with Errors" then
+                            if Rec.Status = Rec.Status::"Completed with Errors" then
                                 ShowErrors();
                     end;
                 }
@@ -73,6 +83,7 @@ page 1799 "Data Migration Overview"
                 {
                     ApplicationArea = All;
                     Caption = 'Next Task';
+                    OptionCaption = ' ,Review and fix errors,Review and post,Review and Delete';
                     ToolTip = 'Specifies the next task that is needed to complete the migration.';
 
                     trigger OnDrillDown()
@@ -82,7 +93,7 @@ page 1799 "Data Migration Overview"
                                 ShowErrors();
                             NextTask::"Review and post",
                           NextTask::"Review and Delete":
-                                case "Destination Table ID" of
+                                case Rec."Destination Table ID" of
                                     DATABASE::Vendor:
                                         GoToGeneralJournalForVendors();
                                     DATABASE::Customer:
@@ -103,7 +114,7 @@ page 1799 "Data Migration Overview"
 
                     trigger OnDrillDown()
                     begin
-                        if "Error Count" = 0 then
+                        if Rec."Error Count" = 0 then
                             exit;
                         ShowErrors();
                     end;
@@ -121,8 +132,7 @@ page 1799 "Data Migration Overview"
                 ApplicationArea = All;
                 Caption = 'Refresh';
                 Image = Refresh;
-                //The property 'ToolTip' cannot be empty.
-                //ToolTip = '';
+                ToolTip = 'Refresh this page.';
 
                 trigger OnAction()
                 begin
@@ -195,37 +205,37 @@ page 1799 "Data Migration Overview"
 
         DataMigrationMgt.UpdateMigrationStatus(Rec);
 
-        case Status of
-            Status::Completed:
+        case Rec.Status of
+            Rec.Status::Completed:
                 begin
                     StatusStyle := 'Favorable'; // bold green
                     if DataMigrationMgt.DestTableHasAnyTransactions(Rec, DummyCode) then
                         NextTask := NextTask::"Review and post";
                 end;
-            Status::"Completed with Errors":
+            Rec.Status::"Completed with Errors":
                 begin
                     NextTask := NextTask::"Review and fix errors";
                     StatusStyle := 'Attention';
                 end;
-            Status::Stopped,
-            Status::Failed:
+            Rec.Status::Stopped,
+            Rec.Status::Failed:
                 begin
                     StatusStyle := 'Attention'; // red
                     if DataMigrationMgt.DestTableHasAnyTransactions(Rec, DummyCode) then
                         NextTask := NextTask::"Review and Delete";
                 end;
-            Status::"In Progress":
+            Rec.Status::"In Progress":
                 StatusStyle := 'StandardAccent'; // blue
-            Status::Pending:
+            Rec.Status::Pending:
                 StatusStyle := 'Standard'; // black
         end;
 
-        CalcFields("Error Count");
-        if "Error Count" = 0 then
+        Rec.CalcFields("Error Count");
+        if Rec."Error Count" = 0 then
             ErrorStyle := 'Subordinate';
 
         AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
-        AllObjWithCaption.SetRange("Object ID", "Destination Table ID");
+        AllObjWithCaption.SetRange("Object ID", Rec."Destination Table ID");
         if AllObjWithCaption.FindFirst() then
             TableNameToMigrate := AllObjWithCaption."Object Caption";
     end;
@@ -238,9 +248,7 @@ page 1799 "Data Migration Overview"
     var
         DataMigrationFacade: Codeunit "Data Migration Facade";
         RefreshNotification: Notification;
-        [InDataSet]
         StatusStyle: Text;
-        [InDataSet]
         TableNameToMigrate: Text[250];
         DashboardEmptyNotificationMsg: Label 'This page shows the status of a data migration. It''s empty because you have not migrated data.';
         StartDataMigrationMsg: Label 'Start data migration';
@@ -259,8 +267,8 @@ page 1799 "Data Migration Overview"
     var
         DataMigrationError: Record "Data Migration Error";
     begin
-        DataMigrationError.SetRange("Migration Type", "Migration Type");
-        DataMigrationError.SetRange("Destination Table ID", "Destination Table ID");
+        DataMigrationError.SetRange("Migration Type", Rec."Migration Type");
+        DataMigrationError.SetRange("Destination Table ID", Rec."Destination Table ID");
         if DataMigrationError.FindFirst() then begin
             PAGE.RunModal(PAGE::"Data Migration Error", DataMigrationError);
             CurrPage.Update();
@@ -315,7 +323,7 @@ page 1799 "Data Migration Overview"
         ItemJournalLine: Record "Item Journal Line";
         ItemJournalBatchName: Code[10];
     begin
-        DataMigrationFacade.OnFindBatchForItemTransactions("Migration Type", ItemJournalBatchName);
+        DataMigrationFacade.OnFindBatchForItemTransactions(Rec."Migration Type", ItemJournalBatchName);
         if ItemJournalBatchName <> '' then begin
             ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatchName);
             if ItemJournalLine.FindFirst() then begin
@@ -332,7 +340,7 @@ page 1799 "Data Migration Overview"
         GenJournalLine: Record "Gen. Journal Line";
         GenJournalBatchName: Code[10];
     begin
-        DataMigrationFacade.OnFindBatchForCustomerTransactions("Migration Type", GenJournalBatchName);
+        DataMigrationFacade.OnFindBatchForCustomerTransactions(Rec."Migration Type", GenJournalBatchName);
         if GenJournalBatchName <> '' then begin
             GenJournalLine.SetRange("Journal Batch Name", GenJournalBatchName);
             if GenJournalLine.FindFirst() then begin
@@ -350,7 +358,7 @@ page 1799 "Data Migration Overview"
         GenJournalLine: Record "Gen. Journal Line";
         GenJournalBatchName: Code[10];
     begin
-        DataMigrationFacade.OnFindBatchForVendorTransactions("Migration Type", GenJournalBatchName);
+        DataMigrationFacade.OnFindBatchForVendorTransactions(Rec."Migration Type", GenJournalBatchName);
         if GenJournalBatchName <> '' then begin
             GenJournalLine.SetRange("Journal Batch Name", GenJournalBatchName);
             if GenJournalLine.FindFirst() then begin

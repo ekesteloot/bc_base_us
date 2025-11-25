@@ -36,9 +36,6 @@ codeunit 1430 "Role Center Notification Mgt."
 #if not CLEAN21
         EvaluationNotificationMsg: Label 'Ready to try Business Central with your own company data? We’ll walk you through the setup.';
 #endif
-        WSDeprecationNotificationMsg: Label 'Your user account is using access keys for web service authentication. Web service access keys are no longer supported and will stop working after October 1, 2022.';
-        ShowMoreWSDeprecationLinkTok: Label 'Learn more';
-        ShowWSDeprecationFixNowTok: Label 'Review required update...';
         TrialNotificationMsg: Label 'Your trial period expires in %1 days. Ready to subscribe, or do you need more time?', Comment = '%1=Count of days until trial expires';
         TrialNotificationPreviewMsg: Label 'Your trial period expires in %1 days.', Comment = '%1=Count of days until trial expires';
         TrialSuspendedNotificationMsg: Label 'Your trial period has expired. You can subscribe or extend the period to get more time.';
@@ -73,26 +70,6 @@ codeunit 1430 "Role Center Notification Mgt."
         EvaluationNotification.Send();
     end;
 #endif
-    local procedure CreateAndSendWSDeprecationNotification()
-    var
-        WSDeprecationNotification: Notification;
-        NotificationsMessage: Text;
-        NotificationEndingLongTok: label ' (days left: %1).', Comment = '%1 number of days eq 23';
-        NotificationEndingShortTok: label '.';
-    begin
-        WSDeprecationNotification.Id := GetWSDeprecationNotificationId();
-        NotificationsMessage := WSDeprecationNotificationMsg;
-        if (DMY2Date(1, 10, 2022) - today) > 0 then
-            NotificationsMessage := NotificationsMessage + StrSubstNo(NotificationEndingLongTok, format(DMY2Date(1, 10, 2022) - today))
-        else
-            NotificationsMessage := NotificationsMessage + NotificationEndingShortTok;
-        WSDeprecationNotification.Message := NotificationsMessage;
-        WSDeprecationNotification.Scope := NotificationScope::LocalScope;
-        WSDeprecationNotification.AddAction(ShowMoreWSDeprecationLinkTok, CODEUNIT::"User Management", 'BasicAuthDepricationNotificationShowMore');
-        WSDeprecationNotification.AddAction(
-            ShowWSDeprecationFixNowTok, CODEUNIT::"Role Center Notification Mgt.", 'FixNowWSDeprecation');
-        WSDeprecationNotification.Send();
-    end;
 
     procedure FixNowWSDeprecation(Notification: Notification)
     begin
@@ -491,7 +468,9 @@ codeunit 1430 "Role Center Notification Mgt."
         ResultTrialExtendedSuspended: Boolean;
         ResultPaidWarning: Boolean;
         ResultPaidSuspended: Boolean;
+#if not CLEAN23
         ResultWSDeprecationWarning: Boolean;
+#endif
         ResultSandbox: Boolean;
     begin
         OnBeforeShowNotifications();
@@ -503,7 +482,9 @@ codeunit 1430 "Role Center Notification Mgt."
             ResultTrialExtended := ShowTrialExtendedNotification();
             ResultTrialExtendedSuspended := ShowTrialExtendedSuspendedNotification();
         end;
+#if not CLEAN23
         ResultWSDeprecationWarning := ShowWSDeprecationNotication();
+#endif
         ResultPaidWarning := ShowPaidWarningNotification();
         ResultPaidSuspended := ShowPaidSuspendedNotification();
         ResultSandbox := ShowSandboxNotification();
@@ -517,7 +498,7 @@ codeunit 1430 "Role Center Notification Mgt."
           ResultTrial or ResultTrialSuspended or
           ResultTrialExtended or ResultTrialExtendedSuspended or
           ResultPaidWarning or ResultPaidSuspended or
-          ResultSandbox or ResultWSDeprecationWarning);
+          ResultSandbox)
     end;
 
 #if not CLEAN21
@@ -548,7 +529,8 @@ codeunit 1430 "Role Center Notification Mgt."
         CreateAndSendTrialNotification();
         exit(true);
     end;
-
+#if not CLEAN23
+    [Obsolete('This deprecation warning should no longer be shown with from 23.0', '23.0')]
     procedure ShowWSDeprecationNotication(): Boolean
     var
         User: Record User;
@@ -556,8 +538,6 @@ codeunit 1430 "Role Center Notification Mgt."
         NavTenantSettingsHelper: DotNet NavTenantSettingsHelper;
         WebServiceKey: Text[80];
     begin
-        if not AreNotificationsSupported() then
-            exit(false);
         if not NavTenantSettingsHelper.IsWSKeyAllowed() then
             exit(false);
         if not User.ReadPermission then
@@ -565,10 +545,9 @@ codeunit 1430 "Role Center Notification Mgt."
         WebServiceKey := IdentityManagement.GetWebServicesKey(UserSecurityId());
         if WebServiceKey = '' then
             exit(false);
-        CreateAndSendWSDeprecationNotification();
         exit(true);
     end;
-
+#endif
     procedure ShowTrialSuspendedNotification(): Boolean
     begin
         IsRunningPreviewEvent();

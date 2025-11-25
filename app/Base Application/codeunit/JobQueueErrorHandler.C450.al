@@ -1,3 +1,7 @@
+namespace System.Threading;
+
+using System.Utilities;
+
 codeunit 450 "Job Queue Error Handler"
 {
     Permissions = TableData "Job Queue Entry" = rimd,

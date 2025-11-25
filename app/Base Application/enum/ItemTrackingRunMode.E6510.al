@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 enum 6510 "Item Tracking Run Mode"
 {
     Extensible = true;

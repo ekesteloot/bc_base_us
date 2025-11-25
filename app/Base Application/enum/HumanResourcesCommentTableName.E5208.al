@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Comment;
+
 enum 5208 "Human Resources Comment Table Name"
 {
     Extensible = true;

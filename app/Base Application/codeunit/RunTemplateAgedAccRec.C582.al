@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using System.Environment;
+using System.Integration;
+
 codeunit 582 "Run Template Aged Acc. Rec."
 {
 

@@ -1,3 +1,7 @@
+namespace System.Integration;
+
+using System.Reflection;
+
 table 1801 "Data Migration Entity"
 {
     Caption = 'Data Migration Entity';

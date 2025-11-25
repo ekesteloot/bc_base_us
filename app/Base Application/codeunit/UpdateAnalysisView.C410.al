@@ -1,3 +1,12 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.CashFlow.Forecast;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Reflection;
+
 codeunit 410 "Update Analysis View"
 {
     Permissions = TableData "G/L Entry" = r,
@@ -10,11 +19,11 @@ codeunit 410 "Update Analysis View"
 
     trigger OnRun()
     begin
-        if Code <> '' then begin
+        if Rec.Code <> '' then begin
             InitLastEntryNo();
-            LockTable();
-            Find();
-            UpdateOne(Rec, 2, "Last Entry No." < LastGLEntryNo - 1000);
+            Rec.LockTable();
+            Rec.Find();
+            UpdateOne(Rec, 2, Rec."Last Entry No." < LastGLEntryNo - 1000);
         end;
     end;
 

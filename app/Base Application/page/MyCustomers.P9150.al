@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Customer;
+
 page 9150 "My Customers"
 {
     Caption = 'My Customers';
@@ -65,9 +67,9 @@ page 9150 "My Customers"
                 Caption = 'Open';
                 Image = ViewDetails;
                 RunObject = Page "Customer Card";
-                RunPageLink = "No." = FIELD("Customer No.");
+                RunPageLink = "No." = field("Customer No.");
                 RunPageMode = View;
-                RunPageView = SORTING("No.");
+                RunPageView = sorting("No.");
                 Scope = Repeater;
                 ShortCutKey = 'Return';
                 ToolTip = 'Open the card for the selected record.';
@@ -87,10 +89,10 @@ page 9150 "My Customers"
 
     trigger OnOpenPage()
     begin
-        SetRange("User ID", UserId);
+        Rec.SetRange("User ID", UserId);
     end;
 
-    var
+    protected var
         Customer: Record Customer;
 
     local procedure SyncFieldsWithCustomer()
@@ -99,12 +101,12 @@ page 9150 "My Customers"
     begin
         Clear(Customer);
 
-        if Customer.Get("Customer No.") then
-            if (Name <> Customer.Name) or ("Phone No." <> Customer."Phone No.") then begin
-                Name := Customer.Name;
-                "Phone No." := Customer."Phone No.";
-                if MyCustomer.Get("User ID", "Customer No.") then
-                    Modify();
+        if Customer.Get(Rec."Customer No.") then
+            if (Rec.Name <> Customer.Name) or (Rec."Phone No." <> Customer."Phone No.") then begin
+                Rec.Name := Customer.Name;
+                Rec."Phone No." := Customer."Phone No.";
+                if MyCustomer.Get(Rec."User ID", Rec."Customer No.") then
+                    Rec.Modify();
             end;
     end;
 }

@@ -1,4 +1,6 @@
-﻿page 427 "Payment Methods"
+﻿namespace Microsoft.BankMgt.BankAccount;
+
+page 427 "Payment Methods"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Payment Methods';
@@ -13,7 +15,7 @@
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code to identify this payment method.';
@@ -90,7 +92,7 @@
                 Caption = 'T&ranslation';
                 Image = Translation;
                 RunObject = Page "Payment Method Translations";
-                RunPageLink = "Payment Method Code" = FIELD(Code);
+                RunPageLink = "Payment Method Code" = field(Code);
                 ToolTip = 'View or edit descriptions for each payment method in different languages.';
             }
         }

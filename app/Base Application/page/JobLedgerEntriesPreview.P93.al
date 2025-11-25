@@ -1,3 +1,9 @@
+namespace Microsoft.ProjectMgt.Jobs.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using System.Security.User;
+
 page 93 "Job Ledger Entries Preview"
 {
     Caption = 'Job Ledger Entries Preview';
@@ -229,7 +235,7 @@ page 93 "Job Ledger Entries Preview"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -264,7 +270,7 @@ page 93 "Job Ledger Entries Preview"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the entry type that the job ledger entry is linked to.';
                 }
-                field(Adjusted; Adjusted)
+                field(Adjusted; Rec.Adjusted)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies whether a job ledger entry has been modified or adjusted. The value in this field is inserted by the Adjust Cost - Item Entries batch job. The Adjusted check box is selected if applicable.';
@@ -370,7 +376,7 @@ page 93 "Job Ledger Entries Preview"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
                 action("<Action28>")
@@ -385,7 +391,7 @@ page 93 "Job Ledger Entries Preview"
                         JobUsageLink: Record "Job Usage Link";
                         JobPlanningLine: Record "Job Planning Line";
                     begin
-                        JobUsageLink.SetRange("Entry No.", "Entry No.");
+                        JobUsageLink.SetRange("Entry No.", Rec."Entry No.");
 
                         if JobUsageLink.FindSet() then
                             repeat

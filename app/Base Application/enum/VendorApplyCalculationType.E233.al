@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Payables;
+
 enum 233 "Vendor Apply Calculation Type"
 {
     Extensible = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Analysis;
+
 table 923 "Customer Sales Buffer"
 {
     DataClassification = SystemMetadata;

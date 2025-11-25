@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 page 556 "Analysis View List"
 {
     ApplicationArea = Dimensions;
@@ -15,7 +17,7 @@ page 556 "Analysis View List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the code for this entry.';
@@ -92,7 +94,7 @@ page 556 "Analysis View List"
 
                 trigger OnAction()
                 begin
-                    RunAnalysisByDimensionPage();
+                    Rec.RunAnalysisByDimensionPage();
                 end;
             }
             action("&Update")
@@ -122,7 +124,7 @@ page 556 "Analysis View List"
 
     trigger OnOpenPage()
     begin
-        IncludeBudgets := "Account Source" = "Account Source"::"G/L Account";
+        IncludeBudgets := Rec."Account Source" = Rec."Account Source"::"G/L Account";
     end;
 
     var

@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 page 936 "Alt. Vendor Posting Groups"
 {
     Caption = 'Alternative Vendor Posting Groups';
@@ -12,7 +14,7 @@ page 936 "Alt. Vendor Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Alt. Vendor Posting Group"; "Alt. Vendor Posting Group")
+                field("Alt. Vendor Posting Group"; Rec."Alt. Vendor Posting Group")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the vendor group for posting business transactions to general general ledger accounts.';

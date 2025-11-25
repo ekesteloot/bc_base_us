@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Setup;
+
+using System.Reflection;
+
 page 385 "Report Selection - Bank Acc."
 {
     ApplicationArea = Basic, Suite;
@@ -84,13 +88,13 @@ page 385 "Report Selection - Bank Acc."
         Rec.FilterGroup(2);
         case ReportUsage2 of
             "Report Selection Usage Bank"::Statement:
-                Rec.SetRange(Usage, "Report Selection Usage"::"B.Stmt");
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"B.Stmt");
             "Report Selection Usage Bank"::"Reconciliation - Test":
-                Rec.SetRange(Usage, "Report Selection Usage"::"B.Recon.Test");
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"B.Recon.Test");
             "Report Selection Usage Bank"::Check:
-                Rec.SetRange(Usage, "Report Selection Usage"::"B.Check");
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"B.Check");
             "Report Selection Usage Bank"::"Posted Payment Reconciliation":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Posted Payment Reconciliation");
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"Posted Payment Reconciliation");
         end;
         OnSetUsageFilterOnAfterSetFiltersByReportUsage(Rec, ReportUsage2);
         Rec.FilterGroup(0);
@@ -104,13 +108,13 @@ page 385 "Report Selection - Bank Acc."
         if Rec.GetFilter(Usage) <> '' then begin
             if Evaluate(NewReportUsage, Rec.GetFilter(Usage)) then
                 case NewReportUsage of
-                    "Report Selection Usage"::"B.Stmt":
+                    Enum::"Report Selection Usage"::"B.Stmt":
                         ReportUsage2 := "Report Selection Usage Bank"::Statement;
-                    "Report Selection Usage"::"B.Recon.Test":
+                    Enum::"Report Selection Usage"::"B.Recon.Test":
                         ReportUsage2 := "Report Selection Usage Bank"::"Reconciliation - Test";
-                    "Report Selection Usage"::"B.Check":
+                    Enum::"Report Selection Usage"::"B.Check":
                         ReportUsage2 := "Report Selection Usage Bank"::Check;
-                    "Report Selection Usage"::"Posted Payment Reconciliation":
+                    Enum::"Report Selection Usage"::"Posted Payment Reconciliation":
                         ReportUsage2 := "Report Selection Usage Bank"::"Posted Payment Reconciliation";
                     else
                         OnInitUsageFilterOnElseCase(NewReportUsage, ReportUsage2);

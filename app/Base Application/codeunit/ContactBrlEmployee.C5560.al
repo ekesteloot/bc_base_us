@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.HumanResources.Employee;
+
 codeunit 5560 "Contact BRL Employee" implements "Contact Business Relation Link"
 {
 

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 enum 28 "Costing Method"
 {
     Extensible = true;

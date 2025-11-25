@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Archive;
+
+using System.Security.User;
+
 page 5166 "Purchase List Archive"
 {
     Caption = 'Purchase List Archive';
@@ -41,7 +49,7 @@ page 5166 "Purchase List Archive"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Archived By");
+                        UserMgt.DisplayUserInformation(Rec."Archived By");
                     end;
                 }
                 field("Interaction Exist"; Rec."Interaction Exist")

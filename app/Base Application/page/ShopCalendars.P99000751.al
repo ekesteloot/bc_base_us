@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 page 99000751 "Shop Calendars"
 {
     ApplicationArea = Manufacturing;
@@ -13,7 +15,7 @@ page 99000751 "Shop Calendars"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies a code to identify for this shop calendar.';
@@ -54,7 +56,7 @@ page 99000751 "Shop Calendars"
                     Caption = 'Working Days';
                     Image = Workdays;
                     RunObject = Page "Shop Calendar Working Days";
-                    RunPageLink = "Shop Calendar Code" = FIELD(Code);
+                    RunPageLink = "Shop Calendar Code" = field(Code);
                     ToolTip = 'View or edit the calendar days that are working days and at what time they start and end.';
                 }
                 action(Holidays)
@@ -63,7 +65,7 @@ page 99000751 "Shop Calendars"
                     Caption = 'Holidays';
                     Image = Holiday;
                     RunObject = Page "Shop Calendar Holidays";
-                    RunPageLink = "Shop Calendar Code" = FIELD(Code);
+                    RunPageLink = "Shop Calendar Code" = field(Code);
                     ToolTip = 'View or edit days that are registered as holidays. ';
                 }
             }

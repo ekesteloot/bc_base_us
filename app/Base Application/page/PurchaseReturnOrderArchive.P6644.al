@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Archive;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Vendor;
+using System.Security.User;
+
 page 6644 "Purchase Return Order Archive"
 {
     Caption = 'Purchase Return Order Archive';
@@ -5,7 +12,7 @@ page 6644 "Purchase Return Order Archive"
     Editable = false;
     PageType = Document;
     SourceTable = "Purchase Header Archive";
-    SourceTableView = WHERE("Document Type" = CONST("Return Order"));
+    SourceTableView = where("Document Type" = const("Return Order"));
 
     layout
     {
@@ -169,9 +176,9 @@ page 6644 "Purchase Return Order Archive"
             part(PurchLinesArchive; "Purch Return Order Arc Subform")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Document No." = FIELD("No."),
-                              "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                              "Version No." = FIELD("Version No.");
+                SubPageLink = "Document No." = field("No."),
+                              "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                              "Version No." = field("Version No.");
             }
             group("Invoice Details")
             {
@@ -409,7 +416,7 @@ page 6644 "Purchase Return Order Archive"
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the code of the port of entry where the items pass into your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the destination country or region for the purpose of Intrastat reporting.';
@@ -432,7 +439,7 @@ page 6644 "Purchase Return Order Archive"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Archived By");
+                        UserMgt.DisplayUserInformation(Rec."Archived By");
                     end;
                 }
                 field("Date Archived"; Rec."Date Archived")
@@ -480,7 +487,7 @@ page 6644 "Purchase Return Order Archive"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Vendor Card";
-                    RunPageLink = "No." = FIELD("Buy-from Vendor No.");
+                    RunPageLink = "No." = field("Buy-from Vendor No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -495,7 +502,7 @@ page 6644 "Purchase Return Order Archive"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Co&mments")
@@ -504,11 +511,11 @@ page 6644 "Purchase Return Order Archive"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Archive Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0),
-                                  "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                  "Version No." = FIELD("Version No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0),
+                                  "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                  "Version No." = field("Version No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Print)
@@ -529,8 +536,8 @@ page 6644 "Purchase Return Order Archive"
 
     trigger OnAfterGetRecord()
     begin
-        BuyFromContact.GetOrClear("Buy-from Contact No.");
-        PayToContact.GetOrClear("Pay-to Contact No.");
+        BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
+        PayToContact.GetOrClear(Rec."Pay-to Contact No.");
     end;
 
     var

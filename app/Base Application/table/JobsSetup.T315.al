@@ -1,3 +1,12 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.Setup;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.WIP;
+
 table 315 "Jobs Setup"
 {
     Caption = 'Jobs Setup';
@@ -69,7 +78,7 @@ table 315 "Jobs Setup"
         field(7003; "Default Sales Price List Code"; Code[20])
         {
             Caption = 'Default Sales Price List Code';
-            TableRelation = "Price List Header" where("Price Type" = Const(Sale), "Source Group" = Const(Job), "Allow Updating Defaults" = const(true));
+            TableRelation = "Price List Header" where("Price Type" = const(Sale), "Source Group" = const(Job), "Allow Updating Defaults" = const(true));
             DataClassification = CustomerContent;
             trigger OnLookup()
             var
@@ -84,13 +93,13 @@ table 315 "Jobs Setup"
         field(7004; "Default Purch Price List Code"; Code[20])
         {
             Caption = 'Default Purchase Price List Code';
-            TableRelation = "Price List Header" where("Price Type" = Const(Purchase), "Source Group" = Const(Job), "Allow Updating Defaults" = const(true));
+            TableRelation = "Price List Header" where("Price Type" = const(Purchase), "Source Group" = const(Job), "Allow Updating Defaults" = const(true));
             DataClassification = CustomerContent;
             trigger OnLookup()
             var
                 PriceListHeader: Record "Price List Header";
             begin
-                if Page.RunModal(Page::"Purchase Job Price Lists", PriceListHeader) = Action::LookupOK then begin
+                if Page.RunModal(Enum::PageID::"Purchase Job Price Lists".AsInteger(), PriceListHeader) = Action::LookupOK then begin
                     PriceListHeader.TestField("Allow Updating Defaults");
                     Validate("Default Purch Price List Code", PriceListHeader.Code);
                 end;

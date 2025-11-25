@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 codeunit 197 "Update Acc. Sched. KPI Data"
 {
     Permissions = TableData "Acc. Sched. KPI Web Srv. Setup" = rim,

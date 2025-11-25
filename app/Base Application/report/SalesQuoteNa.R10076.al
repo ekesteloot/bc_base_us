@@ -8,7 +8,7 @@ report 10076 "Sales Quote NA"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Quote));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Quote));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.", "Ship-to Code", "No. Printed";
             RequestFilterHeading = 'Sales Order';
@@ -20,12 +20,12 @@ report 10076 "Sales Quote NA"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE("Document Type" = CONST(Quote));
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where("Document Type" = const(Quote));
                 dataitem(SalesLineComments; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST(Quote), "Print On Quote" = CONST(true));
+                    DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const(Quote), "Print On Quote" = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -113,8 +113,8 @@ report 10076 "Sales Quote NA"
             }
             dataitem("Sales Comment Line"; "Sales Comment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST(Quote), "Print On Quote" = CONST(true), "Document Line No." = CONST(0));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const(Quote), "Print On Quote" = const(true), "Document Line No." = const(0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -154,10 +154,10 @@ report 10076 "Sales Quote NA"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -310,7 +310,7 @@ report 10076 "Sales Quote NA"
                     }
                     dataitem(SalesLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(Number_IntegerLine; Number)
                         {
                         }
@@ -503,6 +503,7 @@ report 10076 "Sales Quote NA"
                     end;
 
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 FormatDocumentFields("Sales Header");
 
@@ -660,9 +661,6 @@ report 10076 "Sales Quote NA"
         PaymentTerms: Record "Payment Terms";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyInformation: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         CompanyInfo: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         TempSalesLine: Record "Sales Line" temporary;
@@ -712,9 +710,7 @@ report 10076 "Sales Quote NA"
         Text007: Label 'Total Tax:';
         Text008: Label 'Tax:';
         UseExternalTaxEngine: Boolean;
-        [InDataSet]
         ArchiveDocumentEnable: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         SellCaptionLbl: Label 'Sell';
         ToCaptionLbl: Label 'To:';
@@ -739,6 +735,11 @@ report 10076 "Sales Quote NA"
         TotalCaptionLbl: Label 'Total:';
         AmtSubjecttoSalesTaxCptnLbl: Label 'Amount Subject to Sales Tax';
         AmtExemptfromSalesTaxCptnLbl: Label 'Amount Exempt from Sales Tax';
+
+    protected var
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     local procedure FormatDocumentFields(SalesHeader: Record "Sales Header")
     begin

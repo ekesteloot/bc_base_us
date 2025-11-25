@@ -68,26 +68,26 @@ page 475 "VAT Statement Preview Line"
 
                     trigger OnDrillDown()
                     begin
-                        case Type of
-                            Type::"Account Totaling":
+                        case Rec.Type of
+                            Rec.Type::"Account Totaling":
                                 begin
-                                    GLEntry.SetFilter("G/L Account No.", "Account Totaling");
+                                    GLEntry.SetFilter("G/L Account No.", Rec."Account Totaling");
                                     Rec.CopyFilter("Date Filter", GLEntry."VAT Reporting Date");
                                     OnColumnValueDrillDownOnBeforeRunGeneralLedgerEntries(VATEntry, GLEntry, Rec);
                                     PAGE.Run(PAGE::"General Ledger Entries", GLEntry);
                                 end;
-                            Type::"VAT Entry Totaling":
+                            Rec.Type::"VAT Entry Totaling":
                                 begin
                                     VATEntry.Reset();
                                     SetKeyForVATEntry(VATEntry);
-                                    VATEntry.SetRange(Type, "Gen. Posting Type");
-                                    VATEntry.SetRange("VAT Bus. Posting Group", "VAT Bus. Posting Group");
-                                    VATEntry.SetRange("VAT Prod. Posting Group", "VAT Prod. Posting Group");
-                                    VATEntry.SetRange("Tax Jurisdiction Code", "Tax Jurisdiction Code");
-                                    VATEntry.SetRange("Use Tax", "Use Tax");
-                                    if GetFilter("Date Filter") <> '' then
+                                    VATEntry.SetRange(Type, Rec."Gen. Posting Type");
+                                    VATEntry.SetRange("VAT Bus. Posting Group", Rec."VAT Bus. Posting Group");
+                                    VATEntry.SetRange("VAT Prod. Posting Group", Rec."VAT Prod. Posting Group");
+                                    VATEntry.SetRange("Tax Jurisdiction Code", Rec."Tax Jurisdiction Code");
+                                    VATEntry.SetRange("Use Tax", Rec."Use Tax");
+                                    if Rec.GetFilter("Date Filter") <> '' then
                                         SetDateFilterForVATEntry(VATEntry);
-                                        
+
                                     case Selection of
                                         Selection::Open:
                                             VATEntry.SetRange(Closed, false);
@@ -99,9 +99,9 @@ page 475 "VAT Statement Preview Line"
                                     OnBeforeOpenPageVATEntryTotaling(VATEntry, Rec, GLEntry);
                                     PAGE.Run(PAGE::"VAT Entries", VATEntry);
                                 end;
-                            Type::"Row Totaling",
-                            Type::Description:
-                                Error(Text000, FieldCaption(Type), Type);
+                            Rec.Type::"Row Totaling",
+                            Rec.Type::Description:
+                                Error(Text000, Rec.FieldCaption(Type), Rec.Type);
                         end;
                     end;
                 }
@@ -116,7 +116,7 @@ page 475 "VAT Statement Preview Line"
     trigger OnAfterGetRecord()
     begin
         CalcColumnValue(Rec, ColumnValue, 0);
-        if "Print with" = "Print with"::"Opposite Sign" then
+        if Rec."Print with" = Rec."Print with"::"Opposite Sign" then
             ColumnValue := -ColumnValue;
     end;
 
@@ -167,9 +167,9 @@ page 475 "VAT Statement Preview Line"
     [Obsolete('Replaced by UpdateForm without VAT Date', '22.0')]
     procedure UpdateForm(var VATStmtName: Record "VAT Statement Name"; NewSelection: Enum "VAT Statement Report Selection"; NewPeriodSelection: Enum "VAT Statement Report Period Selection"; NewUseAmtsInAddCurr: Boolean; NewVATDateType: Enum "VAT Date Type")
     begin
-        SetRange("Statement Template Name", VATStmtName."Statement Template Name");
-        SetRange("Statement Name", VATStmtName.Name);
-        VATStmtName.CopyFilter("Date Filter", "Date Filter");
+        Rec.SetRange("Statement Template Name", VATStmtName."Statement Template Name");
+        Rec.SetRange("Statement Name", VATStmtName.Name);
+        VATStmtName.CopyFilter("Date Filter", Rec."Date Filter");
         Selection := NewSelection;
         PeriodSelection := NewPeriodSelection;
         UseAmtsInAddCurr := NewUseAmtsInAddCurr;
@@ -183,9 +183,9 @@ page 475 "VAT Statement Preview Line"
 
     procedure UpdateForm(var VATStmtName: Record "VAT Statement Name"; NewSelection: Enum "VAT Statement Report Selection"; NewPeriodSelection: Enum "VAT Statement Report Period Selection"; NewUseAmtsInAddCurr: Boolean)
     begin
-        SetRange("Statement Template Name", VATStmtName."Statement Template Name");
-        SetRange("Statement Name", VATStmtName.Name);
-        VATStmtName.CopyFilter("Date Filter", "Date Filter");
+        Rec.SetRange("Statement Template Name", VATStmtName."Statement Template Name");
+        Rec.SetRange("Statement Name", VATStmtName.Name);
+        VATStmtName.CopyFilter("Date Filter", Rec."Date Filter");
         Selection := NewSelection;
         PeriodSelection := NewPeriodSelection;
         UseAmtsInAddCurr := NewUseAmtsInAddCurr;

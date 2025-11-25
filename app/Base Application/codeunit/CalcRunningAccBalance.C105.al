@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Ledger;
+
 codeunit 105 "Calc. Running Acc. Balance"
 {
     SingleInstance = true;

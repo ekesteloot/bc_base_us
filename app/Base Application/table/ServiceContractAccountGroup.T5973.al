@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Contract;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 table 5973 "Service Contract Account Group"
 {
     Caption = 'Service Contract Account Group';

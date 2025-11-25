@@ -1,4 +1,6 @@
-﻿enum 5606 "FA Posting Group Account Type"
+﻿namespace Microsoft.FixedAssets.FixedAsset;
+
+enum 5606 "FA Posting Group Account Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

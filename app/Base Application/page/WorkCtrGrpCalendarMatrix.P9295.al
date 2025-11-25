@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Setup;
+using System.Utilities;
+
 page 9295 "Work Ctr. Grp. Calendar Matrix"
 {
     Caption = 'Work Ctr. Grp. Calendar Matrix';
@@ -14,7 +20,7 @@ page 9295 "Work Ctr. Grp. Calendar Matrix"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the code for the work center group.';
@@ -413,9 +419,9 @@ page 9295 "Work Ctr. Grp. Calendar Matrix"
     local procedure SetDateFilter(MATRIX_ColumnOrdinal: Integer)
     begin
         if MatrixRecords[MATRIX_ColumnOrdinal]."Period Start" = MatrixRecords[MATRIX_ColumnOrdinal]."Period End" then
-            SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start")
+            Rec.SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start")
         else
-            SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start", MatrixRecords[MATRIX_ColumnOrdinal]."Period End")
+            Rec.SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start", MatrixRecords[MATRIX_ColumnOrdinal]."Period End")
     end;
 
     procedure Load(MatrixColumns1: array[32] of Text[1024]; var MatrixRecords1: array[32] of Record Date; CurrentNoOfMatrixColumns: Integer; SetCapacityUoM: Code[10])
@@ -431,7 +437,7 @@ page 9295 "Work Ctr. Grp. Calendar Matrix"
         CalendarEntry: Record "Calendar Entry";
     begin
         CalendarEntry.SetRange("Capacity Type", CalendarEntry."Capacity Type"::"Work Center");
-        CalendarEntry.SetRange("Work Center Group Code", Code);
+        CalendarEntry.SetRange("Work Center Group Code", Rec.Code);
 
         if MatrixRecords[MATRIX_ColumnOrdinal]."Period Start" = MatrixRecords[MATRIX_ColumnOrdinal]."Period End" then
             CalendarEntry.SetRange(Date, MatrixRecords[MATRIX_ColumnOrdinal]."Period Start")
@@ -445,8 +451,8 @@ page 9295 "Work Ctr. Grp. Calendar Matrix"
     local procedure MATRIX_OnAfterGetRecord(MATRIX_ColumnOrdinal: Integer)
     begin
         SetDateFilter(MATRIX_ColumnOrdinal);
-        "Capacity (Effective)" := CalculateCapacity();
-        MATRIX_CellData[MATRIX_ColumnOrdinal] := "Capacity (Effective)";
+        Rec."Capacity (Effective)" := CalculateCapacity();
+        MATRIX_CellData[MATRIX_ColumnOrdinal] := Rec."Capacity (Effective)";
     end;
 
     local procedure CalculateCapacity(): Decimal
@@ -458,12 +464,12 @@ page 9295 "Work Ctr. Grp. Calendar Matrix"
         if CapacityUoM = '' then
             CapacityUoM := MfgSetup."Show Capacity In";
         WorkCenter.SetCurrentKey("Work Center Group Code");
-        WorkCenter.SetRange("Work Center Group Code", Code);
+        WorkCenter.SetRange("Work Center Group Code", Rec.Code);
         if WorkCenter.FindSet() then
             repeat
-                if GetFilter("Work Shift Filter") <> '' then
-                    CopyFilter("Work Shift Filter", WorkCenter."Work Shift Filter");
-                CopyFilter("Date Filter", WorkCenter."Date Filter");
+                if Rec.GetFilter("Work Shift Filter") <> '' then
+                    Rec.CopyFilter("Work Shift Filter", WorkCenter."Work Shift Filter");
+                Rec.CopyFilter("Date Filter", WorkCenter."Date Filter");
                 WorkCenter.CalcFields("Capacity (Effective)");
                 Capacity :=
                   Capacity +

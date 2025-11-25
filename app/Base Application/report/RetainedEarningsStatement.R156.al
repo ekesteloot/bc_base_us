@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 report 156 "Retained Earnings Statement"
 {
     AccessByPermission = TableData "G/L Account" = R;

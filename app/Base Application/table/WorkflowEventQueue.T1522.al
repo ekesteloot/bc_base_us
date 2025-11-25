@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 1522 "Workflow Event Queue"
 {
     Caption = 'Workflow Event Queue';

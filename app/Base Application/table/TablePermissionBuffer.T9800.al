@@ -1,3 +1,7 @@
+namespace System.Security.AccessControl;
+
+using System.Reflection;
+
 table 9800 "Table Permission Buffer"
 {
     Caption = 'Table Permission Buffer';
@@ -30,28 +34,28 @@ table 9800 "Table Permission Buffer"
         {
             Caption = 'Object ID';
             DataClassification = SystemMetadata;
-            TableRelation = IF ("Object Type" = CONST("Table Data")) AllObj."Object ID" WHERE("Object Type" = CONST(Table))
-            ELSE
-            IF ("Object Type" = CONST(Table)) AllObj."Object ID" WHERE("Object Type" = CONST(Table))
-            ELSE
-            IF ("Object Type" = CONST(Report)) AllObj."Object ID" WHERE("Object Type" = CONST(Report))
-            ELSE
-            IF ("Object Type" = CONST(Codeunit)) AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit))
-            ELSE
-            IF ("Object Type" = CONST(XMLport)) AllObj."Object ID" WHERE("Object Type" = CONST(XMLport))
-            ELSE
-            IF ("Object Type" = CONST(MenuSuite)) AllObj."Object ID" WHERE("Object Type" = CONST(MenuSuite))
-            ELSE
-            IF ("Object Type" = CONST(Page)) AllObj."Object ID" WHERE("Object Type" = CONST(Page))
-            ELSE
-            IF ("Object Type" = CONST(Query)) AllObj."Object ID" WHERE("Object Type" = CONST(Query))
-            ELSE
-            IF ("Object Type" = CONST(System)) AllObj."Object ID" WHERE("Object Type" = CONST(System));
+            TableRelation = if ("Object Type" = const("Table Data")) AllObj."Object ID" where("Object Type" = const(Table))
+            else
+            if ("Object Type" = const(Table)) AllObj."Object ID" where("Object Type" = const(Table))
+            else
+            if ("Object Type" = const(Report)) AllObj."Object ID" where("Object Type" = const(Report))
+            else
+            if ("Object Type" = const(Codeunit)) AllObj."Object ID" where("Object Type" = const(Codeunit))
+            else
+            if ("Object Type" = const(XMLport)) AllObj."Object ID" where("Object Type" = const(XMLport))
+            else
+            if ("Object Type" = const(MenuSuite)) AllObj."Object ID" where("Object Type" = const(MenuSuite))
+            else
+            if ("Object Type" = const(Page)) AllObj."Object ID" where("Object Type" = const(Page))
+            else
+            if ("Object Type" = const(Query)) AllObj."Object ID" where("Object Type" = const(Query))
+            else
+            if ("Object Type" = const(System)) AllObj."Object ID" where("Object Type" = const(System));
         }
         field(5; "Object Name"; Text[249])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = FIELD("Object Type"),
-                                                                           "Object ID" = FIELD("Object ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = field("Object Type"),
+                                                                           "Object ID" = field("Object ID")));
             Caption = 'Object Name';
             FieldClass = FlowField;
         }

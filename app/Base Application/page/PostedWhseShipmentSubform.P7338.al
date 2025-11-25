@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.History;
+
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7338 "Posted Whse. Shipment Subform"
 {
     Caption = 'Lines';
@@ -158,19 +163,19 @@ page 7338 "Posted Whse. Shipment Subform"
 
     local procedure ShowPostedSourceDoc()
     begin
-        WMSMgt.ShowPostedSourceDocument("Posted Source Document", "Posted Source No.");
+        WMSMgt.ShowPostedSourceDocument(Rec."Posted Source Document", Rec."Posted Source No.");
     end;
 
     local procedure ShowBinContents()
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", "Bin Code");
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", Rec."Bin Code");
     end;
 
     local procedure ShowWhseLine()
     begin
-        WMSMgt.ShowPostedWhseShptLine("Whse. Shipment No.", "Whse Shipment Line No.");
+        WMSMgt.ShowPostedWhseShptLine(Rec."Whse. Shipment No.", Rec."Whse Shipment Line No.");
     end;
 }
 

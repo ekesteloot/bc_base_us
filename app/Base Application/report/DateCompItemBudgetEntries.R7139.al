@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.DataAdministration;
+using System.Utilities;
+
 report 7139 "Date Comp. Item Budget Entries"
 {
     Caption = 'Date Compr. Item Budget Entries';
@@ -7,7 +15,7 @@ report 7139 "Date Comp. Item Budget Entries"
     {
         dataitem("Item Budget Entry"; "Item Budget Entry")
         {
-            DataItemTableView = SORTING("Analysis Area", "Budget Name", "Item No.", Date);
+            DataItemTableView = sorting("Analysis Area", "Budget Name", "Item No.", Date);
             RequestFilterFields = "Budget Name", "Item No.";
 
             trigger OnAfterGetRecord()
@@ -288,7 +296,6 @@ report 7139 "Date Comp. Item Budget Entries"
         DimMgt: Codeunit DimensionManagement;
         DataArchive: Codeunit "Data Archive";
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
         Window: Dialog;
         NoOfFields: Integer;

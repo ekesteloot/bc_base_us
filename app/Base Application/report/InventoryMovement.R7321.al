@@ -1,14 +1,18 @@
+namespace Microsoft.WarehouseMgt.Reports;
+
+using Microsoft.InventoryMgt.Journal;
+
 report 7321 "Inventory Movement"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Movement/InventoryMovement.rdlc';
+    RDLCLayout = './WarehouseMgt/Reports/InventoryMovement.rdlc';
     Caption = 'Inventory Movement';
 
     dataset
     {
         dataitem("Item Journal Batch"; "Item Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             RequestFilterFields = "Journal Template Name", Name;
             column(JournalTempName_ItemJournalBatch; "Journal Template Name")
             {
@@ -39,7 +43,7 @@ report 7321 "Inventory Movement"
             }
             dataitem("Item Journal Line"; "Item Journal Line")
             {
-                DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
+                DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
                 RequestFilterFields = "Journal Template Name", "Journal Batch Name", "Location Code", "Bin Code", "Item No.", "Variant Code";
                 column(JournalTempName_ItemJournalLine; "Journal Template Name")
                 {

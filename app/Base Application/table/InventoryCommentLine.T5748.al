@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Comment;
+
 table 5748 "Inventory Comment Line"
 {
     Caption = 'Inventory Comment Line';

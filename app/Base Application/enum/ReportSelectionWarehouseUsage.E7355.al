@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Setup;
+
 enum 7355 "Report Selection Warehouse Usage"
 {
     Extensible = true;

@@ -29,7 +29,7 @@ page 362 "Res. Gr. Availability Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period shown in the line.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Capacity';
@@ -50,7 +50,7 @@ page 362 "Res. Gr. Availability Lines"
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the amount of measuring units allocated to service orders.';
                 }
-                field(CapacityAfterOrders; "Availability After Orders")
+                field(CapacityAfterOrders; Rec."Availability After Orders")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Availability After Orders';
@@ -64,7 +64,7 @@ page 362 "Res. Gr. Availability Lines"
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the amount of measuring units allocated to jobs with the status quote.';
                 }
-                field(CapacityAfterQuotes; "Net Availability")
+                field(CapacityAfterQuotes; Rec."Net Availability")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Net Availability';
@@ -81,7 +81,7 @@ page 362 "Res. Gr. Availability Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         SetDateFilter();
         CalcLine();
     end;
@@ -106,7 +106,7 @@ page 362 "Res. Gr. Availability Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -130,22 +130,22 @@ page 362 "Res. Gr. Availability Lines"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            ResGr.SetRange("Date Filter", "Period Start", "Period End")
+            ResGr.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            ResGr.SetRange("Date Filter", 0D, "Period End");
+            ResGr.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     local procedure CalcLine()
     begin
         ResGr.CalcFields(Capacity, "Qty. on Order (Job)", "Qty. Quoted (Job)", "Qty. on Service Order");
-        Capacity := ResGr.Capacity;
-        "Qty. on Order (Job)" := ResGr."Qty. on Order (Job)";
-        "Qty. on Service Order" := ResGr."Qty. on Service Order";
-        "Qty. Quoted (Job)" := ResGr."Qty. Quoted (Job)";
-        "Availability After Orders" := ResGr.Capacity - ResGr."Qty. on Order (Job)" - ResGr."Qty. on Service Order";
-        "Net Availability" := "Availability After Orders" - ResGr."Qty. Quoted (Job)";
+        Rec.Capacity := ResGr.Capacity;
+        Rec."Qty. on Order (Job)" := ResGr."Qty. on Order (Job)";
+        Rec."Qty. on Service Order" := ResGr."Qty. on Service Order";
+        Rec."Qty. Quoted (Job)" := ResGr."Qty. Quoted (Job)";
+        Rec."Availability After Orders" := ResGr.Capacity - ResGr."Qty. on Order (Job)" - ResGr."Qty. on Service Order";
+        Rec."Net Availability" := Rec."Availability After Orders" - ResGr."Qty. Quoted (Job)";
 
-        OnAfterCalcLine(ResGr, "Availability After Orders", "Net Availability", Rec);
+        OnAfterCalcLine(ResGr, Rec."Availability After Orders", Rec."Net Availability", Rec);
     end;
 
     [IntegrationEvent(TRUE, false)]

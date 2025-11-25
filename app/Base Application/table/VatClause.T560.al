@@ -1,3 +1,12 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using System.Reflection;
+
 table 560 "VAT Clause"
 {
     Caption = 'VAT Clause';

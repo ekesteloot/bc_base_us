@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
+using Microsoft.Foundation.Comment;
+using Microsoft.InventoryMgt.Item.Substitution;
+
 page 5725 "Catalog Item Card"
 {
     Caption = 'Catalog Item Card';
@@ -19,7 +24,7 @@ page 5725 "Catalog Item Card"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit() then
+                        if Rec.AssistEdit() then
                             CurrPage.Update();
                     end;
                 }
@@ -135,8 +140,8 @@ page 5725 "Catalog Item Card"
                     Caption = 'Substituti&ons';
                     Image = ItemSubstitution;
                     RunObject = Page "Item Substitution Entry";
-                    RunPageLink = Type = CONST("Nonstock Item"),
-                                  "No." = FIELD("Entry No.");
+                    RunPageLink = Type = const("Nonstock Item"),
+                                  "No." = field("Entry No.");
                     ToolTip = 'View substitute items that are set up to be sold instead of the item.';
                 }
                 action("Co&mments")
@@ -145,8 +150,8 @@ page 5725 "Catalog Item Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Nonstock Item"),
-                                  "No." = FIELD("Entry No.");
+                    RunPageLink = "Table Name" = const("Nonstock Item"),
+                                  "No." = field("Entry No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

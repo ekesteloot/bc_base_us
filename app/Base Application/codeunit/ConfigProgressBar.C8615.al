@@ -1,3 +1,5 @@
+namespace System.IO;
+
 codeunit 8615 "Config. Progress Bar"
 {
 

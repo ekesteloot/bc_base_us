@@ -1,3 +1,12 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Setup;
+
 report 1085 "Job Post WIP to G/L"
 {
     AdditionalSearchTerms = 'posted work in process to general ledger,posted work in progress to general ledger';
@@ -10,7 +19,7 @@ report 1085 "Job Post WIP to G/L"
     {
         dataitem(Job; Job)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
 
             trigger OnAfterGetRecord()

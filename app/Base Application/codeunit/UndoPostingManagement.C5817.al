@@ -422,7 +422,7 @@ codeunit 5817 "Undo Posting Management"
     local procedure ShouldThrowErrorForPostedInvtPickLine(var PostedInvtPickLine: Record "Posted Invt. Pick Line"; UndoType: Integer; UndoID: Code[20]): Boolean
     var
         PostedInvtPickHeader: Record "Posted Invt. Pick Header";
-        CheckedPostedInvtPickHeaderList: List of [Text];        
+        CheckedPostedInvtPickHeaderList: List of [Text];
     begin
         if PostedInvtPickLine.IsEmpty() then
             exit(false);

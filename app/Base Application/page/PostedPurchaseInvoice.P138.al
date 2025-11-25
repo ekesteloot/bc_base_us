@@ -1,3 +1,17 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Vendor;
+using System.Automation;
+
 page 138 "Posted Purchase Invoice"
 {
     Caption = 'Posted Purchase Invoice';
@@ -217,37 +231,37 @@ page 138 "Posted Purchase Invoice"
                     Importance = Additional;
                     ToolTip = 'Specifies the code for the responsibility center that serves the vendor on this purchase document.';
                 }
-                field(Cancelled; Cancelled)
+                field(Cancelled; Rec.Cancelled)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     Style = Unfavorable;
-                    StyleExpr = Cancelled;
+                    StyleExpr = Rec.Cancelled;
                     ToolTip = 'Specifies if the posted purchase invoice has been either corrected or canceled.';
 
                     trigger OnDrillDown()
                     begin
-                        ShowCorrectiveCreditMemo();
+                        Rec.ShowCorrectiveCreditMemo();
                     end;
                 }
-                field(Corrective; Corrective)
+                field(Corrective; Rec.Corrective)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     Style = Unfavorable;
-                    StyleExpr = Corrective;
+                    StyleExpr = Rec.Corrective;
                     ToolTip = 'Specifies if the posted purchase invoice is a corrective document.';
 
                     trigger OnDrillDown()
                     begin
-                        ShowCancelledCreditMemo();
+                        Rec.ShowCancelledCreditMemo();
                     end;
                 }
             }
             part(PurchInvLines; "Posted Purch. Invoice Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group("Invoice Details")
             {
@@ -263,10 +277,10 @@ page 138 "Posted Purchase Invoice"
                         UpdateCurrencyFactor: Codeunit "Update Currency Factor";
                         ChangeExchangeRate: Page "Change Exchange Rate";
                     begin
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", "Posting Date");
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", Rec."Posting Date");
                         ChangeExchangeRate.Editable(false);
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            "Currency Factor" := ChangeExchangeRate.GetParameter();
+                            Rec."Currency Factor" := ChangeExchangeRate.GetParameter();
                             UpdateCurrencyFactor.ModifyPostedPurchaseInvoice(Rec);
                         end;
                     end;
@@ -671,8 +685,8 @@ page 138 "Posted Purchase Invoice"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Purch. Inv. Header"),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::"Purch. Inv. Header"),
+                              "No." = field("No.");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -710,10 +724,10 @@ page 138 "Posted Purchase Invoice"
 
                     trigger OnAction()
                     begin
-                        if "Tax Area Code" = '' then
-                            PAGE.RunModal(PAGE::"Purchase Invoice Statistics", Rec, "No.")
+                        if Rec."Tax Area Code" = '' then
+                            PAGE.RunModal(PAGE::"Purchase Invoice Statistics", Rec, Rec."No.")
                         else
-                            PAGE.RunModal(PAGE::"Purchase Invoice Stats.", Rec, "No.");
+                            PAGE.RunModal(PAGE::"Purchase Invoice Stats.", Rec, Rec."No.");
                     end;
                 }
                 action("Co&mments")
@@ -722,9 +736,9 @@ page 138 "Posted Purchase Invoice"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Invoice"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const("Posted Invoice"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -738,7 +752,7 @@ page 138 "Posted Purchase Invoice"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(Approvals)
@@ -753,7 +767,7 @@ page 138 "Posted Purchase Invoice"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ShowPostedApprovalEntries(RecordId);
+                        ApprovalsMgmt.ShowPostedApprovalEntries(Rec.RecordId);
                     end;
                 }
             }
@@ -789,7 +803,7 @@ page 138 "Posted Purchase Invoice"
                 begin
                     PurchInvHeader := Rec;
                     PurchInvHeader.SetRecFilter();
-                    PrintToDocumentAttachment(PurchInvHeader);
+                    Rec.PrintToDocumentAttachment(PurchInvHeader);
                 end;
             }
             group(Correct)
@@ -801,7 +815,7 @@ page 138 "Posted Purchase Invoice"
                     Caption = 'Correct';
                     Image = Undo;
                     ToolTip = 'Reverse this posted invoice. A credit memo will be created and matched with the invoice, and the invoice will be canceled. Shipments for the invoice will be reversed. To create a new invoice with the same information, use the Copy function. When you copy an invoice, remember to post shipments for the new invoice.';
-                    Visible = not Cancelled;
+                    Visible = not Rec.Cancelled;
 
                     trigger OnAction()
                     var
@@ -817,7 +831,7 @@ page 138 "Posted Purchase Invoice"
                     Caption = 'Cancel';
                     Image = Cancel;
                     ToolTip = 'Create and post a purchase credit memo that reverses this posted purchase invoice. This posted purchase invoice will be canceled.';
-                    Visible = not Cancelled;
+                    Visible = not Rec.Cancelled;
 
                     trigger OnAction()
                     var
@@ -851,11 +865,11 @@ page 138 "Posted Purchase Invoice"
                     Caption = 'Show Canceled/Corrective Credit Memo';
                     Image = CreditMemo;
                     ToolTip = 'Open the posted purchase credit memo that was created when you canceled the posted purchase invoice. If the posted purchase invoice is the result of a canceled purchase credit memo, then the canceled purchase credit memo will open.';
-                    Visible = Cancelled OR Corrective;
+                    Visible = Rec.Cancelled or Rec.Corrective;
 
                     trigger OnAction()
                     begin
-                        ShowCanceledOrCorrCrMemo();
+                        Rec.ShowCanceledOrCorrCrMemo();
                     end;
                 }
             }
@@ -869,7 +883,7 @@ page 138 "Posted Purchase Invoice"
                     Caption = 'Vendor';
                     Image = Vendor;
                     RunObject = Page "Vendor Card";
-                    RunPageLink = "No." = FIELD("Buy-from Vendor No.");
+                    RunPageLink = "No." = field("Buy-from Vendor No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
                 }
@@ -884,7 +898,7 @@ page 138 "Posted Purchase Invoice"
 
                     trigger OnAction()
                     begin
-                        Navigate();
+                        Rec.Navigate();
                     end;
                 }
                 action(DocAttach)
@@ -916,7 +930,7 @@ page 138 "Posted Purchase Invoice"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             group(IncomingDocument)
@@ -935,7 +949,7 @@ page 138 "Posted Purchase Invoice"
                     var
                         IncomingDocument: Record "Incoming Document";
                     begin
-                        IncomingDocument.ShowCard("No.", "Posting Date");
+                        IncomingDocument.ShowCard(Rec."No.", Rec."Posting Date");
                     end;
                 }
                 action(SelectIncomingDoc)
@@ -951,7 +965,7 @@ page 138 "Posted Purchase Invoice"
                     var
                         IncomingDocument: Record "Incoming Document";
                     begin
-                        IncomingDocument.SelectIncomingDocumentForPostedDocument("No.", "Posting Date", RecordId);
+                        IncomingDocument.SelectIncomingDocumentForPostedDocument(Rec."No.", Rec."Posting Date", Rec.RecordId);
                     end;
                 }
                 action(IncomingDocAttachFile)
@@ -967,7 +981,7 @@ page 138 "Posted Purchase Invoice"
                     var
                         IncomingDocumentAttachment: Record "Incoming Document Attachment";
                     begin
-                        IncomingDocumentAttachment.NewAttachmentFromPostedDocument("No.", "Posting Date");
+                        IncomingDocumentAttachment.NewAttachmentFromPostedDocument(Rec."No.", Rec."Posting Date");
                     end;
                 }
             }
@@ -1096,15 +1110,15 @@ page 138 "Posted Purchase Invoice"
     var
         IncomingDocument: Record "Incoming Document";
     begin
-        HasIncomingDocument := IncomingDocument.PostedDocExists("No.", "Posting Date");
+        HasIncomingDocument := IncomingDocument.PostedDocExists(Rec."No.", Rec."Posting Date");
         if GuiAllowed() then
             CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        BuyFromContact.GetOrClear("Buy-from Contact No.");
-        PayToContact.GetOrClear("Pay-to Contact No.");
+        BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
+        PayToContact.GetOrClear(Rec."Pay-to Contact No.");
         FillRemitToFields();
     end;
 
@@ -1113,12 +1127,12 @@ page 138 "Posted Purchase Invoice"
         OfficeMgt: Codeunit "Office Management";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
         if GuiAllowed() then
             IsOfficeAddin := OfficeMgt.IsAvailable();
 
         ActivateFields();
-		VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
     end;
 
     var
@@ -1133,22 +1147,21 @@ page 138 "Posted Purchase Invoice"
         IsPayToCountyVisible: Boolean;
         IsShipToCountyVisible: Boolean;
         IsRemitToCountyVisible: Boolean;
-        [InDataSet]
         VATDateEnabled: Boolean;
 
     local procedure ActivateFields()
     begin
-        IsBuyFromCountyVisible := FormatAddress.UseCounty("Buy-from Country/Region Code");
-        IsPayToCountyVisible := FormatAddress.UseCounty("Pay-to Country/Region Code");
-        IsShipToCountyVisible := FormatAddress.UseCounty("Ship-to Country/Region Code");
+        IsBuyFromCountyVisible := FormatAddress.UseCounty(Rec."Buy-from Country/Region Code");
+        IsPayToCountyVisible := FormatAddress.UseCounty(Rec."Pay-to Country/Region Code");
+        IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
     end;
 
     local procedure FillRemitToFields()
     var
         RemitAddress: Record "Remit Address";
     begin
-        RemitAddress.SetRange("Vendor No.", "Buy-from Vendor No.");
-        RemitAddress.SetRange(Code, "Remit-to Code");
+        RemitAddress.SetRange("Vendor No.", Rec."Buy-from Vendor No.");
+        RemitAddress.SetRange(Code, Rec."Remit-to Code");
         if not RemitAddress.IsEmpty() then begin
             RemitAddress.FindFirst();
             FormatAddress.VendorRemitToAddress(RemitAddress, RemitAddressBuffer);

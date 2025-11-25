@@ -48,9 +48,6 @@ permissionset 2018 "Fixed Assets Journals - Post"
                   tabledata "Ins. Coverage Ledger Entry" = rm,
                   tabledata Maintenance = R,
                   tabledata "Maintenance Ledger Entry" = rim,
-#if not CLEAN20
-                  tabledata "Native - Payment" = RIMD,
-#endif
                   tabledata "Reversal Entry" = RIMD,
                   tabledata "Tax Area" = R,
                   tabledata "Tax Area Line" = R,

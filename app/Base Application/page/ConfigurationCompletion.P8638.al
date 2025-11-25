@@ -1,3 +1,9 @@
+namespace System.IO;
+
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Security.User;
+
 page 8638 "Configuration Completion"
 {
     Caption = 'Configuration Completion';
@@ -41,9 +47,9 @@ page 8638 "Configuration Completion"
                             if Roles.RunModal() = Action::LookupOK then begin
                                 Roles.GetRecord(AllProfileTable);
                                 YourProfileCode := AllProfileTable."Profile ID";
-                                "Your Profile Code" := AllProfileTable."Profile ID";
-                                "Your Profile App ID" := AllProfileTable."App ID";
-                                "Your Profile Scope" := AllProfileTable.Scope;
+                                Rec."Your Profile Code" := AllProfileTable."Profile ID";
+                                Rec."Your Profile App ID" := AllProfileTable."App ID";
+                                Rec."Your Profile Scope" := AllProfileTable.Scope;
                             end;
                         end;
                     }
@@ -99,12 +105,12 @@ page 8638 "Configuration Completion"
 
     trigger OnClosePage()
     begin
-        SelectDefaultRoleCenter("Your Profile Code", "Your Profile App ID", "Your Profile Scope");
+        Rec.SelectDefaultRoleCenter(Rec."Your Profile Code", Rec."Your Profile App ID", Rec."Your Profile Scope");
     end;
 
     trigger OnInit()
     begin
-        YourProfileCode := "Your Profile Code";
+        YourProfileCode := Rec."Your Profile Code";
     end;
 
     var

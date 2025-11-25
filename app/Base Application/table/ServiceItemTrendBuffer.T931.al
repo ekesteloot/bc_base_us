@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Item;
+
 table 931 "Service Item Trend Buffer"
 {
     DataClassification = SystemMetadata;

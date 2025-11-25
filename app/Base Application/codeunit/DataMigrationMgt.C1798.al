@@ -1,3 +1,14 @@
+﻿namespace System.Integration;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Environment.Configuration;
+using System.Threading;
+
 codeunit 1798 "Data Migration Mgt."
 {
     TableNo = "Job Queue Entry";
@@ -9,9 +20,9 @@ codeunit 1798 "Data Migration Mgt."
         Retry: Boolean;
     begin
         EnableDataMigrationNotificationForAllUsers();
-        DataMigrationStatus.Get("Record ID to Process");
+        DataMigrationStatus.Get(Rec."Record ID to Process");
         DataMigrationStatus.SetRange("Migration Type", DataMigrationStatus."Migration Type");
-        Retry := "Parameter String" = RetryTxt;
+        Retry := Rec."Parameter String" = RetryTxt;
 
         OnBeforeMigrationStarted(DataMigrationStatus, Retry);
 

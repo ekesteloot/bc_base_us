@@ -16,7 +16,7 @@ page 1262 "Certificate List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -28,7 +28,7 @@ page 1262 "Certificate List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the certificate.';
                 }
-                field(Scope; Scope)
+                field(Scope; Rec.Scope)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the availability of the certificate. Company gives all users in this specific company access to the certificate. User gives access to a specific user in any company. Company and User gives access to a specific user in the specific company.';
@@ -43,7 +43,7 @@ page 1262 "Certificate List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the certificate has a private key.';
                 }
-                field(ThumbPrint; ThumbPrint)
+                field(ThumbPrint; Rec.ThumbPrint)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the certificate thumbprint.';
@@ -75,7 +75,7 @@ page 1262 "Certificate List"
 
                 trigger OnAction()
                 begin
-                    if Scope = Scope::Company then
+                    if Rec.Scope = Rec.Scope::Company then
                         Error(AssignUserScopeErr);
                     PAGE.Run(PAGE::"Change User", Rec);
                 end;
@@ -87,10 +87,10 @@ page 1262 "Certificate List"
     var
         User: Record User;
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         if User.Get(UserSecurityId()) then;
-        SetFilter("Company ID", '%1|%2', '', CompanyName);
-        SetFilter("User ID", '%1|%2', '', User."User Name");
+        Rec.SetFilter("Company ID", '%1|%2', '', CompanyName);
+        Rec.SetFilter("User ID", '%1|%2', '', User."User Name");
     end;
 
     var

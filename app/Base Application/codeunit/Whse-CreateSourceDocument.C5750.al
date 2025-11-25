@@ -1,3 +1,18 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+#if not CLEAN23
+using Microsoft.AssemblyMgt.Document;
+#endif
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+#if not CLEAN23
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+#endif
+using Microsoft.WarehouseMgt.Document;
+
 codeunit 5750 "Whse.-Create Source Document"
 {
 
@@ -5,371 +20,94 @@ codeunit 5750 "Whse.-Create Source Document"
     begin
     end;
 
-    procedure FromSalesLine2ShptLine(WhseShptHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line") Result: Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Sales Warehouse Mgt.', '23.0')]
+    procedure FromSalesLine2ShptLine(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line") Result: Boolean
     var
-        AsmHeader: Record "Assembly Header";
-        TotalOutstandingWhseShptQty: Decimal;
-        TotalOutstandingWhseShptQtyBase: Decimal;
-        ATOWhseShptLineQty: Decimal;
-        ATOWhseShptLineQtyBase: Decimal;
-        IsHandled: Boolean;
+        SalesWarehouseMgt: Codeunit "Sales Warehouse Mgt.";
     begin
-        IsHandled := false;
-        OnBeforeFromSalesLine2ShptLine(SalesLine, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
-        SalesLine.CalcFields("Whse. Outstanding Qty.", "ATO Whse. Outstanding Qty.",
-          "Whse. Outstanding Qty. (Base)", "ATO Whse. Outstd. Qty. (Base)");
-        TotalOutstandingWhseShptQty := Abs(SalesLine."Outstanding Quantity") - SalesLine."Whse. Outstanding Qty.";
-        TotalOutstandingWhseShptQtyBase := Abs(SalesLine."Outstanding Qty. (Base)") - SalesLine."Whse. Outstanding Qty. (Base)";
-        if SalesLine.AsmToOrderExists(AsmHeader) then begin
-            ATOWhseShptLineQty := AsmHeader."Remaining Quantity" - SalesLine."ATO Whse. Outstanding Qty.";
-            ATOWhseShptLineQtyBase := AsmHeader."Remaining Quantity (Base)" - SalesLine."ATO Whse. Outstd. Qty. (Base)";
-            OnFromSalesLine2ShptLineOnBeforeCreateATOShipmentLine(WhseShptHeader, AsmHeader, SalesLine, ATOWhseShptLineQty, ATOWhseShptLineQtyBase);
-            if ATOWhseShptLineQtyBase > 0 then begin
-                if not CreateShptLineFromSalesLine(WhseShptHeader, SalesLine, ATOWhseShptLineQty, ATOWhseShptLineQtyBase, true) then
-                    exit(false);
-                TotalOutstandingWhseShptQty -= ATOWhseShptLineQty;
-                TotalOutstandingWhseShptQtyBase -= ATOWhseShptLineQtyBase;
-            end;
-        end;
-
-        OnFromSalesLine2ShptLineOnBeforeCreateShipmentLine(
-          WhseShptHeader, SalesLine, TotalOutstandingWhseShptQty, TotalOutstandingWhseShptQtyBase);
-
-        if TotalOutstandingWhseShptQtyBase > 0 then
-            exit(CreateShptLineFromSalesLine(WhseShptHeader, SalesLine, TotalOutstandingWhseShptQty, TotalOutstandingWhseShptQtyBase, false));
-        exit(true);
+        exit(SalesWarehouseMgt.FromSalesLine2ShptLine(WarehouseShipmentHeader, SalesLine));
     end;
+#endif
 
-    local procedure CreateShptLineFromSalesLine(WhseShptHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line"; WhseShptLineQty: Decimal; WhseShptLineQtyBase: Decimal; AssembleToOrder: Boolean): Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Sales Warehouse Mgt.', '23.0')]
+    procedure SalesLine2ReceiptLine(WarehouseReceiptHeader: Record "Warehouse Receipt Header"; SalesLine: Record "Sales Line"): Boolean
     var
-        WhseShptLine: Record "Warehouse Shipment Line";
-        SalesHeader: Record "Sales Header";
+        SalesWarehouseMgt: Codeunit "Sales Warehouse Mgt.";
     begin
-        SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
-
-        with WhseShptLine do begin
-            InitNewLine(WhseShptHeader."No.");
-            SetSource(DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.");
-            SalesLine.TestField("Unit of Measure Code");
-            SetItemData(
-              SalesLine."No.", SalesLine.Description, SalesLine."Description 2", SalesLine."Location Code",
-              SalesLine."Variant Code", SalesLine."Unit of Measure Code", SalesLine."Qty. per Unit of Measure",
-              SalesLine."Qty. Rounding Precision", SalesLine."Qty. Rounding Precision (Base)");
-            OnAfterInitNewWhseShptLine(WhseShptLine, WhseShptHeader, SalesLine, AssembleToOrder);
-            SetQtysOnShptLine(WhseShptLine, WhseShptLineQty, WhseShptLineQtyBase);
-            "Assemble to Order" := AssembleToOrder;
-            if SalesLine."Document Type" = SalesLine."Document Type"::Order then
-                "Due Date" := SalesLine."Planned Shipment Date";
-            if SalesLine."Document Type" = SalesLine."Document Type"::"Return Order" then
-                "Due Date" := WorkDate();
-            if WhseShptHeader."Shipment Date" = 0D then
-                "Shipment Date" := SalesLine."Shipment Date"
-            else
-                "Shipment Date" := WhseShptHeader."Shipment Date";
-            "Destination Type" := "Destination Type"::Customer;
-            "Destination No." := SalesLine."Sell-to Customer No.";
-            "Shipping Advice" := SalesHeader."Shipping Advice";
-            if "Location Code" = WhseShptHeader."Location Code" then
-                "Bin Code" := WhseShptHeader."Bin Code";
-            if "Bin Code" = '' then
-                "Bin Code" := SalesLine."Bin Code";
-            UpdateShptLine(WhseShptLine, WhseShptHeader);
-            OnBeforeCreateShptLineFromSalesLine(WhseShptLine, WhseShptHeader, SalesLine, SalesHeader);
-            CreateShptLine(WhseShptLine);
-            OnAfterCreateShptLineFromSalesLine(WhseShptLine, WhseShptHeader, SalesLine, SalesHeader);
-            exit(not HasErrorOccured());
-        end;
+        exit(SalesWarehouseMgt.SalesLine2ReceiptLine(WarehouseReceiptHeader, SalesLine));
     end;
+#endif
 
-    procedure SalesLine2ReceiptLine(WhseReceiptHeader: Record "Warehouse Receipt Header"; SalesLine: Record "Sales Line"): Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Service Warehouse Mgt.', '23.0')]
+    procedure FromServiceLine2ShptLine(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; ServiceLine: Record "Service Line"): Boolean
     var
-        WhseReceiptLine: Record "Warehouse Receipt Line";
-        IsHandled: Boolean;
-        Result: Boolean;
+        ServiceWarehouseMgt: Codeunit "Service Warehouse Mgt.";
     begin
-        IsHandled := false;
-        OnBeforeSalesLine2ReceiptLine(WhseReceiptHeader, SalesLine, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
-        WhseReceiptLine.InitNewLine(WhseReceiptHeader."No.");
-        WhseReceiptLine.SetSource(DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.");
-        SalesLine.TestField("Unit of Measure Code");
-        WhseReceiptLine.SetItemData(
-            SalesLine."No.", SalesLine.Description, SalesLine."Description 2", SalesLine."Location Code",
-            SalesLine."Variant Code", SalesLine."Unit of Measure Code", SalesLine."Qty. per Unit of Measure",
-            SalesLine."Qty. Rounding Precision", SalesLine."Qty. Rounding Precision (Base)");
-        OnSalesLine2ReceiptLineOnAfterInitNewLine(WhseReceiptLine, WhseReceiptHeader, SalesLine);
-        case SalesLine."Document Type" of
-            SalesLine."Document Type"::Order:
-                begin
-                    WhseReceiptLine.Validate("Qty. Received", Abs(SalesLine."Quantity Shipped"));
-                    WhseReceiptLine."Due Date" := SalesLine."Planned Shipment Date";
-                end;
-            SalesLine."Document Type"::"Return Order":
-                begin
-                    WhseReceiptLine.Validate("Qty. Received", Abs(SalesLine."Return Qty. Received"));
-                    WhseReceiptLine."Due Date" := WorkDate();
-                end;
-        end;
-        SetQtysOnRcptLine(WhseReceiptLine, Abs(SalesLine.Quantity), Abs(SalesLine."Quantity (Base)"));
-        WhseReceiptLine."Starting Date" := SalesLine."Shipment Date";
-        if WhseReceiptLine."Location Code" = WhseReceiptHeader."Location Code" then
-            WhseReceiptLine."Bin Code" := WhseReceiptHeader."Bin Code";
-        if WhseReceiptLine."Bin Code" = '' then
-            WhseReceiptLine."Bin Code" := SalesLine."Bin Code";
-        OnSalesLine2ReceiptLineOnBeforeUpdateReceiptLine(WhseReceiptLine, SalesLine);
-        UpdateReceiptLine(WhseReceiptLine, WhseReceiptHeader);
-        OnBeforeCreateReceiptLineFromSalesLine(WhseReceiptLine, WhseReceiptHeader, SalesLine);
-        CreateReceiptLine(WhseReceiptLine);
-        OnAfterCreateRcptLineFromSalesLine(WhseReceiptLine, WhseReceiptHeader, SalesLine);
-        exit(not WhseReceiptLine.HasErrorOccured());
+        exit(ServiceWarehouseMgt.FromServiceLine2ShptLine(WarehouseShipmentHeader, ServiceLine));
     end;
+#endif
 
-    procedure FromServiceLine2ShptLine(WhseShptHeader: Record "Warehouse Shipment Header"; ServiceLine: Record "Service Line"): Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Purchases Warehouse Mgt.', '23.0')]
+    procedure FromPurchLine2ShptLine(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; PurchaseLine: Record "Purchase Line") Result: Boolean
     var
-        WhseShptLine: Record "Warehouse Shipment Line";
-        ServiceHeader: Record "Service Header";
-        IsHandled: Boolean;
-        Result: Boolean;
+        PurchasesWarehouseMgt: Codeunit "Purchases Warehouse Mgt.";
     begin
-        IsHandled := false;
-        OnBeforeFromService2ShptLine(WhseShptHeader, ServiceLine, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
-        ServiceHeader.Get(ServiceLine."Document Type", ServiceLine."Document No.");
-
-        WhseShptLine.InitNewLine(WhseShptHeader."No.");
-        WhseShptLine.SetSource(DATABASE::"Service Line", ServiceLine."Document Type".AsInteger(), ServiceLine."Document No.", ServiceLine."Line No.");
-        ServiceLine.TestField("Unit of Measure Code");
-        WhseShptLine.SetItemData(
-            ServiceLine."No.", ServiceLine.Description, ServiceLine."Description 2", ServiceLine."Location Code",
-            ServiceLine."Variant Code", ServiceLine."Unit of Measure Code", ServiceLine."Qty. per Unit of Measure",
-            ServiceLine."Qty. Rounding Precision", ServiceLine."Qty. Rounding Precision (Base)");
-        OnFromServiceLine2ShptLineOnAfterInitNewLine(WhseShptLine, WhseShptHeader, ServiceLine);
-        SetQtysOnShptLine(WhseShptLine, Abs(ServiceLine."Outstanding Quantity"), Abs(ServiceLine."Outstanding Qty. (Base)"));
-        if ServiceLine."Document Type" = ServiceLine."Document Type"::Order then
-            WhseShptLine."Due Date" := ServiceLine.GetDueDate();
-        if WhseShptHeader."Shipment Date" = 0D then
-            WhseShptLine."Shipment Date" := ServiceLine.GetShipmentDate()
-        else
-            WhseShptLine."Shipment Date" := WhseShptHeader."Shipment Date";
-        WhseShptLine."Destination Type" := "Warehouse Destination Type"::Customer;
-        WhseShptLine."Destination No." := ServiceLine."Bill-to Customer No.";
-        WhseShptLine."Shipping Advice" := ServiceHeader."Shipping Advice";
-        if WhseShptLine."Location Code" = WhseShptHeader."Location Code" then
-            WhseShptLine."Bin Code" := WhseShptHeader."Bin Code";
-        if WhseShptLine."Bin Code" = '' then
-            WhseShptLine."Bin Code" := ServiceLine."Bin Code";
-        UpdateShptLine(WhseShptLine, WhseShptHeader);
-        OnFromServiceLine2ShptLineOnBeforeCreateShptLine(WhseShptLine, WhseShptHeader, ServiceHeader, ServiceLine);
-        CreateShptLine(WhseShptLine);
-        OnAfterCreateShptLineFromServiceLine(WhseShptLine, WhseShptHeader, ServiceLine);
-        exit(not WhseShptLine.HasErrorOccured());
+        exit(PurchasesWarehouseMgt.FromPurchLine2ShptLine(WarehouseShipmentHeader, PurchaseLine));
     end;
+#endif
 
-    procedure FromPurchLine2ShptLine(WhseShptHeader: Record "Warehouse Shipment Header"; PurchLine: Record "Purchase Line") Result: Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Purchases Warehouse Mgt.', '23.0')]
+    procedure PurchLine2ReceiptLine(WarehouseReceiptHeader: Record "Warehouse Receipt Header"; PurchaseLine: Record "Purchase Line"): Boolean
     var
-        WhseShptLine: Record "Warehouse Shipment Line";
-        IsHandled: Boolean;
+        PurchasesWarehouseMgt: Codeunit "Purchases Warehouse Mgt.";
     begin
-        IsHandled := false;
-        OnBeforeFromPurchLine2ShptLine(PurchLine, Result, IsHandled, WhseShptHeader);
-        if IsHandled then
-            exit(Result);
-
-        with WhseShptLine do begin
-            InitNewLine(WhseShptHeader."No.");
-            SetSource(DATABASE::"Purchase Line", PurchLine."Document Type".AsInteger(), PurchLine."Document No.", PurchLine."Line No.");
-            PurchLine.TestField("Unit of Measure Code");
-            SetItemData(
-              PurchLine."No.", PurchLine.Description, PurchLine."Description 2", PurchLine."Location Code",
-              PurchLine."Variant Code", PurchLine."Unit of Measure Code", PurchLine."Qty. per Unit of Measure",
-              PurchLine."Qty. Rounding Precision", PurchLine."Qty. Rounding Precision (Base)");
-            OnFromPurchLine2ShptLineOnAfterInitNewLine(WhseShptLine, WhseShptHeader, PurchLine);
-            SetQtysOnShptLine(WhseShptLine, Abs(PurchLine."Outstanding Quantity"), Abs(PurchLine."Outstanding Qty. (Base)"));
-            if PurchLine."Document Type" = PurchLine."Document Type"::Order then
-                "Due Date" := PurchLine."Expected Receipt Date";
-            if PurchLine."Document Type" = PurchLine."Document Type"::"Return Order" then
-                "Due Date" := WorkDate();
-            if WhseShptHeader."Shipment Date" = 0D then
-                "Shipment Date" := PurchLine."Planned Receipt Date"
-            else
-                "Shipment Date" := WhseShptHeader."Shipment Date";
-            "Destination Type" := "Destination Type"::Vendor;
-            "Destination No." := PurchLine."Buy-from Vendor No.";
-            if "Location Code" = WhseShptHeader."Location Code" then
-                "Bin Code" := WhseShptHeader."Bin Code";
-            if "Bin Code" = '' then
-                "Bin Code" := PurchLine."Bin Code";
-            UpdateShptLine(WhseShptLine, WhseShptHeader);
-            OnFromPurchLine2ShptLineOnBeforeCreateShptLine(WhseShptLine, WhseShptHeader, PurchLine);
-            OnBeforeCreateShptLineFromPurchLine(WhseShptLine, WhseShptHeader, PurchLine);
-            CreateShptLine(WhseShptLine);
-            OnAfterCreateShptLineFromPurchLine(WhseShptLine, WhseShptHeader, PurchLine);
-            exit(not HasErrorOccured());
-        end;
+        exit(PurchasesWarehouseMgt.PurchLine2ReceiptLine(WarehouseReceiptHeader, PurchaseLine));
     end;
+#endif
 
-    procedure PurchLine2ReceiptLine(WhseReceiptHeader: Record "Warehouse Receipt Header"; PurchLine: Record "Purchase Line"): Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Transfer Warehouse Mgt.', '23.0')]
+    procedure FromTransLine2ShptLine(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; TransferLine: Record "Transfer Line") Result: Boolean
     var
-        WhseReceiptLine: Record "Warehouse Receipt Line";
-        IsHandled: Boolean;
-        Result: Boolean;
+        TransferWarehouseMgt: Codeunit "Transfer Warehouse Mgt.";
     begin
-        IsHandled := false;
-        OnBeforePurchLine2ReceiptLine(WhseReceiptHeader, PurchLine, IsHandled, Result);
-        if IsHandled then
-            exit(Result);
-
-        with WhseReceiptLine do begin
-            InitNewLine(WhseReceiptHeader."No.");
-            SetSource(DATABASE::"Purchase Line", PurchLine."Document Type".AsInteger(), PurchLine."Document No.", PurchLine."Line No.");
-            PurchLine.TestField("Unit of Measure Code");
-            SetItemData(
-              PurchLine."No.", PurchLine.Description, PurchLine."Description 2", PurchLine."Location Code",
-              PurchLine."Variant Code", PurchLine."Unit of Measure Code", PurchLine."Qty. per Unit of Measure",
-              PurchLine."Qty. Rounding Precision", PurchLine."Qty. Rounding Precision (Base)");
-            IsHandled := false;
-            OnPurchLine2ReceiptLineOnAfterInitNewLine(WhseReceiptLine, WhseReceiptHeader, PurchLine, IsHandled);
-            if not IsHandled then begin
-                case PurchLine."Document Type" of
-                    PurchLine."Document Type"::Order:
-                        begin
-                            Validate("Qty. Received", Abs(PurchLine."Quantity Received"));
-                            "Due Date" := PurchLine."Expected Receipt Date";
-                        end;
-                    PurchLine."Document Type"::"Return Order":
-                        begin
-                            Validate("Qty. Received", Abs(PurchLine."Return Qty. Shipped"));
-                            "Due Date" := WorkDate();
-                        end;
-                end;
-                SetQtysOnRcptLine(WhseReceiptLine, Abs(PurchLine.Quantity), Abs(PurchLine."Quantity (Base)"));
-            end;
-            OnPurchLine2ReceiptLineOnAfterSetQtysOnRcptLine(WhseReceiptLine, PurchLine);
-            "Starting Date" := PurchLine."Planned Receipt Date";
-            if "Location Code" = WhseReceiptHeader."Location Code" then
-                "Bin Code" := WhseReceiptHeader."Bin Code";
-            if "Bin Code" = '' then
-                "Bin Code" := PurchLine."Bin Code";
-            UpdateReceiptLine(WhseReceiptLine, WhseReceiptHeader);
-            OnPurchLine2ReceiptLineOnAfterUpdateReceiptLine(WhseReceiptLine, WhseReceiptHeader, PurchLine);
-            CreateReceiptLine(WhseReceiptLine);
-            OnAfterCreateRcptLineFromPurchLine(WhseReceiptLine, WhseReceiptHeader, PurchLine);
-            exit(not HasErrorOccured());
-        end;
+        exit(TransferWarehouseMgt.FromTransLine2ShptLine(WarehouseShipmentHeader, TransferLine));
     end;
+#endif
 
-    procedure FromTransLine2ShptLine(WhseShptHeader: Record "Warehouse Shipment Header"; TransLine: Record "Transfer Line") Result: Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Transfer Warehouse Mgt.', '23.0')]
+    procedure TransLine2ReceiptLine(WarehouseReceiptHeader: Record "Warehouse Receipt Header"; TransferLine: Record "Transfer Line") Result: Boolean
     var
-        WhseShptLine: Record "Warehouse Shipment Line";
-        TransHeader: Record "Transfer Header";
-        IsHandled: Boolean;
+        TransferWarehouseMgt: Codeunit "Transfer Warehouse Mgt.";
     begin
-        IsHandled := false;
-        OnBeforeFromTransLine2ShptLine(TransLine, Result, IsHandled, WhseShptHeader);
-        if IsHandled then
-            exit(Result);
-
-        with WhseShptLine do begin
-            InitNewLine(WhseShptHeader."No.");
-            SetSource(DATABASE::"Transfer Line", 0, TransLine."Document No.", TransLine."Line No.");
-            TransLine.TestField("Unit of Measure Code");
-            SetItemData(
-              TransLine."Item No.", TransLine.Description, TransLine."Description 2", TransLine."Transfer-from Code",
-              TransLine."Variant Code", TransLine."Unit of Measure Code", TransLine."Qty. per Unit of Measure",
-              TransLine."Qty. Rounding Precision", TransLine."Qty. Rounding Precision (Base)");
-            OnFromTransLine2ShptLineOnAfterInitNewLine(WhseShptLine, WhseShptHeader, TransLine);
-            SetQtysOnShptLine(WhseShptLine, TransLine."Outstanding Quantity", TransLine."Outstanding Qty. (Base)");
-            "Due Date" := TransLine."Shipment Date";
-            if WhseShptHeader."Shipment Date" = 0D then
-                "Shipment Date" := WorkDate()
-            else
-                "Shipment Date" := WhseShptHeader."Shipment Date";
-            "Destination Type" := "Destination Type"::Location;
-            "Destination No." := TransLine."Transfer-to Code";
-            if TransHeader.Get(TransLine."Document No.") then
-                "Shipping Advice" := TransHeader."Shipping Advice";
-            if "Location Code" = WhseShptHeader."Location Code" then
-                "Bin Code" := WhseShptHeader."Bin Code";
-            if "Bin Code" = '' then
-                "Bin Code" := TransLine."Transfer-from Bin Code";
-            UpdateShptLine(WhseShptLine, WhseShptHeader);
-            OnBeforeCreateShptLineFromTransLine(WhseShptLine, WhseShptHeader, TransLine, TransHeader);
-            CreateShptLine(WhseShptLine);
-            OnAfterCreateShptLineFromTransLine(WhseShptLine, WhseShptHeader, TransLine, TransHeader);
-            exit(not HasErrorOccured());
-        end;
+        exit(TransferWarehouseMgt.TransLine2ReceiptLine(WarehouseReceiptHeader, TransferLine));
     end;
+#endif
 
-    procedure TransLine2ReceiptLine(WhseReceiptHeader: Record "Warehouse Receipt Header"; TransLine: Record "Transfer Line") Result: Boolean
-    var
-        WhseReceiptLine: Record "Warehouse Receipt Line";
-        UnitOfMeasureMgt: Codeunit "Unit of Measure Management";
-        WhseInbndOtsdgQty: Decimal;
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeTransLine2ReceiptLine(WhseReceiptHeader, TransLine, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
-        with WhseReceiptLine do begin
-            InitNewLine(WhseReceiptHeader."No.");
-            SetSource(DATABASE::"Transfer Line", 1, TransLine."Document No.", TransLine."Line No.");
-            TransLine.TestField("Unit of Measure Code");
-            SetItemData(
-              TransLine."Item No.", TransLine.Description, TransLine."Description 2", TransLine."Transfer-to Code",
-              TransLine."Variant Code", TransLine."Unit of Measure Code", TransLine."Qty. per Unit of Measure",
-              TransLine."Qty. Rounding Precision", TransLine."Qty. Rounding Precision (Base)");
-            OnTransLine2ReceiptLineOnAfterInitNewLine(WhseReceiptLine, WhseReceiptHeader, TransLine);
-            Validate("Qty. Received", TransLine."Quantity Received");
-            TransLine.CalcFields("Whse. Inbnd. Otsdg. Qty (Base)");
-            WhseInbndOtsdgQty :=
-              UnitOfMeasureMgt.CalcQtyFromBase(
-                TransLine."Item No.", TransLine."Variant Code", TransLine."Unit of Measure Code",
-                TransLine."Whse. Inbnd. Otsdg. Qty (Base)", TransLine."Qty. per Unit of Measure");
-            SetQtysOnRcptLine(
-              WhseReceiptLine,
-              TransLine."Quantity Received" + TransLine."Qty. in Transit" - WhseInbndOtsdgQty,
-              TransLine."Qty. Received (Base)" + TransLine."Qty. in Transit (Base)" - TransLine."Whse. Inbnd. Otsdg. Qty (Base)");
-            "Due Date" := TransLine."Receipt Date";
-            "Starting Date" := WorkDate();
-            if "Location Code" = WhseReceiptHeader."Location Code" then
-                "Bin Code" := WhseReceiptHeader."Bin Code";
-            if "Bin Code" = '' then
-                "Bin Code" := TransLine."Transfer-To Bin Code";
-            OnBeforeUpdateRcptLineFromTransLine(WhseReceiptLine, TransLine);
-            UpdateReceiptLine(WhseReceiptLine, WhseReceiptHeader);
-            CreateReceiptLine(WhseReceiptLine);
-            OnAfterCreateRcptLineFromTransLine(WhseReceiptLine, WhseReceiptHeader, TransLine);
-            exit(not HasErrorOccured());
-        end;
-    end;
-
-    local procedure CreateShptLine(var WhseShptLine: Record "Warehouse Shipment Line")
+    internal procedure CreateShipmentLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
     var
         Item: Record Item;
     begin
-        with WhseShptLine do begin
+        with WarehouseShipmentLine do begin
             Item."No." := "Item No.";
             Item.ItemSKUGet(Item, "Location Code", "Variant Code");
             "Shelf No." := Item."Shelf No.";
-            OnBeforeWhseShptLineInsert(WhseShptLine);
+            OnBeforeWhseShptLineInsert(WarehouseShipmentLine);
             Insert();
-            OnAfterWhseShptLineInsert(WhseShptLine);
+            OnAfterWhseShptLineInsert(WarehouseShipmentLine);
             CreateWhseItemTrackingLines();
         end;
 
-        OnAfterCreateShptLine(WhseShptLine);
+        OnAfterCreateShptLine(WarehouseShipmentLine);
     end;
 
-    local procedure SetQtysOnShptLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; Qty: Decimal; QtyBase: Decimal)
+    internal procedure SetQtysOnShptLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; Qty: Decimal; QtyBase: Decimal)
     var
         Location: Record Location;
         IsHandled: Boolean;
@@ -389,35 +127,36 @@ codeunit 5750 "Whse.-Create Source Document"
         end;
     end;
 
-    local procedure CreateReceiptLine(var WhseReceiptLine: Record "Warehouse Receipt Line")
+    internal procedure CreateReceiptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line")
     var
         Item: Record Item;
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateReceiptLine(WhseReceiptLine, IsHandled);
+        OnBeforeCreateReceiptLine(WarehouseReceiptLine, IsHandled);
         if IsHandled then
             exit;
 
-        with WhseReceiptLine do begin
+        with WarehouseReceiptLine do begin
             Item."No." := "Item No.";
             Item.ItemSKUGet(Item, "Location Code", "Variant Code");
             "Shelf No." := Item."Shelf No.";
             Status := GetLineStatus();
-            OnBeforeWhseReceiptLineInsert(WhseReceiptLine);
+            OnBeforeWhseReceiptLineInsert(WarehouseReceiptLine);
             Insert();
-            OnAfterWhseReceiptLineInsert(WhseReceiptLine);
+            OnAfterWhseReceiptLineInsert(WarehouseReceiptLine);
         end;
     end;
 
-    local procedure SetQtysOnRcptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; Qty: Decimal; QtyBase: Decimal)
+    internal procedure SetQtysOnRcptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; Qty: Decimal; QtyBase: Decimal)
     var
         IsHandled: Boolean;
     begin
-    	IsHandled := false;
+        IsHandled := false;
         OnBeforeSetQtysOnRcptLine(WarehouseReceiptLine, Qty, QtyBase, IsHandled);
         if IsHandled then
             exit;
+
         with WarehouseReceiptLine do begin
             Quantity := Qty;
             "Qty. (Base)" := QtyBase;
@@ -427,215 +166,222 @@ codeunit 5750 "Whse.-Create Source Document"
         OnAfterSetQtysOnRcptLine(WarehouseReceiptLine, Qty, QtyBase);
     end;
 
-    local procedure UpdateShptLine(var WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header")
+    internal procedure UpdateShipmentLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header")
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateShptLine(WhseShptLine, WhseShptHeader, IsHandled);
+        OnBeforeUpdateShptLine(WarehouseShipmentLine, WarehouseShipmentHeader, IsHandled);
         if IsHandled then
             exit;
 
-        with WhseShptLine do begin
-            if WhseShptHeader."Zone Code" <> '' then
-                Validate("Zone Code", WhseShptHeader."Zone Code");
-            if WhseShptHeader."Bin Code" <> '' then
-                Validate("Bin Code", WhseShptHeader."Bin Code");
+        with WarehouseShipmentLine do begin
+            if WarehouseShipmentHeader."Zone Code" <> '' then
+                Validate("Zone Code", WarehouseShipmentHeader."Zone Code");
+            if WarehouseShipmentHeader."Bin Code" <> '' then
+                Validate("Bin Code", WarehouseShipmentHeader."Bin Code");
         end;
     end;
 
-    local procedure UpdateReceiptLine(var WhseReceiptLine: Record "Warehouse Receipt Line"; WhseReceiptHeader: Record "Warehouse Receipt Header")
+    internal procedure UpdateReceiptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header")
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateReceiptLine(WhseReceiptLine, WhseReceiptHeader, IsHandled);
+        OnBeforeUpdateReceiptLine(WarehouseReceiptLine, WarehouseReceiptHeader, IsHandled);
         if not IsHandled then begin
-            with WhseReceiptLine do begin
-                if WhseReceiptHeader."Zone Code" <> '' then
-                    Validate("Zone Code", WhseReceiptHeader."Zone Code");
-                if WhseReceiptHeader."Bin Code" <> '' then
-                    Validate("Bin Code", WhseReceiptHeader."Bin Code");
-                if WhseReceiptHeader."Cross-Dock Zone Code" <> '' then
-                    Validate("Cross-Dock Zone Code", WhseReceiptHeader."Cross-Dock Zone Code");
-                if WhseReceiptHeader."Cross-Dock Bin Code" <> '' then
-                    Validate("Cross-Dock Bin Code", WhseReceiptHeader."Cross-Dock Bin Code");
+            with WarehouseReceiptLine do begin
+                if WarehouseReceiptHeader."Zone Code" <> '' then
+                    Validate("Zone Code", WarehouseReceiptHeader."Zone Code");
+                if WarehouseReceiptHeader."Bin Code" <> '' then
+                    Validate("Bin Code", WarehouseReceiptHeader."Bin Code");
+                if WarehouseReceiptHeader."Cross-Dock Zone Code" <> '' then
+                    Validate("Cross-Dock Zone Code", WarehouseReceiptHeader."Cross-Dock Zone Code");
+                if WarehouseReceiptHeader."Cross-Dock Bin Code" <> '' then
+                    Validate("Cross-Dock Bin Code", WarehouseReceiptHeader."Cross-Dock Bin Code");
             end;
-            OnAfterUpdateReceiptLine(WhseReceiptLine, WhseReceiptHeader);
+            OnAfterUpdateReceiptLine(WarehouseReceiptLine, WarehouseReceiptHeader);
         end;
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Sales Warehouse Mgt.', '23.0')]
     procedure CheckIfFromSalesLine2ShptLine(SalesLine: Record "Sales Line"): Boolean
     var
-        IsHandled: Boolean;
-        ReturnValue: Boolean;
+        SalesWarehouseMgt: Codeunit "Sales Warehouse Mgt.";
     begin
-        IsHandled := false;
-        ReturnValue := false;
-        OnBeforeCheckIfSalesLine2ShptLine(SalesLine, ReturnValue, IsHandled);
-        if IsHandled then
-            exit(ReturnValue);
-
-        if SalesLine.IsNonInventoriableItem() then
-            exit(false);
-
-        SalesLine.CalcFields("Whse. Outstanding Qty. (Base)");
-        exit(Abs(SalesLine."Outstanding Qty. (Base)") > Abs(SalesLine."Whse. Outstanding Qty. (Base)"));
+        exit(SalesWarehouseMgt.CheckIfFromSalesLine2ShptLine(SalesLine));
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Service Warehouse Mgt.', '23.0')]
     procedure CheckIfFromServiceLine2ShptLin(ServiceLine: Record "Service Line"): Boolean
+    var
+        ServiceWarehouseMgt: Codeunit "Service Warehouse Mgt.";
     begin
-        ServiceLine.CalcFields("Whse. Outstanding Qty. (Base)");
-        exit(
-          (Abs(ServiceLine."Outstanding Qty. (Base)") > Abs(ServiceLine."Whse. Outstanding Qty. (Base)")) and
-          (ServiceLine."Qty. to Consume (Base)" = 0));
+        exit(ServiceWarehouseMgt.CheckIfFromServiceLine2ShptLine(ServiceLine));
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Sales Warehouse Mgt.', '23.0')]
     procedure CheckIfSalesLine2ReceiptLine(SalesLine: Record "Sales Line"): Boolean
     var
-        WhseReceiptLine: Record "Warehouse Receipt Line";
-        WhseManagement: Codeunit "Whse. Management";
-        IsHandled: Boolean;
-        ReturnValue: Boolean;
+        SalesWarehouseMgt: Codeunit "Sales Warehouse Mgt.";
     begin
-        IsHandled := false;
-        ReturnValue := false;
-        OnBeforeCheckIfSalesLine2ReceiptLine(SalesLine, ReturnValue, IsHandled);
-        if IsHandled then
-            exit(ReturnValue);
-
-        if SalesLine.IsNonInventoriableItem() then
-            exit(false);
-
-        with WhseReceiptLine do begin
-            WhseManagement.SetSourceFilterForWhseRcptLine(
-              WhseReceiptLine, DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", false);
-            CalcSums("Qty. Outstanding (Base)");
-            exit(Abs(SalesLine."Outstanding Qty. (Base)") > Abs("Qty. Outstanding (Base)"));
-        end;
+        exit(SalesWarehouseMgt.CheckIfSalesLine2ReceiptLine(SalesLine));
     end;
+#endif
 
-    procedure CheckIfFromPurchLine2ShptLine(PurchLine: Record "Purchase Line"): Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Purchases Warehouse Mgt.', '23.0')]
+    procedure CheckIfFromPurchLine2ShptLine(PurchaseLine: Record "Purchase Line"): Boolean
     var
-        WhseShptLine: Record "Warehouse Shipment Line";
-        IsHandled: Boolean;
-        ReturnValue: Boolean;
+        PurchasesWarehouseMgt: Codeunit "Purchases Warehouse Mgt.";
     begin
-        IsHandled := false;
-        ReturnValue := false;
-        OnBeforeCheckIfPurchLine2ShptLine(PurchLine, ReturnValue, IsHandled);
-        if IsHandled then
-            exit(ReturnValue);
-
-        if PurchLine.IsNonInventoriableItem() then
-            exit(false);
-
-        with WhseShptLine do begin
-            SetSourceFilter(DATABASE::"Purchase Line", PurchLine."Document Type".AsInteger(), PurchLine."Document No.", PurchLine."Line No.", false);
-            CalcSums("Qty. Outstanding (Base)");
-            exit(Abs(PurchLine."Outstanding Qty. (Base)") > "Qty. Outstanding (Base)");
-        end;
+        exit(PurchasesWarehouseMgt.CheckIfFromPurchLine2ShptLine(PurchaseLine));
     end;
+#endif
 
-    procedure CheckIfPurchLine2ReceiptLine(PurchLine: Record "Purchase Line"): Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Purchases Warehouse Mgt.', '23.0')]
+    procedure CheckIfPurchLine2ReceiptLine(PurchaseLine: Record "Purchase Line"): Boolean
     var
-        ReturnValue: Boolean;
-        IsHandled: Boolean;
+        PurchasesWarehouseMgt: Codeunit "Purchases Warehouse Mgt.";
     begin
-        IsHandled := false;
-        ReturnValue := false;
-        OnBeforeCheckIfPurchLine2ReceiptLine(PurchLine, ReturnValue, IsHandled);
-        if IsHandled then
-            exit(ReturnValue);
-
-        if PurchLine.IsNonInventoriableItem() then
-            exit(false);
-
-        PurchLine.CalcFields("Whse. Outstanding Qty. (Base)");
-        exit(Abs(PurchLine."Outstanding Qty. (Base)") > Abs(PurchLine."Whse. Outstanding Qty. (Base)"));
+        exit(PurchasesWarehouseMgt.CheckIfPurchLine2ReceiptLine(PurchaseLine));
     end;
+#endif
 
-    procedure CheckIfFromTransLine2ShptLine(TransLine: Record "Transfer Line"): Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Transfer Warehouse Mgt.', '23.0')]
+    procedure CheckIfFromTransLine2ShptLine(TransferLine: Record "Transfer Line"): Boolean
     var
-        Location: Record Location;
-        IsHandled: Boolean;
-        ReturnValue: Boolean;
+        TransferWarehouseMgt: Codeunit "Transfer Warehouse Mgt.";
     begin
-        IsHandled := false;
-        OnBeforeCheckIfTransLine2ShipmentLine(TransLine, IsHandled, ReturnValue);
-        if IsHandled then
-            exit(ReturnValue);
-
-        if Location.GetLocationSetup(TransLine."Transfer-from Code", Location) then
-            if Location."Use As In-Transit" then
-                exit(false);
-
-        TransLine.CalcFields("Whse Outbnd. Otsdg. Qty (Base)");
-        exit(TransLine."Outstanding Qty. (Base)" > TransLine."Whse Outbnd. Otsdg. Qty (Base)");
+        exit(TransferWarehouseMgt.CheckIfFromTransLine2ShptLine(TransferLine));
     end;
+#endif
 
-    procedure CheckIfTransLine2ReceiptLine(TransLine: Record "Transfer Line"): Boolean
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Transfer Warehouse Mgt.', '23.0')]
+    procedure CheckIfTransLine2ReceiptLine(TransferLine: Record "Transfer Line"): Boolean
     var
-        Location: Record Location;
-        IsHandled: Boolean;
-        ReturnValue: Boolean;
+        TransferWarehouseMgt: Codeunit "Transfer Warehouse Mgt.";
     begin
-        IsHandled := false;
-        OnBeforeCheckIfTransLine2ReceiptLine(TransLine, IsHandled, ReturnValue);
-        if IsHandled then
-            exit(ReturnValue);
-
-        TransLine.CalcFields("Whse. Inbnd. Otsdg. Qty (Base)");
-        if Location.GetLocationSetup(TransLine."Transfer-to Code", Location) then
-            if Location."Use As In-Transit" then
-                exit(false);
-        exit(TransLine."Qty. in Transit (Base)" > TransLine."Whse. Inbnd. Otsdg. Qty (Base)");
+        exit(TransferWarehouseMgt.CheckIfTransLine2ReceiptLine(TransferLine));
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateShptLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnAfterCreateShptLineFromSalesLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header")
+    begin
+        OnAfterCreateShptLineFromSalesLine(WarehouseShipmentLine, WarehouseShipmentHeader, SalesLine, SalesHeader);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnAfterCreateShptLineFromSalesLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnAfterCreateRcptLineFromSalesLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header"; SalesLine: Record "Sales Line")
+    begin
+        OnAfterCreateRcptLineFromSalesLine(WarehouseReceiptLine, WarehouseReceiptHeader, SalesLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnAfterCreateRcptLineFromSalesLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header"; SalesLine: Record "Sales Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnAfterCreateShptLineFromServiceLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; ServiceLine: Record "Service Line")
+    begin
+        OnAfterCreateShptLineFromServiceLine(WarehouseShipmentLine, WarehouseShipmentHeader, ServiceLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Service Warehouse Mgt.', '23.0')]
     local procedure OnAfterCreateShptLineFromServiceLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; ServiceLine: Record "Service Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnAfterCreateShptLineFromPurchLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; PurchaseLine: Record "Purchase Line")
+    begin
+        OnAfterCreateShptLineFromPurchLine(WarehouseShipmentLine, WarehouseShipmentHeader, PurchaseLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnAfterCreateShptLineFromPurchLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; PurchaseLine: Record "Purchase Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnAfterCreateRcptLineFromPurchLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header"; PurchaseLine: Record "Purchase Line")
+    begin
+        OnAfterCreateRcptLineFromPurchLine(WarehouseReceiptLine, WarehouseReceiptHeader, PurchaseLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnAfterCreateRcptLineFromPurchLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header"; PurchaseLine: Record "Purchase Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnAfterCreateShptLineFromTransLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; TransferLine: Record "Transfer Line"; TransferHeader: Record "Transfer Header")
+    begin
+        OnAfterCreateShptLineFromTransLine(WarehouseShipmentLine, WarehouseShipmentHeader, TransferLine, TransferHeader);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Transfer Warehouse Mgt.', '23.0')]
     local procedure OnAfterCreateShptLineFromTransLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; TransferLine: Record "Transfer Line"; TransferHeader: Record "Transfer Header")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnAfterCreateRcptLineFromTransLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header"; TransferLine: Record "Transfer Line")
+    begin
+        OnAfterCreateRcptLineFromTransLine(WarehouseReceiptLine, WarehouseReceiptHeader, TransferLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Transfer Warehouse Mgt.', '23.0')]
     local procedure OnAfterCreateRcptLineFromTransLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header"; TransferLine: Record "Transfer Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnAfterInitNewWhseShptLine(var WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line"; AssembleToOrder: Boolean)
+    begin
+        OnAfterInitNewWhseShptLine(WhseShptLine, WhseShptHeader, SalesLine, AssembleToOrder);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnAfterInitNewWhseShptLine(var WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line"; AssembleToOrder: Boolean)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetQtysOnRcptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; Qty: Decimal; QtyBase: Decimal)
@@ -652,90 +398,205 @@ codeunit 5750 "Whse.-Create Source Document"
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnBeforeCheckIfSalesLine2ReceiptLine(var SalesLine: Record "Sales Line"; var ReturnValue: Boolean; var IsHandled: Boolean)
+    begin
+        OnBeforeCheckIfSalesLine2ReceiptLine(SalesLine, ReturnValue, IsHandled);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnBeforeCheckIfSalesLine2ReceiptLine(var SalesLine: Record "Sales Line"; var ReturnValue: Boolean; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeCheckIfSalesLine2ShptLine(var SalesLine: Record "Sales Line"; var ReturnValue: Boolean; var IsHandled: Boolean)
+    begin
+        OnBeforeCheckIfSalesLine2ShptLine(SalesLine, ReturnValue, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnBeforeCheckIfSalesLine2ShptLine(var SalesLine: Record "Sales Line"; var ReturnValue: Boolean; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeCheckIfPurchLine2ReceiptLine(var PurchaseLine: Record "Purchase Line"; var ReturnValue: Boolean; var IsHandled: Boolean)
+    begin
+        OnBeforeCheckIfPurchLine2ReceiptLine(PurchaseLine, ReturnValue, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnBeforeCheckIfPurchLine2ReceiptLine(var PurchaseLine: Record "Purchase Line"; var ReturnValue: Boolean; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeCheckIfPurchLine2ShptLine(var PurchaseLine: Record "Purchase Line"; var ReturnValue: Boolean; var IsHandled: Boolean)
+    begin
+        OnBeforeCheckIfPurchLine2ShptLine(PurchaseLine, ReturnValue, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnBeforeCheckIfPurchLine2ShptLine(var PurchaseLine: Record "Purchase Line"; var ReturnValue: Boolean; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeCheckIfTransLine2ReceiptLine(var TransferLine: Record "Transfer Line"; var IsHandled: Boolean; var ReturnValue: Boolean)
+    begin
+        OnBeforeCheckIfTransLine2ReceiptLine(TransferLine, IsHandled, ReturnValue);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Transfer Warehouse Mgt.', '23.0')]
     local procedure OnBeforeCheckIfTransLine2ReceiptLine(var TransferLine: Record "Transfer Line"; var IsHandled: Boolean; var ReturnValue: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeCheckIfTransLine2ShipmentLine(var TransferLine: Record "Transfer Line"; var IsHandled: Boolean; var ReturnValue: Boolean)
+    begin
+        OnBeforeCheckIfTransLine2ShipmentLine(TransferLine, IsHandled, ReturnValue);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Transfer Warehouse Mgt.', '23.0')]
     local procedure OnBeforeCheckIfTransLine2ShipmentLine(var TransferLine: Record "Transfer Line"; var IsHandled: Boolean; var ReturnValue: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeCreateReceiptLineFromSalesLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header"; SalesLine: Record "Sales Line")
+    begin
+        OnBeforeCreateReceiptLineFromSalesLine(WarehouseReceiptLine, WarehouseReceiptHeader, SalesLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnBeforeCreateReceiptLineFromSalesLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header"; SalesLine: Record "Sales Line")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateReceiptLine(var WhseReceiptLine: Record "Warehouse Receipt Line"; var IsHandled: Boolean)
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnBeforeCreateShptLineFromSalesLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header")
+    begin
+        OnBeforeCreateShptLineFromSalesLine(WarehouseShipmentLine, WarehouseShipmentHeader, SalesLine, SalesHeader);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnBeforeCreateShptLineFromSalesLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header")
     begin
     end;
+#endif
 
+#if not CLEAN23
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnBeforeCreateShptLineFromPurchLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; PurchaseLine: Record "Purchase Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeCreateShptLineFromTransLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; TransferLine: Record "Transfer Line"; TransferHeader: Record "Transfer Header")
+    begin
+        OnBeforeCreateShptLineFromTransLine(WarehouseShipmentLine, WarehouseShipmentHeader, TransferLine, TransferHeader);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Transfer Warehouse Mgt.', '23.0')]
     local procedure OnBeforeCreateShptLineFromTransLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; TransferLine: Record "Transfer Line"; TransferHeader: Record "Transfer Header")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeFromPurchLine2ShptLine(var PurchLine: Record "Purchase Line"; var Result: Boolean; var IsHandled: Boolean; WarehouseShipmentHeader: Record "Warehouse Shipment Header")
+    begin
+        OnBeforeFromPurchLine2ShptLine(PurchLine, Result, IsHandled, WarehouseShipmentHeader);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnBeforeFromPurchLine2ShptLine(var PurchLine: Record "Purchase Line"; var Result: Boolean; var IsHandled: Boolean; WarehouseShipmentHeader: Record "Warehouse Shipment Header")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeFromTransLine2ShptLine(var TransLine: Record "Transfer Line"; var Result: Boolean; var IsHandled: Boolean; WarehouseShipmentHeader: Record "Warehouse Shipment Header")
+    begin
+        OnBeforeFromTransLine2ShptLine(TransLine, Result, IsHandled, WarehouseShipmentHeader);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Transfer Warehouse Mgt.', '23.0')]
     local procedure OnBeforeFromTransLine2ShptLine(var TransLine: Record "Transfer Line"; var Result: Boolean; var IsHandled: Boolean; WarehouseShipmentHeader: Record "Warehouse Shipment Header")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeFromSalesLine2ShptLine(var SalesLine: Record "Sales Line"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+        OnBeforeFromSalesLine2ShptLine(SalesLine, Result, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnBeforeFromSalesLine2ShptLine(var SalesLine: Record "Sales Line"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforePurchLine2ReceiptLine(WhseReceiptHeader: Record "Warehouse Receipt Header"; var PurchLine: Record "Purchase Line"; var IsHandled: Boolean; var Result: Boolean)
+    begin
+        OnBeforePurchLine2ReceiptLine(WhseReceiptHeader, PurchLine, IsHandled, Result);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnBeforePurchLine2ReceiptLine(WhseReceiptHeader: Record "Warehouse Receipt Header"; var PurchLine: Record "Purchase Line"; var IsHandled: Boolean; var Result: Boolean)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetQtysOnShptLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var Qty: Decimal; var QtyBase: Decimal; var IsHandled: Boolean)
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnBeforeTransLine2ReceiptLine(WhseReceiptHeader: Record "Warehouse Receipt Header"; var TransLine: Record "Transfer Line"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+        OnBeforeTransLine2ReceiptLine(WhseReceiptHeader, TransLine, Result, IsHandled);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Transfer Warehouse Mgt.', '23.0')]
     local procedure OnBeforeTransLine2ReceiptLine(WhseReceiptHeader: Record "Warehouse Receipt Header"; var TransLine: Record "Transfer Line"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateReceiptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header"; var IsHandled: Boolean)
@@ -756,95 +617,223 @@ codeunit 5750 "Whse.-Create Source Document"
     local procedure OnBeforeWhseShptLineInsert(var WarehouseShipmentLine: Record "Warehouse Shipment Line")
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetQtysOnRcptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; Qty: Decimal; QtyBase: Decimal; var IsHandled: Boolean)
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnBeforeUpdateRcptLineFromTransLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; TransferLine: Record "Transfer Line")
+    begin
+        OnBeforeUpdateRcptLineFromTransLine(WarehouseReceiptLine, TransferLine);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Transfer Warehouse Mgt.', '23.0')]
     local procedure OnBeforeUpdateRcptLineFromTransLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; TransferLine: Record "Transfer Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnSalesLine2ReceiptLineOnAfterInitNewLine(var WhseReceiptLine: Record "Warehouse Receipt Line"; WhseReceiptHeader: Record "Warehouse Receipt Header"; SalesLine: Record "Sales Line")
+    begin
+        OnSalesLine2ReceiptLineOnAfterInitNewLine(WhseReceiptLine, WhseReceiptHeader, SalesLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnSalesLine2ReceiptLineOnAfterInitNewLine(var WhseReceiptLine: Record "Warehouse Receipt Line"; WhseReceiptHeader: Record "Warehouse Receipt Header"; SalesLine: Record "Sales Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnSalesLine2ReceiptLineOnBeforeUpdateReceiptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; SalesLine: Record "Sales Line")
+    begin
+        OnSalesLine2ReceiptLineOnBeforeUpdateReceiptLine(WarehouseReceiptLine, SalesLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnSalesLine2ReceiptLineOnBeforeUpdateReceiptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; SalesLine: Record "Sales Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnFromServiceLine2ShptLineOnAfterInitNewLine(var WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header"; ServiceLine: Record "Service Line")
+    begin
+        OnFromServiceLine2ShptLineOnAfterInitNewLine(WhseShptLine, WhseShptHeader, ServiceLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Service Warehouse Mgt.', '23.0')]
     local procedure OnFromServiceLine2ShptLineOnAfterInitNewLine(var WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header"; ServiceLine: Record "Service Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnFromServiceLine2ShptLineOnBeforeCreateShptLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; ServiceHeader: Record "Service Header"; ServiceLine: Record "Service Line")
+    begin
+        OnFromServiceLine2ShptLineOnBeforeCreateShptLine(WarehouseShipmentLine, WarehouseShipmentHeader, ServiceHeader, ServiceLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Service Warehouse Mgt.', '23.0')]
     local procedure OnFromServiceLine2ShptLineOnBeforeCreateShptLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; ServiceHeader: Record "Service Header"; ServiceLine: Record "Service Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnFromPurchLine2ShptLineOnAfterInitNewLine(var WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header"; PurchLine: Record "Purchase Line")
+    begin
+        OnFromPurchLine2ShptLineOnAfterInitNewLine(WhseShptLine, WhseShptHeader, PurchLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnFromPurchLine2ShptLineOnAfterInitNewLine(var WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header"; PurchLine: Record "Purchase Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnFromPurchLine2ShptLineOnBeforeCreateShptLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; PurchaseLine: Record "Purchase Line")
+    begin
+        OnFromPurchLine2ShptLineOnBeforeCreateShptLine(WarehouseShipmentLine, WarehouseShipmentHeader, PurchaseLine);
+        OnBeforeCreateShptLineFromPurchLine(WarehouseShipmentLine, WarehouseShipmentHeader, PurchaseLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnFromPurchLine2ShptLineOnBeforeCreateShptLine(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; PurchaseLine: Record "Purchase Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnPurchLine2ReceiptLineOnAfterInitNewLine(var WhseReceiptLine: Record "Warehouse Receipt Line"; WhseReceiptHeader: Record "Warehouse Receipt Header"; PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+        OnPurchLine2ReceiptLineOnAfterInitNewLine(WhseReceiptLine, WhseReceiptHeader, PurchaseLine, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnPurchLine2ReceiptLineOnAfterInitNewLine(var WhseReceiptLine: Record "Warehouse Receipt Line"; WhseReceiptHeader: Record "Warehouse Receipt Header"; PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnPurchLine2ReceiptLineOnAfterSetQtysOnRcptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; PurchaseLine: Record "Purchase Line")
+    begin
+        OnPurchLine2ReceiptLineOnAfterSetQtysOnRcptLine(WarehouseReceiptLine, PurchaseLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnPurchLine2ReceiptLineOnAfterSetQtysOnRcptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; PurchaseLine: Record "Purchase Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnPurchLine2ReceiptLineOnAfterUpdateReceiptLine(var WhseReceiptLine: Record "Warehouse Receipt Line"; var WhseReceiptHeader: Record "Warehouse Receipt Header"; PurchaseLine: Record "Purchase Line")
+    begin
+        OnPurchLine2ReceiptLineOnAfterUpdateReceiptLine(WhseReceiptLine, WhseReceiptHeader, PurchaseLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Purchases Warehouse Mgt.', '23.0')]
     local procedure OnPurchLine2ReceiptLineOnAfterUpdateReceiptLine(var WhseReceiptLine: Record "Warehouse Receipt Line"; var WhseReceiptHeader: Record "Warehouse Receipt Header"; PurchaseLine: Record "Purchase Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnFromTransLine2ShptLineOnAfterInitNewLine(var WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header"; TransferLine: Record "Transfer Line")
+    begin
+        OnFromTransLine2ShptLineOnAfterInitNewLine(WhseShptLine, WhseShptHeader, TransferLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Transfer Warehouse Mgt.', '23.0')]
     local procedure OnFromTransLine2ShptLineOnAfterInitNewLine(var WhseShptLine: Record "Warehouse Shipment Line"; WhseShptHeader: Record "Warehouse Shipment Header"; TransferLine: Record "Transfer Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnTransLine2ReceiptLineOnAfterInitNewLine(var WhseReceiptLine: Record "Warehouse Receipt Line"; WhseReceiptHeader: Record "Warehouse Receipt Header"; TransferLine: Record "Transfer Line")
+    begin
+        OnTransLine2ReceiptLineOnAfterInitNewLine(WhseReceiptLine, WhseReceiptHeader, TransferLine);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Transfer Warehouse Mgt.', '23.0')]
     local procedure OnTransLine2ReceiptLineOnAfterInitNewLine(var WhseReceiptLine: Record "Warehouse Receipt Line"; WhseReceiptHeader: Record "Warehouse Receipt Header"; TransferLine: Record "Transfer Line")
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnFromSalesLine2ShptLineOnBeforeCreateShipmentLine(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line"; var TotalOutstandingWhseShptQty: Decimal; var TotalOutstandingWhseShptQtyBase: Decimal)
+    begin
+        OnFromSalesLine2ShptLineOnBeforeCreateShipmentLine(WarehouseShipmentHeader, SalesLine, TotalOutstandingWhseShptQty, TotalOutstandingWhseShptQtyBase);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnFromSalesLine2ShptLineOnBeforeCreateShipmentLine(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line"; var TotalOutstandingWhseShptQty: Decimal; var TotalOutstandingWhseShptQtyBase: Decimal)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateReceiptLine(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header");
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnBeforeSalesLine2ReceiptLine(WarehouseReceiptHeader: Record "Warehouse Receipt Header"; SalesLine: Record "Sales Line"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+        OnBeforeSalesLine2ReceiptLine(WarehouseReceiptHeader, SalesLine, Result, IsHandled);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnBeforeSalesLine2ReceiptLine(WarehouseReceiptHeader: Record "Warehouse Receipt Header"; SalesLine: Record "Sales Line"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnBeforeFromService2ShptLine(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; ServiceLine: Record "Service Line"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+        OnBeforeFromService2ShptLine(WarehouseShipmentHeader, ServiceLine, Result, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Service Warehouse Mgt.', '23.0')]
     local procedure OnBeforeFromService2ShptLine(WarehouseShptHeader: Record "Warehouse Shipment Header"; ServiceLine: Record "Service Line"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnFromSalesLine2ShptLineOnBeforeCreateATOShipmentLine(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; AsmHeader: Record "Assembly Header"; var SalesLine: Record "Sales Line"; var ATOWhseShptLineQty: Decimal; var ATOWhseShptLineQtyBase: Decimal)
+    begin
+        OnFromSalesLine2ShptLineOnBeforeCreateATOShipmentLine(WarehouseShipmentHeader, AsmHeader, SalesLine, ATOWhseShptLineQty, ATOWhseShptLineQtyBase);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnFromSalesLine2ShptLineOnBeforeCreateATOShipmentLine(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; AsmHeader: Record "Assembly Header"; var SalesLine: Record "Sales Line"; var ATOWhseShptLineQty: Decimal; var ATOWhseShptLineQtyBase: Decimal)
     begin
     end;
+#endif
 }
-

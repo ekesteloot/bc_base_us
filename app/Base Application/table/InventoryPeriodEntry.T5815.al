@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Setup;
+
+using Microsoft.InventoryMgt.Ledger;
+using System.Security.AccessControl;
+
 table 5815 "Inventory Period Entry"
 {
     Caption = 'Inventory Period Entry';
@@ -21,8 +26,6 @@ table 5815 "Inventory Period Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(4; "Creation Date"; Date)
         {
@@ -36,8 +39,6 @@ table 5815 "Inventory Period Entry"
         {
             Caption = 'Closing Item Register No.';
             TableRelation = "Item Register";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(7; "Entry Type"; Option)

@@ -1,3 +1,65 @@
+﻿namespace System.Security.User;
+
+using Microsoft.AssemblyMgt.History;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Allocation;
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.HumanResources.Payables;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Ledger;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Setup;
+using System.Automation;
+using System.Diagnostics;
+using System.Environment;
+using System.Environment.Configuration;
+using System.IO;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Threading;
+using System.Utilities;
+using System.Visualization;
+
 codeunit 418 "User Management"
 {
     Permissions = TableData "G/L Entry" = rm,
@@ -100,12 +162,14 @@ codeunit 418 "User Management"
         Text001Qst: Label 'You are renaming an existing user. This will also update all related records. Are you sure that you want to rename the user?';
         Text002Err: Label 'The account %1 already exists.', Comment = '%1 username';
         Text003Err: Label 'You do not have permissions for this action on the table %1.', Comment = '%1 table name';
+#if not CLEAN23
         BasicAuthDescriptionNameTok: Label 'Web Service Access Key';
         BasicAuthUsedNameTok: Label 'Web Service Access Key Warning';
         BasicAuthDepricationTok: Label 'Web Service Access Key is no longer supported in Business Central online. Integrations using this technology will stop working. Please use OAuth instead.';
         BasicAuthUsedTok: Label 'One or more users have still enabled a Web Service Access Key. This is deprecated in Business Central online and integrations using this technology will stop working soon. Please use OAuth instead';
         DontShowAgainTok: Label 'Don''t show me again';
         ShowMoreLinkTok: Label 'Show more';
+#endif
         CurrentUserQst: Label 'You are signed in with the %1 account. Changing the account will refresh your session. Do you want to continue?', Comment = 'USERID';
         UnsupportedLicenseTypeOnSaasErr: Label 'Only users of type %1, %2, %3 and %4 are supported in the online environment.', Comment = '%1,%2,%3,%4 = license type';
         DisableUserMsg: Label 'To permanently disable a user, go to your Microsoft 365 admin center. Disabling the user in Business Central will only be effective until the next user synchonization with Microsoft 365.';
@@ -304,18 +368,25 @@ codeunit 418 "User Management"
         OnAfterRenameRecord(RecRef, TableNo, NumberOfPrimaryKeyFields, UserName, Company);
     end;
 
+#if not CLEAN23
+    [Obsolete('Basic Authentication deprecation warning should no longer be shown with from 23.0', '23.0')]
     [Scope('OnPrem')]
     procedure BasicAuthDepricationNotificationId(): Guid
     begin
         exit('8f5a1371-94e3-42b6-84df-6ed215bc374a');
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Basic Authentication deprecation warning should no longer be shown with from 23.0', '23.0')]
     [Scope('OnPrem')]
     procedure BasicAuthUsedNotificationId(): Guid
     begin
         exit('b21a58f5-23fe-4954-bd74-6f0202c2c019');
     end;
-
+#endif
+#if not CLEAN23
+    [Obsolete('Basic Authentication deprecation warning should no longer be shown with from 23.0', '23.0')]
     [Scope('OnPrem')]
     procedure BasicAuthDepricationNotificationDefault(Enabled: Boolean)
     var
@@ -324,7 +395,9 @@ codeunit 418 "User Management"
         MyNotifications.InsertDefault(
           BasicAuthDepricationNotificationId(), BasicAuthDescriptionNameTok, BasicAuthDepricationTok, Enabled);
     end;
-
+#endif
+#if not CLEAN23
+    [Obsolete('Basic Authentication deprecation warning should no longer be shown with from 23.0', '23.0')]
     [Scope('OnPrem')]
     procedure BasicAuthUsedNotificationDefault(Enabled: Boolean)
     var
@@ -333,7 +406,9 @@ codeunit 418 "User Management"
         MyNotifications.InsertDefault(
           BasicAuthDepricationNotificationId(), BasicAuthUsedNameTok, BasicAuthUsedTok, Enabled);
     end;
-
+#endif
+#if not CLEAN23
+    [Obsolete('Basic Authentication deprecation warning should no longer be shown with from 23.0', '23.0')]
     [Scope('OnPrem')]
     procedure BasicAuthDepricationNotificationShow(BasicAuthDepricationNotification: Notification)
     begin
@@ -345,7 +420,9 @@ codeunit 418 "User Management"
         BasicAuthDepricationNotification.Scope(NotificationScope::LocalScope);
         BasicAuthDepricationNotification.Send();
     end;
-
+#endif
+#if not CLEAN23
+    [Obsolete('Basic Authentication deprecation warning should no longer be shown with from 23.0', '23.0')]
     [Scope('OnPrem')]
     procedure BasicAuthUsedNotificationShow(BasicAuthUsedNotification: Notification)
     begin
@@ -357,8 +434,8 @@ codeunit 418 "User Management"
         BasicAuthUsedNotification.Scope(NotificationScope::LocalScope);
         BasicAuthUsedNotification.Send();
     end;
-
-
+#endif
+#if not CLEAN23
     [Scope('OnPrem')]
     procedure DisableNotifications(Notification: Notification)
     var
@@ -366,12 +443,15 @@ codeunit 418 "User Management"
     begin
         MyNotifications.Disable(Notification.Id);
     end;
-
+#endif
+#if not CLEAN23
+    [Obsolete('Basic Authentication deprecation warning should no longer be shown with from 23.0', '23.0')]
     [Scope('OnPrem')]
     procedure BasicAuthDepricationNotificationShowMore(Notification: Notification)
     begin
         Hyperlink('https://go.microsoft.com/fwlink/?linkid=2207805');
     end;
+#endif
 
     procedure RenameUser(OldUserName: Code[50]; NewUserName: Code[50])
     var

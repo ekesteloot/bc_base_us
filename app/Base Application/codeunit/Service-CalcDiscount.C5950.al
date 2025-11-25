@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+
 codeunit 5950 "Service-Calc. Discount"
 {
     TableNo = "Service Line";
@@ -8,7 +15,7 @@ codeunit 5950 "Service-Calc. Discount"
     begin
         ServiceLine.Copy(Rec);
 
-        TempServHeader.Get("Document Type", "Document No.");
+        TempServHeader.Get(Rec."Document Type", Rec."Document No.");
         TemporaryHeader := false;
         CalculateInvoiceDiscount(TempServHeader, ServiceLine, TempServiceLine);
 

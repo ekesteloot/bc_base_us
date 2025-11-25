@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1238 "Transformation Rule Card"
 {
     Caption = 'Transformation Rule Card';
@@ -11,7 +13,7 @@ page 1238 "Transformation Rule Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies rules for how text that was imported from an external file is transformed to a supported value that can be mapped to the specified field in Business Central.';
@@ -38,7 +40,7 @@ page 1238 "Transformation Rule Card"
 
                     trigger OnAssistEdit()
                     begin
-                        EditNextTransformationRule();
+                        Rec.EditNextTransformationRule();
                     end;
                 }
                 group(Control19)
@@ -81,7 +83,7 @@ page 1238 "Transformation Rule Card"
                 {
                     ShowCaption = false;
                     Visible = LengthVisibleExpr;
-                    field(Length; Length)
+                    field(Length; Rec.Length)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the length of one item unit when measured in the specified unit of measure.';
@@ -116,37 +118,37 @@ page 1238 "Transformation Rule Card"
                 {
                     Caption = 'Field Lookup Options';
                     Visible = LookupGroupVisibleExpr;
-                    field("Table ID"; "Table ID")
+                    field("Table ID"; Rec."Table ID")
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the ID of the table to get the record for the field lookup.';
                     }
-                    field("Table Caption"; "Table Caption")
+                    field("Table Caption"; Rec."Table Caption")
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the caption of the table to get the record for the field lookup.';
                     }
-                    field("Source Field ID"; "Source Field ID")
+                    field("Source Field ID"; Rec."Source Field ID")
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the ID of the field to find the record for the field lookup.';
                     }
-                    field("Source Field Caption"; "Source Field Caption")
+                    field("Source Field Caption"; Rec."Source Field Caption")
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the caption of the field to find the record for the field lookup.';
                     }
-                    field("Target Field ID"; "Target Field ID")
+                    field("Target Field ID"; Rec."Target Field ID")
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the ID of the field to get the value for the field lookup.';
                     }
-                    field("Target Field Caption"; "Target Field Caption")
+                    field("Target Field Caption"; Rec."Target Field Caption")
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the caption of the field to get the value for the field lookup.';
                     }
-                    field("Field Lookup Rule"; "Field Lookup Rule")
+                    field("Field Lookup Rule"; Rec."Field Lookup Rule")
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the type of the field lookup. In case of Target the value from the Target Field ID will be taken as is, even if it is blank. In case of Original If Target Is Blank the original value will be taken if target one is blank.';
@@ -156,7 +158,7 @@ page 1238 "Transformation Rule Card"
                 {
                     Caption = 'Extract From Date';
                     Visible = ExtractFromDateVisibleExpr;
-                    field("Extract From Date Type"; "Extract From Date Type")
+                    field("Extract From Date Type"; Rec."Extract From Date Type")
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies what should be extracted from the date.';
@@ -206,7 +208,7 @@ page 1238 "Transformation Rule Card"
 
                         trigger OnDrillDown()
                         begin
-                            ResultText := TransformText(TestText);
+                            ResultText := Rec.TransformText(TestText);
                         end;
                     }
                 }
@@ -239,17 +241,17 @@ page 1238 "Transformation Rule Card"
     local procedure UpdateEnabled()
     begin
         FindValueVisibleExpr :=
-          "Transformation Type" in ["Transformation Type"::Replace, "Transformation Type"::"Regular Expression - Replace",
-                                    "Transformation Type"::"Regular Expression - Match"];
+          Rec."Transformation Type" in [Rec."Transformation Type"::Replace, Rec."Transformation Type"::"Regular Expression - Replace",
+                                    Rec."Transformation Type"::"Regular Expression - Match"];
         ReplaceValueVisibleExpr :=
-          "Transformation Type" in ["Transformation Type"::"Regular Expression - Replace", "Transformation Type"::Replace];
+          Rec."Transformation Type" in [Rec."Transformation Type"::"Regular Expression - Replace", Rec."Transformation Type"::Replace];
         StartPositionVisibleExpr :=
-          "Transformation Type" in ["Transformation Type"::Substring];
+          Rec."Transformation Type" in [Rec."Transformation Type"::Substring];
         LengthVisibleExpr :=
-          "Transformation Type" in ["Transformation Type"::Substring];
-        DateFormatVisibleExpr := IsDataFormatUpdateAllowed();
-        LookupGroupVisibleExpr := "Transformation Type" = "Transformation Type"::"Field Lookup";
-        RoundGroupVisibleExpr := "Transformation Type" = "Transformation Type"::Round;
-        ExtractFromDateVisibleExpr := "Transformation Type" = "Transformation Type"::"Extract From Date";
+          Rec."Transformation Type" in [Rec."Transformation Type"::Substring];
+        DateFormatVisibleExpr := Rec.IsDataFormatUpdateAllowed();
+        LookupGroupVisibleExpr := Rec."Transformation Type" = Rec."Transformation Type"::"Field Lookup";
+        RoundGroupVisibleExpr := Rec."Transformation Type" = Rec."Transformation Type"::Round;
+        ExtractFromDateVisibleExpr := Rec."Transformation Type" = Rec."Transformation Type"::"Extract From Date";
     end;
 }

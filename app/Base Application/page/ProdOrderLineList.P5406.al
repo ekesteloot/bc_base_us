@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+
 page 5406 "Prod. Order Line List"
 {
     Caption = 'Prod. Order Line List';
@@ -60,54 +65,54 @@ page 5406 "Prod. Order Line List"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("Location Code"; Rec."Location Code")
@@ -232,13 +237,13 @@ page 5406 "Prod. Order Line List"
                     var
                         ProdOrder: Record "Production Order";
                     begin
-                        ProdOrder.Get(Status, "Prod. Order No.");
-                        case Status of
-                            Status::Planned:
+                        ProdOrder.Get(Rec.Status, Rec."Prod. Order No.");
+                        case Rec.Status of
+                            Rec.Status::Planned:
                                 PAGE.Run(PAGE::"Planned Production Order", ProdOrder);
-                            Status::"Firm Planned":
+                            Rec.Status::"Firm Planned":
                                 PAGE.Run(PAGE::"Firm Planned Prod. Order", ProdOrder);
-                            Status::Released:
+                            Rec.Status::Released:
                                 PAGE.Run(PAGE::"Released Production Order", ProdOrder);
                         end;
 
@@ -255,7 +260,7 @@ page 5406 "Prod. Order Line List"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
                 action(ShowTrackingLines)
@@ -263,12 +268,12 @@ page 5406 "Prod. Order Line List"
                     ApplicationArea = ItemTracking;
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
-                    ShortCutKey = 'Ctrl+Alt+I'; 
+                    ShortCutKey = 'Ctrl+Alt+I';
                     ToolTip = 'View or edit serial numbers and lot numbers that are assigned to the item on the document or journal line.';
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }
@@ -294,8 +299,8 @@ page 5406 "Prod. Order Line List"
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
-        GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
+        Rec.GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
     end;
 
     trigger OnInit()

@@ -132,37 +132,31 @@ table 6707 "Booking Item"
     var
         NullJSONTxt: Label 'null', Locked = true;
 
-    [Scope('OnPrem')]
     procedure GetEndDate(): DateTime
     begin
         exit(GetDate(FieldNo("End Date")));
     end;
 
-    [Scope('OnPrem')]
     procedure SetEndDate(NewEndDate: DateTime)
     begin
         SetDate(FieldNo("End Date"), NewEndDate);
     end;
 
-    [Scope('OnPrem')]
     procedure GetInvoiceDate(): DateTime
     begin
         exit(GetDate(FieldNo("Invoice Date")));
     end;
 
-    [Scope('OnPrem')]
     procedure SetInvoiceDate(NewInvoiceDate: DateTime)
     begin
         SetDate(FieldNo("Invoice Date"), NewInvoiceDate);
     end;
 
-    [Scope('OnPrem')]
     procedure GetStartDate(): DateTime
     begin
         exit(GetDate(FieldNo("Start Date")));
     end;
 
-    [Scope('OnPrem')]
     procedure SetStartDate(NewStartDate: DateTime)
     begin
         SetDate(FieldNo("Start Date"), NewStartDate);

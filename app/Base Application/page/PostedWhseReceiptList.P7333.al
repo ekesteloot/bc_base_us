@@ -1,3 +1,10 @@
+namespace Microsoft.WarehouseMgt.History;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+
 page 7333 "Posted Whse. Receipt List"
 {
     ApplicationArea = Warehouse;
@@ -7,8 +14,8 @@ page 7333 "Posted Whse. Receipt List"
     Editable = false;
     PageType = List;
     SourceTable = "Posted Whse. Receipt Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -107,7 +114,7 @@ page 7333 "Posted Whse. Receipt List"
 
                     trigger OnAction()
                     begin
-                        LookupPostedWhseRcptHeader(Rec);
+                        Rec.LookupPostedWhseRcptHeader(Rec);
                     end;
                 }
                 action("Co&mments")
@@ -116,9 +123,9 @@ page 7333 "Posted Whse. Receipt List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Posted Whse. Receipt"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Posted Whse. Receipt"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Put-away Lines")
@@ -127,10 +134,10 @@ page 7333 "Posted Whse. Receipt List"
                     Caption = 'Put-away Lines';
                     Image = PutawayLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Whse. Document Type" = CONST(Receipt),
-                                  "Whse. Document No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Document No.", "Whse. Document Type", "Activity Type")
-                                  WHERE("Activity Type" = CONST("Put-away"));
+                    RunPageLink = "Whse. Document Type" = const(Receipt),
+                                  "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document No.", "Whse. Document Type", "Activity Type")
+                                  where("Activity Type" = const("Put-away"));
                     ToolTip = ' View the related put-aways.';
                 }
                 action("Registered Put-away Lines")
@@ -139,10 +146,10 @@ page 7333 "Posted Whse. Receipt List"
                     Caption = 'Registered Put-away Lines';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Act.-Lines";
-                    RunPageLink = "Whse. Document Type" = CONST(Receipt),
-                                  "Whse. Document No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Document Type", "Whse. Document No.", "Whse. Document Line No.")
-                                  WHERE("Activity Type" = CONST("Put-away"));
+                    RunPageLink = "Whse. Document Type" = const(Receipt),
+                                  "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document Type", "Whse. Document No.", "Whse. Document Line No.")
+                                  where("Activity Type" = const("Put-away"));
                     ToolTip = 'View the list of completed put-away activities.';
                 }
             }
@@ -174,10 +181,10 @@ page 7333 "Posted Whse. Receipt List"
     var
         WMSManagement: Codeunit "WMS Management";
     begin
-        ErrorIfUserIsNotWhseEmployee();
-        FilterGroup(2); // set group of filters user cannot change
-        SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
-        FilterGroup(0); // set filter group back to standard
+        Rec.ErrorIfUserIsNotWhseEmployee();
+        Rec.FilterGroup(2); // set group of filters user cannot change
+        Rec.SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
+        Rec.FilterGroup(0); // set filter group back to standard
     end;
 }
 

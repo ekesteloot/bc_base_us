@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 enum 340 "Reservation Planning Flexibility"
 {
     AssignmentCompatibility = true;

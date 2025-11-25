@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.Foundation.Enums;
+
 page 99000812 "Prod. BOM Matrix per Version"
 {
     Caption = 'Prod. BOM Matrix per Version';
@@ -73,7 +77,7 @@ page 99000812 "Prod. BOM Matrix per Version"
 
                 trigger OnAction()
                 begin
-                    GenerateMatrixColumns("Matrix Page Step Type"::Previous);
+                    GenerateMatrixColumns(Enum::"Matrix Page Step Type"::Previous);
                 end;
             }
             action("Next Set")
@@ -85,7 +89,7 @@ page 99000812 "Prod. BOM Matrix per Version"
 
                 trigger OnAction()
                 begin
-                    GenerateMatrixColumns("Matrix Page Step Type"::Next);
+                    GenerateMatrixColumns(Enum::"Matrix Page Step Type"::Next);
                 end;
             }
         }
@@ -134,7 +138,7 @@ page 99000812 "Prod. BOM Matrix per Version"
         Clear(BOMMatrixMgt);
         BOMMatrixMgt.BOMMatrixFromBOM(ProdBOM, ShowLevel = ShowLevel::Multi);
         MATRIX_MatrixRecord.SetRange("Production BOM No.", ProdBOM."No.");
-        GenerateMatrixColumns("Matrix Page Step Type"::Initial);
+        GenerateMatrixColumns(Enum::"Matrix Page Step Type"::Initial);
     end;
 
     local procedure GenerateMatrixColumns(StepType: Enum "Matrix Page Step Type")

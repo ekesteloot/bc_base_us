@@ -11,7 +11,7 @@ report 10500 "GST/HST Internet File Transfer"
     {
         dataitem("VAT Entry"; "VAT Entry")
         {
-            DataItemTableView = SORTING("Entry No.");
+            DataItemTableView = sorting("Entry No.");
 
             trigger OnAfterGetRecord()
             var

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
 table 197 "Acc. Sched. KPI Buffer"
 {
     Caption = 'Acc. Sched. KPI Buffer';

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5055 "Name Details"
 {
     Caption = 'Name Details';
@@ -23,7 +25,7 @@ page 5055 "Name Details"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the contact''s job title, and is valid for contact persons only.';
                 }
-                field(Initials; Initials)
+                field(Initials; Rec.Initials)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the contact''s initials, when the contact is a person.';
@@ -38,7 +40,7 @@ page 5055 "Name Details"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the contact''s middle name and is valid for contact persons only.';
                 }
-                field(Surname; Surname)
+                field(Surname; Rec.Surname)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the contact''s surname and is valid for contact persons only.';
@@ -75,8 +77,8 @@ page 5055 "Name Details"
                 Caption = '&Salutations';
                 Image = Salutation;
                 RunObject = Page "Contact Salutations";
-                RunPageLink = "Contact No. Filter" = FIELD("No."),
-                              "Salutation Code" = FIELD("Salutation Code");
+                RunPageLink = "Contact No. Filter" = field("No."),
+                              "Salutation Code" = field("Salutation Code");
                 ToolTip = 'Edit specific details regarding the contact person''s name, for example the contact''s first name, middle name, surname, title, and so on.';
             }
         }
@@ -95,7 +97,7 @@ page 5055 "Name Details"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CurrPage.Editable(Type = Type::Person);
+        CurrPage.Editable(Rec.Type = Rec.Type::Person);
     end;
 }
 

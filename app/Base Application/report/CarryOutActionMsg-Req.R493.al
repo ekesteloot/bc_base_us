@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
+using Microsoft.Purchases.Document;
+
 report 493 "Carry Out Action Msg. - Req."
 {
     Caption = 'Carry Out Action Msg. - Req.';

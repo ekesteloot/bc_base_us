@@ -25,12 +25,12 @@ page 7607 "Base Calendar Change List"
                     Caption = 'Recurring System';
                     ToolTip = 'Specifies whether a date or day is a recurring nonworking day. It can be either Annual Recurring or Weekly Recurring.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the date to change associated with the base calendar in this entry.';
                 }
-                field(Day; Day)
+                field(Day; Rec.Day)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the day of the week associated with this change entry.';
@@ -40,7 +40,7 @@ page 7607 "Base Calendar Change List"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a description of the change in this entry.';
                 }
-                field(Nonworking; Nonworking)
+                field(Nonworking; Rec.Nonworking)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Nonworking';

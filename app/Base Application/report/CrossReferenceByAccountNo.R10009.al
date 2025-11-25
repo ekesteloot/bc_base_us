@@ -9,7 +9,7 @@ report 10009 "Cross Reference by Account No."
     {
         dataitem("G/L Entry"; "G/L Entry")
         {
-            DataItemTableView = SORTING("G/L Account No.", "Posting Date");
+            DataItemTableView = sorting("G/L Account No.", "Posting Date");
             RequestFilterFields = "G/L Account No.", "Posting Date", "Source Code", "Global Dimension 1 Code", "Global Dimension 2 Code";
             column(TodayFormatted; Format(Today, 0, 4))
             {

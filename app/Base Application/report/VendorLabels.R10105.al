@@ -170,7 +170,7 @@ report 10105 "Vendor Labels"
             }
             dataitem(BlankLine; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(Vendor__No__; Vendor."No.")
                 {
                 }

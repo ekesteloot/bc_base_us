@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.NoSeries;
+
 report 1497 "Trans. Bank Rec. to Gen. Jnl."
 {
     Caption = 'Trans. Bank Rec. to Gen. Jnl.';
@@ -7,11 +12,11 @@ report 1497 "Trans. Bank Rec. to Gen. Jnl."
     {
         dataitem("Bank Acc. Reconciliation"; "Bank Acc. Reconciliation")
         {
-            DataItemTableView = SORTING("Bank Account No.", "Statement No.") WHERE("Statement Type" = CONST("Bank Reconciliation"));
+            DataItemTableView = sorting("Bank Account No.", "Statement No.") where("Statement Type" = const("Bank Reconciliation"));
             dataitem("Bank Acc. Reconciliation Line"; "Bank Acc. Reconciliation Line")
             {
-                DataItemLink = "Bank Account No." = FIELD("Bank Account No."), "Statement No." = FIELD("Statement No.");
-                DataItemTableView = SORTING("Bank Account No.", "Statement No.", "Statement Line No.");
+                DataItemLink = "Bank Account No." = field("Bank Account No."), "Statement No." = field("Statement No.");
+                DataItemTableView = sorting("Bank Account No.", "Statement No.", "Statement Line No.");
 
                 trigger OnAfterGetRecord()
                 var

@@ -1,3 +1,5 @@
+namespace System.AI;
+
 codeunit 2002 "Azure AI Tracing"
 {
     SingleInstance = true;

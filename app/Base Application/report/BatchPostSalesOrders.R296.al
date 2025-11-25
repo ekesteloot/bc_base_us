@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Setup;
+using System.Environment;
+using System.Security.User;
+
 report 296 "Batch Post Sales Orders"
 {
     Caption = 'Batch Post Sales Orders';
@@ -7,7 +14,7 @@ report 296 "Batch Post Sales Orders"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             RequestFilterFields = "No.", Status;
             RequestFilterHeading = 'Sales Order';
 
@@ -82,7 +89,7 @@ report 296 "Batch Post Sales Orders"
                         trigger OnValidate()
                         begin
                             if ReplacePostingDate then
-                                Message(Text003);
+                                Message(Text003Msg);
 
                             if VATReportingDateMgt.IsVATDateUsageSetToPostingDate() then
                                 ReplaceVATDateReq := ReplacePostingDate;
@@ -191,18 +198,18 @@ report 296 "Batch Post Sales Orders"
 
     var
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
-        Text003: Label 'The exchange rate associated with the new posting date on the sales header will apply to the sales lines.';
-        PrintDoc: Boolean;
-        [InDataSet]
         PrintDocVisible: Boolean;
         VATDateEnabled: Boolean;
         PostInvoiceEditable: Boolean;
 
+        Text003Msg: Label 'The exchange rate associated with the new posting date on the sales header will apply to the sales lines.';
+
     protected var
         ShipReq: Boolean;
         InvReq: Boolean;
-        PostingDateReq, VATDateReq: Date;
-        ReplacePostingDate, ReplaceVATDateReq: Boolean;
+        PostingDateReq, VATDateReq : Date;
+        PrintDoc: Boolean;
+        ReplacePostingDate, ReplaceVATDateReq : Boolean;
         ReplaceDocumentDate: Boolean;
         CalcInvDisc: Boolean;
 
@@ -228,7 +235,7 @@ report 296 "Batch Post Sales Orders"
         VATDateReq := VATDateParam;
         ReplacePostingDate := ReplacePostingDateParam;
         ReplaceDocumentDate := ReplaceDocumentDateParam;
-        ReplaceVATDateReq := ReplaceVATDateParam; 
+        ReplaceVATDateReq := ReplaceVATDateParam;
         CalcInvDisc := CalcInvDiscParam;
     end;
 

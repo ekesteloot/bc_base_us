@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
+using Microsoft.InventoryMgt.Item;
+
 page 7510 "Item Attribute Value Editor"
 {
     Caption = 'Item Attribute Values';
@@ -21,7 +25,7 @@ page 7510 "Item Attribute Value Editor"
 
     trigger OnOpenPage()
     begin
-        CurrPage.ItemAttributeValueList.PAGE.LoadAttributes("No.");
+        CurrPage.ItemAttributeValueList.PAGE.LoadAttributes(Rec."No.");
     end;
 }
 

@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+
 page 9124 "Service Line FactBox"
 {
     Caption = 'Service Line Details';
@@ -43,7 +48,7 @@ page 9124 "Service Line FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    ShowItemSub();
+                    Rec.ShowItemSub();
                     CurrPage.Update();
                 end;
             }
@@ -57,7 +62,7 @@ page 9124 "Service Line FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    PickPrice();
+                    Rec.PickPrice();
                     CurrPage.Update();
                 end;
             }
@@ -71,7 +76,7 @@ page 9124 "Service Line FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    PickDiscount();
+                    Rec.PickDiscount();
                     CurrPage.Update();
                 end;
             }
@@ -90,8 +95,8 @@ page 9124 "Service Line FactBox"
     var
         Item: Record Item;
     begin
-        if Type = Type::Item then begin
-            Item.Get("No.");
+        if Rec.Type = Rec.Type::Item then begin
+            Item.Get(Rec."No.");
             PAGE.Run(PAGE::"Item Card", Item);
         end;
     end;

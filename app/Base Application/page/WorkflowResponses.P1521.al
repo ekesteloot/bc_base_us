@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1521 "Workflow Responses"
 {
     Caption = 'Workflow Responses';
@@ -7,7 +9,7 @@ page 1521 "Workflow Responses"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Workflow Response";
-    SourceTableView = SORTING(Independent, Description);
+    SourceTableView = sorting(Independent, Description);
 
     layout
     {
@@ -44,8 +46,8 @@ page 1521 "Workflow Responses"
     var
         WorkflowWebhookResponses: Codeunit "Workflow Webhook Responses";
     begin
-        SetFilter("Function Name", '<>%1', WorkflowWebhookResponses.SendNotificationToWebhookCode());
-        if FindFirst() then;
+        Rec.SetFilter("Function Name", '<>%1', WorkflowWebhookResponses.SendNotificationToWebhookCode());
+        if Rec.FindFirst() then;
     end;
 
     var
@@ -53,7 +55,7 @@ page 1521 "Workflow Responses"
 
     local procedure GetStyle(): Text
     begin
-        if HasPredecessors() then
+        if Rec.HasPredecessors() then
             exit('Strong');
         exit('');
     end;

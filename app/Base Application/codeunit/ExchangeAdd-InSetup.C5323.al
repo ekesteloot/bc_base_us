@@ -1,3 +1,15 @@
+﻿namespace System.Integration;
+
+using Microsoft.CRm.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.Foundation.Company;
+using System;
+using System.Azure.Identity;
+using System.Environment;
+using System.Security.AccessControl;
+using System.Security.User;
+
 codeunit 5323 "Exchange Add-in Setup"
 {
 

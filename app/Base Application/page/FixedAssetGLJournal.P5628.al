@@ -1,3 +1,15 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+
 page 5628 "Fixed Asset G/L Journal"
 {
     ApplicationArea = FixedAssets;
@@ -86,7 +98,7 @@ page 5628 "Fixed Asset G/L Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccountName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -110,9 +122,9 @@ page 5628 "Fixed Asset G/L Journal"
 
                     trigger OnAssistEdit()
                     begin
-                        ChangeExchangeRate.SetParameterFA("FA Add.-Currency Factor", GetACYCode(), "Posting Date");
+                        ChangeExchangeRate.SetParameterFA(Rec."FA Add.-Currency Factor", GetACYCode(), Rec."Posting Date");
                         if ChangeExchangeRate.RunModal() = ACTION::OK then
-                            "FA Add.-Currency Factor" := ChangeExchangeRate.GetParameter();
+                            Rec."FA Add.-Currency Factor" := ChangeExchangeRate.GetParameter();
 
                         Clear(ChangeExchangeRate);
                     end;
@@ -149,9 +161,9 @@ page 5628 "Fixed Asset G/L Journal"
 
                     trigger OnAssistEdit()
                     begin
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", "Posting Date");
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", Rec."Posting Date");
                         if ChangeExchangeRate.RunModal() = ACTION::OK then
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
 
                         Clear(ChangeExchangeRate);
                     end;
@@ -242,7 +254,7 @@ page 5628 "Fixed Asset G/L Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccountName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field("Bal. Gen. Posting Type"; Rec."Bal. Gen. Posting Type")
@@ -349,7 +361,7 @@ page 5628 "Fixed Asset G/L Journal"
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field("Insurance No."; Rec."Insurance No.")
@@ -360,7 +372,7 @@ page 5628 "Fixed Asset G/L Journal"
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field("Budgeted FA No."; Rec."Budgeted FA No.")
@@ -412,15 +424,15 @@ page 5628 "Fixed Asset G/L Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 3);
                     end;
@@ -429,15 +441,15 @@ page 5628 "Fixed Asset G/L Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 4);
                     end;
@@ -446,15 +458,15 @@ page 5628 "Fixed Asset G/L Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 5);
                     end;
@@ -463,15 +475,15 @@ page 5628 "Fixed Asset G/L Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 6);
                     end;
@@ -480,15 +492,15 @@ page 5628 "Fixed Asset G/L Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 7);
                     end;
@@ -497,15 +509,15 @@ page 5628 "Fixed Asset G/L Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
@@ -587,16 +599,16 @@ page 5628 "Fixed Asset G/L Journal"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = BackgroundErrorCheck;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             part(JournalLineDetails; "Journal Line Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -630,7 +642,7 @@ page 5628 "Fixed Asset G/L Journal"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -650,7 +662,7 @@ page 5628 "Fixed Asset G/L Journal"
 
                     trigger OnAction()
                     begin
-                        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                     end;
                 }
                 action(ShowAllLines)
@@ -664,7 +676,7 @@ page 5628 "Fixed Asset G/L Journal"
 
                     trigger OnAction()
                     begin
-                        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                     end;
                 }
             }
@@ -709,7 +721,7 @@ page 5628 "Fixed Asset G/L Journal"
 
                     trigger OnAction()
                     begin
-                        RenumberDocumentNo();
+                        Rec.RenumberDocumentNo();
                     end;
                 }
                 action("Apply Entries")
@@ -790,8 +802,8 @@ page 5628 "Fixed Asset G/L Journal"
 
                     trigger OnAction()
                     begin
-                        SendToPosting(Codeunit::"Gen. Jnl.-Post");
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        Rec.SendToPosting(Codeunit::"Gen. Jnl.-Post");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -820,8 +832,8 @@ page 5628 "Fixed Asset G/L Journal"
 
                     trigger OnAction()
                     begin
-                        SendToPosting(Codeunit::"Gen. Jnl.-Post+Print");
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        Rec.SendToPosting(Codeunit::"Gen. Jnl.-Post+Print");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -842,7 +854,7 @@ page 5628 "Fixed Asset G/L Journal"
                     var
                         ODataUtility: Codeunit ODataUtility;
                     begin
-                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption, CurrPage.ObjectId(false), "Journal Batch Name", "Journal Template Name");
+                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption, CurrPage.ObjectId(false), Rec."Journal Batch Name", Rec."Journal Template Name");
                     end;
                 }
             }
@@ -919,7 +931,7 @@ page 5628 "Fixed Asset G/L Journal"
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnInit()
@@ -932,7 +944,7 @@ page 5628 "Fixed Asset G/L Journal"
     begin
         UpdateBalance();
         EnableApplyEntriesAction();
-        SetUpNewLine(xRec, Balance, BelowxRec);
+        Rec.SetUpNewLine(xRec, Balance, BelowxRec);
         Clear(ShortcutDimCode);
     end;
 
@@ -948,13 +960,13 @@ page 5628 "Fixed Asset G/L Journal"
         BalAccountName := '';
         SetDimensionsVisibility();
 
-        if IsOpenedFromBatch() then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+        if Rec.IsOpenedFromBatch() then begin
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             GenJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
             SetControlAppearanceFromBatch();
             exit;
         end;
-        GenJnlManagement.TemplateSelection(PAGE::"Fixed Asset G/L Journal", "Gen. Journal Template Type"::Assets, false, Rec, JnlSelected);
+        GenJnlManagement.TemplateSelection(PAGE::"Fixed Asset G/L Journal", Enum::"Gen. Journal Template Type"::Assets, false, Rec, JnlSelected);
         if not JnlSelected then
             Error('');
         GenJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
@@ -980,9 +992,7 @@ page 5628 "Fixed Asset G/L Journal"
         ShowTotalBalance: Boolean;
         AddCurrCodeIsFound: Boolean;
         ApplyEntriesActionEnabled: Boolean;
-        [InDataSet]
         BalanceVisible: Boolean;
-        [InDataSet]
         TotalBalanceVisible: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
         BackgroundErrorCheck: Boolean;
@@ -1005,14 +1015,14 @@ page 5628 "Fixed Asset G/L Journal"
         BalanceVisible := ShowBalance;
         TotalBalanceVisible := ShowTotalBalance;
         if ShowTotalBalance then
-            NumberOfRecords := Count();
+            NumberOfRecords := Rec.Count();
     end;
 
     local procedure EnableApplyEntriesAction()
     begin
         ApplyEntriesActionEnabled :=
-          ("Account Type" in ["Account Type"::Customer, "Account Type"::Vendor]) or
-          ("Bal. Account Type" in ["Bal. Account Type"::Customer, "Bal. Account Type"::Vendor]);
+          (Rec."Account Type" in [Rec."Account Type"::Customer, Rec."Account Type"::Vendor]) or
+          (Rec."Bal. Account Type" in [Rec."Bal. Account Type"::Customer, Rec."Bal. Account Type"::Vendor]);
     end;
 
     local procedure GetACYCode(): Code[10]
@@ -1036,11 +1046,11 @@ page 5628 "Fixed Asset G/L Journal"
     var
         GenJournalBatch: Record "Gen. Journal Batch";
     begin
-        if not GenJournalBatch.Get(GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
+        if not GenJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
-        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
         JournalErrorsMgt.SetFullBatchCheck(true);
     end;
 

@@ -1,3 +1,8 @@
+namespace System.Automation;
+
+using System;
+using System.Environment;
+
 codeunit 1545 "Workflow Webhook Notification"
 {
     // // Intended to be called from a Task (background session)
@@ -19,6 +24,8 @@ codeunit 1545 "Workflow Webhook Notification"
         DataIDTxt: Label 'DataID';
         WorkflowStepInstanceIDTxt: Label 'WorkflowStepInstanceID';
         NotificationUrlTxt: Label 'NotificationUrl';
+        WorkflowWebhookCategoryLbl: Label 'AL Workflow Webhook', Locked = true;
+        WorkflowWebhookCorrelationGuidTxt: Label 'Correlation GUID for workflow webhook notification created: %1', Locked = true;
 
     procedure Initialize(RetryCount: Integer; WaitTimeInMs: Integer)
     begin
@@ -130,10 +137,16 @@ codeunit 1545 "Workflow Webhook Notification"
         StreamWriter: DotNet StreamWriter;
         Encoding: DotNet Encoding;
         WebhookPayload: Text;
+        CorrelationGuid: Text;
     begin
         HttpWebRequest := HttpWebRequest.Create(NotificationUrl);
+        CorrelationGuid := LowerCase(System.Format(CreateGuid(), 0, 4));
         HttpWebRequest.Method := 'POST';
         HttpWebRequest.ContentType('application/json');
+        HttpWebRequest.Headers.Add('clientRequestId', CorrelationGuid);
+        HttpWebRequest.Headers.Add('x-ms-correlation-id', CorrelationGuid);
+
+        Session.LogMessage('0000KX6', StrSubstNo(WorkflowWebhookCorrelationGuidTxt, CorrelationGuid), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', WorkflowWebhookCategoryLbl);
 
         RequestStr := HttpWebRequest.GetRequestStream();
         StreamWriter := StreamWriter.StreamWriter(RequestStr, Encoding.ASCII);

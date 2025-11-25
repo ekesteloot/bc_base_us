@@ -23,9 +23,6 @@ permissionset 3723 "Recievables - Admin"
                   tabledata "Gen. Journal Template" = RIMD,
                   tabledata "Item Charge" = RIMD,
                   tabledata "Line Fee Note on Report Hist." = RIMD,
-#if not CLEAN20
-                  tabledata "Native - Payment" = MD,
-#endif
                   tabledata "Payment Method" = RIMD,
                   tabledata "Payment Terms" = RIMD,
                   tabledata "Reason Code" = R,

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.RoleCenters;
+
 profile "SALES AND RELATIONSHIP MANAGER"
 {
     Caption = 'Sales and Relationship Manager';

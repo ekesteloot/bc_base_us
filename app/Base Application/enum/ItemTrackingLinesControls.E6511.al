@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 enum 6511 "Item Tracking Lines Controls"
 {
     Extensible = true;

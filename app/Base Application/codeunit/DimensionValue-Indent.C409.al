@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 codeunit 409 "Dimension Value-Indent"
 {
     TableNo = "Dimension Value";

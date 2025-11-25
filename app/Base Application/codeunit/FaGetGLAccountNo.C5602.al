@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Maintenance;
+
 codeunit 5602 "FA Get G/L Account No."
 {
 

@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 table 5220 "Human Resource Unit of Measure"
 {
     Caption = 'Human Resource Unit of Measure';

@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Tracking;
+
 page 5881 "Phys. Invt. Recording Subform"
 {
     AutoSplitKey = true;
@@ -18,12 +24,45 @@ page 5881 "Phys. Invt. Recording Subform"
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the number of the item that was counted when taking the physical inventory.';
+
+                    trigger OnValidate()
+                    begin
+                        SetVariantCodeMandatory();
+                    end;
+                }
+                field("Item Reference No."; Rec."Item Reference No.")
+                {
+                    AccessByPermission = tabledata "Item Reference" = R;
+                    ApplicationArea = Suite, ItemReferences;
+                    QuickEntry = false;
+                    ToolTip = 'Specifies a reference to the item number as defined by the item''s barcode.';
+                    Visible = ItemReferenceVisible;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        ItemReferenceManagement: Codeunit "Item Reference Management";
+                    begin
+                        ItemReferenceManagement.PhysicalInventoryRecordReferenceNoLookup(Rec);
+                        SetVariantCodeMandatory();
+                        OnReferenceNoOnAfterLookup(Rec);
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        SetVariantCodeMandatory();
+                    end;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the variant of the item on the line.';
+                    ShowMandatory = VariantCodeMandatory;
                     Visible = false;
+
+                    trigger OnValidate()
+                    begin
+                        SetVariantCodeMandatory();
+                    end;
                 }
                 field(Description; Rec.Description)
                 {
@@ -85,7 +124,7 @@ page 5881 "Phys. Invt. Recording Subform"
                     ToolTip = 'Specifies the quantity on the line, expressed in base units of measure.';
                     Visible = false;
                 }
-                field(Recorded; Recorded)
+                field(Recorded; Rec.Recorded)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if a value was entered in Quantity of the physical inventory recording line.';
@@ -145,9 +184,9 @@ page 5881 "Phys. Invt. Recording Subform"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "Serial No. Information List";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Serial No." = FIELD("Serial No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Serial No." = field("Serial No.");
                     ToolTip = 'Show Serial No. Information Card.';
                 }
                 action("Lot No. Information Card")
@@ -159,23 +198,54 @@ page 5881 "Phys. Invt. Recording Subform"
                     PromotedCategory = Category4;
                     PromotedIsBig = true;
                     RunObject = Page "Lot No. Information List";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Lot No." = FIELD("Lot No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Lot No." = field("Lot No.");
                     ToolTip = 'Show Lot No. Information Card.';
                 }
             }
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        SetItemReferenceVisibility();
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        SetVariantCodeMandatory();
+    end;
+
     var
         CopyPhysInvtRecording: Report "Copy Phys. Invt. Recording";
+        VariantCodeMandatory, ItemReferenceVisible : Boolean;
 
     procedure CopyLine()
     begin
         CopyPhysInvtRecording.SetPhysInvtRecordLine(Rec);
         CopyPhysInvtRecording.RunModal();
         Clear(CopyPhysInvtRecording);
+    end;
+
+    local procedure SetVariantCodeMandatory()
+    var
+        Item: Record Item;
+    begin
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(true, Rec."Item No.");
+    end;
+
+    local procedure SetItemReferenceVisibility()
+    var
+        ItemReference: Record "Item Reference";
+    begin
+        ItemReferenceVisible := not ItemReference.IsEmpty();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReferenceNoOnAfterLookup(var PhysInvtRecordLine: Record "Phys. Invt. Record Line")
+    begin
     end;
 }
 

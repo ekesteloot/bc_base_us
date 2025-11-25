@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Task;
+
 page 5093 "Segment List"
 {
     ApplicationArea = RelationshipMgmt;
@@ -36,7 +40,7 @@ page 5093 "Segment List"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the code of the salesperson responsible for this segment and/or interaction.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the date that the segment was created.';
@@ -72,8 +76,8 @@ page 5093 "Segment List"
                     Caption = 'T&asks';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    RunPageLink = "Segment No." = FIELD("No.");
-                    RunPageView = SORTING("Segment No.");
+                    RunPageLink = "Segment No." = field("No.");
+                    RunPageView = sorting("Segment No.");
                     ToolTip = 'View the tasks that have been assigned to salespeople or teams. Tasks can be linked to contacts and/or campaigns.';
                 }
             }

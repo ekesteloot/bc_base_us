@@ -1,3 +1,9 @@
+﻿namespace Microsoft.CRM.Outlook;
+
+using System.Integration;
+using System.Security.AccessControl;
+using System.Security.Encryption;
+
 table 6700 "Exchange Sync"
 {
     Caption = 'Exchange Sync';
@@ -10,8 +16,6 @@ table 6700 "Exchange Sync"
             DataClassification = EndUserIdentifiableInformation;
             NotBlank = true;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(2; Enabled; Boolean)
@@ -126,7 +130,7 @@ table 6700 "Exchange Sync"
     var
         ActivityLog: Record "Activity Log";
     begin
-        ActivityLog.SetRange("Record ID", RecordId);
+        ActivityLog.SetRange("Record ID", Rec.RecordId);
         ActivityLog.DeleteAll();
     end;
 }

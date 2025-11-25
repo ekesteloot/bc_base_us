@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Setup;
+
 enum 5932 "Report Selection Usage Service"
 {
     Extensible = true;

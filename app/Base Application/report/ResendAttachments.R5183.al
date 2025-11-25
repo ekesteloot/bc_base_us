@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Segment;
+
 report 5183 "Resend Attachments"
 {
     Caption = 'Resend Attachments';
@@ -7,7 +11,7 @@ report 5183 "Resend Attachments"
     {
         dataitem("Interaction Log Entry"; "Interaction Log Entry")
         {
-            DataItemTableView = SORTING("Logged Segment Entry No.") WHERE(Postponed = CONST(false));
+            DataItemTableView = sorting("Logged Segment Entry No.") where(Postponed = const(false));
             RequestFilterFields = "Logged Segment Entry No.", "Entry No.", "Delivery Status", "Correspondence Type", "Contact No.", "Campaign No.";
 
             trigger OnAfterGetRecord()

@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Sales.Customer;
+
 page 5135 "Customer Link"
 {
     Caption = 'Customer Link';
@@ -37,7 +42,7 @@ page 5135 "Customer Link"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if ("No." <> '') and (CloseAction = ACTION::LookupOK) then begin
+        if (Rec."No." <> '') and (CloseAction = ACTION::LookupOK) then begin
             ContBusRel := Rec;
             ContBusRel.Insert(true);
             OnQueryClosePageOnAfterContBusRelInsert(CurrMasterFields, ContBusRel);

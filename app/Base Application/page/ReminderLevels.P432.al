@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Reminder;
+
+using System.Environment;
+
 page 432 "Reminder Levels"
 {
     Caption = 'Reminder Levels';
@@ -96,9 +100,9 @@ page 432 "Reminder Levels"
                     Caption = 'Beginning Text';
                     Image = BeginningText;
                     RunObject = Page "Reminder Text";
-                    RunPageLink = "Reminder Terms Code" = FIELD("Reminder Terms Code"),
-                                  "Reminder Level" = FIELD("No."),
-                                  Position = CONST(Beginning);
+                    RunPageLink = "Reminder Terms Code" = field("Reminder Terms Code"),
+                                  "Reminder Level" = field("No."),
+                                  Position = const(Beginning);
                     ToolTip = 'Define a beginning text for each reminder level. The text will then be printed on the reminder.';
                 }
                 action(EndingText)
@@ -107,9 +111,9 @@ page 432 "Reminder Levels"
                     Caption = 'Ending Text';
                     Image = EndingText;
                     RunObject = Page "Reminder Text";
-                    RunPageLink = "Reminder Terms Code" = FIELD("Reminder Terms Code"),
-                                  "Reminder Level" = FIELD("No."),
-                                  Position = CONST(Ending);
+                    RunPageLink = "Reminder Terms Code" = field("Reminder Terms Code"),
+                                  "Reminder Level" = field("No."),
+                                  Position = const(Ending);
                     ToolTip = 'Define an ending text for each reminder level. The text will then be printed on the reminder.';
                 }
                 separator(Action21)
@@ -122,8 +126,8 @@ page 432 "Reminder Levels"
                     Enabled = AddFeeFieldsEnabled;
                     Image = Currency;
                     RunObject = Page "Currencies for Reminder Level";
-                    RunPageLink = "Reminder Terms Code" = FIELD("Reminder Terms Code"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Reminder Terms Code" = field("Reminder Terms Code"),
+                                  "No." = field("No.");
                     ToolTip = 'View or edit additional feed in additional currencies.';
                 }
             }
@@ -137,9 +141,9 @@ page 432 "Reminder Levels"
                     Enabled = AddFeeSetupEnabled;
                     Image = SetupColumns;
                     RunObject = Page "Additional Fee Setup";
-                    RunPageLink = "Charge Per Line" = CONST(false),
-                                  "Reminder Terms Code" = FIELD("Reminder Terms Code"),
-                                  "Reminder Level No." = FIELD("No.");
+                    RunPageLink = "Charge Per Line" = const(false),
+                                  "Reminder Terms Code" = field("Reminder Terms Code"),
+                                  "Reminder Level No." = field("No.");
                     ToolTip = 'View or edit the fees that apply to late payments.';
                 }
                 action("Additional Fee per Line")
@@ -149,9 +153,9 @@ page 432 "Reminder Levels"
                     Enabled = AddFeeSetupEnabled;
                     Image = SetupLines;
                     RunObject = Page "Additional Fee Setup";
-                    RunPageLink = "Charge Per Line" = CONST(true),
-                                  "Reminder Terms Code" = FIELD("Reminder Terms Code"),
-                                  "Reminder Level No." = FIELD("No.");
+                    RunPageLink = "Charge Per Line" = const(true),
+                                  "Reminder Terms Code" = field("Reminder Terms Code"),
+                                  "Reminder Level No." = field("No.");
                     ToolTip = 'View or edit the fees that apply to late payments.';
                 }
                 action("View Additional Fee Chart")
@@ -198,18 +202,18 @@ page 432 "Reminder Levels"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        NewRecord();
+        Rec.NewRecord();
     end;
 
     trigger OnOpenPage()
     var
         ClientTypeManagement: Codeunit "Client Type Management";
     begin
-        ReminderTerms.SetFilter(Code, GetFilter("Reminder Terms Code"));
+        ReminderTerms.SetFilter(Code, Rec.GetFilter("Reminder Terms Code"));
         ShowColumn := true;
         if ReminderTerms.FindFirst() then begin
             ReminderTerms.SetRecFilter();
-            if ReminderTerms.GetFilter(Code) = GetFilter("Reminder Terms Code") then
+            if ReminderTerms.GetFilter(Code) = Rec.GetFilter("Reminder Terms Code") then
                 ShowColumn := false;
         end;
         ReminderTermsCodeVisible := ShowColumn;
@@ -220,7 +224,6 @@ page 432 "Reminder Levels"
         ReminderTerms: Record "Reminder Terms";
         ClientTypeManagement: Codeunit "Client Type Management";
         ShowColumn: Boolean;
-        [InDataSet]
         ReminderTermsCodeVisible: Boolean;
         AddFeeSetupEnabled: Boolean;
         AddFeeFieldsEnabled: Boolean;
@@ -229,7 +232,7 @@ page 432 "Reminder Levels"
 
     local procedure CheckAddFeeCalcType()
     begin
-        if "Add. Fee Calculation Type" = "Add. Fee Calculation Type"::Fixed then begin
+        if Rec."Add. Fee Calculation Type" = Rec."Add. Fee Calculation Type"::Fixed then begin
             AddFeeSetupEnabled := false;
             AddFeeFieldsEnabled := true;
         end else begin

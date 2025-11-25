@@ -1,3 +1,8 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.Intercompany.Dimension;
+using Microsoft.Intercompany.Setup;
+
 xmlport 12 "IC Outbox Imp/Exp"
 {
     Caption = 'IC Outbox Imp/Exp';
@@ -67,7 +72,7 @@ xmlport 12 "IC Outbox Imp/Exp"
                     MinOccurs = Zero;
                     tableelement(icoutboxjnlline; "IC Outbox Jnl. Line")
                     {
-                        LinkFields = "Transaction No." = FIELD("Transaction No.");
+                        LinkFields = "Transaction No." = field("Transaction No.");
                         LinkTable = ICOutboxTrans;
                         MinOccurs = Zero;
                         XmlName = 'ICOutBoxJnlLine';
@@ -121,11 +126,11 @@ xmlport 12 "IC Outbox Imp/Exp"
                         {
                             tableelement(icioboxjnldim; "IC Inbox/Outbox Jnl. Line Dim.")
                             {
-                                LinkFields = "IC Partner Code" = FIELD("IC Partner Code"), "Transaction No." = FIELD("Transaction No."), "Transaction Source" = FIELD("Transaction Source"), "Line No." = FIELD("Line No.");
+                                LinkFields = "IC Partner Code" = field("IC Partner Code"), "Transaction No." = field("Transaction No."), "Transaction Source" = field("Transaction Source"), "Line No." = field("Line No.");
                                 LinkTable = ICOutBoxJnlLine;
                                 MinOccurs = Zero;
                                 XmlName = 'ICIOBoxJnlDim';
-                                SourceTableView = WHERE("Table ID" = CONST(415));
+                                SourceTableView = where("Table ID" = const(415));
                                 UseTemporary = true;
                                 fieldattribute(TableID; ICIOBoxJnlDim."Table ID")
                                 {
@@ -157,7 +162,7 @@ xmlport 12 "IC Outbox Imp/Exp"
                     MinOccurs = Zero;
                     tableelement(icoutboxsaleshdr; "IC Outbox Sales Header")
                     {
-                        LinkFields = "IC Transaction No." = FIELD("Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
+                        LinkFields = "IC Transaction No." = field("Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
                         LinkTable = ICOutboxTrans;
                         MinOccurs = Zero;
                         XmlName = 'ICOutBoxSalesHdr';
@@ -229,11 +234,11 @@ xmlport 12 "IC Outbox Imp/Exp"
                         {
                             tableelement(icsalesdocdim; "IC Document Dimension")
                             {
-                                LinkFields = "Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
+                                LinkFields = "Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
                                 LinkTable = ICOutBoxSalesHdr;
                                 MinOccurs = Zero;
                                 XmlName = 'ICSalesDocDim';
-                                SourceTableView = WHERE("Table ID" = CONST(426), "Line No." = CONST(0));
+                                SourceTableView = where("Table ID" = const(426), "Line No." = const(0));
                                 UseTemporary = true;
                                 fieldattribute(TableID; ICSalesDocDim."Table ID")
                                 {
@@ -262,7 +267,7 @@ xmlport 12 "IC Outbox Imp/Exp"
                         {
                             tableelement(icoutboxsalesline; "IC Outbox Sales Line")
                             {
-                                LinkFields = "Document No." = FIELD("No."), "IC Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
+                                LinkFields = "Document No." = field("No."), "IC Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
                                 LinkTable = ICOutBoxSalesHdr;
                                 MinOccurs = Zero;
                                 XmlName = 'ICOutBoxSalesLine';
@@ -340,11 +345,11 @@ xmlport 12 "IC Outbox Imp/Exp"
                                 {
                                     tableelement(icsalesdoclinedim; "IC Document Dimension")
                                     {
-                                        LinkFields = "Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source"), "Line No." = FIELD("Line No.");
+                                        LinkFields = "Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source"), "Line No." = field("Line No.");
                                         LinkTable = ICOutBoxSalesLine;
                                         MinOccurs = Zero;
                                         XmlName = 'ICSalesDocLineDim';
-                                        SourceTableView = WHERE("Table ID" = CONST(427));
+                                        SourceTableView = where("Table ID" = const(427));
                                         UseTemporary = true;
                                         fieldattribute(TableID; ICSalesDocLineDim."Table ID")
                                         {
@@ -378,7 +383,7 @@ xmlport 12 "IC Outbox Imp/Exp"
                     MinOccurs = Zero;
                     tableelement(icoutboxpurchhdr; "IC Outbox Purchase Header")
                     {
-                        LinkFields = "IC Transaction No." = FIELD("Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
+                        LinkFields = "IC Transaction No." = field("Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
                         LinkTable = ICOutboxTrans;
                         MinOccurs = Zero;
                         XmlName = 'ICOutBoxPurchHdr';
@@ -459,11 +464,11 @@ xmlport 12 "IC Outbox Imp/Exp"
                         {
                             tableelement(icpurdocdim; "IC Document Dimension")
                             {
-                                LinkFields = "Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
+                                LinkFields = "Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
                                 LinkTable = ICOutBoxPurchHdr;
                                 MinOccurs = Zero;
                                 XmlName = 'ICPurDocDim';
-                                SourceTableView = WHERE("Table ID" = CONST(428), "Line No." = CONST(0));
+                                SourceTableView = where("Table ID" = const(428), "Line No." = const(0));
                                 UseTemporary = true;
                                 fieldattribute(TableID; ICPurDocDim."Table ID")
                                 {
@@ -492,7 +497,7 @@ xmlport 12 "IC Outbox Imp/Exp"
                         {
                             tableelement(icoutboxpurchline; "IC Outbox Purchase Line")
                             {
-                                LinkFields = "Document No." = FIELD("No."), "IC Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
+                                LinkFields = "Document No." = field("No."), "IC Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
                                 LinkTable = ICOutBoxPurchHdr;
                                 MinOccurs = Zero;
                                 XmlName = 'ICOutBoxPurchLine';
@@ -570,11 +575,11 @@ xmlport 12 "IC Outbox Imp/Exp"
                                 {
                                     tableelement(icpurdoclinedim; "IC Document Dimension")
                                     {
-                                        LinkFields = "Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source"), "Line No." = FIELD("Line No.");
+                                        LinkFields = "Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source"), "Line No." = field("Line No.");
                                         LinkTable = ICOutBoxPurchLine;
                                         MinOccurs = Zero;
                                         XmlName = 'ICPurDocLineDim';
-                                        SourceTableView = WHERE("Table ID" = CONST(429));
+                                        SourceTableView = where("Table ID" = const(429));
                                         UseTemporary = true;
                                         fieldattribute(TableID; ICPurDocLineDim."Table ID")
                                         {

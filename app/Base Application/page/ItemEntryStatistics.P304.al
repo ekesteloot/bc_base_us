@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+
 page 304 "Item Entry Statistics"
 {
     Caption = 'Item Entry Statistics';
@@ -452,20 +458,20 @@ page 304 "Item Entry Statistics"
           "Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type",
           "Item Charge No.", "Location Code", "Variant Code");
 
-        ItemLedgEntry2.SetRange("Item No.", "No.");
-        ValueEntry2.SetRange("Item No.", "No.");
+        ItemLedgEntry2.SetRange("Item No.", Rec."No.");
+        ValueEntry2.SetRange("Item No.", Rec."No.");
 
         for j := 1 to 4 do begin
             ItemLedgEntry2.SetRange("Entry Type", j - 1); // Purchase,Positive Adjustment,Sale,Negative Adjustment
-            CopyFilter("Variant Filter", ItemLedgEntry2."Variant Code");
-            CopyFilter("Drop Shipment Filter", ItemLedgEntry2."Drop Shipment");
-            CopyFilter("Location Filter", ItemLedgEntry2."Location Code");
+            Rec.CopyFilter("Variant Filter", ItemLedgEntry2."Variant Code");
+            Rec.CopyFilter("Drop Shipment Filter", ItemLedgEntry2."Drop Shipment");
+            Rec.CopyFilter("Location Filter", ItemLedgEntry2."Location Code");
 
             ValueEntry2.SetRange("Item Ledger Entry Type", j - 1);
             ValueEntry2.SetRange("Entry Type", ValueEntry2."Entry Type"::"Direct Cost");
-            CopyFilter("Variant Filter", ValueEntry2."Variant Code");
-            CopyFilter("Drop Shipment Filter", ValueEntry2."Drop Shipment");
-            CopyFilter("Location Filter", ValueEntry2."Location Code");
+            Rec.CopyFilter("Variant Filter", ValueEntry2."Variant Code");
+            Rec.CopyFilter("Drop Shipment Filter", ValueEntry2."Drop Shipment");
+            Rec.CopyFilter("Location Filter", ValueEntry2."Location Code");
 
             if j in [1, 2] then begin // Purchase,Sale
                 ValueEntry2.SetFilter("Invoiced Quantity", '<>0');
@@ -490,11 +496,11 @@ page 304 "Item Entry Statistics"
           "Drop Shipment", "Location Code", "Expected Receipt Date");
         PurchLine2.SetRange("Document Type", PurchLine2."Document Type"::Order);
         PurchLine2.SetRange(Type, PurchLine2.Type::Item);
-        PurchLine2.SetRange("No.", "No.");
+        PurchLine2.SetRange("No.", Rec."No.");
         PurchLine2.SetFilter("Outstanding Quantity", '<>0');
-        CopyFilter("Variant Filter", PurchLine2."Variant Code");
-        CopyFilter("Drop Shipment Filter", PurchLine2."Drop Shipment");
-        CopyFilter("Location Filter", PurchLine2."Location Code");
+        Rec.CopyFilter("Variant Filter", PurchLine2."Variant Code");
+        Rec.CopyFilter("Drop Shipment Filter", PurchLine2."Drop Shipment");
+        Rec.CopyFilter("Location Filter", PurchLine2."Location Code");
         if PurchLine2.Find('-') then begin
             PurchOrderLine[1] := PurchLine2;
             repeat
@@ -515,9 +521,9 @@ page 304 "Item Entry Statistics"
                 then
                     PurchOrderLine[2] := PurchLine2;
 
-                CopyFilter("Variant Filter", PurchLine2."Variant Code");
-                CopyFilter("Location Filter", PurchLine2."Location Code");
-                CopyFilter("Drop Shipment Filter", PurchLine2."Drop Shipment");
+                Rec.CopyFilter("Variant Filter", PurchLine2."Variant Code");
+                Rec.CopyFilter("Location Filter", PurchLine2."Location Code");
+                Rec.CopyFilter("Drop Shipment Filter", PurchLine2."Drop Shipment");
             until PurchLine2.Next() = 0;
         end;
 
@@ -527,11 +533,11 @@ page 304 "Item Entry Statistics"
           "Drop Shipment", "Location Code", "Shipment Date");
         SalesLine2.SetRange("Document Type", SalesLine2."Document Type"::Order);
         SalesLine2.SetRange(Type, SalesLine2.Type::Item);
-        SalesLine2.SetRange("No.", "No.");
-        CopyFilter("Variant Filter", SalesLine2."Variant Code");
+        SalesLine2.SetRange("No.", Rec."No.");
+        Rec.CopyFilter("Variant Filter", SalesLine2."Variant Code");
         SalesLine2.SetFilter("Outstanding Quantity", '<>0');
-        CopyFilter("Drop Shipment Filter", SalesLine2."Drop Shipment");
-        CopyFilter("Location Filter", SalesLine2."Location Code");
+        Rec.CopyFilter("Drop Shipment Filter", SalesLine2."Drop Shipment");
+        Rec.CopyFilter("Location Filter", SalesLine2."Location Code");
         if SalesLine2.Find('-') then begin
             SalesLine[1] := SalesLine2;
             repeat
@@ -552,9 +558,9 @@ page 304 "Item Entry Statistics"
                 then
                     SalesLine[2] := SalesLine2;
 
-                CopyFilter("Variant Filter", SalesLine2."Variant Code");
-                CopyFilter("Location Filter", SalesLine2."Location Code");
-                CopyFilter("Drop Shipment Filter", SalesLine2."Drop Shipment");
+                Rec.CopyFilter("Variant Filter", SalesLine2."Variant Code");
+                Rec.CopyFilter("Location Filter", SalesLine2."Location Code");
+                Rec.CopyFilter("Drop Shipment Filter", SalesLine2."Drop Shipment");
             until SalesLine2.Next() = 0;
         end;
     end;

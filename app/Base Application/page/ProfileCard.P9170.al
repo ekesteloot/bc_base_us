@@ -1,3 +1,8 @@
+﻿namespace System.Environment.Configuration;
+
+using System.Environment;
+using System.Reflection;
+
 page 9170 "Profile Card"
 {
     Caption = 'Profile (Role)';
@@ -15,7 +20,7 @@ page 9170 "Profile Card"
                 Caption = 'General';
                 Editable = IsProfileEditable;
 
-                field(ScopeField; Scope)
+                field(ScopeField; Rec.Scope)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Scope';
@@ -23,7 +28,7 @@ page 9170 "Profile Card"
                     Visible = false;
                     ToolTip = 'Specifies if the profile is specific to your tenant or generally available in the system.';
                 }
-                field(ProfileIdField; "Profile ID")
+                field(ProfileIdField; Rec."Profile ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Profile ID';
@@ -35,13 +40,13 @@ page 9170 "Profile Card"
                     var
                         AllProfile: Record "All Profile";
                     begin
-                        AllProfile.SetRange("Profile ID", "Profile ID");
+                        AllProfile.SetRange("Profile ID", Rec."Profile ID");
 
                         // Platform inserts the record before validation, hence this filter is needed to enable the desired behaviour
-                        AllProfile.SetFilter("App ID", '<>%1', "App ID");
+                        AllProfile.SetFilter("App ID", '<>%1', Rec."App ID");
 
                         if not AllProfile.IsEmpty() then
-                            Error(ProfileIdAlreadyExistErr, "Profile ID");
+                            Error(ProfileIdAlreadyExistErr, Rec."Profile ID");
 
                         if xRec."Profile ID" <> '' then
                             if not Confirm(RenamingWillDisruptExistingSessionsQst) then
@@ -55,7 +60,7 @@ page 9170 "Profile Card"
                     Enabled = false;
                     ToolTip = 'Specifies the origin of this profile, which can be either an extension, shown by its name, or a custom profile created by a user.';
                 }
-                field(CaptionField; Caption)
+                field(CaptionField; Rec.Caption)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Display Name';
@@ -63,14 +68,14 @@ page 9170 "Profile Card"
                     NotBlank = true;
                     ShowMandatory = true;
                 }
-                field(DescriptionField; Description)
+                field(DescriptionField; Rec.Description)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Description';
                     ToolTip = 'Specifies additional information about the profile, such as its purpose. This information may be shown to users.';
                     MultiLine = true;
                 }
-                field(RoleCenterIdField; "Role Center ID")
+                field(RoleCenterIdField; Rec."Role Center ID")
                 {
                     ApplicationArea = Basic, Suite;
                     BlankZero = true;
@@ -81,25 +86,25 @@ page 9170 "Profile Card"
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
-                        AllObjWithCaptionRec: Record AllObjWithCaption;
+                        AllObjWithCaption: Record AllObjWithCaption;
                         AllObjectsWithCaptionPage: Page "All Objects with Caption";
                     begin
-                        AllObjWithCaptionRec.FilterGroup(2);
-                        AllObjWithCaptionRec.SetRange("Object Type", AllObjWithCaptionRec."Object Type"::Page);
-                        AllObjWithCaptionRec.SetRange("Object Subtype", RoleCenterSubtypeTxt);
-                        AllObjWithCaptionRec.FilterGroup(0);
+                        AllObjWithCaption.FilterGroup(2);
+                        AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Page);
+                        AllObjWithCaption.SetRange("Object Subtype", RoleCenterSubtypeTxt);
+                        AllObjWithCaption.FilterGroup(0);
 
-                        AllObjectsWithCaptionPage.Caption := AvailableRoleCentersPageCaption;
+                        AllObjectsWithCaptionPage.Caption := AvailableRoleCentersPageCaptionLbl;
                         AllObjectsWithCaptionPage.IsObjectTypeVisible(false);
-                        AllObjectsWithCaptionPage.SetTableView(AllObjWithCaptionRec);
+                        AllObjectsWithCaptionPage.SetTableView(AllObjWithCaption);
 
-                        if AllObjWithCaptionRec.Get(AllObjWithCaptionRec."Object Type"::Page, "Role Center ID") then
-                            AllObjectsWithCaptionPage.SetRecord(AllObjWithCaptionRec);
+                        if AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Page, Rec."Role Center ID") then
+                            AllObjectsWithCaptionPage.SetRecord(AllObjWithCaption);
 
                         AllObjectsWithCaptionPage.LookupMode := true;
                         if AllObjectsWithCaptionPage.RunModal() = ACTION::LookupOK then begin
-                            AllObjectsWithCaptionPage.GetRecord(AllObjWithCaptionRec);
-                            Validate("Role Center ID", AllObjWithCaptionRec."Object ID");
+                            AllObjectsWithCaptionPage.GetRecord(AllObjWithCaption);
+                            Rec.Validate("Role Center ID", AllObjWithCaption."Object ID");
                         end;
                         ValidateRoleCenterIdExists();
                     end;
@@ -109,7 +114,7 @@ page 9170 "Profile Card"
                         ValidateRoleCenterIdExists();
                     end;
                 }
-                field(EnabledField; Enabled)
+                field(EnabledField; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Enabled';
@@ -117,11 +122,11 @@ page 9170 "Profile Card"
 
                     trigger OnValidate()
                     begin
-                        if not Enabled then
+                        if not Rec.Enabled then
                             ConfPersonalizationMgt.ValidateDisableProfile(Rec);
                     end;
                 }
-                field(PromotedField; Promoted)
+                field(PromotedField; Rec.Promoted)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Show in Role Explorer';
@@ -133,23 +138,23 @@ page 9170 "Profile Card"
                 Caption = 'Additional Settings';
                 Editable = IsProfileEditable;
 
-                field(DefaultRoleCenterField; "Default Role Center")
+                field(DefaultRoleCenterField; Rec."Default Role Center")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Use as default profile';
                     ToolTip = 'Specifies if this profile is used for all users that are not assigned a role. Only one profile can be set as the default.';
-                    AccessByPermission = tabledata "Tenant Profile" = M;
+                    AccessByPermission = tabledata "All Profile" = M;
 
                     trigger OnValidate()
                     begin
-                        TestField("Profile ID");
-                        TestField("Role Center ID");
+                        Rec.TestField("Profile ID");
+                        Rec.TestField("Role Center ID");
 
-                        if not Enabled then
+                        if not Rec.Enabled then
                             Error(ProfileMustBeEnabledInOrderToSetItAsDefaultErr);
                     end;
                 }
-                field(DisablePersonalizationField; "Disable Personalization")
+                field(DisablePersonalizationField; Rec."Disable Personalization")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Disable personalization';
@@ -208,14 +213,14 @@ page 9170 "Profile Card"
                     Ellipsis = true;
                     Image = Copy;
                     ToolTip = 'Create a copy of this profile including any page customizations made by users for this profile.';
-                    AccessByPermission = tabledata "Tenant Profile" = I;
+                    AccessByPermission = tabledata "All Profile" = I;
 
                     trigger OnAction()
                     var
                         AllProfile: Record "All Profile";
                     begin
                         ConfPersonalizationMgt.CopyProfileWithUserInput(Rec, AllProfile);
-                        if Get(AllProfile.Scope, AllProfile."App ID", AllProfile."Profile ID") then;
+                        if Rec.Get(AllProfile.Scope, AllProfile."App ID", AllProfile."Profile ID") then;
                     end;
                 }
                 action(CustomizeRoleAction)
@@ -226,7 +231,7 @@ page 9170 "Profile Card"
                     Visible = IsWebClient;
                     Enabled = IsProfileEditable;
                     ToolTip = 'Change the user interface for this profile to fit the unique needs of the role (opens in a new tab). The changes that you make only apply to users that are assigned this profile.';
-                    AccessByPermission = tabledata "Tenant Profile" = M;
+                    AccessByPermission = tabledata "All Profile" = M;
 
                     trigger OnAction()
                     begin
@@ -278,8 +283,8 @@ page 9170 "Profile Card"
     var
         EmptyGuid: Guid;
     begin
-        AppName := "App Name";
-        if "App ID" = EmptyGuid then
+        AppName := Rec."App Name";
+        if Rec."App ID" = EmptyGuid then
             AppName := UserCreatedAppNameTxt;
 
         UpdateHasCustomizedPages();
@@ -293,35 +298,35 @@ page 9170 "Profile Card"
     var
         TenantProfilePageMetadata: Record "Tenant Profile Page Metadata";
     begin
-        TenantProfilePageMetadata.SetRange("Profile ID", "Profile ID");
-        TenantProfilePageMetadata.SetRange("App ID", "App ID");
+        TenantProfilePageMetadata.SetRange("Profile ID", Rec."Profile ID");
+        TenantProfilePageMetadata.SetRange("App ID", Rec."App ID");
         TenantProfilePageMetadata.SetRange(Owner, TenantProfilePageMetadata.Owner::Tenant);
         HasCustomizedPages := not TenantProfilePageMetadata.IsEmpty();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Scope := Scope::Tenant;
-        "Role Center ID" := ConfPersonalizationMgt.DefaultRoleCenterID();
-        Enabled := true;
+        Rec.Scope := Rec.Scope::Tenant;
+        Rec."Role Center ID" := ConfPersonalizationMgt.DefaultRoleCenterID();
+        Rec.Enabled := true;
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        TestField(Caption);
-        TestField("Role Center ID");
+        Rec.TestField(Caption);
+        Rec.TestField("Role Center ID");
         ValidateRoleCenterIdExists();
 
-        if "Default Role Center" then
+        if Rec."Default Role Center" then
             ConfPersonalizationMgt.ChangeDefaultRoleCenter(Rec);
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        TestField(Caption);
-        TestField("Role Center ID");
+        Rec.TestField(Caption);
+        Rec.TestField("Role Center ID");
 
-        if "Default Role Center" then
+        if Rec."Default Role Center" then
             ConfPersonalizationMgt.ChangeDefaultRoleCenter(Rec);
     end;
 
@@ -337,14 +342,14 @@ page 9170 "Profile Card"
         ConfPersonalizationMgt.ValidateDeleteProfile(Rec);
 
         if not ConfPersonalizationMgt.CanDeleteProfile(Rec) then begin
-            if not Enabled then begin
-                Message(CannotDeleteProfileAlreadyMarkedAsDisabledMsg, "Profile ID", "App Name");
+            if not Rec.Enabled then begin
+                Message(CannotDeleteProfileAlreadyMarkedAsDisabledMsg, Rec."Profile ID", Rec."App Name");
                 Error('');
             end;
 
-            if Confirm(CannotDeleteProfileMarkAsDisabledQst, false, "Profile ID", "App Name") then begin
-                Enabled := false;
-                Modify(true);
+            if Confirm(CannotDeleteProfileMarkAsDisabledQst, false, Rec."Profile ID", Rec."App Name") then begin
+                Rec.Enabled := false;
+                Rec.Modify(true);
                 exit(false);
             end;
             Error('');
@@ -357,16 +362,16 @@ page 9170 "Profile Card"
     var
         AllObjWithCaption: Record AllObjWithCaption;
     begin
-        if "Default Role Center" then
-            TestField("Role Center ID");
+        if Rec."Default Role Center" then
+            Rec.TestField("Role Center ID");
 
-        AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Page, "Role Center ID");
+        AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Page, Rec."Role Center ID");
         AllObjWithCaption.TestField("Object Subtype", RoleCenterSubtypeTxt);
     end;
 
     local procedure RefreshEditability()
     begin
-        IsUserCreatedProfile := IsNullGuid("App ID");
+        IsUserCreatedProfile := IsNullGuid(Rec."App ID");
 
         IsProfileEditable := not ConfPersonalizationMgt.IsProfileIdAmbiguous(Rec);
     end;
@@ -377,7 +382,7 @@ page 9170 "Profile Card"
         NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
         NotificationToShow: Notification;
     begin
-        NotificationToShow.Id := DuplicateIDNotificationID;
+        NotificationToShow.Id := DuplicateIDNotificationIDTxt;
         NotificationToShow.Message := ThereAreProfilesWithDuplicateIdMsg;
 
         if ConfPersonalizationMgt.IsProfileIdAmbiguous(Rec) then
@@ -391,12 +396,12 @@ page 9170 "Profile Card"
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
         ClientTypeManagement: Codeunit "Client Type Management";
         RoleCenterSubtypeTxt: Label 'RoleCenter', Locked = true;
-        DuplicateIDNotificationID: Label 'ffbf8d52-e612-4e2e-9adc-d15b863d94ff', Locked = true;
+        DuplicateIDNotificationIDTxt: Label 'ffbf8d52-e612-4e2e-9adc-d15b863d94ff', Locked = true;
         RenamingWillDisruptExistingSessionsQst: Label 'If any user is logged in with this profile, they will need to log in again. Do you want to continue?';
         CannotDeleteProfileMarkAsDisabledQst: Label 'The profile "%1" is provided by the extension %2 . You cannot delete the profile, unless you uninstall the extension. Do you want to mark the profile as Disabled instead?', Comment = '%1 = the ID of the profile the user is trying to delete; %2 = the extension (app) that owns the profile.';
         CannotDeleteProfileAlreadyMarkedAsDisabledMsg: Label 'The profile "%1" is provided by the extension %2 . You cannot delete the profile, unless you uninstall the extension. The profile has already been marked as disabled.', Comment = '%1 = the ID of the profile the user is trying to delete; %2 = the extension (app) that owns the profile.';
-        AvailableRoleCentersPageCaption: Label 'Available Role Centers', Comment = 'When the user triggers LookUp of the Role Center ID field, this will be the caption of the lookup page';
-        ProfileIdAlreadyExistErr: Label 'A profile with Profile ID "%1" already exist, please provide another Profile ID.';
+        AvailableRoleCentersPageCaptionLbl: Label 'Available Role Centers', Comment = 'When the user triggers LookUp of the Role Center ID field, this will be the caption of the lookup page';
+        ProfileIdAlreadyExistErr: Label 'A profile with Profile ID "%1" already exist, please provide another Profile ID.', Comment = '%1 = Profile ID';
         ProfileMustBeEnabledInOrderToSetItAsDefaultErr: Label 'The profile must be enabled in order to set it as the default profile.';
         ThereAreProfilesWithDuplicateIdMsg: Label 'Another profile has the same ID as this one. This can cause ambiguity in the system. Give this or the other profile another ID before you customize them. Contact your Microsoft partner for further assistance.';
         UserCreatedAppNameTxt: Label '(User-created)';

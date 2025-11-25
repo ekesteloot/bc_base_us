@@ -9,7 +9,7 @@ report 10152 "Picking List by Item"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("Shelf No.");
+            DataItemTableView = sorting("Shelf No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Description", "Inventory Posting Group", "Shelf No.", "Location Filter";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -89,8 +89,8 @@ report 10152 "Picking List by Item"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "No." = FIELD("No."), "Location Code" = FIELD("Location Filter");
-                DataItemTableView = SORTING("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date") WHERE(Type = CONST(Item), "Document Type" = CONST(Order), "Qty. to Ship" = FILTER(<> 0));
+                DataItemLink = "No." = field("No."), "Location Code" = field("Location Filter");
+                DataItemTableView = sorting("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date") where(Type = const(Item), "Document Type" = const(Order), "Qty. to Ship" = filter(<> 0));
                 RequestFilterFields = "Shipment Date", "Sell-to Customer No.", "Document No.";
                 column(STRSUBSTNO_Text000__Variant_Code__; StrSubstNo(Text000, "Variant Code"))
                 {
@@ -193,8 +193,8 @@ report 10152 "Picking List by Item"
                 }
                 dataitem("Tracking Specification"; "Tracking Specification")
                 {
-                    DataItemLink = "Source ID" = FIELD("Document No."), "Source Ref. No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Source ID", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Source Ref. No.") WHERE("Source Type" = CONST(37), "Source Subtype" = CONST("1"));
+                    DataItemLink = "Source ID" = field("Document No."), "Source Ref. No." = field("Line No.");
+                    DataItemTableView = sorting("Source ID", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Source Ref. No.") where("Source Type" = const(37), "Source Subtype" = const("1"));
                     column(Tracking_Specification__Serial_No__; "Serial No.")
                     {
                     }

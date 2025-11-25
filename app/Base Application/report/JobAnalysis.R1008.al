@@ -1,7 +1,7 @@
 report 1008 "Job Analysis"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/JobAnalysis.rdlc';
+    RDLCLayout = './ProjectMgt/Jobs/Reports/JobAnalysis.rdlc';
     AdditionalSearchTerms = 'project overview';
     ApplicationArea = Jobs;
     Caption = 'Job Analysis';
@@ -43,8 +43,8 @@ report 1008 "Job Analysis"
             }
             dataitem("Job Task"; "Job Task")
             {
-                DataItemLink = "Job No." = FIELD("No.");
-                DataItemTableView = SORTING("Job No.", "Job Task No.");
+                DataItemLink = "Job No." = field("No.");
+                DataItemTableView = sorting("Job No.", "Job Task No.");
                 RequestFilterFields = "Job Task No.";
                 column(HeadLineText8; HeadLineText[8])
                 {
@@ -81,7 +81,7 @@ report 1008 "Job Analysis"
                 }
                 dataitem(BlankLine; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
 
                     trigger OnPreDataItem()
                     begin
@@ -90,7 +90,7 @@ report 1008 "Job Analysis"
                 }
                 dataitem("Integer"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(JobTaskNo_JobTask; "Job Task"."Job Task No.")
                     {
                     }

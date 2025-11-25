@@ -1,3 +1,14 @@
+﻿namespace Microsoft.Intercompany.GLAccount;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Intercompany.BankAccount;
+using Microsoft.Intercompany.DataExchange;
+using Microsoft.Intercompany.Dimension;
+using Microsoft.Intercompany.Partner;
+using System.Telemetry;
+
 codeunit 428 "IC Mapping"
 {
     trigger OnRun()
@@ -117,12 +128,14 @@ codeunit 428 "IC Mapping"
 
     procedure SynchronizeAccounts(DeleteExistingEntries: Boolean; PartnerCode: Code[20])
     var
-        PartnersICAccounts: Record "IC G/L Account";
+#if not CLEAN23
+        ICPartnerAccount: Record "IC G/L Account";
+#endif
+        TempICPartnerAccount: Record "IC G/L Account" temporary;
         ICAccounts: Record "IC G/L Account";
-        TempICAccount: Record "IC G/L Account" temporary;
         ICPartner: Record "IC Partner";
         GLAccount: Record "G/L Account";
-        PrevIndentation: Integer;
+        ICDataExchange: Interface "IC Data Exchange";
         IsChangeCompanyAllowed: Boolean;
     begin
         if not ICPartner.Get(PartnerCode) then
@@ -131,14 +144,25 @@ codeunit 428 "IC Mapping"
         if ICPartner."Inbox Type" <> ICPartner."Inbox Type"::Database then
             Error(SyncInboxTypeNotDatabaseErr, PartnerCode, ICPartner."Inbox Type");
 
-        OnAllowChangeCompanyForICAccounts(IsChangeCompanyAllowed, PartnersICAccounts);
+        IsChangeCompanyAllowed := true;
+#if not CLEAN23
+        OnAllowChangeCompanyForICAccounts(IsChangeCompanyAllowed, ICPartnerAccount);
+        if not IsChangeCompanyAllowed then begin
+            ICPartnerAccount.FindSet();
+            repeat
+                TempICPartnerAccount.TransferFields(ICPartnerAccount, true);
+                TempICPartnerAccount.Insert();
+            until ICPartnerAccount.Next() = 0;
+            TempICPartnerAccount.FindSet();
+        end
+        else
+#endif
+        OnAllowChangeCompanyForTempICAccounts(IsChangeCompanyAllowed, TempICPartnerAccount);
         if IsChangeCompanyAllowed then begin
             // Delete existing IC Accounts if the syncronization points to a company with no IC Accounts and remove the G/L account mapping.
-            if not PartnersICAccounts.ChangeCompany(ICPartner."Inbox Details") then
-                Error(FailedToChangeCompanyErr, PartnersICAccounts.TableCaption, ICPartner.Name);
-            if not PartnersICAccounts.ReadPermission() then
-                Error(MissingPermissionToReadTableErr, PartnersICAccounts.TableCaption(), ICPartner.Name);
-            if PartnersICAccounts.IsEmpty() then begin
+            ICDataExchange := ICPartner."Data Exchange Type";
+            ICDataExchange.GetICPartnerICGLAccount(ICPartner, TempICPartnerAccount);
+            if TempICPartnerAccount.IsEmpty() then begin
                 if not ICAccounts.IsEmpty() then begin
                     ICAccounts.DeleteAll();
                     GLAccount.SetFilter("Default IC Partner G/L Acc. No", '<> ''''');
@@ -147,73 +171,48 @@ codeunit 428 "IC Mapping"
                 end;
                 exit;
             end;
-            PartnersICAccounts.FindSet();
+            TempICPartnerAccount.FindSet();
         end;
 
         if DeleteExistingEntries then
             if not ICAccounts.IsEmpty() then
                 ICAccounts.DeleteAll();
 
-        repeat
-            TransferICAccountWithMappingToTemporalRecord(PartnersICAccounts, ICAccounts, TempICAccount, PrevIndentation);
-        until PartnersICAccounts.Next() = 0;
-
-        TransferICMappingsAndDeletedICAccounts(ICAccounts, TempICAccount);
-        TempICAccount.Reset();
-        TempICAccount.FindSet();
+        TransferICMappingsAndDeletedICAccounts(ICAccounts, TempICPartnerAccount);
+        TempICPartnerAccount.Reset();
+        TempICPartnerAccount.FindSet();
         ICAccounts.LockTable();
         repeat
-            ICAccounts.TransferFields(TempICAccount);
+            ICAccounts.TransferFields(TempICPartnerAccount);
             ICAccounts.Indentation := 0;
             ICAccounts.Insert();
-        until TempICAccount.Next() = 0;
-        TempICAccount.DeleteAll();
+        until TempICPartnerAccount.Next() = 0;
     end;
 
-    local procedure TransferICAccountWithMappingToTemporalRecord(var PartnersICAccounts: Record "IC G/L Account"; var ICAccounts: Record "IC G/L Account"; var TempICAccount: Record "IC G/L Account" temporary; var PrevIndentation: Integer)
-    begin
-        if PartnersICAccounts."Account Type" = PartnersICAccounts."Account Type"::"End-Total" then
-            PrevIndentation := PrevIndentation - 1;
-
-        if (ICAccounts.Get(PartnersICAccounts."No.")) and (ICAccounts."Account Type" = PartnersICAccounts."Account Type") then begin
-            TempICAccount.TransferFields(PartnersICAccounts);
-            TempICAccount."Map-to G/L Acc. No." := ICAccounts."Map-to G/L Acc. No.";
-            TempICAccount.Insert();
-        end
-        else begin
-            TempICAccount.Init();
-            TempICAccount."No." := PartnersICAccounts."No.";
-            TempICAccount.Name := PartnersICAccounts.Name;
-            TempICAccount.Blocked := PartnersICAccounts.Blocked;
-            TempICAccount."Income/Balance" := PartnersICAccounts."Income/Balance";
-            TempICAccount."Account Type" := PartnersICAccounts."Account Type";
-            TempICAccount.Validate(Indentation, PrevIndentation);
-            TempICAccount.Insert();
-        end;
-
-        PrevIndentation := PartnersICAccounts.Indentation;
-        if PartnersICAccounts."Account Type" = PartnersICAccounts."Account Type"::"Begin-Total" then
-            PrevIndentation := PrevIndentation + 1;
-    end;
-
-    local procedure TransferICMappingsAndDeletedICAccounts(var ICAccounts: Record "IC G/L Account"; var TempICAccount: Record "IC G/L Account" temporary)
+    local procedure TransferICMappingsAndDeletedICAccounts(var ICAccounts: Record "IC G/L Account"; var TempICPartnerAccount: Record "IC G/L Account" temporary)
     var
         GLAccount: Record "G/L Account";
     begin
         ICAccounts.Reset();
-        TempICAccount.Reset();
+        TempICPartnerAccount.Reset();
         if ICAccounts.IsEmpty() then
             exit;
+        if not TempICPartnerAccount.IsEmpty() then
+            TempICPartnerAccount.ModifyAll("Map-to G/L Acc. No.", '');
 
         ICAccounts.FindSet();
         repeat
-            TempICAccount.SetRange("No.", ICAccounts."No.");
-            TempICAccount.SetRange("Account Type", ICAccounts."Account Type");
-            if TempICAccount.IsEmpty() then begin
+            TempICPartnerAccount.SetRange("No.", ICAccounts."No.");
+            TempICPartnerAccount.SetRange("Account Type", ICAccounts."Account Type");
+            if TempICPartnerAccount.FindFirst() then begin
+                TempICPartnerAccount."Map-to G/L Acc. No." := ICAccounts."Map-to G/L Acc. No.";
+                TempICPartnerAccount.Modify();
+            end
+            else begin
                 GLAccount.SetRange("Default IC Partner G/L Acc. No", ICAccounts."No.");
                 if not GLAccount.IsEmpty() then
                     GLAccount.ModifyAll("Default IC Partner G/L Acc. No", '');
-            end;
+            end
         until ICAccounts.Next() = 0;
 
         ICAccounts.Reset();
@@ -480,15 +479,18 @@ codeunit 428 "IC Mapping"
 
     procedure SynchronizeDimensions(DeleteExistingEntries: Boolean; PartnerCode: Code[20])
     var
+#if not CLEAN23
         PartnersICDimensions: Record "IC Dimension";
         PartnersICDimensionValues: Record "IC Dimension Value";
+#endif
+        TempPartnersICDimension: Record "IC Dimension" temporary;
+        TempPartnersICDimensionValue: Record "IC Dimension Value" temporary;
         ICDimensions: Record "IC Dimension";
         ICDimensionValues: Record "IC Dimension Value";
-        TempICDimension: Record "IC Dimension" temporary;
-        TempICDimensionValue: Record "IC Dimension Value" temporary;
         ICPartner: Record "IC Partner";
         Dimension: Record Dimension;
         DimensionValue: Record "Dimension Value";
+        ICDataExchange: Interface "IC Data Exchange";
         IsChangeCompanyAllowed: Boolean;
     begin
         if not ICPartner.Get(PartnerCode) then
@@ -497,19 +499,37 @@ codeunit 428 "IC Mapping"
         if ICPartner."Inbox Type" <> ICPartner."Inbox Type"::Database then
             Error(SyncInboxTypeNotDatabaseErr, PartnerCode, ICPartner."Inbox Type");
 
+        IsChangeCompanyAllowed := true;
+#if not CLEAN23
         OnAllowChangeCompanyForICDimensions(IsChangeCompanyAllowed, PartnersICDimensions, PartnersICDimensionValues);
+        if not IsChangeCompanyAllowed then begin
+            PartnersICDimensions.FindSet();
+            repeat
+                TempPartnersICDimension.TransferFields(PartnersICDimensions, true);
+                TempPartnersICDimension.Insert();
+
+                PartnersICDimensionValues.SetRange("Dimension Code", PartnersICDimensions.Code);
+                if not PartnersICDimensionValues.IsEmpty() then begin
+                    PartnersICDimensionValues.FindSet();
+                    repeat
+                        TempPartnersICDimensionValue.TransferFields(PartnersICDimensionValues, true);
+                        TempPartnersICDimensionValue.Insert();
+                    until PartnersICDimensionValues.Next() = 0;
+                end;
+            until PartnersICDimensions.Next() = 0;
+            TempPartnersICDimension.FindSet();
+            TempPartnersICDimensionValue.FindSet();
+        end
+        else
+#endif
+        OnAllowChangeCompanyForTempICDimensions(IsChangeCompanyAllowed, TempPartnersICDimension, TempPartnersICDimensionValue);
         if IsChangeCompanyAllowed then begin
             // Delete existing IC Dimensions if the syncronization points to a company with no IC Dimensions 
             // and remove the dimensions and dimensions values mapping.
-            if not PartnersICDimensions.ChangeCompany(ICPartner."Inbox Details") then
-                Error(FailedToChangeCompanyErr, PartnersICDimensions.TableCaption, ICPartner.Name);
-            if not PartnersICDimensionValues.ChangeCompany(ICPartner."Inbox Details") then
-                Error(FailedToChangeCompanyErr, PartnersICDimensionValues.TableCaption, ICPartner.Name);
-            if not PartnersICDimensions.ReadPermission() then
-                Error(MissingPermissionToReadTableErr, PartnersICDimensions.TableCaption, ICPartner.Name);
-            if not PartnersICDimensionValues.ReadPermission() then
-                Error(MissingPermissionToReadTableErr, PartnersICDimensionValues.TableCaption, ICPartner.Name);
-            if PartnersICDimensions.IsEmpty() then begin
+            ICDataExchange := ICPartner."Data Exchange Type";
+            ICDataExchange.GetICPartnerICDimension(ICPartner, TempPartnersICDimension);
+            ICDataExchange.GetICPartnerICDimensionValue(ICPartner, TempPartnersICDimensionValue);
+            if TempPartnersICDimension.IsEmpty() then begin
                 if not ICDimensions.IsEmpty() then begin
                     ICDimensions.DeleteAll();
                     Dimension.SetFilter("Map-to IC Dimension Code", '<> ''''');
@@ -526,7 +546,7 @@ codeunit 428 "IC Mapping"
                 end;
                 exit;
             end;
-            PartnersICDimensions.FindSet();
+            TempPartnersICDimension.FindSet();
         end;
 
         if DeleteExistingEntries then begin
@@ -536,84 +556,43 @@ codeunit 428 "IC Mapping"
                 ICDimensionValues.DeleteAll();
         end;
 
-        repeat
-            TransferICDimensionWithMappingToTemporalRecord(PartnersICDimensions, ICDimensions, TempICDimension);
-            ICDimensionValues.Reset();
-            PartnersICDimensionValues.SetRange("Dimension Code", PartnersICDimensions.Code);
-            if not PartnersICDimensionValues.IsEmpty() then begin
-                PartnersICDimensionValues.FindSet();
-                repeat
-                    TransferICDimensionValueWithMappingToTemporalRecord(PartnersICDimensionValues, ICDimensionValues, TempICDimensionValue);
-                until PartnersICDimensionValues.Next() = 0;
-            end;
-        until PartnersICDimensions.Next() = 0;
-
-        TransferICMappingsAndDeletedICDimensions(ICDimensions, TempICDimension);
-        TempICDimension.Reset();
-        TempICDimension.FindSet();
+        TransferICMappingsAndDeletedICDimensions(ICDimensions, TempPartnersICDimension);
+        TempPartnersICDimension.Reset();
+        TempPartnersICDimension.FindSet();
         ICDimensions.LockTable();
         repeat
-            ICDimensions.TransferFields(TempICDimension);
+            ICDimensions.TransferFields(TempPartnersICDimension);
             ICDimensions.Insert();
-        until TempICDimension.Next() = 0;
+        until TempPartnersICDimension.Next() = 0;
 
-        TransferICMappingsAndDeletedICDimensionValues(ICDimensionValues, TempICDimensionValue);
-        TempICDimensionValue.Reset();
-        TempICDimensionValue.FindSet();
+        TransferICMappingsAndDeletedICDimensionValues(ICDimensionValues, TempPartnersICDimensionValue);
+        TempPartnersICDimensionValue.Reset();
+        TempPartnersICDimensionValue.FindSet();
         ICDimensionValues.LockTable();
         repeat
-            ICDimensionValues.TransferFields(TempICDimensionValue);
+            ICDimensionValues.TransferFields(TempPartnersICDimensionValue);
             ICDimensionValues.Insert();
-        until TempICDimensionValue.Next() = 0;
-
-        TempICDimension.DeleteAll();
-        TempICDimensionValue.DeleteAll();
+        until TempPartnersICDimensionValue.Next() = 0;
     end;
 
-    local procedure TransferICDimensionWithMappingToTemporalRecord(var PartnersICDimensions: Record "IC Dimension"; var ICDimensions: Record "IC Dimension"; var TempICDimension: Record "IC Dimension" temporary)
-    begin
-        if ICDimensions.Get(PartnersICDimensions.Code) then begin
-            TempICDimension.TransferFields(ICDimensions);
-            TempICDimension.Insert();
-        end
-        else begin
-            TempICDimension.Init();
-            TempICDimension.Code := PartnersICDimensions.Code;
-            TempICDimension.Name := PartnersICDimensions.Name;
-            TempICDimension.Blocked := PartnersICDimensions.Blocked;
-            TempICDimension.Insert();
-        end;
-    end;
-
-    local procedure TransferICDimensionValueWithMappingToTemporalRecord(var PartnersICDimensionValues: Record "IC Dimension Value"; var ICDimensionValues: Record "IC Dimension Value"; var TempICDimensionValue: Record "IC Dimension Value" temporary)
-    begin
-        if ICDimensionValues.Get(PartnersICDimensionValues."Dimension Code", PartnersICDimensionValues.Code) then begin
-            TempICDimensionValue.TransferFields(ICDimensionValues);
-            TempICDimensionValue.Insert();
-        end
-        else begin
-            TempICDimensionValue.Init();
-            TempICDimensionValue."Dimension Code" := PartnersICDimensionValues."Dimension Code";
-            TempICDimensionValue.Code := PartnersICDimensionValues.Code;
-            TempICDimensionValue.Name := PartnersICDimensionValues.Name;
-            TempICDimensionValue."Dimension Value Type" := PartnersICDimensionValues."Dimension Value Type";
-            TempICDimensionValue.Blocked := PartnersICDimensionValues.Blocked;
-            TempICDimensionValue.Insert();
-        end;
-    end;
-
-    local procedure TransferICMappingsAndDeletedICDimensions(var ICDimensions: Record "IC Dimension"; var TempICDimension: Record "IC Dimension" temporary)
+    local procedure TransferICMappingsAndDeletedICDimensions(var ICDimensions: Record "IC Dimension"; var TempPartnersICDimension: Record "IC Dimension" temporary)
     var
         Dimension: Record Dimension;
     begin
         ICDimensions.Reset();
-        TempICDimension.Reset();
+        TempPartnersICDimension.Reset();
         if ICDimensions.IsEmpty() then
             exit;
+        if not TempPartnersICDimension.IsEmpty() then
+            TempPartnersICDimension.ModifyAll("Map-to Dimension Code", '');
 
         ICDimensions.FindSet();
         repeat
-            if TempICDimension.Get(ICDimensions.Code) then begin
+            if TempPartnersICDimension.Get(ICDimensions.Code) then begin
+                TempPartnersICDimension."Map-to Dimension Code" := ICDimensions."Map-to Dimension Code";
+                TempPartnersICDimension.Modify();
+            end
+            else begin
                 Dimension.SetRange("Map-to IC Dimension Code", ICDimensions.Code);
                 if not Dimension.IsEmpty() then
                     Dimension.ModifyAll("Map-to IC Dimension Code", '');
@@ -625,18 +604,27 @@ codeunit 428 "IC Mapping"
             ICDimensions.DeleteAll();
     end;
 
-    local procedure TransferICMappingsAndDeletedICDimensionValues(var ICDimensionValues: Record "IC Dimension Value"; var TempICDimensionValue: Record "IC Dimension Value" temporary)
+    local procedure TransferICMappingsAndDeletedICDimensionValues(var ICDimensionValues: Record "IC Dimension Value"; var TempPartnersICDimensionValue: Record "IC Dimension Value" temporary)
     var
         DimensionValue: Record "Dimension Value";
     begin
         ICDimensionValues.Reset();
-        TempICDimensionValue.Reset();
+        TempPartnersICDimensionValue.Reset();
         if ICDimensionValues.IsEmpty() then
             exit;
+        if not TempPartnersICDimensionValue.IsEmpty() then begin
+            TempPartnersICDimensionValue.ModifyAll("Map-to Dimension Code", '');
+            TempPartnersICDimensionValue.ModifyAll("Map-to Dimension Value Code", '');
+        end;
 
         ICDimensionValues.FindSet();
         repeat
-            if TempICDimensionValue.Get(ICDimensionValues."Dimension Code", ICDimensionValues.Code) then begin
+            if TempPartnersICDimensionValue.Get(ICDimensionValues."Dimension Code", ICDimensionValues.Code) then begin
+                TempPartnersICDimensionValue."Map-to Dimension Code" := ICDimensionValues."Map-to Dimension Code";
+                TempPartnersICDimensionValue."Map-to Dimension Value Code" := ICDimensionValues."Map-to Dimension Value Code";
+                TempPartnersICDimensionValue.Modify();
+            end
+            else begin
                 DimensionValue.SetRange("Map-to IC Dimension Value Code", ICDimensionValues.Code);
                 if not DimensionValue.IsEmpty() then begin
                     DimensionValue.ModifyAll("Map-to IC Dimension Code", '');
@@ -653,9 +641,13 @@ codeunit 428 "IC Mapping"
 
     internal procedure CopyBankAccountsFromPartner(PartnerCode: Code[20])
     var
+#if not CLEAN23
         PartnersBankAccounts: Record "Bank Account";
+#endif
+        TempPartnersBankAccounts: Record "Bank Account" temporary;
         ICBankAccounts: Record "IC Bank Account";
         ICPartner: Record "IC Partner";
+        ICDataExchange: Interface "IC Data Exchange";
         IsChangeCompanyAllowed: Boolean;
     begin
         if not ICPartner.Get(PartnerCode) then
@@ -664,57 +656,90 @@ codeunit 428 "IC Mapping"
         if ICPartner."Inbox Type" <> ICPartner."Inbox Type"::Database then
             Error(CopyInboxTypeNotDatabaseErr, PartnerCode, ICPartner."Inbox Type");
 
+        IsChangeCompanyAllowed := true;
+#if not CLEAN23
         OnAllowChangeCompanyForBankAccounts(IsChangeCompanyAllowed, PartnersBankAccounts);
+        if not IsChangeCompanyAllowed then begin
+            PartnersBankAccounts.FindSet();
+            repeat
+                TempPartnersBankAccounts.TransferFields(PartnersBankAccounts, true);
+                TempPartnersBankAccounts.Insert();
+            until PartnersBankAccounts.Next() = 0;
+            TempPartnersBankAccounts.FindSet();
+        end
+        else
+#endif
+        OnAllowChangeCompanyForTempBankAccounts(IsChangeCompanyAllowed, TempPartnersBankAccounts);
         if IsChangeCompanyAllowed then begin
             // Delete existing IC Bank Accounts if the syncronization points to a company with no IC Bank Accounts.
-            if not PartnersBankAccounts.ChangeCompany(ICPartner."Inbox Details") then
-                Error(FailedToChangeCompanyErr, PartnersBankAccounts.TableCaption, ICPartner.Code);
-            if not PartnersBankAccounts.ReadPermission() then
-                Error(MissingPermissionToReadTableErr, PartnersBankAccounts.TableCaption(), ICPartner.Code);
-            PartnersBankAccounts.SetRange(IntercompanyEnable, true);
-            if PartnersBankAccounts.IsEmpty() then begin
+            ICDataExchange := ICPartner."Data Exchange Type";
+            ICDataExchange.GetICPartnerBankAccount(ICPartner, TempPartnersBankAccounts);
+            TempPartnersBankAccounts.SetRange(IntercompanyEnable, true);
+            if TempPartnersBankAccounts.IsEmpty() then begin
                 Message(NoBankAccountsWithICEnableMsg, ICPartner.Code);
                 ICBankAccounts.SetRange("IC Partner Code", PartnerCode);
                 if not ICBankAccounts.IsEmpty() then
                     ICBankAccounts.DeleteAll();
                 exit;
             end;
-            PartnersBankAccounts.FindSet();
+            TempPartnersBankAccounts.FindSet();
         end;
 
         ICBankAccounts.Reset();
         repeat
-            ICBankAccounts."No." := PartnersBankAccounts."No.";
+            ICBankAccounts."No." := TempPartnersBankAccounts."No.";
             ICBankAccounts."IC Partner Code" := PartnerCode;
-            ICBankAccounts.Name := PartnersBankAccounts.Name;
-            ICBankAccounts."Bank Account No." := PartnersBankAccounts."Bank Account No.";
-            ICBankAccounts.Blocked := PartnersBankAccounts.Blocked;
-            ICBankAccounts."Currency Code" := PartnersBankAccounts."Currency Code";
-            ICBankAccounts.IBAN := PartnersBankAccounts.IBAN;
+            ICBankAccounts.Name := TempPartnersBankAccounts.Name;
+            ICBankAccounts."Bank Account No." := TempPartnersBankAccounts."Bank Account No.";
+            ICBankAccounts.Blocked := TempPartnersBankAccounts.Blocked;
+            ICBankAccounts."Currency Code" := TempPartnersBankAccounts."Currency Code";
+            ICBankAccounts.IBAN := TempPartnersBankAccounts.IBAN;
             ICBankAccounts.Insert();
-        until PartnersBankAccounts.Next() = 0;
+        until TempPartnersBankAccounts.Next() = 0;
     end;
 
     var
         FailedToFindPartnerErr: Label 'There is no partner with code %1 in the list of your intercompany partners.', Comment = '%1 = Partner code';
         SyncInboxTypeNotDatabaseErr: Label 'Syncronization is only available for partners using database as their intercompany inbox type. Partner %1 inbox type is %2', Comment = '%1 = Partner code, %2 = Partner inbox type';
         CopyInboxTypeNotDatabaseErr: Label 'Copy is only available for partners using database as their intercompany inbox type. Partner %1 inbox type is %2', Comment = '%1 = Partner code, %2 = Partner inbox type';
-        FailedToChangeCompanyErr: Label 'It was not possible to find table %1 in partner %2.', Comment = '%1 = Table caption, %2 = Partner Code';
-        MissingPermissionToReadTableErr: Label 'You do not have the necessary permissions to access table %1 of partner %2.', Comment = '%1 = Table caption, %2 = Partner Code';
         NoBankAccountsWithICEnableMsg: Label 'The bank accounts for IC Partner %1 are not set up for intercompany copying. Enable bank accounts to be copied on IC Partner %1 by visiting the bank account card and selecting Enable for Intercompany transactions.', Comment = '%1 = Partner Code';
 
+#if not CLEAN23
+    [Obsolete('Replaced by OnAllowChangeCompanyForTempICAccounts.', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAllowChangeCompanyForICAccounts(var IsChangeCompanyAllowed: Boolean; var PartnersICAccounts: Record "IC G/L Account")
     begin
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Replaced by OnAllowChangeCompanyForTempICDimensions.', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAllowChangeCompanyForICDimensions(var IsChangeCompanyAllowed: Boolean; var PartnersICDimensions: Record "IC Dimension"; var PartnersICDimensionValues: Record "IC Dimension Value")
     begin
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Replaced by OnAllowChangeCompanyForTempBankAccounts.', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAllowChangeCompanyForBankAccounts(var IsChangeCompanyAllowed: Boolean; var PartnersBankAccounts: Record "Bank Account")
+    begin
+    end;
+#endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAllowChangeCompanyForTempICAccounts(var IsChangeCompanyAllowed: Boolean; var TempPartnersICAccounts: Record "IC G/L Account" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAllowChangeCompanyForTempICDimensions(var IsChangeCompanyAllowed: Boolean; var TempPartnersICDimensions: Record "IC Dimension" temporary; var TempPartnersICDimensionValues: Record "IC Dimension Value" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAllowChangeCompanyForTempBankAccounts(var IsChangeCompanyAllowed: Boolean; var TempPartnersBankAccounts: Record "Bank Account" temporary)
     begin
     end;
 }

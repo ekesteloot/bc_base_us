@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 page 99000844 "Prod. Order Routing Tools"
 {
     AutoSplitKey = true;

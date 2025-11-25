@@ -68,9 +68,9 @@
         CDSConnectionSetupShortTitleTxt: Label 'Connect to Dataverse', MaxLength = 50;
         CDSConnectionSetupHelpTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2115257', Locked = true;
         CDSConnectionSetupDescriptionTxt: Label 'Connect to Dataverse for better insights across business applications. Data will flow between the apps for better productivity.', Comment = 'Dataverse is the name of a Microsoft Service and should not be translated';
-        AzureAdSetupTitleTxt: Label 'Set up your Azure Active Directory accounts';
-        AzureAdSetupShortTitleTxt: Label 'Set up Azure Active Directory', MaxLength = 50;
-        AzureAdSetupDescriptionTxt: Label 'Register an Azure Active Directory app so that you can use Power BI, Power Automate, Exchange, and other Azure services from on-premises.';
+        AzureAdSetupTitleTxt: Label 'Set up your Microsoft Entra accounts';
+        AzureAdSetupShortTitleTxt: Label 'Set up Microsoft Entra ID', MaxLength = 50;
+        AzureAdSetupDescriptionTxt: Label 'Register an Microsoft Entra app so that you can use Power BI, Power Automate, Exchange, and other Azure services from on-premises.';
         HelpSetupCashFlowForecastTxt: Label 'https://go.microsoft.com/fwlink/?linkid=828693', Locked = true;
         HelpSetupEmailTxt: Label 'https://go.microsoft.com/fwlink/?linkid=828689', Locked = true;
         HelpImportbusinessdataTxt: Label 'https://go.microsoft.com/fwlink/?linkid=828687', Locked = true;

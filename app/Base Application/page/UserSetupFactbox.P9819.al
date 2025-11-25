@@ -1,3 +1,5 @@
+namespace System.Security.User;
+
 page 9819 "User Setup FactBox"
 {
     Caption = 'User Setup';
@@ -42,7 +44,7 @@ page 9819 "User Setup FactBox"
 
     trigger OnOpenPage()
     begin
-        HideExternalUsers();
+        Rec.HideExternalUsers();
     end;
 }
 

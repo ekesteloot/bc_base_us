@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 5952 "Posted Service Cr. Memo Lines"
 {
     Caption = 'Posted Service Cr. Memo Lines';
@@ -148,7 +152,7 @@ page 5952 "Posted Service Cr. Memo Lines"
                     var
                         ServiceCrMemoHeader: Record "Service Cr.Memo Header";
                     begin
-                        ServiceCrMemoHeader.Get("Document No.");
+                        ServiceCrMemoHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Service Credit Memo", ServiceCrMemoHeader);
                     end;
                 }
@@ -163,7 +167,7 @@ page 5952 "Posted Service Cr. Memo Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(ItemTrackingEntries)
@@ -175,7 +179,7 @@ page 5952 "Posted Service Cr. Memo Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }

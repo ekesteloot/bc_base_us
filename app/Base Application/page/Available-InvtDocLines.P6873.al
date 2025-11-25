@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+
 page 6873 "Available - Invt. Doc. Lines"
 {
     Caption = 'Available - Invt. Doc. Lines';
@@ -8,7 +15,7 @@ page 6873 "Available - Invt. Doc. Lines"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Invt. Document Line";
-    SourceTableView = SORTING("Document Type", "Document No.", "Line No.");
+    SourceTableView = sorting("Document Type", "Document No.", "Line No.");
 
     layout
     {
@@ -212,7 +219,7 @@ page 6873 "Available - Invt. Doc. Lines"
         EntryDate: Date;
     begin
         case Rec."Document Type" of
-            "Invt. Doc. Document Type"::Shipment:
+            Rec."Document Type"::Shipment:
                 begin
                     Rec.CalcFields("Reserved Qty. Outbnd. (Base)");
                     QtyThisLine := Rec."Quantity (Base)";
@@ -221,7 +228,7 @@ page 6873 "Available - Invt. Doc. Lines"
                     Rec.TestField("Location Code", ReservEntry."Location Code");
                     LocationCode := Rec."Location Code";
                 end;
-            "Invt. Doc. Document Type"::Receipt:
+            Rec."Document Type"::Receipt:
                 begin
                     Rec.CalcFields("Reserved Qty. Inbnd. (Base)");
                     QtyThisLine := Rec."Quantity (Base)";

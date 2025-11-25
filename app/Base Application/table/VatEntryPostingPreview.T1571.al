@@ -1,3 +1,15 @@
+﻿namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 1571 "VAT Entry Posting Preview"
 {
     Caption = 'VAT Entry';
@@ -63,9 +75,9 @@ table 1571 "VAT Entry Posting Preview"
         field(12; "Bill-to/Pay-to No."; Code[20])
         {
             Caption = 'Bill-to/Pay-to No.';
-            TableRelation = IF (Type = CONST(Purchase)) Vendor
-            ELSE
-            IF (Type = CONST(Sale)) Customer;
+            TableRelation = if (Type = const(Purchase)) Vendor
+            else
+            if (Type = const(Sale)) Customer;
         }
         field(13; "EU 3-Party Trade"; Boolean)
         {
@@ -287,9 +299,9 @@ table 1571 "VAT Entry Posting Preview"
         field(53; "Ship-to/Order Address Code"; Code[10])
         {
             Caption = 'Ship-to/Order Address Code';
-            TableRelation = IF (Type = CONST(Purchase)) "Order Address".Code WHERE("Vendor No." = FIELD("Bill-to/Pay-to No."))
-            ELSE
-            IF (Type = CONST(Sale)) "Ship-to Address".Code WHERE("Customer No." = FIELD("Bill-to/Pay-to No."));
+            TableRelation = if (Type = const(Purchase)) "Order Address".Code where("Vendor No." = field("Bill-to/Pay-to No."))
+            else
+            if (Type = const(Sale)) "Ship-to Address".Code where("Customer No." = field("Bill-to/Pay-to No."));
         }
         field(54; "Document Date"; Date)
         {

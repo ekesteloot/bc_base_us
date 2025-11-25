@@ -1,15 +1,32 @@
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.AssemblyMgt.History;
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 208 "Sales - Shipment"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/Document/SalesShipment.rdlc';
     Caption = 'Sales - Shipment';
     PreviewMode = PrintLayout;
+    DefaultRenderingLayout = "SalesShipment.rdlc";
 
     dataset
     {
         dataitem("Sales Shipment Header"; "Sales Shipment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Sales Shipment';
             column(No_SalesShptHeader; "No.")
@@ -20,10 +37,10 @@ report 208 "Sales - Shipment"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -183,7 +200,7 @@ report 208 "Sales - Shipment"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Sales Shipment Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -227,9 +244,9 @@ report 208 "Sales - Shipment"
                     }
                     dataitem("Sales Shipment Line"; "Sales Shipment Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Sales Shipment Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(Description_SalesShptLine; Description)
                         {
                         }
@@ -283,7 +300,7 @@ report 208 "Sales - Shipment"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText1; DimText)
                             {
                             }
@@ -327,7 +344,7 @@ report 208 "Sales - Shipment"
                         }
                         dataitem(DisplayAsmInfo; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(PostedAsmLineItemNo; BlanksForIndent() + PostedAsmLine."No.")
                             {
                             }
@@ -404,11 +421,11 @@ report 208 "Sales - Shipment"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(BilltoCustNo_SalesShptHeader; "Sales Shipment Header"."Bill-to Customer No.")
                         {
                         }
@@ -451,7 +468,7 @@ report 208 "Sales - Shipment"
                     }
                     dataitem(ItemTrackingLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(TrackingSpecBufferNo; TempTrackingSpecBuffer."Item No.")
                         {
                         }
@@ -490,7 +507,7 @@ report 208 "Sales - Shipment"
                         }
                         dataitem(TotalItemTracking; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                            DataItemTableView = sorting(Number) where(Number = const(1));
                             column(Quantity1; TotalQty)
                             {
                             }
@@ -572,6 +589,7 @@ report 208 "Sales - Shipment"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Sales Shipment Header");
@@ -658,6 +676,17 @@ report 208 "Sales - Shipment"
         end;
     }
 
+    rendering
+    {
+        layout("SalesShipment.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/History/SalesShipment.rdlc';
+            Caption = 'Standard Sales Shipment (RDLC)';
+            Summary = 'The Standard Sales Shipment (RDLC) provides a detailed layout.';
+        }
+    }
+
     labels
     {
     }
@@ -696,9 +725,6 @@ report 208 "Sales - Shipment"
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyBankAccount: Record "Bank Account";
         CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
@@ -735,7 +761,6 @@ report 208 "Sales - Shipment"
         ShowTotal: Boolean;
         ShowGroup: Boolean;
         TotalQty: Decimal;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         DisplayAssemblyInformation: Boolean;
         AsmHeaderExists: Boolean;
@@ -767,10 +792,13 @@ report 208 "Sales - Shipment"
 
     protected var
         TempTrackingSpecBuffer: Record "Tracking Specification" temporary;
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Shpt. Note") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Shpt. Note") <> '';
     end;
 
     procedure InitializeRequest(NewNoOfCopies: Integer; NewShowInternalInfo: Boolean; NewLogInteraction: Boolean; NewShowCorrectionLines: Boolean; NewShowLotSN: Boolean; DisplayAsmInfo: Boolean)

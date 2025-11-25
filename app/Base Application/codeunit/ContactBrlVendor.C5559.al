@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.Purchases.Vendor;
+
 codeunit 5559 "Contact BRL Vendor" implements "Contact Business Relation Link"
 {
 

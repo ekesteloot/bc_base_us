@@ -1,10 +1,14 @@
-﻿codeunit 5932 "Service-Get Shipment"
+﻿namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ServiceMgt.History;
+
+codeunit 5932 "Service-Get Shipment"
 {
     TableNo = "Service Line";
 
     trigger OnRun()
     begin
-        ServiceHeader.Get("Document Type", "Document No.");
+        ServiceHeader.Get(Rec."Document Type", Rec."Document No.");
         ServiceHeader.TestField("Document Type", ServiceHeader."Document Type"::Invoice);
 
         Clear(ServiceShptLine);
@@ -85,6 +89,25 @@
             exit;
 
         ServiceShipmentLine.TestField("VAT Bus. Posting Group", ServiceHeader."VAT Bus. Posting Group");
+    end;
+
+    procedure GetServiceOrderInvoices(var TempServiceInvoiceHeader: Record "Service Invoice Header" temporary; OrderNo: Code[20])
+    var
+        ServiceInvoiceHeader: Record "Service Invoice Header";
+        ServiceInvoicesByOrder: Query "Service Invoices By Order";
+    begin
+        TempServiceInvoiceHeader.Reset();
+        TempServiceInvoiceHeader.DeleteAll();
+
+        ServiceInvoicesByOrder.SetRange(Order_No_, OrderNo);
+        ServiceInvoicesByOrder.SetFilter(Quantity, '<>0');
+        ServiceInvoicesByOrder.Open();
+
+        while ServiceInvoicesByOrder.Read() do begin
+            ServiceInvoiceHeader.Get(ServiceInvoicesByOrder.Document_No_);
+            TempServiceInvoiceHeader := ServiceInvoiceHeader;
+            TempServiceInvoiceHeader.Insert();
+        end;
     end;
 
     procedure SetServiceHeader(var ServiceHeader2: Record "Service Header")

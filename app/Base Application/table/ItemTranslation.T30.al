@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using System.Globalization;
+
 table 30 "Item Translation"
 {
     Caption = 'Item Translation';
@@ -29,7 +33,7 @@ table 30 "Item Translation"
         field(5400; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
     }
 

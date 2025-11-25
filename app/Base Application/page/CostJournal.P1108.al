@@ -1,3 +1,12 @@
+namespace Microsoft.CostAccounting.Journal;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Posting;
+using Microsoft.CostAccounting.Reports;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+
 page 1108 "Cost Journal"
 {
     ApplicationArea = CostAccounting;
@@ -101,7 +110,7 @@ page 1108 "Cost Journal"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the number of the cost center that a balancing entry for the journal line is posted to.';
                 }
-                field(LineBalance; Balance)
+                field(LineBalance; Rec.Balance)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the balance of the cost type.';
@@ -150,7 +159,7 @@ page 1108 "Cost Journal"
                     group(Control27)
                     {
                         Caption = 'Balance';
-                        field(Balance; LineBalance + Balance - xRec.Balance)
+                        field(Balance; LineBalance + Rec.Balance - xRec.Balance)
                         {
                             ApplicationArea = CostAccounting;
                             Caption = 'Balance';
@@ -162,7 +171,7 @@ page 1108 "Cost Journal"
                     group("Total Balance")
                     {
                         Caption = 'Total Balance';
-                        field(TotalBalance; TotalBalance + Balance - xRec.Balance)
+                        field(TotalBalance; TotalBalance + Rec.Balance - xRec.Balance)
                         {
                             ApplicationArea = CostAccounting;
                             Caption = 'Total Balance';
@@ -195,7 +204,7 @@ page 1108 "Cost Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"CA Jnl.-Post", Rec);
-                        CostJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CostJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -208,8 +217,8 @@ page 1108 "Cost Journal"
 
                     trigger OnAction()
                     begin
-                        SetRange("Journal Template Name", "Journal Template Name");
-                        SetRange("Journal Batch Name", "Journal Batch Name");
+                        Rec.SetRange("Journal Template Name", Rec."Journal Template Name");
+                        Rec.SetRange("Journal Batch Name", Rec."Journal Batch Name");
                         REPORT.Run(REPORT::"Cost Acctg. Journal", true, false, Rec);
                     end;
                 }
@@ -224,7 +233,7 @@ page 1108 "Cost Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"CA Jnl.-Post+Print", Rec);
-                        CostJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CostJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -245,7 +254,7 @@ page 1108 "Cost Journal"
                     var
                         ODataUtility: Codeunit ODataUtility;
                     begin
-                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption, CurrPage.ObjectId(false), "Journal Batch Name", "Journal Template Name");
+                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption, CurrPage.ObjectId(false), Rec."Journal Batch Name", Rec."Journal Template Name");
                     end;
                 }
             }
@@ -303,7 +312,7 @@ page 1108 "Cost Journal"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
         xRec := Rec;
         UpdateLineBalance();
     end;
@@ -317,8 +326,8 @@ page 1108 "Cost Journal"
         if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
             exit;
 
-        if IsOpenedFromBatch() then begin
-            CostJnlBatchName := "Journal Batch Name";
+        if Rec.IsOpenedFromBatch() then begin
+            CostJnlBatchName := Rec."Journal Batch Name";
             CostJnlMgt.OpenJnl(CostJnlBatchName, Rec);
             exit;
         end;
@@ -339,9 +348,7 @@ page 1108 "Cost Journal"
         TotalBalance: Decimal;
         ShowBalance: Boolean;
         ShowTotalBalance: Boolean;
-        [InDataSet]
         BalanceVisible: Boolean;
-        [InDataSet]
         TotalBalanceVisible: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
 
@@ -353,12 +360,12 @@ page 1108 "Cost Journal"
         TotalBalanceVisible := ShowTotalBalance;
 
         // Cost type and bal. Cost Type
-        if CostType.Get("Cost Type No.") then
+        if CostType.Get(Rec."Cost Type No.") then
             CostTypeName := CostType.Name
         else
             CostTypeName := '';
 
-        if CostType.Get("Bal. Cost Type No.") then
+        if CostType.Get(Rec."Bal. Cost Type No.") then
             BalCostTypeName := CostType.Name
         else
             BalCostTypeName := '';

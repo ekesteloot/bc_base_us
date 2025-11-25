@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ServiceMgt.Email;
+
 codeunit 5915 "Customer-Notify by Email"
 {
     TableNo = "Service Header";
@@ -47,7 +51,6 @@ codeunit 5915 "Customer-Notify by Email"
           Text002,
           ServHeader."No.", ServHeader.Status);
     end;
-
 
     [IntegrationEvent(false, false)]
     local procedure OnGetEmailForNotifyByEMailWhenServiceIsDone(ServiceHeader: Record "Service Header"; var EmailAddress: Text[80])

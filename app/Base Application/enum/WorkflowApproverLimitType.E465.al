@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 enum 465 "Workflow Approver Limit Type"
 {
     Extensible = true;

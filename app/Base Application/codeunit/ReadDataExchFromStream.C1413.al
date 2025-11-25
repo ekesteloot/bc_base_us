@@ -12,9 +12,9 @@ codeunit 1413 "Read Data Exch. from Stream"
         OnGetDataExchFileContentEvent(Rec, TempBlob, EventHandled);
 
         if EventHandled then begin
-            "File Name" := 'Data Stream';
+            Rec."File Name" := 'Data Stream';
             RecordRef.GetTable(Rec);
-            TempBlob.ToRecordRef(RecordRef, FieldNo("File Content"));
+            TempBlob.ToRecordRef(RecordRef, Rec.FieldNo("File Content"));
             RecordRef.SetTable(Rec);
         end;
     end;

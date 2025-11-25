@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
 page 230 "Res. Gr. Statistics"
 {
     Caption = 'Res. Gr. Statistics';
@@ -497,24 +499,24 @@ page 230 "Res. Gr. Statistics"
         Clear(TotalUsageUnits);
 
         for i := 1 to 4 do begin
-            SetFilter("Date Filter", ResGrDateFilter[i]);
-            SetRange("Chargeable Filter");
-            CalcFields(Capacity, "Usage (Cost)", "Sales (Price)");
+            Rec.SetFilter("Date Filter", ResGrDateFilter[i]);
+            Rec.SetRange("Chargeable Filter");
+            Rec.CalcFields(Capacity, "Usage (Cost)", "Sales (Price)");
 
-            ResGrCapacity[i] := Capacity;
-            ResGrUsageCost[i] := "Usage (Cost)";
-            UnitPrice[i] := "Sales (Price)";
+            ResGrCapacity[i] := Rec.Capacity;
+            ResGrUsageCost[i] := Rec."Usage (Cost)";
+            UnitPrice[i] := Rec."Sales (Price)";
 
             for j := 1 to 2 do begin
                 if j = 1 then
                     Chargeable := false
                 else
                     Chargeable := true;
-                SetRange("Chargeable Filter", Chargeable);
-                CalcFields("Usage (Qty.)", "Usage (Price)");
-                ResGrUsageUnits[i] [j] := "Usage (Qty.)";
-                ResGrUsagePrice[i] [j] := "Usage (Price)";
-                TotalUsageUnits[i] := TotalUsageUnits[i] + "Usage (Qty.)";
+                Rec.SetRange("Chargeable Filter", Chargeable);
+                Rec.CalcFields("Usage (Qty.)", "Usage (Price)");
+                ResGrUsageUnits[i] [j] := Rec."Usage (Qty.)";
+                ResGrUsagePrice[i] [j] := Rec."Usage (Price)";
+                TotalUsageUnits[i] := TotalUsageUnits[i] + Rec."Usage (Qty.)";
             end;
 
             UnusedCapacity[i] := ResGrCapacity[i] - TotalUsageUnits[i];
@@ -524,8 +526,8 @@ page 230 "Res. Gr. Statistics"
             ResGrProfitPct[i] := CalcPercentage(Profit[i], UnitPrice[i]);
         end;
 
-        SetRange("Date Filter");
-        SetRange("Chargeable Filter");
+        Rec.SetRange("Date Filter");
+        Rec.SetRange("Chargeable Filter");
     end;
 
     var

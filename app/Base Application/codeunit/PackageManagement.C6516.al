@@ -1,3 +1,25 @@
+﻿namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ServiceMgt.Posting;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Availability;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+using System.Environment.Configuration;
+
 codeunit 6516 "Package Management"
 {
 
@@ -1776,10 +1798,10 @@ codeunit 6516 "Package Management"
                     (ReservEntry2."Source Subtype" <> WarehouseActivityLine."Source Subtype") or
                     (ReservEntry2."Source ID" <> WarehouseActivityLine."Source No.") or
                     (((ReservEntry2."Source Ref. No." <> WarehouseActivityLine."Source Line No.") and
-                        (ReservEntry2."Source Type" <> DATABASE::"Prod. Order Component")) or
+                        (ReservEntry2."Source Type" <> Enum::TableID::"Prod. Order Component".AsInteger())) or
                         (((ReservEntry2."Source Prod. Order Line" <> WarehouseActivityLine."Source Line No.") or
                         (ReservEntry2."Source Ref. No." <> WarehouseActivityLine."Source Subline No.")) and
-                        (ReservEntry2."Source Type" = DATABASE::"Prod. Order Component"))))
+                        (ReservEntry2."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger()))))
                     and (ReservEntry2."Package No." = '') then
                     AvailQtyFromOtherResvLines := AvailQtyFromOtherResvLines + Abs(ReservEntry2."Quantity (Base)");
             until ReservEntry.Next() = 0;
@@ -1791,20 +1813,6 @@ codeunit 6516 "Package Management"
                 WarehouseActivityLine."Variant Code", TempWhseActivLine)) < WarehouseActivityLine."Qty. to Handle (Base)"
         then
             Error(InventoryNotAvailableErr, WarehouseActivityLine.FieldCaption("Package No."), ItemTrkgCode);
-    end;
-
-    // CalculateInventory.Report.al
-
-    [EventSubscriber(ObjectType::Report, Report::"Calculate Inventory", 'OnCalcWhseQtyOnAfterLotRequiredWhseEntryClearFilters', '', false, false)]
-    local procedure CalculateInventoryOnCalcWhseQtyOnAfterLotRequiredWhseEntryClearFilters(var WarehouseEntry: Record "Warehouse Entry")
-    begin
-        WarehouseEntry.SetRange("Package No.");
-    end;
-
-    [EventSubscriber(ObjectType::Report, Report::"Calculate Inventory", 'OnCalcWhseQtyOnAfterLotRequiredWhseEntrySetFilters', '', false, false)]
-    local procedure CalculateInventoryOnCalcWhseQtyOnAfterLotRequiredWhseEntrySetFilters(var WarehouseEntry: Record "Warehouse Entry")
-    begin
-        WarehouseEntry.SetRange("Package No.", WarehouseEntry."Package No.");
     end;
 
     // ServItemTrackingRsrvMgt.Codeunit.al

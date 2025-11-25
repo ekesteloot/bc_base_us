@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+
 page 5649 "Total Value Insured"
 {
     Caption = 'Total Value Insured';
@@ -61,11 +67,11 @@ page 5649 "Total Value Insured"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CurrPage.TotalValue.PAGE.CreateTotalValue("No.");
+        CurrPage.TotalValue.PAGE.CreateTotalValue(Rec."No.");
         FASetup.Get();
         FADeprBook.Init();
         if FASetup."Insurance Depr. Book" <> '' then
-            if FADeprBook.Get("No.", FASetup."Insurance Depr. Book") then
+            if FADeprBook.Get(Rec."No.", FASetup."Insurance Depr. Book") then
                 FADeprBook.CalcFields("Acquisition Cost");
     end;
 

@@ -1,4 +1,31 @@
-﻿table 179 "Reversal Entry"
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Reversal;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.Statement;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Security.User;
+using System.Utilities;
+
+table 179 "Reversal Entry"
 {
     Caption = 'Reversal Entry';
     PasteIsValid = false;
@@ -16,21 +43,21 @@
         field(3; "Entry No."; Integer)
         {
             Caption = 'Entry No.';
-            TableRelation = IF ("Entry Type" = CONST("G/L Account")) "G/L Entry"
-            ELSE
-            IF ("Entry Type" = CONST(Customer)) "Cust. Ledger Entry"
-            ELSE
-            IF ("Entry Type" = CONST(Vendor)) "Vendor Ledger Entry"
-            ELSE
-            IF ("Entry Type" = CONST("Bank Account")) "Bank Account Ledger Entry"
-            ELSE
-            IF ("Entry Type" = CONST("Fixed Asset")) "FA Ledger Entry"
-            ELSE
-            IF ("Entry Type" = CONST(Maintenance)) "Maintenance Ledger Entry"
-            ELSE
-            IF ("Entry Type" = CONST(VAT)) "VAT Entry"
-            ELSE
-            IF ("Entry Type" = CONST(Employee)) "Employee Ledger Entry";
+            TableRelation = if ("Entry Type" = const("G/L Account")) "G/L Entry"
+            else
+            if ("Entry Type" = const(Customer)) "Cust. Ledger Entry"
+            else
+            if ("Entry Type" = const(Vendor)) "Vendor Ledger Entry"
+            else
+            if ("Entry Type" = const("Bank Account")) "Bank Account Ledger Entry"
+            else
+            if ("Entry Type" = const("Fixed Asset")) "FA Ledger Entry"
+            else
+            if ("Entry Type" = const(Maintenance)) "Maintenance Ledger Entry"
+            else
+            if ("Entry Type" = const(VAT)) "VAT Entry"
+            else
+            if ("Entry Type" = const(Employee)) "Employee Ledger Entry";
         }
         field(4; "G/L Register No."; Integer)
         {
@@ -57,15 +84,15 @@
         field(9; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Source Type" = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF ("Source Type" = CONST(Employee)) Employee;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor
+            else
+            if ("Source Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Source Type" = const("Fixed Asset")) "Fixed Asset"
+            else
+            if ("Source Type" = const(Employee)) Employee;
         }
         field(10; "Currency Code"; Code[10])
         {
@@ -78,19 +105,19 @@
         }
         field(12; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
         }
         field(13; "Debit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Debit Amount';
         }
         field(14; "Credit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Credit Amount';
         }
@@ -141,15 +168,15 @@
         field(26; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Bal. Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Fixed Asset")) "Fixed Asset";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const(Customer)) Customer
+            else
+            if ("Bal. Account Type" = const(Vendor)) Vendor
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset";
         }
         field(27; "FA Posting Category"; Option)
         {
@@ -196,18 +223,19 @@
     }
 
     var
-        GLEntry: Record "G/L Entry";
-        CustLedgEntry: Record "Cust. Ledger Entry";
-        VendLedgEntry: Record "Vendor Ledger Entry";
-        EmployeeLedgerEntry: Record "Employee Ledger Entry";
-        BankAccLedgEntry: Record "Bank Account Ledger Entry";
+        GlobalGLEntry: Record "G/L Entry";
+        GlobalCustLedgerEntry: Record "Cust. Ledger Entry";
+        GlobalVendorLedgerEntry: Record "Vendor Ledger Entry";
+        GlobalEmployeeLedgerEntry: Record "Employee Ledger Entry";
+        GlobalBankAccountLedgerEntry: Record "Bank Account Ledger Entry";
         BankAccountStatement: Record "Bank Account Statement";
-        VATEntry: Record "VAT Entry";
-        FALedgEntry: Record "FA Ledger Entry";
-        MaintenanceLedgEntry: Record "Maintenance Ledger Entry";
-        GLReg: Record "G/L Register";
-        FAReg: Record "FA Register";
+        GlobalVATEntry: Record "VAT Entry";
+        GlobalFALedgerEntry: Record "FA Ledger Entry";
+        GlobalMaintenanceLedgerEntry: Record "Maintenance Ledger Entry";
+        GlobalGLRegister: Record "G/L Register";
+        GlobalFARegister: Record "FA Register";
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
+        JnlTemplName: Code[10];
 
         Text000: Label 'You cannot reverse %1 No. %2 because the entry is either applied to an entry or has been changed by a batch job.';
         Text001: Label 'You cannot reverse %1 No. %2 because the posting date is not within the allowed posting period.';
@@ -222,7 +250,6 @@
         Text010: Label 'You cannot reverse %1 No. %2 because the register has already been involved in a reversal.';
         Text011: Label 'You cannot reverse %1 No. %2 because the entry has already been involved in a reversal.';
         PostedAndAppliedSameTransactionErr: Label 'You cannot reverse register number %1 because it contains customer or vendor or employee ledger entries that have been posted and applied in the same transaction.\\You must reverse each transaction in register number %1 separately.', Comment = '%1="G/L Register No."';
-        Text013: Label 'You cannot reverse %1 No. %2 because the entry has an associated Realized Gain/Loss entry.';
         UnrealizedVATReverseErr: Label 'You cannot reverse %1 No. %2 because the entry has an associated Unrealized VAT Entry.';
         CaptionTxt: Label '%1 %2 %3', Locked = true;
 
@@ -276,9 +303,9 @@
         OnAfterReverseEntries(Number, RevType, HideDialog);
     end;
 
-    local procedure InsertReversalEntry(Number: Integer; RevType: Option Transaction,Register)
+    protected procedure InsertReversalEntry(Number: Integer; RevType: Option Transaction,Register)
     var
-        TempRevertTransactionNo: Record "Integer" temporary;
+        TempTransactionNoInteger: Record "Integer" temporary;
         NextLineNo: Integer;
         IsHandled: Boolean;
     begin
@@ -290,130 +317,130 @@
         GLSetup.Get();
         TempReversalEntry.DeleteAll();
         NextLineNo := 1;
-        TempRevertTransactionNo.Number := Number;
-        TempRevertTransactionNo.Insert();
+        TempTransactionNoInteger.Number := Number;
+        TempTransactionNoInteger.Insert();
         SetReverseFilter(Number, RevType);
 
-        InsertFromCustLedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo);
-        InsertFromVendLedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo);
-        InsertFromEmplLedgerEntry(TempRevertTransactionNo, Number, RevType, NextLineNo);
-        InsertFromBankAccLedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo);
-        InsertFromFALedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo);
-        InsertFromMaintenanceLedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo);
-        InsertFromVATEntry(TempRevertTransactionNo, Number, RevType, NextLineNo);
-        InsertFromGLEntry(TempRevertTransactionNo, Number, RevType, NextLineNo);
-        OnAfterInsertReversalEntry(TempRevertTransactionNo, Number, RevType, NextLineNo, TempReversalEntry);
+        InsertFromCustLedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo);
+        InsertFromVendLedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo);
+        InsertFromEmplLedgerEntry(TempTransactionNoInteger, Number, RevType, NextLineNo);
+        InsertFromBankAccLedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo);
+        InsertFromFALedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo);
+        InsertFromMaintenanceLedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo);
+        InsertFromVATEntry(TempTransactionNoInteger, Number, RevType, NextLineNo);
+        InsertFromGLEntry(TempTransactionNoInteger, Number, RevType, NextLineNo);
+        OnAfterInsertReversalEntry(TempTransactionNoInteger, Number, RevType, NextLineNo, TempReversalEntry);
         if TempReversalEntry.Find('-') then;
     end;
 
     procedure CheckEntries()
     var
-        GLAcc: Record "G/L Account";
-        DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
-        DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
+        GLAccount: Record "G/L Account";
+        DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+        DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry";
         DetailedEmployeeLedgerEntry: Record "Detailed Employee Ledger Entry";
-        DateComprReg: Record "Date Compr. Register";
+        DateComprRegister: Record "Date Compr. Register";
         BalanceCheckAmount: Decimal;
         BalanceCheckAddCurrAmount: Decimal;
         SkipCheck: Boolean;
     begin
-        DtldCustLedgEntry.LockTable();
-        DtldVendLedgEntry.LockTable();
+        DetailedCustLedgEntry.LockTable();
+        DetailedVendorLedgEntry.LockTable();
         DetailedEmployeeLedgerEntry.LockTable();
-        GLEntry.LockTable();
-        CustLedgEntry.LockTable();
-        VendLedgEntry.LockTable();
-        EmployeeLedgerEntry.LockTable();
-        BankAccLedgEntry.LockTable();
-        FALedgEntry.LockTable();
-        MaintenanceLedgEntry.LockTable();
-        VATEntry.LockTable();
-        GLReg.LockTable();
-        FAReg.LockTable();
+        GlobalGLEntry.LockTable();
+        GlobalCustLedgerEntry.LockTable();
+        GlobalVendorLedgerEntry.LockTable();
+        GlobalEmployeeLedgerEntry.LockTable();
+        GlobalBankAccountLedgerEntry.LockTable();
+        GlobalFALedgerEntry.LockTable();
+        GlobalMaintenanceLedgerEntry.LockTable();
+        GlobalVATEntry.LockTable();
+        GlobalGLRegister.LockTable();
+        GlobalFARegister.LockTable();
         GLSetup.Get();
         MaxPostingDate := 0D;
 
         SkipCheck := false;
         OnBeforeCheckEntries(Rec, DATABASE::"G/L Entry", SkipCheck);
         if not SkipCheck then begin
-            if GLEntry.IsEmpty() then
-                Error(CannotReverseDeletedErr, GLEntry.TableCaption(), GLAcc.TableCaption());
-            if GLEntry.Find('-') then begin
+            if GlobalGLEntry.IsEmpty() then
+                Error(CannotReverseDeletedErr, GlobalGLEntry.TableCaption(), GLAccount.TableCaption());
+            if GlobalGLEntry.Find('-') then begin
                 CheckGLEntry();
                 repeat
-                    CheckGLAcc(GLEntry, BalanceCheckAmount, BalanceCheckAddCurrAmount);
-                until GLEntry.Next() = 0;
+                    CheckGLAcc(GlobalGLEntry, BalanceCheckAmount, BalanceCheckAddCurrAmount);
+                until GlobalGLEntry.Next() = 0;
             end;
             if (BalanceCheckAmount <> 0) or (BalanceCheckAddCurrAmount <> 0) then
                 Error(Text002);
         end;
 
-        if CustLedgEntry.Find('-') then begin
+        if GlobalCustLedgerEntry.Find('-') then begin
             SkipCheck := false;
             OnBeforeCheckEntries(Rec, DATABASE::"Cust. Ledger Entry", SkipCheck);
             if not SkipCheck then
                 repeat
-                    CheckCust(CustLedgEntry);
-                until CustLedgEntry.Next() = 0;
+                    CheckCust(GlobalCustLedgerEntry);
+                until GlobalCustLedgerEntry.Next() = 0;
         end;
 
-        if VendLedgEntry.Find('-') then begin
+        if GlobalVendorLedgerEntry.Find('-') then begin
             SkipCheck := false;
             OnBeforeCheckEntries(Rec, DATABASE::"Vendor Ledger Entry", SkipCheck);
             if not SkipCheck then
                 repeat
-                    CheckVend(VendLedgEntry);
-                until VendLedgEntry.Next() = 0;
+                    CheckVend(GlobalVendorLedgerEntry);
+                until GlobalVendorLedgerEntry.Next() = 0;
         end;
 
-        if EmployeeLedgerEntry.FindSet() then begin
+        if GlobalEmployeeLedgerEntry.FindSet() then begin
             SkipCheck := false;
             OnBeforeCheckEntries(Rec, DATABASE::"Employee Ledger Entry", SkipCheck);
             if not SkipCheck then
                 repeat
-                    CheckEmpl(EmployeeLedgerEntry);
-                until EmployeeLedgerEntry.Next() = 0;
+                    CheckEmpl(GlobalEmployeeLedgerEntry);
+                until GlobalEmployeeLedgerEntry.Next() = 0;
         end;
 
-        if BankAccLedgEntry.Find('-') then begin
+        if GlobalBankAccountLedgerEntry.Find('-') then begin
             SkipCheck := false;
             OnBeforeCheckEntries(Rec, DATABASE::"Bank Account Ledger Entry", SkipCheck);
             if not SkipCheck then
                 repeat
-                    CheckBankAcc(BankAccLedgEntry);
-                until BankAccLedgEntry.Next() = 0;
+                    CheckBankAcc(GlobalBankAccountLedgerEntry);
+                until GlobalBankAccountLedgerEntry.Next() = 0;
         end;
 
-        if FALedgEntry.Find('-') then begin
+        if GlobalFALedgerEntry.Find('-') then begin
             SkipCheck := false;
             OnBeforeCheckEntries(Rec, DATABASE::"FA Ledger Entry", SkipCheck);
             if not SkipCheck then
                 repeat
-                    CheckFA(FALedgEntry);
-                until FALedgEntry.Next() = 0;
+                    CheckFA(GlobalFALedgerEntry);
+                until GlobalFALedgerEntry.Next() = 0;
         end;
 
-        if MaintenanceLedgEntry.Find('-') then begin
+        if GlobalMaintenanceLedgerEntry.Find('-') then begin
             SkipCheck := false;
             OnBeforeCheckEntries(Rec, DATABASE::"Maintenance Ledger Entry", SkipCheck);
             if not SkipCheck then
                 repeat
-                    CheckMaintenance(MaintenanceLedgEntry);
-                until MaintenanceLedgEntry.Next() = 0;
+                    CheckMaintenance(GlobalMaintenanceLedgerEntry);
+                until GlobalMaintenanceLedgerEntry.Next() = 0;
         end;
 
-        if VATEntry.Find('-') then begin
+        if GlobalVATEntry.Find('-') then begin
             SkipCheck := false;
             OnBeforeCheckEntries(Rec, DATABASE::"VAT Entry", SkipCheck);
             if not SkipCheck then
                 repeat
-                    CheckVAT(VATEntry);
-                until VATEntry.Next() = 0;
+                    CheckVAT(GlobalVATEntry);
+                until GlobalVATEntry.Next() = 0;
         end;
 
         OnAfterCheckEntries(MaxPostingDate, Rec);
 
-        DateComprReg.CheckMaxDateCompressed(MaxPostingDate, 1);
+        DateComprRegister.CheckMaxDateCompressed(MaxPostingDate, 1);
     end;
 
     local procedure CheckGLEntry()
@@ -422,15 +449,15 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckGLEntry(Rec, GLEntry, IsHandled);
+        OnBeforeCheckGLEntry(Rec, GlobalGLEntry, IsHandled);
         if IsHandled then
             exit;
 
-        if GLEntry."Journal Batch Name" <> '' then
+        if GlobalGLEntry."Journal Batch Name" <> '' then
             exit;
 
         SourceCodeSetup.Get();
-        if GLEntry."Source Code" = SourceCodeSetup."Payment Reconciliation Journal" then
+        if GlobalGLEntry."Source Code" = SourceCodeSetup."Payment Reconciliation Journal" then
             exit;
 
         TestFieldError();
@@ -438,17 +465,18 @@
 
     local procedure CheckGLAcc(GLEntry: Record "G/L Entry"; var BalanceCheckAmount: Decimal; var BalanceCheckAddCurrAmount: Decimal)
     var
-        GLAcc: Record "G/L Account";
+        GLAccount: Record "G/L Account";
         IsHandled: Boolean;
     begin
         OnBeforeCheckGLAcc(GLEntry);
 
-        GLAcc.Get(GLEntry."G/L Account No.");
+        GLAccount.Get(GLEntry."G/L Account No.");
+        JnlTemplName := GLEntry."Journal Templ. Name";
         CheckPostingDate(GLEntry."Posting Date", GLEntry.TableCaption(), GLEntry."Entry No.");
         IsHandled := false;
-        OnCheckGLAccOnBeforeTestFields(GLAcc, GLEntry, IsHandled);
+        OnCheckGLAccOnBeforeTestFields(GLAccount, GLEntry, IsHandled);
         if not IsHandled then begin
-            GLAcc.TestField(Blocked, false);
+            GLAccount.TestField(Blocked, false);
             GLEntry.TestField("Job No.", '');
         end;
         if GLEntry.Reversed then
@@ -457,41 +485,41 @@
         if GLSetup."Additional Reporting Currency" <> '' then
             BalanceCheckAddCurrAmount := BalanceCheckAddCurrAmount + GLEntry."Additional-Currency Amount";
 
-        OnAfterCheckGLAcc(GLAcc, GLEntry);
+        OnAfterCheckGLAcc(GLAccount, GLEntry);
     end;
 
-    local procedure CheckCust(CustLedgEntry: Record "Cust. Ledger Entry")
+    local procedure CheckCust(CustLedgerEntry: Record "Cust. Ledger Entry")
     var
-        Cust: Record Customer;
+        Customer: Record Customer;
     begin
-        OnBeforeCheckCust(CustLedgEntry);
+        OnBeforeCheckCust(CustLedgerEntry);
 
-        Cust.Get(CustLedgEntry."Customer No.");
-        CheckPostingDate(
-          CustLedgEntry."Posting Date", CustLedgEntry.TableCaption(), CustLedgEntry."Entry No.");
-        Cust.CheckBlockedCustOnJnls(Cust, CustLedgEntry."Document Type", false);
-        if CustLedgEntry.Reversed then
-            AlreadyReversedEntry(CustLedgEntry.TableCaption(), CustLedgEntry."Entry No.");
-        CheckDtldCustLedgEntry(CustLedgEntry);
+        Customer.Get(CustLedgerEntry."Customer No.");
+        JnlTemplName := CustLedgerEntry."Journal Templ. Name";
+        CheckPostingDate(CustLedgerEntry."Posting Date", CustLedgerEntry.TableCaption(), CustLedgerEntry."Entry No.");
+        Customer.CheckBlockedCustOnJnls(Customer, CustLedgerEntry."Document Type", false);
+        if CustLedgerEntry.Reversed then
+            AlreadyReversedEntry(CustLedgerEntry.TableCaption(), CustLedgerEntry."Entry No.");
+        CheckDtldCustLedgEntry(CustLedgerEntry);
 
-        OnAfterCheckCust(Cust, CustLedgEntry);
+        OnAfterCheckCust(Customer, CustLedgerEntry);
     end;
 
-    local procedure CheckVend(VendLedgEntry: Record "Vendor Ledger Entry")
+    local procedure CheckVend(VendorLedgerEntry: Record "Vendor Ledger Entry")
     var
-        Vend: Record Vendor;
+        Vendor: Record Vendor;
     begin
-        OnBeforeCheckVend(VendLedgEntry);
+        OnBeforeCheckVend(VendorLedgerEntry);
 
-        Vend.Get(VendLedgEntry."Vendor No.");
-        CheckPostingDate(
-          VendLedgEntry."Posting Date", VendLedgEntry.TableCaption(), VendLedgEntry."Entry No.");
-        Vend.CheckBlockedVendOnJnls(Vend, VendLedgEntry."Document Type", false);
-        if VendLedgEntry.Reversed then
-            AlreadyReversedEntry(VendLedgEntry.TableCaption(), VendLedgEntry."Entry No.");
-        CheckDtldVendLedgEntry(VendLedgEntry);
+        Vendor.Get(VendorLedgerEntry."Vendor No.");
+        JnlTemplName := VendorLedgerEntry."Journal Templ. Name";
+        CheckPostingDate(VendorLedgerEntry."Posting Date", VendorLedgerEntry.TableCaption(), VendorLedgerEntry."Entry No.");
+        Vendor.CheckBlockedVendOnJnls(Vendor, VendorLedgerEntry."Document Type", false);
+        if VendorLedgerEntry.Reversed then
+            AlreadyReversedEntry(VendorLedgerEntry.TableCaption(), VendorLedgerEntry."Entry No.");
+        CheckDtldVendLedgEntry(VendorLedgerEntry);
 
-        OnAfterCheckVend(Vend, VendLedgEntry);
+        OnAfterCheckVend(Vendor, VendorLedgerEntry);
     end;
 
     local procedure CheckEmpl(EmployeeLedgerEntry2: Record "Employee Ledger Entry")
@@ -500,8 +528,8 @@
     begin
         OnBeforeCheckEmpl(EmployeeLedgerEntry2);
         Employee.Get(EmployeeLedgerEntry2."Employee No.");
-        CheckPostingDate(
-          EmployeeLedgerEntry2."Posting Date", EmployeeLedgerEntry2.TableCaption(), EmployeeLedgerEntry2."Entry No.");
+        JnlTemplName := EmployeeLedgerEntry2."Journal Templ. Name";
+        CheckPostingDate(EmployeeLedgerEntry2."Posting Date", EmployeeLedgerEntry2.TableCaption(), EmployeeLedgerEntry2."Entry No.");
         Employee.CheckBlockedEmployeeOnJnls(false);
         if EmployeeLedgerEntry2.Reversed then
             AlreadyReversedEntry(EmployeeLedgerEntry2.TableCaption(), EmployeeLedgerEntry2."Entry No.");
@@ -510,87 +538,83 @@
         OnAfterCheckEmpl(Employee, EmployeeLedgerEntry2);
     end;
 
-    local procedure CheckBankAcc(BankAccLedgEntry: Record "Bank Account Ledger Entry")
+    local procedure CheckBankAcc(BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
     var
-        BankAcc: Record "Bank Account";
-        CheckLedgEntry: Record "Check Ledger Entry";
+        BankAccount: Record "Bank Account";
+        CheckLedgerEntry: Record "Check Ledger Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckBankAcc(BankAccLedgEntry, IsHandled);
+        OnBeforeCheckBankAcc(BankAccountLedgerEntry, IsHandled);
         if IsHandled then
             exit;
 
-        BankAcc.Get(BankAccLedgEntry."Bank Account No.");
-        CheckPostingDate(
-          BankAccLedgEntry."Posting Date", BankAccLedgEntry.TableCaption(), BankAccLedgEntry."Entry No.");
-        BankAcc.TestField(Blocked, false);
-        if BankAccLedgEntry.Reversed then
-            AlreadyReversedEntry(BankAccLedgEntry.TableCaption(), BankAccLedgEntry."Entry No.");
-        if not BankAccLedgEntry.Open then
+        BankAccount.Get(BankAccountLedgerEntry."Bank Account No.");
+        JnlTemplName := BankAccountLedgerEntry."Journal Templ. Name";
+        CheckPostingDate(BankAccountLedgerEntry."Posting Date", BankAccountLedgerEntry.TableCaption(), BankAccountLedgerEntry."Entry No.");
+        BankAccount.TestField(Blocked, false);
+        if BankAccountLedgerEntry.Reversed then
+            AlreadyReversedEntry(BankAccountLedgerEntry.TableCaption(), BankAccountLedgerEntry."Entry No.");
+        if not BankAccountLedgerEntry.Open then
             Error(
-              Text006, BankAccLedgEntry.TableCaption(), BankAccLedgEntry."Entry No.");
-        if BankAccLedgEntry."Statement No." <> '' then
+              Text006, BankAccountLedgerEntry.TableCaption(), BankAccountLedgerEntry."Entry No.");
+        if BankAccountLedgerEntry."Statement No." <> '' then
             Error(
-              Text007, BankAccLedgEntry.TableCaption(), BankAccLedgEntry."Entry No.");
-        CheckLedgEntry.SetRange("Bank Account Ledger Entry No.", BankAccLedgEntry."Entry No.");
-        if not CheckLedgEntry.IsEmpty() then
+              Text007, BankAccountLedgerEntry.TableCaption(), BankAccountLedgerEntry."Entry No.");
+        CheckLedgerEntry.SetRange("Bank Account Ledger Entry No.", BankAccountLedgerEntry."Entry No.");
+        if not CheckLedgerEntry.IsEmpty() then
             Error(
-              Text003, BankAccLedgEntry.TableCaption(), BankAccLedgEntry."Entry No.");
+              Text003, BankAccountLedgerEntry.TableCaption(), BankAccountLedgerEntry."Entry No.");
 
-        OnAfterCheckBankAcc(BankAcc, BankAccLedgEntry);
+        OnAfterCheckBankAcc(BankAccount, BankAccountLedgerEntry);
     end;
 
-    local procedure CheckFA(FALedgEntry: Record "FA Ledger Entry")
+    local procedure CheckFA(FALedgerEntry: Record "FA Ledger Entry")
     var
-        FA: Record "Fixed Asset";
-        FADeprBook: Record "FA Depreciation Book";
-        DeprCalc: Codeunit "Depreciation Calculation";
+        FixedAsset: Record "Fixed Asset";
+        FADepreciationBook: Record "FA Depreciation Book";
+        DepreciationCalculation: Codeunit "Depreciation Calculation";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckFA(FALedgEntry, IsHandled);
+        OnBeforeCheckFA(FALedgerEntry, IsHandled);
         if IsHandled then
             exit;
 
-        FA.Get(FALedgEntry."FA No.");
-        CheckPostingDate(
-          FALedgEntry."Posting Date", FALedgEntry.TableCaption(), FALedgEntry."Entry No.");
-        CheckFAPostingDate(
-          FALedgEntry."FA Posting Date", FALedgEntry.TableCaption(), FALedgEntry."Entry No.");
-        FA.TestField(Blocked, false);
-        FA.TestField(Inactive, false);
-        if FALedgEntry.Reversed then
-            AlreadyReversedEntry(FALedgEntry.TableCaption(), FALedgEntry."Entry No.");
-        FALedgEntry.TestField("Depreciation Book Code");
-        FADeprBook.Get(FA."No.", FALedgEntry."Depreciation Book Code");
-        if FADeprBook."Disposal Date" <> 0D then
-            Error(Text008, DeprCalc.FAName(FA, FALedgEntry."Depreciation Book Code"));
-        FALedgEntry.TestField("G/L Entry No.");
+        FixedAsset.Get(FALedgerEntry."FA No.");
+        CheckPostingDate(FALedgerEntry."Posting Date", FALedgerEntry.TableCaption(), FALedgerEntry."Entry No.");
+        CheckFAPostingDate(FALedgerEntry."FA Posting Date", FALedgerEntry.TableCaption(), FALedgerEntry."Entry No.");
+        FixedAsset.TestField(Blocked, false);
+        FixedAsset.TestField(Inactive, false);
+        if FALedgerEntry.Reversed then
+            AlreadyReversedEntry(FALedgerEntry.TableCaption(), FALedgerEntry."Entry No.");
+        FALedgerEntry.TestField("Depreciation Book Code");
+        FADepreciationBook.Get(FixedAsset."No.", FALedgerEntry."Depreciation Book Code");
+        if FADepreciationBook."Disposal Date" <> 0D then
+            Error(Text008, DepreciationCalculation.FAName(FixedAsset, FALedgerEntry."Depreciation Book Code"));
+        FALedgerEntry.TestField("G/L Entry No.");
 
-        OnAfterCheckFA(FA, FALedgEntry);
+        OnAfterCheckFA(FixedAsset, FALedgerEntry);
     end;
 
-    local procedure CheckMaintenance(MaintenanceLedgEntry: Record "Maintenance Ledger Entry")
+    local procedure CheckMaintenance(MaintenanceLedgerEntry: Record "Maintenance Ledger Entry")
     var
-        FA: Record "Fixed Asset";
-        FADeprBook: Record "FA Depreciation Book";
+        FixedAsset: Record "Fixed Asset";
+        FADepreciationBook: Record "FA Depreciation Book";
     begin
-        OnBeforeCheckMaintenance(MaintenanceLedgEntry);
-        FA.Get(MaintenanceLedgEntry."FA No.");
-        CheckPostingDate(
-          MaintenanceLedgEntry."Posting Date", MaintenanceLedgEntry.TableCaption(), MaintenanceLedgEntry."Entry No.");
-        CheckFAPostingDate(
-          MaintenanceLedgEntry."FA Posting Date", MaintenanceLedgEntry.TableCaption(), MaintenanceLedgEntry."Entry No.");
-        FA.TestField(Blocked, false);
-        FA.TestField(Inactive, false);
-        MaintenanceLedgEntry.TestField("Depreciation Book Code");
-        if MaintenanceLedgEntry.Reversed then
-            AlreadyReversedEntry(MaintenanceLedgEntry.TableCaption(), MaintenanceLedgEntry."Entry No.");
-        FADeprBook.Get(FA."No.", MaintenanceLedgEntry."Depreciation Book Code");
-        MaintenanceLedgEntry.TestField("G/L Entry No.");
+        OnBeforeCheckMaintenance(MaintenanceLedgerEntry);
+        FixedAsset.Get(MaintenanceLedgerEntry."FA No.");
+        CheckPostingDate(MaintenanceLedgerEntry."Posting Date", MaintenanceLedgerEntry.TableCaption(), MaintenanceLedgerEntry."Entry No.");
+        CheckFAPostingDate(MaintenanceLedgerEntry."FA Posting Date", MaintenanceLedgerEntry.TableCaption(), MaintenanceLedgerEntry."Entry No.");
+        FixedAsset.TestField(Blocked, false);
+        FixedAsset.TestField(Inactive, false);
+        MaintenanceLedgerEntry.TestField("Depreciation Book Code");
+        if MaintenanceLedgerEntry.Reversed then
+            AlreadyReversedEntry(MaintenanceLedgerEntry.TableCaption(), MaintenanceLedgerEntry."Entry No.");
+        FADepreciationBook.Get(FixedAsset."No.", MaintenanceLedgerEntry."Depreciation Book Code");
+        MaintenanceLedgerEntry.TestField("G/L Entry No.");
 
-        OnAfterCheckMaintenance(FA, MaintenanceLedgEntry);
+        OnAfterCheckMaintenance(FixedAsset, MaintenanceLedgerEntry);
     end;
 
     local procedure CheckVAT(VATEntry: Record "VAT Entry")
@@ -602,6 +626,7 @@
         if IsHandled then
             exit;
 
+        JnlTemplName := VATEntry."Journal Templ. Name";
         CheckPostingDate(VATEntry."Posting Date", VATEntry.TableCaption(), VATEntry."Entry No.");
         if VATEntry.Closed then
             Error(
@@ -614,62 +639,44 @@
         OnAfterCheckVAT(VATEntry);
     end;
 
-    local procedure CheckDtldCustLedgEntry(CustLedgEntry: Record "Cust. Ledger Entry")
+    local procedure CheckDtldCustLedgEntry(CustLedgerEntry: Record "Cust. Ledger Entry")
     var
-        DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+        DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckDtldCustLedgEntry(CustLedgEntry, IsHandled);
+        OnBeforeCheckDtldCustLedgEntry(CustLedgerEntry, IsHandled);
         if IsHandled then
             exit;
 
-        DtldCustLedgEntry.SetCurrentKey("Cust. Ledger Entry No.", "Entry Type");
-        DtldCustLedgEntry.SetRange("Cust. Ledger Entry No.", CustLedgEntry."Entry No.");
-        DtldCustLedgEntry.SetFilter("Entry Type", '<>%1', DtldCustLedgEntry."Entry Type"::"Initial Entry");
-        DtldCustLedgEntry.SetRange(Unapplied, false);
-        if not DtldCustLedgEntry.IsEmpty() then
-            Error(ReversalErrorForChangedEntry(CustLedgEntry.TableCaption(), CustLedgEntry."Entry No."));
+        DetailedCustLedgEntry.SetCurrentKey("Cust. Ledger Entry No.", "Entry Type");
+        DetailedCustLedgEntry.SetRange("Cust. Ledger Entry No.", CustLedgerEntry."Entry No.");
+        DetailedCustLedgEntry.SetFilter("Entry Type", '<>%1', DetailedCustLedgEntry."Entry Type"::"Initial Entry");
+        DetailedCustLedgEntry.SetRange(Unapplied, false);
+        if not DetailedCustLedgEntry.IsEmpty() then
+            Error(ReversalErrorForChangedEntry(CustLedgerEntry.TableCaption(), CustLedgerEntry."Entry No."));
 
-        DtldCustLedgEntry.Reset();
-        DtldCustLedgEntry.SetCurrentKey("Transaction No.", "Customer No.", "Entry Type");
-        DtldCustLedgEntry.SetRange("Transaction No.", CustLedgEntry."Transaction No.");
-        DtldCustLedgEntry.SetRange("Customer No.", CustLedgEntry."Customer No.");
-        DtldCustLedgEntry.SetFilter("Entry Type", '%1|%2',
-          DtldCustLedgEntry."Entry Type"::"Realized Gain", DtldCustLedgEntry."Entry Type"::"Realized Loss");
-        if not DtldCustLedgEntry.IsEmpty() then
-            Error(Text013, CustLedgEntry.TableCaption(), CustLedgEntry."Entry No.");
-
-        OnAfterCheckDtldCustLedgEntry(DtldCustLedgEntry, CustLedgEntry);
+        OnAfterCheckDtldCustLedgEntry(DetailedCustLedgEntry, CustLedgerEntry);
     end;
 
-    local procedure CheckDtldVendLedgEntry(VendLedgEntry: Record "Vendor Ledger Entry")
+    local procedure CheckDtldVendLedgEntry(VendorLedgerEntry: Record "Vendor Ledger Entry")
     var
-        DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
+        DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCCheckDtldVendLedgEntry(VendLedgEntry, IsHandled);
+        OnBeforeCCheckDtldVendLedgEntry(VendorLedgerEntry, IsHandled);
         if IsHandled then
             exit;
 
-        DtldVendLedgEntry.SetCurrentKey("Vendor Ledger Entry No.", "Entry Type");
-        DtldVendLedgEntry.SetRange("Vendor Ledger Entry No.", VendLedgEntry."Entry No.");
-        DtldVendLedgEntry.SetFilter("Entry Type", '<>%1', DtldVendLedgEntry."Entry Type"::"Initial Entry");
-        DtldVendLedgEntry.SetRange(Unapplied, false);
-        if not DtldVendLedgEntry.IsEmpty() then
-            Error(ReversalErrorForChangedEntry(VendLedgEntry.TableCaption(), VendLedgEntry."Entry No."));
+        DetailedVendorLedgEntry.SetCurrentKey("Vendor Ledger Entry No.", "Entry Type");
+        DetailedVendorLedgEntry.SetRange("Vendor Ledger Entry No.", VendorLedgerEntry."Entry No.");
+        DetailedVendorLedgEntry.SetFilter("Entry Type", '<>%1', DetailedVendorLedgEntry."Entry Type"::"Initial Entry");
+        DetailedVendorLedgEntry.SetRange(Unapplied, false);
+        if not DetailedVendorLedgEntry.IsEmpty() then
+            Error(ReversalErrorForChangedEntry(VendorLedgerEntry.TableCaption(), VendorLedgerEntry."Entry No."));
 
-        DtldVendLedgEntry.Reset();
-        DtldVendLedgEntry.SetCurrentKey("Transaction No.", "Vendor No.", "Entry Type");
-        DtldVendLedgEntry.SetRange("Transaction No.", VendLedgEntry."Transaction No.");
-        DtldVendLedgEntry.SetRange("Vendor No.", VendLedgEntry."Vendor No.");
-        DtldVendLedgEntry.SetFilter("Entry Type", '%1|%2',
-          DtldVendLedgEntry."Entry Type"::"Realized Gain", DtldVendLedgEntry."Entry Type"::"Realized Loss");
-        if not DtldVendLedgEntry.IsEmpty() then
-            Error(Text013, VendLedgEntry.TableCaption(), VendLedgEntry."Entry No.");
-
-        OnAfterCheckDtldVendLedgEntry(DtldVendLedgEntry, VendLedgEntry);
+        OnAfterCheckDtldVendLedgEntry(DetailedVendorLedgEntry, VendorLedgerEntry);
     end;
 
     local procedure CheckDtldEmplLedgEntry(EmployeeLedgerEntry2: Record "Employee Ledger Entry")
@@ -687,7 +694,7 @@
 
     local procedure CheckRegister(RegisterNo: Integer)
     var
-        GLReg: Record "G/L Register";
+        GLRegister: Record "G/L Register";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -695,10 +702,10 @@
         if IsHandled then
             exit;
 
-        GLReg.Get(RegisterNo);
-        if GLReg.Reversed then
-            Error(Text010, GLReg.TableCaption(), GLReg."No.");
-        if GLReg."Journal Batch Name" = '' then
+        GLRegister.Get(RegisterNo);
+        if GLRegister.Reversed then
+            Error(Text010, GLRegister.TableCaption(), GLRegister."No.");
+        if GLRegister."Journal Batch Name" = '' then
             TempReversalEntry.TestFieldError();
     end;
 
@@ -707,148 +714,147 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSetReverseFilter(Number, RevType, GLEntry, CustLedgEntry, VendLedgEntry, EmployeeLedgerEntry, BankAccLedgEntry, VATEntry, FALedgEntry, MaintenanceLedgEntry, GLReg, Rec, IsHandled);
+        OnBeforeSetReverseFilter(Number, RevType, GlobalGLEntry, GlobalCustLedgerEntry, GlobalVendorLedgerEntry, GlobalEmployeeLedgerEntry, GlobalBankAccountLedgerEntry, GlobalVATEntry, GlobalFALedgerEntry, GlobalMaintenanceLedgerEntry, GlobalGLRegister, Rec, IsHandled);
         if IsHandled then
             exit;
 
         if RevType = RevType::Transaction then begin
-            GLEntry.SetCurrentKey("Transaction No.");
-            CustLedgEntry.SetCurrentKey("Transaction No.");
-            VendLedgEntry.SetCurrentKey("Transaction No.");
-            EmployeeLedgerEntry.SetCurrentKey("Transaction No.");
-            BankAccLedgEntry.SetCurrentKey("Transaction No.");
-            FALedgEntry.SetCurrentKey("Transaction No.");
-            MaintenanceLedgEntry.SetCurrentKey("Transaction No.");
-            VATEntry.SetCurrentKey("Transaction No.");
-            GLEntry.SetRange("Transaction No.", Number);
-            CustLedgEntry.SetRange("Transaction No.", Number);
-            VendLedgEntry.SetRange("Transaction No.", Number);
-            EmployeeLedgerEntry.SetRange("Transaction No.", Number);
-            BankAccLedgEntry.SetRange("Transaction No.", Number);
-            FALedgEntry.SetRange("Transaction No.", Number);
-            FALedgEntry.SetFilter("G/L Entry No.", '<>%1', 0);
-            MaintenanceLedgEntry.SetRange("Transaction No.", Number);
-            VATEntry.SetRange("Transaction No.", Number);
+            GlobalGLEntry.SetCurrentKey("Transaction No.");
+            GlobalCustLedgerEntry.SetCurrentKey("Transaction No.");
+            GlobalVendorLedgerEntry.SetCurrentKey("Transaction No.");
+            GlobalEmployeeLedgerEntry.SetCurrentKey("Transaction No.");
+            GlobalBankAccountLedgerEntry.SetCurrentKey("Transaction No.");
+            GlobalFALedgerEntry.SetCurrentKey("Transaction No.");
+            GlobalMaintenanceLedgerEntry.SetCurrentKey("Transaction No.");
+            GlobalVATEntry.SetCurrentKey("Transaction No.");
+            GlobalGLEntry.SetRange("Transaction No.", Number);
+            GlobalCustLedgerEntry.SetRange("Transaction No.", Number);
+            GlobalVendorLedgerEntry.SetRange("Transaction No.", Number);
+            GlobalEmployeeLedgerEntry.SetRange("Transaction No.", Number);
+            GlobalBankAccountLedgerEntry.SetRange("Transaction No.", Number);
+            GlobalFALedgerEntry.SetRange("Transaction No.", Number);
+            GlobalFALedgerEntry.SetFilter("G/L Entry No.", '<>%1', 0);
+            GlobalMaintenanceLedgerEntry.SetRange("Transaction No.", Number);
+            GlobalVATEntry.SetRange("Transaction No.", Number);
         end else begin
-            GLReg.Get(Number);
-            GLEntry.SetRange("Entry No.", GLReg."From Entry No.", GLReg."To Entry No.");
-            CustLedgEntry.SetRange("Entry No.", GLReg."From Entry No.", GLReg."To Entry No.");
-            VendLedgEntry.SetRange("Entry No.", GLReg."From Entry No.", GLReg."To Entry No.");
-            EmployeeLedgerEntry.SetRange("Entry No.", GLReg."From Entry No.", GLReg."To Entry No.");
-            BankAccLedgEntry.SetRange("Entry No.", GLReg."From Entry No.", GLReg."To Entry No.");
-            FALedgEntry.SetCurrentKey("G/L Entry No.");
-            FALedgEntry.SetRange("G/L Entry No.", GLReg."From Entry No.", GLReg."To Entry No.");
-            MaintenanceLedgEntry.SetCurrentKey("G/L Entry No.");
-            MaintenanceLedgEntry.SetRange("G/L Entry No.", GLReg."From Entry No.", GLReg."To Entry No.");
-            VATEntry.SetRange("Entry No.", GLReg."From VAT Entry No.", GLReg."To VAT Entry No.");
+            GlobalGLRegister.Get(Number);
+            GlobalGLEntry.SetRange("Entry No.", GlobalGLRegister."From Entry No.", GlobalGLRegister."To Entry No.");
+            GlobalCustLedgerEntry.SetRange("Entry No.", GlobalGLRegister."From Entry No.", GlobalGLRegister."To Entry No.");
+            GlobalVendorLedgerEntry.SetRange("Entry No.", GlobalGLRegister."From Entry No.", GlobalGLRegister."To Entry No.");
+            GlobalEmployeeLedgerEntry.SetRange("Entry No.", GlobalGLRegister."From Entry No.", GlobalGLRegister."To Entry No.");
+            GlobalBankAccountLedgerEntry.SetRange("Entry No.", GlobalGLRegister."From Entry No.", GlobalGLRegister."To Entry No.");
+            GlobalFALedgerEntry.SetCurrentKey("G/L Entry No.");
+            GlobalFALedgerEntry.SetRange("G/L Entry No.", GlobalGLRegister."From Entry No.", GlobalGLRegister."To Entry No.");
+            GlobalMaintenanceLedgerEntry.SetCurrentKey("G/L Entry No.");
+            GlobalMaintenanceLedgerEntry.SetRange("G/L Entry No.", GlobalGLRegister."From Entry No.", GlobalGLRegister."To Entry No.");
+            GlobalVATEntry.SetRange("Entry No.", GlobalGLRegister."From VAT Entry No.", GlobalGLRegister."To VAT Entry No.");
         end;
 
-        OnAfterSetReverseFilter(Number, RevType, GLReg, Rec);
+        OnAfterSetReverseFilter(Number, RevType, GlobalGLRegister, Rec);
     end;
 
-    procedure CopyReverseFilters(var GLEntry2: Record "G/L Entry"; var CustLedgEntry2: Record "Cust. Ledger Entry"; var VendLedgEntry2: Record "Vendor Ledger Entry"; var BankAccLedgEntry2: Record "Bank Account Ledger Entry"; var VATEntry2: Record "VAT Entry"; var FALedgEntry2: Record "FA Ledger Entry"; var MaintenanceLedgEntry2: Record "Maintenance Ledger Entry"; var EmployeeLedgerEntry2: Record "Employee Ledger Entry")
+    procedure CopyReverseFilters(var GLEntry: Record "G/L Entry"; var CustLedgerEntry: Record "Cust. Ledger Entry"; var VendorLedgerEntry: Record "Vendor Ledger Entry"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"; var VATEntry: Record "VAT Entry"; var FALedgerEntry: Record "FA Ledger Entry"; var MaintenanceLedgerEntry: Record "Maintenance Ledger Entry"; var EmployeeLedgerEntry: Record "Employee Ledger Entry")
     begin
-        GLEntry2.Copy(GLEntry);
-        CustLedgEntry2.Copy(CustLedgEntry);
-        VendLedgEntry2.Copy(VendLedgEntry);
-        EmployeeLedgerEntry2.Copy(EmployeeLedgerEntry);
-        BankAccLedgEntry2.Copy(BankAccLedgEntry);
-        VATEntry2.Copy(VATEntry);
-        FALedgEntry2.Copy(FALedgEntry);
-        MaintenanceLedgEntry2.Copy(MaintenanceLedgEntry);
+        GLEntry.Copy(GlobalGLEntry);
+        CustLedgerEntry.Copy(GlobalCustLedgerEntry);
+        VendorLedgerEntry.Copy(GlobalVendorLedgerEntry);
+        EmployeeLedgerEntry.Copy(GlobalEmployeeLedgerEntry);
+        BankAccountLedgerEntry.Copy(GlobalBankAccountLedgerEntry);
+        VATEntry.Copy(GlobalVATEntry);
+        FALedgerEntry.Copy(GlobalFALedgerEntry);
+        MaintenanceLedgerEntry.Copy(GlobalMaintenanceLedgerEntry);
     end;
 
     procedure ShowGLEntries()
     begin
-        PAGE.Run(0, GLEntry);
+        PAGE.Run(0, GlobalGLEntry);
     end;
 
     procedure ShowCustLedgEntries()
     begin
-        PAGE.Run(0, CustLedgEntry);
+        PAGE.Run(0, GlobalCustLedgerEntry);
     end;
 
     procedure ShowVendLedgEntries()
     begin
-        PAGE.Run(0, VendLedgEntry);
+        PAGE.Run(0, GlobalVendorLedgerEntry);
     end;
 
     procedure ShowBankAccLedgEntries()
     begin
-        PAGE.Run(0, BankAccLedgEntry);
+        PAGE.Run(0, GlobalBankAccountLedgerEntry);
     end;
 
     procedure ShowFALedgEntries()
     begin
-        PAGE.Run(0, FALedgEntry);
+        PAGE.Run(0, GlobalFALedgerEntry);
     end;
 
     procedure ShowMaintenanceLedgEntries()
     begin
-        PAGE.Run(0, MaintenanceLedgEntry);
+        PAGE.Run(0, GlobalMaintenanceLedgerEntry);
     end;
 
     procedure ShowVATEntries()
     begin
-        PAGE.Run(0, VATEntry);
+        PAGE.Run(0, GlobalVATEntry);
     end;
 
     procedure Caption(): Text
     var
-        GLAcc: Record "G/L Account";
-        Cust: Record Customer;
-        Vend: Record Vendor;
+        GLAccount: Record "G/L Account";
+        Customer: Record Customer;
+        Vendor: Record Vendor;
         Employee: Record Employee;
-        BankAcc: Record "Bank Account";
-        FA: Record "Fixed Asset";
-        VATEntry: Record "VAT Entry";
+        BankAccount: Record "Bank Account";
+        FixedAsset: Record "Fixed Asset";
         NewCaption: Text;
     begin
         case "Entry Type" of
             "Entry Type"::"G/L Account":
                 begin
-                    if GLEntry.Get("Entry No.") then;
-                    if GLAcc.Get(GLEntry."G/L Account No.") then;
-                    exit(StrSubstNo(CaptionTxt, GLAcc.TableCaption(), GLAcc."No.", GLAcc.Name));
+                    if GlobalGLEntry.Get("Entry No.") then;
+                    if GLAccount.Get(GlobalGLEntry."G/L Account No.") then;
+                    exit(StrSubstNo(CaptionTxt, GLAccount.TableCaption(), GLAccount."No.", GLAccount.Name));
                 end;
             "Entry Type"::Customer:
                 begin
-                    if CustLedgEntry.Get("Entry No.") then;
-                    if Cust.Get(CustLedgEntry."Customer No.") then;
-                    exit(StrSubstNo(CaptionTxt, Cust.TableCaption(), Cust."No.", Cust.Name));
+                    if GlobalCustLedgerEntry.Get("Entry No.") then;
+                    if Customer.Get(GlobalCustLedgerEntry."Customer No.") then;
+                    exit(StrSubstNo(CaptionTxt, Customer.TableCaption(), Customer."No.", Customer.Name));
                 end;
             "Entry Type"::Vendor:
                 begin
-                    if VendLedgEntry.Get("Entry No.") then;
-                    if Vend.Get(VendLedgEntry."Vendor No.") then;
-                    exit(StrSubstNo(CaptionTxt, Vend.TableCaption(), Vend."No.", Vend.Name));
+                    if GlobalVendorLedgerEntry.Get("Entry No.") then;
+                    if Vendor.Get(GlobalVendorLedgerEntry."Vendor No.") then;
+                    exit(StrSubstNo(CaptionTxt, Vendor.TableCaption(), Vendor."No.", Vendor.Name));
                 end;
             "Entry Type"::Employee:
                 begin
-                    if EmployeeLedgerEntry.Get("Entry No.") then;
-                    if Employee.Get(EmployeeLedgerEntry."Employee No.") then;
+                    if GlobalEmployeeLedgerEntry.Get("Entry No.") then;
+                    if Employee.Get(GlobalEmployeeLedgerEntry."Employee No.") then;
                     exit(StrSubstNo(CaptionTxt, Employee.TableCaption(), Employee."No.", Employee.FullName()));
                 end;
             "Entry Type"::"Bank Account":
                 begin
-                    if BankAccLedgEntry.Get("Entry No.") then;
-                    if BankAcc.Get(BankAccLedgEntry."Bank Account No.") then;
-                    exit(StrSubstNo(CaptionTxt, BankAcc.TableCaption(), BankAcc."No.", BankAcc.Name));
+                    if GlobalBankAccountLedgerEntry.Get("Entry No.") then;
+                    if BankAccount.Get(GlobalBankAccountLedgerEntry."Bank Account No.") then;
+                    exit(StrSubstNo(CaptionTxt, BankAccount.TableCaption(), BankAccount."No.", BankAccount.Name));
                 end;
             "Entry Type"::"Fixed Asset":
                 begin
-                    if FALedgEntry.Get("Entry No.") then;
-                    if FA.Get(FALedgEntry."FA No.") then;
-                    exit(StrSubstNo(CaptionTxt, FA.TableCaption(), FA."No.", FA.Description));
+                    if GlobalFALedgerEntry.Get("Entry No.") then;
+                    if FixedAsset.Get(GlobalFALedgerEntry."FA No.") then;
+                    exit(StrSubstNo(CaptionTxt, FixedAsset.TableCaption(), FixedAsset."No.", FixedAsset.Description));
                 end;
             "Entry Type"::Maintenance:
                 begin
-                    if MaintenanceLedgEntry.Get("Entry No.") then;
-                    if FA.Get(MaintenanceLedgEntry."FA No.") then;
-                    exit(StrSubstNo(CaptionTxt, FA.TableCaption(), FA."No.", FA.Description));
+                    if GlobalMaintenanceLedgerEntry.Get("Entry No.") then;
+                    if FixedAsset.Get(GlobalMaintenanceLedgerEntry."FA No.") then;
+                    exit(StrSubstNo(CaptionTxt, FixedAsset.TableCaption(), FixedAsset."No.", FixedAsset.Description));
                 end;
             "Entry Type"::VAT:
-                exit(StrSubstNo('%1', VATEntry.TableCaption()));
+                exit(StrSubstNo('%1', GlobalVATEntry.TableCaption()));
             else begin
                 OnAfterCaption(Rec, NewCaption);
                 exit(NewCaption);
@@ -856,29 +862,29 @@
         end;
     end;
 
-    local procedure CheckPostingDate(PostingDate: Date; Caption: Text; EntryNo: Integer)
+    procedure CheckPostingDate(PostingDate: Date; TableCaption: Text; EntryNo: Integer)
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckPostingDate(PostingDate, CopyStr(Caption, 1, 50), EntryNo, IsHandled, Rec, MaxPostingDate);
+        OnBeforeCheckPostingDate(PostingDate, CopyStr(TableCaption, 1, 50), EntryNo, IsHandled, Rec, MaxPostingDate);
         if IsHandled then
             exit;
 
-        if GenJnlCheckLine.DateNotAllowed(PostingDate) then
-            Error(Text001, Caption, EntryNo);
+        if GenJnlCheckLine.DateNotAllowed(PostingDate, JnlTemplName) then
+            Error(Text001, TableCaption, EntryNo);
         if PostingDate > MaxPostingDate then
             MaxPostingDate := PostingDate;
     end;
 
-    local procedure CheckFAPostingDate(FAPostingDate: Date; Caption: Text; EntryNo: Integer)
+    procedure CheckFAPostingDate(FAPostingDate: Date; TableCaption: Text; EntryNo: Integer)
     var
         UserSetup: Record "User Setup";
         FASetup: Record "FA Setup";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckFAPostingDate(FAPostingDate, CopyStr(Caption, 1, 50), EntryNo, IsHandled, Rec, MaxPostingDate, AllowPostingFrom, AllowPostingto, xRec);
+        OnBeforeCheckFAPostingDate(FAPostingDate, CopyStr(TableCaption, 1, 50), EntryNo, IsHandled, Rec, MaxPostingDate, AllowPostingFrom, AllowPostingto, xRec);
         if IsHandled then
             exit;
 
@@ -897,7 +903,7 @@
                 AllowPostingto := 99981231D;
         end;
         if (FAPostingDate < AllowPostingFrom) or (FAPostingDate > AllowPostingto) then
-            Error(Text005, Caption, EntryNo, FALedgEntry.FieldCaption("FA Posting Date"));
+            Error(Text005, TableCaption, EntryNo, GlobalFALedgerEntry.FieldCaption("FA Posting Date"));
         if FAPostingDate > MaxPostingDate then
             MaxPostingDate := FAPostingDate;
     end;
@@ -907,9 +913,9 @@
         Error(Text004);
     end;
 
-    procedure AlreadyReversedEntry(Caption: Text; EntryNo: Integer)
+    procedure AlreadyReversedEntry(TableCaption: Text; EntryNo: Integer)
     begin
-        Error(Text011, Caption, EntryNo);
+        Error(Text011, TableCaption, EntryNo);
     end;
 
     procedure VerifyReversalEntries(var ReversalEntry2: Record "Reversal Entry"; Number: Integer; RevType: Option Transaction,Register): Boolean
@@ -960,23 +966,23 @@
         exit(StrSubstNo(UnrealizedVATReverseErr, TableCaption, EntryNo));
     end;
 
-    protected procedure InsertFromCustLedgEntry(var TempRevertTransactionNo: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
+    protected procedure InsertFromCustLedgEntry(var TempTransactionInteger: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
     var
-        Cust: Record Customer;
-        DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+        Customer: Record Customer;
+        DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
         IsHandled: Boolean;
     begin
-        DtldCustLedgEntry.SetCurrentKey("Transaction No.", "Customer No.", "Entry Type");
-        DtldCustLedgEntry.SetFilter(
-          "Entry Type", '<>%1', DtldCustLedgEntry."Entry Type"::"Initial Entry");
-        if CustLedgEntry.FindSet() then
+        DetailedCustLedgEntry.SetCurrentKey("Transaction No.", "Customer No.", "Entry Type");
+        DetailedCustLedgEntry.SetFilter(
+          "Entry Type", '<>%1', DetailedCustLedgEntry."Entry Type"::"Initial Entry");
+        if GlobalCustLedgerEntry.FindSet() then
             repeat
-                DtldCustLedgEntry.SetRange("Transaction No.", CustLedgEntry."Transaction No.");
-                DtldCustLedgEntry.SetRange("Customer No.", CustLedgEntry."Customer No.");
+                DetailedCustLedgEntry.SetRange("Transaction No.", GlobalCustLedgerEntry."Transaction No.");
+                DetailedCustLedgEntry.SetRange("Customer No.", GlobalCustLedgerEntry."Customer No.");
                 IsHandled := false;
-                OnInsertFromCustLedgEntryOnBeforeCheckSameTransaction(CustLedgEntry, DtldCustLedgEntry, IsHandled);
+                OnInsertFromCustLedgEntryOnBeforeCheckSameTransaction(GlobalCustLedgerEntry, DetailedCustLedgEntry, IsHandled);
                 if not IsHandled then
-                    if (not DtldCustLedgEntry.IsEmpty) and (RevType = RevType::Register) then
+                    if (not DetailedCustLedgEntry.IsEmpty) and (RevType = RevType::Register) then
                         Error(PostedAndAppliedSameTransactionErr, Number);
 
                 Clear(TempReversalEntry);
@@ -984,43 +990,43 @@
                     TempReversalEntry."G/L Register No." := Number;
                 TempReversalEntry."Reversal Type" := RevType;
                 TempReversalEntry."Entry Type" := TempReversalEntry."Entry Type"::Customer;
-                Cust.Get(CustLedgEntry."Customer No.");
-                TempReversalEntry."Account No." := Cust."No.";
-                TempReversalEntry."Account Name" := Cust.Name;
-                TempReversalEntry.CopyFromCustLedgEntry(CustLedgEntry);
+                Customer.Get(GlobalCustLedgerEntry."Customer No.");
+                TempReversalEntry."Account No." := Customer."No.";
+                TempReversalEntry."Account Name" := Customer.Name;
+                TempReversalEntry.CopyFromCustLedgEntry(GlobalCustLedgerEntry);
                 TempReversalEntry."Line No." := NextLineNo;
                 NextLineNo := NextLineNo + 1;
-                OnInsertFromCustLedgEntryOnBeforeTempReversalEntryInsert(TempReversalEntry, CustLedgEntry);
+                OnInsertFromCustLedgEntryOnBeforeTempReversalEntryInsert(TempReversalEntry, GlobalCustLedgerEntry);
                 TempReversalEntry.Insert();
 
-                DtldCustLedgEntry.SetRange(Unapplied, true);
-                if DtldCustLedgEntry.FindSet() then
+                DetailedCustLedgEntry.SetRange(Unapplied, true);
+                if DetailedCustLedgEntry.FindSet() then
                     repeat
-                        InsertCustTempRevertTransNo(TempRevertTransactionNo, DtldCustLedgEntry."Unapplied by Entry No.");
-                    until DtldCustLedgEntry.Next() = 0;
-                DtldCustLedgEntry.SetRange(Unapplied);
-            until CustLedgEntry.Next() = 0;
+                        InsertCustTempRevertTransNo(TempTransactionInteger, DetailedCustLedgEntry."Unapplied by Entry No.");
+                    until DetailedCustLedgEntry.Next() = 0;
+                DetailedCustLedgEntry.SetRange(Unapplied);
+            until GlobalCustLedgerEntry.Next() = 0;
 
-        OnAfterInsertFromCustLedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo, TempReversalEntry, CustLedgEntry);
+        OnAfterInsertFromCustLedgEntry(TempTransactionInteger, Number, RevType, NextLineNo, TempReversalEntry, GlobalCustLedgerEntry);
     end;
 
-    protected procedure InsertFromVendLedgEntry(var TempRevertTransactionNo: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
+    protected procedure InsertFromVendLedgEntry(var TempTransactionNoInteger: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
     var
-        Vend: Record Vendor;
-        DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
+        Vendor: Record Vendor;
+        DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry";
         IsHandled: Boolean;
     begin
-        DtldVendLedgEntry.SetCurrentKey("Transaction No.", "Vendor No.", "Entry Type");
-        DtldVendLedgEntry.SetFilter(
-          "Entry Type", '<>%1', DtldVendLedgEntry."Entry Type"::"Initial Entry");
-        if VendLedgEntry.FindSet() then
+        DetailedVendorLedgEntry.SetCurrentKey("Transaction No.", "Vendor No.", "Entry Type");
+        DetailedVendorLedgEntry.SetFilter(
+          "Entry Type", '<>%1', DetailedVendorLedgEntry."Entry Type"::"Initial Entry");
+        if GlobalVendorLedgerEntry.FindSet() then
             repeat
-                DtldVendLedgEntry.SetRange("Transaction No.", VendLedgEntry."Transaction No.");
-                DtldVendLedgEntry.SetRange("Vendor No.", VendLedgEntry."Vendor No.");
+                DetailedVendorLedgEntry.SetRange("Transaction No.", GlobalVendorLedgerEntry."Transaction No.");
+                DetailedVendorLedgEntry.SetRange("Vendor No.", GlobalVendorLedgerEntry."Vendor No.");
                 IsHandled := false;
-                OnInsertFromVendLedgEntryOnBeforeCheckSameTransaction(VendLedgEntry, DtldVendLedgEntry, IsHandled);
+                OnInsertFromVendLedgEntryOnBeforeCheckSameTransaction(GlobalVendorLedgerEntry, DetailedVendorLedgEntry, IsHandled);
                 if not IsHandled then
-                    if (not DtldVendLedgEntry.IsEmpty) and (RevType = RevType::Register) then
+                    if (not DetailedVendorLedgEntry.IsEmpty()) and (RevType = RevType::Register) then
                         Error(PostedAndAppliedSameTransactionErr, Number);
 
                 Clear(TempReversalEntry);
@@ -1028,27 +1034,27 @@
                     TempReversalEntry."G/L Register No." := Number;
                 TempReversalEntry."Reversal Type" := RevType;
                 TempReversalEntry."Entry Type" := TempReversalEntry."Entry Type"::Vendor;
-                Vend.Get(VendLedgEntry."Vendor No.");
-                TempReversalEntry."Account No." := Vend."No.";
-                TempReversalEntry."Account Name" := Vend.Name;
-                TempReversalEntry.CopyFromVendLedgEntry(VendLedgEntry);
+                Vendor.Get(GlobalVendorLedgerEntry."Vendor No.");
+                TempReversalEntry."Account No." := Vendor."No.";
+                TempReversalEntry."Account Name" := Vendor.Name;
+                TempReversalEntry.CopyFromVendLedgEntry(GlobalVendorLedgerEntry);
                 TempReversalEntry."Line No." := NextLineNo;
                 NextLineNo := NextLineNo + 1;
-                OnInsertFromVendLedgEntryOnBeforeTempReversalEntryInsert(TempReversalEntry, VendLedgEntry);
+                OnInsertFromVendLedgEntryOnBeforeTempReversalEntryInsert(TempReversalEntry, GlobalVendorLedgerEntry);
                 TempReversalEntry.Insert();
 
-                DtldVendLedgEntry.SetRange(Unapplied, true);
-                if DtldVendLedgEntry.FindSet() then
+                DetailedVendorLedgEntry.SetRange(Unapplied, true);
+                if DetailedVendorLedgEntry.FindSet() then
                     repeat
-                        InsertVendTempRevertTransNo(TempRevertTransactionNo, DtldVendLedgEntry."Unapplied by Entry No.");
-                    until DtldVendLedgEntry.Next() = 0;
-                DtldVendLedgEntry.SetRange(Unapplied);
-            until VendLedgEntry.Next() = 0;
+                        InsertVendTempRevertTransNo(TempTransactionNoInteger, DetailedVendorLedgEntry."Unapplied by Entry No.");
+                    until DetailedVendorLedgEntry.Next() = 0;
+                DetailedVendorLedgEntry.SetRange(Unapplied);
+            until GlobalVendorLedgerEntry.Next() = 0;
 
-        OnAfterInsertFromVendLedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo, TempReversalEntry, VendLedgEntry);
+        OnAfterInsertFromVendLedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo, TempReversalEntry, GlobalVendorLedgerEntry);
     end;
 
-    protected procedure InsertFromEmplLedgerEntry(var TempRevertTransactionNo: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
+    protected procedure InsertFromEmplLedgerEntry(var TempTransactionNoInteger: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
     var
         DetailedEmployeeLedgerEntry: Record "Detailed Employee Ledger Entry";
     begin
@@ -1056,157 +1062,157 @@
         DetailedEmployeeLedgerEntry.SetFilter(
           "Entry Type", '<>%1', DetailedEmployeeLedgerEntry."Entry Type"::"Initial Entry");
 
-        if EmployeeLedgerEntry.FindSet() then
+        if GlobalEmployeeLedgerEntry.FindSet() then
             repeat
-                DetailedEmployeeLedgerEntry.SetRange("Transaction No.", EmployeeLedgerEntry."Transaction No.");
-                DetailedEmployeeLedgerEntry.SetRange("Employee No.", EmployeeLedgerEntry."Employee No.");
+                DetailedEmployeeLedgerEntry.SetRange("Transaction No.", GlobalEmployeeLedgerEntry."Transaction No.");
+                DetailedEmployeeLedgerEntry.SetRange("Employee No.", GlobalEmployeeLedgerEntry."Employee No.");
                 if (not DetailedEmployeeLedgerEntry.IsEmpty) and (RevType = RevType::Register) then
                     Error(PostedAndAppliedSameTransactionErr, Number);
 
                 InsertTempReversalEntryEmployee(Number, RevType, NextLineNo);
                 NextLineNo += 1;
 
-                InsertTempRevertTransactionNoUnappliedEmployeeEntries(TempRevertTransactionNo, DetailedEmployeeLedgerEntry);
+                InsertTempRevertTransactionNoUnappliedEmployeeEntries(TempTransactionNoInteger, DetailedEmployeeLedgerEntry);
 
-            until EmployeeLedgerEntry.Next() = 0;
+            until GlobalEmployeeLedgerEntry.Next() = 0;
 
-        OnAfterInsertFromEmplLedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo, TempReversalEntry, EmployeeLedgerEntry);
+        OnAfterInsertFromEmplLedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo, TempReversalEntry, GlobalEmployeeLedgerEntry);
     end;
 
-    protected procedure InsertFromBankAccLedgEntry(TempRevertTransactionNo: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
+    protected procedure InsertFromBankAccLedgEntry(TempTransactionNoInteger: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
     var
-        BankAcc: Record "Bank Account";
+        BankAccount: Record "Bank Account";
     begin
-        if BankAccLedgEntry.FindSet() then
+        if GlobalBankAccountLedgerEntry.FindSet() then
             repeat
-                OnInsertFromBankAccLedgEntryOnStartRepeatBankAccLedgEntry(BankAccLedgEntry);
+                OnInsertFromBankAccLedgEntryOnStartRepeatBankAccLedgEntry(GlobalBankAccountLedgerEntry);
                 Clear(TempReversalEntry);
                 if RevType = RevType::Register then
                     TempReversalEntry."G/L Register No." := Number;
                 TempReversalEntry."Reversal Type" := RevType;
                 TempReversalEntry."Entry Type" := TempReversalEntry."Entry Type"::"Bank Account";
-                BankAcc.Get(BankAccLedgEntry."Bank Account No.");
-                TempReversalEntry."Account No." := BankAcc."No.";
-                TempReversalEntry."Account Name" := BankAcc.Name;
-                TempReversalEntry.CopyFromBankAccLedgEntry(BankAccLedgEntry);
+                BankAccount.Get(GlobalBankAccountLedgerEntry."Bank Account No.");
+                TempReversalEntry."Account No." := BankAccount."No.";
+                TempReversalEntry."Account Name" := BankAccount.Name;
+                TempReversalEntry.CopyFromBankAccLedgEntry(GlobalBankAccountLedgerEntry);
                 TempReversalEntry."Line No." := NextLineNo;
                 NextLineNo := NextLineNo + 1;
                 TempReversalEntry.Insert();
-            until BankAccLedgEntry.Next() = 0;
+            until GlobalBankAccountLedgerEntry.Next() = 0;
 
-        OnAfterInsertFromBankAccLedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo, TempReversalEntry, BankAccLedgEntry);
+        OnAfterInsertFromBankAccLedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo, TempReversalEntry, GlobalBankAccountLedgerEntry);
     end;
 
-    protected procedure InsertFromFALedgEntry(TempRevertTransactionNo: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
+    protected procedure InsertFromFALedgEntry(TempTransactionNoInteger: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
     var
-        FA: Record "Fixed Asset";
+        FixedAsset: Record "Fixed Asset";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeInsertFromFALedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo, TempReversalEntry, FALedgEntry, IsHandled);
+        OnBeforeInsertFromFALedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo, TempReversalEntry, GlobalFALedgerEntry, IsHandled);
         if IsHandled then
             exit;
 
-        if FALedgEntry.FindSet() then
+        if GlobalFALedgerEntry.FindSet() then
             repeat
                 Clear(TempReversalEntry);
                 if RevType = RevType::Register then
                     TempReversalEntry."G/L Register No." := Number;
                 TempReversalEntry."Reversal Type" := RevType;
                 TempReversalEntry."Entry Type" := TempReversalEntry."Entry Type"::"Fixed Asset";
-                FA.Get(FALedgEntry."FA No.");
-                TempReversalEntry."Account No." := FA."No.";
-                TempReversalEntry."Account Name" := FA.Description;
-                TempReversalEntry.CopyFromFALedgEntry(FALedgEntry);
-                if FALedgEntry."FA Posting Type" <> FALedgEntry."FA Posting Type"::"Salvage Value" then begin
+                FixedAsset.Get(GlobalFALedgerEntry."FA No.");
+                TempReversalEntry."Account No." := FixedAsset."No.";
+                TempReversalEntry."Account Name" := FixedAsset.Description;
+                TempReversalEntry.CopyFromFALedgEntry(GlobalFALedgerEntry);
+                if GlobalFALedgerEntry."FA Posting Type" <> GlobalFALedgerEntry."FA Posting Type"::"Salvage Value" then begin
                     TempReversalEntry."Line No." := NextLineNo;
                     NextLineNo := NextLineNo + 1;
                     TempReversalEntry.Insert();
                 end;
-            until FALedgEntry.Next() = 0;
+            until GlobalFALedgerEntry.Next() = 0;
 
-        OnAfterInsertFromFALedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo, TempReversalEntry, FALedgEntry);
+        OnAfterInsertFromFALedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo, TempReversalEntry, GlobalFALedgerEntry);
     end;
 
-    protected procedure InsertFromMaintenanceLedgEntry(TempRevertTransactionNo: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
+    protected procedure InsertFromMaintenanceLedgEntry(TempTransactionNoInteger: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
     var
-        FA: Record "Fixed Asset";
+        FixedAsset: Record "Fixed Asset";
     begin
-        if MaintenanceLedgEntry.FindSet() then
+        if GlobalMaintenanceLedgerEntry.FindSet() then
             repeat
                 Clear(TempReversalEntry);
                 if RevType = RevType::Register then
                     TempReversalEntry."G/L Register No." := Number;
                 TempReversalEntry."Reversal Type" := RevType;
                 TempReversalEntry."Entry Type" := TempReversalEntry."Entry Type"::Maintenance;
-                FA.Get(MaintenanceLedgEntry."FA No.");
-                TempReversalEntry."Account No." := FA."No.";
-                TempReversalEntry."Account Name" := FA.Description;
-                TempReversalEntry.CopyFromMaintenanceEntry(MaintenanceLedgEntry);
+                FixedAsset.Get(GlobalMaintenanceLedgerEntry."FA No.");
+                TempReversalEntry."Account No." := FixedAsset."No.";
+                TempReversalEntry."Account Name" := FixedAsset.Description;
+                TempReversalEntry.CopyFromMaintenanceEntry(GlobalMaintenanceLedgerEntry);
                 TempReversalEntry."Line No." := NextLineNo;
                 NextLineNo := NextLineNo + 1;
                 TempReversalEntry.Insert();
-            until MaintenanceLedgEntry.Next() = 0;
+            until GlobalMaintenanceLedgerEntry.Next() = 0;
 
-        OnAfterInsertFromMaintenanceLedgEntry(TempRevertTransactionNo, Number, RevType, NextLineNo, TempReversalEntry, MaintenanceLedgEntry);
+        OnAfterInsertFromMaintenanceLedgEntry(TempTransactionNoInteger, Number, RevType, NextLineNo, TempReversalEntry, GlobalMaintenanceLedgerEntry);
     end;
 
-    protected procedure InsertFromVATEntry(var TempRevertTransactionNo: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
+    protected procedure InsertFromVATEntry(var TempTransactionNoInteger: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
     begin
-        TempRevertTransactionNo.FindSet();
+        TempTransactionNoInteger.FindSet();
         repeat
             if RevType = RevType::Transaction then
-                VATEntry.SetRange("Transaction No.", TempRevertTransactionNo.Number);
-            OnInsertFromVATEntryOnAfterVATEntrySetRange(VATEntry, RevType, TempRevertTransactionNo);
-            if VATEntry.FindSet() then
+                GlobalVATEntry.SetRange("Transaction No.", TempTransactionNoInteger.Number);
+            OnInsertFromVATEntryOnAfterVATEntrySetRange(GlobalVATEntry, RevType, TempTransactionNoInteger);
+            if GlobalVATEntry.FindSet() then
                 repeat
-                    OnInsertFromVATEntryOnStartRepeatVATEntry(VATEntry);
+                    OnInsertFromVATEntryOnStartRepeatVATEntry(GlobalVATEntry);
                     Clear(TempReversalEntry);
                     if RevType = RevType::Register then
                         TempReversalEntry."G/L Register No." := Number;
                     TempReversalEntry."Reversal Type" := RevType;
                     TempReversalEntry."Entry Type" := TempReversalEntry."Entry Type"::VAT;
-                    TempReversalEntry.CopyFromVATEntry(VATEntry);
+                    TempReversalEntry.CopyFromVATEntry(GlobalVATEntry);
                     TempReversalEntry."Line No." := NextLineNo;
                     NextLineNo := NextLineNo + 1;
-                    OnInsertFromVATEntryOnBeforeTempReversalEntryInsert(TempReversalEntry, RevType, TempRevertTransactionNo);
+                    OnInsertFromVATEntryOnBeforeTempReversalEntryInsert(TempReversalEntry, RevType, TempTransactionNoInteger);
                     TempReversalEntry.Insert();
-                until VATEntry.Next() = 0;
-        until TempRevertTransactionNo.Next() = 0;
+                until GlobalVATEntry.Next() = 0;
+        until TempTransactionNoInteger.Next() = 0;
 
-        OnAfterInsertFromVATEntry(TempRevertTransactionNo, Number, RevType, NextLineNo, TempReversalEntry, VATEntry);
+        OnAfterInsertFromVATEntry(TempTransactionNoInteger, Number, RevType, NextLineNo, TempReversalEntry, GlobalVATEntry);
     end;
 
-    protected procedure InsertFromGLEntry(var TempRevertTransactionNo: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
+    protected procedure InsertFromGLEntry(var TempTransactionNoInteger: Record "Integer" temporary; Number: Integer; RevType: Option Transaction,Register; var NextLineNo: Integer)
     var
-        GLAcc: Record "G/L Account";
+        GLAccount: Record "G/L Account";
     begin
-        TempRevertTransactionNo.FindSet();
+        TempTransactionNoInteger.FindSet();
         repeat
             if RevType = RevType::Transaction then
-                GLEntry.SetRange("Transaction No.", TempRevertTransactionNo.Number);
-            OnInsertFromGLEntryOnAfterGLEntrySetRange(GLEntry, RevType, TempRevertTransactionNo);
-            if GLEntry.FindSet() then
+                GlobalGLEntry.SetRange("Transaction No.", TempTransactionNoInteger.Number);
+            OnInsertFromGLEntryOnAfterGLEntrySetRange(GlobalGLEntry, RevType, TempTransactionNoInteger);
+            if GlobalGLEntry.FindSet() then
                 repeat
-                    OnInsertFromGLEntryOnBeforeClearTempReversalEntry(GLEntry);
+                    OnInsertFromGLEntryOnBeforeClearTempReversalEntry(GlobalGLEntry);
                     Clear(TempReversalEntry);
                     if RevType = RevType::Register then
                         TempReversalEntry."G/L Register No." := Number;
                     TempReversalEntry."Reversal Type" := RevType;
                     TempReversalEntry."Entry Type" := TempReversalEntry."Entry Type"::"G/L Account";
-                    if not GLAcc.Get(GLEntry."G/L Account No.") then
-                        Error(CannotReverseDeletedErr, GLEntry.TableCaption(), GLAcc.TableCaption());
-                    TempReversalEntry."Account No." := GLAcc."No.";
-                    TempReversalEntry."Account Name" := GLAcc.Name;
-                    TempReversalEntry.CopyFromGLEntry(GLEntry);
+                    if not GLAccount.Get(GlobalGLEntry."G/L Account No.") then
+                        Error(CannotReverseDeletedErr, GlobalGLEntry.TableCaption(), GLAccount.TableCaption());
+                    TempReversalEntry."Account No." := GLAccount."No.";
+                    TempReversalEntry."Account Name" := GLAccount.Name;
+                    TempReversalEntry.CopyFromGLEntry(GlobalGLEntry);
                     TempReversalEntry."Line No." := NextLineNo;
                     NextLineNo := NextLineNo + 1;
-                    OnInsertFromGLEntryOnBeforeTempReversalEntryInsert(TempReversalEntry, GLEntry, RevType, TempRevertTransactionNo, Rec);
+                    OnInsertFromGLEntryOnBeforeTempReversalEntryInsert(TempReversalEntry, GlobalGLEntry, RevType, TempTransactionNoInteger, Rec);
                     TempReversalEntry.Insert();
-                until GLEntry.Next() = 0;
-        until TempRevertTransactionNo.Next() = 0;
+                until GlobalGLEntry.Next() = 0;
+        until TempTransactionNoInteger.Next() = 0;
 
-        OnAfterInsertFromGLEntry(TempRevertTransactionNo, Number, RevType, NextLineNo, TempReversalEntry, GLEntry);
+        OnAfterInsertFromGLEntry(TempTransactionNoInteger, Number, RevType, NextLineNo, TempReversalEntry, GlobalGLEntry);
     end;
 
     local procedure InsertTempReversalEntryEmployee(Number: Integer; RevType: Option Transaction,Register; NextLineNo: Integer)
@@ -1218,82 +1224,82 @@
             TempReversalEntry."G/L Register No." := Number;
         TempReversalEntry."Reversal Type" := RevType;
         TempReversalEntry."Entry Type" := TempReversalEntry."Entry Type"::Employee;
-        Employee.Get(EmployeeLedgerEntry."Employee No.");
+        Employee.Get(GlobalEmployeeLedgerEntry."Employee No.");
         TempReversalEntry."Account No." := Employee."No.";
         TempReversalEntry."Account Name" := CopyStr(Employee.FullName(), 1, MaxStrLen(TempReversalEntry."Account Name"));
-        TempReversalEntry.CopyFromEmployeeLedgerEntry(EmployeeLedgerEntry);
+        TempReversalEntry.CopyFromEmployeeLedgerEntry(GlobalEmployeeLedgerEntry);
         TempReversalEntry."Line No." := NextLineNo;
         TempReversalEntry.Insert();
     end;
 
-    procedure CopyFromCustLedgEntry(CustLedgEntry: Record "Cust. Ledger Entry")
+    procedure CopyFromCustLedgEntry(CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
-        "Entry No." := CustLedgEntry."Entry No.";
-        "Posting Date" := CustLedgEntry."Posting Date";
-        "Source Code" := CustLedgEntry."Source Code";
-        "Journal Batch Name" := CustLedgEntry."Journal Batch Name";
-        "Transaction No." := CustLedgEntry."Transaction No.";
-        "Currency Code" := CustLedgEntry."Currency Code";
-        Description := CustLedgEntry.Description;
-        CustLedgEntry.CalcFields(Amount, "Debit Amount", "Credit Amount",
+        "Entry No." := CustLedgerEntry."Entry No.";
+        "Posting Date" := CustLedgerEntry."Posting Date";
+        "Source Code" := CustLedgerEntry."Source Code";
+        "Journal Batch Name" := CustLedgerEntry."Journal Batch Name";
+        "Transaction No." := CustLedgerEntry."Transaction No.";
+        "Currency Code" := CustLedgerEntry."Currency Code";
+        Description := CustLedgerEntry.Description;
+        CustLedgerEntry.CalcFields(Amount, "Debit Amount", "Credit Amount",
           "Amount (LCY)", "Debit Amount (LCY)", "Credit Amount (LCY)");
-        Amount := CustLedgEntry.Amount;
-        "Debit Amount" := CustLedgEntry."Debit Amount";
-        "Credit Amount" := CustLedgEntry."Credit Amount";
-        "Amount (LCY)" := CustLedgEntry."Amount (LCY)";
-        "Debit Amount (LCY)" := CustLedgEntry."Debit Amount (LCY)";
-        "Credit Amount (LCY)" := CustLedgEntry."Credit Amount (LCY)";
-        "Document Type" := CustLedgEntry."Document Type";
-        "Document No." := CustLedgEntry."Document No.";
-        "Bal. Account Type" := CustLedgEntry."Bal. Account Type";
-        "Bal. Account No." := CustLedgEntry."Bal. Account No.";
+        Amount := CustLedgerEntry.Amount;
+        "Debit Amount" := CustLedgerEntry."Debit Amount";
+        "Credit Amount" := CustLedgerEntry."Credit Amount";
+        "Amount (LCY)" := CustLedgerEntry."Amount (LCY)";
+        "Debit Amount (LCY)" := CustLedgerEntry."Debit Amount (LCY)";
+        "Credit Amount (LCY)" := CustLedgerEntry."Credit Amount (LCY)";
+        "Document Type" := CustLedgerEntry."Document Type";
+        "Document No." := CustLedgerEntry."Document No.";
+        "Bal. Account Type" := CustLedgerEntry."Bal. Account Type";
+        "Bal. Account No." := CustLedgerEntry."Bal. Account No.";
 
-        OnAfterCopyFromCustLedgEntry(Rec, CustLedgEntry);
+        OnAfterCopyFromCustLedgEntry(Rec, CustLedgerEntry);
     end;
 
-    procedure CopyFromBankAccLedgEntry(BankAccLedgEntry: Record "Bank Account Ledger Entry")
+    procedure CopyFromBankAccLedgEntry(BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
     begin
-        "Entry No." := BankAccLedgEntry."Entry No.";
-        "Posting Date" := BankAccLedgEntry."Posting Date";
-        "Source Code" := BankAccLedgEntry."Source Code";
-        "Journal Batch Name" := BankAccLedgEntry."Journal Batch Name";
-        "Transaction No." := BankAccLedgEntry."Transaction No.";
-        "Currency Code" := BankAccLedgEntry."Currency Code";
-        Description := BankAccLedgEntry.Description;
-        Amount := BankAccLedgEntry.Amount;
-        "Debit Amount" := BankAccLedgEntry."Debit Amount";
-        "Credit Amount" := BankAccLedgEntry."Credit Amount";
-        "Amount (LCY)" := BankAccLedgEntry."Amount (LCY)";
-        "Debit Amount (LCY)" := BankAccLedgEntry."Debit Amount (LCY)";
-        "Credit Amount (LCY)" := BankAccLedgEntry."Credit Amount (LCY)";
-        "Document Type" := BankAccLedgEntry."Document Type";
-        "Document No." := BankAccLedgEntry."Document No.";
-        "Bal. Account Type" := BankAccLedgEntry."Bal. Account Type";
-        "Bal. Account No." := BankAccLedgEntry."Bal. Account No.";
+        "Entry No." := BankAccountLedgerEntry."Entry No.";
+        "Posting Date" := BankAccountLedgerEntry."Posting Date";
+        "Source Code" := BankAccountLedgerEntry."Source Code";
+        "Journal Batch Name" := BankAccountLedgerEntry."Journal Batch Name";
+        "Transaction No." := BankAccountLedgerEntry."Transaction No.";
+        "Currency Code" := BankAccountLedgerEntry."Currency Code";
+        Description := BankAccountLedgerEntry.Description;
+        Amount := BankAccountLedgerEntry.Amount;
+        "Debit Amount" := BankAccountLedgerEntry."Debit Amount";
+        "Credit Amount" := BankAccountLedgerEntry."Credit Amount";
+        "Amount (LCY)" := BankAccountLedgerEntry."Amount (LCY)";
+        "Debit Amount (LCY)" := BankAccountLedgerEntry."Debit Amount (LCY)";
+        "Credit Amount (LCY)" := BankAccountLedgerEntry."Credit Amount (LCY)";
+        "Document Type" := BankAccountLedgerEntry."Document Type";
+        "Document No." := BankAccountLedgerEntry."Document No.";
+        "Bal. Account Type" := BankAccountLedgerEntry."Bal. Account Type";
+        "Bal. Account No." := BankAccountLedgerEntry."Bal. Account No.";
 
-        OnAfterCopyFromBankAccLedgEntry(Rec, BankAccLedgEntry);
+        OnAfterCopyFromBankAccLedgEntry(Rec, BankAccountLedgerEntry);
     end;
 
-    procedure CopyFromFALedgEntry(FALedgEntry: Record "FA Ledger Entry")
+    procedure CopyFromFALedgEntry(FALedgerEntry: Record "FA Ledger Entry")
     begin
-        "Entry No." := FALedgEntry."Entry No.";
-        "Posting Date" := FALedgEntry."Posting Date";
-        "FA Posting Category" := FALedgEntry."FA Posting Category";
-        "FA Posting Type" := "Reversal Entry FA Posting Type".FromInteger(FALedgEntry."FA Posting Type".AsInteger() + 1);
-        "Source Code" := FALedgEntry."Source Code";
-        "Journal Batch Name" := FALedgEntry."Journal Batch Name";
-        "Transaction No." := FALedgEntry."Transaction No.";
-        Description := FALedgEntry.Description;
-        "Amount (LCY)" := FALedgEntry.Amount;
-        "Debit Amount (LCY)" := FALedgEntry."Debit Amount";
-        "Credit Amount (LCY)" := FALedgEntry."Credit Amount";
-        "VAT Amount" := FALedgEntry."VAT Amount";
-        "Document Type" := FALedgEntry."Document Type";
-        "Document No." := FALedgEntry."Document No.";
-        "Bal. Account Type" := FALedgEntry."Bal. Account Type";
-        "Bal. Account No." := FALedgEntry."Bal. Account No.";
+        "Entry No." := FALedgerEntry."Entry No.";
+        "Posting Date" := FALedgerEntry."Posting Date";
+        "FA Posting Category" := FALedgerEntry."FA Posting Category";
+        "FA Posting Type" := Enum::"Reversal Entry FA Posting Type".FromInteger(FALedgerEntry."FA Posting Type".AsInteger() + 1);
+        "Source Code" := FALedgerEntry."Source Code";
+        "Journal Batch Name" := FALedgerEntry."Journal Batch Name";
+        "Transaction No." := FALedgerEntry."Transaction No.";
+        Description := FALedgerEntry.Description;
+        "Amount (LCY)" := FALedgerEntry.Amount;
+        "Debit Amount (LCY)" := FALedgerEntry."Debit Amount";
+        "Credit Amount (LCY)" := FALedgerEntry."Credit Amount";
+        "VAT Amount" := FALedgerEntry."VAT Amount";
+        "Document Type" := FALedgerEntry."Document Type";
+        "Document No." := FALedgerEntry."Document No.";
+        "Bal. Account Type" := FALedgerEntry."Bal. Account Type";
+        "Bal. Account No." := FALedgerEntry."Bal. Account No.";
 
-        OnAfterCopyFromFALedgEntry(Rec, FALedgEntry);
+        OnAfterCopyFromFALedgEntry(Rec, FALedgerEntry);
     end;
 
     procedure CopyFromGLEntry(GLEntry: Record "G/L Entry")
@@ -1318,24 +1324,24 @@
         OnAfterCopyFromGLEntry(Rec, GLEntry);
     end;
 
-    procedure CopyFromMaintenanceEntry(MaintenanceLedgEntry: Record "Maintenance Ledger Entry")
+    procedure CopyFromMaintenanceEntry(MaintenanceLedgerEntry: Record "Maintenance Ledger Entry")
     begin
-        "Entry No." := MaintenanceLedgEntry."Entry No.";
-        "Posting Date" := MaintenanceLedgEntry."Posting Date";
-        "Source Code" := MaintenanceLedgEntry."Source Code";
-        "Journal Batch Name" := MaintenanceLedgEntry."Journal Batch Name";
-        "Transaction No." := MaintenanceLedgEntry."Transaction No.";
-        Description := MaintenanceLedgEntry.Description;
-        "Amount (LCY)" := MaintenanceLedgEntry.Amount;
-        "Debit Amount (LCY)" := MaintenanceLedgEntry."Debit Amount";
-        "Credit Amount (LCY)" := MaintenanceLedgEntry."Credit Amount";
-        "VAT Amount" := MaintenanceLedgEntry."VAT Amount";
-        "Document Type" := MaintenanceLedgEntry."Document Type";
-        "Document No." := MaintenanceLedgEntry."Document No.";
-        "Bal. Account Type" := MaintenanceLedgEntry."Bal. Account Type";
-        "Bal. Account No." := MaintenanceLedgEntry."Bal. Account No.";
+        "Entry No." := MaintenanceLedgerEntry."Entry No.";
+        "Posting Date" := MaintenanceLedgerEntry."Posting Date";
+        "Source Code" := MaintenanceLedgerEntry."Source Code";
+        "Journal Batch Name" := MaintenanceLedgerEntry."Journal Batch Name";
+        "Transaction No." := MaintenanceLedgerEntry."Transaction No.";
+        Description := MaintenanceLedgerEntry.Description;
+        "Amount (LCY)" := MaintenanceLedgerEntry.Amount;
+        "Debit Amount (LCY)" := MaintenanceLedgerEntry."Debit Amount";
+        "Credit Amount (LCY)" := MaintenanceLedgerEntry."Credit Amount";
+        "VAT Amount" := MaintenanceLedgerEntry."VAT Amount";
+        "Document Type" := MaintenanceLedgerEntry."Document Type";
+        "Document No." := MaintenanceLedgerEntry."Document No.";
+        "Bal. Account Type" := MaintenanceLedgerEntry."Bal. Account Type";
+        "Bal. Account No." := MaintenanceLedgerEntry."Bal. Account No.";
 
-        OnAfterCopyFromMaintenanceEntry(Rec, MaintenanceLedgEntry);
+        OnAfterCopyFromMaintenanceEntry(Rec, MaintenanceLedgerEntry);
     end;
 
     procedure CopyFromVATEntry(VATEntry: Record "VAT Entry")
@@ -1352,29 +1358,29 @@
         OnAfterCopyFromVATEntry(Rec, VATEntry);
     end;
 
-    procedure CopyFromVendLedgEntry(VendLedgEntry: Record "Vendor Ledger Entry")
+    procedure CopyFromVendLedgEntry(VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
-        "Entry No." := VendLedgEntry."Entry No.";
-        "Posting Date" := VendLedgEntry."Posting Date";
-        "Source Code" := VendLedgEntry."Source Code";
-        "Journal Batch Name" := VendLedgEntry."Journal Batch Name";
-        "Transaction No." := VendLedgEntry."Transaction No.";
-        "Currency Code" := VendLedgEntry."Currency Code";
-        Description := VendLedgEntry.Description;
-        VendLedgEntry.CalcFields(Amount, "Debit Amount", "Credit Amount",
+        "Entry No." := VendorLedgerEntry."Entry No.";
+        "Posting Date" := VendorLedgerEntry."Posting Date";
+        "Source Code" := VendorLedgerEntry."Source Code";
+        "Journal Batch Name" := VendorLedgerEntry."Journal Batch Name";
+        "Transaction No." := VendorLedgerEntry."Transaction No.";
+        "Currency Code" := VendorLedgerEntry."Currency Code";
+        Description := VendorLedgerEntry.Description;
+        VendorLedgerEntry.CalcFields(Amount, "Debit Amount", "Credit Amount",
           "Amount (LCY)", "Debit Amount (LCY)", "Credit Amount (LCY)");
-        Amount := VendLedgEntry.Amount;
-        "Debit Amount" := VendLedgEntry."Debit Amount";
-        "Credit Amount" := VendLedgEntry."Credit Amount";
-        "Amount (LCY)" := VendLedgEntry."Amount (LCY)";
-        "Debit Amount (LCY)" := VendLedgEntry."Debit Amount (LCY)";
-        "Credit Amount (LCY)" := VendLedgEntry."Credit Amount (LCY)";
-        "Document Type" := VendLedgEntry."Document Type";
-        "Document No." := VendLedgEntry."Document No.";
-        "Bal. Account Type" := VendLedgEntry."Bal. Account Type";
-        "Bal. Account No." := VendLedgEntry."Bal. Account No.";
+        Amount := VendorLedgerEntry.Amount;
+        "Debit Amount" := VendorLedgerEntry."Debit Amount";
+        "Credit Amount" := VendorLedgerEntry."Credit Amount";
+        "Amount (LCY)" := VendorLedgerEntry."Amount (LCY)";
+        "Debit Amount (LCY)" := VendorLedgerEntry."Debit Amount (LCY)";
+        "Credit Amount (LCY)" := VendorLedgerEntry."Credit Amount (LCY)";
+        "Document Type" := VendorLedgerEntry."Document Type";
+        "Document No." := VendorLedgerEntry."Document No.";
+        "Bal. Account Type" := VendorLedgerEntry."Bal. Account Type";
+        "Bal. Account No." := VendorLedgerEntry."Bal. Account No.";
 
-        OnAfterCopyFromVendLedgEntry(Rec, VendLedgEntry);
+        OnAfterCopyFromVendLedgEntry(Rec, VendorLedgerEntry);
     end;
 
     procedure CopyFromEmployeeLedgerEntry(EmployeeLedgerEntry: Record "Employee Ledger Entry")
@@ -1402,58 +1408,57 @@
         OnAfterCopyFromEmplLedgEntry(Rec, EmployeeLedgerEntry);
     end;
 
-    local procedure InsertCustTempRevertTransNo(var TempRevertTransactionNo: Record "Integer" temporary; CustLedgEntryNo: Integer)
+    local procedure InsertCustTempRevertTransNo(var TempTransactionNoInteger: Record "Integer" temporary; CustLedgEntryNo: Integer)
     var
-        DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+        DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeInsertCustTempRevertTransNo(TempRevertTransactionNo, CustLedgEntryNo, IsHandled);
+        OnBeforeInsertCustTempRevertTransNo(TempTransactionNoInteger, CustLedgEntryNo, IsHandled);
         if IsHandled then
             exit;
 
-        DtldCustLedgEntry.Get(CustLedgEntryNo);
-        if DtldCustLedgEntry."Transaction No." <> 0 then begin
-            TempRevertTransactionNo.Number := DtldCustLedgEntry."Transaction No.";
-            if TempRevertTransactionNo.Insert() then;
+        DetailedCustLedgEntry.Get(CustLedgEntryNo);
+        if DetailedCustLedgEntry."Transaction No." <> 0 then begin
+            TempTransactionNoInteger.Number := DetailedCustLedgEntry."Transaction No.";
+            if TempTransactionNoInteger.Insert() then;
         end;
     end;
 
-    local procedure InsertVendTempRevertTransNo(var TempRevertTransactionNo: Record "Integer" temporary; VendLedgEntryNo: Integer)
+    local procedure InsertVendTempRevertTransNo(var TempTransactionNoInteger: Record "Integer" temporary; VendLedgEntryNo: Integer)
     var
-        DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
+        DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeInsertVendTempRevertTransNo(TempRevertTransactionNo, VendLedgEntryNo, IsHandled);
+        OnBeforeInsertVendTempRevertTransNo(TempTransactionNoInteger, VendLedgEntryNo, IsHandled);
         if IsHandled then
             exit;
 
-        DtldVendLedgEntry.Get(VendLedgEntryNo);
-        if DtldVendLedgEntry."Transaction No." <> 0 then
-        begin
-            TempRevertTransactionNo.Number := DtldVendLedgEntry."Transaction No.";
-            if TempRevertTransactionNo.Insert() then;
+        DetailedVendorLedgEntry.Get(VendLedgEntryNo);
+        if DetailedVendorLedgEntry."Transaction No." <> 0 then begin
+            TempTransactionNoInteger.Number := DetailedVendorLedgEntry."Transaction No.";
+            if TempTransactionNoInteger.Insert() then;
         end;
     end;
 
-    local procedure InsertEmplTempRevertTransNo(var TempRevertTransactionNo: Record "Integer" temporary; EmployeeLedgEntryNo: Integer)
+    local procedure InsertEmplTempRevertTransNo(var TempTransactionNoInteger: Record "Integer" temporary; EmployeeLedgEntryNo: Integer)
     var
         DetailedEmployeeLedgerEntry: Record "Detailed Employee Ledger Entry";
     begin
         DetailedEmployeeLedgerEntry.Get(EmployeeLedgEntryNo);
         if DetailedEmployeeLedgerEntry."Transaction No." <> 0 then begin
-            TempRevertTransactionNo.Number := DetailedEmployeeLedgerEntry."Transaction No.";
-            if TempRevertTransactionNo.Insert() then;
+            TempTransactionNoInteger.Number := DetailedEmployeeLedgerEntry."Transaction No.";
+            if TempTransactionNoInteger.Insert() then;
         end;
     end;
 
-    local procedure InsertTempRevertTransactionNoUnappliedEmployeeEntries(var TempRevertTransactionNo: Record "Integer" temporary; var DetailedEmployeeLedgerEntry: Record "Detailed Employee Ledger Entry")
+    local procedure InsertTempRevertTransactionNoUnappliedEmployeeEntries(var TempTransactionNoInteger: Record "Integer" temporary; var DetailedEmployeeLedgerEntry: Record "Detailed Employee Ledger Entry")
     begin
         DetailedEmployeeLedgerEntry.SetRange(Unapplied, true);
         if DetailedEmployeeLedgerEntry.FindSet() then
             repeat
-                InsertEmplTempRevertTransNo(TempRevertTransactionNo, DetailedEmployeeLedgerEntry."Unapplied by Entry No.");
+                InsertEmplTempRevertTransNo(TempTransactionNoInteger, DetailedEmployeeLedgerEntry."Unapplied by Entry No.");
             until DetailedEmployeeLedgerEntry.Next() = 0;
         DetailedEmployeeLedgerEntry.SetRange(Unapplied);
     end;

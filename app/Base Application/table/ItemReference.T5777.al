@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 5777 "Item Reference"
 {
     Caption = 'Item Reference';
@@ -13,12 +19,12 @@ table 5777 "Item Reference"
         field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(3; "Unit of Measure"; Code[10])
         {
             Caption = 'Unit of Measure';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(4; "Reference Type"; Enum "Item Reference Type")
         {
@@ -33,13 +39,14 @@ table 5777 "Item Reference"
         field(5; "Reference Type No."; Code[20])
         {
             Caption = 'Reference Type No.';
-            TableRelation = IF ("Reference Type" = CONST(Customer)) Customer."No."
-            ELSE
-            IF ("Reference Type" = CONST(Vendor)) Vendor."No.";
+            TableRelation = if ("Reference Type" = const(Customer)) Customer."No."
+            else
+            if ("Reference Type" = const(Vendor)) Vendor."No.";
         }
         field(6; "Reference No."; Code[50])
         {
             Caption = 'Reference No.';
+            ExtendedDatatype = Barcode;
             NotBlank = true;
         }
         field(7; Description; Text[100])
@@ -56,6 +63,26 @@ table 5777 "Item Reference"
         field(9; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
+        }
+        field(10; "Starting Date"; Date)
+        {
+            Caption = 'Starting Date';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDates();
+            end;
+        }
+        field(11; "Ending Date"; Date)
+        {
+            Caption = 'Ending Date';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDates();
+            end;
         }
     }
 
@@ -217,19 +244,29 @@ table 5777 "Item Reference"
         exit(not ItemReference2.IsEmpty);
     end;
 
+    [Obsolete('Use another implementation of FindItemDescription.', '23.0')]
     procedure FindItemDescription(var ItemDescription: Text[100]; var ItemDescription2: Text[50]; ItemNo: Code[20]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; ReferenceType: Enum "Item Reference Type"; ReferenceTypeNo: Code[20]) Result: Boolean
+    begin
+        exit(FindItemDescription(ItemDescription, ItemDescription2, ItemNo, VariantCode, UnitOfMeasureCode, 0D, ReferenceType, ReferenceTypeNo));
+    end;
+
+    procedure FindItemDescription(var ItemDescription: Text[100]; var ItemDescription2: Text[50]; ItemNo: Code[20]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; ToDate: Date; ReferenceType: Enum "Item Reference Type"; ReferenceTypeNo: Code[20]) Result: Boolean
     var
         ItemReference: Record "Item Reference";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeFindItemDescription(ItemDescription, ItemDescription2, ItemNo, VariantCode, UnitOfMeasureCode, ReferenceType, ReferenceTypeNo, Result, IsHandled, ItemReference);
+        OnBeforeFindItemDescription(ItemDescription, ItemDescription2, ItemNo, VariantCode, UnitOfMeasureCode, ReferenceType, ReferenceTypeNo, Result, IsHandled, ItemReference, ToDate);
         if IsHandled then
             exit(Result);
 
         ItemReference.SetRange("Item No.", ItemNo);
         ItemReference.SetRange("Variant Code", VariantCode);
         ItemReference.SetRange("Unit of Measure", UnitOfMeasureCode);
+        if ToDate <> 0D then begin
+            ItemReference.SetFilter("Starting Date", '<=%1', ToDate);
+            ItemReference.SetFilter("Ending Date", '>=%1|%2', ToDate, 0D);
+        end;
         ItemReference.SetRange("Reference Type", ReferenceType);
         ItemReference.SetRange("Reference Type No.", ReferenceTypeNo);
         if ItemReference.FindFirst() then begin
@@ -255,6 +292,16 @@ table 5777 "Item Reference"
         exit(not ItemUnitOfMeasure.IsEmpty());
     end;
 
+    local procedure CheckDates()
+    var
+        StartingEndingDateErr: Label '%1 %2 is before %3 %4.', Comment = '%1 and %3 = Date Captions, %2 and %4 = Date Values';
+    begin
+        if Rec."Ending Date" = 0D then
+            exit;
+        if Rec."Ending Date" < Rec."Starting Date" then
+            Error(StartingEndingDateErr, Rec.FieldCaption("Ending Date"), Rec."Ending Date", Rec.FieldCaption("Starting Date"), Rec."Starting Date");
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateItemVendor(var ItemReference: Record "Item Reference"; ItemVendor: Record "Item Vendor")
     begin
@@ -271,7 +318,7 @@ table 5777 "Item Reference"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindItemDescription(var ItemDescription: Text[100]; var ItemDescription2: Text[50]; ItemNo: Code[20]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; ReferenceType: Enum "Item Reference Type"; ReferenceTypeNo: Code[20]; var Result: Boolean; var IsHandled: Boolean; var ItemReference: Record "Item Reference")
+    local procedure OnBeforeFindItemDescription(var ItemDescription: Text[100]; var ItemDescription2: Text[50]; ItemNo: Code[20]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; ReferenceType: Enum "Item Reference Type"; ReferenceTypeNo: Code[20]; var Result: Boolean; var IsHandled: Boolean; var ItemReference: Record "Item Reference"; ToDate: Date)
     begin
     end;
 

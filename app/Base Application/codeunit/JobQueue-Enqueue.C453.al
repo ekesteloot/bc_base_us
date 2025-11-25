@@ -1,3 +1,5 @@
+namespace System.Threading;
+
 codeunit 453 "Job Queue - Enqueue"
 {
     Permissions = TableData "Job Queue Entry" = rimd;

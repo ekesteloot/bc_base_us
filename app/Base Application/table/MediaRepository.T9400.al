@@ -1,3 +1,8 @@
+﻿namespace System.Utilities;
+
+using System.Environment;
+using System.IO;
+
 table 9400 "Media Repository"
 {
     Caption = 'Media Repository';

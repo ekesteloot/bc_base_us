@@ -1,4 +1,26 @@
-﻿table 21 "Cust. Ledger Entry"
+﻿namespace Microsoft.Sales.Receivables;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.ServiceMgt.History;
+using System.Security.AccessControl;
+using System.Utilities;
+using System.IO;
+
+table 21 "Cust. Ledger Entry"
 {
     Caption = 'Cust. Ledger Entry';
     DrillDownPageID = "Customer Ledger Entries";
@@ -55,21 +77,21 @@
         }
         field(13; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Ledger Entry Amount" = CONST(true),
-                                                                         "Cust. Ledger Entry No." = FIELD("Entry No."),
-                                                                         "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Ledger Entry Amount" = const(true),
+                                                                         "Cust. Ledger Entry No." = field("Entry No."),
+                                                                         "Posting Date" = field("Date Filter")));
             Caption = 'Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(14; "Remaining Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Cust. Ledger Entry No." = FIELD("Entry No."),
-                                                                         "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Cust. Ledger Entry No." = field("Entry No."),
+                                                                         "Posting Date" = field("Date Filter")));
             Caption = 'Remaining Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -77,9 +99,9 @@
         field(15; "Original Amt. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Cust. Ledger Entry No." = FIELD("Entry No."),
-                                                                                 "Entry Type" = FILTER("Initial Entry"),
-                                                                                 "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Cust. Ledger Entry No." = field("Entry No."),
+                                                                                 "Entry Type" = filter("Initial Entry"),
+                                                                                 "Posting Date" = field("Date Filter")));
             Caption = 'Original Amt. (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -87,8 +109,8 @@
         field(16; "Remaining Amt. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Cust. Ledger Entry No." = FIELD("Entry No."),
-                                                                                 "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Cust. Ledger Entry No." = field("Entry No."),
+                                                                                 "Posting Date" = field("Date Filter")));
             Caption = 'Remaining Amt. (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -96,9 +118,9 @@
         field(17; "Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Ledger Entry Amount" = CONST(true),
-                                                                                 "Cust. Ledger Entry No." = FIELD("Entry No."),
-                                                                                 "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Ledger Entry Amount" = const(true),
+                                                                                 "Cust. Ledger Entry No." = field("Entry No."),
+                                                                                 "Posting Date" = field("Date Filter")));
             Caption = 'Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -132,13 +154,13 @@
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(24; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(25; "Salesperson Code"; Code[20])
         {
@@ -226,7 +248,7 @@
         }
         field(39; "Original Pmt. Disc. Possible"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Original Pmt. Disc. Possible';
             Editable = false;
@@ -257,7 +279,7 @@
         }
         field(46; "Closed by Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Closed by Amount';
         }
@@ -283,22 +305,22 @@
             Caption = 'Reason Code';
             TableRelation = "Reason Code";
         }
-        field(51; "Bal. Account Type"; enum "Gen. Journal Account Type")
+        field(51; "Bal. Account Type"; Enum "Gen. Journal Account Type")
         {
             Caption = 'Bal. Account Type';
         }
         field(52; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Bal. Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Fixed Asset")) "Fixed Asset";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const(Customer)) Customer
+            else
+            if ("Bal. Account Type" = const(Vendor)) Vendor
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset";
         }
         field(53; "Transaction No."; Integer)
         {
@@ -311,24 +333,24 @@
         }
         field(58; "Debit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Debit Amount" WHERE("Ledger Entry Amount" = CONST(true),
-                                                                                 "Cust. Ledger Entry No." = FIELD("Entry No."),
-                                                                                 "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Debit Amount" where("Ledger Entry Amount" = const(true),
+                                                                                 "Cust. Ledger Entry No." = field("Entry No."),
+                                                                                 "Posting Date" = field("Date Filter")));
             Caption = 'Debit Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(59; "Credit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Credit Amount" WHERE("Ledger Entry Amount" = CONST(true),
-                                                                                  "Cust. Ledger Entry No." = FIELD("Entry No."),
-                                                                                  "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Credit Amount" where("Ledger Entry Amount" = const(true),
+                                                                                  "Cust. Ledger Entry No." = field("Entry No."),
+                                                                                  "Posting Date" = field("Date Filter")));
             Caption = 'Credit Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -337,9 +359,9 @@
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Debit Amount (LCY)" WHERE("Ledger Entry Amount" = CONST(true),
-                                                                                       "Cust. Ledger Entry No." = FIELD("Entry No."),
-                                                                                       "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Debit Amount (LCY)" where("Ledger Entry Amount" = const(true),
+                                                                                       "Cust. Ledger Entry No." = field("Entry No."),
+                                                                                       "Posting Date" = field("Date Filter")));
             Caption = 'Debit Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -348,9 +370,9 @@
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Credit Amount (LCY)" WHERE("Ledger Entry Amount" = CONST(true),
-                                                                                        "Cust. Ledger Entry No." = FIELD("Entry No."),
-                                                                                        "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Credit Amount (LCY)" where("Ledger Entry Amount" = const(true),
+                                                                                        "Cust. Ledger Entry No." = field("Entry No."),
+                                                                                        "Posting Date" = field("Date Filter")));
             Caption = 'Credit Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -400,11 +422,11 @@
         }
         field(75; "Original Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Cust. Ledger Entry No." = FIELD("Entry No."),
-                                                                         "Entry Type" = FILTER("Initial Entry"),
-                                                                         "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Cust. Ledger Entry No." = field("Entry No."),
+                                                                         "Entry Type" = filter("Initial Entry"),
+                                                                         "Posting Date" = field("Date Filter")));
             Caption = 'Original Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -416,7 +438,7 @@
         }
         field(77; "Remaining Pmt. Disc. Possible"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Remaining Pmt. Disc. Possible';
 
@@ -443,7 +465,7 @@
         }
         field(79; "Max. Payment Tolerance"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Max. Payment Tolerance';
 
@@ -465,7 +487,7 @@
         }
         field(81; "Accepted Payment Tolerance"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Accepted Payment Tolerance';
         }
@@ -480,7 +502,7 @@
         }
         field(84; "Amount to Apply"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount to Apply';
 
@@ -547,7 +569,7 @@
         field(288; "Recipient Bank Account"; Code[20])
         {
             Caption = 'Recipient Bank Account';
-            TableRelation = "Customer Bank Account".Code WHERE("Customer No." = FIELD("Customer No."));
+            TableRelation = "Customer Bank Account".Code where("Customer No." = field("Customer No."));
         }
         field(289; "Message to Recipient"; Text[140])
         {
@@ -578,7 +600,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])
@@ -638,7 +660,7 @@
         field(1200; "Direct Debit Mandate ID"; Code[35])
         {
             Caption = 'Direct Debit Mandate ID';
-            TableRelation = "SEPA Direct Debit Mandate" WHERE("Customer No." = FIELD("Customer No."));
+            TableRelation = "SEPA Direct Debit Mandate" where("Customer No." = field("Customer No."));
         }
         field(10015; "Tax Exemption No."; Text[30])
         {
@@ -1155,6 +1177,53 @@
         OnAfterRecalculateAmounts(Rec, FromCurrencyCode, ToCurrencyCode, PostingDate);
     end;
 
+    procedure UpdateAmountsForApplication(ApplnDate: Date; ApplnCurrencyCode: Code[10]; RoundAmounts: Boolean; UpdateMaxPaymentTolerance: Boolean)
+    var
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+    begin
+        //new
+        if "Currency Code" = ApplnCurrencyCode then
+            exit;
+        if RoundAmounts then begin
+            "Remaining Amount" :=
+                CurrencyExchangeRate.ExchangeAmount(
+                    "Remaining Amount", "Currency Code", ApplnCurrencyCode, ApplnDate);
+            "Remaining Pmt. Disc. Possible" :=
+                CurrencyExchangeRate.ExchangeAmount(
+                    "Remaining Pmt. Disc. Possible", "Currency Code", ApplnCurrencyCode, ApplnDate);
+            if UpdateMaxPaymentTolerance then
+                "Max. Payment Tolerance" :=
+                    CurrencyExchangeRate.ExchangeAmount(
+                        "Max. Payment Tolerance", "Currency Code", ApplnCurrencyCode, ApplnDate);
+            "Amount to Apply" :=
+                CurrencyExchangeRate.ExchangeAmount(
+                    "Amount to Apply", "Currency Code", ApplnCurrencyCode, ApplnDate);
+        end else begin
+            "Remaining Amount" :=
+                CurrencyExchangeRate.ExchangeAmtFCYToFCY(
+                    ApplnDate, "Currency Code", ApplnCurrencyCode, "Remaining Amount");
+            "Remaining Pmt. Disc. Possible" :=
+                CurrencyExchangeRate.ExchangeAmtFCYToFCY(
+                    ApplnDate, "Currency Code", ApplnCurrencyCode, "Remaining Pmt. Disc. Possible");
+            if UpdateMaxPaymentTolerance then // If it is not a problem that "Max. Payment Tolerance" is updated in procedure CalcApplnAmount() on the page "Apply Customer Entries", then maybe the argument UpdateMaxPaymentTolerance can be removed.
+                "Max. Payment Tolerance" :=
+                    CurrencyExchangeRate.ExchangeAmtFCYToFCY(
+                        ApplnDate, "Currency Code", ApplnCurrencyCode, "Max. Payment Tolerance");
+            "Amount to Apply" :=
+                CurrencyExchangeRate.ExchangeAmtFCYToFCY(
+                    ApplnDate, "Currency Code", ApplnCurrencyCode, "Amount to Apply");
+        end;
+
+        OnAfterUpdateAmountsForApplication(Rec, ApplnDate, ApplnCurrencyCode, RoundAmounts, UpdateMaxPaymentTolerance);
+    end;
+
+    procedure GetRemainingPmtDiscPossible(ReferenceDate: Date) RemainingPmtDiscPossible: Decimal
+    begin
+        RemainingPmtDiscPossible := "Remaining Pmt. Disc. Possible";
+
+        OnAfterGetRemainingPmtDiscPossible(Rec, ReferenceDate, RemainingPmtDiscPossible);
+    end;
+
     local procedure AreOppositeSign(Amount1: Decimal; Amount2: Decimal): Boolean
     var
         Math: Codeunit "Math";
@@ -1248,6 +1317,16 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateMessagetoRecipient(var CustLedgerEntry: Record "Cust. Ledger Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdateAmountsForApplication(var CustLedgerEntry: Record "Cust. Ledger Entry"; ApplnDate: Date; ApplnCurrencyCode: Code[10]; RoundAmounts: Boolean; UpdateMaxPaymentTolerance: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetRemainingPmtDiscPossible(CustLedgerEntry: Record "Cust. Ledger Entry"; ReferenceDate: Date; var RemainingPmtDiscPossible: Decimal)
     begin
     end;
 }

@@ -7,7 +7,7 @@ page 5211 "Employee Absences"
     PageType = List;
     PopulateAllFields = true;
     SourceTable = "Employee Absence";
-    SourceTableView = SORTING("Employee No.", "From Date");
+    SourceTableView = sorting("Employee No.", "From Date");
 
     layout
     {
@@ -57,7 +57,7 @@ page 5211 "Employee Absences"
                     ToolTip = 'Specifies the quantity associated with absences, in hours or days.';
                     Visible = false;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies if a comment is associated with this entry.';
@@ -93,8 +93,8 @@ page 5211 "Employee Absences"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Human Resource Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Employee Absence"),
-                                  "Table Line No." = FIELD("Entry No.");
+                    RunPageLink = "Table Name" = const("Employee Absence"),
+                                  "Table Line No." = field("Entry No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

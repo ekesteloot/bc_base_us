@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using System.Visualization;
+
 table 771 "Analysis Report Chart Line"
 {
     Caption = 'Analysis Report Chart Line';
@@ -9,52 +13,52 @@ table 771 "Analysis Report Chart Line"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
-            TableRelation = "Analysis Report Chart Setup"."User ID" WHERE(Name = FIELD(Name),
-                                                                           "Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Analysis Report Chart Setup"."User ID" where(Name = field(Name),
+                                                                           "Analysis Area" = field("Analysis Area"));
         }
         field(2; Name; Text[30])
         {
             Caption = 'Name';
             Editable = false;
-            TableRelation = "Analysis Report Chart Setup".Name WHERE("User ID" = FIELD("User ID"),
-                                                                      "Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Analysis Report Chart Setup".Name where("User ID" = field("User ID"),
+                                                                      "Analysis Area" = field("Analysis Area"));
         }
         field(3; "Analysis Line Line No."; Integer)
         {
             Caption = 'Analysis Line Line No.';
             Editable = false;
-            TableRelation = "Analysis Line"."Line No." WHERE("Analysis Area" = FIELD("Analysis Area"),
-                                                              "Analysis Line Template Name" = FIELD("Analysis Line Template Name"));
+            TableRelation = "Analysis Line"."Line No." where("Analysis Area" = field("Analysis Area"),
+                                                              "Analysis Line Template Name" = field("Analysis Line Template Name"));
         }
         field(4; "Analysis Column Line No."; Integer)
         {
             Caption = 'Analysis Column Line No.';
             Editable = false;
-            TableRelation = "Analysis Column"."Line No." WHERE("Analysis Area" = FIELD("Analysis Area"),
-                                                                "Analysis Column Template" = FIELD("Analysis Column Template Name"));
+            TableRelation = "Analysis Column"."Line No." where("Analysis Area" = field("Analysis Area"),
+                                                                "Analysis Column Template" = field("Analysis Column Template Name"));
         }
         field(6; "Analysis Area"; Enum "Analysis Area Type")
         {
             Caption = 'Analysis Area';
             Editable = false;
-            TableRelation = "Analysis Report Chart Setup"."Analysis Area" WHERE("User ID" = FIELD("User ID"),
-                                                                                 Name = FIELD(Name));
+            TableRelation = "Analysis Report Chart Setup"."Analysis Area" where("User ID" = field("User ID"),
+                                                                                 Name = field(Name));
         }
         field(7; "Analysis Line Template Name"; Code[10])
         {
             Caption = 'Analysis Line Template Name';
             Editable = false;
-            TableRelation = "Analysis Report Chart Setup"."Analysis Line Template Name" WHERE("User ID" = FIELD("User ID"),
-                                                                                               "Analysis Area" = FIELD("Analysis Area"),
-                                                                                               Name = FIELD(Name));
+            TableRelation = "Analysis Report Chart Setup"."Analysis Line Template Name" where("User ID" = field("User ID"),
+                                                                                               "Analysis Area" = field("Analysis Area"),
+                                                                                               Name = field(Name));
         }
         field(8; "Analysis Column Template Name"; Code[10])
         {
             Caption = 'Analysis Column Template Name';
             Editable = false;
-            TableRelation = "Analysis Report Chart Setup"."Analysis Column Template Name" WHERE("User ID" = FIELD("User ID"),
-                                                                                                 "Analysis Area" = FIELD("Analysis Area"),
-                                                                                                 Name = FIELD(Name));
+            TableRelation = "Analysis Report Chart Setup"."Analysis Column Template Name" where("User ID" = field("User ID"),
+                                                                                                 "Analysis Area" = field("Analysis Area"),
+                                                                                                 Name = field(Name));
         }
         field(10; "Original Measure Name"; Text[111])
         {

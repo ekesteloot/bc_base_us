@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Substitution;
+
 page 5716 "Item Substitution Entry"
 {
     Caption = 'Item Substitution Entry';
@@ -40,12 +42,12 @@ page 5716 "Item Substitution Entry"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the description of the substitute item.';
                 }
-                field(Interchangeable; Interchangeable)
+                field(Interchangeable; Rec.Interchangeable)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the item and the substitute item are interchangeable.';
                 }
-                field(Condition; Condition)
+                field(Condition; Rec.Condition)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that a condition exists for this substitution.';
@@ -77,12 +79,12 @@ page 5716 "Item Substitution Entry"
                 Caption = '&Condition';
                 Image = ViewComments;
                 RunObject = Page "Condition Entry";
-                RunPageLink = Type = FIELD(Type),
-                              "No." = FIELD("No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Substitute Type" = FIELD("Substitute Type"),
-                              "Substitute No." = FIELD("Substitute No."),
-                              "Substitute Variant Code" = FIELD("Substitute Variant Code");
+                RunPageLink = Type = field(Type),
+                              "No." = field("No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Substitute Type" = field("Substitute Type"),
+                              "Substitute No." = field("Substitute No."),
+                              "Substitute Variant Code" = field("Substitute Variant Code");
                 ToolTip = 'Specify a condition for the item substitution, which is for information only and does not affect the item substitution.';
             }
         }

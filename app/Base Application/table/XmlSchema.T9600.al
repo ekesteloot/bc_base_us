@@ -1,3 +1,8 @@
+﻿namespace System.Xml;
+
+using System.IO;
+using System.Utilities;
+
 table 9600 "XML Schema"
 {
     Caption = 'XML Schema';

@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Deposit;
+
 codeunit 1513 "Open Deposit Test Report"
 {
     trigger OnRun()

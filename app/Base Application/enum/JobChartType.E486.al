@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Analysis;
+
 enum 486 "Job Chart Type"
 {
     Extensible = true;

@@ -1,3 +1,14 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Structure;
+
 page 99000818 "Prod. Order Components"
 {
     AutoSplitKey = true;
@@ -25,8 +36,8 @@ page 99000818 "Prod. Order Components"
                         Item: Record Item;
                     begin
                         ItemNoOnAfterValidate();
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(true, "Item No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(true, Rec."Item No.");
                     end;
                 }
                 field("Variant Code"; Rec."Variant Code")
@@ -40,8 +51,8 @@ page 99000818 "Prod. Order Components"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(true, "Item No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(true, Rec."Item No.");
                     end;
                 }
                 field("Due Date-Time"; Rec."Due Date-Time")
@@ -82,7 +93,7 @@ page 99000818 "Prod. Order Components"
                         CalculationFormulaOnAfterValidate();
                     end;
                 }
-                field(Length; Length)
+                field(Length; Rec.Length)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the length of one item unit when measured in the specified unit of measure.';
@@ -93,7 +104,7 @@ page 99000818 "Prod. Order Components"
                         LengthOnAfterValidate();
                     end;
                 }
-                field(Width; Width)
+                field(Width; Rec.Width)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the width of one item unit when measured in the specified unit of measure.';
@@ -104,7 +115,7 @@ page 99000818 "Prod. Order Components"
                         WidthOnAfterValidate();
                     end;
                 }
-                field(Weight; Weight)
+                field(Weight; Rec.Weight)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the weight of one item unit when measured in the specified unit of measure.';
@@ -115,7 +126,7 @@ page 99000818 "Prod. Order Components"
                         WeightOnAfterValidate();
                     end;
                 }
-                field(Depth; Depth)
+                field(Depth; Rec.Depth)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the depth of one item unit when measured in the specified unit of measure.';
@@ -144,7 +155,7 @@ page 99000818 "Prod. Order Components"
 
                     trigger OnDrillDown()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                         CurrPage.Update(false);
                     end;
                 }
@@ -189,84 +200,84 @@ page 99000818 "Prod. Order Components"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
                 field("Routing Link Code"; Rec."Routing Link Code")
@@ -303,7 +314,7 @@ page 99000818 "Prod. Order Components"
                     ToolTip = 'Specifies the total cost on the line by multiplying the unit cost by the quantity.';
                     Visible = false;
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the position of the component on the bill of material.';
@@ -452,10 +463,10 @@ page 99000818 "Prod. Order Components"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Prod. Order Comp. Cmt. Sheet";
-                    RunPageLink = Status = FIELD(Status),
-                                  "Prod. Order No." = FIELD("Prod. Order No."),
-                                  "Prod. Order Line No." = FIELD("Prod. Order Line No."),
-                                  "Prod. Order BOM Line No." = FIELD("Line No.");
+                    RunPageLink = Status = field(Status),
+                                  "Prod. Order No." = field("Prod. Order No."),
+                                  "Prod. Order Line No." = field("Prod. Order Line No."),
+                                  "Prod. Order BOM Line No." = field("Line No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -469,7 +480,7 @@ page 99000818 "Prod. Order Components"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -483,7 +494,7 @@ page 99000818 "Prod. Order Components"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
                 action("Bin Contents")
@@ -492,10 +503,10 @@ page 99000818 "Prod. Order Components"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Bin Code", "Item No.", "Variant Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Bin Code", "Item No.", "Variant Code");
                     ToolTip = 'View items in the bin if the selected line contains a bin code.';
                 }
                 action(SelectItemSubstitution)
@@ -509,7 +520,7 @@ page 99000818 "Prod. Order Components"
                     trigger OnAction()
                     begin
                         CurrPage.SaveRecord();
-                        ShowItemSub();
+                        Rec.ShowItemSub();
                         CurrPage.Update(true);
                         ReserveComp();
                     end;
@@ -520,12 +531,12 @@ page 99000818 "Prod. Order Components"
                     Caption = 'Put-away/Pick Lines/Movement Lines';
                     Image = PutawayLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Source Type" = CONST(5407),
-                                  "Source Subtype" = CONST("3"),
-                                  "Source No." = FIELD("Prod. Order No."),
-                                  "Source Line No." = FIELD("Prod. Order Line No."),
-                                  "Source Subline No." = FIELD("Line No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.", "Unit of Measure Code", "Action Type", "Breakbulk No.", "Original Breakbulk");
+                    RunPageLink = "Source Type" = const(5407),
+                                  "Source Subtype" = const("3"),
+                                  "Source No." = field("Prod. Order No."),
+                                  "Source Line No." = field("Prod. Order Line No."),
+                                  "Source Subline No." = field("Line No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.", "Unit of Measure Code", "Action Type", "Breakbulk No.", "Original Breakbulk");
                     ToolTip = 'View the list of ongoing inventory put-aways, picks, or movements for the order.';
                 }
                 action("Item Ledger E&ntries")
@@ -534,11 +545,11 @@ page 99000818 "Prod. Order Components"
                     Caption = 'Item Ledger E&ntries';
                     Image = ItemLedger;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Order Type" = CONST(Production),
-                                  "Order No." = FIELD("Prod. Order No."),
+                    RunPageLink = "Order Type" = const(Production),
+                                  "Order No." = field("Prod. Order No."),
                                   "Order Line No." = field("Prod. Order Line No."),
                                   "Prod. Order Comp. Line No." = field("Line No.");
-                    RunPageView = SORTING("Order Type", "Order No.");
+                    RunPageView = sorting("Order Type", "Order No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the item ledger entries of the item on the document or journal line.';
                 }
@@ -559,11 +570,11 @@ page 99000818 "Prod. Order Components"
 
                     trigger OnAction()
                     begin
-                        if Status in [Status::Simulated, Status::Planned] then
-                            Error(Text000, Status);
+                        if Rec.Status in [Rec.Status::Simulated, Rec.Status::Planned] then
+                            Error(Text000, Rec.Status);
 
                         CurrPage.SaveRecord();
-                        ShowReservation();
+                        Rec.ShowReservation();
                     end;
                 }
                 action(OrderTracking)
@@ -663,9 +674,9 @@ page 99000818 "Prod. Order Components"
     var
         Item: Record Item;
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(true, "Item No.");
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(true, Rec."Item No.");
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -697,17 +708,17 @@ page 99000818 "Prod. Order Components"
         ShouldReserve: Boolean;
     begin
         ShouldReserve :=
-            (xRec."Remaining Qty. (Base)" <> "Remaining Qty. (Base)") or
-            (xRec."Item No." <> "Item No.") or
-            (xRec."Location Code" <> "Location Code");
+            (xRec."Remaining Qty. (Base)" <> Rec."Remaining Qty. (Base)") or
+            (xRec."Item No." <> Rec."Item No.") or
+            (xRec."Location Code" <> Rec."Location Code");
 
         OnBeforeReserveComp(Rec, xRec, ShouldReserve);
 
         if ShouldReserve then
-            if Item.Get("Item No.") then
+            if Item.Get(Rec."Item No.") then
                 if Item.Reserve = Item.Reserve::Always then begin
                     CurrPage.SaveRecord();
-                    AutoReserve();
+                    Rec.AutoReserve();
                     CurrPage.Update(false);
                 end;
     end;

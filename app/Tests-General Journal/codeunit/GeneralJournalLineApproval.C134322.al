@@ -38,6 +38,7 @@ codeunit 134322 "General Journal Line Approval"
         JournalBatchNotApprovedCheckErr: Label 'You cannot use Gen. Journal Line: %1,%2,%3 for this action.\\The restriction was imposed because the journal batch requires approval.';
 
     [Test]
+    [HandlerFunctions('ConfirmHandlerYes')]
     [Scope('OnPrem')]
     procedure DeleteAfterSendingRequest()
     var
@@ -2127,6 +2128,12 @@ codeunit 134322 "General Journal Line Approval"
         Check.BankAccount.SetValue(LibraryVariableStorage.DequeueText);
         Check.OneCheckPerVendorPerDocumentNo.SetValue(LibraryVariableStorage.DequeueBoolean);
         Check.SaveAsXml(LibraryReportDataset.GetParametersFileName, LibraryReportDataset.GetFileName);
+    end;
+
+    [ConfirmHandler]
+    procedure ConfirmHandlerYes(Question: Text[1024]; var Reply: Boolean)
+    begin
+        Reply := true;
     end;
 }
 

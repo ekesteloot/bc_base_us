@@ -1,7 +1,12 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Foundation.Address;
+
 report 5056 "Contact - Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/ContactLabels.rdlc';
+    RDLCLayout = './CRM/Reports/ContactLabels.rdlc';
     ApplicationArea = RelationshipMgmt;
     Caption = 'Contact Labels';
     UsageCategory = ReportsAndAnalysis;

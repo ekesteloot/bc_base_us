@@ -1,7 +1,11 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.Foundation.Company;
+
 report 10200 "Resource Usage"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ResourceUsage.rdlc';
+    RDLCLayout = './ProjectMgt/Resources/Reports/ResourceUsage.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Resource Usage';
     UsageCategory = ReportsAndAnalysis;

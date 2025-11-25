@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.Integration.Dataverse;
+
 page 5400 "Item Unit Group List"
 {
     Caption = 'Item Unit Group List';

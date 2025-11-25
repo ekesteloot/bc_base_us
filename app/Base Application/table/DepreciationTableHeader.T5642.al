@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 table 5642 "Depreciation Table Header"
 {
     Caption = 'Depreciation Table Header';

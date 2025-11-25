@@ -11,7 +11,7 @@ codeunit 30149 "Shpfy GQL UpdateOrderAttr" implements "Shpfy IGraphQL"
     /// <returns>Return value of type Text.</returns>
     internal procedure GetGraphQL(): Text
     begin
-        exit('{"query": "mutation  {orderUpdate(input: {id: \"gid://shopify/Order/{{OrderId}}\" customAttributes: {{CustomAttributes}}}) {order {name}}}"}');
+        exit('{"query": "mutation  {orderUpdate(input: {id: \"gid://shopify/Order/{{OrderId}}\" customAttributes: {{CustomAttributes}}}) {order {name}, userErrors {field, message}}}"}');
     end;
 
     /// <summary>

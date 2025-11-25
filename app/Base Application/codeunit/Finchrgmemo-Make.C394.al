@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Sales.Customer;
+
+using Microsoft.Sales.Receivables;
+
 codeunit 394 "FinChrgMemo-Make"
 {
 

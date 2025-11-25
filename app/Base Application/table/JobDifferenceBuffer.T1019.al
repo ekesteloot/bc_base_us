@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
 table 1019 "Job Difference Buffer"
 {
     Caption = 'Job Difference Buffer';

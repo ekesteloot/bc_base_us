@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+
 page 5415 "Item Avail. by Variant Lines"
 {
     Caption = 'Lines';
@@ -18,7 +23,7 @@ page 5415 "Item Avail. by Variant Lines"
             {
                 Editable = false;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies a code to identify the variant.';
@@ -337,7 +342,7 @@ page 5415 "Item Avail. by Variant Lines"
             Item.SetRange("Date Filter", PeriodStart, PeriodEnd)
         else
             Item.SetRange("Date Filter", 0D, PeriodEnd);
-        Item.SetRange("Variant Filter", Code);
+        Item.SetRange("Variant Filter", Rec.Code);
     end;
 
     local procedure ShowItemAvailLineList(What: Integer)

@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8619 "Config. Template Line"
 {
     Caption = 'Config. Template Line';
@@ -37,8 +41,8 @@ table 8619 "Config. Template Line"
         field(4; "Field ID"; Integer)
         {
             Caption = 'Field ID';
-            TableRelation = IF (Type = CONST(Field)) Field."No." WHERE(TableNo = FIELD("Table ID"),
-                                                                      Class = CONST(Normal));
+            TableRelation = if (Type = const(Field)) Field."No." where(TableNo = field("Table ID"),
+                                                                      Class = const(Normal));
         }
         field(5; "Field Name"; Text[30])
         {
@@ -70,8 +74,8 @@ table 8619 "Config. Template Line"
         }
         field(7; "Table Name"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Name" WHERE("Object Type" = FILTER(Table),
-                                                                        "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Name" where("Object Type" = filter(Table),
+                                                                        "Object ID" = field("Table ID")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
@@ -119,13 +123,15 @@ table 8619 "Config. Template Line"
                     Error(TemplateHierarchyErr, "Template Code");
             end;
         }
-        field(9; "Template Description"; Text[50])
+#pragma warning disable AS0086
+        field(9; "Template Description"; Text[100])
         {
-            CalcFormula = Lookup("Config. Template Header".Description WHERE(Code = FIELD("Data Template Code")));
+            CalcFormula = Lookup("Config. Template Header".Description where(Code = field("Data Template Code")));
             Caption = 'Template Description';
             Editable = false;
             FieldClass = FlowField;
         }
+#pragma warning restore AS0086
         field(10; Mandatory; Boolean)
         {
             Caption = 'Mandatory';
@@ -188,16 +194,16 @@ table 8619 "Config. Template Line"
         }
         field(13; "Table Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = FILTER(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = filter(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(14; "Field Caption"; Text[250])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table ID"),
-                                                              "No." = FIELD("Field ID")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table ID"),
+                                                              "No." = field("Field ID")));
             Caption = 'Field Caption';
             Editable = false;
             FieldClass = FlowField;

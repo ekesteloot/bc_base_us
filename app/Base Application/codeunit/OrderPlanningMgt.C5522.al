@@ -1,3 +1,18 @@
+﻿namespace Microsoft.InventoryMgt.Requisition;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
 codeunit 5522 "Order Planning Mgt."
 {
     trigger OnRun()
@@ -200,15 +215,15 @@ codeunit 5522 "Order Planning Mgt."
             "Journal Batch Name" := GetJnlBatchNameForOrderPlanning();
             case UnplannedDemand."Demand Type" of
                 UnplannedDemand."Demand Type"::Sales:
-                    "Demand Type" := DATABASE::"Sales Line";
+                    "Demand Type" := Enum::TableID::"Sales Line".AsInteger();
                 UnplannedDemand."Demand Type"::Production:
-                    "Demand Type" := DATABASE::"Prod. Order Component";
+                    "Demand Type" := Enum::TableID::"Prod. Order Component".AsInteger();
                 UnplannedDemand."Demand Type"::Service:
-                    "Demand Type" := DATABASE::"Service Line";
+                    "Demand Type" := Enum::TableID::"Service Line".AsInteger();
                 UnplannedDemand."Demand Type"::Job:
-                    "Demand Type" := DATABASE::"Job Planning Line";
+                    "Demand Type" := Enum::TableID::"Job Planning Line".AsInteger();
                 UnplannedDemand."Demand Type"::Assembly:
-                    "Demand Type" := DATABASE::"Assembly Line";
+                    "Demand Type" := Enum::TableID::"Assembly Line".AsInteger();
             end;
             "Demand Subtype" := UnplannedDemand."Demand SubType";
             "Demand Order No." := UnplannedDemand."Demand Order No.";
@@ -277,7 +292,7 @@ codeunit 5522 "Order Planning Mgt."
 
         OnCalcATPQtyOnBeforeCalcQtyAvailabletoPromise(Item);
         exit(
-            AvailableToPromise.CalcQtyAvailableToPromise(Item, GrossRequirement, ScheduledRcpt, DemandDate, "Analysis Period Type"::Day, ODF))
+            AvailableToPromise.CalcQtyAvailableToPromise(Item, GrossRequirement, ScheduledRcpt, DemandDate, Enum::"Analysis Period Type"::Day, ODF))
     end;
 
     procedure CalcATPEarliestDate(ItemNo: Text[250]; VariantFilter: Text[250]; LocationFilter: Text[250]; DemandDate: Date; Quantity: Decimal): Date
@@ -407,7 +422,7 @@ codeunit 5522 "Order Planning Mgt."
         Item: Record Item;
     begin
         if (ReqLine.Type <> ReqLine.Type::Item) or
-           (ReqLine."Demand Type" <> DATABASE::"Prod. Order Component")
+           (ReqLine."Demand Type" <> Enum::TableID::"Prod. Order Component".AsInteger())
         then
             exit(false);
 

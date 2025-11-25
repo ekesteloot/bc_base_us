@@ -1,14 +1,23 @@
+﻿namespace Microsoft.Purchases.Archive;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 415 "Archived Purchase Quote"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/ArchivedPurchaseQuote.rdlc';
+    RDLCLayout = './Purchases/Archive/ArchivedPurchaseQuote.rdlc';
     Caption = 'Archived Purchase Quote';
 
     dataset
     {
         dataitem("Purchase Header Archive"; "Purchase Header Archive")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Quote));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Quote));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Archived Purchase Quote';
             column(Purchase_Header_Archive_Document_Type; "Document Type")
@@ -19,10 +28,10 @@ report 415 "Archived Purchase Quote"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(STRSUBSTNO_Text002_CopyText_; StrSubstNo(Text002, CopyText))
                     {
                     }
@@ -158,7 +167,7 @@ report 415 "Archived Purchase Quote"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purchase Header Archive";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -202,9 +211,9 @@ report 415 "Archived Purchase Quote"
                     }
                     dataitem("Purchase Line Archive"; "Purchase Line Archive")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Purchase Header Archive";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -213,7 +222,7 @@ report 415 "Archived Purchase Quote"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ShowInternalInfo; ShowInternalInfo)
                         {
                         }
@@ -270,7 +279,7 @@ report 415 "Archived Purchase Quote"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_Control60; DimText)
                             {
                             }
@@ -347,7 +356,7 @@ report 415 "Archived Purchase Quote"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(ShipmentMethod_Description; ShipmentMethod.Description)
                         {
                         }
@@ -357,7 +366,7 @@ report 415 "Archived Purchase Quote"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Purchase_Header_Archive___Buy_from_Vendor_No__; "Purchase Header Archive"."Buy-from Vendor No.")
                         {
                         }
@@ -373,7 +382,7 @@ report 415 "Archived Purchase Quote"
                     }
                     dataitem(Total3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(ShipToAddr_1_; ShipToAddr[1])
                         {
                         }
@@ -449,6 +458,7 @@ report 415 "Archived Purchase Quote"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Purchase Header Archive");

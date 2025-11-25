@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 enum 5440 "Reordering Policy"
 {
     Extensible = true;

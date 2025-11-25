@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+
 report 5689 "Create FA Depreciation Books"
 {
     Caption = 'Create FA Depreciation Books';
@@ -7,7 +12,7 @@ report 5689 "Create FA Depreciation Books"
     {
         dataitem("Fixed Asset"; "Fixed Asset")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "FA Class Code", "FA Subclass Code";
 
             trigger OnAfterGetRecord()

@@ -1,3 +1,16 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Enums;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Receivables;
+
 table 296 "Reminder Line"
 {
     Caption = 'Reminder Line';
@@ -18,7 +31,7 @@ table 296 "Reminder Line"
         {
             Caption = 'Attached to Line No.';
             Editable = false;
-            TableRelation = "Reminder Line"."Line No." WHERE("Reminder No." = FIELD("Reminder No."));
+            TableRelation = "Reminder Line"."Line No." where("Reminder No." = field("Reminder No."));
         }
         field(4; Type; Enum "Reminder Source Type")
         {
@@ -196,11 +209,11 @@ table 296 "Reminder Line"
         field(15; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(" ")) "Standard Text"
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF (Type = CONST("Line Fee")) "G/L Account";
+            TableRelation = if (Type = const(" ")) "Standard Text"
+            else
+            if (Type = const("G/L Account")) "G/L Account"
+            else
+            if (Type = const("Line Fee")) "G/L Account";
 
             trigger OnValidate()
             begin

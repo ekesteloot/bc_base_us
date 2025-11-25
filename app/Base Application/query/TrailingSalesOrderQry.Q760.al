@@ -6,7 +6,7 @@ query 760 "Trailing Sales Order Qry"
     {
         dataitem(Sales_Header; "Sales Header")
         {
-            DataItemTableFilter = "Document Type" = CONST(Order);
+            DataItemTableFilter = "Document Type" = const(Order);
             filter(ShipmentDate; "Shipment Date")
             {
             }
@@ -23,7 +23,7 @@ query 760 "Trailing Sales Order Qry"
             {
                 DataItemLink = "Document Type" = Sales_Header."Document Type", "Document No." = Sales_Header."No.";
                 SqlJoinType = InnerJoin;
-                DataItemTableFilter = Amount = FILTER(<> 0);
+                DataItemTableFilter = Amount = filter(<> 0);
                 column(Amount; Amount)
                 {
                     Method = Sum;

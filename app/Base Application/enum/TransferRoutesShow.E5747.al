@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
 enum 5747 "Transfer Routes Show"
 {
     Extensible = true;

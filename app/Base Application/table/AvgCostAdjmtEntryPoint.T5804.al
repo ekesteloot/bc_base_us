@@ -12,7 +12,7 @@ table 5804 "Avg. Cost Adjmt. Entry Point"
         field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(3; "Location Code"; Code[10])
         {

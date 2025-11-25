@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 enum 5092 "Opportunity Status"
 {
     Extensible = true;

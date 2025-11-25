@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.AllocationAccount;
+using Microsoft.FinancialMgt.AllocationAccount.Sales;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+
 page 516 "Sales Lines"
 {
     ApplicationArea = Basic, Suite;
@@ -75,7 +82,7 @@ page 516 "Sales Lines"
                     ToolTip = 'Specifies the inventory location from which the items sold should be picked and where the inventory decrease is registered.';
                     Visible = true;
                 }
-                field(Reserve; Reserve)
+                field(Reserve; Rec.Reserve)
                 {
                     ApplicationArea = Reservation;
                     ToolTip = 'Specifies whether a reservation can be made for items on this line.';
@@ -107,6 +114,19 @@ page 516 "Sales Lines"
                     BlankZero = true;
                     ToolTip = 'Specifies the net amount, excluding any invoice discount amount, that must be paid for products on the line.';
                 }
+                field("Allocation Account No."; Rec."Selected Alloc. Account No.")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Allocation Account No.';
+                    ToolTip = 'Specifies the allocation account number that will be used to distribute the amounts during the posting process.';
+                    Visible = UseAllocationAccountNumber;
+                    trigger OnValidate()
+                    var
+                        SalesAllocAccMgt: Codeunit "Sales Alloc. Acc. Mgt.";
+                    begin
+                        SalesAllocAccMgt.VerifySelectedAllocationAccountNo(Rec);
+                    end;
+                }
                 field("Job No."; Rec."Job No.")
                 {
                     ApplicationArea = Jobs;
@@ -135,54 +155,54 @@ page 516 "Sales Lines"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
                 }
                 field("Shipment Date"; Rec."Shipment Date")
@@ -219,7 +239,7 @@ page 516 "Sales Lines"
                     var
                         PageManagement: Codeunit "Page Management";
                     begin
-                        SalesHeader.Get("Document Type", "Document No.");
+                        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
                         PageManagement.PageRun(SalesHeader);
                     end;
                 }
@@ -233,7 +253,7 @@ page 516 "Sales Lines"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
                 action("Item &Tracking Lines")
@@ -246,7 +266,7 @@ page 516 "Sales Lines"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
                 action("Detach Lines")
@@ -264,7 +284,28 @@ page 516 "Sales Lines"
                         CurrPage.SetSelectionFilter(SalesLine);
                         SalesLine.ModifyAll("Attached to Line No.", 0);
                     end;
-                }                
+                }
+                action(RedistributeAccAllocations)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Redistribute Account Allocations';
+                    Image = EditList;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to redistribute the account allocations for this line.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        AllocAccManualOverride: Page Microsoft.FinancialMgt.AllocationAccount."Redistribute Acc. Allocations";
+                    begin
+                        if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
+                        AllocAccManualOverride.SetParentTableId(Database::"Sales Line");
+                        AllocAccManualOverride.RunModal();
+                    end;
+                }
             }
         }
         area(Promoted)
@@ -299,7 +340,7 @@ page 516 "Sales Lines"
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -308,13 +349,18 @@ page 516 "Sales Lines"
     end;
 
     trigger OnOpenPage()
+    var
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
     begin
+        UseAllocationAccountNumber := AllocationAccountMgt.UseAllocationAccountNoField();
         DetachLinesVisible := Rec.GetFilter("Attached to Line No.") <> '';
     end;
 
     var
         SalesHeader: Record "Sales Header";
         DetachLinesVisible: Boolean;
+        UseAllocationAccountNumber: Boolean;
+        ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Type.';
 
     protected var
         ShortcutDimCode: array[8] of Code[20];

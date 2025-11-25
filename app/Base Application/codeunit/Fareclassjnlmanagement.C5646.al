@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.FixedAssets.FixedAsset;
+
 codeunit 5646 FAReclassJnlManagement
 {
     Permissions = TableData "FA Reclass. Journal Template" = rimd,

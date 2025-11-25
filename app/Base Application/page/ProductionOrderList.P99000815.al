@@ -1,3 +1,10 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.WarehouseMgt.Ledger;
+
 page 99000815 "Production Order List"
 {
     ApplicationArea = Manufacturing;
@@ -201,9 +208,9 @@ page 99000815 "Production Order List"
                         Caption = 'Item Ledger E&ntries';
                         Image = ItemLedger;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ShortCutKey = 'Ctrl+F7';
                         ToolTip = 'View the item ledger entries of the item on the document or journal line.';
                     }
@@ -213,9 +220,9 @@ page 99000815 "Production Order List"
                         Caption = 'Capacity Ledger Entries';
                         Image = CapacityLedger;
                         RunObject = Page "Capacity Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                     }
                     action("Value Entries")
@@ -224,9 +231,9 @@ page 99000815 "Production Order List"
                         Caption = 'Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the value entries of the item on the document or journal line.';
                     }
                     action("&Warehouse Entries")
@@ -235,10 +242,10 @@ page 99000815 "Production Order List"
                         Caption = '&Warehouse Entries';
                         Image = BinLedger;
                         RunObject = Page "Warehouse Entries";
-                        RunPageLink = "Source Type" = FILTER(83 | 5407),
-                                      "Source Subtype" = FILTER("3" | "4" | "5"),
-                                      "Source No." = FIELD("No.");
-                        RunPageView = SORTING("Source Type", "Source Subtype", "Source No.");
+                        RunPageLink = "Source Type" = filter(83 | 5407),
+                                      "Source Subtype" = filter("3" | "4" | "5"),
+                                      "Source No." = field("No.");
+                        RunPageView = sorting("Source Type", "Source Subtype", "Source No.");
                         ToolTip = 'View the history of quantities that are registered for the item in warehouse activities. ';
                     }
                 }
@@ -248,8 +255,8 @@ page 99000815 "Production Order List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Prod. Order Comment Sheet";
-                    RunPageLink = Status = FIELD(Status),
-                                  "Prod. Order No." = FIELD("No.");
+                    RunPageLink = Status = field(Status),
+                                  "Prod. Order No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -263,7 +270,7 @@ page 99000815 "Production Order List"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -273,9 +280,9 @@ page 99000815 "Production Order List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Production Order Statistics";
-                    RunPageLink = Status = FIELD(Status),
-                                  "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = Status = field(Status),
+                                  "No." = field("No."),
+                                  "Date Filter" = field("Date Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -323,7 +330,7 @@ page 99000815 "Production Order List"
 #if not CLEAN17
     trigger OnAfterGetRecord()
     begin
-        GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
+        Rec.GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
     end;
 
     trigger OnInit()
@@ -345,16 +352,16 @@ page 99000815 "Production Order List"
 #endif
     local procedure OpenSourceCard()
     begin
-        case Status of
-            Status::Simulated:
+        case Rec.Status of
+            Rec.Status::Simulated:
                 Page.Run(Page::"Simulated Production Order", Rec);
-            Status::Planned:
+            Rec.Status::Planned:
                 Page.Run(Page::"Planned Production Order", Rec);
-            Status::"Firm Planned":
+            Rec.Status::"Firm Planned":
                 Page.Run(Page::"Firm Planned Prod. Order", Rec);
-            Status::Released:
+            Rec.Status::Released:
                 Page.Run(Page::"Released Production Order", Rec);
-            Status::Finished:
+            Rec.Status::Finished:
                 Page.Run(Page::"Finished Production Order", Rec);
         end;
     end;

@@ -18,6 +18,10 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "All Profile" = m,
                   tabledata AllObj = m,
                   tabledata AllObjWithCaption = Rm,
+                  tabledata "Alloc. Acc. Manual Override" = RIMD,
+                  tabledata "Alloc. Account Distribution" = R,
+                  tabledata "Allocation Account" = R,
+                  tabledata "Allocation Line" = RIMD,
                   tabledata Chart = m,
                   tabledata Company = M,
                   tabledata "Code Coverage" = Rm,
@@ -77,7 +81,9 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Table Information" = Rm,
                   tabledata "Table Metadata" = m,
                   tabledata "Table Synch. Setup" = Rm,
+#pragma warning disable AL0432
                   tabledata "Tenant Profile" = m,
+#pragma warning restore AL0432
                   tabledata "Tenant Profile Extension" = m,
                   tabledata "Tenant Profile Page Metadata" = m,
                   tabledata "Tenant Profile Setting" = m,
@@ -200,6 +206,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Booking Staff" = RM,
                   tabledata "Booking Sync" = RM,
                   tabledata "Budget Buffer" = RM,
+                  tabledata "Bus. Unit In Cons. Process" = RIM,
                   tabledata "Business Chart Buffer" = RM,
                   tabledata "Business Chart Map" = RM,
                   tabledata "Business Chart User Setup" = RIMD,
@@ -228,6 +235,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Cash Flow Worksheet Line" = RM,
                   tabledata "Cause of Absence" = RM,
                   tabledata "Cause of Inactivity" = RM,
+                  tabledata "CDS Available Virtual Table" = RM,
                   tabledata "CDS Company" = RM,
                   tabledata "CDS Connection Setup" = RM,
                   tabledata "CDS Coupled Business Unit" = RM,
@@ -279,6 +287,8 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Config. Template Line" = RIMD,
                   tabledata "Config. Tmpl. Selection Rules" = RIMD,
                   tabledata "Consolidation Account" = RM,
+                  tabledata "Consolidation Process" = RIM,
+                  tabledata "Consolidation Setup" = RI,
                   tabledata "Cont. Duplicate Search String" = RIMD,
                   tabledata Contact = RM,
                   tabledata "Contact Alt. Addr. Date Range" = RM,
@@ -398,9 +408,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Customer Price Group" = RM,
                   tabledata "Customer Sales Buffer" = RIMD,
                   tabledata "Customer Templ." = RIMD,
-#if not CLEAN20
-                  tabledata "Customer Template" = RM,
-#endif
                   tabledata "Customized Calendar Change" = RM,
                   tabledata "Customized Calendar Entry" = RM,
                   tabledata "CV Ledger Entry Buffer" = RM,
@@ -595,10 +602,6 @@ permissionset 7931 "D365 TEAM MEMBER"
 #if not CLEAN21
                   tabledata "Graph Mail Setup" = RM,
 # endif
-#if not CLEAN20
-                  tabledata "Graph Subscription" = RM,
-                  tabledata "Graph Business Setting" = RM,
-#endif
                   tabledata "Grounds for Termination" = RM,
                   tabledata "Handled IC Inbox Jnl. Line" = RM,
                   tabledata "Handled IC Inbox Purch. Header" = RM,
@@ -690,7 +693,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Inventory Report Entry" = RM,
                   tabledata "Inventory Report Header" = RM,
                   tabledata "Inventory Setup" = RM,
-#if not CLEAN20
+#if not CLEAN23
                   tabledata "Invoice Post. Buffer" = RM,
 #endif
                   tabledata "Invoice Posting Buffer" = RM,
@@ -829,12 +832,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "My Vendor" = RIMD,
                   tabledata "Name/Value Buffer" = RM,
                   tabledata "Named Forward Link" = RM,
-#if not CLEAN20
-                  tabledata "Native - API Tax Setup" = RIMD,
-                  tabledata "Native - Export Invoices" = RIMD,
-                  tabledata "Native - Gen. Settings Buffer" = RIMD,
-                  tabledata "Native - Payment" = RIMD,
-#endif
                   tabledata "No. Series" = RM,
                   tabledata "No. Series Line" = RM,
                   tabledata "No. Series Relationship" = RM,
@@ -952,9 +949,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Phys. Invt. Record Line" = RM,
                   tabledata "Phys. Invt. Tracking" = RM,
                   tabledata "Picture Entity" = RIMD,
-#if not CLEAN20
-                  tabledata "Plan Permission Set" = Rm,
-#endif
                   tabledata "Planning Assignment" = Rim,
                   tabledata "Planning Buffer" = RM,
                   tabledata "Planning Component" = Rm,
@@ -1002,7 +996,9 @@ permissionset 7931 "D365 TEAM MEMBER"
 #if not CLEAN21
                   tabledata "Power BI User License" = RIMD,
 #endif
+#if not CLEAN23
                   tabledata "Power BI User Status" = RIMD,
+#endif
                   tabledata "Prepayment Inv. Line Buffer" = RM,
                   tabledata "Price Asset" = RIMD,
                   tabledata "Price Calculation Buffer" = RIMD,
@@ -1423,17 +1419,6 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Workflow Webhook Sub Buffer" = RIMD,
                   tabledata "Workflow Webhook Subscription" = RIMD,
                   tabledata "Workflows Entries Buffer" = Rimd,
-#if not CLEAN20
-                  tabledata "XBRL Comment Line" = RIMD,
-                  tabledata "XBRL G/L Map Line" = RIMD,
-                  tabledata "XBRL Line Constant" = RIMD,
-                  tabledata "XBRL Linkbase" = RIMD,
-                  tabledata "XBRL Rollup Line" = RIMD,
-                  tabledata "XBRL Schema" = RIMD,
-                  tabledata "XBRL Taxonomy" = RIMD,
-                  tabledata "XBRL Taxonomy Label" = RIMD,
-                  tabledata "XBRL Taxonomy Line" = RIMD,
-#endif
                   tabledata "XML Buffer" = RM,
                   tabledata "XML Schema" = RM,
                   tabledata "XML Schema Element" = RM,

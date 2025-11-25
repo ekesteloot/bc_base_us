@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+
 page 7115 "Inventory Analysis Lines"
 {
     AutoSplitKey = true;
@@ -60,18 +65,18 @@ page 7115 "Inventory Analysis Lines"
 
                     trigger OnValidate()
                     begin
-                        if (Type in [Type::Customer, Type::"Customer Group", Type::Vendor, type::"Sales/Purchase Person"]) then
-                            FieldError(Type);
+                        if (Rec.Type in [Rec.Type::Customer, Rec.Type::"Customer Group", Rec.Type::Vendor, Rec.Type::"Sales/Purchase Person"]) then
+                            Rec.FieldError(Rec.Type);
                     end;
                 }
-                field(Range; Range)
+                field(Range; Rec.Range)
                 {
                     ApplicationArea = InventoryAnalysis;
                     ToolTip = 'Specifies the number or formula of the type to use to calculate the total for this line.';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        exit(LookupTotalingRange(Text));
+                        exit(Rec.LookupTotalingRange(Text));
                     end;
                 }
                 field("Dimension 1 Totaling"; Rec."Dimension 1 Totaling")
@@ -81,7 +86,7 @@ page 7115 "Inventory Analysis Lines"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        exit(LookupDimTotalingRange(Text, ItemAnalysisView."Dimension 1 Code"));
+                        exit(Rec.LookupDimTotalingRange(Text, ItemAnalysisView."Dimension 1 Code"));
                     end;
                 }
                 field("Dimension 2 Totaling"; Rec."Dimension 2 Totaling")
@@ -91,7 +96,7 @@ page 7115 "Inventory Analysis Lines"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        exit(LookupDimTotalingRange(Text, ItemAnalysisView."Dimension 2 Code"));
+                        exit(Rec.LookupDimTotalingRange(Text, ItemAnalysisView."Dimension 2 Code"));
                     end;
                 }
                 field("Dimension 3 Totaling"; Rec."Dimension 3 Totaling")
@@ -101,7 +106,7 @@ page 7115 "Inventory Analysis Lines"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        exit(LookupDimTotalingRange(Text, ItemAnalysisView."Dimension 3 Code"));
+                        exit(Rec.LookupDimTotalingRange(Text, ItemAnalysisView."Dimension 3 Code"));
                     end;
                 }
                 field("New Page"; Rec."New Page")
@@ -109,28 +114,28 @@ page 7115 "Inventory Analysis Lines"
                     ApplicationArea = InventoryAnalysis;
                     ToolTip = 'Specifies if you want a page break after the current line when you print the analysis report.';
                 }
-                field(Show; Show)
+                field(Show; Rec.Show)
                 {
                     ApplicationArea = InventoryAnalysis;
                     ToolTip = 'Specifies whether you want the analysis line to be included when you print the report.';
                 }
-                field(Bold; Bold)
+                field(Bold; Rec.Bold)
                 {
                     ApplicationArea = InventoryAnalysis;
                     ToolTip = 'Specifies if you want the amounts in this line to be printed in bold.';
                 }
-                field(Indentation; Indentation)
+                field(Indentation; Rec.Indentation)
                 {
                     ApplicationArea = InventoryAnalysis;
                     ToolTip = 'Specifies the indentation of the line.';
                     Visible = false;
                 }
-                field(Italic; Italic)
+                field(Italic; Rec.Italic)
                 {
                     ApplicationArea = InventoryAnalysis;
                     ToolTip = 'Specifies if you want the amounts in this line to be printed in italics.';
                 }
-                field(Underline; Underline)
+                field(Underline; Rec.Underline)
                 {
                     ApplicationArea = InventoryAnalysis;
                     ToolTip = 'Specifies if you want the amounts in this line to be underlined when printed.';
@@ -233,9 +238,9 @@ page 7115 "Inventory Analysis Lines"
 
         GLSetup.Get();
 
-        if AnalysisLineTemplate.Get(GetRangeMax("Analysis Area"), CurrentAnalysisLineTempl) then
+        if AnalysisLineTemplate.Get(Rec.GetRangeMax("Analysis Area"), CurrentAnalysisLineTempl) then
             if AnalysisLineTemplate."Item Analysis View Code" <> '' then
-                ItemAnalysisView.Get(GetRangeMax("Analysis Area"), AnalysisLineTemplate."Item Analysis View Code")
+                ItemAnalysisView.Get(Rec.GetRangeMax("Analysis Area"), AnalysisLineTemplate."Item Analysis View Code")
             else begin
                 Clear(ItemAnalysisView);
                 ItemAnalysisView."Dimension 1 Code" := GLSetup."Global Dimension 1 Code";
@@ -247,7 +252,6 @@ page 7115 "Inventory Analysis Lines"
         ItemAnalysisView: Record "Item Analysis View";
         AnalysisReportMgt: Codeunit "Analysis Report Management";
         CurrentAnalysisLineTempl: Code[10];
-        [InDataSet]
         DescriptionIndent: Integer;
 
     local procedure InsertLine(Type: Enum "Analysis Line Type")
@@ -256,7 +260,7 @@ page 7115 "Inventory Analysis Lines"
     begin
         CurrPage.Update(true);
         AnalysisLine.Copy(Rec);
-        if "Line No." = 0 then begin
+        if Rec."Line No." = 0 then begin
             AnalysisLine := xRec;
             if AnalysisLine.Next() = 0 then
                 AnalysisLine."Line No." := xRec."Line No." + 10000;
@@ -307,13 +311,13 @@ page 7115 "Inventory Analysis Lines"
     begin
         CurrPage.SaveRecord();
         AnalysisReportMgt.SetAnalysisLineTemplName(CurrentAnalysisLineTempl, Rec);
-        if ItemSchedName.Get(GetRangeMax("Analysis Area"), CurrentAnalysisLineTempl) then
+        if ItemSchedName.Get(Rec.GetRangeMax("Analysis Area"), CurrentAnalysisLineTempl) then
             CurrPage.Update(false);
     end;
 
     local procedure DescriptionOnFormat()
     begin
-        DescriptionIndent := Indentation;
+        DescriptionIndent := Rec.Indentation;
     end;
 
     [IntegrationEvent(false, false)]

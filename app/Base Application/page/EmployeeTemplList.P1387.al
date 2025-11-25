@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Employee;
+
 page 1387 "Employee Templ. List"
 {
     Caption = 'Employee Templates';

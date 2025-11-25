@@ -1,14 +1,19 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+
 report 319 "Payments on Hold"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/PaymentsonHold.rdlc';
+    RDLCLayout = './Purchases/Reports/PaymentsonHold.rdlc';
     Caption = 'Payments on Hold';
 
     dataset
     {
         dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
         {
-            DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date") WHERE(Open = CONST(true), "On Hold" = FILTER(<> ''));
+            DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date") where(Open = const(true), "On Hold" = filter(<> ''));
             RequestFilterFields = "Due Date";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {

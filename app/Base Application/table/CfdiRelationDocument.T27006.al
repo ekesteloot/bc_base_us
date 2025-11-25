@@ -24,11 +24,11 @@ table 27006 "CFDI Relation Document"
         field(7; "Related Doc. No."; Code[20])
         {
             NotBlank = true;
-            TableRelation = IF ("Related Doc. Type" = CONST(Invoice)) "Cust. Ledger Entry"."Document No." WHERE("Document Type" = FILTER(Invoice),
-                                                                                                               "Customer No." = FIELD("Customer No."))
-            ELSE
-            IF ("Related Doc. Type" = CONST("Credit Memo")) "Cust. Ledger Entry"."Document No." WHERE("Document Type" = FILTER("Credit Memo"),
-                                                                                                                                                                                                             "Customer No." = FIELD("Customer No."));
+            TableRelation = if ("Related Doc. Type" = const(Invoice)) "Cust. Ledger Entry"."Document No." where("Document Type" = filter(Invoice),
+                                                                                                               "Customer No." = field("Customer No."))
+            else
+            if ("Related Doc. Type" = const("Credit Memo")) "Cust. Ledger Entry"."Document No." where("Document Type" = filter("Credit Memo"),
+                                                                                                                                                                                                             "Customer No." = field("Customer No."));
             ValidateTableRelation = false;
 
             trigger OnValidate()

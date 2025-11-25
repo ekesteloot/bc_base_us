@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Security.User;
+
 page 830 "Workflow Webhook Entries"
 {
     ApplicationArea = Suite;
@@ -5,8 +9,8 @@ page 830 "Workflow Webhook Entries"
     Editable = false;
     PageType = List;
     SourceTable = "Workflow Webhook Entry";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Entry No.")
+                      order(Ascending);
     UsageCategory = Lists;
 
     layout
@@ -35,10 +39,10 @@ page 830 "Workflow Webhook Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Initiated By User ID");
+                        UserMgt.DisplayUserInformation(Rec."Initiated By User ID");
                     end;
                 }
-                field(Response; Response)
+                field(Response; Rec.Response)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the affected workflow response.';
@@ -52,7 +56,7 @@ page 830 "Workflow Webhook Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Last Modified By User ID");
+                        UserMgt.DisplayUserInformation(Rec."Last Modified By User ID");
                     end;
                 }
                 field("Last Date-Time Modified"; Rec."Last Date-Time Modified")
@@ -136,7 +140,7 @@ page 830 "Workflow Webhook Entries"
 
                 trigger OnAction()
                 begin
-                    ShowRecord();
+                    Rec.ShowRecord();
                 end;
             }
         }
@@ -167,9 +171,9 @@ page 830 "Workflow Webhook Entries"
         WorkflowWebhookNotification: Record "Workflow Webhook Notification";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
-        RecordIDText := Format("Record ID", 0, 1);
+        RecordIDText := Format(Rec."Record ID", 0, 1);
         CanCancel := WorkflowWebhookManagement.CanCancel(Rec);
-        if FindWorkflowWebhookNotification("Workflow Step Instance ID", WorkflowWebhookNotification) then begin
+        if FindWorkflowWebhookNotification(Rec."Workflow Step Instance ID", WorkflowWebhookNotification) then begin
             NotificationStatusText := Format(WorkflowWebhookNotification.Status);
             NotificationErrorText := WorkflowWebhookNotification."Error Message";
             CanResendNotification := WorkflowWebhookNotification.Status = WorkflowWebhookNotification.Status::Failed;
@@ -183,7 +187,7 @@ page 830 "Workflow Webhook Entries"
     trigger OnOpenPage()
     begin
         if not ShowAllResponses then
-            SetFilter(Response, Format(Response::Pending));
+            Rec.SetFilter(Response, Format(Rec.Response::Pending));
     end;
 
     var
@@ -202,7 +206,7 @@ page 830 "Workflow Webhook Entries"
 
     procedure Setfilters(RecordIDValue: RecordID)
     begin
-        SetRange("Record ID", RecordIDValue);
+        Rec.SetRange("Record ID", RecordIDValue);
         ShowAllResponses := true;
     end;
 }

@@ -1,3 +1,10 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Comment;
+using Microsoft.Manufacturing.Reports;
+
 page 99000755 "Work Center List"
 {
     AdditionalSearchTerms = 'production resource,production personnel';
@@ -71,12 +78,12 @@ page 99000755 "Work Center List"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the amount of work that can be done in a specified time period. The capacity of a work center indicates how many machines or persons are working at the same time. If you enter 2, for example, the work center will take half of the time compared to a work center with the capacity of 1. ';
                 }
-                field(Efficiency; Efficiency)
+                field(Efficiency; Rec.Efficiency)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the efficiency factor as a percentage of the work center.';
@@ -165,9 +172,9 @@ page 99000755 "Work Center List"
                     Caption = 'Capacity Ledger E&ntries';
                     Image = CapacityLedger;
                     RunObject = Page "Capacity Ledger Entries";
-                    RunPageLink = "Work Center No." = FIELD("No."),
-                                  "Posting Date" = FIELD("Date Filter");
-                    RunPageView = SORTING("Work Center No.", "Work Shift Code", "Posting Date");
+                    RunPageLink = "Work Center No." = field("No."),
+                                  "Posting Date" = field("Date Filter");
+                    RunPageView = sorting("Work Center No.", "Work Shift Code", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                 }
@@ -177,8 +184,8 @@ page 99000755 "Work Center List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Manufacturing Comment Sheet";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = WHERE("Table Name" = CONST("Work Center"));
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = where("Table Name" = const("Work Center"));
                     ToolTip = 'View or add comments for the record.';
                 }
                 group(Dimensions)
@@ -191,8 +198,8 @@ page 99000755 "Work Center List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(99000754),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(99000754),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -210,7 +217,7 @@ page 99000755 "Work Center List"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(Work);
-                            DefaultDimMultiple.SetMultiRecord(Work, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(Work, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -221,8 +228,8 @@ page 99000755 "Work Center List"
                     Caption = 'Lo&ad';
                     Image = WorkCenterLoad;
                     RunObject = Page "Work Center Load";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = SORTING("No.");
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = sorting("No.");
                     ToolTip = 'View the availability of the machine or work center, including its capacity, the allocated quantity, availability after orders, and the load in percent of its total capacity.';
                 }
                 action(Statistics)
@@ -231,9 +238,9 @@ page 99000755 "Work Center List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Work Center Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Work Shift Filter" = FIELD("Work Shift Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Work Shift Filter" = field("Work Shift Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -256,9 +263,9 @@ page 99000755 "Work Center List"
                     Caption = 'A&bsence';
                     Image = WorkCenterAbsence;
                     RunObject = Page "Capacity Absence";
-                    RunPageLink = "Capacity Type" = CONST("Work Center"),
-                                  "No." = FIELD("No."),
-                                  Date = FIELD("Date Filter");
+                    RunPageLink = "Capacity Type" = const("Work Center"),
+                                  "No." = field("No."),
+                                  Date = field("Date Filter");
                     ToolTip = 'View which working days are not available. ';
                 }
                 action("Ta&sk List")
@@ -267,11 +274,11 @@ page 99000755 "Work Center List"
                     Caption = 'Ta&sk List';
                     Image = TaskList;
                     RunObject = Page "Work Center Task List";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = SORTING(Type, "No.")
-                                  WHERE(Type = CONST("Work Center"),
-                                        Status = FILTER(.. Released),
-                                        "Routing Status" = FILTER(<> Finished));
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = sorting(Type, "No.")
+                                  where(Type = const("Work Center"),
+                                        Status = filter(.. Released),
+                                        "Routing Status" = filter(<> Finished));
                     ToolTip = 'View the list of operations that are scheduled for the work center.';
                 }
             }

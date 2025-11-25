@@ -1,3 +1,9 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Setup;
+using System;
+using System.Visualization;
+
 page 869 "Cash Flow Forecast Chart"
 {
     Caption = 'Cash Flow Forecast';
@@ -25,7 +31,7 @@ page 869 "Cash Flow Forecast Chart"
 
                 trigger DataPointClicked(point: DotNet BusinessChartDataPoint)
                 begin
-                    SetDrillDownIndexes(point);
+                    Rec.SetDrillDownIndexes(point);
                     CashFlowChartMgt.DrillDown(Rec);
                 end;
 
@@ -342,7 +348,6 @@ page 869 "Cash Flow Forecast Chart"
         NeedsUpdate: Boolean;
         IsChartDataReady: Boolean;
         IsChartAddInReady: Boolean;
-        [InDataSet]
         IsCashFlowSetUp: Boolean;
         NotSetupLbl: Label 'Cash Flow Forecast is not set up. An Assisted Setup is available for easy set up.';
         ChartDescriptionMsg: Label 'Shows the expected movement of money into or out of your company.';
@@ -358,7 +363,7 @@ page 869 "Cash Flow Forecast Chart"
             exit;
 
         if CashFlowChartMgt.UpdateData(Rec) then
-            Update(CurrPage.BusinessChart);
+            Rec.Update(CurrPage.BusinessChart);
         UpdateStatus();
 
         NeedsUpdate := false;

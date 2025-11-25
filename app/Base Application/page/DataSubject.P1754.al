@@ -24,7 +24,7 @@ page 1754 "Data Subject"
 
                     trigger OnDrillDown()
                     begin
-                        PAGE.Run("Page No.");
+                        PAGE.Run(Rec."Page No.");
                     end;
                 }
             }
@@ -46,8 +46,8 @@ page 1754 "Data Subject"
                 var
                     DataPrivacyWizard: Page "Data Privacy Wizard";
                 begin
-                    if "Table Caption" <> '' then begin
-                        DataPrivacyWizard.SetEntitityType(Rec, "Table Caption");
+                    if Rec."Table Caption" <> '' then begin
+                        DataPrivacyWizard.SetEntitityType(Rec, Rec."Table Caption");
                         DataPrivacyWizard.RunModal();
                     end;
                 end;

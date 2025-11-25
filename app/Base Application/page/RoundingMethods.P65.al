@@ -13,7 +13,7 @@ page 65 "Rounding Methods"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the rounding method for item prices.';
@@ -33,7 +33,7 @@ page 65 "Rounding Methods"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies how to round.';
                 }
-                field(Precision; Precision)
+                field(Precision; Rec.Precision)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the size of the interval that you want between rounded amounts.';

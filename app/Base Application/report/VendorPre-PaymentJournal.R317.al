@@ -1,14 +1,42 @@
+﻿namespace Microsoft.Purchases.Reports;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Intercompany.BankAccount;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Security.User;
+using System.Utilities;
+
 report 317 "Vendor Pre-Payment Journal"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/VendorPrePaymentJournal.rdlc';
+    RDLCLayout = './Purchases/Reports/VendorPrePaymentJournal.rdlc';
     Caption = 'Vendor Pre-Payment Journal';
 
     dataset
     {
         dataitem("Gen. Journal Batch"; "Gen. Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             column(Gen__Journal_Batch_Journal_Template_Name; "Journal Template Name")
             {
             }
@@ -17,7 +45,7 @@ report 317 "Vendor Pre-Payment Journal"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 PrintOnlyIfDetail = true;
                 column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
                 {
@@ -105,9 +133,9 @@ report 317 "Vendor Pre-Payment Journal"
                 }
                 dataitem("Gen. Journal Line"; "Gen. Journal Line")
                 {
-                    DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
+                    DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
                     DataItemLinkReference = "Gen. Journal Batch";
-                    DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.", "Account Type", "Account No.");
+                    DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.", "Account Type", "Account No.");
                     RequestFilterFields = "Posting Date";
                     column(Gen__Journal_Line__Posting_Date_; "Posting Date")
                     {
@@ -281,8 +309,8 @@ report 317 "Vendor Pre-Payment Journal"
                     }
                     dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
                     {
-                        DataItemLink = "Customer No." = FIELD("Account No."), "Applies-to ID" = FIELD("Applies-to ID");
-                        DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date", "Currency Code");
+                        DataItemLink = "Customer No." = field("Account No."), "Applies-to ID" = field("Applies-to ID");
+                        DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date", "Currency Code");
                         column(Cust__Ledger_Entry__Document_Type_; "Document Type")
                         {
                         }
@@ -396,8 +424,8 @@ report 317 "Vendor Pre-Payment Journal"
                     }
                     dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
                     {
-                        DataItemLink = "Vendor No." = FIELD("Account No."), "Applies-to ID" = FIELD("Applies-to ID");
-                        DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date", "Currency Code");
+                        DataItemLink = "Vendor No." = field("Account No."), "Applies-to ID" = field("Applies-to ID");
+                        DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date", "Currency Code");
                         column(Remaining_Amount__Control3035; -"Remaining Amount")
                         {
                             AutoFormatExpression = "Currency Code";
@@ -511,7 +539,7 @@ report 317 "Vendor Pre-Payment Journal"
                     }
                     dataitem(ErrorLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number_; ErrorText[Number])
                         {
                         }
@@ -648,7 +676,7 @@ report 317 "Vendor Pre-Payment Journal"
                 }
                 dataitem(ReconcileLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(GLAccNetChange__No__; TempGLAccNetChange."No.")
                     {
                     }
@@ -1853,7 +1881,7 @@ report 317 "Vendor Pre-Payment Journal"
                                     AddError(StrSubstNo(E070Err, FieldCaption("IC Partner G/L Acc. No.")));
                             end;
 
-                if "IC Account Type" = "IC Journal Account Type"::"Bank Account" then
+                if "IC Account Type" = "IC Account Type"::"Bank Account" then
                     if ICBankAccount.Get("IC Account No.") then
                         if ICBankAccount.Blocked then
                             AddError(StrSubstNo(E032Err, ICBankAccount.FieldCaption(Blocked), false,
@@ -1871,7 +1899,7 @@ report 317 "Vendor Pre-Payment Journal"
             if "IC Account No." = '' then
                 AddError(StrSubstNo(E002Err, FieldCaption("IC Account No.")))
             else begin
-                if "IC Account Type" = "IC Journal Account Type"::"G/L Account" then
+                if "IC Account Type" = "IC Account Type"::"G/L Account" then
                     if ICGLAccount.Get("IC Account No.") then
                         if ICGLAccount.Blocked then
                             AddError(StrSubstNo(E032Err, ICGLAccount.FieldCaption(Blocked), false,
@@ -1886,7 +1914,7 @@ report 317 "Vendor Pre-Payment Journal"
                                 if CurrentICPartner = '' then
                                     AddError(StrSubstNo(E070Err, FieldCaption("IC Account No.")));
                             end;
-                if "IC Account Type" = "IC Journal Account Type"::"Bank Account" then
+                if "IC Account Type" = "IC Account Type"::"Bank Account" then
                     if ICBankAccount.Get("IC Account No.") then
                         if ICBankAccount.Blocked then
                             AddError(StrSubstNo(E032Err, ICBankAccount.FieldCaption(Blocked), false,
@@ -2190,11 +2218,11 @@ report 317 "Vendor Pre-Payment Journal"
             No[1] := "Account No.";
             TableID[2] := DimMgt.TypeToTableID1("Bal. Account Type".AsInteger());
             No[2] := "Bal. Account No.";
-            TableID[3] := DATABASE::Job;
+            TableID[3] := Enum::TableID::Job.AsInteger();
             No[3] := "Job No.";
-            TableID[4] := DATABASE::"Salesperson/Purchaser";
+            TableID[4] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
             No[4] := "Salespers./Purch. Code";
-            TableID[5] := DATABASE::Campaign;
+            TableID[5] := Enum::TableID::Campaign.AsInteger();
             No[5] := "Campaign No.";
             AddConditionalError(not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID"), DimMgt.GetDimValuePostingErr());
         end;

@@ -1,4 +1,10 @@
-﻿table 414 "IC Outbox Transaction"
+﻿namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.Intercompany.Journal;
+using Microsoft.Intercompany.Partner;
+using System.Utilities;
+
+table 414 "IC Outbox Transaction"
 {
     Caption = 'IC Outbox Transaction';
 

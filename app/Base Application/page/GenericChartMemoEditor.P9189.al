@@ -1,3 +1,7 @@
+namespace System.Visualization;
+
+using System.Globalization;
+
 page 9189 "Generic Chart Memo Editor"
 {
     Caption = 'Generic Chart Memo Editor';
@@ -13,7 +17,7 @@ page 9189 "Generic Chart Memo Editor"
             repeater(Languages)
             {
                 Caption = 'Languages';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code. This field is intended only for internal use.';
@@ -46,7 +50,7 @@ page 9189 "Generic Chart Memo Editor"
 
                     trigger OnValidate()
                     begin
-                        SetMemoText(MemoText)
+                        Rec.SetMemoText(MemoText)
                     end;
                 }
             }
@@ -59,7 +63,7 @@ page 9189 "Generic Chart Memo Editor"
 
     trigger OnAfterGetCurrRecord()
     begin
-        MemoText := GetMemoText();
+        MemoText := Rec.GetMemoText();
     end;
 
     var
@@ -69,11 +73,11 @@ page 9189 "Generic Chart Memo Editor"
     var
         Language: Codeunit Language;
     begin
-        Copy(TempGenericChartMemoBuf, true);
-        SetRange(Code, MemoCode);
-        if Get(MemoCode, Language.GetUserLanguageCode()) then;
+        Rec.Copy(TempGenericChartMemoBuf, true);
+        Rec.SetRange(Code, MemoCode);
+        if Rec.Get(MemoCode, Language.GetUserLanguageCode()) then;
         CurrPage.RunModal();
-        exit(GetMemo(MemoCode, Language.GetUserLanguageCode()))
+        exit(Rec.GetMemo(MemoCode, Language.GetUserLanguageCode()))
     end;
 }
 

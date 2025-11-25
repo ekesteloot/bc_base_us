@@ -15,7 +15,7 @@ table 5479 "Journal Lines Entity Setup"
         field(2; "Default Journal Batch Name"; Code[10])
         {
             Caption = 'Default Journal Batch Name';
-            TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = CONST('GENERAL'));
+            TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = const('GENERAL'));
         }
     }
 

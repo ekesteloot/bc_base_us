@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Duplicates;
+
 page 703 "Merge Duplicate Subform"
 {
     Caption = 'Merge Duplicate Subform';
@@ -6,7 +8,7 @@ page 703 "Merge Duplicate Subform"
     PageType = ListPart;
     SourceTable = "Merge Duplicates Line Buffer";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("In Primary Key");
+    SourceTableView = sorting("In Primary Key");
 
     layout
     {
@@ -20,7 +22,7 @@ page 703 "Merge Duplicate Subform"
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     Style = Strong;
-                    StyleExpr = "In Primary Key" = "In Primary Key"::Yes;
+                    StyleExpr = Rec."In Primary Key" = Rec."In Primary Key"::Yes;
                     ToolTip = 'Specifies the ID of the table.';
                     Visible = IsTableLine;
                 }
@@ -29,11 +31,11 @@ page 703 "Merge Duplicate Subform"
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     Style = Strong;
-                    StyleExpr = "In Primary Key" = "In Primary Key"::Yes;
+                    StyleExpr = Rec."In Primary Key" = Rec."In Primary Key"::Yes;
                     ToolTip = 'Specifies the name of the table.';
                     Visible = IsTableLine;
                 }
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -74,7 +76,7 @@ page 703 "Merge Duplicate Subform"
                     ToolTip = 'Specifies the number of records related to the current record.';
                     Visible = IsTableLine;
                 }
-                field(Override; Override)
+                field(Override; Rec.Override)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = IsOverrideEnabled;
@@ -93,7 +95,7 @@ page 703 "Merge Duplicate Subform"
                     Caption = 'Alternate Value';
                     Editable = IsFieldEditable;
                     Style = Strong;
-                    StyleExpr = Override OR Modified;
+                    StyleExpr = Rec.Override or Rec.Modified;
                     ToolTip = 'Specifies the value of the field in the duplicate record.';
                     Visible = NOT IsTableLine;
 
@@ -110,13 +112,13 @@ page 703 "Merge Duplicate Subform"
                     ToolTip = 'Specifies the number of records related to the duplicate record.';
                     Visible = IsTableLine;
                 }
-                field(Conflicts; Conflicts)
+                field(Conflicts; Rec.Conflicts)
                 {
                     ApplicationArea = Basic, Suite;
                     DrillDown = true;
                     Editable = false;
                     Style = Unfavorable;
-                    StyleExpr = Conflicts > 0;
+                    StyleExpr = Rec.Conflicts > 0;
                     ToolTip = 'Specifies if conflicting records exist.';
                     Visible = IsTableLine;
                 }
@@ -130,18 +132,18 @@ page 703 "Merge Duplicate Subform"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if "Can Be Renamed" then begin
-            IsFieldEditable := not HasFieldToOverride();
+        if Rec."Can Be Renamed" then begin
+            IsFieldEditable := not Rec.HasFieldToOverride();
             IsOverrideEnabled := false;
         end else begin
-            IsOverrideEnabled := not HasModifiedField();
+            IsOverrideEnabled := not Rec.HasModifiedField();
             IsFieldEditable := false;
         end;
     end;
 
     trigger OnAfterGetRecord()
     begin
-        IsTableLine := Type = Type::Table;
+        IsTableLine := Rec.Type = Rec.Type::Table;
         SetStyle();
     end;
 
@@ -153,20 +155,20 @@ page 703 "Merge Duplicate Subform"
 
     procedure Set(var TempMergeDuplicatesLineBuffer: Record "Merge Duplicates Line Buffer" temporary)
     begin
-        Copy(TempMergeDuplicatesLineBuffer, true);
-        FilterGroup(2);
-        TempMergeDuplicatesLineBuffer.CopyFilter(Type, Type);
-        FilterGroup(0);
-        if FindFirst() then;
+        Rec.Copy(TempMergeDuplicatesLineBuffer, true);
+        Rec.FilterGroup(2);
+        TempMergeDuplicatesLineBuffer.CopyFilter(Type, Rec.Type);
+        Rec.FilterGroup(0);
+        if Rec.FindFirst() then;
     end;
 
     local procedure SetStyle()
     begin
-        if Override then
+        if Rec.Override then
             StyleExpr := 'StrongAccent'
         else
-            if "In Primary Key" = "In Primary Key"::Yes then
-                if Modified then
+            if Rec."In Primary Key" = Rec."In Primary Key"::Yes then
+                if Rec.Modified then
                     StyleExpr := 'Attention'
                 else
                     StyleExpr := 'Strong'

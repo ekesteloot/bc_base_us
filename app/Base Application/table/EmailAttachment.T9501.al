@@ -1,3 +1,5 @@
+namespace System.Email;
+
 table 9501 "Email Attachment"
 {
     Caption = 'Email Attachment';

@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.ProjectMgt.Jobs.Posting;
+
 page 276 "Job Journal Batches"
 {
     Caption = 'Job Journal Batches';
@@ -137,12 +141,12 @@ page 276 "Job Journal Batches"
 
     trigger OnInit()
     begin
-        SetRange("Journal Template Name");
+        Rec.SetRange("Journal Template Name");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetupNewBatch();
+        Rec.SetupNewBatch();
     end;
 
     trigger OnOpenPage()
@@ -159,9 +163,9 @@ page 276 "Job Journal Batches"
         JobJnlTemplate: Record "Job Journal Template";
     begin
         if not CurrPage.LookupMode then
-            if GetFilter("Journal Template Name") <> '' then
-                if GetRangeMin("Journal Template Name") = GetRangeMax("Journal Template Name") then
-                    if JobJnlTemplate.Get(GetRangeMin("Journal Template Name")) then
+            if Rec.GetFilter("Journal Template Name") <> '' then
+                if Rec.GetRangeMin("Journal Template Name") = Rec.GetRangeMax("Journal Template Name") then
+                    if JobJnlTemplate.Get(Rec.GetRangeMin("Journal Template Name")) then
                         exit(JobJnlTemplate.Name + ' ' + JobJnlTemplate.Description);
     end;
 }

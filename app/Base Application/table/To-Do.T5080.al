@@ -1,3 +1,23 @@
+﻿namespace Microsoft.CRM.Task;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Outlook;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Document;
+using System;
+using System.Azure.Identity;
+using System.Environment;
+using System.Globalization;
+using System.Integration;
+using System.Security.AccessControl;
+
 table 5080 "To-do"
 {
     Caption = 'Task';
@@ -216,8 +236,6 @@ table 5080 "To-do"
         {
             Caption = 'Segment No.';
             TableRelation = "Segment Header";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(8; Type; Enum "Task Type")
         {
@@ -351,9 +369,9 @@ table 5080 "To-do"
         }
         field(16; Comment; Boolean)
         {
-            CalcFormula = Exist("Rlshp. Mgt. Comment Line" WHERE("Table Name" = CONST("To-do"),
-                                                                  "No." = FIELD("Organizer To-do No."),
-                                                                  "Sub No." = CONST(0)));
+            CalcFormula = exist("Rlshp. Mgt. Comment Line" where("Table Name" = const("To-do"),
+                                                                  "No." = field("Organizer To-do No."),
+                                                                  "Sub No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -372,14 +390,14 @@ table 5080 "To-do"
         }
         field(18; "Contact Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact.Name WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact No.")));
             Caption = 'Contact Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(19; "Team Name"; Text[50])
         {
-            CalcFormula = Lookup(Team.Name WHERE(Code = FIELD("Team Code")));
+            CalcFormula = Lookup(Team.Name where(Code = field("Team Code")));
             Caption = 'Team Name';
             Editable = false;
             FieldClass = FlowField;
@@ -387,14 +405,14 @@ table 5080 "To-do"
         }
         field(20; "Salesperson Name"; Text[50])
         {
-            CalcFormula = Lookup("Salesperson/Purchaser".Name WHERE(Code = FIELD("Salesperson Code")));
+            CalcFormula = Lookup("Salesperson/Purchaser".Name where(Code = field("Salesperson Code")));
             Caption = 'Salesperson Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(21; "Campaign Description"; Text[100])
         {
-            CalcFormula = Lookup(Campaign.Description WHERE("No." = FIELD("Campaign No.")));
+            CalcFormula = Lookup(Campaign.Description where("No." = field("Campaign No.")));
             Caption = 'Campaign Description';
             Editable = false;
             FieldClass = FlowField;
@@ -402,11 +420,11 @@ table 5080 "To-do"
         field(22; "Contact Company No."; Code[20])
         {
             Caption = 'Contact Company No.';
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(23; "Contact Company Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact.Name WHERE("No." = FIELD("Contact Company No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact Company No.")));
             Caption = 'Contact Company Name';
             Editable = false;
             FieldClass = FlowField;
@@ -439,7 +457,7 @@ table 5080 "To-do"
         }
         field(27; "Opportunity Description"; Text[100])
         {
-            CalcFormula = Lookup(Opportunity.Description WHERE("No." = FIELD("Opportunity No.")));
+            CalcFormula = Lookup(Opportunity.Description where("No." = field("Opportunity No.")));
             Caption = 'Opportunity Description';
             Editable = false;
             FieldClass = FlowField;
@@ -629,15 +647,15 @@ table 5080 "To-do"
         }
         field(43; "No. of Attendees"; Integer)
         {
-            CalcFormula = Count(Attendee WHERE("To-do No." = FIELD("Organizer To-do No.")));
+            CalcFormula = count(Attendee where("To-do No." = field("Organizer To-do No.")));
             Caption = 'No. of Attendees';
             Editable = false;
             FieldClass = FlowField;
         }
         field(44; "Attendees Accepted No."; Integer)
         {
-            CalcFormula = Count(Attendee WHERE("To-do No." = FIELD("Organizer To-do No."),
-                                                "Invitation Response Type" = CONST(Accepted)));
+            CalcFormula = count(Attendee where("To-do No." = field("Organizer To-do No."),
+                                                "Invitation Response Type" = const(Accepted)));
             Caption = 'Attendees Accepted No.';
             Editable = false;
             FieldClass = FlowField;
@@ -929,13 +947,7 @@ table 5080 "To-do"
     local procedure CreateInteraction()
     var
         TempSegLine: Record "Segment Line" temporary;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCreateInteraction(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         if Type = Type::"Phone Call" then begin
             TempSegLine."Campaign No." := "Campaign No.";
             TempSegLine."Opportunity No." := "Opportunity No.";
@@ -1001,7 +1013,6 @@ table 5080 "To-do"
             TableCaption, Task2."Organizer To-do No.", TableCaption(), "No."));
     end;
 
-    [Scope('OnPrem')]
     procedure InsertTask(Task2: Record "To-do"; var RMCommentLine: Record "Rlshp. Mgt. Comment Line"; var TempAttendee: Record Attendee temporary; var TaskInteractionLanguage: Record "To-do Interaction Language"; var TempAttachment: Record Attachment temporary; ActivityCode: Code[10]; Deliver: Boolean)
     var
         SegHeader: Record "Segment Header";
@@ -1016,7 +1027,7 @@ table 5080 "To-do"
                     ConfirmText := Text002
                 else
                     ConfirmText := Text003;
-                if Confirm(ConfirmText, true, SegHeader."No.") then begin
+                if Confirm(ConfirmText, true, SegHeader."No.") then
                     if ActivityCode = '' then begin
                         Task2.Get(InsertTaskAndRelatedData(
                             Task2, TaskInteractionLanguage, TempAttachment, TempAttendee, RMCommentLine));
@@ -1024,9 +1035,8 @@ table 5080 "To-do"
                             SendMAPIInvitations(Task2, true);
                     end else
                         InsertActivityTask(Task2, ActivityCode, TempAttendee);
-                end;
             end;
-        end else begin
+        end else
             if ActivityCode = '' then begin
                 Task2.Get(InsertTaskAndRelatedData(
                     Task2, TaskInteractionLanguage, TempAttachment, TempAttendee, RMCommentLine));
@@ -1034,7 +1044,6 @@ table 5080 "To-do"
                     SendMAPIInvitations(Task2, true);
             end else
                 InsertActivityTask(Task2, ActivityCode, TempAttendee);
-        end;
 
         if (Task2.Type = Task2.Type::Meeting) and
            Task2.Get(Task2."Organizer To-do No.")
@@ -1107,10 +1116,7 @@ table 5080 "To-do"
                 TaskNo := Task2."No.";
                 if Task2."System To-do Type" = "System To-do Type"::Team then
                     CreateOrganizerTask(Task2, TempAttendee, Task2."No.");
-                if Attendee.Find('-') then
-                    repeat
-                        CreateSubTask(Attendee, Task2);
-                    until Attendee.Next() = 0;
+                CreateAttendeesSubTask(Attendee, Task2);
             end else
                 if Attendee.Find('-') then begin
                     Window.Open(Text036 + TaskNoMsg + Text038);
@@ -1619,13 +1625,7 @@ table 5080 "To-do"
         InteractTemplLanguage: Record "Interaction Tmpl. Language";
         Attachment2: Record Attachment;
         AttachmentManagement: Codeunit AttachmentManagement;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateInteractionTemplate(Task, TaskInteractionLanguage, Attachment, InteractTmplCode, AttachmentTemporary, IsHandled);
-        if IsHandled then
-            exit;
-
         Task.Modify();
         TaskInteractionLanguage.SetRange("To-do No.", Task."No.");
 
@@ -1759,8 +1759,6 @@ table 5080 "To-do"
     var
         TaskInteractionLanguage: Record "To-do Interaction Language";
     begin
-        OnBeforeCreateAttachment(Rec, PageNotEditable);
-
         if "Interaction Template Code" = '' then
             exit;
         if not TaskInteractionLanguage.Get("Organizer To-do No.", "Language Code") then begin
@@ -1780,8 +1778,6 @@ table 5080 "To-do"
     var
         TaskInteractionLanguage: Record "To-do Interaction Language";
     begin
-        OnBeforeOpenAttachment(Rec, PageNotEditable);
-
         if "Interaction Template Code" = '' then
             exit;
         if TaskInteractionLanguage.Get("Organizer To-do No.", "Language Code") then
@@ -1795,8 +1791,6 @@ table 5080 "To-do"
     var
         TaskInteractionLanguage: Record "To-do Interaction Language";
     begin
-        OnBeforeImportAttachment(Rec);
-
         if "Interaction Template Code" = '' then
             exit;
 
@@ -1816,8 +1810,6 @@ table 5080 "To-do"
     var
         TaskInteractionLanguage: Record "To-do Interaction Language";
     begin
-        OnBeforeExportAttachment(Rec);
-
         if "Interaction Template Code" = '' then
             exit;
 
@@ -1831,8 +1823,6 @@ table 5080 "To-do"
     var
         TaskInteractionLanguage: Record "To-do Interaction Language";
     begin
-        OnBeforeRemoveAttachment(Rec);
-
         if "Interaction Template Code" = '' then
             exit;
 
@@ -2040,7 +2030,7 @@ table 5080 "To-do"
             "Salesperson Code" := xRec."Salesperson Code"
     end;
 
-    local procedure ReassignTeamTaskToSalesperson()
+    procedure ReassignTeamTaskToSalesperson()
     var
         Task: Record "To-do";
         Attendee: Record Attendee;
@@ -2284,7 +2274,6 @@ table 5080 "To-do"
 
         OnStartWizardOnBeforeInsert(Rec);
         Insert();
-        OnStartWizardOnAfterInsert(Rec);
         RunCreateTaskPage();
     end;
 
@@ -2361,7 +2350,6 @@ table 5080 "To-do"
             ErrorMessage(FieldCaption(Location));
     end;
 
-    [Scope('OnPrem')]
     procedure FinishWizard(SendExchangeAppointment: Boolean)
     var
         SendOnFinish, IsHandled : Boolean;
@@ -2445,7 +2433,6 @@ table 5080 "To-do"
         Error(Text043, FieldName);
     end;
 
-    [Scope('OnPrem')]
     procedure AssignDefaultAttendeeInfo()
     var
         InteractionTemplate: Record "Interaction Template";
@@ -2681,7 +2668,6 @@ table 5080 "To-do"
             end;
     end;
 
-    [Scope('OnPrem')]
     procedure LoadTempAttachment()
     var
         Attachment: Record Attachment;
@@ -3006,6 +2992,21 @@ table 5080 "To-do"
         exit(TaskType in [TaskType::Meeting, TaskType::"Phone Call"]);
     end;
 
+    local procedure CreateAttendeesSubTask(var Attendee: Record Attendee; ToDo: Record "To-do")
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCreateSubTaskForAttendees(ToDo, IsHandled);
+        if IsHandled then
+            exit;
+
+        if Attendee.Find('-') then
+            repeat
+                CreateSubTask(Attendee, ToDo);
+            until Attendee.Next() = 0;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyFieldsFromActivityStep(var TempTask: Record "To-do" temporary; ActivityStep: Record "Activity Step")
     begin
@@ -3173,42 +3174,7 @@ table 5080 "To-do"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateInteraction(var Todo: Record "To-do"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateInteractionTemplate(var Todo: Record "To-do"; var TodoInteractionLanguage: Record "To-do Interaction Language"; var Attachment: Record Attachment; InteractTmplCode: Code[10]; AttachmentTemporary: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateAttachment(var Todo: Record "To-do"; var PageNotEditable: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenAttachment(var Todo: Record "To-do"; var PageNotEditable: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeImportAttachment(var Todo: Record "To-do")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeExportAttachment(var Todo: Record "To-do")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRemoveAttachment(var Todo: Record "To-do")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnStartWizardOnAfterInsert(var Todo: Record "To-do")
+    local procedure OnBeforeCreateSubTaskForAttendees(var ToDo: Record "To-do"; var IsHandled: Boolean)
     begin
     end;
 }

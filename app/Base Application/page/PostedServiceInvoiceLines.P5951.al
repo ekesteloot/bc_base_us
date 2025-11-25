@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 5951 "Posted Service Invoice Lines"
 {
     Caption = 'Posted Service Invoice Lines';
@@ -164,7 +168,7 @@ page 5951 "Posted Service Invoice Lines"
 
                     trigger OnAction()
                     begin
-                        ServInvHeader.Get("Document No.");
+                        ServInvHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Service Invoice", ServInvHeader);
                     end;
                 }
@@ -179,7 +183,7 @@ page 5951 "Posted Service Invoice Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Entries")
@@ -191,7 +195,7 @@ page 5951 "Posted Service Invoice Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }

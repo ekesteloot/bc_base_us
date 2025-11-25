@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Manufacturing.Reports;
+
 page 99000758 "Work Center Groups"
 {
     ApplicationArea = Manufacturing;
@@ -13,7 +17,7 @@ page 99000758 "Work Center Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the code for the work center group.';
@@ -62,9 +66,9 @@ page 99000758 "Work Center Groups"
                     Caption = 'Lo&ad';
                     Image = WorkCenterLoad;
                     RunObject = Page "Work Center Group Load";
-                    RunPageLink = Code = FIELD(Code),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Work Shift Filter" = FIELD("Work Shift Filter");
+                    RunPageLink = Code = field(Code),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Work Shift Filter" = field("Work Shift Filter");
                     ToolTip = 'View the availability of the machine or work center, including its capacity, the allocated quantity, availability after orders, and the load in percent of its total capacity.';
                 }
             }

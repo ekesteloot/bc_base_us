@@ -1,7 +1,7 @@
 page 7603 "Customized Calendar Changes"
 {
     Caption = 'Customized Calendar Changes';
-    DataCaptionExpression = GetCaption();
+    DataCaptionExpression = Rec.GetCaption();
     PageType = List;
     SourceTable = "Customized Calendar Change";
 
@@ -36,12 +36,12 @@ page 7603 "Customized Calendar Changes"
                     Caption = 'Recurring System';
                     ToolTip = 'Specifies a date or day as a recurring nonworking or working day.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the date associated with this customized calendar entry.';
                 }
-                field(Day; Day)
+                field(Day; Rec.Day)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the day of the week associated with this entry.';
@@ -51,7 +51,7 @@ page 7603 "Customized Calendar Changes"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a description of this entry.';
                 }
-                field(Nonworking; Nonworking)
+                field(Nonworking; Rec.Nonworking)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Nonworking';

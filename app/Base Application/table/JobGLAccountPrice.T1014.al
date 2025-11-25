@@ -1,3 +1,9 @@
+namespace Microsoft.ProjectMgt.Jobs.Pricing;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.ProjectMgt.Jobs.Job;
+
 table 1014 "Job G/L Account Price"
 {
     Caption = 'Job G/L Account Price';
@@ -8,7 +14,7 @@ table 1014 "Job G/L Account Price"
     ObsoleteTag = '16.0';
 #else
     ObsoleteState = Removed;
-    ObsoleteTag = '22.0';
+    ObsoleteTag = '24.0';
 #endif    
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
 
@@ -31,7 +37,7 @@ table 1014 "Job G/L Account Price"
         field(2; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
 
 #if not CLEAN21
             trigger OnValidate()
@@ -50,7 +56,7 @@ table 1014 "Job G/L Account Price"
         }
         field(5; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
 
@@ -95,7 +101,7 @@ table 1014 "Job G/L Account Price"
         }
         field(10; Description; Text[100])
         {
-            CalcFormula = Lookup("G/L Account".Name WHERE("No." = FIELD("G/L Account No.")));
+            CalcFormula = Lookup("G/L Account".Name where("No." = field("G/L Account No.")));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;

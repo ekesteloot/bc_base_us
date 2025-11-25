@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Setup;
+using System.IO;
+using System.Telemetry;
+
 page 600 "IC Dimensions"
 {
     ApplicationArea = Dimensions;
@@ -14,7 +21,7 @@ page 600 "IC Dimensions"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the intercompany dimension code.';
@@ -24,7 +31,7 @@ page 600 "IC Dimensions"
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the intercompany dimension name';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -84,7 +91,7 @@ page 600 "IC Dimensions"
                     Caption = 'IC Dimension &Values';
                     Image = ChangeDimensions;
                     RunObject = Page "IC Dimension Values";
-                    RunPageLink = "Dimension Code" = FIELD(Code);
+                    RunPageLink = "Dimension Code" = field(Code);
                     ToolTip = 'View or edit how your company''s dimension values correspond to the dimension values of your intercompany partners.';
                     Visible = false;
                     ObsoleteState = Pending;
@@ -100,6 +107,22 @@ page 600 "IC Dimensions"
             {
                 Caption = 'F&unctions';
                 Image = "Action";
+                action("IC Dimension Values")
+                {
+                    ApplicationArea = Dimensions;
+                    Caption = 'Intercompany Dimension Values';
+                    Image = Dimensions;
+                    RunPageMode = View;
+                    ToolTip = 'View or edit the intercompany dimension values for the current intercompany dimension.';
+
+                    trigger OnAction()
+                    var
+                        PageICDimensionValue: Page "IC Dimension Values";
+                    begin
+                        PageICDimensionValue.SetDimensionCode(Rec.Code);
+                        PageICDimensionValue.Run();
+                    end;
+                }
 #if not CLEAN22
                 action("Map to Dim. with Same Code")
                 {
@@ -133,12 +156,8 @@ page 600 "IC Dimensions"
                     ApplicationArea = Dimensions;
                     Caption = 'Copy from Dimensions';
                     Image = CopyDimensions;
-                    ToolTip = 'Creates intercompany dimensions for existing dimensions.';
-
-                    trigger OnAction()
-                    begin
-                        CopyFromDimensionsToICDim();
-                    end;
+                    RunObject = Page "IC Dimensions Selector";
+                    ToolTip = 'Creates intercompany dimensions from existing dimensions.';
                 }
                 separator(Action14)
                 {
@@ -187,7 +206,7 @@ page 600 "IC Dimensions"
                     begin
                         ICSetup.FindFirst();
                         if ICSetup."IC Inbox Type" <> ICSetup."IC Inbox Type"::Database then begin
-                            Message(OnlyAvailableForICUsingDatabase);
+                            Message(OnlyAvailableForICUsingDatabaseMsg);
                             exit;
                         end;
                         ICPartnerCode := ICSetup."Partner Code for Acc. Syn.";
@@ -222,6 +241,10 @@ page 600 "IC Dimensions"
                     ObsoleteTag = '22.0';
                 }
 #endif      
+                actionref(ICDimensionValues_Promoted; "IC Dimension Values")
+                {
+
+                }
                 actionref(OpenDimensionsMapping_Promoted; OpenDimensionsMapping)
                 {
                 }
@@ -267,67 +290,10 @@ page 600 "IC Dimensions"
         EnableSynchronization: Boolean;
         SelectFileToImportLbl: Label 'Select file to import into the dimensions of intercompany.';
         DefaultNameForExportFileLbl: Label 'ICDimensions.xml';
-        CopyFromDimensionsQst: Label 'Are you sure you want to copy from Dimensions?';
         RequestUserForFileNameLbl: Label 'Enter the file name.';
         SupportedFileTypesLbl: Label 'XML Files (*.xml)|*.xml|All Files (*.*)|*.*';
         SynchronizeIntercompanyQst: Label 'Partner %1 has been set for the synchronization of intercompany. Do you want to synchronize instead of switching to another partner?', Comment = '%1 = IC Partner code';
-        OnlyAvailableForICUsingDatabase: Label 'Synchronization is only available for companies using a Database for Intercompany. Select this option in the setup if you want to use this action.';
-
-    local procedure CopyFromDimensionsToICDim()
-    var
-        Dim: Record Dimension;
-        DimVal: Record "Dimension Value";
-        ICDim: Record "IC Dimension";
-        ICDimVal: Record "IC Dimension Value";
-        ConfirmManagement: Codeunit "Confirm Management";
-        FeatureTelemetry: Codeunit "Feature Telemetry";
-        ICMapping: Codeunit "IC Mapping";
-        ICDimValEmpty: Boolean;
-        ICDimValExists: Boolean;
-        PrevIndentation: Integer;
-    begin
-        if not ConfirmManagement.GetResponseOrDefault(CopyFromDimensionsQst, true) then
-            exit;
-
-        FeatureTelemetry.LogUptake('0000IL2', ICMapping.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::"Set up");
-
-        ICDimVal.LockTable();
-        ICDim.LockTable();
-        Dim.SetRange(Blocked, false);
-        if Dim.Find('-') then
-            repeat
-                if not ICDim.Get(Dim.Code) then begin
-                    ICDim.Init();
-                    ICDim.Code := Dim.Code;
-                    ICDim.Name := Dim.Name;
-                    ICDim.Insert();
-                end;
-
-                ICDimValExists := false;
-                DimVal.SetRange("Dimension Code", Dim.Code);
-                ICDimVal.SetRange("Dimension Code", Dim.Code);
-                ICDimValEmpty := not ICDimVal.FindFirst();
-                if DimVal.Find('-') then
-                    repeat
-                        if DimVal."Dimension Value Type" = DimVal."Dimension Value Type"::"End-Total" then
-                            PrevIndentation := PrevIndentation - 1;
-                        if not ICDimValEmpty then
-                            ICDimValExists := ICDimVal.Get(DimVal."Dimension Code", DimVal.Code);
-                        if not ICDimValExists and not DimVal.Blocked then begin
-                            ICDimVal.Init();
-                            ICDimVal."Dimension Code" := DimVal."Dimension Code";
-                            ICDimVal.Code := DimVal.Code;
-                            ICDimVal.Name := DimVal.Name;
-                            ICDimVal."Dimension Value Type" := DimVal."Dimension Value Type";
-                            ICDimVal.Indentation := PrevIndentation;
-                            ICDimVal.Insert();
-                        end;
-                        PrevIndentation := ICDimVal.Indentation;
-                        if DimVal."Dimension Value Type" = DimVal."Dimension Value Type"::"Begin-Total" then
-                            PrevIndentation := PrevIndentation + 1;
-                    until DimVal.Next() = 0;
-            until Dim.Next() = 0;
-    end;
+        OnlyAvailableForICUsingDatabaseMsg: Label 'Synchronization is only available for companies using a Database for Intercompany. Select this option in the setup if you want to use this action.';
 
     local procedure ImportFromXML()
     var

@@ -1,3 +1,12 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.IO;
+
 codeunit 1207 "Pmt Export Mgt Vend Ledg Entry"
 {
     Permissions = TableData "Vendor Ledger Entry" = rm;

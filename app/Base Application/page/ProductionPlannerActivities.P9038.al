@@ -1,3 +1,15 @@
+namespace Microsoft.Manufacturing.RoleCenters;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Purchases.Document;
+using Microsoft.Shared.Navigate;
+using System.Environment;
+using System.Visualization;
+
 page 9038 "Production Planner Activities"
 {
     Caption = 'Activities';

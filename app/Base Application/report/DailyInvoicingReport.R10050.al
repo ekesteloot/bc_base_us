@@ -10,7 +10,7 @@ report 10050 "Daily Invoicing Report"
     {
         dataitem(Currency; Currency)
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
 
             trigger OnAfterGetRecord()
             begin
@@ -29,7 +29,7 @@ report 10050 "Daily Invoicing Report"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             PrintOnlyIfDetail = true;
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -75,7 +75,7 @@ report 10050 "Daily Invoicing Report"
             }
             dataitem("Sales Invoice Header"; "Sales Invoice Header")
             {
-                DataItemTableView = SORTING("No.");
+                DataItemTableView = sorting("No.");
                 RequestFilterFields = "Posting Date", "Bill-to Customer No.", "Salesperson Code", "Payment Terms Code";
                 RequestFilterHeading = 'Sales Invoice';
                 column(Sales_Invoice_Header__No__; "No.")
@@ -171,7 +171,7 @@ report 10050 "Daily Invoicing Report"
             }
             dataitem("Sales Cr.Memo Header"; "Sales Cr.Memo Header")
             {
-                DataItemTableView = SORTING("No.");
+                DataItemTableView = sorting("No.");
                 column(Sales_Cr_Memo_Header__No__; "No.")
                 {
                 }
@@ -378,9 +378,7 @@ report 10050 "Daily Invoicing Report"
         TempCurrency: Record Currency temporary;
         FilterString: Text;
         SalesTax: Decimal;
-        [InDataSet]
         IncludeInvoices: Boolean;
-        [InDataSet]
         IncludeCreditMemos: Boolean;
         UseCurrency: Boolean;
         TotalAmtExclTax: Decimal;

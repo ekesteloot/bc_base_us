@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using System.Reflection;
+
 page 102 "Item Journal Templates"
 {
     ApplicationArea = Basic, Suite;
@@ -150,7 +154,7 @@ page 102 "Item Journal Templates"
                     Caption = 'Batches';
                     Image = Description;
                     RunObject = Page "Item Journal Batches";
-                    RunPageLink = "Journal Template Name" = FIELD(Name);
+                    RunPageLink = "Journal Template Name" = field(Name);
                     ToolTip = 'View or edit multiple journals for a specific template. You can use batches when you need multiple journals of a certain type.';
                     Scope = Repeater;
                 }

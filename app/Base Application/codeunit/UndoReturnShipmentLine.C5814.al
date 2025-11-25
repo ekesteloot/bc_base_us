@@ -1,3 +1,15 @@
+﻿namespace Microsoft.Purchases.History;
+
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+
 codeunit 5814 "Undo Return Shipment Line"
 {
     Permissions = TableData "Purchase Line" = rimd,

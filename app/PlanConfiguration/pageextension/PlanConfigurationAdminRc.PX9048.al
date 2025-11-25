@@ -4,11 +4,19 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Azure.Identity;
+
 /// <summary>
 /// Add the available plan configuration to the Security Admin role center.
 /// </summary>
 pageextension 9048 "Plan Configuration Admin RC" extends "Security Admin Role Center"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'The element has been moved to the main page.';
+#pragma warning disable AS0072    
+    ObsoleteTag = '22.0';
+#pragma warning restore AS0072    
+
     layout
     {
         addafter(Control4)

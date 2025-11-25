@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Segment;
+
 page 5144 "Saved Segment Criteria Subform"
 {
     Caption = 'Saved Segment Criteria Subform';
@@ -29,7 +31,7 @@ page 5144 "Saved Segment Criteria Subform"
                     ToolTip = 'Specifies the type of information the line shows. There are two options: Action or Filter.';
                     Visible = false;
                 }
-                field(ActionTable; ActionTable())
+                field(ActionTable; Rec.ActionTable())
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Action/Table';
@@ -61,9 +63,7 @@ page 5144 "Saved Segment Criteria Subform"
     end;
 
     var
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         ActionTableIndent: Integer;
 
     local procedure GetSegmentCriteriaFilter(): Text

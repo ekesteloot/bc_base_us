@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 180 "G/L Account Where-Used"
 {
     Caption = 'G/L Account Where-Used';

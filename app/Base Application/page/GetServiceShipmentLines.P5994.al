@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ServiceMgt.Document;
+
 page 5994 "Get Service Shipment Lines"
 {
     Caption = 'Get Service Shipment Lines';
@@ -153,7 +158,7 @@ page 5994 "Get Service Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ServiceShptHeader.Get("Document No.");
+                        ServiceShptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Service Shipment", ServiceShptHeader);
                     end;
                 }
@@ -168,7 +173,7 @@ page 5994 "Get Service Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Entries")
@@ -180,7 +185,7 @@ page 5994 "Get Service Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }
@@ -204,9 +209,7 @@ page 5994 "Get Service Shipment Lines"
         ServiceHeader: Record "Service Header";
         TempServiceShptLine: Record "Service Shipment Line" temporary;
         ServiceGetShpt: Codeunit "Service-Get Shipment";
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     procedure SetServiceHeader(var ServiceHeader2: Record "Service Header")
@@ -221,16 +224,16 @@ page 5994 "Get Service Shipment Lines"
     begin
         TempServiceShptLine.Reset();
         TempServiceShptLine.CopyFilters(Rec);
-        TempServiceShptLine.SetRange("Document No.", "Document No.");
+        TempServiceShptLine.SetRange("Document No.", Rec."Document No.");
         if not TempServiceShptLine.FindFirst() then begin
             ServiceShptLine.CopyFilters(Rec);
-            ServiceShptLine.SetRange("Document No.", "Document No.");
+            ServiceShptLine.SetRange("Document No.", Rec."Document No.");
             if not ServiceShptLine.FindFirst() then
                 exit(false);
             TempServiceShptLine := ServiceShptLine;
             TempServiceShptLine.Insert();
         end;
-        if "Line No." = TempServiceShptLine."Line No." then
+        if Rec."Line No." = TempServiceShptLine."Line No." then
             exit(true);
     end;
 

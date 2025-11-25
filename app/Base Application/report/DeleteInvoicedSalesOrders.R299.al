@@ -10,7 +10,7 @@ report 299 "Delete Invoiced Sales Orders"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.";
             RequestFilterHeading = 'Sales Order';
 

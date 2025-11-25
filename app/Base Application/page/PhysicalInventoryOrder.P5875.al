@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.InventoryMgt.Counting.Comment;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Counting.Recording;
+using Microsoft.InventoryMgt.Counting.Reports;
+
 page 5875 "Physical Inventory Order"
 {
     Caption = 'Physical Inventory Order';
@@ -19,7 +26,7 @@ page 5875 "Physical Inventory Order"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -74,8 +81,8 @@ page 5875 "Physical Inventory Order"
             part(OrderLines; "Physical Inventory Order Subf.")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "Document No." = FIELD("No.");
-                SubPageView = SORTING("Document No.", "Line No.");
+                SubPageLink = "Document No." = field("No.");
+                SubPageView = sorting("Document No.", "Line No.");
             }
         }
         area(factboxes)
@@ -102,7 +109,7 @@ page 5875 "Physical Inventory Order"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Phys. Invt. Order Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information for the physical inventory order.';
                 }
@@ -112,9 +119,9 @@ page 5875 "Physical Inventory Order"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Phys. Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST(Order),
-                                  "Order No." = FIELD("No."),
-                                  "Recording No." = CONST(0);
+                    RunPageLink = "Document Type" = const(Order),
+                                  "Order No." = field("No."),
+                                  "Recording No." = const(0);
                     ToolTip = 'View or edit comments for the physical inventory order.';
                 }
                 action("&Recordings")
@@ -123,8 +130,8 @@ page 5875 "Physical Inventory Order"
                     Caption = '&Recordings';
                     Image = Document;
                     RunObject = Page "Phys. Inventory Recording List";
-                    RunPageLink = "Order No." = FIELD("No.");
-                    RunPageView = SORTING("Order No.", "Recording No.");
+                    RunPageLink = "Order No." = field("No.");
+                    RunPageView = sorting("Order No.", "Recording No.");
                     ToolTip = 'Open any related physical inventory recordings, the documents that are used to record the actual counting.';
                 }
                 action(Dimensions)
@@ -136,7 +143,7 @@ page 5875 "Physical Inventory Order"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }

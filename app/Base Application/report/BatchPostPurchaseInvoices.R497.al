@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using System.Environment;
+
 report 497 "Batch Post Purchase Invoices"
 {
     Caption = 'Batch Post Purchase Invoices';
@@ -7,7 +14,7 @@ report 497 "Batch Post Purchase Invoices"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Invoice));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Invoice));
             RequestFilterFields = "No.", Status;
             RequestFilterHeading = 'Purchase Invoice';
 
@@ -19,7 +26,7 @@ report 497 "Batch Post Purchase Invoices"
                 PostingSelectionManagement.CheckUserCanInvoicePurchase();
                 PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::Print, PrintDoc);
                 PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Replace VAT Date", ReplaceVATDateReq);
-                PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"VAT Date", VATDateReq);   
+                PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"VAT Date", VATDateReq);
                 PurchaseBatchPostMgt.RunBatch("Purchase Header", ReplacePostingDate, PostingDateReq, ReplaceDocumentDate, CalcInvDisc, false, true);
 
                 CurrReport.Break();
@@ -67,7 +74,7 @@ report 497 "Batch Post Purchase Invoices"
                         begin
                             if ReplacePostingDate then
                                 Message(Text003);
-                            
+
                             if VATReportingDateMgt.IsVATDateUsageSetToPostingDate() then
                                 ReplaceVATDateReq := ReplacePostingDate;
                             UpdateVATDate();
@@ -162,12 +169,11 @@ report 497 "Batch Post Purchase Invoices"
         Text003: Label 'The exchange rate associated with the new posting date on the purchase header will not apply to the purchase lines.';
 
     protected var
-        PostingDateReq, VATDateReq: Date;
-        ReplacePostingDate, ReplaceVATDateReq: Boolean;
+        PostingDateReq, VATDateReq : Date;
+        ReplacePostingDate, ReplaceVATDateReq : Boolean;
         ReplaceDocumentDate: Boolean;
         CalcInvDisc: Boolean;
         PrintDoc: Boolean;
-        [InDataSet]
         PrintDocVisible: Boolean;
         VATDateEnabled: Boolean;
 

@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Purchases.Vendor;
+
 table 317 "Payable Vendor Ledger Entry"
 {
     Caption = 'Payable Vendor Ledger Entry';

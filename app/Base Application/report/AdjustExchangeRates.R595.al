@@ -1,4 +1,4 @@
-﻿#if not CLEAN20
+﻿#if not CLEAN23
 report 595 "Adjust Exchange Rates"
 {
     ApplicationArea = Basic, Suite;
@@ -19,16 +19,16 @@ report 595 "Adjust Exchange Rates"
     {
         dataitem(Currency; Currency)
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code";
             dataitem("Bank Account"; "Bank Account")
             {
-                DataItemLink = "Currency Code" = FIELD(Code);
-                DataItemTableView = SORTING("Bank Acc. Posting Group");
+                DataItemLink = "Currency Code" = field(Code);
+                DataItemTableView = sorting("Bank Acc. Posting Group");
                 RequestFilterFields = "No.";
                 dataitem(BankAccountGroupTotal; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
 
                     trigger OnAfterGetRecord()
@@ -140,14 +140,14 @@ report 595 "Adjust Exchange Rates"
         }
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             dataitem(CustomerLedgerEntryLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem("Detailed Cust. Ledg. Entry"; "Detailed Cust. Ledg. Entry")
                 {
-                    DataItemTableView = SORTING("Cust. Ledger Entry No.", "Posting Date");
+                    DataItemTableView = sorting("Cust. Ledger Entry No.", "Posting Date");
 
                     trigger OnAfterGetRecord()
                     begin
@@ -220,14 +220,14 @@ report 595 "Adjust Exchange Rates"
         }
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             dataitem(VendorLedgerEntryLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem("Detailed Vendor Ledg. Entry"; "Detailed Vendor Ledg. Entry")
                 {
-                    DataItemTableView = SORTING("Vendor Ledger Entry No.", "Posting Date");
+                    DataItemTableView = sorting("Vendor Ledger Entry No.", "Posting Date");
 
                     trigger OnAfterGetRecord()
                     begin
@@ -299,7 +299,7 @@ report 595 "Adjust Exchange Rates"
         }
         dataitem("VAT Posting Setup"; "VAT Posting Setup")
         {
-            DataItemTableView = SORTING("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+            DataItemTableView = sorting("VAT Bus. Posting Group", "VAT Prod. Posting Group");
 
             trigger OnAfterGetRecord()
             begin
@@ -406,7 +406,7 @@ report 595 "Adjust Exchange Rates"
         }
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.") WHERE("Exchange Rate Adjustment" = FILTER("Adjust Amount" .. "Adjust Additional-Currency Amount"));
+            DataItemTableView = sorting("No.") where("Exchange Rate Adjustment" = filter("Adjust Amount" .. "Adjust Additional-Currency Amount"));
 
             trigger OnAfterGetRecord()
             begin

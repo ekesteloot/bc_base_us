@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Intercompany.Inbox;
+
+using Microsoft.Intercompany.Outbox;
+using Microsoft.Intercompany.Partner;
+using System.Environment.Configuration;
+using System.Utilities;
+
 page 615 "IC Inbox Transactions"
 {
     ApplicationArea = Intercompany;
@@ -46,12 +53,12 @@ page 615 "IC Inbox Transactions"
 
                     trigger OnValidate()
                     begin
-                        SetRange("Transaction Source");
+                        Rec.SetRange("Transaction Source");
                         case ShowLines of
                             ShowLines::"Returned by Partner":
-                                SetRange("Transaction Source", "Transaction Source"::"Returned by Partner");
+                                Rec.SetRange("Transaction Source", Rec."Transaction Source"::"Returned by Partner");
                             ShowLines::"Created by Partner":
-                                SetRange("Transaction Source", "Transaction Source"::"Created by Partner");
+                                Rec.SetRange("Transaction Source", Rec."Transaction Source"::"Created by Partner");
                         end;
                         ShowLinesOnAfterValidate();
                     end;
@@ -65,16 +72,16 @@ page 615 "IC Inbox Transactions"
 
                     trigger OnValidate()
                     begin
-                        SetRange("Line Action");
+                        Rec.SetRange("Line Action");
                         case ShowAction of
                             ShowAction::"No Action":
-                                SetRange("Line Action", "Line Action"::"No Action");
+                                Rec.SetRange("Line Action", Rec."Line Action"::"No Action");
                             ShowAction::Accept:
-                                SetRange("Line Action", "Line Action"::Accept);
+                                Rec.SetRange("Line Action", Rec."Line Action"::Accept);
                             ShowAction::"Return to IC Partner":
-                                SetRange("Line Action", "Line Action"::"Return to IC Partner");
+                                Rec.SetRange("Line Action", Rec."Line Action"::"Return to IC Partner");
                             ShowAction::Cancel:
-                                SetRange("Line Action", "Line Action"::Cancel);
+                                Rec.SetRange("Line Action", Rec."Line Action"::Cancel);
                         end;
                         ShowActionOnAfterValidate();
                     end;
@@ -188,7 +195,7 @@ page 615 "IC Inbox Transactions"
 
                     trigger OnAction()
                     begin
-                        ShowDetails();
+                        Rec.ShowDetails();
                     end;
                 }
                 action(Comments)
@@ -197,10 +204,10 @@ page 615 "IC Inbox Transactions"
                     Caption = 'Comments';
                     Image = ViewComments;
                     RunObject = Page "IC Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("IC Inbox Transaction"),
-                                  "Transaction No." = FIELD("Transaction No."),
-                                  "IC Partner Code" = FIELD("IC Partner Code"),
-                                  "Transaction Source" = FIELD("Transaction Source");
+                    RunPageLink = "Table Name" = const("IC Inbox Transaction"),
+                                  "Transaction No." = field("Transaction No."),
+                                  "IC Partner Code" = field("IC Partner Code"),
+                                  "Transaction Source" = field("Transaction Source");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -295,7 +302,7 @@ page 615 "IC Inbox Transactions"
                         CurrPage.SetSelectionFilter(ICInboxTransaction);
                         if ICInboxTransaction.FindSet() then
                             repeat
-                                TestField("Transaction Source", ICInboxTransaction."Transaction Source"::"Created by Partner");
+                                Rec.TestField("Transaction Source", ICInboxTransaction."Transaction Source"::"Created by Partner");
                                 ICInboxTransaction.Validate("Line Action", ICInboxTransaction."Line Action"::Accept);
                                 ICInboxTransaction.Modify();
                             until ICInboxTransaction.Next() = 0;
@@ -319,7 +326,7 @@ page 615 "IC Inbox Transactions"
                         CurrPage.SetSelectionFilter(ICInboxTransaction);
                         if ICInboxTransaction.FindSet() then
                             repeat
-                                TestField("Transaction Source", ICInboxTransaction."Transaction Source"::"Created by Partner");
+                                Rec.TestField("Transaction Source", ICInboxTransaction."Transaction Source"::"Created by Partner");
                                 ICInboxTransaction."Line Action" := ICInboxTransaction."Line Action"::"Return to IC Partner";
                                 ICInboxTransaction.Modify();
                             until ICInboxTransaction.Next() = 0;
@@ -433,7 +440,7 @@ page 615 "IC Inbox Transactions"
 
     local procedure PartnerFilterOnAfterValidate()
     begin
-        SetFilter("IC Partner Code", PartnerFilter);
+        Rec.SetFilter("IC Partner Code", PartnerFilter);
         CurrPage.Update(false);
     end;
 
@@ -493,6 +500,6 @@ page 615 "IC Inbox Transactions"
         HandledICInboxTrans.SetRange("Source Type", ICInboxTransaction."Source Type");
         HandledICInboxTrans.SetRange("Document Type", ICInboxTransaction."Document Type"::Order);
         exit(not HandledICInboxTrans.IsEmpty());
-   end;
+    end;
 }
 

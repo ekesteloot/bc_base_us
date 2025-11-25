@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.IO;
+
 codeunit 1260 "Imp. SEPA CAMT Gen. Jnl."
 {
     TableNo = "Gen. Journal Line";
@@ -8,7 +13,7 @@ codeunit 1260 "Imp. SEPA CAMT Gen. Jnl."
         ProcessDataExch: Codeunit "Process Data Exch.";
         RecRef: RecordRef;
     begin
-        DataExch.Get("Data Exch. Entry No.");
+        DataExch.Get(Rec."Data Exch. Entry No.");
         PreProcess(Rec);
         RecRef.GetTable(Rec);
         ProcessDataExch.ProcessAllLinesColumnMapping(DataExch, RecRef);

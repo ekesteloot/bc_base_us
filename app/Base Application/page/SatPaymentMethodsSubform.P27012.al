@@ -12,7 +12,7 @@ page 27012 "SAT Payment Methods Subform"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the SAT payment method.';

@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 page 130400 "CAL Test Suites"
 {
     Caption = 'CAL Test Suites';
@@ -29,7 +31,7 @@ page 130400 "CAL Test Suites"
                 {
                     ApplicationArea = All;
                 }
-                field(Failures; Failures)
+                field(Failures; Rec.Failures)
                 {
                     ApplicationArea = All;
                 }
@@ -80,7 +82,7 @@ page 130400 "CAL Test Suites"
 
                         trigger OnAction()
                         begin
-                            ExportTestSuiteSetup();
+                            Rec.ExportTestSuiteSetup();
                         end;
                     }
                     action("I&mport")
@@ -90,7 +92,7 @@ page 130400 "CAL Test Suites"
 
                         trigger OnAction()
                         begin
-                            ImportTestSuiteSetup();
+                            Rec.ImportTestSuiteSetup();
                         end;
                     }
                 }
@@ -109,7 +111,7 @@ page 130400 "CAL Test Suites"
 
                         trigger OnAction()
                         begin
-                            ExportTestSuiteResult();
+                            Rec.ExportTestSuiteResult();
                         end;
                     }
                     action(Action24)
@@ -119,7 +121,7 @@ page 130400 "CAL Test Suites"
 
                         trigger OnAction()
                         begin
-                            ImportTestSuiteResult();
+                            Rec.ImportTestSuiteResult();
                         end;
                     }
                 }

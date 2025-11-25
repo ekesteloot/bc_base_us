@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using System;
+using System.Visualization;
+
 page 769 "Aged Acc. Payable Chart"
 {
     Caption = 'Aged Accounts Payable';
@@ -149,8 +155,8 @@ page 769 "Aged Acc. Payable Chart"
 
     trigger OnAfterGetRecord()
     begin
-        if "No." <> xRec."No." then begin
-            VendorNo := "No.";
+        if Rec."No." <> xRec."No." then begin
+            VendorNo := Rec."No.";
             UpdateChart();
         end;
     end;
@@ -248,7 +254,6 @@ page 769 "Aged Acc. Payable Chart"
         StatusText := AgedAccPayable.UpdateStatusText(BusinessChartBuffer);
     end;
 
-    [Scope('OnPrem')]
     procedure UpdateChartForVendor(NewVendorNo: Code[20])
     begin
         if not IsVisible then

@@ -1,4 +1,4 @@
-report 10480 "Electronic Carta Porte MX"
+﻿report 10480 "Electronic Carta Porte MX"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './Local/ElectronicCartaPorteMX.rdlc';
@@ -12,7 +12,7 @@ report 10480 "Electronic Carta Porte MX"
     {
         dataitem("Document Header"; "Document Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             UseTemporary = true;
             column(DocumentNo; "No.")
@@ -143,8 +143,8 @@ report 10480 "Electronic Carta Porte MX"
             }
             dataitem("Document Line"; "Document Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 UseTemporary = true;
                 column(Page_Caption; PageCaptionLbl)
                 {
@@ -231,8 +231,8 @@ report 10480 "Electronic Carta Porte MX"
             }
             dataitem(CFDITransportOperator; "CFDI Transport Operator")
             {
-                DataItemLink = "Document Table ID" = FIELD("Document Table ID"), "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Table ID", "Document Type", "Document No.", "Operator Code") WHERE("Document Type" = CONST(Quote));
+                DataItemLink = "Document Table ID" = field("Document Table ID"), "Document No." = field("No.");
+                DataItemTableView = sorting("Document Table ID", "Document Type", "Document No.", "Operator Code") where("Document Type" = const(Quote));
                 column(OperatorCode; "Operator Code")
                 {
                 }
@@ -253,7 +253,7 @@ report 10480 "Electronic Carta Porte MX"
             }
             dataitem(QRCode; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(QRCode; TempSalesShipmentHeader."QR Code")
                 {
                 }

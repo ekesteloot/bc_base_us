@@ -3,7 +3,9 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-PermissionSet 4691 "Recurrence Schedule - View"
+namespace System.DateTime;
+
+permissionset 4691 "Recurrence Schedule - View"
 {
     Access = Internal;
     Assignable = false;

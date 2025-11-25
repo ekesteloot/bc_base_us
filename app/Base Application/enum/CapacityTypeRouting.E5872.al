@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 enum 5872 "Capacity Type Routing"
 {
     Extensible = true;

@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8625 "Config. Related Table"
 {
     Caption = 'Config. Related Table';
@@ -13,20 +17,20 @@ table 8625 "Config. Related Table"
         {
             Caption = 'Relation Table ID';
             Editable = false;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(3; "Relation Table Name"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Name" WHERE("Object Type" = CONST(Table),
-                                                                        "Object ID" = FIELD("Relation Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Name" where("Object Type" = const(Table),
+                                                                        "Object ID" = field("Relation Table ID")));
             Caption = 'Relation Table Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Related Fields"; Integer)
         {
-            CalcFormula = Count ("Config. Related Field" WHERE("Table ID" = FIELD("Table ID"),
-                                                               "Relation Table ID" = FIELD("Relation Table ID")));
+            CalcFormula = Count("Config. Related Field" where("Table ID" = field("Table ID"),
+                                                               "Relation Table ID" = field("Relation Table ID")));
             Caption = 'Related Fields';
             Editable = false;
             FieldClass = FlowField;
@@ -34,7 +38,7 @@ table 8625 "Config. Related Table"
         field(5; "In Worksheet"; Boolean)
         {
             BlankZero = true;
-            CalcFormula = Exist ("Config. Line" WHERE("Table ID" = FIELD("Relation Table ID")));
+            CalcFormula = Exist("Config. Line" where("Table ID" = field("Relation Table ID")));
             Caption = 'In Worksheet';
             Editable = false;
             FieldClass = FlowField;

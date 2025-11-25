@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Employee;
+
 enum 5510 "Employee Time Reg. Status"
 {
     Extensible = false;

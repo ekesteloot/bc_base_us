@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1527 "Workflow Change List FactBox"
 {
     Caption = 'Changes to Approve';
@@ -45,8 +47,8 @@ page 1527 "Workflow Change List FactBox"
 
     trigger OnAfterGetRecord()
     begin
-        NewValue := GetFormattedNewValue(true);
-        OldValue := GetFormattedOldValue(true);
+        NewValue := Rec.GetFormattedNewValue(true);
+        OldValue := Rec.GetFormattedOldValue(true);
     end;
 
     var
@@ -55,9 +57,9 @@ page 1527 "Workflow Change List FactBox"
 
     procedure SetFilterFromApprovalEntry(ApprovalEntry: Record "Approval Entry") ReturnValue: Boolean
     begin
-        SetRange("Record ID", ApprovalEntry."Record ID to Approve");
-        SetRange("Workflow Step Instance ID", ApprovalEntry."Workflow Step Instance ID");
-        ReturnValue := FindSet();
+        Rec.SetRange("Record ID", ApprovalEntry."Record ID to Approve");
+        Rec.SetRange("Workflow Step Instance ID", ApprovalEntry."Workflow Step Instance ID");
+        ReturnValue := Rec.FindSet();
         CurrPage.Update(false);
     end;
 }

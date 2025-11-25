@@ -1,3 +1,10 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Foundation.NoSeries;
+
 table 310 "No. Series Relationship"
 {
     Caption = 'No. Series Relationship';
@@ -30,14 +37,14 @@ table 310 "No. Series Relationship"
         }
         field(3; Description; Text[100])
         {
-            CalcFormula = Lookup ("No. Series".Description WHERE(Code = FIELD(Code)));
+            CalcFormula = Lookup("No. Series".Description where(Code = field(Code)));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Series Description"; Text[100])
         {
-            CalcFormula = Lookup ("No. Series".Description WHERE(Code = FIELD("Series Code")));
+            CalcFormula = Lookup("No. Series".Description where(Code = field("Series Code")));
             Caption = 'Series Description';
             Editable = false;
             FieldClass = FlowField;

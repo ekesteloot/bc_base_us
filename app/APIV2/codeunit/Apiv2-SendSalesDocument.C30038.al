@@ -37,14 +37,13 @@ codeunit 30038 "APIV2 - Send Sales Document"
     [Scope('Cloud')]
     procedure CheckDocumentIfNoItemsExists(SalesHeader: Record "Sales Header")
     begin
-        with SalesHeader do
-            if not SalesLinesExist() then
-                case "Document Type" of
-                    "Document Type"::Invoice:
-                        Error(ThereIsNothingToSellInvoiceErr);
-                    else
-                        Error(ThereIsNothingToSellQuoteErr);
-                end;
+        if not SalesHeader.SalesLinesExist() then
+            case SalesHeader."Document Type" of
+                SalesHeader."Document Type"::Invoice:
+                    Error(ThereIsNothingToSellInvoiceErr);
+                else
+                    Error(ThereIsNothingToSellQuoteErr);
+            end;
     end;
 
     local procedure SendCancelledCreditMemoInBackground(var SalesCrMemoHeader: Record "Sales Cr.Memo Header")

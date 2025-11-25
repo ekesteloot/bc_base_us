@@ -15,15 +15,15 @@ page 2200 "Sales Invoice Document API"
     {
         area(content)
         {
-            field(InvoiceId; InvoiceId)
+            field(InvoiceId; Rec.InvoiceId)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
             }
-            field(Base64; Base64)
+            field(Base64; Rec.Base64)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
             }
-            field(Binary; Binary)
+            field(Binary; Rec.Binary)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
             }
@@ -39,18 +39,18 @@ page 2200 "Sales Invoice Document API"
         SalesHeader: Record "Sales Header";
         SalesInvoiceHeader: Record "Sales Invoice Header";
     begin
-        if not Evaluate(InvoiceId, GetFilter(InvoiceId)) then
+        if not Evaluate(Rec.InvoiceId, Rec.GetFilter(InvoiceId)) then
             exit(false);
 
-        if IsNullGuid(InvoiceId) then
+        if IsNullGuid(Rec.InvoiceId) then
             exit(false);
 
-        if SalesInvoiceHeader.GetBySystemId(InvoiceId) then begin
+        if SalesInvoiceHeader.GetBySystemId(Rec.InvoiceId) then begin
             GetDocumentFromPostedInvoice(SalesInvoiceHeader);
             exit(true);
         end;
 
-        if SalesHeader.GetBySystemId(InvoiceId) then begin
+        if SalesHeader.GetBySystemId(Rec.InvoiceId) then begin
             GetDocumentFromDraftInvoice(SalesHeader);
             exit(true);
         end;
@@ -76,11 +76,11 @@ page 2200 "Sales Invoice Document API"
         ReportSelections.GetPdfReportForCust(
           DocumentPath, ReportSelections.Usage::"S.Invoice", SalesInvoiceHeader, SalesInvoiceHeader."Sell-to Customer No.");
 
-        Base64.CreateOutStream(OutStr);
+        Rec.Base64.CreateOutStream(OutStr);
         FileManagement.IsAllowedPath(DocumentPath, false);
         OutStr.WriteText(Convert.ToBase64String(FileObj.ReadAllBytes(DocumentPath)));
 
-        Binary.Import(DocumentPath);
+        Rec.Binary.Import(DocumentPath);
 
         if FILE.Erase(DocumentPath) then;
     end;
@@ -98,11 +98,11 @@ page 2200 "Sales Invoice Document API"
         ReportSelections.GetPdfReportForCust(
           DocumentPath, ReportSelections.Usage::"S.Invoice Draft", SalesHeader, SalesHeader."Sell-to Customer No.");
 
-        Base64.CreateOutStream(OutStr);
+        Rec.Base64.CreateOutStream(OutStr);
         FileManagement.IsAllowedPath(DocumentPath, false);
         OutStr.WriteText(Convert.ToBase64String(FileObj.ReadAllBytes(DocumentPath)));
 
-        Binary.Import(DocumentPath);
+        Rec.Binary.Import(DocumentPath);
 
         if FILE.Erase(DocumentPath) then;
     end;

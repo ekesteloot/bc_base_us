@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
 page 1028 "Job WIP Totals"
 {
     Caption = 'Job WIP Totals';

@@ -1,3 +1,11 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
 report 10053 "Open Customer Entries"
 {
     DefaultLayout = RDLC;
@@ -131,8 +139,8 @@ report 10053 "Open Customer Entries"
             }
             dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
             {
-                DataItemLink = "Customer No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Currency Code" = FIELD("Currency Filter"), "Posting Date" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date") WHERE(Open = CONST(true));
+                DataItemLink = "Customer No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Currency Code" = field("Currency Filter"), "Posting Date" = field("Date Filter");
+                DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date") where(Open = const(true));
                 RequestFilterFields = "Document Type", "On Hold";
                 column(Cust__Ledger_Entry__Posting_Date_; "Posting Date")
                 {

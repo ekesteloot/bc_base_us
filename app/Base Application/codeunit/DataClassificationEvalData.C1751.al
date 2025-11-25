@@ -370,14 +370,12 @@
         ClassifyParallelSessionEntry();
         ClassifyWorkflowsEntriesBuffer();
         ClassifyRecordSetTree();
-#if not CLEAN20
-        ClassifyExtraSettings();
-#endif
         ClassifyApplicationUserSettings();
         ClassifyPermissionSetInPlan();
         ClassifyFinancialReports();
         ClassifyRemitToAddress();
         ClassifyICBankAccount();
+        ClassifyAllocationAccounts();
     end;
 
     local procedure ClassifyFinancialReports()
@@ -577,24 +575,11 @@
         SetTableFieldsToNormal(DATABASE::"VAT Registration No. Format");
         SetTableFieldsToNormal(DATABASE::"Dimension Translation");
         SetTableFieldsToNormal(DATABASE::"Availability at Date");
-#if not CLEAN20
-        SetTableFieldsToNormal(DATABASE::"XBRL Taxonomy");
-        SetTableFieldsToNormal(DATABASE::"XBRL Taxonomy Line");
-        SetTableFieldsToNormal(DATABASE::"XBRL Comment Line");
-        SetTableFieldsToNormal(DATABASE::"XBRL G/L Map Line");
-        SetTableFieldsToNormal(DATABASE::"XBRL Rollup Line");
-        SetTableFieldsToNormal(DATABASE::"XBRL Schema");
-        SetTableFieldsToNormal(DATABASE::"XBRL Linkbase");
-        SetTableFieldsToNormal(DATABASE::"XBRL Taxonomy Label");
-#endif
         SetTableFieldsToNormal(DATABASE::"Change Log Setup");
         SetTableFieldsToNormal(DATABASE::"Change Log Setup (Table)");
         SetTableFieldsToNormal(DATABASE::"Change Log Setup (Field)");
 #if not CLEAN21
         SetTableFieldsToNormal(DATABASE::"Graph Mail Setup");
-#endif
-#if not CLEAN20
-        SetTableFieldsToNormal(DATABASE::"XBRL Line Constant");
 #endif
         SetTableFieldsToNormal(DATABASE::"IC G/L Account");
         SetTableFieldsToNormal(DATABASE::"IC Dimension");
@@ -779,6 +764,9 @@
         SetTableFieldsToNormal(DATABASE::"Business Unit Setup");
         SetTableFieldsToNormal(DATABASE::"Business Unit Information");
         SetTableFieldsToNormal(DATABASE::"Consolidation Account");
+        SetTableFieldsToNormal(Database::"Consolidation Process");
+        SetTableFieldsToNormal(Database::"Bus. Unit In Cons. Process");
+        SetTableFieldsToNormal(Database::"Consolidation Setup");
         SetTableFieldsToNormal(3700); // "Manual Setup" table
         SetTableFieldsToNormal(1876); // "Business Setup Icon" table
         SetTableFieldsToNormal(DATABASE::"VAT Setup Posting Groups");
@@ -820,9 +808,6 @@
         SetTableFieldsToNormal(DATABASE::"O365 Sales Graph");
         SetTableFieldsToNormal(DATABASE::"O365 Sales Invoice Document");
 #endif
-#if not CLEAN20
-        SetTableFieldsToNormal(DATABASE::"Native - Export Invoices");
-#endif
         SetTableFieldsToNormal(Database::"Customer Templ.");
         SetTableFieldsToNormal(Database::"Item Templ.");
         SetTableFieldsToNormal(Database::"Vendor Templ.");
@@ -831,10 +816,6 @@
 
     local procedure ClassifyTablesToNormalPart5()
     begin
-#if not CLEAN20
-        SetTableFieldsToNormal(DATABASE::"Native - Payment");
-        SetTableFieldsToNormal(DATABASE::"Native - API Tax Setup");
-#endif
         SetTableFieldsToNormal(DATABASE::"Contact Alt. Addr. Date Range");
         SetTableFieldsToNormal(DATABASE::"Business Relation");
         SetTableFieldsToNormal(DATABASE::"Contact Business Relation");
@@ -877,9 +858,6 @@
         SetTableFieldsToNormal(DATABASE::"RM Matrix Management");
         SetTableFieldsToNormal(DATABASE::"Interaction Tmpl. Language");
         SetTableFieldsToNormal(DATABASE::"Segment Interaction Language");
-#if not CLEAN20
-        SetTableFieldsToNormal(DATABASE::"Customer Template");
-#endif
         SetTableFieldsToNormal(DATABASE::Rating);
         SetTableFieldsToNormal(DATABASE::"Interaction Template Setup");
         SetTableFieldsToNormal(DATABASE::"Current Salesperson");
@@ -965,10 +943,6 @@
         SetTableFieldsToNormal(DATABASE::"Prod. Order Comp. Cmt Line");
         SetTableFieldsToNormal(DATABASE::"Planning Error Log");
         SetTableFieldsToNormal(DATABASE::"API Entities Setup");
-#if not CLEAN20
-        SetTableFieldsToNormal(DATABASE::"Graph Subscription");
-        SetTableFieldsToNormal(DATABASE::"Graph Business Setting");
-#endif
         SetTableFieldsToNormal(DATABASE::"Sales Invoice Line Aggregate");
         SetTableFieldsToNormal(DATABASE::"Purch. Inv. Line Aggregate");
         SetTableFieldsToNormal(DATABASE::"Aged Report Entity");
@@ -1184,6 +1158,10 @@
         SetTableFieldsToNormal(DATABASE::"Whse. Worksheet Template");
         SetTableFieldsToNormal(DATABASE::"Whse. Internal Put-away Line");
         SetTableFieldsToNormal(DATABASE::"Whse. Internal Pick Line");
+        SetTableFieldsToNormal(DATABASE::"Allocation Policy");
+        SetTableFieldsToNormal(DATABASE::"Reservation Wksh. Batch");
+        SetTableFieldsToNormal(DATABASE::"Reservation Wksh. Line");
+        SetTableFieldsToNormal(DATABASE::"Reservation Worksheet Log");
         SetTableFieldsToNormal(DATABASE::"Bin Template");
         SetTableFieldsToNormal(DATABASE::"Bin Creation Wksh. Template");
         SetTableFieldsToNormal(DATABASE::"Bin Creation Wksh. Name");
@@ -1235,9 +1213,6 @@
         SetTableFieldsToNormal(DATABASE::"User Group Permission Set");
         SetTableFieldsToNormal(DATABASE::"User Group Plan");
 #endif
-#if not CLEAN20
-        SetTableFieldsToNormal(DATABASE::"Plan Permission Set");
-#endif
         SetTableFieldsToNormal(9020); // Security Group
         SetTableFieldsToNormal(DATABASE::"Team Member Cue");
         SetTableFieldsToNormal(DATABASE::"Warehouse Basic Cue");
@@ -1254,7 +1229,7 @@
         SetTableFieldsToNormal(DATABASE::"RapidStart Services Cue");
         SetTableFieldsToNormal(DATABASE::"User Security Status");
         SetTableFieldsToNormal(DATABASE::"Relationship Mgmt. Cue");
-#if not CLEAN20
+#if not CLEAN21
         SetTableFieldsToNormal(DATABASE::"O365 Sales Cue");
 #endif
     end;
@@ -1417,7 +1392,9 @@
         SetTableFieldsToNormal(DATABASE::"Power BI Selection Element");
         SetTableFieldsToNormal(DATABASE::"Power BI Report Configuration");
         SetTableFieldsToNormal(DATABASE::"Power BI Report Uploads");
+#if not CLEAN23
         SetTableFieldsToNormal(DATABASE::"Power BI User Status");
+#endif
 #if not CLEAN22
         SetTableFieldsToNormal(DATABASE::"Power BI Service Status Setup");
 #endif
@@ -1550,6 +1527,14 @@
         TableNo := DATABASE::"CRM Annotation Coupling";
         SetTableFieldsToNormal(TableNo);
         SetFieldToCompanyConfidential(TableNo, DummyCRMAnnotationCoupling.FieldNo("Record Link Record ID"));
+    end;
+
+    local procedure ClassifyAllocationAccounts()
+    begin
+        SetTableFieldsToNormal(DATABASE::"Alloc. Acc. Manual Override");
+        SetTableFieldsToNormal(DATABASE::"Alloc. Account Distribution");
+        SetTableFieldsToNormal(DATABASE::"Allocation Account");
+        SetTableFieldsToNormal(DATABASE::"Allocation Line");
     end;
 
     local procedure ClassifyCRMPostBuffer()
@@ -2466,18 +2451,6 @@
         SetFieldToPersonal(TableNo, DummyAADApplication.FieldNo("User ID"));
     end;
 
-#if not CLEAN20
-    local procedure ClassifyExtraSettings()
-    var
-        TableNo: Integer;
-    begin
-        // Cannot reference Internal table through DATABASE::<Table name>
-        TableNo := 9173; // Extra Settings
-        SetTableFieldsToNormal(TableNo);
-        SetFieldToPersonal(TableNo, 1); // User Security ID
-    end;
-#endif
-
     local procedure ClassifyApplicationUserSettings()
     var
         TableNo: Integer;
@@ -3354,9 +3327,6 @@
         TableNo := DATABASE::"Job Queue Log Entry";
         SetTableFieldsToNormal(TableNo);
         SetFieldToCompanyConfidential(TableNo, DummyJobQueueLogEntry.FieldNo("Job Queue Category Code"));
-#if not CLEAN20
-        SetFieldToPersonal(TableNo, DummyJobQueueLogEntry.FieldNo("Processed by User ID"));
-#endif
         SetFieldToCompanyConfidential(TableNo, DummyJobQueueLogEntry.FieldNo("Error Message"));
         SetFieldToCompanyConfidential(TableNo, DummyJobQueueLogEntry.FieldNo(Description));
         SetFieldToCompanyConfidential(TableNo, DummyJobQueueLogEntry.FieldNo(Status));

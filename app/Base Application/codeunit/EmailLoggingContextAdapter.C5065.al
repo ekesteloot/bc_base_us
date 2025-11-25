@@ -1,4 +1,8 @@
 #if not CLEAN22
+namespace Microsoft.CRM.Outlook;
+
+using System.Threading;
+
 codeunit 5065 "Email Logging Context Adapter"
 {
     SingleInstance = false;

@@ -18,7 +18,7 @@ page 5462 "API Routes"
         {
             repeater(Group)
             {
-                field(route; "Value Long")
+                field(route; Rec."Value Long")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -41,25 +41,25 @@ page 5462 "API Routes"
         if Initialized then
             exit(true);
 
-        View := GetView();
-        Reset();
+        View := Rec.GetView();
+        Rec.Reset();
 
         if not ApiWebhookEntity.FindSet() then
             exit(false);
 
         repeat
-            Route := CopyStr(GetRoute(ApiWebhookEntity), 1, MaxStrLen("Value Long"));
-            SetRange("Value Long", Route);
-            if IsEmpty() then begin
+            Route := CopyStr(GetRoute(ApiWebhookEntity), 1, MaxStrLen(Rec."Value Long"));
+            Rec.SetRange("Value Long", Route);
+            if Rec.IsEmpty() then begin
                 I += 1;
-                ID := I;
-                "Value Long" := Route;
-                Insert();
+                Rec.ID := I;
+                Rec."Value Long" := Route;
+                Rec.Insert();
             end;
         until ApiWebhookEntity.Next() = 0;
 
-        SetView(View);
-        FindFirst();
+        Rec.SetView(View);
+        Rec.FindFirst();
         Initialized := true;
         exit(true);
     end;

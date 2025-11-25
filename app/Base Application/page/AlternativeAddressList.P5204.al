@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.HumanResources.Comment;
+
 page 5204 "Alternative Address List"
 {
     Caption = 'Alternate Address List';
@@ -14,7 +18,7 @@ page 5204 "Alternative Address List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the employee''s alternate address.';
@@ -30,7 +34,7 @@ page 5204 "Alternative Address List"
                     ToolTip = 'Specifies the employee''s first name, or an alternate name.';
                     Visible = false;
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an alternate address for the employee.';
@@ -41,7 +45,7 @@ page 5204 "Alternative Address List"
                     ToolTip = 'Specifies additional address information.';
                     Visible = false;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the alternate address.';
@@ -53,7 +57,7 @@ page 5204 "Alternative Address List"
                     ToolTip = 'Specifies the postal code.';
                     Visible = false;
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the county of the employee''s alternate address.';
@@ -77,7 +81,7 @@ page 5204 "Alternative Address List"
                     ToolTip = 'Specifies the employee''s alternate email address.';
                     Visible = false;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies if a comment was entered for this entry.';
@@ -113,9 +117,9 @@ page 5204 "Alternative Address List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Human Resource Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Alternative Address"),
-                                  "No." = FIELD("Employee No."),
-                                  "Alternative Address Code" = FIELD(Code);
+                    RunPageLink = "Table Name" = const("Alternative Address"),
+                                  "No." = field("Employee No."),
+                                  "Alternative Address Code" = field(Code);
                     ToolTip = 'View or add comments for the record.';
                 }
             }

@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Setup;
+
 page 1280 "Bank Clearing Standards"
 {
     Caption = 'Bank Clearing Standards';
@@ -10,7 +12,7 @@ page 1280 "Bank Clearing Standards"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code of the bank clearing standard that you choose in the Bank Clearing Standard field on a company, customer, or vendor bank account card.';

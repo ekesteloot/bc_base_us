@@ -1,3 +1,14 @@
+namespace Microsoft.Sales.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.CRM.Opportunity;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Archive;
+using System.Utilities;
+
 codeunit 86 "Sales-Quote to Order"
 {
     TableNo = "Sales Header";
@@ -14,22 +25,22 @@ codeunit 86 "Sales-Quote to Order"
     begin
         OnBeforeOnRun(Rec);
 
-        TestField("Document Type", "Document Type"::Quote);
+        Rec.TestField("Document Type", Rec."Document Type"::Quote);
         ShouldRedistributeInvoiceAmount := SalesCalcDiscountByType.ShouldRedistributeInvoiceDiscountAmount(Rec);
 
-        CheckSalesPostRestrictions();
+        Rec.CheckSalesPostRestrictions();
 
-        Cust.Get("Sell-to Customer No.");
-        Cust.CheckBlockedCustOnDocs(Cust, "Document Type"::Order, true, false);
-        if "Sell-to Customer No." <> "Bill-to Customer No." then begin
-            Cust.Get("Bill-to Customer No.");
-            Cust.CheckBlockedCustOnDocs(Cust, "Document Type"::Order, true, false);
+        Cust.Get(Rec."Sell-to Customer No.");
+        Cust.CheckBlockedCustOnDocs(Cust, Rec."Document Type"::Order, true, false);
+        if Rec."Sell-to Customer No." <> Rec."Bill-to Customer No." then begin
+            Cust.Get(Rec."Bill-to Customer No.");
+            Cust.CheckBlockedCustOnDocs(Cust, Rec."Document Type"::Order, true, false);
         end;
-        CalcFields("Amount Including VAT", "Work Description");
+        Rec.CalcFields("Amount Including VAT", "Work Description");
 
-        ValidateSalesPersonOnSalesHeader(Rec, true, false);
+        Rec.ValidateSalesPersonOnSalesHeader(Rec, true, false);
 
-        CheckForBlockedLines();
+        Rec.CheckForBlockedLines();
 
         CheckInProgressOpportunities(Rec);
 
@@ -46,10 +57,10 @@ codeunit 86 "Sales-Quote to Order"
             SalesOrderHeader.Modify();
         end;
 
-        SalesCommentLine.CopyComments("Document Type".AsInteger(), SalesOrderHeader."Document Type".AsInteger(), "No.", SalesOrderHeader."No.");
+        SalesCommentLine.CopyComments(Rec."Document Type".AsInteger(), SalesOrderHeader."Document Type".AsInteger(), Rec."No.", SalesOrderHeader."No.");
         RecordLinkManagement.CopyLinks(Rec, SalesOrderHeader);
 
-        AssignItemCharges("Document Type", "No.", SalesOrderHeader."Document Type", SalesOrderHeader."No.");
+        AssignItemCharges(Rec."Document Type", Rec."No.", SalesOrderHeader."Document Type", SalesOrderHeader."No.");
 
         MoveWonLostOpportunites(Rec, SalesOrderHeader);
 
@@ -58,10 +69,10 @@ codeunit 86 "Sales-Quote to Order"
         IsHandled := false;
         OnBeforeDeleteSalesQuote(Rec, SalesOrderHeader, IsHandled, SalesQuoteLine);
         if not IsHandled then begin
-            ApprovalsMgmt.DeleteApprovalEntries(RecordId);
-            SalesCommentLine.DeleteComments("Document Type".AsInteger(), "No.");
-            DeleteLinks();
-            Delete();
+            ApprovalsMgmt.DeleteApprovalEntries(Rec.RecordId);
+            SalesCommentLine.DeleteComments(Rec."Document Type".AsInteger(), Rec."No.");
+            Rec.DeleteLinks();
+            Rec.Delete();
             SalesQuoteLine.DeleteAll();
             OnRunOnAfterSalesQuoteLineDeleteAll(Rec, SalesOrderHeader, SalesQuoteLine);
         end;

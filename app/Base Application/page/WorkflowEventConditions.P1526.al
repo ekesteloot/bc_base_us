@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Reflection;
+
 page 1526 "Workflow Event Conditions"
 {
     Caption = 'Event Conditions';
@@ -42,7 +46,7 @@ page 1526 "Workflow Event Conditions"
                                 var
                                     WorkflowStep: Record "Workflow Step";
                                 begin
-                                    WorkflowStep.Get("Workflow Code", "Workflow Step ID");
+                                    WorkflowStep.Get(Rec."Workflow Code", Rec."Workflow Step ID");
 
                                     WorkflowStep.OpenEventConditions();
 
@@ -124,7 +128,7 @@ page 1526 "Workflow Event Conditions"
                                     Caption = 'is';
                                     ShowCaption = false;
                                 }
-                                field(Operator; Operator)
+                                field(Operator; Rec.Operator)
                                 {
                                     ApplicationArea = Suite;
                                     ShowCaption = false;
@@ -160,11 +164,11 @@ page 1526 "Workflow Event Conditions"
 
     trigger OnAfterGetRecord()
     begin
-        SetField("Field No.");
+        SetField(Rec."Field No.");
 
         ShowFilter := true;
 
-        ShowAdvancedCondition := "Field No." <> 0;
+        ShowAdvancedCondition := Rec."Field No." <> 0;
         UpdateLabels();
     end;
 
@@ -178,7 +182,7 @@ page 1526 "Workflow Event Conditions"
         WorkflowStep: Record "Workflow Step";
         WorkflowEvent: Record "Workflow Event";
     begin
-        WorkflowStep.Get("Workflow Code", "Workflow Step ID");
+        WorkflowStep.Get(Rec."Workflow Code", Rec."Workflow Step ID");
         WorkflowEvent.Get(WorkflowStep."Function Name");
         EventDescription := WorkflowEvent.Description;
         FilterConditionText := WorkflowStep.GetConditionAsDisplayText();
@@ -198,26 +202,26 @@ page 1526 "Workflow Event Conditions"
     procedure SetRule(TempWorkflowRule: Record "Workflow Rule" temporary)
     begin
         Rec := TempWorkflowRule;
-        Insert(true);
+        Rec.Insert(true);
     end;
 
     local procedure ClearRule()
     begin
         SetField(0);
-        Operator := Operator::Changed;
+        Rec.Operator := Rec.Operator::Changed;
     end;
 
     local procedure SetField(FieldNo: Integer)
     begin
-        "Field No." := FieldNo;
-        CalcFields("Field Caption");
-        FieldCaption2 := "Field Caption";
+        Rec."Field No." := FieldNo;
+        Rec.CalcFields("Field Caption");
+        FieldCaption2 := Rec."Field Caption";
     end;
 
     local procedure FindAndFilterToField(var "Field": Record "Field"; CaptionToFind: Text): Boolean
     begin
         Field.FilterGroup(2);
-        Field.SetRange(TableNo, "Table ID");
+        Field.SetRange(TableNo, Rec."Table ID");
         Field.SetFilter(Type, StrSubstNo('%1|%2|%3|%4|%5|%6|%7|%8|%9|%10|%11|%12|%13',
             Field.Type::Boolean,
             Field.Type::Text,
@@ -234,8 +238,8 @@ page 1526 "Workflow Event Conditions"
             Field.Type::RecordID));
         Field.SetRange(Class, Field.Class::Normal);
 
-        if CaptionToFind = "Field Caption" then
-            Field.SetRange("No.", "Field No.")
+        if CaptionToFind = Rec."Field Caption" then
+            Field.SetRange("No.", Rec."Field No.")
         else
             Field.SetFilter("Field Caption", '%1', '@' + CaptionToFind + '*');
 

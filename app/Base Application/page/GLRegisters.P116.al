@@ -1,3 +1,16 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.Dimension.Correction;
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.HumanResources.Payables;
+using Microsoft.InventoryMgt.Ledger;
+using System.Security.User;
+
 page 116 "G/L Registers"
 {
     AdditionalSearchTerms = 'general ledger registers';
@@ -6,8 +19,8 @@ page 116 "G/L Registers"
     Editable = false;
     PageType = List;
     SourceTable = "G/L Register";
-    SourceTableView = SORTING("No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("No.")
+                      order(descending);
     UsageCategory = History;
 
     layout
@@ -41,7 +54,7 @@ page 116 "G/L Registers"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -54,7 +67,7 @@ page 116 "G/L Registers"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the batch name of the general journal that the entries were posted from.';
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies if the register has been reversed (undone) from the Reverse Entries window.';
@@ -172,7 +185,7 @@ page 116 "G/L Registers"
                     var
                         EmployeeLedgerEntry: Record "Employee Ledger Entry";
                     begin
-                        EmployeeLedgerEntry.SetRange("Entry No.", "From Entry No.", "To Entry No.");
+                        EmployeeLedgerEntry.SetRange("Entry No.", Rec."From Entry No.", Rec."To Entry No.");
                         PAGE.Run(PAGE::"Employee Ledger Entries", EmployeeLedgerEntry);
                     end;
                 }
@@ -182,11 +195,10 @@ page 116 "G/L Registers"
                     Caption = 'Item Ledger Relation';
                     Image = ItemLedger;
                     RunObject = Page "G/L - Item Ledger Relation";
-                    RunPageLink = "G/L Register No." = FIELD("No.");
-                    RunPageView = SORTING("G/L Register No.");
+                    RunPageLink = "G/L Register No." = field("No.");
+                    RunPageView = sorting("G/L Register No.");
                     ToolTip = 'View the link between the general ledger entries and the value entries.';
                 }
-
                 action(ChangeDimensions)
                 {
                     ApplicationArea = All;
@@ -229,14 +241,14 @@ page 116 "G/L Registers"
                         ReversePaymentRecJournal: Codeunit "Reverse Payment Rec. Journal";
                     begin
                         if GetPostedPaymentReconHdr(Rec, PostedPaymentReconHdr) then begin
-                            if not PostedPaymentReconHdr."Is Reversed" then 
+                            if not PostedPaymentReconHdr."Is Reversed" then
                                 ReversePaymentRecJournal.RunReversalWizard(PostedPaymentReconHdr)
                             else
                                 Error(PaymentRecJournalAlreadyReversedMsg);
                             exit;
                         end;
-                        TestField("No.");
-                        ReversalEntry.ReverseRegister("No.");
+                        Rec.TestField("No.");
+                        ReversalEntry.ReverseRegister(Rec."No.");
                     end;
                 }
             }
@@ -355,7 +367,7 @@ page 116 "G/L Registers"
 
     trigger OnOpenPage()
     begin
-        if FindSet() then;
+        if Rec.FindSet() then;
     end;
 
     trigger OnAfterGetRecord()
@@ -370,11 +382,11 @@ page 116 "G/L Registers"
         ReverseEnabled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeGetReverseRegisterEnabled("No.", ReverseEnabled, IsHandled);
+        OnBeforeGetReverseRegisterEnabled(Rec."No.", ReverseEnabled, IsHandled);
         if IsHandled then
             exit(ReverseEnabled);
 
-        if Reversed then
+        if Rec.Reversed then
             exit(false);
 
         if Rec."Journal Batch Name" <> '' then

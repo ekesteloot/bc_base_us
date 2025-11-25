@@ -1,3 +1,8 @@
+﻿namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+
 page 1348 "Employee Link"
 {
     Caption = 'Employee Link';
@@ -34,8 +39,8 @@ page 1348 "Employee Link"
         ContBusRel: Record "Contact Business Relation";
         CustVendBankUpdate: Codeunit "CustVendBank-Update";
     begin
-        if ("No." <> '') and (CloseAction = ACTION::LookupOK) then begin
-            TestField("No.");
+        if (Rec."No." <> '') and (CloseAction = ACTION::LookupOK) then begin
+            Rec.TestField("No.");
             ContBusRel := Rec;
             ContBusRel.Insert(true);
             Contact.Get(ContBusRel."Contact No.");

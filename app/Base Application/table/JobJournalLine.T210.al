@@ -1,3 +1,34 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.ProjectMgt.Resources.Ledger;
+#if not CLEAN21
+using Microsoft.ProjectMgt.Resources.Pricing;
+#endif
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Customer;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using System.Utilities;
+
 table 210 "Job Journal Line"
 {
     Caption = 'Job Journal Line';
@@ -94,11 +125,11 @@ table 210 "Job Journal Line"
         field(8; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST(Item)) Item WHERE(Blocked = CONST(false))
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account";
+            TableRelation = if (Type = const(Resource)) Resource
+            else
+            if (Type = const(Item)) Item where(Blocked = const(false))
+            else
+            if (Type = const("G/L Account")) "G/L Account";
 
             trigger OnValidate()
             var
@@ -249,10 +280,10 @@ table 210 "Job Journal Line"
         field(18; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
-            IF (Type = CONST(Resource)) "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("No."))
-            ELSE
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
+            if (Type = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("No."))
+            else
             "Unit of Measure";
 
             trigger OnValidate()
@@ -326,7 +357,7 @@ table 210 "Job Journal Line"
         field(21; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             begin
@@ -357,30 +388,30 @@ table 210 "Job Journal Line"
         {
             Caption = 'Posting Group';
             Editable = false;
-            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group";
+            TableRelation = if (Type = const(Item)) "Inventory Posting Group";
         }
         field(31; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(32; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(33; "Work Type Code"; Code[10])
@@ -483,7 +514,7 @@ table 210 "Job Journal Line"
         field(73; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Job Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Job Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
         }
         field(74; "Reason Code"; Code[10])
         {
@@ -600,7 +631,7 @@ table 210 "Job Journal Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -616,18 +647,18 @@ table 210 "Job Journal Line"
         field(951; "Time Sheet Line No."; Integer)
         {
             Caption = 'Time Sheet Line No.';
-            TableRelation = "Time Sheet Line"."Line No." WHERE("Time Sheet No." = FIELD("Time Sheet No."));
+            TableRelation = "Time Sheet Line"."Line No." where("Time Sheet No." = field("Time Sheet No."));
         }
         field(952; "Time Sheet Date"; Date)
         {
             Caption = 'Time Sheet Date';
-            TableRelation = "Time Sheet Detail".Date WHERE("Time Sheet No." = FIELD("Time Sheet No."),
-                                                            "Time Sheet Line No." = FIELD("Time Sheet Line No."));
+            TableRelation = "Time Sheet Detail".Date where("Time Sheet No." = field("Time Sheet No."),
+                                                            "Time Sheet Line No." = field("Time Sheet Line No."));
         }
         field(1000; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
 
             trigger OnValidate()
             var
@@ -653,14 +684,14 @@ table 210 "Job Journal Line"
         }
         field(1001; "Total Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Cost';
             Editable = false;
         }
         field(1002; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
             MinValue = 0;
@@ -727,7 +758,7 @@ table 210 "Job Journal Line"
         }
         field(1007; "Line Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Discount Amount';
 
@@ -749,7 +780,7 @@ table 210 "Job Journal Line"
         }
         field(1009; "Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Amount';
 
@@ -774,7 +805,7 @@ table 210 "Job Journal Line"
         }
         field(1011; "Unit Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Cost';
 
@@ -811,7 +842,7 @@ table 210 "Job Journal Line"
         }
         field(1014; "Total Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Price';
             Editable = false;
@@ -833,11 +864,11 @@ table 210 "Job Journal Line"
         {
             BlankZero = true;
             Caption = 'Ledger Entry No.';
-            TableRelation = IF ("Ledger Entry Type" = CONST(Resource)) "Res. Ledger Entry"
-            ELSE
-            IF ("Ledger Entry Type" = CONST(Item)) "Item Ledger Entry"
-            ELSE
-            IF ("Ledger Entry Type" = CONST("G/L Account")) "G/L Entry";
+            TableRelation = if ("Ledger Entry Type" = const(Resource)) "Res. Ledger Entry"
+            else
+            if ("Ledger Entry Type" = const(Item)) "Item Ledger Entry"
+            else
+            if ("Ledger Entry Type" = const("G/L Account")) "G/L Entry";
         }
         field(1019; "Job Planning Line No."; Integer)
         {
@@ -930,10 +961,11 @@ table 210 "Job Journal Line"
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = IF (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."), Blocked = const(false));
 
             trigger OnValidate()
             var
+                ItemVariant: Record "Item Variant";
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -941,7 +973,7 @@ table 210 "Job Journal Line"
                 if IsHandled then
                     exit;
 
-                if "Variant Code" = '' then begin
+                if Rec."Variant Code" = '' then begin
                     if Type = Type::Item then begin
                         Item.Get("No.");
                         Description := Item.Description;
@@ -952,8 +984,9 @@ table 210 "Job Journal Line"
                 end;
 
                 TestField(Type, Type::Item);
-
+                ItemVariant.SetLoadFields(Description, "Description 2", Blocked);
                 ItemVariant.Get("No.", "Variant Code");
+                ItemVariant.TestField(Blocked, false);
                 Description := ItemVariant.Description;
                 "Description 2" := ItemVariant."Description 2";
 
@@ -1009,15 +1042,15 @@ table 210 "Job Journal Line"
         field(5468; "Reserved Qty. (Base)"; Decimal)
         {
             AccessByPermission = TableData Item = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("Journal Template Name"),
-                                                                           "Source Ref. No." = FIELD("Line No."),
-                                                                           "Source Type" = CONST(210),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Journal Template Name"),
+                                                                           "Source Ref. No." = field("Line No."),
+                                                                           "Source Type" = const(210),
 #pragma warning disable AL0603
-                                                                           "Source Subtype" = FIELD("Entry Type"),
+                                                                           "Source Subtype" = field("Entry Type"),
 #pragma warning restore
-                                                                           "Source Batch Name" = FIELD("Journal Batch Name"),
-                                                                           "Source Prod. Order Line" = CONST(0),
-                                                                           "Reservation Status" = CONST(Reservation)));
+                                                                           "Source Batch Name" = field("Journal Batch Name"),
+                                                                           "Source Prod. Order Line" = const(0),
+                                                                           "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1086,8 +1119,8 @@ table 210 "Job Journal Line"
             JobJnlBatch.Get("Journal Template Name", "Journal Batch Name");
         end;
 
-        ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
-        ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+        Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+        Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
     end;
 
     trigger OnModify()
@@ -1115,7 +1148,6 @@ table 210 "Job Journal Line"
         WorkType: Record "Work Type";
         JobJnlBatch: Record "Job Journal Batch";
         JobJnlLine: Record "Job Journal Line";
-        ItemVariant: Record "Item Variant";
         ResUnitofMeasure: Record "Resource Unit of Measure";
         ItemTranslation: Record "Item Translation";
         CurrExchRate: Record "Currency Exchange Rate";
@@ -1364,37 +1396,6 @@ table 210 "Job Journal Line"
         OnAfterSetUpNewLine(Rec, LastJobJnlLine, JobJnlTemplate, JobJnlBatch);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCreateDim(Rec, IsHandled, CurrFieldNo);
-        if IsHandled then
-            exit;
-
-        TableID[1] := Type1;
-        No[1] := No1;
-        TableID[2] := Type2;
-        No[2] := No2;
-        TableID[3] := Type3;
-        No[3] := No3;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, TableID, No, "Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-
-        OnAfterCreateDim(Rec, CurrFieldNo);
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         IsHandled: Boolean;
@@ -1403,9 +1404,6 @@ table 210 "Job Journal Line"
         OnBeforeCreateDim(Rec, IsHandled, CurrFieldNo);
         if IsHandled then
             exit;
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -1433,7 +1431,7 @@ table 210 "Job Journal Line"
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     local procedure GetLocation(LocationCode: Code[10])
@@ -2238,36 +2236,6 @@ table 210 "Job Journal Line"
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Job Journal Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Job Journal Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Job Journal Line") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-#endif
-
     local procedure CalcBaseQtyForJobPlanningLine(Qty: Decimal; FromFieldName: Text; ToFieldName: Text; JobPlanningLine: Record "Job Planning Line"): Decimal
     begin
         exit(UOMMgt.CalcBaseQty(
@@ -2377,13 +2345,6 @@ table 210 "Job Journal Line"
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var JobJournalLine: Record "Job Journal Line"; var FieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateUnitCost(var JobJournalLine: Record "Job Journal Line"; UnitAmountRoundingPrecision: Decimal; CallingFieldNo: Integer)
     begin

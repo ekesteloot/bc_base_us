@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.Inbox;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 651 "Handled IC Inbox Purch. Lines"
 {
     Caption = 'Lines';
@@ -116,7 +120,7 @@ page 651 "Handled IC Inbox Purch. Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }

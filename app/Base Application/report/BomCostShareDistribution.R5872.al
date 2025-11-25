@@ -12,7 +12,7 @@ report 5872 "BOM Cost Share Distribution"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {
@@ -43,7 +43,7 @@ report 5872 "BOM Cost Share Distribution"
             }
             dataitem(BOMBufferLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(TypeNo; StrSubstNo('%1 %2', TempBOMBuffer.Type, TempBOMBuffer."No."))
                 {
                 }

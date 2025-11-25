@@ -1,7 +1,9 @@
+namespace Microsoft.CRM.Duplicates;
+
 page 702 "Merge Duplicate"
 {
     Caption = 'Merge Duplicate';
-    DataCaptionExpression = "Table Name";
+    DataCaptionExpression = Rec."Table Name";
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = Card;
@@ -28,12 +30,12 @@ page 702 "Merge Duplicate"
                     InstructionalText = 'Before merging, review which field values you want to keep or override. The merge action cannot be undone.';
                     ShowCaption = false;
                 }
-                field(Current; Current)
+                field(Current; Rec.Current)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                 }
-                field(Duplicate; Duplicate)
+                field(Duplicate; Rec.Duplicate)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Merge With';
@@ -54,14 +56,14 @@ page 702 "Merge Duplicate"
                     InstructionalText = 'This action cannot be undone.';
                     ShowCaption = false;
                 }
-                field(CurrentRecID; GetPK("Current Record ID"))
+                field(CurrentRecID; GetPK(Rec."Current Record ID"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Current';
                     Editable = false;
                     ToolTip = 'Specifies the values in the fields of the primary key of the current record.';
                 }
-                field(DuplicateRecID; GetPK("Duplicate Record ID"))
+                field(DuplicateRecID; GetPK(Rec."Duplicate Record ID"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Conflicts With';
@@ -75,7 +77,7 @@ page 702 "Merge Duplicate"
                 //The GridLayout property is only supported on controls of type Grid
                 //GridLayout = Rows;
                 Visible = ConflictsExist;
-                field(Conflicts; GetConflictsMsg())
+                field(Conflicts; Rec.GetConflictsMsg())
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -86,7 +88,7 @@ page 702 "Merge Duplicate"
 
                     trigger OnDrillDown()
                     begin
-                        ShowConflicts();
+                        Rec.ShowConflicts();
                         CurrPage.Update(false);
                     end;
                 }
@@ -122,9 +124,9 @@ page 702 "Merge Duplicate"
 
                 trigger OnAction()
                 begin
-                    if Merge() then begin
+                    if Rec.Merge() then begin
                         CurrPage.Close();
-                        Message(RecordMergedMsg, "Table Name", Duplicate, Current);
+                        Message(RecordMergedMsg, Rec."Table Name", Rec.Duplicate, Rec.Current);
                     end;
                 end;
             }
@@ -138,7 +140,7 @@ page 702 "Merge Duplicate"
 
                 trigger OnAction()
                 begin
-                    if RemoveConflictingRecord() then begin
+                    if Rec.RemoveConflictingRecord() then begin
                         ConflictResolved := true;
                         CurrPage.Close();
                     end;
@@ -155,7 +157,7 @@ page 702 "Merge Duplicate"
 
                 trigger OnAction()
                 begin
-                    if RenameConflictingRecord() then begin
+                    if Rec.RenameConflictingRecord() then begin
                         ConflictResolved := true;
                         CurrPage.Close();
                     end;
@@ -185,7 +187,6 @@ page 702 "Merge Duplicate"
         RecordMergedMsg: Label '%1 %2 has been merged to %1 %3.', Comment = '%1 - table name (Customer/Vendor); %2 - Duplicate value; %3 - new kew value';
         ShowRecID: Boolean;
         ConflictResolved: Boolean;
-        [InDataSet]
         ConflictsExist: Boolean;
 
     [Scope('OnPrem')]
@@ -203,13 +204,13 @@ page 702 "Merge Duplicate"
     procedure Set(MergeDuplicatesBuffer: Record "Merge Duplicates Buffer")
     begin
         Rec := MergeDuplicatesBuffer;
-        Insert();
+        Rec.Insert();
         ShowRecID := false;
     end;
 
     procedure SetConflict(MergeDuplicatesConflict: Record "Merge Duplicates Conflict")
     begin
-        InsertFromConflict(MergeDuplicatesConflict);
+        Rec.InsertFromConflict(MergeDuplicatesConflict);
         ShowRecID := true;
         ShowLines();
     end;
@@ -219,7 +220,7 @@ page 702 "Merge Duplicate"
         TempMergeDuplicatesLineBuffer: Record "Merge Duplicates Line Buffer" temporary;
         TempMergeDuplicatesConflict: Record "Merge Duplicates Conflict" temporary;
     begin
-        GetLines(TempMergeDuplicatesLineBuffer, TempMergeDuplicatesConflict);
+        Rec.GetLines(TempMergeDuplicatesLineBuffer, TempMergeDuplicatesConflict);
         TempMergeDuplicatesLineBuffer.SetCurrentKey("In Primary Key");
         TempMergeDuplicatesLineBuffer.SetRange(Type, TempMergeDuplicatesLineBuffer.Type::Field);
         CurrPage.Fields.PAGE.Set(TempMergeDuplicatesLineBuffer);

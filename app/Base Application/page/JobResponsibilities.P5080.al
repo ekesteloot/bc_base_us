@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Contact;
+
 page 5080 "Job Responsibilities"
 {
     ApplicationArea = RelationshipMgmt;
@@ -13,7 +17,7 @@ page 5080 "Job Responsibilities"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the job responsibility.';
@@ -61,7 +65,7 @@ page 5080 "Job Responsibilities"
                     Caption = 'C&ontacts';
                     Image = CustomerContact;
                     RunObject = Page "Job Responsibility Contacts";
-                    RunPageLink = "Job Responsibility Code" = FIELD(Code);
+                    RunPageLink = "Job Responsibility Code" = field(Code);
                     ToolTip = 'View a list of contacts that are associated with the specific job responsibility.';
                 }
             }
@@ -79,7 +83,6 @@ page 5080 "Job Responsibilities"
     end;
 
     var
-        [InDataSet]
         HideNumberOfContacts: Boolean;
 }
 

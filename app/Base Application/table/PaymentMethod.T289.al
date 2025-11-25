@@ -1,3 +1,12 @@
+namespace Microsoft.BankMgt.BankAccount;
+
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Foundation.PaymentTerms;
+using System.Globalization;
+using System.IO;
+
 table 289 "Payment Method"
 {
     Caption = 'Payment Method';
@@ -28,9 +37,9 @@ table 289 "Payment Method"
         field(4; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
 
             trigger OnValidate()
             begin

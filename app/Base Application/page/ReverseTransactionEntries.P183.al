@@ -1,3 +1,15 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reversal;
+
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.Statement;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 page 183 "Reverse Transaction Entries"
 {
     Caption = 'Reverse Entries';
@@ -24,7 +36,7 @@ page 183 "Reverse Transaction Entries"
                 field(EntryTypeText; GetEntryTypeText())
                 {
                     ApplicationArea = Basic, Suite;
-                    CaptionClass = FieldCaption("Entry Type");
+                    CaptionClass = Rec.FieldCaption("Entry Type");
                     Editable = false;
                     ShowCaption = false;
                 }
@@ -332,7 +344,7 @@ page 183 "Reverse Transaction Entries"
                     Image = Undo;
                     Visible = UndoBankStatementVisible;
                     ToolTip = 'Undo the Bank Statement related to these entries.';
-                    
+
                     trigger OnAction()
                     var
                         UndoBankStatementYesNo: Codeunit "Undo Bank Statement (Yes/No)";
@@ -341,8 +353,8 @@ page 183 "Reverse Transaction Entries"
                             if GuiAllowed then
                                 if not Confirm(UndoBankStatementQst) then
                                     exit;
-                            UndoBankStatementYesNo.UndoBankAccountStatement(BankAccountStatement, false);
-                            Message(BankStatementUndoneMsg);
+                        UndoBankStatementYesNo.UndoBankAccountStatement(BankAccountStatement, false);
+                        Message(BankStatementUndoneMsg);
                     end;
                 }
             }
@@ -368,7 +380,7 @@ page 183 "Reverse Transaction Entries"
 
     trigger OnAfterGetCurrRecord()
     begin
-        DescriptionEditable := "Entry Type" <> "Entry Type"::VAT;
+        DescriptionEditable := Rec."Entry Type" <> Rec."Entry Type"::VAT;
     end;
 
     trigger OnInit()
@@ -385,7 +397,6 @@ page 183 "Reverse Transaction Entries"
         ReversalEntry: Record "Reversal Entry";
         BankAccountStatement: Record "Bank Account Statement";
         UndoBankStatementVisible: Boolean;
-        [InDataSet]
         DescriptionEditable: Boolean;
 
         ReverseTransactionEntriesLbl: Label 'Reverse Transaction Entries';
@@ -410,7 +421,7 @@ page 183 "Reverse Transaction Entries"
         until TempReversalEntry.Next() = 0;
     end;
 
-    local procedure Post(PrintRegister: Boolean)
+    procedure Post(PrintRegister: Boolean)
     var
         ReversalPost: Codeunit "Reversal-Post";
     begin
@@ -437,38 +448,38 @@ page 183 "Reverse Transaction Entries"
         if IsHandled then
             exit(EntryTypeText);
 
-        case "Entry Type" of
-            "Entry Type"::"G/L Account":
+        case Rec."Entry Type" of
+            Rec."Entry Type"::"G/L Account":
                 exit(GLEntry.TableCaption());
-            "Entry Type"::Customer:
+            Rec."Entry Type"::Customer:
                 exit(CustLedgEntry.TableCaption());
-            "Entry Type"::Vendor:
+            Rec."Entry Type"::Vendor:
                 exit(VendLedgEntry.TableCaption());
-            "Entry Type"::Employee:
+            Rec."Entry Type"::Employee:
                 exit(EmployeeLedgerEntry.TableCaption());
-            "Entry Type"::"Bank Account":
+            Rec."Entry Type"::"Bank Account":
                 exit(BankAccLedgEntry.TableCaption());
-            "Entry Type"::"Fixed Asset":
+            Rec."Entry Type"::"Fixed Asset":
                 exit(FALedgEntry.TableCaption());
-            "Entry Type"::Maintenance:
+            Rec."Entry Type"::Maintenance:
                 exit(MaintenanceLedgEntry.TableCaption());
-            "Entry Type"::VAT:
+            Rec."Entry Type"::VAT:
                 exit(VATEntry.TableCaption());
             else
-                exit(Format("Entry Type"));
+                exit(Format(Rec."Entry Type"));
         end;
     end;
 
     local procedure InitializeFilter()
     begin
-        FindFirst();
+        Rec.FindFirst();
         ReversalEntry := Rec;
-        if "Reversal Type" = "Reversal Type"::Transaction then begin
+        if Rec."Reversal Type" = Rec."Reversal Type"::Transaction then begin
             CurrPage.Caption := ReverseTransactionEntriesLbl;
-            ReversalEntry.SetReverseFilter("Transaction No.", "Reversal Type");
+            ReversalEntry.SetReverseFilter(Rec."Transaction No.", Rec."Reversal Type");
         end else begin
             CurrPage.Caption := ReverseRegisterEntriesLbl;
-            ReversalEntry.SetReverseFilter("G/L Register No.", "Reversal Type");
+            ReversalEntry.SetReverseFilter(Rec."G/L Register No.", Rec."Reversal Type");
         end;
     end;
 

@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 page 9181 "Generic Chart Filters"
 {
     AutoSplitKey = true;
@@ -24,7 +26,7 @@ page 9181 "Generic Chart Filters"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        GenericChartMgt.RetrieveFieldColumn(TempGenericChartSetup, "Filter Field ID", "Filter Field Name", "Filter Field Name", 0, true);
+                        GenericChartMgt.RetrieveFieldColumn(TempGenericChartSetup, Rec."Filter Field ID", Rec."Filter Field Name", Rec."Filter Field Name", 0, true);
                     end;
 
                     trigger OnValidate()
@@ -32,7 +34,7 @@ page 9181 "Generic Chart Filters"
                         DummyAggregation: Option "None","Count","Sum","Min","Max",Avg;
                     begin
                         GenericChartMgt.ValidateFieldColumn(
-                          TempGenericChartSetup, "Filter Field ID", "Filter Field Name", "Filter Field Name", 0, true, DummyAggregation);
+                          TempGenericChartSetup, Rec."Filter Field ID", Rec."Filter Field Name", Rec."Filter Field Name", 0, true, DummyAggregation);
                     end;
                 }
                 field("Filter Value"; Rec."Filter Value")
@@ -54,22 +56,22 @@ page 9181 "Generic Chart Filters"
 
     procedure SetFilters(var TempGenericChartFilter2: Record "Generic Chart Filter" temporary)
     begin
-        DeleteAll();
+        Rec.DeleteAll();
         if TempGenericChartFilter2.Find('-') then
             repeat
                 Rec := TempGenericChartFilter2;
-                Insert();
+                Rec.Insert();
             until TempGenericChartFilter2.Next() = 0;
     end;
 
     procedure GetFilters(var TempGenericChartFilter2: Record "Generic Chart Filter" temporary)
     begin
         TempGenericChartFilter2.DeleteAll();
-        if Find('-') then
+        if Rec.Find('-') then
             repeat
                 TempGenericChartFilter2 := Rec;
                 TempGenericChartFilter2.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     procedure SetTempGenericChart(GenericChartSetup2: Record "Generic Chart Setup")

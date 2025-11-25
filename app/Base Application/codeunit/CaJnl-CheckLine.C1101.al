@@ -1,3 +1,9 @@
+namespace Microsoft.CostAccounting.Posting;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 codeunit 1101 "CA Jnl.-Check Line"
 {
     TableNo = "Cost Journal Line";

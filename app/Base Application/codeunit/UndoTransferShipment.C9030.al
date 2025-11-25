@@ -1,3 +1,15 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+
 codeunit 9030 "Undo Transfer Shipment"
 {
     Permissions = TableData "Transfer Line" = rimd,
@@ -206,7 +218,7 @@ codeunit 9030 "Undo Transfer Shipment"
         WhseUndoQty.InsertTempWhseJnlLine(
                        ItemJnlLine,
                        Database::"Transfer Line", Direction::Outbound.AsInteger(), TransShptLine."Transfer Order No.", TransShptLine."Line No.",
-                       TempWhseJnlLine."Reference Document"::"Posted Shipment".AsInteger(), TempWhseJnlLine, NextLineNo);
+                       TempWhseJnlLine."Reference Document"::"Posted T. Shipment".AsInteger(), TempWhseJnlLine, NextLineNo);
 
         if GetShptEntries(TransShptLine, ItemLedgEntry) then begin
             ItemLedgEntry.SetTrackingFilterBlank();

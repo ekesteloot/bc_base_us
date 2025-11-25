@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 6416 "Flow User Env. Selection"
 {
     Caption = 'Power Automate User Environment Selection';
@@ -26,7 +28,7 @@ page 6416 "Flow User Env. Selection"
                         EnsureOnlyOneSelection();
                     end;
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Enabled';
@@ -46,12 +48,12 @@ page 6416 "Flow User Env. Selection"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if IsEmpty() then
+        Rec.Reset();
+        if Rec.IsEmpty() then
             Error(FlowServiceManagement.GetGenericError());
 
         SortByEnvironmentNameAscending();
-        FindFirst();
+        Rec.FindFirst();
     end;
 
     var
@@ -59,12 +61,12 @@ page 6416 "Flow User Env. Selection"
 
     local procedure EnsureOnlyOneSelection()
     begin
-        SetRange(Enabled, true);
-        if Count >= 1 then
-            ModifyAll(Enabled, false);
+        Rec.SetRange(Enabled, true);
+        if Rec.Count >= 1 then
+            Rec.ModifyAll(Enabled, false);
 
-        Reset();
-        Enabled := true;
+        Rec.Reset();
+        Rec.Enabled := true;
 
         SortByEnvironmentNameAscending();
         CurrPage.Update();
@@ -76,15 +78,15 @@ page 6416 "Flow User Env. Selection"
         // ShareTable = TRUE and so since both TempFlowUserEnvironmentBuffer and Rec are temporary, COPY function causes Rec to reference the same
         // table as TempFlowUserEnvironmentBuffer. And so any changes to REC happens to TempFlowUserEnvironmentBuffer
 
-        DeleteAll();
-        Copy(TempFlowUserEnvironmentBuffer, true);
-        Reset();
+        Rec.DeleteAll();
+        Rec.Copy(TempFlowUserEnvironmentBuffer, true);
+        Rec.Reset();
     end;
 
     local procedure SortByEnvironmentNameAscending()
     begin
-        SetCurrentKey("Environment Display Name");
-        SetAscending("Environment Display Name", true);
+        Rec.SetCurrentKey("Environment Display Name");
+        Rec.SetAscending("Environment Display Name", true);
     end;
 }
 

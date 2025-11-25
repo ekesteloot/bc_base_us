@@ -1,3 +1,10 @@
+﻿namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Reports;
+using Microsoft.Foundation.NoSeries;
+using System.Reflection;
+
 table 5619 "FA Journal Template"
 {
     Caption = 'FA Journal Template';
@@ -18,12 +25,12 @@ table 5619 "FA Journal Template"
         field(5; "Test Report ID"; Integer)
         {
             Caption = 'Test Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(6; "Page ID"; Integer)
         {
             Caption = 'Page ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Page));
 
             trigger OnValidate()
             begin
@@ -42,7 +49,7 @@ table 5619 "FA Journal Template"
         field(7; "Posting Report ID"; Integer)
         {
             Caption = 'Posting Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(8; "Force Posting Report"; Boolean)
         {
@@ -80,24 +87,24 @@ table 5619 "FA Journal Template"
         }
         field(13; "Test Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Test Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Test Report ID")));
             Caption = 'Test Report Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(14; "Page Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
-                                                                           "Object ID" = FIELD("Page ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Page),
+                                                                           "Object ID" = field("Page ID")));
             Caption = 'Page Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(15; "Posting Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Posting Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Posting Report ID")));
             Caption = 'Posting Report Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -105,12 +112,12 @@ table 5619 "FA Journal Template"
         field(16; "Maint. Posting Report ID"; Integer)
         {
             Caption = 'Maint. Posting Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(17; "Maint. Posting Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Maint. Posting Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Maint. Posting Report ID")));
             Caption = 'Maint. Posting Report Caption';
             Editable = false;
             FieldClass = FlowField;

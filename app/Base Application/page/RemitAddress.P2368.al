@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Remittance;
+
+using Microsoft.Foundation.Address;
+
 page 2368 "Remit Address"
 {
     Caption = 'Remit Address';
@@ -13,7 +17,7 @@ page 2368 "Remit Address"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an remit-to address code.';
@@ -23,7 +27,7 @@ page 2368 "Remit Address"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the company located at the address.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the street address.';
@@ -38,7 +42,7 @@ page 2368 "Remit Address"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the postal code.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the address.';
@@ -47,7 +51,7 @@ page 2368 "Remit Address"
                 {
                     ShowCaption = false;
                     Visible = IsCountyVisible;
-                    field(County; County)
+                    field(County; Rec.County)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the county of the address.';
@@ -60,10 +64,10 @@ page 2368 "Remit Address"
 
                     trigger OnValidate()
                     begin
-                        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                     end;
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the person you regularly contact when you do business with this vendor at this address.';
@@ -133,7 +137,7 @@ page 2368 "Remit Address"
 
                     trigger OnAction()
                     begin
-                        DisplayMap();
+                        Rec.DisplayMap();
                     end;
                 }
             }
@@ -142,7 +146,7 @@ page 2368 "Remit Address"
 
     trigger OnOpenPage()
     begin
-        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
     end;
 
     var
@@ -158,7 +162,7 @@ page 2368 "Remit Address"
         OtherAllRemitAddresses.SetFilter("Code", '<>%1', CodeToIgnore);
 
         if not OtherAllRemitAddresses.IsEmpty() then
-            OtherAllRemitAddresses.ModifyAll(Default,false);
+            OtherAllRemitAddresses.ModifyAll(Default, false);
     end;
 }
 

@@ -1,7 +1,16 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using System.Utilities;
+
 report 5848 "Cost Shares Breakdown"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/CostSharesBreakdown.rdlc';
+    RDLCLayout = './Manufacturing/Reports/CostSharesBreakdown.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Cost Shares Breakdown';
     UsageCategory = ReportsAndAnalysis;
@@ -10,12 +19,12 @@ report 5848 "Cost Shares Breakdown"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE(Type = CONST(Inventory));
+            DataItemTableView = where(Type = const(Inventory));
             RequestFilterFields = "No.", "Inventory Posting Group";
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No.");
-                DataItemTableView = SORTING("Item No.");
+                DataItemLink = "Item No." = field("No.");
+                DataItemTableView = sorting("Item No.");
 
                 trigger OnAfterGetRecord()
                 begin
@@ -46,11 +55,11 @@ report 5848 "Cost Shares Breakdown"
         }
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = WHERE(Status = FILTER(Released ..));
+            DataItemTableView = where(Status = filter(Released ..));
             dataitem("Capacity Ledger Entry"; "Capacity Ledger Entry")
             {
-                DataItemLink = "Order No." = FIELD("No.");
-                DataItemTableView = SORTING("Order Type", "Order No.", "Order Line No.") WHERE("Order Type" = CONST(Production));
+                DataItemLink = "Order No." = field("No.");
+                DataItemTableView = sorting("Order Type", "Order No.", "Order Line No.") where("Order Type" = const(Production));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -74,7 +83,7 @@ report 5848 "Cost Shares Breakdown"
         }
         dataitem(PrintHeader; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             PrintOnlyIfDetail = true;
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -188,7 +197,7 @@ report 5848 "Cost Shares Breakdown"
             }
             dataitem(PrintInvtCostShareBuf; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(CostShareBufDescription; TempCostShareBuffer.Description)
                 {
                 }

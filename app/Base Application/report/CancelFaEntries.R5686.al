@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Ledger;
+
 report 5686 "Cancel FA Entries"
 {
     Caption = 'Cancel FA Entries';

@@ -64,6 +64,7 @@ page 9657 "Customer Report Selections"
                     DrillDown = true;
                     Lookup = true;
                     ToolTip = 'Specifies a description of the custom report layout.';
+                    Visible = not PlatformSelectionEnabled;
 
                     trigger OnDrillDown()
                     begin
@@ -95,6 +96,27 @@ page 9657 "Customer Report Selections"
                         end;
                     end;
                 }
+                field("Email Attachment Layout"; ReportSelectionsImpl.GetReportLayoutCaption(Rec."Report ID", Rec."Email Attachment Layout Name", Rec."Email Attachment Layout AppID"))
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Email Attachment Layout';
+                    ToolTip = 'Specifies the report layout used as email attachment.';
+
+                    trigger OnDrillDown()
+                    var
+                        ReportLayoutListSelection: Record "Report Layout List";
+                        ReportManagementCodeunit: Codeunit ReportManagement;
+                        IsReportLayoutSelected: Boolean;
+                    begin
+                        ReportLayoutListSelection.SetRange("Report ID", Rec."Report ID");
+                        ReportManagementCodeunit.OnSelectReportLayout(ReportLayoutListSelection, IsReportLayoutSelected);
+                        if IsReportLayoutSelected then begin
+                            Rec."Email Attachment Layout Name" := ReportLayoutListSelection."Name";
+                            Rec."Email Attachment Layout AppID" := ReportLayoutListSelection."Application ID";
+                            Rec.Modify();
+                        end;
+                    end;
+                }
                 field(SendToEmail; Rec."Send To Email")
                 {
                     ApplicationArea = Basic, Suite;
@@ -123,6 +145,7 @@ page 9657 "Customer Report Selections"
                     DrillDown = true;
                     Lookup = true;
                     ToolTip = 'Specifies a description of the email body layout that is used.';
+                    Visible = not PlatformSelectionEnabled;
 
                     trigger OnDrillDown()
                     begin
@@ -134,6 +157,27 @@ page 9657 "Customer Report Selections"
                     begin
                         Rec.LookupEmailBodyDescription();
                         CurrPage.Update(true);
+                    end;
+                }
+                field("Email Body Layout"; ReportSelectionsImpl.GetReportLayoutCaption(Rec."Report ID", Rec."Email Body Layout Name", Rec."Email Body Layout AppID"))
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Email Body Layout';
+                    ToolTip = 'Specifies the report layout used as email body.';
+
+                    trigger OnDrillDown()
+                    var
+                        ReportLayoutListSelection: Record "Report Layout List";
+                        ReportManagementCodeunit: Codeunit ReportManagement;
+                        IsReportLayoutSelected: Boolean;
+                    begin
+                        ReportLayoutListSelection.SetRange("Report ID", Rec."Report ID");
+                        ReportManagementCodeunit.OnSelectReportLayout(ReportLayoutListSelection, IsReportLayoutSelected);
+                        if IsReportLayoutSelected then begin
+                            Rec."Email Body Layout Name" := ReportLayoutListSelection."Name";
+                            Rec."Email Body Layout AppID" := ReportLayoutListSelection."Application ID";
+                            Rec.Modify();
+                        end;
                     end;
                 }
             }
@@ -159,7 +203,7 @@ page 9657 "Customer Report Selections"
                 begin
                     CustomReportSelection := Rec;
                     FilterCustomerUsageReportSelections(ReportSelections);
-                    Customer.Get("Source No.");
+                    Customer.Get(Rec."Source No.");
                     Rec.CopyFromReportSelections(ReportSelections, Database::Customer, Customer."No.");
                     CurrPage.SetRecord(CustomReportSelection);
                 end;
@@ -208,8 +252,17 @@ page 9657 "Customer Report Selections"
         MapTableUsageValueToPageValue();
     end;
 
+    trigger OnOpenPage()
+    begin
+        PlatformSelectionEnabled := FeatureManagement.IsEnabled(PlatformSelectionEnabledLbl);
+    end;
+
     var
+        FeatureManagement: Codeunit "Feature Management Facade";
+        ReportSelectionsImpl: Codeunit "Report Selections Impl";
+        PlatformSelectionEnabledLbl: Label 'EnablePlatformBasedReportSelection', Locked = true;
         CouldNotFindCustomReportLayoutErr: Label 'There is no custom report layout with %1 in the description.', Comment = '%1 Description of custom report layout';
+        PlatformSelectionEnabled: Boolean;
 
     protected var
         Usage2: Enum "Custom Report Selection Sales";
@@ -242,10 +295,10 @@ page 9657 "Customer Report Selections"
                 Usage2 := "Custom Report Selection Sales"::"Pro Forma Invoice";
 #if not CLEAN21
             else begin
-                    UsageOpt := Usage2.AsInteger();
-                    OnMapTableUsageValueToPageValueOnCaseElse(CustomReportSelection, UsageOpt, Rec);
-                    Usage2 := "Custom Report Selection Sales".FromInteger(UsageOpt);
-                end;
+                UsageOpt := Usage2.AsInteger();
+                OnMapTableUsageValueToPageValueOnCaseElse(CustomReportSelection, UsageOpt, Rec);
+                Usage2 := "Custom Report Selection Sales".FromInteger(UsageOpt);
+            end;
 #endif
         end;
 
@@ -292,4 +345,3 @@ page 9657 "Customer Report Selections"
     begin
     end;
 }
-

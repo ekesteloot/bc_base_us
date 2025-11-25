@@ -1,7 +1,13 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 304 "Vendor - Detail Trial Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/VendorDetailTrialBalance.rdlc';
+    RDLCLayout = './Purchases/Reports/VendorDetailTrialBalance.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor - Detail Trial Balance';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 304 "Vendor - Detail Trial Balance"
     {
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Name", "Vendor Posting Group", "Date Filter";
             column(VendDatetFilterPeriod; StrSubstNo(Text000, VendDateFilter))
@@ -111,8 +117,8 @@ report 304 "Vendor - Detail Trial Balance"
             }
             dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
             {
-                DataItemLink = "Vendor No." = FIELD("No."), "Posting Date" = FIELD("Date Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Date Filter" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Vendor No.", "Posting Date");
+                DataItemLink = "Vendor No." = field("No."), "Posting Date" = field("Date Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Date Filter" = field("Date Filter");
+                DataItemTableView = sorting("Vendor No.", "Posting Date");
                 column(PostingDate_VendLedgEntry; Format("Posting Date"))
                 {
                 }
@@ -157,8 +163,8 @@ report 304 "Vendor - Detail Trial Balance"
                 }
                 dataitem("Detailed Vendor Ledg. Entry"; "Detailed Vendor Ledg. Entry")
                 {
-                    DataItemLink = "Vendor Ledger Entry No." = FIELD("Entry No.");
-                    DataItemTableView = SORTING("Vendor Ledger Entry No.", "Entry Type", "Posting Date") WHERE("Entry Type" = CONST("Correction of Remaining Amount"));
+                    DataItemLink = "Vendor Ledger Entry No." = field("Entry No.");
+                    DataItemTableView = sorting("Vendor Ledger Entry No.", "Entry Type", "Posting Date") where("Entry Type" = const("Correction of Remaining Amount"));
                     column(EntryTyp_DetVendLedgEntry; "Entry Type")
                     {
                     }
@@ -186,8 +192,8 @@ report 304 "Vendor - Detail Trial Balance"
                 }
                 dataitem("Detailed Vendor Ledg. Entry2"; "Detailed Vendor Ledg. Entry")
                 {
-                    DataItemLink = "Vendor Ledger Entry No." = FIELD("Entry No.");
-                    DataItemTableView = SORTING("Vendor Ledger Entry No.", "Entry Type", "Posting Date") WHERE("Entry Type" = CONST("Appln. Rounding"));
+                    DataItemLink = "Vendor Ledger Entry No." = field("Entry No.");
+                    DataItemTableView = sorting("Vendor Ledger Entry No.", "Entry Type", "Posting Date") where("Entry Type" = const("Appln. Rounding"));
                     column(Entry_DetVendLedgEntry2; "Entry Type")
                     {
                     }
@@ -241,7 +247,7 @@ report 304 "Vendor - Detail Trial Balance"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(VendBalanceLCY4; VendBalanceLCY)
                 {
                     AutoFormatType = 1;

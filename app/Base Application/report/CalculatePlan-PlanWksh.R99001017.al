@@ -7,7 +7,7 @@ report 99001017 "Calculate Plan - Plan. Wksh."
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("Low-Level Code") WHERE(Type = CONST(Inventory));
+            DataItemTableView = sorting("Low-Level Code") where(Type = const(Inventory));
             RequestFilterFields = "No.", Description, "Location Filter";
 
             trigger OnAfterGetRecord()

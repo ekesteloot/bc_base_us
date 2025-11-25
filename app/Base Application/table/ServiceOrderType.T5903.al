@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Setup;
+
+using Microsoft.FinancialMgt.Dimension;
+
 table 5903 "Service Order Type"
 {
     Caption = 'Service Order Type';

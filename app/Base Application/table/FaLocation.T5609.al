@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Setup;
+
 table 5609 "FA Location"
 {
     Caption = 'FA Location';

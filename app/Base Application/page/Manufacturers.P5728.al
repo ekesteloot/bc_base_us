@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
 page 5728 Manufacturers
 {
     ApplicationArea = Basic, Suite;
@@ -13,7 +15,7 @@ page 5728 Manufacturers
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code you want to use for the manufacturer.';

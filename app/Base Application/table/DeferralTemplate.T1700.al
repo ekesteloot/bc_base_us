@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.Deferral;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+using System.Telemetry;
+
 table 1700 "Deferral Template"
 {
     Caption = 'Deferral Template';
@@ -19,8 +26,8 @@ table 1700 "Deferral Template"
         {
             Caption = 'Deferral Account';
             NotBlank = true;
-            TableRelation = "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                 Blocked = CONST(false));
+            TableRelation = "G/L Account" where("Account Type" = const(Posting),
+                                                 Blocked = const(false));
         }
         field(4; "Deferral %"; Decimal)
         {

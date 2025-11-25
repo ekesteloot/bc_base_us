@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
 page 9154 "My Jobs"
 {
     Caption = 'My Jobs';
@@ -69,7 +71,7 @@ page 9154 "My Jobs"
                 Caption = 'Open';
                 Image = ViewDetails;
                 RunObject = Page "Job Card";
-                RunPageLink = "No." = FIELD("Job No.");
+                RunPageLink = "No." = field("Job No.");
                 RunPageMode = View;
                 ShortCutKey = 'Return';
                 ToolTip = 'Open the card for the selected record.';
@@ -89,7 +91,7 @@ page 9154 "My Jobs"
 
     trigger OnOpenPage()
     begin
-        SetRange("User ID", UserId);
+        Rec.SetRange("User ID", UserId);
     end;
 
     var
@@ -99,12 +101,12 @@ page 9154 "My Jobs"
     begin
         Clear(Job);
 
-        if Job.Get("Job No.") then begin
-            Description := Job.Description;
-            Status := Job.Status;
-            "Bill-to Name" := Job."Bill-to Name";
-            "Percent Completed" := Job.PercentCompleted();
-            "Percent Invoiced" := Job.PercentInvoiced();
+        if Job.Get(Rec."Job No.") then begin
+            Rec.Description := Job.Description;
+            Rec.Status := Job.Status;
+            Rec."Bill-to Name" := Job."Bill-to Name";
+            Rec."Percent Completed" := Job.PercentCompleted();
+            Rec."Percent Invoiced" := Job.PercentInvoiced();
         end;
 
         OnAfterGetJob(Rec);

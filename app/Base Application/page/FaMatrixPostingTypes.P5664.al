@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Posting;
+
 page 5664 "FA Matrix Posting Types"
 {
     Caption = 'FA Posting Types';

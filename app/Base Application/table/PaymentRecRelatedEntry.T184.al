@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 table 184 "Payment Rec. Related Entry"
 {
     Caption = 'Payment Reconciliation Related Entry';

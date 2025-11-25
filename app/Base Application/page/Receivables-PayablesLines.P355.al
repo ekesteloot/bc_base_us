@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 page 355 "Receivables-Payables Lines"
 {
     Caption = 'Lines';
@@ -26,7 +34,7 @@ page 355 "Receivables-Payables Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period covered by the summary report of receivables for customers and payables for vendors.';
                 }
-                field(CustBalancesDue; "Cust. Balances Due")
+                field(CustBalancesDue; Rec."Cust. Balances Due")
                 {
                     ApplicationArea = Suite;
                     AutoFormatType = 1;
@@ -39,7 +47,7 @@ page 355 "Receivables-Payables Lines"
                         ShowCustEntriesDue();
                     end;
                 }
-                field(VendorBalancesDue; "Vendor Balances Due")
+                field(VendorBalancesDue; Rec."Vendor Balances Due")
                 {
                     ApplicationArea = Suite;
                     AutoFormatType = 1;
@@ -52,7 +60,7 @@ page 355 "Receivables-Payables Lines"
                         ShowVendEntriesDue();
                     end;
                 }
-                field(ReceivablesPayables; "Receivables-Payables")
+                field(ReceivablesPayables; Rec."Receivables-Payables")
                 {
                     ApplicationArea = Suite;
                     AutoFormatType = 1;
@@ -69,7 +77,7 @@ page 355 "Receivables-Payables Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcLine();
     end;
 
@@ -93,7 +101,7 @@ page 355 "Receivables-Payables Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -110,7 +118,7 @@ page 355 "Receivables-Payables Lines"
     procedure SetLines(var NewGLSetup: Record "General Ledger Setup"; NewPeriodType: Enum "Analysis Period Type"; NewAmountType: Enum "Analysis Amount Type")
     begin
         GLSetup.Copy(NewGLSetup);
-        DeleteAll();
+        Rec.DeleteAll();
         PeriodType := NewPeriodType;
         AmountType := NewAmountType;
         CurrPage.Update(false);
@@ -141,18 +149,18 @@ page 355 "Receivables-Payables Lines"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            GLSetup.SetRange("Date Filter", "Period Start", "Period End")
+            GLSetup.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            GLSetup.SetRange("Date Filter", 0D, "Period End");
+            GLSetup.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     local procedure CalcLine()
     begin
         SetDateFilter();
         GLSetup.CalcFields("Cust. Balances Due", "Vendor Balances Due");
-        "Cust. Balances Due" := GLSetup."Cust. Balances Due";
-        "Vendor Balances Due" := GLSetup."Vendor Balances Due";
-        "Receivables-Payables" := GLSetup."Cust. Balances Due" - GLSetup."Vendor Balances Due";
+        Rec."Cust. Balances Due" := GLSetup."Cust. Balances Due";
+        Rec."Vendor Balances Due" := GLSetup."Vendor Balances Due";
+        Rec."Receivables-Payables" := GLSetup."Cust. Balances Due" - GLSetup."Vendor Balances Due";
 
         OnAfterCalcLine(GLSetup, Rec);
     end;

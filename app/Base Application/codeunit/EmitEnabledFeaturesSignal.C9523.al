@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Telemetry;
+
 codeunit 9523 "Emit Enabled Features Signal"
 {
     Access = Internal;

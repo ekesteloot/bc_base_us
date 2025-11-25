@@ -1,7 +1,7 @@
 report 7320 "Whse. Adjustment Bin"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Bin/WhseAdjustmentBin.rdlc';
+    RDLCLayout = './WarehouseMgt/Reports/WhseAdjustmentBin.rdlc';
     AccessByPermission = TableData Bin = R;
     AdditionalSearchTerms = 'synchronize inventory';
     ApplicationArea = Warehouse;

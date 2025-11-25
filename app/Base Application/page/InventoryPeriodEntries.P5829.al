@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Setup;
+
+using System.Security.User;
+
 page 5829 "Inventory Period Entries"
 {
     Caption = 'Inventory Period Entries';
@@ -35,7 +39,7 @@ page 5829 "Inventory Period Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Creation Date"; Rec."Creation Date")

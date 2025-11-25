@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Setup;
+
+using System.Reflection;
+
 page 306 "Report Selection - Sales"
 {
     ApplicationArea = Basic, Suite;
@@ -54,16 +58,28 @@ page 306 "Report Selection - Sales"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the related document will be attached to the email.';
                 }
+                field(EmailBodyName; Rec."Email Body Layout Name")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the name of the email body layout that is used.';
+                }
+                field(EmailBodyPublisher; Rec."Email Body Layout Publisher")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the publisher of the email body layout that is used.';
+                    Visible = false;
+                }
                 field("Email Body Layout Code"; Rec."Email Body Layout Code")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the ID of the email body layout that is used.';
+                    ToolTip = 'Specifies the ID of the custom email body layout that is used.';
                     Visible = false;
                 }
                 field("Email Body Layout Description"; Rec."Email Body Layout Description")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies a description of the email body layout that is used.';
+                    ToolTip = 'Specifies a description of the custom email body layout that is used.';
+                    Visible = CustomLayoutsExist;
 
                     trigger OnDrillDown()
                     var
@@ -103,10 +119,12 @@ page 306 "Report Selection - Sales"
     begin
         InitUsageFilter();
         SetUsageFilter(false);
+        CustomLayoutsExist := Rec.DoesAnyCustomLayotExist();
     end;
 
     var
         ReportUsage2: Enum "Report Selection Usage Sales";
+        CustomLayoutsExist: Boolean;
 
     local procedure SetUsageFilter(ModifyRec: Boolean)
     begin
@@ -114,44 +132,44 @@ page 306 "Report Selection - Sales"
             if Rec.Modify() then;
         Rec.FilterGroup(2);
         case ReportUsage2 of
-            "Report Selection Usage Sales"::Quote:
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Quote");
-            "Report Selection Usage Sales"::"Blanket Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Blanket");
-            "Report Selection Usage Sales"::Order:
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Order");
-            "Report Selection Usage Sales"::"Work Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Work Order");
-            "Report Selection Usage Sales"::"Pick Instruction":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Order Pick Instruction");
-            "Report Selection Usage Sales"::Invoice:
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Invoice");
-            "Report Selection Usage Sales"::"Draft Invoice":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Invoice Draft");
-            "Report Selection Usage Sales"::"Return Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Return");
-            "Report Selection Usage Sales"::"Credit Memo":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Cr.Memo");
-            "Report Selection Usage Sales"::Shipment:
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Shipment");
-            "Report Selection Usage Sales"::"Return Receipt":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Ret.Rcpt.");
-            "Report Selection Usage Sales"::"Sales Document - Test":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Test");
-            "Report Selection Usage Sales"::"Prepayment Document - Test":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Test Prepmt.");
-            "Report Selection Usage Sales"::"Archived Quote":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Arch.Quote");
-            "Report Selection Usage Sales"::"Archived Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Arch.Order");
-            "Report Selection Usage Sales"::"Archived Return Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Arch.Return");
-            "Report Selection Usage Sales"::"Customer Statement":
-                Rec.SetRange(Usage, "Report Selection Usage"::"C.Statement");
-            "Report Selection Usage Sales"::"Pro Forma Invoice":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Pro Forma S. Invoice");
-            "Report Selection Usage Sales"::"Archived Blanket Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"S.Arch.Blanket");
+            Enum::"Report Selection Usage Sales"::Quote:
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Quote");
+            Enum::"Report Selection Usage Sales"::"Blanket Order":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Blanket");
+            Enum::"Report Selection Usage Sales"::Order:
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Order");
+            Enum::"Report Selection Usage Sales"::"Work Order":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Work Order");
+            Enum::"Report Selection Usage Sales"::"Pick Instruction":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Order Pick Instruction");
+            Enum::"Report Selection Usage Sales"::Invoice:
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Invoice");
+            Enum::"Report Selection Usage Sales"::"Draft Invoice":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Invoice Draft");
+            Enum::"Report Selection Usage Sales"::"Return Order":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Return");
+            Enum::"Report Selection Usage Sales"::"Credit Memo":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Cr.Memo");
+            Enum::"Report Selection Usage Sales"::Shipment:
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Shipment");
+            Enum::"Report Selection Usage Sales"::"Return Receipt":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Ret.Rcpt.");
+            Enum::"Report Selection Usage Sales"::"Sales Document - Test":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Test");
+            Enum::"Report Selection Usage Sales"::"Prepayment Document - Test":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Test Prepmt.");
+            Enum::"Report Selection Usage Sales"::"Archived Quote":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Arch.Quote");
+            Enum::"Report Selection Usage Sales"::"Archived Order":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Arch.Order");
+            Enum::"Report Selection Usage Sales"::"Archived Return Order":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Arch.Return");
+            Enum::"Report Selection Usage Sales"::"Customer Statement":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"C.Statement");
+            Enum::"Report Selection Usage Sales"::"Pro Forma Invoice":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"Pro Forma S. Invoice");
+            Enum::"Report Selection Usage Sales"::"Archived Blanket Order":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"S.Arch.Blanket");
         end;
         OnSetUsageFilterOnAfterSetFiltersByReportUsage(Rec, ReportUsage2.AsInteger());
         Rec.FilterGroup(0);
@@ -165,44 +183,44 @@ page 306 "Report Selection - Sales"
         if Rec.GetFilter(Usage) <> '' then begin
             if Evaluate(NewReportUsage, Rec.GetFilter(Usage)) then
                 case NewReportUsage of
-                    "Report Selection Usage"::"S.Quote":
-                        ReportUsage2 := "Report Selection Usage Sales"::Quote;
-                    "Report Selection Usage"::"S.Blanket":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Blanket Order";
-                    "Report Selection Usage"::"S.Order":
-                        ReportUsage2 := "Report Selection Usage Sales"::Order;
-                    "Report Selection Usage"::"S.Work Order":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Work Order";
-                    "Report Selection Usage"::"S.Order Pick Instruction":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Pick Instruction";
-                    "Report Selection Usage"::"S.Invoice":
-                        ReportUsage2 := "Report Selection Usage Sales"::Invoice;
-                    "Report Selection Usage"::"S.Invoice Draft":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Draft Invoice";
-                    "Report Selection Usage"::"S.Return":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Return Order";
-                    "Report Selection Usage"::"S.Cr.Memo":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Credit Memo";
-                    "Report Selection Usage"::"S.Shipment":
-                        ReportUsage2 := "Report Selection Usage Sales"::Shipment;
-                    "Report Selection Usage"::"S.Ret.Rcpt.":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Return Receipt";
-                    "Report Selection Usage"::"S.Test":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Sales Document - Test";
-                    "Report Selection Usage"::"S.Test Prepmt.":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Prepayment Document - Test";
-                    "Report Selection Usage"::"S.Arch.Quote":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Archived Quote";
-                    "Report Selection Usage"::"S.Arch.Order":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Archived Order";
-                    "Report Selection Usage"::"S.Arch.Return":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Archived Return Order";
-                    "Report Selection Usage"::"C.Statement":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Customer Statement";
-                    "Report Selection Usage"::"Pro Forma S. Invoice":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Pro Forma Invoice";
-                    "Report Selection Usage"::"S.Arch.Blanket":
-                        ReportUsage2 := "Report Selection Usage Sales"::"Archived Blanket Order";
+                    Enum::"Report Selection Usage"::"S.Quote":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::Quote;
+                    Enum::"Report Selection Usage"::"S.Blanket":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Blanket Order";
+                    Enum::"Report Selection Usage"::"S.Order":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::Order;
+                    Enum::"Report Selection Usage"::"S.Work Order":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Work Order";
+                    Enum::"Report Selection Usage"::"S.Order Pick Instruction":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Pick Instruction";
+                    Enum::"Report Selection Usage"::"S.Invoice":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::Invoice;
+                    Enum::"Report Selection Usage"::"S.Invoice Draft":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Draft Invoice";
+                    Enum::"Report Selection Usage"::"S.Return":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Return Order";
+                    Enum::"Report Selection Usage"::"S.Cr.Memo":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Credit Memo";
+                    Enum::"Report Selection Usage"::"S.Shipment":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::Shipment;
+                    Enum::"Report Selection Usage"::"S.Ret.Rcpt.":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Return Receipt";
+                    Enum::"Report Selection Usage"::"S.Test":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Sales Document - Test";
+                    Enum::"Report Selection Usage"::"S.Test Prepmt.":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Prepayment Document - Test";
+                    Enum::"Report Selection Usage"::"S.Arch.Quote":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Archived Quote";
+                    Enum::"Report Selection Usage"::"S.Arch.Order":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Archived Order";
+                    Enum::"Report Selection Usage"::"S.Arch.Return":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Archived Return Order";
+                    Enum::"Report Selection Usage"::"C.Statement":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Customer Statement";
+                    Enum::"Report Selection Usage"::"Pro Forma S. Invoice":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Pro Forma Invoice";
+                    Enum::"Report Selection Usage"::"S.Arch.Blanket":
+                        ReportUsage2 := Enum::"Report Selection Usage Sales"::"Archived Blanket Order";
                     else
                         OnInitUsageFilterOnElseCase(NewReportUsage, ReportUsage2);
                 end;

@@ -1,14 +1,20 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using System.Utilities;
+
 report 5703 "Transfer Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/TransferOrder/TransferOrder.rdlc';
+    RDLCLayout = './InventoryMgt/Transfer/TransferOrder.rdlc';
     Caption = 'Transfer Order';
 
     dataset
     {
         dataitem("Transfer Header"; "Transfer Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Transfer-from Code", "Transfer-to Code";
             RequestFilterHeading = 'Transfer Order';
             column(No_TransferHdr; "No.")
@@ -19,10 +25,10 @@ report 5703 "Transfer Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CopyCaption; StrSubstNo(Text001, CopyText))
                     {
                     }
@@ -87,7 +93,7 @@ report 5703 "Transfer Order"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Transfer Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -134,9 +140,9 @@ report 5703 "Transfer Order"
                     }
                     dataitem("Transfer Line"; "Transfer Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Transfer Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.") WHERE("Derived From Line No." = CONST(0));
+                        DataItemTableView = sorting("Document No.", "Line No.") where("Derived From Line No." = const(0));
                         column(ItemNo_TransLine; "Item No.")
                         {
                             IncludeCaption = true;
@@ -174,7 +180,7 @@ report 5703 "Transfer Order"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText2; DimText)
                             {
                             }

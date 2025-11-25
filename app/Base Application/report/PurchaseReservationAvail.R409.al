@@ -1,7 +1,12 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Tracking;
+
 report 409 "Purchase Reservation Avail."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/PurchaseReservationAvail.rdlc';
+    RDLCLayout = './Purchases/Document/PurchaseReservationAvail.rdlc';
     ApplicationArea = Reservation;
     Caption = 'Purchase Reservation Avail.';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 409 "Purchase Reservation Avail."
     {
         dataitem("Purchase Line"; "Purchase Line")
         {
-            DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE(Type = CONST(Item));
+            DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where(Type = const(Item));
             RequestFilterFields = "Document Type", "Document No.", "Line No.", "No.", "Location Code";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -94,8 +99,8 @@ report 409 "Purchase Reservation Avail."
             }
             dataitem("Reservation Entry"; "Reservation Entry")
             {
-                DataItemLink = "Source ID" = FIELD("Document No."), "Source Ref. No." = FIELD("Line No.");
-                DataItemTableView = SORTING("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Reservation Status", "Shipment Date", "Expected Receipt Date") WHERE("Reservation Status" = CONST(Reservation), "Source Type" = CONST(39), "Source Batch Name" = CONST(''), "Source Prod. Order Line" = CONST(0));
+                DataItemLink = "Source ID" = field("Document No."), "Source Ref. No." = field("Line No.");
+                DataItemTableView = sorting("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Reservation Status", "Shipment Date", "Expected Receipt Date") where("Reservation Status" = const(Reservation), "Source Type" = const(39), "Source Batch Name" = const(''), "Source Prod. Order Line" = const(0));
                 column(ReservText; ReservText)
                 {
                 }
@@ -112,13 +117,13 @@ report 409 "Purchase Reservation Avail."
 
                 trigger OnAfterGetRecord()
                 begin
-                    if "Source Type" = DATABASE::"Item Ledger Entry" then
+                    if "Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then
                         ShowReservDate := 0D
                     else
                         ShowReservDate := "Expected Receipt Date";
                     ReservText := ReservEngineMgt.CreateFromText("Reservation Entry");
 
-                    if "Source Type" <> DATABASE::"Item Ledger Entry" then begin
+                    if "Source Type" <> Enum::TableID::"Item Ledger Entry".AsInteger() then begin
                         if "Expected Receipt Date" > LineReceiptDate then
                             LineReceiptDate := "Expected Receipt Date";
                         if "Expected Receipt Date" > DocumentReceiptDate then
@@ -151,10 +156,10 @@ report 409 "Purchase Reservation Avail."
                         ReservEntry.Reset();
                         ReservEntry.InitSortingAndFilters(true);
                         SetReservationFilters(ReservEntry);
-                        ReservEntry.SetFilter("Source Type", '<>%1', DATABASE::"Item Ledger Entry");
+                        ReservEntry.SetFilter("Source Type", '<>%1', Enum::TableID::"Item Ledger Entry");
                         if ReservEntry.Find('+') then begin
                             LineReceiptDate := ReservEntry."Expected Receipt Date";
-                            ReservEntry.SetRange("Source Type", DATABASE::"Item Ledger Entry");
+                            ReservEntry.SetRange("Source Type", Enum::TableID::"Item Ledger Entry");
                             if ReservEntry.Find('-') then begin
                                 repeat
                                     LineQuantityOnHand := LineQuantityOnHand + ReservEntry.Quantity;

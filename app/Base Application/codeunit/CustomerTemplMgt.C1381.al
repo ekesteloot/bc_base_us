@@ -1,3 +1,12 @@
+﻿namespace Microsoft.Sales.Customer;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.NoSeries;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 1381 "Customer Templ. Mgt."
 {
     trigger OnRun()

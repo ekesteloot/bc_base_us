@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Comment;
+
 page 145 "Posted Purchase Receipts"
 {
     ApplicationArea = Basic, Suite;
@@ -7,8 +13,8 @@ page 145 "Posted Purchase Receipts"
     PageType = List;
     QueryCategory = 'Posted Purchase Receipts';
     SourceTable = "Purch. Rcpt. Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -195,7 +201,7 @@ page 145 "Posted Purchase Receipts"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Purchase Receipt Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -205,8 +211,8 @@ page 145 "Posted Purchase Receipts"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = CONST(Receipt),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const(Receipt),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -220,7 +226,7 @@ page 145 "Posted Purchase Receipts"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -257,7 +263,7 @@ page 145 "Posted Purchase Receipts"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }
@@ -305,10 +311,10 @@ page 145 "Posted Purchase Receipts"
         OfficeMgt: Codeunit "Office Management";
         HasFilters: Boolean;
     begin
-        HasFilters := GetFilters <> '';
-        SetSecurityFilterOnRespCenter();
-        if HasFilters and not Find() then
-            if FindFirst() then;
+        HasFilters := Rec.GetFilters() <> '';
+        Rec.SetSecurityFilterOnRespCenter();
+        if HasFilters and not Rec.Find() then
+            if Rec.FindFirst() then;
         IsOfficeAddin := OfficeMgt.IsAvailable();
     end;
 

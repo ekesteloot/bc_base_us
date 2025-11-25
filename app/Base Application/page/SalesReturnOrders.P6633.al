@@ -5,7 +5,7 @@ page 6633 "Sales Return Orders"
     Editable = false;
     PageType = List;
     SourceTable = "Sales Line";
-    SourceTableView = WHERE("Document Type" = FILTER("Return Order"));
+    SourceTableView = where("Document Type" = filter("Return Order"));
 
     layout
     {
@@ -114,8 +114,8 @@ page 6633 "Sales Return Orders"
                     Caption = 'Show Order';
                     Image = ViewOrder;
                     RunObject = Page "Sales Return Order";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("Document No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("Document No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View the selected sales return order';
                 }
@@ -129,7 +129,7 @@ page 6633 "Sales Return Orders"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
             }

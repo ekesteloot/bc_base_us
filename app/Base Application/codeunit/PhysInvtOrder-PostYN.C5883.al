@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 codeunit 5883 "Phys. Invt. Order-Post (Y/N)"
 {
     TableNo = "Phys. Invt. Order Header";

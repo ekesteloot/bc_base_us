@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
 enum 114 "G/L Budget Matrix Dimensions"
 {
     AssignmentCompatibility = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
 codeunit 5521 "Make Supply Orders (Yes/No)"
 {
     TableNo = "Requisition Line";

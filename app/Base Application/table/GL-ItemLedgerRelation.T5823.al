@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 table 5823 "G/L - Item Ledger Relation"
 {
     Caption = 'G/L - Item Ledger Relation';

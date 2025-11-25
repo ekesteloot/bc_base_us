@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Duplicates;
+
+using Microsoft.CRM.Contact;
+
 table 5085 "Contact Duplicate"
 {
     Caption = 'Contact Duplicate';
@@ -30,14 +34,14 @@ table 5085 "Contact Duplicate"
         }
         field(5; "Contact Name"; Text[100])
         {
-            CalcFormula = Lookup (Contact.Name WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact No.")));
             Caption = 'Contact Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Duplicate Contact Name"; Text[100])
         {
-            CalcFormula = Lookup (Contact.Name WHERE("No." = FIELD("Duplicate Contact No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Duplicate Contact No.")));
             Caption = 'Duplicate Contact Name';
             Editable = false;
             FieldClass = FlowField;

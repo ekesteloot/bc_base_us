@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Sales.Pricing;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Sales.Customer;
+
 table 7023 "Sales Price Worksheet"
 {
     Caption = 'Sales Price Worksheet';
@@ -6,7 +14,7 @@ table 7023 "Sales Price Worksheet"
     ObsoleteTag = '16.0';
 #else
     ObsoleteState = Removed;
-    ObsoleteTag = '22.0';
+    ObsoleteTag = '24.0';
 #endif    
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price Worksheet Line';
 
@@ -40,11 +48,11 @@ table 7023 "Sales Price Worksheet"
         field(2; "Sales Code"; Code[20])
         {
             Caption = 'Sales Code';
-            TableRelation = IF ("Sales Type" = CONST("Customer Price Group")) "Customer Price Group"
-            ELSE
-            IF ("Sales Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Sales Type" = CONST(Campaign)) Campaign;
+            TableRelation = if ("Sales Type" = const("Customer Price Group")) "Customer Price Group"
+            else
+            if ("Sales Type" = const(Customer)) Customer
+            else
+            if ("Sales Type" = const(Campaign)) Campaign;
 
 #if not CLEAN21
             trigger OnValidate()
@@ -117,7 +125,7 @@ table 7023 "Sales Price Worksheet"
         }
         field(5; "Current Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Current Unit Price';
             Editable = false;
@@ -125,7 +133,7 @@ table 7023 "Sales Price Worksheet"
         }
         field(6; "New Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'New Unit Price';
             MinValue = 0;
@@ -183,7 +191,7 @@ table 7023 "Sales Price Worksheet"
         }
         field(20; "Item Description"; Text[100])
         {
-            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item.Description where("No." = field("Item No.")));
             Caption = 'Item Description';
             FieldClass = FlowField;
         }
@@ -194,7 +202,7 @@ table 7023 "Sales Price Worksheet"
         field(5400; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
 #if not CLEAN21
             trigger OnValidate()
@@ -206,7 +214,7 @@ table 7023 "Sales Price Worksheet"
         field(5700; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
 #if not CLEAN21
             trigger OnValidate()

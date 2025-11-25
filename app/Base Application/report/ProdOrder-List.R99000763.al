@@ -1,7 +1,7 @@
 report 99000763 "Prod. Order - List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrder/ProdOrderList.rdlc';
+    RDLCLayout = './Manufacturing/Document/ProdOrderList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +10,7 @@ report 99000763 "Prod. Order - List"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             RequestFilterFields = "No.", Status, "Source No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

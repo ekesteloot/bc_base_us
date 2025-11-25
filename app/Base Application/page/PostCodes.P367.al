@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Address;
+
 page 367 "Post Codes"
 {
     ApplicationArea = Basic, Suite;
@@ -14,12 +16,12 @@ page 367 "Post Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the postal code that is associated with a city.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city linked to the postal code in the Code field.';
@@ -29,12 +31,12 @@ page 367 "Post Codes"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the country/region of the address.';
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a county name.';
                 }
-                field(TimeZone; "Time Zone")
+                field(TimeZone; Rec."Time Zone")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Time Zone';

@@ -8,7 +8,7 @@ page 30110 "Shpfy Gift Cards"
     Caption = 'Shopify Gift Cards';
     PageType = List;
     SourceTable = "Shpfy Gift Card";
-    UsageCategory = Documents;
+    UsageCategory = Lists;
     InsertAllowed = false;
     ModifyAllowed = false;
 

@@ -1,3 +1,18 @@
+namespace Microsoft.BankMgt.Ledger;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Security.AccessControl;
+
 table 271 "Bank Account Ledger Entry"
 {
     Caption = 'Bank Account Ledger Entry';
@@ -38,13 +53,13 @@ table 271 "Bank Account Ledger Entry"
         }
         field(13; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
         }
         field(14; "Remaining Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Remaining Amount';
         }
@@ -62,13 +77,13 @@ table 271 "Bank Account Ledger Entry"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(24; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(25; "Our Contact Code"; Code[20])
         {
@@ -80,8 +95,6 @@ table 271 "Bank Account Ledger Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(28; "Source Code"; Code[10])
         {
@@ -125,17 +138,17 @@ table 271 "Bank Account Ledger Entry"
         field(52; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Bal. Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Employee)) Employee;
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const(Customer)) Customer
+            else
+            if ("Bal. Account Type" = const(Vendor)) Vendor
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset"
+            else
+            if ("Bal. Account Type" = const(Employee)) Employee;
         }
         field(53; "Transaction No."; Integer)
         {
@@ -150,43 +163,25 @@ table 271 "Bank Account Ledger Entry"
         field(56; "Statement No."; Code[20])
         {
             Caption = 'Statement No.';
-#if not CLEAN21
-            TableRelation = IF ("Statement Status" = FILTER("Bank Acc. Entry Applied" | "Check Entry Applied")) "Bank Rec. Header"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."))
-            ELSE
-            IF ("Statement Status" = CONST(Closed)) "Posted Bank Rec. Header"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."));
-#else
-            TableRelation = "Bank Acc. Reconciliation Line"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."));
+            TableRelation = "Bank Acc. Reconciliation Line"."Statement No." where("Bank Account No." = field("Bank Account No."));
             ValidateTableRelation = false;
-#endif
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(57; "Statement Line No."; Integer)
         {
             Caption = 'Statement Line No.';
-#if not CLEAN21
-            TableRelation = IF ("Statement Status" = FILTER("Bank Acc. Entry Applied" | "Check Entry Applied")) "Bank Rec. Line"."Line No." WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                                                                                               "Statement No." = FIELD("Statement No."))
-            ELSE
-            IF ("Statement Status" = CONST(Closed)) "Posted Bank Rec. Line"."Line No." WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                                                                                                                                                                                    "Statement No." = FIELD("Statement No."));
-#else
-            TableRelation = "Bank Acc. Reconciliation Line"."Statement Line No." WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                                        "Statement No." = FIELD("Statement No."));
-#endif
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Bank Acc. Reconciliation Line"."Statement Line No." where("Bank Account No." = field("Bank Account No."),
+                                                                                        "Statement No." = field("Statement No."));
         }
         field(58; "Debit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Debit Amount';
         }
         field(59; "Credit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Credit Amount';
@@ -230,7 +225,7 @@ table 271 "Bank Account Ledger Entry"
         }
         field(70; "Check Ledger Entries"; Integer)
         {
-            CalcFormula = Count("Check Ledger Entry" WHERE("Bank Account Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = count("Check Ledger Entry" where("Bank Account Ledger Entry No." = field("Entry No.")));
             Caption = 'Check Ledger Entries';
             FieldClass = FlowField;
         }
@@ -242,7 +237,7 @@ table 271 "Bank Account Ledger Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])
@@ -484,22 +479,6 @@ table 271 "Bank Account Ledger Entry"
         SetRange("Bank Account No.", BankAccNo);
         SetRange(Open, true);
     end;
-
-#if NOT CLEAN20
-    [Obsolete('Please use the ResetStatementFields(BankAccountNo, StatementNo, StatementType) instead, as we can have payment and bank reconciliations with the same bank account no and statement no and we might be resetting too many ledger entries with this function', '20.0')]
-    procedure ResetStatementFields(BankAccountNo: Code[20]; StatementNo: Code[20])
-    var
-        BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
-        BankAccLedgEntryReset: Codeunit "Bank Acc. Ledg. Entry-Reset";
-    begin
-        BankAccountLedgerEntry.SetRange("Bank Account No.", BankAccountNo);
-        BankAccountLedgerEntry.SetRange("Statement No.", StatementNo);
-        if BankAccountLedgerEntry.FindSet() then
-            repeat
-                BankAccLedgEntryReset.Run(BankAccountLedgerEntry);
-            until BankAccountLedgerEntry.Next() = 0;
-    end;
-#endif
 
     procedure ResetStatementFields(BankAccountNo: Code[20]; StatementNo: Code[20]; StatementType: Option)
     var

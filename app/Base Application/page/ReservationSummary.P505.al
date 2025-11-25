@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 page 505 "Reservation Summary"
 {
     Caption = 'Reservation Summary';

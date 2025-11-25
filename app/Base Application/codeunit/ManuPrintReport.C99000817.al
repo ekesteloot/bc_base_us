@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 codeunit 99000817 "Manu. Print Report"
 {
 

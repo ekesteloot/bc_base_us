@@ -1,4 +1,9 @@
-#if not CLEAN22
+﻿#if not CLEAN22
+namespace System.Security.AccessControl;
+
+using System;
+using System.Visualization;
+
 page 773 "Users in User Groups Chart"
 {
     Caption = 'Users in User Groups';
@@ -72,7 +77,7 @@ page 773 "Users in User Groups Chart"
     local procedure UpdateChart()
     begin
         UpdateData();
-        Update(CurrPage.BusinessChart);
+        Rec.Update(CurrPage.BusinessChart);
     end;
 
     local procedure UpdateData()
@@ -80,13 +85,13 @@ page 773 "Users in User Groups Chart"
         UsersInUserGroups: Query "Users in User Groups";
         ColumnNumber: Integer;
     begin
-        Initialize(); // Initialize .NET variables for the chart
+        Rec.Initialize(); // Initialize .NET variables for the chart
 
         // Define Y-Axis
-        AddIntegerMeasure(UsersTxt, 1, "Chart Type"::Column);
+        Rec.AddIntegerMeasure(UsersTxt, 1, Rec."Chart Type"::Column);
 
         // Define X-Axis
-        SetXAxis(UserGroupTxt, "Data Type"::String);
+        Rec.SetXAxis(UserGroupTxt, Rec."Data Type"::String);
 
         if not UsersInUserGroups.Open() then
             exit;
@@ -94,8 +99,8 @@ page 773 "Users in User Groups Chart"
         ColumnNumber := 0;
         while UsersInUserGroups.Read() do begin
             // Add data to the chart
-            AddColumn(Format(UsersInUserGroups.UserGroupCode)); // X-Axis data
-            SetValue(UsersTxt, ColumnNumber, UsersInUserGroups.NumberOfUsers); // Y-Axis data
+            Rec.AddColumn(Format(UsersInUserGroups.UserGroupCode)); // X-Axis data
+            Rec.SetValue(UsersTxt, ColumnNumber, UsersInUserGroups.NumberOfUsers); // Y-Axis data
             ColumnNumber += 1;
         end;
         IsChartDataReady := true;

@@ -1,3 +1,13 @@
+namespace Microsoft.CostAccounting.Posting;
+
+using Microsoft.CostAccounting.Allocation;
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Journal;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 codeunit 1102 "CA Jnl.-Post Line"
 {
     Permissions = TableData "Cost Entry" = rimd,

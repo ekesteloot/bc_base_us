@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 codeunit 16 "Gen. Jnl.-Show CT Entries"
 {
     TableNo = "Gen. Journal Line";
@@ -11,9 +19,9 @@ codeunit 16 "Gen. Jnl.-Show CT Entries"
         if IsHandled then
             exit;
 
-        if not ("Document Type" in ["Document Type"::Payment, "Document Type"::Refund, "Document Type"::" "]) then
+        if not (Rec."Document Type" in [Rec."Document Type"::Payment, Rec."Document Type"::Refund, Rec."Document Type"::" "]) then
             exit;
-        if not ("Account Type" in ["Account Type"::Customer, "Account Type"::Vendor, "Account Type"::Employee]) then
+        if not (Rec."Account Type" in [Rec."Account Type"::Customer, Rec."Account Type"::Vendor, Rec."Account Type"::Employee]) then
             exit;
 
         SetFiltersOnCreditTransferEntry(Rec, CreditTransferEntry);

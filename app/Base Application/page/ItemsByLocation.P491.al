@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 page 491 "Items by Location"
 {
     Caption = 'Items by Location';

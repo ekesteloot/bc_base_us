@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
 enum 5000 "Financial Report View Layout"
 {
     Extensible = true;

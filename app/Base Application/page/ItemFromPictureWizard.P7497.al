@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item.Picture;
+
+using System.Environment;
+using System.Privacy;
+using System.Utilities;
+
 page 7497 "Item From Picture Wizard"
 {
     PageType = NavigatePage;
@@ -239,7 +245,7 @@ page 7497 "Item From Picture Wizard"
 
         if Backwards then
             Step := Step - 1
-        ELSE
+        else
             Step := Step + 1;
 
         EnableControls();

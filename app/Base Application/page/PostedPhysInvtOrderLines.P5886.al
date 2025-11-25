@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.History;
+
 page 5886 "Posted Phys. Invt. Order Lines"
 {
     Caption = 'Posted Phys. Invt. Order Lines';
@@ -127,8 +129,8 @@ page 5886 "Posted Phys. Invt. Order Lines"
                     Caption = 'Show Document';
                     Image = View;
                     RunObject = Page "Posted Phys. Invt. Order";
-                    RunPageLink = "No." = FIELD("Document No.");
-                    RunPageView = SORTING("No.");
+                    RunPageLink = "No." = field("Document No.");
+                    RunPageView = sorting("No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the document that the selected line exists on.';
                 }

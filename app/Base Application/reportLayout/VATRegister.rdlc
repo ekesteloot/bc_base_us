@@ -163,14 +163,14 @@
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="PostingDateCaption">
+                        <Textbox Name="VATReportingDateCaption">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=First(Fields!PostingDateCaption.Value)</Value>
+                                  <Value>=First(Fields!VATReportingDateCaption.Value)</Value>
                                   <Style>
                                     <FontStyle>Normal</FontStyle>
                                     <FontFamily>Segoe UI</FontFamily>
@@ -809,7 +809,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!PostingDate_VatEntry.Value</Value>
+                                  <Value>=Fields!VATDate_VatEntry.Value</Value>
                                   <Style>
                                     <FontStyle>Normal</FontStyle>
                                     <FontFamily>Segoe UI</FontFamily>
@@ -2099,6 +2099,9 @@ End Function
         <Field Name="PageNoCaption">
           <DataField>PageNoCaption</DataField>
         </Field>
+        <Field Name="VATReportingDateCaption">
+          <DataField>VATReportingDateCaption</DataField>
+        </Field>
         <Field Name="PostingDateCaption">
           <DataField>PostingDateCaption</DataField>
         </Field>
@@ -2125,6 +2128,9 @@ End Function
         </Field>
         <Field Name="PostingDate_VatEntry">
           <DataField>PostingDate_VatEntry</DataField>
+        </Field>
+        <Field Name="VATDate_VatEntry">
+          <DataField>VATDate_VatEntry</DataField>
         </Field>
         <Field Name="DocumentType_VatEntry">
           <DataField>DocumentType_VatEntry</DataField>

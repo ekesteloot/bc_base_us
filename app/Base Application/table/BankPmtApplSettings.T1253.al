@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 table 1253 "Bank Pmt. Appl. Settings"
 {
     Caption = 'Bank Payment Application Settings';

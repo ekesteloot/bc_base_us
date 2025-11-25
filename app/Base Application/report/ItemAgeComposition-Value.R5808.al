@@ -1,7 +1,14 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using System.Utilities;
+
 report 5808 "Item Age Composition - Value"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemAgeCompositionValue.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemAgeCompositionValue.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Age Composition - Value';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +18,7 @@ report 5808 "Item Age Composition - Value"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.") WHERE(Type = CONST(Inventory));
+            DataItemTableView = sorting("No.") where(Type = const(Inventory));
             RequestFilterFields = "No.", "Inventory Posting Group", "Statistics Group", "Location Filter";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -114,8 +121,8 @@ report 5808 "Item Age Composition - Value"
             }
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Item No.", Open) WHERE(Open = CONST(true));
+                DataItemLink = "Item No." = field("No."), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Item No.", Open) where(Open = const(true));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -161,7 +168,7 @@ report 5808 "Item Age Composition - Value"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(TotalInvtValue_ItemLedgEntry; TotalInvtValue_Item)
                 {
                     AutoFormatType = 1;

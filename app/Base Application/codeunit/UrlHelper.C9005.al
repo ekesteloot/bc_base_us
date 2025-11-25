@@ -1,3 +1,5 @@
+namespace System.Utilities;
+
 codeunit 9005 "Url Helper"
 {
     // // The distinction between TIE and PROD shall be felt only when making internal tools. So all functions here are Internal.

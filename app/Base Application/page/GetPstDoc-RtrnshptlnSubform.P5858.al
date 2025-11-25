@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item.Catalog;
+
 page 5858 "Get Pst.Doc-RtrnShptLn Subform"
 {
     Caption = 'Lines';
@@ -55,7 +60,7 @@ page 5858 "Get Pst.Doc-RtrnShptLn Subform"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = SalesReturnOrder;
                     ToolTip = 'Specifies that this item is a catalog item.';
@@ -243,7 +248,6 @@ page 5858 "Get Pst.Doc-RtrnShptLn Subform"
     var
         ReturnShptLine: Record "Return Shipment Line";
         TempReturnShptLine: Record "Return Shipment Line" temporary;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     local procedure IsFirstDocLine(): Boolean

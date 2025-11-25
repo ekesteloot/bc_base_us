@@ -1,4 +1,16 @@
-﻿page 9030 "Account Manager Activities"
+﻿namespace Microsoft.FinancialMgt.RoleCenters;
+
+using Microsoft.BankMgt.Deposit;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+
+page 9030 "Account Manager Activities"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -117,28 +129,19 @@
                     Caption = 'Bank Acc. Reconciliations to Post';
                     DrillDownPageID = "Bank Acc. Reconciliation List";
                     ToolTip = 'Specifies bank account reconciliations that are ready to post. ';
-                    Visible = BankReconWithAutoMatch;
                 }
+#if not CLEAN23
                 field("Bank Reconciliations to Post"; Rec."Bank Reconciliations to Post")
                 {
                     ApplicationArea = All;
                     DrillDownPageID = "Bank Acc. Reconciliation List";
                     ToolTip = 'Specifies that the bank reconciliations are ready to post.';
-                    Visible = NOT BankReconWithAutoMatch;
-                }
-#if not CLEAN21
-                field("Deposits to Post"; Rec."Deposits to Post")
-                {
-                    ApplicationArea = Basic, Suite;
-                    DrillDownPageID = Deposits;
-                    ToolTip = 'Specifies deposits that are ready to be posted.';
-                    Visible = not BankDepositFeatureEnabled;
-                    ObsoleteReason = 'Replaced by Bank Deposits';
+                    Visible = false;
+                    ObsoleteReason = 'Duplicated field, use Bank Acc. Reconciliations.';
                     ObsoleteState = Pending;
-                    ObsoleteTag = '21.0';
+                    ObsoleteTag = '23.0';
                 }
 #endif
-
                 actions
                 {
                     action("New Payment Reconciliation Journal")
@@ -222,20 +225,11 @@
     }
 
     trigger OnInit()
-    var
-        GeneralLedgerSetup: Record "General Ledger Setup";
     begin
         UseSharedTable := false;
-
-        GeneralLedgerSetup.Get();
-        BankReconWithAutoMatch := GeneralLedgerSetup."Bank Recon. with Auto. Match";
     end;
 
     trigger OnOpenPage()
-#if not CLEAN21
-    var
-        BankDepositFeatureMgt: Codeunit "Bank Deposit Feature Mgt.";
-#endif
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -246,17 +240,11 @@
         Rec.SetFilter("Due Date Filter", '<=%1', WorkDate());
         Rec.SetFilter("Overdue Date Filter", '<%1', WorkDate());
         ShowCheckForOCR := OCRServiceMgt.OcrServiceIsEnable();
-        BankDepositFeatureEnabled := true;
-#if not CLEAN21
-        BankDepositFeatureEnabled := BankDepositFeatureMgt.IsEnabled();
-#endif
     end;
 
     var
         OCRServiceMgt: Codeunit "OCR Service Mgt.";
-        BankReconWithAutoMatch: Boolean;
         UseSharedTable: Boolean;
         ShowCheckForOCR: Boolean;
-        BankDepositFeatureEnabled: Boolean;
 }
 

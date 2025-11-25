@@ -1,4 +1,16 @@
-﻿codeunit 7020 "Sales Line - Price" implements "Line With Price"
+﻿namespace Microsoft.Sales.Pricing;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Document;
+
+codeunit 7020 "Sales Line - Price" implements "Line With Price"
 {
     var
         SalesHeader: Record "Sales Header";
@@ -184,7 +196,7 @@
             CurrPriceType::Sale:
                 AddCustomerSources();
             CurrPriceType::Purchase:
-                PriceSourceList.Add("Price Source Type"::"All Vendors");
+                PriceSourceList.Add(Enum::"Price Source Type"::"All Vendors");
         end;
         PriceSourceList.AddJobAsSources(SalesLine."Job No.", SalesLine."Job Task No.");
         OnAfterAddSources(SalesHeader, SalesLine, CurrPriceType, PriceSourceList);
@@ -192,28 +204,18 @@
 
     local procedure AddCustomerSources()
     begin
-        PriceSourceList.Add("Price Source Type"::"All Customers");
-        PriceSourceList.Add("Price Source Type"::Customer, SalesHeader."Bill-to Customer No.");
-        PriceSourceList.Add("Price Source Type"::Contact, SalesHeader."Bill-to Contact No.");
-        PriceSourceList.Add("Price Source Type"::Campaign, SalesHeader."Campaign No.");
+        PriceSourceList.Add(Enum::"Price Source Type"::"All Customers");
+        PriceSourceList.Add(Enum::"Price Source Type"::Customer, SalesHeader."Bill-to Customer No.");
+        PriceSourceList.Add(Enum::"Price Source Type"::Contact, SalesHeader."Bill-to Contact No.");
+        PriceSourceList.Add(Enum::"Price Source Type"::Campaign, SalesHeader."Campaign No.");
         AddActivatedCampaignsAsSource();
-        PriceSourceList.Add("Price Source Type"::"Customer Price Group", SalesLine."Customer Price Group");
-        PriceSourceList.Add("Price Source Type"::"Customer Disc. Group", SalesLine."Customer Disc. Group");
+        PriceSourceList.Add(Enum::"Price Source Type"::"Customer Price Group", SalesLine."Customer Price Group");
+        PriceSourceList.Add(Enum::"Price Source Type"::"Customer Disc. Group", SalesLine."Customer Disc. Group");
     end;
 
     local procedure GetDocumentDate() DocumentDate: Date;
     begin
-        if SalesHeader."No." = '' then
-            DocumentDate := SalesLine."Posting Date"
-        else
-            if SalesHeader."Document Type" in
-                [SalesHeader."Document Type"::Invoice, SalesHeader."Document Type"::"Credit Memo"]
-            then
-                DocumentDate := SalesHeader."Posting Date"
-            else
-                DocumentDate := SalesHeader."Order Date";
-        if DocumentDate = 0D then
-            DocumentDate := WorkDate();
+        DocumentDate := SalesLine.GetDateForCalculations();
         OnAfterGetDocumentDate(DocumentDate, SalesHeader, SalesLine);
     end;
 

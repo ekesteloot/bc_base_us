@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 page 431 "Reminder Terms"
 {
     ApplicationArea = Basic, Suite;
@@ -13,7 +15,7 @@ page 431 "Reminder Terms"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code to identify this set of reminder terms.';
@@ -80,7 +82,7 @@ page 431 "Reminder Terms"
                 Caption = '&Levels';
                 Image = ReminderTerms;
                 RunObject = Page "Reminder Levels";
-                RunPageLink = "Reminder Terms Code" = FIELD(Code);
+                RunPageLink = "Reminder Terms Code" = field(Code);
                 ToolTip = 'View the reminder levels that are used to define when reminders can be created and what charges and texts they must include.';
             }
             action(Translation)
@@ -89,7 +91,7 @@ page 431 "Reminder Terms"
                 Caption = 'Translation';
                 Image = Translation;
                 RunObject = Page "Reminder Terms Translation";
-                RunPageLink = "Reminder Terms Code" = FIELD(Code);
+                RunPageLink = "Reminder Terms Code" = field(Code);
                 ToolTip = 'View the reminder text in any other languages that are set up for reminders.';
             }
         }

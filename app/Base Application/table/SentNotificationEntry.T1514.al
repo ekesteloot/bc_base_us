@@ -1,3 +1,10 @@
+﻿namespace System.Environment.Configuration;
+
+using System.IO;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Utilities;
+
 table 1514 "Sent Notification Entry"
 {
     Caption = 'Sent Notification Entry';

@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8611 "Config. Question Area"
 {
     Caption = 'Config. Question Area';
@@ -33,7 +37,7 @@ table 8611 "Config. Question Area"
         field(4; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = FILTER(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = filter(Table));
 
             trigger OnLookup()
             var
@@ -63,24 +67,24 @@ table 8611 "Config. Question Area"
         }
         field(5; "Table Name"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Name" WHERE("Object Type" = CONST(Table),
-                                                                        "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Name" where("Object Type" = const(Table),
+                                                                        "Object ID" = field("Table ID")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Table Caption"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; "No. of Questions"; Integer)
         {
-            CalcFormula = Count ("Config. Question" WHERE("Questionnaire Code" = FIELD("Questionnaire Code"),
-                                                          "Question Area Code" = FIELD(Code)));
+            CalcFormula = Count("Config. Question" where("Questionnaire Code" = field("Questionnaire Code"),
+                                                          "Question Area Code" = field(Code)));
             Caption = 'No. of Questions';
             Editable = false;
             FieldClass = FlowField;

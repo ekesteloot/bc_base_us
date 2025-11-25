@@ -1,4 +1,22 @@
-﻿codeunit 1004 "Job Transfer Line"
+﻿namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Activity;
+
+codeunit 1004 "Job Transfer Line"
 {
 
     trigger OnRun()
@@ -797,10 +815,10 @@
         exit(true);
     end;
 
-    local procedure IsCreatedFromJob(var SalesLine: Record "Sales Line"): Boolean
+    local procedure IsCreatedFromJob(var SalesLine: Record "Sales Line") Result: Boolean
     begin
-        if (SalesLine."Job No." <> '') and (SalesLine."Job Task No." <> '') and (SalesLine."Job Contract Entry No." <> 0) then
-            exit(true);
+        Result := (SalesLine."Job No." <> '') and (SalesLine."Job Task No." <> '') and (SalesLine."Job Contract Entry No." <> 0);
+        OnAfterIsCreatedFromJob(SalesLine, Result);
     end;
 
     procedure ValidateUnitCostAndPrice(var JobJournalLine: Record "Job Journal Line"; SalesLine: Record "Sales Line"; UnitCost: Decimal; UnitPrice: Decimal)
@@ -820,6 +838,11 @@
             exit(PurchLine."Unit of Measure Code" <> Item."Base Unit of Measure");
         end;
         exit(false);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterIsCreatedFromJob(var SalesLine: Record "Sales Line"; var Result: Boolean)
+    begin
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Threading;
+
 codeunit 2582 "Dimension Correction Undo"
 {
     TableNo = "Job Queue Entry";

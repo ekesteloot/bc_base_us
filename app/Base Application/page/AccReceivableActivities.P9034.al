@@ -1,4 +1,12 @@
-﻿page 9034 "Acc. Receivable Activities"
+﻿namespace Microsoft.FinancialMgt.RoleCenters;
+
+using Microsoft.BankMgt.Deposit;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Receivables;
+
+page 9034 "Acc. Receivable Activities"
 {
     Caption = 'Activities';
     PageType = CardPart;
@@ -70,18 +78,6 @@
             {
                 Caption = 'Deposits';
                 Visible = not BankDepositFeatureEnabled;
-#if not CLEAN21
-                field("Deposits to Post"; Rec."Deposits to Post")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Deposits to Post';
-                    DrillDownPageID = "Deposit List";
-                    ToolTip = 'Specifies the deposits that will be posted.';
-                    ObsoleteReason = 'Use the page "Bank Deposits List" instead.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '21.0';
-                }
-#endif
                 actions
                 {
                     action("New Deposit")
@@ -102,10 +98,6 @@
     }
 
     trigger OnOpenPage()
-#if not CLEAN21
-    var
-        BankDepositFeatureMgt: Codeunit "Bank Deposit Feature Mgt.";
-#endif
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -115,9 +107,6 @@
 
         Rec.SetFilter("Overdue Date Filter", '<%1', WorkDate());
         BankDepositFeatureEnabled := true;
-#if not CLEAN21
-        BankDepositFeatureEnabled := BankDepositFeatureMgt.IsEnabled();
-#endif
     end;
 
     var

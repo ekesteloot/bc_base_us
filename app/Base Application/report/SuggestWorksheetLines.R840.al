@@ -1,4 +1,33 @@
-﻿report 840 "Suggest Worksheet Lines"
+﻿namespace Microsoft.CashFlow.Worksheet;
+
+using Microsoft.BankMgt.Ledger;
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CashFlow.Setup;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Receivables;
+using Microsoft.ServiceMgt.Document;
+using System.AI;
+using System.Environment.Configuration;
+
+report 840 "Suggest Worksheet Lines"
 {
     Caption = 'Suggest Worksheet Lines';
     Permissions = TableData "Dimension Set ID Filter Line" = rimd,
@@ -9,10 +38,10 @@
     {
         dataitem("Cash Flow Forecast"; "Cash Flow Forecast")
         {
-            DataItemTableView = SORTING("No.") ORDER(Ascending);
+            DataItemTableView = sorting("No.") order(Ascending);
             dataitem("Cash Flow Account"; "Cash Flow Account")
             {
-                DataItemTableView = SORTING("No.") ORDER(Ascending) WHERE("G/L Integration" = FILTER(Balance | Both), "G/L Account Filter" = FILTER(<> ''));
+                DataItemTableView = sorting("No.") ORDER(Ascending) where("G/L Integration" = filter(Balance | Both), "G/L Account Filter" = filter(<> ''));
 
                 trigger OnAfterGetRecord()
                 var
@@ -45,7 +74,7 @@
             }
             dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
             {
-                DataItemTableView = SORTING(Open, "Due Date") ORDER(Ascending) WHERE(Open = CONST(true), "Remaining Amount" = FILTER(<> 0));
+                DataItemTableView = sorting(Open, "Due Date") ORDER(Ascending) where(Open = const(true), "Remaining Amount" = filter(<> 0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -73,7 +102,7 @@
             }
             dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
             {
-                DataItemTableView = SORTING(Open, "Due Date") ORDER(Ascending) WHERE(Open = CONST(true), "Remaining Amount" = FILTER(<> 0));
+                DataItemTableView = sorting(Open, "Due Date") ORDER(Ascending) where(Open = const(true), "Remaining Amount" = filter(<> 0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -101,7 +130,7 @@
             }
             dataitem("Purchase Line"; "Purchase Line")
             {
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") ORDER(Ascending) WHERE("Document Type" = CONST(Order));
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.") ORDER(Ascending) where("Document Type" = const(Order));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -131,7 +160,7 @@
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") ORDER(Ascending) WHERE("Document Type" = CONST(Order));
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.") ORDER(Ascending) where("Document Type" = const(Order));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -158,7 +187,7 @@
             }
             dataitem(InvestmentFixedAsset; "Fixed Asset")
             {
-                DataItemTableView = SORTING("No.") WHERE("Budgeted Asset" = CONST(true));
+                DataItemTableView = sorting("No.") where("Budgeted Asset" = const(true));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -185,7 +214,7 @@
             }
             dataitem(SaleFixedAsset; "Fixed Asset")
             {
-                DataItemTableView = SORTING("No.") WHERE("Budgeted Asset" = CONST(false));
+                DataItemTableView = sorting("No.") where("Budgeted Asset" = const(false));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -214,7 +243,7 @@
             }
             dataitem("Cash Flow Manual Expense"; "Cash Flow Manual Expense")
             {
-                DataItemTableView = SORTING(Code) ORDER(Ascending);
+                DataItemTableView = sorting(Code) order(Ascending);
 
                 trigger OnAfterGetRecord()
                 begin
@@ -235,7 +264,7 @@
             }
             dataitem("Cash Flow Manual Revenue"; "Cash Flow Manual Revenue")
             {
-                DataItemTableView = SORTING(Code) ORDER(Ascending);
+                DataItemTableView = sorting(Code) order(Ascending);
 
                 trigger OnAfterGetRecord()
                 begin
@@ -256,7 +285,7 @@
             }
             dataitem(CFAccountForBudget; "Cash Flow Account")
             {
-                DataItemTableView = SORTING("No.") ORDER(Ascending) WHERE("G/L Integration" = FILTER(Budget | Both), "G/L Account Filter" = FILTER(<> ''));
+                DataItemTableView = sorting("No.") ORDER(Ascending) where("G/L Integration" = filter(Budget | Both), "G/L Account Filter" = filter(<> ''));
 
                 trigger OnAfterGetRecord()
                 var
@@ -290,7 +319,7 @@
             }
             dataitem("Service Line"; "Service Line")
             {
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE("Document Type" = CONST(Order));
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where("Document Type" = const(Order));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -317,7 +346,7 @@
             }
             dataitem("Job Planning Line"; "Job Planning Line")
             {
-                DataItemTableView = SORTING("Job No.", "Planning Date", "Document No.");
+                DataItemTableView = sorting("Job No.", "Planning Date", "Document No.");
 
                 trigger OnAfterGetRecord()
                 begin
@@ -345,7 +374,7 @@
             }
             dataitem("Purchase Header"; "Purchase Header")
             {
-                DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+                DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
 
                 trigger OnAfterGetRecord()
                 var
@@ -373,7 +402,7 @@
             }
             dataitem("Sales Header"; "Sales Header")
             {
-                DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+                DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
 
                 trigger OnAfterGetRecord()
                 var

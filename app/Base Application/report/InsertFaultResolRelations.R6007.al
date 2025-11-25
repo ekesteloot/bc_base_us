@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 report 6007 "Insert Fault/Resol. Relations"
 {
     ApplicationArea = Service;

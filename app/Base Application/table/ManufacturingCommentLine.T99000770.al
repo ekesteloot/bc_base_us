@@ -1,3 +1,10 @@
+namespace Microsoft.Manufacturing.Comment;
+
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.WorkCenter;
+
 table 99000770 "Manufacturing Comment Line"
 {
     Caption = 'Manufacturing Comment Line';
@@ -14,13 +21,13 @@ table 99000770 "Manufacturing Comment Line"
         {
             Caption = 'No.';
             NotBlank = true;
-            TableRelation = IF ("Table Name" = CONST("Work Center")) "Work Center"
-            ELSE
-            IF ("Table Name" = CONST("Machine Center")) "Machine Center"
-            ELSE
-            IF ("Table Name" = CONST("Routing Header")) "Routing Header"
-            ELSE
-            IF ("Table Name" = CONST("Production BOM Header")) "Production BOM Header";
+            TableRelation = if ("Table Name" = const("Work Center")) "Work Center"
+            else
+            if ("Table Name" = const("Machine Center")) "Machine Center"
+            else
+            if ("Table Name" = const("Routing Header")) "Routing Header"
+            else
+            if ("Table Name" = const("Production BOM Header")) "Production BOM Header";
         }
         field(3; "Line No."; Integer)
         {

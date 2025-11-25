@@ -1,3 +1,5 @@
+namespace System.Threading;
+
 enum 482 "Job Queue Report Output Type"
 {
     Extensible = true;

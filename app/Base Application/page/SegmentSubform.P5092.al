@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Segment;
+
 page 5092 "Segment Subform"
 {
     AutoSplitKey = true;
@@ -77,12 +79,12 @@ page 5092 "Segment Subform"
                         LanguageCodeOnAfterValidate();
                     end;
                 }
-                field(Subject; Subject)
+                field(Subject; Rec.Subject)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the subject of the segment line. The text in the field is used as the subject in e-mails and Word documents.';
                 }
-                field(Evaluation; Evaluation)
+                field(Evaluation; Rec.Evaluation)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the evaluation of the interaction involving the contact in the segment.';

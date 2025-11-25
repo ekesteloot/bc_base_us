@@ -1,3 +1,8 @@
+﻿namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using Microsoft.Foundation.NoSeries;
+using System.Reflection;
+
 table 206 "Res. Journal Template"
 {
     Caption = 'Res. Journal Template';
@@ -19,12 +24,12 @@ table 206 "Res. Journal Template"
         field(5; "Test Report ID"; Integer)
         {
             Caption = 'Test Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(6; "Page ID"; Integer)
         {
             Caption = 'Page ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Page));
 
             trigger OnValidate()
             begin
@@ -35,7 +40,7 @@ table 206 "Res. Journal Template"
         field(7; "Posting Report ID"; Integer)
         {
             Caption = 'Posting Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(8; "Force Posting Report"; Boolean)
         {
@@ -69,7 +74,7 @@ table 206 "Res. Journal Template"
                 else
                     "Page ID" := PAGE::"Resource Journal";
                 "Test Report ID" := REPORT::"Resource Journal - Test";
-                "Posting Report ID" := REPORT::"Resource Register";
+                "Posting Report ID" := 1103; // REPORT::"Resource Register";
                 SourceCodeSetup.Get();
                 "Source Code" := SourceCodeSetup."Resource Journal";
                 if Recurring then
@@ -78,24 +83,24 @@ table 206 "Res. Journal Template"
         }
         field(13; "Test Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Test Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Test Report ID")));
             Caption = 'Test Report Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(14; "Page Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
-                                                                           "Object ID" = FIELD("Page ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Page),
+                                                                           "Object ID" = field("Page ID")));
             Caption = 'Page Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(15; "Posting Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Posting Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Posting Report ID")));
             Caption = 'Posting Report Caption';
             Editable = false;
             FieldClass = FlowField;

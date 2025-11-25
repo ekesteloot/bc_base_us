@@ -1,7 +1,14 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Text;
+using System.Utilities;
+
 report 321 "Vendor - Balance to Date"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/VendorBalancetoDate.rdlc';
+    RDLCLayout = './Purchases/Reports/VendorBalancetoDate.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor - Balance to Date';
     PreviewMode = PrintLayout;
@@ -12,7 +19,7 @@ report 321 "Vendor - Balance to Date"
     {
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Name", Blocked, "Date Filter";
             column(StrNoVenGetMaxDtFilter; StrSubstNo(Text000, Format(GetRangeMax("Date Filter"))))
@@ -63,7 +70,7 @@ report 321 "Vendor - Balance to Date"
             }
             dataitem(VendLedgEntry3; "Vendor Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(PostDt_VendLedgEntry3; Format("Posting Date"))
                 {
                 }
@@ -78,7 +85,7 @@ report 321 "Vendor - Balance to Date"
                 {
                     IncludeCaption = true;
                 }
-                column(OriginalAmt; Format(OriginalAmt, 0, AutoFormat.ResolveAutoFormat("Auto Format"::AmountFormat, CurrencyCode)))
+                column(OriginalAmt; Format(OriginalAmt, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format"::AmountFormat, CurrencyCode)))
                 {
                 }
                 column(EntryNo_VendLedgEntry3; "Entry No.")
@@ -90,8 +97,8 @@ report 321 "Vendor - Balance to Date"
                 }
                 dataitem("Detailed Vendor Ledg. Entry"; "Detailed Vendor Ledg. Entry")
                 {
-                    DataItemLink = "Vendor Ledger Entry No." = FIELD("Entry No."), "Posting Date" = FIELD("Date Filter");
-                    DataItemTableView = SORTING("Vendor Ledger Entry No.", "Posting Date") WHERE("Entry Type" = FILTER(<> "Initial Entry"));
+                    DataItemLink = "Vendor Ledger Entry No." = field("Entry No."), "Posting Date" = field("Date Filter");
+                    DataItemTableView = sorting("Vendor Ledger Entry No.", "Posting Date") where("Entry Type" = filter(<> "Initial Entry"));
                     column(EntryTp_DtldVendLedgEntry; "Entry Type")
                     {
                     }
@@ -104,7 +111,7 @@ report 321 "Vendor - Balance to Date"
                     column(DocNo_DtldVendLedgEntry; DtldVendLedgDocumentNo)
                     {
                     }
-                    column(Amt; Format(Amt, 0, AutoFormat.ResolveAutoFormat("Auto Format"::AmountFormat, CurrencyCode)))
+                    column(Amt; Format(Amt, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format"::AmountFormat, CurrencyCode)))
                     {
                     }
                     column(CurrencyCode1; CurrencyCode)
@@ -113,7 +120,7 @@ report 321 "Vendor - Balance to Date"
                     column(DtldVendtLedgEntryNum; DtldVendtLedgEntryNum)
                     {
                     }
-                    column(RemainingAmt; Format(RemainingAmt, 0, AutoFormat.ResolveAutoFormat("Auto Format"::AmountFormat, CurrencyCode)))
+                    column(RemainingAmt; Format(RemainingAmt, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format"::AmountFormat, CurrencyCode)))
                     {
                     }
 
@@ -178,14 +185,14 @@ report 321 "Vendor - Balance to Date"
                     if DtldVendLedgEntry.Find('-') then
                         repeat
                             "Entry No." := DtldVendLedgEntry."Vendor Ledger Entry No.";
-                            if CheckVendEntryIncluded("Entry No.") then
+                            if CheckVendLedgerEntryIncludedWithCache("Entry No.") then
                                 Mark(true);
                         until DtldVendLedgEntry.Next() = 0;
 
                     FilterVendorLedgerEntry(VendLedgEntry3);
                     if Find('-') then
                         repeat
-                            if CheckVendEntryIncluded("Entry No.") then
+                            if CheckVendLedgerEntryIncludedWithCache("Entry No.") then
                                 Mark(true);
                         until Next() = 0;
 
@@ -201,7 +208,7 @@ report 321 "Vendor - Balance to Date"
             }
             dataitem(Integer2; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(Name1_Vendor; Vendor.Name)
                 {
                 }
@@ -246,6 +253,7 @@ report 321 "Vendor - Balance to Date"
             var
                 ShouldSkipVendor: Boolean;
             begin
+                Clear(VendorLedgerEntriesIncluded);
                 MaxDate := GetRangeMax("Date Filter");
                 if MinDate = 0D then
                     MinDate := GetRangeMin("Date Filter");
@@ -260,7 +268,7 @@ report 321 "Vendor - Balance to Date"
         }
         dataitem(Integer3; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(CurrTotalBuffer2CurrCode; TempCurrencyTotalBuffer2."Currency Code")
             {
             }
@@ -364,6 +372,7 @@ report 321 "Vendor - Balance to Date"
         DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
         TempCurrencyTotalBuffer: Record "Currency Total Buffer" temporary;
         TempCurrencyTotalBuffer2: Record "Currency Total Buffer" temporary;
+        VendorLedgerEntriesIncluded: Dictionary of [Integer, Boolean];
         AutoFormat: Codeunit "Auto Format";
         PrintAmountInLCY: Boolean;
         PrintOnePrPage: Boolean;
@@ -444,7 +453,7 @@ report 321 "Vendor - Balance to Date"
                 repeat
                     VendorLedgerEntry.Get(DetailedVendorLedgEntry."Vendor Ledger Entry No.");
                     if not Get(VendorLedgerEntry."Entry No.") then
-                        if CheckVendEntryIncluded(VendorLedgerEntry."Entry No.") then begin
+                        if CheckVendLedgerEntryIncludedWithCache(VendorLedgerEntry."Entry No.") then begin
                             TempVendorLedgerEntry := VendorLedgerEntry;
                             Insert();
                         end;
@@ -454,7 +463,7 @@ report 321 "Vendor - Balance to Date"
             if VendorLedgerEntry.FindSet() then
                 repeat
                     if not Get(VendorLedgerEntry."Entry No.") then
-                        if CheckVendEntryIncluded(VendorLedgerEntry."Entry No.") then begin
+                        if CheckVendLedgerEntryIncludedWithCache(VendorLedgerEntry."Entry No.") then begin
                             TempVendorLedgerEntry := VendorLedgerEntry;
                             Insert();
                         end;
@@ -490,6 +499,21 @@ report 321 "Vendor - Balance to Date"
         end;
 
         OnAfterCalcVendorRemainingAmount(TempVendorLedgerEntry, PrintAmountInLCY, RemainingAmt, CurrencyCode);
+    end;
+
+    local procedure CheckVendLedgerEntryIncludedWithCache(EntryNo: Integer): Boolean
+    var
+        IsIncluded: Boolean;
+    begin
+        if VendorLedgerEntriesIncluded.ContainsKey(EntryNo) then begin
+            VendorLedgerEntriesIncluded.Get(EntryNo, IsIncluded);
+            exit(IsIncluded);
+        end;
+
+        IsIncluded := CheckVendEntryIncluded(EntryNo);
+
+        VendorLedgerEntriesIncluded.Add(EntryNo, IsIncluded);
+        exit(IsIncluded);
     end;
 
     local procedure CheckVendEntryIncluded(EntryNo: Integer): Boolean

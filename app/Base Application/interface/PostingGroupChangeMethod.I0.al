@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
 interface "Posting Group Change Method"
 {
     /// <summary>

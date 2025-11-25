@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Source;
+
+using Microsoft.Pricing.PriceList;
+
 codeunit 7033 "Price Source - Cust. Price Gr." implements "Price Source"
 {
     var

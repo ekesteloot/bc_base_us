@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment;
+
 table 2000000183 "Tenant Media Set"
 {
     Caption = 'Tenant Media Set';
@@ -17,7 +23,7 @@ table 2000000183 "Tenant Media Set"
         field(3; "Company Name"; Text[30])
         {
             Caption = 'Company Name';
-            TableRelation = Company.Name;
+            TableRelation = System.Environment.Company.Name;
         }
         field(4; "Media Index"; BigInteger)
         {

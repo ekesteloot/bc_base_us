@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Dimension;
+
 page 602 "IC Dimension List"
 {
     Caption = 'Intercompany Dimension List';
@@ -13,7 +15,7 @@ page 602 "IC Dimension List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the intercompany dimension code.';

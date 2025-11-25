@@ -1,3 +1,18 @@
+﻿namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Outlook;
+#if not CLEAN22
+using System;
+#endif
+using System.Environment;
+#if not CLEAN22
+using System.Environment.Configuration;
+#endif
+using System.Globalization;
+using System.Integration;
+
 page 5094 "Marketing Setup"
 {
     ApplicationArea = Basic, Suite, RelationshipMgmt;
@@ -112,6 +127,12 @@ page 5094 "Marketing Setup"
                         Caption = 'Language Code';
                         ToolTip = 'Specifies the language code to assign automatically to contacts when they are created.';
                     }
+                    field("Default Format Region"; Rec."Default Format Region")
+                    {
+                        ApplicationArea = RelationshipMgmt;
+                        Caption = 'Format Region Code';
+                        ToolTip = 'Specifies the region format to assign automatically to contacts when they are created.';
+                    }
                     field("Default Correspondence Type"; Rec."Default Correspondence Type")
                     {
                         ApplicationArea = RelationshipMgmt;
@@ -156,7 +177,7 @@ page 5094 "Marketing Setup"
                     var
                         Language: Codeunit Language;
                     begin
-                        Language.LookupApplicationLanguageId("Mergefield Language ID");
+                        Language.LookupApplicationLanguageId(Rec."Mergefield Language ID");
                     end;
                 }
                 group("Bus. Relation Code for")
@@ -256,7 +277,7 @@ page 5094 "Marketing Setup"
 
                     trigger OnValidate()
                     begin
-                        if "Autodiscovery E-Mail Address" <> xRec."Autodiscovery E-Mail Address" then begin
+                        if Rec."Autodiscovery E-Mail Address" <> xRec."Autodiscovery E-Mail Address" then begin
                             OnAfterMarketingSetupEmailLoggingUsed();
                             ExchangeWebServicesClient.InvalidateService();
                         end;
@@ -273,7 +294,7 @@ page 5094 "Marketing Setup"
 
                     trigger OnValidate()
                     begin
-                        if "Exchange Service URL" <> xRec."Exchange Service URL" then begin
+                        if Rec."Exchange Service URL" <> xRec."Exchange Service URL" then begin
                             OnAfterMarketingSetupEmailLoggingUsed();
                             ExchangeWebServicesClient.InvalidateService();
                         end;
@@ -316,14 +337,14 @@ page 5094 "Marketing Setup"
                         Caption = 'Client ID';
                         Visible = ClientCredentialsVisible;
                         Enabled = not EmailLoggingEnabled;
-                        ToolTip = 'Specifies the ID of the Azure Active Directory application that will be used to connect to Exchange.', Comment = 'Exchange and Azure Active Directory are names of a Microsoft service and a Microsoft Azure resource and should not be translated.';
+                        ToolTip = 'Specifies the ID of the Microsoft Entra application that will be used to connect to Exchange.', Comment = 'Exchange and Microsoft Entra are names of a Microsoft service and a Microsoft Azure resource and should not be translated.';
                         ObsoleteReason = 'Feature EmailLoggingUsingGraphApi will be enabled by default in version 22.0';
                         ObsoleteState = Pending;
                         ObsoleteTag = '22.0';
 
                         trigger OnValidate()
                         begin
-                            if "Exchange Client Id" <> xRec."Exchange Client Id" then begin
+                            if Rec."Exchange Client Id" <> xRec."Exchange Client Id" then begin
                                 OnAfterMarketingSetupEmailLoggingUsed();
                                 ResetBasicAuthFields();
                                 ExchangeWebServicesClient.InvalidateService();
@@ -337,7 +358,7 @@ page 5094 "Marketing Setup"
                         ExtendedDatatype = Masked;
                         Visible = ClientCredentialsVisible;
                         Enabled = not EmailLoggingEnabled;
-                        ToolTip = 'Specifies the Azure Active Directory application secret that will be used to connect to Exchange.', Comment = 'Exchange and Azure Active Directory are names of a Microsoft service and a Microsoft Azure resource and should not be translated.';
+                        ToolTip = 'Specifies the Microsoft Entra application secret that will be used to connect to Exchange.', Comment = 'Exchange and Microsoft Entra are names of a Microsoft service and a Microsoft Azure resource and should not be translated.';
                         ObsoleteReason = 'Feature EmailLoggingUsingGraphApi will be enabled by default in version 22.0';
                         ObsoleteState = Pending;
                         ObsoleteTag = '22.0';
@@ -345,7 +366,7 @@ page 5094 "Marketing Setup"
                         trigger OnValidate()
                         begin
                             OnAfterMarketingSetupEmailLoggingUsed();
-                            SetExchangeClientSecret(ExchangeClientSecretTemp);
+                            Rec.SetExchangeClientSecret(ExchangeClientSecretTemp);
                             ResetBasicAuthFields();
                             Commit();
                             ExchangeWebServicesClient.InvalidateService();
@@ -358,14 +379,14 @@ page 5094 "Marketing Setup"
                         ExtendedDatatype = URL;
                         Visible = ClientCredentialsVisible;
                         Enabled = not EmailLoggingEnabled;
-                        ToolTip = 'Specifies the redirect URL of the Azure Active Directory application that will be used to connect to Exchange.', Comment = 'Exchange and Azure Active Directory are names of a Microsoft service and a Microsoft Azure resource and should not be translated.';
+                        ToolTip = 'Specifies the redirect URL of the Microsoft Entra application that will be used to connect to Exchange.', Comment = 'Exchange and Microsoft Entra are names of a Microsoft service and a Microsoft Azure resource and should not be translated.';
                         ObsoleteReason = 'Feature EmailLoggingUsingGraphApi will be enabled by default in version 22.0';
                         ObsoleteState = Pending;
                         ObsoleteTag = '22.0';
 
                         trigger OnValidate()
                         begin
-                            if "Exchange Redirect URL" <> xRec."Exchange Redirect URL" then begin
+                            if Rec."Exchange Redirect URL" <> xRec."Exchange Redirect URL" then begin
                                 OnAfterMarketingSetupEmailLoggingUsed();
                                 ResetBasicAuthFields();
                                 ExchangeWebServicesClient.InvalidateService();
@@ -394,7 +415,7 @@ page 5094 "Marketing Setup"
 
                         trigger OnValidate()
                         begin
-                            if "Exchange Account User Name" <> xRec."Exchange Account User Name" then begin
+                            if Rec."Exchange Account User Name" <> xRec."Exchange Account User Name" then begin
                                 OnAfterMarketingSetupEmailLoggingUsed();
                                 ResetOAuth2Fields();
                                 Commit();
@@ -418,7 +439,7 @@ page 5094 "Marketing Setup"
                         begin
                             OnAfterMarketingSetupEmailLoggingUsed();
                             ResetOAuth2Fields();
-                            SetExchangeAccountPassword(ExchangeAccountPasswordTemp);
+                            Rec.SetExchangeAccountPassword(ExchangeAccountPasswordTemp);
                             Commit();
                             ExchangeWebServicesClient.InvalidateService();
                         end;
@@ -446,6 +467,7 @@ page 5094 "Marketing Setup"
 #pragma warning disable AS0072
                     ObsoleteTag = '22.0';
 #pragma warning restore AS0072
+
                     field("Queue Folder Path"; Rec."Queue Folder Path")
                     {
                         ApplicationArea = RelationshipMgmt;
@@ -470,7 +492,7 @@ page 5094 "Marketing Setup"
                                     InitExchangeService();
                                 end;
                             if SetupEmailLogging.GetExchangeFolder(ExchangeWebServicesClient, ExchangeFolder, Text014) then
-                                SetQueueFolder(ExchangeFolder);
+                                Rec.SetQueueFolder(ExchangeFolder);
                         end;
                     }
                     field("Storage Folder Path"; Rec."Storage Folder Path")
@@ -497,7 +519,7 @@ page 5094 "Marketing Setup"
                                     InitExchangeService();
                                 end;
                             if SetupEmailLogging.GetExchangeFolder(ExchangeWebServicesClient, ExchangeFolder, Text015) then
-                                SetStorageFolder(ExchangeFolder);
+                                Rec.SetStorageFolder(ExchangeFolder);
                         end;
                     }
                 }
@@ -529,16 +551,16 @@ page 5094 "Marketing Setup"
                             SetupEmailLogging.DeleteEmailLoggingJobQueueSetup();
                             ExchangeWebServicesClient.InvalidateService();
                             if SoftwareAsAService then
-                                if ("Exchange Account User Name" <> '') or (not IsNullGuid("Exchange Account Password Key")) then begin
+                                if (Rec."Exchange Account User Name" <> '') or (not IsNullGuid(Rec."Exchange Account Password Key")) then begin
                                     Session.LogMessage('0000CPO', DisableBasicAuthenticationTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
-                                    if not IsNullGuid("Exchange Account Password Key") then
-                                        IsolatedStorageManagement.Delete("Exchange Account Password Key", DATASCOPE::Company);
-                                    Clear("Exchange Account Password Key");
-                                    Clear("Exchange Account User Name");
+                                    if not IsNullGuid(Rec."Exchange Account Password Key") then
+                                        IsolatedStorageManagement.Delete(Rec."Exchange Account Password Key", DATASCOPE::Company);
+                                    Clear(Rec."Exchange Account Password Key");
+                                    Clear(Rec."Exchange Account User Name");
                                 end;
                         end;
-                        "Email Logging Enabled" := EmailLoggingEnabled;
-                        Modify();
+                        Rec."Email Logging Enabled" := EmailLoggingEnabled;
+                        Rec.Modify();
                         CurrPage.Update(false);
                     end;
                 }
@@ -606,8 +628,8 @@ page 5094 "Marketing Setup"
                         SetupEmailLogging.RegisterAssistedSetup();
                         Commit(); // Make sure all data is committed before we run the wizard
                         GuidedExperience.Run(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"Setup Email Logging");
-                        if Find() then
-                            EmailLoggingEnabled := "Email Logging Enabled";
+                        if Rec.Find() then
+                            EmailLoggingEnabled := Rec."Email Logging Enabled";
                         CurrPage.Update(false);
                     end;
                 }
@@ -704,31 +726,31 @@ page 5094 "Marketing Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
-        AttachmentStorageLocationEnabl := "Attachment Storage Type" = "Attachment Storage Type"::"Disk File";
+        AttachmentStorageLocationEnabl := Rec."Attachment Storage Type" = Enum::"Attachment Storage Type"::"Disk File";
 
 #if not CLEAN22
         AuthenticationType := AuthenticationType::OAuth2;
         if not SoftwareAsAService then
-            if "Exchange Account User Name" <> '' then
+            if Rec."Exchange Account User Name" <> '' then
                 AuthenticationType := AuthenticationType::Basic;
 
         if AuthenticationType = AuthenticationType::OAuth2 then begin
             ExchangeClientSecretTemp := '';
-            if ("Exchange Client Id" <> '') and (not IsNullGuid("Exchange Client Secret Key")) then
+            if (Rec."Exchange Client Id" <> '') and (not IsNullGuid(Rec."Exchange Client Secret Key")) then
                 ExchangeClientSecretTemp := '**********';
         end else begin
             ExchangeAccountPasswordTemp := '';
-            if ("Exchange Account User Name" <> '') and (not IsNullGuid("Exchange Account Password Key")) then
+            if (Rec."Exchange Account User Name" <> '') and (not IsNullGuid(Rec."Exchange Account Password Key")) then
                 ExchangeAccountPasswordTemp := '**********';
         end;
 
-        EmailLoggingEnabled := "Email Logging Enabled";
+        EmailLoggingEnabled := Rec."Email Logging Enabled";
 #endif
     end;
 
@@ -739,7 +761,6 @@ page 5094 "Marketing Setup"
         ExchangeAccountPasswordTemp: Text;
         ExchangeClientSecretTemp: Text;
 #endif
-        [InDataSet]
         AttachmentStorageLocationEnabl: Boolean;
 #if not CLEAN22
         Text006: Label 'A valid email address is needed to find an instance of Exchange Server.';
@@ -783,10 +804,10 @@ page 5094 "Marketing Setup"
 
     procedure SetAttachmentStorageType()
     begin
-        if ("Attachment Storage Type" = "Attachment Storage Type"::Embedded) or
-           ("Attachment Storage Location" <> '')
+        if (Rec."Attachment Storage Type" = "Attachment Storage Type"::Embedded) or
+           (Rec."Attachment Storage Location" <> '')
         then begin
-            Modify();
+            Rec.Modify();
             Commit();
             REPORT.Run(REPORT::"Relocate Attachments");
         end;
@@ -794,8 +815,8 @@ page 5094 "Marketing Setup"
 
     procedure SetAttachmentStorageLocation()
     begin
-        if "Attachment Storage Location" <> '' then begin
-            Modify();
+        if Rec."Attachment Storage Location" <> '' then begin
+            Rec.Modify();
             Commit();
             REPORT.Run(REPORT::"Relocate Attachments");
         end;
@@ -803,7 +824,7 @@ page 5094 "Marketing Setup"
 
     local procedure AttachmentStorageTypeOnAfterVa()
     begin
-        AttachmentStorageLocationEnabl := "Attachment Storage Type" = "Attachment Storage Type"::"Disk File";
+        AttachmentStorageLocationEnabl := Rec."Attachment Storage Type" = Enum::"Attachment Storage Type"::"Disk File";
         SetAttachmentStorageType();
     end;
 
@@ -833,31 +854,31 @@ page 5094 "Marketing Setup"
         Token: Text;
         Initialized: Boolean;
     begin
-        if "Autodiscovery E-Mail Address" = '' then begin
+        if Rec."Autodiscovery E-Mail Address" = '' then begin
             Session.LogMessage('0000D91', EmptyAutodiscoveryEmailAddressTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
             Error(Text006);
         end;
 
         ExchangeWebServicesClient.InvalidateService();
 
-        TenantId := GetExchangeTenantId();
+        TenantId := Rec.GetExchangeTenantId();
         if TenantId <> '' then begin
             Session.LogMessage('0000D92', ExchangeTenantIdNotSpecifiedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
             SetupEmailLogging.GetClientCredentialsAccessToken(TenantId, Token);
             OAuthCredentials := OAuthCredentials.OAuthCredentials(Token);
-            Initialized := ExchangeWebServicesClient.InitializeOnServerWithImpersonation("Autodiscovery E-Mail Address", "Exchange Service URL", OAuthCredentials);
+            Initialized := ExchangeWebServicesClient.InitializeOnServerWithImpersonation(Rec."Autodiscovery E-Mail Address", Rec."Exchange Service URL", OAuthCredentials);
         end else
-            if "Exchange Account User Name" <> '' then begin
+            if Rec."Exchange Account User Name" <> '' then begin
                 Session.LogMessage('0000D93', ExchangeAccountSpecifiedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
-                CreateExchangeAccountCredentials(WebCredentials);
-                Initialized := ExchangeWebServicesClient.InitializeOnServer("Autodiscovery E-Mail Address", "Exchange Service URL", WebCredentials.Credentials);
+                Rec.CreateExchangeAccountCredentials(WebCredentials);
+                Initialized := ExchangeWebServicesClient.InitializeOnServer(Rec."Autodiscovery E-Mail Address", Rec."Exchange Service URL", WebCredentials.Credentials);
             end else begin
                 Session.LogMessage('0000D94', ExchangeAccountNotSpecifiedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
-                Initialized := ExchangeWebServicesClient.InitializeOnClient("Autodiscovery E-Mail Address", "Exchange Service URL");
+                Initialized := ExchangeWebServicesClient.InitializeOnClient(Rec."Autodiscovery E-Mail Address", Rec."Exchange Service URL");
             end;
 
         if not Initialized then begin
-            Session.LogMessage('0000D95', StrSubstNo(CannotInitializeConnectionToExchangeWithTokenTxt, "Autodiscovery E-Mail Address", "Exchange Service URL", Token), Verbosity::Normal, DataClassification::CustomerContent, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
+            Session.LogMessage('0000D95', StrSubstNo(CannotInitializeConnectionToExchangeWithTokenTxt, Rec."Autodiscovery E-Mail Address", Rec."Exchange Service URL", Token), Verbosity::Normal, DataClassification::CustomerContent, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
             Error(CannotInitializeConnectionToExchangeErr);
         end;
 
@@ -865,7 +886,7 @@ page 5094 "Marketing Setup"
 
         ExchangeWebServicesClient.GetPublicFolders(TempExchangeFolder);
         if TempExchangeFolder.IsEmpty() then begin
-            Session.LogMessage('0000D97', StrSubstNo(CannotAccessRootPublicFolderTxt, "Autodiscovery E-Mail Address", "Exchange Service URL", Token), Verbosity::Normal, DataClassification::CustomerContent, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
+            Session.LogMessage('0000D97', StrSubstNo(CannotAccessRootPublicFolderTxt, Rec."Autodiscovery E-Mail Address", Rec."Exchange Service URL", Token), Verbosity::Normal, DataClassification::CustomerContent, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
             Error(CannotAccessRootPublicFolderErr);
         end;
 
@@ -880,14 +901,14 @@ page 5094 "Marketing Setup"
         TenantId: Text;
     begin
         Session.LogMessage('0000D99', SignInAdminTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
-        if "Autodiscovery E-Mail Address" = '' then begin
+        if Rec."Autodiscovery E-Mail Address" = '' then begin
             Session.LogMessage('0000D9A', EmptyAutodiscoveryEmailAddressTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
             Error(Text006);
         end;
 
         SetupEmailLogging.PromptAdminConsent(Token);
         SetupEmailLogging.ExtractTenantIdFromAccessToken(TenantId, Token);
-        SetExchangeTenantId(TenantId);
+        Rec.SetExchangeTenantId(TenantId);
     end;
 
     [Obsolete('Feature EmailLoggingUsingGraphApi will be enabled by default in version 22.0', '22.0')]
@@ -907,7 +928,7 @@ page 5094 "Marketing Setup"
         ProgressWindow: Dialog;
         ValidationCaption: Text;
     begin
-        ValidationCaption := FieldCaption("Autodiscovery E-Mail Address");
+        ValidationCaption := Rec.FieldCaption("Autodiscovery E-Mail Address");
         ProgressWindow.Open(Text013, ValidationCaption);
 
         if not TryInitExchangeService() then begin
@@ -916,7 +937,7 @@ page 5094 "Marketing Setup"
             exit(false);
         end;
 
-        ValidationCaption := FieldCaption("Queue Folder Path");
+        ValidationCaption := Rec.FieldCaption("Queue Folder Path");
         ProgressWindow.Update();
         if not ExchangeWebServicesClient.FolderExists(MarketingSetup.GetQueueFolderUID()) then begin
             Session.LogMessage('0000D9F', QueueFolderNotAccessibleTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
@@ -924,7 +945,7 @@ page 5094 "Marketing Setup"
             exit(false);
         end;
 
-        ValidationCaption := FieldCaption("Storage Folder Path");
+        ValidationCaption := Rec.FieldCaption("Storage Folder Path");
         ProgressWindow.Update();
         if not ExchangeWebServicesClient.FolderExists(MarketingSetup.GetStorageFolderUID()) then begin
             Session.LogMessage('0000D9G', StorageFolderNotAccessibleTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', EmailLoggingTelemetryCategoryTxt);
@@ -962,8 +983,8 @@ page 5094 "Marketing Setup"
         if SoftwareAsAService then
             exit;
 
-        "Exchange Account User Name" := '';
-        SetExchangeAccountPassword('');
+        Rec."Exchange Account User Name" := '';
+        Rec.SetExchangeAccountPassword('');
         Commit();
     end;
 
@@ -972,9 +993,9 @@ page 5094 "Marketing Setup"
         if SoftwareAsAService then
             exit;
 
-        ResetExchangeTenantId();
-        "Exchange Client Id" := '';
-        SetExchangeClientSecret('');
+        Rec.ResetExchangeTenantId();
+        Rec."Exchange Client Id" := '';
+        Rec.SetExchangeClientSecret('');
         Commit();
     end;
 

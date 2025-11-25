@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Environment.Configuration;
+
 page 1502 "Workflow Subpage"
 {
     AutoSplitKey = true;
@@ -15,9 +19,9 @@ page 1502 "Workflow Subpage"
             repeater(Group)
             {
                 FreezeColumn = Condition;
-                IndentationColumn = Indent;
+                IndentationColumn = Rec.Indent;
                 IndentationControls = "Event Description";
-                field(Indent; Indent)
+                field(Indent; Rec.Indent)
                 {
                     ApplicationArea = Suite;
                     Editable = false;
@@ -39,7 +43,7 @@ page 1502 "Workflow Subpage"
                         CurrPage.Update(false);
                     end;
                 }
-                field(Condition; Condition)
+                field(Condition; Rec.Condition)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'On Condition';
@@ -50,7 +54,7 @@ page 1502 "Workflow Subpage"
                     trigger OnAssistEdit()
                     begin
                         if CurrPage.Editable then begin
-                            OpenEventConditions();
+                            Rec.OpenEventConditions();
                             CurrPage.Update(true);
                         end;
                     end;
@@ -68,14 +72,14 @@ page 1502 "Workflow Subpage"
                     Caption = 'Then Response';
                     Editable = false;
                     Lookup = false;
-                    StyleExpr = "Response Description Style";
+                    StyleExpr = Rec."Response Description Style";
                     ToolTip = 'Specifies the workflow response that is that triggered by the related workflow event.';
                     Width = 100;
 
                     trigger OnAssistEdit()
                     begin
                         if CurrPage.Editable then begin
-                            OpenEventResponses();
+                            Rec.OpenEventResponses();
                             CurrPage.Update(false);
                         end;
                     end;
@@ -99,7 +103,7 @@ page 1502 "Workflow Subpage"
 
                 trigger OnAction()
                 begin
-                    MoveLeft();
+                    Rec.MoveLeft();
                 end;
             }
             action(IncreaseIndent)
@@ -113,7 +117,7 @@ page 1502 "Workflow Subpage"
 
                 trigger OnAction()
                 begin
-                    MoveRight();
+                    Rec.MoveRight();
                 end;
             }
             action(DeleteEventConditions)
@@ -128,7 +132,7 @@ page 1502 "Workflow Subpage"
 
                 trigger OnAction()
                 begin
-                    DeleteEventConditions();
+                    Rec.DeleteEventConditions();
                 end;
             }
         }
@@ -140,7 +144,7 @@ page 1502 "Workflow Subpage"
     begin
         if Workflow.Get(WorkflowCode) then;
         SetActionVisibility();
-        UpdateResponseDescriptionStyle();
+        Rec.UpdateResponseDescriptionStyle();
         IsNotTemplate := not Workflow.Template;
     end;
 
@@ -154,21 +158,21 @@ page 1502 "Workflow Subpage"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        FilterGroup(4);
-        if WorkflowCode <> GetRangeMax("Workflow Code") then begin
-            WorkflowCode := GetRangeMax("Workflow Code");
-            ClearBuffer();
+        Rec.FilterGroup(4);
+        if WorkflowCode <> Rec.GetRangeMax("Workflow Code") then begin
+            WorkflowCode := Rec.GetRangeMax("Workflow Code");
+            Rec.ClearBuffer();
         end;
 
-        if IsEmpty() then
-            PopulateTable(WorkflowCode);
+        if Rec.IsEmpty() then
+            Rec.PopulateTable(WorkflowCode);
 
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        CreateNewWhenThenLine(WorkflowCode, BelowxRec);
+        Rec.CreateNewWhenThenLine(WorkflowCode, BelowxRec);
     end;
 
     trigger OnOpenPage()
@@ -189,12 +193,12 @@ page 1502 "Workflow Subpage"
         Workflow: Record Workflow;
         WorkflowStep: Record "Workflow Step";
     begin
-        if not WorkflowStep.Get("Workflow Code", "Event Step ID") then begin
+        if not WorkflowStep.Get(Rec."Workflow Code", Rec."Event Step ID") then begin
             EnableEditActions := false;
             exit;
         end;
 
-        Workflow.Get("Workflow Code");
+        Workflow.Get(Rec."Workflow Code");
 
         EnableEditActions := (not Workflow.Enabled) and (WorkflowStep.Type = WorkflowStep.Type::"Event") and
           ((not IsNullGuid(WorkflowStep.Argument)) or WorkflowStep.HasWorkflowRules());
@@ -202,8 +206,8 @@ page 1502 "Workflow Subpage"
 
     procedure RefreshBuffer()
     begin
-        ClearBuffer();
-        PopulateTable(WorkflowCode);
+        Rec.ClearBuffer();
+        Rec.PopulateTable(WorkflowCode);
     end;
 }
 

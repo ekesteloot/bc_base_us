@@ -1,15 +1,27 @@
+﻿namespace Microsoft.Sales.Customer;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 1316 "Standard Statement"
 {
-    RDLCLayout = './SalesReceivables/StandardStatement.rdlc';
-    WordLayout = './StandardStatement.docx';
     Caption = 'Customer Statement';
-    DefaultLayout = Word;
+    DefaultRenderingLayout = "StandardStatement.docx";
 
     dataset
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Name", "Print Statements", "Currency Filter";
             column(No_Cust; "No.")
@@ -17,7 +29,7 @@ report 1316 "Standard Statement"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 PrintOnlyIfDetail = true;
                 column(CompanyPicture; CompanyInfo.Picture)
                 {
@@ -178,22 +190,22 @@ report 1316 "Standard Statement"
                 column(CurrReportPageNoCaption; CurrReportPageNoCaptionLbl)
                 {
                 }
-                column(CompanyLegalOffice; CompanyInfo.GetLegalOffice())
+                column(CompanyLegalOffice; LegalOfficeTxt)
                 {
                 }
-                column(CompanyLegalOffice_Lbl; CompanyInfo.GetLegalOfficeLbl())
+                column(CompanyLegalOffice_Lbl; LegalOfficeLbl)
                 {
                 }
                 dataitem(CurrencyLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     PrintOnlyIfDetail = true;
                     column(Total_Caption2; Total_CaptionLbl)
                     {
                     }
                     dataitem(CustLedgEntryHdr; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Currency2Code_CustLedgEntryHdr; StrSubstNo(EntriesLbl, CurrencyCode3))
                         {
                         }
@@ -222,7 +234,7 @@ report 1316 "Standard Statement"
                         }
                         dataitem(DtldCustLedgEntries; "Detailed Cust. Ledg. Entry")
                         {
-                            DataItemTableView = SORTING("Customer No.", "Posting Date", "Entry Type", "Currency Code");
+                            DataItemTableView = sorting("Customer No.", "Posting Date", "Entry Type", "Currency Code");
                             column(PostDate_DtldCustLedgEntries; Format("Posting Date"))
                             {
                             }
@@ -232,7 +244,9 @@ report 1316 "Standard Statement"
                             column(Description; Description)
                             {
                             }
-                            column(YourReference_DtldCustLedgEntries; YourReference) { }
+                            column(YourReference_DtldCustLedgEntries; YourReference)
+                            {
+                            }
                             column(DueDate_DtldCustLedgEntries; Format(DueDate))
                             {
                             }
@@ -323,8 +337,15 @@ report 1316 "Standard Statement"
                                 end;
 
                                 if PrintLine then begin
+                                    if StatementStyle = StatementStyle::"Open Item" then
+                                        if RemainingAmount = 0 then
+                                            CurrReport.Skip();
+
                                     NumberOfCustLedgerEntryLines += 1;
-                                    CustBalance := CustBalance + Amount;
+                                    if StatementStyle = StatementStyle::"Open Item" then
+                                        CustBalance += RemainingAmount
+                                    else
+                                        CustBalance := CustBalance + Amount;
                                     IsNewCustCurrencyGroup := IsFirstPrintLine;
                                     IsFirstPrintLine := false;
                                     ClearCompanyPicture();
@@ -336,6 +357,8 @@ report 1316 "Standard Statement"
                                 SetRange("Customer No.", Customer."No.");
                                 SetRange("Posting Date", StartDate, EndDate);
                                 SetRange("Currency Code", TempCurrency2.Code);
+                                if StatementStyle = StatementStyle::"Open Item" then
+                                    SetRange("Entry Type", "Entry Type"::"Initial Entry");
                                 OnDtldCustLedgEntriesOnPreDataItemOnAfterSetFilters(DtldCustLedgEntries);
                                 if TempCurrency2.Code = '' then begin
                                     GLSetup.TestField("LCY Code");
@@ -349,7 +372,7 @@ report 1316 "Standard Statement"
                     }
                     dataitem(CustLedgEntryFooter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(CurrencyCode3_CustLedgEntryFooter; CurrencyCode3)
                         {
                         }
@@ -372,7 +395,7 @@ report 1316 "Standard Statement"
                     }
                     dataitem(OverdueVisible; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Total_Caption3; Total_CaptionLbl)
                         {
                         }
@@ -402,9 +425,9 @@ report 1316 "Standard Statement"
                         }
                         dataitem(CustLedgEntry2; "Cust. Ledger Entry")
                         {
-                            DataItemLink = "Customer No." = FIELD("No.");
+                            DataItemLink = "Customer No." = field("No.");
                             DataItemLinkReference = Customer;
-                            DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date");
+                            DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date");
                             column(RemainAmt_CustLedgEntry2; "Remaining Amount")
                             {
                                 AutoFormatExpression = "Currency Code";
@@ -473,7 +496,7 @@ report 1316 "Standard Statement"
                         }
                         dataitem(OverdueEntryFooder; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                            DataItemTableView = sorting(Number) where(Number = const(1));
                             column(OverdueBalance; CustBalance2)
                             {
                             }
@@ -487,6 +510,8 @@ report 1316 "Standard Statement"
                     }
 
                     trigger OnAfterGetRecord()
+                    var
+                        CustLedgerEntryBalance: Record "Cust. Ledger Entry";
                     begin
                         if Number = 1 then
                             TempCurrency2.Find('-');
@@ -503,12 +528,31 @@ report 1316 "Standard Statement"
                             CustLedgerEntry.SetRange("Currency Code", TempCurrency2.Code);
                             EntriesExists := not CustLedgerEntry.IsEmpty();
                         until EntriesExists;
-                        Cust2 := Customer;
-                        Cust2.SetRange("Date Filter", 0D, StartDate - 1);
-                        Cust2.SetRange("Currency Filter", TempCurrency2.Code);
-                        Cust2.CalcFields("Net Change");
-                        StartBalance := Cust2."Net Change";
-                        CustBalance := Cust2."Net Change";
+
+                        if StatementStyle = StatementStyle::"Open Item" then begin
+                            CustBalance := 0;
+                            StartBalance := 0;
+                            CustLedgerEntryBalance.SetCurrentKey("Customer No.", "Posting Date", "Currency Code");
+                            CustLedgerEntryBalance.SetRange("Customer No.", Customer."No.");
+                            CustLedgerEntryBalance.SetRange("Posting Date", 0D, StartDate - 1);
+                            CustLedgerEntryBalance.SetRange("Currency Code", TempCurrency2.Code);
+                            CustLedgerEntryBalance.SetRange("Date Filter", 0D, EndDate);
+                            CustLedgerEntryBalance.SetFilter("Remaining Amount", '<>0');
+                            CustLedgerEntryBalance.SetAutoCalcFields("Remaining Amount");
+                            if CustLedgerEntryBalance.FindSet() then
+                                repeat
+                                    StartBalance += CustLedgerEntryBalance."Remaining Amount";
+                                until CustLedgerEntryBalance.Next() = 0;
+                            CustBalance := StartBalance;
+                        end
+                        else begin
+                            Cust2 := Customer;
+                            Cust2.SetRange("Date Filter", 0D, StartDate - 1);
+                            Cust2.SetRange("Currency Filter", TempCurrency2.Code);
+                            Cust2.CalcFields("Net Change");
+                            StartBalance := Cust2."Net Change";
+                            CustBalance := Cust2."Net Change";
+                        end;
                         CustBalance2 := 0;
                     end;
 
@@ -519,12 +563,12 @@ report 1316 "Standard Statement"
                 }
                 dataitem(AgingBandVisible; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     dataitem(AgingCustLedgEntry; "Cust. Ledger Entry")
                     {
-                        DataItemLink = "Customer No." = FIELD("No.");
+                        DataItemLink = "Customer No." = field("No.");
                         DataItemLinkReference = Customer;
-                        DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date");
+                        DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date");
 
                         trigger OnAfterGetRecord()
                         var
@@ -556,7 +600,7 @@ report 1316 "Standard Statement"
                     }
                     dataitem(AgingBandLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(AgingDate1; Format(AgingDate[1] + 1))
                         {
                         }
@@ -652,7 +696,7 @@ report 1316 "Standard Statement"
             }
             dataitem(LetterText; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(GreetingText; GreetingLbl)
                 {
                 }
@@ -668,6 +712,7 @@ report 1316 "Standard Statement"
             begin
                 TempAgingBandBuf.DeleteAll();
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
                 PrintLine := false;
                 if PrintAllHavingBal and (not PrintAllHavingEntry) then
@@ -679,6 +724,11 @@ report 1316 "Standard Statement"
                     CustLedgerEntry.SetRange("Customer No.", "No.");
                     CustLedgerEntry.SetRange("Posting Date", StartDate, EndDate);
                     CopyFilter("Currency Filter", CustLedgerEntry."Currency Code");
+                    if StatementStyle = StatementStyle::"Open Item" then begin
+                        CustLedgerEntry.SetRange("Date Filter", 0D, EndDate);
+                        CustLedgerEntry.SetFilter("Remaining Amount", '<>0');
+                    end;
+
                     PrintLine := not CustLedgerEntry.IsEmpty();
                     OnCurrencyLoopOnAfterGetRecordOnAfterCustLedgerEntryCheckIsEmpty(Customer, CustLedgerEntry, PrintLine);
                 end;
@@ -693,7 +743,6 @@ report 1316 "Standard Statement"
 
                 FormatAddr.Customer(CustAddr, Customer);
                 PrintedCustomersList.Add("No.");
-
                 UpdatePictures();
                 FirstRecordPrinted := false;
                 IsFirstLoop := false;
@@ -745,12 +794,26 @@ report 1316 "Standard Statement"
                         ToolTip = 'Specifies the date to which the report or batch job processes information.';
                         ShowMandatory = true;
                     }
+                    field("Statement Style"; StatementStyle)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Statement Style';
+                        OptionCaption = 'Balance,Open Item';
+                        ToolTip = 'Specifies if you want regular statement report or report with open entries only which are posted in the selected period and still open in the moment of Ending Date.';
+
+                        trigger OnValidate()
+                        begin
+                            UpdateReqPageParameters();
+                        end;
+                    }
+
                     field(ShowOverdueEntries; PrintEntriesDue)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Show Overdue Entries';
                         ToolTip = 'Specifies if you want overdue entries to be shown separately for each currency.';
                     }
+
                     group(Include)
                     {
                         Caption = 'Include';
@@ -760,6 +823,7 @@ report 1316 "Standard Statement"
                             Caption = 'Include All Customers with Ledger Entries';
                             MultiLine = true;
                             ToolTip = 'Specifies if you want entries displayed for customers that have ledger entries at the end of the selected period.';
+                            Editable = PrintAllHavingEntryEditable;
 
                             trigger OnValidate()
                             begin
@@ -773,6 +837,7 @@ report 1316 "Standard Statement"
                             Caption = 'Include All Customers with a Balance';
                             MultiLine = true;
                             ToolTip = 'Specifies if you want entries displayed for customers that have a balance at the end of the selected period.';
+                            Editable = PrintAllHavingBalEditable;
 
                             trigger OnValidate()
                             begin
@@ -785,12 +850,14 @@ report 1316 "Standard Statement"
                             ApplicationArea = Basic, Suite;
                             Caption = 'Include Reversed Entries';
                             ToolTip = 'Specifies if you want to include reversed entries in the report.';
+                            Editable = PrintReversedEntriesEditable;
                         }
                         field(IncludeUnappliedEntries; PrintUnappliedEntries)
                         {
                             ApplicationArea = Basic, Suite;
                             Caption = 'Include Unapplied Entries';
                             ToolTip = 'Specifies if you want to include unapplied entries in the report.';
+                            Editable = PrintUnappliedEntriesEditable;
                         }
                     }
                     group("Aging Band")
@@ -891,11 +958,38 @@ report 1316 "Standard Statement"
         end;
     }
 
+    rendering
+    {
+        layout("StandardStatement.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/Customer/StandardStatement.rdlc';
+            Caption = 'Standard Customer Statement (RDLC)';
+            Summary = 'The Standard Customer Statement (RDLC) provides a detailed layout.';
+        }
+        layout("StandardStatement.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/Customer/StandardStatement.docx';
+            Caption = 'Standard Customer Statement (Word)';
+            Summary = 'The Standard Customer Statement (Word) provides a basic layout.';
+        }
+        layout("StandardCustomerStatementEmail.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/Customer/StandardCustomerStatementEmail.docx';
+            Caption = 'Standard Customer Statement Email (Word)';
+            Summary = 'The Standard Customer Statement Email (Word) provides an email body layout.';
+        }
+    }
+
     labels
     {
     }
 
     trigger OnInitReport()
+    var
+        IsHandled: Boolean;
     begin
         GLSetup.Get();
         SalesSetup.Get();
@@ -916,6 +1010,10 @@ report 1316 "Standard Statement"
         UpdatePictures();
 
         LogInteractionEnable := true;
+        PrintAllHavingEntryEditable := true;
+
+        IsHandled := false;
+        OnInitReportForGlobalVariable(IsHandled, LegalOfficeTxt, LegalOfficeLbl);
     end;
 
     trigger OnPostReport()
@@ -945,10 +1043,6 @@ report 1316 "Standard Statement"
     var
         GLSetup: Record "General Ledger Setup";
         SalesSetup: Record "Sales & Receivables Setup";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         SavedCompanyInfo: Record "Company Information";
         SavedCompanyInfo1: Record "Company Information";
         SavedCompanyInfo2: Record "Company Information";
@@ -974,11 +1068,15 @@ report 1316 "Standard Statement"
         StartBalance: Decimal;
         CurrencyCode3: Code[10];
         DateChoice: Option "Due Date","Posting Date";
+        StatementStyle: Option "Balance","Open Item";
         AgingDate: array[5] of Date;
         AgingBandEndingDate: Date;
         AgingBandCurrencyCode: Code[20];
-        [InDataSet]
         LogInteractionEnable: Boolean;
+        PrintAllHavingEntryEditable: Boolean;
+        PrintAllHavingBalEditable: Boolean;
+        PrintUnappliedEntriesEditable: Boolean;
+        PrintReversedEntriesEditable: Boolean;
         isInitialized: Boolean;
         IsFirstLoop: Boolean;
         IsFirstPrintLine: Boolean;
@@ -990,12 +1088,10 @@ report 1316 "Standard Statement"
         SupportedOutputMethod: Option Print,Preview,Word,PDF,Email,XML;
         ChosenOutputMethod: Integer;
         PrintIfEmailIsMissing: Boolean;
-        [InDataSet]
         ShowPrintIfEmailIsMissing: Boolean;
         CustBalance2: Decimal;
         FirstRecordPrinted: Boolean;
         YourReference: Text;
-
         EntriesLbl: Label 'Entries %1', Comment = '%1 = Currency code';
         OverdueEntriesLbl: Label 'Overdue Entries %1', Comment = '%1=Currency code';
         StatementLbl: Label 'Statement ';
@@ -1036,8 +1132,13 @@ report 1316 "Standard Statement"
         BodyLbl: Label 'Thank you for your business. Your statement is attached to this message.';
         TelemetryCategoryTxt: Label 'Report', Locked = true;
         CustomerStatementReportGeneratedTxt: Label 'Customer Statement report generated.', Locked = true;
+        LegalOfficeTxt, LegalOfficeLbl : Text;
 
     protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
         CustBalance: Decimal;
         RemainingAmount: Decimal;
         IncludeAgingBand: Boolean;
@@ -1187,12 +1288,14 @@ report 1316 "Standard Statement"
         if Format(PeriodLength) = '' then
             Evaluate(PeriodLength, '<1M+CM>');
 
+        UpdateReqPageParameters();
+
         ShowPrintIfEmailIsMissing := SupportedOutputMethod = SupportedOutputMethod::Email;
     end;
 
     local procedure InitInteractionLog()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Stmnt.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Stmnt.") <> '';
     end;
 
     local procedure VerifyDates()
@@ -1215,6 +1318,26 @@ report 1316 "Standard Statement"
             TempCurrency2.Insert();
             CustLedgerEntry.SetFilter("Currency Code", '>%1', CustLedgerEntry."Currency Code");
         end;
+    end;
+
+    local procedure UpdateReqPageParameters()
+    begin
+        PrintAllHavingEntryEditable := StatementStyle <> StatementStyle::"Open Item";
+        PrintAllHavingBalEditable := StatementStyle <> StatementStyle::"Open Item";
+        PrintUnappliedEntriesEditable := StatementStyle <> StatementStyle::"Open Item";
+        PrintReversedEntriesEditable := StatementStyle <> StatementStyle::"Open Item";
+
+        if not PrintAllHavingEntryEditable then
+            PrintAllHavingEntry := false;
+
+        if not PrintAllHavingBalEditable then
+            PrintAllHavingBal := true;
+
+        if not PrintUnappliedEntriesEditable then
+            PrintUnappliedEntries := true;
+
+        if not PrintReversedEntriesEditable then
+            PrintReversedEntries := false;
     end;
 
     local procedure LogReportTelemetry(StartDateTime: DateTime; FinishDateTime: DateTime; NumberOfLines: Integer)
@@ -1259,6 +1382,11 @@ report 1316 "Standard Statement"
 
     [IntegrationEvent(false, false)]
     local procedure OnCustLedgEntry2OnPreDataItemOnAfterSetFilters(var CustLedgEntry: Record "Cust. Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitReportForGlobalVariable(var IsHandled: Boolean; var LegalOfficeTxt: Text; var LegalOfficeLbl: Text)
     begin
     end;
 }

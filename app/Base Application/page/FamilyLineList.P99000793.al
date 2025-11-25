@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Family;
+
 page 99000793 "Family Line List"
 {
     Caption = 'Family Line List';

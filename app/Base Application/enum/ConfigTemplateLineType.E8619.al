@@ -1,3 +1,5 @@
+namespace System.IO;
+
 enum 8619 "Config. Template Line Type"
 {
     Extensible = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 page 425 "Vendor Bank Account Card"
 {
     Caption = 'Vendor Bank Account Card';
@@ -11,7 +13,7 @@ page 425 "Vendor Bank Account Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code to identify this vendor bank account.';
@@ -21,7 +23,7 @@ page 425 "Vendor Bank Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank where the vendor has this bank account.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the address of the bank where the vendor has the bank account.';
@@ -31,12 +33,12 @@ page 425 "Vendor Bank Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies additional address information.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the bank where the vendor has the bank account.';
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'State';
@@ -57,7 +59,7 @@ page 425 "Vendor Bank Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the telephone number of the bank where the vendor has the bank account.';
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank employee regularly contacted in connection with this bank account.';
@@ -118,7 +120,7 @@ page 425 "Vendor Bank Account Card"
                     Importance = Additional;
                     ToolTip = 'Specifies the SWIFT code (international bank identifier code) of the bank where the vendor has the account.';
                 }
-                field(IBAN; IBAN)
+                field(IBAN; Rec.IBAN)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;

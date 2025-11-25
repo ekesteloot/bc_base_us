@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.WarehouseMgt.Ledger;
+
 query 7300 "Lot Numbers by Bin"
 {
     Caption = 'Lot Numbers by Bin';

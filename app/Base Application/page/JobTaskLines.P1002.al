@@ -1,3 +1,11 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.Purchases.Document;
+
 page 1002 "Job Task Lines"
 {
     Caption = 'Job Task Lines';
@@ -42,7 +50,7 @@ page 1002 "Job Task Lines"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the purpose of the account. Newly created accounts are automatically assigned the Posting account type, but you can change this. Choose the field to select one of the following five options:';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies an interval or a list of job task numbers.';
@@ -122,13 +130,13 @@ page 1002 "Job Task Lines"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the remaining total price (LCY) as the sum of prices from job planning lines associated with the job task. The calculation occurs when you have specified that there is a usage link between the job ledger and the job planning lines.';
                 }
-                field("EAC (Total Cost)"; CalcEACTotalCost())
+                field("EAC (Total Cost)"; Rec.CalcEACTotalCost())
                 {
                     ApplicationArea = Jobs;
                     Caption = 'EAC (Total Cost)';
                     ToolTip = 'Specifies the estimate at completion (EAC) total cost for a job task line. If the Apply Usage Link check box on the job is selected, then the EAC (Total Cost) field is calculated as follows:  Usage (Total Cost) + Remaining (Total Cost).';
                 }
-                field("EAC (Total Price)"; CalcEACTotalPrice())
+                field("EAC (Total Price)"; Rec.CalcEACTotalPrice())
                 {
                     ApplicationArea = Jobs;
                     Caption = 'EAC (Total Price)';
@@ -157,7 +165,7 @@ page 1002 "Job Task Lines"
                     var
                         PurchLine: Record "Purchase Line";
                     begin
-                        SetPurchLineFilters(PurchLine, "Job No.", "Job Task No.");
+                        SetPurchLineFilters(PurchLine, Rec."Job No.", Rec."Job Task No.");
                         PurchLine.SetFilter("Outstanding Amt. Ex. VAT (LCY)", '<> 0');
                         PAGE.RunModal(PAGE::"Purchase Lines", PurchLine);
                     end;
@@ -173,7 +181,7 @@ page 1002 "Job Task Lines"
                     var
                         PurchLine: Record "Purchase Line";
                     begin
-                        SetPurchLineFilters(PurchLine, "Job No.", "Job Task No.");
+                        SetPurchLineFilters(PurchLine, Rec."Job No.", Rec."Job Task No.");
                         PurchLine.SetFilter("Amt. Rcd. Not Invoiced (LCY)", '<> 0');
                         PAGE.RunModal(PAGE::"Purchase Lines", PurchLine);
                     end;
@@ -215,12 +223,12 @@ page 1002 "Job Task Lines"
                         JobPlanningLine: Record "Job Planning Line";
                         JobPlanningLines: Page "Job Planning Lines";
                     begin
-                        TestField("Job Task Type", "Job Task Type"::Posting);
-                        TestField("Job No.");
-                        TestField("Job Task No.");
+                        Rec.TestField("Job Task Type", Rec."Job Task Type"::Posting);
+                        Rec.TestField("Job No.");
+                        Rec.TestField("Job Task No.");
                         JobPlanningLine.FilterGroup(2);
-                        JobPlanningLine.SetRange("Job No.", "Job No.");
-                        JobPlanningLine.SetRange("Job Task No.", "Job Task No.");
+                        JobPlanningLine.SetRange("Job No.", Rec."Job No.");
+                        JobPlanningLine.SetRange("Job Task No.", Rec."Job Task No.");
                         JobPlanningLine.FilterGroup(0);
                         JobPlanningLines.SetJobTaskNoVisible(false);
                         JobPlanningLines.SetTableView(JobPlanningLine);
@@ -233,8 +241,8 @@ page 1002 "Job Task Lines"
                     Caption = 'Job Task &Statistics';
                     Image = StatisticsDocument;
                     RunObject = Page "Job Task Statistics";
-                    RunPageLink = "Job No." = FIELD("Job No."),
-                                  "Job Task No." = FIELD("Job Task No.");
+                    RunPageLink = "Job No." = field("Job No."),
+                                  "Job Task No." = field("Job Task No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistics for the job task.';
                 }
@@ -244,8 +252,8 @@ page 1002 "Job Task Lines"
                     Caption = 'Job &Task Card';
                     Image = Task;
                     RunObject = Page "Job Task Card";
-                    RunPageLink = "Job No." = FIELD("Job No."),
-                                  "Job Task No." = FIELD("Job Task No.");
+                    RunPageLink = "Job No." = field("Job No."),
+                                  "Job Task No." = field("Job Task No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View detailed information about a job task, such as the description of the task and the type, which can be either a heading, a posting, a begin-total, an end-total, or a total.';
                 }
@@ -263,8 +271,8 @@ page 1002 "Job Task Lines"
                         Caption = 'Dimensions-&Single';
                         Image = Dimensions;
                         RunObject = Page "Job Task Dimensions";
-                        RunPageLink = "Job No." = FIELD("Job No."),
-                                      "Job Task No." = FIELD("Job Task No.");
+                        RunPageLink = "Job No." = field("Job No."),
+                                      "Job Task No." = field("Job Task No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -318,8 +326,8 @@ page 1002 "Job Task Lines"
                     Caption = '&WIP Entries';
                     Image = WIPEntries;
                     RunObject = Page "Job WIP Entries";
-                    RunPageLink = "Job No." = FIELD("Job No.");
-                    RunPageView = SORTING("Job No.", "Job Posting Group", "WIP Posting Date");
+                    RunPageLink = "Job No." = field("Job No.");
+                    RunPageView = sorting("Job No.", "Job Posting Group", "WIP Posting Date");
                     ToolTip = 'View entries for the job that are posted as work in process.';
                 }
                 action("WIP &G/L Entries")
@@ -328,8 +336,8 @@ page 1002 "Job Task Lines"
                     Caption = 'WIP &G/L Entries';
                     Image = WIPLedger;
                     RunObject = Page "Job WIP G/L Entries";
-                    RunPageLink = "Job No." = FIELD("Job No.");
-                    RunPageView = SORTING("Job No.");
+                    RunPageLink = "Job No." = field("Job No.");
+                    RunPageView = sorting("Job No.");
                     ToolTip = 'View the job''s WIP G/L entries.';
                 }
             }
@@ -343,9 +351,9 @@ page 1002 "Job Task Lines"
                     Caption = 'Job Ledger E&ntries';
                     Image = JobLedger;
                     RunObject = Page "Job Ledger Entries";
-                    RunPageLink = "Job No." = FIELD("Job No."),
-                                  "Job Task No." = FIELD("Job Task No.");
-                    RunPageView = SORTING("Job No.", "Job Task No.");
+                    RunPageLink = "Job No." = field("Job No."),
+                                  "Job Task No." = field("Job Task No.");
+                    RunPageView = sorting("Job No.", "Job Task No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the job ledger entries.';
                 }
@@ -370,14 +378,14 @@ page 1002 "Job Task Lines"
                         Job: Record Job;
                         JobTask: Record "Job Task";
                     begin
-                        TestField("Job No.");
-                        Job.Get("Job No.");
+                        Rec.TestField("Job No.");
+                        Job.Get(Rec."Job No.");
                         if Job.Blocked = Job.Blocked::All then
                             Job.TestBlocked();
 
                         JobTask.SetRange("Job No.", Job."No.");
-                        if "Job Task No." <> '' then
-                            JobTask.SetRange("Job Task No.", "Job Task No.");
+                        if Rec."Job Task No." <> '' then
+                            JobTask.SetRange("Job Task No.", Rec."Job Task No.");
 
                         REPORT.RunModal(REPORT::"Job Create Sales Invoice", true, false, JobTask);
                     end;
@@ -400,14 +408,14 @@ page 1002 "Job Task Lines"
                         Job: Record Job;
                         JobTask: Record "Job Task";
                     begin
-                        TestField("Job No.");
-                        Job.Get("Job No.");
+                        Rec.TestField("Job No.");
+                        Job.Get(Rec."Job No.");
                         if Job.Blocked = Job.Blocked::All then
                             Job.TestBlocked();
 
-                        TestField("Job Task No.");
+                        Rec.TestField("Job Task No.");
                         JobTask.SetRange("Job No.", Job."No.");
-                        JobTask.SetRange("Job Task No.", "Job Task No.");
+                        JobTask.SetRange("Job Task No.", Rec."Job Task No.");
 
                         REPORT.RunModal(REPORT::"Job Split Planning Line", true, false, JobTask);
                     end;
@@ -425,14 +433,14 @@ page 1002 "Job Task Lines"
                         Job: Record Job;
                         JobTask: Record "Job Task";
                     begin
-                        TestField("Job No.");
-                        Job.Get("Job No.");
+                        Rec.TestField("Job No.");
+                        Job.Get(Rec."Job No.");
                         if Job.Blocked = Job.Blocked::All then
                             Job.TestBlocked();
 
                         JobTask.SetRange("Job No.", Job."No.");
-                        if "Job Task No." <> '' then
-                            JobTask.SetRange("Job Task No.", "Job Task No.");
+                        if Rec."Job Task No." <> '' then
+                            JobTask.SetRange("Job Task No.", Rec."Job Task No.");
 
                         REPORT.RunModal(REPORT::"Change Job Dates", true, false, JobTask);
                     end;
@@ -461,7 +469,7 @@ page 1002 "Job Task Lines"
                         var
                             CopyJobPlanningLines: Page "Copy Job Planning Lines";
                         begin
-                            TestField("Job Task Type", "Job Task Type"::Posting);
+                            Rec.TestField("Job Task Type", Rec."Job Task Type"::Posting);
                             CopyJobPlanningLines.SetToJobTask(Rec);
                             CopyJobPlanningLines.RunModal();
                         end;
@@ -478,7 +486,7 @@ page 1002 "Job Task Lines"
                         var
                             CopyJobPlanningLines: Page "Copy Job Planning Lines";
                         begin
-                            TestField("Job Task Type", "Job Task Type"::Posting);
+                            Rec.TestField("Job Task Type", Rec."Job Task Type"::Posting);
                             CopyJobPlanningLines.SetFromJobTask(Rec);
                             CopyJobPlanningLines.RunModal();
                         end;
@@ -499,11 +507,14 @@ page 1002 "Job Task Lines"
                         trigger OnAction()
                         var
                             Job: Record Job;
+                            JobCalculateWIP: Report "Job Calculate WIP";
                         begin
-                            TestField("Job No.");
-                            Job.Get("Job No.");
+                            Rec.TestField("Job No.");
+                            Job.Get(Rec."Job No.");
                             Job.SetRange("No.", Job."No.");
-                            REPORT.RunModal(REPORT::"Job Calculate WIP", true, false, Job);
+                            Clear(JobCalculateWIP);
+                            JobCalculateWIP.SetTableView(Job);
+                            JobCalculateWIP.Run();
                         end;
                     }
                     action("<Action49>")
@@ -519,8 +530,8 @@ page 1002 "Job Task Lines"
                         var
                             Job: Record Job;
                         begin
-                            TestField("Job No.");
-                            Job.Get("Job No.");
+                            Rec.TestField("Job No.");
+                            Job.Get(Rec."Job No.");
                             Job.SetRange("No.", Job."No.");
                             REPORT.RunModal(REPORT::"Job Post WIP to G/L", true, false, Job);
                         end;
@@ -676,24 +687,22 @@ page 1002 "Job Task Lines"
 
     trigger OnAfterGetRecord()
     begin
-        DescriptionIndent := Indentation;
-        StyleIsStrong := "Job Task Type" <> "Job Task Type"::Posting;
+        DescriptionIndent := Rec.Indentation;
+        StyleIsStrong := Rec."Job Task Type" <> Rec."Job Task Type"::Posting;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        ClearTempDim();
+        Rec.ClearTempDim();
     end;
 
     var
-        [InDataSet]
         DescriptionIndent: Integer;
-        [InDataSet]
         StyleIsStrong: Boolean;
 
     procedure SetPurchLineFilters(var PurchLine: Record "Purchase Line"; JobNo: Code[20]; JobTaskNo: Code[20])
     begin
-        ApplyPurchaseLineFilters(PurchLine, JobNo, JobTaskNo);
+        Rec.ApplyPurchaseLineFilters(PurchLine, JobNo, JobTaskNo);
     end;
 }
 

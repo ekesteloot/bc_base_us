@@ -1,4 +1,12 @@
-﻿codeunit 5640 "Duplicate Depr. Book"
+﻿namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Setup;
+
+codeunit 5640 "Duplicate Depr. Book"
 {
 
     trigger OnRun()
@@ -172,7 +180,7 @@
             TemplateName := GenJnlLine."Journal Template Name";
             BatchName := GenJnlLine."Journal Batch Name";
             FAGetJnl.JnlName(
-                DeprBook.Code, false, "FA Journal Line FA Posting Type".FromInteger(GenJnlLine."FA Posting Type".AsInteger() - 1),
+                DeprBook.Code, false, Enum::"FA Journal Line FA Posting Type".FromInteger(GenJnlLine."FA Posting Type".AsInteger() - 1),
                 DuplicateInGenJnl, TemplateName, BatchName);
         end;
         if not GenJnlPosting then
@@ -193,7 +201,7 @@
         GenJnlLine."Account Type" := GenJnlLine."Account Type"::"Fixed Asset";
         GenJnlLine."Account No." := FAJnlLine."FA No.";
         GenJnlLine."Depreciation Book Code" := FAJnlLine."Depreciation Book Code";
-        GenJnlLine."FA Posting Type" := "Gen. Journal Line FA Posting Type".FromInteger(FAJnlLine."FA Posting Type".AsInteger() + 1);
+        GenJnlLine."FA Posting Type" := Enum::"Gen. Journal Line FA Posting Type".FromInteger(FAJnlLine."FA Posting Type".AsInteger() + 1);
         GenJnlLine."FA Posting Date" := FAJnlLine."FA Posting Date";
         GenJnlLine."Posting Date" := FAJnlLine."Posting Date";
         if GenJnlLine."Posting Date" = GenJnlLine."FA Posting Date" then
@@ -225,7 +233,7 @@
     local procedure MakeFAJnlLine(var FAJnlLine: Record "FA Journal Line"; var GenJnlLine: Record "Gen. Journal Line")
     begin
         FAJnlLine."Depreciation Book Code" := GenJnlLine."Depreciation Book Code";
-        FAJnlLine."FA Posting Type" := "FA Journal Line FA Posting Type".FromInteger(GenJnlLine."FA Posting Type".AsInteger() - 1);
+        FAJnlLine."FA Posting Type" := Enum::"FA Journal Line FA Posting Type".FromInteger(GenJnlLine."FA Posting Type".AsInteger() - 1);
         FAJnlLine."FA No." := GenJnlLine."Account No.";
         FAJnlLine."FA Posting Date" := GenJnlLine."FA Posting Date";
         FAJnlLine."Posting Date" := GenJnlLine."Posting Date";

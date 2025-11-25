@@ -1,4 +1,24 @@
-﻿table 352 "Default Dimension"
+﻿namespace Microsoft.FinancialMgt.Dimension;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CashFlow.Setup;
+using Microsoft.CRM.Campaign;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.Foundation.Enums;
+using Microsoft.HumanResources.Employee;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Reflection;
+using System.Text;
+
+table 352 "Default Dimension"
 {
     Caption = 'Default Dimension';
     LookupPageID = "Default Dimensions";
@@ -9,14 +29,14 @@
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
 
             trigger OnLookup()
             var
                 TempAllObjWithCaption: Record AllObjWithCaption temporary;
             begin
                 Clear(TempAllObjWithCaption);
-                DimMgt.DefaultDimObjectNoList(TempAllObjWithCaption);
+                DimensionManagement.DefaultDimObjectNoList(TempAllObjWithCaption);
                 if PAGE.RunModal(PAGE::Objects, TempAllObjWithCaption) = ACTION::LookupOK then begin
                     "Table ID" := TempAllObjWithCaption."Object ID";
                     Validate("Table ID");
@@ -28,10 +48,10 @@
                 TempAllObjWithCaption: Record AllObjWithCaption temporary;
             begin
                 CalcFields("Table Caption");
-                DimMgt.DefaultDimObjectNoList(TempAllObjWithCaption);
+                DimensionManagement.DefaultDimObjectNoList(TempAllObjWithCaption);
                 TempAllObjWithCaption."Object Type" := TempAllObjWithCaption."Object Type"::Table;
                 TempAllObjWithCaption."Object ID" := "Table ID";
-                if not TempAllObjWithCaption.Find() then
+                if TempAllObjWithCaption.IsEmpty() then
                     FieldError("Table ID");
             end;
         }
@@ -75,8 +95,8 @@
         field(4; "Dimension Value Code"; Code[20])
         {
             Caption = 'Dimension Value Code';
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"),
-                                                         Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"),
+                                                         Blocked = const(false));
 
             trigger OnValidate()
             begin
@@ -100,8 +120,8 @@
         }
         field(6; "Table Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -120,13 +140,13 @@
             begin
                 case "Parent Type" of
                     "Parent Type"::Customer:
-                        "Table ID" := Database::Customer;
+                        "Table ID" := Enum::TableID::Customer.AsInteger();
                     "Parent Type"::Employee:
-                        "Table ID" := Database::Employee;
+                        "Table ID" := Enum::TableID::Employee.AsInteger();
                     "Parent Type"::Item:
-                        "Table ID" := Database::Item;
+                        "Table ID" := Enum::TableID::Item.AsInteger();
                     "Parent Type"::Vendor:
-                        "Table ID" := Database::Vendor;
+                        "Table ID" := Enum::TableID::Vendor.AsInteger();
                 end;
             end;
         }
@@ -139,7 +159,7 @@
                 DimValuePerAccount: Record "Dim. Value per Account";
             begin
                 TestField("Dimension Code");
-                TestField("Value Posting", "Default Dimension Value Posting Type"::"Code Mandatory");
+                TestField("Value Posting", Enum::"Default Dimension Value Posting Type"::"Code Mandatory");
                 if not IsTemporary() then
                     UpdateDimValuesPerAccountFromAllowedValuesFilter(DimValuePerAccount);
             end;
@@ -148,13 +168,13 @@
         {
             Caption = 'ParentId';
             DataClassification = SystemMetadata;
-            TableRelation = IF ("Table ID" = CONST(15)) "G/L Account".SystemId
-            ELSE
-            IF ("Table ID" = CONST(18)) Customer.SystemId
-            ELSE
-            IF ("Table ID" = CONST(23)) Vendor.SystemId
-            ELSE
-            IF ("Table ID" = CONST(5200)) Employee.SystemId;
+            TableRelation = if ("Table ID" = const(15)) "G/L Account".SystemId
+            else
+            if ("Table ID" = const(18)) Customer.SystemId
+            else
+            if ("Table ID" = const(23)) Vendor.SystemId
+            else
+            if ("Table ID" = const(5200)) Employee.SystemId;
 
             trigger OnValidate()
             begin
@@ -219,6 +239,9 @@
         key(Key2; "Dimension Code")
         {
         }
+        key(Key3; "Parent Type", ParentID)
+        {
+        }
     }
 
     fieldgroups
@@ -231,16 +254,16 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeOnDelete(Rec, DimMgt, IsHandled);
+        OnBeforeOnDelete(Rec, DimensionManagement, IsHandled);
         if IsHandled then
             exit;
 
-        GLSetup.Get();
-        if "Dimension Code" = GLSetup."Global Dimension 1 Code" then
+        GeneralLedgerSetup.Get();
+        if "Dimension Code" = GeneralLedgerSetup."Global Dimension 1 Code" then
             UpdateGlobalDimCode(1, "Table ID", "No.", '');
-        if "Dimension Code" = GLSetup."Global Dimension 2 Code" then
+        if "Dimension Code" = GeneralLedgerSetup."Global Dimension 2 Code" then
             UpdateGlobalDimCode(2, "Table ID", "No.", '');
-        DimMgt.DefaultDimOnDelete(Rec);
+        DimensionManagement.DefaultDimOnDelete(Rec);
 
         DimValuePerAccount.SetRange("Table ID", "Table ID");
         DimValuePerAccount.SetRange("No.", "No.");
@@ -253,16 +276,16 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeOnInsert(Rec, DimMgt, IsHandled);
+        OnBeforeOnInsert(Rec, DimensionManagement, IsHandled);
         if IsHandled then
             exit;
 
-        GLSetup.Get();
-        if "Dimension Code" = GLSetup."Global Dimension 1 Code" then
+        GeneralLedgerSetup.Get();
+        if "Dimension Code" = GeneralLedgerSetup."Global Dimension 1 Code" then
             UpdateGlobalDimCode(1, "Table ID", "No.", "Dimension Value Code");
-        if "Dimension Code" = GLSetup."Global Dimension 2 Code" then
+        if "Dimension Code" = GeneralLedgerSetup."Global Dimension 2 Code" then
             UpdateGlobalDimCode(2, "Table ID", "No.", "Dimension Value Code");
-        DimMgt.DefaultDimOnInsert(Rec);
+        DimensionManagement.DefaultDimOnInsert(Rec);
         UpdateParentId();
         UpdateParentType();
     end;
@@ -272,16 +295,16 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeOnModify(Rec, DimMgt, IsHandled);
+        OnBeforeOnModify(Rec, DimensionManagement, IsHandled);
         if IsHandled then
             exit;
 
-        GLSetup.Get();
-        if "Dimension Code" = GLSetup."Global Dimension 1 Code" then
+        GeneralLedgerSetup.Get();
+        if "Dimension Code" = GeneralLedgerSetup."Global Dimension 1 Code" then
             UpdateGlobalDimCode(1, "Table ID", "No.", "Dimension Value Code");
-        if "Dimension Code" = GLSetup."Global Dimension 2 Code" then
+        if "Dimension Code" = GeneralLedgerSetup."Global Dimension 2 Code" then
             UpdateGlobalDimCode(2, "Table ID", "No.", "Dimension Value Code");
-        DimMgt.DefaultDimOnModify(Rec);
+        DimensionManagement.DefaultDimOnModify(Rec);
     end;
 
     trigger OnRename()
@@ -295,16 +318,16 @@
             exit;
 
         if ("Table ID" <> xRec."Table ID") or ("Dimension Code" <> xRec."Dimension Code") then
-            Error(Text000, TableCaption);
+            Error(CannotRenameErr, TableCaption);
 
         DimValuePerAccount.RenameNo("Table ID", xRec."No.", "No.", "Dimension Code");
     end;
 
     var
-        GLSetup: Record "General Ledger Setup";
-        DimMgt: Codeunit DimensionManagement;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        DimensionManagement: Codeunit DimensionManagement;
 
-        Text000: Label 'You can''t rename a %1.';
+        CannotRenameErr: Label 'You can''t rename a %1.', Comment = '%1 - table caption';
         DimensionIdDoesNotMatchADimensionErr: Label 'The "dimensionId" does not match to a Dimension.', Locked = true;
         DimensionValueIdDoesNotMatchADimensionValueErr: Label 'The "dimensionValueId" does not match to a Dimension Value.', Locked = true;
         DimensionIdMismatchErr: Label 'The "dimensionId" and "dimensionValueId" match to different Dimension records.', Locked = true;
@@ -318,11 +341,11 @@
 
     procedure GetCaption(): Text[250]
     var
-        ObjTransl: Record "Object Translation";
+        ObjectTranslation: Record "Object Translation";
         CurrTableID: Integer;
         NewTableID: Integer;
         NewNo: Code[20];
-        SourceTableName: Text[100];
+        SourceTableName: Text[250];
     begin
         if not Evaluate(NewTableID, GetFilter("Table ID")) then
             exit('');
@@ -335,7 +358,7 @@
                 NewTableID := 0;
 
         if NewTableID <> CurrTableID then
-            SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, NewTableID);
+            SourceTableName := ObjectTranslation.TranslateObject(ObjectTranslation."Object Type"::Table, NewTableID);
         CurrTableID := NewTableID;
 
         if GetFilter("No.") <> '' then
@@ -360,47 +383,47 @@
             exit;
 
         case TableID of
-            DATABASE::"G/L Account":
+            Enum::TableID::"G/L Account".AsInteger():
                 UpdateGLAccGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::Customer:
+            Enum::TableID::Customer.AsInteger():
                 UpdateCustGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::Vendor:
+            Enum::TableID::Vendor.AsInteger():
                 UpdateVendGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::Item:
+            Enum::TableID::Item.AsInteger():
                 UpdateItemGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::"Resource Group":
+            Enum::TableID::"Resource Group".AsInteger():
                 UpdateResGrGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::Resource:
+            Enum::TableID::Resource.AsInteger():
                 UpdateResGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::Job:
+            Enum::TableID::Job.AsInteger():
                 UpdateJobGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::"Bank Account":
+            Enum::TableID::"Bank Account".AsInteger():
                 UpdateBankGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::Employee:
+            Enum::TableID::Employee.AsInteger():
                 UpdateEmpoyeeGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::"Fixed Asset":
+            Enum::TableID::"Fixed Asset".AsInteger():
                 UpdateFAGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::Insurance:
+            Enum::TableID::Insurance.AsInteger():
                 UpdateInsuranceGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::"Responsibility Center":
+            Enum::TableID::"Responsibility Center".AsInteger():
                 UpdateRespCenterGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::"Work Center":
+            Enum::TableID::"Work Center".AsInteger():
                 UpdateWorkCenterGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::"Salesperson/Purchaser":
+            Enum::TableID::"Salesperson/Purchaser".AsInteger():
                 UpdateSalesPurchGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::Campaign:
+            Enum::TableID::Campaign.AsInteger():
                 UpdateCampaignGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::"Cash Flow Manual Expense":
+            Enum::TableID::"Cash Flow Manual Expense".AsInteger():
                 UpdateNeutrPayGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            DATABASE::"Cash Flow Manual Revenue":
+            Enum::TableID::"Cash Flow Manual Revenue".AsInteger():
                 UpdateNeutrRevGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Database::"Vendor Templ.":
+            Enum::TableID::"Vendor Templ.".AsInteger():
                 UpdateVendorTemplGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Database::"Customer Templ.":
+            Enum::TableID::"Customer Templ.".AsInteger():
                 UpdateCustomerTemplGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Database::"Item Templ.":
+            Enum::TableID::"Item Templ.".AsInteger():
                 UpdateItemTemplGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
-            Database::"Employee Templ.":
+            Enum::TableID::"Employee Templ.".AsInteger():
                 UpdateEmployeeTemplGlobalDimCode(GlobalDimCodeNo, AccNo, NewDimValue);
             else
                 OnAfterUpdateGlobalDimCode(GlobalDimCodeNo, TableID, AccNo, NewDimValue);
@@ -409,55 +432,55 @@
 
     local procedure UpdateGLAccGlobalDimCode(GlobalDimCodeNo: Integer; GLAccNo: Code[20]; NewDimValue: Code[20])
     var
-        GLAcc: Record "G/L Account";
+        GLAccount: Record "G/L Account";
     begin
-        if GLAcc.Get(GLAccNo) then begin
+        if GLAccount.Get(GLAccNo) then begin
             case GlobalDimCodeNo of
                 1:
-                    GLAcc."Global Dimension 1 Code" := NewDimValue;
+                    GLAccount."Global Dimension 1 Code" := NewDimValue;
                 2:
-                    GLAcc."Global Dimension 2 Code" := NewDimValue;
+                    GLAccount."Global Dimension 2 Code" := NewDimValue;
                 else
                     OnUpdateGLAccGlobalDimCodeOnCaseElse(GlobalDimCodeNo, GLAccNo, NewDimValue);
             end;
-            OnUpdateGLAccGlobalDimCodeOnBeforeGLAccModify(GLAcc, NewDimValue, GlobalDimCodeNo);
-            GLAcc.Modify(true);
+            OnUpdateGLAccGlobalDimCodeOnBeforeGLAccModify(GLAccount, NewDimValue, GlobalDimCodeNo);
+            GLAccount.Modify(true);
         end;
     end;
 
     local procedure UpdateCustGlobalDimCode(GlobalDimCodeNo: Integer; CustNo: Code[20]; NewDimValue: Code[20])
     var
-        Cust: Record Customer;
+        Customer: Record Customer;
     begin
-        if Cust.Get(CustNo) then begin
+        if Customer.Get(CustNo) then begin
             case GlobalDimCodeNo of
                 1:
-                    Cust."Global Dimension 1 Code" := NewDimValue;
+                    Customer."Global Dimension 1 Code" := NewDimValue;
                 2:
-                    Cust."Global Dimension 2 Code" := NewDimValue;
+                    Customer."Global Dimension 2 Code" := NewDimValue;
                 else
                     OnUpdateCustGlobalDimCodeOnCaseElse(GlobalDimCodeNo, CustNo, NewDimValue);
             end;
-            OnUpdateCustGlobalDimCodeOnBeforeCustModify(Cust, NewDimValue, GlobalDimCodeNo);
-            Cust.Modify(true);
+            OnUpdateCustGlobalDimCodeOnBeforeCustModify(Customer, NewDimValue, GlobalDimCodeNo);
+            Customer.Modify(true);
         end;
     end;
 
     local procedure UpdateVendGlobalDimCode(GlobalDimCodeNo: Integer; VendNo: Code[20]; NewDimValue: Code[20])
     var
-        Vend: Record Vendor;
+        Vendor: Record Vendor;
     begin
-        if Vend.Get(VendNo) then begin
+        if Vendor.Get(VendNo) then begin
             case GlobalDimCodeNo of
                 1:
-                    Vend."Global Dimension 1 Code" := NewDimValue;
+                    Vendor."Global Dimension 1 Code" := NewDimValue;
                 2:
-                    Vend."Global Dimension 2 Code" := NewDimValue;
+                    Vendor."Global Dimension 2 Code" := NewDimValue;
                 else
                     OnUpdateVendGlobalDimCodeOnCaseElse(GlobalDimCodeNo, VendNo, NewDimValue);
             end;
-            OnUpdateVendGlobalDimCodeOnBeforeVendModify(Vend, NewDimValue, GlobalDimCodeNo);
-            Vend.Modify(true);
+            OnUpdateVendGlobalDimCodeOnBeforeVendModify(Vendor, NewDimValue, GlobalDimCodeNo);
+            Vendor.Modify(true);
         end;
     end;
 
@@ -481,37 +504,37 @@
 
     local procedure UpdateResGrGlobalDimCode(GlobalDimCodeNo: Integer; ResGrNo: Code[20]; NewDimValue: Code[20])
     var
-        ResGr: Record "Resource Group";
+        ResourceGroup: Record "Resource Group";
     begin
-        if ResGr.Get(ResGrNo) then begin
+        if ResourceGroup.Get(ResGrNo) then begin
             case GlobalDimCodeNo of
                 1:
-                    ResGr."Global Dimension 1 Code" := NewDimValue;
+                    ResourceGroup."Global Dimension 1 Code" := NewDimValue;
                 2:
-                    ResGr."Global Dimension 2 Code" := NewDimValue;
+                    ResourceGroup."Global Dimension 2 Code" := NewDimValue;
                 else
                     OnUpdateResGrGlobalDimCodeOnCaseElse(GlobalDimCodeNo, ResGrNo, NewDimValue);
             end;
-            OnUpdateResGrGlobalDimCodeOnBeforeResGrModify(ResGr, NewDimValue, GlobalDimCodeNo);
-            ResGr.Modify(true);
+            OnUpdateResGrGlobalDimCodeOnBeforeResGrModify(ResourceGroup, NewDimValue, GlobalDimCodeNo);
+            ResourceGroup.Modify(true);
         end;
     end;
 
     local procedure UpdateResGlobalDimCode(GlobalDimCodeNo: Integer; ResNo: Code[20]; NewDimValue: Code[20])
     var
-        Res: Record Resource;
+        Resource: Record Resource;
     begin
-        if Res.Get(ResNo) then begin
+        if Resource.Get(ResNo) then begin
             case GlobalDimCodeNo of
                 1:
-                    Res."Global Dimension 1 Code" := NewDimValue;
+                    Resource."Global Dimension 1 Code" := NewDimValue;
                 2:
-                    Res."Global Dimension 2 Code" := NewDimValue;
+                    Resource."Global Dimension 2 Code" := NewDimValue;
                 else
                     OnUpdateResGlobalDimCodeCaseElse(GlobalDimCodeNo, ResNo, NewDimValue);
             end;
-            OnUpdateResGlobalDimCodeOnBeforeResModify(Res, NewDimValue, GlobalDimCodeNo);
-            Res.Modify(true);
+            OnUpdateResGlobalDimCodeOnBeforeResModify(Resource, NewDimValue, GlobalDimCodeNo);
+            Resource.Modify(true);
         end;
     end;
 
@@ -535,19 +558,19 @@
 
     local procedure UpdateBankGlobalDimCode(GlobalDimCodeNo: Integer; BankAccNo: Code[20]; NewDimValue: Code[20])
     var
-        BankAcc: Record "Bank Account";
+        BankAccount: Record "Bank Account";
     begin
-        if BankAcc.Get(BankAccNo) then begin
+        if BankAccount.Get(BankAccNo) then begin
             case GlobalDimCodeNo of
                 1:
-                    BankAcc."Global Dimension 1 Code" := NewDimValue;
+                    BankAccount."Global Dimension 1 Code" := NewDimValue;
                 2:
-                    BankAcc."Global Dimension 2 Code" := NewDimValue;
+                    BankAccount."Global Dimension 2 Code" := NewDimValue;
                 else
                     OnUpdateBankGlobalDimCodeCaseElse(GlobalDimCodeNo, BankAccNo, NewDimValue);
             end;
-            OnUpdateBankGlobalDimCodeOnBeforeBankModify(BankAcc, NewDimValue, GlobalDimCodeNo);
-            BankAcc.Modify(true);
+            OnUpdateBankGlobalDimCodeOnBeforeBankModify(BankAccount, NewDimValue, GlobalDimCodeNo);
+            BankAccount.Modify(true);
         end;
     end;
 
@@ -571,19 +594,19 @@
 
     local procedure UpdateFAGlobalDimCode(GlobalDimCodeNo: Integer; FANo: Code[20]; NewDimValue: Code[20])
     var
-        FA: Record "Fixed Asset";
+        FixedAsset: Record "Fixed Asset";
     begin
-        if FA.Get(FANo) then begin
+        if FixedAsset.Get(FANo) then begin
             case GlobalDimCodeNo of
                 1:
-                    FA."Global Dimension 1 Code" := NewDimValue;
+                    FixedAsset."Global Dimension 1 Code" := NewDimValue;
                 2:
-                    FA."Global Dimension 2 Code" := NewDimValue;
+                    FixedAsset."Global Dimension 2 Code" := NewDimValue;
                 else
                     OnUpdateFAGlobalDimCodeCaseElse(GlobalDimCodeNo, FANo, NewDimValue);
             end;
-            OnUpdateFAGlobalDimCodeOnBeforeFAModify(FA, NewDimValue, GlobalDimCodeNo);
-            FA.Modify(true);
+            OnUpdateFAGlobalDimCodeOnBeforeFAModify(FixedAsset, NewDimValue, GlobalDimCodeNo);
+            FixedAsset.Modify(true);
         end;
     end;
 
@@ -607,19 +630,19 @@
 
     local procedure UpdateRespCenterGlobalDimCode(GlobalDimCodeNo: Integer; RespCenterNo: Code[20]; NewDimValue: Code[20])
     var
-        RespCenter: Record "Responsibility Center";
+        ResponsibilityCenter: Record "Responsibility Center";
     begin
-        if RespCenter.Get(RespCenterNo) then begin
+        if ResponsibilityCenter.Get(RespCenterNo) then begin
             case GlobalDimCodeNo of
                 1:
-                    RespCenter."Global Dimension 1 Code" := NewDimValue;
+                    ResponsibilityCenter."Global Dimension 1 Code" := NewDimValue;
                 2:
-                    RespCenter."Global Dimension 2 Code" := NewDimValue;
+                    ResponsibilityCenter."Global Dimension 2 Code" := NewDimValue;
                 else
                     OnUpdateRespCenterGlobalDimCodeCaseElse(GlobalDimCodeNo, RespCenterNo, NewDimValue);
             end;
-            OnUpdateRespCenterGlobalDimCodeOnBeforeRespCenterModify(RespCenter, NewDimValue, GlobalDimCodeNo);
-            RespCenter.Modify(true);
+            OnUpdateRespCenterGlobalDimCodeOnBeforeRespCenterModify(ResponsibilityCenter, NewDimValue, GlobalDimCodeNo);
+            ResponsibilityCenter.Modify(true);
         end;
     end;
 
@@ -676,35 +699,35 @@
 
     local procedure UpdateNeutrPayGlobalDimCode(GlobalDimCodeNo: Integer; CFManualExpenseNo: Code[20]; NewDimValue: Code[20])
     var
-        CFManualExpense: Record "Cash Flow Manual Expense";
+        CashFlowManualExpense: Record "Cash Flow Manual Expense";
     begin
-        if CFManualExpense.Get(CFManualExpenseNo) then begin
+        if CashFlowManualExpense.Get(CFManualExpenseNo) then begin
             case GlobalDimCodeNo of
                 1:
-                    CFManualExpense."Global Dimension 1 Code" := NewDimValue;
+                    CashFlowManualExpense."Global Dimension 1 Code" := NewDimValue;
                 2:
-                    CFManualExpense."Global Dimension 2 Code" := NewDimValue;
+                    CashFlowManualExpense."Global Dimension 2 Code" := NewDimValue;
                 else
                     OnUpdateNeutrPayGlobalDimCodeCaseElse(GlobalDimCodeNo, CFManualExpenseNo, NewDimValue);
             end;
-            CFManualExpense.Modify(true);
+            CashFlowManualExpense.Modify(true);
         end;
     end;
 
     local procedure UpdateNeutrRevGlobalDimCode(GlobalDimCodeNo: Integer; CFManualRevenueNo: Code[20]; NewDimValue: Code[20])
     var
-        CFManualRevenue: Record "Cash Flow Manual Revenue";
+        CashFlowManualRevenue: Record "Cash Flow Manual Revenue";
     begin
-        if CFManualRevenue.Get(CFManualRevenueNo) then begin
+        if CashFlowManualRevenue.Get(CFManualRevenueNo) then begin
             case GlobalDimCodeNo of
                 1:
-                    CFManualRevenue."Global Dimension 1 Code" := NewDimValue;
+                    CashFlowManualRevenue."Global Dimension 1 Code" := NewDimValue;
                 2:
-                    CFManualRevenue."Global Dimension 2 Code" := NewDimValue;
+                    CashFlowManualRevenue."Global Dimension 2 Code" := NewDimValue;
                 else
                     OnUpdateNeutrRevGlobalDimCodeCaseElse(GlobalDimCodeNo, CFManualRevenueNo, NewDimValue);
             end;
-            CFManualRevenue.Modify(true);
+            CashFlowManualRevenue.Modify(true);
         end;
     end;
 
@@ -715,14 +738,14 @@
 
     local procedure CheckDimension(DimensionCode: Code[20])
     begin
-        if not DimMgt.CheckDim(DimensionCode) then
-            Error(DimMgt.GetDimErr());
+        if not DimensionManagement.CheckDim(DimensionCode) then
+            Error(DimensionManagement.GetDimErr());
     end;
 
     local procedure CheckDimensionValue(DimensionCode: Code[20]; DimensionValueCode: Code[20])
     begin
-        if not DimMgt.CheckDimValue(DimensionCode, DimensionValueCode) then
-            Error(DimMgt.GetDimErr());
+        if not DimensionManagement.CheckDimValue(DimensionCode, DimensionValueCode) then
+            Error(DimensionManagement.GetDimErr());
         if "Value Posting" = "Value Posting"::"No Code" then
             TestField("Dimension Value Code", '');
         CheckDimensionValueAllowedForAccount();
@@ -734,7 +757,7 @@
     begin
         if DimValuePerAccount.Get("Table ID", "No.", "Dimension Code", "Dimension Value Code") then
             if not DimValuePerAccount.Allowed then
-                Error(DimMgt.GetNotAllowedDimValuePerAccount(Rec, "Dimension Value Code"));
+                Error(DimensionManagement.GetNotAllowedDimValuePerAccount(Rec, "Dimension Value Code"));
     end;
 
     procedure ClearAllowedValuesFilter(var DimValuePerAccount: Record "Dim. Value per Account")
@@ -749,13 +772,13 @@
             end;
         end;
     end;
-
+#if not CLEAN23
     [Obsolete('Replaced by CreateDimValuePerAccountFromDimValue(DimValue: Record "Dimension Value"; Allowed: Boolean)', '22.0')]
     procedure CreateDimValuePerAccountFromDimValue(DimValue: Record "Dimension Value")
     begin
         CreateDimValuePerAccountFromDimValue(DimValue, false);
     end;
-
+#endif
     procedure CreateDimValuePerAccountFromDimValue(DimValue: Record "Dimension Value"; ShouldUpdateAllowed: Boolean)
     var
         DimValuePerAccount: Record "Dim. Value per Account";
@@ -777,7 +800,7 @@
         TempDimValuePerAccount: Record "Dim. Value per Account" temporary;
     begin
         TempDimValuePerAccount := DimValuePerAccount;
-        TempDimValuePerAccount.Insert;
+        TempDimValuePerAccount.Insert();
 
         TempDimValuePerAccount.SetRange("Table ID", DimValuePerAccount."Table ID");
         TempDimValuePerAccount.SetRange("No.", DimValuePerAccount."No.");
@@ -798,7 +821,7 @@
             exit;
         end;
 
-        DimMgt.SyncDimValuePerAccountWithDimValues(Rec);
+        DimensionManagement.SyncDimValuePerAccountWithDimValues(Rec);
 
         CheckDimensionValuesInFilter();
 
@@ -873,7 +896,7 @@
         DimValuePerAccount.Setrange(Allowed, false);
         if DimValuePerAccount.IsEmpty() then
             exit('');
-        DimMgt.CheckIfNoAllowedValuesSelected(DimValuePerAccount);
+        DimensionManagement.CheckIfNoAllowedValuesSelected(DimValuePerAccount);
         RecRef.GetTable(DimValuePerAccount);
         exit(SelectionFilterMgt.GetSelectionFilter(RecRef, DimValuePerAccount.FieldNo("Dimension Value Code")));
     end;
@@ -937,25 +960,25 @@
         ParentRecordRefId := ParentRecordRef.RecordId;
 
         case ParentRecordRefId.TableNo of
-            DATABASE::Item:
+            Enum::TableID::Item.AsInteger():
                 begin
                     Item.Get(ParentRecordRefId);
                     "No." := Item."No.";
                     "Parent Type" := "Parent Type"::Item;
                 end;
-            DATABASE::Customer:
+            Enum::TableID::Customer.AsInteger():
                 begin
                     Customer.Get(ParentRecordRefId);
                     "No." := Customer."No.";
                     "Parent Type" := "Parent Type"::Customer;
                 end;
-            DATABASE::Vendor:
+            Enum::TableID::Vendor.AsInteger():
                 begin
                     Vendor.Get(ParentRecordRefId);
                     "No." := Vendor."No.";
                     "Parent Type" := "Parent Type"::Vendor;
                 end;
-            DATABASE::Employee:
+            Enum::TableID::Employee.AsInteger():
                 begin
                     Employee.Get(ParentRecordRefId);
                     "No." := Employee."No.";
@@ -1014,13 +1037,13 @@
         NewParentType: Enum "Default Dimension Parent Type";
     begin
         case "Table ID" of
-            DATABASE::Item:
+            Enum::TableID::Item.AsInteger():
                 NewParentType := "Parent Type"::Item;
-            DATABASE::Customer:
+            Enum::TableID::Customer.AsInteger():
                 NewParentType := "Parent Type"::Customer;
-            DATABASE::Vendor:
+            Enum::TableID::Vendor.AsInteger():
                 NewParentType := "Parent Type"::Vendor;
-            DATABASE::Employee:
+            Enum::TableID::Employee.AsInteger():
                 NewParentType := "Parent Type"::Employee;
             else
                 NewParentType := "Parent Type"::" ";
@@ -1042,16 +1065,16 @@
         NewParentId: Guid;
     begin
         case "Table ID" of
-            DATABASE::Item:
+            Enum::TableID::Item.AsInteger():
                 if Item.Get("No.") then
                     NewParentId := Item.SystemId;
-            DATABASE::Customer:
+            Enum::TableID::Customer.AsInteger():
                 if Customer.Get("No.") then
                     NewParentId := Customer.SystemId;
-            DATABASE::Vendor:
+            Enum::TableID::Vendor.AsInteger():
                 if Vendor.Get("No.") then
                     NewParentId := Vendor.SystemId;
-            DATABASE::Employee:
+            Enum::TableID::Employee.AsInteger():
                 if Employee.Get("No.") then
                     NewParentId := Employee.SystemId;
         end;
@@ -1124,7 +1147,7 @@
         AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
         AllObjWithCaption.SetRange("Object ID", TableID);
         if AllObjWithCaption.FindFirst() then;
-        Error(StrSubstNo(RequestedRecordIsNotSupportedErr, AllObjWithCaption."Object Caption"));
+        Error(RequestedRecordIsNotSupportedErr, AllObjWithCaption."Object Caption");
     end;
 
     local procedure UpdateVendorTemplGlobalDimCode(GlobalDimCodeNo: Integer; VendorTemplCode: Code[20]; NewDimValue: Code[20])

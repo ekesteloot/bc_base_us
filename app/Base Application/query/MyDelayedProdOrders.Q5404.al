@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 query 5404 "My Delayed Prod. Orders"
 {
     Caption = 'My Delayed Prod. Orders';
@@ -12,7 +16,7 @@ query 5404 "My Delayed Prod. Orders"
             dataitem(Prod_Order_Line; "Prod. Order Line")
             {
                 DataItemLink = "Item No." = My_Item."Item No.";
-                DataItemTableFilter = Status = FILTER(Planned | "Firm Planned" | Released);
+                DataItemTableFilter = Status = filter(Planned | "Firm Planned" | Released);
                 column(Item_No; "Item No.")
                 {
                 }

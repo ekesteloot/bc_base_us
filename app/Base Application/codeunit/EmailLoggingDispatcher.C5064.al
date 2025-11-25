@@ -1,4 +1,14 @@
 #if not CLEAN22
+namespace Microsoft.CRM.Outlook;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using System;
+using System.Integration;
+using System.Threading;
+
 codeunit 5064 "Email Logging Dispatcher"
 {
     TableNo = "Job Queue Entry";

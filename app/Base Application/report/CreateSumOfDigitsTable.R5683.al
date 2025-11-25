@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 report 5683 "Create Sum of Digits Table"
 {
     Caption = 'Create Sum of Digits Table';

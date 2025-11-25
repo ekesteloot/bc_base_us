@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System;
+
 codeunit 8626 "Config. Import Table in Backgr"
 {
     TableNo = "Parallel Session Entry";
@@ -12,11 +16,11 @@ codeunit 8626 "Config. Import Table in Backgr"
         nodetext: Text;
         PackageCode: Code[20];
     begin
-        PackageCode := CopyStr(Parameter, 1, MaxStrLen(PackageCode));
+        PackageCode := CopyStr(Rec.Parameter, 1, MaxStrLen(PackageCode));
         if PackageCode = '' then
             exit;
 
-        if not MemoryMappedFile.OpenMemoryMappedFile(Format(ID)) then
+        if not MemoryMappedFile.OpenMemoryMappedFile(Format(Rec.ID)) then
             exit;
         MemoryMappedFile.ReadTextWithSeparatorsFromMemoryMappedFile(nodetext);
         MemoryMappedFile.Dispose();

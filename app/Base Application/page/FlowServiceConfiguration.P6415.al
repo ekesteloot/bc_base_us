@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 6415 "Flow Service Configuration"
 {
     Caption = 'Power Automate Service Configuration';
@@ -34,10 +36,10 @@ page 6415 "Flow Service Configuration"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

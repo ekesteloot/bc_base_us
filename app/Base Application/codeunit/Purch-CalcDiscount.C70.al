@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+
+
 codeunit 70 "Purch.-Calc.Discount"
 {
     Permissions = tabledata "Purchase Header" = rm,
@@ -11,11 +19,11 @@ codeunit 70 "Purch.-Calc.Discount"
     begin
         PurchLine.Copy(Rec);
 
-        TempPurchHeader.Get("Document Type", "Document No.");
+        TempPurchHeader.Get(Rec."Document Type", Rec."Document No.");
         UpdateHeader := true;
         CalculateInvoiceDiscount(TempPurchHeader, TempPurchLine);
 
-        if Get(PurchLine."Document Type", PurchLine."Document No.", PurchLine."Line No.") then;
+        if Rec.Get(PurchLine."Document Type", PurchLine."Document No.", PurchLine."Line No.") then;
     end;
 
     var
@@ -57,7 +65,8 @@ codeunit 70 "Purch.-Calc.Discount"
             PurchLine2.SetRange("System-Created Entry", true);
             PurchLine2.SetRange(Type, PurchLine2.Type::"G/L Account");
             PurchLine2.SetRange("No.", VendPostingGr."Service Charge Acc.");
-            if PurchLine2.FindSet(true, false) then
+            PurchLine2.SetLoadFields("Unit Cost", "Receipt No.", "Qty. Rcd. Not Invoiced (Base)");
+            if PurchLine2.FindSet(true) then
                 repeat
                     PurchLine2."Direct Unit Cost" := 0;
                     PurchLine2.Modify();
@@ -66,11 +75,12 @@ codeunit 70 "Purch.-Calc.Discount"
                 until PurchLine2.Next() = 0;
 
             PurchLine2.Reset();
+            PurchLine2.SetLoadFields();
             PurchLine2.SetRange("Document Type", "Document Type");
             PurchLine2.SetRange("Document No.", "Document No.");
             PurchLine2.SetFilter(Type, '<>0');
             OnCalculateInvoiceDiscountOnBeforeFindForCalcVATAmountLines(PurchHeader, PurchLine2, UpdateHeader);
-            if PurchLine2.Find('-') then;
+            if PurchLine2.FindFirst() then;
             PurchLine2.CalcVATAmountLines(0, PurchHeader, PurchLine2, TempVATAmountLine);
             InvDiscBase :=
               TempVATAmountLine.GetTotalInvDiscBaseAmount(
@@ -111,7 +121,7 @@ codeunit 70 "Purch.-Calc.Discount"
                     PurchLine2.Reset();
                     PurchLine2.SetRange("Document Type", "Document Type");
                     PurchLine2.SetRange("Document No.", "Document No.");
-                    PurchLine2.Find('+');
+                    PurchLine2.FindLast();
                     PurchLine2.Init();
                     if not UpdateHeader then
                         PurchLine2.SetPurchHeader(PurchHeader);
@@ -141,7 +151,7 @@ codeunit 70 "Purch.-Calc.Discount"
                 end;
                 PurchLine2.CalcVATAmountLines(0, PurchHeader, PurchLine2, TempVATAmountLine);
             end else
-                if TempServiceChargeLine.FindSet(false, false) then
+                if TempServiceChargeLine.FindSet(false) then
                     repeat
                         if (TempServiceChargeLine."Receipt No." = '') and (TempServiceChargeLine."Qty. Rcd. Not Invoiced (Base)" = 0) then begin
                             PurchLine2 := TempServiceChargeLine;
@@ -241,6 +251,7 @@ codeunit 70 "Purch.-Calc.Discount"
             with PurchaseLine do begin
                 SetRange("Document Type", PurchaseHeader."Document Type");
                 SetRange("Document No.", PurchaseHeader."No.");
+                SetLoadFields(Type, Quantity, "Direct Unit Cost", "Qty. to Invoice", "Prepayment %", "Prepmt. Line Amount", Amount);
                 if FindSet(true) then
                     repeat
                         if not ZeroAmountLine(0) and ("Prepayment %" = PurchaseHeader."Prepayment %") then begin

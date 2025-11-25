@@ -1,7 +1,11 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.HumanResources.Employee;
+
 report 5208 "Employee - Relatives"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeRelatives.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeRelatives.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee Relatives';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5208 "Employee - Relatives"
     {
         dataitem("Employee Relative"; "Employee Relative")
         {
-            DataItemTableView = SORTING("Employee No.", "Line No.");
+            DataItemTableView = sorting("Employee No.", "Line No.");
             RequestFilterFields = "Employee No.", "Relative Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

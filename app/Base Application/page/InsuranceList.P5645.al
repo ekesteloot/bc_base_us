@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Comment;
+
 page 5645 "Insurance List"
 {
     ApplicationArea = FixedAssets;
@@ -89,9 +94,9 @@ page 5645 "Insurance List"
                     Caption = 'Coverage Ledger E&ntries';
                     Image = GeneralLedger;
                     RunObject = Page "Ins. Coverage Ledger Entries";
-                    RunPageLink = "Insurance No." = FIELD("No.");
-                    RunPageView = SORTING("Insurance No.", "Disposed FA", "Posting Date")
-                                  WHERE("Disposed FA" = FILTER(false | true));
+                    RunPageLink = "Insurance No." = field("No.");
+                    RunPageView = sorting("Insurance No.", "Disposed FA", "Posting Date")
+                                  where("Disposed FA" = filter(false | true));
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View insurance ledger entries that were created when you post to an insurance account from a purchase invoice, credit memo or journal line.';
                 }
@@ -101,8 +106,8 @@ page 5645 "Insurance List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Insurance),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Insurance),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 group(Dimensions)
@@ -115,8 +120,8 @@ page 5645 "Insurance List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(5628),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(5628),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -134,7 +139,7 @@ page 5645 "Insurance List"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(Insurance);
-                            DefaultDimMultiple.SetMultiRecord(Insurance, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(Insurance, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -148,7 +153,7 @@ page 5645 "Insurance List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Insurance Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View detailed historical information about the fixed asset.';
                 }

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Segment;
+
 page 5142 "Save Segment Criteria"
 {
     Caption = 'Save Segment Criteria';

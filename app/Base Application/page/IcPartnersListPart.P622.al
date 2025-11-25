@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Partner;
+
 page 622 "IC Partners List Part"
 {
     ApplicationArea = Intercompany;

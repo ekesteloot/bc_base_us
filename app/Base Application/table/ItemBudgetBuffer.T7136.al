@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 7136 "Item Budget Buffer"
 {
     Caption = 'Item Budget Buffer';
@@ -20,11 +29,11 @@ table 7136 "Item Budget Buffer"
         {
             Caption = 'Source No.';
             DataClassification = SystemMetadata;
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type" = CONST(Item)) Item;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor
+            else
+            if ("Source Type" = const(Item)) Item;
         }
         field(4; "Location Code"; Code[10])
         {
@@ -37,14 +46,14 @@ table 7136 "Item Budget Buffer"
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(6; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(7; "Budget Dimension 1 Code"; Code[20])
         {

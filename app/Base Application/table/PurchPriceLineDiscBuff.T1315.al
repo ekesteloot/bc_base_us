@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Pricing;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.InventoryMgt.Item;
+
 table 1315 "Purch. Price Line Disc. Buff."
 {
     Caption = 'Purch. Price Line Disc. Buff.';
@@ -6,7 +11,7 @@ table 1315 "Purch. Price Line Disc. Buff."
     ObsoleteTag = '16.0';
 #else
     ObsoleteState = Removed;
-    ObsoleteTag = '22.0';
+    ObsoleteTag = '24.0';
 #endif    
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price Worksheet Line';
 
@@ -33,7 +38,7 @@ table 1315 "Purch. Price Line Disc. Buff."
         }
         field(6; "Direct Unit Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Direct Unit Cost';
             DataClassification = SystemMetadata;

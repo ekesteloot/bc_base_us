@@ -89,7 +89,7 @@ report 742 "VAT Report Request Page"
                         ShowMandatory = true;
                         ToolTip = 'Specifies whether to include VAT entries only from the specified period, or also from previous periods within the specified year.';
                     }
-                    field(VATStatementTemplate; "Statement Template Name")
+                    field(VATStatementTemplate; Rec."Statement Template Name")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'VAT Statement Template';
@@ -97,13 +97,13 @@ report 742 "VAT Report Request Page"
                         TableRelation = "VAT Statement Template";
                         ToolTip = 'Specifies the VAT Statement to generate the VAT report.';
                     }
-                    field(VATStatementName; "Statement Name")
+                    field(VATStatementName; Rec."Statement Name")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'VAT Statement Name';
                         LookupPageID = "VAT Statement Names";
                         ShowMandatory = true;
-                        TableRelation = "VAT Statement Name".Name WHERE("Statement Template Name" = FIELD("Statement Template Name"));
+                        TableRelation = "VAT Statement Name".Name where("Statement Template Name" = field("Statement Template Name"));
                         ToolTip = 'Specifies the VAT Statement to generate the VAT report.';
                     }
                     field("Period Year"; Rec."Period Year")
@@ -160,23 +160,23 @@ report 742 "VAT Report Request Page"
             VATStatementTemplate: Record "VAT Statement Template";
             VATStatementName: Record "VAT Statement Name";
         begin
-            CopyFilters("VAT Report Header");
-            FindFirst();
+            Rec.CopyFilters("VAT Report Header");
+            Rec.FindFirst();
 
             if VATStatementTemplate.Count = 1 then begin
                 VATStatementTemplate.FindFirst();
-                "Statement Template Name" := VATStatementTemplate.Name;
-                Modify();
+                Rec."Statement Template Name" := VATStatementTemplate.Name;
+                Rec.Modify();
 
                 VATStatementName.SetRange("Statement Template Name", VATStatementTemplate.Name);
                 if VATStatementName.Count = 1 then begin
                     VATStatementName.FindFirst();
-                    "Statement Name" := VATStatementName.Name;
-                    Modify();
+                    Rec."Statement Name" := VATStatementName.Name;
+                    Rec.Modify();
                 end;
             end;
 
-            PeriodIsEditable := "Return Period No." = '';
+            PeriodIsEditable := Rec."Return Period No." = '';
             OnAfterSetPeriodIsEditable(Rec, PeriodIsEditable);
         end;
     }
@@ -188,7 +188,6 @@ report 742 "VAT Report Request Page"
     var
         Selection: Enum "VAT Statement Report Selection";
         PeriodSelection: Enum "VAT Statement Report Period Selection";
-        [InDataSet]
         PeriodIsEditable: Boolean;
 
     [IntegrationEvent(false, false)]

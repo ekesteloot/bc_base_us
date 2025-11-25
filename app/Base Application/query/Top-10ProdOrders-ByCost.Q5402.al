@@ -8,7 +8,7 @@ query 5402 "Top-10 Prod. Orders - by Cost"
     {
         dataitem(Prod_Order_Line; "Prod. Order Line")
         {
-            DataItemTableFilter = Status = FILTER(Planned | "Firm Planned" | Released);
+            DataItemTableFilter = Status = filter(Planned | "Firm Planned" | Released);
             column(Item_No; "Item No.")
             {
             }

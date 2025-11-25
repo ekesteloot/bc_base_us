@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 enum 9842 "User Grp. Migration Guide Page"
 {
     Extensible = true;

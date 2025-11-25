@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 7152 "Item Analysis View Filter"
 {
     Caption = 'Item Analysis View Filter';

@@ -1,3 +1,8 @@
+﻿namespace System.Tooling;
+
+using System;
+using System.Reflection;
+
 page 9621 "Add Page Fields"
 {
     Caption = 'New Field';

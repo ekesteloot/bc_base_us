@@ -1,3 +1,11 @@
+﻿namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using System.Utilities;
+
 codeunit 7153 "Item Analysis Management"
 {
 
@@ -54,19 +62,19 @@ codeunit 7153 "Item Analysis Management"
 
         case DimCode of
             Item.TableCaption():
-                exit("Item Analysis Dimension Type"::Item);
+                exit(Enum::"Item Analysis Dimension Type"::Item);
             Text000:
-                exit("Item Analysis Dimension Type"::Period);
+                exit(Enum::"Item Analysis Dimension Type"::Period);
             Location.TableCaption():
-                exit("Item Analysis Dimension Type"::Location);
+                exit(Enum::"Item Analysis Dimension Type"::Location);
             ItemAnalysisView."Dimension 1 Code":
-                exit("Item Analysis Dimension Type"::"Dimension 1");
+                exit(Enum::"Item Analysis Dimension Type"::"Dimension 1");
             ItemAnalysisView."Dimension 2 Code":
-                exit("Item Analysis Dimension Type"::"Dimension 2");
+                exit(Enum::"Item Analysis Dimension Type"::"Dimension 2");
             ItemAnalysisView."Dimension 3 Code":
-                exit("Item Analysis Dimension Type"::"Dimension 3");
+                exit(Enum::"Item Analysis Dimension Type"::"Dimension 3");
             else
-                exit("Item Analysis Dimension Type"::Undefined);
+                exit(Enum::"Item Analysis Dimension Type"::Undefined);
         end;
     end;
 
@@ -433,17 +441,6 @@ codeunit 7153 "Item Analysis Management"
         exit(OldDimSelCode);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by ValidateLineDimTypeAndCode', '20.0')]
-    procedure ValidateLineDimCode(ItemAnalysisView: Record "Item Analysis View"; var LineDimCode: Text[30]; var LineDimOption: Option Item,Period,Location,"Dimension 1","Dimension 2","Dimension 3"; ColumnDimOption: Option Item,Period,Location,"Dimension 1","Dimension 2","Dimension 3"; var InternalDateFilter: Text; var DateFilter: Text; var ItemStatisticsBuffer: Record "Item Statistics Buffer"; var PeriodInitialized: Boolean)
-    begin
-        ValidateLineDimTypeAndCode(
-            ItemAnalysisView,
-            LineDimCode, LineDimOption, "Item Analysis Dimension Type".FromInteger(ColumnDimOption),
-            InternalDateFilter, DateFilter, ItemStatisticsBuffer, PeriodInitialized);
-    end;
-#endif
-
     procedure ValidateLineDimTypeAndCode(ItemAnalysisView: Record "Item Analysis View"; var LineDimCode: Text[30]; var LineDimType: Enum "Item Analysis Dimension Type"; ColumnDimType: Enum "Item Analysis Dimension Type"; var InternalDateFilter: Text; var DateFilter: Text; var ItemStatisticsBuffer: Record "Item Statistics Buffer"; var PeriodInitialized: Boolean)
     begin
         if DimCodeNotAllowed(LineDimCode, ItemAnalysisView) then begin
@@ -678,20 +675,6 @@ codeunit 7153 "Item Analysis Management"
                 end;
         end;
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by CalculateAmount()', '20.0')]
-    procedure CalcAmount(ValueType: Option "Sales Amount","Cost Amount",Quantity; SetColumnFilter: Boolean; CurrentAnalysisArea: Option; var ItemStatisticsBuffer: Record "Item Statistics Buffer"; CurrentItemAnalysisViewCode: Code[10]; ItemFilter: Code[250]; LocationFilter: Code[250]; DateFilter: Text[30]; BudgetFilter: Code[250]; Dim1Filter: Code[250]; Dim2Filter: Code[250]; Dim3Filter: Code[250]; LineDimOption: Option Item,Period,Location,"Dimension 1","Dimension 2","Dimension 3"; LineDimCodeBuf: Record "Dimension Code Buffer"; ColDimOption: Option Item,Period,Location,"Dimension 1","Dimension 2","Dimension 3"; ColDimCodeBuf: Record "Dimension Code Buffer"; ShowActualBudget: Option "Actual Amounts","Budgeted Amounts",Variance,"Variance%","Index%"): Decimal
-    begin
-        CalculateAmount(
-            "Item Analysis Value Type".FromInteger(ValueType), SetColumnFilter,
-            "Analysis Area Type".FromInteger(CurrentAnalysisArea), ItemStatisticsBuffer, CurrentItemAnalysisViewCode,
-            ItemFilter, LocationFilter, DateFilter, BudgetFilter, Dim1Filter, Dim2Filter, Dim3Filter,
-            "Item Analysis Dimension Type".FromInteger(LineDimOption), LineDimCodeBuf,
-            "Item Analysis Dimension Type".FromInteger(ColDimOption), ColDimCodeBuf,
-            "Item Analysis Show Type".FromInteger(ShowActualBudget));
-    end;
-#endif
 
     procedure CalculateAmount(ValueType: Enum "Item Analysis Value Type"; SetColumnFilter: Boolean; CurrentAnalysisArea: Enum "Analysis Area Type"; var ItemStatisticsBuffer: Record "Item Statistics Buffer"; CurrentItemAnalysisViewCode: Code[10]; ItemFilter: Code[250]; LocationFilter: Code[250]; DateFilter: Text[30]; BudgetFilter: Code[250]; Dim1Filter: Code[250]; Dim2Filter: Code[250]; Dim3Filter: Code[250]; LineDimType: Enum "Item Analysis Dimension Type"; LineDimCodeBuf: Record "Dimension Code Buffer"; ColDimType: Enum "Item Analysis Dimension Type"; ColDimCodeBuf: Record "Dimension Code Buffer"; ShowActualBudget: Enum "Item Analysis Show Type"): Decimal
     var

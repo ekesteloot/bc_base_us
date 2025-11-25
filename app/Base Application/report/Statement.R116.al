@@ -1,14 +1,28 @@
+﻿namespace Microsoft.Sales.Customer;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 116 Statement
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/Statement.rdlc';
+    RDLCLayout = './Sales/Customer/Statement.rdlc';
     Caption = 'Statement';
 
     dataset
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Name", "Print Statements", "Currency Filter";
             column(No_Cust; "No.")
@@ -16,7 +30,7 @@ report 116 Statement
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 PrintOnlyIfDetail = true;
                 column(CompanyInfo1Picture; CompanyInfo1.Picture)
                 {
@@ -173,11 +187,11 @@ report 116 Statement
                 }
                 dataitem(CurrencyLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     PrintOnlyIfDetail = true;
                     dataitem(CustLedgEntryHdr; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Currency2Code_CustLedgEntryHdr; StrSubstNo(Text001Lbl, CurrencyCode3))
                         {
                         }
@@ -206,7 +220,7 @@ report 116 Statement
                         }
                         dataitem("Detailed Cust. Ledg. Entry"; "Detailed Cust. Ledg. Entry")
                         {
-                            DataItemTableView = SORTING("Customer No.", "Posting Date", "Entry Type", "Currency Code");
+                            DataItemTableView = sorting("Customer No.", "Posting Date", "Entry Type", "Currency Code");
                             column(PostDate_DtldCustLedgEntries; Format("Posting Date"))
                             {
                             }
@@ -324,7 +338,7 @@ report 116 Statement
                     }
                     dataitem(CustLedgEntryFooter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(CurrencyCode3_CustLedgEntryFooter; CurrencyCode3)
                         {
                         }
@@ -347,9 +361,9 @@ report 116 Statement
                     }
                     dataitem(CustLedgEntry2; "Cust. Ledger Entry")
                     {
-                        DataItemLink = "Customer No." = FIELD("No.");
+                        DataItemLink = "Customer No." = field("No.");
                         DataItemLinkReference = Customer;
-                        DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date");
+                        DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date");
                         column(OverDueEntries; StrSubstNo(Text002Lbl, TempCurrency2.Code))
                         {
                         }
@@ -459,7 +473,7 @@ report 116 Statement
                 }
                 dataitem(AgingBandLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(AgingDate1; Format(AgingDate[1] + 1))
                     {
                     }
@@ -547,6 +561,7 @@ report 116 Statement
             begin
                 TempAgingBandBuf.DeleteAll();
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
                 PrintLine := false;
                 if PrintAllHavingBal then
@@ -817,10 +832,6 @@ report 116 Statement
     var
         GLSetup: Record "General Ledger Setup";
         SalesSetup: Record "Sales & Receivables Setup";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         Cust2: Record Customer;
         TempCurrency2: Record Currency temporary;
         DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
@@ -854,7 +865,6 @@ report 116 Statement
         AgingBandEndingDate: Date;
         AgingBandCurrencyCode: Code[20];
         IncludeAgingBand: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         isInitialized: Boolean;
         IsFirstLoop: Boolean;
@@ -863,7 +873,6 @@ report 116 Statement
         SupportedOutputMethod: Option Print,Preview,PDF,Email,Excel,XML;
         ChosenOutputMethod: Integer;
         PrintIfEmailIsMissing: Boolean;
-        [InDataSet]
         ShowPrintIfEmailIsMissing: Boolean;
         FirstCustomerPrinted: Boolean;
 
@@ -902,6 +911,12 @@ report 116 Statement
         BlankEndDateErr: Label 'End Date must have a value.';
         StartDateLaterTheEndDateErr: Label 'Start date must be earlier than End date.';
         CurrReportPageNoCaptionLbl: Label 'Page';
+
+    protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     local procedure GetDate(PostingDate: Date; DueDate: Date): Date
     begin
@@ -1022,7 +1037,7 @@ report 116 Statement
         if (not PrintAllHavingEntry) and (not PrintAllHavingBal) then
             PrintAllHavingBal := true;
 
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Stmnt.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Stmnt.") <> '';
         LogInteractionEnable := LogInteraction;
 
         if Format(PeriodLength) = '' then

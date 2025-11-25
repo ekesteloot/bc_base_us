@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Substitution;
+
 enum 101 "Item Substitute Type"
 {
     Extensible = true;

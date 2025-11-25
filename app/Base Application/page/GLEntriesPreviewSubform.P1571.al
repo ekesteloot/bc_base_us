@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Security.User;
+
 page 1571 "G/L Entries Preview Subform"
 {
     PageType = ListPart;
@@ -13,7 +20,7 @@ page 1571 "G/L Entries Preview Subform"
             repeater(GroupName)
             {
                 ShowAsTree = true;
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 ShowCaption = false;
                 TreeInitialState = CollapseAll;
                 field("G/L Account No."; Rec."G/L Account No.")
@@ -118,7 +125,7 @@ page 1571 "G/L Entries Preview Subform"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -133,7 +140,7 @@ page 1571 "G/L Entries Preview Subform"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry has been part of a reverse transaction (correction) made by the Reverse function.';
@@ -242,7 +249,7 @@ page 1571 "G/L Entries Preview Subform"
 
                 trigger OnAction()
                 begin
-                    GenJnlPostPreview.ShowDimensions(DATABASE::"G/L Entry", "G/L Entry No.", "Dimension Set ID");
+                    GenJnlPostPreview.ShowDimensions(DATABASE::"G/L Entry", Rec."G/L Entry No.", Rec."Dimension Set ID");
                 end;
             }
         }
@@ -255,16 +262,16 @@ page 1571 "G/L Entries Preview Subform"
 
     trigger OnAfterGetRecord()
     begin
-        Emphasize := Indentation = 0;
-        ShowDimensionEnabled := "G/L Entry No." <> 0;
+        Emphasize := Rec.Indentation = 0;
+        ShowDimensionEnabled := Rec."G/L Entry No." <> 0;
 
-        if "G/L Entry No." <> 0 then
-            TempGLEntry.Get("G/L Entry No.")
+        if Rec."G/L Entry No." <> 0 then
+            TempGLEntry.Get(Rec."G/L Entry No.")
         else begin
             TempGLEntry.Init();
-            TempGLEntry."G/L Account No." := "G/L Account No.";
-            TempGLEntry.Description := Description;
-            TempGLEntry.Amount := Amount;
+            TempGLEntry."G/L Account No." := Rec."G/L Account No.";
+            TempGLEntry.Description := Rec.Description;
+            TempGLEntry.Amount := Rec.Amount;
         end;
     end;
 
@@ -296,8 +303,8 @@ page 1571 "G/L Entries Preview Subform"
         TempGLEntryPostingPreview: Record "G/L Entry Posting Preview" temporary;
         RecRef: RecordRef;
     begin
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         TempGLEntryPostingPreview.Reset();
         TempGLEntryPostingPreview.DeleteAll();
         TempGLEntry.Reset();

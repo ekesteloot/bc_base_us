@@ -8,10 +8,10 @@ codeunit 5810 "Change Average Cost Setting"
         WindowIsOpen := false;
 
         AvgCostEntryPointHandler.LockBuffer();
-        LockTable();
+        Rec.LockTable();
         AccPeriod.LockTable();
 
-        Modify();
+        Rec.Modify();
 
         if AccPeriod.IsEmpty() then
             StartingValuationDate := CalcDate('<-CY>', WorkDate())
@@ -24,8 +24,8 @@ codeunit 5810 "Change Average Cost Setting"
                 StartingValuationDate := AccPeriod."Starting Date";
             end;
             repeat
-                AccPeriod."Average Cost Period" := "Average Cost Period";
-                AccPeriod."Average Cost Calc. Type" := "Average Cost Calc. Type";
+                AccPeriod."Average Cost Period" := Rec."Average Cost Period";
+                AccPeriod."Average Cost Calc. Type" := Rec."Average Cost Calc. Type";
                 AccPeriod.Modify();
             until AccPeriod.Next() = 0;
         end;

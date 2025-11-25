@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Address;
+
 page 9140 "Postcode Select Address"
 {
     Caption = 'Address Selection';
@@ -15,7 +17,7 @@ page 9140 "Postcode Select Address"
         {
             repeater(Group)
             {
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = Invoicing, Basic, Suite;
                     Editable = false;
@@ -34,17 +36,17 @@ page 9140 "Postcode Select Address"
         if TempAddressListNameValueBuffer.FindSet() then
             repeat
                 Rec := TempAddressListNameValueBuffer;
-                Insert();
+                Rec.Insert();
             until TempAddressListNameValueBuffer.Next() = 0;
 
-        FindFirst(); // Move selection to the first one
+        Rec.FindFirst(); // Move selection to the first one
     end;
 
     procedure GetSelectedAddress(var TempSelectedAddressNameValueBuffer: Record "Name/Value Buffer" temporary)
     begin
         CurrPage.SetSelectionFilter(TempSelectedAddressNameValueBuffer);
-        SetFilter(ID, TempSelectedAddressNameValueBuffer.GetFilter(ID));
-        FindFirst();
+        Rec.SetFilter(ID, TempSelectedAddressNameValueBuffer.GetFilter(ID));
+        Rec.FindFirst();
         TempSelectedAddressNameValueBuffer := Rec;
     end;
 }

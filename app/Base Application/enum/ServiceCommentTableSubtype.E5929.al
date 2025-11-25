@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Comment;
+
 enum 5929 "Service Comment Table Subtype"
 {
     Extensible = true;

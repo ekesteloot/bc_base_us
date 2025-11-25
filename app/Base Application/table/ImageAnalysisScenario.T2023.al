@@ -1,3 +1,7 @@
+namespace System.AI;
+
+using System.Environment;
+
 table 2023 "Image Analysis Scenario"
 {
     Caption = 'Image Analysis Scenario';

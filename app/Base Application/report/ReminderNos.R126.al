@@ -1,7 +1,12 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.Foundation.NoSeries;
+using System.Utilities;
+
 report 126 "Reminder Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/ReminderNos.rdlc';
+    RDLCLayout = './Sales/Reminder/ReminderNos.rdlc';
     Caption = 'Reminder Nos.';
     ObsoleteState = Pending;
     ObsoleteReason = 'Infrequently used report.';
@@ -11,7 +16,7 @@ report 126 "Reminder Nos."
     {
         dataitem("Issued Reminder Header"; "Issued Reminder Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Issued Reminder';
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
@@ -61,7 +66,7 @@ report 126 "Reminder Nos."
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorText_Number_; ErrorText[Number])
                 {
                 }
@@ -87,8 +92,8 @@ report 126 "Reminder Nos."
             }
             dataitem(IssuedReminderHeader; "Issued Reminder Header")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("No.");
                 column(IssuedReminderHeader__User_ID_; "User ID")
                 {
                 }

@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Email;
+
+using System.Email;
+
 codeunit 5916 ServMailManagement
 {
     TableNo = "Service Email Queue";
@@ -9,14 +13,14 @@ codeunit 5916 ServMailManagement
     begin
         // do not silently exit if the sending failed
         if not MailManagement.IsEnabled() then
-            Error(EmailSendErr, "To Address", "Subject Line");
+            Error(EmailSendErr, Rec."To Address", Rec."Subject Line");
 
         InitTempEmailItem(TempEmailItem, Rec);
 
         MailManagement.SetHideMailDialog(true);
         MailManagement.SetHideEmailSendingError(false);
         if not MailManagement.Send(TempEmailItem, Enum::"Email Scenario"::"Service Order") then
-            Error(EmailSendErr, "To Address", "Subject Line");
+            Error(EmailSendErr, Rec."To Address", Rec."Subject Line");
     end;
 
     var

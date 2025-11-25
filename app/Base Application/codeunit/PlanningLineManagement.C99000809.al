@@ -1,4 +1,18 @@
-﻿codeunit 99000809 "Planning Line Management"
+﻿namespace Microsoft.InventoryMgt.Planning;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+
+codeunit 99000809 "Planning Line Management"
 {
     Permissions = TableData "Manufacturing Setup" = rm,
                   TableData "Routing Header" = r,
@@ -65,7 +79,7 @@
                 if PlanningResiliency and PlanningRoutingLine.Recalculate then
                     TempPlanningErrorLog.SetError(
                       StrSubstNo(Text011, PlanningRoutingLine.TableCaption()),
-                      DATABASE::"Routing Header", RoutingHeader.GetPosition());
+                      Enum::TableID::"Routing Header".AsInteger(), RoutingHeader.GetPosition());
                 PlanningRoutingLine.TestField(Recalculate, false);
                 CheckRoutingLine(RoutingHeader, RoutingLine);
                 TransferRoutingLine(PlanningRoutingLine, ReqLine, RoutingLine);
@@ -82,7 +96,7 @@
 
             OnTransferRoutingLineOnBeforeCalcRoutingCostPerUnit(PlanningRoutingLine, ReqLine, RoutingLine);
 
-            CostCalcMgt.RoutingCostPerUnit(
+            CostCalcMgt.CalcRoutingCostPerUnit(
               Type, "No.", "Direct Unit Cost", "Indirect Cost %", "Overhead Rate", "Unit Cost per", "Unit Cost Calculation");
             OnTransferRoutingLineOnBeforeValidateDirectUnitCost(ReqLine, RoutingLine, PlanningRoutingLine);
             Validate("Direct Unit Cost");
@@ -117,7 +131,7 @@
                     BOMHeader.Get(ReqLine."Production BOM No.");
                     TempPlanningErrorLog.SetError(
                       StrSubstNo(Text014, ReqLine."Production BOM No.", ReqLine."No."),
-                      DATABASE::"Production BOM Header", BOMHeader.GetPosition());
+                      Enum::TableID::"Production BOM Header".AsInteger(), BOMHeader.GetPosition());
                 end;
                 Error(
                   Text000,
@@ -237,7 +251,7 @@
                 Item.Get(ReqLine."No.");
                 TempPlanningErrorLog.SetError(
                   StrSubstNo(Text014, ReqLine."No.", ReqLine."No."),
-                  DATABASE::Item, Item.GetPosition());
+                  Enum::TableID::Item.AsInteger(), Item.GetPosition());
             end;
             Error(
               Text000,
@@ -300,7 +314,7 @@
 
                                 PlanningComponent."Flushing Method" := CompSKU."Flushing Method";
                                 PlanningComponent."Ref. Order Type" := ReqLine."Ref. Order Type";
-                                PlanningComponent."Ref. Order Status" := "Production Order Status".FromInteger(ReqLine."Ref. Order Status");
+                                PlanningComponent."Ref. Order Status" := Enum::"Production Order Status".FromInteger(ReqLine."Ref. Order Status");
                                 PlanningComponent."Ref. Order No." := ReqLine."Ref. Order No.";
                                 OnBeforeInsertAsmPlanningComponent(ReqLine, AsmBOMComp[Level], PlanningComponent);
                                 PlanningComponent.Insert();
@@ -599,7 +613,7 @@
                 "Planning Level Code" := ReqLine."Planning Level" + 1;
 
             "Ref. Order Type" := ReqLine."Ref. Order Type";
-            "Ref. Order Status" := "Production Order Status".FromInteger(ReqLine."Ref. Order Status");
+            "Ref. Order Status" := Enum::"Production Order Status".FromInteger(ReqLine."Ref. Order Status");
             "Ref. Order No." := ReqLine."Ref. Order No.";
             OnBeforeInsertPlanningComponent(ReqLine, ProdBOMLine, PlanningComponent, LineQtyPerUOM, ItemQtyPerUOM);
             Insert();
@@ -664,7 +678,7 @@
                 RoutingLine.FieldCaption("Operation No."), RoutingLine."Operation No.",
                 RoutingHeader.TableCaption(), RoutingHeader."No.",
                 RoutingLine.FieldCaption("No.")),
-              DATABASE::"Routing Header", RoutingHeader.GetPosition());
+              Enum::TableID::"Routing Header".AsInteger(), RoutingHeader.GetPosition());
         end;
         RoutingLine.TestField("No.");
 
@@ -676,7 +690,7 @@
                 MachineCenter.FieldCaption("Work Center No."),
                 MachineCenter.TableCaption(),
                 MachineCenter."No."),
-              DATABASE::"Machine Center", MachineCenter.GetPosition());
+              Enum::TableID::"Machine Center".AsInteger(), MachineCenter.GetPosition());
         end;
         RoutingLine.TestField("Work Center No.");
     end;
@@ -698,7 +712,7 @@
         if not Item3.Get(ReqLine2."No.") then
             exit;
 
-        ShouldExit := Item3."Manufacturing Policy" <> "Manufacturing Policy"::"Make-to-Order";
+        ShouldExit := Item3."Manufacturing Policy" <> Item3."Manufacturing Policy"::"Make-to-Order";
         OnCheckMultiLevelStructureOnAfterCalcShouldExitManufacturingPolicy(ReqLine2, ShouldExit);
         if ShouldExit then
             exit;
@@ -730,7 +744,7 @@
                 OnCheckMultiLevelStructureOnAfterCalcThrowLineSpacingError(ReqLine2, LineSpacing, PlanningLineNo, ThrowLineSpacingError);
                 if ThrowLineSpacingError then begin
                     if PlanningResiliency then
-                        TempPlanningErrorLog.SetError(Text015, DATABASE::"Requisition Line", ReqLine.GetPosition());
+                        TempPlanningErrorLog.SetError(Text015, Enum::TableID::"Requisition Line".AsInteger(), ReqLine.GetPosition());
                     Error(Text002);
                 end;
                 ReqLine3.Init();

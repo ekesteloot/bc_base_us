@@ -1,3 +1,12 @@
+﻿namespace System.Integration;
+
+using System;
+using System.Environment;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+using System.Xml;
+
 codeunit 1297 "Http Web Request Mgt."
 {
     var

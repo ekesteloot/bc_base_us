@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+
 page 559 "Analysis View Budget Entries"
 {
     ApplicationArea = Dimensions;
@@ -92,14 +96,14 @@ page 559 "Analysis View Budget Entries"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if "Analysis View Code" <> xRec."Analysis View Code" then;
+        if Rec."Analysis View Code" <> xRec."Analysis View Code" then;
     end;
 
     local procedure DrillDown()
     var
         GLBudgetEntry: Record "G/L Budget Entry";
     begin
-        GLBudgetEntry.SetRange("Entry No.", "Entry No.");
+        GLBudgetEntry.SetRange("Entry No.", Rec."Entry No.");
         PAGE.RunModal(PAGE::"G/L Budget Entries", GLBudgetEntry);
     end;
 }

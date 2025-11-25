@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using System.Utilities;
+
 page 501 "Available - Purchase Lines"
 {
     Caption = 'Available - Purchase Lines';
@@ -10,7 +18,7 @@ page 501 "Available - Purchase Lines"
     PageType = List;
     Permissions = TableData "Purchase Line" = rm;
     SourceTable = "Purchase Line";
-    SourceTableView = SORTING("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Expected Receipt Date");
+    SourceTableView = sorting("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Expected Receipt Date");
 
     layout
     {
@@ -203,7 +211,7 @@ page 501 "Available - Purchase Lines"
 
     trigger OnAfterGetRecord()
     begin
-        GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
+        Rec.GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
     end;
 
     trigger OnOpenPage()
@@ -296,7 +304,7 @@ page 501 "Available - Purchase Lines"
 
         UpdateReservMgt();
         TrackingSpecification.InitTrackingSpecification(
-          DATABASE::"Purchase Line", "Document Type".AsInteger(), Rec."Document No.", '', 0, Rec."Line No.",
+          DATABASE::"Purchase Line", Rec."Document Type".AsInteger(), Rec."Document No.", '', 0, Rec."Line No.",
           Rec."Variant Code", Rec."Location Code", Rec."Qty. per Unit of Measure");
         ReservMgt.CreateReservation(
           ReservEntry.Description, Rec."Expected Receipt Date", ReservedQuantity, ReserveQuantityBase, TrackingSpecification);

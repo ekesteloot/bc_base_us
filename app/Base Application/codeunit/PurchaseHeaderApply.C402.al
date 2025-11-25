@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.Purchases.Document;
+
 codeunit 402 "Purchase Header Apply"
 {
     TableNo = "Purchase Header";

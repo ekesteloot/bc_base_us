@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
+using Microsoft.InventoryMgt.Counting.Comment;
+
 page 5879 "Phys. Inventory Recording"
 {
     Caption = 'Phys. Inventory Recording';
@@ -65,9 +69,9 @@ page 5879 "Phys. Inventory Recording"
             part(Lines; "Phys. Invt. Recording Subform")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "Order No." = FIELD("Order No."),
-                              "Recording No." = FIELD("Recording No.");
-                SubPageView = SORTING("Order No.", "Recording No.", "Line No.");
+                SubPageLink = "Order No." = field("Order No."),
+                              "Recording No." = field("Recording No.");
+                SubPageView = sorting("Order No.", "Recording No.", "Line No.");
             }
         }
         area(factboxes)
@@ -94,9 +98,9 @@ page 5879 "Phys. Inventory Recording"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Phys. Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST(Recording),
-                                  "Order No." = FIELD("Order No."),
-                                  "Recording No." = FIELD("Recording No.");
+                    RunPageLink = "Document Type" = const(Recording),
+                                  "Order No." = field("Order No."),
+                                  "Recording No." = field("Recording No.");
                     ToolTip = 'View or add comments for the recording.';
                 }
             }

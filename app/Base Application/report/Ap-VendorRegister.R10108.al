@@ -9,7 +9,7 @@ report 10108 "AP - Vendor Register"
     {
         dataitem("G/L Register"; "G/L Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Creation Date", "Source Code", "Journal Batch Name";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -83,7 +83,7 @@ report 10108 "AP - Vendor Register"
             }
             dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 RequestFilterFields = "Vendor No.", "Document Type";
                 column(Vendor_Ledger_Entry__Vendor_No__; "Vendor No.")
                 {

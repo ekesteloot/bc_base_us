@@ -1,3 +1,10 @@
+namespace Microsoft.FixedAssets.Setup;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Posting;
+
 page 5607 "Fixed Asset Setup"
 {
     AdditionalSearchTerms = 'fa setup';
@@ -218,10 +225,10 @@ page 5607 "Fixed Asset Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

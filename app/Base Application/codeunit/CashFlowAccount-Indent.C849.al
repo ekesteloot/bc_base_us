@@ -1,3 +1,5 @@
+namespace Microsoft.CashFlow.Account;
+
 codeunit 849 "Cash Flow Account - Indent"
 {
 

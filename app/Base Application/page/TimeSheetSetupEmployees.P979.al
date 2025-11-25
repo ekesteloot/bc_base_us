@@ -17,7 +17,7 @@ page 979 "Time Sheet Setup Employees"
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies an identification number for the entry or record.';
                 }
-                field(FullName; FullName())
+                field(FullName; Rec.FullName())
                 {
                     ApplicationArea = BasicHR;
                     Caption = 'Full Name';

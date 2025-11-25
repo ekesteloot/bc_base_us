@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Campaign;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Sales.Customer;
+
 table 7030 "Campaign Target Group"
 {
     Caption = 'Campaign Target Group';
@@ -13,9 +18,9 @@ table 7030 "Campaign Target Group"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(Customer)) Customer
-            ELSE
-            IF (Type = CONST(Contact)) Contact WHERE(Type = FILTER(Company));
+            TableRelation = if (Type = const(Customer)) Customer
+            else
+            if (Type = const(Contact)) Contact where(Type = filter(Company));
         }
         field(3; "Campaign No."; Code[20])
         {

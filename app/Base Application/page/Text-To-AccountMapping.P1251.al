@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 page 1251 "Text-to-Account Mapping"
 {
     AutoSplitKey = true;
@@ -34,7 +36,7 @@ page 1251 "Text-to-Account Mapping"
 
                     trigger OnValidate()
                     begin
-                        EnableBalSourceNo := IsBalSourceNoEnabled();
+                        EnableBalSourceNo := Rec.IsBalSourceNoEnabled();
                     end;
                 }
                 field("Bal. Source No."; Rec."Bal. Source No.")
@@ -53,12 +55,12 @@ page 1251 "Text-to-Account Mapping"
 
     trigger OnAfterGetCurrRecord()
     begin
-        EnableBalSourceNo := IsBalSourceNoEnabled();
+        EnableBalSourceNo := Rec.IsBalSourceNoEnabled();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        exit(CheckEntriesAreConsistent());
+        exit(Rec.CheckEntriesAreConsistent());
     end;
 
     var

@@ -36,7 +36,7 @@ table 423 "IC Inbox/Outbox Jnl. Line Dim."
         field(6; "Dimension Value Code"; Code[20])
         {
             Caption = 'Dimension Value Code';
-            TableRelation = "IC Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
+            TableRelation = "IC Dimension Value".Code where("Dimension Code" = field("Dimension Code"));
 
             trigger OnValidate()
             begin

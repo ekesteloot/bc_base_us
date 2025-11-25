@@ -1,10 +1,14 @@
+namespace System.Diagnostics;
+
+using System.DataAdministration;
+
 page 1367 "Monitored Field Log Entries"
 {
     PageType = List;
     ApplicationArea = Basic, Suite;
     UsageCategory = Administration;
     SourceTable = "Change Log Entry";
-    SourceTableView = SORTING("Entry No.")
+    SourceTableView = sorting("Entry No.")
                       ORDER(Descending)
                       where("Field Log Entry Feature" = filter("Monitor Sensitive Fields" | All));
     Editable = false;
@@ -34,7 +38,7 @@ page 1367 "Monitored Field Log Entries"
                     ApplicationArea = Basic, Suite;
                     trigger OnDrillDown()
                     begin
-                        MonitorSensitiveFieldData.OpenChangedRecordPage("Table No.", "Field No.", "Changed Record SystemId");
+                        MonitorSensitiveFieldData.OpenChangedRecordPage(Rec."Table No.", Rec."Field No.", Rec."Changed Record SystemId");
                     end;
                 }
                 field("Table Caption"; Rec."Table Caption")
@@ -93,7 +97,7 @@ page 1367 "Monitored Field Log Entries"
 
                 trigger OnAction()
                 begin
-                    SetFilter("Table No.", '');
+                    Rec.SetFilter("Table No.", '');
                     IsMonitoredFieldsEntriesShown := true;
                 end;
             }
@@ -108,7 +112,7 @@ page 1367 "Monitored Field Log Entries"
 
                 trigger OnAction()
                 begin
-                    SetFilter("Table No.", '<>%1', Database::"Change Log Setup (Field)");
+                    Rec.SetFilter("Table No.", '<>%1', Database::"Change Log Setup (Field)");
                     IsMonitoredFieldsEntriesShown := false;
                 end;
             }
@@ -145,7 +149,7 @@ page 1367 "Monitored Field Log Entries"
     trigger OnOpenPage()
     begin
         MonitorSensitiveFieldData.ResetNotificationCount();
-        SetFilter("Table No.", '<>%1', Database::"Change Log Setup (Field)");
+        Rec.SetFilter("Table No.", '<>%1', Database::"Change Log Setup (Field)");
         IsMonitoredFieldsEntriesShown := false;
     end;
 

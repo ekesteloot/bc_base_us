@@ -34,7 +34,7 @@ page 9098 "Job No. of Prices FactBox"
                 var
                     JobResPrice: Record "Job Resource Price";
                 begin
-                    JobResPrice.SetRange("Job No.", "No.");
+                    JobResPrice.SetRange("Job No.", Rec."No.");
 
                     PAGE.Run(PAGE::"Job Resource Prices", JobResPrice);
                 end;
@@ -53,7 +53,7 @@ page 9098 "Job No. of Prices FactBox"
                 var
                     JobItPrice: Record "Job Item Price";
                 begin
-                    JobItPrice.SetRange("Job No.", "No.");
+                    JobItPrice.SetRange("Job No.", Rec."No.");
 
                     PAGE.Run(PAGE::"Job Item Prices", JobItPrice);
                 end;
@@ -72,7 +72,7 @@ page 9098 "Job No. of Prices FactBox"
                 var
                     JobAccPrice: Record "Job G/L Account Price";
                 begin
-                    JobAccPrice.SetRange("Job No.", "No.");
+                    JobAccPrice.SetRange("Job No.", Rec."No.");
 
                     PAGE.Run(PAGE::"Job G/L Account Prices", JobAccPrice);
                 end;
@@ -132,7 +132,7 @@ page 9098 "Job No. of Prices FactBox"
         NoOfItemPrices := 0;
         NoOfAccountPrices := 0;
 
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnOpenPage()
@@ -186,15 +186,15 @@ page 9098 "Job No. of Prices FactBox"
             exit(false);
 
         JobResourcePrice.Reset();
-        JobResourcePrice.SetRange("Job No.", "No.");
+        JobResourcePrice.SetRange("Job No.", Rec."No.");
         NoOfResourcePrices := JobResourcePrice.Count();
 
         JobItemPrice.Reset();
-        JobItemPrice.SetRange("Job No.", "No.");
+        JobItemPrice.SetRange("Job No.", Rec."No.");
         NoOfItemPrices := JobItemPrice.Count();
 
         JobAccountPrice.Reset();
-        JobAccountPrice.SetRange("Job No.", "No.");
+        JobAccountPrice.SetRange("Job No.", Rec."No.");
         NoOfAccountPrices := JobAccountPrice.Count();
         exit(true);
     end;

@@ -1,14 +1,18 @@
+namespace Microsoft.BankMgt.Reports;
+
+using Microsoft.BankMgt.Reconciliation;
+
 report 1409 "Posted Payment Reconciliation"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/PostedPaymentReconciliation.rdlc';
+    RDLCLayout = './BankMgt/Reports/PostedPaymentReconciliation.rdlc';
     Caption = 'Posted Payment Reconciliation';
 
     dataset
     {
         dataitem("Posted Payment Recon. Hdr"; "Posted Payment Recon. Hdr")
         {
-            DataItemTableView = SORTING("Bank Account No.", "Statement No.");
+            DataItemTableView = sorting("Bank Account No.", "Statement No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Bank Account No.", "Statement No.";
             column(ComanyName; COMPANYPROPERTY.DisplayName())
@@ -47,8 +51,8 @@ report 1409 "Posted Payment Reconciliation"
             }
             dataitem("Posted Payment Recon. Line"; "Posted Payment Recon. Line")
             {
-                DataItemLink = "Bank Account No." = FIELD("Bank Account No."), "Statement No." = FIELD("Statement No.");
-                DataItemTableView = SORTING("Bank Account No.", "Statement No.", "Statement Line No.");
+                DataItemLink = "Bank Account No." = field("Bank Account No."), "Statement No." = field("Statement No.");
+                DataItemTableView = sorting("Bank Account No.", "Statement No.", "Statement Line No.");
                 column(TrnsctnDte_BnkAcStmtLin; Format("Transaction Date"))
                 {
                 }

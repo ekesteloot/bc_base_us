@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
+#if not CLEAN21
+using Microsoft.Purchases.Pricing;
+#endif
+
 page 298 "Vendor Item List"
 {
     Caption = 'Vendor Item List';
@@ -71,9 +77,9 @@ page 298 "Vendor Item List"
                     Caption = 'Purch. Prices';
                     Image = Price;
                     RunObject = Page "Purchase Prices";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Vendor No." = FIELD("Vendor No.");
-                    RunPageView = SORTING("Item No.", "Vendor No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Vendor No." = field("Vendor No.");
+                    RunPageView = sorting("Item No.", "Vendor No.");
                     ToolTip = 'Define purchase price agreements with vendors for specific items.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '19.0';
@@ -85,8 +91,8 @@ page 298 "Vendor Item List"
                     Caption = 'Purch. Line Discounts';
                     Image = LineDiscount;
                     RunObject = Page "Purchase Line Discounts";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Vendor No." = FIELD("Vendor No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Vendor No." = field("Vendor No.");
                     ToolTip = 'Define purchase line discounts with vendors. For example, you may get for a line discount if you buy items from a vendor in large quantities.';
                     ObsoleteState = Pending;
                     ObsoleteTag = '19.0';

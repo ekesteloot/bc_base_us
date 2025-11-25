@@ -1,43 +1,53 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 codeunit 15 "Gen. Jnl.-Show Card"
 {
     TableNo = "Gen. Journal Line";
 
     trigger OnRun()
     begin
-        case "Account Type" of
-            "Account Type"::"G/L Account":
+        case Rec."Account Type" of
+            Rec."Account Type"::"G/L Account":
                 begin
-                    GLAcc."No." := "Account No.";
+                    GLAcc."No." := Rec."Account No.";
                     PAGE.Run(PAGE::"G/L Account Card", GLAcc);
                 end;
-            "Account Type"::Customer:
+            Rec."Account Type"::Customer:
                 begin
-                    Cust."No." := "Account No.";
+                    Cust."No." := Rec."Account No.";
                     PAGE.Run(PAGE::"Customer Card", Cust);
                 end;
-            "Account Type"::Vendor:
+            Rec."Account Type"::Vendor:
                 begin
-                    Vend."No." := "Account No.";
+                    Vend."No." := Rec."Account No.";
                     PAGE.Run(PAGE::"Vendor Card", Vend);
                 end;
-            "Account Type"::Employee:
+            Rec."Account Type"::Employee:
                 begin
-                    Empl."No." := "Account No.";
+                    Empl."No." := Rec."Account No.";
                     PAGE.Run(PAGE::"Employee Card", Empl);
                 end;
-            "Account Type"::"Bank Account":
+            Rec."Account Type"::"Bank Account":
                 begin
-                    BankAcc."No." := "Account No.";
+                    BankAcc."No." := Rec."Account No.";
                     PAGE.Run(PAGE::"Bank Account Card", BankAcc);
                 end;
-            "Account Type"::"Fixed Asset":
+            Rec."Account Type"::"Fixed Asset":
                 begin
-                    FA."No." := "Account No.";
+                    FA."No." := Rec."Account No.";
                     PAGE.Run(PAGE::"Fixed Asset Card", FA);
                 end;
-            "Account Type"::"IC Partner":
+            Rec."Account Type"::"IC Partner":
                 begin
-                    ICPartner.Code := "Account No.";
+                    ICPartner.Code := Rec."Account No.";
                     PAGE.Run(PAGE::"IC Partner Card", ICPartner);
                 end;
         end;

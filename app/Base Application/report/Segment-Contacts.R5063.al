@@ -1,14 +1,20 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Segment;
+using Microsoft.Foundation.Address;
+
 report 5063 "Segment - Contacts"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/SegmentContacts.rdlc';
+    RDLCLayout = './CRM/Reports/SegmentContacts.rdlc';
     Caption = 'Segment - Contacts';
 
     dataset
     {
         dataitem("Segment Header"; "Segment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Campaign No.", "Salesperson Code";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -45,12 +51,12 @@ report 5063 "Segment - Contacts"
             }
             dataitem("Segment Line"; "Segment Line")
             {
-                DataItemLink = "Segment No." = FIELD("No.");
-                DataItemTableView = SORTING("Contact No.", "Segment No.");
+                DataItemLink = "Segment No." = field("No.");
+                DataItemTableView = sorting("Contact No.", "Segment No.");
                 dataitem(Contact; Contact)
                 {
-                    DataItemLink = "No." = FIELD("Contact No.");
-                    DataItemTableView = SORTING("No.");
+                    DataItemLink = "No." = field("Contact No.");
+                    DataItemTableView = sorting("No.");
                     RequestFilterFields = "No.", "Search Name", Type;
                     column(ContAddr7; ContAddr[7])
                     {

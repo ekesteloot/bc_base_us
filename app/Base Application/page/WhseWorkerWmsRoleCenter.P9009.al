@@ -1,3 +1,24 @@
+﻿namespace Microsoft.WarehouseMgt.RoleCenters;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Reports;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Reports;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Worksheet;
+using System.Email;
+using System.Security.User;
+using System.Threading;
+
 page 9009 "Whse. Worker WMS Role Center"
 {
     Caption = 'Warehouse Worker - Warehouse Management System';
@@ -139,8 +160,8 @@ page 9009 "Whse. Worker WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Released';
                 RunObject = Page "Warehouse Shipment List";
-                RunPageView = SORTING("No.")
-                              WHERE(Status = FILTER(Released));
+                RunPageView = sorting("No.")
+                              where(Status = filter(Released));
                 ToolTip = 'View the list of released source documents that are ready for warehouse activities.';
             }
             action(WhseShptPartPicked)
@@ -148,7 +169,7 @@ page 9009 "Whse. Worker WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Partially Picked';
                 RunObject = Page "Warehouse Shipment List";
-                RunPageView = WHERE("Document Status" = FILTER("Partially Picked"));
+                RunPageView = where("Document Status" = filter("Partially Picked"));
                 ToolTip = 'View the list of ongoing warehouse picks that are partially completed.';
             }
             action(WhseShptComplPicked)
@@ -156,7 +177,7 @@ page 9009 "Whse. Worker WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Completely Picked';
                 RunObject = Page "Warehouse Shipment List";
-                RunPageView = WHERE("Document Status" = FILTER("Completely Picked"));
+                RunPageView = where("Document Status" = filter("Completely Picked"));
                 ToolTip = 'View the list of completed warehouse picks.';
             }
             action(WhseShptPartShipped)
@@ -164,7 +185,7 @@ page 9009 "Whse. Worker WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Partially Shipped';
                 RunObject = Page "Warehouse Shipment List";
-                RunPageView = WHERE("Document Status" = FILTER("Partially Shipped"));
+                RunPageView = where("Document Status" = filter("Partially Shipped"));
                 ToolTip = 'View the list of ongoing warehouse shipments that are partially completed.';
             }
             action(WhseReceipts)
@@ -179,7 +200,7 @@ page 9009 "Whse. Worker WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Partially Received';
                 RunObject = Page "Warehouse Receipts";
-                RunPageView = WHERE("Document Status" = FILTER("Partially Received"));
+                RunPageView = where("Document Status" = filter("Partially Received"));
                 ToolTip = 'View the list of ongoing warehouse receipts that are partially completed.';
             }
             action("Transfer Orders")
@@ -253,7 +274,7 @@ page 9009 "Whse. Worker WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Warehouse Physical Inventory Journals';
                     RunObject = Page "Whse. Journal Batches List";
-                    RunPageView = WHERE("Template Type" = CONST("Physical Inventory"));
+                    RunPageView = where("Template Type" = const("Physical Inventory"));
                     ToolTip = 'Prepare to count inventories by preparing the documents that warehouse employees use when they perform a physical inventory of selected items or of all the inventory. When the physical count has been made, you enter the number of items that are in the bins in this window, and then you register the physical inventory.';
                 }
                 action("WhseItem Journals")
@@ -261,7 +282,7 @@ page 9009 "Whse. Worker WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Warehouse Item Journals';
                     RunObject = Page "Whse. Journal Batches List";
-                    RunPageView = WHERE("Template Type" = CONST(Item));
+                    RunPageView = where("Template Type" = const(Item));
                     ToolTip = 'Adjust the quantity of an item in a particular bin or bins. For instance, you might find some items in a bin that are not registered in the system, or you might not be able to pick the quantity needed because there are fewer items in a bin than was calculated by the program. The bin is then updated to correspond to the actual quantity in the bin. In addition, it creates a balancing quantity in the adjustment bin, for synchronization with item ledger entries, which you can then post with an item journal.';
                 }
             }
@@ -274,7 +295,7 @@ page 9009 "Whse. Worker WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Put-away Worksheets';
                     RunObject = Page "Worksheet Names List";
-                    RunPageView = WHERE("Template Type" = CONST("Put-away"));
+                    RunPageView = where("Template Type" = const("Put-away"));
                     ToolTip = 'Plan and initialize item put-aways.';
                 }
                 action(MovementWorksheets)
@@ -282,7 +303,7 @@ page 9009 "Whse. Worker WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Movement Worksheets';
                     RunObject = Page "Worksheet Names List";
-                    RunPageView = WHERE("Template Type" = CONST(Movement));
+                    RunPageView = where("Template Type" = const(Movement));
                     ToolTip = 'Plan and initiate movements of items between bins according to an advanced warehouse configuration.';
                 }
                 action(PickWorksheets)
@@ -290,7 +311,7 @@ page 9009 "Whse. Worker WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Pick Worksheets';
                     RunObject = Page "Worksheet Names List";
-                    RunPageView = WHERE("Template Type" = CONST(Pick));
+                    RunPageView = where("Template Type" = const(Pick));
                     ToolTip = 'Plan and initialize picks of items. ';
                 }
             }
@@ -303,8 +324,6 @@ page 9009 "Whse. Worker WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Registered Picks';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Registered Whse. Picks";
                     ToolTip = 'View warehouse picks that have been performed.';
                 }
@@ -313,8 +332,6 @@ page 9009 "Whse. Worker WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Registered Put-aways';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Registered Whse. Put-aways";
                     ToolTip = 'View the list of completed put-away activities.';
                 }
@@ -323,8 +340,6 @@ page 9009 "Whse. Worker WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Registered Movements';
                     Image = RegisteredDocs;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Registered Whse. Movements";
                     ToolTip = 'View the list of completed warehouse movements.';
                 }
@@ -333,8 +348,6 @@ page 9009 "Whse. Worker WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Posted Whse. Receipts';
                     Image = PostedReceipts;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Posted Whse. Receipt List";
                     ToolTip = 'Open the list of posted warehouse receipts.';
                 }
@@ -396,6 +409,22 @@ page 9009 "Whse. Worker WMS Role Center"
                 Image = MovementWorksheet;
                 RunObject = Page "Movement Worksheet";
                 ToolTip = 'Prepare to move items between bins within the warehouse.';
+            }
+            action(ItemInquiry)
+            {
+                ApplicationArea = Warehouse;
+                Caption = 'Item Inquiry';
+                Image = MovementWorksheet;
+                RunObject = Page "Item Inquiry";
+                ToolTip = 'View detailed information about an item.';
+            }
+            action(ItemBinContentInquiry)
+            {
+                ApplicationArea = Warehouse;
+                Caption = 'Item Bin Content Inquiry';
+                Image = MovementWorksheet;
+                RunObject = Page "Item Bin Content Inquiry";
+                ToolTip = 'View detailed information about an item in a bin.';
             }
         }
     }

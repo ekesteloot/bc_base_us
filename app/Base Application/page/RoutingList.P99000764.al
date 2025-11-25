@@ -1,3 +1,9 @@
+﻿namespace Microsoft.Manufacturing.Routing;
+
+using Microsoft.Manufacturing.Comment;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Reports;
+
 page 99000764 "Routing List"
 {
     AdditionalSearchTerms = 'operations,process structure';
@@ -81,8 +87,8 @@ page 99000764 "Routing List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Manufacturing Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Routing Header"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Routing Header"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("&Versions")
@@ -93,7 +99,7 @@ page 99000764 "Routing List"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     RunObject = Page "Routing Version List";
-                    RunPageLink = "Routing No." = FIELD("No.");
+                    RunPageLink = "Routing No." = field("No.");
                     ToolTip = 'View or edit other versions of the routing, typically with other operations data. ';
                 }
                 action("Where-used")
@@ -102,8 +108,8 @@ page 99000764 "Routing List"
                     Caption = 'Where-used';
                     Image = "Where-Used";
                     RunObject = Page "Where-Used Item List";
-                    RunPageLink = "Routing No." = FIELD("No.");
-                    RunPageView = SORTING("Routing No.");
+                    RunPageLink = "Routing No." = field("No.");
+                    RunPageView = sorting("Routing No.");
                     ToolTip = 'View a list of BOMs in which the item is used.';
                 }
             }

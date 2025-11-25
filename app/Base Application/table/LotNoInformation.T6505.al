@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+
 table 6505 "Lot No. Information"
 {
     Caption = 'Lot No. Information';
@@ -16,11 +24,12 @@ table 6505 "Lot No. Information"
         field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(3; "Lot No."; Code[50])
         {
             Caption = 'Lot No.';
+            ExtendedDatatype = Barcode;
             NotBlank = true;
         }
         field(10; Description; Text[100])
@@ -43,20 +52,20 @@ table 6505 "Lot No. Information"
         }
         field(14; Comment; Boolean)
         {
-            CalcFormula = Exist("Item Tracking Comment" WHERE(Type = CONST("Lot No."),
-                                                               "Item No." = FIELD("Item No."),
-                                                               "Variant Code" = FIELD("Variant Code"),
-                                                               "Serial/Lot No." = FIELD("Lot No.")));
+            CalcFormula = exist("Item Tracking Comment" where(Type = const("Lot No."),
+                                                               "Item No." = field("Item No."),
+                                                               "Variant Code" = field("Variant Code"),
+                                                               "Serial/Lot No." = field("Lot No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
         }
         field(20; Inventory; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No."),
-                                                                  "Variant Code" = FIELD("Variant Code"),
-                                                                  "Lot No." = FIELD("Lot No."),
-                                                                  "Location Code" = FIELD("Location Filter")));
+            CalcFormula = sum("Item Ledger Entry".Quantity where("Item No." = field("Item No."),
+                                                                  "Variant Code" = field("Variant Code"),
+                                                                  "Lot No." = field("Lot No."),
+                                                                  "Location Code" = field("Location Filter")));
             Caption = 'Inventory';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -77,17 +86,17 @@ table 6505 "Lot No. Information"
         {
             Caption = 'Bin Filter';
             FieldClass = FlowFilter;
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Filter"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Filter"));
         }
         field(24; "Expired Inventory"; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry"."Remaining Quantity" WHERE("Item No." = FIELD("Item No."),
-                                                                              "Variant Code" = FIELD("Variant Code"),
-                                                                              "Lot No." = FIELD("Lot No."),
-                                                                              "Location Code" = FIELD("Location Filter"),
-                                                                              "Expiration Date" = FIELD("Date Filter"),
-                                                                              Open = CONST(true),
-                                                                              Positive = CONST(true)));
+            CalcFormula = sum("Item Ledger Entry"."Remaining Quantity" where("Item No." = field("Item No."),
+                                                                              "Variant Code" = field("Variant Code"),
+                                                                              "Lot No." = field("Lot No."),
+                                                                              "Location Code" = field("Location Filter"),
+                                                                              "Expiration Date" = field("Date Filter"),
+                                                                              Open = const(true),
+                                                                              Positive = const(true)));
             Caption = 'Expired Inventory';
             DecimalPlaces = 0 : 5;
             Editable = false;

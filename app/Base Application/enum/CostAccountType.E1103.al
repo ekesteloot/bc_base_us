@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Account;
+
 enum 1103 "Cost Account Type"
 {
     AssignmentCompatibility = true;

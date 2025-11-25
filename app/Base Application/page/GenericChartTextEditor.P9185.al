@@ -1,3 +1,7 @@
+namespace System.Visualization;
+
+using System.Globalization;
+
 page 9185 "Generic Chart Text Editor"
 {
     Caption = 'Generic Chart Text Editor';
@@ -12,7 +16,7 @@ page 9185 "Generic Chart Text Editor"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code. This field is intended only for internal use.';
@@ -29,7 +33,7 @@ page 9185 "Generic Chart Text Editor"
                     Editable = false;
                     ToolTip = 'Specifies the language of the measure caption that is shown next to the y-axis of the generic chart.';
                 }
-                field(Text; Caption)
+                field(Text; Rec.Caption)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the caption that is shown next to the y-axis to describe the selected measure.';
@@ -46,11 +50,11 @@ page 9185 "Generic Chart Text Editor"
     var
         Language: Codeunit Language;
     begin
-        Copy(TempGenericChartCaptionsBuf, true);
-        SetRange(Code, CaptionCode);
-        if Get(CaptionCode, Language.GetUserLanguageCode()) then;
+        Rec.Copy(TempGenericChartCaptionsBuf, true);
+        Rec.SetRange(Code, CaptionCode);
+        if Rec.Get(CaptionCode, Language.GetUserLanguageCode()) then;
         CurrPage.RunModal();
-        exit(GetCaption(CaptionCode, Language.GetUserLanguageCode()))
+        exit(Rec.GetCaption(CaptionCode, Language.GetUserLanguageCode()))
     end;
 }
 

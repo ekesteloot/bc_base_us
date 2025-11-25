@@ -1,7 +1,16 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using System.Text;
+using System.Utilities;
+
 report 7151 "Item Dimensions - Total"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemDimensionsTotal.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemDimensionsTotal.rdlc';
     ApplicationArea = Dimensions;
     Caption = 'Item Dimensions - Total';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +19,7 @@ report 7151 "Item Dimensions - Total"
     {
         dataitem("Item Analysis View"; "Item Analysis View")
         {
-            DataItemTableView = SORTING("Analysis Area", Code);
+            DataItemTableView = sorting("Analysis Area", Code);
             column(ViewLastUpdatedText; ViewLastUpdatedText)
             {
             }
@@ -99,7 +108,7 @@ report 7151 "Item Dimensions - Total"
             }
             dataitem(Level1; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ColumnValuesAsText51; ColumnValuesAsText[5, 1])
                 {
                     AutoCalcField = false;
@@ -140,7 +149,7 @@ report 7151 "Item Dimensions - Total"
                 }
                 dataitem(Level2; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ColumnValuesAsText52; ColumnValuesAsText[5, 2])
                     {
                         AutoCalcField = false;
@@ -181,7 +190,7 @@ report 7151 "Item Dimensions - Total"
                     }
                     dataitem(Level3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ColumnValuesAsText53; ColumnValuesAsText[5, 3])
                         {
                             AutoCalcField = false;
@@ -236,7 +245,7 @@ report 7151 "Item Dimensions - Total"
                     }
                     dataitem(Level2e; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(DimValNmeIndnt22DimValNme21; PadStr('', DimValNameIndent[2] * 2) + DimValName[2])
                         {
                         }
@@ -283,7 +292,7 @@ report 7151 "Item Dimensions - Total"
                 }
                 dataitem(Level1e; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(DimValNmeIndnt12DimValNme12; PadStr('', DimValNameIndent[1] * 2) + DimValName[1])
                     {
                     }
@@ -951,22 +960,22 @@ report 7151 "Item Dimensions - Total"
                     end;
                 end;
             else begin
-                    TempDimVal.Reset();
-                    TempDimVal.SetRange("Dimension Code", IterationDimCode);
-                    TempDimVal.SetFilter(Code, IterationFilter);
-                    if FindFirstRec then
-                        SearchResult := TempDimVal.Find('-')
-                    else
-                        if TempDimVal.Get(IterationDimCode, IterationDimValCode) then
-                            SearchResult := TempDimVal.Next() <> 0;
-                    if SearchResult then begin
-                        IterationDimValCode := TempDimVal.Code;
-                        IterationDimValName := TempDimVal.Name;
-                        IterationTotaling := TempDimVal.Totaling;
-                        IterationIndentation := TempDimVal.Indentation;
-                        IterationPostingType := TempDimVal."Dimension Value Type";
-                    end;
+                TempDimVal.Reset();
+                TempDimVal.SetRange("Dimension Code", IterationDimCode);
+                TempDimVal.SetFilter(Code, IterationFilter);
+                if FindFirstRec then
+                    SearchResult := TempDimVal.Find('-')
+                else
+                    if TempDimVal.Get(IterationDimCode, IterationDimValCode) then
+                        SearchResult := TempDimVal.Next() <> 0;
+                if SearchResult then begin
+                    IterationDimValCode := TempDimVal.Code;
+                    IterationDimValName := TempDimVal.Name;
+                    IterationTotaling := TempDimVal.Totaling;
+                    IterationIndentation := TempDimVal.Indentation;
+                    IterationPostingType := TempDimVal."Dimension Value Type";
                 end;
+            end;
         end;
         if not SearchResult then begin
             IterationDimValCode := '';

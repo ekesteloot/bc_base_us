@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Address;
+
 page 80 "Country/Region Translations"
 {
     Caption = 'Country/Region Translations';

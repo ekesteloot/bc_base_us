@@ -1,7 +1,14 @@
+namespace Microsoft.FixedAssets.Reports;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.FixedAssets.Setup;
+
 report 5610 "Fixed Asset - G/L Analysis"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/FixedAssetGLAnalysis.rdlc';
+    RDLCLayout = './FixedAssets/Reports/FixedAssetGLAnalysis.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset G/L Analysis';
     UsageCategory = ReportsAndAnalysis;
@@ -214,39 +221,39 @@ report 5610 "Fixed Asset - G/L Analysis"
                         ApplicationArea = FixedAssets;
                         Caption = 'Depreciation Book';
                         TableRelation = "Depreciation Book";
-                        ToolTip = 'Specifies a code for the depreciation book that is included in the report. You can set up an unlimited number of depreciation books to accommodate various depreciation purposes (such as tax and financial statements). For each depreciation book, you must define the terms and conditions, such as integration with general ledger.';
+                        ToolTip = 'Specifies the code for the depreciation book to be included in the report or batch job.';
                     }
                     field(StartingDate; StartingDate)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Starting Date';
-                        ToolTip = 'Specifies the date from which the report or batch job processes information.';
+                        ToolTip = 'Specifies the date when you want the report to start.';
                     }
                     field(EndingDate; EndingDate)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Ending Date';
-                        ToolTip = 'Specifies the date to which the report or batch job processes information.';
+                        ToolTip = 'Specifies the date when you want the report to end.';
                     }
                     field(DateField1; DateType1)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Date Field 1';
-                        TableRelation = "FA Date Type"."FA Date Type Name" WHERE("G/L Entry" = CONST(true));
-                        ToolTip = 'Specifies a special date that the report must show. The report has two columns in which two types of dates can be displayed. In each of the fields, select one of the available date types.';
+                        TableRelation = "FA Date Type"."FA Date Type Name" where("G/L Entry" = const(true));
+                        ToolTip = 'Specifies the first type of date that the report must show. The report has two columns in which two types of dates can be displayed. In each of the fields, select one of the available date types.';
                     }
                     field(DateField2; DateType2)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Date Field 2';
-                        TableRelation = "FA Date Type"."FA Date Type Name" WHERE("G/L Entry" = CONST(true));
-                        ToolTip = 'Specifies a special date that the report must show. The report has two columns in which two types of dates can be displayed. In each of the fields, select one of the available date types.';
+                        TableRelation = "FA Date Type"."FA Date Type Name" where("G/L Entry" = const(true));
+                        ToolTip = 'Specifies the second type of date that the report must show.';
                     }
                     field(AmountField1; PostingType1)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Amount Field 1';
-                        TableRelation = "FA Posting Type"."FA Posting Type Name" WHERE("G/L Entry" = CONST(true));
+                        TableRelation = "FA Posting Type"."FA Posting Type Name" where("G/L Entry" = const(true));
                         ToolTip = 'Specifies an Amount field that you use to create your own analysis. The report has three columns in which three types of amounts can be displayed. Choose the relevant FA posting type for each column.';
                     }
                     field(Period1; Period1)
@@ -254,13 +261,13 @@ report 5610 "Fixed Asset - G/L Analysis"
                         ApplicationArea = FixedAssets;
                         Caption = 'Period 1';
                         OptionCaption = ' ,Disposal,Bal. Disposal';
-                        ToolTip = 'Specifies how the report shows amounts in the first amount field. (Blank): The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field. Disposal: The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to disposal accounts. Bal. Disposal: The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to balancing disposal accounts. ';
+                        ToolTip = 'Specifies how the report determines the nature of the amounts in the first amount field. (Blank): The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field. Disposal: The amounts consists of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to disposal accounts. Bal. Disposal: The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to balancing disposal accounts.';
                     }
                     field(AmountField2; PostingType2)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Amount Field 2';
-                        TableRelation = "FA Posting Type"."FA Posting Type Name" WHERE("G/L Entry" = CONST(true));
+                        TableRelation = "FA Posting Type"."FA Posting Type Name" where("G/L Entry" = const(true));
                         ToolTip = 'Specifies an Amount field that you use to create your own analysis.';
                     }
                     field(Period2; Period2)
@@ -268,13 +275,13 @@ report 5610 "Fixed Asset - G/L Analysis"
                         ApplicationArea = FixedAssets;
                         Caption = 'Period 2';
                         OptionCaption = ' ,Disposal,Bal. Disposal';
-                        ToolTip = 'Specifies how the report shows amounts in the second amount field. (Blank): The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field. Disposal: The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to disposal accounts. Bal. Disposal: The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to balancing disposal accounts. ';
+                        ToolTip = 'Specifies how the report determines the nature of the amounts in the second amount field. (Blank): The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field. Disposal: The amounts consists of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to disposal accounts. Bal. Disposal: The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to balancing disposal accounts.';
                     }
                     field(AmountField3; PostingType3)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Amount Field 3';
-                        TableRelation = "FA Posting Type"."FA Posting Type Name" WHERE("G/L Entry" = CONST(true));
+                        TableRelation = "FA Posting Type"."FA Posting Type Name" where("G/L Entry" = const(true));
                         ToolTip = 'Specifies an Amount field that you use to create your own analysis.';
                     }
                     field(Period3; Period3)
@@ -282,14 +289,14 @@ report 5610 "Fixed Asset - G/L Analysis"
                         ApplicationArea = FixedAssets;
                         Caption = 'Period 3';
                         OptionCaption = ' ,Disposal,Bal. Disposal';
-                        ToolTip = 'Specifies how the report shows amounts in the third amount field. (Blank): The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field. Disposal: The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to disposal accounts. Bal. Disposal: The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to balancing disposal accounts. ';
+                        ToolTip = 'Specifies how the report determines the nature of the amounts in the third amount field. (Blank): The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field. Disposal: The amounts consists of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to disposal accounts. Bal. Disposal: The amounts consist of fixed asset ledger entries with the posting type that corresponds to the option in the amount field if these entries have been posted to balancing disposal accounts.';
                     }
                     field(GroupTotals; GroupTotals)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Group Totals';
                         OptionCaption = ' ,FA Class,FA Subclass,FA Location,Main Asset,Global Dimension 1,Global Dimension 2,FA Posting Group';
-                        ToolTip = 'Specifies that you want the report to group the fixed assets and print group totals. For example, if you have set up six FA classes, then select the FA Class option to have group totals printed for each of the six class codes. Select to see the available options. If you do not want group totals to be printed, select the blank option.';
+                        ToolTip = 'Specifies a group type if you want the report to group the fixed assets and print group totals. For example, if you have set up six FA classes, then select the FA Class option to have group totals printed for each of the six class codes. Select to see the available options. If you do not want group totals to be printed, select the blank option.';
                     }
                     field(PrintperFixedAsset; PrintDetails)
                     {

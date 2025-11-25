@@ -1,4 +1,35 @@
-﻿table 5108 "Sales Line Archive"
+﻿namespace Microsoft.Sales.Archive;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Enums;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Pricing;
+using Microsoft.WarehouseMgt.Structure;
+using System.Reflection;
+
+table 5108 "Sales Line Archive"
 {
     Caption = 'Sales Line Archive';
     PasteIsValid = false;
@@ -17,8 +48,8 @@
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Sales Header Archive"."No." WHERE("Document Type" = FIELD("Document Type"),
-                                                                "Version No." = FIELD("Version No."));
+            TableRelation = "Sales Header Archive"."No." where("Document Type" = field("Document Type"),
+                                                                "Version No." = field("Version No."));
         }
         field(4; "Line No."; Integer)
         {
@@ -31,29 +62,29 @@
         field(6; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(" ")) "Standard Text"
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF (Type = CONST("Charge (Item)")) "Item Charge";
+            TableRelation = if (Type = const(" ")) "Standard Text"
+            else
+            if (Type = const("G/L Account")) "G/L Account"
+            else
+            if (Type = const(Item)) Item
+            else
+            if (Type = const(Resource)) Resource
+            else
+            if (Type = const("Fixed Asset")) "Fixed Asset"
+            else
+            if (Type = const("Charge (Item)")) "Item Charge";
         }
         field(7; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(8; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
-            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group"
-            ELSE
-            IF (Type = CONST("Fixed Asset")) "FA Posting Group";
+            TableRelation = if (Type = const(Item)) "Inventory Posting Group"
+            else
+            if (Type = const("Fixed Asset")) "FA Posting Group";
         }
         field(9; "Quantity Disc. Code"; Code[20])
         {
@@ -98,7 +129,7 @@
         }
         field(22; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             CaptionClass = GetCaptionClass(FieldNo("Unit Price"));
             Caption = 'Unit Price';
@@ -129,19 +160,19 @@
         }
         field(28; "Line Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Discount Amount';
         }
         field(29; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
         }
         field(30; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
         }
@@ -179,13 +210,13 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(41; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(42; "Price Group Code"; Code[10])
         {
@@ -216,7 +247,7 @@
         }
         field(57; "Outstanding Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Outstanding Amount';
             Editable = false;
@@ -228,7 +259,7 @@
         }
         field(59; "Shipped Not Invoiced"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Shipped Not Invoiced';
         }
@@ -263,20 +294,20 @@
         }
         field(69; "Inv. Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Inv. Discount Amount';
         }
         field(71; "Purchase Order No."; Code[20])
         {
             Caption = 'Purchase Order No.';
-            TableRelation = IF ("Drop Shipment" = CONST(true)) "Purchase Header"."No." WHERE("Document Type" = CONST(Order));
+            TableRelation = if ("Drop Shipment" = const(true)) "Purchase Header"."No." where("Document Type" = const(Order));
         }
         field(72; "Purch. Order Line No."; Integer)
         {
             Caption = 'Purch. Order Line No.';
-            TableRelation = IF ("Drop Shipment" = CONST(true)) "Purchase Line"."Line No." WHERE("Document Type" = CONST(Order),
-                                                                                               "Document No." = FIELD("Purchase Order No."));
+            TableRelation = if ("Drop Shipment" = const(true)) "Purchase Line"."Line No." where("Document Type" = const(Order),
+                                                                                               "Document No." = field("Purchase Order No."));
         }
         field(73; "Drop Shipment"; Boolean)
         {
@@ -310,10 +341,10 @@
         field(80; "Attached to Line No."; Integer)
         {
             Caption = 'Attached to Line No.';
-            TableRelation = "Sales Line Archive"."Line No." WHERE("Document Type" = FIELD("Document Type"),
-                                                                   "Document No." = FIELD("Document No."),
-                                                                   "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                                                   "Version No." = FIELD("Version No."));
+            TableRelation = "Sales Line Archive"."Line No." where("Document Type" = field("Document Type"),
+                                                                   "Document No." = field("Document No."),
+                                                                   "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                                                   "Version No." = field("Version No."));
         }
         field(81; "Exit Point"; Code[10])
         {
@@ -382,27 +413,23 @@
         field(97; "Blanket Order No."; Code[20])
         {
             Caption = 'Blanket Order No.';
-            TableRelation = "Sales Header"."No." WHERE("Document Type" = CONST("Blanket Order"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Sales Header"."No." where("Document Type" = const("Blanket Order"));
         }
         field(98; "Blanket Order Line No."; Integer)
         {
             Caption = 'Blanket Order Line No.';
-            TableRelation = "Sales Line"."Line No." WHERE("Document Type" = CONST("Blanket Order"),
-                                                           "Document No." = FIELD("Blanket Order No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Sales Line"."Line No." where("Document Type" = const("Blanket Order"),
+                                                           "Document No." = field("Blanket Order No."));
         }
         field(99; "VAT Base Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'VAT Base Amount';
         }
         field(100; "Unit Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Cost';
         }
@@ -412,20 +439,20 @@
         }
         field(103; "Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Line Amount"));
             Caption = 'Line Amount';
         }
         field(104; "VAT Difference"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'VAT Difference';
         }
         field(105; "Inv. Disc. Amount to Invoice"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Inv. Disc. Amount to Invoice';
         }
@@ -450,7 +477,7 @@
         }
         field(110; "Prepmt. Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt. Line Amount"));
             Caption = 'Prepmt. Line Amount';
@@ -458,7 +485,7 @@
         }
         field(111; "Prepmt. Amt. Inv."; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt. Amt. Inv."));
             Caption = 'Prepmt. Amt. Inv.';
@@ -466,21 +493,21 @@
         }
         field(112; "Prepmt. Amt. Incl. VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepmt. Amt. Incl. VAT';
             Editable = false;
         }
         field(113; "Prepayment Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepayment Amount';
             Editable = false;
         }
         field(114; "Prepmt. VAT Base Amt."; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepmt. VAT Base Amt.';
             Editable = false;
@@ -518,7 +545,7 @@
         }
         field(121; "Prepmt Amt to Deduct"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt Amt to Deduct"));
             Caption = 'Prepmt Amt to Deduct';
@@ -526,7 +553,7 @@
         }
         field(122; "Prepmt Amt Deducted"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt Amt Deducted"));
             Caption = 'Prepmt Amt Deducted';
@@ -539,7 +566,7 @@
         }
         field(124; "Prepmt. Amount Inv. Incl. VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepmt. Amount Inv. Incl. VAT';
             Editable = false;
@@ -556,7 +583,7 @@
         }
         field(145; "Pmt. Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Pmt. Discount Amount';
         }
@@ -568,14 +595,14 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(1001; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
             Editable = false;
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(1002; "Job Contract Entry No."; Integer)
         {
@@ -602,12 +629,12 @@
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
@@ -622,8 +649,8 @@
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
             "Unit of Measure";
         }
         field(5415; "Quantity (Base)"; Decimal)
@@ -694,9 +721,9 @@
         }
         field(5702; "Substitution Available"; Boolean)
         {
-            CalcFormula = Exist("Item Substitution" WHERE(Type = CONST(Item),
-                                                           "No." = FIELD("No."),
-                                                           "Substitute Type" = CONST(Item)));
+            CalcFormula = exist("Item Substitution" where(Type = const(Item),
+                                                           "No." = field("No."),
+                                                           "Substitute Type" = const(Item)));
             Caption = 'Substitution Available';
             Editable = false;
             FieldClass = FlowField;
@@ -704,12 +731,12 @@
         field(5703; "Originally Ordered No."; Code[20])
         {
             Caption = 'Originally Ordered No.';
-            TableRelation = IF (Type = CONST(Item)) Item;
+            TableRelation = if (Type = const(Item)) Item;
         }
         field(5704; "Originally Ordered Var. Code"; Code[10])
         {
             Caption = 'Originally Ordered Var. Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("Originally Ordered No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("Originally Ordered No."));
         }
         field(5705; "Cross-Reference No."; Code[20])
         {
@@ -721,7 +748,7 @@
         field(5706; "Unit of Measure (Cross Ref.)"; Code[10])
         {
             Caption = 'Unit of Measure (Cross Ref.)';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."));
             ObsoleteReason = 'Cross-Reference replaced by Item Reference feature.';
             ObsoleteState = Removed;
             ObsoleteTag = '22.0';
@@ -770,13 +797,13 @@
         field(5714; "Special Order Purchase No."; Code[20])
         {
             Caption = 'Special Order Purchase No.';
-            TableRelation = IF ("Special Order" = CONST(true)) "Purchase Header"."No." WHERE("Document Type" = CONST(Order));
+            TableRelation = if ("Special Order" = const(true)) "Purchase Header"."No." where("Document Type" = const(Order));
         }
         field(5715; "Special Order Purch. Line No."; Integer)
         {
             Caption = 'Special Order Purch. Line No.';
-            TableRelation = IF ("Special Order" = CONST(true)) "Purchase Line"."Line No." WHERE("Document Type" = CONST(Order),
-                                                                                               "Document No." = FIELD("Special Order Purchase No."));
+            TableRelation = if ("Special Order" = const(true)) "Purchase Line"."Line No." where("Document Type" = const(Order),
+                                                                                               "Document No." = field("Special Order Purchase No."));
         }
         field(5725; "Item Reference No."; Code[50])
         {
@@ -785,7 +812,7 @@
         field(5726; "Item Reference Unit of Measure"; Code[10])
         {
             Caption = 'Reference Unit of Measure';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."));
         }
         field(5727; "Item Reference Type"; Enum "Item Reference Type")
         {
@@ -834,7 +861,7 @@
         field(5797; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(5800; "Allow Item Charge Assignment"; Boolean)
         {
@@ -864,7 +891,7 @@
         }
         field(5807; "Return Amt. Rcd. Not Invd."; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Return Amt. Rcd. Not Invd.';
         }
@@ -892,9 +919,9 @@
         field(5900; "Service Contract No."; Code[20])
         {
             Caption = 'Service Contract No.';
-            TableRelation = "Service Contract Header"."Contract No." WHERE("Contract Type" = CONST(Contract),
-                                                                            "Customer No." = FIELD("Sell-to Customer No."),
-                                                                            "Bill-to Customer No." = FIELD("Bill-to Customer No."));
+            TableRelation = "Service Contract Header"."Contract No." where("Contract Type" = const(Contract),
+                                                                            "Customer No." = field("Sell-to Customer No."),
+                                                                            "Bill-to Customer No." = field("Bill-to Customer No."));
         }
         field(5901; "Service Order No."; Code[20])
         {
@@ -903,7 +930,7 @@
         field(5902; "Service Item No."; Code[20])
         {
             Caption = 'Service Item No.';
-            TableRelation = "Service Item"."No." WHERE("Customer No." = FIELD("Sell-to Customer No."));
+            TableRelation = "Service Item"."No." where("Customer No." = field("Sell-to Customer No."));
         }
         field(5903; "Appl.-to Service Entry"; Integer)
         {
@@ -1033,7 +1060,7 @@
         exit(Field."Field Caption");
     end;
 
-    internal procedure IsExtendedText(): Boolean
+    procedure IsExtendedText(): Boolean
     begin
         exit((Type = Type::" ") and ("Attached to Line No." <> 0) and (Quantity = 0));
     end;

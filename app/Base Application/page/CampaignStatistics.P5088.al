@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Campaign;
+
 page 5088 "Campaign Statistics"
 {
     Caption = 'Campaign Statistics';
@@ -84,17 +86,17 @@ page 5088 "Campaign Statistics"
 
     trigger OnAfterGetRecord()
     begin
-        if "Target Contacts Contacted" = 0 then
+        if Rec."Target Contacts Contacted" = 0 then
             ResponseRate := 0
         else
-            ResponseRate := Round("Contacts Responded" / "Target Contacts Contacted" * 100, 0.1);
+            ResponseRate := Round(Rec."Contacts Responded" / Rec."Target Contacts Contacted" * 100, 0.1);
 
-        if "Contacts Responded" = 0 then begin
+        if Rec."Contacts Responded" = 0 then begin
             AvgCostPerResp := 0;
             AvgDurationPerResp := 0;
         end else begin
-            AvgCostPerResp := Round("Cost (LCY)" / "Contacts Responded");
-            AvgDurationPerResp := Round("Duration (Min.)" / "Contacts Responded", 0.01);
+            AvgCostPerResp := Round(Rec."Cost (LCY)" / Rec."Contacts Responded");
+            AvgDurationPerResp := Round(Rec."Duration (Min.)" / Rec."Contacts Responded", 0.01);
         end;
     end;
 

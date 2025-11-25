@@ -15,7 +15,7 @@ query 57 "Power BI Item Sales List"
             dataitem(Value_Entry; "Value Entry")
             {
                 DataItemLink = "Item No." = Item."No.";
-                DataItemTableFilter = "Item Ledger Entry Type" = CONST(Sale);
+                DataItemTableFilter = "Item Ledger Entry Type" = const(Sale);
                 column(Sales_Post_Date; "Posting Date")
                 {
                 }

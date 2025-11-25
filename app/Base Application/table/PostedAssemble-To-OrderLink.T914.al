@@ -1,3 +1,8 @@
+namespace Microsoft.AssemblyMgt.History;
+
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+
 table 914 "Posted Assemble-to-Order Link"
 {
     Caption = 'Posted Assemble-to-Order Link';
@@ -15,7 +20,7 @@ table 914 "Posted Assemble-to-Order Link"
         field(2; "Assembly Document No."; Code[20])
         {
             Caption = 'Assembly Document No.';
-            TableRelation = IF ("Assembly Document Type" = CONST(Assembly)) "Posted Assembly Header" WHERE("No." = FIELD("Assembly Document No."));
+            TableRelation = if ("Assembly Document Type" = const(Assembly)) "Posted Assembly Header" where("No." = field("Assembly Document No."));
         }
         field(12; "Document Type"; Option)
         {
@@ -26,8 +31,8 @@ table 914 "Posted Assemble-to-Order Link"
         field(13; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = IF ("Document Type" = CONST("Sales Shipment")) "Sales Shipment Line" WHERE("Document No." = FIELD("Document No."),
-                                                                                                      "Line No." = FIELD("Document Line No."));
+            TableRelation = if ("Document Type" = const("Sales Shipment")) "Sales Shipment Line" where("Document No." = field("Document No."),
+                                                                                                      "Line No." = field("Document Line No."));
         }
         field(14; "Document Line No."; Integer)
         {

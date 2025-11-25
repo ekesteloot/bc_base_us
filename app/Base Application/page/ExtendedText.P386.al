@@ -1,7 +1,9 @@
+namespace Microsoft.Foundation.ExtendedText;
+
 page 386 "Extended Text"
 {
     Caption = 'Extended Text';
-    DataCaptionExpression = GetCaption();
+    DataCaptionExpression = Rec.GetCaption();
     PageType = ListPlus;
     PopulateAllFields = true;
     SourceTable = "Extended Text Header";
@@ -42,10 +44,10 @@ page 386 "Extended Text"
             part(Control25; "Extended Text Lines")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Table Name" = FIELD("Table Name"),
-                              "No." = FIELD("No."),
-                              "Language Code" = FIELD("Language Code"),
-                              "Text No." = FIELD("Text No.");
+                SubPageLink = "Table Name" = field("Table Name"),
+                              "No." = field("No."),
+                              "Language Code" = field("Language Code"),
+                              "Text No." = field("Text No.");
             }
             group(Sales)
             {
@@ -84,7 +86,7 @@ page 386 "Extended Text"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies whether the text will be available on sales credit memos.';
                 }
-                field(Reminder; Reminder)
+                field(Reminder; Rec.Reminder)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies whether the extended text will be available on reminders.';

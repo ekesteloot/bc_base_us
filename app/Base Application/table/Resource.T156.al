@@ -1,3 +1,30 @@
+﻿namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.ProjectMgt.Resources.Setup;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Resources;
+using Microsoft.ServiceMgt.Setup;
+using System.Security.User;
+
 table 156 Resource
 {
     Caption = 'Resource';
@@ -60,11 +87,9 @@ table 156 Resource
         field(8; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -143,24 +168,24 @@ table 156 Resource
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(17; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(18; "Base Unit of Measure"; Code[10])
@@ -284,8 +309,8 @@ table 156 Resource
         }
         field(27; Comment; Boolean)
         {
-            CalcFormula = Exist("Comment Line" WHERE("Table Name" = CONST(Resource),
-                                                      "No." = FIELD("No.")));
+            CalcFormula = exist("Comment Line" where("Table Name" = const(Resource),
+                                                      "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -319,19 +344,19 @@ table 156 Resource
         }
         field(41; Capacity; Decimal)
         {
-            CalcFormula = Sum("Res. Capacity Entry".Capacity WHERE("Resource No." = FIELD("No."),
-                                                                    Date = FIELD("Date Filter")));
+            CalcFormula = sum("Res. Capacity Entry".Capacity where("Resource No." = field("No."),
+                                                                    Date = field("Date Filter")));
             Caption = 'Capacity';
             DecimalPlaces = 0 : 5;
             FieldClass = FlowField;
         }
         field(42; "Qty. on Order (Job)"; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line"."Quantity (Base)" WHERE(Status = CONST(Order),
-                                                                           "Schedule Line" = CONST(true),
-                                                                           Type = CONST(Resource),
-                                                                           "No." = FIELD("No."),
-                                                                           "Planning Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Job Planning Line"."Quantity (Base)" where(Status = const(Order),
+                                                                           "Schedule Line" = const(true),
+                                                                           Type = const(Resource),
+                                                                           "No." = field("No."),
+                                                                           "Planning Date" = field("Date Filter")));
             Caption = 'Qty. on Order (Job)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -339,11 +364,11 @@ table 156 Resource
         }
         field(43; "Qty. Quoted (Job)"; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line"."Quantity (Base)" WHERE(Status = CONST(Quote),
-                                                                           "Schedule Line" = CONST(true),
-                                                                           Type = CONST(Resource),
-                                                                           "No." = FIELD("No."),
-                                                                           "Planning Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Job Planning Line"."Quantity (Base)" where(Status = const(Quote),
+                                                                           "Schedule Line" = const(true),
+                                                                           Type = const(Resource),
+                                                                           "No." = field("No."),
+                                                                           "Planning Date" = field("Date Filter")));
             Caption = 'Qty. Quoted (Job)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -351,11 +376,11 @@ table 156 Resource
         }
         field(44; "Usage (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Res. Ledger Entry"."Quantity (Base)" WHERE("Entry Type" = CONST(Usage),
-                                                                           Chargeable = FIELD("Chargeable Filter"),
-                                                                           "Unit of Measure Code" = FIELD("Unit of Measure Filter"),
-                                                                           "Resource No." = FIELD("No."),
-                                                                           "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Res. Ledger Entry"."Quantity (Base)" where("Entry Type" = const(Usage),
+                                                                           Chargeable = field("Chargeable Filter"),
+                                                                           "Unit of Measure Code" = field("Unit of Measure Filter"),
+                                                                           "Resource No." = field("No."),
+                                                                           "Posting Date" = field("Date Filter")));
             Caption = 'Usage (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -364,11 +389,11 @@ table 156 Resource
         field(45; "Usage (Cost)"; Decimal)
         {
             AutoFormatType = 2;
-            CalcFormula = Sum("Res. Ledger Entry"."Total Cost" WHERE("Entry Type" = CONST(Usage),
-                                                                      Chargeable = FIELD("Chargeable Filter"),
-                                                                      "Unit of Measure Code" = FIELD("Unit of Measure Filter"),
-                                                                      "Resource No." = FIELD("No."),
-                                                                      "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Res. Ledger Entry"."Total Cost" where("Entry Type" = const(Usage),
+                                                                      Chargeable = field("Chargeable Filter"),
+                                                                      "Unit of Measure Code" = field("Unit of Measure Filter"),
+                                                                      "Resource No." = field("No."),
+                                                                      "Posting Date" = field("Date Filter")));
             Caption = 'Usage (Cost)';
             Editable = false;
             FieldClass = FlowField;
@@ -376,21 +401,21 @@ table 156 Resource
         field(46; "Usage (Price)"; Decimal)
         {
             AutoFormatType = 2;
-            CalcFormula = Sum("Res. Ledger Entry"."Total Price" WHERE("Entry Type" = CONST(Usage),
-                                                                       Chargeable = FIELD("Chargeable Filter"),
-                                                                       "Unit of Measure Code" = FIELD("Unit of Measure Filter"),
-                                                                       "Resource No." = FIELD("No."),
-                                                                       "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Res. Ledger Entry"."Total Price" where("Entry Type" = const(Usage),
+                                                                       Chargeable = field("Chargeable Filter"),
+                                                                       "Unit of Measure Code" = field("Unit of Measure Filter"),
+                                                                       "Resource No." = field("No."),
+                                                                       "Posting Date" = field("Date Filter")));
             Caption = 'Usage (Price)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(47; "Sales (Qty.)"; Decimal)
         {
-            CalcFormula = - Sum("Res. Ledger Entry"."Quantity (Base)" WHERE("Entry Type" = CONST(Sale),
-                                                                            "Unit of Measure Code" = FIELD("Unit of Measure Filter"),
-                                                                            "Resource No." = FIELD("No."),
-                                                                            "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Res. Ledger Entry"."Quantity (Base)" where("Entry Type" = const(Sale),
+                                                                            "Unit of Measure Code" = field("Unit of Measure Filter"),
+                                                                            "Resource No." = field("No."),
+                                                                            "Posting Date" = field("Date Filter")));
             Caption = 'Sales (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -399,10 +424,10 @@ table 156 Resource
         field(48; "Sales (Cost)"; Decimal)
         {
             AutoFormatType = 2;
-            CalcFormula = - Sum("Res. Ledger Entry"."Total Cost" WHERE("Entry Type" = CONST(Sale),
-                                                                       "Unit of Measure Code" = FIELD("Unit of Measure Filter"),
-                                                                       "Resource No." = FIELD("No."),
-                                                                       "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Res. Ledger Entry"."Total Cost" where("Entry Type" = const(Sale),
+                                                                       "Unit of Measure Code" = field("Unit of Measure Filter"),
+                                                                       "Resource No." = field("No."),
+                                                                       "Posting Date" = field("Date Filter")));
             Caption = 'Sales (Cost)';
             Editable = false;
             FieldClass = FlowField;
@@ -410,10 +435,10 @@ table 156 Resource
         field(49; "Sales (Price)"; Decimal)
         {
             AutoFormatType = 2;
-            CalcFormula = - Sum("Res. Ledger Entry"."Total Price" WHERE("Entry Type" = CONST(Sale),
-                                                                        "Unit of Measure Code" = FIELD("Unit of Measure Filter"),
-                                                                        "Resource No." = FIELD("No."),
-                                                                        "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Res. Ledger Entry"."Total Price" where("Entry Type" = const(Sale),
+                                                                        "Unit of Measure Code" = field("Unit of Measure Filter"),
+                                                                        "Resource No." = field("No."),
+                                                                        "Posting Date" = field("Date Filter")));
             Caption = 'Sales (Price)';
             Editable = false;
             FieldClass = FlowField;
@@ -446,11 +471,9 @@ table 156 Resource
         field(53; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -556,10 +579,10 @@ table 156 Resource
         }
         field(900; "Qty. on Assembly Order"; Decimal)
         {
-            CalcFormula = Sum("Assembly Line"."Remaining Quantity (Base)" WHERE("Document Type" = CONST(Order),
-                                                                                 Type = CONST(Resource),
-                                                                                 "No." = FIELD("No."),
-                                                                                 "Due Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Assembly Line"."Remaining Quantity (Base)" where("Document Type" = const(Order),
+                                                                                 Type = const(Resource),
+                                                                                 "No." = field("No."),
+                                                                                 "Due Date" = field("Date Filter")));
             Caption = 'Qty. on Assembly Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -616,10 +639,10 @@ table 156 Resource
         }
         field(5900; "Qty. on Service Order"; Decimal)
         {
-            CalcFormula = Sum("Service Order Allocation"."Allocated Hours" WHERE(Posted = CONST(false),
-                                                                                  "Resource No." = FIELD("No."),
-                                                                                  "Allocation Date" = FIELD("Date Filter"),
-                                                                                  Status = CONST(Active)));
+            CalcFormula = sum("Service Order Allocation"."Allocated Hours" where(Posted = const(false),
+                                                                                  "Resource No." = field("No."),
+                                                                                  "Allocation Date" = field("Date Filter"),
+                                                                                  Status = const(Active)));
             Caption = 'Qty. on Service Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -632,8 +655,8 @@ table 156 Resource
         }
         field(5902; "In Customer Zone"; Boolean)
         {
-            CalcFormula = Exist("Resource Service Zone" WHERE("Resource No." = FIELD("No."),
-                                                               "Service Zone Code" = FIELD("Service Zone Filter")));
+            CalcFormula = exist("Resource Service Zone" where("Resource No." = field("No."),
+                                                               "Service Zone Code" = field("Service Zone Filter")));
             Caption = 'In Customer Zone';
             Editable = false;
             FieldClass = FlowField;
@@ -830,7 +853,7 @@ table 156 Resource
         IsHandled := false;
         OnBeforeAssistEdit(Rec, OldRes, IsHandled, Result);
         if IsHandled then
-            exit(Result);
+            exit;
 
         with Res do begin
             Res := Rec;

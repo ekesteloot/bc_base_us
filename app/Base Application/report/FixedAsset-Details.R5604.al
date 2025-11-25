@@ -1,7 +1,14 @@
+namespace Microsoft.FixedAssets.Reports;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Setup;
+
 report 5604 "Fixed Asset - Details"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/FixedAssetDetails.rdlc';
+    RDLCLayout = './FixedAssets/Reports/FixedAssetDetails.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset Details';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +17,7 @@ report 5604 "Fixed Asset - Details"
     {
         dataitem("Fixed Asset"; "Fixed Asset")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "FA Class Code", "FA Subclass Code", "Budgeted Asset", "FA Posting Date Filter";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -81,7 +88,7 @@ report 5604 "Fixed Asset - Details"
             }
             dataitem("FA Ledger Entry"; "FA Ledger Entry")
             {
-                DataItemTableView = SORTING("FA No.", "Depreciation Book Code", "FA Posting Date");
+                DataItemTableView = sorting("FA No.", "Depreciation Book Code", "FA Posting Date");
                 column(FA_Ledger_Entry__FA_Posting_Date_; Format("FA Posting Date"))
                 {
                 }
@@ -157,13 +164,13 @@ report 5604 "Fixed Asset - Details"
                         ApplicationArea = FixedAssets;
                         Caption = 'Depreciation Book';
                         TableRelation = "Depreciation Book";
-                        ToolTip = 'Specifies a code for the depreciation book that is included in the report. You can set up an unlimited number of depreciation books to accommodate various depreciation purposes (such as tax and financial statements). For each depreciation book, you must define the terms and conditions, such as integration with general ledger.';
+                        ToolTip = 'Specifies the code for the depreciation book to be included in the report or batch job.';
                     }
                     field(NewPagePerAsset; PrintOnlyOnePerPage)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'New Page per Asset';
-                        ToolTip = 'Specifies if you want to print each asset on a separate page. Each asset will begin at the top of the following page. Otherwise, each asset will follow the previous account on the current page.';
+                        ToolTip = 'Specifies if you want each fixed asset printed on a new page.';
                     }
                     field(IncludeReversedEntries; PrintReversedEntries)
                     {

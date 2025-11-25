@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Sales.Document;
+
 codeunit 99000792 "Create Prod. Order from Sale"
 {
 
@@ -74,7 +80,7 @@ codeunit 99000792 "Create Prod. Order from Sale"
                 if ProdOrderLine.FindFirst() then begin
                     ProdOrderRowID :=
                       ItemTrackingMgt.ComposeRowID(
-                        DATABASE::"Prod. Order Line", ProdOrderLine.Status.AsInteger(),
+                        Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine.Status.AsInteger(),
                         ProdOrderLine."Prod. Order No.", '', ProdOrderLine."Line No.", 0);
                     ItemTrackingMgt.CopyItemTracking(SalesLine.RowID1(), ProdOrderRowID, true, true);
 

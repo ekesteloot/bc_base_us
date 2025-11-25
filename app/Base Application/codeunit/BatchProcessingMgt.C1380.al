@@ -96,7 +96,7 @@ codeunit 1380 "Batch Processing Mgt."
 
             if GuiAllowed() then
                 Window.Open(PostingTemplateMsg);
-            CounterTotal := Count();
+            CounterTotal := count();
 
             if ErrorMessageMgt.Activate(ErrorMessageHandler) then
                 ErrorMessageMgt.PushContext(ErrorContextElement, Number, 0, StrSubstNo(BatchProcessingTxt, Caption));
@@ -144,6 +144,7 @@ codeunit 1380 "Batch Processing Mgt."
         ICOutboxExport: Codeunit "IC Outbox Export";
         PostingResult: Boolean;
     begin
+        OnBeforeBatchProcessGenJournalLine(GenJournalLine);
         Commit();
         ErrorMessageMgt.Activate(ErrorMessageHandler);
 
@@ -340,7 +341,7 @@ codeunit 1380 "Batch Processing Mgt."
         BatchProcessingSessionMap: Record "Batch Processing Session Map";
         BatchProcessingParameter: Record "Batch Processing Parameter";
     begin
-        BatchProcessingSessionMap.SetRange("Record ID", RecordID);
+        BatchProcessingSessionMap.SetRange("Record ID", RecordId);
         BatchProcessingSessionMap.SetRange("User ID", UserSecurityId());
         BatchProcessingSessionMap.SetRange("Session ID", SessionId());
         BatchProcessingSessionMap.SetFilter("Batch ID", '<>%1', BatchIDGlobal);
@@ -399,7 +400,7 @@ codeunit 1380 "Batch Processing Mgt."
         BatchProcessingParameter: Record "Batch Processing Parameter";
         BatchProcessingSessionMap: Record "Batch Processing Session Map";
     begin
-        BatchProcessingSessionMap.SetRange("Record ID", RecordID);
+        BatchProcessingSessionMap.SetRange("Record ID", RecordId);
         BatchProcessingSessionMap.SetRange("User ID", UserSecurityId());
         BatchProcessingSessionMap.SetRange("Session ID", SessionId());
 
@@ -553,6 +554,11 @@ codeunit 1380 "Batch Processing Mgt."
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeBatchProcess(var RecRef: RecordRef)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeBatchProcessGenJournalLine(var GenJournalLine: Record "Gen. Journal Line")
     begin
     end;
 

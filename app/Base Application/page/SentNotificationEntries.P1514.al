@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 page 1514 "Sent Notification Entries"
 {
     ApplicationArea = Suite;
@@ -13,7 +15,7 @@ page 1514 "Sent Notification Entries"
         {
             repeater(Group)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the ID of the sent notification entry.';
@@ -28,7 +30,7 @@ page 1514 "Sent Notification Entries"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the user who received the sent notification.';
                 }
-                field("FORMAT(""Triggered By Record"")"; Format("Triggered By Record"))
+                field("FORMAT(""Triggered By Record"")"; Format(Rec."Triggered By Record"))
                 {
                     ApplicationArea = Suite;
                     Caption = 'Triggered By Record';
@@ -77,7 +79,7 @@ page 1514 "Sent Notification Entries"
 
                 trigger OnAction()
                 begin
-                    ExportContent(true);
+                    Rec.ExportContent(true);
                 end;
             }
         }

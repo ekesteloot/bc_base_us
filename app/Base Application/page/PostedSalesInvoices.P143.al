@@ -1,3 +1,13 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 page 143 "Posted Sales Invoices"
 {
     AdditionalSearchTerms = 'posted bill';
@@ -8,8 +18,8 @@ page 143 "Posted Sales Invoices"
     PageType = List;
     QueryCategory = 'Posted Sales Invoices';
     SourceTable = "Sales Invoice Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     AboutTitle = 'About posted sales invoices';
@@ -267,35 +277,35 @@ page 143 "Posted Sales Invoices"
                     ToolTip = 'Specifies the code for the shipping agent who is transporting the items.';
                     Visible = false;
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the posted sales invoice is paid. The check box will also be selected if a credit memo for the remaining amount has been applied.';
                 }
-                field(Cancelled; Cancelled)
+                field(Cancelled; Rec.Cancelled)
                 {
                     ApplicationArea = Basic, Suite;
-                    HideValue = NOT Cancelled;
+                    HideValue = not Rec.Cancelled;
                     Style = Unfavorable;
-                    StyleExpr = Cancelled;
+                    StyleExpr = Rec.Cancelled;
                     ToolTip = 'Specifies if the posted sales invoice has been either corrected or canceled.';
 
                     trigger OnDrillDown()
                     begin
-                        ShowCorrectiveCreditMemo();
+                        Rec.ShowCorrectiveCreditMemo();
                     end;
                 }
-                field(Corrective; Corrective)
+                field(Corrective; Rec.Corrective)
                 {
                     ApplicationArea = Basic, Suite;
-                    HideValue = NOT Corrective;
+                    HideValue = not Rec.Corrective;
                     Style = Unfavorable;
-                    StyleExpr = Corrective;
+                    StyleExpr = Rec.Corrective;
                     ToolTip = 'Specifies if the posted sales invoice is a corrective document.';
 
                     trigger OnDrillDown()
                     begin
-                        ShowCancelledCreditMemo();
+                        Rec.ShowCancelledCreditMemo();
                     end;
                 }
                 field("Shipment Date"; Rec."Shipment Date")
@@ -343,8 +353,8 @@ page 143 "Posted Sales Invoices"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Sales Invoice Header"),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::"Sales Invoice Header"),
+                              "No." = field("No.");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -392,10 +402,10 @@ page 143 "Posted Sales Invoices"
                     trigger OnAction()
                     begin
                         OnBeforeCalculateSalesTaxStatistics(Rec);
-                        if "Tax Area Code" = '' then
-                            PAGE.RunModal(PAGE::"Sales Invoice Statistics", Rec, "No.")
+                        if Rec."Tax Area Code" = '' then
+                            PAGE.RunModal(PAGE::"Sales Invoice Statistics", Rec, Rec."No.")
                         else
-                            PAGE.RunModal(PAGE::"Sales Invoice Stats.", Rec, "No.");
+                            PAGE.RunModal(PAGE::"Sales Invoice Stats.", Rec, Rec."No.");
                     end;
                 }
                 action("Co&mments")
@@ -404,8 +414,8 @@ page 143 "Posted Sales Invoices"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Invoice"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Invoice"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -419,7 +429,7 @@ page 143 "Posted Sales Invoices"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(IncomingDoc)
@@ -434,7 +444,7 @@ page 143 "Posted Sales Invoices"
                     var
                         IncomingDocument: Record "Incoming Document";
                     begin
-                        IncomingDocument.ShowCard("No.", "Posting Date");
+                        IncomingDocument.ShowCard(Rec."No.", Rec."Posting Date");
                     end;
                 }
             }
@@ -454,7 +464,7 @@ page 143 "Posted Sales Invoices"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CreateInCRM)
@@ -485,7 +495,7 @@ page 143 "Posted Sales Invoices"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -528,7 +538,7 @@ page 143 "Posted Sales Invoices"
 
                     trigger OnAction()
                     begin
-                        ExportEDocument();
+                        Rec.ExportEDocument();
                     end;
                 }
                 action(ExportEDocumentPDF)
@@ -540,7 +550,7 @@ page 143 "Posted Sales Invoices"
 
                     trigger OnAction()
                     begin
-                        ExportEDocumentPDF();
+                        Rec.ExportEDocumentPDF();
                     end;
                 }
                 action("&Cancel")
@@ -576,7 +586,7 @@ page 143 "Posted Sales Invoices"
                     var
                         CFDIDocuments: Record "CFDI Documents";
                     begin
-                        if CFDIDocuments.Get("No.", DATABASE::"Sales Invoice Header", true, true) then
+                        if CFDIDocuments.Get(Rec."No.", DATABASE::"Sales Invoice Header", true, true) then
                             PAGE.Run(PAGE::"SAT CFDI Document Information", CFDIDocuments);
                     end;
                 }
@@ -586,9 +596,9 @@ page 143 "Posted Sales Invoices"
                     Caption = 'CFDI Relation Documents';
                     Image = Allocations;
                     RunObject = Page "CFDI Relation Documents";
-                    RunPageLink = "Document Table ID" = CONST(112),
-                                  "Document No." = FIELD("No."),
-                                  "Customer No." = FIELD("Bill-to Customer No.");
+                    RunPageLink = "Document Table ID" = const(112),
+                                  "Document No." = field("No."),
+                                  "Customer No." = field("Bill-to Customer No.");
                     RunPageMode = View;
                     ToolTip = 'View or add CFDI relation documents for the record.';
                 }
@@ -658,7 +668,7 @@ page 143 "Posted Sales Invoices"
                 begin
                     SalesInvHeader := Rec;
                     CurrPage.SetSelectionFilter(SalesInvHeader);
-                    PrintToDocumentAttachment(SalesInvHeader);
+                    Rec.PrintToDocumentAttachment(SalesInvHeader);
                 end;
             }
             action(Navigate)
@@ -672,7 +682,7 @@ page 143 "Posted Sales Invoices"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action(ActivityLog)
@@ -686,7 +696,7 @@ page 143 "Posted Sales Invoices"
                 var
                     ActivityLog: Record "Activity Log";
                 begin
-                    ActivityLog.ShowEntries(RecordId);
+                    ActivityLog.ShowEntries(Rec.RecordId);
                 end;
             }
             group(Correct)
@@ -700,7 +710,7 @@ page 143 "Posted Sales Invoices"
                     Image = Undo;
                     Scope = Repeater;
                     ToolTip = 'Reverse this posted invoice. A credit memo will be created and matched with the invoice, and the invoice will be canceled. Shipments for the invoice will be reversed. To create a new invoice with the same information, use the Copy function. When you copy an invoice, remember to post shipments for the new invoice.';
-                    Visible = not Cancelled;
+                    Visible = not Rec.Cancelled;
 
                     trigger OnAction()
                     begin
@@ -715,7 +725,7 @@ page 143 "Posted Sales Invoices"
                     Image = Cancel;
                     Scope = Repeater;
                     ToolTip = 'Create and post a sales credit memo that reverses this posted sales invoice. This posted sales invoice will be canceled.';
-                    Visible = not Cancelled;
+                    Visible = not Rec.Cancelled;
 
                     trigger OnAction()
                     begin
@@ -753,11 +763,11 @@ page 143 "Posted Sales Invoices"
                     Image = CreditMemo;
                     Scope = Repeater;
                     ToolTip = 'Open the posted sales credit memo that was created when you canceled the posted sales invoice. If the posted sales invoice is the result of a canceled sales credit memo, then the canceled sales credit memo will open.';
-                    Visible = Cancelled OR Corrective;
+                    Visible = Rec.Cancelled or Rec.Corrective;
 
                     trigger OnAction()
                     begin
-                        ShowCanceledOrCorrCrMemo();
+                        Rec.ShowCanceledOrCorrCrMemo();
                     end;
                 }
             }
@@ -771,7 +781,7 @@ page 143 "Posted Sales Invoices"
                     Caption = 'Customer';
                     Image = Customer;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No.");
+                    RunPageLink = "No." = field("Sell-to Customer No.");
                     Scope = Repeater;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer.';
@@ -899,17 +909,17 @@ page 143 "Posted Sales Invoices"
         view(OnlyUnpaid)
         {
             Caption = 'Unpaid';
-            Filters = where(Cancelled = CONST(false), Closed = CONST(false));
+            Filters = where(Cancelled = const(false), Closed = const(false));
         }
         view(OnlyPaid)
         {
             Caption = 'Paid';
-            Filters = where(Cancelled = CONST(false), Closed = CONST(true));
+            Filters = where(Cancelled = const(false), Closed = const(true));
         }
         view(OnlyCancelled)
         {
             Caption = 'Canceled';
-            Filters = where(Cancelled = CONST(true));
+            Filters = where(Cancelled = const(true));
         }
     }
 
@@ -924,13 +934,13 @@ page 143 "Posted Sales Invoices"
         CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
         CRMIsCoupledToRecord := CRMIntegrationEnabled;
         if CRMIsCoupledToRecord then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
     end;
 
     trigger OnAfterGetRecord()
     begin
         if DocExchStatusVisible then
-            DocExchStatusStyle := GetDocExchStatusStyle();
+            DocExchStatusStyle := Rec.GetDocExchStatusStyle();
     end;
 
     trigger OnOpenPage()
@@ -940,15 +950,15 @@ page 143 "Posted Sales Invoices"
         OfficeMgt: Codeunit "Office Management";
         HasFilters: Boolean;
     begin
-        HasFilters := GetFilters <> '';
-        SetSecurityFilterOnRespCenter();
+        HasFilters := Rec.GetFilters() <> '';
+        Rec.SetSecurityFilterOnRespCenter();
         OnOpenPageOnAfterSetFilters(Rec);
         CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled();
-        if HasFilters and not Find() then
-            if FindFirst() then;
+        if HasFilters and not Rec.Find() then
+            if Rec.FindFirst() then;
         IsOfficeAddin := OfficeMgt.IsAvailable();
         SalesInvoiceHeader.CopyFilters(Rec);
-        SalesInvoiceHeader.SetFilter("Document Exchange Status", '<>%1', "Document Exchange Status"::"Not Sent");
+        SalesInvoiceHeader.SetFilter("Document Exchange Status", '<>%1', Rec."Document Exchange Status"::"Not Sent");
         DocExchStatusVisible := not SalesInvoiceHeader.IsEmpty();
     end;
 

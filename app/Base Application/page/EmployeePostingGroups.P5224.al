@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Employee;
+
 page 5224 "Employee Posting Groups"
 {
     ApplicationArea = BasicHR;
@@ -12,7 +14,7 @@ page 5224 "Employee Posting Groups"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies an identifier for the employee posting group.';

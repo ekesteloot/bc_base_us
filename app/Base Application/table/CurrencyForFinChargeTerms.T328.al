@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.FinancialMgt.Currency;
+
 table 328 "Currency for Fin. Charge Terms"
 {
     Caption = 'Currency for Fin. Charge Terms';
@@ -22,7 +26,7 @@ table 328 "Currency for Fin. Charge Terms"
         }
         field(4; "Additional Fee"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Additional Fee';
             MinValue = 0;

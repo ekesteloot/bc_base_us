@@ -1,3 +1,5 @@
+namespace Microsoft.CashFlow.Comment;
+
 page 848 "Cash Flow Comment"
 {
     AutoSplitKey = true;
@@ -12,17 +14,17 @@ page 848 "Cash Flow Comment"
             repeater(Control1000)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the date of the cash flow comment.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the comment for the record.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code of the record.';
@@ -46,7 +48,7 @@ page 848 "Cash Flow Comment"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
     end;
 }
 

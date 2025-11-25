@@ -1,3 +1,9 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Statement;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.IO;
+
 page 1287 "Payment Application Review"
 {
     PageType = Card;
@@ -126,12 +132,12 @@ page 1287 "Payment Application Review"
                         trigger OnValidate()
                         begin
                             CurrPage.Update();
-                            if Difference <> 0 then
-                                TransferRemainingAmountToAccount();
+                            if Rec.Difference <> 0 then
+                                Rec.TransferRemainingAmountToAccount();
                         end;
                     }
 
-                    field(AccountName; GetAppliedToName())
+                    field(AccountName; Rec.GetAppliedToName())
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Account Name';
@@ -140,11 +146,11 @@ page 1287 "Payment Application Review"
 
                         trigger OnDrillDown()
                         begin
-                            AppliedToDrillDown();
+                            Rec.AppliedToDrillDown();
                         end;
                     }
 
-                    field(GetAppliedToDocumentNo; GetAppliedToDocumentNo())
+                    field(GetAppliedToDocumentNo; Rec.GetAppliedToDocumentNo())
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Document No.';
@@ -152,7 +158,7 @@ page 1287 "Payment Application Review"
 
                         trigger OnDrillDown()
                         begin
-                            ShowAppliedToEntries();
+                            Rec.ShowAppliedToEntries();
                         end;
                     }
 
@@ -245,7 +251,7 @@ page 1287 "Payment Application Review"
                         end;
                     }
 
-                    field(DocExtDocNumber; GetAppliedToDocumentNo())
+                    field(DocExtDocNumber; Rec.GetAppliedToDocumentNo())
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Document Number';
@@ -254,7 +260,7 @@ page 1287 "Payment Application Review"
 
                         trigger OnDrillDown()
                         begin
-                            ShowAppliedToEntries();
+                            Rec.ShowAppliedToEntries();
                         end;
                     }
                 }
@@ -283,7 +289,7 @@ page 1287 "Payment Application Review"
                         ToolTip = 'Specifies how many open ledger entries match the amount on the bank statement line.';
                     }
 
-                    field(AccountNameReview; GetAppliedToName())
+                    field(AccountNameReview; Rec.GetAppliedToName())
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'No. of Open Ledger Entries for';
@@ -291,7 +297,7 @@ page 1287 "Payment Application Review"
 
                         trigger OnDrillDown()
                         begin
-                            OpenAccountPage("Account Type".AsInteger(), "Account No.");
+                            Rec.OpenAccountPage(Rec."Account Type".AsInteger(), Rec."Account No.");
                         end;
                     }
 
@@ -304,7 +310,7 @@ page 1287 "Payment Application Review"
 
                         trigger OnDrillDown()
                         begin
-                            DrillDownOnNoOfLedgerEntriesWithinAmountTolerance();
+                            Rec.DrillDownOnNoOfLedgerEntriesWithinAmountTolerance();
                         end;
                     }
 
@@ -317,7 +323,7 @@ page 1287 "Payment Application Review"
 
                         trigger OnDrillDown()
                         begin
-                            DrillDownOnNoOfLedgerEntriesOutsideOfAmountTolerance();
+                            Rec.DrillDownOnNoOfLedgerEntriesOutsideOfAmountTolerance();
                         end;
                     }
                 }
@@ -346,7 +352,7 @@ page 1287 "Payment Application Review"
                     begin
                         CurrPage.SetSelectionFilter(BankAccReconciliationLine);
                         BankAccReconciliationLine.AcceptAppliedPaymentEntriesSelectedLines();
-                        Next();
+                        Rec.Next();
                     end;
                 }
 
@@ -378,8 +384,8 @@ page 1287 "Payment Application Review"
                     trigger OnAction()
                     var
                     begin
-                        DisplayApplication();
-                        GetAppliedPmtData(AppliedPmtEntry, RemainingAmountAfterPosting, StatementToRemAmtDifference, PmtAppliedToTxt);
+                        Rec.DisplayApplication();
+                        Rec.GetAppliedPmtData(AppliedPmtEntry, RemainingAmountAfterPosting, StatementToRemAmtDifference, PmtAppliedToTxt);
                     end;
                 }
 
@@ -447,7 +453,7 @@ page 1287 "Payment Application Review"
 
     trigger OnOpenPage()
     begin
-        TotalNumberOfRecordsToReview := Count();
+        TotalNumberOfRecordsToReview := Rec.Count();
         CurrentRecordToReview := 0;
         CurrPage.Caption(PageCaptionLbl);
         Clear(VisitedKeys);
@@ -459,18 +465,18 @@ page 1287 "Payment Application Review"
         MatchBankPayments: Codeunit "Match Bank Payments";
     begin
         ClearGlobals();
-        CalcFields("Match Confidence", "Match Quality");
-        HasPaymentFile := GetPaymentFile(DataExchField);
-        GetAppliedPmtData(AppliedPmtEntry, RemainingAmountAfterPosting, StatementToRemAmtDifference, PmtAppliedToTxt);
-        CurrentRecordToReview := VisitedKeys.IndexOf("Statement Line No.");
+        Rec.CalcFields("Match Confidence", "Match Quality");
+        HasPaymentFile := Rec.GetPaymentFile(DataExchField);
+        Rec.GetAppliedPmtData(AppliedPmtEntry, RemainingAmountAfterPosting, StatementToRemAmtDifference, PmtAppliedToTxt);
+        CurrentRecordToReview := VisitedKeys.IndexOf(Rec."Statement Line No.");
         if (CurrentRecordToReview < 1) then begin
-            VisitedKeys.Add("Statement Line No.");
+            VisitedKeys.Add(Rec."Statement Line No.");
             CurrentRecordToReview := VisitedKeys.Count();
         end;
 
-        DifferenceVisible := (Difference <> 0) and ("Applied Entries" > 0);
-        LineNotAppliedVisible := "Applied Entries" = 0;
-        TotalNumberOfRecordsToReview := Count();
+        DifferenceVisible := (Rec.Difference <> 0) and (Rec."Applied Entries" > 0);
+        LineNotAppliedVisible := Rec."Applied Entries" = 0;
+        TotalNumberOfRecordsToReview := Rec.Count();
         IsMatchedAutomatically := MatchBankPayments.IsMatchedAutomatically(Rec, BankPmtApplRule);
         MatchBankPayments.GetMatchPaymentDetailsInfo(Rec, BankPmtApplRule, IsMatchedAutomatically, RelatedPartyMatchedText, AmountMatchText, DocumentMatchedText, DirectDebitMatchedText, DirectDebitMatched, NoOfLedgerEntriesWithinAmountTolerance, NoOfLedgerEntriesOutsideAmountTolerance, RelatedPartyMatchInfoText, DocumentMatchInfoText);
         DocumentMatchDetailsEnabled := DocumentMatchInfoText <> '';
@@ -483,7 +489,7 @@ page 1287 "Payment Application Review"
             ReviewRequiredVisible := not TempReviewBankPmtApplRule.IsEmpty();
         end;
 
-        ReviewRequiredTxt := StrSubstNo(ReviewRequiredLbl, Format("Match Confidence"));
+        ReviewRequiredTxt := StrSubstNo(ReviewRequiredLbl, Format(Rec."Match Confidence"));
 
         if TotalNumberOfRecordsToReview > 1 then
             CurrPage.Caption(PageCaptionLbl + StrSubstNo(RemainingRecordToReviewPageCaptionLbl, TotalNumberOfRecordsToReview))

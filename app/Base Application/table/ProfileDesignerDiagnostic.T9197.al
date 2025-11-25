@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 table 9197 "Profile Designer Diagnostic"
 {
     DataClassification = CustomerContent;

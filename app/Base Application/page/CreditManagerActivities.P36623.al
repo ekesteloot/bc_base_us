@@ -76,14 +76,14 @@ page 36623 "Credit Manager Activities"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
-        SetRange("Overdue Date Filter", 0D, WorkDate() - 1);
-        SetRange("User Filter", UserId);
+        Rec.SetRange("Overdue Date Filter", 0D, WorkDate() - 1);
+        Rec.SetRange("User Filter", UserId);
     end;
 }
 

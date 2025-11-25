@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.PaymentRegistration;
+
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+
 page 983 "Payment Registration Details"
 {
     Caption = 'Payment Registration Details';
@@ -25,7 +30,7 @@ page 983 "Payment Registration Details"
                     var
                         Customer: Record Customer;
                     begin
-                        Customer.Get("Source No.");
+                        Customer.Get(Rec."Source No.");
                         PAGE.Run(PAGE::"Customer Card", Customer);
                     end;
                 }
@@ -41,7 +46,7 @@ page 983 "Payment Registration Details"
 
                     trigger OnDrillDown()
                     begin
-                        Navigate();
+                        Rec.Navigate();
                     end;
                 }
                 field("Document Type"; Rec."Document Type")
@@ -129,7 +134,7 @@ page 983 "Payment Registration Details"
                     Caption = 'Finance Charge Memo';
                     Image = FinChargeMemo;
                     RunObject = Page "Finance Charge Memo";
-                    RunPageLink = "Customer No." = FIELD("Source No.");
+                    RunPageLink = "Customer No." = field("Source No.");
                     RunPageMode = Create;
                     ToolTip = 'Create a finance charge memo for the customer on the selected line, for example, to issue a finance charge for late payment.';
                 }
@@ -147,7 +152,7 @@ page 983 "Payment Registration Details"
 
                     trigger OnAction()
                     begin
-                        Navigate();
+                        Rec.Navigate();
                     end;
                 }
             }
@@ -195,9 +200,9 @@ page 983 "Payment Registration Details"
 
     local procedure SetUserInteractions()
     begin
-        PmtDiscStyle := GetPmtDiscStyle();
-        DueDateStyle := GetDueDateStyle();
-        Warning := GetWarning();
+        PmtDiscStyle := Rec.GetPmtDiscStyle();
+        DueDateStyle := Rec.GetDueDateStyle();
+        Warning := Rec.GetWarning();
     end;
 }
 

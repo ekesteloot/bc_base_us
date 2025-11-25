@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 2587 "Dim Corr Values Overview"
 {
     PageType = List;

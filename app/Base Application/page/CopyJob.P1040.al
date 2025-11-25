@@ -1,3 +1,9 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Sales.Customer;
+
 page 1040 "Copy Job"
 {
     Caption = 'Copy Job';
@@ -204,8 +210,22 @@ page 1040 "Copy Job"
     end;
 
     var
-        SourceJob: Record Job;
         CopyJob: Codeunit "Copy Job";
+        FromDate: Date;
+        ToDate: Date;
+        Source: Option "Job Planning Lines","Job Ledger Entries","None";
+        PlanningLineType: Option "Budget+Billable",Budget,Billable;
+        LedgerEntryType: Option "Usage+Sale",Usage,Sale;
+        PlanningLineTypeEnable: Boolean;
+        LedgerEntryLineTypeEnable: Boolean;
+
+        Text001: Label 'The job no. %1 was successfully copied to the new job no. %2 with the status %3.', Comment = '%1 - The "No." of source job; %2 - The "No." of target job, %3 - job status.';
+        Text002: Label 'Job No. %1 will be assigned to the new Job. Do you want to continue?';
+        Text003: Label '%1 %2 does not exist.', Comment = 'Job Task 1000 does not exist.';
+        Text004: Label 'Provide a valid source %1.';
+
+    protected var
+        SourceJob: Record Job;
         SourceJobNo: Code[20];
         FromJobTaskNo: Code[20];
         ToJobTaskNo: Code[20];
@@ -213,22 +233,9 @@ page 1040 "Copy Job"
         TargetJobDescription: Text[100];
         TargetSellToCustomerNo: Code[20];
         TargetBillToCustomerNo: Code[20];
-        FromDate: Date;
-        ToDate: Date;
-        Source: Option "Job Planning Lines","Job Ledger Entries","None";
-        PlanningLineType: Option "Budget+Billable",Budget,Billable;
-        LedgerEntryType: Option "Usage+Sale",Usage,Sale;
-        Text001: Label 'The job no. %1 was successfully copied to the new job no. %2 with the status %3.', Comment = '%1 - The "No." of source job; %2 - The "No." of target job, %3 - job status.';
-        Text002: Label 'Job No. %1 will be assigned to the new Job. Do you want to continue?';
-        Text003: Label '%1 %2 does not exist.', Comment = 'Job Task 1000 does not exist.';
         CopyJobPrices: Boolean;
         CopyQuantity: Boolean;
         CopyDimensions: Boolean;
-        [InDataSet]
-        PlanningLineTypeEnable: Boolean;
-        [InDataSet]
-        LedgerEntryLineTypeEnable: Boolean;
-        Text004: Label 'Provide a valid source %1.';
 
     local procedure ValidateUserInput()
     var
@@ -238,7 +245,6 @@ page 1040 "Copy Job"
     begin
         if (SourceJobNo = '') or not SourceJob.Get(SourceJob."No.") then
             Error(Text004, SourceJob.TableCaption());
-
         IsHandled := false;
         OnValidateUserInputOnBeforeCheckTargetJobNo(SourceJob, TargetJobNo, IsHandled);
         if not IsHandled then begin

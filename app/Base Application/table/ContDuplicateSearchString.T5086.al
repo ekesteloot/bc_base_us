@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Duplicates;
+
+using Microsoft.CRM.Contact;
+
 table 5086 "Cont. Duplicate Search String"
 {
     Caption = 'Cont. Duplicate Search String';
@@ -8,7 +12,7 @@ table 5086 "Cont. Duplicate Search String"
         {
             Caption = 'Contact Company No.';
             NotBlank = true;
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(2; "Field No."; Integer)
         {

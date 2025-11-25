@@ -1,3 +1,16 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.AssemblyMgt.Posting;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.WarehouseMgt.Ledger;
+
 page 902 "Assembly Orders"
 {
     AdditionalSearchTerms = 'kitting order,kit sale';
@@ -9,7 +22,7 @@ page 902 "Assembly Orders"
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "Assembly Header";
-    SourceTableView = WHERE("Document Type" = FILTER(Order));
+    SourceTableView = where("Document Type" = filter(Order));
     UsageCategory = Lists;
 
     layout
@@ -33,6 +46,12 @@ page 902 "Assembly Orders"
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the description of the assembly item.';
+                }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Assembly;
+                    ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
                 }
                 field("Due Date"; Rec."Due Date")
                 {
@@ -125,9 +144,9 @@ page 902 "Assembly Orders"
                         Caption = 'Item Ledger E&ntries';
                         Image = ItemLedger;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Assembly),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Assembly),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ShortCutKey = 'Ctrl+F7';
                         ToolTip = 'View the item ledger entries of the item on the document or journal line.';
                     }
@@ -137,9 +156,9 @@ page 902 "Assembly Orders"
                         Caption = 'Capacity Ledger Entries';
                         Image = CapacityLedger;
                         RunObject = Page "Capacity Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Assembly),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Assembly),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                     }
                     action("Resource Ledger Entries")
@@ -148,9 +167,9 @@ page 902 "Assembly Orders"
                         Caption = 'Resource Ledger Entries';
                         Image = ResourceLedger;
                         RunObject = Page "Resource Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Assembly),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Assembly),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the ledger entries for the resource.';
                     }
                     action("Value Entries")
@@ -159,9 +178,9 @@ page 902 "Assembly Orders"
                         Caption = 'Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Order Type" = CONST(Assembly),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Assembly),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the value entries of the item on the document or journal line.';
                     }
                     action("Warehouse Entries")
@@ -170,10 +189,10 @@ page 902 "Assembly Orders"
                         Caption = '&Warehouse Entries';
                         Image = BinLedger;
                         RunObject = Page "Warehouse Entries";
-                        RunPageLink = "Source Type" = FILTER(83 | 901),
-                                      "Source Subtype" = FILTER("1" | "6"),
-                                      "Source No." = FIELD("No.");
-                        RunPageView = SORTING("Source Type", "Source Subtype", "Source No.");
+                        RunPageLink = "Source Type" = filter(83 | 901),
+                                      "Source Subtype" = filter("1" | "6"),
+                                      "Source No." = field("No.");
+                        RunPageView = sorting("Source Type", "Source Subtype", "Source No.");
                         ToolTip = 'View the history of quantities that are registered for the item in warehouse activities. ';
                     }
                 }
@@ -183,8 +202,8 @@ page 902 "Assembly Orders"
                     Caption = 'Show Order';
                     Image = ViewOrder;
                     RunObject = Page "Assembly Order";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View the selected assembly order.';
                 }
@@ -286,7 +305,7 @@ page 902 "Assembly Orders"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Assembly BOM")
@@ -295,7 +314,7 @@ page 902 "Assembly Orders"
                     Caption = 'Assembly BOM';
                     Image = AssemblyBOM;
                     RunObject = Page "Assembly BOM";
-                    RunPageLink = "Parent Item No." = FIELD("Item No.");
+                    RunPageLink = "Parent Item No." = field("Item No.");
                     ToolTip = 'View or edit the bill of material that specifies which items and resources are required to assemble the assembly item.';
                 }
                 action(Comments)
@@ -304,9 +323,9 @@ page 902 "Assembly Orders"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Assembly Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "Document No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "Document No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -407,10 +426,10 @@ page 902 "Assembly Orders"
                 Caption = 'Release';
                 ShowAs = SplitButton;
 
-                actionref(Reopen_Promoted; Reopen)
+                actionref(Release_Promoted; Release)
                 {
                 }
-                actionref(Release_Promoted; Release)
+                actionref(Reopen_Promoted; Reopen)
                 {
                 }
             }

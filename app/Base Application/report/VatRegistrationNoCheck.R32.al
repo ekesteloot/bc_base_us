@@ -10,7 +10,7 @@ report 32 "VAT Registration No. Check"
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {
             }
@@ -22,13 +22,13 @@ report 32 "VAT Registration No. Check"
             }
             dataitem(Integer2; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(Format_ErrorsCaption; Format_ErrorsCaptionLbl)
                 {
                 }
                 dataitem(Customer; Customer)
                 {
-                    DataItemTableView = SORTING("No.") WHERE("VAT Registration No." = FILTER(<> ''));
+                    DataItemTableView = sorting("No.") where("VAT Registration No." = filter(<> ''));
                     column(Customer__No__; "No.")
                     {
                     }
@@ -64,7 +64,7 @@ report 32 "VAT Registration No. Check"
                 }
                 dataitem(Vendor; Vendor)
                 {
-                    DataItemTableView = SORTING("No.") WHERE("VAT Registration No." = FILTER(<> ''));
+                    DataItemTableView = sorting("No.") where("VAT Registration No." = filter(<> ''));
                     column(Vendor__No__; "No.")
                     {
                     }
@@ -100,7 +100,7 @@ report 32 "VAT Registration No. Check"
                 }
                 dataitem(Contact; Contact)
                 {
-                    DataItemTableView = SORTING("No.") WHERE("VAT Registration No." = FILTER(<> ''));
+                    DataItemTableView = sorting("No.") where("VAT Registration No." = filter(<> ''));
                     column(Contact__No__; "No.")
                     {
                     }
@@ -144,13 +144,13 @@ report 32 "VAT Registration No. Check"
             }
             dataitem(Integer3; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(DuplicatesCaption; DuplicatesCaptionLbl)
                 {
                 }
                 dataitem(Customer2; Customer)
                 {
-                    DataItemTableView = SORTING("No.") WHERE("VAT Registration No." = FILTER(<> ''));
+                    DataItemTableView = sorting("No.") where("VAT Registration No." = filter(<> ''));
                     PrintOnlyIfDetail = true;
                     column(Customer2__No__; "No.")
                     {
@@ -181,8 +181,8 @@ report 32 "VAT Registration No. Check"
                     }
                     dataitem(Customer3; Customer)
                     {
-                        DataItemLink = "VAT Registration No." = FIELD("VAT Registration No.");
-                        DataItemTableView = SORTING("VAT Registration No.") WHERE("VAT Registration No." = FILTER(<> ''));
+                        DataItemLink = "VAT Registration No." = field("VAT Registration No.");
+                        DataItemTableView = sorting("VAT Registration No.") where("VAT Registration No." = filter(<> ''));
                         column(Customer3__No__; "No.")
                         {
                         }
@@ -212,7 +212,7 @@ report 32 "VAT Registration No. Check"
                 }
                 dataitem(Vendor2; Vendor)
                 {
-                    DataItemTableView = SORTING("No.") WHERE("VAT Registration No." = FILTER(<> ''));
+                    DataItemTableView = sorting("No.") where("VAT Registration No." = filter(<> ''));
                     PrintOnlyIfDetail = true;
                     column(Vendor2__No__; "No.")
                     {
@@ -243,8 +243,8 @@ report 32 "VAT Registration No. Check"
                     }
                     dataitem(Vendor3; Vendor)
                     {
-                        DataItemLink = "VAT Registration No." = FIELD("VAT Registration No.");
-                        DataItemTableView = SORTING("VAT Registration No.") WHERE("VAT Registration No." = FILTER(<> ''));
+                        DataItemLink = "VAT Registration No." = field("VAT Registration No.");
+                        DataItemTableView = sorting("VAT Registration No.") where("VAT Registration No." = filter(<> ''));
                         column(Vendor3__No__; "No.")
                         {
                         }
@@ -274,7 +274,7 @@ report 32 "VAT Registration No. Check"
                 }
                 dataitem(Contact2; Contact)
                 {
-                    DataItemTableView = SORTING("No.") WHERE("VAT Registration No." = FILTER(<> ''));
+                    DataItemTableView = sorting("No.") where("VAT Registration No." = filter(<> ''));
                     PrintOnlyIfDetail = true;
                     column(Contact2__No__; "No.")
                     {
@@ -305,8 +305,8 @@ report 32 "VAT Registration No. Check"
                     }
                     dataitem(Contact3; Contact)
                     {
-                        DataItemLink = "VAT Registration No." = FIELD("VAT Registration No.");
-                        DataItemTableView = SORTING("VAT Registration No.") WHERE("VAT Registration No." = FILTER(<> ''));
+                        DataItemLink = "VAT Registration No." = field("VAT Registration No.");
+                        DataItemTableView = sorting("VAT Registration No.") where("VAT Registration No." = filter(<> ''));
                         column(Contact3__No__; "No.")
                         {
                         }

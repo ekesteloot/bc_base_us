@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Setup;
+
 codeunit 99000793 "Calculate Low-Level Code"
 {
     Permissions = TableData Item = rm,
@@ -16,7 +22,7 @@ codeunit 99000793 "Calculate Low-Level Code"
             SetRecursiveLevelsOnBOM(ProdBOM, Item2."Low-Level Code" + 1, false);
         OnBeforeItemModify(Item2);
         Item2.Modify();
-        Copy(Item2);
+        Rec.Copy(Item2);
     end;
 
     var

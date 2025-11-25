@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 1507 "Workflow Step Buffer"
 {
     Caption = 'Workflow Step Buffer';
@@ -103,15 +105,15 @@ table 1507 "Workflow Step Buffer"
         {
             Caption = 'Event Step ID';
             DataClassification = SystemMetadata;
-            TableRelation = "Workflow Step".ID WHERE("Workflow Code" = FIELD("Workflow Code"),
-                                                      Type = CONST(Event));
+            TableRelation = "Workflow Step".ID where("Workflow Code" = field("Workflow Code"),
+                                                      Type = const(Event));
         }
         field(8; "Response Step ID"; Integer)
         {
             Caption = 'Response Step ID';
             DataClassification = SystemMetadata;
-            TableRelation = "Workflow Step".ID WHERE("Workflow Code" = FIELD("Workflow Code"),
-                                                      Type = CONST(Response));
+            TableRelation = "Workflow Step".ID where("Workflow Code" = field("Workflow Code"),
+                                                      Type = const(Response));
         }
         field(9; "Workflow Code"; Code[20])
         {
@@ -123,14 +125,14 @@ table 1507 "Workflow Step Buffer"
         {
             Caption = 'Parent Event Step ID';
             DataClassification = SystemMetadata;
-            TableRelation = "Workflow Step".ID WHERE("Workflow Code" = FIELD("Workflow Code"),
-                                                      Type = CONST(Event));
+            TableRelation = "Workflow Step".ID where("Workflow Code" = field("Workflow Code"),
+                                                      Type = const(Event));
         }
         field(11; "Previous Workflow Step ID"; Integer)
         {
             Caption = 'Previous Workflow Step ID';
             DataClassification = SystemMetadata;
-            TableRelation = "Workflow Step".ID WHERE("Workflow Code" = FIELD("Workflow Code"));
+            TableRelation = "Workflow Step".ID where("Workflow Code" = field("Workflow Code"));
         }
         field(12; "Response Description Style"; Text[30])
         {
@@ -170,7 +172,7 @@ table 1507 "Workflow Step Buffer"
         }
         field(18; Template; Boolean)
         {
-            CalcFormula = Lookup(Workflow.Template WHERE(Code = FIELD("Workflow Code")));
+            CalcFormula = Lookup(Workflow.Template where(Code = field("Workflow Code")));
             Caption = 'Template';
             FieldClass = FlowField;
         }

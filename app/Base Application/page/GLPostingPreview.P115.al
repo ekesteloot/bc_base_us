@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 page 115 "G/L Posting Preview"
 {
     Caption = 'Posting Preview';
@@ -68,7 +70,7 @@ page 115 "G/L Posting Preview"
 
                     trigger OnAction()
                     begin
-                        PostingPreviewEventHandler.ShowEntries("Table ID");
+                        PostingPreviewEventHandler.ShowEntries(Rec."Table ID");
                     end;
                 }
             }
@@ -95,7 +97,7 @@ page 115 "G/L Posting Preview"
         if TempDocumentEntry.FindSet() then
             repeat
                 Rec := TempDocumentEntry;
-                Insert();
+                Rec.Insert();
             until TempDocumentEntry.Next() = 0;
     end;
 }

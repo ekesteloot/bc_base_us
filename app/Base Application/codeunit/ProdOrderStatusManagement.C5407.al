@@ -1,4 +1,22 @@
-﻿codeunit 5407 "Prod. Order Status Management"
+﻿namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Purchases.Document;
+using Microsoft.WarehouseMgt.Activity;
+using System.Environment.Configuration;
+using System.Utilities;
+
+codeunit 5407 "Prod. Order Status Management"
 {
     Permissions = TableData "Source Code Setup" = r,
                   TableData "Production Order" = rimd,
@@ -72,7 +90,7 @@
             IsHandled := false;
             OnChangeProdOrderStatusOnBeforeDeleteDocReservation(ProdOrder, IsHandled);
             if not IsHandled then
-                ReservMgt.DeleteDocumentReservation(DATABASE::"Prod. Order Line", ProdOrder.Status.AsInteger(), ProdOrder."No.", false);
+                ReservMgt.DeleteDocumentReservation(Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrder.Status.AsInteger(), ProdOrder."No.", false);
             ErrorIfUnableToClearWIP(ProdOrder);
             TransProdOrder(ProdOrder);
 
@@ -229,7 +247,7 @@
                         ToProdOrderLine.Modify();
                         NewStatusOption := NewStatus.AsInteger();
                         OnAfterToProdOrderLineModify(ToProdOrderLine, FromProdOrderLine, NewStatusOption);
-                        NewStatus := "Production Order Status".FromInteger(NewStatusOption);
+                        NewStatus := Enum::"Production Order Status".FromInteger(NewStatusOption);
                     end;
                 until Next() = 0;
                 OnAfterTransProdOrderLines(FromProdOrder, ToProdOrder);
@@ -974,7 +992,7 @@
                 UOMMgt.TimeRndPrecision()));
             ItemJnlLine.Validate(
               "Run Time",
-              CostCalculationManagement.CalcCostTime(
+              CostCalculationManagement.CalculateCostTime(
                 OutputQtyBase + PutawayQtyBaseToCalc,
                 ProdOrderRtngLine."Setup Time", ProdOrderRtngLine."Setup Time Unit of Meas. Code",
                 ProdOrderRtngLine."Run Time", ProdOrderRtngLine."Run Time Unit of Meas. Code",
@@ -1095,7 +1113,7 @@
           WarehouseActivityLine."Activity Type"::"Invt. Movement", WarehouseActivityLine."Activity Type"::"Invt. Pick",
           WarehouseActivityLine."Activity Type"::Pick);
         WarehouseActivityLine.SetSourceFilter(
-          DATABASE::"Prod. Order Component", ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.",
+          Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.",
           ProdOrderComponent."Prod. Order Line No.", ProdOrderComponent."Line No.", true);
         WarehouseActivityLine.SetRange("Original Breakbulk", false);
         WarehouseActivityLine.SetRange("Breakbulk No.", 0);

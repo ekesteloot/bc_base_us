@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Comment;
+
 table 5090 "Sales Cycle"
 {
     Caption = 'Sales Cycle';
@@ -27,10 +31,10 @@ table 5090 "Sales Cycle"
         }
         field(5; "No. of Opportunities"; Integer)
         {
-            CalcFormula = Count ("Opportunity Entry" WHERE(Active = CONST(true),
-                                                           "Sales Cycle Code" = FIELD(Code),
-                                                           "Action Taken" = FILTER(<> Won & <> Lost),
-                                                           "Estimated Close Date" = FIELD("Date Filter")));
+            CalcFormula = Count("Opportunity Entry" where(Active = const(true),
+                                                           "Sales Cycle Code" = field(Code),
+                                                           "Action Taken" = filter(<> Won & <> Lost),
+                                                           "Estimated Close Date" = field("Date Filter")));
             Caption = 'No. of Opportunities';
             Editable = false;
             FieldClass = FlowField;
@@ -38,10 +42,10 @@ table 5090 "Sales Cycle"
         field(6; "Estimated Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("Opportunity Entry"."Estimated Value (LCY)" WHERE(Active = CONST(true),
-                                                                                 "Sales Cycle Code" = FIELD(Code),
-                                                                                 "Action Taken" = FILTER(<> Won & <> Lost),
-                                                                                 "Estimated Close Date" = FIELD("Date Filter")));
+            CalcFormula = Sum("Opportunity Entry"."Estimated Value (LCY)" where(Active = const(true),
+                                                                                 "Sales Cycle Code" = field(Code),
+                                                                                 "Action Taken" = filter(<> Won & <> Lost),
+                                                                                 "Estimated Close Date" = field("Date Filter")));
             Caption = 'Estimated Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -49,19 +53,19 @@ table 5090 "Sales Cycle"
         field(7; "Calcd. Current Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("Opportunity Entry"."Calcd. Current Value (LCY)" WHERE(Active = CONST(true),
-                                                                                      "Sales Cycle Code" = FIELD(Code),
-                                                                                      "Action Taken" = FILTER(<> Won & <> Lost),
-                                                                                      "Estimated Close Date" = FIELD("Date Filter")));
+            CalcFormula = Sum("Opportunity Entry"."Calcd. Current Value (LCY)" where(Active = const(true),
+                                                                                      "Sales Cycle Code" = field(Code),
+                                                                                      "Action Taken" = filter(<> Won & <> Lost),
+                                                                                      "Estimated Close Date" = field("Date Filter")));
             Caption = 'Calcd. Current Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(8; Comment; Boolean)
         {
-            CalcFormula = Exist ("Rlshp. Mgt. Comment Line" WHERE("Table Name" = CONST("Sales Cycle"),
-                                                                  "No." = FIELD(Code),
-                                                                  "Sub No." = CONST(0)));
+            CalcFormula = Exist("Rlshp. Mgt. Comment Line" where("Table Name" = const("Sales Cycle"),
+                                                                  "No." = field(Code),
+                                                                  "Sub No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;

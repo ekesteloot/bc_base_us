@@ -172,7 +172,7 @@ codeunit 104030 "Upgrade Plan Permissions"
         PlanIds: Codeunit "Plan Ids";
     begin
         AddUserGroupToPlan(CopyStr(BackupRestoreTok, 1, MaxStrLen(UserGroupPlan."User Group Code")),
-            PlanIds.GetInternalAdminPlanId());
+            PlanIds.GetGlobalAdminPlanId());
     end;
 
     local procedure TryInsertPermissionSet(PermissionSetID: Code[20]; PermissionSetName: Text[30]): Boolean
@@ -356,7 +356,7 @@ codeunit 104030 "Upgrade Plan Permissions"
         AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetViralSignupPlanId());
         AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetExternalAccountantPlanId());
         AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetDelegatedAdminPlanId());
-        AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetInternalAdminPlanId());
+        AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetGlobalAdminPlanId());
         AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetTeamMemberISVPlanId());
         AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetEssentialISVPlanId());
         AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetPremiumISVPlanId());
@@ -366,6 +366,7 @@ codeunit 104030 "Upgrade Plan Permissions"
         AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetAccountantHubPlanId());
         AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetHelpDeskPlanId());
         AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetInfrastructurePlanId());
+        AddUserGroupToPlan(ExcelExportActionTok, PlanIds.GetEssentialAttachPlanId());
     end;
 
     local procedure SetAutomateActionPermissions()
@@ -441,7 +442,7 @@ codeunit 104030 "Upgrade Plan Permissions"
         AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetViralSignupPlanId());
         AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetExternalAccountantPlanId());
         AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetDelegatedAdminPlanId());
-        AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetInternalAdminPlanId());
+        AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetGlobalAdminPlanId());
         AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetTeamMemberISVPlanId());
         AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetEssentialISVPlanId());
         AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetPremiumISVPlanId());
@@ -452,6 +453,7 @@ codeunit 104030 "Upgrade Plan Permissions"
         AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetHelpDeskPlanId());
         AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetInfrastructurePlanId());
         AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetPremiumPartnerSandboxPlanId());
+        AddUserGroupToPlan(AutomateActionUserGroupTok, PlanIds.GetEssentialAttachPlanId());
     end;
 
     local procedure SetMonitorSensitiveFieldPermissions()

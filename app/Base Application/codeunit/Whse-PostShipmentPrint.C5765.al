@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Document;
+
 codeunit 5765 "Whse.-Post Shipment + Print"
 {
     TableNo = "Warehouse Shipment Line";

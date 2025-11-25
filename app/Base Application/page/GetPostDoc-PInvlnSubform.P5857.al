@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Purchases.Document;
+
 page 5857 "Get Post.Doc - P.InvLn Subform"
 {
     Caption = 'Lines';
@@ -60,7 +66,7 @@ page 5857 "Get Post.Doc - P.InvLn Subform"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that this item is a catalog item.';
@@ -369,7 +375,6 @@ page 5857 "Get Post.Doc - P.InvLn Subform"
         ShowRec: Boolean;
 
     protected var
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     local procedure IsFirstDocLine(): Boolean
@@ -459,7 +464,7 @@ page 5857 "Get Post.Doc - P.InvLn Subform"
 
     local procedure GetAppliedQty(): Decimal
     begin
-        if (Rec.Type = Type::Item) and (Rec.Quantity - RemainingQty > 0) then
+        if (Rec.Type = Rec.Type::Item) and (Rec.Quantity - RemainingQty > 0) then
             exit(Rec.Quantity - RemainingQty);
         exit(0);
     end;
@@ -472,7 +477,7 @@ page 5857 "Get Post.Doc - P.InvLn Subform"
 
     local procedure ShowDocument()
     begin
-        if not PurchInvHeader.Get("Document No.") then
+        if not PurchInvHeader.Get(Rec."Document No.") then
             exit;
         PAGE.Run(PAGE::"Posted Purchase Invoice", PurchInvHeader);
     end;

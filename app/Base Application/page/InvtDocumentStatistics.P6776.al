@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Document;
+
 page 6776 "Invt. Document Statistics"
 {
     Caption = 'Item Document Statistics';
@@ -61,8 +63,8 @@ page 6776 "Invt. Document Statistics"
     begin
         ClearAll();
 
-        InvtDocLine.SetRange("Document Type", "Document Type");
-        InvtDocLine.SetRange("Document No.", "No.");
+        InvtDocLine.SetRange("Document Type", Rec."Document Type");
+        InvtDocLine.SetRange("Document No.", Rec."No.");
         if InvtDocLine.Find('-') then
             repeat
                 LineQty := LineQty + InvtDocLine.Quantity;

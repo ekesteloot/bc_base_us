@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 enum 1514 "Notification Method Type"
 {
     Extensible = true;

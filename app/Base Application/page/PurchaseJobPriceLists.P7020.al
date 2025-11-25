@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Pricing;
+
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+
 page 7020 "Purchase Job Price Lists"
 {
     Caption = 'Purchase Job Price Lists';
@@ -7,7 +15,7 @@ page 7020 "Purchase Job Price Lists"
     QueryCategory = 'Purchase Job Price Lists';
     RefreshOnActivate = true;
     SourceTable = "Price List Header";
-    SourceTableView = WHERE("Source Group" = CONST(Job), "Price Type" = CONST(Purchase));
+    SourceTableView = where("Source Group" = const(Job), "Price Type" = const(Purchase));
     ApplicationArea = Jobs;
     UsageCategory = Lists;
 

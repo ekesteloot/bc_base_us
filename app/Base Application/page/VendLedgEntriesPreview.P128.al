@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 page 128 "Vend. Ledg. Entries Preview"
 {
     Caption = 'Vendor Entries Preview';
@@ -118,7 +123,7 @@ page 128 "Vend. Ledg. Entries Preview"
                     Caption = 'Original Amount';
                     Editable = false;
                     ToolTip = 'Specifies the amount on the vendor ledger entry before you post.';
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
 
                     trigger OnDrillDown()
@@ -145,7 +150,7 @@ page 128 "Vend. Ledg. Entries Preview"
                     Caption = 'Amount';
                     Editable = false;
                     ToolTip = 'Specifies the net amount of all the lines in the vendor entry.';
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
 
                     trigger OnDrillDown()
@@ -196,7 +201,7 @@ page 128 "Vend. Ledg. Entries Preview"
                     Caption = 'Remaining Amount';
                     Editable = false;
                     ToolTip = 'Specifies the remaining amount on the vendor ledger entry before you post.';
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
 
                     trigger OnDrillDown()
@@ -262,7 +267,7 @@ page 128 "Vend. Ledg. Entries Preview"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the maximum tolerated amount the entry can differ from the amount on the invoice or credit memo.';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the amount on the entry has been fully paid or there is still a remaining amount that must be applied to.';
@@ -364,7 +369,7 @@ page 128 "Vend. Ledg. Entries Preview"
                     var
                         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
                     begin
-                        GenJnlPostPreview.ShowDimensions(DATABASE::"Vendor Ledger Entry", "Entry No.", "Dimension Set ID");
+                        GenJnlPostPreview.ShowDimensions(DATABASE::"Vendor Ledger Entry", Rec."Entry No.", Rec."Dimension Set ID");
                     end;
                 }
                 action(SetDimensionFilter)
@@ -377,7 +382,7 @@ page 128 "Vend. Ledg. Entries Preview"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -400,7 +405,7 @@ page 128 "Vend. Ledg. Entries Preview"
 
     trigger OnAfterGetRecord()
     begin
-        StyleTxt := SetStyle();
+        StyleTxt := Rec.SetStyle();
         CalcAmounts(AmountFCY, AmountLCY, RemainingAmountFCY, RemainingAmountLCY, OriginalAmountFCY, OriginalAmountLCY);
     end;
 
@@ -442,7 +447,7 @@ page 128 "Vend. Ledg. Entries Preview"
         if TempVendLedgerEntry.FindSet() then
             repeat
                 Rec := TempVendLedgerEntry;
-                Insert();
+                Rec.Insert();
             until TempVendLedgerEntry.Next() = 0;
 
         if TempDetailedVendLedgEntry2.FindSet() then
@@ -461,7 +466,7 @@ page 128 "Vend. Ledg. Entries Preview"
         OriginalAmountLCY := 0;
         OriginalAmountFCY := 0;
 
-        TempDetailedVendLedgEntry.SetRange("Vendor Ledger Entry No.", "Entry No.");
+        TempDetailedVendLedgEntry.SetRange("Vendor Ledger Entry No.", Rec."Entry No.");
         if TempDetailedVendLedgEntry.FindSet() then
             repeat
                 if TempDetailedVendLedgEntry."Entry Type" = TempDetailedVendLedgEntry."Entry Type"::"Initial Entry" then begin

@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.InventoryMgt.Setup;
+using System.Text;
+
 codeunit 360 "Accounting Period Mgt."
 {
     Permissions = tabledata "Accounting Period" = R;

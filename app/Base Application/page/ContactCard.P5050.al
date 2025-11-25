@@ -1,3 +1,28 @@
+﻿namespace Microsoft.CRM.Contact;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Outlook;
+using Microsoft.CRM.Profiling;
+using Microsoft.CRM.Reports;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using Microsoft.CRM.Task;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Pricing;
+using System.Email;
+using System.Integration.Word;
+using System.IO;
+
 page 5050 "Contact Card"
 {
     Caption = 'Contact Card';
@@ -20,7 +45,7 @@ page 5050 "Contact Card"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -98,7 +123,7 @@ page 5050 "Contact Card"
                         begin
                             CurrPage.SaveRecord();
                             Commit();
-                            LookupCompany();
+                            Rec.LookupCompany();
                             CurrPage.Update(false);
                         end;
                     }
@@ -120,7 +145,7 @@ page 5050 "Contact Card"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        Rec.ShowBusinessRelation("Contact Business Relation Link To Table"::" ", true);
+                        Rec.ShowBusinessRelation(Enum::"Contact Business Relation Link To Table"::" ", true);
                         CurrPage.Update(false);
                     end;
                 }
@@ -142,9 +167,9 @@ page 5050 "Contact Card"
                             ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
                             ContactBusinessRelation.SetRange("No.", Customer."No.");
                             if ContactBusinessRelation.FindFirst() then
-                                Validate("Company No.", ContactBusinessRelation."Contact No.");
+                                Rec.Validate("Company No.", ContactBusinessRelation."Contact No.");
                         end else
-                            Validate("Company No.", '');
+                            Rec.Validate("Company No.", '');
                     end;
                 }
                 field("Search Name"; Rec."Search Name")
@@ -172,7 +197,7 @@ page 5050 "Contact Card"
                     Importance = Additional;
                     ToolTip = 'Specifies the organizational code for the contact, for example, top management. This field is valid for persons only.';
                 }
-                field(LastDateTimeModified; GetLastDateTimeModified())
+                field(LastDateTimeModified; Rec.GetLastDateTimeModified())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Last DateTime Modified';
@@ -190,8 +215,8 @@ page 5050 "Contact Card"
                         InteractionLogEntry: Record "Interaction Log Entry";
                     begin
                         InteractionLogEntry.SetCurrentKey("Contact Company No.", Date, "Contact No.", Canceled, "Initiated By", "Attempt Failed");
-                        InteractionLogEntry.SetRange("Contact Company No.", "Company No.");
-                        InteractionLogEntry.SetFilter("Contact No.", "Lookup Contact No.");
+                        InteractionLogEntry.SetRange("Contact Company No.", Rec."Company No.");
+                        InteractionLogEntry.SetFilter("Contact No.", Rec."Lookup Contact No.");
                         InteractionLogEntry.SetRange("Attempt Failed", false);
                         if InteractionLogEntry.FindLast() then
                             PAGE.Run(0, InteractionLogEntry);
@@ -208,8 +233,8 @@ page 5050 "Contact Card"
                         InteractionLogEntry: Record "Interaction Log Entry";
                     begin
                         InteractionLogEntry.SetCurrentKey("Contact Company No.", Date, "Contact No.", Canceled, "Initiated By", "Attempt Failed");
-                        InteractionLogEntry.SetRange("Contact Company No.", "Company No.");
-                        InteractionLogEntry.SetFilter("Contact No.", "Lookup Contact No.");
+                        InteractionLogEntry.SetRange("Contact Company No.", Rec."Company No.");
+                        InteractionLogEntry.SetFilter("Contact No.", Rec."Lookup Contact No.");
                         InteractionLogEntry.SetRange("Initiated By", InteractionLogEntry."Initiated By"::Us);
                         if InteractionLogEntry.FindLast() then
                             PAGE.Run(0, InteractionLogEntry);
@@ -233,7 +258,7 @@ page 5050 "Contact Card"
                     Importance = Additional;
                     ToolTip = 'Specifies whether to limit access to data for the data subject during daily operations. This is useful, for example, when protecting data from changes while it is under privacy review.';
                 }
-                field(Minor; Minor)
+                field(Minor; Rec.Minor)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
@@ -263,8 +288,8 @@ page 5050 "Contact Card"
             {
                 ApplicationArea = RelationshipMgmt;
                 Caption = 'History';
-                SubPageLink = "Contact Company No." = FIELD("Company No."),
-                                "Contact No." = FIELD("No.");
+                SubPageLink = "Contact Company No." = field("Company No."),
+                                "Contact No." = field("No.");
             }
             group(Communication)
             {
@@ -272,7 +297,7 @@ page 5050 "Contact Card"
                 group(Control37)
                 {
                     Caption = 'Address';
-                    field(Address; Address)
+                    field(Address; Rec.Address)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the contact''s address.';
@@ -293,12 +318,12 @@ page 5050 "Contact Card"
                         Importance = Promoted;
                         ToolTip = 'Specifies the postal code.';
                     }
-                    field(City; City)
+                    field(City; Rec.City)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the city where the contact is located.';
                     }
-                    field(County; County)
+                    field(County; Rec.County)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'State';
@@ -316,7 +341,7 @@ page 5050 "Contact Card"
                         trigger OnDrillDown()
                         begin
                             CurrPage.Update(true);
-                            DisplayMap();
+                            Rec.DisplayMap();
                         end;
                     }
                 }
@@ -363,6 +388,12 @@ page 5050 "Contact Card"
                         Importance = Promoted;
                         ToolTip = 'Specifies the language that is used when translating specified text on documents to foreign business partner, such as an item description on an order confirmation.';
                     }
+                    field("Format Region"; Rec."Format Region")
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Importance = Promoted;
+                        ToolTip = 'Specifies the format region that is used when formatting dates and numbers on documents to foreign business partner, such as an total amount on an order date.';
+                    }
                 }
             }
             group("Foreign Trade")
@@ -400,7 +431,7 @@ page 5050 "Contact Card"
             {
                 ApplicationArea = RelationshipMgmt;
                 Caption = 'Profile Questionnaire';
-                SubPageLink = "Contact No." = FIELD("No.");
+                SubPageLink = "Contact No." = field("No.");
             }
         }
         area(factboxes)
@@ -408,14 +439,14 @@ page 5050 "Contact Card"
             part(Control41; "Contact Picture")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = NOT IsOfficeAddin;
             }
             part(Control31; "Contact Statistics FactBox")
             {
                 ApplicationArea = RelationshipMgmt;
-                SubPageLink = "No." = FIELD("No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("No."),
+                              "Date Filter" = field("Date Filter");
             }
             systempart(Control1900383207; Links)
             {
@@ -464,8 +495,8 @@ page 5050 "Contact Card"
                         var
                             ContactIndustryGroupRec: Record "Contact Industry Group";
                         begin
-                            CheckContactType(Type::Company);
-                            ContactIndustryGroupRec.SetRange("Contact No.", "Company No.");
+                            Rec.CheckContactType(Rec.Type::Company);
+                            ContactIndustryGroupRec.SetRange("Contact No.", Rec."Company No.");
                             PAGE.Run(PAGE::"Contact Industry Groups", ContactIndustryGroupRec);
                         end;
                     }
@@ -480,8 +511,8 @@ page 5050 "Contact Card"
                         var
                             ContactWebSourceRec: Record "Contact Web Source";
                         begin
-                            CheckContactType(Type::Company);
-                            ContactWebSourceRec.SetRange("Contact No.", "Company No.");
+                            Rec.CheckContactType(Rec.Type::Company);
+                            ContactWebSourceRec.SetRange("Contact No.", Rec."Company No.");
                             PAGE.Run(PAGE::"Contact Web Sources", ContactWebSourceRec);
                         end;
                     }
@@ -502,8 +533,8 @@ page 5050 "Contact Card"
                         var
                             ContJobResp: Record "Contact Job Responsibility";
                         begin
-                            CheckContactType(Type::Person);
-                            ContJobResp.SetRange("Contact No.", "No.");
+                            Rec.CheckContactType(Rec.Type::Person);
+                            ContJobResp.SetRange("Contact No.", Rec."No.");
                             PAGE.RunModal(PAGE::"Contact Job Responsibilities", ContJobResp);
                         end;
                     }
@@ -528,7 +559,7 @@ page 5050 "Contact Card"
                     Caption = '&Picture';
                     Image = Picture;
                     RunObject = Page "Contact Picture";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'View or add a picture of the contact person or, for example, the company''s logo.';
                 }
                 action("Co&mments")
@@ -537,9 +568,9 @@ page 5050 "Contact Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Rlshp. Mgt. Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Contact),
-                                  "No." = FIELD("No."),
-                                  "Sub No." = CONST(0);
+                    RunPageLink = "Table Name" = const(Contact),
+                                  "No." = field("No."),
+                                  "Sub No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 group("Alternati&ve Address")
@@ -552,7 +583,7 @@ page 5050 "Contact Card"
                         Caption = 'Card';
                         Image = EditLines;
                         RunObject = Page "Contact Alt. Address List";
-                        RunPageLink = "Contact No." = FIELD("No.");
+                        RunPageLink = "Contact No." = field("No.");
                         ToolTip = 'View or change detailed information about the contact.';
                     }
                     action("Date Ranges")
@@ -561,7 +592,7 @@ page 5050 "Contact Card"
                         Caption = 'Date Ranges';
                         Image = DateRange;
                         RunObject = Page "Contact Alt. Addr. Date Ranges";
-                        RunPageLink = "Contact No." = FIELD("No.");
+                        RunPageLink = "Contact No." = field("No.");
                         ToolTip = 'Specify date ranges that apply to the contact''s alternate address.';
                     }
                 }
@@ -569,7 +600,7 @@ page 5050 "Contact Card"
             group(ActionGroupCRM)
             {
                 Caption = 'Dataverse';
-                Enabled = (Type <> Type::Company) AND ("Company No." <> '');
+                Enabled = (Rec.Type <> Rec.Type::Company) AND (Rec."Company No." <> '');
                 Visible = CRMIntegrationEnabled or CDSIntegrationEnabled;
                 action(CRMGotoContact)
                 {
@@ -582,7 +613,7 @@ page 5050 "Contact Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -597,7 +628,7 @@ page 5050 "Contact Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.UpdateOneNow(RecordId);
+                        CRMIntegrationManagement.UpdateOneNow(Rec.RecordId);
                     end;
                 }
                 group(Coupling)
@@ -617,7 +648,7 @@ page 5050 "Contact Card"
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(DeleteCRMCoupling)
@@ -633,7 +664,7 @@ page 5050 "Contact Card"
                         var
                             CRMCouplingManagement: Codeunit "CRM Coupling Management";
                         begin
-                            CRMCouplingManagement.RemoveCoupling(RecordId);
+                            CRMCouplingManagement.RemoveCoupling(Rec.RecordId);
                         end;
                     }
                 }
@@ -648,7 +679,7 @@ page 5050 "Contact Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -662,7 +693,7 @@ page 5050 "Contact Card"
                     Caption = 'Relate&d Contacts';
                     Image = Users;
                     RunObject = Page "Contact List";
-                    RunPageLink = "Company No." = FIELD("Company No.");
+                    RunPageLink = "Company No." = field("Company No.");
                     ToolTip = 'View a list of all contacts.';
                 }
                 action("Segmen&ts")
@@ -671,10 +702,10 @@ page 5050 "Contact Card"
                     Caption = 'Segmen&ts';
                     Image = Segment;
                     RunObject = Page "Contact Segment List";
-                    RunPageLink = "Contact Company No." = FIELD("Company No."),
-                                  "Contact No." = FILTER(<> ''),
-                                  "Contact No." = FIELD(FILTER("Lookup Contact No."));
-                    RunPageView = SORTING("Contact No.", "Segment No.");
+                    RunPageLink = "Contact Company No." = field("Company No."),
+                                  "Contact No." = filter(<> ''),
+                                  "Contact No." = field(FILTER("Lookup Contact No."));
+                    RunPageView = sorting("Contact No.", "Segment No.");
                     ToolTip = 'View the segments that are related to the contact.';
                 }
                 action("Mailing &Groups")
@@ -683,7 +714,7 @@ page 5050 "Contact Card"
                     Caption = 'Mailing &Groups';
                     Image = DistributionGroup;
                     RunObject = Page "Contact Mailing Groups";
-                    RunPageLink = "Contact No." = FIELD("No.");
+                    RunPageLink = "Contact No." = field("No.");
                     ToolTip = 'View or edit the mailing groups that the contact is assigned to, for example, for sending price lists or Christmas cards.';
                 }
                 action(RelatedCustomer)
@@ -755,7 +786,7 @@ page 5050 "Contact Card"
 
                     trigger OnAction()
                     begin
-                        DisplayMap();
+                        Rec.DisplayMap();
                     end;
                 }
                 action("Office Customer/Vendor")
@@ -768,7 +799,7 @@ page 5050 "Contact Card"
 
                     trigger OnAction()
                     begin
-                        ShowBusinessRelation("Contact Business Relation Link To Table"::" ", false);
+                        Rec.ShowBusinessRelation(Enum::"Contact Business Relation Link To Table"::" ", false);
                     end;
                 }
             }
@@ -787,7 +818,7 @@ page 5050 "Contact Card"
                     var
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        PriceUXManagement.ShowPriceLists(Rec, "Price Type"::Sale, "Price Amount Type"::Any);
+                        PriceUXManagement.ShowPriceLists(Rec, Enum::"Price Type"::Sale, Enum::"Price Amount Type"::Any);
                     end;
                 }
                 action(PriceLines)
@@ -805,7 +836,7 @@ page 5050 "Contact Card"
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Price);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Price);
                     end;
                 }
                 action(DiscountLines)
@@ -823,7 +854,7 @@ page 5050 "Contact Card"
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Discount);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
 #if not CLEAN21
@@ -859,10 +890,10 @@ page 5050 "Contact Card"
                     Caption = 'T&asks';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    RunPageLink = "Contact Company No." = FIELD("Company No."),
-                                  "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                  "System To-do Type" = FILTER(Organizer | "Contact Attendee");
-                    RunPageView = SORTING("Contact Company No.", Date, "Contact No.", Closed);
+                    RunPageLink = "Contact Company No." = field("Company No."),
+                                  "Contact No." = field(FILTER("Lookup Contact No.")),
+                                  "System To-do Type" = filter(Organizer | "Contact Attendee");
+                    RunPageView = sorting("Contact Company No.", Date, "Contact No.", Closed);
                     ToolTip = 'View all marketing tasks that involve the contact person.';
                 }
                 action("Oppo&rtunities")
@@ -871,10 +902,10 @@ page 5050 "Contact Card"
                     Caption = 'Oppo&rtunities';
                     Image = OpportunityList;
                     RunObject = Page "Opportunity List";
-                    RunPageLink = "Contact Company No." = FIELD("Company No."),
-                                  "Contact No." = FILTER(<> ''),
-                                  "Contact No." = FIELD(FILTER("Lookup Contact No."));
-                    RunPageView = SORTING("Contact Company No.", "Contact No.");
+                    RunPageLink = "Contact Company No." = field("Company No."),
+                                  "Contact No." = filter(<> ''),
+                                  "Contact No." = field(FILTER("Lookup Contact No."));
+                    RunPageView = sorting("Contact Company No.", "Contact No.");
                     ToolTip = 'View the sales opportunities that are handled by salespeople for the contact. Opportunities must involve a contact and can be linked to campaigns.';
                 }
                 action("Postponed &Interactions")
@@ -883,10 +914,10 @@ page 5050 "Contact Card"
                     Caption = 'Postponed &Interactions';
                     Image = PostponedInteractions;
                     RunObject = Page "Postponed Interactions";
-                    RunPageLink = "Contact Company No." = FIELD("Company No."),
-                                  "Contact No." = FILTER(<> ''),
-                                  "Contact No." = FIELD(FILTER("Lookup Contact No."));
-                    RunPageView = SORTING("Contact Company No.", Date, "Contact No.", Canceled, "Initiated By", "Attempt Failed");
+                    RunPageLink = "Contact Company No." = field("Company No."),
+                                  "Contact No." = filter(<> ''),
+                                  "Contact No." = field(FILTER("Lookup Contact No."));
+                    RunPageView = sorting("Contact Company No.", Date, "Contact No.", Canceled, "Initiated By", "Attempt Failed");
                     ToolTip = 'View postponed interactions for the contact.';
                 }
             }
@@ -900,8 +931,8 @@ page 5050 "Contact Card"
                     Caption = 'Sales &Quotes';
                     Image = Quote;
                     RunObject = Page "Sales Quotes";
-                    RunPageLink = "Sell-to Contact No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Sell-to Contact No.");
+                    RunPageLink = "Sell-to Contact No." = field("No.");
+                    RunPageView = sorting("Document Type", "Sell-to Contact No.");
                     ToolTip = 'View sales quotes that exist for the contact.';
                 }
             }
@@ -915,10 +946,10 @@ page 5050 "Contact Card"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Contact Company No." = FIELD("Company No."),
-                                  "Contact No." = FILTER(<> ''),
-                                  "Contact No." = FIELD(FILTER("Lookup Contact No."));
-                    RunPageView = SORTING("Contact Company No.", Date, "Contact No.", Canceled, "Initiated By", "Attempt Failed");
+                    RunPageLink = "Contact Company No." = field("Company No."),
+                                  "Contact No." = filter(<> ''),
+                                  "Contact No." = field(FILTER("Lookup Contact No."));
+                    RunPageView = sorting("Contact Company No.", Date, "Contact No.", Canceled, "Initiated By", "Attempt Failed");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
@@ -928,7 +959,7 @@ page 5050 "Contact Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Contact Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -965,7 +996,7 @@ page 5050 "Contact Card"
                     var
                         ContactWebSource: Record "Contact Web Source";
                     begin
-                        ContactWebSource.SetRange("Contact No.", "Company No.");
+                        ContactWebSource.SetRange("Contact No.", Rec."Company No.");
                         if PAGE.RunModal(PAGE::"Web Source Launch", ContactWebSource) = ACTION::LookupOK then
                             ContactWebSource.Launch();
                     end;
@@ -999,7 +1030,7 @@ page 5050 "Contact Card"
 
                         trigger OnAction()
                         begin
-                            CreateCustomer();
+                            Rec.CreateCustomer();
                         end;
                     }
                     action(CreateVendor)
@@ -1011,7 +1042,7 @@ page 5050 "Contact Card"
 
                         trigger OnAction()
                         begin
-                            CreateVendor();
+                            Rec.CreateVendor();
                         end;
                     }
                     action(CreateBank)
@@ -1024,7 +1055,7 @@ page 5050 "Contact Card"
 
                         trigger OnAction()
                         begin
-                            CreateBankAccount();
+                            Rec.CreateBankAccount();
                         end;
                     }
                     action(CreateEmployee)
@@ -1036,7 +1067,7 @@ page 5050 "Contact Card"
 
                         trigger OnAction()
                         begin
-                            CreateEmployee();
+                            Rec.CreateEmployee();
                         end;
                     }
                 }
@@ -1053,7 +1084,7 @@ page 5050 "Contact Card"
 
                         trigger OnAction()
                         begin
-                            CreateCustomerLink();
+                            Rec.CreateCustomerLink();
                         end;
                     }
                     action(Vendor)
@@ -1065,7 +1096,7 @@ page 5050 "Contact Card"
 
                         trigger OnAction()
                         begin
-                            CreateVendorLink();
+                            Rec.CreateVendorLink();
                         end;
                     }
                     action(Bank)
@@ -1078,7 +1109,7 @@ page 5050 "Contact Card"
 
                         trigger OnAction()
                         begin
-                            CreateBankAccountLink();
+                            Rec.CreateBankAccountLink();
                         end;
                     }
                     action(LinkEmployee)
@@ -1124,7 +1155,7 @@ page 5050 "Contact Card"
                     var
                         TempMergeDuplicatesBuffer: Record "Merge Duplicates Buffer" temporary;
                     begin
-                        TempMergeDuplicatesBuffer.Show(DATABASE::Contact, "No.");
+                        TempMergeDuplicatesBuffer.Show(DATABASE::Contact, Rec."No.");
                     end;
                 }
                 action(CreateAsCustomer)
@@ -1137,7 +1168,7 @@ page 5050 "Contact Card"
 
                     trigger OnAction()
                     begin
-                        CreateCustomerFromTemplate(ChooseNewCustomerTemplate());
+                        Rec.CreateCustomerFromTemplate(Rec.ChooseNewCustomerTemplate());
                     end;
                 }
                 action(CreateAsVendor)
@@ -1150,7 +1181,7 @@ page 5050 "Contact Card"
 
                     trigger OnAction()
                     begin
-                        CreateVendor();
+                        Rec.CreateVendor();
                     end;
                 }
                 action(MakePhoneCall)
@@ -1179,7 +1210,7 @@ page 5050 "Contact Card"
 
                 trigger OnAction()
                 begin
-                    CreateInteraction();
+                    Rec.CreateInteraction();
                 end;
             }
             action(WordTemplate)
@@ -1222,8 +1253,8 @@ page 5050 "Contact Card"
                 Caption = 'Create Opportunity';
                 Image = NewOpportunity;
                 RunObject = Page "Opportunity Card";
-                RunPageLink = "Contact No." = FIELD("No."),
-                              "Contact Company No." = FIELD("Company No.");
+                RunPageLink = "Contact No." = field("No."),
+                              "Contact Company No." = field("Company No.");
                 RunPageMode = Create;
                 ToolTip = 'Register a sales opportunity for the contact.';
             }
@@ -1236,7 +1267,7 @@ page 5050 "Contact Card"
 
                 trigger OnAction()
                 begin
-                    CreateSalesQuoteFromContact();
+                    Rec.CreateSalesQuoteFromContact();
                 end;
             }
         }
@@ -1414,8 +1445,8 @@ page 5050 "Contact Card"
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
     begin
         if CRMIntegrationEnabled or CDSIntegrationEnabled then begin
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
-            if "No." <> xRec."No." then
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
+            if Rec."No." <> xRec."No." then
                 CRMIntegrationManagement.SendResultNotification(Rec);
         end;
 
@@ -1426,7 +1457,7 @@ page 5050 "Contact Card"
         EnableFields();
         SetEnabledRelatedActions();
 
-        if Type = Type::Person then
+        if Rec.Type = Rec.Type::Person then
             IntegrationFindCustomerNo()
         else
             IntegrationCustomerNo := '';
@@ -1479,11 +1510,8 @@ page 5050 "Contact Card"
         CompanyDetails: Page "Company Details";
         NameDetails: Page "Name Details";
         IntegrationCustomerNo: Code[20];
-        [InDataSet]
         CurrencyCodeEnable: Boolean;
-        [InDataSet]
         VATRegistrationNoEnable: Boolean;
-        [InDataSet]
         CompanyNameEnable: Boolean;
         CRMIntegrationEnabled: Boolean;
         CDSIntegrationEnabled: Boolean;
@@ -1497,7 +1525,6 @@ page 5050 "Contact Card"
         RegistrationNumberEnabled: Boolean;
 
     protected var
-        [InDataSet]
         OrganizationalLevelCodeEnable: Boolean;
         ParentalConsentReceivedEnable: Boolean;
         CompanyGroupEnabled: Boolean;
@@ -1507,12 +1534,12 @@ page 5050 "Contact Card"
 
     local procedure EnableFields()
     begin
-        CompanyGroupEnabled := Type = Type::Company;
-        PersonGroupEnabled := Type = Type::Person;
-        CurrencyCodeEnable := Type = Type::Company;
-        VATRegistrationNoEnable := Type = Type::Company;
-        CompanyNameEnable := Type = Type::Person;
-        OrganizationalLevelCodeEnable := Type = Type::Person;
+        CompanyGroupEnabled := Rec.Type = Rec.Type::Company;
+        PersonGroupEnabled := Rec.Type = Rec.Type::Person;
+        CurrencyCodeEnable := Rec.Type = Rec.Type::Company;
+        VATRegistrationNoEnable := Rec.Type = Rec.Type::Company;
+        CompanyNameEnable := Rec.Type = Rec.Type::Person;
+        OrganizationalLevelCodeEnable := Rec.Type = Rec.Type::Person;
         RegistrationNumberEnabled := Rec.Type = Rec.Type::Company;
 
         OnAfterEnableFields(CompanyGroupEnabled, PersonGroupEnabled, CurrencyCodeEnable, VATRegistrationNoEnable, CompanyNameEnable, OrganizationalLevelCodeEnable);
@@ -1529,7 +1556,7 @@ page 5050 "Contact Card"
     begin
         ContactBusinessRelation.SetCurrentKey("Link to Table", "Contact No.");
         ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
-        ContactBusinessRelation.SetRange("Contact No.", "Company No.");
+        ContactBusinessRelation.SetRange("Contact No.", Rec."Company No.");
         if ContactBusinessRelation.FindFirst() then
             IntegrationCustomerNo := ContactBusinessRelation."No."
         else
@@ -1550,10 +1577,10 @@ page 5050 "Contact Card"
 
     local procedure SetParentalConsentReceivedEnable()
     begin
-        if Minor then
+        if Rec.Minor then
             ParentalConsentReceivedEnable := true
         else begin
-            "Parental Consent Received" := false;
+            Rec."Parental Consent Received" := false;
             ParentalConsentReceivedEnable := false;
         end;
     end;

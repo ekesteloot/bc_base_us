@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.RoleCenters;
+
 profile "WAREHOUSE"
 {
     Enabled = true;

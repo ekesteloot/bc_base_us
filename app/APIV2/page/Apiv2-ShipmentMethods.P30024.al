@@ -17,31 +17,31 @@ page 30024 "APIV2 - Shipment Methods"
         {
             repeater(Group)
             {
-                field(id; SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'Id';
                     Editable = false;
                 }
-                field("code"; Code)
+                field("code"; Rec.Code)
                 {
                     Caption = 'Code';
                     ShowMandatory = true;
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Code));
+                        RegisterFieldSet(Rec.FieldNo(Code));
                     end;
                 }
-                field(displayName; Description)
+                field(displayName; Rec.Description)
                 {
                     Caption = 'Display Name';
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Description));
+                        RegisterFieldSet(Rec.FieldNo(Description));
                     end;
                 }
-                field(lastModifiedDateTime; SystemModifiedAt)
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
                 {
                     Caption = 'Last Modified Date';
                 }
@@ -59,17 +59,17 @@ page 30024 "APIV2 - Shipment Methods"
         GraphMgtGeneralTools: Codeunit "Graph Mgt - General Tools";
         ShipmentMethodRecordRef: RecordRef;
     begin
-        ShipmentMethod.SetRange(Code, Code);
+        ShipmentMethod.SetRange(Code, Rec.Code);
         if not ShipmentMethod.IsEmpty() then
-            Insert();
+            Rec.Insert();
 
-        Insert(true);
+        Rec.Insert(true);
 
         ShipmentMethodRecordRef.GetTable(Rec);
         GraphMgtGeneralTools.ProcessNewRecordFromAPI(ShipmentMethodRecordRef, TempFieldSet, CurrentDateTime());
         ShipmentMethodRecordRef.SetTable(Rec);
 
-        Modify(true);
+        Rec.Modify(true);
         exit(false);
     end;
 
@@ -77,14 +77,14 @@ page 30024 "APIV2 - Shipment Methods"
     var
         ShipmentMethod: Record "Shipment Method";
     begin
-        ShipmentMethod.GetBySystemId(SystemId);
+        ShipmentMethod.GetBySystemId(Rec.SystemId);
 
-        if Code = ShipmentMethod.Code then
-            Modify(true)
+        if Rec.Code = ShipmentMethod.Code then
+            Rec.Modify(true)
         else begin
             ShipmentMethod.TransferFields(Rec, false);
-            ShipmentMethod.Rename(Code);
-            TransferFields(ShipmentMethod, true);
+            ShipmentMethod.Rename(Rec.Code);
+            Rec.TransferFields(ShipmentMethod, true);
         end;
     end;
 
@@ -102,7 +102,6 @@ page 30024 "APIV2 - Shipment Methods"
         TempFieldSet.Insert(true);
     end;
 }
-
 
 
 

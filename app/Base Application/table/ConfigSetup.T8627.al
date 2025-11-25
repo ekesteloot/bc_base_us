@@ -1,3 +1,17 @@
+﻿namespace System.IO;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Setup;
+using System;
+using System.Environment.Configuration;
+using System.Globalization;
+using System.Reflection;
+using System.Utilities;
+using System.Xml;
+
 table 8627 "Config. Setup"
 {
     Caption = 'Config. Setup';

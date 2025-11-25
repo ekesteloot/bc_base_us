@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.BankMgt.DirectDebit;
+
 page 423 "Customer Bank Account Card"
 {
     Caption = 'Customer Bank Account Card';
@@ -11,7 +15,7 @@ page 423 "Customer Bank Account Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code to identify this customer bank account.';
@@ -21,7 +25,7 @@ page 423 "Customer Bank Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank where the customer has the bank account.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the address of the bank where the customer has the bank account.';
@@ -31,12 +35,12 @@ page 423 "Customer Bank Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies additional address information.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the bank where the customer has the bank account.';
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'State / ZIP Code';
@@ -57,7 +61,7 @@ page 423 "Customer Bank Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the postal code.';
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank employee regularly contacted in connection with this bank account.';
@@ -123,7 +127,7 @@ page 423 "Customer Bank Account Card"
                     Importance = Additional;
                     ToolTip = 'Specifies the SWIFT code (international bank identifier code) of the bank where the customer has the account.';
                 }
-                field(IBAN; IBAN)
+                field(IBAN; Rec.IBAN)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
@@ -170,8 +174,8 @@ page 423 "Customer Bank Account Card"
                 Caption = 'Direct Debit Mandates';
                 Image = MakeAgreement;
                 RunObject = Page "SEPA Direct Debit Mandates";
-                RunPageLink = "Customer No." = FIELD("Customer No."),
-                              "Customer Bank Account Code" = FIELD(Code);
+                RunPageLink = "Customer No." = field("Customer No."),
+                              "Customer Bank Account Code" = field(Code);
                 ToolTip = 'View or edit direct-debit mandates that you set up to reflect agreements with customers to collect invoice payments from their bank account.';
             }
         }

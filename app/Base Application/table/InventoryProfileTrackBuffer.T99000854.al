@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 table 99000854 "Inventory Profile Track Buffer"
 {
     Caption = 'Inventory Profile Track Buffer';

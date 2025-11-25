@@ -1,10 +1,15 @@
+namespace Microsoft.Purchases.Archive;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item.Catalog;
+
 page 6645 "Purch Return Order Arc Subform"
 {
     Caption = 'Lines';
     Editable = false;
     PageType = ListPart;
     SourceTable = "Purchase Line Archive";
-    SourceTableView = WHERE("Document Type" = CONST("Return Order"));
+    SourceTableView = where("Document Type" = const("Return Order"));
 
     layout
     {
@@ -35,7 +40,7 @@ page 6645 "Purch Return Order Arc Subform"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = PurchReturnOrder;
                     ToolTip = 'Specifies that this item is a catalog item.';
@@ -276,7 +281,7 @@ page 6645 "Purch Return Order Arc Subform"
                     ToolTip = 'Specifies the work center number of the journal line.';
                     Visible = false;
                 }
-                field(Finished; Finished)
+                field(Finished; Rec.Finished)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies that any related service or operation is finished.';
@@ -333,9 +338,9 @@ page 6645 "Purch Return Order Arc Subform"
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
                 }
                 field(ShortcutDimCode4; ShortcutDimCode[4])
@@ -343,9 +348,9 @@ page 6645 "Purch Return Order Arc Subform"
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
                 }
                 field(ShortcutDimCode5; ShortcutDimCode[5])
@@ -353,9 +358,9 @@ page 6645 "Purch Return Order Arc Subform"
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
                 }
                 field(ShortcutDimCode6; ShortcutDimCode[6])
@@ -363,9 +368,9 @@ page 6645 "Purch Return Order Arc Subform"
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
                 }
                 field(ShortcutDimCode7; ShortcutDimCode[7])
@@ -373,9 +378,9 @@ page 6645 "Purch Return Order Arc Subform"
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
                 }
                 field(ShortcutDimCode8; ShortcutDimCode[8])
@@ -383,9 +388,9 @@ page 6645 "Purch Return Order Arc Subform"
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
                 }
                 field("Gross Weight"; Rec."Gross Weight")
@@ -437,7 +442,7 @@ page 6645 "Purch Return Order Arc Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(Comments)
@@ -449,7 +454,7 @@ page 6645 "Purch Return Order Arc Subform"
 
                     trigger OnAction()
                     begin
-                        ShowLineComments();
+                        Rec.ShowLineComments();
                     end;
                 }
                 action("Document &Line Tracking")
@@ -473,7 +478,7 @@ page 6645 "Purch Return Order Arc Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDeferrals();
+                        Rec.ShowDeferrals();
                     end;
                 }
             }
@@ -489,7 +494,7 @@ page 6645 "Purch Return Order Arc Subform"
     var
         DimMgt: Codeunit DimensionManagement;
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     protected var
@@ -508,7 +513,7 @@ page 6645 "Purch Return Order Arc Subform"
         DocumentLineTracking: Page "Document Line Tracking";
     begin
         Clear(DocumentLineTracking);
-        DocumentLineTracking.SetDoc(9, "Document No.", "Line No.", "Blanket Order No.", "Blanket Order Line No.", '', 0);
+        DocumentLineTracking.SetDoc(9, Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", '', 0);
         DocumentLineTracking.RunModal();
     end;
 

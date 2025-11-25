@@ -1,4 +1,30 @@
-﻿table 311 "Sales & Receivables Setup"
+﻿namespace Microsoft.Sales.Setup;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.Dataverse;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment;
+#if not CLEAN23
+using System.Telemetry;
+#endif
+using System.Threading;
+
+table 311 "Sales & Receivables Setup"
 {
     Caption = 'Sales & Receivables Setup';
     DrillDownPageID = "Sales & Receivables Setup";
@@ -345,13 +371,9 @@
         field(60; "Batch Archiving Quotes"; Boolean)
         {
             Caption = 'Batch Archiving Quotes';
-#if CLEAN20
             ObsoleteState = Removed;
-#else
-            ObsoleteState = Pending;
-#endif
+            ObsoleteTag = '23.0';
             ObsoleteReason = 'The field is part of the removed functionality.';
-            ObsoleteTag = '20.0';
         }
         field(61; "Ignore Updated Addresses"; Boolean)
         {
@@ -414,13 +436,19 @@
             Caption = 'Allow Multiple Posting Groups';
             DataClassification = SystemMetadata;
 
-#if not CLEAN20
             trigger OnValidate()
-            begin
-                if "Allow Multiple Posting Groups" then
-                    CheckMultiplePostingGroupsNotAllowed();
-            end;
+#if not CLEAN23
+            var
+                FeatureTelemetry: Codeunit "Feature Telemetry";
+                FeatureKeyManagement: Codeunit "Feature Key Management";
 #endif
+            begin
+#if not CLEAN23
+                if "Allow Multiple Posting Groups" then
+                    FeatureTelemetry.LogUptake(
+                        '0000JRB', FeatureKeyManagement.GetAllowMultipleCustVendPostingGroupsFeatureKey(), Enum::"Feature Uptake Status"::Discovered);
+#endif
+            end;
         }
         field(176; "Check Multiple Posting Groups"; enum "Posting Group Change Method")
         {
@@ -435,47 +463,47 @@
         field(201; "S. Invoice Template Name"; Code[10])
         {
             Caption = 'Sales Invoice Journal Template';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
         }
         field(202; "S. Cr. Memo Template Name"; Code[10])
         {
             Caption = 'Sales Cr. Memo Journal Template';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
         }
         field(203; "S. Prep. Inv. Template Name"; Code[10])
         {
             Caption = 'Sales Prep. Invoice Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
         }
         field(204; "S. Prep. Cr.Memo Template Name"; Code[10])
         {
             Caption = 'Sales Prep. Cr. Memo Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
         }
         field(205; "IC Sales Invoice Template Name"; Code[10])
         {
             Caption = 'IC Sales Invoice Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Intercompany));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Intercompany));
         }
         field(206; "IC Sales Cr. Memo Templ. Name"; Code[10])
         {
             Caption = 'IC Sales Cr. Memo Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Intercompany));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Intercompany));
         }
         field(207; "Fin. Charge Jnl. Template Name"; Code[10])
         {
             Caption = 'Finance Charge Journal Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
         }
         field(208; "Reminder Journal Template Name"; Code[10])
         {
             Caption = 'Reminder Journal Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
         }
         field(209; "Reminder Journal Batch Name"; Code[10])
         {
             Caption = 'Reminder Journal Batch Name';
-            TableRelation = IF ("Reminder Journal Template Name" = FILTER(<> '')) "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Reminder Journal Template Name"));
+            TableRelation = if ("Reminder Journal Template Name" = filter(<> '')) "Gen. Journal Batch".Name where("Journal Template Name" = field("Reminder Journal Template Name"));
 
             trigger OnValidate()
             begin
@@ -490,7 +518,7 @@
         field(211; "Fin. Charge Jnl. Batch Name"; Code[10])
         {
             Caption = 'Finance Charge Journal Batch Name';
-            TableRelation = IF ("Fin. Charge Jnl. Template Name" = FILTER(<> '')) "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Fin. Charge Jnl. Template Name"));
+            TableRelation = if ("Fin. Charge Jnl. Template Name" = filter(<> '')) "Gen. Journal Batch".Name where("Journal Template Name" = field("Fin. Charge Jnl. Template Name"));
 
             trigger OnValidate()
             begin
@@ -513,29 +541,8 @@
         {
             Caption = 'Invoice Posting Setup';
             ObsoleteReason = 'Replaced by direct selection of posting interface in codeunits.';
-#if CLEAN20
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-
-            trigger OnValidate()
-            var
-                AllObjWithCaption: Record AllObjWithCaption;
-                EnvironmentInfo: Codeunit "Environment Information";
-                InvoicePostingInterface: Interface "Invoice Posting";
-            begin
-                if "Invoice Posting Setup" <> "Sales Invoice Posting"::"Invoice Posting (Default)" then begin
-                    if EnvironmentInfo.IsProduction() then
-                        error(InvoicePostingNotAllowedErr);
-
-                    AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Codeunit, "Invoice Posting Setup".AsInteger());
-                    InvoicePostingInterface := "Invoice Posting Setup";
-                    InvoicePostingInterface.Check(Database::"Sales Header");
-                end;
-            end;
-#endif
         }
         field(5329; "Write-in Product Type"; Option)
         {
@@ -546,9 +553,9 @@
         field(5330; "Write-in Product No."; Code[20])
         {
             Caption = 'Write-in Product No.';
-            TableRelation = IF ("Write-in Product Type" = CONST(Item)) Item."No." WHERE(Type = FILTER(Service | "Non-Inventory"))
-            ELSE
-            IF ("Write-in Product Type" = CONST(Resource)) Resource."No.";
+            TableRelation = if ("Write-in Product Type" = const(Item)) Item."No." where(Type = filter(Service | "Non-Inventory"))
+            else
+            if ("Write-in Product Type" = const(Resource)) Resource."No.";
 
             trigger OnValidate()
             var
@@ -640,13 +647,13 @@
         field(7003; "Default Price List Code"; Code[20])
         {
             Caption = 'Default Price List Code';
-            TableRelation = "Price List Header" where("Price Type" = Const(Sale), "Source Group" = Const(Customer), "Allow Updating Defaults" = const(true));
+            TableRelation = "Price List Header" where("Price Type" = const(Sale), "Source Group" = const(Customer), "Allow Updating Defaults" = const(true));
             DataClassification = CustomerContent;
             trigger OnLookup()
             var
                 PriceListHeader: Record "Price List Header";
             begin
-                if Page.RunModal(Page::"Sales Price Lists", PriceListHeader) = Action::LookupOK then begin
+                if Page.RunModal(Enum::PageID::"Sales Price Lists", PriceListHeader) = Action::LookupOK then begin
                     PriceListHeader.TestField("Allow Updating Defaults");
                     Validate("Default Price List Code", PriceListHeader.Code);
                 end;
@@ -677,6 +684,11 @@
                 CheckGLAccPostingTypeBlockedAndGenProdPostingType("Freight G/L Acc. No.");
             end;
         }
+        field(7104; "Link Doc. Date To Posting Date"; Boolean)
+        {
+            Caption = 'Link Doc. Date to Posting Date';
+            DataClassification = SystemMetadata;
+        }
     }
 
     keys
@@ -694,10 +706,6 @@
     var
         JobQueuePriorityErr: Label 'Job Queue Priority must be zero or positive.';
         ProductCoupledErr: Label 'You must choose a record that is not coupled to a product in %1.', Comment = '%1 - Dynamics 365 Sales product name';
-#if not CLEAN20
-        InvoicePostingNotAllowedErr: Label 'Use of alternative invoice posting interfaces in production environment is currently not allowed.';
-        MultiplePostingGroupsNotAllowedErr: Label 'Use of multiple posting groups in production environment is currently not allowed.';
-#endif
         RecordHasBeenRead: Boolean;
         CRMBidirectionalSalesOrderIntEnabledErr: Label 'You cannot disable Archive Orders when Dynamics 365 Sales connection and Bidirectional Sales Order Integration are enabled.';
 
@@ -719,16 +727,6 @@
         Get();
         exit("Post with Job Queue" or "Post & Print with Job Queue");
     end;
-
-#if not CLEAN20
-    internal procedure CheckMultiplePostingGroupsNotAllowed(): Text
-    var
-        EnvironmentInformation: Codeunit "Environment Information";
-    begin
-        if EnvironmentInformation.IsSaas() and EnvironmentInformation.IsProduction() then
-            error(MultiplePostingGroupsNotAllowedErr);
-    end;
-#endif
 
     local procedure CheckGLAccPostingTypeBlockedAndGenProdPostingType(AccNo: Code[20])
     var

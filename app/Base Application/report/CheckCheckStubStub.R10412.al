@@ -9,7 +9,7 @@ report 10412 "Check (Check/Stub/Stub)"
     {
         dataitem(VoidGenJnlLine; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
             RequestFilterFields = "Journal Template Name", "Journal Batch Name", "Posting Date";
 
             trigger OnAfterGetRecord()
@@ -43,7 +43,7 @@ report 10412 "Check (Check/Stub/Stub)"
         }
         dataitem(TestGenJnlLine; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -112,7 +112,7 @@ report 10412 "Check (Check/Stub/Stub)"
         }
         dataitem(GenJnlLine; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
             column(GenJnlLine_Journal_Template_Name; "Journal Template Name")
             {
             }
@@ -124,7 +124,7 @@ report 10412 "Check (Check/Stub/Stub)"
             }
             dataitem(CheckPages; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(CheckToAddr_1_; CheckToAddr[1])
                 {
                 }
@@ -145,7 +145,7 @@ report 10412 "Check (Check/Stub/Stub)"
                 }
                 dataitem(PrintSettledLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 10;
                     column(PreprintedStub; PreprintedStub)
                     {
@@ -372,7 +372,7 @@ report 10412 "Check (Check/Stub/Stub)"
                 }
                 dataitem(PrintCheck; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     column(PrnChkCheckToAddr_CheckStyle__CA_5_; PrnChkCheckToAddr[CheckStyle::CA, 5])
                     {

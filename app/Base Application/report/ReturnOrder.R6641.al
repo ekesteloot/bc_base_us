@@ -1,7 +1,24 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Vendor;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 6641 "Return Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ReturnOrder.rdlc';
+    RDLCLayout = './Purchases/Document/ReturnOrder.rdlc';
     Caption = 'Return Order';
     PreviewMode = PrintLayout;
 
@@ -9,7 +26,7 @@ report 6641 "Return Order"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Return Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Return Order"));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Purchase Return Order';
             column(No_PurchHdr; "No.")
@@ -47,10 +64,10 @@ report 6641 "Return Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(AmtCaption; AmtCaptionLbl)
                     {
                     }
@@ -220,7 +237,7 @@ report 6641 "Return Order"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText_DimensionLoop1; DimText_DimensionLoop1)
                         {
                         }
@@ -268,9 +285,9 @@ report 6641 "Return Order"
                     }
                     dataitem("Purchase Line"; "Purchase Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -279,7 +296,7 @@ report 6641 "Return Order"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(TypeInt; TypeInt)
                         {
                         }
@@ -409,7 +426,7 @@ report 6641 "Return Order"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_DimensionLoop2; DimText_DimensionLoop1)
                             {
                             }
@@ -496,7 +513,7 @@ report 6641 "Return Order"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmtLineVATBase; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -559,7 +576,7 @@ report 6641 "Return Order"
                     }
                     dataitem(VATCounterLCY; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VALExchRate; VALExchRate)
                         {
                         }
@@ -617,7 +634,7 @@ report 6641 "Return Order"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
 
                         trigger OnPreDataItem()
                         begin
@@ -627,7 +644,7 @@ report 6641 "Return Order"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(SellToCustNo_PurchHdr; "Purchase Header"."Sell-to Customer No.")
                         {
                             IncludeCaption = false;
@@ -714,6 +731,7 @@ report 6641 "Return Order"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Purchase Header");
@@ -799,11 +817,11 @@ report 6641 "Return Order"
             if "Purchase Header".FindSet() then
                 repeat
                     if "Purchase Header"."Buy-from Contact No." <> '' then
-                        SegManagement.LogDocument(22, "Purchase Header"."No.", 0, 0, DATABASE::Contact,
+                        SegManagement.LogDocument(22, "Purchase Header"."No.", 0, 0, Enum::TableID::Contact.AsInteger(),
                           "Purchase Header"."Buy-from Contact No.", "Purchase Header"."Purchaser Code", '',
                           "Purchase Header"."Posting Description", '')
                     else
-                        SegManagement.LogDocument(22, "Purchase Header"."No.", 0, 0, DATABASE::Vendor,
+                        SegManagement.LogDocument(22, "Purchase Header"."No.", 0, 0, Enum::TableID::Vendor.AsInteger(),
                           "Purchase Header"."Buy-from Vendor No.", "Purchase Header"."Purchaser Code", '',
                           "Purchase Header"."Posting Description", '')
                 until "Purchase Header".Next() = 0;
@@ -860,7 +878,6 @@ report 6641 "Return Order"
         VALExchRate: Text[50];
         OutputNo: Integer;
         TypeInt: Integer;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -907,7 +924,7 @@ report 6641 "Return Order"
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Purch. Return Ord. Cnfrmn.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch. Return Ord. Cnfrmn.") <> '';
     end;
 
     local procedure IsReportInPreviewMode(): Boolean

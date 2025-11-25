@@ -1,3 +1,33 @@
+﻿namespace Microsoft.Manufacturing.RoleCenters;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Family;
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Manufacturing.Journal;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Reports;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.StandardCost;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.Shared.Navigate;
+
 page 8903 "Manufacturing Manager RC"
 {
     Caption = 'Manufacturing Manager RC';

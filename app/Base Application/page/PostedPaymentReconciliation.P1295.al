@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 page 1295 "Posted Payment Reconciliation"
 {
     Caption = 'Posted Payment Reconciliation';
@@ -28,8 +30,8 @@ page 1295 "Posted Payment Reconciliation"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Lines';
-                SubPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                              "Statement No." = FIELD("Statement No.");
+                SubPageLink = "Bank Account No." = field("Bank Account No."),
+                              "Statement No." = field("Statement No.");
             }
         }
         area(factboxes)

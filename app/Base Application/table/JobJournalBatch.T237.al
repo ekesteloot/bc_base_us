@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.Foundation.NoSeries;
+
 table 237 "Job Journal Batch"
 {
     Caption = 'Job Journal Batch';
@@ -71,7 +75,7 @@ table 237 "Job Journal Batch"
         }
         field(22; Recurring; Boolean)
         {
-            CalcFormula = Lookup("Job Journal Template".Recurring WHERE(Name = FIELD("Journal Template Name")));
+            CalcFormula = Lookup("Job Journal Template".Recurring where(Name = field("Journal Template Name")));
             Caption = 'Recurring';
             Editable = false;
             FieldClass = FlowField;

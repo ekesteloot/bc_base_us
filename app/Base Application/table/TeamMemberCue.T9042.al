@@ -10,36 +10,36 @@ table 9042 "Team Member Cue"
         }
         field(2; "Open Time Sheets"; Integer)
         {
-            CalcFormula = Count("Time Sheet Header" WHERE("Open Exists" = FILTER(= true),
-                                                           "Owner User ID" = FIELD("User ID Filter")));
+            CalcFormula = count("Time Sheet Header" where("Open Exists" = filter(= true),
+                                                           "Owner User ID" = field("User ID Filter")));
             Caption = 'Open Time Sheets';
             FieldClass = FlowField;
         }
         field(3; "Submitted Time Sheets"; Integer)
         {
-            CalcFormula = Count("Time Sheet Header" WHERE("Submitted Exists" = FILTER(= true),
-                                                           "Owner User ID" = FIELD("User ID Filter")));
+            CalcFormula = count("Time Sheet Header" where("Submitted Exists" = filter(= true),
+                                                           "Owner User ID" = field("User ID Filter")));
             Caption = 'Submitted Time Sheets';
             FieldClass = FlowField;
         }
         field(4; "Rejected Time Sheets"; Integer)
         {
-            CalcFormula = Count("Time Sheet Header" WHERE("Rejected Exists" = FILTER(= true),
-                                                           "Owner User ID" = FIELD("User ID Filter")));
+            CalcFormula = count("Time Sheet Header" where("Rejected Exists" = filter(= true),
+                                                           "Owner User ID" = field("User ID Filter")));
             Caption = 'Rejected Time Sheets';
             FieldClass = FlowField;
         }
         field(5; "Approved Time Sheets"; Integer)
         {
-            CalcFormula = Count("Time Sheet Header" WHERE("Approved Exists" = FILTER(= true),
-                                                           "Owner User ID" = FIELD("User ID Filter")));
+            CalcFormula = count("Time Sheet Header" where("Approved Exists" = filter(= true),
+                                                           "Owner User ID" = field("User ID Filter")));
             Caption = 'Approved Time Sheets';
             FieldClass = FlowField;
         }
         field(7; "Time Sheets to Approve"; Integer)
         {
-            CalcFormula = Count("Time Sheet Header" WHERE("Approver User ID" = FIELD("Approve ID Filter"),
-                                                           "Submitted Exists" = CONST(true)));
+            CalcFormula = count("Time Sheet Header" where("Approver User ID" = field("Approve ID Filter"),
+                                                           "Submitted Exists" = const(true)));
             Caption = 'Time Sheets to Approve';
             FieldClass = FlowField;
         }

@@ -1,3 +1,14 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.IO;
+
 table 1296 "Posted Payment Recon. Line"
 {
     Caption = 'Posted Payment Recon. Line';
@@ -13,7 +24,7 @@ table 1296 "Posted Payment Recon. Line"
         field(2; "Statement No."; Code[20])
         {
             Caption = 'Statement No.';
-            TableRelation = "Posted Payment Recon. Hdr"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."));
+            TableRelation = "Posted Payment Recon. Hdr"."Statement No." where("Bank Account No." = field("Bank Account No."));
         }
         field(3; "Statement Line No."; Integer)
         {
@@ -95,18 +106,18 @@ table 1296 "Posted Payment Recon. Line"
         field(22; "Account No."; Code[20])
         {
             Caption = 'Account No.';
-            TableRelation = IF ("Account Type" = CONST("G/L Account")) "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                                                          Blocked = CONST(false))
-            ELSE
-            IF ("Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Account Type" = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF ("Account Type" = CONST("IC Partner")) "IC Partner";
+            TableRelation = if ("Account Type" = const("G/L Account")) "G/L Account" where("Account Type" = const(Posting),
+                                                                                          Blocked = const(false))
+            else
+            if ("Account Type" = const(Customer)) Customer
+            else
+            if ("Account Type" = const(Vendor)) Vendor
+            else
+            if ("Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Account Type" = const("Fixed Asset")) "Fixed Asset"
+            else
+            if ("Account Type" = const("IC Partner")) "IC Partner";
         }
         field(23; "Applied Document No."; Text[250])
         {

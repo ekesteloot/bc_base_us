@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Employee;
+
 codeunit 5201 "Employee/Salesperson Update"
 {
     Permissions = TableData "Salesperson/Purchaser" = rimd;

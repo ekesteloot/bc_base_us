@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
 report 99001041 "Delete Expired Components"
 {
     Caption = 'Delete Expired Components';
@@ -7,7 +9,7 @@ report 99001041 "Delete Expired Components"
     {
         dataitem("Production BOM Header"; "Production BOM Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
 
             trigger OnAfterGetRecord()

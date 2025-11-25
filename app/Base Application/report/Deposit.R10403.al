@@ -16,7 +16,7 @@ report 10403 Deposit
             }
             dataitem(PageHeader; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(USERID; UserId)
                 {
                 }
@@ -112,9 +112,9 @@ report 10403 Deposit
                 }
                 dataitem("Posted Deposit Line"; "Posted Deposit Line")
                 {
-                    DataItemLink = "Deposit No." = FIELD("No.");
+                    DataItemLink = "Deposit No." = field("No.");
                     DataItemLinkReference = "Posted Deposit Header";
-                    DataItemTableView = SORTING("Deposit No.", "Line No.");
+                    DataItemTableView = sorting("Deposit No.", "Line No.");
                     column(Posted_Deposit_Line__Account_Type_; "Account Type")
                     {
                     }
@@ -153,7 +153,7 @@ report 10403 Deposit
                     }
                     dataitem(CustApplication; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(AppliedCustLedgEntry__Document_Date_; AppliedCustLedgEntry."Document Date")
                         {
                         }
@@ -224,7 +224,7 @@ report 10403 Deposit
                     }
                     dataitem(VendApplication; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(AppliedVendLedgEntry__Document_Date_; AppliedVendLedgEntry."Document Date")
                         {
                         }
@@ -382,6 +382,7 @@ report 10403 Deposit
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault('');
 
                 if not BankAccount.Get("Bank Account No.") then
                     BankAccount.Name := StrSubstNo(Text001, BankAccount.TableCaption());

@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Manufacturing.Capacity;
+
 page 99000756 "Work Center Statistics"
 {
     Caption = 'Work Center Statistics';
@@ -283,7 +287,7 @@ page 99000756 "Work Center Statistics"
             DateFilterCalc.CreateFiscalYearFilter(WorkCtrDateFilter[3], WorkCtrDateName[3], CurrentDate, -1);
         end;
 
-        WorkCenter2.Get("No.");
+        WorkCenter2.Get(Rec."No.");
         WorkCenter2.CopyFilters(Rec);
 
         for i := 1 to 4 do begin
@@ -294,8 +298,8 @@ page 99000756 "Work Center Statistics"
             WorkCenter2.CalcFields("Capacity (Total)", "Capacity (Effective)", "Prod. Order Need (Qty.)");
 
             CapLedgEntry.SetCurrentKey("Work Center No.", "Work Shift Code", "Posting Date");
-            CapLedgEntry.SetRange("Work Center No.", "No.");
-            CapLedgEntry.SetFilter("Work Shift Code", "Work Shift Filter");
+            CapLedgEntry.SetRange("Work Center No.", Rec."No.");
+            CapLedgEntry.SetFilter("Work Shift Code", Rec."Work Shift Filter");
             CapLedgEntry.SetFilter("Posting Date", WorkCtrDateFilter[i]);
             if CapLedgEntry.Find('-') then
                 repeat
@@ -311,7 +315,7 @@ page 99000756 "Work Center Statistics"
             WorkCtrActEfficiency[i] := CalcPercentage(WorkCtrActNeed[i], WorkCtrCapacity[i]);
         end;
 
-        SetRange("Date Filter");
+        Rec.SetRange("Date Filter");
     end;
 
     var

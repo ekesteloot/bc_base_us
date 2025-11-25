@@ -27,7 +27,7 @@ page 199 "Unlinked Attachments"
                     Editable = false;
                     ToolTip = 'Specifies when the record was created.';
                 }
-                field(Id; Id)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;

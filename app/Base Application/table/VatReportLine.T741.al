@@ -63,9 +63,9 @@ table 741 "VAT Report Line"
         {
             Caption = 'Bill-to/Pay-to No.';
             Editable = false;
-            TableRelation = IF (Type = CONST(Purchase)) Vendor
-            ELSE
-            IF (Type = CONST(Sale)) Customer;
+            TableRelation = if (Type = const(Purchase)) Vendor
+            else
+            if (Type = const(Sale)) Customer;
         }
         field(13; "EU 3-Party Trade"; Boolean)
         {

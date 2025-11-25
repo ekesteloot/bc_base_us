@@ -1,3 +1,18 @@
+namespace Microsoft.InventoryMgt.Planning;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 table 99000829 "Planning Component"
 {
     Caption = 'Planning Component';
@@ -14,13 +29,13 @@ table 99000829 "Planning Component"
         field(2; "Worksheet Batch Name"; Code[10])
         {
             Caption = 'Worksheet Batch Name';
-            TableRelation = IF ("Worksheet Template Name" = FILTER(<> '')) "Requisition Wksh. Name".Name WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"));
+            TableRelation = if ("Worksheet Template Name" = filter(<> '')) "Requisition Wksh. Name".Name where("Worksheet Template Name" = field("Worksheet Template Name"));
         }
         field(3; "Worksheet Line No."; Integer)
         {
             Caption = 'Worksheet Line No.';
-            TableRelation = "Requisition Line"."Line No." WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                                                 "Journal Batch Name" = FIELD("Worksheet Batch Name"));
+            TableRelation = "Requisition Line"."Line No." where("Worksheet Template Name" = field("Worksheet Template Name"),
+                                                                 "Journal Batch Name" = field("Worksheet Batch Name"));
         }
         field(5; "Line No."; Integer)
         {
@@ -30,7 +45,7 @@ table 99000829 "Planning Component"
         field(11; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            TableRelation = Item WHERE(Type = FILTER(Inventory | "Non-Inventory"));
+            TableRelation = Item where(Type = filter(Inventory | "Non-Inventory"));
 
             trigger OnValidate()
             begin
@@ -62,7 +77,7 @@ table 99000829 "Planning Component"
         field(13; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             begin
@@ -173,7 +188,7 @@ table 99000829 "Planning Component"
         field(21; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             begin
@@ -251,7 +266,7 @@ table 99000829 "Planning Component"
         field(30; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             begin
@@ -265,12 +280,12 @@ table 99000829 "Planning Component"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
                 Modify();
             end;
         }
@@ -278,19 +293,19 @@ table 99000829 "Planning Component"
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
                 Modify();
             end;
         }
         field(33; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -300,9 +315,9 @@ table 99000829 "Planning Component"
         field(35; "Supplied-by Line No."; Integer)
         {
             Caption = 'Supplied-by Line No.';
-            TableRelation = "Requisition Line"."Line No." WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                                                 "Journal Batch Name" = FIELD("Worksheet Batch Name"),
-                                                                 "Line No." = FIELD("Supplied-by Line No."));
+            TableRelation = "Requisition Line"."Line No." where("Worksheet Template Name" = field("Worksheet Template Name"),
+                                                                 "Journal Batch Name" = field("Worksheet Batch Name"),
+                                                                 "Line No." = field("Supplied-by Line No."));
         }
         field(36; "Planning Level Code"; Integer)
         {
@@ -522,13 +537,13 @@ table 99000829 "Planning Component"
         }
         field(63; "Reserved Qty. (Base)"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("Worksheet Template Name"),
-                                                                            "Source Ref. No." = FIELD("Line No."),
-                                                                            "Source Type" = CONST(99000829),
-                                                                            "Source Subtype" = CONST("0"),
-                                                                            "Source Batch Name" = FIELD("Worksheet Batch Name"),
-                                                                            "Source Prod. Order Line" = FIELD("Worksheet Line No."),
-                                                                            "Reservation Status" = CONST(Reservation)));
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Worksheet Template Name"),
+                                                                            "Source Ref. No." = field("Line No."),
+                                                                            "Source Type" = const(99000829),
+                                                                            "Source Subtype" = const("0"),
+                                                                            "Source Batch Name" = field("Worksheet Batch Name"),
+                                                                            "Source Prod. Order Line" = field("Worksheet Line No."),
+                                                                            "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -536,13 +551,13 @@ table 99000829 "Planning Component"
         }
         field(71; "Reserved Quantity"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("Worksheet Template Name"),
-                                                                   "Source Ref. No." = FIELD("Line No."),
-                                                                   "Source Type" = CONST(99000829),
-                                                                   "Source Subtype" = CONST("0"),
-                                                                   "Source Batch Name" = FIELD("Worksheet Batch Name"),
-                                                                   "Source Prod. Order Line" = FIELD("Worksheet Line No."),
-                                                                   "Reservation Status" = CONST(Reservation)));
+            CalcFormula = - sum("Reservation Entry".Quantity where("Source ID" = field("Worksheet Template Name"),
+                                                                   "Source Ref. No." = field("Line No."),
+                                                                   "Source Type" = const(99000829),
+                                                                   "Source Subtype" = const("0"),
+                                                                   "Source Batch Name" = field("Worksheet Batch Name"),
+                                                                   "Source Prod. Order Line" = field("Worksheet Line No."),
+                                                                   "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -586,7 +601,7 @@ table 99000829 "Planning Component"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -645,8 +660,8 @@ table 99000829 "Planning Component"
     begin
         ReservePlanningComponent.VerifyQuantity(Rec, xRec);
 
-        ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
-        ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+        Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+        Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
 
         GetReqLine();
         "Planning Line Origin" := ReqLine."Planning Line Origin";
@@ -898,38 +913,10 @@ table 99000829 "Planning Component"
             ReservePlanningComponent.CallItemTracking(Rec);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        DimensionSetIDArr: array[10] of Integer;
-        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-    begin
-        TableID[1] := Type1;
-        No[1] := No1;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        GetReqLine();
-        DimensionSetIDArr[1] :=
-          DimMgt.GetRecDefaultDimID(Rec, CurrFieldNo, DefaultDimSource, '', "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-        DimensionSetIDArr[2] := ReqLine."Dimension Set ID";
-        "Dimension Set ID" :=
-          DimMgt.GetCombinedDimensionSetID(DimensionSetIDArr, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         DimensionSetIDArr: array[10] of Integer;
     begin
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -1027,7 +1014,7 @@ table 99000829 "Planning Component"
 
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSource(DATABASE::"Planning Component", 0, "Worksheet Template Name", "Line No.", "Worksheet Batch Name", "Worksheet Line No.");
+        ReservEntry.SetSource(Enum::TableID::"Planning Component".AsInteger(), 0, "Worksheet Template Name", "Line No.", "Worksheet Batch Name", "Worksheet Line No.");
         ReservEntry.SetItemData("Item No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         ReservEntry."Expected Receipt Date" := "Due Date";
         ReservEntry."Shipment Date" := "Due Date";
@@ -1035,7 +1022,7 @@ table 99000829 "Planning Component"
 
     procedure SetReservationFilters(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSourceFilter(DATABASE::"Planning Component", 0, "Worksheet Template Name", "Line No.", false);
+        ReservEntry.SetSourceFilter(Enum::TableID::"Planning Component".AsInteger(), 0, "Worksheet Template Name", "Line No.", false);
         ReservEntry.SetSourceFilter("Worksheet Batch Name", "Worksheet Line No.");
 
         OnAfterSetReservationFilters(ReservEntry, Rec);
@@ -1114,7 +1101,7 @@ table 99000829 "Planning Component"
         UntrackedPlngElement.SetRange("Worksheet Template Name", "Worksheet Template Name");
         UntrackedPlngElement.SetRange("Worksheet Batch Name", "Worksheet Batch Name");
         UntrackedPlngElement.SetRange("Item No.", "Item No.");
-        UntrackedPlngElement.SetRange("Source Type", DATABASE::"Production Forecast Entry");
+        UntrackedPlngElement.SetRange("Source Type", Enum::TableID::"Production Forecast Entry");
         if UntrackedPlngElement.FindFirst() then begin
             ForecastName := CopyStr(UntrackedPlngElement."Source ID", 1, 10);
             exit(true);
@@ -1150,7 +1137,7 @@ table 99000829 "Planning Component"
     local procedure GetRefOrderTypeBin() BinCode: Code[20]
     var
         PlanningRoutingLine: Record "Planning Routing Line";
-        WMSManagement: Codeunit "WMS Management";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1164,8 +1151,8 @@ table 99000829 "Planning Component"
                     if "Location Code" = ReqLine."Location Code" then
                         if FindFirstRtngLine(PlanningRoutingLine, ReqLine) then
                             BinCode :=
-                                WMSManagement.GetProdCenterBinCode(
-                                    PlanningRoutingLine.Type, PlanningRoutingLine."No.", "Location Code", true, "Flushing Method".AsInteger());
+                                ProdOrderWarehouseMgt.GetProdCenterBinCode(
+                                    PlanningRoutingLine.Type, PlanningRoutingLine."No.", "Location Code", true, "Flushing Method");
                     if BinCode <> '' then
                         exit(BinCode);
                     BinCode := GetFlushingMethodBin();
@@ -1229,66 +1216,17 @@ table 99000829 "Planning Component"
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
-        DimMgt.AddDimSource(DefaultDimSource, Database::Item, Rec."Item No.");
-        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Item.AsInteger(), Rec."Item No.");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."Location Code");
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource);
     end;
-
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Planning Component", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Planning Component", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDimTableIDs(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Planning Component") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDimTableIDs(var PlanningComponent: Record "Planning Component"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var PlanningComponent: Record "Planning Component"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var PlanningComponent: Record "Planning Component"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterFilterLinesWithItemToPlan(var PlanningComponent: Record "Planning Component"; var Item: Record Item)
     begin

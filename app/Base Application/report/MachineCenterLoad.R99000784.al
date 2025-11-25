@@ -1,7 +1,13 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+using System.Utilities;
+
 report 99000784 "Machine Center Load"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/MachineCenterLoad.rdlc';
+    RDLCLayout = './Manufacturing/Reports/MachineCenterLoad.rdlc';
     AdditionalSearchTerms = 'production resource load,production personnel load';
     ApplicationArea = Manufacturing;
     Caption = 'Machine Center Load';
@@ -45,7 +51,7 @@ report 99000784 "Machine Center Load"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 PrintOnlyIfDetail = true;
                 column(PeriodStartingDate; Format(PeriodStartingDate))
                 {
@@ -61,9 +67,9 @@ report 99000784 "Machine Center Load"
                 }
                 dataitem("Machine Center"; "Machine Center")
                 {
-                    DataItemLink = "Work Center No." = FIELD("No."), "Work Shift Filter" = FIELD("Work Shift Filter");
+                    DataItemLink = "Work Center No." = field("No."), "Work Shift Filter" = field("Work Shift Filter");
                     DataItemLinkReference = "Work Center";
-                    DataItemTableView = SORTING("Work Center No.");
+                    DataItemTableView = sorting("Work Center No.");
                     column(No_MachineCenter; "No.")
                     {
                         IncludeCaption = true;

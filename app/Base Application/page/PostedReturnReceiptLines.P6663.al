@@ -137,7 +137,7 @@ page 6663 "Posted Return Receipt Lines"
                     var
                         ReturnRcptHeader: Record "Return Receipt Header";
                     begin
-                        ReturnRcptHeader.Get("Document No.");
+                        ReturnRcptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Return Receipt", ReturnRcptHeader);
                     end;
                 }
@@ -152,7 +152,7 @@ page 6663 "Posted Return Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }

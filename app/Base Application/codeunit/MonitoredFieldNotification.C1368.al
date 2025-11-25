@@ -1,3 +1,8 @@
+namespace System.Diagnostics;
+
+using System.Email;
+using System.Security.AccessControl;
+
 codeunit 1368 "Monitored Field Notification"
 {
     Access = Internal;
@@ -45,7 +50,7 @@ codeunit 1368 "Monitored Field Notification"
     local procedure IsMonitorReadyToSendEmails(var FieldMonitoringSetup: record "Field Monitoring Setup"; var UseNewEmailFeature: Boolean): Boolean
     begin
         if FieldMonitoringSetup.Get() then
-            if (FieldMonitoringSetup."Email Account Name" <> '') and (not IsNullGuid(FieldMonitoringSetup."Email Account Id")) and EmailAccount.IsAnyAccountRegistered() then begin
+            if (FieldMonitoringSetup."Email Account Name" <> '') and EmailAccount.IsAccountRegistered(FieldMonitoringSetup."Email Account Id", FieldMonitoringSetup."Email Connector") then begin
                 UseNewEmailFeature := true;
                 exit(true);
             end;

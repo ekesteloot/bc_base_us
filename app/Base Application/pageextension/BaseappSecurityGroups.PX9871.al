@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 pageextension 9871 "BaseApp Security Groups" extends "Security Groups"
 {
     actions

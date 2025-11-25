@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 codeunit 1225 "Unixtimestamp Transformation"
 {
 

@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.History;
+
+using Microsoft.InventoryMgt.Counting.Reports;
+
 page 5884 "Posted Phys. Invt. Order List"
 {
     ApplicationArea = Warehouse;
@@ -6,8 +10,8 @@ page 5884 "Posted Phys. Invt. Order List"
     Editable = false;
     PageType = List;
     SourceTable = "Pstd. Phys. Invt. Order Hdr";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -65,7 +69,7 @@ page 5884 "Posted Phys. Invt. Order List"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }

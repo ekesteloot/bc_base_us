@@ -134,6 +134,12 @@ xmlport 5801 "Export Item Data"
                 fieldelement(Item_Blocked; Item.Blocked)
                 {
                 }
+                fieldelement(Item_SalesBlocked; Item."Sales Blocked")
+                {
+                }
+                fieldelement(Item_PurchasingBlocked; Item."Purchasing Blocked")
+                {
+                }
                 fieldelement(Item_LastDateModified; Item."Last Date Modified")
                 {
                 }
@@ -370,7 +376,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'UnitOfMeasure';
-                SourceTableView = SORTING(Code);
+                SourceTableView = sorting(Code);
                 fieldelement(UnitOfMeasure_Code; UnitOfMeasure.Code)
                 {
                 }
@@ -389,7 +395,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'ItemUnitOfMeasure';
-                SourceTableView = SORTING("Item No.", Code);
+                SourceTableView = sorting("Item No.", Code);
                 fieldelement(ItemUnitOfMeasure_ItemNo; ItemUnitOfMeasure."Item No.")
                 {
                 }
@@ -425,7 +431,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'GenProdPostingGroup';
-                SourceTableView = SORTING(Code);
+                SourceTableView = sorting(Code);
                 fieldelement(GenProdPostingGroup_Code; GenProdPostingGroup.Code)
                 {
                 }
@@ -444,7 +450,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'GenPostingSetup';
-                SourceTableView = SORTING("Gen. Bus. Posting Group", "Gen. Prod. Posting Group");
+                SourceTableView = sorting("Gen. Bus. Posting Group", "Gen. Prod. Posting Group");
                 fieldelement(GenPostingSetup_GenBusPostingGroup; GenPostingSetup."Gen. Bus. Posting Group")
                 {
                 }
@@ -457,7 +463,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'GenBusPostingGroup';
-                SourceTableView = SORTING(Code);
+                SourceTableView = sorting(Code);
                 fieldelement(GenBusPostingGroup_Code; GenBusPostingGroup.Code)
                 {
                 }
@@ -476,7 +482,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'VatProdPostingGroup';
-                SourceTableView = SORTING(Code);
+                SourceTableView = sorting(Code);
                 fieldelement(VatProdPostingGroup_Code; VATProdPostingGroup.Code)
                 {
                 }
@@ -489,7 +495,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'VATPostingSetup';
-                SourceTableView = SORTING("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+                SourceTableView = sorting("VAT Bus. Posting Group", "VAT Prod. Posting Group");
                 fieldelement(VATPostingSetup_VATBusPostingGroup; VATPostingSetup."VAT Bus. Posting Group")
                 {
                 }
@@ -502,7 +508,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'InventoryPostingGroup';
-                SourceTableView = SORTING(Code);
+                SourceTableView = sorting(Code);
                 fieldelement(InventoryPostingGroup_Code; InventoryPostingGroup.Code)
                 {
                 }
@@ -515,7 +521,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'InventoryPostingSetup';
-                SourceTableView = SORTING("Location Code", "Invt. Posting Group Code");
+                SourceTableView = sorting("Location Code", "Invt. Posting Group Code");
                 fieldelement(InventoryPostingSetup_LocationCode; InventoryPostingSetup."Location Code")
                 {
                 }
@@ -538,10 +544,10 @@ xmlport 5801 "Export Item Data"
             {
                 AutoSave = true;
                 AutoUpdate = true;
-                LinkFields = "Item No." = FIELD("No.");
+                LinkFields = "Item No." = field("No.");
                 LinkTable = Item;
                 XmlName = 'ItemLedgEntry';
-                SourceTableView = SORTING("Item No.");
+                SourceTableView = sorting("Item No.");
                 fieldelement(ItemLedgEntry_EntryNo; ItemLedgEntry."Entry No.")
                 {
                 }
@@ -740,7 +746,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'ItemApplnEntry';
-                SourceTableView = SORTING("Entry No.");
+                SourceTableView = sorting("Entry No.");
                 UseTemporary = true;
                 fieldelement(ItemApplnEntry_EntryNo; TempItemApplnEntry."Entry No.")
                 {
@@ -792,10 +798,10 @@ xmlport 5801 "Export Item Data"
             {
                 AutoSave = true;
                 AutoUpdate = true;
-                LinkFields = "Item No." = FIELD("No.");
+                LinkFields = "Item No." = field("No.");
                 LinkTable = Item;
                 XmlName = 'ValueEntry';
-                SourceTableView = SORTING("Item No.");
+                SourceTableView = sorting("Item No.");
                 fieldelement(ValueEntry_EntryNo; ValueEntry."Entry No.")
                 {
                 }
@@ -1003,7 +1009,7 @@ xmlport 5801 "Export Item Data"
                 AutoUpdate = true;
                 MinOccurs = Zero;
                 XmlName = 'Location';
-                SourceTableView = SORTING(Code);
+                SourceTableView = sorting(Code);
                 fieldelement(Location_Code; Location.Code)
                 {
                 }
@@ -1065,11 +1071,11 @@ xmlport 5801 "Export Item Data"
             {
                 AutoSave = true;
                 AutoUpdate = true;
-                LinkFields = "Item No." = FIELD("No.");
+                LinkFields = "Item No." = field("No.");
                 LinkTable = Item;
                 MinOccurs = Zero;
                 XmlName = 'ItemVariant';
-                SourceTableView = SORTING("Item No.", Code);
+                SourceTableView = sorting("Item No.", Code);
                 fieldelement(ItemVariant_Code; ItemVariant.Code)
                 {
                 }
@@ -1077,6 +1083,15 @@ xmlport 5801 "Export Item Data"
                 {
                 }
                 fieldelement(ItemVariant_Description; ItemVariant.Description)
+                {
+                }
+                fieldelement(ItemVariant_Blocked; ItemVariant.Blocked)
+                {
+                }
+                fieldelement(ItemVariant_SalesBlocked; ItemVariant."Sales Blocked")
+                {
+                }
+                fieldelement(ItemVariant_PurchasingBlocked; ItemVariant."Purchasing Blocked")
                 {
                 }
 
@@ -1089,11 +1104,11 @@ xmlport 5801 "Export Item Data"
             {
                 AutoSave = false;
                 AutoUpdate = false;
-                LinkFields = "Item No." = FIELD("No.");
+                LinkFields = "Item No." = field("No.");
                 LinkTable = Item;
                 MinOccurs = Zero;
                 XmlName = 'AvgCostAdjmtEntryPoint';
-                SourceTableView = SORTING("Item No.");
+                SourceTableView = sorting("Item No.");
                 fieldelement(AvgCostAdjmtEntryPoint_ItemNo; AvgCostAdjmtEntryPoint."Item No.")
                 {
                 }
@@ -1127,7 +1142,7 @@ xmlport 5801 "Export Item Data"
                 AutoUpdate = true;
                 MinOccurs = Zero;
                 XmlName = 'ItemTrackingCode';
-                SourceTableView = SORTING(Code);
+                SourceTableView = sorting(Code);
                 fieldelement(ItemTrackingCode_Code; ItemTrackingCode.Code)
                 {
                 }
@@ -1259,7 +1274,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'InventorySetup';
-                SourceTableView = SORTING("Primary Key");
+                SourceTableView = sorting("Primary Key");
                 fieldelement(InventorySetup_PrimaryKey; InventorySetup."Primary Key")
                 {
                 }
@@ -1297,7 +1312,7 @@ xmlport 5801 "Export Item Data"
                 AutoUpdate = true;
                 MinOccurs = Zero;
                 XmlName = 'ProdOrder';
-                SourceTableView = SORTING("No.", Status);
+                SourceTableView = sorting("No.", Status);
 
                 trigger OnAfterGetRecord()
                 begin
@@ -1317,7 +1332,7 @@ xmlport 5801 "Export Item Data"
                 AutoUpdate = true;
                 MinOccurs = Zero;
                 XmlName = 'ProdOrder2';
-                SourceTableView = SORTING("No.", Status);
+                SourceTableView = sorting("No.", Status);
                 UseTemporary = true;
                 fieldelement(ProdOrder2_Status; TempProdOrder.Status)
                 {
@@ -1464,7 +1479,7 @@ xmlport 5801 "Export Item Data"
                 AutoUpdate = true;
                 MinOccurs = Zero;
                 XmlName = 'ProdOrderLine';
-                SourceTableView = SORTING("Prod. Order No.", "Line No.", Status);
+                SourceTableView = sorting("Prod. Order No.", "Line No.", Status);
                 UseTemporary = true;
                 fieldelement(ProdOrderLine_Status; TempProdOrderLine.Status)
                 {
@@ -1627,11 +1642,11 @@ xmlport 5801 "Export Item Data"
             {
                 AutoSave = true;
                 AutoUpdate = true;
-                LinkFields = "Item No." = FIELD("No.");
+                LinkFields = "Item No." = field("No.");
                 LinkTable = Item;
                 MinOccurs = Zero;
                 XmlName = 'CapLedgEntry';
-                SourceTableView = SORTING("Entry No.");
+                SourceTableView = sorting("Entry No.");
                 fieldelement(CapLedgEntry_EntryNo; CapLedgEntry."Entry No.")
                 {
                 }
@@ -1781,7 +1796,7 @@ xmlport 5801 "Export Item Data"
                 AutoUpdate = true;
                 MinOccurs = Zero;
                 XmlName = 'CapValueEntry';
-                SourceTableView = SORTING("Entry No.");
+                SourceTableView = sorting("Entry No.");
                 UseTemporary = true;
                 fieldelement(CapValueEntry_EntryNo; TempCapValueEntry."Entry No.")
                 {
@@ -1989,7 +2004,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = true;
                 AutoUpdate = true;
                 XmlName = 'GeneralLedgSetup';
-                SourceTableView = SORTING("Primary Key");
+                SourceTableView = sorting("Primary Key");
                 fieldelement(GeneralLedgSetup_PrimaryKey; GeneralLedgSetup."Primary Key")
                 {
                 }
@@ -2065,7 +2080,7 @@ xmlport 5801 "Export Item Data"
                 AutoSave = false;
                 AutoUpdate = false;
                 XmlName = 'AccountingPeriod';
-                SourceTableView = SORTING("Starting Date");
+                SourceTableView = sorting("Starting Date");
                 fieldelement(AccountingPeriod_StartingDate; AccountingPeriod."Starting Date")
                 {
                 }
@@ -2098,11 +2113,11 @@ xmlport 5801 "Export Item Data"
             {
                 AutoSave = true;
                 AutoUpdate = true;
-                LinkFields = "Item No." = FIELD("No.");
+                LinkFields = "Item No." = field("No.");
                 LinkTable = Item;
                 MinOccurs = Zero;
                 XmlName = 'PostValueEntryToGl';
-                SourceTableView = SORTING("Item No.", "Posting Date");
+                SourceTableView = sorting("Item No.", "Posting Date");
                 fieldelement(PostValueEntryToGl_ValueEntryNo; PostValueEntryToGl."Value Entry No.")
                 {
                 }
@@ -2124,7 +2139,7 @@ xmlport 5801 "Export Item Data"
                 AutoUpdate = true;
                 MinOccurs = Zero;
                 XmlName = 'ItemApplnEntryHistory';
-                SourceTableView = SORTING("Primary Entry No.");
+                SourceTableView = sorting("Primary Entry No.");
                 UseTemporary = true;
                 fieldelement(ItemApplnEntryHist_EntryNo; TempItemApplnEntryHistory."Entry No.")
                 {
@@ -2181,7 +2196,7 @@ xmlport 5801 "Export Item Data"
                 AutoUpdate = true;
                 MinOccurs = Zero;
                 XmlName = 'InventoryPeriod';
-                SourceTableView = SORTING("Ending Date");
+                SourceTableView = sorting("Ending Date");
                 fieldelement(InventoryPeriod_EndingDate; InventoryPeriod."Ending Date")
                 {
                 }
@@ -2198,7 +2213,7 @@ xmlport 5801 "Export Item Data"
                 AutoUpdate = true;
                 MinOccurs = Zero;
                 XmlName = 'ItemRegister';
-                SourceTableView = SORTING("Source Code");
+                SourceTableView = sorting("Source Code");
                 fieldelement(ItemRegister_No; ItemRegister."No.")
                 {
                 }
@@ -2248,11 +2263,11 @@ xmlport 5801 "Export Item Data"
             {
                 AutoSave = true;
                 AutoUpdate = true;
-                LinkFields = "Item No." = FIELD("No.");
+                LinkFields = "Item No." = field("No.");
                 LinkTable = Item;
                 MinOccurs = Zero;
                 XmlName = 'StockkeepingUnit';
-                SourceTableView = SORTING("Item No.");
+                SourceTableView = sorting("Item No.");
                 fieldelement(StockkeepingUnit_ItemNo; StockkeepingUnit."Item No.")
                 {
                 }
@@ -2378,7 +2393,7 @@ xmlport 5801 "Export Item Data"
                 AutoUpdate = true;
                 MinOccurs = Zero;
                 XmlName = 'InvAdjmEntry';
-                SourceTableView = SORTING("Order Type", "Order No.", "Order Line No.");
+                SourceTableView = sorting("Order Type", "Order No.", "Order Line No.");
                 fieldelement(InvAdjmEntry_OrderType; InvAdjmEntry."Order Type")
                 {
                 }

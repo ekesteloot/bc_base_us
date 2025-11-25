@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Outlook;
+
 table 1612 "Office Admin. Credentials"
 {
     Caption = 'Office Admin. Credentials';

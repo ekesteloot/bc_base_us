@@ -1,14 +1,33 @@
+﻿namespace Microsoft.Sales.Reminder;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 117 Reminder
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/Reminder.rdlc';
     Caption = 'Reminder';
+    DefaultRenderingLayout = "Reminder.rdlc";
 
     dataset
     {
         dataitem("Issued Reminder Header"; "Issued Reminder Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Reminder';
             column(No_IssuedReminderHeader; "No.")
@@ -67,7 +86,7 @@ report 117 Reminder
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(DueDate_IssuedReminderHeader; Format("Issued Reminder Header"."Due Date"))
                 {
                 }
@@ -221,7 +240,7 @@ report 117 Reminder
                 dataitem(DimensionLoop; "Integer")
                 {
                     DataItemLinkReference = "Issued Reminder Header";
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText_DimensionLoop; DimText)
                     {
                     }
@@ -268,9 +287,9 @@ report 117 Reminder
                 }
                 dataitem("Issued Reminder Line"; "Issued Reminder Line")
                 {
-                    DataItemLink = "Reminder No." = FIELD("No.");
+                    DataItemLink = "Reminder No." = field("No.");
                     DataItemLinkReference = "Issued Reminder Header";
-                    DataItemTableView = SORTING("Reminder No.", "Line No.");
+                    DataItemTableView = sorting("Reminder No.", "Line No.");
                     column(RemAmt_IssuedReminderLine; "Remaining Amount")
                     {
                         AutoFormatExpression = GetCurrencyCodeFromHeader();
@@ -429,9 +448,9 @@ report 117 Reminder
                 }
                 dataitem(IssuedReminderLine2; "Issued Reminder Line")
                 {
-                    DataItemLink = "Reminder No." = FIELD("No.");
+                    DataItemLink = "Reminder No." = field("No.");
                     DataItemLinkReference = "Issued Reminder Header";
-                    DataItemTableView = SORTING("Reminder No.", "Line No.");
+                    DataItemTableView = sorting("Reminder No.", "Line No.");
                     column(Desc_IssuedReminderLine2; Description)
                     {
                     }
@@ -457,7 +476,7 @@ report 117 Reminder
                 }
                 dataitem(VATCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(VATAmtLineAmtInclVAT; TempVATAmountLine."Amount Including VAT")
                     {
                         AutoFormatExpression = "Issued Reminder Line".GetCurrencyCodeFromHeader();
@@ -505,7 +524,7 @@ report 117 Reminder
                 }
                 dataitem(VATCounterLCY; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(VALExchRate; VALExchRate)
                     {
                     }
@@ -570,7 +589,7 @@ report 117 Reminder
                 }
                 dataitem(LetterText; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(GreetingText; GreetingLbl)
                     {
                     }
@@ -611,6 +630,7 @@ report 117 Reminder
                 VATPostingSetup: Record "VAT Posting Setup";
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 DimSetEntry.SetRange("Dimension Set ID", "Dimension Set ID");
@@ -736,9 +756,27 @@ report 117 Reminder
 
         trigger OnOpenPage()
         begin
-            LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Rmdr.") <> '';
+            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Rmdr.") <> '';
             LogInteractionEnable := LogInteraction;
         end;
+    }
+
+    rendering
+    {
+        layout("Reminder.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/Reminder/Reminder.rdlc';
+            Caption = 'Reminder (RDLC)';
+            Summary = 'The Reminder (RDLC) provides a detailed layout.';
+        }
+        layout("DefaultReminderEmail.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/Reminder/DefaultReminderEmail.docx';
+            Caption = 'Default Reminder Email (Word)';
+            Summary = 'The Default Reminder Email (Word) provides an email body for the reminder.';
+        }
     }
 
     labels
@@ -792,10 +830,6 @@ report 117 Reminder
         GLSetup: Record "General Ledger Setup";
         SalesSetup: Record "Sales & Receivables Setup";
         CompanyBankAccount: Record "Bank Account";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         DimSetEntry: Record "Dimension Set Entry";
         CurrExchRate: Record "Currency Exchange Rate";
         Cust: Record Customer;
@@ -822,7 +856,6 @@ report 117 Reminder
         VATInterest: Decimal;
         VALVATBase: Decimal;
         VALVATAmount: Decimal;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         TxtPageLbl: Label 'Page';
         DueDateCaptionLbl: Label 'Due Date';
@@ -861,6 +894,10 @@ report 117 Reminder
 
     protected var
         TempVATAmountLine: Record "VAT Amount Line" temporary;
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
         ReferenceText: Text[35];
         VATNoText: Text[30];
         EndLineNo: Integer;

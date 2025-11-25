@@ -1,3 +1,16 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5404 "Item Unit of Measure"
 {
     Caption = 'Item Unit of Measure';

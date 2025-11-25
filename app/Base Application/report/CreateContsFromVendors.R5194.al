@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Contact;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Setup;
+using Microsoft.Purchases.Vendor;
+
 report 5194 "Create Conts. from Vendors"
 {
     ApplicationArea = RelationshipMgmt;

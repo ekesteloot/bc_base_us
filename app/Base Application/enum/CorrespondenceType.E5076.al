@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 enum 5076 "Correspondence Type"
 {
     Extensible = true;

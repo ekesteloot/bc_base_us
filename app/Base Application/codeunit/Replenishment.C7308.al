@@ -1,3 +1,10 @@
+namespace Microsoft.WarehouseMgt.Worksheet;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Structure;
+
 codeunit 7308 Replenishment
 {
 

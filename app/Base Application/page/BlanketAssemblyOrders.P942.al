@@ -1,3 +1,8 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.FinancialMgt.Dimension;
+
 page 942 "Blanket Assembly Orders"
 {
     ApplicationArea = Assembly;
@@ -7,7 +12,7 @@ page 942 "Blanket Assembly Orders"
     Editable = false;
     PageType = List;
     SourceTable = "Assembly Header";
-    SourceTableView = WHERE("Document Type" = FILTER("Blanket Order"));
+    SourceTableView = where("Document Type" = filter("Blanket Order"));
     UsageCategory = Lists;
 
     layout
@@ -31,6 +36,12 @@ page 942 "Blanket Assembly Orders"
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the description of the assembly item.';
+                }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Assembly;
+                    ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
                 }
                 field("Due Date"; Rec."Due Date")
                 {
@@ -120,7 +131,7 @@ page 942 "Blanket Assembly Orders"
 
                 trigger OnAction()
                 begin
-                    ShowStatistics();
+                    Rec.ShowStatistics();
                 end;
             }
             action(Dimensions)
@@ -134,7 +145,7 @@ page 942 "Blanket Assembly Orders"
 
                 trigger OnAction()
                 begin
-                    ShowDimensions();
+                    Rec.ShowDimensions();
                 end;
             }
             action("Assembly BOM")
@@ -146,7 +157,7 @@ page 942 "Blanket Assembly Orders"
 
                 trigger OnAction()
                 begin
-                    ShowAssemblyList();
+                    Rec.ShowAssemblyList();
                 end;
             }
             action(Comments)
@@ -155,9 +166,9 @@ page 942 "Blanket Assembly Orders"
                 Caption = 'Comments';
                 Image = ViewComments;
                 RunObject = Page "Assembly Comment Sheet";
-                RunPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No."),
-                              "Document Line No." = CONST(0);
+                RunPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("No."),
+                              "Document Line No." = const(0);
                 ToolTip = 'View or add comments for the record.';
             }
         }
@@ -177,7 +188,7 @@ page 942 "Blanket Assembly Orders"
 
                     trigger OnAction()
                     begin
-                        UpdateUnitCost();
+                        Rec.UpdateUnitCost();
                     end;
                 }
                 action("Refresh Lines")
@@ -189,7 +200,7 @@ page 942 "Blanket Assembly Orders"
 
                     trigger OnAction()
                     begin
-                        RefreshBOM();
+                        Rec.RefreshBOM();
                         CurrPage.Update();
                     end;
                 }
@@ -202,7 +213,7 @@ page 942 "Blanket Assembly Orders"
 
                     trigger OnAction()
                     begin
-                        ShowAvailability();
+                        Rec.ShowAvailability();
                     end;
                 }
             }
@@ -211,7 +222,7 @@ page 942 "Blanket Assembly Orders"
 
     trigger OnAfterGetRecord()
     begin
-        IsUnitCostEditable := not IsStandardCostItem();
+        IsUnitCostEditable := not Rec.IsStandardCostItem();
     end;
 
     trigger OnOpenPage()

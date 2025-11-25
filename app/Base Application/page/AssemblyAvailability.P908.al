@@ -1,3 +1,8 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+
 page 908 "Assembly Availability"
 {
     Caption = 'Assembly Availability';
@@ -70,8 +75,8 @@ page 908 "Assembly Availability"
                         Item: Record Item;
                         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
                     begin
-                        Item.Get("Item No.");
-                        SetItemFilter(Item);
+                        Item.Get(Rec."Item No.");
+                        Rec.SetItemFilter(Item);
                         ItemAvailFormsMgt.ShowItemLedgerEntries(Item, false);
                     end;
                 }
@@ -117,8 +122,8 @@ page 908 "Assembly Availability"
                 part(AssemblyLineAvail; "Assembly Line Avail.")
                 {
                     ApplicationArea = Assembly;
-                    SubPageLink = "Document Type" = FIELD("Document Type"),
-                                  "Document No." = FIELD("No.");
+                    SubPageLink = "Document Type" = field("Document Type"),
+                                  "Document No." = field("No.");
                 }
             }
         }
@@ -143,7 +148,7 @@ page 908 "Assembly Availability"
     var
         TempAssemblyLine: Record "Assembly Line" temporary;
     begin
-        Copy(TempAssemblyHeader2, true);
+        Rec.Copy(TempAssemblyHeader2, true);
         TempAssemblyLine.Copy(TempAssemblyLine2, true);
         CurrPage.AssemblyLineAvail.PAGE.SetHeader(TempAssemblyHeader2);
         CurrPage.AssemblyLineAvail.PAGE.SetLinesRecord(TempAssemblyLine);

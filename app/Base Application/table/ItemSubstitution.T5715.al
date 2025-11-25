@@ -1,3 +1,9 @@
+﻿namespace Microsoft.InventoryMgt.Item.Substitution;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Location;
+
 table 5715 "Item Substitution"
 {
     Caption = 'Item Substitution';
@@ -10,9 +16,9 @@ table 5715 "Item Substitution"
         {
             Caption = 'No.';
             NotBlank = true;
-            TableRelation = IF (Type = CONST(Item)) Item."No."
-            ELSE
-            IF (Type = CONST("Nonstock Item")) "Nonstock Item"."Entry No.";
+            TableRelation = if (Type = const(Item)) Item."No."
+            else
+            if (Type = const("Nonstock Item")) "Nonstock Item"."Entry No.";
 
             trigger OnValidate()
             begin
@@ -32,7 +38,7 @@ table 5715 "Item Substitution"
         field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("No."));
 
             trigger OnValidate()
             begin
@@ -44,9 +50,9 @@ table 5715 "Item Substitution"
         {
             Caption = 'Substitute No.';
             NotBlank = true;
-            TableRelation = IF ("Substitute Type" = CONST(Item)) Item."No."
-            ELSE
-            IF ("Substitute Type" = CONST("Nonstock Item")) "Nonstock Item"."Entry No.";
+            TableRelation = if ("Substitute Type" = const(Item)) Item."No."
+            else
+            if ("Substitute Type" = const("Nonstock Item")) "Nonstock Item"."Entry No.";
 
             trigger OnValidate()
             begin
@@ -72,7 +78,7 @@ table 5715 "Item Substitution"
         field(4; "Substitute Variant Code"; Code[10])
         {
             Caption = 'Substitute Variant Code';
-            TableRelation = IF ("Substitute Type" = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("Substitute No."));
+            TableRelation = if ("Substitute Type" = const(Item)) "Item Variant".Code where("Item No." = field("Substitute No."));
 
             trigger OnValidate()
             begin
@@ -114,12 +120,12 @@ table 5715 "Item Substitution"
         }
         field(8; Condition; Boolean)
         {
-            CalcFormula = Exist("Substitution Condition" WHERE(Type = FIELD(Type),
-                                                                "No." = FIELD("No."),
-                                                                "Variant Code" = FIELD("Variant Code"),
-                                                                "Substitute Type" = FIELD("Substitute Type"),
-                                                                "Substitute No." = FIELD("Substitute No."),
-                                                                "Substitute Variant Code" = FIELD("Substitute Variant Code")));
+            CalcFormula = exist("Substitution Condition" where(Type = field(Type),
+                                                                "No." = field("No."),
+                                                                "Variant Code" = field("Variant Code"),
+                                                                "Substitute Type" = field("Substitute Type"),
+                                                                "Substitute No." = field("Substitute No."),
+                                                                "Substitute Variant Code" = field("Substitute Variant Code")));
             Caption = 'Condition';
             Editable = false;
             FieldClass = FlowField;
@@ -181,7 +187,7 @@ table 5715 "Item Substitution"
         }
         field(102; "Sub. Item No."; Code[20])
         {
-            CalcFormula = Lookup("Nonstock Item"."Item No." WHERE("Entry No." = FIELD("Substitute No.")));
+            CalcFormula = Lookup("Nonstock Item"."Item No." where("Entry No." = field("Substitute No.")));
             Caption = 'Sub. Item No.';
             Editable = false;
             FieldClass = FlowField;

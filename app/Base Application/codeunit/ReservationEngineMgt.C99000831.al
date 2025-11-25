@@ -1,3 +1,19 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
 codeunit 99000831 "Reservation Engine Mgt."
 {
     Permissions = TableData "Item Ledger Entry" = rm,
@@ -84,7 +100,7 @@ codeunit 99000831 "Reservation Engine Mgt."
     begin
         with ReservEntry do
             case "Source Type" of
-                DATABASE::"Sales Line":
+                Enum::TableID::"Sales Line".AsInteger():
                     begin
                         SalesLine.Get("Source Subtype", "Source ID", "Source Ref. No.");
                         if Positive then
@@ -92,7 +108,7 @@ codeunit 99000831 "Reservation Engine Mgt."
                         else
                             ChangeDateFieldOnResEntry(ReservEntry, 0D, SalesLine."Shipment Date");
                     end;
-                DATABASE::"Purchase Line":
+                Enum::TableID::"Purchase Line".AsInteger():
                     begin
                         PurchaseLine.Get("Source Subtype", "Source ID", "Source Ref. No.");
                         if Positive then
@@ -100,28 +116,28 @@ codeunit 99000831 "Reservation Engine Mgt."
                         else
                             ChangeDateFieldOnResEntry(ReservEntry, 0D, "Shipment Date");
                     end;
-                DATABASE::"Planning Component":
+                Enum::TableID::"Planning Component".AsInteger():
                     begin
                         PlanningComponent.Get("Source ID", "Source Batch Name", "Source Prod. Order Line", "Source Ref. No.");
                         ChangeDateFieldOnResEntry(ReservEntry, 0D, PlanningComponent."Due Date")
                     end;
-                DATABASE::"Item Ledger Entry":
+                Enum::TableID::"Item Ledger Entry".AsInteger():
                     begin
                         ItemLedgerEntry.Get("Source Ref. No.");
                         ChangeDateFieldOnResEntry(ReservEntry, ItemLedgerEntry."Posting Date", 0D);
                     end;
-                DATABASE::"Prod. Order Line":
+                Enum::TableID::"Prod. Order Line".AsInteger():
                     begin
                         ProdOrderLine.Get("Source Subtype", "Source ID", "Source Prod. Order Line");
                         ChangeDateFieldOnResEntry(ReservEntry, ProdOrderLine."Due Date", 0D);
                     end;
-                DATABASE::"Prod. Order Component":
+                Enum::TableID::"Prod. Order Component".AsInteger():
                     begin
                         ProdOrderComponent.Get("Source Subtype", "Source ID", "Source Prod. Order Line", "Source Ref. No.");
                         ChangeDateFieldOnResEntry(ReservEntry, 0D, ProdOrderComponent."Due Date");
                         exit;
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     begin
                         TransferLine.Get("Source ID", "Source Ref. No.");
                         if Positive then
@@ -129,7 +145,7 @@ codeunit 99000831 "Reservation Engine Mgt."
                         else
                             ChangeDateFieldOnResEntry(ReservEntry, 0D, TransferLine."Shipment Date");
                     end;
-                DATABASE::"Service Line":
+                Enum::TableID::"Service Line".AsInteger():
                     begin
                         ServiceLine.Get("Source Subtype", "Source ID", "Source Ref. No.");
                         ChangeDateFieldOnResEntry(ReservEntry, 0D, ServiceLine."Needed by Date");
@@ -169,7 +185,7 @@ codeunit 99000831 "Reservation Engine Mgt."
             if (Item."Order Tracking Policy" = Item."Order Tracking Policy"::None) and
                (not TransferLineWithItemTracking(ReservEntry2)) and
                (((ReservEntry.Binding = ReservEntry.Binding::"Order-to-Order") and ReservEntry2.Positive) or
-                (ReservEntry2."Source Type" = DATABASE::"Item Ledger Entry") or not ReservEntry2.TrackingExists())
+                (ReservEntry2."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger()) or not ReservEntry2.TrackingExists())
             then
                 ReservEntry2.Delete()
             else begin
@@ -230,7 +246,7 @@ codeunit 99000831 "Reservation Engine Mgt."
         if ReservEntry."Reservation Status" <> ReservEntry."Reservation Status"::Surplus then begin
             ReservEntry2.Get(ReservEntry."Entry No.", not ReservEntry.Positive);
             if not TransferLineWithItemTracking(ReservEntry2) and
-               ((ReservEntry2."Source Type" = DATABASE::"Item Ledger Entry") or not ReservEntry2.TrackingExists())
+               ((ReservEntry2."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger()) or not ReservEntry2.TrackingExists())
             then
                 ReservEntry2.Delete()
             else begin
@@ -316,95 +332,95 @@ codeunit 99000831 "Reservation Engine Mgt."
     begin
         with ReservEntry do begin
             case "Source Type" of
-                DATABASE::"Sales Line":
+                Enum::TableID::"Sales Line".AsInteger():
                     begin
                         SourceType := SourceType::Sales;
                         exit(StrSubstNo(SourceDoc3Txt, SelectStr(SourceType, SourceTypeText),
-                            "Sales Document Type".FromInteger("Source Subtype"), "Source ID"));
+                            Enum::"Sales Document Type".FromInteger("Source Subtype"), "Source ID"));
                     end;
-                DATABASE::"Purchase Line":
+                Enum::TableID::"Purchase Line".AsInteger():
                     begin
                         SourceType := SourceType::Purchase;
                         exit(StrSubstNo(SourceDoc3Txt, SelectStr(SourceType, SourceTypeText),
-                            "Purchase Document Type".FromInteger("Source Subtype"), "Source ID"));
+                            Enum::"Purchase Document Type".FromInteger("Source Subtype"), "Source ID"));
                     end;
-                DATABASE::"Requisition Line":
+                Enum::TableID::"Requisition Line".AsInteger():
                     begin
                         SourceType := SourceType::"Requisition Line";
                         exit(StrSubstNo(SourceDoc3Txt, SelectStr(SourceType, SourceTypeText),
                             "Source ID", "Source Batch Name"));
                     end;
-                DATABASE::"Planning Component":
+                Enum::TableID::"Planning Component".AsInteger():
                     begin
                         SourceType := SourceType::"Planning Component";
                         exit(StrSubstNo(SourceDoc3Txt, SelectStr(SourceType, SourceTypeText),
                             "Source ID", "Source Batch Name"));
                     end;
-                DATABASE::"Item Journal Line":
+                Enum::TableID::"Item Journal Line".AsInteger():
                     begin
                         SourceType := SourceType::"Item Journal";
                         exit(StrSubstNo(SourceDoc4Txt, SelectStr(SourceType, SourceTypeText),
-                            "Item Ledger Entry Type".FromInteger("Source Subtype"), "Source ID", "Source Batch Name"));
+                            Enum::"Item Ledger Entry Type".FromInteger("Source Subtype"), "Source ID", "Source Batch Name"));
                     end;
-                DATABASE::"Job Journal Line":
+                Enum::TableID::"Job Journal Line".AsInteger():
                     begin
                         SourceType := SourceType::"Job Journal";
                         exit(StrSubstNo(SourceDoc4Txt, SelectStr(SourceType, SourceTypeText),
-                            "Job Journal Line Entry Type".FromInteger("Source Subtype"), "Source ID", "Source Batch Name"));
+                            Enum::"Job Journal Line Entry Type".FromInteger("Source Subtype"), "Source ID", "Source Batch Name"));
                     end;
-                DATABASE::"Item Ledger Entry":
+                Enum::TableID::"Item Ledger Entry".AsInteger():
                     begin
                         SourceType := SourceType::"Item Ledger Entry";
                         exit(StrSubstNo(SourceDoc2Txt, SelectStr(SourceType, SourceTypeText), "Source Ref. No."));
                     end;
-                DATABASE::"Prod. Order Line":
+                Enum::TableID::"Prod. Order Line".AsInteger():
                     begin
                         SourceType := SourceType::"Prod. Order Line";
                         exit(StrSubstNo(SourceDoc3Txt, SelectStr(SourceType, SourceTypeText),
-                            "Production Order Status".FromInteger("Source Subtype"), "Source ID"));
+                            Enum::"Production Order Status".FromInteger("Source Subtype"), "Source ID"));
                     end;
-                DATABASE::"Prod. Order Component":
+                Enum::TableID::"Prod. Order Component".AsInteger():
                     begin
                         SourceType := SourceType::"Prod. Order Component";
                         exit(StrSubstNo(SourceDoc3Txt, SelectStr(SourceType, SourceTypeText),
-                            "Production Order Status".FromInteger("Source Subtype"), "Source ID"));
+                            Enum::"Production Order Status".FromInteger("Source Subtype"), "Source ID"));
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     begin
                         SourceType := SourceType::Transfer;
                         exit(StrSubstNo(SourceDoc3Txt, SelectStr(SourceType, SourceTypeText),
                             "Source ID", SelectStr("Source Subtype" + 1, Text005)));
                     end;
-                DATABASE::"Service Line":
+                Enum::TableID::"Service Line".AsInteger():
                     begin
                         SourceType := SourceType::Service;
                         exit(StrSubstNo(SourceDoc2Txt, SelectStr(SourceType, SourceTypeText), "Source ID"));
                     end;
-                DATABASE::"Job Planning Line":
+                Enum::TableID::"Job Planning Line".AsInteger():
                     begin
                         SourceType := SourceType::Job;
                         exit(StrSubstNo(SourceDoc2Txt, SelectStr(SourceType, SourceTypeText), "Source ID"));
                     end;
-                DATABASE::"Assembly Header":
+                Enum::TableID::"Assembly Header".AsInteger():
                     begin
                         SourceType := SourceType::"Assembly Header";
                         exit(
                           StrSubstNo(SourceDoc3Txt, SelectStr(SourceType, SourceTypeText),
-                            "Assembly Document Type".FromInteger("Source Subtype"), "Source ID"));
+                            Enum::"Assembly Document Type".FromInteger("Source Subtype"), "Source ID"));
                     end;
-                DATABASE::"Assembly Line":
+                Enum::TableID::"Assembly Line".AsInteger():
                     begin
                         SourceType := SourceType::"Assembly Line";
                         exit(
                           StrSubstNo(SourceDoc3Txt, SelectStr(SourceType, SourceTypeText),
-                            "Assembly Document Type".FromInteger("Source Subtype"), "Source ID"));
+                            Enum::"Assembly Document Type".FromInteger("Source Subtype"), "Source ID"));
                     end;
-                DATABASE::"Invt. Document Line":
+                Enum::TableID::"Invt. Document Line".AsInteger():
                     begin
                         SourceType := SourceType::"Inventory Document";
                         exit(
                           StrSubstNo(SourceDoc3Txt, SelectStr(SourceType, SourceTypeText),
-                            "Invt. Doc. Document Type".FromInteger("Source Subtype"), "Source ID"));
+                            Enum::"Invt. Doc. Document Type".FromInteger("Source Subtype"), "Source ID"));
                     end;
             end;
 
@@ -506,8 +522,8 @@ codeunit 99000831 "Reservation Engine Mgt."
         NextEntryNo: Integer;
         DateFormula: DateFormula;
     begin
-        if not (ReservEntry."Source Type" in [DATABASE::"Prod. Order Line",
-                                              DATABASE::"Purchase Line"])
+        if not (ReservEntry."Source Type" in [Enum::TableID::"Prod. Order Line".AsInteger(),
+                                              Enum::TableID::"Purchase Line".AsInteger()])
         then
             exit;
 
@@ -652,7 +668,7 @@ codeunit 99000831 "Reservation Engine Mgt."
                 if not CalledRecursively then
                     SaveLostReservQty(ReservEntry2); // Late Binding
                 ReservEntry2."Reservation Status" := ReservEntry2."Reservation Status"::Surplus;
-                if ReservEntry2."Source Type" = DATABASE::"Item Ledger Entry" then begin
+                if ReservEntry2."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then begin
                     GetItem(ReservEntry2."Item No.");
                     if Item."Order Tracking Policy" = Item."Order Tracking Policy"::None then
                         ReservEntry2."Quantity (Base)" := 0;
@@ -701,7 +717,7 @@ codeunit 99000831 "Reservation Engine Mgt."
                 if not CalledRecursively then
                     SaveLostReservQty(ReservEntry1); // Late Binding
                 GetItem(ReservEntry1."Item No.");
-                if (ReservEntry1."Source Type" = DATABASE::"Item Ledger Entry") and
+                if (ReservEntry1."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger()) and
                    (Item."Order Tracking Policy" = Item."Order Tracking Policy"::None)
                 then begin
                     ReservEntry1.Delete();
@@ -822,7 +838,7 @@ codeunit 99000831 "Reservation Engine Mgt."
                 GetItem(TempReservEntry."Item No.");
                 if Item."Order Tracking Policy" = Item."Order Tracking Policy"::None then begin
                     repeat
-                        if (TempReservEntry."Source Type" = DATABASE::"Item Ledger Entry") or not TempReservEntry.TrackingExists() then begin
+                        if (TempReservEntry."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger()) or not TempReservEntry.TrackingExists() then begin
                             ReservEntry := TempReservEntry;
                             ReservEntry.Delete();
                         end;
@@ -884,7 +900,7 @@ codeunit 99000831 "Reservation Engine Mgt."
     var
         SalesLine: Record "Sales Line";
     begin
-        if ReservEntry."Source Type" = DATABASE::"Sales Line" then begin
+        if ReservEntry."Source Type" = Enum::TableID::"Sales Line".AsInteger() then begin
             SalesLine.Get(ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Ref. No.");
             SalesLine.UpdatePlanned();
             SalesLine.Modify();
@@ -1128,60 +1144,61 @@ codeunit 99000831 "Reservation Engine Mgt."
             exit;
 
         case TableID of
-            DATABASE::"Sales Line",
-            DATABASE::"Purchase Line",
-            DATABASE::"Service Line",
-            DATABASE::"Job Planning Line",
-            DATABASE::"Assembly Line",
-            DATABASE::"Invt. Document Line":
+            Enum::TableID::"Sales Line".AsInteger(),
+            Enum::TableID::"Purchase Line".AsInteger(),
+            Enum::TableID::"Service Line".AsInteger(),
+            Enum::TableID::"Job Planning Line".AsInteger(),
+            Enum::TableID::"Assembly Line".AsInteger(),
+            Enum::TableID::"Invt. Document Line".AsInteger():
                 begin
                     PointerFieldIsActive[2] := true;  // SubType
                     PointerFieldIsActive[3] := true;  // ID
                     PointerFieldIsActive[6] := true;  // RefNo
                 end;
-            DATABASE::"Requisition Line":
+            Enum::TableID::"Requisition Line".AsInteger():
                 begin
                     PointerFieldIsActive[3] := true;  // ID
                     PointerFieldIsActive[4] := true;  // BatchName
                     PointerFieldIsActive[6] := true;  // RefNo
                 end;
-            DATABASE::"Item Journal Line":
-                begin
-                    PointerFieldIsActive[2] := true;  // SubType
-                    PointerFieldIsActive[3] := true;  // ID
-                    PointerFieldIsActive[4] := true;  // BatchName
-                    PointerFieldIsActive[6] := true;  // RefNo
-                end;
-            DATABASE::"Job Journal Line":
+            Enum::TableID::"Item Journal Line".AsInteger():
                 begin
                     PointerFieldIsActive[2] := true;  // SubType
                     PointerFieldIsActive[3] := true;  // ID
                     PointerFieldIsActive[4] := true;  // BatchName
                     PointerFieldIsActive[6] := true;  // RefNo
                 end;
-            DATABASE::"Item Ledger Entry":
+            Enum::TableID::"Job Journal Line".AsInteger():
+                begin
+                    PointerFieldIsActive[2] := true;  // SubType
+                    PointerFieldIsActive[3] := true;  // ID
+                    PointerFieldIsActive[4] := true;  // BatchName
+                    PointerFieldIsActive[6] := true;  // RefNo
+                end;
+            Enum::TableID::"Item Ledger Entry".AsInteger():
                 PointerFieldIsActive[6] := true;  // RefNo
-            DATABASE::"Prod. Order Line":
+            Enum::TableID::"Prod. Order Line".AsInteger():
                 begin
                     PointerFieldIsActive[2] := true;  // SubType
                     PointerFieldIsActive[3] := true;  // ID
                     PointerFieldIsActive[5] := true;  // ProdOrderLine
                 end;
-            DATABASE::"Prod. Order Component", DATABASE::"Transfer Line":
+            Enum::TableID::"Prod. Order Component".AsInteger(),
+            Enum::TableID::"Transfer Line".AsInteger():
                 begin
                     PointerFieldIsActive[2] := true;  // SubType
                     PointerFieldIsActive[3] := true;  // ID
                     PointerFieldIsActive[5] := true;  // ProdOrderLine
                     PointerFieldIsActive[6] := true;  // RefNo
                 end;
-            DATABASE::"Planning Component":
+            Enum::TableID::"Planning Component".AsInteger():
                 begin
                     PointerFieldIsActive[3] := true;  // ID
                     PointerFieldIsActive[4] := true;  // BatchName
                     PointerFieldIsActive[5] := true;  // ProdOrderLine
                     PointerFieldIsActive[6] := true;  // RefNo
                 end;
-            DATABASE::"Assembly Header":
+            Enum::TableID::"Assembly Header".AsInteger():
                 begin
                     PointerFieldIsActive[2] := true;  // SubType
                     PointerFieldIsActive[3] := true;  // ID
@@ -1273,7 +1290,7 @@ codeunit 99000831 "Reservation Engine Mgt."
         ReservEntry.InitSortingAndFilters(true);
 
         with SalesHeader do begin
-            ReservEntry.SetRange("Source Type", DATABASE::"Sales Line");
+            ReservEntry.SetRange("Source Type", Enum::TableID::"Sales Line");
             ReservEntry.SetRange("Source Subtype", "Document Type");
             ReservEntry.SetRange("Source ID", "No.");
         end;
@@ -1288,7 +1305,7 @@ codeunit 99000831 "Reservation Engine Mgt."
         ReservEntry.InitSortingAndFilters(true);
 
         with PurchHeader do begin
-            ReservEntry.SetRange("Source Type", DATABASE::"Purchase Line");
+            ReservEntry.SetRange("Source Type", Enum::TableID::"Purchase Line");
             ReservEntry.SetRange("Source Subtype", "Document Type");
             ReservEntry.SetRange("Source ID", "No.");
         end;
@@ -1303,7 +1320,7 @@ codeunit 99000831 "Reservation Engine Mgt."
         ReservEntry.InitSortingAndFilters(true);
 
         with TransHeader do begin
-            ReservEntry.SetRange("Source Type", DATABASE::"Transfer Line");
+            ReservEntry.SetRange("Source Type", Enum::TableID::"Transfer Line");
             ReservEntry.SetRange("Source ID", "No.");
         end;
 
@@ -1322,7 +1339,7 @@ codeunit 99000831 "Reservation Engine Mgt."
 
     local procedure TransferLineWithItemTracking(ReservEntry: Record "Reservation Entry"): Boolean
     begin
-        exit((ReservEntry."Source Type" = DATABASE::"Transfer Line") and ReservEntry.TrackingExists());
+        exit((ReservEntry."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and ReservEntry.TrackingExists());
     end;
 
     local procedure CheckTrackingNoMismatch(ReservEntry: Record "Reservation Entry"; TrackingSpecification: Record "Tracking Specification"; TrackingSpecification2: Record "Tracking Specification"; ItemTrackingCode: Record "Item Tracking Code"): Boolean

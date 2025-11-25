@@ -19,7 +19,7 @@ page 9247 "Abs. Overview by Period Matrix"
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field("Full Name"; FullName())
+                field("Full Name"; Rec.FullName())
                 {
                     ApplicationArea = BasicHR;
                     Caption = 'Full Name';
@@ -442,11 +442,11 @@ page 9247 "Abs. Overview by Period Matrix"
     begin
         if AbsenceAmountType = AbsenceAmountType::"Net Change" then
             if MatrixRecords[ColumnID]."Period Start" = MatrixRecords[ColumnID]."Period End" then
-                SetRange("Date Filter", MatrixRecords[ColumnID]."Period Start")
+                Rec.SetRange("Date Filter", MatrixRecords[ColumnID]."Period Start")
             else
-                SetRange("Date Filter", MatrixRecords[ColumnID]."Period Start", MatrixRecords[ColumnID]."Period End")
+                Rec.SetRange("Date Filter", MatrixRecords[ColumnID]."Period Start", MatrixRecords[ColumnID]."Period End")
         else
-            SetRange("Date Filter", 0D, MatrixRecords[ColumnID]."Period End");
+            Rec.SetRange("Date Filter", 0D, MatrixRecords[ColumnID]."Period End");
     end;
 
     procedure LoadMatrix(NewMatrixColumns: array[32] of Text[1024]; var NewMatrixRecords: array[32] of Record Date; NewCauseOfAbsenceFilter: Code[10]; NewAmountType: Enum "Analysis Amount Type")
@@ -465,18 +465,18 @@ page 9247 "Abs. Overview by Period Matrix"
         EmployeeAbsence: Record "Employee Absence";
     begin
         SetDateFilter(ColumnID);
-        EmployeeAbsence.SetRange("Employee No.", "No.");
+        EmployeeAbsence.SetRange("Employee No.", Rec."No.");
         EmployeeAbsence.SetFilter("Cause of Absence Code", CauseOfAbsenceFilter);
-        EmployeeAbsence.SetFilter("From Date", Format("Date Filter"));
+        EmployeeAbsence.SetFilter("From Date", Format(Rec."Date Filter"));
         PAGE.Run(0, EmployeeAbsence);
     end;
 
     local procedure MATRIX_OnAfterGetRecord(ColumnID: Integer)
     begin
         SetDateFilter(ColumnID);
-        SetFilter("Cause of Absence Filter", CauseOfAbsenceFilter);
-        CalcFields("Total Absence (Base)");
-        MATRIX_CellData[ColumnID] := "Total Absence (Base)";
+        Rec.SetFilter("Cause of Absence Filter", CauseOfAbsenceFilter);
+        Rec.CalcFields("Total Absence (Base)");
+        MATRIX_CellData[ColumnID] := Rec."Total Absence (Base)";
     end;
 }
 

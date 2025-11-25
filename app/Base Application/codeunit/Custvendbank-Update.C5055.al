@@ -1,3 +1,11 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 codeunit 5055 "CustVendBank-Update"
 {
     Permissions = TableData "Bank Account" = rm,
@@ -17,7 +25,7 @@ codeunit 5055 "CustVendBank-Update"
         if IsHandled then
             exit;
 
-        ContBusRel.SetRange("Contact No.", "No.");
+        ContBusRel.SetRange("Contact No.", Rec."No.");
         ContBusRel.SetFilter("Link to Table", '<>''''');
 
         if ContBusRel.Find('-') then

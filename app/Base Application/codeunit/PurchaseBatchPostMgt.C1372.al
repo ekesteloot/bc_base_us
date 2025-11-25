@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Posting;
+
+using Microsoft.Intercompany.Outbox;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using System.Threading;
+using System.Utilities;
+
 codeunit 1372 "Purchase Batch Post Mgt."
 {
     EventSubscriberInstance = Manual;
@@ -41,12 +53,12 @@ codeunit 1372 "Purchase Batch Post Mgt."
         if ReplacePostingDate and (PostingDate = 0D) then
             Error(PostingDateIsNotSetErr);
 
-        BatchProcessingMgt.SetParameter("Batch Posting Parameter Type"::Invoice, Invoice);
-        BatchProcessingMgt.SetParameter("Batch Posting Parameter Type"::Receive, Receive);
-        BatchProcessingMgt.SetParameter("Batch Posting Parameter Type"::"Calculate Invoice Discount", CalcInvoiceDiscount);
-        BatchProcessingMgt.SetParameter("Batch Posting Parameter Type"::"Posting Date", PostingDate);
-        BatchProcessingMgt.SetParameter("Batch Posting Parameter Type"::"Replace Posting Date", ReplacePostingDate);
-        BatchProcessingMgt.SetParameter("Batch Posting Parameter Type"::"Replace Document Date", ReplaceDocumentDate);
+        BatchProcessingMgt.SetParameter(Enum::"Batch Posting Parameter Type"::Invoice, Invoice);
+        BatchProcessingMgt.SetParameter(Enum::"Batch Posting Parameter Type"::Receive, Receive);
+        BatchProcessingMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Calculate Invoice Discount", CalcInvoiceDiscount);
+        BatchProcessingMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Posting Date", PostingDate);
+        BatchProcessingMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Replace Posting Date", ReplacePostingDate);
+        BatchProcessingMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Replace Document Date", ReplaceDocumentDate);
         OnRunBatchOnAfterAddParameters(BatchProcessingMgt);
 
         PurchaseBatchPostMgt.SetBatchProcessor(BatchProcessingMgt);

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 table 323 "VAT Business Posting Group"
 {
     Caption = 'VAT Business Posting Group';

@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+using System.Utilities;
+
 table 251 "Gen. Product Posting Group"
 {
     Caption = 'Gen. Product Posting Group';

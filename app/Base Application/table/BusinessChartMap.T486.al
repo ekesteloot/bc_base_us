@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 486 "Business Chart Map"
 {
     Caption = 'Business Chart Map';

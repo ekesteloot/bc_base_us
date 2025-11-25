@@ -1,4 +1,12 @@
-﻿table 222 "Ship-to Address"
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.ServiceMgt.Setup;
+using System.Email;
+
+table 222 "Ship-to Address"
 {
     Caption = 'Ship-to Address';
     DataCaptionFields = "Customer No.", Name, "Code";
@@ -36,11 +44,9 @@
         field(7; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -115,7 +121,7 @@
         field(83; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(84; "Fax No."; Text[30])
         {
@@ -140,11 +146,9 @@
         field(91; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -199,7 +203,7 @@
         field(5792; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(5900; "Service Zone Code"; Code[10])
         {

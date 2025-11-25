@@ -67,7 +67,7 @@ page 10134 "Posted Bank Rec. Lines"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the amount of the item, such as a check, that was deposited.';
                 }
-                field(Cleared; Cleared)
+                field(Cleared; Rec.Cleared)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the check on the line has been cleared, as indicated on the bank statement.';

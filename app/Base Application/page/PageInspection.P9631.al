@@ -1,3 +1,8 @@
+﻿namespace System.Tooling;
+
+using System.Apps;
+using System.Reflection;
+
 page 9631 "Page Inspection"
 {
     Caption = 'Page Inspection';
@@ -22,6 +27,23 @@ page 9631 "Page Inspection"
                     ApplicationArea = All;
                     Caption = 'Page';
                     ToolTip = 'Specifies the selected page''s name, number, and type.';
+                }
+            }
+            group(ExploreInVSCode)
+            {
+                ShowCaption = false;
+                field(ExploreInVsCodeTextLbl; ExploreInVsCodeTextLbl)
+                {
+                    ApplicationArea = All;
+                    DrillDown = true;
+                    ExtendedDatatype = URL;
+                    ShowCaption = false;
+                    ToolTip = 'Specifies the URL that opens this page in Visual Studio Code and attaches debugger to current session.';
+
+                    trigger OnDrillDown()
+                    begin
+                        HyperLink(OpenInVsCoderequestURL);
+                    end;
                 }
             }
             group(Control12)
@@ -178,14 +200,14 @@ page 9631 "Page Inspection"
 
                     trigger OnDrillDown()
                     var
-                        ApplicationObjectMetadata: Record "Application Object Metadata";
+                        AllObjWithCaption: Record AllObjWithCaption;
                         NavAppInstalledApp: Record "NAV App Installed App";
                     begin
                         ShowExtensions := true;
                         ShowFields := false;
                         ShowFilters := false;
 
-                        if ApplicationObjectMetadata.ReadPermission and NavAppInstalledApp.ReadPermission then
+                        if AllObjWithCaption.ReadPermission and NavAppInstalledApp.ReadPermission then
                             ShowNoPermissionForExtensions := false
                         else
                             ShowNoPermissionForExtensions := true;
@@ -226,7 +248,7 @@ page 9631 "Page Inspection"
                 ApplicationArea = All;
                 Editable = false;
                 Enabled = false;
-                Visible = ShowExtensions;
+                Visible = ShowExtensions and not ShowNoPermissionForExtensions;
             }
             part(Filters; "Page Inspection Filters")
             {
@@ -257,6 +279,7 @@ page 9631 "Page Inspection"
     begin
         SetElementsVisibilities();
         UpdateVisiblePart();
+        SetOpenInVSCodeRequestURL();
     end;
 
     trigger OnOpenPage()
@@ -266,7 +289,7 @@ page 9631 "Page Inspection"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        exit(FindFirst());
+        exit(Rec.FindFirst());
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
@@ -284,6 +307,8 @@ page 9631 "Page Inspection"
         InfoFormatSecondDetailOnlyLbl: Label '(%1)', Locked = true;
         ViewFullTableURL: Text;
         ViewTableLbl: Label 'View table';
+        OpenInVsCoderequestURL: Text;
+        ExploreInVsCodeTextLbl: Label 'Explore page in Visual Studio Code';
         ShowFields: Boolean;
         ShowExtensions: Boolean;
         ShowFilters: Boolean;
@@ -313,6 +338,13 @@ page 9631 "Page Inspection"
         PageIsOpening: Boolean;
         PageIsOpeningTextLbl: Label 'This page is being opened.';
 
+    local procedure SetOpenInVSCodeRequestURL()
+    var
+        VSCodeRequestHelper: Codeunit "VS Code Request Helper";
+    begin
+        OpenInVsCoderequestURL := VSCodeRequestHelper.GetUrlToNavigatePageInVSCode(Rec);
+    end;
+
     local procedure SetInitialVisibilities()
     begin
         ShowFields := true;
@@ -337,82 +369,82 @@ page 9631 "Page Inspection"
         PageMetadata: Record "Page Metadata";
         BaseUrlTxt: Text;
     begin
-        if "Source Data Type" = 'Query' then begin
+        if Rec."Source Data Type" = 'Query' then begin
             IsViewQueryPage := true;
-            QueryInfo := StrSubstNo(InfoFormatTwoDetailsLbl, "Source Table Name", "Source Table No.");
+            QueryInfo := StrSubstNo(InfoFormatTwoDetailsLbl, Rec."Source Table Name", Rec."Source Table No.");
         end else
             IsViewQueryPage := false;
 
         PageMetadata.Reset();
-        PageMetadata.SetFilter(ID, '%1', "Page ID");
+        PageMetadata.SetFilter(ID, '%1', Rec."Page ID");
         if PageMetadata.FindFirst() then
             PageSourceTableIsTemporary := PageMetadata.SourceTableTemporary
         else
             PageSourceTableIsTemporary := false;
 
-        if "Page ID" = 0 then begin
-            if "Page Name" = '' then
-                PageInfo := StrSubstNo(InfoFormatSecondDetailOnlyLbl, "Page Type")
+        if Rec."Page ID" = 0 then begin
+            if Rec."Page Name" = '' then
+                PageInfo := StrSubstNo(InfoFormatSecondDetailOnlyLbl, Rec."Page Type")
             else
-                if "Page Type" = '' then
-                    PageInfo := StrSubstNo(InfoFormatOneDetailLbl, "Page Name")
+                if Rec."Page Type" = '' then
+                    PageInfo := StrSubstNo(InfoFormatOneDetailLbl, Rec."Page Name")
                 else
-                    PageInfo := StrSubstNo(InfoFormatTwoDetailsLbl, "Page Name", "Page Type")
+                    PageInfo := StrSubstNo(InfoFormatTwoDetailsLbl, Rec."Page Name", Rec."Page Type")
         end else
-            if "Page Type" = '' then
-                PageInfo := StrSubstNo(InfoFormatTwoDetailsLbl, "Page Name", "Page ID")
+            if Rec."Page Type" = '' then
+                PageInfo := StrSubstNo(InfoFormatTwoDetailsLbl, Rec."Page Name", Rec."Page ID")
             else
-                PageInfo := StrSubstNo(InfoFormatThreeDetailsLbl, "Page Name", "Page ID", "Page Type");
+                PageInfo := StrSubstNo(InfoFormatThreeDetailsLbl, Rec."Page Name", Rec."Page ID", Rec."Page Type");
 
-        if "Page Name" = ViewTablePageLbl then begin
+        if Rec."Page Name" = ViewTablePageLbl then begin
             IsViewTablePage := true;
-            PageInfo := StrSubstNo(InfoFormatTwoDetailsLbl, "Page Name", "Page Type");
+            PageInfo := StrSubstNo(InfoFormatTwoDetailsLbl, Rec."Page Name", Rec."Page Type");
         end else
             IsViewTablePage := false;
 
-        if "Source Table No." <= 0 then begin
+        if Rec."Source Table No." <= 0 then begin
             TableInfo := NoSourceTableLbl;
             PageHasSourceTable := false;
         end else begin
-            TableInfo := StrSubstNo(InfoFormatTwoDetailsLbl, "Source Table Name", "Source Table No.");
+            TableInfo := StrSubstNo(InfoFormatTwoDetailsLbl, Rec."Source Table Name", Rec."Source Table No.");
             PageHasSourceTable := true;
             BaseUrlTxt := GetUrl(CLIENTTYPE::Current, CompanyName);
             if StrPos(BaseUrlTxt, '?') = 0 then
-                ViewFullTableURL := StrSubstNo('%1?table=%2', BaseUrlTxt, "Source Table No.")
+                ViewFullTableURL := StrSubstNo('%1?table=%2', BaseUrlTxt, Rec."Source Table No.")
             else
-                ViewFullTableURL := StrSubstNo('%1&table=%2', BaseUrlTxt, "Source Table No.");
+                ViewFullTableURL := StrSubstNo('%1&table=%2', BaseUrlTxt, Rec."Source Table No.");
         end;
 
-        PageIsRoleCenter := ("Current Form ID" = '00000000-0000-0000-0000-000000000001');
+        PageIsRoleCenter := (Rec."Current Form ID" = '00000000-0000-0000-0000-000000000001');
 
-        PageIsReportRequest := ("Current Form ID" = '00000000-0000-0000-0000-000000000002');
+        PageIsReportRequest := (Rec."Current Form ID" = '00000000-0000-0000-0000-000000000002');
 
-        PageIsSystemPart := ("Current Form ID" = '00000000-0000-0000-0000-000000000003') or
-          ("Current Form ID" = '00000000-0000-0000-0000-000000000004');
+        PageIsSystemPart := (Rec."Current Form ID" = '00000000-0000-0000-0000-000000000003') or
+          (Rec."Current Form ID" = '00000000-0000-0000-0000-000000000004');
 
-        PageIsReportViewer := ("Current Form ID" = '00000000-0000-0000-0000-000000000005');
+        PageIsReportViewer := (Rec."Current Form ID" = '00000000-0000-0000-0000-000000000005');
 
-        PageIsXMLPortPage := ("Page Type" = 'XMLPort');
+        PageIsXMLPortPage := (Rec."Page Type" = 'XMLPort');
 
-        PageIsSystem := ("Current Form ID" = '00000000-0000-0000-0000-000000000006');
+        PageIsSystem := (Rec."Current Form ID" = '00000000-0000-0000-0000-000000000006');
 
-        PageIsOpening := ("Current Form ID" = '00000000-0000-0000-0000-000000000007');
+        PageIsOpening := (Rec."Current Form ID" = '00000000-0000-0000-0000-000000000007');
     end;
 
     local procedure UpdateVisiblePart()
     begin
         // Always update the fields - even when the part is not visible, otherwise 
         // it risks displaying the wrong set of fields when it is made visible
-        CurrPage.Fields.PAGE.UpdatePage("Current Form ID", "Current Form Bookmark");
+        CurrPage.Fields.PAGE.UpdatePage(Rec."Current Form ID", Rec."Current Form Bookmark");
         CurrPage.Fields.PAGE.SetFieldListVisibility(PageHasSourceTable);
 
         if ShowExtensions then begin
-            CurrPage.Extensions.PAGE.FilterForExtAffectingPage("Page ID", "Source Table No.", "Current Form ID");
-            CurrPage.Extensions.PAGE.SetExtensionListVisibility(not PageIsReportRequest and not PageIsReportViewer and not PageIsSystem);
+            CurrPage.Extensions.PAGE.FilterForExtAffectingPage(Rec."Page ID", Rec."Source Table No.", Rec."Current Form ID");
+            CurrPage.Extensions.PAGE.SetExtensionListVisibility(not PageIsReportRequest and not PageIsReportViewer and not PageIsSystem and not ShowNoPermissionForExtensions);
         end;
 
         if ShowFilters then begin
-            CurrPage.Filters.PAGE.UpdatePage("Current Form ID", "Current Form Bookmark");
+            CurrPage.Filters.PAGE.UpdatePage(Rec."Current Form ID", Rec."Current Form Bookmark");
             CurrPage.Filters.PAGE.SetFilterListVisibility(PageHasSourceTable);
         end;
     end;

@@ -1,3 +1,11 @@
+﻿namespace System.Security.AccessControl;
+
+using System.Environment;
+using System.IO;
+using System.Reflection;
+using System.Security.User;
+using System.Utilities;
+
 page 9802 "Permission Sets"
 {
     AdditionalSearchTerms = 'access rights privilege';
@@ -21,7 +29,7 @@ page 9802 "Permission Sets"
             repeater(Group)
             {
                 Caption = 'Permission Set';
-                field(PermissionSet; "Role ID")
+                field(PermissionSet; Rec."Role ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Permission Set';
@@ -34,7 +42,7 @@ page 9802 "Permission Sets"
                     begin
                         PermissionPagesMgt.DisallowEditingPermissionSetsForNonAdminUsers();
                         PermissionPagesMgt.VerifyPermissionSetRoleID(Rec."Role ID");
-                        RenameTenantPermissionSet();
+                        Rec.RenameTenantPermissionSet();
                     end;
 
                     trigger OnDrillDown()
@@ -87,7 +95,7 @@ page 9802 "Permission Sets"
                 ApplicationArea = Basic, Suite;
                 Caption = 'System Permissions';
                 Editable = false;
-                SubPageLink = "Role ID" = FIELD("Role ID");
+                SubPageLink = "Role ID" = field("Role ID");
                 Visible = false;
             }
             part("Tenant Permissions"; "Tenant Permissions FactBox")
@@ -106,8 +114,8 @@ page 9802 "Permission Sets"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Permissions';
                 Editable = false;
-                SubPageLink = "Role ID" = FIELD("Role ID"),
-                              "App ID" = FIELD("App ID");
+                SubPageLink = "Role ID" = field("Role ID"),
+                              "App ID" = field("App ID");
             }
             part("Included Permission Sets"; "Included PermissionSet FactBox")
             {
@@ -225,7 +233,7 @@ page 9802 "Permission Sets"
                     var
                         PermissionConflict: Page "Permission Conflicts";
                     begin
-                        PermissionConflict.SetPermissionSetId("Role ID");
+                        PermissionConflict.SetPermissionSetId(Rec."Role ID");
                         PermissionConflict.Run();
                     end;
                 }
@@ -291,9 +299,9 @@ page 9802 "Permission Sets"
                         CopyPermissionSet: Report "Copy Permission Set";
                         ZeroGuid: Guid;
                     begin
-                        AggregatePermissionSet.SetRange(Scope, Scope);
-                        AggregatePermissionSet.SetRange("App ID", "App ID");
-                        AggregatePermissionSet.SetRange("Role ID", "Role ID");
+                        AggregatePermissionSet.SetRange(Scope, Rec.Scope);
+                        AggregatePermissionSet.SetRange("App ID", Rec."App ID");
+                        AggregatePermissionSet.SetRange("Role ID", Rec."Role ID");
 
                         CopyPermissionSet.SetTableView(AggregatePermissionSet);
                         CopyPermissionSet.RunModal();
@@ -493,13 +501,13 @@ page 9802 "Permission Sets"
 
     trigger OnAfterGetCurrRecord()
     begin
-        IsPermissionSetEditable := Type = Type::"User-Defined";
+        IsPermissionSetEditable := Rec.Type = Rec.Type::"User-Defined";
         CurrPage."Included Permission Sets".Page.UpdateIncludedPermissionSets(Rec."Role ID");
     end;
 
     trigger OnAfterGetRecord()
     begin
-        IsPermissionSetEditable := Type = Type::"User-Defined";
+        IsPermissionSetEditable := Rec.Type = Rec.Type::"User-Defined";
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -513,18 +521,18 @@ page 9802 "Permission Sets"
     begin
         PermissionPagesMgt.DisallowEditingPermissionSetsForNonAdminUsers();
 
-        if Type <> Type::"User-Defined" then
+        if Rec.Type <> Rec.Type::"User-Defined" then
             Error(CannotDeletePermissionSetErr);
 
-        PermissionSetLink.SetRange("Linked Permission Set ID", "Role ID");
+        PermissionSetLink.SetRange("Linked Permission Set ID", Rec."Role ID");
         PermissionSetLink.DeleteAll();
 
 #if not CLEAN22
-        UserGroupPermissionSet.SetRange("Role ID", "Role ID");
+        UserGroupPermissionSet.SetRange("Role ID", Rec."Role ID");
         UserGroupPermissionSet.DeleteAll();
 #endif
 
-        TenantPermissionSet.Get("App ID", "Role ID");
+        TenantPermissionSet.Get(Rec."App ID", Rec."Role ID");
         TenantPermissionSet.Delete();
 
         CurrPage.Update();
@@ -553,8 +561,8 @@ page 9802 "Permission Sets"
         TenantPermissionSet.Name := Rec.Name;
         TenantPermissionSet.Insert();
 
-        Insert();
-        Rec.Get(Type::"User-Defined", "Role ID");
+        Rec.Insert();
+        Rec.Get(Rec.Type::"User-Defined", Rec."Role ID");
         exit(false);
     end;
 
@@ -565,7 +573,7 @@ page 9802 "Permission Sets"
     begin
         PermissionPagesMgt.DisallowEditingPermissionSetsForNonAdminUsers();
 
-        if Type = Type::"User-Defined" then begin
+        if Rec.Type = Rec.Type::"User-Defined" then begin
             PermissionPagesMgt.VerifyPermissionSetRoleID(Rec."Role ID");
             TenantPermissionSet.Get(xRec."App ID", xRec."Role ID");
             if xRec."Role ID" <> Rec."Role ID" then begin
@@ -582,9 +590,9 @@ page 9802 "Permission Sets"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Type := Type::"User-Defined";
+        Rec.Type := Rec.Type::"User-Defined";
         IsPermissionSetEditable := true;
-        Scope := Scope::Tenant;
+        Rec.Scope := Rec.Scope::Tenant;
     end;
 
     trigger OnOpenPage()
@@ -601,10 +609,10 @@ page 9802 "Permission Sets"
         IsSaas := EnvironmentInfo.IsSaaS();
 
         PermissionPagesMgt.CheckAndRaiseNotificationIfAppDBPermissionSetsChanged();
-        FillRecordBuffer();
+        Rec.FillRecordBuffer();
 
         if PermissionManager.IsIntelligentCloud() then
-            SetRange("Role ID", IntelligentCloudTok);
+            Rec.SetRange("Role ID", IntelligentCloudTok);
     end;
 #if not CLEAN21
     local procedure IsImportNewVersion(InStream: InStream): Boolean
@@ -637,12 +645,12 @@ page 9802 "Permission Sets"
         CurrPage.SetSelectionFilter(Rec);
         if Rec.FindSet() then
             repeat
-                if TenantPermissionSet.Get("App ID", "Role ID") then
+                if TenantPermissionSet.Get(Rec."App ID", Rec."Role ID") then
                     TenantPermissionSet.Mark(true);
-            until Next() = 0;
+            until Rec.Next() = 0;
         TenantPermissionSet.MarkedOnly(true);
-        Reset();
-        CopyFilters(PermissionSetBuffer);
+        Rec.Reset();
+        Rec.CopyFilters(PermissionSetBuffer);
     end;
 
     local procedure GetSelectionFilter(var MetadataPermissionSet: Record "Metadata Permission Set")
@@ -652,14 +660,14 @@ page 9802 "Permission Sets"
         MetadataPermissionSet.Reset();
         PermissionSetBuffer.CopyFilters(Rec);
         CurrPage.SetSelectionFilter(Rec);
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
-                if MetadataPermissionSet.Get("App ID", "Role ID") then
+                if MetadataPermissionSet.Get(Rec."App ID", Rec."Role ID") then
                     MetadataPermissionSet.Mark(true);
-            until Next() = 0;
+            until Rec.Next() = 0;
         MetadataPermissionSet.MarkedOnly(true);
-        Reset();
-        CopyFilters(PermissionSetBuffer);
+        Rec.Reset();
+        Rec.CopyFilters(PermissionSetBuffer);
     end;
 
 #if not CLEAN21
@@ -670,14 +678,14 @@ page 9802 "Permission Sets"
         AggregatePermissionSet.Reset();
         PermissionSetBuffer.CopyFilters(Rec);
         CurrPage.SetSelectionFilter(Rec);
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
-                if AggregatePermissionSet.Get(Scope, "App ID", "Role ID") then
+                if AggregatePermissionSet.Get(Rec.Scope, Rec."App ID", Rec."Role ID") then
                     AggregatePermissionSet.Mark(true);
-            until Next() = 0;
+            until Rec.Next() = 0;
         AggregatePermissionSet.MarkedOnly(true);
-        Reset();
-        CopyFilters(PermissionSetBuffer);
+        Rec.Reset();
+        Rec.CopyFilters(PermissionSetBuffer);
     end;
 #endif
 
@@ -695,7 +703,6 @@ page 9802 "Permission Sets"
     var
         PermissionManager: Codeunit "Permission Manager";
         CanManageUsersOnTenant: Boolean;
-        [InDataSet]
         IsPermissionSetEditable: Boolean;
         IsSaas: Boolean;
         CannotDeletePermissionSetErr: Label 'You can only delete user-created or copied permission sets.';

@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000804 "Standard Task Personnel"
 {
     AutoSplitKey = true;

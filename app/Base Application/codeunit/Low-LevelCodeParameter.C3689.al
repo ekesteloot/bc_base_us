@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.InventoryMgt.BOM.Tree;
+
 codeunit 3689 "Low-Level Code Parameter"
 {
     var
@@ -26,9 +32,9 @@ codeunit 3689 "Low-Level Code Parameter"
     begin
         RunMode := NewRunMode;
         case RunMode of
-            "Low-Level Code Run Mode"::Calculate:
+            RunMode::Calculate:
                 ShowHeading(CalculatingLbl);
-            "Low-Level Code Run Mode"::"Write To Database":
+            RunMode::"Write To Database":
                 ShowHeading(WritingToDBLbl);
         end;
     end;

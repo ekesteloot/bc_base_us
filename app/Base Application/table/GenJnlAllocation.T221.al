@@ -1,3 +1,13 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Enums;
+
 table 221 "Gen. Jnl. Allocation"
 {
     Caption = 'Gen. Jnl. Allocation';
@@ -13,13 +23,13 @@ table 221 "Gen. Jnl. Allocation"
         field(2; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
         }
         field(3; "Journal Line No."; Integer)
         {
             Caption = 'Journal Line No.';
-            TableRelation = "Gen. Journal Line"."Line No." WHERE("Journal Template Name" = FIELD("Journal Template Name"),
-                                                                  "Journal Batch Name" = FIELD("Journal Batch Name"));
+            TableRelation = "Gen. Journal Line"."Line No." where("Journal Template Name" = field("Journal Template Name"),
+                                                                  "Journal Batch Name" = field("Journal Batch Name"));
         }
         field(4; "Line No."; Integer)
         {
@@ -58,12 +68,12 @@ table 221 "Gen. Jnl. Allocation"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
                 Modify();
             end;
         }
@@ -71,12 +81,12 @@ table 221 "Gen. Jnl. Allocation"
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
                 Modify();
             end;
         }
@@ -184,7 +194,7 @@ table 221 "Gen. Jnl. Allocation"
         }
         field(17; "Account Name"; Text[100])
         {
-            CalcFormula = Lookup("G/L Account".Name WHERE("No." = FIELD("Account No.")));
+            CalcFormula = Lookup("G/L Account".Name where("No." = field("Account No.")));
             Caption = 'Account Name';
             Editable = false;
             FieldClass = FlowField;
@@ -263,7 +273,7 @@ table 221 "Gen. Jnl. Allocation"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -295,8 +305,8 @@ table 221 "Gen. Jnl. Allocation"
         LockTable();
         GenJnlLine.Get("Journal Template Name", "Journal Batch Name", "Journal Line No.");
 
-        ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
-        ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+        Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+        Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
     end;
 
     var
@@ -313,7 +323,7 @@ table 221 "Gen. Jnl. Allocation"
         GenJournalBatch: Record "Gen. Journal Batch";
     begin
         if ("Journal Template Name" <> '') and ("Journal Batch Name" <> '') then
-            if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
+            if GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
                 exit(GenJournalBatch."Copy VAT Setup to Jnl. Lines");
 
         exit(true);
@@ -510,30 +520,6 @@ table 221 "Gen. Jnl. Allocation"
         exit('');
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        TableID[1] := Type1;
-        No[1] := No1;
-        IsHandled := false;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No, IsHandled);
-        if IsHandled then
-            exit;
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(Rec, CurrFieldNo, TableID, No, '', "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-
-        OnAfterCreateDim(Rec, CurrFieldNo, TableID, No);
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         IsHandled: Boolean;
@@ -542,19 +528,12 @@ table 221 "Gen. Jnl. Allocation"
         OnBeforeCreateDim(Rec, IsHandled);
         if IsHandled then
             exit;
-#if not CLEAN20
-        if RunEventOnAfterCreateDimTableIDs(DefaultDimSource) then
-            exit;
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(Rec, CurrFieldNo, DefaultDimSource, '', "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
-#if not CLEAN20
-        RunEventOnAfterCreateDim(DefaultDimSource);
-#endif
         OnAfterCreateDimProcedure(Rec, CurrFieldNo, DefaultDimSource);
     end;
 
@@ -575,7 +554,7 @@ table 221 "Gen. Jnl. Allocation"
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure ShowDimensions()
@@ -617,46 +596,6 @@ table 221 "Gen. Jnl. Allocation"
         OnAfterCheckGLAccount(GLAccount, Rec);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Gen. Jnl. Allocation", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Gen. Jnl. Allocation", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]) IsHandled: Boolean
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Gen. Jnl. Allocation") then
-            exit;
-
-        IsHandled := false;
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No, IsHandled);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDim(Rec, CurrFieldNo, TableID, No);
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var GenJnlAllocation: Record "Gen. Jnl. Allocation"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
@@ -671,20 +610,6 @@ table 221 "Gen. Jnl. Allocation"
     local procedure OnAfterCreateDimProcedure(var GenJnlAllocation: Record "Gen. Jnl. Allocation"; CurrFieldNo: Integer; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]);
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by new implementation in codeunit Purch. Post Invoice', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var GenJnlAllocation: Record "Gen. Jnl. Allocation"; var FieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by new implementation in codeunit Purch. Post Invoice', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var GenJnlAlloc: Record "Gen. Jnl. Allocation"; CurrentFieldNo: Integer; TableID: array[10] of Integer; No: array[10] of Code[20])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterShowDimensions(var GenJnlAllocation: Record "Gen. Jnl. Allocation"; xGenJnlAllocation: Record "Gen. Jnl. Allocation")

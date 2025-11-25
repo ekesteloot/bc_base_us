@@ -1,3 +1,14 @@
+namespace System.Integration;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.RoleCenters;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Environment.Configuration;
+using System.Reflection;
+
 codeunit 1802 "Data Migration Notifier"
 {
 

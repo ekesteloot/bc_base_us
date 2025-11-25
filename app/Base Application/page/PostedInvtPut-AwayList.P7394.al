@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.InventoryDocument;
+
+using Microsoft.WarehouseMgt.Comment;
+
 page 7394 "Posted Invt. Put-away List"
 {
     ApplicationArea = Warehouse;
@@ -6,8 +14,8 @@ page 7394 "Posted Invt. Put-away List"
     Editable = false;
     PageType = List;
     SourceTable = "Posted Invt. Put-away Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -78,9 +86,9 @@ page 7394 "Posted Invt. Put-away List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Posted Invt. Put-Away"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Posted Invt. Put-Away"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -97,7 +105,7 @@ page 7394 "Posted Invt. Put-away List"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }

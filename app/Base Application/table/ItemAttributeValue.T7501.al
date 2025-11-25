@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using System.Globalization;
+using System.IO;
+
 table 7501 "Item Attribute Value"
 {
     Caption = 'Item Attribute Value';
@@ -10,7 +17,7 @@ table 7501 "Item Attribute Value"
         {
             Caption = 'Attribute ID';
             NotBlank = true;
-            TableRelation = "Item Attribute".ID WHERE(Blocked = CONST(false));
+            TableRelation = "Item Attribute".ID where(Blocked = const(false));
         }
         field(2; ID; Integer)
         {
@@ -82,7 +89,7 @@ table 7501 "Item Attribute Value"
         }
         field(10; "Attribute Name"; Text[250])
         {
-            CalcFormula = Lookup("Item Attribute".Name WHERE(ID = FIELD("Attribute ID")));
+            CalcFormula = Lookup("Item Attribute".Name where(ID = field("Attribute ID")));
             Caption = 'Attribute Name';
             FieldClass = FlowField;
         }
@@ -195,9 +202,9 @@ table 7501 "Item Attribute Value"
                 ItemAttribute.Type::Date:
                     exit(Format("Date Value"));
                 else begin
-                        OnGetValueInCurrentLanguage(ItemAttribute, Rec);
-                        exit(Value);
-                    end;
+                    OnGetValueInCurrentLanguage(ItemAttribute, Rec);
+                    exit(Value);
+                end;
             end;
         exit('');
     end;
@@ -315,7 +322,7 @@ table 7501 "Item Attribute Value"
     begin
         Reset();
         DeleteAll();
-        ItemAttributeValueMapping.SetRange("Table ID", DATABASE::Item);
+        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::Item);
         ItemAttributeValueMapping.SetRange("No.", KeyValue);
         if ItemAttributeValueMapping.FindSet() then
             repeat
@@ -337,7 +344,7 @@ table 7501 "Item Attribute Value"
         DeleteAll();
         if CategoryCode = '' then
             exit;
-        ItemAttributeValueMapping.SetRange("Table ID", DATABASE::"Item Category");
+        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::"Item Category");
         repeat
             ItemAttributeValueMapping.SetRange("No.", CategoryCode);
             if ItemAttributeValueMapping.FindSet() then

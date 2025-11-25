@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
 enum 5740 "Transfer Order Post"
 {
     Extensible = false;

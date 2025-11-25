@@ -1,4 +1,14 @@
 #if not CLEAN21
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Sales.Customer;
+using System.Environment;
+using System.Text;
+
 page 7004 "Sales Line Discounts"
 {
     Caption = 'Sales Line Discounts';
@@ -122,8 +132,8 @@ page 7004 "Sales Line Discounts"
                         ItemDiscGrList: Page "Item Disc. Groups";
                     begin
                         Result := true;
-                        case Type of
-                            Type::Item:
+                        case Rec.Type of
+                            Rec.Type::Item:
                                 begin
                                     ItemList.LookupMode := true;
                                     if ItemList.RunModal() = ACTION::LookupOK then
@@ -131,7 +141,7 @@ page 7004 "Sales Line Discounts"
                                     else
                                         Result := false;
                                 end;
-                            Type::"Item Disc. Group":
+                            Rec.Type::"Item Disc. Group":
                                 begin
                                     ItemDiscGrList.LookupMode := true;
                                     if ItemDiscGrList.RunModal() = ACTION::LookupOK then
@@ -197,7 +207,7 @@ page 7004 "Sales Line Discounts"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(SalesType; "Sales Type")
+                field(SalesType; Rec."Sales Type")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the sales type of the sales line discount. The sales type defines whether the sales price is for an individual customer, customer discount group, all customers, or for a campaign.';
@@ -207,7 +217,7 @@ page 7004 "Sales Line Discounts"
                         SetEditableFields();
                     end;
                 }
-                field(SalesCode; "Sales Code")
+                field(SalesCode; Rec."Sales Code")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = SalesCodeEditable;
@@ -218,7 +228,7 @@ page 7004 "Sales Line Discounts"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of item that the sales discount line is valid for. That is, either an item or an item discount group.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies one of two values, depending on the value in the Type field.';
@@ -304,7 +314,7 @@ page 7004 "Sales Line Discounts"
 
                 trigger OnAction()
                 begin
-                    Reset();
+                    Rec.Reset();
                     UpdateBasicRecFilters();
                     SetEditableFields();
                 end;
@@ -358,13 +368,9 @@ page 7004 "Sales Line Discounts"
         ClientTypeManagement: Codeunit "Client Type Management";
         Text000: Label 'All Customers';
         PageCaption: Text;
-        [InDataSet]
         SalesCodeEditable: Boolean;
-        [InDataSet]
         SalesCodeFilterCtrlEnable: Boolean;
-        [InDataSet]
         CodeFilterCtrlEnable: Boolean;
-        [InDataSet]
         IsOnMobile: Boolean;
 
     protected var
@@ -377,7 +383,7 @@ page 7004 "Sales Line Discounts"
 
     local procedure GetRecFilters()
     begin
-        if GetFilters <> '' then
+        if Rec.GetFilters() <> '' then
             UpdateBasicRecFilters();
     end;
 
@@ -387,9 +393,9 @@ page 7004 "Sales Line Discounts"
         CodeFilterCtrlEnable := true;
 
         if SalesTypeFilter <> SalesTypeFilter::None then
-            SetRange("Sales Type", SalesTypeFilter)
+            Rec.SetRange("Sales Type", SalesTypeFilter)
         else
-            SetRange("Sales Type");
+            Rec.SetRange("Sales Type");
 
         if SalesTypeFilter in [SalesTypeFilter::"All Customers", SalesTypeFilter::None] then begin
             SalesCodeFilterCtrlEnable := false;
@@ -397,14 +403,14 @@ page 7004 "Sales Line Discounts"
         end;
 
         if SalesCodeFilter <> '' then
-            SetFilter("Sales Code", SalesCodeFilter)
+            Rec.SetFilter("Sales Code", SalesCodeFilter)
         else
-            SetRange("Sales Code");
+            Rec.SetRange("Sales Code");
 
         if ItemTypeFilter <> ItemTypeFilter::None then
-            SetRange(Type, ItemTypeFilter)
+            Rec.SetRange(Type, ItemTypeFilter)
         else
-            SetRange(Type);
+            Rec.SetRange(Type);
 
         if ItemTypeFilter = ItemTypeFilter::None then begin
             CodeFilterCtrlEnable := false;
@@ -412,19 +418,19 @@ page 7004 "Sales Line Discounts"
         end;
 
         if CodeFilter <> '' then
-            SetFilter(Code, CodeFilter)
+            Rec.SetFilter(Code, CodeFilter)
         else
-            SetRange(Code);
+            Rec.SetRange(Code);
 
         if CurrencyCodeFilter <> '' then
-            SetFilter("Currency Code", CurrencyCodeFilter)
+            Rec.SetFilter("Currency Code", CurrencyCodeFilter)
         else
-            SetRange("Currency Code");
+            Rec.SetRange("Currency Code");
 
         if StartingDateFilter <> '' then
-            SetFilter("Starting Date", StartingDateFilter)
+            Rec.SetFilter("Starting Date", StartingDateFilter)
         else
-            SetRange("Starting Date");
+            Rec.SetRange("Starting Date");
 
         CurrPage.Update(false);
     end;
@@ -540,24 +546,24 @@ page 7004 "Sales Line Discounts"
 
     local procedure GetSalesTypeFilter(): Integer
     begin
-        case GetFilter("Sales Type") of
-            Format("Sales Type"::Customer):
+        case Rec.GetFilter("Sales Type") of
+            Format(Rec."Sales Type"::Customer):
                 exit(0);
-            Format("Sales Type"::"Customer Disc. Group"):
+            Format(Rec."Sales Type"::"Customer Disc. Group"):
                 exit(1);
-            Format("Sales Type"::"All Customers"):
+            Format(Rec."Sales Type"::"All Customers"):
                 exit(2);
-            Format("Sales Type"::Campaign):
+            Format(Rec."Sales Type"::Campaign):
                 exit(3);
         end;
     end;
 
     local procedure GetTypeFilter() TypeFilter: Integer
     begin
-        case GetFilter(Type) of
-            Format(Type::Item):
+        case Rec.GetFilter(Type) of
+            Format(Rec.Type::Item):
                 exit(0);
-            Format(Type::"Item Disc. Group"):
+            Format(Rec.Type::"Item Disc. Group"):
                 exit(1);
             else
                 OnGetTypeFilterCaseElse(Rec, TypeFilter);
@@ -568,24 +574,24 @@ page 7004 "Sales Line Discounts"
     var
         FilterPageBuilder: FilterPageBuilder;
     begin
-        FilterPageBuilder.AddTable(TableCaption, DATABASE::"Sales Line Discount");
-        FilterPageBuilder.SetView(TableCaption, GetView());
+        FilterPageBuilder.AddTable(Rec.TableCaption, DATABASE::"Sales Line Discount");
+        FilterPageBuilder.SetView(Rec.TableCaption, Rec.GetView());
 
-        if GetFilter("Sales Type") = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo("Sales Type"));
-        if GetFilter("Sales Code") = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo("Sales Code"));
-        if GetFilter(Type) = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo(Type));
-        if GetFilter(Code) = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo(Code));
-        if GetFilter("Starting Date") = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo("Starting Date"));
-        if GetFilter("Currency Code") = '' then
-            FilterPageBuilder.AddFieldNo(TableCaption, FieldNo("Currency Code"));
+        if Rec.GetFilter("Sales Type") = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo("Sales Type"));
+        if Rec.GetFilter("Sales Code") = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo("Sales Code"));
+        if Rec.GetFilter(Type) = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo(Type));
+        if Rec.GetFilter(Code) = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo(Code));
+        if Rec.GetFilter("Starting Date") = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo("Starting Date"));
+        if Rec.GetFilter("Currency Code") = '' then
+            FilterPageBuilder.AddFieldNo(Rec.TableCaption, Rec.FieldNo("Currency Code"));
 
         if FilterPageBuilder.RunModal() then
-            SetView(FilterPageBuilder.GetView(TableCaption));
+            Rec.SetView(FilterPageBuilder.GetView(Rec.TableCaption));
 
         UpdateBasicRecFilters();
         SetEditableFields();
@@ -593,25 +599,25 @@ page 7004 "Sales Line Discounts"
 
     local procedure UpdateBasicRecFilters()
     begin
-        if GetFilter("Sales Type") <> '' then
+        if Rec.GetFilter("Sales Type") <> '' then
             SalesTypeFilter := GetSalesTypeFilter()
         else
             SalesTypeFilter := SalesTypeFilter::None;
 
-        if GetFilter(Type) <> '' then
+        if Rec.GetFilter(Type) <> '' then
             ItemTypeFilter := GetTypeFilter()
         else
             ItemTypeFilter := ItemTypeFilter::None;
 
-        SalesCodeFilter := GetFilter("Sales Code");
-        CodeFilter := GetFilter(Code);
-        CurrencyCodeFilter := GetFilter("Currency Code");
-        Evaluate(StartingDateFilter, GetFilter("Starting Date"));
+        SalesCodeFilter := Rec.GetFilter("Sales Code");
+        CodeFilter := Rec.GetFilter(Code);
+        CurrencyCodeFilter := Rec.GetFilter("Currency Code");
+        Evaluate(StartingDateFilter, Rec.GetFilter("Starting Date"));
     end;
 
     local procedure SetEditableFields()
     begin
-        SalesCodeEditable := "Sales Type" <> "Sales Type"::"All Customers";
+        SalesCodeEditable := Rec."Sales Type" <> Rec."Sales Type"::"All Customers";
     end;
 
     [IntegrationEvent(true, false)]

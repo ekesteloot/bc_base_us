@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Check;
+
+using Microsoft.BankMgt.Reconciliation;
+
 page 382 "Apply Check Ledger Entries"
 {
     Caption = 'Apply Check Ledger Entries';
@@ -64,7 +68,7 @@ page 382 "Apply Check Ledger Entries"
                     Editable = false;
                     ToolTip = 'Specifies the type check, such as Manual.';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -143,17 +147,17 @@ page 382 "Apply Check Ledger Entries"
     trigger OnAfterGetCurrRecord()
     begin
         LineApplied :=
-          ("Statement Status" = "Statement Status"::"Check Entry Applied") and
-          ("Statement No." = BankAccReconLine."Statement No.") and
-          ("Statement Line No." = BankAccReconLine."Statement Line No.");
+          (Rec."Statement Status" = Rec."Statement Status"::"Check Entry Applied") and
+          (Rec."Statement No." = BankAccReconLine."Statement No.") and
+          (Rec."Statement Line No." = BankAccReconLine."Statement Line No.");
     end;
 
     trigger OnAfterGetRecord()
     begin
         LineApplied :=
-          ("Statement Status" = "Statement Status"::"Check Entry Applied") and
-          ("Statement No." = BankAccReconLine."Statement No.") and
-          ("Statement Line No." = BankAccReconLine."Statement Line No.");
+          (Rec."Statement Status" = Rec."Statement Status"::"Check Entry Applied") and
+          (Rec."Statement No." = BankAccReconLine."Statement No.") and
+          (Rec."Statement Line No." = BankAccReconLine."Statement Line No.");
     end;
 
     var

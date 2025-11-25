@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.InventoryMgt.Ledger;
+using System.Security.AccessControl;
+
 table 9152 "My Item"
 {
     Caption = 'My Item';
@@ -9,8 +14,6 @@ table 9152 "My Item"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(2; "Item No."; Code[20])
@@ -36,7 +39,7 @@ table 9152 "My Item"
         }
         field(5; Inventory; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item No.")));
+            CalcFormula = sum("Item Ledger Entry".Quantity where("Item No." = field("Item No.")));
             Caption = 'Inventory';
             Editable = false;
             FieldClass = FlowField;

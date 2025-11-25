@@ -1,3 +1,42 @@
+﻿namespace Microsoft.Sales.Customer;
+
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Comment;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Sales.Analysis;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Reports;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using System.Automation;
+using System.Email;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration.Word;
+using System.Privacy;
+
 page 21 "Customer Card"
 {
     Caption = 'Customer Card';
@@ -24,7 +63,7 @@ page 21 "Customer Card"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -37,7 +76,7 @@ page 21 "Customer Card"
 
                     trigger OnValidate()
                     begin
-                        Validate("CFDI Customer Name", Name);
+                        Rec.Validate("CFDI Customer Name", Rec.Name);
                         CurrPage.Update(true);
                     end;
                 }
@@ -75,7 +114,7 @@ page 21 "Customer Card"
 
                     trigger OnDrillDown()
                     begin
-                        OpenCustomerLedgerEntries(false);
+                        Rec.OpenCustomerLedgerEntries(false);
                     end;
                 }
                 field(BalanceAsVendor; BalanceAsVendor)
@@ -107,7 +146,7 @@ page 21 "Customer Card"
 
                     trigger OnDrillDown()
                     begin
-                        OpenCustomerLedgerEntries(true);
+                        Rec.OpenCustomerLedgerEntries(true);
                     end;
                 }
                 field("Credit Limit (LCY)"; Rec."Credit Limit (LCY)")
@@ -121,7 +160,7 @@ page 21 "Customer Card"
                         SetCreditLimitStyle();
                     end;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies which transactions with the customer that cannot be processed, for example, because the customer is insolvent.';
@@ -220,7 +259,7 @@ page 21 "Customer Card"
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies that the customer is considered a client that reports general public information according to the Mexican tax authorities (SAT).';
                 }
-                field("CFDI Period"; Rec."CFDI Period") 
+                field("CFDI Period"; Rec."CFDI Period")
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the period to use when reporting for general public customers';
@@ -244,7 +283,7 @@ page 21 "Customer Card"
                 group(AddressDetails)
                 {
                     Caption = 'Address';
-                    field(Address; Address)
+                    field(Address; Rec.Address)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the customer''s address. This address will appear on all sales documents for the customer.';
@@ -261,10 +300,10 @@ page 21 "Customer Card"
 
                         trigger OnValidate()
                         begin
-                            IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                            IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                         end;
                     }
-                    field(City; City)
+                    field(City; Rec.City)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the customer''s city.';
@@ -273,7 +312,7 @@ page 21 "Customer Card"
                     {
                         ShowCaption = false;
                         Visible = IsCountyVisible;
-                        field(County; County)
+                        field(County; Rec.County)
                         {
                             ApplicationArea = Basic, Suite;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -297,7 +336,7 @@ page 21 "Customer Card"
                         trigger OnDrillDown()
                         begin
                             CurrPage.Update(true);
-                            DisplayMap();
+                            Rec.DisplayMap();
                         end;
                     }
                 }
@@ -306,7 +345,7 @@ page 21 "Customer Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the customer''s telephone number.';
                 }
-                field(MobilePhoneNo; "Mobile Phone No.")
+                field(MobilePhoneNo; Rec."Mobile Phone No.")
                 {
                     Caption = 'Mobile Phone No.';
                     ApplicationArea = Basic, Suite;
@@ -337,6 +376,12 @@ page 21 "Customer Card"
                     Importance = Additional;
                     ToolTip = 'Specifies the language to be used on printouts for this customer.';
                 }
+                field("Format Region"; Rec."Format Region")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the Format Region to be used on printouts for this customer.';
+                }
                 group(ContactDetails)
                 {
                     Caption = 'Contact';
@@ -347,7 +392,7 @@ page 21 "Customer Card"
                         Importance = Additional;
                         ToolTip = 'Specifies the contact number for the customer.';
                     }
-                    field(ContactName; Contact)
+                    field(ContactName; Rec.Contact)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Contact Name';
@@ -386,7 +431,7 @@ page 21 "Customer Card"
                     ToolTip = 'Specifies the Economic Operators Registration and Identification number that is used when you exchange information with the customs authorities due to trade into or out of the European Union.';
                     Visible = false;
                 }
-                field(GLN; GLN)
+                field(GLN; Rec.GLN)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
@@ -653,7 +698,7 @@ page 21 "Customer Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if several orders delivered to the customer can appear on the same sales invoice.';
                 }
-                field(Reserve; Reserve)
+                field(Reserve; Rec.Reserve)
                 {
                     ApplicationArea = Reservation;
                     ToolTip = 'Specifies whether items will never, automatically (Always), or optionally be reserved for this customer.';
@@ -711,7 +756,7 @@ page 21 "Customer Card"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        TestField("Base Calendar Code");
+                        Rec.TestField("Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(Rec);
                     end;
                 }
@@ -732,7 +777,7 @@ page 21 "Customer Card"
 
                         trigger OnDrillDown()
                         begin
-                            OpenCustomerLedgerEntries(false);
+                            Rec.OpenCustomerLedgerEntries(false);
                         end;
                     }
                     field(ExpectedCustMoneyOwed; ExpectedMoneyOwed)
@@ -745,7 +790,7 @@ page 21 "Customer Card"
 
                         trigger OnDrillDown()
                         begin
-                            CustomerMgt.DrillDownMoneyOwedExpected("No.");
+                            CustomerMgt.DrillDownMoneyOwedExpected(Rec."No.");
                         end;
                     }
                     field(TotalMoneyOwed; TotalMoneyOwed)
@@ -756,13 +801,13 @@ page 21 "Customer Card"
                         StyleExpr = TRUE;
                         ToolTip = 'Specifies the payment amount that the customer owes for completed sales plus sales that are still ongoing. The value is calculated asynchronously so there might be a delay in updating this field.';
                     }
-                    field(CreditLimit; "Credit Limit (LCY)")
+                    field(CreditLimit; Rec."Credit Limit (LCY)")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Credit Limit';
                         ToolTip = 'Specifies the maximum amount you allow the customer to exceed the payment balance before warnings are issued.';
                     }
-                    field(CalcCreditLimitLCYExpendedPct; CalcCreditLimitLCYExpendedPct())
+                    field(CalcCreditLimitLCYExpendedPct; Rec.CalcCreditLimitLCYExpendedPct())
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Usage Of Credit Limit';
@@ -786,10 +831,10 @@ page 21 "Customer Card"
                             DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
                             CustLedgEntry: Record "Cust. Ledger Entry";
                         begin
-                            DtldCustLedgEntry.SetRange("Customer No.", "No.");
-                            CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
-                            CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
-                            CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
+                            DtldCustLedgEntry.SetRange("Customer No.", Rec."No.");
+                            Rec.CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                            Rec.CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                            Rec.CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
                             CustLedgEntry.DrillDownOnOverdueEntries(DtldCustLedgEntry);
                         end;
                     }
@@ -834,7 +879,7 @@ page 21 "Customer Card"
 
                         trigger OnDrillDown()
                         begin
-                            CustomerMgt.DrillDownOnPostedInvoices("No.")
+                            CustomerMgt.DrillDownOnPostedInvoices(Rec."No.")
                         end;
                     }
                     field(AmountOnCrMemo; AmountOnPostedCrMemos)
@@ -845,7 +890,7 @@ page 21 "Customer Card"
 
                         trigger OnDrillDown()
                         begin
-                            CustomerMgt.DrillDownOnPostedCrMemo("No.")
+                            CustomerMgt.DrillDownOnPostedCrMemo(Rec."No.")
                         end;
                     }
                     field(AmountOnOutstandingInvoices; AmountOnOutstandingInvoices)
@@ -856,7 +901,7 @@ page 21 "Customer Card"
 
                         trigger OnDrillDown()
                         begin
-                            CustomerMgt.DrillDownOnUnpostedInvoices("No.")
+                            CustomerMgt.DrillDownOnUnpostedInvoices(Rec."No.")
                         end;
                     }
                     field(AmountOnOutstandingCrMemos; AmountOnOutstandingCrMemos)
@@ -867,7 +912,7 @@ page 21 "Customer Card"
 
                         trigger OnDrillDown()
                         begin
-                            CustomerMgt.DrillDownOnUnpostedCrMemos("No.")
+                            CustomerMgt.DrillDownOnUnpostedCrMemos(Rec."No.")
                         end;
                     }
                     field(Totals; Totals)
@@ -888,7 +933,7 @@ page 21 "Customer Card"
                 part(AgedAccReceivableChart; "Aged Acc. Receivable Chart")
                 {
                     ApplicationArea = Basic, Suite;
-                    SubPageLink = "No." = FIELD("No.");
+                    SubPageLink = "No." = field("No.");
                 }
             }
         }
@@ -897,7 +942,7 @@ page 21 "Customer Card"
             part(Control149; "Customer Picture")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = NOT IsOfficeAddin;
             }
             part("Attached Documents"; "Document Attachment Factbox")
@@ -905,79 +950,79 @@ page 21 "Customer Card"
                 ApplicationArea = All;
                 Caption = 'Attachments';
                 SubPageLink = "Table ID" = CONST(Database::Customer),
-                              "No." = FIELD("No.");
+                              "No." = field("No.");
             }
             part(Details; "Office Customer Details")
             {
                 ApplicationArea = All;
                 Caption = 'Details';
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = IsOfficeAddin;
             }
             part(AgedAccReceivableChart2; "Aged Acc. Receivable Chart")
             {
                 ApplicationArea = All;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = IsOfficeAddin;
             }
             part(Control39; "CRM Statistics FactBox")
             {
                 ApplicationArea = All;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = CRMIsCoupledToRecord;
             }
             part(SalesHistSelltoFactBox; "Sales Hist. Sell-to FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
             }
             part(SalesHistBilltoFactBox; "Sales Hist. Bill-to FactBox")
             {
                 ApplicationArea = All;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                 Visible = false;
             }
             part(CustomerStatisticsFactBox; "Customer Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
             }
             part(Control1905532107; "Dimensions FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 SubPageLink = "Table ID" = CONST(18),
-                              "No." = FIELD("No.");
+                              "No." = field("No.");
             }
             part(Control1907829707; "Service Hist. Sell-to FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                 Visible = false;
             }
             part(Control1902613707; "Service Hist. Bill-to FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                 Visible = false;
             }
             part(WorkflowStatus; "Workflow Status FactBox")
@@ -1014,7 +1059,7 @@ page 21 "Customer Card"
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
                     RunPageLink = "Table ID" = CONST(18),
-                                  "No." = FIELD("No.");
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -1024,7 +1069,7 @@ page 21 "Customer Card"
                     Caption = 'Bank Accounts';
                     Image = BankAccount;
                     RunObject = Page "Customer Bank Account List";
-                    RunPageLink = "Customer No." = FIELD("No.");
+                    RunPageLink = "Customer No." = field("No.");
                     ToolTip = 'View or set up the customer''s bank accounts. You can set up any number of bank accounts for each customer.';
                 }
                 action("Direct Debit Mandates")
@@ -1033,7 +1078,7 @@ page 21 "Customer Card"
                     Caption = 'Direct Debit Mandates';
                     Image = MakeAgreement;
                     RunObject = Page "SEPA Direct Debit Mandates";
-                    RunPageLink = "Customer No." = FIELD("No.");
+                    RunPageLink = "Customer No." = field("No.");
                     ToolTip = 'View the direct-debit mandates that reflect agreements with customers to collect invoice payments from their bank account.';
                 }
                 action(ShipToAddresses)
@@ -1042,7 +1087,7 @@ page 21 "Customer Card"
                     Caption = 'Ship-&to Addresses';
                     Image = ShipAddress;
                     RunObject = Page "Ship-to Address List";
-                    RunPageLink = "Customer No." = FIELD("No.");
+                    RunPageLink = "Customer No." = field("No.");
                     ToolTip = 'View or edit alternate shipping addresses where the customer wants items delivered if different from the regular address.';
                 }
                 action(Contact)
@@ -1055,7 +1100,7 @@ page 21 "Customer Card"
 
                     trigger OnAction()
                     begin
-                        ShowContact();
+                        Rec.ShowContact();
                     end;
                 }
                 action("Item References")
@@ -1066,8 +1111,8 @@ page 21 "Customer Card"
                     Image = Change;
                     RunObject = Page "Item References";
                     RunPageLink = "Reference Type" = CONST(Customer),
-                                  "Reference Type No." = FIELD("No.");
-                    RunPageView = SORTING("Reference Type", "Reference Type No.");
+                                  "Reference Type No." = field("No.");
+                    RunPageView = sorting("Reference Type", "Reference Type No.");
                     ToolTip = 'Set up the customer''s own identification of items that you sell to the customer. Item references to the customer''s item number means that the item number is automatically shown on sales documents instead of the number that you use.';
                 }
                 action("Co&mments")
@@ -1077,7 +1122,7 @@ page 21 "Customer Card"
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
                     RunPageLink = "Table Name" = CONST(Customer),
-                                  "No." = FIELD("No.");
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(ApprovalEntries)
@@ -1090,7 +1135,7 @@ page 21 "Customer Card"
 
                     trigger OnAction()
                     begin
-                        ApprovalsMgmt.OpenApprovalEntriesPage(RecordId);
+                        ApprovalsMgmt.OpenApprovalEntriesPage(Rec.RecordId);
                     end;
                 }
                 action(Attachments)
@@ -1122,7 +1167,7 @@ page 21 "Customer Card"
                         CustomReportSelection: Record "Custom Report Selection";
                     begin
                         CustomReportSelection.SetRange("Source Type", DATABASE::Customer);
-                        CustomReportSelection.SetRange("Source No.", "No.");
+                        CustomReportSelection.SetRange("Source No.", Rec."No.");
                         PAGE.RunModal(PAGE::"Customer Report Selections", CustomReportSelection);
                     end;
                 }
@@ -1130,7 +1175,7 @@ page 21 "Customer Card"
             group(ActionGroupCRM)
             {
                 Caption = 'Dataverse';
-                Enabled = (BlockedFilterApplied and (Blocked = Blocked::" ")) or not BlockedFilterApplied;
+                Enabled = (BlockedFilterApplied and (Rec.Blocked = Rec.Blocked::" ")) or not BlockedFilterApplied;
                 Visible = CRMIntegrationEnabled or CDSIntegrationEnabled;
                 action(CRMGotoAccount)
                 {
@@ -1144,7 +1189,7 @@ page 21 "Customer Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -1160,7 +1205,7 @@ page 21 "Customer Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.UpdateOneNow(RecordId);
+                        CRMIntegrationManagement.UpdateOneNow(Rec.RecordId);
                     end;
                 }
                 action(UpdateStatisticsInCRM)
@@ -1197,7 +1242,7 @@ page 21 "Customer Card"
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(DeleteCRMCoupling)
@@ -1214,7 +1259,7 @@ page 21 "Customer Card"
                         var
                             CRMCouplingManagement: Codeunit "CRM Coupling Management";
                         begin
-                            CRMCouplingManagement.RemoveCoupling(RecordId);
+                            CRMCouplingManagement.RemoveCoupling(Rec.RecordId);
                         end;
                     }
                 }
@@ -1230,7 +1275,7 @@ page 21 "Customer Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -1244,9 +1289,9 @@ page 21 "Customer Card"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     RunObject = Page "Customer Ledger Entries";
-                    RunPageLink = "Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Customer No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Customer No." = field("No.");
+                    RunPageView = sorting("Customer No.")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -1256,10 +1301,10 @@ page 21 "Customer Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Customer Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -1269,9 +1314,9 @@ page 21 "Customer Card"
                     Caption = 'S&ales';
                     Image = Sales;
                     RunObject = Page "Customer Sales";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'View a summary of customer ledger entries. You select the time interval in the View by field. The Period column on the left contains a series of dates that are determined by the time interval you have selected.';
                 }
                 action("Entry Statistics")
@@ -1280,10 +1325,10 @@ page 21 "Customer Card"
                     Caption = 'Entry Statistics';
                     Image = EntryStatistics;
                     RunObject = Page "Customer Entry Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'View entry statistics for the record.';
                 }
                 action("Statistics by C&urrencies")
@@ -1292,10 +1337,10 @@ page 21 "Customer Card"
                     Caption = 'Statistics by C&urrencies';
                     Image = Currencies;
                     RunObject = Page "Cust. Stats. by Curr. Lines";
-                    RunPageLink = "Customer Filter" = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "Customer Filter" = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Date Filter" = field("Date Filter");
                     ToolTip = 'View statistics for customers that use multiple currencies.';
                 }
                 action("Item &Tracking Entries")
@@ -1309,7 +1354,7 @@ page 21 "Customer Card"
                     var
                         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
                     begin
-                        ItemTrackingDocMgt.ShowItemTrackingForEntity(1, "No.", '', '', '');
+                        ItemTrackingDocMgt.ShowItemTrackingForEntity(1, Rec."No.", '', '', '');
                     end;
                 }
                 action("Sent Emails")
@@ -1341,7 +1386,7 @@ page 21 "Customer Card"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Category7;
                     RunObject = Page "Cust. Invoice Discounts";
-                    RunPageLink = Code = FIELD("Invoice Disc. Code");
+                    RunPageLink = Code = field("Invoice Disc. Code");
                     ToolTip = 'Set up different discounts that are applied to invoices for the customer. An invoice discount is automatically granted to the customer when the total on a sales invoice exceeds a certain amount.';
                 }
                 action(PriceLists)
@@ -1356,7 +1401,7 @@ page 21 "Customer Card"
                     var
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        PriceUXManagement.ShowPriceLists(Rec, "Price Amount Type"::Any);
+                        PriceUXManagement.ShowPriceLists(Rec, Enum::"Price Amount Type"::Any);
                     end;
                 }
                 action(PriceLines)
@@ -1375,7 +1420,7 @@ page 21 "Customer Card"
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Price);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Price);
                     end;
                 }
                 action(DiscountLines)
@@ -1394,7 +1439,7 @@ page 21 "Customer Card"
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Discount);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
 #if not CLEAN21
@@ -1436,7 +1481,7 @@ page 21 "Customer Card"
                     begin
                         SalesPrice.SetCurrentKey("Sales Type", "Sales Code");
                         SalesPrice.SetRange("Sales Type", SalesPrice."Sales Type"::Customer);
-                        SalesPrice.SetRange("Sales Code", "No.");
+                        SalesPrice.SetRange("Sales Code", Rec."No.");
                         Page.Run(Page::"Sales Prices", SalesPrice);
                     end;
                 }
@@ -1457,7 +1502,7 @@ page 21 "Customer Card"
                     begin
                         SalesLineDiscount.SetCurrentKey("Sales Type", "Sales Code");
                         SalesLineDiscount.SetRange("Sales Type", SalesLineDiscount."Sales Type"::Customer);
-                        SalesLineDiscount.SetRange("Sales Code", "No.");
+                        SalesLineDiscount.SetRange("Sales Code", Rec."No.");
                         Page.Run(Page::"Sales Line Discounts", SalesLineDiscount);
                     end;
                 }
@@ -1494,8 +1539,8 @@ page 21 "Customer Card"
                     Image = PrepaymentPercentages;
                     RunObject = Page "Sales Prepayment Percentages";
                     RunPageLink = "Sales Type" = CONST(Customer),
-                                  "Sales Code" = FIELD("No.");
-                    RunPageView = SORTING("Sales Type", "Sales Code");
+                                  "Sales Code" = field("No.");
+                    RunPageView = sorting("Sales Type", "Sales Code");
                     ToolTip = 'View or edit the percentages of the price that can be paid as a prepayment. ';
                 }
                 action("Recurring Sales Lines")
@@ -1509,7 +1554,7 @@ page 21 "Customer Card"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "Standard Customer Sales Codes";
-                    RunPageLink = "Customer No." = FIELD("No.");
+                    RunPageLink = "Customer No." = field("No.");
                     ToolTip = 'Set up recurring sales lines for the customer, such as a monthly replenishment order, that can quickly be inserted on a sales document for the customer.';
                 }
             }
@@ -1523,8 +1568,8 @@ page 21 "Customer Card"
                     Caption = 'Quotes';
                     Image = Quote;
                     RunObject = Page "Sales Quotes";
-                    RunPageLink = "Sell-to Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Sell-to Customer No.");
+                    RunPageLink = "Sell-to Customer No." = field("No.");
+                    RunPageView = sorting("Document Type", "Sell-to Customer No.");
                     ToolTip = 'View a list of ongoing sales quotes for the customer.';
                 }
                 action(Invoices)
@@ -1533,8 +1578,8 @@ page 21 "Customer Card"
                     Caption = 'Invoices';
                     Image = Invoice;
                     RunObject = Page "Sales Invoice List";
-                    RunPageLink = "Sell-to Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Sell-to Customer No.");
+                    RunPageLink = "Sell-to Customer No." = field("No.");
+                    RunPageView = sorting("Document Type", "Sell-to Customer No.");
                     ToolTip = 'View a list of ongoing sales invoices for the customer.';
                 }
                 action(Orders)
@@ -1543,8 +1588,8 @@ page 21 "Customer Card"
                     Caption = 'Orders';
                     Image = Document;
                     RunObject = Page "Sales Order List";
-                    RunPageLink = "Sell-to Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Sell-to Customer No.");
+                    RunPageLink = "Sell-to Customer No." = field("No.");
+                    RunPageView = sorting("Document Type", "Sell-to Customer No.");
                     ToolTip = 'View a list of ongoing sales orders for the customer.';
                 }
                 action("Return Orders")
@@ -1553,8 +1598,8 @@ page 21 "Customer Card"
                     Caption = 'Return Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Sales Return Order List";
-                    RunPageLink = "Sell-to Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Sell-to Customer No.");
+                    RunPageLink = "Sell-to Customer No." = field("No.");
+                    RunPageView = sorting("Document Type", "Sell-to Customer No.");
                     ToolTip = 'Open the list of ongoing return orders.';
                 }
                 group("Issued Documents")
@@ -1567,8 +1612,8 @@ page 21 "Customer Card"
                         Caption = 'Issued &Reminders';
                         Image = OrderReminder;
                         RunObject = Page "Issued Reminder List";
-                        RunPageLink = "Customer No." = FIELD("No.");
-                        RunPageView = SORTING("Customer No.", "Posting Date");
+                        RunPageLink = "Customer No." = field("No.");
+                        RunPageView = sorting("Customer No.", "Posting Date");
                         ToolTip = 'View the reminders that you have sent to the customer.';
                     }
                     action("Issued &Finance Charge Memos")
@@ -1577,8 +1622,8 @@ page 21 "Customer Card"
                         Caption = 'Issued &Finance Charge Memos';
                         Image = FinChargeMemo;
                         RunObject = Page "Issued Fin. Charge Memo List";
-                        RunPageLink = "Customer No." = FIELD("No.");
-                        RunPageView = SORTING("Customer No.", "Posting Date");
+                        RunPageLink = "Customer No." = field("No.");
+                        RunPageView = sorting("Customer No.", "Posting Date");
                         ToolTip = 'View the finance charge memos that you have sent to the customer.';
                     }
                 }
@@ -1588,8 +1633,8 @@ page 21 "Customer Card"
                     Caption = 'Blanket Orders';
                     Image = BlanketOrder;
                     RunObject = Page "Blanket Sales Orders";
-                    RunPageLink = "Sell-to Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Sell-to Customer No.");
+                    RunPageLink = "Sell-to Customer No." = field("No.");
+                    RunPageView = sorting("Document Type", "Sell-to Customer No.");
                     ToolTip = 'Open the list of ongoing blanket orders.';
                 }
                 action("&Jobs")
@@ -1598,8 +1643,8 @@ page 21 "Customer Card"
                     Caption = '&Jobs';
                     Image = Job;
                     RunObject = Page "Job List";
-                    RunPageLink = "Bill-to Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Bill-to Customer No.");
+                    RunPageLink = "Bill-to Customer No." = field("No.");
+                    RunPageView = sorting("Bill-to Customer No.");
                     ToolTip = 'Open the list of ongoing jobs.';
                 }
             }
@@ -1613,8 +1658,8 @@ page 21 "Customer Card"
                     Caption = 'Service Orders';
                     Image = Document;
                     RunObject = Page "Service Orders";
-                    RunPageLink = "Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Customer No.");
+                    RunPageLink = "Customer No." = field("No.");
+                    RunPageView = sorting("Document Type", "Customer No.");
                     ToolTip = 'Open the list of ongoing service orders.';
                 }
                 action("Ser&vice Contracts")
@@ -1623,8 +1668,8 @@ page 21 "Customer Card"
                     Caption = 'Ser&vice Contracts';
                     Image = ServiceAgreement;
                     RunObject = Page "Customer Service Contracts";
-                    RunPageLink = "Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Customer No.", "Ship-to Code");
+                    RunPageLink = "Customer No." = field("No.");
+                    RunPageView = sorting("Customer No.", "Ship-to Code");
                     ToolTip = 'Open the list of ongoing service contracts.';
                 }
                 action("Service &Items")
@@ -1633,8 +1678,8 @@ page 21 "Customer Card"
                     Caption = 'Service &Items';
                     Image = ServiceItem;
                     RunObject = Page "Service Items";
-                    RunPageLink = "Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Customer No.", "Ship-to Code", "Item No.", "Serial No.");
+                    RunPageLink = "Customer No." = field("No.");
+                    RunPageView = sorting("Customer No.", "Ship-to Code", "Item No.", "Serial No.");
                     ToolTip = 'View or edit the service items that are registered for the customer.';
                 }
             }
@@ -1650,7 +1695,7 @@ page 21 "Customer Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Category4;
                 RunObject = Page "Blanket Sales Order";
-                RunPageLink = "Sell-to Customer No." = FIELD("No.");
+                RunPageLink = "Sell-to Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a blanket sales order for the customer.';
             }
@@ -1661,7 +1706,7 @@ page 21 "Customer Card"
                 Caption = 'Sales Quote';
                 Image = NewSalesQuote;
                 RunObject = Page "Sales Quote";
-                RunPageLink = "Sell-to Customer No." = FIELD("No.");
+                RunPageLink = "Sell-to Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Offer items or services to a customer.';
                 Visible = NOT IsOfficeAddin;
@@ -1673,7 +1718,7 @@ page 21 "Customer Card"
                 Caption = 'Sales Invoice';
                 Image = NewSalesInvoice;
                 RunObject = Page "Sales Invoice";
-                RunPageLink = "Sell-to Customer No." = FIELD("No.");
+                RunPageLink = "Sell-to Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a sales invoice for the customer.';
                 Visible = NOT IsOfficeAddin;
@@ -1685,7 +1730,7 @@ page 21 "Customer Card"
                 Caption = 'Sales Order';
                 Image = Document;
                 RunObject = Page "Sales Order";
-                RunPageLink = "Sell-to Customer No." = FIELD("No.");
+                RunPageLink = "Sell-to Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a sales order for the customer.';
                 Visible = NOT IsOfficeAddin;
@@ -1697,7 +1742,7 @@ page 21 "Customer Card"
                 Caption = 'Sales Credit Memo';
                 Image = CreditMemo;
                 RunObject = Page "Sales Credit Memo";
-                RunPageLink = "Sell-to Customer No." = FIELD("No.");
+                RunPageLink = "Sell-to Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new sales credit memo to revert a posted sales invoice.';
                 Visible = NOT IsOfficeAddin;
@@ -1713,7 +1758,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    CreateAndShowNewQuote();
+                    Rec.CreateAndShowNewQuote();
                 end;
             }
             action(NewSalesInvoiceAddin)
@@ -1727,7 +1772,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    CreateAndShowNewInvoice();
+                    Rec.CreateAndShowNewInvoice();
                 end;
             }
             action(NewSalesOrderAddin)
@@ -1741,7 +1786,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    CreateAndShowNewOrder();
+                    Rec.CreateAndShowNewOrder();
                 end;
             }
             action(NewSalesCreditMemoAddin)
@@ -1755,7 +1800,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    CreateAndShowNewCreditMemo();
+                    Rec.CreateAndShowNewCreditMemo();
                 end;
             }
             action(NewSalesReturnOrder)
@@ -1767,7 +1812,7 @@ page 21 "Customer Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Category4;
                 RunObject = Page "Sales Return Order";
-                RunPageLink = "Sell-to Customer No." = FIELD("No.");
+                RunPageLink = "Sell-to Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new sales return order for items or services.';
             }
@@ -1780,7 +1825,7 @@ page 21 "Customer Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Category4;
                 RunObject = Page "Service Quote";
-                RunPageLink = "Customer No." = FIELD("No.");
+                RunPageLink = "Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new service quote for the customer.';
             }
@@ -1793,7 +1838,7 @@ page 21 "Customer Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Category4;
                 RunObject = Page "Service Invoice";
-                RunPageLink = "Customer No." = FIELD("No.");
+                RunPageLink = "Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new service invoice for the customer.';
             }
@@ -1806,7 +1851,7 @@ page 21 "Customer Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Category4;
                 RunObject = Page "Service Order";
-                RunPageLink = "Customer No." = FIELD("No.");
+                RunPageLink = "Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new service order for the customer.';
             }
@@ -1819,7 +1864,7 @@ page 21 "Customer Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Category4;
                 RunObject = Page "Service Credit Memo";
-                RunPageLink = "Customer No." = FIELD("No.");
+                RunPageLink = "Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new service credit memo for the customer.';
             }
@@ -1830,7 +1875,7 @@ page 21 "Customer Card"
                 Caption = 'Reminder';
                 Image = Reminder;
                 RunObject = Page Reminder;
-                RunPageLink = "Customer No." = FIELD("No.");
+                RunPageLink = "Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new reminder for the customer.';
             }
@@ -1843,7 +1888,7 @@ page 21 "Customer Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Category4;
                 RunObject = Page "Finance Charge Memo";
-                RunPageLink = "Customer No." = FIELD("No.");
+                RunPageLink = "Customer No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new finance charge memo.';
             }
@@ -1866,7 +1911,7 @@ page 21 "Customer Card"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ApproveRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.ApproveRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Reject)
@@ -1881,7 +1926,7 @@ page 21 "Customer Card"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.RejectRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.RejectRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Delegate)
@@ -1896,7 +1941,7 @@ page 21 "Customer Card"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.DelegateRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.DelegateRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Comment)
@@ -1950,7 +1995,7 @@ page 21 "Customer Card"
                         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelCustomerApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
                 group(Flow)
@@ -1963,9 +2008,9 @@ page 21 "Customer Card"
                         Caption = 'Create a Power Automate approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
-                        Visible = IsSaaS and PowerAutomateTemplatesEnabled;
+                        Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
 #else
-                        Visible = IsSaaS;
+                        Visible = IsSaaS and IsPowerAutomatePrivacyNoticeApproved;
 #endif
                         CustomActionType = FlowTemplateGallery;
                         FlowTemplateCategoryName = 'd365bc_approval_customer';
@@ -1977,7 +2022,7 @@ page 21 "Customer Card"
                         Caption = 'Create a Power Automate approval flow';
                         Image = Flow;
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
-                        Visible = IsSaaS and not PowerAutomateTemplatesEnabled;
+                        Visible = IsSaaS and not PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
                         ObsoleteReason = 'This action will be handled by platform as part of the CreateFlowFromTemplate customaction';
                         ObsoleteState = Pending;
                         ObsoleteTag = '22.0';
@@ -2104,7 +2149,7 @@ page 21 "Customer Card"
                     var
                         TempMergeDuplicatesBuffer: Record "Merge Duplicates Buffer" temporary;
                     begin
-                        TempMergeDuplicatesBuffer.Show(DATABASE::Customer, "No.");
+                        TempMergeDuplicatesBuffer.Show(DATABASE::Customer, Rec."No.");
                     end;
                 }
             }
@@ -2137,7 +2182,7 @@ page 21 "Customer Card"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = Process;
                 RunObject = Page "Payment Registration";
-                RunPageLink = "Source No." = FIELD("No.");
+                RunPageLink = "Source No." = field("No.");
                 ToolTip = 'Process your customer payments by matching amounts received on your bank account with the related unpaid sales invoices, and then post the payments.';
             }
             action(WordTemplate)
@@ -2188,7 +2233,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    RunReport(REPORT::"Aged Accounts Receivable NA", "No.");
+                    RunReport(REPORT::"Aged Accounts Receivable NA", Rec."No.");
                 end;
             }
             action("Customer Labels")
@@ -2202,7 +2247,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    RunReport(REPORT::"Customer Labels NA", "No.");
+                    RunReport(REPORT::"Customer Labels NA", Rec."No.");
                 end;
             }
             action("Account Detail")
@@ -2214,7 +2259,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    RunReport(REPORT::"Customer Account Detail", "No.");
+                    RunReport(REPORT::"Customer Account Detail", Rec."No.");
                 end;
             }
             action("Cash Applied")
@@ -2230,7 +2275,7 @@ page 21 "Customer Card"
                 var
                     CustLedgerEntry: Record "Cust. Ledger Entry";
                 begin
-                    CustLedgerEntry.SetRange("Customer No.", "No.");
+                    CustLedgerEntry.SetRange("Customer No.", Rec."No.");
                     REPORT.Run(REPORT::"Cash Applied", true, true, CustLedgerEntry);
                 end;
             }
@@ -2243,7 +2288,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    RunReport(REPORT::"Open Customer Entries", "No.");
+                    RunReport(REPORT::"Open Customer Entries", Rec."No.");
                 end;
             }
             action("Customer/Item Statistics")
@@ -2257,7 +2302,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    RunReport(REPORT::"Customer/Item Statistics", "No.");
+                    RunReport(REPORT::"Customer/Item Statistics", Rec."No.");
                 end;
             }
             action("Customer Jobs (Cost)")
@@ -2271,7 +2316,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    RunReport(REPORT::"Customer Jobs (Cost)", "No.");
+                    RunReport(REPORT::"Customer Jobs (Cost)", Rec."No.");
                 end;
             }
             action("Customer Jobs (Price)")
@@ -2285,7 +2330,7 @@ page 21 "Customer Card"
 
                 trigger OnAction()
                 begin
-                    RunReport(REPORT::"Customer Jobs (Price)", "No.");
+                    RunReport(REPORT::"Customer Jobs (Price)", Rec."No.");
                 end;
             }
             action("Report Statement")
@@ -2304,13 +2349,13 @@ page 21 "Customer Card"
                 begin
                     RecRef.Open(Database::Customer);
                     CustomLayoutReporting.SetOutputFileBaseName(StatementFileNameTxt);
-                    CustomReportSelection.SetRange(Usage, "Report Selection Usage"::"C.Statement");
+                    CustomReportSelection.SetRange(Usage, Enum::"Report Selection Usage"::"C.Statement");
                     if CustomReportSelection.FindFirst() then
-                        CustomLayoutReporting.SetTableFilterForReportID(CustomReportSelection."Report ID", "No.")
+                        CustomLayoutReporting.SetTableFilterForReportID(CustomReportSelection."Report ID", Rec."No.")
                     else
-                        CustomLayoutReporting.SetTableFilterForReportID(Report::"Standard Statement", "No.");
+                        CustomLayoutReporting.SetTableFilterForReportID(Report::"Standard Statement", Rec."No.");
                     CustomLayoutReporting.ProcessReportData(
-                        "Report Selection Usage"::"C.Statement", RecRef, Customer.FieldName("No."),
+                        Enum::"Report Selection Usage"::"C.Statement", RecRef, Customer.FieldName("No."),
                         Database::Customer, Customer.FieldName("No."), true);
                 end;
             }
@@ -2623,21 +2668,21 @@ page 21 "Customer Card"
         SetCreditLimitStyle();
 
         if CRMIntegrationEnabled or CDSIntegrationEnabled then begin
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
-            if "No." <> xRec."No." then
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
+            if Rec."No." <> xRec."No." then
                 CRMIntegrationManagement.SendResultNotification(Rec);
         end;
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
         OpenApprovalEntriesExistCurrUser := false;
         if AnyWorkflowExists then begin
-            CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
-            WorkflowStepInstance.SetRange("Record ID", RecordId);
+            CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
+            WorkflowStepInstance.SetRange("Record ID", Rec.RecordId);
             ShowWorkflowStatus := not WorkflowStepInstance.IsEmpty();
             if ShowWorkflowStatus then
-                CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(RecordId);
-            OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+                CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
+            OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
             if OpenApprovalEntriesExist then
-                OpenApprovalEntriesExistCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
+                OpenApprovalEntriesExistCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(Rec.RecordId);
 
         end;
     end;
@@ -2663,6 +2708,8 @@ page 21 "Customer Card"
         SetCaption(CaptionTxt);
         CurrPage.Caption(CaptionTxt);
 
+        IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
+
 #if not CLEAN22
         InitPowerAutomateTemplateVisibility();
 #endif
@@ -2673,7 +2720,7 @@ page 21 "Customer Card"
         DocumentNoVisibility: Codeunit DocumentNoVisibility;
     begin
         if GuiAllowed then
-            if "No." = '' then
+            if Rec."No." = '' then
                 if DocumentNoVisibility.CustomerNoSeriesIsDefault() then
                     NewMode := true;
     end;
@@ -2683,7 +2730,7 @@ page 21 "Customer Card"
         OnBeforeOnOpenPage(Rec);
 
         if Rec.GetFilter("Date Filter") = '' then
-            SetRange("Date Filter", 0D, WorkDate());
+            Rec.SetRange("Date Filter", 0D, WorkDate());
         if GuiAllowed() then
             OnOpenPageFunc()
         else
@@ -2766,13 +2813,13 @@ page 21 "Customer Card"
         BalanceAsVendor := 0;
         BalanceAsVendorEnabled := false;
 
-        Args.Add(CustomerCardCalculations.GetCustomerNoLabel(), "No.");
-        Args.Add(CustomerCardCalculations.GetFiltersLabel(), GetView());
+        Args.Add(CustomerCardCalculations.GetCustomerNoLabel(), Rec."No.");
+        Args.Add(CustomerCardCalculations.GetFiltersLabel(), Rec.GetView());
         Args.Add(CustomerCardCalculations.GetWorkDateLabel(), Format(WorkDate()));
 
         CurrPage.EnqueueBackgroundTask(BackgroundTaskId, Codeunit::"Customer Card Calculations", Args);
 
-        Session.LogMessage('0000D4Q', StrSubstNo(PageBckGrndTaskStartedTxt, "No."), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CustomerCardServiceCategoryTxt);
+        Session.LogMessage('0000D4Q', StrSubstNo(PageBckGrndTaskStartedTxt, Rec."No."), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CustomerCardServiceCategoryTxt);
     end;
 
 
@@ -2853,7 +2900,7 @@ page 21 "Customer Card"
                     Evaluate(BalanceAsVendor, DictionaryValue);
 
             AttentionToPaidDay := DaysPastDueDate > 0;
-            TotalMoneyOwed := "Balance (LCY)" + ExpectedMoneyOwed;
+            TotalMoneyOwed := Rec."Balance (LCY)" + ExpectedMoneyOwed;
 
             Session.LogMessage('0000D4R', PageBckGrndTaskCompletedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CustomerCardServiceCategoryTxt);
         end;
@@ -2866,6 +2913,8 @@ page 21 "Customer Card"
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
         CustomerMgt: Codeunit "Customer Mgt.";
         FormatAddress: Codeunit "Format Address";
+        PrivacyNotice: Codeunit "Privacy Notice";
+        PrivacyNoticeRegistrations: Codeunit "Privacy Notice Registrations";
         LinkedVendorNo: Code[20];
         BalanceAsVendor: Decimal;
         StyleTxt: Text;
@@ -2875,6 +2924,7 @@ page 21 "Customer Card"
         ExtendedPriceEnabled: Boolean;
         CRMIsCoupledToRecord: Boolean;
         OpenApprovalEntriesExistCurrUser: Boolean;
+        IsPowerAutomatePrivacyNoticeApproved: Boolean;
         OpenApprovalEntriesExist: Boolean;
         ShowWorkflowStatus: Boolean;
         NoFieldVisible: Boolean;
@@ -2928,7 +2978,6 @@ page 21 "Customer Card"
         PaymentsThisYearTxt: Label 'Payments This Year as of %1', Comment = '%1 = Current Fiscal Year Filter';
 
     protected var
-        [InDataSet]
         ContactEditable: Boolean;
         IsOfficeAddin: Boolean;
         NoPostedInvoices: Integer;
@@ -2963,15 +3012,15 @@ page 21 "Customer Card"
     begin
         StyleTxt := '';
         BalanceExhausted := false;
-        if "Credit Limit (LCY)" > 0 then
-            BalanceExhausted := "Balance (LCY)" >= "Credit Limit (LCY)";
+        if Rec."Credit Limit (LCY)" > 0 then
+            BalanceExhausted := Rec."Balance (LCY)" >= Rec."Credit Limit (LCY)";
         if BalanceExhausted then
             StyleTxt := 'Unfavorable';
     end;
 
     local procedure HasCustomBaseCalendar(): Boolean
     begin
-        if "Base Calendar Code" = '' then
+        if Rec."Base Calendar Code" = '' then
             exit(false)
         else
             exit(CalendarMgmt.CustomizedChangesExist(Rec));
@@ -3109,3 +3158,4 @@ page 21 "Customer Card"
     begin
     end;
 }
+

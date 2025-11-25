@@ -1,3 +1,12 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using System.Automation;
+
 page 9300 "Sales Quotes"
 {
     AdditionalSearchTerms = 'offer';
@@ -10,7 +19,7 @@ page 9300 "Sales Quotes"
     QueryCategory = 'Sales Quotes';
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = CONST(Quote));
+    SourceTableView = where("Document Type" = const(Quote));
     UsageCategory = Lists;
 
     AboutTitle = 'About sales quotes';
@@ -233,21 +242,21 @@ page 9300 "Sales Quotes"
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
-                SubPageLink = "Table ID" = CONST(Database::"Sales Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Sales Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             part(Control1900316107; "Customer Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -303,7 +312,7 @@ page 9300 "Sales Quotes"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
             }
@@ -317,8 +326,8 @@ page 9300 "Sales Quotes"
                     Enabled = CustomerSelected;
                     Image = Customer;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer.';
                 }
@@ -329,7 +338,7 @@ page 9300 "Sales Quotes"
                     Enabled = ContactSelected;
                     Image = Card;
                     RunObject = Page "Contact Card";
-                    RunPageLink = "No." = FIELD("Sell-to Contact No.");
+                    RunPageLink = "No." = field("Sell-to Contact No.");
                     ToolTip = 'View or edit detailed information about the contact person at the customer.';
                 }
             }
@@ -358,9 +367,9 @@ page 9300 "Sales Quotes"
                         if IsHandled then
                             exit;
 
-                        PrepareOpeningDocumentStatistics();
+                        Rec.PrepareOpeningDocumentStatistics();
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        ShowDocumentStatisticsPage();
+                        Rec.ShowDocumentStatisticsPage();
                     end;
                 }
                 action("Co&mments")
@@ -370,9 +379,9 @@ page 9300 "Sales Quotes"
                     Enabled = QuoteActionsEnabled;
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Print)
@@ -480,7 +489,7 @@ page 9300 "Sales Quotes"
 
                     trigger OnAction()
                     begin
-                        if CheckCustomerCreated(false) then
+                        if Rec.CheckCustomerCreated(false) then
                             CurrPage.Update(true);
                     end;
                 }
@@ -495,7 +504,7 @@ page 9300 "Sales Quotes"
 
                     trigger OnAction()
                     begin
-                        CreateTask();
+                        Rec.CreateTask();
                     end;
                 }
             }
@@ -517,7 +526,7 @@ page 9300 "Sales Quotes"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualRelease(SalesHeader);
+                        Rec.PerformManualRelease(SalesHeader);
                     end;
                 }
                 action(Reopen)
@@ -533,7 +542,7 @@ page 9300 "Sales Quotes"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualReopen(SalesHeader);
+                        Rec.PerformManualReopen(SalesHeader);
                     end;
                 }
             }
@@ -571,7 +580,7 @@ page 9300 "Sales Quotes"
                         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelSalesApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
             }
@@ -669,17 +678,17 @@ page 9300 "Sales Quotes"
     trigger OnAfterGetRecord()
     begin
         StyleTxt := SetStyle();
-        StatusStyleTxt := GetStatusStyleText();
+        StatusStyleTxt := Rec.GetStatusStyleText();
     end;
 
     trigger OnOpenPage()
     var
         OfficeMgt: Codeunit "Office Management";
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
         IsOfficeAddin := OfficeMgt.IsAvailable();
 
-        CopySellToCustomerFilter();
+        Rec.CopySellToCustomerFilter();
     end;
 
     var
@@ -691,7 +700,6 @@ page 9300 "Sales Quotes"
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
         StyleTxt: Text;
-        [InDataSet]
         StatusStyleTxt: Text;
 
     protected var
@@ -703,14 +711,14 @@ page 9300 "Sales Quotes"
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
-        CustomerSelected := "Sell-to Customer No." <> '';
-        ContactSelected := "Sell-to Contact No." <> '';
-        QuoteActionsEnabled := "No." <> '';
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
+        CustomerSelected := Rec."Sell-to Customer No." <> '';
+        ContactSelected := Rec."Sell-to Contact No." <> '';
+        QuoteActionsEnabled := Rec."No." <> '';
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
     end;
 
     local procedure CheckSalesCheckAllLinesHaveQuantityAssigned()
@@ -722,7 +730,7 @@ page 9300 "Sales Quotes"
 
     procedure SetStyle(): Text
     begin
-        if ("Quote Valid Until Date" <> 0D) and (WorkDate() > "Quote Valid Until Date") then
+        if (Rec."Quote Valid Until Date" <> 0D) and (WorkDate() > Rec."Quote Valid Until Date") then
             exit('Unfavorable');
 
         exit('');

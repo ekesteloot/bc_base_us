@@ -1,3 +1,10 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Foundation.NoSeries;
+
 page 457 "No. Series Lines"
 {
     AutoSplitKey = true;
@@ -6,7 +13,7 @@ page 457 "No. Series Lines"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "No. Series Line";
-    SourceTableView = SORTING("Series Code", "Starting Date", "Starting No.");
+    SourceTableView = sorting("Series Code", "Starting Date", "Starting No.");
 
     layout
     {
@@ -76,12 +83,12 @@ page 457 "No. Series Lines"
                         CurrPage.Update(true);
                     end;
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the number series line is open. It is open until the last number in the series has been used.';
                 }
-                field(Series; Series)
+                field(Series; Rec.Series)
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the series of control numbers that are assigned by the tax authorities (SAT).';
@@ -120,13 +127,13 @@ page 457 "No. Series Lines"
     trigger OnAfterGetCurrRecord()
     begin
         if Rec."Allow Gaps in Nos." then
-            Rec."Last No. Used" := GetLastNoUsed();
+            Rec."Last No. Used" := Rec.GetLastNoUsed();
     end;
 
     trigger OnAfterGetRecord()
     begin
         if Rec."Allow Gaps in Nos." then
-            Rec."Last No. Used" := GetLastNoUsed();
+            Rec."Last No. Used" := Rec.GetLastNoUsed();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)

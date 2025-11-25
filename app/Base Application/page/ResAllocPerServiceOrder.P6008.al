@@ -1,3 +1,11 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Document;
+using System.Text;
+using System.Utilities;
+
 page 6008 "Res. Alloc. per Service Order"
 {
     Caption = 'Resource Allocated per Service Order';
@@ -135,8 +143,8 @@ page 6008 "Res. Alloc. per Service Order"
     trigger OnOpenPage()
     begin
         SetMatrixColumns("Matrix Page Step Type"::Initial);
-        if HasFilter then
-            ResourceFilter := GetFilter("Resource Filter");
+        if Rec.HasFilter then
+            ResourceFilter := Rec.GetFilter("Resource Filter");
     end;
 
     var

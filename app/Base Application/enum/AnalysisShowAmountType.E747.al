@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 enum 747 "Analysis Show Amount Type"
 {
     Extensible = true;

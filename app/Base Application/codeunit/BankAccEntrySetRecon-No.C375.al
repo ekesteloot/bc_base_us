@@ -1,3 +1,8 @@
+﻿namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+
 codeunit 375 "Bank Acc. Entry Set Recon.-No."
 {
     Permissions = TableData "Bank Account Ledger Entry" = rm,

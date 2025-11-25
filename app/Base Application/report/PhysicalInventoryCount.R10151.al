@@ -10,13 +10,13 @@ report 10151 "Physical Inventory Count"
     {
         dataitem("Item Journal Template"; "Item Journal Template")
         {
-            DataItemTableView = SORTING(Name);
+            DataItemTableView = sorting(Name);
             column(Item_Journal_Template_Name; Name)
             {
             }
             dataitem("Item Journal Batch"; "Item Journal Batch")
             {
-                DataItemTableView = SORTING("Journal Template Name", Name);
+                DataItemTableView = sorting("Journal Template Name", Name);
                 PrintOnlyIfDetail = true;
                 column(CompanyInformation_Name; CompanyInformation.Name)
                 {
@@ -77,8 +77,8 @@ report 10151 "Physical Inventory Count"
                 }
                 dataitem("Item Journal Line"; "Item Journal Line")
                 {
-                    DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
-                    DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+                    DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
+                    DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
                     RequestFilterFields = "Journal Template Name", "Journal Batch Name", "Item No.", "Location Code";
                     column(EmptyString; '')
                     {

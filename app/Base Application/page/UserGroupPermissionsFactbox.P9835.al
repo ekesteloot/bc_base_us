@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 page 9835 "User Group Permissions FactBox"
 {
     Caption = 'Permission Sets';

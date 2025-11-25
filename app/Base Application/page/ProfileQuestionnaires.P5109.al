@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5109 "Profile Questionnaires"
 {
     ApplicationArea = RelationshipMgmt;
@@ -13,7 +15,7 @@ page 5109 "Profile Questionnaires"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code of the profile questionnaire.';
@@ -23,7 +25,7 @@ page 5109 "Profile Questionnaires"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the description of the profile questionnaire.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the priority you give to the profile questionnaire and where it should be displayed on the lines of the Contact Card. There are five options:';
@@ -66,7 +68,7 @@ page 5109 "Profile Questionnaires"
                 Ellipsis = true;
                 Image = Setup;
                 RunObject = Page "Profile Questionnaire Setup";
-                RunPageLink = "Profile Questionnaire Code" = FIELD(Code);
+                RunPageLink = "Profile Questionnaire Code" = field(Code);
                 ShortCutKey = 'Return';
                 ToolTip = 'Modify how the questionnaire is set up.';
             }

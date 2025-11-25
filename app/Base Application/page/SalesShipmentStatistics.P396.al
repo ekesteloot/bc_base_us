@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.History;
+
 page 396 "Sales Shipment Statistics"
 {
     Caption = 'Sales Shipment Statistics';
@@ -80,7 +82,7 @@ page 396 "Sales Shipment Statistics"
         if IsHandled then
             exit;
 
-        SalesShptLine.SetRange("Document No.", "No.");
+        SalesShptLine.SetRange("Document No.", Rec."No.");
         OnCalculateTotalsOnAfterSalesShptLineSetFilters(SalesShptLine, Rec);
         if SalesShptLine.Find('-') then
             repeat

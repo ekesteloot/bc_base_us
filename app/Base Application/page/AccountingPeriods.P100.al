@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.InventoryMgt.Setup;
+
 page 100 "Accounting Periods"
 {
     AdditionalSearchTerms = 'fiscal year,fiscal period';
@@ -30,7 +35,7 @@ page 100 "Accounting Periods"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether to use the accounting period to start a fiscal year.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the accounting period belongs to a closed fiscal year.';
@@ -40,7 +45,7 @@ page 100 "Accounting Periods"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if you can change the starting date for the accounting period.';
                 }
-                field("InvtPeriod.IsInvtPeriodClosed(""Starting Date"")"; InvtPeriod.IsInvtPeriodClosed("Starting Date"))
+                field("InvtPeriod.IsInvtPeriodClosed(""Starting Date"")"; InvtPeriod.IsInvtPeriodClosed(Rec."Starting Date"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Inventory Period Closed';

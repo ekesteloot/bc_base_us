@@ -1,3 +1,10 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+
 report 1135 "Copy G/L Budget to Cost Acctg."
 {
     Caption = 'Copy G/L Budget to Cost Acctg.';
@@ -7,7 +14,7 @@ report 1135 "Copy G/L Budget to Cost Acctg."
     {
         dataitem("G/L Budget Entry"; "G/L Budget Entry")
         {
-            DataItemTableView = SORTING("Budget Name", "G/L Account No.", Date);
+            DataItemTableView = sorting("Budget Name", "G/L Account No.", Date);
             RequestFilterFields = "Budget Name", "G/L Account No.", Date, "Global Dimension 1 Code", "Global Dimension 2 Code", "Budget Dimension 1 Code", "Budget Dimension 2 Code", "Budget Dimension 3 Code", "Budget Dimension 4 Code";
 
             trigger OnAfterGetRecord()

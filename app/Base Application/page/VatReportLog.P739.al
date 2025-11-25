@@ -115,8 +115,8 @@ page 739 "VAT Report Log"
 
     procedure SetReport(VATReportHeader: Record "VAT Report Header")
     begin
-        SetFilter("VAT Report No.", VATReportHeader."No.");
-        SetFilter("VAT Report Type", Format(VATReportHeader."VAT Report Config. Code"::"EC Sales List"));
+        Rec.SetFilter("VAT Report No.", VATReportHeader."No.");
+        Rec.SetFilter("VAT Report Type", Format(VATReportHeader."VAT Report Config. Code"::"EC Sales List"));
     end;
 }
 

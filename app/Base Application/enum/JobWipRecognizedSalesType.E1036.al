@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
 enum 1036 "Job WIP Recognized Sales Type"
 {
     Extensible = true;

@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 report 8621 "Config. Package - Process"
 {
     Caption = 'Config. Package - Process';
@@ -8,7 +12,7 @@ report 8621 "Config. Package - Process"
     {
         dataitem("Config. Package Table"; "Config. Package Table")
         {
-            DataItemTableView = SORTING("Package Code", "Table ID") ORDER(Ascending);
+            DataItemTableView = sorting("Package Code", "Table ID") order(Ascending);
 
             trigger OnAfterGetRecord()
             var
@@ -57,7 +61,7 @@ report 8621 "Config. Package - Process"
         TempField.Insert();
         TempTransformationRule.Init();
         TempTransformationRule.Code := Format(TempField."No.");
-        TempTransformationRule."Transformation Type" := "Transformation Rule Type".FromInteger(TransformationType);
+        TempTransformationRule."Transformation Type" := Enum::"Transformation Rule Type".FromInteger(TransformationType);
         TempTransformationRule.Insert();
     end;
 

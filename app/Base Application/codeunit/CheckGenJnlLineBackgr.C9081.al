@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using System.Utilities;
+
 codeunit 9081 "Check Gen. Jnl. Line. Backgr."
 {
     trigger OnRun()

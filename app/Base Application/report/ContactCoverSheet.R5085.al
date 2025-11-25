@@ -1,7 +1,16 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using System.Email;
+
 report 5085 "Contact Cover Sheet"
 {
-    RDLCLayout = './CRM/ContactCoverSheet.5085.rdlc';
-    WordLayout = './ContactCoverSheet.docx';
+    RDLCLayout = './CRM/Reports/ContactCoverSheet.5085.rdlc';
+    WordLayout = './CRM/Reports/ContactCoverSheet.docx';
     Caption = 'Contact Cover Sheet';
     DefaultLayout = Word;
     PreviewMode = PrintLayout;
@@ -14,8 +23,8 @@ report 5085 "Contact Cover Sheet"
             RequestFilterFields = "No.";
             dataitem("Segment Line"; "Segment Line")
             {
-                DataItemLink = "Segment No." = FIELD("No.");
-                DataItemTableView = SORTING("Segment No.", "Campaign No.", Date);
+                DataItemLink = "Segment No." = field("No.");
+                DataItemTableView = sorting("Segment No.", "Campaign No.", Date);
 
                 trigger OnAfterGetRecord()
                 begin
@@ -63,7 +72,7 @@ report 5085 "Contact Cover Sheet"
         }
         dataitem(TempSegmentLine; "Segment Line")
         {
-            DataItemTableView = SORTING("Segment No.", "Line No.");
+            DataItemTableView = sorting("Segment No.", "Line No.");
             UseTemporary = true;
             column(CompanyInformationPhoneNo; CompanyInformation."Phone No.")
             {
@@ -209,7 +218,7 @@ report 5085 "Contact Cover Sheet"
         var
             SegManagement: Codeunit SegManagement;
         begin
-            LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Cover Sheet") <> '';
+            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Cover Sheet") <> '';
             LogInteractionEnable := LogInteraction;
         end;
     }
@@ -240,7 +249,6 @@ report 5085 "Contact Cover Sheet"
         BankAccountLbl: Label 'Bank Account';
         BestRegardsLbl: Label 'Best Regards,';
         LogInteraction: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         RunFromSegment: Boolean;
 

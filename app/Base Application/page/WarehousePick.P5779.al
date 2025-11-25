@@ -1,3 +1,11 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 page 5779 "Warehouse Pick"
 {
     Caption = 'Warehouse Pick';
@@ -6,7 +14,7 @@ page 5779 "Warehouse Pick"
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "Warehouse Activity Header";
-    SourceTableView = WHERE(Type = CONST(Pick));
+    SourceTableView = where(Type = const(Pick));
 
     layout
     {
@@ -23,7 +31,7 @@ page 5779 "Warehouse Pick"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -76,10 +84,10 @@ page 5779 "Warehouse Pick"
             part(WhseActivityLines; "Whse. Pick Subform")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "Activity Type" = FIELD(Type),
-                              "No." = FIELD("No.");
-                SubPageView = SORTING("Activity Type", "No.", "Sorting Sequence No.")
-                              WHERE(Breakbulk = CONST(false));
+                SubPageLink = "Activity Type" = field(Type),
+                              "No." = field("No.");
+                SubPageView = sorting("Activity Type", "No.", "Sorting Sequence No.")
+                              where(Breakbulk = const(false));
             }
         }
         area(factboxes)
@@ -88,16 +96,16 @@ page 5779 "Warehouse Pick"
             {
                 ApplicationArea = Warehouse;
                 Provider = WhseActivityLines;
-                SubPageLink = "No." = FIELD("Item No.");
+                SubPageLink = "No." = field("Item No.");
                 Visible = true;
             }
             part(Control4; "Lot Numbers by Bin FactBox")
             {
                 ApplicationArea = Warehouse;
                 Provider = WhseActivityLines;
-                SubPageLink = "Item No." = FIELD("Item No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Location Code" = FIELD("Location Code");
+                SubPageLink = "Item No." = field("Item No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Location Code" = field("Location Code");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -127,9 +135,9 @@ page 5779 "Warehouse Pick"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Whse. Activity Header"),
-                                  Type = FIELD(Type),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Whse. Activity Header"),
+                                  Type = field(Type),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Registered Picks")
@@ -138,9 +146,9 @@ page 5779 "Warehouse Pick"
                     Caption = 'Registered Picks';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Activity List";
-                    RunPageLink = Type = FIELD(Type),
-                                  "Whse. Activity No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Activity No.");
+                    RunPageLink = Type = field(Type),
+                                  "Whse. Activity No." = field("No.");
+                    RunPageView = sorting("Whse. Activity No.");
                     ToolTip = 'View the quantities that have already been picked.';
                 }
             }
@@ -270,7 +278,7 @@ page 5779 "Warehouse Pick"
 
     trigger OnAfterGetRecord()
     begin
-        CurrentLocationCode := "Location Code";
+        CurrentLocationCode := Rec."Location Code";
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -282,10 +290,10 @@ page 5779 "Warehouse Pick"
     var
         WMSManagement: Codeunit "WMS Management";
     begin
-        ErrorIfUserIsNotWhseEmployee();
-        FilterGroup(2); // set group of filters user cannot change
-        SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
-        FilterGroup(0); // set filter group back to standard
+        Rec.ErrorIfUserIsNotWhseEmployee();
+        Rec.FilterGroup(2); // set group of filters user cannot change
+        Rec.SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
+        Rec.FilterGroup(0); // set filter group back to standard
 
         SetBinFieldsVisibleOnLines(false);
     end;
@@ -321,7 +329,7 @@ page 5779 "Warehouse Pick"
         if (Rec."Location Code" = LocationCodeWhenHideBinLastChecked) then
             exit(false);
 
-        if "Location Code" <> '' then
+        if Rec."Location Code" <> '' then
             HideBinFieldsLocal := not Rec.BinCodeMandatory();
 
         LocationCodeWhenHideBinLastChecked := Rec."Location Code";

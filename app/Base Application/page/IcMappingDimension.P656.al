@@ -1,3 +1,8 @@
+namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Intercompany.GLAccount;
+
 page 656 "IC Mapping Dimension"
 {
     PageType = ListPlus;

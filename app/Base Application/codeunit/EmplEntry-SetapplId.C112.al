@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Payables;
+
 codeunit 112 "Empl. Entry-SetAppl.ID"
 {
     Permissions = TableData "Employee Ledger Entry" = rimd;

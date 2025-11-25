@@ -1,3 +1,8 @@
+namespace System.Diagnostics;
+
+using System.DataAdministration;
+using System.Email;
+
 page 1366 "Field Monitoring Setup"
 {
     PageType = Card;
@@ -37,9 +42,9 @@ page 1366 "Field Monitoring Setup"
                             TempEmailAccount: Record "Email Account" temporary;
                         begin
                             if Page.RunModal(Page::"Email Accounts", TempEmailAccount) = Action::LookupOK then begin
-                                "Email Account Id" := TempEmailAccount."Account Id";
-                                "Email Account Name" := TempEmailAccount.Name;
-                                "Email Connector" := TempEmailAccount.Connector;
+                                Rec."Email Account Id" := TempEmailAccount."Account Id";
+                                Rec."Email Account Name" := TempEmailAccount.Name;
+                                Rec."Email Connector" := TempEmailAccount.Connector;
                             end;
                         end;
                     }
@@ -114,7 +119,7 @@ page 1366 "Field Monitoring Setup"
 
     var
         MonitorSensitiveField: Codeunit "Monitor Sensitive Field";
-        IsMonitorEnabled : Boolean;
+        IsMonitorEnabled: Boolean;
 
     trigger OnOpenPage()
     begin
@@ -123,6 +128,6 @@ page 1366 "Field Monitoring Setup"
 
     trigger OnAfterGetCurrRecord()
     begin
-        IsMonitorEnabled := "Monitor Status";
+        IsMonitorEnabled := Rec."Monitor Status";
     end;
 }

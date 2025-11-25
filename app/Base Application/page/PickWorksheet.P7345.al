@@ -1,3 +1,18 @@
+﻿namespace Microsoft.WarehouseMgt.Worksheet;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.CrossDock;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Integration.Excel;
+
 page 7345 "Pick Worksheet"
 {
     ApplicationArea = Warehouse;
@@ -8,7 +23,7 @@ page 7345 "Pick Worksheet"
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "Whse. Worksheet Line";
-    SourceTableView = SORTING("Worksheet Template Name", Name, "Location Code", "Sorting Sequence No.");
+    SourceTableView = sorting("Worksheet Template Name", Name, "Location Code", "Sorting Sequence No.");
     UsageCategory = Tasks;
 
     layout
@@ -25,13 +40,13 @@ page 7345 "Pick Worksheet"
                 trigger OnLookup(var Text: Text): Boolean
                 begin
                     CurrPage.SaveRecord();
-                    LookupWhseWkshName(Rec, CurrentWkshName, CurrentLocationCode);
+                    Rec.LookupWhseWkshName(Rec, CurrentWkshName, CurrentLocationCode);
                     CurrPage.Update(false);
                 end;
 
                 trigger OnValidate()
                 begin
-                    CheckWhseWkshName(CurrentWkshName, CurrentLocationCode, Rec);
+                    Rec.CheckWhseWkshName(CurrentWkshName, CurrentLocationCode, Rec);
                     CurrentWkshNameOnAfterValidate();
                 end;
             }
@@ -92,7 +107,7 @@ page 7345 "Pick Worksheet"
 
                     trigger OnValidate()
                     begin
-                        GetItem("Item No.", ItemDescription);
+                        Rec.GetItem(Rec."Item No.", ItemDescription);
                     end;
                 }
                 field("Variant Code"; Rec."Variant Code")
@@ -107,6 +122,12 @@ page 7345 "Pick Worksheet"
                     ApplicationArea = Warehouse;
                     Editable = false;
                     ToolTip = 'Specifies the description of the item on the line.';
+                }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
                 }
                 field("To Zone Code"; Rec."To Zone Code")
                 {
@@ -149,7 +170,7 @@ page 7345 "Pick Worksheet"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the quantity that still needs to be handled.';
                 }
-                field(AvailableQtyToPickExcludingQCBins; AvailableQtyToPickExcludingQCBins())
+                field(AvailableQtyToPickExcludingQCBins; Rec.AvailableQtyToPickForCurrentLine())
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Available Qty. to Pick';
@@ -211,7 +232,7 @@ page 7345 "Pick Worksheet"
 
                     trigger OnDrillDown()
                     begin
-                        CrossDockMgt.ShowBinContentsCrossDocked("Item No.", "Variant Code", "Unit of Measure Code", "Location Code", true);
+                        CrossDockMgt.ShowBinContentsCrossDocked(Rec."Item No.", Rec."Variant Code", Rec."Unit of Measure Code", Rec."Location Code", true);
                     end;
                 }
                 field(QtyCrossDockedUOMBase; QtyCrossDockedUOMBase)
@@ -225,7 +246,7 @@ page 7345 "Pick Worksheet"
 
                     trigger OnDrillDown()
                     begin
-                        CrossDockMgt.ShowBinContentsCrossDocked("Item No.", "Variant Code", "Unit of Measure Code", "Location Code", true);
+                        CrossDockMgt.ShowBinContentsCrossDocked(Rec."Item No.", Rec."Variant Code", Rec."Unit of Measure Code", Rec."Location Code", true);
                     end;
                 }
                 field(QtyCrossDockedAllUOMBase; QtyCrossDockedAllUOMBase)
@@ -239,7 +260,7 @@ page 7345 "Pick Worksheet"
 
                     trigger OnDrillDown()
                     begin
-                        CrossDockMgt.ShowBinContentsCrossDocked("Item No.", "Variant Code", "Unit of Measure Code", "Location Code", false);
+                        CrossDockMgt.ShowBinContentsCrossDocked(Rec."Item No.", Rec."Variant Code", Rec."Unit of Measure Code", Rec."Location Code", false);
                     end;
                 }
             }
@@ -267,9 +288,9 @@ page 7345 "Pick Worksheet"
             part(Control8; "Lot Numbers by Bin FactBox")
             {
                 ApplicationArea = ItemTracking;
-                SubPageLink = "Item No." = FIELD("Item No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Location Code" = FIELD("Location Code");
+                SubPageLink = "Item No." = field("Item No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Location Code" = field("Location Code");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -303,7 +324,7 @@ page 7345 "Pick Worksheet"
                     trigger OnAction()
                     begin
                         WMSMgt.ShowSourceDocLine(
-                          "Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+                          Rec."Source Type", Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.", Rec."Source Subline No.");
                     end;
                 }
                 action("Whse. Document Line")
@@ -329,7 +350,7 @@ page 7345 "Pick Worksheet"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }
@@ -343,7 +364,7 @@ page 7345 "Pick Worksheet"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -353,10 +374,10 @@ page 7345 "Pick Worksheet"
                     Caption = 'Warehouse Entries';
                     Image = BinLedger;
                     RunObject = Page "Warehouse Entries";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Location Code" = FIELD("Location Code");
-                    RunPageView = SORTING("Item No.", "Location Code", "Variant Code", "Bin Type Code", "Unit of Measure Code", "Lot No.", "Serial No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Location Code" = field("Location Code");
+                    RunPageView = sorting("Item No.", "Location Code", "Variant Code", "Bin Type Code", "Unit of Measure Code", "Lot No.", "Serial No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View completed warehouse activities related to the document.';
                 }
@@ -366,10 +387,10 @@ page 7345 "Pick Worksheet"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Location Code" = FIELD("Location Code");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Location Code" = field("Location Code");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
                 action("Bin Contents")
@@ -378,10 +399,10 @@ page 7345 "Pick Worksheet"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Item No.", "Variant Code");
                     ToolTip = 'View items in the bin if the selected line contains a bin code.';
                 }
             }
@@ -407,7 +428,7 @@ page 7345 "Pick Worksheet"
                     begin
                         RetrieveWhsePickDoc.GetSingleWhsePickDoc(
                           CurrentWkshTemplateName, CurrentWkshName, CurrentLocationCode);
-                        SortWhseWkshLines(
+                        Rec.SortWhseWkshLines(
                           CurrentWkshTemplateName, CurrentWkshName, CurrentLocationCode, CurrentSortingMethod);
 
                         OnAfterActionGetWarehouseDocuments(CurrentWkshTemplateName, CurrentWkshName, CurrentLocationCode, CurrentSortingMethod);
@@ -425,7 +446,7 @@ page 7345 "Pick Worksheet"
                         PickWkshLine: Record "Whse. Worksheet Line";
                     begin
                         PickWkshLine.Copy(Rec);
-                        AutofillQtyToHandle(PickWkshLine);
+                        Rec.AutofillQtyToHandle(PickWkshLine);
                     end;
                 }
                 action("Delete Qty. to Handle")
@@ -440,7 +461,7 @@ page 7345 "Pick Worksheet"
                         PickWkshLine: Record "Whse. Worksheet Line";
                     begin
                         PickWkshLine.Copy(Rec);
-                        DeleteQtyToHandle(PickWkshLine);
+                        Rec.DeleteQtyToHandle(PickWkshLine);
                     end;
                 }
                 action(CreatePick)
@@ -454,6 +475,31 @@ page 7345 "Pick Worksheet"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Whse. Create Pick", Rec);
+                    end;
+                }
+            }
+            group("Page")
+            {
+                Caption = 'Page';
+                action(EditInExcel)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Edit in Excel';
+                    Image = Excel;
+                    ToolTip = 'Send the data in the worksheet to an Excel file for analysis or editing.';
+                    Visible = IsSaaSExcelAddinEnabled;
+                    AccessByPermission = System "Allow Action Export To Excel" = X;
+
+                    trigger OnAction()
+                    var
+                        EditinExcel: Codeunit "Edit in Excel";
+                        EditinExcelFilters: Codeunit "Edit in Excel Filters";
+                        ODataUtility: Codeunit "ODataUtility";
+                    begin
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec.Name)), Enum::"Edit in Excel Filter Type"::Equal, CurrentWkshName, Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Worksheet Template Name")), Enum::"Edit in Excel Filter Type"::Equal, CurrentWkshTemplateName, Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Location Code")), Enum::"Edit in Excel Filter Type"::Equal, CurrentLocationCode, Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcel.EditPageInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), Page::"Pick Worksheet", EditInExcelFilters, StrSubstNo(ExcelFileNameTxt, CurrentWkshName, CurrentWkshTemplateName));
                     end;
                 }
             }
@@ -562,11 +608,17 @@ page 7345 "Pick Worksheet"
 
     trigger OnOpenPage()
     var
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ServerSetting: Codeunit "Server Setting";
         WhseWkshSelected: Boolean;
     begin
-        OpenedFromBatch := (Name <> '') and ("Worksheet Template Name" = '');
+        IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        // if called from API (such as edit-in-excel), do not filter 
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
+        OpenedFromBatch := (Rec.Name <> '') and (Rec."Worksheet Template Name" = '');
         if OpenedFromBatch then begin
-            CurrentWkshName := Name;
+            CurrentWkshName := Rec.Name;
             CurrentLocationCode := Rec."Location Code";
             Rec.OpenWhseWksh(Rec, CurrentWkshTemplateName, CurrentWkshName, CurrentLocationCode);
             exit;
@@ -581,10 +633,12 @@ page 7345 "Pick Worksheet"
         WMSMgt: Codeunit "WMS Management";
         CrossDockMgt: Codeunit "Whse. Cross-Dock Management";
         UOMMgt: Codeunit "Unit of Measure Management";
+        ExcelFileNameTxt: Label 'Pick Worksheet - WorksheetName %1 - WorksheetTemplateName %2', Comment = '%1 = Worksheet Name; %2 = Worksheet Template Name';
         QtyCrossDockedUOM: Decimal;
         QtyCrossDockedAllUOMBase: Decimal;
         QtyCrossDockedUOMBase: Decimal;
         OpenedFromBatch: Boolean;
+        IsSaaSExcelAddinEnabled: Boolean;
         WhseDocumentType: Enum "Warehouse Pick Document Type";
 
     protected var

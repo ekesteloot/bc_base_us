@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
 enum 5726 "Item Reference Type"
 {
     Extensible = true;

@@ -1,3 +1,10 @@
+namespace Microsoft.BankMgt.Statement;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.Reconciliation;
+
 table 276 "Bank Account Statement Line"
 {
     Caption = 'Bank Account Statement Line';
@@ -12,7 +19,7 @@ table 276 "Bank Account Statement Line"
         field(2; "Statement No."; Code[20])
         {
             Caption = 'Statement No.';
-            TableRelation = "Bank Account Statement"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."));
+            TableRelation = "Bank Account Statement"."Statement No." where("Bank Account No." = field("Bank Account No."));
         }
         field(3; "Statement Line No."; Integer)
         {
@@ -49,11 +56,9 @@ table 276 "Bank Account Statement Line"
             Caption = 'Applied Amount';
             Editable = false;
         }
-        field(10; Type; Option)
+        field(10; Type; Enum "Bank Acc. Statement Line Type")
         {
             Caption = 'Type';
-            OptionCaption = 'Bank Account Ledger Entry,Check Ledger Entry,Difference';
-            OptionMembers = "Bank Account Ledger Entry","Check Ledger Entry",Difference;
         }
         field(11; "Applied Entries"; Integer)
         {

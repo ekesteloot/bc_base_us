@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.RoleCenters;
+
 profile "RESOURCE MANAGER"
 {
     Caption = 'Resource Manager';

@@ -25,7 +25,7 @@ table 10010 "IRS 1099 Form-Box"
         }
         field(10; "Adjustment Exists"; Integer)
         {
-            CalcFormula = Count("IRS 1099 Adjustment" WHERE("IRS 1099 Code" = FIELD(Code)));
+            CalcFormula = count("IRS 1099 Adjustment" where("IRS 1099 Code" = field(Code)));
             Editable = false;
             FieldClass = FlowField;
         }

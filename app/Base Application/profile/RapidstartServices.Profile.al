@@ -1,3 +1,5 @@
+namespace System.IO;
+
 profile "RAPIDSTART SERVICES"
 {
     Caption = 'RapidStart Services Implementer';

@@ -1,3 +1,11 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Setup;
+
 report 5687 "Copy Depreciation Book"
 {
     Caption = 'Copy Depreciation Book';
@@ -7,7 +15,7 @@ report 5687 "Copy Depreciation Book"
     {
         dataitem("Fixed Asset"; "Fixed Asset")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "FA Class Code", "FA Subclass Code";
 
             trigger OnAfterGetRecord()

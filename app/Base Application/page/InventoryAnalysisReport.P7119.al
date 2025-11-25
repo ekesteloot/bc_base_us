@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+
 page 7119 "Inventory Analysis Report"
 {
     Caption = 'Inventory Analysis Report';
@@ -8,7 +13,7 @@ page 7119 "Inventory Analysis Report"
     PageType = Card;
     SaveValues = true;
     SourceTable = "Analysis Line";
-    SourceTableView = WHERE("Analysis Area" = CONST(Inventory));
+    SourceTableView = where("Analysis Area" = const(Inventory));
 
     layout
     {
@@ -94,7 +99,7 @@ page 7119 "Inventory Analysis Report"
 
                     trigger OnValidate()
                     begin
-                        SetRange("Source Type Filter", CurrentSourceTypeFilter);
+                        Rec.SetRange("Source Type Filter", CurrentSourceTypeFilter);
                         CurrentSourceTypeNoFilter := '';
                         AnalysisReportMgt.SetSourceNo(Rec, CurrentSourceTypeNoFilter);
                         CurrentSourceTypeFilterOnAfterValidate();
@@ -345,9 +350,9 @@ page 7119 "Inventory Analysis Report"
 
         GLSetup.Get();
 
-        if AnalysisLineTemplate.Get(GetRangeMax("Analysis Area"), CurrentLineTemplate) then
+        if AnalysisLineTemplate.Get(Rec.GetRangeMax("Analysis Area"), CurrentLineTemplate) then
             if AnalysisLineTemplate."Item Analysis View Code" <> '' then
-                ItemAnalysisView.Get(GetRangeMax("Analysis Area"), AnalysisLineTemplate."Item Analysis View Code")
+                ItemAnalysisView.Get(Rec.GetRangeMax("Analysis Area"), AnalysisLineTemplate."Item Analysis View Code")
             else begin
                 Clear(ItemAnalysisView);
                 ItemAnalysisView."Dimension 1 Code" := GLSetup."Global Dimension 1 Code";
@@ -395,7 +400,7 @@ page 7119 "Inventory Analysis Report"
         InternalDateFilter: Text;
     begin
         PeriodPageMgt.FindPeriodOnMatrixPage(DateFilter, InternalDateFilter, SearchText, PeriodType, false);
-        SetFilter("Date Filter", InternalDateFilter);
+        Rec.SetFilter("Date Filter", InternalDateFilter);
     end;
 
     local procedure ValidateAnalysisTemplateName()
@@ -403,7 +408,7 @@ page 7119 "Inventory Analysis Report"
         AnalysisLineTemplate: Record "Analysis Line Template";
         PrevItemAnalysisView: Record "Item Analysis View";
     begin
-        if AnalysisLineTemplate.Get(GetRangeMax("Analysis Area"), CurrentLineTemplate) then
+        if AnalysisLineTemplate.Get(Rec.GetRangeMax("Analysis Area"), CurrentLineTemplate) then
             if (AnalysisLineTemplate."Default Column Template Name" <> '') and
                (CurrentColumnTemplate <> AnalysisLineTemplate."Default Column Template Name")
             then begin
@@ -415,18 +420,18 @@ page 7119 "Inventory Analysis Report"
         if AnalysisLineTemplate."Item Analysis View Code" <> ItemAnalysisView.Code then begin
             PrevItemAnalysisView := ItemAnalysisView;
             if AnalysisLineTemplate."Item Analysis View Code" <> '' then
-                ItemAnalysisView.Get(GetRangeMax("Analysis Area"), AnalysisLineTemplate."Item Analysis View Code")
+                ItemAnalysisView.Get(Rec.GetRangeMax("Analysis Area"), AnalysisLineTemplate."Item Analysis View Code")
             else begin
                 Clear(ItemAnalysisView);
                 ItemAnalysisView."Dimension 1 Code" := GLSetup."Global Dimension 1 Code";
                 ItemAnalysisView."Dimension 2 Code" := GLSetup."Global Dimension 2 Code";
             end;
             if PrevItemAnalysisView."Dimension 1 Code" <> ItemAnalysisView."Dimension 1 Code" then
-                SetRange("Dimension 1 Filter");
+                Rec.SetRange("Dimension 1 Filter");
             if PrevItemAnalysisView."Dimension 2 Code" <> ItemAnalysisView."Dimension 2 Code" then
-                SetRange("Dimension 2 Filter");
+                Rec.SetRange("Dimension 2 Filter");
             if PrevItemAnalysisView."Dimension 3 Code" <> ItemAnalysisView."Dimension 3 Code" then
-                SetRange("Dimension 3 Filter");
+                Rec.SetRange("Dimension 3 Filter");
         end;
     end;
 
@@ -434,7 +439,7 @@ page 7119 "Inventory Analysis Report"
     var
         AnalysisReportName: Record "Analysis Report Name";
     begin
-        if AnalysisReportName.Get(GetRangeMax("Analysis Area"), CurrentReportName) then begin
+        if AnalysisReportName.Get(Rec.GetRangeMax("Analysis Area"), CurrentReportName) then begin
             if AnalysisReportName."Analysis Line Template Name" <> '' then
                 CurrentLineTemplate := AnalysisReportName."Analysis Line Template Name";
             if AnalysisReportName."Analysis Column Template Name" <> '' then
@@ -447,18 +452,18 @@ page 7119 "Inventory Analysis Report"
         AnalysisReportName: Record "Analysis Report Name";
     begin
         if CurrentReportName <> '' then
-            if AnalysisReportName.Get("Analysis Area"::Inventory, CurrentReportName) then
+            if AnalysisReportName.Get(Rec."Analysis Area"::Inventory, CurrentReportName) then
                 exit(AnalysisReportName.Name + ' ' + AnalysisReportName.Description);
     end;
 
     procedure SetFilters()
     begin
         TempAnalysisColumn.Reset();
-        TempAnalysisColumn.SetRange("Analysis Area", "Analysis Area"::Inventory);
+        TempAnalysisColumn.SetRange("Analysis Area", Rec."Analysis Area"::Inventory);
         TempAnalysisColumn.SetRange("Analysis Column Template", CurrentColumnTemplate);
 
         AnalysisLine.Copy(Rec);
-        AnalysisLine.SetRange("Analysis Area", "Analysis Area"::Inventory);
+        AnalysisLine.SetRange("Analysis Area", Rec."Analysis Area"::Inventory);
         AnalysisLine.SetRange("Analysis Line Template Name", CurrentLineTemplate);
     end;
 

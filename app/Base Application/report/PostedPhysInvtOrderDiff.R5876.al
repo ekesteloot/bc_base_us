@@ -1,7 +1,15 @@
+namespace Microsoft.InventoryMgt.Counting.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Counting.History;
+using Microsoft.InventoryMgt.Counting.Tracking;
+using System.Utilities;
+
 report 5876 "Posted Phys. Invt. Order Diff."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/PhysInventory/PostedPhysInvtOrderDiff.rdlc';
+    RDLCLayout = './InventoryMgt/Counting/Reports/PostedPhysInvtOrderDiff.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Posted Phys. Invt. Order Diff.';
     UsageCategory = ReportsAndAnalysis;
@@ -16,7 +24,7 @@ report 5876 "Posted Phys. Invt. Order Diff."
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(USERID; UserId)
                 {
                 }
@@ -70,9 +78,9 @@ report 5876 "Posted Phys. Invt. Order Diff."
                 }
                 dataitem("Pstd. Phys. Invt. Order Line"; "Pstd. Phys. Invt. Order Line")
                 {
-                    DataItemLink = "Document No." = FIELD("No.");
+                    DataItemLink = "Document No." = field("No.");
                     DataItemLinkReference = "Posted Phys. Invt. Order Hdr";
-                    DataItemTableView = SORTING("Document No.", "Line No.");
+                    DataItemTableView = sorting("Document No.", "Line No.");
                     column(Posted_Phys__Invt__Order_Line__Item_No__; "Item No.")
                     {
                     }
@@ -185,7 +193,7 @@ report 5876 "Posted Phys. Invt. Order Diff."
                     }
                     dataitem(DiffListBufferLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(TempPhysInvtCountBuffer__Track__Qty__Pos___Base__; TempPhysInvtCountBuffer."Track. Qty. Pos. (Base)")
                         {
                             DecimalPlaces = 0 : 5;
@@ -312,7 +320,7 @@ report 5876 "Posted Phys. Invt. Order Diff."
                     }
                     dataitem(LineDimensionLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -373,7 +381,7 @@ report 5876 "Posted Phys. Invt. Order Diff."
                     }
                     dataitem("Integer"; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
 
                         trigger OnPreDataItem()
                         begin

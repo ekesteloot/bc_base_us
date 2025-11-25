@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Allocation;
+
 enum 1118 "Cost Allocation Target Period"
 {
     Extensible = true;

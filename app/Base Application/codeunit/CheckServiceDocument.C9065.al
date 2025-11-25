@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ServiceMgt.Posting;
+
 codeunit 9065 "Check Service Document"
 {
     TableNo = "Service Header";

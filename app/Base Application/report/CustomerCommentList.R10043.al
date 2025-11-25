@@ -9,7 +9,7 @@ report 10043 "Customer Comment List"
     {
         dataitem("Comment Line"; "Comment Line")
         {
-            DataItemTableView = SORTING("Table Name", "No.", "Line No.") WHERE("Table Name" = CONST(Customer));
+            DataItemTableView = sorting("Table Name", "No.", "Line No.") where("Table Name" = const(Customer));
             RequestFilterFields = "No.", Date, "Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

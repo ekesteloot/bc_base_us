@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
 page 275 "Job Journal Template List"
 {
     Caption = 'Job Journal Template List';

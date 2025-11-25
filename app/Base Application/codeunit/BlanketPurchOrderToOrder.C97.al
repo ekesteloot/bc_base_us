@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 codeunit 97 "Blanket Purch. Order to Order"
 {
     TableNo = "Purchase Header";
@@ -11,19 +18,19 @@ codeunit 97 "Blanket Purch. Order to Order"
         PurchCalcDiscByType: Codeunit "Purch - Calc Disc. By Type";
         ShouldRedistributeInvoiceAmount: Boolean;
     begin
-        OnBeforeRun(Rec);
+        OnBeforeRun(Rec, SkipCommit);
 
-        TestField("Document Type", "Document Type"::"Blanket Order");
+        Rec.TestField("Document Type", Rec."Document Type"::"Blanket Order");
         ShouldRedistributeInvoiceAmount := PurchCalcDiscByType.ShouldRedistributeInvoiceDiscountAmount(Rec);
 
-        Vend.Get("Buy-from Vendor No.");
+        Vend.Get(Rec."Buy-from Vendor No.");
         Vend.CheckBlockedVendOnDocs(Vend, false);
 
-        ValidatePurchaserOnPurchHeader(Rec, true, false);
+        Rec.ValidatePurchaserOnPurchHeader(Rec, true, false);
 
-        CheckForBlockedLines();
+        Rec.CheckForBlockedLines();
 
-        if QtyToReceiveIsZero() then
+        if Rec.QtyToReceiveIsZero() then
             Error(Text002);
 
         PurchSetup.Get();
@@ -31,8 +38,8 @@ codeunit 97 "Blanket Purch. Order to Order"
         CreatePurchHeader(Rec, Vend."Prepayment %");
 
         PurchBlanketOrderLine.Reset();
-        PurchBlanketOrderLine.SetRange("Document Type", "Document Type");
-        PurchBlanketOrderLine.SetRange("Document No.", "No.");
+        PurchBlanketOrderLine.SetRange("Document Type", Rec."Document Type");
+        PurchBlanketOrderLine.SetRange("Document No.", Rec."No.");
         OnRunOnAfterPurchBlanketOrderLineSetFilters(PurchBlanketOrderLine);
         if PurchBlanketOrderLine.FindSet() then
             repeat
@@ -48,7 +55,7 @@ codeunit 97 "Blanket Purch. Order to Order"
                     ResetQuantityFields(PurchOrderLine);
                     PurchOrderLine."Document Type" := PurchOrderHeader."Document Type";
                     PurchOrderLine."Document No." := PurchOrderHeader."No.";
-                    PurchOrderLine."Blanket Order No." := "No.";
+                    PurchOrderLine."Blanket Order No." := Rec."No.";
                     PurchOrderLine."Blanket Order Line No." := PurchBlanketOrderLine."Line No.";
 
                     if (PurchOrderLine."No." <> '') and (PurchOrderLine.Type <> PurchOrderLine.Type::" ") then begin
@@ -95,7 +102,7 @@ codeunit 97 "Blanket Purch. Order to Order"
                 end;
             until PurchBlanketOrderLine.Next() = 0;
 
-        OnAfterInsertAllPurchOrderLines(Rec, PurchOrderHeader);
+        OnAfterInsertAllPurchOrderLines(Rec, PurchOrderHeader, SkipCommit);
 
         if PurchSetup."Default Posting Date" = PurchSetup."Default Posting Date"::"No Date" then begin
             PurchOrderHeader."Posting Date" := 0D;
@@ -105,14 +112,15 @@ codeunit 97 "Blanket Purch. Order to Order"
         if PurchSetup."Copy Comments Blanket to Order" then begin
             PurchCommentLine.CopyComments(
                 PurchCommentLine."Document Type"::"Blanket Order".AsInteger(),
-                PurchOrderHeader."Document Type".AsInteger(), "No.", PurchOrderHeader."No.");
+                PurchOrderHeader."Document Type".AsInteger(), Rec."No.", PurchOrderHeader."No.");
             RecordLinkManagement.CopyLinks(Rec, PurchOrderHeader);
         end;
 
         if not (ShouldRedistributeInvoiceAmount or PurchSetup."Calc. Inv. Discount") then
             PurchCalcDiscByType.ResetRecalculateInvoiceDisc(PurchOrderHeader);
 
-        Commit();
+        if not SkipCommit then
+            Commit();
 
         OnAfterRun(Rec, PurchOrderHeader);
     end;
@@ -125,6 +133,7 @@ codeunit 97 "Blanket Purch. Order to Order"
         PurchLine: Record "Purchase Line";
         PurchLineReserve: Codeunit "Purch. Line-Reserve";
         QuantityOnOrders: Decimal;
+        SkipCommit: Boolean;
 
         QuantityCheckErr: Label '%1 of %2 %3 in %4 %5 cannot be more than %6.\%7\%8 - %9 = %6.', Comment = '%1: FIELDCAPTION("Qty. to Receive (Base)"); %2: Field(Type); %3: Field(No.); %4: FIELDCAPTION("Line No."); %5: Field(Line No.); %6: Decimal Qty Difference; %7: Text001; %8: Field(Outstanding Qty. (Base)); %9: Decimal Quantity On Orders';
         Text001: Label '%1 - Unposted %1 = Possible %2';
@@ -283,10 +292,16 @@ codeunit 97 "Blanket Purch. Order to Order"
         PurchHeader := PurchOrderHeader;
     end;
 
-    local procedure IsPurchOrderLineToBeInserted(PurchOrderLine: Record "Purchase Line"): Boolean
+    local procedure IsPurchOrderLineToBeInserted(PurchOrderLine: Record "Purchase Line") Result: Boolean
     var
         AttachedToPurchaseLine: Record "Purchase Line";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeIsPurchOrderLineToBeInserted(PurchOrderHeader, PurchOrderLine, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if not PurchOrderLine.IsExtendedText() then
             exit(true);
         exit(
@@ -310,7 +325,7 @@ codeunit 97 "Blanket Purch. Order to Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeRun(var PurchaseHeader: Record "Purchase Header")
+    local procedure OnBeforeRun(var PurchaseHeader: Record "Purchase Header"; var SkipCommit: Boolean)
     begin
     end;
 
@@ -340,12 +355,17 @@ codeunit 97 "Blanket Purch. Order to Order"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeIsPurchOrderLineToBeInserted(var PurchaseHader: Record "Purchase Header"; PurchaseLine: Record "Purchase Line"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdatePurchOrderLineDirectUnitCost(var PurchOrderLine: Record "Purchase Line"; PurchBlanketOrderLine: Record "Purchase Line"; PurchOrderHeader: Record "Purchase Header"; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInsertAllPurchOrderLines(BlanketOrderPurchHeader: Record "Purchase Header"; OrderPurchHeader: Record "Purchase Header")
+    local procedure OnAfterInsertAllPurchOrderLines(BlanketOrderPurchHeader: Record "Purchase Header"; OrderPurchHeader: Record "Purchase Header"; var SkipCommit: Boolean)
     begin
     end;
 

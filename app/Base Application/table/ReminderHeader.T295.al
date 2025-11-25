@@ -1,4 +1,24 @@
-﻿table 295 "Reminder Header"
+﻿namespace Microsoft.Sales.Reminder;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Setup;
+using System.Globalization;
+using System.IO;
+using System.Security.User;
+using System.Text;
+
+table 295 "Reminder Header"
 {
     Caption = 'Reminder Header';
     DataCaptionFields = "No.", Name;
@@ -57,6 +77,7 @@
                 Contact := Cust.Contact;
                 "Country/Region Code" := Cust."Country/Region Code";
                 "Language Code" := Cust."Language Code";
+                "Format Region" := Cust."Format Region";
                 "Currency Code" := Cust."Currency Code";
                 "Shortcut Dimension 1 Code" := Cust."Global Dimension 1 Code";
                 "Shortcut Dimension 2 Code" := Cust."Global Dimension 2 Code";
@@ -94,11 +115,9 @@
         field(7; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -119,11 +138,9 @@
         field(8; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -188,24 +205,24 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(16; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(17; "Customer Posting Group"; Code[20])
@@ -316,7 +333,7 @@
         field(28; "Reminder Level"; Integer)
         {
             Caption = 'Reminder Level';
-            TableRelation = "Reminder Level"."No." WHERE("Reminder Terms Code" = FIELD("Reminder Terms Code"));
+            TableRelation = "Reminder Level"."No." where("Reminder Terms Code" = field("Reminder Terms Code"));
 
             trigger OnValidate()
             begin
@@ -337,19 +354,19 @@
         }
         field(30; Comment; Boolean)
         {
-            CalcFormula = Exist("Reminder Comment Line" WHERE(Type = CONST(Reminder),
-                                                               "No." = FIELD("No.")));
+            CalcFormula = exist("Reminder Comment Line" where(Type = const(Reminder),
+                                                               "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
         }
         field(31; "Remaining Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Reminder Line"."Remaining Amount" WHERE("Reminder No." = FIELD("No."),
-                                                                        "Line Type" = CONST("Reminder Line"),
-                                                                        "Detailed Interest Rates Entry" = CONST(false)));
+            CalcFormula = sum("Reminder Line"."Remaining Amount" where("Reminder No." = field("No."),
+                                                                        "Line Type" = const("Reminder Line"),
+                                                                        "Detailed Interest Rates Entry" = const(false)));
             Caption = 'Remaining Amount';
             DecimalPlaces = 2 : 2;
             Editable = false;
@@ -357,34 +374,34 @@
         }
         field(32; "Interest Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Reminder Line".Amount WHERE("Reminder No." = FIELD("No."),
-                                                            Type = CONST("Customer Ledger Entry"),
-                                                            "Detailed Interest Rates Entry" = CONST(false),
-                                                            "Line Type" = FILTER(<> "Not Due")));
+            CalcFormula = sum("Reminder Line".Amount where("Reminder No." = field("No."),
+                                                            Type = const("Customer Ledger Entry"),
+                                                            "Detailed Interest Rates Entry" = const(false),
+                                                            "Line Type" = filter(<> "Not Due")));
             Caption = 'Interest Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(33; "Additional Fee"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Reminder Line".Amount WHERE("Reminder No." = FIELD("No."),
-                                                            Type = CONST("G/L Account"),
-                                                            "Line Type" = FILTER(<> "Not Due")));
+            CalcFormula = sum("Reminder Line".Amount where("Reminder No." = field("No."),
+                                                            Type = const("G/L Account"),
+                                                            "Line Type" = filter(<> "Not Due")));
             Caption = 'Additional Fee';
             Editable = false;
             FieldClass = FlowField;
         }
         field(34; "VAT Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Reminder Line"."VAT Amount" WHERE("Reminder No." = FIELD("No."),
-                                                                  "Detailed Interest Rates Entry" = CONST(false),
-                                                                  "Line Type" = FILTER(<> "Not Due")));
+            CalcFormula = sum("Reminder Line"."VAT Amount" where("Reminder No." = field("No."),
+                                                                  "Detailed Interest Rates Entry" = const(false),
+                                                                  "Line Type" = filter(<> "Not Due")));
             Caption = 'VAT Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -444,10 +461,10 @@
         }
         field(45; "Add. Fee per Line"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
-            CalcFormula = Sum("Reminder Line".Amount WHERE("Reminder No." = FIELD("No."),
-                                                            Type = CONST("Line Fee"),
-                                                            "Line Type" = FILTER(<> "Not Due")));
+            AutoFormatExpression = Rec."Currency Code";
+            CalcFormula = sum("Reminder Line".Amount where("Reminder No." = field("No."),
+                                                            Type = const("Line Fee"),
+                                                            "Line Type" = filter(<> "Not Due")));
             Caption = 'Add. Fee per Line';
             FieldClass = FlowField;
         }
@@ -466,10 +483,15 @@
                     InitVATDate();
             end;
         }
+        field(54; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(163; "Company Bank Account Code"; Code[20])
         {
             Caption = 'Company Bank Account Code';
-            TableRelation = "Bank Account" where("Currency Code" = FIELD("Currency Code"));
+            TableRelation = "Bank Account" where("Currency Code" = field("Currency Code"));
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -479,7 +501,7 @@
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
 
             trigger OnValidate()
@@ -724,10 +746,6 @@
                       CurrencyForReminderLevel.FieldNo("Additional Fee")), 1, 100);
                 ReminderLine.Validate(Amount, AdditionalFee);
                 ReminderLine."Line Type" := ReminderLine."Line Type"::"Additional Fee";
-#if not CLEAN20                
-                OnBeforeInsertReminderTextLine(ReminderLine, ReminderText, ReminderHeader);
-                OnBeforeInsertReminderLine(ReminderLine);
-#endif
                 OnInsertLinesOnBeforeReminderLineInsert(Rec, ReminderLine);
                 ReminderLine.Insert();
                 if TransferExtendedText.ReminderCheckIfAnyExtText(ReminderLine, false) then
@@ -903,10 +921,6 @@
                     ReminderLine."Line Type" := ReminderLine."Line Type"::"Beginning Text"
                 else
                     ReminderLine."Line Type" := ReminderLine."Line Type"::"Ending Text";
-#if not CLEAN20
-                OnBeforeInsertReminderTextLine(ReminderLine, ReminderText, ReminderHeader);
-                OnBeforeInsertReminderLine(ReminderLine);
-#endif
                 OnInsertTextLinesOnBeforeReminderLineInsert(ReminderLine, ReminderText, ReminderHeader);
                 ReminderLine.Insert();
             until ReminderText.Next() = 0;
@@ -928,9 +942,6 @@
         ReminderLine.Init();
         ReminderLine."Line No." := NextLineNo;
         ReminderLine."Line Type" := LineType;
-#if not CLEAN20
-        OnBeforeInsertReminderLine(ReminderLine);
-#endif
         OnInsertBlankLineOnBeforeReminderLineInsert(ReminderLine);
         ReminderLine.Insert();
     end;
@@ -969,60 +980,22 @@
         exit(true);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCreateDim(Rec, CurrFieldNo, TableID, No, Type1, No1, SourceCodeSetup, IsHandled);
-        if IsHandled then
-            exit;
-
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, TableID, No, SourceCodeSetup.Reminder, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-
-        OnAfterCreateDim(Rec, CurrFieldNo, TableID, No);
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-#if not CLEAN20
-        RunEventOnBeforeCreateDim(DefaultDimSource, IsHandled);
-#endif
         OnBeforeCreateDimProcedure(Rec, CurrFieldNo, DefaultDimSource, IsHandled);
         if not IsHandled then begin
             SourceCodeSetup.Get();
-#if not CLEAN20
-            RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
-
             "Shortcut Dimension 1 Code" := '';
             "Shortcut Dimension 2 Code" := '';
             "Dimension Set ID" :=
               DimMgt.GetRecDefaultDimID(
                 Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup.Reminder, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
         end;
-#if not CLEAN20
-        RunEventOnAfterCreateDim(DefaultDimSource);
-#endif
+
         OnAfterCreateDimProcedure(Rec, CurrFieldNo, DefaultDimSource);
     end;
 
@@ -1230,73 +1203,10 @@
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource);
     end;
 
-#if not CLEAN20
-    local procedure RunEventOnBeforeCreateDim(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        Type1: Integer;
-        No1: Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Reminder Header") then
-            exit;
-
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Reminder Header", DefaultDimSource, TableID, No);
-        Type1 := TableID[1];
-        No1 := No[1];
-        OnBeforeCreateDim(Rec, CurrFieldNo, TableID, No, Type1, No1, SourceCodeSetup, IsHandled);
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Reminder Header", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Reminder Header") then
-            exit;
-
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Reminder Header", DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Reminder Header", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDim(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Reminder Header") then
-            exit;
-
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Reminder Header", DefaultDimSource, TableID, No);
-        OnAfterCreateDim(Rec, CurrFieldNo, TableID, No);
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Reminder Header", DefaultDimSource, TableID, No);
-    end;
-
-    [Obsolete('Replaced by OnAfterInitDefaultDimensionSources()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var ReminderHeader: Record "Reminder Header"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var ReminderHeader: Record "Reminder Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by OnAfterCreateDimProcedure()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var ReminderHeader: Record "Reminder Header"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDimProcedure(var ReminderHeader: Record "Reminder Header"; CurrFieldNo: Integer; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
@@ -1353,14 +1263,6 @@
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by OnBeforeCreateDimProcedure()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateDim(var ReminderHeader: Record "Reminder Header"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20]; Type1: Integer; No1: Code[20]; SourceCodeSetup: Record "Source Code Setup"; var IsHandled: Boolean)
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetNoSeriesCode(var ReminderHeader: Record "Reminder Header"; SalesSetup: Record "Sales & Receivables Setup"; var NoSeriesCode: Code[20]; var IsHandled: Boolean)
     begin
@@ -1370,20 +1272,6 @@
     local procedure OnBeforeGetIssuingNoSeriesCode(var ReminderHeader: Record "Reminder Header"; SalesSetup: Record "Sales & Receivables Setup"; var IssuingNos: Code[20]; var IsHandled: Boolean)
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced with OnInsertLinesOnBeforeReminderLineInsert', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertReminderLine(var ReminderLine: Record "Reminder Line")
-    begin
-    end;
-
-    [Obsolete('Replaced with OnInsertTextLinesOnBeforeReminderLineInsert', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertReminderTextLine(var ReminderLine: Record "Reminder Line"; var ReminderText: Record "Reminder Text"; var ReminderHeader: Record "Reminder Header")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertLinesOnBeforeReminderLineInsert(var ReminderHeader: Record "Reminder Header"; var ReminderLine: Record "Reminder Line")

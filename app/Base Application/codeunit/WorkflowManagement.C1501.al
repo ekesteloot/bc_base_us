@@ -1,3 +1,9 @@
+﻿namespace System.Automation;
+
+using System;
+using System.Telemetry;
+using System.Utilities;
+
 codeunit 1501 "Workflow Management"
 {
     Permissions = TableData Workflow = R,

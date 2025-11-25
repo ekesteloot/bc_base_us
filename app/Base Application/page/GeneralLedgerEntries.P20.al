@@ -1,3 +1,16 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.Dimension.Correction;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Shared.Navigate;
+using System.Diagnostics;
+using System.Security.User;
+
 page 20 "General Ledger Entries"
 {
     AdditionalSearchTerms = 'g/l transactions';
@@ -9,8 +22,8 @@ page 20 "General Ledger Entries"
     PageType = List;
     Permissions = TableData "G/L Entry" = m;
     SourceTable = "G/L Entry";
-    SourceTableView = SORTING("G/L Account No.", "Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("G/L Account No.", "Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -196,7 +209,7 @@ page 20 "General Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -227,7 +240,7 @@ page 20 "General Ledger Entries"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -379,7 +392,7 @@ page 20 "General Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -393,7 +406,7 @@ page 20 "General Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
                 action(GLDimensionOverview)
@@ -408,7 +421,7 @@ page 20 "General Ledger Entries"
                     var
                         GLEntriesDimensionOverview: Page "G/L Entries Dimension Overview";
                     begin
-                        if IsTemporary then begin
+                        if Rec.IsTemporary then begin
                             GLEntriesDimensionOverview.SetTempGLEntry(Rec);
                             GLEntriesDimensionOverview.Run();
                         end else
@@ -477,7 +490,7 @@ page 20 "General Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowValueEntries();
+                        Rec.ShowValueEntries();
                     end;
                 }
             }
@@ -502,11 +515,11 @@ page 20 "General Ledger Entries"
                         ReversalEntry: Record "Reversal Entry";
                     begin
                         Clear(ReversalEntry);
-                        if Reversed then
-                            ReversalEntry.AlreadyReversedEntry(TableCaption, "Entry No.");
+                        if Rec.Reversed then
+                            ReversalEntry.AlreadyReversedEntry(Rec.TableCaption, Rec."Entry No.");
                         CheckEntryPostedFromJournal();
-                        TestField("Transaction No.");
-                        ReversalEntry.ReverseTransaction("Transaction No.")
+                        Rec.TestField("Transaction No.");
+                        ReversalEntry.ReverseTransaction(Rec."Transaction No.")
                     end;
                 }
                 group(IncomingDocument)
@@ -525,7 +538,7 @@ page 20 "General Ledger Entries"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            IncomingDocument.ShowCard("Document No.", "Posting Date");
+                            IncomingDocument.ShowCard(Rec."Document No.", Rec."Posting Date");
                         end;
                     }
                     action(SelectIncomingDoc)
@@ -541,7 +554,7 @@ page 20 "General Ledger Entries"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            IncomingDocument.SelectIncomingDocumentForPostedDocument("Document No.", "Posting Date", RecordId);
+                            IncomingDocument.SelectIncomingDocumentForPostedDocument(Rec."Document No.", Rec."Posting Date", Rec.RecordId);
                         end;
                     }
                     action(IncomingDocAttachFile)
@@ -557,7 +570,7 @@ page 20 "General Ledger Entries"
                         var
                             IncomingDocumentAttachment: Record "Incoming Document Attachment";
                         begin
-                            IncomingDocumentAttachment.NewAttachmentFromPostedDocument("Document No.", "Posting Date");
+                            IncomingDocumentAttachment.NewAttachmentFromPostedDocument(Rec."Document No.", Rec."Posting Date");
                         end;
                     }
                 }
@@ -574,7 +587,7 @@ page 20 "General Ledger Entries"
                 var
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -589,7 +602,7 @@ page 20 "General Ledger Entries"
                 var
                     PostedDocsWithNoIncBuf: Record "Posted Docs. With No Inc. Buf.";
                 begin
-                    CopyFilter("G/L Account No.", PostedDocsWithNoIncBuf."G/L Account No. Filter");
+                    Rec.CopyFilter("G/L Account No.", PostedDocsWithNoIncBuf."G/L Account No. Filter");
                     PAGE.Run(PAGE::"Posted Docs. With No Inc. Doc.", PostedDocsWithNoIncBuf);
                 end;
             }
@@ -692,8 +705,8 @@ page 20 "General Ledger Entries"
         SetDimVisibility();
         IsVATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
 
-        if (GetFilters() <> '') and not Find() then
-            if FindFirst() then;
+        if (Rec.GetFilters() <> '') and not Rec.Find() then
+            if Rec.FindFirst() then;
     end;
 
     var
@@ -702,7 +715,6 @@ page 20 "General Ledger Entries"
         HasIncomingDocument: Boolean;
         AmountVisible: Boolean;
         DebitCreditVisible: Boolean;
-        [InDataSet]
         IsVATDateEnabled: Boolean;
 
     protected var
@@ -759,14 +771,14 @@ page 20 "General Ledger Entries"
         if IsHandled then
             exit;
 
-        if "Journal Batch Name" = '' then
+        if Rec."Journal Batch Name" = '' then
             ReversalEntry.TestFieldError();
     end;
 
     local procedure SetChangeLogEntriesFilter(var ChangeLogEntry: Record "Change Log Entry")
     begin
         ChangeLogEntry.SetRange("Table No.", DATABASE::"G/L Entry");
-        ChangeLogEntry.SetRange("Primary Key Field 1 Value", Format("Entry No.", 0, 9));
+        ChangeLogEntry.SetRange("Primary Key Field 1 Value", Format(Rec."Entry No.", 0, 9));
     end;
 
     [IntegrationEvent(false, false)]

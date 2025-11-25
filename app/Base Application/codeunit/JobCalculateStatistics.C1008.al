@@ -1,3 +1,10 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+
 codeunit 1008 "Job Calculate Statistics"
 {
 
@@ -299,6 +306,8 @@ codeunit 1008 "Job Calculate Statistics"
     end;
 
     procedure ShowLedgEntry(JobType: Option " ",Resource,Item,GL; Usage: Boolean)
+    var
+        JobLedgerEntries: Page "Job Ledger Entries";
     begin
         JobLedgEntry.SetRange(Type);
         if Usage then
@@ -307,7 +316,9 @@ codeunit 1008 "Job Calculate Statistics"
             JobLedgEntry.SetRange("Entry Type", JobLedgEntry."Entry Type"::Sale);
         if JobType > 0 then
             JobLedgEntry.SetRange(Type, JobType - 1);
-        PAGE.Run(PAGE::"Job Ledger Entries", JobLedgEntry);
+        Clear(JobLedgerEntries);
+        JobLedgerEntries.SetTableView(JobLedgEntry);
+        JobLedgerEntries.Run();
     end;
 
     procedure GetHeadLineText(AmountField: array[8] of Option " ",SchPrice,UsagePrice,BillablePrice,InvoicedPrice,SchCost,UsageCost,BillableCost,InvoicedCost,SchProfit,UsageProfit,BillableProfit,InvoicedProfit; CurrencyField: array[8] of Option LCY,FCY; var HeadLineText: array[8] of Text[50]; Job: Record Job)

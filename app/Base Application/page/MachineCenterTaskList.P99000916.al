@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.MachineCenter;
+
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Comment;
+using Microsoft.Manufacturing.Document;
+
 page 99000916 "Machine Center Task List"
 {
     Caption = 'Machine Center Task List';
@@ -170,9 +176,9 @@ page 99000916 "Machine Center Task List"
                     Caption = 'Capacity Ledger E&ntries';
                     Image = CapacityLedger;
                     RunObject = Page "Capacity Ledger Entries";
-                    RunPageLink = Type = CONST("Machine Center"),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING(Type, "No.", "Work Shift Code", "Item No.", "Posting Date");
+                    RunPageLink = Type = const("Machine Center"),
+                                  "No." = field("No.");
+                    RunPageView = sorting(Type, "No.", "Work Shift Code", "Item No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                 }
@@ -182,8 +188,8 @@ page 99000916 "Machine Center Task List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Manufacturing Comment Sheet";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = WHERE("Table Name" = CONST("Machine Center"));
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = where("Table Name" = const("Machine Center"));
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Lo&ad")
@@ -192,7 +198,7 @@ page 99000916 "Machine Center Task List"
                     Caption = 'Lo&ad';
                     Image = WorkCenterLoad;
                     RunObject = Page "Machine Center Load";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'View the availability of the machine or work center, including its the capacity, the allocated quantity, availability after orders, and the load in percent of its total capacity.';
                 }
                 action(Statistics)
@@ -201,7 +207,7 @@ page 99000916 "Machine Center Task List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Machine Center Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -226,7 +232,7 @@ page 99000916 "Machine Center Task List"
                         ProdOrderRoutingLine: Record "Prod. Order Routing Line";
                         CalculateProdOrder: Codeunit "Calculate Prod. Order";
                     begin
-                        if "Prod. Order No." = '' then
+                        if Rec."Prod. Order No." = '' then
                             exit;
 
                         ProdOrderRoutingLine.Copy(Rec);
@@ -247,9 +253,9 @@ page 99000916 "Machine Center Task List"
                         ProdOrderLine: Record "Prod. Order Line";
                         TrackingForm: Page "Order Tracking";
                     begin
-                        ProdOrderLine.SetRange(Status, Status);
-                        ProdOrderLine.SetRange("Prod. Order No.", "Prod. Order No.");
-                        ProdOrderLine.SetRange("Routing No.", "Routing No.");
+                        ProdOrderLine.SetRange(Status, Rec.Status);
+                        ProdOrderLine.SetRange("Prod. Order No.", Rec."Prod. Order No.");
+                        ProdOrderLine.SetRange("Routing No.", Rec."Routing No.");
                         if ProdOrderLine.FindFirst() then begin
                             TrackingForm.SetProdOrderLine(ProdOrderLine);
                             TrackingForm.RunModal();

@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Inbox;
+
 enum 437 "IC Inbox Purchase Document Type"
 {
     Extensible = true;

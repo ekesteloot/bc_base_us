@@ -1,3 +1,9 @@
+namespace System.IO;
+
+using System;
+using System.Utilities;
+using System.Xml;
+
 codeunit 1203 "Import XML File to Data Exch."
 {
     Permissions = TableData "Data Exch. Field" = rimd;

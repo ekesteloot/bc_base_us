@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using System.IO;
+
 codeunit 1254 "Match Bank Pmt. Appl."
 {
     TableNo = "Bank Acc. Reconciliation";

@@ -1,3 +1,10 @@
+namespace Microsoft.AssemblyMgt.Setup;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Sales.History;
+
 table 905 "Assembly Setup"
 {
     Caption = 'Assembly Setup';

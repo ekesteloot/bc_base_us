@@ -1,7 +1,13 @@
+namespace Microsoft.WarehouseMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Ledger;
+
 report 7303 "Warehouse Register - Quantity"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Register/WarehouseRegisterQuantity.rdlc';
+    RDLCLayout = './WarehouseMgt/Reports/WarehouseRegisterQuantity.rdlc';
     AccessByPermission = TableData Location = R;
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Register - Quantity';
@@ -11,7 +17,7 @@ report 7303 "Warehouse Register - Quantity"
     {
         dataitem("Warehouse Register"; "Warehouse Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(TodayFormatted; Format(Today, 0, 4))
@@ -46,7 +52,7 @@ report 7303 "Warehouse Register - Quantity"
             }
             dataitem("Warehouse Entry"; "Warehouse Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(EntryNo_WarehouseEntry; "Entry No.")
                 {
                     IncludeCaption = true;

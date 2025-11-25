@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Ledger;
+
+using System.Utilities;
+
 report 7399 "Delete Empty Whse. Registers"
 {
     Caption = 'Delete Empty Whse. Registers';
@@ -8,7 +12,7 @@ report 7399 "Delete Empty Whse. Registers"
     {
         dataitem("Warehouse Register"; "Warehouse Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "Creation Date";
 
             trigger OnAfterGetRecord()

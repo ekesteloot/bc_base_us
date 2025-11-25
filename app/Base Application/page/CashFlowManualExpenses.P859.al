@@ -1,11 +1,16 @@
+namespace Microsoft.CashFlow.Setup;
+
+using Microsoft.CashFlow.Forecast;
+using Microsoft.FinancialMgt.Dimension;
+
 page 859 "Cash Flow Manual Expenses"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Cash Flow Manual Expenses';
     PageType = List;
     SourceTable = "Cash Flow Manual Expense";
-    SourceTableView = SORTING("Starting Date")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Starting Date")
+                      order(Ascending);
     UsageCategory = Lists;
 
     layout
@@ -15,7 +20,7 @@ page 859 "Cash Flow Manual Expenses"
             repeater(Control1000)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code of the record.';
@@ -41,7 +46,7 @@ page 859 "Cash Flow Manual Expenses"
 
                     trigger OnValidate()
                     begin
-                        ValidateFromDatePrecedesToDate("Starting Date", "Ending Date");
+                        ValidateFromDatePrecedesToDate(Rec."Starting Date", Rec."Ending Date");
                     end;
                 }
                 field(Amount; Rec.Amount)
@@ -61,7 +66,7 @@ page 859 "Cash Flow Manual Expenses"
                         RecurringFrequency: Text;
                     begin
                         RecurringFrequency := CashFlowManagement.RecurrenceToRecurringFrequency(Recurrence);
-                        Evaluate("Recurring Frequency", RecurringFrequency);
+                        Evaluate(Rec."Recurring Frequency", RecurringFrequency);
                         EnableControls();
                     end;
                 }
@@ -73,7 +78,7 @@ page 859 "Cash Flow Manual Expenses"
 
                     trigger OnValidate()
                     begin
-                        CashFlowManagement.RecurringFrequencyToRecurrence("Recurring Frequency", Recurrence);
+                        CashFlowManagement.RecurringFrequencyToRecurrence(Rec."Recurring Frequency", Recurrence);
                     end;
                 }
                 field("Ending Date"; Rec."Ending Date")
@@ -85,7 +90,7 @@ page 859 "Cash Flow Manual Expenses"
 
                     trigger OnValidate()
                     begin
-                        ValidateFromDatePrecedesToDate("Starting Date", "Ending Date");
+                        ValidateFromDatePrecedesToDate(Rec."Starting Date", Rec."Ending Date");
                     end;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
@@ -118,8 +123,8 @@ page 859 "Cash Flow Manual Expenses"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(850),
-                                  "No." = FIELD(Code);
+                    RunPageLink = "Table ID" = const(850),
+                                  "No." = field(Code);
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -149,7 +154,7 @@ page 859 "Cash Flow Manual Expenses"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        InitNewRecord();
+        Rec.InitNewRecord();
     end;
 
     var
@@ -161,14 +166,14 @@ page 859 "Cash Flow Manual Expenses"
     local procedure GetRecord()
     begin
         EnableControls();
-        CashFlowManagement.RecurringFrequencyToRecurrence("Recurring Frequency", Recurrence);
+        CashFlowManagement.RecurringFrequencyToRecurrence(Rec."Recurring Frequency", Recurrence);
     end;
 
     local procedure EnableControls()
     begin
         EndingDateEnabled := (Recurrence <> Recurrence::" ");
         if not EndingDateEnabled then
-            "Ending Date" := 0D;
+            Rec."Ending Date" := 0D;
     end;
 
     local procedure ValidateFromDatePrecedesToDate(FromDate: Date; ToDate: Date)

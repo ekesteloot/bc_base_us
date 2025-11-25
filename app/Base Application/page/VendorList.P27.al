@@ -1,4 +1,31 @@
-﻿page 27 "Vendor List"
+﻿namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.Comment;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Reports;
+using Microsoft.Purchases.Setup;
+using System.Automation;
+using System.Email;
+using System.Integration.PowerBI;
+using System.Integration.Word;
+using System.Text;
+
+page 27 "Vendor List"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Vendors';
@@ -74,7 +101,7 @@
                     ToolTip = 'Specifies the vendor''s intercompany partner code.';
                     Visible = false;
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the person you regularly contact when you do business with this vendor.';
@@ -138,7 +165,7 @@
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an alternate name that you can use to search for the record in question when you cannot remember the value in the Name field.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies which transactions with the vendor that cannot be processed, for example a vendor that is declared insolvent.';
@@ -193,7 +220,7 @@
 
                     trigger OnDrillDown()
                     begin
-                        OpenVendorLedgerEntries(false);
+                        Rec.OpenVendorLedgerEntries(false);
                     end;
                 }
                 field("Balance Due (LCY)"; Rec."Balance Due (LCY)")
@@ -203,7 +230,7 @@
 
                     trigger OnDrillDown()
                     begin
-                        OpenVendorLedgerEntries(true);
+                        Rec.OpenVendorLedgerEntries(true);
                     end;
                 }
                 field("Payments (LCY)"; Rec."Payments (LCY)")
@@ -241,44 +268,44 @@
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::Vendor), "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::Vendor), "No." = field("No.");
             }
             part(VendorDetailsFactBox; "Vendor Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                 Visible = false;
             }
             part(VendorStatisticsFactBox; "Vendor Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
             }
             part(VendorHistBuyFromFactBox; "Vendor Hist. Buy-from FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
             }
             part(VendorHistPayToFactBox; "Vendor Hist. Pay-to FactBox")
             {
                 ApplicationArea = All;
-                SubPageLink = "No." = FIELD("No."),
-                              "Currency Filter" = FIELD("Currency Filter"),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                SubPageLink = "No." = field("No."),
+                              "Currency Filter" = field("Currency Filter"),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                 Visible = false;
             }
 #if not CLEAN21
@@ -320,8 +347,8 @@
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(23),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(23),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -339,7 +366,7 @@
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(Vend);
-                            DefaultDimMultiple.SetMultiRecord(Vend, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(Vend, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -350,7 +377,7 @@
                     Caption = 'Bank Accounts';
                     Image = BankAccount;
                     RunObject = Page "Vendor Bank Account List";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'Open the list of the vendor''s bank accounts';
                 }
                 action("C&ontact")
@@ -363,7 +390,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowContact();
+                        Rec.ShowContact();
                     end;
                 }
                 separator(Action55)
@@ -375,7 +402,7 @@
                     Caption = 'Order &Addresses';
                     Image = Addresses;
                     RunObject = Page "Order Address List";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'View or edit alternate addresses for the vendor.';
                 }
                 action("&Locations")
@@ -383,7 +410,7 @@
                     Caption = '&Locations';
                     Image = Warehouse;
                     RunObject = Page "Vendor Locations";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'View the locations for the vendors.';
                 }
                 action(RemitAddresses)
@@ -392,7 +419,7 @@
                     Caption = 'Remit Addresses';
                     Image = Addresses;
                     RunObject = Page "Remit Address List";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'View or edit alternate remit addresses for the vendor.';
                 }
                 action("Co&mments")
@@ -401,8 +428,8 @@
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Vendor),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Vendor),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Item Refe&rences")
@@ -412,9 +439,9 @@
                     Caption = 'Item Refe&rences';
                     Image = Change;
                     RunObject = Page "Item References";
-                    RunPageLink = "Reference Type" = CONST(Vendor),
-                                  "Reference Type No." = FIELD("No.");
-                    RunPageView = SORTING("Reference Type", "Reference Type No.");
+                    RunPageLink = "Reference Type" = const(Vendor),
+                                  "Reference Type No." = field("No.");
+                    RunPageView = sorting("Reference Type", "Reference Type No.");
                     ToolTip = 'Set up a customer''s or vendor''s own identification of the selected item. references to the customer''s item number means that the item number is automatically shown on sales documents instead of the number that you use.';
                 }
                 action(ApprovalEntries)
@@ -427,7 +454,7 @@
 
                     trigger OnAction()
                     begin
-                        ApprovalsMgmt.OpenApprovalEntriesPage(RecordId);
+                        ApprovalsMgmt.OpenApprovalEntriesPage(Rec.RecordId);
                     end;
                 }
             }
@@ -441,8 +468,8 @@
                     Caption = 'Items';
                     Image = Item;
                     RunObject = Page "Vendor Item Catalog";
-                    RunPageLink = "Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Vendor No.");
+                    RunPageLink = "Vendor No." = field("No.");
+                    RunPageView = sorting("Vendor No.");
                     ToolTip = 'Open the list of items that you trade in.';
                 }
                 action("Invoice &Discounts")
@@ -451,7 +478,7 @@
                     Caption = 'Invoice &Discounts';
                     Image = CalculateInvoiceDiscount;
                     RunObject = Page "Vend. Invoice Discounts";
-                    RunPageLink = Code = FIELD("Invoice Disc. Code");
+                    RunPageLink = Code = field("Invoice Disc. Code");
                     ToolTip = 'Set up different discounts that are applied to invoices for the vendor. An invoice discount is automatically granted to the vendor when the total on a sales invoice exceeds a certain amount.';
                 }
                 action(PriceLists)
@@ -466,7 +493,7 @@
                     var
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        PriceUXManagement.ShowPriceLists(Rec, "Price Amount Type"::Any);
+                        PriceUXManagement.ShowPriceLists(Rec, Enum::"Price Amount Type"::Any);
                     end;
                 }
                 action(PriceLines)
@@ -485,7 +512,7 @@
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Price);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Price);
                     end;
                 }
                 action(DiscountLines)
@@ -504,7 +531,7 @@
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Discount);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
 #if not CLEAN21
@@ -536,8 +563,8 @@
                     Image = Price;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Purchase Prices";
-                    RunPageLink = "Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Vendor No.");
+                    RunPageLink = "Vendor No." = field("No.");
+                    RunPageView = sorting("Vendor No.");
                     ToolTip = 'View or set up different prices for items that you buy from the vendor. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -550,8 +577,8 @@
                     Image = LineDiscount;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Purchase Line Discounts";
-                    RunPageLink = "Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Vendor No.");
+                    RunPageLink = "Vendor No." = field("No.");
+                    RunPageView = sorting("Vendor No.");
                     ToolTip = 'View or set up different discounts for items that you buy from the vendor. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -564,8 +591,8 @@
                     Caption = 'Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Purchase Prepmt. Percentages";
-                    RunPageLink = "Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Vendor No.");
+                    RunPageLink = "Vendor No." = field("No.");
+                    RunPageView = sorting("Vendor No.");
                     ToolTip = 'View or edit the percentages of the price that can be paid as a prepayment. ';
                 }
                 action("Recurring Purchase Lines")
@@ -574,7 +601,7 @@
                     Caption = 'Recurring Purchase Lines';
                     Image = CodesList;
                     RunObject = Page "Standard Vendor Purchase Codes";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'View or edit recurring purchase lines for the vendor.';
                 }
                 action("Mapping Text to Account")
@@ -583,7 +610,7 @@
                     Caption = 'Mapping Text to Account';
                     Image = MapAccounts;
                     RunObject = Page "Text-to-Account Mapping Wksh.";
-                    RunPageLink = "Vendor No." = FIELD("No.");
+                    RunPageLink = "Vendor No." = field("No.");
                     ToolTip = 'Page mapping text to account';
                 }
             }
@@ -597,8 +624,8 @@
                     Caption = 'Quotes';
                     Image = Quote;
                     RunObject = Page "Purchase Quotes";
-                    RunPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Buy-from Vendor No.");
+                    RunPageLink = "Buy-from Vendor No." = field("No.");
+                    RunPageView = sorting("Document Type", "Buy-from Vendor No.");
                     ToolTip = 'View a list of ongoing purchase quotes.';
                 }
                 action(Orders)
@@ -607,8 +634,8 @@
                     Caption = 'Orders';
                     Image = Document;
                     RunObject = Page "Purchase Order List";
-                    RunPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Buy-from Vendor No.");
+                    RunPageLink = "Buy-from Vendor No." = field("No.");
+                    RunPageView = sorting("Document Type", "Buy-from Vendor No.");
                     ToolTip = 'View a list of ongoing purchase orders for the vendor.';
                 }
                 action("Return Orders")
@@ -617,8 +644,8 @@
                     Caption = 'Return Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Purchase Return Order List";
-                    RunPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Buy-from Vendor No.");
+                    RunPageLink = "Buy-from Vendor No." = field("No.");
+                    RunPageView = sorting("Document Type", "Buy-from Vendor No.");
                     ToolTip = 'Open the list of ongoing return orders.';
                 }
                 action("Blanket Orders")
@@ -627,8 +654,8 @@
                     Caption = 'Blanket Orders';
                     Image = BlanketOrder;
                     RunObject = Page "Blanket Purchase Orders";
-                    RunPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Buy-from Vendor No.");
+                    RunPageLink = "Buy-from Vendor No." = field("No.");
+                    RunPageView = sorting("Document Type", "Buy-from Vendor No.");
                     ToolTip = 'Open the list of ongoing blanket orders.';
                 }
             }
@@ -642,9 +669,9 @@
                     Caption = 'Ledger E&ntries';
                     Image = VendorLedger;
                     RunObject = Page "Vendor Ledger Entries";
-                    RunPageLink = "Vendor No." = FIELD("No.");
-                    RunPageView = SORTING("Vendor No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Vendor No." = field("No.");
+                    RunPageView = sorting("Vendor No.")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -654,10 +681,10 @@
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Vendor Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -667,9 +694,9 @@
                     Caption = 'Purchases';
                     Image = Purchase;
                     RunObject = Page "Vendor Purchases";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'Shows a summary of vendor ledger entries. You select the time interval in the View by field. The Period column on the left contains a series of dates that are determined by the time interval you have selected.';
                 }
                 action("Entry Statistics")
@@ -678,10 +705,10 @@
                     Caption = 'Entry Statistics';
                     Image = EntryStatistics;
                     RunObject = Page "Vendor Entry Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'View entry statistics for the record.';
                 }
                 action("1099 Statistics")
@@ -690,7 +717,7 @@
                     Caption = '1099 Statistics';
                     Image = Statistics1099;
                     RunObject = Page "Vendor 1099 Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'Shift+F11';
                     ToolTip = 'View the vendor 1099 statistics that you can use to create 1099 reports and generate the files necessary to submit 1099 information to the Internal Revenue Service (IRS). This information is required to report paid vendor income.';
                 }
@@ -700,10 +727,10 @@
                     Caption = 'Statistics by C&urrencies';
                     Image = Currencies;
                     RunObject = Page "Vend. Stats. by Curr. Lines";
-                    RunPageLink = "Vendor Filter" = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "Vendor Filter" = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Date Filter" = field("Date Filter");
                     ToolTip = 'View statistics for vendors that use multiple currencies.';
                 }
                 action("Item &Tracking Entries")
@@ -717,7 +744,7 @@
                     var
                         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
                     begin
-                        ItemTrackingDocMgt.ShowItemTrackingForEntity(2, "No.", '', '', '');
+                        ItemTrackingDocMgt.ShowItemTrackingForEntity(2, Rec."No.", '', '', '');
                     end;
                 }
                 action("Sent Emails")
@@ -740,7 +767,7 @@
                 Caption = 'Dataverse';
                 Image = Administration;
                 Visible = CRMIntegrationEnabled or CDSIntegrationEnabled;
-                Enabled = (BlockedFilterApplied and (Blocked = Blocked::" ")) or not BlockedFilterApplied;
+                Enabled = (BlockedFilterApplied and (Rec.Blocked = Rec.Blocked::" ")) or not BlockedFilterApplied;
                 action(CDSGotoAccount)
                 {
                     ApplicationArea = Suite;
@@ -752,7 +779,7 @@
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CDSSynchronizeNow)
@@ -797,7 +824,7 @@
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(MatchBasedCoupling)
@@ -887,7 +914,7 @@
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -900,7 +927,7 @@
                 Caption = 'Blanket Purchase Order';
                 Image = BlanketOrder;
                 RunObject = Page "Blanket Purchase Order";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new blanket purchase order for the vendor.';
             }
@@ -910,7 +937,7 @@
                 Caption = 'Purchase Quote';
                 Image = Quote;
                 RunObject = Page "Purchase Quote";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase quote for the vendor.';
             }
@@ -920,7 +947,7 @@
                 Caption = 'Purchase Invoice';
                 Image = NewPurchaseInvoice;
                 RunObject = Page "Purchase Invoice";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase invoice for items or services.';
             }
@@ -930,7 +957,7 @@
                 Caption = 'Purchase Order';
                 Image = Document;
                 RunObject = Page "Purchase Order";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase order.';
             }
@@ -940,7 +967,7 @@
                 Caption = 'Purchase Credit Memo';
                 Image = CreditMemo;
                 RunObject = Page "Purchase Credit Memo";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase credit memo to revert a posted purchase invoice.';
                 AboutTitle = 'Create a new document';
@@ -952,7 +979,7 @@
                 Caption = 'Purchase Return Order';
                 Image = ReturnOrder;
                 RunObject = Page "Purchase Return Order";
-                RunPageLink = "Buy-from Vendor No." = FIELD("No.");
+                RunPageLink = "Buy-from Vendor No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase return order for the vendor.';
             }
@@ -992,7 +1019,7 @@
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
                         ApprovalsMgmt.OnCancelVendorApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
             }
@@ -1046,10 +1073,10 @@
                 Caption = 'Pay Vendor';
                 Image = SuggestVendorPayments;
                 RunObject = Page "Vendor Ledger Entries";
-                RunPageLink = "Vendor No." = FIELD("No."),
-                              "Remaining Amount" = FILTER(< 0),
-                              "Applies-to ID" = FILTER(''),
-                              "Document Type" = FILTER(Invoice);
+                RunPageLink = "Vendor No." = field("No."),
+                              "Remaining Amount" = filter(< 0),
+                              "Applies-to ID" = filter(''),
+                              "Document Type" = filter(Invoice);
                 ToolTip = 'Opens vendor ledger entries for the selected vendor with invoices that have not been paid yet.';
             }
             action(WordTemplate)
@@ -1542,21 +1569,21 @@
         Vendor: Record Vendor;
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
 
         CRMIsCoupledToRecord := CRMIntegrationEnabled or CDSIntegrationEnabled;
         if CRMIsCoupledToRecord then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
 
 #if not CLEAN21
         // Contextual Power BI FactBox: send data to filter the report in the FactBox
-        CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection("No.", false, PowerBIVisible);
+        CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection(Rec."No.", false, PowerBIVisible);
 #endif
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection("No.");
+        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection(Rec."No.");
 
         CurrPage.SetSelectionFilter(Vendor);
         CanSendEmail := Vendor.Count() = 1;
@@ -1597,7 +1624,6 @@
         ReadSoftOCRMasterDataSync: Codeunit "ReadSoft OCR Master Data Sync";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
         PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
-        [InDataSet]
         CanSendEmail: Boolean;
         OpenApprovalEntriesExist: Boolean;
         CanCancelApprovalForRecord: Boolean;

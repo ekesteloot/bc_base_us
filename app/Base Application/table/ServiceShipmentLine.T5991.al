@@ -1,3 +1,29 @@
+﻿namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Pricing;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Structure;
+using System.Reflection;
+using System.Security.User;
+
 table 5991 "Service Shipment Line"
 {
     Caption = 'Service Shipment Line';
@@ -29,15 +55,15 @@ table 5991 "Service Shipment Line"
         field(6; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(" ")) "Standard Text"
-            ELSE
-            IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST(Cost)) "Service Cost"
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account";
+            TableRelation = if (Type = const(" ")) "Standard Text"
+            else
+            if (Type = const(Item)) Item
+            else
+            if (Type = const(Resource)) Resource
+            else
+            if (Type = const(Cost)) "Service Cost"
+            else
+            if (Type = const("G/L Account")) "G/L Account";
         }
         field(7; "Location Code"; Code[10])
         {
@@ -47,7 +73,7 @@ table 5991 "Service Shipment Line"
         field(8; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
-            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group";
+            TableRelation = if (Type = const(Item)) "Inventory Posting Group";
         }
         field(11; Description; Text[100])
         {
@@ -68,7 +94,7 @@ table 5991 "Service Shipment Line"
         }
         field(22; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             CaptionClass = GetCaptionClass(FieldNo("Unit Price"));
             Caption = 'Unit Price';
@@ -129,13 +155,13 @@ table 5991 "Service Shipment Line"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(41; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(42; "Customer Price Group"; Code[10])
         {
@@ -251,13 +277,13 @@ table 5991 "Service Shipment Line"
         }
         field(99; "VAT Base Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'VAT Base Amount';
         }
         field(100; "Unit Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Cost';
         }
@@ -269,7 +295,7 @@ table 5991 "Service Shipment Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(950; "Time Sheet No."; Code[20])
@@ -280,23 +306,23 @@ table 5991 "Service Shipment Line"
         field(951; "Time Sheet Line No."; Integer)
         {
             Caption = 'Time Sheet Line No.';
-            TableRelation = "Time Sheet Line"."Line No." WHERE("Time Sheet No." = FIELD("Time Sheet No."));
+            TableRelation = "Time Sheet Line"."Line No." where("Time Sheet No." = field("Time Sheet No."));
         }
         field(952; "Time Sheet Date"; Date)
         {
             Caption = 'Time Sheet Date';
-            TableRelation = "Time Sheet Detail".Date WHERE("Time Sheet No." = FIELD("Time Sheet No."),
-                                                            "Time Sheet Line No." = FIELD("Time Sheet Line No."));
+            TableRelation = "Time Sheet Detail".Date where("Time Sheet No." = field("Time Sheet No."),
+                                                            "Time Sheet Line No." = field("Time Sheet Line No."));
         }
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
@@ -308,8 +334,8 @@ table 5991 "Service Shipment Line"
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
             "Unit of Measure";
         }
         field(5415; "Quantity (Base)"; Decimal)
@@ -393,7 +419,7 @@ table 5991 "Service Shipment Line"
         field(5916; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Customer No."));
         }
         field(5918; "Quantity Consumed"; Decimal)
         {
@@ -423,8 +449,8 @@ table 5991 "Service Shipment Line"
         field(5931; "Fault Code"; Code[10])
         {
             Caption = 'Fault Code';
-            TableRelation = "Fault Code".Code WHERE("Fault Area Code" = FIELD("Fault Area Code"),
-                                                     "Symptom Code" = FIELD("Symptom Code"));
+            TableRelation = "Fault Code".Code where("Fault Area Code" = field("Fault Area Code"),
+                                                     "Symptom Code" = field("Symptom Code"));
         }
         field(5932; "Resolution Code"; Code[10])
         {
@@ -442,7 +468,7 @@ table 5991 "Service Shipment Line"
         field(5936; "Contract No."; Code[20])
         {
             Caption = 'Contract No.';
-            TableRelation = "Service Contract Header"."Contract No." WHERE("Contract Type" = CONST(Contract));
+            TableRelation = "Service Contract Header"."Contract No." where("Contract Type" = const(Contract));
         }
         field(5938; "Contract Disc. %"; Decimal)
         {
@@ -476,9 +502,9 @@ table 5991 "Service Shipment Line"
         field(5968; "Replaced Item No."; Code[20])
         {
             Caption = 'Replaced Item No.';
-            TableRelation = IF ("Replaced Item Type" = CONST(Item)) Item
-            ELSE
-            IF ("Replaced Item Type" = CONST("Service Item")) "Service Item";
+            TableRelation = if ("Replaced Item Type" = const(Item)) Item
+            else
+            if ("Replaced Item Type" = const("Service Item")) "Service Item";
         }
         field(5969; "Exclude Contract Discount"; Boolean)
         {
@@ -676,6 +702,7 @@ table 5991 "Service Shipment Line"
 
             ServiceLine."Shipment No." := "Document No.";
             ServiceLine."Shipment Line No." := "Line No.";
+            ServiceLine."Order No." := "Order No.";
 
             if not ExtTextLine then
                 ValidateServiceLineAmounts(ServiceLine, ServiceOrderLine, ServiceInvHeader);

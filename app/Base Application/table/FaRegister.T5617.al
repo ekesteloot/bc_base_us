@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using System.Security.AccessControl;
+
 table 5617 "FA Register"
 {
     Caption = 'FA Register';
@@ -33,8 +39,6 @@ table 5617 "FA Register"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(7; "Journal Batch Name"; Code[10])
         {
@@ -51,8 +55,6 @@ table 5617 "FA Register"
             BlankZero = true;
             Caption = 'G/L Register No.';
             TableRelation = "G/L Register";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(10; "From Maintenance Entry No."; Integer)
         {

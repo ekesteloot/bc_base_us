@@ -31,7 +31,7 @@ table 5847 "Average Cost Calc. Overview"
         field(6; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(7; "Cost is Adjusted"; Boolean)
         {

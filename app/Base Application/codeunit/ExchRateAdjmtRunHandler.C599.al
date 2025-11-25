@@ -5,7 +5,7 @@ codeunit 599 "Exch. Rate Adjmt. Run Handler"
         RunExchangeRateAdjustment();
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     var
         FeatureKeyManagement: Codeunit "Feature Key Management";
 #endif
@@ -19,7 +19,7 @@ codeunit 599 "Exch. Rate Adjmt. Run Handler"
         if IsHandled then
             exit;
 
-#if not CLEAN20
+#if not CLEAN23
         IsHandled := FeatureKeyManagement.IsExtensibleExchangeRateAdjustmentEnabled();
         Commit();
 
@@ -34,7 +34,7 @@ codeunit 599 "Exch. Rate Adjmt. Run Handler"
 
     procedure RunCustExchRateAdjustment(GenJnlLine: Record "Gen. Journal Line"; var TempCustLedgerEntry: Record "Cust. Ledger Entry" temporary)
     var
-#if not CLEAN20
+#if not CLEAN23
         AdjustExchangeRates: Report "Adjust Exchange Rates";
 #endif
         ExchRateAdjmtProcess: Codeunit "Exch. Rate Adjmt. Process";
@@ -43,7 +43,7 @@ codeunit 599 "Exch. Rate Adjmt. Run Handler"
         IsHandled := false;
         OnBeforeRunCustExchRateAdjustment(GenJnlLine, TempCustLedgerEntry, IsHandled);
         if not IsHandled then
-#if not CLEAN20
+#if not CLEAN23
             if FeatureKeyManagement.IsExtensibleExchangeRateAdjustmentEnabled() then
                 ExchRateAdjmtProcess.AdjustExchRateCust(GenJnlLine, TempCustLedgerEntry)
             else
@@ -55,7 +55,7 @@ codeunit 599 "Exch. Rate Adjmt. Run Handler"
 
     procedure RunVendExchRateAdjustment(GenJnlLine: Record "Gen. Journal Line"; var TempVendorLedgerEntry: Record "Vendor Ledger Entry" temporary)
     var
-#if not CLEAN20
+#if not CLEAN23
         AdjustExchangeRates: Report "Adjust Exchange Rates";
 #endif
         ExchRateAdjmtProcess: Codeunit "Exch. Rate Adjmt. Process";
@@ -64,7 +64,7 @@ codeunit 599 "Exch. Rate Adjmt. Run Handler"
         IsHandled := false;
         OnBeforeRunVendExchRateAdjustment(GenJnlLine, TempVendorLedgerEntry, IsHandled);
         if not IsHandled then
-#if not CLEAN20
+#if not CLEAN23
             if FeatureKeyManagement.IsExtensibleExchangeRateAdjustmentEnabled() then
                 ExchRateAdjmtProcess.AdjustExchRateVend(GenJnlLine, TempVendorLedgerEntry)
             else

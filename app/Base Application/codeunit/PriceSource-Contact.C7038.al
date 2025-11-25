@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Source;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Sales.Customer;
+
 codeunit 7038 "Price Source - Contact" implements "Price Source"
 {
     var
@@ -59,6 +70,27 @@ codeunit 7038 "Price Source - Contact" implements "Price Source"
     begin
         PriceSource.Description := Contact.Name;
         OnAfterFillAdditionalFields(PriceSource, Contact);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Price Source List", 'OnBeforeAddChildren', '', false, false)]
+    local procedure AddChildren(var Sender: Codeunit "Price Source List"; PriceSource: Record "Price Source"; var TempChildPriceSource: Record "Price Source" temporary);
+    var
+        ContactBusinessRelation: Record "Contact Business Relation";
+        Customer: Record Customer;
+    begin
+        if PriceSource."Source Type" = "Price Source Type"::Contact then begin
+            ContactBusinessRelation.SetLoadFields("No.");
+            ContactBusinessRelation.SetRange("Contact No.", PriceSource."Source No.");
+            ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
+            if ContactBusinessRelation.FindSet() then
+                repeat
+                    Customer.SetLoadFields("No.");
+                    if Customer.Get(ContactBusinessRelation."No.") then begin
+                        Customer.ToPriceSource(TempChildPriceSource);
+                        Sender.Add(TempChildPriceSource);
+                    end;
+                until ContactBusinessRelation.Next() = 0;
+        end;
     end;
 
     [IntegrationEvent(false, false)]

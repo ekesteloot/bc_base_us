@@ -10,7 +10,7 @@ page 1878 "VAT Bus. Post. Grp Part"
         {
             repeater(Group)
             {
-                field(Selected; Selected)
+                field(Selected; Rec.Selected)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Include';
@@ -18,22 +18,22 @@ page 1878 "VAT Bus. Post. Grp Part"
 
                     trigger OnValidate()
                     begin
-                        if not Selected then
-                            if CheckExistingCustomersAndVendorsWithVAT(Code) then begin
+                        if not Rec.Selected then
+                            if Rec.CheckExistingCustomersAndVendorsWithVAT(Rec.Code) then begin
                                 TrigerNotification(VATBusGrpExistingDataErrorMsg);
-                                Selected := true;
+                                Rec.Selected := true;
                             end;
                     end;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the posting group that determines how to calculate and post VAT for customers and vendors. The number of VAT posting groups that you set up can depend on local legislation and whether you trade both domestically and internationally.';
 
                     trigger OnValidate()
                     begin
-                        if (Code <> xRec.Code) and (xRec.Code <> '') then
-                            if CheckExistingCustomersAndVendorsWithVAT(xRec.Code) then begin
+                        if (Rec.Code <> xRec.Code) and (xRec.Code <> '') then
+                            if Rec.CheckExistingCustomersAndVendorsWithVAT(xRec.Code) then begin
                                 TrigerNotification(VATBusGrpExistingDataErrorMsg);
                                 Error('');
                             end;
@@ -54,11 +54,11 @@ page 1878 "VAT Bus. Post. Grp Part"
 
     trigger OnDeleteRecord(): Boolean
     begin
-        if CheckExistingCustomersAndVendorsWithVAT(Code) then begin
+        if Rec.CheckExistingCustomersAndVendorsWithVAT(Rec.Code) then begin
             TrigerNotification(VATBusGrpExistingDataErrorMsg);
             exit(false);
         end;
-        if Count = 1 then begin
+        if Rec.Count = 1 then begin
             TrigerNotification(VATBusGrpEmptyErrorMsg);
             exit(false);
         end;
@@ -66,15 +66,15 @@ page 1878 "VAT Bus. Post. Grp Part"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Selected := true;
+        Rec.Selected := true;
     end;
 
     trigger OnOpenPage()
     begin
         VATBusGrpNotification.Id := Format(CreateGuid());
-        PopulateVATBusGrp();
-        Selected := true;
-        SetRange(Default, false);
+        Rec.PopulateVATBusGrp();
+        Rec.Selected := true;
+        Rec.SetRange(Default, false);
     end;
 
     var

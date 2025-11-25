@@ -13,7 +13,7 @@ page 257 "Source Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the source code.';
@@ -54,8 +54,8 @@ page 257 "Source Codes"
                     Caption = 'G/L Registers';
                     Image = GLRegisters;
                     RunObject = Page "G/L Registers";
-                    RunPageLink = "Source Code" = FIELD(Code);
-                    RunPageView = SORTING("Source Code");
+                    RunPageLink = "Source Code" = field(Code);
+                    RunPageView = sorting("Source Code");
                     ToolTip = 'View posted G/L entries.';
                 }
                 action("Item Registers")
@@ -64,8 +64,8 @@ page 257 "Source Codes"
                     Caption = 'Item Registers';
                     Image = ItemRegisters;
                     RunObject = Page "Item Registers";
-                    RunPageLink = "Source Code" = FIELD(Code);
-                    RunPageView = SORTING("Source Code");
+                    RunPageLink = "Source Code" = field(Code);
+                    RunPageView = sorting("Source Code");
                     ToolTip = 'View posted item entries.';
                 }
                 action("Resource Registers")
@@ -74,8 +74,8 @@ page 257 "Source Codes"
                     Caption = 'Resource Registers';
                     Image = ResourceRegisters;
                     RunObject = Page "Resource Registers";
-                    RunPageLink = "Source Code" = FIELD(Code);
-                    RunPageView = SORTING("Source Code");
+                    RunPageLink = "Source Code" = field(Code);
+                    RunPageView = sorting("Source Code");
                     ToolTip = 'View a list of all the resource registers. Every time a resource entry is posted, a register is created. Every register shows the first and last entry numbers of its entries. You can use the information in a resource register to document when entries were posted.';
                 }
                 action("Job Registers")
@@ -84,8 +84,8 @@ page 257 "Source Codes"
                     Caption = 'Job Registers';
                     Image = JobRegisters;
                     RunObject = Page "Job Registers";
-                    RunPageLink = "Source Code" = FIELD(Code);
-                    RunPageView = SORTING("Source Code");
+                    RunPageLink = "Source Code" = field(Code);
+                    RunPageView = sorting("Source Code");
                     ToolTip = 'Open the related job registers.';
                 }
                 action("FA Registers")
@@ -94,8 +94,8 @@ page 257 "Source Codes"
                     Caption = 'FA Registers';
                     Image = FARegisters;
                     RunObject = Page "FA Registers";
-                    RunPageLink = "Source Code" = FIELD(Code);
-                    RunPageView = SORTING("Source Code");
+                    RunPageLink = "Source Code" = field(Code);
+                    RunPageView = sorting("Source Code");
                     ToolTip = 'View the fixed asset registers. Every register shows the first and last entry numbers of its entries. An FA register is created when you post a transaction that results in one or more FA entries.';
                 }
                 action("I&nsurance Registers")
@@ -104,8 +104,8 @@ page 257 "Source Codes"
                     Caption = 'I&nsurance Registers';
                     Image = InsuranceRegisters;
                     RunObject = Page "Insurance Registers";
-                    RunPageLink = "Source Code" = FIELD(Code);
-                    RunPageView = SORTING("Source Code");
+                    RunPageLink = "Source Code" = field(Code);
+                    RunPageView = sorting("Source Code");
                     ToolTip = 'View posted insurance entries.';
                 }
                 action("Warehouse Registers")
@@ -114,8 +114,8 @@ page 257 "Source Codes"
                     Caption = 'Warehouse Registers';
                     Image = WarehouseRegisters;
                     RunObject = Page "Warehouse Registers";
-                    RunPageLink = "Source Code" = FIELD(Code);
-                    RunPageView = SORTING("Source Code");
+                    RunPageLink = "Source Code" = field(Code);
+                    RunPageView = sorting("Source Code");
                     ToolTip = 'View all warehouse entries per registration date.';
                 }
             }

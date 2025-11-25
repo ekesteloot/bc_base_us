@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
 table 2587 "Invalidated Dim Correction"
 {
     DataClassification = CustomerContent;

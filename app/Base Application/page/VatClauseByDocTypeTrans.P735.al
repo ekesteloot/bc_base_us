@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 page 735 "VAT Clause by Doc. Type Trans."
 {
     Caption = 'VAT Clause by Document Type Translations';

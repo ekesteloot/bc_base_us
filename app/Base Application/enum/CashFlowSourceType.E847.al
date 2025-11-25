@@ -1,3 +1,5 @@
+namespace Microsoft.CashFlow.Setup;
+
 enum 847 "Cash Flow Source Type"
 {
     Extensible = true;

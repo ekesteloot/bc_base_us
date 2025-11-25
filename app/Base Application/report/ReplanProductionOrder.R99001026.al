@@ -1,3 +1,14 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+
 report 99001026 "Replan Production Order"
 {
     Caption = 'Replan Production Order';
@@ -7,15 +18,15 @@ report 99001026 "Replan Production Order"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.") WHERE(Status = FILTER(.. Released));
+            DataItemTableView = sorting(Status, "No.") where(Status = filter(.. Released));
             dataitem("Prod. Order Line"; "Prod. Order Line")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Planning Level Code");
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Planning Level Code");
                 dataitem("Prod. Order Routing Line"; "Prod. Order Routing Line")
                 {
-                    DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("Prod. Order No."), "Routing No." = FIELD("Routing No.");
-                    DataItemTableView = SORTING(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
+                    DataItemLink = Status = field(Status), "Prod. Order No." = field("Prod. Order No."), "Routing No." = field("Routing No.");
+                    DataItemTableView = sorting(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
 
                     trigger OnAfterGetRecord()
                     var
@@ -71,8 +82,8 @@ report 99001026 "Replan Production Order"
                 }
                 dataitem("Prod. Order Component"; "Prod. Order Component")
                 {
-                    DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("Prod. Order No."), "Prod. Order Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
+                    DataItemLink = Status = field(Status), "Prod. Order No." = field("Prod. Order No."), "Prod. Order Line No." = field("Line No.");
+                    DataItemTableView = sorting(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
 
                     trigger OnAfterGetRecord()
                     var
@@ -354,7 +365,7 @@ report 99001026 "Replan Production Order"
                         if "Reserved Qty. (Base)" = 0 then
                             Delete(true)
                         else begin
-                            ExtReservedQtyBase := CalcQtyReservedFromExternalDemand(ProdOrderLine, DATABASE::"Prod. Order Component");
+                            ExtReservedQtyBase := CalcQtyReservedFromExternalDemand(ProdOrderLine, Enum::TableID::"Prod. Order Component".AsInteger());
                             Validate(
                               Quantity,
                               UOMMgt.CalcQtyFromBase(

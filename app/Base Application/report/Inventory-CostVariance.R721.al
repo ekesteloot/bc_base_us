@@ -1,7 +1,12 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+
 report 721 "Inventory - Cost Variance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InventoryCostVariance.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InventoryCostVariance.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory - Cost Variance';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 721 "Inventory - Cost Variance"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Costing Method", "Location Filter";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
@@ -80,14 +85,14 @@ report 721 "Inventory - Cost Variance"
             }
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Location Code" = FIELD("Location Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date") WHERE("Entry Type" = FILTER(Purchase | "Positive Adjmt."));
+                DataItemLink = "Item No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date") where("Entry Type" = filter(Purchase | "Positive Adjmt."));
                 PrintOnlyIfDetail = true;
                 RequestFilterFields = "Posting Date", "Source Type", "Source No.";
                 dataitem("Value Entry"; "Value Entry")
                 {
-                    DataItemLink = "Item Ledger Entry No." = FIELD("Entry No."), "Variant Code" = FIELD("Variant Code"), "Location Code" = FIELD("Location Code"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Code"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Code");
-                    DataItemTableView = SORTING("Item Ledger Entry No.") WHERE("Expected Cost" = CONST(false));
+                    DataItemLink = "Item Ledger Entry No." = field("Entry No."), "Variant Code" = field("Variant Code"), "Location Code" = field("Location Code"), "Global Dimension 1 Code" = field("Global Dimension 1 Code"), "Global Dimension 2 Code" = field("Global Dimension 2 Code");
+                    DataItemTableView = sorting("Item Ledger Entry No.") where("Expected Cost" = const(false));
                     column(No_ItemLedgerEntry; "Item Ledger Entry"."Entry No.")
                     {
                         IncludeCaption = true;

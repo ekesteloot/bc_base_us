@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 codeunit 33 "Vendor Card Calculations"
 {
     trigger OnRun()

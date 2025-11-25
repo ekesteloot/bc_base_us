@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 page 910 "Assembly Item - Details"
 {
     Caption = 'Assembly Item - Details';

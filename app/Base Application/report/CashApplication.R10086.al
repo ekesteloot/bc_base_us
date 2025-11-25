@@ -146,8 +146,8 @@ report 10086 "Cash Application"
             }
             dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
             {
-                DataItemLink = "Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date") WHERE(Open = CONST(true), Positive = CONST(false), "On Hold" = CONST(''));
+                DataItemLink = "Vendor No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date") where(Open = const(true), Positive = const(false), "On Hold" = const(''));
                 column(Vendor_Ledger_Entry__Document_Type_; "Document Type")
                 {
                 }
@@ -210,8 +210,8 @@ report 10086 "Cash Application"
             }
             dataitem("Vendor Ledger Entry 2"; "Vendor Ledger Entry")
             {
-                DataItemLink = "Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date") WHERE(Open = CONST(true), Positive = CONST(false));
+                DataItemLink = "Vendor No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date") where(Open = const(true), Positive = const(false));
                 column(Vendor_Ledger_Entry_2__Document_Type_; "Document Type")
                 {
                 }
@@ -284,7 +284,7 @@ report 10086 "Cash Application"
             }
             dataitem("Vendor Totals"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(Vendor__No___Control61; Vendor."No.")
                 {
                 }

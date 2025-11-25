@@ -1,4 +1,6 @@
-﻿enum 5719 "Nonstock Item No. Format"
+﻿namespace Microsoft.InventoryMgt.Item.Catalog;
+
+enum 5719 "Nonstock Item No. Format"
 {
     Extensible = true;
     AssignmentCompatibility = true;

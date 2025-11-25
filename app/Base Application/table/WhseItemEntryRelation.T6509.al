@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Ledger;
+
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Tracking;
+
 table 6509 "Whse. Item Entry Relation"
 {
     Caption = 'Whse. Item Entry Relation';

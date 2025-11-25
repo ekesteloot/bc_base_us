@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.RoleCenters;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Shared.Navigate;
+
 page 9063 "Purchase Agent Activities"
 {
     Caption = 'Activities';

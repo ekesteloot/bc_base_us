@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 enum 727 "Analysis Dimension Option"
 {
     Extensible = true;

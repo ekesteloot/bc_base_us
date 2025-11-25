@@ -57,7 +57,7 @@ page 5212 "Absence Registration"
                     ToolTip = 'Specifies the quantity associated with absences, in hours or days.';
                     Visible = false;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies if a comment is associated with this entry.';
@@ -93,8 +93,8 @@ page 5212 "Absence Registration"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Human Resource Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Employee Absence"),
-                                  "Table Line No." = FIELD("Entry No.");
+                    RunPageLink = "Table Name" = const("Employee Absence"),
+                                  "Table Line No." = field("Entry No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 separator(Action31)
@@ -106,7 +106,7 @@ page 5212 "Absence Registration"
                     Caption = 'Overview by &Categories';
                     Image = AbsenceCategory;
                     RunObject = Page "Absence Overview by Categories";
-                    RunPageLink = "Employee No. Filter" = FIELD("Employee No.");
+                    RunPageLink = "Employee No. Filter" = field("Employee No.");
                     ToolTip = 'View categorized absence information for employees.';
                 }
                 action("Overview by &Periods")
@@ -123,7 +123,7 @@ page 5212 "Absence Registration"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        exit(Employee.Get("Employee No."));
+        exit(Employee.Get(Rec."Employee No."));
     end;
 
     var

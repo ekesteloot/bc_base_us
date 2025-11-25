@@ -1,3 +1,16 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Worksheet;
+
 codeunit 5752 "Get Source Doc. Outbound"
 {
 
@@ -11,7 +24,6 @@ codeunit 5752 "Get Source Doc. Outbound"
         Text001: Label 'If %1 is %2 in %3 no. %4, then all associated lines where type is %5 must use the same location.';
         Text002: Label 'The warehouse shipment was not created because the Shipping Advice field is set to Complete, and item no. %1 is not available in location code %2.\\You can create the warehouse shipment by either changing the Shipping Advice field to Partial in %3 no. %4 or by manually filling in the warehouse shipment document.';
         Text003: Label 'The warehouse shipment was not created because an open warehouse shipment exists for the Sales Header and Shipping Advice is %1.\\You must add the item(s) as new line(s) to the existing warehouse shipment or change Shipping Advice to Partial.';
-        Text004: Label 'No %1 was found. The warehouse shipment could not be created.';
 
     local procedure CreateWhseShipmentHeaderFromWhseRequest(var WarehouseRequest: Record "Warehouse Request") Result: Boolean
     var
@@ -40,15 +52,15 @@ codeunit 5752 "Get Source Doc. Outbound"
 
     procedure GetOutboundDocs(var WhseShptHeader: Record "Warehouse Shipment Header")
     var
-        WhseGetSourceFilterRec: Record "Warehouse Source Filter";
+        WhseGetSourceFilter: Record "Warehouse Source Filter";
         WhseSourceFilterSelection: Page "Filters to Get Source Docs.";
     begin
         WhseShptHeader.Find();
         WhseSourceFilterSelection.SetOneCreatedShptHeader(WhseShptHeader);
-        WhseGetSourceFilterRec.FilterGroup(2);
-        WhseGetSourceFilterRec.SetRange(Type, WhseGetSourceFilterRec.Type::Outbound);
-        WhseGetSourceFilterRec.FilterGroup(0);
-        WhseSourceFilterSelection.SetTableView(WhseGetSourceFilterRec);
+        WhseGetSourceFilter.FilterGroup(2);
+        WhseGetSourceFilter.SetRange(Type, WhseGetSourceFilter.Type::Outbound);
+        WhseGetSourceFilter.FilterGroup(0);
+        WhseSourceFilterSelection.SetTableView(WhseGetSourceFilter);
         WhseSourceFilterSelection.RunModal();
 
         UpdateShipmentHeaderStatus(WhseShptHeader);
@@ -122,12 +134,7 @@ codeunit 5752 "Get Source Doc. Outbound"
             exit(false);
 
         FindWarehouseRequestForSalesOrder(WhseRqst, SalesHeader);
-
-        if WhseRqst.IsEmpty() then
-            exit(false);
-
-        CreateWhseShipmentHeaderFromWhseRequest(WhseRqst);
-        exit(true);
+        exit(CreateWhseShipmentHeaderFromWhseRequest(WhseRqst));
     end;
 
     procedure CreateFromPurchaseReturnOrder(PurchHeader: Record "Purchase Header")
@@ -260,7 +267,7 @@ codeunit 5752 "Get Source Doc. Outbound"
 
                         if CheckAvailability(
                              CurrItemVariant, QtyOutstandingBase, SalesLine."Location Code",
-                             SalesOrder.Caption, DATABASE::"Sales Line", "Document Type".AsInteger(), "No.", ShowError)
+                             SalesOrder.Caption, Enum::TableID::"Sales Line".AsInteger(), "Document Type".AsInteger(), "No.", ShowError)
                         then
                             exit(true);
                         SetItemVariant(CurrItemVariant, SalesLine."No.", SalesLine."Variant Code");
@@ -274,7 +281,7 @@ codeunit 5752 "Get Source Doc. Outbound"
 
                         if CheckAvailability(
                              CurrItemVariant, QtyOutstandingBase, SalesLine."Location Code",
-                             SalesOrder.Caption, DATABASE::"Sales Line", "Document Type".AsInteger(), "No.", ShowError)
+                             SalesOrder.Caption, Enum::TableID::"Sales Line".AsInteger(), "Document Type".AsInteger(), "No.", ShowError)
                         then
                             exit(true);
                     end;
@@ -341,7 +348,7 @@ codeunit 5752 "Get Source Doc. Outbound"
                     else begin
                         if CheckAvailability(
                              CurrItemVariant, QtyOutstandingBase, TransferLine."Transfer-from Code",
-                             TransferOrder.Caption, DATABASE::"Transfer Line", 0, "No.", ShowError)
+                             TransferOrder.Caption, Enum::TableID::"Transfer Line".AsInteger(), 0, "No.", ShowError)
                         then // outbound
                             exit(true);
                         SetItemVariant(CurrItemVariant, TransferLine."Item No.", TransferLine."Variant Code");
@@ -350,7 +357,7 @@ codeunit 5752 "Get Source Doc. Outbound"
                     if RecordNo = TotalNoOfRecords then // last record
                         if CheckAvailability(
                              CurrItemVariant, QtyOutstandingBase, TransferLine."Transfer-from Code",
-                             TransferOrder.Caption, DATABASE::"Transfer Line", 0, "No.", ShowError)
+                             TransferOrder.Caption, Enum::TableID::"Transfer Line".AsInteger(), 0, "No.", ShowError)
                         then // outbound
                             exit(true);
                 until TransferLine.Next() = 0; // sorted by item
@@ -470,7 +477,7 @@ codeunit 5752 "Get Source Doc. Outbound"
             CheckWhseShipmentConflict(SalesHeader);
             CheckSalesHeader(SalesHeader, true);
             WhseRqst.SetRange(Type, WhseRqst.Type::Outbound);
-            WhseRqst.SetSourceFilter(DATABASE::"Sales Line", "Document Type".AsInteger(), "No.");
+            WhseRqst.SetSourceFilter(Enum::TableID::"Sales Line".AsInteger(), "Document Type".AsInteger(), "No.");
             WhseRqst.SetRange("Document Status", WhseRqst."Document Status"::Released);
             OnFindWarehouseRequestForSalesOrderOnAfterWhseRqstSetFilters(WhseRqst, SalesHeader);
             GetRequireShipRqst(WhseRqst);
@@ -484,7 +491,7 @@ codeunit 5752 "Get Source Doc. Outbound"
         with PurchHeader do begin
             TestField(Status, Status::Released);
             WhseRqst.SetRange(Type, WhseRqst.Type::Outbound);
-            WhseRqst.SetSourceFilter(DATABASE::"Purchase Line", "Document Type".AsInteger(), "No.");
+            WhseRqst.SetSourceFilter(Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "No.");
             WhseRqst.SetRange("Document Status", WhseRqst."Document Status"::Released);
             OnFindWarehouseRequestForPurchReturnOrderOnAfterWhseRqstSetFilters(WhseRqst, PurchHeader);
             GetRequireShipRqst(WhseRqst);
@@ -499,7 +506,7 @@ codeunit 5752 "Get Source Doc. Outbound"
             TestField(Status, Status::Released);
             CheckTransferHeader(TransHeader, true);
             WhseRqst.SetRange(Type, WhseRqst.Type::Outbound);
-            WhseRqst.SetSourceFilter(DATABASE::"Transfer Line", 0, "No.");
+            WhseRqst.SetSourceFilter(Enum::TableID::"Transfer Line".AsInteger(), 0, "No.");
             WhseRqst.SetRange("Document Status", WhseRqst."Document Status"::Released);
             OnFindWarehouseRequestForOutbndTransferOrderOnAfterWhseRqstSetFilters(WhseRqst, TransHeader);
             GetRequireShipRqst(WhseRqst);
@@ -513,7 +520,7 @@ codeunit 5752 "Get Source Doc. Outbound"
         with ServiceHeader do begin
             TestField("Release Status", "Release Status"::"Released to Ship");
             WhseRqst.SetRange(Type, WhseRqst.Type::Outbound);
-            WhseRqst.SetSourceFilter(DATABASE::"Service Line", "Document Type".AsInteger(), "No.");
+            WhseRqst.SetSourceFilter(Enum::TableID::"Service Line".AsInteger(), "Document Type".AsInteger(), "No.");
             WhseRqst.SetRange("Document Status", WhseRqst."Document Status"::Released);
             OnFindWarehouseRequestForServiceOrderOnAfterSetWhseRqstFilters(WhseRqst, ServiceHeader);
             GetRequireShipRqst(WhseRqst);
@@ -544,7 +551,6 @@ codeunit 5752 "Get Source Doc. Outbound"
 
     local procedure ShowResult(WhseShipmentCreated: Boolean)
     var
-        WarehouseRequest: Record "Warehouse Request";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -552,11 +558,9 @@ codeunit 5752 "Get Source Doc. Outbound"
         if IsHandled then
             exit;
 
-        if WhseShipmentCreated then begin
-            GetSourceDocuments.ShowShipmentDialog();
+        GetSourceDocuments.ShowShipmentDialog();
+        if WhseShipmentCreated then
             OpenWarehouseShipmentPage();
-        end else
-            Message(Text004, WarehouseRequest.TableCaption());
     end;
 
     [IntegrationEvent(false, false)]

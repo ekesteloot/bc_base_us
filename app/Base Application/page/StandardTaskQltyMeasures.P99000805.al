@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000805 "Standard Task Qlty Measures"
 {
     AutoSplitKey = true;

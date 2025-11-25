@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ServiceMgt.Document;
+
 page 576 "VAT Specification Subform"
 {
     Caption = 'Lines';
@@ -57,7 +62,7 @@ page 576 "VAT Specification Subform"
 
                     trigger OnValidate()
                     begin
-                        CalcVATFields(CurrencyCode, PricesIncludingVAT, VATBaseDiscPct);
+                        Rec.CalcVATFields(CurrencyCode, PricesIncludingVAT, VATBaseDiscPct);
                         ModifyRec();
                     end;
                 }
@@ -80,14 +85,14 @@ page 576 "VAT Specification Subform"
                     begin
                         if AllowVATDifference and not AllowVATDifferenceOnThisTab then
                             if ParentControl = PAGE::"Service Order Statistics" then
-                                Error(Text000, FieldCaption("VAT Amount"), Text002)
+                                Error(Text000, Rec.FieldCaption("VAT Amount"), Text002)
                             else
-                                Error(Text000, FieldCaption("VAT Amount"), Text003);
+                                Error(Text000, Rec.FieldCaption("VAT Amount"), Text003);
 
                         if PricesIncludingVAT then
-                            "VAT Base" := "Amount Including VAT" - "VAT Amount"
+                            Rec."VAT Base" := Rec."Amount Including VAT" - Rec."VAT Amount"
                         else
-                            "Amount Including VAT" := "VAT Amount" + "VAT Base";
+                            Rec."Amount Including VAT" := Rec."VAT Amount" + Rec."VAT Base";
 
                         FormCheckVATDifference();
                         ModifyRec();
@@ -146,9 +151,9 @@ page 576 "VAT Specification Subform"
                     begin
                         if AllowVATDifference and not AllowVATDifferenceOnThisTab then
                             if ParentControl = PAGE::"Service Order Statistics" then
-                                Error(Text000, FieldCaption("Non-Deductible VAT Amount"), Text002)
+                                Error(Text000, Rec.FieldCaption("Non-Deductible VAT Amount"), Text002)
                             else
-                                Error(Text000, FieldCaption("Non-Deductible VAT Amount"), Text003);
+                                Error(Text000, Rec.FieldCaption("Non-Deductible VAT Amount"), Text003);
                         NonDeductibleVAT.CheckNonDeductibleVATAmountDiff(Rec, xRec, AllowVATDifference, Currency);
                         ModifyRec();
                     end;
@@ -176,10 +181,10 @@ page 576 "VAT Specification Subform"
     trigger OnAfterGetRecord()
     begin
         if MainFormActiveTab = MainFormActiveTab::Other then
-            VATAmountEditable := AllowVATDifference and not "Includes Prepayment"
+            VATAmountEditable := AllowVATDifference and not Rec."Includes Prepayment"
         else
             VATAmountEditable := AllowVATDifference;
-        InvoiceDiscountAmountEditable := AllowInvDisc and not "Includes Prepayment";
+        InvoiceDiscountAmountEditable := AllowInvDisc and not Rec."Includes Prepayment";
     end;
 
     trigger OnInit()
@@ -203,29 +208,28 @@ page 576 "VAT Specification Subform"
         AllowVATDifference: Boolean;
         AllowVATDifferenceOnThisTab: Boolean;
         PricesIncludingVAT: Boolean;
-        AllowInvDisc: Boolean;
         VATBaseDiscPct: Decimal;
         ParentControl: Integer;
         CurrentTabNo: Integer;
         MainFormActiveTab: Option Other,Prepayment;
-        NonDeductibleVATVisible: Boolean;
-        [InDataSet]
         VATAmountEditable: Boolean;
-        [InDataSet]
-        InvoiceDiscountAmountEditable: Boolean;
+        NonDeductibleVATVisible: Boolean;
 
         Text000: Label '%1 can only be modified on the %2 tab.';
         Text001: Label 'The total %1 for a document must not exceed the value %2 in the %3 field.';
         Text002: Label 'Details';
         Text003: Label 'Invoicing';
 
+    protected var
+        AllowInvDisc, InvoiceDiscountAmountEditable : Boolean;
+
     procedure SetTempVATAmountLine(var NewVATAmountLine: Record "VAT Amount Line")
     begin
-        DeleteAll();
+        Rec.DeleteAll();
         if NewVATAmountLine.Find('-') then
             repeat
-                Copy(NewVATAmountLine);
-                Insert();
+                Rec.Copy(NewVATAmountLine);
+                Rec.Insert();
             until NewVATAmountLine.Next() = 0;
         CurrPage.Update(false);
     end;
@@ -233,11 +237,11 @@ page 576 "VAT Specification Subform"
     procedure GetTempVATAmountLine(var NewVATAmountLine: Record "VAT Amount Line")
     begin
         NewVATAmountLine.DeleteAll();
-        if Find('-') then
+        if Rec.Find('-') then
             repeat
                 NewVATAmountLine.Copy(Rec);
                 NewVATAmountLine.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     procedure InitGlobals(NewCurrencyCode: Code[10]; NewAllowVATDifference: Boolean; NewAllowVATDifferenceOnThisTab: Boolean; NewPricesIncludingVAT: Boolean; NewAllowInvDisc: Boolean; NewVATBaseDiscPct: Decimal)
@@ -260,17 +264,17 @@ page 576 "VAT Specification Subform"
         VATAmountLine2: Record "VAT Amount Line";
         TotalVATDifference: Decimal;
     begin
-        CheckVATDifference(CurrencyCode, AllowVATDifference);
+        Rec.CheckVATDifference(CurrencyCode, AllowVATDifference);
         VATAmountLine2 := Rec;
-        TotalVATDifference := Abs("VAT Difference") - Abs(xRec."VAT Difference");
-        if Find('-') then
+        TotalVATDifference := Abs(Rec."VAT Difference") - Abs(xRec."VAT Difference");
+        if Rec.Find('-') then
             repeat
-                TotalVATDifference := TotalVATDifference + Abs("VAT Difference");
-            until Next() = 0;
+                TotalVATDifference := TotalVATDifference + Abs(Rec."VAT Difference");
+            until Rec.Next() = 0;
         Rec := VATAmountLine2;
         if TotalVATDifference > Currency."Max. VAT Difference Allowed" then
             Error(
-              Text001, FieldCaption("VAT Difference"),
+              Text001, Rec.FieldCaption("VAT Difference"),
               Currency."Max. VAT Difference Allowed", Currency.FieldCaption("Max. VAT Difference Allowed"));
     end;
 
@@ -278,14 +282,14 @@ page 576 "VAT Specification Subform"
     var
         ServLine: Record "Service Line";
     begin
-        Modified := true;
-        Modify();
+        Rec.Modified := true;
+        Rec.Modify();
 
         if ((ParentControl = PAGE::"Service Order Statistics") and
             (CurrentTabNo <> 1)) or
            (ParentControl = PAGE::"Service Statistics")
         then
-            if GetAnyLineModified() then begin
+            if Rec.GetAnyLineModified() then begin
                 ServLine.UpdateVATOnLines(0, ServHeader, ServLine, Rec);
                 ServLine.UpdateVATOnLines(1, ServHeader, ServLine, Rec);
             end;

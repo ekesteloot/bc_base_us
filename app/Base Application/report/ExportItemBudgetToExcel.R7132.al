@@ -1,3 +1,11 @@
+﻿namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.IO;
+using System.Utilities;
+
 report 7132 "Export Item Budget to Excel"
 {
     Caption = 'Export Item Budget to Excel';
@@ -8,7 +16,7 @@ report 7132 "Export Item Budget to Excel"
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
 
             trigger OnAfterGetRecord()
             var

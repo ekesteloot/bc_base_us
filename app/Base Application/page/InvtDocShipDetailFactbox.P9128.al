@@ -1,3 +1,10 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+
 page 9128 "Invt. Doc Ship. Detail Factbox"
 {
     Caption = 'Shipping Details';
@@ -105,7 +112,7 @@ page 9128 "Invt. Doc Ship. Detail Factbox"
     trigger OnAfterGetRecord()
     begin
         case Rec."Source Type" of
-            Database::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 begin
                     GetSalesHeader();
                     Number := SalesHeader."Ship-to Code";
@@ -119,7 +126,7 @@ page 9128 "Invt. Doc Ship. Detail Factbox"
                     CountryRegion := SalesHeader."Ship-to Country/Region Code";
                     Contact := SalesHeader."Ship-to Contact";
                 end;
-            Database::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 begin
                     GetPurchaseHeader();
                     Number := PurchaseHeader."Ship-to Code";
@@ -133,7 +140,7 @@ page 9128 "Invt. Doc Ship. Detail Factbox"
                     CountryRegion := PurchaseHeader."Ship-to Country/Region Code";
                     Contact := PurchaseHeader."Ship-to Contact";
                 end;
-            Database::"Transfer Line":
+            Enum::TableID::"Transfer Line".AsInteger():
                 begin
                     GetTransferHeader();
                     Number := TransferHeader."Transfer-to Code";

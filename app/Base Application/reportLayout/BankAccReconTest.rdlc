@@ -4284,7 +4284,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>= Max(Fields!Bank_Acc__Reconciliation_Line_Difference_Control29Format.Value)</Format>
+                                    <Format>= max(Fields!Bank_Acc__Reconciliation_Line_Difference_Control29Format.Value)</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -4637,7 +4637,7 @@
                                   <Style>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>= Max(Fields!Bank_Acc__Reconciliation_Line_Difference_Control29Format.Value)</Format>
+                                    <Format>= max(Fields!Bank_Acc__Reconciliation_Line_Difference_Control29Format.Value)</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -9521,12 +9521,6 @@ End Function
         </Field>
         <Field Name="Bank_Acc__Reconciliation___TotalBalOnBankAccountFormat">
           <DataField>Bank_Acc__Reconciliation___TotalBalOnBankAccountFormat</DataField>
-        </Field>
-        <Field Name="Bank_Acc__Reconciliation___TotalBalOnBankAccountLCY">
-          <DataField>Bank_Acc__Reconciliation___TotalBalOnBankAccountLCY</DataField>
-        </Field>
-        <Field Name="Bank_Acc__Reconciliation___TotalBalOnBankAccountLCYFormat">
-          <DataField>Bank_Acc__Reconciliation___TotalBalOnBankAccountLCYFormat</DataField>
         </Field>
         <Field Name="Bank_Acc__Reconciliation___TotalBalOnGLAccount">
           <DataField>Bank_Acc__Reconciliation___TotalBalOnGLAccount</DataField>

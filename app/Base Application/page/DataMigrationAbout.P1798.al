@@ -1,3 +1,5 @@
+namespace System.Integration;
+
 page 1798 "Data Migration About"
 {
     Caption = 'About Data Migration';

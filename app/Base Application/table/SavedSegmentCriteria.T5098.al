@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Segment;
+
+using System.Security.AccessControl;
+
 table 5098 "Saved Segment Criteria"
 {
     Caption = 'Saved Segment Criteria';
@@ -20,13 +24,11 @@ table 5098 "Saved Segment Criteria"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(5; "No. of Actions"; Integer)
         {
-            CalcFormula = Count ("Saved Segment Criteria Line" WHERE("Segment Criteria Code" = FIELD(Code),
-                                                                     Type = CONST(Action)));
+            CalcFormula = count("Saved Segment Criteria Line" where("Segment Criteria Code" = field(Code),
+                                                                     Type = const(Action)));
             Caption = 'No. of Actions';
             Editable = false;
             FieldClass = FlowField;

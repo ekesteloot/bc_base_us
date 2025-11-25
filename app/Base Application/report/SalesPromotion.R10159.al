@@ -77,8 +77,8 @@ report 10159 "Sales Promotion"
             }
             dataitem("Sales Price"; "Sales Price")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter");
-                DataItemTableView = SORTING("Item No.", "Sales Type", "Sales Code", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code");
+                DataItemLink = "Item No." = field("No."), "Variant Code" = field("Variant Filter");
+                DataItemTableView = sorting("Item No.", "Sales Type", "Sales Code", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code");
                 RequestFilterFields = "Sales Type", "Starting Date";
                 column(Item__No__; Item."No.")
                 {

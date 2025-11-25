@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 page 445 "Finance Charge Text"
 {
     AutoSplitKey = true;
@@ -22,13 +24,13 @@ page 445 "Finance Charge Text"
                     ToolTip = 'Specifies the code for the involved finance charges in case of late payment.';
                     Visible = false;
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the text will appear at the beginning or the end of the finance charge memo.';
                     Visible = false;
                 }
-                field(Text; Text)
+                field(Text; Rec.Text)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the text that you want to insert in the finance charge memo.';

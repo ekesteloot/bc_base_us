@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
 page 2580 "Dim Correction Blocked Setup"
 {
     PageType = ListPart;

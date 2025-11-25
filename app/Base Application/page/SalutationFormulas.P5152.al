@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Setup;
+
 page 5152 "Salutation Formulas"
 {
     Caption = 'Salutation Formulas';
@@ -22,7 +24,7 @@ page 5152 "Salutation Formulas"
                     ApplicationArea = All;
                     ToolTip = 'Specifies whether the salutation is formal or informal. Make your selection by clicking the field.';
                 }
-                field(Salutation; Salutation)
+                field(Salutation; Rec.Salutation)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the salutation itself.';

@@ -1,4 +1,56 @@
-﻿table 39 "Purchase Line"
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.AllocationAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+using System.Telemetry;
+using System.Utilities;
+using System.Environment.Configuration;
+
+table 39 "Purchase Line"
 {
     Caption = 'Purchase Line';
     DrillDownPageID = "Purchase Lines";
@@ -20,7 +72,7 @@
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Purchase Header"."No." WHERE("Document Type" = FIELD("Document Type"));
+            TableRelation = "Purchase Header"."No." where("Document Type" = field("Document Type"));
         }
         field(4; "Line No."; Integer)
         {
@@ -64,7 +116,7 @@
                                 PurchLineReserve.VerifyChange(Rec, xRec);
                                 CalcFields("Reserved Qty. (Base)");
                                 TestField("Reserved Qty. (Base)", 0);
-                                WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                                PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
                                 OnValidateTypeOnAfterCheckItem(Rec, xRec);
                             end;
                         Type::"Fixed Asset":
@@ -75,7 +127,7 @@
                     end;
                     if xRec."Deferral Code" <> '' then
                         DeferralUtilities.RemoveOrSetDeferralSchedule('',
-                          "Deferral Document Type"::Purchase.AsInteger(), '', '',
+                          Enum::"Deferral Document Type"::Purchase.AsInteger(), '', '',
                           xRec."Document Type".AsInteger(), xRec."Document No.", xRec."Line No.",
                           xRec.GetDeferralAmount(), PurchHeader."Posting Date", '', xRec."Currency Code", true);
                 end;
@@ -107,26 +159,21 @@
         {
             CaptionClass = GetCaptionClass(FieldNo("No."));
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(" ")) "Standard Text"
-            ELSE
-            IF (Type = CONST("G/L Account"),
-                                     "System-Created Entry" = CONST(false)) "G/L Account" WHERE("Direct Posting" = CONST(true),
-                                                                                               "Account Type" = CONST(Posting),
-                                                                                               Blocked = CONST(false))
-            ELSE
-            IF (Type = CONST("G/L Account"),
-                                                                                                        "System-Created Entry" = CONST(true)) "G/L Account"
-            ELSE
-            IF (Type = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF (Type = CONST("Charge (Item)")) "Item Charge"
-            ELSE
-            IF (Type = CONST(Item),
-                                                                                                                 "Document Type" = FILTER(<> "Credit Memo" & <> "Return Order")) Item WHERE(Blocked = CONST(false),
-                                                                                                                                                                                       "Purchasing Blocked" = CONST(false))
-            ELSE
-            IF (Type = CONST(Item),
-                                                                                                                                                                                                "Document Type" = FILTER("Credit Memo" | "Return Order")) Item WHERE(Blocked = CONST(false))
+            TableRelation = if (Type = const(" ")) "Standard Text"
+            else
+            if (Type = const("G/L Account"), "System-Created Entry" = const(false)) "G/L Account" where("Direct Posting" = const(true), "Account Type" = const(Posting), Blocked = const(false))
+            else
+            if (Type = const("G/L Account"), "System-Created Entry" = const(true)) "G/L Account"
+            else
+            if (Type = const("Fixed Asset")) "Fixed Asset"
+            else
+            if (Type = const("Charge (Item)")) "Item Charge"
+            else
+            if (Type = const(Item), "Document Type" = filter(<> "Credit Memo" & <> "Return Order")) Item where(Blocked = const(false), "Purchasing Blocked" = const(false))
+            else
+            if (Type = const(Item), "Document Type" = filter("Credit Memo" | "Return Order")) Item where(Blocked = const(false))
+            else
+            if (Type = const("Allocation Account")) "Allocation Account"
             else
             if (Type = const(Resource)) Resource;
 
@@ -170,7 +217,7 @@
                         CalcFields("Reserved Qty. (Base)");
                         TestField("Reserved Qty. (Base)", 0);
                         if Type = Type::Item then
-                            WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                            PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
                         OnValidateNoOnAfterVerifyChange(Rec, xRec);
                         if CurrFieldNo = Rec.FieldNo("No.") then
                             CheckWarehouse(false);
@@ -278,7 +325,7 @@
         field(7; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             var
@@ -288,10 +335,6 @@
             begin
                 TestStatusOpen();
                 OnValidateLocationCodeOnAfterTestStatusOpen(Rec);
-#if not CLEAN20  
-                IsHandled := false;
-                OnBeforeUpdateLocationCode(Rec, IsHandled);
-#endif                 
                 if xRec."Location Code" <> "Location Code" then begin
                     if "Prepmt. Amt. Inv." <> 0 then
                         if not ConfirmManagement.GetResponseOrDefault(
@@ -324,7 +367,7 @@
 
                 if (xRec."Location Code" <> "Location Code") and (Quantity <> 0) then begin
                     PurchLineReserve.VerifyChange(Rec, xRec);
-                    WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                    PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
                     UpdateWithWarehouseReceive();
                 end;
                 "Bin Code" := '';
@@ -400,9 +443,9 @@
         {
             Caption = 'Posting Group';
             Editable = false;
-            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group"
-            ELSE
-            IF (Type = CONST("Fixed Asset")) "FA Posting Group";
+            TableRelation = if (Type = const(Item)) "Inventory Posting Group"
+            else
+            if (Type = const("Fixed Asset")) "FA Posting Group";
         }
         field(10; "Expected Receipt Date"; Date)
         {
@@ -431,23 +474,23 @@
         field(11; Description; Text[100])
         {
             Caption = 'Description';
-            TableRelation = IF (Type = CONST("G/L Account"), "No." = CONST(''),
-                "System-Created Entry" = CONST(false)) "G/L Account".Name WHERE("Direct Posting" = CONST(true),
-                                                                                "Account Type" = CONST(Posting),
-                                                                                Blocked = CONST(false))
-            ELSE
-            IF (Type = CONST("G/L Account"), "System-Created Entry" = CONST(true)) "G/L Account".Name
-            ELSE
-            IF (Type = CONST(Item), "Document Type" = FILTER(<> "Credit Memo" & <> "Return Order")) Item.Description WHERE(Blocked = CONST(false),
-                                                                                    "Purchasing Blocked" = CONST(false))
-            ELSE
-            IF (Type = CONST(Item), "Document Type" = FILTER("Credit Memo" | "Return Order")) Item.Description WHERE(Blocked = CONST(false))
-            ELSE
-            IF (Type = CONST("Fixed Asset")) "Fixed Asset".Description
-            ELSE
-            IF (Type = CONST("Charge (Item)")) "Item Charge".Description
+            TableRelation = if (Type = const("G/L Account"), "No." = const(''),
+                "System-Created Entry" = const(false)) "G/L Account".Name where("Direct Posting" = const(true),
+                                                                                "Account Type" = const(Posting),
+                                                                                Blocked = const(false))
             else
-            if (Type = CONST(Resource)) Resource.Name;
+            if (Type = const("G/L Account"), "System-Created Entry" = const(true)) "G/L Account".Name
+            else
+            if (Type = const(Item), "Document Type" = filter(<> "Credit Memo" & <> "Return Order")) Item.Description where(Blocked = const(false),
+                                                                                    "Purchasing Blocked" = const(false))
+            else
+            if (Type = const(Item), "Document Type" = filter("Credit Memo" | "Return Order")) Item.Description where(Blocked = const(false))
+            else
+            if (Type = const("Fixed Asset")) "Fixed Asset".Description
+            else
+            if (Type = const("Charge (Item)")) "Item Charge".Description
+            else
+            if (Type = const(Resource)) Resource.Name;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -607,7 +650,7 @@
                     IsHandled := false;
                     OnValidateQuantityOnBeforePurchaseLineVerifyChange(Rec, StatusCheckSuspended, IsHandled, xRec);
                     if not IsHandled then
-                        WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                        PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
                     CheckApplToItemLedgEntry();
                 end;
 
@@ -651,6 +694,7 @@
 
             trigger OnValidate()
             var
+                CannotInvoiceErrorInfo: ErrorInfo;
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -667,10 +711,14 @@
                     if ("Qty. per Unit of Measure" <> 0) and not IsSubcontractingCreditMemo() then
                         ValidateQuantityInvIsBalanced();
                 end;
-                if ("Qty. to Invoice" * Quantity < 0) or (Abs("Qty. to Invoice") > Abs(MaxQtyToInvoice())) then
-                    Error(
-                      Text006,
-                      MaxQtyToInvoice());
+                if ("Qty. to Invoice" * Quantity < 0) or (Abs("Qty. to Invoice") > Abs(MaxQtyToInvoice())) then begin
+                    CannotInvoiceErrorInfo.Title := QtyInvoiceNotValidTitleLbl;
+                    CannotInvoiceErrorInfo.Message := StrSubstNo(Text006, MaxQtyToInvoice());
+                    CannotInvoiceErrorInfo.RecordId := Rec.RecordId;
+                    CannotInvoiceErrorInfo.AddAction(StrSubstNo(QtyInvoiceActionLbl, MaxQtyToInvoice()), Codeunit::"Purchase Line - Price", 'SetPurchaseQtyInvoice');
+                    Error(CannotInvoiceErrorInfo);
+                end;
+
                 if ("Qty. to Invoice (Base)" * "Quantity (Base)" < 0) or (Abs("Qty. to Invoice (Base)") > Abs(MaxQtyToInvoiceBase())) then
                     Error(
                       Text007,
@@ -692,6 +740,7 @@
 
             trigger OnValidate()
             var
+                CannotReceiveErrorInfo: ErrorInfo;
                 IsHandled: Boolean;
                 ShouldCheckLocationRequireReceive: Boolean;
             begin
@@ -724,8 +773,13 @@
                         if ((("Qty. to Receive" < 0) xor (Quantity < 0)) and (Quantity <> 0) and ("Qty. to Receive" <> 0)) or
                            (Abs("Qty. to Receive") > Abs("Outstanding Quantity")) or
                            (((Quantity < 0) xor ("Outstanding Quantity" < 0)) and (Quantity <> 0) and ("Outstanding Quantity" <> 0))
-                        then
-                            Error(Text008, "Outstanding Quantity");
+                        then begin
+                            CannotReceiveErrorInfo.Title := QtyReceiveNotValidTitleLbl;
+                            CannotReceiveErrorInfo.Message := StrSubstNo(Text008, "Outstanding Quantity");
+                            CannotReceiveErrorInfo.RecordId := Rec.RecordId;
+                            CannotReceiveErrorInfo.AddAction(StrSubstNo(QtyReceiveActionLbl, "Outstanding Quantity"), Codeunit::"Purchase Line - Price", 'SetPurchaseReceiveQty');
+                            Error(CannotReceiveErrorInfo);
+                        end;
                         if ((("Qty. to Receive (Base)" < 0) xor ("Quantity (Base)" < 0)) and ("Quantity (Base)" <> 0) and ("Qty. to Receive (Base)" <> 0)) or
                            (Abs("Qty. to Receive (Base)") > Abs("Outstanding Qty. (Base)")) or
                            ((("Quantity (Base)" < 0) xor ("Outstanding Qty. (Base)" < 0)) and ("Quantity (Base)" <> 0) and ("Outstanding Qty. (Base)" <> 0))
@@ -744,7 +798,7 @@
         }
         field(22; "Direct Unit Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             CaptionClass = GetCaptionClass(FieldNo("Direct Unit Cost"));
             Caption = 'Direct Unit Cost';
@@ -833,7 +887,7 @@
         }
         field(28; "Line Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Discount Amount';
 
@@ -862,7 +916,7 @@
         }
         field(29; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
             Editable = false;
@@ -917,7 +971,7 @@
         }
         field(30; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
             Editable = false;
@@ -1038,24 +1092,24 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(41; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(45; "Job No."; Code[20])
@@ -1142,7 +1196,7 @@
         }
         field(57; "Outstanding Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Outstanding Amount';
             Editable = false;
@@ -1176,7 +1230,7 @@
         }
         field(59; "Amt. Rcd. Not Invoiced"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amt. Rcd. Not Invoiced';
             Editable = false;
@@ -1256,7 +1310,7 @@
         }
         field(69; "Inv. Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Inv. Discount Amount';
             Editable = false;
@@ -1284,13 +1338,13 @@
         {
             Caption = 'Sales Order No.';
             Editable = false;
-            TableRelation = IF ("Drop Shipment" = CONST(true)) "Sales Header"."No." WHERE("Document Type" = CONST(Order));
+            TableRelation = if ("Drop Shipment" = const(true)) "Sales Header"."No." where("Document Type" = const(Order));
 
             trigger OnValidate()
             begin
                 if (xRec."Sales Order No." <> "Sales Order No.") and (Quantity <> 0) then begin
                     PurchLineReserve.VerifyChange(Rec, xRec);
-                    WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                    PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
                 end;
             end;
         }
@@ -1298,14 +1352,14 @@
         {
             Caption = 'Sales Order Line No.';
             Editable = false;
-            TableRelation = IF ("Drop Shipment" = CONST(true)) "Sales Line"."Line No." WHERE("Document Type" = CONST(Order),
-                                                                                            "Document No." = FIELD("Sales Order No."));
+            TableRelation = if ("Drop Shipment" = const(true)) "Sales Line"."Line No." where("Document Type" = const(Order),
+                                                                                            "Document No." = field("Sales Order No."));
 
             trigger OnValidate()
             begin
                 if (xRec."Sales Order Line No." <> "Sales Order Line No.") and (Quantity <> 0) then begin
                     PurchLineReserve.VerifyChange(Rec, xRec);
-                    WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                    PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
                 end;
             end;
         }
@@ -1319,7 +1373,7 @@
             begin
                 if (xRec."Drop Shipment" <> "Drop Shipment") and (Quantity <> 0) then begin
                     PurchLineReserve.VerifyChange(Rec, xRec);
-                    WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                    PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
                 end;
                 if "Drop Shipment" then begin
                     "Bin Code" := '';
@@ -1383,8 +1437,8 @@
         {
             Caption = 'Attached to Line No.';
             Editable = false;
-            TableRelation = "Purchase Line"."Line No." WHERE("Document Type" = FIELD("Document Type"),
-                                                              "Document No." = FIELD("Document No."));
+            TableRelation = "Purchase Line"."Line No." where("Document Type" = field("Document Type"),
+                                                              "Document No." = field("Document No."));
         }
         field(81; "Entry Point"; Code[10])
         {
@@ -1565,13 +1619,13 @@
         field(95; "Reserved Quantity"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("Document No."),
-                                                                  "Source Ref. No." = FIELD("Line No."),
-                                                                  "Source Type" = CONST(39),
+            CalcFormula = sum("Reservation Entry".Quantity where("Source ID" = field("Document No."),
+                                                                  "Source Ref. No." = field("Line No."),
+                                                                  "Source Type" = const(39),
 #pragma warning disable AL0603
-                                                                  "Source Subtype" = FIELD("Document Type"),
+                                                                  "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                                                  "Reservation Status" = CONST(Reservation)));
+                                                                  "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1581,9 +1635,7 @@
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
             Caption = 'Blanket Order No.';
-            TableRelation = "Purchase Header"."No." WHERE("Document Type" = CONST("Blanket Order"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Purchase Header"."No." where("Document Type" = const("Blanket Order"));
 
             trigger OnLookup()
             var
@@ -1619,10 +1671,8 @@
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
             Caption = 'Blanket Order Line No.';
-            TableRelation = "Purchase Line"."Line No." WHERE("Document Type" = CONST("Blanket Order"),
-                                                              "Document No." = FIELD("Blanket Order No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Purchase Line"."Line No." where("Document Type" = const("Blanket Order"),
+                                                              "Document No." = field("Blanket Order No."));
 
             trigger OnLookup()
             begin
@@ -1662,14 +1712,14 @@
         }
         field(99; "VAT Base Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'VAT Base Amount';
             Editable = false;
         }
         field(100; "Unit Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Cost';
             Editable = false;
@@ -1681,7 +1731,7 @@
         }
         field(103; "Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Line Amount"));
             Caption = 'Line Amount';
@@ -1715,14 +1765,14 @@
         }
         field(104; "VAT Difference"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'VAT Difference';
             Editable = false;
         }
         field(105; "Inv. Disc. Amount to Invoice"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Inv. Disc. Amount to Invoice';
             Editable = false;
@@ -1812,7 +1862,7 @@
         }
         field(110; "Prepmt. Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt. Line Amount"));
             Caption = 'Prepmt. Line Amount';
@@ -1839,7 +1889,7 @@
         }
         field(111; "Prepmt. Amt. Inv."; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt. Amt. Inv."));
             Caption = 'Prepmt. Amt. Inv.';
@@ -1847,21 +1897,21 @@
         }
         field(112; "Prepmt. Amt. Incl. VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepmt. Amt. Incl. VAT';
             Editable = false;
         }
         field(113; "Prepayment Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepayment Amount';
             Editable = false;
         }
         field(114; "Prepmt. VAT Base Amt."; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepmt. VAT Base Amt.';
             Editable = false;
@@ -1915,7 +1965,7 @@
         }
         field(121; "Prepmt Amt to Deduct"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt Amt to Deduct"));
             Caption = 'Prepmt Amt to Deduct';
@@ -1944,7 +1994,7 @@
         }
         field(122; "Prepmt Amt Deducted"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt Amt Deducted"));
             Caption = 'Prepmt Amt Deducted';
@@ -1957,7 +2007,7 @@
         }
         field(124; "Prepmt. Amount Inv. Incl. VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepmt. Amount Inv. Incl. VAT';
             Editable = false;
@@ -1991,21 +2041,21 @@
         }
         field(135; "Prepayment VAT Difference"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepayment VAT Difference';
             Editable = false;
         }
         field(136; "Prepmt VAT Diff. to Deduct"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepmt VAT Diff. to Deduct';
             Editable = false;
         }
         field(137; "Prepmt VAT Diff. Deducted"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepmt VAT Diff. Deducted';
             Editable = false;
@@ -2055,7 +2105,7 @@
         }
         field(145; "Pmt. Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Pmt. Discount Amount';
 
@@ -2067,7 +2117,7 @@
         }
         field(146; "Prepmt. Pmt. Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Prepmt. Pmt. Discount Amount';
             Editable = false;
@@ -2080,7 +2130,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -2091,7 +2141,7 @@
         field(1001; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
 
             trigger OnValidate()
             var
@@ -2479,7 +2529,7 @@
                 DeferralPostDate := GetDeferralPostDate(PurchHeader);
 
                 DeferralUtilities.DeferralCodeOnValidate(
-                  "Deferral Code", "Deferral Document Type"::Purchase.AsInteger(), '', '',
+                  "Deferral Code", Enum::"Deferral Document Type"::Purchase.AsInteger(), '', '',
                   "Document Type".AsInteger(), "Document No.", "Line No.",
                   GetDeferralAmount(), DeferralPostDate,
                   Description, PurchHeader."Currency Code");
@@ -2487,7 +2537,7 @@
                 if "Document Type" = "Document Type"::"Return Order" then
                     "Returns Deferral Start Date" :=
                       DeferralUtilities.GetDeferralStartDate(
-                          "Deferral Document Type"::Purchase.AsInteger(),
+                          Enum::"Deferral Document Type"::Purchase.AsInteger(),
                           "Document Type".AsInteger(), "Document No.", "Line No.", "Deferral Code", PurchHeader."Posting Date");
             end;
         }
@@ -2502,10 +2552,10 @@
             begin
                 GetPurchHeader();
                 if DeferralHeader.Get(
-                    "Deferral Document Type"::Purchase.AsInteger(), '', '', "Document Type", "Document No.", "Line No.")
+                    Enum::"Deferral Document Type"::Purchase.AsInteger(), '', '', "Document Type", "Document No.", "Line No.")
                 then
                     DeferralUtilities.CreateDeferralSchedule(
-                        "Deferral Code", "Deferral Document Type"::Purchase.AsInteger(), '', '',
+                        "Deferral Code", Enum::"Deferral Document Type"::Purchase.AsInteger(), '', '',
                         "Document Type".AsInteger(), "Document No.", "Line No.", GetDeferralAmount(),
                         DeferralHeader."Calc. Method", "Returns Deferral Start Date",
                         DeferralHeader."No. of Periods", true,
@@ -2513,14 +2563,30 @@
                         PurchHeader."Currency Code");
             end;
         }
+        field(2675; "Selected Alloc. Account No."; Code[20])
+        {
+            Caption = 'Allocation Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = "Allocation Account";
+        }
+        field(2677; "Alloc. Acc. Modified by User"; Boolean)
+        {
+            Caption = 'Allocation Account Distributions Modified';
+            FieldClass = FlowField;
+            CalcFormula = exist(Microsoft.FinancialMgt.AllocationAccount."Alloc. Acc. Manual Override" where("Parent System Id" = field(SystemId), "Parent Table Id" = const(Database::"Purchase Line")));
+        }
+        field(2678; "Allocation Account No."; Code[20])
+        {
+            Caption = 'Allocation Account No.';
+            DataClassification = CustomerContent;
+            TableRelation = "Allocation Account";
+        }
         field(5401; "Prod. Order No."; Code[20])
         {
             AccessByPermission = TableData "Machine Center" = R;
             Caption = 'Prod. Order No.';
             Editable = false;
-            TableRelation = "Production Order"."No." WHERE(Status = CONST(Released));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Production Order"."No." where(Status = const(Released));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -2533,14 +2599,32 @@
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item), "Document Type" = filter(<> "Credit Memo" & <> "Return Order")) "Item Variant".Code where("Item No." = field("No."), Blocked = const(false), "Purchasing Blocked" = const(false))
+            else
+            if (Type = const(Item), "Document Type" = filter("Credit Memo" | "Return Order")) "Item Variant".Code where("Item No." = field("No."), Blocked = const(false));
+            ValidateTableRelation = false;
 
             trigger OnValidate()
             var
+                ItemVariant: Record "Item Variant";
                 IsHandled: Boolean;
             begin
-                if "Variant Code" <> '' then
-                    TestField(Type, Type::Item);
+                if "Variant Code" <> '' then begin
+                    Rec.TestField(Type, Rec.Type::Item);
+
+                    IsHandled := false;
+                    OnValidateVariantCodeBeforeCheckBlocked(Rec, IsHandled);
+                    if not IsHandled then begin
+                        ItemVariant.SetLoadFields(Blocked, "Purchasing Blocked");
+                        ItemVariant.Get(Rec."No.", Rec."Variant Code");
+                        ItemVariant.TestField(Blocked, false);
+                        if ItemVariant."Purchasing Blocked" then
+                            if IsCreditDocType() then
+                                SendBlockedItemVariantNotification()
+                            else
+                                Error(ItemVariantPurchasingBlockedErr, ItemVariant.Code, ItemVariant."Item No.", ItemVariant.FieldCaption("Purchasing Blocked"));
+                    end;
+                end;
                 TestStatusOpen();
 
                 if xRec."Variant Code" <> "Variant Code" then begin
@@ -2564,7 +2648,7 @@
 
                 if (xRec."Variant Code" <> "Variant Code") and (Quantity <> 0) then begin
                     PurchLineReserve.VerifyChange(Rec, xRec);
-                    WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                    PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
                     InitItemAppl();
                 end;
 
@@ -2589,17 +2673,17 @@
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Document Type" = FILTER(Order | Invoice),
-                                Quantity = FILTER(< 0)) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"),
-                                                                                     "Item No." = FIELD("No."),
-                                                                                     "Variant Code" = FIELD("Variant Code"))
-            ELSE
-            IF ("Document Type" = FILTER("Return Order" | "Credit Memo"),
-                                                                                              Quantity = FILTER(>= 0)) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                                                                    "Item No." = FIELD("No."),
-                                                                                                                                                    "Variant Code" = FIELD("Variant Code"))
-            ELSE
-            Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = if ("Document Type" = filter(Order | Invoice),
+                                Quantity = filter(< 0)) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
+                                                                                     "Item No." = field("No."),
+                                                                                     "Variant Code" = field("Variant Code"))
+            else
+            if ("Document Type" = filter("Return Order" | "Credit Memo"),
+                                                                                              Quantity = filter(>= 0)) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
+                                                                                                                                                    "Item No." = field("No."),
+                                                                                                                                                    "Variant Code" = field("Variant Code"))
+            else
+            Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnLookup()
             var
@@ -2676,9 +2760,9 @@
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item),
-                                "No." = FILTER(<> '')) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
+            TableRelation = if (Type = const(Item),
+                                "No." = filter(<> '')) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
             if (Type = const(Resource), "No." = filter(<> '')) "Resource Unit of Measure".Code where("Resource No." = field("No."))
             else
             if (Type = filter("Charge (Item)" | "Fixed Asset" | "G/L Account")) "Unit of Measure";
@@ -2708,7 +2792,7 @@
                         Error(Text001, FieldCaption("Unit of Measure Code"), "Sales Order No.");
 
                 if (xRec."Unit of Measure Code" <> "Unit of Measure Code") and (Quantity <> 0) then begin
-                    WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                    PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
                     PlanPriceCalcByField(FieldNo("Unit of Measure Code"));
                 end;
                 SetUnitOfMeasure();
@@ -2834,13 +2918,13 @@
         }
         field(5495; "Reserved Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Source Type" = CONST(39),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Source Type" = const(39),
 #pragma warning disable AL0603
-                                                                           "Source Subtype" = FIELD("Document Type"),
+                                                                           "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                                                           "Source ID" = FIELD("Document No."),
-                                                                           "Source Ref. No." = FIELD("Line No."),
-                                                                           "Reservation Status" = CONST(Reservation)));
+                                                                           "Source ID" = field("Document No."),
+                                                                           "Source Ref. No." = field("Line No."),
+                                                                           "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3037,38 +3121,39 @@
             trigger OnValidate()
             begin
                 if (xRec."Special Order" <> "Special Order") and (Quantity <> 0) then
-                    WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                    PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
             end;
         }
         field(5714; "Special Order Sales No."; Code[20])
         {
             AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
             Caption = 'Special Order Sales No.';
-            TableRelation = IF ("Special Order" = CONST(true)) "Sales Header"."No." WHERE("Document Type" = CONST(Order));
+            TableRelation = if ("Special Order" = const(true)) "Sales Header"."No." where("Document Type" = const(Order));
 
             trigger OnValidate()
             begin
                 if (xRec."Special Order Sales No." <> "Special Order Sales No.") and (Quantity <> 0) then
-                    WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                    PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
             end;
         }
         field(5715; "Special Order Sales Line No."; Integer)
         {
             AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
             Caption = 'Special Order Sales Line No.';
-            TableRelation = IF ("Special Order" = CONST(true)) "Sales Line"."Line No." WHERE("Document Type" = CONST(Order),
-                                                                                            "Document No." = FIELD("Special Order Sales No."));
+            TableRelation = if ("Special Order" = const(true)) "Sales Line"."Line No." where("Document Type" = const(Order),
+                                                                                            "Document No." = field("Special Order Sales No."));
 
             trigger OnValidate()
             begin
                 if (xRec."Special Order Sales Line No." <> "Special Order Sales Line No.") and (Quantity <> 0) then
-                    WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                    PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
             end;
         }
         field(5725; "Item Reference No."; Code[50])
         {
             AccessByPermission = TableData "Item Reference" = R;
             Caption = 'Item Reference No.';
+            ExtendedDatatype = Barcode;
 
             trigger OnLookup()
             begin
@@ -3089,7 +3174,7 @@
         {
             AccessByPermission = TableData "Item Reference" = R;
             Caption = 'Item Reference Unit of Measure';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."));
         }
         field(5727; "Item Reference Type"; Enum "Item Reference Type")
         {
@@ -3103,12 +3188,12 @@
         {
             AccessByPermission = TableData Location = R;
             BlankZero = true;
-            CalcFormula = Sum("Warehouse Receipt Line"."Qty. Outstanding (Base)" WHERE("Source Type" = CONST(39),
+            CalcFormula = sum("Warehouse Receipt Line"."Qty. Outstanding (Base)" where("Source Type" = const(39),
 #pragma warning disable AL0603
-                                                                                        "Source Subtype" = FIELD("Document Type"),
+                                                                                        "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                                                                        "Source No." = FIELD("Document No."),
-                                                                                        "Source Line No." = FIELD("Line No.")));
+                                                                                        "Source No." = field("Document No."),
+                                                                                        "Source Line No." = field("Line No.")));
             Caption = 'Whse. Outstanding Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3304,9 +3389,9 @@
         }
         field(5801; "Qty. to Assign"; Decimal)
         {
-            CalcFormula = Sum("Item Charge Assignment (Purch)"."Qty. to Assign" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                       "Document No." = FIELD("Document No."),
-                                                                                       "Document Line No." = FIELD("Line No.")));
+            CalcFormula = sum("Item Charge Assignment (Purch)"."Qty. to Assign" where("Document Type" = field("Document Type"),
+                                                                                       "Document No." = field("Document No."),
+                                                                                       "Document Line No." = field("Line No.")));
             Caption = 'Qty. to Assign';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3314,9 +3399,9 @@
         }
         field(5802; "Qty. Assigned"; Decimal)
         {
-            CalcFormula = Sum("Item Charge Assignment (Purch)"."Qty. Assigned" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                      "Document No." = FIELD("Document No."),
-                                                                                      "Document Line No." = FIELD("Line No.")));
+            CalcFormula = sum("Item Charge Assignment (Purch)"."Qty. Assigned" where("Document Type" = field("Document Type"),
+                                                                                      "Document No." = field("Document No."),
+                                                                                      "Document Line No." = field("Line No.")));
             Caption = 'Qty. Assigned';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3333,7 +3418,7 @@
                 IsHandled: Boolean;
             begin
                 if (CurrFieldNo <> 0) and
-                   (Type = Type::Item) and
+                   IsInventoriableItem() and
                    ("Return Qty. to Ship" <> 0) and
                    (not "Drop Shipment")
                 then
@@ -3403,7 +3488,7 @@
         }
         field(5807; "Return Shpd. Not Invd."; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Return Shpd. Not Invd.';
             Editable = false;
@@ -3447,9 +3532,9 @@
         }
         field(5812; "Item Charge Qty. to Handle"; Decimal)
         {
-            CalcFormula = Sum("Item Charge Assignment (Purch)"."Qty. to Handle" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                       "Document No." = FIELD("Document No."),
-                                                                                       "Document Line No." = FIELD("Line No.")));
+            CalcFormula = sum("Item Charge Assignment (Purch)"."Qty. to Handle" where("Document Type" = field("Document Type"),
+                                                                                       "Document No." = field("Document No."),
+                                                                                       "Document Line No." = field("Line No.")));
             Caption = 'Item Charge Qty. to Handle';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3469,13 +3554,13 @@
         }
         field(6201; "Non-Deductible VAT Base"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Non-Deductible VAT Base';
             Editable = false;
         }
         field(6202; "Non-Deductible VAT Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Non-Deductible VAT Amount';
             Editable = false;
         }
@@ -3486,13 +3571,13 @@
         }
         field(6204; "Prepmt. Non-Deduct. VAT Base"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Prepmt.  Non-Deductible VAT Base';
             Editable = false;
         }
         field(6205; "Prepmt. Non-Deduct. VAT Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Prepmt. on-Deductible VAT Amount';
             Editable = false;
         }
@@ -3533,20 +3618,20 @@
         field(7010; "Attached Doc Count"; Integer)
         {
             BlankNumbers = DontBlank;
-            CalcFormula = Count("Document Attachment" WHERE("Table ID" = CONST(39),
-                                                             "No." = FIELD("Document No."),
-                                                             "Document Type" = FIELD("Document Type"),
-                                                             "Line No." = FIELD("Line No.")));
+            CalcFormula = count("Document Attachment" where("Table ID" = const(39),
+                                                             "No." = field("Document No."),
+                                                             "Document Type" = field("Document Type"),
+                                                             "Line No." = field("Line No.")));
             Caption = 'Attached Doc Count';
             FieldClass = FlowField;
             InitValue = 0;
         }
         field(7011; "Attached Lines Count"; Integer)
         {
-            CalcFormula = Count("Purchase Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                       "Document No." = FIELD("Document No."),
-                                                       "Attached to Line No." = FIELD("Line No."),
-                                                       Quantity = FILTER(<> 0)));
+            CalcFormula = count("Purchase Line" where("Document Type" = field("Document Type"),
+                                                       "Document No." = field("Document No."),
+                                                       "Attached to Line No." = field("Line No."),
+                                                       Quantity = filter(<> 0)));
             Caption = 'Attached Lines Count';
             Editable = false;
             FieldClass = FlowField;
@@ -3576,7 +3661,7 @@
 
                 if xRec."Over-Receipt Quantity" = "Over-Receipt Quantity" then
                     exit;
-                PurchaseHeader.Get("Document Type", "Document No.");
+                PurchaseHeader.Get(Rec."Document Type", Rec."Document No.");
                 PurchaseHeader.TestField("Document Type", PurchHeader."Document Type"::Order);
                 PurchaseHeader.TestField(Status, PurchHeader.Status::Released);
                 TestField(Type, Type::Item);
@@ -3628,7 +3713,7 @@
         field(10017; "Provincial Tax Area Code"; Code[20])
         {
             Caption = 'Provincial Tax Area Code';
-            TableRelation = "Tax Area" WHERE("Country/Region" = CONST(CA));
+            TableRelation = "Tax Area" where("Country/Region" = const(CA));
 
             trigger OnValidate()
             var
@@ -3679,9 +3764,9 @@
         {
             Caption = 'Operation No.';
             Editable = false;
-            TableRelation = "Prod. Order Routing Line"."Operation No." WHERE(Status = CONST(Released),
-                                                                              "Prod. Order No." = FIELD("Prod. Order No."),
-                                                                              "Routing No." = FIELD("Routing No."));
+            TableRelation = "Prod. Order Routing Line"."Operation No." where(Status = const(Released),
+                                                                              "Prod. Order No." = field("Prod. Order No."),
+                                                                              "Routing No." = field("Routing No."));
 
             trigger OnValidate()
             var
@@ -3744,8 +3829,8 @@
         {
             Caption = 'Prod. Order Line No.';
             Editable = false;
-            TableRelation = "Prod. Order Line"."Line No." WHERE(Status = FILTER(Released ..),
-                                                                 "Prod. Order No." = FIELD("Prod. Order No."));
+            TableRelation = "Prod. Order Line"."Line No." where(Status = filter(Released ..),
+                                                                 "Prod. Order No." = field("Prod. Order No."));
         }
         field(99000755; "Overhead Rate"; Decimal)
         {
@@ -3798,7 +3883,9 @@
         }
         key(Key4; "Document Type", "Pay-to Vendor No.", "Currency Code", "Document No.")
         {
-            IncludedFields = "Outstanding Amount", "Amt. Rcd. Not Invoiced", "Outstanding Amount (LCY)", "Amt. Rcd. Not Invoiced (LCY)";
+#pragma warning disable AS0038
+            IncludedFields = "Outstanding Amount", "Amt. Rcd. Not Invoiced", "Outstanding Amount (LCY)", "Amt. Rcd. Not Invoiced (LCY)", "Prepmt. Amount Inv. (LCY)", "Prepmt. VAT Amount Inv. (LCY)";
+#pragma warning RESTORE AS0038
         }
         key(Key7; "Document Type", "Blanket Order No.", "Blanket Order Line No.")
         {
@@ -3812,6 +3899,7 @@
         }
         key(Key10; "Document Type", "Receipt No.", "Receipt Line No.")
         {
+            IncludedFields = Quantity;
         }
         key(Key11; Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Document Type", "Expected Receipt Date")
         {
@@ -3849,6 +3937,9 @@
         key(Key23; "Attached to Line No.")
         {
         }
+        key(Key24; "No.", Type)
+        {
+        }
     }
 
     fieldgroups
@@ -3872,7 +3963,7 @@
 
         CheckForTaxDifferences();
 
-        if (Quantity <> 0) and ItemExists("No.") then begin
+        if (Rec.Quantity <> 0) and Rec.ItemExists(Rec."No.") then begin
             PurchLineReserve.DeleteLine(Rec);
             IsHandled := false;
             OnDeleteOnBeforeCheckQtyNotInvoiced(Rec, IsHandled);
@@ -3888,7 +3979,7 @@
             if not IsHandled then begin
                 CalcFields("Reserved Qty. (Base)");
                 TestField("Reserved Qty. (Base)", 0);
-                WhseValidateSourceLine.PurchaseLineDelete(Rec);
+                PurchasesWarehouseMgt.PurchaseLineDelete(Rec);
             end;
         end;
 
@@ -3961,7 +4052,7 @@
 
         if "Deferral Code" <> '' then
             DeferralUtilities.DeferralCodeOnDelete(
-                "Deferral Document Type"::Purchase.AsInteger(), '', '',
+                Enum::"Deferral Document Type"::Purchase.AsInteger(), '', '',
                 "Document Type".AsInteger(), "Document No.", "Line No.");
     end;
 
@@ -4010,7 +4101,7 @@
         Text001: Label 'You cannot change %1 because the order line is associated with sales order %2.';
         Text002: Label 'Prices including VAT cannot be calculated when %1 is %2.';
         Text004: Label 'must not be less than %1';
-        Text006: Label 'You cannot invoice more than %1 units.';
+        Text006: Label 'You can''t invoice more than %1 units.', Comment = '%1 - the field value';
         Text007: Label 'You cannot invoice more than %1 base units.';
         Text008: Label 'You cannot receive more than %1 units.';
         Text009: Label 'You cannot receive more than %1 base units.';
@@ -4034,6 +4125,10 @@
         Text037: Label 'cannot be %1.';
         Text038: Label 'cannot be less than %1.';
         Text039: Label 'cannot be more than %1.';
+        QtyInvoiceNotValidTitleLbl: Label 'Qty. to Invoice isn''t valid';
+        QtyInvoiceActionLbl: Label 'Set value to %1', Comment = '%1 - Qty. to Invoice';
+        QtyReceiveNotValidTitleLbl: Label 'Qty. to Receive isn''t valid';
+        QtyReceiveActionLbl: Label 'Set value to %1', comment = '%1=Qty. to Receive';
         ItemChargeAssignmentErr: Label 'You can only assign Item Charges for Line Types of Charge (Item).';
         Text99000000: Label 'You cannot change %1 when the purchase order is associated to a production order.';
         PurchHeader: Record "Purchase Header";
@@ -4058,12 +4153,12 @@
         PurchSetup: Record "Purchases & Payables Setup";
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
         PurchLineReserve: Codeunit "Purch. Line-Reserve";
+        PurchasesWarehouseMgt: Codeunit "Purchases Warehouse Mgt.";
         UOMMgt: Codeunit "Unit of Measure Management";
         AddOnIntegrMgt: Codeunit AddOnIntegrManagement;
         DimMgt: Codeunit DimensionManagement;
         ItemReferenceMgt: Codeunit "Item Reference Management";
         CatalogItemMgt: Codeunit "Catalog Item Management";
-        WhseValidateSourceLine: Codeunit "Whse. Validate Source Line";
         LeadTimeMgt: Codeunit "Lead-Time Management";
         CalendarMgmt: Codeunit "Calendar Management";
         CheckDateConflict: Codeunit "Reservation-Check Date Confl.";
@@ -4071,7 +4166,6 @@
         PostingSetupMgt: Codeunit PostingSetupManagement;
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
         FieldCausedPriceCalculation: Integer;
-        TrackingBlocked: Boolean;
         GLSetupRead: Boolean;
         UnitCostCurrency: Decimal;
         UpdateFromVAT: Boolean;
@@ -4100,10 +4194,12 @@
         CannotFindDescErr: Label 'Cannot find %1 with Description %2.\\Make sure to use the correct type.', Comment = '%1 = Type caption %2 = Description';
         CommentLbl: Label 'Comment';
         LineDiscountPctErr: Label 'The value in the Line Discount % field must be between 0 and 100.';
-        PurchasingBlockedErr: Label 'You cannot purchase item %1 because the Purchasing Blocked check box is selected on the item card.', Comment = '%1 = Item Number';
+        ItemPurchasingBlockedErr: Label 'You cannot purchase Item %1 because the %2 check box is selected on the Item card.', Comment = '%1 - Item No., %2 - Blocked Field Caption';
+        ItemVariantPurchasingBlockedErr: Label 'You cannot purchase Item Variant %1, Item %2 because the %3 check box is selected on the Item Variant card.', Comment = '%1 - Variant Code, %2 = Item No., %3 - Blocked Field Caption';
         CannotChangePrepaidServiceChargeErr: Label 'You cannot change the line because it will affect service charges that are already invoiced as part of a prepayment.';
         LineInvoiceDiscountAmountResetTok: Label 'The value in the Inv. Discount Amount field in %1 has been cleared.', Comment = '%1 - Record ID';
         BlockedItemNotificationMsg: Label 'Item %1 is blocked, but it is allowed on this type of document.', Comment = '%1 is Item No.';
+        BlockedItemVariantNotificationMsg: Label 'Item Variant %1 for Item %2 is blocked, but it is allowed on this type of document.', Comment = '%1 - Item Variant Code, %2 - Item No.';
         InvDiscForPrepmtExceededErr: Label 'You cannot enter an invoice discount for purchase document %1.\\You must cancel the prepayment invoice first and then you will be able to update the invoice discount.', Comment = '%1 - document number';
         CannotAllowInvDiscountErr: Label 'The value of the %1 field is not valid when the VAT Calculation Type field is set to "Full VAT".', Comment = '%1 is the name of not valid field';
         CannotChangeVATGroupWithPrepmInvErr: Label 'You cannot change the VAT product posting group because prepayment invoices have been posted.\\You need to post the prepayment credit memo to be able to change the VAT product posting group.';
@@ -4114,6 +4210,7 @@
         HideValidationDialog: Boolean;
         StatusCheckSuspended: Boolean;
         SkipTaxCalculation: Boolean;
+        TrackingBlocked: Boolean;
 
     procedure InitOutstanding()
     var
@@ -4303,10 +4400,6 @@
         "Shortcut Dimension 1 Code" := PurchHeader."Shortcut Dimension 1 Code";
         "Shortcut Dimension 2 Code" := PurchHeader."Shortcut Dimension 2 Code";
         "Dimension Set ID" := PurchHeader."Dimension Set ID";
-#if not CLEAN20        
-        IsHandled := false;
-        OnBeforeUpdateLocationCode(Rec, IsHandled);
-#endif         
         "Location Code" := PurchHeader."Location Code";
         "Transaction Type" := PurchHeader."Transaction Type";
         "Transport Method" := PurchHeader."Transport Method";
@@ -4526,6 +4619,7 @@
             "Tax Group Code" := GLAcc."Tax Group Code";
             "Allow Invoice Disc." := false;
             "Allow Item Charge Assignment" := false;
+            OnNotHandledCopyFromGLAccount(Rec, GLAcc);
             InitDeferralCode();
         end;
         OnAfterAssignGLAccountValues(Rec, GLAcc, PurchHeader, xRec, TempPurchaseLine);
@@ -4548,7 +4642,7 @@
                 if IsCreditDocType() then
                     SendBlockedItemNotification()
                 else
-                    Error(PurchasingBlockedErr, Item."No.");
+                    Error(ItemPurchasingBlockedErr, Item."No.", Item.FieldCaption("Purchasing Blocked"));
             if Item.Type = Item.Type::Inventory then begin
                 Item.TestField("Inventory Posting Group");
                 "Posting Group" := Item."Inventory Posting Group";
@@ -4735,7 +4829,7 @@
 
         TestField("Document No.");
         if ("Document Type" <> PurchHeader."Document Type") or ("Document No." <> PurchHeader."No.") then begin
-            PurchHeader.Get("Document Type", "Document No.");
+            PurchHeader.Get(Rec."Document Type", Rec."Document No.");
             if PurchHeader."Currency Code" = '' then
                 Currency.InitRoundingPrecision()
             else begin
@@ -4802,7 +4896,7 @@
 
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSource(DATABASE::"Purchase Line", "Document Type".AsInteger(), "Document No.", "Line No.", '', 0);
+        ReservEntry.SetSource(Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "Document No.", "Line No.", '', 0);
         ReservEntry.SetItemData("No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         if Type <> Type::Item then
             ReservEntry."Item No." := '';
@@ -4815,7 +4909,7 @@
 
     procedure SetReservationFilters(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSourceFilter(DATABASE::"Purchase Line", "Document Type".AsInteger(), "Document No.", "Line No.", false);
+        ReservEntry.SetSourceFilter(Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "Document No.", "Line No.", false);
         ReservEntry.SetSourceFilter('', 0);
 
         OnAfterSetReservationFilters(ReservEntry, Rec);
@@ -4977,7 +5071,7 @@
         PriceType: Enum "Price Type";
     begin
         if (PurchaseHeader."No." = '') and ("Document No." <> '') then
-            PurchaseHeader.Get("Document Type", "Document No.");
+            PurchaseHeader.Get(Rec."Document Type", Rec."Document No.");
         GetLineWithPrice(LineWithPrice);
         LineWithPrice.SetLine(PriceType::Purchase, PurchaseHeader, Rec);
         PriceCalculationMgt.GetHandler(LineWithPrice, PriceCalculation);
@@ -5520,7 +5614,6 @@
         LocalGLAcc: Record "G/L Account";
         FAPostingGr: Record "FA Posting Group";
         FADeprBook: Record "FA Depreciation Book";
-
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -5853,45 +5946,6 @@
         PurchLineReserve.CallItemTracking(Rec);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        DummyDefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCreateDim(Rec, IsHandled, CurrFieldNo, DummyDefaultDimSource);
-        if IsHandled then
-            exit;
-
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        TableID[2] := Type2;
-        No[2] := No2;
-        TableID[3] := Type3;
-        No[3] := No3;
-        TableID[4] := Type4;
-        No[4] := No4;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        GetPurchHeader();
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, TableID, No, SourceCodeSetup.Purchases,
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", PurchHeader."Dimension Set ID", DATABASE::Vendor);
-        DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-
-        OnAfterCreateDim(Rec, CurrFieldNo, xRec);
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
@@ -5903,9 +5957,6 @@
             exit;
 
         SourceCodeSetup.Get();
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -5913,7 +5964,7 @@
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup.Purchases,
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", PurchHeader."Dimension Set ID", DATABASE::Vendor);
+            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", PurchHeader."Dimension Set ID", Enum::TableID::Vendor.AsInteger());
         OnCreateDimOnBeforeUpdateGlobalDimFromDimSetID(Rec);
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
@@ -6079,12 +6130,12 @@
             exit;
 
         DimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
-        ValidateShortcutDimCode(FieldNumber, ShortcutDimCode);
+        Rec.ValidateShortcutDimCode(FieldNumber, ShortcutDimCode);
     end;
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     local procedure GetSKU() Result: Boolean
@@ -6520,6 +6571,7 @@
         with PurchLine do begin
             SetRange("Document Type", PurchHeader."Document Type");
             SetRange("Document No.", PurchHeader."No.");
+            SetLoadFieldsForInvDiscoundCalculation(PurchLine);
             OnUpdateVATOnLinesOnAfterSetFilters(PurchLine, PurchHeader);
             LockTable();
             if FindSet() then
@@ -6680,6 +6732,7 @@
                         end;
                     end;
                 until Next() = 0;
+            PurchLine.SetLoadFields();
         end;
 
         OnAfterUpdateVATOnLines(PurchHeader, PurchLine, VATAmountLine, QtyType);
@@ -6705,6 +6758,7 @@
         with PurchLine do begin
             SetRange("Document Type", PurchHeader."Document Type");
             SetRange("Document No.", PurchHeader."No.");
+            SetLoadFieldsForInvDiscoundCalculation(PurchLine);
             OnCalcVATAmountLinesOnAfterSetFilters(PurchLine, PurchHeader);
             if FindSet() then
                 repeat
@@ -6774,9 +6828,7 @@
                                 end;
                             QtyType::Shipping:
                                 begin
-                                    if "Document Type" in
-                                       ["Document Type"::"Return Order", "Document Type"::"Credit Memo"]
-                                    then begin
+                                    if IsCreditDocType() then begin
                                         QtyToHandle := "Return Qty. to Ship";
                                         VATAmountLine.Quantity += "Return Qty. to Ship (Base)";
                                     end else begin
@@ -6794,6 +6846,7 @@
                         OnCalcVATAmountLinesOnAfterCalcLineTotals(VATAmountLine, PurchHeader, PurchLine, Currency, QtyType, TotalVATAmount);
                     end;
                 until Next() = 0;
+            PurchLine.SetLoadFields();
         end;
 
         OnCalcVATAmountLinesOnBeforeVATAmountLineUpdateLines(PurchLine, VATAmountLine, TotalVATAmount);
@@ -6881,10 +6934,11 @@
         SetDefaultQuantity();
     end;
 
-    local procedure CheckWarehouse(ShowDialogMessage: Boolean)
+    procedure CheckWarehouse(ShowDialogMessage: Boolean)
     var
         Location2: Record Location;
         WarehouseSetup: Record "Warehouse Setup";
+        WhseValidateSourceLine: Codeunit "Whse. Validate Source Line";
         WMSManagement: Codeunit "WMS Management";
         ShowDialog: Option " ",Message,Error;
         DialogText: Text[50];
@@ -6935,7 +6989,7 @@
                     (Location2."Require Receive" or Location2."Require Put-away"))
                 then begin
                     if WhseValidateSourceLine.WhseLinesExist(
-                         DATABASE::"Purchase Line", "Document Type".AsInteger(), "Document No.", "Line No.", 0, Quantity)
+                         Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "Document No.", "Line No.", 0, Quantity)
                     then
                         ShowDialog := ShowDialog::Error
                     else
@@ -6957,7 +7011,7 @@
                     (Location2."Require Shipment" or Location2."Require Pick"))
                 then begin
                     if WhseValidateSourceLine.WhseLinesExist(
-                         DATABASE::"Purchase Line", "Document Type".AsInteger(), "Document No.", "Line No.", 0, Quantity)
+                         Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "Document No.", "Line No.", 0, Quantity)
                     then
                         ShowDialog := ShowDialog::Error
                     else
@@ -7067,7 +7121,7 @@
     begin
         exit(
             ItemTrackingMgt.ComposeRowID(
-                DATABASE::"Purchase Line", "Document Type".AsInteger(), "Document No.", '', 0, "Line No."));
+                Enum::TableID::"Purchase Line".AsInteger(), "Document Type".AsInteger(), "Document No.", '', 0, "Line No."));
     end;
 
     local procedure GetDefaultBin()
@@ -7924,11 +7978,11 @@
             exit;
 
         if SalesTaxDifference.AnyTaxDifferenceRecords(
-             "Sales Tax Document Area"::Purchase.AsInteger(), "Document Type".AsInteger(), "Document No.")
+             Enum::"Sales Tax Document Area"::Purchase.AsInteger(), "Document Type".AsInteger(), "Document No.")
         then begin
             if Confirm(Text1020001, false) then
                 SalesTaxDifference.ClearDocDifference(
-                  "Sales Tax Document Area"::Purchase.AsInteger(), "Document Type".AsInteger(), "Document No.")
+                  Enum::"Sales Tax Document Area"::Purchase.AsInteger(), "Document Type".AsInteger(), "Document No.")
             else
                 Error(Text1020000);
         end;
@@ -8015,7 +8069,7 @@
         exit(Round(BaseAmount * (1 + "VAT %" / 100), Currency."Amount Rounding Precision"));
     end;
 
-    internal procedure IsExtendedText(): Boolean
+    procedure IsExtendedText(): Boolean
     begin
         exit((Type = Type::" ") and ("Attached to Line No." <> 0) and (Quantity = 0));
     end;
@@ -8146,7 +8200,7 @@
                 DimMgt.CreateDimSetFromJobTaskDim("Job No.",
                 "Job Task No.", DimValue1, DimValue2);
             DimMgt.CreateDimForPurchLineWithHigherPriorities(
-                Rec, CurrFieldNo, DimSetArrID[3], DimValue1, DimValue2, SourceCodeSetup.Purchases, DATABASE::Job);
+                Rec, CurrFieldNo, DimSetArrID[3], DimValue1, DimValue2, SourceCodeSetup.Purchases, Enum::TableID::Job.AsInteger());
 
             "Dimension Set ID" :=
                 DimMgt.GetCombinedDimensionSetID(
@@ -8243,12 +8297,18 @@
     local procedure UpdateICPartnerItemReference()
     var
         ItemReference: Record "Item Reference";
+        ToDate: Date;
     begin
         ItemReference.SetRange("Reference Type", "Item Reference Type"::Vendor);
         ItemReference.SetRange("Reference Type No.", "Buy-from Vendor No.");
         ItemReference.SetRange("Item No.", "No.");
         ItemReference.SetRange("Variant Code", "Variant Code");
         ItemReference.SetRange("Unit of Measure", "Unit of Measure Code");
+        ToDate := Rec.GetDateForCalculations();
+        if ToDate <> 0D then begin
+            ItemReference.SetFilter("Starting Date", '<=%1', ToDate);
+            ItemReference.SetFilter("Ending Date", '>=%1|%2', ToDate, 0D);
+        end;
         if ItemReference.FindFirst() then
             "IC Item Reference No." := ItemReference."Reference No."
         else
@@ -8325,7 +8385,7 @@
         end;
 
         DeferralUtilities.RemoveOrSetDeferralSchedule(
-            "Deferral Code", "Deferral Document Type"::Purchase.AsInteger(), '', '',
+            "Deferral Code", Enum::"Deferral Document Type"::Purchase.AsInteger(), '', '',
             "Document Type".AsInteger(), "Document No.", "Line No.",
             GetDeferralAmount(), DeferralPostDate, Description, PurchHeader."Currency Code", AdjustStartDate);
     end;
@@ -8342,7 +8402,7 @@
 
         exit(
             DeferralUtilities.OpenLineScheduleEdit(
-                "Deferral Code", "Deferral Document Type"::Purchase.AsInteger(), '', '',
+                "Deferral Code", Enum::"Deferral Document Type"::Purchase.AsInteger(), '', '',
                 "Document Type".AsInteger(), "Document No.", "Line No.",
                 GetDeferralAmount(), PostingDate, Description, CurrencyCode));
     end;
@@ -8399,7 +8459,7 @@
         exit("Document Type" in ["Document Type"::Order, "Document Type"::Invoice]);
     end;
 
-    local procedure IsReceivedFromOcr(): Boolean
+    procedure IsReceivedFromOcr(): Boolean
     var
         IncomingDocument: Record "Incoming Document";
     begin
@@ -8465,6 +8525,22 @@
         NotificationToSend.Recall();
         NotificationToSend.Message := StrSubstNo(BlockedItemNotificationMsg, "No.");
         NotificationLifecycleMgt.SendNotification(NotificationToSend, RecordId);
+    end;
+
+    local procedure GetBlockedItemVariantNotificationID(): Guid
+    begin
+        exit('1113AAF8-EC5B-4F80-BB38-09A770130E59');
+    end;
+
+    local procedure SendBlockedItemVariantNotification()
+    var
+        NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
+        NotificationToSend: Notification;
+    begin
+        NotificationToSend.Id := GetBlockedItemVariantNotificationID();
+        NotificationToSend.Recall();
+        NotificationToSend.Message := StrSubstNo(BlockedItemVariantNotificationMsg, Rec."Variant Code", Rec."No.");
+        NotificationLifecycleMgt.SendNotification(NotificationToSend, Rec.RecordId());
     end;
 
     procedure SendLineInvoiceDiscountResetNotification()
@@ -8543,23 +8619,37 @@
     end;
 
     procedure UpdatePrepmtAmounts()
+    var
+        OutstandingAmountExclTax: Decimal;
     begin
         if (Rec.Quantity <> 0) and (Rec."Outstanding Quantity" = 0) and (Rec."Qty. Rcd. Not Invoiced" = 0) then
             if PurchHeader."Document Type" <> PurchHeader."Document Type"::Invoice then
                 exit;
 
         if PurchHeader."Document Type" <> PurchHeader."Document Type"::Invoice then begin
+            OutstandingAmountExclTax := CalculateOutstandingAmountExclTax();
             "Prepayment VAT Difference" := 0;
             if not PrePaymentLineAmountEntered then begin
-                "Prepmt. Line Amount" := Round("Line Amount" * "Prepayment %" / 100, Currency."Amount Rounding Precision");
-                if abs("Inv. Discount Amount" + "Prepmt. Line Amount") > abs("Line Amount") THEN
-                    "Prepmt. Line Amount" := "Line Amount" - "Inv. Discount Amount";
+                "Prepmt. Line Amount" := Round((OutstandingAmountExclTax) * "Prepayment %" / 100, Currency."Amount Rounding Precision");
+                "Prepmt. Line Amount" := "Prepmt. Line Amount" + "Prepmt Amt Deducted";
             end;
             PrePaymentLineAmountEntered := false;
         end;
 
         if not IsTemporary() then
             CheckPrepmtAmounts();
+    end;
+
+    local procedure CalculateOutstandingAmountExclTax(): Decimal
+    var
+        OutstandingAmount: Decimal;
+        QuantityNotInvoiced: Decimal;
+    begin
+        if Rec.Quantity = 0 then
+            exit(0);
+        QuantityNotInvoiced := (Rec.Quantity - Rec."Quantity Invoiced");
+        OutstandingAmount := round(((Rec."Line Amount" - Rec."Inv. Discount Amount") * QuantityNotInvoiced) / Rec.Quantity, Currency."Amount Rounding Precision");
+        exit(OutstandingAmount);
     end;
 
     local procedure CheckPrepmtAmounts()
@@ -8583,7 +8673,7 @@
                 FieldError("Direct Unit Cost", StrSubstNo(Text043, FieldCaption("Prepayment %")));
         end;
         if PurchHeader."Document Type" <> PurchHeader."Document Type"::Invoice then begin
-            if ("Prepmt. Line Amount" < "Prepmt. Amt. Inv.") and (PurchHeader.Status <> PurchHeader.Status::Released) then begin
+            if (("Prepmt. Line Amount" + Currency."Amount Rounding Precision") < "Prepmt. Amt. Inv.") and (PurchHeader.Status <> PurchHeader.Status::Released) then begin
                 if IsServiceCharge() then
                     Error(CannotChangePrepaidServiceChargeErr);
                 if "Inv. Discount Amount" <> 0 then
@@ -8700,7 +8790,7 @@
         if IsHandled then
             exit;
 
-        if "Line Amount" <> xRec."Line Amount" then begin
+        if Rec."Line Amount" <> xRec."Line Amount" then begin
             "VAT Difference" := 0;
             NonDeductibleVAT.InitNonDeductibleVATDiff(Rec);
             LineAmountChanged := true;
@@ -8730,7 +8820,7 @@
             IsHandled := false;
             OnCheckLocationRequireReceiveOnBeforePurchaseLineVerifyChange(Rec, xRec, IsHandled);
             if not IsHandled then
-                WhseValidateSourceLine.PurchaseLineVerifyChange(Rec, xRec);
+                PurchasesWarehouseMgt.PurchaseLineVerifyChange(Rec, xRec);
         end;
     end;
 
@@ -8854,7 +8944,7 @@
         OnAfterCreateDimFromDefaultDim(Rec, DefaultDimSource, FieldNo);
     end;
 
-    local procedure GetTableValuePair(FieldNo: Integer) TableValuePair: Dictionary of [Integer, Code[20]]
+    procedure GetTableValuePair(FieldNo: Integer) TableValuePair: Dictionary of [Integer, Code[20]]
     var
         IsHandled: Boolean;
     begin
@@ -8867,11 +8957,11 @@
             FieldNo = Rec.FieldNo("No."):
                 TableValuePair.Add(DimMgt.PurchLineTypeToTableID(Type), Rec."No.");
             FieldNo = Rec.FieldNo("Responsibility Center"):
-                TableValuePair.Add(Database::"Responsibility Center", Rec."Responsibility Center");
+                TableValuePair.Add(Enum::TableID::"Responsibility Center".AsInteger(), Rec."Responsibility Center");
             FieldNo = Rec.FieldNo("Job No."):
-                TableValuePair.Add(Database::Job, Rec."Job No.");
+                TableValuePair.Add(Enum::TableID::Job.AsInteger(), Rec."Job No.");
             FieldNo = Rec.FieldNo("Location Code"):
-                TableValuePair.Add(Database::Location, Rec."Location Code");
+                TableValuePair.Add(Enum::TableID::Location.AsInteger(), Rec."Location Code");
         end;
         OnAfterInitTableValuePair(TableValuePair, FieldNo, Rec);
     end;
@@ -8879,54 +8969,54 @@
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
         DimMgt.AddDimSource(DefaultDimSource, DimMgt.PurchLineTypeToTableID(Rec.Type), Rec."No.", FieldNo = Rec.FieldNo("No."));
-        DimMgt.AddDimSource(DefaultDimSource, Database::Job, Rec."Job No.", FieldNo = Rec.FieldNo("Job No."));
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", Rec."Work Center No.", FieldNo = Rec.FieldNo("Work Center No."));
-        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), Rec."Job No.", FieldNo = Rec.FieldNo("Job No."));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center".AsInteger(), Rec."Responsibility Center", FieldNo = Rec.FieldNo("Responsibility Center"));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), Rec."Work Center No.", FieldNo = Rec.FieldNo("Work Center No."));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;
 
-    internal procedure SaveLookupSelection(Selected: RecordRef)
+    procedure SaveLookupSelection(SelectedRecordRef: RecordRef)
     var
         GLAccount: Record "G/L Account";
         Item: Record Item;
         Resource: Record Resource;
         FixedAsset: Record "Fixed Asset";
         ItemCharge2: Record "Item Charge";
-        LookupStateMgr: Codeunit "Lookup State Manager";
+        LookupStateManager: Codeunit "Lookup State Manager";
         RecVariant: Variant;
     begin
         case Rec.Type of
             Rec.Type::Item:
                 begin
-                    Selected.SetTable(Item);
+                    SelectedRecordRef.SetTable(Item);
                     RecVariant := Item;
-                    LookupStateMgr.SaveRecord(RecVariant);
+                    LookupStateManager.SaveRecord(RecVariant);
                 end;
             Rec.Type::"G/L Account":
                 begin
-                    Selected.SetTable(GLAccount);
+                    SelectedRecordRef.SetTable(GLAccount);
                     RecVariant := GLAccount;
-                    LookupStateMgr.SaveRecord(RecVariant);
+                    LookupStateManager.SaveRecord(RecVariant);
                 end;
             Rec.Type::Resource:
                 begin
-                    Selected.SetTable(Resource);
+                    SelectedRecordRef.SetTable(Resource);
                     RecVariant := Resource;
-                    LookupStateMgr.SaveRecord(RecVariant);
+                    LookupStateManager.SaveRecord(RecVariant);
                 end;
             Rec.Type::"Fixed Asset":
                 begin
-                    Selected.SetTable(FixedAsset);
+                    SelectedRecordRef.SetTable(FixedAsset);
                     RecVariant := FixedAsset;
-                    LookupStateMgr.SaveRecord(RecVariant);
+                    LookupStateManager.SaveRecord(RecVariant);
                 end;
             Rec.Type::"Charge (Item)":
                 begin
-                    Selected.SetTable(ItemCharge2);
+                    SelectedRecordRef.SetTable(ItemCharge2);
                     RecVariant := ItemCharge2;
-                    LookupStateMgr.SaveRecord(RecVariant);
+                    LookupStateManager.SaveRecord(RecVariant);
                 end;
         end;
     end;
@@ -8942,14 +9032,14 @@
         if IsHandled then
             exit;
 
-        SelectedPurchLine.SetFilter(Type, '>%1', "Purchase Line Type"::" ");
+        SelectedPurchLine.SetFilter(Type, '>%1', SelectedPurchLine.Type::" ");
         SelectedPurchLine.SetFilter(Quantity, '<>0');
         if not SelectedPurchLine.FindSet() then
             exit;
 
         InvtItemPurchLine.SetRange("Document Type", SelectedPurchLine."Document Type");
         InvtItemPurchLine.SetRange("Document No.", SelectedPurchLine."Document No.");
-        InvtItemPurchLine.SetRange(Type, "Purchase Line Type"::Item);
+        InvtItemPurchLine.SetRange(Type, SelectedPurchLine.Type::Item);
         InvtItemPurchLine.SetRange("Attached to Line No.", 0);
         if InvtItemPurchLine.FindSet() then
             repeat
@@ -8969,67 +9059,80 @@
                 until SelectedPurchLine.Next() = 0;
     end;
 
-    internal procedure RestoreLookupSelection()
+    procedure RestoreLookupSelection()
     var
         GLAccount: Record "G/L Account";
         Item: Record Item;
         Resource: Record Resource;
         FixedAsset: Record "Fixed Asset";
         ItemCharge2: Record "Item Charge";
-        LookupStateMgr: Codeunit "Lookup State Manager";
+        LookupStateManager: Codeunit "Lookup State Manager";
         RecRef: RecordRef;
         RecVariant: Variant;
     begin
-        if LookupStateMgr.IsRecordSaved() then begin
+        if LookupStateManager.IsRecordSaved() then begin
             case Rec.Type of
                 Rec.Type::Item:
                     begin
-                        RecVariant := LookupStateMgr.GetSavedRecord();
+                        RecVariant := LookupStateManager.GetSavedRecord();
                         RecRef.GetTable(RecVariant);
-                        if RecRef.Number = Database::Item then begin
+                        if RecRef.Number = Enum::TableID::Item.AsInteger() then begin
                             Item := RecVariant;
                             Rec.Validate("No.", Item."No.");
                         end;
                     end;
                 Rec.Type::"G/L Account":
                     begin
-                        RecVariant := LookupStateMgr.GetSavedRecord();
+                        RecVariant := LookupStateManager.GetSavedRecord();
                         RecRef.GetTable(RecVariant);
-                        if RecRef.Number = Database::"G/L Account" then begin
+                        if RecRef.Number = Enum::TableID::"G/L Account".AsInteger() then begin
                             GLAccount := RecVariant;
                             Rec.Validate("No.", GLAccount."No.");
                         end;
                     end;
                 Rec.Type::Resource:
                     begin
-                        RecVariant := LookupStateMgr.GetSavedRecord();
+                        RecVariant := LookupStateManager.GetSavedRecord();
                         RecRef.GetTable(RecVariant);
-                        if RecRef.Number = Database::Resource then begin
+                        if RecRef.Number = Enum::TableID::Resource.AsInteger() then begin
                             Resource := RecVariant;
                             Rec.Validate("No.", Resource."No.");
                         end;
                     end;
                 Rec.Type::"Fixed Asset":
                     begin
-                        RecVariant := LookupStateMgr.GetSavedRecord();
+                        RecVariant := LookupStateManager.GetSavedRecord();
                         RecRef.GetTable(RecVariant);
-                        if RecRef.Number = Database::"Fixed Asset" then begin
+                        if RecRef.Number = Enum::TableID::"Fixed Asset".AsInteger() then begin
                             FixedAsset := RecVariant;
                             Rec.Validate("No.", FixedAsset."No.");
                         end;
                     end;
                 Rec.Type::"Charge (Item)":
                     begin
-                        RecVariant := LookupStateMgr.GetSavedRecord();
+                        RecVariant := LookupStateManager.GetSavedRecord();
                         RecRef.GetTable(RecVariant);
-                        if RecRef.Number = Database::"Item Charge" then begin
+                        if RecRef.Number = Enum::TableID::"Item Charge".AsInteger() then begin
                             ItemCharge2 := RecVariant;
                             Rec.Validate("No.", ItemCharge2."No.");
                         end;
                     end;
             end;
-            LookupStateMgr.ClearSavedRecord();
+            LookupStateManager.ClearSavedRecord();
         end;
+    end;
+
+    procedure GetDateForCalculations() CalculationDate: Date;
+    begin
+        if Rec."Document No." <> '' then begin
+            Rec.GetPurchHeader();
+            if PurchHeader."Document Type" in [PurchHeader."Document Type"::Invoice, PurchHeader."Document Type"::"Credit Memo"] then
+                CalculationDate := PurchHeader."Posting Date"
+            else
+                CalculationDate := PurchHeader."Order Date";
+        end;
+        if CalculationDate = 0D then
+            CalculationDate := WorkDate();
     end;
 
     local procedure HasVatInUse(): Boolean
@@ -9045,7 +9148,19 @@
 
         exit(true);
     end;
-    
+
+    local procedure SetLoadFieldsForInvDiscoundCalculation(var PurchaseLine: Record "Purchase Line")
+    begin
+        PurchaseLine.SetLoadFields(
+            "Document Type", "Document No.", Type, "No.", "Receipt No.", "Return Shipment No.", "Deferral Code",
+            Quantity, "Quantity (Base)", "Qty. to Invoice", "Qty. to Invoice (Base)", "Qty. Rcd. Not Invoiced", "Qty. Rcd. Not Invoiced (Base)", "Ret. Qty. Shpd Not Invd.(Base)", "Return Qty. Shipped (Base)",
+            "Return Qty. Shipped Not Invd.", "Qty. to Receive", "Qty. to Receive (Base)", "Return Qty. to Ship", "Return Qty. to Ship (Base)", "Return Qty. Shipped", "Outstanding Quantity", "Outstanding Qty. (Base)",
+            "Quantity Invoiced", "Qty. Invoiced (Base)", "Quantity Received", "Qty. Received (Base)", "Qty. per Unit of Measure", "Reserved Quantity",
+            "Unit Cost", "Amount Including VAT", Amount, "Line Amount", "Inv. Discount Amount", "Inv. Disc. Amount to Invoice", "VAT Difference", "VAT Base Amount",
+            "Outstanding Amount", "Outstanding Amount (LCY)", "Amt. Rcd. Not Invoiced", "Amt. Rcd. Not Invoiced (LCY)", "Return Shpd. Not Invd.", "Return Shpd. Not Invd. (LCY)",
+            "System-Created Entry", "VAT Identifier", "VAT Calculation Type", "Tax Group Code", "VAT %", "Allow Invoice Disc.", "Prepayment Line", "Completely Received");
+    end;
+
     local procedure CalcQtyReceivedBaseFromPostedReceipt(): Decimal
     var
         PurchRcptLine: Record "Purch. Rcpt. Line";
@@ -9068,47 +9183,33 @@
         exit(Rec."Qty. Received (Base)");
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
+    procedure CheckIfPurchaseLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock") Result: Boolean
     var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
+        QtyReservedFromStock: Decimal;
     begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Purchase Line", DefaultDimSource, TableID, No);
+        Result := true;
+
+        if not Rec.IsInventoriableItem() then
+            exit(true);
+
+        if ReservedFromStock = ReservedFromStock::" " then
+            exit(true);
+
+        QtyReservedFromStock := PurchLineReserve.GetReservedQtyFromInventory(Rec);
+
+        case ReservedFromStock of
+            ReservedFromStock::Full:
+                if QtyToPost <> QtyReservedFromStock then
+                    Result := false;
+            ReservedFromStock::"Full and Partial":
+                if QtyReservedFromStock = 0 then
+                    Result := false;
+            else
+                OnCheckIfPurchaseLineMeetsReservedFromStockSetting(QtyToPost, ReservedFromStock, Result);
+        end;
+
+        exit(Result);
     end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Purchase Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDimTableIDs(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Purchase Line") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDimTableIDs(var PurchaseLine: Record "Purchase Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var PurchaseLine: Record "Purchase Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
@@ -9398,13 +9499,6 @@
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var PurchLine: Record "Purchase Line"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetDeferralPostDate(var PurchaseLine: Record "Purchase Line"; PurchHeader: Record "Purchase Header"; var DeferralPostDate: Date);
     begin
@@ -9597,6 +9691,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCopyFromGLAccount(var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; CallingFieldNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnNotHandledCopyFromGLAccount(var PurchaseLine: Record "Purchase Line"; GLAccount: Record "G/L Account")
     begin
     end;
 
@@ -10372,14 +10471,14 @@
 
     procedure AssignedItemCharge(): Boolean
     begin
-        exit((Type = Type::"Charge (Item)") and ("No." <> ''));
+        exit((Type = Type::"Charge (Item)") and ("No." <> '') and ("Qty. to Assign" < Quantity));
     end;
 
     procedure ShowDeferralSchedule()
     var
         PurchaseHeader: Record "Purchase Header";
     begin
-        PurchaseHeader.Get("Document Type", "Document No.");
+        PurchaseHeader.Get(Rec."Document Type", Rec."Document No.");
         ShowDeferrals(PurchaseHeader."Posting Date", PurchaseHeader."Currency Code");
     end;
 
@@ -10612,14 +10711,6 @@
     local procedure OnBeforeUpdateDimensionsFromJobTask(var PurchaseLine: Record "Purchase Line"; CurrFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced with OnValidateLocationCodeOnAfterTestStatusOpen and OnAfterInitHeaderDefaults', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateLocationCode(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnInitHeaderDefaultsOnBeforeSetVATBusPostingGroup(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
@@ -10909,7 +11000,6 @@
     begin
     end;
 
-
 #if not CLEAN23
     [Obsolete('Pending removal use "OnAfterValidateNoPurchaseLine" instead', '23.0')]
     [IntegrationEvent(false, false)]
@@ -10942,11 +11032,6 @@
     local procedure OnAfterIsInbound(PurchaseLine: Record "Purchase Line"; var IsInboundDocument: Boolean)
     begin
     end;
-    
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdatePrePaymentAmounts(var PurchaseLine: Record "Purchase Line")
-    begin
-    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeBlanketOrderIsRelated(var CurrentPurchaseLine: Record "Purchase Line"; var BlanketOrderPurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; var Result: Boolean)
@@ -10963,13 +11048,28 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdatePrePaymentAmounts(var PurchaseLine: Record "Purchase Line")
+    begin
+    end;
+
     [IntegrationEvent(true, false)]
     local procedure OnValidateNoOnBeforeJobTaskIsSet(PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; xPurchaseLine: Record "Purchase Line"; TempPurchaseLine: Record "Purchase Line" temporary; IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnValidateVariantCodeBeforeCheckBlocked(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterValidateBlanketOrderLineNo(var PurchaseLine: Record "Purchase Line"; BlanketOrderPurchLine: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckIfPurchaseLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock"; var Result: Boolean)
     begin
     end;
 

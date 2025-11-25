@@ -1,7 +1,15 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 328 "Vendor Document Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/VendorDocumentNos.rdlc';
+    RDLCLayout = './Purchases/Reports/VendorDocumentNos.rdlc';
     Caption = 'Vendor Document Nos.';
     ObsoleteState = Pending;
     ObsoleteReason = 'Infrequently used report.';
@@ -11,7 +19,7 @@ report 328 "Vendor Document Nos."
     {
         dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
         {
-            DataItemTableView = SORTING("Document No.");
+            DataItemTableView = sorting("Document No.");
             RequestFilterFields = "Document Type", "Document No.";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {
@@ -60,7 +68,7 @@ report 328 "Vendor Document Nos."
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorText_Number_; ErrorText[Number])
                 {
                 }
@@ -86,8 +94,8 @@ report 328 "Vendor Document Nos."
             }
             dataitem(VendLedgerEntry; "Vendor Ledger Entry")
             {
-                DataItemLink = "Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("Entry No.");
+                DataItemLink = "Entry No." = field("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(VendLedgerEntry__User_ID_; "User ID")
                 {
                 }

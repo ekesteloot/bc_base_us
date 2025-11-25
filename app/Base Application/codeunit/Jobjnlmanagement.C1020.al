@@ -1,3 +1,10 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 codeunit 1020 JobJnlManagement
 {
     Permissions = TableData "Job Journal Template" = rimd,

@@ -1,3 +1,9 @@
+﻿namespace System.IO;
+
+using System;
+using System.Integration;
+using System.Utilities;
+
 codeunit 1237 "Get Json Structure"
 {
 

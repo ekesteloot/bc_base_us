@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.Posting;
+
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using System.Utilities;
+
 codeunit 5982 "Service-Post+Print"
 {
     TableNo = "Service Header";

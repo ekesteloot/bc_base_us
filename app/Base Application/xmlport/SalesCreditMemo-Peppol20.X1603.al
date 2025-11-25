@@ -1,3 +1,12 @@
+﻿namespace Microsoft.Sales.Peppol;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.History;
+using System.Utilities;
+
 xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"
 {
     Caption = 'Sales Credit Memo - PEPPOL 2.0';
@@ -11,7 +20,7 @@ xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"
         {
             MaxOccurs = Once;
             XmlName = 'CreditNote';
-            SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            SourceTableView = sorting(Number) where(Number = filter(1 ..));
             textelement(UBLVersionID)
             {
                 NamespacePrefix = 'cbc';
@@ -195,7 +204,7 @@ xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"
             {
                 NamespacePrefix = 'cac';
                 XmlName = 'AdditionalDocumentReference';
-                SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                SourceTableView = sorting(Number) where(Number = filter(1 ..));
                 textelement(additionaldocumentreferenceid)
                 {
                     NamespacePrefix = 'cbc';
@@ -246,7 +255,8 @@ xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"
                         AdditionalDocRefDocumentType,
                         URI,
                         mimeCode,
-                        EmbeddedDocumentBinaryObject);
+                        EmbeddedDocumentBinaryObject,
+                        ProcessedDocType);
 
                     if AdditionalDocumentReferenceID = '' then
                         currXMLport.Skip();
@@ -887,7 +897,7 @@ xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"
             {
                 NamespacePrefix = 'cac';
                 XmlName = 'AllowanceCharge';
-                SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                SourceTableView = sorting(Number) where(Number = filter(1 ..));
                 textelement(ChargeIndicator)
                 {
                     NamespacePrefix = 'cbc';
@@ -977,7 +987,7 @@ xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"
                 {
                     NamespacePrefix = 'cac';
                     XmlName = 'TaxSubtotal';
-                    SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    SourceTableView = sorting(Number) where(Number = filter(1 ..));
                     textelement(TaxableAmount)
                     {
                         NamespacePrefix = 'cbc';
@@ -1175,7 +1185,7 @@ xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"
             {
                 NamespacePrefix = 'cac';
                 XmlName = 'CreditNoteLine';
-                SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                SourceTableView = sorting(Number) where(Number = filter(1 ..));
                 textelement(salescrmemolineid)
                 {
                     NamespacePrefix = 'cbc';
@@ -1377,7 +1387,7 @@ xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"
                     {
                         NamespacePrefix = 'cac';
                         XmlName = 'CommodityClassification';
-                        SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        SourceTableView = sorting(Number) where(Number = filter(1 ..));
                         textelement(CommodityCode)
                         {
                             NamespacePrefix = 'cbc';
@@ -1466,7 +1476,7 @@ xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"
                     {
                         NamespacePrefix = 'cac';
                         XmlName = 'AdditionalItemProperty';
-                        SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        SourceTableView = sorting(Number) where(Number = filter(1 ..));
                         textelement(additionalitempropertyname)
                         {
                             NamespacePrefix = 'cbc';
@@ -1533,7 +1543,7 @@ xmlport 1603 "Sales Credit Memo - PEPPOL 2.0"
                     {
                         NamespacePrefix = 'cac';
                         XmlName = 'AllowanceCharge';
-                        SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        SourceTableView = sorting(Number) where(Number = filter(1 ..));
                         textelement(pricechargeindicator)
                         {
                             NamespacePrefix = 'cbc';

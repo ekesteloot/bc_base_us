@@ -146,8 +146,8 @@
         field(10044; "Transport Operators"; Integer)
         {
             Caption = 'Transport Operators';
-            CalcFormula = Count("CFDI Transport Operator" WHERE("Document Table ID" = FIELD("Document Table ID"),
-                                                                 "Document No." = FIELD("No.")));
+            CalcFormula = count("CFDI Transport Operator" where("Document Table ID" = field("Document Table ID"),
+                                                                 "Document No." = field("No.")));
             FieldClass = FlowField;
         }
         field(10045; "Transit-from Date/Time"; DateTime)
@@ -182,22 +182,22 @@
         field(10052; "Trailer 1"; Code[20])
         {
             Caption = 'Trailer 1';
-            TableRelation = "Fixed Asset" WHERE("SAT Trailer Type" = FILTER(<> ''));
+            TableRelation = "Fixed Asset" where("SAT Trailer Type" = filter(<> ''));
         }
         field(10053; "Trailer 2"; Code[20])
         {
             Caption = 'Trailer 2';
-            TableRelation = "Fixed Asset" WHERE("SAT Trailer Type" = FILTER(<> ''));
+            TableRelation = "Fixed Asset" where("SAT Trailer Type" = filter(<> ''));
         }
         field(10054; "Transit-from Location"; Code[10])
         {
             Caption = 'Transit-from Location';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(10055; "Transit-to Location"; Code[10])
         {
             Caption = 'Transit-to Location';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(10056; "Medical Insurer Name"; Text[50])
         {

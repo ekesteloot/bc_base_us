@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.InventoryMgt.Counting.Recording;
+using Microsoft.InventoryMgt.Counting.Tracking;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Tracking;
+
 codeunit 5880 "Phys. Invt. Order-Finish"
 {
     TableNo = "Phys. Invt. Order Header";
@@ -94,10 +102,7 @@ codeunit 5880 "Phys. Invt. Order-Finish"
                             else
                                 PhysInvtOrderLine."Neg. Qty. (Base)" := PhysInvtOrderLine."Quantity (Base)";
 
-                        IsHandled := false;
-                        OnCodeOnBeforePhysInvtOrderLineCalcCosts(PhysInvtOrderLine, IsHandled);
-                        if not IsHandled then
-                            PhysInvtOrderLine.CalcCosts();
+                        PhysInvtOrderLine.CalcCosts();
 
                         OnBeforePhysInvtOrderLineModify(PhysInvtOrderLine);
                         PhysInvtOrderLine.Modify();
@@ -164,10 +169,7 @@ codeunit 5880 "Phys. Invt. Order-Finish"
                                                 PhysInvtOrderLine2."Document No.", PhysInvtOrderLine2."Line No.", false,
                                                 PhysInvtOrderLine2."Quantity (Base)");
                                     end;
-                                    IsHandled := false;
-                                    OnCodeOnBeforePhysInvtOrderLine2CalcCosts(PhysInvtOrderLine2, IsHandled);
-                                    if not IsHandled then
-                                        PhysInvtOrderLine2.CalcCosts();
+                                    PhysInvtOrderLine2.CalcCosts();
                                     PhysInvtOrderLine2.Modify();
                                 until PhysInvtOrderLine2.Next() = 0;
                         end;
@@ -181,6 +183,7 @@ codeunit 5880 "Phys. Invt. Order-Finish"
 
     local procedure CheckOrderLine(PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var Item: Record Item)
     var
+        ItemVariant: Record "Item Variant";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -192,6 +195,12 @@ codeunit 5880 "Phys. Invt. Order-Finish"
             CheckLine();
             Item.Get("Item No.");
             Item.TestField(Blocked, false);
+
+            if PhysInvtOrderLine."Variant Code" <> '' then begin
+                ItemVariant.SetLoadFields(Blocked);
+                ItemVariant.Get(PhysInvtOrderLine."Item No.", PhysInvtOrderLine."Variant Code");
+                ItemVariant.TestField(Blocked, false);
+            end;
 
             IsHandled := false;
             OnBeforeGetSamePhysInvtOrderLine(PhysInvtOrderLine, PhysInvtOrderHeader, IsHandled, PhysInvtOrderLine2);
@@ -475,16 +484,6 @@ codeunit 5880 "Phys. Invt. Order-Finish"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetPhysInvtRecordLineFilters(var PhysInvtOrderLine2: Record "Phys. Invt. Order Line"; PhysInvtOrderLine: Record "Phys. Invt. Order Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforePhysInvtOrderLineCalcCosts(var PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforePhysInvtOrderLine2CalcCosts(var PhysInvtOrderLine2: Record "Phys. Invt. Order Line"; var IsHandled: Boolean);
     begin
     end;
 }

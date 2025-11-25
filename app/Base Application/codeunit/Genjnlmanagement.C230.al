@@ -1,4 +1,16 @@
-﻿codeunit 230 GenJnlManagement
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.AllocationAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
+codeunit 230 GenJnlManagement
 {
     Permissions = TableData "Gen. Journal Template" = rimd,
                   TableData "Gen. Journal Batch" = rimd;
@@ -39,7 +51,7 @@
 
         GenJnlTemplateType := PageTemplate.AsInteger();
         OnTemplateSelectionSetFilter(GenJnlTemplate, GenJnlTemplateType, RecurringJnl, PageID, GenJnlLine);
-        PageTemplate := "Gen. Journal Template Type".FromInteger(GenJnlTemplateType);
+        PageTemplate := Enum::"Gen. Journal Template Type".FromInteger(GenJnlTemplateType);
 
         JnlSelected := FindTemplateFromSelection(GenJnlTemplate, PageTemplate, RecurringJnl);
 
@@ -219,7 +231,6 @@
         OnAfterCheckName(GenJnlBatch, CurrentJnlBatchName, GenJnlLine);
     end;
 
-    [Scope('OnPrem')]
     procedure CheckCurrencyCode(CurrencyCode: Code[10])
     var
         Currency: Record Currency;
@@ -391,6 +402,8 @@
         ICPartner: Record "IC Partner";
         [SecurityFiltering(SecurityFilter::Filtered)]
         Employee: Record Employee;
+        [SecurityFiltering(SecurityFilter::Filtered)]
+        AllocationAccount: Record "Allocation Account";
         AccName: Text[100];
     begin
         case AccType of
@@ -435,6 +448,12 @@
                     Employee.SetloadFields("First Name", "Last Name");
                     if Employee.Get(AccNo) then
                         AccName := Employee."First Name" + ' ' + Employee."Last Name";
+                end;
+            AccType::"Allocation Account":
+                begin
+                    AllocationAccount.SetloadFields(Name);
+                    if AllocationAccount.Get(AccNo) then
+                        AccName := AllocationAccount.Name;
                 end;
         end;
         exit(AccName);

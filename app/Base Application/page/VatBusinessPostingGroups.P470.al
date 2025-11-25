@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 page 470 "VAT Business Posting Groups"
 {
     ApplicationArea = Basic, Suite;
@@ -13,7 +15,7 @@ page 470 "VAT Business Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the posting group that determines how to calculate and post VAT for customers and vendors. The number of VAT posting groups that you set up can depend on local legislation and whether you trade both domestically and internationally.';
@@ -50,7 +52,7 @@ page 470 "VAT Business Posting Groups"
                 Caption = '&Setup';
                 Image = Setup;
                 RunObject = Page "VAT Posting Setup";
-                RunPageLink = "VAT Bus. Posting Group" = FIELD(Code);
+                RunPageLink = "VAT Bus. Posting Group" = field(Code);
                 ToolTip = 'View or edit combinations of Tax business posting groups and Tax product posting groups. Fill in a line for each combination of VAT business posting group and VAT product posting group.';
             }
         }

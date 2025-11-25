@@ -1,3 +1,8 @@
+﻿namespace Microsoft.Purchases.Payables;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+
 page 9095 "Vendor Hist. Buy-from FactBox"
 {
     Caption = 'Buy-from Vendor History';
@@ -89,7 +94,7 @@ page 9095 "Vendor Hist. Buy-from FactBox"
                     Caption = 'Pstd. Credit Memos';
                     ToolTip = 'Specifies the number of posted purchase credit memos that exist for the vendor.';
                 }
-                field(NoOfIncomingDocuments; "No. of Incoming Documents")
+                field(NoOfIncomingDocuments; Rec."No. of Incoming Documents")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Incoming Documents';
@@ -99,73 +104,73 @@ page 9095 "Vendor Hist. Buy-from FactBox"
             cuegroup(Control1)
             {
                 ShowCaption = false;
-                field(CueQuotes; "No. of Quotes")
+                field(CueQuotes; Rec."No. of Quotes")
                 {
                     ApplicationArea = Suite;
                     Caption = 'Quotes';
                     DrillDownPageID = "Purchase Quotes";
                     ToolTip = 'Specifies the number of purchase quotes that exist for the vendor.';
                 }
-                field(CueBlanketOrders; "No. of Blanket Orders")
+                field(CueBlanketOrders; Rec."No. of Blanket Orders")
                 {
                     ApplicationArea = Suite;
                     Caption = 'Blanket Orders';
                     DrillDownPageID = "Blanket Purchase Orders";
                     ToolTip = 'Specifies the number of purchase blanket orders that exist for the vendor.';
                 }
-                field(CueOrders; "No. of Orders")
+                field(CueOrders; Rec."No. of Orders")
                 {
                     ApplicationArea = Suite;
                     Caption = 'Orders';
                     DrillDownPageID = "Purchase Order List";
                     ToolTip = 'Specifies the number of purchase orders that exist for the vendor.';
                 }
-                field(CueInvoices; "No. of Invoices")
+                field(CueInvoices; Rec."No. of Invoices")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Invoices';
                     DrillDownPageID = "Purchase Invoices";
                     ToolTip = 'Specifies the number of unposted purchase invoices that exist for the vendor.';
                 }
-                field(CueReturnOrders; "No. of Return Orders")
+                field(CueReturnOrders; Rec."No. of Return Orders")
                 {
                     ApplicationArea = PurchReturnOrder;
                     Caption = 'Return Orders';
                     DrillDownPageID = "Purchase Return Order List";
                     ToolTip = 'Specifies the number of purchase return orders that exist for the vendor.';
                 }
-                field(CueCreditMemos; "No. of Credit Memos")
+                field(CueCreditMemos; Rec."No. of Credit Memos")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Credit Memos';
                     DrillDownPageID = "Purchase Credit Memos";
                     ToolTip = 'Specifies the number of unposted purchase credit memos that exist for the vendor.';
                 }
-                field(CuePostedRetShip; "No. of Pstd. Return Shipments")
+                field(CuePostedRetShip; Rec."No. of Pstd. Return Shipments")
                 {
                     ApplicationArea = PurchReturnOrder;
                     Caption = 'Pstd. Return Shipments';
                     ToolTip = 'Specifies the number of posted return shipments that exist for the vendor.';
                 }
-                field(CuePostedReceipts; "No. of Pstd. Receipts")
+                field(CuePostedReceipts; Rec."No. of Pstd. Receipts")
                 {
                     ApplicationArea = Suite;
                     Caption = 'Pstd. Receipts';
                     ToolTip = 'Specifies the number of posted purchase receipts that exist for the vendor.';
                 }
-                field(CuePostedInvoices; "No. of Pstd. Invoices")
+                field(CuePostedInvoices; Rec."No. of Pstd. Invoices")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Pstd. Invoices';
                     ToolTip = 'Specifies the number of posted purchase invoices that exist for the vendor.';
                 }
-                field(CuePostedCreditMemos; "No. of Pstd. Credit Memos")
+                field(CuePostedCreditMemos; Rec."No. of Pstd. Credit Memos")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Pstd. Credit Memos';
                     ToolTip = 'Specifies the number of posted purchase credit memos that exist for the vendor.';
                 }
-                field(CueIncomingDocuments; "No. of Incoming Documents")
+                field(CueIncomingDocuments; Rec."No. of Incoming Documents")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Incoming Documents';

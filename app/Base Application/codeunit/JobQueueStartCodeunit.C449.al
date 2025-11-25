@@ -1,3 +1,8 @@
+namespace System.Threading;
+
+using System.Environment.Configuration;
+using System.Utilities;
+
 codeunit 449 "Job Queue Start Codeunit"
 {
     Permissions = TableData "Job Queue Entry" = rm, tabledata "Report Settings Override" = rim;
@@ -16,16 +21,16 @@ codeunit 449 "Job Queue Start Codeunit"
         Success: Boolean;
         LastError: DotNet LastError;
     begin
-        if "User Language ID" <> 0 then
-            GlobalLanguage("User Language ID");
+        if Rec."User Language ID" <> 0 then
+            GlobalLanguage(Rec."User Language ID");
 
         ErrorMessageManagement.Activate(ErrorMessageHandler);
         ErrorMessageManagement.PushContext(ErrorContextElement, Rec.RecordId(), 0, JobQueueStartContextTxt);
-        case "Object Type to Run" of
-            "Object Type to Run"::Codeunit:
-                Success := Codeunit.Run("Object ID to Run", Rec);
-            "Object Type to Run"::Report:
-                Success := RunReport("Object ID to Run", Rec);
+        case Rec."Object Type to Run" of
+            Rec."Object Type to Run"::Codeunit:
+                Success := Codeunit.Run(Rec."Object ID to Run", Rec);
+            Rec."Object Type to Run"::Report:
+                Success := RunReport(Rec."Object ID to Run", Rec);
         end;
 
         if (not Success) or ErrorMessageManagement.GetErrorsInContext(ErrorContextElement, TempErrorMessage) then begin

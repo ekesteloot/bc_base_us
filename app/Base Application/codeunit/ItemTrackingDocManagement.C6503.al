@@ -1,3 +1,18 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.AssemblyMgt.History;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+
 codeunit 6503 "Item Tracking Doc. Management"
 {
 
@@ -241,33 +256,33 @@ codeunit 6503 "Item Tracking Doc. Management"
         OnBeforeRetrieveDocumentItemTracking(TempTrackingSpecBuffer, SourceID, SourceType, SourceSubType, IsHandled);
         if not IsHandled then
             case SourceType of
-                DATABASE::"Purchase Header":
+                Enum::TableID::"Purchase Header":
                     RetrieveTrackingPurchase(TempTrackingSpecBuffer, SourceID, SourceSubType);
-                DATABASE::"Sales Header":
+                Enum::TableID::"Sales Header":
                     RetrieveTrackingSales(TempTrackingSpecBuffer, SourceID, SourceSubType);
-                DATABASE::"Service Header":
+                Enum::TableID::"Service Header":
                     RetrieveTrackingService(TempTrackingSpecBuffer, SourceID, SourceSubType);
-                DATABASE::"Purch. Rcpt. Header":
+                Enum::TableID::"Purch. Rcpt. Header":
                     RetrieveTrackingPurchaseReceipt(TempTrackingSpecBuffer, SourceID);
-                DATABASE::"Sales Shipment Header":
+                Enum::TableID::"Sales Shipment Header":
                     RetrieveTrackingSalesShipment(TempTrackingSpecBuffer, SourceID);
-                DATABASE::"Sales Invoice Header":
+                Enum::TableID::"Sales Invoice Header":
                     RetrieveTrackingSalesInvoice(TempTrackingSpecBuffer, SourceID);
-                DATABASE::"Sales Cr.Memo Header":
+                Enum::TableID::"Sales Cr.Memo Header":
                     RetrieveTrackingSalesCrMemoHeader(TempTrackingSpecBuffer, SourceID);
-                DATABASE::"Purch. Inv. Header":
+                Enum::TableID::"Purch. Inv. Header":
                     RetrieveTrackingPurhInvHeader(TempTrackingSpecBuffer, SourceID);
-                DATABASE::"Purch. Cr. Memo Hdr.":
+                Enum::TableID::"Purch. Cr. Memo Hdr.":
                     RetrieveTrackingPurchCrMemoHeader(TempTrackingSpecBuffer, SourceID);
-                DATABASE::"Service Shipment Header":
+                Enum::TableID::"Service Shipment Header":
                     RetrieveTrackingServiceShipment(TempTrackingSpecBuffer, SourceID);
-                DATABASE::"Service Invoice Header":
+                Enum::TableID::"Service Invoice Header":
                     RetrieveTrackingServiceInvoice(TempTrackingSpecBuffer, SourceID);
                 else begin
-                        OnRetrieveDocumentItemTracking(TempTrackingSpecBuffer, SourceID, Found, SourceType, SourceSubType, RetrieveAsmItemTracking);
-                        if not Found then
-                            Error(TableNotSupportedErr, SourceType);
-                    end;
+                    OnRetrieveDocumentItemTracking(TempTrackingSpecBuffer, SourceID, Found, SourceType, SourceSubType, RetrieveAsmItemTracking);
+                    if not Found then
+                        Error(TableNotSupportedErr, SourceType);
+                end;
             end;
 
         TempTrackingSpecBuffer.Reset();
@@ -347,10 +362,10 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if Item.Get(PurchaseLine."No.") then
                         Descr := Item.Description;
                     FindReservEntries(
-                        TempTrackingSpecBuffer, DATABASE::"Purchase Line", PurchaseLine."Document Type".AsInteger(),
+                        TempTrackingSpecBuffer, Enum::TableID::"Purchase Line", PurchaseLine."Document Type".AsInteger(),
                         PurchaseLine."Document No.", '', 0, PurchaseLine."Line No.", Descr);
                     FindTrackingEntries(
-                        TempTrackingSpecBuffer, DATABASE::"Purchase Line", PurchaseLine."Document Type".AsInteger(),
+                        TempTrackingSpecBuffer, Enum::TableID::"Purchase Line", PurchaseLine."Document Type".AsInteger(),
                         PurchaseLine."Document No.", '', 0, PurchaseLine."Line No.", Descr);
                 end;
             until PurchaseLine.Next() = 0;
@@ -375,7 +390,7 @@ codeunit 6503 "Item Tracking Doc. Management"
                         Descr := Item.Description;
                     FindShptRcptEntries(
                       TempTrackingSpecBuffer,
-                      DATABASE::"Purch. Rcpt. Line", 0, PurchRcptLine."Document No.", '', 0, PurchRcptLine."Line No.", Descr);
+                      Enum::TableID::"Purch. Rcpt. Line", 0, PurchRcptLine."Document No.", '', 0, PurchRcptLine."Line No.", Descr);
                 end;
             until PurchRcptLine.Next() = 0;
     end;
@@ -399,10 +414,10 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if Item.Get(SalesLine."No.") then
                         Descr := Item.Description;
                     FindReservEntries(
-                        TempTrackingSpecBuffer, DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(),
+                        TempTrackingSpecBuffer, Enum::TableID::"Sales Line", SalesLine."Document Type".AsInteger(),
                         SalesLine."Document No.", '', 0, SalesLine."Line No.", Descr);
                     FindTrackingEntries(
-                        TempTrackingSpecBuffer, DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(),
+                        TempTrackingSpecBuffer, Enum::TableID::"Sales Line", SalesLine."Document Type".AsInteger(),
                         SalesLine."Document No.", '', 0, SalesLine."Line No.", Descr);
                 end;
             until SalesLine.Next() = 0;
@@ -427,10 +442,10 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if Item.Get(ServLine."No.") then
                         Descr := Item.Description;
                     FindReservEntries(
-                        TempTrackingSpecBuffer, DATABASE::"Service Line", ServLine."Document Type".AsInteger(),
+                        TempTrackingSpecBuffer, Enum::TableID::"Service Line", ServLine."Document Type".AsInteger(),
                         ServLine."Document No.", '', 0, ServLine."Line No.", Descr);
                     FindTrackingEntries(
-                        TempTrackingSpecBuffer, DATABASE::"Service Line", ServLine."Document Type".AsInteger(),
+                        TempTrackingSpecBuffer, Enum::TableID::"Service Line", ServLine."Document Type".AsInteger(),
                         ServLine."Document No.", '', 0, ServLine."Line No.", Descr);
                 end;
             until ServLine.Next() = 0;
@@ -457,7 +472,7 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if Item.Get(SalesShipmentLine."No.") then
                         Descr := Item.Description;
                     FindShptRcptEntries(TempTrackingSpecBuffer,
-                      DATABASE::"Sales Shipment Line", 0, SalesShipmentLine."Document No.", '', 0, SalesShipmentLine."Line No.", Descr);
+                      Enum::TableID::"Sales Shipment Line", 0, SalesShipmentLine."Document No.", '', 0, SalesShipmentLine."Line No.", Descr);
                     if RetrieveAsmItemTracking then
                         if SalesShipmentLine.AsmToShipmentExists(PostedAsmHeader) then begin
                             PostedAsmLine.SetRange("Document No.", PostedAsmHeader."No.");
@@ -465,7 +480,7 @@ codeunit 6503 "Item Tracking Doc. Management"
                                 repeat
                                     Descr := PostedAsmLine.Description;
                                     FindShptRcptEntries(TempTrackingSpecBuffer,
-                                      DATABASE::"Posted Assembly Line", 0, PostedAsmLine."Document No.", '', 0, PostedAsmLine."Line No.", Descr);
+                                      Enum::TableID::"Posted Assembly Line", 0, PostedAsmLine."Document No.", '', 0, PostedAsmLine."Line No.", Descr);
                                 until PostedAsmLine.Next() = 0;
                         end;
                 end;
@@ -491,7 +506,7 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if Item.Get(SalesInvoiceLine."No.") then
                         Descr := Item.Description;
                     FindInvoiceEntries(TempTrackingSpecBuffer,
-                      DATABASE::"Sales Invoice Line", 0, SalesInvoiceLine."Document No.", '', 0, SalesInvoiceLine."Line No.", Descr);
+                      Enum::TableID::"Sales Invoice Line", 0, SalesInvoiceLine."Document No.", '', 0, SalesInvoiceLine."Line No.", Descr);
                 end;
             until SalesInvoiceLine.Next() = 0;
         end;
@@ -515,7 +530,7 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if Item.Get(SalesCrMLine."No.") then
                         Descr := Item.Description;
                     FindInvoiceEntries(TempTrackingSpecBuffer,
-                      DATABASE::"Sales Cr.Memo Line", 0, SalesCrMLine."Document No.", '', 0, SalesCrMLine."Line No.", Descr);
+                      Enum::TableID::"Sales Cr.Memo Line", 0, SalesCrMLine."Document No.", '', 0, SalesCrMLine."Line No.", Descr);
                 end;
             until SalesCrMLine.Next() = 0;
         end;
@@ -539,7 +554,7 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if Item.Get(PurchInvLine."No.") then
                         Descr := Item.Description;
                     FindInvoiceEntries(TempTrackingSpecBuffer,
-                      DATABASE::"Purch. Inv. Line", 0, PurchInvLine."Document No.", '', 0, PurchInvLine."Line No.", Descr);
+                      Enum::TableID::"Purch. Inv. Line", 0, PurchInvLine."Document No.", '', 0, PurchInvLine."Line No.", Descr);
                 end;
             until PurchInvLine.Next() = 0;
         end;
@@ -563,7 +578,7 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if Item.Get(PurchCrMLine."No.") then
                         Descr := Item.Description;
                     FindInvoiceEntries(TempTrackingSpecBuffer,
-                      DATABASE::"Purch. Cr. Memo Line", 0, PurchCrMLine."Document No.", '', 0, PurchCrMLine."Line No.", Descr);
+                      Enum::TableID::"Purch. Cr. Memo Line", 0, PurchCrMLine."Document No.", '', 0, PurchCrMLine."Line No.", Descr);
                 end;
             until PurchCrMLine.Next() = 0;
         end;
@@ -586,7 +601,7 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if Item.Get(ServShptLine."No.") then
                         Descr := Item.Description;
                     FindShptRcptEntries(TempTrackingSpecBuffer,
-                      DATABASE::"Service Shipment Line", 0, ServShptLine."Document No.", '', 0, ServShptLine."Line No.", Descr);
+                      Enum::TableID::"Service Shipment Line", 0, ServShptLine."Document No.", '', 0, ServShptLine."Line No.", Descr);
                 end;
             until ServShptLine.Next() = 0;
         end;
@@ -609,7 +624,7 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if Item.Get(ServInvLine."No.") then
                         Descr := Item.Description;
                     FindInvoiceEntries(TempTrackingSpecBuffer,
-                      DATABASE::"Service Invoice Line", 0, ServInvLine."Document No.", '', 0, ServInvLine."Line No.", Descr);
+                      Enum::TableID::"Service Invoice Line", 0, ServInvLine."Document No.", '', 0, ServInvLine."Line No.", Descr);
                 end;
             until ServInvLine.Next() = 0;
         end;
@@ -695,12 +710,12 @@ codeunit 6503 "Item Tracking Doc. Management"
         ItemLedgEntry.SetRange("Order No.", ID);
         ItemLedgEntry.SetRange("Order Line No.", ProdOrderLine);
         case Type of
-            DATABASE::"Prod. Order Line":
+            Enum::TableID::"Prod. Order Line":
                 begin
                     ItemLedgEntry.SetRange("Entry Type", ItemLedgEntry."Entry Type"::Output);
                     ItemLedgEntry.SetRange("Prod. Order Comp. Line No.", 0);
                 end;
-            DATABASE::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component":
                 begin
                     ItemLedgEntry.SetRange("Entry Type", ItemLedgEntry."Entry Type"::Consumption);
                     ItemLedgEntry.SetRange("Prod. Order Comp. Line No.", RefNo);
@@ -736,7 +751,7 @@ codeunit 6503 "Item Tracking Doc. Management"
         ItemLedgEntry.SetRange("Job No.", ID);
         ItemLedgEntry.SetRange("Order Line No.", RefNo);
 
-        if Type = Database::"Job Planning Line" then
+        if Type = Enum::TableID::"Job Planning Line" then
             ItemLedgEntry.SetRange("Entry Type", ItemLedgEntry."Entry Type"::"Negative Adjmt.")
         else
             exit(false);
@@ -771,19 +786,19 @@ codeunit 6503 "Item Tracking Doc. Management"
     local procedure TableSignFactor(TableNo: Integer): Integer
     begin
         if TableNo in [
-                       DATABASE::"Sales Line",
-                       DATABASE::"Sales Shipment Line",
-                       DATABASE::"Sales Invoice Line",
-                       DATABASE::"Purch. Cr. Memo Line",
-                       DATABASE::"Prod. Order Component",
-                       DATABASE::"Transfer Shipment Line",
-                       DATABASE::"Return Shipment Line",
-                       DATABASE::"Invt. Shipment Line",
-                       DATABASE::"Planning Component",
-                       DATABASE::"Posted Assembly Line",
-                       DATABASE::"Service Line",
-                       DATABASE::"Service Shipment Line",
-                       DATABASE::"Service Invoice Line"]
+                       Enum::TableID::"Sales Line",
+                       Enum::TableID::"Sales Shipment Line",
+                       Enum::TableID::"Sales Invoice Line",
+                       Enum::TableID::"Purch. Cr. Memo Line",
+                       Enum::TableID::"Prod. Order Component",
+                       Enum::TableID::"Transfer Shipment Line",
+                       Enum::TableID::"Return Shipment Line",
+                       Enum::TableID::"Invt. Shipment Line",
+                       Enum::TableID::"Planning Component",
+                       Enum::TableID::"Posted Assembly Line",
+                       Enum::TableID::"Service Line",
+                       Enum::TableID::"Service Shipment Line",
+                       Enum::TableID::"Service Invoice Line"]
         then
             exit(-1);
 
@@ -855,7 +870,7 @@ codeunit 6503 "Item Tracking Doc. Management"
         if Item."Item Tracking Code" <> '' then begin
             ItemTrackingCode.Code := Item."Item Tracking Code";
             ItemTrackingMgt.GetItemTrackingSetup(
-                ItemTrackingCode, "Item Ledger Entry Type"::" ", false, ItemTrackingSetup);
+                ItemTrackingCode, Enum::"Item Ledger Entry Type"::" ", false, ItemTrackingSetup);
             if ItemTrackingSetup.TrackingRequired() then begin
                 ReservEntryFor.Reset();
                 ReservEntryFor.SetSourceFilter(Type, Subtype, DocNo, LineNo, true);
@@ -881,7 +896,7 @@ codeunit 6503 "Item Tracking Doc. Management"
                 exit;
 
         case SourceType of
-            DATABASE::"Sales Header":
+            Enum::TableID::"Sales Header".AsInteger():
                 begin
                     SalesLine.SetRange("Document Type", SourceSubtype);
                     SalesLine.SetRange("Document No.", SourceID);
@@ -889,25 +904,25 @@ codeunit 6503 "Item Tracking Doc. Management"
                     if SalesLine.FindSet() then
                         repeat
                             CreateLineTrkgFromReservation(
-                              SalesLine."No.", DATABASE::"Sales Line", SourceSubtype, SourceID, SalesLine."Line No.");
+                              SalesLine."No.", Enum::TableID::"Sales Line", SourceSubtype, SourceID, SalesLine."Line No.");
                         until SalesLine.Next() = 0;
                 end;
-            DATABASE::"Transfer Header":
+            Enum::TableID::"Transfer Header":
                 begin
                     TransLine.SetRange("Document No.", SourceID);
                     if TransLine.FindSet() then
                         repeat
                             CreateLineTrkgFromReservation(
-                              TransLine."Item No.", DATABASE::"Transfer Line", SourceSubtype, SourceID, TransLine."Line No.")
+                              TransLine."Item No.", Enum::TableID::"Transfer Line", SourceSubtype, SourceID, TransLine."Line No.")
                         until TransLine.Next() = 0;
                 end;
-            DATABASE::"Invt. Document Header":
+            Enum::TableID::"Invt. Document Header":
                 begin
                     InvtDocLine.SetRange("Document No.", SourceID);
                     if InvtDocLine.FindSet() then
                         repeat
                             CreateLineTrkgFromReservation(
-                              InvtDocLine."Item No.", DATABASE::"Invt. Document Line", SourceSubtype, SourceID, InvtDocLine."Line No.");
+                              InvtDocLine."Item No.", Enum::TableID::"Invt. Document Line", SourceSubtype, SourceID, InvtDocLine."Line No.");
                         until InvtDocLine.Next() = 0;
                 end;
         end;

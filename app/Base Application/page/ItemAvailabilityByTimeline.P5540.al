@@ -1,9 +1,18 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+#if not CLEAN21
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Forecast;
+#endif
+
 #pragma warning disable AS0031
 #pragma warning disable AS0032
 #pragma warning disable AS0018
 #pragma warning disable AS0106 // Protected variables ItemNo, LocationFilter, VariantFilter, ForecastName, and IncludeBlanketOrders were removed before AS0106 was introduced.
 page 5540 "Item Availability by Timeline"
 #pragma warning restore AS0106
+
 {
     Caption = 'Item Availability by Timeline';
     DeleteAllowed = false;
@@ -12,8 +21,8 @@ page 5540 "Item Availability by Timeline"
     PageType = Worksheet;
     SourceTable = "Timeline Event Change";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Due Date")
-                          ORDER(Ascending);
+    SourceTableView = sorting("Due Date")
+                          order(Ascending);
     ObsoleteState = Pending;
     ObsoleteReason = 'TimelineVisualizer control has been deprecated and has never worked on the web client.';
     ObsoleteTag = '21.0';
@@ -213,9 +222,7 @@ page 5540 "Item Availability by Timeline"
         ItemNo: Code[20];
         LocationFilter: Text;
         VariantFilter: Text;
-        [InDataSet]
         ForecastName: Code[10];
-        [InDataSet]
         IncludeBlanketOrders: Boolean;
 
     [Scope('OnPrem')]

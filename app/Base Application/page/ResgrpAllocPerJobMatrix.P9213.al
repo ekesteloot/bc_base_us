@@ -1,3 +1,9 @@
+namespace Microsoft.ProjectMgt.Jobs.Analysis;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using System.Utilities;
+
 page 9213 "ResGrp. Alloc. per Job Matrix"
 {
     Caption = 'Res. Gr. Allocated per Job Matrix';
@@ -481,74 +487,42 @@ page 9213 "ResGrp. Alloc. per Job Matrix"
         MatrixColumnCaptions: array[32] of Text[100];
         MatrixCellData: array[32] of Text[100];
         MatrixCellQuantity: Decimal;
-        [InDataSet]
         Col1Visible: Boolean;
-        [InDataSet]
         Col2Visible: Boolean;
-        [InDataSet]
         Col3Visible: Boolean;
-        [InDataSet]
         Col4Visible: Boolean;
-        [InDataSet]
         Col5Visible: Boolean;
-        [InDataSet]
         Col6Visible: Boolean;
-        [InDataSet]
         Col7Visible: Boolean;
-        [InDataSet]
         Col8Visible: Boolean;
-        [InDataSet]
         Col9Visible: Boolean;
-        [InDataSet]
         Col10Visible: Boolean;
-        [InDataSet]
         Col11Visible: Boolean;
-        [InDataSet]
         Col12Visible: Boolean;
-        [InDataSet]
         Col13Visible: Boolean;
-        [InDataSet]
         Col14Visible: Boolean;
-        [InDataSet]
         Col15Visible: Boolean;
-        [InDataSet]
         Col16Visible: Boolean;
-        [InDataSet]
         Col17Visible: Boolean;
-        [InDataSet]
         Col18Visible: Boolean;
-        [InDataSet]
         Col19Visible: Boolean;
-        [InDataSet]
         Col20Visible: Boolean;
-        [InDataSet]
         Col21Visible: Boolean;
-        [InDataSet]
         Col22Visible: Boolean;
-        [InDataSet]
         Col23Visible: Boolean;
-        [InDataSet]
         Col24Visible: Boolean;
-        [InDataSet]
         Col25Visible: Boolean;
-        [InDataSet]
         Col26Visible: Boolean;
-        [InDataSet]
         Col27Visible: Boolean;
-        [InDataSet]
         Col28Visible: Boolean;
-        [InDataSet]
         Col29Visible: Boolean;
-        [InDataSet]
         Col30Visible: Boolean;
-        [InDataSet]
         Col31Visible: Boolean;
-        [InDataSet]
         Col32Visible: Boolean;
 
     procedure Load(var NewVerticalRec: Record Job; var NewHorizontalRec: Record "Job Planning Line"; NewMatrixColumnCaptions: array[32] of Text[100]; var NewMatrixDateFilters: array[32] of Record Date)
     begin
-        Copy(NewVerticalRec);
+        Rec.Copy(NewVerticalRec);
         MatrixRec.Copy(NewHorizontalRec);
         CopyArray(MatrixColumnCaptions, NewMatrixColumnCaptions, 1);
         CopyArray(MatrixColumnDateFilters, NewMatrixDateFilters, 1);
@@ -560,10 +534,10 @@ page 9213 "ResGrp. Alloc. per Job Matrix"
     begin
         MatrixRec.Reset();
         MatrixRec.SetRange(Type, MatrixRec.Type::Resource);
-        MatrixRec.SetRange("Job No.", "No.");
+        MatrixRec.SetRange("Job No.", Rec."No.");
         MatrixRec.SetRange("Schedule Line", true);
-        if GetFilter("Resource Gr. Filter") <> '' then
-            MatrixRec.SetFilter("Resource Group No.", GetRangeMin("Resource Gr. Filter"), GetRangeMax("Resource Gr. Filter"));
+        if Rec.GetFilter("Resource Gr. Filter") <> '' then
+            MatrixRec.SetFilter("Resource Group No.", Rec.GetRangeMin("Resource Gr. Filter"), Rec.GetRangeMax("Resource Gr. Filter"));
 
         for I := 1 to ArrayLen(MatrixColumnDateFilters) do begin
             MatrixCellQuantity := 0;
@@ -589,10 +563,10 @@ page 9213 "ResGrp. Alloc. per Job Matrix"
         JobPlanningLine: Record "Job Planning Line";
         IsHandled: Boolean;
     begin
-        JobPlanningLine.SetFilter("Resource Group No.", GetRangeMin("Resource Gr. Filter"), GetRangeMax("Resource Gr. Filter"));
+        JobPlanningLine.SetFilter("Resource Group No.", Rec.GetRangeMin("Resource Gr. Filter"), Rec.GetRangeMax("Resource Gr. Filter"));
         JobPlanningLine.SetRange(
           "Planning Date", MatrixColumnDateFilters[Column]."Period Start", MatrixColumnDateFilters[Column]."Period End");
-        JobPlanningLine.SetRange("Job No.", "No.");
+        JobPlanningLine.SetRange("Job No.", Rec."No.");
         JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Resource);
         JobPlanningLine.SetRange("Schedule Line", true);
         IsHandled := false;

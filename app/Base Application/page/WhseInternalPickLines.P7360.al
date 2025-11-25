@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
 page 7360 "Whse. Internal Pick Lines"
 {
     Caption = 'Whse. Internal Pick Lines';
@@ -157,7 +159,7 @@ page 7360 "Whse. Internal Pick Lines"
                     var
                         WhseInternalPickHeader: Record "Whse. Internal Pick Header";
                     begin
-                        WhseInternalPickHeader.Get("No.");
+                        WhseInternalPickHeader.Get(Rec."No.");
                         PAGE.Run(PAGE::"Whse. Internal Pick", WhseInternalPickHeader);
                     end;
                 }

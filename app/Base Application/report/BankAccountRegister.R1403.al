@@ -1,7 +1,13 @@
+namespace Microsoft.BankMgt.Reports;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 report 1403 "Bank Account Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/BankAccountRegister.rdlc';
+    RDLCLayout = './BankMgt/Reports/BankAccountRegister.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Bank Account Register';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 1403 "Bank Account Register"
     {
         dataitem("G/L Register"; "G/L Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -96,7 +102,7 @@ report 1403 "Bank Account Register"
             }
             dataitem("Bank Account Ledger Entry"; "Bank Account Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(Bank_Account_Ledger_Entry__Posting_Date_; Format("Posting Date"))
                 {
                 }

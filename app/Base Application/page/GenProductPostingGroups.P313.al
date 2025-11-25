@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 page 313 "Gen. Product Posting Groups"
 {
     ApplicationArea = Basic, Suite;
@@ -13,7 +15,7 @@ page 313 "Gen. Product Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the product posting group.';
@@ -60,7 +62,7 @@ page 313 "Gen. Product Posting Groups"
                 Caption = '&Setup';
                 Image = Setup;
                 RunObject = Page "General Posting Setup";
-                RunPageLink = "Gen. Prod. Posting Group" = FIELD(Code);
+                RunPageLink = "Gen. Prod. Posting Group" = field(Code);
                 ToolTip = 'View or edit how you want to set up combinations of general business and general product posting groups.';
             }
         }

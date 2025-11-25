@@ -1,14 +1,19 @@
+namespace Microsoft.CostAccounting.Reports;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Ledger;
+
 report 1144 "Cost Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/CostAccounting/CostRegister.rdlc';
+    RDLCLayout = './CostAccounting/Reports/CostRegister.rdlc';
     Caption = 'Cost Register';
 
     dataset
     {
         dataitem("Cost Register"; "Cost Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
@@ -43,7 +48,7 @@ report 1144 "Cost Register"
             }
             dataitem("Cost Entry"; "Cost Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(PostingDate_CostEntry; Format("Posting Date"))
                 {
                 }

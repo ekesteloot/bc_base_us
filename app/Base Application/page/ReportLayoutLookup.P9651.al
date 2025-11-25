@@ -16,7 +16,7 @@ page 9651 "Report Layout Lookup"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Report ID';
                 Enabled = ShowReportID;
-                TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+                TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
                 ToolTip = 'Specifies the ID of the report.';
 
                 trigger OnValidate()

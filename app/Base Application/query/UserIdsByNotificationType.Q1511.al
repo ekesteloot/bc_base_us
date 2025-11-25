@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 query 1511 "User IDs by Notification Type"
 {
     Caption = 'User IDs by Notification Type';

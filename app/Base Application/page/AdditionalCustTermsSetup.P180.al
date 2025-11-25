@@ -15,7 +15,7 @@ page 180 "Additional Cust. Terms Setup"
             group(General)
             {
                 Caption = 'General';
-                field(Accepted; Accepted)
+                field(Accepted; Rec.Accepted)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -51,8 +51,8 @@ page 180 "Additional Cust. Terms Setup"
 
                 trigger OnAction()
                 begin
-                    Validate("Effective Date", Today);
-                    Modify();
+                    Rec.Validate("Effective Date", Today);
+                    Rec.Modify();
                 end;
             }
             action(Deactivate)
@@ -65,8 +65,8 @@ page 180 "Additional Cust. Terms Setup"
 
                 trigger OnAction()
                 begin
-                    Validate("Effective Date", 0D);
-                    Modify();
+                    Rec.Validate("Effective Date", 0D);
+                    Rec.Modify();
                 end;
             }
             action(Reset)
@@ -79,8 +79,8 @@ page 180 "Additional Cust. Terms Setup"
 
                 trigger OnAction()
                 begin
-                    Validate(Accepted, false);
-                    Modify();
+                    Rec.Validate(Accepted, false);
+                    Rec.Modify();
                 end;
             }
         }
@@ -105,13 +105,13 @@ page 180 "Additional Cust. Terms Setup"
 
     trigger OnAfterGetRecord()
     begin
-        Active := GetActive();
+        Active := Rec.GetActive();
     end;
 
     trigger OnOpenPage()
     begin
-        if not Get() then
-            Insert();
+        if not Rec.Get() then
+            Rec.Insert();
     end;
 
     var

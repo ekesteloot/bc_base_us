@@ -1,3 +1,20 @@
+﻿namespace Microsoft.WarehouseMgt.Journal;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.WarehouseMgt.Worksheet;
+using System.Security.AccessControl;
+
 table 7311 "Warehouse Journal Line"
 {
     Caption = 'Warehouse Journal Line';
@@ -14,7 +31,7 @@ table 7311 "Warehouse Journal Line"
         field(2; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Warehouse Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Warehouse Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
         }
         field(3; "Line No."; Integer)
         {
@@ -32,7 +49,7 @@ table 7311 "Warehouse Journal Line"
         field(6; "From Zone Code"; Code[10])
         {
             Caption = 'From Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -48,32 +65,32 @@ table 7311 "Warehouse Journal Line"
         field(7; "From Bin Code"; Code[20])
         {
             Caption = 'From Bin Code';
-            TableRelation = IF ("Phys. Inventory" = CONST(false),
-                                "Item No." = FILTER(''),
-                                "From Zone Code" = FILTER('')) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Phys. Inventory" = CONST(false),
-                                         "Item No." = FILTER(<> ''),
-                                         "From Zone Code" = FILTER('')) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                      "Item No." = FIELD("Item No."))
-            ELSE
-            IF ("Phys. Inventory" = CONST(false),
-                                                                                                               "Item No." = FILTER(''),
-                                                                                                               "From Zone Code" = FILTER(<> '')) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                                                                                              "Zone Code" = FIELD("From Zone Code"))
-            ELSE
-            IF ("Phys. Inventory" = CONST(false),
-                                                                                                                                                                                       "Item No." = FILTER(<> ''),
-                                                                                                                                                                                       "From Zone Code" = FILTER(<> '')) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                                                                                                                                                                      "Item No." = FIELD("Item No."),
-                                                                                                                                                                                                                                                      "Zone Code" = FIELD("From Zone Code"))
-            ELSE
-            IF ("Phys. Inventory" = CONST(true),
-                                                                                                                                                                                                                                                               "From Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Phys. Inventory" = CONST(true),
-                                                                                                                                                                                                                                                                        "From Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                                                                                                                                                                                                                                       "Zone Code" = FIELD("From Zone Code"));
+            TableRelation = if ("Phys. Inventory" = const(false),
+                                "Item No." = filter(''),
+                                "From Zone Code" = filter('')) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"))
+            else
+            if ("Phys. Inventory" = const(false),
+                                         "Item No." = filter(<> ''),
+                                         "From Zone Code" = filter('')) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
+                                                                                                      "Item No." = field("Item No."))
+            else
+            if ("Phys. Inventory" = const(false),
+                                                                                                               "Item No." = filter(''),
+                                                                                                               "From Zone Code" = filter(<> '')) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
+                                                                                                                                                                              "Zone Code" = field("From Zone Code"))
+            else
+            if ("Phys. Inventory" = const(false),
+                                                                                                                                                                                       "Item No." = filter(<> ''),
+                                                                                                                                                                                       "From Zone Code" = filter(<> '')) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
+                                                                                                                                                                                                                                                      "Item No." = field("Item No."),
+                                                                                                                                                                                                                                                      "Zone Code" = field("From Zone Code"))
+            else
+            if ("Phys. Inventory" = const(true),
+                                                                                                                                                                                                                                                               "From Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Phys. Inventory" = const(true),
+                                                                                                                                                                                                                                                                        "From Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                                                                                                                                                                                                                                                                       "Zone Code" = field("From Zone Code"));
 
             trigger OnLookup()
             begin
@@ -110,7 +127,7 @@ table 7311 "Warehouse Journal Line"
         field(9; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            TableRelation = Item WHERE(Type = CONST(Inventory));
+            TableRelation = Item where(Type = const(Inventory));
 
             trigger OnValidate()
             begin
@@ -237,7 +254,7 @@ table 7311 "Warehouse Journal Line"
         field(14; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -256,10 +273,10 @@ table 7311 "Warehouse Journal Line"
         field(15; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                               "Zone Code" = FIELD("Zone Code"));
+            TableRelation = if ("Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                               "Zone Code" = field("Zone Code"));
 
             trigger OnLookup()
             begin
@@ -331,7 +348,7 @@ table 7311 "Warehouse Journal Line"
         field(27; "To Zone Code"; Code[10])
         {
             Caption = 'To Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -345,10 +362,10 @@ table 7311 "Warehouse Journal Line"
         field(28; "To Bin Code"; Code[20])
         {
             Caption = 'To Bin Code';
-            TableRelation = IF ("To Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("To Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                                  "Zone Code" = FIELD("To Zone Code"));
+            TableRelation = if ("To Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("To Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                                  "Zone Code" = field("To Zone Code"));
 
             trigger OnValidate()
             begin
@@ -470,8 +487,6 @@ table 7311 "Warehouse Journal Line"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(68; "Qty. (Calculated) (Base)"; Decimal)
         {
@@ -494,7 +509,7 @@ table 7311 "Warehouse Journal Line"
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             var
@@ -526,7 +541,7 @@ table 7311 "Warehouse Journal Line"
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             var
@@ -632,7 +647,7 @@ table 7311 "Warehouse Journal Line"
 
             trigger OnLookup()
             begin
-                ItemTrackingMgt.LookupTrackingNoInfo("Item No.", "Variant Code", "Item Tracking Type"::"Package No.", "Package No.");
+                ItemTrackingMgt.LookupTrackingNoInfo("Item No.", "Variant Code", Enum::"Item Tracking Type"::"Package No.", "Package No.");
             end;
 
             trigger OnValidate()
@@ -851,7 +866,7 @@ table 7311 "Warehouse Journal Line"
     var
         ReservEntry: Record "Reservation Entry";
     begin
-        if "Source Type" = DATABASE::"Prod. Order Component" then begin
+        if "Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then begin
             ReservEntry.SetSourceFilter("Source Type", "Source Subtype", "Journal Template Name", "Source Subline No.", true);
             ReservEntry.SetSourceFilter("Journal Batch Name", "Source Line No.");
         end else begin
@@ -1118,7 +1133,6 @@ table 7311 "Warehouse Journal Line"
     begin
         OnBeforeOpenJnl(WhseJnlLine, CurrentJnlBatchName, CurrentLocationCode);
 
-        WMSMgt.CheckUserIsWhseEmployee();
         CheckTemplateName(
           WhseJnlLine.GetRangeMax("Journal Template Name"), CurrentLocationCode, CurrentJnlBatchName);
         WhseJnlLine.FilterGroup := 2;
@@ -1246,7 +1260,7 @@ table 7311 "Warehouse Journal Line"
         WhseWkshLine."Qty. per Unit of Measure" := "Qty. per Unit of Measure";
         OnOpenItemTrackingLinesOnBeforeSetSource(WhseWkshLine, Rec);
 
-        WhseItemTrackingLines.SetSource(WhseWkshLine, DATABASE::"Warehouse Journal Line");
+        WhseItemTrackingLines.SetSource(WhseWkshLine, Enum::TableID::"Warehouse Journal Line".AsInteger());
         WhseItemTrackingLines.RunModal();
         Clear(WhseItemTrackingLines);
 
@@ -1496,7 +1510,7 @@ table 7311 "Warehouse Journal Line"
     local procedure DeleteWhseItemTracking()
     begin
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          DATABASE::"Warehouse Journal Line", 0, "Journal Batch Name", "Journal Template Name", 0, "Line No.", "Location Code", true);
+          Enum::TableID::"Warehouse Journal Line".AsInteger(), 0, "Journal Batch Name", "Journal Template Name", 0, "Line No.", "Location Code", true);
     end;
 
     [IntegrationEvent(false, false)]

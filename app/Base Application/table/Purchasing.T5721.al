@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
 table 5721 Purchasing
 {
     Caption = 'Purchasing';

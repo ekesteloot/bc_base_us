@@ -41,7 +41,7 @@ page 780 "Certificates of Supply"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the receipt date of the signed certificate of supply.';
                 }
-                field(Printed; Printed)
+                field(Printed; Rec.Printed)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -97,10 +97,10 @@ page 780 "Certificates of Supply"
                 var
                     CertificateOfSupply: Record "Certificate of Supply";
                 begin
-                    if not IsEmpty() then begin
+                    if not Rec.IsEmpty() then begin
                         CertificateOfSupply.Copy(Rec);
-                        CertificateOfSupply.SetRange("Document Type", "Document Type");
-                        CertificateOfSupply.SetRange("Document No.", "Document No.");
+                        CertificateOfSupply.SetRange("Document Type", Rec."Document Type");
+                        CertificateOfSupply.SetRange("Document No.", Rec."Document No.");
                     end;
                     CertificateOfSupply.Print();
                 end;
@@ -121,11 +121,11 @@ page 780 "Certificates of Supply"
 
     trigger OnOpenPage()
     begin
-        if GetFilters = '' then
-            SetFilter(Status, '<>%1', Status::"Not Applicable")
+        if Rec.GetFilters = '' then
+            Rec.SetFilter(Status, '<>%1', Rec.Status::"Not Applicable")
         else
-            if "Document No." <> '' then
-                InitRecord("Document Type".AsInteger(), "Document No.")
+            if Rec."Document No." <> '' then
+                Rec.InitRecord(Rec."Document Type".AsInteger(), Rec."Document No.")
     end;
 }
 

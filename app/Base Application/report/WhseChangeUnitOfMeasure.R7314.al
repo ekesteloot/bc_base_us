@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.WarehouseMgt.Structure;
+
 report 7314 "Whse. Change Unit of Measure"
 {
     Caption = 'Whse. Change Unit of Measure';
@@ -19,13 +24,13 @@ report 7314 "Whse. Change Unit of Measure"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field("Action Type"; "Action Type")
+                    field("Action Type"; Rec."Action Type")
                     {
                         ApplicationArea = Warehouse;
                         Editable = false;
                         ToolTip = 'Specifies if you want to change the unit of measure on a Take line or on a Place line.';
                     }
-                    field("Qty. to Handle"; "Qty. to Handle")
+                    field("Qty. to Handle"; Rec."Qty. to Handle")
                     {
                         ApplicationArea = Warehouse;
                         Editable = false;
@@ -34,7 +39,7 @@ report 7314 "Whse. Change Unit of Measure"
                     group(From)
                     {
                         Caption = 'From';
-                        field("Unit of Measure Code"; "Unit of Measure Code")
+                        field("Unit of Measure Code"; Rec."Unit of Measure Code")
                         {
                             ApplicationArea = Warehouse;
                             Editable = false;
@@ -55,7 +60,7 @@ report 7314 "Whse. Change Unit of Measure"
                             begin
                                 ItemUOM.Reset();
                                 ItemUOM.FilterGroup(2);
-                                ItemUOM.SetRange("Item No.", "Item No.");
+                                ItemUOM.SetRange("Item No.", Rec."Item No.");
                                 ItemUOM.FilterGroup(0);
                                 ItemUOM.Code := WarehouseActivityLine."Unit of Measure Code";
                                 if PAGE.RunModal(0, ItemUOM) = ACTION::LookupOK then begin
@@ -66,7 +71,7 @@ report 7314 "Whse. Change Unit of Measure"
 
                             trigger OnValidate()
                             begin
-                                ItemUOM.Get("Item No.", UOMCode);
+                                ItemUOM.Get(Rec."Item No.", UOMCode);
                                 WarehouseActivityLine."Qty. per Unit of Measure" := ItemUOM."Qty. per Unit of Measure";
                                 WarehouseActivityLine."Unit of Measure Code" := ItemUOM.Code;
                                 CheckUOM();
@@ -92,23 +97,23 @@ report 7314 "Whse. Change Unit of Measure"
 
         trigger OnAfterGetRecord()
         begin
-            UOMCode := "Unit of Measure Code";
-            WarehouseActivityLine.Quantity := "Qty. to Handle";
-            WarehouseActivityLine."Qty. (Base)" := "Qty. to Handle (Base)";
+            UOMCode := Rec."Unit of Measure Code";
+            WarehouseActivityLine.Quantity := Rec."Qty. to Handle";
+            WarehouseActivityLine."Qty. (Base)" := Rec."Qty. to Handle (Base)";
         end;
 
         trigger OnOpenPage()
         begin
-            Copy(WarehouseActivityLine);
-            Get("Activity Type", "No.", "Line No.");
-            SetRecFilter();
-            TestField("Bin Code");
+            Rec.Copy(WarehouseActivityLine);
+            Rec.Get(Rec."Activity Type", Rec."No.", Rec."Line No.");
+            Rec.SetRecFilter();
+            Rec.TestField("Bin Code");
         end;
 
         trigger OnQueryClosePage(CloseAction: Action): Boolean
         begin
             if CloseAction = ACTION::OK then
-                if UOMCode <> "Unit of Measure Code" then
+                if UOMCode <> Rec."Unit of Measure Code" then
                     ChangeUOM2 := true;
         end;
     }
@@ -137,33 +142,33 @@ report 7314 "Whse. Change Unit of Measure"
         Clear(BinContent);
         QtyChangeBase := 0;
         QtyAvailBase := 0;
-        if "Serial No." <> '' then
+        if Rec."Serial No." <> '' then
             WarehouseActivityLine.TestField("Qty. per Unit of Measure", 1);
         BinContent."Qty. per Unit of Measure" := WarehouseActivityLine."Qty. per Unit of Measure";
 
-        QtyChangeBase := "Qty. to Handle (Base)";
-        if "Action Type" = "Action Type"::Take then
+        QtyChangeBase := Rec."Qty. to Handle (Base)";
+        if Rec."Action Type" = Rec."Action Type"::Take then
             if BinContent.Get(
-                 "Location Code", "Bin Code", "Item No.",
-                 "Variant Code", WarehouseActivityLine."Unit of Measure Code")
+                 Rec."Location Code", Rec."Bin Code", Rec."Item No.",
+                 Rec."Variant Code", WarehouseActivityLine."Unit of Measure Code")
             then begin
-                QtyChangeBase := "Qty. to Handle (Base)";
-                if "Activity Type" in ["Activity Type"::Pick, "Activity Type"::"Invt. Pick", "Activity Type"::"Invt. Movement"] then
+                QtyChangeBase := Rec."Qty. to Handle (Base)";
+                if Rec."Activity Type" in [Rec."Activity Type"::Pick, Rec."Activity Type"::"Invt. Pick", Rec."Activity Type"::"Invt. Movement"] then
                     QtyAvailBase := BinContent.CalcQtyAvailToPick(0)
                 else
                     QtyAvailBase := BinContent.CalcQtyAvailToTake(0);
                 if QtyAvailBase < QtyChangeBase then
-                    Error(Text001, FieldCaption("Qty. (Base)"), QtyChangeBase, BinContent.TableCaption(), FieldCaption("Bin Code"))
+                    Error(Text001, Rec.FieldCaption("Qty. (Base)"), QtyChangeBase, BinContent.TableCaption(), Rec.FieldCaption("Bin Code"))
             end else
-                Error(Text001, FieldCaption("Qty. (Base)"), QtyChangeBase, BinContent.TableCaption(), FieldCaption("Bin Code"));
+                Error(Text001, Rec.FieldCaption("Qty. (Base)"), QtyChangeBase, BinContent.TableCaption(), Rec.FieldCaption("Bin Code"));
 
         if BinContent."Qty. per Unit of Measure" = WarehouseActivityLine."Qty. per Unit of Measure" then begin
             WarehouseActivityLine.Validate("Unit of Measure Code");
-            WarehouseActivityLine.Validate(Quantity, "Qty. to Handle (Base)" / WarehouseActivityLine."Qty. per Unit of Measure");
+            WarehouseActivityLine.Validate(Quantity, Rec."Qty. to Handle (Base)" / WarehouseActivityLine."Qty. per Unit of Measure");
         end else begin
             WarehouseActivityLine.Validate("Unit of Measure Code");
             WarehouseActivityLine."Qty. per Unit of Measure" := BinContent."Qty. per Unit of Measure";
-            WarehouseActivityLine.Validate(Quantity, "Qty. to Handle (Base)" / BinContent."Qty. per Unit of Measure");
+            WarehouseActivityLine.Validate(Quantity, Rec."Qty. to Handle (Base)" / BinContent."Qty. per Unit of Measure");
             WarehouseActivityLine.Validate("Qty. Outstanding");
             WarehouseActivityLine.Validate("Qty. to Handle");
         end;

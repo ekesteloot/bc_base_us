@@ -22,9 +22,9 @@ table 5206 "Cause of Absence"
         }
         field(4; "Total Absence (Base)"; Decimal)
         {
-            CalcFormula = Sum ("Employee Absence"."Quantity (Base)" WHERE("Cause of Absence Code" = FIELD(Code),
-                                                                          "Employee No." = FIELD("Employee No. Filter"),
-                                                                          "From Date" = FIELD("Date Filter")));
+            CalcFormula = Sum ("Employee Absence"."Quantity (Base)" where("Cause of Absence Code" = field(Code),
+                                                                          "Employee No." = field("Employee No. Filter"),
+                                                                          "From Date" = field("Date Filter")));
             Caption = 'Total Absence (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -35,16 +35,16 @@ table 5206 "Cause of Absence"
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
         }
         field(6; "Global Dimension 2 Filter"; Code[20])
         {
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
         }
         field(7; "Employee No. Filter"; Code[20])
         {

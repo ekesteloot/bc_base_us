@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 enum 5405 "Production Order Status"
 {
     Extensible = true;

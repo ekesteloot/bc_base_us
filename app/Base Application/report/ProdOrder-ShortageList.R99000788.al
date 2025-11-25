@@ -1,7 +1,7 @@
 report 99000788 "Prod. Order - Shortage List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrder/ProdOrderShortageList.rdlc';
+    RDLCLayout = './Manufacturing/Document/ProdOrderShortageList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Shortage List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +10,7 @@ report 99000788 "Prod. Order - Shortage List"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = Status, "No.", "Date Filter";
             column(TodayFormatted; Format(Today, 0, 4))
@@ -69,16 +69,16 @@ report 99000788 "Prod. Order - Shortage List"
             }
             dataitem("Prod. Order Line"; "Prod. Order Line")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Line No.");
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Line No.");
                 PrintOnlyIfDetail = true;
                 column(LineNo_ProdOrderLine; "Line No.")
                 {
                 }
                 dataitem("Prod. Order Component"; "Prod. Order Component")
                 {
-                    DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("Prod. Order No."), "Prod. Order Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING(Status, "Item No.", "Variant Code", "Location Code", "Due Date");
+                    DataItemLink = Status = field(Status), "Prod. Order No." = field("Prod. Order No."), "Prod. Order Line No." = field("Line No.");
+                    DataItemTableView = sorting(Status, "Item No.", "Variant Code", "Location Code", "Due Date");
                     column(CompItemInventory; CompItem.Inventory)
                     {
                         DecimalPlaces = 0 : 5;

@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Forecast;
+
 enum 9245 "Demand Forecast Type"
 {
     Extensible = true;

@@ -82,7 +82,7 @@ page 10807 "Sales Tax Setup Wizard"
 
                         trigger OnValidate()
                         begin
-                            NextEnabled := ("Tax Account (Sales)" <> '') or ("Tax Account (Purchases)" <> '');
+                            NextEnabled := (Rec."Tax Account (Sales)" <> '') or (Rec."Tax Account (Purchases)" <> '');
                         end;
                     }
                     field("Tax Account (Purchases)"; Rec."Tax Account (Purchases)")
@@ -91,7 +91,7 @@ page 10807 "Sales Tax Setup Wizard"
 
                         trigger OnValidate()
                         begin
-                            NextEnabled := ("Tax Account (Sales)" <> '') or ("Tax Account (Purchases)" <> '');
+                            NextEnabled := (Rec."Tax Account (Sales)" <> '') or (Rec."Tax Account (Purchases)" <> '');
                         end;
                     }
                 }
@@ -108,7 +108,7 @@ page 10807 "Sales Tax Setup Wizard"
                         Caption = '';
                         InstructionalText = 'Enter your city tax information';
                         Visible = CityAndCountyVisible;
-                        field(City; City)
+                        field(City; Rec.City)
                         {
                             ApplicationArea = SalesTax;
                         }
@@ -118,7 +118,7 @@ page 10807 "Sales Tax Setup Wizard"
 
                             trigger OnValidate()
                             begin
-                                Validate(City);
+                                Rec.Validate(City);
                             end;
                         }
                     }
@@ -129,7 +129,7 @@ page 10807 "Sales Tax Setup Wizard"
                         //The GridLayout property is only supported on controls of type Grid
                         //GridLayout = Rows;
                         Visible = CityAndCountyVisible;
-                        field(County; County)
+                        field(County; Rec.County)
                         {
                             ApplicationArea = SalesTax;
                         }
@@ -139,7 +139,7 @@ page 10807 "Sales Tax Setup Wizard"
 
                             trigger OnValidate()
                             begin
-                                Validate(County);
+                                Rec.Validate(County);
                             end;
                         }
                     }
@@ -149,7 +149,7 @@ page 10807 "Sales Tax Setup Wizard"
                         InstructionalText = 'Enter your state tax information';
                         //The GridLayout property is only supported on controls of type Grid
                         //GridLayout = Rows;
-                        field(State; State)
+                        field(State; Rec.State)
                         {
                             ApplicationArea = SalesTax;
                         }
@@ -159,7 +159,7 @@ page 10807 "Sales Tax Setup Wizard"
 
                             trigger OnValidate()
                             begin
-                                Validate(State);
+                                Rec.Validate(State);
                             end;
                         }
                         field("Country/Region"; Rec."Country/Region")
@@ -182,8 +182,8 @@ page 10807 "Sales Tax Setup Wizard"
 
                         trigger OnValidate()
                         begin
-                            "Tax Area Code" := DelChr("Tax Area Code", '<>', ' ');
-                            NextEnabled := "Tax Area Code" <> '';
+                            Rec."Tax Area Code" := DelChr(Rec."Tax Area Code", '<>', ' ');
+                            NextEnabled := Rec."Tax Area Code" <> '';
                         end;
                     }
                 }
@@ -263,7 +263,7 @@ page 10807 "Sales Tax Setup Wizard"
                     GuidedExperience: Codeunit "Guided Experience";
                     Info: ModuleInfo;
                 begin
-                    StoreSalesTaxSetup();
+                    Rec.StoreSalesTaxSetup();
                     GuidedExperience.CompleteAssistedSetup(ObjectType::Page, PAGE::"Sales Tax Setup Wizard");
                     CurrPage.Close();
                     AssignTaxAreaCode();
@@ -274,10 +274,10 @@ page 10807 "Sales Tax Setup Wizard"
 
     trigger OnOpenPage()
     begin
-        if not Get() then begin
-            Init();
-            Initialize();
-            Insert();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Initialize();
+            Rec.Insert();
         end;
         LoadTopBanners();
         ShowIntroStep();
@@ -355,7 +355,7 @@ page 10807 "Sales Tax Setup Wizard"
     local procedure ShowTaxAccountsStep()
     begin
         ResetWizardControls();
-        NextEnabled := ("Tax Account (Purchases)" <> '') or ("Tax Account (Sales)" <> '');
+        NextEnabled := (Rec."Tax Account (Purchases)" <> '') or (Rec."Tax Account (Sales)" <> '');
     end;
 
     local procedure ShowTaxRatesStep()
@@ -366,11 +366,11 @@ page 10807 "Sales Tax Setup Wizard"
     local procedure ShowTaxAreaNameStep()
     begin
         ResetWizardControls();
-        if "Tax Area Code" in ['', GeneratedName] then begin
-            GeneratedName := GenerateTaxAreaCode();
-            "Tax Area Code" := GeneratedName;
+        if Rec."Tax Area Code" in ['', GeneratedName] then begin
+            GeneratedName := Rec.GenerateTaxAreaCode();
+            Rec."Tax Area Code" := GeneratedName;
         end;
-        NextEnabled := "Tax Area Code" <> '';
+        NextEnabled := Rec."Tax Area Code" <> '';
     end;
 
     local procedure ShowDoneStep()
@@ -401,24 +401,24 @@ page 10807 "Sales Tax Setup Wizard"
         Commit();
         if AssignToCustomers then begin
             AssignTaxAreaToCustomer.SetTableView(Customer);
-            AssignTaxAreaToCustomer.SetDefaultAreaCode("Tax Area Code");
+            AssignTaxAreaToCustomer.SetDefaultAreaCode(Rec."Tax Area Code");
             AssignTaxAreaToCustomer.Run();
             Commit();
         end;
         if AssignToVendors then begin
             AssignTaxAreaToVendor.SetTableView(Vendor);
-            AssignTaxAreaToVendor.SetDefaultAreaCode("Tax Area Code");
+            AssignTaxAreaToVendor.SetDefaultAreaCode(Rec."Tax Area Code");
             AssignTaxAreaToVendor.Run();
             Commit();
         end;
         if AssignToLocations then begin
             AssignTaxAreaToLocation.SetTableView(Location);
-            AssignTaxAreaToLocation.SetDefaultAreaCode("Tax Area Code");
+            AssignTaxAreaToLocation.SetDefaultAreaCode(Rec."Tax Area Code");
             AssignTaxAreaToLocation.Run();
             Commit();
         end;
         if AssignToCompanyInfo and DummyCompanyInformation.FindFirst() then begin
-            DummyCompanyInformation.Validate("Tax Area Code", "Tax Area Code");
+            DummyCompanyInformation.Validate("Tax Area Code", Rec."Tax Area Code");
             DummyCompanyInformation.Modify();
             Commit();
         end;
@@ -447,10 +447,10 @@ page 10807 "Sales Tax Setup Wizard"
         CompanyInformation: Record "Company Information";
     begin
         if CompanyInformation.IsCanada() then
-            "Country/Region" := "Country/Region"::CA
+            Rec."Country/Region" := Rec."Country/Region"::CA
         else
-            "Country/Region" := "Country/Region"::US;
-        Modify();
+            Rec."Country/Region" := Rec."Country/Region"::US;
+        Rec.Modify();
     end;
 }
 

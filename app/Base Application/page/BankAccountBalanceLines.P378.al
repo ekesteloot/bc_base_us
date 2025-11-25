@@ -1,3 +1,9 @@
+namespace Microsoft.BankMgt.BankAccount;
+
+using Microsoft.BankMgt.Ledger;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 378 "Bank Account Balance Lines"
 {
     Caption = 'Lines';
@@ -26,7 +32,7 @@ page 378 "Bank Account Balance Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period shown in the line.';
                 }
-                field(NetChange; "Net Change")
+                field(NetChange; Rec."Net Change")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = BankAcc."Currency Code";
@@ -86,7 +92,7 @@ page 378 "Bank Account Balance Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -127,17 +133,17 @@ page 378 "Bank Account Balance Lines"
     procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            BankAcc.SetRange("Date Filter", "Period Start", "Period End")
+            BankAcc.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            BankAcc.SetRange("Date Filter", 0D, "Period End");
+            BankAcc.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     local procedure CalcLine()
     begin
         SetDateFilter();
         BankAcc.CalcFields("Net Change", "Net Change (LCY)");
-        "Net Change" := BankAcc."Net Change";
-        "Net Change (LCY)" := BankAcc."Net Change (LCY)";
+        Rec."Net Change" := BankAcc."Net Change";
+        Rec."Net Change (LCY)" := BankAcc."Net Change (LCY)";
 
         OnAfterCalcLine(BankAcc, Rec);
     end;

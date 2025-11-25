@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.ADCS;
+
 page 7705 "Miniform Functions"
 {
     Caption = 'Miniform Functions';

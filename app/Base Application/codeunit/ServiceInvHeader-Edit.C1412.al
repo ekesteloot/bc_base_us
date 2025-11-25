@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 codeunit 1412 "Service Inv. Header - Edit"
 {
     Permissions = TableData "Service Invoice Header" = rm;
@@ -11,11 +13,11 @@ codeunit 1412 "Service Inv. Header - Edit"
         ServiceInvoiceHeader.LockTable();
         ServiceInvoiceHeader.Find();
         OnRunOnBeforeAssignNewValues(ServiceInvoiceHeader, Rec);
-        ServiceInvoiceHeader."Payment Method Code" := "Payment Method Code";
-        ServiceInvoiceHeader."Payment Reference" := "Payment Reference";
-        ServiceInvoiceHeader."Company Bank Account Code" := "Company Bank Account Code";
+        ServiceInvoiceHeader."Payment Method Code" := Rec."Payment Method Code";
+        ServiceInvoiceHeader."Payment Reference" := Rec."Payment Reference";
+        ServiceInvoiceHeader."Company Bank Account Code" := Rec."Company Bank Account Code";
         OnOnRunOnBeforeTestFieldNo(ServiceInvoiceHeader, Rec);
-        ServiceInvoiceHeader.TestField("No.", "No.");
+        ServiceInvoiceHeader.TestField("No.", Rec."No.");
         ServiceInvoiceHeader.Modify();
         Rec := ServiceInvoiceHeader;
 

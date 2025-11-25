@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentRegistration;
+
 page 982 "Payment Registration Setup"
 {
     ApplicationArea = Basic, Suite;
@@ -61,11 +63,11 @@ page 982 "Payment Registration Setup"
 
     trigger OnOpenPage()
     begin
-        if not Get(UserId) then begin
-            if Get() then;
+        if not Rec.Get(UserId()) then begin
+            if Rec.Get() then;
 
-            "User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
-            Insert();
+            Rec."User ID" := CopyStr(UserId(), 1, MaxStrLen(Rec."User ID"));
+            Rec.Insert();
         end;
 
         PageCaption := '';
@@ -74,7 +76,7 @@ page 982 "Payment Registration Setup"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if CloseAction = ACTION::LookupOK then
-            exit(ValidateMandatoryFields(true));
+            exit(Rec.ValidateMandatoryFields(true));
     end;
 
     var

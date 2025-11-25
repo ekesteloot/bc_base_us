@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Worksheet;
+
 enum 7313 "Warehouse Destination Type 2"
 {
     Extensible = true;

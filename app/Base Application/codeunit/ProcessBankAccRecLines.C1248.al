@@ -1,3 +1,9 @@
+﻿namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using System.IO;
+using System.Telemetry;
+
 codeunit 1248 "Process Bank Acc. Rec Lines"
 {
     Permissions = TableData "Data Exch." = rimd;
@@ -9,7 +15,7 @@ codeunit 1248 "Process Bank Acc. Rec Lines"
         ProcessDataExch: Codeunit "Process Data Exch.";
         RecRef: RecordRef;
     begin
-        DataExch.Get("Data Exch. Entry No.");
+        DataExch.Get(Rec."Data Exch. Entry No.");
         RecRef.GetTable(Rec);
         ProcessDataExch.ProcessAllLinesColumnMapping(DataExch, RecRef);
     end;

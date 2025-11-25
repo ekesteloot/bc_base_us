@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Location;
+
 report 794 "Adjust Item Costs/Prices"
 {
     ApplicationArea = Basic, Suite;
@@ -9,7 +14,7 @@ report 794 "Adjust Item Costs/Prices"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Vendor No.", "Inventory Posting Group", "Costing Method";
 
             trigger OnAfterGetRecord()
@@ -71,7 +76,7 @@ report 794 "Adjust Item Costs/Prices"
         }
         dataitem("Stockkeeping Unit"; "Stockkeeping Unit")
         {
-            DataItemTableView = SORTING("Item No.", "Location Code", "Variant Code");
+            DataItemTableView = sorting("Item No.", "Location Code", "Variant Code");
 
             trigger OnAfterGetRecord()
             begin
@@ -232,11 +237,8 @@ report 794 "Adjust Item Costs/Prices"
         AdjFactor: Decimal;
         Selection: Option "Unit Price","Profit %","Indirect Cost %","Last Direct Cost","Standard Cost";
         AdjustCard: Option "Item Card","Stockkeeping Unit Card";
-        [InDataSet]
         Selection1Enable: Boolean;
-        [InDataSet]
         Selection2Enable: Boolean;
-        [InDataSet]
         Selection3Enable: Boolean;
         SelectionErr: Label '%1 is not a valid selection.';
         SelectionTxt: Label 'Unit Price,Profit %,Indirect Cost %,Last Direct Cost,Standard Cost';

@@ -1,22 +1,31 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using System.Email;
+
 report 5064 "Segment - Cover Sheet"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/SegmentCoverSheet.rdlc';
+    RDLCLayout = './CRM/Reports/SegmentCoverSheet.rdlc';
     Caption = 'Segment - Cover Sheet';
 
     dataset
     {
         dataitem("Segment Header"; "Segment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             dataitem("Segment Line"; "Segment Line")
             {
-                DataItemLink = "Segment No." = FIELD("No.");
-                DataItemTableView = SORTING("Segment No.", "Campaign No.", Date);
+                DataItemLink = "Segment No." = field("No.");
+                DataItemTableView = sorting("Segment No.", "Campaign No.", Date);
                 dataitem(Contact; Contact)
                 {
-                    DataItemLink = "No." = FIELD("Contact No.");
-                    DataItemTableView = SORTING("No.");
+                    DataItemLink = "No." = field("Contact No.");
+                    DataItemTableView = sorting("No.");
                     column(Addr_1_; Addr[1])
                     {
                     }
@@ -352,7 +361,7 @@ report 5064 "Segment - Cover Sheet"
 
         trigger OnOpenPage()
         begin
-            LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Cover Sheet") <> '';
+            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Cover Sheet") <> '';
             LogInteractionEnable := LogInteraction;
         end;
     }
@@ -371,7 +380,6 @@ report 5064 "Segment - Cover Sheet"
         Marks: array[7] of Boolean;
         MarksTxt: array[7] of Text[1];
         LogInteraction: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
 
         MarkTxt: Label 'x', Locked = true;

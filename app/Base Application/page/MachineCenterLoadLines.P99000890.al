@@ -1,3 +1,10 @@
+namespace Microsoft.Manufacturing.MachineCenter;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using System.Utilities;
+
 page 99000890 "Machine Center Load Lines"
 {
     Caption = 'Lines';
@@ -29,7 +36,7 @@ page 99000890 "Machine Center Load Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period shown in the line.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Capacity';
@@ -42,12 +49,12 @@ page 99000890 "Machine Center Load Lines"
                     begin
                         CalendarEntry.SetRange("Capacity Type", CalendarEntry."Capacity Type"::"Machine Center");
                         CalendarEntry.SetRange("No.", MachineCenter."No.");
-                        CalendarEntry.SetRange(Date, "Period Start", "Period End");
+                        CalendarEntry.SetRange(Date, Rec."Period Start", Rec."Period End");
 
                         PAGE.Run(0, CalendarEntry);
                     end;
                 }
-                field(AllocatedQty; "Allocated Qty.")
+                field(AllocatedQty; Rec."Allocated Qty.")
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Allocated Qty.';
@@ -61,19 +68,19 @@ page 99000890 "Machine Center Load Lines"
                         ProdOrderCapNeed.SetCurrentKey(Type, "No.", "Starting Date-Time");
                         ProdOrderCapNeed.SetRange(Type, ProdOrderCapNeed.Type::"Machine Center");
                         ProdOrderCapNeed.SetRange("No.", MachineCenter."No.");
-                        ProdOrderCapNeed.SetRange(Date, "Period Start", "Period End");
+                        ProdOrderCapNeed.SetRange(Date, Rec."Period Start", Rec."Period End");
                         ProdOrderCapNeed.SetRange("Requested Only", false);
                         PAGE.Run(0, ProdOrderCapNeed);
                     end;
                 }
-                field(CapacityAvailable; "Availability After Orders")
+                field(CapacityAvailable; Rec."Availability After Orders")
                 {
                     ApplicationArea = Planning;
                     Caption = 'Availability After Orders';
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the available capacity of this machine center that is not used in the planning of a given time period.';
                 }
-                field(CapacityEfficiency; Load)
+                field(CapacityEfficiency; Rec.Load)
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Load';
@@ -90,7 +97,7 @@ page 99000890 "Machine Center Load Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcLine();
     end;
 
@@ -114,7 +121,7 @@ page 99000890 "Machine Center Load Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -125,16 +132,6 @@ page 99000890 "Machine Center Load Lines"
         MachineCenter: Record "Machine Center";
         PeriodType: Enum "Analysis Period Type";
         AmountType: Enum "Analysis Amount Type";
-
-#if not CLEAN20
-    [Obsolete('Replaced by procedure SetLines()', '20.0')]
-    procedure Set(var NewMachineCenter: Record "Machine Center"; NewPeriodType: Integer; NewAmountType: Option "Net Change","Balance at Date")
-    begin
-        SetLines(
-            NewMachineCenter,
-            "Analysis Period Type".FromInteger(NewPeriodType), "Analysis Amount Type".FromInteger(NewAmountType));
-    end;
-#endif
 
     procedure SetLines(var NewMachineCenter: Record "Machine Center"; NewPeriodType: Enum "Analysis Period Type"; NewAmountType: Enum "Analysis Amount Type")
     begin
@@ -148,22 +145,22 @@ page 99000890 "Machine Center Load Lines"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            MachineCenter.SetRange("Date Filter", "Period Start", "Period End")
+            MachineCenter.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            MachineCenter.SetRange("Date Filter", 0D, "Period End");
+            MachineCenter.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     local procedure CalcLine()
     begin
         SetDateFilter();
         MachineCenter.CalcFields("Capacity (Effective)", "Prod. Order Need (Qty.)");
-        Capacity := MachineCenter."Capacity (Effective)";
-        "Allocated Qty." := MachineCenter."Prod. Order Need (Qty.)";
-        "Availability After Orders" := MachineCenter."Capacity (Effective)" - MachineCenter."Prod. Order Need (Qty.)";
+        Rec.Capacity := MachineCenter."Capacity (Effective)";
+        Rec."Allocated Qty." := MachineCenter."Prod. Order Need (Qty.)";
+        Rec."Availability After Orders" := MachineCenter."Capacity (Effective)" - MachineCenter."Prod. Order Need (Qty.)";
         if MachineCenter."Capacity (Effective)" <> 0 then
-            Load := Round(MachineCenter."Prod. Order Need (Qty.)" / MachineCenter."Capacity (Effective)" * 100, 0.1)
+            Rec.Load := Round(MachineCenter."Prod. Order Need (Qty.)" / MachineCenter."Capacity (Effective)" * 100, 0.1)
         else
-            Load := 0;
+            Rec.Load := 0;
 
         OnAfterCalcLine(MachineCenter, Rec);
     end;

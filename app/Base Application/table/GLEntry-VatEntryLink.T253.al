@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 table 253 "G/L Entry - VAT Entry Link"
 {
     Caption = 'G/L Entry - VAT Entry Link';

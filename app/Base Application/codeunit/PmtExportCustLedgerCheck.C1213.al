@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.Sales.Receivables;
+
 codeunit 1213 "Pmt. Export Cust. Ledger Check"
 {
     TableNo = "Cust. Ledger Entry";

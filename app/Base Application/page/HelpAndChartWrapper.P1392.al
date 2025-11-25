@@ -230,17 +230,22 @@ page 1392 "Help And Chart Wrapper"
         ChartManagement: Codeunit "Chart Management";
         StatusText: Text;
         Period: Option " ",Next,Previous;
-        [InDataSet]
         PreviousNextActionEnabled: Boolean;
         NoDescriptionMsg: Label 'A description was not specified for this chart.';
         IsChartAddInReady: Boolean;
         IsSaaS: Boolean;
 
     local procedure InitializeSelectedChart()
+    var
+        ErrorText: Text;
     begin
         OnBeforeInitializeSelectedChart(SelectedChartDefinition);
         ChartManagement.SetDefaultPeriodLength(SelectedChartDefinition, BusinessChartBuffer);
-        ChartManagement.UpdateChart(SelectedChartDefinition, BusinessChartBuffer, Period::" ");
+        if not ChartManagement.UpdateChartSafe(SelectedChartDefinition, BusinessChartBuffer, Period::" ", ErrorText) then begin
+            StatusText := ErrorText;
+            exit;
+        end;
+
         PreviousNextActionEnabled := ChartManagement.UpdateNextPrevious(SelectedChartDefinition);
         ChartManagement.UpdateStatusText(SelectedChartDefinition, BusinessChartBuffer, StatusText);
         UpdateChart();

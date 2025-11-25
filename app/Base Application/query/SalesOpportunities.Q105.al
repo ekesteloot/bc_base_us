@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 query 105 "Sales Opportunities"
 {
     Caption = 'Sales Opportunities';

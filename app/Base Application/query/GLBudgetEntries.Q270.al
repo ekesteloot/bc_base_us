@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
 query 270 "G/L Budget Entries"
 {
     Caption = 'G/L Budget Entries';

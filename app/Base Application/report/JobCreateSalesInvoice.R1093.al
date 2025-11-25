@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Sales.Setup;
+
 report 1093 "Job Create Sales Invoice"
 {
     ApplicationArea = Jobs;
@@ -9,7 +14,7 @@ report 1093 "Job Create Sales Invoice"
     {
         dataitem("Job Task"; "Job Task")
         {
-            DataItemTableView = SORTING("Job No.", "Job Task No.");
+            DataItemTableView = sorting("Job No.", "Job Task No.");
             RequestFilterFields = "Job No.", "Job Task No.", "Planning Date Filter";
 
             trigger OnAfterGetRecord()
@@ -20,13 +25,13 @@ report 1093 "Job Create Sales Invoice"
                 OnBeforeJobTaskOnAfterGetRecord("Job Task", IsHandled);
                 if not IsHandled then
                     JobCreateInvoice.CreateSalesInvoiceJobTask(
-                      "Job Task", PostingDate, InvoicePerTask, NoOfInvoices, OldJobNo, OldJTNo, false);
+                      "Job Task", PostingDate, DocumentDate, InvoicePerTask, NoOfInvoices, OldJobNo, OldJTNo, false);
             end;
 
             trigger OnPostDataItem()
             begin
                 JobCreateInvoice.CreateSalesInvoiceJobTask(
-                  "Job Task", PostingDate, InvoicePerTask, NoOfInvoices, OldJobNo, OldJTNo, true);
+                  "Job Task", PostingDate, DocumentDate, InvoicePerTask, NoOfInvoices, OldJobNo, OldJTNo, true);
             end;
 
             trigger OnPreDataItem()
@@ -53,6 +58,22 @@ report 1093 "Job Create Sales Invoice"
                         ApplicationArea = Jobs;
                         Caption = 'Posting Date';
                         ToolTip = 'Specifies the posting date for the document.';
+
+                        trigger OnValidate()
+                        var
+                            SalesReceivablesSetup: Record "Sales & Receivables Setup";
+                        begin
+                            SalesReceivablesSetup.SetLoadFields("Link Doc. Date To Posting Date");
+                            SalesReceivablesSetup.GetRecordOnce();
+                            if SalesReceivablesSetup."Link Doc. Date To Posting Date" then
+                                DocumentDate := PostingDate;
+                        end;
+                    }
+                    field("Document Date"; DocumentDate)
+                    {
+                        ApplicationArea = Jobs;
+                        Caption = 'Document Date';
+                        ToolTip = 'Specifies the document date.';
                     }
                     field(JobChoice; JobChoice)
                     {
@@ -72,6 +93,7 @@ report 1093 "Job Create Sales Invoice"
         trigger OnOpenPage()
         begin
             PostingDate := WorkDate();
+            DocumentDate := WorkDate();
         end;
     }
 
@@ -113,7 +135,7 @@ report 1093 "Job Create Sales Invoice"
 
     protected var
         JobChoice: Option Job,"Job Task";
-        PostingDate: Date;
+        PostingDate, DocumentDate : Date;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterPostReport(NoOfInvoices: Integer)

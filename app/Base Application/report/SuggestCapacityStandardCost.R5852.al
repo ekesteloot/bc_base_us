@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Manufacturing.StandardCost;
+
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.ProjectMgt.Resources.Resource;
+using System.Utilities;
+
 report 5852 "Suggest Capacity Standard Cost"
 {
     Caption = 'Suggest Work/Mach Ctr Std Cost';
@@ -78,7 +85,7 @@ report 5852 "Suggest Capacity Standard Cost"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
         }
     }
 

@@ -1,4 +1,30 @@
-﻿codeunit 365 "Format Address"
+﻿namespace Microsoft.Foundation.Address;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.HumanResources.Employee;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+
+codeunit 365 "Format Address"
 {
     Permissions = tabledata "Country/Region" = r;
     SingleInstance = true;
@@ -350,6 +376,22 @@
             exit;
 
         with BankAcc do
+            FormatAddr(
+              AddrArray, Name, "Name 2", Contact, Address, "Address 2",
+              City, "Post Code", County, "Country/Region Code");
+    end;
+
+
+    procedure Location(var AddrArray: array[8] of Text[100]; var Location: Record Location)
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeLocation(AddrArray, Location, IsHandled);
+        if IsHandled then
+            exit;
+
+        with Location do
             FormatAddr(
               AddrArray, Name, "Name 2", Contact, Address, "Address 2",
               City, "Post Code", County, "Country/Region Code");
@@ -1752,6 +1794,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeBankAcc(var AddrArray: array[8] of Text[100]; var BankAccount: Record "Bank Account"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLocation(var AddrArray: array[8] of Text[100]; var Location: Record Location; var IsHandled: Boolean)
     begin
     end;
 

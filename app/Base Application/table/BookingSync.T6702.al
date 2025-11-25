@@ -22,8 +22,6 @@ table 6702 "Booking Sync"
             DataClassification = EndUserIdentifiableInformation;
             NotBlank = true;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(5; "Last Customer Sync"; DateTime)
@@ -65,7 +63,7 @@ table 6702 "Booking Sync"
         field(14; "Item Template Code"; Code[10])
         {
             Caption = 'Item Template Code';
-            TableRelation = "Config. Template Header".Code WHERE("Table ID" = FILTER(27));
+            TableRelation = "Config. Template Header".Code where("Table ID" = filter(27));
         }
         field(15; "Customer Templ. Code"; Code[20])
         {

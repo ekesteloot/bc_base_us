@@ -1,7 +1,12 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Purchases.Vendor;
+
 report 310 "Vendor - Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/VendorLabels.rdlc';
+    RDLCLayout = './Purchases/Reports/VendorLabels.rdlc';
     ApplicationArea = Suite;
     Caption = 'Vendor - Labels';
     UsageCategory = ReportsAndAnalysis;

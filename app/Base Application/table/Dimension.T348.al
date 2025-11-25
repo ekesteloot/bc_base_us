@@ -1,3 +1,16 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Intercompany.Dimension;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using System.Globalization;
+
 table 348 Dimension
 {
     Caption = 'Dimension';
@@ -158,6 +171,7 @@ table 348 Dimension
                     GLSetup.Modify();
                 end;
         end;
+
         RemoveICDimensionMappings();
     end;
 

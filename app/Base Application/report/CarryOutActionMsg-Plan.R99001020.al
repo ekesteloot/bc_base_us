@@ -1,3 +1,14 @@
+﻿namespace Microsoft.InventoryMgt.Requisition;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
 report 99001020 "Carry Out Action Msg. - Plan."
 {
     Caption = 'Carry Out Action Msg. - Plan.';
@@ -7,7 +18,7 @@ report 99001020 "Carry Out Action Msg. - Plan."
     {
         dataitem("Requisition Line"; "Requisition Line")
         {
-            DataItemTableView = SORTING("Worksheet Template Name", "Journal Batch Name", "Vendor No.", "Sell-to Customer No.", "Ship-to Code", "Order Address Code", "Currency Code", "Ref. Order Type", "Ref. Order Status", "Ref. Order No.", "Location Code", "Transfer-from Code");
+            DataItemTableView = sorting("Worksheet Template Name", "Journal Batch Name", "Vendor No.", "Sell-to Customer No.", "Ship-to Code", "Order Address Code", "Currency Code", "Ref. Order Type", "Ref. Order Status", "Ref. Order No.", "Location Code", "Transfer-from Code");
             RequestFilterHeading = 'Planning Line';
 
             trigger OnAfterGetRecord()
@@ -312,9 +323,7 @@ report 99001020 "Carry Out Action Msg. - Plan."
         CounterTotal: Integer;
         CounterFailed: Integer;
         EndOrderDate: Date;
-        [InDataSet]
         PurchOrderCopyToReqWksh: Boolean;
-        [InDataSet]
         TransOrderCopyToReqWksh: Boolean;
 
         Text000: Label 'There are no planning lines to make orders for.';
@@ -354,18 +363,18 @@ report 99001020 "Carry Out Action Msg. - Plan."
         case RequisitionLine."Ref. Order Type" of
             RequisitionLine."Ref. Order Type"::"Prod. Order":
                 if ProdOrderChoice <> ProdOrderChoice::" " then
-                    CarryOutActions("Planning Create Source Type"::Production, ProdOrderChoice.AsInteger(), ProdWkshTempl, ProdWkshName);
+                    CarryOutActions(Enum::"Planning Create Source Type"::Production, ProdOrderChoice.AsInteger(), ProdWkshTempl, ProdWkshName);
             RequisitionLine."Ref. Order Type"::Purchase:
                 if PurchOrderChoice = PurchOrderChoice::"Copy to Req. Wksh" then
-                    CarryOutActions("Planning Create Source Type"::Purchase, PurchOrderChoice.AsInteger(), ReqWkshTemp, ReqWksh);
+                    CarryOutActions(Enum::"Planning Create Source Type"::Purchase, PurchOrderChoice.AsInteger(), ReqWkshTemp, ReqWksh);
             RequisitionLine."Ref. Order Type"::Transfer:
                 if TransOrderChoice <> TransOrderChoice::" " then begin
                     CarryOutAction.SetSplitTransferOrders(not CombineTransferOrders);
-                    CarryOutActions("Planning Create Source Type"::Transfer, TransOrderChoice.AsInteger(), TransWkshTemp, TransWkshName);
+                    CarryOutActions(Enum::"Planning Create Source Type"::Transfer, TransOrderChoice.AsInteger(), TransWkshTemp, TransWkshName);
                 end;
             RequisitionLine."Ref. Order Type"::Assembly:
                 if AsmOrderChoice <> AsmOrderChoice::" " then
-                    CarryOutActions("Planning Create Source Type"::Assembly, AsmOrderChoice.AsInteger(), '', '');
+                    CarryOutActions(Enum::"Planning Create Source Type"::Assembly, AsmOrderChoice.AsInteger(), '', '');
             else
                 CurrReport.Skip();
         end;
@@ -430,10 +439,10 @@ report 99001020 "Carry Out Action Msg. - Plan."
 
     procedure InitializeRequest(NewProdOrderChoice: Option; NewPurchOrderChoice: Option; NewTransOrderChoice: Option; NewAsmOrderChoice: Option)
     begin
-        ProdOrderChoice := "Planning Create Prod. Order".FromInteger(NewProdOrderChoice);
-        PurchOrderChoice := "Planning Create Purchase Order".FromInteger(NewPurchOrderChoice);
-        TransOrderChoice := "Planning Create Transfer Order".FromInteger(NewTransOrderChoice);
-        AsmOrderChoice := "Planning Create Assembly Order".FromInteger(NewAsmOrderChoice);
+        ProdOrderChoice := Enum::"Planning Create Prod. Order".FromInteger(NewProdOrderChoice);
+        PurchOrderChoice := Enum::"Planning Create Purchase Order".FromInteger(NewPurchOrderChoice);
+        TransOrderChoice := Enum::"Planning Create Transfer Order".FromInteger(NewTransOrderChoice);
+        AsmOrderChoice := Enum::"Planning Create Assembly Order".FromInteger(NewAsmOrderChoice);
     end;
 
     procedure InitializeRequest2(NewProdOrderChoice: Option; NewPurchOrderChoice: Option; NewTransOrderChoice: Option; NewAsmOrderChoice: Option; NewReqWkshTemp: Code[10]; NewReqWksh: Code[10]; NewTransWkshTemp: Code[10]; NewTransWkshName: Code[10])
@@ -511,7 +520,7 @@ report 99001020 "Carry Out Action Msg. - Plan."
             CheckSupplyFrom();
 
             case "Demand Type" of
-                DATABASE::"Sales Line":
+                Enum::TableID::"Sales Line".AsInteger():
                     begin
                         SalesLine.Get("Demand Subtype", "Demand Order No.", "Demand Line No.");
                         SalesLine.TestField(Type, SalesLine.Type::Item);
@@ -526,7 +535,7 @@ report 99001020 "Carry Out Action Msg. - Plan."
                           "Demand Quantity (Base)",
                           -SalesLine.SignedXX(SalesLine."Outstanding Qty. (Base)" - SalesLine."Reserved Qty. (Base)"))
                     end;
-                DATABASE::"Prod. Order Component":
+                Enum::TableID::"Prod. Order Component".AsInteger():
                     begin
                         ProdOrderComp.Get("Demand Subtype", "Demand Order No.", "Demand Line No.", "Demand Ref. No.");
                         TestField("No.", ProdOrderComp."Item No.");
@@ -542,7 +551,7 @@ report 99001020 "Carry Out Action Msg. - Plan."
                         if (ProdOrderChoice = ProdOrderChoice::Planned) and Reserve then
                             ReserveforPlannedProd := true;
                     end;
-                DATABASE::"Service Line":
+                Enum::TableID::"Service Line".AsInteger():
                     begin
                         ServLine.Get("Demand Subtype", "Demand Order No.", "Demand Line No.");
                         ServLine.TestField(Type, ServLine.Type::Item);
@@ -557,7 +566,7 @@ report 99001020 "Carry Out Action Msg. - Plan."
                           "Demand Quantity (Base)",
                           -ServLine.SignedXX(ServLine."Outstanding Qty. (Base)" - ServLine."Reserved Qty. (Base)"))
                     end;
-                DATABASE::"Job Planning Line":
+                Enum::TableID::"Job Planning Line".AsInteger():
                     begin
                         JobPlanningLine.SetRange("Job Contract Entry No.", "Demand Line No.");
                         JobPlanningLine.FindFirst();
@@ -575,7 +584,7 @@ report 99001020 "Carry Out Action Msg. - Plan."
                           "Demand Quantity (Base)",
                           JobPlanningLine."Remaining Qty. (Base)" - JobPlanningLine."Reserved Qty. (Base)")
                     end;
-                DATABASE::"Assembly Line":
+                Enum::TableID::"Assembly Line".AsInteger():
                     begin
                         AsmLine.Get("Demand Subtype", "Demand Order No.", "Demand Line No.");
                         AsmLine.TestField(Type, AsmLine.Type::Item);

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
 page 2592 "Dimension Corrections"
 {
     PageType = List;

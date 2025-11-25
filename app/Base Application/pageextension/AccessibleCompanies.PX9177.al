@@ -21,12 +21,12 @@ pageextension 9177 "Accessible Companies" extends "Accessible Companies"
                 var
                     AssistedCompanySetupStatus: Record "Assisted Company Setup Status";
                 begin
-                    AssistedCompanySetupStatus.DrillDownSetupStatus(Name);
+                    AssistedCompanySetupStatus.DrillDownSetupStatus(Rec.Name);
                 end;
             }
         }
     }
-    
+
     trigger OnAfterGetRecord()
     var
         AssistedCompanySetupStatus: Record "Assisted Company Setup Status";

@@ -86,7 +86,7 @@ page 325 "Intrastat Journal Templates"
                     Caption = 'Batches';
                     Image = Description;
                     RunObject = Page "Intrastat Jnl. Batches";
-                    RunPageLink = "Journal Template Name" = FIELD(Name);
+                    RunPageLink = "Journal Template Name" = field(Name);
                     ToolTip = 'View or edit multiple journals for a specific template. You can use batches when you need multiple journals of a certain type.';
                     Scope = Repeater;
                 }

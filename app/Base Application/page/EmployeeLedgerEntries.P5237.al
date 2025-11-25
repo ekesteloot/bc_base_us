@@ -1,3 +1,11 @@
+namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.Shared.Navigate;
+
 page 5237 "Employee Ledger Entries"
 {
     ApplicationArea = BasicHR;
@@ -103,7 +111,7 @@ page 5237 "Employee Ledger Entries"
                     ToolTip = 'Specifies the number of the balancing account that is used for the entry.';
                     Visible = false;
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = BasicHR;
                     Editable = false;
@@ -149,12 +157,14 @@ page 5237 "Employee Ledger Entries"
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = Dimensions;
+                    Editable = false;
                     ToolTip = 'Specifies the code for the global dimension that is linked to the record or entry for analysis purposes. Two global dimensions, typically for the company''s most important activities, are available on all cards, documents, reports, and lists.';
                     Visible = Dim1Visible;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = Dimensions;
+                    Editable = false;
                     ToolTip = 'Specifies the code for the global dimension that is linked to the record or entry for analysis purposes. Two global dimensions, typically for the company''s most important activities, are available on all cards, documents, reports, and lists.';
                     Visible = Dim2Visible;
                 }
@@ -234,7 +244,7 @@ page 5237 "Employee Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Detailed &Ledger Entries")
@@ -243,9 +253,9 @@ page 5237 "Employee Ledger Entries"
                     Caption = 'Detailed &Ledger Entries';
                     Image = View;
                     RunObject = Page "Detailed Empl. Ledger Entries";
-                    RunPageLink = "Employee Ledger Entry No." = FIELD("Entry No."),
-                                  "Employee No." = FIELD("Employee No.");
-                    RunPageView = SORTING("Employee Ledger Entry No.", "Posting Date");
+                    RunPageLink = "Employee Ledger Entry No." = field("Entry No."),
+                                  "Employee No." = field("Employee No.");
+                    RunPageView = sorting("Employee Ledger Entry No.", "Posting Date");
                     Scope = Repeater;
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a summary of the all posted entries and adjustments related to a specific employee ledger entry';
@@ -262,7 +272,7 @@ page 5237 "Employee Ledger Entries"
                     var
                         Navigate: Page Navigate;
                     begin
-                        Navigate.SetDoc("Posting Date", "Document No.");
+                        Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                         Navigate.Run();
                     end;
                 }
@@ -291,7 +301,7 @@ page 5237 "Employee Ledger Entries"
                         EmployeeLedgerEntry.Copy(Rec);
                         EmplEntryApplyPostedEntries.ApplyEmplEntryFormEntry(EmployeeLedgerEntry);
                         Rec := EmployeeLedgerEntry;
-                        Get("Entry No.");
+                        Rec.Get(Rec."Entry No.");
                         CurrPage.Update();
                     end;
                 }
@@ -311,7 +321,7 @@ page 5237 "Employee Ledger Entries"
                     var
                         EmplEntryApplyPostedEntries: Codeunit "EmplEntry-Apply Posted Entries";
                     begin
-                        EmplEntryApplyPostedEntries.UnApplyEmplLedgEntry("Entry No.");
+                        EmplEntryApplyPostedEntries.UnApplyEmplLedgEntry(Rec."Entry No.");
                     end;
                 }
                 action(CreatePayment)
@@ -352,7 +362,7 @@ page 5237 "Employee Ledger Entries"
                         ReversePaymentRec: Codeunit "Reverse Payment Rec. Journal";
                     begin
                         ReversePaymentRec.ErrorIfEntryIsNotReversable(Rec);
-                        ReversalEntry.ReverseTransaction("Transaction No.");
+                        ReversalEntry.ReverseTransaction(Rec."Transaction No.");
                     end;
                 }
             }

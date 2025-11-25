@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 page 5218 "Misc. Articles"
 {
     ApplicationArea = BasicHR;
@@ -13,7 +15,7 @@ page 5218 "Misc. Articles"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a code for the miscellaneous article.';

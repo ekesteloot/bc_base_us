@@ -1,3 +1,7 @@
+namespace System.Security.User;
+
+using System.Security.AccessControl;
+
 table 1552 "User Callouts"
 {
     Caption = 'User Callouts';

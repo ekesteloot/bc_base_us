@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Allocation;
+
 page 1106 "Cost Allocation Target"
 {
     AutoSplitKey = true;
@@ -63,7 +65,7 @@ page 1106 "Cost Allocation Target"
                     ToolTip = 'Specifies whether the values in the static base are weighted.';
                     Visible = false;
                 }
-                field(Share; Share)
+                field(Share; Rec.Share)
                 {
                     ApplicationArea = CostAccounting;
                     BlankZero = true;
@@ -74,12 +76,12 @@ page 1106 "Cost Allocation Target"
                         UpdatePage();
                     end;
                 }
-                field(Percent; Percent)
+                field(Percent; Rec.Percent)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the percentage rate calculated based on all other allocation targets.';
                 }
-                field(Base; Base)
+                field(Base; Rec.Base)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies whether or not the base is static.';

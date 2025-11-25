@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using System.Utilities;
+
 report 87 "Copy - General Posting Setup"
 {
     Caption = 'Copy - General Posting Setup';
@@ -7,7 +11,7 @@ report 87 "Copy - General Posting Setup"
     {
         dataitem("General Posting Setup"; "General Posting Setup")
         {
-            DataItemTableView = SORTING("Gen. Bus. Posting Group", "Gen. Prod. Posting Group");
+            DataItemTableView = sorting("Gen. Bus. Posting Group", "Gen. Prod. Posting Group");
 
             trigger OnAfterGetRecord()
             var

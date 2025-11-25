@@ -1,3 +1,13 @@
+namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.HumanResources.Employee;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 5223 "Detailed Employee Ledger Entry"
 {
     Caption = 'Detailed Employee Ledger Entry';
@@ -32,7 +42,7 @@ table 5223 "Detailed Employee Ledger Entry"
         }
         field(7; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
         }
@@ -56,8 +66,6 @@ table 5223 "Detailed Employee Ledger Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -79,8 +87,6 @@ table 5223 "Detailed Employee Ledger Entry"
         field(14; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(15; "Reason Code"; Code[10])
         {
@@ -89,14 +95,14 @@ table 5223 "Detailed Employee Ledger Entry"
         }
         field(16; "Debit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Debit Amount';
         }
         field(17; "Credit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Credit Amount';
@@ -116,12 +122,12 @@ table 5223 "Detailed Employee Ledger Entry"
         field(21; "Initial Entry Global Dim. 1"; Code[20])
         {
             Caption = 'Initial Entry Global Dim. 1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(22; "Initial Entry Global Dim. 2"; Code[20])
         {
             Caption = 'Initial Entry Global Dim. 2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(35; "Initial Document Type"; Enum "Gen. Journal Document Type")
         {
@@ -138,7 +144,7 @@ table 5223 "Detailed Employee Ledger Entry"
         field(38; "Unapplied by Entry No."; Integer)
         {
             Caption = 'Unapplied by Entry No.';
-            TableRelation = "Detailed Vendor Ledg. Entry";
+            TableRelation = "Detailed Employee Ledger Entry";
         }
         field(42; "Application No."; Integer)
         {

@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.WarehouseMgt.Document;
+
 page 5784 "Filters to Get Source Docs."
 {
     Caption = 'Filters to Get Source Docs.';
@@ -28,7 +32,7 @@ page 5784 "Filters to Get Source Docs."
             {
                 Editable = true;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the code that identifies the filter record.';
@@ -74,12 +78,12 @@ page 5784 "Filters to Get Source Docs."
                         RequestType::Receive:
                             begin
                                 GetSourceBatch.SetOneCreatedReceiptHeader(WhseReceiptHeader);
-                                SetFilters(GetSourceBatch, WhseReceiptHeader."Location Code");
+                                Rec.SetFilters(GetSourceBatch, WhseReceiptHeader."Location Code");
                             end;
                         RequestType::Ship:
                             begin
                                 GetSourceBatch.SetOneCreatedShptHeader(WhseShptHeader);
-                                SetFilters(GetSourceBatch, WhseShptHeader."Location Code");
+                                Rec.SetFilters(GetSourceBatch, WhseShptHeader."Location Code");
                                 GetSourceBatch.SetSkipBlocked(true);
                             end;
                     end;
@@ -102,7 +106,7 @@ page 5784 "Filters to Get Source Docs."
                 var
                     SourceDocFilterCard: Page "Source Document Filter Card";
                 begin
-                    TestField(Code);
+                    Rec.TestField(Code);
                     case RequestType of
                         RequestType::Receive:
                             SourceDocFilterCard.SetOneCreatedReceiptHeader(WhseReceiptHeader);
@@ -134,16 +138,16 @@ page 5784 "Filters to Get Source Docs."
 
     trigger OnAfterGetCurrRecord()
     begin
-        ShowRequestForm := "Show Filter Request";
+        ShowRequestForm := Rec."Show Filter Request";
     end;
 
     trigger OnOpenPage()
     begin
         DataCaption := CurrPage.Caption;
-        FilterGroup := 2;
-        if GetFilter(Type) <> '' then
-            DataCaption := DataCaption + ' - ' + GetFilter(Type);
-        FilterGroup := 0;
+        Rec.FilterGroup := 2;
+        if Rec.GetFilter(Type) <> '' then
+            DataCaption := DataCaption + ' - ' + Rec.GetFilter(Type);
+        Rec.FilterGroup := 0;
         CurrPage.Caption(DataCaption);
     end;
 

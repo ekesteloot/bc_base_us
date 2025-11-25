@@ -1,3 +1,7 @@
+namespace System.Diagnostics;
+
+using System.Reflection;
+
 page 1369 "Monitored Fields Worksheet"
 {
     PageType = Worksheet;
@@ -53,7 +57,7 @@ page 1369 "Monitored Fields Worksheet"
 
                     trigger OnValidate()
                     begin
-                        MonitorSensitiveField.ValidateTableAndFieldNo(TableNo, "Field No.");
+                        MonitorSensitiveField.ValidateTableAndFieldNo(TableNo, Rec."Field No.");
                     end;
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -67,7 +71,7 @@ page 1369 "Monitored Fields Worksheet"
                         if Page.RunModal(Page::"Fields Lookup", FieldTable) = Action::LookupOK then begin
                             TableNo := FieldTable.TableNo;
                             SetTableNumberAndCaption();
-                            Validate("Field No.", FieldTable."No.");
+                            Rec.Validate("Field No.", FieldTable."No.");
                         end;
                     end;
                 }
@@ -78,7 +82,7 @@ page 1369 "Monitored Fields Worksheet"
                     Enabled = false;
                     ToolTip = 'Specifies the name of the monitored field.';
                 }
-                field(Notify; Notify)
+                field(Notify; Rec.Notify)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether to send an email notification when the value in this monitored field is changed. The email is sent to the recipient specified on the Field Monitoring Setup page.';
@@ -171,38 +175,38 @@ page 1369 "Monitored Fields Worksheet"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         TableNo := 0;
-        "Field No." := 0;
+        Rec."Field No." := 0;
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        MonitorSensitiveField.ValidateTableAndFieldNo("Table No.", "Field No.");
+        MonitorSensitiveField.ValidateTableAndFieldNo(Rec."Table No.", Rec."Field No.");
         MonitorSensitiveField.InsertChangeLogSetupTable(TableNo);
         SetTableNumberAndCaption();
 
-        "Log Insertion" := true;
-        "Log Modification" := true;
-        "Log Deletion" := true;
-        "Monitor Sensitive Field" := true;
+        Rec."Log Insertion" := true;
+        Rec."Log Modification" := true;
+        Rec."Log Deletion" := true;
+        Rec."Monitor Sensitive Field" := true;
     end;
 
     trigger OnAfterGetRecord()
     begin
-        TableNo := "Table No.";
+        TableNo := Rec."Table No.";
     end;
 
     local procedure ChangeNotificationStatus(NotifyValue: Boolean)
     begin
         CurrPage.SetSelectionFilter(Rec);
 
-        if not IsEmpty() then
-            ModifyAll(Notify, NotifyValue, true);
-        Reset();
+        if not Rec.IsEmpty() then
+            Rec.ModifyAll(Notify, NotifyValue, true);
+        Rec.Reset();
     end;
 
     local procedure SetTableNumberAndCaption()
     begin
-        "Table No." := TableNo;
+        Rec."Table No." := TableNo;
     end;
 
     var

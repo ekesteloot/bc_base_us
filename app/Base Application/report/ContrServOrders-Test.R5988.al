@@ -1,14 +1,21 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Setup;
+
 report 5988 "Contr. Serv. Orders - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ContrServOrdersTest.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ContrServOrdersTest.rdlc';
     Caption = 'Contr. Serv. Orders - Test';
 
     dataset
     {
         dataitem("Service Contract Header"; "Service Contract Header")
         {
-            DataItemTableView = WHERE("Contract Type" = CONST(Contract), "Change Status" = CONST(Locked), Status = CONST(Signed));
+            DataItemTableView = where("Contract Type" = const(Contract), "Change Status" = const(Locked), Status = const(Signed));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Contract No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -73,8 +80,8 @@ report 5988 "Contr. Serv. Orders - Test"
             }
             dataitem("Service Contract Line"; "Service Contract Line")
             {
-                DataItemLink = "Contract Type" = FIELD("Contract Type"), "Contract No." = FIELD("Contract No.");
-                DataItemTableView = SORTING("Contract Type", "Contract No.", "Line No.") ORDER(Ascending) WHERE("Service Period" = FILTER(<> ''));
+                DataItemLink = "Contract Type" = field("Contract Type"), "Contract No." = field("Contract No.");
+                DataItemTableView = sorting("Contract Type", "Contract No.", "Line No.") ORDER(Ascending) where("Service Period" = filter(<> ''));
                 column(Service_Contract_Line__Serial_No__; "Serial No.")
                 {
                 }

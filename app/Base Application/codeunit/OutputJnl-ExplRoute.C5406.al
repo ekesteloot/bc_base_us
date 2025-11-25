@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Manufacturing.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+
 codeunit 5406 "Output Jnl.-Expl. Route"
 {
     Permissions = TableData "Item Journal Line" = rimd,
@@ -24,7 +31,7 @@ codeunit 5406 "Output Jnl.-Expl. Route"
         if IsHandled then
             exit;
 
-        if ("Order Type" <> "Order Type"::Production) or ("Order No." = '') then
+        if (Rec."Order Type" <> Rec."Order Type"::Production) or (Rec."Order No." = '') then
             exit;
 
         if not ItemJnlLineReserve.DeleteLineConfirm(Rec) then
@@ -32,48 +39,48 @@ codeunit 5406 "Output Jnl.-Expl. Route"
 
         ProdOrderLine.Reset();
         ProdOrderLine.SetRange(Status, ProdOrderLine.Status::Released);
-        ProdOrderLine.SetRange("Prod. Order No.", "Order No.");
-        if "Order Line No." <> 0 then
-            ProdOrderLine.SetRange("Line No.", "Order Line No.");
-        if "Item No." <> '' then
-            ProdOrderLine.SetRange("Item No.", "Item No.");
-        if "Routing Reference No." <> 0 then
-            ProdOrderLine.SetRange("Routing Reference No.", "Routing Reference No.");
-        if "Routing No." <> '' then
-            ProdOrderLine.SetRange("Routing No.", "Routing No.");
+        ProdOrderLine.SetRange("Prod. Order No.", Rec."Order No.");
+        if Rec."Order Line No." <> 0 then
+            ProdOrderLine.SetRange("Line No.", Rec."Order Line No.");
+        if Rec."Item No." <> '' then
+            ProdOrderLine.SetRange("Item No.", Rec."Item No.");
+        if Rec."Routing Reference No." <> 0 then
+            ProdOrderLine.SetRange("Routing Reference No.", Rec."Routing Reference No.");
+        if Rec."Routing No." <> '' then
+            ProdOrderLine.SetRange("Routing No.", Rec."Routing No.");
 
         ProdOrderRtngLine.SetRange(Status, ProdOrderRtngLine.Status::Released);
-        ProdOrderRtngLine.SetRange("Prod. Order No.", "Order No.");
-        if "Operation No." <> '' then
-            ProdOrderRtngLine.SetRange("Operation No.", "Operation No.");
+        ProdOrderRtngLine.SetRange("Prod. Order No.", Rec."Order No.");
+        if Rec."Operation No." <> '' then
+            ProdOrderRtngLine.SetRange("Operation No.", Rec."Operation No.");
         ProdOrderRtngLine.SetFilter("Routing Status", '<> %1', ProdOrderRtngLine."Routing Status"::Finished);
         ProdOrderRtngLine.SetRange("Flushing Method", ProdOrderRtngLine."Flushing Method"::Manual);
         OnRunOnAfterProdOrderRtngLineSetFiltersBeforeLoop(ProdOrderRtngLine, ProdOrderLine);
 
         // Clear fields in xRec to ensure that validation code regarding dimensions is executed:
-        "Order Line No." := 0;
-        "Item No." := '';
-        "Routing Reference No." := 0;
-        "Routing No." := '';
+        Rec."Order Line No." := 0;
+        Rec."Item No." := '';
+        Rec."Routing Reference No." := 0;
+        Rec."Routing No." := '';
 
         ItemJnlLine := Rec;
 
         ItemJnlLine.SetRange(
-          "Journal Template Name", "Journal Template Name");
+          "Journal Template Name", Rec."Journal Template Name");
         ItemJnlLine.SetRange(
-          "Journal Batch Name", "Journal Batch Name");
+          "Journal Batch Name", Rec."Journal Batch Name");
         OnRunOnAfterItemJnlLineSetFilters(Rec, ProdOrderLine, ProdOrderRtngLine, ItemJnlLine);
 
         if ItemJnlLine.Find('>') then begin
             LineSpacing :=
-              (ItemJnlLine."Line No." - "Line No.") div
+              (ItemJnlLine."Line No." - Rec."Line No.") div
               (1 + ProdOrderLine.Count * ProdOrderRtngLine.Count);
             if LineSpacing = 0 then
                 Error(Text000);
         end else
             LineSpacing := 10000;
 
-        NextLineNo := "Line No.";
+        NextLineNo := Rec."Line No.";
 
         if not ProdOrderLine.Find('-') then
             Error(Text001);
@@ -139,7 +146,7 @@ codeunit 5406 "Output Jnl.-Expl. Route"
         ItemJnlLineReserve.DeleteLine(Rec);
 
         OnBeforeDeleteItemJnlLine(Rec);
-        Delete();
+        Rec.Delete();
     end;
 
     var

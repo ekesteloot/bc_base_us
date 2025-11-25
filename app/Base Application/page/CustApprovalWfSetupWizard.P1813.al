@@ -1,3 +1,11 @@
+﻿namespace System.Automation;
+
+using Microsoft.Sales.Customer;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Utilities;
+
 page 1813 "Cust. Approval WF Setup Wizard"
 {
     Caption = 'Customer Approval Workflow Setup';
@@ -265,10 +273,10 @@ page 1813 "Cust. Approval WF Setup Wizard"
 
     trigger OnInit()
     begin
-        if not Get() then begin
-            Init();
+        if not Rec.Get() then begin
+            Rec.Init();
             SetDefaultValues();
-            Insert();
+            Rec.Insert();
         end;
         LoadTopBanners();
     end;
@@ -329,8 +337,7 @@ page 1813 "Cust. Approval WF Setup Wizard"
             Step::"Customer Approver Setup":
                 ShowApprovalUserSetupDetailsStep();
             Step::"Automatic Approval Setup":
-                if "App. Trigger" = "App. Trigger"::"The user changes a specific field"
-                then
+                if Rec."App. Trigger" = Rec."App. Trigger"::"The user changes a specific field" then
                     ShowCustomerApprovalDetailsStep()
                 else
                     NextStep(Backwards);
@@ -357,7 +364,7 @@ page 1813 "Cust. Approval WF Setup Wizard"
     begin
         ResetWizardControls();
         CustomerAutoAppDetailsVisible := true;
-        SetCustomerField(Field);
+        SetCustomerField(Rec.Field);
     end;
 
     local procedure ShowDoneStep()
@@ -367,12 +374,11 @@ page 1813 "Cust. Approval WF Setup Wizard"
         NextEnabled := false;
         FinishEnabled := true;
 
-        if "App. Trigger" = "App. Trigger"::"The user sends an approval requests manually" then
-            SummaryText := StrSubstNo(ManualTriggerTxt, "Approver ID");
-        if "App. Trigger" = "App. Trigger"::"The user changes a specific field"
-        then begin
-            CalcFields("Field Caption");
-            SummaryText := StrSubstNo(AutoTriggerTxt, "Approver ID", "Field Caption", "Field Operator");
+        if Rec."App. Trigger" = Rec."App. Trigger"::"The user sends an approval requests manually" then
+            SummaryText := StrSubstNo(ManualTriggerTxt, Rec."Approver ID");
+        if Rec."App. Trigger" = Rec."App. Trigger"::"The user changes a specific field" then begin
+            Rec.CalcFields("Field Caption");
+            SummaryText := StrSubstNo(AutoTriggerTxt, Rec."Approver ID", Rec."Field Caption", Rec."Field Operator");
         end;
 
         SummaryText := ConvertStr(SummaryText, '\', '/');
@@ -402,26 +408,26 @@ page 1813 "Cust. Approval WF Setup Wizard"
         WorkflowResponseHandling: Codeunit "Workflow Response Handling";
         WorkflowCode: Code[20];
     begin
-        TableNo := DATABASE::Customer;
+        Rec.TableNo := DATABASE::Customer;
         WorkflowCode := WorkflowSetup.GetWorkflowTemplateCode(WorkflowSetup.CustomerCreditLimitChangeApprovalWorkflowCode());
         if Workflow.Get(WorkflowCode) then begin
             WorkflowStep.SetRange("Workflow Code", WorkflowCode);
             WorkflowStep.SetRange("Function Name", WorkflowResponseHandling.ShowMessageCode());
             if WorkflowStep.FindFirst() then begin
                 WorkflowStepArgument.Get(WorkflowStep.Argument);
-                "Custom Message" := WorkflowStepArgument.Message;
+                Rec."Custom Message" := WorkflowStepArgument.Message;
             end;
             WorkflowRule.SetRange("Workflow Code", WorkflowCode);
             if WorkflowRule.FindFirst() then begin
-                Field := WorkflowRule."Field No.";
-                "Field Operator" := WorkflowRule.Operator;
+                Rec.Field := WorkflowRule."Field No.";
+                Rec."Field Operator" := WorkflowRule.Operator;
             end;
         end;
     end;
 
     local procedure ValidateApprover()
     begin
-        if "Approver ID" = '' then
+        if Rec."Approver ID" = '' then
             Error(MandatoryApproverErr);
     end;
 
@@ -436,9 +442,9 @@ page 1813 "Cust. Approval WF Setup Wizard"
 
     local procedure SetCustomerField(FieldNo: Integer)
     begin
-        Field := FieldNo;
-        CalcFields("Field Caption");
-        CustomerFieldCaption := "Field Caption";
+        Rec.Field := FieldNo;
+        Rec.CalcFields("Field Caption");
+        CustomerFieldCaption := Rec."Field Caption";
     end;
 
     local procedure FindAndFilterToField(var FieldRec: Record "Field"; CaptionToFind: Text): Boolean
@@ -462,8 +468,8 @@ page 1813 "Cust. Approval WF Setup Wizard"
         FieldRec.SetRange(Class, FieldRec.Class::Normal);
         FieldRec.SetFilter(ObsoleteState, '<>%1', FieldRec.ObsoleteState::Removed);
 
-        if CaptionToFind = "Field Caption" then
-            FieldRec.SetRange("No.", Field)
+        if CaptionToFind = Rec."Field Caption" then
+            FieldRec.SetRange("No.", Rec.Field)
         else
             FieldRec.SetFilter("Field Caption", '%1', '@' + CaptionToFind + '*');
 

@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Remittance;
+
 page 2369 "Remit Address List"
 {
     Caption = 'Remit Address List';
@@ -15,7 +17,7 @@ page 2369 "Remit Address List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an remit-to address code.';
@@ -25,7 +27,7 @@ page 2369 "Remit Address List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the company name for the remit address.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the remit address.';
@@ -43,7 +45,7 @@ page 2369 "Remit Address List"
                     ToolTip = 'Specifies the postal code.';
                     Visible = false;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the remit address.';
@@ -66,7 +68,7 @@ page 2369 "Remit Address List"
                     ToolTip = 'Specifies the fax number associated with the address.';
                     Visible = false;
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the person you regularly contact when you do business with this vendor at this address.';
@@ -102,7 +104,7 @@ page 2369 "Remit Address List"
 
                     trigger OnAction()
                     begin
-                        DisplayMap();
+                        Rec.DisplayMap();
                     end;
                 }
             }

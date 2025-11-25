@@ -1,4 +1,13 @@
-﻿page 1191 "Create Employee Payment"
+﻿namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Employee;
+
+page 1191 "Create Employee Payment"
 {
     Caption = 'Create Employee Payment';
     PageType = StandardDialog;
@@ -16,8 +25,8 @@
                     ApplicationArea = Basic, Suite;
                     Caption = 'Batch Name';
                     ShowMandatory = true;
-                    TableRelation = "Gen. Journal Batch".Name WHERE("Template Type" = CONST(Payments),
-                                                                     Recurring = CONST(false));
+                    TableRelation = "Gen. Journal Batch".Name where("Template Type" = const(Payments),
+                                                                     Recurring = const(false));
                     ToolTip = 'Specifies the name of the journal batch.';
 
                     trigger OnValidate()

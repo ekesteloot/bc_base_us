@@ -7,12 +7,12 @@ codeunit 83 "Sales-Quote to Order (Yes/No)"
         if IsOnRunHandled(Rec) then
             exit;
 
-        TestField("Document Type", "Document Type"::Quote);
+        Rec.TestField("Document Type", Rec."Document Type"::Quote);
         if not ConfirmConvertToOrder(Rec) then
             exit;
 
-        if CheckCustomerCreated(true) then
-            Get("Document Type"::Quote, "No.")
+        if Rec.CheckCustomerCreated(true) then
+            Rec.Get(Rec."Document Type"::Quote, Rec."No.")
         else
             exit;
 

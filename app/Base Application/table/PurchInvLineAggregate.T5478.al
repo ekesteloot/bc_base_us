@@ -1,3 +1,18 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Entity;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+
 table 5478 "Purch. Inv. Line Aggregate"
 {
     Caption = 'Purch. Inv. Line Aggregate';
@@ -63,7 +78,7 @@ table 5478 "Purch. Inv. Line Aggregate"
         }
         field(22; "Direct Unit Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Direct Unit Cost';
         }
@@ -81,19 +96,19 @@ table 5478 "Purch. Inv. Line Aggregate"
         }
         field(28; "Line Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Discount Amount';
         }
         field(29; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
         }
         field(30; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
         }
@@ -112,7 +127,7 @@ table 5478 "Purch. Inv. Line Aggregate"
         }
         field(69; "Inv. Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Inv. Discount Amount';
             Editable = false;
@@ -134,27 +149,27 @@ table 5478 "Purch. Inv. Line Aggregate"
         }
         field(99; "VAT Base Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'VAT Base Amount';
         }
         field(103; "Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Amount';
         }
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item),
-                                "No." = FILTER(<> '')) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
+            TableRelation = if (Type = const(Item),
+                                "No." = filter(<> '')) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
             "Unit of Measure";
         }
         field(8000; "Document Id"; Guid)
@@ -168,7 +183,7 @@ table 5478 "Purch. Inv. Line Aggregate"
         field(8002; "Variant Id"; Guid)
         {
             Caption = 'Variant Id';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".SystemId WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".SystemId where("Item No." = field("No."));
 
             trigger OnValidate()
             begin
@@ -181,7 +196,7 @@ table 5478 "Purch. Inv. Line Aggregate"
         }
         field(9021; "Tax Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Tax Amount';
         }
@@ -232,19 +247,19 @@ table 5478 "Purch. Inv. Line Aggregate"
         }
         field(9039; "Line Tax Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Tax Amount';
         }
         field(9040; "Line Amount Including Tax"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Amount Including Tax';
         }
         field(9041; "Line Amount Excluding Tax"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Amount Excluding Tax';
         }
@@ -254,7 +269,7 @@ table 5478 "Purch. Inv. Line Aggregate"
         }
         field(9043; "Inv. Discount Amount Excl. VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Inv. Discount Amount Excl. VAT';
         }

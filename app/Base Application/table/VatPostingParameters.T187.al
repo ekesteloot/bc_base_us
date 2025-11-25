@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 table 187 "VAT Posting Parameters"
 {
     TableType = Temporary;

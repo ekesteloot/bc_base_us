@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.DataAdministration;
+using System.Utilities;
+
 report 97 "Date Compr. G/L Budget Entries"
 {
     Caption = 'Date Compr. G/L Budget Entries';
@@ -8,7 +16,7 @@ report 97 "Date Compr. G/L Budget Entries"
     {
         dataitem("G/L Budget Entry"; "G/L Budget Entry")
         {
-            DataItemTableView = SORTING("Budget Name", "G/L Account No.", Date);
+            DataItemTableView = sorting("Budget Name", "G/L Account No.", Date);
             RequestFilterFields = "Budget Name", "G/L Account No.";
 
             trigger OnAfterGetRecord()
@@ -279,7 +287,6 @@ report 97 "Date Compr. G/L Budget Entries"
         DimEntryNo: Integer;
         RetainDimText: Text[250];
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
         RegExists: Boolean;
         CompressEntriesQst: Label 'This batch job deletes entries. We recommend that you create a backup of the database before you run the batch job.\\Do you want to continue?';

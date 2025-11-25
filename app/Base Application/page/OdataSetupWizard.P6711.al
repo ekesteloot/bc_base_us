@@ -1,3 +1,12 @@
+﻿namespace System.Integration;
+
+using System;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration.Excel;
+using System.Reflection;
+using System.Utilities;
+
 page 6711 "OData Setup Wizard"
 {
     Caption = 'Reporting Data Setup';
@@ -100,7 +109,7 @@ page 6711 "OData Setup Wizard"
 
                         trigger OnValidate()
                         begin
-                            "Object ID" := 0;
+                            Rec."Object ID" := 0;
                             ClearTables();
                             ClearObjectType();
                             ClearName();
@@ -137,13 +146,13 @@ page 6711 "OData Setup Wizard"
                                     TenantWebServicesLookup.GetRecord(TenantWebService);
                                     ServiceNameLookup := TenantWebService."Service Name";
                                     ObjectTypeLookup := TenantWebService."Object Type";
-                                    "Object ID" := TenantWebService."Object ID";
+                                    Rec."Object ID" := TenantWebService."Object ID";
                                 end;
-                                "Service Name" := ServiceNameLookup;
-                                "Object Type" := ObjectTypeLookup;
-                                "Object ID" := TenantWebService."Object ID";
+                                Rec."Service Name" := ServiceNameLookup;
+                                Rec."Object Type" := ObjectTypeLookup;
+                                Rec."Object ID" := TenantWebService."Object ID";
                                 if ActionType = ActionType::"Create a copy of an existing data set" then
-                                    "Service Name" := ServiceNameEdit;
+                                    Rec."Service Name" := ServiceNameEdit;
                                 ClearTables();
                             end;
 
@@ -153,12 +162,12 @@ page 6711 "OData Setup Wizard"
                             begin
                                 TenantWebService.SetRange("Service Name", ServiceNameLookup);
                                 if TenantWebService.FindFirst() then begin
-                                    "Service Name" := ServiceNameLookup;
+                                    Rec."Service Name" := ServiceNameLookup;
                                     ObjectTypeLookup := TenantWebService."Object Type";
-                                    "Object Type" := ObjectTypeLookup;
-                                    "Object ID" := TenantWebService."Object ID";
+                                    Rec."Object Type" := ObjectTypeLookup;
+                                    Rec."Object ID" := TenantWebService."Object ID";
                                     if ActionType = ActionType::"Create a copy of an existing data set" then
-                                        "Service Name" := ServiceNameEdit;
+                                        Rec."Service Name" := ServiceNameEdit;
                                 end else
                                     Error(UseLookupErr);
                             end;
@@ -180,11 +189,11 @@ page 6711 "OData Setup Wizard"
                                 TenantWebService: Record "Tenant Web Service";
                                 WebServiceManagement: Codeunit "Web Service Management";
                             begin
-                                "Service Name" := ServiceNameEdit;
+                                Rec."Service Name" := ServiceNameEdit;
                                 if not WebServiceManagement.IsServiceNameValid(ServiceNameEdit) then
                                     Error(WebServiceNameNotValidErr);
                                 if not (ActionType = ActionType::"Edit an existing data set") then begin
-                                    TenantWebService.SetRange("Service Name", "Service Name");
+                                    TenantWebService.SetRange("Service Name", Rec."Service Name");
                                     if TenantWebService.FindFirst() then
                                         Error(DuplicateServiceNameErr);
                                 end;
@@ -200,10 +209,10 @@ page 6711 "OData Setup Wizard"
 
                         trigger OnValidate()
                         begin
-                            "Object Type" := ObjectTypeLookup;
-                            if "Object Type" <> xRec."Object Type" then begin
+                            Rec."Object Type" := ObjectTypeLookup;
+                            if Rec."Object Type" <> xRec."Object Type" then begin
                                 ClearTables();
-                                "Object ID" := 0;
+                                Rec."Object ID" := 0;
                             end;
                         end;
                     }
@@ -219,11 +228,11 @@ page 6711 "OData Setup Wizard"
                             AllObjWithCaption: Record AllObjWithCaption;
                             AllObjectsWithCaption: Page "All Objects with Caption";
                         begin
-                            if ObjectTypeLookup = "Object Type"::Page then begin
+                            if ObjectTypeLookup = Rec."Object Type"::Page then begin
                                 AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Page);
                                 AllObjWithCaption.SetRange("Object Subtype", 'List')
                             end else
-                                if ObjectTypeLookup = "Object Type"::Query then
+                                if ObjectTypeLookup = Rec."Object Type"::Query then
                                     AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Query);
 
                             AllObjectsWithCaption.SetTableView(AllObjWithCaption);
@@ -239,10 +248,10 @@ page 6711 "OData Setup Wizard"
                                    (AllObjWithCaption."Object Subtype" <> 'List')
                                 then
                                     Error(InvalidPageTypeErr);
-                                "Object ID" := AllObjWithCaption."Object ID";
+                                Rec."Object ID" := AllObjWithCaption."Object ID";
                                 ObjectTypeLookup := AllObjWithCaption."Object Type";
 
-                                if "Object ID" <> xRec."Object ID" then
+                                if Rec."Object ID" <> xRec."Object ID" then
                                     ClearTables();
                             end;
                         end;
@@ -253,13 +262,13 @@ page 6711 "OData Setup Wizard"
                         begin
                             if ObjectTypeLookup = ObjectTypeLookup::Page then begin
                                 AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Page);
-                                AllObjWithCaption.SetRange("Object ID", "Object ID");
+                                AllObjWithCaption.SetRange("Object ID", Rec."Object ID");
                                 if AllObjWithCaption.FindFirst() then
                                     if AllObjWithCaption."Object Subtype" <> 'List' then
                                         Error(InvalidPageTypeErr);
                             end;
 
-                            if "Object ID" <> xRec."Object ID" then
+                            if Rec."Object ID" <> xRec."Object ID" then
                                 ClearTables();
                         end;
                     }
@@ -390,11 +399,11 @@ page 6711 "OData Setup Wizard"
                                     Error(MissingServiceNameErr);
                                 if (ActionType = ActionType::"Edit an existing data set") and (ServiceNameLookup = '') then
                                     Error(MissingServiceNameErr);
-                                if "Object ID" = 0 then
+                                if Rec."Object ID" = 0 then
                                     Error(MissingObjectIDErr);
 
                                 CurrPage.Update();
-                                CurrPage.ODataColSubForm.PAGE.InitColumns(ObjectTypeLookup, "Object ID", ActionType, ServiceNameLookup, ServiceNameEdit);
+                                CurrPage.ODataColSubForm.PAGE.InitColumns(ObjectTypeLookup, Rec."Object ID", ActionType, ServiceNameLookup, ServiceNameEdit);
                                 CurrentPage := CurrentPage + 1;
                             end;
                     end;
@@ -475,14 +484,14 @@ page 6711 "OData Setup Wizard"
         CheckPermissions();
         LoadTopBanners();
         CurrentPage := 1;
-        ObjectTypeLookup := "Object Type"::Page;
-        "Object Type" := "Object Type"::Page;
+        ObjectTypeLookup := Rec."Object Type"::Page;
+        Rec."Object Type" := Rec."Object Type"::Page;
         EditInExcelVisible();
     end;
 
     trigger OnOpenPage()
     begin
-        Insert();
+        Rec.Insert();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -523,6 +532,9 @@ page 6711 "OData Setup Wizard"
         PublishWithoutFieldsErr: Label 'Please select field(s) before publishing the data set.';
         PermissionsErr: Label 'You do not have permissions to run this wizard.';
         ServiceNotFoundErr: Label 'The web service does not exist.';
+        EditInExcelBadFieldTypeErr: Label 'The Edit in Excel functionality does not support filters set on fields of type "%1". Clear the filters on fields of this type, and try again.', Comment = '%1: Type of the field';
+        EditInExcelBadFilterErr: Label 'The Edit in Excel functionality only supports filters with single values, not ranges or multiple values. Please clear the filter on field %1.', Comment = '%1: Field Name';
+
         ExcelVisible: Boolean;
 
     local procedure GetFilterText(var TempTenantWebServiceColumns: Record "Tenant Web Service Columns" temporary): Boolean
@@ -564,7 +576,7 @@ page 6711 "OData Setup Wizard"
             FilterText := '';
             FilterTextTemp := '';
             TempTenantWebServiceFilter.Init();
-            TempTenantWebServiceFilter.SetRange(TenantWebServiceID, RecordId);
+            TempTenantWebServiceFilter.SetRange(TenantWebServiceID, Rec.RecordId);
             TempTenantWebServiceFilter.SetRange("Data Item", keyValuePair.Key);
 
             if TempTenantWebServiceFilter.Find('-') then
@@ -628,7 +640,7 @@ page 6711 "OData Setup Wizard"
                 FilterText := FilterPage.GetView(keyValuePair.Value, false);
                 TempTenantWebServiceFilter.Init();
                 TempTenantWebServiceFilter."Data Item" := keyValuePair.Key;
-                TempTenantWebServiceFilter.TenantWebServiceID := RecordId;
+                TempTenantWebServiceFilter.TenantWebServiceID := Rec.RecordId;
                 WebServiceManagement.SetTenantWebServiceFilter(TempTenantWebServiceFilter, FilterText);
 
                 UpdateEditInExcelFilters(AllObjWithCaption, FilterText);
@@ -649,13 +661,11 @@ page 6711 "OData Setup Wizard"
         FieldRef: FieldRef;
         FieldIndex: Integer;
         TotalFields: Integer;
-        FilterValueEnglish: Text;
+        FilterValue: Text;
         FilterEDMValue: Text;
         FilterEDMType: Enum "Edit in Excel Edm Type";
         FieldName: Text;
         FilterType: Enum "Edit in Excel Filter Type";
-        PreviousGlobalLanguage: Integer;
-        EnglishLanguage: Integer;
     begin
         clear(EditinExcelFilters);
         RecordRef.Open(AllObjWithCaption."Object ID");
@@ -665,22 +675,20 @@ page 6711 "OData Setup Wizard"
         for FieldIndex := 1 to TotalFields do begin
             FieldRef := RecordRef.FieldIndex(FieldIndex);
 
-            PreviousGlobalLanguage := GlobalLanguage();
-            // Retrieve filters in English-US for ease of processing
-            EnglishLanguage := 1033;
-            GlobalLanguage(EnglishLanguage);
-            FilterValueEnglish := FieldRef.GetFilter();
-            GlobalLanguage(PreviousGlobalLanguage);
-
-            if FilterValueEnglish <> '' then
+            FilterValue := FieldRef.GetFilter();
+            if FilterValue <> '' then
                 if IsFilterRange(FieldRef) then
                     if IsFilterRangeSingleValue(FieldRef) then begin
                         FieldName := ODataUtility.ExternalizeName(FieldRef.Name);
                         FilterEDMType := ConvertFieldTypeToEdmType(FieldRef.Type);
                         FilterType := Enum::"Edit in Excel Filter Type"::Equal;
-                        FilterEDMValue := ConvertToEDMValue(FilterValueEnglish, FilterEDMType);
+                        FilterEDMValue := ConvertToEDMValue(FilterValue, FilterEDMType);
                         EditinExcelFilters.AddField(FieldName, FilterType, FilterEDMValue, FilterEDMType);
                     end
+                    else
+                        error(EditInExcelBadFilterErr, FieldRef.Name)
+                else
+                    error(EditInExcelBadFilterErr, FieldRef.Name)
         end
     end;
 
@@ -730,7 +738,7 @@ page 6711 "OData Setup Wizard"
             FieldType::Boolean:
                 EdmType := Enum::"Edit in Excel Edm Type"::"Edm.Boolean";
             else
-                EdmType := Enum::"Edit in Excel Edm Type"::"Edm.String";
+                error(EditInExcelBadFieldTypeErr, FieldType)
         end;
 
         exit(EdmType);
@@ -757,21 +765,21 @@ page 6711 "OData Setup Wizard"
     begin
         Clear(TenantWebService);
         TenantWebService.Init();
-        TenantWebService.Validate("Object Type", "Object Type");
-        TenantWebService.Validate("Object ID", "Object ID");
+        TenantWebService.Validate("Object Type", Rec."Object Type");
+        TenantWebService.Validate("Object ID", Rec."Object ID");
         if (ActionType = ActionType::"Create a new data set") or (ActionType = ActionType::"Create a copy of an existing data set") then
             TenantWebService.Validate("Service Name", ServiceNameEdit)
         else
             TenantWebService.Validate("Service Name", ServiceNameLookup);
 
         TenantWebService.Validate(Published, true);
-        if "Object Type" = "Object Type"::Query then begin
-            ODataServiceRootUrl := GetUrl(CLIENTTYPE::ODataV4, CompanyName, OBJECTTYPE::Query, "Object ID", TenantWebService);
+        if Rec."Object Type" = Rec."Object Type"::Query then begin
+            ODataServiceRootUrl := GetUrl(CLIENTTYPE::ODataV4, CompanyName, OBJECTTYPE::Query, Rec."Object ID", TenantWebService);
             ODataUrl := ODataUtility.GenerateODataV4Url(ODataServiceRootUrl, TenantWebService."Service Name", ObjectTypeParam::Query);
             exit(ODataUrl);
         end;
-        if "Object Type" = "Object Type"::Page then begin
-            ODataServiceRootUrl := GetUrl(CLIENTTYPE::ODataV4, CompanyName, OBJECTTYPE::Page, "Object ID", TenantWebService);
+        if Rec."Object Type" = Rec."Object Type"::Page then begin
+            ODataServiceRootUrl := GetUrl(CLIENTTYPE::ODataV4, CompanyName, OBJECTTYPE::Page, Rec."Object ID", TenantWebService);
             ODataUrl := ODataUtility.GenerateODataV4Url(ODataServiceRootUrl, TenantWebService."Service Name", ObjectTypeParam::Page);
             exit(ODataUrl);
         end;
@@ -793,7 +801,7 @@ page 6711 "OData Setup Wizard"
     begin
         TenantWebService.Init();
         TenantWebService.Validate("Object Type", ObjectTypeLookup);
-        TenantWebService.Validate("Object ID", "Object ID");
+        TenantWebService.Validate("Object ID", Rec."Object ID");
         TenantWebService.Validate(Published, true);
         if (ActionType = ActionType::"Create a new data set") or
            (ActionType = ActionType::"Create a copy of an existing data set")
@@ -881,12 +889,12 @@ page 6711 "OData Setup Wizard"
         WebServiceManagement: Codeunit "Web Service Management";
     begin
         TenantWebService.Init();
-        TenantWebService.SetRange("Object Type", "Object Type");
+        TenantWebService.SetRange("Object Type", Rec."Object Type");
 
         if ActionType = ActionType::"Create a copy of an existing data set" then
             TenantWebService.SetRange("Service Name", ServiceNameLookup)
         else
-            TenantWebService.SetRange("Service Name", "Service Name");
+            TenantWebService.SetRange("Service Name", Rec."Service Name");
 
         if TenantWebService.FindFirst() then begin
             TenantWebServiceFilter.Init();
@@ -906,13 +914,13 @@ page 6711 "OData Setup Wizard"
 
     local procedure ClearObjectType()
     begin
-        "Object Type" := "Object Type"::Page;
+        Rec."Object Type" := Rec."Object Type"::Page;
         ObjectTypeLookup := ObjectTypeLookup::Page;
     end;
 
     local procedure ClearName()
     begin
-        "Service Name" := '';
+        Rec."Service Name" := '';
         ServiceNameEdit := '';
         Clear(ServiceNameLookup);
     end;
@@ -921,8 +929,8 @@ page 6711 "OData Setup Wizard"
     var
         AllObjWithCaption: Record AllObjWithCaption;
     begin
-        AllObjWithCaption.SetRange("Object Type", "Object Type");
-        AllObjWithCaption.SetRange("Object ID", "Object ID");
+        AllObjWithCaption.SetRange("Object Type", Rec."Object Type");
+        AllObjWithCaption.SetRange("Object ID", Rec."Object ID");
         if AllObjWithCaption.FindFirst() then
             exit(AllObjWithCaption."Object Name");
     end;

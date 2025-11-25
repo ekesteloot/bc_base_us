@@ -1,10 +1,12 @@
+namespace System.IO;
+
 page 8631 "Config. Areas"
 {
     Caption = 'Config. Areas';
     Editable = false;
     PageType = ListPart;
     SourceTable = "Config. Line";
-    SourceTableView = WHERE("Line Type" = FILTER(<> Table));
+    SourceTableView = where("Line Type" = filter(<> Table));
 
     layout
     {
@@ -28,7 +30,7 @@ page 8631 "Config. Areas"
                     StyleExpr = NameEmphasize;
                     ToolTip = 'Specifies the name of the line type.';
                 }
-                field(GetNoTables; GetNoTables())
+                field(GetNoTables; Rec.GetNoTables())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'No. of Tables';
@@ -54,14 +56,14 @@ page 8631 "Config. Areas"
     trigger OnAfterGetRecord()
     begin
         NameIndent := 0;
-        case "Line Type" of
-            "Line Type"::Group:
+        case Rec."Line Type" of
+            Rec."Line Type"::Group:
                 NameIndent := 1;
         end;
 
         NameEmphasize := (NameIndent = 0);
 
-        Progress := GetProgress();
+        Progress := Rec.GetProgress();
     end;
 
     var

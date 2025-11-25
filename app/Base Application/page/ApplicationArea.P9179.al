@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 page 9179 "Application Area"
 {
     ApplicationArea = All;
@@ -23,7 +25,7 @@ page 9179 "Application Area"
                     Editable = false;
                     ToolTip = 'Specifies the scope of the application functionality for which fields and actions are shown. Fields and action for non-selected application areas are hidden to simplify the user interface.';
                 }
-                field(Selected; Selected)
+                field(Selected; Rec.Selected)
                 {
                     ApplicationArea = All;
                     Caption = 'Show in User Interface';

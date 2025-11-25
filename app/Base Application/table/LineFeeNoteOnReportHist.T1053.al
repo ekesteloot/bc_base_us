@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Globalization;
+
 table 1053 "Line Fee Note on Report Hist."
 {
     Caption = 'Line Fee Note on Report Hist.';
@@ -10,7 +17,7 @@ table 1053 "Line Fee Note on Report Hist."
         {
             Caption = 'Cust. Ledger Entry No';
             Editable = false;
-            TableRelation = "Cust. Ledger Entry"."Entry No." WHERE("Entry No." = FIELD("Cust. Ledger Entry No"));
+            TableRelation = "Cust. Ledger Entry"."Entry No." where("Entry No." = field("Cust. Ledger Entry No"));
         }
         field(2; "Due Date"; Date)
         {

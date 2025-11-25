@@ -1,3 +1,12 @@
+﻿namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using System.Utilities;
+
 page 9223 "Item Statistics Matrix"
 {
     Caption = 'Item Statistics Matrix';
@@ -36,8 +45,8 @@ page 9223 "Item Statistics Matrix"
                     begin
                         with ItemBuffer do
                             if not (("Line Option" = "Line Option"::"Profit Calculation") and
-                                    ((Name = FieldCaption("Profit (LCY)")) or (Name = FieldCaption("Profit %"))) or
-                                    (("Line Option" = "Line Option"::"Cost Specification") and (Name = FieldCaption("Inventoriable Costs"))))
+                                    ((Rec.Name = FieldCaption("Profit (LCY)")) or (Rec.Name = FieldCaption("Profit %"))) or
+                                    (("Line Option" = "Line Option"::"Cost Specification") and (Rec.Name = FieldCaption("Inventoriable Costs"))))
                             then begin
                                 SetCommonFilters(ItemBuffer);
                                 SetFilters(ItemBuffer, 0);
@@ -506,7 +515,7 @@ page 9223 "Item Statistics Matrix"
         MATRIX_Steps: Integer;
     begin
         NameIndent := 0;
-        Amount := Calculate(false);
+        Rec.Amount := Calculate(false);
         MATRIX_ColumnOrdinal := 0;
         if MATRIX_OnFindRecord('=><') then begin
             MATRIX_ColumnOrdinal := 1;
@@ -651,71 +660,38 @@ page 9223 "Item Statistics Matrix"
         MATRIX_CellData: array[32] of Decimal;
         MATRIX_CaptionSet: array[32] of Text[80];
         RoundingFactorFormatString: Text;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     local procedure IntegerLineSetFilter()
@@ -735,13 +711,13 @@ page 9223 "Item Statistics Matrix"
     begin
         case DimCode of
             '':
-                exit("Item Statistics Column Option"::Undefined);
+                exit(Enum::"Item Statistics Column Option"::Undefined);
             Text002:
-                exit("Item Statistics Column Option"::Period);
+                exit(Enum::"Item Statistics Column Option"::Period);
             Location.TableCaption():
-                exit("Item Statistics Column Option"::Location);
+                exit(Enum::"Item Statistics Column Option"::Location);
             else
-                exit("Item Statistics Column Option"::Undefined);
+                exit(Enum::"Item Statistics Column Option"::Undefined);
         end;
     end;
 
@@ -983,10 +959,10 @@ page 9223 "Item Statistics Matrix"
             if GetFilter("Variant Filter") <> '' then
                 CopyFilter("Variant Filter", ValueEntry."Variant Code");
             case true of
-                (("Line Option" = "Line Option"::"Profit Calculation") and (Name = FieldCaption("Sales (LCY)"))) or
+                (("Line Option" = "Line Option"::"Profit Calculation") and (Rec.Name = FieldCaption("Sales (LCY)"))) or
               ("Line Option" = "Line Option"::"Sales Item Charge Spec."):
                     PAGE.Run(0, ValueEntry, ValueEntry."Sales Amount (Actual)");
-                Name = FieldCaption("Non-Invtbl. Costs (LCY)"):
+                Rec.Name = FieldCaption("Non-Invtbl. Costs (LCY)"):
                     PAGE.Run(0, ValueEntry, ValueEntry."Cost Amount (Non-Invtbl.)");
                 else
                     PAGE.Run(0, ValueEntry, ValueEntry."Cost Amount (Actual)");
@@ -1032,7 +1008,7 @@ page 9223 "Item Statistics Matrix"
                         SetRange("Date Filter", 0D, DimCodeBuf."Period End");
                 DimOption::"Profit Calculation",
               DimOption::"Cost Specification":
-                    case Name of
+                    case Rec.Name of
                         FieldCaption("Sales (LCY)"),
                         FieldCaption("COGS (LCY)"),
                         FieldCaption("Profit (LCY)"),
@@ -1055,7 +1031,7 @@ page 9223 "Item Statistics Matrix"
                                   "Item Ledger Entry Type Filter"::Sale,
                                   "Item Ledger Entry Type Filter"::" ");
                                 SetRange("Variance Type Filter", "Variance Type Filter"::" ");
-                                case Name of
+                                case Rec.Name of
                                     FieldCaption("Direct Cost (LCY)"):
                                         SetRange("Entry Type Filter", "Entry Type Filter"::"Direct Cost");
                                     FieldCaption("Revaluation (LCY)"):
@@ -1257,8 +1233,8 @@ page 9223 "Item Statistics Matrix"
     begin
         with ItemBuffer do
             if not (("Line Option" = "Line Option"::"Profit Calculation") and
-                    ((Name = FieldCaption("Profit (LCY)")) or (Name = FieldCaption("Profit %"))) or
-                    (("Line Option" = "Line Option"::"Cost Specification") and (Name = FieldCaption("Inventoriable Costs"))))
+                    ((Rec.Name = FieldCaption("Profit (LCY)")) or (Rec.Name = FieldCaption("Profit %"))) or
+                    (("Line Option" = "Line Option"::"Cost Specification") and (Rec.Name = FieldCaption("Inventoriable Costs"))))
             then begin
                 SetCommonFilters(ItemBuffer);
                 SetFilters(ItemBuffer, 0);
@@ -1286,7 +1262,7 @@ page 9223 "Item Statistics Matrix"
 
     local procedure NameOnFormat()
     begin
-        NameIndent := Indentation;
+        NameIndent := Rec.Indentation;
     end;
 
     local procedure CopyValueEntryFilters(var ValueEntry: Record "Value Entry")

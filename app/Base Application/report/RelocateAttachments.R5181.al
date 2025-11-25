@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Setup;
+using System.IO;
+
 report 5181 "Relocate Attachments"
 {
     Caption = 'Relocate Attachments';
@@ -8,7 +13,7 @@ report 5181 "Relocate Attachments"
     {
         dataitem(Attachment; Attachment)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
 
             trigger OnAfterGetRecord()
             var

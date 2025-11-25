@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Journal;
+
 table 5623 "FA Reclass. Journal Batch"
 {
     Caption = 'FA Reclass. Journal Batch';

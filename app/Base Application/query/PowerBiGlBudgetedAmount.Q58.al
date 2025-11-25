@@ -14,7 +14,7 @@ query 58 "Power BI GL Budgeted Amount"
             }
             column(Account_Type; "Account Type")
             {
-                ColumnFilter = Account_Type = CONST(Posting);
+                ColumnFilter = Account_Type = const(Posting);
             }
             column(Debit_Credit; "Debit/Credit")
             {

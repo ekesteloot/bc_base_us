@@ -12,7 +12,7 @@ page 5402 "Unit of Measure Translation"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the unit of measure code for which you want to enter a translation.';

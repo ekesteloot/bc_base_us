@@ -1,3 +1,9 @@
+﻿namespace System.Threading;
+
+using System;
+using System.Environment.Configuration;
+using System.Utilities;
+
 codeunit 454 "Job Queue - Send Notification"
 {
     TableNo = "Job Queue Entry";
@@ -11,18 +17,18 @@ codeunit 454 "Job Queue - Send Notification"
         OnBeforeRun(Rec, RecordLink, IsHandled);
         if not IsHandled then begin
             RecordLink."Link ID" := 0;
-            RecordLink."Record ID" := RecordId();
-            if Status = Status::Error then
-                RecordLink.Description := CopyStr("Error Message", 1, MaxStrLen(RecordLink.Description))
+            RecordLink."Record ID" := Rec.RecordId();
+            if Rec.Status = Rec.Status::Error then
+                RecordLink.Description := CopyStr(Rec."Error Message", 1, MaxStrLen(RecordLink.Description))
             else
-                RecordLink.Description := Description;
+                RecordLink.Description := Rec.Description;
             SetURL(Rec, RecordLink);
             RecordLink.Type := RecordLink.Type::Note;
             RecordLink.Created := CurrentDateTime();
             RecordLink."User ID" := UserId();
             RecordLink.Company := CompanyName();
             RecordLink.Notify := true;
-            RecordLink."To User ID" := "User ID";
+            RecordLink."To User ID" := Rec."User ID";
             SetText(Rec, RecordLink);
             RecordLink.Insert();
         end;

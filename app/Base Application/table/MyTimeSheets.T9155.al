@@ -9,8 +9,6 @@ table 9155 "My Time Sheets"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(2; "Time Sheet No."; Code[20])

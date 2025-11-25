@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Document;
+
+using System.Utilities;
+
 report 6698 "Move Negative Purchase Lines"
 {
     Caption = 'Move Negative Purchase Lines';
@@ -108,8 +112,8 @@ report 6698 "Move Negative Purchase Lines"
         CopyDocMgt.SetProperties(true, false, true, true, true, false, false);
         if (FromDocType = FromDocType::"Return Order") or (FromDocType = FromDocType::"Credit Memo") then
             ToDocType := ToDocType2;
-        ToPurchHeader."Document Type" := CopyDocMgt.GetPurchaseDocumentType("Purchase Document Type From".FromInteger(ToDocType));
-        CopyDocMgt.CopyPurchDoc("Purchase Document Type From".FromInteger(FromDocType), FromPurchHeader."No.", ToPurchHeader);
+        ToPurchHeader."Document Type" := CopyDocMgt.GetPurchaseDocumentType(Enum::"Purchase Document Type From".FromInteger(ToDocType));
+        CopyDocMgt.CopyPurchDoc(Enum::"Purchase Document Type From".FromInteger(FromDocType), FromPurchHeader."No.", ToPurchHeader);
 
         OnAfterPreReport(CopyDocMgt);
     end;
@@ -122,9 +126,7 @@ report 6698 "Move Negative Purchase Lines"
         ToDocType2: Option ,,"Order",Invoice,"Return Order","Credit Memo";
         FromDocType: Option Quote,"Blanket Order","Order",Invoice,"Return Order","Credit Memo";
         Text001: Label '%1 %2 has been created. Do you want to view the created document?';
-        [InDataSet]
         DropDownForRetOrderAndCrMemoEd: Boolean;
-        [InDataSet]
         DropDownForOrderAndInvoiceEdit: Boolean;
         Text19012737: Label 'When you move a negative purchase line to your selected document type, the quantity of the line on the selected document will become positive.';
 

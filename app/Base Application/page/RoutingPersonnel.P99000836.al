@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000836 "Routing Personnel"
 {
     AutoSplitKey = true;

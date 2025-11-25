@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 table 9177 "Experience Tier Buffer"
 {
     Caption = 'Experience Tier Buffer';

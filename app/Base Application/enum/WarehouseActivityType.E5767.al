@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
 enum 5767 "Warehouse Activity Type"
 {
     Extensible = true;

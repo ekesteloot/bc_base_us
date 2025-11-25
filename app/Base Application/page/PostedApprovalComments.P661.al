@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Security.User;
+
 page 661 "Posted Approval Comments"
 {
     Caption = 'Posted Approval Comments';
@@ -32,10 +36,10 @@ page 661 "Posted Approval Comments"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the comment. You can enter a maximum of 250 characters, both numbers and letters.';
@@ -66,12 +70,12 @@ page 661 "Posted Approval Comments"
 
     trigger OnAfterGetCurrRecord()
     begin
-        PostedRecordID := Format("Posted Record ID", 0, 1);
+        PostedRecordID := Format(Rec."Posted Record ID", 0, 1);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        PostedRecordID := Format("Posted Record ID", 0, 1);
+        PostedRecordID := Format(Rec."Posted Record ID", 0, 1);
     end;
 
     var

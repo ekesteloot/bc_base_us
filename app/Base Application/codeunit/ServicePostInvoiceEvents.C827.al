@@ -1,3 +1,12 @@
+namespace Microsoft.ServiceMgt.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Sales.Receivables;
+using Microsoft.ServiceMgt.Document;
+
 codeunit 827 "Service Post Invoice Events"
 {
     // OnAfter events
@@ -135,6 +144,16 @@ codeunit 827 "Service Post Invoice Events"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostBalancingEntryOnBeforeGenJnlPostLine(var GenJournalLine: Record "Gen. Journal Line"; ServiceHeader: Record "Service Header"; var TotalServiceLine: Record "Service Line"; var TotalServiceLineLCY: Record "Service Line"; PreviewMode: Boolean; SuppressCommit: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
+    begin
+    end;
+
+    internal procedure RunOnPostBalancingEntryOnBeforeFindCustLedgerEntry(var ServiceHeader: Record "Service Header"; var CustLedgerEntry: Record "Cust. Ledger Entry"; var IsHandled: Boolean)
+    begin
+        OnPostBalancingEntryOnBeforeFindCustLedgerEntry(ServiceHeader, CustLedgerEntry, IsHandled);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostBalancingEntryOnBeforeFindCustLedgerEntry(var ServiceHeader: Record "Service Header"; var CustLedgerEntry: Record "Cust. Ledger Entry"; var IsHandled: Boolean)
     begin
     end;
 

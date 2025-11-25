@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 codeunit 8820 "AAD Application Interface"
 {
     trigger OnRun()

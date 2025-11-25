@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Deposit;
+
 table 500 "Deposits Page Setup"
 {
     DataClassification = SystemMetadata;

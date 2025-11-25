@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Setup;
+
+using Microsoft.ServiceMgt.Resources;
+
 page 6018 "Skill Codes"
 {
     ApplicationArea = Service;
@@ -13,7 +17,7 @@ page 6018 "Skill Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies a code for the skill.';
@@ -54,9 +58,9 @@ page 6018 "Skill Codes"
                     Caption = '&Resource Skills';
                     Image = ResourceSkills;
                     RunObject = Page "Resource Skills";
-                    RunPageLink = "Skill Code" = FIELD(Code);
-                    RunPageView = SORTING("Skill Code")
-                                  WHERE(Type = CONST(Resource));
+                    RunPageLink = "Skill Code" = field(Code);
+                    RunPageView = sorting("Skill Code")
+                                  where(Type = const(Resource));
                     ToolTip = 'View or edit information about sills that can be assigned to resources.';
                 }
             }

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 #pragma warning disable AS0082
 enum 257 "VAT Date Type"
 {

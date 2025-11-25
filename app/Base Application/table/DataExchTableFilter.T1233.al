@@ -1,3 +1,5 @@
+namespace System.IO;
+
 table 1233 "Data Exch. Table Filter"
 {
     Caption = 'Data Exch. Table Filter';

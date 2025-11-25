@@ -36,7 +36,7 @@ page 966 "Time Sheet Line Job Detail"
                     Editable = WorkTypeCodeAllowEdit;
                     ToolTip = 'Specifies which work type the resource applies to. Prices are updated based on this entry.';
                 }
-                field(Chargeable; Chargeable)
+                field(Chargeable; Rec.Chargeable)
                 {
                     ApplicationArea = Jobs;
                     Editable = ChargeableAllowEdit;
@@ -52,9 +52,9 @@ page 966 "Time Sheet Line Job Detail"
 
     trigger OnAfterGetCurrRecord()
     begin
-        AllowEdit := GetAllowEdit(0, ManagerRole);
-        WorkTypeCodeAllowEdit := GetAllowEdit(FieldNo("Work Type Code"), ManagerRole);
-        ChargeableAllowEdit := GetAllowEdit(FieldNo(Chargeable), ManagerRole);
+        AllowEdit := Rec.GetAllowEdit(0, ManagerRole);
+        WorkTypeCodeAllowEdit := Rec.GetAllowEdit(Rec.FieldNo("Work Type Code"), ManagerRole);
+        ChargeableAllowEdit := Rec.GetAllowEdit(Rec.FieldNo(Chargeable), ManagerRole);
     end;
 
     protected var
@@ -66,7 +66,7 @@ page 966 "Time Sheet Line Job Detail"
     procedure SetParameters(TimeSheetLine: Record "Time Sheet Line"; NewManagerRole: Boolean)
     begin
         Rec := TimeSheetLine;
-        Insert();
+        Rec.Insert();
         ManagerRole := NewManagerRole;
     end;
 }

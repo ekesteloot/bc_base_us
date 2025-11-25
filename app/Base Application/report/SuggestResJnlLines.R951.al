@@ -7,7 +7,7 @@ report 951 "Suggest Res. Jnl. Lines"
     {
         dataitem(Resource; Resource)
         {
-            DataItemTableView = WHERE("Use Time Sheet" = CONST(true));
+            DataItemTableView = where("Use Time Sheet" = const(true));
             RequestFilterFields = "No.", Type;
 
             trigger OnAfterGetRecord()

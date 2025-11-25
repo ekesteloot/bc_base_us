@@ -8,7 +8,7 @@ report 10120 "Purchase Credit Memo NA"
     {
         dataitem("Purch. Cr. Memo Hdr."; "Purch. Cr. Memo Hdr.")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Buy-from Vendor No.", "Pay-to Vendor No.", "No. Printed";
             column(No_PurchCrMemoHdr; "No.")
@@ -16,10 +16,10 @@ report 10120 "Purchase Credit Memo NA"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyAddress1; CompanyAddress[1])
                     {
                     }
@@ -163,9 +163,9 @@ report 10120 "Purchase Credit Memo NA"
                     }
                     dataitem("Purch. Cr. Memo Line"; "Purch. Cr. Memo Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Purch. Cr. Memo Hdr.";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(AmountExclInvDisc; AmountExclInvDisc)
                         {
                         }
@@ -327,6 +327,7 @@ report 10120 "Purchase Credit Memo NA"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Purchaser Code" = '' then
                     Clear(SalesPurchPerson)
@@ -512,7 +513,6 @@ report 10120 "Purchase Credit Memo NA"
         Text007: Label 'Total Tax:';
         Text008: Label 'Tax:';
         Text009: Label 'VOID CREDIT MEMO';
-        [InDataSet]
         LogInteractionEnable: Boolean;
         ToCaptionLbl: Label 'To:';
         ApplytoTypeCaptionLbl: Label 'Apply to Type';

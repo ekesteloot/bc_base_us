@@ -5,7 +5,7 @@ page 9650 "Custom Report Layouts"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "Custom Report Layout";
-    SourceTableView = SORTING("Report ID", "Company Name", Type);
+    SourceTableView = sorting("Report ID", "Company Name", Type);
     UsageCategory = Administration;
 
     layout
@@ -14,7 +14,7 @@ page 9650 "Custom Report Layouts"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = IsNotBuiltIn;
@@ -71,7 +71,7 @@ page 9650 "Custom Report Layouts"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Last Modified by User");
+                        UserMgt.DisplayUserInformation(Rec."Last Modified by User");
                     end;
                 }
             }
@@ -105,7 +105,7 @@ page 9650 "Custom Report Layouts"
 
                 trigger OnAction()
                 begin
-                    CopyBuiltInReportLayout();
+                    Rec.CopyBuiltInReportLayout();
                 end;
             }
             action(CopyRec)
@@ -117,7 +117,7 @@ page 9650 "Custom Report Layouts"
 
                 trigger OnAction()
                 begin
-                    CopyReportLayout();
+                    Rec.CopyReportLayout();
                 end;
             }
         }
@@ -208,7 +208,7 @@ page 9650 "Custom Report Layouts"
 
                 trigger OnAction()
                 begin
-                    ExportSchema('', true);
+                    Rec.ExportSchema('', true);
                 end;
             }
             action(ImportLayout)
@@ -220,7 +220,7 @@ page 9650 "Custom Report Layouts"
 
                 trigger OnAction()
                 begin
-                    ImportReportLayout('');
+                    Rec.ImportReportLayout('');
                 end;
             }
             action(ExportLayout)
@@ -232,7 +232,7 @@ page 9650 "Custom Report Layouts"
 
                 trigger OnAction()
                 begin
-                    ExportReportLayout('', true);
+                    Rec.ExportReportLayout('', true);
                 end;
             }
             action(UpdateWordLayout)
@@ -244,11 +244,11 @@ page 9650 "Custom Report Layouts"
 
                 trigger OnAction()
                 begin
-                    if CanBeModified() then
-                        if UpdateReportLayout(false, false) then
-                            Message(UpdateSuccesMsg, Format(Type))
+                    if Rec.CanBeModified() then
+                        if Rec.UpdateReportLayout(false, false) then
+                            Message(UpdateSuccesMsg, Format(Rec.Type))
                         else
-                            Message(UpdateNotRequiredMsg, Format(Type));
+                            Message(UpdateNotRequiredMsg, Format(Rec.Type));
                 end;
             }
         }
@@ -263,7 +263,7 @@ page 9650 "Custom Report Layouts"
 
                 trigger OnAction()
                 begin
-                    RunCustomReport();
+                    Rec.RunCustomReport();
                 end;
             }
         }
@@ -332,7 +332,7 @@ page 9650 "Custom Report Layouts"
         DocumentSharing: Codeunit "Document Sharing";
     begin
         CurrPage.Caption := GetPageCaption();
-        ReportLayoutSelection.SetTempLayoutSelected('');
+        ReportLayoutSelection.ClearTempLayoutSelected();
         IsNotBuiltIn := not Rec."Built-In";
         CurrPage.SetSelectionFilter(CustomReportLayout);
         IsMultiSelect := CustomReportLayout.Count() > 1;
@@ -344,7 +344,7 @@ page 9650 "Custom Report Layouts"
     var
         ReportLayoutSelection: Record "Report Layout Selection";
     begin
-        ReportLayoutSelection.SetTempLayoutSelected('');
+        ReportLayoutSelection.ClearTempLayoutSelected();
     end;
 
     trigger OnOpenPage()
@@ -375,11 +375,11 @@ page 9650 "Custom Report Layouts"
         FilterText: Text;
         ReportID: Integer;
     begin
-        if "Report ID" <> 0 then
-            exit(StrSubstNo(CaptionTxt, PageName, "Report ID", "Report Name"));
-        FilterGroup(4);
-        FilterText := GetFilter("Report ID");
-        FilterGroup(0);
+        if Rec."Report ID" <> 0 then
+            exit(StrSubstNo(CaptionTxt, PageName, Rec."Report ID", Rec."Report Name"));
+        Rec.FilterGroup(4);
+        FilterText := Rec.GetFilter("Report ID");
+        Rec.FilterGroup(0);
         if Evaluate(ReportID, FilterText) then
             if AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Report, ReportID) then
                 exit(StrSubstNo(CaptionTxt, PageName, ReportID, AllObjWithCaption."Object Caption"));

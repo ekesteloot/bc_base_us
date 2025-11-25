@@ -1,3 +1,9 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using System.Security.AccessControl;
+
 table 1111 "Cost Budget Register"
 {
     Caption = 'Cost Budget Register';
@@ -104,16 +110,12 @@ table 1111 "Cost Budget Register"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(32; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
             Editable = false;
             TableRelation = "Cost Journal Template";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(33; "Cost Budget Name"; Code[10])
         {

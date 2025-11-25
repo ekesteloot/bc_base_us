@@ -1,3 +1,14 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.StandardCost;
+using System.Utilities;
+
 report 5899 "Calculate Inventory Value"
 {
     Caption = 'Calculate Inventory Value';
@@ -7,7 +18,7 @@ report 5899 "Calculate Inventory Value"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.") WHERE(Type = CONST(Inventory));
+            DataItemTableView = sorting("No.") where(Type = const(Inventory));
             RequestFilterFields = "No.", "Costing Method", "Location Filter", "Variant Filter";
 
             trigger OnAfterGetRecord()
@@ -322,13 +333,9 @@ report 5899 "Calculate Inventory Value"
         UpdStdCost: Boolean;
         ShowDialog: Boolean;
         IncludeExpectedCost: Boolean;
-        [InDataSet]
         ByLocationEnable: Boolean;
-        [InDataSet]
         ByVariantEnable: Boolean;
-        [InDataSet]
         CalcBaseEnable: Boolean;
-        [InDataSet]
         UpdStdCostEnable: Boolean;
         DuplWarningQst: Label 'Duplicate Revaluation Journals will be generated.\Do you want to continue?';
         HideDuplWarning: Boolean;
@@ -595,7 +602,7 @@ report 5899 "Calculate Inventory Value"
         ByLocation := NewByLocation;
         ByVariant := NewByVariant;
         UpdStdCost := NewUpdStdCost;
-        CalcBase := "Inventory Value Calc. Base".FromInteger(NewCalcBase);
+        CalcBase := Enum::"Inventory Value Calc. Base".FromInteger(NewCalcBase);
         ShowDialog := NewShowDialog;
         HideDuplWarning := NewHideDuplWarning;
     end;

@@ -8,8 +8,8 @@ page 710 "Activity Log"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Activity Log";
-    SourceTableView = SORTING("Activity Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Activity Date")
+                      order(Descending);
 
     layout
     {
@@ -31,10 +31,10 @@ page 710 "Activity Log"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
-                field(Context; Context)
+                field(Context; Rec.Context)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the context in which the activity occurred.';
@@ -62,7 +62,7 @@ page 710 "Activity Log"
 
                     trigger OnDrillDown()
                     begin
-                        Export('', true);
+                        Rec.Export('', true);
                     end;
                 }
             }
@@ -84,7 +84,7 @@ page 710 "Activity Log"
                 var
                     PageManagement: Codeunit "Page Management";
                 begin
-                    if not PageManagement.PageRun("Record ID") then
+                    if not PageManagement.PageRun(Rec."Record ID") then
                         Message(NoRelatedRecordMsg);
                 end;
             }
@@ -98,7 +98,7 @@ page 710 "Activity Log"
 
                 trigger OnAction()
                 begin
-                    Export('', true);
+                    Rec.Export('', true);
                 end;
             }
             action(Delete7days)
@@ -110,7 +110,7 @@ page 710 "Activity Log"
 
                 trigger OnAction()
                 begin
-                    DeleteEntries(7);
+                    Rec.DeleteEntries(7);
                 end;
             }
             action(Delete0days)
@@ -122,7 +122,7 @@ page 710 "Activity Log"
 
                 trigger OnAction()
                 begin
-                    DeleteEntries(0);
+                    Rec.DeleteEntries(0);
                 end;
             }
         }
@@ -144,13 +144,13 @@ page 710 "Activity Log"
 
     trigger OnAfterGetRecord()
     begin
-        HasDetailedInfo := "Detailed Info".HasValue;
+        HasDetailedInfo := Rec."Detailed Info".HasValue;
     end;
 
     trigger OnOpenPage()
     begin
-        if FindFirst() then;
-        SetAutoCalcFields("Detailed Info");
+        if Rec.FindFirst() then;
+        Rec.SetAutoCalcFields("Detailed Info");
     end;
 
     var

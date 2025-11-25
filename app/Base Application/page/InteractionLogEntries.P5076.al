@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Task;
+using System.Security.User;
+
 page 5076 "Interaction Log Entries"
 {
     ApplicationArea = RelationshipMgmt;
@@ -5,7 +12,7 @@ page 5076 "Interaction Log Entries"
     Editable = false;
     PageType = List;
     SourceTable = "Interaction Log Entry";
-    SourceTableView = WHERE(Postponed = CONST(false));
+    SourceTableView = where(Postponed = const(false));
     UsageCategory = History;
 
     layout
@@ -16,7 +23,7 @@ page 5076 "Interaction Log Entries"
             {
                 Editable = false;
                 ShowCaption = false;
-                field(Canceled; Canceled)
+                field(Canceled; Rec.Canceled)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies whether the interaction has been canceled. The field is not editable.';
@@ -44,7 +51,7 @@ page 5076 "Interaction Log Entries"
                     ToolTip = 'Specifies the status of the delivery of the attachment. There are three options:';
                     Visible = false;
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the date that you have entered in the Date field in the Create Interaction wizard or the Segment window when you created the interaction. The field is not editable.';
@@ -77,7 +84,7 @@ page 5076 "Interaction Log Entries"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the description of the interaction.';
                 }
-                field(Attachment; "Attachment No." <> 0)
+                field(Attachment; Rec."Attachment No." <> 0)
                 {
                     ApplicationArea = RelationshipMgmt;
                     BlankZero = true;
@@ -86,8 +93,8 @@ page 5076 "Interaction Log Entries"
 
                     trigger OnAssistEdit()
                     begin
-                        if "Attachment No." <> 0 then
-                            OpenAttachment();
+                        if Rec."Attachment No." <> 0 then
+                            Rec.OpenAttachment();
                     end;
                 }
                 field("Information Flow"; Rec."Information Flow")
@@ -123,7 +130,7 @@ page 5076 "Interaction Log Entries"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the name of the contact company for which an interaction has been logged.';
                 }
-                field(Evaluation; Evaluation)
+                field(Evaluation; Rec.Evaluation)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the evaluation of the interaction. There are five options: Very Positive, Positive, Neutral, Negative, and Very Negative.';
@@ -153,7 +160,7 @@ page 5076 "Interaction Log Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Segment No."; Rec."Segment No.")
@@ -202,7 +209,7 @@ page 5076 "Interaction Log Entries"
                     ToolTip = 'Specifies the language code for the interaction for the interaction log. The code is copied from the language code of the interaction template, if one is specified.';
                     Visible = false;
                 }
-                field(Subject; Subject)
+                field(Subject; Rec.Subject)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the subject text that will be used for this interaction.';
@@ -219,7 +226,7 @@ page 5076 "Interaction Log Entries"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the number of the entry, as assigned from the specified number series when the entry was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies that a comment exists for this interaction log entry.';
@@ -260,22 +267,22 @@ page 5076 "Interaction Log Entries"
                     var
                         FilterPageBuilder: FilterPageBuilder;
                     begin
-                        FilterPageBuilder.AddTable(TableName, DATABASE::"Interaction Log Entry");
-                        FilterPageBuilder.SetView(TableName, GetView());
+                        FilterPageBuilder.AddTable(Rec.TableName, DATABASE::"Interaction Log Entry");
+                        FilterPageBuilder.SetView(Rec.TableName, Rec.GetView());
 
-                        if GetFilter("Campaign No.") = '' then
-                            FilterPageBuilder.AddFieldNo(TableName, FieldNo("Campaign No."));
-                        if GetFilter("Segment No.") = '' then
-                            FilterPageBuilder.AddFieldNo(TableName, FieldNo("Segment No."));
-                        if GetFilter("Salesperson Code") = '' then
-                            FilterPageBuilder.AddFieldNo(TableName, FieldNo("Salesperson Code"));
-                        if GetFilter("Contact No.") = '' then
-                            FilterPageBuilder.AddFieldNo(TableName, FieldNo("Contact No."));
-                        if GetFilter("Contact Company No.") = '' then
-                            FilterPageBuilder.AddFieldNo(TableName, FieldNo("Contact Company No."));
+                        if Rec.GetFilter("Campaign No.") = '' then
+                            FilterPageBuilder.AddFieldNo(Rec.TableName, Rec.FieldNo("Campaign No."));
+                        if Rec.GetFilter("Segment No.") = '' then
+                            FilterPageBuilder.AddFieldNo(Rec.TableName, Rec.FieldNo("Segment No."));
+                        if Rec.GetFilter("Salesperson Code") = '' then
+                            FilterPageBuilder.AddFieldNo(Rec.TableName, Rec.FieldNo("Salesperson Code"));
+                        if Rec.GetFilter("Contact No.") = '' then
+                            FilterPageBuilder.AddFieldNo(Rec.TableName, Rec.FieldNo("Contact No."));
+                        if Rec.GetFilter("Contact Company No.") = '' then
+                            FilterPageBuilder.AddFieldNo(Rec.TableName, Rec.FieldNo("Contact Company No."));
 
                         if FilterPageBuilder.RunModal() then
-                            SetView(FilterPageBuilder.GetView(TableName));
+                            Rec.SetView(FilterPageBuilder.GetView(Rec.TableName));
                     end;
                 }
                 action(ClearFilter)
@@ -287,10 +294,10 @@ page 5076 "Interaction Log Entries"
 
                     trigger OnAction()
                     begin
-                        Reset();
-                        FilterGroup(2);
-                        SetRange(Postponed, false);
-                        FilterGroup(0);
+                        Rec.Reset();
+                        Rec.FilterGroup(2);
+                        Rec.SetRange(Postponed, false);
+                        Rec.FilterGroup(0);
                     end;
                 }
                 action("Co&mments")
@@ -299,7 +306,7 @@ page 5076 "Interaction Log Entries"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inter. Log Entry Comment Sheet";
-                    RunPageLink = "Entry No." = FIELD("Entry No.");
+                    RunPageLink = "Entry No." = field("Entry No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -334,8 +341,8 @@ page 5076 "Interaction Log Entries"
                     var
                         InteractLogEntry: Record "Interaction Log Entry";
                     begin
-                        InteractLogEntry.SetRange("Logged Segment Entry No.", "Logged Segment Entry No.");
-                        InteractLogEntry.SetRange("Entry No.", "Entry No.");
+                        InteractLogEntry.SetRange("Logged Segment Entry No.", Rec."Logged Segment Entry No.");
+                        InteractLogEntry.SetRange("Entry No.", Rec."Entry No.");
                         REPORT.RunModal(REPORT::"Resend Attachments", true, false, InteractLogEntry);
                     end;
                 }
@@ -365,7 +372,7 @@ page 5076 "Interaction Log Entries"
 
                     trigger OnAction()
                     begin
-                        CreateTask();
+                        Rec.CreateTask();
                     end;
                 }
                 action("Delete Canceled Entries")
@@ -387,10 +394,10 @@ page 5076 "Interaction Log Entries"
 
                 trigger OnAction()
                 begin
-                    if "Attachment No." <> 0 then
-                        OpenAttachment()
+                    if Rec."Attachment No." <> 0 then
+                        Rec.OpenAttachment()
                     else
-                        ShowDocument();
+                        Rec.ShowDocument();
                 end;
             }
             action("Create &Interaction")
@@ -402,7 +409,7 @@ page 5076 "Interaction Log Entries"
 
                 trigger OnAction()
                 begin
-                    CreateInteraction();
+                    Rec.CreateInteraction();
                 end;
             }
             action(CreateOpportunity)
@@ -418,7 +425,7 @@ page 5076 "Interaction Log Entries"
                 var
                     InteractionMgt: Codeunit "Interaction Mgt.";
                 begin
-                    AssignNewOpportunity();
+                    Rec.AssignNewOpportunity();
                     InteractionMgt.ShowNotificationOpportunityCreated(Rec);
                     CurrPage.Update(false);
                 end;
@@ -469,19 +476,19 @@ page 5076 "Interaction Log Entries"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CalcFields("Contact Name", "Contact Company Name");
+        Rec.CalcFields("Contact Name", "Contact Company Name");
     end;
 
     trigger OnAfterGetRecord()
     begin
-        ShowCreateOpportunity := CanCreateOpportunity();
+        ShowCreateOpportunity := Rec.CanCreateOpportunity();
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
     var
         RecordsFound: Boolean;
     begin
-        RecordsFound := Find(Which);
+        RecordsFound := Rec.Find(Which);
         ShowEnable := RecordsFound;
         exit(RecordsFound);
     end;
@@ -500,7 +507,6 @@ page 5076 "Interaction Log Entries"
         InteractionLogEntry: Record "Interaction Log Entry";
 
     protected var
-        [InDataSet]
         ShowEnable: Boolean;
         ShowCreateOpportunity: Boolean;
 
@@ -511,27 +517,27 @@ page 5076 "Interaction Log Entries"
         Task: Record "To-do";
         Opportunity: Record Opportunity;
     begin
-        if Contact.Get("Contact Company No.") then
+        if Contact.Get(Rec."Contact Company No.") then
             CurrPage.Caption(CurrPage.Caption + ' - ' + Contact."Company No." + ' . ' + Contact."Company Name");
-        if Contact.Get("Contact No.") then begin
+        if Contact.Get(Rec."Contact No.") then begin
             CurrPage.Caption(CurrPage.Caption + ' - ' + Contact."No." + ' . ' + Contact.Name);
             exit;
         end;
-        if "Contact Company No." <> '' then
+        if Rec."Contact Company No." <> '' then
             exit;
-        if Salesperson.Get("Salesperson Code") then begin
-            CurrPage.Caption(CurrPage.Caption + ' - ' + "Salesperson Code" + ' . ' + Salesperson.Name);
-            exit;
-        end;
-        if "Interaction Template Code" <> '' then begin
-            CurrPage.Caption(CurrPage.Caption + ' - ' + "Interaction Template Code");
+        if Salesperson.Get(Rec."Salesperson Code") then begin
+            CurrPage.Caption(CurrPage.Caption + ' - ' + Rec."Salesperson Code" + ' . ' + Salesperson.Name);
             exit;
         end;
-        if Task.Get("To-do No.") then begin
+        if Rec."Interaction Template Code" <> '' then begin
+            CurrPage.Caption(CurrPage.Caption + ' - ' + Rec."Interaction Template Code");
+            exit;
+        end;
+        if Task.Get(Rec."To-do No.") then begin
             CurrPage.Caption(CurrPage.Caption + ' - ' + Task."No." + ' . ' + Task.Description);
             exit;
         end;
-        if Opportunity.Get("Opportunity No.") then
+        if Opportunity.Get(Rec."Opportunity No.") then
             CurrPage.Caption(CurrPage.Caption + ' - ' + Opportunity."No." + ' . ' + Opportunity.Description);
     end;
 }

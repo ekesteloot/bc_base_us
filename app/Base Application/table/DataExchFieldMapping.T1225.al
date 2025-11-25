@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 1225 "Data Exch. Field Mapping"
 {
     Caption = 'Data Exch. Field Mapping';
@@ -20,13 +24,13 @@ table 1225 "Data Exch. Field Mapping"
         {
             Caption = 'Column No.';
             NotBlank = true;
-            TableRelation = "Data Exch. Column Def"."Column No." WHERE("Data Exch. Def Code" = FIELD("Data Exch. Def Code"),
-                                                                        "Data Exch. Line Def Code" = FIELD("Data Exch. Line Def Code"));
+            TableRelation = "Data Exch. Column Def"."Column No." where("Data Exch. Def Code" = field("Data Exch. Def Code"),
+                                                                        "Data Exch. Line Def Code" = field("Data Exch. Line Def Code"));
         }
         field(4; "Field ID"; Integer)
         {
             Caption = 'Field ID';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table ID"));
+            TableRelation = Field."No." where(TableNo = field("Table ID"));
         }
         field(5; Optional; Boolean)
         {
@@ -55,7 +59,7 @@ table 1225 "Data Exch. Field Mapping"
         {
             Caption = 'Data Exch. Line Def Code';
             NotBlank = true;
-            TableRelation = "Data Exch. Line Def".Code WHERE("Data Exch. Def Code" = FIELD("Data Exch. Def Code"));
+            TableRelation = "Data Exch. Line Def".Code where("Data Exch. Def Code" = field("Data Exch. Def Code"));
         }
         field(9; Multiplier; Decimal)
         {
@@ -71,12 +75,12 @@ table 1225 "Data Exch. Field Mapping"
         field(10; "Target Table ID"; Integer)
         {
             Caption = 'Target Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(11; "Target Field ID"; Integer)
         {
             Caption = 'Target Field ID';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Target Table ID"));
+            TableRelation = Field."No." where(TableNo = field("Target Table ID"));
 
             trigger OnLookup()
             var
@@ -90,29 +94,26 @@ table 1225 "Data Exch. Field Mapping"
         }
         field(12; "Target Table Caption"; Text[250])
         {
-            CalcFormula = Lookup("Table Metadata".Caption WHERE(ID = FIELD("Target Table ID")));
+            CalcFormula = Lookup("Table Metadata".Caption where(ID = field("Target Table ID")));
             Caption = 'Target Table Caption';
             FieldClass = FlowField;
         }
-        field(13; "Target Field Caption"; Text[30])
+#pragma warning disable AS0086
+        field(13; "Target Field Caption"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Target Table ID"),
-                                                              "No." = FIELD("Target Field ID")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Target Table ID"),
+                                                              "No." = field("Target Field ID")));
             Caption = 'Target Field Caption';
             FieldClass = FlowField;
-#if CLEAN20
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-#endif
             ObsoleteReason = 'Redesigned to a new field "Target Table Field Calcucation"';
         }
+#pragma warning restore AS0086
         field(14; "Target Table Field Caption"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Target Table ID"),
-                                                              "No." = FIELD("Target Field ID")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Target Table ID"),
+                                                              "No." = field("Target Field ID")));
             Caption = 'Target Field Caption';
             FieldClass = FlowField;
         }
@@ -148,14 +149,7 @@ table 1225 "Data Exch. Field Mapping"
     }
 
     trigger OnInsert()
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeInsert(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         TestField("Column No.");
 
         if IsValidToUseMultiplier() and (Multiplier = 0) then
@@ -195,24 +189,24 @@ table 1225 "Data Exch. Field Mapping"
 
     procedure GetColumnCaption(): Text
     var
-        DataExchColDef: Record "Data Exch. Column Def";
+        DataExchColumnDef: Record "Data Exch. Column Def";
     begin
-        DataExchColDef.SetRange("Data Exch. Def Code", "Data Exch. Def Code");
-        DataExchColDef.SetRange("Data Exch. Line Def Code", "Data Exch. Line Def Code");
-        DataExchColDef.SetRange("Column No.", "Column No.");
-        if DataExchColDef.FindFirst() then
-            exit(DataExchColDef.Name);
+        DataExchColumnDef.SetRange("Data Exch. Def Code", "Data Exch. Def Code");
+        DataExchColumnDef.SetRange("Data Exch. Line Def Code", "Data Exch. Line Def Code");
+        DataExchColumnDef.SetRange("Column No.", "Column No.");
+        if DataExchColumnDef.FindFirst() then
+            exit(DataExchColumnDef.Name);
         exit('');
     end;
 
     procedure GetFieldCaption(): Text
     var
-        recRef: RecordRef;
-        fieldRef: FieldRef;
+        RecordRef: RecordRef;
+        FieldRef: FieldRef;
     begin
-        recRef.Open("Table ID");
-        fieldRef := recRef.Field("Field ID");
-        exit(fieldRef.Caption);
+        RecordRef.Open("Table ID");
+        FieldRef := RecordRef.Field("Field ID");
+        exit(FieldRef.Caption());
     end;
 
     local procedure IsValidToUseMultiplier(): Boolean
@@ -228,19 +222,14 @@ table 1225 "Data Exch. Field Mapping"
 
     procedure GetPath(): Text
     var
-        DataExchColDef: Record "Data Exch. Column Def";
+        DataExchColumnDef: Record "Data Exch. Column Def";
     begin
-        DataExchColDef.SetRange("Data Exch. Def Code", "Data Exch. Def Code");
-        DataExchColDef.SetRange("Data Exch. Line Def Code", "Data Exch. Line Def Code");
-        DataExchColDef.SetRange("Column No.", "Column No.");
-        if DataExchColDef.FindFirst() then
-            exit(DataExchColDef.Path);
+        DataExchColumnDef.SetRange("Data Exch. Def Code", "Data Exch. Def Code");
+        DataExchColumnDef.SetRange("Data Exch. Line Def Code", "Data Exch. Line Def Code");
+        DataExchColumnDef.SetRange("Column No.", "Column No.");
+        if DataExchColumnDef.FindFirst() then
+            exit(DataExchColumnDef.Path);
         exit('');
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsert(var DataExchFieldMapping: Record "Data Exch. Field Mapping"; var IsHandled: Boolean)
-    begin
     end;
 }
 

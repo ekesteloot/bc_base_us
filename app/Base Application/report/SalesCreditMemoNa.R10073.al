@@ -8,7 +8,7 @@ report 10073 "Sales Credit Memo NA"
     {
         dataitem("Sales Cr.Memo Header"; "Sales Cr.Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.", "Ship-to Code", "No. Printed";
             RequestFilterHeading = 'Sales Credit Memo';
@@ -17,12 +17,12 @@ report 10073 "Sales Credit Memo NA"
             }
             dataitem("Sales Cr.Memo Line"; "Sales Cr.Memo Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 dataitem(SalesLineComments; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Posted Credit Memo"), "Print On Credit Memo" = CONST(true));
+                    DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Posted Credit Memo"), "Print On Credit Memo" = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -45,8 +45,8 @@ report 10073 "Sales Credit Memo NA"
             }
             dataitem("Sales Comment Line"; "Sales Comment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Posted Credit Memo"), "Print On Credit Memo" = CONST(true), "Document Line No." = CONST(0));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Posted Credit Memo"), "Print On Credit Memo" = const(true), "Document Line No." = const(0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -66,10 +66,10 @@ report 10073 "Sales Credit Memo NA"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo3Picture; CompanyInfo3.Picture)
                     {
                     }
@@ -234,7 +234,7 @@ report 10073 "Sales Credit Memo NA"
                     }
                     dataitem(SalesCrMemoLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(AmountExclInvDisc; AmountExclInvDisc)
                         {
                         }
@@ -409,6 +409,7 @@ report 10073 "Sales Credit Memo NA"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if PrintCompany then
                     if RespCenter.Get("Responsibility Center") then begin
@@ -571,9 +572,6 @@ report 10073 "Sales Credit Memo NA"
         AmountExclInvDisc: Decimal;
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         TempSalesCrMemoLine: Record "Sales Cr.Memo Line" temporary;
         RespCenter: Record "Responsibility Center";
@@ -617,7 +615,6 @@ report 10073 "Sales Credit Memo NA"
         Text007: Label 'Total Tax:';
         Text008: Label 'Tax:';
         Text009: Label 'VOID CREDIT MEMO';
-        [InDataSet]
         LogInteractionEnable: Boolean;
         CreditCaptionLbl: Label 'Credit';
         ShipDateCaptionLbl: Label 'Ship Date';
@@ -644,6 +641,11 @@ report 10073 "Sales Credit Memo NA"
         TotalCaptionLbl: Label 'Total:';
         AmountSubjecttoSalesTaxCaptionLbl: Label 'Amount Subject to Sales Tax';
         AmountExemptfromSalesTaxCaptionLbl: Label 'Amount Exempt from Sales Tax';
+
+    protected var
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     local procedure InsertTempLine(Comment: Text[80]; IncrNo: Integer)
     begin

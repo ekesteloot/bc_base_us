@@ -1,7 +1,17 @@
+namespace Microsoft.CashFlow.Reports;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Text;
+using System.Utilities;
+
 report 852 "Cash Flow Dimensions - Detail"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/CashFlow/CashFlowDimensionsDetail.rdlc';
+    RDLCLayout = './CashFlow/Reports/CashFlowDimensionsDetail.rdlc';
     ApplicationArea = Dimensions;
     Caption = 'Cash Flow Dimensions - Detail';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +20,7 @@ report 852 "Cash Flow Dimensions - Detail"
     {
         dataitem("Analysis View"; "Analysis View")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             column(ViewLastUpdatedText; ViewLastUpdatedText)
             {
             }
@@ -70,7 +80,7 @@ report 852 "Cash Flow Dimensions - Detail"
             }
             dataitem(Level1; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(DimValCode1; DimValCode[1])
                 {
                 }
@@ -82,7 +92,7 @@ report 852 "Cash Flow Dimensions - Detail"
                 }
                 dataitem(Level2; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(DimValCode2; DimValCode[2])
                     {
                     }
@@ -112,7 +122,7 @@ report 852 "Cash Flow Dimensions - Detail"
                     }
                     dataitem(Level3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DimValCode3; DimValCode[3])
                         {
                         }
@@ -139,7 +149,7 @@ report 852 "Cash Flow Dimensions - Detail"
                         }
                         dataitem(Level4; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(DimValCode4; DimValCode[4])
                             {
                             }
@@ -166,7 +176,7 @@ report 852 "Cash Flow Dimensions - Detail"
                             }
                             dataitem(Level5; "Integer")
                             {
-                                DataItemTableView = SORTING(Number);
+                                DataItemTableView = sorting(Number);
                                 column(TempCFLedgEntryEntryNo_Level5; TempCFForecastEntry."Entry No.")
                                 {
                                 }
@@ -186,7 +196,7 @@ report 852 "Cash Flow Dimensions - Detail"
                             }
                             dataitem(Level4e; "Integer")
                             {
-                                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                                DataItemTableView = sorting(Number) where(Number = const(1));
                                 column(Total4; Total[4])
                                 {
                                     AutoFormatType = 1;
@@ -218,7 +228,7 @@ report 852 "Cash Flow Dimensions - Detail"
                         }
                         dataitem(Level3e; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                            DataItemTableView = sorting(Number) where(Number = const(1));
                             column(Total3; Total[3])
                             {
                                 AutoFormatType = 1;
@@ -250,7 +260,7 @@ report 852 "Cash Flow Dimensions - Detail"
                     }
                     dataitem(Level2e; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Total2; Total[2])
                         {
                             AutoFormatType = 1;
@@ -282,7 +292,7 @@ report 852 "Cash Flow Dimensions - Detail"
                 }
                 dataitem(Level1e; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(Total1; Total[1])
                     {
                         AutoFormatType = 1;
@@ -737,19 +747,19 @@ report 852 "Cash Flow Dimensions - Detail"
                     end;
                 end;
             else begin
-                    TempDimVal.Reset();
-                    TempDimVal.SetRange("Dimension Code", IterationDimCode);
-                    TempDimVal.SetFilter(Code, IterationFilter);
-                    if FindFirstRec then
-                        SearchResult := TempDimVal.Find('-')
-                    else
-                        if TempDimVal.Get(IterationDimCode, IterationDimValCode) then
-                            SearchResult := (TempDimVal.Next() <> 0);
-                    if SearchResult then begin
-                        IterationDimValCode := TempDimVal.Code;
-                        IterationDimValName := TempDimVal.Name;
-                    end;
+                TempDimVal.Reset();
+                TempDimVal.SetRange("Dimension Code", IterationDimCode);
+                TempDimVal.SetFilter(Code, IterationFilter);
+                if FindFirstRec then
+                    SearchResult := TempDimVal.Find('-')
+                else
+                    if TempDimVal.Get(IterationDimCode, IterationDimValCode) then
+                        SearchResult := (TempDimVal.Next() <> 0);
+                if SearchResult then begin
+                    IterationDimValCode := TempDimVal.Code;
+                    IterationDimValName := TempDimVal.Name;
                 end;
+            end;
         end;
         if not SearchResult then begin
             IterationDimValCode := '';

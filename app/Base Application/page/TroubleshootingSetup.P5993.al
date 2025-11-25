@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 page 5993 "Troubleshooting Setup"
 {
     Caption = 'Troubleshooting Setup';
@@ -72,9 +74,9 @@ page 5993 "Troubleshooting Setup"
                     trigger OnAction()
                     begin
                         Clear(Tblshtg);
-                        if TblshtgHeader.Get("Troubleshooting No.") then
-                            if "No." <> '' then begin
-                                Tblshtg.SetCaption(Format(Type), "No.");
+                        if TblshtgHeader.Get(Rec."Troubleshooting No.") then
+                            if Rec."No." <> '' then begin
+                                Tblshtg.SetCaption(Format(Rec.Type), Rec."No.");
                                 Tblshtg.SetRecord(TblshtgHeader);
                             end;
 
@@ -93,27 +95,25 @@ page 5993 "Troubleshooting Setup"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Validate(Type, RecType);
-        Validate("No.", No);
+        Rec.Validate(Type, RecType);
+        Rec.Validate("No.", No);
     end;
 
     trigger OnOpenPage()
     begin
-        TypeVisible := GetFilter(Type) = '';
-        NoVisible := GetFilter("No.") = '';
+        TypeVisible := Rec.GetFilter(Type) = '';
+        NoVisible := Rec.GetFilter("No.") = '';
 
-        if (GetFilter(Type) <> '') and (GetFilter("No.") <> '') then begin
-            RecType := GetRangeMin(Type);
-            No := GetRangeMin("No.");
+        if (Rec.GetFilter(Type) <> '') and (Rec.GetFilter("No.") <> '') then begin
+            RecType := Rec.GetRangeMin(Type);
+            No := Rec.GetRangeMin("No.");
         end;
     end;
 
     var
         TblshtgHeader: Record "Troubleshooting Header";
         Tblshtg: Page Troubleshooting;
-        [InDataSet]
         TypeVisible: Boolean;
-        [InDataSet]
         NoVisible: Boolean;
         RecType: Enum "Troubleshooting Item Type";
         No: Code[20];

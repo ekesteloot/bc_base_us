@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Security.AccessControl;
+
 table 1504 "Workflow Step Instance"
 {
     Caption = 'Workflow Step Instance';
@@ -24,7 +28,7 @@ table 1504 "Workflow Step Instance"
         field(3; "Workflow Step ID"; Integer)
         {
             Caption = 'Workflow Step ID';
-            TableRelation = "Workflow Step".ID WHERE("Workflow Code" = FIELD("Workflow Code"));
+            TableRelation = "Workflow Step".ID where("Workflow Code" = field("Workflow Code"));
         }
         field(4; Description; Text[100])
         {
@@ -86,14 +90,14 @@ table 1504 "Workflow Step Instance"
         field(22; "Function Name"; Code[128])
         {
             Caption = 'Function Name';
-            TableRelation = IF (Type = CONST(Event)) "Workflow Event"
-            ELSE
-            IF (Type = CONST(Response)) "Workflow Response";
+            TableRelation = if (Type = const(Event)) "Workflow Event"
+            else
+            if (Type = const(Response)) "Workflow Response";
         }
         field(23; Argument; Guid)
         {
             Caption = 'Argument';
-            TableRelation = "Workflow Step Argument" WHERE(Type = FIELD(Type));
+            TableRelation = "Workflow Step Argument" where(Type = field(Type));
         }
         field(30; "Original Workflow Code"; Code[20])
         {
@@ -103,7 +107,7 @@ table 1504 "Workflow Step Instance"
         field(31; "Original Workflow Step ID"; Integer)
         {
             Caption = 'Original Workflow Step ID';
-            TableRelation = "Workflow Step".ID WHERE("Workflow Code" = FIELD("Original Workflow Code"));
+            TableRelation = "Workflow Step".ID where("Workflow Code" = field("Original Workflow Code"));
         }
         field(32; "Sequence No."; Integer)
         {
@@ -125,6 +129,11 @@ table 1504 "Workflow Step Instance"
         }
         key(Key4; "Function Name")
         {
+            IncludedFields = Status, Type;
+        }
+        key(Key5; "Record ID")
+        {
+            IncludedFields = Status, Type, "Function Name";
         }
     }
 

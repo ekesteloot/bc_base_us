@@ -1,3 +1,11 @@
+namespace System.IO;
+
+using Microsoft.FinancialMgt.Dimension;
+using System;
+using System.Reflection;
+using System.Utilities;
+using System.Xml;
+
 codeunit 8618 "Config. Excel Exchange"
 {
 

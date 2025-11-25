@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Outlook;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 page 1638 "Booking Items"
 {
     Caption = 'Bookings Not Invoiced';
@@ -19,7 +25,7 @@ page 1638 "Booking Items"
                     Caption = 'Start Date';
                     ToolTip = 'Specifies the start date and time of the booking.';
                 }
-                field(Duration; Duration)
+                field(Duration; Rec.Duration)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the duration of the booking that is not yet invoiced.';
@@ -34,11 +40,11 @@ page 1638 "Booking Items"
                     var
                         Customer: Record Customer;
                     begin
-                        if Customer.FindByEmail(Customer, "Customer Email") then
+                        if Customer.FindByEmail(Customer, Rec."Customer Email") then
                             PAGE.Run(PAGE::"Customer Card", Customer);
                     end;
                 }
-                field(Service; "Service Name")
+                field(Service; Rec."Service Name")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the subject of the booking.';
@@ -48,7 +54,7 @@ page 1638 "Booking Items"
                         BookingServiceMapping: Record "Booking Service Mapping";
                         Item: Record Item;
                     begin
-                        if BookingServiceMapping.Get("Service ID") then
+                        if BookingServiceMapping.Get(Rec."Service ID") then
                             if Item.Get(BookingServiceMapping."Item No.") then
                                 PAGE.Run(PAGE::"Item Card", Item);
                     end;
@@ -198,8 +204,8 @@ page 1638 "Booking Items"
     var
         OutlookSynchTypeConv: Codeunit "Outlook Synch. Type Conv";
     begin
-        StartDate := OutlookSynchTypeConv.UTC2LocalDT(GetStartDate());
-        CustomerName := "Customer Name";
+        StartDate := OutlookSynchTypeConv.UTC2LocalDT(Rec.GetStartDate());
+        CustomerName := Rec."Customer Name";
         if CustomerName = '' then
             CustomerName := NoCustomerSelectedTxt;
     end;
@@ -215,8 +221,8 @@ page 1638 "Booking Items"
 
     local procedure ActionAllowed() Allowed: Boolean
     begin
-        Allowed := CheckActionAllowed();
-        if "Customer Name" = '' then begin
+        Allowed := Rec.CheckActionAllowed();
+        if Rec."Customer Name" = '' then begin
             Message(NoCustomerSelectedMsg);
             Allowed := false;
         end;
@@ -224,7 +230,7 @@ page 1638 "Booking Items"
 
     procedure GetSelectedRecords(var TempBookingItem: Record "Booking Item" temporary)
     begin
-        if MarkedOnly then begin
+        if Rec.MarkedOnly then begin
             TempBookingItem.Copy(Rec, true);
             TempBookingItem.MarkedOnly(true);
         end else begin
@@ -259,8 +265,8 @@ page 1638 "Booking Items"
 
     local procedure RemoveFromView(var TempBookingItem: Record "Booking Item" temporary)
     begin
-        Get(TempBookingItem.SystemId);
-        Delete();
+        Rec.Get(TempBookingItem.SystemId);
+        Rec.Delete();
     end;
 }
 

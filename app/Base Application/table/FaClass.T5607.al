@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Setup;
+
 table 5607 "FA Class"
 {
     Caption = 'FA Class';

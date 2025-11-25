@@ -1,3 +1,11 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Pricing;
+
 table 5909 "Service Shipment Buffer"
 {
     Caption = 'Service Shipment Buffer';
@@ -30,16 +38,16 @@ table 5909 "Service Shipment Buffer"
         {
             Caption = 'No.';
             DataClassification = SystemMetadata;
-            TableRelation = IF (Type = CONST(" ")) "Standard Text"
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF (Type = CONST(Item)) Item WHERE(Type = FILTER(Inventory | "Non-Inventory"),
-                                                                   Blocked = CONST(false))
-            ELSE
-            IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST(Cost)) "Service Cost";
+            TableRelation = if (Type = const(" ")) "Standard Text"
+            else
+            if (Type = const("G/L Account")) "G/L Account"
+            else
+            if (Type = const(Item)) Item where(Type = filter(Inventory | "Non-Inventory"),
+                                                                   Blocked = const(false))
+            else
+            if (Type = const(Resource)) Resource
+            else
+            if (Type = const(Cost)) "Service Cost";
         }
         field(7; Quantity; Decimal)
         {

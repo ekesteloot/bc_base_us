@@ -1,9 +1,27 @@
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.AssemblyMgt.History;
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Environment;
+using System.Globalization;
+using System.Utilities;
+
 report 1308 "Standard Sales - Shipment"
 {
-    RDLCLayout = './SalesReceivables/Document/StandardSalesShipment.rdlc';
-    WordLayout = './StandardSalesShipment.docx';
     Caption = 'Sales - Shipment';
-    DefaultLayout = Word;
+    DefaultRenderingLayout = "StandardSalesShipment.docx";
     EnableHyperlinks = true;
     PreviewMode = PrintLayout;
     WordMergeDataItem = Header;
@@ -12,7 +30,7 @@ report 1308 "Standard Sales - Shipment"
     {
         dataitem(Header; "Sales Shipment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Sales Shipment';
             column(CompanyAddress1; CompanyAddr[1])
@@ -111,19 +129,19 @@ report 1308 "Standard Sales - Shipment"
             column(CompanyVATRegistrationNo_Lbl; CompanyInfo.GetVATRegistrationNumberLbl())
             {
             }
-            column(CompanyLegalOffice; CompanyInfo.GetLegalOffice())
+            column(CompanyLegalOffice; LegalOfficeTxt)
             {
             }
-            column(CompanyLegalOffice_Lbl; CompanyInfo.GetLegalOfficeLbl())
+            column(CompanyLegalOffice_Lbl; LegalOfficeLbl)
             {
             }
-            column(CompanyCustomGiro; CompanyInfo.GetCustomGiro())
+            column(CompanyCustomGiro; CustomGiroTxt)
             {
             }
-            column(CompanyCustomGiro_Lbl; CompanyInfo.GetCustomGiroLbl())
+            column(CompanyCustomGiro_Lbl; CustomGiroLbl)
             {
             }
-            column(CompanyLegalStatement; GetLegalStatement())
+            column(CompanyLegalStatement; LegalStatementLbl)
             {
             }
             column(BilltoAddressCaption; BilltoAddressCaptionLbl)
@@ -398,9 +416,9 @@ report 1308 "Standard Sales - Shipment"
             }
             dataitem(Line; "Sales Shipment Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
+                DataItemLink = "Document No." = field("No.");
                 DataItemLinkReference = Header;
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 column(LineNo_Line; "Line No.")
                 {
                 }
@@ -493,7 +511,7 @@ report 1308 "Standard Sales - Shipment"
                 }
                 dataitem(AssemblyLine; "Posted Assembly Line")
                 {
-                    DataItemTableView = SORTING("Document No.", "Line No.");
+                    DataItemTableView = sorting("Document No.", "Line No.");
                     UseTemporary = true;
                     column(LineNo_AssemblyLine; "No.")
                     {
@@ -590,7 +608,7 @@ report 1308 "Standard Sales - Shipment"
                         ItemTrackingDocMgt.SetRetrieveAsmItemTracking(true);
                         TrackingSpecCount :=
                           ItemTrackingDocMgt.RetrieveDocumentItemTracking(TempLocalTrackingSpecBuffer,
-                            Header."No.", DATABASE::"Sales Shipment Header", 0);
+                            Header."No.", Enum::TableID::"Sales Shipment Header", 0);
                         ItemTrackingDocMgt.SetRetrieveAsmItemTracking(false);
                         UpdateTrackingSpecBuffer(TempLocalTrackingSpecBuffer);
                     end;
@@ -598,7 +616,7 @@ report 1308 "Standard Sales - Shipment"
             }
             dataitem(ItemTrackingLine; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(TrackingSpecBufferEntryNo; TempTrackingSpecBuffer."Entry No.")
                 {
                 }
@@ -635,7 +653,7 @@ report 1308 "Standard Sales - Shipment"
             }
             dataitem(WorkDescriptionLines; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 .. 99999));
+                DataItemTableView = sorting(Number) where(Number = filter(1 .. 99999));
                 column(WorkDescriptionLineNumber; Number)
                 {
                 }
@@ -664,7 +682,7 @@ report 1308 "Standard Sales - Shipment"
             }
             dataitem(LeftHeader; "Name/Value Buffer")
             {
-                DataItemTableView = SORTING(ID);
+                DataItemTableView = sorting(ID);
                 UseTemporary = true;
                 column(LeftHeaderName; Name)
                 {
@@ -675,7 +693,7 @@ report 1308 "Standard Sales - Shipment"
             }
             dataitem(RightHeader; "Name/Value Buffer")
             {
-                DataItemTableView = SORTING(ID);
+                DataItemTableView = sorting(ID);
                 UseTemporary = true;
                 column(RightHeaderName; Name)
                 {
@@ -686,7 +704,7 @@ report 1308 "Standard Sales - Shipment"
             }
             dataitem(LetterText; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(GreetingText; GreetingLbl)
                 {
                 }
@@ -701,6 +719,7 @@ report 1308 "Standard Sales - Shipment"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 if not IsReportInPreviewMode() then
@@ -794,16 +813,58 @@ report 1308 "Standard Sales - Shipment"
         end;
     }
 
+    rendering
+    {
+        layout("StandardSalesShipment.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/History/StandardSalesShipment.rdlc';
+            Caption = 'Standard Sales Shipment (RDLC)';
+            Summary = 'The Standard Sales Shipment (RDLC) provides a detailed layout.';
+        }
+        layout("StandardSalesShipment.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesShipment.docx';
+            Caption = 'Standard Sales Shipment (Word)';
+            Summary = 'The Standard Sales Shipment (Word) provides a basic layout.';
+        }
+        layout("StandardSalesShipmentBlue.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesShipmentBlue.docx';
+            Caption = 'Standard Sales Shipment - Blue (Word)';
+            Summary = 'The Standard Sales Shipment - Blue (Word) provides a simple layout with a blue theme.';
+        }
+    }
+
     labels
     {
     }
 
     trigger OnInitReport()
+    var
+        SalesShipmentHeader: Record "Sales Shipment Header";
+        IsHandled: Boolean;
     begin
         GLSetup.Get();
         CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
         SalesSetup.Get();
+
+        if SalesShipmentHeader.GetLegalStatement() <> '' then
+            LegalStatementLbl := SalesShipmentHeader.GetLegalStatement();
+
+        IsHandled := false;
+        OnInitReportForGlobalVariable(IsHandled, LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl, LegalStatementLbl);
+#if not CLEAN23
+        if not IsHandled then begin
+            LegalOfficeTxt := CompanyInfo.GetLegalOffice();
+            LegalOfficeLbl := CompanyInfo.GetLegalOfficeLbl();
+            CustomGiroTxt := CompanyInfo.GetCustomGiro();
+            CustomGiroLbl := CompanyInfo.GetCustomGiroLbl();
+        end;
+#endif
     end;
 
     trigger OnPostReport()
@@ -813,11 +874,11 @@ report 1308 "Standard Sales - Shipment"
                 repeat
                     if Header."Bill-to Contact No." <> '' then
                         SegManagement.LogDocument(
-                          4, Header."No.", 0, 0, DATABASE::Contact, Header."Bill-to Contact No.", Header."Salesperson Code",
+                          4, Header."No.", 0, 0, Enum::TableID::Contact.AsInteger(), Header."Bill-to Contact No.", Header."Salesperson Code",
                           Header."Campaign No.", Header."Posting Description", '')
                     else
                         SegManagement.LogDocument(
-                          4, Header."No.", 0, 0, DATABASE::Customer, Header."Bill-to Customer No.", Header."Salesperson Code",
+                          4, Header."No.", 0, 0, Enum::TableID::Customer.AsInteger(), Header."Bill-to Customer No.", Header."Salesperson Code",
                           Header."Campaign No.", Header."Posting Description", '');
                 until Header.Next() = 0;
     end;
@@ -836,7 +897,6 @@ report 1308 "Standard Sales - Shipment"
     var
         GLSetup: Record "General Ledger Setup";
         CompanyBankAccount: Record "Bank Account";
-        CompanyInfo: Record "Company Information";
         DummyCompanyInfo: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         Cust: Record Customer;
@@ -858,7 +918,6 @@ report 1308 "Standard Sales - Shipment"
         MoreLines: Boolean;
         ShowWorkDescription: Boolean;
         LogInteraction: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         DisplayAssemblyInformation: Boolean;
         ShowCorrectionLines: Boolean;
@@ -915,8 +974,10 @@ report 1308 "Standard Sales - Shipment"
         NetWeightLbl: Label 'Unit Net Weight';
         UnitVolumeLbl: Label 'Unit Volume';
         UnitsperParcelLbl: Label 'Units per Parcel';
+        LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl, LegalStatementLbl : Text;
 
     protected var
+        CompanyInfo: Record "Company Information";
         ShipmentMethod: Record "Shipment Method";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         TempTrackingSpecBuffer: Record "Tracking Specification" temporary;
@@ -929,7 +990,7 @@ report 1308 "Standard Sales - Shipment"
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Inv.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Inv.") <> '';
     end;
 
     local procedure DocumentCaption(): Text
@@ -1003,11 +1064,11 @@ report 1308 "Standard Sales - Shipment"
         end;
     end;
 
-    local procedure IsReportInPreviewMode(): Boolean
+    protected procedure IsReportInPreviewMode(): Boolean
     var
         MailManagement: Codeunit "Mail Management";
     begin
-        exit(CurrReport.Preview or MailManagement.IsHandlingGetEmailBody());
+        exit(CurrReport.Preview() or MailManagement.IsHandlingGetEmailBody());
     end;
 
     local procedure GetUOMText(UOMCode: Code[10]): Text[50]
@@ -1143,6 +1204,11 @@ report 1308 "Standard Sales - Shipment"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFormatDocumentFields(var SalesShipmentHeader: Record "Sales Shipment Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitReportForGlobalVariable(var IsHandled: Boolean; var LegalOfficeTxt: Text; var LegalOfficeLbl: Text; var CustomGiroTxt: Text; var CustomGiroLbl: Text; var LegalStatementLbl: Text)
     begin
     end;
 

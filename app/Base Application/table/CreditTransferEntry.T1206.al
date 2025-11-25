@@ -1,3 +1,15 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
 table 1206 "Credit Transfer Entry"
 {
     Caption = 'Credit Transfer Entry';
@@ -23,16 +35,16 @@ table 1206 "Credit Transfer Entry"
         field(4; "Account No."; Code[20])
         {
             Caption = 'Account No.';
-            TableRelation = IF ("Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) Vendor;
+            TableRelation = if ("Account Type" = const(Customer)) Customer
+            else
+            if ("Account Type" = const(Vendor)) Vendor;
         }
         field(5; "Applies-to Entry No."; Integer)
         {
             Caption = 'Applies-to Entry No.';
-            TableRelation = IF ("Account Type" = CONST(Customer)) "Cust. Ledger Entry"
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) "Vendor Ledger Entry";
+            TableRelation = if ("Account Type" = const(Customer)) "Cust. Ledger Entry"
+            else
+            if ("Account Type" = const(Vendor)) "Vendor Ledger Entry";
         }
         field(6; "Transfer Date"; Date)
         {
@@ -53,8 +65,8 @@ table 1206 "Credit Transfer Entry"
         }
         field(10; Canceled; Boolean)
         {
-            CalcFormula = Exist("Credit Transfer Register" WHERE("No." = FIELD("Credit Transfer Register No."),
-                                                                  Status = CONST(Canceled)));
+            CalcFormula = exist("Credit Transfer Register" where("No." = field("Credit Transfer Register No."),
+                                                                  Status = const(Canceled)));
             Caption = 'Canceled';
             FieldClass = FlowField;
         }

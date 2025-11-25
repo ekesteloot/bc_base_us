@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
 page 1026 "Job WIP Warnings"
 {
     Caption = 'Job WIP Warnings';

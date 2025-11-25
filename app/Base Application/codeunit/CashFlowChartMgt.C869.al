@@ -1,3 +1,10 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Setup;
+using Microsoft.CashFlow.Worksheet;
+using System.Visualization;
+
 codeunit 869 "Cash Flow Chart Mgt."
 {
 

@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Tooling;
+
+using System.Reflection;
+
 table 2000000100 "Debugger Breakpoint"
 {
     Caption = 'Debugger Breakpoint';
@@ -29,7 +37,7 @@ table 2000000100 "Debugger Breakpoint"
         }
         field(10; "Object Name"; Text[30])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Name" WHERE("Object Type" = FIELD("Object Type"),
+            CalcFormula = Lookup(AllObjWithCaption."Object Name" WHERE("Object Type" = FIELD("Object Type"),
                                                                         "Object ID" = FIELD("Object ID")));
             Caption = 'Object Name';
             FieldClass = FlowField;

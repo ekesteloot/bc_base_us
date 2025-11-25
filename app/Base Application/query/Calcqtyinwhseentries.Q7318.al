@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+
 query 7318 CalcQtyInWhseEntries
 {
     QueryType = Normal;

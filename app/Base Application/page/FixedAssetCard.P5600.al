@@ -1,4 +1,17 @@
-﻿page 5600 "Fixed Asset Card"
+﻿namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.FixedAssets.Reports;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Comment;
+using System.Utilities;
+
+page 5600 "Fixed Asset Card"
 {
     Caption = 'Fixed Asset Card';
     PageType = Document;
@@ -22,7 +35,7 @@
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
 
@@ -63,10 +76,10 @@
                         var
                             FASubclass: Record "FA Subclass";
                         begin
-                            if "FA Class Code" <> '' then
-                                FASubclass.SetFilter("FA Class Code", '%1|%2', '', "FA Class Code");
+                            if Rec."FA Class Code" <> '' then
+                                FASubclass.SetFilter("FA Class Code", '%1|%2', '', Rec."FA Class Code");
 
-                            if FASubclass.Get("FA Subclass Code") then;
+                            if FASubclass.Get(Rec."FA Subclass Code") then;
                             if PAGE.RunModal(0, FASubclass) = ACTION::LookupOK then begin
                                 Text := FASubclass.Code;
                                 exit(true);
@@ -134,19 +147,19 @@
                     Importance = Promoted;
                     ToolTip = 'Specifies which employee is responsible for the fixed asset.';
                 }
-                field(Inactive; Inactive)
+                field(Inactive; Rec.Inactive)
                 {
                     ApplicationArea = FixedAssets;
                     Importance = Additional;
                     ToolTip = 'Specifies that the fixed asset is inactive (for example, if the asset is not in service or is obsolete).';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = FixedAssets;
                     Importance = Additional;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
                 }
-                field(Acquired; Acquired)
+                field(Acquired; Rec.Acquired)
                 {
                     ApplicationArea = FixedAssets;
                     Editable = false;
@@ -325,7 +338,7 @@
             {
                 ApplicationArea = FixedAssets;
                 Caption = 'Depreciation Books';
-                SubPageLink = "FA No." = FIELD("No.");
+                SubPageLink = "FA No." = field("No.");
                 Visible = NOT Simple;
             }
             group(Maintenance)
@@ -359,7 +372,7 @@
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies the warranty expiration date of the fixed asset.';
                 }
-                field(Insured; Insured)
+                field(Insured; Rec.Insured)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies that the fixed asset is linked to an insurance policy.';
@@ -422,14 +435,14 @@
             {
                 ApplicationArea = FixedAssets;
                 Caption = 'Fixed Asset Picture';
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Fixed Asset"),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::"Fixed Asset"),
+                              "No." = field("No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -457,7 +470,7 @@
                     Caption = 'Depreciation &Books';
                     Image = DepreciationBooks;
                     RunObject = Page "FA Depreciation Books";
-                    RunPageLink = "FA No." = FIELD("No.");
+                    RunPageLink = "FA No." = field("No.");
                     ToolTip = 'View or edit the depreciation book or books that must be used for each of the fixed assets. Here you also specify the way depreciation must be calculated.';
                 }
                 action(Statistics)
@@ -466,7 +479,7 @@
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Fixed Asset Statistics";
-                    RunPageLink = "FA No." = FIELD("No.");
+                    RunPageLink = "FA No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View detailed historical information about the fixed asset.';
                 }
@@ -476,8 +489,8 @@
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(5600),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(5600),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -487,7 +500,7 @@
                     Caption = 'Maintenance &Registration';
                     Image = MaintenanceRegistrations;
                     RunObject = Page "Maintenance Registration";
-                    RunPageLink = "FA No." = FIELD("No.");
+                    RunPageLink = "FA No." = field("No.");
                     ToolTip = 'View or edit the date and description regarding the maintenance of the fixed asset.';
                 }
                 action("FA Posting Types Overview")
@@ -504,8 +517,8 @@
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Fixed Asset"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Fixed Asset"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Attachments)
@@ -535,7 +548,7 @@
                     Caption = 'M&ain Asset Components';
                     Image = Components;
                     RunObject = Page "Main Asset Components";
-                    RunPageLink = "Main Asset No." = FIELD("No.");
+                    RunPageLink = "Main Asset No." = field("No.");
                     ToolTip = 'View or edit fixed asset components of the main fixed asset that is represented by the fixed asset card.';
                 }
                 action("Ma&in Asset Statistics")
@@ -544,7 +557,7 @@
                     Caption = 'Ma&in Asset Statistics';
                     Image = StatisticsDocument;
                     RunObject = Page "Main Asset Statistics";
-                    RunPageLink = "FA No." = FIELD("No.");
+                    RunPageLink = "FA No." = field("No.");
                     ToolTip = 'View detailed historical information about the fixed asset.';
                 }
                 separator(Action39)
@@ -562,7 +575,7 @@
                     Caption = 'Total Value Ins&ured';
                     Image = TotalValueInsured;
                     RunObject = Page "Total Value Insured";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'View the amounts that you posted to each insurance policy for the fixed asset. The amounts shown can be more or less than the actual insurance policy coverage. The amounts shown can differ from the actual book value of the asset.';
                 }
             }
@@ -576,9 +589,9 @@
                     Caption = 'Ledger E&ntries';
                     Image = FixedAssetLedger;
                     RunObject = Page "FA Ledger Entries";
-                    RunPageLink = "FA No." = FIELD("No.");
-                    RunPageView = SORTING("FA No.")
-                                  ORDER(Descending);
+                    RunPageLink = "FA No." = field("No.");
+                    RunPageView = sorting("FA No.")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -588,9 +601,9 @@
                     Caption = 'Error Ledger Entries';
                     Image = ErrorFALedgerEntries;
                     RunObject = Page "FA Error Ledger Entries";
-                    RunPageLink = "Canceled from FA No." = FIELD("No.");
-                    RunPageView = SORTING("Canceled from FA No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Canceled from FA No." = field("No.");
+                    RunPageView = sorting("Canceled from FA No.")
+                                  order(Descending);
                     ToolTip = 'View the entries that have been posted as a result of you using the Cancel function to cancel an entry.';
                 }
                 action("Main&tenance Ledger Entries")
@@ -599,8 +612,8 @@
                     Caption = 'Main&tenance Ledger Entries';
                     Image = MaintenanceLedgerEntries;
                     RunObject = Page "Maintenance Ledger Entries";
-                    RunPageLink = "FA No." = FIELD("No.");
-                    RunPageView = SORTING("FA No.");
+                    RunPageLink = "FA No." = field("No.");
+                    RunPageView = sorting("FA No.");
                     ToolTip = 'View all the maintenance ledger entries for a fixed asset.';
                 }
             }
@@ -619,7 +632,7 @@
                 var
                     FixedAssetAcquisitionWizard: Codeunit "Fixed Asset Acquisition Wizard";
                 begin
-                    FixedAssetAcquisitionWizard.RunAcquisitionWizard("No.");
+                    FixedAssetAcquisitionWizard.RunAcquisitionWizard(Rec."No.");
                 end;
             }
             action("C&opy Fixed Asset")
@@ -634,7 +647,7 @@
                 var
                     CopyFA: Report "Copy Fixed Asset";
                 begin
-                    CopyFA.SetFANo("No.");
+                    CopyFA.SetFANo(Rec."No.");
                     CopyFA.RunModal();
                 end;
             }
@@ -753,7 +766,7 @@
 
     trigger OnAfterGetRecord()
     begin
-        if "No." <> xRec."No." then
+        if Rec."No." <> xRec."No." then
             SaveSimpleDepreciationBook(xRec."No.");
 
         LoadFADepreciationBooks();
@@ -772,7 +785,7 @@
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        SaveSimpleDepreciationBook("No.");
+        SaveSimpleDepreciationBook(Rec."No.");
     end;
 
     var
@@ -802,11 +815,11 @@
             exit;
 
         ShowNotification :=
-          (not Acquired) and (not "Budgeted Asset") and
-          FieldsForAcquitionInGeneralGroupAreCompleted() and AtLeastOneDepreciationLineIsComplete();
+          (not Rec.Acquired) and (not Rec."Budgeted Asset") and
+          Rec.FieldsForAcquitionInGeneralGroupAreCompleted() and AtLeastOneDepreciationLineIsComplete();
         if ShowNotification and IsNullGuid(FAAcquireWizardNotificationId) then begin
             Acquirable := true;
-            ShowAcquireWizardNotification();
+            Rec.ShowAcquireWizardNotification();
         end else
             Acquirable := false;
     end;
@@ -818,7 +831,7 @@
         if Simple then
             exit(FADepreciationBook.RecIsReadyForAcquisition());
 
-        exit(FADepreciationBookMultiline.LineIsReadyForAcquisition("No."));
+        exit(FADepreciationBookMultiline.LineIsReadyForAcquisition(Rec."No."));
     end;
 
     procedure SaveSimpleDepreciationBook(FixedAssetNo: Code[20])
@@ -858,7 +871,7 @@
         if FADepreciationBook."Depreciation Book Code" = '' then begin
             FASetup.Get();
             FADepreciationBook.Validate("Depreciation Book Code", FASetup."Default Depr. Book");
-            SaveSimpleDepreciationBook("No.");
+            SaveSimpleDepreciationBook(Rec."No.");
             LoadFADepreciationBooks();
         end;
     end;
@@ -872,13 +885,13 @@
         UpdateConfirmed: Boolean;
         IsDifferentFAPostingGr: Boolean;
     begin
-        if FASubclass.Get("FA Subclass Code") then;
+        if FASubclass.Get(Rec."FA Subclass Code") then;
         UpdateAllowed := true;
         UpdateConfirmed := true;
         IsDifferentFAPostingGr := FADepreciationBook."FA Posting Group" <> FASubclass."Default FA Posting Group";
 
         if (FADepreciationBook."FA Posting Group" <> '') and IsDifferentFAPostingGr then begin
-            FALedgerEntry.SetRange("FA No.", "No.");
+            FALedgerEntry.SetRange("FA No.", Rec."No.");
             UpdateAllowed := FALedgerEntry.IsEmpty();
 
             if UpdateAllowed then
@@ -892,13 +905,13 @@
         end;
 
         if UpdateConfirmed and UpdateAllowed then begin
-            Validate("FA Posting Group", FASubclass."Default FA Posting Group");
+            Rec.Validate("FA Posting Group", FASubclass."Default FA Posting Group");
             if IsDifferentFAPostingGr then begin
                 FADepreciationBook.Validate("FA Posting Group", FASubclass."Default FA Posting Group");
                 if Simple then
-                    SaveSimpleDepreciationBook("No.")
+                    SaveSimpleDepreciationBook(Rec."No.")
                 else
-                    UpdateDepreciationBook("No.");
+                    UpdateDepreciationBook(Rec."No.");
             end;
         end;
         if not UpdateAllowed and IsDifferentFAPostingGr then
@@ -917,7 +930,7 @@
     protected procedure LoadFADepreciationBooks()
     begin
         Clear(FADepreciationBookOld);
-        FADepreciationBookOld.SetRange("FA No.", "No.");
+        FADepreciationBookOld.SetRange("FA No.", Rec."No.");
         if FADepreciationBookOld.Count <= 1 then begin
             if FADepreciationBookOld.FindFirst() then begin
                 FADepreciationBookOld.CalcFields("Book Value");

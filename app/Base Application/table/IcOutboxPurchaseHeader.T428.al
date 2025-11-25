@@ -1,3 +1,12 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Intercompany.Dimension;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Vendor;
+
 table 428 "IC Outbox Purchase Header"
 {
     Caption = 'IC Outbox Purchase Header';
@@ -78,8 +87,6 @@ table 428 "IC Outbox Purchase Header"
             Caption = 'Currency Code';
             Editable = false;
             TableRelation = Currency;
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(35; "Prices Including VAT"; Boolean)
         {

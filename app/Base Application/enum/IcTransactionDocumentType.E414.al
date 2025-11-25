@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Journal;
+
 enum 414 "IC Transaction Document Type"
 {
     Extensible = true;

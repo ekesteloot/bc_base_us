@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Contact;
+
+using System.Email;
+
 table 5100 "Communication Method"
 {
     Caption = 'Communication Method';

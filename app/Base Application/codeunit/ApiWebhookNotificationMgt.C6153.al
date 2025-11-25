@@ -612,25 +612,6 @@ codeunit 6153 "API Webhook Notification Mgt."
     end;
 
     [Scope('OnPrem')]
-    [Obsolete('Use field SystemModifiedAt', '18.0')]
-    procedure FindLastModifiedDateTimeField(var RecRef: RecordRef; var FieldRef: FieldRef): Boolean
-    var
-        "Field": Record "Field";
-    begin
-        Field.SetRange(TableNo, RecRef.Number);
-        Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
-        Field.SetRange(Type, Field.Type::DateTime);
-        Field.SetFilter(FieldName, '%1|%2|%3|%4',
-          'Last Modified Date Time', 'Last Modified DateTime', 'Last DateTime Modified', 'Last Date Time Modified');
-
-        if not Field.FindFirst() then
-            exit(false);
-
-        FieldRef := RecRef.Field(Field."No.");
-        exit(true);
-    end;
-
-    [Scope('OnPrem')]
     procedure ScheduleJob(EarliestStartDateTime: DateTime)
     var
         JobQueueEntry: Record "Job Queue Entry";
@@ -648,6 +629,8 @@ codeunit 6153 "API Webhook Notification Mgt."
             exit;
         end;
 
+        JobQueueEntry.SetLoadFields(ID, "Earliest Start Date/Time", Scheduled);
+        JobQueueEntry.ReadIsolation := JobQueueEntry.ReadIsolation::ReadUnCommitted;
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"API Webhook Notification Send");
         JobQueueEntry.SetRange("Job Queue Category Code", JobQueueCategoryCodeLbl);
@@ -701,6 +684,7 @@ codeunit 6153 "API Webhook Notification Mgt."
         Deleted: Boolean;
     begin
         // delete the hanging job as it blocks staring other jobs of the same category
+        JobQueueEntry.SetLoadFields(Scheduled, "Earliest Start Date/Time");
         JobQueueEntry.SetRange("Job Queue Category Code", JobQueueCategoryCodeLbl);
         JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
         if JobQueueEntry.FindFirst() then begin

@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 90 "Inventory Order Type"
 {
     Extensible = true;

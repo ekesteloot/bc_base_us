@@ -1,3 +1,11 @@
+namespace Microsoft.Manufacturing.RoleCenters;
+
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Journal;
+using Microsoft.WarehouseMgt.Activity;
+using System.Security.User;
+
 page 9044 "Shop Super. basic Activities"
 {
     Caption = 'Activities';
@@ -150,12 +158,12 @@ page 9044 "Shop Super. basic Activities"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
-        SetRange("User ID Filter", UserId);
+        Rec.SetRange("User ID Filter", UserId);
     end;
 
     var

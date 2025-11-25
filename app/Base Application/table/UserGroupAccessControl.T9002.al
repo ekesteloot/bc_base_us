@@ -1,3 +1,8 @@
+namespace System.Security.AccessControl;
+
+using System.Environment;
+using System.Environment.Configuration;
+
 table 9002 "User Group Access Control"
 {
     Caption = 'User Group Access Control';
@@ -39,7 +44,7 @@ table 9002 "User Group Access Control"
         }
         field(5; "User Name"; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("User Security ID")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("User Security ID")));
             Caption = 'User Name';
             Editable = false;
             FieldClass = FlowField;

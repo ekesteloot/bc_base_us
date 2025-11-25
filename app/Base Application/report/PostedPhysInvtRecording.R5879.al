@@ -1,7 +1,12 @@
+namespace Microsoft.InventoryMgt.Counting.Reports;
+
+using Microsoft.InventoryMgt.Counting.History;
+using System.Utilities;
+
 report 5879 "Posted Phys. Invt. Recording"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/PhysInventory/PostedPhysInvtRecording.rdlc';
+    RDLCLayout = './InventoryMgt/Counting/Reports/PostedPhysInvtRecording.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Posted Phys. Invt. Recording';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5879 "Posted Phys. Invt. Recording"
     {
         dataitem("Posted Phys. Invt. Record Hdr"; "Pstd. Phys. Invt. Record Hdr")
         {
-            DataItemTableView = SORTING("Order No.", "Recording No.");
+            DataItemTableView = sorting("Order No.", "Recording No.");
             RequestFilterFields = "Order No.", "Recording No.";
             column(Posted_Phys__Invt__Rec__Header_Order_No_; "Order No.")
             {
@@ -20,7 +25,7 @@ report 5879 "Posted Phys. Invt. Recording"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(USERID; UserId)
                 {
                 }
@@ -89,9 +94,9 @@ report 5879 "Posted Phys. Invt. Recording"
                 }
                 dataitem("Pstd. Phys. Invt. Record Line"; "Pstd. Phys. Invt. Record Line")
                 {
-                    DataItemLink = "Order No." = FIELD("Order No."), "Recording No." = FIELD("Recording No.");
+                    DataItemLink = "Order No." = field("Order No."), "Recording No." = field("Recording No.");
                     DataItemLinkReference = "Posted Phys. Invt. Record Hdr";
-                    DataItemTableView = SORTING("Order No.", "Recording No.", "Line No.");
+                    DataItemTableView = sorting("Order No.", "Recording No.", "Line No.");
                     column(Posted_Phys__Invt__Rec__Line__Item_No__; "Item No.")
                     {
                     }

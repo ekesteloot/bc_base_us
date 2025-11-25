@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Setup;
+using System.Environment;
+
 report 795 "Adjust Cost - Item Entries"
 {
     AdditionalSearchTerms = 'cost forwarding';
@@ -149,11 +158,8 @@ report 795 "Adjust Cost - Item Entries"
     var
         InvtSetup: Record "Inventory Setup";
         InvtAdjmtHandler: Codeunit "Inventory Adjustment Handler";
-        [InDataSet]
         PostEnable: Boolean;
-        [InDataSet]
         FilterItemNoEditable: Boolean;
-        [InDataSet]
         FilterItemCategoryEditable: Boolean;
 
         Text005: Label 'You must not use Item No. Filter and Item Category Filter at the same time.';

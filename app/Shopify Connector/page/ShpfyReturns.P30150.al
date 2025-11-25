@@ -1,10 +1,10 @@
 page 30150 "Shpfy Returns"
 {
     ApplicationArea = All;
-    Caption = 'Returns';
+    Caption = 'Shopify Returns';
     PageType = List;
     SourceTable = "Shpfy Return Header";
-    UsageCategory = Documents;
+    UsageCategory = Lists;
     Editable = false;
     CardPageId = "Shpfy Return";
     SourceTableView = sorting("Return Id") order(descending);

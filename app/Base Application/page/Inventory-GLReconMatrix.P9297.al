@@ -532,71 +532,38 @@ page 9297 "Inventory - G/L Recon Matrix"
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[32] of Text[250];
         MATRIX_CaptionSet: array[32] of Text[80];
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
-        [InDataSet]
         TotalEmphasize: Boolean;
 
     local procedure DimCodeToOption(DimCode: Text[30]): Integer
@@ -738,10 +705,10 @@ page 9297 "Inventory - G/L Recon Matrix"
         GetGLSetup();
         with TempInventoryReportEntry do begin
             case true of
-                FieldCaption("G/L Total") in [Name, MatrixRecords[MATRIX_ColumnOrdinal].Name]:
+                FieldCaption("G/L Total") in [Rec.Name, MatrixRecords[MATRIX_ColumnOrdinal].Name]:
                     SetRange(Type, Type::"G/L Account");
-                FieldCaption(Difference) in [Name, MatrixRecords[MATRIX_ColumnOrdinal].Name],
-              FieldCaption(Warning) in [Name, MatrixRecords[MATRIX_ColumnOrdinal].Name]:
+                FieldCaption(Difference) in [Rec.Name, MatrixRecords[MATRIX_ColumnOrdinal].Name],
+              FieldCaption(Warning) in [Rec.Name, MatrixRecords[MATRIX_ColumnOrdinal].Name]:
                     SetRange(Type, Type::" ");
                 else
                     SetRange(Type, Type::Item);
@@ -749,7 +716,7 @@ page 9297 "Inventory - G/L Recon Matrix"
             case InvtReportHeader."Line Option" of
                 InvtReportHeader."Line Option"::"Balance Sheet",
               InvtReportHeader."Line Option"::"Income Statement":
-                    case Name of
+                    case Rec.Name of
                         FieldCaption(Total), FieldCaption("G/L Total"), FieldCaption(Difference):
                             case MatrixRecords[MATRIX_ColumnOrdinal].Name of
                                 FieldCaption(Inventory):
@@ -1033,7 +1000,7 @@ page 9297 "Inventory - G/L Recon Matrix"
         Text: Text[250];
     begin
         with TempInventoryReportEntry do
-            case Name of
+            case Rec.Name of
                 FieldCaption(Warning):
                     case MatrixRecords[MATRIX_ColumnOrdinal].Name of
                         FieldCaption(Inventory):
@@ -1150,7 +1117,7 @@ page 9297 "Inventory - G/L Recon Matrix"
             end;
 
             Reset();
-            if FieldCaption("G/L Total") in [MATRIX_CaptionSet[MATRIX_ColumnOrdinal], Name] then
+            if FieldCaption("G/L Total") in [MATRIX_CaptionSet[MATRIX_ColumnOrdinal], Rec.Name] then
                 SetRange(Type, Type::"G/L Account")
             else
                 SetRange(Type, Type::Item);
@@ -1158,7 +1125,7 @@ page 9297 "Inventory - G/L Recon Matrix"
             SetFilter("Posting Date Filter", InvtReportHeader.GetFilter("Posting Date Filter"));
             SetFilter("Location Filter", InvtReportHeader.GetFilter("Location Filter"));
 
-            if FieldCaption(Warning) in [Name, MATRIX_CaptionSet[MATRIX_ColumnOrdinal]] then begin
+            if FieldCaption(Warning) in [Rec.Name, MATRIX_CaptionSet[MATRIX_ColumnOrdinal]] then begin
                 ShowWarningText(1, MATRIX_ColumnOrdinal);
                 exit;
             end;
@@ -1166,7 +1133,7 @@ page 9297 "Inventory - G/L Recon Matrix"
             case InvtReportHeader."Line Option" of
                 InvtReportHeader."Line Option"::"Balance Sheet",
               InvtReportHeader."Line Option"::"Income Statement":
-                    case Name of
+                    case Rec.Name of
                         FieldCaption(Total), FieldCaption("G/L Total"):
                             case MATRIX_CaptionSet[MATRIX_ColumnOrdinal] of
                                 FieldCaption(Inventory):
@@ -1342,9 +1309,9 @@ page 9297 "Inventory - G/L Recon Matrix"
             MATRIX_CellData[MATRIX_ColumnOrdinal] := '';
 
         with TempInventoryReportEntry do begin
-            TotalEmphasize := "Show in Bold";
+            TotalEmphasize := Rec."Show in Bold";
 
-            if FieldCaption(Warning) in [Name, MatrixRecords[MATRIX_ColumnOrdinal].Name] then begin
+            if FieldCaption(Warning) in [Rec.Name, MatrixRecords[MATRIX_ColumnOrdinal].Name] then begin
                 SetRange(Type, Type::" ");
                 if FindFirst() then;
                 case InvtReportHeader."Line Option" of

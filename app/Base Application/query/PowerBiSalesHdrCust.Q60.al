@@ -12,7 +12,7 @@ query 60 "Power BI Sales Hdr. Cust."
             dataitem(Sales_Line; "Sales Line")
             {
                 DataItemLink = "Document Type" = Sales_Header."Document Type", "Document No." = Sales_Header."No.";
-                DataItemTableFilter = Type = CONST(Item);
+                DataItemTableFilter = Type = const(Item);
                 column(Item_No; "No.")
                 {
                 }

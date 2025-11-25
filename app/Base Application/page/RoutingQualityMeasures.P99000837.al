@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000837 "Routing Quality Measures"
 {
     AutoSplitKey = true;

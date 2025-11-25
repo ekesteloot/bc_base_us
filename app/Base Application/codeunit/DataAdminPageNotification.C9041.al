@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.DataAdministration;
+
+using System.Environment.Configuration;
+
 codeunit 9041 "Data Admin. Page Notification"
 {
     Access = Internal;

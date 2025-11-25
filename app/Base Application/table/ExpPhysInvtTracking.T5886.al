@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.Tracking;
+
+using Microsoft.InventoryMgt.Counting.Document;
+
 table 5886 "Exp. Phys. Invt. Tracking"
 {
     Caption = 'Exp. Phys. Invt. Tracking';
@@ -14,7 +18,7 @@ table 5886 "Exp. Phys. Invt. Tracking"
         field(2; "Order Line No."; Integer)
         {
             Caption = 'Order Line No.';
-            TableRelation = "Phys. Invt. Order Line"."Line No." WHERE("Document No." = FIELD("Order No"));
+            TableRelation = "Phys. Invt. Order Line"."Line No." where("Document No." = field("Order No"));
         }
         field(3; "Serial No."; Code[50])
         {

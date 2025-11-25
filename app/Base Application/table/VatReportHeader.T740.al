@@ -166,7 +166,7 @@
         field(11; "Period No."; Integer)
         {
             Caption = 'Period No.';
-            TableRelation = "Date Lookup Buffer"."Period No." WHERE("Period Type" = FIELD("Period Type"));
+            TableRelation = "Date Lookup Buffer"."Period No." where("Period Type" = field("Period Type"));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -195,12 +195,12 @@
         field(15; "Statement Name"; Code[10])
         {
             Caption = 'Statement Name';
-            TableRelation = "VAT Statement Name".Name WHERE("Statement Template Name" = FIELD("Statement Template Name"));
+            TableRelation = "VAT Statement Name".Name where("Statement Template Name" = field("Statement Template Name"));
         }
         field(16; "VAT Report Version"; Code[10])
         {
             Caption = 'VAT Report Version';
-            TableRelation = "VAT Reports Configuration"."VAT Report Version" WHERE("VAT Report Type" = FIELD("VAT Report Config. Code"));
+            TableRelation = "VAT Reports Configuration"."VAT Report Version" where("VAT Report Type" = field("VAT Report Config. Code"));
         }
         field(17; "Submitted By"; Guid)
         {
@@ -216,15 +216,18 @@
         {
             Caption = 'Return Period No.';
         }
-#if not CLEAN22
         field(20; "Date Type"; Enum "VAT Date Type")
         {
             Caption = 'Date Type';
             ObsoleteReason = 'Selected VAT Date type no longer supported';
+#if not CLEAN22
             ObsoleteState = Pending;
             ObsoleteTag = '22.0';
-        }
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '25.0';
 #endif
+        }
         field(30; "Additional Information"; Code[50])
         {
             Caption = 'Additional Information';

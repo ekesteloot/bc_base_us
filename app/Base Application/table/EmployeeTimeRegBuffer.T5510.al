@@ -57,8 +57,6 @@ table 5510 "Employee Time Reg Buffer"
             Caption = 'Unit of Measure Code';
             DataClassification = SystemMetadata;
             TableRelation = "Unit of Measure";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(7999; "Employee Id"; Guid)
@@ -241,9 +239,9 @@ table 5510 "Employee Time Reg Buffer"
                 Calendar.FindLast();
                 LastDate := Calendar."Period Start";
             end else
-                Error(StrSubstNo(DateFilterIsInvalidErr, MaxDateFilterRange()));
+                Error(DateFilterIsInvalidErr, MaxDateFilterRange());
             if LastDate - FirstDate > MaxDateFilterRange() then
-                Error(StrSubstNo(DateFilterIsInvalidErr, MaxDateFilterRange()));
+                Error(DateFilterIsInvalidErr, MaxDateFilterRange());
             LoadRecordsFromTSDetails(DateFilter);
             exit;
         end;

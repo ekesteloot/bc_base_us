@@ -1,4 +1,12 @@
-#if not CLEAN22
+﻿#if not CLEAN22
+namespace System.Security.User;
+
+using System;
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Tooling;
+
 page 9191 "User Page Personalization List"
 {
     ApplicationArea = Basic, Suite;
@@ -50,7 +58,7 @@ page 9191 "User Page Personalization List"
                     Caption = 'Legacy Personalization';
                     ToolTip = 'Specifies if the personalization was made in the Windows client or the Web client.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Date';
@@ -118,7 +126,7 @@ page 9191 "User Page Personalization List"
                 begin
                     ShowingOnlyErrors := true;
                     TempDesignerDiagnostics.Reset();
-                    TempDesignerDiagnostics.SetRange(Severity, Severity::Error);
+                    TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Error);
 
                     TempUserMetadata.Copy(Rec, true);
                     if TempUserMetadata.FindSet() then
@@ -145,10 +153,10 @@ page 9191 "User Page Personalization List"
 
                 trigger OnAction()
                 begin
-                    ClearMarks();
-                    MarkedOnly(false);
+                    Rec.ClearMarks();
+                    Rec.MarkedOnly(false);
                     ShowingOnlyErrors := false;
-                    if FindFirst() then;
+                    if Rec.FindFirst() then;
                     UpdateUserDiagnosticsListPart();
                 end;
             }
@@ -176,12 +184,12 @@ page 9191 "User Page Personalization List"
     var
         PageDefinition: Record "Page Metadata";
     begin
-        if "Personalization ID" = ExtensionMetadataTxt then
+        if Rec."Personalization ID" = ExtensionMetadataTxt then
             LegacyPersonalization := false
         else
             LegacyPersonalization := true;
 
-        if PageDefinition.Get("Page ID") then
+        if PageDefinition.Get(Rec."Page ID") then
             PageName := PageDefinition.Caption
         else
             PageName := '';
@@ -194,16 +202,16 @@ page 9191 "User Page Personalization List"
         UserPageMetadata: Record "User Page Metadata";
         UserMetadata: Record "User Metadata";
     begin
-        if "Personalization ID" = ExtensionMetadataTxt then begin
-            UserPageMetadata.SetFilter("User SID", "User SID");
-            UserPageMetadata.SetFilter("Page ID", Format("Page ID"));
+        if Rec."Personalization ID" = ExtensionMetadataTxt then begin
+            UserPageMetadata.SetFilter("User SID", Rec."User SID");
+            UserPageMetadata.SetFilter("Page ID", Format(Rec."Page ID"));
 
             if UserPageMetadata.FindFirst() then
                 UserPageMetadata.Delete(true);
         end else begin
-            UserMetadata.SetFilter("User SID", "User SID");
-            UserMetadata.SetFilter("Page ID", Format("Page ID"));
-            UserMetadata.SetFilter("Personalization ID", "Personalization ID");
+            UserMetadata.SetFilter("User SID", Rec."User SID");
+            UserMetadata.SetFilter("Page ID", Format(Rec."Page ID"));
+            UserMetadata.SetFilter("Personalization ID", Rec."Personalization ID");
 
             if UserMetadata.FindFirst() then
                 UserMetadata.Delete(true);
@@ -218,7 +226,7 @@ page 9191 "User Page Personalization List"
         UserPageMetadata: Record "User Page Metadata";
         EmptyGuid: Guid;
     begin
-        Reset();
+        Rec.Reset();
 
         if not (FilterUserID = EmptyGuid) then begin
             UserMetadata.SetFilter("User SID", FilterUserID);
@@ -227,22 +235,22 @@ page 9191 "User Page Personalization List"
 
         if UserMetadata.FindSet() then
             repeat
-                "User SID" := UserMetadata."User SID";
-                "Page ID" := UserMetadata."Page ID";
-                "Personalization ID" := UserMetadata."Personalization ID";
-                Date := UserMetadata.Date;
-                Time := UserMetadata.Time;
-                if IncludedUser("User SID") then
-                    Insert();
+                Rec."User SID" := UserMetadata."User SID";
+                Rec."Page ID" := UserMetadata."Page ID";
+                Rec."Personalization ID" := UserMetadata."Personalization ID";
+                Rec.Date := UserMetadata.Date;
+                Rec.Time := UserMetadata.Time;
+                if IncludedUser(Rec."User SID") then
+                    Rec.Insert();
             until UserMetadata.Next() = 0;
 
         if UserPageMetadata.FindSet() then
             repeat
-                "User SID" := UserPageMetadata."User SID";
-                "Page ID" := UserPageMetadata."Page ID";
-                "Personalization ID" := ExtensionMetadataTxt;
-                if IncludedUser("User SID") then
-                    Insert();
+                Rec."User SID" := UserPageMetadata."User SID";
+                Rec."Page ID" := UserPageMetadata."Page ID";
+                Rec."Personalization ID" := ExtensionMetadataTxt;
+                if IncludedUser(Rec."User SID") then
+                    Rec.Insert();
             until UserPageMetadata.Next() = 0;
     end;
 
@@ -251,7 +259,7 @@ page 9191 "User Page Personalization List"
         Errors: Integer;
     begin
         TempDesignerDiagnostics.Reset();
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Error);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Error);
         Errors := TempDesignerDiagnostics.Count();
 
         if Errors > 0 then
@@ -303,6 +311,11 @@ page 9191 "User Page Personalization List"
         TotalUsers := CountNumberOfUsersWithinFilter(TempUserMetadata);
 
         CurrentUserNumber := 0;
+
+        // Delete all records to avoid multiplication of the same errors
+        TempDesignerDiagnostics.Reset();
+        TempDesignerDiagnostics.DeleteAll();
+
         if TempUserMetadata.FindSet() then
             repeat
                 // We may have multiple profiles in this query, every time we see a new profile, we need to re-create the NavDesignerConfigurationPageCustomizationValidation for that profile
@@ -313,7 +326,7 @@ page 9191 "User Page Personalization List"
                     CurrentUserNumber += 1;
                 end;
 
-                if "Personalization ID" = ExtensionMetadataTxt then
+                if Rec."Personalization ID" = ExtensionMetadataTxt then
                     ValidatePageForDesignerCustomizationBase(NavDesignerPersonalizationPageCustomizationValidation, TempUserMetadata);
             until TempUserMetadata.Next() = 0;
     end;
@@ -345,25 +358,25 @@ page 9191 "User Page Personalization List"
         OperationId: Guid;
     begin
         HealthStatusStyleExpr := 'Favorable';
-        if "Personalization ID" <> ExtensionMetadataTxt then
+        if Rec."Personalization ID" <> ExtensionMetadataTxt then
             exit(LegacyPersonalizationsCannotBeScannedTxt);
 
-        if not UserSidToOperationId.Get(Format("User SID") + Format("Page ID"), OperationId) then
+        if not UserSidToOperationId.Get(Format(Rec."User SID") + Format(Rec."Page ID"), OperationId) then
             exit;
 
         TempDesignerDiagnostics.Reset();
         TempDesignerDiagnostics.SetRange("Operation ID", OperationId);
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Error);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Error);
         if TempDesignerDiagnostics.Count() > 0 then begin
             HealthStatusStyleExpr := 'Unfavorable';
             exit(StrSubstNo(PageValidationFailedWithErrorsTxt, TempDesignerDiagnostics.Count()));
         end;
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Warning);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Warning);
         if TempDesignerDiagnostics.Count() > 0 then begin
             HealthStatusStyleExpr := 'Ambiguous';
             exit(StrSubstNo(PageSuccessfullyValidatedWithWarningsTxt, TempDesignerDiagnostics.Count()));
         end;
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Information);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Information);
         if TempDesignerDiagnostics.Count() > 0 then begin
             HealthStatusStyleExpr := 'Favorable';
             exit(StrSubstNo(PageSuccessfullyValidatedWithInformationalMessagesTxt, TempDesignerDiagnostics.Count()));
@@ -380,7 +393,7 @@ page 9191 "User Page Personalization List"
     var
         OperationId: Guid;
     begin
-        if UserSidToOperationId.Get(Format("User SID") + Format("Page ID"), OperationId) then;
+        if UserSidToOperationId.Get(Format(Rec."User SID") + Format(Rec."Page ID"), OperationId) then;
         TempDesignerDiagnostics.Reset();
         TempDesignerDiagnostics.SetRange("Operation ID", OperationId);
         CurrPage.UserDiagnosticsListPart.Page.SetRecords(TempDesignerDiagnostics);

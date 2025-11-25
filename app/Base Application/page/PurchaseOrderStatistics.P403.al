@@ -1,4 +1,13 @@
-﻿page 403 "Purchase Order Statistics"
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
+page 403 "Purchase Order Statistics"
 {
     Caption = 'Purchase Order Statistics';
     DeleteAllowed = false;
@@ -532,9 +541,6 @@
         TempVATAmountLine4: Record "VAT Amount Line" temporary;
         PurchSetup: Record "Purchases & Payables Setup";
         VATLinesForm: Page "VAT Amount Lines";
-        PrepmtTotalAmount: Decimal;
-        PrepmtVATAmount: Decimal;
-        PrepmtTotalAmount2: Decimal;
         VATAmountText: array[3] of Text[30];
         PrepmtVATAmountText: Text[30];
         PrepmtInvPct: Decimal;
@@ -556,6 +562,9 @@
         TotalPurchLine: array[3] of Record "Purchase Line";
         TotalPurchLineLCY: array[3] of Record "Purchase Line";
         PurchPost: Codeunit "Purch.-Post";
+        PrepmtTotalAmount: Decimal;
+        PrepmtTotalAmount2: Decimal;
+        PrepmtVATAmount: Decimal;
         TotalAmount1: array[3] of Decimal;
         TotalAmount2: array[3] of Decimal;
         VATAmount: array[3] of Decimal;
@@ -568,7 +577,7 @@
         OptionValueOutOfRange: Integer;
         IsHandled: Boolean;
     begin
-        CurrPage.Caption(StrSubstNo(Text000, "Document Type"));
+        CurrPage.Caption(StrSubstNo(Text000, Rec."Document Type"));
 
         if PrevNo = Rec."No." then
             exit;
@@ -588,7 +597,6 @@
             PurchPost.GetPurchLines(Rec, TempPurchLine, i - 1);
             OnRefreshOnAfterGetRecordOnAfterGetPurchLines(Rec, TempPurchLine);
             Clear(PurchPost);
-            OnRefreshOnAfterGetRecordOnBeforePurchLineCalcVATAmountLines(Rec);
             case i of
                 1:
                     PurchLine.CalcVATAmountLines(0, Rec, TempPurchLine, TempVATAmountLine1);
@@ -613,8 +621,6 @@
                     TotalAmount1[i] := TotalPurchLine[i].Amount;
                     TotalAmount2[i] := TotalPurchLine[i]."Amount Including VAT";
                 end;
-
-            OnRefreshOnAfterGetRecordOnAfterCalcTotal(Rec, i);
         end;
         TempPurchLine.DeleteAll();
         Clear(TempPurchLine);
@@ -641,8 +647,6 @@
         OptionValueOutOfRange := -1;
         PrevTab := OptionValueOutOfRange;
         UpdateHeaderInfo(2, TempVATAmountLine2);
-
-        OnAfterRefreshOnAfterGetRecord(Rec, TotalAmount1, TotalAmount2);
     end;
 
     local procedure UpdateHeaderInfo(IndexNo: Integer; var VATAmountLine: Record "VAT Amount Line")
@@ -674,7 +678,7 @@
 
             TotalPurchLineLCY[IndexNo].Amount :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                UseDate, "Currency Code", TotalPurchLineLCY[IndexNo].Amount, "Currency Factor");
+                UseDate, Rec."Currency Code", TotalPurchLineLCY[IndexNo].Amount, Rec."Currency Factor");
         end;
     end;
 
@@ -726,7 +730,7 @@
         if not (ModifiedIndexNo in [1, 2]) then
             exit;
 
-        if InvoicedLineExists() then
+        if Rec.InvoicedLineExists() then
             if not ConfirmManagement.GetResponseOrDefault(UpdateInvDiscountQst, true) then
                 Error('');
 
@@ -858,7 +862,7 @@
         if not AllowInvDisc then
             Error(
               Text005,
-              VendInvDisc.TableCaption(), FieldCaption("Invoice Disc. Code"), "Invoice Disc. Code");
+              VendInvDisc.TableCaption(), Rec.FieldCaption("Invoice Disc. Code"), Rec."Invoice Disc. Code");
     end;
 
     local procedure Pct(Numerator: Decimal; Denominator: Decimal): Decimal
@@ -873,8 +877,8 @@
         Clear(VATLinesForm);
         VATLinesForm.SetTempVATAmountLine(VATLinesToDrillDown);
         VATLinesForm.InitGlobals(
-          "Currency Code", AllowVATDifference, AllowVATDifference and ThisTabAllowsVATEditing,
-          "Prices Including VAT", AllowInvDisc, "VAT Base Discount %");
+          Rec."Currency Code", AllowVATDifference, AllowVATDifference and ThisTabAllowsVATEditing,
+          Rec."Prices Including VAT", AllowInvDisc, Rec."VAT Base Discount %");
         VATLinesForm.RunModal();
         VATLinesForm.GetTempVATAmountLine(VATLinesToDrillDown);
     end;
@@ -901,21 +905,6 @@
 
     [IntegrationEvent(true, false)]
     local procedure OnUpdateHeaderInfoAfterCalcTotalAmount(var PurchaseHeader: Record "Purchase Header"; var IndexNo: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnRefreshOnAfterGetRecordOnBeforePurchLineCalcVATAmountLines(var PurchaseHeader: Record "Purchase Header")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnRefreshOnAfterGetRecordOnAfterCalcTotal(var PurchaseHeader: Record "Purchase Header"; i: Integer)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterRefreshOnAfterGetRecord(var PurchaseHeader: Record "Purchase Header"; TotalAmount1: array[3] of Decimal; TotalAmount2: array[3] of Decimal)
     begin
     end;
 }

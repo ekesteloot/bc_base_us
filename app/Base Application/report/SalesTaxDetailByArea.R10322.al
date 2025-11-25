@@ -10,7 +10,7 @@ report 10322 "Sales Tax Detail by Area"
     {
         dataitem("Tax Area"; "Tax Area")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -80,8 +80,8 @@ report 10322 "Sales Tax Detail by Area"
             }
             dataitem("Tax Area Line"; "Tax Area Line")
             {
-                DataItemLink = "Tax Area" = FIELD(Code);
-                DataItemTableView = SORTING("Tax Area", "Tax Jurisdiction Code");
+                DataItemLink = "Tax Area" = field(Code);
+                DataItemTableView = sorting("Tax Area", "Tax Jurisdiction Code");
                 column(Tax_Area_Line_Tax_Area; "Tax Area")
                 {
                 }
@@ -90,8 +90,8 @@ report 10322 "Sales Tax Detail by Area"
                 }
                 dataitem("Tax Jurisdiction"; "Tax Jurisdiction")
                 {
-                    DataItemLink = Code = FIELD("Tax Jurisdiction Code");
-                    DataItemTableView = SORTING(Code);
+                    DataItemLink = Code = field("Tax Jurisdiction Code");
+                    DataItemTableView = sorting(Code);
                     column(TaxJursidictionCodePlusLabel; TableCaption + ' ' + FieldCaption(Code) + ': ' + Code)
                     {
                     }
@@ -103,8 +103,8 @@ report 10322 "Sales Tax Detail by Area"
                     }
                     dataitem("Tax Detail"; "Tax Detail")
                     {
-                        DataItemLink = "Tax Jurisdiction Code" = FIELD(Code);
-                        DataItemTableView = SORTING("Tax Jurisdiction Code", "Tax Group Code", "Tax Type", "Effective Date");
+                        DataItemLink = "Tax Jurisdiction Code" = field(Code);
+                        DataItemTableView = sorting("Tax Jurisdiction Code", "Tax Group Code", "Tax Type", "Effective Date");
                         RequestFilterFields = "Tax Group Code", "Tax Type", "Effective Date";
                         column(Tax_Detail__Tax_Group_Code_; "Tax Group Code")
                         {

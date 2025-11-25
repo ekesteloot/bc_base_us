@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Setup;
+
+using System.Reflection;
+
 page 5754 "Report Selection - Inventory"
 {
     ApplicationArea = Basic, Suite;
@@ -85,37 +89,37 @@ page 5754 "Report Selection - Inventory"
         Rec.FilterGroup(2);
         case ReportUsage2 of
             "Report Selection Usage Inventory"::"Transfer Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::Inv1);
+                Rec.SetRange(Usage, Rec.Usage::Inv1);
             "Report Selection Usage Inventory"::"Transfer Shipment":
-                Rec.SetRange(Usage, "Report Selection Usage"::Inv2);
+                Rec.SetRange(Usage, Rec.Usage::Inv2);
             "Report Selection Usage Inventory"::"Transfer Receipt":
-                Rec.SetRange(Usage, "Report Selection Usage"::Inv3);
+                Rec.SetRange(Usage, Rec.Usage::Inv3);
             "Report Selection Usage Inventory"::"Inventory Period Test":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Invt.Period Test");
+                Rec.SetRange(Usage, Rec.Usage::"Invt.Period Test");
             "Report Selection Usage Inventory"::"Assembly Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Asm.Order");
+                Rec.SetRange(Usage, Rec.Usage::"Asm.Order");
             "Report Selection Usage Inventory"::"Posted Assembly Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"P.Asm.Order");
+                Rec.SetRange(Usage, Rec.Usage::"P.Asm.Order");
             "Report Selection Usage Inventory"::"Phys. Invt. Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Phys.Invt.Order");
+                Rec.SetRange(Usage, Rec.Usage::"Phys.Invt.Order");
             "Report Selection Usage Inventory"::"Phys. Invt. Order Test":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Phys.Invt.Order Test");
+                Rec.SetRange(Usage, Rec.Usage::"Phys.Invt.Order Test");
             "Report Selection Usage Inventory"::"Phys. Invt. Recording":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Phys.Invt.Rec.");
+                Rec.SetRange(Usage, Rec.Usage::"Phys.Invt.Rec.");
             "Report Selection Usage Inventory"::"Posted Phys. Invt. Order":
-                Rec.SetRange(Usage, "Report Selection Usage"::"P.Phys.Invt.Order");
+                Rec.SetRange(Usage, Rec.Usage::"P.Phys.Invt.Order");
             "Report Selection Usage Inventory"::"Posted Phys. Invt. Recording":
-                Rec.SetRange(Usage, "Report Selection Usage"::"P.Phys.Invt.Rec.");
+                Rec.SetRange(Usage, Rec.Usage::"P.Phys.Invt.Rec.");
             "Report Selection Usage Inventory"::"Direct Transfer":
-                Rec.SetRange(Usage, "Report Selection Usage"::"P.Direct Transfer");
+                Rec.SetRange(Usage, Rec.Usage::"P.Direct Transfer");
             "Report Selection Usage Inventory"::"Inventory Receipt":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Inventory Receipt");
+                Rec.SetRange(Usage, Rec.Usage::"Inventory Receipt");
             "Report Selection Usage Inventory"::"Inventory Shipment":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Inventory Shipment");
+                Rec.SetRange(Usage, Rec.Usage::"Inventory Shipment");
             "Report Selection Usage Inventory"::"Posted Inventory Receipt":
-                Rec.SetRange(Usage, "Report Selection Usage"::"P.Inventory Receipt");
+                Rec.SetRange(Usage, Rec.Usage::"P.Inventory Receipt");
             "Report Selection Usage Inventory"::"Posted Inventory Shipment":
-                Rec.SetRange(Usage, "Report Selection Usage"::"P.Inventory Shipment");
+                Rec.SetRange(Usage, Rec.Usage::"P.Inventory Shipment");
         end;
         OnSetUsageFilterOnAfterSetFiltersByReportUsage(Rec, ReportUsage2);
         Rec.FilterGroup(0);
@@ -129,37 +133,37 @@ page 5754 "Report Selection - Inventory"
         if Rec.GetFilter(Usage) <> '' then begin
             if Evaluate(NewReportUsage, Rec.GetFilter(Usage)) then
                 case NewReportUsage of
-                    "Report Selection Usage"::"Inv1":
+                    NewReportUsage::"Inv1":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Transfer Order";
-                    "Report Selection Usage"::"Inv2":
+                    NewReportUsage::"Inv2":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Transfer Shipment";
-                    "Report Selection Usage"::"Inv3":
+                    NewReportUsage::"Inv3":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Transfer Receipt";
-                    "Report Selection Usage"::"Invt.Period Test":
+                    NewReportUsage::"Invt.Period Test":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Inventory Period Test";
-                    "Report Selection Usage"::"Asm.Order":
+                    NewReportUsage::"Asm.Order":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Assembly Order";
-                    "Report Selection Usage"::"P.Asm.Order":
+                    NewReportUsage::"P.Asm.Order":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Posted Assembly Order";
-                    "Report Selection Usage"::"Phys.Invt.Order":
+                    NewReportUsage::"Phys.Invt.Order":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Phys. Invt. Order";
-                    "Report Selection Usage"::"Phys.Invt.Order Test":
+                    NewReportUsage::"Phys.Invt.Order Test":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Phys. Invt. Order Test";
-                    "Report Selection Usage"::"Phys.Invt.Rec.":
+                    NewReportUsage::"Phys.Invt.Rec.":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Phys. Invt. Recording";
-                    "Report Selection Usage"::"P.Phys.Invt.Order":
+                    NewReportUsage::"P.Phys.Invt.Order":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Posted Phys. Invt. Order";
-                    "Report Selection Usage"::"P.Phys.Invt.Rec.":
+                    NewReportUsage::"P.Phys.Invt.Rec.":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Posted Phys. Invt. Recording";
-                    "Report Selection Usage"::"P.Direct Transfer":
+                    NewReportUsage::"P.Direct Transfer":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Direct Transfer";
-                    "Report Selection Usage"::"Inventory Receipt":
+                    NewReportUsage::"Inventory Receipt":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Inventory Receipt";
-                    "Report Selection Usage"::"Inventory Shipment":
+                    NewReportUsage::"Inventory Shipment":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Inventory Shipment";
-                    "Report Selection Usage"::"P.Inventory Receipt":
+                    NewReportUsage::"P.Inventory Receipt":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Posted Inventory Receipt";
-                    "Report Selection Usage"::"P.Inventory Shipment":
+                    NewReportUsage::"P.Inventory Shipment":
                         ReportUsage2 := "Report Selection Usage Inventory"::"Posted Inventory Shipment";
                     else
                         OnInitUsageFilterOnElseCase(NewReportUsage, ReportUsage2);

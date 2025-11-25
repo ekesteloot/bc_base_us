@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 report 7110 "Renumber Analysis Lines"
 {
     Caption = 'Renumber Analysis Lines';

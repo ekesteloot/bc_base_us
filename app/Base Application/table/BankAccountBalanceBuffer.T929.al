@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.BankAccount;
+
 table 929 "Bank Account Balance Buffer"
 {
     DataClassification = SystemMetadata;

@@ -484,12 +484,12 @@ codeunit 249 "VAT Registration Log Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckVIESForVATNoField(var RecordRef: RecordRef; var VATRegistrationLog: Record "VAT Registration Log"; RecordVariant: Variant; EntryNo: Code[20]; CountryCode: Code[10]; AccountType: Option; var VATNoFieldName: Text; var IsHandled: Boolean)
+    local procedure OnBeforeUpdateRecordFromVATRegLog(var RecordRef: RecordRef; RecordVariant: Variant; VATRegistrationLog: Record "VAT Registration Log"; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateRecordFromVATRegLog(var RecordRef: RecordRef; RecordVariant: Variant; VATRegistrationLog: Record "VAT Registration Log"; var IsHandled: Boolean)
+    local procedure OnBeforeCheckVIESForVATNoField(var RecordRef: RecordRef; var VATRegistrationLog: Record "VAT Registration Log"; RecordVariant: Variant; EntryNo: Code[20]; CountryCode: Code[10]; AccountType: Option; var VATNoFieldName: Text; var IsHandled: Boolean)
     begin
     end;
 

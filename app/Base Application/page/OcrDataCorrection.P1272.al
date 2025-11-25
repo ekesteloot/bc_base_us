@@ -174,7 +174,7 @@ page 1272 "OCR Data Correction"
                         field("TempOriginalIncomingDocument.""Amount Incl. VAT"""; TempOriginalIncomingDocument."Amount Incl. VAT")
                         {
                             ApplicationArea = Basic, Suite;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Amount Incl. VAT';
                             Editable = false;
@@ -183,7 +183,7 @@ page 1272 "OCR Data Correction"
                         field("TempOriginalIncomingDocument.""Amount Excl. VAT"""; TempOriginalIncomingDocument."Amount Excl. VAT")
                         {
                             ApplicationArea = Basic, Suite;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Amount Excl. VAT';
                             Editable = false;
@@ -192,7 +192,7 @@ page 1272 "OCR Data Correction"
                         field("TempOriginalIncomingDocument.""VAT Amount"""; TempOriginalIncomingDocument."VAT Amount")
                         {
                             ApplicationArea = Basic, Suite;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'VAT Amount';
                             Editable = false;
@@ -217,7 +217,7 @@ page 1272 "OCR Data Correction"
 
                 trigger OnAction()
                 begin
-                    ResetOriginalOCRData();
+                    Rec.ResetOriginalOCRData();
                 end;
             }
             action("Send OCR Feedback")
@@ -229,7 +229,7 @@ page 1272 "OCR Data Correction"
 
                 trigger OnAction()
                 begin
-                    if UploadCorrectedOCRData() then
+                    if Rec.UploadCorrectedOCRData() then
                         CurrPage.Close();
                 end;
             }
@@ -242,7 +242,7 @@ page 1272 "OCR Data Correction"
 
                 trigger OnAction()
                 begin
-                    ShowMainAttachment();
+                    Rec.ShowMainAttachment();
                 end;
             }
         }
@@ -272,8 +272,8 @@ page 1272 "OCR Data Correction"
 
     trigger OnModifyRecord(): Boolean
     begin
-        "OCR Data Corrected" := true;
-        Modify();
+        Rec."OCR Data Corrected" := true;
+        Rec.Modify();
         exit(false)
     end;
 

@@ -1,3 +1,10 @@
+﻿namespace System.Environment.Configuration;
+
+using System.Automation;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 1511 "Notification Entry"
 {
     Caption = 'Notification Entry';
@@ -138,7 +145,7 @@ table 1511 "Notification Entry"
             NotificationSchedule.ScheduleNotification(Rec);
     end;
 
-    local procedure InsertRec(NewType: Enum "Notification Entry Type"; NewUserID: Code[50]; NewRecordID: RecordID; NewLinkTargetPage: Integer; NewCustomLink: Text[250]; NewSenderUserID: Code[50]): Boolean;
+    procedure InsertRec(NewType: Enum "Notification Entry Type"; NewUserID: Code[50]; NewRecordID: RecordID; NewLinkTargetPage: Integer; NewCustomLink: Text[250]; NewSenderUserID: Code[50]): Boolean;
     begin
         if not DoesTableMatchType(NewType, NewRecordID.TableNo) then
             exit(false);

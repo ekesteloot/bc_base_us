@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ServiceMgt.Contract;
+using System.Utilities;
+
 report 5979 "Copy Service Document"
 {
     Caption = 'Copy Service Document';
@@ -118,17 +123,19 @@ report 5979 "Copy Service Document"
     end;
 
     var
-        ServContractHeader: Record "Service Contract Header";
-        FromServContractHeader: Record "Service Contract Header";
         OutServContractLine: Record "Service Contract Line";
         CopyDocMgt: Codeunit "Copy Document Mgt.";
         DocType: Option Quote,Contract;
-        DocNo: Code[20];
         AllLinesCopied: Boolean;
         Text000: Label 'It was not possible to copy all of the service contract lines.\\Do you want to see these lines?';
         Text002: Label 'You can only copy the document with the same %1.';
         Text003: Label 'The document has a different ship-to code.\\Do you want to continue?';
         Text004: Label 'You must fill in the Document No. field.';
+
+    protected var
+        ServContractHeader: Record "Service Contract Header";
+        FromServContractHeader: Record "Service Contract Header";
+        DocNo: Code[20];
 
     procedure SetServContractHeader(var NewServContractHeader: Record "Service Contract Header")
     begin

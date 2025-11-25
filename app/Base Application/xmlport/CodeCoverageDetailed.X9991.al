@@ -1,3 +1,8 @@
+namespace System.TestTools.CodeCoverage;
+
+using System.Reflection;
+using System.Tooling;
+
 xmlport 9991 "Code Coverage Detailed"
 {
     Caption = 'Code Coverage Detailed';
@@ -10,7 +15,7 @@ xmlport 9991 "Code Coverage Detailed"
             tableelement("Code Coverage"; "Code Coverage")
             {
                 XmlName = 'CodeCoverage';
-                SourceTableView = WHERE("Line Type" = CONST(Code), "No. of Hits" = FILTER(> 0));
+                SourceTableView = where("Line Type" = const(Code), "No. of Hits" = filter(> 0));
                 fieldelement(ObjectType; "Code Coverage"."Object Type")
                 {
                 }

@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.Purchases.Vendor;
+
 page 1162 "Purchase Invoice Due Next Week"
 {
     Caption = '<Purchase Invoices Due Next Week>';
@@ -7,8 +11,8 @@ page 1162 "Purchase Invoice Due Next Week"
     PageType = CardPart;
     ShowFilter = false;
     SourceTable = "Vendor Ledger Entry";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Entry No.")
+                      order(Descending);
 
     layout
     {
@@ -49,7 +53,7 @@ page 1162 "Purchase Invoice Due Next Week"
                     var
                         HyperLinkUrl: Text[250];
                     begin
-                        HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 574) + StrSubstNo(FilterForRemAmtDrillDwnTxt, "Entry No.");
+                        HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 574) + StrSubstNo(FilterForRemAmtDrillDwnTxt, Rec."Entry No.");
                         HyperLink(HyperLinkUrl);
                     end;
                 }
@@ -71,17 +75,17 @@ page 1162 "Purchase Invoice Due Next Week"
     var
         Vendor: Record Vendor;
     begin
-        Vendor.Get("Vendor No.");
+        Vendor.Get(Rec."Vendor No.");
         VendorName := Vendor.Name;
-        StyleTxt := SetStyle();
+        StyleTxt := Rec.SetStyle();
     end;
 
     trigger OnOpenPage()
     begin
-        SetRange(Open, true);
-        SetFilter("Document Type", 'Invoice|Credit Memo');
-        SetFilter("Due Date", '%1..%2', CalcDate('<1D>', WorkDate()), CalcDate('<1W>', WorkDate()));
-        Ascending := false;
+        Rec.SetRange(Open, true);
+        Rec.SetFilter("Document Type", 'Invoice|Credit Memo');
+        Rec.SetFilter("Due Date", '%1..%2', CalcDate('<1D>', WorkDate()), CalcDate('<1W>', WorkDate()));
+        Rec.Ascending := false;
     end;
 
     var

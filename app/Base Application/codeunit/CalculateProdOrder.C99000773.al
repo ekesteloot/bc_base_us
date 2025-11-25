@@ -1,3 +1,17 @@
+﻿namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+
 codeunit 99000773 "Calculate Prod. Order"
 {
     Permissions = TableData Item = r,
@@ -29,7 +43,7 @@ codeunit 99000773 "Calculate Prod. Order"
         GetPlanningParameters: Codeunit "Planning-Get Parameters";
         LeadTimeMgt: Codeunit "Lead-Time Management";
         CalendarMgt: Codeunit "Shop Calendar Management";
-        WMSManagement: Codeunit "WMS Management";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
         NextProdOrderCompLineNo: Integer;
         Blocked: Boolean;
         ProdOrderModify: Boolean;
@@ -112,7 +126,7 @@ codeunit 99000773 "Calculate Prod. Order"
         end;
 
         OnTransferRoutingOnBeforeCalcRoutingCostPerUnit(ProdOrderRoutingLine, ProdOrderLine, RoutingLine);
-        CostCalcMgt.RoutingCostPerUnit(
+        CostCalcMgt.CalcRoutingCostPerUnit(
             ProdOrderRoutingLine.Type, ProdOrderRoutingLine."No.",
             ProdOrderRoutingLine."Direct Unit Cost", ProdOrderRoutingLine."Indirect Cost %", ProdOrderRoutingLine."Overhead Rate",
             ProdOrderRoutingLine."Unit Cost per", ProdOrderRoutingLine."Unit Cost Calculation");
@@ -783,15 +797,13 @@ codeunit 99000773 "Calculate Prod. Order"
     end;
 
     local procedure GetDefaultBin() BinCode: Code[20]
-    var
-        WMSMgt: Codeunit "WMS Management";
     begin
         with ProdOrderComp do
             if "Location Code" <> '' then begin
                 if Location.Code <> "Location Code" then
                     Location.Get("Location Code");
                 if Location."Bin Mandatory" and (not Location."Directed Put-away and Pick") then
-                    WMSMgt.GetDefaultBin("Item No.", "Variant Code", "Location Code", BinCode);
+                    ProdOrderWarehouseMgt.GetDefaultBin("Item No.", "Variant Code", "Location Code", BinCode);
             end;
     end;
 
@@ -800,7 +812,7 @@ codeunit 99000773 "Calculate Prod. Order"
         RouteBinCode: Code[20];
     begin
         RouteBinCode :=
-          WMSManagement.GetLastOperationFromBinCode(
+          ProdOrderWarehouseMgt.GetLastOperationFromBinCode(
             RoutingNo,
             ProdOrderLine."Routing Version Code",
             ProdOrderLine."Location Code",
@@ -817,7 +829,7 @@ codeunit 99000773 "Calculate Prod. Order"
             exit;
 
         ProdOrderRoutingLineBinCode :=
-            WMSManagement.GetProdRoutingLastOperationFromBinCode(
+            ProdOrderWarehouseMgt.GetProdRoutingLastOperationFromBinCode(
                 ProdOrderLine.Status, ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.",
                 ProdOrderLine."Routing No.", ProdOrderLine."Location Code");
         SetProdOrderLineBinCode(ProdOrderLine, ProdOrderRoutingLineBinCode, ProdOrderLine."Location Code");
@@ -831,7 +843,7 @@ codeunit 99000773 "Calculate Prod. Order"
             exit;
 
         PlanningLinesBinCode :=
-          WMSManagement.GetPlanningRtngLastOperationFromBinCode(
+          ProdOrderWarehouseMgt.GetPlanningRtngLastOperationFromBinCode(
             ReqLine."Worksheet Template Name",
             ReqLine."Journal Batch Name",
             ReqLine."Line No.",
@@ -866,7 +878,7 @@ codeunit 99000773 "Calculate Prod. Order"
                     ProdOrderLine.Validate("Bin Code", FromProdBinCode)
                 else
                     if Location."Bin Mandatory" and not Location."Directed Put-away and Pick" then
-                        if WMSManagement.GetDefaultBin(ProdOrderLine."Item No.", ProdOrderLine."Variant Code", Location.Code, FromProdBinCode) then
+                        if ProdOrderWarehouseMgt.GetDefaultBin(ProdOrderLine."Item No.", ProdOrderLine."Variant Code", Location.Code, FromProdBinCode) then
                             ProdOrderLine.Validate("Bin Code", FromProdBinCode);
             end;
     end;

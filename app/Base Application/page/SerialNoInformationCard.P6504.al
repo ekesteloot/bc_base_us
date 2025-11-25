@@ -1,3 +1,8 @@
+﻿namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Tracking;
+
 page 6504 "Serial No. Information Card"
 {
     Caption = 'Serial No. Information Card';
@@ -32,7 +37,7 @@ page 6504 "Serial No. Information Card"
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies a description of the serial no. information record.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -41,7 +46,7 @@ page 6504 "Serial No. Information Card"
             group(Inventory)
             {
                 Caption = 'Inventory';
-                field(Control19; Inventory)
+                field(Control19; Rec.Inventory)
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies the inventory quantity of the specified serial number.';
@@ -89,8 +94,8 @@ page 6504 "Serial No. Information Card"
                         ItemTrackingSetup: Record "Item Tracking Setup";
                         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
                     begin
-                        ItemTrackingSetup."Serial No." := "Serial No.";
-                        ItemTrackingDocMgt.ShowItemTrackingForEntity(0, '', "Item No.", "Variant Code", '', ItemTrackingSetup);
+                        ItemTrackingSetup."Serial No." := Rec."Serial No.";
+                        ItemTrackingDocMgt.ShowItemTrackingForEntity(0, '', Rec."Item No.", Rec."Variant Code", '', ItemTrackingSetup);
                     end;
                 }
                 action(Comment)
@@ -99,10 +104,10 @@ page 6504 "Serial No. Information Card"
                     Caption = 'Comment';
                     Image = ViewComments;
                     RunObject = Page "Item Tracking Comments";
-                    RunPageLink = Type = CONST("Serial No."),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Serial/Lot No." = FIELD("Serial No.");
+                    RunPageLink = Type = const("Serial No."),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Serial/Lot No." = field("Serial No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 separator(Action24)
@@ -121,12 +126,31 @@ page 6504 "Serial No. Information Card"
                         ItemTracing: Page "Item Tracing";
                     begin
                         Clear(ItemTracing);
-                        ItemTracingBuffer.SetRange("Item No.", "Item No.");
-                        ItemTracingBuffer.SetRange("Variant Code", "Variant Code");
-                        ItemTracingBuffer.SetRange("Serial No.", "Serial No.");
+                        ItemTracingBuffer.SetRange("Item No.", Rec."Item No.");
+                        ItemTracingBuffer.SetRange("Variant Code", Rec."Variant Code");
+                        ItemTracingBuffer.SetRange("Serial No.", Rec."Serial No.");
                         ItemTracing.InitFilters(ItemTracingBuffer);
                         ItemTracing.FindRecords();
                         ItemTracing.RunModal();
+                    end;
+                }
+                action(PrintLabel)
+                {
+                    AccessByPermission = TableData "Serial No. Information" = I;
+                    ApplicationArea = ItemTracking;
+                    Image = Print;
+                    Caption = 'Print Label';
+                    ToolTip = 'Print Label';
+
+                    trigger OnAction()
+                    var
+                        SNInfo: Record "Serial No. Information";
+                        SNLabel: Report "SN Label";
+                    begin
+                        SNInfo := Rec;
+                        CurrPage.SetSelectionFilter(SNInfo);
+                        SNLabel.SetTableView(SNInfo);
+                        SNLabel.RunModal();
                     end;
                 }
             }
@@ -154,8 +178,8 @@ page 6504 "Serial No. Information Card"
                         ItemTrackingMgt: Codeunit "Item Tracking Management";
                         SerialNoInfoList: Page "Serial No. Information List";
                     begin
-                        ShowRecords.SetRange("Item No.", "Item No.");
-                        ShowRecords.SetRange("Variant Code", "Variant Code");
+                        ShowRecords.SetRange("Item No.", Rec."Item No.");
+                        ShowRecords.SetRange("Variant Code", Rec."Variant Code");
 
                         FocusOnRecord.Copy(ShowRecords);
                         FocusOnRecord.SetRange("Serial No.", TrackingSpecification."Serial No.");
@@ -166,7 +190,7 @@ page 6504 "Serial No. Information Card"
                             SerialNoInfoList.SetRecord(FocusOnRecord);
                         if SerialNoInfoList.RunModal() = ACTION::LookupOK then begin
                             SerialNoInfoList.GetRecord(SelectedRecord);
-                            ItemTrackingMgt.CopySerialNoInformation(SelectedRecord, "Serial No.");
+                            ItemTrackingMgt.CopySerialNoInformation(SelectedRecord, Rec."Serial No.");
                         end;
                     end;
                 }
@@ -199,6 +223,9 @@ page 6504 "Serial No. Information Card"
                 actionref(Navigate_Promoted; Navigate)
                 {
                 }
+                actionref(PrintLabel_Promoted; PrintLabel)
+                {
+                }
             }
         }
     }
@@ -212,7 +239,6 @@ page 6504 "Serial No. Information Card"
 
     var
         ShowButtonFunctions: Boolean;
-        [InDataSet]
         ButtonFunctionsVisible: Boolean;
 
     protected var

@@ -1,3 +1,23 @@
+﻿namespace Microsoft.Intercompany.Partner;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Company;
+using Microsoft.Intercompany.DataExchange;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Inbox;
+using Microsoft.Intercompany.Outbox;
+using Microsoft.Intercompany.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Environment;
+using System.Telemetry;
+
 table 413 "IC Partner"
 {
     Caption = 'IC Partner';
@@ -45,7 +65,7 @@ table 413 "IC Partner"
         field(5; "Inbox Details"; Text[250])
         {
             Caption = 'Inbox Details';
-            TableRelation = IF ("Inbox Type" = CONST(Database)) Company.Name;
+            TableRelation = if ("Inbox Type" = const(Database)) Company.Name;
 
             trigger OnLookup()
             var
@@ -94,8 +114,8 @@ table 413 "IC Partner"
         }
         field(11; Comment; Boolean)
         {
-            CalcFormula = Exist("Comment Line" WHERE("Table Name" = CONST("IC Partner"),
-                                                      "No." = FIELD(Code)));
+            CalcFormula = exist("Comment Line" where("Table Name" = const("IC Partner"),
+                                                      "No." = field(Code)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -125,6 +145,56 @@ table 413 "IC Partner"
         field(17; "Auto. Accept Transactions"; Boolean)
         {
             Caption = 'Auto. Accept Transactions';
+        }
+        field(18; "Data Exchange Type"; Enum "IC Data Exchange Type")
+        {
+            Caption = 'Data Exchange Type';
+            Description = 'Specifies the type of data exchange with the partner, enabling the system to determine the appropriate communication method for intercompany transactions.';
+            Editable = false;
+            InitValue = Database;
+        }
+        field(100; "Connection Url Key"; Guid)
+        {
+            Caption = 'Connection URL Key';
+            DataClassification = SystemMetadata;
+        }
+        field(101; "Company Id Key"; Guid)
+        {
+            Caption = 'Company ID Key';
+            DataClassification = SystemMetadata;
+        }
+        field(102; "Client Id Key"; Guid)
+        {
+            Caption = 'Client ID Key';
+            ExtendedDatatype = Masked;
+            DataClassification = SystemMetadata;
+        }
+        field(103; "Client Secret Key"; Guid)
+        {
+            Caption = 'Client Secret Key';
+            ExtendedDatatype = Masked;
+            DataClassification = SystemMetadata;
+        }
+        field(104; "Authority Url Key"; Guid)
+        {
+            Caption = 'Authority URL Key';
+            DataClassification = SystemMetadata;
+        }
+        field(105; "Redirect Url key"; Guid)
+        {
+            Caption = 'Redirect URL Key';
+            DataClassification = SystemMetadata;
+        }
+        field(106; "Token Key"; Guid)
+        {
+            Caption = 'Client Secret Key';
+            ExtendedDatatype = Masked;
+            DataClassification = SystemMetadata;
+        }
+        field(107; "Token Expiration Time"; DateTime)
+        {
+            Caption = 'Token Expiration Time';
+            DataClassification = SystemMetadata;
         }
     }
 
@@ -278,32 +348,26 @@ table 413 "IC Partner"
     local procedure AutosetICPartnerName(Company: Record Company)
     var
         MyICSetup: Record "IC Setup";
-        OtherICSetup: Record "IC Setup";
+        TempPartnerICSetup: Record "IC Setup" temporary;
+        ICDataExchange: Interface "IC Data Exchange";
     begin
         if not MyICSetup.Get() then begin
             MyICSetup.Init();
             MyICSetup.Insert();
         end;
 
-        if not OtherICSetup.ChangeCompany(Company.Name) then
-            Error(CantFindCompanyErr);
+        ICDataExchange := Rec."Data Exchange Type";
+        ICDataExchange.GetICPartnerICSetup(Company.Name, TempPartnerICSetup);
 
-        if not OtherICSetup.ReadPermission() then
-            exit;
-        if not OtherICSetup.Get() then begin
+        if TempPartnerICSetup."IC Partner Code" = '' then begin
             if System.GuiAllowed() then
                 Message(CompanyNotICConfiguredErr);
             exit;
         end;
-        if OtherICSetup."IC Partner Code" = '' then begin
-            if System.GuiAllowed() then
-                Message(CompanyNotICConfiguredErr);
-            exit;
-        end;
-        if OtherICSetup."IC Partner Code" = MyICSetup."IC Partner Code" then
+        if TempPartnerICSetup."IC Partner Code" = MyICSetup."IC Partner Code" then
             if System.GuiAllowed() then
                 Message(PartnerCompanySameICSetupCodeErr);
-        Rec.Code := OtherICSetup."IC Partner Code";
+        Rec.Code := TempPartnerICSetup."IC Partner Code";
         Rec.Name := CopyStr(Company."Display Name", 1, MaxStrLen(Rec.Name));
         if Rec.Name = '' then
             Rec.Name := Company.Name;
@@ -311,34 +375,57 @@ table 413 "IC Partner"
 
     local procedure AutosetICPartnerCurrency(Company: Record Company)
     var
-        PartnerGeneralLedgerSetup: Record "General Ledger Setup";
+        TempPartnerGeneralLedgerSetup: Record "General Ledger Setup" temporary;
         CurrentCompanyGeneralLedgerSetup: Record "General Ledger Setup";
+        ICDataExchange: Interface "IC Data Exchange";
     begin
-        if not PartnerGeneralLedgerSetup.ChangeCompany(Company.Name) then
-            Error(CantFindCompanyErr);
-        if not PartnerGeneralLedgerSetup.ReadPermission() then
-            exit;
-        if not PartnerGeneralLedgerSetup.Get() then
-            exit;
         if not CurrentCompanyGeneralLedgerSetup.Get() then
             exit;
 
-        if CurrentCompanyGeneralLedgerSetup."LCY Code" <> PartnerGeneralLedgerSetup."LCY Code" then
-            Rec."Currency Code" := PartnerGeneralLedgerSetup."LCY Code";
+        ICDataExchange := Rec."Data Exchange Type";
+        ICDataExchange.GetICPartnerGeneralLedgerSetup(Company.Name, TempPartnerGeneralLedgerSetup);
+
+        if CurrentCompanyGeneralLedgerSetup."LCY Code" <> TempPartnerGeneralLedgerSetup."LCY Code" then
+            Rec."Currency Code" := TempPartnerGeneralLedgerSetup."LCY Code";
     end;
 
     local procedure AutosetICPartnerCountry(Company: Record Company)
     var
-        CompanyInformation: Record "Company Information";
+        TempCompanyInformation: Record "Company Information" temporary;
+        ICDataExchange: Interface "IC Data Exchange";
     begin
-        if not CompanyInformation.ChangeCompany(Company.Name) then
-            Error(CantFindCompanyErr);
-        if not CompanyInformation.ReadPermission() then
-            exit;
-        if not CompanyInformation.Get() then
-            exit;
-        Rec."Country/Region Code" := CompanyInformation."Country/Region Code";
-    end; 
+        ICDataExchange := Rec."Data Exchange Type";
+        ICDataExchange.GetICPartnerCompanyInformation(Company.Name, TempCompanyInformation);
+        Rec."Country/Region Code" := TempCompanyInformation."Country/Region Code";
+    end;
 
+    [NonDebuggable]
+    internal procedure SetSecret(SecretKey: Guid; ClientSecretText: Text): Guid
+    var
+        NewSecretKey: Guid;
+    begin
+        if not IsNullGuid(SecretKey) then
+            if not IsolatedStorage.Delete(SecretKey, DataScope::Company) then;
+
+        NewSecretKey := CreateGuid();
+
+        if (not EncryptionEnabled() or (StrLen(ClientSecretText) > 215)) then
+            IsolatedStorage.Set(NewSecretKey, ClientSecretText, DataScope::Company)
+        else
+            IsolatedStorage.SetEncrypted(NewSecretKey, ClientSecretText, DataScope::Company);
+
+        exit(NewSecretKey);
+    end;
+
+    [NonDebuggable]
+    internal procedure GetSecret(SecretKey: Guid): Text
+    var
+        ClientSecretText: Text;
+    begin
+        if not IsNullGuid(SecretKey) then
+            if not IsolatedStorage.Get(SecretKey, DataScope::Company, ClientSecretText) then;
+
+        exit(ClientSecretText);
+    end;
 }
 

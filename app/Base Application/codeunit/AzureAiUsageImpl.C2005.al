@@ -1,3 +1,7 @@
+namespace System.AI;
+
+using System.Environment;
+
 codeunit 2005 "Azure AI Usage Impl."
 {
     Access = Internal;

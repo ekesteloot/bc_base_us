@@ -8,7 +8,7 @@ report 10315 "Data Dictionary"
     {
         dataitem(TableDef; "Data Dictionary Info")
         {
-            DataItemTableView = SORTING("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") WHERE(Type = FILTER(Table), "Table No." = FILTER(< 2000000001));
+            DataItemTableView = sorting("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") where(Type = filter(Table), "Table No." = filter(< 2000000001));
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {
             }
@@ -65,8 +65,8 @@ report 10315 "Data Dictionary"
             }
             dataitem(FieldDef; "Data Dictionary Info")
             {
-                DataItemLink = "Table No." = FIELD("Table No.");
-                DataItemTableView = SORTING("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") WHERE(Type = FILTER(Field));
+                DataItemLink = "Table No." = field("Table No.");
+                DataItemTableView = sorting("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") where(Type = filter(Field));
                 column(FieldDef__Field_No__; "Field No.")
                 {
                 }
@@ -162,8 +162,8 @@ report 10315 "Data Dictionary"
                 }
                 dataitem(CaptionML; "Data Dictionary Info")
                 {
-                    DataItemLink = "Table No." = FIELD("Table No."), "Field No." = FIELD("Field No.");
-                    DataItemTableView = SORTING("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") WHERE(Type = FILTER(Caption));
+                    DataItemLink = "Table No." = field("Table No."), "Field No." = field("Field No.");
+                    DataItemTableView = sorting("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") where(Type = filter(Caption));
                     column(CaptionML_Value; Value)
                     {
                     }
@@ -194,8 +194,8 @@ report 10315 "Data Dictionary"
                 }
                 dataitem(OptionString; "Data Dictionary Info")
                 {
-                    DataItemLink = "Table No." = FIELD("Table No."), "Field No." = FIELD("Field No.");
-                    DataItemTableView = SORTING("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") WHERE(Type = FILTER(Option));
+                    DataItemLink = "Table No." = field("Table No."), "Field No." = field("Field No.");
+                    DataItemTableView = sorting("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") where(Type = filter(Option));
                     column(OptionString_Value; Value)
                     {
                     }
@@ -226,8 +226,8 @@ report 10315 "Data Dictionary"
                 }
                 dataitem(TableRelation; "Data Dictionary Info")
                 {
-                    DataItemLink = "Table No." = FIELD("Table No."), "Field No." = FIELD("Field No.");
-                    DataItemTableView = SORTING("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") WHERE(Type = FILTER(Relation));
+                    DataItemLink = "Table No." = field("Table No."), "Field No." = field("Field No.");
+                    DataItemTableView = sorting("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") where(Type = filter(Relation));
                     column(ShowTableRelations; ShowTableRelations)
                     {
                     }
@@ -273,8 +273,8 @@ report 10315 "Data Dictionary"
                 }
                 dataitem(CalcFormula; "Data Dictionary Info")
                 {
-                    DataItemLink = "Table No." = FIELD("Table No."), "Field No." = FIELD("Field No.");
-                    DataItemTableView = SORTING("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") WHERE(Type = FILTER(CalcFormula));
+                    DataItemLink = "Table No." = field("Table No."), "Field No." = field("Field No.");
+                    DataItemTableView = sorting("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") where(Type = filter(CalcFormula));
                     column(ShowCalcFormulas; ShowCalcFormulas)
                     {
                     }
@@ -321,8 +321,8 @@ report 10315 "Data Dictionary"
             }
             dataitem("Keys"; "Data Dictionary Info")
             {
-                DataItemLink = "Table No." = FIELD("Table No.");
-                DataItemTableView = SORTING("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") WHERE(Type = FILTER(Key));
+                DataItemLink = "Table No." = field("Table No.");
+                DataItemTableView = sorting("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") where(Type = filter(Key));
                 column(ShowKeys; ShowKeys)
                 {
                 }
@@ -394,8 +394,8 @@ report 10315 "Data Dictionary"
                 }
                 dataitem(SumIndexFields; "Data Dictionary Info")
                 {
-                    DataItemLink = "Table No." = FIELD("Table No."), "Key No." = FIELD("Key No.");
-                    DataItemTableView = SORTING("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") WHERE(Type = FILTER(SumIndexField));
+                    DataItemLink = "Table No." = field("Table No."), "Key No." = field("Key No.");
+                    DataItemTableView = sorting("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") where(Type = filter(SumIndexField));
                     column(ShowSumIndexFields4; ShowSumIndexFields4)
                     {
                     }
@@ -452,8 +452,8 @@ report 10315 "Data Dictionary"
                 }
                 dataitem(KeyGroups; "Data Dictionary Info")
                 {
-                    DataItemLink = "Table No." = FIELD("Table No."), "Key No." = FIELD("Key No.");
-                    DataItemTableView = SORTING("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") WHERE(Type = FILTER(KeyGroup));
+                    DataItemLink = "Table No." = field("Table No."), "Key No." = field("Key No.");
+                    DataItemTableView = sorting("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") where(Type = filter(KeyGroup));
                     column(KeyGroups_Value; Value)
                     {
                     }
@@ -517,8 +517,8 @@ report 10315 "Data Dictionary"
             }
             dataitem(PermissionRange; "Data Dictionary Info")
             {
-                DataItemLink = "Table No." = FIELD("Table No.");
-                DataItemTableView = SORTING("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") WHERE(Type = FILTER(Permission));
+                DataItemLink = "Table No." = field("Table No.");
+                DataItemTableView = sorting("Table No.", "Field No.", Type, Language, "Key No.", "Line No.") where(Type = filter(Permission));
                 column(ShowPermissions; ShowPermissions)
                 {
                 }
@@ -582,7 +582,7 @@ report 10315 "Data Dictionary"
             }
             dataitem(NewPage; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 MaxIteration = 1;
             }
 
@@ -797,9 +797,7 @@ report 10315 "Data Dictionary"
         TotalKey: Text[1000];
         DeleteData: Boolean;
         TablePropertiesDescription: array[2] of Text[100];
-        [InDataSet]
         ShowSumIndexFieldsControlEnabl: Boolean;
-        [InDataSet]
         ShowKeyGroupControlEnable: Boolean;
         TotalKey2: Boolean;
         TotalKey4: Boolean;

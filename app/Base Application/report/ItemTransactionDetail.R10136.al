@@ -116,8 +116,8 @@ report 10136 "Item Transaction Detail"
             }
             dataitem(PriorItemLedgerEntry; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Location Code" = FIELD("Location Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Item No.", "Variant Code", "Location Code", "Posting Date");
+                DataItemLink = "Item No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Item No.", "Variant Code", "Location Code", "Posting Date");
                 column(ValueEntry__Posting_Date_; ValueEntry."Posting Date")
                 {
                 }
@@ -198,8 +198,8 @@ report 10136 "Item Transaction Detail"
             }
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Location Code" = FIELD("Location Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Posting Date" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Item No.", "Variant Code", "Location Code", "Posting Date");
+                DataItemLink = "Item No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Posting Date" = field("Date Filter");
+                DataItemTableView = sorting("Item No.", "Variant Code", "Location Code", "Posting Date");
                 RequestFilterFields = "Entry Type";
                 column(QuantityOnHandCF; QuantityOnHandCF)
                 {

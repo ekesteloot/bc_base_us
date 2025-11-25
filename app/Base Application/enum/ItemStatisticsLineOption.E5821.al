@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 enum 5821 "Item Statistics Line Option"
 {
     Extensible = true;

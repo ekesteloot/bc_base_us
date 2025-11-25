@@ -37,7 +37,7 @@ page 270 "Online Bank Accounts"
         OnlineBankAccLink.FindSet();
         repeat
             Rec := OnlineBankAccLink;
-            Insert();
+            Rec.Insert();
         until OnlineBankAccLink.Next() = 0
     end;
 }

@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Employee;
+
 page 5221 "Confidential Information"
 {
     AutoSplitKey = true;
@@ -23,7 +25,7 @@ page 5221 "Confidential Information"
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a description of the confidential information.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies if a comment is associated with the entry.';
@@ -65,9 +67,9 @@ page 5221 "Confidential Information"
                         HRConfidentialCommentLine: Record "HR Confidential Comment Line";
                     begin
                         HRConfidentialCommentLine.SetRange("Table Name", HRConfidentialCommentLine."Table Name"::"Confidential Information");
-                        HRConfidentialCommentLine.SetRange("No.", "Employee No.");
-                        HRConfidentialCommentLine.SetRange(Code, "Confidential Code");
-                        HRConfidentialCommentLine.SetRange("Table Line No.", "Line No.");
+                        HRConfidentialCommentLine.SetRange("No.", Rec."Employee No.");
+                        HRConfidentialCommentLine.SetRange(Code, Rec."Confidential Code");
+                        HRConfidentialCommentLine.SetRange("Table Line No.", Rec."Line No.");
                         PAGE.RunModal(PAGE::"HR Confidential Comment Sheet", HRConfidentialCommentLine);
                     end;
                 }

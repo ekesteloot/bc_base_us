@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Comment;
+
 enum 5061 "Rlshp. Mgt. Comment Line Table Name"
 {
     Extensible = true;

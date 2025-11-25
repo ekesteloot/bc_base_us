@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Request;
+
 codeunit 5770 "Whse.-Service Release"
 {
 
@@ -65,7 +70,7 @@ codeunit 5770 "Whse.-Service Release"
         WarehouseRequest2.LockTable();
         if WarehouseRequest2.FindSet() then
             repeat
-                WarehouseRequest2."Document Status" := ServiceHeader."Release Status"::Open;
+                WarehouseRequest2."Document Status" := ServiceHeader."Release Status"::Open.AsInteger();
                 WarehouseRequest2.Modify();
             until WarehouseRequest2.Next() = 0;
 
@@ -95,9 +100,9 @@ codeunit 5770 "Whse.-Service Release"
             WarehouseRequest."Source Subtype" := ServiceHeader."Document Type".AsInteger();
             WarehouseRequest."Source No." := ServiceHeader."No.";
             WarehouseRequest."Shipping Advice" := ServiceHeader."Shipping Advice";
-            WarehouseRequest."Document Status" := ServiceHeader."Release Status"::"Released to Ship";
+            WarehouseRequest."Document Status" := ServiceHeader."Release Status"::"Released to Ship".AsInteger();
             WarehouseRequest."Location Code" := ServiceLine."Location Code";
-            WarehouseRequest."Destination Type" := "Warehouse Destination Type"::Customer;
+            WarehouseRequest."Destination Type" := WarehouseRequest."Destination Type"::Customer;
             WarehouseRequest."Destination No." := ServiceHeader."Bill-to Customer No.";
             WarehouseRequest."External Document No." := '';
             WarehouseRequest."Shipment Date" := ServiceLine.GetShipmentDate();
@@ -124,14 +129,14 @@ codeunit 5770 "Whse.-Service Release"
         end;
     end;
 
-    local procedure SetWhseRqstFiltersByStatus(ServiceHeader: Record "Service Header"; var WarehouseRequest: Record "Warehouse Request"; Status: Option)
+    local procedure SetWhseRqstFiltersByStatus(ServiceHeader: Record "Service Header"; var WarehouseRequest: Record "Warehouse Request"; Status: Enum "Service Doc. Release Status")
     begin
         WarehouseRequest.Reset();
         WarehouseRequest.SetCurrentKey("Source Type", "Source Subtype", "Source No.");
         WarehouseRequest.SetRange("Source Type", DATABASE::"Service Line");
         WarehouseRequest.SetRange("Source Subtype", ServiceHeader."Document Type");
         WarehouseRequest.SetRange("Source No.", ServiceHeader."No.");
-        WarehouseRequest.SetRange("Document Status", Status);
+        WarehouseRequest.SetRange("Document Status", Status.AsInteger());
     end;
 
     [IntegrationEvent(false, false)]

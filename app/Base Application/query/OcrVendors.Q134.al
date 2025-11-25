@@ -6,7 +6,7 @@ query 134 "OCR Vendors"
     {
         dataitem(Vendor; Vendor)
         {
-            DataItemTableFilter = Name = FILTER(<> '');
+            DataItemTableFilter = Name = filter(<> '');
             column(Id; SystemId)
             {
             }

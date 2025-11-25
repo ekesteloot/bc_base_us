@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item.Catalog;
+
 page 6651 "Posted Return Shipment Subform"
 {
     AutoSplitKey = true;
@@ -128,7 +133,7 @@ page 6651 "Posted Return Shipment Subform"
                     ToolTip = 'Specifies the code for Shortcut Dimension 2, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
                     Visible = false;
                 }
-                field(Correction; Correction)
+                field(Correction; Rec.Correction)
                 {
                     ApplicationArea = PurchReturnOrder;
                     Editable = false;
@@ -202,7 +207,7 @@ page 6651 "Posted Return Shipment Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(Comments)
@@ -214,7 +219,7 @@ page 6651 "Posted Return Shipment Subform"
 
                     trigger OnAction()
                     begin
-                        ShowLineComments();
+                        Rec.ShowLineComments();
                     end;
                 }
                 action(DocumentLineTracking)
@@ -238,7 +243,7 @@ page 6651 "Posted Return Shipment Subform"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
                 action(ItemCreditMemoLines)
@@ -272,8 +277,8 @@ page 6651 "Posted Return Shipment Subform"
 
     local procedure PageShowItemPurchCrMemoLines()
     begin
-        TestField(Type, Type::Item);
-        ShowItemPurchCrMemoLines();
+        Rec.TestField(Type, Rec.Type::Item);
+        Rec.ShowItemPurchCrMemoLines();
     end;
 
     procedure ShowDocumentLineTracking()
@@ -281,7 +286,7 @@ page 6651 "Posted Return Shipment Subform"
         DocumentLineTracking: Page "Document Line Tracking";
     begin
         Clear(DocumentLineTracking);
-        DocumentLineTracking.SetDoc(13, "Document No.", "Line No.", "Return Order No.", "Return Order Line No.", '', 0);
+        DocumentLineTracking.SetDoc(13, Rec."Document No.", Rec."Line No.", Rec."Return Order No.", Rec."Return Order Line No.", '', 0);
         DocumentLineTracking.RunModal();
     end;
 }

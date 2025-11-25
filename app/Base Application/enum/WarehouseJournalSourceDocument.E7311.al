@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Journal;
+
 enum 7311 "Warehouse Journal Source Document"
 {
     Extensible = true;

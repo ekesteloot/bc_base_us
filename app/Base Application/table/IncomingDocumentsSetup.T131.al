@@ -42,7 +42,7 @@ table 131 "Incoming Documents Setup"
         field(3; "General Journal Batch Name"; Code[10])
         {
             Caption = 'General Journal Batch Name';
-            TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("General Journal Template Name"));
+            TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = field("General Journal Template Name"));
 
             trigger OnValidate()
             var

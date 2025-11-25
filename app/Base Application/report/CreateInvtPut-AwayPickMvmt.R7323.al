@@ -1,3 +1,12 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Activity;
+
 report 7323 "Create Invt Put-away/Pick/Mvmt"
 {
     AccessByPermission = TableData Location = R;
@@ -10,7 +19,7 @@ report 7323 "Create Invt Put-away/Pick/Mvmt"
     {
         dataitem("Warehouse Request"; "Warehouse Request")
         {
-            DataItemTableView = SORTING("Source Document", "Source No.");
+            DataItemTableView = sorting("Source Document", "Source No.");
             RequestFilterFields = "Source Document", "Source No.", "Location Code";
 
             trigger OnAfterGetRecord()
@@ -131,7 +140,7 @@ report 7323 "Create Invt Put-away/Pick/Mvmt"
                 DocumentCreated := false;
 
                 if CreatePick or CreateMovement then
-                    CreateInvtPickMovement.SetReportGlobals(PrintDocument, ShowError);
+                    CreateInvtPickMovement.SetReportGlobals(PrintDocument, ShowError, ReservedFromStock);
 
                 CreateInvtPickMovement.SetSourceDocDetailsFilter("Warehouse Source Filter");
                 CreateInvtPutAway.SetSourceDocDetailsFilter("Warehouse Source Filter");
@@ -139,7 +148,7 @@ report 7323 "Create Invt Put-away/Pick/Mvmt"
         }
         dataitem("Warehouse Source Filter"; "Warehouse Source Filter")
         {
-            DataItemTableView = SORTING(Type, Code);
+            DataItemTableView = sorting(Type, Code);
             RequestFilterFields = "Item No. Filter", "Variant Code Filter", "Shipment Date Filter", "Receipt Date Filter", "Job No.", "Job Task No. Filter", "Prod. Order No.", "Prod. Order Line No. Filter";
             RequestFilterHeading = 'Document details';
             UseTemporary = true;
@@ -154,46 +163,69 @@ report 7323 "Create Invt Put-away/Pick/Mvmt"
         {
             area(content)
             {
-                group(Options)
+                group("Warehouse Documents")
                 {
-                    Caption = 'Options';
+                    Caption = 'Warehouse Documents';
+
                     field(CreateInventorytPutAway; CreatePutAway)
                     {
-                        ApplicationArea = Warehouse;
                         Caption = 'Create Invt. Put-Away';
                         ToolTip = 'Specifies if you want to create inventory put-away documents for all source documents that are included in the filter and for which a put-away document is appropriate.';
+
+                        trigger OnValidate()
+                        begin
+                            if not (CreatePick or CreateMovement) then
+                                ReservedFromStock := ReservedFromStock::" ";
+                        end;
                     }
                     field(CInvtPick; CreatePick)
                     {
-                        ApplicationArea = Warehouse;
                         Caption = 'Create Invt. Pick';
                         ToolTip = 'Specifies if you want to create inventory pick documents for all source documents that are included in the filter and for which a pick document is appropriate.';
 
                         trigger OnValidate()
                         begin
                             CreateMovement := false;
+                            if not (CreatePick or CreateMovement) then
+                                ReservedFromStock := ReservedFromStock::" ";
                         end;
                     }
                     field(CInvtMvmt; CreateMovement)
                     {
-                        ApplicationArea = Warehouse;
                         Caption = 'Create Invt. Movement';
                         ToolTip = 'Specifies if you want to create inventory movement documents for all source documents that are included in the filter and for which a movement document is appropriate.';
 
                         trigger OnValidate()
                         begin
                             CreatePick := false;
+                            if not (CreatePick or CreateMovement) then
+                                ReservedFromStock := ReservedFromStock::" ";
+                        end;
+                    }
+                }
+                group(Options)
+                {
+                    Caption = 'Options';
+
+                    field("Reserved From Stock"; ReservedFromStock)
+                    {
+                        Caption = 'Reserved from stock';
+                        ToolTip = 'Specifies if you want to include only source document lines that are fully or partially reserved from current stock.';
+                        ValuesAllowed = " ", "Full and Partial", Full;
+
+                        trigger OnValidate()
+                        begin
+                            if CreatePutAway and not (CreatePick or CreateMovement) then
+                                ReservedFromStock := ReservedFromStock::" ";
                         end;
                     }
                     field(PrintDocument; PrintDocument)
                     {
-                        ApplicationArea = Warehouse;
                         Caption = 'Print Document';
                         ToolTip = 'Specifies if you want the document to be printed.';
                     }
                     field(ShowError; ShowError)
                     {
-                        ApplicationArea = Warehouse;
                         Caption = 'Show Error';
                         ToolTip = 'Specifies if the report shows error information.';
                     }
@@ -252,6 +284,7 @@ report 7323 "Create Invt Put-away/Pick/Mvmt"
     protected var
         WarehouseActivityHeader: Record "Warehouse Activity Header";
         TempWarehouseActivityHeader: Record "Warehouse Activity Header" temporary;
+        ReservedFromStock: Enum "Reservation From Stock";
         CreatePutAway: Boolean;
         CreatePick: Boolean;
         CreateMovement: Boolean;
@@ -320,13 +353,13 @@ report 7323 "Create Invt Put-away/Pick/Mvmt"
                 (WhseRequest."Shipping Advice" = WhseRequest."Shipping Advice"::Complete)
             then
                 case WhseRequest."Source Type" of
-                    DATABASE::"Sales Line":
+                    Enum::TableID::"Sales Line".AsInteger():
                         if WhseRequest."Source Subtype" = WhseRequest."Source Subtype"::"1" then begin
                             SkipRecord := not SalesHeader.Get(SalesHeader."Document Type"::Order, WhseRequest."Source No.");
                             if not SkipRecord then
                                 SkipRecord := GetSrcDocOutbound.CheckSalesHeader(SalesHeader, ShowError);
                         end;
-                    DATABASE::"Transfer Line":
+                    Enum::TableID::"Transfer Line".AsInteger():
                         begin
                             SkipRecord := not TransferHeader.Get(WhseRequest."Source No.");
                             if not SkipRecord then

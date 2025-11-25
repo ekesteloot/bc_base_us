@@ -1,3 +1,5 @@
+namespace Microsoft.CashFlow.Account;
+
 enum 841 "Cash Flow Account Type"
 {
     AssignmentCompatibility = true;

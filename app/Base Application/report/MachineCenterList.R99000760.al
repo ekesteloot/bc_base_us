@@ -1,7 +1,11 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Manufacturing.MachineCenter;
+
 report 99000760 "Machine Center List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/MachineCenterList.rdlc';
+    RDLCLayout = './Manufacturing/Reports/MachineCenterList.rdlc';
     AdditionalSearchTerms = 'production resource,production personnel';
     ApplicationArea = Manufacturing;
     Caption = 'Machine Center List';
@@ -11,7 +15,7 @@ report 99000760 "Machine Center List"
     {
         dataitem("Machine Center"; "Machine Center")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Work Center No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

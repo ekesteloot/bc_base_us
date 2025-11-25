@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.History;
+
+using Microsoft.InventoryMgt.Comment;
+
 page 6569 "Posted Invt. Receipts"
 {
     ApplicationArea = Basic, Suite;
@@ -81,8 +85,8 @@ page 6569 "Posted Invt. Receipts"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Inventory Receipt"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Inventory Receipt"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

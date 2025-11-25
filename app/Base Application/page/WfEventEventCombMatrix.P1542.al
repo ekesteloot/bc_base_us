@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1542 "WF Event/Event Comb. Matrix"
 {
     Caption = 'WF Event/Event Comb. Matrix';
@@ -243,7 +245,7 @@ page 1542 "WF Event/Event Comb. Matrix"
             WorkflowEvent.SetRange(Description, MATRIX_Caption[i]);
             if WorkflowEvent.FindFirst() then
                 if WFEventResponseCombination.Get(WFEventResponseCombination.Type::"Event", WorkflowEvent."Function Name",
-                     WFEventResponseCombination."Predecessor Type"::"Event", "Function Name") or (not WorkflowEvent.HasPredecessors())
+                     WFEventResponseCombination."Predecessor Type"::"Event", Rec."Function Name") or (not WorkflowEvent.HasPredecessors())
                 then
                     MATRIX_CellData[i] := true
                 else
@@ -260,14 +262,14 @@ page 1542 "WF Event/Event Comb. Matrix"
         WorkflowEvent.FindFirst();
 
         if MATRIX_CellData[ColumnNo] then begin
-            WorkflowEventHandling.AddEventPredecessor(WorkflowEvent."Function Name", "Function Name");
+            WorkflowEventHandling.AddEventPredecessor(WorkflowEvent."Function Name", Rec."Function Name");
             WorkflowEvent.MakeIndependent();
         end else begin
             if not WorkflowEvent.HasPredecessors() then
                 WorkflowEvent.MakeDependentOnAllEvents();
 
             if WFEventResponseCombination.Get(WFEventResponseCombination.Type::"Event", WorkflowEvent."Function Name",
-                 WFEventResponseCombination."Predecessor Type"::"Event", "Function Name")
+                 WFEventResponseCombination."Predecessor Type"::"Event", Rec."Function Name")
             then
                 WFEventResponseCombination.Delete();
         end;

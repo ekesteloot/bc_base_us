@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 report 99003802 "Copy Production Order Document"
 {
     Caption = 'Copy Production Order Document';

@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 enum 1511 "Notification Entry Type"
 {
     Extensible = true;

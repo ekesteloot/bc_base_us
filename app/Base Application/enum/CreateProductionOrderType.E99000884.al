@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 enum 99000884 "Create Production Order Type"
 {
     Extensible = true;

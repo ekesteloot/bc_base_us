@@ -174,7 +174,7 @@ codeunit 104 "Update Name In Ledger Entries"
             Format(Database::Vendor):
                 UpdateVendNamesInLedgerEntries();
             else
-                Error(StrSubstNo(ParameterNotSupportedErr, Param));
+                Error(ParameterNotSupportedErr, Param);
         end;
     end;
 

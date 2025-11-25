@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.Contract;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ServiceMgt.Reports;
+using Microsoft.ServiceMgt.Setup;
+using System.Utilities;
+
 report 6031 "Update Contract Prices"
 {
     ApplicationArea = Service;
@@ -10,7 +17,7 @@ report 6031 "Update Contract Prices"
         dataitem("Service Contract Header"; "Service Contract Header")
         {
             CalcFields = Name, "Calcd. Annual Amount";
-            DataItemTableView = SORTING("Next Price Update Date") WHERE("Contract Type" = CONST(Contract), Status = CONST(Signed), "Change Status" = CONST(Locked));
+            DataItemTableView = sorting("Next Price Update Date") where("Contract Type" = const(Contract), Status = const(Signed), "Change Status" = const(Locked));
             RequestFilterFields = "Contract No.", "Item Filter";
 
             trigger OnAfterGetRecord()

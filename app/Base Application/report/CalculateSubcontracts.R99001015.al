@@ -7,12 +7,12 @@ report 99001015 "Calculate Subcontracts"
     {
         dataitem("Work Center"; "Work Center")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Subcontractor No.";
             dataitem("Prod. Order Routing Line"; "Prod. Order Routing Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING(Type, "No.") WHERE(Status = CONST(Released), Type = CONST("Work Center"), "Routing Status" = FILTER(< Finished));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting(Type, "No.") where(Status = const(Released), Type = const("Work Center"), "Routing Status" = filter(< Finished));
                 RequestFilterFields = "Prod. Order No.", "Starting Date";
 
                 trigger OnAfterGetRecord()

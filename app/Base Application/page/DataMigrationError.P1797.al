@@ -1,3 +1,5 @@
+namespace System.Integration;
+
 page 1797 "Data Migration Error"
 {
     Caption = 'Data Migration Errors';
@@ -98,7 +100,7 @@ page 1797 "Data Migration Error"
                     DataMigrationFacade: Codeunit "Data Migration Facade";
                     DataMigrationOverview: Page "Data Migration Overview";
                 begin
-                    DataMigrationFacade.OnBatchEditFromErrorView("Migration Type", "Destination Table ID");
+                    DataMigrationFacade.OnBatchEditFromErrorView(Rec."Migration Type", Rec."Destination Table ID");
 
                     if not Confirm(StrSubstNo(MigrateEntitiesAgainQst, DataMigrationOverview.Caption), true) then
                         exit;
@@ -135,10 +137,10 @@ page 1797 "Data Migration Error"
         StagingTableRecId: RecordID;
         DummyRecordId: RecordID;
     begin
-        StagingTableRecId := "Source Staging Table Record ID";
+        StagingTableRecId := Rec."Source Staging Table Record ID";
         StagingTableRecIdSpecified := StagingTableRecId <> DummyRecordId;
 
-        DataMigrationFacade.OnInitDataMigrationError("Migration Type", BulkFixErrorsButtonEnabled);
+        DataMigrationFacade.OnInitDataMigrationError(Rec."Migration Type", BulkFixErrorsButtonEnabled);
     end;
 
     trigger OnOpenPage()
@@ -203,7 +205,7 @@ page 1797 "Data Migration Error"
     begin
         DataMigrationError.ModifyAll("Scheduled For Retry", true, true);
 
-        DataMigrationFacade.StartMigration("Migration Type", true);
+        DataMigrationFacade.StartMigration(Rec."Migration Type", true);
 
         Message(MigrationStartedMsg, DataMigrationOverview.Caption);
         CurrPage.Close();

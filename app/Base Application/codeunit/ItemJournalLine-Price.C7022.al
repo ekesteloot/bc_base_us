@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+
 codeunit 7022 "Item Journal Line - Price" implements "Line With Price"
 {
     var
@@ -128,9 +137,7 @@ codeunit 7022 "Item Journal Line - Price" implements "Line With Price"
         PriceCalculationBuffer."Variant Code" := ItemJournalLine."Variant Code";
         PriceCalculationBuffer."Location Code" := ItemJournalLine."Location Code";
         PriceCalculationBuffer."Is SKU" := IsSKU;
-        PriceCalculationBuffer."Document Date" := ItemJournalLine."Posting Date";
-        if PriceCalculationBuffer."Document Date" = 0D then
-            PriceCalculationBuffer."Document Date" := WorkDate();
+        PriceCalculationBuffer."Document Date" := GetDocumentDate();
         PriceCalculationBuffer.Validate("Currency Code", '');
 
         // Tax
@@ -164,6 +171,12 @@ codeunit 7022 "Item Journal Line - Price" implements "Line With Price"
     begin
         if AmountType <> AmountType::Discount then
             ItemJournalLine.Validate("Unit Amount");
+    end;
+
+    local procedure GetDocumentDate() DocumentDate: Date;
+    begin
+        DocumentDate := ItemJournalLine.GetDateForCalculations();
+        OnAfterGetDocumentDate(DocumentDate, ItemJournalLine);
     end;
 
     procedure SetPrice(AmountType: enum "Price Amount Type"; PriceListLine: Record "Price List Line")
@@ -216,6 +229,11 @@ codeunit 7022 "Item Journal Line - Price" implements "Line With Price"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetPrice(var ItemJournalLine: Record "Item Journal Line"; PriceListLine: Record "Price List Line"; AmountType: Enum "Price Amount Type"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetDocumentDate(var DocumentDate: Date; ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 }

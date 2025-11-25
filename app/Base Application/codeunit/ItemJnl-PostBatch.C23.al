@@ -1,3 +1,22 @@
+﻿namespace Microsoft.InventoryMgt.Posting;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using System.Utilities;
+
 codeunit 23 "Item Jnl.-Post Batch"
 {
     Permissions = TableData "Item Journal Batch" = rimd,
@@ -223,17 +242,17 @@ codeunit 23 "Item Jnl.-Post Batch"
             IsHandled := false;
             OnBeforeCheckJnlLine(ItemJnlLine, SuppressCommit, IsHandled);
             if not IsHandled then
-                if ((ItemJnlLine."Value Entry Type" = "Cost Entry Type"::"Direct Cost") and (ItemJnlLine."Item Charge No." = '')) or
+                if ((ItemJnlLine."Value Entry Type" = ItemJnlLine."Value Entry Type"::"Direct Cost") and (ItemJnlLine."Item Charge No." = '')) or
                     ((ItemJnlLine."Invoiced Quantity" <> 0) and (ItemJnlLine.Amount <> 0))
                 then begin
                     ItemJnlCheckLine.RunCheck(ItemJnlLine);
 
                     if (ItemJnlLine.Quantity <> 0) and
-                        (ItemJnlLine."Value Entry Type" = "Cost Entry Type"::"Direct Cost") and (ItemJnlLine."Item Charge No." = '')
+                        (ItemJnlLine."Value Entry Type" = ItemJnlLine."Value Entry Type"::"Direct Cost") and (ItemJnlLine."Item Charge No." = '')
                     then
                         CheckWMSBin(ItemJnlLine);
 
-                    if (ItemJnlLine."Value Entry Type" = "Cost Entry Type"::Revaluation) and
+                    if (ItemJnlLine."Value Entry Type" = ItemJnlLine."Value Entry Type"::Revaluation) and
                         (ItemJnlLine."Inventory Value Per" = ItemJnlLine."Inventory Value Per"::" ") and ItemJnlLine."Partial Revaluation"
                     then
                         CheckRemainingQty();
@@ -279,7 +298,7 @@ codeunit 23 "Item Jnl.-Post Batch"
             if ItemJnlLine."Inventory Value Per" <> ItemJnlLine."Inventory Value Per"::" " then
                 ItemJnlPostSumLine(ItemJnlLine)
             else
-                if ((ItemJnlLine."Value Entry Type" = "Cost Entry Type"::"Direct Cost") and (ItemJnlLine."Item Charge No." = '')) or
+                if ((ItemJnlLine."Value Entry Type" = ItemJnlLine."Value Entry Type"::"Direct Cost") and (ItemJnlLine."Item Charge No." = '')) or
                     ((ItemJnlLine."Invoiced Quantity" <> 0) and (ItemJnlLine.Amount <> 0))
                 then begin
                     LineCount := LineCount + 1;
@@ -295,7 +314,7 @@ codeunit 23 "Item Jnl.-Post Batch"
                         OriginalQuantityBase := ItemJnlLine."Quantity (Base)";
                         if not ItemJnlPostLine.RunWithCheck(ItemJnlLine) then
                             ItemJnlPostLine.CheckItemTracking();
-                        if ItemJnlLine."Value Entry Type" <> "Cost Entry Type"::Revaluation then begin
+                        if ItemJnlLine."Value Entry Type" <> ItemJnlLine."Value Entry Type"::Revaluation then begin
                             ItemJnlPostLine.CollectTrackingSpecification(TempTrackingSpecification);
                             OnPostLinesBeforePostWhseJnlLine(ItemJnlLine, SuppressCommit);
                             PostWhseJnlLine(ItemJnlLine, OriginalQuantity, OriginalQuantityBase, TempTrackingSpecification);
@@ -893,7 +912,7 @@ codeunit 23 "Item Jnl.-Post Batch"
             SetRange("Item No.", SKU."Item No.");
             SetRange("Location Code", SKU."Location Code");
             SetRange("Variant Code", SKU."Variant Code");
-            SetRange("Source Type", DATABASE::"Prod. Order Component");
+            SetRange("Source Type", Enum::TableID::"Prod. Order Component");
             SetRange("Source ID", ItemJnlLine."Order No.");
             if IsEmpty() then
                 exit;

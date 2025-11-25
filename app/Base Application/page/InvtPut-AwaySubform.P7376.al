@@ -1,3 +1,11 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7376 "Invt. Put-away Subform"
 {
     AutoSplitKey = true;
@@ -8,7 +16,7 @@ page 7376 "Invt. Put-away Subform"
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Warehouse Activity Line";
-    SourceTableView = WHERE("Activity Type" = CONST("Invt. Put-away"));
+    SourceTableView = where("Activity Type" = const("Invt. Put-away"));
 
     layout
     {
@@ -191,6 +199,16 @@ page 7376 "Invt. Put-away Subform"
                     ToolTip = 'Specifies the code of the equipment required when you perform the action on the line.';
                     Visible = false;
                 }
+                field("Over-Receipt Quantity"; Rec."Over-Receipt Quantity")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies over-receipt quantity.';
+                }
+                field("Over-Receipt Code"; Rec."Over-Receipt Code")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies over-receipt code.';
+                }
             }
         }
     }
@@ -359,9 +377,7 @@ page 7376 "Invt. Put-away Subform"
     var
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         WMSMgt: Codeunit "WMS Management";
-        [InDataSet]
         ExpirationDateEditable: Boolean;
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     local procedure ShowSourceLine()
@@ -396,8 +412,8 @@ page 7376 "Invt. Put-away Subform"
         WhseActivLine: Record "Warehouse Activity Line";
     begin
         WhseActivLine.Copy(Rec);
-        SplitLine(WhseActivLine);
-        Copy(WhseActivLine);
+        Rec.SplitLine(WhseActivLine);
+        Rec.Copy(WhseActivLine);
         CurrPage.Update(false);
     end;
 
@@ -433,7 +449,7 @@ page 7376 "Invt. Put-away Subform"
         WhseActivLine: Record "Warehouse Activity Line";
     begin
         WhseActivLine.Copy(Rec);
-        AutofillQtyToHandle(WhseActivLine);
+        Rec.AutofillQtyToHandle(WhseActivLine);
     end;
 
     procedure DeleteQtyToHandle()
@@ -441,7 +457,7 @@ page 7376 "Invt. Put-away Subform"
         WhseActivLine: Record "Warehouse Activity Line";
     begin
         WhseActivLine.Copy(Rec);
-        DeleteQtyToHandle(WhseActivLine);
+        Rec.DeleteQtyToHandle(WhseActivLine);
     end;
 
     procedure UpdateForm()

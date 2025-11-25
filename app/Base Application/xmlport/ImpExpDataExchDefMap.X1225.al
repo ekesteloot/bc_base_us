@@ -1,3 +1,5 @@
+namespace System.IO;
+
 xmlport 1225 "Imp / Exp Data Exch Def & Map"
 {
     Caption = 'Imp / Exp Data Exch Def & Map';
@@ -138,11 +140,11 @@ xmlport 1225 "Imp / Exp Data Exch Def & Map"
                 }
                 tableelement("Data Exch. Line Def"; "Data Exch. Line Def")
                 {
-                    LinkFields = "Data Exch. Def Code" = FIELD(Code);
+                    LinkFields = "Data Exch. Def Code" = field(Code);
                     LinkTable = "Data Exch. Def";
                     MinOccurs = Zero;
                     XmlName = 'DataExchLineDef';
-                    SourceTableView = SORTING("Data Exch. Def Code", "Parent Code");
+                    SourceTableView = sorting("Data Exch. Def Code", "Parent Code");
                     fieldattribute(LineType; "Data Exch. Line Def"."Line Type")
                     {
                         Occurrence = Optional;
@@ -179,7 +181,7 @@ xmlport 1225 "Imp / Exp Data Exch Def & Map"
                     }
                     tableelement("Data Exch. Column Def"; "Data Exch. Column Def")
                     {
-                        LinkFields = "Data Exch. Def Code" = FIELD("Data Exch. Def Code"), "Data Exch. Line Def Code" = FIELD(Code);
+                        LinkFields = "Data Exch. Def Code" = field("Data Exch. Def Code"), "Data Exch. Line Def Code" = field(Code);
                         LinkTable = "Data Exch. Line Def";
                         MinOccurs = Zero;
                         XmlName = 'DataExchColumnDef';
@@ -296,7 +298,7 @@ xmlport 1225 "Imp / Exp Data Exch Def & Map"
                     }
                     tableelement("Data Exch. Mapping"; "Data Exch. Mapping")
                     {
-                        LinkFields = "Data Exch. Def Code" = FIELD("Data Exch. Def Code"), "Data Exch. Line Def Code" = FIELD(Code);
+                        LinkFields = "Data Exch. Def Code" = field("Data Exch. Def Code"), "Data Exch. Line Def Code" = field(Code);
                         LinkTable = "Data Exch. Line Def";
                         MinOccurs = Zero;
                         XmlName = 'DataExchMapping';
@@ -378,7 +380,7 @@ xmlport 1225 "Imp / Exp Data Exch Def & Map"
                         }
                         tableelement("Data Exch. Field Mapping"; "Data Exch. Field Mapping")
                         {
-                            LinkFields = "Data Exch. Def Code" = FIELD("Data Exch. Def Code"), "Data Exch. Line Def Code" = FIELD("Data Exch. Line Def Code"), "Table ID" = FIELD("Table ID");
+                            LinkFields = "Data Exch. Def Code" = field("Data Exch. Def Code"), "Data Exch. Line Def Code" = field("Data Exch. Line Def Code"), "Table ID" = field("Table ID");
                             LinkTable = "Data Exch. Mapping";
                             MinOccurs = Zero;
                             XmlName = 'DataExchFieldMapping';
@@ -655,7 +657,7 @@ xmlport 1225 "Imp / Exp Data Exch Def & Map"
                         }
                         tableelement("Data Exch. Field Grouping"; "Data Exch. Field Grouping")
                         {
-                            LinkFields = "Data Exch. Def Code" = FIELD("Data Exch. Def Code"), "Data Exch. Line Def Code" = FIELD("Data Exch. Line Def Code"), "Table ID" = FIELD("Table ID");
+                            LinkFields = "Data Exch. Def Code" = field("Data Exch. Def Code"), "Data Exch. Line Def Code" = field("Data Exch. Line Def Code"), "Table ID" = field("Table ID");
                             LinkTable = "Data Exch. Mapping";
                             MinOccurs = Zero;
                             XmlName = 'DataExchFieldGrouping';

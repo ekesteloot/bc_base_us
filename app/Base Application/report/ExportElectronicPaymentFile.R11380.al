@@ -8,13 +8,13 @@ report 11380 "Export Electronic Payment File"
     {
         dataitem("Gen. Journal Line"; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.") WHERE("Check Exported" = CONST(false), "Check Printed" = CONST(false), "Bank Payment Type" = FILTER("Electronic Payment" | "Electronic Payment-IAT"), "Document Type" = FILTER(Payment | Refund));
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.") where("Check Exported" = const(false), "Check Printed" = const(false), "Bank Payment Type" = filter("Electronic Payment" | "Electronic Payment-IAT"), "Document Type" = filter(Payment | Refund));
             RequestFilterFields = "Journal Template Name", "Journal Batch Name";
             dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
             {
-                DataItemLink = "Applies-to ID" = FIELD("Applies-to ID");
+                DataItemLink = "Applies-to ID" = field("Applies-to ID");
                 DataItemLinkReference = "Gen. Journal Line";
-                DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) WHERE(Open = CONST(true));
+                DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) where(Open = const(true));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -51,9 +51,9 @@ report 11380 "Export Electronic Payment File"
             }
             dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
             {
-                DataItemLink = "Applies-to ID" = FIELD("Applies-to ID");
+                DataItemLink = "Applies-to ID" = field("Applies-to ID");
                 DataItemLinkReference = "Gen. Journal Line";
-                DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) WHERE(Open = CONST(true));
+                DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) where(Open = const(true));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -90,7 +90,7 @@ report 11380 "Export Electronic Payment File"
             }
             dataitem(Unapplied; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
 
                 trigger OnAfterGetRecord()
                 begin

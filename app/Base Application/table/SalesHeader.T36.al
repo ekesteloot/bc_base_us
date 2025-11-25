@@ -1,4 +1,67 @@
-﻿table 36 "Sales Header"
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.BankMgt.Setup;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Outlook;
+using Microsoft.CRM.Task;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Posting;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Archive;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Request;
+using System;
+using System.Globalization;
+using System.Reflection;
+using System.Utilities;
+using Microsoft.Foundation.NoSeries;
+using System.Threading;
+using System.Email;
+using System.Security.User;
+using System.Environment.Configuration;
+
+table 36 "Sales Header"
 {
     Caption = 'Sales Header';
     DataCaptionFields = "No.", "Sell-to Customer Name";
@@ -27,12 +90,6 @@
                 if "No." = '' then
                     InitRecord();
                 TestStatusOpen();
-
-                IsHandled := false;
-                OnValidateSellToCustomerNoOnAfterTestStatusOpen(Rec, xRec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if ("Sell-to Customer No." <> xRec."Sell-to Customer No.") and
                    (xRec."Sell-to Customer No." <> '')
                 then begin
@@ -139,7 +196,7 @@
 
                 OnValidateSellToCustomerNoOnBeforeRecallModifyAddressNotification(Rec, xRec);
                 if (xRec."Sell-to Customer No." <> '') and (xRec."Sell-to Customer No." <> "Sell-to Customer No.") then
-                    RecallModifyAddressNotification(GetModifyCustomerAddressNotificationId());
+                    Rec.RecallModifyAddressNotification(GetModifyCustomerAddressNotificationId());
 
                 if xRec."Sell-to Customer No." <> "Sell-to Customer No." then begin
                     CopyCFDIFieldsFromCustomer;
@@ -172,11 +229,7 @@
             begin
                 TestStatusOpen();
                 BilltoCustomerNoChanged := xRec."Bill-to Customer No." <> "Bill-to Customer No.";
-
-                IsHandled := false;
-                OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(Rec, xRec, CurrFieldNo, IsHandled);
-
-                if BilltoCustomerNoChanged and not IsHandled then
+                if BilltoCustomerNoChanged then
                     if xRec."Bill-to Customer No." = '' then
                         InitRecord()
                     else
@@ -235,7 +288,7 @@
 
                 OnValidateBillToCustomerNoOnBeforeRecallModifyAddressNotification(Rec, xRec);
                 if (xRec."Bill-to Customer No." <> '') and (xRec."Bill-to Customer No." <> "Bill-to Customer No.") then
-                    RecallModifyAddressNotification(GetModifyBillToCustomerAddressNotificationId());
+                    Rec.RecallModifyAddressNotification(Rec.GetModifyBillToCustomerAddressNotificationId());
 
                 if xRec."Bill-to Customer No." <> "Bill-to Customer No." then begin
                     CopyCFDIFieldsFromCustomer;
@@ -304,11 +357,9 @@
         field(9; "Bill-to City"; Text[30])
         {
             Caption = 'Bill-to City';
-            TableRelation = IF ("Bill-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Bill-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Bill-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Bill-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Bill-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Bill-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -359,7 +410,7 @@
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Sell-to Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Sell-to Customer No."));
 
             trigger OnValidate()
             var
@@ -443,11 +494,9 @@
         field(17; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -493,6 +542,7 @@
 
             trigger OnValidate()
             var
+                SalesReceivablesSetup: Record "Sales & Receivables Setup";
                 IsHandled: Boolean;
                 NeedUpdateCurrencyFactor: Boolean;
             begin
@@ -518,8 +568,12 @@
 
                 IsHandled := false;
                 OnValidatePostingDateOnBeforeAssignDocumentDate(Rec, IsHandled);
+
+                SalesReceivablesSetup.SetLoadFields("Link Doc. Date To Posting Date");
+                SalesReceivablesSetup.GetRecordOnce();
+
                 if not IsHandled then
-                    if "Incoming Document Entry No." = 0 then
+                    if ("Incoming Document Entry No." = 0) and SalesReceivablesSetup."Link Doc. Date To Posting Date" then
                         Validate("Document Date", "Posting Date");
 
                 if ("Document Type" in ["Document Type"::Invoice, "Document Type"::"Credit Memo"]) and
@@ -664,7 +718,7 @@
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             var
@@ -690,24 +744,24 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(31; "Customer Posting Group"; Code[20])
@@ -893,6 +947,11 @@
                 MessageIfSalesLinesExist(FieldCaption("Language Code"));
             end;
         }
+        field(42; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(43; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
@@ -921,9 +980,9 @@
         }
         field(46; Comment; Boolean)
         {
-            CalcFormula = Exist("Sales Comment Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                            "No." = FIELD("No."),
-                                                            "Document Line No." = CONST(0)));
+            CalcFormula = exist("Sales Comment Line" where("Document Type" = field("Document Type"),
+                                                            "No." = field("No."),
+                                                            "Document Line No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -1004,9 +1063,9 @@
         field(55; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
 
             trigger OnValidate()
             begin
@@ -1029,9 +1088,9 @@
         }
         field(56; "Recalculate Invoice Disc."; Boolean)
         {
-            CalcFormula = Exist("Sales Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                    "Document No." = FIELD("No."),
-                                                    "Recalculate Invoice Disc." = CONST(true)));
+            CalcFormula = exist("Sales Line" where("Document Type" = field("Document Type"),
+                                                    "Document No." = field("No."),
+                                                    "Recalculate Invoice Disc." = const(true)));
             Caption = 'Recalculate Invoice Disc.';
             Editable = false;
             FieldClass = FlowField;
@@ -1051,20 +1110,20 @@
         }
         field(60; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line".Amount WHERE("Document Type" = FIELD("Document Type"),
-                                                         "Document No." = FIELD("No.")));
+            CalcFormula = sum("Sales Line".Amount where("Document Type" = field("Document Type"),
+                                                         "Document No." = field("No.")));
             Caption = 'Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(61; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line"."Amount Including VAT" WHERE("Document Type" = FIELD("Document Type"),
-                                                                         "Document No." = FIELD("No.")));
+            CalcFormula = sum("Sales Line"."Amount Including VAT" where("Document Type" = field("Document Type"),
+                                                                         "Document No." = field("No.")));
             Caption = 'Amount Including VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -1299,11 +1358,9 @@
         field(83; "Sell-to City"; Text[30])
         {
             Caption = 'Sell-to City';
-            TableRelation = IF ("Sell-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Sell-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Sell-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Sell-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Sell-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Sell-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -1364,8 +1421,6 @@
         {
             Caption = 'Bill-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -1408,7 +1463,7 @@
             var
                 FormatAddress: Codeunit "Format Address";
             begin
-                if not FormatAddress.UseCounty("Bill-to Country/Region Code") then
+                if not FormatAddress.UseCounty(Rec."Bill-to Country/Region Code") then
                     "Bill-to County" := '';
                 ModifyBillToCustomerAddress();
             end;
@@ -1416,11 +1471,9 @@
         field(88; "Sell-to Post Code"; Code[20])
         {
             Caption = 'Sell-to Post Code';
-            TableRelation = IF ("Sell-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Sell-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Sell-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Sell-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Sell-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Sell-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -1435,13 +1488,9 @@
             trigger OnValidate()
             var
                 IsHandled: Boolean;
-                DoExit: Boolean;
             begin
                 IsHandled := false;
-                OnBeforeValidateSellToPostCode(Rec, PostCode, CurrFieldNo, IsHandled, DoExit);
-                if DoExit then
-                    exit;
-
+                OnBeforeValidateSellToPostCode(Rec, PostCode, CurrFieldNo, IsHandled);
                 if not IsHandled then
                     PostCode.ValidatePostCode(
                         "Sell-to City", "Sell-to Post Code", "Sell-to County", "Sell-to Country/Region Code", (CurrFieldNo <> 0) and GuiAllowed);
@@ -1469,7 +1518,7 @@
             var
                 FormatAddress: Codeunit "Format Address";
             begin
-                if not FormatAddress.UseCounty("Sell-to Country/Region Code") then
+                if not FormatAddress.UseCounty(Rec."Sell-to Country/Region Code") then
                     "Sell-to County" := '';
                 UpdateShipToAddressFromSellToAddress(FieldNo("Ship-to Country/Region Code"));
                 ModifyCustomerAddress();
@@ -1479,11 +1528,9 @@
         field(91; "Ship-to Post Code"; Code[20])
         {
             Caption = 'Ship-to Post Code';
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -1516,7 +1563,7 @@
             Caption = 'Ship-to Country/Region Code';
             TableRelation = "Country/Region";
         }
-        field(94; "Bal. Account Type"; enum "Payment Balance Account Type")
+        field(94; "Bal. Account Type"; Enum "Payment Balance Account Type")
         {
             Caption = 'Bal. Account Type';
         }
@@ -2093,9 +2140,9 @@
             var
                 JobQueueEntry: Record "Job Queue Entry";
             begin
-                if "Job Queue Status" = "Job Queue Status"::" " then
+                if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                     exit;
-                JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
             end;
         }
         field(161; "Job Queue Entry ID"; Guid)
@@ -2106,7 +2153,7 @@
         field(163; "Company Bank Account Code"; Code[20])
         {
             Caption = 'Company Bank Account Code';
-            TableRelation = "Bank Account" where("Currency Code" = FIELD("Currency Code"));
+            TableRelation = "Bank Account" where("Currency Code" = field("Currency Code"));
 
             trigger OnValidate()
             begin
@@ -2133,9 +2180,9 @@
         }
         field(166; "Last Email Sent Time"; DateTime)
         {
-            CalcFormula = Max("O365 Document Sent History"."Created Date-Time" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                      "Document No." = FIELD("No."),
-                                                                                      Posted = CONST(false)));
+            CalcFormula = max("O365 Document Sent History"."Created Date-Time" where("Document Type" = field("Document Type"),
+                                                                                      "Document No." = field("No."),
+                                                                                      Posted = const(false)));
             Caption = 'Last Email Sent Time';
             FieldClass = FlowField;
             ObsoleteReason = 'Microsoft Invoicing has been discontinued.';
@@ -2149,10 +2196,10 @@
         }
         field(167; "Last Email Sent Status"; Option)
         {
-            CalcFormula = Lookup("O365 Document Sent History"."Job Last Status" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                       "Document No." = FIELD("No."),
-                                                                                       Posted = CONST(false),
-                                                                                       "Created Date-Time" = FIELD("Last Email Sent Time")));
+            CalcFormula = Lookup("O365 Document Sent History"."Job Last Status" where("Document Type" = field("Document Type"),
+                                                                                       "Document No." = field("No."),
+                                                                                       Posted = const(false),
+                                                                                       "Created Date-Time" = field("Last Email Sent Time")));
             Caption = 'Last Email Sent Status';
             FieldClass = FlowField;
             OptionCaption = 'Not Sent,In Process,Finished,Error';
@@ -2168,10 +2215,10 @@
         }
         field(168; "Sent as Email"; Boolean)
         {
-            CalcFormula = Exist("O365 Document Sent History" WHERE("Document Type" = FIELD("Document Type"),
-                                                                    "Document No." = FIELD("No."),
-                                                                    Posted = CONST(false),
-                                                                    "Job Last Status" = CONST(Finished)));
+            CalcFormula = exist("O365 Document Sent History" where("Document Type" = field("Document Type"),
+                                                                    "Document No." = field("No."),
+                                                                    Posted = const(false),
+                                                                    "Job Last Status" = const(Finished)));
             Caption = 'Sent as Email';
             FieldClass = FlowField;
             ObsoleteReason = 'Microsoft Invoicing has been discontinued.';
@@ -2185,10 +2232,10 @@
         }
         field(169; "Last Email Notif Cleared"; Boolean)
         {
-            CalcFormula = Lookup("O365 Document Sent History".NotificationCleared WHERE("Document Type" = FIELD("Document Type"),
-                                                                                         "Document No." = FIELD("No."),
-                                                                                         Posted = CONST(false),
-                                                                                         "Created Date-Time" = FIELD("Last Email Sent Time")));
+            CalcFormula = Lookup("O365 Document Sent History".NotificationCleared where("Document Type" = field("Document Type"),
+                                                                                         "Document No." = field("No."),
+                                                                                         Posted = const(false),
+                                                                                         "Created Date-Time" = field("Last Email Sent Time")));
             Caption = 'Last Email Notif Cleared';
             FieldClass = FlowField;
             ObsoleteReason = 'Microsoft Invoicing has been discontinued.';
@@ -2245,7 +2292,7 @@
         field(178; "Journal Templ. Name"; Code[10])
         {
             Caption = 'Journal Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Sales));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Sales));
 
             trigger OnValidate()
             begin
@@ -2290,16 +2337,16 @@
         }
         field(300; "Amt. Ship. Not Inv. (LCY)"; Decimal)
         {
-            CalcFormula = Sum("Sales Line"."Shipped Not Invoiced (LCY)" WHERE("Document Type" = FIELD("Document Type"),
-                                                                               "Document No." = FIELD("No.")));
+            CalcFormula = sum("Sales Line"."Shipped Not Invoiced (LCY)" where("Document Type" = field("Document Type"),
+                                                                               "Document No." = field("No.")));
             Caption = 'Amount Shipped Not Invoiced (LCY) Incl. VAT';
             Editable = false;
             FieldClass = FlowField;
         }
         field(301; "Amt. Ship. Not Inv. (LCY) Base"; Decimal)
         {
-            CalcFormula = Sum("Sales Line"."Shipped Not Inv. (LCY) No VAT" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                  "Document No." = FIELD("No.")));
+            CalcFormula = sum("Sales Line"."Shipped Not Inv. (LCY) No VAT" where("Document Type" = field("Document Type"),
+                                                                                  "Document No." = field("No.")));
             Caption = 'Amount Shipped Not Invoiced (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -2312,7 +2359,7 @@
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
 
             trigger OnValidate()
@@ -2347,24 +2394,24 @@
         field(1200; "Direct Debit Mandate ID"; Code[35])
         {
             Caption = 'Direct Debit Mandate ID';
-            TableRelation = "SEPA Direct Debit Mandate" WHERE("Customer No." = FIELD("Bill-to Customer No."),
-                                                               Closed = CONST(false),
-                                                               Blocked = CONST(false));
+            TableRelation = "SEPA Direct Debit Mandate" where("Customer No." = field("Bill-to Customer No."),
+                                                               Closed = const(false),
+                                                               Blocked = const(false));
         }
         field(1305; "Invoice Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line"."Inv. Discount Amount" WHERE("Document No." = FIELD("No."),
-                                                                         "Document Type" = FIELD("Document Type")));
+            CalcFormula = sum("Sales Line"."Inv. Discount Amount" where("Document No." = field("No."),
+                                                                         "Document Type" = field("Document Type")));
             Caption = 'Invoice Discount Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5043; "No. of Archived Versions"; Integer)
         {
-            CalcFormula = Max("Sales Header Archive"."Version No." WHERE("Document Type" = FIELD("Document Type"),
-                                                                          "No." = FIELD("No."),
-                                                                          "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence")));
+            CalcFormula = max("Sales Header Archive"."Version No." where("Document Type" = field("Document Type"),
+                                                                          "No." = field("No."),
+                                                                          "Doc. No. Occurrence" = field("Doc. No. Occurrence")));
             Caption = 'No. of Archived Versions';
             Editable = false;
             FieldClass = FlowField;
@@ -2413,11 +2460,6 @@
                 if "Sell-to Contact No." <> '' then
                     if Cont.Get("Sell-to Contact No.") then
                         Cont.CheckIfPrivacyBlockedGeneric();
-
-                IsHandled := false;
-                OnValidateSellToContactNoOnAfterContCheckIfPrivacyBlockedGeneric(Rec, xRec, IsHandled);
-                if IsHandled then
-                    exit;
 
                 if ("Sell-to Contact No." <> xRec."Sell-to Contact No.") and
                    (xRec."Sell-to Contact No." <> '')
@@ -2547,12 +2589,12 @@
         field(5055; "Opportunity No."; Code[20])
         {
             Caption = 'Opportunity No.';
-            TableRelation = IF ("Document Type" = FILTER(<> Order)) Opportunity."No." WHERE("Contact No." = FIELD("Sell-to Contact No."),
-                                                                                          Closed = CONST(false))
-            ELSE
-            IF ("Document Type" = CONST(Order)) Opportunity."No." WHERE("Contact No." = FIELD("Sell-to Contact No."),
-                                                                                                                                                          "Sales Document No." = FIELD("No."),
-                                                                                                                                                          "Sales Document Type" = CONST(Order));
+            TableRelation = if ("Document Type" = filter(<> Order)) Opportunity."No." where("Contact No." = field("Sell-to Contact No."),
+                                                                                          Closed = const(false))
+            else
+            if ("Document Type" = const(Order)) Opportunity."No." where("Contact No." = field("Sell-to Contact No."),
+                                                                                                                                                          "Sales Document No." = field("No."),
+                                                                                                                                                          "Sales Document Type" = const(Order));
 
             trigger OnValidate()
             begin
@@ -2627,7 +2669,7 @@
                     end;
                 end;
 
-                Validate("Ship-to Code", '');
+                Rec.Validate("Ship-to Code", '');
                 if BillToCustTemplate.Get("Bill-to Customer Templ. Code") then
                     InitFromBillToCustTemplate(BillToCustTemplate);
 
@@ -2673,31 +2715,33 @@
             Caption = 'Shipping Advice';
 
             trigger OnValidate()
+            var
+                SalesWarehouseMgt: Codeunit "Sales Warehouse Mgt.";
             begin
                 TestStatusOpen();
                 if InventoryPickConflict("Document Type", "No.", "Shipping Advice") then
                     Error(Text066, FieldCaption("Shipping Advice"), Format("Shipping Advice"), TableCaption);
                 if WhseShipmentConflict("Document Type", "No.", "Shipping Advice") then
                     Error(Text070, FieldCaption("Shipping Advice"), Format("Shipping Advice"), TableCaption);
-                WhseSourceHeader.SalesHeaderVerifyChange(Rec, xRec);
+                SalesWarehouseMgt.SalesHeaderVerifyChange(Rec, xRec);
             end;
         }
         field(5751; "Shipped Not Invoiced"; Boolean)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Exist("Sales Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                    "Document No." = FIELD("No."),
-                                                    "Qty. Shipped Not Invoiced" = FILTER(<> 0)));
+            CalcFormula = exist("Sales Line" where("Document Type" = field("Document Type"),
+                                                    "Document No." = field("No."),
+                                                    "Qty. Shipped Not Invoiced" = filter(<> 0)));
             Caption = 'Shipped Not Invoiced';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5752; "Completely Shipped"; Boolean)
         {
-            CalcFormula = Min("Sales Line"."Completely Shipped" WHERE("Document Type" = FIELD("Document Type"),
-                                                                       "Document No." = FIELD("No."),
-                                                                       Type = FILTER(<> " "),
-                                                                       "Location Code" = FIELD("Location Filter")));
+            CalcFormula = min("Sales Line"."Completely Shipped" where("Document Type" = field("Document Type"),
+                                                                       "Document No." = field("No."),
+                                                                       Type = filter(<> " "),
+                                                                       "Location Code" = field("Location Filter")));
             Caption = 'Completely Shipped';
             Editable = false;
             FieldClass = FlowField;
@@ -2716,16 +2760,16 @@
         field(5755; Shipped; Boolean)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Exist("Sales Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                    "Document No." = FIELD("No."),
-                                                    "Qty. Shipped (Base)" = FILTER(<> 0)));
+            CalcFormula = exist("Sales Line" where("Document Type" = field("Document Type"),
+                                                    "Document No." = field("No."),
+                                                    "Qty. Shipped (Base)" = filter(<> 0)));
             Caption = 'Shipped';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5756; "Last Shipment Date"; Date)
         {
-            CalcFormula = Lookup("Sales Shipment Header"."Shipment Date" WHERE("No." = FIELD("Last Shipping No.")));
+            CalcFormula = Lookup("Sales Shipment Header"."Shipment Date" where("No." = field("Last Shipping No.")));
             Caption = 'Last Shipment Date';
             FieldClass = FlowField;
         }
@@ -2797,7 +2841,7 @@
         field(5794; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
 
             trigger OnValidate()
             var
@@ -2819,11 +2863,11 @@
         field(5795; "Late Order Shipping"; Boolean)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Exist("Sales Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                    "Sell-to Customer No." = FIELD("Sell-to Customer No."),
-                                                    "Document No." = FIELD("No."),
-                                                    "Shipment Date" = FIELD("Date Filter"),
-                                                    "Outstanding Quantity" = FILTER(<> 0)));
+            CalcFormula = exist("Sales Line" where("Document Type" = field("Document Type"),
+                                                    "Sell-to Customer No." = field("Sell-to Customer No."),
+                                                    "Document No." = field("No."),
+                                                    "Shipment Date" = field("Date Filter"),
+                                                    "Outstanding Quantity" = filter(<> 0)));
             Caption = 'Late Order Shipping';
             Editable = false;
             FieldClass = FlowField;
@@ -2942,8 +2986,8 @@
         }
         field(10009; "Outstanding Amount ($)"; Decimal)
         {
-            CalcFormula = Sum("Sales Line"."Outstanding Amount (LCY)" WHERE("Document Type" = FIELD("Document Type"),
-                                                                             "Document No." = FIELD("No.")));
+            CalcFormula = sum("Sales Line"."Outstanding Amount (LCY)" where("Document Type" = field("Document Type"),
+                                                                             "Document No." = field("No.")));
             Caption = 'Outstanding Amount ($)';
             Editable = false;
             FieldClass = FlowField;
@@ -2960,9 +3004,9 @@
         field(10044; "Transport Operators"; Integer)
         {
             Caption = 'Transport Operators';
-            CalcFormula = Count("CFDI Transport Operator" WHERE("Document Table ID" = CONST(36),
-                                                                 "Document Type" = FIELD("Document Type"),
-                                                                 "Document No." = FIELD("No.")));
+            CalcFormula = count("CFDI Transport Operator" where("Document Table ID" = const(36),
+                                                                 "Document Type" = field("Document Type"),
+                                                                 "Document No." = field("No.")));
             FieldClass = FlowField;
         }
         field(10045; "Transit-from Date/Time"; DateTime)
@@ -2997,17 +3041,17 @@
         field(10052; "Trailer 1"; Code[20])
         {
             Caption = 'Trailer 1';
-            TableRelation = "Fixed Asset" WHERE("SAT Trailer Type" = FILTER(<> ''));
+            TableRelation = "Fixed Asset" where("SAT Trailer Type" = filter(<> ''));
         }
         field(10053; "Trailer 2"; Code[20])
         {
             Caption = 'Trailer 2';
-            TableRelation = "Fixed Asset" WHERE("SAT Trailer Type" = FILTER(<> ''));
+            TableRelation = "Fixed Asset" where("SAT Trailer Type" = filter(<> ''));
         }
         field(10055; "Transit-to Location"; Code[10])
         {
             Caption = 'Transit-to Location';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
             ObsoleteReason = 'Replaced with SAT Address ID.';
 #if not CLEAN23
             ObsoleteState = Pending;
@@ -3185,7 +3229,7 @@
         OnDeleteOnAfterPostSalesDeleteDeleteHeader(Rec);
 
         Validate("Applies-to ID", '');
-        Validate("Incoming Document Entry No.", 0);
+        Rec.Validate("Incoming Document Entry No.", 0);
 
         DeleteRecordInApprovalRequest();
         SalesLine.Reset();
@@ -3232,7 +3276,7 @@
         InitInsert();
         InsertMode := true;
 
-        SetSellToCustomerFromFilter();
+        Rec.SetSellToCustomerFromFilter();
 
         if GetFilterContNo() <> '' then
             Validate("Sell-to Contact No.", GetFilterContNo());
@@ -3314,7 +3358,6 @@
         CustCheckCreditLimit: Codeunit "Cust-Check Cr. Limit";
         DimMgt: Codeunit DimensionManagement;
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
-        WhseSourceHeader: Codeunit "Whse. Validate Source Header";
         SalesLineReserve: Codeunit "Sales Line-Reserve";
         PostingSetupMgt: Codeunit PostingSetupManagement;
         StandardCodesMgtGlobal: Codeunit "Standard Codes Mgt.";
@@ -3330,7 +3373,6 @@
         Text045: Label 'You can not change the %1 field because %2 %3 has %4 = %5 and the %6 has already been assigned %7 %8.';
         Text048: Label 'Sales quote %1 has already been assigned to opportunity %2. Would you like to reassign this quote?';
         Text049: Label 'The %1 field cannot be blank because this quote is linked to an opportunity.';
-        InsertMode: Boolean;
         Text051: Label 'The sales %1 %2 already exists.';
         Text053: Label 'You must cancel the approval process if you wish to change the %1.';
         Text056: Label 'Deleting this document will cause a gap in the number series for prepayment invoices. An empty prepayment invoice %1 will be created to fill this gap in the number series.\\Do you want to continue?';
@@ -3367,7 +3409,7 @@
         ModifyBillToCustomerAddressNotificationDescriptionTxt: Label 'Warn if the bill-to address on sales documents is different from the customer''s existing address.';
         DuplicatedCaptionsNotAllowedErr: Label 'Field captions must not be duplicated when using this method. Use UpdateSalesLinesByFieldNo instead.';
         PhoneNoCannotContainLettersErr: Label 'You cannot enter letters in this field.';
-        SplitMessageTxt: Label '%1\%2', Comment = 'Some message text 1.\Some message text 2.';
+        SplitMessageTxt: Label '%1\%2', Comment = 'Some message text 1.\Some message text 2.', Locked = true;
         ConfirmEmptyEmailQst: Label 'Contact %1 has no email address specified. The value in the Email field on the sales order, %2, will be deleted. Do you want to continue?', Comment = '%1 - Contact No., %2 - Email';
         FullSalesTypesTxt: Label 'Sales Quote,Sales Order,Sales Invoice,Sales Credit Memo,Sales Blanket Order,Sales Return Order';
         RecreateSalesLinesCancelErr: Label 'Change in the existing sales lines for the field %1 is cancelled by user.', Comment = '%1 - Field Name, Sample: You must delete the existing sales lines before you can change Currency Code.';
@@ -3387,6 +3429,7 @@
         NoSeriesMgt: Codeunit NoSeriesManagement;
         HideCreditCheckDialogue: Boolean;
         HideValidationDialog: Boolean;
+        InsertMode: Boolean;
         StatusCheckSuspended: Boolean;
         UpdateDocumentDate: Boolean;
         SkipSellToContact: Boolean;
@@ -3465,7 +3508,7 @@
         IsHandled := false;
         OnInitRecordOnBeforeGetNextArchiveDocOccurrenceNo(Rec, IsHandled);
         if not IsHandled then
-            "Doc. No. Occurrence" := ArchiveManagement.GetNextOccurrenceNo(DATABASE::"Sales Header", "Document Type".AsInteger(), "No.");
+            "Doc. No. Occurrence" := ArchiveManagement.GetNextOccurrenceNo(DATABASE::"Sales Header", Rec."Document Type".AsInteger(), Rec."No.");
 
         OnAfterInitRecord(Rec);
     end;
@@ -3573,7 +3616,7 @@
             if NoSeriesMgt.SelectSeries(GetNoSeriesCode(), OldSalesHeader."No. Series", "No. Series") then begin
                 if ("Sell-to Customer No." = '') and ("Sell-to Contact No." = '') then begin
                     HideCreditCheckDialogue := false;
-                    CheckCreditMaxBeforeInsert();
+                    Rec.CheckCreditMaxBeforeInsert();
                     HideCreditCheckDialogue := true;
                 end;
                 NoSeriesMgt.SetSeries("No.");
@@ -3815,14 +3858,7 @@
     end;
 
     local procedure ResetInvoiceDiscountValue()
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeResetInvoiceDiscountValue(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         if "Invoice Discount Value" <> 0 then begin
             CalcFields("Invoice Discount Amount");
             if "Invoice Discount Amount" = 0 then
@@ -3946,7 +3982,7 @@
         if ShouldCreateSalsesLine then begin
             CreateSalesLine(TempSalesLine);
             ExtendedTextAdded := false;
-            OnAfterRecreateSalesLine(SalesLine, TempSalesLine, Rec);
+            OnAfterRecreateSalesLine(SalesLine, TempSalesLine);
 
             if SalesLine.Type = SalesLine.Type::Item then
                 RecreateSalesLinesFillItemChargeAssignment(SalesLine, TempSalesLine, TempItemChargeAssgntSales);
@@ -3956,8 +3992,6 @@
                 TempInteger.Number := SalesLine."Line No.";
                 TempInteger.Insert();
             end;
-
-            OnRecreateSalesLinesHandleSupplementTypesOnAfterCreateSalesLine(Rec, SalesLine, TempSalesLine);
         end else
             if not ExtendedTextAdded then begin
                 TransferExtendedText.SalesCheckIfAnyExtText(SalesLine, true);
@@ -4066,7 +4100,7 @@
             exit;
 
         if "Currency Code" <> '' then begin
-            if "Posting Date" <> 0D then
+            if Rec."Posting Date" <> 0D then
                 CurrencyDate := "Posting Date"
             else
                 CurrencyDate := WorkDate();
@@ -4363,52 +4397,6 @@
                 Error('');
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20]; Type4: Integer; No4: Code[20]; Type5: Integer; No5: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        OldDimSetID: Integer;
-        IsHandled: Boolean;
-        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-    begin
-        IsHandled := false;
-        OnBeforeCreateDim(Rec, IsHandled, DefaultDimSource);
-        if IsHandled then
-            exit;
-
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        TableID[2] := Type2;
-        No[2] := No2;
-        TableID[3] := Type3;
-        No[3] := No3;
-        TableID[4] := Type4;
-        No[4] := No4;
-        TableID[5] := Type5;
-        No[5] := No5;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        OldDimSetID := "Dimension Set ID";
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup.Sales, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-
-        OnCreateDimOnBeforeUpdateLines(Rec, xRec, CurrFieldNo, OldDimSetID, DefaultDimSource);
-
-        if (OldDimSetID <> "Dimension Set ID") and SalesLinesExist() then begin
-            Modify();
-            UpdateAllLineDim("Dimension Set ID", OldDimSetID);
-        end;
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
@@ -4421,9 +4409,6 @@
             exit;
 
         SourceCodeSetup.Get();
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -4434,7 +4419,7 @@
 
         OnCreateDimOnBeforeUpdateLines(Rec, xRec, CurrFieldNo, OldDimSetID, DefaultDimSource);
 
-        if (OldDimSetID <> "Dimension Set ID") and (OldDimSetID <> 0) and guiallowed then
+        if (OldDimSetID <> "Dimension Set ID") and (OldDimSetID <> 0) and GuiAllowed and not GetHideValidationDialog() then
             if CouldDimensionsBeKept() then
                 if not ConfirmKeepExistingDimensions(OldDimSetID) then begin
                     "Dimension Set ID" := OldDimSetID;
@@ -4975,7 +4960,7 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckCustomerContactRelation(Rec, Cont, IsHandled, CustomerNo, ContBusinessRelationNo);
+        OnBeforeCheckCustomerContactRelation(Rec, Cont, IsHandled);
         if IsHandled then
             exit;
 
@@ -5037,6 +5022,7 @@
                 "VAT Registration No." := SearchContact."VAT Registration No.";
                 Validate("Currency Code", SearchContact."Currency Code");
                 "Language Code" := SearchContact."Language Code";
+                "Format Region" := SearchContact."Format Region";
 
                 OnUpdateBillToCustOnAfterSalesQuote(Rec, SearchContact);
 
@@ -5263,7 +5249,7 @@
         if IsHandled then
             exit;
 
-        Validate("Ship-to Code", Customer."Ship-to Code");
+        Rec.Validate("Ship-to Code", Customer."Ship-to Code");
     end;
 
     procedure ShowDocDim()
@@ -5544,7 +5530,7 @@
             FilterGroup(0);
         end;
 
-        SetRange("Date Filter", 0D, WorkDate());
+        Rec.SetRange("Date Filter", 0D, WorkDate());
     end;
 
     procedure SynchronizeForReservations(var NewSalesLine: Record "Sales Line"; OldSalesLine: Record "Sales Line")
@@ -5922,7 +5908,7 @@
             Error(ErrorInfo.Create(ShippingAdviceErr, true, Rec));
     end;
 
-    local procedure GetContactAsCompany(Contact: Record Contact; var SearchContact: Record Contact): Boolean;
+    protected procedure GetContactAsCompany(Contact: Record Contact; var SearchContact: Record Contact): Boolean;
     var
         IsHandled: Boolean;
     begin
@@ -5987,7 +5973,7 @@
 
         if "No." = '' then begin
             HideCreditCheckDialogue := false;
-            CheckCreditMaxBeforeInsert();
+            Rec.CheckCreditMaxBeforeInsert();
             HideCreditCheckDialogue := true;
         end;
     end;
@@ -6111,9 +6097,7 @@
         Commit();
     end;
 
-    procedure ShowDocumentStatisticsPage()
-    var
-        StatisticsPageId: Integer;
+    procedure ShowDocumentStatisticsPage() StatisticsPageId: Integer
     begin
         StatisticsPageId := GetStatisticsPageID();
 
@@ -6193,7 +6177,7 @@
 
     procedure SetStatus(NewStatus: Option)
     begin
-        Status := "Sales Document Status".FromInteger(NewStatus);
+        Status := Enum::"Sales Document Status".FromInteger(NewStatus);
         Modify();
     end;
 
@@ -6412,7 +6396,7 @@
     var
         DeferralHeader: Record "Deferral Header";
     begin
-        DeferralHeader.SetRange("Deferral Doc. Type", "Deferral Document Type"::Sales);
+        DeferralHeader.SetRange("Deferral Doc. Type", Enum::"Deferral Document Type"::Sales);
         DeferralHeader.SetRange("Gen. Jnl. Template Name", '');
         DeferralHeader.SetRange("Gen. Jnl. Batch Name", '');
         DeferralHeader.SetRange("Document Type", "Document Type");
@@ -6880,6 +6864,7 @@
         "Invoice Disc. Code" := BillToCustomer."Invoice Disc. Code";
         "Customer Disc. Group" := BillToCustomer."Customer Disc. Group";
         "Language Code" := BillToCustomer."Language Code";
+        "Format Region" := BillToCustomer."Format Region";
         SetSalespersonCode(BillToCustomer."Salesperson Code", "Salesperson Code");
         "Combine Shipments" := BillToCustomer."Combine Shipments";
         Reserve := BillToCustomer.Reserve;
@@ -7054,26 +7039,19 @@
         if IsCreditDocType() then
             exit;
 
-        IsHandled := false;
+        IsHandled := FALSE;
         OnUpdateShipToContactOnBeforeValidateShipToContact(Rec, xRec, CurrFieldNo, IsHandled);
         if not IsHandled then
             Validate("Ship-to Contact", "Sell-to Contact");
     end;
 
-    procedure ConfirmCloseUnposted() Result: Boolean
+    procedure ConfirmCloseUnposted(): Boolean
     var
         InstructionMgt: Codeunit "Instruction Mgt.";
-        IsHandled: Boolean;
     begin
-        if SalesLinesExist() then begin
-            IsHandled := false;
-            OnConfirmCloseUnpostedOnSalesLinesExist(Rec, Result, IsHandled);
-            if IsHandled then
-                exit(Result);
-
+        if SalesLinesExist() then
             if InstructionMgt.IsUnpostedEnabledForRecord(Rec) then
                 exit(InstructionMgt.ShowConfirm(DocumentNotPostedClosePageQst, InstructionMgt.QueryPostOnCloseCode()));
-        end;
         exit(true)
     end;
 
@@ -7319,7 +7297,7 @@
         NoOfSelected := SalesHeader.Count;
         SalesHeader.SetFilter(Status, '<>%1', SalesHeader.Status::Released);
         NoOfSkipped := NoOfSelected - SalesHeader.Count;
-        BatchProcessingMgt.BatchProcess(SalesHeader, Codeunit::"Sales Manual Release", "Error Handling Options"::"Show Error", NoOfSelected, NoOfSkipped);
+        BatchProcessingMgt.BatchProcess(SalesHeader, Codeunit::"Sales Manual Release", Enum::"Error Handling Options"::"Show Error", NoOfSelected, NoOfSkipped);
     end;
 
     internal procedure PerformManualRelease()
@@ -7341,7 +7319,7 @@
         NoOfSelected := SalesHeader.Count;
         SalesHeader.SetFilter(Status, '<>%1', SalesHeader.Status::Open);
         NoOfSkipped := NoOfSelected - SalesHeader.Count;
-        BatchProcessingMgt.BatchProcess(SalesHeader, Codeunit::"Sales Manual Reopen", "Error Handling Options"::"Show Error", NoOfSelected, NoOfSkipped);
+        BatchProcessingMgt.BatchProcess(SalesHeader, Codeunit::"Sales Manual Reopen", Enum::"Error Handling Options"::"Show Error", NoOfSelected, NoOfSkipped);
     end;
 
     procedure SelectSalesHeaderNewCustomerTemplate(): Code[20]
@@ -7710,6 +7688,7 @@
     var
         CurrentSalesLine: Record "Sales Line";
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         Resource: Record Resource;
     begin
         CurrentSalesLine.SetCurrentKey("Document Type", "Document No.", Type);
@@ -7727,6 +7706,12 @@
                         begin
                             Item.Get(CurrentSalesLine."No.");
                             Item.TestField(Blocked, false);
+
+                            if CurrentSalesLine."Variant Code" <> '' then begin
+                                ItemVariant.SetLoadFields(Blocked);
+                                ItemVariant.Get(CurrentSalesLine."No.", CurrentSalesLine."Variant Code");
+                                ItemVariant.TestField(Blocked, false);
+                            end
                         end;
                     CurrentSalesLine.Type::Resource:
                         begin
@@ -7837,7 +7822,7 @@
         else begin
             if "Bill-to Customer No." = "Sell-to Customer No." then
                 SkipBillToContact := true;
-            Validate("Bill-to Customer No.", "Sell-to Customer No.");
+            Rec.Validate("Bill-to Customer No.", Rec."Sell-to Customer No.");
             SkipBillToContact := false;
         end;
     end;
@@ -7939,7 +7924,7 @@
         exit("Posting Date");
     end;
 
-    local procedure InitPostingNoSeries()
+    procedure InitPostingNoSeries()
     var
         PostingNoSeries: Code[20];
     begin
@@ -8155,47 +8140,27 @@
         exit(Connected);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
+    internal procedure GetQtyReservedFromStockState() Result: Enum "Reservation From Stock"
     var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
+        SalesLineLocal: Record "Sales Line";
+        QtyReservedFromStock: Decimal;
     begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Sales Header", DefaultDimSource, TableID, No);
+        QtyReservedFromStock := SalesLineReserve.GetReservedQtyFromInventory(Rec);
+
+        SalesLineLocal.SetRange("Document Type", "Document Type");
+        SalesLineLocal.SetRange("Document No.", "No.");
+        SalesLineLocal.SetRange(Type, SalesLineLocal.Type::Item);
+        SalesLineLocal.CalcSums("Outstanding Qty. (Base)");
+
+        case QtyReservedFromStock of
+            0:
+                exit(Result::None);
+            SalesLineLocal."Outstanding Qty. (Base)":
+                exit(Result::Full);
+            else
+                exit(Result::Partial);
+        end;
     end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Sales Header", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDimTableIDs(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Sales Header") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDimTableIDs(var SalesHeader: Record "Sales Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterAssignDefaultVATBusPostingGroup(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; GenBusinessPostingGroup: Record "Gen. Business Posting Group")
@@ -8268,7 +8233,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterRecreateSalesLine(var SalesLine: Record "Sales Line"; var TempSalesLine: Record "Sales Line" temporary; var SalesHeader: Record "Sales Header")
+    local procedure OnAfterRecreateSalesLine(var SalesLine: Record "Sales Line"; var TempSalesLine: Record "Sales Line" temporary)
     begin
     end;
 
@@ -8412,14 +8377,6 @@
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by OnAfterInitDefaultDimensionSources() event', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var SalesHeader: Record "Sales Header"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateShortcutDimCode(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
@@ -8531,7 +8488,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckCustomerContactRelation(var SalesHeader: Record "Sales Header"; Cont: Record Contact; var IsHandled: Boolean; CustomerNo: Code[20]; ContBusinessRelationNo: Code[20])
+    local procedure OnBeforeCheckCustomerContactRelation(var SalesHeader: Record "Sales Header"; Cont: Record Contact; var IsHandled: Boolean)
     begin
     end;
 
@@ -8921,7 +8878,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateSellToPostCode(var SalesHeader: Record "Sales Header"; var PostCodeRec: Record "Post Code"; CurrentFieldNo: Integer; var IsHandled: Boolean; var DoExit: Boolean)
+    local procedure OnBeforeValidateSellToPostCode(var SalesHeader: Record "Sales Header"; var PostCodeRec: Record "Post Code"; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
@@ -9897,36 +9854,6 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckItemAvailabilityInLines(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateSellToCustomerNoOnAfterTestStatusOpen(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateBillToCustomerNoOnAfterCheckBilltoCustomerNoChanged(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; CurrFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateSellToContactNoOnAfterContCheckIfPrivacyBlockedGeneric(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnRecreateSalesLinesHandleSupplementTypesOnAfterCreateSalesLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; TempSalesLine: Record "Sales Line" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnConfirmCloseUnpostedOnSalesLinesExist(var SalesHeader: Record "Sales Header"; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeResetInvoiceDiscountValue(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 }

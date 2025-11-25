@@ -1,10 +1,25 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Sales.Setup;
+using System.Automation;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Privacy;
+using System.Threading;
+
 page 255 "Cash Receipt Journal"
 {
     AdditionalSearchTerms = 'customer payment';
     ApplicationArea = Basic, Suite;
     AutoSplitKey = true;
     Caption = 'Cash Receipt Journals';
-    DataCaptionExpression = DataCaption();
+    DataCaptionExpression = Rec.DataCaption();
     DelayedInsert = true;
     PageType = Worksheet;
     SaveValues = true;
@@ -267,7 +282,7 @@ page 255 "Cash Receipt Journal"
                     ToolTip = 'Specifies the code of the VAT product posting group that will be used when you post the entry on the journal line.';
                     Visible = false;
                 }
-                field("Applied (Yes/No)"; IsApplied())
+                field("Applied (Yes/No)"; Rec.IsApplied())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Applied (Yes/No)';
@@ -344,9 +359,9 @@ page 255 "Cash Receipt Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
@@ -360,9 +375,9 @@ page 255 "Cash Receipt Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
@@ -376,9 +391,9 @@ page 255 "Cash Receipt Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
@@ -392,14 +407,14 @@ page 255 "Cash Receipt Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 6);
                     end;
@@ -408,9 +423,9 @@ page 255 "Cash Receipt Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
@@ -424,9 +439,9 @@ page 255 "Cash Receipt Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
@@ -904,9 +919,9 @@ page 255 "Cash Receipt Journal"
                     Caption = 'Create a Power Automate approval flow';
                     ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
-                    Visible = IsSaaS and PowerAutomateTemplatesEnabled;
+                    Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
 #else
-                    Visible = IsSaaS;
+                    Visible = IsSaaS and IsPowerAutomatePrivacyNoticeApproved;
 #endif
                     CustomActionType = FlowTemplateGallery;
                     FlowTemplateCategoryName = 'd365bc_approval_generalJournal';
@@ -918,7 +933,7 @@ page 255 "Cash Receipt Journal"
                     Caption = 'Create a Power Automate approval flow';
                     Image = Flow;
                     ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
-                    Visible = IsSaaS and not PowerAutomateTemplatesEnabled;
+                    Visible = IsSaaS and not PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
                     ObsoleteReason = 'This action will be handled by platform as part of the CreateFlowFromTemplate customaction';
                     ObsoleteState = Pending;
                     ObsoleteTag = '22.0';
@@ -1014,7 +1029,7 @@ page 255 "Cash Receipt Journal"
                             ApprovalsMgmt.GetApprovalComment(Rec)
                         else
                             if OpenApprovalEntriesOnJnlBatchExist then
-                                if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
+                                if GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
                                     ApprovalsMgmt.GetApprovalComment(GenJournalBatch);
                     end;
                 }
@@ -1216,6 +1231,8 @@ page 255 "Cash Receipt Journal"
         GeneralLedgerSetup.GetRecordOnce();
         SalesReceivablesSetup.GetRecordOnce();
         SetJobQueueVisibility();
+
+        IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
 #if not CLEAN22
         InitPowerAutomateTemplateVisibility();
 #endif
@@ -1223,7 +1240,7 @@ page 255 "Cash Receipt Journal"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(RecordId);
+        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(Rec.RecordId);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1275,6 +1292,8 @@ page 255 "Cash Receipt Journal"
         ClientTypeManagement: Codeunit "Client Type Management";
         JournalErrorsMgt: Codeunit "Journal Errors Mgt.";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
+        PrivacyNotice: Codeunit "Privacy Notice";
+        PrivacyNoticeRegistrations: Codeunit "Privacy Notice Registrations";
         ChangeExchangeRate: Page "Change Exchange Rate";
         CurrentJnlBatchName: Code[10];
         AccName: Text[100];
@@ -1284,12 +1303,10 @@ page 255 "Cash Receipt Journal"
         NumberOfRecords: Integer;
         ShowBalance: Boolean;
         ShowTotalBalance: Boolean;
-        [InDataSet]
         BalanceVisible: Boolean;
-        [InDataSet]
         TotalBalanceVisible: Boolean;
-        [InDataSet]
         IsPostingGroupEditable: Boolean;
+        IsPowerAutomatePrivacyNoticeApproved: Boolean;
         OpenApprovalEntriesExistForCurrUser: Boolean;
         OpenApprovalEntriesExistForCurrUserBatch: Boolean;
         OpenApprovalEntriesOnJnlBatchExist: Boolean;
@@ -1401,7 +1418,7 @@ page 255 "Cash Receipt Journal"
         CanRequestFlowApprovalForLine: Boolean;
     begin
         OpenApprovalEntriesExistForCurrUser :=
-          OpenApprovalEntriesExistForCurrUserBatch or ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
+          OpenApprovalEntriesExistForCurrUserBatch or ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(Rec.RecordId);
 
         OpenApprovalEntriesOnJnlLineExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId());
         OpenApprovalEntriesOnBatchOrCurrJnlLineExist := OpenApprovalEntriesOnJnlBatchExist or OpenApprovalEntriesOnJnlLineExist;

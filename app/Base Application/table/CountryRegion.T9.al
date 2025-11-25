@@ -1,4 +1,11 @@
-﻿table 9 "Country/Region"
+﻿namespace Microsoft.Foundation.Address;
+
+using Microsoft.Foundation.Company;
+using System.Globalization;
+using System.Reflection;
+using System.Utilities;
+
+table 9 "Country/Region"
 {
     Caption = 'Country/Region';
     LookupPageID = "Countries/Regions";

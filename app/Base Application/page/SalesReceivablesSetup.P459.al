@@ -1,3 +1,15 @@
+namespace Microsoft.Sales.Setup;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Reminder;
+
 page 459 "Sales & Receivables Setup"
 {
     ApplicationArea = Basic, Suite;
@@ -47,7 +59,7 @@ page 459 "Sales & Receivables Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if amounts are rounded for sales invoices. Rounding is applied as specified in the Inv. Rounding Precision (LCY) field in the General Ledger Setup window. ';
                 }
-                field(DefaultItemQuantity; "Default Item Quantity")
+                field(DefaultItemQuantity; Rec."Default Item Quantity")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Default Item Quantity';
@@ -180,14 +192,12 @@ page 459 "Sales & Receivables Setup"
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies if multiple posting groups can be used for the same customer in sales documents.';
-                    Visible = MultiplePostingGroupsVisible;
                 }
                 field("Check Multiple Posting Groups"; Rec."Check Multiple Posting Groups")
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies implementation method of checking which posting groups can be used for the customer.';
-                    Visible = MultiplePostingGroupsVisible;
                 }
                 field("Ignore Updated Addresses"; Rec."Ignore Updated Addresses")
                 {
@@ -211,19 +221,6 @@ page 459 "Sales & Receivables Setup"
                     Importance = Additional;
                     ToolTip = 'Specifies that the description on document lines of type G/L Account will be carried to the resulting general ledger entries.';
                 }
-#if not CLEAN20
-                field("Invoice Posting Setup"; Rec."Invoice Posting Setup")
-                {
-                    ApplicationArea = Advanced;
-                    Editable = false;
-                    Importance = Additional;
-                    ToolTip = 'Specifies invoice posting implementation codeunit which is used for posting of sales invoices.';
-                    Visible = false;
-                    ObsoleteReason = 'Replaced by direct selection of posting interface in codeunits.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '20.0';
-                }
-#endif
                 field("Document Default Line Type"; Rec."Document Default Line Type")
                 {
                     ApplicationArea = Basic, Suite;
@@ -234,6 +231,12 @@ page 459 "Sales & Receivables Setup"
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies that you can change the names of customers on open sales documents. The change applies only to the documents.';
+                }
+                field("Update Document Date When Posting Date Is Modified"; Rec."Link Doc. Date To Posting Date")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies whether the document date changes when the posting date is modified.';
+                    Importance = Additional;
                 }
             }
             group(Prices)
@@ -423,17 +426,6 @@ page 459 "Sales & Receivables Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if you want to archive sales quotes when they are deleted.';
                 }
-#if not CLEAN20
-                field("Batch Archiving Quotes"; Rec."Batch Archiving Quotes")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies if deleted sales quotes can be manually archived with the Archived Sales Quotes batch job.';
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'The field is part of the removed functionality.';
-                    ObsoleteTag = '20.0';
-                }
-#endif
                 field("Archive Blanket Orders"; Rec."Archive Blanket Orders")
                 {
                     ApplicationArea = Basic, Suite;
@@ -674,7 +666,6 @@ page 459 "Sales & Receivables Setup"
         GeneralLedgerSetup: Record "General Ledger Setup";
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
-        FeatureKeyManagement: Codeunit "Feature Key Management";
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -687,13 +678,11 @@ page 459 "Sales & Receivables Setup"
         CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled();
         GeneralLedgerSetup.Get();
         JnlTemplateNameVisible := GeneralLedgerSetup."Journal Templ. Name Mandatory";
-        MultiplePostingGroupsVisible := FeatureKeyManagement.IsAllowMultipleCustVendPostingGroupsEnabled();
     end;
 
     var
         ExtendedPriceEnabled: Boolean;
         CRMIntegrationEnabled: Boolean;
         JnlTemplateNameVisible: Boolean;
-        MultiplePostingGroupsVisible: Boolean;
 }
 

@@ -1,3 +1,8 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.FinancialMgt.Dimension;
+using System.Security.User;
+
 page 850 "Cash Flow Forecast Entries"
 {
     ApplicationArea = Basic, Suite;
@@ -19,7 +24,7 @@ page 850 "Cash Flow Forecast Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the cash flow date that the entry is posted to.';
                 }
-                field(Overdue; Overdue)
+                field(Overdue; Rec.Overdue)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry is related to an overdue payment. ';
@@ -46,7 +51,7 @@ page 850 "Cash Flow Forecast Entries"
 
                     trigger OnDrillDown()
                     begin
-                        ShowSource(false);
+                        Rec.ShowSource(false);
                     end;
                 }
                 field("Source Type"; Rec."Source Type")
@@ -61,7 +66,7 @@ page 850 "Cash Flow Forecast Entries"
 
                     trigger OnDrillDown()
                     begin
-                        ShowSource(true);
+                        Rec.ShowSource(true);
                     end;
                 }
                 field("Payment Discount"; Rec."Payment Discount")
@@ -95,7 +100,7 @@ page 850 "Cash Flow Forecast Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Entry No."; Rec."Entry No.")
@@ -174,7 +179,7 @@ page 850 "Cash Flow Forecast Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -187,7 +192,7 @@ page 850 "Cash Flow Forecast Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
                 action(GLDimensionOverview)
@@ -212,7 +217,7 @@ page 850 "Cash Flow Forecast Entries"
 
                 trigger OnAction()
                 begin
-                    ShowSource(false);
+                    Rec.ShowSource(false);
                 end;
             }
         }
@@ -249,12 +254,12 @@ page 850 "Cash Flow Forecast Entries"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
     begin
-        exit(Next(Steps));
+        exit(Rec.Next(Steps));
     end;
 
     trigger OnOpenPage()

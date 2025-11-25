@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.Capacity;
+
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+
 table 99000760 "Calendar Absence Entry"
 {
     Caption = 'Calendar Absence Entry';
@@ -15,9 +20,9 @@ table 99000760 "Calendar Absence Entry"
         {
             Caption = 'No.';
             NotBlank = true;
-            TableRelation = IF ("Capacity Type" = CONST("Work Center")) "Work Center"
-            ELSE
-            IF ("Capacity Type" = CONST("Machine Center")) "Machine Center";
+            TableRelation = if ("Capacity Type" = const("Work Center")) "Work Center"
+            else
+            if ("Capacity Type" = const("Machine Center")) "Machine Center";
 
             trigger OnValidate()
             begin

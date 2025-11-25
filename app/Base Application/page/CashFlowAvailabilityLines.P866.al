@@ -1,3 +1,9 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Setup;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 866 "Cash Flow Availability Lines"
 {
     Caption = 'Lines';
@@ -23,7 +29,7 @@ page 866 "Cash Flow Availability Lines"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the accounting period. it is a good idea to use descriptive names, such as Month01, 1st Month, 1st Month/2000, Month01-2000, M1-2001/2002, etc.';
                 }
-                field(Receivables; Receivables)
+                field(Receivables; Rec.Receivables)
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = FormatStr();
@@ -36,7 +42,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::Receivables);
                     end;
                 }
-                field(SalesOrders; "Sales Orders")
+                field(SalesOrders; Rec."Sales Orders")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = FormatStr();
@@ -49,7 +55,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::"Sales Orders");
                     end;
                 }
-                field(ServiceOrders; "Service Orders")
+                field(ServiceOrders; Rec."Service Orders")
                 {
                     ApplicationArea = Service;
                     AutoFormatExpression = FormatStr();
@@ -62,7 +68,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::"Service Orders");
                     end;
                 }
-                field(SalesofFixedAssets; "Fixed Assets Disposal")
+                field(SalesofFixedAssets; Rec."Fixed Assets Disposal")
                 {
                     ApplicationArea = FixedAssets;
                     AutoFormatExpression = FormatStr();
@@ -75,7 +81,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::"Fixed Assets Disposal");
                     end;
                 }
-                field(ManualRevenues; "Cash Flow Manual Revenues")
+                field(ManualRevenues; Rec."Cash Flow Manual Revenues")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = FormatStr();
@@ -88,7 +94,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::"Cash Flow Manual Revenue");
                     end;
                 }
-                field(Payables; Payables)
+                field(Payables; Rec.Payables)
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = FormatStr();
@@ -101,7 +107,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::Payables);
                     end;
                 }
-                field(PurchaseOrders; "Purchase Orders")
+                field(PurchaseOrders; Rec."Purchase Orders")
                 {
                     ApplicationArea = Suite;
                     AutoFormatExpression = FormatStr();
@@ -114,7 +120,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::"Purchase Orders");
                     end;
                 }
-                field(BudgetedFixedAssets; "Fixed Assets Budget")
+                field(BudgetedFixedAssets; Rec."Fixed Assets Budget")
                 {
                     ApplicationArea = FixedAssets;
                     AutoFormatExpression = FormatStr();
@@ -127,7 +133,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::"Fixed Assets Budget");
                     end;
                 }
-                field(ManualExpenses; "Cash Flow Manual Expenses")
+                field(ManualExpenses; Rec."Cash Flow Manual Expenses")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = FormatStr();
@@ -140,7 +146,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::"Cash Flow Manual Expense");
                     end;
                 }
-                field(Budget; "G/L Budget")
+                field(Budget; Rec."G/L Budget")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = FormatStr();
@@ -153,7 +159,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::"G/L Budget");
                     end;
                 }
-                field(Job; Job)
+                field(Job; Rec.Job)
                 {
                     ApplicationArea = Jobs;
                     AutoFormatExpression = FormatStr();
@@ -166,7 +172,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::Job);
                     end;
                 }
-                field(Tax; Tax)
+                field(Tax; Rec.Tax)
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = FormatStr();
@@ -179,7 +185,7 @@ page 866 "Cash Flow Availability Lines"
                         CashFlowForecast.DrillDownSourceTypeEntries(CashFlowForecast."Source Type Filter"::Tax);
                     end;
                 }
-                field(Total; Total)
+                field(Total; Rec.Total)
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = FormatStr();
@@ -204,12 +210,12 @@ page 866 "Cash Flow Availability Lines"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CashFlowForecast.SetCashFlowDateFilter("Period Start", "Period End");
+        CashFlowForecast.SetCashFlowDateFilter(Rec."Period Start", Rec."Period End");
     end;
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcLine();
     end;
 
@@ -233,7 +239,7 @@ page 866 "Cash Flow Availability Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     protected var

@@ -1,7 +1,7 @@
 report 5205 "Employee - Absences by Causes"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeAbsencesbyCauses.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeAbsencesbyCauses.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee Absences by Causes';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +10,7 @@ report 5205 "Employee - Absences by Causes"
     {
         dataitem("Employee Absence"; "Employee Absence")
         {
-            DataItemTableView = SORTING("Cause of Absence Code", "From Date");
+            DataItemTableView = sorting("Cause of Absence Code", "From Date");
             RequestFilterFields = "Employee No.", "From Date", "Cause of Absence Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

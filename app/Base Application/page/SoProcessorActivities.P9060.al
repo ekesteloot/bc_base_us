@@ -1,3 +1,13 @@
+﻿namespace Microsoft.Sales.RoleCenters;
+
+using Microsoft.Sales.Document;
+using Microsoft.Shared.Navigate;
+using System;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Feedback;
+using System.Visualization;
+
 page 9060 "SO Processor Activities"
 {
     Caption = 'Activities';

@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 page 494 "Finance Charge Terms Card"
 {
     Caption = 'Finance Charge Terms Card';
@@ -11,7 +13,7 @@ page 494 "Finance Charge Terms Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a code for the finance charge terms.';

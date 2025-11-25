@@ -1,3 +1,9 @@
+﻿namespace System.Security.AccessControl;
+
+using System.Azure.Identity;
+using System.Reflection;
+using System.Upgrade;
+
 codeunit 104061 "Upgrade User Groups"
 {
     Subtype = Upgrade;

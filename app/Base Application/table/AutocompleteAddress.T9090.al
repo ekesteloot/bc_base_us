@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Address;
+
 table 9090 "Autocomplete Address"
 {
     Caption = 'Autocomplete Address';
@@ -23,9 +25,7 @@ table 9090 "Autocomplete Address"
         field(5; Postcode; Text[20])
         {
             Caption = 'Postcode';
-            TableRelation = "Post Code" WHERE("Country/Region Code" = FIELD("Country / Region"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Post Code" where("Country/Region Code" = field("Country / Region"));
             ValidateTableRelation = false;
         }
         field(6; "Country / Region"; Text[10])

@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.FinancialMgt.Analysis;
+
 page 108 "Financial Reports"
 {
     ApplicationArea = Basic, Suite;
@@ -240,7 +244,7 @@ page 108 "Financial Reports"
                     AccSchedOverview: Page "Acc. Schedule Overview";
                 begin
                     AccSchedOverview.SetViewOnlyMode(false);
-                    AccSchedOverview.SetFinancialReportName(Name);
+                    AccSchedOverview.SetFinancialReportName(Rec.Name);
                     AccSchedOverview.Run();
                 end;
             }

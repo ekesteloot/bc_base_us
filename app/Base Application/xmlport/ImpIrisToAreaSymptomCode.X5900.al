@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 xmlport 5900 "Imp. IRIS to Area/Symptom Code"
 {
     Caption = 'Imp. IRIS to Area/Symptom Code';

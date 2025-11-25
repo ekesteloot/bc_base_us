@@ -1,3 +1,11 @@
+namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Setup;
+
 report 5688 "Cancel FA Ledger Entries"
 {
     Caption = 'Cancel FA Ledger Entries';
@@ -7,7 +15,7 @@ report 5688 "Cancel FA Ledger Entries"
     {
         dataitem("Fixed Asset"; "Fixed Asset")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "FA Class Code", "FA Subclass Code";
 
             trigger OnAfterGetRecord()

@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+
 table 5822 "Invt. Post to G/L Test Buffer"
 {
     Caption = 'Invt. Post to G/L Test Buffer';

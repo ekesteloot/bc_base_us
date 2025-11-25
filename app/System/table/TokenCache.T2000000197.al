@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Security.Authentication;
+
+using System.Security.AccessControl;
+
 table 2000000197 "Token Cache"
 {
     Caption = 'Token Cache';
@@ -39,11 +47,11 @@ table 2000000197 "Token Cache"
         {
             Caption = 'Tenant String Unique ID';
         }
-		field(8; "Home Account ID"; Text[120])
+        field(8; "Home Account ID"; Text[120])
         {
             Caption = 'Home Account ID';
         }
-		field(9; "Login Hint"; Text[120])
+        field(9; "Login Hint"; Text[120])
         {
             Caption = 'Login Hint';
         }

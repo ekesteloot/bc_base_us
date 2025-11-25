@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 page 5125 "Opportunity Subform"
 {
     Caption = 'Sales Cycle Stages';
@@ -5,8 +7,8 @@ page 5125 "Opportunity Subform"
     LinksAllowed = false;
     PageType = ListPart;
     SourceTable = "Opportunity Entry";
-    SourceTableView = SORTING("Opportunity No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Opportunity No.")
+                      order(Descending);
 
     layout
     {
@@ -15,7 +17,7 @@ page 5125 "Opportunity Subform"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Active; Active)
+                field(Active; Rec.Active)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies that the opportunity entry is active.';

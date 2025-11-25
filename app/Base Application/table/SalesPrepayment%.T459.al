@@ -25,9 +25,9 @@ table 459 "Sales Prepayment %"
         field(3; "Sales Code"; Code[20])
         {
             Caption = 'Sales Code';
-            TableRelation = IF ("Sales Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Sales Type" = CONST("Customer Price Group")) "Customer Price Group";
+            TableRelation = if ("Sales Type" = const(Customer)) Customer
+            else
+            if ("Sales Type" = const("Customer Price Group")) "Customer Price Group";
 
             trigger OnValidate()
             begin

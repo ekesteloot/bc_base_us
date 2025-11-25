@@ -1,3 +1,10 @@
+namespace Microsoft.WarehouseMgt.Ledger;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Tracking;
+using System.DataAdministration;
+using System.Utilities;
+
 report 7398 "Date Compress Whse. Entries"
 {
     Caption = 'Date Compress Whse. Entries';
@@ -10,7 +17,7 @@ report 7398 "Date Compress Whse. Entries"
     {
         dataitem("Warehouse Entry"; "Warehouse Entry")
         {
-            DataItemTableView = SORTING("Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code", "Lot No.", "Serial No.", "Entry Type", Dedicated, "Package No.");
+            DataItemTableView = sorting("Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code", "Lot No.", "Serial No.", "Entry Type", Dedicated, "Package No.");
             RequestFilterFields = "Item No.", "Bin Code", "Location Code", "Zone Code";
 
             trigger OnAfterGetRecord()
@@ -290,7 +297,6 @@ report 7398 "Date Compress Whse. Entries"
         Text008: Label 'Date Compressed';
         HideDialog: Boolean;
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
 
         CompressEntriesQst: Label 'This batch job deletes entries. We recommend that you create a backup of the database before you run the batch job.\\Do you want to continue?';
@@ -317,7 +323,7 @@ report 7398 "Date Compress Whse. Entries"
         NextRegNo := DateComprReg.GetLastEntryNo() + 1;
 
         DateComprReg.InitRegister(
-          DATABASE::"Warehouse Entry", NextRegNo,
+          Enum::TableID::"Warehouse Entry".AsInteger(), NextRegNo,
           EntrdDateComprReg."Starting Date", EntrdDateComprReg."Ending Date", EntrdDateComprReg."Period Length",
           WhseEntryFilter, WhseReg."No.", SourceCodeSetup."Compress Whse. Entries");
 

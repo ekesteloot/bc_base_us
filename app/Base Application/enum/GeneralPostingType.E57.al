@@ -1,4 +1,6 @@
-﻿enum 57 "General Posting Type"
+﻿namespace Microsoft.Foundation.Enums;
+
+enum 57 "General Posting Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

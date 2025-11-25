@@ -1,3 +1,8 @@
+namespace System.Integration;
+
+using System;
+using System.Utilities;
+
 codeunit 1299 "Web Request Helper"
 {
 

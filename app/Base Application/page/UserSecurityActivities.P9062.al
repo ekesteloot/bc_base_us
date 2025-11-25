@@ -1,3 +1,16 @@
+﻿namespace System.Security.User;
+
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using System;
+using System.Azure.Identity;
+using System.Diagnostics;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Feedback;
+using System.Privacy;
+using System.Security.AccessControl;
+
 page 9062 "User Security Activities"
 {
     Caption = 'User Security Activities';
@@ -159,10 +172,10 @@ page 9062 "User Security Activities"
         if SoftwareAsAService then
             NumberOfPlans := GetNumberOfPlans();
         UserSecurityStatus.LoadUsers();
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
         DataSensitivity.SetRange("Company Name", CompanyName);

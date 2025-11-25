@@ -1,7 +1,11 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Task;
+
 report 5059 "Team - Tasks"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/TeamTasks.rdlc';
+    RDLCLayout = './CRM/Reports/TeamTasks.rdlc';
     ApplicationArea = RelationshipMgmt;
     Caption = 'Team Tasks';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5059 "Team - Tasks"
     {
         dataitem("To-do"; "To-do")
         {
-            DataItemTableView = SORTING("Team Code", Date) WHERE("System To-do Type" = CONST(Team));
+            DataItemTableView = sorting("Team Code", Date) where("System To-do Type" = const(Team));
             RequestFilterFields = "Team Code", Date, "Campaign No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

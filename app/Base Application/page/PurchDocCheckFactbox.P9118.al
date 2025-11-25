@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Document;
+
+using System.Utilities;
+
 page 9118 "Purch. Doc. Check Factbox"
 {
     PageType = ListPart;

@@ -1,7 +1,15 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 report 38 "Trial Balance by Period"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/TrialBalancebyPeriod.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/TrialBalancebyPeriod.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Trial Balance by Period';
     PreviewMode = PrintLayout;
@@ -12,7 +20,7 @@ report 38 "Trial Balance by Period"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Income/Balance", "Account Type", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {
@@ -88,7 +96,7 @@ report 38 "Trial Balance by Period"
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
 
                 trigger OnPreDataItem()
                 begin
@@ -97,7 +105,7 @@ report 38 "Trial Balance by Period"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(ColumnValuesAsText_4_; ColumnValuesAsText[4])
                 {
                     AutoCalcField = false;
@@ -343,15 +351,7 @@ report 38 "Trial Balance by Period"
         AccountingPeriod2: Record "Accounting Period";
         GLIndent: Record "G/L Account";
         MatrixMgt: Codeunit "Matrix Management";
-        PeriodStartingDate: Date;
-        StartDate: array[20] of Date;
-        EndDate: array[20] of Date;
-        ColumnValuesAsText: array[13] of Text[30];
-        RoundingText: Text[80];
-        Header: array[13, 2] of Text[100];
-        RoundingFactor: Enum "Analysis Rounding Factor";
         i: Integer;
-        MaxCount: Integer;
         RoundingFactorInt: Integer;
         PageGroupNo: Integer;
         GLAccountType: Integer;
@@ -364,7 +364,6 @@ report 38 "Trial Balance by Period"
         Text014: Label 'Indentation Level %1 is not used in the Chart of Accounts. This Chart of Accounts uses max. %2 levels.';
         IndentationLevelCap: Label 'Indentation Level : %1';
         IsNewPage: Boolean;
-        Indent: Option "None","0","1","2","3","4","5";
         MaxIndent: Text[5];
         LastPageText50Lbl: Label '/ Last Page';
         LastPageText51Lbl: Label '/ Continued';
@@ -374,6 +373,15 @@ report 38 "Trial Balance by Period"
 
     protected var
         GLFilter: Text;
+        PeriodStartingDate: Date;
+        StartDate: array[20] of Date;
+        EndDate: array[20] of Date;
+        ColumnValuesAsText: array[13] of Text[30];
+        RoundingText: Text[80];
+        Header: array[13, 2] of Text[100];
+        RoundingFactor: Enum "Analysis Rounding Factor";
+        MaxCount: Integer;
+        Indent: Option "None","0","1","2","3","4","5";
 
     local procedure AccPeriodEndDate(UseStartDate: Date): Date
     var

@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+
 codeunit 60 "Sales-Calc. Discount"
 {
     Permissions = tabledata "Sales Header" = rm,
@@ -10,7 +17,7 @@ codeunit 60 "Sales-Calc. Discount"
     begin
         SalesLine.Copy(Rec);
 
-        TempSalesHeader.Get("Document Type", "Document No.");
+        TempSalesHeader.Get(Rec."Document Type", Rec."Document No.");
         UpdateHeader := true;
 
         IsHandled := false;
@@ -18,7 +25,7 @@ codeunit 60 "Sales-Calc. Discount"
         if not IsHandled then
             CalculateInvoiceDiscount(TempSalesHeader, TempSalesLine);
 
-        if Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.") then;
+        if Rec.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.") then;
     end;
 
     var
@@ -65,7 +72,8 @@ codeunit 60 "Sales-Calc. Discount"
             SalesLine2.SetRange("System-Created Entry", true);
             SalesLine2.SetRange(Type, SalesLine2.Type::"G/L Account");
             SalesLine2.SetRange("No.", CustPostingGr."Service Charge Acc.");
-            if SalesLine2.FindSet(true, false) then
+            SalesLine2.SetLoadFields("Unit Price", "Shipment No.", "Qty. Shipped Not Invoiced");
+            if SalesLine2.FindSet(true) then
                 repeat
                     SalesLine2."Unit Price" := 0;
                     SalesLine2.Modify();
@@ -74,6 +82,7 @@ codeunit 60 "Sales-Calc. Discount"
                 until SalesLine2.Next() = 0;
 
             SalesLine2.Reset();
+            SalesLine2.SetLoadFields();
             SalesLine2.SetRange("Document Type", "Document Type");
             SalesLine2.SetRange("Document No.", "Document No.");
             SalesLine2.SetFilter(Type, '<>0');
@@ -145,7 +154,7 @@ codeunit 60 "Sales-Calc. Discount"
                 if TempServiceChargeLine.FindSet(false, false) then
                     repeat
                         if (TempServiceChargeLine."Shipment No." = '') and (TempServiceChargeLine."Qty. Shipped Not Invoiced" = 0) then begin
-                            SalesLine2 := TempServiceChargeLine;
+                            SalesLine2.Get("Document Type", "Document No.", TempServiceChargeLine."Line No.");
                             IsHandled := false;
                             OnCalculateInvoiceDiscountOnBeforeSalesLine2DeleteTrue(UpdateHeader, SalesLine2, IsHandled);
                             if not IsHandled then
@@ -218,7 +227,7 @@ codeunit 60 "Sales-Calc. Discount"
             SalesLine.Validate("Unit Price", CustInvDisc."Service Charge");
     end;
 
-    local procedure CustInvDiscRecExists(InvDiscCode: Code[20]) Result: Boolean
+    procedure CustInvDiscRecExists(InvDiscCode: Code[20]) Result: Boolean
     var
         CustInvDisc: Record "Cust. Invoice Disc.";
         IsHandled: Boolean;
@@ -293,6 +302,7 @@ codeunit 60 "Sales-Calc. Discount"
             with SalesLine do begin
                 SetRange("Document Type", SalesHeader."Document Type");
                 SetRange("Document No.", SalesHeader."No.");
+                SetLoadFields(Type, Quantity, "Unit Price", "Qty. to Invoice", "Prepayment %", "Prepmt. Line Amount", Amount);
                 if FindSet(true) then
                     repeat
                         if not ZeroAmountLine(0) and ("Prepayment %" = SalesHeader."Prepayment %") then begin

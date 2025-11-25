@@ -1,3 +1,10 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Activity;
+
 table 7330 "Bin Content Buffer"
 {
     Caption = 'Bin Content Buffer';

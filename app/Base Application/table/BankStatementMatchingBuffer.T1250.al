@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 #pragma warning disable AS0109
 table 1250 "Bank Statement Matching Buffer"
 #pragma warning restore AS0109

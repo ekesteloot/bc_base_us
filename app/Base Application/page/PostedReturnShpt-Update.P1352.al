@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.History;
+
 page 1352 "Posted Return Shpt. - Update"
 {
     Caption = 'Posted Return Shpt. - Update';
@@ -77,17 +79,16 @@ page 1352 "Posted Return Shpt. - Update"
     local procedure RecordChanged() IsChanged: Boolean
     begin
         IsChanged :=
-            ("Ship-to County" <> xReturnShipmentHeader."Ship-to County") or
-            ("Ship-to Country/Region Code" <> xReturnShipmentHeader."Ship-to Country/Region Code");
+            (Rec."Ship-to County" <> xReturnShipmentHeader."Ship-to County") or
+            (Rec."Ship-to Country/Region Code" <> xReturnShipmentHeader."Ship-to Country/Region Code");
 
         OnAfterRecordChanged(Rec, xRec, IsChanged, xReturnShipmentHeader);
     end;
 
-    [Scope('OnPrem')]
     procedure SetRec(ReturnShipmentHeader: Record "Return Shipment Header")
     begin
         Rec := ReturnShipmentHeader;
-        Insert();
+        Rec.Insert();
     end;
 
     [IntegrationEvent(false, false)]

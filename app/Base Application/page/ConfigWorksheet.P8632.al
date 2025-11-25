@@ -1,3 +1,9 @@
+namespace System.IO;
+
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Security.User;
+
 page 8632 "Config. Worksheet"
 {
     AdditionalSearchTerms = 'rapid start implementation migrate setup worksheet';
@@ -6,7 +12,7 @@ page 8632 "Config. Worksheet"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "Config. Line";
-    SourceTableView = SORTING("Vertical Sorting");
+    SourceTableView = sorting("Vertical Sorting");
     UsageCategory = Tasks;
 
     layout
@@ -43,7 +49,7 @@ page 8632 "Config. Worksheet"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the table is promoted. Select the check box to promote the table in the configuration worksheet. You can use this designation as a signal that this table requires additional attention.';
                 }
-                field(Reference; Reference)
+                field(Reference; Rec.Reference)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a url address. Use this field to provide a url address to a location that Specifies information about the table. For example, you could provide the address of a page that Specifies information about setup considerations that the solution implementer should consider.';
@@ -81,7 +87,7 @@ page 8632 "Config. Worksheet"
 
                     trigger OnAssistEdit()
                     begin
-                        ShowTableData();
+                        Rec.ShowTableData();
                     end;
                 }
                 field("Page Caption"; Rec."Page Caption")
@@ -94,7 +100,7 @@ page 8632 "Config. Worksheet"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the table is covered by the license of the person creating the configuration package.';
                 }
-                field(NoOfRecords; GetNoOfRecordsText())
+                field(NoOfRecords; Rec.GetNoOfRecordsText())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'No. of Records';
@@ -130,21 +136,21 @@ page 8632 "Config. Worksheet"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Package Table';
-                SubPageLink = "Package Code" = FIELD("Package Code"),
-                              "Table ID" = FIELD("Table ID");
-                SubPageView = SORTING("Package Code", "Table ID");
+                SubPageLink = "Package Code" = field("Package Code"),
+                              "Table ID" = field("Table ID");
+                SubPageView = sorting("Package Code", "Table ID");
             }
             part("Related Tables"; "Config. Related Tables FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Related Tables';
-                SubPageLink = "Table ID" = FIELD("Table ID");
+                SubPageLink = "Table ID" = field("Table ID");
             }
             part(Control22; "Config. Questions FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Questions';
-                SubPageLink = "Table ID" = FIELD("Table ID");
+                SubPageLink = "Table ID" = field("Table ID");
             }
             systempart(Notes; Notes)
             {
@@ -178,7 +184,7 @@ page 8632 "Config. Worksheet"
 
                     trigger OnAction()
                     begin
-                        ShowQuestions();
+                        Rec.ShowQuestions();
                     end;
                 }
                 action(Users)
@@ -214,8 +220,8 @@ page 8632 "Config. Worksheet"
 
                     trigger OnAction()
                     begin
-                        TestField("Package Code");
-                        ConfigPackageTable.ShowPackageCard("Package Code");
+                        Rec.TestField("Package Code");
+                        ConfigPackageTable.ShowPackageCard(Rec."Package Code");
                     end;
                 }
                 action(PromotedOnly)
@@ -227,10 +233,10 @@ page 8632 "Config. Worksheet"
 
                     trigger OnAction()
                     begin
-                        if GetFilter("Promoted Table") = '' then
-                            SetRange("Promoted Table", true)
+                        if Rec.GetFilter("Promoted Table") = '' then
+                            Rec.SetRange("Promoted Table", true)
                         else
-                            SetRange("Promoted Table");
+                            Rec.SetRange("Promoted Table");
                     end;
                 }
                 action("Database Data")
@@ -242,7 +248,7 @@ page 8632 "Config. Worksheet"
 
                     trigger OnAction()
                     begin
-                        ShowTableData();
+                        Rec.ShowTableData();
                     end;
                 }
                 action(PackageData)
@@ -255,7 +261,7 @@ page 8632 "Config. Worksheet"
                     trigger OnAction()
                     begin
                         GetConfigPackageTable(ConfigPackageTable);
-                        ConfigPackageTable.ShowPackageRecords(Show::Records, "Dimensions as Columns");
+                        ConfigPackageTable.ShowPackageRecords(Show::Records, Rec."Dimensions as Columns");
                     end;
                 }
                 action(Errors)
@@ -268,7 +274,7 @@ page 8632 "Config. Worksheet"
                     trigger OnAction()
                     begin
                         GetConfigPackageTable(ConfigPackageTable);
-                        ConfigPackageTable.ShowPackageRecords(Show::Errors, "Dimensions as Columns");
+                        ConfigPackageTable.ShowPackageRecords(Show::Errors, Rec."Dimensions as Columns");
                     end;
                 }
                 action("Fields")
@@ -355,7 +361,7 @@ page 8632 "Config. Worksheet"
 
                     trigger OnAction()
                     begin
-                        DeleteDuplicateLines();
+                        Rec.DeleteDuplicateLines();
                     end;
                 }
                 action(ApplyData)
@@ -389,7 +395,7 @@ page 8632 "Config. Worksheet"
                     begin
                         CurrPage.SaveRecord();
                         ConfigLine.SetCurrentKey("Vertical Sorting");
-                        ConfigLine.SetFilter("Vertical Sorting", '..%1', "Vertical Sorting" - 1);
+                        ConfigLine.SetFilter("Vertical Sorting", '..%1', Rec."Vertical Sorting" - 1);
                         if ConfigLine.FindLast() then begin
                             ExchangeLines(Rec, ConfigLine);
                             CurrPage.Update(false);
@@ -409,7 +415,7 @@ page 8632 "Config. Worksheet"
                     begin
                         CurrPage.SaveRecord();
                         ConfigLine.SetCurrentKey("Vertical Sorting");
-                        ConfigLine.SetFilter("Vertical Sorting", '%1..', "Vertical Sorting" + 1);
+                        ConfigLine.SetFilter("Vertical Sorting", '%1..', Rec."Vertical Sorting" + 1);
                         if ConfigLine.FindFirst() then begin
                             ExchangeLines(Rec, ConfigLine);
                             CurrPage.Update(false);
@@ -628,10 +634,10 @@ page 8632 "Config. Worksheet"
     trigger OnAfterGetRecord()
     begin
         NameIndent := 0;
-        case "Line Type" of
-            "Line Type"::Group:
+        case Rec."Line Type" of
+            Rec."Line Type"::Group:
                 NameIndent := 1;
-            "Line Type"::Table:
+            Rec."Line Type"::Table:
                 NameIndent := 2;
         end;
 
@@ -657,8 +663,8 @@ page 8632 "Config. Worksheet"
         ConfigLine.SetCurrentKey("Vertical Sorting");
         if BelowxRec then begin
             if ConfigLine.FindLast() then;
-            "Vertical Sorting" := ConfigLine."Vertical Sorting" + 1;
-            "Line No." := NextLineNo;
+            Rec."Vertical Sorting" := ConfigLine."Vertical Sorting" + 1;
+            Rec."Line No." := NextLineNo;
         end else begin
             NextVertNo := xRec."Vertical Sorting";
 
@@ -669,33 +675,31 @@ page 8632 "Config. Worksheet"
                     ConfigLine.Modify();
                 until ConfigLine.Next(-1) = 0;
 
-            "Line No." := NextLineNo;
-            "Vertical Sorting" := NextVertNo;
+            Rec."Line No." := NextLineNo;
+            Rec."Vertical Sorting" := NextVertNo;
         end;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Line Type" := xRec."Line Type";
+        Rec."Line Type" := xRec."Line Type";
     end;
 
     trigger OnOpenPage()
     var
         ConfigPackageManagement: Codeunit "Config. Package Management";
     begin
-        FilterGroup := 2;
-        SetRange("Company Filter", CompanyName);
-        FilterGroup := 0;
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Company Filter", CompanyName);
+        Rec.FilterGroup := 0;
         ConfigPackageManagement.RemoveRecordsWithObsoleteTableID(
-          DATABASE::"Config. Line", FieldNo("Table ID"));
+          DATABASE::"Config. Line", Rec.FieldNo("Table ID"));
     end;
 
     var
         ConfigPackageTable: Record "Config. Package Table";
         Show: Option Records,Errors,All;
-        [InDataSet]
         NameEmphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
         NextLineNo: Integer;
         NextVertNo: Integer;
@@ -758,8 +762,8 @@ page 8632 "Config. Worksheet"
 
     local procedure GetConfigPackageTable(var ConfigPackageTable: Record "Config. Package Table")
     begin
-        TestField("Table ID");
-        if not ConfigPackageTable.Get("Package Code", "Table ID") then
+        Rec.TestField("Table ID");
+        if not ConfigPackageTable.Get(Rec."Package Code", Rec."Table ID") then
             Error(Text001);
     end;
 }

@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Pricing;
+
 /// <summary>
 /// The purpose of the table is to setup access to UX and logic of the sales price calculation.
 /// TableType is not set to Temporary only because the ReadPermission() method always returns true.

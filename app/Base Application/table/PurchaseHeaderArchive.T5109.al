@@ -1,3 +1,32 @@
+﻿namespace Microsoft.Purchases.Archive;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using System.Globalization;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 5109 "Purchase Header Archive"
 {
     Caption = 'Purchase Header Archive';
@@ -46,8 +75,6 @@ table 5109 "Purchase Header Archive"
         {
             Caption = 'Pay-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(10; "Pay-to Contact"; Text[100])
@@ -82,8 +109,6 @@ table 5109 "Purchase Header Archive"
         {
             Caption = 'Ship-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
@@ -135,19 +160,19 @@ table 5109 "Purchase Header Archive"
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(31; "Vendor Posting Group"; Code[20])
         {
@@ -178,6 +203,11 @@ table 5109 "Purchase Header Archive"
             Caption = 'Language Code';
             TableRelation = Language;
         }
+        field(42; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(43; "Purchaser Code"; Code[20])
         {
             Caption = 'Purchaser Code';
@@ -189,11 +219,11 @@ table 5109 "Purchase Header Archive"
         }
         field(46; Comment; Boolean)
         {
-            CalcFormula = Exist("Purch. Comment Line Archive" WHERE("Document Type" = FIELD("Document Type"),
-                                                                     "No." = FIELD("No."),
-                                                                     "Document Line No." = CONST(0),
-                                                                     "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                                                     "Version No." = FIELD("Version No.")));
+            CalcFormula = exist("Purch. Comment Line Archive" where("Document Type" = field("Document Type"),
+                                                                     "No." = field("No."),
+                                                                     "Document Line No." = const(0),
+                                                                     "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                                                     "Version No." = field("Version No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -217,9 +247,9 @@ table 5109 "Purchase Header Archive"
         field(55; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
         }
         field(57; Receive; Boolean)
         {
@@ -231,23 +261,23 @@ table 5109 "Purchase Header Archive"
         }
         field(60; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Purchase Line Archive".Amount WHERE("Document Type" = FIELD("Document Type"),
-                                                                    "Document No." = FIELD("No."),
-                                                                    "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                                                    "Version No." = FIELD("Version No.")));
+            CalcFormula = sum("Purchase Line Archive".Amount where("Document Type" = field("Document Type"),
+                                                                    "Document No." = field("No."),
+                                                                    "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                                                    "Version No." = field("Version No.")));
             Caption = 'Amount';
             FieldClass = FlowField;
         }
         field(61; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Purchase Line Archive"."Amount Including VAT" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                    "Document No." = FIELD("No."),
-                                                                                    "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                                                                    "Version No." = FIELD("Version No.")));
+            CalcFormula = sum("Purchase Line Archive"."Amount Including VAT" where("Document Type" = field("Document Type"),
+                                                                                    "Document No." = field("No."),
+                                                                                    "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                                                                    "Version No." = field("Version No.")));
             Caption = 'Amount Including VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -340,8 +370,6 @@ table 5109 "Purchase Header Archive"
         {
             Caption = 'Buy-from City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(84; "Buy-from Contact"; Text[100])
@@ -352,8 +380,6 @@ table 5109 "Purchase Header Archive"
         {
             Caption = 'Pay-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(86; "Pay-to County"; Text[30])
@@ -370,8 +396,6 @@ table 5109 "Purchase Header Archive"
         {
             Caption = 'Buy-from Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(89; "Buy-from County"; Text[30])
@@ -388,8 +412,6 @@ table 5109 "Purchase Header Archive"
         {
             Caption = 'Ship-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(92; "Ship-to County"; Text[30])
@@ -409,7 +431,7 @@ table 5109 "Purchase Header Archive"
         field(95; "Order Address Code"; Code[10])
         {
             Caption = 'Order Address Code';
-            TableRelation = "Order Address".Code WHERE("Vendor No." = FIELD("Buy-from Vendor No."));
+            TableRelation = "Order Address".Code where("Vendor No." = field("Buy-from Vendor No."));
         }
         field(97; "Entry Point"; Code[10])
         {
@@ -479,11 +501,9 @@ table 5109 "Purchase Header Archive"
             MaxValue = 100;
             MinValue = 0;
         }
-        field(120; Status; Option)
+        field(120; Status; Enum "Purchase Document Status")
         {
             Caption = 'Status';
-            OptionCaption = 'Open,Released,Pending Approval,Pending Prepayment';
-            OptionMembers = Open,Released,"Pending Approval","Pending Prepayment";
         }
         field(121; "Invoice Discount Calculation"; Option)
         {
@@ -591,9 +611,9 @@ table 5109 "Purchase Header Archive"
         }
         field(145; "No. of Archived Versions"; Integer)
         {
-            CalcFormula = Max("Purchase Header Archive"."Version No." WHERE("Document Type" = FIELD("Document Type"),
-                                                                             "No." = FIELD("No."),
-                                                                             "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence")));
+            CalcFormula = max("Purchase Header Archive"."Version No." where("Document Type" = field("Document Type"),
+                                                                             "No." = field("No."),
+                                                                             "Doc. No. Occurrence" = field("Doc. No. Occurrence")));
             Caption = 'No. of Archived Versions';
             Editable = false;
             FieldClass = FlowField;
@@ -602,10 +622,8 @@ table 5109 "Purchase Header Archive"
         {
             Caption = 'Purchase Quote No.';
             Editable = false;
-            TableRelation = "Purchase Header"."No." WHERE("Document Type" = CONST(Quote),
-                                                           "No." = FIELD("Purchase Quote No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Purchase Header"."No." where("Document Type" = const(Quote),
+                                                           "No." = field("Purchase Quote No."));
             ValidateTableRelation = false;
         }
         field(179; "VAT Reporting Date"; Date)
@@ -620,14 +638,14 @@ table 5109 "Purchase Header Archive"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(3998; "Source Doc. Exists"; Boolean)
         {
             FieldClass = Flowfield;
-            CalcFormula = Exist("Purchase Header" WHERE("Document Type" = FIELD("Document Type"),
-                                                            "No." = FIELD("No.")));
+            CalcFormula = exist("Purchase Header" where("Document Type" = field("Document Type"),
+                                                            "No." = field("No.")));
             Caption = 'Source Doc. Exists';
             Editable = false;
         }
@@ -635,9 +653,9 @@ table 5109 "Purchase Header Archive"
         {
             Caption = 'Last Archived Date';
             FieldClass = FlowField;
-            CalcFormula = Max("Purchase Header Archive".SystemCreatedAt where("Document Type" = FIELD("Document Type"),
-                                                            "No." = FIELD("No."),
-                                                            "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence")));
+            CalcFormula = max("Purchase Header Archive".SystemCreatedAt where("Document Type" = field("Document Type"),
+                                                            "No." = field("No."),
+                                                            "Doc. No. Occurrence" = field("Doc. No. Occurrence")));
             Editable = false;
         }
         field(5043; "Interaction Exist"; Boolean)
@@ -658,8 +676,6 @@ table 5109 "Purchase Header Archive"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(5047; "Version No."; Integer)
         {
@@ -691,12 +707,12 @@ table 5109 "Purchase Header Archive"
         }
         field(5752; "Completely Received"; Boolean)
         {
-            CalcFormula = Min("Purchase Line Archive"."Completely Received" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                   "Document No." = FIELD("No."),
-                                                                                   "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                                                                   "Version No." = FIELD("Version No."),
-                                                                                   "Expected Receipt Date" = FIELD("Date Filter"),
-                                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = min("Purchase Line Archive"."Completely Received" where("Document Type" = field("Document Type"),
+                                                                                   "Document No." = field("No."),
+                                                                                   "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                                                                   "Version No." = field("Version No."),
+                                                                                   "Expected Receipt Date" = field("Date Filter"),
+                                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Completely Received';
             Editable = false;
             FieldClass = FlowField;
@@ -773,7 +789,7 @@ table 5109 "Purchase Header Archive"
         field(10017; "Provincial Tax Area Code"; Code[20])
         {
             Caption = 'Provincial Tax Area Code';
-            TableRelation = "Tax Area" WHERE("Country/Region" = CONST(CA));
+            TableRelation = "Tax Area" where("Country/Region" = const(CA));
         }
         field(10018; "STE Transaction ID"; Text[20])
         {
@@ -811,6 +827,7 @@ table 5109 "Purchase Header Archive"
     trigger OnDelete()
     var
         PurchaseLineArchive: Record "Purchase Line Archive";
+        PurchCommentLineArchive: Record "Purch. Comment Line Archive";
         DeferralHeaderArchive: Record "Deferral Header Archive";
     begin
         PurchaseLineArchive.SetRange("Document Type", "Document Type");
@@ -819,11 +836,11 @@ table 5109 "Purchase Header Archive"
         PurchaseLineArchive.SetRange("Version No.", "Version No.");
         PurchaseLineArchive.DeleteAll();
 
-        PurchCommentLineArch.SetRange("Document Type", "Document Type");
-        PurchCommentLineArch.SetRange("No.", "No.");
-        PurchCommentLineArch.SetRange("Doc. No. Occurrence", "Doc. No. Occurrence");
-        PurchCommentLineArch.SetRange("Version No.", "Version No.");
-        PurchCommentLineArch.DeleteAll();
+        PurchCommentLineArchive.SetRange("Document Type", "Document Type");
+        PurchCommentLineArchive.SetRange("No.", "No.");
+        PurchCommentLineArchive.SetRange("Doc. No. Occurrence", "Doc. No. Occurrence");
+        PurchCommentLineArchive.SetRange("Version No.", "Version No.");
+        PurchCommentLineArchive.DeleteAll();
 
         DeferralHeaderArchive.SetRange("Deferral Doc. Type", "Deferral Document Type"::Purchase);
         DeferralHeaderArchive.SetRange("Document Type", "Document Type");
@@ -834,13 +851,12 @@ table 5109 "Purchase Header Archive"
     end;
 
     var
-        PurchCommentLineArch: Record "Purch. Comment Line Archive";
-        DimMgt: Codeunit DimensionManagement;
-        UserSetupMgt: Codeunit "User Setup Management";
+        DimensionManagement: Codeunit DimensionManagement;
+        UserSetupManagement: Codeunit "User Setup Management";
 
     procedure ShowDimensions()
     begin
-        DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2', "Document Type", "No."));
+        DimensionManagement.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2', "Document Type", "No."));
     end;
 
     procedure SetSecurityFilterOnRespCenter()
@@ -852,9 +868,9 @@ table 5109 "Purchase Header Archive"
         if IsHandled then
             exit;
 
-        if UserSetupMgt.GetPurchasesFilter() <> '' then begin
+        if UserSetupManagement.GetPurchasesFilter() <> '' then begin
             FilterGroup(2);
-            SetRange("Responsibility Center", UserSetupMgt.GetPurchasesFilter());
+            SetRange("Responsibility Center", UserSetupManagement.GetPurchasesFilter());
             FilterGroup(0);
         end;
     end;

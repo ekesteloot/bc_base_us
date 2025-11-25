@@ -1,3 +1,7 @@
+namespace System.Integration;
+
+using System.IO;
+
 table 1806 "Data Migration Setup"
 {
     Caption = 'Data Migration Setup';
@@ -11,17 +15,17 @@ table 1806 "Data Migration Setup"
         field(2; "Default Customer Template"; Code[10])
         {
             Caption = 'Default Customer Template';
-            TableRelation = "Config. Template Header" WHERE("Table ID" = CONST(18));
+            TableRelation = "Config. Template Header" where("Table ID" = const(18));
         }
         field(3; "Default Vendor Template"; Code[10])
         {
             Caption = 'Default Vendor Template';
-            TableRelation = "Config. Template Header" WHERE("Table ID" = CONST(23));
+            TableRelation = "Config. Template Header" where("Table ID" = const(23));
         }
         field(4; "Default Item Template"; Code[10])
         {
             Caption = 'Default Item Template';
-            TableRelation = "Config. Template Header" WHERE("Table ID" = CONST(27));
+            TableRelation = "Config. Template Header" where("Table ID" = const(27));
         }
         field(5; "Default Account Template"; Code[10])
         {

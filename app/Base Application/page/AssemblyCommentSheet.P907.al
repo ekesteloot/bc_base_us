@@ -1,3 +1,5 @@
+namespace Microsoft.AssemblyMgt.Comment;
+
 page 907 "Assembly Comment Sheet"
 {
     AutoSplitKey = true;
@@ -16,17 +18,17 @@ page 907 "Assembly Comment Sheet"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the date of when the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the comment.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies a code for the comment.';
@@ -42,7 +44,7 @@ page 907 "Assembly Comment Sheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
     end;
 }
 

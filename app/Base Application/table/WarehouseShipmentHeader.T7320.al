@@ -1,3 +1,16 @@
+﻿namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 table 7320 "Warehouse Shipment Header"
 {
     Caption = 'Warehouse Shipment Header';
@@ -23,7 +36,7 @@ table 7320 "Warehouse Shipment Header"
         field(2; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             var
@@ -44,7 +57,7 @@ table 7320 "Warehouse Shipment Header"
 
                 GetLocation("Location Code");
                 Location.TestField("Require Shipment");
-                if Location."Directed Put-away and Pick" or Location."Bin Mandatory" then
+                if Location."Bin Mandatory" then
                     Validate("Bin Code", Location."Shipment Bin Code");
 
                 if UserId <> '' then begin
@@ -58,7 +71,7 @@ table 7320 "Warehouse Shipment Header"
         {
             Caption = 'Assigned User ID';
             DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "Warehouse Employee" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = "Warehouse Employee" where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -98,9 +111,9 @@ table 7320 "Warehouse Shipment Header"
         }
         field(11; Comment; Boolean)
         {
-            CalcFormula = Exist("Warehouse Comment Line" WHERE("Table Name" = CONST("Whse. Shipment"),
-                                                                Type = CONST(" "),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = exist("Warehouse Comment Line" where("Table Name" = const("Whse. Shipment"),
+                                                                Type = const(" "),
+                                                                "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -108,10 +121,10 @@ table 7320 "Warehouse Shipment Header"
         field(12; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                               "Zone Code" = FIELD("Zone Code"));
+            TableRelation = if ("Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                               "Zone Code" = field("Zone Code"));
 
             trigger OnValidate()
             var
@@ -122,10 +135,8 @@ table 7320 "Warehouse Shipment Header"
                     TestField(Status, Status::Open);
                     if "Bin Code" <> '' then begin
                         GetLocation("Location Code");
-                        WhseIntegrationMgt.CheckBinTypeCode(DATABASE::"Warehouse Shipment Header",
-                          FieldCaption("Bin Code"),
-                          "Location Code",
-                          "Bin Code", 0);
+                        WhseIntegrationMgt.CheckBinTypeCode(
+                            Enum::TableID::"Warehouse Shipment Header".AsInteger(), FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
                         Bin.Get("Location Code", "Bin Code");
                         "Zone Code" := Bin."Zone Code";
                     end;
@@ -136,7 +147,7 @@ table 7320 "Warehouse Shipment Header"
         field(13; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -192,7 +203,7 @@ table 7320 "Warehouse Shipment Header"
         field(42; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(43; "Shipment Method Code"; Code[10])
         {
@@ -223,7 +234,7 @@ table 7320 "Warehouse Shipment Header"
         }
         field(46; "Completely Picked"; Boolean)
         {
-            CalcFormula = Min("Warehouse Shipment Line"."Completely Picked" WHERE("No." = FIELD("No.")));
+            CalcFormula = min("Warehouse Shipment Line"."Completely Picked" where("No." = field("No.")));
             Caption = 'Completely Picked';
             Editable = false;
             FieldClass = FlowField;
@@ -348,7 +359,6 @@ table 7320 "Warehouse Shipment Header"
 
         Text000: Label 'You cannot rename a %1.';
         Text001: Label 'You cannot change the %1, because the document has one or more lines.';
-        Text002: Label 'You must first set up user %1 as a warehouse employee.';
         Text003: Label 'You are not allowed to use location code %1.';
         Text006: Label 'You have changed %1 on the %2, but it has not been changed on the existing Warehouse Shipment Lines.\';
         Text007: Label 'You must update the existing Warehouse Shipment Lines manually.';
@@ -565,8 +575,9 @@ table 7320 "Warehouse Shipment Header"
             repeat
                 if WhseShptLine."Assemble to Order" then
                     WhseShptLine.Validate("Qty. to Ship", 0);
-                ItemTrackingMgt.DeleteWhseItemTrkgLines(DATABASE::"Warehouse Shipment Line", 0, WhseShptLine."No.",
-                  '', 0, WhseShptLine."Line No.", WhseShptLine."Location Code", true);
+                ItemTrackingMgt.DeleteWhseItemTrkgLines(
+                    Enum::TableID::"Warehouse Shipment Line".AsInteger(), 0, WhseShptLine."No.",
+                    '', 0, WhseShptLine."Line No.", WhseShptLine."Location Code", true);
 
                 OnBeforeWhseShptLineDelete(WhseShptLine);
                 WhseShptLine.Delete();
@@ -625,7 +636,6 @@ table 7320 "Warehouse Shipment Header"
 
     procedure ErrorIfUserIsNotWhseEmployee()
     var
-        WhseEmployee: Record "Warehouse Employee";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -633,11 +643,7 @@ table 7320 "Warehouse Shipment Header"
         if IsHandled then
             exit;
 
-        if UserId <> '' then begin
-            WhseEmployee.SetRange("User ID", UserId);
-            if WhseEmployee.IsEmpty() then
-                Error(Text002, UserId);
-        end;
+        WMSManagement.CheckUserIsWhseEmployee();
     end;
 
     procedure ApplyCustomSortingToWhseShptLines(var WarehouseShipmentLine: Record "Warehouse Shipment Line")

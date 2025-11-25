@@ -4,7 +4,7 @@ page 553 "VAT Rate Change Log Entries"
     Editable = false;
     PageType = List;
     SourceTable = "VAT Rate Change Log Entry";
-    SourceTableView = SORTING("Entry No.");
+    SourceTableView = sorting("Entry No.");
 
     layout
     {
@@ -29,7 +29,7 @@ page 553 "VAT Rate Change Log Entries"
                     ToolTip = 'Specifies the table. This field is intended only for internal use.';
                     Visible = false;
                 }
-                field("Record Identifier"; Format("Record ID"))
+                field("Record Identifier"; Format(Rec."Record ID"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Record Identifier';
@@ -60,7 +60,7 @@ page 553 "VAT Rate Change Log Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the description for the VAT rate change conversion.';
                 }
-                field(Converted; Converted)
+                field(Converted; Rec.Converted)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the status of the VAT rate change conversion.';
@@ -102,12 +102,12 @@ page 553 "VAT Rate Change Log Entries"
                         RecRef: RecordRef;
                         IsHandled: Boolean;
                     begin
-                        if Format("Record ID") = '' then
+                        if Format(Rec."Record ID") = '' then
                             exit;
-                        if not RecRef.Get("Record ID") then
+                        if not RecRef.Get(Rec."Record ID") then
                             Error(Text0002);
 
-                        case "Table ID" of
+                        case Rec."Table ID" of
                             DATABASE::"Sales Header",
                           DATABASE::"Purchase Header",
                           DATABASE::"Gen. Journal Line",
@@ -136,11 +136,11 @@ page 553 "VAT Rate Change Log Entries"
                                     PageManagement.PageRunModal(ServiceHeader);
                                 end;
                             else begin
-                                    IsHandled := false;
-                                    OnAfterShow(Rec, IsHandled);
-                                    if not IsHandled then
-                                        Message(Text0001);
-                                end;
+                                IsHandled := false;
+                                OnAfterShow(Rec, IsHandled);
+                                if not IsHandled then
+                                    Message(Text0001);
+                            end;
                         end;
                     end;
                 }
@@ -161,7 +161,7 @@ page 553 "VAT Rate Change Log Entries"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Table Caption")
+        Rec.CalcFields("Table Caption");
     end;
 
     var

@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 page 9853 "Effective Permissions By Set"
 {
     Caption = 'By Permission Set';
@@ -26,9 +28,9 @@ page 9853 "Effective Permissions By Set"
                     begin
                         if Rec.Source in [Rec.Source::Entitlement, Rec.Source::Inherent] then
                             exit;
-                        OpenPermissionsPage(true);
+                        Rec.OpenPermissionsPage(true);
                         if Rec.Type = Rec.Type::"User-Defined" then begin
-                            TenantPermission.Get(GetAppID(), Rec."Permission Set", CurrObjectType, CurrObjectID);
+                            TenantPermission.Get(Rec.GetAppID(), Rec."Permission Set", CurrObjectType, CurrObjectID);
                             Rec."Read Permission" := TenantPermission."Read Permission";
                             Rec."Insert Permission" := TenantPermission."Insert Permission";
                             Rec."Modify Permission" := TenantPermission."Modify Permission";
@@ -154,25 +156,15 @@ page 9853 "Effective Permissions By Set"
         CurrObjectType: Option;
         CurrObjectID: Integer;
         CurrUserID: Guid;
-        [InDataSet]
         ReadPermissions: Enum Permission;
-        [InDataSet]
         InsertPermissions: Enum Permission;
-        [InDataSet]
         ModifyPermissions: Enum Permission;
-        [InDataSet]
         DeletePermissions: Enum Permission;
-        [InDataSet]
         ExecutePermissions: Enum Permission;
-        [InDataSet]
         ReadEntitlementPermissions: Enum Permission;
-        [InDataSet]
         InsertEntitlementPermissions: Enum Permission;
-        [InDataSet]
         ModifyEntitlementPermissions: Enum Permission;
-        [InDataSet]
         DeleteEntitlementPermissions: Enum Permission;
-        [InDataSet]
         ExecuteEntitlementPermissions: Enum Permission;
 
     local procedure RefreshDisplayTexts()
@@ -211,12 +203,12 @@ page 9853 "Effective Permissions By Set"
         EffectivePermissionsMgt.PopulatePermissionBuffer(TempPermissionBuffer, PassedUserID, PassedCompanyName,
           CurrentObjectType, CurrentObjectID);
 
-        DeleteAll();
+        Rec.DeleteAll();
 
         if TempPermissionBuffer.FindSet() then
             repeat
                 Rec := TempPermissionBuffer;
-                Insert();
+                Rec.Insert();
                 if TempPermissionBuffer.Source = TempPermissionBuffer.Source::Entitlement then
                     EntitlementPermissionBuffer := TempPermissionBuffer;
             until TempPermissionBuffer.Next() = 0;

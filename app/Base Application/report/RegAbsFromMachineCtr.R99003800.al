@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.MachineCenter;
+
+using Microsoft.Manufacturing.Capacity;
+
 report 99003800 "Reg. Abs. (from Machine Ctr.)"
 {
     ApplicationArea = Manufacturing;

@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FixedAssets.Maintenance;
+using System.Utilities;
+
 report 5693 "Delete Empty FA Registers"
 {
     Caption = 'Delete Empty FA Registers';
@@ -8,7 +13,7 @@ report 5693 "Delete Empty FA Registers"
     {
         dataitem("FA Register"; "FA Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "Creation Date";
 
             trigger OnAfterGetRecord()

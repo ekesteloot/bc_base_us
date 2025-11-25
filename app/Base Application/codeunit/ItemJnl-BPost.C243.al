@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Posting;
+
+using Microsoft.InventoryMgt.Journal;
+
 codeunit 243 "Item Jnl.-B.Post"
 {
     TableNo = "Item Journal Batch";
@@ -6,7 +10,7 @@ codeunit 243 "Item Jnl.-B.Post"
     begin
         ItemJnlBatch.Copy(Rec);
         Code();
-        Copy(ItemJnlBatch);
+        Rec.Copy(ItemJnlBatch);
     end;
 
     var

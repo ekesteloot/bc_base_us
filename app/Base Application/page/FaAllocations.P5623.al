@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 5623 "FA Allocations"
 {
     AutoSplitKey = true;
@@ -33,7 +37,7 @@ page 5623 "FA Allocations"
             group(Control18)
             {
                 ShowCaption = false;
-                field(AllocationPct; AllocationPct + "Allocation %" - xRec."Allocation %")
+                field(AllocationPct; AllocationPct + Rec."Allocation %" - xRec."Allocation %")
                 {
                     ApplicationArea = All;
                     Caption = 'Allocation %';
@@ -42,7 +46,7 @@ page 5623 "FA Allocations"
                     ToolTip = 'Specifies the allocation percentage that has accumulated on the line.';
                     Visible = AllocationPctVisible;
                 }
-                field(TotalAllocationPct; TotalAllocationPct + "Allocation %" - xRec."Allocation %")
+                field(TotalAllocationPct; TotalAllocationPct + Rec."Allocation %" - xRec."Allocation %")
                 {
                     ApplicationArea = All;
                     Caption = 'Total Alloc. %';
@@ -87,7 +91,7 @@ page 5623 "FA Allocations"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -123,40 +127,40 @@ page 5623 "FA Allocations"
     end;
 
     var
-        AllocationPct: Decimal;
-        TotalAllocationPct: Decimal;
         ShowAllocationPct: Boolean;
         ShowTotalAllocationPct: Boolean;
-        [InDataSet]
+
+    protected var
+        AllocationPct: Decimal;
+        TotalAllocationPct: Decimal;
         AllocationPctVisible: Boolean;
-        [InDataSet]
         TotalAllocationPctVisible: Boolean;
 
     local procedure UpdateAllocationPct()
     var
-        TempFAAlloc: Record "FA Allocation";
+        FAAllocation: Record "FA Allocation";
     begin
-        TempFAAlloc.CopyFilters(Rec);
-        ShowTotalAllocationPct := TempFAAlloc.CalcSums("Allocation %");
+        FAAllocation.CopyFilters(Rec);
+        ShowTotalAllocationPct := FAAllocation.CalcSums("Allocation %");
         if ShowTotalAllocationPct then begin
-            TotalAllocationPct := TempFAAlloc."Allocation %";
-            if "Line No." = 0 then
+            TotalAllocationPct := FAAllocation."Allocation %";
+            if Rec."Line No." = 0 then
                 TotalAllocationPct := TotalAllocationPct + xRec."Allocation %";
         end;
 
-        if "Line No." <> 0 then begin
-            TempFAAlloc.SetRange("Line No.", 0, "Line No.");
-            ShowAllocationPct := TempFAAlloc.CalcSums("Allocation %");
+        if Rec."Line No." <> 0 then begin
+            FAAllocation.SetRange("Line No.", 0, Rec."Line No.");
+            ShowAllocationPct := FAAllocation.CalcSums("Allocation %");
             if ShowAllocationPct then
-                AllocationPct := TempFAAlloc."Allocation %";
+                AllocationPct := FAAllocation."Allocation %";
         end else begin
-            TempFAAlloc.SetRange("Line No.", 0, xRec."Line No.");
-            ShowAllocationPct := TempFAAlloc.CalcSums("Allocation %");
+            FAAllocation.SetRange("Line No.", 0, xRec."Line No.");
+            ShowAllocationPct := FAAllocation.CalcSums("Allocation %");
             if ShowAllocationPct then begin
-                AllocationPct := TempFAAlloc."Allocation %";
-                TempFAAlloc.CopyFilters(Rec);
-                TempFAAlloc := xRec;
-                if TempFAAlloc.Next() = 0 then
+                AllocationPct := FAAllocation."Allocation %";
+                FAAllocation.CopyFilters(Rec);
+                FAAllocation := xRec;
+                if FAAllocation.Next() = 0 then
                     AllocationPct := AllocationPct + xRec."Allocation %";
             end;
         end;

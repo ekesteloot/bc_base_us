@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 table 961 "Alt. Vendor Posting Group"
 {
     Caption = 'Alternative Vendor Posting Group';

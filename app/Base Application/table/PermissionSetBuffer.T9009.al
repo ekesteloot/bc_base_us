@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 table 9009 "Permission Set Buffer"
 {
     Caption = 'Permission Set Buffer';

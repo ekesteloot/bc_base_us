@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.Activity.History;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+
 page 9343 "Registered Whse. Put-aways"
 {
     ApplicationArea = Warehouse;
@@ -6,7 +12,7 @@ page 9343 "Registered Whse. Put-aways"
     Editable = false;
     PageType = List;
     SourceTable = "Registered Whse. Activity Hdr.";
-    SourceTableView = WHERE(Type = CONST("Put-away"));
+    SourceTableView = where(Type = const("Put-away"));
     UsageCategory = History;
 
     layout
@@ -89,9 +95,9 @@ page 9343 "Registered Whse. Put-aways"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Rgstrd. Whse. Activity Header"),
-                                  Type = FIELD(Type),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Rgstrd. Whse. Activity Header"),
+                                  Type = field(Type),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -139,6 +145,6 @@ page 9343 "Registered Whse. Put-aways"
     end;
 
     var
-        ReportParametersTxt: Label '<?xml version="1.0" standalone="yes"?><ReportParameters name="Delete Registered Whse. Docs." id="5755"><DataItems><DataItem name="Registered Whse. Activity Hdr.">VERSION(1) SORTING(Field1,Field2) WHERE(Field1=1(1))</DataItem></DataItems></ReportParameters>', Locked = true;
+        ReportParametersTxt: Label '<?xml version="1.0" standalone="yes"?><ReportParameters name="Delete Registered Whse. Docs." id="5755"><DataItems><DataItem name="Registered Whse. Activity Hdr.">VERSION(1) SORTING(Field1,Field2) where(Field1=1(1))</DataItem></DataItems></ReportParameters>', Locked = true;
 }
 

@@ -1,7 +1,16 @@
+﻿namespace Microsoft.FixedAssets.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using System.Utilities;
+
 report 5611 "FA Posting Group - Net Change"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/FAPostingGroupNetChange.rdlc';
+    RDLCLayout = './FixedAssets/Reports/FAPostingGroupNetChange.rdlc';
     AdditionalSearchTerms = 'fixed asset posting group net change';
     ApplicationArea = FixedAssets;
     Caption = 'FA Posting Group - Net Change';
@@ -11,7 +20,7 @@ report 5611 "FA Posting Group - Net Change"
     {
         dataitem("FA Depreciation Book"; "FA Depreciation Book")
         {
-            DataItemTableView = SORTING("FA No.", "Depreciation Book Code");
+            DataItemTableView = sorting("FA No.", "Depreciation Book Code");
             RequestFilterFields = "FA No.", "Depreciation Book Code", "FA Posting Group";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -53,7 +62,7 @@ report 5611 "FA Posting Group - Net Change"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(OnlyTotals; OnlyTotals)
             {
             }
@@ -97,7 +106,7 @@ report 5611 "FA Posting Group - Net Change"
         }
         dataitem(Headline; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
 
             trigger OnAfterGetRecord()
             begin
@@ -120,7 +129,7 @@ report 5611 "FA Posting Group - Net Change"
         }
         dataitem(Total; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(FirstTotalHeader; FirstTotalHeader)
             {
             }

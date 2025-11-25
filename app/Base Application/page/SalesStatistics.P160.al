@@ -1,3 +1,11 @@
+namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+
 #pragma warning disable AS0106 // Protected variables TempVATAmountLinePrep, TempVATAmountLineTot, TempTotVATAmountLinePrep, TempTotVATAmountLineTot were removed before AS0106 was introduced.
 page 160 "Sales Statistics"
 #pragma warning restore AS0106
@@ -244,7 +252,7 @@ page 160 "Sales Statistics"
           not (SalesSetup."Calc. Inv. Discount" and CustInvDiscRecExists(Rec."Invoice Disc. Code"));
         AllowVATDifference :=
           SalesSetup."Allow VAT Difference" and
-          not (Rec."Document Type" in ["Sales Document Type"::Quote, "Sales Document Type"::"Blanket Order"]);
+          not (Rec."Document Type" in [Rec."Document Type"::Quote, Rec."Document Type"::"Blanket Order"]);
         OnOpenPageOnBeforeSetEditable(AllowInvDisc, AllowVATDifference, Rec, SalesSetup);
         CurrPage.Editable := AllowVATDifference or AllowInvDisc;
         SetVATSpecification();
@@ -309,7 +317,7 @@ page 160 "Sales Statistics"
         else
             TotalSalesLineLCY.Amount := TotalAmount1;
         if Rec."Currency Code" <> '' then begin
-            if (Rec."Document Type" in ["Sales Document Type"::"Blanket Order", "Sales Document Type"::Quote]) and
+            if (Rec."Document Type" in [Rec."Document Type"::"Blanket Order", Rec."Document Type"::Quote]) and
                (Rec."Posting Date" = 0D)
             then
                 UseDate := WorkDate()
@@ -369,7 +377,7 @@ page 160 "Sales Statistics"
         InvDiscBaseAmount: Decimal;
     begin
         CheckAllowInvDisc();
-        InvDiscBaseAmount := TempVATAmountLine.GetTotalInvDiscBaseAmount(false, "Currency Code");
+        InvDiscBaseAmount := TempVATAmountLine.GetTotalInvDiscBaseAmount(false, Rec."Currency Code");
         if InvDiscBaseAmount = 0 then
             Error(Text003, TempVATAmountLine.FieldCaption("Inv. Disc. Base Amount"));
 

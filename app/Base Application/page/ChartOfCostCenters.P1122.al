@@ -1,3 +1,11 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Reports;
+using Microsoft.CostAccounting.Setup;
+using System.Security.User;
+using System.Text;
+
 page 1122 "Chart of Cost Centers"
 {
     AdditionalSearchTerms = 'cost accounting allocation centers';
@@ -7,7 +15,7 @@ page 1122 "Chart of Cost Centers"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "Cost Center";
-    SourceTableView = SORTING("Sorting Order");
+    SourceTableView = sorting("Sorting Order");
     UsageCategory = Lists;
 
     layout
@@ -19,7 +27,7 @@ page 1122 "Chart of Cost Centers"
                 IndentationColumn = NameIndent;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = CostAccounting;
                     Style = Strong;
@@ -38,7 +46,7 @@ page 1122 "Chart of Cost Centers"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the purpose of the cost object, such as Cost Object, Heading, or Begin-Total. Newly created cost objects are automatically assigned the Cost Object type, but you can change this.';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
@@ -81,7 +89,7 @@ page 1122 "Chart of Cost Centers"
                     LookupPageID = "User Lookup";
                     ToolTip = 'Specifies the person who is responsible for the chart of cost centers.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -98,7 +106,7 @@ page 1122 "Chart of Cost Centers"
                     ToolTip = 'Specifies whether you want a blank line to appear immediately after this cost center when you print the chart of cost centers. The New Page, Blank Line, and Indentation fields define the layout of the chart of cost centers.';
                     Visible = false;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies a comment that applies.';
@@ -122,8 +130,8 @@ page 1122 "Chart of Cost Centers"
                     Caption = 'Cost E&ntries';
                     Image = CostEntries;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Cost Center Code" = FIELD(Code);
-                    RunPageView = SORTING("Cost Center Code", "Cost Type No.", Allocated, "Posting Date");
+                    RunPageLink = "Cost Center Code" = field(Code);
+                    RunPageView = sorting("Cost Center Code", "Cost Type No.", Allocated, "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View cost entries, which can come from sources such as automatic transfer of general ledger entries to cost entries, manual posting for pure cost entries, internal charges, and manual allocations, and automatic allocation postings for actual costs.';
                 }
@@ -140,10 +148,10 @@ page 1122 "Chart of Cost Centers"
 
                     trigger OnAction()
                     begin
-                        if Totaling = '' then
-                            CostType.SetFilter("Cost Center Filter", Code)
+                        if Rec.Totaling = '' then
+                            CostType.SetFilter("Cost Center Filter", Rec.Code)
                         else
-                            CostType.SetFilter("Cost Center Filter", Totaling);
+                            CostType.SetFilter("Cost Center Filter", Rec.Totaling);
 
                         PAGE.Run(PAGE::"Cost Type Balance", CostType);
                     end;
@@ -250,43 +258,41 @@ page 1122 "Chart of Cost Centers"
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SetSelectionFilter(Rec);
-        ConfirmDeleteIfEntriesExist(Rec, false);
-        Reset();
+        Rec.ConfirmDeleteIfEntriesExist(Rec, false);
+        Rec.Reset();
     end;
 
     var
         CostType: Record "Cost Type";
         CostAccSetup: Record "Cost Accounting Setup";
         CostAccMgt: Codeunit "Cost Account Mgt";
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     local procedure CodeOnFormat()
     begin
-        Emphasize := "Line Type" <> "Line Type"::"Cost Center";
+        Emphasize := Rec."Line Type" <> Rec."Line Type"::"Cost Center";
     end;
 
     local procedure NameOnFormat()
     begin
-        NameIndent := Indentation;
-        Emphasize := "Line Type" <> "Line Type"::"Cost Center";
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec."Line Type" <> Rec."Line Type"::"Cost Center";
     end;
 
     local procedure NetChangeOnFormat()
     begin
-        Emphasize := "Line Type" <> "Line Type"::"Cost Center";
+        Emphasize := Rec."Line Type" <> Rec."Line Type"::"Cost Center";
     end;
 
     local procedure BalanceatDateC15OnFormat()
     begin
-        Emphasize := "Line Type" <> "Line Type"::"Cost Center";
+        Emphasize := Rec."Line Type" <> Rec."Line Type"::"Cost Center";
     end;
 
     local procedure BalancetoAllocateOnFormat()
     begin
-        Emphasize := "Line Type" <> "Line Type"::"Cost Center";
+        Emphasize := Rec."Line Type" <> Rec."Line Type"::"Cost Center";
     end;
 
     procedure GetSelectionFilter(): Text

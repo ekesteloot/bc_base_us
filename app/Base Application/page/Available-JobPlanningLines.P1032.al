@@ -1,3 +1,10 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.ProjectMgt.Jobs.Job;
+
 page 1032 "Available - Job Planning Lines"
 {
     Caption = 'Available - Job Planning Lines';
@@ -10,7 +17,7 @@ page 1032 "Available - Job Planning Lines"
     PageType = List;
     Permissions = TableData "Job Planning Line" = rm;
     SourceTable = "Job Planning Line";
-    SourceTableView = SORTING(Status, Type, "No.", "Variant Code", "Location Code", "Planning Date");
+    SourceTableView = sorting(Status, Type, "No.", "Variant Code", "Location Code", "Planning Date");
 
     layout
     {
@@ -220,7 +227,7 @@ page 1032 "Available - Job Planning Lines"
         TrackingSpecification: Record "Tracking Specification";
     begin
         Rec.CalcFields("Reserved Qty. (Base)");
-        if Abs(Rec."Remaining Qty. (Base)") + "Reserved Qty. (Base)" < ReserveQuantityBase then
+        if Abs(Rec."Remaining Qty. (Base)") + Rec."Reserved Qty. (Base)" < ReserveQuantityBase then
             Error(Text003, Abs(Rec."Remaining Qty. (Base)") + Rec."Reserved Quantity");
 
         Rec.TestField("No.", ReservEntry."Item No.");
@@ -229,7 +236,7 @@ page 1032 "Available - Job Planning Lines"
 
         TrackingSpecification.InitTrackingSpecification(
           DATABASE::"Job Planning Line", Rec.Status.AsInteger(), Rec."Job No.", '', 0, Rec."Job Contract Entry No.",
-          Rec."Variant Code", "Location Code", Rec."Qty. per Unit of Measure");
+          Rec."Variant Code", Rec."Location Code", Rec."Qty. per Unit of Measure");
         ReservMgt.CreateReservation(
           ReservEntry.Description, Rec."Planning Date", ReserveQuantity, ReserveQuantityBase, TrackingSpecification);
         UpdateReservFrom();

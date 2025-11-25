@@ -1,3 +1,7 @@
+namespace System.Visualization;
+
+using Microsoft.FinancialMgt.FinancialReports;
+
 table 1310 "Chart Definition"
 {
     Caption = 'Chart Definition';

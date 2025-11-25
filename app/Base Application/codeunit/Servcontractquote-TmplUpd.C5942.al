@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Contract;
+
 codeunit 5942 "ServContractQuote-Tmpl. Upd."
 {
     TableNo = "Service Contract Header";

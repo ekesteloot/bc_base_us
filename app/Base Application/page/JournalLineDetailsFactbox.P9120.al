@@ -1,3 +1,11 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 page 9120 "Journal Line Details FactBox"
 {
     PageType = CardPart;
@@ -11,7 +19,7 @@ page 9120 "Journal Line Details FactBox"
     {
         area(Content)
         {
-            field(PostingGroup; "Posting Group")
+            field(PostingGroup; Rec."Posting Group")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Posting Group';
@@ -52,7 +60,7 @@ page 9120 "Journal Line Details FactBox"
                     var
                         GeneralPostingSetup: Record "General Posting Setup";
                     begin
-                        if GeneralPostingSetup.Get("Gen. Bus. Posting Group", "Gen. Prod. Posting Group") then
+                        if GeneralPostingSetup.Get(Rec."Gen. Bus. Posting Group", Rec."Gen. Prod. Posting Group") then
                             Page.Run(Page::"General Posting Setup", GeneralPostingSetup);
                     end;
                 }
@@ -68,7 +76,7 @@ page 9120 "Journal Line Details FactBox"
                     var
                         VATPostingSetupLocal: Record "VAT Posting Setup";
                     begin
-                        if VATPostingSetupLocal.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group") then
+                        if VATPostingSetupLocal.Get(Rec."VAT Bus. Posting Group", Rec."VAT Prod. Posting Group") then
                             Page.Run(Page::"VAT Posting Setup", VATPostingSetupLocal);
                     end;
                 }
@@ -88,7 +96,7 @@ page 9120 "Journal Line Details FactBox"
                     var
                         GenJnlLine: Record "Gen. Journal Line";
                     begin
-                        if "Bal. Account No." <> '' then begin
+                        if Rec."Bal. Account No." <> '' then begin
                             GenJnlLine.TransferFields(Rec);
                             CODEUNIT.Run(CODEUNIT::"Exchange Acc. G/L Journal Line", GenJnlLine);
                             Codeunit.Run(Codeunit::"Gen. Jnl.-Show Card", GenJnlLine);
@@ -107,7 +115,7 @@ page 9120 "Journal Line Details FactBox"
                     var
                         GeneralPostingSetup: Record "General Posting Setup";
                     begin
-                        if GeneralPostingSetup.Get("Bal. Gen. Bus. Posting Group", "Bal. Gen. Prod. Posting Group") then
+                        if GeneralPostingSetup.Get(Rec."Bal. Gen. Bus. Posting Group", Rec."Bal. Gen. Prod. Posting Group") then
                             Page.Run(Page::"General Posting Setup", GeneralPostingSetup);
                     end;
                 }
@@ -123,7 +131,7 @@ page 9120 "Journal Line Details FactBox"
                     var
                         VATPostingSetupLocal: Record "VAT Posting Setup";
                     begin
-                        if VATPostingSetupLocal.Get("Bal. VAT Bus. Posting Group", "Bal. VAT Prod. Posting Group") then
+                        if VATPostingSetupLocal.Get(Rec."Bal. VAT Bus. Posting Group", Rec."Bal. VAT Prod. Posting Group") then
                             Page.Run(Page::"VAT Posting Setup", VATPostingSetupLocal);
                     end;
                 }
@@ -155,10 +163,10 @@ page 9120 "Journal Line Details FactBox"
 
     local procedure MakePostingSetupText()
     begin
-        GenPostingSetupText := GetPostingSetupText("Gen. Bus. Posting Group", "Gen. Prod. Posting Group");
-        VATPostingSetupText := GetPostingSetupText("VAT Bus. Posting Group", "VAT Prod. Posting Group");
-        BalGenPostingSetupText := GetPostingSetupText("Bal. Gen. Bus. Posting Group", "Bal. Gen. Prod. Posting Group");
-        BalVATPostingSetupText := GetPostingSetupText("Bal. VAT Bus. Posting Group", "Bal. VAT Prod. Posting Group");
+        GenPostingSetupText := GetPostingSetupText(Rec."Gen. Bus. Posting Group", Rec."Gen. Prod. Posting Group");
+        VATPostingSetupText := GetPostingSetupText(Rec."VAT Bus. Posting Group", Rec."VAT Prod. Posting Group");
+        BalGenPostingSetupText := GetPostingSetupText(Rec."Bal. Gen. Bus. Posting Group", Rec."Bal. Gen. Prod. Posting Group");
+        BalVATPostingSetupText := GetPostingSetupText(Rec."Bal. VAT Bus. Posting Group", Rec."Bal. VAT Prod. Posting Group");
     end;
 
     local procedure GetPostingSetupText(BusPostingGroup: Code[20]; ProdPostingGroup: Code[20]): Text
@@ -174,12 +182,12 @@ page 9120 "Journal Line Details FactBox"
         GeneralPostingSetup: Record "General Posting Setup";
         VATPostingSetupLocal: Record "VAT Posting Setup";
     begin
-        AccountEnabled := "Account No." <> '';
-        BalAccountEnabled := "Bal. Account No." <> '';
-        GenPostingSetupEnabled := AccountEnabled and GeneralPostingSetup.Get("Gen. Bus. Posting Group", "Gen. Prod. Posting Group");
-        VATPostingSetupEnabled := AccountEnabled and VATPostingSetupLocal.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
-        BalGenPostingSetupEnabled := BalAccountEnabled and GeneralPostingSetup.Get("Bal. Gen. Bus. Posting Group", "Bal. Gen. Prod. Posting Group");
-        BalVATPostingSetupEnabled := BalAccountEnabled and VATPostingSetupLocal.Get("Bal. VAT Bus. Posting Group", "Bal. VAT Prod. Posting Group");
+        AccountEnabled := Rec."Account No." <> '';
+        BalAccountEnabled := Rec."Bal. Account No." <> '';
+        GenPostingSetupEnabled := AccountEnabled and GeneralPostingSetup.Get(Rec."Gen. Bus. Posting Group", Rec."Gen. Prod. Posting Group");
+        VATPostingSetupEnabled := AccountEnabled and VATPostingSetupLocal.Get(Rec."VAT Bus. Posting Group", Rec."VAT Prod. Posting Group");
+        BalGenPostingSetupEnabled := BalAccountEnabled and GeneralPostingSetup.Get(Rec."Bal. Gen. Bus. Posting Group", Rec."Bal. Gen. Prod. Posting Group");
+        BalVATPostingSetupEnabled := BalAccountEnabled and VATPostingSetupLocal.Get(Rec."Bal. VAT Bus. Posting Group", Rec."Bal. VAT Prod. Posting Group");
 
     end;
 
@@ -190,17 +198,17 @@ page 9120 "Journal Line Details FactBox"
         FAPostingGroup: Record "FA Posting Group";
     begin
         case true of
-            ("Account Type" = "Account Type"::Customer) or
-            ("Bal. Account Type" = "Bal. Account Type"::Customer):
-                if CustomerPostingGroup.Get("Posting Group") then
+            (Rec."Account Type" = Rec."Account Type"::Customer) or
+            (Rec."Bal. Account Type" = Rec."Bal. Account Type"::Customer):
+                if CustomerPostingGroup.Get(Rec."Posting Group") then
                     Page.Run(Page::"Customer Posting Groups", CustomerPostingGroup);
-            ("Account Type" = "Account Type"::Vendor) or
-            ("Bal. Account Type" = "Bal. Account Type"::Vendor):
-                if VendorPostingGroup.Get("Posting Group") then
+            (Rec."Account Type" = Rec."Account Type"::Vendor) or
+            (Rec."Bal. Account Type" = Rec."Bal. Account Type"::Vendor):
+                if VendorPostingGroup.Get(Rec."Posting Group") then
                     Page.Run(Page::"Vendor Posting Groups", VendorPostingGroup);
-            ("Account Type" = "Account Type"::"Fixed Asset") or
-            ("Bal. Account Type" = "Bal. Account Type"::"Fixed Asset"):
-                if FAPostingGroup.Get("Posting Group") then
+            (Rec."Account Type" = Rec."Account Type"::"Fixed Asset") or
+            (Rec."Bal. Account Type" = Rec."Bal. Account Type"::"Fixed Asset"):
+                if FAPostingGroup.Get(Rec."Posting Group") then
                     Page.Run(Page::"FA Posting Groups", FAPostingGroup);
         end;
     end;

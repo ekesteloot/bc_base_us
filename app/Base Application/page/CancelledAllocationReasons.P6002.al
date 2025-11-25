@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Document;
+
 page 6002 "Cancelled Allocation Reasons"
 {
     Caption = 'Canceled Allocation Reasons';
@@ -94,8 +96,8 @@ page 6002 "Cancelled Allocation Reasons"
 
     trigger OnAfterGetRecord()
     begin
-        ServHeader.Get("Document Type", "Document No.");
-        if not ServItemLine.Get("Document Type", "Document No.", "Service Item Line No.") then
+        ServHeader.Get(Rec."Document Type", Rec."Document No.");
+        if not ServItemLine.Get(Rec."Document Type", Rec."Document No.", Rec."Service Item Line No.") then
             ServPriority := ServHeader.Priority
         else
             ServPriority := ServItemLine.Priority;

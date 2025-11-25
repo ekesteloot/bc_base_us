@@ -1,3 +1,30 @@
+namespace Microsoft.AssemblyMgt.Posting;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.History;
+using Microsoft.AssemblyMgt.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using System.Utilities;
+
 codeunit 900 "Assembly-Post"
 {
     Permissions = TableData "Posted Assembly Header" = rim,
@@ -26,11 +53,11 @@ codeunit 900 "Assembly-Post"
 
         AssemblyHeader := Rec;
 
-        if IsAsmToOrder() then
-            TestField("Assemble to Order", false);
+        if Rec.IsAsmToOrder() then
+            Rec.TestField("Assemble to Order", false);
 
-        OpenWindow("Document Type");
-        Window.Update(1, StrSubstNo('%1 %2', "Document Type", "No."));
+        OpenWindow(Rec."Document Type");
+        Window.Update(1, StrSubstNo('%1 %2', Rec."Document Type", Rec."No."));
 
         InitPost(AssemblyHeader);
         Post(AssemblyHeader, ItemJnlPostLine, ResJnlPostLine, WhseJnlRegisterLine, false);
@@ -251,9 +278,9 @@ codeunit 900 "Assembly-Post"
         if not PostingDateExists then
             PostingDateExists :=
               BatchProcessingMgt.GetBooleanParameter(
-                AssemblyHeader.RecordId, "Batch Posting Parameter Type"::"Replace Posting Date", ReplacePostingDate) and
+                AssemblyHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Replace Posting Date", ReplacePostingDate) and
               BatchProcessingMgt.GetDateParameter(
-                  AssemblyHeader.RecordId, "Batch Posting Parameter Type"::"Posting Date", PostingDate);
+                  AssemblyHeader.RecordId, Enum::"Batch Posting Parameter Type"::"Posting Date", PostingDate);
 
         if PostingDateExists and (ReplacePostingDate or (AssemblyHeader."Posting Date" = 0D)) then
             AssemblyHeader."Posting Date" := PostingDate;

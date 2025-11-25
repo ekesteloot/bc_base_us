@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.InventoryMgt.Location;
+using System.Utilities;
+
 report 7317 "Whse. - Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Shipment/WhseShipment.rdlc';
+    RDLCLayout = './WarehouseMgt/Document/WhseShipment.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Shipment';
     UsageCategory = Documents;
@@ -10,14 +19,14 @@ report 7317 "Whse. - Shipment"
     {
         dataitem("Warehouse Shipment Header"; "Warehouse Shipment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             column(HeaderNo_WhseShptHeader; "No.")
             {
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(CompanyName; COMPANYPROPERTY.DisplayName())
                 {
                 }
@@ -50,9 +59,9 @@ report 7317 "Whse. - Shipment"
                 }
                 dataitem("Warehouse Shipment Line"; "Warehouse Shipment Line")
                 {
-                    DataItemLink = "No." = FIELD("No.");
+                    DataItemLink = "No." = field("No.");
                     DataItemLinkReference = "Warehouse Shipment Header";
-                    DataItemTableView = SORTING("No.", "Line No.");
+                    DataItemTableView = sorting("No.", "Line No.");
                     column(ShelfNo_WhseShptLine; "Shelf No.")
                     {
                         IncludeCaption = true;
@@ -110,7 +119,7 @@ report 7317 "Whse. - Shipment"
 
     requestpage
     {
-        Caption = 'Warehouse Posted Shipment';
+        Caption = 'Warehouse Shipment';
 
         layout
         {

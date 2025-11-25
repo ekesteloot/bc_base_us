@@ -54,7 +54,7 @@ page 619 "IC Inbox/Outbox Jnl. Line Dim."
         ObjTransl: Record "Object Translation";
         NewTableID: Integer;
     begin
-        NewTableID := GetTableID(GetFilter("Table ID"));
+        NewTableID := GetTableID(Rec.GetFilter("Table ID"));
         if NewTableID = 0 then
             exit('');
 
@@ -66,11 +66,11 @@ page 619 "IC Inbox/Outbox Jnl. Line Dim."
 
         CurrTableID := NewTableID;
 
-        if GetFilter("Line No.") = '' then
+        if Rec.GetFilter("Line No.") = '' then
             CurrLineNo := 0
         else
-            if GetRangeMin("Line No.") = GetRangeMax("Line No.") then
-                CurrLineNo := GetRangeMin("Line No.")
+            if Rec.GetRangeMin("Line No.") = Rec.GetRangeMax("Line No.") then
+                CurrLineNo := Rec.GetRangeMin("Line No.")
             else
                 CurrLineNo := 0;
 

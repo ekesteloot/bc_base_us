@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Environment;
+using System.Integration;
+
 table 135 "Acc. Sched. KPI Web Srv. Setup"
 {
     Caption = 'Acc. Sched. KPI Web Srv. Setup';
@@ -56,9 +64,9 @@ table 135 "Acc. Sched. KPI Web Srv. Setup"
         }
         field(7; Published; Boolean)
         {
-            CalcFormula = Exist("Web Service" WHERE("Object Type" = CONST(Page),
-                                                     "Object ID" = CONST(197),
-                                                     Published = CONST(true)));
+            CalcFormula = exist("Web Service" where("Object Type" = const(Page),
+                                                     "Object ID" = const(197),
+                                                     Published = const(true)));
             Caption = 'Published';
             Editable = false;
             FieldClass = FlowField;

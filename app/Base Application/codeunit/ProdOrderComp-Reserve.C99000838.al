@@ -1,3 +1,15 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+
 codeunit 99000838 "Prod. Order Comp.-Reserve"
 {
     Permissions = TableData "Reservation Entry" = rimd,
@@ -8,61 +20,62 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
     end;
 
     var
+        FromTrackingSpecification: Record "Tracking Specification";
+        CreateReservEntry: Codeunit "Create Reserv. Entry";
+        ReservationEngineMgt: Codeunit "Reservation Engine Mgt.";
+        ReservationManagement: Codeunit "Reservation Management";
+        Blocked: Boolean;
+        DeleteItemTracking: Boolean;
+
         Text000: Label 'Reserved quantity cannot be greater than %1';
         Text002: Label 'must be filled in when a quantity is reserved';
         Text003: Label 'must not be changed when a quantity is reserved';
         Text004: Label 'Codeunit is not initialized correctly.';
         Text010: Label 'Firm Planned %1';
         Text011: Label 'Released %1';
-        FromTrackingSpecification: Record "Tracking Specification";
-        CreateReservEntry: Codeunit "Create Reserv. Entry";
-        ReservEngineMgt: Codeunit "Reservation Engine Mgt.";
-        ReservMgt: Codeunit "Reservation Management";
-        Blocked: Boolean;
-        DeleteItemTracking: Boolean;
 
-    procedure CreateReservation(ProdOrderComp: Record "Prod. Order Component"; Description: Text[100]; ExpectedReceiptDate: Date; Quantity: Decimal; QuantityBase: Decimal; ForReservEntry: Record "Reservation Entry")
+    procedure CreateReservation(ProdOrderComponent: Record "Prod. Order Component"; Description: Text[100]; ExpectedReceiptDate: Date; Quantity: Decimal; QuantityBase: Decimal; ForReservationEntry: Record "Reservation Entry")
     var
         ShipmentDate: Date;
     begin
         if FromTrackingSpecification."Source Type" = 0 then
             Error(Text004);
 
-        ProdOrderComp.TestField("Item No.");
-        ProdOrderComp.TestField("Due Date");
-        ProdOrderComp.CalcFields("Reserved Qty. (Base)");
-        if Abs(ProdOrderComp."Remaining Qty. (Base)") < Abs(ProdOrderComp."Reserved Qty. (Base)") + QuantityBase then
+        ProdOrderComponent.TestField("Item No.");
+        ProdOrderComponent.TestField("Due Date");
+        ProdOrderComponent.CalcFields("Reserved Qty. (Base)");
+        if Abs(ProdOrderComponent."Remaining Qty. (Base)") < Abs(ProdOrderComponent."Reserved Qty. (Base)") + QuantityBase then
             Error(
               Text000,
-              Abs(ProdOrderComp."Remaining Qty. (Base)") - Abs(ProdOrderComp."Reserved Qty. (Base)"));
+              Abs(ProdOrderComponent."Remaining Qty. (Base)") - Abs(ProdOrderComponent."Reserved Qty. (Base)"));
 
-        ProdOrderComp.TestField("Location Code", FromTrackingSpecification."Location Code");
-        ProdOrderComp.TestField("Variant Code", FromTrackingSpecification."Variant Code");
+        ProdOrderComponent.TestField("Location Code", FromTrackingSpecification."Location Code");
+        ProdOrderComponent.TestField("Variant Code", FromTrackingSpecification."Variant Code");
         if QuantityBase > 0 then
-            ShipmentDate := ProdOrderComp."Due Date"
+            ShipmentDate := ProdOrderComponent."Due Date"
         else begin
             ShipmentDate := ExpectedReceiptDate;
-            ExpectedReceiptDate := ProdOrderComp."Due Date";
+            ExpectedReceiptDate := ProdOrderComponent."Due Date";
         end;
 
         CreateReservEntry.CreateReservEntryFor(
-            DATABASE::"Prod. Order Component", ProdOrderComp.Status.AsInteger(),
-            ProdOrderComp."Prod. Order No.", '', ProdOrderComp."Prod. Order Line No.",
-            ProdOrderComp."Line No.", ProdOrderComp."Qty. per Unit of Measure",
-            Quantity, QuantityBase, ForReservEntry);
+            Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComponent.Status.AsInteger(),
+            ProdOrderComponent."Prod. Order No.", '', ProdOrderComponent."Prod. Order Line No.",
+            ProdOrderComponent."Line No.", ProdOrderComponent."Qty. per Unit of Measure",
+            Quantity, QuantityBase, ForReservationEntry);
         CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
         CreateReservEntry.CreateReservEntry(
-            ProdOrderComp."Item No.", ProdOrderComp."Variant Code", ProdOrderComp."Location Code",
+            ProdOrderComponent."Item No.", ProdOrderComponent."Variant Code", ProdOrderComponent."Location Code",
             Description, ExpectedReceiptDate, ShipmentDate, 0);
 
         FromTrackingSpecification."Source Type" := 0;
     end;
 
-    procedure CreateBindingReservation(ProdOrderComp: Record "Prod. Order Component"; Description: Text[100]; ExpectedReceiptDate: Date; Quantity: Decimal; QuantityBase: Decimal)
+    procedure CreateBindingReservation(ProdOrderComponent: Record "Prod. Order Component"; Description: Text[100]; ExpectedReceiptDate: Date; Quantity: Decimal; QuantityBase: Decimal)
     var
-        DummyReservEntry: Record "Reservation Entry";
+        DummyReservationEntry: Record "Reservation Entry";
     begin
-        CreateReservation(ProdOrderComp, Description, ExpectedReceiptDate, Quantity, QuantityBase, DummyReservEntry);
+        CreateReservation(ProdOrderComponent, Description, ExpectedReceiptDate, Quantity, QuantityBase, DummyReservationEntry);
     end;
 
     procedure CreateReservationSetFrom(TrackingSpecification: Record "Tracking Specification")
@@ -75,174 +88,201 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
         CreateReservEntry.SetBinding(Binding);
     end;
 
-    procedure Caption(ProdOrderComp: Record "Prod. Order Component") CaptionText: Text
+    procedure Caption(ProdOrderComponent: Record "Prod. Order Component") CaptionText: Text
     begin
-        CaptionText := ProdOrderComp.GetSourceCaption();
+        CaptionText := ProdOrderComponent.GetSourceCaption();
     end;
 
-    procedure FindReservEntry(ProdOrderComp: Record "Prod. Order Component"; var ReservEntry: Record "Reservation Entry"): Boolean
+    procedure FindReservEntry(ProdOrderComponent: Record "Prod. Order Component"; var ReservationEntry: Record "Reservation Entry"): Boolean
     begin
-        ReservEntry.InitSortingAndFilters(false);
-        ProdOrderComp.SetReservationFilters(ReservEntry);
-        if not ReservEntry.IsEmpty() then
-            exit(ReservEntry.FindLast());
+        ReservationEntry.InitSortingAndFilters(false);
+        ProdOrderComponent.SetReservationFilters(ReservationEntry);
+        if not ReservationEntry.IsEmpty() then
+            exit(ReservationEntry.FindLast());
     end;
 
-    procedure ReservEntryExist(ProdOrderComp: Record "Prod. Order Component"): Boolean
+    procedure GetReservedQtyFromInventory(ProdOrderComponent: Record "Prod. Order Component"): Decimal
     var
-        ReservEntry: Record "Reservation Entry";
+        ReservationEntry: Record "Reservation Entry";
+        QtyReservedFromItemLedger: Query "Qty. Reserved From Item Ledger";
     begin
-        ReservEngineMgt.InitFilterAndSortingLookupFor(ReservEntry, false);
-        ProdOrderComp.SetReservationFilters(ReservEntry);
-        exit(not ReservEntry.IsEmpty);
+        ProdOrderComponent.SetReservationEntry(ReservationEntry);
+        QtyReservedFromItemLedger.SetSourceFilter(ReservationEntry);
+        QtyReservedFromItemLedger.Open();
+        if QtyReservedFromItemLedger.Read() then
+            exit(QtyReservedFromItemLedger.Quantity__Base_);
+
+        exit(0);
     end;
 
-    procedure VerifyChange(var NewProdOrderComp: Record "Prod. Order Component"; var OldProdOrderComp: Record "Prod. Order Component")
+    procedure GetReservedQtyFromInventory(ProductionOrder: Record "Production Order"): Decimal
     var
-        ProdOrderComp: Record "Prod. Order Component";
+        ReservationEntry: Record "Reservation Entry";
+        QtyReservedFromItemLedger: Query "Qty. Reserved From Item Ledger";
+    begin
+        ReservationEntry.SetSource(
+          Enum::TableID::"Prod. Order Component".AsInteger(), ProductionOrder.Status.AsInteger(), ProductionOrder."No.", 0, '', 0);
+        QtyReservedFromItemLedger.SetSourceFilter(ReservationEntry);
+        QtyReservedFromItemLedger.Open();
+        if QtyReservedFromItemLedger.Read() then
+            exit(QtyReservedFromItemLedger.Quantity__Base_);
+
+        exit(0);
+    end;
+
+    procedure ReservEntryExist(ProdOrderComponent: Record "Prod. Order Component"): Boolean
+    var
+        ReservationEntry: Record "Reservation Entry";
+    begin
+        ReservationEngineMgt.InitFilterAndSortingLookupFor(ReservationEntry, false);
+        ProdOrderComponent.SetReservationFilters(ReservationEntry);
+        exit(not ReservationEntry.IsEmpty);
+    end;
+
+    procedure VerifyChange(var NewProdOrderComponent: Record "Prod. Order Component"; var OldProdOrderComponent: Record "Prod. Order Component")
+    var
+        ProdOrderComponent: Record "Prod. Order Component";
         ShowError: Boolean;
         HasError: Boolean;
     begin
-        if NewProdOrderComp.Status = NewProdOrderComp.Status::Finished then
+        if NewProdOrderComponent.Status = NewProdOrderComponent.Status::Finished then
             exit;
         if Blocked then
             exit;
-        if NewProdOrderComp."Line No." = 0 then
-            if not ProdOrderComp.Get(
-                 NewProdOrderComp.Status,
-                 NewProdOrderComp."Prod. Order No.",
-                 NewProdOrderComp."Prod. Order Line No.",
-                 NewProdOrderComp."Line No.")
+        if NewProdOrderComponent."Line No." = 0 then
+            if not ProdOrderComponent.Get(
+                 NewProdOrderComponent.Status,
+                 NewProdOrderComponent."Prod. Order No.",
+                 NewProdOrderComponent."Prod. Order Line No.",
+                 NewProdOrderComponent."Line No.")
             then
                 exit;
 
-        NewProdOrderComp.CalcFields("Reserved Qty. (Base)");
-        ShowError := NewProdOrderComp."Reserved Qty. (Base)" <> 0;
+        NewProdOrderComponent.CalcFields("Reserved Qty. (Base)");
+        ShowError := NewProdOrderComponent."Reserved Qty. (Base)" <> 0;
 
-        if NewProdOrderComp."Due Date" = 0D then
+        if NewProdOrderComponent."Due Date" = 0D then
             if ShowError then
-                NewProdOrderComp.FieldError("Due Date", Text002)
+                NewProdOrderComponent.FieldError("Due Date", Text002)
             else
                 HasError := true;
 
-        if NewProdOrderComp."Item No." <> OldProdOrderComp."Item No." then
+        if NewProdOrderComponent."Item No." <> OldProdOrderComponent."Item No." then
             if ShowError then
-                NewProdOrderComp.FieldError("Item No.", Text003)
+                NewProdOrderComponent.FieldError("Item No.", Text003)
             else
                 HasError := true;
-        if NewProdOrderComp."Location Code" <> OldProdOrderComp."Location Code" then
+        if NewProdOrderComponent."Location Code" <> OldProdOrderComponent."Location Code" then
             if ShowError then
-                NewProdOrderComp.FieldError("Location Code", Text003)
+                NewProdOrderComponent.FieldError("Location Code", Text003)
             else
                 HasError := true;
-        if (NewProdOrderComp."Bin Code" <> OldProdOrderComp."Bin Code") and
-           (not ReservMgt.CalcIsAvailTrackedQtyInBin(
-              NewProdOrderComp."Item No.", NewProdOrderComp."Bin Code",
-              NewProdOrderComp."Location Code", NewProdOrderComp."Variant Code",
-              DATABASE::"Prod. Order Component", NewProdOrderComp.Status.AsInteger(),
-              NewProdOrderComp."Prod. Order No.", '', NewProdOrderComp."Prod. Order Line No.",
-              NewProdOrderComp."Line No."))
+        if (NewProdOrderComponent."Bin Code" <> OldProdOrderComponent."Bin Code") and
+           (not ReservationManagement.CalcIsAvailTrackedQtyInBin(
+              NewProdOrderComponent."Item No.", NewProdOrderComponent."Bin Code",
+              NewProdOrderComponent."Location Code", NewProdOrderComponent."Variant Code",
+              Enum::TableID::"Prod. Order Component".AsInteger(), NewProdOrderComponent.Status.AsInteger(),
+              NewProdOrderComponent."Prod. Order No.", '', NewProdOrderComponent."Prod. Order Line No.",
+              NewProdOrderComponent."Line No."))
         then begin
             if ShowError then
-                NewProdOrderComp.FieldError("Bin Code", Text003);
+                NewProdOrderComponent.FieldError("Bin Code", Text003);
             HasError := true;
         end;
-        if NewProdOrderComp."Variant Code" <> OldProdOrderComp."Variant Code" then
+        if NewProdOrderComponent."Variant Code" <> OldProdOrderComponent."Variant Code" then
             if ShowError then
-                NewProdOrderComp.FieldError("Variant Code", Text003)
+                NewProdOrderComponent.FieldError("Variant Code", Text003)
             else
                 HasError := true;
-        if NewProdOrderComp."Line No." <> OldProdOrderComp."Line No." then
+        if NewProdOrderComponent."Line No." <> OldProdOrderComponent."Line No." then
             HasError := true;
 
-        OnVerifyChangeOnBeforeHasError(NewProdOrderComp, OldProdOrderComp, HasError, ShowError);
+        OnVerifyChangeOnBeforeHasError(NewProdOrderComponent, OldProdOrderComponent, HasError, ShowError);
 
         if HasError then
-            if (NewProdOrderComp."Item No." <> OldProdOrderComp."Item No.") or NewProdOrderComp.ReservEntryExist() then begin
-                if NewProdOrderComp."Item No." <> OldProdOrderComp."Item No." then begin
-                    ReservMgt.SetReservSource(OldProdOrderComp);
-                    ReservMgt.DeleteReservEntries(true, 0);
-                    ReservMgt.SetReservSource(NewProdOrderComp);
+            if (NewProdOrderComponent."Item No." <> OldProdOrderComponent."Item No.") or NewProdOrderComponent.ReservEntryExist() then begin
+                if NewProdOrderComponent."Item No." <> OldProdOrderComponent."Item No." then begin
+                    ReservationManagement.SetReservSource(OldProdOrderComponent);
+                    ReservationManagement.DeleteReservEntries(true, 0);
+                    ReservationManagement.SetReservSource(NewProdOrderComponent);
                 end else begin
-                    ReservMgt.SetReservSource(NewProdOrderComp);
-                    ReservMgt.DeleteReservEntries(true, 0);
+                    ReservationManagement.SetReservSource(NewProdOrderComponent);
+                    ReservationManagement.DeleteReservEntries(true, 0);
                 end;
-                ReservMgt.AutoTrack(NewProdOrderComp."Remaining Qty. (Base)");
+                ReservationManagement.AutoTrack(NewProdOrderComponent."Remaining Qty. (Base)");
             end;
 
-        if HasError or (NewProdOrderComp."Due Date" <> OldProdOrderComp."Due Date") then begin
-            AssignForPlanning(NewProdOrderComp);
-            if (NewProdOrderComp."Item No." <> OldProdOrderComp."Item No.") or
-               (NewProdOrderComp."Variant Code" <> OldProdOrderComp."Variant Code") or
-               (NewProdOrderComp."Location Code" <> OldProdOrderComp."Location Code")
+        if HasError or (NewProdOrderComponent."Due Date" <> OldProdOrderComponent."Due Date") then begin
+            AssignForPlanning(NewProdOrderComponent);
+            if (NewProdOrderComponent."Item No." <> OldProdOrderComponent."Item No.") or
+               (NewProdOrderComponent."Variant Code" <> OldProdOrderComponent."Variant Code") or
+               (NewProdOrderComponent."Location Code" <> OldProdOrderComponent."Location Code")
             then
-                AssignForPlanning(OldProdOrderComp);
+                AssignForPlanning(OldProdOrderComponent);
         end;
     end;
 
-    procedure VerifyQuantity(var NewProdOrderComp: Record "Prod. Order Component"; var OldProdOrderComp: Record "Prod. Order Component")
+    procedure VerifyQuantity(var NewProdOrderComponent: Record "Prod. Order Component"; var OldProdOrderComponent: Record "Prod. Order Component")
     var
-        ProdOrderComp: Record "Prod. Order Component";
+        ProdOrderComponent: Record "Prod. Order Component";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeVerifyQuantity(NewProdOrderComp, OldProdOrderComp, ReservMgt, IsHandled);
+        OnBeforeVerifyQuantity(NewProdOrderComponent, OldProdOrderComponent, ReservationManagement, IsHandled);
         if IsHandled then
             exit;
 
         if Blocked then
             exit;
 
-        with NewProdOrderComp do begin
-            if Status = Status::Finished then
+        if NewProdOrderComponent.Status = NewProdOrderComponent.Status::Finished then
+            exit;
+        if NewProdOrderComponent."Line No." = OldProdOrderComponent."Line No." then
+            if NewProdOrderComponent."Remaining Qty. (Base)" = OldProdOrderComponent."Remaining Qty. (Base)" then
                 exit;
-            if "Line No." = OldProdOrderComp."Line No." then
-                if "Remaining Qty. (Base)" = OldProdOrderComp."Remaining Qty. (Base)" then
-                    exit;
-            if "Line No." = 0 then
-                if not ProdOrderComp.Get(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.") then
-                    exit;
-            ReservMgt.SetReservSource(NewProdOrderComp);
-            if "Qty. per Unit of Measure" <> OldProdOrderComp."Qty. per Unit of Measure" then
-                ReservMgt.ModifyUnitOfMeasure();
-            if "Remaining Qty. (Base)" * OldProdOrderComp."Remaining Qty. (Base)" < 0 then
-                ReservMgt.DeleteReservEntries(true, 0)
-            else
-                ReservMgt.DeleteReservEntries(false, "Remaining Qty. (Base)");
-            ReservMgt.ClearSurplus();
-            ReservMgt.AutoTrack("Remaining Qty. (Base)");
-            AssignForPlanning(NewProdOrderComp);
-        end;
+        if NewProdOrderComponent."Line No." = 0 then
+            if not ProdOrderComponent.Get(NewProdOrderComponent.Status, NewProdOrderComponent."Prod. Order No.", NewProdOrderComponent."Prod. Order Line No.", NewProdOrderComponent."Line No.") then
+                exit;
+        ReservationManagement.SetReservSource(NewProdOrderComponent);
+        if NewProdOrderComponent."Qty. per Unit of Measure" <> OldProdOrderComponent."Qty. per Unit of Measure" then
+            ReservationManagement.ModifyUnitOfMeasure();
+        if NewProdOrderComponent."Remaining Qty. (Base)" * OldProdOrderComponent."Remaining Qty. (Base)" < 0 then
+            ReservationManagement.DeleteReservEntries(true, 0)
+        else
+            ReservationManagement.DeleteReservEntries(false, NewProdOrderComponent."Remaining Qty. (Base)");
+        ReservationManagement.ClearSurplus();
+        ReservationManagement.AutoTrack(NewProdOrderComponent."Remaining Qty. (Base)");
+        AssignForPlanning(NewProdOrderComponent);
     end;
 
-    procedure TransferPOCompToPOComp(var OldProdOrderComp: Record "Prod. Order Component"; var NewProdOrderComp: Record "Prod. Order Component"; TransferQty: Decimal; TransferAll: Boolean)
+    procedure TransferPOCompToPOComp(var OldProdOrderComponent: Record "Prod. Order Component"; var NewProdOrderComponent: Record "Prod. Order Component"; TransferQty: Decimal; TransferAll: Boolean)
     var
-        OldReservEntry: Record "Reservation Entry";
+        OldReservationEntry: Record "Reservation Entry";
     begin
-        OnBeforeTransferPOCompToPOComp(OldProdOrderComp, NewProdOrderComp);
+        OnBeforeTransferPOCompToPOComp(OldProdOrderComponent, NewProdOrderComponent);
 
-        if not FindReservEntry(OldProdOrderComp, OldReservEntry) then
+        if not FindReservEntry(OldProdOrderComponent, OldReservationEntry) then
             exit;
 
-        OldReservEntry.Lock();
+        OldReservationEntry.Lock();
 
-        NewProdOrderComp.TestItemFields(OldProdOrderComp."Item No.", OldProdOrderComp."Variant Code", OldProdOrderComp."Location Code");
+        NewProdOrderComponent.TestItemFields(OldProdOrderComponent."Item No.", OldProdOrderComponent."Variant Code", OldProdOrderComponent."Location Code");
 
-        OldReservEntry.TransferReservations(
-            OldReservEntry, OldProdOrderComp."Item No.", OldProdOrderComp."Variant Code", OldProdOrderComp."Location Code",
-            TransferAll, TransferQty, NewProdOrderComp."Qty. per Unit of Measure",
-            DATABASE::"Prod. Order Component", NewProdOrderComp.Status.AsInteger(), NewProdOrderComp."Prod. Order No.", '',
-            NewProdOrderComp."Prod. Order Line No.", NewProdOrderComp."Line No.");
+        OldReservationEntry.TransferReservations(
+            OldReservationEntry, OldProdOrderComponent."Item No.", OldProdOrderComponent."Variant Code", OldProdOrderComponent."Location Code",
+            TransferAll, TransferQty, NewProdOrderComponent."Qty. per Unit of Measure",
+            Enum::TableID::"Prod. Order Component".AsInteger(), NewProdOrderComponent.Status.AsInteger(), NewProdOrderComponent."Prod. Order No.", '',
+            NewProdOrderComponent."Prod. Order Line No.", NewProdOrderComponent."Line No.");
     end;
 
-    procedure TransferPOCompToItemJnlLine(var OldProdOrderComp: Record "Prod. Order Component"; var NewItemJnlLine: Record "Item Journal Line"; TransferQty: Decimal)
+    procedure TransferPOCompToItemJnlLine(var OldProdOrderComponent: Record "Prod. Order Component"; var NewItemJournalLine: Record "Item Journal Line"; TransferQty: Decimal)
     begin
-        TransferPOCompToItemJnlLineCheckILE(OldProdOrderComp, NewItemJnlLine, TransferQty, false);
+        TransferPOCompToItemJnlLineCheckILE(OldProdOrderComponent, NewItemJournalLine, TransferQty, false);
     end;
 
-    procedure TransferPOCompToItemJnlLineCheckILE(var OldProdOrderComp: Record "Prod. Order Component"; var NewItemJnlLine: Record "Item Journal Line"; TransferQty: Decimal; CheckApplFromItemEntry: Boolean)
+    procedure TransferPOCompToItemJnlLineCheckILE(var OldProdOrderComponent: Record "Prod. Order Component"; var NewItemJournalLine: Record "Item Journal Line"; TransferQty: Decimal; CheckApplFromItemEntry: Boolean)
     var
-        OldReservEntry: Record "Reservation Entry";
+        OldReservationEntry: Record "Reservation Entry";
         OppositeReservationEntry: Record "Reservation Entry";
         ItemTrackingSetup: Record "Item Tracking Setup";
         ItemTrackingFilterIsSet: Boolean;
@@ -251,116 +291,117 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
         UnTrackedQty: Decimal;
         xTransferQty: Decimal;
     begin
-        if not FindReservEntry(OldProdOrderComp, OldReservEntry) then
+        if not FindReservEntry(OldProdOrderComponent, OldReservationEntry) then
             exit;
 
-        OnBeforeTransferPOCompToItemJnlLineCheckILE(OldProdOrderComp, NewItemJnlLine);
+        OnBeforeTransferPOCompToItemJnlLineCheckILE(OldProdOrderComponent, NewItemJournalLine);
 
         if CheckApplFromItemEntry then
-            if OppositeReservationEntry.Get(OldReservEntry."Entry No.", not OldReservEntry.Positive) then
-                if OppositeReservationEntry."Source Type" <> DATABASE::"Item Ledger Entry" then
+            if OppositeReservationEntry.Get(OldReservationEntry."Entry No.", not OldReservationEntry.Positive) then
+                if OppositeReservationEntry."Source Type" <> Enum::TableID::"Item Ledger Entry".AsInteger() then
                     exit;
 
         // Store initial values
-        OldReservEntry.CalcSums("Quantity (Base)");
-        TrackedQty := -OldReservEntry."Quantity (Base)";
+        OldReservationEntry.CalcSums("Quantity (Base)");
+        TrackedQty := -OldReservationEntry."Quantity (Base)";
         xTransferQty := TransferQty;
 
-        OldReservEntry.Lock();
+        OldReservationEntry.Lock();
 
         // Handle Item Tracking on consumption:
         Clear(CreateReservEntry);
-        if NewItemJnlLine."Entry Type" = NewItemJnlLine."Entry Type"::Consumption then
-            if NewItemJnlLine.TrackingExists() then begin
-                CreateReservEntry.SetNewTrackingFromItemJnlLine(NewItemJnlLine);
+        if NewItemJournalLine."Entry Type" = NewItemJournalLine."Entry Type"::Consumption then
+            if NewItemJournalLine.TrackingExists() then begin
+                CreateReservEntry.SetNewTrackingFromItemJnlLine(NewItemJournalLine);
                 // Try to match against Item Tracking on the prod. order line:
-                OldReservEntry.SetTrackingFilterFromItemJnlLine(NewItemJnlLine);
-                if OldReservEntry.IsEmpty() then
-                    OldReservEntry.ClearTrackingFilter()
+                OldReservationEntry.SetTrackingFilterFromItemJnlLine(NewItemJournalLine);
+                if OldReservationEntry.IsEmpty() then
+                    OldReservationEntry.ClearTrackingFilter()
                 else
                     ItemTrackingFilterIsSet := true;
             end;
 
-        NewItemJnlLine.TestItemFields(OldProdOrderComp."Item No.", OldProdOrderComp."Variant Code", OldProdOrderComp."Location Code");
+        NewItemJournalLine.TestItemFields(OldProdOrderComponent."Item No.", OldProdOrderComponent."Variant Code", OldProdOrderComponent."Location Code");
 
-        OnTransferPOCompToItemJnlLineCheckILEOnBeforeCheckTransferQty(OldProdOrderComp, NewItemJnlLine, OldReservEntry, TransferQty, TrackedQty);
+        OnTransferPOCompToItemJnlLineCheckILEOnBeforeCheckTransferQty(OldProdOrderComponent, NewItemJournalLine, OldReservationEntry, TransferQty, TrackedQty);
 
         if TransferQty = 0 then
             exit;
 
-        ItemTrackingSetup.CopyTrackingFromItemJnlLine(NewItemJnlLine);
-        if ReservEngineMgt.InitRecordSet(OldReservEntry, ItemTrackingSetup) then
-                repeat
-                    OldReservEntry.TestItemFields(OldProdOrderComp."Item No.", OldProdOrderComp."Variant Code", OldProdOrderComp."Location Code");
+        ItemTrackingSetup.CopyTrackingFromItemJnlLine(NewItemJournalLine);
+        if ReservationEngineMgt.InitRecordSet(OldReservationEntry, ItemTrackingSetup) then
+            repeat
+                OldReservationEntry.TestItemFields(OldProdOrderComponent."Item No.", OldProdOrderComponent."Variant Code", OldProdOrderComponent."Location Code");
 
-                    OnTransferPOCompToItemJnlLineCheckILEOnBeforeTransferReservEntry(NewItemJnlLine, OldReservEntry);
+                OnTransferPOCompToItemJnlLineCheckILEOnBeforeTransferReservEntry(NewItemJournalLine, OldReservationEntry);
 
-                    TransferQty := CreateReservEntry.TransferReservEntry(DATABASE::"Item Journal Line",
-                        NewItemJnlLine."Entry Type".AsInteger(), NewItemJnlLine."Journal Template Name", NewItemJnlLine."Journal Batch Name", 0,
-                        NewItemJnlLine."Line No.", NewItemJnlLine."Qty. per Unit of Measure", OldReservEntry, TransferQty);
+                TransferQty := CreateReservEntry.TransferReservEntry(
+                    Enum::TableID::"Item Journal Line".AsInteger(),
+                    NewItemJournalLine."Entry Type".AsInteger(), NewItemJournalLine."Journal Template Name", NewItemJournalLine."Journal Batch Name", 0,
+                    NewItemJournalLine."Line No.", NewItemJournalLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
 
-                    OnTransferPOCompToItemJnlLineCheckILEOnAfterTransferReservEntry(NewItemJnlLine, OldReservEntry);
+                OnTransferPOCompToItemJnlLineCheckILEOnAfterTransferReservEntry(NewItemJournalLine, OldReservationEntry);
 
-                    EndLoop := TransferQty = 0;
-                    if not EndLoop then
-                        if ReservEngineMgt.NEXTRecord(OldReservEntry) = 0 then
-                            if ItemTrackingFilterIsSet then begin
-                                OldReservEntry.ClearTrackingFilter();
-                                ItemTrackingFilterIsSet := false;
-                                EndLoop := not ReservEngineMgt.InitRecordSet(OldReservEntry);
-                            end else
-                                EndLoop := true;
-                until EndLoop;
+                EndLoop := TransferQty = 0;
+                if not EndLoop then
+                    if ReservationEngineMgt.NEXTRecord(OldReservationEntry) = 0 then
+                        if ItemTrackingFilterIsSet then begin
+                            OldReservationEntry.ClearTrackingFilter();
+                            ItemTrackingFilterIsSet := false;
+                            EndLoop := not ReservationEngineMgt.InitRecordSet(OldReservationEntry);
+                        end else
+                            EndLoop := true;
+            until EndLoop;
 
         // Handle remaining transfer quantity
         if TransferQty <> 0 then begin
             TrackedQty -= (xTransferQty - TransferQty);
-            UnTrackedQty := OldProdOrderComp."Remaining Qty. (Base)" - TrackedQty;
+            UnTrackedQty := OldProdOrderComponent."Remaining Qty. (Base)" - TrackedQty;
             if TransferQty > UnTrackedQty then begin
-                ReservMgt.SetReservSource(OldProdOrderComp);
-                ReservMgt.DeleteReservEntries(false, OldProdOrderComp."Remaining Qty. (Base)");
+                ReservationManagement.SetReservSource(OldProdOrderComponent);
+                ReservationManagement.DeleteReservEntries(false, OldProdOrderComponent."Remaining Qty. (Base)");
             end;
         end;
     end;
 
-    procedure DeleteLineConfirm(var ProdOrderComp: Record "Prod. Order Component"): Boolean
+    procedure DeleteLineConfirm(var ProdOrderComponent: Record "Prod. Order Component"): Boolean
     var
         ReservationEntry: Record "Reservation Entry";
     begin
-        with ProdOrderComp do begin
-            if not FindReservEntry(ProdOrderComp, ReservationEntry) then
+        with ProdOrderComponent do begin
+            if not FindReservEntry(ProdOrderComponent, ReservationEntry) then
                 exit(true);
 
-            ReservMgt.SetReservSource(ProdOrderComp);
-            if ReservMgt.DeleteItemTrackingConfirm() then
+            ReservationManagement.SetReservSource(ProdOrderComponent);
+            if ReservationManagement.DeleteItemTrackingConfirm() then
                 DeleteItemTracking := true;
         end;
 
         exit(DeleteItemTracking);
     end;
 
-    procedure DeleteLine(var ProdOrderComp: Record "Prod. Order Component")
+    procedure DeleteLine(var ProdOrderComponent: Record "Prod. Order Component")
     begin
         if Blocked then
             exit;
 
-        with ProdOrderComp do begin
-            Clear(ReservMgt);
-            ReservMgt.SetReservSource(ProdOrderComp);
+        with ProdOrderComponent do begin
+            Clear(ReservationManagement);
+            ReservationManagement.SetReservSource(ProdOrderComponent);
             if DeleteItemTracking then
-                ReservMgt.SetItemTrackingHandling(1); // Allow Deletion
-            ReservMgt.DeleteReservEntries(true, 0);
-            OnDeleteLineOnAfterDeleteReservEntries(ProdOrderComp);
+                ReservationManagement.SetItemTrackingHandling(1); // Allow Deletion
+            ReservationManagement.DeleteReservEntries(true, 0);
+            OnDeleteLineOnAfterDeleteReservEntries(ProdOrderComponent);
             CalcFields("Reserved Qty. (Base)");
-            AssignForPlanning(ProdOrderComp);
+            AssignForPlanning(ProdOrderComponent);
         end;
     end;
 
-    local procedure AssignForPlanning(var ProdOrderComp: Record "Prod. Order Component")
+    local procedure AssignForPlanning(var ProdOrderComponent: Record "Prod. Order Component")
     var
         PlanningAssignment: Record "Planning Assignment";
     begin
-        with ProdOrderComp do begin
+        with ProdOrderComponent do begin
             if Status = Status::Simulated then
                 exit;
             if "Item No." <> '' then
@@ -373,145 +414,144 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
         Blocked := SetBlocked;
     end;
 
-    procedure CallItemTracking(var ProdOrderComp: Record "Prod. Order Component")
+    procedure CallItemTracking(var ProdOrderComponent: Record "Prod. Order Component")
     var
         TrackingSpecification: Record "Tracking Specification";
-        ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
+        ItemTrackingDocManagement: Codeunit "Item Tracking Doc. Management";
         ItemTrackingLines: Page "Item Tracking Lines";
     begin
-        if ProdOrderComp.Status = ProdOrderComp.Status::Finished then
-            ItemTrackingDocMgt.ShowItemTrackingForProdOrderComp(DATABASE::"Prod. Order Component",
-              ProdOrderComp."Prod. Order No.", ProdOrderComp."Prod. Order Line No.", ProdOrderComp."Line No.")
+        if ProdOrderComponent.Status = ProdOrderComponent.Status::Finished then
+            ItemTrackingDocManagement.ShowItemTrackingForProdOrderComp(Enum::TableID::"Prod. Order Component".AsInteger(),
+              ProdOrderComponent."Prod. Order No.", ProdOrderComponent."Prod. Order Line No.", ProdOrderComponent."Line No.")
         else begin
-            ProdOrderComp.TestField("Item No.");
-            TrackingSpecification.InitFromProdOrderComp(ProdOrderComp);
-            ItemTrackingLines.SetSourceSpec(TrackingSpecification, ProdOrderComp."Due Date");
-            ItemTrackingLines.SetInbound(ProdOrderComp.IsInbound());
+            ProdOrderComponent.TestField("Item No.");
+            TrackingSpecification.InitFromProdOrderComp(ProdOrderComponent);
+            ItemTrackingLines.SetSourceSpec(TrackingSpecification, ProdOrderComponent."Due Date");
+            ItemTrackingLines.SetInbound(ProdOrderComponent.IsInbound());
             ItemTrackingLines.RunModal();
         end;
 
-        OnAfterCallItemTracking(ProdOrderComp);
+        OnAfterCallItemTracking(ProdOrderComponent);
     end;
 
     procedure UpdateItemTrackingAfterPosting(ProdOrderComponent: Record "Prod. Order Component")
     var
-        ReservEntry: Record "Reservation Entry";
-        CreateReservEntry: Codeunit "Create Reserv. Entry";
+        ReservationEntry: Record "Reservation Entry";
     begin
         // Used for updating Quantity to Handle after posting;
-        ReservEntry.SetSourceFilter(
-            DATABASE::"Prod. Order Component", ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.",
+        ReservationEntry.SetSourceFilter(
+            Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComponent.Status.AsInteger(), ProdOrderComponent."Prod. Order No.",
             ProdOrderComponent."Line No.", true);
-        ReservEntry.SetSourceFilter('', ProdOrderComponent."Prod. Order Line No.");
-        CreateReservEntry.UpdateItemTrackingAfterPosting(ReservEntry);
+        ReservationEntry.SetSourceFilter('', ProdOrderComponent."Prod. Order Line No.");
+        CreateReservEntry.UpdateItemTrackingAfterPosting(ReservationEntry);
     end;
 
-    procedure BindToPurchase(ProdOrderComp: Record "Prod. Order Component"; PurchLine: Record "Purchase Line"; ReservQty: Decimal; ReservQtyBase: Decimal)
+    procedure BindToPurchase(ProdOrderComponent: Record "Prod. Order Component"; PurchaseLine: Record "Purchase Line"; ReservQty: Decimal; ReservQtyBase: Decimal)
     var
         TrackingSpecification: Record "Tracking Specification";
         ReservationEntry: Record "Reservation Entry";
     begin
         SetBinding(ReservationEntry.Binding::"Order-to-Order");
         TrackingSpecification.InitTrackingSpecification(
-          DATABASE::"Purchase Line", PurchLine."Document Type".AsInteger(), PurchLine."Document No.", '', 0, PurchLine."Line No.",
-          PurchLine."Variant Code", PurchLine."Location Code", PurchLine."Qty. per Unit of Measure");
+          Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", '', 0, PurchaseLine."Line No.",
+          PurchaseLine."Variant Code", PurchaseLine."Location Code", PurchaseLine."Qty. per Unit of Measure");
         CreateReservationSetFrom(TrackingSpecification);
-        CreateBindingReservation(ProdOrderComp, PurchLine.Description, PurchLine."Expected Receipt Date", ReservQty, ReservQtyBase);
+        CreateBindingReservation(ProdOrderComponent, PurchaseLine.Description, PurchaseLine."Expected Receipt Date", ReservQty, ReservQtyBase);
     end;
 
-    procedure BindToProdOrder(ProdOrderComp: Record "Prod. Order Component"; ProdOrderLine: Record "Prod. Order Line"; ReservQty: Decimal; ReservQtyBase: Decimal)
+    procedure BindToProdOrder(ProdOrderComponent: Record "Prod. Order Component"; ProdOrderLine: Record "Prod. Order Line"; ReservQty: Decimal; ReservQtyBase: Decimal)
     var
         TrackingSpecification: Record "Tracking Specification";
         ReservationEntry: Record "Reservation Entry";
     begin
         SetBinding(ReservationEntry.Binding::"Order-to-Order");
         TrackingSpecification.InitTrackingSpecification(
-            DATABASE::"Prod. Order Line", ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", '', ProdOrderLine."Line No.", 0,
+            Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", '', ProdOrderLine."Line No.", 0,
             ProdOrderLine."Variant Code", ProdOrderLine."Location Code", ProdOrderLine."Qty. per Unit of Measure");
         CreateReservationSetFrom(TrackingSpecification);
-        CreateBindingReservation(ProdOrderComp, ProdOrderLine.Description, ProdOrderLine."Ending Date", ReservQty, ReservQtyBase);
+        CreateBindingReservation(ProdOrderComponent, ProdOrderLine.Description, ProdOrderLine."Ending Date", ReservQty, ReservQtyBase);
     end;
 
-    procedure BindToRequisition(ProdOrderComp: Record "Prod. Order Component"; ReqLine: Record "Requisition Line"; ReservQty: Decimal; ReservQtyBase: Decimal)
+    procedure BindToRequisition(ProdOrderComponent: Record "Prod. Order Component"; RequisitionLine: Record "Requisition Line"; ReservQty: Decimal; ReservQtyBase: Decimal)
     var
         TrackingSpecification: Record "Tracking Specification";
         ReservationEntry: Record "Reservation Entry";
     begin
         SetBinding(ReservationEntry.Binding::"Order-to-Order");
         TrackingSpecification.InitTrackingSpecification(
-          DATABASE::"Requisition Line",
-          0, ReqLine."Worksheet Template Name", ReqLine."Journal Batch Name", 0, ReqLine."Line No.",
-          ReqLine."Variant Code", ReqLine."Location Code", ReqLine."Qty. per Unit of Measure");
+          Enum::TableID::"Requisition Line".AsInteger(),
+          0, RequisitionLine."Worksheet Template Name", RequisitionLine."Journal Batch Name", 0, RequisitionLine."Line No.",
+          RequisitionLine."Variant Code", RequisitionLine."Location Code", RequisitionLine."Qty. per Unit of Measure");
         CreateReservationSetFrom(TrackingSpecification);
-        CreateBindingReservation(ProdOrderComp, ReqLine.Description, ReqLine."Due Date", ReservQty, ReservQtyBase);
+        CreateBindingReservation(ProdOrderComponent, RequisitionLine.Description, RequisitionLine."Due Date", ReservQty, ReservQtyBase);
     end;
 
-    procedure BindToAssembly(ProdOrderComp: Record "Prod. Order Component"; AsmHeader: Record "Assembly Header"; ReservQty: Decimal; ReservQtyBase: Decimal)
+    procedure BindToAssembly(ProdOrderComponent: Record "Prod. Order Component"; AssemblyHeader: Record "Assembly Header"; ReservQty: Decimal; ReservQtyBase: Decimal)
     var
         TrackingSpecification: Record "Tracking Specification";
         ReservationEntry: Record "Reservation Entry";
     begin
         SetBinding(ReservationEntry.Binding::"Order-to-Order");
         TrackingSpecification.InitTrackingSpecification(
-          DATABASE::"Assembly Header", AsmHeader."Document Type".AsInteger(), AsmHeader."No.", '', 0, 0,
-          AsmHeader."Variant Code", AsmHeader."Location Code", AsmHeader."Qty. per Unit of Measure");
+          Enum::TableID::"Assembly Header".AsInteger(), AssemblyHeader."Document Type".AsInteger(), AssemblyHeader."No.", '', 0, 0,
+          AssemblyHeader."Variant Code", AssemblyHeader."Location Code", AssemblyHeader."Qty. per Unit of Measure");
         CreateReservationSetFrom(TrackingSpecification);
-        CreateBindingReservation(ProdOrderComp, AsmHeader.Description, AsmHeader."Due Date", ReservQty, ReservQtyBase);
+        CreateBindingReservation(ProdOrderComponent, AssemblyHeader.Description, AssemblyHeader."Due Date", ReservQty, ReservQtyBase);
     end;
 
-    procedure BindToTransfer(ProdOrderComp: Record "Prod. Order Component"; TransLine: Record "Transfer Line"; ReservQty: Decimal; ReservQtyBase: Decimal)
+    procedure BindToTransfer(ProdOrderComponent: Record "Prod. Order Component"; TransferLine: Record "Transfer Line"; ReservQty: Decimal; ReservQtyBase: Decimal)
     var
         TrackingSpecification: Record "Tracking Specification";
         ReservationEntry: Record "Reservation Entry";
     begin
         SetBinding(ReservationEntry.Binding::"Order-to-Order");
         TrackingSpecification.InitTrackingSpecification(
-          DATABASE::"Transfer Line", 1, TransLine."Document No.", '', 0, TransLine."Line No.",
-          TransLine."Variant Code", TransLine."Transfer-to Code", TransLine."Qty. per Unit of Measure");
+          Enum::TableID::"Transfer Line".AsInteger(), 1, TransferLine."Document No.", '', 0, TransferLine."Line No.",
+          TransferLine."Variant Code", TransferLine."Transfer-to Code", TransferLine."Qty. per Unit of Measure");
         CreateReservationSetFrom(TrackingSpecification);
-        CreateBindingReservation(ProdOrderComp, TransLine.Description, TransLine."Receipt Date", ReservQty, ReservQtyBase);
+        CreateBindingReservation(ProdOrderComponent, TransferLine.Description, TransferLine."Receipt Date", ReservQty, ReservQtyBase);
     end;
 
     [EventSubscriber(ObjectType::Page, PAGE::Reservation, 'OnGetQtyPerUOMFromSourceRecRef', '', false, false)]
     local procedure OnGetQtyPerUOMFromSourceRecRef(SourceRecRef: RecordRef; var QtyPerUOM: Decimal; var QtyReserved: Decimal; var QtyReservedBase: Decimal; var QtyToReserve: Decimal; var QtyToReserveBase: Decimal)
     var
-        ProdOrderComp: Record "Prod. Order Component";
+        ProdOrderComponent: Record "Prod. Order Component";
     begin
         if MatchThisTable(SourceRecRef.Number) then begin
-            SourceRecRef.SetTable(ProdOrderComp);
-            ProdOrderComp.Find();
-            QtyPerUOM := ProdOrderComp.GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
+            SourceRecRef.SetTable(ProdOrderComponent);
+            ProdOrderComponent.Find();
+            QtyPerUOM := ProdOrderComponent.GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
         end;
     end;
 
-    local procedure SetReservSourceFor(SourceRecRef: RecordRef; var ReservEntry: Record "Reservation Entry"; var CaptionText: Text)
+    local procedure SetReservSourceFor(SourceRecordRef: RecordRef; var ReservationEntry: Record "Reservation Entry"; var CaptionText: Text)
     var
-        ProdOrderComp: Record "Prod. Order Component";
+        ProdOrderComponent: Record "Prod. Order Component";
     begin
-        SourceRecRef.SetTable(ProdOrderComp);
-        ProdOrderComp.TestField("Due Date");
+        SourceRecordRef.SetTable(ProdOrderComponent);
+        ProdOrderComponent.TestField("Due Date");
 
-        ProdOrderComp.SetReservationEntry(ReservEntry);
+        ProdOrderComponent.SetReservationEntry(ReservationEntry);
 
-        CaptionText := ProdOrderComp.GetSourceCaption();
+        CaptionText := ProdOrderComponent.GetSourceCaption();
     end;
 
     local procedure EntryStartNo(): Integer
     begin
-        exit("Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger());
+        exit(Enum::"Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger());
     end;
 
     local procedure MatchThisEntry(EntryNo: Integer): Boolean
     begin
-        exit(EntryNo in ["Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger(),
-                         "Reservation Summary Type"::"Planned Prod. Order Comp.".AsInteger(),
-                         "Reservation Summary Type"::"Firm Planned Prod. Order Comp.".AsInteger(),
-                         "Reservation Summary Type"::"Released Prod. Order Comp.".AsInteger()]);
+        exit(EntryNo in [Enum::"Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger(),
+                         Enum::"Reservation Summary Type"::"Planned Prod. Order Comp.".AsInteger(),
+                         Enum::"Reservation Summary Type"::"Firm Planned Prod. Order Comp.".AsInteger(),
+                         Enum::"Reservation Summary Type"::"Released Prod. Order Comp.".AsInteger()]);
     end;
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = 5407); // DATABASE::"Prod. Order Component"
+        exit(TableID = Enum::TableID::"Prod. Order Component".AsInteger());
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnSetReservSource', '', false, false)]
@@ -538,7 +578,7 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
     local procedure OnFilterReservEntry(var FilterReservEntry: Record "Reservation Entry"; ReservEntrySummary: Record "Entry Summary")
     begin
         if MatchThisEntry(ReservEntrySummary."Entry No.") then begin
-            FilterReservEntry.SetRange("Source Type", DATABASE::"Prod. Order Component");
+            FilterReservEntry.SetRange("Source Type", Enum::TableID::"Prod. Order Component".AsInteger());
             FilterReservEntry.SetRange("Source Subtype", ReservEntrySummary."Entry No." - EntryStartNo());
         end;
     end;
@@ -548,7 +588,7 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
     begin
         if MatchThisEntry(FromEntrySummary."Entry No.") then
             IsHandled :=
-                (FilterReservEntry."Source Type" = DATABASE::"Prod. Order Component") and
+                (FilterReservEntry."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger()) and
                 (FilterReservEntry."Source Subtype" = FromEntrySummary."Entry No." - EntryStartNo());
     end;
 
@@ -624,25 +664,25 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
         end;
     end;
 
-    local procedure GetSourceValue(ReservEntry: Record "Reservation Entry"; var SourceRecRef: RecordRef; ReturnOption: Option "Net Qty. (Base)","Gross Qty. (Base)"): Decimal
+    local procedure GetSourceValue(ReservationEntry: Record "Reservation Entry"; var SourceRecordRef: RecordRef; ReturnOption: Option "Net Qty. (Base)","Gross Qty. (Base)"): Decimal
     var
-        ProdOrderComp: Record "Prod. Order Component";
+        ProdOrderComponent: Record "Prod. Order Component";
         IsHandled: Boolean;
         ReturnValue: Decimal;
     begin
         IsHandled := false;
-        OnBeforeGetSourceValue(ReservEntry, SourceRecRef, ReturnOption, ReturnValue, IsHandled);
+        OnBeforeGetSourceValue(ReservationEntry, SourceRecordRef, ReturnOption, ReturnValue, IsHandled);
         if IsHandled then
             exit(ReturnValue);
 
 
-        ProdOrderComp.Get(ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Prod. Order Line", ReservEntry."Source Ref. No.");
-        SourceRecRef.GetTable(ProdOrderComp);
+        ProdOrderComponent.Get(ReservationEntry."Source Subtype", ReservationEntry."Source ID", ReservationEntry."Source Prod. Order Line", ReservationEntry."Source Ref. No.");
+        SourceRecordRef.GetTable(ProdOrderComponent);
         case ReturnOption of
             ReturnOption::"Net Qty. (Base)":
-                exit(ProdOrderComp."Remaining Qty. (Base)");
+                exit(ProdOrderComponent."Remaining Qty. (Base)");
             ReturnOption::"Gross Qty. (Base)":
-                exit(ProdOrderComp."Expected Qty. (Base)");
+                exit(ProdOrderComponent."Expected Qty. (Base)");
         end;
     end;
 
@@ -653,35 +693,35 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
             ReturnQty := GetSourceValue(ReservEntry, SourceRecRef, ReturnOption);
     end;
 
-    local procedure UpdateStatistics(CalcReservEntry: Record "Reservation Entry"; var TempEntrySummary: Record "Entry Summary" temporary; AvailabilityDate: Date; Status: Enum "Production Order Status"; Positive: Boolean; var TotalQuantity: Decimal)
+    local procedure UpdateStatistics(ReservationEntry: Record "Reservation Entry"; var TempEntrySummary: Record "Entry Summary" temporary; AvailabilityDate: Date; Status: Enum "Production Order Status"; Positive: Boolean; var TotalQuantity: Decimal)
     var
-        ProdOrderComp: Record "Prod. Order Component";
+        ProdOrderComponent: Record "Prod. Order Component";
         AvailabilityFilter: Text;
     begin
-        if not ProdOrderComp.ReadPermission then
+        if not ProdOrderComponent.ReadPermission then
             exit;
 
-        AvailabilityFilter := CalcReservEntry.GetAvailabilityFilter(AvailabilityDate, Positive);
-        ProdOrderComp.FilterLinesForReservation(CalcReservEntry, Status.AsInteger(), AvailabilityFilter, Positive);
-        if ProdOrderComp.FindSet() then
+        AvailabilityFilter := ReservationEntry.GetAvailabilityFilter(AvailabilityDate, Positive);
+        ProdOrderComponent.FilterLinesForReservation(ReservationEntry, Status.AsInteger(), AvailabilityFilter, Positive);
+        if ProdOrderComponent.FindSet() then
             repeat
-                    ProdOrderComp.CalcFields("Reserved Qty. (Base)");
-                TempEntrySummary."Total Reserved Quantity" -= ProdOrderComp."Reserved Qty. (Base)";
-                TotalQuantity += ProdOrderComp."Remaining Qty. (Base)";
-            until ProdOrderComp.Next() = 0;
+                ProdOrderComponent.CalcFields("Reserved Qty. (Base)");
+                TempEntrySummary."Total Reserved Quantity" -= ProdOrderComponent."Reserved Qty. (Base)";
+                TotalQuantity += ProdOrderComponent."Remaining Qty. (Base)";
+            until ProdOrderComponent.Next() = 0;
 
         if TotalQuantity = 0 then
             exit;
 
         with TempEntrySummary do
             if (TotalQuantity < 0) = Positive then begin
-                "Table ID" := DATABASE::"Prod. Order Component";
-                if Status = ProdOrderComp.Status::"Firm Planned" then
+                "Table ID" := Enum::TableID::"Prod. Order Component".AsInteger();
+                if Status = ProdOrderComponent.Status::"Firm Planned" then
                     "Summary Type" :=
-                        CopyStr(StrSubstNo(Text010, ProdOrderComp.TableCaption()), 1, MaxStrLen("Summary Type"))
+                        CopyStr(StrSubstNo(Text010, ProdOrderComponent.TableCaption()), 1, MaxStrLen("Summary Type"))
                 else
                     "Summary Type" :=
-                        CopyStr(StrSubstNo(Text011, ProdOrderComp.TableCaption()), 1, MaxStrLen("Summary Type"));
+                        CopyStr(StrSubstNo(Text011, ProdOrderComponent.TableCaption()), 1, MaxStrLen("Summary Type"));
                 "Total Quantity" := -TotalQuantity;
                 "Total Available Quantity" := "Total Quantity" - "Total Reserved Quantity";
                 if not Insert() then
@@ -692,11 +732,30 @@ codeunit 99000838 "Prod. Order Comp.-Reserve"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reservation Management", 'OnUpdateStatistics', '', false, false)]
     local procedure OnUpdateStatistics(CalcReservEntry: Record "Reservation Entry"; var ReservSummEntry: Record "Entry Summary"; AvailabilityDate: Date; Positive: Boolean; var TotalQuantity: Decimal)
     begin
-        if ReservSummEntry."Entry No." in ["Reservation Summary Type"::"Firm Planned Prod. Order Comp.".AsInteger(),
-                                           "Reservation Summary Type"::"Released Prod. Order Comp.".AsInteger()]
+        if ReservSummEntry."Entry No." in [Enum::"Reservation Summary Type"::"Firm Planned Prod. Order Comp.".AsInteger(),
+                                           Enum::"Reservation Summary Type"::"Released Prod. Order Comp.".AsInteger()]
         then
             UpdateStatistics(
-                CalcReservEntry, ReservSummEntry, AvailabilityDate, "Production Order Status".FromInteger(ReservSummEntry."Entry No." - 71), Positive, TotalQuantity);
+                CalcReservEntry, ReservSummEntry, AvailabilityDate, Enum::"Production Order Status".FromInteger(ReservSummEntry."Entry No." - 71), Positive, TotalQuantity);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Reservation Entries", 'OnLookupReserved', '', false, false)]
+    local procedure OnLookupReserved(var ReservationEntry: Record "Reservation Entry")
+    begin
+        if MatchThisTable(ReservationEntry."Source Type") then
+            ShowSourceLines(ReservationEntry);
+    end;
+
+    local procedure ShowSourceLines(var ReservationEntry: Record "Reservation Entry")
+    var
+        ProdOrderComponent: Record "Prod. Order Component";
+    begin
+        ProdOrderComponent.Reset();
+        ProdOrderComponent.SetRange(Status, ReservationEntry."Source Subtype");
+        ProdOrderComponent.SetRange("Prod. Order No.", ReservationEntry."Source ID");
+        ProdOrderComponent.SetRange("Prod. Order Line No.", ReservationEntry."Source Prod. Order Line");
+        ProdOrderComponent.SetRange("Line No.", ReservationEntry."Source Ref. No.");
+        PAGE.RunModal(0, ProdOrderComponent);
     end;
 
     [IntegrationEvent(false, false)]

@@ -3,7 +3,11 @@ permissionset 5759 "D365 BANKING"
     Assignable = true;
 
     Caption = 'Dynamics 365 Banking';
-    Permissions = tabledata "Analysis View" = rimd,
+    Permissions =
+                  tabledata "Alloc. Account Distribution" = RIMD,
+                  tabledata "Allocation Account" = RIMD,
+                  tabledata "Allocation Line" = RIMD,
+                  tabledata "Analysis View" = rimd,
                   tabledata "Analysis View Entry" = rim,
                   tabledata "Analysis View Filter" = r,
                   tabledata "Applied Payment Entry" = RIMD,

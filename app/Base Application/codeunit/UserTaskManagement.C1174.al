@@ -1,3 +1,5 @@
+namespace System.Security.User;
+
 codeunit 1174 "User Task Management"
 {
     // // Code unit to manage user tasks / user tasks groups.

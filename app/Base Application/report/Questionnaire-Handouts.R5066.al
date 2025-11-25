@@ -1,7 +1,11 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Profiling;
+
 report 5066 "Questionnaire - Handouts"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/QuestionnaireHandouts.rdlc';
+    RDLCLayout = './CRM/Reports/QuestionnaireHandouts.rdlc';
     ApplicationArea = RelationshipMgmt;
     Caption = 'Questionnaire - Handouts';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5066 "Questionnaire - Handouts"
     {
         dataitem("Profile Questionnaire Header"; "Profile Questionnaire Header")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code", "Contact Type", "Business Relation Code";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {
@@ -41,8 +45,8 @@ report 5066 "Questionnaire - Handouts"
             }
             dataitem("Profile Questionnaire Line"; "Profile Questionnaire Line")
             {
-                DataItemLink = "Profile Questionnaire Code" = FIELD(Code);
-                DataItemTableView = SORTING("Profile Questionnaire Code", "Line No.");
+                DataItemLink = "Profile Questionnaire Code" = field(Code);
+                DataItemTableView = sorting("Profile Questionnaire Code", "Line No.");
                 column(Profile_Questionnaire_Line_Description; Description)
                 {
                 }

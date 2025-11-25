@@ -16,14 +16,14 @@ table 1878 "VAT Assisted Setup Templates"
         field(3; "Default VAT Bus. Posting Grp"; Code[20])
         {
             Caption = 'Default VAT Bus. Posting Grp';
-            TableRelation = "VAT Assisted Setup Bus. Grp.".Code WHERE(Selected = CONST(true),
-                                                                       Default = CONST(false));
+            TableRelation = "VAT Assisted Setup Bus. Grp.".Code where(Selected = const(true),
+                                                                       Default = const(false));
         }
         field(4; "Default VAT Prod. Posting Grp"; Code[20])
         {
             Caption = 'Default VAT Prod. Posting Grp';
-            TableRelation = "VAT Setup Posting Groups"."VAT Prod. Posting Group" WHERE(Selected = CONST(true),
-                                                                                        Default = CONST(false));
+            TableRelation = "VAT Setup Posting Groups"."VAT Prod. Posting Group" where(Selected = const(true),
+                                                                                        Default = const(false));
         }
         field(5; "Table ID"; Integer)
         {

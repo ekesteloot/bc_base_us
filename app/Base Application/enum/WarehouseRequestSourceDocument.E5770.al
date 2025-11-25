@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Request;
+
 enum 5770 "Warehouse Request Source Document"
 {
     Extensible = true;

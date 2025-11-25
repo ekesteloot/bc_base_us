@@ -1,3 +1,14 @@
+﻿namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.HumanResources.Analysis;
+using Microsoft.HumanResources.Comment;
+using Microsoft.HumanResources.Payables;
+using System.Email;
+
 page 5200 "Employee Card"
 {
     Caption = 'Employee Card';
@@ -20,7 +31,7 @@ page 5200 "Employee Card"
 
                     trigger OnAssistEdit()
                     begin
-                        AssistEdit();
+                        Rec.AssistEdit();
                     end;
                 }
                 field("First Name"; Rec."First Name")
@@ -47,7 +58,7 @@ page 5200 "Employee Card"
                     Importance = Promoted;
                     ToolTip = 'Specifies the employee''s job title.';
                 }
-                field(Initials; Initials)
+                field(Initials; Rec.Initials)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the employee''s initials.';
@@ -57,7 +68,7 @@ page 5200 "Employee Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an alternate name that you can use to search for the record in question when you cannot remember the value in the Name field.';
                 }
-                field(Gender; Gender)
+                field(Gender; Rec.Gender)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the employee''s gender.';
@@ -93,7 +104,7 @@ page 5200 "Employee Card"
                 group(Control13)
                 {
                     ShowCaption = false;
-                    field(Address; Address)
+                    field(Address; Rec.Address)
                     {
                         ApplicationArea = BasicHR;
                         ToolTip = 'Specifies the employee''s address.';
@@ -103,7 +114,7 @@ page 5200 "Employee Card"
                         ApplicationArea = BasicHR;
                         ToolTip = 'Specifies additional address information.';
                     }
-                    field(City; City)
+                    field(City; Rec.City)
                     {
                         ApplicationArea = BasicHR;
                         ToolTip = 'Specifies the city of the address.';
@@ -112,7 +123,7 @@ page 5200 "Employee Card"
                     {
                         ShowCaption = false;
                         Visible = IsCountyVisible;
-                        field(County; County)
+                        field(County; Rec.County)
                         {
                             ApplicationArea = BasicHR;
                             ToolTip = 'Specifies the county of the employee.';
@@ -130,7 +141,7 @@ page 5200 "Employee Card"
 
                         trigger OnValidate()
                         begin
-                            IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                            IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                         end;
                     }
                     field(ShowMap; ShowMapLbl)
@@ -145,7 +156,7 @@ page 5200 "Employee Card"
                         trigger OnDrillDown()
                         begin
                             CurrPage.Update(true);
-                            DisplayMap();
+                            Rec.DisplayMap();
                         end;
                     }
                 }
@@ -159,12 +170,12 @@ page 5200 "Employee Card"
                         Importance = Promoted;
                         ToolTip = 'Specifies the employee''s private telephone number.';
                     }
-                    field(Pager; Pager)
+                    field(Pager; Rec.Pager)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the employee''s pager number.';
                     }
-                    field(Extension; Extension)
+                    field(Extension; Rec.Extension)
                     {
                         ApplicationArea = BasicHR;
                         Importance = Promoted;
@@ -307,7 +318,7 @@ page 5200 "Employee Card"
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the number used by the bank for the bank account.';
                 }
-                field(IBAN; IBAN)
+                field(IBAN; Rec.IBAN)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the bank account''s international bank account number.';
@@ -338,14 +349,14 @@ page 5200 "Employee Card"
             part(Control3; "Employee Picture")
             {
                 ApplicationArea = BasicHR;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::Employee),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::Employee),
+                              "No." = field("No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -374,8 +385,8 @@ page 5200 "Employee Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Human Resource Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Employee),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Employee),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -384,8 +395,8 @@ page 5200 "Employee Card"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(5200),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(5200),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -395,7 +406,7 @@ page 5200 "Employee Card"
                     Caption = '&Picture';
                     Image = Picture;
                     RunObject = Page "Employee Picture";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'View or add a picture of the employee or, for example, the company''s logo.';
                 }
                 action(AlternativeAddresses)
@@ -404,7 +415,7 @@ page 5200 "Employee Card"
                     Caption = '&Alternate Addresses';
                     Image = Addresses;
                     RunObject = Page "Alternative Address List";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'Open the list of addresses that are registered for the employee.';
                 }
                 action("&Relatives")
@@ -413,7 +424,7 @@ page 5200 "Employee Card"
                     Caption = '&Relatives';
                     Image = Relatives;
                     RunObject = Page "Employee Relatives";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'Open the list of relatives that are registered for the employee.';
                 }
                 action("Mi&sc. Article Information")
@@ -422,7 +433,7 @@ page 5200 "Employee Card"
                     Caption = 'Mi&sc. Article Information';
                     Image = Filed;
                     RunObject = Page "Misc. Article Information";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'Open the list of miscellaneous articles that are registered for the employee.';
                 }
                 action("&Confidential Information")
@@ -431,7 +442,7 @@ page 5200 "Employee Card"
                     Caption = '&Confidential Information';
                     Image = Lock;
                     RunObject = Page "Confidential Information";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'Open the list of any confidential information that is registered for the employee.';
                 }
                 action("Q&ualifications")
@@ -440,7 +451,7 @@ page 5200 "Employee Card"
                     Caption = 'Q&ualifications';
                     Image = Certificate;
                     RunObject = Page "Employee Qualifications";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'Open the list of qualifications that are registered for the employee.';
                 }
                 action("A&bsences")
@@ -449,7 +460,7 @@ page 5200 "Employee Card"
                     Caption = 'A&bsences';
                     Image = Absence;
                     RunObject = Page "Employee Absences";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'View absence information for the employee.';
                 }
                 separator(Action23)
@@ -461,8 +472,8 @@ page 5200 "Employee Card"
                     Caption = 'Absences by Ca&tegories';
                     Image = AbsenceCategory;
                     RunObject = Page "Empl. Absences by Categories";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Employee No. Filter" = FIELD("No.");
+                    RunPageLink = "No." = field("No."),
+                                  "Employee No. Filter" = field("No.");
                     ToolTip = 'View categorized absence information for the employee.';
                 }
                 action("Misc. Articles &Overview")
@@ -490,9 +501,9 @@ page 5200 "Employee Card"
                     Caption = 'Ledger E&ntries';
                     Image = VendorLedger;
                     RunObject = Page "Employee Ledger Entries";
-                    RunPageLink = "Employee No." = FIELD("No.");
-                    RunPageView = SORTING("Employee No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Employee No." = field("No.");
+                    RunPageView = sorting("Employee No.")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -519,9 +530,9 @@ page 5200 "Employee Card"
                     Caption = 'Pay Employee';
                     Image = SuggestVendorPayments;
                     RunObject = Page "Employee Ledger Entries";
-                    RunPageLink = "Employee No." = FIELD("No."),
-                                  "Remaining Amount" = FILTER(< 0),
-                                  "Applies-to ID" = FILTER('');
+                    RunPageLink = "Employee No." = field("No."),
+                                  "Remaining Amount" = filter(< 0),
+                                  "Applies-to ID" = filter('');
                     ToolTip = 'View employee ledger entries for the record with remaining amount that have not been paid yet.';
                 }
                 action(Contact)
@@ -536,7 +547,7 @@ page 5200 "Employee Card"
                         ContBusRel: Record "Contact Business Relation";
                         Contact: Record Contact;
                     begin
-                        if ContBusRel.FindByRelation(ContBusRel."Link to Table"::Employee, "No.") then begin
+                        if ContBusRel.FindByRelation(ContBusRel."Link to Table"::Employee, Rec."No.") then begin
                             Contact.Get(ContBusRel."Contact No.");
                             Page.Run(Page::"Contact Card", Contact);
                         end;
@@ -684,7 +695,7 @@ page 5200 "Employee Card"
     trigger OnOpenPage()
     begin
         SetNoFieldVisible();
-        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -692,7 +703,7 @@ page 5200 "Employee Card"
         DocumentNoVisibility: Codeunit DocumentNoVisibility;
     begin
         if GuiAllowed then
-            if "No." = '' then
+            if Rec."No." = '' then
                 if DocumentNoVisibility.EmployeeNoSeriesIsDefault() then
                     NewMode := true;
     end;
@@ -707,7 +718,7 @@ page 5200 "Employee Card"
         NewMode := false;
 
         if EmployeeTemplMgt.InsertEmployeeFromTemplate(Employee) then begin
-            Copy(Employee);
+            Rec.Copy(Employee);
             CurrPage.Update();
         end else
             if EmployeeTemplMgt.TemplatesAreNotEmpty() then

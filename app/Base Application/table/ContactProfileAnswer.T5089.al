@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Profiling;
+
+using Microsoft.CRM.Contact;
+
 table 5089 "Contact Profile Answer"
 {
     Caption = 'Contact Profile Answer';
@@ -25,7 +29,7 @@ table 5089 "Contact Profile Answer"
         {
             Caption = 'Contact Company No.';
             NotBlank = true;
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(3; "Profile Questionnaire Code"; Code[20])
         {
@@ -44,8 +48,8 @@ table 5089 "Contact Profile Answer"
         field(4; "Line No."; Integer)
         {
             Caption = 'Line No.';
-            TableRelation = "Profile Questionnaire Line"."Line No." WHERE("Profile Questionnaire Code" = FIELD("Profile Questionnaire Code"),
-                                                                           Type = CONST(Answer));
+            TableRelation = "Profile Questionnaire Line"."Line No." where("Profile Questionnaire Code" = field("Profile Questionnaire Code"),
+                                                                           Type = const(Answer));
 
             trigger OnValidate()
             var
@@ -57,22 +61,22 @@ table 5089 "Contact Profile Answer"
         }
         field(5; Answer; Text[250])
         {
-            CalcFormula = Lookup("Profile Questionnaire Line".Description WHERE("Profile Questionnaire Code" = FIELD("Profile Questionnaire Code"),
-                                                                                 "Line No." = FIELD("Line No.")));
+            CalcFormula = Lookup("Profile Questionnaire Line".Description where("Profile Questionnaire Code" = field("Profile Questionnaire Code"),
+                                                                                 "Line No." = field("Line No.")));
             Caption = 'Answer';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Contact Company Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact."Company Name" WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact."Company Name" where("No." = field("Contact No.")));
             Caption = 'Contact Company Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; "Contact Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact.Name WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact No.")));
             Caption = 'Contact Name';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,14 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Shared.Navigate;
+
 page 38 "Item Ledger Entries"
 {
     AdditionalSearchTerms = 'inventory transactions';
@@ -8,8 +19,8 @@ page 38 "Item Ledger Entries"
     Editable = false;
     PageType = List;
     SourceTable = "Item Ledger Entry";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Entry No.")
+                      order(descending);
     UsageCategory = History;
 
     layout
@@ -96,7 +107,7 @@ page 38 "Item Ledger Entries"
                         ItemTrackingManagement: Codeunit "Item Tracking Management";
                     begin
                         ItemTrackingManagement.LookupTrackingNoInfo(
-                            Rec."Item No.", Rec."Variant Code", "Item Tracking Type"::"Serial No.", Rec."Serial No.");
+                            Rec."Item No.", Rec."Variant Code", Enum::"Item Tracking Type"::"Serial No.", Rec."Serial No.");
                     end;
                 }
                 field("Lot No."; Rec."Lot No.")
@@ -405,8 +416,8 @@ page 38 "Item Ledger Entries"
                     Caption = '&Value Entries';
                     Image = ValueLedger;
                     RunObject = Page "Value Entries";
-                    RunPageLink = "Item Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Item Ledger Entry No.");
+                    RunPageLink = "Item Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Item Ledger Entry No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of posted amounts that affect the value of the item. Value entries are created for every transaction with the item.';
                 }
@@ -429,7 +440,6 @@ page 38 "Item Ledger Entries"
                 }
                 action("Reservation Entries")
                 {
-                    AccessByPermission = TableData Item = R;
                     ApplicationArea = Reservation;
                     Caption = 'Reservation Entries';
                     Image = ReservationLedger;
@@ -552,7 +562,6 @@ page 38 "Item Ledger Entries"
     var
         Navigate: Page Navigate;
         DimensionSetIDFilter: Page "Dimension Set ID Filter";
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     protected var

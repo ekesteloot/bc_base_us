@@ -1,3 +1,24 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Archive;
+using System.Environment.Configuration;
+using System.Utilities;
+
 codeunit 5343 "CRM Sales Order to Sales Order"
 {
     TableNo = "CRM Salesorder";
@@ -537,20 +558,6 @@ codeunit 5343 "CRM Sales Order to Sales Order"
         end;
 
         SalesLine.InsertFreightLine(CRMSalesorder.FreightAmount);
-    end;
-
-    [Obsolete('Replaced with the overload containing SalesLineNo', '18.0')]
-    procedure CreateExtendedDescriptionOrderLines(SalesHeader: Record "Sales Header"; FullDescription: Text)
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        while StrLen(FullDescription) > 0 do begin
-            InitNewSalesLine(SalesHeader, SalesLine);
-
-            SalesLine.Validate(Description, CopyStr(FullDescription, 1, MaxStrLen(SalesLine.Description)));
-            SalesLine.Insert();
-            FullDescription := CopyStr(FullDescription, MaxStrLen(SalesLine.Description) + 1);
-        end;
     end;
 
     procedure CreateExtendedDescriptionOrderLines(SalesHeader: Record "Sales Header"; FullDescription: Text; SalesLineNo: Integer)

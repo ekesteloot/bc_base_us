@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Ledger;
+
 query 7345 "Avail Qty. (Base) In QC Bins"
 {
     Caption = 'Avail Qty. (Base) In QC Bins';

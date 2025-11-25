@@ -1,3 +1,10 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Worksheet;
+
 page 7354 "Whse. Internal Put-away"
 {
     Caption = 'Whse. Internal Put-away';
@@ -20,7 +27,7 @@ page 7354 "Whse. Internal Put-away"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -32,7 +39,7 @@ page 7354 "Whse. Internal Put-away"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         CurrPage.SaveRecord();
-                        LookupLocation(Rec);
+                        Rec.LookupLocation(Rec);
                         CurrPage.Update(true);
                     end;
                 }
@@ -92,8 +99,8 @@ page 7354 "Whse. Internal Put-away"
             part(WhseInternalPutAwayLines; "Internal Put-away Subform")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "No." = FIELD("No.");
-                SubPageView = SORTING("No.", "Sorting Sequence No.");
+                SubPageLink = "No." = field("No.");
+                SubPageView = sorting("No.", "Sorting Sequence No.");
             }
         }
         area(factboxes)
@@ -102,9 +109,9 @@ page 7354 "Whse. Internal Put-away"
             {
                 ApplicationArea = ItemTracking;
                 Provider = WhseInternalPutAwayLines;
-                SubPageLink = "Item No." = FIELD("Item No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Location Code" = FIELD("Location Code");
+                SubPageLink = "Item No." = field("Item No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Location Code" = field("Location Code");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -134,9 +141,9 @@ page 7354 "Whse. Internal Put-away"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Internal Put-away"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Internal Put-away"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Put-away Lines")
@@ -145,10 +152,10 @@ page 7354 "Whse. Internal Put-away"
                     Caption = 'Put-away Lines';
                     Image = PutawayLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Whse. Document Type" = CONST("Internal Put-away"),
-                                  "Whse. Document No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Document No.", "Whse. Document Type", "Activity Type")
-                                  WHERE("Activity Type" = CONST("Put-away"));
+                    RunPageLink = "Whse. Document Type" = const("Internal Put-away"),
+                                  "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document No.", "Whse. Document Type", "Activity Type")
+                                  where("Activity Type" = const("Put-away"));
                     ToolTip = ' View the related put-aways.';
                 }
             }
@@ -171,7 +178,7 @@ page 7354 "Whse. Internal Put-away"
                     var
                         ReleaseWhseInternalPutAway: Codeunit "Whse. Int. Put-away Release";
                     begin
-                        if Status = Status::Open then
+                        if Rec.Status = Rec.Status::Open then
                             ReleaseWhseInternalPutAway.Release(Rec);
                     end;
                 }
@@ -204,9 +211,9 @@ page 7354 "Whse. Internal Put-away"
                         BinContent: Record "Bin Content";
                         GetBinContent: Report "Whse. Get Bin Content";
                     begin
-                        BinContent.SetRange("Location Code", "Location Code");
+                        BinContent.SetRange("Location Code", Rec."Location Code");
                         GetBinContent.SetTableView(BinContent);
-                        GetBinContent.SetParameters(DummyRec, Rec, "Warehouse Destination Type 2"::"WhseInternalPutawayHeader");
+                        GetBinContent.SetParameters(DummyRec, Rec, Enum::"Warehouse Destination Type 2"::"WhseInternalPutawayHeader");
                         GetBinContent.Run();
                     end;
                 }
@@ -276,7 +283,7 @@ page 7354 "Whse. Internal Put-away"
 
     trigger OnOpenPage()
     begin
-        SetWhseLocationFilter();
+        Rec.SetWhseLocationFilter();
     end;
 
     local procedure SortingMethodOnAfterValidate()

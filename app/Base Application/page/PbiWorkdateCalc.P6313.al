@@ -3,7 +3,7 @@ page 6313 "PBI WorkDate Calc."
     Caption = 'PBI WorkDate Calc.';
     PageType = List;
     SourceTable = "Integer";
-    SourceTableView = WHERE(Number = CONST(1));
+    SourceTableView = where(Number = const(1));
 
     layout
     {

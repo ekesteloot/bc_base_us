@@ -16,18 +16,10 @@ permissionset 1002 "LOCAL READ"
                   tabledata "ACH US Header" = R,
                   tabledata "B10 Adjustment" = R,
                   tabledata "Bank Comment Line" = R,
-#if not CLEAN21
-                  tabledata "Bank Rec. Header" = R,
-                  tabledata "Bank Rec. Line" = R,
-                  tabledata "Bank Rec. Sub-line" = R,
-#endif
                   tabledata "CFDI Documents" = R,
                   tabledata "CFDI Relation Document" = R,
                   tabledata "Credit Manager Cue" = R,
                   tabledata "Data Dictionary Info" = R,
-#if not CLEAN21
-                  tabledata "Deposit Header" = R,
-#endif
                   tabledata "Document Header" = R,
                   tabledata "Document Line" = R,
                   tabledata "EFT Export" = R,

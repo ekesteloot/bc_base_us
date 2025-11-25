@@ -7,7 +7,7 @@ page 321 "ECSL Report"
     PageType = Document;
     ShowFilter = false;
     SourceTable = "VAT Report Header";
-    SourceTableView = WHERE("VAT Report Config. Code" = FILTER("EC Sales List"));
+    SourceTableView = where("VAT Report Config. Code" = filter("EC Sales List"));
 
     layout
     {
@@ -24,7 +24,7 @@ page 321 "ECSL Report"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -132,7 +132,7 @@ page 321 "ECSL Report"
             part(ECSLReportLines; "ECSL Report Subform")
             {
                 ApplicationArea = BasicEU;
-                SubPageLink = "Report No." = FIELD("No.");
+                SubPageLink = "Report No." = field("No.");
             }
             part(ErrorMessagesPart; "Error Messages Part")
             {
@@ -166,7 +166,7 @@ page 321 "ECSL Report"
                         VATReportMediator.GetLines(Rec);
                         UpdateSubForm();
                         CheckForErrors();
-                        ECSLVATReportLine.SetRange("Report No.", "No.");
+                        ECSLVATReportLine.SetRange("Report No.", Rec."No.");
                         if ECSLVATReportLine.Count = 0 then
                             Message(NoLineGeneratedMsg);
                     end;
@@ -345,9 +345,9 @@ page 321 "ECSL Report"
 
     trigger OnOpenPage()
     begin
-        if "No." <> '' then
+        if Rec."No." <> '' then
             InitPageControllers();
-        IsEditable := Status = Status::Open;
+        IsEditable := Rec.Status = Rec.Status::Open;
         DeleteErrors();
     end;
 
@@ -373,16 +373,16 @@ page 321 "ECSL Report"
 
     local procedure ClearPeriod()
     begin
-        "Period No." := 0;
-        "Period Type" := "Period Type"::" ";
+        Rec."Period No." := 0;
+        Rec."Period Type" := Rec."Period Type"::" ";
     end;
 
     local procedure InitPageControllers()
     begin
-        SuggestLinesControllerStatus := Status = Status::Open;
-        ReleaseControllerStatus := Status = Status::Open;
-        SubmitControllerStatus := Status = Status::Released;
-        ReopenControllerStatus := Status = Status::Released;
+        SuggestLinesControllerStatus := Rec.Status = Rec.Status::Open;
+        ReleaseControllerStatus := Rec.Status = Rec.Status::Open;
+        SubmitControllerStatus := Rec.Status = Rec.Status::Released;
+        ReopenControllerStatus := Rec.Status = Rec.Status::Released;
     end;
 
     local procedure CheckForErrors(): Boolean
@@ -392,7 +392,7 @@ page 321 "ECSL Report"
     begin
         ErrorMessage.SetRange("Context Record ID", DummyCompanyInformation.RecordId);
         ErrorMessage.CopyToTemp(TempErrorMessage);
-        ErrorMessage.SetRange("Context Record ID", RecordId);
+        ErrorMessage.SetRange("Context Record ID", Rec.RecordId);
         ErrorMessage.CopyToTemp(TempErrorMessage);
 
         CurrPage.ErrorMessagesPart.PAGE.SetRecords(TempErrorMessage);

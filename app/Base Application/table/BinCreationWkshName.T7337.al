@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Location;
+
 table 7337 "Bin Creation Wksh. Name"
 {
     Caption = 'Bin Creation Wksh. Name';
@@ -37,7 +41,7 @@ table 7337 "Bin Creation Wksh. Name"
         }
         field(21; "Template Type"; Option)
         {
-            CalcFormula = Lookup ("Bin Creation Wksh. Template".Type WHERE(Name = FIELD("Worksheet Template Name")));
+            CalcFormula = Lookup("Bin Creation Wksh. Template".Type WHERE(Name = FIELD("Worksheet Template Name")));
             Caption = 'Template Type';
             Editable = false;
             FieldClass = FlowField;

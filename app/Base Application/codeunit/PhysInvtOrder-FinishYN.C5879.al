@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
 codeunit 5879 "Phys. Invt. Order-Finish (Y/N)"
 {
     TableNo = "Phys. Invt. Order Header";

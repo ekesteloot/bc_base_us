@@ -1,3 +1,9 @@
+namespace System.Diagnostics;
+
+using System.DataAdministration;
+using System.Environment;
+using System.Utilities;
+
 page 592 "Change Log Setup"
 {
     ApplicationArea = Basic, Suite;
@@ -134,10 +140,10 @@ page 592 "Change Log Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 
@@ -158,7 +164,7 @@ page 592 "Change Log Setup"
         EnvironmentInfo: Codeunit "Environment Information";
         ConfirmManagement: Codeunit "Confirm Management";
     begin
-        if not "Change Log Activated" then
+        if not Rec."Change Log Activated" then
             exit;
         if not EnvironmentInfo.IsSaaS() then
             exit;

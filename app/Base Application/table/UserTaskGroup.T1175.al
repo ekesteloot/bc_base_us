@@ -1,3 +1,5 @@
+namespace System.Security.User;
+
 table 1175 "User Task Group"
 {
     Caption = 'User Task Group';

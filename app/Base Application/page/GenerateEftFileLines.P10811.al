@@ -13,7 +13,7 @@ page 10811 "Generate EFT File Lines"
         {
             repeater(Group)
             {
-                field(Include; Include)
+                field(Include; Rec.Include)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies to either include or exclude this line.';
@@ -36,7 +36,7 @@ page 10811 "Generate EFT File Lines"
                     Editable = false;
                     ToolTip = 'Specifies the account number that the journal line entry will be posted to.';
                 }
-                field(Amount; "Amount (LCY)")
+                field(Amount; Rec."Amount (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Amount';
@@ -56,16 +56,16 @@ page 10811 "Generate EFT File Lines"
     var
         EFTExport: Record "EFT Export";
     begin
-        DeleteAll();
+        Rec.DeleteAll();
         EFTExport.SetCurrentKey("Bank Account No.", Transmitted);
         EFTExport.SetRange("Bank Account No.", BankAccountNumber);
         EFTExport.SetRange(Transmitted, false);
         if EFTExport.Find('-') then
             repeat
-                EFTExport.Description := CopyStr(EFTExport.Description, 1, MaxStrLen(Description));
-                TransferFields(EFTExport);
-                Include := true;
-                Insert();
+                EFTExport.Description := CopyStr(EFTExport.Description, 1, MaxStrLen(Rec.Description));
+                Rec.TransferFields(EFTExport);
+                Rec.Include := true;
+                Rec.Insert();
             until EFTExport.Next() = 0;
         CurrPage.Update(false);
     end;
@@ -83,25 +83,25 @@ page 10811 "Generate EFT File Lines"
     procedure GetColumns(var TempEFTExportWorkset: Record "EFT Export Workset" temporary)
     begin
         TempEFTExportWorkset.DeleteAll();
-        SetRange(Include, true);
-        if FindFirst() then
+        Rec.SetRange(Include, true);
+        if Rec.FindFirst() then
             repeat
                 TempEFTExportWorkset.TransferFields(Rec);
                 TempEFTExportWorkset.Insert();
-            until Next() = 0;
-        Reset();
+            until Rec.Next() = 0;
+        Rec.Reset();
     end;
 
     [Scope('OnPrem')]
     procedure MarkUnmarkInclude(SetInclude: Boolean; BankAccountNumber: Code[20])
     begin
-        SetCurrentKey("Bal. Account No.");
-        SetRange("Bal. Account No.", BankAccountNumber);
-        if FindFirst() then
+        Rec.SetCurrentKey("Bal. Account No.");
+        Rec.SetRange("Bal. Account No.", BankAccountNumber);
+        if Rec.FindFirst() then
             repeat
-                Include := SetInclude;
-                Modify();
-            until Next() = 0;
+                Rec.Include := SetInclude;
+                Rec.Modify();
+            until Rec.Next() = 0;
     end;
 }
 

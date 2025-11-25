@@ -8,7 +8,7 @@ report 10082 "Return Receipt"
     {
         dataitem("Return Receipt Header"; "Return Receipt Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.", "Ship-to Code", "No. Printed";
             RequestFilterHeading = 'Return Receipt';
@@ -17,12 +17,12 @@ report 10082 "Return Receipt"
             }
             dataitem("Return Receipt Line"; "Return Receipt Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 dataitem(SalesLineComments; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Posted Return Receipt"), "Print On Return Receipt" = CONST(true));
+                    DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Posted Return Receipt"), "Print On Return Receipt" = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -45,8 +45,8 @@ report 10082 "Return Receipt"
             }
             dataitem("Sales Comment Line"; "Sales Comment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Posted Return Receipt"), "Print On Return Receipt" = CONST(true), "Document Line No." = CONST(0));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Posted Return Receipt"), "Print On Return Receipt" = const(true), "Document Line No." = const(0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -66,10 +66,10 @@ report 10082 "Return Receipt"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyAddress1; CompanyAddress[1])
                     {
                     }
@@ -219,7 +219,7 @@ report 10082 "Return Receipt"
                     }
                     dataitem(RetRcptLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(TempReturnReceiptLineNo; TempReturnReceiptLine."No.")
                         {
                         }
@@ -337,6 +337,7 @@ report 10082 "Return Receipt"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if PrintCompany then
                     if RespCenter.Get("Responsibility Center") then begin
@@ -482,7 +483,6 @@ report 10082 "Return Receipt"
         TaxRegNo: Text[30];
         TaxRegLabel: Text;
         CurrentCopiesNo: Integer;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         BillCaptionLbl: Label 'Bill';
         ToCaptionLbl: Label 'To:';

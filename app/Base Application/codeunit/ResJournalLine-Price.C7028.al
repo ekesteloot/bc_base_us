@@ -1,3 +1,12 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 codeunit 7028 "Res. Journal Line - Price" implements "Line With Price"
 {
     var

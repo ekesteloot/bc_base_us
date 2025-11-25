@@ -1,3 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.InventoryMgt.BOM.Tree;
+
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.ProductionBOM;
+using System.Threading;
+using System.Utilities;
+
 codeunit 3687 "Low-Level Code Calculator"
 {
     var
@@ -161,7 +173,7 @@ codeunit 3687 "Low-Level Code Calculator"
         Item.SetFilter("Production BOM No.", '<> %1', '');
         TotalItemCount := Item.Count();
 
-        ItemProductionBOMs.SetRange(BOMStatus, "BOM Status"::Certified);
+        ItemProductionBOMs.SetRange(BOMStatus, Enum::"BOM Status"::Certified);
         ItemProductionBOMs.Open();
         while ItemProductionBOMs.Read() do begin
             Progressed += 1;
@@ -201,14 +213,14 @@ codeunit 3687 "Low-Level Code Calculator"
             end;
             LowLevelCodeParam.ShowDetails(StrSubstNo(RecordDetailsLbl, ProductionBOMHeader.TableCaption(), ProductionBOMLineDetails.No_), Progressed, TotalProdBOMCount);
 
-            if (ProductionBOMLineDetails.Status = "BOM Status"::Certified) or ((ProductionBOMLineDetails.BOM_Version_Code <> '') and (ProductionBOMLineDetails.BOM_Version_StartingDate <= WorkDate()) and (ProductionBOMLineDetails.BOM_Version_Status = "BOM Status"::Certified)) then begin
+            if (ProductionBOMLineDetails.Status = ProductionBOMLineDetails.Status::Certified) or ((ProductionBOMLineDetails.BOM_Version_Code <> '') and (ProductionBOMLineDetails.BOM_Version_StartingDate <= WorkDate()) and (ProductionBOMLineDetails.BOM_Version_Status = Enum::"BOM Status"::Certified)) then begin
                 Parent.CreateForProdBOM(ProductionBOMLineDetails.No_, ProductionBOMLineDetails.Low_Level_Code, LowLevelCodeParam);
                 case ProductionBOMLineDetails.Type of
                     "Production BOM Line Type"::Item:
                         if ProductionBOMLineDetails.ChildItem_No_ <> '' then
                             Child.CreateForItem(ProductionBOMLineDetails.ChildItem_No_, ProductionBOMLineDetails.ChildItem_Low_Level_Code, LowLevelCodeParam);
                     "Production BOM Line Type"::"Production BOM":
-                        if (ProductionBOMLineDetails.ChildBOM_No_ <> '') and (ProductionBOMLineDetails.ChildBOM_Status = "BOM Status"::Certified) then
+                        if (ProductionBOMLineDetails.ChildBOM_No_ <> '') and (ProductionBOMLineDetails.ChildBOM_Status = ProductionBOMLineDetails.Status::Certified) then
                             Child.CreateForProdBOM(ProductionBOMLineDetails.ChildBOM_No_, ProductionBOMLineDetails.ChildBOM_Low_Level_Code, LowLevelCodeParam);
                 end;
 

@@ -1,4 +1,8 @@
 #if not CLEAN22
+namespace System.Diagnostics;
+
+using System.Utilities;
+
 report 510 "Change Log - Delete"
 {
     Caption = 'Change Log - Delete';
@@ -12,7 +16,7 @@ report 510 "Change Log - Delete"
     {
         dataitem("Change Log Entry"; "Change Log Entry")
         {
-            DataItemTableView = SORTING("Table No.", "Primary Key Field 1 Value");
+            DataItemTableView = sorting("Table No.", "Primary Key Field 1 Value");
             RequestFilterFields = "Date and Time", "Table No.";
 
             trigger OnPostDataItem()

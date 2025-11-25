@@ -22,7 +22,7 @@ page 9839 "Printer Selections FactBox"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Report ID"; Rec."Report ID")

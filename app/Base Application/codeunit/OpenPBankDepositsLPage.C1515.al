@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Deposit;
+
 codeunit 1515 "Open P. Bank Deposits L. Page"
 {
     trigger OnRun()

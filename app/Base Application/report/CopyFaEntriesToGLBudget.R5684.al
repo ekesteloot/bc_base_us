@@ -1,3 +1,10 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Setup;
+
 report 5684 "Copy FA Entries to G/L Budget"
 {
     Caption = 'Copy FA Entries to G/L Budget';
@@ -7,7 +14,7 @@ report 5684 "Copy FA Entries to G/L Budget"
     {
         dataitem("Fixed Asset"; "Fixed Asset")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "FA Class Code", "FA Subclass Code", "Budgeted Asset";
 
             trigger OnAfterGetRecord()

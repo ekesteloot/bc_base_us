@@ -1,3 +1,5 @@
+namespace System.Utilities;
+
 table 880 "Excel Template Storage"
 {
     Caption = 'Excel Template Storage';

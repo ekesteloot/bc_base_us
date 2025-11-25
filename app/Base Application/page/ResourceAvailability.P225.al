@@ -1,3 +1,8 @@
+﻿namespace Microsoft.ProjectMgt.Resources.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 page 225 "Resource Availability"
 {
     Caption = 'Resource Availability';

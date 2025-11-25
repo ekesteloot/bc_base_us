@@ -1,4 +1,24 @@
-﻿codeunit 13 "Gen. Jnl.-Post Batch"
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Posting;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Intercompany.Inbox;
+using Microsoft.Intercompany.Outbox;
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Utilities;
+
+codeunit 13 "Gen. Jnl.-Post Batch"
 {
     Permissions = TableData "Gen. Journal Batch" = rimd;
     TableNo = "Gen. Journal Line";
@@ -67,7 +87,7 @@
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        NoSeriesMgt2: array[10] of Codeunit NoSeriesManagement;
+        NoSeriesMgt2: array[100] of Codeunit NoSeriesManagement;
         ICOutboxMgt: Codeunit ICInboxOutboxMgt;
         SalesTaxCalculate: Codeunit "Sales Tax Calculate";
         PostingSetupMgt: Codeunit PostingSetupManagement;
@@ -152,6 +172,7 @@
     local procedure ProcessLines(var GenJnlLine: Record "Gen. Journal Line")
     var
         TempGenJnlLine: Record "Gen. Journal Line" temporary;
+        TempGenJnlBatch: Record "Gen. Journal Batch" temporary;
         GenJnlLineVATInfoSource: Record "Gen. Journal Line";
         UpdateAnalysisView: Codeunit "Update Analysis View";
         ICOutboxExport: Codeunit "IC Outbox Export";
@@ -263,6 +284,8 @@
                 GenJnlPostPreview.ThrowError();
             end;
 
+            TempGenJnlBatch.Copy(GenJnlBatch);
+
             // Update/delete lines
             if GLRegNo <> 0 then
                 UpdateAndDeleteLines(GenJnlLine);
@@ -297,7 +320,7 @@
                 until GLEntry.Next() = 0;
         end;
         UpdateAnalysisView.UpdateAll(0, true);
-        GenJnlBatch.OnMoveGenJournalBatch(GLReg.RecordId);
+        TempGenJnlBatch.OnMoveGenJournalBatch(GLReg.RecordId);
         if not SuppressCommit then
             Commit();
 
@@ -305,7 +328,7 @@
             Message(SkippedLineMsg);
 
         OnAfterProcessLines(TempGenJnlLine, GenJnlLine, SuppressCommit, PreviewMode);
-        
+
         if LastICTransactionNo > 0 then
             ICFeedback.ShowIntercompanyMessage(TempGenJnlLine, ICLastDocNo, ICProccessedLines);
     end;
@@ -1442,6 +1465,7 @@
             if NeedCheckZeroAmount() and (Amount = 0) and IsRecurring() then
                 exit(false);
 
+            GenJnlPostLine.SetPreviewMode(PreviewMode);
             LineCount := LineCount + 1;
             if CurrentICPartner <> '' then
                 "IC Partner Code" := CurrentICPartner;

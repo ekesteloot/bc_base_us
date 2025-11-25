@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 page 1512 "Notification Setup"
 {
     ApplicationArea = Suite;
@@ -24,7 +26,7 @@ page 1512 "Notification Setup"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the code of the notification method that is used to create notifications for the user.';
                 }
-                field(Schedule; Schedule)
+                field(Schedule; Rec.Schedule)
                 {
                     ApplicationArea = Suite;
                     Editable = false;
@@ -44,8 +46,8 @@ page 1512 "Notification Setup"
                 Caption = 'Notification Schedule';
                 Image = DateRange;
                 RunObject = Page "Notification Schedule";
-                RunPageLink = "User ID" = FIELD("User ID"),
-                              "Notification Type" = FIELD("Notification Type");
+                RunPageLink = "User ID" = field("User ID"),
+                              "Notification Type" = field("Notification Type");
                 ToolTip = 'Specify when the user receives notifications. The value is copied from the Recurrence field in the Notification Schedule window.';
             }
         }

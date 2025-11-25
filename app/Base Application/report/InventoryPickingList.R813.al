@@ -1,7 +1,14 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 report 813 "Inventory Picking List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InventoryPickingList.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InventoryPickingList.rdlc';
     AccessByPermission = TableData Location = R;
     ApplicationArea = Warehouse;
     Caption = 'Inventory Picking List';
@@ -62,8 +69,8 @@ report 813 "Inventory Picking List"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Location Code" = FIELD("Location Filter"), "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Bin Code" = FIELD("Bin Filter");
-                DataItemTableView = SORTING("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date") WHERE(Type = CONST(Item), "Document Type" = CONST(Order), "Qty. to Ship" = FILTER(<> 0));
+                DataItemLink = "No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter"), "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"), "Bin Code" = field("Bin Filter");
+                DataItemTableView = sorting("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date") where(Type = const(Item), "Document Type" = const(Order), "Qty. to Ship" = filter(<> 0));
                 RequestFilterFields = "Shipment Date", "Location Code";
                 RequestFilterHeading = 'Sales Order Line';
                 column(DocumentNo_SalesLine; "Document No.")

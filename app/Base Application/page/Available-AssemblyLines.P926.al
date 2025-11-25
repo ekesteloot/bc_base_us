@@ -1,3 +1,9 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+
 page 926 "Available - Assembly Lines"
 {
     Caption = 'Available - Assembly Lines';
@@ -8,7 +14,7 @@ page 926 "Available - Assembly Lines"
     PageType = List;
     Permissions = TableData "Assembly Line" = rm;
     SourceTable = "Assembly Line";
-    SourceTableView = SORTING("Document Type", "Document No.", Type, "Location Code");
+    SourceTableView = sorting("Document Type", "Document No.", Type, "Location Code");
 
     layout
     {

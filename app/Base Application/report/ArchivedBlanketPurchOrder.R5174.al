@@ -1,14 +1,27 @@
+﻿namespace Microsoft.Purchases.Archive;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 5174 "Archived Blanket Purch. Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/ArchivedBlanketPurchOrder.rdlc';
+    RDLCLayout = './Purchases/Archive/ArchivedBlanketPurchOrder.rdlc';
     Caption = 'Archived Blanket Purch. Order';
 
     dataset
     {
         dataitem("Purchase Header Archive"; "Purchase Header Archive")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Blanket Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Blanket Order"));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Archived Blanket Purchase Order';
             column(Purchase_Header_Archive_Document_Type; "Document Type")
@@ -25,10 +38,10 @@ report 5174 "Archived Blanket Purch. Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(STRSUBSTNO_Text004_CopyText_; StrSubstNo(ReportTitleLbl, CopyText))
                     {
                     }
@@ -179,7 +192,7 @@ report 5174 "Archived Blanket Purch. Order"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purchase Header Archive";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -230,9 +243,9 @@ report 5174 "Archived Blanket Purch. Order"
                     }
                     dataitem("Purchase Line Archive"; "Purchase Line Archive")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No."), "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"), "Version No." = FIELD("Version No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No."), "Doc. No. Occurrence" = field("Doc. No. Occurrence"), "Version No." = field("Version No.");
                         DataItemLinkReference = "Purchase Header Archive";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Doc. No. Occurrence", "Version No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Doc. No. Occurrence", "Version No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -241,7 +254,7 @@ report 5174 "Archived Blanket Purch. Order"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(PurchLineArch__Line_Amount_; TempPurchLineArchive."Line Amount")
                         {
                             AutoFormatExpression = "Purchase Line Archive"."Currency Code";
@@ -428,7 +441,7 @@ report 5174 "Archived Blanket Purch. Order"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_Control74; DimText)
                             {
                             }
@@ -526,7 +539,7 @@ report 5174 "Archived Blanket Purch. Order"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmountLine__VAT_Base_; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Purchase Header Archive"."Currency Code";
@@ -685,7 +698,7 @@ report 5174 "Archived Blanket Purch. Order"
                     }
                     dataitem(VATCounterLCY; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VALExchRate; VALExchRate)
                         {
                         }
@@ -791,7 +804,7 @@ report 5174 "Archived Blanket Purch. Order"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(PaymentTerms_Description; PaymentTerms.Description)
                         {
                         }
@@ -810,7 +823,7 @@ report 5174 "Archived Blanket Purch. Order"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Purchase_Header_Archive___Pay_to_Vendor_No__; "Purchase Header Archive"."Pay-to Vendor No.")
                         {
                         }
@@ -856,7 +869,7 @@ report 5174 "Archived Blanket Purch. Order"
                     }
                     dataitem(Total3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Purchase_Header_Archive___Sell_to_Customer_No__; "Purchase Header Archive"."Sell-to Customer No.")
                         {
                         }
@@ -947,6 +960,7 @@ report 5174 "Archived Blanket Purch. Order"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Purchase Header Archive");

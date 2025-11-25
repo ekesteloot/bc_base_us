@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Insurance;
+
 page 5648 "Insurance Types"
 {
     ApplicationArea = FixedAssets;
@@ -13,7 +15,7 @@ page 5648 "Insurance Types"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies an insurance type code.';

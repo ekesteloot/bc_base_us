@@ -22,7 +22,7 @@ page 760 "Trailing Sales Orders Chart"
 
                 trigger DataPointClicked(point: DotNet BusinessChartDataPoint)
                 begin
-                    SetDrillDownIndexes(point);
+                    Rec.SetDrillDownIndexes(point);
                     TrailingSalesOrdersMgt.DrillDown(Rec);
                 end;
 
@@ -299,33 +299,19 @@ page 760 "Trailing Sales Orders Chart"
         TrailingSalesOrdersMgt: Codeunit "Trailing Sales Orders Mgt.";
         StatusText: Text[250];
         NeedsUpdate: Boolean;
-        [InDataSet]
         AllOrdersEnabled: Boolean;
-        [InDataSet]
         OrdersUntilTodayEnabled: Boolean;
-        [InDataSet]
         DelayedOrdersEnabled: Boolean;
-        [InDataSet]
         DayEnabled: Boolean;
-        [InDataSet]
         WeekEnabled: Boolean;
-        [InDataSet]
         MonthEnabled: Boolean;
-        [InDataSet]
         QuarterEnabled: Boolean;
-        [InDataSet]
         YearEnabled: Boolean;
-        [InDataSet]
         AmountEnabled: Boolean;
-        [InDataSet]
         NoOfOrdersEnabled: Boolean;
-        [InDataSet]
         StackedAreaEnabled: Boolean;
-        [InDataSet]
         StackedAreaPctEnabled: Boolean;
-        [InDataSet]
         StackedColumnEnabled: Boolean;
-        [InDataSet]
         StackedColumnPctEnabled: Boolean;
         IsChartAddInReady: Boolean;
         IsChartDataReady: Boolean;
@@ -337,7 +323,7 @@ page 760 "Trailing Sales Orders Chart"
         if not IsChartAddInReady then
             exit;
         TrailingSalesOrdersMgt.UpdateData(Rec);
-        Update(CurrPage.BusinessChart);
+        Rec.Update(CurrPage.BusinessChart);
         UpdateStatus();
         NeedsUpdate := false;
     end;

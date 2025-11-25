@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Asset;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+
 codeunit 7041 "Price Asset - Item" implements "Price Asset"
 {
     var
@@ -173,11 +184,7 @@ codeunit 7041 "Price Asset - Item" implements "Price Asset"
                     PriceAsset."Unit Price" := Item."Unit Price";
                 end;
             PriceAsset."Price Type"::Purchase:
-                begin
-                    PriceAsset."Allow Invoice Disc." := Item."Allow Invoice Disc.";
-
-                    PriceAsset."Unit Price" := Item."Last Direct Cost";
-                end;
+                PriceAsset."Unit Price" := Item."Last Direct Cost";
         end;
 
         OnAfterFillAdditionalFields(PriceAsset, Item, ItemVariant);

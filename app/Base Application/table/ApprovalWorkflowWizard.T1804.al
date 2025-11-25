@@ -1,3 +1,9 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.Reflection;
+using System.Security.User;
+
 table 1804 "Approval Workflow Wizard"
 {
     Caption = 'Approval Workflow Wizard';
@@ -39,7 +45,7 @@ table 1804 "Approval Workflow Wizard"
         field(10; "Field"; Integer)
         {
             Caption = 'Field';
-            TableRelation = Field."No." WHERE(TableNo = CONST(18));
+            TableRelation = Field."No." where(TableNo = const(18));
         }
         field(11; TableNo; Integer)
         {
@@ -47,8 +53,8 @@ table 1804 "Approval Workflow Wizard"
         }
         field(12; "Field Caption"; Text[250])
         {
-            CalcFormula = Lookup (Field."Field Caption" WHERE(TableNo = FIELD(TableNo),
-                                                              "No." = FIELD(Field)));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field(TableNo),
+                                                              "No." = field(Field)));
             Caption = 'Field Caption';
             FieldClass = FlowField;
         }

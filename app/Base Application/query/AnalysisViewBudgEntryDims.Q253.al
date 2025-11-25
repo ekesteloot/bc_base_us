@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 query 253 "Analysis View Budg. Entry Dims"
 {
     Caption = 'Analysis View Budg. Entry Dims';

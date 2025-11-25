@@ -1,4 +1,40 @@
-﻿table 112 "Sales Invoice Header"
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.BankMgt.Setup;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Integration.Dataverse;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Navigate;
+using System.Globalization;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.User;
+using System.Utilities;
+using System.IO;
+
+table 112 "Sales Invoice Header"
 {
     Caption = 'Sales Invoice Header';
     DataCaptionFields = "No.", "Sell-to Customer Name";
@@ -43,8 +79,6 @@
         {
             Caption = 'Bill-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(10; "Bill-to Contact"; Text[100])
@@ -58,7 +92,7 @@
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Sell-to Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Sell-to Customer No."));
         }
         field(13; "Ship-to Name"; Text[100])
         {
@@ -80,8 +114,6 @@
         {
             Caption = 'Ship-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
@@ -132,19 +164,19 @@
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(31; "Customer Posting Group"; Code[20])
         {
@@ -187,6 +219,11 @@
             Caption = 'Language Code';
             TableRelation = Language;
         }
+        field(42; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(43; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
@@ -199,9 +236,9 @@
         }
         field(46; Comment; Boolean)
         {
-            CalcFormula = Exist("Sales Comment Line" WHERE("Document Type" = CONST("Posted Invoice"),
-                                                            "No." = FIELD("No."),
-                                                            "Document Line No." = CONST(0)));
+            CalcFormula = exist("Sales Comment Line" where("Document Type" = const("Posted Invoice"),
+                                                            "No." = field("No."),
+                                                            "Document Line No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -237,24 +274,24 @@
         field(55; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
         }
         field(60; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Invoice Line".Amount WHERE("Document No." = FIELD("No.")));
+            CalcFormula = sum("Sales Invoice Line".Amount where("Document No." = field("No.")));
             Caption = 'Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(61; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Invoice Line"."Amount Including VAT" WHERE("Document No." = FIELD("No.")));
+            CalcFormula = sum("Sales Invoice Line"."Amount Including VAT" where("Document No." = field("No.")));
             Caption = 'Amount Including VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -312,8 +349,6 @@
         {
             Caption = 'Sell-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(84; "Sell-to Contact"; Text[100])
@@ -324,8 +359,6 @@
         {
             Caption = 'Bill-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(86; "Bill-to County"; Text[30])
@@ -342,8 +375,6 @@
         {
             Caption = 'Sell-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(89; "Sell-to County"; Text[30])
@@ -360,8 +391,6 @@
         {
             Caption = 'Ship-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(92; "Ship-to County"; Text[30])
@@ -445,8 +474,6 @@
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(113; "Source Code"; Code[10])
         {
@@ -506,13 +533,13 @@
         field(163; "Company Bank Account Code"; Code[20])
         {
             Caption = 'Company Bank Account Code';
-            TableRelation = "Bank Account" where("Currency Code" = FIELD("Currency Code"));
+            TableRelation = "Bank Account" where("Currency Code" = field("Currency Code"));
         }
         field(166; "Last Email Sent Time"; DateTime)
         {
-            CalcFormula = Max("O365 Document Sent History"."Created Date-Time" WHERE("Document Type" = CONST(Invoice),
-                                                                                      "Document No." = FIELD("No."),
-                                                                                      Posted = CONST(true)));
+            CalcFormula = max("O365 Document Sent History"."Created Date-Time" where("Document Type" = const(Invoice),
+                                                                                      "Document No." = field("No."),
+                                                                                      Posted = const(true)));
             Caption = 'Last Email Sent Time';
             FieldClass = FlowField;
             ObsoleteReason = 'Microsoft Invoicing has been discontinued.';
@@ -526,10 +553,10 @@
         }
         field(167; "Last Email Sent Status"; Option)
         {
-            CalcFormula = Lookup("O365 Document Sent History"."Job Last Status" WHERE("Document Type" = CONST(Invoice),
-                                                                                       "Document No." = FIELD("No."),
-                                                                                       Posted = CONST(true),
-                                                                                       "Created Date-Time" = FIELD("Last Email Sent Time")));
+            CalcFormula = Lookup("O365 Document Sent History"."Job Last Status" where("Document Type" = const(Invoice),
+                                                                                       "Document No." = field("No."),
+                                                                                       Posted = const(true),
+                                                                                       "Created Date-Time" = field("Last Email Sent Time")));
             Caption = 'Last Email Sent Status';
             FieldClass = FlowField;
             OptionCaption = 'Not Sent,In Process,Finished,Error';
@@ -545,10 +572,10 @@
         }
         field(168; "Sent as Email"; Boolean)
         {
-            CalcFormula = Exist("O365 Document Sent History" WHERE("Document Type" = CONST(Invoice),
-                                                                    "Document No." = FIELD("No."),
-                                                                    Posted = CONST(true),
-                                                                    "Job Last Status" = CONST(Finished)));
+            CalcFormula = exist("O365 Document Sent History" where("Document Type" = const(Invoice),
+                                                                    "Document No." = field("No."),
+                                                                    Posted = const(true),
+                                                                    "Job Last Status" = const(Finished)));
             Caption = 'Sent as Email';
             FieldClass = FlowField;
             ObsoleteReason = 'Microsoft Invoicing has been discontinued.';
@@ -562,10 +589,10 @@
         }
         field(169; "Last Email Notif Cleared"; Boolean)
         {
-            CalcFormula = Lookup("O365 Document Sent History".NotificationCleared WHERE("Document Type" = CONST(Invoice),
-                                                                                         "Document No." = FIELD("No."),
-                                                                                         Posted = CONST(true),
-                                                                                         "Created Date-Time" = FIELD("Last Email Sent Time")));
+            CalcFormula = Lookup("O365 Document Sent History".NotificationCleared where("Document Type" = const(Invoice),
+                                                                                         "Document No." = field("No."),
+                                                                                         Posted = const(true),
+                                                                                         "Created Date-Time" = field("Last Email Sent Time")));
             Caption = 'Last Email Notif Cleared';
             FieldClass = FlowField;
             ObsoleteReason = 'Microsoft Invoicing has been discontinued.';
@@ -623,7 +650,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(600; "Payment Service Set ID"; Integer)
@@ -665,21 +692,21 @@
         field(1200; "Direct Debit Mandate ID"; Code[35])
         {
             Caption = 'Direct Debit Mandate ID';
-            TableRelation = "SEPA Direct Debit Mandate" WHERE("Customer No." = FIELD("Bill-to Customer No."));
+            TableRelation = "SEPA Direct Debit Mandate" where("Customer No." = field("Bill-to Customer No."));
         }
         field(1302; Closed; Boolean)
         {
-            CalcFormula = - Exist("Cust. Ledger Entry" WHERE("Entry No." = FIELD("Cust. Ledger Entry No."),
-                                                             Open = FILTER(true)));
+            CalcFormula = - Exist("Cust. Ledger Entry" where("Entry No." = field("Cust. Ledger Entry No."),
+                                                             Open = filter(true)));
             Caption = 'Closed';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1303; "Remaining Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Cust. Ledger Entry No." = FIELD("Cust. Ledger Entry No.")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Cust. Ledger Entry No." = field("Cust. Ledger Entry No.")));
             Caption = 'Remaining Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -689,29 +716,27 @@
             Caption = 'Cust. Ledger Entry No.';
             Editable = false;
             TableRelation = "Cust. Ledger Entry"."Entry No.";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(1305; "Invoice Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Invoice Line"."Inv. Discount Amount" WHERE("Document No." = FIELD("No.")));
+            CalcFormula = sum("Sales Invoice Line"."Inv. Discount Amount" where("Document No." = field("No.")));
             Caption = 'Invoice Discount Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1310; Cancelled; Boolean)
         {
-            CalcFormula = Exist("Cancelled Document" WHERE("Source ID" = CONST(112),
-                                                            "Cancelled Doc. No." = FIELD("No.")));
+            CalcFormula = exist("Cancelled Document" where("Source ID" = const(112),
+                                                            "Cancelled Doc. No." = field("No.")));
             Caption = 'Cancelled';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1311; Corrective; Boolean)
         {
-            CalcFormula = Exist("Cancelled Document" WHERE("Source ID" = CONST(114),
-                                                            "Cancelled By Doc. No." = FIELD("No.")));
+            CalcFormula = exist("Cancelled Document" where("Source ID" = const(114),
+                                                            "Cancelled By Doc. No." = field("No.")));
             Caption = 'Corrective';
             Editable = false;
             FieldClass = FlowField;
@@ -888,7 +913,7 @@
         field(10055; "Transit-to Location"; Code[10])
         {
             Caption = 'Transit-to Location';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
             ObsoleteReason = 'Replaced with SAT Address ID.';
 #if not CLEAN23
             ObsoleteState = Pending;
@@ -928,7 +953,7 @@
         field(27003; "Substitution Document No."; Code[20])
         {
             Caption = 'Substitution Document No.';
-            TableRelation = "Sales Invoice Header" WHERE("Electronic Document Status" = FILTER("Stamp Received"));
+            TableRelation = "Sales Invoice Header" where("Electronic Document Status" = filter("Stamp Received"));
         }
         field(27004; "CFDI Export Code"; Code[10])
         {
@@ -1037,7 +1062,7 @@
         ApprovalsMgmt.DeletePostedApprovalEntries(RecordId);
 
         PostedDeferralHeader.DeleteForDoc(
-            "Deferral Document Type"::Sales.AsInteger(), '', '',
+            Enum::"Deferral Document Type"::Sales.AsInteger(), '', '',
             SalesCommentLine."Document Type"::"Posted Invoice".AsInteger(), "No.");
     end;
 
@@ -1352,7 +1377,7 @@
     var
         ActivityLog: Record "Activity Log";
     begin
-        ActivityLog.ShowEntries(RecordId);
+        ActivityLog.ShowEntries(Rec.RecordId);
     end;
 
     procedure StartTrackingSite()
@@ -1414,9 +1439,9 @@
         CalcFields(Cancelled, Corrective);
         case true of
             Cancelled:
-                ShowCorrectiveCreditMemo();
+                Rec.ShowCorrectiveCreditMemo();
             Corrective:
-                ShowCancelledCreditMemo();
+                Rec.ShowCancelledCreditMemo();
         end;
     end;
 

@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Comment;
+
 page 5069 "Web Sources"
 {
     ApplicationArea = RelationshipMgmt;
@@ -13,7 +17,7 @@ page 5069 "Web Sources"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the Web source.';
@@ -23,12 +27,12 @@ page 5069 "Web Sources"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the description of the Web source.';
                 }
-                field(URL; URL)
+                field(URL; Rec.URL)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the URL to use to search for information about the contact on the Internet.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies whether a comment has been assigned to this Web source.';
@@ -64,9 +68,9 @@ page 5069 "Web Sources"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Rlshp. Mgt. Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Web Source"),
-                                  "No." = FIELD(Code),
-                                  "Sub No." = CONST(0);
+                    RunPageLink = "Table Name" = const("Web Source"),
+                                  "No." = field(Code),
+                                  "Sub No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
             }

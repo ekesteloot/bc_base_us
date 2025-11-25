@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 xmlport 5902 "Import IRIS to Resol. Codes"
 {
     Caption = 'Import IRIS to Resol. Codes';

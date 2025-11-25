@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Activity.History;
+
+using Microsoft.WarehouseMgt.Journal;
+
 page 5797 "Registered Whse. Activity List"
 {
     Caption = 'Registered Whse. Activity List';
@@ -83,12 +87,12 @@ page 5797 "Registered Whse. Activity List"
 
                     trigger OnAction()
                     begin
-                        case Type of
-                            Type::"Put-away":
+                        case Rec.Type of
+                            Rec.Type::"Put-away":
                                 PAGE.Run(PAGE::"Registered Put-away", Rec);
-                            Type::Pick:
+                            Rec.Type::Pick:
                                 PAGE.Run(PAGE::"Registered Pick", Rec);
-                            Type::Movement:
+                            Rec.Type::Movement:
                                 PAGE.Run(PAGE::"Registered Movement", Rec);
                         end;
                     end;
@@ -119,12 +123,12 @@ page 5797 "Registered Whse. Activity List"
 
     local procedure FormCaption(): Text[250]
     begin
-        case Type of
-            Type::"Put-away":
+        case Rec.Type of
+            Rec.Type::"Put-away":
                 exit(Text000);
-            Type::Pick:
+            Rec.Type::Pick:
                 exit(Text001);
-            Type::Movement:
+            Rec.Type::Movement:
                 exit(Text002);
             else
                 exit(Text003);

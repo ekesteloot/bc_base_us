@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+
 page 7372 "Bin Creation Worksheet"
 {
     AccessByPermission = TableData Bin = R;
@@ -60,7 +65,7 @@ page 7372 "Bin Creation Worksheet"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the bin where the items are picked or put away.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the description for the bin that should be created.';
@@ -148,7 +153,7 @@ page 7372 "Bin Creation Worksheet"
 
                     trigger OnAction()
                     begin
-                        BinCreateWksh.SetTemplAndWorksheet("Worksheet Template Name", Name, CurrentLocationCode);
+                        BinCreateWksh.SetTemplAndWorksheet(Rec."Worksheet Template Name", Rec.Name, CurrentLocationCode);
                         BinCreateWksh.RunModal();
                         Clear(BinCreateWksh);
                     end;
@@ -165,15 +170,15 @@ page 7372 "Bin Creation Worksheet"
                     trigger OnAction()
                     begin
                         BinCreateLine.Copy(Rec);
-                        SetFilter("Bin Code", '<>%1', '');
+                        Rec.SetFilter("Bin Code", '<>%1', '');
                         CODEUNIT.Run(CODEUNIT::"Bin Create", Rec);
                         BinCreateLine.Reset();
-                        Copy(BinCreateLine);
-                        FilterGroup(2);
-                        SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        SetRange(Name, Name);
-                        SetRange("Location Code", CurrentLocationCode);
-                        FilterGroup(0);
+                        Rec.Copy(BinCreateLine);
+                        Rec.FilterGroup(2);
+                        Rec.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        Rec.SetRange(Name, Rec.Name);
+                        Rec.SetRange("Location Code", CurrentLocationCode);
+                        Rec.FilterGroup(0);
                         CurrPage.Update(false);
                     end;
                 }
@@ -188,11 +193,11 @@ page 7372 "Bin Creation Worksheet"
 
                 trigger OnAction()
                 begin
-                    BinCreateLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                    BinCreateLine.SetRange(Name, Name);
-                    BinCreateLine.SetRange("Location Code", "Location Code");
+                    BinCreateLine.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                    BinCreateLine.SetRange(Name, Rec.Name);
+                    BinCreateLine.SetRange("Location Code", Rec."Location Code");
                     BinCreateLine.SetRange(Type, BinCreateLine.Type::Bin);
-                    REPORT.Run(REPORT::"Bin Creation Wksh. Report", true, false, BinCreateLine);
+                    REPORT.Run(Enum::ReportID::"Bin Creation Wksh. Report".AsInteger(), true, false, BinCreateLine);
                 end;
             }
         }
@@ -217,17 +222,17 @@ page 7372 "Bin Creation Worksheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(GetRangeMax("Worksheet Template Name"));
+        Rec.SetUpNewLine(Rec.GetRangeMax("Worksheet Template Name"));
     end;
 
     trigger OnOpenPage()
     var
         WkshSelected: Boolean;
     begin
-        OpenedFromBatch := (Name <> '') and ("Worksheet Template Name" = '');
+        OpenedFromBatch := (Rec.Name <> '') and (Rec."Worksheet Template Name" = '');
         if OpenedFromBatch then begin
-            CurrentJnlBatchName := Name;
-            CurrentLocationCode := "Location Code";
+            CurrentJnlBatchName := Rec.Name;
+            CurrentLocationCode := Rec."Location Code";
             BinCreateLine.OpenWksh(CurrentJnlBatchName, CurrentLocationCode, Rec);
             exit;
         end;

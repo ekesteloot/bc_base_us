@@ -1,3 +1,5 @@
+namespace Microsoft.AssemblyMgt.Document;
+
 enum 904 "Assemble-to-Order Link Type"
 {
     Extensible = true;

@@ -1,3 +1,10 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Setup;
+
 report 5691 "Index Insurance"
 {
     ApplicationArea = FixedAssets;
@@ -136,18 +143,14 @@ report 5691 "Index Insurance"
 
     var
         FASetup: Record "FA Setup";
-        DeprBook: Record "Depreciation Book";
         Insurance: Record Insurance;
         FAJnlSetup: Record "FA Journal Setup";
         TempInsurance: Record Insurance temporary;
         InsCoverageLedgEntry: Record "Ins. Coverage Ledger Entry";
         InsuranceJnlLine: Record "Insurance Journal Line";
         Window: Dialog;
-        PostingDate: Date;
-        IndexFigure: Decimal;
         DocumentNo: Code[20];
         NoSeries: Code[20];
-        PostingDescription: Text[100];
         NextLineNo: Integer;
 
         Text000: Label 'You must specify %1.';
@@ -155,6 +158,12 @@ report 5691 "Index Insurance"
         Text002: Label 'Index Figure must not be 100.';
         Text003: Label 'Index Figure must be positive.';
         Text004: Label 'Indexing insurance    #1##########';
+
+    protected var
+        PostingDate: Date;
+        IndexFigure: Decimal;
+        PostingDescription: Text[100];
+        DeprBook: Record "Depreciation Book";
 
     procedure InitializeRequest(DocumentNoFrom: Code[20]; PostingDescriptionFrom: Text[100]; PostingDateFrom: Date; IndexFigureFrom: Decimal)
     begin

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 table 5111 Rating
 {
     Caption = 'Rating';
@@ -14,9 +16,9 @@ table 5111 Rating
         {
             Caption = 'Profile Questionnaire Line No.';
             NotBlank = true;
-            TableRelation = "Profile Questionnaire Line"."Line No." WHERE("Profile Questionnaire Code" = FIELD("Profile Questionnaire Code"),
-                                                                           Type = CONST(Question),
-                                                                           "Contact Class. Field" = CONST(Rating));
+            TableRelation = "Profile Questionnaire Line"."Line No." where("Profile Questionnaire Code" = field("Profile Questionnaire Code"),
+                                                                           Type = const(Question),
+                                                                           "Contact Class. Field" = const(Rating));
         }
         field(3; "Rating Profile Quest. Code"; Code[20])
         {
@@ -28,8 +30,8 @@ table 5111 Rating
         {
             Caption = 'Rating Profile Quest. Line No.';
             NotBlank = true;
-            TableRelation = "Profile Questionnaire Line"."Line No." WHERE("Profile Questionnaire Code" = FIELD("Rating Profile Quest. Code"),
-                                                                           Type = CONST(Answer));
+            TableRelation = "Profile Questionnaire Line"."Line No." where("Profile Questionnaire Code" = field("Rating Profile Quest. Code"),
+                                                                           Type = const(Answer));
         }
         field(5; Points; Decimal)
         {
@@ -37,14 +39,16 @@ table 5111 Rating
             Caption = 'Points';
             DecimalPlaces = 0 : 0;
         }
-        field(6; "Profile Question Description"; Text[100])
+#pragma warning disable AS0086
+        field(6; "Profile Question Description"; Text[250])
         {
-            CalcFormula = Lookup ("Profile Questionnaire Line".Description WHERE("Profile Questionnaire Code" = FIELD("Profile Questionnaire Code"),
-                                                                                 "Line No." = FIELD("Profile Questionnaire Line No.")));
+            CalcFormula = Lookup("Profile Questionnaire Line".Description where("Profile Questionnaire Code" = field("Profile Questionnaire Code"),
+                                                                                 "Line No." = field("Profile Questionnaire Line No.")));
             Caption = 'Profile Question Description';
             Editable = false;
             FieldClass = FlowField;
         }
+#pragma warning restore AS0086
     }
 
     keys

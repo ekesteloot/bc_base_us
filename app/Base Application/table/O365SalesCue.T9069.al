@@ -17,15 +17,15 @@ table 9069 "O365 Sales Cue"
         }
         field(2; "Overdue Sales Documents"; Integer)
         {
-            CalcFormula = Count("Cust. Ledger Entry" WHERE("Document Type" = FILTER(Invoice | "Credit Memo"),
-                                                            "Due Date" = FIELD("Overdue Date Filter"),
-                                                            Open = CONST(true)));
+            CalcFormula = count("Cust. Ledger Entry" where("Document Type" = filter(Invoice | "Credit Memo"),
+                                                            "Due Date" = field("Overdue Date Filter"),
+                                                            Open = const(true)));
             Caption = 'Overdue Sales Documents';
             FieldClass = FlowField;
         }
         field(3; "Customers - Blocked"; Integer)
         {
-            CalcFormula = Count(Customer WHERE(Blocked = FILTER(<> " ")));
+            CalcFormula = count(Customer where(Blocked = filter(<> " ")));
             Caption = 'Customers - Blocked';
             FieldClass = FlowField;
         }
@@ -56,51 +56,51 @@ table 9069 "O365 Sales Cue"
         }
         field(9; "Non-Applied Payments"; Integer)
         {
-            CalcFormula = Count("Bank Acc. Reconciliation" WHERE("Statement Type" = CONST("Payment Application")));
+            CalcFormula = count("Bank Acc. Reconciliation" where("Statement Type" = const("Payment Application")));
             Caption = 'Non-Applied Payments';
             FieldClass = FlowField;
         }
         field(10; "Invoiced YTD"; Decimal)
         {
-            CalcFormula = Sum("Sales Invoice Entity Aggregate"."Amount Including VAT" WHERE("Document Date" = FIELD("YTD Date Filter"),
-                                                                                             Status = FILTER(Open | Paid)));
+            CalcFormula = sum("Sales Invoice Entity Aggregate"."Amount Including VAT" where("Document Date" = field("YTD Date Filter"),
+                                                                                             Status = filter(Open | Paid)));
             Caption = 'Invoiced YTD';
             FieldClass = FlowField;
         }
         field(11; "Invoiced CM"; Decimal)
         {
-            CalcFormula = Sum("Sales Invoice Entity Aggregate"."Amount Including VAT" WHERE("Document Date" = FIELD("CM Date Filter"),
-                                                                                             Status = FILTER(Open | Paid)));
+            CalcFormula = sum("Sales Invoice Entity Aggregate"."Amount Including VAT" where("Document Date" = field("CM Date Filter"),
+                                                                                             Status = filter(Open | Paid)));
             Caption = 'Invoiced CM';
             FieldClass = FlowField;
         }
         field(12; "Sales Invoices Outstanding"; Decimal)
         {
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)");
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)");
             Caption = 'Sales Invoices Outstanding';
             FieldClass = FlowField;
         }
         field(13; "Sales Invoices Overdue"; Decimal)
         {
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Initial Entry Due Date" = FIELD("Overdue Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Entry Due Date" = field("Overdue Date Filter")));
             Caption = 'Sales Invoices Overdue';
             FieldClass = FlowField;
         }
         field(14; "No. of Quotes"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Quote)));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Quote)));
             Caption = 'No. of Quotes';
             FieldClass = FlowField;
         }
         field(15; "No. of Draft Invoices"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Invoice)));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Invoice)));
             Caption = 'No. of Draft Invoices';
             FieldClass = FlowField;
         }
         field(16; "No. of Invoices YTD"; Integer)
         {
-            CalcFormula = Count("Sales Invoice Header" WHERE("Posting Date" = FIELD("YTD Date Filter")));
+            CalcFormula = count("Sales Invoice Header" where("Posting Date" = field("YTD Date Filter")));
             Caption = 'No. of Invoices YTD';
             FieldClass = FlowField;
         }

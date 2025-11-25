@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.Consolidation;
+
+using Microsoft.FinancialMgt.Currency;
+using System.Environment;
+using System.Text;
+
 page 240 "Business Unit List"
 {
     AdditionalSearchTerms = 'department,consolidation';
@@ -16,15 +22,15 @@ page 240 "Business Unit List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the identifier for the business unit in the consolidated company.';
                 }
-                field("Company Name"; Rec."Company Name")
+                field("Company Name"; CompanyName)
                 {
                     ApplicationArea = Suite;
-                    LookupPageID = Companies;
+                    Caption = 'Company Name';
                     ToolTip = 'Specifies the company that will become a business unit in the consolidated company.';
                 }
                 field(Name; Rec.Name)
@@ -51,7 +57,7 @@ page 240 "Business Unit List"
                     ToolTip = 'Specifies whether data is retrieved in the local currency (LCY) or the additional reporting currency (ACY) from the business unit.';
                     Visible = false;
                 }
-                field(Consolidate; Consolidate)
+                field(Consolidate; Rec.Consolidate)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies whether to include the business unit in the Consolidation report.';
@@ -137,10 +143,10 @@ page 240 "Business Unit List"
                     trigger OnAction()
                     begin
                         ChangeExchangeRate.SetCaption(Text000);
-                        ChangeExchangeRate.SetParameter("Currency Code", "Income Currency Factor", WorkDate());
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Income Currency Factor", WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            "Income Currency Factor" := ChangeExchangeRate.GetParameter();
-                            Modify();
+                            Rec."Income Currency Factor" := ChangeExchangeRate.GetParameter();
+                            Rec.Modify();
                         end;
                         Clear(ChangeExchangeRate);
                     end;
@@ -156,10 +162,10 @@ page 240 "Business Unit List"
                     trigger OnAction()
                     begin
                         ChangeExchangeRate.SetCaption(Text001);
-                        ChangeExchangeRate.SetParameter("Currency Code", "Balance Currency Factor", WorkDate());
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Balance Currency Factor", WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            "Balance Currency Factor" := ChangeExchangeRate.GetParameter();
-                            Modify();
+                            Rec."Balance Currency Factor" := ChangeExchangeRate.GetParameter();
+                            Rec.Modify();
                         end;
                         Clear(ChangeExchangeRate);
                     end;
@@ -174,10 +180,10 @@ page 240 "Business Unit List"
                     trigger OnAction()
                     begin
                         ChangeExchangeRate.SetCaption(Text002);
-                        ChangeExchangeRate.SetParameter("Currency Code", "Last Balance Currency Factor", WorkDate());
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Last Balance Currency Factor", WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            "Last Balance Currency Factor" := ChangeExchangeRate.GetParameter();
-                            Modify();
+                            Rec."Last Balance Currency Factor" := ChangeExchangeRate.GetParameter();
+                            Rec.Modify();
                         end;
                         Clear(ChangeExchangeRate);
                     end;
@@ -243,6 +249,7 @@ page 240 "Business Unit List"
                 separator(Action43)
                 {
                 }
+#if not CLEAN23
                 action("Run Consolidation")
                 {
                     ApplicationArea = Suite;
@@ -251,7 +258,12 @@ page 240 "Business Unit List"
                     Image = ImportDatabase;
                     RunObject = Report "Import Consolidation from DB";
                     ToolTip = 'Run consolidation.';
+                    Visible = false;
+                    ObsoleteReason = 'Use the action StartConsolidation in this page or directly Report 90.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '23.0';
                 }
+#endif
                 action("I&mport File")
                 {
                     ApplicationArea = Suite;
@@ -268,6 +280,37 @@ page 240 "Business Unit List"
                     Image = Export;
                     RunObject = Report "Export Consolidation";
                     ToolTip = 'Export transactions from the business units to a file.';
+                }
+                action(StartConsolidation)
+                {
+                    ApplicationArea = Suite;
+                    Caption = 'Run Consolidation';
+                    Ellipsis = true;
+                    Image = LaunchWeb;
+                    ToolTip = 'Run consolidation.';
+                    Visible = IsSaaS;
+
+                    trigger OnAction()
+                    begin
+                        Page.Run(Page::"Consolidate Wizard");
+                    end;
+                }
+                action(ConsolidationsInProgress)
+                {
+                    ApplicationArea = Suite;
+                    Caption = 'Consolidations in Progress';
+                    Image = JobJournal;
+                    ToolTip = 'Shows the consolidations in progress';
+                    RunObject = Page "Consolidations in Progress";
+                    Visible = IsSaaS;
+                }
+                action(Setup)
+                {
+                    ApplicationArea = Suite;
+                    Caption = 'Setup';
+                    Image = Setup;
+                    Tooltip = 'Setup of the consolidation parameters';
+                    RunObject = Page "Consolidation Setup";
                 }
             }
         }
@@ -287,15 +330,37 @@ page 240 "Business Unit List"
                 {
                 }
             }
+            actionref(Setup_Promoted; Setup)
+            {
+            }
+            actionref(StartConsolidation_Promoted; StartConsolidation)
+            {
+            }
         }
     }
 
     var
         ChangeExchangeRate: Page "Change Exchange Rate";
-
+        CompanyName: Text;
+        IsSaaS: Boolean;
         Text000: Label 'Average Rate (Manual)';
         Text001: Label 'Closing Rate';
         Text002: Label 'Last Closing Rate';
+
+    trigger OnOpenPage()
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        IsSaaS := EnvironmentInformation.IsSaaS();
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        if Rec."Default Data Import Method" = Rec."Default Data Import Method"::Database then
+            CompanyName := Rec."Company Name";
+        if Rec."Default Data Import Method" = Rec."Default Data Import Method"::API then
+            CompanyName := Rec."External Company Name";
+    end;
 
     procedure GetSelectionFilter(): Text
     var

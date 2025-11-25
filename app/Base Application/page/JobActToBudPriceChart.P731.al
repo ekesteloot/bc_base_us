@@ -1,3 +1,9 @@
+namespace Microsoft.ProjectMgt.Jobs.Analysis;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using System;
+using System.Visualization;
+
 page 731 "Job Act to Bud Price Chart"
 {
     Caption = 'Job Act to Bud Price Chart';
@@ -66,7 +72,7 @@ page 731 "Job Act to Bud Price Chart"
 
                         trigger OnAction()
                         begin
-                            UpdateChart("Business Chart Type"::Column);
+                            UpdateChart(Enum::"Business Chart Type"::Column);
                         end;
                     }
                     action(Line)
@@ -77,7 +83,7 @@ page 731 "Job Act to Bud Price Chart"
 
                         trigger OnAction()
                         begin
-                            UpdateChart("Business Chart Type"::Line);
+                            UpdateChart(Enum::"Business Chart Type"::Line);
                         end;
                     }
                     action("Stacked Column")
@@ -88,7 +94,7 @@ page 731 "Job Act to Bud Price Chart"
 
                         trigger OnAction()
                         begin
-                            UpdateChart("Business Chart Type"::StackedColumn);
+                            UpdateChart(Enum::"Business Chart Type"::StackedColumn);
                         end;
                     }
                     action("Stacked Area")
@@ -99,7 +105,7 @@ page 731 "Job Act to Bud Price Chart"
 
                         trigger OnAction()
                         begin
-                            UpdateChart("Business Chart Type"::StackedArea);
+                            UpdateChart(Enum::"Business Chart Type"::StackedArea);
                         end;
                     }
                 }
@@ -119,14 +125,14 @@ page 731 "Job Act to Bud Price Chart"
         if not ChartIsReady then
             exit;
 
-        JobChartMgt.CreateChart(BusChartBuf, TempJob, NewChartType, "Job Chart Type"::"Actual to Budget Price");
+        JobChartMgt.CreateChart(BusChartBuf, TempJob, NewChartType, Enum::"Job Chart Type"::"Actual to Budget Price");
         BusChartBuf.Update(CurrPage.Chart);
         CurrentChartType := NewChartType;
     end;
 
     local procedure DefaultChartType(): Enum "Business Chart Type"
     begin
-        exit("Business Chart Type"::Column);
+        exit(Enum::"Business Chart Type"::Column);
     end;
 }
 

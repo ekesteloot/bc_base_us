@@ -1,3 +1,28 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.BankMgt.Statement;
+using Microsoft.FinancialMgt.AllocationAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Automation;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Privacy;
+using System.Telemetry;
+using System.Threading;
+using System.Utilities;
+
 page 39 "General Journal"
 {
     // // This page has two view modes based on global variable 'IsSimplePage' as :-
@@ -11,7 +36,7 @@ page 39 "General Journal"
     ApplicationArea = Basic, Suite;
     AutoSplitKey = true;
     Caption = 'General Journals';
-    DataCaptionExpression = DataCaption();
+    DataCaptionExpression = Rec.DataCaption();
     DelayedInsert = true;
     PageType = Worksheet;
     SaveValues = true;
@@ -64,12 +89,12 @@ page 39 "General Journal"
                         if not IsSimplePage then
                             exit;
                         if CurrentDocNo = '' then
-                            CurrentDocNo := "Document No.";
-                        if CurrentDocNo = "Document No." then
+                            CurrentDocNo := Rec."Document No.";
+                        if CurrentDocNo = Rec."Document No." then
                             exit;
 
-                        if Count = 0 then
-                            "Document No." := CurrentDocNo;
+                        if Rec.Count = 0 then
+                            Rec."Document No." := CurrentDocNo;
 
                         IsChangingDocNo := true;
                         SetDocumentNumberFilter(CurrentDocNo);
@@ -87,7 +112,7 @@ page 39 "General Journal"
 
                     trigger OnValidate()
                     begin
-                        UpdateCurrencyFactor(FieldNo("Posting Date"));
+                        UpdateCurrencyFactor(Rec.FieldNo("Posting Date"));
                     end;
                 }
                 field("<CurrentCurrencyCode>"; CurrentCurrencyCode)
@@ -101,8 +126,16 @@ page 39 "General Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.CheckCurrencyCode(CurrentCurrencyCode);
-                        UpdateCurrencyFactor(FieldNo("Currency Code"));
+                        UpdateCurrencyFactor(Rec.FieldNo("Currency Code"));
                     end;
+                }
+                field(GenJnlBatchApprovalStatus; GenJnlBatchApprovalStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Approval Status';
+                    Editable = false;
+                    Visible = EnabledGenJnlBatchWorkflowsExist;
+                    ToolTip = 'Specifies the approval status for general journal batch.';
                 }
             }
             repeater(Control1)
@@ -152,8 +185,8 @@ page 39 "General Journal"
 
                     trigger OnAssistEdit()
                     begin
-                        if "Incoming Document Entry No." > 0 then
-                            HyperLink(GetIncomingDocumentURL());
+                        if Rec."Incoming Document Entry No." > 0 then
+                            HyperLink(Rec.GetIncomingDocumentURL());
                     end;
                 }
                 field("External Document No."; Rec."External Document No.")
@@ -192,13 +225,13 @@ page 39 "General Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         SetUserInteractions();
                         // On TAB81 Account No. - OnValidate() will reset currency code to empty if
                         // there is no balancing account for this G/L line. This happens under GetGLAccount
                         // function. So, we need to validate current curency code again.
                         if IsSimplePage then
-                            Validate("Currency Code", CurrentCurrencyCode);
+                            Rec.Validate("Currency Code", CurrentCurrencyCode);
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -208,6 +241,14 @@ page 39 "General Journal"
                     Caption = 'Account Name';
                     Editable = false;
                     ToolTip = 'Specifies the account name that the entry on the journal line will be posted to.';
+                }
+                field(GenJnlLineApprovalStatus; GenJnlLineApprovalStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Approval Status';
+                    Editable = false;
+                    Visible = EnabledGenJnlLineWorkflowsExist;
+                    ToolTip = 'Specifies the approval status for general journal line.';
                 }
                 field(Description; Rec.Description)
                 {
@@ -256,9 +297,9 @@ page 39 "General Journal"
 
                     trigger OnAssistEdit()
                     begin
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", "Posting Date");
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", Rec."Posting Date");
                         if ChangeExchangeRate.RunModal() = ACTION::OK then
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
 
                         Clear(ChangeExchangeRate);
                     end;
@@ -401,7 +442,7 @@ page 39 "General Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -433,6 +474,20 @@ page 39 "General Journal"
                     ToolTip = 'Specifies the general product posting group code associated with the balancing account that will be used when you post the entry.';
                     Visible = NOT IsSimplePage;
                 }
+                field("Allocation Account No."; Rec."Selected Alloc. Account No.")
+                {
+                    ApplicationArea = All;
+                    StyleExpr = StyleTxt;
+                    Caption = 'Allocation Account No.';
+                    ToolTip = 'Specifies the allocation account number that will be used to distribute the amounts during the posting process.';
+                    Visible = UseAllocationAccountNumber;
+                    trigger OnValidate()
+                    var
+                        GenJournalAllocAccMgt: Codeunit "Gen. Journal Alloc. Acc. Mgt.";
+                    begin
+                        GenJournalAllocAccMgt.VerifySelectedAllocationAccountNo(Rec);
+                    end;
+                }
                 field("Deferral Code"; Rec."Deferral Code")
                 {
                     ApplicationArea = Suite;
@@ -457,9 +512,9 @@ page 39 "General Journal"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
                 field("Bal. VAT Bus. Posting Group"; Rec."Bal. VAT Bus. Posting Group")
@@ -499,7 +554,7 @@ page 39 "General Journal"
                     ToolTip = 'Specifies that the general journal line has been automatically applied with a matching payment using the Apply Automatically function.';
                     Visible = false;
                 }
-                field(Applied; IsApplied())
+                field(Applied; Rec.IsApplied())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Applied';
@@ -542,13 +597,13 @@ page 39 "General Journal"
                     ToolTip = 'Specifies the reason code that has been entered on the journal lines.';
                     Visible = false;
                 }
-                field(Correction; Correction)
+                field(Correction; Rec.Correction)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the entry as a corrective entry. You can use the field if you need to post a corrective entry to an account.';
                     Visible = NOT IsSimplePage;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies a comment about the activity on the journal line. Note that the comment is not carried forward to posted entries.';
@@ -576,14 +631,14 @@ page 39 "General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 3);
                     end;
@@ -592,14 +647,14 @@ page 39 "General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 4);
                     end;
@@ -608,14 +663,14 @@ page 39 "General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 5);
                     end;
@@ -624,14 +679,14 @@ page 39 "General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 6);
                     end;
@@ -640,14 +695,14 @@ page 39 "General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 7);
                     end;
@@ -656,14 +711,14 @@ page 39 "General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
@@ -771,22 +826,22 @@ page 39 "General Journal"
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
                 Visible = BackgroundErrorCheck;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             part(JournalLineDetails; "Journal Line Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Visible = not IsSimplePage;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             part(Control1900919607; "Dimension Set Entries FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Dimension Set ID" = FIELD("Dimension Set ID");
+                SubPageLink = "Dimension Set ID" = field("Dimension Set ID");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -843,7 +898,7 @@ page 39 "General Journal"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -906,7 +961,7 @@ page 39 "General Journal"
 
                     trigger OnAction()
                     begin
-                        RenumberDocumentNo();
+                        Rec.RenumberDocumentNo();
                     end;
                 }
                 action("Insert Conv. LCY Rndg. Lines")
@@ -934,7 +989,7 @@ page 39 "General Journal"
                         StdGenJnl: Record "Standard General Journal";
                     begin
                         StdGenJnl.FilterGroup := 2;
-                        StdGenJnl.SetRange("Journal Template Name", "Journal Template Name");
+                        StdGenJnl.SetRange("Journal Template Name", Rec."Journal Template Name");
                         StdGenJnl.FilterGroup := 0;
 
                         if PAGE.RunModal(PAGE::"Standard General Journals", StdGenJnl) = ACTION::LookupOK then begin
@@ -967,12 +1022,12 @@ page 39 "General Journal"
                         StdGenJnl: Record "Standard General Journal";
                         SaveAsStdGenJnl: Report "Save as Standard Gen. Journal";
                     begin
-                        GeneralJnlLines.SetFilter("Journal Template Name", "Journal Template Name");
+                        GeneralJnlLines.SetFilter("Journal Template Name", Rec."Journal Template Name");
                         GeneralJnlLines.SetFilter("Journal Batch Name", CurrentJnlBatchName);
                         CurrPage.SetSelectionFilter(GeneralJnlLines);
                         GeneralJnlLines.CopyFilters(Rec);
 
-                        GenJnlBatch.Get("Journal Template Name", CurrentJnlBatchName);
+                        GenJnlBatch.Get(Rec."Journal Template Name", CurrentJnlBatchName);
                         SaveAsStdGenJnl.Initialise(GeneralJnlLines, GenJnlBatch);
                         SaveAsStdGenJnl.RunModal();
                         if not SaveAsStdGenJnl.GetStdGeneralJournal(StdGenJnl) then
@@ -1004,8 +1059,8 @@ page 39 "General Journal"
 
                     trigger OnAction()
                     begin
-                        SendToPosting(Codeunit::"Gen. Jnl.-Post");
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        Rec.SendToPosting(Codeunit::"Gen. Jnl.-Post");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         if IsSimplePage then
                             if GeneralLedgerSetup."Post with Job Queue" then
                                 NewDocumentNo()
@@ -1040,8 +1095,8 @@ page 39 "General Journal"
 
                     trigger OnAction()
                     begin
-                        SendToPosting(Codeunit::"Gen. Jnl.-Post+Print");
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        Rec.SendToPosting(Codeunit::"Gen. Jnl.-Post+Print");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         if IsSimplePage then
                             if GeneralLedgerSetup."Post & Print with Job Queue" then
                                 NewDocumentNo()
@@ -1061,7 +1116,7 @@ page 39 "General Journal"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                         SetJobQueueVisibility();
                         CurrPage.Update(false);
                     end;
@@ -1076,6 +1131,26 @@ page 39 "General Journal"
                     trigger OnAction()
                     begin
                         Rec.ShowDeferralSchedule();
+                    end;
+                }
+                action(RedistributeAccAllocations)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Redistribute Account Allocations';
+                    Image = EditList;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to redistribute the account allocations for this line.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        AllocAccManualOverride: Page Microsoft.FinancialMgt.AllocationAccount."Redistribute Acc. Allocations";
+                    begin
+                        if (Rec."Account Type" <> Rec."Account Type"::"Allocation Account") and (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '') then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+                        AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
+                        AllocAccManualOverride.SetParentTableId(Database::"Gen. Journal Line");
+                        AllocAccManualOverride.RunModal();
                     end;
                 }
                 group(IncomingDocument)
@@ -1094,7 +1169,7 @@ page 39 "General Journal"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            IncomingDocument.ShowCardFromEntryNo("Incoming Document Entry No.");
+                            IncomingDocument.ShowCardFromEntryNo(Rec."Incoming Document Entry No.");
                         end;
                     }
                     action(SelectIncomingDoc)
@@ -1109,7 +1184,7 @@ page 39 "General Journal"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            Validate("Incoming Document Entry No.", IncomingDocument.SelectIncomingDocument("Incoming Document Entry No.", RecordId));
+                            Rec.Validate("Incoming Document Entry No.", IncomingDocument.SelectIncomingDocument(Rec."Incoming Document Entry No.", Rec.RecordId));
                         end;
                     }
                     action(IncomingDocAttachFile)
@@ -1140,10 +1215,10 @@ page 39 "General Journal"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            if IncomingDocument.Get("Incoming Document Entry No.") then
+                            if IncomingDocument.Get(Rec."Incoming Document Entry No.") then
                                 IncomingDocument.RemoveLinkToRelatedRecord();
-                            "Incoming Document Entry No." := 0;
-                            Modify(true);
+                            Rec."Incoming Document Entry No." := 0;
+                            Rec.Modify(true);
                         end;
                     }
                 }
@@ -1161,8 +1236,8 @@ page 39 "General Journal"
 
                     trigger OnAction()
                     begin
-                        if FindLast() then;
-                        ImportBankStatement();
+                        if Rec.FindLast() then;
+                        Rec.ImportBankStatement();
                     end;
                 }
                 action(ShowStatementLineDetails)
@@ -1171,8 +1246,8 @@ page 39 "General Journal"
                     Caption = 'Bank Statement Details';
                     Image = ExternalDocument;
                     RunObject = Page "Bank Statement Line Details";
-                    RunPageLink = "Data Exch. No." = FIELD("Data Exch. Entry No."),
-                                  "Line No." = FIELD("Data Exch. Line No.");
+                    RunPageLink = "Data Exch. No." = field("Data Exch. Entry No."),
+                                  "Line No." = field("Data Exch. Line No.");
                     ToolTip = 'View the content of the imported bank statement file, such as account number, posting date, and amounts.';
                     Visible = false;
                 }
@@ -1246,7 +1321,7 @@ page 39 "General Journal"
                         ImportPayrollTransaction: Codeunit "Import Payroll Transaction";
                     begin
                         GeneralLedgerSetup.TestField("Payroll Trans. Import Format");
-                        if FindLast() then;
+                        if Rec.FindLast() then;
                         ImportPayrollTransaction.SelectAndImportPayrollDataToGL(Rec, GeneralLedgerSetup."Payroll Trans. Import Format");
                     end;
                 }
@@ -1260,7 +1335,7 @@ page 39 "General Journal"
 
                     trigger OnAction()
                     begin
-                        if FindLast() then;
+                        if Rec.FindLast() then;
                         PayrollManagement.ImportPayroll(Rec);
                     end;
                 }
@@ -1276,7 +1351,7 @@ page 39 "General Journal"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Journal Batch';
-                        Enabled = NOT OpenApprovalEntriesOnBatchOrAnyJnlLineExist AND CanRequestFlowApprovalForBatchAndAllLines;
+                        Enabled = NOT OpenApprovalEntriesOnBatchOrAnyJnlLineExist AND CanRequestFlowApprovalForBatchAndAllLines AND EnabledGenJnlBatchWorkflowsExist;
                         Image = SendApprovalRequest;
                         ToolTip = 'Send all journal lines for approval, also those that you may not see because of filters.';
 
@@ -1293,7 +1368,7 @@ page 39 "General Journal"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Selected Journal Lines';
-                        Enabled = NOT OpenApprovalEntriesOnBatchOrCurrJnlLineExist AND CanRequestFlowApprovalForBatchAndCurrentLine;
+                        Enabled = NOT OpenApprovalEntriesOnBatchOrCurrJnlLineExist AND CanRequestFlowApprovalForBatchAndCurrentLine AND EnabledGenJnlLineWorkflowsExist;
                         Image = SendApprovalRequest;
                         ToolTip = 'Send selected journal lines for approval.';
 
@@ -1304,7 +1379,7 @@ page 39 "General Journal"
                             ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                         begin
                             GetCurrentlySelectedLines(GenJournalLine);
-                            ApprovalsMgmt.TrySendJournalLineApprovalRequests(GenJournalLine);
+                            ApprovalsMgmt.SendJournalLinesApprovalRequests(GenJournalLine);
                             SetControlAppearanceFromBatch();
                         end;
                     }
@@ -1355,9 +1430,9 @@ page 39 "General Journal"
                     Caption = 'Create a Power Automate approval flow';
                     ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
-                    Visible = IsSaaS and PowerAutomateTemplatesEnabled;
+                    Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
 #else
-                    Visible = IsSaaS;
+                    Visible = IsSaaS and IsPowerAutomatePrivacyNoticeApproved;
 #endif
                     CustomActionType = FlowTemplateGallery;
                     FlowTemplateCategoryName = 'd365bc_approval_generalJournal';
@@ -1369,7 +1444,7 @@ page 39 "General Journal"
                     Caption = 'Create a Power Automate approval flow';
                     Image = Flow;
                     ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
-                    Visible = IsSaaS and not PowerAutomateTemplatesEnabled;
+                    Visible = IsSaaS and not PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
                     ObsoleteReason = 'This action will be handled by platform as part of the CreateFlowFromTemplate customaction';
                     ObsoleteState = Pending;
                     ObsoleteTag = '22.0';
@@ -1454,7 +1529,7 @@ page 39 "General Journal"
                     Caption = 'Comments';
                     Image = ViewComments;
                     ToolTip = 'View or add comments for the record.';
-                    Visible = OpenApprovalEntriesExistForCurrUser;
+                    Visible = OpenApprovalEntriesExistForCurrUser or ApprovalEntriesExistSentByCurrentUser;
 
                     trigger OnAction()
                     var
@@ -1465,7 +1540,7 @@ page 39 "General Journal"
                             ApprovalsMgmt.GetApprovalComment(Rec)
                         else
                             if OpenApprovalEntriesOnJnlBatchExist then
-                                if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
+                                if GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
                                     ApprovalsMgmt.GetApprovalComment(GenJournalBatch);
                     end;
                 }
@@ -1495,7 +1570,7 @@ page 39 "General Journal"
                             GLAccount.SetRange("Direct Posting", true);
                             GLAccount.SetRange(Blocked, false);
                             CreateGLAccJournalLines.SetTableView(GLAccount);
-                            CreateGLAccJournalLines.InitializeRequest(DocumentTypes, GetPostingDate(), "Journal Template Name", "Journal Batch Name", '');
+                            CreateGLAccJournalLines.InitializeRequest(DocumentTypes, GetPostingDate(), Rec."Journal Template Name", Rec."Journal Batch Name", '');
                             CreateGLAccJournalLines.UseRequestPage(false);
                             CreateGLAccJournalLines.SetDefaultDocumentNo(CurrentDocNo);
                             Commit();  // Commit is required for Create Lines.
@@ -1520,7 +1595,7 @@ page 39 "General Journal"
                             CreateCustomerJournalLines.SetTableView(Customer);
                             PostingDate := GetPostingDate();
                             CreateCustomerJournalLines.InitializeRequest(DocumentTypes, PostingDate, PostingDate);
-                            CreateCustomerJournalLines.InitializeRequestTemplate("Journal Template Name", "Journal Batch Name", '');
+                            CreateCustomerJournalLines.InitializeRequestTemplate(Rec."Journal Template Name", Rec."Journal Batch Name", '');
                             CreateCustomerJournalLines.UseRequestPage(false);
                             CreateCustomerJournalLines.SetDefaultDocumentNo(CurrentDocNo);
                             Commit();  // Commit is required for Create Lines.
@@ -1545,7 +1620,7 @@ page 39 "General Journal"
                             CreateVendorJournalLines.SetTableView(Vendor);
                             PostingDate := GetPostingDate();
                             CreateVendorJournalLines.InitializeRequest(DocumentTypes, PostingDate, PostingDate);
-                            CreateVendorJournalLines.InitializeRequestTemplate("Journal Template Name", "Journal Batch Name", '');
+                            CreateVendorJournalLines.InitializeRequestTemplate(Rec."Journal Template Name", Rec."Journal Batch Name", '');
                             CreateVendorJournalLines.UseRequestPage(false);
                             CreateVendorJournalLines.SetDefaultDocumentNo(CurrentDocNo);
                             Commit();  // Commit is required for Create Lines.
@@ -1570,7 +1645,7 @@ page 39 "General Journal"
                     var
                         ODataUtility: Codeunit ODataUtility;
                     begin
-                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption, CurrPage.ObjectId(false), "Journal Batch Name", "Journal Template Name");
+                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption, CurrPage.ObjectId(false), Rec."Journal Batch Name", Rec."Journal Template Name");
                     end;
                 }
                 action(PreviousDocNumberTrx)
@@ -1662,7 +1737,7 @@ page 39 "General Journal"
 
                         trigger OnAction()
                         begin
-                            SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                            Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                         end;
                     }
                     action(ShowAllLines)
@@ -1676,7 +1751,7 @@ page 39 "General Journal"
 
                         trigger OnAction()
                         begin
-                            SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                            Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                         end;
                     }
                 }
@@ -1899,8 +1974,8 @@ page 39 "General Journal"
             UpdateBalance();
         EnableApplyEntriesAction();
         SetControlAppearance();
-        HasIncomingDocument := "Incoming Document Entry No." <> 0;
-        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(RecordId);
+        HasIncomingDocument := Rec."Incoming Document Entry No." <> 0;
+        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(Rec.RecordId);
         // PostedFromSimplePage is set to TRUE when 'POST' / 'POST+PRINT' action is executed in simple page mode.
         // It gets set to FALSE when OnNewRecord is called in the simple mode.
         // After posting we try to find the first record and filter on its document number
@@ -1910,13 +1985,15 @@ page 39 "General Journal"
         if not PostedFromSimplePage then
             CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
         SetJobQueueVisibility();
+        GetGenJnlBatchApprovalStatus();
     end;
 
     trigger OnAfterGetRecord()
     begin
         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
         SetUserInteractions();
+        GetGenJnlLineApprovalStatus();
     end;
 
     trigger OnInit()
@@ -1936,6 +2013,9 @@ page 39 "General Journal"
             IsSimplePage := GenJnlManagement.GetJournalSimplePageModePreference(PAGE::"General Journal");
 
         GeneralLedgerSetup.Get();
+
+        IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
+
         SetJobQueueVisibility();
 
 #if not CLEAN22
@@ -1945,7 +2025,7 @@ page 39 "General Journal"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(RecordId);
+        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(Rec.RecordId);
     end;
 
     trigger OnModifyRecord(): Boolean
@@ -1957,7 +2037,7 @@ page 39 "General Journal"
     begin
         UpdateBalance();
         EnableApplyEntriesAction();
-        SetUpNewLine(xRec, Balance, BelowxRec);
+        Rec.SetUpNewLine(xRec, Balance, BelowxRec);
         // set values from header for currency code, doc no. and posting date
         // for show less columns or simple page mode
         if IsSimplePage then begin
@@ -1971,13 +2051,14 @@ page 39 "General Journal"
 
     trigger OnOpenPage()
     var
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
         ServerSetting: Codeunit "Server Setting";
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
         LastGenJnlBatch: Code[10];
     begin
         IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
-
+        UseAllocationAccountNumber := AllocationAccountMgt.UseAllocationAccountNoField();
         if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
             exit;
 
@@ -2013,11 +2094,15 @@ page 39 "General Journal"
         NoSeriesMgt: Codeunit NoSeriesManagement;
         JournalErrorsMgt: Codeunit "Journal Errors Mgt.";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
+        PrivacyNotice: Codeunit "Privacy Notice";
+        PrivacyNoticeRegistrations: Codeunit "Privacy Notice Registrations";
+        ApprovalMgmt: Codeunit "Approvals Mgmt.";
         ChangeExchangeRate: Page "Change Exchange Rate";
         GLReconcile: Page Reconciliation;
-        CurrentJnlBatchName: Code[10];
         AccName: Text[100];
         BalAccName: Text[100];
+        GenJnlBatchApprovalStatus: Text[20];
+        GenJnlLineApprovalStatus: Text[20];        
         Balance: Decimal;
         TotalBalance: Decimal;
         NumberOfRecords: Integer;
@@ -2027,16 +2112,18 @@ page 39 "General Journal"
         Text001: Label 'Standard General Journal %1 has been successfully created.';
         HasIncomingDocument: Boolean;
         ApplyEntriesActionEnabled: Boolean;
-        [InDataSet]
         BalanceVisible: Boolean;
-        [InDataSet]
         TotalBalanceVisible: Boolean;
         StyleTxt: Text;
+        IsPowerAutomatePrivacyNoticeApproved: Boolean;
+        ApprovalEntriesExistSentByCurrentUser: Boolean;
         OpenApprovalEntriesExistForCurrUser: Boolean;
         OpenApprovalEntriesOnJnlBatchExist: Boolean;
         OpenApprovalEntriesOnJnlLineExist: Boolean;
         OpenApprovalEntriesOnBatchOrCurrJnlLineExist: Boolean;
         OpenApprovalEntriesOnBatchOrAnyJnlLineExist: Boolean;
+        EnabledGenJnlLineWorkflowsExist: Boolean;
+        EnabledGenJnlBatchWorkflowsExist: Boolean;
         ShowWorkflowStatusOnBatch: Boolean;
         ShowWorkflowStatusOnLine: Boolean;
         CanCancelApprovalForJnlBatch: Boolean;
@@ -2059,13 +2146,15 @@ page 39 "General Journal"
         CurrentPostingDate: Date;
         CurrentCurrencyCode: Code[10];
         IsChangingDocNo: Boolean;
-        [InDataSet]
         VATDateEnabled: Boolean;
         MissingExchangeRatesQst: Label 'There are no exchange rates for currency %1 and date %2. Do you want to add them now? Otherwise, the last change you made will be reverted.', Comment = '%1 - currency code, %2 - posting date';
+        ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Account Type or Balancing Account Type.';
         PostedFromSimplePage: Boolean;
         DocumentNumberMsg: Label 'Document No. must have a value in Gen. Journal Line.';
+        UseAllocationAccountNumber: Boolean;
 
     protected var
+        CurrentJnlBatchName: Code[10];
         IsSimplePage: Boolean;
         ShortcutDimCode: array[8] of Code[20];
         DimVisible1: Boolean;
@@ -2089,8 +2178,8 @@ page 39 "General Journal"
     local procedure EnableApplyEntriesAction()
     begin
         ApplyEntriesActionEnabled :=
-          ("Account Type" in ["Account Type"::Customer, "Account Type"::Vendor, "Account Type"::Employee]) or
-          ("Bal. Account Type" in ["Bal. Account Type"::Customer, "Bal. Account Type"::Vendor, "Bal. Account Type"::Employee]);
+          (Rec."Account Type" in [Rec."Account Type"::Customer, Rec."Account Type"::Vendor, Rec."Account Type"::Employee]) or
+          (Rec."Bal. Account Type" in [Rec."Bal. Account Type"::Customer, Rec."Bal. Account Type"::Vendor, Rec."Bal. Account Type"::Employee]);
 
         OnAfterEnableApplyEntriesAction(Rec, ApplyEntriesActionEnabled);
     end;
@@ -2105,7 +2194,7 @@ page 39 "General Journal"
 
     procedure SetUserInteractions()
     begin
-        StyleTxt := GetStyle();
+        StyleTxt := Rec.GetStyle();
     end;
 
     local procedure GetCurrentlySelectedLines(var GenJournalLine: Record "Gen. Journal Line"): Boolean
@@ -2121,27 +2210,45 @@ page 39 "General Journal"
         exit(Workdate());
     end;
 
-    local procedure SetControlAppearance()
+    internal procedure SetApprovalState(RecordId: RecordId; OpenApprovalEntriesOnJournalBatchExist: Boolean; LocalCanRequestFlowApprovalForBatch: Boolean; var LocalCanCancelFlowApprovalForLine: Boolean; var OpenApprovalEntriesExistForCurrentUser: Boolean; var OpenApprovalEntriesOnJournalLineExist: Boolean; var OpenApprovalEntriesOnBatchOrCurrentJournalLineExist: Boolean; var CanCancelApprovalForJournalLine: Boolean; var LocalCanRequestFlowApprovalForBatchAndCurrentLine: Boolean)
     var
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
         CanRequestFlowApprovalForLine: Boolean;
     begin
-        OpenApprovalEntriesExistForCurrUser :=
-          OpenApprovalEntriesExistForCurrUser or
-          ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
+        OpenApprovalEntriesExistForCurrentUser := OpenApprovalEntriesExistForCurrentUser or ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
+        OpenApprovalEntriesOnJournalLineExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesOnBatchOrCurrentJournalLineExist := OpenApprovalEntriesOnJournalBatchExist or OpenApprovalEntriesOnJournalLineExist;
+        CanCancelApprovalForJournalLine := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestFlowApprovalForLine, LocalCanCancelFlowApprovalForLine);
+        LocalCanRequestFlowApprovalForBatchAndCurrentLine := LocalCanRequestFlowApprovalForBatch and CanRequestFlowApprovalForLine;
+    end;
 
-        OpenApprovalEntriesOnJnlLineExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
-        OpenApprovalEntriesOnBatchOrCurrJnlLineExist := OpenApprovalEntriesOnJnlBatchExist or OpenApprovalEntriesOnJnlLineExist;
+    internal procedure SetApprovalStateForBatch(GenJournalBatch: Record "Gen. Journal Batch"; GenJournalLine: Record "Gen. Journal Line"; var OpenApprovalEntriesExistForCurrentUser: Boolean; var OpenApprovalEntriesOnJournalBatchExist: Boolean; var OpenApprovalEntriesOnBatchOrAnyJournalLineExist: Boolean; var CanCancelApprovalForJournalBatch: Boolean; var LocalCanRequestFlowApprovalForBatch: Boolean; var LocalCanCancelFlowApprovalForBatch: Boolean; var LocalCanRequestFlowApprovalForBatchAndAllLines: Boolean; var LocalApprovalEntriesExistSentByCurrentUser: Boolean)
+    var
+        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+        WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
+        WorkflowEventHandling: Codeunit "Workflow Event Handling";
+        WorkflowManagement: Codeunit "Workflow Management";
+        CanRequestFlowApprovalForAllLines: Boolean;
+    begin
+        OpenApprovalEntriesExistForCurrentUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(GenJournalBatch.RecordId);
+        OpenApprovalEntriesOnJournalBatchExist := ApprovalsMgmt.HasOpenApprovalEntries(GenJournalBatch.RecordId);
+        OpenApprovalEntriesOnBatchOrAnyJournalLineExist := OpenApprovalEntriesOnJournalBatchExist or ApprovalsMgmt.HasAnyOpenJournalLineApprovalEntries(GenJournalLine."Journal Template Name", GenJournalLine."Journal Batch Name");
+        CanCancelApprovalForJournalBatch := ApprovalsMgmt.CanCancelApprovalForRecord(GenJournalBatch.RecordId);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancelJournalBatch(GenJournalBatch, LocalCanRequestFlowApprovalForBatch, LocalCanCancelFlowApprovalForBatch, CanRequestFlowApprovalForAllLines);
+        LocalCanRequestFlowApprovalForBatchAndAllLines := LocalCanRequestFlowApprovalForBatch and CanRequestFlowApprovalForAllLines;
+        LocalApprovalEntriesExistSentByCurrentUser := ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(GenJournalBatch.RecordId);
 
-        ShowWorkflowStatusOnLine := CurrPage.WorkflowStatusLine.PAGE.SetFilterOnWorkflowRecord(RecordId);
+        EnabledGenJnlLineWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Line", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalLineForApprovalCode());
+        EnabledGenJnlBatchWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Batch", WorkflowEventHandling.RunWorkflowOnSendGeneralJournalBatchForApprovalCode());
+    end;
 
-        CanCancelApprovalForJnlLine := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
-
+    local procedure SetControlAppearance()
+    begin
+        SetApprovalState(Rec.RecordId, OpenApprovalEntriesOnJnlBatchExist, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForLine, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlLineExist, OpenApprovalEntriesOnBatchOrCurrJnlLineExist, CanCancelApprovalForJnlLine, CanRequestFlowApprovalForBatchAndCurrentLine);
+        ShowWorkflowStatusOnLine := CurrPage.WorkflowStatusLine.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
         SetPayrollAppearance();
-
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestFlowApprovalForLine, CanCancelFlowApprovalForLine);
-        CanRequestFlowApprovalForBatchAndCurrentLine := CanRequestFlowApprovalForBatch and CanRequestFlowApprovalForLine;
     end;
 
     local procedure IterateDocNumbers(FindTxt: Text; NextNum: Integer)
@@ -2151,12 +2258,12 @@ page 39 "General Journal"
         CurrentDocNoWasFound: Boolean;
         NoLines: Boolean;
     begin
-        if Count = 0 then
+        if Rec.Count = 0 then
             NoLines := true;
         GenJournalLine.Reset();
         GenJournalLine.SetCurrentKey("Document No.", "Line No.");
-        GenJournalLine.SetRange("Journal Template Name", "Journal Template Name");
-        GenJournalLine.SetRange("Journal Batch Name", "Journal Batch Name");
+        GenJournalLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+        GenJournalLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
         // IF GenJournalLine.FIND('+') THEN
         if GenJournalLine.Find(FindTxt) then
             repeat
@@ -2182,18 +2289,18 @@ page 39 "General Journal"
         GenJnlBatch: Record "Gen. Journal Batch";
         LastDocNo: Code[20];
     begin
-        if Count = 0 then
+        if Rec.Count = 0 then
             exit;
-        GenJnlBatch.Get("Journal Template Name", CurrentJnlBatchName);
+        GenJnlBatch.Get(Rec."Journal Template Name", CurrentJnlBatchName);
         GenJournalLine.Reset();
         GenJournalLine.SetCurrentKey("Document No.");
-        GenJournalLine.SetRange("Journal Template Name", "Journal Template Name");
-        GenJournalLine.SetRange("Journal Batch Name", "Journal Batch Name");
+        GenJournalLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+        GenJournalLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
         if GenJournalLine.FindLast() then begin
             LastDocNo := GenJournalLine."Document No.";
-            IncrementDocumentNo(GenJnlBatch, LastDocNo);
+            Rec.IncrementDocumentNo(GenJnlBatch, LastDocNo);
         end else
-            LastDocNo := NoSeriesMgt.TryGetNextNo(GenJnlBatch."No. Series", "Posting Date");
+            LastDocNo := NoSeriesMgt.TryGetNextNo(GenJnlBatch."No. Series", Rec."Posting Date");
 
         CurrentDocNo := LastDocNo;
         SetDocumentNumberFilter(CurrentDocNo);
@@ -2208,8 +2315,8 @@ page 39 "General Journal"
         if IsHandled then
             exit(Result);
 
-        if IsOpenedFromBatch() then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+        if Rec.IsOpenedFromBatch() then begin
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             GenJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
             SetControlAppearanceFromBatch();
             SetDataForSimpleModeOnOpen();
@@ -2227,7 +2334,7 @@ page 39 "General Journal"
         if IsHandled then
             exit;
 
-        GenJnlManagement.TemplateSelection(PAGE::"General Journal", "Gen. Journal Template Type"::General, false, Rec, JnlSelected);
+        GenJnlManagement.TemplateSelection(PAGE::"General Journal", Enum::"Gen. Journal Template Type"::General, false, Rec, JnlSelected);
         if not JnlSelected then
             Error('');
     end;
@@ -2243,30 +2350,15 @@ page 39 "General Journal"
     local procedure SetControlAppearanceFromBatch()
     var
         GenJournalBatch: Record "Gen. Journal Batch";
-        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
-        WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
-        CanRequestFlowApprovalForAllLines: Boolean;
     begin
-        if not GenJournalBatch.Get(GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
+        if not GenJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
 
         ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.PAGE.SetFilterOnWorkflowRecord(GenJournalBatch.RecordId);
-        OpenApprovalEntriesExistForCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(GenJournalBatch.RecordId);
-        OpenApprovalEntriesOnJnlBatchExist := ApprovalsMgmt.HasOpenApprovalEntries(GenJournalBatch.RecordId);
-
-        OpenApprovalEntriesOnBatchOrAnyJnlLineExist :=
-          OpenApprovalEntriesOnJnlBatchExist or
-          ApprovalsMgmt.HasAnyOpenJournalLineApprovalEntries("Journal Template Name", "Journal Batch Name");
-
-        CanCancelApprovalForJnlBatch := ApprovalsMgmt.CanCancelApprovalForRecord(GenJournalBatch.RecordId);
-
-        WorkflowWebhookManagement.GetCanRequestAndCanCancelJournalBatch(
-          GenJournalBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForAllLines);
-        CanRequestFlowApprovalForBatchAndAllLines := CanRequestFlowApprovalForBatch and CanRequestFlowApprovalForAllLines;
-
+        SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser);
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
-        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
         JournalErrorsMgt.SetFullBatchCheck(true);
     end;
 
@@ -2290,10 +2382,10 @@ page 39 "General Journal"
     var
         OriginalFilterGroup: Integer;
     begin
-        OriginalFilterGroup := FilterGroup;
-        FilterGroup := 25;
-        SetFilter("Document No.", DocNoToSet);
-        FilterGroup := OriginalFilterGroup;
+        OriginalFilterGroup := Rec.FilterGroup;
+        Rec.FilterGroup := 25;
+        Rec.SetFilter("Document No.", DocNoToSet);
+        Rec.FilterGroup := OriginalFilterGroup;
     end;
 
     local procedure SetDimensionVisibility()
@@ -2322,8 +2414,8 @@ page 39 "General Journal"
         GenJournalLine: Record "Gen. Journal Line";
     begin
         if IsSimplePage then begin
-            GenJournalLine.SetRange("Journal Template Name", "Journal Template Name");
-            GenJournalLine.SetRange("Journal Batch Name", "Journal Batch Name");
+            GenJournalLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+            GenJournalLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
             GenJournalLine.SetRange("Document No.", CurrentDocNo);
             GenJournalLine.CalcSums("Debit Amount");
             exit(GenJournalLine."Debit Amount");
@@ -2335,8 +2427,8 @@ page 39 "General Journal"
         GenJournalLine: Record "Gen. Journal Line";
     begin
         if IsSimplePage then begin
-            GenJournalLine.SetRange("Journal Template Name", "Journal Template Name");
-            GenJournalLine.SetRange("Journal Batch Name", "Journal Batch Name");
+            GenJournalLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+            GenJournalLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
             GenJournalLine.SetRange("Document No.", CurrentDocNo);
             GenJournalLine.CalcSums("Credit Amount");
             exit(GenJournalLine."Credit Amount");
@@ -2355,8 +2447,8 @@ page 39 "General Journal"
     begin
         if IsSimplePage then begin
             // Filter on the first record
-            SetCurrentKey("Document No.", "Line No.");
-            if FindFirst() then
+            Rec.SetCurrentKey("Document No.", "Line No.");
+            if Rec.FindFirst() then
                 SetDataForSimpleMode(Rec)
             else begin
                 // if no rec is found reset the currentposting date to workdate and currency code to empty
@@ -2375,7 +2467,7 @@ page 39 "General Journal"
         // Need to set up simple page mode properties on batch change
         if IsSimplePage then begin
             GenJournalLine.Reset();
-            GenJournalLine.SetRange("Journal Template Name", "Journal Template Name");
+            GenJournalLine.SetRange("Journal Template Name", Rec."Journal Template Name");
             GenJournalLine.SetRange("Journal Batch Name", CurrentJnlBatchName);
             IsChangingDocNo := false;
             if GenJournalLine.FindFirst() then
@@ -2389,31 +2481,31 @@ page 39 "General Journal"
         BankAccount: Record "Bank Account";
     begin
         // No lines shown
-        if Count = 0 then
+        if Rec.Count = 0 then
             // If xrec."Document No." is empty that means this is the first entry for a batch
             // In this case we want to assign current doc no. to the document no. of the record
             // But if user changes the doc no. then we want to use whatever value they enter for
             // current doc no.
-            if ((xRec."Document No." = '') or (xRec."Journal Batch Name" <> "Journal Batch Name")) and (not IsChangingDocNo) then begin
-                CurrentDocNo := "Document No.";
+            if ((xRec."Document No." = '') or (xRec."Journal Batch Name" <> Rec."Journal Batch Name")) and (not IsChangingDocNo) then begin
+                CurrentDocNo := Rec."Document No.";
                 IF xRec."Journal Batch Name" = '' THEN
-                    IF GenJournalBatch.GET("Journal Template Name", "Journal Batch Name") THEN
+                    IF GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
                         IF GenJournalBatch."Bal. Account Type" = GenJournalBatch."Bal. Account Type"::"Bank Account" THEN
                             IF BankAccount.GET(GenJournalBatch."Bal. Account No.") THEN
                                 CurrentCurrencyCode := BankAccount."Currency Code";
             end else begin
-                "Document No." := CurrentDocNo;
+                Rec."Document No." := CurrentDocNo;
                 // Clear out credit / debit for empty page since these
                 // might have been set if suggest balance amount is checked on the batch
-                Validate("Credit Amount", 0);
-                Validate("Debit Amount", 0);
+                Rec.Validate("Credit Amount", 0);
+                Rec.Validate("Debit Amount", 0);
             end
         else
-            "Document No." := CurrentDocNo;
+            Rec."Document No." := CurrentDocNo;
 
-        "Currency Code" := CurrentCurrencyCode;
+        Rec."Currency Code" := CurrentCurrencyCode;
         if CurrentPostingDate <> 0D then
-            Validate("Posting Date", CurrentPostingDate);
+            Rec.Validate("Posting Date", CurrentPostingDate);
     end;
 
     local procedure SetDataForSimpleModeOnPropValidation(FieldNumber: Integer)
@@ -2423,8 +2515,8 @@ page 39 "General Journal"
     begin
         if IsSimplePage then begin
             GenJournalLine.Reset();
-            GenJournalLine.SetRange("Journal Template Name", "Journal Template Name");
-            GenJournalLine.SetRange("Journal Batch Name", "Journal Batch Name");
+            GenJournalLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+            GenJournalLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
             GenJournalLine.SetRange("Document No.", CurrentDocNo);
             if GenJournalLine.Findset(true, false) then
                 repeat
@@ -2450,8 +2542,8 @@ page 39 "General Journal"
             exit;
 
         PostedFromSimplePage := true;
-        SetCurrentKey("Document No.", "Line No.");
-        if FindFirst() then
+        Rec.SetCurrentKey("Document No.", "Line No.");
+        if Rec.FindFirst() then
             SetDataForSimpleMode(Rec)
     end;
 
@@ -2470,8 +2562,8 @@ page 39 "General Journal"
                     UpdateCurrencyExchangeRates.OpenExchangeRatesPage(CurrentCurrencyCode);
                     UpdateCurrencyFactor(FieldNo);
                 end else begin
-                    CurrentCurrencyCode := "Currency Code";
-                    CurrentPostingDate := "Posting Date";
+                    CurrentCurrencyCode := Rec."Currency Code";
+                    CurrentPostingDate := Rec."Posting Date";
                 end
         else
             SetDataForSimpleModeOnPropValidation(FieldNo);
@@ -2479,8 +2571,45 @@ page 39 "General Journal"
 
     local procedure SetJobQueueVisibility()
     begin
-        JobQueueVisible := "Job Queue Status" = "Job Queue Status"::"Scheduled for Posting";
+        JobQueueVisible := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
         JobQueuesUsed := GeneralLedgerSetup.JobQueueActive();
+    end;
+
+    local procedure GetGenJnlBatchApprovalStatus()
+    var
+        ApprovalEntry: Record "Approval Entry";
+        GenJnlBatch: Record "Gen. Journal Batch";        
+    begin
+        Clear(GenJnlBatchApprovalStatus);
+        if EnabledGenJnlBatchWorkflowsExist and GenJnlBatch.Get(Rec."Journal Template Name", CurrentJnlBatchName) then
+            if ApprovalMgmt.FindApprovalEntryByRecordId(ApprovalEntry, GenJnlBatch.RecordId) then
+                GenJnlBatchApprovalStatus := GetApprovalStatusFromApprovalEntry(ApprovalEntry);
+    end;
+
+    local procedure GetGenJnlLineApprovalStatus()
+    var
+        ApprovalEntry: Record "Approval Entry";        
+    begin
+        Clear(GenJnlLineApprovalStatus);
+        if EnabledGenJnlLineWorkflowsExist then
+            if ApprovalMgmt.FindApprovalEntryByRecordId(ApprovalEntry, Rec.RecordId) then
+                GenJnlLineApprovalStatus := GetApprovalStatusFromApprovalEntry(ApprovalEntry);
+    end;
+
+    local procedure GetApprovalStatusFromApprovalEntry(var ApprovalEntry: Record "Approval Entry"): Text[20]
+    var
+        RecRef: RecordRef;
+        FldRef: FieldRef;
+        ApprovalStatus: Text;
+        PendingApprovalLbl: Label 'Pending Approval';
+    begin
+        RecRef.GetTable(ApprovalEntry);
+        FldRef := RecRef.Field(ApprovalEntry.FieldNo(Status));
+        if FldRef.GetEnumValueName(ApprovalEntry.Status.AsInteger() + 1) = 'Open' then
+            ApprovalStatus := PendingApprovalLbl
+        else
+            ApprovalStatus := FldRef.GetEnumValueCaption(ApprovalEntry.Status.AsInteger() + 1);
+        exit(CopyStr(ApprovalStatus, 1, 20));
     end;
 
 #if not CLEAN22

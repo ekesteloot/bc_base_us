@@ -11,7 +11,7 @@ page 170 "Standard Sales Code Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a code which identifies this standard sales code.';
@@ -30,7 +30,7 @@ page 170 "Standard Sales Code Card"
             part(StdSalesLines; "Standard Sales Code Subform")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Standard Sales Code" = FIELD(Code);
+                SubPageLink = "Standard Sales Code" = field(Code);
             }
         }
         area(factboxes)

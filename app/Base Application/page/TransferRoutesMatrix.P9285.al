@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.InventoryMgt.Location;
+
 page 9285 "Transfer Routes Matrix"
 {
     Caption = 'Transfer Routes Matrix';
@@ -6,7 +10,7 @@ page 9285 "Transfer Routes Matrix"
     LinksAllowed = false;
     PageType = ListPart;
     SourceTable = Location;
-    SourceTableView = WHERE("Use As In-Transit" = CONST(false));
+    SourceTableView = where("Use As In-Transit" = const(false));
 
     layout
     {
@@ -15,7 +19,7 @@ page 9285 "Transfer Routes Matrix"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Location;
                     Caption = 'Transfer-from Code';
@@ -447,79 +451,38 @@ page 9285 "Transfer Routes Matrix"
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[32] of Text[80];
         MATRIX_CaptionSet: array[32] of Text[80];
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
-
-#if not CLEAN20
-    [Obsolete('Replaced by LoadMatrix()', '20.0')]
-    procedure Load(NewMatrixColumns: array[32] of Text[1024]; var NewMatrixRecords: array[32] of Record Location; NewCurrentNoOfMatrixColumns: Integer; NewShow: Option "In-Transit Code","Shipping Agent Code","Shipping Agent Service Code")
-    begin
-        LoadMatrix(
-            NewMatrixColumns, NewMatrixRecords, NewCurrentNoOfMatrixColumns, "Transfer Routes Show".FromInteger(NewShow));
-    end;
-#endif
 
     procedure LoadMatrix(NewMatrixColumns: array[32] of Text[1024]; var NewMatrixRecords: array[32] of Record Location; NewCurrentNoOfMatrixColumns: Integer; NewShow: Enum "Transfer Routes Show")
     begin
@@ -532,7 +495,7 @@ page 9285 "Transfer Routes Matrix"
     local procedure MATRIX_OnAfterGetRecord(MATRIX_ColumnOrdinal: Integer)
     begin
         ShowRouteSpecification(MATRIX_ColumnOrdinal);
-        if (Format(Specification) = '') and (MatrixRecords[MATRIX_ColumnOrdinal].Code <> Code) then
+        if (Format(Specification) = '') and (MatrixRecords[MATRIX_ColumnOrdinal].Code <> Rec.Code) then
             Specification := '...';
 
         MATRIX_CellData[MATRIX_ColumnOrdinal] := Format(Specification);
@@ -541,7 +504,7 @@ page 9285 "Transfer Routes Matrix"
     local procedure ShowRouteSpecification(MATRIX_ColumnOrdinal: Integer)
     begin
         Specification := '';
-        if TransferRoute.Get(Code, MatrixRecords[MATRIX_ColumnOrdinal].Code) then
+        if TransferRoute.Get(Rec.Code, MatrixRecords[MATRIX_ColumnOrdinal].Code) then
             case Show of
                 Show::"Shipping Agent Code":
                     Specification := TransferRoute."Shipping Agent Code";
@@ -556,10 +519,10 @@ page 9285 "Transfer Routes Matrix"
 
     local procedure MATRIX_OnAssistEdit(MATRIX_ColumnOrdinal: Integer)
     begin
-        if MatrixRecords[MATRIX_ColumnOrdinal].Code <> Code then begin
-            if not TransferRoute.Get(Code, MatrixRecords[MATRIX_ColumnOrdinal].Code) then begin
+        if MatrixRecords[MATRIX_ColumnOrdinal].Code <> Rec.Code then begin
+            if not TransferRoute.Get(Rec.Code, MatrixRecords[MATRIX_ColumnOrdinal].Code) then begin
                 TransferRoute.Init();
-                TransferRoute.Validate("Transfer-from Code", Code);
+                TransferRoute.Validate("Transfer-from Code", Rec.Code);
                 TransferRoute.Validate("Transfer-to Code", MatrixRecords[MATRIX_ColumnOrdinal].Code);
                 TransferRoute.Insert();
                 Commit();

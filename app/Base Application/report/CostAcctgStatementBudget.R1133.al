@@ -1,7 +1,11 @@
+namespace Microsoft.CostAccounting.Reports;
+
+using Microsoft.CostAccounting.Account;
+
 report 1133 "Cost Acctg. Statement/Budget"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/CostAccounting/CostAcctgStatementBudget.rdlc';
+    RDLCLayout = './CostAccounting/Reports/CostAcctgStatementBudget.rdlc';
     ApplicationArea = CostAccounting;
     Caption = 'Cost Acctg. Statement/Budget';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 1133 "Cost Acctg. Statement/Budget"
     {
         dataitem("Cost Type"; "Cost Type")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Budget Filter", "Date Filter", "Cost Center Filter", "Cost Object Filter", Type, "Cost Classification";
             column(DateFilterTxt; DateFilterTxt)
             {

@@ -1,3 +1,28 @@
+﻿namespace Microsoft.Sales.RoleCenters;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Reports;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
+using Microsoft.Integration.D365Sales;
+using Microsoft.InventoryMgt.Item;
+#if CLEAN21
+using Microsoft.Pricing.Worksheet;
+#endif
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Analysis;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+#if CLEAN21
+using Microsoft.Sales.Pricing;
+#endif
+using Microsoft.Sales.Reports;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+using System.Threading;
+
 page 9005 "Sales Manager Role Center"
 {
     Caption = 'Sales Manager';
@@ -161,7 +186,7 @@ page 9005 "Sales Manager Role Center"
                 Caption = 'Open';
                 Image = Edit;
                 RunObject = Page "Sales Order List";
-                RunPageView = WHERE(Status = FILTER(Open));
+                RunPageView = where(Status = filter(Open));
                 ShortCutKey = 'Return';
                 ToolTip = 'Open the card for the selected record.';
             }
@@ -186,7 +211,7 @@ page 9005 "Sales Manager Role Center"
                 Caption = 'Open';
                 Image = Edit;
                 RunObject = Page "Sales Invoice List";
-                RunPageView = WHERE(Status = FILTER(Open));
+                RunPageView = where(Status = filter(Open));
                 ShortCutKey = 'Return';
                 ToolTip = 'Open the card for the selected record.';
             }
@@ -296,7 +321,7 @@ page 9005 "Sales Manager Role Center"
                 ApplicationArea = RelationshipMgmt;
                 Caption = 'Sales Price &Worksheet';
                 Image = PriceWorksheet;
-                RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7023)); // "Sales Price Worksheet";
+                RunPageView = where("Object Type" = const(Page), "Object ID" = const(7023)); // "Sales Price Worksheet";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'Manage sales prices for individual customers, for a group of customers, for all customers, or for a campaign.';
                 ObsoleteState = Pending;
@@ -314,7 +339,7 @@ page 9005 "Sales Manager Role Center"
                 ApplicationArea = RelationshipMgmt;
                 Caption = 'Sales &Prices';
                 Image = SalesPrices;
-                RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7002)); // "Sales Prices"
+                RunPageView = where("Object Type" = const(Page), "Object ID" = const(7002)); // "Sales Prices"
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'Define how to set up sales price agreements. These sales prices can be for individual customers, for a group of customers, for all customers, or for a campaign.';
                 ObsoleteState = Pending;
@@ -326,7 +351,7 @@ page 9005 "Sales Manager Role Center"
                 ApplicationArea = RelationshipMgmt;
                 Caption = 'Sales Line &Discounts';
                 Image = SalesLineDisc;
-                RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7004)); // "Sales Line Discounts"
+                RunPageView = where("Object Type" = const(Page), "Object ID" = const(7004)); // "Sales Line Discounts"
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'View or edit sales line discounts that you grant when certain conditions are met, such as customer, quantity, or ending date. The discount agreements can be for individual customers, for a group of customers, for all customers or for a campaign.';
                 ObsoleteState = Pending;

@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment.Configuration;
+
 table 2000000233 "Tenant Report Layout Selection"
 {
     Caption = 'Tenant Report Layout Selection';
@@ -10,7 +16,7 @@ table 2000000233 "Tenant Report Layout Selection"
         field(1; "Report ID"; Integer)
         {
             Caption = 'Report ID';
-            TableRelation = Object.ID WHERE("Type" = const(Report));
+            TableRelation = System.Reflection.Object.ID WHERE("Type" = const(Report));
         }
 
         field(2; "Layout Name"; Text[250])
@@ -26,7 +32,7 @@ table 2000000233 "Tenant Report Layout Selection"
         field(4; "Company Name"; Text[30])
         {
             Caption = 'Company Name';
-            TableRelation = Company.Name;
+            TableRelation = System.Environment.Company.Name;
         }
 
         field(5; "User ID"; Guid)

@@ -17,29 +17,29 @@ table 10012 "Sales Tax Amount Difference"
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = IF ("Document Product Area" = CONST(Sales)) "Sales Header"."No." WHERE("Document Type" = FIELD("Document Type"))
-            ELSE
-            IF ("Document Product Area" = CONST(Purchase)) "Purchase Header"."No." WHERE("Document Type" = FIELD("Document Type"))
-            ELSE
-            IF ("Document Product Area" = CONST(Service)) "Service Header"."No." WHERE("Document Type" = FIELD("Document Type"))
-            ELSE
-            IF ("Document Type" = CONST(Invoice),
-                                     "Document Product Area" = CONST("Posted Sale")) "Sales Invoice Header"
-            ELSE
-            IF ("Document Type" = CONST("Credit Memo"),
-                                              "Document Product Area" = CONST("Posted Sale")) "Sales Cr.Memo Header"
-            ELSE
-            IF ("Document Type" = CONST(Invoice),
-                                                       "Document Product Area" = CONST("Posted Purchase")) "Purch. Inv. Header"
-            ELSE
-            IF ("Document Type" = CONST("Credit Memo"),
-                                                                "Document Product Area" = CONST("Posted Purchase")) "Purch. Cr. Memo Hdr."
-            ELSE
-            IF ("Document Type" = CONST(Invoice),
-                                                                         "Document Product Area" = CONST("Posted Service")) "Service Invoice Header"
-            ELSE
-            IF ("Document Type" = CONST("Credit Memo"),
-                                                                                  "Document Product Area" = CONST("Posted Service")) "Service Cr.Memo Header";
+            TableRelation = if ("Document Product Area" = const(Sales)) "Sales Header"."No." where("Document Type" = field("Document Type"))
+            else
+            if ("Document Product Area" = const(Purchase)) "Purchase Header"."No." where("Document Type" = field("Document Type"))
+            else
+            if ("Document Product Area" = const(Service)) "Service Header"."No." where("Document Type" = field("Document Type"))
+            else
+            if ("Document Type" = const(Invoice),
+                                     "Document Product Area" = const("Posted Sale")) "Sales Invoice Header"
+            else
+            if ("Document Type" = const("Credit Memo"),
+                                              "Document Product Area" = const("Posted Sale")) "Sales Cr.Memo Header"
+            else
+            if ("Document Type" = const(Invoice),
+                                                       "Document Product Area" = const("Posted Purchase")) "Purch. Inv. Header"
+            else
+            if ("Document Type" = const("Credit Memo"),
+                                                                "Document Product Area" = const("Posted Purchase")) "Purch. Cr. Memo Hdr."
+            else
+            if ("Document Type" = const(Invoice),
+                                                                         "Document Product Area" = const("Posted Service")) "Service Invoice Header"
+            else
+            if ("Document Type" = const("Credit Memo"),
+                                                                                  "Document Product Area" = const("Posted Service")) "Service Cr.Memo Header";
         }
         field(5; "Tax Area Code"; Code[20])
         {

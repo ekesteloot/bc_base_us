@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Setup;
+
 enum 385 "Report Selection Usage Bank"
 {
     Extensible = true;

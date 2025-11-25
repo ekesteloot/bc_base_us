@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using System.Environment.Configuration;
+using System.Threading;
+
 codeunit 1805 "Import Config. Package Files"
 {
     // // This code unit is executed in a separate session. Messages and errors will be output to the event log.
@@ -19,9 +24,9 @@ codeunit 1805 "Import Config. Package Files"
 
         UserPersonalization.Get(UserSecurityId());
         CurrentLanguageID := GlobalLanguage;
-        if (UserPersonalization."Language ID" <> "Language ID") and ("Language ID" <> 0) then
-            if not TrySetGlobalLanguage("Language ID") then
-                Error(InvalidLanguageIDErr, "Language ID");
+        if (UserPersonalization."Language ID" <> Rec."Language ID") and (Rec."Language ID" <> 0) then
+            if not TrySetGlobalLanguage(Rec."Language ID") then
+                Error(InvalidLanguageIDErr, Rec."Language ID");
 
         CompanyInitialize.InitializeCompany();
         ImportConfigurationPackageFiles(Rec);

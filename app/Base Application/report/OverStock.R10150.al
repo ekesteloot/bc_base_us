@@ -187,8 +187,8 @@ report 10150 "Over Stock"
             }
             dataitem("Stockkeeping Unit"; "Stockkeeping Unit")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter"), "Date Filter" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Item No.", "Location Code", "Variant Code");
+                DataItemLink = "Item No." = field("No."), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter"), "Date Filter" = field("Date Filter");
+                DataItemTableView = sorting("Item No.", "Location Code", "Variant Code");
                 column(ValuedAmount_Control1480008; ValuedAmount)
                 {
                 }

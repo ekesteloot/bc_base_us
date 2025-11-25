@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.RoleCenters;
+
 profile "HR"
 {
     Enabled = true;

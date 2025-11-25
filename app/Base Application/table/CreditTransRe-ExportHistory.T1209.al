@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
 table 1209 "Credit Trans Re-export History"
 {
     Caption = 'Credit Trans Re-export History';

@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Posting;
+
+using Microsoft.CostAccounting.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 codeunit 1108 "CA Jnl.-Post"
 {
     TableNo = "Cost Journal Line";

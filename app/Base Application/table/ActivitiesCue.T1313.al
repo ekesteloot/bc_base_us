@@ -22,13 +22,13 @@ table 1313 "Activities Cue"
         }
         field(4; "Ongoing Sales Invoices"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = FILTER(Invoice)));
+            CalcFormula = count("Sales Header" where("Document Type" = filter(Invoice)));
             Caption = 'Ongoing Sales Invoices';
             FieldClass = FlowField;
         }
         field(5; "Ongoing Purchase Invoices"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER(Invoice)));
+            CalcFormula = count("Purchase Header" where("Document Type" = filter(Invoice)));
             Caption = 'Ongoing Purchase Invoices';
             FieldClass = FlowField;
         }
@@ -66,20 +66,20 @@ table 1313 "Activities Cue"
         }
         field(11; "Ongoing Sales Quotes"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = FILTER(Quote)));
+            CalcFormula = count("Sales Header" where("Document Type" = filter(Quote)));
             Caption = 'Ongoing Sales Quotes';
             FieldClass = FlowField;
         }
         field(13; "Sales Inv. - Pending Doc.Exch."; Integer)
         {
-            CalcFormula = Count("Sales Invoice Header" WHERE("Document Exchange Status" = FILTER("Sent to Document Exchange Service" | "Delivery Failed")));
+            CalcFormula = count("Sales Invoice Header" where("Document Exchange Status" = filter("Sent to Document Exchange Service" | "Delivery Failed")));
             Caption = 'Sales Invoices - Pending Document Exchange';
             Editable = false;
             FieldClass = FlowField;
         }
         field(14; "Sales CrM. - Pending Doc.Exch."; Integer)
         {
-            CalcFormula = Count("Sales Cr.Memo Header" WHERE("Document Exchange Status" = FILTER("Sent to Document Exchange Service" | "Delivery Failed")));
+            CalcFormula = count("Sales Cr.Memo Header" where("Document Exchange Status" = filter("Sent to Document Exchange Service" | "Delivery Failed")));
             Caption = 'Sales Credit Memos - Pending Document Exchange';
             Editable = false;
             FieldClass = FlowField;
@@ -91,49 +91,49 @@ table 1313 "Activities Cue"
         }
         field(20; "My Incoming Documents"; Integer)
         {
-            CalcFormula = Count("Incoming Document" WHERE(Processed = CONST(false)));
+            CalcFormula = count("Incoming Document" where(Processed = const(false)));
             Caption = 'My Incoming Documents';
             FieldClass = FlowField;
         }
         field(21; "Non-Applied Payments"; Integer)
         {
-            CalcFormula = Count("Bank Acc. Reconciliation" WHERE("Statement Type" = CONST("Payment Application")));
+            CalcFormula = count("Bank Acc. Reconciliation" where("Statement Type" = const("Payment Application")));
             Caption = 'Non-Applied Payments';
             FieldClass = FlowField;
         }
         field(22; "Purch. Invoices Due Next Week"; Integer)
         {
-            CalcFormula = Count("Vendor Ledger Entry" WHERE("Document Type" = FILTER(Invoice | "Credit Memo"),
-                                                             "Due Date" = FIELD("Due Next Week Filter"),
-                                                             Open = CONST(true)));
+            CalcFormula = count("Vendor Ledger Entry" where("Document Type" = filter(Invoice | "Credit Memo"),
+                                                             "Due Date" = field("Due Next Week Filter"),
+                                                             Open = const(true)));
             Caption = 'Purch. Invoices Due Next Week';
             Editable = false;
             FieldClass = FlowField;
         }
         field(23; "Sales Invoices Due Next Week"; Integer)
         {
-            CalcFormula = Count("Cust. Ledger Entry" WHERE("Document Type" = FILTER(Invoice | "Credit Memo"),
-                                                            "Due Date" = FIELD("Due Next Week Filter"),
-                                                            Open = CONST(true)));
+            CalcFormula = count("Cust. Ledger Entry" where("Document Type" = filter(Invoice | "Credit Memo"),
+                                                            "Due Date" = field("Due Next Week Filter"),
+                                                            Open = const(true)));
             Caption = 'Sales Invoices Due Next Week';
             Editable = false;
             FieldClass = FlowField;
         }
         field(24; "Ongoing Sales Orders"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = FILTER(Order)));
+            CalcFormula = count("Sales Header" where("Document Type" = filter(Order)));
             Caption = 'Ongoing Sales Orders';
             FieldClass = FlowField;
         }
         field(25; "Inc. Doc. Awaiting Verfication"; Integer)
         {
-            CalcFormula = Count("Incoming Document" WHERE("OCR Status" = CONST("Awaiting Verification")));
+            CalcFormula = count("Incoming Document" where("OCR Status" = const("Awaiting Verification")));
             Caption = 'Inc. Doc. Awaiting Verfication';
             FieldClass = FlowField;
         }
         field(26; "Purchase Orders"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER(Order)));
+            CalcFormula = count("Purchase Header" where("Document Type" = filter(Order)));
             Caption = 'Purchase Orders';
             FieldClass = FlowField;
         }
@@ -144,33 +144,33 @@ table 1313 "Activities Cue"
         }
         field(28; "IC Inbox Transactions"; Integer)
         {
-            CalcFormula = Count("IC Inbox Transaction");
+            CalcFormula = count("IC Inbox Transaction");
             Caption = 'IC Inbox Transactions';
             FieldClass = FlowField;
         }
         field(29; "IC Outbox Transactions"; Integer)
         {
-            CalcFormula = Count("IC Outbox Transaction");
+            CalcFormula = count("IC Outbox Transaction");
             Caption = 'IC Outbox Transactions';
             FieldClass = FlowField;
         }
         field(31; "Outstanding Vendor Invoices"; Integer)
         {
-            CalcFormula = Count("Vendor Ledger Entry" WHERE("Document Type" = FILTER(Invoice),
-                                                             Open = CONST(true)));
+            CalcFormula = count("Vendor Ledger Entry" where("Document Type" = filter(Invoice),
+                                                             Open = const(true)));
             Caption = 'Outstanding Vendor Invoices';
             Editable = false;
             FieldClass = FlowField;
         }
         field(32; "Coupled Data Synch Errors"; Integer)
         {
-            CalcFormula = Count("CRM Integration Record" WHERE(Skipped = CONST(true)));
+            CalcFormula = count("CRM Integration Record" where(Skipped = const(true)));
             Caption = 'Coupled Data Synch Errors';
             FieldClass = FlowField;
         }
         field(33; "CDS Integration Errors"; Integer)
         {
-            CalcFormula = Count("Integration Synch. Job Errors");
+            CalcFormula = count("Integration Synch. Job Errors");
             Caption = 'Dataverse Integration Errors';
             FieldClass = FlowField;
         }

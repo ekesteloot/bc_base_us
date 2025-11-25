@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Contract;
+
+using Microsoft.ServiceMgt.Document;
+
 codeunit 5945 CreateCreditfromContractLines
 {
     SingleInstance = true;
@@ -12,18 +16,18 @@ codeunit 5945 CreateCreditfromContractLines
         if IsHandled then
             exit;
 
-        ServContractHeader.Get("Contract Type", "Contract No.");
-        if not Credited and
-           not "New Line"
+        ServContractHeader.Get(Rec."Contract Type", Rec."Contract No.");
+        if not Rec.Credited and
+           not Rec."New Line"
         then begin
-            if "Line Amount" > 0 then
+            if Rec."Line Amount" > 0 then
                 if ServContractHeader."Automatic Credit Memos" then
-                    if "Credit Memo Date" > 0D then
+                    if Rec."Credit Memo Date" > 0D then
                         CreditNoteNo := ServContractMgt.CreateContractLineCreditMemo(Rec, true);
             ServItemLine.Reset();
             ServItemLine.SetCurrentKey("Contract No.");
-            ServItemLine.SetRange("Contract No.", "Contract No.");
-            ServItemLine.SetRange("Contract Line No.", "Line No.");
+            ServItemLine.SetRange("Contract No.", Rec."Contract No.");
+            ServItemLine.SetRange("Contract Line No.", Rec."Line No.");
             ServItemLineExist := ServItemLine.FindFirst();
         end;
 
@@ -33,7 +37,7 @@ codeunit 5945 CreateCreditfromContractLines
                 Message(Text000, CreditNoteNo);
             if ServItemLineExist then
                 if LinesToDelete = 1 then
-                    Message(Text002, LowerCase(TableCaption))
+                    Message(Text002, LowerCase(Rec.TableCaption))
                 else
                     Message(Text001);
             ServItemLineExist := false;

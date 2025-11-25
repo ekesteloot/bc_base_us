@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 5647 "Ins. Coverage Ledger Entries"
 {
     ApplicationArea = FixedAssets;
@@ -89,7 +95,7 @@ page 5647 "Ins. Coverage Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -145,7 +151,7 @@ page 5647 "Ins. Coverage Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -162,7 +168,7 @@ page 5647 "Ins. Coverage Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

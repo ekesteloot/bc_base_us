@@ -1,3 +1,11 @@
+﻿namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 5780 "Whse. Pick Subform"
 {
     AutoSplitKey = true;
@@ -8,7 +16,7 @@ page 5780 "Whse. Pick Subform"
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Warehouse Activity Line";
-    SourceTableView = WHERE("Activity Type" = CONST(Pick));
+    SourceTableView = where("Activity Type" = const(Pick));
 
     layout
     {
@@ -441,13 +449,9 @@ page 5780 "Whse. Pick Subform"
     var
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         WMSMgt: Codeunit "WMS Management";
-        [InDataSet]
         ZoneCodeEditable: Boolean;
-        [InDataSet]
         BinCodeEditable: Boolean;
-        [InDataSet]
         PackageTrackingVisible: Boolean;
-        [InDataSet]
         HideBinFields: Boolean;
 
     local procedure ShowSourceLine()

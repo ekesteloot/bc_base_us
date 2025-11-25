@@ -6,7 +6,7 @@ query 141 "EU VAT Entries"
     {
         dataitem(VAT_Entry; "VAT Entry")
         {
-            DataItemTableFilter = Type = CONST(Sale);
+            DataItemTableFilter = Type = const(Sale);
             column(Base; Base)
             {
             }
@@ -38,7 +38,7 @@ query 141 "EU VAT Entries"
             {
                 DataItemLink = Code = VAT_Entry."Country/Region Code";
                 SqlJoinType = InnerJoin;
-                DataItemTableFilter = "EU Country/Region Code" = FILTER(<> '');
+                DataItemTableFilter = "EU Country/Region Code" = filter(<> '');
                 column(Name; Name)
                 {
                 }

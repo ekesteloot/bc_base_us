@@ -1,3 +1,5 @@
+namespace System.IO;
+
 xmlport 8610 "Config. Data Schema"
 {
     Caption = 'Config. Data Schema';
@@ -122,10 +124,10 @@ xmlport 8610 "Config. Data Schema"
                                                 XmlName = 'xsd:sequence';
                                                 tableelement("Config. Package Field"; "Config. Package Field")
                                                 {
-                                                    LinkFields = "Package Code" = FIELD("Package Code"), "Table ID" = FIELD("Table ID");
+                                                    LinkFields = "Package Code" = field("Package Code"), "Table ID" = field("Table ID");
                                                     LinkTable = "Config. Package Table";
                                                     XmlName = 'xsd:element';
-                                                    SourceTableView = SORTING("Package Code", "Table ID", "Processing Order") ORDER(Ascending);
+                                                    SourceTableView = sorting("Package Code", "Table ID", "Processing Order") order(Ascending);
                                                     textattribute(type1)
                                                     {
                                                         XmlName = 'type';

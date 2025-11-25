@@ -1,3 +1,25 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Intercompany.Partner;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 1570 "G/L Entry Posting Preview"
 {
     Caption = 'G/L Entry';
@@ -35,19 +57,19 @@ table 1570 "G/L Entry Posting Preview"
         field(10; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Bal. Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF ("Bal. Account Type" = CONST("IC Partner")) "IC Partner"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Employee)) Employee;
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const(Customer)) Customer
+            else
+            if ("Bal. Account Type" = const(Vendor)) Vendor
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset"
+            else
+            if ("Bal. Account Type" = const("IC Partner")) "IC Partner"
+            else
+            if ("Bal. Account Type" = const(Employee)) Employee;
         }
         field(17; Amount; Decimal)
         {
@@ -58,13 +80,13 @@ table 1570 "G/L Entry Posting Preview"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(24; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(27; "User ID"; Code[50])
         {
@@ -163,15 +185,15 @@ table 1570 "G/L Entry Posting Preview"
         field(58; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Source Type" = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF ("Source Type" = CONST(Employee)) Employee;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor
+            else
+            if ("Source Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Source Type" = const("Fixed Asset")) "Fixed Asset"
+            else
+            if ("Source Type" = const(Employee)) Employee;
         }
         field(59; "No. Series"; Code[20])
         {
@@ -252,7 +274,7 @@ table 1570 "G/L Entry Posting Preview"
         }
         field(76; "G/L Account Name"; Text[100])
         {
-            CalcFormula = Lookup("G/L Account".Name WHERE("No." = FIELD("G/L Account No.")));
+            CalcFormula = Lookup("G/L Account".Name where("No." = field("G/L Account No.")));
             Caption = 'G/L Account Name';
             Editable = false;
             FieldClass = FlowField;
@@ -360,9 +382,9 @@ table 1570 "G/L Entry Posting Preview"
         {
             BlankZero = true;
             Caption = 'FA Entry No.';
-            TableRelation = IF ("FA Entry Type" = CONST("Fixed Asset")) "FA Ledger Entry"
-            ELSE
-            IF ("FA Entry Type" = CONST(Maintenance)) "Maintenance Ledger Entry";
+            TableRelation = if ("FA Entry Type" = const("Fixed Asset")) "FA Ledger Entry"
+            else
+            if ("FA Entry Type" = const(Maintenance)) "Maintenance Ledger Entry";
         }
         field(5618; Comment; Text[250])
         {
@@ -370,7 +392,7 @@ table 1570 "G/L Entry Posting Preview"
         }
         field(8001; "Account Id"; Guid)
         {
-            CalcFormula = Lookup("G/L Account".SystemId WHERE("No." = FIELD("G/L Account No.")));
+            CalcFormula = Lookup("G/L Account".SystemId where("No." = field("G/L Account No.")));
             Caption = 'Account Id';
             FieldClass = FlowField;
             TableRelation = "G/L Account".SystemId;

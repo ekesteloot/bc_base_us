@@ -1,3 +1,5 @@
+namespace System.Integration.PowerBI;
+
 /// <summary>
 /// Contains only one record that tracks whether the Power BI service is throttling the calls coming from Business Central, and when the service will be available again.
 /// </summary>

@@ -21,13 +21,8 @@ table 62 "Record Export Buffer"
             Caption = 'ServerFilePath';
             DataClassification = SystemMetadata;
             ObsoleteReason = 'Replaced by usage of the File Content field.';
-#if not CLEAN20
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#endif
         }
         field(4; ClientFileName; Text[250])
         {

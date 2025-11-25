@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 xmlport 9171 "Import/Export Permission Sets"
 {
     Caption = 'Import/Export Permission Sets';

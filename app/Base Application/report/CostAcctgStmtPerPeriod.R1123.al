@@ -1,7 +1,12 @@
+namespace Microsoft.CostAccounting.Reports;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 report 1123 "Cost Acctg. Stmt. per Period"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/CostAccounting/CostAcctgStmtperPeriod.rdlc';
+    RDLCLayout = './CostAccounting/Reports/CostAcctgStmtperPeriod.rdlc';
     ApplicationArea = CostAccounting;
     Caption = 'Cost Acctg. Stmt. per Period';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 1123 "Cost Acctg. Stmt. per Period"
     {
         dataitem("Cost Type"; "Cost Type")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", Type, "Date Filter", "Cost Center Filter", "Cost Object Filter";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -272,7 +277,6 @@ report 1123 "Cost Acctg. Stmt. per Period"
         ActPeriodTxt: Text[30];
         ComparePeriodTxt: Text[30];
         OnlyAccWithEntries: Boolean;
-        [InDataSet]
         ShowAddCurr: Boolean;
         ActAmt: Decimal;
         CompareAmt: Decimal;

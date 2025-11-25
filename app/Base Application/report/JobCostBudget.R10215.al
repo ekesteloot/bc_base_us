@@ -19,7 +19,7 @@ report 10215 "Job Cost Budget"
             }
             dataitem(PageHeader; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(BudgetOptionText; BudgetOptionText)
                 {
                 }
@@ -94,9 +94,9 @@ report 10215 "Job Cost Budget"
                 }
                 dataitem("Job Task"; "Job Task")
                 {
-                    DataItemLink = "Job No." = FIELD("No.");
+                    DataItemLink = "Job No." = field("No.");
                     DataItemLinkReference = Job;
-                    DataItemTableView = SORTING("Job No.", "Job Task No.");
+                    DataItemTableView = sorting("Job No.", "Job Task No.");
                     column(Job_Task_Job_No_; "Job No.")
                     {
                     }
@@ -105,7 +105,7 @@ report 10215 "Job Cost Budget"
                     }
                     dataitem(BlankLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(Job_Task___No__of_Blank_Lines_; "Job Task"."No. of Blank Lines")
                         {
                         }
@@ -120,9 +120,9 @@ report 10215 "Job Cost Budget"
                     }
                     dataitem("Job Planning Line"; "Job Planning Line")
                     {
-                        DataItemLink = "Job No." = FIELD("No."), "Planning Date" = FIELD("Planning Date Filter");
+                        DataItemLink = "Job No." = field("No."), "Planning Date" = field("Planning Date Filter");
                         DataItemLinkReference = Job;
-                        DataItemTableView = SORTING("Job No.", "Job Task No.", "Schedule Line", "Planning Date") WHERE(Type = FILTER(<> Text));
+                        DataItemTableView = sorting("Job No.", "Job Task No.", "Schedule Line", "Planning Date") where(Type = filter(<> Text));
                         column(Job_Planning_Line__Job_Task_No__; "Job Task No.")
                         {
                         }
@@ -183,7 +183,7 @@ report 10215 "Job Cost Budget"
                     }
                     dataitem("Integer"; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(PADSTR____2____Job_Task__Indentation_____Job_Task__Description_Control1480007; PadStr('', 2 * "Job Task".Indentation) + "Job Task".Description)
                         {
                         }

@@ -1,3 +1,10 @@
+namespace System.IO;
+
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.Utilities;
+
 codeunit 1275 "Exp. Post-Mapping Gen. Jnl."
 {
     Permissions = TableData "Credit Transfer Entry" = rimd;
@@ -13,7 +20,7 @@ codeunit 1275 "Exp. Post-Mapping Gen. Jnl."
         Window: Dialog;
         LineNo: Integer;
     begin
-        GenJnlLine.SetRange("Data Exch. Entry No.", "Entry No.");
+        GenJnlLine.SetRange("Data Exch. Entry No.", Rec."Entry No.");
         GenJnlLine.FindSet();
 
         CreditTransferRegister.SetRange("From Bank Account No.", GenJnlLine."Bal. Account No.");

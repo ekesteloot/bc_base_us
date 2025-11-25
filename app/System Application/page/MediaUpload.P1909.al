@@ -3,6 +3,10 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Device;
+
+using System.Utilities;
+
 /// <summary>
 /// Provides an interface for accessing the media on the client device.
 /// </summary>
@@ -38,7 +42,7 @@ page 1909 "Media Upload"
             {
                 Caption = 'Could not acess the media.';
                 InstructionalText = 'Could not access the media on the device. Make sure that you are using the app for Windows, Android, or iOS.';
-                Visible = NOT MediaUploadAvailable;
+                Visible = not MediaUploadAvailable;
             }
         }
     }
@@ -48,7 +52,6 @@ page 1909 "Media Upload"
         [RunOnClient]
         [WithEvents]
         CameraProvider: DotNet CameraProvider;
-        [InDataSet]
         MediaUploadAvailable: Boolean;
 
     /// <summary>

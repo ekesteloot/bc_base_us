@@ -1,7 +1,11 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.InventoryMgt.Item;
+
 report 99000755 "Single-level Cost Shares"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/SinglelevelCostShares.rdlc';
+    RDLCLayout = './Manufacturing/Reports/SinglelevelCostShares.rdlc';
     AdditionalSearchTerms = 'rolled-up cost,cost breakdown';
     ApplicationArea = Manufacturing;
     Caption = 'Single-level Cost Shares';
@@ -11,7 +15,7 @@ report 99000755 "Single-level Cost Shares"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             column(TodayFormatted; Format(Today))
             {

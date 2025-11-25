@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using System.Upgrade;
+
 codeunit 7048 "Set Price Line Source Group"
 {
     trigger OnRun()
@@ -35,23 +43,23 @@ codeunit 7048 "Set Price Line Source Group"
             exit;
 
         PriceListLine.SetLoadFields("Source Group", "Source Type", "Price Type", Status);
-        PriceListLine.SetRange("Source Group", "Price Source Group"::All);
+        PriceListLine.SetRange("Source Group", PriceListLine."Source Group"::All);
         if PriceListLine.FindSet(true) then
             repeat
                 if PriceListLine."Source Type" in
-                    ["Price Source Type"::"All Jobs",
-                    "Price Source Type"::Job,
-                    "Price Source Type"::"Job Task"]
+                    [PriceListLine."Source Type"::"All Jobs",
+                    PriceListLine."Source Type"::Job,
+                    PriceListLine."Source Type"::"Job Task"]
                 then
-                    PriceListLine."Source Group" := "Price Source Group"::Job
+                    PriceListLine."Source Group" := PriceListLine."Source Group"::Job
                 else
                     case PriceListLine."Price Type" of
                         "Price Type"::Purchase:
-                            PriceListLine."Source Group" := "Price Source Group"::Vendor;
+                            PriceListLine."Source Group" := PriceListLine."Source Group"::Vendor;
                         "Price Type"::Sale:
-                            PriceListLine."Source Group" := "Price Source Group"::Customer;
+                            PriceListLine."Source Group" := PriceListLine."Source Group"::Customer;
                     end;
-                if PriceListLine."Source Group" <> "Price Source Group"::All then
+                if PriceListLine."Source Group" <> PriceListLine."Source Group"::All then
                     if PriceListLine.Status = "Price Status"::Active then begin
                         PriceListLine.Status := "Price Status"::Draft;
                         PriceListLine.Modify();

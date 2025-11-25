@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Analysis;
+
 enum 7158 "Sales Analysis Matrix Dimensions"
 {
     AssignmentCompatibility = true;

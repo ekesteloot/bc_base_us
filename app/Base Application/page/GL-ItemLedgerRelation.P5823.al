@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Shared.Navigate;
+
 page 5823 "G/L - Item Ledger Relation"
 {
     Caption = 'G/L - Item Ledger Relation';
@@ -396,7 +402,7 @@ page 5823 "G/L - Item Ledger Relation"
 
     trigger OnAfterGetRecord()
     begin
-        if not ValueEntry.Get("Value Entry No.") then
+        if not ValueEntry.Get(Rec."Value Entry No.") then
             ValueEntry.Init();
     end;
 
@@ -407,7 +413,7 @@ page 5823 "G/L - Item Ledger Relation"
     var
         GLRegister: Record "G/L Register";
     begin
-        exit(StrSubstNo('%1 %2', GLRegister.TableCaption(), GetFilter("G/L Register No.")));
+        exit(StrSubstNo('%1 %2', GLRegister.TableCaption(), Rec.GetFilter("G/L Register No.")));
     end;
 }
 

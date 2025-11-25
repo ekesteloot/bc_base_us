@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+
 page 99000897 "Available - Prod. Order Lines"
 {
     Caption = 'Available - Prod. Order Lines';
@@ -8,7 +14,7 @@ page 99000897 "Available - Prod. Order Lines"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Prod. Order Line";
-    SourceTableView = SORTING(Status, "Item No.", "Variant Code", "Location Code", "Due Date");
+    SourceTableView = sorting(Status, "Item No.", "Variant Code", "Location Code", "Due Date");
 
     layout
     {
@@ -209,7 +215,7 @@ page 99000897 "Available - Prod. Order Lines"
         TrackingSpecification: Record "Tracking Specification";
     begin
         Rec.CalcFields("Reserved Qty. (Base)");
-        if Rec."Remaining Qty. (Base)" + "Reserved Qty. (Base)" < ReserveQuantityBase then
+        if Rec."Remaining Qty. (Base)" + Rec."Reserved Qty. (Base)" < ReserveQuantityBase then
             Error(Text002, Rec."Remaining Qty. (Base)" + Rec."Reserved Qty. (Base)");
 
         Rec.TestField("Item No.", ReservEntry."Item No.");
@@ -218,7 +224,7 @@ page 99000897 "Available - Prod. Order Lines"
 
         UpdateReservMgt();
         TrackingSpecification.InitTrackingSpecification(
-            DATABASE::"Prod. Order Line", Rec.Status.AsInteger(), Rec."Prod. Order No.", '',
+            Enum::TableID::"Prod. Order Line".AsInteger(), Rec.Status.AsInteger(), Rec."Prod. Order No.", '',
             Rec."Line No.", 0, Rec."Variant Code", Rec."Location Code", Rec."Qty. per Unit of Measure");
         ReservMgt.CreateReservation(
           ReservEntry.Description, Rec."Due Date", ReserveQuantity, ReserveQuantityBase, TrackingSpecification);

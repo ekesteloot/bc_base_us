@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 1540 "Workflow User Group"
 {
     Caption = 'Workflow User Group';

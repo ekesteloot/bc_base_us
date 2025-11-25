@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.Manufacturing.Capacity;
+using System.Security.User;
+
 page 117 "Item Registers"
 {
     AdditionalSearchTerms = 'inventory transactions';
@@ -39,7 +44,7 @@ page 117 "Item Registers"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")

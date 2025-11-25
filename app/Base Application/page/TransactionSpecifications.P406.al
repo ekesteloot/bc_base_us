@@ -13,12 +13,12 @@ page 406 "Transaction Specifications"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies a code for the transaction specification.';
                 }
-                field(Text; Text)
+                field(Text; Rec.Text)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies a description of the transaction specification.';

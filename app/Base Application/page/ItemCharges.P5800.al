@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Ledger;
+
 page 5800 "Item Charges"
 {
     AdditionalSearchTerms = 'fee transportation freight handling landed cost';
@@ -80,9 +85,9 @@ page 5800 "Item Charges"
                     Caption = 'Value E&ntries';
                     Image = ValueLedger;
                     RunObject = Page "Value Entries";
-                    RunPageLink = "Entry Type" = CONST("Direct Cost"),
-                                  "Item Charge No." = FIELD("No.");
-                    RunPageView = SORTING("Item Charge No.");
+                    RunPageLink = "Entry Type" = const("Direct Cost"),
+                                  "Item Charge No." = field("No.");
+                    RunPageView = sorting("Item Charge No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the amounts related to item or capacity ledger entries for the record on the document or journal line.';
                 }
@@ -92,8 +97,8 @@ page 5800 "Item Charges"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(5800),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(5800),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }

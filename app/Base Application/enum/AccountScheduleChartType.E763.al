@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
 enum 763 "Account Schedule Chart Type"
 {
     Extensible = true;

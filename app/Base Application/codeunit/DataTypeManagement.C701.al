@@ -1,3 +1,5 @@
+namespace System.Reflection;
+
 codeunit 701 "Data Type Management"
 {
 

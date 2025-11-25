@@ -1,3 +1,9 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+
 page 930 "Assembly Quote"
 {
     Caption = 'Assembly Quote';
@@ -5,9 +11,9 @@ page 930 "Assembly Quote"
     InsertAllowed = false;
     PageType = Document;
     SourceTable = "Assembly Header";
-    SourceTableView = SORTING("Document Type", "No.")
+    SourceTableView = sorting("Document Type", "No.")
                       ORDER(Ascending)
-                      WHERE("Document Type" = CONST(Quote));
+                      where("Document Type" = const(Quote));
 
     layout
     {
@@ -24,7 +30,7 @@ page 930 "Assembly Quote"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -33,13 +39,19 @@ page 930 "Assembly Quote"
                     ApplicationArea = Basic, Suite;
                     Editable = IsAsmToOrderEditable;
                     Importance = Promoted;
-                    TableRelation = Item."No." WHERE("Assembly BOM" = CONST(true));
+                    TableRelation = Item."No." where("Assembly BOM" = const(true));
                     ToolTip = 'Specifies the number of the item that is being assembled with the assembly order.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the description of the assembly item.';
+                }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Assembly;
+                    ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
                 }
                 group(Control33)
                 {
@@ -88,7 +100,7 @@ page 930 "Assembly Quote"
 
                     trigger OnDrillDown()
                     begin
-                        ShowAsmToOrder();
+                        Rec.ShowAsmToOrder();
                     end;
                 }
                 field(Status; Rec.Status)
@@ -101,8 +113,8 @@ page 930 "Assembly Quote"
             {
                 ApplicationArea = Assembly;
                 Caption = 'Lines';
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("No.");
             }
             group(Posting)
             {
@@ -162,19 +174,19 @@ page 930 "Assembly Quote"
             part(Control11; "Assembly Item - Details")
             {
                 ApplicationArea = Assembly;
-                SubPageLink = "No." = FIELD("Item No.");
+                SubPageLink = "No." = field("Item No.");
             }
             part(Control44; "Component - Item Details")
             {
                 ApplicationArea = Assembly;
                 Provider = Lines;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             part(Control43; "Component - Resource Details")
             {
                 ApplicationArea = Assembly;
                 Provider = Lines;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             systempart(Control8; Links)
             {
@@ -202,7 +214,7 @@ page 930 "Assembly Quote"
 
                 trigger OnAction()
                 begin
-                    ShowStatistics();
+                    Rec.ShowStatistics();
                 end;
             }
             action(Dimensions)
@@ -216,7 +228,7 @@ page 930 "Assembly Quote"
 
                 trigger OnAction()
                 begin
-                    ShowDimensions();
+                    Rec.ShowDimensions();
                 end;
             }
             action("Assembly BOM")
@@ -228,7 +240,7 @@ page 930 "Assembly Quote"
 
                 trigger OnAction()
                 begin
-                    ShowAssemblyList();
+                    Rec.ShowAssemblyList();
                 end;
             }
             action(Comments)
@@ -237,9 +249,9 @@ page 930 "Assembly Quote"
                 Caption = 'Comments';
                 Image = ViewComments;
                 RunObject = Page "Assembly Comment Sheet";
-                RunPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No."),
-                              "Document Line No." = CONST(0);
+                RunPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("No."),
+                              "Document Line No." = const(0);
                 ToolTip = 'View or add comments for the record.';
             }
         }
@@ -298,7 +310,7 @@ page 930 "Assembly Quote"
 
                     trigger OnAction()
                     begin
-                        UpdateUnitCost();
+                        Rec.UpdateUnitCost();
                     end;
                 }
                 action("Refresh Lines")
@@ -310,7 +322,7 @@ page 930 "Assembly Quote"
 
                     trigger OnAction()
                     begin
-                        RefreshBOM();
+                        Rec.RefreshBOM();
                         CurrPage.Update();
                     end;
                 }
@@ -323,7 +335,7 @@ page 930 "Assembly Quote"
 
                     trigger OnAction()
                     begin
-                        ShowAvailability();
+                        Rec.ShowAvailability();
                     end;
                 }
                 action("Refresh availability warnings")
@@ -334,7 +346,7 @@ page 930 "Assembly Quote"
                     ToolTip = 'Check items availability and refresh warnings';
                     trigger OnAction()
                     begin
-                        UpdateWarningOnLines()
+                        Rec.UpdateWarningOnLines()
                     end;
                 }
             }
@@ -398,8 +410,8 @@ page 930 "Assembly Quote"
 
     trigger OnAfterGetRecord()
     begin
-        IsUnitCostEditable := not IsStandardCostItem();
-        IsAsmToOrderEditable := not IsAsmToOrder();
+        IsUnitCostEditable := not Rec.IsStandardCostItem();
+        IsAsmToOrderEditable := not Rec.IsAsmToOrder();
     end;
 
     trigger OnOpenPage()
@@ -407,13 +419,11 @@ page 930 "Assembly Quote"
         IsUnitCostEditable := true;
         IsAsmToOrderEditable := true;
 
-        UpdateWarningOnLines();
+        Rec.UpdateWarningOnLines();
     end;
 
     protected var
-        [InDataSet]
         IsUnitCostEditable: Boolean;
-        [InDataSet]
         IsAsmToOrderEditable: Boolean;
 }
 

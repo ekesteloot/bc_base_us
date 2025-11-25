@@ -1,4 +1,10 @@
 #if not CLEAN21
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Sales.Customer;
+
 page 1345 "Sales Price and Line Discounts"
 {
     Caption = 'Sales Prices';
@@ -41,7 +47,7 @@ page 1345 "Sales Price and Line Discounts"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the discount is valid for an item or for an item discount group.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Enabled = CodeIsVisible;
@@ -61,13 +67,13 @@ page 1345 "Sales Price and Line Discounts"
                 field("Line Discount %"; Rec."Line Discount %")
                 {
                     ApplicationArea = Basic, Suite;
-                    Enabled = "Line Type" = 1;
+                    Enabled = Rec."Line Type" = 1;
                     ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = Basic, Suite;
-                    Enabled = "Line Type" = 2;
+                    Enabled = Rec."Line Type" = 2;
                     ToolTip = 'Specifies the price of one unit of the item or resource. You can enter a price manually or have it entered according to the Price/Profit Calculation field on the related card.';
                 }
                 field("Starting Date"; Rec."Starting Date")
@@ -137,7 +143,7 @@ page 1345 "Sales Price and Line Discounts"
 
                 trigger OnAction()
                 begin
-                    FilterToActualRecords();
+                    Rec.FilterToActualRecords();
                 end;
             }
             action("Show All")
@@ -149,7 +155,7 @@ page 1345 "Sales Price and Line Discounts"
 
                 trigger OnAction()
                 begin
-                    Reset();
+                    Rec.Reset();
                 end;
             }
             action("Refresh Data")
@@ -166,11 +172,11 @@ page 1345 "Sales Price and Line Discounts"
                 begin
                     if GetLoadedItemNo() <> '' then
                         if Item.Get(GetLoadedItemNo()) then begin
-                            LoadDataForItem(Item);
+                            Rec.LoadDataForItem(Item);
                             exit;
                         end;
                     if Customer.Get(GetLoadedCustNo()) then
-                        LoadDataForCustomer(Customer)
+                        Rec.LoadDataForCustomer(Customer)
                 end;
             }
             action("Set Special Prices")
@@ -238,13 +244,13 @@ page 1345 "Sales Price and Line Discounts"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        if ("Loaded Customer No." = GetLoadedCustNo()) and ("Loaded Item No." = GetLoadedItemNo()) then
+        if (Rec."Loaded Customer No." = GetLoadedCustNo()) and (Rec."Loaded Item No." = GetLoadedItemNo()) then
             exit;
 
-        "Loaded Item No." := GetLoadedItemNo();
-        "Loaded Customer No." := GetLoadedCustNo();
-        "Loaded Price Group" := GetLoadedPriceGroup();
-        "Loaded Disc. Group" := GetLoadedDiscGroup();
+        Rec."Loaded Item No." := GetLoadedItemNo();
+        Rec."Loaded Customer No." := GetLoadedCustNo();
+        Rec."Loaded Price Group" := GetLoadedPriceGroup();
+        Rec."Loaded Disc. Group" := GetLoadedDiscGroup();
     end;
 
     var
@@ -273,7 +279,7 @@ page 1345 "Sales Price and Line Discounts"
         loadedDiscGroup := Item."Item Disc. Group";
         loadedPriceGroup := '';
 
-        LoadDataForItem(Item);
+        Rec.LoadDataForItem(Item);
     end;
 
     procedure LoadCustomer(Customer: Record Customer)
@@ -283,7 +289,7 @@ page 1345 "Sales Price and Line Discounts"
         loadedPriceGroup := Customer."Customer Price Group";
         loadedDiscGroup := Customer."Customer Disc. Group";
 
-        LoadDataForCustomer(Customer);
+        Rec.LoadDataForCustomer(Customer);
     end;
 
     procedure GetLoadedItemNo(): Code[20]
@@ -348,7 +354,7 @@ page 1345 "Sales Price and Line Discounts"
         Item: Record Item;
     begin
         Item.Get(loadedItemNo);
-        UpdatePriceIncludesVatAndPrices(Item, IncludesVat);
+        Rec.UpdatePriceIncludesVatAndPrices(Item, IncludesVat);
     end;
 }
 #endif

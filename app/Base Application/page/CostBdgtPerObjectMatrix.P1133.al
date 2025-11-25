@@ -1,3 +1,9 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.Foundation.Enums;
+
 page 1133 "Cost Bdgt. per Object Matrix"
 {
     Caption = 'Cost Bdgt. per Object Matrix';
@@ -292,11 +298,11 @@ page 1133 "Cost Bdgt. per Object Matrix"
                     Caption = '&Card';
                     Image = EditLines;
                     RunObject = Page "Cost Type Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Cost Center Filter" = FIELD("Cost Center Filter"),
-                                  "Cost Object Filter" = FIELD("Cost Object Filter"),
-                                  "Budget Filter" = FIELD("Budget Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Cost Center Filter" = field("Cost Center Filter"),
+                                  "Cost Object Filter" = field("Cost Object Filter"),
+                                  "Budget Filter" = field("Budget Filter");
                     RunPageOnRec = true;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information for the cost type.';
@@ -307,8 +313,8 @@ page 1133 "Cost Bdgt. per Object Matrix"
                     Caption = 'E&ntries';
                     Image = Entries;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Cost Type No." = FIELD("No.");
-                    RunPageView = SORTING("Cost Type No.", "Posting Date");
+                    RunPageLink = "Cost Type No." = field("No.");
+                    RunPageView = sorting("Cost Type No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the entries for the cost object per center.';
                 }
@@ -322,8 +328,8 @@ page 1133 "Cost Bdgt. per Object Matrix"
     begin
         for MATRIX_CurrentColumnOrdinal := 1 to MATRIX_CurrentNoOfMatrixColumn do
             MATRIX_OnAfterGetRecord(MATRIX_CurrentColumnOrdinal);
-        NameIndent := Indentation;
-        Emphasize := Type <> Type::"Cost Type";
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec.Type <> Rec.Type::"Cost Type";
     end;
 
     var
@@ -337,9 +343,7 @@ page 1133 "Cost Bdgt. per Object Matrix"
         RoundingFactor: Enum "Analysis Rounding Factor";
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[12] of Decimal;
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
         Text000: Label 'Set View As to Net Change before you edit entries.';
 

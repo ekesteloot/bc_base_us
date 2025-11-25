@@ -1,3 +1,11 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Intercompany.Journal;
+using Microsoft.Intercompany.Setup;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+
 codeunit 404 "IC Feedback"
 {
     var

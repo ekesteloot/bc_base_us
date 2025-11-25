@@ -1,7 +1,17 @@
+﻿namespace System.Security.User;
+
+using System;
+using System.Azure.Identity;
+using System.Email;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Security.AccessControl;
+using System.Utilities;
+
 page 9807 "User Card"
 {
     Caption = 'User Card';
-    DataCaptionExpression = "Full Name";
+    DataCaptionExpression = Rec."Full Name";
     DelayedInsert = true;
     PageType = Card;
     SourceTable = User;
@@ -32,7 +42,7 @@ page 9807 "User Card"
 
                     trigger OnValidate()
                     begin
-                        if xRec."User Name" <> "User Name" then
+                        if xRec."User Name" <> Rec."User Name" then
                             ValidateUserName();
                     end;
                 }
@@ -59,7 +69,7 @@ page 9807 "User Card"
                             Error(CannotCreateAadGroupErr);
                     end;
                 }
-                field(State; State)
+                field(State; Rec.State)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Status';
@@ -117,16 +127,16 @@ page 9807 "User Card"
 
                         trigger OnValidate()
                         begin
-                            IdentityManagement.SetAuthenticationEmail("User Security ID", "Authentication Email");
+                            IdentityManagement.SetAuthenticationEmail(Rec."User Security ID", Rec."Authentication Email");
                             CurrPage.SaveRecord();
-                            AuthenticationStatus := IdentityManagement.GetAuthenticationStatus("User Security ID");
+                            AuthenticationStatus := IdentityManagement.GetAuthenticationStatus(Rec."User Security ID");
                         end;
                     }
                     field(ApplicationID; ApplicationID)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Application ID';
-                        ToolTip = 'Specifies the client ID of the Microsoft Azure Active Directory application when authenticating web-service calls. This field is only relevant when the Business Central user is used for web services.';
+                        ToolTip = 'Specifies the client ID of the Microsoft Microsoft Entra application when authenticating web-service calls. This field is only relevant when the Business Central user is used for web services.';
                         Visible = not IsSaaS;
 
                         trigger OnValidate()
@@ -134,9 +144,9 @@ page 9807 "User Card"
                             ZeroGUID: Guid;
                         begin
                             if ApplicationID = '' then
-                                Validate("Application ID", ZeroGUID)
+                                Rec.Validate("Application ID", ZeroGUID)
                             else
-                                Validate("Application ID", ApplicationID);
+                                Rec.Validate("Application ID", ApplicationID);
                         end;
                     }
                     field(MappedToExchangeIdentifier; HasExchangeIdentifier)
@@ -400,8 +410,8 @@ page 9807 "User Card"
                         if not Confirm(ConfirmRemoveExchangeIdentifierQst) then
                             exit;
 
-                        Clear("Exchange Identifier");
-                        Modify(true);
+                        Clear(Rec."Exchange Identifier");
+                        Rec.Modify(true);
                         HasExchangeIdentifier := false;
                     end;
                 }
@@ -420,7 +430,7 @@ page 9807 "User Card"
                     var
                         EffectivePermissionsMgt: Codeunit "Effective Permissions Mgt.";
                     begin
-                        EffectivePermissionsMgt.OpenPageForUser("User Security ID");
+                        EffectivePermissionsMgt.OpenPageForUser(Rec."User Security ID");
                     end;
                 }
             }
@@ -497,26 +507,26 @@ page 9807 "User Card"
         AzureADGraph: Codeunit "Azure AD Graph";
         IsGraphUserAccountEnabled: Boolean;
     begin
-        WindowsUserName := IdentityManagement.UserName("Windows Security ID");
+        WindowsUserName := IdentityManagement.UserName(Rec."Windows Security ID");
 
-        TestField("User Name");
+        Rec.TestField("User Name");
 
-        if IdentityManagement.IsUserPasswordSet("User Security ID") then
+        if IdentityManagement.IsUserPasswordSet(Rec."User Security ID") then
             Password := '********';
-        ACSStatus := IdentityManagement.GetACSStatus("User Security ID");
-        WebServiceExpiryDate := IdentityManagement.GetWebServiceExpiryDate("User Security ID");
-        AuthenticationStatus := IdentityManagement.GetAuthenticationStatus("User Security ID");
-        HasExchangeIdentifier := "Exchange Identifier" <> '';
-        InitialState := State;
+        ACSStatus := IdentityManagement.GetACSStatus(Rec."User Security ID");
+        WebServiceExpiryDate := IdentityManagement.GetWebServiceExpiryDate(Rec."User Security ID");
+        AuthenticationStatus := IdentityManagement.GetAuthenticationStatus(Rec."User Security ID");
+        HasExchangeIdentifier := Rec."Exchange Identifier" <> '';
+        InitialState := Rec.State;
 
-        if not IsNullGuid("Application ID") then
-            ApplicationID := "Application ID";
+        if not IsNullGuid(Rec."Application ID") then
+            ApplicationID := Rec."Application ID";
 
         if UserSecurityId() <> Rec."User Security ID" then
             WebServiceID := '*************************************'
         else begin
             WebServiceID := IdentityManagement.GetWebServicesKey(Rec."User Security ID");
-            Session.LogSecurityAudit(ReadWebServiceKeyTxt, SecurityOperationResult::Success, StrSubstNo(ReadWebServiceKeyForUserTxt, "User Name"), AuditCategory::KeyManagement);
+            Session.LogSecurityAudit(ReadWebServiceKeyTxt, SecurityOperationResult::Success, StrSubstNo(ReadWebServiceKeyForUserTxt, Rec."User Name"), AuditCategory::KeyManagement);
         end;
         if IsWebServiceAccesskeyAllowed then begin
             AllowChangeWebServiceAccessKey := (UserSecurityId() = Rec."User Security ID") or UserPermissions.CanManageUsersOnTenant(UserSecurityId());
@@ -551,8 +561,8 @@ page 9807 "User Card"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        "User Security ID" := CreateGuid();
-        TestField("User Name");
+        Rec."User Security ID" := CreateGuid();
+        Rec.TestField("User Name");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -562,7 +572,7 @@ page 9807 "User Card"
 
         WindowsUserName := '';
         Password := '';
-        "Change Password" := false;
+        Rec."Change Password" := false;
         WebServiceID := '';
         Clear(WebServiceExpiryDate);
         Clear(TelemetryUserID);
@@ -570,9 +580,13 @@ page 9807 "User Card"
 
     trigger OnOpenPage()
     var
+#if not CLEAN23
         MyNotification: Record "My Notifications";
+#endif
         EnvironmentInfo: Codeunit "Environment Information";
+#if not CLEAN23
         UserManagement: Codeunit "User Management";
+#endif        
 #if not CLEAN22
         LegacyUserGroups: Codeunit "Legacy User Groups";
 #endif
@@ -590,22 +604,25 @@ page 9807 "User Card"
 
         OnPremAskFirstUserToCreateSuper();
         RefreshParts();
-
+#if not CLEAN23
         Usermanagement.BasicAuthDepricationNotificationDefault(false);
         if MyNotification.IsEnabled(UserManagement.BasicAuthDepricationNotificationId()) then
             UserManagement.BasicAuthDepricationNotificationShow(BasicAuthDepricationNotification);
+#endif
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if "User Name" <> '' then
+        if Rec."User Name" <> '' then
             exit(ValidateAuthentication());
     end;
 
     var
         UserSecID: Record User;
         IdentityManagement: Codeunit "Identity Management";
+#if not CLEAN23
         BasicAuthDepricationNotification: Notification;
+#endif
         WindowsUserName: Text[208];
         Text001Err: Label 'The account %1 is not a valid Windows account.', Comment = 'USERID';
         Text002Err: Label 'The account %1 already exists.', Comment = 'USERID';
@@ -619,7 +636,6 @@ page 9807 "User Card"
         Confirm001Qst: Label 'The current Web Service Access Key will not be valid after editing. All clients that use it have to be updated. Do you want to continue?';
         WebServiceExpiryDate: DateTime;
         Confirm002Qst: Label 'You have not completed all necessary fields for the Credential Type that this client is currently using. The user will not be able to log in unless you provide a value in the %1 field. Are you sure that you want to close the window?', Comment = 'USERID';
-        [InDataSet]
         DeployedToAzure: Boolean;
         Confirm003Qst: Label 'The user will not be able to sign in unless you change the state to Enabled. Are you sure that you want to close the page?';
         HasExchangeIdentifier: Boolean;
@@ -631,12 +647,11 @@ page 9807 "User Card"
         IsWebServiceAccesskeyAllowed: Boolean;
         ApplicationID: Text;
         CannotManageUsersQst: Label 'You cannot add or delete users on this page. Administrators can manage users in the Microsoft 365 admin center.\\Do you want to go there now?';
-        [InDataSet]
         AllowChangeWebServiceAccessKey: Boolean;
         AllowCreateWebServiceAccessKey: Boolean;
         InitialState: Option;
         CannotCreateWindowsGroupErr: Label 'User accounts of type ''Windows Group'' can only be created by creating a security group.';
-        CannotCreateAadGroupErr: Label 'User accounts of type ''AAD Group'' are only available in SaaS.';
+        CannotCreateAadGroupErr: Label 'User accounts of type ''Microsoft Entra group'' are only available in SaaS.';
         CreateFirstUserQst: Label 'You will be locked out after creating first user. Would you first like to create a SUPER user for %1?', Comment = 'USERID';
         CannotEditForOtherUsersErr: Label 'You can only change your own web service access keys.';
         CannotCreateWebServiceAccessKeyErr: Label 'You cannot create a web service access key for this user because they have delegated administration privileges.';
@@ -652,14 +667,14 @@ page 9807 "User Card"
     var
         User: Record User;
     begin
-        if "Windows Security ID" = '' then
-            Error(Text001Err, "User Name");
+        if Rec."Windows Security ID" = '' then
+            Error(Text001Err, Rec."User Name");
 
-        if ("Windows Security ID" = 'S-1-1-0') or ("Windows Security ID" = 'S-1-5-7') or ("Windows Security ID" = 'S-1-5-32-544') then
-            Error(Text003Err, IdentityManagement.UserName("Windows Security ID"));
+        if (Rec."Windows Security ID" = 'S-1-1-0') or (Rec."Windows Security ID" = 'S-1-5-7') or (Rec."Windows Security ID" = 'S-1-5-32-544') then
+            Error(Text003Err, IdentityManagement.UserName(Rec."Windows Security ID"));
 
-        User.SetFilter("Windows Security ID", "Windows Security ID");
-        User.SetFilter("User Security ID", '<>%1', "User Security ID");
+        User.SetFilter("Windows Security ID", Rec."Windows Security ID");
+        User.SetFilter("User Security ID", '<>%1', Rec."User Security ID");
         if not User.IsEmpty() then
             Error(Text002Err, User."User Name");
     end;
@@ -683,8 +698,8 @@ page 9807 "User Card"
         ShowConfirmDisableUser: Boolean;
     begin
         UserSecID.Reset();
-        if (UserSecID.Count = 1) or (UserSecurityId() = "User Security ID") then begin
-            if IdentityManagement.IsWindowsAuthentication() and ("Windows Security ID" = '') then
+        if (UserSecID.Count = 1) or (UserSecurityId() = Rec."User Security ID") then begin
+            if IdentityManagement.IsWindowsAuthentication() and (Rec."Windows Security ID" = '') then
                 ValidationField := 'Windows User Name';
 
             if IdentityManagement.IsUserNamePasswordAuthentication() and (Password = '') then
@@ -696,10 +711,10 @@ page 9807 "User Card"
             if ValidationField <> '' then
                 exit(Confirm(Confirm002Qst, false, ValidationField));
         end else
-            if ("Windows Security ID" = '') and (Password = '') and (ACSStatus = 0) and (AuthenticationStatus = 0) then
+            if (Rec."Windows Security ID" = '') and (Password = '') and (ACSStatus = 0) and (AuthenticationStatus = 0) then
                 exit(Confirm(Confirm004Qst, false));
 
-        ShowConfirmDisableUser := (InitialState = State::Enabled) and (State = State::Disabled);
+        ShowConfirmDisableUser := (InitialState = Rec.State::Enabled) and (Rec.State = Rec.State::Disabled);
         OnValidateAuthenticationOnAfterCalcShowConfirmDisableUser(InitialState, Rec, ShowConfirmDisableUser);
         if ShowConfirmDisableUser then
             exit(Confirm(Confirm003Qst, false));
@@ -726,7 +741,7 @@ page 9807 "User Card"
     var
         SetWebServiceAccessKey: Page "Set Web Service Access Key";
     begin
-        TestField("User Name");
+        Rec.TestField("User Name");
 
         if not AllowChangeWebServiceAccessKey then
             Error(CannotEditForOtherUsersErr);
@@ -741,7 +756,7 @@ page 9807 "User Card"
 
             if SetWebServiceAccessKey.RunModal() = Action::OK then begin
                 CurrPage.Update();
-                Session.LogSecurityAudit(NewWebSeriveKeyTxt, SecurityOperationResult::Success, StrSubstNo(NewWebSeriveKeyForUserTxt, "User Name"), AuditCategory::KeyManagement);
+                Session.LogSecurityAudit(NewWebSeriveKeyTxt, SecurityOperationResult::Success, StrSubstNo(NewWebSeriveKeyForUserTxt, Rec."User Name"), AuditCategory::KeyManagement);
             end;
         end;
     end;
@@ -751,7 +766,7 @@ page 9807 "User Card"
         PasswordDialogManagement: Codeunit "Password Dialog Management";
         Password: Text;
     begin
-        TestField("User Name");
+        Rec.TestField("User Name");
 
         CurrPage.SaveRecord();
         Commit();
@@ -761,7 +776,7 @@ page 9807 "User Card"
         if Password = '' then
             exit;
 
-        SetUserPassword("User Security ID", Password);
+        SetUserPassword(Rec."User Security ID", Password);
         CurrPage.Update(false);
     end;
 
@@ -769,10 +784,10 @@ page 9807 "User Card"
     var
         UserACSSetup: Page "User ACS Setup";
     begin
-        TestField("User Name");
+        Rec.TestField("User Name");
 
         UserSecID.SetCurrentKey("User Security ID");
-        UserSecID.SetRange("User Security ID", "User Security ID", "User Security ID");
+        UserSecID.SetRange("User Security ID", Rec."User Security ID", Rec."User Security ID");
         UserACSSetup.SetRecord(UserSecID);
         UserACSSetup.SetTableView(UserSecID);
         if UserACSSetup.RunModal() = Action::OK then
@@ -826,7 +841,7 @@ page 9807 "User Card"
 
     local procedure SetUserName()
     begin
-        "User Name" := WindowsUserName;
+        Rec."User Name" := WindowsUserName;
         ValidateUserName();
     end;
 
@@ -837,10 +852,10 @@ page 9807 "User Card"
         if not IsSaaS then
             exit;
 
-        OriginalFilterGroup := FilterGroup;
-        FilterGroup := 2;
-        SetFilter("License Type", '<>%1&<>%2&<>%3', "License Type"::"External User", "License Type"::Application, "License Type"::"AAD Group");
-        FilterGroup := OriginalFilterGroup;
+        OriginalFilterGroup := Rec.FilterGroup;
+        Rec.FilterGroup := 2;
+        Rec.SetFilter("License Type", '<>%1&<>%2&<>%3', Rec."License Type"::"External User", Rec."License Type"::Application, Rec."License Type"::"AAD Group");
+        Rec.FilterGroup := OriginalFilterGroup;
     end;
 
     local procedure ValidateWindowsUserName()
@@ -848,12 +863,12 @@ page 9807 "User Card"
         UserSID: Text;
     begin
         if WindowsUserName = '' then
-            "Windows Security ID" := ''
+            Rec."Windows Security ID" := ''
         else begin
             UserSID := Sid(WindowsUserName);
             WindowsUserName := IdentityManagement.UserName(UserSID);
             if WindowsUserName <> '' then begin
-                "Windows Security ID" := UserSID;
+                Rec."Windows Security ID" := UserSID;
                 ValidateSid();
                 SetUserName();
                 RefreshParts();

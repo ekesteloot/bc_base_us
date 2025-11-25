@@ -18,7 +18,7 @@ table 255 "VAT Statement Template"
         field(6; "Page ID"; Integer)
         {
             Caption = 'Page ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Page));
 
             trigger OnValidate()
             begin
@@ -30,20 +30,20 @@ table 255 "VAT Statement Template"
         field(7; "VAT Statement Report ID"; Integer)
         {
             Caption = 'VAT Statement Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(16; "Page Caption"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
-                                                                           "Object ID" = FIELD("Page ID")));
+            CalcFormula = Lookup (AllObjWithCaption."Object Caption" where("Object Type" = const(Page),
+                                                                           "Object ID" = field("Page ID")));
             Caption = 'Page Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(17; "VAT Statement Report Caption"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("VAT Statement Report ID")));
+            CalcFormula = Lookup (AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("VAT Statement Report ID")));
             Caption = 'VAT Statement Report Caption';
             Editable = false;
             FieldClass = FlowField;

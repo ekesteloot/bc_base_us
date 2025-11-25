@@ -8,7 +8,7 @@ report 10125 "Purchase Order (Pre-Printed)"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Buy-from Vendor No.", "Pay-to Vendor No.", "No. Printed";
             column(DocType_PurchHdr; "Document Type")
@@ -19,10 +19,10 @@ report 10125 "Purchase Order (Pre-Printed)"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyAddress1; CompanyAddress[1])
                     {
                     }
@@ -130,9 +130,9 @@ report 10125 "Purchase Order (Pre-Printed)"
                     }
                     dataitem("Purchase Line"; "Purchase Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE("Document Type" = CONST(Order));
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where("Document Type" = const(Order));
                         column(AmountExclInvDisc; AmountExclInvDisc)
                         {
                         }
@@ -327,6 +327,7 @@ report 10125 "Purchase Order (Pre-Printed)"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 if PrintCompany then
                     if RespCenter.Get("Responsibility Center") then begin
                         FormatAddress.RespCenter(CompanyAddress, RespCenter);
@@ -509,9 +510,7 @@ report 10125 "Purchase Order (Pre-Printed)"
         Text007: Label 'Total Tax:';
         Text008: Label 'Tax:';
         UseExternalTaxEngine: Boolean;
-        [InDataSet]
         ArchiveDocumentEnable: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
 }
 

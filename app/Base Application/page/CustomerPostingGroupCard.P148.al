@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Sales.Reminder;
+
 page 148 "Customer Posting Group Card"
 {
     Caption = 'Customer Posting Group Card';
@@ -11,7 +15,7 @@ page 148 "Customer Posting Group Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the identifier for the customer posting group. This is what you choose when you assign the group to an entity or document.';
@@ -139,7 +143,7 @@ page 148 "Customer Posting Group Card"
     var
         ReminderTerms: Record "Reminder Terms";
     begin
-        SetAccountVisibility(PmtToleranceVisible, PmtDiscountVisible, InvRoundingVisible, ApplnRoundingVisible);
+        Rec.SetAccountVisibility(PmtToleranceVisible, PmtDiscountVisible, InvRoundingVisible, ApplnRoundingVisible);
         ReminderTerms.SetAccountVisibility(InterestAccountVisible, AddFeeAccountVisible, AddFeePerLineAccountVisible);
     end;
 

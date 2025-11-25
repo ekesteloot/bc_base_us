@@ -1,7 +1,23 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Shared.Archive;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 404 "Purchase - Quote"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/PurchaseQuote.rdlc';
+    RDLCLayout = './Purchases/Document/PurchaseQuote.rdlc';
     Caption = 'Purchase - Quote';
     PreviewMode = PrintLayout;
 
@@ -9,7 +25,7 @@ report 404 "Purchase - Quote"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Quote));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Quote));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Purchase Quote';
             column(DocType_PurchaseHeader; "Document Type")
@@ -83,10 +99,10 @@ report 404 "Purchase - Quote"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(PurchaseQuoteCopyText; StrSubstNo(Text002, CopyText))
                     {
                     }
@@ -234,7 +250,7 @@ report 404 "Purchase - Quote"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -281,9 +297,9 @@ report 404 "Purchase - Quote"
                     }
                     dataitem("Purchase Line"; "Purchase Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -292,7 +308,7 @@ report 404 "Purchase - Quote"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ShowInternalInfo; ShowInternalInfo)
                         {
                         }
@@ -322,7 +338,7 @@ report 404 "Purchase - Quote"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimTextLine; DimText)
                             {
                             }
@@ -404,11 +420,11 @@ report 404 "Purchase - Quote"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
 
                         trigger OnPreDataItem()
                         begin
@@ -418,7 +434,7 @@ report 404 "Purchase - Quote"
                     }
                     dataitem(Total3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(ShipToAddr1; ShipToAddr[1])
                         {
                         }
@@ -486,6 +502,7 @@ report 404 "Purchase - Quote"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Purchase Header");
@@ -648,9 +665,7 @@ report 404 "Purchase - Quote"
         OldDimText: Text[75];
         Continue: Boolean;
         OutputNo: Integer;
-        [InDataSet]
         ArchiveDocumentEnable: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
         CompanyInfoVATRegistrationNoCaptionLbl: Label 'VAT Registration No.';
@@ -702,7 +717,7 @@ report 404 "Purchase - Quote"
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Purch.Qte.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch.Qte.") <> '';
     end;
 
     local procedure FormatAddressFields(PurchaseHeader: Record "Purchase Header")

@@ -1,7 +1,14 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.ProductionBOM;
+using System.Utilities;
+
 report 99000754 "Rolled-up Cost Shares"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/RolledupCostShares.rdlc';
+    RDLCLayout = './Manufacturing/Reports/RolledupCostShares.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Rolled-up Cost Shares';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +17,7 @@ report 99000754 "Rolled-up Cost Shares"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Search Description", "Inventory Posting Group";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -68,7 +75,7 @@ report 99000754 "Rolled-up Cost Shares"
             }
             dataitem(BOMLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(RolledupMaterialCost_Item; Item."Rolled-up Material Cost")
                 {
                     AutoFormatType = 2;
@@ -94,7 +101,7 @@ report 99000754 "Rolled-up Cost Shares"
                 }
                 dataitem("Integer"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     column(ProdBOMLineIndexNo; ProdBOMLine[Index]."No.")
                     {

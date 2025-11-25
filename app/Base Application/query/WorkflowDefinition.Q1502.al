@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 query 1502 "Workflow Definition"
 {
     Caption = 'Workflow Definition';

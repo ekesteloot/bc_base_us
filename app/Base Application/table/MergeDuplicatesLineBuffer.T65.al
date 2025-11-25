@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Duplicates;
+
+using System.Reflection;
+using System.Utilities;
+
 table 65 "Merge Duplicates Line Buffer"
 {
     Caption = 'Merge Duplicates Line Buffer';

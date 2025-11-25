@@ -1,3 +1,11 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 page 901 "Assembly Order Subform"
 {
     AutoSplitKey = true;
@@ -22,7 +30,7 @@ page 901 "Assembly Order Subform"
 
                     trigger OnDrillDown()
                     begin
-                        ShowAvailabilityWarningPage();
+                        Rec.ShowAvailabilityWarningPage();
                     end;
                 }
                 field(Type; Rec.Type)
@@ -39,10 +47,10 @@ page 901 "Assembly Order Subform"
                     var
                         Item: Record "Item";
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         ReserveItem();
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field(Description; Rec.Description)
@@ -67,8 +75,8 @@ page 901 "Assembly Order Subform"
                         Item: Record "Item";
                     begin
                         ReserveItem();
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field("Location Code"; Rec."Location Code")
@@ -78,7 +86,7 @@ page 901 "Assembly Order Subform"
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         ReserveItem();
                     end;
                 }
@@ -183,7 +191,7 @@ page 901 "Assembly Order Subform"
                     ApplicationArea = Reservation;
                     ToolTip = 'Specifies how many units of the assembly component have been reserved for this assembly order line.';
                 }
-                field(Reserve; Reserve)
+                field(Reserve; Rec.Reserve)
                 {
                     ApplicationArea = Reservation;
                     ToolTip = 'Specifies the reserve option for the assembly order line.';
@@ -239,84 +247,84 @@ page 901 "Assembly Order Subform"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
             }
@@ -418,7 +426,7 @@ page 901 "Assembly Order Subform"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
                 action("Item Tracking Lines")
@@ -431,7 +439,7 @@ page 901 "Assembly Order Subform"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
                 action("Show Warning")
@@ -443,7 +451,7 @@ page 901 "Assembly Order Subform"
 
                     trigger OnAction()
                     begin
-                        ShowAvailabilityWarning();
+                        Rec.ShowAvailabilityWarning();
                     end;
                 }
                 action(Dimensions)
@@ -457,7 +465,7 @@ page 901 "Assembly Order Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Co&mments")
@@ -466,9 +474,9 @@ page 901 "Assembly Order Subform"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Assembly Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "Document No." = FIELD("Document No."),
-                                  "Document Line No." = FIELD("Line No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "Document No." = field("Document No."),
+                                  "Document Line No." = field("Line No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(AssemblyBOM)
@@ -480,7 +488,7 @@ page 901 "Assembly Order Subform"
 
                     trigger OnAction()
                     begin
-                        ShowAssemblyList();
+                        Rec.ShowAssemblyList();
                     end;
                 }
             }
@@ -498,10 +506,10 @@ page 901 "Assembly Order Subform"
                     trigger OnAction()
                     begin
                         CurrPage.SaveRecord();
-                        ShowItemSub();
+                        Rec.ShowItemSub();
                         CurrPage.Update(true);
-                        if (Reserve = Reserve::Always) and ("No." <> xRec."No.") then begin
-                            AutoReserve();
+                        if (Rec.Reserve = Rec.Reserve::Always) and (Rec."No." <> xRec."No.") then begin
+                            Rec.AutoReserve();
                             CurrPage.Update(false);
                         end;
                     end;
@@ -515,7 +523,7 @@ page 901 "Assembly Order Subform"
 
                     trigger OnAction()
                     begin
-                        ExplodeAssemblyList();
+                        Rec.ExplodeAssemblyList();
                         CurrPage.Update();
                     end;
                 }
@@ -529,7 +537,7 @@ page 901 "Assembly Order Subform"
 
                     trigger OnAction()
                     begin
-                        ShowReservation();
+                        Rec.ShowReservation();
                     end;
                 }
                 action("Order &Tracking")
@@ -541,7 +549,7 @@ page 901 "Assembly Order Subform"
 
                     trigger OnAction()
                     begin
-                        ShowTracking();
+                        Rec.ShowTracking();
                     end;
                 }
             }
@@ -552,17 +560,17 @@ page 901 "Assembly Order Subform"
     var
         Item: Record "Item";
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
-        ReservationStatusField := ReservationStatus();
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
+        ReservationStatusField := Rec.ReservationStatus();
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
     end;
 
     trigger OnDeleteRecord(): Boolean
     var
         AssemblyLineReserve: Codeunit "Assembly Line-Reserve";
     begin
-        if (Quantity <> 0) and ItemExists("No.") then begin
+        if (Rec.Quantity <> 0) and Rec.ItemExists(Rec."No.") then begin
             Commit();
             if not AssemblyLineReserve.DeleteLineConfirm(Rec) then
                 exit(false);
@@ -598,23 +606,23 @@ page 901 "Assembly Order Subform"
 
     protected procedure ReserveItem()
     begin
-        if Type <> Type::Item then
+        if Rec.Type <> Rec.Type::Item then
             exit;
 
-        if ("Remaining Quantity (Base)" <> xRec."Remaining Quantity (Base)") or
-           ("No." <> xRec."No.") or
-           ("Location Code" <> xRec."Location Code") or
-           ("Variant Code" <> xRec."Variant Code") or
-           ("Due Date" <> xRec."Due Date") or
-           ((Reserve <> xRec.Reserve) and ("Remaining Quantity (Base)" <> 0))
+        if (Rec."Remaining Quantity (Base)" <> xRec."Remaining Quantity (Base)") or
+           (Rec."No." <> xRec."No.") or
+           (Rec."Location Code" <> xRec."Location Code") or
+           (Rec."Variant Code" <> xRec."Variant Code") or
+           (Rec."Due Date" <> xRec."Due Date") or
+           ((Rec.Reserve <> xRec.Reserve) and (Rec."Remaining Quantity (Base)" <> 0))
         then
-            if Reserve = Reserve::Always then begin
+            if Rec.Reserve = Rec.Reserve::Always then begin
                 CurrPage.SaveRecord();
-                AutoReserve();
+                Rec.AutoReserve();
                 CurrPage.Update(false);
             end;
 
-        ReservationStatusField := ReservationStatus();
+        ReservationStatusField := Rec.ReservationStatus();
     end;
 
     local procedure SetDimensionsVisibility()

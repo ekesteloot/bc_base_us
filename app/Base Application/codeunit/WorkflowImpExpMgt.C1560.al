@@ -1,3 +1,9 @@
+﻿namespace System.Automation;
+
+using System;
+using System.Utilities;
+using System.Xml;
+
 codeunit 1560 "Workflow Imp. / Exp. Mgt"
 {
 

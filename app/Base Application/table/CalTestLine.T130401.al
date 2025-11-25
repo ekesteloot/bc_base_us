@@ -1,3 +1,7 @@
+namespace System.TestTools.TestRunner;
+
+using System.Reflection;
+
 table 130401 "CAL Test Line"
 {
     Caption = 'CAL Test Line';
@@ -42,8 +46,8 @@ table 130401 "CAL Test Line"
         {
             Caption = 'Test Codeunit';
             Editable = false;
-            TableRelation = IF ("Line Type" = CONST(Codeunit)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit),
-                                                                                                  "Object Subtype" = CONST('Test'));
+            TableRelation = if ("Line Type" = const(Codeunit)) AllObjWithCaption."Object ID" where("Object Type" = const(Codeunit),
+                                                                                                  "Object Subtype" = const('Test'));
 
             trigger OnValidate()
             var
@@ -144,7 +148,7 @@ table 130401 "CAL Test Line"
         }
         field(13; "Hit Objects"; Integer)
         {
-            CalcFormula = Count("CAL Test Coverage Map" WHERE("Test Codeunit ID" = FIELD("Test Codeunit")));
+            CalcFormula = count("CAL Test Coverage Map" where("Test Codeunit ID" = field("Test Codeunit")));
             Caption = 'Hit Objects';
             Editable = false;
             FieldClass = FlowField;

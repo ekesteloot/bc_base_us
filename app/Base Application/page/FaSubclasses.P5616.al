@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Setup;
+
 page 5616 "FA Subclasses"
 {
     AdditionalSearchTerms = 'fixed asset subclasses buildings vehicles';
@@ -14,7 +16,7 @@ page 5616 "FA Subclasses"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies a code for the subclass that the fixed asset belongs to.';

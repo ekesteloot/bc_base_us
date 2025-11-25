@@ -1,3 +1,14 @@
+﻿namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Sales.Setup;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 1336 "Item Templ. Mgt."
 {
     trigger OnRun()
@@ -56,7 +67,7 @@ codeunit 1336 "Item Templ. Mgt."
         Item.Get(Item."No.");
     end;
 
-    local procedure ApplyTemplate(var Item: Record Item; ItemTempl: Record "Item Templ."; UpdateExistingValues: Boolean)
+    internal procedure InitFromTemplate(var Item: Record Item; ItemTempl: Record "Item Templ."; UpdateExistingValues: Boolean)
     var
         TempItem: Record Item temporary;
         InventorySetup: Record "Inventory Setup";
@@ -73,7 +84,6 @@ codeunit 1336 "Item Templ. Mgt."
         i: Integer;
         FieldExclusionList: List of [Integer];
         FieldValidationList: List of [Integer];
-        IsHandled: Boolean;
     begin
         CheckItemTemplRoundingPrecision(ItemTempl);
         ItemRecRef.GetTable(Item);
@@ -102,7 +112,11 @@ codeunit 1336 "Item Templ. Mgt."
             end;
         end;
 
+#if not CLEAN23
         OnApplyTemplateOnBeforeValidateFields(ItemRecRef, ItemTemplRecRef, FieldExclusionList, FieldValidationList);
+#endif    
+
+        OnInitFromTemplateOnBeforeValidateFields(ItemRecRef, ItemTemplRecRef, FieldExclusionList, FieldValidationList);
 
         for i := 1 to FieldValidationList.Count do begin
             ItemTemplFldRef := ItemTemplRecRef.Field(FieldValidationList.Get(i));
@@ -120,6 +134,14 @@ codeunit 1336 "Item Templ. Mgt."
         end;
         Item.Validate("Item Category Code", ItemTempl."Item Category Code");
         Item.Validate("Indirect Cost %", ItemTempl."Indirect Cost %");
+    end;
+
+    local procedure ApplyTemplate(var Item: Record Item; ItemTempl: Record "Item Templ."; UpdateExistingValues: Boolean)
+    var
+        IsHandled: Boolean;
+    begin
+        InitFromTemplate(Item, ItemTempl, UpdateExistingValues);
+
         IsHandled := false;
         OnApplyTemplateOnBeforeItemModify(Item, ItemTempl, IsHandled);
         if not IsHandled then
@@ -626,8 +648,16 @@ codeunit 1336 "Item Templ. Mgt."
     begin
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by the event OnInitFromTemplateOnBeforeValidateFields', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnApplyTemplateOnBeforeValidateFields(var ItemRecRef: RecordRef; var ItemTemplRecRef: RecordRef; FieldExclusionList: List of [Integer]; var FieldValidationList: List of [Integer])
+    begin
+    end;
+#endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitFromTemplateOnBeforeValidateFields(var ItemRecRef: RecordRef; var ItemTemplRecRef: RecordRef; FieldExclusionList: List of [Integer]; var FieldValidationList: List of [Integer])
     begin
     end;
 

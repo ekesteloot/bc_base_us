@@ -1,4 +1,18 @@
-﻿table 1226 "Payment Export Data"
+﻿namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.IO;
+using System.Text;
+
+table 1226 "Payment Export Data"
 {
     Caption = 'Payment Export Data';
 

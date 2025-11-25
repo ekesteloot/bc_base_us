@@ -1,3 +1,5 @@
+namespace System.Integration.PowerBI;
+
 /// <summary>
 /// Caches the validity of the Power BI license for a user.
 /// </summary>

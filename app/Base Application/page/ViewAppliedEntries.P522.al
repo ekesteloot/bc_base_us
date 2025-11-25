@@ -112,7 +112,7 @@ page 522 "View Applied Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the adjusted cost, in LCY, of the quantity posting.';
                 }
-                field(GetUnitCostLCY; GetUnitCostLCY())
+                field(GetUnitCostLCY; Rec.GetUnitCostLCY())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Unit Cost(LCY)';
@@ -155,7 +155,7 @@ page 522 "View Applied Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the quantity for this item ledger entry that was shipped and has not yet been returned.';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the entry has been fully applied to.';
@@ -223,7 +223,7 @@ page 522 "View Applied Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("&Value Entries")
@@ -232,8 +232,8 @@ page 522 "View Applied Entries"
                     Caption = '&Value Entries';
                     Image = ValueLedger;
                     RunObject = Page "Value Entries";
-                    RunPageLink = "Item Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Item Ledger Entry No.");
+                    RunPageLink = "Item Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Item Ledger Entry No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of posted amounts that affect the value of the item. Value entries are created for every transaction with the item.';
                 }
@@ -247,7 +247,7 @@ page 522 "View Applied Entries"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
             }
@@ -302,7 +302,7 @@ page 522 "View Applied Entries"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnInit()
@@ -329,7 +329,6 @@ page 522 "View Applied Entries"
         TotalApplied: Decimal;
         Text001: Label 'Applied Entries';
         Text002: Label 'Unapplied Entries';
-        [InDataSet]
         RemoveAppButtonVisible: Boolean;
 
     procedure SetRecordToShow(var RecordToSet: Record "Item Ledger Entry"; var ApplyCodeunit: Codeunit "Item Jnl.-Post Line"; newShowApplied: Boolean)
@@ -381,13 +380,13 @@ page 522 "View Applied Entries"
         if TempItemLedgEntry.FindSet() then
             repeat
                 Rec := TempItemLedgEntry;
-                Insert();
+                Rec.Insert();
             until TempItemLedgEntry.Next() = 0;
     end;
 
     local procedure InitView()
     begin
-        DeleteAll();
+        Rec.DeleteAll();
         TempItemLedgEntry.Reset();
         TempItemLedgEntry.DeleteAll();
     end;
@@ -625,8 +624,8 @@ page 522 "View Applied Entries"
     var
         ItemLedgEntry: Record "Item Ledger Entry";
     begin
-        ItemLedgEntry.Get("Entry No.");
-        ApplQty := Quantity;
+        ItemLedgEntry.Get(Rec."Entry No.");
+        ApplQty := Rec.Quantity;
         Qty := ItemLedgEntry.Quantity;
     end;
 

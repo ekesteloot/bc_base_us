@@ -1,3 +1,11 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 1251 "Text-to-Account Mapping"
 {
     Caption = 'Text-to-Account Mapping';
@@ -22,16 +30,16 @@ table 1251 "Text-to-Account Mapping"
         field(3; "Debit Acc. No."; Code[20])
         {
             Caption = 'Debit Acc. No.';
-            TableRelation = "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                 Blocked = CONST(false),
-                                                 "Direct Posting" = CONST(true));
+            TableRelation = "G/L Account" where("Account Type" = const(Posting),
+                                                 Blocked = const(false),
+                                                 "Direct Posting" = const(true));
         }
         field(4; "Credit Acc. No."; Code[20])
         {
             Caption = 'Credit Acc. No.';
-            TableRelation = "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                 Blocked = CONST(false),
-                                                 "Direct Posting" = CONST(true));
+            TableRelation = "G/L Account" where("Account Type" = const(Posting),
+                                                 Blocked = const(false),
+                                                 "Direct Posting" = const(true));
         }
         field(5; "Bal. Source Type"; Option)
         {
@@ -47,14 +55,14 @@ table 1251 "Text-to-Account Mapping"
         field(6; "Bal. Source No."; Code[20])
         {
             Caption = 'Bal. Source No.';
-            TableRelation = IF ("Bal. Source Type" = CONST("G/L Account")) "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                                                              Blocked = CONST(false))
-            ELSE
-            IF ("Bal. Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Bal. Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Bal. Source Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Source Type" = const("G/L Account")) "G/L Account" where("Account Type" = const(Posting),
+                                                                                              Blocked = const(false))
+            else
+            if ("Bal. Source Type" = const(Customer)) Customer
+            else
+            if ("Bal. Source Type" = const(Vendor)) Vendor
+            else
+            if ("Bal. Source Type" = const("Bank Account")) "Bank Account";
         }
         field(7; "Vendor No."; Code[20])
         {

@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Contract;
+
 enum 5968 "Service Contract Change Status"
 {
     Extensible = true;

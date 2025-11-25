@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Shared.Navigate;
+
 page 19 "G/L Entries Part"
 {
     PageType = ListPart;

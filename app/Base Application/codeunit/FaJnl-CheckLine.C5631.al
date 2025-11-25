@@ -1,3 +1,13 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+using System.Security.User;
+
 codeunit 5631 "FA Jnl.-Check Line"
 {
     TableNo = "Gen. Journal Line";
@@ -5,38 +15,38 @@ codeunit 5631 "FA Jnl.-Check Line"
     trigger OnRun()
     begin
         CheckJobNo(Rec);
-        TestField("FA Posting Type");
-        TestField("Depreciation Book Code");
-        if "Duplicate in Depreciation Book" = "Depreciation Book Code" then
-            FieldError(
-              "Duplicate in Depreciation Book",
-              StrSubstNo(Text000, FieldCaption("Depreciation Book Code")));
-        if "Account Type" = "Bal. Account Type" then
+        Rec.TestField("FA Posting Type");
+        Rec.TestField("Depreciation Book Code");
+        if Rec."Duplicate in Depreciation Book" = Rec."Depreciation Book Code" then
+            Rec.FieldError(
+              Rec."Duplicate in Depreciation Book",
+              StrSubstNo(Text000, Rec.FieldCaption("Depreciation Book Code")));
+        if Rec."Account Type" = Rec."Bal. Account Type" then
             Error(
               Text001,
-              FieldCaption("Account Type"), FieldCaption("Bal. Account Type"), "Account Type");
-        if "Account No." <> '' then
+              Rec.FieldCaption("Account Type"), Rec.FieldCaption("Bal. Account Type"), Rec."Account Type");
+        if Rec."Account No." <> '' then
             CheckAccountNo(Rec);
 
-        if "Bal. Account No." <> '' then
+        if Rec."Bal. Account No." <> '' then
             CheckBalAccountNo(Rec);
 
-        if "Recurring Method".AsInteger() > "Recurring Method"::"V  Variable".AsInteger() then begin
+        if Rec."Recurring Method".AsInteger() > Rec."Recurring Method"::"V  Variable".AsInteger() then begin
             GenJnlline2."Account Type" := GenJnlline2."Account Type"::"Fixed Asset";
-            FieldError(
-              "Recurring Method",
+            Rec.FieldError(
+              Rec."Recurring Method",
               StrSubstNo(Text002,
-                "Recurring Method",
-                FieldCaption("Account Type"),
-                FieldCaption("Bal. Account Type"),
+                Rec."Recurring Method",
+                Rec.FieldCaption("Account Type"),
+                Rec.FieldCaption("Bal. Account Type"),
                 GenJnlline2."Account Type"));
         end;
-        DeprBookCode := "Depreciation Book Code";
-        if "FA Posting Date" = 0D then
-            "FA Posting Date" := "Posting Date";
-        FAPostingDate := "FA Posting Date";
-        PostingDate := "Posting Date";
-        FAPostingType := "FA Journal Line FA Posting Type".FromInteger("FA Posting Type".AsInteger() - 1);
+        DeprBookCode := Rec."Depreciation Book Code";
+        if Rec."FA Posting Date" = 0D then
+            Rec."FA Posting Date" := Rec."Posting Date";
+        FAPostingDate := Rec."FA Posting Date";
+        PostingDate := Rec."Posting Date";
+        FAPostingType := "FA Journal Line FA Posting Type".FromInteger(Rec."FA Posting Type".AsInteger() - 1);
         GenJnlPosting := true;
         GenJnlLine := Rec;
         CheckJnlLine();

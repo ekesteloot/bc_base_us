@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.StandardCost;
+
+using Microsoft.InventoryMgt.Item;
+
 report 5854 "Roll Up Standard Cost"
 {
     Caption = 'Roll Up Standard Cost';
@@ -7,7 +11,7 @@ report 5854 "Roll Up Standard Cost"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Costing Method";
 
             trigger OnPostDataItem()

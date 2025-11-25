@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.Item;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ServiceMgt.Pricing;
+using Microsoft.ServiceMgt.Resources;
+
 table 5904 "Service Item Group"
 {
     Caption = 'Service Item Group';

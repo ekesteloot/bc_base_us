@@ -1,3 +1,17 @@
+namespace Microsoft.WarehouseMgt.History;
+
+using Microsoft.AssemblyMgt.History;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+
 codeunit 7320 "Whse. Undo Quantity"
 {
     Permissions = TableData "Whse. Item Entry Relation" = md,
@@ -41,7 +55,7 @@ codeunit 7320 "Whse. Undo Quantity"
                     TempWhseJnlLine.SetSource(SourceType, SourceSubType, SourceNo, SourceLineNo, 0);
                     TempWhseJnlLine."Source Document" :=
                       WhseMgt.GetWhseJnlSourceDocument(TempWhseJnlLine."Source Type", TempWhseJnlLine."Source Subtype");
-                    TempWhseJnlLine."Reference Document" := "Whse. Reference Document Type".FromInteger(RefDoc);
+                    TempWhseJnlLine."Reference Document" := Enum::"Whse. Reference Document Type".FromInteger(RefDoc);
                     TempWhseJnlLine."Reference No." := "Document No.";
                     TempWhseJnlLine."Location Code" := "Location Code";
                     TempWhseJnlLine."Zone Code" := WhseEntry."Zone Code";
@@ -129,9 +143,9 @@ codeunit 7320 "Whse. Undo Quantity"
         with PostedWhseRcptLine do begin
             Reset();
             case UndoType of
-                DATABASE::"Purch. Rcpt. Line":
+                Enum::TableID::"Purch. Rcpt. Line".AsInteger():
                     SetRange("Posted Source Document", "Posted Source Document"::"Posted Receipt");
-                DATABASE::"Return Receipt Line":
+                Enum::TableID::"Return Receipt Line".AsInteger():
                     SetRange("Posted Source Document", "Posted Source Document"::"Posted Return Receipt");
                 else
                     exit;
@@ -163,12 +177,12 @@ codeunit 7320 "Whse. Undo Quantity"
         with PostedWhseShptLine do begin
             Reset();
             case UndoType of
-                DATABASE::"Sales Shipment Line",
-              DATABASE::"Service Shipment Line":
+                Enum::TableID::"Sales Shipment Line".AsInteger(),
+              Enum::TableID::"Service Shipment Line".AsInteger():
                     SetRange("Posted Source Document", "Posted Source Document"::"Posted Shipment");
-                DATABASE::"Return Shipment Line":
+                Enum::TableID::"Return Shipment Line".AsInteger():
                     SetRange("Posted Source Document", "Posted Source Document"::"Posted Return Shipment");
-                DATABASE::"Transfer Shipment Line":
+                Enum::TableID::"Transfer Shipment Line".AsInteger():
                     SetRange("Posted Source Document", "Posted Source Document"::"Posted Transfer Shipment");
                 else
                     exit;
@@ -239,7 +253,7 @@ codeunit 7320 "Whse. Undo Quantity"
             LineSpacing := 10000;
     end;
 
-    local procedure InsertPostedWhseShptLine(OldPostedWhseShptLine: Record "Posted Whse. Shipment Line")
+    procedure InsertPostedWhseShptLine(OldPostedWhseShptLine: Record "Posted Whse. Shipment Line")
     var
         NewPostedWhseShptLine: Record "Posted Whse. Shipment Line";
         LineSpacing: Integer;
@@ -387,13 +401,13 @@ codeunit 7320 "Whse. Undo Quantity"
     local procedure DeleteWhseItemEntryRelationRcpt(NewPostedWhseRcptLine: Record "Posted Whse. Receipt Line")
     begin
         with NewPostedWhseRcptLine do
-            DeleteWhseItemEntryRelation(DATABASE::"Posted Whse. Receipt Line", "No.", "Line No.");
+            DeleteWhseItemEntryRelation(Enum::TableID::"Posted Whse. Receipt Line".AsInteger(), "No.", "Line No.");
     end;
 
     local procedure DeleteWhseItemEntryRelationShpt(NewPostedWhseShptLine: Record "Posted Whse. Shipment Line")
     begin
         with NewPostedWhseShptLine do
-            DeleteWhseItemEntryRelation(DATABASE::"Posted Whse. Shipment Line", "No.", "Line No.");
+            DeleteWhseItemEntryRelation(Enum::TableID::"Posted Whse. Shipment Line".AsInteger(), "No.", "Line No.");
     end;
 
     local procedure DeleteWhseItemEntryRelation(SourceType: Integer; SourceNo: Code[20]; SourceLineNo: Integer)
@@ -411,13 +425,13 @@ codeunit 7320 "Whse. Undo Quantity"
     begin
         with PostedWhseRcptLine do begin
             case "Source Type" of
-                DATABASE::"Purchase Line":
+                Enum::TableID::"Purchase Line".AsInteger():
                     begin
                         PurchLine.Get("Source Subtype", "Source No.", "Source Line No.");
                         if not (PurchLine."Quantity Received" < PurchLine.Quantity) then
                             exit;
                     end;
-                DATABASE::"Sales Line":
+                Enum::TableID::"Sales Line".AsInteger():
                     begin
                         SalesLine.Get("Source Subtype", "Source No.", "Source Line No.");
                         if not (SalesLine."Return Qty. Received" < SalesLine.Quantity) then
@@ -444,19 +458,19 @@ codeunit 7320 "Whse. Undo Quantity"
 
         with PostedWhseShptLine do begin
             case "Source Type" of
-                DATABASE::"Sales Line":
+                Enum::TableID::"Sales Line".AsInteger():
                     begin
                         SalesLine.Get("Source Subtype", "Source No.", "Source Line No.");
                         if not (SalesLine."Quantity Shipped" < SalesLine.Quantity) then
                             exit;
                     end;
-                DATABASE::"Purchase Line":
+                Enum::TableID::"Purchase Line".AsInteger():
                     begin
                         PurchLine.Get("Source Subtype", "Source No.", "Source Line No.");
                         if not (PurchLine."Return Qty. Shipped" < PurchLine.Quantity) then
                             exit;
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     begin
                         TransferLine.Get("Source No.", "Source Line No.");
                         if not (TransferLine."Quantity Shipped" < TransferLine.Quantity) then
@@ -490,7 +504,7 @@ codeunit 7320 "Whse. Undo Quantity"
     var
         PostedATOLink: Record "Posted Assemble-to-Order Link";
     begin
-        if UndoType = DATABASE::"Sales Shipment Line" then begin
+        if UndoType = Enum::TableID::"Sales Shipment Line".AsInteger() then begin
             PostedATOLink.SetRange("Document Type", PostedATOLink."Document Type"::"Sales Shipment");
             PostedATOLink.SetRange("Document No.", UndoID);
             PostedATOLink.SetRange("Document Line No.", SourceRefNo);

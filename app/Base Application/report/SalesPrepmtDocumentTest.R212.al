@@ -1,14 +1,30 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using System.Utilities;
+
 report 212 "Sales Prepmt. Document Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/SalesPrepmtDocumentTest.rdlc';
+    RDLCLayout = './Sales/Reports/SalesPrepmtDocumentTest.rdlc';
     Caption = 'Sales Prepmt. Document Test';
 
     dataset
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = WHERE("Document Type" = CONST(Order));
+            DataItemTableView = where("Document Type" = const(Order));
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Prepayment Sales Document';
             column(Sales_Header_Document_Type; "Document Type")
@@ -19,7 +35,7 @@ report 212 "Sales Prepmt. Document Test"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
                 {
                 }
@@ -250,7 +266,7 @@ report 212 "Sales Prepmt. Document Test"
                 }
                 dataitem(HeaderDimLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -292,7 +308,7 @@ report 212 "Sales Prepmt. Document Test"
                 }
                 dataitem(HeaderErrorCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -315,10 +331,10 @@ report 212 "Sales Prepmt. Document Test"
                 }
                 dataitem(CopyLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     dataitem("Sales Line"; "Sales Line")
                     {
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -327,7 +343,7 @@ report 212 "Sales Prepmt. Document Test"
                     }
                     dataitem(SalesLineLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(Sales_Line___Prepmt__Amt__Inv__; "Sales Line"."Prepmt. Amt. Inv.")
                         {
                         }
@@ -384,7 +400,7 @@ report 212 "Sales Prepmt. Document Test"
                         }
                         dataitem(LineErrorCounter; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(ErrorText_Number__Control94; ErrorText[Number])
                             {
                             }
@@ -493,11 +509,11 @@ report 212 "Sales Prepmt. Document Test"
                 }
                 dataitem(Blank; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                 }
                 dataitem(PrepmtLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(Prepayment_Inv__Line_Buffer___G_L_Account_No__; "Prepayment Inv. Line Buffer"."G/L Account No.")
                     {
                     }
@@ -598,7 +614,7 @@ report 212 "Sales Prepmt. Document Test"
                     }
                     dataitem("Prepayment Inv. Line Buffer"; "Prepayment Inv. Line Buffer")
                     {
-                        DataItemTableView = SORTING("G/L Account No.", "Dimension Set ID", "Job No.", "Tax Area Code", "Tax Liable", "Tax Group Code", "Invoice Rounding", Adjustment, "Line No.");
+                        DataItemTableView = sorting("G/L Account No.", "Dimension Set ID", "Job No.", "Tax Area Code", "Tax Liable", "Tax Group Code", "Invoice Rounding", Adjustment, "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -607,7 +623,7 @@ report 212 "Sales Prepmt. Document Test"
                     }
                     dataitem(LineDimLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText_Control97; DimText)
                         {
                         }
@@ -649,7 +665,7 @@ report 212 "Sales Prepmt. Document Test"
                     }
                     dataitem(PrepmtErrorCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number__Control128; ErrorText[Number])
                         {
                         }
@@ -690,7 +706,7 @@ report 212 "Sales Prepmt. Document Test"
                             AddError(DimMgt.GetDimCombErr());
                         TableID[1] := DimMgt.SalesLineTypeToTableID(TempSalesLine.Type::"G/L Account");
                         No[1] := "Prepayment Inv. Line Buffer"."G/L Account No.";
-                        TableID[2] := DATABASE::Job;
+                        TableID[2] := Enum::TableID::Job.AsInteger();
                         No[2] := "Prepayment Inv. Line Buffer"."Job No.";
                         if not DimMgt.CheckDimValuePosting(TableID, No, TempPrepmtInvLineBuf."Dimension Set ID") then
                             AddError(DimMgt.GetDimValuePostingErr());
@@ -704,7 +720,7 @@ report 212 "Sales Prepmt. Document Test"
                 }
                 dataitem(VATCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(VATAmountLine__VAT_Amount_; TempVATAmountLine."VAT Amount")
                     {
                         AutoFormatExpression = "Sales Header"."Currency Code";
@@ -863,21 +879,21 @@ report 212 "Sales Prepmt. Document Test"
 
                 CheckPostingDate("Sales Header");
 
-                DimSetEntry.SetRange("Dimension Set ID", "Sales Header"."Dimension Set ID");
-                if not DimMgt.CheckDimIDComb("Sales Header"."Dimension Set ID") then
+                DimSetEntry.SetRange("Dimension Set ID", "Dimension Set ID");
+                if not DimMgt.CheckDimIDComb("Dimension Set ID") then
                     AddError(DimMgt.GetDimCombErr());
 
-                TableID[1] := DATABASE::Customer;
+                TableID[1] := Enum::TableID::Customer.AsInteger();
                 No[1] := "Bill-to Customer No.";
-                TableID[2] := DATABASE::Job;
+                TableID[2] := Enum::TableID::Job.AsInteger();
                 // No[2] := "Job No.";
-                TableID[3] := DATABASE::"Salesperson/Purchaser";
+                TableID[3] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
                 No[3] := "Salesperson Code";
-                TableID[4] := DATABASE::Campaign;
+                TableID[4] := Enum::TableID::Campaign.AsInteger();
                 No[4] := "Campaign No.";
-                TableID[5] := DATABASE::"Responsibility Center";
+                TableID[5] := Enum::TableID::"Responsibility Center".AsInteger();
                 No[5] := "Responsibility Center";
-                if not DimMgt.CheckDimValuePosting(TableID, No, "Sales Header"."Dimension Set ID") then
+                if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
                     AddError(DimMgt.GetDimValuePostingErr());
             end;
         }
@@ -1056,14 +1072,17 @@ report 212 "Sales Prepmt. Document Test"
 
     local procedure MergeText(DimSetEntry: Record "Dimension Set Entry"): Boolean
     begin
-        if (StrLen(DimText) + StrLen(StrSubstNo('%1 - %2', DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code")) + 2) >
+        if StrLen(DimText) + StrLen(StrSubstNo('%1 - %2', DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code")) + 2 >
            MaxStrLen(DimText)
         then
             exit(true);
+
         if DimText = '' then
             DimText := StrSubstNo('%1 - %2', DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code")
         else
-            DimText := StrSubstNo('%1; %2', DimText, StrSubstNo('%1 - %2', DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code"));
+            DimText :=
+              StrSubstNo('%1; %2', DimText, StrSubstNo('%1 - %2', DimSetEntry."Dimension Code", DimSetEntry."Dimension Value Code"));
+
         exit(false);
     end;
 

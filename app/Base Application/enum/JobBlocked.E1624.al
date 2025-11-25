@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
 enum 1624 "Job Blocked"
 {
     Extensible = true;

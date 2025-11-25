@@ -166,7 +166,7 @@ report 10137 "Inventory Labels"
             }
             dataitem(BlankLine; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(BlankLine_Number; Number)
                 {
                 }

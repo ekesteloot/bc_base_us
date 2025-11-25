@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 347 "Close Income Statement Buffer"
 {
     Caption = 'Close Income Statement Buffer';

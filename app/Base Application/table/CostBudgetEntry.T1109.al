@@ -1,3 +1,11 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Allocation;
+using Microsoft.CostAccounting.Setup;
+using System.Security.AccessControl;
+using System.Utilities;
+
 table 1109 "Cost Budget Entry"
 {
     Caption = 'Cost Budget Entry';
@@ -72,8 +80,6 @@ table 1109 "Cost Budget Entry"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(42; "Last Date Modified"; Date)
         {

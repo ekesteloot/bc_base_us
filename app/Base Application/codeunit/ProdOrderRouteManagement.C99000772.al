@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 codeunit 99000772 "Prod. Order Route Management"
 {
 

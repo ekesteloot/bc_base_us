@@ -1,3 +1,24 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.ServiceMgt.History;
+using System.Security.AccessControl;
+using System.Utilities;
+
 table 254 "VAT Entry"
 {
     Caption = 'VAT Entry';
@@ -77,9 +98,9 @@ table 254 "VAT Entry"
         field(12; "Bill-to/Pay-to No."; Code[20])
         {
             Caption = 'Bill-to/Pay-to No.';
-            TableRelation = IF (Type = CONST(Purchase)) Vendor
-            ELSE
-            IF (Type = CONST(Sale)) Customer;
+            TableRelation = if (Type = const(Purchase)) Vendor
+            else
+            if (Type = const(Sale)) Customer;
 
             trigger OnValidate()
             begin
@@ -119,8 +140,6 @@ table 254 "VAT Entry"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(15; "Source Code"; Code[10])
         {
@@ -339,9 +358,9 @@ table 254 "VAT Entry"
         field(53; "Ship-to/Order Address Code"; Code[10])
         {
             Caption = 'Ship-to/Order Address Code';
-            TableRelation = IF (Type = CONST(Purchase)) "Order Address".Code WHERE("Vendor No." = FIELD("Bill-to/Pay-to No."))
-            ELSE
-            IF (Type = CONST(Sale)) "Ship-to Address".Code WHERE("Customer No." = FIELD("Bill-to/Pay-to No."));
+            TableRelation = if (Type = const(Purchase)) "Order Address".Code where("Vendor No." = field("Bill-to/Pay-to No."))
+            else
+            if (Type = const(Sale)) "Ship-to Address".Code where("Customer No." = field("Bill-to/Pay-to No."));
         }
         field(54; "Document Date"; Date)
         {
@@ -429,13 +448,12 @@ table 254 "VAT Entry"
                 Validate(Type);
                 if not VATDateReportingMgt.IsVATDateModifiable() or not VATDateReportingMgt.IsValidVATDate(Rec) or not VATDateReportingMgt.IsValidDate(xRec."VAT Reporting Date", true) then
                     Error('');
-
                 VATDateReportingMgt.UpdateLinkedEntries(Rec);
             end;
         }
         field(6200; "Non-Deductible VAT %"; Decimal)
         {
-            Caption = 'Non-Deductible VAT %"';
+            Caption = 'Non-Deductible VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
@@ -740,7 +758,7 @@ table 254 "VAT Entry"
                 exit;
 
             if GuiAllowed() then begin
-                NoOfRecords := Count();
+                NoOfRecords := count();
                 Window.Open(AdjustTitleMsg + ProgressMsg);
             end;
         end;

@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.History;
+
 codeunit 391 "Shipment Header - Edit"
 {
     Permissions = TableData "Sales Shipment Header" = rm;
@@ -8,11 +10,11 @@ codeunit 391 "Shipment Header - Edit"
         SalesShptHeader := Rec;
         SalesShptHeader.LockTable();
         SalesShptHeader.Find();
-        SalesShptHeader."Shipping Agent Code" := "Shipping Agent Code";
-        SalesShptHeader."Shipping Agent Service Code" := "Shipping Agent Service Code";
-        SalesShptHeader."Package Tracking No." := "Package Tracking No.";
+        SalesShptHeader."Shipping Agent Code" := Rec."Shipping Agent Code";
+        SalesShptHeader."Shipping Agent Service Code" := Rec."Shipping Agent Service Code";
+        SalesShptHeader."Package Tracking No." := Rec."Package Tracking No.";
         OnBeforeSalesShptHeaderModify(SalesShptHeader, Rec);
-        SalesShptHeader.TestField("No.", "No.");
+        SalesShptHeader.TestField("No.", Rec."No.");
         SalesShptHeader.Modify();
         Rec := SalesShptHeader;
 

@@ -1,3 +1,9 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Sales.Document;
+
 table 1022 "Job Planning Line Invoice"
 {
     Caption = 'Job Planning Line Invoice';
@@ -16,14 +22,14 @@ table 1022 "Job Planning Line Invoice"
         {
             Caption = 'Job Task No.';
             Editable = false;
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(3; "Job Planning Line No."; Integer)
         {
             Caption = 'Job Planning Line No.';
             Editable = false;
-            TableRelation = "Job Planning Line"."Line No." WHERE("Job No." = FIELD("Job No."),
-                                                                  "Job Task No." = FIELD("Job Task No."));
+            TableRelation = "Job Planning Line"."Line No." where("Job No." = field("Job No."),
+                                                                  "Job Task No." = field("Job Task No."));
         }
         field(4; "Document Type"; Enum "Job Planning Line Invoice Document Type")
         {

@@ -1,3 +1,7 @@
+namespace System.Integration;
+
+using System.Integration.Excel;
+
 page 6713 "OData Fields Export"
 {
     Caption = 'Select Fields to Export';

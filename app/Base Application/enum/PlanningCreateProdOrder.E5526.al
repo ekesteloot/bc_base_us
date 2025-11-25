@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 enum 5526 "Planning Create Prod. Order"
 {
     Extensible = true;

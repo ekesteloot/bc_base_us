@@ -1,3 +1,10 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Posting;
+
 codeunit 5611 "Calculate Normal Depreciation"
 {
     Permissions = TableData "FA Ledger Entry" = r,

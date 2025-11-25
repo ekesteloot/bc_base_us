@@ -1,7 +1,12 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Task;
+
 report 5068 "Opportunity - Details"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/OpportunityDetails.rdlc';
+    RDLCLayout = './CRM/Reports/OpportunityDetails.rdlc';
     ApplicationArea = RelationshipMgmt;
     Caption = 'Opportunity - Details';
     UsageCategory = ReportsAndAnalysis;
@@ -43,8 +48,8 @@ report 5068 "Opportunity - Details"
             }
             dataitem(PreTodo; "To-do")
             {
-                DataItemLink = "Opportunity No." = FIELD("No.");
-                DataItemTableView = SORTING("Opportunity No.", Date, Closed) ORDER(Ascending) WHERE("Opportunity Entry No." = CONST(0), "System To-do Type" = FILTER(Team | Organizer));
+                DataItemLink = "Opportunity No." = field("No.");
+                DataItemTableView = sorting("Opportunity No.", Date, Closed) ORDER(Ascending) where("Opportunity Entry No." = const(0), "System To-do Type" = filter(Team | Organizer));
                 column(Status_Pretodo; Status)
                 {
                     IncludeCaption = true;
@@ -79,8 +84,8 @@ report 5068 "Opportunity - Details"
             }
             dataitem("Opportunity Entry"; "Opportunity Entry")
             {
-                DataItemLink = "Opportunity No." = FIELD("No.");
-                DataItemTableView = SORTING("Opportunity No.") ORDER(Ascending) WHERE("Sales Cycle Stage" = FILTER(<> 0));
+                DataItemLink = "Opportunity No." = field("No.");
+                DataItemTableView = sorting("Opportunity No.") ORDER(Ascending) where("Sales Cycle Stage" = filter(<> 0));
                 column(SalesCycleStage_OppEntry; "Sales Cycle Stage")
                 {
                 }
@@ -126,8 +131,8 @@ report 5068 "Opportunity - Details"
                 }
                 dataitem("To-do"; "To-do")
                 {
-                    DataItemLink = "Opportunity No." = FIELD("Opportunity No."), "Opportunity Entry No." = FIELD("Entry No.");
-                    DataItemTableView = SORTING("Opportunity No.", Date, Closed) ORDER(Ascending) WHERE("System To-do Type" = FILTER(Team | Organizer));
+                    DataItemLink = "Opportunity No." = field("Opportunity No."), "Opportunity Entry No." = field("Entry No.");
+                    DataItemTableView = sorting("Opportunity No.", Date, Closed) ORDER(Ascending) where("System To-do Type" = filter(Team | Organizer));
                     column(Status_Todo; Status)
                     {
                         IncludeCaption = true;
@@ -171,8 +176,8 @@ report 5068 "Opportunity - Details"
             }
             dataitem("Sales Cycle Stage"; "Sales Cycle Stage")
             {
-                DataItemLink = "Sales Cycle Code" = FIELD("Sales Cycle Code");
-                DataItemTableView = SORTING("Sales Cycle Code", Stage);
+                DataItemLink = "Sales Cycle Code" = field("Sales Cycle Code");
+                DataItemTableView = sorting("Sales Cycle Code", Stage);
                 PrintOnlyIfDetail = true;
                 column(Stage_SalesCycleStage; Stage)
                 {
@@ -198,8 +203,8 @@ report 5068 "Opportunity - Details"
                 }
                 dataitem("Activity Step"; "Activity Step")
                 {
-                    DataItemLink = "Activity Code" = FIELD("Activity Code");
-                    DataItemTableView = SORTING("Activity Code", "Step No.");
+                    DataItemLink = "Activity Code" = field("Activity Code");
+                    DataItemTableView = sorting("Activity Code", "Step No.");
                     column(Desc_ActivityStep; Description)
                     {
                         IncludeCaption = true;

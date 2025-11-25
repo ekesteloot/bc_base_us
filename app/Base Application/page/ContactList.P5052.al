@@ -1,3 +1,26 @@
+﻿namespace Microsoft.CRM.Contact;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Outlook;
+using Microsoft.CRM.Profiling;
+using Microsoft.CRM.Reports;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using Microsoft.CRM.Task;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Pricing;
+using System.Email;
+using System.Integration.Word;
+using System.Text;
+
 page 5052 "Contact List"
 {
     ApplicationArea = Basic, Suite, Service;
@@ -7,7 +30,7 @@ page 5052 "Contact List"
     Editable = false;
     PageType = List;
     SourceTable = Contact;
-    SourceTableView = SORTING("Company Name", "Company No.", Type, Name);
+    SourceTableView = sorting("Company Name", "Company No.", Type, Name);
     UsageCategory = Lists;
 
     layout
@@ -125,7 +148,7 @@ page 5052 "Contact List"
                     ToolTip = 'Specifies whether to limit access to data for the data subject during daily operations. This is useful, for example, when protecting data from changes while it is under privacy review.';
                     Visible = false;
                 }
-                field(Minor; Minor)
+                field(Minor; Rec.Minor)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
@@ -163,8 +186,8 @@ page 5052 "Contact List"
             part(Control128; "Contact Statistics FactBox")
             {
                 ApplicationArea = RelationshipMgmt;
-                SubPageLink = "No." = FIELD("No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("No."),
+                              "Date Filter" = field("Date Filter");
             }
             systempart(Control1900383207; Links)
             {
@@ -196,7 +219,7 @@ page 5052 "Contact List"
                         Caption = 'Business Relations';
                         Image = BusinessRelation;
                         RunObject = Page "Contact Business Relations";
-                        RunPageLink = "Contact No." = FIELD("Company No.");
+                        RunPageLink = "Contact No." = field("Company No.");
                         ToolTip = 'View or edit the contact''s business relations, such as customers, vendors, banks, lawyers, consultants, competitors, and so on.';
                     }
                     action("Industry Groups")
@@ -205,7 +228,7 @@ page 5052 "Contact List"
                         Caption = 'Industry Groups';
                         Image = IndustryGroups;
                         RunObject = Page "Contact Industry Groups";
-                        RunPageLink = "Contact No." = FIELD("Company No.");
+                        RunPageLink = "Contact No." = field("Company No.");
                         ToolTip = 'View or edit the industry groups, such as Retail or Automobile, that the contact belongs to.';
                     }
                     action("Web Sources")
@@ -214,7 +237,7 @@ page 5052 "Contact List"
                         Caption = 'Web Sources';
                         Image = Web;
                         RunObject = Page "Contact Web Sources";
-                        RunPageLink = "Contact No." = FIELD("Company No.");
+                        RunPageLink = "Contact No." = field("Company No.");
                         ToolTip = 'View a list of the web sites with information about the contacts.';
                     }
                 }
@@ -234,8 +257,8 @@ page 5052 "Contact List"
                         var
                             ContJobResp: Record "Contact Job Responsibility";
                         begin
-                            CheckContactType(Type::Person);
-                            ContJobResp.SetRange("Contact No.", "No.");
+                            Rec.CheckContactType(Rec.Type::Person);
+                            ContJobResp.SetRange("Contact No.", Rec."No.");
                             PAGE.RunModal(PAGE::"Contact Job Responsibilities", ContJobResp);
                         end;
                     }
@@ -260,7 +283,7 @@ page 5052 "Contact List"
                     Caption = '&Picture';
                     Image = Picture;
                     RunObject = Page "Contact Picture";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'View or add a picture of the contact person or, for example, the company''s logo.';
                 }
                 action("Co&mments")
@@ -269,9 +292,9 @@ page 5052 "Contact List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Rlshp. Mgt. Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Contact),
-                                  "No." = FIELD("No."),
-                                  "Sub No." = CONST(0);
+                    RunPageLink = "Table Name" = const(Contact),
+                                  "No." = field("No."),
+                                  "Sub No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 group("Alternati&ve Address")
@@ -284,7 +307,7 @@ page 5052 "Contact List"
                         Caption = 'Card';
                         Image = EditLines;
                         RunObject = Page "Contact Alt. Address List";
-                        RunPageLink = "Contact No." = FIELD("No.");
+                        RunPageLink = "Contact No." = field("No.");
                         ToolTip = 'View or change detailed information about the contact.';
                     }
                     action("Date Ranges")
@@ -293,7 +316,7 @@ page 5052 "Contact List"
                         Caption = 'Date Ranges';
                         Image = DateRange;
                         RunObject = Page "Contact Alt. Addr. Date Ranges";
-                        RunPageLink = "Contact No." = FIELD("No.");
+                        RunPageLink = "Contact No." = field("No.");
                         ToolTip = 'Specify date ranges that apply to the contact''s alternate address.';
                     }
                 }
@@ -306,7 +329,7 @@ page 5052 "Contact List"
                 {
                     ApplicationArea = Suite;
                     Caption = 'Contact';
-                    Enabled = (Type <> Type::Company) AND ("Company No." <> '');
+                    Enabled = (Rec.Type <> Rec.Type::Company) AND (Rec."Company No." <> '');
                     Image = CoupledContactPerson;
                     ToolTip = 'Open the coupled Dataverse contact.';
 
@@ -314,7 +337,7 @@ page 5052 "Contact List"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -322,7 +345,7 @@ page 5052 "Contact List"
                     AccessByPermission = TableData "CRM Integration Record" = IM;
                     ApplicationArea = Suite;
                     Caption = 'Synchronize';
-                    Enabled = (Type <> Type::Company) AND ("Company No." <> '');
+                    Enabled = (Rec.Type <> Rec.Type::Company) AND (Rec."Company No." <> '');
                     Image = Refresh;
                     ToolTip = 'Send or get updated data to or from Dataverse.';
 
@@ -346,7 +369,7 @@ page 5052 "Contact List"
                 group(Coupling)
                 {
                     Caption = 'Coupling', Comment = 'Coupling is a noun';
-                    Enabled = (Type <> Type::Company) AND ("Company No." <> '');
+                    Enabled = (Rec.Type <> Rec.Type::Company) AND (Rec."Company No." <> '');
                     Image = LinkAccount;
                     ToolTip = 'Create, change, or delete a coupling between the Business Central record and a Dataverse record.';
                     action(ManageCRMCoupling)
@@ -361,7 +384,7 @@ page 5052 "Contact List"
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(MatchBasedCoupling)
@@ -412,7 +435,7 @@ page 5052 "Contact List"
                     {
                         ApplicationArea = Suite;
                         Caption = 'Create Contact in Dataverse';
-                        Enabled = (Type <> Type::Company) AND ("Company No." <> '');
+                        Enabled = (Rec.Type <> Rec.Type::Company) AND (Rec."Company No." <> '');
                         Image = NewCustomer;
                         ToolTip = 'Create a contact in Dataverse that is linked to a contact in your company.';
 
@@ -451,7 +474,7 @@ page 5052 "Contact List"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -482,10 +505,10 @@ page 5052 "Contact List"
                     Caption = 'Segmen&ts';
                     Image = Segment;
                     RunObject = Page "Contact Segment List";
-                    RunPageLink = "Contact Company No." = FIELD("Company No."),
-                                  "Contact No." = FILTER(<> ''),
-                                  "Contact No." = FIELD(FILTER("Lookup Contact No."));
-                    RunPageView = SORTING("Contact No.", "Segment No.");
+                    RunPageLink = "Contact Company No." = field("Company No."),
+                                  "Contact No." = filter(<> ''),
+                                  "Contact No." = field(FILTER("Lookup Contact No."));
+                    RunPageView = sorting("Contact No.", "Segment No.");
                     ToolTip = 'View the segments that are related to the contact.';
                 }
                 action("Mailing &Groups")
@@ -494,7 +517,7 @@ page 5052 "Contact List"
                     Caption = 'Mailing &Groups';
                     Image = DistributionGroup;
                     RunObject = Page "Contact Mailing Groups";
-                    RunPageLink = "Contact No." = FIELD("No.");
+                    RunPageLink = "Contact No." = field("No.");
                     ToolTip = 'View or edit the mailing groups that the contact is assigned to, for example, for sending price lists or Christmas cards.';
                 }
                 action(RelatedCustomer)
@@ -573,7 +596,7 @@ page 5052 "Contact List"
                     var
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        PriceUXManagement.ShowPriceLists(Rec, "Price Type"::Sale, "Price Amount Type"::Any);
+                        PriceUXManagement.ShowPriceLists(Rec, Enum::"Price Type"::Sale, Enum::"Price Amount Type"::Any);
                     end;
                 }
                 action(PriceLines)
@@ -591,7 +614,7 @@ page 5052 "Contact List"
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Price);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Price);
                     end;
                 }
                 action(DiscountLines)
@@ -609,7 +632,7 @@ page 5052 "Contact List"
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Discount);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
 #if not CLEAN21
@@ -657,11 +680,11 @@ page 5052 "Contact List"
                     Caption = 'Open Oppo&rtunities';
                     Image = OpportunityList;
                     RunObject = Page "Opportunity List";
-                    RunPageLink = "Contact Company No." = FIELD("Company No."),
-                                  "Contact No." = FILTER(<> ''),
-                                  "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                  Status = FILTER("Not Started" | "In Progress");
-                    RunPageView = SORTING("Contact Company No.", "Contact No.");
+                    RunPageLink = "Contact Company No." = field("Company No."),
+                                  "Contact No." = filter(<> ''),
+                                  "Contact No." = field(FILTER("Lookup Contact No.")),
+                                  Status = filter("Not Started" | "In Progress");
+                    RunPageView = sorting("Contact Company No.", "Contact No.");
                     Scope = Repeater;
                     ToolTip = 'View the open sales opportunities that are handled by salespeople for the contact. Opportunities must involve a contact and can be linked to campaigns.';
                 }
@@ -671,10 +694,10 @@ page 5052 "Contact List"
                     Caption = 'Postponed &Interactions';
                     Image = PostponedInteractions;
                     RunObject = Page "Postponed Interactions";
-                    RunPageLink = "Contact Company No." = FIELD("Company No."),
-                                  "Contact No." = FILTER(<> ''),
-                                  "Contact No." = FIELD(FILTER("Lookup Contact No."));
-                    RunPageView = SORTING("Contact Company No.", "Contact No.");
+                    RunPageLink = "Contact Company No." = field("Company No."),
+                                  "Contact No." = filter(<> ''),
+                                  "Contact No." = field(FILTER("Lookup Contact No."));
+                    RunPageView = sorting("Contact Company No.", "Contact No.");
                     ToolTip = 'View postponed interactions for the contact.';
                 }
             }
@@ -688,8 +711,8 @@ page 5052 "Contact List"
                     Caption = 'Sales &Quotes';
                     Image = Quote;
                     RunObject = Page "Sales Quotes";
-                    RunPageLink = "Sell-to Contact No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", "Sell-to Contact No.");
+                    RunPageLink = "Sell-to Contact No." = field("No.");
+                    RunPageView = sorting("Document Type", "Sell-to Contact No.");
                     ToolTip = 'View sales quotes that exist for the contact.';
                 }
             }
@@ -703,11 +726,11 @@ page 5052 "Contact List"
                     Caption = 'Closed Oppo&rtunities';
                     Image = OpportunityList;
                     RunObject = Page "Opportunity List";
-                    RunPageLink = "Contact Company No." = FIELD("Company No."),
-                                  "Contact No." = FILTER(<> ''),
-                                  "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                  Status = FILTER(Won | Lost);
-                    RunPageView = SORTING("Contact Company No.", "Contact No.");
+                    RunPageLink = "Contact Company No." = field("Company No."),
+                                  "Contact No." = filter(<> ''),
+                                  "Contact No." = field(FILTER("Lookup Contact No.")),
+                                  Status = filter(Won | Lost);
+                    RunPageView = sorting("Contact Company No.", "Contact No.");
                     ToolTip = 'View the closed sales opportunities that are handled by salespeople for the contact. Opportunities must involve a contact and can be linked to campaigns.';
                 }
                 action("Interaction Log E&ntries")
@@ -716,10 +739,10 @@ page 5052 "Contact List"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Contact Company No." = FIELD("Company No."),
-                                  "Contact No." = FILTER(<> ''),
-                                  "Contact No." = FIELD(FILTER("Lookup Contact No."));
-                    RunPageView = SORTING("Contact Company No.", "Contact No.");
+                    RunPageLink = "Contact Company No." = field("Company No."),
+                                  "Contact No." = filter(<> ''),
+                                  "Contact No." = field(FILTER("Lookup Contact No."));
+                    RunPageView = sorting("Contact Company No.", "Contact No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
@@ -729,7 +752,7 @@ page 5052 "Contact List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Contact Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -767,7 +790,7 @@ page 5052 "Contact List"
                     var
                         TAPIManagement: Codeunit TAPIManagement;
                     begin
-                        TAPIManagement.DialContCustVendBank(DATABASE::Contact, "No.", GetDefaultPhoneNo(), '');
+                        TAPIManagement.DialContCustVendBank(DATABASE::Contact, Rec."No.", Rec.GetDefaultPhoneNo(), '');
                     end;
                 }
                 action("Launch &Web Source")
@@ -781,7 +804,7 @@ page 5052 "Contact List"
                     var
                         ContactWebSource: Record "Contact Web Source";
                     begin
-                        ContactWebSource.SetRange("Contact No.", "Company No.");
+                        ContactWebSource.SetRange("Contact No.", Rec."Company No.");
                         if PAGE.RunModal(PAGE::"Web Source Launch", ContactWebSource) = ACTION::LookupOK then
                             ContactWebSource.Launch();
                     end;
@@ -799,7 +822,7 @@ page 5052 "Contact List"
 
                         trigger OnAction()
                         begin
-                            CreateCustomer();
+                            Rec.CreateCustomer();
                         end;
                     }
                     action(Vendor)
@@ -811,7 +834,7 @@ page 5052 "Contact List"
 
                         trigger OnAction()
                         begin
-                            CreateVendor();
+                            Rec.CreateVendor();
                         end;
                     }
                     action(Bank)
@@ -824,7 +847,7 @@ page 5052 "Contact List"
 
                         trigger OnAction()
                         begin
-                            CreateBankAccount();
+                            Rec.CreateBankAccount();
                         end;
                     }
                     action(CreateEmployee)
@@ -853,7 +876,7 @@ page 5052 "Contact List"
 
                         trigger OnAction()
                         begin
-                            CreateCustomerLink();
+                            Rec.CreateCustomerLink();
                         end;
                     }
                     action(Action64)
@@ -865,7 +888,7 @@ page 5052 "Contact List"
 
                         trigger OnAction()
                         begin
-                            CreateVendorLink();
+                            Rec.CreateVendorLink();
                         end;
                     }
                     action(Action65)
@@ -878,7 +901,7 @@ page 5052 "Contact List"
 
                         trigger OnAction()
                         begin
-                            CreateBankAccountLink();
+                            Rec.CreateBankAccountLink();
                         end;
                     }
                     action(LinkEmployee)
@@ -890,7 +913,7 @@ page 5052 "Contact List"
 
                         trigger OnAction()
                         begin
-                            CreateEmployeeLink();
+                            Rec.CreateEmployeeLink();
                         end;
                     }
                 }
@@ -923,7 +946,7 @@ page 5052 "Contact List"
 
                 trigger OnAction()
                 begin
-                    CreateInteraction();
+                    Rec.CreateInteraction();
                 end;
             }
             action("Create Opportunity")
@@ -932,8 +955,8 @@ page 5052 "Contact List"
                 Caption = 'Create Opportunity';
                 Image = NewOpportunity;
                 RunObject = Page "Opportunity Card";
-                RunPageLink = "Contact No." = FIELD("No."),
-                              "Contact Company No." = FIELD("Company No.");
+                RunPageLink = "Contact No." = field("No."),
+                              "Contact Company No." = field("Company No.");
                 RunPageMode = Create;
                 ToolTip = 'Register a sales opportunity for the contact.';
             }
@@ -1008,7 +1031,7 @@ page 5052 "Contact List"
 
                 trigger OnAction()
                 begin
-                    CreateSalesQuoteFromContact();
+                    Rec.CreateSalesQuoteFromContact();
                 end;
             }
         }
@@ -1170,7 +1193,7 @@ page 5052 "Contact List"
     begin
         EnableFields();
         if CRMIntegrationEnabled or CDSIntegrationEnabled then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
         SetEnabledRelatedActions();
 
         CurrPage.SetSelectionFilter(Contact);
@@ -1179,7 +1202,7 @@ page 5052 "Contact List"
 
     trigger OnAfterGetRecord()
     begin
-        StyleIsStrong := Type = Type::Company;
+        StyleIsStrong := Rec.Type = Rec.Type::Company;
     end;
 
     trigger OnOpenPage()
@@ -1221,9 +1244,7 @@ page 5052 "Contact List"
     var
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
-        [InDataSet]
         CanSendEmail: Boolean;
-        [InDataSet]
         StyleIsStrong: Boolean;
         CompanyGroupEnabled: Boolean;
         PersonGroupEnabled: Boolean;
@@ -1239,8 +1260,8 @@ page 5052 "Contact List"
 
     local procedure EnableFields()
     begin
-        CompanyGroupEnabled := Type = Type::Company;
-        PersonGroupEnabled := Type = Type::Person;
+        CompanyGroupEnabled := Rec.Type = Rec.Type::Company;
+        PersonGroupEnabled := Rec.Type = Rec.Type::Person;
         ExportContactEnabled := Rec."No." <> '';
     end;
 

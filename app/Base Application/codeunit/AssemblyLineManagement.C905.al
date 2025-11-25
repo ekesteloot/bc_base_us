@@ -1,3 +1,14 @@
+﻿namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Worksheet;
+
 codeunit 905 "Assembly Line Management"
 {
     Permissions = TableData "Assembly Line" = rimd;
@@ -280,6 +291,7 @@ codeunit 905 "Assembly Line Management"
         DueDateBeforeWorkDate: Boolean;
         NewLineDueDate: Date;
         IsHandled: Boolean;
+        ShouldReplaceAsmLines: Boolean;
     begin
         IsHandled := false;
         OnBeforeUpdateAssemblyLines(AsmHeader, OldAsmHeader, FieldNum, ReplaceLinesFromBOM, CurrFieldNo, CurrentFieldNum, IsHandled, HideValidationDialog);
@@ -302,7 +314,9 @@ codeunit 905 "Assembly Line Management"
         OnUpdateAssemblyLinesOnAfterCopyAssemblyData(TempAssemblyLine, ReplaceLinesFromBOM);
         if ReplaceLinesFromBOM then begin
             TempAssemblyLine.DeleteAll();
-            if not ((AsmHeader."Quantity (Base)" = 0) or (AsmHeader."Item No." = '')) then begin  // condition to replace asm lines
+            ShouldReplaceAsmLines := not ((AsmHeader."Quantity (Base)" = 0) or (AsmHeader."Item No." = '')); // condition to replace asm lines
+            OnUpdateAssemblyLinesOnAfterCalcShouldReplaceAsmLines(AsmHeader, TempAssemblyLine, ShouldReplaceAsmLines);
+            if ShouldReplaceAsmLines then begin
                 IsHandled := false;
                 OnBeforeReplaceAssemblyLines(AsmHeader, TempAssemblyLine, IsHandled);
                 if not IsHandled then begin
@@ -743,8 +757,8 @@ codeunit 905 "Assembly Line Management"
                 repeat
                     if ItemTrackingMgt.GetWhseItemTrkgSetup("No.") then
                         ItemTrackingMgt.InitItemTrackingForTempWhseWorksheetLine(
-                            "Warehouse Worksheet Document Type"::Assembly, "Document No.", "Line No.",
-                            DATABASE::"Assembly Line", "Document Type".AsInteger(), "Document No.", "Line No.", 0);
+                            Enum::"Warehouse Worksheet Document Type"::Assembly, "Document No.", "Line No.",
+                            Enum::TableID::"Assembly Line".AsInteger(), "Document Type".AsInteger(), "Document No.", "Line No.", 0);
                 until Next() = 0;
         end;
     end;
@@ -867,6 +881,11 @@ codeunit 905 "Assembly Line Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateAssemblyLinesOnBeforeAutoReserveAsmLine(var AssemblyLine: Record "Assembly Line"; ReplaceLinesFromBOM: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateAssemblyLinesOnAfterCalcShouldReplaceAsmLines(AssemblyHeader: Record "Assembly Header"; TempAssemblyLine: Record "Assembly Line" temporary; var ShouldReplaceAsmLines: Boolean)
     begin
     end;
 

@@ -1,3 +1,27 @@
+﻿namespace Microsoft.Manufacturing.RoleCenters;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Journal;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Reports;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Activity;
+using System.Security.User;
+using System.Threading;
+
 page 9012 "Shop Supervisor Role Center"
 {
     Caption = 'Shop Supervisor - Manufacturing Comprehensive';
@@ -169,7 +193,7 @@ page 9012 "Shop Supervisor Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = 'Produced';
                 RunObject = Page "Item List";
-                RunPageView = WHERE("Replenishment System" = CONST("Prod. Order"));
+                RunPageView = where("Replenishment System" = const("Prod. Order"));
                 ToolTip = 'View the list of production items.';
             }
             action(ItemsRawMaterials)
@@ -177,9 +201,9 @@ page 9012 "Shop Supervisor Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = 'Raw Materials';
                 RunObject = Page "Item List";
-                RunPageView = WHERE("Low-Level Code" = FILTER(> 0),
-                                    "Replenishment System" = CONST(Purchase),
-                                    "Production BOM No." = FILTER(= ''));
+                RunPageView = where("Low-Level Code" = filter(> 0),
+                                    "Replenishment System" = const(Purchase),
+                                    "Production BOM No." = filter(= ''));
                 ToolTip = 'View the list of items that are not bills of material.';
             }
             action("Stockkeeping Units")
@@ -246,8 +270,8 @@ page 9012 "Shop Supervisor Role Center"
                 ApplicationArea = Planning;
                 Caption = 'Requisition Worksheets';
                 RunObject = Page "Req. Wksh. Names";
-                RunPageView = WHERE("Template Type" = CONST("Req."),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const("Req."),
+                                    Recurring = const(false));
                 ToolTip = 'Calculate a supply plan to fulfill item demand with purchases or transfers.';
             }
             action(SubcontractingWorksheets)
@@ -255,8 +279,8 @@ page 9012 "Shop Supervisor Role Center"
                 ApplicationArea = Planning;
                 Caption = 'Subcontracting Worksheets';
                 RunObject = Page "Req. Wksh. Names";
-                RunPageView = WHERE("Template Type" = CONST("For. Labor"),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const("For. Labor"),
+                                    Recurring = const(false));
                 ToolTip = 'Calculate the needed production supply, find the production orders that have material ready to send to a subcontractor, and automatically create purchase orders for subcontracted operations from production order routings.';
             }
         }
@@ -271,8 +295,8 @@ page 9012 "Shop Supervisor Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Consumption Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Consumption),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Consumption),
+                                        Recurring = const(false));
                     ToolTip = 'Post the consumption of material as operations are performed.';
                 }
                 action(OutputJournals)
@@ -280,8 +304,8 @@ page 9012 "Shop Supervisor Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Output Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Output),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Output),
+                                        Recurring = const(false));
                     ToolTip = 'Post finished end items and time spent in production. ';
                 }
                 action(CapacityJournals)
@@ -289,8 +313,8 @@ page 9012 "Shop Supervisor Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Capacity Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Capacity),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Capacity),
+                                        Recurring = const(false));
                     ToolTip = 'Post consumed capacities that are not assigned to the production order. For example, maintenance work must be assigned to capacity, but not to a production order.';
                 }
                 action(RecurringCapacityJournals)
@@ -298,8 +322,8 @@ page 9012 "Shop Supervisor Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Recurring Capacity Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Capacity),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(Capacity),
+                                        Recurring = const(true));
                     ToolTip = 'Post consumed capacities that are not posted as part of production order output, such as maintenance work.';
                 }
             }

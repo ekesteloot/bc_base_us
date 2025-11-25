@@ -1,3 +1,9 @@
+﻿namespace System.Security.AccessControl;
+
+using Microsoft.Foundation.Company;
+using System.Environment;
+using System.Security.User;
+
 page 9852 "Effective Permissions"
 {
     ApplicationArea = All;
@@ -211,13 +217,13 @@ page 9852 "Effective Permissions"
         EffectivePermissionsMgt: Codeunit "Effective Permissions Mgt.";
     begin
         // Refresh
-        if "Object ID" <> 0 then begin // handle case when there are no records at all
+        if Rec."Object ID" <> 0 then begin // handle case when there are no records at all
             EffectivePermissionsMgt.PopulatePermissionRecordWithEffectivePermissionsForObject(Rec, CurrentUserID, CurrentCompanyName,
-              "Object Type", "Object ID");
-            Modify();
+              Rec."Object Type", Rec."Object ID");
+            Rec.Modify();
         end;
 
-        CurrPage.ByPermissionSet.PAGE.SetRecordAndRefresh(CurrentUserID, CurrentCompanyName, "Object Type", "Object ID");
+        CurrPage.ByPermissionSet.PAGE.SetRecordAndRefresh(CurrentUserID, CurrentCompanyName, Rec."Object Type", Rec."Object ID");
     end;
 
     trigger OnAfterGetRecord()
@@ -225,11 +231,11 @@ page 9852 "Effective Permissions"
         TenantPermission: Record "Tenant Permission";
         ZeroGuid: Guid;
     begin
-        if "Object ID" = 0 then
+        if Rec."Object ID" = 0 then
             exit;
         TenantPermission.SetRange("App ID", ZeroGuid); // does not come from an extension
-        TenantPermission.SetRange("Object Type", "Object Type");
-        TenantPermission.SetRange("Object ID", "Object ID");
+        TenantPermission.SetRange("Object Type", Rec."Object Type");
+        TenantPermission.SetRange("Object ID", Rec."Object ID");
         ContainedInCustomPermissionSet := not TenantPermission.IsEmpty();
     end;
 
@@ -258,7 +264,7 @@ page 9852 "Effective Permissions"
         LastUsedShowAllObjects: Boolean;
         ShowAllObjects: Boolean;
         ContainedInCustomPermissionSet: Boolean;
-        OnlyAadUsersAllowedErr: Label 'The effective permissions content can be shown only for Azure AAD users.';
+        OnlyAadUsersAllowedErr: Label 'The effective permissions content can be shown only for Microsoft Entra ID users.';
 
     local procedure FillByObject()
     var

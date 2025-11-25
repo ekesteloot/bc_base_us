@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Dataverse;
+
+using Microsoft.Integration.SyncEngine;
+using System.Threading;
+
 page 5373 "CRM Synch. Job Queue"
 {
     Caption = 'Microsoft Dynamics 365 Sales Synch. Job Queue';
@@ -5,7 +14,7 @@ page 5373 "CRM Synch. Job Queue"
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "Job Queue Entry";
-    SourceTableView = SORTING("Last Ready State");
+    SourceTableView = sorting("Last Ready State");
 
     layout
     {
@@ -49,17 +58,16 @@ page 5373 "CRM Synch. Job Queue"
 
     trigger OnAfterGetRecord()
     begin
-        StatusIsError := Status = Status::Error;
+        StatusIsError := Rec.Status = Rec.Status::Error;
     end;
 
     trigger OnOpenPage()
     begin
-        SetRange(Status, Status::Error);
-        SetFilter("Object ID to Run", '%1|%2|%3', Codeunit::"Integration Synch. Job Runner", Codeunit::"Int. Uncouple Job Runner", Codeunit::"Int. Coupling Job Runner");
+        Rec.SetRange(Status, Rec.Status::Error);
+        Rec.SetFilter("Object ID to Run", '%1|%2|%3', Codeunit::"Integration Synch. Job Runner", Codeunit::"Int. Uncouple Job Runner", Codeunit::"Int. Coupling Job Runner");
     end;
 
     var
-        [InDataSet]
         StatusIsError: Boolean;
 }
 

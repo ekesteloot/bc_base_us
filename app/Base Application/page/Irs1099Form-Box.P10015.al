@@ -13,7 +13,7 @@ page 10015 "IRS 1099 Form-Box"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicUS;
                     ToolTip = 'Specifies the 1099 form and the 1099 box.';
@@ -68,8 +68,8 @@ page 10015 "IRS 1099 Form-Box"
                 ApplicationArea = Basic, Suite;
                 Image = AdjustEntries;
                 RunObject = Page "IRS 1099 Adjustments";
-                RunPageLink = "IRS 1099 Code" = FIELD(Code);
-                RunPageView = SORTING("Vendor No.", "IRS 1099 Code", Year);
+                RunPageLink = "IRS 1099 Code" = field(Code);
+                RunPageView = sorting("Vendor No.", "IRS 1099 Code", Year);
                 ToolTip = 'Specifies the adjusted amount per vendor and year.';
             }
         }

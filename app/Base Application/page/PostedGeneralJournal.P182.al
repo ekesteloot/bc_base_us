@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.Dimension.Correction;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Shared.Navigate;
+using System.Automation;
+
 page 182 "Posted General Journal"
 {
     ApplicationArea = Basic, Suite;
@@ -198,7 +206,7 @@ page 182 "Posted General Journal"
             part(Control1900919607; "Dimension Set Entries FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Dimension Set ID" = FIELD("Dimension Set ID");
+                SubPageLink = "Dimension Set ID" = field("Dimension Set ID");
             }
             systempart(Control1900383207; Links)
             {
@@ -266,7 +274,7 @@ page 182 "Posted General Journal"
                     var
                         Navigate: Page Navigate;
                     begin
-                        Navigate.SetDoc("Posting Date", "Document No.");
+                        Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                         Navigate.Run();
                     end;
                 }
@@ -290,6 +298,23 @@ page 182 "Posted General Journal"
                         GLEntry.SetRange("Posting Date", Rec."Posting Date");
                         DimensionCorrectionMgt.CreateCorrectionFromFilter(GLEntry, DimensionCorrection);
                         Page.Run(PAGE::"Dimension Correction Draft", DimensionCorrection);
+                    end;
+                }
+                action(Approvals)
+                {
+                    AccessByPermission = TableData "Posted Approval Entry" = R;
+                    ApplicationArea = Suite;
+                    Caption = 'Approvals';
+                    Image = Approvals;
+                    ToolTip = 'View a list of the records that are approved and posted through General Journal.';
+
+                    trigger OnAction()
+                    var
+                        GLRegister: Record "G/L Register";
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                    begin
+                        if GLRegister.Get(Rec."G/L Register No.") then
+                            ApprovalsMgmt.ShowPostedApprovalEntries(GLRegister.RecordId);
                     end;
                 }
             }
@@ -321,9 +346,9 @@ page 182 "Posted General Journal"
 
     trigger OnAfterGetRecord()
     begin
-        if GLRegisterNo <> "G/L Register No." then begin
+        if GLRegisterNo <> Rec."G/L Register No." then begin
             Bold := true;
-            GLRegisterNo := "G/L Register No.";
+            GLRegisterNo := Rec."G/L Register No.";
         end else
             Bold := false;
     end;
@@ -333,9 +358,9 @@ page 182 "Posted General Journal"
         if not LookuptemplateBatchName() then
             exit;
 
-        SetRange("Journal Template Name", CurrentJnlTemplateName);
-        SetRange("Journal Batch Name", CurrentJnlBatchName);
-        if FindSet() then;
+        Rec.SetRange("Journal Template Name", CurrentJnlTemplateName);
+        Rec.SetRange("Journal Batch Name", CurrentJnlBatchName);
+        if Rec.FindSet() then;
         CurrPage.Update(false);
     end;
 

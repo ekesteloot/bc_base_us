@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.RoleCenters;
+
 profile "SALES"
 {
     Enabled = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
 page 7500 "Item Attributes"
 {
     ApplicationArea = Basic, Suite;
@@ -26,7 +28,7 @@ page 7500 "Item Attributes"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of the item attribute.';
                 }
-                field(Values; GetValues())
+                field(Values; Rec.GetValues())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Values';
@@ -34,10 +36,10 @@ page 7500 "Item Attributes"
 
                     trigger OnDrillDown()
                     begin
-                        OpenItemAttributeValues();
+                        Rec.OpenItemAttributeValues();
                     end;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the attribute cannot be assigned to an item. Items to which the attribute is already assigned are not affected.';
@@ -57,10 +59,10 @@ page 7500 "Item Attributes"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item Attribute &Values';
-                    Enabled = (Type = Type::Option);
+                    Enabled = (Rec.Type = Rec.Type::Option);
                     Image = CalculateInventory;
                     RunObject = Page "Item Attribute Values";
-                    RunPageLink = "Attribute ID" = FIELD(ID);
+                    RunPageLink = "Attribute ID" = field(ID);
                     ToolTip = 'Opens a window in which you can define the values for the selected item attribute.';
                 }
                 action(ItemAttributeTranslations)
@@ -69,7 +71,7 @@ page 7500 "Item Attributes"
                     Caption = 'Translations';
                     Image = Translations;
                     RunObject = Page "Item Attribute Translations";
-                    RunPageLink = "Attribute ID" = FIELD(ID);
+                    RunPageLink = "Attribute ID" = field(ID);
                     ToolTip = 'Opens a window in which you can define the translations for the selected item attribute.';
                 }
             }

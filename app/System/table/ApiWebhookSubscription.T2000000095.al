@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Integration;
+
+using System.Security.AccessControl;
+
 table 2000000095 "API Webhook Subscription"
 {
     Caption = 'API Webhook Subscription';

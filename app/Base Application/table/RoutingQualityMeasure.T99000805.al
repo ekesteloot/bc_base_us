@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 table 99000805 "Routing Quality Measure"
 {
     Caption = 'Routing Quality Measure';
@@ -50,14 +52,14 @@ table 99000805 "Routing Quality Measure"
         field(20; "Version Code"; Code[20])
         {
             Caption = 'Version Code';
-            TableRelation = "Routing Version"."Version Code" WHERE("Routing No." = FIELD("Routing No."));
+            TableRelation = "Routing Version"."Version Code" where("Routing No." = field("Routing No."));
         }
         field(21; "Operation No."; Code[10])
         {
             Caption = 'Operation No.';
             NotBlank = true;
-            TableRelation = "Routing Line"."Operation No." WHERE("Routing No." = FIELD("Routing No."),
-                                                                  "Version Code" = FIELD("Version Code"));
+            TableRelation = "Routing Line"."Operation No." where("Routing No." = field("Routing No."),
+                                                                  "Version Code" = field("Version Code"));
         }
     }
 

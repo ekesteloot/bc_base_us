@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 page 9153 "My Accounts"
 {
     Caption = 'My Accounts';
@@ -29,7 +33,7 @@ page 9153 "My Accounts"
                     Lookup = false;
                     ToolTip = 'Specifies the name of the cash account.';
                 }
-                field(Balance; "Account Balance")
+                field(Balance; Rec."Account Balance")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Balance';
@@ -63,9 +67,9 @@ page 9153 "My Accounts"
                 Caption = 'Open';
                 Image = ViewDetails;
                 RunObject = Page "G/L Account Card";
-                RunPageLink = "No." = FIELD("Account No.");
+                RunPageLink = "No." = field("Account No.");
                 RunPageMode = View;
-                RunPageView = SORTING("No.");
+                RunPageView = sorting("No.");
                 ShortCutKey = 'Return';
                 ToolTip = 'Open the card for the selected record.';
             }
@@ -84,7 +88,7 @@ page 9153 "My Accounts"
 
     trigger OnOpenPage()
     begin
-        SetRange("User ID", UserId);
+        Rec.SetRange("User ID", UserId);
     end;
 
     var
@@ -102,13 +106,13 @@ page 9153 "My Accounts"
             exit;
 
         Clear(GLAccount);
-        if GLAccount.Get("Account No.") then begin
+        if GLAccount.Get(Rec."Account No.") then begin
             GLAccount.CalcFields(Balance);
-            if ("Account Balance" <> GLAccount.Balance) or (Name <> GLAccount.Name) then begin
-                "Account Balance" := GLAccount.Balance;
-                Name := GLAccount.Name;
-                if MyAccount.Get("User ID", "Account No.") then
-                    Modify();
+            if (Rec."Account Balance" <> GLAccount.Balance) or (Rec.Name <> GLAccount.Name) then begin
+                Rec."Account Balance" := GLAccount.Balance;
+                Rec.Name := GLAccount.Name;
+                if MyAccount.Get(Rec."User ID", Rec."Account No.") then
+                    Rec.Modify();
             end;
         end;
     end;

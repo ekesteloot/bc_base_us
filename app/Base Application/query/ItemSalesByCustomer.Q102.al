@@ -6,7 +6,7 @@ query 102 "Item Sales by Customer"
     {
         dataitem(Value_Entry; "Value Entry")
         {
-            DataItemTableFilter = "Source Type" = FILTER(Customer), "Item Ledger Entry No." = FILTER(<> 0), "Document Type" = FILTER("Sales Invoice" | "Sales Credit Memo");
+            DataItemTableFilter = "Source Type" = filter(Customer), "Item Ledger Entry No." = filter(<> 0), "Document Type" = filter("Sales Invoice" | "Sales Credit Memo");
             column(Entry_No; "Entry No.")
             {
             }

@@ -1,3 +1,8 @@
+namespace Microsoft.CashFlow.Setup;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.FinancialMgt.Dimension;
+
 table 849 "Cash Flow Manual Revenue"
 {
     Caption = 'Cash Flow Manual Revenue';
@@ -52,12 +57,12 @@ table 849 "Cash Flow Manual Revenue"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
                 Modify();
             end;
         }
@@ -65,12 +70,12 @@ table 849 "Cash Flow Manual Revenue"
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
                 Modify();
             end;
         }

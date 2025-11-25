@@ -1,3 +1,19 @@
+﻿namespace Microsoft.InventoryMgt.Location;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Picture;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Structure;
+
 page 5700 "Stockkeeping Unit Card"
 {
     Caption = 'Stockkeeping Unit Card';
@@ -79,7 +95,7 @@ page 5700 "Stockkeeping Unit Card"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies how many item units are reserved for service orders, which is how many units are listed on outstanding service order lines.';
                 }
-                field(Inventory; Inventory)
+                field(Inventory; Rec.Inventory)
                 {
                     ApplicationArea = Planning;
                     Importance = Promoted;
@@ -161,7 +177,7 @@ page 5700 "Stockkeeping Unit Card"
 
                     trigger OnValidate()
                     begin
-                        Validate("Replenishment System", SKUReplenishmentSystem);
+                        Rec.Validate("Replenishment System", SKUReplenishmentSystem);
                     end;
                 }
                 field("Lead Time Calculation"; Rec."Lead Time Calculation")
@@ -460,7 +476,7 @@ page 5700 "Stockkeeping Unit Card"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -491,8 +507,8 @@ page 5700 "Stockkeeping Unit Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Item),
-                                  "No." = FIELD("Item No.");
+                    RunPageLink = "Table Name" = const(Item),
+                                  "No." = field("Item No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -501,8 +517,8 @@ page 5700 "Stockkeeping Unit Card"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(27),
-                                  "No." = FIELD("Item No.");
+                    RunPageLink = "Table ID" = const(27),
+                                  "No." = field("Item No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -512,13 +528,13 @@ page 5700 "Stockkeeping Unit Card"
                     Caption = '&Picture';
                     Image = Picture;
                     RunObject = Page "Item Picture";
-                    RunPageLink = "No." = FIELD("Item No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Location Filter" = FIELD("Location Code"),
-                                  "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                  "Variant Filter" = FIELD("Variant Code");
+                    RunPageLink = "No." = field("Item No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Location Filter" = field("Location Code"),
+                                  "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                  "Variant Filter" = field("Variant Code");
                     ToolTip = 'View or add a picture of the item or, for example, the company''s logo.';
                 }
                 separator(Action103)
@@ -530,7 +546,7 @@ page 5700 "Stockkeeping Unit Card"
                     Caption = '&Units of Measure';
                     Image = UnitOfMeasure;
                     RunObject = Page "Item Units of Measure";
-                    RunPageLink = "Item No." = FIELD("Item No.");
+                    RunPageLink = "Item No." = field("Item No.");
                     ToolTip = 'Set up the different units that the item can be traded in, such as piece, box, or hour.';
                 }
                 action("Va&riants")
@@ -539,7 +555,7 @@ page 5700 "Stockkeeping Unit Card"
                     Caption = 'Va&riants';
                     Image = ItemVariant;
                     RunObject = Page "Item Variants";
-                    RunPageLink = "Item No." = FIELD("Item No.");
+                    RunPageLink = "Item No." = field("Item No.");
                     ToolTip = 'View how the inventory level of an item will develop over time according to the variant that you select.';
                 }
                 separator(Action106)
@@ -551,8 +567,8 @@ page 5700 "Stockkeeping Unit Card"
                     Caption = 'Translations';
                     Image = Translations;
                     RunObject = Page "Item Translations";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD(FILTER("Variant Code"));
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field(FILTER("Variant Code"));
                     ToolTip = 'View or edit translated item descriptions. Translated item descriptions are automatically inserted on documents according to the language code.';
                 }
                 action("E&xtended Texts")
@@ -561,9 +577,9 @@ page 5700 "Stockkeeping Unit Card"
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST(Item),
-                                  "No." = FIELD("Item No.");
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const(Item),
+                                  "No." = field("Item No.");
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     ToolTip = 'Select or set up additional text for the description of the item. Extended text can be inserted under the Description field on document lines for the item.';
                 }
             }
@@ -581,13 +597,13 @@ page 5700 "Stockkeeping Unit Card"
                         Caption = 'Entry Statistics';
                         Image = EntryStatistics;
                         RunObject = Page "Item Entry Statistics";
-                        RunPageLink = "No." = FIELD("Item No."),
-                                      "Date Filter" = FIELD("Date Filter"),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Code"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Code");
+                        RunPageLink = "No." = field("Item No."),
+                                      "Date Filter" = field("Date Filter"),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Code"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Code");
                         ToolTip = 'View entry statistics for the record.';
                     }
                     action("T&urnover")
@@ -596,12 +612,12 @@ page 5700 "Stockkeeping Unit Card"
                         Caption = 'T&urnover';
                         Image = Turnover;
                         RunObject = Page "Item Turnover";
-                        RunPageLink = "No." = FIELD("Item No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Code"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Code");
+                        RunPageLink = "No." = field("Item No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Code"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Code");
                         ToolTip = 'View a detailed account of item turnover by periods after you have set the relevant filters for location and variant.';
                     }
                 }
@@ -620,13 +636,13 @@ page 5700 "Stockkeeping Unit Card"
                         var
                             Item: Record Item;
                         begin
-                            Item.Get("Item No.");
-                            Item.SetRange("Location Filter", "Location Code");
-                            Item.SetRange("Variant Filter", "Variant Code");
-                            CopyFilter("Date Filter", Item."Date Filter");
-                            CopyFilter("Global Dimension 1 Filter", Item."Global Dimension 1 Filter");
-                            CopyFilter("Global Dimension 2 Filter", Item."Global Dimension 2 Filter");
-                            CopyFilter("Drop Shipment Filter", Item."Drop Shipment Filter");
+                            Item.Get(Rec."Item No.");
+                            Item.SetRange("Location Filter", Rec."Location Code");
+                            Item.SetRange("Variant Filter", Rec."Variant Code");
+                            Rec.CopyFilter("Date Filter", Item."Date Filter");
+                            Rec.CopyFilter("Global Dimension 1 Filter", Item."Global Dimension 1 Filter");
+                            Rec.CopyFilter("Global Dimension 2 Filter", Item."Global Dimension 2 Filter");
+                            Rec.CopyFilter("Drop Shipment Filter", Item."Drop Shipment Filter");
                             ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByEvent());
                         end;
                     }
@@ -636,12 +652,12 @@ page 5700 "Stockkeeping Unit Card"
                         Caption = 'Period';
                         Image = Period;
                         RunObject = Page "Item Availability by Periods";
-                        RunPageLink = "No." = FIELD("Item No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Code"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Code");
+                        RunPageLink = "No." = field("Item No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Code"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Code");
                         ToolTip = 'View the projected quantity of the item over time according to time periods, such as day, week, or month.';
                     }
                     action(Lot)
@@ -666,9 +682,9 @@ page 5700 "Stockkeeping Unit Card"
                         var
                             Item: Record Item;
                         begin
-                            Item.Get("Item No.");
-                            Item.SetRange("Location Filter", "Location Code");
-                            Item.SetRange("Variant Filter", "Variant Code");
+                            Item.Get(Rec."Item No.");
+                            Item.SetRange("Location Filter", Rec."Location Code");
+                            Item.SetRange("Variant Filter", Rec."Variant Code");
                             ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByBOM());
                         end;
                     }
@@ -686,7 +702,7 @@ page 5700 "Stockkeeping Unit Card"
 
                         trigger OnAction()
                         begin
-                            ShowTimeline(Rec);
+                            Rec.ShowTimeline(Rec);
                         end;
                     }
 #endif                
@@ -697,9 +713,9 @@ page 5700 "Stockkeeping Unit Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Stock. Unit Comment Sheet";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Location Code" = FIELD("Location Code");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Location Code" = field("Location Code");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -717,10 +733,10 @@ page 5700 "Stockkeeping Unit Card"
                         Caption = 'Ledger E&ntries';
                         Image = ItemLedger;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Item No." = FIELD("Item No."),
-                                      "Location Code" = FIELD("Location Code"),
-                                      "Variant Code" = FIELD("Variant Code");
-                        RunPageView = SORTING("Item No.", Open, "Variant Code");
+                        RunPageLink = "Item No." = field("Item No."),
+                                      "Location Code" = field("Location Code"),
+                                      "Variant Code" = field("Variant Code");
+                        RunPageView = sorting("Item No.", Open, "Variant Code");
                         ShortCutKey = 'Ctrl+F7';
                         ToolTip = 'View the history of transactions that have been posted for the selected record.';
                     }
@@ -730,11 +746,11 @@ page 5700 "Stockkeeping Unit Card"
                         Caption = '&Reservation Entries';
                         Image = ReservationLedger;
                         RunObject = Page "Reservation Entries";
-                        RunPageLink = "Item No." = FIELD("Item No."),
-                                      "Location Code" = FIELD("Location Code"),
-                                      "Variant Code" = FIELD("Variant Code"),
-                                      "Reservation Status" = CONST(Reservation);
-                        RunPageView = SORTING("Item No.", "Variant Code", "Location Code", "Reservation Status");
+                        RunPageLink = "Item No." = field("Item No."),
+                                      "Location Code" = field("Location Code"),
+                                      "Variant Code" = field("Variant Code"),
+                                      "Reservation Status" = const(Reservation);
+                        RunPageView = sorting("Item No.", "Variant Code", "Location Code", "Reservation Status");
                         ToolTip = 'View all reservations that are made for the item, either manually or automatically.';
                     }
                     action("&Phys. Inventory Ledger Entries")
@@ -743,10 +759,10 @@ page 5700 "Stockkeeping Unit Card"
                         Caption = '&Phys. Inventory Ledger Entries';
                         Image = PhysicalInventoryLedger;
                         RunObject = Page "Phys. Inventory Ledger Entries";
-                        RunPageLink = "Item No." = FIELD("Item No."),
-                                      "Location Code" = FIELD("Location Code"),
-                                      "Variant Code" = FIELD("Variant Code");
-                        RunPageView = SORTING("Item No.", "Variant Code");
+                        RunPageLink = "Item No." = field("Item No."),
+                                      "Location Code" = field("Location Code"),
+                                      "Variant Code" = field("Variant Code");
+                        RunPageView = sorting("Item No.", "Variant Code");
                         ToolTip = 'View how many units of the item you had in stock at the last physical count.';
                     }
                     action("&Value Entries")
@@ -755,10 +771,10 @@ page 5700 "Stockkeeping Unit Card"
                         Caption = '&Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Item No." = FIELD("Item No."),
-                                      "Location Code" = FIELD("Location Code"),
-                                      "Variant Code" = FIELD("Variant Code");
-                        RunPageView = SORTING("Item No.", "Valuation Date", "Location Code", "Variant Code");
+                        RunPageLink = "Item No." = field("Item No."),
+                                      "Location Code" = field("Location Code"),
+                                      "Variant Code" = field("Variant Code");
+                        RunPageView = sorting("Item No.", "Valuation Date", "Location Code", "Variant Code");
                         ToolTip = 'View the history of posted amounts that affect the value of the item. Value entries are created for every transaction with the item.';
                     }
                     action("Item &Tracking Entries")
@@ -772,7 +788,7 @@ page 5700 "Stockkeeping Unit Card"
                         var
                             ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
                         begin
-                            ItemTrackingDocMgt.ShowItemTrackingForEntity(0, '', "Item No.", "Variant Code", "Location Code");
+                            ItemTrackingDocMgt.ShowItemTrackingForEntity(0, '', Rec."Item No.", Rec."Variant Code", Rec."Location Code");
                         end;
                     }
                 }
@@ -787,10 +803,10 @@ page 5700 "Stockkeeping Unit Card"
                     Caption = '&Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Item No.", "Variant Code");
                     ToolTip = 'View the quantities of the item in each bin where it exists. You can see all the important parameters relating to bin content, and you can modify certain bin content parameters in this window.';
                 }
             }
@@ -972,39 +988,22 @@ page 5700 "Stockkeeping Unit Card"
         SKUReplenishmentSystem: Enum "SKU Replenishment System";
 
     protected var
-        [InDataSet]
         TimeBucketEnable: Boolean;
-        [InDataSet]
         SafetyLeadTimeEnable: Boolean;
-        [InDataSet]
         SafetyStockQtyEnable: Boolean;
-        [InDataSet]
         ReorderPointEnable: Boolean;
-        [InDataSet]
         ReorderQtyEnable: Boolean;
-        [InDataSet]
         MaximumInventoryEnable: Boolean;
-        [InDataSet]
         MinimumOrderQtyEnable: Boolean;
-        [InDataSet]
         MaximumOrderQtyEnable: Boolean;
-        [InDataSet]
         OrderMultipleEnable: Boolean;
-        [InDataSet]
         IncludeInventoryEnable: Boolean;
-        [InDataSet]
         ReschedulingPeriodEnable: Boolean;
-        [InDataSet]
         LotAccumulationPeriodEnable: Boolean;
-        [InDataSet]
         DampenerPeriodEnable: Boolean;
-        [InDataSet]
         DampenerQtyEnable: Boolean;
-        [InDataSet]
         OverflowLevelEnable: Boolean;
-        [InDataSet]
         StandardCostEnable: Boolean;
-        [InDataSet]
         UnitCostEnable: Boolean;
 
     local procedure EnablePlanningControls()
@@ -1050,12 +1049,12 @@ page 5700 "Stockkeeping Unit Card"
 
         InvtSetup.Get();
         Item.Reset();
-        if Item.Get("Item No.") then begin
+        if Item.Get(Rec."Item No.") then begin
             if InvtSetup."Average Cost Calc. Type" = InvtSetup."Average Cost Calc. Type"::"Item & Location & Variant" then begin
-                Item.SetRange("Location Filter", "Location Code");
-                Item.SetRange("Variant Filter", "Variant Code");
+                Item.SetRange("Location Filter", Rec."Location Code");
+                Item.SetRange("Variant Filter", Rec."Variant Code");
             end;
-            Item.SetFilter("Date Filter", GetFilter("Date Filter"));
+            Item.SetFilter("Date Filter", Rec.GetFilter("Date Filter"));
         end;
     end;
 

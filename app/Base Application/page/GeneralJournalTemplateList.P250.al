@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using System.Reflection;
+
 page 250 "General Journal Template List"
 {
     Caption = 'General Journal Template List';

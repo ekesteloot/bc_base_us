@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 574 "Detailed Vendor Ledg. Entries"
 {
     AdditionalSearchTerms = 'purchase transaction,payment';
@@ -52,6 +58,12 @@ page 574 "Detailed Vendor Ledg. Entries"
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the Global Dimension 2 code of the initial vendor ledger entry.';
+                    Visible = false;
+                }
+                field("Posting Group"; Rec."Posting Group")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the vendor''s market type to link business transactions to.';
                     Visible = false;
                 }
                 field("Currency Code"; Rec."Currency Code")
@@ -111,7 +123,7 @@ page 574 "Detailed Vendor Ledg. Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -126,7 +138,7 @@ page 574 "Detailed Vendor Ledg. Entries"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Unapplied; Unapplied)
+                field(Unapplied; Rec.Unapplied)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the entry has been unapplied (undone) from the Unapply Vendor Entries window by the entry no. shown in the Unapplied by Entry No. field.';
@@ -200,7 +212,7 @@ page 574 "Detailed Vendor Ledg. Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

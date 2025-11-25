@@ -122,6 +122,17 @@ table 30141 "Shpfy Return Line"
         }
     }
 
+    trigger OnDelete()
+    var
+        DataCapture: Record "Shpfy Data Capture";
+    begin
+        DataCapture.SetCurrentKey("Linked To Table", "Linked To Id");
+        DataCapture.SetRange("Linked To Table", Database::"Shpfy Return Line");
+        DataCapture.SetRange("Linked To Id", Rec.SystemId);
+        if not DataCapture.IsEmpty then
+            DataCapture.DeleteAll(false);
+    end;
+
     internal procedure GetReturnReasonNote(): Text
     var
         TypeHelper: Codeunit "Type Helper";

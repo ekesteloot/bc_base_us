@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Contact;
+
 table 5057 "Industry Group"
 {
     Caption = 'Industry Group';
@@ -17,7 +21,7 @@ table 5057 "Industry Group"
         }
         field(3; "No. of Contacts"; Integer)
         {
-            CalcFormula = Count ("Contact Industry Group" WHERE("Industry Group Code" = FIELD(Code)));
+            CalcFormula = Count("Contact Industry Group" where("Industry Group Code" = field(Code)));
             Caption = 'No. of Contacts';
             Editable = false;
             FieldClass = FlowField;

@@ -1,4 +1,8 @@
 #if not CLEAN21
+namespace Microsoft.ProjectMgt.Resources.Pricing;
+
+using Microsoft.Pricing.Calculation;
+
 page 203 "Resource Costs"
 {
     ApplicationArea = Basic, Suite;
@@ -23,7 +27,7 @@ page 203 "Resource Costs"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the type.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the code.';

@@ -1,3 +1,8 @@
+namespace System.Threading;
+
+using System.Azure.Identity;
+using System.Security.AccessControl;
+
 page 672 "Job Queue Entries"
 {
     ApplicationArea = Basic, Suite;
@@ -5,7 +10,7 @@ page 672 "Job Queue Entries"
     CardPageID = "Job Queue Entry Card";
     PageType = List;
     SourceTable = "Job Queue Entry";
-    SourceTableView = SORTING("Last Ready State");
+    SourceTableView = sorting("Last Ready State");
     UsageCategory = Lists;
 
     layout
@@ -69,11 +74,11 @@ page 672 "Job Queue Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the earliest date and time when the job queue entry should be run.';
                 }
-                field(Scheduled; Scheduled)
+                field(Scheduled; Rec.Scheduled)
                 {
                     ApplicationArea = Basic, Suite;
                     Style = Unfavorable;
-                    StyleExpr = NOT Scheduled;
+                    StyleExpr = NOT Rec.Scheduled;
                     ToolTip = 'Specifies if the job queue entry has been scheduled to run automatically, which happens when an entry changes status to Ready. If the field is cleared, the job queue entry is not scheduled to run.';
                 }
                 field("Recurring Job"; Rec."Recurring Job")
@@ -140,7 +145,7 @@ page 672 "Job Queue Entries"
                     ToolTip = 'Specifies the latest time of the day that the recurring job queue entry is to be run.';
                     Visible = false;
                 }
-                field(Timeout; "Job Timeout")
+                field(Timeout; Rec."Job Timeout")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the maximum time that the job queue entry is allowed to run.';
@@ -183,7 +188,7 @@ page 672 "Job Queue Entries"
                         if IsUserDelegated then
                             JobQueueManagement.SendForApproval(Rec)
                         else
-                            SetStatus(Status::Ready);
+                            Rec.SetStatus(Rec.Status::Ready);
                     end;
                 }
                 action(Suspend)
@@ -195,7 +200,7 @@ page 672 "Job Queue Entries"
 
                     trigger OnAction()
                     begin
-                        SetStatus(Status::"On Hold");
+                        Rec.SetStatus(Rec.Status::"On Hold");
                     end;
                 }
                 action(ShowError)
@@ -207,7 +212,7 @@ page 672 "Job Queue Entries"
 
                     trigger OnAction()
                     begin
-                        ShowErrorMessage();
+                        Rec.ShowErrorMessage();
                     end;
                 }
                 action(Restart)
@@ -222,7 +227,7 @@ page 672 "Job Queue Entries"
                         if IsUserDelegated then
                             JobQueueManagement.SendForApproval(Rec)
                         else
-                            Restart();
+                            Rec.Restart();
                     end;
                 }
                 action(RunInForeground)
@@ -253,7 +258,7 @@ page 672 "Job Queue Entries"
                     Caption = 'Log Entries';
                     Image = Log;
                     RunObject = Page "Job Queue Log Entries";
-                    RunPageLink = ID = FIELD(ID);
+                    RunPageLink = ID = field(ID);
                     ToolTip = 'View the job queue log entries.';
                 }
                 action(ShowRecord)
@@ -265,7 +270,7 @@ page 672 "Job Queue Entries"
 
                     trigger OnAction()
                     begin
-                        LookupRecordToProcess();
+                        Rec.LookupRecordToProcess();
                     end;
                 }
                 action(RemoveError)
@@ -346,11 +351,11 @@ page 672 "Job Queue Entries"
         User: Record User;
     begin
         UserDoesNotExist := false;
-        if "User ID" = UserId then
+        if Rec."User ID" = UserId then
             exit;
         if User.IsEmpty() then
             exit;
-        User.SetRange("User Name", "User ID");
+        User.SetRange("User Name", Rec."User ID");
         UserDoesNotExist := User.IsEmpty();
     end;
 

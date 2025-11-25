@@ -9,7 +9,7 @@ report 10478 "Elec. Service Cr Memo MX"
     {
         dataitem("Service Cr.Memo Header"; "Service Cr.Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Service Credit Memo';
             column(Service_Cr_Memo_Header_No_; "No.")
@@ -20,10 +20,10 @@ report 10478 "Elec. Service Cr Memo MX"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo_Picture; CompanyInfo.Picture)
                     {
                     }
@@ -234,7 +234,7 @@ report 10478 "Elec. Service Cr Memo MX"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Service Cr.Memo Header";
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DimText; DimText)
                         {
                         }
@@ -263,9 +263,9 @@ report 10478 "Elec. Service Cr Memo MX"
                     }
                     dataitem("Service Cr.Memo Line"; "Service Cr.Memo Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Service Cr.Memo Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(TypeInt; TypeInt)
                         {
                         }
@@ -476,7 +476,7 @@ report 10478 "Elec. Service Cr Memo MX"
                         }
                         dataitem("Service Shipment Buffer"; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(ServiceShipmentBuffer__Posting_Date_; Format(ServiceShipmentBuffer."Posting Date"))
                             {
                             }
@@ -506,7 +506,7 @@ report 10478 "Elec. Service Cr Memo MX"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(DimText_Control88; DimText)
                             {
                             }
@@ -584,7 +584,7 @@ report 10478 "Elec. Service Cr Memo MX"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmountLine__VAT_Base_; VATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Service Cr.Memo Header"."Currency Code";
@@ -743,11 +743,11 @@ report 10478 "Elec. Service Cr Memo MX"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Service_Cr_Memo_Header___Customer_No__; "Service Cr.Memo Header"."Customer No.")
                         {
                         }
@@ -793,7 +793,7 @@ report 10478 "Elec. Service Cr Memo MX"
                     }
                     dataitem(OriginalStringLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(OriginalStringText; OriginalStringText)
                         {
                         }
@@ -819,7 +819,7 @@ report 10478 "Elec. Service Cr Memo MX"
                     }
                     dataitem(DigitalSignaturePACLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DigitalSignaturePACText; DigitalSignaturePACText)
                         {
                         }
@@ -845,7 +845,7 @@ report 10478 "Elec. Service Cr Memo MX"
                     }
                     dataitem(DigitalSignatureLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DigitalSignatureText; DigitalSignatureText)
                         {
                         }
@@ -871,7 +871,7 @@ report 10478 "Elec. Service Cr Memo MX"
                     }
                     dataitem(QRCode; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Service_Cr_Memo_Header___QR_Code_; "Service Cr.Memo Header"."QR Code")
                         {
                         }
@@ -919,6 +919,7 @@ report 10478 "Elec. Service Cr Memo MX"
                     Error(Text008);
 
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if not CompanyBankAccount.Get("Service Cr.Memo Header"."Company Bank Account Code") then
                     CompanyBankAccount.CopyBankFieldsFromCompanyInfo(CompanyInfo);
@@ -1066,9 +1067,6 @@ report 10478 "Elec. Service Cr Memo MX"
         GLSetup: Record "General Ledger Setup";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyBankAccount: Record "Bank Account";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         ServiceSetup: Record "Service Mgt. Setup";
         VATAmountLine: Record "VAT Amount Line" temporary;
         DimSetEntry: Record "Dimension Set Entry";
@@ -1167,6 +1165,11 @@ report 10478 "Elec. Service Cr Memo MX"
         SATPaymentMethod: Text[50];
         SATPaymentTerm: Text[50];
         SATTaxRegimeClassification: Text[100];
+
+    protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     procedure FindPostedShipmentDate(): Date
     var

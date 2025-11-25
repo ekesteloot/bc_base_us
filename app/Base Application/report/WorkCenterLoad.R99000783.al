@@ -1,7 +1,12 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Manufacturing.WorkCenter;
+using System.Utilities;
+
 report 99000783 "Work Center Load"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/WorkCenterLoad.rdlc';
+    RDLCLayout = './Manufacturing/Reports/WorkCenterLoad.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Work Center Load';
     UsageCategory = ReportsAndAnalysis;
@@ -51,7 +56,7 @@ report 99000783 "Work Center Load"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 PrintOnlyIfDetail = true;
                 column(PeriodStartingDate; Format(PeriodStartingDate))
                 {
@@ -67,9 +72,9 @@ report 99000783 "Work Center Load"
                 }
                 dataitem("Work Center"; "Work Center")
                 {
-                    DataItemLink = "Work Center Group Code" = FIELD(Code);
+                    DataItemLink = "Work Center Group Code" = field(Code);
                     DataItemLinkReference = "Work Center Group";
-                    DataItemTableView = SORTING("Work Center Group Code");
+                    DataItemTableView = sorting("Work Center Group Code");
                     RequestFilterFields = "Work Shift Filter";
                     column(No_WorkCntr; "No.")
                     {

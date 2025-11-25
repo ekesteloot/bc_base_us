@@ -1,7 +1,11 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.Foundation.Company;
+
 report 10199 "Resource Statistics"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ResourceStatistics.rdlc';
+    RDLCLayout = './ProjectMgt/Resources/Reports/ResourceStatistics.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Resource Statistics';
     UsageCategory = ReportsAndAnalysis;

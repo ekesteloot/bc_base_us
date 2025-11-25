@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.InventoryMgt.Setup;
+
 codeunit 2847 "Cost Adj. Sch. Notif. Handler"
 {
     var

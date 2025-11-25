@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 page 472 "VAT Posting Setup"
 {
     ApplicationArea = Basic, Suite;
@@ -190,7 +192,7 @@ page 472 "VAT Posting Setup"
 
                 trigger OnAction()
                 begin
-                    SuggestSetupAccounts();
+                    Rec.SuggestSetupAccounts();
                 end;
             }
             action(Copy)
@@ -230,7 +232,7 @@ page 472 "VAT Posting Setup"
     var
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
     begin
-        SetAccountsVisibility(UnrealizedVATVisible, AdjustForPmtDiscVisible);
+        Rec.SetAccountsVisibility(UnrealizedVATVisible, AdjustForPmtDiscVisible);
         NonDeductibleVATVisible := NonDeductibleVAT.IsNonDeductibleVATEnabled();
     end;
 

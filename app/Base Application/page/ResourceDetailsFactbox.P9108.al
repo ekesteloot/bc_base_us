@@ -1,3 +1,12 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+#if not CLEAN21
+using Microsoft.ProjectMgt.Resources.Pricing;
+#endif
+
 page 9108 "Resource Details FactBox"
 {
     Caption = 'Resource Details';
@@ -37,7 +46,7 @@ page 9108 "Resource Details FactBox"
                     RescPrice: Record "Resource Price";
                 begin
                     RescPrice.SetRange(Type, RescPrice.Type::Resource);
-                    RescPrice.SetRange(Code, "No.");
+                    RescPrice.SetRange(Code, Rec."No.");
 
                     PAGE.Run(PAGE::"Resource Prices", RescPrice);
                 end;
@@ -59,7 +68,7 @@ page 9108 "Resource Details FactBox"
                     RescCost: Record "Resource Cost";
                 begin
                     RescCost.SetRange(Type, RescCost.Type::Resource);
-                    RescCost.SetRange(Code, "No.");
+                    RescCost.SetRange(Code, Rec."No.");
 
                     PAGE.Run(PAGE::"Resource Costs", RescCost);
                 end;
@@ -76,7 +85,7 @@ page 9108 "Resource Details FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    Rec.ShowPriceListLines("Price Type"::Sale, "Price Amount Type"::Any);
+                    Rec.ShowPriceListLines(Enum::"Price Type"::Sale, Enum::"Price Amount Type"::Any);
                 end;
             }
             field(NoOfResCosts; NoOfResourceCosts)
@@ -90,7 +99,7 @@ page 9108 "Resource Details FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    Rec.ShowPriceListLines("Price Type"::Purchase, "Price Amount Type"::Any);
+                    Rec.ShowPriceListLines(Enum::"Price Type"::Purchase, Enum::"Price Amount Type"::Any);
                 end;
             }
         }
@@ -110,7 +119,7 @@ page 9108 "Resource Details FactBox"
         NoOfResourcePrices := 0;
         NoOfResourceCosts := 0;
 
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnOpenPage()
@@ -138,13 +147,13 @@ page 9108 "Resource Details FactBox"
         if CalcOldNoOfRecords() then
             exit;
 #endif
-        PriceListLine.SetRange(Status, "Price Status"::Active);
-        PriceListLine.SetRange("Asset Type", "Price Asset Type"::Resource);
+        PriceListLine.SetRange(Status, Enum::"Price Status"::Active);
+        PriceListLine.SetRange("Asset Type", Enum::"Price Asset Type"::Resource);
         PriceListLine.SetRange("Asset No.", Rec."No.");
-        PriceListLine.SetRange("Price Type", "Price Type"::Sale);
+        PriceListLine.SetRange("Price Type", Enum::"Price Type"::Sale);
         NoOfResourcePrices := PriceListLine.Count();
 
-        PriceListLine.SetRange("Price Type", "Price Type"::Purchase);
+        PriceListLine.SetRange("Price Type", Enum::"Price Type"::Purchase);
         NoOfResourceCosts := PriceListLine.Count();
     end;
 
@@ -159,12 +168,12 @@ page 9108 "Resource Details FactBox"
 
         ResourcePrice.Reset();
         ResourcePrice.SetRange(Type, ResourcePrice.Type::Resource);
-        ResourcePrice.SetRange(Code, "No.");
+        ResourcePrice.SetRange(Code, Rec."No.");
         NoOfResourcePrices := ResourcePrice.Count();
 
         ResourceCost.Reset();
         ResourceCost.SetRange(Type, ResourceCost.Type::Resource);
-        ResourceCost.SetRange(Code, "No.");
+        ResourceCost.SetRange(Code, Rec."No.");
         NoOfResourceCosts := ResourceCost.Count();
         exit(true);
     end;

@@ -1,3 +1,14 @@
+﻿namespace Microsoft.Purchases.Pricing;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+
 codeunit 7021 "Purchase Line - Price" implements "Line With Price"
 {
     var
@@ -35,6 +46,24 @@ codeunit 7021 "Purchase Line - Price" implements "Line With Price"
     procedure SetSources(var NewPriceSourceList: codeunit "Price Source List")
     begin
         PriceSourceList.Copy(NewPriceSourceList);
+    end;
+
+    procedure SetPurchaseQtyInvoice(ErrorInfo: ErrorInfo)
+    var
+        CurrPurchaseLine: Record "Purchase Line";
+    begin
+        CurrPurchaseLine.Get(ErrorInfo.RecordId);
+        CurrPurchaseLine.Validate("Qty. to Invoice", CurrPurchaseLine.MaxQtyToInvoice());
+        CurrPurchaseLine.Modify(true);
+    end;
+
+    procedure SetPurchaseReceiveQty(ErrorInfo: ErrorInfo)
+    var
+        CurrPurchaseLine: Record "Purchase Line";
+    begin
+        CurrPurchaseLine.Get(ErrorInfo.RecordId);
+        CurrPurchaseLine.Validate("Qty. to Receive", CurrPurchaseLine."Outstanding Quantity");
+        CurrPurchaseLine.Modify(true);
     end;
 
     procedure GetLine(var Line: Variant)
@@ -129,7 +158,7 @@ codeunit 7021 "Purchase Line - Price" implements "Line With Price"
         PriceCalculationBuffer: Record "Price Calculation Buffer";
     begin
         OnBeforeCopyToBuffer(PurchaseHeader, PurchaseLine);
-        
+
         PriceCalculationBuffer.Init();
         if not SetAssetSource(PriceCalculationBuffer) then
             exit(false);
@@ -210,14 +239,7 @@ codeunit 7021 "Purchase Line - Price" implements "Line With Price"
 
     local procedure GetDocumentDate() DocumentDate: Date;
     begin
-        if PurchaseHeader."Document Type" in
-            [PurchaseHeader."Document Type"::Invoice, PurchaseHeader."Document Type"::"Credit Memo"]
-        then
-            DocumentDate := PurchaseHeader."Posting Date"
-        else
-            DocumentDate := PurchaseHeader."Order Date";
-        if DocumentDate = 0D then
-            DocumentDate := WorkDate();
+        DocumentDate := PurchaseLine.GetDateForCalculations();
         OnAfterGetDocumentDate(DocumentDate, PurchaseHeader, PurchaseLine);
     end;
 
@@ -328,5 +350,5 @@ codeunit 7021 "Purchase Line - Price" implements "Line With Price"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCopyToBuffer(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line")
     begin
-    end;    
+    end;
 }

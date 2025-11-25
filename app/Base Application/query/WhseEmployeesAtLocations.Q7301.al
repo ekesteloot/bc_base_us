@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Setup;
+
+using Microsoft.InventoryMgt.Location;
+
 query 7301 "Whse. Employees at Locations"
 {
     Caption = 'Whse. Employees at Locations';

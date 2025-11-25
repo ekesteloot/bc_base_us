@@ -1,3 +1,14 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 report 82 "Export Budget to Excel"
 {
     Caption = 'Export Budget to Excel';
@@ -7,7 +18,7 @@ report 82 "Export Budget to Excel"
     {
         dataitem("G/L Budget Entry"; "G/L Budget Entry")
         {
-            DataItemTableView = SORTING("Budget Name", "G/L Account No.", "Business Unit Code", "Global Dimension 1 Code", "Global Dimension 2 Code", "Budget Dimension 1 Code", "Budget Dimension 2 Code", "Budget Dimension 3 Code", "Budget Dimension 4 Code", Date);
+            DataItemTableView = sorting("Budget Name", "G/L Account No.", "Business Unit Code", "Global Dimension 1 Code", "Global Dimension 2 Code", "Budget Dimension 1 Code", "Budget Dimension 2 Code", "Budget Dimension 3 Code", "Budget Dimension 4 Code", Date);
             RequestFilterFields = "Budget Name", "Business Unit Code", "G/L Account No.", "Global Dimension 1 Code", "Global Dimension 2 Code", "Budget Dimension 1 Code", "Budget Dimension 2 Code", "Budget Dimension 3 Code", "Budget Dimension 4 Code";
 
             trigger OnAfterGetRecord()
@@ -495,7 +506,7 @@ report 82 "Export Budget to Excel"
         StartDate := NewStartDate;
         NoOfPeriods := NewNoOfPeriods;
         PeriodLength := NewPeriodLength;
-        RoundingFactor := "Analysis Rounding Factor".FromInteger(NewRoundingFactor);
+        RoundingFactor := Enum::"Analysis Rounding Factor".FromInteger(NewRoundingFactor);
     end;
 
     procedure SetFileNameSilent(NewFileName: Text)

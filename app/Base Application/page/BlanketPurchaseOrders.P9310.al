@@ -1,3 +1,9 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Vendor;
+
 page 9310 "Blanket Purchase Orders"
 {
     ApplicationArea = Suite;
@@ -9,7 +15,7 @@ page 9310 "Blanket Purchase Orders"
     QueryCategory = 'Blanket Purchase Orders';
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";
-    SourceTableView = WHERE("Document Type" = CONST("Blanket Order"));
+    SourceTableView = where("Document Type" = const("Blanket Order"));
     UsageCategory = Lists;
 
     layout
@@ -176,15 +182,15 @@ page 9310 "Blanket Purchase Orders"
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
-                SubPageLink = "Table ID" = CONST(Database::"Purchase Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Purchase Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(Control1901138007; "Vendor Details FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Buy-from Vendor No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Buy-from Vendor No."),
+                              "Date Filter" = field("Date Filter");
             }
             systempart(Control1900383207; Links)
             {
@@ -216,7 +222,7 @@ page 9310 "Blanket Purchase Orders"
 
                     trigger OnAction()
                     begin
-                        OpenPurchaseOrderStatistics();
+                        Rec.OpenPurchaseOrderStatistics();
                     end;
                 }
                 action("Co&mments")
@@ -225,9 +231,9 @@ page 9310 "Blanket Purchase Orders"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Blanket Order"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const("Blanket Order"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -241,7 +247,7 @@ page 9310 "Blanket Purchase Orders"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Approvals)
@@ -461,25 +467,24 @@ page 9310 "Blanket Purchase Orders"
 
     trigger OnOpenPage()
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
-        CopyBuyFromVendorFilter();
+        Rec.CopyBuyFromVendorFilter();
     end;
 
     var
         DocPrint: Codeunit "Document-Print";
         OpenApprovalEntriesExist: Boolean;
         CanCancelApprovalForRecord: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
 
     local procedure SetControlAppearance()
     var
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
     end;
 }
 

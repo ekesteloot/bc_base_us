@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.Intercompany.Inbox;
+
 page 613 "Handled IC Outbox Transactions"
 {
     ApplicationArea = Intercompany;
@@ -142,7 +146,7 @@ page 613 "Handled IC Outbox Transactions"
 
                     trigger OnAction()
                     begin
-                        ShowDetails();
+                        Rec.ShowDetails();
                     end;
                 }
                 action(Comments)
@@ -151,10 +155,10 @@ page 613 "Handled IC Outbox Transactions"
                     Caption = 'Comments';
                     Image = ViewComments;
                     RunObject = Page "IC Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Handled IC Outbox Transaction"),
-                                  "Transaction No." = FIELD("Transaction No."),
-                                  "IC Partner Code" = FIELD("IC Partner Code"),
-                                  "Transaction Source" = FIELD("Transaction Source");
+                    RunPageLink = "Table Name" = const("Handled IC Outbox Transaction"),
+                                  "Transaction No." = field("Transaction No."),
+                                  "IC Partner Code" = field("IC Partner Code"),
+                                  "Transaction Source" = field("Transaction Source");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

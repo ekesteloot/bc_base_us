@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Task;
+
+using Microsoft.CRM.Contact;
+
 table 5199 Attendee
 {
     Caption = 'Attendee';
@@ -56,9 +60,9 @@ table 5199 Attendee
         field(5; "Attendee No."; Code[20])
         {
             Caption = 'Attendee No.';
-            TableRelation = IF ("Attendee Type" = CONST(Contact)) Contact WHERE("No." = FIELD("Attendee No."))
-            ELSE
-            IF ("Attendee Type" = CONST(Salesperson)) "Salesperson/Purchaser" WHERE(Code = FIELD("Attendee No."));
+            TableRelation = if ("Attendee Type" = const(Contact)) Contact where("No." = field("Attendee No."))
+            else
+            if ("Attendee Type" = const(Salesperson)) "Salesperson/Purchaser" where(Code = field("Attendee No."));
 
             trigger OnValidate()
             var
@@ -232,14 +236,7 @@ table 5199 Attendee
     end;
 
     procedure CreateAttendee(var Attendee: Record Attendee; TaskNo: Code[20]; LineNo: Integer; AttendanceType: Integer; AttendeeType: Integer; AttendeeNo: Code[20]; SendInvitation: Boolean)
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCreateAttendee(Attendee, TaskNo, "Line No.", AttendanceType, AttendeeType, AttendeeNo, SendInvitation, IsHandled);
-        if IsHandled then
-            exit;
-
         ValidateOrganizer(AttendeeNo, AttendanceType, AttendeeType, TaskNo);
 
         Attendee.Init();
@@ -276,11 +273,6 @@ table 5199 Attendee
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateAttendee(AttendeeRec: Record Attendee; var Attendee: Record Attendee; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateAttendee(var Attendee: Record Attendee; TaskNo: Code[20]; LineNo: Integer; AttendanceType: Integer; AttendeeType: Integer; AttendeeNo: Code[20]; SendInvitation: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

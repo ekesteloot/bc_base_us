@@ -27,7 +27,7 @@ page 9039 "O365 Sales Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowYearlySalesOverview();
+                        Rec.ShowYearlySalesOverview();
                     end;
                 }
                 field("Invoiced CM"; Rec."Invoiced CM")
@@ -41,7 +41,7 @@ page 9039 "O365 Sales Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowMonthlySalesOverview();
+                        Rec.ShowMonthlySalesOverview();
                     end;
                 }
             }
@@ -59,7 +59,7 @@ page 9039 "O365 Sales Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowInvoices(false);
+                        Rec.ShowInvoices(false);
                     end;
                 }
                 field("Sales Invoices Overdue"; Rec."Sales Invoices Overdue")
@@ -69,19 +69,19 @@ page 9039 "O365 Sales Activities"
                     AutoFormatType = 11;
                     Caption = 'Overdue amount';
                     Style = Unfavorable;
-                    StyleExpr = "Sales Invoices Overdue" > 0;
+                    StyleExpr = Rec."Sales Invoices Overdue" > 0;
                     ToolTip = 'Specifies the total amount that has not been paid and is after the due date.';
 
                     trigger OnDrillDown()
                     begin
-                        ShowInvoices(true);
+                        Rec.ShowInvoices(true);
                     end;
                 }
             }
             cuegroup("Ongoing sales")
             {
                 Caption = 'Ongoing sales';
-                field(NoOfDrafts; "No. of Draft Invoices")
+                field(NoOfDrafts; Rec."No. of Draft Invoices")
                 {
                     ApplicationArea = Invoicing, Basic, Suite;
                     Caption = 'Draft invoices';
@@ -89,10 +89,10 @@ page 9039 "O365 Sales Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowDraftInvoices();
+                        Rec.ShowDraftInvoices();
                     end;
                 }
-                field(NoOfQuotes; "No. of Quotes")
+                field(NoOfQuotes; Rec."No. of Quotes")
                 {
                     ApplicationArea = Invoicing, Basic, Suite;
                     Caption = 'Estimates';
@@ -100,7 +100,7 @@ page 9039 "O365 Sales Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowQuotes();
+                        Rec.ShowQuotes();
                     end;
                 }
                 field(NoOfUnpaidInvoices; NumberOfUnpaidInvoices)
@@ -111,7 +111,7 @@ page 9039 "O365 Sales Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowUnpaidInvoices();
+                        Rec.ShowUnpaidInvoices();
                     end;
                 }
             }
@@ -154,7 +154,7 @@ page 9039 "O365 Sales Activities"
                         Caption = 'Send a test invoice';
                         Image = TileNew;
                         RunObject = Page "BC O365 Sales Invoice";
-                        RunPageLink = "No." = CONST('TESTINVOICE');
+                        RunPageLink = "No." = const('TESTINVOICE');
                         RunPageMode = Create;
                         ToolTip = 'Create a new test invoice.';
                         Visible = CreateTestInvoiceVisible;
@@ -264,7 +264,7 @@ page 9039 "O365 Sales Activities"
     trigger OnAfterGetCurrRecord()
     begin
         O365DocumentSendMgt.ShowRoleCenterEmailNotification(true);
-        NumberOfUnpaidInvoices := GetNumberOfUnpaidInvoices();
+        NumberOfUnpaidInvoices := Rec.GetNumberOfUnpaidInvoices();
         CreateTestInvoiceVisible := O365SetupMgmt.ShowCreateTestInvoice();
         GettingStartedGroupVisible :=
           CreateTestInvoiceVisible or ReplayGettingStartedVisible or PaymentServicesVisible or SetupBusinessInfoVisible;
@@ -284,8 +284,8 @@ page 9039 "O365 Sales Activities"
 
     trigger OnOpenPage()
     begin
-        OnOpenActivitiesPage(CurrencyFormatTxt);
-        SetRange("User ID Filter", UserId);
+        Rec.OnOpenActivitiesPage(CurrencyFormatTxt);
+        Rec.SetRange("User ID Filter", UserId);
         PreparePageNotifier();
         O365DocumentSendMgt.ShowRoleCenterEmailNotification(false);
     end;

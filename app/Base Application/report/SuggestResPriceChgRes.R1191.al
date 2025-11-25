@@ -1,4 +1,9 @@
 #if not CLEAN21
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ProjectMgt.Resources.Pricing;
+
 report 1191 "Suggest Res. Price Chg. (Res.)"
 {
     Caption = 'Suggest Res. Price Chg. (Res.)';
@@ -11,7 +16,7 @@ report 1191 "Suggest Res. Price Chg. (Res.)"
     {
         dataitem(Resource; Resource)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Resource Group No.";
 
             trigger OnAfterGetRecord()

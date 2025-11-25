@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
 enum 1619 "Job Status"
 {
     Extensible = true;

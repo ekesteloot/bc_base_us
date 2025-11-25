@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Statement;
+
+using Microsoft.BankMgt.BankAccount;
+
 table 275 "Bank Account Statement"
 {
     Caption = 'Bank Account Statement';

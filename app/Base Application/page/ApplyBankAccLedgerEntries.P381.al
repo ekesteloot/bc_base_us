@@ -1,3 +1,10 @@
+namespace Microsoft.BankMgt.Ledger;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 page 381 "Apply Bank Acc. Ledger Entries"
 {
     Caption = 'Apply Bank Acc. Ledger Entries';
@@ -75,13 +82,13 @@ page 381 "Apply Bank Acc. Ledger Entries"
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the amount that remains to be applied to. The amount is denominated in the applicable foreign currency.';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies whether the amount on the bank account entry has been fully applied to, or if there is a remaining amount that must be applied to.';
                 }
-                field(Positive; Positive)
+                field(Positive; Rec.Positive)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -208,13 +215,13 @@ page 381 "Apply Bank Acc. Ledger Entries"
         SetUserInteractions();
         CalcBalance();
         ApplyControledFilters();
-   end;
+    end;
 
     trigger OnAfterGetRecord()
     begin
         StatementNoLineApplied := Rec.GetAppliedStatementNo();
         SetUserInteractions();
-   end;
+    end;
 
     trigger OnInit()
     begin
@@ -248,13 +255,7 @@ page 381 "Apply Bank Acc. Ledger Entries"
     procedure GetSelectedRecords(var TempBankAccountLedgerEntry: Record "Bank Account Ledger Entry" temporary)
     var
         BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeGetSelectedRecords(Rec, TempBankAccountLedgerEntry, IsHandled);
-        if IsHandled then
-            exit;
-
         CurrPage.SetSelectionFilter(BankAccountLedgerEntry);
         if BankAccountLedgerEntry.FindSet() then
             repeat
@@ -280,7 +281,7 @@ page 381 "Apply Bank Acc. Ledger Entries"
             StyleTxt := 'Favorable'
         else
             StyleTxt := 'AttentionAccent';
-   end;
+    end;
 
     procedure ShowAll()
     begin
@@ -352,7 +353,7 @@ page 381 "Apply Bank Acc. Ledger Entries"
 #if not CLEAN22
         BankAccReconciliationPage.UpdateBankAccountLedgerEntrySubpageOnAfterSetFilters(Rec);
 #endif
-   end;
+    end;
 
     local procedure ApplyPartFilters()
     begin
@@ -363,7 +364,7 @@ page 381 "Apply Bank Acc. Ledger Entries"
 
     local procedure CalcBalance()
     begin
-        if BankAccount.Get("Bank Account No.") then begin
+        if BankAccount.Get(Rec."Bank Account No.") then begin
             BankAccount.CalcFields(Balance, "Total on Checks");
             Balance := BankAccount.Balance;
             CheckBalance := BankAccount."Total on Checks";
@@ -376,11 +377,11 @@ page 381 "Apply Bank Acc. Ledger Entries"
     procedure ToggleMatchedFilter(SetFilterOn: Boolean)
     begin
         if SetFilterOn then begin
-            SetRange("Statement Status", "Statement Status"::Open);
-            SetRange("Statement No.", '');
-            SetRange("Statement Line No.", 0);
+            Rec.SetRange("Statement Status", Rec."Statement Status"::Open);
+            Rec.SetRange("Statement No.", '');
+            Rec.SetRange("Statement Line No.", 0);
         end else
-            Reset();
+            Rec.Reset();
         CurrPage.Update();
     end;
 #endif
@@ -412,11 +413,6 @@ page 381 "Apply Bank Acc. Ledger Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterApplyControledFilters(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetSelectedRecords(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"; var TempBankAccountLedgerEntry: Record "Bank Account Ledger Entry" temporary; var IsHandled: Boolean)
     begin
     end;
 }

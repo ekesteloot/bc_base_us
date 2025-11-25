@@ -1,3 +1,10 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.DataAdministration;
+using System.Utilities;
+
 report 5697 "Date Compress Insurance Ledger"
 {
     Caption = 'Date Compress Insurance Ledger';
@@ -11,7 +18,7 @@ report 5697 "Date Compress Insurance Ledger"
     {
         dataitem("Ins. Coverage Ledger Entry"; "Ins. Coverage Ledger Entry")
         {
-            DataItemTableView = SORTING("FA No.", "Insurance No.", "Disposed FA");
+            DataItemTableView = sorting("FA No.", "Insurance No.", "Disposed FA");
             RequestFilterFields = "Insurance No.", "FA No.";
 
             trigger OnAfterGetRecord()
@@ -286,7 +293,6 @@ report 5697 "Date Compress Insurance Ledger"
         DimEntryNo: Integer;
         RetainDimText: Text[250];
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
 
         CompressEntriesQst: Label 'This batch job deletes entries. We recommend that you create a backup of the database before you run the batch job.\\Do you want to continue?';

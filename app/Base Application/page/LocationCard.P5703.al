@@ -1,4 +1,12 @@
-﻿page 5703 "Location Card"
+﻿namespace Microsoft.InventoryMgt.Location;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.ServiceMgt.Resources;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
+page 5703 "Location Card"
 {
     Caption = 'Location Card';
     PageType = Card;
@@ -42,19 +50,19 @@
                 field("Tax Area Code"; Rec."Tax Area Code")
                 {
                     ApplicationArea = SalesTax;
-                    Editable = NOT "Do Not Use For Tax Calculation";
+                    Editable = NOT Rec."Do Not Use For Tax Calculation";
                     ToolTip = 'Specifies the tax area code for this location.';
                 }
                 field("Tax Exemption No."; Rec."Tax Exemption No.")
                 {
                     ApplicationArea = SalesTax;
-                    Editable = NOT "Do Not Use For Tax Calculation";
+                    Editable = NOT Rec."Do Not Use For Tax Calculation";
                     ToolTip = 'Specifies if the company''s tax exemption number. If the company has been registered exempt for sales and use tax this number would have been assigned by the taxing authority.';
                 }
                 field("Provincial Tax Area Code"; Rec."Provincial Tax Area Code")
                 {
                     ApplicationArea = BasicCA;
-                    Editable = NOT "Do Not Use For Tax Calculation";
+                    Editable = NOT Rec."Do Not Use For Tax Calculation";
                     ToolTip = 'Specifies the tax area code for self assessed Provincial Sales Tax for the company.';
                 }
             }
@@ -152,7 +160,6 @@
                         ApplicationArea = Location, BasicMX;
                         Importance = Additional;
                         ToolTip = 'Specifies the state, entity, region, community, or similar definitions where the domicile of the origin and / or destination of the goods or merchandise that are moved in the different means of transport is located.';
-                        Visible = false;
                         ObsoleteState = Pending;
                         ObsoleteReason = 'Replaced with SAT Address table.';
                         ObsoleteTag = '23.0';
@@ -162,7 +169,6 @@
                         ApplicationArea = Location, BasicMX;
                         Importance = Additional;
                         ToolTip = 'Specifies the municipality, delegation or mayoralty, county, or similar definitions where the destination address of the goods or merchandise that are moved in the different means of transport is located.';
-                        Visible = false;
                         ObsoleteState = Pending;
                         ObsoleteReason = 'Replaced with SAT Address table.';
                         ObsoleteTag = '23.0';
@@ -172,7 +178,6 @@
                         ApplicationArea = Location, BasicMX;
                         Importance = Additional;
                         ToolTip = 'Specifies the city, town, district, or similar definition where the domicile of origin and / or destination of the goods or merchandise that are moved in the different means of transport is located.';
-                        Visible = false;
                         ObsoleteState = Pending;
                         ObsoleteReason = 'Replaced with SAT Address table.';
                         ObsoleteTag = '23.0';
@@ -184,7 +189,6 @@
                         Editable = false;
                         Importance = Additional;
                         ToolTip = 'Specifies the SAT suburb code where the domicile of the origin or destination of the goods or merchandise that are moved in the different means of transport is located.';
-                        Visible = false;
                         ObsoleteState = Pending;
                         ObsoleteReason = 'Replaced with SAT Address table.';
                         ObsoleteTag = '23.0';
@@ -208,19 +212,21 @@
                         Caption = 'SAT Postal Code';
                         Editable = false;
                         Importance = Additional;
-                        Visible = false;
                         ToolTip = 'Specifies the SAT postal code where the domicile of the origin or destination of the goods or merchandise that are moved in the different means of transport is located.';
                         ObsoleteState = Pending;
                         ObsoleteReason = 'Replaced with SAT Address table.';
                         ObsoleteTag = '23.0';
                     }
-#endif                    
                     field("ID Ubicacion"; Rec."ID Ubicacion")
                     {
                         ApplicationArea = Location, BasicMX;
                         Caption = 'ID Ubicacion';
                         ToolTip = 'Specifies a code for the point of departure or entry of this transport in six numerical digits that are assigned by the taxpayer who issues the voucher for identification.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Replaced with SAT Address table.';
+                        ObsoleteTag = '23.0';
                     }
+#endif
                     field("SAT Address ID"; Rec."SAT Address ID")
                     {
                         ApplicationArea = Location, BasicMX;
@@ -233,142 +239,191 @@
             group(Warehouse)
             {
                 Caption = 'Warehouse';
-                field("Require Receive"; Rec."Require Receive")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = RequireReceiveEnable;
-                    ToolTip = 'Specifies if the location requires a receipt document when receiving items.';
 
-                    trigger OnValidate()
-                    begin
-                        UpdateEnabled();
-                    end;
-                }
-                field("Require Shipment"; Rec."Require Shipment")
+                group("Purch., Sales & Transfer")
                 {
-                    ApplicationArea = Warehouse;
-                    Enabled = RequireShipmentEnable;
-                    ToolTip = 'Specifies if the location requires a shipment document when shipping items.';
+                    Caption = 'Purchase, Sales, Service & Transfer';
+                    field("Require Receive"; Rec."Require Receive")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = RequireReceiveEnable;
+                        ToolTip = 'Specifies if the location requires a receipt document when receiving items.';
 
-                    trigger OnValidate()
-                    begin
-                        UpdateEnabled();
-                    end;
-                }
-                field("Require Put-away"; Rec."Require Put-away")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = RequirePutAwayEnable;
-                    Importance = Promoted;
-                    ToolTip = 'Specifies if the location requires a dedicated warehouse activity when putting items away.';
+                        trigger OnValidate()
+                        begin
+                            UpdateEnabled();
+                        end;
+                    }
+                    field("Require Shipment"; Rec."Require Shipment")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = RequireShipmentEnable;
+                        ToolTip = 'Specifies if the location requires a shipment document when shipping items.';
 
-                    trigger OnValidate()
-                    begin
-                        UpdateEnabled();
-                    end;
-                }
-                field("Use Put-away Worksheet"; Rec."Use Put-away Worksheet")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = UsePutAwayWorksheetEnable;
-                    ToolTip = 'Specifies if put-aways for posted warehouse receipts must be created with the put-away worksheet. If the check box is not selected, put-aways are created directly when you post a warehouse receipt.';
-                }
-                field("Require Pick"; Rec."Require Pick")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = RequirePickEnable;
-                    Importance = Promoted;
-                    ToolTip = 'Specifies if the location requires a dedicated warehouse activity when picking items.';
+                        trigger OnValidate()
+                        begin
+                            UpdateEnabled();
+                        end;
+                    }
+                    field("Require Put-away"; Rec."Require Put-away")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = RequirePutAwayEnable;
+                        Importance = Promoted;
+                        ToolTip = 'Specifies if the location requires a dedicated warehouse activity when putting items away.';
 
-                    trigger OnValidate()
-                    begin
-                        UpdateEnabled();
-                    end;
-                }
-                field("Bin Mandatory"; Rec."Bin Mandatory")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = BinMandatoryEnable;
-                    Importance = Promoted;
-                    ToolTip = 'Specifies if the location requires that a bin code is specified on all item transactions.';
+                        trigger OnValidate()
+                        begin
+                            UpdateEnabled();
+                        end;
+                    }
+                    field("Require Pick"; Rec."Require Pick")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = RequirePickEnable;
+                        Importance = Promoted;
+                        ToolTip = 'Specifies if the location requires a dedicated warehouse activity when picking items.';
 
-                    trigger OnValidate()
-                    begin
-                        UpdateEnabled();
-                    end;
+                        trigger OnValidate()
+                        begin
+                            UpdateEnabled();
+                        end;
+                    }
                 }
-                field("Directed Put-away and Pick"; Rec."Directed Put-away and Pick")
+                group("Production Warehouse Handling")
                 {
-                    ApplicationArea = Warehouse;
-                    Enabled = DirectedPutawayandPickEnable;
-                    ToolTip = 'Specifies if the location requires advanced warehouse functionality, such as calculated bin suggestion.';
+                    Caption = 'Production';
+                    field("Prod. Consumption Whse. Handling"; Rec."Prod. Consump. Whse. Handling")
+                    {
+                        Caption = 'Prod. Consumption Whse. Handling';
+                        ApplicationArea = Warehouse;
+                        ToolTip = 'Specifies the warehouse handling for consumption in production scenarios.';
+                        Enabled = ProdPickWhseHandlingEnable;
+                    }
+                    field("Prod. Output Whse. Handling"; Rec."Prod. Output Whse. Handling")
+                    {
+                        Caption = 'Prod. Output Whse. Handling';
+                        ApplicationArea = Warehouse;
+                        ToolTip = 'Specifies the warehouse handling for output in production scenarios';
+                        Enabled = ProdPutawayWhseHandlingEnable;
+                    }
+                }
+                group("Assembly Warehouse Handling")
+                {
+                    Caption = 'Assembly';
+                    field("Asm. Consump. Whse. Handling"; Rec."Asm. Consump. Whse. Handling")
+                    {
+                        Caption = 'Asm. Consump. Whse. Handling';
+                        ApplicationArea = Warehouse;
+                        ToolTip = 'Specifies the warehouse handling for consumption in assembly scenarios.';
+                        Enabled = AssemblyPickWhseHandlingEnable;
+                    }
+                }
+                group("Job Warehouse Handling")
+                {
+                    Caption = 'Job';
+                    field("Job Consump. Whse. Handling"; Rec."Job Consump. Whse. Handling")
+                    {
+                        Caption = 'Job Consump. Whse. Handling';
+                        ApplicationArea = Warehouse;
+                        ToolTip = 'Specifies the warehouse handling for consumption in job scenarios.';
+                        Enabled = JobPickWhseHandlingEnable;
+                    }
+                }
+                group("Other settings")
+                {
+                    ShowCaption = false;
+                    field("Bin Mandatory"; Rec."Bin Mandatory")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = BinMandatoryEnable;
+                        Importance = Promoted;
+                        ToolTip = 'Specifies if the location requires that a bin code is specified on all item transactions.';
 
-                    trigger OnValidate()
-                    begin
-                        UpdateEnabled();
-                    end;
-                }
-                field("Use ADCS"; Rec."Use ADCS")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = UseADCSEnable;
-                    ToolTip = 'Specifies the automatic data capture system that warehouse employees must use to keep track of items within the warehouse.';
-                    Visible = false;
-                }
-                field("Default Bin Selection"; Rec."Default Bin Selection")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = DefaultBinSelectionEnable;
-                    ToolTip = 'Specifies the method used to select the default bin.';
-                }
-                field("Outbound Whse. Handling Time"; Rec."Outbound Whse. Handling Time")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = OutboundWhseHandlingTimeEnable;
-                    ToolTip = 'Specifies a date formula for the time it takes to get items ready to ship from this location. The time element is used in the calculation of the delivery date as follows: Shipment Date + Outbound Warehouse Handling Time = Planned Shipment Date + Shipping Time = Planned Delivery Date.';
-                }
-                field("Inbound Whse. Handling Time"; Rec."Inbound Whse. Handling Time")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = InboundWhseHandlingTimeEnable;
-                    ToolTip = 'Specifies the time it takes to make items part of available inventory, after the items have been posted as received.';
-                }
-                field("Base Calendar Code"; Rec."Base Calendar Code")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = BaseCalendarCodeEnable;
-                    ToolTip = 'Specifies a customizable calendar for planning that holds the location''s working days and holidays.';
-                }
-                field("Customized Calendar"; format(CalendarMgmt.CustomizedChangesExist(Rec)))
-                {
-                    ApplicationArea = Warehouse;
-                    Caption = 'Customized Calendar';
-                    Editable = false;
-                    ToolTip = 'Specifies if the location has a customized calendar with working days that are different from those in the company''s base calendar.';
+                        trigger OnValidate()
+                        begin
+                            UpdateEnabled();
+                        end;
+                    }
+                    field("Directed Put-away and Pick"; Rec."Directed Put-away and Pick")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = DirectedPutawayandPickEnable;
+                        ToolTip = 'Specifies if the location requires advanced warehouse functionality, such as calculated bin suggestion.';
 
-                    trigger OnDrillDown()
-                    begin
-                        CurrPage.SaveRecord();
-                        Rec.TestField("Base Calendar Code");
-                        CalendarMgmt.ShowCustomizedCalendar(Rec);
-                    end;
-                }
-                field("Use Cross-Docking"; Rec."Use Cross-Docking")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = UseCrossDockingEnable;
-                    ToolTip = 'Specifies if the location supports movement of items directly from the receiving dock to the shipping dock.';
+                        trigger OnValidate()
+                        begin
+                            UpdateEnabled();
+                        end;
+                    }
+                    field("Use Put-away Worksheet"; Rec."Use Put-away Worksheet")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = UsePutAwayWorksheetEnable;
+                        ToolTip = 'Specifies if put-aways for posted warehouse receipts must be created with the put-away worksheet. If the check box is not selected, put-aways are created directly when you post a warehouse receipt.';
+                    }
+                    field("Use ADCS"; Rec."Use ADCS")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = UseADCSEnable;
+                        ToolTip = 'Specifies the automatic data capture system that warehouse employees must use to keep track of items within the warehouse.';
+                        Visible = false;
+                    }
+                    field("Default Bin Selection"; Rec."Default Bin Selection")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = DefaultBinSelectionEnable;
+                        ToolTip = 'Specifies the method used to select the default bin.';
+                    }
+                    field("Outbound Whse. Handling Time"; Rec."Outbound Whse. Handling Time")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = OutboundWhseHandlingTimeEnable;
+                        ToolTip = 'Specifies a date formula for the time it takes to get items ready to ship from this location. The time element is used in the calculation of the delivery date as follows: Shipment Date + Outbound Warehouse Handling Time = Planned Shipment Date + Shipping Time = Planned Delivery Date.';
+                    }
+                    field("Inbound Whse. Handling Time"; Rec."Inbound Whse. Handling Time")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = InboundWhseHandlingTimeEnable;
+                        ToolTip = 'Specifies the time it takes to make items part of available inventory, after the items have been posted as received.';
+                    }
+                    field("Base Calendar Code"; Rec."Base Calendar Code")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = BaseCalendarCodeEnable;
+                        ToolTip = 'Specifies a customizable calendar for planning that holds the location''s working days and holidays.';
+                    }
+                    field("Customized Calendar"; format(CalendarManagement.CustomizedChangesExist(Rec)))
+                    {
+                        ApplicationArea = Warehouse;
+                        Caption = 'Customized Calendar';
+                        Editable = false;
+                        ToolTip = 'Specifies if the location has a customized calendar with working days that are different from those in the company''s base calendar.';
 
-                    trigger OnValidate()
-                    begin
-                        UpdateEnabled();
-                    end;
-                }
-                field("Cross-Dock Due Date Calc."; Rec."Cross-Dock Due Date Calc.")
-                {
-                    ApplicationArea = Warehouse;
-                    Enabled = CrossDockDueDateCalcEnable;
-                    ToolTip = 'Specifies the cross-dock due date calculation.';
+                        trigger OnDrillDown()
+                        begin
+                            CurrPage.SaveRecord();
+                            Rec.TestField("Base Calendar Code");
+                            CalendarManagement.ShowCustomizedCalendar(Rec);
+                        end;
+                    }
+                    field("Use Cross-Docking"; Rec."Use Cross-Docking")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = UseCrossDockingEnable;
+                        ToolTip = 'Specifies if the location supports movement of items directly from the receiving dock to the shipping dock.';
+
+                        trigger OnValidate()
+                        begin
+                            UpdateEnabled();
+                        end;
+                    }
+                    field("Cross-Dock Due Date Calc."; Rec."Cross-Dock Due Date Calc.")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = CrossDockDueDateCalcEnable;
+                        ToolTip = 'Specifies the cross-dock due date calculation.';
+                    }
                 }
             }
             group(Bins)
@@ -503,6 +558,12 @@
                 group("Put-away")
                 {
                     Caption = 'Put-away';
+                    field("Put-away Bin Policy"; Rec."Put-away Bin Policy")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = PutawayBinPolicyEnable;
+                        Tooltip = 'Specifies how bins are automatically selected for inventory put-away.';
+                    }
                     field("Put-away Template Code"; Rec."Put-away Template Code")
                     {
                         ApplicationArea = Warehouse;
@@ -519,6 +580,12 @@
                 group(Pick)
                 {
                     Caption = 'Pick';
+                    field("Pick Bin Policy"; Rec."Pick Bin Policy")
+                    {
+                        ApplicationArea = Warehouse;
+                        Enabled = PickBinPolicyEnable;
+                        Tooltip = 'Specifies how bins are automatically selected for inventory picks.';
+                    }
                     field("Always Create Pick Line"; Rec."Always Create Pick Line")
                     {
                         ApplicationArea = Warehouse;
@@ -564,7 +631,7 @@
                     Caption = '&Resource Locations';
                     Image = Resource;
                     RunObject = Page "Resource Locations";
-                    RunPageLink = "Location Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field(Code);
                     ToolTip = 'View or edit information about where resources are located. In this window, you can assign resources to locations.';
                 }
                 action("&Zones")
@@ -573,7 +640,7 @@
                     Caption = '&Zones';
                     Image = Zones;
                     RunObject = Page Zones;
-                    RunPageLink = "Location Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field(Code);
                     ToolTip = 'View or edit information about zones that you use at this location to structure your bins.';
                 }
                 action("&Bins")
@@ -582,7 +649,7 @@
                     Caption = '&Bins';
                     Image = Bins;
                     RunObject = Page Bins;
-                    RunPageLink = "Location Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field(Code);
                     ToolTip = 'View or edit information about bins that you use at this location to hold items.';
                 }
                 action("Inventory Posting Setup")
@@ -591,7 +658,7 @@
                     Caption = 'Inventory Posting Setup';
                     Image = PostedInventoryPick;
                     RunObject = Page "Inventory Posting Setup";
-                    RunPageLink = "Location Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field(Code);
                     ToolTip = 'Set up links between inventory posting groups, inventory locations, and general ledger accounts to define where transactions for inventory items are recorded in the general ledger.';
                 }
                 action("Warehouse Employees")
@@ -600,7 +667,7 @@
                     Caption = 'Warehouse Employees';
                     Image = WarehouseSetup;
                     RunObject = Page "Warehouse Employees";
-                    RunPageLink = "Location Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field(Code);
                     ToolTip = 'View the warehouse employees that exist in the system.';
                 }
                 action("Online Map")
@@ -706,87 +773,71 @@
         PutAwayTemplateCodeEnable := true;
         AllowBreakbulkEnable := true;
         SpecialEquipmentEnable := true;
+        PickBinPolicyEnable := true;
+        PutawayBinPolicyEnable := true;
         BinCapacityPolicyEnable := true;
+        ProdPutawayWhseHandlingEnable := true;
+        ProdPickWhseHandlingEnable := true;
+        JobPickWhseHandlingEnable := true;
+        AssemblyPickWhseHandlingEnable := true;
         BaseCalendarCodeEnable := true;
         InboundWhseHandlingTimeEnable := true;
         OutboundWhseHandlingTimeEnable := true;
         EditInTransit := true;
     end;
 
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        UpdateEnabled();
+    end;
+
     var
 #if not CLEAN23
         SATSuburb: Record "SAT Suburb";
 #endif
-        CalendarMgmt: Codeunit "Calendar Management";
-        [InDataSet]
-        OutboundWhseHandlingTimeEnable: Boolean;
-        [InDataSet]
-        InboundWhseHandlingTimeEnable: Boolean;
-        [InDataSet]
-        BaseCalendarCodeEnable: Boolean;
-        [InDataSet]
-        BinCapacityPolicyEnable: Boolean;
-        [InDataSet]
-        CheckWhseClassEnable: Boolean;
-        [InDataSet]
-        SpecialEquipmentEnable: Boolean;
-        [InDataSet]
-        AllowBreakbulkEnable: Boolean;
-        [InDataSet]
-        PutAwayTemplateCodeEnable: Boolean;
-        [InDataSet]
-        AlwaysCreatePickLineEnable: Boolean;
-        [InDataSet]
-        AlwaysCreatePutawayLineEnable: Boolean;
-        [InDataSet]
-        CrossDockDueDateCalcEnable: Boolean;
-        [InDataSet]
-        OpenShopFloorBinCodeEnable: Boolean;
-        [InDataSet]
-        ToProductionBinCodeEnable: Boolean;
-        [InDataSet]
-        FromProductionBinCodeEnable: Boolean;
-        [InDataSet]
-        AdjustmentBinCodeEnable: Boolean;
-        [InDataSet]
-        ToAssemblyBinCodeEnable: Boolean;
-        [InDataSet]
-        ToJobBinCodeEnable: Boolean;
-        [InDataSet]
-        FromAssemblyBinCodeEnable: Boolean;
-        AssemblyShipmentBinCodeEnable: Boolean;
-        [InDataSet]
-        PickAccordingToFEFOEnable: Boolean;
-        [InDataSet]
-        CrossDockBinCodeEnable: Boolean;
-        [InDataSet]
-        DirectedPutawayandPickEnable: Boolean;
-        [InDataSet]
-        DefaultBinSelectionEnable: Boolean;
-        [InDataSet]
-        RequirePickEnable: Boolean;
-        [InDataSet]
-        RequirePutAwayEnable: Boolean;
-        [InDataSet]
-        RequireReceiveEnable: Boolean;
-        [InDataSet]
-        RequireShipmentEnable: Boolean;
-        [InDataSet]
-        BinMandatoryEnable: Boolean;
-        [InDataSet]
-        UsePutAwayWorksheetEnable: Boolean;
-        [InDataSet]
+        CalendarManagement: Codeunit "Calendar Management";
         EditInTransit: Boolean;
         ShowMapLbl: Label 'Show on Map';
 
     protected var
-        [InDataSet]
+        OutboundWhseHandlingTimeEnable: Boolean;
+        InboundWhseHandlingTimeEnable: Boolean;
+        BaseCalendarCodeEnable: Boolean;
+        BinCapacityPolicyEnable: Boolean;
+        CheckWhseClassEnable: Boolean;
+        SpecialEquipmentEnable: Boolean;
+        PickBinPolicyEnable: Boolean;
+        PutawayBinPolicyEnable: Boolean;
+        ProdPutawayWhseHandlingEnable: Boolean;
+        ProdPickWhseHandlingEnable: Boolean;
+        JobPickWhseHandlingEnable: Boolean;
+        AssemblyPickWhseHandlingEnable: Boolean;
+        AllowBreakbulkEnable: Boolean;
+        PutAwayTemplateCodeEnable: Boolean;
+        AlwaysCreatePickLineEnable: Boolean;
+        AlwaysCreatePutawayLineEnable: Boolean;
+        CrossDockDueDateCalcEnable: Boolean;
+        OpenShopFloorBinCodeEnable: Boolean;
+        ToProductionBinCodeEnable: Boolean;
+        FromProductionBinCodeEnable: Boolean;
+        AdjustmentBinCodeEnable: Boolean;
+        ToAssemblyBinCodeEnable: Boolean;
+        ToJobBinCodeEnable: Boolean;
+        FromAssemblyBinCodeEnable: Boolean;
+        AssemblyShipmentBinCodeEnable: Boolean;
+        PickAccordingToFEFOEnable: Boolean;
+        CrossDockBinCodeEnable: Boolean;
+        DirectedPutawayandPickEnable: Boolean;
+        DefaultBinSelectionEnable: Boolean;
+        RequirePickEnable: Boolean;
+        RequirePutAwayEnable: Boolean;
+        RequireReceiveEnable: Boolean;
+        RequireShipmentEnable: Boolean;
+        BinMandatoryEnable: Boolean;
+        UsePutAwayWorksheetEnable: Boolean;
         ReceiptBinCodeEnable: Boolean;
-        [InDataSet]
         ShipmentBinCodeEnable: Boolean;
-        [InDataSet]
         UseADCSEnable: Boolean;
-        [InDataSet]
         UseCrossDockingEnable: Boolean;
 
     procedure UpdateEnabled()
@@ -804,12 +855,18 @@
         BinCapacityPolicyEnable := Rec."Bin Mandatory";
         CheckWhseClassEnable := Rec."Bin Mandatory" and not Rec."Directed Put-away and Pick";
         SpecialEquipmentEnable := Rec."Bin Mandatory";
+        PickBinPolicyEnable := Rec."Bin Mandatory" and not Rec."Directed Put-away and Pick";
+        PutawayBinPolicyEnable := Rec."Bin Mandatory" and not Rec."Directed Put-away and Pick";
+        ProdPutawayWhseHandlingEnable := not Rec."Use As In-Transit" and not Rec."Directed Put-away and Pick";
+        ProdPickWhseHandlingEnable := not Rec."Use As In-Transit" and not Rec."Directed Put-away and Pick";
+        JobPickWhseHandlingEnable := not Rec."Use As In-Transit" and not Rec."Directed Put-away and Pick";
+        AssemblyPickWhseHandlingEnable := not Rec."Use As In-Transit" and not Rec."Directed Put-away and Pick";
         AllowBreakbulkEnable := Rec."Directed Put-away and Pick";
-        PutAwayTemplateCodeEnable := Rec."Directed Put-away and Pick";
+        PutAwayTemplateCodeEnable := Rec."Bin Mandatory";
         UsePutAwayWorksheetEnable :=
           Rec."Directed Put-away and Pick" or (Rec."Require Put-away" and Rec."Require Receive" and not Rec."Use As In-Transit");
-        AlwaysCreatePickLineEnable := Rec."Directed Put-away and Pick";
-        AlwaysCreatePutawayLineEnable := Rec."Directed Put-away and Pick";
+        AlwaysCreatePickLineEnable := Rec."Bin Mandatory";
+        AlwaysCreatePutawayLineEnable := Rec."Bin Mandatory";
 
         UseCrossDockingEnable :=
             not Rec."Use As In-Transit" and Rec."Require Receive" and Rec."Require Shipment" and Rec."Require Put-away" and Rec."Require Pick";
@@ -837,7 +894,7 @@
     var
         TransferHeader: Record "Transfer Header";
     begin
-        TransferHeader.SetRange("In-Transit Code", Code);
+        TransferHeader.SetRange("In-Transit Code", Rec.Code);
         EditInTransit := TransferHeader.IsEmpty();
     end;
 

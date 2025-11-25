@@ -9,10 +9,10 @@ report 950 "Create Time Sheets"
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             dataitem(Resource; Resource)
             {
-                DataItemTableView = WHERE("Use Time Sheet" = CONST(true));
+                DataItemTableView = where("Use Time Sheet" = const(true));
                 RequestFilterFields = "No.", Type;
 
                 trigger OnAfterGetRecord()

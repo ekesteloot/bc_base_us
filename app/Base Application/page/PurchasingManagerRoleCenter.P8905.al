@@ -1,3 +1,39 @@
+﻿namespace Microsoft.Purchases.RoleCenters;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Team;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Manufacturing.StandardCost;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Analysis;
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Reports;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.Shared.Navigate;
+
 page 8905 "Purchasing Manager Role Center"
 {
     Caption = 'Purchasing Manager Role Center';
@@ -227,9 +263,9 @@ page 8905 "Purchasing Manager Role Center"
                     }
                     action("Vendor - Summary Aging")
                     {
-                    	ApplicationArea = Basic,Suite;
-                    	Caption = 'Aged Accounts Payable';
-                    	RunObject = Report "Aged Accounts Payable NA";
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Aged Accounts Payable';
+                        RunObject = Report "Aged Accounts Payable NA";
                     }
                     action("Vendor/Item Purchases")
                     {
@@ -242,7 +278,7 @@ page 8905 "Purchasing Manager Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'List Price Sheet';
 #if not CLEAN21
-                        RunPageView = WHERE("Object Type" = CONST(Report), "Object ID" = CONST(10148)); // "List Price Sheet"
+                        RunPageView = where("Object Type" = const(Report), "Object ID" = const(10148)); // "List Price Sheet"
                         RunObject = Page "Role Center Page Dispatcher";
 #else
                         RunObject = Report "List Price Sheet V16";
@@ -469,9 +505,9 @@ page 8905 "Purchasing Manager Role Center"
                         }
                         action("Vendor - Summary Aging1")
                         {
-                        	ApplicationArea = Basic,Suite;
-                        	Caption = 'Aged Accounts Payable';
-                        	RunObject = Report "Aged Accounts Payable NA";
+                            ApplicationArea = Basic, Suite;
+                            Caption = 'Aged Accounts Payable';
+                            RunObject = Report "Aged Accounts Payable NA";
                         }
                         action("Purchase Statistics1")
                         {

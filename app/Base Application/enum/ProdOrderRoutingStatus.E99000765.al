@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 enum 99000765 "Prod. Order Routing Status"
 {
     Extensible = true;

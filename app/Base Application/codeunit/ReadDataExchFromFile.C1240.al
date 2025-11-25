@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Utilities;
+
 codeunit 1240 "Read Data Exch. from File"
 {
     TableNo = "Data Exch.";
@@ -8,16 +12,16 @@ codeunit 1240 "Read Data Exch. from File"
         FileMgt: Codeunit "File Management";
         RecordRef: RecordRef;
     begin
-        OnBeforeFileImport(TempBlob, "File Name");
+        OnBeforeFileImport(TempBlob, Rec."File Name");
 
         if not TempBlob.HasValue() then
-            "File Name" := CopyStr(
+            Rec."File Name" := CopyStr(
                 FileMgt.BLOBImportWithFilter(TempBlob, ImportBankStmtTxt, '', FileFilterTxt, FileFilterExtensionTxt), 1, 250);
 
-        if "File Name" <> '' then begin
+        if Rec."File Name" <> '' then begin
             OnRunOnBeforeGetTable(TempBlob, Rec);
             RecordRef.GetTable(Rec);
-            TempBlob.ToRecordRef(RecordRef, FieldNo("File Content"));
+            TempBlob.ToRecordRef(RecordRef, Rec.FieldNo("File Content"));
             RecordRef.SetTable(Rec);
         end;
     end;

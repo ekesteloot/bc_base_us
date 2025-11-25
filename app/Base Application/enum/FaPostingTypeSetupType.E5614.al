@@ -1,4 +1,6 @@
-﻿enum 5614 "FA Posting Type Setup Type"
+﻿namespace Microsoft.FixedAssets.Posting;
+
+enum 5614 "FA Posting Type Setup Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

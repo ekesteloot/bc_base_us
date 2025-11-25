@@ -1,3 +1,12 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Threading;
+
 codeunit 1512 "Workflow Create Payment Line"
 {
     TableNo = "Job Queue Entry";
@@ -7,8 +16,8 @@ codeunit 1512 "Workflow Create Payment Line"
         WorkflowStepArgument: Record "Workflow Step Argument";
         WorkflowStepArgumentArchive: Record "Workflow Step Argument Archive";
     begin
-        if not WorkflowStepArgument.Get("Record ID to Process") then begin
-            WorkflowStepArgumentArchive.SetRange("Original Record ID", "Record ID to Process");
+        if not WorkflowStepArgument.Get(Rec."Record ID to Process") then begin
+            WorkflowStepArgumentArchive.SetRange("Original Record ID", Rec."Record ID to Process");
             if not WorkflowStepArgumentArchive.FindFirst() then
                 exit;
 

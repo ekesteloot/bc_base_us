@@ -1,3 +1,7 @@
+namespace Microsoft.CashFlow.Setup;
+
+using System.AI;
+
 page 846 "Cash Flow Setup"
 {
     // HYPERLINK('https://go.microsoft.com/fwlink/?linkid=828352');
@@ -101,7 +105,7 @@ page 846 "Cash Flow Setup"
 
                     trigger OnValidate()
                     begin
-                        TaxAccountTypeValid := HasValidTaxAccountInfo();
+                        TaxAccountTypeValid := Rec.HasValidTaxAccountInfo();
                         CurrPage.Update();
                     end;
                 }
@@ -119,13 +123,20 @@ page 846 "Cash Flow Setup"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of period that you want to see the forecast by.';
+                    trigger OnValidate();
+                    var
+                        CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
+                    begin
+                        if not xRec."Azure AI Enabled" and Rec."Azure AI Enabled" then
+                            Rec."Azure AI Enabled" := CustomerConsentMgt.ConfirmUserConsentToMicrosoftService();
+                    end;
                 }
                 field("Historical Periods"; Rec."Historical Periods")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of historical periods to include in the forecast.';
                 }
-                field(Horizon; Horizon)
+                field(Horizon; Rec.Horizon)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies how many periods you want the forecast to cover.';
@@ -151,17 +162,10 @@ page 846 "Cash Flow Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the range of deviation, plus or minus, that you''ll accept in the forecast. Lower percentages represent more accurate forecasts, and are typically between 20 and 40. Forecasts outside the range are considered inaccurate, and do not display.';
                 }
-                field(Enabled; "Azure AI Enabled")
+                field(Enabled; Rec."Azure AI Enabled")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies status of Azure AI forecast.';
-                    trigger OnValidate();
-                    var
-                        CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
-                    begin
-                        if not xRec."Azure AI Enabled" and Rec."Azure AI Enabled" then
-                            Rec."Azure AI Enabled" := CustomerConsentMgt.ConfirmUserConsentToMicrosoftService();
-                    end;
                 }
                 field("Total Proc. Time"; Format(AzureAIUsage.GetTotalProcessingTime(AzureAIService::"Machine Learning")))
                 {
@@ -210,16 +214,16 @@ page 846 "Cash Flow Setup"
 
     trigger OnAfterGetRecord()
     begin
-        TaxAccountTypeValid := HasValidTaxAccountInfo();
-        "API Key" := GetUserDefinedAPIKey();
+        TaxAccountTypeValid := Rec.HasValidTaxAccountInfo();
+        Rec."API Key" := Rec.GetUserDefinedAPIKey();
     end;
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 

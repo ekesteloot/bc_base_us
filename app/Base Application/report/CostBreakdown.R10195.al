@@ -23,8 +23,8 @@ report 10195 "Cost Breakdown"
             }
             dataitem("Res. Ledger Entry"; "Res. Ledger Entry")
             {
-                DataItemLink = "Resource No." = FIELD("No."), "Unit of Measure Code" = FIELD("Unit of Measure Filter"), "Posting Date" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Entry Type", Chargeable, "Unit of Measure Code", "Resource No.", "Posting Date") WHERE("Entry Type" = CONST(Usage));
+                DataItemLink = "Resource No." = field("No."), "Unit of Measure Code" = field("Unit of Measure Filter"), "Posting Date" = field("Date Filter");
+                DataItemTableView = sorting("Entry Type", Chargeable, "Unit of Measure Code", "Resource No.", "Posting Date") where("Entry Type" = const(Usage));
                 column(Cost_Breakdown_; 'Cost Breakdown')
                 {
                 }

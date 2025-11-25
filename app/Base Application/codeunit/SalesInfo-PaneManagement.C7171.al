@@ -120,6 +120,22 @@ codeunit 7171 "Sales Info-Pane Management"
         end;
     end;
 
+    procedure GetQtyReservedFromStockState(SalesLine: Record "Sales Line") Result: Enum "Reservation From Stock"
+    var
+        SalesLineReserve: Codeunit "Sales Line-Reserve";
+        QtyReservedFromStock: Decimal;
+    begin
+        QtyReservedFromStock := SalesLineReserve.GetReservedQtyFromInventory(SalesLine);
+        case QtyReservedFromStock of
+            0:
+                exit(Result::None);
+            SalesLine."Outstanding Qty. (Base)":
+                exit(Result::Full);
+            else
+                exit(Result::Partial);
+        end;
+    end;
+
     procedure CalcNoOfSubstitutions(var SalesLine: Record "Sales Line"): Integer
     begin
         if GetItem(SalesLine) then begin

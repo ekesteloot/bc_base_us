@@ -1,3 +1,7 @@
+namespace System.Diagnostics;
+
+using System.Reflection;
+
 table 404 "Change Log Setup (Field)"
 {
     Caption = 'Change Log Setup (Field)';
@@ -13,12 +17,12 @@ table 404 "Change Log Setup (Field)"
         field(2; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            TableRelation = Field."No." where(TableNo = field("Table No."));
         }
         field(3; "Field Caption"; Text[100])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No."),
-                                                              "No." = FIELD("Field No.")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table No."),
+                                                              "No." = field("Field No.")));
             Caption = 'Field Caption';
             FieldClass = FlowField;
         }
@@ -44,8 +48,8 @@ table 404 "Change Log Setup (Field)"
         }
         field(9; "Table Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table No.")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table No.")));
             Caption = 'Table Caption';
             FieldClass = FlowField;
         }

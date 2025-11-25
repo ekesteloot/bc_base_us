@@ -1,3 +1,10 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Reports;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using System.Security.User;
+
 page 1101 "Cost Type Card"
 {
     Caption = 'Cost Type Card';
@@ -27,7 +34,7 @@ page 1101 "Cost Type Card"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the type of the cost type.';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
@@ -57,7 +64,7 @@ page 1101 "Cost Type Card"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies an alternate name that you can use to search for the record in question when you cannot remember the value in the Name field.';
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = CostAccounting;
                     Importance = Promoted;
@@ -88,7 +95,7 @@ page 1101 "Cost Type Card"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies if you want a new page to start immediately after this cost center when you print the chart of cash flow accounts.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -111,10 +118,10 @@ page 1101 "Cost Type Card"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Modified By");
+                        UserMgt.DisplayUserInformation(Rec."Modified By");
                     end;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies a description that applies to the cost type.';
@@ -150,8 +157,8 @@ page 1101 "Cost Type Card"
                     Caption = 'E&ntries';
                     Image = Entries;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Cost Type No." = FIELD("No.");
-                    RunPageView = SORTING("Cost Type No.", "Posting Date");
+                    RunPageLink = "Cost Type No." = field("No.");
+                    RunPageView = sorting("Cost Type No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View cost entries related to the cost type.';
                 }
@@ -164,9 +171,9 @@ page 1101 "Cost Type Card"
                     Caption = '&Balance';
                     Image = Balance;
                     RunObject = Page "Cost Type Balance";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Cost Center Filter" = FIELD("Cost Center Filter"),
-                                  "Cost Object Filter" = FIELD("Cost Object Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Cost Center Filter" = field("Cost Center Filter"),
+                                  "Cost Object Filter" = field("Cost Object Filter");
                     ToolTip = 'View a summary of the balance at date or the net change for different time periods for the cost types that you select. You can select different time intervals and set filters on the cost centers and cost objects that you want to see.';
                 }
             }
@@ -269,7 +276,7 @@ page 1101 "Cost Type Card"
 
     trigger OnAfterGetRecord()
     begin
-        SetRange("No.");
+        Rec.SetRange("No.");
     end;
 }
 

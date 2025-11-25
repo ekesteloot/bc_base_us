@@ -1,5 +1,17 @@
+﻿#if not CLEAN23
+namespace System.Integration.PowerBI;
+
+using System;
+using System.Azure.Identity;
+using System.Integration;
+using System.Utilities;
+
 codeunit 6299 "Power BI Embed Helper"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This functionality has been replaced by the Power BI javascript library';
+    ObsoleteTag = '23.0';
+
     // // Handles creation of messages to post to the Power BI Embed page in the WebPageViewer control addin
 
     /**
@@ -200,26 +212,6 @@ codeunit 6299 "Power BI Embed Helper"
         EmbeddedTargetOrigin := UriBuilderBaseUrl.Uri().AbsoluteUri();
     end;
 
-#if not CLEAN20
-    [Scope('OnPrem')]
-    [NonDebuggable]
-    [Obsolete('Use TryGetLoadReportMessage instead.', '20.0')]
-    procedure GetLoadReportMessage(): Text
-    var
-        AccessToken: Text;
-        HttpUtility: DotNet HttpUtility;
-    begin
-        AccessToken := HttpUtility.JavaScriptStringEncode(
-            AzureAdMgt.GetAccessToken(PowerBiServiceMgt.GetPowerBIResourceUrl(), PowerBiServiceMgt.GetPowerBiResourceName(), false)
-            );
-
-        if AccessToken = '' then
-            Session.LogMessage('0000B6X', EmptyAccessTokenForPBITelemetryMsg, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
-
-        exit(StrSubstNo(LoadReportMessageJsonTxt, AccessToken));
-    end;
-#endif
-
     [Scope('OnPrem')]
     [NonDebuggable]
     [TryFunction]
@@ -261,3 +253,5 @@ codeunit 6299 "Power BI Embed Helper"
     end;
 
 }
+
+#endif

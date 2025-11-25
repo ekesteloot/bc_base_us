@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 page 99000845 "Prod. Order Routing Personnel"
 {
     AutoSplitKey = true;

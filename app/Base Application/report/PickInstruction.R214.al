@@ -1,14 +1,14 @@
 report 214 "Pick Instruction"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/PickInstruction.rdlc';
+    RDLCLayout = './Sales/Document/PickInstruction.rdlc';
     Caption = 'Pick Instruction';
 
     dataset
     {
         dataitem(CopyLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             column(Number; Number)
             {
             }
@@ -20,7 +20,7 @@ report 214 "Pick Instruction"
             }
             dataitem("Sales Header"; "Sales Header")
             {
-                DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+                DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
                 RequestFilterFields = "No.";
                 column(No_SalesHeader; "No.")
                 {
@@ -36,8 +36,8 @@ report 214 "Pick Instruction"
                 }
                 dataitem("Sales Line"; "Sales Line")
                 {
-                    DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
-                    DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE(Type = CONST(Item));
+                    DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
+                    DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where(Type = const(Item));
                     column(LineNo_SalesLine; "Line No.")
                     {
                     }
@@ -85,7 +85,7 @@ report 214 "Pick Instruction"
                     }
                     dataitem("Assembly Line"; "Assembly Line")
                     {
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
                         column(No_AssemblyLine; "No.")
                         {
                             IncludeCaption = true;

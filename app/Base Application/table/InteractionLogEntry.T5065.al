@@ -1,3 +1,24 @@
+﻿namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Task;
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using System.Globalization;
+using System.Integration;
+using System.Security.AccessControl;
+
 table 5065 "Interaction Log Entry"
 {
     Caption = 'Interaction Log Entry';
@@ -20,7 +41,7 @@ table 5065 "Interaction Log Entry"
         field(3; "Contact Company No."; Code[20])
         {
             Caption = 'Contact Company No.';
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(4; Date; Date)
         {
@@ -64,8 +85,6 @@ table 5065 "Interaction Log Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(12; "Interaction Group Code"; Code[10])
         {
@@ -85,7 +104,7 @@ table 5065 "Interaction Log Entry"
         field(15; "Campaign Entry No."; Integer)
         {
             Caption = 'Campaign Entry No.';
-            TableRelation = "Campaign Entry" WHERE("Campaign No." = FIELD("Campaign No."));
+            TableRelation = "Campaign Entry" where("Campaign No." = field("Campaign No."));
         }
         field(16; "Campaign Response"; Boolean)
         {
@@ -137,7 +156,7 @@ table 5065 "Interaction Log Entry"
         field(28; "Contact Alt. Address Code"; Code[10])
         {
             Caption = 'Contact Alt. Address Code';
-            TableRelation = "Contact Alt. Address".Code WHERE("Contact No." = FIELD("Contact No."));
+            TableRelation = "Contact Alt. Address".Code where("Contact No." = field("Contact No."));
         }
         field(29; "Logged Segment Entry No."; Integer)
         {
@@ -151,8 +170,6 @@ table 5065 "Interaction Log Entry"
         field(31; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(32; "Version No."; Integer)
         {
@@ -185,22 +202,22 @@ table 5065 "Interaction Log Entry"
         }
         field(39; "Contact Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact.Name WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact No.")));
             Caption = 'Contact Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(40; "Contact Company Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact.Name WHERE("No." = FIELD("Contact Company No."),
-                                                     Type = CONST(Company)));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact Company No."),
+                                                     Type = const(Company)));
             Caption = 'Contact Company Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(43; Comment; Boolean)
         {
-            CalcFormula = Exist("Inter. Log Entry Comment Line" WHERE("Entry No." = FIELD("Entry No.")));
+            CalcFormula = exist("Inter. Log Entry Comment Line" where("Entry No." = field("Entry No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -784,7 +801,7 @@ table 5065 "Interaction Log Entry"
             Selected := DIALOG.StrMenu(Text011);
             if Selected <> 0 then
                 repeat
-                    Evaluation := "Interaction Evaluation".FromInteger(Selected);
+                    Evaluation := Enum::"Interaction Evaluation".FromInteger(Selected);
                     Modify();
                 until Next() = 0
         end;
@@ -793,7 +810,6 @@ table 5065 "Interaction Log Entry"
     procedure ResumeInteraction()
     var
         TempSegLine: Record "Segment Line" temporary;
-        IsHandled: Boolean;
     begin
         TempSegLine.CopyFromInteractLogEntry(Rec);
         TempSegLine.Validate(Date, WorkDate());
@@ -816,10 +832,8 @@ table 5065 "Interaction Log Entry"
         if TempSegLine."Opportunity No." <> '' then
             TempSegLine.SetRange("Opportunity No.", TempSegLine."Opportunity No.");
 
-        IsHandled := false;
-        OnResumeInteractionOnBeforeStartWizard(Rec, TempSegLine, IsHandled);
-        if not IsHandled then
-            TempSegLine.StartWizard();
+        OnResumeInteractionOnBeforeStartWizard(Rec, TempSegLine);
+        TempSegLine.StartWizard();
     end;
 
     procedure GetEntryTitle() EntryTitle: Text
@@ -884,7 +898,7 @@ table 5065 "Interaction Log Entry"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnResumeInteractionOnBeforeStartWizard(InteractionLogEntry: Record "Interaction Log Entry"; var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
+    local procedure OnResumeInteractionOnBeforeStartWizard(InteractionLogEntry: Record "Interaction Log Entry"; var SegmentLine: Record "Segment Line")
     begin
     end;
 }

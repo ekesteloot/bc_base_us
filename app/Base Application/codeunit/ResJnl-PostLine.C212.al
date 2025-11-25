@@ -1,3 +1,9 @@
+﻿namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 codeunit 212 "Res. Jnl.-Post Line"
 {
     Permissions = TableData "Res. Ledger Entry" = rimd,

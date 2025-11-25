@@ -1,3 +1,13 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+
+using Microsoft.Sales.Receivables;
+
 page 438 "Issued Reminder"
 {
     Caption = 'Issued Reminder';
@@ -30,7 +40,7 @@ page 438 "Issued Reminder"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the customer the reminder is for.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the address of the customer the reminder is for.';
@@ -40,12 +50,12 @@ page 438 "Issued Reminder"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies additional address information.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city name of the customer the reminder is for.';
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'State / ZIP Code';
@@ -56,7 +66,7 @@ page 438 "Issued Reminder"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the postal code.';
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the person you regularly contact when you communicate with the customer the reminder is for.';
@@ -93,7 +103,7 @@ page 438 "Issued Reminder"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the posting date that the reminder was issued on.';
                 }
-                field("VAT Reporting Date"; Rec."VAT Reporting Date") 
+                field("VAT Reporting Date"; Rec."VAT Reporting Date")
                 {
                     ApplicationArea = VAT;
                     Visible = VATDateEnabled;
@@ -119,7 +129,7 @@ page 438 "Issued Reminder"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies how many times the document has been printed.';
                 }
-                field(Canceled; Canceled)
+                field(Canceled; Rec.Canceled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the issued reminder has been canceled.';
@@ -129,7 +139,7 @@ page 438 "Issued Reminder"
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "Reminder No." = FIELD("No.");
+                SubPageLink = "Reminder No." = field("No.");
             }
             group(Posting)
             {
@@ -158,9 +168,9 @@ page 438 "Issued Reminder"
                     trigger OnAssistEdit()
                     begin
                         ChangeExchangeRate.SetParameter(
-                          "Currency Code",
-                          CurrExchRate.ExchangeRate("Posting Date", "Currency Code"),
-                          "Posting Date");
+                          Rec."Currency Code",
+                          CurrExchRate.ExchangeRate(Rec."Posting Date", Rec."Currency Code"),
+                          Rec."Posting Date");
                         ChangeExchangeRate.Editable(false);
                         if ChangeExchangeRate.RunModal() = ACTION::OK then;
                         Clear(ChangeExchangeRate);
@@ -195,7 +205,7 @@ page 438 "Issued Reminder"
             {
                 ApplicationArea = Basic, Suite;
                 Provider = ReminderLines;
-                SubPageLink = "Entry No." = FIELD("Entry No.");
+                SubPageLink = "Entry No." = field("Entry No.");
             }
             systempart(Control1905767507; Notes)
             {
@@ -232,8 +242,8 @@ page 438 "Issued Reminder"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Reminder Comment Sheet";
-                    RunPageLink = Type = CONST("Issued Reminder"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = Type = const("Issued Reminder"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("C&ustomer")
@@ -242,7 +252,7 @@ page 438 "Issued Reminder"
                     Caption = 'C&ustomer';
                     Image = Customer;
                     RunObject = Page "Customer List";
-                    RunPageLink = "No." = FIELD("Customer No.");
+                    RunPageLink = "No." = field("Customer No.");
                     ToolTip = 'Open the card of the customer that the reminder or finance charge applies to. ';
                 }
                 action(Dimensions)
@@ -256,7 +266,7 @@ page 438 "Issued Reminder"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 separator(Action6)
@@ -268,7 +278,7 @@ page 438 "Issued Reminder"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Issued Reminder Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -327,7 +337,7 @@ page 438 "Issued Reminder"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action(Cancel)
@@ -342,7 +352,7 @@ page 438 "Issued Reminder"
                 begin
                     IssuedReminderHeader := Rec;
                     IssuedReminderHeader.SetRecFilter();
-                    RunCancelIssuedReminder(IssuedReminderHeader);
+                    Rec.RunCancelIssuedReminder(IssuedReminderHeader);
                 end;
             }
         }
@@ -402,14 +412,14 @@ page 438 "Issued Reminder"
     var
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
-		VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
     end;
 
     trigger OnAfterGetRecord()
     var
         Customer: Record Customer;
     begin
-        Customer.GetPrimaryContact("Customer No.", PrimaryContact);
+        Customer.GetPrimaryContact(Rec."Customer No.", PrimaryContact);
     end;
 
     var
@@ -417,7 +427,6 @@ page 438 "Issued Reminder"
         IssuedReminderHeader: Record "Issued Reminder Header";
         CurrExchRate: Record "Currency Exchange Rate";
         ChangeExchangeRate: Page "Change Exchange Rate";
-        [InDataSet]
         VATDateEnabled: Boolean;
 
     [IntegrationEvent(false, false)]

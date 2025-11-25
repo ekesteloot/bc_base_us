@@ -150,8 +150,8 @@ report 10142 "Item Cost and Price List"
             }
             dataitem("Stockkeeping Unit"; "Stockkeeping Unit")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter");
-                DataItemTableView = SORTING("Item No.", "Location Code", "Variant Code");
+                DataItemLink = "Item No." = field("No."), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter");
+                DataItemTableView = sorting("Item No.", "Location Code", "Variant Code");
                 column(Stockkeeping_Unit__Item_No__; "Item No.")
                 {
                 }

@@ -3,7 +3,8 @@ permissionset 617 "D365 DYN CRM MGT"
     Assignable = true;
 
     Caption = 'Dynamics 365 Dynamics CRM Mgt.';
-    Permissions = tabledata "CDS Company" = RIMD,
+    Permissions = tabledata "CDS Available Virtual Table" = RIMD,
+                  tabledata "CDS Company" = RIMD,
                   tabledata "CDS Connection Setup" = RIMD,
                   tabledata "CDS Coupled Business Unit" = RIMD,
                   tabledata "CDS Environment" = RIMD,
@@ -66,9 +67,6 @@ permissionset 617 "D365 DYN CRM MGT"
                   tabledata "CRM Uom" = RIMD,
                   tabledata "CRM Uomschedule" = RIMD,
                   tabledata "Customer Templ." = Rimd,
-#if not CLEAN20
-                  tabledata "Customer Template" = Rimd,
-#endif
                   tabledata "Integration Field Mapping" = RIMD,
                   tabledata "Integration Synch. Job" = RIMD,
                   tabledata "Integration Synch. Job Errors" = RIMD,

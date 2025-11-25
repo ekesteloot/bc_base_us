@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 7114 "Analysis Columns"
 {
     AutoSplitKey = true;
@@ -63,7 +65,7 @@ page 7114 "Analysis Columns"
                     ToolTip = 'Specifies the filter that applies to the item value entry type that you want this column to be calculated from.';
                     Visible = false;
                 }
-                field(Invoiced; Invoiced)
+                field(Invoiced; Rec.Invoiced)
                 {
                     ApplicationArea = SalesAnalysis, PurchaseAnalysis;
                     ToolTip = 'Specifies if you want the analysis report to be based on invoiced amounts. If left field blank, the report will be based on expected amounts.';
@@ -78,7 +80,7 @@ page 7114 "Analysis Columns"
                     ApplicationArea = SalesAnalysis, PurchaseAnalysis;
                     ToolTip = 'Specifies the type of ledger entries that will be included in the amounts in the analysis column.';
                 }
-                field(Formula; Formula)
+                field(Formula; Rec.Formula)
                 {
                     ApplicationArea = SalesAnalysis, PurchaseAnalysis;
                     ToolTip = 'Specifies a formula for how data is shown in the column when the analysis report is printed.';
@@ -103,7 +105,7 @@ page 7114 "Analysis Columns"
                     ApplicationArea = SalesAnalysis, PurchaseAnalysis;
                     ToolTip = 'Specifies the source data that the source data type in the Analysis Type Code field, in the Analysis Columns window, is based on.';
                 }
-                field(Show; Show)
+                field(Show; Rec.Show)
                 {
                     ApplicationArea = SalesAnalysis, PurchaseAnalysis;
                     ToolTip = 'Specifies when you want the amounts in the column to be shown in reports.';
@@ -141,8 +143,8 @@ page 7114 "Analysis Columns"
 
     trigger OnAfterGetRecord()
     begin
-        ItemLedgerEntryTypeFilterOnFor(Format("Item Ledger Entry Type Filter"));
-        ValueEntryTypeFilterOnFormat(Format("Value Entry Type Filter"));
+        ItemLedgerEntryTypeFilterOnFor(Format(Rec."Item Ledger Entry Type Filter"));
+        ValueEntryTypeFilterOnFormat(Format(Rec."Value Entry Type Filter"));
     end;
 
     trigger OnOpenPage()
@@ -171,14 +173,14 @@ page 7114 "Analysis Columns"
 
     local procedure ItemLedgerEntryTypeFilterOnFor(Text: Text[1024])
     begin
-        Text := "Item Ledger Entry Type Filter";
-        AnalysisRepMgmt.ValidateFilter(Text, DATABASE::"Analysis Column", FieldNo("Item Ledger Entry Type Filter"), false);
+        Text := Rec."Item Ledger Entry Type Filter";
+        AnalysisRepMgmt.ValidateFilter(Text, DATABASE::"Analysis Column", Rec.FieldNo("Item Ledger Entry Type Filter"), false);
     end;
 
     local procedure ValueEntryTypeFilterOnFormat(Text: Text[1024])
     begin
-        Text := "Value Entry Type Filter";
-        AnalysisRepMgmt.ValidateFilter(Text, DATABASE::"Analysis Column", FieldNo("Value Entry Type Filter"), false);
+        Text := Rec."Value Entry Type Filter";
+        AnalysisRepMgmt.ValidateFilter(Text, DATABASE::"Analysis Column", Rec.FieldNo("Value Entry Type Filter"), false);
     end;
 }
 

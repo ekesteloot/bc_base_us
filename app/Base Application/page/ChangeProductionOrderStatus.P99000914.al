@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Capacity;
+
 page 99000914 "Change Production Order Status"
 {
     ApplicationArea = Manufacturing;
@@ -148,13 +154,13 @@ page 99000914 "Change Production Order Status"
                         var
                             ItemLedgEntry: Record "Item Ledger Entry";
                         begin
-                            if Status <> Status::Released then
+                            if Rec.Status <> Rec.Status::Released then
                                 exit;
 
                             ItemLedgEntry.Reset();
                             ItemLedgEntry.SetCurrentKey("Order Type", "Order No.");
                             ItemLedgEntry.SetRange("Order Type", ItemLedgEntry."Order Type"::Production);
-                            ItemLedgEntry.SetRange("Order No.", "No.");
+                            ItemLedgEntry.SetRange("Order No.", Rec."No.");
                             PAGE.RunModal(0, ItemLedgEntry);
                         end;
                     }
@@ -169,13 +175,13 @@ page 99000914 "Change Production Order Status"
                         var
                             CapLedgEntry: Record "Capacity Ledger Entry";
                         begin
-                            if Status <> Status::Released then
+                            if Rec.Status <> Rec.Status::Released then
                                 exit;
 
                             CapLedgEntry.Reset();
                             CapLedgEntry.SetCurrentKey("Order Type", "Order No.");
                             CapLedgEntry.SetRange("Order Type", CapLedgEntry."Order Type"::Production);
-                            CapLedgEntry.SetRange("Order No.", "No.");
+                            CapLedgEntry.SetRange("Order No.", Rec."No.");
                             PAGE.RunModal(0, CapLedgEntry);
                         end;
                     }
@@ -190,13 +196,13 @@ page 99000914 "Change Production Order Status"
                         var
                             ValueEntry: Record "Value Entry";
                         begin
-                            if Status <> Status::Released then
+                            if Rec.Status <> Rec.Status::Released then
                                 exit;
 
                             ValueEntry.Reset();
                             ValueEntry.SetCurrentKey("Order Type", "Order No.");
                             ValueEntry.SetRange("Order Type", ValueEntry."Order Type"::Production);
-                            ValueEntry.SetRange("Order No.", "No.");
+                            ValueEntry.SetRange("Order No.", Rec."No.");
                             PAGE.RunModal(0, ValueEntry);
                         end;
                     }
@@ -207,8 +213,8 @@ page 99000914 "Change Production Order Status"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Prod. Order Comment Sheet";
-                    RunPageLink = Status = FIELD(Status),
-                                  "Prod. Order No." = FIELD("No.");
+                    RunPageLink = Status = field(Status),
+                                  "Prod. Order No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -222,7 +228,7 @@ page 99000914 "Change Production Order Status"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -232,9 +238,9 @@ page 99000914 "Change Production Order Status"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Production Order Statistics";
-                    RunPageLink = Status = FIELD(Status),
-                                  "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = Status = field(Status),
+                                  "No." = field("No."),
+                                  "Date Filter" = field("Date Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -273,23 +279,23 @@ page 99000914 "Change Production Order Status"
 
                         ChangeStatusForm.ReturnPostingInfo(NewStatus, NewPostingDate, NewUpdateUnitCost);
 
-                        NoOfRecords := Count;
+                        NoOfRecords := Rec.Count;
 
                         Window.Open(StrSubstNo(Text000, NewStatus) + Text001);
 
                         POCount := 0;
 
-                        if Find('-') then
+                        if Rec.Find('-') then
                             repeat
                                 POCount := POCount + 1;
-                                Window.Update(1, "No.");
+                                Window.Update(1, Rec."No.");
                                 Window.Update(2, Round(POCount / NoOfRecords * 10000, 1));
                                 IsHandled := false;
                                 OnBeforeChangeProdOrderStatus(Rec, NewStatus, NewPostingDate, NewUpdateUnitCost, IsHandled);
                                 if not IsHandled then
                                     ProdOrderStatusMgt.ChangeProdOrderStatus(Rec, NewStatus, NewPostingDate, NewUpdateUnitCost);
                                 Commit();
-                            until Next() = 0;
+                            until Rec.Next() = 0;
                     end;
                 }
             }
@@ -348,19 +354,19 @@ page 99000914 "Change Production Order Status"
 
     protected procedure BuildPage()
     begin
-        FilterGroup(2);
-        SetRange(Status, ProdOrderStatus);
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetRange(Status, ProdOrderStatus);
+        Rec.FilterGroup(0);
 
         if StartingDate <> 0D then
-            SetFilter("Starting Date", '..%1', StartingDate)
+            Rec.SetFilter("Starting Date", '..%1', StartingDate)
         else
-            SetRange("Starting Date");
+            Rec.SetRange("Starting Date");
 
         if EndingDate <> 0D then
-            SetFilter("Ending Date", '..%1', EndingDate)
+            Rec.SetFilter("Ending Date", '..%1', EndingDate)
         else
-            SetRange("Ending Date");
+            Rec.SetRange("Ending Date");
 
         CurrPage.Update(false);
     end;

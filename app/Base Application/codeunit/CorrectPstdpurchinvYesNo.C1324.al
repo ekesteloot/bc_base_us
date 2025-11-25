@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.Purchases.Document;
+using System.Utilities;
+
 codeunit 1324 "Correct PstdPurchInv (Yes/No)"
 {
     Permissions = TableData "Purch. Inv. Header" = rm,

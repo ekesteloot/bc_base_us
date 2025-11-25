@@ -1,3 +1,15 @@
+﻿namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Text;
+using System.Utilities;
+
 page 7159 "Invt. Analysis by Dimensions"
 {
     Caption = 'Invt. Analysis by Dimensions';
@@ -527,11 +539,8 @@ page 7159 "Invt. Analysis by Dimensions"
         ShowOppositeSign: Boolean;
         Text100: Label 'Period';
         NewItemAnalysisCode: Code[10];
-        [InDataSet]
         Dim1FilterEnable: Boolean;
-        [InDataSet]
         Dim2FilterEnable: Boolean;
-        [InDataSet]
         Dim3FilterEnable: Boolean;
 
     protected var

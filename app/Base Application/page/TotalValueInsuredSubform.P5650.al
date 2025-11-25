@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Insurance;
+
 page 5650 "Total Value Insured Subform"
 {
     Caption = 'Lines';
@@ -45,17 +47,17 @@ page 5650 "Total Value Insured Subform"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        exit(FindFirst(Which));
+        exit(Rec.FindFirst(Which));
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
     begin
-        exit(FindNext(Steps));
+        exit(Rec.FindNext(Steps));
     end;
 
     procedure CreateTotalValue(FANo: Code[20])
     begin
-        CreateInsTotValueInsured(FANo);
+        Rec.CreateInsTotValueInsured(FANo);
         CurrPage.Update();
     end;
 }

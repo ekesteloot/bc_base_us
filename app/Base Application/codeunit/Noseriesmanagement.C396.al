@@ -1,3 +1,10 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Foundation.NoSeries;
+
 codeunit 396 NoSeriesManagement
 {
     Permissions = tabledata "No. Series Line" = rimd,
@@ -423,7 +430,7 @@ codeunit 396 NoSeriesManagement
 
         if NewNo <> '' then begin
             if IncStr(NewNo) = '' then
-                Error(StrSubstNo(UnincrementableStringErr, NewFieldName));
+                Error(UnincrementableStringErr, NewFieldName);
             NoSeriesLine2 := NoSeriesLine;
             if NewNo = GetNoText(NewNo) then
                 Length := 0

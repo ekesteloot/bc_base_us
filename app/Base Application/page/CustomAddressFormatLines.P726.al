@@ -1,9 +1,11 @@
+namespace Microsoft.Foundation.Address;
+
 page 726 "Custom Address Format Lines"
 {
     Caption = 'Custom Address Format Lines';
     PageType = List;
     SourceTable = "Custom Address Format Line";
-    SourceTableView = SORTING("Country/Region Code", "Line No.", "Field Position");
+    SourceTableView = sorting("Country/Region Code", "Line No.", "Field Position");
 
     layout
     {
@@ -18,7 +20,7 @@ page 726 "Custom Address Format Lines"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupField();
+                        Rec.LookupField();
                     end;
                 }
                 field("Field Name"; Rec."Field Name")
@@ -27,7 +29,7 @@ page 726 "Custom Address Format Lines"
                     Editable = false;
                     ToolTip = 'Specifies reference address field name.';
                 }
-                field(Separator; Separator)
+                field(Separator; Rec.Separator)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies separator symbol.';
@@ -49,7 +51,7 @@ page 726 "Custom Address Format Lines"
 
                 trigger OnAction()
                 begin
-                    MoveLine(-1);
+                    Rec.MoveLine(-1);
                 end;
             }
             action("Move Down")
@@ -61,7 +63,7 @@ page 726 "Custom Address Format Lines"
 
                 trigger OnAction()
                 begin
-                    MoveLine(1);
+                    Rec.MoveLine(1);
                 end;
             }
         }

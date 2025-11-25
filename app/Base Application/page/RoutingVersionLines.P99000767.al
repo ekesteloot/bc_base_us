@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000767 "Routing Version Lines"
 {
     Caption = 'Lines';
@@ -213,7 +215,7 @@ page 99000767 "Routing Version Lines"
 
     trigger OnAfterGetCurrRecord()
     begin
-        ShowRelatedDataEnabled := "Operation No." <> '';
+        ShowRelatedDataEnabled := Rec."Operation No." <> '';
     end;
 
     var
@@ -222,9 +224,9 @@ page 99000767 "Routing Version Lines"
 
     local procedure ShowComment()
     begin
-        RtngComment.SetRange("Routing No.", "Routing No.");
-        RtngComment.SetRange("Operation No.", "Operation No.");
-        RtngComment.SetRange("Version Code", "Version Code");
+        RtngComment.SetRange("Routing No.", Rec."Routing No.");
+        RtngComment.SetRange("Operation No.", Rec."Operation No.");
+        RtngComment.SetRange("Version Code", Rec."Version Code");
 
         PAGE.Run(PAGE::"Routing Comment Sheet", RtngComment);
     end;
@@ -233,9 +235,9 @@ page 99000767 "Routing Version Lines"
     var
         RtngTool: Record "Routing Tool";
     begin
-        RtngTool.SetRange("Routing No.", "Routing No.");
-        RtngTool.SetRange("Version Code", "Version Code");
-        RtngTool.SetRange("Operation No.", "Operation No.");
+        RtngTool.SetRange("Routing No.", Rec."Routing No.");
+        RtngTool.SetRange("Version Code", Rec."Version Code");
+        RtngTool.SetRange("Operation No.", Rec."Operation No.");
 
         PAGE.Run(PAGE::"Routing Tools", RtngTool);
     end;
@@ -244,9 +246,9 @@ page 99000767 "Routing Version Lines"
     var
         RtngPersonnel: Record "Routing Personnel";
     begin
-        RtngPersonnel.SetRange("Routing No.", "Routing No.");
-        RtngPersonnel.SetRange("Version Code", "Version Code");
-        RtngPersonnel.SetRange("Operation No.", "Operation No.");
+        RtngPersonnel.SetRange("Routing No.", Rec."Routing No.");
+        RtngPersonnel.SetRange("Version Code", Rec."Version Code");
+        RtngPersonnel.SetRange("Operation No.", Rec."Operation No.");
 
         PAGE.Run(PAGE::"Routing Personnel", RtngPersonnel);
     end;
@@ -255,9 +257,9 @@ page 99000767 "Routing Version Lines"
     var
         RtngQltyMeasure: Record "Routing Quality Measure";
     begin
-        RtngQltyMeasure.SetRange("Routing No.", "Routing No.");
-        RtngQltyMeasure.SetRange("Version Code", "Version Code");
-        RtngQltyMeasure.SetRange("Operation No.", "Operation No.");
+        RtngQltyMeasure.SetRange("Routing No.", Rec."Routing No.");
+        RtngQltyMeasure.SetRange("Version Code", Rec."Version Code");
+        RtngQltyMeasure.SetRange("Operation No.", Rec."Operation No.");
 
         PAGE.Run(PAGE::"Routing Quality Measures", RtngQltyMeasure);
     end;

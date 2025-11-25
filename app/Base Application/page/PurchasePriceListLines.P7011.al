@@ -1,3 +1,9 @@
+﻿namespace Microsoft.Purchases.Pricing;
+
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Pricing;
+
 page 7011 "Purchase Price List Lines"
 {
     AutoSplitKey = true;
@@ -315,55 +321,31 @@ page 7011 "Purchase Price List Lines"
         PriceListHeader: Record "Price List Header";
         PriceType: Enum "Price Type";
         ViewAmountType: Enum "Price Amount Type";
-        [InDataSet]
         AllowUpdatingDefaults: Boolean;
-        [InDataSet]
         AmountEditable: Boolean;
-        [InDataSet]
         AmountTypeIsEditable: Boolean;
-        [InDataSet]
         AmountTypeIsVisible: Boolean;
         DiscountStyle: Text;
-        [InDataSet]
         DiscountMandatory: Boolean;
-        [InDataSet]
         DiscountVisible: Boolean;
-        [InDataSet]
         IsJobGroup: Boolean;
-        [InDataSet]
         IsParentAllowed: Boolean;
-        [InDataSet]
         ItemAsset: Boolean;
         PriceStyle: Text;
-        [InDataSet]
         PriceMandatory: Boolean;
-        [InDataSet]
         GLAccountAsset: Boolean;
-        [InDataSet]
         AssignToNoVisible: Boolean;
-        [InDataSet]
         AssignToParentNoVisible: Boolean;
-        [InDataSet]
         JobSourceTypeVisible: Boolean;
-        [InDataSet]
         SourceTypeVisible: Boolean;
-        [InDataSet]
         SourceNoVisible: Boolean;
-        [InDataSet]
         PriceVisible: Boolean;
-        [InDataSet]
         ResourceAsset: Boolean;
-        [InDataSet]
         SourceNoEnabled: Boolean;
-        [InDataSet]
         ParentSourceNoVisible: Boolean;
-        [InDataSet]
         LineToVerify: Boolean;
-        [InDataSet]
         UOMEditable: Boolean;
-        [InDataSet]
         UnitCostEditable: Boolean;
-        [InDataSet]
         UseCustomLookup: Boolean;
 
     local procedure GetStyle(Mandatory: Boolean): Text;
@@ -382,7 +364,7 @@ page 7011 "Purchase Price List Lines"
         UOMEditable := Rec.IsUOMSupported();
         ItemAsset := Rec.IsAssetItem();
         ResourceAsset := Rec.IsAssetResource();
-        GLAccountAsset := Rec."Asset Type" = "Price Asset Type"::"G/L Account";
+        GLAccountAsset := Rec."Asset Type" = Rec."Asset Type"::"G/L Account";
         UnitCostEditable := AmountEditable and (ResourceAsset or GLAccountAsset);
     end;
 
@@ -440,15 +422,15 @@ page 7011 "Purchase Price List Lines"
     local procedure UpdateSourceType()
     begin
         case PriceListHeader."Source Group" of
-            "Price Source Group"::Vendor:
+            PriceListHeader."Source Group"::Vendor:
                 begin
                     IsJobGroup := false;
                     SourceType := "Purchase Price Source Type".FromInteger(Rec."Source Type".AsInteger());
                 end;
-            "Price Source Group"::Job:
+            PriceListHeader."Source Group"::Job:
                 begin
                     IsJobGroup := true;
-                    JobSourceType := "Job Price Source Type".FromInteger(Rec."Source Type".AsInteger());
+                    JobSourceType := Enum::"Job Price Source Type".FromInteger(Rec."Source Type".AsInteger());
                 end;
             else
                 OnUpdateSourceTypeOnCaseElse(PriceListHeader, SourceType, IsJobGroup);

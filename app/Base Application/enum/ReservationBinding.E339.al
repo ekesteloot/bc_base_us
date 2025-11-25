@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 enum 339 "Reservation Binding"
 {
     AssignmentCompatibility = true;

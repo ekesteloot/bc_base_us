@@ -1,3 +1,16 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
 codeunit 99000889 AvailabilityManagement
 {
     Permissions = TableData "Sales Line" = r,
@@ -92,6 +105,7 @@ codeunit 99000889 AvailabilityManagement
     local procedure InsertPromisingLine(var OrderPromisingLine: Record "Order Promising Line"; UnavailableQty: Decimal)
     var
         LineItem: Record Item;
+        ItemVariant: Record "Item Variant";
     begin
         with OrderPromisingLine do begin
             "Unavailable Quantity (Base)" := UnavailableQty;
@@ -106,8 +120,12 @@ codeunit 99000889 AvailabilityManagement
                     TestField("Location Code");
                 LineItem.SetLoadFields("Variant Mandatory if Exists");
                 if LineItem.Get(OrderPromisingLine."Item No.") then
-                    if LineItem.IsVariantMandatory() then
-                        TestField("Variant Code");
+                    if LineItem.IsVariantMandatory() then begin
+                        OrderPromisingLine.TestField("Variant Code");
+                        ItemVariant.SetLoadFields(Blocked);
+                        ItemVariant.Get(Item."No.", OrderPromisingLine."Variant Code");
+                        ItemVariant.TestField(Blocked, false);
+                    end;
                 if "Unavailable Quantity (Base)" < 0 then
                     "Unavailable Quantity (Base)" := 0;
                 if "Unavailable Quantity (Base)" > "Required Quantity (Base)" then

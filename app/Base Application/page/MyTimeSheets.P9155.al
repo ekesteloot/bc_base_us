@@ -27,7 +27,7 @@ page 9155 "My Time Sheets"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the end date of the assignment.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies any comments about the assignment.';
@@ -68,7 +68,7 @@ page 9155 "My Time Sheets"
 
     trigger OnOpenPage()
     begin
-        SetRange("User ID", UserId);
+        Rec.SetRange("User ID", UserId);
     end;
 
     var
@@ -78,11 +78,11 @@ page 9155 "My Time Sheets"
     begin
         Clear(TimeSheetHeader);
 
-        if TimeSheetHeader.Get("Time Sheet No.") then begin
-            "Time Sheet No." := TimeSheetHeader."No.";
-            "Start Date" := TimeSheetHeader."Starting Date";
-            "End Date" := TimeSheetHeader."Ending Date";
-            Comment := TimeSheetHeader.Comment;
+        if TimeSheetHeader.Get(Rec."Time Sheet No.") then begin
+            Rec."Time Sheet No." := TimeSheetHeader."No.";
+            Rec."Start Date" := TimeSheetHeader."Starting Date";
+            Rec."End Date" := TimeSheetHeader."Ending Date";
+            Rec.Comment := TimeSheetHeader.Comment;
         end;
     end;
 
@@ -95,12 +95,12 @@ page 9155 "My Time Sheets"
     begin
 #if not CLEAN22
         if not TimeSheetMgt.TimeSheetV2Enabled() then begin
-            TimeSheetMgt.SetTimeSheetNo("Time Sheet No.", TimeSheetLine);
+            TimeSheetMgt.SetTimeSheetNo(Rec."Time Sheet No.", TimeSheetLine);
             PAGE.Run(PAGE::"Time Sheet", TimeSheetLine);
             exit;
         end;
 #endif
-        TimeSheetHeader.Get("Time Sheet No.");
+        TimeSheetHeader.Get(Rec."Time Sheet No.");
         Page.Run(Page::"Time Sheet Card", TimeSheetHeader);
     end;
 }

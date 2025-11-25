@@ -495,8 +495,8 @@ report 10130 "Availability Projection"
             }
             dataitem("Item Variant"; "Item Variant")
             {
-                DataItemLink = "Item No." = FIELD("No.");
-                DataItemTableView = SORTING("Item No.", Code);
+                DataItemLink = "Item No." = field("No.");
+                DataItemTableView = sorting("Item No.", Code);
                 column(OnHand_7__Control1; TOnHand[7])
                 {
                     DecimalPlaces = 0 : 5;

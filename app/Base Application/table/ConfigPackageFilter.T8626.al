@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8626 "Config. Package Filter"
 {
     Caption = 'Config. Package Filter';
@@ -34,16 +38,16 @@ table 8626 "Config. Package Filter"
         }
         field(6; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table ID"),
-                                                        "No." = FIELD("Field ID")));
+            CalcFormula = Lookup(Field.FieldName where(TableNo = field("Table ID"),
+                                                        "No." = field("Field ID")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; "Field Caption"; Text[250])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table ID"),
-                                                              "No." = FIELD("Field ID")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table ID"),
+                                                              "No." = field("Field ID")));
             Caption = 'Field Caption';
             Editable = false;
             FieldClass = FlowField;

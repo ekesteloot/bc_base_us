@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using System;
+using System.Utilities;
+
 codeunit 1234 "Json Text Reader/Writer"
 {
 

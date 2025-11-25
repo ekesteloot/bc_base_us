@@ -1,3 +1,9 @@
+﻿namespace System.Security.Authentication;
+
+using System;
+using System.Environment;
+using System.Security.Encryption;
+
 codeunit 1140 "OAuth 2.0 Mgt."
 {
 

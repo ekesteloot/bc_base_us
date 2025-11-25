@@ -1,3 +1,9 @@
+﻿namespace System.TestTools.CodeCoverage;
+
+using System;
+using System.Reflection;
+using System.Tooling;
+
 codeunit 9990 "Code Coverage Mgt."
 {
     SingleInstance = true;

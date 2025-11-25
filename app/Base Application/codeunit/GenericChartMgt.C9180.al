@@ -1,3 +1,11 @@
+﻿namespace System.Visualization;
+
+using System;
+using System.Apps;
+using System.Environment;
+using System.Globalization;
+using System.Reflection;
+
 codeunit 9180 "Generic Chart Mgt"
 {
 

@@ -1,3 +1,33 @@
+﻿namespace System.Text;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Reminder;
+using Microsoft.ServiceMgt.Document;
+using System.Automation;
+using System.Security.AccessControl;
+
 codeunit 46 SelectionFilterManagement
 {
 
@@ -11,7 +41,7 @@ codeunit 46 SelectionFilterManagement
     /// <param name="TempRecRef">Record used to determine the field filter.</param>
     /// <param name="SelectionFieldID">The field for which the filter will be constructed.</param>
     /// <returns>The filter for the provided field ID. For example, '1..3|6'.</returns>
-    /// <remarks>This method queries the database intensively, can cause perfomance issues and even cause database server exceptions. Consider using <seealso cref="GetSimpleSelectionFilter"/>.</remarks>
+    /// <remarks>This method queries the database intensively, can cause perfomance issues and even cause database server exceptions. Consider using the overload with ComputeRangesUsingRecords set to false.</remarks>
     procedure GetSelectionFilter(var TempRecRef: RecordRef; SelectionFieldID: Integer): Text
     var
         RecRef: RecordRef;

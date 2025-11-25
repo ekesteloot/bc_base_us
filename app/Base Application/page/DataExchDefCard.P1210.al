@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1210 "Data Exch Def Card"
 {
     Caption = 'Data Exchange Definition';
@@ -14,7 +16,7 @@ page 1210 "Data Exch Def Card"
                 group(Control19)
                 {
                     ShowCaption = false;
-                    field("Code"; Code)
+                    field("Code"; Rec.Code)
                     {
                         ApplicationArea = Basic, Suite;
                         ShowMandatory = true;
@@ -33,9 +35,9 @@ page 1210 "Data Exch Def Card"
 
                         trigger OnValidate()
                         begin
-                            IsNonXMLFileType := CheckEnableDisableIsNonXMLFileType();
-                            IsDelimitedFileType := CheckEnableDisableDelimitedFileType();
-                            IsImportType := CheckEnableDisableIsImportType();
+                            IsNonXMLFileType := Rec.CheckEnableDisableIsNonXMLFileType();
+                            IsDelimitedFileType := Rec.CheckEnableDisableDelimitedFileType();
+                            IsImportType := Rec.CheckEnableDisableIsImportType();
                             CurrPage.Update();
                         end;
                     }
@@ -47,9 +49,9 @@ page 1210 "Data Exch Def Card"
 
                         trigger OnValidate()
                         begin
-                            IsImportType := CheckEnableDisableIsImportType();
-                            PositivePayUpdateCodeunits();
-                            EFTPaymentUpdateCodeunits();
+                            IsImportType := Rec.CheckEnableDisableIsImportType();
+                            Rec.PositivePayUpdateCodeunits();
+                            Rec.EFTPaymentUpdateCodeunits();
                             CurrPage.Update();
                         end;
                     }
@@ -139,15 +141,15 @@ page 1210 "Data Exch Def Card"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Line Definitions';
-                SubPageLink = "Data Exch. Def Code" = FIELD(Code);
+                SubPageLink = "Data Exch. Def Code" = field(Code);
             }
             part("Column Definitions"; "Data Exch Col Def Part")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Column Definitions';
                 Provider = "Line Definitions";
-                SubPageLink = "Data Exch. Line Def Code" = FIELD(Code),
-                              "Data Exch. Def Code" = FIELD("Data Exch. Def Code");
+                SubPageLink = "Data Exch. Line Def Code" = field(Code),
+                              "Data Exch. Def Code" = field("Data Exch. Def Code");
             }
         }
     }
@@ -179,7 +181,7 @@ page 1210 "Data Exch Def Card"
                 var
                     DataExchDef: Record "Data Exch. Def";
                 begin
-                    DataExchDef.SetFilter(Code, Code);
+                    DataExchDef.SetFilter(Code, Rec.Code);
                     XMLPORT.Run(XMLPORT::"Imp / Exp Data Exch Def & Map", false, false, DataExchDef);
                 end;
             }
@@ -212,8 +214,8 @@ page 1210 "Data Exch Def Card"
     var
         DataExchLineDef: Record "Data Exch. Line Def";
     begin
-        if not DataExchLineDef.Get(Code) then begin
-            DataExchLineDef."Data Exch. Def Code" := Code;
+        if not DataExchLineDef.Get(Rec.Code) then begin
+            DataExchLineDef."Data Exch. Def Code" := Rec.Code;
             DataExchLineDef.Code := DefaultTxt;
             DataExchLineDef.Name := DefaultTxt;
             DataExchLineDef."Line Type" := 1;
@@ -223,9 +225,9 @@ page 1210 "Data Exch Def Card"
 
     trigger OnOpenPage()
     begin
-        IsNonXMLFileType := CheckEnableDisableIsNonXMLFileType();
-        IsImportType := CheckEnableDisableIsImportType();
-        IsDelimitedFileType := CheckEnableDisableDelimitedFileType();
+        IsNonXMLFileType := Rec.CheckEnableDisableIsNonXMLFileType();
+        IsImportType := Rec.CheckEnableDisableIsImportType();
+        IsDelimitedFileType := Rec.CheckEnableDisableDelimitedFileType();
     end;
 
     var

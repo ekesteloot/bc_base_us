@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 778 "Analysis Report Chart SubPage"
 {
     Caption = 'Analysis Report Chart SubPage';
@@ -43,7 +45,7 @@ page 778 "Analysis Report Chart SubPage"
 
                     trigger OnValidate()
                     begin
-                        if "Chart Type" = "Chart Type"::" " then
+                        if Rec."Chart Type" = Rec."Chart Type"::" " then
                             CurrPage.Update();
                     end;
                 }
@@ -103,7 +105,7 @@ page 778 "Analysis Report Chart SubPage"
                     AnalysisReportChartLine: Record "Analysis Report Chart Line";
                 begin
                     CurrPage.SetSelectionFilter(AnalysisReportChartLine);
-                    AnalysisReportChartLine.ModifyAll("Chart Type", "Chart Type"::" ");
+                    AnalysisReportChartLine.ModifyAll("Chart Type", Rec."Chart Type"::" ");
                     CurrPage.Update();
                 end;
             }
@@ -125,7 +127,7 @@ page 778 "Analysis Report Chart SubPage"
     trigger OnFindRecord(Which: Text): Boolean
     begin
         SetFilters(Rec);
-        exit(FindSet());
+        exit(Rec.FindSet());
     end;
 
     var

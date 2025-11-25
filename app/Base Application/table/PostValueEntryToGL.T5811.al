@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+
 table 5811 "Post Value Entry to G/L"
 {
     Caption = 'Post Value Entry to G/L';

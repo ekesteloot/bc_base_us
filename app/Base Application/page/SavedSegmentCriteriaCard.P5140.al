@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Segment;
+
 page 5140 "Saved Segment Criteria Card"
 {
     Caption = 'Saved Segment Criteria Card';
@@ -12,7 +14,7 @@ page 5140 "Saved Segment Criteria Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code of the saved segment criteria.';
@@ -26,7 +28,7 @@ page 5140 "Saved Segment Criteria Card"
             part(Control11; "Saved Segment Criteria Subform")
             {
                 ApplicationArea = RelationshipMgmt;
-                SubPageLink = "Segment Criteria Code" = FIELD(Code);
+                SubPageLink = "Segment Criteria Code" = field(Code);
             }
         }
         area(factboxes)

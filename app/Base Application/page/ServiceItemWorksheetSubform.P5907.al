@@ -1,3 +1,15 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Setup;
+
 page 5907 "Service Item Worksheet Subform"
 {
     AutoSplitKey = true;
@@ -34,8 +46,8 @@ page 5907 "Service Item Worksheet Subform"
                         Item: Record "Item";
                     begin
                         NoOnAfterValidate();
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field("Variant Code"; Rec."Variant Code")
@@ -49,11 +61,11 @@ page 5907 "Service Item Worksheet Subform"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that the item is a catalog item.';
@@ -64,13 +76,19 @@ page 5907 "Service Item Worksheet Subform"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the description of an item, resource, cost, or a standard text on the line.';
                 }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
+                }
                 field("Work Type Code"; Rec."Work Type Code")
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies a code for the type of work performed by the resource registered on this line.';
                     Visible = false;
                 }
-                field(Control86; Reserve)
+                field(Control86; Rec.Reserve)
                 {
                     ApplicationArea = Reservation;
                     ToolTip = 'Specifies whether a reservation can be made for items on this line.';
@@ -202,7 +220,7 @@ page 5907 "Service Item Worksheet Subform"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that the contract discount is excluded for the item, resource, or cost on this line.';
                 }
-                field(Warranty; Warranty)
+                field(Warranty; Rec.Warranty)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that a warranty discount is available on this line of type Item or Resource.';
@@ -303,84 +321,84 @@ page 5907 "Service Item Worksheet Subform"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
             }
@@ -417,7 +435,7 @@ page 5907 "Service Item Worksheet Subform"
 
                     trigger OnAction()
                     begin
-                        InsertStartFee;
+                        InsertStartFee();
                     end;
                 }
                 action("Insert Travel Fee")
@@ -429,7 +447,7 @@ page 5907 "Service Item Worksheet Subform"
 
                     trigger OnAction()
                     begin
-                        InsertTravelFee;
+                        InsertTravelFee();
                     end;
                 }
                 action(Reserve)
@@ -441,8 +459,8 @@ page 5907 "Service Item Worksheet Subform"
 
                     trigger OnAction()
                     begin
-                        Find();
-                        ShowReservation();
+                        Rec.Find();
+                        Rec.ShowReservation();
                     end;
                 }
                 action("Order Tracking")
@@ -454,8 +472,8 @@ page 5907 "Service Item Worksheet Subform"
 
                     trigger OnAction()
                     begin
-                        Find();
-                        ShowTracking();
+                        Rec.Find();
+                        Rec.ShowTracking();
                     end;
                 }
                 action("&Catalog Items")
@@ -468,7 +486,7 @@ page 5907 "Service Item Worksheet Subform"
 
                     trigger OnAction()
                     begin
-                        ShowNonstock();
+                        Rec.ShowNonstock();
                     end;
                 }
             }
@@ -564,7 +582,7 @@ page 5907 "Service Item Worksheet Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Select Item Substitution")
@@ -577,7 +595,7 @@ page 5907 "Service Item Worksheet Subform"
 
                     trigger OnAction()
                     begin
-                        SelectItemSubstitution;
+                        SelectItemSubstitution();
                     end;
                 }
                 action("&Fault/Resol. Codes Relationships")
@@ -602,7 +620,7 @@ page 5907 "Service Item Worksheet Subform"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
                 action("Order &Promising Line")
@@ -614,7 +632,7 @@ page 5907 "Service Item Worksheet Subform"
 
                     trigger OnAction()
                     begin
-                        ShowOrderPromisingLine();
+                        Rec.ShowOrderPromisingLine();
                     end;
                 }
             }
@@ -625,16 +643,16 @@ page 5907 "Service Item Worksheet Subform"
     var
         Item: Record Item;
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
     end;
 
     trigger OnDeleteRecord(): Boolean
     var
         ServiceLineReserve: Codeunit "Service Line-Reserve";
     begin
-        if (Quantity <> 0) and ItemExists("No.") then begin
+        if (Rec.Quantity <> 0) and Rec.ItemExists(Rec."No.") then begin
             Commit();
             if not ServiceLineReserve.DeleteLineConfirm(Rec) then
                 exit(false);
@@ -644,14 +662,14 @@ page 5907 "Service Item Worksheet Subform"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        "Line No." := GetLineNo();
+        Rec."Line No." := Rec.GetLineNo();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Type := xRec.Type;
+        Rec.Type := xRec.Type;
         Clear(ShortcutDimCode);
-        Validate("Service Item Line No.", ServItemLineNo);
+        Rec.Validate("Service Item Line No.", ServItemLineNo);
     end;
 
     var
@@ -667,7 +685,7 @@ page 5907 "Service Item Worksheet Subform"
     procedure SetValues(TempServItemLineNo: Integer)
     begin
         ServItemLineNo := TempServItemLineNo;
-        SetFilter("Service Item Line No.", '=%1|=%2', 0, ServItemLineNo);
+        Rec.SetFilter("Service Item Line No.", '=%1|=%2', 0, ServItemLineNo);
     end;
 
     local procedure InsertStartFee()
@@ -713,58 +731,58 @@ page 5907 "Service Item Worksheet Subform"
                   Text000,
                   ServMgtSetup.FieldCaption("Fault Reporting Level"), ServMgtSetup."Fault Reporting Level", ServMgtSetup.TableCaption());
         end;
-        ServItemLine.Get("Document Type", "Document No.", "Service Item Line No.");
+        ServItemLine.Get(Rec."Document Type", Rec."Document No.", Rec."Service Item Line No.");
         Clear(FaultResolutionRelation);
-        FaultResolutionRelation.SetDocument(DATABASE::"Service Line", "Document Type".AsInteger(), "Document No.", "Line No.");
-        FaultResolutionRelation.SetFilters("Symptom Code", "Fault Code", "Fault Area Code", ServItemLine."Service Item Group Code");
+        FaultResolutionRelation.SetDocument(DATABASE::"Service Line", Rec."Document Type".AsInteger(), Rec."Document No.", Rec."Line No.");
+        FaultResolutionRelation.SetFilters(Rec."Symptom Code", Rec."Fault Code", Rec."Fault Area Code", ServItemLine."Service Item Group Code");
         FaultResolutionRelation.RunModal();
         CurrPage.Update(false);
     end;
 
     local procedure SelectItemSubstitution()
     begin
-        ShowItemSub();
-        Modify();
+        Rec.ShowItemSub();
+        Rec.Modify();
     end;
 
     protected procedure NoOnAfterValidate()
     begin
         InsertExtendedText(false);
 
-        if (Reserve = Reserve::Always) and
-           ("Outstanding Qty. (Base)" <> 0) and
-           ("No." <> xRec."No.")
+        if (Rec.Reserve = Rec.Reserve::Always) and
+           (Rec."Outstanding Qty. (Base)" <> 0) and
+           (Rec."No." <> xRec."No.")
         then begin
             CurrPage.SaveRecord();
-            AutoReserve(true);
+            Rec.AutoReserve();
             CurrPage.Update(false);
         end;
     end;
 
     protected procedure LocationCodeOnAfterValidate()
     begin
-        if (Reserve = Reserve::Always) and
-           ("Outstanding Qty. (Base)" <> 0) and
-           ("Location Code" <> xRec."Location Code")
+        if (Rec.Reserve = Rec.Reserve::Always) and
+           (Rec."Outstanding Qty. (Base)" <> 0) and
+           (Rec."Location Code" <> xRec."Location Code")
         then begin
             CurrPage.SaveRecord();
-            AutoReserve(true);
+            Rec.AutoReserve();
             CurrPage.Update(false);
         end;
     end;
 
     protected procedure QuantityOnAfterValidate()
     begin
-        if Type = Type::Item then
-            case Reserve of
-                Reserve::Always:
+        if Rec.Type = Rec.Type::Item then
+            case Rec.Reserve of
+                Rec.Reserve::Always:
                     begin
                         CurrPage.SaveRecord();
-                        AutoReserve(true);
+                        Rec.AutoReserve();
                         CurrPage.Update(false);
                     end;
-                Reserve::Optional:
-                    if (Quantity < xRec.Quantity) and (xRec.Quantity > 0) then begin
+                Rec.Reserve::Optional:
+                    if (Rec.Quantity < xRec.Quantity) and (xRec.Quantity > 0) then begin
                         CurrPage.SaveRecord();
                         CurrPage.Update(false);
                     end;
@@ -773,12 +791,12 @@ page 5907 "Service Item Worksheet Subform"
 
     protected procedure PostingDateOnAfterValidate()
     begin
-        if (Reserve = Reserve::Always) and
-           ("Outstanding Qty. (Base)" <> 0) and
-           ("Posting Date" <> xRec."Posting Date")
+        if (Rec.Reserve = Rec.Reserve::Always) and
+           (Rec."Outstanding Qty. (Base)" <> 0) and
+           (Rec."Posting Date" <> xRec."Posting Date")
         then begin
             CurrPage.SaveRecord();
-            AutoReserve(true);
+            Rec.AutoReserve(true);
             CurrPage.Update(false);
         end;
     end;

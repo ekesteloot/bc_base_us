@@ -1,3 +1,19 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Ledger;
+using Microsoft.ServiceMgt.Posting;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using System.Utilities;
+
 codeunit 5818 "Undo Service Shipment Line"
 {
     Permissions = TableData "Item Application Entry" = rmd,
@@ -19,21 +35,21 @@ codeunit 5818 "Undo Service Shipment Line"
         if IsHandled then
             exit;
 
-        if not Find('-') then
+        if not Rec.Find('-') then
             exit;
 
         ConfMessage := Text000;
 
         if CheckComponentsAdjusted(Rec) then
             ConfMessage :=
-              StrSubstNo(Text004, FieldCaption("Service Item No."), Format("Service Item No.")) +
+              StrSubstNo(Text004, Rec.FieldCaption("Service Item No."), Format(Rec."Service Item No.")) +
               Text000;
 
         if not HideDialog then
             if not ConfirmManagement.GetResponseOrDefault(ConfMessage, true) then
                 exit;
 
-        LockTable();
+        Rec.LockTable();
         ServShptLine.Copy(Rec);
         Code();
         Rec := ServShptLine;
@@ -132,7 +148,7 @@ codeunit 5818 "Undo Service Shipment Line"
                 if Type = Type::Item then
                     ItemShptEntryNo := PostItemJnlLine(ServShptLine)
                 else
-                    ItemShptEntryNo := 0;
+                    ItemShptEntryNo := GetCorrectionLineNo(ServShptLine);
 
                 if Type = Type::Resource then
                     PostResJnlLine(ServShptLine);
@@ -212,6 +228,34 @@ codeunit 5818 "Undo Service Shipment Line"
                 UndoPostingMgt.CheckItemLedgEntries(TempItemLedgEntry, "Line No.");
             end;
         end;
+    end;
+
+    procedure GetCorrectionLineNo(ServiceShipmentLine2: Record "Service Shipment Line") Result: Integer;
+    var
+        ServiceShipmentLine3: Record "Service Shipment Line";
+        LineSpacing: Integer;
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeGetCorrectionLineNo(ServiceShipmentLine2, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
+        with ServiceShipmentLine2 do begin
+            ServiceShipmentLine3.SetRange("Document No.", "Document No.");
+            ServiceShipmentLine3."Document No." := "Document No.";
+            ServiceShipmentLine3."Line No." := "Line No.";
+            ServiceShipmentLine3.Find('=');
+            if ServiceShipmentLine3.Next() <> 0 then begin
+                LineSpacing := (ServiceShipmentLine3."Line No." - "Line No.") div 2;
+                if LineSpacing = 0 then
+                    Error(Text002);
+            end else
+                LineSpacing := 10000;
+
+            Result := "Line No." + LineSpacing;
+        end;
+        OnAfterGetCorrectionLineNo(ServiceShipmentLine2, Result);
     end;
 
     local procedure PostItemJnlLine(ServShptLine: Record "Service Shipment Line"): Integer
@@ -419,12 +463,22 @@ codeunit 5818 "Undo Service Shipment Line"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnAfterGetCorrectionLineNo(ServiceShipmentLine: Record "Service Shipment Line"; var Result: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateOrderLine(var ServiceLine: Record "Service Line"; var ServiceShptLine: Record "Service Shipment Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckServShptLine(var ServiceShptLine: Record "Service Shipment Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetCorrectionLineNo(ServiceShipmentLine: Record "Service Shipment Line"; var Result: Integer; var IsHandled: Boolean)
     begin
     end;
 

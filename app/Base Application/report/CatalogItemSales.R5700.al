@@ -1,7 +1,12 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+
 report 5700 "Catalog Item Sales"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/CatalogItemSales.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/CatalogItemSales.rdlc';
     AdditionalSearchTerms = 'non-inventoriable sale,special sales order';
     ApplicationArea = Basic, Suite;
     Caption = 'Catalog Item Sales';
@@ -11,7 +16,7 @@ report 5700 "Catalog Item Sales"
     {
         dataitem("Item Ledger Entry"; "Item Ledger Entry")
         {
-            DataItemTableView = SORTING("Item No.", "Entry Type");
+            DataItemTableView = sorting("Item No.", "Entry Type");
             RequestFilterFields = "Item No.", "Location Code", "Posting Date";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -64,8 +69,8 @@ report 5700 "Catalog Item Sales"
             }
             dataitem("Value Entry"; "Value Entry")
             {
-                DataItemLink = "Item Ledger Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("Item Ledger Entry No.");
+                DataItemLink = "Item Ledger Entry No." = field("Entry No.");
+                DataItemTableView = sorting("Item Ledger Entry No.");
                 column(ValueEntryDocumentNo; "Document No.")
                 {
                     IncludeCaption = true;

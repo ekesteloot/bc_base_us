@@ -1,14 +1,19 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using System.Utilities;
+
 report 6529 "Item Tracking Navigate"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemTracking/ItemTrackingNavigate.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemTrackingNavigate.rdlc';
     Caption = 'Item Tracking Navigate';
 
     dataset
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(TodayFormatted; Format(Today, 0, 4))
             {
             }
@@ -50,7 +55,7 @@ report 6529 "Item Tracking Navigate"
             }
             dataitem(RecordBuffer; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(TempDocEntryNoOfRecords; TempDocEntry."No. of Records")
                 {
                 }

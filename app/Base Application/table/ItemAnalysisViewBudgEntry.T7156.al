@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 7156 "Item Analysis View Budg. Entry"
 {
     Caption = 'Item Analysis View Budg. Entry';
@@ -14,13 +23,13 @@ table 7156 "Item Analysis View Budg. Entry"
         {
             Caption = 'Analysis View Code';
             NotBlank = true;
-            TableRelation = "Item Analysis View".Code WHERE("Analysis Area" = FIELD("Analysis Area"),
-                                                             Code = FIELD("Analysis View Code"));
+            TableRelation = "Item Analysis View".Code where("Analysis Area" = field("Analysis Area"),
+                                                             Code = field("Analysis View Code"));
         }
         field(3; "Budget Name"; Code[10])
         {
             Caption = 'Budget Name';
-            TableRelation = "Item Budget Name".Name WHERE("Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Item Budget Name".Name where("Analysis Area" = field("Analysis Area"));
         }
         field(4; "Item No."; Code[20])
         {
@@ -34,11 +43,11 @@ table 7156 "Item Analysis View Budg. Entry"
         field(6; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type" = CONST(Item)) Item;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor
+            else
+            if ("Source Type" = const(Item)) Item;
         }
         field(8; "Location Code"; Code[10])
         {

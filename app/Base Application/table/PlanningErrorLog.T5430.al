@@ -15,7 +15,7 @@ table 5430 "Planning Error Log"
         field(2; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Requisition Wksh. Name".Name WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"));
+            TableRelation = "Requisition Wksh. Name".Name where("Worksheet Template Name" = field("Worksheet Template Name"));
         }
         field(3; "Entry No."; Integer)
         {
@@ -33,7 +33,7 @@ table 5430 "Planning Error Log"
         field(6; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(7; "Table Position"; Text[250])
         {

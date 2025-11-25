@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Contact;
+
+using Microsoft.CRM.BusinessRelation;
+
 page 9130 "Contact Statistics FactBox"
 {
     Caption = 'Contact Statistics';
@@ -62,7 +66,7 @@ page 9130 "Contact Statistics FactBox"
 
                     trigger OnDrillDown()
                     begin
-                        Rec.ShowBusinessRelation("Contact Business Relation Link To Table"::" ", true);
+                        Rec.ShowBusinessRelation(Enum::"Contact Business Relation Link To Table"::" ", true);
                     end;
                 }
                 field("No. of Mailing Groups"; Rec."No. of Mailing Groups")
@@ -80,7 +84,7 @@ page 9130 "Contact Statistics FactBox"
 
     trigger OnAfterGetCurrRecord()
     begin
-        NoOfBusinessRelations := Rec.CountNoOfBusinessRelations("Contact Business Relation Link To Table"::" ");
+        NoOfBusinessRelations := Rec.CountNoOfBusinessRelations(Enum::"Contact Business Relation Link To Table"::" ");
     end;
 
     var

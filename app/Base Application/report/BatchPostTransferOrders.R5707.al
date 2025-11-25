@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using System.Utilities;
+
 report 5707 "Batch Post Transfer Orders"
 {
     ApplicationArea = All;

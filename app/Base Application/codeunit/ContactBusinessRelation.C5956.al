@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using System.Email;
+
 codeunit 5956 "Contact Business Relation"
 {
     Access = Internal;

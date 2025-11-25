@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
 enum 208 "Res. Journal Line Entry Type"
 {
     Extensible = true;

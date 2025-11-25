@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
+using Microsoft.InventoryMgt.Item;
+using System.Environment;
+
 page 9110 "Item Attributes Factbox"
 {
     Caption = 'Item Attributes';
@@ -16,14 +21,14 @@ page 9110 "Item Attributes Factbox"
             repeater(Control2)
             {
                 ShowCaption = false;
-                field(Attribute; GetAttributeNameInCurrentLanguage())
+                field(Attribute; Rec.GetAttributeNameInCurrentLanguage())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Attribute';
                     ToolTip = 'Specifies the name of the item attribute.';
                     Visible = TranslatedValuesVisible;
                 }
-                field(Value; GetValueInCurrentLanguage())
+                field(Value; Rec.GetValueInCurrentLanguage())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Value';
@@ -37,7 +42,7 @@ page 9110 "Item Attributes Factbox"
                     ToolTip = 'Specifies the name of the item attribute.';
                     Visible = NOT TranslatedValuesVisible;
                 }
-                field(RawValue; Value)
+                field(RawValue; Rec.Value)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Value';
@@ -79,7 +84,7 @@ page 9110 "Item Attributes Factbox"
 
     trigger OnOpenPage()
     begin
-        SetAutoCalcFields("Attribute Name");
+        Rec.SetAutoCalcFields("Attribute Name");
         TranslatedValuesVisible := ClientTypeManagement.GetCurrentClientType() <> CLIENTTYPE::Phone;
         IsVisible := true;
         if ItemAttCode <> '' then begin
@@ -111,7 +116,7 @@ page 9110 "Item Attributes Factbox"
             ItemAttCode := KeyValue;
             exit;
         end;
-        LoadItemAttributesFactBoxData(KeyValue);
+        Rec.LoadItemAttributesFactBoxData(KeyValue);
         SetContext(ContextType::Item, KeyValue);
         CurrPage.Update(false);
     end;
@@ -122,7 +127,7 @@ page 9110 "Item Attributes Factbox"
             CategoryAttCode := CategoryCode;
             exit;
         end;
-        LoadCategoryAttributesFactBoxData(CategoryCode);
+        Rec.LoadCategoryAttributesFactBoxData(CategoryCode);
         SetContext(ContextType::Category, CategoryCode);
         CurrPage.Update(false);
     end;

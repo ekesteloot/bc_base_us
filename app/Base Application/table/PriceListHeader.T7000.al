@@ -1,3 +1,24 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using System.Utilities;
+
 table 7000 "Price List Header"
 {
     Caption = 'Price List';
@@ -254,21 +275,21 @@ table 7000 "Price List Header"
         {
             Caption = 'Assign-to No.';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Source Type" = CONST(Campaign)) Campaign
-            ELSE
-            IF ("Source Type" = CONST(Contact)) Contact
-            ELSE
-            IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST("Customer Disc. Group")) "Customer Discount Group"
-            ELSE
-            IF ("Source Type" = CONST("Customer Price Group")) "Customer Price Group"
-            ELSE
-            IF ("Source Type" = CONST(Job)) Job
-            ELSE
-            IF ("Source Type" = CONST("Job Task")) "Job Task"."Job Task No." where("Job No." = field("Parent Source No."), "Job Task Type" = CONST(Posting))
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor;
+            TableRelation = if ("Source Type" = const(Campaign)) Campaign
+            else
+            if ("Source Type" = const(Contact)) Contact
+            else
+            if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const("Customer Disc. Group")) "Customer Discount Group"
+            else
+            if ("Source Type" = const("Customer Price Group")) "Customer Price Group"
+            else
+            if ("Source Type" = const(Job)) Job
+            else
+            if ("Source Type" = const("Job Task")) "Job Task"."Job Task No." where("Job No." = field("Parent Source No."), "Job Task Type" = const(Posting))
+            else
+            if ("Source Type" = const(Vendor)) Vendor;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -280,7 +301,7 @@ table 7000 "Price List Header"
         {
             Caption = 'Assign-to Parent No.';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Source Type" = CONST("Job Task")) Job;
+            TableRelation = if ("Source Type" = const("Job Task")) Job;
             ValidateTableRelation = false;
 
             trigger OnValidate()

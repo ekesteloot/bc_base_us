@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Archive;
+
+using Microsoft.FinancialMgt.Dimension;
+using System.Security.User;
+
 page 9347 "Purchase Order Archives"
 {
     ApplicationArea = Basic, Suite;
@@ -6,7 +11,7 @@ page 9347 "Purchase Order Archives"
     Editable = false;
     PageType = List;
     SourceTable = "Purchase Header Archive";
-    SourceTableView = WHERE("Document Type" = CONST(Order));
+    SourceTableView = where("Document Type" = const(Order));
     UsageCategory = History;
 
     layout
@@ -45,7 +50,7 @@ page 9347 "Purchase Order Archives"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Archived By");
+                        UserMgt.DisplayUserInformation(Rec."Archived By");
                     end;
                 }
                 field("Interaction Exist"; Rec."Interaction Exist")
@@ -260,7 +265,7 @@ page 9347 "Purchase Order Archives"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Co&mments")
@@ -269,11 +274,11 @@ page 9347 "Purchase Order Archives"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Archive Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0),
-                                  "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                  "Version No." = FIELD("Version No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0),
+                                  "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                  "Version No." = field("Version No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -293,7 +298,7 @@ page 9347 "Purchase Order Archives"
 
     trigger OnOpenPage()
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
     end;
 }
 

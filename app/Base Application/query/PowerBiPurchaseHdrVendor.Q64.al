@@ -12,7 +12,7 @@ query 64 "Power BI Purchase Hdr. Vendor"
             dataitem(Purchase_Line; "Purchase Line")
             {
                 DataItemLink = "Document Type" = Purchase_Header."Document Type", "Document No." = Purchase_Header."No.";
-                DataItemTableFilter = Type = CONST(Item);
+                DataItemTableFilter = Type = const(Item);
                 column(Item_No; "No.")
                 {
                 }

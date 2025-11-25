@@ -1,3 +1,11 @@
+namespace Microsoft.Manufacturing.RoleCenters;
+
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Journal;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Activity;
+using System.Security.User;
+
 page 9041 "Shop Supervisor Activities"
 {
     Caption = 'Activities';
@@ -143,12 +151,12 @@ page 9041 "Shop Supervisor Activities"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
-        SetRange("User ID Filter", UserId);
+        Rec.SetRange("User ID Filter", UserId);
     end;
 
     var

@@ -1,3 +1,16 @@
+﻿namespace System.IO;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Posting;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+using System.Reflection;
+
 table 8631 "Config. Table Processing Rule"
 {
     Caption = 'Config. Table Processing Rule';
@@ -33,7 +46,7 @@ table 8631 "Config. Table Processing Rule"
         field(5; "Custom Processing Codeunit ID"; Integer)
         {
             Caption = 'Custom Processing Codeunit ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Codeunit));
 
             trigger OnValidate()
             begin
@@ -125,17 +138,17 @@ table 8631 "Config. Table Processing Rule"
             exit(true);
 
         case "Table ID" of
-            DATABASE::"Sales Header":
+            Enum::TableID::"Sales Header":
                 exit(Action in [Action::Invoice, Action::Ship]);
-            DATABASE::"Purchase Header":
+            Enum::TableID::"Purchase Header":
                 exit(Action in [Action::Invoice, Action::Receive]);
-            DATABASE::"Gen. Journal Line", DATABASE::"Gen. Journal Batch":
+            Enum::TableID::"Gen. Journal Line", Enum::TableID::"Gen. Journal Batch":
                 exit(Action = Action::Post);
-            DATABASE::"Custom Report Layout":
+            Enum::TableID::"Custom Report Layout":
                 exit(Action = Action::Post);
-            DATABASE::"Transfer Header":
+            Enum::TableID::"Transfer Header":
                 exit(Action in [Action::Ship, Action::Receive]);
-            DATABASE::Item:
+            Enum::TableID::Item:
                 exit(Action in [Action::Post]);
         end;
         exit(false);
@@ -164,19 +177,19 @@ table 8631 "Config. Table Processing Rule"
     procedure RunActionOnInsertedRecord(RecRef: RecordRef): Boolean
     begin
         case "Table ID" of
-            DATABASE::"Sales Header":
+            Enum::TableID::"Sales Header":
                 exit(RunActionOnSalesHeader(RecRef));
-            DATABASE::"Purchase Header":
+            Enum::TableID::"Purchase Header":
                 exit(RunActionOnPurchHeader(RecRef));
-            DATABASE::"Gen. Journal Line":
+            Enum::TableID::"Gen. Journal Line":
                 exit(RunActionOnGenJnlLine(RecRef));
-            DATABASE::"Gen. Journal Batch":
+            Enum::TableID::"Gen. Journal Batch":
                 exit(RunActionOnGenJnlBatch(RecRef));
-            DATABASE::"Custom Report Layout":
+            Enum::TableID::"Custom Report Layout":
                 exit(RunActionOnCustomReportLayout(RecRef));
-            DATABASE::"Transfer Header":
+            Enum::TableID::"Transfer Header":
                 exit(RunActionOnTransferHeader(RecRef));
-            DATABASE::Item:
+            Enum::TableID::Item:
                 exit(RunActionOnItem(RecRef));
             else
                 exit(RunCustomActionOnRecRef(RecRef));

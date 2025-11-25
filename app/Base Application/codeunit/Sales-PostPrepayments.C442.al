@@ -1,7 +1,31 @@
-﻿codeunit 442 "Sales-Post Prepayments"
+﻿namespace Microsoft.Sales.Posting;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Utilities;
+
+codeunit 442 "Sales-Post Prepayments"
 {
     Permissions = TableData "Sales Line" = rimd,
-#if not CLEAN20
+#if not CLEAN23
                   TableData "Invoice Post. Buffer" = rimd,
 #endif
                   TableData "Sales Invoice Header" = rimd,
@@ -181,7 +205,7 @@
                     begin
                         InsertSalesInvHeader(SalesInvHeader, SalesHeader, PostingDescription, GenJnlLineDocNo, SrcCode, PostingNoSeriesCode);
                         GenJnlLineDocType := GenJnlLine."Document Type"::Invoice;
-                        PostedDocTabNo := DATABASE::"Sales Invoice Header";
+                        PostedDocTabNo := Enum::TableID::"Sales Invoice Header".AsInteger();
                         Window.Update(1, StrSubstNo(Text003, "Document Type", "No.", SalesInvHeader."No."));
                     end;
                 DocumentType::"Credit Memo":
@@ -191,7 +215,7 @@
                           SalesCrMemoHeader, SalesHeader, PostingDescription, GenJnlLineDocNo, SrcCode, PostingNoSeriesCode,
                           CalcPmtDiscOnCrMemos);
                         GenJnlLineDocType := GenJnlLine."Document Type"::"Credit Memo";
-                        PostedDocTabNo := DATABASE::"Sales Cr.Memo Header";
+                        PostedDocTabNo := Enum::TableID::"Sales Cr.Memo Header".AsInteger();
                         Window.Update(1, StrSubstNo(Text011, "Document Type", "No.", SalesCrMemoHeader."No."));
                     end;
             end;
@@ -226,9 +250,9 @@
             if "Compress Prepayment" then
                 case DocumentType of
                     DocumentType::Invoice:
-                        CopyLineCommentLinesCompressedPrepayment("No.", DATABASE::"Sales Invoice Header", SalesInvHeader."No.");
+                        CopyLineCommentLinesCompressedPrepayment("No.", Enum::TableID::"Sales Invoice Header".AsInteger(), SalesInvHeader."No.");
                     DocumentType::"Credit Memo":
-                        CopyLineCommentLinesCompressedPrepayment("No.", DATABASE::"Sales Cr.Memo Header", SalesCrMemoHeader."No.");
+                        CopyLineCommentLinesCompressedPrepayment("No.", Enum::TableID::"Sales Cr.Memo Header".AsInteger(), SalesCrMemoHeader."No.");
                 end;
 
             OnAfterCreateLinesOnBeforeGLPosting(SalesHeader, SalesInvHeader, SalesCrMemoHeader, TempPrepmtInvLineBuffer, DocumentType, LineNo);
@@ -324,12 +348,12 @@
                     DocumentType::Invoice:
                         begin
                             InsertSalesInvLine(SalesInvHeader, LineNo, TempPrepmtInvLineBuffer, SalesHeader);
-                            PostedDocTabNo := DATABASE::"Sales Invoice Line";
+                            PostedDocTabNo := Enum::TableID::"Sales Invoice Line".AsInteger();
                         end;
                     DocumentType::"Credit Memo":
                         begin
                             InsertSalesCrMemoLine(SalesCrMemoHeader, LineNo, TempPrepmtInvLineBuffer, SalesHeader);
-                            PostedDocTabNo := DATABASE::"Sales Cr.Memo Line";
+                            PostedDocTabNo := Enum::TableID::"Sales Cr.Memo Line".AsInteger();
                         end;
                 end;
                 PrevLineNo := LineNo;
@@ -393,10 +417,10 @@
             ErrorMessageMgt.Finish(RecordId);
             CheckSalesPostRestrictions();
             Cust.Get("Sell-to Customer No.");
-            Cust.CheckBlockedCustOnDocs(Cust, "Sales Document Type".FromInteger(PrepmtDocTypeToDocType(DocumentType)), false, true);
+            Cust.CheckBlockedCustOnDocs(Cust, Enum::"Sales Document Type".FromInteger(PrepmtDocTypeToDocType(DocumentType)), false, true);
             if "Bill-to Customer No." <> "Sell-to Customer No." then begin
                 Cust.Get("Bill-to Customer No.");
-                Cust.CheckBlockedCustOnDocs(Cust, "Sales Document Type".FromInteger(PrepmtDocTypeToDocType(DocumentType)), false, true);
+                Cust.CheckBlockedCustOnDocs(Cust, Enum::"Sales Document Type".FromInteger(PrepmtDocTypeToDocType(DocumentType)), false, true);
             end;
             OnAfterCheckPrepmtDoc(SalesHeader, DocumentType, SuppressCommit);
         end;
@@ -887,11 +911,11 @@
 
         with SalesCommentLine do
             case ToDocType of
-                DATABASE::"Sales Invoice Header":
+                Enum::TableID::"Sales Invoice Header".AsInteger():
                     CopyHeaderComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Invoice".AsInteger(),
                         FromNumber, ToNumber);
-                DATABASE::"Sales Cr.Memo Header":
+                Enum::TableID::"Sales Cr.Memo Header".AsInteger():
                     CopyHeaderComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Credit Memo".AsInteger(),
                         FromNumber, ToNumber);
@@ -907,11 +931,11 @@
 
         with SalesCommentLine do
             case ToDocType of
-                DATABASE::"Sales Invoice Header":
+                Enum::TableID::"Sales Invoice Header".AsInteger():
                     CopyLineComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Invoice".AsInteger(),
                         FromNumber, ToNumber, FromLineNo, ToLineNo);
-                DATABASE::"Sales Cr.Memo Header":
+                Enum::TableID::"Sales Cr.Memo Header".AsInteger():
                     CopyLineComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Credit Memo".AsInteger(),
                         FromNumber, ToNumber, FromLineNo, ToLineNo);
@@ -927,11 +951,11 @@
 
         with SalesCommentLine do
             case ToDocType of
-                DATABASE::"Sales Invoice Header":
+                Enum::TableID::"Sales Invoice Header".AsInteger():
                     CopyLineCommentsFromSalesLines(
                       "Document Type"::Order.AsInteger(), "Document Type"::"Posted Invoice".AsInteger(),
                       FromNumber, ToNumber, TempSalesLine);
-                DATABASE::"Sales Cr.Memo Header":
+                Enum::TableID::"Sales Cr.Memo Header".AsInteger():
                     CopyLineCommentsFromSalesLines(
                       "Document Type"::Order.AsInteger(), "Document Type"::"Posted Credit Memo".AsInteger(),
                       FromNumber, ToNumber, TempSalesLine);
@@ -952,7 +976,7 @@
             NextLineNo := PrevLineNo + 10000;
             repeat
                 case TabNo of
-                    DATABASE::"Sales Invoice Line":
+                    Enum::TableID::"Sales Invoice Line".AsInteger():
                         begin
                             SalesInvLine.Init();
                             SalesInvLine."Document No." := DocNo;
@@ -961,7 +985,7 @@
                             OnInsertExtendedTextOnBeforeSalesInvLineInsert(SalesInvLine, TabNo, DocNo, NextLineNo, TempExtTextLine, SalesHeader);
                             SalesInvLine.Insert();
                         end;
-                    DATABASE::"Sales Cr.Memo Line":
+                    Enum::TableID::"Sales Cr.Memo Line".AsInteger():
                         begin
                             SalesCrMemoLine.Init();
                             SalesCrMemoLine."Document No." := DocNo;
@@ -1371,9 +1395,6 @@
             "Orig. Pmt. Disc. Possible(LCY)" := TotalPrepmtInvLineBufferLCY."Orig. Pmt. Disc. Possible";
             if GLSetup."Journal Templ. Name Mandatory" then
                 "Journal Template Name" := GenJournalTemplate.Name;
-#if not CLEAN20
-            OnBeforePostBalancingEntry(GenJnlLine, CustLedgEntry, TotalPrepmtInvLineBuffer, TotalPrepmtInvLineBufferLCY, SuppressCommit, SalesHeader, DocumentType);
-#endif
             OnPostBalancingEntryOnBeforeGenJnlPostLineRunWithCheck(GenJnlLine, CustLedgEntry, TotalPrepmtInvLineBuffer, TotalPrepmtInvLineBufferLCY, SuppressCommit, SalesHeader, DocType);
             GenJnlPostLine.RunWithCheck(GenJnlLine);
             OnAfterPostBalancingEntry(GenJnlLine, CustLedgEntry, TotalPrepmtInvLineBuffer, TotalPrepmtInvLineBufferLCY, SuppressCommit, SalesHeader);
@@ -1445,15 +1466,15 @@
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
         SourceCodeSetup.Get();
-        DimMgt.AddDimSource(DefaultDimSource, Database::"G/L Account", SalesLine."No.");
-        DimMgt.AddDimSource(DefaultDimSource, Database::Job, SalesLine."Job No.");
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", SalesLine."Responsibility Center");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"G/L Account".AsInteger(), SalesLine."No.");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), SalesLine."Job No.");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center".AsInteger(), SalesLine."Responsibility Center");
         SalesLine."Shortcut Dimension 1 Code" := '';
         SalesLine."Shortcut Dimension 2 Code" := '';
         SalesLine."Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             SalesLine, 0, DefaultDimSource, SourceCodeSetup.Sales,
-            SalesLine."Shortcut Dimension 1 Code", SalesLine."Shortcut Dimension 2 Code", SalesLine."Dimension Set ID", DATABASE::Customer);
+            SalesLine."Shortcut Dimension 1 Code", SalesLine."Shortcut Dimension 2 Code", SalesLine."Dimension Set ID", Enum::TableID::Customer.AsInteger());
 
         OnAfterCreateDimensions(SalesLine, DefaultDimSource);
     end;
@@ -1621,7 +1642,7 @@
             SalesInvHeader."Tax Area Code" := '';
             OnBeforeSalesInvHeaderInsert(SalesInvHeader, SalesHeader, SuppressCommit, GenJnlLineDocNo);
             SalesInvHeader.Insert();
-            CopyHeaderCommentLines("No.", DATABASE::"Sales Invoice Header", GenJnlLineDocNo);
+            CopyHeaderCommentLines("No.", Enum::TableID::"Sales Invoice Header".AsInteger(), GenJnlLineDocNo);
             OnAfterSalesInvHeaderInsert(SalesInvHeader, SalesHeader, SuppressCommit);
         end;
     end;
@@ -1670,7 +1691,7 @@
             SalesInvLine.Insert();
             if not SalesHeader."Compress Prepayment" then
                 CopyLineCommentLines(
-                  SalesHeader."No.", DATABASE::"Sales Invoice Header", SalesInvHeader."No.", "Line No.", LineNo);
+                  SalesHeader."No.", Enum::TableID::"Sales Invoice Header".AsInteger(), SalesInvHeader."No.", "Line No.", LineNo);
             OnAfterSalesInvLineInsert(SalesInvLine, SalesInvHeader, PrepmtInvLineBuffer, SuppressCommit);
         end;
     end;
@@ -1702,7 +1723,7 @@
             SalesCrMemoHeader."Tax Area Code" := '';
             OnBeforeSalesCrMemoHeaderInsert(SalesCrMemoHeader, SalesHeader, SuppressCommit);
             SalesCrMemoHeader.Insert();
-            CopyHeaderCommentLines("No.", DATABASE::"Sales Cr.Memo Header", GenJnlLineDocNo);
+            CopyHeaderCommentLines("No.", Enum::TableID::"Sales Cr.Memo Header".AsInteger(), GenJnlLineDocNo);
             OnAfterSalesCrMemoHeaderInsert(SalesCrMemoHeader, SalesHeader, SuppressCommit);
         end;
     end;
@@ -1751,7 +1772,7 @@
             SalesCrMemoLine.Insert();
             if not SalesHeader."Compress Prepayment" then
                 CopyLineCommentLines(
-                  SalesHeader."No.", DATABASE::"Sales Cr.Memo Header", SalesCrMemoHeader."No.", "Line No.", LineNo);
+                  SalesHeader."No.", Enum::TableID::"Sales Cr.Memo Header".AsInteger(), SalesCrMemoHeader."No.", "Line No.", LineNo);
             OnAfterSalesCrMemoLineInsert(SalesCrMemoLine, SalesCrMemoHeader, PrepmtInvLineBuffer, SuppressCommit);
         end;
     end;
@@ -2015,14 +2036,6 @@
     local procedure OnBeforeSalesCrMemoLineInsert(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; PrepmtInvLineBuffer: Record "Prepayment Inv. Line Buffer"; CommitIsSuppressed: Boolean)
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by OnPostBalancingEntryOnBeforeGenJnlPostLineRunWithCheck', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostBalancingEntry(var GenJnlLine: Record "Gen. Journal Line"; CustLedgEntry: Record "Cust. Ledger Entry"; TotalPrepmtInvLineBuffer: Record "Prepayment Inv. Line Buffer"; TotalPrepmtInvLineBufferLCY: Record "Prepayment Inv. Line Buffer"; CommitIsSuppressed: Boolean; SalesHeader: Record "Sales Header"; DocumentType: enum "Gen. Journal Document Type")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostCustomerEntry(var GenJnlLine: Record "Gen. Journal Line"; TotalPrepmtInvLineBuffer: Record "Prepayment Inv. Line Buffer"; TotalPrepmtInvLineBufferLCY: Record "Prepayment Inv. Line Buffer"; CommitIsSuppressed: Boolean; SalesHeader: Record "Sales Header"; DocumentType: Option Invoice,"Credit Memo")

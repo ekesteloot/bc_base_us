@@ -1,3 +1,7 @@
+namespace System.DataAdministration;
+
+using System.Threading;
+
 pageextension 3999 "Reten. Pol. Setup List Ext." extends "Retention Policy Setup List"
 {
     actions

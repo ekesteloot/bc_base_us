@@ -1,3 +1,15 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+
 table 7114 "Analysis Line"
 {
     Caption = 'Analysis Line';
@@ -13,7 +25,7 @@ table 7114 "Analysis Line"
         field(2; "Analysis Line Template Name"; Code[10])
         {
             Caption = 'Analysis Line Template Name';
-            TableRelation = "Analysis Line Template".Name WHERE("Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Analysis Line Template".Name where("Analysis Area" = field("Analysis Area"));
         }
         field(3; "Line No."; Integer)
         {
@@ -73,19 +85,17 @@ table 7114 "Analysis Line"
         field(7; Range; Text[250])
         {
             Caption = 'Range';
-            TableRelation = IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST(Customer)) Customer
-            ELSE
-            IF (Type = CONST(Vendor)) Vendor
-            ELSE
-            IF (Type = CONST("Item Group")) "Dimension Value".Code WHERE("Dimension Code" = FIELD("Group Dimension Code"), Blocked = CONST(false))
-            ELSE
-            IF (Type = CONST("Customer Group")) "Dimension Value".Code WHERE("Dimension Code" = FIELD("Group Dimension Code"), Blocked = CONST(false))
-            ELSE
-            IF (Type = CONST("Sales/Purchase person")) "Dimension Value".Code WHERE("Dimension Code" = FIELD("Group Dimension Code"), Blocked = CONST(false));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if (Type = const(Item)) Item
+            else
+            if (Type = const(Customer)) Customer
+            else
+            if (Type = const(Vendor)) Vendor
+            else
+            if (Type = const("Item Group")) "Dimension Value".Code where("Dimension Code" = field("Group Dimension Code"), Blocked = const(false))
+            else
+            if (Type = const("Customer Group")) "Dimension Value".Code where("Dimension Code" = field("Group Dimension Code"), Blocked = const(false))
+            else
+            if (Type = const("Sales/Purchase person")) "Dimension Value".Code where("Dimension Code" = field("Group Dimension Code"), Blocked = const(false));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -152,7 +162,7 @@ table 7114 "Analysis Line"
         {
             Caption = 'Item Budget Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Item Budget Name".Name WHERE("Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Item Budget Name".Name where("Analysis Area" = field("Analysis Area"));
         }
         field(17; "Location Filter"; Code[10])
         {
@@ -183,8 +193,6 @@ table 7114 "Analysis Line"
             AccessByPermission = TableData Dimension = R;
             CaptionClass = GetCaptionClass(4);
             Caption = 'Dimension 1 Totaling';
-            //This property is currently not supported
-            //TestTableRelation = false;
             //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
             //ValidateTableRelation = false;
         }
@@ -193,8 +201,6 @@ table 7114 "Analysis Line"
             AccessByPermission = TableData Dimension = R;
             CaptionClass = GetCaptionClass(5);
             Caption = 'Dimension 2 Totaling';
-            //This property is currently not supported
-            //TestTableRelation = false;
             //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
             //ValidateTableRelation = false;
         }
@@ -203,8 +209,6 @@ table 7114 "Analysis Line"
             AccessByPermission = TableData "Dimension Combination" = R;
             CaptionClass = GetCaptionClass(6);
             Caption = 'Dimension 3 Totaling';
-            //This property is currently not supported
-            //TestTableRelation = false;
             //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
             //ValidateTableRelation = false;
         }
@@ -212,11 +216,11 @@ table 7114 "Analysis Line"
         {
             Caption = 'Source No. Filter';
             FieldClass = FlowFilter;
-            TableRelation = IF ("Source Type Filter" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type Filter" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type Filter" = CONST(Item)) Item;
+            TableRelation = if ("Source Type Filter" = const(Customer)) Customer
+            else
+            if ("Source Type Filter" = const(Vendor)) Vendor
+            else
+            if ("Source Type Filter" = const(Item)) Item;
         }
         field(25; "Group Dimension Code"; Code[20])
         {
@@ -366,7 +370,7 @@ table 7114 "Analysis Line"
         until FormulaAnalysisLine.Next() = 0;
     end;
 
-    procedure LookupTotalingRange(var Text: Text) Result: Boolean
+    procedure LookupTotalingRange(var Text: Text): Boolean
     var
         InventorySetup: Record "Inventory Setup";
         SalesSetup: Record "Sales & Receivables Setup";
@@ -417,8 +421,6 @@ table 7114 "Analysis Line"
                     SalesSetup.TestField("Salesperson Dimension Code");
                     exit(LookupDimTotalingRange(Text, SalesSetup."Salesperson Dimension Code"));
                 end;
-            else
-                OnLookupTotalingRangeOnElse(Rec, Text, Result);
         end;
     end;
 
@@ -487,11 +489,6 @@ table 7114 "Analysis Line"
                 ItemAnalysisView."Dimension 1 Code" := GLSetup."Global Dimension 1 Code";
                 ItemAnalysisView."Dimension 2 Code" := GLSetup."Global Dimension 2 Code";
             end;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnLookupTotalingRangeOnElse(var AnalysisLine: Record "Analysis Line"; var Text: Text; var Result: Boolean)
-    begin
     end;
 }
 

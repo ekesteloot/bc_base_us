@@ -1,3 +1,9 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 1118 "Cost Budget by Cost Center"
 {
     Caption = 'Cost Budget by Cost Center';
@@ -191,7 +197,7 @@ page 1118 "Cost Budget by Cost Center"
         FindPeriod('');
         CostCenterMatrixRecord.SetCurrentKey("Sorting Order");
         MATRIX_CaptionFieldNo := 1;
-        BudgetFilter := GetFilter("Budget Filter");
+        BudgetFilter := Rec.GetFilter("Budget Filter");
         GenerateColumnCaptions("Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
@@ -242,25 +248,25 @@ page 1118 "Cost Budget by Cost Center"
         Calendar: Record Date;
         PeriodPageMgt: Codeunit PeriodPageManagement;
     begin
-        if GetFilter("Date Filter") <> '' then begin
-            Calendar.SetFilter("Period Start", GetFilter("Date Filter"));
+        if Rec.GetFilter("Date Filter") <> '' then begin
+            Calendar.SetFilter("Period Start", Rec.GetFilter("Date Filter"));
             if not PeriodPageMgt.FindDate('+', Calendar, PeriodType) then
                 PeriodPageMgt.FindDate('+', Calendar, PeriodType::Day);
             Calendar.SetRange("Period Start");
         end;
         PeriodPageMgt.FindDate(FindTxt, Calendar, PeriodType);
         if AmountType = AmountType::"Net Change" then begin
-            SetRange("Date Filter", Calendar."Period Start", Calendar."Period End");
-            if GetRangeMin("Date Filter") = GetRangeMax("Date Filter") then
-                SetRange("Date Filter", GetRangeMin("Date Filter"));
+            Rec.SetRange("Date Filter", Calendar."Period Start", Calendar."Period End");
+            if Rec.GetRangeMin("Date Filter") = Rec.GetRangeMax("Date Filter") then
+                Rec.SetRange("Date Filter", Rec.GetRangeMin("Date Filter"));
         end else
-            SetRange("Date Filter", 0D, Calendar."Period End");
+            Rec.SetRange("Date Filter", 0D, Calendar."Period End");
     end;
 
     local procedure UpdateMatrixSubform()
     begin
         CurrPage.MatrixForm.PAGE.LoadMatrix(
-          MATRIX_CaptionSet, CostCenterMatrixRecords, MATRIX_CurrSetLength, GetFilter("Date Filter"), BudgetFilter, RoundingFactor);
+          MATRIX_CaptionSet, CostCenterMatrixRecords, MATRIX_CurrSetLength, Rec.GetFilter("Date Filter"), BudgetFilter, RoundingFactor);
     end;
 }
 

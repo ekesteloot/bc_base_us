@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Journal;
+
 page 5609 "FA Journal Setup"
 {
     Caption = 'FA Journal Setup';

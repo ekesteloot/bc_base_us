@@ -15,12 +15,12 @@ table 5717 "Item Cross Reference"
         field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(3; "Unit of Measure"; Code[10])
         {
             Caption = 'Unit of Measure';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(4; "Cross-Reference Type"; Option)
         {
@@ -40,9 +40,9 @@ table 5717 "Item Cross Reference"
         field(5; "Cross-Reference Type No."; Code[30])
         {
             Caption = 'Cross-Reference Type No.';
-            TableRelation = IF ("Cross-Reference Type" = CONST(Customer)) Customer."No."
-            ELSE
-            IF ("Cross-Reference Type" = CONST(Vendor)) Vendor."No.";
+            TableRelation = if ("Cross-Reference Type" = const(Customer)) Customer."No."
+            else
+            if ("Cross-Reference Type" = const(Vendor)) Vendor."No.";
         }
         field(6; "Cross-Reference No."; Code[20])
         {

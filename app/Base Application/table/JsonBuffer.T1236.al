@@ -1,3 +1,9 @@
+﻿namespace System.IO;
+
+using System;
+using System.Reflection;
+using System.Utilities;
+
 table 1236 "JSON Buffer"
 {
     Caption = 'JSON Buffer';

@@ -1,7 +1,16 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Vendor;
+
 report 717 "Inventory - Reorders"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InventoryReorders.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InventoryReorders.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Reorders';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +20,7 @@ report 717 "Inventory - Reorders"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("Vendor No.");
+            DataItemTableView = sorting("Vendor No.");
             RequestFilterFields = "No.", "Location Filter", "Variant Filter", "Assembly BOM", "Inventory Posting Group", "Shelf No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -120,7 +129,7 @@ report 717 "Inventory - Reorders"
         }
         dataitem("Stockkeeping Unit"; "Stockkeeping Unit")
         {
-            DataItemTableView = SORTING("Replenishment System", "Vendor No.", "Transfer-from Code");
+            DataItemTableView = sorting("Replenishment System", "Vendor No.", "Transfer-from Code");
             column(StockkeepingUnitTableCaption; TableCaption + ': ' + SKUFIlter)
             {
             }
@@ -321,7 +330,7 @@ report 717 "Inventory - Reorders"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Transfer-from Code';
                         Enabled = TransferFromCodeEnable;
-                        TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+                        TableRelation = Location where("Use As In-Transit" = const(false));
                         ToolTip = 'Specifies a filter for the location or locations from which you want to see inbound SKU quantities.';
                     }
                 }
@@ -363,7 +372,6 @@ report 717 "Inventory - Reorders"
         SKUFIlter: Text;
         BuyFromVendorNo: Code[20];
         TransferFromCode: Code[10];
-        [InDataSet]
         TransferFromCodeEnable: Boolean;
         PageCaptionLbl: Label 'Page';
         InventoryReordersCaptionLbl: Label 'Inventory - Reorders';

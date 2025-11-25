@@ -773,6 +773,7 @@ codeunit 134220 "WFWH General Journal Line"
 
     [Test]
     [Scope('OnPrem')]
+    [HandlerFunctions('ConfirmHandlerYes')]
     procedure EnsureGeneralJournalLineApprovalWorkflowFunctionsCorrectlyWhenGeneralJournalLineIsDeleted()
     var
         GenJournalBatch: Record "Gen. Journal Batch";
@@ -1172,6 +1173,12 @@ codeunit 134220 "WFWH General Journal Line"
     [Scope('OnPrem')]
     procedure MessageHandler(Message: Text[1024])
     begin
+    end;
+
+    [ConfirmHandler]
+    procedure ConfirmHandlerYes(Question: Text[1024]; var Reply: Boolean)
+    begin
+        Reply := true;
     end;
 
     local procedure VerifySingleApprovalRequestPendingForFilteredGeneralJournalLine(DummyWorkflowWebhookEntry: Record "Workflow Webhook Entry"; GenJournalId: Guid)

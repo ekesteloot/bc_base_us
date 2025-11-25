@@ -13,7 +13,7 @@ page 394 "Entry/Exit Points"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the code for the shipping location (Entry/Exit Point).';

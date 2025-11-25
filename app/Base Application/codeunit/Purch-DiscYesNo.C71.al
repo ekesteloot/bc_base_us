@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Document;
+
+using System.Utilities;
+
 codeunit 71 "Purch.-Disc. (Yes/No)"
 {
     TableNo = "Purchase Line";

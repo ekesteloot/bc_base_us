@@ -401,7 +401,7 @@
                 InsertSourceCode(Purchases, Text003, Text004);
                 InsertSourceCode("Deleted Document", Text005, DocumentCreatedToAvoidGapInNoSeriesTxt);
                 InsertSourceCode("Inventory Post Cost", Text006, ReportName(REPORT::"Post Inventory Cost to G/L"));
-#if not CLEAN20
+#if not CLEAN23
                 InsertSourceCode("Exchange Rate Adjmt.", Text007, ReportName(REPORT::"Adjust Exchange Rates"));
 #else
                 InsertSourceCode("Exchange Rate Adjmt.", Text007, ReportName(REPORT::"Exch. Rate Adjustment"));

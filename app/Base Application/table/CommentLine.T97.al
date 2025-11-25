@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Comment;
+
 table 97 "Comment Line"
 {
     Caption = 'Comment Line';

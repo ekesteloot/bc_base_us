@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using System.Environment;
+
 codeunit 810 "Webservice Notification Mgt."
 {
     [Scope('OnPrem')]

@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Maintenance;
+
 table 5626 Maintenance
 {
     Caption = 'Maintenance';

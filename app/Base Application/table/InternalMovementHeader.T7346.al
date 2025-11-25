@@ -1,3 +1,15 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 table 7346 "Internal Movement Header"
 {
     Caption = 'Internal Movement Header';
@@ -21,7 +33,7 @@ table 7346 "Internal Movement Header"
         field(2; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             begin
@@ -44,7 +56,7 @@ table 7346 "Internal Movement Header"
         {
             Caption = 'Assigned User ID';
             DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "Warehouse Employee" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = "Warehouse Employee" where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -74,9 +86,9 @@ table 7346 "Internal Movement Header"
         }
         field(7; Comment; Boolean)
         {
-            CalcFormula = Exist("Warehouse Comment Line" WHERE("Table Name" = CONST("Internal Movement"),
-                                                                Type = CONST(" "),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = exist("Warehouse Comment Line" where("Table Name" = const("Internal Movement"),
+                                                                Type = const(" "),
+                                                                "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -84,7 +96,7 @@ table 7346 "Internal Movement Header"
         field(8; "To Bin Code"; Code[20])
         {
             Caption = 'To Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnLookup()
             var
@@ -295,7 +307,7 @@ table 7346 "Internal Movement Header"
         WhseCommentLine.DeleteAll();
 
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          DATABASE::"Internal Movement Line", 0, "No.", '', 0, 0, '', false);
+          Enum::TableID::"Internal Movement Line".AsInteger(), 0, "No.", '', 0, 0, '', false);
     end;
 
     procedure CheckLocationSettings(LocationCode: Code[10])

@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8613 "Config. Question Areas"
 {
     Caption = 'Config. Question Areas';
@@ -16,7 +18,7 @@ page 8613 "Config. Question Areas"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code for the question area. You fill in a value for the code when you create a question area for your setup questionnaire.';

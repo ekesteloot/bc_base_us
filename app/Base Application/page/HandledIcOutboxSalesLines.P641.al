@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 641 "Handled IC Outbox Sales Lines"
 {
     Caption = 'Lines';
@@ -116,7 +120,7 @@ page 641 "Handled IC Outbox Sales Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }

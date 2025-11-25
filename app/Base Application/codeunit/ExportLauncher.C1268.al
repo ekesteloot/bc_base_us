@@ -1,3 +1,5 @@
+namespace System.IO;
+
 codeunit 1268 "Export Launcher"
 {
     Permissions = TableData "Data Exch." = rimd;
@@ -11,9 +13,9 @@ codeunit 1268 "Export Launcher"
         if not SourceRecordIsInitialized then
             Error(UnknownSourceRecordErr);
 
-        DataExchDef.Get("Data Exch. Def Code");
+        DataExchDef.Get(Rec."Data Exch. Def Code");
 
-        CreateDataExch(DataExch, "Data Exch. Def Code", "Data Exch. Line Def Code", SourceRecRef.GetView());
+        CreateDataExch(DataExch, Rec."Data Exch. Def Code", Rec."Data Exch. Line Def Code", SourceRecRef.GetView());
 
         if DataExchDef."Data Handling Codeunit" > 0 then
             CODEUNIT.Run(DataExchDef."Data Handling Codeunit", Rec);

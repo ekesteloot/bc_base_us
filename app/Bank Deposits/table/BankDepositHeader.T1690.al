@@ -37,6 +37,7 @@ table 1690 "Bank Deposit Header"
                 Validate("Currency Code", BankAccount."Currency Code");
                 "Bank Acc. Posting Group" := BankAccount."Bank Acc. Posting Group";
                 "Language Code" := BankAccount."Language Code";
+                "Format Region" := BankAccount."Format Region";
 
                 DimensionManagement.AddDimSource(DefaultDimSource, Database::"Bank Account", "Bank Account No.");
                 CreateDim(DefaultDimSource);
@@ -205,6 +206,11 @@ table 1690 "Bank Deposit Header"
         field(23; "Post as Lump Sum"; Boolean)
         {
             Caption = 'Post as Lump Sum';
+        }
+        field(24; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
         }
         field(480; "Dimension Set ID"; Integer)
         {

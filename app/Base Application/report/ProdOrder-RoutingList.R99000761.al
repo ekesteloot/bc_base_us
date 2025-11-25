@@ -1,7 +1,11 @@
+namespace Microsoft.Manufacturing.Document;
+
+using System.Utilities;
+
 report 99000761 "Prod. Order - Routing List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrder/ProdOrderRoutingList.rdlc';
+    RDLCLayout = './Manufacturing/Document/ProdOrderRoutingList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Routing List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 99000761 "Prod. Order - Routing List"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             RequestFilterFields = Status, "No.", "Source Type", "Source No.";
             column(Production_Order_Status; Status)
             {
@@ -20,7 +24,7 @@ report 99000761 "Prod. Order - Routing List"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
                 {
                 }
@@ -93,8 +97,8 @@ report 99000761 "Prod. Order - Routing List"
             }
             dataitem("Prod. Order Routing Line"; "Prod. Order Routing Line")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
                 column(Prod__Order_Routing_Line__Operation_No__; "Operation No.")
                 {
                 }

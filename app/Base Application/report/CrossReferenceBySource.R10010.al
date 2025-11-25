@@ -10,7 +10,7 @@ report 10010 "Cross Reference by Source"
     {
         dataitem("G/L Register"; "G/L Register")
         {
-            DataItemTableView = SORTING("Source Code", "Journal Batch Name", "Creation Date");
+            DataItemTableView = sorting("Source Code", "Journal Batch Name", "Creation Date");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Source Code", "Journal Batch Name", "Creation Date";
             column(TodayFormatted; Format(Today, 0, 4))
@@ -87,7 +87,7 @@ report 10010 "Cross Reference by Source"
             }
             dataitem("G/L Entry"; "G/L Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(GLAccountNo_GLEntry; "G/L Account No.")
                 {
                 }

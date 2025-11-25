@@ -42,7 +42,7 @@ page 9656 "Report Layout Update Log"
                     Caption = 'Field Name';
                     ToolTip = 'Specifies the field or element in the report layout that the update pertains to.';
                 }
-                field(Message; Message)
+                field(Message; Rec.Message)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Message';
@@ -67,8 +67,8 @@ page 9656 "Report Layout Update Log"
                 var
                     CustomReportLayout: Record "Custom Report Layout";
                 begin
-                    CustomReportLayout.SetFilter("Report ID", Format("Report ID"));
-                    CustomReportLayout.SetFilter(Description, "Layout Description");
+                    CustomReportLayout.SetFilter("Report ID", Format(Rec."Report ID"));
+                    CustomReportLayout.SetFilter(Description, Rec."Layout Description");
                     if CustomReportLayout.FindFirst() then
                         PAGE.Run(PAGE::"Custom Report Layouts", CustomReportLayout);
                 end;

@@ -1,3 +1,10 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Foundation.NoSeries;
+
 page 456 "No. Series"
 {
     AdditionalSearchTerms = 'numbering,number series';
@@ -15,7 +22,7 @@ page 456 "No. Series"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a number series code.';
@@ -173,7 +180,7 @@ page 456 "No. Series"
                     Caption = 'Lines';
                     Image = AllLines;
                     RunObject = Page "No. Series Lines";
-                    RunPageLink = "Series Code" = FIELD(Code);
+                    RunPageLink = "Series Code" = field(Code);
                     ToolTip = 'View or edit additional information about the number series lines.';
                 }
                 action(Relationships)
@@ -182,7 +189,7 @@ page 456 "No. Series"
                     Caption = 'Relationships';
                     Image = Relationship;
                     RunObject = Page "No. Series Relationships";
-                    RunPageLink = Code = FIELD(Code);
+                    RunPageLink = Code = field(Code);
                     ToolTip = 'View or edit relationships between number series.';
                 }
             }
@@ -202,7 +209,7 @@ page 456 "No. Series"
                     BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
                 begin
                     CurrPage.SetSelectionFilter(NoSeries);
-                    BatchProcessingMgt.BatchProcess(NoSeries, Codeunit::"No. Series Check", "Error Handling Options"::"Show Error", 0, 0);
+                    BatchProcessingMgt.BatchProcess(NoSeries, Codeunit::"No. Series Check", Enum::"Error Handling Options"::"Show Error", 0, 0);
                 end;
             }
         }
@@ -244,12 +251,11 @@ page 456 "No. Series"
         WarningNo: Code[20];
         IncrementByNo: Integer;
         LastDateUsed: Date;
-        [InDataSet]
         AllowGaps: Boolean;
 
     local procedure DrillDownActionOnPage()
     begin
-        DrillDown();
+        Rec.DrillDown();
         CurrPage.Update(false);
     end;
 

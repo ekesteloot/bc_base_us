@@ -1,3 +1,13 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.InventoryMgt.Counting.Tracking;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+
 report 5880 "Calc. Phys. Invt. Order Lines"
 {
     Caption = 'Calc. Phys. Invt. Order Lines';
@@ -7,7 +17,7 @@ report 5880 "Calc. Phys. Invt. Order Lines"
     {
         dataitem(Item; Item)
         {
-            RequestFilterFields = "No.", "Inventory Posting Group", "Gen. Prod. Posting Group", "Variant Filter", "Location Filter", "Bin Filter", "Date Filter";
+            RequestFilterFields = "No.", "Inventory Posting Group", "Gen. Prod. Posting Group", "Item Category Code", "Variant Filter", "Location Filter", "Bin Filter", "Date Filter";
 
             trigger OnAfterGetRecord()
             begin
@@ -29,8 +39,7 @@ report 5880 "Calc. Phys. Invt. Order Lines"
                     Window.Close();
                     if ItemsBlocked then
                         Message(BlockedItemMsg);
-                    Message(
-                      StrSubstNo(LinesCreatedMsg, LineCount));
+                    Message(StrSubstNo(LinesCreatedMsg, LineCount));
                 end;
             end;
 
@@ -74,17 +83,35 @@ report 5880 "Calc. Phys. Invt. Order Lines"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(CalcQtyExpected; CalcQtyExpected)
+                    field(CalcQtyExpectedField; CalcQtyExpected)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Calculate Qty. Expected';
                         ToolTip = 'Specifies if you want the program to calculate and insert the contents of the field quantity expected for new created physical inventory order lines.';
                     }
-                    field(ZeroQty; ZeroQty)
+                    field(ZeroQtyField; ZeroQty)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Items Not on Inventory';
-                        ToolTip = 'Specifies if journal lines should be created for items that are not on inventory, that is, items where the value in the Qty. (Calculated) field is 0.';
+                        ToolTip = 'Specifies if physical inventory order lines should be created for items that are not on inventory, that is, items where the value in the Qty. Expected (Base) field is 0.';
+
+                        trigger OnValidate()
+                        begin
+                            if not ZeroQty then
+                                IncludeItemWithNoTransaction := false;
+                        end;
+                    }
+                    field(IncludeItemWithNoTransactionField; IncludeItemWithNoTransaction)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Include Items without Transactions';
+                        ToolTip = 'Specifies if physical inventory order lines should be created for items that are not on inventory and are not used in any transactions.';
+
+                        trigger OnValidate()
+                        begin
+                            if IncludeItemWithNoTransaction then
+                                ZeroQty := true;
+                        end;
                     }
                 }
             }
@@ -129,7 +156,7 @@ report 5880 "Calc. Phys. Invt. Order Lines"
         ItemsBlocked: Boolean;
         CalcQtyExpected: Boolean;
         HideValidationDialog: Boolean;
-        ZeroQty: Boolean;
+        ZeroQty, IncludeItemWithNoTransaction : Boolean;
 
     procedure SetPhysInvtOrderHeader(NewPhysInvtOrderHeader: Record "Phys. Invt. Order Header")
     begin
@@ -140,8 +167,14 @@ report 5880 "Calc. Phys. Invt. Order Lines"
 
     procedure InitializeRequest(ZeroQty2: Boolean; CalcQtyExpected2: Boolean)
     begin
+        InitializeRequest(ZeroQty2, CalcQtyExpected2, false);
+    end;
+
+    procedure InitializeRequest(ZeroQty2: Boolean; CalcQtyExpected2: Boolean; IncludeItemWithNoTransaction2: Boolean)
+    begin
         ZeroQty := ZeroQty2;
         CalcQtyExpected := CalcQtyExpected2;
+        IncludeItemWithNoTransaction := ZeroQty2 and IncludeItemWithNoTransaction2;
     end;
 
     procedure InitializeInvtCount(InvtCountCode2: Code[10]; CycleSourceType2: Option " ",Item,SKU)
@@ -158,9 +191,10 @@ report 5880 "Calc. Phys. Invt. Order Lines"
     local procedure CalcItemPhysInvtOrderLines()
     var
         Bin: Record Bin;
+        ItemVariant: Record "Item Variant";
         BlankWhseEntry: Record "Warehouse Entry";
         PhysInvtOrderLineArgs: Record "Phys. Invt. Order Line";
-        IsHandled: Boolean;
+        IsHandled, ItemVariantBlocked : Boolean;
     begin
         IsHandled := false;
         OnBeforeCalcItemPhysInvtOrderLines(Item, IsHandled);
@@ -171,46 +205,56 @@ report 5880 "Calc. Phys. Invt. Order Lines"
         if ItemLedgEntry.Find('-') then
             repeat
                 if IsNewItemLedgEntryGroup() then begin
-                    LastItemLedgEntry := ItemLedgEntry;
-
-                    if PhysInvtTrackingMgt.LocationIsBinMandatory(ItemLedgEntry."Location Code") then begin
-                        Clear(LastWhseEntry);
-                        SetWhseEntryFilters();
-                        if WhseEntry.Find('-') then
-                            repeat
-                                if IsNewWhseEntryGroup() then begin
-                                    LastWhseEntry := WhseEntry;
-                                    Bin.SetRange("Location Code", WhseEntry."Location Code");
-                                    Bin.SetRange(Code, WhseEntry."Bin Code");
-                                    IsHandled := false;
-                                    OnBeforeCreateNewPhysInvtOrderLineForWhseEntry(
-                                      Item, WhseEntry, ItemLedgEntry, PhysInvtOrderHeader, PhysInvtOrderLine, ErrorText,
-                                      NextLineNo, InvtCountCode, CycleSourceType, CalcQtyExpected, LastItemLedgEntryNo, LineCount, IsHandled);
-                                    if not IsHandled then begin
-                                        PhysInvtOrderLineArgs.PrepareLineArgs(WhseEntry, ItemLedgEntry);
-                                        if (not Bin.IsEmpty) and
-                                           (PhysInvtOrderHeader.GetSamePhysInvtOrderLine(
-                                              PhysInvtOrderLineArgs,
-                                              ErrorText,
-                                              PhysInvtOrderLine) = 0)
-                                        then
-                                            CreateNewPhysInvtOrderLine();
-                                    end;
-                                end;
-                            until WhseEntry.Next() = 0;
-                    end else begin
-                        PhysInvtOrderLineArgs.PrepareLineArgs(BlankWhseEntry, ItemLedgEntry);
-                        if PhysInvtOrderHeader.GetSamePhysInvtOrderLine(
-                             PhysInvtOrderLineArgs,
-                             ErrorText,
-                             PhysInvtOrderLine) = 0
-                        then begin
-                            WhseEntry.Init();
-                            CreateNewPhysInvtOrderLine();
-                        end;
+                    ItemVariantBlocked := false;
+                    if ItemLedgEntry."Variant Code" <> '' then begin
+                        ItemVariant.SetLoadFields(Blocked);
+                        ItemVariant.Get(ItemLedgEntry."Item No.", ItemLedgEntry."Variant Code");
+                        ItemVariantBlocked := ItemVariant.Blocked;
+                        if ItemVariantBlocked then
+                            ItemsBlocked := true;
                     end;
+
+                    LastItemLedgEntry := ItemLedgEntry;
+                    if not ItemVariantBlocked then
+                        if PhysInvtTrackingMgt.LocationIsBinMandatory(ItemLedgEntry."Location Code") then begin
+                            Clear(LastWhseEntry);
+                            SetWhseEntryFilters();
+                            if WhseEntry.Find('-') then
+                                repeat
+                                    if IsNewWhseEntryGroup() then begin
+                                        LastWhseEntry := WhseEntry;
+                                        Bin.SetRange("Location Code", WhseEntry."Location Code");
+                                        Bin.SetRange(Code, WhseEntry."Bin Code");
+                                        IsHandled := false;
+                                        OnBeforeCreateNewPhysInvtOrderLineForWhseEntry(
+                                          Item, WhseEntry, ItemLedgEntry, PhysInvtOrderHeader, PhysInvtOrderLine, ErrorText,
+                                          NextLineNo, InvtCountCode, CycleSourceType, CalcQtyExpected, LastItemLedgEntryNo, LineCount, IsHandled);
+                                        if not IsHandled then begin
+                                            PhysInvtOrderLineArgs.PrepareLineArgs(WhseEntry, ItemLedgEntry);
+                                            if (not Bin.IsEmpty) and
+                                               (PhysInvtOrderHeader.GetSamePhysInvtOrderLine(
+                                                  PhysInvtOrderLineArgs,
+                                                  ErrorText,
+                                                  PhysInvtOrderLine) = 0)
+                                            then
+                                                CreateNewPhysInvtOrderLine();
+                                        end;
+                                    end;
+                                until WhseEntry.Next() = 0;
+                        end else begin
+                            PhysInvtOrderLineArgs.PrepareLineArgs(BlankWhseEntry, ItemLedgEntry);
+                            if PhysInvtOrderHeader.GetSamePhysInvtOrderLine(
+                                 PhysInvtOrderLineArgs,
+                                 ErrorText,
+                                 PhysInvtOrderLine) = 0
+                            then begin
+                                WhseEntry.Init();
+                                CreateNewPhysInvtOrderLine();
+                            end;
+                        end;
                 end;
             until ItemLedgEntry.Next() = 0;
+        CalcItemPhysInvtOrderLinesForItemWithNoTransactions();
     end;
 
     local procedure SetItemLedgEntryFilters()
@@ -255,6 +299,25 @@ report 5880 "Calc. Phys. Invt. Order Lines"
         OnAfterIsNewWhseEntryGroup(WhseEntry, LastWhseEntry, Result);
     end;
 
+    local procedure CreatePhysInvtOrderLineForItemsWithoutTransactions(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10])
+    var
+        PhysInvtOrderLineArgs: Record "Phys. Invt. Order Line";
+        BlankItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        WhseEntry.Init();
+        WhseEntry."Item No." := ItemNo;
+        WhseEntry."Variant Code" := VariantCode;
+        WhseEntry."Location Code" := LocationCode;
+
+        OnCreatePhysInvtOrderLineForItemsWithoutTransactions(WhseEntry);
+
+        PhysInvtOrderLineArgs.PrepareLineArgs(WhseEntry, BlankItemLedgerEntry);
+        if PhysInvtOrderHeader.GetSamePhysInvtOrderLine(PhysInvtOrderLineArgs, ErrorText, PhysInvtOrderLine) = 0 then begin
+            OnCreatePhysInvtOrderLineForItemsWithoutTransactionsBeforeCreateNewPhysInvtOrderLine(WhseEntry, ItemLedgEntry);
+            CreateNewPhysInvtOrderLine();
+        end;
+    end;
+
     procedure CreateNewPhysInvtOrderLine()
     var
         PhysInvtOrderLineArgs: Record "Phys. Invt. Order Line";
@@ -276,6 +339,82 @@ report 5880 "Calc. Phys. Invt. Order Lines"
             NextLineNo := NextLineNo + 10000;
             LineCount := LineCount + 1;
         end;
+    end;
+
+    local procedure CalcItemPhysInvtOrderLinesForItemWithNoTransactions()
+    var
+        Location: Record Location;
+        ItemVariant: Record "Item Variant";
+    begin
+        if not IncludeItemWithNoTransaction then
+            exit;
+
+        ItemVariant.SetRange("Item No.", Item."No.");
+        if Item.GetFilter("Variant Filter") <> '' then
+            Item.CopyFilter("Variant Filter", ItemVariant.Code);
+        if Item.GetFilter("Location Filter") <> '' then
+            Item.CopyFilter("Location Filter", Location."Code");
+
+        SetItemLedgEntryFilters();
+        OnBeforeCreateNewPhysInvtOrderLineForItemWithNoTransactionAfterSetItemVariantFilters(Item, ItemVariant);
+        if Location.FindSet() then
+            repeat
+                CalcItemPhysInvtOrderLinesForItemWithNoTransactionsOnLocation(ItemVariant, Location);
+            until Location.Next() = 0;
+
+        if ShouldCalcForBlankLocation() then begin
+            Clear(Location);
+            CalcItemPhysInvtOrderLinesForItemWithNoTransactionsOnLocation(ItemVariant, Location);
+        end;
+        SetItemLedgEntryFilters();
+    end;
+
+    local procedure CalcItemPhysInvtOrderLinesForItemWithNoTransactionsOnLocation(var ItemVariant: Record "Item Variant"; Location: Record Location)
+    var
+        ItemVariantExists: Boolean;
+    begin
+        if PhysInvtTrackingMgt.LocationIsBinMandatory(Location.Code) then
+            exit;
+
+        ItemLedgEntry.SetRange("Location Code", Location.Code);
+
+        if ItemVariant.FindSet() then begin
+            ItemVariantExists := true;
+            repeat
+                ItemLedgEntry.SetRange("Variant Code", ItemVariant.Code);
+                if ItemLedgEntry.IsEmpty() then
+                    CreatePhysInvtOrderLineForItemsWithoutTransactions(Item."No.", ItemVariant.Code, Location.Code);
+            until ItemVariant.Next() = 0
+        end;
+
+        ItemLedgEntry.SetRange("Variant Code", '');
+        OnBeforeCreateNewPhysInvtOrderLineForItemWithNoTransaction(Item, ItemVariantExists, Location);
+        if not Item.IsVariantMandatory() or not ItemVariantExists then
+            if ItemLedgEntry.IsEmpty() then
+                CreatePhysInvtOrderLineForItemsWithoutTransactions(Item."No.", '', Location.Code);
+
+        ItemLedgEntry.SetRange("Location Code");
+        ItemLedgEntry.SetRange("Variant Code");
+    end;
+
+    local procedure ShouldCalcForBlankLocation(): Boolean
+    var
+        TempLocation: Record Location temporary;
+        InventorySetup: Record "Inventory Setup";
+    begin
+        InventorySetup.SetLoadFields("Location Mandatory");
+        InventorySetup.Get();
+        if InventorySetup."Location Mandatory" then
+            exit(false);
+
+        if Item.GetFilter("Location Filter") = '' then
+            exit(true);
+
+        // Verify empty location not excluded
+        TempLocation.DeleteAll();
+        TempLocation.Insert(false);
+        TempLocation.SetFilter(Code, Item.GetFilter("Location Filter"));
+        exit(not TempLocation.IsEmpty());
     end;
 
     [IntegrationEvent(false, false)]
@@ -330,6 +469,26 @@ report 5880 "Calc. Phys. Invt. Order Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetWhseEntryFilters(var WhseEntry: Record "Warehouse Entry"; ItemLedgEntry: Record "Item Ledger Entry"; Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateNewPhysInvtOrderLineForItemWithNoTransactionAfterSetItemVariantFilters(var Item: Record Item; var ItemVariant: Record "Item Variant")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateNewPhysInvtOrderLineForItemWithNoTransaction(var Item: Record Item; var ItemVariantExists: Boolean; Location: Record Location)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreatePhysInvtOrderLineForItemsWithoutTransactions(var WarehouseEntry: Record "Warehouse Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreatePhysInvtOrderLineForItemsWithoutTransactionsBeforeCreateNewPhysInvtOrderLine(var WarehouseEntry: Record "Warehouse Entry"; var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
     end;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
 table 278 "Job Journal Quantity"
 {
     Caption = 'Job Journal Quantity';

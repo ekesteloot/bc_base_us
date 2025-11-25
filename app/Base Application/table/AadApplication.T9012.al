@@ -1,3 +1,10 @@
+﻿namespace System.Environment.Configuration;
+
+using System.Apps;
+using System.Security.AccessControl;
+using System.Security.User;
+using System.Utilities;
+
 table 9012 "AAD Application"
 {
     Caption = 'AAD Application';
@@ -30,10 +37,13 @@ table 9012 "AAD Application"
                 If not UserExists() and (Rec.State = Rec.State::Enabled) then begin
                     Rec.TestField(Description);
                     ConfirmQuestion := StrSubstNo(UserNameCannotbeChangedQst, Rec.Description);
-                    If ConfirmManagement.GetResponseOrDefault(ConfirmQuestion, true) then
+                    if "Client Id" <> AADApplicationSetup.GetD365BCForVEAppId() then begin
+                        If ConfirmManagement.GetResponseOrDefault(ConfirmQuestion, true) then
+                            CreateUserFromAADApplication()
+                        else
+                            error('');
+                    end else
                         CreateUserFromAADApplication()
-                    else
-                        error('');
                 end;
                 User.Get("User Id");
                 ErrorTxt := StrSubstNo(NoPermissionToChangeUserErr, SuperPermissionSetTxt, SECURITYPermissionSetTxt);
@@ -186,6 +196,7 @@ table 9012 "AAD Application"
     end;
 
     var
+        AADApplicationSetup: Codeunit "AAD Application Setup";
         CannotRenameErr: Label 'You cannot rename a %1.', Comment = '%1 Table name';
         UserMustExistErr: Label 'Register an user before enabling the %1', Comment = '%1 Table AAD Application';
         NoPermissionToChangeUserErr: Label 'You need to have either %1 or %2 privileges in the user permission set to update the state.', Comment = '%1 = SUPER; %2 = SECURITY';

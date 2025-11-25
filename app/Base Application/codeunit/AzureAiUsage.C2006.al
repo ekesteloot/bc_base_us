@@ -1,3 +1,5 @@
+namespace System.AI;
+
 /// <summary>
 /// Retrieves information about the usage of the Azure AI services.
 /// </summary>

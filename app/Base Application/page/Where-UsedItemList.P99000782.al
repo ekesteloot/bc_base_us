@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+
 page 99000782 "Where-Used Item List"
 {
     Caption = 'Where-Used';

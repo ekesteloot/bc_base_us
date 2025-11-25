@@ -1,3 +1,12 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Setup;
+using System.Utilities;
+
 page 9229 "Res. Avail. (Service) Matrix"
 {
     Caption = 'Res. Availability (Service) Matrix';
@@ -78,7 +87,7 @@ page 9229 "Res. Avail. (Service) Matrix"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Name2; Name)
+                field(Name2; Rec.Name)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies a description of the resource.';
@@ -485,7 +494,7 @@ page 9229 "Res. Avail. (Service) Matrix"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Resource Card";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -511,7 +520,7 @@ page 9229 "Res. Avail. (Service) Matrix"
 
                         Clear(ServOrderAllocMgt);
                         ServOrderAllocMgt.AllocateDate(
-                          CurrentDocumentType, CurrentDocumentNo, CurrentEntryNo, "No.", '', SelectedDate, QtytoAllocate);
+                          CurrentDocumentType, CurrentDocumentNo, CurrentEntryNo, Rec."No.", '', SelectedDate, QtytoAllocate);
                         CurrPage.Close();
                     end;
                 }
@@ -526,7 +535,7 @@ page 9229 "Res. Avail. (Service) Matrix"
         MatrixOnAfterGetRecord();
         if QualifiedForServItems = QualifiedForServItems::"Selected Service Item" then begin
             if ServItemLine.Get(CurrentDocumentType, CurrentDocumentNo, CurrentServItemLineNo) then
-                Qualified := ServOrderAllocMgt.QualifiedForServiceItemLine(ServItemLine, "No.")
+                Qualified := ServOrderAllocMgt.QualifiedForServiceItemLine(ServItemLine, Rec."No.")
             else
                 Qualified := false;
         end else begin
@@ -535,7 +544,7 @@ page 9229 "Res. Avail. (Service) Matrix"
             ServItemLine.SetRange("Document No.", ServHeader."No.");
             if ServItemLine.Find('-') then
                 repeat
-                    QualifiedForAll := ServOrderAllocMgt.QualifiedForServiceItemLine(ServItemLine, "No.")
+                    QualifiedForAll := ServOrderAllocMgt.QualifiedForServiceItemLine(ServItemLine, Rec."No.")
                 until (QualifiedForAll = false) or (ServItemLine.Next() = 0);
             if QualifiedForAll then
                 Qualified := true
@@ -544,15 +553,15 @@ page 9229 "Res. Avail. (Service) Matrix"
         end;
 
         if ServHeader.Get(CurrentDocumentType, CurrentDocumentNo) then
-            "Service Zone Filter" := ServHeader."Service Zone Code"
+            Rec."Service Zone Filter" := ServHeader."Service Zone Code"
         else
-            "Service Zone Filter" := '';
+            Rec."Service Zone Filter" := '';
         PreferredResource := false;
         if ServItem.Get(ServItemLine."Service Item No.") then
-            if ServItem."Preferred Resource" = "No." then
+            if ServItem."Preferred Resource" = Rec."No." then
                 PreferredResource := true;
 
-        CalcFields("In Customer Zone");
+        Rec.CalcFields("In Customer Zone");
     end;
 
     trigger OnInit()
@@ -622,77 +631,41 @@ page 9229 "Res. Avail. (Service) Matrix"
         PreferredResource: Boolean;
         MATRIX_CellData: array[32] of Decimal;
         MatrixColumnCaptions: array[32] of Text[100];
-        [InDataSet]
         SkilledVisible: Boolean;
-        [InDataSet]
         InCustomerZoneVisible: Boolean;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
-        [InDataSet]
         SelectedDayEnable: Boolean;
-        [InDataSet]
         QtytoallocateEnable: Boolean;
 
         Text000: Label 'You cannot allocate a resource when selected period is %1.';
@@ -734,7 +707,7 @@ page 9229 "Res. Avail. (Service) Matrix"
             exit;
 
         MatrixRec.Reset();
-        MatrixRec.SetRange("No.", "No.");
+        MatrixRec.SetRange("No.", Rec."No.");
         for I := 1 to ArrayLen(MatrixColumnDateFilters) do begin
             MATRIX_CellData[I] := 0;
             MatrixRec.SetRange("Date Filter", MatrixColumnDateFilters[I]."Period Start",
@@ -757,7 +730,7 @@ page 9229 "Res. Avail. (Service) Matrix"
     begin
         Clear(ResAvailability);
         Clear(Res);
-        Res.SetRange("No.", "No.");
+        Res.SetRange("No.", Rec."No.");
         Res.SetRange("Date Filter", MatrixColumnDateFilters[Column]."Period Start",
           MatrixColumnDateFilters[Column]."Period End");
         ResAvailability.SetTableView(Res);

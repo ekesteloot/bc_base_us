@@ -1,3 +1,20 @@
+﻿namespace Microsoft.Sales.Receivables;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Posting;
+using Microsoft.Shared.Navigate;
+
 page 232 "Apply Customer Entries"
 {
     Caption = 'Apply Customer Entries';
@@ -97,6 +114,8 @@ page 232 "Apply Customer Entries"
                             Error(CannotSetAppliesToIDErr);
 
                         SetCustApplId(true);
+                        if Rec."Applies-to ID" <> '' then
+                            UpdateCustomAppliesToIDForGenJournal(Rec."Applies-to ID");
 
                         CurrPage.Update(false);
                     end;
@@ -407,7 +426,7 @@ page 232 "Apply Customer Entries"
             part(Control1903096107; "Customer Ledger Entry FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Entry No." = FIELD("Entry No.");
+                SubPageLink = "Entry No." = field("Entry No.");
                 Visible = true;
             }
         }
@@ -427,8 +446,8 @@ page 232 "Apply Customer Entries"
                     Caption = 'Reminder/Fin. Charge Entries';
                     Image = Reminder;
                     RunObject = Page "Reminder/Fin. Charge Entries";
-                    RunPageLink = "Customer Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Customer Entry No.");
+                    RunPageLink = "Customer Entry No." = field("Entry No.");
+                    RunPageView = sorting("Customer Entry No.");
                     ToolTip = 'View the reminders and finance charge entries that you have entered for the customer.';
                 }
                 action("Applied E&ntries")
@@ -460,8 +479,8 @@ page 232 "Apply Customer Entries"
                     Caption = 'Detailed &Ledger Entries';
                     Image = View;
                     RunObject = Page "Detailed Cust. Ledg. Entries";
-                    RunPageLink = "Cust. Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Cust. Ledger Entry No.", "Posting Date");
+                    RunPageLink = "Cust. Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Cust. Ledger Entry No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a summary of the all posted entries and adjustments related to a specific customer ledger entry.';
                 }
@@ -747,6 +766,8 @@ page 232 "Apply Customer Entries"
         Navigate: Page Navigate;
         StyleTxt: Text;
         AppliesToID: Code[50];
+        CustomAppliesToID: Code[50];
+        TimesSetCustomAppliesToID: Integer;
         ValidExchRate: Boolean;
         MustSelectEntryErr: Label 'You must select an applying entry before you can post the application.';
         PostingInWrongContextErr: Label 'You must post the application from the window where you entered the applying entry.';
@@ -759,6 +780,7 @@ page 232 "Apply Customer Entries"
         ApplicationDateErr: Label 'The %1 entered must not be before the %1 on the %2.';
         HasDocumentAttachment: Boolean;
         CustNameVisible: Boolean;
+        GenJnlLineApply: Boolean;
 
     protected var
         Currency: Record Currency;
@@ -781,7 +803,6 @@ page 232 "Apply Customer Entries"
         PmtDiscAmount: Decimal;
         ApplnCurrencyCode: Code[10];
         CustEntryApplID: Code[50];
-        [InDataSet]
         AppliesToIDVisible: Boolean;
         DifferentCurrenciesInAppln: Boolean;
         PostingDone: Boolean;
@@ -792,6 +813,7 @@ page 232 "Apply Customer Entries"
     procedure SetGenJnlLine(NewGenJnlLine: Record "Gen. Journal Line"; ApplnTypeSelect: Integer)
     begin
         GenJnlLine := NewGenJnlLine;
+        GenJnlLineApply := true;
 
         if GenJnlLine."Account Type" = GenJnlLine."Account Type"::Customer then
             ApplyingAmount := GenJnlLine.Amount;
@@ -819,7 +841,7 @@ page 232 "Apply Customer Entries"
         SalesLine: Record "Sales Line";
     begin
         SalesHeader := NewSalesHeader;
-        CopyFilters(NewCustLedgEntry);
+        Rec.CopyFilters(NewCustLedgEntry);
 
         SalesPost.SumSalesLines(
           SalesHeader, 0, TotalSalesLine, TotalSalesLineLCY,
@@ -924,6 +946,35 @@ page 232 "Apply Customer Entries"
         end;
 
         OnAfterSetApplyingCustLedgEntry(TempApplyingCustLedgEntry, GenJnlLine, SalesHeader);
+    end;
+
+    internal procedure GetCustomAppliesToID(): Code[50]
+    begin
+        if TimesSetCustomAppliesToID <> 1 then
+            exit('');
+        exit(CustomAppliesToID);
+    end;
+
+    local procedure UpdateCustomAppliesToIDForGenJournal(NewAppliesToID: Code[50])
+    begin
+        if (not GenJnlLineApply) or (ApplnType <> ApplnType::"Applies-to ID") then
+            exit;
+        if JournalHasDocumentNo(NewAppliesToID) then
+            exit;
+        if (CustomAppliesToID = '') or ((CustomAppliesToID <> '') and (CustomAppliesToID <> NewAppliesToID)) then
+            TimesSetCustomAppliesToID += 1;
+
+        CustomAppliesToID := NewAppliesToID;
+    end;
+
+    local procedure JournalHasDocumentNo(AppliesToIDCode: Code[50]): Boolean
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+    begin
+        GenJournalLine.SetRange("Journal Template Name", GenJnlLine."Journal Template Name");
+        GenJournalLine.SetRange("Journal Batch Name", GenJnlLine."Journal Batch Name");
+        GenJournalLine.SetRange("Document No.", CopyStr(AppliesToIDCode, 1, MaxStrLen(GenJournalLine."Document No.")));
+        exit(not GenJournalLine.IsEmpty());
     end;
 
     local procedure SetApplyingCustledgEntrySalesHeader()
@@ -1042,7 +1093,7 @@ page 232 "Apply Customer Entries"
         CustLedgEntry.Copy(Rec);
         if CurrentRec then begin
             CustLedgEntry.SetRecFilter();
-            CustEntrySetApplID.SetApplId(CustLedgEntry, TempApplyingCustLedgEntry, "Applies-to ID")
+            CustEntrySetApplID.SetApplId(CustLedgEntry, TempApplyingCustLedgEntry, Rec."Applies-to ID")
         end else begin
             CurrPage.SetSelectionFilter(CustLedgEntry);
             CustEntrySetApplID.SetApplId(CustLedgEntry, TempApplyingCustLedgEntry, GetAppliesToID())
@@ -1137,17 +1188,8 @@ page 232 "Apply Customer Entries"
                                     AppliedCustLedgEntry := Rec;
                                     with AppliedCustLedgEntry do begin
                                         CalcFields("Remaining Amount");
-                                        if "Currency Code" <> ApplnCurrencyCode then begin
-                                            "Remaining Amount" :=
-                                            CurrExchRate.ExchangeAmtFCYToFCY(
-                                                ApplnDate, "Currency Code", ApplnCurrencyCode, "Remaining Amount");
-                                            "Remaining Pmt. Disc. Possible" :=
-                                            CurrExchRate.ExchangeAmtFCYToFCY(
-                                                ApplnDate, "Currency Code", ApplnCurrencyCode, "Remaining Pmt. Disc. Possible");
-                                            "Amount to Apply" :=
-                                            CurrExchRate.ExchangeAmtFCYToFCY(
-                                                ApplnDate, "Currency Code", ApplnCurrencyCode, "Amount to Apply");
-                                        end;
+                                        if "Currency Code" <> ApplnCurrencyCode then
+                                            UpdateAmountsForApplication(ApplnDate, ApplnCurrencyCode, false, false);
 
                                         OnCalcApplnAmountOnCalcTypeGenJnlLineOnApplnTypeToDocNoOnBeforeSetAppliedAmount(Rec, ApplnDate, ApplnCurrencyCode);
                                         if "Amount to Apply" <> 0 then
@@ -1158,11 +1200,11 @@ page 232 "Apply Customer Entries"
 
                                         if PaymentToleranceMgt.CheckCalcPmtDiscGenJnlCust(
                                             GenJnlLine, AppliedCustLedgEntry, 0, false) and
-                                        ((Abs(GenJnlLine.Amount) + ApplnRoundingPrecision >=
-                                            Abs(AppliedAmount - "Remaining Pmt. Disc. Possible")) or
+                                           ((Abs(GenJnlLine.Amount) + ApplnRoundingPrecision >=
+                                            Abs(AppliedAmount - GetRemainingPmtDiscPossible(GenJnlLine."Posting Date"))) or
                                             (GenJnlLine.Amount = 0))
                                         then
-                                            PmtDiscAmount := "Remaining Pmt. Disc. Possible";
+                                            PmtDiscAmount := GetRemainingPmtDiscPossible(GenJnlLine."Posting Date");
 
                                         if not DifferentCurrenciesInAppln then
                                             DifferentCurrenciesInAppln := ApplnCurrencyCode <> "Currency Code";
@@ -1387,28 +1429,28 @@ page 232 "Apply Customer Entries"
 
                 if CanUseDisc and
                    (Abs(TempAppliedCustLedgEntry."Amount to Apply") >=
-                    Abs(TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible"))
+                    Abs(TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate)))
                 then
                     if Abs(CurrentAmount) >
-                       Abs(TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible")
+                       Abs(TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate))
                     then begin
-                        PmtDiscAmount += TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
-                        CurrentAmount += TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
+                        PmtDiscAmount += TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate);
+                        CurrentAmount += TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate);
                     end else
                         if Abs(CurrentAmount) =
-                           Abs(TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible")
+                           Abs(TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate))
                         then begin
-                            PmtDiscAmount += TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
+                            PmtDiscAmount += TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate);
                             CurrentAmount +=
-                              TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
+                              TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate);
                             AppliedAmount += CorrectionAmount;
                         end else
                             if FromZeroGenJnl then begin
-                                PmtDiscAmount += TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
+                                PmtDiscAmount += TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate);
                                 CurrentAmount +=
-                                  TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
+                                  TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate);
                             end else begin
-                                PossiblePmtDisc := TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
+                                PossiblePmtDisc := TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate);
                                 RemainingAmountExclDiscounts :=
                                   TempAppliedCustLedgEntry."Remaining Amount" - PossiblePmtDisc - TempAppliedCustLedgEntry."Max. Payment Tolerance";
                                 if Abs(CurrentAmount) + Abs(CalcOppositeEntriesAmount(TempAppliedCustLedgEntry)) >=
@@ -1418,7 +1460,7 @@ page 232 "Apply Customer Entries"
                                     AppliedAmount += CorrectionAmount;
                                 end;
                                 CurrentAmount +=
-                                  TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
+                                  TempAppliedCustLedgEntry."Remaining Amount" - TempAppliedCustLedgEntry.GetRemainingPmtDiscPossible(PostingDate);
                             end
                 else begin
                     if ((CurrentAmount + TempAppliedCustLedgEntry."Amount to Apply") * CurrentAmount) <= 0 then
@@ -1541,7 +1583,7 @@ page 232 "Apply Customer Entries"
 
     procedure ExchangeLedgerEntryAmounts(Type: Enum "Customer Apply Calculation Type"; CurrencyCode: Code[10]; var CalcCustLedgEntry: Record "Cust. Ledger Entry"; PostingDate: Date)
     var
-        CalculateCurrency, IsHandled : Boolean;
+        CalculateCurrency, IsHandled: Boolean;
     begin
         CalcCustLedgEntry.CalcFields("Remaining Amount");
 

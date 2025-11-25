@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
 codeunit 99000768 "Production BOM-Copy"
 {
     TableNo = "Production BOM Header";

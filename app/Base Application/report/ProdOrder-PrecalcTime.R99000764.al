@@ -1,7 +1,7 @@
 report 99000764 "Prod. Order - Precalc. Time"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrder/ProdOrderPrecalcTime.rdlc';
+    RDLCLayout = './Manufacturing/Document/ProdOrderPrecalcTime.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Precalc. Time';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +10,7 @@ report 99000764 "Prod. Order - Precalc. Time"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             RequestFilterFields = Status, "No.", "Source No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -80,8 +80,8 @@ report 99000764 "Prod. Order - Precalc. Time"
             }
             dataitem("Prod. Order Routing Line"; "Prod. Order Routing Line")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
                 column(Prod__Order_Routing_Line__Operation_No__; "Operation No.")
                 {
                 }
@@ -152,8 +152,8 @@ report 99000764 "Prod. Order - Precalc. Time"
             }
             dataitem("Prod. Order Component"; "Prod. Order Component")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
                 column(Prod__Order_Component__Item_No__; "Item No.")
                 {
                 }

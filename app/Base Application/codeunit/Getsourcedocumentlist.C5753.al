@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.Purchases.Document;
+using Microsoft.WarehouseMgt.Document;
+
 codeunit 5753 GetSourceDocumentList
 {
     procedure ReturnListofWhseShipments(e: ErrorInfo)

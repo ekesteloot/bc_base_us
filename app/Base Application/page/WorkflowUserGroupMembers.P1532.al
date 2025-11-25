@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1532 "Workflow User Group Members"
 {
     Caption = 'Workflow User Group Members';

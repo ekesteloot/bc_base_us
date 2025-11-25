@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 enum 1253 "Pmt. Appl. Related Party Name Matching"
 {
     Extensible = true;

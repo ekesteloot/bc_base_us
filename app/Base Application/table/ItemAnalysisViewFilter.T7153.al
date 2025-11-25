@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+
 table 7153 "Item Analysis View Filter"
 {
     Caption = 'Item Analysis View Filter';
@@ -13,8 +17,8 @@ table 7153 "Item Analysis View Filter"
         {
             Caption = 'Analysis View Code';
             NotBlank = true;
-            TableRelation = "Item Analysis View".Code WHERE("Analysis Area" = FIELD("Analysis Area"),
-                                                             Code = FIELD("Analysis View Code"));
+            TableRelation = "Item Analysis View".Code where("Analysis Area" = field("Analysis Area"),
+                                                             Code = field("Analysis View Code"));
         }
         field(3; "Dimension Code"; Code[20])
         {
@@ -25,9 +29,7 @@ table 7153 "Item Analysis View Filter"
         field(4; "Dimension Value Filter"; Code[250])
         {
             Caption = 'Dimension Value Filter';
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"));
             ValidateTableRelation = false;
         }
     }

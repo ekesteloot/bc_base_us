@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 page 1572 "VAT Entries Preview Subform"
 {
     PageType = ListPart;
@@ -13,7 +17,7 @@ page 1572 "VAT Entries Preview Subform"
             repeater(GroupName)
             {
                 ShowAsTree = true;
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 ShowCaption = false;
                 TreeInitialState = CollapseAll;
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
@@ -68,7 +72,7 @@ page 1572 "VAT Entries Preview Subform"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of the VAT entry.';
                 }
-                field(Base; Base)
+                field(Base; Rec.Base)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the amount that the VAT amount (the amount shown in the Amount field) is calculated from.';
@@ -138,7 +142,7 @@ page 1572 "VAT Entries Preview Subform"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies if the transaction is related to trade with a third party within the EU.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the VAT entry has been closed by the Calc. and Post VAT Settlement batch job.';
@@ -153,7 +157,7 @@ page 1572 "VAT Entries Preview Subform"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the internal reference number for the line.';
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry has been part of a reverse transaction.';
@@ -182,7 +186,7 @@ page 1572 "VAT Entries Preview Subform"
     }
     trigger OnAfterGetRecord()
     begin
-        Emphasize := Indentation = 0;
+        Emphasize := Rec.Indentation = 0;
     end;
 
     protected var
@@ -193,8 +197,8 @@ page 1572 "VAT Entries Preview Subform"
         TempVATEntryPostingPreview: Record "VAT Entry Posting Preview" temporary;
         RecRef: RecordRef;
     begin
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         TempVATEntryPostingPreview.Reset();
         TempVATEntryPostingPreview.DeleteAll();
 

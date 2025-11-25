@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+
+
 page 400 "Purchase Invoice Statistics"
 {
     Caption = 'Purchase Invoice Statistics';
@@ -16,7 +24,7 @@ page 400 "Purchase Invoice Statistics"
                 field("VendAmount + InvDiscAmount"; VendAmount + InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Amount';
                     ToolTip = 'Specifies the net amount of all the lines in the purchase document.';
@@ -24,7 +32,7 @@ page 400 "Purchase Invoice Statistics"
                 field(InvDiscAmount; InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     ToolTip = 'Specifies the invoice discount amount for the purchase document.';
@@ -32,7 +40,7 @@ page 400 "Purchase Invoice Statistics"
                 field(VendAmount; VendAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total amount, less any invoice discount amount, and excluding VAT for the purchase document.';
@@ -40,7 +48,7 @@ page 400 "Purchase Invoice Statistics"
                 field(VATAmount; VATAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = '3,' + Format(VATAmountText);
                     Caption = 'VAT Amount';
@@ -49,7 +57,7 @@ page 400 "Purchase Invoice Statistics"
                 field(AmountInclVAT; AmountInclVAT)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total Incl. VAT';
                     ToolTip = 'Specifies the total amount, including VAT, that will be posted to the vendor''s account for all the lines in the purchase document.';
@@ -126,7 +134,7 @@ page 400 "Purchase Invoice Statistics"
     begin
         ClearAll();
 
-        Currency.Initialize("Currency Code");
+        Currency.Initialize(Rec."Currency Code");
 
         CalculateTotals();
 
@@ -138,28 +146,28 @@ page 400 "Purchase Invoice Statistics"
         else
             VATAmountText := StrSubstNo(Text001, VATPercentage);
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             AmountLCY := VendAmount
         else
             AmountLCY :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                WorkDate(), "Currency Code", VendAmount, "Currency Factor");
+                WorkDate(), Rec."Currency Code", VendAmount, Rec."Currency Factor");
 
         VendLedgEntry.SetCurrentKey("Document No.");
-        VendLedgEntry.SetRange("Document No.", "No.");
+        VendLedgEntry.SetRange("Document No.", Rec."No.");
         VendLedgEntry.SetRange("Document Type", VendLedgEntry."Document Type"::Invoice);
-        VendLedgEntry.SetRange("Vendor No.", "Pay-to Vendor No.");
+        VendLedgEntry.SetRange("Vendor No.", Rec."Pay-to Vendor No.");
         if VendLedgEntry.FindFirst() then
             AmountLCY := -(VendLedgEntry."Purchase (LCY)");
 
-        if not Vend.Get("Pay-to Vendor No.") then
+        if not Vend.Get(Rec."Pay-to Vendor No.") then
             Clear(Vend);
         Vend.CalcFields("Balance (LCY)");
 
         PurchInvLine.CalcVATAmountLines(Rec, TempVATAmountLine);
         OnOnAfterGetRecordOnBeforeUpdateSubForm(Rec);
         CurrPage.SubForm.PAGE.SetTempVATAmountLine(TempVATAmountLine);
-        CurrPage.SubForm.PAGE.InitGlobals("Currency Code", false, false, false, false, "VAT Base Discount %");
+        CurrPage.SubForm.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var
@@ -196,12 +204,12 @@ page 400 "Purchase Invoice Statistics"
         if IsHandled then
             exit;
 
-        PurchInvLine.SetRange("Document No.", "No.");
+        PurchInvLine.SetRange("Document No.", Rec."No.");
         if PurchInvLine.Find('-') then
             repeat
                 VendAmount += PurchInvLine.Amount;
                 AmountInclVAT += PurchInvLine."Amount Including VAT";
-                if "Prices Including VAT" then
+                if Rec."Prices Including VAT" then
                     InvDiscAmount += PurchInvLine."Inv. Discount Amount" / (1 + PurchInvLine."VAT %" / 100)
                 else
                     InvDiscAmount += PurchInvLine."Inv. Discount Amount";

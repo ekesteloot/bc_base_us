@@ -1,3 +1,9 @@
+﻿namespace System.AI;
+
+using System;
+using System.IO;
+using System.Utilities;
+
 codeunit 2024 "Image Analysis Wrapper V1.0" implements "Image Analysis Provider"
 {
     Access = Internal;

@@ -1,3 +1,18 @@
+﻿namespace Microsoft.WarehouseMgt.Journal;
+
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Reports;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Integration.Excel;
+
 page 7326 "Whse. Phys. Invt. Journal"
 {
     AdditionalSearchTerms = 'physical count';
@@ -83,6 +98,7 @@ page 7326 "Whse. Phys. Invt. Journal"
                 {
                     ApplicationArea = ItemTracking;
                     Editable = SerialNoEditable;
+                    ExtendedDatatype = Barcode;
                     ToolTip = 'Specifies the same as for the field in the Item Journal window.';
                     Visible = false;
                 }
@@ -90,6 +106,7 @@ page 7326 "Whse. Phys. Invt. Journal"
                 {
                     ApplicationArea = ItemTracking;
                     Editable = LotNoEditable;
+                    ExtendedDatatype = Barcode;
                     ToolTip = 'Specifies the same as for the field in the Item Journal window.';
                     Visible = false;
                 }
@@ -97,6 +114,7 @@ page 7326 "Whse. Phys. Invt. Journal"
                 {
                     ApplicationArea = ItemTracking;
                     Editable = PackageNoEditable;
+                    ExtendedDatatype = Barcode;
                     ToolTip = 'Specifies the same as for the field in the Item Journal window.';
                     Visible = PackageNoVisible;
                 }
@@ -223,7 +241,7 @@ page 7326 "Whse. Phys. Invt. Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -233,10 +251,10 @@ page 7326 "Whse. Phys. Invt. Journal"
                     Caption = 'Warehouse Entries';
                     Image = BinLedger;
                     RunObject = Page "Warehouse Entries";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Location Code" = FIELD("Location Code");
-                    RunPageView = SORTING("Item No.", "Location Code", "Variant Code", "Bin Type Code", "Unit of Measure Code", "Lot No.", "Serial No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Location Code" = field("Location Code");
+                    RunPageView = sorting("Item No.", "Location Code", "Variant Code", "Bin Type Code", "Unit of Measure Code", "Lot No.", "Serial No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View completed warehouse activities related to the document.';
                 }
@@ -246,10 +264,10 @@ page 7326 "Whse. Phys. Invt. Journal"
                     Caption = 'Ledger E&ntries';
                     Image = ItemLedger;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Location Code" = FIELD("Location Code");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Location Code" = field("Location Code");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
                 action("Bin Contents")
@@ -258,10 +276,10 @@ page 7326 "Whse. Phys. Invt. Journal"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Item No.", "Variant Code");
                     ToolTip = 'View items in the bin if the selected line contains a bin code.';
                 }
             }
@@ -318,6 +336,31 @@ page 7326 "Whse. Phys. Invt. Journal"
                         end;
 
                         Clear(PhysInvtCountMgt);
+                    end;
+                }
+            }
+            group("Page")
+            {
+                Caption = 'Page';
+                action(EditInExcel)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Edit in Excel';
+                    Image = Excel;
+                    ToolTip = 'Send the data in the journal to an Excel file for analysis or editing.';
+                    Visible = IsSaaSExcelAddinEnabled;
+                    AccessByPermission = System "Allow Action Export To Excel" = X;
+
+                    trigger OnAction()
+                    var
+                        EditinExcel: Codeunit "Edit in Excel";
+                        EditinExcelFilters: Codeunit "Edit in Excel Filters";
+                        ODataUtility: Codeunit "ODataUtility";
+                    begin
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Journal Batch Name")), Enum::"Edit in Excel Filter Type"::Equal, CurrentJnlBatchName, Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Journal Template Name")), Enum::"Edit in Excel Filter Type"::Equal, Rec."Journal Template Name", Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Location Code")), Enum::"Edit in Excel Filter Type"::Equal, CurrentLocationCode, Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcel.EditPageInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), Page::"Whse. Phys. Invt. Journal", EditInExcelFilters);
                     end;
                 }
             }
@@ -473,14 +516,25 @@ page 7326 "Whse. Phys. Invt. Journal"
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
+    var
+        ClientTypeManagement: Codeunit "Client Type Management";
     begin
+        // if called from API (such as edit-in-excel), do not refresh 
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
         Rec.SetUpNewLine(xRec);
     end;
 
     trigger OnOpenPage()
     var
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ServerSetting: Codeunit "Server Setting";
         JnlSelected: Boolean;
     begin
+        IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        // if called from API (such as edit-in-excel), do not filter 
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
         if Rec.IsOpenedFromBatch() then begin
             CurrentJnlBatchName := Rec."Journal Batch Name";
             CurrentLocationCode := Rec."Location Code";
@@ -501,16 +555,13 @@ page 7326 "Whse. Phys. Invt. Journal"
         ReportPrint: Codeunit "Test Report-Print";
         CurrentJnlBatchName: Code[10];
         CurrentLocationCode: Code[10];
+        IsSaaSExcelAddinEnabled: Boolean;
 
     protected var
         ItemDescription: Text[100];
-        [InDataSet]
         SerialNoEditable: Boolean;
-        [InDataSet]
         LotNoEditable: Boolean;
-        [InDataSet]
         PackageNoEditable: Boolean;
-        [InDataSet]
         PackageNoVisible: Boolean;
         QtyPhysInventoryBaseIsEditable: Boolean;
 

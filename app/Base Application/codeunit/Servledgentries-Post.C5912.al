@@ -1,4 +1,15 @@
-﻿codeunit 5912 "ServLedgEntries-Post"
+﻿namespace Microsoft.ServiceMgt.Posting;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Ledger;
+
+codeunit 5912 "ServLedgEntries-Post"
 {
     Permissions = TableData "Service Ledger Entry" = rimd,
                   TableData "Warranty Ledger Entry" = rimd,

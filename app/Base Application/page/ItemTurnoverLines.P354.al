@@ -26,7 +26,7 @@ page 354 "Item Turnover Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period defined on the line, related to year-to-date inventory turnover.';
                 }
-                field(PurchasesQty; "Purchases (Qty.)")
+                field(PurchasesQty; Rec."Purchases (Qty.)")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Purchases (Qty.)';
@@ -39,7 +39,7 @@ page 354 "Item Turnover Lines"
                         ShowItemEntries(false);
                     end;
                 }
-                field(PurchasesLCY; "Purchases (LCY)")
+                field(PurchasesLCY; Rec."Purchases (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
@@ -52,7 +52,7 @@ page 354 "Item Turnover Lines"
                         ShowValueEntries(false);
                     end;
                 }
-                field(SalesQty; "Sales (Qty.)")
+                field(SalesQty; Rec."Sales (Qty.)")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales (Qty.)';
@@ -65,7 +65,7 @@ page 354 "Item Turnover Lines"
                         ShowItemEntries(true);
                     end;
                 }
-                field(SalesLCY; "Sales (LCY)")
+                field(SalesLCY; Rec."Sales (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
@@ -88,7 +88,7 @@ page 354 "Item Turnover Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         SetDateFilter();
         CalcLine();
     end;
@@ -96,10 +96,10 @@ page 354 "Item Turnover Lines"
     local procedure CalcLine()
     begin
         Item.CalcFields("Purchases (Qty.)", "Purchases (LCY)", "Sales (Qty.)", "Sales (LCY)");
-        "Purchases (Qty.)" := Item."Purchases (Qty.)";
-        "Purchases (LCY)" := Item."Purchases (LCY)";
-        "Sales (Qty.)" := Item."Sales (Qty.)";
-        "Sales (LCY)" := Item."Sales (LCY)";
+        Rec."Purchases (Qty.)" := Item."Purchases (Qty.)";
+        Rec."Purchases (LCY)" := Item."Purchases (LCY)";
+        Rec."Sales (Qty.)" := Item."Sales (Qty.)";
+        Rec."Sales (LCY)" := Item."Sales (LCY)";
 
         OnAfterCalcLine(Item, Rec);
     end;
@@ -124,7 +124,7 @@ page 354 "Item Turnover Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -192,9 +192,9 @@ page 354 "Item Turnover Lines"
     protected procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            Item.SetRange("Date Filter", "Period Start", "Period End")
+            Item.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            Item.SetRange("Date Filter", 0D, "Period End");
+            Item.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     [IntegrationEvent(TRUE, false)]

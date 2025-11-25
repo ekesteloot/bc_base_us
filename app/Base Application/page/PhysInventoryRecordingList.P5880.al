@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
+using Microsoft.InventoryMgt.Counting.Reports;
+
 page 5880 "Phys. Inventory Recording List"
 {
     ApplicationArea = Warehouse;

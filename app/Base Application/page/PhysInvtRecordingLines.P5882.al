@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
 page 5882 "Phys. Invt. Recording Lines"
 {
     Caption = 'Phys. Invt. Recording Lines';
@@ -38,6 +40,11 @@ page 5882 "Phys. Invt. Recording Lines"
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the number of the item that was counted when taking the physical inventory.';
+                }
+                field("Item Reference No."; Rec."Item Reference No.")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies a reference to the item number as defined by the item''s barcode.';
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
@@ -98,7 +105,7 @@ page 5882 "Phys. Invt. Recording Lines"
                     ToolTip = 'Specifies the Quantity on the line, expressed in base units of measure.';
                     Visible = false;
                 }
-                field(Recorded; Recorded)
+                field(Recorded; Rec.Recorded)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if a value was entered in Quantity of the physical inventory recording line.';
@@ -139,9 +146,9 @@ page 5882 "Phys. Invt. Recording Lines"
                     Caption = 'Show Document';
                     Image = View;
                     RunObject = Page "Phys. Inventory Recording";
-                    RunPageLink = "Order No." = FIELD("Order No."),
-                                  "Recording No." = FIELD("Recording No.");
-                    RunPageView = SORTING("Order No.", "Recording No.");
+                    RunPageLink = "Order No." = field("Order No."),
+                                  "Recording No." = field("Recording No.");
+                    RunPageView = sorting("Order No.", "Recording No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Show inventory count recording.';
                 }

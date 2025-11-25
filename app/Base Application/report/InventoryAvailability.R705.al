@@ -1,7 +1,13 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 report 705 "Inventory Availability"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InventoryAvailability.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InventoryAvailability.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Availability';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +17,7 @@ report 705 "Inventory Availability"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE(Type = CONST(Inventory));
+            DataItemTableView = where(Type = const(Inventory));
             RequestFilterFields = "No.", "Location Filter", "Variant Filter", "Search Description", "Assembly BOM", "Inventory Posting Group", "Statistics Group", "Vendor No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -102,8 +108,8 @@ report 705 "Inventory Availability"
             }
             dataitem("Stockkeeping Unit"; "Stockkeeping Unit")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter");
-                DataItemTableView = SORTING("Item No.", "Location Code", "Variant Code");
+                DataItemLink = "Item No." = field("No."), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter");
+                DataItemTableView = sorting("Item No.", "Location Code", "Variant Code");
                 column(AssemblyBOMStock_Item; Format(Item."Assembly BOM"))
                 {
                 }

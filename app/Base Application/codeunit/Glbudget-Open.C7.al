@@ -1,13 +1,19 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+
 codeunit 7 "GLBudget-Open"
 {
     TableNo = "G/L Account";
 
     trigger OnRun()
     begin
-        if GetFilter("Budget Filter") = '' then
+        if Rec.GetFilter("Budget Filter") = '' then
             SearchForName := true
         else begin
-            GLBudgetName.SetFilter(Name, GetFilter("Budget Filter"));
+            GLBudgetName.SetFilter(Name, Rec.GetFilter("Budget Filter"));
             SearchForName := not GLBudgetName.FindFirst();
             GLBudgetName.SetRange(Name);
         end;
@@ -18,7 +24,7 @@ codeunit 7 "GLBudget-Open"
                 GLBudgetName.Description := Text001;
                 GLBudgetName.Insert();
             end;
-            SetFilter("Budget Filter", GLBudgetName.Name);
+            Rec.SetFilter("Budget Filter", GLBudgetName.Name);
         end;
     end;
 

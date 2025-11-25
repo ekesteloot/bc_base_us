@@ -1,3 +1,5 @@
+namespace System.IO;
+
 table 8610 "Config. Questionnaire"
 {
     Caption = 'Config. Questionnaire';

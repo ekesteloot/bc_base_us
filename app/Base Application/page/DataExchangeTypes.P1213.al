@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1213 "Data Exchange Types"
 {
     ApplicationArea = Basic, Suite;
@@ -12,7 +14,7 @@ page 1213 "Data Exchange Types"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the data exchange type.';

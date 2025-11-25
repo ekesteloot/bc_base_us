@@ -1,3 +1,11 @@
+namespace Microsoft.CRM.Analysis;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
+using System.Utilities;
+
 page 9255 "Tasks Matrix"
 {
     Caption = 'Tasks Matrix';
@@ -33,22 +41,22 @@ page 9255 "Tasks Matrix"
                         case TableOption of
                             TableOption::Salesperson:
                                 begin
-                                    SalesPurchPerson.Get("No.");
+                                    SalesPurchPerson.Get(Rec."No.");
                                     PAGE.RunModal(0, SalesPurchPerson);
                                 end;
                             TableOption::Team:
                                 begin
-                                    Team.Get("No.");
+                                    Team.Get(Rec."No.");
                                     PAGE.RunModal(0, Team);
                                 end;
                             TableOption::Campaign:
                                 begin
-                                    Campaign.Get("No.");
+                                    Campaign.Get(Rec."No.");
                                     PAGE.RunModal(0, Campaign);
                                 end;
                             TableOption::Contact:
                                 begin
-                                    Contact.Get("No.");
+                                    Contact.Get(Rec."No.");
                                     PAGE.RunModal(0, Contact);
                                 end;
                         end;
@@ -489,7 +497,7 @@ page 9255 "Tasks Matrix"
     var
         MATRIX_CurrentColumnOrdinal: Integer;
     begin
-        if (Type = Type::Person) and (TableOption = TableOption::Contact) then
+        if (Rec.Type = Rec.Type::Person) and (TableOption = TableOption::Contact) then
             NameIndent := 1
         else
             NameIndent := 0;
@@ -517,19 +525,19 @@ page 9255 "Tasks Matrix"
     begin
         MATRIX_NoOfMatrixColumns := ArrayLen(MATRIX_CellData);
         if IncludeClosed then
-            SetRange("Task Closed Filter")
+            Rec.SetRange("Task Closed Filter")
         else
-            SetRange("Task Closed Filter", false);
+            Rec.SetRange("Task Closed Filter", false);
 
         if StatusFilter <> StatusFilter::" " then
-            SetRange("Task Status Filter", StatusFilter - 1)
+            Rec.SetRange("Task Status Filter", StatusFilter - 1)
         else
-            SetRange("Task Status Filter");
+            Rec.SetRange("Task Status Filter");
 
         if PriorityFilter <> PriorityFilter::" " then
-            SetRange("Priority Filter", PriorityFilter - 1)
+            Rec.SetRange("Priority Filter", PriorityFilter - 1)
         else
-            SetRange("Priority Filter");
+            Rec.SetRange("Priority Filter");
 
         ValidateFilter();
         ValidateTableOption();
@@ -547,7 +555,6 @@ page 9255 "Tasks Matrix"
         StatusFilter: Option " ","Not Started","In Progress",Completed,Waiting,Postponed;
         PriorityFilter: Option " ",Low,Normal,High;
         IncludeClosed: Boolean;
-        [InDataSet]
         StyleIsStrong: Boolean;
         FilterSalesPerson: Code[250];
         FilterTeam: Code[250];
@@ -558,22 +565,21 @@ page 9255 "Tasks Matrix"
         MATRIX_CellData: array[32] of Text[1024];
         ColumnCaptions: array[32] of Text[1024];
         ColumnDateFilters: array[32] of Text[50];
-        [InDataSet]
         NameIndent: Integer;
         MultipleTxt: Label 'Multiple';
 
     local procedure SetFilters()
     begin
         if StatusFilter <> StatusFilter::" " then begin
-            SetRange("Task Status Filter", StatusFilter - 1);
+            Rec.SetRange("Task Status Filter", StatusFilter - 1);
             Task.SetRange(Status, StatusFilter - 1);
         end else begin
-            SetRange("Task Status Filter");
+            Rec.SetRange("Task Status Filter");
             Task.SetRange(Status);
         end;
 
-        Task.SetFilter("System To-do Type", '%1|%2', "System Task Type Filter"::Organizer,
-          "System Task Type Filter"::"Salesperson Attendee");
+        Task.SetFilter("System To-do Type", '%1|%2', Rec."System Task Type Filter"::Organizer,
+          Rec."System Task Type Filter"::"Salesperson Attendee");
 
         if IncludeClosed then
             Task.SetRange(Closed)
@@ -581,43 +587,43 @@ page 9255 "Tasks Matrix"
             Task.SetRange(Closed, false);
 
         if PriorityFilter <> PriorityFilter::" " then begin
-            SetRange("Priority Filter", PriorityFilter - 1);
+            Rec.SetRange("Priority Filter", PriorityFilter - 1);
             Task.SetRange(Priority, PriorityFilter - 1);
         end else begin
-            SetRange("Priority Filter");
+            Rec.SetRange("Priority Filter");
             Task.SetRange(Priority);
         end;
 
         case TableOption of
             TableOption::Salesperson:
                 begin
-                    SetRange("Salesperson Filter", "No.");
-                    SetFilter(
+                    Rec.SetRange("Salesperson Filter", Rec."No.");
+                    Rec.SetFilter(
                       "System Task Type Filter", '%1|%2',
-                      "System Task Type Filter"::Organizer,
-                      "System Task Type Filter"::"Salesperson Attendee");
+                      Rec."System Task Type Filter"::Organizer,
+                      Rec."System Task Type Filter"::"Salesperson Attendee");
                 end;
             TableOption::Team:
                 begin
-                    SetRange("Team Filter", "No.");
-                    SetRange("System Task Type Filter", "System Task Type Filter"::Team);
+                    Rec.SetRange("Team Filter", Rec."No.");
+                    Rec.SetRange("System Task Type Filter", Rec."System Task Type Filter"::Team);
                 end;
             TableOption::Campaign:
                 begin
-                    SetRange("Campaign Filter", "No.");
-                    SetRange("System Task Type Filter", "System Task Type Filter"::Organizer);
+                    Rec.SetRange("Campaign Filter", Rec."No.");
+                    Rec.SetRange("System Task Type Filter", Rec."System Task Type Filter"::Organizer);
                 end;
             TableOption::Contact:
-                if Type = Type::Company then begin
-                    SetRange("Contact Filter");
-                    SetRange("Contact Company Filter", "Company No.");
-                    SetRange(
-                      "System Task Type Filter", "System Task Type Filter"::"Contact Attendee");
+                if Rec.Type = Rec.Type::Company then begin
+                    Rec.SetRange("Contact Filter");
+                    Rec.SetRange("Contact Company Filter", Rec."Company No.");
+                    Rec.SetRange(
+                      "System Task Type Filter", Rec."System Task Type Filter"::"Contact Attendee");
                 end else begin
-                    SetRange("Contact Filter", "No.");
-                    SetRange("Contact Company Filter");
-                    SetRange(
-                      "System Task Type Filter", "System Task Type Filter"::"Contact Attendee");
+                    Rec.SetRange("Contact Filter", Rec."No.");
+                    Rec.SetRange("Contact Company Filter");
+                    Rec.SetRange(
+                      "System Task Type Filter", Rec."System Task Type Filter"::"Contact Attendee");
                 end;
         end;
 
@@ -760,34 +766,34 @@ page 9255 "Tasks Matrix"
 
     local procedure ValidateTableOption()
     begin
-        SetRange("Contact Company Filter");
+        Rec.SetRange("Contact Company Filter");
         case TableOption of
             TableOption::Salesperson:
                 begin
-                    SetFilter("Team Filter", FilterTeam);
-                    SetFilter("Campaign Filter", FilterCampaign);
-                    SetFilter("Contact Filter", FilterContact);
+                    Rec.SetFilter("Team Filter", FilterTeam);
+                    Rec.SetFilter("Campaign Filter", FilterCampaign);
+                    Rec.SetFilter("Contact Filter", FilterContact);
                     ValidateFilter();
                 end;
             TableOption::Team:
                 begin
-                    SetFilter("Salesperson Filter", FilterSalesPerson);
-                    SetFilter("Campaign Filter", FilterCampaign);
-                    SetFilter("Contact Filter", FilterContact);
+                    Rec.SetFilter("Salesperson Filter", FilterSalesPerson);
+                    Rec.SetFilter("Campaign Filter", FilterCampaign);
+                    Rec.SetFilter("Contact Filter", FilterContact);
                     ValidateFilter();
                 end;
             TableOption::Campaign:
                 begin
-                    SetFilter("Salesperson Filter", FilterSalesPerson);
-                    SetFilter("Team Filter", FilterTeam);
-                    SetFilter("Contact Filter", FilterContact);
+                    Rec.SetFilter("Salesperson Filter", FilterSalesPerson);
+                    Rec.SetFilter("Team Filter", FilterTeam);
+                    Rec.SetFilter("Contact Filter", FilterContact);
                     ValidateFilter();
                 end;
             TableOption::Contact:
                 begin
-                    SetFilter("Salesperson Filter", FilterSalesPerson);
-                    SetFilter("Team Filter", FilterTeam);
-                    SetFilter("Campaign Filter", FilterCampaign);
+                    Rec.SetFilter("Salesperson Filter", FilterSalesPerson);
+                    Rec.SetFilter("Team Filter", FilterTeam);
+                    Rec.SetFilter("Campaign Filter", FilterCampaign);
                     ValidateFilter();
                 end;
         end;
@@ -815,9 +821,9 @@ page 9255 "Tasks Matrix"
         Salesperson.SetFilter("Team Filter", FilterTeam);
         Salesperson.SetFilter("Campaign Filter", FilterCampaign);
         Salesperson.SetFilter("Contact Company Filter", FilterContact);
-        Salesperson.SetFilter("Task Status Filter", GetFilter("Task Status Filter"));
-        Salesperson.SetFilter("Closed Task Filter", GetFilter("Task Closed Filter"));
-        Salesperson.SetFilter("Priority Filter", GetFilter("Priority Filter"));
+        Salesperson.SetFilter("Task Status Filter", Rec.GetFilter("Task Status Filter"));
+        Salesperson.SetFilter("Closed Task Filter", Rec.GetFilter("Task Closed Filter"));
+        Salesperson.SetFilter("Priority Filter", Rec.GetFilter("Priority Filter"));
         Salesperson.SetRange("Task Entry Exists", true);
     end;
 
@@ -828,9 +834,9 @@ page 9255 "Tasks Matrix"
         Campaign.SetFilter("Salesperson Filter", FilterSalesPerson);
         Campaign.SetFilter("Team Filter", FilterTeam);
         Campaign.SetFilter("Contact Company Filter", FilterContact);
-        Campaign.SetFilter("Task Status Filter", GetFilter("Task Status Filter"));
-        Campaign.SetFilter("Task Closed Filter", GetFilter("Task Closed Filter"));
-        Campaign.SetFilter("Priority Filter", GetFilter("Priority Filter"));
+        Campaign.SetFilter("Task Status Filter", Rec.GetFilter("Task Status Filter"));
+        Campaign.SetFilter("Task Closed Filter", Rec.GetFilter("Task Closed Filter"));
+        Campaign.SetFilter("Priority Filter", Rec.GetFilter("Priority Filter"));
         Campaign.SetRange("Task Entry Exists", true);
     end;
 
@@ -842,9 +848,9 @@ page 9255 "Tasks Matrix"
         Cont.SetFilter("Campaign Filter", FilterCampaign);
         Cont.SetFilter("Salesperson Filter", FilterSalesPerson);
         Cont.SetFilter("Team Filter", FilterTeam);
-        Cont.SetFilter("Task Status Filter", GetFilter("Task Status Filter"));
-        Cont.SetFilter("Task Closed Filter", GetFilter("Task Closed Filter"));
-        Cont.SetFilter("Priority Filter", GetFilter("Priority Filter"));
+        Cont.SetFilter("Task Status Filter", Rec.GetFilter("Task Status Filter"));
+        Cont.SetFilter("Task Closed Filter", Rec.GetFilter("Task Closed Filter"));
+        Cont.SetFilter("Priority Filter", Rec.GetFilter("Priority Filter"));
         Cont.SetRange("Task Entry Exists", true);
     end;
 
@@ -855,9 +861,9 @@ page 9255 "Tasks Matrix"
         Team.SetFilter("Campaign Filter", FilterCampaign);
         Team.SetFilter("Salesperson Filter", FilterSalesPerson);
         Team.SetFilter("Contact Company Filter", FilterContact);
-        Team.SetFilter("Task Status Filter", GetFilter("Task Status Filter"));
-        Team.SetFilter("Task Closed Filter", GetFilter("Task Closed Filter"));
-        Team.SetFilter("Priority Filter", GetFilter("Priority Filter"));
+        Team.SetFilter("Task Status Filter", Rec.GetFilter("Task Status Filter"));
+        Team.SetFilter("Task Closed Filter", Rec.GetFilter("Task Closed Filter"));
+        Team.SetFilter("Priority Filter", Rec.GetFilter("Priority Filter"));
         Team.SetRange("Task Entry Exists", true);
     end;
 
@@ -886,21 +892,21 @@ page 9255 "Tasks Matrix"
         Task.SetRange(Date, MatrixRecords[ColumnID]."Period Start", MatrixRecords[ColumnID]."Period End");
         case TableOption of
             TableOption::Salesperson:
-                Task.SetFilter("Salesperson Code", "No.");
+                Task.SetFilter("Salesperson Code", Rec."No.");
             TableOption::Team:
-                Task.SetFilter("Team Code", "No.");
+                Task.SetFilter("Team Code", Rec."No.");
             TableOption::Campaign:
-                Task.SetFilter("Campaign No.", "No.");
+                Task.SetFilter("Campaign No.", Rec."No.");
             TableOption::Contact:
-                Task.SetFilter("Contact No.", "No.");
+                Task.SetFilter("Contact No.", Rec."No.");
         end;
-        Task.SetFilter("Salesperson Code", GetFilter("Salesperson Filter"));
-        Task.SetFilter("Team Code", GetFilter("Team Filter"));
-        Task.SetFilter("Contact Company No.", GetFilter("Contact Company Filter"));
-        Task.SetFilter(Status, GetFilter("Task Status Filter"));
-        Task.SetFilter(Closed, GetFilter("Task Closed Filter"));
-        Task.SetFilter(Priority, GetFilter("Priority Filter"));
-        Task.SetFilter("System To-do Type", GetFilter("System Task Type Filter"));
+        Task.SetFilter("Salesperson Code", Rec.GetFilter("Salesperson Filter"));
+        Task.SetFilter("Team Code", Rec.GetFilter("Team Filter"));
+        Task.SetFilter("Contact Company No.", Rec.GetFilter("Contact Company Filter"));
+        Task.SetFilter(Status, Rec.GetFilter("Task Status Filter"));
+        Task.SetFilter(Closed, Rec.GetFilter("Task Closed Filter"));
+        Task.SetFilter(Priority, Rec.GetFilter("Priority Filter"));
+        Task.SetFilter("System To-do Type", Rec.GetFilter("System Task Type Filter"));
 
         PAGE.RunModal(PAGE::"Task List", Task);
     end;
@@ -908,36 +914,36 @@ page 9255 "Tasks Matrix"
     local procedure MATRIX_OnAfterGetRecord(Matrix_ColumnOrdinal: Integer)
     begin
         SetFilters();
-        SetRange("Date Filter", MatrixRecords[Matrix_ColumnOrdinal]."Period Start", MatrixRecords[Matrix_ColumnOrdinal]."Period End");
-        CalcFields("No. of Tasks");
+        Rec.SetRange("Date Filter", MatrixRecords[Matrix_ColumnOrdinal]."Period Start", MatrixRecords[Matrix_ColumnOrdinal]."Period End");
+        Rec.CalcFields("No. of Tasks");
         if OutputOption <> OutputOption::"Contact No." then begin
-            if "No. of Tasks" = 0 then
+            if Rec."No. of Tasks" = 0 then
                 MATRIX_CellData[Matrix_ColumnOrdinal] := ''
             else
-                MATRIX_CellData[Matrix_ColumnOrdinal] := Format("No. of Tasks");
+                MATRIX_CellData[Matrix_ColumnOrdinal] := Format(Rec."No. of Tasks");
         end else begin
-            if GetFilter("Team Filter") <> '' then
-                Task.SetFilter("Team Code", GetFilter("Team Filter"));
-            if GetFilter("Salesperson Filter") <> '' then
-                Task.SetFilter("Salesperson Code", GetFilter("Salesperson Filter"));
-            if GetFilter("Campaign Filter") <> '' then
-                Task.SetFilter("Campaign No.", GetFilter("Campaign Filter"));
-            if GetFilter("Contact Filter") <> '' then
-                Task.SetFilter("Contact No.", "Contact Filter");
-            if GetFilter("Date Filter") <> '' then
-                Task.SetFilter(Date, GetFilter("Date Filter"));
-            if GetFilter("Task Status Filter") <> '' then
-                Task.SetFilter(Status, GetFilter("Task Status Filter"));
-            if GetFilter("Priority Filter") <> '' then
-                Task.SetFilter(Priority, GetFilter("Priority Filter"));
-            if GetFilter("Task Closed Filter") <> '' then
-                Task.SetFilter(Closed, GetFilter("Task Closed Filter"));
-            if GetFilter("Contact Company Filter") <> '' then
-                Task.SetFilter("Contact Company No.", GetFilter("Contact Company Filter"));
-            if "No. of Tasks" = 0 then
+            if Rec.GetFilter("Team Filter") <> '' then
+                Task.SetFilter("Team Code", Rec.GetFilter("Team Filter"));
+            if Rec.GetFilter("Salesperson Filter") <> '' then
+                Task.SetFilter("Salesperson Code", Rec.GetFilter("Salesperson Filter"));
+            if Rec.GetFilter("Campaign Filter") <> '' then
+                Task.SetFilter("Campaign No.", Rec.GetFilter("Campaign Filter"));
+            if Rec.GetFilter("Contact Filter") <> '' then
+                Task.SetFilter("Contact No.", Rec."Contact Filter");
+            if Rec.GetFilter("Date Filter") <> '' then
+                Task.SetFilter(Date, Rec.GetFilter("Date Filter"));
+            if Rec.GetFilter("Task Status Filter") <> '' then
+                Task.SetFilter(Status, Rec.GetFilter("Task Status Filter"));
+            if Rec.GetFilter("Priority Filter") <> '' then
+                Task.SetFilter(Priority, Rec.GetFilter("Priority Filter"));
+            if Rec.GetFilter("Task Closed Filter") <> '' then
+                Task.SetFilter(Closed, Rec.GetFilter("Task Closed Filter"));
+            if Rec.GetFilter("Contact Company Filter") <> '' then
+                Task.SetFilter("Contact Company No.", Rec.GetFilter("Contact Company Filter"));
+            if Rec."No. of Tasks" = 0 then
                 MATRIX_CellData[Matrix_ColumnOrdinal] := ''
             else
-                if "No. of Tasks" > 1 then
+                if Rec."No. of Tasks" > 1 then
                     MATRIX_CellData[Matrix_ColumnOrdinal] := MultipleTxt
                 else begin
                     Task.FindFirst();
@@ -951,7 +957,7 @@ page 9255 "Tasks Matrix"
 
     local procedure FormatLine()
     begin
-        StyleIsStrong := Type = Type::Company;
+        StyleIsStrong := Rec.Type = Rec.Type::Company;
     end;
 
     [IntegrationEvent(true, false)]

@@ -1,7 +1,10 @@
+#if not CLEAN22
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 7379 "Item Bin Contents"
 {
     Caption = 'Item Bin Contents';
-    DataCaptionExpression = GetCaption();
+    DataCaptionExpression = Rec.GetCaption();
     DelayedInsert = true;
     PageType = List;
     SourceTable = "Bin Content";
@@ -38,22 +41,22 @@ page 7379 "Item Bin Contents"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the bin code.';
                 }
-                field("Fixed"; Fixed)
+                field("Fixed"; Rec.Fixed)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies that the item (bin content) has been associated with this bin, and that the bin should normally contain the item.';
                 }
-                field(Default; Default)
+                field(Default; Rec.Default)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if the bin is the default bin for the associated item.';
                 }
-                field(Dedicated; Dedicated)
+                field(Dedicated; Rec.Dedicated)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if the bin is used as a dedicated bin, which means that its bin content is available only to certain resources.';
                 }
-                field(CalcQtyUOM; CalcQtyUOM())
+                field(CalcQtyUOM; Rec.CalcQtyUOM())
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Quantity';
@@ -114,6 +117,7 @@ page 7379 "Item Bin Contents"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         if xRec."Location Code" <> '' then
-            "Location Code" := xRec."Location Code";
+            Rec."Location Code" := xRec."Location Code";
     end;
 }
+#endif

@@ -1,3 +1,5 @@
+namespace System.IO;
+
 #pragma warning disable AS0032
 page 9075 "RapidStart Services Activities"
 {

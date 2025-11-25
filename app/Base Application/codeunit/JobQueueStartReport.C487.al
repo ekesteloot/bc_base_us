@@ -1,3 +1,7 @@
+namespace System.Threading;
+
+using System.Environment.Configuration;
+
 codeunit 487 "Job Queue Start Report"
 {
     TableNo = "Job Queue Entry";

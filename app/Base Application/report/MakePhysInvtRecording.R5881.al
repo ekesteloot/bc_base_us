@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
+using Microsoft.InventoryMgt.Counting.Document;
+
 report 5881 "Make Phys. Invt. Recording"
 {
     Caption = 'Make New Phys. Invt. Recording';
@@ -7,12 +11,12 @@ report 5881 "Make Phys. Invt. Recording"
     {
         dataitem("Phys. Invt. Order Header"; "Phys. Invt. Order Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             dataitem("Phys. Invt. Order Line"; "Phys. Invt. Order Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 RequestFilterFields = "Item No.", "Location Code", "Bin Code", "Shelf No.", "Inventory Posting Group";
 
                 trigger OnAfterGetRecord()

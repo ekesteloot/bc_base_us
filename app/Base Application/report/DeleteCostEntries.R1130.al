@@ -1,3 +1,7 @@
+namespace Microsoft.CostAccounting.Ledger;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 report 1130 "Delete Cost Entries"
 {
     Caption = 'Delete Cost Entries';
@@ -8,7 +12,7 @@ report 1130 "Delete Cost Entries"
     {
         dataitem("Cost Register"; "Cost Register")
         {
-            DataItemTableView = SORTING("No.") ORDER(Descending);
+            DataItemTableView = sorting("No.") order(Descending);
 
             trigger OnAfterGetRecord()
             var
@@ -68,7 +72,7 @@ report 1130 "Delete Cost Entries"
                         ApplicationArea = CostAccounting;
                         Caption = 'From Register No.';
                         Lookup = true;
-                        TableRelation = "Cost Register" WHERE(Closed = CONST(false));
+                        TableRelation = "Cost Register" where(Closed = const(false));
                         ToolTip = 'Specifies the starting posted register number to determine the starting point for the deletion of register numbers.';
                     }
                     field(ToRegisterNo; CostRegister3."No.")
@@ -76,7 +80,7 @@ report 1130 "Delete Cost Entries"
                         ApplicationArea = CostAccounting;
                         Caption = 'To Register No.';
                         Editable = false;
-                        TableRelation = "Cost Register" WHERE(Closed = CONST(false));
+                        TableRelation = "Cost Register" where(Closed = const(false));
                         ToolTip = 'Specifies that the last posted register number is filled in automatically. You cannot change the contents of this field.';
                     }
                 }

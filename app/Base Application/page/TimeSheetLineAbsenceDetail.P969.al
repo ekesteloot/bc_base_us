@@ -34,7 +34,7 @@ page 969 "Time Sheet Line Absence Detail"
 
     trigger OnAfterGetCurrRecord()
     begin
-        AllowEdit := GetAllowEdit(0, ManagerRole);
+        AllowEdit := Rec.GetAllowEdit(0, ManagerRole);
     end;
 
     protected var
@@ -44,7 +44,7 @@ page 969 "Time Sheet Line Absence Detail"
     procedure SetParameters(TimeSheetLine: Record "Time Sheet Line"; NewManagerRole: Boolean)
     begin
         Rec := TimeSheetLine;
-        Insert();
+        Rec.Insert();
         ManagerRole := NewManagerRole;
     end;
 }

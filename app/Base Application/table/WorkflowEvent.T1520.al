@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Reflection;
+
 table 1520 "Workflow Event"
 {
     Caption = 'Workflow Event';
@@ -15,7 +19,7 @@ table 1520 "Workflow Event"
         field(2; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(3; Description; Text[250])
         {
@@ -24,12 +28,12 @@ table 1520 "Workflow Event"
         field(4; "Request Page ID"; Integer)
         {
             Caption = 'Request Page ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(5; "Dynamic Req. Page Entity Name"; Code[20])
         {
             Caption = 'Dynamic Req. Page Entity Name';
-            TableRelation = "Dynamic Request Page Entity".Name WHERE("Table ID" = FIELD("Table ID"));
+            TableRelation = "Dynamic Request Page Entity".Name where("Table ID" = field("Table ID"));
         }
         field(6; "Used for Record Change"; Boolean)
         {

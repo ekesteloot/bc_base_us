@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 page 9251 "Dimension Combinations Matrix"
 {
     Caption = 'Dimension Combinations Matrix';
@@ -13,7 +15,7 @@ page 9251 "Dimension Combinations Matrix"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the code for the dimension.';
@@ -388,7 +390,7 @@ page 9251 "Dimension Combinations Matrix"
         MATRIX_CurrentColumnOrdinal: Integer;
         MATRIX_Steps: Integer;
     begin
-        Name := GetMLName(GlobalLanguage);
+        Rec.Name := Rec.GetMLName(GlobalLanguage);
         MATRIX_CurrentColumnOrdinal := 0;
         if MATRIX_OnFindRecord('=><') then begin
             MATRIX_CurrentColumnOrdinal := 1;
@@ -443,7 +445,7 @@ page 9251 "Dimension Combinations Matrix"
     begin
         MATRIX_NoOfMatrixColumns := ArrayLen(MATRIX_CellData);
         if SelectedDimCode <> '' then
-            SetRange(Code, SelectedDimCode);
+            Rec.SetRange(Code, SelectedDimCode);
     end;
 
     var
@@ -460,69 +462,37 @@ page 9251 "Dimension Combinations Matrix"
         SeeCombinationsQst: Label 'Do you want to see the list of values?';
         Text001: Label 'No limitations,Limited,Blocked';
         SelectedDimCode: Code[20];
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
 
     procedure Load(MatrixColumns1: array[32] of Text[1024]; var MatrixRecords1: array[32] of Record Dimension; _ShowColumnName: Boolean)
@@ -539,10 +509,10 @@ page 9251 "Dimension Combinations Matrix"
 
     local procedure SetLimitations(ColumnID: Integer)
     begin
-        if MatrixRecords[ColumnID].Code <> Code then begin
+        if MatrixRecords[ColumnID].Code <> Rec.Code then begin
             if CombinationIsLimited(ColumnID) then
                 if Confirm(SeeCombinationsQst) then begin
-                    DimensionValueCombinations.Load(Code, MatrixRecords[ColumnID].Code, ShowColumnName);
+                    DimensionValueCombinations.Load(Rec.Code, MatrixRecords[ColumnID].Code, ShowColumnName);
                     DimensionValueCombinations.RunModal();
                     Clear(DimensionValueCombinations);
                     exit;
@@ -555,7 +525,7 @@ page 9251 "Dimension Combinations Matrix"
     local procedure CombinationExists(ColumnID: Integer): Boolean
     begin
         Clear(DimComb); // The global record variable holds what GET returns or nothing.
-        exit(DimComb.Get(Code, MatrixRecords[ColumnID].Code) or DimComb.Get(MatrixRecords[ColumnID].Code, Code));
+        exit(DimComb.Get(Rec.Code, MatrixRecords[ColumnID].Code) or DimComb.Get(MatrixRecords[ColumnID].Code, Rec.Code));
     end;
 
     local procedure CombinationIsLimited(ColumnID: Integer): Boolean
@@ -570,9 +540,9 @@ page 9251 "Dimension Combinations Matrix"
         OptionValueOutOfRange: Integer;
     begin
         OptionValueOutOfRange := -1;
-        if MatrixRecords[ColumnID].Code <> Code then begin
-            if not DimComb.Get(Code, MatrixRecords[ColumnID].Code) then
-                if not DimComb.Get(MatrixRecords[ColumnID].Code, Code) then
+        if MatrixRecords[ColumnID].Code <> Rec.Code then begin
+            if not DimComb.Get(Rec.Code, MatrixRecords[ColumnID].Code) then
+                if not DimComb.Get(MatrixRecords[ColumnID].Code, Rec.Code) then
                     DimComb."Combination Restriction" := OptionValueOutOfRange;
 
             DimLimVal := DimComb."Combination Restriction" + 2;
@@ -610,11 +580,11 @@ page 9251 "Dimension Combinations Matrix"
         Dim1Code: Code[20];
         Dim2Code: Code[20];
     begin
-        if Code > MatrixRecords[MATRIX_ColumnOrdinal].Code then begin
+        if Rec.Code > MatrixRecords[MATRIX_ColumnOrdinal].Code then begin
             Dim1Code := MatrixRecords[MATRIX_ColumnOrdinal].Code;
-            Dim2Code := Code;
+            Dim2Code := Rec.Code;
         end else begin
-            Dim1Code := Code;
+            Dim1Code := Rec.Code;
             Dim2Code := MatrixRecords[MATRIX_ColumnOrdinal].Code;
         end;
 
@@ -634,12 +604,12 @@ page 9251 "Dimension Combinations Matrix"
         Dim1Code: Code[20];
         Dim2Code: Code[20];
     begin
-        if MatrixRecords[ColumnID].Code <> Code then begin
-            if Code > MatrixRecords[ColumnID].Code then begin
+        if MatrixRecords[ColumnID].Code <> Rec.Code then begin
+            if Rec.Code > MatrixRecords[ColumnID].Code then begin
                 Dim1Code := MatrixRecords[ColumnID].Code;
-                Dim2Code := Code;
+                Dim2Code := Rec.Code;
             end else begin
-                Dim1Code := Code;
+                Dim1Code := Rec.Code;
                 Dim2Code := MatrixRecords[ColumnID].Code;
             end;
 

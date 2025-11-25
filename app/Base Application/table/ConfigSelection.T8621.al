@@ -1,3 +1,5 @@
+namespace System.IO;
+
 table 8621 "Config. Selection"
 {
     Caption = 'Config. Selection';

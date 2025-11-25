@@ -1,3 +1,11 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.WorkCenter;
+
 table 5410 "Prod. Order Capacity Need"
 {
     Caption = 'Prod. Order Capacity Need';
@@ -13,7 +21,7 @@ table 5410 "Prod. Order Capacity Need"
         field(2; "Prod. Order No."; Code[20])
         {
             Caption = 'Prod. Order No.';
-            TableRelation = "Production Order"."No." WHERE(Status = FIELD(Status));
+            TableRelation = "Production Order"."No." where(Status = field(Status));
             ValidateTableRelation = false;
         }
         field(3; "Routing No."; Code[20])
@@ -36,9 +44,9 @@ table 5410 "Prod. Order Capacity Need"
         field(7; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST("Work Center")) "Work Center"
-            ELSE
-            IF (Type = CONST("Machine Center")) "Machine Center";
+            TableRelation = if (Type = const("Work Center")) "Work Center"
+            else
+            if (Type = const("Machine Center")) "Machine Center";
         }
         field(8; "Work Center No."; Code[20])
         {
@@ -129,13 +137,13 @@ table 5410 "Prod. Order Capacity Need"
         field(32; "Worksheet Batch Name"; Code[10])
         {
             Caption = 'Worksheet Batch Name';
-            TableRelation = "Requisition Wksh. Name".Name WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"));
+            TableRelation = "Requisition Wksh. Name".Name where("Worksheet Template Name" = field("Worksheet Template Name"));
         }
         field(33; "Worksheet Line No."; Integer)
         {
             Caption = 'Worksheet Line No.';
-            TableRelation = "Requisition Line"."Line No." WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                                                 "Journal Batch Name" = FIELD("Worksheet Batch Name"));
+            TableRelation = "Requisition Line"."Line No." where("Worksheet Template Name" = field("Worksheet Template Name"),
+                                                                 "Journal Batch Name" = field("Worksheet Batch Name"));
         }
         field(41; Active; Boolean)
         {

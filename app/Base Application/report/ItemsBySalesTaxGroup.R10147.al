@@ -9,7 +9,7 @@ report 10147 "Items by Sales Tax Group"
     {
         dataitem("Tax Group"; "Tax Group")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -78,7 +78,7 @@ report 10147 "Items by Sales Tax Group"
             dataitem(Item; Item)
             {
                 CalcFields = Comment;
-                DataItemLink = "Tax Group Code" = FIELD(Code);
+                DataItemLink = "Tax Group Code" = field(Code);
                 RequestFilterFields = "No.", "Shelf No.", "Inventory Posting Group", "Vendor No.";
                 column(Item__No__; "No.")
                 {

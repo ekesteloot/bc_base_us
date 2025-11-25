@@ -1,3 +1,7 @@
+namespace System.AI;
+
+using System.Utilities;
+
 table 2020 "Image Analysis Setup"
 {
     Caption = 'Image Analysis Setup';

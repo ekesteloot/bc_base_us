@@ -1,7 +1,11 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Opportunity;
+
 report 5058 "Salesperson - Opportunities"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/SalespersonOpportunities.rdlc';
+    RDLCLayout = './CRM/Reports/SalespersonOpportunities.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Salesperson Opportunities';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5058 "Salesperson - Opportunities"
     {
         dataitem(Opportunity; Opportunity)
         {
-            DataItemTableView = SORTING("Salesperson Code", Closed);
+            DataItemTableView = sorting("Salesperson Code", Closed);
             RequestFilterFields = "Salesperson Code", "No.", "Campaign No.", "Contact No.", "Creation Date", Closed, "Date Closed";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

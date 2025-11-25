@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 776 "Analysis Report Chart Matrix"
 {
     Caption = 'Analysis Report Chart Matrix';
@@ -222,7 +224,7 @@ page 776 "Analysis Report Chart Matrix"
     var
         AnalysisLine: Record "Analysis Line";
     begin
-        if AnalysisLine.Get("Analysis Area", "Analysis Line Template Name", "Analysis Line Line No.") then begin
+        if AnalysisLine.Get(Rec."Analysis Area", Rec."Analysis Line Template Name", Rec."Analysis Line Line No.") then begin
             AnalysisLineRowNo := AnalysisLine."Row Ref. No.";
             AnalysisLineDescription := AnalysisLine.Description;
             GetChartTypes();
@@ -231,7 +233,7 @@ page 776 "Analysis Report Chart Matrix"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        exit(FindSet());
+        exit(Rec.FindSet());
     end;
 
     var
@@ -245,16 +247,16 @@ page 776 "Analysis Report Chart Matrix"
 
     procedure SetFilters(AnalysisReportChartSetup: Record "Analysis Report Chart Setup")
     begin
-        Reset();
+        Rec.Reset();
 
         AnalysisReportChartSetup.SetLinkToLines(Rec);
         case AnalysisReportChartSetup."Base X-Axis on" of
             AnalysisReportChartSetup."Base X-Axis on"::Period:
-                if FindFirst() then
-                    SetRange("Analysis Column Line No.", "Analysis Column Line No.");
+                if Rec.FindFirst() then
+                    Rec.SetRange("Analysis Column Line No.", Rec."Analysis Column Line No.");
             AnalysisReportChartSetup."Base X-Axis on"::Line,
           AnalysisReportChartSetup."Base X-Axis on"::Column:
-                SetRange("Analysis Column Line No.", 0);
+                Rec.SetRange("Analysis Column Line No.", 0);
         end;
         UpdateColumnCaptions(AnalysisReportChartSetup);
     end;
@@ -287,19 +289,19 @@ page 776 "Analysis Report Chart Matrix"
         AnalysisReportChartLine2: Record "Analysis Report Chart Line";
         i: Integer;
     begin
-        AnalysisReportChartSetup.Get("User ID", "Analysis Area", Name);
+        AnalysisReportChartSetup.Get(Rec."User ID", Rec."Analysis Area", Rec.Name);
         case AnalysisReportChartSetup."Base X-Axis on" of
             AnalysisReportChartSetup."Base X-Axis on"::Period:
                 for i := 1 to MaxColumns do begin
-                    AnalysisReportChartLine.Get("User ID", "Analysis Area", Name, "Analysis Line Line No.", ColumnLineNos[i]);
+                    AnalysisReportChartLine.Get(Rec."User ID", Rec."Analysis Area", Rec.Name, Rec."Analysis Line Line No.", ColumnLineNos[i]);
                     ChartType[i] := AnalysisReportChartLine."Chart Type";
                 end;
             AnalysisReportChartSetup."Base X-Axis on"::Line:
                 begin
-                    AnalysisReportChartLine.Get("User ID", "Analysis Area", Name, "Analysis Line Line No.", 0);
+                    AnalysisReportChartLine.Get(Rec."User ID", Rec."Analysis Area", Rec.Name, Rec."Analysis Line Line No.", 0);
                     if AnalysisReportChartLine."Chart Type" <> AnalysisReportChartLine."Chart Type"::" " then
                         for i := 1 to MaxColumns do begin
-                            AnalysisReportChartLine2.Get("User ID", "Analysis Area", Name, 0, ColumnLineNos[i]);
+                            AnalysisReportChartLine2.Get(Rec."User ID", Rec."Analysis Area", Rec.Name, 0, ColumnLineNos[i]);
                             ChartType[i] := AnalysisReportChartLine2."Chart Type";
                         end
                     else
@@ -308,9 +310,9 @@ page 776 "Analysis Report Chart Matrix"
                 end;
             AnalysisReportChartSetup."Base X-Axis on"::Column:
                 begin
-                    AnalysisReportChartLine.Get("User ID", "Analysis Area", Name, "Analysis Line Line No.", 0);
+                    AnalysisReportChartLine.Get(Rec."User ID", Rec."Analysis Area", Rec.Name, Rec."Analysis Line Line No.", 0);
                     for i := 1 to MaxColumns do begin
-                        AnalysisReportChartLine2.Get("User ID", "Analysis Area", Name, 0, ColumnLineNos[i]);
+                        AnalysisReportChartLine2.Get(Rec."User ID", Rec."Analysis Area", Rec.Name, 0, ColumnLineNos[i]);
                         if AnalysisReportChartLine2."Chart Type" <> AnalysisReportChartLine2."Chart Type"::" " then
                             ChartType[i] := AnalysisReportChartLine."Chart Type"
                         else
@@ -330,14 +332,14 @@ page 776 "Analysis Report Chart Matrix"
         if ColumnNo > MaxColumns then
             Error(Text001);
 
-        AnalysisReportChartSetup.Get("User ID", "Analysis Area", Name);
+        AnalysisReportChartSetup.Get(Rec."User ID", Rec."Analysis Area", Rec.Name);
         case AnalysisReportChartSetup."Base X-Axis on" of
             AnalysisReportChartSetup."Base X-Axis on"::Period:
-                AnalysisReportChartLine.Get("User ID", "Analysis Area", Name, "Analysis Line Line No.", ColumnLineNos[ColumnNo]);
+                AnalysisReportChartLine.Get(Rec."User ID", Rec."Analysis Area", Rec.Name, Rec."Analysis Line Line No.", ColumnLineNos[ColumnNo]);
             AnalysisReportChartSetup."Base X-Axis on"::Line:
-                AnalysisReportChartLine.Get("User ID", "Analysis Area", Name, 0, ColumnLineNos[ColumnNo]);
+                AnalysisReportChartLine.Get(Rec."User ID", Rec."Analysis Area", Rec.Name, 0, ColumnLineNos[ColumnNo]);
             AnalysisReportChartSetup."Base X-Axis on"::Column:
-                AnalysisReportChartLine.Get("User ID", "Analysis Area", Name, "Analysis Line Line No.", 0);
+                AnalysisReportChartLine.Get(Rec."User ID", Rec."Analysis Area", Rec.Name, Rec."Analysis Line Line No.", 0);
         end;
         AnalysisReportChartLine.Validate("Chart Type", ChartType[ColumnNo]);
         AnalysisReportChartLine.Modify();

@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Visualization;
+
 codeunit 763 "Aged Acc. Receivable"
 {
 

@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Campaign;
+
+using Microsoft.CRM.Interaction;
+
 page 5089 "Campaign Entries"
 {
     ApplicationArea = RelationshipMgmt;
@@ -20,12 +24,12 @@ page 5089 "Campaign Entries"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the number of the entry, as assigned from the specified number series when the entry was created.';
                 }
-                field(Canceled; Canceled)
+                field(Canceled; Rec.Canceled)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies that the entry has been canceled.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the date the campaign entry was recorded. The field is not editable.';
@@ -81,9 +85,9 @@ page 5089 "Campaign Entries"
                     Caption = 'Interaction Log E&ntry';
                     Image = Interaction;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Campaign No." = FIELD("Campaign No."),
-                                  "Campaign Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Campaign No.", "Campaign Entry No.");
+                    RunPageLink = "Campaign No." = field("Campaign No."),
+                                  "Campaign Entry No." = field("Entry No.");
+                    RunPageView = sorting("Campaign No.", "Campaign Entry No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
@@ -104,7 +108,7 @@ page 5089 "Campaign Entries"
 
                     trigger OnAction()
                     begin
-                        ToggleCanceledCheckmark();
+                        Rec.ToggleCanceledCheckmark();
                     end;
                 }
                 action("Delete Canceled Entries")

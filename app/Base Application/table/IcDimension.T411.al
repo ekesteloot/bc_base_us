@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.FinancialMgt.Dimension;
+
 table 411 "IC Dimension"
 {
     Caption = 'IC Dimension';

@@ -1,14 +1,20 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.NoSeries;
+using System.Utilities;
+
 report 23 "G/L Document Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/GLDocumentNos.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/GLDocumentNos.rdlc';
     Caption = 'G/L Document Nos.';
 
     dataset
     {
         dataitem("G/L Entry"; "G/L Entry")
         {
-            DataItemTableView = SORTING("Document No.");
+            DataItemTableView = sorting("Document No.");
             RequestFilterFields = "Document No.";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {
@@ -57,7 +63,7 @@ report 23 "G/L Document Nos."
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorText_Number_; ErrorText[Number])
                 {
                 }
@@ -80,8 +86,8 @@ report 23 "G/L Document Nos."
             }
             dataitem(GLEntry; "G/L Entry")
             {
-                DataItemLink = "Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("Entry No.");
+                DataItemLink = "Entry No." = field("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(GLEntry__User_ID_; "User ID")
                 {
                 }

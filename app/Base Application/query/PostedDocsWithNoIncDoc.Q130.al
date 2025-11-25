@@ -35,7 +35,7 @@ query 130 "Posted Docs. With No Inc. Doc."
                 DataItemLink = "Document No." = G_L_Entry."Document No.", "Posting Date" = G_L_Entry."Posting Date";
                 column(NoOfIncomingDocuments)
                 {
-                    ColumnFilter = NoOfIncomingDocuments = CONST(0);
+                    ColumnFilter = NoOfIncomingDocuments = const(0);
                     Method = Count;
                 }
             }

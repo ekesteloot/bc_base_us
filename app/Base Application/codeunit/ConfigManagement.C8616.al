@@ -1,3 +1,15 @@
+namespace System.IO;
+
+using Microsoft.Foundation.Enums;
+#if not CLEAN21
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+#endif
+using System.Environment;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Utilities;
+
 codeunit 8616 "Config. Management"
 {
     EventSubscriberInstance = Manual;
@@ -86,7 +98,7 @@ codeunit 8616 "Config. Management"
     begin
         TempFieldRec.DeleteAll();
         if CopyTable then
-            MarkPostValidationData(DATABASE::Contact, 5053);
+            MarkPostValidationData(Enum::TableID::Contact, 5053);
         TransferContent(TableID, NewCompanyName, CopyTable);
         TempFieldRec.DeleteAll();
         exit(true);
@@ -160,470 +172,470 @@ codeunit 8616 "Config. Management"
         PageID: Integer;
     begin
         case TableID of
-            DATABASE::"Company Information":
-                exit(PAGE::"Company Information");
-            DATABASE::"Responsibility Center":
-                exit(PAGE::"Responsibility Center List");
-            DATABASE::"Accounting Period":
-                exit(PAGE::"Accounting Periods");
-            DATABASE::"General Ledger Setup":
-                exit(PAGE::"General Ledger Setup");
-            DATABASE::"No. Series":
-                exit(PAGE::"No. Series");
-            DATABASE::"No. Series Line":
-                exit(PAGE::"No. Series Lines");
-            DATABASE::"G/L Account":
-                exit(PAGE::"Chart of Accounts");
-            DATABASE::"Gen. Business Posting Group":
-                exit(PAGE::"Gen. Business Posting Groups");
-            DATABASE::"Gen. Product Posting Group":
-                exit(PAGE::"Gen. Product Posting Groups");
-            DATABASE::"General Posting Setup":
-                exit(PAGE::"General Posting Setup");
-            DATABASE::"VAT Business Posting Group":
-                exit(PAGE::"VAT Business Posting Groups");
-            DATABASE::"VAT Product Posting Group":
-                exit(PAGE::"VAT Product Posting Groups");
-            DATABASE::"VAT Posting Setup":
-                exit(PAGE::"VAT Posting Setup");
-            DATABASE::"Acc. Schedule Name":
-                exit(PAGE::"Account Schedule Names");
-            DATABASE::"Column Layout Name":
-                exit(PAGE::"Column Layout Names");
-            DATABASE::"G/L Budget Name":
-                exit(PAGE::"G/L Budget Names");
-            DATABASE::"VAT Statement Template":
-                exit(PAGE::"VAT Statement Templates");
-            DATABASE::"Tariff Number":
-                exit(PAGE::"Tariff Numbers");
-            DATABASE::"Transaction Type":
-                exit(PAGE::"Transaction Types");
-            DATABASE::"Transaction Specification":
-                exit(PAGE::"Transaction Specifications");
-            DATABASE::"Transport Method":
-                exit(PAGE::"Transport Methods");
-            DATABASE::"Entry/Exit Point":
-                exit(PAGE::"Entry/Exit Points");
-            DATABASE::Area:
-                exit(PAGE::Areas);
-            DATABASE::Territory:
-                exit(PAGE::Territories);
-            DATABASE::"Tax Jurisdiction":
-                exit(PAGE::"Tax Jurisdictions");
-            DATABASE::"Tax Group":
-                exit(PAGE::"Tax Groups");
-            DATABASE::"Tax Detail":
-                exit(PAGE::"Tax Details");
-            DATABASE::"Tax Area":
-                exit(PAGE::"Tax Area");
-            DATABASE::"Tax Area Line":
-                exit(PAGE::"Tax Area Line");
-            DATABASE::"Source Code":
-                exit(PAGE::"Source Codes");
-            DATABASE::"Reason Code":
-                exit(PAGE::"Reason Codes");
-            DATABASE::"Standard Text":
-                exit(PAGE::"Standard Text Codes");
-            DATABASE::"Business Unit":
-                exit(PAGE::"Business Unit List");
-            DATABASE::Dimension:
-                exit(PAGE::Dimensions);
-            DATABASE::"Default Dimension Priority":
-                exit(PAGE::"Default Dimension Priorities");
-            DATABASE::"Dimension Combination":
-                exit(PAGE::"Dimension Combinations");
-            DATABASE::"Analysis View":
-                exit(PAGE::"Analysis View List");
-            DATABASE::"Post Code":
-                exit(PAGE::"Post Codes");
-            DATABASE::"Country/Region":
-                exit(PAGE::"Countries/Regions");
-            DATABASE::Language:
-                exit(PAGE::Languages);
-            DATABASE::Currency:
-                exit(PAGE::Currencies);
-            DATABASE::"Bank Account":
-                exit(PAGE::"Bank Account List");
-            DATABASE::"Bank Account Posting Group":
-                exit(PAGE::"Bank Account Posting Groups");
-            DATABASE::"Change Log Setup (Table)":
-                exit(PAGE::"Change Log Setup (Table) List");
-            DATABASE::"Change Log Setup (Field)":
-                exit(PAGE::"Change Log Setup (Field) List");
-            DATABASE::"Sales & Receivables Setup":
-                exit(PAGE::"Sales & Receivables Setup");
-            DATABASE::Customer:
-                exit(PAGE::"Customer List");
-            DATABASE::"Customer Posting Group":
-                exit(PAGE::"Customer Posting Groups");
-            DATABASE::"Payment Terms":
-                exit(PAGE::"Payment Terms");
-            DATABASE::"Payment Method":
-                exit(PAGE::"Payment Methods");
-            DATABASE::"Reminder Terms":
-                exit(PAGE::"Reminder Terms");
-            DATABASE::"Reminder Level":
-                exit(PAGE::"Reminder Levels");
-            DATABASE::"Reminder Text":
-                exit(PAGE::"Reminder Text");
-            DATABASE::"Finance Charge Terms":
-                exit(PAGE::"Finance Charge Terms");
-            DATABASE::"Shipment Method":
-                exit(PAGE::"Shipment Methods");
-            DATABASE::"Shipping Agent":
-                exit(PAGE::"Shipping Agents");
-            DATABASE::"Shipping Agent Services":
-                exit(PAGE::"Shipping Agent Services");
-            DATABASE::"Customer Discount Group":
-                exit(PAGE::"Customer Disc. Groups");
-            DATABASE::"Salesperson/Purchaser":
-                exit(PAGE::"Salespersons/Purchasers");
-            DATABASE::"Marketing Setup":
-                exit(PAGE::"Marketing Setup");
-            DATABASE::"Duplicate Search String Setup":
-                exit(PAGE::"Duplicate Search String Setup");
-            DATABASE::Contact:
-                exit(PAGE::"Contact List");
-            DATABASE::"Business Relation":
-                exit(PAGE::"Business Relations");
-            DATABASE::"Mailing Group":
-                exit(PAGE::"Mailing Groups");
-            DATABASE::"Industry Group":
-                exit(PAGE::"Industry Groups");
-            DATABASE::"Web Source":
-                exit(PAGE::"Web Sources");
-            DATABASE::"Interaction Group":
-                exit(PAGE::"Interaction Groups");
-            DATABASE::"Interaction Template":
-                exit(PAGE::"Interaction Templates");
-            DATABASE::"Job Responsibility":
-                exit(PAGE::"Job Responsibilities");
-            DATABASE::"Organizational Level":
-                exit(PAGE::"Organizational Levels");
-            DATABASE::"Campaign Status":
-                exit(PAGE::"Campaign Status");
-            DATABASE::Activity:
-                exit(PAGE::Activity);
-            DATABASE::Team:
-                exit(PAGE::Teams);
-            DATABASE::"Profile Questionnaire Header":
-                exit(PAGE::"Profile Questionnaires");
-            DATABASE::"Sales Cycle":
-                exit(PAGE::"Sales Cycles");
-            DATABASE::"Close Opportunity Code":
-                exit(PAGE::"Close Opportunity Codes");
-            DATABASE::"Service Mgt. Setup":
-                exit(PAGE::"Service Mgt. Setup");
-            DATABASE::"Service Item":
-                exit(PAGE::"Service Item List");
-            DATABASE::"Service Hour":
-                exit(PAGE::"Default Service Hours");
-            DATABASE::"Work-Hour Template":
-                exit(PAGE::"Work-Hour Templates");
-            DATABASE::"Resource Service Zone":
-                exit(PAGE::"Resource Service Zones");
-            DATABASE::Loaner:
-                exit(PAGE::"Loaner List");
-            DATABASE::"Skill Code":
-                exit(PAGE::"Skill Codes");
-            DATABASE::"Fault Reason Code":
-                exit(PAGE::"Fault Reason Codes");
-            DATABASE::"Service Cost":
-                exit(PAGE::"Service Costs");
-            DATABASE::"Service Zone":
-                exit(PAGE::"Service Zones");
-            DATABASE::"Service Order Type":
-                exit(PAGE::"Service Order Types");
-            DATABASE::"Service Item Group":
-                exit(PAGE::"Service Item Groups");
-            DATABASE::"Service Shelf":
-                exit(PAGE::"Service Shelves");
-            DATABASE::"Service Status Priority Setup":
-                exit(PAGE::"Service Order Status Setup");
-            DATABASE::"Repair Status":
-                exit(PAGE::"Repair Status Setup");
-            DATABASE::"Service Price Group":
-                exit(PAGE::"Service Price Groups");
-            DATABASE::"Serv. Price Group Setup":
-                exit(PAGE::"Serv. Price Group Setup");
-            DATABASE::"Service Price Adjustment Group":
-                exit(PAGE::"Serv. Price Adjmt. Group");
-            DATABASE::"Serv. Price Adjustment Detail":
-                exit(PAGE::"Serv. Price Adjmt. Detail");
-            DATABASE::"Resolution Code":
-                exit(PAGE::"Resolution Codes");
-            DATABASE::"Fault Area":
-                exit(PAGE::"Fault Areas");
-            DATABASE::"Symptom Code":
-                exit(PAGE::"Symptom Codes");
-            DATABASE::"Fault Code":
-                exit(PAGE::"Fault Codes");
-            DATABASE::"Fault/Resol. Cod. Relationship":
-                exit(PAGE::"Fault/Resol. Cod. Relationship");
-            DATABASE::"Contract Group":
-                exit(PAGE::"Service Contract Groups");
-            DATABASE::"Service Contract Template":
-                exit(PAGE::"Service Contract Template");
-            DATABASE::"Service Contract Account Group":
-                exit(PAGE::"Serv. Contract Account Groups");
-            DATABASE::"Troubleshooting Header":
-                exit(PAGE::Troubleshooting);
-            DATABASE::"Purchases & Payables Setup":
-                exit(PAGE::"Purchases & Payables Setup");
-            DATABASE::Vendor:
-                exit(PAGE::"Vendor List");
-            DATABASE::"Vendor Posting Group":
-                exit(PAGE::"Vendor Posting Groups");
-            DATABASE::Purchasing:
-                exit(PAGE::"Purchasing Codes");
-            DATABASE::"Inventory Setup":
-                exit(PAGE::"Inventory Setup");
-            DATABASE::"Nonstock Item Setup":
-                exit(PAGE::"Catalog Item Setup");
-            DATABASE::"Item Tracking Code":
-                exit(PAGE::"Item Tracking Codes");
-            DATABASE::Item:
-                exit(PAGE::"Item List");
-            DATABASE::"Nonstock Item":
-                exit(PAGE::"Catalog Item List");
-            DATABASE::"Inventory Posting Group":
-                exit(PAGE::"Inventory Posting Groups");
-            DATABASE::"Inventory Posting Setup":
-                exit(PAGE::"Inventory Posting Setup");
-            DATABASE::"Unit of Measure":
-                exit(PAGE::"Units of Measure");
-            DATABASE::"Customer Price Group":
-                exit(PAGE::"Customer Price Groups");
-            DATABASE::"Item Discount Group":
-                exit(PAGE::"Item Disc. Groups");
-            DATABASE::Manufacturer:
-                exit(PAGE::Manufacturers);
-            DATABASE::"Item Category":
-                exit(PAGE::"Item Categories");
-            DATABASE::"Rounding Method":
-                exit(PAGE::"Rounding Methods");
-            DATABASE::Location:
-                exit(PAGE::"Location List");
-            DATABASE::"Transfer Route":
-                exit(PAGE::"Transfer Routes");
-            DATABASE::"Stockkeeping Unit":
-                exit(PAGE::"Stockkeeping Unit List");
-            DATABASE::"Warehouse Setup":
-                exit(PAGE::"Warehouse Setup");
-            DATABASE::"Resources Setup":
-                exit(PAGE::"Resources Setup");
-            DATABASE::Resource:
-                exit(PAGE::"Resource List");
-            DATABASE::"Resource Group":
-                exit(PAGE::"Resource Groups");
-            DATABASE::"Work Type":
-                exit(PAGE::"Work Types");
-            DATABASE::"Jobs Setup":
-                exit(PAGE::"Jobs Setup");
-            DATABASE::"Job Posting Group":
-                exit(PAGE::"Job Posting Groups");
-            DATABASE::"FA Setup":
-                exit(PAGE::"Fixed Asset Setup");
-            DATABASE::"Fixed Asset":
-                exit(PAGE::"Fixed Asset List");
-            DATABASE::Insurance:
-                exit(PAGE::"Insurance List");
-            DATABASE::"FA Posting Group":
-                exit(PAGE::"FA Posting Groups");
-            DATABASE::"FA Journal Template":
-                exit(PAGE::"FA Journal Templates");
-            DATABASE::"FA Reclass. Journal Template":
-                exit(PAGE::"FA Reclass. Journal Templates");
-            DATABASE::"Insurance Journal Template":
-                exit(PAGE::"Insurance Journal Templates");
-            DATABASE::"Depreciation Book":
-                exit(PAGE::"Depreciation Book List");
-            DATABASE::"FA Class":
-                exit(PAGE::"FA Classes");
-            DATABASE::"FA Subclass":
-                exit(PAGE::"FA Subclasses");
-            DATABASE::"FA Location":
-                exit(PAGE::"FA Locations");
-            DATABASE::"Insurance Type":
-                exit(PAGE::"Insurance Types");
-            DATABASE::Maintenance:
-                exit(PAGE::Maintenance);
-            DATABASE::"Human Resources Setup":
-                exit(PAGE::"Human Resources Setup");
-            DATABASE::Employee:
-                exit(PAGE::"Employee List");
-            DATABASE::"Cause of Absence":
-                exit(PAGE::"Causes of Absence");
-            DATABASE::"Cause of Inactivity":
-                exit(PAGE::"Causes of Inactivity");
-            DATABASE::"Grounds for Termination":
-                exit(PAGE::"Grounds for Termination");
-            DATABASE::"Employment Contract":
-                exit(PAGE::"Employment Contracts");
-            DATABASE::Qualification:
-                exit(PAGE::Qualifications);
-            DATABASE::Relative:
-                exit(PAGE::Relatives);
-            DATABASE::"Misc. Article":
-                exit(PAGE::"Misc. Article Information");
-            DATABASE::Confidential:
-                exit(PAGE::Confidential);
-            DATABASE::"Employee Statistics Group":
-                exit(PAGE::"Employee Statistics Groups");
-            DATABASE::Union:
-                exit(PAGE::Unions);
-            DATABASE::"Manufacturing Setup":
-                exit(PAGE::"Manufacturing Setup");
-            DATABASE::Family:
-                exit(PAGE::Family);
-            DATABASE::"Production BOM Header":
-                exit(PAGE::"Production BOM");
-            DATABASE::"Capacity Unit of Measure":
-                exit(PAGE::"Capacity Units of Measure");
-            DATABASE::"Work Shift":
-                exit(PAGE::"Work Shifts");
-            DATABASE::"Shop Calendar":
-                exit(PAGE::"Shop Calendars");
-            DATABASE::"Work Center Group":
-                exit(PAGE::"Work Center Groups");
-            DATABASE::"Standard Task":
-                exit(PAGE::"Standard Tasks");
-            DATABASE::"Routing Link":
-                exit(PAGE::"Routing Links");
-            DATABASE::Stop:
-                exit(PAGE::"Stop Codes");
-            DATABASE::Scrap:
-                exit(PAGE::"Scrap Codes");
-            DATABASE::"Machine Center":
-                exit(PAGE::"Machine Center List");
-            DATABASE::"Work Center":
-                exit(PAGE::"Work Center List");
-            DATABASE::"Routing Header":
-                exit(PAGE::Routing);
-            DATABASE::"Cost Type":
-                exit(PAGE::"Cost Type List");
-            DATABASE::"Cost Journal Template":
-                exit(PAGE::"Cost Journal Templates");
-            DATABASE::"Cost Allocation Source":
-                exit(PAGE::"Cost Allocation");
-            DATABASE::"Cost Allocation Target":
-                exit(PAGE::"Cost Allocation Target List");
-            DATABASE::"Cost Accounting Setup":
-                exit(PAGE::"Cost Accounting Setup");
-            DATABASE::"Cost Budget Name":
-                exit(PAGE::"Cost Budget Names");
-            DATABASE::"Cost Center":
-                exit(PAGE::"Chart of Cost Centers");
-            DATABASE::"Cost Object":
-                exit(PAGE::"Chart of Cost Objects");
-            DATABASE::"Cash Flow Setup":
-                exit(PAGE::"Cash Flow Setup");
-            DATABASE::"Cash Flow Forecast":
-                exit(PAGE::"Cash Flow Forecast List");
-            DATABASE::"Cash Flow Account":
-                exit(PAGE::"Chart of Cash Flow Accounts");
-            DATABASE::"Cash Flow Manual Expense":
-                exit(PAGE::"Cash Flow Manual Expenses");
-            DATABASE::"Cash Flow Manual Revenue":
-                exit(PAGE::"Cash Flow Manual Revenues");
-            DATABASE::"IC Partner":
-                exit(PAGE::"IC Partner List");
-            DATABASE::"Base Calendar":
-                exit(PAGE::"Base Calendar List");
-            DATABASE::"Finance Charge Text":
-                exit(PAGE::"Reminder Text");
-            DATABASE::"Currency for Fin. Charge Terms":
-                exit(PAGE::"Currencies for Fin. Chrg Terms");
-            DATABASE::"Currency for Reminder Level":
-                exit(PAGE::"Currencies for Reminder Level");
-            DATABASE::"Currency Exchange Rate":
-                exit(PAGE::"Currency Exchange Rates");
-            DATABASE::"VAT Statement Name":
-                exit(PAGE::"VAT Statement Names");
-            DATABASE::"VAT Statement Line":
-                exit(PAGE::"VAT Statement");
-            DATABASE::"No. Series Relationship":
-                exit(PAGE::"No. Series Relationships");
-            DATABASE::"User Setup":
-                exit(PAGE::"User Setup");
-            DATABASE::"Gen. Journal Template":
-                exit(PAGE::"General Journal Template List");
-            DATABASE::"Gen. Journal Batch":
-                exit(PAGE::"General Journal Batches");
-            DATABASE::"Gen. Journal Line":
-                exit(PAGE::"General Journal");
-            DATABASE::"Item Journal Template":
-                exit(PAGE::"Item Journal Template List");
-            DATABASE::"Item Journal Batch":
-                exit(PAGE::"Item Journal Batches");
-            DATABASE::"Customer Bank Account":
-                exit(PAGE::"Customer Bank Account List");
-            DATABASE::"Vendor Bank Account":
-                exit(PAGE::"Vendor Bank Account List");
-            DATABASE::"Cust. Invoice Disc.":
-                exit(PAGE::"Cust. Invoice Discounts");
-            DATABASE::"Vendor Invoice Disc.":
-                exit(PAGE::"Vend. Invoice Discounts");
-            DATABASE::"Dimension Value":
-                exit(PAGE::"Dimension Value List");
-            DATABASE::"Dimension Value Combination":
-                exit(PAGE::"Dimension Combinations");
-            DATABASE::"Default Dimension":
-                exit(PAGE::"Default Dimensions");
-            DATABASE::"Dimension Translation":
-                exit(PAGE::"Dimension Translations");
-            DATABASE::"Dimension Set Entry":
-                exit(PAGE::"Dimension Set Entries");
-            DATABASE::"VAT Report Setup":
-                exit(PAGE::"VAT Report Setup");
-            DATABASE::"VAT Registration No. Format":
-                exit(PAGE::"VAT Registration No. Formats");
-            DATABASE::"G/L Entry":
-                exit(PAGE::"General Ledger Entries");
-            DATABASE::"Cust. Ledger Entry":
-                exit(PAGE::"Customer Ledger Entries");
-            DATABASE::"Vendor Ledger Entry":
-                exit(PAGE::"Vendor Ledger Entries");
-            DATABASE::"Item Ledger Entry":
-                exit(PAGE::"Item Ledger Entries");
-            DATABASE::"Sales Header":
-                exit(PAGE::"Sales List");
-            DATABASE::"Purchase Header":
-                exit(PAGE::"Purchase List");
-            DATABASE::"G/L Register":
-                exit(PAGE::"G/L Registers");
-            DATABASE::"Item Register":
-                exit(PAGE::"Item Registers");
-            DATABASE::"Item Journal Line":
-                exit(PAGE::"Item Journal Lines");
-            DATABASE::"Sales Shipment Header":
-                exit(PAGE::"Posted Sales Shipments");
-            DATABASE::"Sales Invoice Header":
-                exit(PAGE::"Posted Sales Invoices");
-            DATABASE::"Sales Cr.Memo Header":
-                exit(PAGE::"Posted Sales Credit Memos");
-            DATABASE::"Purch. Rcpt. Header":
-                exit(PAGE::"Posted Purchase Receipts");
-            DATABASE::"Purch. Inv. Header":
-                exit(PAGE::"Posted Purchase Invoices");
-            DATABASE::"Purch. Cr. Memo Hdr.":
-                exit(PAGE::"Posted Purchase Credit Memos");
+            Enum::TableID::"Company Information".AsInteger():
+                exit(Enum::PageID::"Company Information".AsInteger());
+            Enum::TableID::"Responsibility Center".AsInteger():
+                exit(Enum::PageID::"Responsibility Center List".AsInteger());
+            Enum::TableID::"Accounting Period".AsInteger():
+                exit(Enum::PageID::"Accounting Periods".AsInteger());
+            Enum::TableID::"General Ledger Setup".AsInteger():
+                exit(Enum::PageID::"General Ledger Setup".AsInteger());
+            Enum::TableID::"No. Series".AsInteger():
+                exit(Enum::PageID::"No. Series".AsInteger());
+            Enum::TableID::"No. Series Line".AsInteger():
+                exit(Enum::PageID::"No. Series Lines".AsInteger());
+            Enum::TableID::"G/L Account".AsInteger():
+                exit(Enum::PageID::"Chart of Accounts".AsInteger());
+            Enum::TableID::"Gen. Business Posting Group".AsInteger():
+                exit(Enum::PageID::"Gen. Business Posting Groups".AsInteger());
+            Enum::TableID::"Gen. Product Posting Group".AsInteger():
+                exit(Enum::PageID::"Gen. Product Posting Groups".AsInteger());
+            Enum::TableID::"General Posting Setup".AsInteger():
+                exit(Enum::PageID::"General Posting Setup".AsInteger());
+            Enum::TableID::"VAT Business Posting Group".AsInteger():
+                exit(Enum::PageID::"VAT Business Posting Groups".AsInteger());
+            Enum::TableID::"VAT Product Posting Group".AsInteger():
+                exit(Enum::PageID::"VAT Product Posting Groups".AsInteger());
+            Enum::TableID::"VAT Posting Setup".AsInteger():
+                exit(Enum::PageID::"VAT Posting Setup".AsInteger());
+            Enum::TableID::"Acc. Schedule Name".AsInteger():
+                exit(Enum::PageID::"Account Schedule Names".AsInteger());
+            Enum::TableID::"Column Layout Name".AsInteger():
+                exit(Enum::PageID::"Column Layout Names".AsInteger());
+            Enum::TableID::"G/L Budget Name".AsInteger():
+                exit(Enum::PageID::"G/L Budget Names".AsInteger());
+            Enum::TableID::"VAT Statement Template".AsInteger():
+                exit(Enum::PageID::"VAT Statement Templates".AsInteger());
+            Enum::TableID::"Tariff Number".AsInteger():
+                exit(Enum::PageID::"Tariff Numbers".AsInteger());
+            Enum::TableID::"Transaction Type".AsInteger():
+                exit(Enum::PageID::"Transaction Types".AsInteger());
+            Enum::TableID::"Transaction Specification".AsInteger():
+                exit(Enum::PageID::"Transaction Specifications".AsInteger());
+            Enum::TableID::"Transport Method".AsInteger():
+                exit(Enum::PageID::"Transport Methods".AsInteger());
+            Enum::TableID::"Entry/Exit Point".AsInteger():
+                exit(Enum::PageID::"Entry/Exit Points".AsInteger());
+            Enum::TableID::Area.AsInteger():
+                exit(Enum::PageID::Areas.AsInteger());
+            Enum::TableID::Territory.AsInteger():
+                exit(Enum::PageID::Territories.AsInteger());
+            Enum::TableID::"Tax Jurisdiction".AsInteger():
+                exit(Enum::PageID::"Tax Jurisdictions".AsInteger());
+            Enum::TableID::"Tax Group".AsInteger():
+                exit(Enum::PageID::"Tax Groups".AsInteger());
+            Enum::TableID::"Tax Detail".AsInteger():
+                exit(Enum::PageID::"Tax Details".AsInteger());
+            Enum::TableID::"Tax Area".AsInteger():
+                exit(Enum::PageID::"Tax Area".AsInteger());
+            Enum::TableID::"Tax Area Line".AsInteger():
+                exit(Enum::PageID::"Tax Area Line".AsInteger());
+            Enum::TableID::"Source Code".AsInteger():
+                exit(Enum::PageID::"Source Codes".AsInteger());
+            Enum::TableID::"Reason Code".AsInteger():
+                exit(Enum::PageID::"Reason Codes".AsInteger());
+            Enum::TableID::"Standard Text".AsInteger():
+                exit(Enum::PageID::"Standard Text Codes".AsInteger());
+            Enum::TableID::"Business Unit".AsInteger():
+                exit(Enum::PageID::"Business Unit List".AsInteger());
+            Enum::TableID::Dimension.AsInteger():
+                exit(Enum::PageID::Dimensions.AsInteger());
+            Enum::TableID::"Default Dimension Priority".AsInteger():
+                exit(Enum::PageID::"Default Dimension Priorities".AsInteger());
+            Enum::TableID::"Dimension Combination".AsInteger():
+                exit(Enum::PageID::"Dimension Combinations".AsInteger());
+            Enum::TableID::"Analysis View".AsInteger():
+                exit(Enum::PageID::"Analysis View List".AsInteger());
+            Enum::TableID::"Post Code".AsInteger():
+                exit(Enum::PageID::"Post Codes".AsInteger());
+            Enum::TableID::"Country/Region".AsInteger():
+                exit(Enum::PageID::"Countries/Regions".AsInteger());
+            Enum::TableID::Language.AsInteger():
+                exit(Enum::PageID::Languages.AsInteger());
+            Enum::TableID::Currency.AsInteger():
+                exit(Enum::PageID::Currencies.AsInteger());
+            Enum::TableID::"Bank Account".AsInteger():
+                exit(Enum::PageID::"Bank Account List".AsInteger());
+            Enum::TableID::"Bank Account Posting Group".AsInteger():
+                exit(Enum::PageID::"Bank Account Posting Groups".AsInteger());
+            Enum::TableID::"Change Log Setup (Table)".AsInteger():
+                exit(Enum::PageID::"Change Log Setup (Table) List".AsInteger());
+            Enum::TableID::"Change Log Setup (Field)".AsInteger():
+                exit(Enum::PageID::"Change Log Setup (Field) List".AsInteger());
+            Enum::TableID::"Sales & Receivables Setup".AsInteger():
+                exit(Enum::PageID::"Sales & Receivables Setup".AsInteger());
+            Enum::TableID::Customer.AsInteger():
+                exit(Enum::PageID::"Customer List".AsInteger());
+            Enum::TableID::"Customer Posting Group".AsInteger():
+                exit(Enum::PageID::"Customer Posting Groups".AsInteger());
+            Enum::TableID::"Payment Terms".AsInteger():
+                exit(Enum::PageID::"Payment Terms".AsInteger());
+            Enum::TableID::"Payment Method".AsInteger():
+                exit(Enum::PageID::"Payment Methods".AsInteger());
+            Enum::TableID::"Reminder Terms".AsInteger():
+                exit(Enum::PageID::"Reminder Terms".AsInteger());
+            Enum::TableID::"Reminder Level".AsInteger():
+                exit(Enum::PageID::"Reminder Levels".AsInteger());
+            Enum::TableID::"Reminder Text".AsInteger():
+                exit(Enum::PageID::"Reminder Text".AsInteger());
+            Enum::TableID::"Finance Charge Terms".AsInteger():
+                exit(Enum::PageID::"Finance Charge Terms".AsInteger());
+            Enum::TableID::"Shipment Method".AsInteger():
+                exit(Enum::PageID::"Shipment Methods".AsInteger());
+            Enum::TableID::"Shipping Agent".AsInteger():
+                exit(Enum::PageID::"Shipping Agents".AsInteger());
+            Enum::TableID::"Shipping Agent Services".AsInteger():
+                exit(Enum::PageID::"Shipping Agent Services".AsInteger());
+            Enum::TableID::"Customer Discount Group".AsInteger():
+                exit(Enum::PageID::"Customer Disc. Groups".AsInteger());
+            Enum::TableID::"Salesperson/Purchaser".AsInteger():
+                exit(Enum::PageID::"Salespersons/Purchasers".AsInteger());
+            Enum::TableID::"Marketing Setup".AsInteger():
+                exit(Enum::PageID::"Marketing Setup".AsInteger());
+            Enum::TableID::"Duplicate Search String Setup".AsInteger():
+                exit(Enum::PageID::"Duplicate Search String Setup".AsInteger());
+            Enum::TableID::Contact.AsInteger():
+                exit(Enum::PageID::"Contact List".AsInteger());
+            Enum::TableID::"Business Relation".AsInteger():
+                exit(Enum::PageID::"Business Relations".AsInteger());
+            Enum::TableID::"Mailing Group".AsInteger():
+                exit(Enum::PageID::"Mailing Groups".AsInteger());
+            Enum::TableID::"Industry Group".AsInteger():
+                exit(Enum::PageID::"Industry Groups".AsInteger());
+            Enum::TableID::"Web Source".AsInteger():
+                exit(Enum::PageID::"Web Sources".AsInteger());
+            Enum::TableID::"Interaction Group".AsInteger():
+                exit(Enum::PageID::"Interaction Groups".AsInteger());
+            Enum::TableID::"Interaction Template".AsInteger():
+                exit(Enum::PageID::"Interaction Templates".AsInteger());
+            Enum::TableID::"Job Responsibility".AsInteger():
+                exit(Enum::PageID::"Job Responsibilities".AsInteger());
+            Enum::TableID::"Organizational Level".AsInteger():
+                exit(Enum::PageID::"Organizational Levels".AsInteger());
+            Enum::TableID::"Campaign Status".AsInteger():
+                exit(Enum::PageID::"Campaign Status".AsInteger());
+            Enum::TableID::Activity.AsInteger():
+                exit(Enum::PageID::Activity.AsInteger());
+            Enum::TableID::Team.AsInteger():
+                exit(Enum::PageID::Teams.AsInteger());
+            Enum::TableID::"Profile Questionnaire Header".AsInteger():
+                exit(Enum::PageID::"Profile Questionnaires".AsInteger());
+            Enum::TableID::"Sales Cycle".AsInteger():
+                exit(Enum::PageID::"Sales Cycles".AsInteger());
+            Enum::TableID::"Close Opportunity Code".AsInteger():
+                exit(Enum::PageID::"Close Opportunity Codes".AsInteger());
+            Enum::TableID::"Service Mgt. Setup".AsInteger():
+                exit(Enum::PageID::"Service Mgt. Setup".AsInteger());
+            Enum::TableID::"Service Item".AsInteger():
+                exit(Enum::PageID::"Service Item List".AsInteger());
+            Enum::TableID::"Service Hour".AsInteger():
+                exit(Enum::PageID::"Default Service Hours".AsInteger());
+            Enum::TableID::"Work-Hour Template".AsInteger():
+                exit(Enum::PageID::"Work-Hour Templates".AsInteger());
+            Enum::TableID::"Resource Service Zone".AsInteger():
+                exit(Enum::PageID::"Resource Service Zones".AsInteger());
+            Enum::TableID::Loaner.AsInteger():
+                exit(Enum::PageID::"Loaner List".AsInteger());
+            Enum::TableID::"Skill Code".AsInteger():
+                exit(Enum::PageID::"Skill Codes".AsInteger());
+            Enum::TableID::"Fault Reason Code".AsInteger():
+                exit(Enum::PageID::"Fault Reason Codes".AsInteger());
+            Enum::TableID::"Service Cost".AsInteger():
+                exit(Enum::PageID::"Service Costs".AsInteger());
+            Enum::TableID::"Service Zone".AsInteger():
+                exit(Enum::PageID::"Service Zones".AsInteger());
+            Enum::TableID::"Service Order Type".AsInteger():
+                exit(Enum::PageID::"Service Order Types".AsInteger());
+            Enum::TableID::"Service Item Group".AsInteger():
+                exit(Enum::PageID::"Service Item Groups".AsInteger());
+            Enum::TableID::"Service Shelf".AsInteger():
+                exit(Enum::PageID::"Service Shelves".AsInteger());
+            Enum::TableID::"Service Status Priority Setup".AsInteger():
+                exit(Enum::PageID::"Service Order Status Setup".AsInteger());
+            Enum::TableID::"Repair Status".AsInteger():
+                exit(Enum::PageID::"Repair Status Setup".AsInteger());
+            Enum::TableID::"Service Price Group".AsInteger():
+                exit(Enum::PageID::"Service Price Groups".AsInteger());
+            Enum::TableID::"Serv. Price Group Setup".AsInteger():
+                exit(Enum::PageID::"Serv. Price Group Setup".AsInteger());
+            Enum::TableID::"Service Price Adjustment Group".AsInteger():
+                exit(Enum::PageID::"Serv. Price Adjmt. Group".AsInteger());
+            Enum::TableID::"Serv. Price Adjustment Detail".AsInteger():
+                exit(Enum::PageID::"Serv. Price Adjmt. Detail".AsInteger());
+            Enum::TableID::"Resolution Code".AsInteger():
+                exit(Enum::PageID::"Resolution Codes".AsInteger());
+            Enum::TableID::"Fault Area".AsInteger():
+                exit(Enum::PageID::"Fault Areas".AsInteger());
+            Enum::TableID::"Symptom Code".AsInteger():
+                exit(Enum::PageID::"Symptom Codes".AsInteger());
+            Enum::TableID::"Fault Code".AsInteger():
+                exit(Enum::PageID::"Fault Codes".AsInteger());
+            Enum::TableID::"Fault/Resol. Cod. Relationship".AsInteger():
+                exit(Enum::PageID::"Fault/Resol. Cod. Relationship".AsInteger());
+            Enum::TableID::"Contract Group".AsInteger():
+                exit(Enum::PageID::"Service Contract Groups".AsInteger());
+            Enum::TableID::"Service Contract Template".AsInteger():
+                exit(Enum::PageID::"Service Contract Template".AsInteger());
+            Enum::TableID::"Service Contract Account Group".AsInteger():
+                exit(Enum::PageID::"Serv. Contract Account Groups".AsInteger());
+            Enum::TableID::"Troubleshooting Header".AsInteger():
+                exit(Enum::PageID::Troubleshooting.AsInteger());
+            Enum::TableID::"Purchases & Payables Setup".AsInteger():
+                exit(Enum::PageID::"Purchases & Payables Setup".AsInteger());
+            Enum::TableID::Vendor.AsInteger():
+                exit(Enum::PageID::"Vendor List".AsInteger());
+            Enum::TableID::"Vendor Posting Group".AsInteger():
+                exit(Enum::PageID::"Vendor Posting Groups".AsInteger());
+            Enum::TableID::Purchasing.AsInteger():
+                exit(Enum::PageID::"Purchasing Codes".AsInteger());
+            Enum::TableID::"Inventory Setup".AsInteger():
+                exit(Enum::PageID::"Inventory Setup".AsInteger());
+            Enum::TableID::"Nonstock Item Setup".AsInteger():
+                exit(Enum::PageID::"Catalog Item Setup".AsInteger());
+            Enum::TableID::"Item Tracking Code".AsInteger():
+                exit(Enum::PageID::"Item Tracking Codes".AsInteger());
+            Enum::TableID::Item.AsInteger():
+                exit(Enum::PageID::"Item List".AsInteger());
+            Enum::TableID::"Nonstock Item".AsInteger():
+                exit(Enum::PageID::"Catalog Item List".AsInteger());
+            Enum::TableID::"Inventory Posting Group".AsInteger():
+                exit(Enum::PageID::"Inventory Posting Groups".AsInteger());
+            Enum::TableID::"Inventory Posting Setup".AsInteger():
+                exit(Enum::PageID::"Inventory Posting Setup".AsInteger());
+            Enum::TableID::"Unit of Measure".AsInteger():
+                exit(Enum::PageID::"Units of Measure".AsInteger());
+            Enum::TableID::"Customer Price Group".AsInteger():
+                exit(Enum::PageID::"Customer Price Groups".AsInteger());
+            Enum::TableID::"Item Discount Group".AsInteger():
+                exit(Enum::PageID::"Item Disc. Groups".AsInteger());
+            Enum::TableID::Manufacturer.AsInteger():
+                exit(Enum::PageID::Manufacturers.AsInteger());
+            Enum::TableID::"Item Category".AsInteger():
+                exit(Enum::PageID::"Item Categories".AsInteger());
+            Enum::TableID::"Rounding Method".AsInteger():
+                exit(Enum::PageID::"Rounding Methods".AsInteger());
+            Enum::TableID::Location.AsInteger():
+                exit(Enum::PageID::"Location List".AsInteger());
+            Enum::TableID::"Transfer Route".AsInteger():
+                exit(Enum::PageID::"Transfer Routes".AsInteger());
+            Enum::TableID::"Stockkeeping Unit".AsInteger():
+                exit(Enum::PageID::"Stockkeeping Unit List".AsInteger());
+            Enum::TableID::"Warehouse Setup".AsInteger():
+                exit(Enum::PageID::"Warehouse Setup".AsInteger());
+            Enum::TableID::"Resources Setup".AsInteger():
+                exit(Enum::PageID::"Resources Setup".AsInteger());
+            Enum::TableID::Resource.AsInteger():
+                exit(Enum::PageID::"Resource List".AsInteger());
+            Enum::TableID::"Resource Group".AsInteger():
+                exit(Enum::PageID::"Resource Groups".AsInteger());
+            Enum::TableID::"Work Type".AsInteger():
+                exit(Enum::PageID::"Work Types".AsInteger());
+            Enum::TableID::"Jobs Setup".AsInteger():
+                exit(Enum::PageID::"Jobs Setup".AsInteger());
+            Enum::TableID::"Job Posting Group".AsInteger():
+                exit(Enum::PageID::"Job Posting Groups".AsInteger());
+            Enum::TableID::"FA Setup".AsInteger():
+                exit(Enum::PageID::"Fixed Asset Setup".AsInteger());
+            Enum::TableID::"Fixed Asset".AsInteger():
+                exit(Enum::PageID::"Fixed Asset List".AsInteger());
+            Enum::TableID::Insurance.AsInteger():
+                exit(Enum::PageID::"Insurance List".AsInteger());
+            Enum::TableID::"FA Posting Group".AsInteger():
+                exit(Enum::PageID::"FA Posting Groups".AsInteger());
+            Enum::TableID::"FA Journal Template".AsInteger():
+                exit(Enum::PageID::"FA Journal Templates".AsInteger());
+            Enum::TableID::"FA Reclass. Journal Template".AsInteger():
+                exit(Enum::PageID::"FA Reclass. Journal Templates".AsInteger());
+            Enum::TableID::"Insurance Journal Template".AsInteger():
+                exit(Enum::PageID::"Insurance Journal Templates".AsInteger());
+            Enum::TableID::"Depreciation Book".AsInteger():
+                exit(Enum::PageID::"Depreciation Book List".AsInteger());
+            Enum::TableID::"FA Class".AsInteger():
+                exit(Enum::PageID::"FA Classes".AsInteger());
+            Enum::TableID::"FA Subclass".AsInteger():
+                exit(Enum::PageID::"FA Subclasses".AsInteger());
+            Enum::TableID::"FA Location".AsInteger():
+                exit(Enum::PageID::"FA Locations".AsInteger());
+            Enum::TableID::"Insurance Type".AsInteger():
+                exit(Enum::PageID::"Insurance Types".AsInteger());
+            Enum::TableID::Maintenance.AsInteger():
+                exit(Enum::PageID::Maintenance.AsInteger());
+            Enum::TableID::"Human Resources Setup".AsInteger():
+                exit(Enum::PageID::"Human Resources Setup".AsInteger());
+            Enum::TableID::Employee.AsInteger():
+                exit(Enum::PageID::"Employee List".AsInteger());
+            Enum::TableID::"Cause of Absence".AsInteger():
+                exit(Enum::PageID::"Causes of Absence".AsInteger());
+            Enum::TableID::"Cause of Inactivity".AsInteger():
+                exit(Enum::PageID::"Causes of Inactivity".AsInteger());
+            Enum::TableID::"Grounds for Termination".AsInteger():
+                exit(Enum::PageID::"Grounds for Termination".AsInteger());
+            Enum::TableID::"Employment Contract".AsInteger():
+                exit(Enum::PageID::"Employment Contracts".AsInteger());
+            Enum::TableID::Qualification.AsInteger():
+                exit(Enum::PageID::Qualifications.AsInteger());
+            Enum::TableID::Relative.AsInteger():
+                exit(Enum::PageID::Relatives.AsInteger());
+            Enum::TableID::"Misc. Article".AsInteger():
+                exit(Enum::PageID::"Misc. Article Information".AsInteger());
+            Enum::TableID::Confidential.AsInteger():
+                exit(Enum::PageID::Confidential.AsInteger());
+            Enum::TableID::"Employee Statistics Group".AsInteger():
+                exit(Enum::PageID::"Employee Statistics Groups".AsInteger());
+            Enum::TableID::Union.AsInteger():
+                exit(Enum::PageID::Unions.AsInteger());
+            Enum::TableID::"Manufacturing Setup".AsInteger():
+                exit(Enum::PageID::"Manufacturing Setup".AsInteger());
+            Enum::TableID::Family.AsInteger():
+                exit(Enum::PageID::Family.AsInteger());
+            Enum::TableID::"Production BOM Header".AsInteger():
+                exit(Enum::PageID::"Production BOM".AsInteger());
+            Enum::TableID::"Capacity Unit of Measure".AsInteger():
+                exit(Enum::PageID::"Capacity Units of Measure".AsInteger());
+            Enum::TableID::"Work Shift".AsInteger():
+                exit(Enum::PageID::"Work Shifts".AsInteger());
+            Enum::TableID::"Shop Calendar".AsInteger():
+                exit(Enum::PageID::"Shop Calendars".AsInteger());
+            Enum::TableID::"Work Center Group".AsInteger():
+                exit(Enum::PageID::"Work Center Groups".AsInteger());
+            Enum::TableID::"Standard Task".AsInteger():
+                exit(Enum::PageID::"Standard Tasks".AsInteger());
+            Enum::TableID::"Routing Link".AsInteger():
+                exit(Enum::PageID::"Routing Links".AsInteger());
+            Enum::TableID::Stop.AsInteger():
+                exit(Enum::PageID::"Stop Codes".AsInteger());
+            Enum::TableID::Scrap.AsInteger():
+                exit(Enum::PageID::"Scrap Codes".AsInteger());
+            Enum::TableID::"Machine Center".AsInteger():
+                exit(Enum::PageID::"Machine Center List".AsInteger());
+            Enum::TableID::"Work Center".AsInteger():
+                exit(Enum::PageID::"Work Center List".AsInteger());
+            Enum::TableID::"Routing Header".AsInteger():
+                exit(Enum::PageID::Routing.AsInteger());
+            Enum::TableID::"Cost Type".AsInteger():
+                exit(Enum::PageID::"Cost Type List".AsInteger());
+            Enum::TableID::"Cost Journal Template".AsInteger():
+                exit(Enum::PageID::"Cost Journal Templates".AsInteger());
+            Enum::TableID::"Cost Allocation Source".AsInteger():
+                exit(Enum::PageID::"Cost Allocation".AsInteger());
+            Enum::TableID::"Cost Allocation Target".AsInteger():
+                exit(Enum::PageID::"Cost Allocation Target List".AsInteger());
+            Enum::TableID::"Cost Accounting Setup".AsInteger():
+                exit(Enum::PageID::"Cost Accounting Setup".AsInteger());
+            Enum::TableID::"Cost Budget Name".AsInteger():
+                exit(Enum::PageID::"Cost Budget Names".AsInteger());
+            Enum::TableID::"Cost Center".AsInteger():
+                exit(Enum::PageID::"Chart of Cost Centers".AsInteger());
+            Enum::TableID::"Cost Object".AsInteger():
+                exit(Enum::PageID::"Chart of Cost Objects".AsInteger());
+            Enum::TableID::"Cash Flow Setup".AsInteger():
+                exit(Enum::PageID::"Cash Flow Setup".AsInteger());
+            Enum::TableID::"Cash Flow Forecast".AsInteger():
+                exit(Enum::PageID::"Cash Flow Forecast List".AsInteger());
+            Enum::TableID::"Cash Flow Account".AsInteger():
+                exit(Enum::PageID::"Chart of Cash Flow Accounts".AsInteger());
+            Enum::TableID::"Cash Flow Manual Expense".AsInteger():
+                exit(Enum::PageID::"Cash Flow Manual Expenses".AsInteger());
+            Enum::TableID::"Cash Flow Manual Revenue".AsInteger():
+                exit(Enum::PageID::"Cash Flow Manual Revenues".AsInteger());
+            Enum::TableID::"IC Partner".AsInteger():
+                exit(Enum::PageID::"IC Partner List".AsInteger());
+            Enum::TableID::"Base Calendar".AsInteger():
+                exit(Enum::PageID::"Base Calendar List".AsInteger());
+            Enum::TableID::"Finance Charge Text".AsInteger():
+                exit(Enum::PageID::"Reminder Text".AsInteger());
+            Enum::TableID::"Currency for Fin. Charge Terms".AsInteger():
+                exit(Enum::PageID::"Currencies for Fin. Chrg Terms".AsInteger());
+            Enum::TableID::"Currency for Reminder Level".AsInteger():
+                exit(Enum::PageID::"Currencies for Reminder Level".AsInteger());
+            Enum::TableID::"Currency Exchange Rate".AsInteger():
+                exit(Enum::PageID::"Currency Exchange Rates".AsInteger());
+            Enum::TableID::"VAT Statement Name".AsInteger():
+                exit(Enum::PageID::"VAT Statement Names".AsInteger());
+            Enum::TableID::"VAT Statement Line".AsInteger():
+                exit(Enum::PageID::"VAT Statement".AsInteger());
+            Enum::TableID::"No. Series Relationship".AsInteger():
+                exit(Enum::PageID::"No. Series Relationships".AsInteger());
+            Enum::TableID::"User Setup".AsInteger():
+                exit(Enum::PageID::"User Setup".AsInteger());
+            Enum::TableID::"Gen. Journal Template".AsInteger():
+                exit(Enum::PageID::"General Journal Template List".AsInteger());
+            Enum::TableID::"Gen. Journal Batch".AsInteger():
+                exit(Enum::PageID::"General Journal Batches".AsInteger());
+            Enum::TableID::"Gen. Journal Line".AsInteger():
+                exit(Enum::PageID::"General Journal".AsInteger());
+            Enum::TableID::"Item Journal Template".AsInteger():
+                exit(Enum::PageID::"Item Journal Template List".AsInteger());
+            Enum::TableID::"Item Journal Batch".AsInteger():
+                exit(Enum::PageID::"Item Journal Batches".AsInteger());
+            Enum::TableID::"Customer Bank Account".AsInteger():
+                exit(Enum::PageID::"Customer Bank Account List".AsInteger());
+            Enum::TableID::"Vendor Bank Account".AsInteger():
+                exit(Enum::PageID::"Vendor Bank Account List".AsInteger());
+            Enum::TableID::"Cust. Invoice Disc.".AsInteger():
+                exit(Enum::PageID::"Cust. Invoice Discounts".AsInteger());
+            Enum::TableID::"Vendor Invoice Disc.".AsInteger():
+                exit(Enum::PageID::"Vend. Invoice Discounts".AsInteger());
+            Enum::TableID::"Dimension Value".AsInteger():
+                exit(Enum::PageID::"Dimension Value List".AsInteger());
+            Enum::TableID::"Dimension Value Combination".AsInteger():
+                exit(Enum::PageID::"Dimension Combinations".AsInteger());
+            Enum::TableID::"Default Dimension".AsInteger():
+                exit(Enum::PageID::"Default Dimensions".AsInteger());
+            Enum::TableID::"Dimension Translation".AsInteger():
+                exit(Enum::PageID::"Dimension Translations".AsInteger());
+            Enum::TableID::"Dimension Set Entry".AsInteger():
+                exit(Enum::PageID::"Dimension Set Entries".AsInteger());
+            Enum::TableID::"VAT Report Setup".AsInteger():
+                exit(Enum::PageID::"VAT Report Setup".AsInteger());
+            Enum::TableID::"VAT Registration No. Format".AsInteger():
+                exit(Enum::PageID::"VAT Registration No. Formats".AsInteger());
+            Enum::TableID::"G/L Entry".AsInteger():
+                exit(Enum::PageID::"General Ledger Entries".AsInteger());
+            Enum::TableID::"Cust. Ledger Entry".AsInteger():
+                exit(Enum::PageID::"Customer Ledger Entries".AsInteger());
+            Enum::TableID::"Vendor Ledger Entry".AsInteger():
+                exit(Enum::PageID::"Vendor Ledger Entries".AsInteger());
+            Enum::TableID::"Item Ledger Entry".AsInteger():
+                exit(Enum::PageID::"Item Ledger Entries".AsInteger());
+            Enum::TableID::"Sales Header".AsInteger():
+                exit(Enum::PageID::"Sales List".AsInteger());
+            Enum::TableID::"Purchase Header".AsInteger():
+                exit(Enum::PageID::"Purchase List".AsInteger());
+            Enum::TableID::"G/L Register".AsInteger():
+                exit(Enum::PageID::"G/L Registers".AsInteger());
+            Enum::TableID::"Item Register".AsInteger():
+                exit(Enum::PageID::"Item Registers".AsInteger());
+            Enum::TableID::"Item Journal Line".AsInteger():
+                exit(Enum::PageID::"Item Journal Lines".AsInteger());
+            Enum::TableID::"Sales Shipment Header".AsInteger():
+                exit(Enum::PageID::"Posted Sales Shipments".AsInteger());
+            Enum::TableID::"Sales Invoice Header".AsInteger():
+                exit(Enum::PageID::"Posted Sales Invoices".AsInteger());
+            Enum::TableID::"Sales Cr.Memo Header".AsInteger():
+                exit(Enum::PageID::"Posted Sales Credit Memos".AsInteger());
+            Enum::TableID::"Purch. Rcpt. Header".AsInteger():
+                exit(Enum::PageID::"Posted Purchase Receipts".AsInteger());
+            Enum::TableID::"Purch. Inv. Header".AsInteger():
+                exit(Enum::PageID::"Posted Purchase Invoices".AsInteger());
+            Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
+                exit(Enum::PageID::"Posted Purchase Credit Memos".AsInteger());
 #if not CLEAN21
-            DATABASE::"Sales Price":
-                exit(PAGE::"Sales Prices");
-            DATABASE::"Purchase Price":
-                exit(PAGE::"Purchase Prices");
+            Database::"Sales Price":
+                exit(Page::"Sales Prices");
+            Database::"Purchase Price":
+                exit(Page::"Purchase Prices");
 #endif
-            DATABASE::"Price List Line":
-                exit(Page::"Price List Line Review");
-            DATABASE::"VAT Entry":
-                exit(PAGE::"VAT Entries");
-            DATABASE::"FA Ledger Entry":
-                exit(PAGE::"FA Ledger Entries");
-            DATABASE::"Value Entry":
-                exit(PAGE::"Value Entries");
-            DATABASE::"Source Code Setup":
-                exit(PAGE::"Source Code Setup");
+            Enum::TableID::"Price List Line".AsInteger():
+                exit(Enum::PageID::"Price List Line Review".AsInteger());
+            Enum::TableID::"VAT Entry".AsInteger():
+                exit(Enum::PageID::"VAT Entries".AsInteger());
+            Enum::TableID::"FA Ledger Entry".AsInteger():
+                exit(Enum::PageID::"FA Ledger Entries".AsInteger());
+            Enum::TableID::"Value Entry".AsInteger():
+                exit(Enum::PageID::"Value Entries".AsInteger());
+            Enum::TableID::"Source Code Setup".AsInteger():
+                exit(Enum::PageID::"Source Code Setup".AsInteger());
             else begin
                 OnFindPage(TableID, PageID);
                 exit(PageID);
@@ -730,36 +742,36 @@ codeunit 8616 "Config. Management"
 
     local procedure InsertDimTables(var TempInt: Record "Integer"; IncludeLicensedTablesOnly: Boolean)
     begin
-        InsertTempInt(TempInt, DATABASE::Dimension, IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, DATABASE::"Dimension Value", IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, DATABASE::"Dimension Combination", IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, DATABASE::"Dimension Value Combination", IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, DATABASE::"Dimension Set Entry", IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, DATABASE::"Dimension Set Tree Node", IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, DATABASE::"Default Dimension", IncludeLicensedTablesOnly);
-        InsertTempInt(TempInt, DATABASE::"Default Dimension Priority", IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Enum::TableID::Dimension.AsInteger(), IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Enum::TableID::"Dimension Value".AsInteger(), IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Enum::TableID::"Dimension Combination".AsInteger(), IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Enum::TableID::"Dimension Value Combination".AsInteger(), IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Enum::TableID::"Dimension Set Entry".AsInteger(), IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Enum::TableID::"Dimension Set Tree Node".AsInteger(), IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Enum::TableID::"Default Dimension".AsInteger(), IncludeLicensedTablesOnly);
+        InsertTempInt(TempInt, Enum::TableID::"Default Dimension Priority".AsInteger(), IncludeLicensedTablesOnly);
     end;
 
     procedure IsDefaultDimTable(TableID: Integer) Result: Boolean
     begin
         case TableID of
-            DATABASE::"G/L Account",
-          DATABASE::Customer,
-          DATABASE::Vendor,
-          DATABASE::Item,
-          DATABASE::"Resource Group",
-          DATABASE::Resource,
-          DATABASE::Job,
-          DATABASE::"Bank Account",
-          DATABASE::Employee,
-          DATABASE::"Fixed Asset",
-          DATABASE::Insurance,
-          DATABASE::"Responsibility Center",
-          DATABASE::"Work Center",
-          DATABASE::"Salesperson/Purchaser",
-          DATABASE::Campaign,
-          DATABASE::"Cash Flow Manual Expense",
-          DATABASE::"Cash Flow Manual Revenue":
+            Enum::TableID::"G/L Account".AsInteger(),
+          Enum::TableID::Customer.AsInteger(),
+          Enum::TableID::Vendor.AsInteger(),
+          Enum::TableID::Item.AsInteger(),
+          Enum::TableID::"Resource Group".AsInteger(),
+          Enum::TableID::Resource.AsInteger(),
+          Enum::TableID::Job.AsInteger(),
+          Enum::TableID::"Bank Account".AsInteger(),
+          Enum::TableID::Employee.AsInteger(),
+          Enum::TableID::"Fixed Asset".AsInteger(),
+          Enum::TableID::Insurance.AsInteger(),
+          Enum::TableID::"Responsibility Center".AsInteger(),
+          Enum::TableID::"Work Center".AsInteger(),
+          Enum::TableID::"Salesperson/Purchaser".AsInteger(),
+          Enum::TableID::Campaign.AsInteger(),
+          Enum::TableID::"Cash Flow Manual Expense".AsInteger(),
+          Enum::TableID::"Cash Flow Manual Revenue".AsInteger():
                 exit(true);
         end;
 
@@ -771,7 +783,7 @@ codeunit 8616 "Config. Management"
         RecRef: RecordRef;
     begin
         RecRef.Open(TableID);
-        Result := RecRef.FieldExist(DATABASE::"Dimension Set Entry");
+        Result := RecRef.FieldExist(Enum::TableID::"Dimension Set Entry".AsInteger());
         OnAfterIsDimSetIDTable(TableID, Result);
     end;
 
@@ -780,19 +792,19 @@ codeunit 8616 "Config. Management"
         ConfigValidateMgt: Codeunit "Config. Validate Management";
     begin
         exit(
-          (FieldID = DATABASE::"Dimension Set Entry") or
-          (ConfigValidateMgt.GetRelationTableID(TableID, FieldID) = DATABASE::"Dimension Value"));
+          (FieldID = Enum::TableID::"Dimension Set Entry".AsInteger()) or
+          (ConfigValidateMgt.GetRelationTableID(TableID, FieldID) = Enum::TableID::"Dimension Value".AsInteger()));
     end;
 
     local procedure TableIsInAllowedRange(TableID: Integer) Result: Boolean
     begin
         // This condition duplicates table relation of ConfigLine."Table ID" field to prevent runtime errors
         Result := TableID in [1 .. 99000999,
-                              DATABASE::"Permission Set",
-                              DATABASE::Permission,
-                              DATABASE::"Tenant Permission Set Rel.",
-                              DATABASE::"Tenant Permission Set",
-                              DATABASE::"Tenant Permission"];
+                              Database::"Permission Set",
+                              Database::Permission,
+                              Database::"Tenant Permission Set Rel.",
+                              Database::"Tenant Permission Set",
+                              Database::"Tenant Permission"];
         OnAfterTableIsInAllowedRange(TableID, Result);
     end;
 
@@ -806,11 +818,11 @@ codeunit 8616 "Config. Management"
 
     procedure IsSystemTable(TableID: Integer) Result: Boolean
     begin
-        Result := (TableID > 2000000000) and not (TableID in [DATABASE::"Permission Set",
-                                                              DATABASE::Permission,
-                                                              DATABASE::"Tenant Permission Set Rel.",
-                                                              DATABASE::"Tenant Permission Set",
-                                                              DATABASE::"Tenant Permission"]);
+        Result := (TableID > 2000000000) and not (TableID in [Database::"Permission Set",
+                                                              Database::Permission,
+                                                              Database::"Tenant Permission Set Rel.",
+                                                              Database::"Tenant Permission Set",
+                                                              Database::"Tenant Permission"]);
         OnAfterIsSystemTable(TableID, Result);
     end;
 
@@ -861,7 +873,7 @@ codeunit 8616 "Config. Management"
                 AddDimTables := AddDimTables or ConfigLine."Dimensions as Columns";
             until ConfigLine.Next() = 0;
         if AddDimTables and not Export then
-            Filter += StrSubstNo('%1|%2|', DATABASE::"Dimension Value", DATABASE::"Default Dimension");
+            Filter += StrSubstNo('%1|%2|', Enum::TableID::"Dimension Value".AsInteger(), Enum::TableID::"Default Dimension".AsInteger());
         if Filter <> '' then
             Filter := CopyStr(Filter, 1, StrLen(Filter) - 1);
 

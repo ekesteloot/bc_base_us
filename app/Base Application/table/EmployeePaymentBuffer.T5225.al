@@ -1,3 +1,10 @@
+namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.HumanResources.Employee;
+
 table 5225 "Employee Payment Buffer"
 {
     Caption = 'Employee Payment Buffer';
@@ -33,14 +40,14 @@ table 5225 "Employee Payment Buffer"
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(6; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(7; "Document No."; Code[20])
         {
@@ -67,20 +74,20 @@ table 5225 "Employee Payment Buffer"
         {
             Caption = 'Creditor No.';
             DataClassification = SystemMetadata;
-            TableRelation = "Employee Ledger Entry"."Creditor No." WHERE("Entry No." = FIELD("Employee Ledg. Entry No."));
+            TableRelation = "Employee Ledger Entry"."Creditor No." where("Entry No." = field("Employee Ledg. Entry No."));
         }
         field(171; "Payment Reference"; Code[50])
         {
             Caption = 'Payment Reference';
             DataClassification = SystemMetadata;
             Numeric = true;
-            TableRelation = "Employee Ledger Entry"."Payment Reference" WHERE("Entry No." = FIELD("Employee Ledg. Entry No."));
+            TableRelation = "Employee Ledger Entry"."Payment Reference" where("Entry No." = field("Employee Ledg. Entry No."));
         }
         field(172; "Payment Method Code"; Code[10])
         {
             Caption = 'Payment Method Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Employee Ledger Entry"."Payment Method Code" WHERE("Employee No." = FIELD("Employee No."));
+            TableRelation = "Employee Ledger Entry"."Payment Method Code" where("Employee No." = field("Employee No."));
         }
         field(173; "Applies-to Ext. Doc. No."; Code[35])
         {

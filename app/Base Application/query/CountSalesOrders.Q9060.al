@@ -6,7 +6,7 @@ query 9060 "Count Sales Orders"
     {
         dataitem(Sales_Header; "Sales Header")
         {
-            DataItemTableFilter = "Document Type" = CONST(Order);
+            DataItemTableFilter = "Document Type" = const(Order);
             filter(Status; Status)
             {
             }

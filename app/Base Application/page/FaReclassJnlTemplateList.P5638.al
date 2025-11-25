@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Journal;
+
 page 5638 "FA Reclass. Jnl. Template List"
 {
     Caption = 'FA Reclass. Jnl. Template List';

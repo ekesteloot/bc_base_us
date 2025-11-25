@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+
 table 95 "G/L Budget Name"
 {
     Caption = 'G/L Budget Name';

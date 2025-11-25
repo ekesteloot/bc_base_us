@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.History;
+
+using Microsoft.InventoryMgt.Comment;
+
 page 6567 "Posted Invt. Receipt"
 {
     Caption = 'Posted Invt. Receipt';
@@ -71,7 +75,7 @@ page 6567 "Posted Invt. Receipt"
             part(ReceiptLines; "Posted Invt. Receipt Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group(Control1900309501)
             {
@@ -161,8 +165,8 @@ page 6567 "Posted Invt. Receipt"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Inventory Receipt"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Inventory Receipt"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -257,7 +261,7 @@ page 6567 "Posted Invt. Receipt"
     begin
         ClearAll();
 
-        InvtRcptLine.SetRange("Document No.", "No.");
+        InvtRcptLine.SetRange("Document No.", Rec."No.");
         if InvtRcptLine.Find('-') then
             repeat
                 LineQty := LineQty + InvtRcptLine.Quantity;

@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Setup;
+
 enum 7302 "Warehouse Internal Sorting Method"
 {
     Extensible = true;

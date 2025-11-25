@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Journal;
+
 enum 7309 "Warehouse Journal Template Type"
 {
     Extensible = true;

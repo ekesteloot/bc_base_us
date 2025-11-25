@@ -1,3 +1,8 @@
+namespace System.Security.AccessControl;
+
+using System.Azure.Identity;
+using System.Environment;
+
 codeunit 9873 "BaseApp Security Group Impl."
 {
     Access = Internal;

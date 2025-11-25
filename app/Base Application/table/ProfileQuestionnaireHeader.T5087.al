@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Profiling;
+
+using Microsoft.CRM.BusinessRelation;
+
 table 5087 "Profile Questionnaire Header"
 {
     Caption = 'Profile Questionnaire Header';

@@ -1,14 +1,16 @@
+namespace Microsoft.AssemblyMgt.Document;
+
 report 902 "Assembly Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Assembly/AssemblyOrder.rdlc';
+    RDLCLayout = './AssemblyMgt/Document/AssemblyOrder.rdlc';
     Caption = 'Assembly Order';
 
     dataset
     {
         dataitem("Assembly Header"; "Assembly Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.");
+            DataItemTableView = sorting("Document Type", "No.");
             RequestFilterFields = "No.", "Item No.", "Due Date";
             column(No_AssemblyHeader; "No.")
             {
@@ -57,8 +59,8 @@ report 902 "Assembly Order"
             }
             dataitem("Assembly Line"; "Assembly Line")
             {
-                DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
                 column(Type_AssemblyLine; Type)
                 {
                     IncludeCaption = true;

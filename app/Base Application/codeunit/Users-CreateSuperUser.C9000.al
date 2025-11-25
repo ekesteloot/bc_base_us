@@ -1,3 +1,8 @@
+﻿namespace System.Security.User;
+
+using System.Environment;
+using System.Security.AccessControl;
+
 codeunit 9000 "Users - Create Super User"
 {
 
@@ -8,27 +13,29 @@ codeunit 9000 "Users - Create Super User"
         if not User.IsEmpty() then
             exit;
 
-        SafeCreateUser(UserId, Sid());
+        SafeCreateUser(UserId, SID());
     end;
 
     [Scope('OnPrem')]
     procedure SafeCreateUser(UserID: Code[50]; SID: Text[119])
     var
         User: Record User;
-        PermissionSet: Record "Permission Set";
+        MetadataPermissionSet: Record "Metadata Permission Set";
     begin
         User.SetRange("User Name", UserID);
         if User.FindFirst() then
             exit;
 
-        GetSuperRole(PermissionSet);
+        GetSuperRole(MetadataPermissionSet);
         CreateUser(User, UserID, SID);
-        AssignPermissionSetToUser(User, PermissionSet);
+        AssignPermissionSetToUser(User, MetadataPermissionSet);
     end;
 
-    local procedure GetSuperRole(var PermissionSet: Record "Permission Set")
+    local procedure GetSuperRole(var MetadataPermissionSet: Record "Metadata Permission Set")
+    var
+        NullGuid: Guid;
     begin
-        PermissionSet.Get('SUPER');
+        MetadataPermissionSet.Get(NullGuid, 'SUPER');
     end;
 
     local procedure CreateUser(var User: Record User; UserName: Code[50]; WindowsSecurityID: Text[119])
@@ -43,26 +50,26 @@ codeunit 9000 "Users - Create Super User"
         User.Insert(true);
     end;
 
-    local procedure AssignPermissionSetToUser(var User: Record User; var PermissionSet: Record "Permission Set")
+    local procedure AssignPermissionSetToUser(var User: Record User; var MetadataPermissionSet: Record "Metadata Permission Set")
     var
         AccessControl: Record "Access Control";
     begin
         AccessControl.SetRange("User Security ID", User."User Security ID");
-        AccessControl.SetRange("Role ID", PermissionSet."Role ID");
+        AccessControl.SetRange("Role ID", MetadataPermissionSet."Role ID");
         if not AccessControl.IsEmpty() then
             exit;
         AccessControl."User Security ID" := User."User Security ID";
-        AccessControl."Role ID" := PermissionSet."Role ID";
+        AccessControl."Role ID" := CopyStr(MetadataPermissionSet."Role ID", 1, MaxStrLen(AccessControl."Role ID"));
         AccessControl.Insert(true);
     end;
 
     [Scope('OnPrem')]
     procedure AddUserAsSuper(var User: Record User)
     var
-        PermissionSet: Record "Permission Set";
+        MetadataPermissionSet: Record "Metadata Permission Set";
     begin
-        GetSuperRole(PermissionSet);
-        AssignPermissionSetToUser(User, PermissionSet);
+        GetSuperRole(MetadataPermissionSet);
+        AssignPermissionSetToUser(User, MetadataPermissionSet);
     end;
 }
 

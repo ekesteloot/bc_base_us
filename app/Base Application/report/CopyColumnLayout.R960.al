@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
 report 960 "Copy Column Layout"
 {
     Caption = 'Copy Column Layout';
@@ -7,7 +9,7 @@ report 960 "Copy Column Layout"
     {
         dataitem(SourceColumnLayoutName; "Column Layout Name")
         {
-            DataItemTableView = SORTING(Name) ORDER(Ascending);
+            DataItemTableView = sorting(Name) order(Ascending);
 
             trigger OnAfterGetRecord()
             var

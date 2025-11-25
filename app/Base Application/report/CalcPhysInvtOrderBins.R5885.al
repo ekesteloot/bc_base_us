@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+
 report 5885 "Calc. Phys. Invt. Order (Bins)"
 {
     Caption = 'Calc. Phys. Invt. Order (Bins)';
@@ -7,13 +14,15 @@ report 5885 "Calc. Phys. Invt. Order (Bins)"
     {
         dataitem(Bin; Bin)
         {
-            DataItemTableView = SORTING("Location Code", Code);
+            DataItemTableView = sorting("Location Code", Code);
             RequestFilterFields = "Location Code", "Code";
 
             trigger OnAfterGetRecord()
             var
                 Item: Record Item;
+                ItemVariant: Record "Item Variant";
                 PhysInvtOrderLineArgs: Record "Phys. Invt. Order Line";
+                ItemVariantBlocked: Boolean;
                 IsHandled: Boolean;
             begin
                 Location.Get("Location Code");
@@ -21,46 +30,56 @@ report 5885 "Calc. Phys. Invt. Order (Bins)"
 
                 OnAfterGetRecordBinOnAfterCheckLocation(PhysInvtOrderHeader, Bin);
 
-                if not HideValidationDialog then begin
-                    Window.Update(1, "Location Code");
-                    Window.Update(2, Code);
+                if (not HideValidationDialog) and GuiAllowed() then begin
+                    WindowDialog.Update(1, "Location Code");
+                    WindowDialog.Update(2, Code);
                 end;
 
-                Clear(LastWhseEntry);
+                Clear(LastWarehouseEntry);
 
-                WhseEntry.Reset();
-                WhseEntry.SetCurrentKey("Location Code", "Bin Code", "Item No.", "Variant Code");
-                WhseEntry.SetRange("Location Code", "Location Code");
-                WhseEntry.SetRange("Bin Code", Code);
-                if WhseEntry.Find('-') then
+                WarehouseEntry.Reset();
+                WarehouseEntry.SetCurrentKey("Location Code", "Bin Code", "Item No.", "Variant Code");
+                WarehouseEntry.SetRange("Location Code", "Location Code");
+                WarehouseEntry.SetRange("Bin Code", Code);
+                if WarehouseEntry.Find('-') then
                     repeat
-                        if Item.Get(WhseEntry."Item No.") then
+                        if Item.Get(WarehouseEntry."Item No.") then
                             if not Item.Blocked then begin
-                                if IsNewWhseEntryGroup(Item) then begin
-                                    LastWhseEntry := WhseEntry;
-                                    IsHandled := false;
-                                    OnBeforeCreateNewPhysInvtOrderLineForWhseEntry(
-                                      Item, WhseEntry, PhysInvtOrderHeader, PhysInvtOrderLine, ErrorText, NextLineNo,
-                                      CalcQtyExpected, LastItemLedgEntryNo, LineCount, IsHandled);
-                                    if not IsHandled then begin
-                                        PhysInvtOrderLineArgs.PrepareLineArgs(WhseEntry);
-                                        if PhysInvtOrderHeader.GetSamePhysInvtOrderLine(
-                                             PhysInvtOrderLineArgs,
-                                             ErrorText,
-                                             PhysInvtOrderLine) = 0
-                                        then
-                                            CreateNewPhysInvtOrderLine();
+                                ItemVariantBlocked := false;
+                                if WarehouseEntry."Variant Code" <> '' then begin
+                                    ItemVariant.SetLoadFields(Blocked);
+                                    if ItemVariant.Get(WarehouseEntry."Item No.", WarehouseEntry."Variant Code") and ItemVariant.Blocked then begin
+                                        ItemVariantBlocked := true;
+                                        ItemsBlocked := true;
                                     end;
                                 end;
+
+                                if not ItemVariantBlocked then
+                                    if IsNewWhseEntryGroup(Item) then begin
+                                        LastWarehouseEntry := WarehouseEntry;
+                                        IsHandled := false;
+                                        OnBeforeCreateNewPhysInvtOrderLineForWhseEntry(
+                                          Item, WarehouseEntry, PhysInvtOrderHeader, PhysInvtOrderLine, ErrorText, NextLineNo,
+                                          CalcQtyExpectedReq, LastItemLedgEntryNo, LineCount, IsHandled);
+                                        if not IsHandled then begin
+                                            PhysInvtOrderLineArgs.PrepareLineArgs(WarehouseEntry);
+                                            if PhysInvtOrderHeader.GetSamePhysInvtOrderLine(
+                                                 PhysInvtOrderLineArgs,
+                                                 ErrorText,
+                                                 PhysInvtOrderLine) = 0
+                                            then
+                                                CreateNewPhysInvtOrderLine();
+                                        end;
+                                    end;
                             end else
                                 ItemsBlocked := true;
-                    until WhseEntry.Next() = 0;
+                    until WarehouseEntry.Next() = 0;
             end;
 
             trigger OnPostDataItem()
             begin
-                if not HideValidationDialog then begin
-                    Window.Close();
+                if (not HideValidationDialog) and GuiAllowed() then begin
+                    WindowDialog.Close();
                     if ItemsBlocked then
                         Message(BlockedItemMsg);
                     Message(
@@ -83,8 +102,8 @@ report 5885 "Calc. Phys. Invt. Order (Bins)"
                 else
                     NextLineNo := 10000;
 
-                if not HideValidationDialog then
-                    Window.Open(CalculatingLinesMsg + LocationAndBinMsg);
+                if (not HideValidationDialog) and GuiAllowed() then
+                    WindowDialog.Open(CalculatingLinesMsg + LocationAndBinMsg);
 
                 LineCount := 0;
                 ItemsBlocked := false;
@@ -102,13 +121,13 @@ report 5885 "Calc. Phys. Invt. Order (Bins)"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(CalcQtyExpected; CalcQtyExpected)
+                    field(CalcQtyExpected; CalcQtyExpectedReq)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Calculate Qty. Expected';
                         ToolTip = 'Specifies if you want the program to calculate and insert the contents of the field quantity expected for new created physical inventory order lines.';
                     }
-                    field(ZeroQty; ZeroQty)
+                    field(ZeroQty; ZeroQtyReq)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Items Not on Inventory';
@@ -128,27 +147,26 @@ report 5885 "Calc. Phys. Invt. Order (Bins)"
     }
 
     var
+        CalculatingLinesMsg: Label 'Calculating the order lines...\\';
+        LocationAndBinMsg: Label 'Location #1########   Bin #2############', Comment = '%1,%2 = counters';
+        LinesCreatedMsg: Label '%1 new lines have been created.', Comment = '%1 = counter';
+        BlockedItemMsg: Label 'There is at least one blocked item or item variant that was skipped.';
+
+    protected var
         PhysInvtOrderHeader: Record "Phys. Invt. Order Header";
         PhysInvtOrderLine: Record "Phys. Invt. Order Line";
         Location: Record Location;
-        WhseEntry: Record "Warehouse Entry";
-        LastWhseEntry: Record "Warehouse Entry";
-        Window: Dialog;
+        WarehouseEntry: Record "Warehouse Entry";
+        LastWarehouseEntry: Record "Warehouse Entry";
+        WindowDialog: Dialog;
         ErrorText: Text[250];
         QtyExp: Decimal;
         LastItemLedgEntryNo: Integer;
         NextLineNo: Integer;
         LineCount: Integer;
-        ZeroQty: Boolean;
-        CalcQtyExpected: Boolean;
+        ZeroQtyReq: Boolean;
+        CalcQtyExpectedReq: Boolean;
         ItemsBlocked: Boolean;
-
-        CalculatingLinesMsg: Label 'Calculating the order lines...\\';
-        LocationAndBinMsg: Label 'Location #1########   Bin #2############', Comment = '%1,%2 = counters';
-        LinesCreatedMsg: Label '%1 new lines have been created.', Comment = '%1 = counter';
-        BlockedItemMsg: Label 'There is at least one blocked item that was skipped.';
-
-    protected var
         HideValidationDialog: Boolean;
 
     procedure SetPhysInvtOrderHeader(NewPhysInvtOrderHeader: Record "Phys. Invt. Order Header")
@@ -168,18 +186,18 @@ report 5885 "Calc. Phys. Invt. Order (Bins)"
         PhysInvtOrderLineArgs: Record "Phys. Invt. Order Line";
         InsertLine: Boolean;
     begin
-        PhysInvtOrderLineArgs.PrepareLineArgs(WhseEntry);
+        PhysInvtOrderLineArgs.PrepareLineArgs(WarehouseEntry);
         PhysInvtOrderLine.PrepareLine(
             PhysInvtOrderHeader."No.", NextLineNo, PhysInvtOrderLineArgs, '', 0);
         PhysInvtOrderLine.CalcQtyAndLastItemLedgExpected(QtyExp, LastItemLedgEntryNo);
         InsertLine := false;
-        OnCreateNewPhysInvtOrderLineOnAfterCalcQtyAndLastItemLedgExpected(QtyExp, LastItemLedgEntryNo, WhseEntry, PhysInvtOrderLine, InsertLine);
-        if (QtyExp <> 0) or ZeroQty or InsertLine then begin
+        OnCreateNewPhysInvtOrderLineOnAfterCalcQtyAndLastItemLedgExpected(QtyExp, LastItemLedgEntryNo, WarehouseEntry, PhysInvtOrderLine, InsertLine);
+        if (QtyExp <> 0) or ZeroQtyReq or InsertLine then begin
             PhysInvtOrderLine.Insert(true);
             PhysInvtOrderLine.CreateDimFromDefaultDim();
-            if CalcQtyExpected then
+            if CalcQtyExpectedReq then
                 PhysInvtOrderLine.CalcQtyAndTrackLinesExpected();
-            OnBeforePhysInvtOrderLineModify(PhysInvtOrderLine, CalcQtyExpected);
+            OnBeforePhysInvtOrderLineModify(PhysInvtOrderLine, CalcQtyExpectedReq);
             PhysInvtOrderLine.Modify();
             NextLineNo := NextLineNo + 10000;
             LineCount := LineCount + 1;
@@ -189,11 +207,11 @@ report 5885 "Calc. Phys. Invt. Order (Bins)"
     local procedure IsNewWhseEntryGroup(Item: Record Item) Result: Boolean
     begin
         Result :=
-            (LastWhseEntry."Location Code" <> WhseEntry."Location Code") or
-            (LastWhseEntry."Bin Code" <> WhseEntry."Bin Code") or
-            (LastWhseEntry."Item No." <> WhseEntry."Item No.") or
-            (LastWhseEntry."Variant Code" <> WhseEntry."Variant Code");
-        OnAfterIsNewWhseEntryGroup(WhseEntry, LastWhseEntry, Result, Item);
+            (LastWarehouseEntry."Location Code" <> WarehouseEntry."Location Code") or
+            (LastWarehouseEntry."Bin Code" <> WarehouseEntry."Bin Code") or
+            (LastWarehouseEntry."Item No." <> WarehouseEntry."Item No.") or
+            (LastWarehouseEntry."Variant Code" <> WarehouseEntry."Variant Code");
+        OnAfterIsNewWhseEntryGroup(WarehouseEntry, LastWarehouseEntry, Result, Item);
     end;
 
     [IntegrationEvent(false, false)]

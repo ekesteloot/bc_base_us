@@ -1,3 +1,17 @@
+﻿namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Enums;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using System.Text;
+
 table 303 "Finance Charge Memo Line"
 {
     Caption = 'Finance Charge Memo Line';
@@ -18,7 +32,7 @@ table 303 "Finance Charge Memo Line"
         {
             Caption = 'Attached to Line No.';
             Editable = false;
-            TableRelation = "Finance Charge Memo Line"."Line No." WHERE("Finance Charge Memo No." = FIELD("Finance Charge Memo No."));
+            TableRelation = "Finance Charge Memo Line"."Line No." where("Finance Charge Memo No." = field("Finance Charge Memo No."));
         }
         field(4; Type; Option)
         {
@@ -156,9 +170,9 @@ table 303 "Finance Charge Memo Line"
         field(15; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(" ")) "Standard Text"
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account";
+            TableRelation = if (Type = const(" ")) "Standard Text"
+            else
+            if (Type = const("G/L Account")) "G/L Account";
 
             trigger OnValidate()
             begin
@@ -989,7 +1003,7 @@ table 303 "Finance Charge Memo Line"
     local procedure OnCreateMulitplyInterestRateEntriesOnBeforeBuildDescription(var FinanceChargeMemoLine: Record "Finance Charge Memo Line"; UseCalcDate: Date; UseDueDate: Date)
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterCumulateDetailedEntries(var FinanceChargeMemoLine: Record "Finance Charge Memo Line"; var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; ClosedAtDate: Date; var CumAmount: Decimal)
     begin

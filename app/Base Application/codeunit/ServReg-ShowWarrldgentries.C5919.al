@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Ledger;
+
 codeunit 5919 "Serv Reg.-Show WarrLdgEntries"
 {
     TableNo = "Service Register";
@@ -5,7 +7,7 @@ codeunit 5919 "Serv Reg.-Show WarrLdgEntries"
     trigger OnRun()
     begin
         WarrLedgEntry.Reset();
-        WarrLedgEntry.SetRange("Entry No.", "From Warranty Entry No.", "To Warranty Entry No.");
+        WarrLedgEntry.SetRange("Entry No.", Rec."From Warranty Entry No.", Rec."To Warranty Entry No.");
         PAGE.Run(PAGE::"Warranty Ledger Entries", WarrLedgEntry);
     end;
 

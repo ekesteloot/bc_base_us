@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Payables;
+
 codeunit 111 "Vend. Entry-SetAppl.ID"
 {
     Permissions = TableData "Vendor Ledger Entry" = rimd;

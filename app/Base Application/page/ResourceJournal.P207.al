@@ -1,3 +1,12 @@
+﻿namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.ProjectMgt.Resources.Resource;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+
 page 207 "Resource Journal"
 {
     AdditionalSearchTerms = 'register hours';
@@ -74,8 +83,8 @@ page 207 "Resource Journal"
 
                     trigger OnValidate()
                     begin
-                        ResJnlManagement.GetRes("Resource No.", ResName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        ResJnlManagement.GetRes(Rec."Resource No.", ResName);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field("Resource Group No."; Rec."Resource Group No.")
@@ -86,7 +95,7 @@ page 207 "Resource Journal"
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field(Description; Rec.Description)
@@ -186,14 +195,14 @@ page 207 "Resource Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 3);
                     end;
@@ -202,14 +211,14 @@ page 207 "Resource Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 4);
                     end;
@@ -218,14 +227,14 @@ page 207 "Resource Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 5);
                     end;
@@ -234,14 +243,14 @@ page 207 "Resource Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 6);
                     end;
@@ -250,14 +259,14 @@ page 207 "Resource Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 7);
                     end;
@@ -266,14 +275,14 @@ page 207 "Resource Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
@@ -305,9 +314,9 @@ page 207 "Resource Journal"
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
                 Visible = BackgroundErrorCheck;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -341,7 +350,7 @@ page 207 "Resource Journal"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -356,7 +365,7 @@ page 207 "Resource Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Resource Card";
-                    RunPageLink = "No." = FIELD("Resource No.");
+                    RunPageLink = "No." = field("Resource No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -366,8 +375,8 @@ page 207 "Resource Journal"
                     Caption = 'Ledger E&ntries';
                     Image = ResourceLedger;
                     RunObject = Page "Resource Ledger Entries";
-                    RunPageLink = "Resource No." = FIELD("Resource No.");
-                    RunPageView = SORTING("Resource No.");
+                    RunPageLink = "Resource No." = field("Resource No.");
+                    RunPageView = sorting("Resource No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -403,7 +412,7 @@ page 207 "Resource Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Res. Jnl.-Post", Rec);
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -418,7 +427,7 @@ page 207 "Resource Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Res. Jnl.-Post+Print", Rec);
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -460,7 +469,7 @@ page 207 "Resource Journal"
                     var
                         ODataUtility: Codeunit ODataUtility;
                     begin
-                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption, CurrPage.ObjectId(false), "Journal Batch Name", "Journal Template Name");
+                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption, CurrPage.ObjectId(false), Rec."Journal Batch Name", Rec."Journal Template Name");
                     end;
                 }
                 group(Errors)
@@ -479,7 +488,7 @@ page 207 "Resource Journal"
 
                         trigger OnAction()
                         begin
-                            SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                            Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                         end;
                     }
                     action(ShowAllLines)
@@ -493,7 +502,7 @@ page 207 "Resource Journal"
 
                         trigger OnAction()
                         begin
-                            SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                            Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                         end;
                     }
                 }
@@ -572,17 +581,17 @@ page 207 "Resource Journal"
 
     trigger OnAfterGetCurrRecord()
     begin
-        ResJnlManagement.GetRes("Resource No.", ResName);
+        ResJnlManagement.GetRes(Rec."Resource No.", ResName);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
         Clear(ShortcutDimCode);
     end;
 
@@ -599,8 +608,8 @@ page 207 "Resource Journal"
 
         OnOpenPageOnBeforeOpenJnl(Rec, CurrentJnlBatchName);
 
-        if IsOpenedFromBatch() then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+        if Rec.IsOpenedFromBatch() then begin
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             ResJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
             SetControlAppearanceFromBatch();
             exit;
@@ -647,12 +656,12 @@ page 207 "Resource Journal"
         ResJournalBatch: Record "Res. Journal Batch";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
     begin
-        if not ResJournalBatch.Get(GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
+        if not ResJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
 
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
-        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
         ResJournalErrorsMgt.SetFullBatchCheck(true);
     end;
 

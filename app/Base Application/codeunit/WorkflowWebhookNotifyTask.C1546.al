@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Security.AccessControl;
+
 codeunit 1546 "Workflow Webhook Notify Task"
 {
     // // Intended to be called using TaskScheduler
@@ -17,13 +21,13 @@ codeunit 1546 "Workflow Webhook Notify Task"
         InitHandled: Boolean;
     begin
         // Fetch Subscription
-        WorkflowWebhookSubscriptionTable.SetFilter("WF Definition Id", "Workflow Code");
+        WorkflowWebhookSubscriptionTable.SetFilter("WF Definition Id", Rec."Workflow Code");
         WorkflowWebhookSubscriptionTable.SetFilter(Enabled, '%1', true);
         if not WorkflowWebhookSubscriptionTable.FindFirst() then
             exit;
 
         // Fetch Entry
-        WorkflowWebhookEntryTable.SetRange("Workflow Step Instance ID", ID);
+        WorkflowWebhookEntryTable.SetRange("Workflow Step Instance ID", Rec.ID);
         if not WorkflowWebhookEntryTable.FindFirst() then
             exit;
 

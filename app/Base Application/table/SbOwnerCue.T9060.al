@@ -10,49 +10,49 @@ table 9060 "SB Owner Cue"
         }
         field(2; "Released Sales Quotes"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Quote),
-                                                      Status = FILTER(Released)));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Quote),
+                                                      Status = filter(Released)));
             Caption = 'Released Sales Quotes';
             FieldClass = FlowField;
         }
         field(3; "Open Sales Orders"; Integer)
         {
             AccessByPermission = TableData "Return Receipt Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Order),
-                                                      Status = FILTER(Open)));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Order),
+                                                      Status = filter(Open)));
             Caption = 'Open Sales Orders';
             FieldClass = FlowField;
         }
         field(4; "Released Sales Orders"; Integer)
         {
             AccessByPermission = TableData "Return Receipt Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Order),
-                                                      Status = FILTER(Released)));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Order),
+                                                      Status = filter(Released)));
             Caption = 'Released Sales Orders';
             FieldClass = FlowField;
         }
         field(5; "Released Purchase Orders"; Integer)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Order),
-                                                         Status = FILTER(Released)));
+            CalcFormula = count("Purchase Header" where("Document Type" = const(Order),
+                                                         Status = filter(Released)));
             Caption = 'Released Purchase Orders';
             FieldClass = FlowField;
         }
         field(6; "Overdue Sales Documents"; Integer)
         {
-            CalcFormula = Count("Cust. Ledger Entry" WHERE("Document Type" = FILTER(Invoice | "Credit Memo"),
-                                                            "Due Date" = FIELD("Overdue Date Filter"),
-                                                            Open = CONST(true)));
+            CalcFormula = count("Cust. Ledger Entry" where("Document Type" = filter(Invoice | "Credit Memo"),
+                                                            "Due Date" = field("Overdue Date Filter"),
+                                                            Open = const(true)));
             Caption = 'Overdue Sales Documents';
             FieldClass = FlowField;
         }
         field(7; "SOs Shipped Not Invoiced"; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Order),
-                                                      "Completely Shipped" = CONST(true),
-                                                      "Shipped Not Invoiced" = CONST(true)));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Order),
+                                                      "Completely Shipped" = const(true),
+                                                      "Shipped Not Invoiced" = const(true)));
             Caption = 'SOs Shipped Not Invoiced';
             FieldClass = FlowField;
             ObsoleteReason = 'Poor performance';
@@ -61,46 +61,46 @@ table 9060 "SB Owner Cue"
         }
         field(8; "Customers - Blocked"; Integer)
         {
-            CalcFormula = Count(Customer WHERE(Blocked = FILTER(<> " ")));
+            CalcFormula = count(Customer where(Blocked = filter(<> " ")));
             Caption = 'Customers - Blocked';
             FieldClass = FlowField;
         }
         field(9; "Purchase Documents Due Today"; Integer)
         {
-            CalcFormula = Count("Vendor Ledger Entry" WHERE("Document Type" = FILTER(Invoice | "Credit Memo"),
-                                                             "Due Date" = FIELD("Due Date Filter"),
-                                                             Open = CONST(true)));
+            CalcFormula = count("Vendor Ledger Entry" where("Document Type" = filter(Invoice | "Credit Memo"),
+                                                             "Due Date" = field("Due Date Filter"),
+                                                             Open = const(true)));
             Caption = 'Purchase Documents Due Today';
             FieldClass = FlowField;
         }
         field(10; "Vendors - Payment on Hold"; Integer)
         {
-            CalcFormula = Count(Vendor WHERE(Blocked = FILTER(Payment)));
+            CalcFormula = count(Vendor where(Blocked = filter(Payment)));
             Caption = 'Vendors - Payment on Hold';
             FieldClass = FlowField;
         }
         field(11; "Sales Invoices"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = FILTER(Invoice)));
+            CalcFormula = count("Sales Header" where("Document Type" = filter(Invoice)));
             Caption = 'Sales Invoices';
             FieldClass = FlowField;
         }
         field(12; "Unpaid Sales Invoices"; Integer)
         {
-            CalcFormula = Count("Sales Invoice Header" WHERE(Closed = FILTER(false)));
+            CalcFormula = count("Sales Invoice Header" where(Closed = filter(false)));
             Caption = 'Unpaid Sales Invoices';
             FieldClass = FlowField;
         }
         field(13; "Overdue Sales Invoices"; Integer)
         {
-            CalcFormula = Count("Sales Invoice Header" WHERE("Due Date" = FIELD("Overdue Date Filter"),
-                                                              Closed = FILTER(false)));
+            CalcFormula = count("Sales Invoice Header" where("Due Date" = field("Overdue Date Filter"),
+                                                              Closed = filter(false)));
             Caption = 'Overdue Sales Invoices';
             FieldClass = FlowField;
         }
         field(14; "Sales Quotes"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = FILTER(Quote)));
+            CalcFormula = count("Sales Header" where("Document Type" = filter(Quote)));
             Caption = 'Sales Quotes';
             FieldClass = FlowField;
         }
@@ -117,20 +117,20 @@ table 9060 "SB Owner Cue"
         }
         field(30; "Purchase Invoices"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER(Invoice)));
+            CalcFormula = count("Purchase Header" where("Document Type" = filter(Invoice)));
             Caption = 'Purchase Invoices';
             FieldClass = FlowField;
         }
         field(31; "Unpaid Purchase Invoices"; Integer)
         {
-            CalcFormula = Count("Purch. Inv. Header" WHERE(Closed = FILTER(false)));
+            CalcFormula = count("Purch. Inv. Header" where(Closed = filter(false)));
             Caption = 'Unpaid Purchase Invoices';
             FieldClass = FlowField;
         }
         field(32; "Overdue Purchase Invoices"; Integer)
         {
-            CalcFormula = Count("Purch. Inv. Header" WHERE("Due Date" = FIELD("Overdue Date Filter"),
-                                                            Closed = FILTER(false)));
+            CalcFormula = count("Purch. Inv. Header" where("Due Date" = field("Overdue Date Filter"),
+                                                            Closed = filter(false)));
             Caption = 'Overdue Purchase Invoices';
             FieldClass = FlowField;
         }

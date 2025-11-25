@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment;
+
+using System.Security.AccessControl;
+
 table 2000000110 "Active Session"
 {
     Caption = 'Active Session';
@@ -38,8 +46,8 @@ table 2000000110 "Active Session"
         field(7; "Client Type"; Option)
         {
             Caption = 'Client Type';
-            OptionCaption = 'Windows Client,SharePoint Client,Web Service,Client Service,NAS,Background,Management Client,Web Client,Unknown,Tablet,Phone,Desktop';
-            OptionMembers = "Windows Client","SharePoint Client","Web Service","Client Service",NAS,Background,"Management Client","Web Client",Unknown,Tablet,Phone,Desktop;
+            OptionCaption = 'Windows Client,SharePoint Client,Web Service,Client Service,NAS,Background,Management Client,Web Client,Unknown,Tablet,Phone,Desktop,Teams,Child Session';
+            OptionMembers = "Windows Client","SharePoint Client","Web Service","Client Service",NAS,Background,"Management Client","Web Client",Unknown,Tablet,Phone,Desktop,Teams,"Child Session";
         }
         field(8; "Client Computer Name"; Text[250])
         {

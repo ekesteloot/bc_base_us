@@ -1,14 +1,21 @@
+namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using Microsoft.Foundation.Company;
+using System.Utilities;
+
 report 5084 "Email Merge"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './CRM/EmailMerge.rdlc';
+    DefaultRenderingLayout = "EmailMerge.rdlc";
     Caption = 'Email Merge';
 
     dataset
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(Company_Information_Picture; CompanyInformation.Picture)
             {
             }
@@ -60,6 +67,24 @@ report 5084 "Email Merge"
 
         actions
         {
+        }
+    }
+
+    rendering
+    {
+        layout("EmailMerge.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './CRM/Interaction/EmailMerge.rdlc';
+            Caption = 'EMail Merge (RDLC)';
+            Summary = 'The EMail Merge (RDLC) provides a detailed layout.';
+        }
+        layout("DefaultEmailMergeDoc.docx")
+        {
+            Type = Word;
+            LayoutFile = './CRM/DefaultEmailMergeDoc.docx';
+            Caption = 'EMail Merge (Word)';
+            Summary = 'The EMail Merge (Word) provides a basic layout.';
         }
     }
 

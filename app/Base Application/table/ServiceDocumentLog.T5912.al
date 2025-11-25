@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ServiceMgt.History;
+using System.Security.AccessControl;
+
 table 5912 "Service Document Log"
 {
     Caption = 'Service Document Log';
@@ -10,19 +15,19 @@ table 5912 "Service Document Log"
         field(1; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = IF ("Document Type" = CONST(Quote)) "Service Header"."No." WHERE("Document Type" = CONST(Quote))
-            ELSE
-            IF ("Document Type" = CONST(Order)) "Service Header"."No." WHERE("Document Type" = CONST(Order))
-            ELSE
-            IF ("Document Type" = CONST(Invoice)) "Service Header"."No." WHERE("Document Type" = CONST(Invoice))
-            ELSE
-            IF ("Document Type" = CONST("Credit Memo")) "Service Header"."No." WHERE("Document Type" = CONST("Credit Memo"))
-            ELSE
-            IF ("Document Type" = CONST(Shipment)) "Service Shipment Header"
-            ELSE
-            IF ("Document Type" = CONST("Posted Invoice")) "Service Invoice Header"
-            ELSE
-            IF ("Document Type" = CONST("Posted Credit Memo")) "Service Cr.Memo Header";
+            TableRelation = if ("Document Type" = const(Quote)) "Service Header"."No." where("Document Type" = const(Quote))
+            else
+            if ("Document Type" = const(Order)) "Service Header"."No." where("Document Type" = const(Order))
+            else
+            if ("Document Type" = const(Invoice)) "Service Header"."No." where("Document Type" = const(Invoice))
+            else
+            if ("Document Type" = const("Credit Memo")) "Service Header"."No." where("Document Type" = const("Credit Memo"))
+            else
+            if ("Document Type" = const(Shipment)) "Service Shipment Header"
+            else
+            if ("Document Type" = const("Posted Invoice")) "Service Invoice Header"
+            else
+            if ("Document Type" = const("Posted Credit Memo")) "Service Cr.Memo Header";
             ValidateTableRelation = false;
         }
         field(2; "Entry No."; Integer)
@@ -58,8 +63,6 @@ table 5912 "Service Document Log"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(10; "Document Type"; Enum "Service Log Document Type")
         {

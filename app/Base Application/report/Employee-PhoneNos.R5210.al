@@ -1,14 +1,18 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.HumanResources.Employee;
+
 report 5210 "Employee - Phone Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeePhoneNos.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeePhoneNos.rdlc';
     Caption = 'Employee - Phone Nos.';
 
     dataset
     {
         dataitem(Employee; Employee)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Global Dimension 1 Code", "Global Dimension 2 Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

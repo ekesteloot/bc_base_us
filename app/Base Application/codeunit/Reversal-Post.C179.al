@@ -1,3 +1,9 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Reversal;
+
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 codeunit 179 "Reversal-Post"
 {
     TableNo = "Reversal Entry";

@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 530 "Posted Purchase Cr. Memo Lines"
 {
     ApplicationArea = Basic, Suite;
@@ -226,7 +230,7 @@ page 530 "Posted Purchase Cr. Memo Lines"
 
                     trigger OnAction()
                     begin
-                        PurchCrMemoHeader.Get("Document No.");
+                        PurchCrMemoHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Purchase Credit Memo", PurchCrMemoHeader);
                     end;
                 }
@@ -241,7 +245,7 @@ page 530 "Posted Purchase Cr. Memo Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Lines")
@@ -254,7 +258,7 @@ page 530 "Posted Purchase Cr. Memo Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }

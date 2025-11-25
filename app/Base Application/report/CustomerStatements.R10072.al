@@ -9,7 +9,7 @@ report 10072 "Customer Statements"
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Print Statements", "Date Filter";
             column(Customer_No_; "No.")
             {
@@ -22,7 +22,7 @@ report 10072 "Customer Statements"
             }
             dataitem(HeaderFooter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(CompanyInformation_Picture; CompanyInformation.Picture)
                 {
                 }
@@ -214,9 +214,9 @@ report 10072 "Customer Statements"
                 }
                 dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
                 {
-                    DataItemLink = "Customer No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
+                    DataItemLink = "Customer No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
                     DataItemLinkReference = Customer;
-                    DataItemTableView = SORTING("Customer No.", Open) WHERE(Open = CONST(true));
+                    DataItemTableView = sorting("Customer No.", Open) where(Open = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -237,9 +237,9 @@ report 10072 "Customer Statements"
                 }
                 dataitem(AfterStmntDateEntry; "Cust. Ledger Entry")
                 {
-                    DataItemLink = "Customer No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
+                    DataItemLink = "Customer No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
                     DataItemLinkReference = Customer;
-                    DataItemTableView = SORTING("Customer No.", "Posting Date");
+                    DataItemTableView = sorting("Customer No.", "Posting Date");
 
                     trigger OnAfterGetRecord()
                     begin
@@ -263,7 +263,7 @@ report 10072 "Customer Statements"
                 }
                 dataitem("Balance Forward"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(FromDate___1; FromDate - 1)
                     {
                     }
@@ -293,7 +293,7 @@ report 10072 "Customer Statements"
                 }
                 dataitem(OpenItem; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(TempCustLedgEntry__Document_No__; TempCustLedgEntry."Document No.")
                     {
                     }
@@ -378,9 +378,9 @@ report 10072 "Customer Statements"
                 }
                 dataitem(CustLedgerEntry4; "Cust. Ledger Entry")
                 {
-                    DataItemLink = "Customer No." = FIELD("No.");
+                    DataItemLink = "Customer No." = field("No.");
                     DataItemLinkReference = Customer;
-                    DataItemTableView = SORTING("Customer No.", "Posting Date");
+                    DataItemTableView = sorting("Customer No.", "Posting Date");
                     column(CustLedgerEntry4__Document_No__; "Document No.")
                     {
                     }
@@ -440,7 +440,7 @@ report 10072 "Customer Statements"
                 }
                 dataitem(EndOfCustomer; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(StatementComplete; StatementComplete)
                     {
                     }
@@ -467,6 +467,7 @@ report 10072 "Customer Statements"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 DebitBalance := 0;
                 CreditBalance := 0;
@@ -735,9 +736,6 @@ report 10072 "Customer Statements"
     end;
 
     var
-        CompanyInformation: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         Currency: Record Currency;
         CurrExchRate: Record "Currency Exchange Rate";
@@ -785,7 +783,6 @@ report 10072 "Customer Statements"
         TempAmountDue: array[4] of Decimal;
         AgingMethod_Int: Integer;
         StatementStyle_Int: Integer;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         PeriodCalcTxt: Label '-%1', Comment = '%1 = length of Aging Periods, dateformula';
         STATEMENTCaptionLbl: Label 'STATEMENT', Comment = 'Page title.';
@@ -810,10 +807,12 @@ report 10072 "Customer Statements"
         SupportedOutputMethod: Option Print,Preview,PDF,Email,Excel,XML;
         ChosenOutputMethod: Integer;
         PrintIfEmailIsMissing: Boolean;
-        [InDataSet]
         ShowPrintIfEmailIsMissing: Boolean;
 
-	protected var
+    protected var
+        CompanyInformation: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
         TempCustLedgEntry: Record "Cust. Ledger Entry" temporary;
 
     procedure GetTermsString(var CustLedgerEntry: Record "Cust. Ledger Entry"): Text[250]

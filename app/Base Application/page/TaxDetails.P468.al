@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.SalesTax;
+
+using Microsoft.FinancialMgt.VAT;
+
 page 468 "Tax Details"
 {
     ApplicationArea = SalesTax;
@@ -97,9 +101,9 @@ page 468 "Tax Details"
                         VATEntry: Record "VAT Entry";
                     begin
                         VATEntry.SetCurrentKey("Tax Jurisdiction Code", "Tax Group Used", "Tax Type", "Use Tax", "Posting Date");
-                        VATEntry.SetRange("Tax Jurisdiction Code", "Tax Jurisdiction Code");
-                        VATEntry.SetRange("Tax Group Used", "Tax Group Code");
-                        VATEntry.SetRange("Tax Type", "Tax Type");
+                        VATEntry.SetRange("Tax Jurisdiction Code", Rec."Tax Jurisdiction Code");
+                        VATEntry.SetRange("Tax Group Used", Rec."Tax Group Code");
+                        VATEntry.SetRange("Tax Type", Rec."Tax Type");
                         PAGE.Run(PAGE::"VAT Entries", VATEntry);
                     end;
                 }

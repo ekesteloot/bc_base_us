@@ -1,7 +1,11 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Manufacturing.Journal;
+
 report 5500 "Prod. Order Comp. and Routing"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrder/ProdOrderCompandRouting.rdlc';
+    RDLCLayout = './Manufacturing/Document/ProdOrderCompandRouting.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order Comp. and Routing';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5500 "Prod. Order Comp. and Routing"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             RequestFilterFields = Status, "No.";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -37,8 +41,8 @@ report 5500 "Prod. Order Comp. and Routing"
             }
             dataitem("Prod. Order Line"; "Prod. Order Line")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Line No.");
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Line No.");
                 RequestFilterFields = "Item No.", "Line No.";
                 column(No1_ProductionOrder; "Production Order"."No.")
                 {
@@ -87,8 +91,8 @@ report 5500 "Prod. Order Comp. and Routing"
                 }
                 dataitem("Prod. Order Component"; "Prod. Order Component")
                 {
-                    DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("Prod. Order No."), "Prod. Order Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
+                    DataItemLink = Status = field(Status), "Prod. Order No." = field("Prod. Order No."), "Prod. Order Line No." = field("Line No.");
+                    DataItemTableView = sorting(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
                     column(ItemNo_PrdOrdrComp; "Item No.")
                     {
                     }
@@ -129,8 +133,8 @@ report 5500 "Prod. Order Comp. and Routing"
                 }
                 dataitem("Prod. Order Routing Line"; "Prod. Order Routing Line")
                 {
-                    DataItemLink = "Routing No." = FIELD("Routing No."), "Routing Reference No." = FIELD("Routing Reference No."), "Prod. Order No." = FIELD("Prod. Order No."), Status = FIELD(Status);
-                    DataItemTableView = SORTING(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
+                    DataItemLink = "Routing No." = field("Routing No."), "Routing Reference No." = field("Routing Reference No."), "Prod. Order No." = field("Prod. Order No."), Status = field(Status);
+                    DataItemTableView = sorting(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
                     column(OprNo_ProdOrderRtngLine; "Operation No.")
                     {
                     }
@@ -168,8 +172,8 @@ report 5500 "Prod. Order Comp. and Routing"
                     }
                     dataitem(CompLink; "Prod. Order Component")
                     {
-                        DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("Prod. Order No."), "Prod. Order Line No." = FIELD("Routing Reference No."), "Routing Link Code" = FIELD("Routing Link Code");
-                        DataItemTableView = SORTING(Status, "Prod. Order No.", "Routing Link Code", "Flushing Method") WHERE("Routing Link Code" = FILTER(<> ''));
+                        DataItemLink = Status = field(Status), "Prod. Order No." = field("Prod. Order No."), "Prod. Order Line No." = field("Routing Reference No."), "Routing Link Code" = field("Routing Link Code");
+                        DataItemTableView = sorting(Status, "Prod. Order No.", "Routing Link Code", "Flushing Method") where("Routing Link Code" = filter(<> ''));
                         column(ItemNo_CompLink; "Item No.")
                         {
                         }

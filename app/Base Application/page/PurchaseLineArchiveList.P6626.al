@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Archive;
+
 page 6626 "Purchase Line Archive List"
 {
     Caption = 'Purchase Line Archive List';
@@ -110,15 +112,15 @@ page 6626 "Purchase Line Archive List"
                     var
                         PurchaseHeaderArchive: Record "Purchase Header Archive";
                     begin
-                        PurchaseHeaderArchive.Get("Document Type", "Document No.", "Doc. No. Occurrence", "Version No.");
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        PurchaseHeaderArchive.Get(Rec."Document Type", Rec."Document No.", Rec."Doc. No. Occurrence", Rec."Version No.");
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 PAGE.Run(PAGE::"Purchase Order Archive", PurchaseHeaderArchive);
-                            "Document Type"::Quote:
+                            Rec."Document Type"::Quote:
                                 PAGE.Run(PAGE::"Purchase Quote Archive", PurchaseHeaderArchive);
-                            "Document Type"::"Blanket Order":
+                            Rec."Document Type"::"Blanket Order":
                                 PAGE.Run(PAGE::"Blanket Purchase Order Archive", PurchaseHeaderArchive);
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 PAGE.Run(PAGE::"Purchase Return Order Archive", PurchaseHeaderArchive);
                         end;
                     end;

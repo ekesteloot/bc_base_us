@@ -3,7 +3,11 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-PermissionSet 54 "Language - Read"
+namespace System.Globalization;
+
+using System.Environment.Configuration;
+
+permissionset 54 "Language - Read"
 {
     Access = Public;
     Assignable = false;

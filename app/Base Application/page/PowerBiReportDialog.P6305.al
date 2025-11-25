@@ -1,9 +1,17 @@
+#if not CLEAN23
+namespace System.Integration.PowerBI;
+
+using System;
+
 page 6305 "Power BI Report Dialog"
 {
     Caption = 'Power BI Report Dialog';
     Editable = false;
     LinksAllowed = false;
     ShowFilter = false;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This page has been replaced by page 6323 "Power BI Report Card"';
+    ObsoleteTag = '23.0';
 
     layout
     {
@@ -89,3 +97,4 @@ page 6305 "Power BI Report Dialog"
     end;
 }
 
+#endif

@@ -1,7 +1,12 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Ledger;
+
 report 5938 "Service Profit (Service Items)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceProfitServiceItems.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceProfitServiceItems.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Profit (Service Items)';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5938 "Service Profit (Service Items)"
     {
         dataitem("Service Item"; "Service Item")
         {
-            DataItemTableView = SORTING("Item No.", "Serial No.");
+            DataItemTableView = sorting("Item No.", "Serial No.");
             RequestFilterFields = "Item No.", "Variant Code", "No.", "Date Filter";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

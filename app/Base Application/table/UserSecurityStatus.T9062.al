@@ -1,3 +1,11 @@
+﻿namespace System.Security.User;
+
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using System.Azure.Identity;
+using System.Environment;
+using System.Security.AccessControl;
+
 table 9062 "User Security Status"
 {
     Caption = 'User Security Status';
@@ -14,13 +22,13 @@ table 9062 "User Security Status"
         }
         field(2; "User Name"; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("User Security ID")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("User Security ID")));
             Caption = 'User Name';
             FieldClass = FlowField;
         }
         field(3; "Full Name"; Text[80])
         {
-            CalcFormula = Lookup(User."Full Name" WHERE("User Security ID" = FIELD("User Security ID")));
+            CalcFormula = Lookup(User."Full Name" where("User Security ID" = field("User Security ID")));
             Caption = 'Full Name';
             FieldClass = FlowField;
         }
@@ -30,7 +38,7 @@ table 9062 "User Security Status"
         }
         field(14; "Belongs To Subscription Plan"; Boolean)
         {
-            CalcFormula = Exist("User Plan" WHERE("User Security ID" = FIELD("User Security ID")));
+            CalcFormula = exist("User Plan" where("User Security ID" = field("User Security ID")));
             Caption = 'Belongs To Subscription Plan';
             FieldClass = FlowField;
             ObsoleteState = Removed;
@@ -39,7 +47,7 @@ table 9062 "User Security Status"
         }
         field(15; "Belongs to User Group"; Boolean)
         {
-            CalcFormula = Exist("User Group Member" WHERE("User Security ID" = FIELD("User Security ID")));
+            CalcFormula = exist("User Group Member" where("User Security ID" = field("User Security ID")));
             Caption = 'Belongs to User Group';
             FieldClass = FlowField;
             ObsoleteReason = 'User group membership cannot be calculated via a flow field in the new user group system.';
@@ -53,8 +61,8 @@ table 9062 "User Security Status"
         }
         field(20; "Users - To review"; Integer)
         {
-            CalcFormula = Count("User Security Status" WHERE(Reviewed = CONST(false),
-                                                              "User Security ID" = FILTER(<> '{00000000-0000-0000-0000-000000000000}')));
+            CalcFormula = count("User Security Status" where(Reviewed = const(false),
+                                                              "User Security ID" = filter(<> '{00000000-0000-0000-0000-000000000000}')));
             Caption = 'Users - To review';
             FieldClass = FlowField;
         }
@@ -77,19 +85,19 @@ table 9062 "User Security Status"
 #else
             ObsoleteState = Pending;
             ObsoleteTag = '22.0';
-            CalcFormula = Count("User Security Status" WHERE("Belongs to User Group" = CONST(false),
-                                                              "User Security ID" = FILTER(<> '{00000000-0000-0000-0000-000000000000}')));
+            CalcFormula = count("User Security Status" where("Belongs to User Group" = const(false),
+                                                              "User Security ID" = filter(<> '{00000000-0000-0000-0000-000000000000}')));
 #endif
         }
         field(25; "CDS Integration Errors"; Integer)
         {
-            CalcFormula = Count("Integration Synch. Job Errors");
+            CalcFormula = count("Integration Synch. Job Errors");
             Caption = 'Dataverse Integration Errors';
             FieldClass = FlowField;
         }
         field(26; "Coupled Data Synch Errors"; Integer)
         {
-            CalcFormula = Count("CRM Integration Record" WHERE(Skipped = CONST(true)));
+            CalcFormula = count("CRM Integration Record" where(Skipped = const(true)));
             Caption = 'Coupled Data Synch Errors';
             FieldClass = FlowField;
         }

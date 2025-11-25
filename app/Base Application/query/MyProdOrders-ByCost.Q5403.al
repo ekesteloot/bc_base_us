@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 query 5403 "My Prod. Orders - By Cost"
 {
     Caption = 'My Prod. Orders - By Cost';
@@ -13,7 +17,7 @@ query 5403 "My Prod. Orders - By Cost"
             dataitem(Prod_Order_Line; "Prod. Order Line")
             {
                 DataItemLink = "Item No." = My_Item."Item No.";
-                DataItemTableFilter = Status = FILTER(Planned | "Firm Planned" | Released);
+                DataItemTableFilter = Status = filter(Planned | "Firm Planned" | Released);
                 column(Item_No; "Item No.")
                 {
                 }

@@ -1,3 +1,7 @@
+namespace System.DataAdministration;
+
+using System.Threading;
+
 codeunit 3997 "Retention Policy JQ"
 {
     Access = Internal;
@@ -12,7 +16,6 @@ codeunit 3997 "Retention Policy JQ"
         SkipRescheduleOnLimitExceededLbl: Label 'Wrong session ID for job queue. Did not reschedule the job queue entry. Session ID: %1, Expected Session ID %2.', Comment = '%1, %2 = integer';
         JQNotRecheduledBecauseHandledLbl: Label 'The event was handled by another subscriber. Did not reschedule the job queue entry.';
         JQNotRecheduledBecauseUserInvokedRunLbl: Label 'The user invoked the retention policy run. Did not reschedule the job queue entry.';
-        JQNotRecheduledBecauseNotAllPoliciesRunLbl: Label 'A single retention policy was run. Did not reschedule the job queue entry.';
         JQNotRecheduledBecauseOutsideTimeWindowLbl: Label 'Event occurs outside allowed time window. Did not reschedule the job queue entry.';
 
     trigger OnRun()
@@ -43,11 +46,6 @@ codeunit 3997 "Retention Policy JQ"
 
         if UserInvokedRun then begin
             RetentionPolicyLog.LogInfo(RetentionPolicyLogCategory::"Retention Policy - Schedule", JQNotRecheduledBecauseUserInvokedRunLbl);
-            exit;
-        end;
-
-        if not ApplyAllRetentionPolicies then begin
-            RetentionPolicyLog.LogInfo(RetentionPolicyLogCategory::"Retention Policy - Schedule", JQNotRecheduledBecauseNotAllPoliciesRunLbl);
             exit;
         end;
 

@@ -20,7 +20,7 @@ page 1164 "User Task List Part"
             repeater(Control12)
             {
                 ShowCaption = false;
-                field(Title; Title)
+                field(Title; Rec.Title)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the name of the task.';
@@ -48,7 +48,7 @@ page 1164 "User Task List Part"
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies when the task must be completed.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the priority of the task compared to other tasks. Enter any number.';
@@ -109,19 +109,19 @@ page 1164 "User Task List Part"
 
     trigger OnAfterGetRecord()
     begin
-        StyleTxt := SetStyle();
+        StyleTxt := Rec.SetStyle();
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
         SetFilterBasedOnMode();
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
     begin
         SetFilterBasedOnMode();
-        exit(Next(Steps));
+        exit(Rec.Next(Steps));
     end;
 
     var

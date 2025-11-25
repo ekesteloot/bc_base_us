@@ -8,7 +8,7 @@ report 10400 "Check Translation Management"
     {
         dataitem(PageLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(TodayFormatted; Format(Today, 0, 4))
             {
             }
@@ -40,7 +40,7 @@ report 10400 "Check Translation Management"
             }
             dataitem(AmountTestLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(TestAmountText1; TestAmountText[1])
                 {
                 }
@@ -66,7 +66,7 @@ report 10400 "Check Translation Management"
             }
             dataitem(DateTestLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(TestDateIndicator; TestDateIndicator)
                 {
                 }

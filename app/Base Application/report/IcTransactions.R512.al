@@ -10,7 +10,7 @@ report 512 "IC Transactions"
     {
         dataitem(HeaderInt; "Integer")
         {
-            DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = const(1));
             column(USERID; UserId)
             {
             }
@@ -74,13 +74,13 @@ report 512 "IC Transactions"
                 }
                 dataitem("Integer"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(STRSUBSTNO___1__2__3__GLAcc_TABLECAPTION_GLAcc__No___GLAcc_Name_; StrSubstNo('%1 %2 %3', GLAcc.TableCaption(), GLAcc."No.", GLAcc.Name))
                     {
                     }
                     dataitem(Integer2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(TempGLEntry__Credit_Amount_; TempGLEntry."Credit Amount")
                         {
                         }
@@ -212,7 +212,7 @@ report 512 "IC Transactions"
             }
             dataitem(ICPartner2; "IC Partner")
             {
-                DataItemTableView = SORTING(Code) ORDER(Ascending);
+                DataItemTableView = sorting(Code) order(Ascending);
                 PrintOnlyIfDetail = true;
                 column(ICPartner2_Code; Code)
                 {
@@ -249,15 +249,15 @@ report 512 "IC Transactions"
                 }
                 dataitem(Customer; Customer)
                 {
-                    DataItemLink = "No." = FIELD("Customer No.");
-                    DataItemTableView = SORTING("No.") ORDER(Ascending);
+                    DataItemLink = "No." = field("Customer No.");
+                    DataItemTableView = sorting("No.") order(Ascending);
                     PrintOnlyIfDetail = true;
                     column(STRSUBSTNO___1__2__3___4__5___TABLECAPTION__No___Name_ICPartner2_TABLECAPTION_ICPartner2_Code_; StrSubstNo('%1 %2 %3 (%4 %5)', TableCaption(), "No.", Name, ICPartner2.TableCaption(), ICPartner2.Code))
                     {
                     }
                     dataitem(CustInt; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = const(1));
                         column(Text002; Text002Lbl)
                         {
                         }
@@ -277,8 +277,8 @@ report 512 "IC Transactions"
                     dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
                     {
                         CalcFields = Amount, "Amount (LCY)";
-                        DataItemLink = "Customer No." = FIELD("No.");
-                        DataItemTableView = SORTING("Customer No.", "Posting Date", "Currency Code") ORDER(Ascending);
+                        DataItemLink = "Customer No." = field("No.");
+                        DataItemTableView = sorting("Customer No.", "Posting Date", "Currency Code") order(Ascending);
                         column(Cust__Ledger_Entry__Amount__LCY__; "Amount (LCY)")
                         {
                         }
@@ -332,7 +332,7 @@ report 512 "IC Transactions"
             }
             dataitem(ICPartner3; "IC Partner")
             {
-                DataItemTableView = SORTING(Code) ORDER(Ascending);
+                DataItemTableView = sorting(Code) order(Ascending);
                 PrintOnlyIfDetail = true;
                 column(Vendor_Ledger_Entry_DescriptionCaption; "Vendor Ledger Entry".FieldCaption(Description))
                 {
@@ -366,8 +366,8 @@ report 512 "IC Transactions"
                 }
                 dataitem(Vendor; Vendor)
                 {
-                    DataItemLink = "No." = FIELD("Vendor No.");
-                    DataItemTableView = SORTING("No.") ORDER(Ascending);
+                    DataItemLink = "No." = field("Vendor No.");
+                    DataItemTableView = sorting("No.") order(Ascending);
                     PrintOnlyIfDetail = true;
                     column(STRSUBSTNO___1__2__3___4__5___TABLECAPTION__No___Name_ICPartner3_TABLECAPTION_ICPartner3_Code_; StrSubstNo('%1 %2 %3 (%4 %5)', TableCaption(), "No.", Name, ICPartner3.TableCaption(), ICPartner3.Code))
                     {
@@ -377,7 +377,7 @@ report 512 "IC Transactions"
                     }
                     dataitem(VendInt; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = const(1));
                         column(Text002_Control87; Text002Lbl)
                         {
                         }
@@ -397,8 +397,8 @@ report 512 "IC Transactions"
                     dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
                     {
                         CalcFields = Amount, "Amount (LCY)";
-                        DataItemLink = "Vendor No." = FIELD("No.");
-                        DataItemTableView = SORTING("Vendor No.", "Posting Date", "Currency Code") ORDER(Ascending);
+                        DataItemLink = "Vendor No." = field("No.");
+                        DataItemTableView = sorting("Vendor No.", "Posting Date", "Currency Code") order(Ascending);
                         column(Vendor_Ledger_Entry__Amount__LCY__; "Amount (LCY)")
                         {
                         }

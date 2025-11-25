@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
 page 99000809 "Production BOM Version"
 {
     Caption = 'Production BOM Version';
@@ -19,7 +21,7 @@ page 99000809 "Production BOM Version"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -53,9 +55,9 @@ page 99000809 "Production BOM Version"
             part(ProdBOMLine; "Production BOM Version Lines")
             {
                 ApplicationArea = Manufacturing;
-                SubPageLink = "Production BOM No." = FIELD("Production BOM No."),
-                              "Version Code" = FIELD("Version Code");
-                SubPageView = SORTING("Production BOM No.", "Version Code", "Line No.");
+                SubPageLink = "Production BOM No." = field("Production BOM No."),
+                              "Version Code" = field("Version Code");
+                SubPageView = sorting("Production BOM No.", "Version Code", "Line No.");
             }
         }
         area(factboxes)
@@ -93,8 +95,8 @@ page 99000809 "Production BOM Version"
                         ProdBOMHeader: Record "Production BOM Header";
                         ProdBOMWhereUsed: Page "Prod. BOM Where-Used";
                     begin
-                        ProdBOMHeader.Get("Production BOM No.");
-                        ProdBOMWhereUsed.SetProdBOM(ProdBOMHeader, "Starting Date");
+                        ProdBOMHeader.Get(Rec."Production BOM No.");
+                        ProdBOMWhereUsed.SetProdBOM(ProdBOMHeader, Rec."Starting Date");
                         ProdBOMWhereUsed.Run();
                     end;
                 }
@@ -118,8 +120,8 @@ page 99000809 "Production BOM Version"
                         if not Confirm(Text000, false) then
                             exit;
 
-                        ProdBOMHeader.Get("Production BOM No.");
-                        ProductionBOMCopy.CopyBOM("Production BOM No.", '', ProdBOMHeader, "Version Code");
+                        ProdBOMHeader.Get(Rec."Production BOM No.");
+                        ProductionBOMCopy.CopyBOM(Rec."Production BOM No.", '', ProdBOMHeader, Rec."Version Code");
                     end;
                 }
                 action("Copy BOM &Version")

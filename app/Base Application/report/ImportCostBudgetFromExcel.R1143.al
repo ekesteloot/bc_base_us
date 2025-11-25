@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using System.IO;
+
 report 1143 "Import Cost Budget from Excel"
 {
     Caption = 'Import Cost Budget from Excel';
@@ -7,7 +12,7 @@ report 1143 "Import Cost Budget from Excel"
     {
         dataitem(TempCostBudgetBuffer; "Cost Budget Buffer")
         {
-            DataItemTableView = SORTING("Cost Type No.", "Cost Center Code", "Cost Object Code", Date);
+            DataItemTableView = sorting("Cost Type No.", "Cost Center Code", "Cost Object Code", Date);
             UseTemporary = true;
 
             trigger OnAfterGetRecord()

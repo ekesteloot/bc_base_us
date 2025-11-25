@@ -1,3 +1,10 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using System.Utilities;
+
 page 99000888 "Work Center Load Lines"
 {
     Caption = 'Lines';
@@ -29,7 +36,7 @@ page 99000888 "Work Center Load Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period shown in the line.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Capacity';
@@ -47,7 +54,7 @@ page 99000888 "Work Center Load Lines"
                         PAGE.Run(0, CalendarEntry);
                     end;
                 }
-                field(AllocatedQty; "Allocated Qty.")
+                field(AllocatedQty; Rec."Allocated Qty.")
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Allocated Qty.';
@@ -66,14 +73,14 @@ page 99000888 "Work Center Load Lines"
                         PAGE.Run(0, ProdOrderCapNeed);
                     end;
                 }
-                field(CapacityAvailable; "Availability After Orders")
+                field(CapacityAvailable; Rec."Availability After Orders")
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Availability After Orders';
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the available capacity of this resource.';
                 }
-                field(CapacityEfficiency; Load)
+                field(CapacityEfficiency; Rec.Load)
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Load';
@@ -90,7 +97,7 @@ page 99000888 "Work Center Load Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcLine();
     end;
 
@@ -114,7 +121,7 @@ page 99000888 "Work Center Load Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -129,7 +136,7 @@ page 99000888 "Work Center Load Lines"
     procedure SetLines(var NewWorkCenter: Record "Work Center"; NewPeriodType: Enum "Analysis Period Type"; NewAmountType: Enum "Analysis Amount Type")
     begin
         WorkCenter.Copy(NewWorkCenter);
-        DeleteAll();
+        Rec.DeleteAll();
         PeriodType := NewPeriodType;
         AmountType := NewAmountType;
         CurrPage.Update(false);
@@ -140,22 +147,22 @@ page 99000888 "Work Center Load Lines"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            WorkCenter.SetRange("Date Filter", "Period Start", "Period End")
+            WorkCenter.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            WorkCenter.SetRange("Date Filter", 0D, "Period End");
+            WorkCenter.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     local procedure CalcLine()
     begin
         SetDateFilter();
         WorkCenter.CalcFields("Capacity (Effective)", "Prod. Order Need (Qty.)");
-        Capacity := WorkCenter."Capacity (Effective)";
-        "Allocated Qty." := WorkCenter."Prod. Order Need (Qty.)";
-        "Availability After Orders" := WorkCenter."Capacity (Effective)" - WorkCenter."Prod. Order Need (Qty.)";
+        Rec.Capacity := WorkCenter."Capacity (Effective)";
+        Rec."Allocated Qty." := WorkCenter."Prod. Order Need (Qty.)";
+        Rec."Availability After Orders" := WorkCenter."Capacity (Effective)" - WorkCenter."Prod. Order Need (Qty.)";
         if WorkCenter."Capacity (Effective)" <> 0 then
-            Load := Round(WorkCenter."Prod. Order Need (Qty.)" / WorkCenter."Capacity (Effective)" * 100, 0.1)
+            Rec.Load := Round(WorkCenter."Prod. Order Need (Qty.)" / WorkCenter."Capacity (Effective)" * 100, 0.1)
         else
-            Load := 0;
+            Rec.Load := 0;
 
         OnAfterCalcLine(WorkCenter, Rec);
     end;

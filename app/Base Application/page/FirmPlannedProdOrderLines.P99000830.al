@@ -1,3 +1,10 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 page 99000830 "Firm Planned Prod. Order Lines"
 {
     AutoSplitKey = true;
@@ -7,7 +14,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Prod. Order Line";
-    SourceTableView = WHERE(Status = CONST("Firm Planned"));
+    SourceTableView = where(Status = const("Firm Planned"));
 
     layout
     {
@@ -106,7 +113,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
 
                     trigger OnValidate()
                     begin
-                        Validate("Starting Time", StartingTime);
+                        Rec.Validate("Starting Time", StartingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -119,7 +126,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
 
                     trigger OnValidate()
                     begin
-                        Validate("Starting Date", StartingDate);
+                        Rec.Validate("Starting Date", StartingDate);
                         CurrPage.Update(true);
                     end;
                 }
@@ -142,7 +149,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
 
                     trigger OnValidate()
                     begin
-                        Validate("Ending Time", EndingTime);
+                        Rec.Validate("Ending Time", EndingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -155,7 +162,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
 
                     trigger OnValidate()
                     begin
-                        Validate("Ending Date", EndingDate);
+                        Rec.Validate("Ending Date", EndingDate);
                         CurrPage.Update(true);
                     end;
                 }
@@ -217,84 +224,84 @@ page 99000830 "Firm Planned Prod. Order Lines"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
             }
@@ -425,7 +432,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
                 action(Dimensions)
@@ -439,7 +446,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Ro&uting")
@@ -452,7 +459,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
 
                     trigger OnAction()
                     begin
-                        ShowRouting();
+                        Rec.ShowRouting();
                     end;
                 }
                 action(Components)
@@ -478,7 +485,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }
@@ -488,9 +495,9 @@ page 99000830 "Firm Planned Prod. Order Lines"
     trigger OnAfterGetRecord()
     begin
         DescriptionIndent := 0;
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
         DescriptionOnFormat();
-        GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
+        Rec.GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -519,7 +526,6 @@ page 99000830 "Firm Planned Prod. Order Lines"
 
     var
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
-        [InDataSet]
         DescriptionIndent: Integer;
         StartingTime: Time;
         EndingTime: Time;
@@ -534,9 +540,9 @@ page 99000830 "Firm Planned Prod. Order Lines"
     var
         ProdOrderComp: Record "Prod. Order Component";
     begin
-        ProdOrderComp.SetRange(Status, Status);
-        ProdOrderComp.SetRange("Prod. Order No.", "Prod. Order No.");
-        ProdOrderComp.SetRange("Prod. Order Line No.", "Line No.");
+        ProdOrderComp.SetRange(Status, Rec.Status);
+        ProdOrderComp.SetRange("Prod. Order No.", Rec."Prod. Order No.");
+        ProdOrderComp.SetRange("Prod. Order Line No.", Rec."Line No.");
 
         PAGE.Run(PAGE::"Prod. Order Components", ProdOrderComp);
     end;
@@ -552,7 +558,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
     local procedure PageShowReservation()
     begin
         CurrPage.SaveRecord();
-        ShowReservation();
+        Rec.ShowReservation();
     end;
 
     procedure UpdateForm(SetSaveRecord: Boolean)
@@ -562,7 +568,7 @@ page 99000830 "Firm Planned Prod. Order Lines"
 
     local procedure DescriptionOnFormat()
     begin
-        DescriptionIndent := "Planning Level Code";
+        DescriptionIndent := Rec."Planning Level Code";
     end;
 }
 

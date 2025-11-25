@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using System.Reflection;
+
 codeunit 9177 "Application Area Cache"
 {
     SingleInstance = true;

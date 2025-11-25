@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Journal;
+
 page 5640 "FA Reclass. Journal Batches"
 {
     Caption = 'FA Reclass. Journal Batches';
@@ -74,7 +76,7 @@ page 5640 "FA Reclass. Journal Batches"
 
     trigger OnInit()
     begin
-        SetRange("Journal Template Name");
+        Rec.SetRange("Journal Template Name");
     end;
 
     trigger OnOpenPage()
@@ -90,9 +92,9 @@ page 5640 "FA Reclass. Journal Batches"
         ReclassJnlTempl: Record "FA Reclass. Journal Template";
     begin
         if not CurrPage.LookupMode then
-            if GetFilter("Journal Template Name") <> '' then
-                if GetRangeMin("Journal Template Name") = GetRangeMax("Journal Template Name") then
-                    if ReclassJnlTempl.Get(GetRangeMin("Journal Template Name")) then
+            if Rec.GetFilter("Journal Template Name") <> '' then
+                if Rec.GetRangeMin("Journal Template Name") = Rec.GetRangeMax("Journal Template Name") then
+                    if ReclassJnlTempl.Get(Rec.GetRangeMin("Journal Template Name")) then
                         exit(ReclassJnlTempl.Name + ' ' + ReclassJnlTempl.Description);
     end;
 }

@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Document;
+
 page 175 "Standard Purchase Code Card"
 {
     Caption = 'Standard Purchase Code Card';
@@ -11,7 +13,7 @@ page 175 "Standard Purchase Code Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a code which identifies this standard purchase code.';
@@ -30,7 +32,7 @@ page 175 "Standard Purchase Code Card"
             part(StdPurchaseLines; "Standard Purchase Code Subform")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Standard Purchase Code" = FIELD(Code);
+                SubPageLink = "Standard Purchase Code" = field(Code);
             }
         }
         area(factboxes)

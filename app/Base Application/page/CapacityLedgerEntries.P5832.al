@@ -1,3 +1,12 @@
+﻿namespace Microsoft.Manufacturing.Capacity;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Shared.Navigate;
+
 page 5832 "Capacity Ledger Entries"
 {
     ApplicationArea = Assembly, Manufacturing;
@@ -6,8 +15,8 @@ page 5832 "Capacity Ledger Entries"
     Editable = false;
     PageType = List;
     SourceTable = "Capacity Ledger Entry";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Entry No.")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -285,7 +294,7 @@ page 5832 "Capacity Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -298,7 +307,7 @@ page 5832 "Capacity Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
                 action("&Value Entries")
@@ -307,8 +316,8 @@ page 5832 "Capacity Ledger Entries"
                     Caption = '&Value Entries';
                     Image = ValueLedger;
                     RunObject = Page "Value Entries";
-                    RunPageLink = "Capacity Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Capacity Ledger Entry No.", "Entry Type");
+                    RunPageLink = "Capacity Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Capacity Ledger Entry No.", "Entry Type");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of posted amounts that affect the value of the item. Value entries are created for every transaction with the item.';
                 }
@@ -328,10 +337,10 @@ page 5832 "Capacity Ledger Entries"
                 var
                     Navigate: Page Navigate;
                 begin
-                    if "Order Type" = "Order Type"::Production then
-                        Navigate.SetDoc("Posting Date", "Order No.")
+                    if Rec."Order Type" = Rec."Order Type"::Production then
+                        Navigate.SetDoc(Rec."Posting Date", Rec."Order No.")
                     else
-                        Navigate.SetDoc("Posting Date", '');
+                        Navigate.SetDoc(Rec."Posting Date", '');
                     Navigate.Run();
                 end;
             }
@@ -403,26 +412,26 @@ page 5832 "Capacity Ledger Entries"
         Description := '';
 
         case true of
-            GetFilter("Work Center No.") <> '':
+            Rec.GetFilter("Work Center No.") <> '':
                 begin
                     SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 99000754);
-                    SourceFilter := GetFilter("Work Center No.");
+                    SourceFilter := Rec.GetFilter("Work Center No.");
                     if MaxStrLen(WorkCenter."No.") >= StrLen(SourceFilter) then
                         if WorkCenter.Get(SourceFilter) then
                             Description := WorkCenter.Name;
                 end;
-            (GetFilter("No.") <> '') and (GetFilter(Type) = Text000):
+            (Rec.GetFilter("No.") <> '') and (Rec.GetFilter(Type) = Text000):
                 begin
                     SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 99000758);
-                    SourceFilter := GetFilter("No.");
+                    SourceFilter := Rec.GetFilter("No.");
                     if MaxStrLen(MachineCenter."No.") >= StrLen(SourceFilter) then
                         if MachineCenter.Get(SourceFilter) then
                             Description := MachineCenter.Name;
                 end;
-            (GetFilter("Order No.") <> '') and ("Order Type" = "Order Type"::Production):
+            (Rec.GetFilter("Order No.") <> '') and (Rec."Order Type" = Rec."Order Type"::Production):
                 begin
                     SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 5405);
-                    SourceFilter := GetFilter("Order No.");
+                    SourceFilter := Rec.GetFilter("Order No.");
                     if MaxStrLen(ProdOrder."No.") >= StrLen(SourceFilter) then
                         if ProdOrder.Get(ProdOrder.Status::Released, SourceFilter) or
                            ProdOrder.Get(ProdOrder.Status::Finished, SourceFilter)

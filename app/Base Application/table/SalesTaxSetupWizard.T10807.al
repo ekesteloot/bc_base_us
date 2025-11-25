@@ -11,9 +11,9 @@ table 10807 "Sales Tax Setup Wizard"
         field(2; "Tax Account (Sales)"; Code[20])
         {
             Caption = 'Tax Account (Sales)';
-            TableRelation = "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                 "Income/Balance" = CONST("Balance Sheet"),
-                                                 Blocked = CONST(false));
+            TableRelation = "G/L Account" where("Account Type" = const(Posting),
+                                                 "Income/Balance" = const("Balance Sheet"),
+                                                 Blocked = const(false));
 
             trigger OnValidate()
             begin
@@ -24,8 +24,8 @@ table 10807 "Sales Tax Setup Wizard"
         field(3; "Tax Account (Purchases)"; Code[20])
         {
             Caption = 'Tax Account (Purchases)';
-            TableRelation = "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                 Blocked = CONST(false));
+            TableRelation = "G/L Account" where("Account Type" = const(Posting),
+                                                 Blocked = const(false));
 
             trigger OnValidate()
             begin

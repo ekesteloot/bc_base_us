@@ -10,7 +10,7 @@ report 10094 "Outstanding Order Stat. by PO"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Order Date";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -111,8 +111,8 @@ report 10094 "Outstanding Order Stat. by PO"
             }
             dataitem("Purchase Line"; "Purchase Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE("Document Type" = CONST(Order), "Outstanding Quantity" = FILTER(<> 0));
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where("Document Type" = const(Order), "Outstanding Quantity" = filter(<> 0));
                 RequestFilterFields = "Expected Receipt Date";
                 column(OutstandExclInvDisc; OutstandExclInvDisc)
                 {

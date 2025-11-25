@@ -1,4 +1,6 @@
 #if not CLEAN21
+namespace System.Security.AccessControl;
+
 xmlport 9173 "Export Permission Sets"
 {
     Caption = 'Export Permission Sets';
@@ -39,11 +41,11 @@ xmlport 9173 "Export Permission Sets"
                 }
                 tableelement(Permission; Permission)
                 {
-                    LinkFields = "Role ID" = FIELD("Role ID");
+                    LinkFields = "Role ID" = field("Role ID");
                     LinkTable = "Aggregate Permission Set";
                     MinOccurs = Zero;
                     XmlName = 'Permission';
-                    SourceTableView = SORTING("Role ID", "Object Type", "Object ID");
+                    SourceTableView = sorting("Role ID", "Object Type", "Object ID");
                     fieldelement(ObjectType; Permission."Object Type")
                     {
                     }
@@ -119,11 +121,11 @@ xmlport 9173 "Export Permission Sets"
                 }
                 tableelement("Expanded Permission"; "Expanded Permission")
                 {
-                    LinkFields = "App ID" = FIELD("App ID"), "Role ID" = FIELD("Role ID"), Scope = FIELD(Scope);
+                    LinkFields = "App ID" = field("App ID"), "Role ID" = field("Role ID"), Scope = field(Scope);
                     LinkTable = "Aggregate Permission Set";
                     MinOccurs = Zero;
                     XmlName = 'TenantPermission';
-                    SourceTableView = SORTING("App ID", "Role ID", "Object Type", "Object ID");
+                    SourceTableView = sorting("App ID", "Role ID", "Object Type", "Object ID");
                     fieldelement(ObjectType; "Expanded Permission"."Object Type")
                     {
                     }

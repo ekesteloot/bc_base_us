@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1237 "Transformation Rules"
 {
     ApplicationArea = Basic, Suite;
@@ -16,7 +18,7 @@ page 1237 "Transformation Rules"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies rules for how text that was imported from an external file is transformed to a supported value that can be mapped to the specified field in Dynamics 365.';
@@ -46,7 +48,7 @@ page 1237 "Transformation Rules"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies rules for how text that was imported from an external file is transformed to a supported value that can be mapped to the specified field in Business Central.';
                 }
-                field(Length; Length)
+                field(Length; Rec.Length)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies rules for how text that was imported from an external file is transformed to a supported value that can be mapped to the specified field in Business Central.';
@@ -71,9 +73,9 @@ page 1237 "Transformation Rules"
 
     trigger OnOpenPage()
     begin
-        if IsEmpty() then
-            CreateDefaultTransformations();
-        OnCreateTransformationRules();
+        if Rec.IsEmpty() then
+            Rec.CreateDefaultTransformations();
+        Rec.OnCreateTransformationRules();
     end;
 }
 

@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Security.User;
+
 page 9103 "Pending Approval FactBox"
 {
     Caption = 'Pending Approval';
@@ -17,7 +21,7 @@ page 9103 "Pending Approval FactBox"
                 var
                     UserMgt: Codeunit "User Management";
                 begin
-                    UserMgt.DisplayUserInformation("Sender ID");
+                    UserMgt.DisplayUserInformation(Rec."Sender ID");
                 end;
             }
             field("Due Date"; Rec."Due Date")
@@ -36,7 +40,7 @@ page 9103 "Pending Approval FactBox"
                     ApprovalComments: Page "Approval Comments";
                 begin
                     ApprovalComments.SetTableView(ApprovalCommentLine);
-                    ApprovalComments.SetWorkflowStepInstanceID("Workflow Step Instance ID");
+                    ApprovalComments.SetWorkflowStepInstanceID(Rec."Workflow Step Instance ID");
                     ApprovalComments.RunModal();
                     CurrPage.Update();
                 end;
@@ -50,8 +54,8 @@ page 9103 "Pending Approval FactBox"
 
     trigger OnAfterGetRecord()
     begin
-        ApprovalCommentLine.SetRange("Table ID", "Table ID");
-        ApprovalCommentLine.SetRange("Record ID to Approve", "Record ID to Approve");
+        ApprovalCommentLine.SetRange("Table ID", Rec."Table ID");
+        ApprovalCommentLine.SetRange("Record ID to Approve", Rec."Record ID to Approve");
         if ApprovalCommentLine.FindLast() then;
     end;
 

@@ -1,8 +1,17 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Calculation;
+
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+
 table 7007 "Price Calculation Buffer"
 {
-    #pragma warning disable AS0034
+#pragma warning disable AS0034
     TableType = Temporary;
-    #pragma warning restore AS0034
+#pragma warning restore AS0034
 
     fields
     {

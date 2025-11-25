@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+
+using Microsoft.FinancialMgt.VAT;
+
 page 1570 "Extended G/L Posting Preview"
 {
     PageType = Card;

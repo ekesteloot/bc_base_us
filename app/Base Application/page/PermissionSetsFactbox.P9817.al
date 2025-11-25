@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 page 9817 "Permission Sets FactBox"
 {
     Caption = 'Permission Sets';
@@ -64,6 +66,5 @@ page 9817 "Permission Sets FactBox"
 
     var
         User: Record User;
-        [InDataSet]
         PermissionSetNotFound: Boolean;
 }

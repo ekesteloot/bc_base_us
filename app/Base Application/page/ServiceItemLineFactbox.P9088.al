@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ServiceMgt.Item;
+
 page 9088 "Service Item Line FactBox"
 {
     Caption = 'Service Item Line Details';
@@ -72,7 +76,7 @@ page 9088 "Service Item Line FactBox"
     var
         ServiceItem: Record "Service Item";
     begin
-        if ServiceItem.Get("Service Item No.") then
+        if ServiceItem.Get(Rec."Service Item No.") then
             PAGE.Run(PAGE::"Service Item Card", ServiceItem);
     end;
 }

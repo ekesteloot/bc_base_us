@@ -1,9 +1,21 @@
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 1309 "Standard Sales - Return Rcpt."
 {
-    RDLCLayout = './SalesReceivables/Document/StandardSalesReturnRcpt.rdlc';
-    WordLayout = './StandardSalesReturnRcpt.docx';
     Caption = 'Return Receipt';
-    DefaultLayout = Word;
+    DefaultRenderingLayout = "StandardSalesReturnRcpt.docx";
     EnableHyperlinks = true;
     PreviewMode = PrintLayout;
     WordMergeDataItem = Header;
@@ -12,7 +24,7 @@ report 1309 "Standard Sales - Return Rcpt."
     {
         dataitem(Header; "Return Receipt Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Return Receipt';
             column(CompanyAddress1; CompanyAddr[1])
@@ -111,19 +123,19 @@ report 1309 "Standard Sales - Return Rcpt."
             column(CompanyVATRegistrationNo_Lbl; CompanyInfo.GetVATRegistrationNumberLbl())
             {
             }
-            column(CompanyLegalOffice; CompanyInfo.GetLegalOffice())
+            column(CompanyLegalOffice; LegalOfficeTxt)
             {
             }
-            column(CompanyLegalOffice_Lbl; CompanyInfo.GetLegalOfficeLbl())
+            column(CompanyLegalOffice_Lbl; LegalOfficeLbl)
             {
             }
-            column(CompanyCustomGiro; CompanyInfo.GetCustomGiro())
+            column(CompanyCustomGiro; CustomGiroTxt)
             {
             }
-            column(CompanyCustomGiro_Lbl; CompanyInfo.GetCustomGiroLbl())
+            column(CompanyCustomGiro_Lbl; CustomGiroLbl)
             {
             }
-            column(CompanyLegalStatement; GetLegalStatement())
+            column(CompanyLegalStatement; LegalStatementLbl)
             {
             }
             column(BilltoAddressCaption; BilltoAddressCaptionLbl)
@@ -374,9 +386,9 @@ report 1309 "Standard Sales - Return Rcpt."
             }
             dataitem(Line; "Return Receipt Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
+                DataItemLink = "Document No." = field("No.");
                 DataItemLinkReference = Header;
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 column(LineNo_Line; "Line No.")
                 {
                 }
@@ -459,7 +471,7 @@ report 1309 "Standard Sales - Return Rcpt."
             }
             dataitem(LeftHeader; "Name/Value Buffer")
             {
-                DataItemTableView = SORTING(ID);
+                DataItemTableView = sorting(ID);
                 UseTemporary = true;
                 column(LeftHeaderName; Name)
                 {
@@ -470,7 +482,7 @@ report 1309 "Standard Sales - Return Rcpt."
             }
             dataitem(RightHeader; "Name/Value Buffer")
             {
-                DataItemTableView = SORTING(ID);
+                DataItemTableView = sorting(ID);
                 UseTemporary = true;
                 column(RightHeaderName; Name)
                 {
@@ -481,7 +493,7 @@ report 1309 "Standard Sales - Return Rcpt."
             }
             dataitem(LetterText; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(GreetingText; GreetingLbl)
                 {
                 }
@@ -496,6 +508,7 @@ report 1309 "Standard Sales - Return Rcpt."
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 if not IsReportInPreviewMode() then
@@ -568,16 +581,58 @@ report 1309 "Standard Sales - Return Rcpt."
         end;
     }
 
+    rendering
+    {
+        layout("StandardSalesReturnRcpt.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/History/StandardSalesReturnRcpt.rdlc';
+            Caption = 'Standard Sales Return Receipt (RDLC)';
+            Summary = 'The Standard Sales Return Receipt (RDLC) provides a detailed layout.';
+        }
+        layout("StandardSalesReturnRcpt.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesReturnRcpt.docx';
+            Caption = 'Standard Sales Return Receipt (Word)';
+            Summary = 'The Standard Sales Return Receipt (Word) provides a basic layout.';
+        }
+        layout("StandardSalesReturnRcptBlue.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesReturnRcptBlue.docx';
+            Caption = 'Standard Sales Return Receipt - Blue (Word)';
+            Summary = 'The Standard Sales Return Receipt - Blue (Word) provides a simple layout with a blue theme.';
+        }
+    }
+
     labels
     {
     }
 
     trigger OnInitReport()
+    var
+        ReturnReceiptHeader: Record "Return Receipt Header";
+        IsHandled: Boolean;
     begin
         GLSetup.Get();
         CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
         SalesSetup.Get();
+
+        if ReturnReceiptHeader.GetLegalStatement() <> '' then
+            LegalStatementLbl := ReturnReceiptHeader.GetLegalStatement();
+
+        IsHandled := false;
+        OnInitReportForGlobalVariable(IsHandled, LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl, LegalStatementLbl);
+#if not CLEAN23
+        if not IsHandled then begin
+            LegalOfficeTxt := CompanyInfo.GetLegalOffice();
+            LegalOfficeLbl := CompanyInfo.GetLegalOfficeLbl();
+            CustomGiroTxt := CompanyInfo.GetCustomGiro();
+            CustomGiroLbl := CompanyInfo.GetCustomGiroLbl();
+        end;
+#endif
     end;
 
     trigger OnPostReport()
@@ -611,7 +666,6 @@ report 1309 "Standard Sales - Return Rcpt."
         GLSetup: Record "General Ledger Setup";
         ShipmentMethod: Record "Shipment Method";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        CompanyInfo: Record "Company Information";
         DummyCompanyInfo: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         Cust: Record Customer;
@@ -630,7 +684,6 @@ report 1309 "Standard Sales - Return Rcpt."
         MoreLines: Boolean;
         ShowCustAddr: Boolean;
         LogInteraction: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         ShowCorrectionLines: Boolean;
         CompanyLogoPosition: Integer;
@@ -669,10 +722,14 @@ report 1309 "Standard Sales - Return Rcpt."
         BillToContactMobilePhoneNoLbl: Label 'Bill-to Contact Mobile Phone No.';
         BillToContactEmailLbl: Label 'Bill-to Contact E-Mail';
         BilltoAddressCaptionLbl: Label 'Bill-to Address';
+        LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl, LegalStatementLbl : Text;
+
+    protected var
+        CompanyInfo: Record "Company Information";
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Inv.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Inv.") <> '';
     end;
 
     local procedure DocumentCaption(): Text
@@ -691,11 +748,11 @@ report 1309 "Standard Sales - Return Rcpt."
         ShowCorrectionLines := NewShowCorrectionLines;
     end;
 
-    local procedure IsReportInPreviewMode(): Boolean
+    protected procedure IsReportInPreviewMode(): Boolean
     var
         MailManagement: Codeunit "Mail Management";
     begin
-        exit(CurrReport.Preview or MailManagement.IsHandlingGetEmailBody());
+        exit(CurrReport.Preview() or MailManagement.IsHandlingGetEmailBody());
     end;
 
     local procedure FillLeftHeader()
@@ -771,6 +828,11 @@ report 1309 "Standard Sales - Return Rcpt."
 
     [IntegrationEvent(TRUE, FALSE)]
     local procedure OnAfterGetSalesHeader(ReturnReceiptHeader: Record "Return Receipt Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitReportForGlobalVariable(var IsHandled: Boolean; var LegalOfficeTxt: Text; var LegalOfficeLbl: Text; var CustomGiroTxt: Text; var CustomGiroLbl: Text; var LegalStatementLbl: Text)
     begin
     end;
 

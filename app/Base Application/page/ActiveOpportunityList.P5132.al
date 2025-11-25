@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Task;
+using Microsoft.Sales.Document;
+
 page 5132 "Active Opportunity List"
 {
     Caption = 'Active Opportunity List';
@@ -18,7 +25,7 @@ page 5132 "Active Opportunity List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies that the opportunity is closed.';
@@ -140,7 +147,7 @@ page 5132 "Active Opportunity List"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Opportunity Card";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the active opportunity.';
                 }
@@ -150,7 +157,7 @@ page 5132 "Active Opportunity List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Opportunity Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -160,8 +167,8 @@ page 5132 "Active Opportunity List"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Opportunity No." = FIELD("No.");
-                    RunPageView = SORTING("Opportunity No.", Date);
+                    RunPageLink = "Opportunity No." = field("No.");
+                    RunPageView = sorting("Opportunity No.", Date);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
@@ -171,8 +178,8 @@ page 5132 "Active Opportunity List"
                     Caption = 'Postponed &Interactions';
                     Image = PostponedInteractions;
                     RunObject = Page "Postponed Interactions";
-                    RunPageLink = "Opportunity No." = FIELD("No.");
-                    RunPageView = SORTING("Opportunity No.", Date);
+                    RunPageLink = "Opportunity No." = field("No.");
+                    RunPageView = sorting("Opportunity No.", Date);
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
                 action("T&asks")
@@ -181,9 +188,9 @@ page 5132 "Active Opportunity List"
                     Caption = 'T&asks';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    RunPageLink = "Opportunity No." = FIELD("No."),
-                                  "System To-do Type" = FILTER(Organizer);
-                    RunPageView = SORTING("Opportunity No.");
+                    RunPageLink = "Opportunity No." = field("No."),
+                                  "System To-do Type" = filter(Organizer);
+                    RunPageView = sorting("Opportunity No.");
                     ToolTip = 'View all marketing tasks that involve the opportunity.';
                 }
                 action("Co&mments")
@@ -192,8 +199,8 @@ page 5132 "Active Opportunity List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Rlshp. Mgt. Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Opportunity),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Opportunity),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -213,7 +220,7 @@ page 5132 "Active Opportunity List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CalcFields("Contact Name", "Contact Company Name");
+        Rec.CalcFields("Contact Name", "Contact Company Name");
     end;
 }
 

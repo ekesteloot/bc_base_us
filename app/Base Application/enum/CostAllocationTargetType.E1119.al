@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Allocation;
+
 enum 1119 "Cost Allocation Target Type"
 {
     Extensible = true;

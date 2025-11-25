@@ -11,7 +11,7 @@ page 7600 "Base Calendar Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Code';
@@ -27,7 +27,7 @@ page 7600 "Base Calendar Card"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the name of the base calendar in the entry.';
                 }
-                field("Customized Changes Exist"; format("Customized Changes Exist"))
+                field("Customized Changes Exist"; format(Rec."Customized Changes Exist"))
                 {
                     ApplicationArea = Suite;
                     Caption = 'Customized Changes Exist';
@@ -74,7 +74,7 @@ page 7600 "Base Calendar Card"
                         CalendarMgt: Codeunit "Calendar Management";
                         WhereUsedList: Page "Where-Used Base Calendar";
                     begin
-                        CalendarMgt.CreateWhereUsedEntries(Code);
+                        CalendarMgt.CreateWhereUsedEntries(Rec.Code);
                         WhereUsedList.RunModal();
                         Clear(WhereUsedList);
                     end;
@@ -93,7 +93,7 @@ page 7600 "Base Calendar Card"
                     Caption = '&Maintain Base Calendar Changes';
                     Image = Edit;
                     RunObject = Page "Base Calendar Changes";
-                    RunPageLink = "Base Calendar Code" = FIELD(Code);
+                    RunPageLink = "Base Calendar Code" = field(Code);
                     ToolTip = 'View or edit a base calendar. You would typically enter any nonworking days that you want to apply to a base calendar that you are setting up, to change their status from working to nonworking. You can also use this window to edit a base calendar that has already been set up.';
                 }
             }
@@ -102,7 +102,7 @@ page 7600 "Base Calendar Card"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Customized Changes Exist");
+        Rec.CalcFields("Customized Changes Exist");
         CurrPage.BaseCalendarEntries.PAGE.SetCalendarSource(Rec);
     end;
 }

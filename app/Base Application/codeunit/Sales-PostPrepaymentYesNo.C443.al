@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Utilities;
+
 codeunit 443 "Sales-Post Prepayment (Yes/No)"
 {
     EventSubscriberInstance = Manual;

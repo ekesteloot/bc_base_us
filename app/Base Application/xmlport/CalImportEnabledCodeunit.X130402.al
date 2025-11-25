@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 xmlport 130402 "CAL Import Enabled Codeunit"
 {
     Caption = 'CAL Import Enabled Codeunit';

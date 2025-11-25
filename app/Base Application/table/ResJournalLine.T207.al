@@ -1,3 +1,24 @@
+﻿namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+#if not CLEAN21
+using Microsoft.ProjectMgt.Resources.Pricing;
+#endif
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using System.Utilities;
+
 table 207 "Res. Journal Line"
 {
     Caption = 'Res. Journal Line';
@@ -124,7 +145,7 @@ table 207 "Res. Journal Line"
         field(11; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("Resource No."));
+            TableRelation = "Resource Unit of Measure".Code where("Resource No." = field("Resource No."));
 
             trigger OnValidate()
             var
@@ -213,24 +234,24 @@ table 207 "Res. Journal Line"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(19; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(21; "Source Code"; Code[10])
@@ -242,7 +263,7 @@ table 207 "Res. Journal Line"
         field(23; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Res. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Res. Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
         }
         field(24; "Reason Code"; Code[10])
         {
@@ -294,7 +315,7 @@ table 207 "Res. Journal Line"
         field(34; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer."No.";
+            TableRelation = if ("Source Type" = const(Customer)) Customer."No.";
         }
         field(35; "Qty. per Unit of Measure"; Decimal)
         {
@@ -323,7 +344,7 @@ table 207 "Res. Journal Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -339,13 +360,13 @@ table 207 "Res. Journal Line"
         field(951; "Time Sheet Line No."; Integer)
         {
             Caption = 'Time Sheet Line No.';
-            TableRelation = "Time Sheet Line"."Line No." WHERE("Time Sheet No." = FIELD("Time Sheet No."));
+            TableRelation = "Time Sheet Line"."Line No." where("Time Sheet No." = field("Time Sheet No."));
         }
         field(952; "Time Sheet Date"; Date)
         {
             Caption = 'Time Sheet Date';
-            TableRelation = "Time Sheet Detail".Date WHERE("Time Sheet No." = FIELD("Time Sheet No."),
-                                                            "Time Sheet Line No." = FIELD("Time Sheet Line No."));
+            TableRelation = "Time Sheet Detail".Date where("Time Sheet No." = field("Time Sheet No."),
+                                                            "Time Sheet Line No." = field("Time Sheet Line No."));
         }
         field(959; "System-Created Entry"; Boolean)
         {
@@ -372,8 +393,8 @@ table 207 "Res. Journal Line"
         ResJnlTemplate.Get("Journal Template Name");
         ResJnlBatch.Get("Journal Template Name", "Journal Batch Name");
 
-        ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
-        ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+        Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+        Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
     end;
 
     var
@@ -476,45 +497,14 @@ table 207 "Res. Journal Line"
         OnAfterSetUpNewLine(Rec, LastResJnlLine);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        TableID[1] := Type1;
-        No[1] := No1;
-        TableID[2] := Type2;
-        No[2] := No2;
-        TableID[3] := Type3;
-        No[3] := No3;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, TableID, No, "Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-
-        OnAfterCreateDim(Rec, CurrFieldNo, TableID, No);
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, "Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
 
-#if not CLEAN20
-        RunEventOnAfterCreateDim(DefaultDimSource);
-#endif
         OnAfterCreateDimProcedure(Rec, CurrFieldNo, DefaultDimSource);
     end;
 
@@ -535,7 +525,7 @@ table 207 "Res. Journal Line"
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure CopyDocumentFields(DocNo: Code[20]; ExtDocNo: Text[35]; SourceCode: Code[10]; NoSeriesCode: Code[20])
@@ -791,45 +781,6 @@ table 207 "Res. Journal Line"
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Res. Journal Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Res. Journal Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Res. Journal Line") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDim(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDim(Rec, CurrFieldNo, TableID, No);
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var ResJournalLine: Record "Res. Journal Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
@@ -882,20 +833,6 @@ table 207 "Res. Journal Line"
     local procedure OnAfterCopyResJnlLineFromJobJnlLine(var ResJnlLine: Record "Res. Journal Line"; var JobJnlLine: Record "Job Journal Line")
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var ResJournalLine: Record "Res. Journal Line"; var FieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var ResJournalLine: Record "Res. Journal Line"; var FieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetUpNewLine(var ResJournalLine: Record "Res. Journal Line"; LastResJournalLine: Record "Res. Journal Line")

@@ -1,3 +1,18 @@
+namespace Microsoft.WarehouseMgt.Tracking;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Worksheet;
+
 table 6550 "Whse. Item Tracking Line"
 {
     Caption = 'Whse. Item Tracking Line';
@@ -183,32 +198,32 @@ table 6550 "Whse. Item Tracking Line"
         }
         field(92; "Put-away Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding (Base)" WHERE("Activity Type" = FILTER("Put-away"),
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding (Base)" where("Activity Type" = filter("Put-away"),
 #pragma warning disable AL0603
-                                                                                         "Whse. Document Type" = FIELD("Source Type Filter"),
+                                                                                         "Whse. Document Type" = field("Source Type Filter"),
 #pragma warning restore AL0603
-                                                                                         "Whse. Document No." = FIELD("Source ID"),
-                                                                                         "Whse. Document Line No." = FIELD("Source Ref. No."),
-                                                                                         "Serial No." = FIELD("Serial No."),
-                                                                                         "Lot No." = FIELD("Lot No."),
-                                                                                         "Package No." = FIELD("Package No."),
-                                                                                         "Action Type" = FILTER(" " | Take)));
+                                                                                         "Whse. Document No." = field("Source ID"),
+                                                                                         "Whse. Document Line No." = field("Source Ref. No."),
+                                                                                         "Serial No." = field("Serial No."),
+                                                                                         "Lot No." = field("Lot No."),
+                                                                                         "Package No." = field("Package No."),
+                                                                                         "Action Type" = filter(" " | Take)));
             Caption = 'Put-away Qty. (Base)';
             DecimalPlaces = 0 : 5;
             FieldClass = FlowField;
         }
         field(93; "Pick Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding (Base)" WHERE("Activity Type" = FILTER(Pick | Movement),
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding (Base)" where("Activity Type" = filter(Pick | Movement),
 #pragma warning disable AL0603
-                                                                                         "Whse. Document Type" = FIELD("Source Type Filter"),
+                                                                                         "Whse. Document Type" = field("Source Type Filter"),
 #pragma warning restore AL0603
-                                                                                         "Whse. Document No." = FIELD("Source ID"),
-                                                                                         "Whse. Document Line No." = FIELD("Source Ref. No."),
-                                                                                         "Serial No." = FIELD("Serial No."),
-                                                                                         "Lot No." = FIELD("Lot No."),
-                                                                                         "Package No." = FIELD("Package No."),
-                                                                                         "Action Type" = FILTER(" " | Place)));
+                                                                                         "Whse. Document No." = field("Source ID"),
+                                                                                         "Whse. Document Line No." = field("Source Ref. No."),
+                                                                                         "Serial No." = field("Serial No."),
+                                                                                         "Lot No." = field("Lot No."),
+                                                                                         "Package No." = field("Package No."),
+                                                                                         "Action Type" = filter(" " | Place)));
             Caption = 'Pick Qty. (Base)';
             DecimalPlaces = 0 : 5;
             FieldClass = FlowField;
@@ -234,7 +249,7 @@ table 6550 "Whse. Item Tracking Line"
         field(5401; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(6505; "New Expiration Date"; Date)
         {
@@ -376,7 +391,7 @@ table 6550 "Whse. Item Tracking Line"
     var
         WarehouseJournalLine: Record "Warehouse Journal Line";
     begin
-        if SourceType = DATABASE::"Warehouse Journal Line" then
+        if SourceType = Enum::TableID::"Warehouse Journal Line".AsInteger() then
             exit(WarehouseJournalLine.IsReclass(SourceBatchName));
 
         exit(false);
@@ -399,27 +414,27 @@ table 6550 "Whse. Item Tracking Line"
             exit;
 
         case WhseItemTrackingLine."Source Type" of
-            DATABASE::"Warehouse Journal Line":
+            Enum::TableID::"Warehouse Journal Line":
                 begin
                     WarehouseJournalLine.Get(
                         WhseItemTrackingLine."Source Batch Name", WhseItemTrackingLine."Source ID",
                         WhseItemTrackingLine."Location Code", WhseItemTrackingLine."Source Ref. No.");
                     BinCode := WarehouseJournalLine."Bin Code";
                 end;
-            DATABASE::"Whse. Worksheet Line":
+            Enum::TableID::"Whse. Worksheet Line":
                 begin
                     WhseWorksheetLine.Get(
                         WhseItemTrackingLine."Source Batch Name", WhseItemTrackingLine."Source ID",
                         WhseItemTrackingLine."Location Code", WhseItemTrackingLine."Source Ref. No.");
                     BinCode := WhseWorksheetLine."From Bin Code";
                 end;
-            DATABASE::"Whse. Internal Put-away Line":
+            Enum::TableID::"Whse. Internal Put-away Line":
                 begin
                     WhseInternalPutawayLine.Get(
                         WhseItemTrackingLine."Source ID", WhseItemTrackingLine."Source Ref. No.");
                     BinCode := WhseInternalPutawayLine."From Bin Code";
                 end;
-            DATABASE::"Internal Movement Line":
+            Enum::TableID::"Internal Movement Line":
                 begin
                     InternalMovementLine.Get(
                         WhseItemTrackingLine."Source ID", WhseItemTrackingLine."Source Ref. No.");

@@ -1,4 +1,10 @@
-﻿report 492 "Copy Purchase Document"
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Setup;
+
+report 492 "Copy Purchase Document"
 {
     Caption = 'Copy Purchase Document';
     ProcessingOnly = true;
@@ -238,7 +244,7 @@
                             if PurchHeader."Document Type" in
                                [PurchHeader."Document Type"::"Return Order", PurchHeader."Document Type"::"Credit Memo"]
                             then
-                                Message(Text000, FromDocType, "Purchase Document Type From"::"Posted Invoice", Text001);
+                                Message(Text000, FromDocType, Enum::"Purchase Document Type From"::"Posted Invoice", Text001);
                         end;
                     FromDocType::"Posted Invoice":
                         begin
@@ -254,7 +260,7 @@
                             if PurchHeader."Document Type" in
                                [PurchHeader."Document Type"::Order, PurchHeader."Document Type"::Invoice]
                             then
-                                Message(Text000, FromDocType, "Purchase Document Type From"::"Posted Credit Memo", Text002);
+                                Message(Text000, FromDocType, Enum::"Purchase Document Type From"::"Posted Credit Memo", Text002);
                         end;
                     FromDocType::"Posted Credit Memo":
                         begin
@@ -470,6 +476,16 @@
         FromDocNo := NewFromDocNo;
         IncludeHeader := NewIncludeHeader;
         RecalculateLines := NewRecalcLines;
+    end;
+
+    procedure SetParameters(NewFromDocType: Enum "Purchase Document Type From"; NewFromDocNo: Code[20]; NewIncludeHeader: Boolean; NewRecalcLines: Boolean; NewFromDocNoOccurrence: Integer; NewFromDocVersionNo: Integer)
+    begin
+        FromDocType := NewFromDocType;
+        FromDocNo := NewFromDocNo;
+        IncludeHeader := NewIncludeHeader;
+        RecalculateLines := NewRecalcLines;
+        FromDocNoOccurrence := NewFromDocNoOccurrence;
+        FromDocVersionNo := NewFromDocVersionNo;
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,3 +1,7 @@
+namespace Microsoft.Foundation.PaymentTerms;
+
+using Microsoft.Integration.Dataverse;
+
 page 4 "Payment Terms"
 {
     AdditionalSearchTerms = 'payment conditions';
@@ -14,7 +18,7 @@ page 4 "Payment Terms"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code to identify this set of payment terms.';
@@ -96,7 +100,7 @@ page 4 "Payment Terms"
                 Caption = 'T&ranslation';
                 Image = Translation;
                 RunObject = Page "Payment Term Translations";
-                RunPageLink = "Payment Term" = FIELD(Code);
+                RunPageLink = "Payment Term" = field(Code);
                 ToolTip = 'View or edit descriptions for each payment method in different languages.';
             }
             group(ActionGroupCRM)

@@ -9,7 +9,7 @@ report 10476 "Elec. Sales Credit Memo MX"
     {
         dataitem("Sales Cr.Memo Header"; "Sales Cr.Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.", "Ship-to Code", "No. Printed";
             RequestFilterHeading = 'Sales Credit Memo';
@@ -21,12 +21,12 @@ report 10476 "Elec. Sales Credit Memo MX"
             }
             dataitem("Sales Cr.Memo Line"; "Sales Cr.Memo Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 dataitem(SalesLineComments; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Posted Credit Memo"), "Print On Credit Memo" = CONST(true));
+                    DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Posted Credit Memo"), "Print On Credit Memo" = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -68,8 +68,8 @@ report 10476 "Elec. Sales Credit Memo MX"
             }
             dataitem("Sales Comment Line"; "Sales Comment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Posted Credit Memo"), "Print On Credit Memo" = CONST(true), "Document Line No." = CONST(0));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Posted Credit Memo"), "Print On Credit Memo" = const(true), "Document Line No." = const(0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -108,10 +108,10 @@ report 10476 "Elec. Sales Credit Memo MX"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInformation_Picture; CompanyInformation.Picture)
                     {
                     }
@@ -309,7 +309,7 @@ report 10476 "Elec. Sales Credit Memo MX"
                     }
                     dataitem(SalesCrMemoLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(AmountExclInvDisc; AmountExclInvDisc)
                         {
                         }
@@ -436,7 +436,7 @@ report 10476 "Elec. Sales Credit Memo MX"
                     }
                     dataitem(OriginalStringLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(OriginalStringText; OriginalStringText)
                         {
                         }
@@ -462,7 +462,7 @@ report 10476 "Elec. Sales Credit Memo MX"
                     }
                     dataitem(DigitalSignaturePACLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DigitalSignaturePACText; DigitalSignaturePACText)
                         {
                         }
@@ -488,7 +488,7 @@ report 10476 "Elec. Sales Credit Memo MX"
                     }
                     dataitem(DigitalSignatureLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DigitalSignatureText; DigitalSignatureText)
                         {
                         }
@@ -514,7 +514,7 @@ report 10476 "Elec. Sales Credit Memo MX"
                     }
                     dataitem(QRCode; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Sales_Cr_Memo_Header___QR_Code_; "Sales Cr.Memo Header"."QR Code")
                         {
                         }
@@ -567,6 +567,7 @@ report 10476 "Elec. Sales Credit Memo MX"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Salesperson Code" = '' then
                     Clear(SalesPurchPerson)
@@ -582,7 +583,7 @@ report 10476 "Elec. Sales Credit Memo MX"
                 FormatAddress.SalesCrMemoBillTo(BillToAddress, "Sales Cr.Memo Header");
                 FormatAddress.SalesCrMemoShipTo(ShipToAddress, ShipToAddress, "Sales Cr.Memo Header");
 
-                if Customer."CFDI Customer Name" <> '' then 
+                if Customer."CFDI Customer Name" <> '' then
                     BillToAddressName := Customer."CFDI Customer Name"
                 else
                     BillToAddressName := BillToAddress[1];
@@ -706,9 +707,6 @@ report 10476 "Elec. Sales Credit Memo MX"
         AmountExclInvDisc: Decimal;
         TotalAmountIncludingVAT: Decimal;
         SalesPurchPerson: Record "Salesperson/Purchaser";
-        CompanyInformation: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         TempSalesCrMemoLine: Record "Sales Cr.Memo Line" temporary;
         RespCenter: Record "Responsibility Center";
@@ -744,7 +742,6 @@ report 10476 "Elec. Sales Credit Memo MX"
         Text010: Label 'You can not sign or send or print a deleted document.';
         DigitalSignaturePACTextUnbounded: Text;
         Text011: Label '%1, %2';
-        [InDataSet]
         LogInteractionEnable: Boolean;
         CreditCaptionLbl: Label 'Credit-To:';
         Ship_DateCaptionLbl: Label 'Ship Date';
@@ -782,6 +779,11 @@ report 10476 "Elec. Sales Credit Memo MX"
         SATPaymentMethod: Text[50];
         SATPaymentTerm: Text[50];
         SATTaxRegimeClassification: Text[100];
+
+    protected var
+        CompanyInformation: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     procedure ConvertAmounttoWords(AmountLoc: Decimal)
     var

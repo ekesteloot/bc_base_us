@@ -1,3 +1,16 @@
+namespace Microsoft.Manufacturing.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+
 page 99000846 "Consumption Journal"
 {
     ApplicationArea = Manufacturing;
@@ -97,6 +110,28 @@ page 99000846 "Consumption Journal"
                         ItemNoOnAfterValidate();
                     end;
                 }
+                field("Item Reference No."; Rec."Item Reference No.")
+                {
+                    AccessByPermission = tabledata "Item Reference" = R;
+                    ApplicationArea = Manufacturing, ItemReferences;
+                    QuickEntry = false;
+                    ToolTip = 'Specifies a reference to the item number as defined by the item''s barcode.';
+                    Visible = false;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        ItemReferenceManagement: Codeunit "Item Reference Management";
+                    begin
+                        ItemReferenceManagement.ItemJournalReferenceNoLookup(Rec);
+                        ItemNoOnAfterValidate();
+                        OnReferenceNoOnAfterLookup(Rec);
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        ItemNoOnAfterValidate();
+                    end;
+                }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = Planning;
@@ -179,9 +214,9 @@ page 99000846 "Consumption Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
@@ -193,9 +228,9 @@ page 99000846 "Consumption Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
@@ -207,9 +242,9 @@ page 99000846 "Consumption Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
@@ -221,9 +256,9 @@ page 99000846 "Consumption Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
@@ -235,9 +270,9 @@ page 99000846 "Consumption Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
@@ -249,9 +284,9 @@ page 99000846 "Consumption Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
@@ -286,9 +321,9 @@ page 99000846 "Consumption Journal"
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
                 Visible = BackgroundErrorCheck;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -345,10 +380,10 @@ page 99000846 "Consumption Journal"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Bin Code", "Item No.", "Variant Code", "Unit of Measure Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Bin Code", "Item No.", "Variant Code", "Unit of Measure Code");
                     ToolTip = 'View items in the bin if the selected line contains a bin code.';
                 }
             }
@@ -362,7 +397,7 @@ page 99000846 "Consumption Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Released Production Order";
-                    RunPageLink = "No." = FIELD("Order No.");
+                    RunPageLink = "No." = field("Order No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -376,8 +411,8 @@ page 99000846 "Consumption Journal"
                         Caption = 'Item Ledger E&ntries';
                         Image = ItemLedger;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("Order No.");
                         ShortCutKey = 'Ctrl+F7';
                         ToolTip = 'View the item ledger entries of the item on the document or journal line.';
                     }
@@ -387,9 +422,9 @@ page 99000846 "Consumption Journal"
                         Caption = 'Capacity Ledger Entries';
                         Image = CapacityLedger;
                         RunObject = Page "Capacity Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("Order No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("Order No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                     }
                 }
@@ -413,7 +448,7 @@ page 99000846 "Consumption Journal"
                     var
                         CalcConsumption: Report "Calc. Consumption";
                     begin
-                        CalcConsumption.SetTemplateAndBatchName("Journal Template Name", "Journal Batch Name");
+                        CalcConsumption.SetTemplateAndBatchName(Rec."Journal Template Name", Rec."Journal Batch Name");
 
                         CalcConsumption.RunModal();
                     end;
@@ -494,14 +529,28 @@ page 99000846 "Consumption Journal"
                     ItemJnlLine: Record "Item Journal Line";
                 begin
                     ItemJnlLine.Copy(Rec);
-                    ItemJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
-                    ItemJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
-                    REPORT.RunModal(REPORT::"Inventory Movement", true, true, ItemJnlLine);
+                    ItemJnlLine.PrintInventoryMovement();
                 end;
             }
             group("Page")
             {
                 Caption = 'Page';
+                action(EditInExcel)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Edit in Excel';
+                    Image = Excel;
+                    ToolTip = 'Send the data in the journal to an Excel file for analysis or editing.';
+                    Visible = IsSaaSExcelAddinEnabled;
+                    AccessByPermission = System "Allow Action Export To Excel" = X;
+
+                    trigger OnAction()
+                    var
+                        ODataUtility: Codeunit ODataUtility;
+                    begin
+                        ODataUtility.EditJournalWorksheetInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), CurrPage.ObjectId(false), Rec."Journal Batch Name", Rec."Journal Template Name");
+                    end;
+                }
                 group(Errors)
                 {
                     Caption = 'Issues';
@@ -518,7 +567,7 @@ page 99000846 "Consumption Journal"
 
                         trigger OnAction()
                         begin
-                            SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                            Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                         end;
                     }
                     action(ShowAllLines)
@@ -532,7 +581,7 @@ page 99000846 "Consumption Journal"
 
                         trigger OnAction()
                         begin
-                            SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                            Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                         end;
                     }
 
@@ -658,10 +707,15 @@ page 99000846 "Consumption Journal"
 
     trigger OnOpenPage()
     var
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ServerSetting: Codeunit "Server Setting";
         JnlSelected: Boolean;
     begin
+        IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        // if called from API (such as edit-in-excel), do not filter 
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
         SetDimensionsVisibility();
-
         if Rec.IsOpenedFromBatch() then begin
             CurrentJnlBatchName := Rec."Journal Batch Name";
             ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
@@ -682,6 +736,7 @@ page 99000846 "Consumption Journal"
         ProdOrderDescription: Text[100];
         BackgroundErrorCheck: Boolean;
         ShowAllLinesEnabled: Boolean;
+        IsSaaSExcelAddinEnabled: Boolean;
 
     protected var
         CurrentJnlBatchName: Code[10];
@@ -708,12 +763,12 @@ page 99000846 "Consumption Journal"
         ItemJournalBatch: Record "Item Journal Batch";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
     begin
-        if not ItemJournalBatch.Get(GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
+        if not ItemJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
 
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
-        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
         ItemJournalErrorsMgt.SetFullBatchCheck(true);
     end;
 
@@ -744,6 +799,11 @@ page 99000846 "Consumption Journal"
     local procedure ShowPreview()
     begin
         Rec.PreviewPostItemJnlFromProduction();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReferenceNoOnAfterLookup(var ItemJournalLine: Record "Item Journal Line")
+    begin
     end;
 }
 

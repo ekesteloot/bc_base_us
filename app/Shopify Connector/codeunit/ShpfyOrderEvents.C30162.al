@@ -204,4 +204,9 @@ codeunit 30162 "Shpfy Order Events"
     internal procedure OnBeforeConvertToFulfillmentStatus(Value: Text; var ShpfyOrderFulfillStatus: Enum "Shpfy Order Fulfill. Status"; var IsHandled: Boolean)
     begin
     end;
+
+    [InternalEvent(false)]
+    internal procedure OnBeforeConvertToOrderReturnStatus(Value: Text; var ShpfyOrderReturnStatus: Enum "Shpfy Order Return Status"; var IsHandled: Boolean)
+    begin
+    end;
 }

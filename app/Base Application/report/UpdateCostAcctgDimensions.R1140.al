@@ -1,3 +1,7 @@
+namespace Microsoft.CostAccounting.Setup;
+
+using Microsoft.FinancialMgt.Dimension;
+
 report 1140 "Update Cost Acctg. Dimensions"
 {
     Caption = 'Update Cost Acctg. Dimensions';

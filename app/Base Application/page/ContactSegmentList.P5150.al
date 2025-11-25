@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Contact;
+using System.Environment;
+
 page 5150 "Contact Segment List"
 {
     Caption = 'Contact Segment List';
@@ -23,7 +28,7 @@ page 5150 "Contact Segment List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the description of the segment line.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the date the segment line was created.';
@@ -71,7 +76,7 @@ page 5150 "Contact Segment List"
                     Caption = '&Card';
                     Image = EditLines;
                     RunObject = Page Segment;
-                    RunPageLink = "No." = FIELD("Segment No.");
+                    RunPageLink = "No." = field("Segment No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View detailed information about the contact segment.';
                 }
@@ -81,7 +86,7 @@ page 5150 "Contact Segment List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CalcFields("Contact Name");
+        Rec.CalcFields("Contact Name");
     end;
 
     var
@@ -92,8 +97,8 @@ page 5150 "Contact Segment List"
         Contact: Record Contact;
         SourceFilter: Text;
     begin
-        if GetFilter("Contact Company No.") <> '' then begin
-            SourceFilter := GetFilter("Contact Company No.");
+        if Rec.GetFilter("Contact Company No.") <> '' then begin
+            SourceFilter := Rec.GetFilter("Contact Company No.");
             if MaxStrLen(Contact."Company No.") >= StrLen(SourceFilter) then
                 if Contact.Get(SourceFilter) then
                     Result := StrSubstNo('%1 %2', Contact."No.", Contact.Name);

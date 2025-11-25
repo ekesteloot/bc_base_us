@@ -1,3 +1,9 @@
+﻿namespace System.TestTools.TestRunner;
+
+using System.Reflection;
+using System.Tooling;
+using System.Utilities;
+
 codeunit 130401 "CAL Test Management"
 {
     SingleInstance = true;

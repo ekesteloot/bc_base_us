@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Payables;
+
 codeunit 114 "Empl. Entry-Edit"
 {
     Permissions = TableData "Employee Ledger Entry" = rm,
@@ -10,17 +12,17 @@ codeunit 114 "Empl. Entry-Edit"
         EmplLedgEntry.LockTable();
         EmplLedgEntry.Find();
         if EmplLedgEntry.Open then begin
-            EmplLedgEntry."Applies-to ID" := "Applies-to ID";
-            EmplLedgEntry.Validate("Payment Method Code", "Payment Method Code");
-            EmplLedgEntry.Validate("Amount to Apply", "Amount to Apply");
-            EmplLedgEntry.Validate("Applying Entry", "Applying Entry");
-            EmplLedgEntry.Validate("Message to Recipient", "Message to Recipient");
+            EmplLedgEntry."Applies-to ID" := Rec."Applies-to ID";
+            EmplLedgEntry.Validate("Payment Method Code", Rec."Payment Method Code");
+            EmplLedgEntry.Validate("Amount to Apply", Rec."Amount to Apply");
+            EmplLedgEntry.Validate("Applying Entry", Rec."Applying Entry");
+            EmplLedgEntry.Validate("Message to Recipient", Rec."Message to Recipient");
         end;
-        EmplLedgEntry.Validate("Exported to Payment File", "Exported to Payment File");
-        EmplLedgEntry.Validate("Creditor No.", "Creditor No.");
-        EmplLedgEntry.Validate("Payment Reference", "Payment Reference");
+        EmplLedgEntry.Validate("Exported to Payment File", Rec."Exported to Payment File");
+        EmplLedgEntry.Validate("Creditor No.", Rec."Creditor No.");
+        EmplLedgEntry.Validate("Payment Reference", Rec."Payment Reference");
         OnBeforeEmplLedgEntryModify(EmplLedgEntry, Rec);
-        EmplLedgEntry.TestField("Entry No.", "Entry No.");
+        EmplLedgEntry.TestField("Entry No.", Rec."Entry No.");
         EmplLedgEntry.Modify();
         Rec := EmplLedgEntry;
     end;

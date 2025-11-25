@@ -1,3 +1,8 @@
+namespace Microsoft.HumanResources.Analysis;
+
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Setup;
+
 page 9271 "Qualification Overview Matrix"
 {
     Caption = 'Qualification Overview Matrix';
@@ -19,7 +24,7 @@ page 9271 "Qualification Overview Matrix"
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field("Full Name"; FullName())
+                field("Full Name"; Rec.FullName())
                 {
                     ApplicationArea = BasicHR;
                     Caption = 'Full Name';
@@ -472,69 +477,37 @@ page 9271 "Qualification Overview Matrix"
         MATRIX_CellData: array[32] of Boolean;
         MATRIX_ColumnCaption: array[32] of Text[1024];
         Qualified: Boolean;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
 
     procedure Load(MatrixColumns1: array[32] of Text[1024]; var MatrixRecords1: array[32] of Record Qualification)
@@ -547,7 +520,7 @@ page 9271 "Qualification Overview Matrix"
     var
         EmployeeQualification: Record "Employee Qualification";
     begin
-        EmployeeQualification.SetRange("Employee No.", "No.");
+        EmployeeQualification.SetRange("Employee No.", Rec."No.");
         EmployeeQualification.SetRange("Qualification Code", MatrixRecords[ColumnID].Code);
         OnMatrixOnDrillDownOnAfterEmployeeQualificationSetFilters(EmployeeQualification);
         PAGE.Run(PAGE::"Qualified Employees", EmployeeQualification);
@@ -555,9 +528,9 @@ page 9271 "Qualification Overview Matrix"
 
     local procedure MATRIX_OnAfterGetRecord(ColumnID: Integer)
     var
-        EmployeeQualification: Record "Employee Qualification";    
+        EmployeeQualification: Record "Employee Qualification";
     begin
-        EmployeeQualification.SetRange("Employee No.", "No.");
+        EmployeeQualification.SetRange("Employee No.", Rec."No.");
         EmployeeQualification.SetRange("Qualification Code", MatrixRecords[ColumnID].Code);
         OnMatrixOnAfterGetRecordOnAfterEmployeeQualificationSetFilters(EmployeeQualification);
         Qualified := not EmployeeQualification.IsEmpty();
@@ -600,7 +573,7 @@ page 9271 "Qualification Overview Matrix"
         Field31Visible := MATRIX_ColumnCaption[31] <> '';
         Field32Visible := MATRIX_ColumnCaption[32] <> '';
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnMatrixOnDrillDownOnAfterEmployeeQualificationSetFilters(var EmployeeQualification: Record "Employee Qualification")
     begin

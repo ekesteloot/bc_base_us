@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Setup;
+
 table 99000750 "Work Shift"
 {
     Caption = 'Work Shift';

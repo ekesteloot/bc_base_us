@@ -1,4 +1,17 @@
-﻿codeunit 817 "Service Post Invoice" implements "Invoice Posting"
+﻿namespace Microsoft.ServiceMgt.Posting;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Pricing;
+using System.Environment.Configuration;
+
+codeunit 817 "Service Post Invoice" implements "Invoice Posting"
 {
     var
         SalesSetup: Record "Sales & Receivables Setup";
@@ -316,6 +329,7 @@
     var
         ServiceHeader: Record "Service Header";
         GenJnlLine: Record "Gen. Journal Line";
+        CurrExchRate: Record "Currency Exchange Rate";
     begin
         ServiceHeader := ServiceHeaderVar;
 
@@ -344,6 +358,10 @@
             "Profit (LCY)" := -(TotalServiceLineLCY.Amount - TotalServiceLineLCY."Unit Cost (LCY)");
             "Inv. Discount (LCY)" := -TotalServiceLineLCY."Inv. Discount Amount";
             "System-Created Entry" := true;
+            "Orig. Pmt. Disc. Possible" := -TotalServiceLine."Pmt. Discount Amount";
+            "Orig. Pmt. Disc. Possible(LCY)" :=
+              CurrExchRate.ExchangeAmtFCYToLCY(
+                ServiceHeader."Posting Date", ServiceHeader."Currency Code", -TotalServiceLine."Pmt. Discount Amount", ServiceHeader."Currency Factor");
 
             ServicePostInvoiceEvents.RunOnPostLedgerEntryOnBeforeGenJnlPostLine(
                 GenJnlLine, ServiceHeader, TotalServiceLine, TotalServiceLineLCY, PreviewMode, SuppressCommit, GenJnlPostLine);
@@ -356,12 +374,16 @@
     procedure PostBalancingEntry(ServiceHeaderVar: Variant; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
     var
         ServiceHeader: Record "Service Header";
-        CustLedgEntry: Record "Cust. Ledger Entry";
+        CustLedgerEntry: Record "Cust. Ledger Entry";
         GenJnlLine: Record "Gen. Journal Line";
+        IsHandled: Boolean;
     begin
         ServiceHeader := ServiceHeaderVar;
 
-        CustLedgEntry.FindLast();
+        IsHandled := false;
+        ServicePostInvoiceEvents.RunOnPostBalancingEntryOnBeforeFindCustLedgerEntry(ServiceHeader, CustLedgerEntry, IsHandled);
+        if not IsHandled then
+            FindCustLedgerEntry(CustLedgerEntry);
 
         with GenJnlLine do begin
             InitNewLine(
@@ -385,15 +407,16 @@
 
             SetApplyToDocNo(ServiceHeader, GenJnlLine);
 
-            Amount := TotalServiceLine."Amount Including VAT" + CustLedgEntry."Remaining Pmt. Disc. Possible";
+            Amount := TotalServiceLine."Amount Including VAT" + CustLedgerEntry."Remaining Pmt. Disc. Possible";
             "Source Currency Amount" := Amount;
-            CustLedgEntry.CalcFields(Amount);
-            if CustLedgEntry.Amount = 0 then
+            CustLedgerEntry.CalcFields(Amount);
+            if CustLedgerEntry.Amount = 0 then
                 "Amount (LCY)" := TotalServiceLineLCY."Amount Including VAT"
             else
                 "Amount (LCY)" :=
                   TotalServiceLineLCY."Amount Including VAT" +
-                  Round(CustLedgEntry."Remaining Pmt. Disc. Possible" / CustLedgEntry."Adjusted Currency Factor");
+                  Round(CustLedgerEntry."Remaining Pmt. Disc. Possible" / CustLedgerEntry."Adjusted Currency Factor");
+            "Allow Zero-Amount Posting" := true;
 
             ServicePostInvoiceEvents.RunOnPostBalancingEntryOnBeforeGenJnlPostLine(
                 GenJnlLine, ServiceHeader, TotalServiceLine, TotalServiceLineLCY, PreviewMode, SuppressCommit, GenJnlPostLine);
@@ -414,6 +437,13 @@
         end;
     end;
 
+    local procedure FindCustLedgerEntry(var CustLedgerEntry: Record "Cust. Ledger Entry")
+    begin
+        CustLedgerEntry.SetRange("Document Type", InvoicePostingParameters."Document Type");
+        CustLedgerEntry.SetRange("Document No.", InvoicePostingParameters."Document No.");
+        CustLedgerEntry.FindLast();
+    end;
+
     procedure PrepareJobLine(SalesHeaderVar: Variant; SalesLineVar: Variant; SalesLineACYVar: Variant)
     begin
     end;
@@ -425,30 +455,4 @@
     procedure CreatePostedDeferralSchedule(ServiceLineVar: Variant; NewDocumentType: Integer; NewDocumentNo: Code[20]; NewLineNo: Integer; PostingDate: Date)
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by RunOnPostBalancingEntryOnAfterGenJnlPostLine in codeunit Service Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostBalancingEntryOnAfterGenJnlPostLine(var GenJournalLine: Record "Gen. Journal Line"; ServiceHeader: Record "Service Header"; var TotalServiceLine: Record "Service Line"; var TotalServiceLineLCY: Record "Service Line"; PreviewMode: Boolean; SuppressCommit: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced by RunOnPostBalancingEntryOnBeforeGenJnlPostLine in codeunit Service Post Invoice Subscr.', '20.0')]
-    local procedure OnPostBalancingEntryOnBeforeGenJnlPostLine(var GenJournalLine: Record "Gen. Journal Line"; ServiceHeader: Record "Service Header"; var TotalServiceLine: Record "Service Line"; var TotalServiceLineLCY: Record "Service Line"; PreviewMode: Boolean; SuppressCommit: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced by RunOnPostLedgerEntryOnAfterGenJnlPostLine in codeunit Service Post Invoice Subscr.', '20.0')]
-    local procedure OnPostLedgerEntryOnAfterGenJnlPostLine(var GenJournalLine: Record "Gen. Journal Line"; ServiceHeader: Record "Service Header"; var TotalServiceLine: Record "Service Line"; var TotalServiceLineLCY: Record "Service Line"; PreviewMode: Boolean; SuppressCommit: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced by RunOnPostLedgerEntryOnBeforeGenJnlPostLine in codeunit Service Post Invoice Subscr.', '20.0')]
-    local procedure OnPostLedgerEntryOnBeforeGenJnlPostLine(var GenJournalLine: Record "Gen. Journal Line"; ServiceHeader: Record "Service Header"; var TotalServiceLine: Record "Service Line"; var TotalServiceLineLCY: Record "Service Line"; PreviewMode: Boolean; SuppressCommit: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-#endif
 }

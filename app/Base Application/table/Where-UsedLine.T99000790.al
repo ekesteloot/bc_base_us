@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+
 table 99000790 "Where-Used Line"
 {
     Caption = 'Where-Used Line';

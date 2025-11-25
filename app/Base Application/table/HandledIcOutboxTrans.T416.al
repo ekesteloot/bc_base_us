@@ -1,3 +1,8 @@
+﻿namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.Intercompany.Journal;
+using Microsoft.Intercompany.Partner;
+
 table 416 "Handled IC Outbox Trans."
 {
     Caption = 'Handled IC Outbox Trans.';

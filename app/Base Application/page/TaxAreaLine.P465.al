@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.SalesTax;
+
 page 465 "Tax Area Line"
 {
     Caption = 'Lines';

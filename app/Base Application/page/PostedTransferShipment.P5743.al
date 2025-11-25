@@ -1,3 +1,9 @@
+﻿namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.InventoryMgt.Comment;
+
 page 5743 "Posted Transfer Shipment"
 {
     Caption = 'Posted Transfer Shipment';
@@ -84,7 +90,7 @@ page 5743 "Posted Transfer Shipment"
             part(TransferShipmentLines; "Posted Transfer Shpt. Subform")
             {
                 ApplicationArea = Location;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group(Shipment)
             {
@@ -300,7 +306,7 @@ page 5743 "Posted Transfer Shipment"
                     Importance = Promoted;
                     ToolTip = 'Specifies the transport method, for the purpose of reporting to INTRASTAT.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     Editable = false;
@@ -367,7 +373,7 @@ page 5743 "Posted Transfer Shipment"
                     ApplicationArea = Location, BasicMX;
                     ToolTip = 'Specifies the second trailer or semi-trailer that is used with the vehicle for the transfer of goods or merchandise.';
                 }
-                field(Control1310010; "Foreign Trade")
+                field(Control1310010; Rec."Foreign Trade")
                 {
                     ApplicationArea = Location, BasicMX;
                     ToolTip = 'Specifies whether the goods or merchandise that are transported enter or leave the national territory.';
@@ -474,7 +480,7 @@ page 5743 "Posted Transfer Shipment"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Transfer Shipment Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information about the transfer order, such as the quantity and total weight transferred.';
                 }
@@ -484,8 +490,8 @@ page 5743 "Posted Transfer Shipment"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Transfer Shipment"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Transfer Shipment"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -499,7 +505,7 @@ page 5743 "Posted Transfer Shipment"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -532,7 +538,7 @@ page 5743 "Posted Transfer Shipment"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action("Update Document")
@@ -564,7 +570,7 @@ page 5743 "Posted Transfer Shipment"
 
                     trigger OnAction()
                     begin
-                        RequestStampEDocument();
+                        Rec.RequestStampEDocument();
                     end;
                 }
                 action("Export E-Document as &XML")
@@ -576,7 +582,7 @@ page 5743 "Posted Transfer Shipment"
 
                     trigger OnAction()
                     begin
-                        ExportEDocument();
+                        Rec.ExportEDocument();
                     end;
                 }
                 action("&Cancel")
@@ -588,7 +594,7 @@ page 5743 "Posted Transfer Shipment"
 
                     trigger OnAction()
                     begin
-                        CancelEDocument();
+                        Rec.CancelEDocument();
                     end;
                 }
                 action("Print Carta Porte Document")
@@ -647,8 +653,8 @@ page 5743 "Posted Transfer Shipment"
 
     trigger OnOpenPage()
     begin
-        IsFromCountyVisible := FormatAddress.UseCounty("Trsf.-from Country/Region Code");
-        IsToCountyVisible := FormatAddress.UseCounty("Trsf.-to Country/Region Code");
+        IsFromCountyVisible := FormatAddress.UseCounty(Rec."Trsf.-from Country/Region Code");
+        IsToCountyVisible := FormatAddress.UseCounty(Rec."Trsf.-to Country/Region Code");
     end;
 
     var

@@ -1,3 +1,14 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Intercompany.Dimension;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.ProjectMgt.Jobs.Job;
+
 table 427 "IC Outbox Sales Line"
 {
     Caption = 'IC Outbox Sales Line';
@@ -36,7 +47,7 @@ table 427 "IC Outbox Sales Line"
         }
         field(22; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
             Editable = false;
@@ -50,13 +61,13 @@ table 427 "IC Outbox Sales Line"
         }
         field(28; "Line Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Discount Amount';
         }
         field(30; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
             Editable = false;
@@ -88,19 +99,17 @@ table 427 "IC Outbox Sales Line"
             Caption = 'Currency Code';
             Editable = false;
             TableRelation = Currency;
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(99; "VAT Base Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'VAT Base Amount';
             Editable = false;
         }
         field(103; "Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Amount';
             Editable = false;
@@ -114,13 +123,13 @@ table 427 "IC Outbox Sales Line"
         {
             Caption = 'IC Partner Reference';
             Editable = false;
-            TableRelation = IF ("IC Partner Ref. Type" = CONST(" ")) "Standard Text"
-            ELSE
-            IF ("IC Partner Ref. Type" = CONST("G/L Account")) "IC G/L Account"
-            ELSE
-            IF ("IC Partner Ref. Type" = CONST(Item)) Item
-            ELSE
-            IF ("IC Partner Ref. Type" = CONST("Charge (Item)")) "Item Charge";
+            TableRelation = if ("IC Partner Ref. Type" = const(" ")) "Standard Text"
+            else
+            if ("IC Partner Ref. Type" = const("G/L Account")) "IC G/L Account"
+            else
+            if ("IC Partner Ref. Type" = const(Item)) Item
+            else
+            if ("IC Partner Ref. Type" = const("Charge (Item)")) "Item Charge";
         }
         field(125; "IC Partner Code"; Code[20])
         {

@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+
 table 5895 "Inventory Adjustment Buffer"
 {
     Caption = 'Inventory Adjustment Buffer';
@@ -99,7 +106,7 @@ table 5895 "Inventory Adjustment Buffer"
         {
             Caption = 'Variant Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
     }
 

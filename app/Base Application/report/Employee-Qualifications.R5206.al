@@ -1,7 +1,11 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.HumanResources.Employee;
+
 report 5206 "Employee - Qualifications"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeQualifications.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeQualifications.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee Qualifications';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5206 "Employee - Qualifications"
     {
         dataitem("Employee Qualification"; "Employee Qualification")
         {
-            DataItemTableView = SORTING("Employee No.", "Line No.");
+            DataItemTableView = sorting("Employee No.", "Line No.");
             RequestFilterFields = "Employee No.", "Qualification Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

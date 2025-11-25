@@ -1,3 +1,14 @@
+﻿namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.IO;
+using System.Utilities;
+
 report 7131 "Import Item Budget from Excel"
 {
     Caption = 'Import Item Budget from Excel';
@@ -7,7 +18,7 @@ report 7131 "Import Item Budget from Excel"
     {
         dataitem(ItemBudgetBuf; "Item Budget Buffer")
         {
-            DataItemTableView = SORTING("Item No.", "Source Type", "Source No.", "Location Code", "Global Dimension 1 Code", "Global Dimension 2 Code", "Budget Dimension 1 Code", "Budget Dimension 2 Code", "Budget Dimension 3 Code", Date);
+            DataItemTableView = sorting("Item No.", "Source Type", "Source No.", "Location Code", "Global Dimension 1 Code", "Global Dimension 2 Code", "Budget Dimension 1 Code", "Budget Dimension 2 Code", "Budget Dimension 3 Code", Date);
 
             trigger OnAfterGetRecord()
             begin
@@ -222,9 +233,7 @@ report 7131 "Import Item Budget from Excel"
         ValueType: Option "Sales Amount","COGS / Cost Amount",Quantity;
         ValueTypeHidden: Option "Sales Amount","COGS / Cost Amount",Quantity;
         GlSetupRead: Boolean;
-        [InDataSet]
         SalesValueTypeVisible: Boolean;
-        [InDataSet]
         PurchValueTypeVisible: Boolean;
 
         Text000: Label 'You must specify a budget name to import to.';
@@ -432,7 +441,7 @@ report 7131 "Import Item Budget from Excel"
                                 if SourceTypeFilter <> SourceTypeFilter::" " then
                                     ItemBudgetBuf."Source Type" := SourceTypeFilter
                                 else
-                                    ItemBudgetBuf."Source Type" := "Analysis Source Type".FromInteger(LineDimOption.AsInteger());
+                                    ItemBudgetBuf."Source Type" := Enum::"Analysis Source Type".FromInteger(LineDimOption.AsInteger());
                                 ItemBudgetBuf."Source No." := SourceNoFilter;
                                 ItemBudgetBuf."Location Code" := LocationFilter;
                                 ItemBudgetBuf."Global Dimension 1 Code" := GlobalDim1Filter;

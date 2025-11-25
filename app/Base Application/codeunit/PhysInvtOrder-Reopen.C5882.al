@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.InventoryMgt.Tracking;
+
 codeunit 5882 "Phys. Invt. Order-Reopen"
 {
     TableNo = "Phys. Invt. Order Header";

@@ -1,3 +1,19 @@
+﻿namespace Microsoft.CRM.Outlook;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using System;
+using System.Email;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Utilities;
+
 codeunit 1630 "Office Management"
 {
     var

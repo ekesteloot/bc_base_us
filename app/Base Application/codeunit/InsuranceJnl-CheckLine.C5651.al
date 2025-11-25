@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Setup;
+
 codeunit 5651 "Insurance Jnl.-Check Line"
 {
     TableNo = "Insurance Journal Line";

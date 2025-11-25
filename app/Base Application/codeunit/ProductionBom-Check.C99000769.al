@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+
 codeunit 99000769 "Production BOM-Check"
 {
     Permissions = TableData Item = r,
@@ -171,32 +177,42 @@ codeunit 99000769 "Production BOM-Check"
     var
         ProductionBOMHeader: Record "Production BOM Header";
         ProductionBOMLine: Record "Production BOM Line";
+        ProdItem: Record Item;
+        ProductionBOMNo: Code[20];
         NextVersionCode: Code[20];
         CheckNextLevel: Boolean;
     begin
         ProductionBOMLine.SetRange("Production BOM No.", TempProductionBOMHeader."No.");
         ProductionBOMLine.SetRange("Version Code", VersionCode);
-        ProductionBOMLine.SetRange(Type, ProductionBOMLine.Type::"Production BOM");
         ProductionBOMLine.SetFilter("No.", '<>%1', '');
         if ProductionBOMLine.FindSet() then
             repeat
-                TempProductionBOMHeader."No." := ProductionBOMLine."No.";
-                if not TempProductionBOMHeader.Insert() then
-                    Error(CircularRefInBOMErr, ProductionBOMLine."No.", ProductionBOMLine."Production BOM No.");
+                if ProductionBOMLine.Type = ProductionBOMLine.Type::Item then begin
+                    ProdItem.SetLoadFields("Production BOM No.");
+                    ProdItem.Get(ProductionBOMLine."No.");
+                    ProductionBOMNo := ProdItem."Production BOM No.";
+                end else
+                    ProductionBOMNo := ProductionBOMLine."No.";
 
-                NextVersionCode := VersionMgt.GetBOMVersion(ProductionBOMLine."No.", WorkDate(), true);
-                if NextVersionCode <> '' then
-                    CheckNextLevel := true
-                else begin
-                    ProductionBOMHeader.Get(ProductionBOMLine."No.");
-                    CheckNextLevel := ProductionBOMHeader.Status = ProductionBOMHeader.Status::Certified;
+                if ProductionBOMNo <> '' then begin
+                    TempProductionBOMHeader."No." := ProductionBOMNo;
+                    if not TempProductionBOMHeader.Insert() then
+                        Error(CircularRefInBOMErr, ProductionBOMNo, ProductionBOMLine."Production BOM No.");
+
+                    NextVersionCode := VersionMgt.GetBOMVersion(ProductionBOMNo, WorkDate(), true);
+                    if NextVersionCode <> '' then
+                        CheckNextLevel := true
+                    else begin
+                        ProductionBOMHeader.Get(ProductionBOMNo);
+                        CheckNextLevel := ProductionBOMHeader.Status = ProductionBOMHeader.Status::Certified;
+                    end;
+
+                    if CheckNextLevel then
+                        CheckCircularReferencesInProductionBOM(TempProductionBOMHeader, NextVersionCode);
+
+                    TempProductionBOMHeader.Get(ProductionBOMNo);
+                    TempProductionBOMHeader.Delete();
                 end;
-
-                if CheckNextLevel then
-                    CheckCircularReferencesInProductionBOM(TempProductionBOMHeader, NextVersionCode);
-
-                TempProductionBOMHeader.Get(ProductionBOMLine."No.");
-                TempProductionBOMHeader.Delete();
             until ProductionBOMLine.Next() = 0;
     end;
 

@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Posting;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using System.Threading;
+
 codeunit 98 "Purchase Post via Job Queue"
 {
     TableNo = "Job Queue Entry";
@@ -12,12 +22,12 @@ codeunit 98 "Purchase Post via Job Queue"
         SavedLockTimeout: Boolean;
         IsHandled: Boolean;
     begin
-        TestField("Record ID to Process");
-        RecRef.Get("Record ID to Process");
+        Rec.TestField("Record ID to Process");
+        RecRef.Get(Rec."Record ID to Process");
         RecRef.SetTable(PurchHeader);
         PurchHeader.Find();
 
-        BatchProcessingMgt.GetBatchFromSession("Record ID to Process", "User Session ID");
+        BatchProcessingMgt.GetBatchFromSession(Rec."Record ID to Process", Rec."User Session ID");
 
         SavedLockTimeout := LockTimeout;
         SetJobQueueStatus(PurchHeader, PurchHeader."Job Queue Status"::Posting, Rec);

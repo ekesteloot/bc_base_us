@@ -1,4 +1,20 @@
-﻿codeunit 1605 "PEPPOL Management"
+﻿namespace Microsoft.Sales.Peppol;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using System.IO;
+using System.Telemetry;
+
+codeunit 1605 "PEPPOL Management"
 {
 
     trigger OnRun()
@@ -6,6 +22,7 @@
     end;
 
     var
+        ProcessedDocType: Option Sale,Service;
         SalespersonTxt: Label 'Salesperson';
         InvoiceDisAmtTxt: Label 'Invoice Discount Amount';
         LineDisAmtTxt: Label 'Line Discount Amount';
@@ -92,15 +109,15 @@
         OnAfterGetContractDocRefInfo(SalesHeader, ContractDocumentReferenceID, DocumentTypeCode, ContractRefDocTypeCodeListID, DocumentType);
     end;
 
-    [Obsolete('Replaced by GetAdditionalDocRefInfo() extended with SalesHeader parameter', '18.0')]
-    procedure GetAdditionalDocRefInfo(var AdditionalDocumentReferenceID: Text; var AdditionalDocRefDocumentType: Text; var URI: Text; var MimeCode: Text; var EmbeddedDocumentBinaryObject: Text)
-    var
-        SalesHeader: Record "Sales Header";
-    begin
-        GetAdditionalDocRefInfo(SalesHeader, AdditionalDocumentReferenceID, AdditionalDocRefDocumentType, URI, MimeCode, EmbeddedDocumentBinaryObject);
-    end;
-
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure with additional parameter ProcessedDocType', '23.0')]
     procedure GetAdditionalDocRefInfo(Salesheader: Record "Sales Header"; var AdditionalDocumentReferenceID: Text; var AdditionalDocRefDocumentType: Text; var URI: Text; var MimeCode: Text; var EmbeddedDocumentBinaryObject: Text)
+    begin
+        GetAdditionalDocRefInfo(SalesHeader, AdditionalDocumentReferenceID, AdditionalDocRefDocumentType, URI, MimeCode, EmbeddedDocumentBinaryObject, 0);
+    end;
+#endif
+
+    procedure GetAdditionalDocRefInfo(Salesheader: Record "Sales Header"; var AdditionalDocumentReferenceID: Text; var AdditionalDocRefDocumentType: Text; var URI: Text; var MimeCode: Text; var EmbeddedDocumentBinaryObject: Text; NewProcessedDocType: Option Sale,Service)
     begin
         AdditionalDocumentReferenceID := '';
         AdditionalDocRefDocumentType := '';
@@ -109,7 +126,7 @@
         EmbeddedDocumentBinaryObject := '';
 
         OnAfterGetAdditionalDocRefInfo(
-          AdditionalDocumentReferenceID, AdditionalDocRefDocumentType, URI, MimeCode, EmbeddedDocumentBinaryObject, SalesHeader);
+          AdditionalDocumentReferenceID, AdditionalDocRefDocumentType, URI, MimeCode, EmbeddedDocumentBinaryObject, SalesHeader, ProcessedDocType);
     end;
 
     procedure GetAccountingSupplierPartyInfo(var SupplierEndpointID: Text; var SupplierSchemeID: Text; var SupplierName: Text)
@@ -923,7 +940,7 @@
             "VAT Calculation Type" := SalesLine."VAT Calculation Type";
             "Tax Group Code" := SalesLine."Tax Group Code";
             "Tax Area Code" := SalesLine."Tax Area Code";
-	    "Tax Category" := VATPostingSetup."Tax Category";
+            "Tax Category" := VATPostingSetup."Tax Category";
             "VAT %" := SalesLine."VAT %";
             "VAT Base" := SalesLine.Amount;
             "Amount Including VAT" := SalesLine."Amount Including VAT";
@@ -1371,7 +1388,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGetAdditionalDocRefInfo(var AdditionalDocumentReferenceID: Text; var AdditionalDocRefDocumentType: Text; var URI: Text; var MimeCode: Text; var EmbeddedDocumentBinaryObject: Text; SalesHeader: Record "Sales Header")
+    local procedure OnAfterGetAdditionalDocRefInfo(var AdditionalDocumentReferenceID: Text; var AdditionalDocRefDocumentType: Text; var URI: Text; var MimeCode: Text; var EmbeddedDocumentBinaryObject: Text; SalesHeader: Record "Sales Header"; ProcessedDocType: Option Sale,Service)
     begin
     end;
 

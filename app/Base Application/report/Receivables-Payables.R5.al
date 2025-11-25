@@ -1,7 +1,12 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Utilities;
+
 report 5 "Receivables-Payables"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/ReceivablesPayables.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/ReceivablesPayables.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Receivables-Payables';
     PreviewMode = PrintLayout;
@@ -11,7 +16,7 @@ report 5 "Receivables-Payables"
     {
         dataitem("General Ledger Setup"; "General Ledger Setup")
         {
-            DataItemTableView = SORTING("Primary Key") WHERE("Primary Key" = CONST(''));
+            DataItemTableView = sorting("Primary Key") where("Primary Key" = const(''));
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
             }
@@ -82,7 +87,7 @@ report 5 "Receivables-Payables"
             }
             dataitem(PeriodLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(GLSetupDateFilter; GLSetup.GetFilter("Date Filter"))
                 {
                 }

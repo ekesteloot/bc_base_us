@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Contact;
+
 table 5066 "Job Responsibility"
 {
     Caption = 'Job Responsibility';
@@ -17,7 +21,7 @@ table 5066 "Job Responsibility"
         }
         field(3; "No. of Contacts"; Integer)
         {
-            CalcFormula = Count ("Contact Job Responsibility" WHERE("Job Responsibility Code" = FIELD(Code)));
+            CalcFormula = Count("Contact Job Responsibility" where("Job Responsibility Code" = field(Code)));
             Caption = 'No. of Contacts';
             Editable = false;
             FieldClass = FlowField;

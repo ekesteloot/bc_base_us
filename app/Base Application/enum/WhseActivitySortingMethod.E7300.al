@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
 enum 7300 "Whse. Activity Sorting Method"
 {
     Extensible = true;

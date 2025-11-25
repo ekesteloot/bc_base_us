@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Tooling;
+
+using System.Security.AccessControl;
+
 table 2000000222 "Designed Query Permission"
 {
     Caption = 'Designed Query Permission';
@@ -18,7 +26,7 @@ table 2000000222 "Designed Query Permission"
         }
         field(3; "Role Name"; Text[30])
         {
-            CalcFormula = Lookup ("Tenant Permission Set".Name WHERE("App ID" = FIELD("App ID"),
+            CalcFormula = Lookup("Tenant Permission Set".Name WHERE("App ID" = FIELD("App ID"),
                                                                      "Role ID" = FIELD("Role ID")));
             Caption = 'Role Name';
             FieldClass = FlowField;
@@ -30,7 +38,7 @@ table 2000000222 "Designed Query Permission"
         }
         field(5; "Object Name"; Text[30])
         {
-            CalcFormula = Lookup ("Designed Query Obj"."Object Name" WHERE("Object ID" = FIELD("Object ID")));
+            CalcFormula = Lookup("Designed Query Obj"."Object Name" WHERE("Object ID" = FIELD("Object ID")));
             Caption = 'Object Name';
             FieldClass = FlowField;
         }

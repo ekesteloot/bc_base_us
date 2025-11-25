@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.WarehouseMgt.Ledger;
+
 codeunit 242 "Item Jnl.-Post+Print"
 {
     TableNo = "Item Journal Line";
@@ -6,7 +13,7 @@ codeunit 242 "Item Jnl.-Post+Print"
     begin
         ItemJnlLine.Copy(Rec);
         Code();
-        Copy(ItemJnlLine);
+        Rec.Copy(ItemJnlLine);
     end;
 
     var

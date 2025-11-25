@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 enum 712 "Service Document Exchange Status"
 {
     Extensible = true;

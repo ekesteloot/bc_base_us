@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 5488 "Trial Balance Entity Buffer"
 {
     Caption = 'Trial Balance Entity Buffer';

@@ -1,3 +1,19 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Entity;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+
 table 5495 "Sales Order Entity Buffer"
 {
     Caption = 'Sales Order Entity Buffer';
@@ -55,11 +71,9 @@ table 5495 "Sales Order Entity Buffer"
         {
             Caption = 'Bill-to City';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Bill-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Bill-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Bill-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Bill-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Bill-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Bill-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(10; "Bill-to Contact"; Text[100])
@@ -91,11 +105,9 @@ table 5495 "Sales Order Entity Buffer"
         {
             Caption = 'Ship-to City';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
@@ -134,14 +146,14 @@ table 5495 "Sales Order Entity Buffer"
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
         }
         field(31; "Customer Posting Group"; Code[20])
         {
@@ -173,23 +185,23 @@ table 5495 "Sales Order Entity Buffer"
         }
         field(56; "Recalculate Invoice Disc."; Boolean)
         {
-            CalcFormula = Exist("Sales Line" WHERE("Document Type" = CONST(Invoice),
-                                                    "Document No." = FIELD("No."),
-                                                    "Recalculate Invoice Disc." = CONST(true)));
+            CalcFormula = exist("Sales Line" where("Document Type" = const(Invoice),
+                                                    "Document No." = field("No."),
+                                                    "Recalculate Invoice Disc." = const(true)));
             Caption = 'Recalculate Invoice Disc.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(60; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
             DataClassification = CustomerContent;
         }
         field(61; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
             DataClassification = CustomerContent;
@@ -215,11 +227,9 @@ table 5495 "Sales Order Entity Buffer"
         {
             Caption = 'Sell-to City';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Sell-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Sell-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Sell-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Sell-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Sell-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Sell-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(84; "Sell-to Contact"; Text[100])
@@ -232,8 +242,6 @@ table 5495 "Sales Order Entity Buffer"
             Caption = 'Bill-to Post Code';
             DataClassification = CustomerContent;
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(86; "Bill-to County"; Text[30])
@@ -252,11 +260,9 @@ table 5495 "Sales Order Entity Buffer"
         {
             Caption = 'Sell-to Post Code';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Sell-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Sell-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Sell-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Sell-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Sell-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Sell-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(89; "Sell-to County"; Text[30])
@@ -275,11 +281,9 @@ table 5495 "Sales Order Entity Buffer"
         {
             Caption = 'Ship-to Post Code';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(92; "Ship-to County"; Text[30])
@@ -321,12 +325,10 @@ table 5495 "Sales Order Entity Buffer"
             Caption = 'Cust. Ledger Entry No.';
             DataClassification = CustomerContent;
             TableRelation = "Cust. Ledger Entry"."Entry No.";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(1305; "Invoice Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
@@ -362,7 +364,7 @@ table 5495 "Sales Order Entity Buffer"
         }
         field(9600; "Total Tax Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Tax Amount';
             DataClassification = CustomerContent;
@@ -613,20 +615,6 @@ table 5495 "Sales Order Entity Buffer"
         UpdateCurrencyId();
         UpdatePaymentTermsId();
         UpdateShipmentMethodId();
-#if not CLEAN20
-        UpdateGraphContactId();
-#endif        
     end;
-
-#if not CLEAN20
-    [Obsolete('The functionality that uses this was removed', '20.0')]
-    procedure UpdateGraphContactId()
-    var
-        contactFound: Boolean;
-    begin
-        if not contactFound then
-            Clear("Contact Graph Id");
-    end;
-#endif
 }
 

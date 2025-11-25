@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 table 5645 "FA Date Type"
 {
     Caption = 'FA Date Type';
@@ -44,98 +46,98 @@ table 5645 "FA Date Type"
 
     procedure CreateTypes()
     var
-        FADeprBook: Record "FA Depreciation Book";
+        FADepreciationBook: Record "FA Depreciation Book";
     begin
         LockTable();
         if not Find('-') then begin
             "FA Entry" := true;
             "G/L Entry" := true;
-            InsertRec(1, FADeprBook.FieldNo("Last Acquisition Cost Date"), FADeprBook.FieldCaption("Last Acquisition Cost Date"));
-            InsertRec(2, FADeprBook.FieldNo("Last Depreciation Date"), FADeprBook.FieldCaption("Last Depreciation Date"));
-            InsertRec(3, FADeprBook.FieldNo("Last Write-Down Date"), FADeprBook.FieldCaption("Last Write-Down Date"));
-            InsertRec(4, FADeprBook.FieldNo("Last Appreciation Date"), FADeprBook.FieldCaption("Last Appreciation Date"));
-            InsertRec(5, FADeprBook.FieldNo("Last Custom 1 Date"), FADeprBook.FieldCaption("Last Custom 1 Date"));
-            InsertRec(6, FADeprBook.FieldNo("Last Custom 2 Date"), FADeprBook.FieldCaption("Last Custom 2 Date"));
-            InsertRec(7, FADeprBook.FieldNo("Disposal Date"), FADeprBook.FieldCaption("Disposal Date"));
-            InsertRec(8, FADeprBook.FieldNo("Last Salvage Value Date"), FADeprBook.FieldCaption("Last Salvage Value Date"));
+            InsertRec(1, FADepreciationBook.FieldNo("Last Acquisition Cost Date"), FADepreciationBook.FieldCaption("Last Acquisition Cost Date"));
+            InsertRec(2, FADepreciationBook.FieldNo("Last Depreciation Date"), FADepreciationBook.FieldCaption("Last Depreciation Date"));
+            InsertRec(3, FADepreciationBook.FieldNo("Last Write-Down Date"), FADepreciationBook.FieldCaption("Last Write-Down Date"));
+            InsertRec(4, FADepreciationBook.FieldNo("Last Appreciation Date"), FADepreciationBook.FieldCaption("Last Appreciation Date"));
+            InsertRec(5, FADepreciationBook.FieldNo("Last Custom 1 Date"), FADepreciationBook.FieldCaption("Last Custom 1 Date"));
+            InsertRec(6, FADepreciationBook.FieldNo("Last Custom 2 Date"), FADepreciationBook.FieldCaption("Last Custom 2 Date"));
+            InsertRec(7, FADepreciationBook.FieldNo("Disposal Date"), FADepreciationBook.FieldCaption("Disposal Date"));
+            InsertRec(8, FADepreciationBook.FieldNo("Last Salvage Value Date"), FADepreciationBook.FieldCaption("Last Salvage Value Date"));
             "G/L Entry" := false;
-            InsertRec(9, FADeprBook.FieldNo("Acquisition Date"), FADeprBook.FieldCaption("Acquisition Date"));
+            InsertRec(9, FADepreciationBook.FieldNo("Acquisition Date"), FADepreciationBook.FieldCaption("Acquisition Date"));
             "FA Entry" := false;
             "G/L Entry" := true;
-            InsertRec(10, FADeprBook.FieldNo("G/L Acquisition Date"), FADeprBook.FieldCaption("G/L Acquisition Date"));
+            InsertRec(10, FADepreciationBook.FieldNo("G/L Acquisition Date"), FADepreciationBook.FieldCaption("G/L Acquisition Date"));
         end else begin
             SetCurrentKey("Entry No.");
             Find('-');
             repeat
                 if "Entry No." = 1 then
-                    if ("FA Date Type No." <> FADeprBook.FieldNo("Last Acquisition Cost Date")) or
-                       ("FA Date Type Name" <> FADeprBook.FieldCaption("Last Acquisition Cost Date"))
+                    if ("FA Date Type No." <> FADepreciationBook.FieldNo("Last Acquisition Cost Date")) or
+                       ("FA Date Type Name" <> FADepreciationBook.FieldCaption("Last Acquisition Cost Date"))
                     then begin
                         Delete();
-                        InsertRec(1, FADeprBook.FieldNo("Last Acquisition Cost Date"), FADeprBook.FieldCaption("Last Acquisition Cost Date"));
+                        InsertRec(1, FADepreciationBook.FieldNo("Last Acquisition Cost Date"), FADepreciationBook.FieldCaption("Last Acquisition Cost Date"));
                     end;
                 if "Entry No." = 2 then
-                    if ("FA Date Type No." <> FADeprBook.FieldNo("Last Depreciation Date")) or
-                       ("FA Date Type Name" <> FADeprBook.FieldCaption("Last Depreciation Date"))
+                    if ("FA Date Type No." <> FADepreciationBook.FieldNo("Last Depreciation Date")) or
+                       ("FA Date Type Name" <> FADepreciationBook.FieldCaption("Last Depreciation Date"))
                     then begin
                         Delete();
-                        InsertRec(2, FADeprBook.FieldNo("Last Depreciation Date"), FADeprBook.FieldCaption("Last Depreciation Date"));
+                        InsertRec(2, FADepreciationBook.FieldNo("Last Depreciation Date"), FADepreciationBook.FieldCaption("Last Depreciation Date"));
                     end;
                 if "Entry No." = 3 then
-                    if ("FA Date Type No." <> FADeprBook.FieldNo("Last Write-Down Date")) or
-                       ("FA Date Type Name" <> FADeprBook.FieldCaption("Last Write-Down Date"))
+                    if ("FA Date Type No." <> FADepreciationBook.FieldNo("Last Write-Down Date")) or
+                       ("FA Date Type Name" <> FADepreciationBook.FieldCaption("Last Write-Down Date"))
                     then begin
                         Delete();
-                        InsertRec(3, FADeprBook.FieldNo("Last Write-Down Date"), FADeprBook.FieldCaption("Last Write-Down Date"));
+                        InsertRec(3, FADepreciationBook.FieldNo("Last Write-Down Date"), FADepreciationBook.FieldCaption("Last Write-Down Date"));
                     end;
                 if "Entry No." = 4 then
-                    if ("FA Date Type No." <> FADeprBook.FieldNo("Last Appreciation Date")) or
-                       ("FA Date Type Name" <> FADeprBook.FieldCaption("Last Appreciation Date"))
+                    if ("FA Date Type No." <> FADepreciationBook.FieldNo("Last Appreciation Date")) or
+                       ("FA Date Type Name" <> FADepreciationBook.FieldCaption("Last Appreciation Date"))
                     then begin
                         Delete();
-                        InsertRec(4, FADeprBook.FieldNo("Last Appreciation Date"), FADeprBook.FieldCaption("Last Appreciation Date"));
+                        InsertRec(4, FADepreciationBook.FieldNo("Last Appreciation Date"), FADepreciationBook.FieldCaption("Last Appreciation Date"));
                     end;
                 if "Entry No." = 5 then
-                    if ("FA Date Type No." <> FADeprBook.FieldNo("Last Custom 1 Date")) or
-                       ("FA Date Type Name" <> FADeprBook.FieldCaption("Last Custom 1 Date"))
+                    if ("FA Date Type No." <> FADepreciationBook.FieldNo("Last Custom 1 Date")) or
+                       ("FA Date Type Name" <> FADepreciationBook.FieldCaption("Last Custom 1 Date"))
                     then begin
                         Delete();
-                        InsertRec(5, FADeprBook.FieldNo("Last Custom 1 Date"), FADeprBook.FieldCaption("Last Custom 1 Date"));
+                        InsertRec(5, FADepreciationBook.FieldNo("Last Custom 1 Date"), FADepreciationBook.FieldCaption("Last Custom 1 Date"));
                     end;
                 if "Entry No." = 6 then
-                    if ("FA Date Type No." <> FADeprBook.FieldNo("Last Custom 2 Date")) or
-                       ("FA Date Type Name" <> FADeprBook.FieldCaption("Last Custom 2 Date"))
+                    if ("FA Date Type No." <> FADepreciationBook.FieldNo("Last Custom 2 Date")) or
+                       ("FA Date Type Name" <> FADepreciationBook.FieldCaption("Last Custom 2 Date"))
                     then begin
                         Delete();
-                        InsertRec(6, FADeprBook.FieldNo("Last Custom 2 Date"), FADeprBook.FieldCaption("Last Custom 2 Date"));
+                        InsertRec(6, FADepreciationBook.FieldNo("Last Custom 2 Date"), FADepreciationBook.FieldCaption("Last Custom 2 Date"));
                     end;
                 if "Entry No." = 7 then
-                    if ("FA Date Type No." <> FADeprBook.FieldNo("Disposal Date")) or
-                       ("FA Date Type Name" <> FADeprBook.FieldCaption("Disposal Date"))
+                    if ("FA Date Type No." <> FADepreciationBook.FieldNo("Disposal Date")) or
+                       ("FA Date Type Name" <> FADepreciationBook.FieldCaption("Disposal Date"))
                     then begin
                         Delete();
-                        InsertRec(7, FADeprBook.FieldNo("Disposal Date"), FADeprBook.FieldCaption("Disposal Date"));
+                        InsertRec(7, FADepreciationBook.FieldNo("Disposal Date"), FADepreciationBook.FieldCaption("Disposal Date"));
                     end;
                 if "Entry No." = 8 then
-                    if ("FA Date Type No." <> FADeprBook.FieldNo("Last Salvage Value Date")) or
-                       ("FA Date Type Name" <> FADeprBook.FieldCaption("Last Salvage Value Date"))
+                    if ("FA Date Type No." <> FADepreciationBook.FieldNo("Last Salvage Value Date")) or
+                       ("FA Date Type Name" <> FADepreciationBook.FieldCaption("Last Salvage Value Date"))
                     then begin
                         Delete();
-                        InsertRec(8, FADeprBook.FieldNo("Last Salvage Value Date"), FADeprBook.FieldCaption("Last Salvage Value Date"));
+                        InsertRec(8, FADepreciationBook.FieldNo("Last Salvage Value Date"), FADepreciationBook.FieldCaption("Last Salvage Value Date"));
                     end;
                 if "Entry No." = 9 then
-                    if ("FA Date Type No." <> FADeprBook.FieldNo("Acquisition Date")) or
-                       ("FA Date Type Name" <> FADeprBook.FieldCaption("Acquisition Date"))
+                    if ("FA Date Type No." <> FADepreciationBook.FieldNo("Acquisition Date")) or
+                       ("FA Date Type Name" <> FADepreciationBook.FieldCaption("Acquisition Date"))
                     then begin
                         Delete();
-                        InsertRec(9, FADeprBook.FieldNo("Acquisition Date"), FADeprBook.FieldCaption("Acquisition Date"));
+                        InsertRec(9, FADepreciationBook.FieldNo("Acquisition Date"), FADepreciationBook.FieldCaption("Acquisition Date"));
                     end;
                 if "Entry No." = 10 then
-                    if ("FA Date Type No." <> FADeprBook.FieldNo("G/L Acquisition Date")) or
-                       ("FA Date Type Name" <> FADeprBook.FieldCaption("G/L Acquisition Date"))
+                    if ("FA Date Type No." <> FADepreciationBook.FieldNo("G/L Acquisition Date")) or
+                       ("FA Date Type Name" <> FADepreciationBook.FieldCaption("G/L Acquisition Date"))
                     then begin
                         Delete();
-                        InsertRec(10, FADeprBook.FieldNo("G/L Acquisition Date"), FADeprBook.FieldCaption("G/L Acquisition Date"));
+                        InsertRec(10, FADepreciationBook.FieldNo("G/L Acquisition Date"), FADepreciationBook.FieldCaption("G/L Acquisition Date"));
                     end;
             until Next() = 0;
         end;
@@ -143,7 +145,7 @@ table 5645 "FA Date Type"
         OnAfterCreateTypes(Rec);
     end;
 
-    local procedure InsertRec(FAEntryNo: Integer; FADateTypeNo: Integer; FADateTypeName: Text[80])
+    procedure InsertRec(FAEntryNo: Integer; FADateTypeNo: Integer; FADateTypeName: Text)
     begin
         "Entry No." := FAEntryNo;
         "FA Date Type No." := FADateTypeNo;

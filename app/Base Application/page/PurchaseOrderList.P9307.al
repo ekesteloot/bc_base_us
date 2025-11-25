@@ -1,3 +1,21 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Request;
+using System.Automation;
+using System.Text;
+using System.Threading;
+
 page 9307 "Purchase Order List"
 {
     ApplicationArea = Basic, Suite;
@@ -9,7 +27,7 @@ page 9307 "Purchase Order List"
     QueryCategory = 'Purchase Order List';
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";
-    SourceTableView = WHERE("Document Type" = CONST(Order));
+    SourceTableView = where("Document Type" = const(Order));
     UsageCategory = Lists;
 
     layout
@@ -214,7 +232,7 @@ page 9307 "Purchase Order List"
                 {
                     ApplicationArea = Suite;
                     Style = Unfavorable;
-                    StyleExpr = "Job Queue Status" = "Job Queue Status"::ERROR;
+                    StyleExpr = Rec."Job Queue Status" = Rec."Job Queue Status"::ERROR;
                     ToolTip = 'Specifies the status of a job queue entry that handles the posting of purchase orders.';
                     Visible = JobQueueActive;
 
@@ -222,9 +240,9 @@ page 9307 "Purchase Order List"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
                 field("Amount Received Not Invoiced excl. VAT (LCY)"; Rec."A. Rcd. Not Inv. Ex. VAT (LCY)")
@@ -275,9 +293,9 @@ page 9307 "Purchase Order List"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Purchase Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Purchase Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -288,8 +306,8 @@ page 9307 "Purchase Order List"
             part(Control1901138007; "Vendor Details FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Buy-from Vendor No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Buy-from Vendor No."),
+                              "Date Filter" = field("Date Filter");
             }
             systempart(Control1900383207; Links)
             {
@@ -322,7 +340,7 @@ page 9307 "Purchase Order List"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Statistics)
@@ -336,7 +354,7 @@ page 9307 "Purchase Order List"
                     trigger OnAction()
                     begin
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        OpenPurchaseOrderStatistics();
+                        Rec.OpenPurchaseOrderStatistics();
                     end;
                 }
                 action(Approvals)
@@ -360,9 +378,9 @@ page 9307 "Purchase Order List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -376,8 +394,8 @@ page 9307 "Purchase Order List"
                     Caption = 'Receipts';
                     Image = PostedReceipts;
                     RunObject = Page "Posted Purchase Receipts";
-                    RunPageLink = "Order No." = FIELD("No.");
-                    RunPageView = SORTING("Order No.");
+                    RunPageLink = "Order No." = field("No.");
+                    RunPageView = sorting("Order No.");
                     ToolTip = 'View a list of posted purchase receipts for the order.';
                 }
                 action(PostedPurchaseInvoices)
@@ -385,10 +403,16 @@ page 9307 "Purchase Order List"
                     ApplicationArea = Suite;
                     Caption = 'Invoices';
                     Image = Invoice;
-                    RunObject = Page "Posted Purchase Invoices";
-                    RunPageLink = "Order No." = FIELD("No.");
-                    RunPageView = SORTING("Order No.");
                     ToolTip = 'View a list of ongoing purchase invoices for the order.';
+
+                    trigger OnAction()
+                    var
+                        TempPurchInvHeader: Record "Purch. Inv. Header" temporary;
+                        PurchGetReceipt: Codeunit "Purch.-Get Receipt";
+                    begin
+                        PurchGetReceipt.GetPurchOrderInvoices(TempPurchInvHeader, Rec."No.");
+                        Page.Run(Page::"Posted Purchase Invoices", TempPurchInvHeader);
+                    end;
                 }
                 action(PostedPurchasePrepmtInvoices)
                 {
@@ -396,8 +420,8 @@ page 9307 "Purchase Order List"
                     Caption = 'Prepa&yment Invoices';
                     Image = PrepaymentInvoice;
                     RunObject = Page "Posted Purchase Invoices";
-                    RunPageLink = "Prepayment Order No." = FIELD("No.");
-                    RunPageView = SORTING("Prepayment Order No.");
+                    RunPageLink = "Prepayment Order No." = field("No.");
+                    RunPageView = sorting("Prepayment Order No.");
                     ToolTip = 'View related posted sales invoices that involve a prepayment. ';
                 }
                 action("Prepayment Credi&t Memos")
@@ -406,8 +430,8 @@ page 9307 "Purchase Order List"
                     Caption = 'Prepayment Credi&t Memos';
                     Image = PrepaymentCreditMemo;
                     RunObject = Page "Posted Purchase Credit Memos";
-                    RunPageLink = "Prepayment Order No." = FIELD("No.");
-                    RunPageView = SORTING("Prepayment Order No.");
+                    RunPageLink = "Prepayment Order No." = field("No.");
+                    RunPageView = sorting("Prepayment Order No.");
                     ToolTip = 'View related posted sales credit memos that involve a prepayment. ';
                 }
             }
@@ -421,9 +445,9 @@ page 9307 "Purchase Order List"
                     Caption = 'In&vt. Put-away/Pick Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity List";
-                    RunPageLink = "Source Document" = CONST("Purchase Order"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Document", "Source No.", "Location Code");
+                    RunPageLink = "Source Document" = const("Purchase Order"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Document", "Source No.", "Location Code");
                     ToolTip = 'View items that are inbound or outbound on inventory put-away or inventory pick documents for the purchase order.';
                 }
                 action("Whse. Receipt Lines")
@@ -432,12 +456,12 @@ page 9307 "Purchase Order List"
                     Caption = 'Whse. Receipt Lines';
                     Image = ReceiptLines;
                     RunObject = Page "Whse. Receipt Lines";
-                    RunPageLink = "Source Type" = CONST(39),
+                    RunPageLink = "Source Type" = const(39),
 #pragma warning disable AL0603
-                                  "Source Subtype" = FIELD("Document Type"),
+                                  "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.");
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.");
                     ToolTip = 'View ongoing warehouse receipts for the document, in advanced warehouse configurations.';
                 }
                 action("Whse. Put-away Lines")
@@ -609,7 +633,7 @@ page 9307 "Purchase Order List"
                         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelPurchaseApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
             }
@@ -632,8 +656,8 @@ page 9307 "Purchase Order List"
                         Rec.PerformManualRelease();
                         GetSourceDocInbound.CreateFromPurchOrder(Rec);
 
-                        if not Find('=><') then
-                            Init();
+                        if not Rec.Find('=><') then
+                            Rec.Init();
                     end;
                 }
                 action("Create Inventor&y Put-away/Pick")
@@ -648,10 +672,10 @@ page 9307 "Purchase Order List"
                     trigger OnAction()
                     begin
                         Rec.PerformManualRelease();
-                        CreateInvtPutAwayPick();
+                        Rec.CreateInvtPutAwayPick();
 
-                        if not Find('=><') then
-                            Init();
+                        if not Rec.Find('=><') then
+                            Rec.Init();
                     end;
                 }
             }
@@ -696,9 +720,9 @@ page 9307 "Purchase Order List"
                             BatchProcessingMgt.SetParametersForPageID(Page::"Purchase Order List");
 
                             PurchaseBatchPostMgt.SetBatchProcessor(BatchProcessingMgt);
-                            PurchaseBatchPostMgt.RunWithUI(PurchaseHeader, Count, ReadyToPostQst);
+                            PurchaseBatchPostMgt.RunWithUI(PurchaseHeader, Rec.Count(), ReadyToPostQst);
                         end else
-                            SendToPosting(CODEUNIT::"Purch.-Post (Yes/No)");
+                            Rec.SendToPosting(Codeunit::"Purch.-Post (Yes/No)");
                     end;
                 }
                 action(Preview)
@@ -727,7 +751,7 @@ page 9307 "Purchase Order List"
 
                     trigger OnAction()
                     begin
-                        SendToPosting(CODEUNIT::"Purch.-Post + Print");
+                        Rec.SendToPosting(Codeunit::"Purch.-Post + Print");
                     end;
                 }
                 action(PostBatch)
@@ -759,7 +783,7 @@ page 9307 "Purchase Order List"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                     end;
                 }
             }
@@ -886,14 +910,13 @@ page 9307 "Purchase Order List"
 
         JobQueueActive := PurchasesPayablesSetup.JobQueueActive();
 
-        CopyBuyFromVendorFilter();
+        Rec.CopyBuyFromVendorFilter();
         if OnlyShowHeadersWithVat then
             SetFilterOnPositiveVatPostingGroups();
     end;
 
     var
         ReportPrint: Codeunit "Test Report-Print";
-        [InDataSet]
         JobQueueActive: Boolean;
         OpenApprovalEntriesExist: Boolean;
         CanCancelApprovalForRecord: Boolean;
@@ -901,7 +924,6 @@ page 9307 "Purchase Order List"
         ReadyToPostQst: Label 'The number of orders that will be posted is %1. \Do you want to continue?', Comment = '%1 - selected count';
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
 
     local procedure SetControlAppearance()
@@ -909,11 +931,11 @@ page 9307 "Purchase Order List"
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
     end;
 
     procedure SkipShowingLinesWithoutVAT()

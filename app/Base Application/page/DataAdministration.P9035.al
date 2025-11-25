@@ -1,3 +1,38 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.DataAdministration;
+
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Task;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Email;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Ledger;
+
 page 9035 "Data Administration"
 {
     PageType = List;

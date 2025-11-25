@@ -1,3 +1,11 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 1120 "Cost Type Balance/Budget"
 {
     Caption = 'Cost Type Balance/Budget';
@@ -100,7 +108,7 @@ page 1120 "Cost Type Balance/Budget"
                 IndentationColumn = NameIndent;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field(Number; "No.")
+                field(Number; Rec."No.")
                 {
                     ApplicationArea = CostAccounting;
                     Style = Strong;
@@ -193,11 +201,11 @@ page 1120 "Cost Type Balance/Budget"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Cost Type Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Cost Center Filter" = FIELD("Cost Center Filter"),
-                                  "Cost Object Filter" = FIELD("Cost Object Filter"),
-                                  "Budget Filter" = FIELD("Budget Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Cost Center Filter" = field("Cost Center Filter"),
+                                  "Cost Object Filter" = field("Cost Object Filter"),
+                                  "Budget Filter" = field("Budget Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about cost type.';
                 }
@@ -209,9 +217,9 @@ page 1120 "Cost Type Balance/Budget"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Cost Type No." = FIELD("No."),
-                                  "Posting Date" = FIELD("Date Filter");
-                    RunPageView = SORTING("Cost Type No.", "Posting Date");
+                    RunPageLink = "Cost Type No." = field("No."),
+                                  "Posting Date" = field("Date Filter");
+                    RunPageView = sorting("Cost Type No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View cost entries, which can come from sources such as automatic transfer of general ledger entries to cost entries, manual posting for pure cost entries, internal charges, and manual allocations, and automatic allocation postings for actual costs.';
                 }
@@ -292,9 +300,7 @@ page 1120 "Cost Type Balance/Budget"
         PeriodType: Enum "Analysis Period Type";
         AmountType: Enum "Analysis Amount Type";
         BudgetPct: Decimal;
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
         BudgetFilter: Code[10];
         CostCenterFilter: Text[1024];

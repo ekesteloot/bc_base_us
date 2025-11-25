@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 table 353 "Dimension ID Buffer"
 {
     Caption = 'Dimension ID Buffer';

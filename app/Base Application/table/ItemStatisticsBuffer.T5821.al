@@ -1,3 +1,14 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 5821 "Item Statistics Buffer"
 {
     Caption = 'Item Statistics Buffer';
@@ -35,21 +46,21 @@ table 5821 "Item Statistics Buffer"
         {
             Caption = 'Budget Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Item Budget Name".Name WHERE("Analysis Area" = FIELD("Analysis Area Filter"));
+            TableRelation = "Item Budget Name".Name where("Analysis Area" = field("Analysis Area Filter"));
         }
         field(6; "Global Dimension 1 Filter"; Code[20])
         {
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(7; "Global Dimension 2 Filter"; Code[20])
         {
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(9; "Date Filter"; Date)
         {
@@ -82,27 +93,27 @@ table 5821 "Item Statistics Buffer"
         {
             Caption = 'Source No. Filter';
             FieldClass = FlowFilter;
-            TableRelation = IF ("Source Type Filter" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type Filter" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type Filter" = CONST(Item)) Item;
+            TableRelation = if ("Source Type Filter" = const(Customer)) Customer
+            else
+            if ("Source Type Filter" = const(Vendor)) Vendor
+            else
+            if ("Source Type Filter" = const(Item)) Item;
             ValidateTableRelation = false;
         }
         field(15; "Invoiced Quantity"; Decimal)
         {
-            CalcFormula = Sum("Value Entry"."Invoiced Quantity" WHERE("Item No." = FIELD("Item Filter"),
-                                                                       "Posting Date" = FIELD("Date Filter"),
-                                                                       "Variant Code" = FIELD("Variant Filter"),
-                                                                       "Location Code" = FIELD("Location Filter"),
-                                                                       "Entry Type" = FIELD("Entry Type Filter"),
-                                                                       "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                       "Variance Type" = FIELD("Variance Type Filter"),
-                                                                       "Item Charge No." = FIELD("Item Charge No. Filter"),
-                                                                       "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                       "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                       "Source Type" = FIELD("Source Type Filter"),
-                                                                       "Source No." = FIELD("Source No. Filter")));
+            CalcFormula = sum("Value Entry"."Invoiced Quantity" where("Item No." = field("Item Filter"),
+                                                                       "Posting Date" = field("Date Filter"),
+                                                                       "Variant Code" = field("Variant Filter"),
+                                                                       "Location Code" = field("Location Filter"),
+                                                                       "Entry Type" = field("Entry Type Filter"),
+                                                                       "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                       "Variance Type" = field("Variance Type Filter"),
+                                                                       "Item Charge No." = field("Item Charge No. Filter"),
+                                                                       "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                       "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                       "Source Type" = field("Source Type Filter"),
+                                                                       "Source No." = field("Source No. Filter")));
             Caption = 'Invoiced Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -111,18 +122,18 @@ table 5821 "Item Statistics Buffer"
         field(16; "Sales Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("Item No." = FIELD("Item Filter"),
-                                                                           "Posting Date" = FIELD("Date Filter"),
-                                                                           "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                           "Entry Type" = FIELD("Entry Type Filter"),
-                                                                           "Variance Type" = FIELD("Variance Type Filter"),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                           "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                           "Item Charge No." = FIELD("Item Charge No. Filter"),
-                                                                           "Source Type" = FIELD("Source Type Filter"),
-                                                                           "Source No." = FIELD("Source No. Filter")));
+            CalcFormula = sum("Value Entry"."Sales Amount (Actual)" where("Item No." = field("Item Filter"),
+                                                                           "Posting Date" = field("Date Filter"),
+                                                                           "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                           "Entry Type" = field("Entry Type Filter"),
+                                                                           "Variance Type" = field("Variance Type Filter"),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                           "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                           "Item Charge No." = field("Item Charge No. Filter"),
+                                                                           "Source Type" = field("Source Type Filter"),
+                                                                           "Source No." = field("Source No. Filter")));
             Caption = 'Sales Amount (Actual)';
             Editable = false;
             FieldClass = FlowField;
@@ -130,18 +141,18 @@ table 5821 "Item Statistics Buffer"
         field(17; "Cost Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Actual)" WHERE("Item No." = FIELD("Item Filter"),
-                                                                          "Posting Date" = FIELD("Date Filter"),
-                                                                          "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                          "Entry Type" = FIELD("Entry Type Filter"),
-                                                                          "Variance Type" = FIELD("Variance Type Filter"),
-                                                                          "Location Code" = FIELD("Location Filter"),
-                                                                          "Variant Code" = FIELD("Variant Filter"),
-                                                                          "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                          "Item Charge No." = FIELD("Item Charge No. Filter"),
-                                                                          "Source Type" = FIELD("Source Type Filter"),
-                                                                          "Source No." = FIELD("Source No. Filter")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Actual)" where("Item No." = field("Item Filter"),
+                                                                          "Posting Date" = field("Date Filter"),
+                                                                          "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                          "Entry Type" = field("Entry Type Filter"),
+                                                                          "Variance Type" = field("Variance Type Filter"),
+                                                                          "Location Code" = field("Location Filter"),
+                                                                          "Variant Code" = field("Variant Filter"),
+                                                                          "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                          "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                          "Item Charge No." = field("Item Charge No. Filter"),
+                                                                          "Source Type" = field("Source Type Filter"),
+                                                                          "Source No." = field("Source No. Filter")));
             Caption = 'Cost Amount (Actual)';
             Editable = false;
             FieldClass = FlowField;
@@ -149,18 +160,18 @@ table 5821 "Item Statistics Buffer"
         field(18; "Cost Amount (Non-Invtbl.)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Non-Invtbl.)" WHERE("Item No." = FIELD("Item Filter"),
-                                                                               "Posting Date" = FIELD("Date Filter"),
-                                                                               "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                               "Variance Type" = FIELD("Variance Type Filter"),
-                                                                               "Entry Type" = FIELD("Entry Type Filter"),
-                                                                               "Location Code" = FIELD("Location Filter"),
-                                                                               "Variant Code" = FIELD("Variant Filter"),
-                                                                               "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                               "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                               "Item Charge No." = FIELD("Item Charge No. Filter"),
-                                                                               "Source Type" = FIELD("Source Type Filter"),
-                                                                               "Source No." = FIELD("Source No. Filter")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Non-Invtbl.)" where("Item No." = field("Item Filter"),
+                                                                               "Posting Date" = field("Date Filter"),
+                                                                               "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                               "Variance Type" = field("Variance Type Filter"),
+                                                                               "Entry Type" = field("Entry Type Filter"),
+                                                                               "Location Code" = field("Location Filter"),
+                                                                               "Variant Code" = field("Variant Filter"),
+                                                                               "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                               "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                               "Item Charge No." = field("Item Charge No. Filter"),
+                                                                               "Source Type" = field("Source Type Filter"),
+                                                                               "Source No." = field("Source No. Filter")));
             Caption = 'Cost Amount (Non-Invtbl.)';
             Editable = false;
             FieldClass = FlowField;
@@ -254,15 +265,15 @@ table 5821 "Item Statistics Buffer"
 #pragma warning restore AS0070
         field(45; Quantity; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("Item Filter"),
-                                                                  "Source Type" = FIELD("Source Type Filter"),
-                                                                  "Source No." = FIELD("Source No. Filter"),
-                                                                  "Posting Date" = FIELD("Date Filter"),
-                                                                  "Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                  "Location Code" = FIELD("Location Filter"),
-                                                                  "Variant Code" = FIELD("Variant Filter"),
-                                                                  "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                  "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+            CalcFormula = sum("Item Ledger Entry".Quantity where("Item No." = field("Item Filter"),
+                                                                  "Source Type" = field("Source Type Filter"),
+                                                                  "Source No." = field("Source No. Filter"),
+                                                                  "Posting Date" = field("Date Filter"),
+                                                                  "Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                  "Location Code" = field("Location Filter"),
+                                                                  "Variant Code" = field("Variant Filter"),
+                                                                  "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                  "Global Dimension 2 Code" = field("Global Dimension 2 Filter")));
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -271,18 +282,18 @@ table 5821 "Item Statistics Buffer"
         field(46; "Sales Amount (Expected)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Sales Amount (Expected)" WHERE("Item No." = FIELD("Item Filter"),
-                                                                             "Source Type" = FIELD("Source Type Filter"),
-                                                                             "Source No." = FIELD("Source No. Filter"),
-                                                                             "Posting Date" = FIELD("Date Filter"),
-                                                                             "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                             "Variance Type" = FIELD("Variance Type Filter"),
-                                                                             "Entry Type" = FIELD("Entry Type Filter"),
-                                                                             "Location Code" = FIELD("Location Filter"),
-                                                                             "Variant Code" = FIELD("Variant Filter"),
-                                                                             "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                             "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                             "Item Charge No." = FIELD("Item Charge No. Filter")));
+            CalcFormula = sum("Value Entry"."Sales Amount (Expected)" where("Item No." = field("Item Filter"),
+                                                                             "Source Type" = field("Source Type Filter"),
+                                                                             "Source No." = field("Source No. Filter"),
+                                                                             "Posting Date" = field("Date Filter"),
+                                                                             "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                             "Variance Type" = field("Variance Type Filter"),
+                                                                             "Entry Type" = field("Entry Type Filter"),
+                                                                             "Location Code" = field("Location Filter"),
+                                                                             "Variant Code" = field("Variant Filter"),
+                                                                             "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                             "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                             "Item Charge No." = field("Item Charge No. Filter")));
             Caption = 'Sales Amount (Expected)';
             Editable = false;
             FieldClass = FlowField;
@@ -290,36 +301,36 @@ table 5821 "Item Statistics Buffer"
         field(47; "Cost Amount (Expected)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Expected)" WHERE("Item No." = FIELD("Item Filter"),
-                                                                            "Source Type" = FIELD("Source Type Filter"),
-                                                                            "Source No." = FIELD("Source No. Filter"),
-                                                                            "Posting Date" = FIELD("Date Filter"),
-                                                                            "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                            "Variance Type" = FIELD("Variance Type Filter"),
-                                                                            "Entry Type" = FIELD("Entry Type Filter"),
-                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                            "Variant Code" = FIELD("Variant Filter"),
-                                                                            "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                            "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                            "Item Charge No." = FIELD("Item Charge No. Filter")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Expected)" where("Item No." = field("Item Filter"),
+                                                                            "Source Type" = field("Source Type Filter"),
+                                                                            "Source No." = field("Source No. Filter"),
+                                                                            "Posting Date" = field("Date Filter"),
+                                                                            "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                            "Variance Type" = field("Variance Type Filter"),
+                                                                            "Entry Type" = field("Entry Type Filter"),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                            "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                            "Item Charge No." = field("Item Charge No. Filter")));
             Caption = 'Cost Amount (Expected)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(50; "Budgeted Quantity"; Decimal)
         {
-            CalcFormula = Sum("Item Budget Entry".Quantity WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                  "Budget Name" = FIELD("Budget Filter"),
-                                                                  "Item No." = FIELD("Item Filter"),
-                                                                  Date = FIELD("Date Filter"),
-                                                                  "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                  "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                  "Budget Dimension 1 Code" = FIELD("Dimension 1 Filter"),
-                                                                  "Budget Dimension 2 Code" = FIELD("Dimension 2 Filter"),
-                                                                  "Budget Dimension 3 Code" = FIELD("Dimension 3 Filter"),
-                                                                  "Source Type" = FIELD("Source Type Filter"),
-                                                                  "Source No." = FIELD("Source No. Filter"),
-                                                                  "Location Code" = FIELD("Location Filter")));
+            CalcFormula = sum("Item Budget Entry".Quantity where("Analysis Area" = field("Analysis Area Filter"),
+                                                                  "Budget Name" = field("Budget Filter"),
+                                                                  "Item No." = field("Item Filter"),
+                                                                  Date = field("Date Filter"),
+                                                                  "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                  "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                  "Budget Dimension 1 Code" = field("Dimension 1 Filter"),
+                                                                  "Budget Dimension 2 Code" = field("Dimension 2 Filter"),
+                                                                  "Budget Dimension 3 Code" = field("Dimension 3 Filter"),
+                                                                  "Source Type" = field("Source Type Filter"),
+                                                                  "Source No." = field("Source No. Filter"),
+                                                                  "Location Code" = field("Location Filter")));
             Caption = 'Budgeted Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -328,18 +339,18 @@ table 5821 "Item Statistics Buffer"
         field(51; "Budgeted Sales Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Item Budget Entry"."Sales Amount" WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                        "Budget Name" = FIELD("Budget Filter"),
-                                                                        "Item No." = FIELD("Item Filter"),
-                                                                        Date = FIELD("Date Filter"),
-                                                                        "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                        "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                        "Budget Dimension 1 Code" = FIELD("Dimension 1 Filter"),
-                                                                        "Budget Dimension 2 Code" = FIELD("Dimension 2 Filter"),
-                                                                        "Budget Dimension 3 Code" = FIELD("Dimension 3 Filter"),
-                                                                        "Source Type" = FIELD("Source Type Filter"),
-                                                                        "Source No." = FIELD("Source No. Filter"),
-                                                                        "Location Code" = FIELD("Location Filter")));
+            CalcFormula = sum("Item Budget Entry"."Sales Amount" where("Analysis Area" = field("Analysis Area Filter"),
+                                                                        "Budget Name" = field("Budget Filter"),
+                                                                        "Item No." = field("Item Filter"),
+                                                                        Date = field("Date Filter"),
+                                                                        "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                        "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                        "Budget Dimension 1 Code" = field("Dimension 1 Filter"),
+                                                                        "Budget Dimension 2 Code" = field("Dimension 2 Filter"),
+                                                                        "Budget Dimension 3 Code" = field("Dimension 3 Filter"),
+                                                                        "Source Type" = field("Source Type Filter"),
+                                                                        "Source No." = field("Source No. Filter"),
+                                                                        "Location Code" = field("Location Filter")));
             Caption = 'Budgeted Sales Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -347,18 +358,18 @@ table 5821 "Item Statistics Buffer"
         field(52; "Budgeted Cost Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Item Budget Entry"."Cost Amount" WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                       "Budget Name" = FIELD("Budget Filter"),
-                                                                       "Item No." = FIELD("Item Filter"),
-                                                                       Date = FIELD("Date Filter"),
-                                                                       "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                       "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                       "Budget Dimension 1 Code" = FIELD("Dimension 1 Filter"),
-                                                                       "Budget Dimension 2 Code" = FIELD("Dimension 2 Filter"),
-                                                                       "Budget Dimension 3 Code" = FIELD("Dimension 3 Filter"),
-                                                                       "Source Type" = FIELD("Source Type Filter"),
-                                                                       "Source No." = FIELD("Source No. Filter"),
-                                                                       "Location Code" = FIELD("Location Filter")));
+            CalcFormula = sum("Item Budget Entry"."Cost Amount" where("Analysis Area" = field("Analysis Area Filter"),
+                                                                       "Budget Name" = field("Budget Filter"),
+                                                                       "Item No." = field("Item Filter"),
+                                                                       Date = field("Date Filter"),
+                                                                       "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                       "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                       "Budget Dimension 1 Code" = field("Dimension 1 Filter"),
+                                                                       "Budget Dimension 2 Code" = field("Dimension 2 Filter"),
+                                                                       "Budget Dimension 3 Code" = field("Dimension 3 Filter"),
+                                                                       "Source Type" = field("Source Type Filter"),
+                                                                       "Source No." = field("Source No. Filter"),
+                                                                       "Location Code" = field("Location Filter")));
             Caption = 'Budgeted Cost Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -367,7 +378,7 @@ table 5821 "Item Statistics Buffer"
         {
             Caption = 'Analysis View Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Item Analysis View".Code WHERE("Analysis Area" = FIELD("Analysis Area Filter"));
+            TableRelation = "Item Analysis View".Code where("Analysis Area" = field("Analysis Area Filter"));
         }
         field(71; "Dimension 1 Filter"; Code[20])
         {
@@ -386,18 +397,18 @@ table 5821 "Item Statistics Buffer"
         }
         field(80; "Analysis - Quantity"; Decimal)
         {
-            CalcFormula = Sum("Item Analysis View Entry".Quantity WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                         "Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                         "Item No." = FIELD("Item Filter"),
-                                                                         "Location Code" = FIELD("Location Filter"),
-                                                                         "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                         "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                         "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                         "Posting Date" = FIELD("Date Filter"),
-                                                                         "Source Type" = FIELD("Source Type Filter"),
-                                                                         "Source No." = FIELD("Source No. Filter"),
-                                                                         "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                         "Entry Type" = FIELD("Entry Type Filter")));
+            CalcFormula = sum("Item Analysis View Entry".Quantity where("Analysis Area" = field("Analysis Area Filter"),
+                                                                         "Analysis View Code" = field("Analysis View Filter"),
+                                                                         "Item No." = field("Item Filter"),
+                                                                         "Location Code" = field("Location Filter"),
+                                                                         "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                         "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                         "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                         "Posting Date" = field("Date Filter"),
+                                                                         "Source Type" = field("Source Type Filter"),
+                                                                         "Source No." = field("Source No. Filter"),
+                                                                         "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                         "Entry Type" = field("Entry Type Filter")));
             Caption = 'Analysis - Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -405,18 +416,18 @@ table 5821 "Item Statistics Buffer"
         }
         field(81; "Analysis - Invoiced Quantity"; Decimal)
         {
-            CalcFormula = Sum("Item Analysis View Entry"."Invoiced Quantity" WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                                    "Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                                    "Item No." = FIELD("Item Filter"),
-                                                                                    "Location Code" = FIELD("Location Filter"),
-                                                                                    "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                                    "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                                    "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                                    "Posting Date" = FIELD("Date Filter"),
-                                                                                    "Source Type" = FIELD("Source Type Filter"),
-                                                                                    "Source No." = FIELD("Source No. Filter"),
-                                                                                    "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                                    "Entry Type" = FIELD("Entry Type Filter")));
+            CalcFormula = sum("Item Analysis View Entry"."Invoiced Quantity" where("Analysis Area" = field("Analysis Area Filter"),
+                                                                                    "Analysis View Code" = field("Analysis View Filter"),
+                                                                                    "Item No." = field("Item Filter"),
+                                                                                    "Location Code" = field("Location Filter"),
+                                                                                    "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                                    "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                                    "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                                    "Posting Date" = field("Date Filter"),
+                                                                                    "Source Type" = field("Source Type Filter"),
+                                                                                    "Source No." = field("Source No. Filter"),
+                                                                                    "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                                    "Entry Type" = field("Entry Type Filter")));
             Caption = 'Analysis - Invoiced Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -425,18 +436,18 @@ table 5821 "Item Statistics Buffer"
         field(82; "Analysis - Sales Amt. (Actual)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Item Analysis View Entry"."Sales Amount (Actual)" WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                                        "Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                                        "Item No." = FIELD("Item Filter"),
-                                                                                        "Location Code" = FIELD("Location Filter"),
-                                                                                        "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                                        "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                                        "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                                        "Posting Date" = FIELD("Date Filter"),
-                                                                                        "Source Type" = FIELD("Source Type Filter"),
-                                                                                        "Source No." = FIELD("Source No. Filter"),
-                                                                                        "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                                        "Entry Type" = FIELD("Entry Type Filter")));
+            CalcFormula = sum("Item Analysis View Entry"."Sales Amount (Actual)" where("Analysis Area" = field("Analysis Area Filter"),
+                                                                                        "Analysis View Code" = field("Analysis View Filter"),
+                                                                                        "Item No." = field("Item Filter"),
+                                                                                        "Location Code" = field("Location Filter"),
+                                                                                        "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                                        "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                                        "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                                        "Posting Date" = field("Date Filter"),
+                                                                                        "Source Type" = field("Source Type Filter"),
+                                                                                        "Source No." = field("Source No. Filter"),
+                                                                                        "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                                        "Entry Type" = field("Entry Type Filter")));
             Caption = 'Analysis - Sales Amt. (Actual)';
             Editable = false;
             FieldClass = FlowField;
@@ -444,18 +455,18 @@ table 5821 "Item Statistics Buffer"
         field(83; "Analysis - Sales Amt. (Exp)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Item Analysis View Entry"."Sales Amount (Expected)" WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                                          "Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                                          "Item No." = FIELD("Item Filter"),
-                                                                                          "Location Code" = FIELD("Location Filter"),
-                                                                                          "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                                          "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                                          "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                                          "Posting Date" = FIELD("Date Filter"),
-                                                                                          "Source Type" = FIELD("Source Type Filter"),
-                                                                                          "Source No." = FIELD("Source No. Filter"),
-                                                                                          "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                                          "Entry Type" = FIELD("Entry Type Filter")));
+            CalcFormula = sum("Item Analysis View Entry"."Sales Amount (Expected)" where("Analysis Area" = field("Analysis Area Filter"),
+                                                                                          "Analysis View Code" = field("Analysis View Filter"),
+                                                                                          "Item No." = field("Item Filter"),
+                                                                                          "Location Code" = field("Location Filter"),
+                                                                                          "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                                          "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                                          "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                                          "Posting Date" = field("Date Filter"),
+                                                                                          "Source Type" = field("Source Type Filter"),
+                                                                                          "Source No." = field("Source No. Filter"),
+                                                                                          "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                                          "Entry Type" = field("Entry Type Filter")));
             Caption = 'Analysis - Sales Amt. (Exp)';
             Editable = false;
             FieldClass = FlowField;
@@ -463,18 +474,18 @@ table 5821 "Item Statistics Buffer"
         field(84; "Analysis - Cost Amt. (Actual)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Item Analysis View Entry"."Cost Amount (Actual)" WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                                       "Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                                       "Item No." = FIELD("Item Filter"),
-                                                                                       "Location Code" = FIELD("Location Filter"),
-                                                                                       "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                                       "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                                       "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                                       "Posting Date" = FIELD("Date Filter"),
-                                                                                       "Source Type" = FIELD("Source Type Filter"),
-                                                                                       "Source No." = FIELD("Source No. Filter"),
-                                                                                       "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                                       "Entry Type" = FIELD("Entry Type Filter")));
+            CalcFormula = sum("Item Analysis View Entry"."Cost Amount (Actual)" where("Analysis Area" = field("Analysis Area Filter"),
+                                                                                       "Analysis View Code" = field("Analysis View Filter"),
+                                                                                       "Item No." = field("Item Filter"),
+                                                                                       "Location Code" = field("Location Filter"),
+                                                                                       "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                                       "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                                       "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                                       "Posting Date" = field("Date Filter"),
+                                                                                       "Source Type" = field("Source Type Filter"),
+                                                                                       "Source No." = field("Source No. Filter"),
+                                                                                       "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                                       "Entry Type" = field("Entry Type Filter")));
             Caption = 'Analysis - Cost Amt. (Actual)';
             Editable = false;
             FieldClass = FlowField;
@@ -482,18 +493,18 @@ table 5821 "Item Statistics Buffer"
         field(85; "Analysis - Cost Amt. (Exp)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Item Analysis View Entry"."Cost Amount (Expected)" WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                                         "Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                                         "Item No." = FIELD("Item Filter"),
-                                                                                         "Location Code" = FIELD("Location Filter"),
-                                                                                         "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                                         "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                                         "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                                         "Posting Date" = FIELD("Date Filter"),
-                                                                                         "Source Type" = FIELD("Source Type Filter"),
-                                                                                         "Source No." = FIELD("Source No. Filter"),
-                                                                                         "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                                         "Entry Type" = FIELD("Entry Type Filter")));
+            CalcFormula = sum("Item Analysis View Entry"."Cost Amount (Expected)" where("Analysis Area" = field("Analysis Area Filter"),
+                                                                                         "Analysis View Code" = field("Analysis View Filter"),
+                                                                                         "Item No." = field("Item Filter"),
+                                                                                         "Location Code" = field("Location Filter"),
+                                                                                         "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                                         "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                                         "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                                         "Posting Date" = field("Date Filter"),
+                                                                                         "Source Type" = field("Source Type Filter"),
+                                                                                         "Source No." = field("Source No. Filter"),
+                                                                                         "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                                         "Entry Type" = field("Entry Type Filter")));
             Caption = 'Analysis - Cost Amt. (Exp)';
             Editable = false;
             FieldClass = FlowField;
@@ -501,35 +512,35 @@ table 5821 "Item Statistics Buffer"
         field(86; "Analysis CostAmt.(Non-Invtbl.)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Item Analysis View Entry"."Cost Amount (Non-Invtbl.)" WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                                            "Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                                            "Item No." = FIELD("Item Filter"),
-                                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                                            "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                                            "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                                            "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                                            "Posting Date" = FIELD("Date Filter"),
-                                                                                            "Source Type" = FIELD("Source Type Filter"),
-                                                                                            "Source No." = FIELD("Source No. Filter"),
-                                                                                            "Item Ledger Entry Type" = FIELD("Item Ledger Entry Type Filter"),
-                                                                                            "Entry Type" = FIELD("Entry Type Filter")));
+            CalcFormula = sum("Item Analysis View Entry"."Cost Amount (Non-Invtbl.)" where("Analysis Area" = field("Analysis Area Filter"),
+                                                                                            "Analysis View Code" = field("Analysis View Filter"),
+                                                                                            "Item No." = field("Item Filter"),
+                                                                                            "Location Code" = field("Location Filter"),
+                                                                                            "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                                            "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                                            "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                                            "Posting Date" = field("Date Filter"),
+                                                                                            "Source Type" = field("Source Type Filter"),
+                                                                                            "Source No." = field("Source No. Filter"),
+                                                                                            "Item Ledger Entry Type" = field("Item Ledger Entry Type Filter"),
+                                                                                            "Entry Type" = field("Entry Type Filter")));
             Caption = 'Analysis CostAmt.(Non-Invtbl.)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(91; "Analysis - Budgeted Quantity"; Decimal)
         {
-            CalcFormula = Sum("Item Analysis View Budg. Entry".Quantity WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                               "Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                               "Budget Name" = FIELD("Budget Filter"),
-                                                                               "Item No." = FIELD("Item Filter"),
-                                                                               "Location Code" = FIELD("Location Filter"),
-                                                                               "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                               "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                               "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                               "Posting Date" = FIELD("Date Filter"),
-                                                                               "Source Type" = FIELD("Source Type Filter"),
-                                                                               "Source No." = FIELD("Source No. Filter")));
+            CalcFormula = sum("Item Analysis View Budg. Entry".Quantity where("Analysis Area" = field("Analysis Area Filter"),
+                                                                               "Analysis View Code" = field("Analysis View Filter"),
+                                                                               "Budget Name" = field("Budget Filter"),
+                                                                               "Item No." = field("Item Filter"),
+                                                                               "Location Code" = field("Location Filter"),
+                                                                               "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                               "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                               "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                               "Posting Date" = field("Date Filter"),
+                                                                               "Source Type" = field("Source Type Filter"),
+                                                                               "Source No." = field("Source No. Filter")));
             Caption = 'Analysis - Budgeted Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -538,17 +549,17 @@ table 5821 "Item Statistics Buffer"
         field(92; "Analysis - Budgeted Sales Amt."; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Item Analysis View Budg. Entry"."Sales Amount" WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                                     "Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                                     "Budget Name" = FIELD("Budget Filter"),
-                                                                                     "Item No." = FIELD("Item Filter"),
-                                                                                     "Location Code" = FIELD("Location Filter"),
-                                                                                     "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                                     "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                                     "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                                     "Posting Date" = FIELD("Date Filter"),
-                                                                                     "Source Type" = FIELD("Source Type Filter"),
-                                                                                     "Source No." = FIELD("Source No. Filter")));
+            CalcFormula = sum("Item Analysis View Budg. Entry"."Sales Amount" where("Analysis Area" = field("Analysis Area Filter"),
+                                                                                     "Analysis View Code" = field("Analysis View Filter"),
+                                                                                     "Budget Name" = field("Budget Filter"),
+                                                                                     "Item No." = field("Item Filter"),
+                                                                                     "Location Code" = field("Location Filter"),
+                                                                                     "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                                     "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                                     "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                                     "Posting Date" = field("Date Filter"),
+                                                                                     "Source Type" = field("Source Type Filter"),
+                                                                                     "Source No." = field("Source No. Filter")));
             Caption = 'Analysis - Budgeted Sales Amt.';
             Editable = false;
             FieldClass = FlowField;
@@ -556,17 +567,17 @@ table 5821 "Item Statistics Buffer"
         field(93; "Analysis - Budgeted Cost Amt."; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Item Analysis View Budg. Entry"."Cost Amount" WHERE("Analysis Area" = FIELD("Analysis Area Filter"),
-                                                                                    "Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                                    "Budget Name" = FIELD("Budget Filter"),
-                                                                                    "Item No." = FIELD("Item Filter"),
-                                                                                    "Location Code" = FIELD("Location Filter"),
-                                                                                    "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                                    "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                                    "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                                    "Posting Date" = FIELD("Date Filter"),
-                                                                                    "Source Type" = FIELD("Source Type Filter"),
-                                                                                    "Source No." = FIELD("Source No. Filter")));
+            CalcFormula = sum("Item Analysis View Budg. Entry"."Cost Amount" where("Analysis Area" = field("Analysis Area Filter"),
+                                                                                    "Analysis View Code" = field("Analysis View Filter"),
+                                                                                    "Budget Name" = field("Budget Filter"),
+                                                                                    "Item No." = field("Item Filter"),
+                                                                                    "Location Code" = field("Location Filter"),
+                                                                                    "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                                    "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                                    "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                                    "Posting Date" = field("Date Filter"),
+                                                                                    "Source Type" = field("Source Type Filter"),
+                                                                                    "Source No." = field("Source No. Filter")));
             Caption = 'Analysis - Budgeted Cost Amt.';
             Editable = false;
             FieldClass = FlowField;

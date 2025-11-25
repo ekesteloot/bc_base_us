@@ -1,3 +1,14 @@
+namespace Microsoft.CRM.RoleCenters;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Segment;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Sales.Document;
+
 table 9063 "Relationship Mgmt. Cue"
 {
     Caption = 'Relationship Mgmt. Cue';
@@ -10,83 +21,83 @@ table 9063 "Relationship Mgmt. Cue"
         }
         field(2; Contacts; Integer)
         {
-            CalcFormula = Count(Contact);
+            CalcFormula = count(Contact);
             Caption = 'Contacts';
             FieldClass = FlowField;
         }
         field(3; Segments; Integer)
         {
-            CalcFormula = Count("Segment Header");
+            CalcFormula = count("Segment Header");
             Caption = 'Segments';
             FieldClass = FlowField;
         }
         field(4; "Logged Segments"; Integer)
         {
-            CalcFormula = Count("Logged Segment");
+            CalcFormula = count("Logged Segment");
             Caption = 'Logged Segments';
             FieldClass = FlowField;
         }
         field(5; "Open Opportunities"; Integer)
         {
-            CalcFormula = Count(Opportunity WHERE(Closed = FILTER(false)));
+            CalcFormula = count(Opportunity where(Closed = filter(false)));
             Caption = 'Open Opportunities';
             FieldClass = FlowField;
         }
         field(6; "Closed Opportunities"; Integer)
         {
-            CalcFormula = Count(Opportunity WHERE(Closed = FILTER(true)));
+            CalcFormula = count(Opportunity where(Closed = filter(true)));
             Caption = 'Closed Opportunities';
             FieldClass = FlowField;
         }
         field(7; "Opportunities Due in 7 Days"; Integer)
         {
-            CalcFormula = Count("Opportunity Entry" WHERE(Active = FILTER(true),
-                                                           "Date Closed" = FILTER(0D),
-                                                           "Estimated Close Date" = FIELD("Due Date Filter")));
+            CalcFormula = count("Opportunity Entry" where(Active = filter(true),
+                                                           "Date Closed" = filter(0D),
+                                                           "Estimated Close Date" = field("Due Date Filter")));
             Caption = 'Opportunities Due in 7 Days';
             FieldClass = FlowField;
         }
         field(8; "Overdue Opportunities"; Integer)
         {
-            CalcFormula = Count("Opportunity Entry" WHERE(Active = FILTER(true),
-                                                           "Date Closed" = FILTER(0D),
-                                                           "Estimated Close Date" = FIELD("Overdue Date Filter")));
+            CalcFormula = count("Opportunity Entry" where(Active = filter(true),
+                                                           "Date Closed" = filter(0D),
+                                                           "Estimated Close Date" = field("Overdue Date Filter")));
             Caption = 'Overdue Opportunities';
             FieldClass = FlowField;
         }
         field(9; "Sales Cycles"; Integer)
         {
-            CalcFormula = Count("Sales Cycle");
+            CalcFormula = count("Sales Cycle");
             Caption = 'Sales Cycles';
             FieldClass = FlowField;
         }
         field(10; "Sales Persons"; Integer)
         {
-            CalcFormula = Count("Salesperson/Purchaser");
+            CalcFormula = count("Salesperson/Purchaser");
             Caption = 'Sales Persons';
             FieldClass = FlowField;
         }
         field(11; "Contacts - Open Opportunities"; Integer)
         {
-            CalcFormula = Count(Contact WHERE("No. of Opportunities" = FILTER(<> 0)));
+            CalcFormula = count(Contact where("No. of Opportunities" = filter(<> 0)));
             Caption = 'Contacts - Open Opportunities';
             FieldClass = FlowField;
         }
         field(12; "Contacts - Companies"; Integer)
         {
-            CalcFormula = Count(Contact WHERE(Type = CONST(Company)));
+            CalcFormula = count(Contact where(Type = const(Company)));
             Caption = 'Contacts - Companies';
             FieldClass = FlowField;
         }
         field(13; "Contacts - Persons"; Integer)
         {
-            CalcFormula = Count(Contact WHERE(Type = CONST(Person)));
+            CalcFormula = count(Contact where(Type = const(Person)));
             Caption = 'Contacts - Persons';
             FieldClass = FlowField;
         }
         field(14; "Contacts - Duplicates"; Integer)
         {
-            CalcFormula = Count("Contact Duplicate");
+            CalcFormula = count("Contact Duplicate");
             Caption = 'Contacts - Duplicates';
             FieldClass = FlowField;
         }
@@ -102,21 +113,21 @@ table 9063 "Relationship Mgmt. Cue"
         }
         field(20; "Open Sales Quotes"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = FILTER(Quote),
-                                                      Status = FILTER(Open)));
+            CalcFormula = count("Sales Header" where("Document Type" = filter(Quote),
+                                                      Status = filter(Open)));
             Caption = 'Open Sales Quotes';
             FieldClass = FlowField;
         }
         field(21; "Open Sales Orders"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = FILTER(Order),
-                                                      Status = FILTER(Open)));
+            CalcFormula = count("Sales Header" where("Document Type" = filter(Order),
+                                                      Status = filter(Open)));
             Caption = 'Open Sales Orders';
             FieldClass = FlowField;
         }
         field(22; "Active Campaigns"; Integer)
         {
-            CalcFormula = Count(Campaign WHERE(Activated = FILTER(true)));
+            CalcFormula = count(Campaign where(Activated = filter(true)));
             Caption = 'Active Campaigns';
             FieldClass = FlowField;
         }
@@ -127,13 +138,13 @@ table 9063 "Relationship Mgmt. Cue"
         }
         field(24; "Coupled Data Synch Errors"; Integer)
         {
-            CalcFormula = Count("CRM Integration Record" WHERE(Skipped = CONST(true)));
+            CalcFormula = count("CRM Integration Record" where(Skipped = const(true)));
             Caption = 'Coupled Data Synch Errors';
             FieldClass = FlowField;
         }
         field(25; "CDS Integration Errors"; Integer)
         {
-            CalcFormula = Count("Integration Synch. Job Errors");
+            CalcFormula = count("Integration Synch. Job Errors");
             Caption = 'Dataverse Integration Errors';
             FieldClass = FlowField;
         }

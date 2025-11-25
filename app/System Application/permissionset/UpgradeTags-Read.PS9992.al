@@ -3,7 +3,12 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-PermissionSet 9992 "Upgrade Tags - Read"
+namespace System.Upgrade;
+
+using System.Environment;
+using System.Integration;
+
+permissionset 9992 "Upgrade Tags - Read"
 {
     Access = Public;
     Assignable = false;

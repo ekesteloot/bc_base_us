@@ -1,7 +1,13 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.ProductionBOM;
+using System.Utilities;
+
 report 99000758 "Compare List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/CompareList.rdlc';
+    RDLCLayout = './Manufacturing/Reports/CompareList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Item BOM Compare List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 99000758 "Compare List"
     {
         dataitem(ItemLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             MaxIteration = 1;
 
             trigger OnPreDataItem()
@@ -31,7 +37,7 @@ report 99000758 "Compare List"
         }
         dataitem(BOMLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
             }

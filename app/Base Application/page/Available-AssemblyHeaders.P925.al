@@ -1,3 +1,9 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+
 page 925 "Available - Assembly Headers"
 {
     Caption = 'Available - Assembly Headers';
@@ -8,7 +14,7 @@ page 925 "Available - Assembly Headers"
     PageType = List;
     Permissions = TableData "Assembly Header" = rm;
     SourceTable = "Assembly Header";
-    SourceTableView = SORTING("Document Type", "Item No.", "Variant Code", "Location Code", "Due Date");
+    SourceTableView = sorting("Document Type", "Item No.", "Variant Code", "Location Code", "Due Date");
 
     layout
     {
@@ -240,7 +246,7 @@ page 925 "Available - Assembly Headers"
 
         UpdateReservMgt();
         TrackingSpecification.InitTrackingSpecification(
-          DATABASE::"Assembly Header", "Document Type".AsInteger(), Rec."No.", '', 0, 0,
+          DATABASE::"Assembly Header", Rec."Document Type".AsInteger(), Rec."No.", '', 0, 0,
           Rec."Variant Code", Rec."Location Code", Rec."Qty. per Unit of Measure");
         ReservMgt.CreateReservation(
           ReservEntry.Description, Rec."Due Date", ReserveQuantity, ReserveQuantityBase, TrackingSpecification);

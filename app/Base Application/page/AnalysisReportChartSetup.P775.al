@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 775 "Analysis Report Chart Setup"
 {
     Caption = 'Analysis Report Chart Setup';
@@ -28,7 +30,7 @@ page 775 "Analysis Report Chart Setup"
                     trigger OnValidate()
                     begin
                         SetEnabled();
-                        SetAnalysisReportName("Analysis Report Name");
+                        Rec.SetAnalysisReportName(Rec."Analysis Report Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -40,7 +42,7 @@ page 775 "Analysis Report Chart Setup"
                     trigger OnValidate()
                     begin
                         SetEnabled();
-                        SetShowPer("Base X-Axis on");
+                        Rec.SetShowPer(Rec."Base X-Axis on");
                         CurrPage.Update(false);
                     end;
                 }
@@ -115,7 +117,7 @@ page 775 "Analysis Report Chart Setup"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Start Date" := WorkDate();
+        Rec."Start Date" := WorkDate();
     end;
 
     trigger OnOpenPage()
@@ -130,9 +132,9 @@ page 775 "Analysis Report Chart Setup"
 
     local procedure SetEnabled()
     begin
-        IsNoOfPeriodsEnabled := "Base X-Axis on" = "Base X-Axis on"::Period;
-        IsXAxisVisible := "Base X-Axis on" <> "Base X-Axis on"::Period;
-        IsEndDateEnabled := "Base X-Axis on" <> "Base X-Axis on"::Period;
+        IsNoOfPeriodsEnabled := Rec."Base X-Axis on" = Rec."Base X-Axis on"::Period;
+        IsXAxisVisible := Rec."Base X-Axis on" <> Rec."Base X-Axis on"::Period;
+        IsEndDateEnabled := Rec."Base X-Axis on" <> Rec."Base X-Axis on"::Period;
         CurrPage.SetupYAxis.PAGE.SetViewAsMeasure(true);
         CurrPage.SetupYAxis.PAGE.SetSetupRec(Rec);
         CurrPage.SetupXAxis.PAGE.SetViewAsMeasure(false);

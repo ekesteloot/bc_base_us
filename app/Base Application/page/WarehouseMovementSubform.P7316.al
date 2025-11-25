@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7316 "Warehouse Movement Subform"
 {
     Caption = 'Lines';
@@ -5,8 +14,8 @@ page 7316 "Warehouse Movement Subform"
     LinksAllowed = false;
     PageType = ListPart;
     SourceTable = "Warehouse Activity Line";
-    SourceTableView = SORTING("Activity Type", "No.", "Sorting Sequence No.")
-                      WHERE("Activity Type" = CONST(Movement));
+    SourceTableView = sorting("Activity Type", "No.", "Sorting Sequence No.")
+                      where("Activity Type" = const(Movement));
 
     layout
     {

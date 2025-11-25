@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.Posting;
+
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Utilities;
+
 codeunit 89 "Sales-Post + Email"
 {
     TableNo = "Sales Header";

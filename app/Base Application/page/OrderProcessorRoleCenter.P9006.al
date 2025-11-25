@@ -1,3 +1,38 @@
+﻿namespace Microsoft.Sales.RoleCenters;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Integration.D365Sales;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Attribute;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+#if CLEAN21
+using Microsoft.Pricing.Reports;
+using Microsoft.Pricing.Worksheet;
+#endif
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+#if CLEAN21
+using Microsoft.Sales.Pricing;
+#endif
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Reports;
+using Microsoft.Shared.Navigate;
+using System.Email;
+using System.Integration.PowerBI;
+using System.Security.User;
+using System.Threading;
+
 page 9006 "Order Processor Role Center"
 {
     Caption = 'Sales Order Processor';
@@ -99,7 +134,7 @@ page 9006 "Order Processor Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Shipped Not Invoiced';
                 RunObject = Page "Sales Order List";
-                RunPageView = WHERE("Shipped Not Invoiced" = CONST(true));
+                RunPageView = where("Shipped Not Invoiced" = const(true));
                 ToolTip = 'View sales documents that are shipped but not yet invoiced.';
             }
             action(SalesOrdersComplShtNotInv)
@@ -107,8 +142,8 @@ page 9006 "Order Processor Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Completely Shipped Not Invoiced';
                 RunObject = Page "Sales Order List";
-                RunPageView = WHERE("Completely Shipped" = CONST(true),
-                                    "Shipped Not Invoiced" = CONST(true));
+                RunPageView = where("Completely Shipped" = const(true),
+                                    "Shipped Not Invoiced" = const(true));
                 ToolTip = 'View sales documents that are fully shipped but not fully invoiced.';
             }
             action(Items)
@@ -132,8 +167,8 @@ page 9006 "Order Processor Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Item Journals';
                 RunObject = Page "Item Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Item),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Item),
+                                    Recurring = const(false));
                 ToolTip = 'Post item transactions directly to the item ledger to adjust inventory in connection with purchases, sales, and positive or negative adjustments without using documents. You can save sets of item journal lines as standard journals so that you can perform recurring postings quickly. A condensed version of the item journal function exists on item cards for quick adjustment of an items inventory quantity.';
             }
             action(SalesJournals)
@@ -141,8 +176,8 @@ page 9006 "Order Processor Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales Journals';
                 RunObject = Page "General Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Sales),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Sales),
+                                    Recurring = const(false));
                 ToolTip = 'Post any sales-related transaction directly to a customer, bank, or general ledger account instead of using dedicated documents. You can post all types of financial sales transactions, including payments, refunds, and finance charge amounts. Note that you cannot post item quantities with a sales journal.';
             }
             action(CashReceiptJournals)
@@ -151,8 +186,8 @@ page 9006 "Order Processor Role Center"
                 Caption = 'Cash Receipt Journals';
                 Image = Journals;
                 RunObject = Page "General Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST("Cash Receipts"),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const("Cash Receipts"),
+                                    Recurring = const(false));
                 ToolTip = 'Register received payments by manually applying them to the related customer, vendor, or bank ledger entries. Then, post the payments to G/L accounts and thereby close the related ledger entries.';
             }
             action("Transfer Orders")
@@ -175,8 +210,6 @@ page 9006 "Order Processor Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Customers';
                     Image = Customer;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Customer List";
                     ToolTip = 'View or edit detailed information for the customers that you trade with. From each customer card, you can open related information, such as sales statistics and ongoing orders, and you can define special prices and line discounts that you grant if certain conditions are met.';
                 }
@@ -184,8 +217,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Quotes';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Sales Quotes";
                     ToolTip = 'Make offers to customers to sell certain products on certain delivery and payment terms. While you negotiate with a customer, you can change and resend the sales quote as much as needed. When the customer accepts the offer, you convert the sales quote to a sales invoice or a sales order in which you process the sale.';
                 }
@@ -193,8 +224,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Orders';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Sales Order List";
                     ToolTip = 'Record your agreements with customers to sell certain products on certain delivery and payment terms. Sales orders, unlike sales invoices, allow you to ship partially, deliver directly from your vendor to your customer, initiate warehouse handling, and print various customer-facing documents. Sales invoicing is integrated in the sales order process.';
                 }
@@ -210,8 +239,6 @@ page 9006 "Order Processor Role Center"
                     ApplicationArea = Suite;
                     Caption = 'Blanket Sales Orders';
                     Image = Reminder;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Blanket Sales Orders";
                     ToolTip = 'Use blanket sales orders as a framework for a long-term agreement between you and your customers to sell large quantities that are to be delivered in several smaller shipments over a certain period of time. Blanket orders often cover only one item with predetermined delivery dates. The main reason for using a blanket order rather than a sales order is that quantities entered on a blanket order do not affect item availability and thus can be used as a worksheet for monitoring, forecasting, and planning purposes..';
                 }
@@ -219,8 +246,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Invoices';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Sales Invoice List";
                     ToolTip = 'Register your sales to customers and invite them to pay according to the delivery and payment terms by sending them a sales invoice document. Posting a sales invoice registers shipment and records an open receivable entry on the customer''s account, which will be closed when payment is received. To manage the shipment process, use sales orders, in which sales invoicing is integrated.';
                 }
@@ -228,8 +253,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = SalesReturnOrder;
                     Caption = 'Sales Return Orders';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Sales Return Order List";
                     ToolTip = 'Compensate your customers for incorrect or damaged items that you sent to them and received payment for. Sales return orders enable you to receive items from multiple sales documents with one sales return, automatically create related sales credit memos or other return-related documents, such as a replacement sales order, and support warehouse documents for the item handling. Note: If an erroneous sale has not been paid yet, you can simply cancel the posted sales invoice to automatically revert the financial transaction.';
                 }
@@ -237,8 +260,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Credit Memos';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Sales Credit Memos";
                     ToolTip = 'Revert the financial transactions involved when your customers want to cancel a purchase or return incorrect or damaged items that you sent to them and received payment for. To include the correct information, you can create the sales credit memo from the related posted sales invoice or you can create a new sales credit memo with copied invoice information. If you need more control of the sales return process, such as warehouse documents for the physical handling, use sales return orders, in which sales credit memos are integrated. Note: If an erroneous sale has not been paid yet, you can simply cancel the posted sales invoice to automatically revert the financial transaction.';
                 }
@@ -246,11 +267,9 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Sales),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Sales),
+                                        Recurring = const(false));
                     ToolTip = 'Post any sales-related transaction directly to a customer, bank, or general ledger account instead of using dedicated documents. You can post all types of financial sales transactions, including payments, refunds, and finance charge amounts. Note that you cannot post item quantities with a sales journal.';
                 }
                 action("Posted Sales Invoices")
@@ -287,8 +306,6 @@ page 9006 "Order Processor Role Center"
                     ApplicationArea = Location;
                     Caption = 'Transfer Orders';
                     Image = FinChargeMemo;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Transfer Orders";
                     ToolTip = 'Move inventory items between company locations. With transfer orders, you ship the outbound transfer from one location and receive the inbound transfer at the other location. This allows you to manage the involved warehouse activities and provides more certainty that inventory quantities are updated correctly.';
                 }
@@ -296,8 +313,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Reminders';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Reminder List";
                     ToolTip = 'Remind customers about overdue amounts based on reminder terms and the related reminder levels. Each reminder level includes rules about when the reminder will be issued in relation to the invoice due date or the date of the previous reminder and whether interests are added. Reminders are integrated with finance charge memos, which are documents informing customers of interests or other money penalties for payment delays.';
                 }
@@ -305,8 +320,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Finance Charge Memos';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Finance Charge Memo List";
                     ToolTip = 'Send finance charge memos to customers with delayed payments, typically following a reminder process. Finance charges are calculated automatically and added to the overdue amounts on the customer''s account according to the specified finance charge terms and penalty/interest amounts.';
                 }
@@ -321,8 +334,6 @@ page 9006 "Order Processor Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Vendors';
                     Image = Vendor;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Vendor List";
                     ToolTip = 'View or edit detailed information for the vendors that you trade with. From each vendor card, you can open related information, such as purchase statistics and ongoing orders, and you can define special prices and line discounts that the vendor grants you if certain conditions are met.';
                 }
@@ -330,8 +341,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Purchase Quotes';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Purchase Quotes";
                     ToolTip = 'Create purchase quotes to represent your request for quotes from vendors. Quotes can be converted to purchase orders.';
                 }
@@ -339,8 +348,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Purchase Orders';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Purchase Order List";
                     ToolTip = 'Create purchase orders to mirror sales documents that vendors send to you. This enables you to record the cost of purchases and to track accounts payable. Posting purchase orders dynamically updates inventory levels so that you can minimize inventory costs and provide better customer service. Purchase orders allow partial receipts, unlike with purchase invoices, and enable drop shipment directly from your vendor to your customer. Purchase orders can be created automatically from PDF or image files from your vendors by using the Incoming Documents feature.';
                 }
@@ -348,8 +355,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Blanket Purchase Orders';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Blanket Purchase Orders";
                     ToolTip = 'Use blanket purchase orders as a framework for a long-term agreement between you and your vendors to buy large quantities that are to be delivered in several smaller shipments over a certain period of time. Blanket orders often cover only one item with predetermined delivery dates. The main reason for using a blanket order rather than a purchase order is that quantities entered on a blanket order do not affect item availability and thus can be used as a worksheet for monitoring, forecasting, and planning purposes.';
                 }
@@ -357,8 +362,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Purchase Invoices';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Purchase Invoices";
                     ToolTip = 'Create purchase invoices to mirror sales documents that vendors send to you. This enables you to record the cost of purchases and to track accounts payable. Posting purchase invoices dynamically updates inventory levels so that you can minimize inventory costs and provide better customer service. Purchase invoices can be created automatically from PDF or image files from your vendors by using the Incoming Documents feature.';
                 }
@@ -366,8 +369,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Purchase Return Orders';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Purchase Return Order List";
                     ToolTip = 'Create purchase return orders to mirror sales return documents that vendors send to you for incorrect or damaged items that you have paid for and then returned to the vendor. Purchase return orders enable you to ship back items from multiple purchase documents with one purchase return and support warehouse documents for the item handling. Purchase return orders can be created automatically from PDF or image files from your vendors by using the Incoming Documents feature. Note: If you have not yet paid for an erroneous purchase, you can simply cancel the posted purchase invoice to automatically revert the financial transaction.';
                 }
@@ -375,8 +376,6 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Purchase Credit Memos';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Purchase Credit Memos";
                     ToolTip = 'Create purchase credit memos to mirror sales credit memos that vendors send to you for incorrect or damaged items that you have paid for and then returned to the vendor. If you need more control of the purchase return process, such as warehouse documents for the physical handling, use purchase return orders, in which purchase credit memos are integrated. Purchase credit memos can be created automatically from PDF or image files from your vendors by using the Incoming Documents feature. Note: If you have not yet paid for an erroneous purchase, you can simply cancel the posted purchase invoice to automatically revert the financial transaction.';
                 }
@@ -384,11 +383,9 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Purchase Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Purchases),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Purchases),
+                                        Recurring = const(false));
                     ToolTip = 'Post any purchase-related transaction directly to a vendor, bank, or general ledger account instead of using dedicated documents. You can post all types of financial purchase transactions, including payments, refunds, and finance charge amounts. Note that you cannot post item quantities with a purchase journal.';
                 }
                 action("Posted Purchase Invoices")
@@ -429,8 +426,6 @@ page 9006 "Order Processor Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Items';
                     Image = Item;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item List";
                     ToolTip = 'View or edit detailed information for the products that you trade in. The item card can be of type Inventory or Service to specify if the item is a physical unit or a labor time unit. Here you also define if items in inventory or on incoming orders are automatically reserved for outbound documents and whether order tracking links are created between demand and supply to reflect planning actions.';
                 }
@@ -438,19 +433,15 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Item),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Item),
+                                        Recurring = const(false));
                     ToolTip = 'Post item transactions directly to the item ledger to adjust inventory in connection with purchases, sales, and positive or negative adjustments without using documents. You can save sets of item journal lines as standard journals so that you can perform recurring postings quickly. A condensed version of the item journal function exists on item cards for quick adjustment of an items inventory quantity.';
                 }
                 action("Item Charges")
                 {
                     ApplicationArea = Suite;
                     Caption = 'Item Charges';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item Charges";
                     ToolTip = 'View or edit the codes for item charges that you can assign to purchase and sales transactions to include any added costs, such as freight, physical handling, and insurance that you incur when purchasing or selling items. This is important to ensure correct inventory valuation. For purchases, the landed cost of a purchased item consists of the vendor''s purchase price and all additional direct item charges that can be assigned to individual receipts or return shipments. For sales, knowing the cost of shipping sold items can be as vital to your company as knowing the landed cost of purchased items.';
                 }
@@ -473,8 +464,8 @@ page 9006 "Order Processor Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Item Reclassification Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Transfer),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Transfer),
+                                        Recurring = const(false));
                     ToolTip = 'Change information on item ledger entries, such as dimensions, location codes, bin codes, and serial or lot numbers.';
                 }
                 action("Phys. Inventory Journals")
@@ -482,16 +473,14 @@ page 9006 "Order Processor Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Phys. Inventory Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const("Phys. Inventory"),
+                                        Recurring = const(false));
                     ToolTip = 'Select how you want to maintain an up-to-date record of your inventory at different locations.';
                 }
                 action("Assembly Orders")
                 {
                     ApplicationArea = Assembly;
                     Caption = 'Assembly Orders';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Assembly Orders";
                     ToolTip = 'Combine components in simple processes without the need of manufacturing functionality. Sell assembled items by building the item to order or by picking from stock.';
                 }
@@ -499,18 +488,14 @@ page 9006 "Order Processor Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Drop Shipments';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Sales Lines";
-                    RunPageView = WHERE("Drop Shipment" = CONST(true));
+                    RunPageView = where("Drop Shipment" = const(true));
                     ToolTip = 'Minimize delivery time and inventory cost by having items shipped from your vendor directly to your customer. This simply requires that you mark the sales order for drop shipment and then create a linked purchase order with the customer specified as the recipient. ';
                 }
                 action(Locations)
                 {
                     ApplicationArea = Location;
                     Caption = 'Locations';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Location List";
                     ToolTip = 'Manage the different places or warehouses where you receive, process, or ship inventory to increase customer service and keep inventory costs low.';
                 }
@@ -641,9 +626,6 @@ page 9006 "Order Processor Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales &Quote';
                 Image = NewSalesQuote;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Sales Quote";
                 RunPageMode = Create;
                 ToolTip = 'Create a new sales quote to offer items or services to a customer.';
@@ -653,9 +635,6 @@ page 9006 "Order Processor Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales &Invoice';
                 Image = NewSalesInvoice;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Sales Invoice";
                 RunPageMode = Create;
                 ToolTip = 'Create a new invoice for the sales of items or services. Invoice quantities cannot be posted partially.';
@@ -665,9 +644,6 @@ page 9006 "Order Processor Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales &Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
                 ToolTip = 'Create a new sales order for items or services.';
@@ -677,9 +653,6 @@ page 9006 "Order Processor Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales &Return Order';
                 Image = ReturnOrder;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Sales Return Order";
                 RunPageMode = Create;
                 ToolTip = 'Compensate your customers for incorrect or damaged items that you sent to them and received payment for. Sales return orders enable you to receive items from multiple sales documents with one sales return, automatically create related sales credit memos or other return-related documents, such as a replacement sales order, and support warehouse documents for the item handling. Note: If an erroneous sale has not been paid yet, you can simply cancel the posted sales invoice to automatically revert the financial transaction.';
@@ -689,9 +662,6 @@ page 9006 "Order Processor Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales &Credit Memo';
                 Image = CreditMemo;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
                 ToolTip = 'Create a new sales credit memo to revert a posted sales invoice.';
@@ -716,7 +686,7 @@ page 9006 "Order Processor Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Price &Worksheet';
                     Image = PriceWorksheet;
-                    RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7023)); // "Sales Price Worksheet";
+                    RunPageView = where("Object Type" = const(Page), "Object ID" = const(7023)); // "Sales Price Worksheet";
                     RunObject = Page "Role Center Page Dispatcher";
                     ToolTip = 'Manage sales prices for individual customers, for a group of customers, for all customers, or for a campaign.';
                     ObsoleteState = Pending;
@@ -743,7 +713,7 @@ page 9006 "Order Processor Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = '&Prices';
                     Image = SalesPrices;
-                    RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7002)); // "Sales Prices";
+                    RunPageView = where("Object Type" = const(Page), "Object ID" = const(7002)); // "Sales Prices";
                     RunObject = Page "Role Center Page Dispatcher";
                     ToolTip = 'Set up different prices for items that you sell to the customer. An item price is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
                     ObsoleteState = Pending;
@@ -755,7 +725,7 @@ page 9006 "Order Processor Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = '&Line Discounts';
                     Image = SalesLineDisc;
-                    RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7004)); // "Sales Line Discounts";
+                    RunPageView = where("Object Type" = const(Page), "Object ID" = const(7004)); // "Sales Line Discounts";
                     RunObject = Page "Role Center Page Dispatcher";
                     ToolTip = 'Set up different discounts for items that you sell to the customer. An item discount is automatically granted on invoice lines when the specified criteria are met, such as customer, quantity, or ending date.';
                     ObsoleteState = Pending;
@@ -847,7 +817,7 @@ page 9006 "Order Processor Role Center"
                         Caption = 'List Price Sheet';
                         Image = "Report";
 #if not CLEAN21
-                        RunPageView = WHERE("Object Type" = CONST(Report), "Object ID" = CONST(10148)); // "List Price Sheet"
+                        RunPageView = where("Object Type" = const(Report), "Object ID" = const(10148)); // "List Price Sheet"
                         RunObject = Page "Role Center Page Dispatcher";
 #else
                         RunObject = Report "List Price Sheet V16";

@@ -1,7 +1,11 @@
+namespace Microsoft.FixedAssets.Maintenance;
+
+using Microsoft.FixedAssets.FixedAsset;
+
 report 5635 "Maintenance - Next Service"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/MaintenanceNextService.rdlc';
+    RDLCLayout = './FixedAssets/Maintenance/MaintenanceNextService.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset Maintenance Next Service';
     UsageCategory = ReportsAndAnalysis;
@@ -78,13 +82,13 @@ report 5635 "Maintenance - Next Service"
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Starting Date';
-                        ToolTip = 'Specifies the date from which the report or batch job processes information.';
+                        ToolTip = 'Specifies the first date to be included in the report. Fixed assets that have a next service date before the date in this field will not be included.';
                     }
                     field(EndingDate; EndingDate)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Ending Date';
-                        ToolTip = 'Specifies the date to which the report or batch job processes information.';
+                        ToolTip = 'Specifies the last date to be included in the report. Fixed assets that have a next service date after the date in this field will not be included.';
                     }
                 }
             }

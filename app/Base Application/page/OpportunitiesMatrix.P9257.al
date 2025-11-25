@@ -1,3 +1,11 @@
+namespace Microsoft.CRM.Analysis;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 9257 "Opportunities Matrix"
 {
     Caption = 'Opportunities Matrix';
@@ -611,8 +619,8 @@ page 9257 "Opportunities Matrix"
     var
         MATRIX_CurrentColumnOrdinal: Integer;
     begin
-        StyleIsStrong := Type = Type::Company;
-        if (Type = Type::Person) and (TableType = TableType::Contact) then
+        StyleIsStrong := Rec.Type = Rec.Type::Company;
+        if (Rec.Type = Rec.Type::Person) and (TableType = TableType::Contact) then
             NameIndent := 1
         else
             NameIndent := 0;
@@ -704,73 +712,39 @@ page 9257 "Opportunities Matrix"
         CalcdCurrentValueFilter: Text;
         SalesCycleFilter: Text;
         RoundingFactorFormatString: Text;
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         NameIndent: Integer;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
 
     local procedure SetFilters()
@@ -795,15 +769,15 @@ page 9257 "Opportunities Matrix"
     begin
         case OutPutOption of
             OutPutOption::"No of Opportunities":
-                exit("No. of Opportunities");
+                exit(Rec."No. of Opportunities");
             OutPutOption::"Estimated Value (LCY)":
-                exit("Estimated Value (LCY)");
+                exit(Rec."Estimated Value (LCY)");
             OutPutOption::"Calc. Current Value (LCY)":
-                exit("Calcd. Current Value (LCY)");
+                exit(Rec."Calcd. Current Value (LCY)");
             OutPutOption::"Avg. Estimated Value (LCY)":
-                exit("Avg. Estimated Value (LCY)");
+                exit(Rec."Avg. Estimated Value (LCY)");
             OutPutOption::"Avg. Calc. Current Value (LCY)":
-                exit("Avg.Calcd. Current Value (LCY)");
+                exit(Rec."Avg.Calcd. Current Value (LCY)");
         end;
     end;
 
@@ -938,11 +912,11 @@ page 9257 "Opportunities Matrix"
     begin
         case OptionStatusFilter of
             OptionStatusFilter::"In Progress":
-                SetRange("Action Taken Filter", "Action Taken Filter"::" ", "Action Taken Filter"::Jumped);
+                Rec.SetRange("Action Taken Filter", Rec."Action Taken Filter"::" ", Rec."Action Taken Filter"::Jumped);
             OptionStatusFilter::Won:
-                SetRange("Action Taken Filter", "Action Taken Filter"::Won);
+                Rec.SetRange("Action Taken Filter", Rec."Action Taken Filter"::Won);
             OptionStatusFilter::Lost:
-                SetRange("Action Taken Filter", "Action Taken Filter"::Lost);
+                Rec.SetRange("Action Taken Filter", Rec."Action Taken Filter"::Lost);
         end;
     end;
 
@@ -976,60 +950,60 @@ page 9257 "Opportunities Matrix"
     local procedure UpdateSalespersonFilter()
     begin
         SalespersonPurchaser.Reset();
-        if GetFilter("Action Taken Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Action Taken Filter", GetFilter("Action Taken Filter"));
-        if GetFilter("Sales Cycle Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Sales Cycle Filter", GetFilter("Sales Cycle Filter"));
-        if GetFilter("Sales Cycle Stage Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Sales Cycle Stage Filter", GetFilter("Sales Cycle Stage Filter"));
-        if GetFilter("Probability % Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Probability % Filter", GetFilter("Probability % Filter"));
-        if GetFilter("Completed % Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Completed % Filter", GetFilter("Completed % Filter"));
-        if GetFilter("Close Opportunity Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Close Opportunity Filter", GetFilter("Close Opportunity Filter"));
-        if GetFilter("Contact Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Contact Filter", GetFilter("Contact Filter"));
-        if GetFilter("Contact Company Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Contact Company Filter", GetFilter("Contact Company Filter"));
-        if GetFilter("Campaign Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Campaign Filter", GetFilter("Campaign Filter"));
-        if GetFilter("Estimated Value Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Estimated Value Filter", GetFilter("Estimated Value Filter"));
-        if GetFilter("Calcd. Current Value Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Calcd. Current Value Filter", GetFilter("Calcd. Current Value Filter"));
-        if GetFilter("Chances of Success % Filter") <> '' then
-            SalespersonPurchaser.SetFilter("Chances of Success % Filter", GetFilter("Chances of Success % Filter"));
+        if Rec.GetFilter("Action Taken Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Action Taken Filter", Rec.GetFilter("Action Taken Filter"));
+        if Rec.GetFilter("Sales Cycle Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Sales Cycle Filter", Rec.GetFilter("Sales Cycle Filter"));
+        if Rec.GetFilter("Sales Cycle Stage Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Sales Cycle Stage Filter", Rec.GetFilter("Sales Cycle Stage Filter"));
+        if Rec.GetFilter("Probability % Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Probability % Filter", Rec.GetFilter("Probability % Filter"));
+        if Rec.GetFilter("Completed % Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Completed % Filter", Rec.GetFilter("Completed % Filter"));
+        if Rec.GetFilter("Close Opportunity Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Close Opportunity Filter", Rec.GetFilter("Close Opportunity Filter"));
+        if Rec.GetFilter("Contact Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Contact Filter", Rec.GetFilter("Contact Filter"));
+        if Rec.GetFilter("Contact Company Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Contact Company Filter", Rec.GetFilter("Contact Company Filter"));
+        if Rec.GetFilter("Campaign Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Campaign Filter", Rec.GetFilter("Campaign Filter"));
+        if Rec.GetFilter("Estimated Value Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Estimated Value Filter", Rec.GetFilter("Estimated Value Filter"));
+        if Rec.GetFilter("Calcd. Current Value Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Calcd. Current Value Filter", Rec.GetFilter("Calcd. Current Value Filter"));
+        if Rec.GetFilter("Chances of Success % Filter") <> '' then
+            SalespersonPurchaser.SetFilter("Chances of Success % Filter", Rec.GetFilter("Chances of Success % Filter"));
         SalespersonPurchaser.SetRange("Opportunity Entry Exists", true);
     end;
 
     local procedure UpdateCampaignFilter()
     begin
         Campaign.Reset();
-        if GetFilter("Action Taken Filter") <> '' then
-            Campaign.SetFilter("Action Taken Filter", GetFilter("Action Taken Filter"));
-        if GetFilter("Sales Cycle Filter") <> '' then
-            Campaign.SetFilter("Sales Cycle Filter", GetFilter("Sales Cycle Filter"));
-        if GetFilter("Sales Cycle Stage Filter") <> '' then
-            Campaign.SetFilter("Sales Cycle Stage Filter", GetFilter("Sales Cycle Stage Filter"));
-        if GetFilter("Probability % Filter") <> '' then
-            Campaign.SetFilter("Probability % Filter", GetFilter("Probability % Filter"));
-        if GetFilter("Completed % Filter") <> '' then
-            Campaign.SetFilter("Completed % Filter", GetFilter("Completed % Filter"));
-        if GetFilter("Close Opportunity Filter") <> '' then
-            Campaign.SetFilter("Close Opportunity Filter", GetFilter("Close Opportunity Filter"));
-        if GetFilter("Contact Filter") <> '' then
-            Campaign.SetFilter("Contact Filter", GetFilter("Contact Filter"));
-        if GetFilter("Contact Company Filter") <> '' then
-            Campaign.SetFilter("Contact Company Filter", GetFilter("Contact Company Filter"));
-        if GetFilter("Estimated Value Filter") <> '' then
-            Campaign.SetFilter("Estimated Value Filter", GetFilter("Estimated Value Filter"));
-        if GetFilter("Salesperson Filter") <> '' then
-            Campaign.SetFilter("Salesperson Filter", GetFilter("Salesperson Filter"));
-        if GetFilter("Calcd. Current Value Filter") <> '' then
-            Campaign.SetFilter("Calcd. Current Value Filter", GetFilter("Calcd. Current Value Filter"));
-        if GetFilter("Chances of Success % Filter") <> '' then
-            Campaign.SetFilter("Chances of Success % Filter", GetFilter("Chances of Success % Filter"));
+        if Rec.GetFilter("Action Taken Filter") <> '' then
+            Campaign.SetFilter("Action Taken Filter", Rec.GetFilter("Action Taken Filter"));
+        if Rec.GetFilter("Sales Cycle Filter") <> '' then
+            Campaign.SetFilter("Sales Cycle Filter", Rec.GetFilter("Sales Cycle Filter"));
+        if Rec.GetFilter("Sales Cycle Stage Filter") <> '' then
+            Campaign.SetFilter("Sales Cycle Stage Filter", Rec.GetFilter("Sales Cycle Stage Filter"));
+        if Rec.GetFilter("Probability % Filter") <> '' then
+            Campaign.SetFilter("Probability % Filter", Rec.GetFilter("Probability % Filter"));
+        if Rec.GetFilter("Completed % Filter") <> '' then
+            Campaign.SetFilter("Completed % Filter", Rec.GetFilter("Completed % Filter"));
+        if Rec.GetFilter("Close Opportunity Filter") <> '' then
+            Campaign.SetFilter("Close Opportunity Filter", Rec.GetFilter("Close Opportunity Filter"));
+        if Rec.GetFilter("Contact Filter") <> '' then
+            Campaign.SetFilter("Contact Filter", Rec.GetFilter("Contact Filter"));
+        if Rec.GetFilter("Contact Company Filter") <> '' then
+            Campaign.SetFilter("Contact Company Filter", Rec.GetFilter("Contact Company Filter"));
+        if Rec.GetFilter("Estimated Value Filter") <> '' then
+            Campaign.SetFilter("Estimated Value Filter", Rec.GetFilter("Estimated Value Filter"));
+        if Rec.GetFilter("Salesperson Filter") <> '' then
+            Campaign.SetFilter("Salesperson Filter", Rec.GetFilter("Salesperson Filter"));
+        if Rec.GetFilter("Calcd. Current Value Filter") <> '' then
+            Campaign.SetFilter("Calcd. Current Value Filter", Rec.GetFilter("Calcd. Current Value Filter"));
+        if Rec.GetFilter("Chances of Success % Filter") <> '' then
+            Campaign.SetFilter("Chances of Success % Filter", Rec.GetFilter("Chances of Success % Filter"));
         Campaign.SetRange("Opportunity Entry Exists", true);
     end;
 
@@ -1037,28 +1011,28 @@ page 9257 "Opportunities Matrix"
     begin
         Cont.Reset();
         Cont.SetCurrentKey("Company Name", "Company No.", Type, Name);
-        if GetFilter("Action Taken Filter") <> '' then
-            Cont.SetFilter("Action Taken Filter", GetFilter("Action Taken Filter"));
-        if GetFilter("Sales Cycle Filter") <> '' then
-            Cont.SetFilter("Sales Cycle Filter", GetFilter("Sales Cycle Filter"));
-        if GetFilter("Sales Cycle Stage Filter") <> '' then
-            Cont.SetFilter("Sales Cycle Stage Filter", GetFilter("Sales Cycle Stage Filter"));
-        if GetFilter("Probability % Filter") <> '' then
-            Cont.SetFilter("Probability % Filter", GetFilter("Probability % Filter"));
-        if GetFilter("Completed % Filter") <> '' then
-            Cont.SetFilter("Completed % Filter", GetFilter("Completed % Filter"));
-        if GetFilter("Close Opportunity Filter") <> '' then
-            Cont.SetFilter("Close Opportunity Filter", GetFilter("Close Opportunity Filter"));
-        if GetFilter("Estimated Value Filter") <> '' then
-            Cont.SetFilter("Estimated Value Filter", GetFilter("Estimated Value Filter"));
-        if GetFilter("Salesperson Filter") <> '' then
-            Cont.SetFilter("Salesperson Filter", GetFilter("Salesperson Filter"));
-        if GetFilter("Calcd. Current Value Filter") <> '' then
-            Cont.SetFilter("Calcd. Current Value Filter", GetFilter("Calcd. Current Value Filter"));
-        if GetFilter("Chances of Success % Filter") <> '' then
-            Cont.SetFilter("Chances of Success % Filter", GetFilter("Chances of Success % Filter"));
-        if GetFilter("Campaign Filter") <> '' then
-            Cont.SetFilter("Campaign Filter", GetFilter("Campaign Filter"));
+        if Rec.GetFilter("Action Taken Filter") <> '' then
+            Cont.SetFilter("Action Taken Filter", Rec.GetFilter("Action Taken Filter"));
+        if Rec.GetFilter("Sales Cycle Filter") <> '' then
+            Cont.SetFilter("Sales Cycle Filter", Rec.GetFilter("Sales Cycle Filter"));
+        if Rec.GetFilter("Sales Cycle Stage Filter") <> '' then
+            Cont.SetFilter("Sales Cycle Stage Filter", Rec.GetFilter("Sales Cycle Stage Filter"));
+        if Rec.GetFilter("Probability % Filter") <> '' then
+            Cont.SetFilter("Probability % Filter", Rec.GetFilter("Probability % Filter"));
+        if Rec.GetFilter("Completed % Filter") <> '' then
+            Cont.SetFilter("Completed % Filter", Rec.GetFilter("Completed % Filter"));
+        if Rec.GetFilter("Close Opportunity Filter") <> '' then
+            Cont.SetFilter("Close Opportunity Filter", Rec.GetFilter("Close Opportunity Filter"));
+        if Rec.GetFilter("Estimated Value Filter") <> '' then
+            Cont.SetFilter("Estimated Value Filter", Rec.GetFilter("Estimated Value Filter"));
+        if Rec.GetFilter("Salesperson Filter") <> '' then
+            Cont.SetFilter("Salesperson Filter", Rec.GetFilter("Salesperson Filter"));
+        if Rec.GetFilter("Calcd. Current Value Filter") <> '' then
+            Cont.SetFilter("Calcd. Current Value Filter", Rec.GetFilter("Calcd. Current Value Filter"));
+        if Rec.GetFilter("Chances of Success % Filter") <> '' then
+            Cont.SetFilter("Chances of Success % Filter", Rec.GetFilter("Chances of Success % Filter"));
+        if Rec.GetFilter("Campaign Filter") <> '' then
+            Cont.SetFilter("Campaign Filter", Rec.GetFilter("Campaign Filter"));
         Cont.SetRange("Opportunity Entry Exists", true);
     end;
 
@@ -1070,7 +1044,7 @@ page 9257 "Opportunities Matrix"
         OutPutOption := NewOutput;
         RoundingFactor := NewRoundingFactor;
         OptionStatusFilter := NewOptionStatusFilter;
-        "Close Opportunity Filter" := NewCloseOpportunityFilter;
+        Rec."Close Opportunity Filter" := NewCloseOpportunityFilter;
         SuccessChanceFilter := NewSuccessChanceFilter;
         ProbabilityFilter := NewProbabilityFilter;
         CompletedFilter := NewCompletedFilter;
@@ -1104,31 +1078,31 @@ page 9257 "Opportunities Matrix"
             OppEntry.SetFilter("Contact Company No.", Rec."Company No.");
 
         if Rec.GetFilter("Sales Cycle Filter") <> '' then
-            OppEntry.SetFilter("Sales Cycle Code", GetFilter("Sales Cycle Filter"));
+            OppEntry.SetFilter("Sales Cycle Code", Rec.GetFilter("Sales Cycle Filter"));
 
         if Rec.GetFilter("Sales Cycle Stage Filter") <> '' then
-            OppEntry.SetFilter("Sales Cycle Stage", GetFilter("Sales Cycle Stage Filter"));
+            OppEntry.SetFilter("Sales Cycle Stage", Rec.GetFilter("Sales Cycle Stage Filter"));
 
         if Rec.GetFilter("Action Taken Filter") <> '' then
-            OppEntry.SetFilter("Action Taken", GetFilter("Action Taken Filter"));
+            OppEntry.SetFilter("Action Taken", Rec.GetFilter("Action Taken Filter"));
 
         if Rec.GetFilter("Probability % Filter") <> '' then
-            OppEntry.SetFilter("Probability %", GetFilter("Probability % Filter"));
+            OppEntry.SetFilter("Probability %", Rec.GetFilter("Probability % Filter"));
 
         if Rec.GetFilter("Completed % Filter") <> '' then
-            OppEntry.SetFilter("Completed %", GetFilter("Completed % Filter"));
+            OppEntry.SetFilter("Completed %", Rec.GetFilter("Completed % Filter"));
 
         if Rec.GetFilter("Close Opportunity Filter") <> '' then
-            OppEntry.SetFilter("Close Opportunity Code", GetFilter("Close Opportunity Filter"));
+            OppEntry.SetFilter("Close Opportunity Code", Rec.GetFilter("Close Opportunity Filter"));
 
         if Rec.GetFilter("Chances of Success % Filter") <> '' then
-            OppEntry.SetFilter("Chances of Success %", GetFilter("Chances of Success % Filter"));
+            OppEntry.SetFilter("Chances of Success %", Rec.GetFilter("Chances of Success % Filter"));
 
         if Rec.GetFilter("Estimated Value Filter") <> '' then
-            OppEntry.SetFilter("Estimated Value (LCY)", GetFilter("Estimated Value Filter"));
+            OppEntry.SetFilter("Estimated Value (LCY)", Rec.GetFilter("Estimated Value Filter"));
 
         if Rec.GetFilter("Calcd. Current Value Filter") <> '' then
-            OppEntry.SetFilter("Calcd. Current Value (LCY)", GetFilter("Calcd. Current Value Filter"));
+            OppEntry.SetFilter("Calcd. Current Value (LCY)", Rec.GetFilter("Calcd. Current Value Filter"));
 
         if OppEntry.Find('-') then
             repeat
@@ -1145,19 +1119,19 @@ page 9257 "Opportunities Matrix"
         TestAmount: Text[80];
     begin
         SetFilters();
-        SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start", MatrixRecords[MATRIX_ColumnOrdinal]."Period End");
+        Rec.SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start", MatrixRecords[MATRIX_ColumnOrdinal]."Period End");
 
         case OutPutOption of
             OutPutOption::"No of Opportunities":
-                CalcFields("No. of Opportunities");
+                Rec.CalcFields("No. of Opportunities");
             OutPutOption::"Estimated Value (LCY)":
-                CalcFields("Estimated Value (LCY)");
+                Rec.CalcFields("Estimated Value (LCY)");
             OutPutOption::"Calc. Current Value (LCY)":
-                CalcFields("Calcd. Current Value (LCY)");
+                Rec.CalcFields("Calcd. Current Value (LCY)");
             OutPutOption::"Avg. Estimated Value (LCY)":
-                CalcFields("Avg. Estimated Value (LCY)");
+                Rec.CalcFields("Avg. Estimated Value (LCY)");
             OutPutOption::"Avg. Calc. Current Value (LCY)":
-                CalcFields("Avg.Calcd. Current Value (LCY)");
+                Rec.CalcFields("Avg.Calcd. Current Value (LCY)");
         end;
         if ReturnOutput() = 0 then
             MATRIX_CellData[MATRIX_ColumnOrdinal] := ''
@@ -1171,39 +1145,39 @@ page 9257 "Opportunities Matrix"
     local procedure TestFilters()
     begin
         if EstimatedValueFilter <> '' then
-            SetFilter("Estimated Value Filter", EstimatedValueFilter)
+            Rec.SetFilter("Estimated Value Filter", EstimatedValueFilter)
         else
-            SetRange("Estimated Value Filter");
+            Rec.SetRange("Estimated Value Filter");
 
         if SalesCycleStageFilter <> '' then
-            SetFilter("Sales Cycle Stage Filter", SalesCycleStageFilter)
+            Rec.SetFilter("Sales Cycle Stage Filter", SalesCycleStageFilter)
         else
-            SetRange("Sales Cycle Stage Filter");
+            Rec.SetRange("Sales Cycle Stage Filter");
 
         if SuccessChanceFilter <> '' then
-            SetFilter("Chances of Success % Filter", SuccessChanceFilter)
+            Rec.SetFilter("Chances of Success % Filter", SuccessChanceFilter)
         else
-            SetRange("Chances of Success % Filter");
+            Rec.SetRange("Chances of Success % Filter");
 
         if ProbabilityFilter <> '' then
-            SetFilter("Probability % Filter", ProbabilityFilter)
+            Rec.SetFilter("Probability % Filter", ProbabilityFilter)
         else
-            SetRange("Probability % Filter");
+            Rec.SetRange("Probability % Filter");
 
         if CompletedFilter <> '' then
-            SetFilter("Completed % Filter", CompletedFilter)
+            Rec.SetFilter("Completed % Filter", CompletedFilter)
         else
-            SetRange("Completed % Filter");
+            Rec.SetRange("Completed % Filter");
 
         if CalcdCurrentValueFilter <> '' then
-            SetFilter("Calcd. Current Value Filter", CalcdCurrentValueFilter)
+            Rec.SetFilter("Calcd. Current Value Filter", CalcdCurrentValueFilter)
         else
-            SetRange("Calcd. Current Value Filter");
+            Rec.SetRange("Calcd. Current Value Filter");
 
         if SalesCycleFilter <> '' then
-            SetFilter("Sales Cycle Filter", SalesCycleFilter)
+            Rec.SetFilter("Sales Cycle Filter", SalesCycleFilter)
         else
-            SetRange("Sales Cycle Filter");
+            Rec.SetRange("Sales Cycle Filter");
     end;
 
     procedure SetColumnVisibility()

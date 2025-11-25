@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+
 page 159 "Receivables-Payables"
 {
     ApplicationArea = Suite;

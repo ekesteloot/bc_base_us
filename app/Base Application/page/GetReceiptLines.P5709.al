@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Document;
+
 page 5709 "Get Receipt Lines"
 {
     Caption = 'Get Receipt Lines';
@@ -200,7 +205,7 @@ page 5709 "Get Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        PurchRcptHeader.Get("Document No.");
+                        PurchRcptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Purchase Receipt", PurchRcptHeader);
                     end;
                 }
@@ -215,7 +220,7 @@ page 5709 "Get Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Entries")
@@ -227,7 +232,7 @@ page 5709 "Get Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }
@@ -295,7 +300,6 @@ page 5709 "Get Receipt Lines"
         ItemReferenceNo: Code[50];
 
     protected var
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     procedure SetPurchHeader(var PurchHeader2: Record "Purchase Header")
@@ -315,21 +319,19 @@ page 5709 "Get Receipt Lines"
     var
         PurchRcptLine: Record "Purch. Rcpt. Line";
     begin
-        OnBeforeIsFirstDocLine(Rec, TempPurchRcptLine);
-
         TempPurchRcptLine.Reset();
         TempPurchRcptLine.CopyFilters(Rec);
-        TempPurchRcptLine.SetRange("Document No.", "Document No.");
+        TempPurchRcptLine.SetRange("Document No.", Rec."Document No.");
         if not TempPurchRcptLine.FindFirst() then begin
             PurchRcptLine.CopyFilters(Rec);
-            PurchRcptLine.SetRange("Document No.", "Document No.");
+            PurchRcptLine.SetRange("Document No.", Rec."Document No.");
             PurchRcptLine.SetFilter("Qty. Rcd. Not Invoiced", '<>0');
             if PurchRcptLine.FindFirst() then begin
                 TempPurchRcptLine := PurchRcptLine;
                 TempPurchRcptLine.Insert();
             end;
         end;
-        if "Line No." = TempPurchRcptLine."Line No." then
+        if Rec."Line No." = TempPurchRcptLine."Line No." then
             exit(true);
     end;
 
@@ -350,12 +352,12 @@ page 5709 "Get Receipt Lines"
     var
         SrcPurchRcptHeader: Record "Purch. Rcpt. Header";
     begin
-        SrcPurchRcptHeader.Get("Document No.");
+        SrcPurchRcptHeader.Get(Rec."Document No.");
         VendorOrderNo := SrcPurchRcptHeader."Vendor Order No.";
         VendorShptNo := SrcPurchRcptHeader."Vendor Shipment No.";
         OrderNo := SrcPurchRcptHeader."Order No.";
 
-        ItemReferenceNo := "Item Reference No.";
+        ItemReferenceNo := Rec."Item Reference No.";
     end;
 
     [IntegrationEvent(false, false)]
@@ -365,11 +367,6 @@ page 5709 "Get Receipt Lines"
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnQueryClosePage(CloseAction: Action; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsFirstDocLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; var TempPurchRcptLine: Record "Purch. Rcpt. Line" temporary)
     begin
     end;
 }

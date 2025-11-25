@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Insurance;
+
 codeunit 5673 "Insurance Jnl.-B.Post+Print"
 {
     TableNo = "Insurance Journal Batch";
@@ -6,7 +8,7 @@ codeunit 5673 "Insurance Jnl.-B.Post+Print"
     begin
         InsuranceJnlBatch.Copy(Rec);
         Code();
-        Copy(InsuranceJnlBatch);
+        Rec.Copy(InsuranceJnlBatch);
     end;
 
     var

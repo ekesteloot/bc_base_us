@@ -1,3 +1,16 @@
+namespace Microsoft.Sales.Receivables;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 379 "Detailed Cust. Ledg. Entry"
 {
     Caption = 'Detailed Cust. Ledg. Entry';
@@ -35,7 +48,7 @@ table 379 "Detailed Cust. Ledg. Entry"
         }
         field(7; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
         }
@@ -59,8 +72,6 @@ table 379 "Detailed Cust. Ledg. Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -82,8 +93,6 @@ table 379 "Detailed Cust. Ledg. Entry"
         field(14; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(15; "Reason Code"; Code[10])
         {
@@ -92,14 +101,14 @@ table 379 "Detailed Cust. Ledg. Entry"
         }
         field(16; "Debit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Debit Amount';
         }
         field(17; "Credit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Credit Amount';
@@ -123,12 +132,12 @@ table 379 "Detailed Cust. Ledg. Entry"
         field(21; "Initial Entry Global Dim. 1"; Code[20])
         {
             Caption = 'Initial Entry Global Dim. 1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(22; "Initial Entry Global Dim. 2"; Code[20])
         {
             Caption = 'Initial Entry Global Dim. 2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(24; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -173,13 +182,13 @@ table 379 "Detailed Cust. Ledg. Entry"
         }
         field(39; "Remaining Pmt. Disc. Possible"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Remaining Pmt. Disc. Possible';
         }
         field(40; "Max. Payment Tolerance"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Max. Payment Tolerance';
         }
@@ -227,9 +236,7 @@ table 379 "Detailed Cust. Ledg. Entry"
         }
         key(Key4; "Ledger Entry Amount", "Cust. Ledger Entry No.", "Posting Date")
         {
-            MaintainSQLIndex = false;
-            MaintainSiftIndex = false;
-            SumIndexFields = Amount, "Amount (LCY)", "Debit Amount", "Debit Amount (LCY)", "Credit Amount", "Credit Amount (LCY)";
+            IncludedFields = Amount, "Amount (LCY)", "Debit Amount", "Debit Amount (LCY)", "Credit Amount", "Credit Amount (LCY)";
             ObsoleteState = Pending;
             ObsoleteReason = 'Replaced with "Key17" for better peformance.';
             ObsoleteTag = '18.0';
@@ -272,8 +279,7 @@ table 379 "Detailed Cust. Ledg. Entry"
         }
         key(Key17; "Cust. Ledger Entry No.", "Posting Date", "Ledger Entry Amount")
         {
-            MaintainSQLIndex = false;
-            SumIndexFields = Amount, "Amount (LCY)", "Debit Amount", "Debit Amount (LCY)", "Credit Amount", "Credit Amount (LCY)";
+            IncludedFields = Amount, "Amount (LCY)", "Debit Amount", "Debit Amount (LCY)", "Credit Amount", "Credit Amount (LCY)";
         }
     }
 

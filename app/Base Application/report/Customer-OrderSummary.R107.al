@@ -1,7 +1,13 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 report 107 "Customer - Order Summary"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/CustomerOrderSummary.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerOrderSummary.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Customer - Order Summary';
     PreviewMode = PrintLayout;
@@ -11,7 +17,7 @@ report 107 "Customer - Order Summary"
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Name", "Customer Posting Group", "Currency Filter";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
@@ -103,8 +109,8 @@ report 107 "Customer - Order Summary"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "Bill-to Customer No." = FIELD("No."), "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Currency Code" = FIELD("Currency Filter");
-                DataItemTableView = SORTING("Document Type", "Bill-to Customer No.", "Currency Code") WHERE("Document Type" = CONST(Order), "Outstanding Quantity" = FILTER(<> 0));
+                DataItemLink = "Bill-to Customer No." = field("No."), "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"), "Currency Code" = field("Currency Filter");
+                DataItemTableView = sorting("Document Type", "Bill-to Customer No.", "Currency Code") where("Document Type" = const(Order), "Outstanding Quantity" = filter(<> 0));
                 column(SalesOrderAmount; SalesOrderAmount)
                 {
                     AutoFormatExpression = "Currency Code";

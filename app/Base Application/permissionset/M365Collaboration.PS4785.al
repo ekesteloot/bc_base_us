@@ -1,8 +1,11 @@
-#if not CLEAN21
+#if not CLEAN23
 permissionset 4785 "M365 COLLABORATION"
 {
     Assignable = true;
     Caption = 'Microsoft 365 Collaboration';
+    ObsoleteReason = 'No longer used.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '23.0';
 
     IncludedPermissionSets = "BaseApp Objects - Exec",
                              "LOGIN";

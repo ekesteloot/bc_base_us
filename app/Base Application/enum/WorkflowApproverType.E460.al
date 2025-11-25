@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 enum 460 "Workflow Approver Type"
 {
     Extensible = true;

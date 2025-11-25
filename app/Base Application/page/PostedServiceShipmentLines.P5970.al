@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Ledger;
+
 page 5970 "Posted Service Shipment Lines"
 {
     AutoSplitKey = true;
@@ -226,7 +231,7 @@ page 5970 "Posted Service Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(ItemTrackingEntries)
@@ -238,7 +243,7 @@ page 5970 "Posted Service Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
                 separator(Action27)
@@ -253,8 +258,8 @@ page 5970 "Posted Service Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        TestField(Type, Type::Item);
-                        ShowItemServInvLines();
+                        Rec.TestField(Type, Rec.Type::Item);
+                        Rec.ShowItemServInvLines();
                     end;
                 }
             }
@@ -315,7 +320,7 @@ page 5970 "Posted Service Shipment Lines"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }
@@ -372,11 +377,11 @@ page 5970 "Posted Service Shipment Lines"
     begin
         case SelectionFilter of
             SelectionFilter::"All Shipment Lines":
-                SetRange("Service Item Line No.");
+                Rec.SetRange("Service Item Line No.");
             SelectionFilter::"Lines per Selected Service Item":
-                SetRange("Service Item Line No.", ServItemLineNo);
+                Rec.SetRange("Service Item Line No.", ServItemLineNo);
             SelectionFilter::"Lines Not Item Related":
-                SetFilter("Service Item Line No.", '=%1', 0);
+                Rec.SetFilter("Service Item Line No.", '=%1', 0);
         end;
         CurrPage.Update(false);
     end;
@@ -387,13 +392,13 @@ page 5970 "Posted Service Shipment Lines"
         TempItemLedgEntry: Record "Item Ledger Entry" temporary;
         TrackingForm: Page "Order Tracking";
     begin
-        TestField(Type, Type::Item);
-        if "Item Shpt. Entry No." <> 0 then begin
-            ItemLedgEntry.Get("Item Shpt. Entry No.");
+        Rec.TestField(Type, Rec.Type::Item);
+        if Rec."Item Shpt. Entry No." <> 0 then begin
+            ItemLedgEntry.Get(Rec."Item Shpt. Entry No.");
             TrackingForm.SetItemLedgEntry(ItemLedgEntry);
         end else
             TrackingForm.SetMultipleItemLedgEntries(TempItemLedgEntry,
-              DATABASE::"Service Shipment Line", 0, "Document No.", '', 0, "Line No.");
+              DATABASE::"Service Shipment Line", 0, Rec."Document No.", '', 0, Rec."Line No.");
         TrackingForm.RunModal();
     end;
 

@@ -1,3 +1,10 @@
+namespace Microsoft.FixedAssets.Maintenance;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+
 codeunit 5647 "Make Maintenance Ledger Entry"
 {
 

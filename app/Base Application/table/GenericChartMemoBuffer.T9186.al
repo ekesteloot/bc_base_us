@@ -1,3 +1,7 @@
+namespace System.Visualization;
+
+using System.Globalization;
+
 table 9186 "Generic Chart Memo Buffer"
 {
     Caption = 'Generic Chart Memo Buffer';
@@ -20,7 +24,7 @@ table 9186 "Generic Chart Memo Buffer"
         }
         field(4; "Language Name"; Text[50])
         {
-            CalcFormula = Lookup(Language.Name WHERE(Code = FIELD("Language Code")));
+            CalcFormula = Lookup(Language.Name where(Code = field("Language Code")));
             Caption = 'Language Name';
             FieldClass = FlowField;
         }

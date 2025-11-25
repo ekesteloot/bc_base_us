@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.ProjectMgt.Jobs.Journal;
+
 report 1087 "Change Job Dates"
 {
     ApplicationArea = Jobs;
@@ -9,7 +13,7 @@ report 1087 "Change Job Dates"
     {
         dataitem("Job Task"; "Job Task")
         {
-            DataItemTableView = SORTING("Job No.", "Job Task No.");
+            DataItemTableView = sorting("Job No.", "Job Task No.");
             RequestFilterFields = "Job No.", "Job Task No.";
 
             trigger OnAfterGetRecord()

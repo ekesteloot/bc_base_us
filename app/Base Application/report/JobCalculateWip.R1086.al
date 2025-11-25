@@ -1,3 +1,10 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Setup;
+
 report 1086 "Job Calculate WIP"
 {
     AdditionalSearchTerms = 'calculate work in process,calculate work in progress';
@@ -10,7 +17,7 @@ report 1086 "Job Calculate WIP"
     {
         dataitem(Job; Job)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Planning Date Filter", "Posting Date Filter";
 
             trigger OnAfterGetRecord()

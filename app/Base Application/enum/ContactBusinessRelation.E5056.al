@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.BusinessRelation;
+
 enum 5056 "Contact Business Relation"
 {
     Extensible = true;

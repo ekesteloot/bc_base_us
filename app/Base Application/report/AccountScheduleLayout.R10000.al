@@ -9,7 +9,7 @@ report 10000 "Account Schedule Layout"
     {
         dataitem("Acc. Schedule Name"; "Acc. Schedule Name")
         {
-            DataItemTableView = SORTING(Name);
+            DataItemTableView = sorting(Name);
             PrintOnlyIfDetail = true;
             RequestFilterFields = Name;
             column(Acc__Schedule_Name_Name; Name)
@@ -17,8 +17,8 @@ report 10000 "Account Schedule Layout"
             }
             dataitem("Acc. Schedule Line"; "Acc. Schedule Line")
             {
-                DataItemLink = "Schedule Name" = FIELD(Name);
-                DataItemTableView = SORTING("Schedule Name", "Line No.");
+                DataItemLink = "Schedule Name" = field(Name);
+                DataItemTableView = sorting("Schedule Name", "Line No.");
                 RequestFilterFields = "Row No.";
                 column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
                 {

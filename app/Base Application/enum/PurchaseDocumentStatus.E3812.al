@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Document;
+
 enum 3812 "Purchase Document Status"
 {
     Extensible = true;

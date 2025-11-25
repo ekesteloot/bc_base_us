@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 table 5489 "Dimension Set Entry Buffer"
 {
     Caption = 'Dimension Set Entry Buffer';
@@ -23,7 +25,7 @@ table 5489 "Dimension Set Entry Buffer"
             Caption = 'Dimension Value Code';
             DataClassification = SystemMetadata;
             NotBlank = true;
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"));
         }
         field(4; "Dimension Value ID"; Integer)
         {
@@ -32,15 +34,15 @@ table 5489 "Dimension Set Entry Buffer"
         }
         field(5; "Dimension Name"; Text[30])
         {
-            CalcFormula = Lookup(Dimension.Name WHERE(Code = FIELD("Dimension Code")));
+            CalcFormula = Lookup(Dimension.Name where(Code = field("Dimension Code")));
             Caption = 'Dimension Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Dimension Value Name"; Text[50])
         {
-            CalcFormula = Lookup("Dimension Value".Name WHERE("Dimension Code" = FIELD("Dimension Code"),
-                                                               Code = FIELD("Dimension Value Code")));
+            CalcFormula = Lookup("Dimension Value".Name where("Dimension Code" = field("Dimension Code"),
+                                                               Code = field("Dimension Value Code")));
             Caption = 'Dimension Value Name';
             Editable = false;
             FieldClass = FlowField;
@@ -49,6 +51,20 @@ table 5489 "Dimension Set Entry Buffer"
         {
             Caption = 'Parent Type';
             DataClassification = SystemMetadata;
+        }
+        field(8; "Dimension Consolidation Code"; Code[20])
+        {
+            Caption = 'Dimension Consolidation Code';
+            FieldClass = FlowField;
+            Editable = false;
+            CalcFormula = lookup(Dimension."Consolidation Code" where(Code = field("Dimension Code")));
+        }
+        field(9; "Dim. Val. Consolidation Code"; Code[20])
+        {
+            Caption = 'Dimension Value Consolidation Code';
+            FieldClass = FlowField;
+            Editable = false;
+            CalcFormula = lookup("Dimension Value"."Consolidation Code" where("Dimension Code" = field("Dimension Code"), Code = field("Dimension Value Code")));
         }
         field(8000; "Dimension Id"; Guid)
         {

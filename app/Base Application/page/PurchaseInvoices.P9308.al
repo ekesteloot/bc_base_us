@@ -1,3 +1,17 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using System.Automation;
+using System.Environment.Configuration;
+using System.Integration.PowerBI;
+using System.Text;
+using System.Threading;
+
 page 9308 "Purchase Invoices"
 {
     AdditionalSearchTerms = 'vendor invoice';
@@ -10,7 +24,7 @@ page 9308 "Purchase Invoices"
     QueryCategory = 'Purchase Invoices';
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";
-    SourceTableView = WHERE("Document Type" = CONST(Invoice));
+    SourceTableView = where("Document Type" = const(Invoice));
     UsageCategory = Lists;
 
     layout
@@ -229,7 +243,7 @@ page 9308 "Purchase Invoices"
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
-                    StyleExpr = "Job Queue Status" = "Job Queue Status"::ERROR;
+                    StyleExpr = Rec."Job Queue Status" = Rec."Job Queue Status"::ERROR;
                     ToolTip = 'Specifies the status of a job queue entry that handles the posting of purchase invoices.';
                     Visible = JobQueueActive;
 
@@ -237,9 +251,9 @@ page 9308 "Purchase Invoices"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
                 field(Amount; Rec.Amount)
@@ -272,8 +286,8 @@ page 9308 "Purchase Invoices"
             part(Control1901138007; "Vendor Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Buy-from Vendor No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Buy-from Vendor No."),
+                              "Date Filter" = field("Date Filter");
             }
 #if not CLEAN21
             part("Power BI Report FactBox"; "Power BI Report FactBox")
@@ -315,9 +329,9 @@ page 9308 "Purchase Invoices"
 
                     trigger OnAction()
                     begin
-                        PrepareOpeningDocumentStatistics();
+                        Rec.PrepareOpeningDocumentStatistics();
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        ShowDocumentStatisticsPage();
+                        Rec.ShowDocumentStatisticsPage();
                     end;
                 }
                 action("Co&mments")
@@ -326,9 +340,9 @@ page 9308 "Purchase Invoices"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -342,7 +356,7 @@ page 9308 "Purchase Invoices"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
             }
@@ -373,8 +387,8 @@ page 9308 "Purchase Invoices"
                     Caption = 'Vendor';
                     Image = Vendor;
                     RunObject = Page "Vendor Card";
-                    RunPageLink = "No." = FIELD("Buy-from Vendor No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "No." = field("Buy-from Vendor No."),
+                                  "Date Filter" = field("Date Filter");
                     Scope = Repeater;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
@@ -450,7 +464,7 @@ page 9308 "Purchase Invoices"
                         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelPurchaseApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
             }
@@ -477,7 +491,7 @@ page 9308 "Purchase Invoices"
                             repeat
                                 VerifyTotal(PurchaseHeader);
                             until PurchaseHeader.Next() = 0;
-                            PurchaseBatchPostMgt.RunWithUI(PurchaseHeader, Count, ReadyToPostQst);
+                            PurchaseBatchPostMgt.RunWithUI(PurchaseHeader, Rec.Count(), ReadyToPostQst);
                         end else begin
                             VerifyTotal(Rec);
                             Post(CODEUNIT::"Purch.-Post (Yes/No)");
@@ -556,7 +570,7 @@ page 9308 "Purchase Invoices"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                     end;
                 }
             }
@@ -669,9 +683,9 @@ page 9308 "Purchase Invoices"
 
 #if not CLEAN21
         // Contextual Power BI FactBox: send data to filter the report in the FactBox: (SourceTableFildToCompare,QueryName/FieldName)
-        CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection("No.", false, PowerBIVisible);
+        CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection(Rec."No.", false, PowerBIVisible);
 #endif
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection("No.");
+        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection(Rec."No.");
     end;
 
     trigger OnInit()
@@ -688,11 +702,11 @@ page 9308 "Purchase Invoices"
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
         JobQueueActive := PurchasesPayablesSetup.JobQueueActive();
 
-        CopyBuyFromVendorFilter();
+        Rec.CopyBuyFromVendorFilter();
     end;
 
     var
@@ -700,7 +714,6 @@ page 9308 "Purchase Invoices"
         TotalsMismatchErr: Label 'The invoice cannot be posted because the total is different from the total on the related incoming document.';
         ReportPrint: Codeunit "Test Report-Print";
         PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
-        [InDataSet]
         JobQueueActive: Boolean;
         OpenApprovalEntriesExist: Boolean;
         CanCancelApprovalForRecord: Boolean;
@@ -710,7 +723,6 @@ page 9308 "Purchase Invoices"
         ReadyToPostQst: Label 'The number of invoices that will be posted is %1. \Do you want to continue?', Comment = '%1 - selected count';
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
 
     local procedure SetControlAppearance()
@@ -718,11 +730,11 @@ page 9308 "Purchase Invoices"
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
     end;
 
     procedure Post(PostingCodeunitID: Integer)
@@ -737,7 +749,7 @@ page 9308 "Purchase Invoices"
         PreAssignedNo := Rec."No.";
         xLastPostingNo := Rec."Last Posting No.";
 
-        SendToPosting(PostingCodeunitID);
+        Rec.SendToPosting(PostingCodeunitID);
 
         IsHandled := false;
         OnPostBeforeNavigateAfterPosting(Rec, PostingCodeunitID, IsHandled);

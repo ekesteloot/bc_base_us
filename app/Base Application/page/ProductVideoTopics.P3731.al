@@ -22,7 +22,7 @@ page 3731 "Product Video Topics"
                     var
                         Video: Codeunit Video;
                     begin
-                        Video.Show("Video Category".FromInteger(Number));
+                        Video.Show("Video Category".FromInteger(Rec.Number));
                     end;
                 }
             }
@@ -53,9 +53,9 @@ page 3731 "Product Video Topics"
         foreach i in "Video Category".Ordinals() do
             // skip showing uncategoried videos- as this page should focus on meaningful topics for new users 
             if Format("Video Category".FromInteger(i)) <> Format("Video Category"::Uncategorized) then begin
-                Init();
-                Number := i;
-                Insert();
+                Rec.Init();
+                Rec.Number := i;
+                Rec.Insert();
             end;
     end;
 
@@ -63,7 +63,7 @@ page 3731 "Product Video Topics"
     var
         VideoCategory: Enum "Video Category";
     begin
-        VideoCategory := "Video Category".FromInteger(Number);
+        VideoCategory := "Video Category".FromInteger(Rec.Number);
         TopicName := Format(VideoCategory);
     end;
 

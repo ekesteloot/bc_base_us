@@ -1,3 +1,11 @@
+namespace Microsoft.FixedAssets.Posting;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.Foundation.Enums;
+
 page 9277 "FA Posting Types Overv. Matrix"
 {
     Caption = 'FA Posting Types Overv. Matrix';
@@ -533,8 +541,8 @@ page 9277 "FA Posting Types Overv. Matrix"
                     var
                         FALedgEntry: Record "FA Ledger Entry";
                     begin
-                        FALedgEntry.SetRange("FA No.", "FA No.");
-                        FALedgEntry.SetRange("Depreciation Book Code", "Depreciation Book Code");
+                        FALedgEntry.SetRange("FA No.", Rec."FA No.");
+                        FALedgEntry.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
                         FALedgEntry.SetCurrentKey("FA No.", "Depreciation Book Code");
 
                         PAGE.Run(PAGE::"FA Ledger Entries", FALedgEntry);
@@ -551,8 +559,8 @@ page 9277 "FA Posting Types Overv. Matrix"
                     var
                         FALedgEntry: Record "FA Ledger Entry";
                     begin
-                        FALedgEntry.SetRange("Canceled from FA No.", "FA No.");
-                        FALedgEntry.SetRange("Depreciation Book Code", "Depreciation Book Code");
+                        FALedgEntry.SetRange("Canceled from FA No.", Rec."FA No.");
+                        FALedgEntry.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
                         FALedgEntry.SetCurrentKey("Canceled from FA No.", "Depreciation Book Code");
 
                         PAGE.Run(PAGE::"FA Error Ledger Entries", FALedgEntry);
@@ -569,8 +577,8 @@ page 9277 "FA Posting Types Overv. Matrix"
                     var
                         MaintLedgEntry: Record "Maintenance Ledger Entry";
                     begin
-                        MaintLedgEntry.SetRange("FA No.", "FA No.");
-                        MaintLedgEntry.SetRange("Depreciation Book Code", "Depreciation Book Code");
+                        MaintLedgEntry.SetRange("FA No.", Rec."FA No.");
+                        MaintLedgEntry.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
                         MaintLedgEntry.SetCurrentKey("FA No.", "Depreciation Book Code");
 
                         PAGE.Run(PAGE::"Maintenance Ledger Entries", MaintLedgEntry);
@@ -591,8 +599,8 @@ page 9277 "FA Posting Types Overv. Matrix"
                     var
                         FADeprBook: Record "FA Depreciation Book";
                     begin
-                        FADeprBook.SetRange("FA No.", "FA No.");
-                        FADeprBook.SetRange("Depreciation Book Code", "Depreciation Book Code");
+                        FADeprBook.SetRange("FA No.", Rec."FA No.");
+                        FADeprBook.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
 
                         PAGE.Run(PAGE::"Fixed Asset Statistics", FADeprBook);
                     end;
@@ -608,8 +616,8 @@ page 9277 "FA Posting Types Overv. Matrix"
                     var
                         FADeprBook: Record "FA Depreciation Book";
                     begin
-                        FADeprBook.SetRange("FA No.", "FA No.");
-                        FADeprBook.SetRange("Depreciation Book Code", "Depreciation Book Code");
+                        FADeprBook.SetRange("FA No.", Rec."FA No.");
+                        FADeprBook.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
 
                         PAGE.Run(PAGE::"Main Asset Statistics", FADeprBook);
                     end;
@@ -715,69 +723,37 @@ page 9277 "FA Posting Types Overv. Matrix"
         MATRIX_CaptionSet: array[32] of Text[80];
         DateFilter: Text;
         RoundingFactorFormatString: Text;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
 
     procedure LoadMatrix(NewMatrixColumns: array[32] of Text[80]; var NewMatrixRecords: array[32] of Record "FA Matrix Posting Type"; CurrentNoOfMatrixColumns: Integer; NewDateFilter: Text; NewRoundingFactor: Enum "Analysis Rounding Factor")
@@ -796,15 +772,15 @@ page 9277 "FA Posting Types Overv. Matrix"
 
     local procedure MATRIX_OnDrillDown(MATRIX_ColumnOrdinal: Integer)
     begin
-        DP_Book2.SetRange("FA No.", "FA No.");
-        DP_Book2.SetRange("Depreciation Book Code", "Depreciation Book Code");
+        DP_Book2.SetRange("FA No.", Rec."FA No.");
+        DP_Book2.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
 
         if DP_Book2.FindFirst() then
             FALedgerEntry.SetRange("Depreciation Book Code", DP_Book2."Depreciation Book Code")
         else
             FALedgerEntry.SetRange("Depreciation Book Code");
         FALedgerEntry.SetFilter("FA Posting Date", DateFilter);
-        FALedgerEntry.SetRange("FA No.", "FA No.");
+        FALedgerEntry.SetRange("FA No.", Rec."FA No.");
         OnBeforeMATRIX_OnDrillDown(FALedgerEntry);
 
         case MatrixRecords[MATRIX_ColumnOrdinal]."Entry No." of

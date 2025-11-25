@@ -19,15 +19,15 @@ table 9144 "Approvals Activities Cue"
         }
         field(3; "Requests to Approve"; Integer)
         {
-            CalcFormula = Count("Approval Entry" WHERE("Approver ID" = FIELD("User ID Filter"),
-                                                        Status = FILTER(Open)));
+            CalcFormula = count("Approval Entry" where("Approver ID" = field("User ID Filter"),
+                                                        Status = filter(Open)));
             Caption = 'Requests to Approve';
             FieldClass = FlowField;
         }
         field(4; "Requests Sent for Approval"; Integer)
         {
-            CalcFormula = Count("Approval Entry" WHERE("Sender ID" = FIELD("User ID Filter"),
-                                                        Status = FILTER(Open)));
+            CalcFormula = count("Approval Entry" where("Sender ID" = field("User ID Filter"),
+                                                        Status = filter(Open)));
             Caption = 'Requests Sent for Approval';
             FieldClass = FlowField;
         }

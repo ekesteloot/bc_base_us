@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentRegistration;
+
 enum 96 "Payment Balance Account Type"
 {
     Extensible = true;

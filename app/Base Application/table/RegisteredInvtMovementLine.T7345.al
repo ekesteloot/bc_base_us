@@ -1,3 +1,21 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.InventoryDocument;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Family;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 table 7345 "Registered Invt. Movement Line"
 {
     Caption = 'Registered Invt. Movement Line';
@@ -62,12 +80,12 @@ table 7345 "Registered Invt. Movement Line"
         field(15; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(16; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(17; "Qty. per Unit of Measure"; Decimal)
         {
@@ -114,17 +132,17 @@ table 7345 "Registered Invt. Movement Line"
         field(40; "Destination No."; Code[20])
         {
             Caption = 'Destination No.';
-            TableRelation = IF ("Destination Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Destination Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Destination Type" = CONST(Location)) Location
-            ELSE
-            IF ("Destination Type" = CONST(Item)) Item
-            ELSE
-            IF ("Destination Type" = CONST(Family)) Family
-            ELSE
-            IF ("Destination Type" = CONST("Sales Order")) "Sales Header"."No." WHERE("Document Type" = CONST(Order));
+            TableRelation = if ("Destination Type" = const(Vendor)) Vendor
+            else
+            if ("Destination Type" = const(Customer)) Customer
+            else
+            if ("Destination Type" = const(Location)) Location
+            else
+            if ("Destination Type" = const(Item)) Item
+            else
+            if ("Destination Type" = const(Family)) Family
+            else
+            if ("Destination Type" = const("Sales Order")) "Sales Header"."No." where("Document Type" = const(Order));
         }
         field(41; "Whse. Activity No."; Code[20])
         {
@@ -139,7 +157,7 @@ table 7345 "Registered Invt. Movement Line"
         field(43; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(44; "Shipment Method Code"; Code[10])
         {
@@ -186,18 +204,18 @@ table 7345 "Registered Invt. Movement Line"
         field(7300; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Action Type" = FILTER(<> Take)) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                              "Zone Code" = FIELD("Zone Code"))
-            ELSE
-            IF ("Action Type" = FILTER(<> Take),
-                                                                                       "Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Action Type" = CONST(Take)) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = if ("Action Type" = filter(<> Take)) Bin.Code where("Location Code" = field("Location Code"),
+                                                                              "Zone Code" = field("Zone Code"))
+            else
+            if ("Action Type" = filter(<> Take),
+                                                                                       "Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Action Type" = const(Take)) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"));
         }
         field(7301; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
         }
         field(7305; "Action Type"; Enum "Warehouse Action Type")
         {

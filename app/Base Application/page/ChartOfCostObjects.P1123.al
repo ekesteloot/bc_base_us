@@ -1,3 +1,10 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Reports;
+using Microsoft.CostAccounting.Setup;
+using System.Text;
+
 page 1123 "Chart of Cost Objects"
 {
     AdditionalSearchTerms = 'cost accounting allocation objects';
@@ -7,7 +14,7 @@ page 1123 "Chart of Cost Objects"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "Cost Object";
-    SourceTableView = SORTING("Sorting Order");
+    SourceTableView = sorting("Sorting Order");
     UsageCategory = Lists;
 
     layout
@@ -19,7 +26,7 @@ page 1123 "Chart of Cost Objects"
                 IndentationColumn = NameIndent;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = CostAccounting;
                     Style = Strong;
@@ -38,7 +45,7 @@ page 1123 "Chart of Cost Objects"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the purpose of the cost object, such as Cost Object, Heading, or Begin-Total. Newly created cost objects are automatically assigned the Cost Object type, but you can change this.';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
@@ -62,12 +69,12 @@ page 1123 "Chart of Cost Objects"
                     StyleExpr = Emphasize;
                     ToolTip = 'Specifies the net change in the account balance during the time period in the Date Filter field.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies a description that applies.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -100,8 +107,8 @@ page 1123 "Chart of Cost Objects"
                     Caption = 'Cost E&ntries';
                     Image = CostEntries;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Cost Object Code" = FIELD(Code);
-                    RunPageView = SORTING("Cost Object Code", "Cost Type No.", Allocated, "Posting Date");
+                    RunPageLink = "Cost Object Code" = field(Code);
+                    RunPageView = sorting("Cost Object Code", "Cost Type No.", Allocated, "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View cost entries, which can come from sources such as automatic transfer of general ledger entries to cost entries, manual posting for pure cost entries, internal charges, and manual allocations, and automatic allocation postings for actual costs.';
                 }
@@ -118,10 +125,10 @@ page 1123 "Chart of Cost Objects"
 
                     trigger OnAction()
                     begin
-                        if Totaling = '' then
-                            CostType.SetFilter("Cost Object Filter", Code)
+                        if Rec.Totaling = '' then
+                            CostType.SetFilter("Cost Object Filter", Rec.Code)
                         else
-                            CostType.SetFilter("Cost Object Filter", Totaling);
+                            CostType.SetFilter("Cost Object Filter", Rec.Totaling);
 
                         PAGE.Run(PAGE::"Cost Type Balance", CostType);
                     end;
@@ -227,38 +234,36 @@ page 1123 "Chart of Cost Objects"
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SetSelectionFilter(Rec);
-        ConfirmDeleteIfEntriesExist(Rec, false);
-        Reset();
+        Rec.ConfirmDeleteIfEntriesExist(Rec, false);
+        Rec.Reset();
     end;
 
     var
         CostType: Record "Cost Type";
         CostAccSetup: Record "Cost Accounting Setup";
         CostAccountMgt: Codeunit "Cost Account Mgt";
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     local procedure CodeOnFormat()
     begin
-        Emphasize := "Line Type" <> "Line Type"::"Cost Object";
+        Emphasize := Rec."Line Type" <> Rec."Line Type"::"Cost Object";
     end;
 
     local procedure NameOnFormat()
     begin
-        NameIndent := Indentation;
-        Emphasize := "Line Type" <> "Line Type"::"Cost Object";
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec."Line Type" <> Rec."Line Type"::"Cost Object";
     end;
 
     local procedure BalanceatDateOnFormat()
     begin
-        Emphasize := "Line Type" <> "Line Type"::"Cost Object";
+        Emphasize := Rec."Line Type" <> Rec."Line Type"::"Cost Object";
     end;
 
     local procedure NetChangeOnFormat()
     begin
-        Emphasize := "Line Type" <> "Line Type"::"Cost Object";
+        Emphasize := Rec."Line Type" <> Rec."Line Type"::"Cost Object";
     end;
 
     procedure GetSelectionFilter(): Text

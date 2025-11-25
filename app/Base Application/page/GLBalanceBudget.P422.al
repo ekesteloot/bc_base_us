@@ -1,3 +1,16 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
+using System.Text;
+using System.Utilities;
+
 page 422 "G/L Balance/Budget"
 {
     Caption = 'G/L Balance/Budget';
@@ -75,12 +88,12 @@ page 422 "G/L Balance/Budget"
                         DateFilter2: Text;
                     begin
                         if DateFilter = '' then
-                            SetRange("Date Filter")
+                            Rec.SetRange("Date Filter")
                         else begin
                             DateFilter2 := DateFilter;
                             FilterTokens.MakeDateFilter(DateFilter2);
                             DateFilter := CopyStr(DateFilter2, 1, MaxStrLen(DateFilter));
-                            SetFilter("Date Filter", DateFilter);
+                            Rec.SetFilter("Date Filter", DateFilter);
                         end;
 
                         CurrPage.Update();
@@ -107,9 +120,9 @@ page 422 "G/L Balance/Budget"
                     trigger OnValidate()
                     begin
                         if GLAccFilter = '' then
-                            SetRange("No.")
+                            Rec.SetRange("No.")
                         else
-                            SetFilter("No.", GLAccFilter);
+                            Rec.SetFilter("No.", GLAccFilter);
                         CurrPage.Update();
                     end;
                 }
@@ -122,9 +135,9 @@ page 422 "G/L Balance/Budget"
                     trigger OnValidate()
                     begin
                         if GLAccCategoryFilter = GLAccCategoryFilter::" " then
-                            SetRange("Account Category")
+                            Rec.SetRange("Account Category")
                         else
-                            SetRange("Account Category", GLAccCategoryFilter);
+                            Rec.SetRange("Account Category", GLAccCategoryFilter);
                         CurrPage.Update();
                     end;
                 }
@@ -139,13 +152,13 @@ page 422 "G/L Balance/Budget"
                     begin
                         case IncomeBalanceGLAccFilter of
                             IncomeBalanceGLAccFilter::" ":
-                                SetRange("Income/Balance");
+                                Rec.SetRange("Income/Balance");
                             IncomeBalanceGLAccFilter::"Balance Sheet":
-                                SetRange("Income/Balance", "Income/Balance"::"Balance Sheet");
+                                Rec.SetRange("Income/Balance", Rec."Income/Balance"::"Balance Sheet");
                             IncomeBalanceGLAccFilter::"Income Statement":
-                                SetRange("Income/Balance", "Income/Balance"::"Income Statement");
+                                Rec.SetRange("Income/Balance", Rec."Income/Balance"::"Income Statement");
                         end;
-                        IncomeBalanceVisible := GetFilter("Income/Balance") = '';
+                        IncomeBalanceVisible := Rec.GetFilter("Income/Balance") = '';
                         CurrPage.Update();
                     end;
                 }
@@ -167,9 +180,9 @@ page 422 "G/L Balance/Budget"
                     trigger OnValidate()
                     begin
                         if GlobalDim1Filter = '' then
-                            SetRange("Global Dimension 1 Filter")
+                            Rec.SetRange("Global Dimension 1 Filter")
                         else
-                            SetFilter("Global Dimension 1 Filter", GlobalDim1Filter);
+                            Rec.SetFilter("Global Dimension 1 Filter", GlobalDim1Filter);
                         CurrPage.Update();
                     end;
                 }
@@ -191,9 +204,9 @@ page 422 "G/L Balance/Budget"
                     trigger OnValidate()
                     begin
                         if GlobalDim2Filter = '' then
-                            SetRange("Global Dimension 2 Filter")
+                            Rec.SetRange("Global Dimension 2 Filter")
                         else
-                            SetFilter("Global Dimension 2 Filter", GlobalDim2Filter);
+                            Rec.SetFilter("Global Dimension 2 Filter", GlobalDim2Filter);
                         CurrPage.Update();
                     end;
                 }
@@ -333,12 +346,12 @@ page 422 "G/L Balance/Budget"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "G/L Account Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Budget Filter" = FIELD("Budget Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Budget Filter" = field("Budget Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the G/L account card for the selected record.';
                 }
@@ -350,8 +363,8 @@ page 422 "G/L Balance/Budget"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     RunObject = Page "General Ledger Entries";
-                    RunPageLink = "G/L Account No." = FIELD("No.");
-                    RunPageView = SORTING("G/L Account No.");
+                    RunPageLink = "G/L Account No." = field("No.");
+                    RunPageView = sorting("G/L Account No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -361,8 +374,8 @@ page 422 "G/L Balance/Budget"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -371,8 +384,8 @@ page 422 "G/L Balance/Budget"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(15),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(15),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -382,9 +395,9 @@ page 422 "G/L Balance/Budget"
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     ToolTip = 'View additional information that has been added to the description for the current account.';
                 }
             }
@@ -443,7 +456,7 @@ page 422 "G/L Balance/Budget"
                         trigger OnAction()
                         begin
                             GLAcc.Copy(Rec);
-                            GLAcc.SetRange("No.", "No.");
+                            GLAcc.SetRange("No.", Rec."No.");
                             GLAcc.SetRange("Date Filter");
                             REPORT.Run(REPORT::"Budget Amount by Period", true, false, GLAcc);
                         end;
@@ -459,7 +472,7 @@ page 422 "G/L Balance/Budget"
                         trigger OnAction()
                         begin
                             GLAcc.Copy(Rec);
-                            GLAcc.SetRange("No.", "No.");
+                            GLAcc.SetRange("No.", Rec."No.");
                             GLAcc.SetRange("Date Filter");
                             REPORT.Run(REPORT::"Budget from History", true, false, GLAcc);
                         end;
@@ -492,7 +505,7 @@ page 422 "G/L Balance/Budget"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetupNewGLAcc(xRec, BelowxRec);
+        Rec.SetupNewGLAcc(xRec, BelowxRec);
     end;
 
     trigger OnOpenPage()
@@ -519,12 +532,10 @@ page 422 "G/L Balance/Budget"
         GLAccCategoryFilter: Enum "G/L Account Category";
         IncomeBalanceGLAccFilter: Option " ","Income Statement","Balance Sheet";
         BudgetPct: Decimal;
-        [InDataSet]
         Emphasize: Boolean;
         IncomeBalanceVisible: Boolean;
         GlobalDim1FilterEnable: Boolean;
         GlobalDim2FilterEnable: Boolean;
-        [InDataSet]
         NameIndent: Integer;
         DateFilter: Text;
         GlobalDim1Filter: Text;
@@ -537,8 +548,8 @@ page 422 "G/L Balance/Budget"
         AccountingPeriod: Record "Accounting Period";
         PeriodPageMgt: Codeunit PeriodPageManagement;
     begin
-        if GetFilter("Date Filter") <> '' then begin
-            Calendar.SetFilter("Period Start", GetFilter("Date Filter"));
+        if Rec.GetFilter("Date Filter") <> '' then begin
+            Calendar.SetFilter("Period Start", Rec.GetFilter("Date Filter"));
             if not PeriodPageMgt.FindDate('+', Calendar, PeriodType) then
                 PeriodPageMgt.FindDate('+', Calendar, PeriodType::Day);
             Calendar.SetRange("Period Start");
@@ -546,56 +557,56 @@ page 422 "G/L Balance/Budget"
         PeriodPageMgt.FindDate(SearchText, Calendar, PeriodType);
         if AmountType = AmountType::"Net Change" then
             if Calendar."Period Start" = Calendar."Period End" then
-                SetRange("Date Filter", Calendar."Period Start")
+                Rec.SetRange("Date Filter", Calendar."Period Start")
             else
-                SetRange("Date Filter", Calendar."Period Start", Calendar."Period End")
+                Rec.SetRange("Date Filter", Calendar."Period Start", Calendar."Period End")
         else
-            SetRange("Date Filter", 0D, Calendar."Period End");
+            Rec.SetRange("Date Filter", 0D, Calendar."Period End");
         if ClosingEntryFilter = ClosingEntryFilter::Exclude then begin
             AccountingPeriod.SetCurrentKey("New Fiscal Year");
             AccountingPeriod.SetRange("New Fiscal Year", true);
-            if GetRangeMin("Date Filter") = 0D then
-                AccountingPeriod.SetRange("Starting Date", 0D, GetRangeMax("Date Filter"))
+            if Rec.GetRangeMin("Date Filter") = 0D then
+                AccountingPeriod.SetRange("Starting Date", 0D, Rec.GetRangeMax("Date Filter"))
             else
                 AccountingPeriod.SetRange(
                   "Starting Date",
-                  GetRangeMin("Date Filter") + 1,
-                  GetRangeMax("Date Filter"));
+                  Rec.GetRangeMin("Date Filter") + 1,
+                  Rec.GetRangeMax("Date Filter"));
             if AccountingPeriod.Find('-') then
                 repeat
-                    SetFilter(
-                      "Date Filter", GetFilter("Date Filter") + '&<>%1',
+                    Rec.SetFilter(
+                      "Date Filter", Rec.GetFilter("Date Filter") + '&<>%1',
                       ClosingDate(AccountingPeriod."Starting Date" - 1));
                 until AccountingPeriod.Next() = 0;
         end else
-            SetRange(
+            Rec.SetRange(
               "Date Filter",
-              GetRangeMin("Date Filter"),
-              ClosingDate(GetRangeMax("Date Filter")));
-        DateFilter := GetFilter("Date Filter");
+              Rec.GetRangeMin("Date Filter"),
+              ClosingDate(Rec.GetRangeMax("Date Filter")));
+        DateFilter := Rec.GetFilter("Date Filter");
     end;
 
     local procedure CalcFormFields()
     begin
-        CalcFields("Net Change", "Budgeted Amount");
-        if "Net Change" >= 0 then begin
-            "Debit Amount" := "Net Change";
-            "Credit Amount" := 0;
+        Rec.CalcFields("Net Change", "Budgeted Amount");
+        if Rec."Net Change" >= 0 then begin
+            Rec."Debit Amount" := Rec."Net Change";
+            Rec."Credit Amount" := 0;
         end else begin
-            "Debit Amount" := 0;
-            "Credit Amount" := -"Net Change";
+            Rec."Debit Amount" := 0;
+            Rec."Credit Amount" := -Rec."Net Change";
         end;
-        if "Budgeted Amount" >= 0 then begin
-            "Budgeted Debit Amount" := "Budgeted Amount";
-            "Budgeted Credit Amount" := 0;
+        if Rec."Budgeted Amount" >= 0 then begin
+            Rec."Budgeted Debit Amount" := Rec."Budgeted Amount";
+            Rec."Budgeted Credit Amount" := 0;
         end else begin
-            "Budgeted Debit Amount" := 0;
-            "Budgeted Credit Amount" := -"Budgeted Amount";
+            Rec."Budgeted Debit Amount" := 0;
+            Rec."Budgeted Credit Amount" := -Rec."Budgeted Amount";
         end;
-        if "Budgeted Amount" = 0 then
+        if Rec."Budgeted Amount" = 0 then
             BudgetPct := 0
         else
-            BudgetPct := "Net Change" / "Budgeted Amount" * 100;
+            BudgetPct := Rec."Net Change" / Rec."Budgeted Amount" * 100;
     end;
 
     local procedure BudgetedDebitAmountOnAfterVali()
@@ -700,8 +711,8 @@ page 422 "G/L Balance/Budget"
 
     local procedure FormatLine()
     begin
-        NameIndent := Indentation;
-        Emphasize := "Account Type" <> "Account Type"::Posting;
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
     end;
 
     local procedure DayPeriodTypeOnValidate()
@@ -760,15 +771,15 @@ page 422 "G/L Balance/Budget"
         GLBudgetOpen.SetupFiltersOnGLAccBudgetPage(
           GlobalDim1Filter, GlobalDim2Filter, GlobalDim1FilterEnable, GlobalDim2FilterEnable,
           PeriodType, DateFilter, Rec);
-        IncomeBalanceVisible := GetFilter("Income/Balance") = '';
-        GLAccFilter := GetFilter("No.");
+        IncomeBalanceVisible := Rec.GetFilter("Income/Balance") = '';
+        GLAccFilter := Rec.GetFilter("No.");
 
-        if Evaluate(TempGLAccount."Account Category", GetFilter("Account Category")) then
+        if Evaluate(TempGLAccount."Account Category", Rec.GetFilter("Account Category")) then
             GLAccCategoryFilter := TempGLAccount."Account Category"
         else
             GLAccCategoryFilter := GLAccCategoryFilter::" ";
 
-        if Evaluate(TempGLAccount."Income/Balance", GetFilter("Income/Balance")) then
+        if Evaluate(TempGLAccount."Income/Balance", Rec.GetFilter("Income/Balance")) then
             case TempGLAccount."Income/Balance" of
                 TempGLAccount."Income/Balance"::"Income Statement":
                     IncomeBalanceGLAccFilter := IncomeBalanceGLAccFilter::"Income Statement";

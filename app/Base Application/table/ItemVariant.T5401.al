@@ -1,3 +1,25 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.WarehouseMgt.ADCS;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5401 "Item Variant"
 {
     Caption = 'Item Variant';
@@ -50,6 +72,21 @@ table 5401 "Item Variant"
                     if Item.GetBySystemId("Item Id") then
                         "Item No." := Item."No.";
             end;
+        }
+        field(54; Blocked; Boolean)
+        {
+            Caption = 'Blocked';
+            DataClassification = CustomerContent;
+        }
+        field(8003; "Sales Blocked"; Boolean)
+        {
+            Caption = 'Sales Blocked';
+            DataClassification = CustomerContent;
+        }
+        field(8004; "Purchasing Blocked"; Boolean)
+        {
+            Caption = 'Purchasing Blocked';
+            DataClassification = CustomerContent;
         }
     }
 

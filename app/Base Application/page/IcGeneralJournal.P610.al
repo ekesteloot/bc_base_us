@@ -1,3 +1,19 @@
+﻿namespace Microsoft.Intercompany.Journal;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Intercompany.GLAccount;
+using System.Automation;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Telemetry;
+using System.Threading;
+
 page 610 "IC General Journal"
 {
     ApplicationArea = Intercompany;
@@ -86,7 +102,7 @@ page 610 "IC General Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -116,9 +132,9 @@ page 610 "IC General Journal"
 
                     trigger OnAssistEdit()
                     begin
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", "Posting Date");
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", Rec."Posting Date");
                         if ChangeExchangeRate.RunModal() = ACTION::OK then
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
 
                         Clear(ChangeExchangeRate);
                     end;
@@ -209,7 +225,7 @@ page 610 "IC General Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field("Bal. Gen. Posting Type"; Rec."Bal. Gen. Posting Type")
@@ -304,7 +320,7 @@ page 610 "IC General Journal"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies a comment about the activity on the journal line. Note that the comment is not carried forward to posted entries.';
@@ -321,9 +337,9 @@ page 610 "IC General Journal"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
                 field(ICAccountType; Rec."IC Account Type")
@@ -352,15 +368,15 @@ page 610 "IC General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 3);
                     end;
@@ -369,15 +385,15 @@ page 610 "IC General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 4);
                     end;
@@ -386,15 +402,15 @@ page 610 "IC General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 5);
                     end;
@@ -403,15 +419,15 @@ page 610 "IC General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 6);
                     end;
@@ -420,15 +436,15 @@ page 610 "IC General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 7);
                     end;
@@ -437,15 +453,15 @@ page 610 "IC General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
@@ -528,16 +544,34 @@ page 610 "IC General Journal"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = BackgroundErrorCheck;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             part(JournalLineDetails; "Journal Line Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
+            }
+            part(WorkflowStatusBatch; "Workflow Status FactBox")
+            {
+                ApplicationArea = Suite;
+                Caption = 'Batch Workflows';
+                Editable = false;
+                Enabled = false;
+                ShowFilter = false;
+                Visible = ShowWorkflowStatusOnBatch;
+            }
+            part(WorkflowStatusLine; "Workflow Status FactBox")
+            {
+                ApplicationArea = Suite;
+                Caption = 'Line Workflows';
+                Editable = false;
+                Enabled = false;
+                ShowFilter = false;
+                Visible = ShowWorkflowStatusOnLine;
             }
             systempart(Control1900383207; Links)
             {
@@ -571,7 +605,7 @@ page 610 "IC General Journal"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -615,7 +649,7 @@ page 610 "IC General Journal"
 
                     trigger OnAction()
                     begin
-                        RenumberDocumentNo();
+                        Rec.RenumberDocumentNo();
                     end;
                 }
                 action("Apply Entries")
@@ -696,8 +730,8 @@ page 610 "IC General Journal"
                         FeatureTelemetry.LogUptake('0000ILI', ICMapping.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::Used);
                         FeatureTelemetry.LogUsage('0000ILN', ICMapping.GetFeatureTelemetryName(), 'Posting General IC journal');
 
-                        SendToPosting(Codeunit::"Gen. Jnl.-Post");
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        Rec.SendToPosting(Codeunit::"Gen. Jnl.-Post");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         SetJobQueueVisibility();
                         CurrPage.Update(false);
                     end;
@@ -736,8 +770,8 @@ page 610 "IC General Journal"
                     begin
                         FeatureTelemetry.LogUptake('0000ILK', ICMapping.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::Used);
                         FeatureTelemetry.LogUsage('0000ILP', ICMapping.GetFeatureTelemetryName(), 'Post and Print on General IC journal');
-                        SendToPosting(Codeunit::"Gen. Jnl.-Post+Print");
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        Rec.SendToPosting(Codeunit::"Gen. Jnl.-Post+Print");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         SetJobQueueVisibility();
                         CurrPage.Update(false);
                     end;
@@ -752,9 +786,164 @@ page 610 "IC General Journal"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                         SetJobQueueVisibility();
                         CurrPage.Update(false);
+                    end;
+                }
+            }
+            group("Request Approval")
+            {
+                Caption = 'Request Approval';
+                group(SendApprovalRequest)
+                {
+                    Caption = 'Send Approval Request';
+                    Image = SendApprovalRequest;
+                    action(SendApprovalRequestJournalBatch)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Journal Batch';
+                        Enabled = not OpenApprovalEntriesOnBatchOrAnyJnlLineExist and CanRequestFlowApprovalForBatchAndAllLines;
+                        Image = SendApprovalRequest;
+                        ToolTip = 'Send all journal lines for approval, also those that you may not see because of filters.';
+
+                        trigger OnAction()
+                        var
+                            ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        begin
+                            ApprovalsMgmt.TrySendJournalBatchApprovalRequest(Rec);
+                            SetControlAppearanceFromBatch();
+                            SetControlAppearance();
+                        end;
+                    }
+                    action(SendApprovalRequestJournalLine)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Selected Journal Lines';
+                        Enabled = not OpenApprovalEntriesOnBatchOrCurrJnlLineExist and CanRequestFlowApprovalForBatchAndCurrentLine;
+                        Image = SendApprovalRequest;
+                        ToolTip = 'Send selected journal lines for approval.';
+
+                        trigger OnAction()
+                        var
+                            [SecurityFiltering(SecurityFilter::Filtered)]
+                            GenJournalLine: Record "Gen. Journal Line";
+                            ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        begin
+                            GetCurrentlySelectedLines(GenJournalLine);
+                            ApprovalsMgmt.TrySendJournalLineApprovalRequests(GenJournalLine);
+                            SetControlAppearanceFromBatch();
+                        end;
+                    }
+                }
+                group(CancelApprovalRequest)
+                {
+                    Caption = 'Cancel Approval Request';
+                    Image = Cancel;
+                    action(CancelApprovalRequestJournalBatch)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Journal Batch';
+                        Enabled = CanCancelApprovalForJnlBatch or CanCancelFlowApprovalForBatch;
+                        Image = CancelApprovalRequest;
+                        ToolTip = 'Cancel sending all journal lines for approval, also those that you may not see because of filters.';
+
+                        trigger OnAction()
+                        var
+                            ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        begin
+                            ApprovalsMgmt.TryCancelJournalBatchApprovalRequest(Rec);
+                            SetControlAppearance();
+                            SetControlAppearanceFromBatch();
+                        end;
+                    }
+                    action(CancelApprovalRequestJournalLine)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Selected Journal Lines';
+                        Enabled = CanCancelApprovalForJnlLine or CanCancelFlowApprovalForLine;
+                        Image = CancelApprovalRequest;
+                        ToolTip = 'Cancel sending selected journal lines for approval.';
+
+                        trigger OnAction()
+                        var
+                            [SecurityFiltering(SecurityFilter::Filtered)]
+                            GenJournalLine: Record "Gen. Journal Line";
+                            ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                        begin
+                            GetCurrentlySelectedLines(GenJournalLine);
+                            ApprovalsMgmt.TryCancelJournalLineApprovalRequests(GenJournalLine);
+                        end;
+                    }
+                }
+            }
+            group(Approval)
+            {
+                Caption = 'Approval';
+                action(Approve)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Approve';
+                    Image = Approve;
+                    ToolTip = 'Approve the requested changes.';
+                    Visible = OpenApprovalEntriesExistForCurrUser;
+
+                    trigger OnAction()
+                    var
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                    begin
+                        ApprovalsMgmt.ApproveGenJournalLineRequest(Rec);
+                    end;
+                }
+                action(Reject)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Reject';
+                    Image = Reject;
+                    ToolTip = 'Reject the approval request.';
+                    Visible = OpenApprovalEntriesExistForCurrUser;
+
+                    trigger OnAction()
+                    var
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                    begin
+                        ApprovalsMgmt.RejectGenJournalLineRequest(Rec);
+                    end;
+                }
+                action(Delegate)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Delegate';
+                    Image = Delegate;
+                    ToolTip = 'Delegate the approval to a substitute approver.';
+                    Visible = OpenApprovalEntriesExistForCurrUser;
+
+                    trigger OnAction()
+                    var
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                    begin
+                        ApprovalsMgmt.DelegateGenJournalLineRequest(Rec);
+                    end;
+                }
+                action(Comments)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Comments';
+                    Image = ViewComments;
+                    ToolTip = 'View or add comments for the record.';
+                    Visible = OpenApprovalEntriesExistForCurrUser or ApprovalEntriesExistSentByCurrentUser;
+
+                    trigger OnAction()
+                    var
+                        GenJournalBatch: Record "Gen. Journal Batch";
+                        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
+                    begin
+                        if OpenApprovalEntriesOnJnlLineExist or ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(Rec.RecordId) then
+                            ApprovalsMgmt.GetApprovalComment(Rec)
+                        else
+                            if GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
+                                if OpenApprovalEntriesOnJnlBatchExist or ApprovalsMgmt.HasApprovalEntriesSentByCurrentUser(GenJournalBatch.RecordId) then
+                                    ApprovalsMgmt.GetApprovalComment(GenJournalBatch);
                     end;
                 }
             }
@@ -773,7 +962,7 @@ page 610 "IC General Journal"
 
                     trigger OnAction()
                     begin
-                        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                     end;
                 }
                 action(ShowAllLines)
@@ -787,7 +976,7 @@ page 610 "IC General Journal"
 
                     trigger OnAction()
                     begin
-                        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                     end;
                 }
             }
@@ -875,6 +1064,51 @@ page 610 "IC General Journal"
                 {
                 }
             }
+            group(Category_Approve)
+            {
+                Caption = 'Approve';
+
+                actionref(Approve_Promoted; Approve)
+                {
+                }
+                actionref(Reject_Promoted; Reject)
+                {
+                }
+                actionref(Comments_Promoted; Comments)
+                {
+                }
+                actionref(Delegate_Promoted; Delegate)
+                {
+                }
+            }
+            group("Category_Request Approval")
+            {
+                Caption = 'Request Approval';
+
+                group("Category_Send Approval Request")
+                {
+                    Caption = 'Send Approval Request';
+
+                    actionref(SendApprovalRequestJournalBatch_Promoted; SendApprovalRequestJournalBatch)
+                    {
+                    }
+                    actionref(SendApprovalRequestJournalLine_Promoted; SendApprovalRequestJournalLine)
+                    {
+                    }
+                }
+                group("Category_Cancel Approval Request")
+                {
+                    Caption = 'Cancel Approval Request';
+
+                    actionref(CancelApprovalRequestJournalBatch_Promoted; CancelApprovalRequestJournalBatch)
+                    {
+                    }
+                    actionref(CancelApprovalRequestJournalLine_Promoted; CancelApprovalRequestJournalLine)
+                    {
+                    }
+                }
+            }
+
             group(Category_Category8)
             {
                 Caption = 'Account', Comment = 'Generated from the PromotedActionCategories property index 7.';
@@ -924,12 +1158,13 @@ page 610 "IC General Journal"
         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
         UpdateBalance();
         EnableApplyEntriesAction();
+        SetControlAppearance();
         SetJobQueueVisibility();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnInit()
@@ -944,7 +1179,7 @@ page 610 "IC General Journal"
     begin
         UpdateBalance();
         EnableApplyEntriesAction();
-        SetUpNewLine(xRec, Balance, BelowxRec);
+        Rec.SetUpNewLine(xRec, Balance, BelowxRec);
         Clear(ShortcutDimCode);
         Clear(AccName);
     end;
@@ -959,8 +1194,8 @@ page 610 "IC General Journal"
             exit;
 
         SetDimensionsVisibility();
-        if IsOpenedFromBatch() then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+        if Rec.IsOpenedFromBatch() then begin
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             GenJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
             SetControlAppearanceFromBatch();
             exit;
@@ -980,6 +1215,7 @@ page 610 "IC General Journal"
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
         ClientTypeManagement: Codeunit "Client Type Management";
         ChangeExchangeRate: Page "Change Exchange Rate";
+        GeneralJournal: Page "General Journal";
         GLReconcile: Page Reconciliation;
         CurrentJnlBatchName: Code[10];
         AccName: Text[100];
@@ -990,15 +1226,28 @@ page 610 "IC General Journal"
         ShowBalance: Boolean;
         ShowTotalBalance: Boolean;
         ApplyEntriesActionEnabled: Boolean;
-        [InDataSet]
         BalanceVisible: Boolean;
-        [InDataSet]
         TotalBalanceVisible: Boolean;
         JobQueuesUsed: Boolean;
         JobQueueVisible: Boolean;
         BackgroundErrorCheck: Boolean;
         ShowAllLinesEnabled: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
+        ApprovalEntriesExistSentByCurrentUser: Boolean;
+        OpenApprovalEntriesExistForCurrUser: Boolean;
+        OpenApprovalEntriesOnJnlBatchExist: Boolean;
+        OpenApprovalEntriesOnJnlLineExist: Boolean;
+        OpenApprovalEntriesOnBatchOrCurrJnlLineExist: Boolean;
+        OpenApprovalEntriesOnBatchOrAnyJnlLineExist: Boolean;
+        ShowWorkflowStatusOnBatch: Boolean;
+        ShowWorkflowStatusOnLine: Boolean;
+        CanCancelApprovalForJnlBatch: Boolean;
+        CanCancelApprovalForJnlLine: Boolean;
+        CanRequestFlowApprovalForBatch: Boolean;
+        CanRequestFlowApprovalForBatchAndAllLines: Boolean;
+        CanRequestFlowApprovalForBatchAndCurrentLine: Boolean;
+        CanCancelFlowApprovalForBatch: Boolean;
+        CanCancelFlowApprovalForLine: Boolean;
 
     protected var
         ShortcutDimCode: array[8] of Code[20];
@@ -1017,14 +1266,14 @@ page 610 "IC General Journal"
         BalanceVisible := ShowBalance;
         TotalBalanceVisible := ShowTotalBalance;
         if ShowTotalBalance then
-            NumberOfRecords := Count();
+            NumberOfRecords := Rec.Count();
     end;
 
     local procedure EnableApplyEntriesAction()
     begin
         ApplyEntriesActionEnabled :=
-          ("Account Type" in ["Account Type"::Customer, "Account Type"::Vendor]) or
-          ("Bal. Account Type" in ["Bal. Account Type"::Customer, "Bal. Account Type"::Vendor]);
+          (Rec."Account Type" in [Rec."Account Type"::Customer, Rec."Account Type"::Vendor]) or
+          (Rec."Bal. Account Type" in [Rec."Bal. Account Type"::Customer, Rec."Bal. Account Type"::Vendor]);
     end;
 
     local procedure CurrentJnlBatchNameOnAfterVali()
@@ -1054,22 +1303,36 @@ page 610 "IC General Journal"
         Clear(DimMgt);
     end;
 
+    local procedure SetControlAppearance()
+    begin
+        GeneralJournal.SetApprovalState(Rec.RecordId, OpenApprovalEntriesOnJnlBatchExist, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForLine, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlLineExist, OpenApprovalEntriesOnBatchOrCurrJnlLineExist, CanCancelApprovalForJnlLine, CanRequestFlowApprovalForBatchAndCurrentLine);
+        ShowWorkflowStatusOnLine := CurrPage.WorkflowStatusLine.Page.SetFilterOnWorkflowRecord(Rec.RecordId);
+    end;
+
     local procedure SetControlAppearanceFromBatch()
     var
         GenJournalBatch: Record "Gen. Journal Batch";
     begin
-        if not GenJournalBatch.Get(GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
+        if not GenJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
+        ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.Page.SetFilterOnWorkflowRecord(GenJournalBatch.RecordId);
+        GeneralJournal.SetApprovalStateForBatch(GenJournalBatch, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnJnlBatchExist, OpenApprovalEntriesOnBatchOrAnyJnlLineExist, CanCancelApprovalForJnlBatch, CanRequestFlowApprovalForBatch, CanCancelFlowApprovalForBatch, CanRequestFlowApprovalForBatchAndAllLines, ApprovalEntriesExistSentByCurrentUser);
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
-        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
         JournalErrorsMgt.SetFullBatchCheck(true);
     end;
 
     local procedure SetJobQueueVisibility()
     begin
-        JobQueueVisible := "Job Queue Status" = "Job Queue Status"::"Scheduled for Posting";
+        JobQueueVisible := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
         JobQueuesUsed := GeneralLedgerSetup.JobQueueActive();
+    end;
+
+    local procedure GetCurrentlySelectedLines(var GenJournalLine: Record "Gen. Journal Line"): Boolean
+    begin
+        CurrPage.SetSelectionFilter(GenJournalLine);
+        exit(GenJournalLine.FindSet());
     end;
 
     [IntegrationEvent(false, false)]

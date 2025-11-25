@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 codeunit 5618 "Table Depr. Calculation"
 {
 

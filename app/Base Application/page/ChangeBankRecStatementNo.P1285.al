@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 page 1285 "Change Bank Rec. Statement No."
 {
     PageType = StandardDialog;

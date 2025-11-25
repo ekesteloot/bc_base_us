@@ -1,3 +1,15 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 5802 "Value Entries"
 {
     AdditionalSearchTerms = 'costing,inventory cost,inventory valuation';
@@ -7,8 +19,8 @@ page 5802 "Value Entries"
     Editable = false;
     PageType = List;
     SourceTable = "Value Entry";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Entry No.")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -45,7 +57,7 @@ page 5802 "Value Entries"
                     ToolTip = 'Specifies the type of variance described in this entry.';
                     Visible = false;
                 }
-                field(Adjustment; Adjustment)
+                field(Adjustment; Rec.Adjustment)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies this field was inserted by the Adjust Cost - Item Entries batch job, if it contains a check mark.';
@@ -213,7 +225,7 @@ page 5802 "Value Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Posting Group"; Rec."Source Posting Group")
@@ -404,7 +416,7 @@ page 5802 "Value Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -417,7 +429,7 @@ page 5802 "Value Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
                 action("General Ledger")
@@ -429,7 +441,7 @@ page 5802 "Value Entries"
 
                     trigger OnAction()
                     begin
-                        ShowGL();
+                        Rec.ShowGL();
                     end;
                 }
             }
@@ -446,7 +458,7 @@ page 5802 "Value Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -484,7 +496,7 @@ page 5802 "Value Entries"
 
     trigger OnOpenPage()
     begin
-        FilterGroupNo := FilterGroup; // Trick: FILTERGROUP is used to transfer an integer value
+        FilterGroupNo := Rec.FilterGroup; // Trick: FILTERGROUP is used to transfer an integer value
         SetDimVisibility();
     end;
 
@@ -527,28 +539,28 @@ page 5802 "Value Entries"
         Description := '';
 
         case true of
-            GetFilter("Item Ledger Entry No.") <> '':
+            Rec.GetFilter("Item Ledger Entry No.") <> '':
                 begin
                     SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 32);
-                    SourceFilter := GetFilter("Item Ledger Entry No.");
+                    SourceFilter := Rec.GetFilter("Item Ledger Entry No.");
                 end;
-            GetFilter("Capacity Ledger Entry No.") <> '':
+            Rec.GetFilter("Capacity Ledger Entry No.") <> '':
                 begin
                     SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 5832);
-                    SourceFilter := GetFilter("Capacity Ledger Entry No.");
+                    SourceFilter := Rec.GetFilter("Capacity Ledger Entry No.");
                 end;
-            GetFilter("Item No.") <> '':
+            Rec.GetFilter("Item No.") <> '':
                 begin
                     SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 27);
-                    SourceFilter := GetFilter("Item No.");
+                    SourceFilter := Rec.GetFilter("Item No.");
                     if MaxStrLen(Item."No.") >= StrLen(SourceFilter) then
                         if Item.Get(SourceFilter) then
                             Description := Item.Description;
                 end;
-            (GetFilter("Order No.") <> '') and ("Order Type" = "Order Type"::Production):
+            (Rec.GetFilter("Order No.") <> '') and (Rec."Order Type" = Rec."Order Type"::Production):
                 begin
                     SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 5405);
-                    SourceFilter := GetFilter("Order No.");
+                    SourceFilter := Rec.GetFilter("Order No.");
                     if MaxStrLen(ProdOrder."No.") >= StrLen(SourceFilter) then
                         if ProdOrder.Get(ProdOrder.Status::Released, SourceFilter) or
                            ProdOrder.Get(ProdOrder.Status::Finished, SourceFilter)
@@ -557,57 +569,57 @@ page 5802 "Value Entries"
                             Description := ProdOrder.Description;
                         end;
                 end;
-            GetFilter("Source No.") <> '':
-                case "Source Type" of
-                    "Source Type"::Customer:
+            Rec.GetFilter("Source No.") <> '':
+                case Rec."Source Type" of
+                    Rec."Source Type"::Customer:
                         begin
                             SourceTableName :=
                               ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 18);
-                            SourceFilter := GetFilter("Source No.");
+                            SourceFilter := Rec.GetFilter("Source No.");
                             if MaxStrLen(Cust."No.") >= StrLen(SourceFilter) then
                                 if Cust.Get(SourceFilter) then
                                     Description := Cust.Name;
                         end;
-                    "Source Type"::Vendor:
+                    Rec."Source Type"::Vendor:
                         begin
                             SourceTableName :=
                               ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 23);
-                            SourceFilter := GetFilter("Source No.");
+                            SourceFilter := Rec.GetFilter("Source No.");
                             if MaxStrLen(Vend."No.") >= StrLen(SourceFilter) then
                                 if Vend.Get(SourceFilter) then
                                     Description := Vend.Name;
                         end;
                 end;
-            GetFilter("Global Dimension 1 Code") <> '':
+            Rec.GetFilter("Global Dimension 1 Code") <> '':
                 begin
                     GLSetup.Get();
                     Dimension.Code := GLSetup."Global Dimension 1 Code";
-                    SourceFilter := GetFilter("Global Dimension 1 Code");
+                    SourceFilter := Rec.GetFilter("Global Dimension 1 Code");
                     SourceTableName := Dimension.GetMLName(GlobalLanguage);
                     if MaxStrLen(DimValue.Code) >= StrLen(SourceFilter) then
                         if DimValue.Get(GLSetup."Global Dimension 1 Code", SourceFilter) then
                             Description := DimValue.Name;
                 end;
-            GetFilter("Global Dimension 2 Code") <> '':
+            Rec.GetFilter("Global Dimension 2 Code") <> '':
                 begin
                     GLSetup.Get();
                     Dimension.Code := GLSetup."Global Dimension 2 Code";
-                    SourceFilter := GetFilter("Global Dimension 2 Code");
+                    SourceFilter := Rec.GetFilter("Global Dimension 2 Code");
                     SourceTableName := Dimension.GetMLName(GlobalLanguage);
                     if MaxStrLen(DimValue.Code) >= StrLen(SourceFilter) then
                         if DimValue.Get(GLSetup."Global Dimension 2 Code", SourceFilter) then
                             Description := DimValue.Name;
                 end;
-            GetFilter("Document Type") <> '':
+            Rec.GetFilter("Document Type") <> '':
                 begin
-                    SourceTableName := GetFilter("Document Type");
-                    SourceFilter := GetFilter("Document No.");
-                    Description := GetFilter("Document Line No.");
+                    SourceTableName := Rec.GetFilter("Document Type");
+                    SourceFilter := Rec.GetFilter("Document No.");
+                    Description := Rec.GetFilter("Document Line No.");
                 end;
             FilterGroupNo = DATABASE::"Item Analysis View Entry":
                 begin
-                    if Item."No." <> "Item No." then
-                        if not Item.Get("Item No.") then
+                    if Item."No." <> Rec."Item No." then
+                        if not Item.Get(Rec."Item No.") then
                             Clear(Item);
                     SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, DATABASE::"Item Analysis View Entry");
                     SourceFilter := Item."No.";

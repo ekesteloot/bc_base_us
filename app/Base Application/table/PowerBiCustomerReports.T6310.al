@@ -1,3 +1,5 @@
+namespace System.Integration.PowerBI;
+
 /// <summary>
 /// Stores in a BLOB the reports uploaded to Power BI using the Business Central pages.
 /// </summary>

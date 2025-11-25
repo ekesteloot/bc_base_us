@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Statement;
+
 codeunit 371 "Bank Acc. Recon. Post (Yes/No)"
 {
     TableNo = "Bank Acc. Reconciliation";

@@ -15,7 +15,7 @@ page 10018 "IRS 1099 Adjustments"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the vendor account.';
                 }
-                field(Year; Year)
+                field(Year; Rec.Year)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the tax year for the 1099 forms.';

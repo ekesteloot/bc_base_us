@@ -1,3 +1,7 @@
+namespace Microsoft.CostAccounting.Posting;
+
+using Microsoft.CostAccounting.Journal;
+
 codeunit 1107 "CA Jnl.-B. Post"
 {
     TableNo = "Cost Journal Batch";

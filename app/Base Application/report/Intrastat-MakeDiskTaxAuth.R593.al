@@ -11,7 +11,7 @@ report 593 "Intrastat - Make Disk Tax Auth"
     {
         dataitem("Intrastat Jnl. Batch"; "Intrastat Jnl. Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             RequestFilterFields = "Journal Template Name", Name;
             dataitem(IntrastatJnlLine; "Intrastat Jnl. Line")
             {
@@ -289,22 +289,6 @@ report 593 "Intrastat - Make Disk Tax Auth"
               Text, Length);
         exit(PadStr('', Length - StrLen(Text), '0') + Text);
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by InitializeRequest(outstream,...)', '20.0')]
-    procedure InitializeRequest(newServerFileName: Text)
-    begin
-        IntrastatFileWriter.SetServerFileName(newServerFileName);
-    end;
-
-    [Obsolete('Replaced by InitializeRequest(outstream,...)', '20.0')]
-    procedure InitializeRequestWithExportFormat(newServerFileName: Text; NewExportFormat: Enum "Intrastat Export Format")
-    begin
-        IntrastatFileWriter.SetServerFileName(newServerFileName);
-        SpecifiedExportFormat := NewExportFormat;
-        ExportFormatIsSpecified := true;
-    end;
-#endif
 
     procedure InitializeRequest(var newResultFileOutStream: OutStream; NewExportFormat: Enum "Intrastat Export Format")
     begin

@@ -7,7 +7,7 @@ page 7019 "Sales Job Price Lists"
     QueryCategory = 'Sales Job Price Lists';
     RefreshOnActivate = true;
     SourceTable = "Price List Header";
-    SourceTableView = WHERE("Source Group" = CONST(Job), "Price Type" = CONST(Sale));
+    SourceTableView = where("Source Group" = const(Job), "Price Type" = const(Sale));
     ApplicationArea = Jobs;
     UsageCategory = Lists;
 

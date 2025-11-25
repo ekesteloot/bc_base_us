@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 enum 5062 "Attachment Storage Type"
 {
     Extensible = true;

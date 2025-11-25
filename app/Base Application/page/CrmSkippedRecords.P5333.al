@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Dataverse;
+
+using Microsoft.Integration.SyncEngine;
+
 page 5333 "CRM Skipped Records"
 {
     AccessByPermission = TableData "CRM Integration Record" = R;
@@ -32,7 +40,7 @@ page 5333 "CRM Skipped Records"
 
                     trigger OnDrillDown()
                     begin
-                        CRMSynchHelper.ShowPage("Record ID");
+                        CRMSynchHelper.ShowPage(Rec."Record ID");
                     end;
                 }
                 field("Record Exists"; Rec."Record Exists")
@@ -48,7 +56,7 @@ page 5333 "CRM Skipped Records"
 
                     trigger OnDrillDown()
                     begin
-                        CRMSynchHelper.ShowPage("Int. Record ID");
+                        CRMSynchHelper.ShowPage(Rec."Int. Record ID");
                     end;
                 }
                 field("Int. Record Exists"; Rec."Int. Record Exists")
@@ -110,7 +118,7 @@ page 5333 "CRM Skipped Records"
                     CRMOptionMapping: Record "CRM Option Mapping";
                     CRMIntegrationManagement: Codeunit "CRM Integration Management";
                 begin
-                    if IsEmpty() then
+                    if Rec.IsEmpty() then
                         exit;
                     CRMIntegrationManagement.UpdateAllSkippedNow();
                     Refresh(CRMIntegrationRecord, CRMOptionMapping);
@@ -145,7 +153,7 @@ page 5333 "CRM Skipped Records"
             {
                 ApplicationArea = Suite;
                 Caption = 'Synchronization Log';
-                Enabled = AreRecordsExist AND "Record Exists";
+                Enabled = AreRecordsExist and Rec."Record Exists";
                 Image = Log;
                 ToolTip = 'View integration synchronization jobs for the skipped record.';
 
@@ -155,10 +163,10 @@ page 5333 "CRM Skipped Records"
                     CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     RecId: RecordId;
                 begin
-                    CRMIntegrationRecord."Table ID" := "Table ID";
-                    CRMIntegrationRecord."Integration ID" := "Integration ID";
+                    CRMIntegrationRecord."Table ID" := Rec."Table ID";
+                    CRMIntegrationRecord."Integration ID" := Rec."Integration ID";
                     CRMIntegrationRecord.FindRecordId(RecId);
-                    if "CRM Option Id" = 0 then
+                    if Rec."CRM Option Id" = 0 then
                         CRMIntegrationManagement.ShowLog(RecId)
                     else
                         CRMIntegrationManagement.ShowOptionLog(RecId);
@@ -168,7 +176,7 @@ page 5333 "CRM Skipped Records"
             {
                 ApplicationArea = Suite;
                 Caption = 'Set Up Coupling';
-                Enabled = AreRecordsExist AND "Record Exists";
+                Enabled = AreRecordsExist and Rec."Record Exists";
                 Image = LinkAccount;
                 ToolTip = 'Create or modify the coupling to a Dynamics 365 Sales entity.';
 
@@ -179,8 +187,8 @@ page 5333 "CRM Skipped Records"
                     CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     RecId: RecordId;
                 begin
-                    CRMIntegrationRecord."Table ID" := "Table ID";
-                    CRMIntegrationRecord."Integration ID" := "Integration ID";
+                    CRMIntegrationRecord."Table ID" := Rec."Table ID";
+                    CRMIntegrationRecord."Integration ID" := Rec."Integration ID";
                     CRMIntegrationRecord.FindRecordId(RecId);
                     if CRMIntegrationRecord.FindByRecordID(RecId) then
                         if CRMIntegrationManagement.DefineCoupling(RecId) then begin
@@ -353,8 +361,8 @@ page 5333 "CRM Skipped Records"
         TempCRMSynchConflictBuffer: Record "CRM Synch. Conflict Buffer" temporary;
     begin
         AreRecordsExist := true;
-        IsOneOfRecordsDeleted := IsOneRecordDeleted();
-        DoBothOfRecordsExist := DoBothRecordsExist();
+        IsOneOfRecordsDeleted := Rec.IsOneRecordDeleted();
+        DoBothOfRecordsExist := Rec.DoBothRecordsExist();
 
         TempCRMSynchConflictBuffer.Copy(Rec, true);
         CurrPage.SetSelectionFilter(TempCRMSynchConflictBuffer);
@@ -395,7 +403,7 @@ page 5333 "CRM Skipped Records"
 
     local procedure LoadData(TableIdFilter: Text);
     begin
-        Reset();
+        Rec.Reset();
         CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled();
         CDSIntegrationEnabled := CRMIntegrationManagement.IsCDSIntegrationEnabled();
         if not SetOutside and (CRMIntegrationEnabled or CDSIntegrationEnabled) then
@@ -429,7 +437,7 @@ page 5333 "CRM Skipped Records"
     var
         cnt: Integer;
     begin
-        cnt := Fill(CRMIntegrationRecord, CRMOptionMapping);
+        cnt := Rec.Fill(CRMIntegrationRecord, CRMOptionMapping);
         SetOutside := true;
         if cnt >= 100 then begin
             TooManyErrorsNotification.Id(GetTooManyErrorsNotificationId());
@@ -452,7 +460,7 @@ page 5333 "CRM Skipped Records"
 
     local procedure Refresh(var CRMIntegrationRecord: Record "CRM Integration Record"; var CRMOptionMapping: Record "CRM Option Mapping")
     begin
-        UpdateSourceTable(CRMIntegrationRecord, CRMOptionMapping);
+        Rec.UpdateSourceTable(CRMIntegrationRecord, CRMOptionMapping);
         AreRecordsExist := false;
     end;
 

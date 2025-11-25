@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 657 "IC Mapping Dimension Incoming"
 {
     PageType = ListPart;

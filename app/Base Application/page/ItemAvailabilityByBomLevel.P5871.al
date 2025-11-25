@@ -1,3 +1,13 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.BOM.Tree;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.Manufacturing.Document;
+
 page 5871 "Item Availability by BOM Level"
 {
     Caption = 'Item Availability by BOM Level';
@@ -131,7 +141,7 @@ page 5871 "Item Availability by BOM Level"
             repeater(Group)
             {
                 Caption = 'Lines';
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 ShowAsTree = true;
                 field("No."; Rec."No.")
                 {
@@ -163,7 +173,7 @@ page 5871 "Item Availability by BOM Level"
                             ShowWarnings();
                     end;
                 }
-                field(Bottleneck; Bottleneck)
+                field(Bottleneck; Rec.Bottleneck)
                 {
                     ApplicationArea = Assembly;
                     Editable = false;
@@ -438,9 +448,9 @@ page 5871 "Item Availability by BOM Level"
     var
         DummyBOMWarningLog: Record "BOM Warning Log";
     begin
-        IsParentExpr := not "Is Leaf";
+        IsParentExpr := not Rec."Is Leaf";
 
-        HasWarning := not IsLineOk(false, DummyBOMWarningLog);
+        HasWarning := not Rec.IsLineOk(false, DummyBOMWarningLog);
     end;
 
     trigger OnOpenPage()
@@ -455,14 +465,12 @@ page 5871 "Item Availability by BOM Level"
         AsmHeader: Record "Assembly Header";
         ProdOrderLine: Record "Prod. Order Line";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
-        [InDataSet]
         IsParentExpr: Boolean;
         DemandDate: Date;
         IsCalculated: Boolean;
         ShowTotalAvailability: Boolean;
         Text000: Label 'Could not find items with BOM levels.';
         Text001: Label 'There are no warnings.';
-        [InDataSet]
         HasWarning: Boolean;
 
     protected var
@@ -546,16 +554,16 @@ page 5871 "Item Availability by BOM Level"
     var
         Item: Record Item;
     begin
-        TestField(Type, Type::Item);
+        Rec.TestField(Rec.Type, Rec.Type::Item);
 
-        Item.Get("No.");
-        Item.SetFilter("No.", "No.");
-        Item.SetRange("Date Filter", 0D, "Needed by Date");
+        Item.Get(Rec."No.");
+        Item.SetFilter("No.", Rec."No.");
+        Item.SetRange("Date Filter", 0D, Rec."Needed by Date");
         Item.SetFilter("Location Filter", LocationFilter);
-        Item.SetFilter("Variant Filter", "Variant Code");
+        Item.SetFilter("Variant Filter", Rec."Variant Code");
         if ShowBy <> ShowBy::Item then
-            Item.SetFilter("Location Filter", "Location Code");
-        if Indentation = 0 then
+            Item.SetFilter("Location Filter", Rec."Location Code");
+        if Rec.Indentation = 0 then
             Item.SetFilter("Variant Filter", VariantFilter);
 
         ItemAvailFormsMgt.ShowItemAvailFromItem(Item, AvailType);
@@ -566,13 +574,13 @@ page 5871 "Item Availability by BOM Level"
         Item: Record Item;
         ItemAbleToMakeTimeline: Report "Item - Able to Make (Timeline)";
     begin
-        TestField(Type, Type::Item);
+        Rec.TestField(Type, Rec.Type::Item);
 
-        Item.Get("No.");
-        Item.SetFilter("No.", "No.");
+        Item.Get(Rec."No.");
+        Item.SetFilter("No.", Rec."No.");
 
         with ItemAbleToMakeTimeline do begin
-            if Indentation = 0 then
+            if Rec.Indentation = 0 then
                 case ShowBy of
                     ShowBy::Item:
                         begin
@@ -590,7 +598,7 @@ page 5871 "Item Availability by BOM Level"
             end;
 
             SetTableView(Item);
-            Initialize("Needed by Date", 0, 7, true);
+            Initialize(Rec."Needed by Date", 0, 7, true);
             Run();
         end;
     end;
@@ -599,7 +607,7 @@ page 5871 "Item Availability by BOM Level"
     var
         TempBOMWarningLog: Record "BOM Warning Log" temporary;
     begin
-        if IsLineOk(true, TempBOMWarningLog) then
+        if Rec.IsLineOk(true, TempBOMWarningLog) then
             Message(Text001)
         else
             PAGE.RunModal(PAGE::"BOM Warning Log", TempBOMWarningLog);
@@ -609,7 +617,7 @@ page 5871 "Item Availability by BOM Level"
     var
         TempBOMWarningLog: Record "BOM Warning Log" temporary;
     begin
-        if AreAllLinesOk(TempBOMWarningLog) then
+        if Rec.AreAllLinesOk(TempBOMWarningLog) then
             Message(Text001)
         else
             PAGE.RunModal(PAGE::"BOM Warning Log", TempBOMWarningLog);

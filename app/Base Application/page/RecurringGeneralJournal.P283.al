@@ -1,10 +1,22 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Threading;
+
 page 283 "Recurring General Journal"
 {
     AdditionalSearchTerms = 'accruals';
     ApplicationArea = Suite, FixedAssets;
     AutoSplitKey = true;
     Caption = 'Recurring General Journals';
-    DataCaptionExpression = DataCaption();
+    DataCaptionExpression = Rec.DataCaption();
     DelayedInsert = true;
     PageType = Worksheet;
     SaveValues = true;
@@ -100,7 +112,7 @@ page 283 "Recurring General Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -148,9 +160,9 @@ page 283 "Recurring General Journal"
 
                     trigger OnAssistEdit()
                     begin
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", "Posting Date");
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", Rec."Posting Date");
                         if ChangeExchangeRate.RunModal() = ACTION::OK then
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
 
                         Clear(ChangeExchangeRate);
                     end;
@@ -270,9 +282,9 @@ page 283 "Recurring General Journal"
                         CurrPage.SaveRecord();
                         Commit();
                         GenJnlAlloc.Reset();
-                        GenJnlAlloc.SetRange("Journal Template Name", "Journal Template Name");
-                        GenJnlAlloc.SetRange("Journal Batch Name", "Journal Batch Name");
-                        GenJnlAlloc.SetRange("Journal Line No.", "Line No.");
+                        GenJnlAlloc.SetRange("Journal Template Name", Rec."Journal Template Name");
+                        GenJnlAlloc.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+                        GenJnlAlloc.SetRange("Journal Line No.", Rec."Line No.");
                         PAGE.RunModal(PAGE::Allocations, GenJnlAlloc);
                         CurrPage.Update(false);
                     end;
@@ -294,7 +306,7 @@ page 283 "Recurring General Journal"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the last date the recurring journal will be posted, if you have indicated in the journal is recurring.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies a comment about the activity on the journal line. Note that the comment is not carried forward to posted entries.';
@@ -311,9 +323,9 @@ page 283 "Recurring General Journal"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
@@ -324,7 +336,7 @@ page 283 "Recurring General Journal"
 
                     trigger OnValidate()
                     begin
-                        CheckShortcutDimCodeRecurringMethod("Shortcut Dimension 1 Code");
+                        Rec.CheckShortcutDimCodeRecurringMethod(Rec."Shortcut Dimension 1 Code");
                     end;
                 }
                 field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
@@ -335,22 +347,22 @@ page 283 "Recurring General Journal"
 
                     trigger OnValidate()
                     begin
-                        CheckShortcutDimCodeRecurringMethod("Shortcut Dimension 2 Code");
+                        Rec.CheckShortcutDimCodeRecurringMethod(Rec."Shortcut Dimension 2 Code");
                     end;
                 }
                 field(ShortcutDimCode3; ShortcutDimCode[3])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[3]);
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 3);
                     end;
@@ -359,15 +371,15 @@ page 283 "Recurring General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[4]);
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 4);
                     end;
@@ -376,15 +388,15 @@ page 283 "Recurring General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[5]);
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 5);
                     end;
@@ -393,15 +405,15 @@ page 283 "Recurring General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[6]);
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 6);
                     end;
@@ -410,15 +422,15 @@ page 283 "Recurring General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[7]);
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 7);
                     end;
@@ -427,15 +439,15 @@ page 283 "Recurring General Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[8]);
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.CheckShortcutDimCodeRecurringMethod(ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
@@ -518,9 +530,9 @@ page 283 "Recurring General Journal"
             part(JournalLineDetails; "Journal Line Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -549,9 +561,9 @@ page 283 "Recurring General Journal"
                     Caption = 'Allocations';
                     Image = Allocations;
                     RunObject = Page Allocations;
-                    RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                                  "Journal Batch Name" = FIELD("Journal Batch Name"),
-                                  "Journal Line No." = FIELD("Line No.");
+                    RunPageLink = "Journal Template Name" = field("Journal Template Name"),
+                                  "Journal Batch Name" = field("Journal Batch Name"),
+                                  "Journal Line No." = field("Line No.");
                     ToolTip = 'Allocate the amount on the selected journal line to the accounts that you specify.';
                 }
                 action(Dimensions)
@@ -566,7 +578,7 @@ page 283 "Recurring General Journal"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -619,7 +631,7 @@ page 283 "Recurring General Journal"
 
                     trigger OnAction()
                     begin
-                        ShowRecurringDimFilter();
+                        Rec.ShowRecurringDimFilter();
                     end;
                 }
             }
@@ -651,7 +663,7 @@ page 283 "Recurring General Journal"
                     trigger OnAction()
                     var
                     begin
-                        SendToPosting(Codeunit::"Gen. Jnl.-Post");
+                        Rec.SendToPosting(Codeunit::"Gen. Jnl.-Post");
                         CurrPage.Update(false);
                     end;
                 }
@@ -689,7 +701,7 @@ page 283 "Recurring General Journal"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                         SetJobQueueVisibility();
                         CurrPage.Update(false);
                     end;
@@ -812,7 +824,7 @@ page 283 "Recurring General Journal"
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnInit()
@@ -827,7 +839,7 @@ page 283 "Recurring General Journal"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         UpdateBalance();
-        SetUpNewLine(xRec, Balance, BelowxRec);
+        Rec.SetUpNewLine(xRec, Balance, BelowxRec);
         Clear(ShortcutDimCode);
     end;
 
@@ -847,8 +859,8 @@ page 283 "Recurring General Journal"
         SetControlVisibility();
         SetDimensionsVisibility();
 
-        if IsOpenedFromBatch() then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+        if Rec.IsOpenedFromBatch() then begin
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             GenJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
             exit;
         end;
@@ -871,9 +883,7 @@ page 283 "Recurring General Journal"
         NumberOfRecords: Integer;
         ShowBalance: Boolean;
         ShowTotalBalance: Boolean;
-        [InDataSet]
         BalanceVisible: Boolean;
-        [InDataSet]
         TotalBalanceVisible: Boolean;
         AmountVisible: Boolean;
         DebitCreditVisible: Boolean;
@@ -881,7 +891,6 @@ page 283 "Recurring General Journal"
         JobQueueVisible: Boolean;
         DimensionBalanceLine: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
-        [InDataSet]
         VATDateEnabled: Boolean;
 
     protected var
@@ -903,7 +912,7 @@ page 283 "Recurring General Journal"
         BalanceVisible := ShowBalance;
         TotalBalanceVisible := ShowTotalBalance;
         if ShowTotalBalance then
-            NumberOfRecords := Count();
+            NumberOfRecords := Rec.Count();
     end;
 
     local procedure SelectJournalWithError()
@@ -958,13 +967,13 @@ page 283 "Recurring General Journal"
 
     local procedure SetJobQueueVisibility()
     begin
-        JobQueueVisible := "Job Queue Status" = "Job Queue Status"::"Scheduled for Posting";
+        JobQueueVisible := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
         JobQueuesUsed := GeneralLedgerSetup.JobQueueActive();
     end;
 
     local procedure IsDimensionBalanceLine()
     begin
-        DimensionBalanceLine := "Recurring Method" in ["Recurring Method"::"BD Balance by Dimension", "Recurring Method"::"RBD Reversing Balance by Dimension"];
+        DimensionBalanceLine := Rec."Recurring Method" in [Rec."Recurring Method"::"BD Balance by Dimension", Rec."Recurring Method"::"RBD Reversing Balance by Dimension"];
     end;
 
     [IntegrationEvent(false, false)]

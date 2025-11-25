@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.RoleCenters;
+
 profile "SHIPPING AND RECEIVING"
 {
     Caption = 'Inventory Manager';

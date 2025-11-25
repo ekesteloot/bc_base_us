@@ -46,7 +46,7 @@ page 738 "VAT Return Period Card"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownVATReturn();
+                        Rec.DrillDownVATReturn();
                     end;
                 }
                 field(VATReturnStatus; VATReturnStatus)
@@ -58,7 +58,7 @@ page 738 "VAT Return Period Card"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownVATReturn();
+                        Rec.DrillDownVATReturn();
                     end;
                 }
             }
@@ -160,11 +160,11 @@ page 738 "VAT Return Period Card"
 
     local procedure InitPageControllers()
     begin
-        CreateVATReturnEnabled := (Status = Status::Open) and ("VAT Return No." = '');
-        OpenVATReturnEnabled := (Status = Status::Open) or ("VAT Return No." <> '');
-        CalcFields("VAT Return Status");
-        if "VAT Return No." <> '' then
-            VATReturnStatus := "VAT Return Status" + 1
+        CreateVATReturnEnabled := (Rec.Status = Rec.Status::Open) and (Rec."VAT Return No." = '');
+        OpenVATReturnEnabled := (Rec.Status = Rec.Status::Open) or (Rec."VAT Return No." <> '');
+        Rec.CalcFields("VAT Return Status");
+        if Rec."VAT Return No." <> '' then
+            VATReturnStatus := Rec."VAT Return Status" + 1
         else
             VATReturnStatus := VATReturnStatus::" ";
     end;

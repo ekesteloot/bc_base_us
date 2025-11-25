@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Setup;
+
 table 5070 "Organizational Level"
 {
     Caption = 'Organizational Level';

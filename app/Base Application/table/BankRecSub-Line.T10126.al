@@ -2,13 +2,10 @@ table 10126 "Bank Rec. Sub-line"
 {
     Caption = 'Bank Rec. Sub-line';
     ObsoleteReason = 'Deprecated in favor of W1 Bank Reconciliation';
-#if not CLEAN21
-    ObsoleteState = Pending;
-    ObsoleteTag = '21.0';
-#else
     ObsoleteState = Removed;
-    ObsoleteTag = '24.0';
-#endif
+    ObsoleteTag = '23.0';
+    ReplicateData = false;
+
     fields
     {
         field(1; "Bank Account No."; Code[20])
@@ -19,14 +16,14 @@ table 10126 "Bank Rec. Sub-line"
         field(2; "Statement No."; Code[20])
         {
             Caption = 'Statement No.';
-            TableRelation = "Bank Rec. Header"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."));
+            TableRelation = "Bank Rec. Header"."Statement No." where("Bank Account No." = field("Bank Account No."));
         }
         field(3; "Bank Rec. Line No."; Integer)
         {
             Caption = 'Bank Rec. Line No.';
-            TableRelation = "Bank Rec. Line"."Line No." WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                               "Statement No." = FIELD("Statement No."),
-                                                               "Record Type" = CONST(Deposit));
+            TableRelation = "Bank Rec. Line"."Line No." where("Bank Account No." = field("Bank Account No."),
+                                                               "Statement No." = field("Statement No."),
+                                                               "Record Type" = const(Deposit));
         }
         field(4; "Line No."; Integer)
         {
@@ -51,15 +48,15 @@ table 10126 "Bank Rec. Sub-line"
         field(9; "Account No."; Code[20])
         {
             Caption = 'Account No.';
-            TableRelation = IF ("Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Account Type" = CONST("Fixed Asset")) "Fixed Asset";
+            TableRelation = if ("Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Account Type" = const(Customer)) Customer
+            else
+            if ("Account Type" = const(Vendor)) Vendor
+            else
+            if ("Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Account Type" = const("Fixed Asset")) "Fixed Asset";
         }
         field(10; Description; Text[100])
         {

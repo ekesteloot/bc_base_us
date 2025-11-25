@@ -1,3 +1,5 @@
+namespace System.AI;
+
 table 2000 "Time Series Buffer"
 {
     Caption = 'Time Series Buffer';

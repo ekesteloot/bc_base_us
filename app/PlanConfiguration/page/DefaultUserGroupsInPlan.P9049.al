@@ -4,6 +4,10 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Azure.Identity;
+
+using System.Security.AccessControl;
+
 /// <summary>
 /// List page that hold the default user groups assigned to a plan.
 /// </summary>

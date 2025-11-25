@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+
 query 6502 "Items With Expiration Date"
 {
     Caption = 'Items With Expiration Date';

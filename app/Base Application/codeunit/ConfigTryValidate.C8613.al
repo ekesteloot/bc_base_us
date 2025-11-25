@@ -1,3 +1,5 @@
+namespace System.IO;
+
 codeunit 8613 "Config. Try Validate"
 {
 

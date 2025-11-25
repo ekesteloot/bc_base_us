@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 page 9198 "Profile Import Result List"
 {
     PageType = List;
@@ -17,13 +19,13 @@ page 9198 "Profile Import Result List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies an ID that is used to identify the profile (role). There can be more than one profile with the same ID if they come from different extensions.';
                 }
-                field(Severity; Severity)
+                field(Severity; Rec.Severity)
                 {
                     ApplicationArea = All;
                     width = 5;
                     ToolTip = 'Specifies the severity of this diagnostics message.';
                 }
-                field(Message; Message)
+                field(Message; Rec.Message)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the diagnostics message from the compiler.';
@@ -42,7 +44,7 @@ page 9198 "Profile Import Result List"
 
     trigger OnAfterGetRecord()
     begin
-        ApplicationName := ExtensionManagement.GetAppName("Profile App ID");
+        ApplicationName := ExtensionManagement.GetAppName(Rec."Profile App ID");
     end;
 
     var

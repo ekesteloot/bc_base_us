@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
 table 1312 "Trial Balance Setup"
 {
     Caption = 'Trial Balance Setup';

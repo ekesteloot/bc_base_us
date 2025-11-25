@@ -1,3 +1,38 @@
+﻿namespace Microsoft.WarehouseMgt.RoleCenters;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.History;
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Counting.History;
+using Microsoft.InventoryMgt.Counting.Recording;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reports;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Reports;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Worksheet;
+using System.Email;
+using System.Security.User;
+using System.Threading;
+
 page 9000 "Whse. WMS Role Center"
 {
     Caption = 'Shipping and Receiving - Warehouse Management System';
@@ -154,8 +189,8 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Released';
                 RunObject = Page "Warehouse Shipment List";
-                RunPageView = SORTING("No.")
-                              WHERE(Status = FILTER(Released));
+                RunPageView = sorting("No.")
+                              where(Status = filter(Released));
                 ToolTip = 'View the list of released source documents that are ready for warehouse activities.';
             }
             action(WhseShptPartPicked)
@@ -163,7 +198,7 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Partially Picked';
                 RunObject = Page "Warehouse Shipment List";
-                RunPageView = WHERE("Document Status" = FILTER("Partially Picked"));
+                RunPageView = where("Document Status" = filter("Partially Picked"));
                 ToolTip = 'View the list of ongoing warehouse picks that are partially completed.';
             }
             action(WhseShptComplPicked)
@@ -171,7 +206,7 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Completely Picked';
                 RunObject = Page "Warehouse Shipment List";
-                RunPageView = WHERE("Document Status" = FILTER("Completely Picked"));
+                RunPageView = where("Document Status" = filter("Completely Picked"));
                 ToolTip = 'View the list of completed warehouse picks.';
             }
             action(WhseShptPartShipped)
@@ -179,7 +214,7 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Partially Shipped';
                 RunObject = Page "Warehouse Shipment List";
-                RunPageView = WHERE("Document Status" = FILTER("Partially Shipped"));
+                RunPageView = where("Document Status" = filter("Partially Shipped"));
                 ToolTip = 'View the list of ongoing warehouse shipments that are partially completed.';
             }
             action(WhseRcpt)
@@ -194,7 +229,7 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Partially Received';
                 RunObject = Page "Warehouse Receipts";
-                RunPageView = WHERE("Document Status" = FILTER("Partially Received"));
+                RunPageView = where("Document Status" = filter("Partially Received"));
                 ToolTip = 'View the list of ongoing warehouse receipts that are partially completed.';
             }
             action(TransferOrders)
@@ -245,7 +280,7 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Unassigned';
                 RunObject = Page "Warehouse Picks";
-                RunPageView = WHERE("Assigned User ID" = FILTER(''));
+                RunPageView = where("Assigned User ID" = filter(''));
                 ToolTip = 'View all unassigned warehouse activities.';
             }
             action(Putaway)
@@ -260,7 +295,7 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Unassigned';
                 RunObject = Page "Warehouse Put-aways";
-                RunPageView = WHERE("Assigned User ID" = FILTER(''));
+                RunPageView = where("Assigned User ID" = filter(''));
                 ToolTip = 'View all unassigned warehouse activities.';
             }
             action(Movements)
@@ -275,7 +310,7 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Unassigned';
                 RunObject = Page "Warehouse Movements";
-                RunPageView = WHERE("Assigned User ID" = FILTER(''));
+                RunPageView = where("Assigned User ID" = filter(''));
                 ToolTip = 'View all unassigned warehouse activities.';
             }
             action(BinContents)
@@ -305,7 +340,7 @@ page 9000 "Whse. WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Released';
                     RunObject = Page "Sales Order List";
-                    RunPageView = WHERE(Status = FILTER(Released));
+                    RunPageView = where(Status = filter(Released));
                     ToolTip = 'View the list of released source documents that are ready for warehouse activities.';
                 }
                 action(SalesOrdersPartShipped)
@@ -313,8 +348,8 @@ page 9000 "Whse. WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Partially Shipped';
                     RunObject = Page "Sales Order List";
-                    RunPageView = WHERE(Status = FILTER(Released),
-                                        "Completely Shipped" = FILTER(false));
+                    RunPageView = where(Status = filter(Released),
+                                        "Completely Shipped" = filter(false));
                     ToolTip = 'View the list of ongoing warehouse shipments that are partially completed.';
                 }
                 action(SalesReturnOrders)
@@ -337,7 +372,7 @@ page 9000 "Whse. WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Released';
                     RunObject = Page "Purchase Order List";
-                    RunPageView = WHERE(Status = FILTER(Released));
+                    RunPageView = where(Status = filter(Released));
                     ToolTip = 'View the list of released source documents that are ready for warehouse activities.';
                 }
                 action(PurchaseOrdersPartReceived)
@@ -345,8 +380,8 @@ page 9000 "Whse. WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Partially Received';
                     RunObject = Page "Purchase Order List";
-                    RunPageView = WHERE(Status = FILTER(Released),
-                                        "Completely Received" = FILTER(false));
+                    RunPageView = where(Status = filter(Released),
+                                        "Completely Received" = filter(false));
                     ToolTip = 'View the list of ongoing warehouse receipts that are partially completed.';
                 }
                 action(PurchaseReturnOrders)
@@ -390,8 +425,6 @@ page 9000 "Whse. WMS Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Locations';
                     Image = Warehouse;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Location List";
                     ToolTip = 'View the list of warehouse locations.';
                 }
@@ -411,63 +444,51 @@ page 9000 "Whse. WMS Role Center"
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Warehouse Item Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Whse. Journal Batches List";
-                    RunPageView = WHERE("Template Type" = CONST(Item));
+                    RunPageView = where("Template Type" = const(Item));
                     ToolTip = 'Adjust the quantity of an item in a particular bin or bins. For instance, you might find some items in a bin that are not registered in the system, or you might not be able to pick the quantity needed because there are fewer items in a bin than was calculated by the program. The bin is then updated to correspond to the actual quantity in the bin. In addition, it creates a balancing quantity in the adjustment bin, for synchronization with item ledger entries, which you can then post with an item journal.';
                 }
                 action(WhseReclassJournals)
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Warehouse Reclassification Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Whse. Journal Batches List";
-                    RunPageView = WHERE("Template Type" = CONST(Reclassification));
+                    RunPageView = where("Template Type" = const(Reclassification));
                     ToolTip = 'Change information on warehouse entries, such as zone codes and bin codes.';
                 }
                 action(WhsePhysInvtJournals)
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Warehouse Physical Inventory Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Whse. Journal Batches List";
-                    RunPageView = WHERE("Template Type" = CONST("Physical Inventory"));
+                    RunPageView = where("Template Type" = const("Physical Inventory"));
                     ToolTip = 'Prepare to count inventories by preparing the documents that warehouse employees use when they perform a physical inventory of selected items or of all the inventory. When the physical count has been made, you enter the number of items that are in the bins in this window, and then you register the physical inventory.';
                 }
                 action(ItemJournals)
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Item Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Item),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Item),
+                                        Recurring = const(false));
                     ToolTip = 'Post item transactions directly to the item ledger to adjust inventory in connection with purchases, sales, and positive or negative adjustments without using documents. You can save sets of item journal lines as standard journals so that you can perform recurring postings quickly. A condensed version of the item journal function exists on item cards for quick adjustment of an items inventory quantity.';
                 }
                 action(ItemReclassJournals)
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Item Reclass. Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Transfer),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Transfer),
+                                        Recurring = const(false));
                     ToolTip = 'Change information recorded on item ledger entries. Typical inventory information to reclassify includes dimensions and sales campaign codes, but you can also perform basic inventory transfers by reclassifying location and bin codes. Serial or lot numbers and their expiration dates must be reclassified with the Item Tracking Reclassification journal.';
                 }
                 action(PhysInventoryJournals)
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Phys. Inventory Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const("Phys. Inventory"),
+                                        Recurring = const(false));
                     ToolTip = 'Prepare to count the actual items in inventory to check if the quantity registered in the system is the same as the physical quantity. If there are differences, post them to the item ledger with the physical inventory journal before you do the inventory valuation.';
                 }
             }
@@ -479,38 +500,30 @@ page 9000 "Whse. WMS Role Center"
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Put-away Worksheets';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Worksheet Names List";
-                    RunPageView = WHERE("Template Type" = CONST("Put-away"));
+                    RunPageView = where("Template Type" = const("Put-away"));
                     ToolTip = 'Plan and initialize item put-aways.';
                 }
                 action(PickWorksheets)
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Pick Worksheets';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Worksheet Names List";
-                    RunPageView = WHERE("Template Type" = CONST(Pick));
+                    RunPageView = where("Template Type" = const(Pick));
                     ToolTip = 'Plan and initialize picks of items. ';
                 }
                 action(MovementWorksheets)
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Movement Worksheets';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Worksheet Names List";
-                    RunPageView = WHERE("Template Type" = CONST(Movement));
+                    RunPageView = where("Template Type" = const(Movement));
                     ToolTip = 'Plan and initiate movements of items between bins according to an advanced warehouse configuration.';
                 }
                 action("Internal Put-aways")
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Internal Put-aways';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Whse. Internal Put-away List";
                     ToolTip = 'View the list of ongoing put-aways for internal activities, such as production.';
                 }
@@ -518,8 +531,6 @@ page 9000 "Whse. WMS Role Center"
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Internal Picks';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Whse. Internal Pick List";
                     ToolTip = 'View the list of ongoing picks for internal activities, such as production.';
                 }
@@ -653,9 +664,6 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Whse. &Shipment';
                 Image = Shipment;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Warehouse Shipment";
                 RunPageMode = Create;
                 ToolTip = 'Create a new warehouse shipment.';
@@ -665,9 +673,6 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'T&ransfer Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Transfer Order";
                 RunPageMode = Create;
                 ToolTip = 'Move items from one warehouse location to another.';
@@ -677,9 +682,6 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = '&Purchase Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
                 ToolTip = 'Purchase goods or services from a vendor.';
@@ -689,9 +691,6 @@ page 9000 "Whse. WMS Role Center"
                 ApplicationArea = Warehouse;
                 Caption = '&Whse. Receipt';
                 Image = Receipt;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Warehouse Receipt";
                 RunPageMode = Create;
                 ToolTip = 'Record the receipt of items according to an advanced warehouse configuration. ';

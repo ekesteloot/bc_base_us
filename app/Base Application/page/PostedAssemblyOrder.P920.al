@@ -1,3 +1,8 @@
+namespace Microsoft.AssemblyMgt.History;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.FinancialMgt.Dimension;
+
 page 920 "Posted Assembly Order"
 {
     Caption = 'Posted Assembly Order';
@@ -75,10 +80,10 @@ page 920 "Posted Assembly Order"
 
                     trigger OnDrillDown()
                     begin
-                        ShowAsmToOrder();
+                        Rec.ShowAsmToOrder();
                     end;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies if the posted assembly order has been undone.';
@@ -87,7 +92,7 @@ page 920 "Posted Assembly Order"
             part(Lines; "Posted Assembly Order Subform")
             {
                 ApplicationArea = Assembly;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group(Posting)
             {
@@ -152,7 +157,7 @@ page 920 "Posted Assembly Order"
 
                 trigger OnAction()
                 begin
-                    ShowStatistics();
+                    Rec.ShowStatistics();
                 end;
             }
             action(Dimensions)
@@ -166,7 +171,7 @@ page 920 "Posted Assembly Order"
 
                 trigger OnAction()
                 begin
-                    ShowDimensions();
+                    Rec.ShowDimensions();
                 end;
             }
             action("Item &Tracking Lines")
@@ -174,12 +179,12 @@ page 920 "Posted Assembly Order"
                 ApplicationArea = ItemTracking;
                 Caption = 'Item &Tracking Lines';
                 Image = ItemTrackingLines;
-                ShortCutKey = 'Ctrl+Alt+I'; 
+                ShortCutKey = 'Ctrl+Alt+I';
                 ToolTip = 'View or edit serial numbers and lot numbers that are assigned to the item on the document or journal line.';
 
                 trigger OnAction()
                 begin
-                    ShowItemTrackingLines();
+                    Rec.ShowItemTrackingLines();
                 end;
             }
             action(Comments)
@@ -188,9 +193,9 @@ page 920 "Posted Assembly Order"
                 Caption = 'Co&mments';
                 Image = ViewComments;
                 RunObject = Page "Assembly Comment Sheet";
-                RunPageLink = "Document Type" = CONST("Posted Assembly"),
-                              "Document No." = FIELD("No."),
-                              "Document Line No." = CONST(0);
+                RunPageLink = "Document Type" = const("Posted Assembly"),
+                              "Document No." = field("No."),
+                              "Document Line No." = const(0);
                 ToolTip = 'View or add comments for the record.';
             }
         }
@@ -221,7 +226,7 @@ page 920 "Posted Assembly Order"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action("Undo Post")
@@ -284,11 +289,10 @@ page 920 "Posted Assembly Order"
 
     trigger OnAfterGetRecord()
     begin
-        UndoPostEnabledExpr := not Reversed and not IsAsmToOrder();
+        UndoPostEnabledExpr := not Rec.Reversed and not Rec.IsAsmToOrder();
     end;
 
     var
-        [InDataSet]
         UndoPostEnabledExpr: Boolean;
 }
 

@@ -1,10 +1,12 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
 codeunit 245 "Item Reg.-Show Ledger"
 {
     TableNo = "Item Register";
 
     trigger OnRun()
     begin
-        ItemLedgEntry.SetRange("Entry No.", "From Entry No.", "To Entry No.");
+        ItemLedgEntry.SetRange("Entry No.", Rec."From Entry No.", Rec."To Entry No.");
         PAGE.Run(PAGE::"Item Ledger Entries", ItemLedgEntry);
     end;
 

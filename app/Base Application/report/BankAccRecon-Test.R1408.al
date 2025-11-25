@@ -1,7 +1,20 @@
+namespace Microsoft.BankMgt.Reports;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 1408 "Bank Acc. Recon. - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/BankAccReconTest.rdlc';
+    RDLCLayout = './BankMgt/Reports/BankAccReconTest.rdlc';
     Caption = 'Bank Acc. Recon. - Test';
     EnableHyperlinks = true;
 
@@ -9,7 +22,7 @@ report 1408 "Bank Acc. Recon. - Test"
     {
         dataitem("Bank Acc. Reconciliation"; "Bank Acc. Reconciliation")
         {
-            DataItemTableView = SORTING("Bank Account No.", "Statement No.");
+            DataItemTableView = sorting("Bank Account No.", "Statement No.");
             RequestFilterFields = "Bank Account No.", "Statement No.";
             column(Bank_Acc__Reconciliation_Bank_Account_No_; "Bank Account No.")
             {
@@ -19,7 +32,7 @@ report 1408 "Bank Acc. Recon. - Test"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
                 {
                 }
@@ -46,12 +59,6 @@ report 1408 "Bank Acc. Recon. - Test"
                 }
                 column(Bank_Acc__Reconciliation___TotalBalOnBankAccount; BankAcc."Balance at Date")
                 {
-                }
-                column(Bank_Acc__Reconciliation___TotalBalOnBankAccountLCY; BankAcc."Balance at Date (LCY)")
-                {
-                    ObsoleteReason = 'Replaced by column TotalBalOnGLAccountLCY';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '20.3';
                 }
                 column(Bank_Acc__Reconciliation___TotalBalOnGLAccount; TotalBalOnGLAccount)
                 {
@@ -157,7 +164,7 @@ report 1408 "Bank Acc. Recon. - Test"
                 }
                 dataitem(HeaderErrorCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -177,9 +184,9 @@ report 1408 "Bank Acc. Recon. - Test"
                 }
                 dataitem("Bank Acc. Reconciliation Line"; "Bank Acc. Reconciliation Line")
                 {
-                    DataItemLink = "Statement Type" = FIELD("Statement Type"), "Bank Account No." = FIELD("Bank Account No."), "Statement No." = FIELD("Statement No.");
+                    DataItemLink = "Statement Type" = field("Statement Type"), "Bank Account No." = field("Bank Account No."), "Statement No." = field("Statement No.");
                     DataItemLinkReference = "Bank Acc. Reconciliation";
-                    DataItemTableView = SORTING("Bank Account No.", "Statement No.", "Statement Line No.");
+                    DataItemTableView = sorting("Bank Account No.", "Statement No.", "Statement Line No.");
                     column(Bank_Acc__Reconciliation_Line__Transaction_Date_; Format("Transaction Date"))
                     {
                     }
@@ -251,7 +258,7 @@ report 1408 "Bank Acc. Recon. - Test"
                     }
                     dataitem(LineErrorCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number__Control97; ErrorText[Number])
                         {
                         }
@@ -366,7 +373,7 @@ report 1408 "Bank Acc. Recon. - Test"
                 }
                 dataitem(FooterErrorCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(FooterError1; FooterError1)
                     {
                     }
@@ -692,7 +699,7 @@ report 1408 "Bank Acc. Recon. - Test"
                       OutstandingPayment.GetAppliedAmount(BankAccountLedgerEntry."Entry No.");
                     if RemainingAmt <> 0 then
                         OutstandingPayment.CopyFromBankAccLedgerEntry(BankAccountLedgerEntry, OutstandingPayment.Type::"Check Ledger Entry",
-                          "Bank Acc. Reconciliation"."Statement Type", "Bank Acc. Reconciliation"."Statement No.", RemainingAmt, 0)
+                          "Bank Acc. Reconciliation"."Statement Type".AsInteger(), "Bank Acc. Reconciliation"."Statement No.", RemainingAmt, 0)
                 end else begin
                     LedgEntryRemainingAmount := OutstandingBankTransaction.GetRemainingAmount(BankAccountLedgerEntry."Entry No.");
                     if LedgEntryRemainingAmount = 0 then
@@ -704,7 +711,7 @@ report 1408 "Bank Acc. Recon. - Test"
                           OutstandingBankTransaction, TempOutstandingBankTransaction, BankAccountLedgerEntry);
                         OutstandingBankTransaction.CopyFromBankAccLedgerEntry(BankAccountLedgerEntry,
                           OutstandingBankTransaction.Type::"Bank Account Ledger Entry",
-                          "Bank Acc. Reconciliation"."Statement Type", "Bank Acc. Reconciliation"."Statement No.",
+                          "Bank Acc. Reconciliation"."Statement Type".AsInteger(), "Bank Acc. Reconciliation"."Statement No.",
                           RemainingAmt, OutstandingBankTransaction.Indentation);
                     end;
                 end;

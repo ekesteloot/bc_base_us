@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Employee;
+
 enum 5224 "Employee Gender"
 {
     Extensible = true;

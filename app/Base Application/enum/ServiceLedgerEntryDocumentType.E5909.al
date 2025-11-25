@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Ledger;
+
 enum 5909 "Service Ledger Entry Document Type"
 {
     Extensible = true;

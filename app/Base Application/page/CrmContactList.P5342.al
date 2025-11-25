@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Integration.Dataverse;
+
 page 5342 "CRM Contact List"
 {
     ApplicationArea = Suite;
@@ -6,7 +15,7 @@ page 5342 "CRM Contact List"
     Editable = false;
     PageType = List;
     SourceTable = "CRM Contact";
-    SourceTableView = SORTING(FullName);
+    SourceTableView = sorting(FullName);
     UsageCategory = Lists;
 
     layout
@@ -16,75 +25,75 @@ page 5342 "CRM Contact List"
             repeater(Control2)
             {
                 ShowCaption = false;
-                field(FullName; FullName)
+                field(FullName; Rec.FullName)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Name';
                     StyleExpr = FirstColumnStyle;
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_Line1; Address1_Line1)
+                field(Address1_Line1; Rec.Address1_Line1)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Street 1';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_Line2; Address1_Line2)
+                field(Address1_Line2; Rec.Address1_Line2)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Street 2';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_PostalCode; Address1_PostalCode)
+                field(Address1_PostalCode; Rec.Address1_PostalCode)
                 {
                     ApplicationArea = Suite;
                     Caption = 'ZIP/Postal Code';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_City; Address1_City)
+                field(Address1_City; Rec.Address1_City)
                 {
                     ApplicationArea = Suite;
                     Caption = 'City';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Address1_Country; Address1_Country)
+                field(Address1_Country; Rec.Address1_Country)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Country/Region';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(EMailAddress1; EMailAddress1)
+                field(EMailAddress1; Rec.EMailAddress1)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Email Address';
                     ExtendedDatatype = EMail;
                     ToolTip = 'Specifies the email address.';
                 }
-                field(Fax; Fax)
+                field(Fax; Rec.Fax)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Fax';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(WebSiteUrl; WebSiteUrl)
+                field(WebSiteUrl; Rec.WebSiteUrl)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Website URL';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(MobilePhone; MobilePhone)
+                field(MobilePhone; Rec.MobilePhone)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Mobile Phone';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Pager; Pager)
+                field(Pager; Rec.Pager)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Pager';
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(Telephone1; Telephone1)
+                field(Telephone1; Rec.Telephone1)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Telephone';
@@ -129,7 +138,7 @@ page 5342 "CRM Contact List"
 
                 trigger OnAction()
                 begin
-                    MarkedOnly(true);
+                    Rec.MarkedOnly(true);
                 end;
             }
             action(ShowAll)
@@ -141,7 +150,7 @@ page 5342 "CRM Contact List"
 
                 trigger OnAction()
                 begin
-                    MarkedOnly(false);
+                    Rec.MarkedOnly(false);
                 end;
             }
         }
@@ -169,20 +178,20 @@ page 5342 "CRM Contact List"
         CRMIntegrationRecord: Record "CRM Integration Record";
         RecordID: RecordID;
     begin
-        if CRMIntegrationRecord.FindRecordIDFromID(ContactId, DATABASE::Contact, RecordID) then
-            if CurrentlyCoupledCRMContact.ContactId = ContactId then begin
+        if CRMIntegrationRecord.FindRecordIDFromID(Rec.ContactId, DATABASE::Contact, RecordID) then
+            if CurrentlyCoupledCRMContact.ContactId = Rec.ContactId then begin
                 Coupled := 'Current';
                 FirstColumnStyle := 'Strong';
-                Mark(true);
+                Rec.Mark(true);
             end else begin
                 Coupled := 'Yes';
                 FirstColumnStyle := 'Subordinate';
-                Mark(false);
+                Rec.Mark(false);
             end
         else begin
             Coupled := 'No';
             FirstColumnStyle := 'None';
-            Mark(true);
+            Rec.Mark(true);
         end;
     end;
 
@@ -196,9 +205,9 @@ page 5342 "CRM Contact List"
     var
         LookupCRMTables: Codeunit "Lookup CRM Tables";
     begin
-        FilterGroup(4);
-        SetView(LookupCRMTables.GetIntegrationTableMappingView(DATABASE::"CRM Contact"));
-        FilterGroup(0);
+        Rec.FilterGroup(4);
+        Rec.SetView(LookupCRMTables.GetIntegrationTableMappingView(DATABASE::"CRM Contact"));
+        Rec.FilterGroup(0);
     end;
 
     var

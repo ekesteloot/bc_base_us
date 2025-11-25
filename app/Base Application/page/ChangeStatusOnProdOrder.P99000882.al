@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 page 99000882 "Change Status on Prod. Order"
 {
     Caption = 'Change Status on Prod. Order';
@@ -57,11 +59,8 @@ page 99000882 "Change Status on Prod. Order"
     var
         ProdOrderStatus: Record "Production Order";
         PostingDate: Date;
-        [InDataSet]
         FirmPlannedStatusEditable: Boolean;
-        [InDataSet]
         ReleasedStatusEditable: Boolean;
-        [InDataSet]
         FinishedStatusEditable: Boolean;
         Text666: Label '%1 is not a valid selection.';
 

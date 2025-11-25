@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Segment;
+
+using System.Reflection;
+
 table 5097 "Segment Criteria Line"
 {
     Caption = 'Segment Criteria Line';
@@ -66,8 +70,8 @@ table 5097 "Segment Criteria Line"
         }
         field(13; "Table Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table No.")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table No.")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;

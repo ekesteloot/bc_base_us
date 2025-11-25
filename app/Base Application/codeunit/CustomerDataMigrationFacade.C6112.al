@@ -1,3 +1,9 @@
+﻿namespace System.Integration;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Sales.Customer;
+
 codeunit 6112 "Customer Data Migration Facade"
 {
     TableNo = "Data Migration Parameters";
@@ -8,17 +14,17 @@ codeunit 6112 "Customer Data Migration Facade"
         ChartOfAccountsMigrated: Boolean;
     begin
         ChartOfAccountsMigrated := DataMigrationStatusFacade.HasMigratedChartOfAccounts(Rec);
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
-                OnMigrateCustomer("Staging Table RecId To Process");
-                OnMigrateCustomerDimensions("Staging Table RecId To Process");
+                OnMigrateCustomer(Rec."Staging Table RecId To Process");
+                OnMigrateCustomerDimensions(Rec."Staging Table RecId To Process");
 
                 // migrate transactions for this customer
-                OnMigrateCustomerPostingGroups("Staging Table RecId To Process", ChartOfAccountsMigrated);
-                OnMigrateCustomerTransactions("Staging Table RecId To Process", ChartOfAccountsMigrated);
+                OnMigrateCustomerPostingGroups(Rec."Staging Table RecId To Process", ChartOfAccountsMigrated);
+                OnMigrateCustomerTransactions(Rec."Staging Table RecId To Process", ChartOfAccountsMigrated);
                 GenJournalLineIsSet := false;
                 CustomerIsSet := false;
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     var

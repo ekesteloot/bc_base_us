@@ -12,7 +12,7 @@ page 747 "VAT Clauses"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code for a VAT clause, which is used to provide a VAT description associated with a sales line on a sales invoice, credit memo, or other sales document.';
@@ -51,7 +51,7 @@ page 747 "VAT Clauses"
                 Caption = '&Setup';
                 Image = Setup;
                 RunObject = Page "VAT Posting Setup";
-                RunPageLink = "VAT Clause Code" = FIELD(Code);
+                RunPageLink = "VAT Clause Code" = field(Code);
                 ToolTip = 'View or edit combinations of VAT business posting groups and VAT product posting groups.';
             }
             action("T&ranslation")
@@ -60,7 +60,7 @@ page 747 "VAT Clauses"
                 Caption = 'T&ranslation';
                 Image = Translation;
                 RunObject = Page "VAT Clause Translations";
-                RunPageLink = "VAT Clause Code" = FIELD(Code);
+                RunPageLink = "VAT Clause Code" = field(Code);
                 ToolTip = 'View or edit translations for each VAT clause description in different languages.';
             }
             action("DescriptionByDocumentType")
@@ -69,7 +69,7 @@ page 747 "VAT Clauses"
                 Caption = 'Description by document type';
                 Image = Invoice;
                 RunObject = Page "VAT Clauses by Doc. Type";
-                RunPageLink = "VAT Clause Code" = FIELD(Code);
+                RunPageLink = "VAT Clause Code" = field(Code);
                 ToolTip = 'View or edit VAT clause descriptions by document type.';
             }
             action("E&xtended Texts")
@@ -78,9 +78,9 @@ page 747 "VAT Clauses"
                 Caption = 'E&xtended Texts';
                 Image = Text;
                 RunObject = Page "Extended Text List";
-                RunPageLink = "Table Name" = CONST("VAT Clause"),
-                              "No." = FIELD(Code);
-                RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                RunPageLink = "Table Name" = const("VAT Clause"),
+                              "No." = field(Code);
+                RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                 ToolTip = 'View additional information that has been added to the description for the VAT clause.';
             }
         }

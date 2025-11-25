@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.History;
+
 codeunit 1323 "Cancel PstdSalesInv (Yes/No)"
 {
     Permissions = TableData "Sales Invoice Header" = rm,

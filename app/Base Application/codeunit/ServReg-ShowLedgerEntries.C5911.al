@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Ledger;
+
 codeunit 5911 "Serv Reg.-Show Ledger Entries"
 {
     TableNo = "Service Register";
@@ -5,7 +7,7 @@ codeunit 5911 "Serv Reg.-Show Ledger Entries"
     trigger OnRun()
     begin
         ServLedgEntry.Reset();
-        ServLedgEntry.SetRange("Entry No.", "From Entry No.", "To Entry No.");
+        ServLedgEntry.SetRange("Entry No.", Rec."From Entry No.", Rec."To Entry No.");
         PAGE.Run(PAGE::"Service Ledger Entries", ServLedgEntry);
     end;
 

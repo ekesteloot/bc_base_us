@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
 table 7390 "Create Pick Parameters"
 {
     Caption = 'Create Pick Parameters';

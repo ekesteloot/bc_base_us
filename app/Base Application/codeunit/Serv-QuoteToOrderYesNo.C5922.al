@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using System.Utilities;
+
 codeunit 5922 "Serv-Quote to Order (Yes/No)"
 {
     TableNo = "Service Header";

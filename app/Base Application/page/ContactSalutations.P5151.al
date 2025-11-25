@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Contact;
+
+using Microsoft.CRM.Setup;
+
 page 5151 "Contact Salutations"
 {
     Caption = 'Contact Salutations';
@@ -22,7 +26,7 @@ page 5151 "Contact Salutations"
                     ApplicationArea = All;
                     ToolTip = 'Specifies whether the salutation is formal or informal. Make your selection by clicking the field.';
                 }
-                field(GetContactSalutation; GetContactSalutation())
+                field(GetContactSalutation; Rec.GetContactSalutation())
                 {
                     ApplicationArea = All;
                     Caption = 'Salutation';

@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.HumanResources.Setup;
+
 table 5219 "HR Confidential Comment Line"
 {
     Caption = 'HR Confidential Comment Line';

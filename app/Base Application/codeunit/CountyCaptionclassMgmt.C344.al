@@ -1,3 +1,7 @@
+namespace Microsoft.Foundation.Address;
+
+using System.Text;
+
 codeunit 344 "County CaptionClass Mgmt"
 {
     SingleInstance = true;

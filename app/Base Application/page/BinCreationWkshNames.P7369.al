@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 7369 "Bin Creation Wksh. Names"
 {
     Caption = 'Bin Creation Wksh. Names';
@@ -13,12 +15,12 @@ page 7369 "Bin Creation Wksh. Names"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a name for the worksheet.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a description for the worksheet.';
@@ -54,9 +56,9 @@ page 7369 "Bin Creation Wksh. Names"
         BinCreateWkshTmpl: Record "Bin Creation Wksh. Template";
     begin
         if not CurrPage.LookupMode then
-            if GetFilter("Worksheet Template Name") <> '' then
-                if GetRangeMin("Worksheet Template Name") = GetRangeMax("Worksheet Template Name") then
-                    if BinCreateWkshTmpl.Get(GetRangeMin("Worksheet Template Name")) then
+            if Rec.GetFilter("Worksheet Template Name") <> '' then
+                if Rec.GetRangeMin("Worksheet Template Name") = Rec.GetRangeMax("Worksheet Template Name") then
+                    if BinCreateWkshTmpl.Get(Rec.GetRangeMin("Worksheet Template Name")) then
                         exit(BinCreateWkshTmpl.Name + ' ' + BinCreateWkshTmpl.Description);
     end;
 }

@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.InventoryMgt.BOM.Tree;
+
 table 5871 "Memoized Result"
 {
     Caption = 'Memoized Result';

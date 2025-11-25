@@ -1,3 +1,14 @@
+﻿namespace Microsoft.CRM.Contact;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Profiling;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 5199 "Update Contact Classification"
 {
     ApplicationArea = RelationshipMgmt;
@@ -9,12 +20,12 @@ report 5199 "Update Contact Classification"
     {
         dataitem("Profile Questionnaire Header"; "Profile Questionnaire Header")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code", Description, "Business Relation Code";
             dataitem("Profile Questionnaire Line"; "Profile Questionnaire Line")
             {
-                DataItemLink = "Profile Questionnaire Code" = FIELD(Code);
-                DataItemTableView = SORTING("Profile Questionnaire Code", "Line No.") WHERE(Type = CONST(Question), "Auto Contact Classification" = CONST(true), "Contact Class. Field" = FILTER(<> Rating));
+                DataItemLink = "Profile Questionnaire Code" = field(Code);
+                DataItemTableView = sorting("Profile Questionnaire Code", "Line No.") where(Type = const(Question), "Auto Contact Classification" = const(true), "Contact Class. Field" = filter(<> Rating));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -76,7 +87,7 @@ report 5199 "Update Contact Classification"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
 
             trigger OnAfterGetRecord()
             begin
@@ -195,7 +206,7 @@ report 5199 "Update Contact Classification"
         NoOfRecs := Cust.Count();
         if Cust.Find('-') then
             repeat
-                    OnFindCustomerValuesOnBeforeCustLoop(ProfileQuestionnaireLine, Cust);
+                OnFindCustomerValuesOnBeforeCustLoop(ProfileQuestionnaireLine, Cust);
                 RecCount := RecCount + 1;
                 Window.Update(5, Cust."No.");
                 Window.Update(6, Round(10000 * RecCount / NoOfRecs, 1));
@@ -280,21 +291,21 @@ report 5199 "Update Contact Classification"
                                 if NoOfInvoices <> 0 then begin
                                     DaysOverdue := 0;
                                     CustLedgEntry.Find('-');
-                                                              repeat
-                                                                  if CustLedgEntry."Closed at Date" > CustLedgEntry."Due Date" then
-                                                                      DaysOverdue := DaysOverdue + (CustLedgEntry."Closed at Date" - CustLedgEntry."Due Date")
-                                                                  else
-                                                                      if CustLedgEntry."Closed at Date" = 0D then begin
-                                                                          CustLedgEntry2.Reset();
-                                                                          CustLedgEntry2.SetCurrentKey("Closed by Entry No.");
-                                                                          CustLedgEntry2.SetRange("Document Type", CustLedgEntry2."Document Type"::Payment);
-                                                                          CustLedgEntry2.SetRange("Closed by Entry No.", CustLedgEntry."Entry No.");
-                                                                          if CustLedgEntry2.FindFirst() and
-                                                                             (CustLedgEntry2."Closed at Date" > CustLedgEntry."Due Date")
-                                                                          then
-                                                                              DaysOverdue := DaysOverdue + (CustLedgEntry2."Closed at Date" - CustLedgEntry."Due Date");
-                                                                      end;
-                                                              until CustLedgEntry.Next() = 0;
+                                    repeat
+                                        if CustLedgEntry."Closed at Date" > CustLedgEntry."Due Date" then
+                                            DaysOverdue := DaysOverdue + (CustLedgEntry."Closed at Date" - CustLedgEntry."Due Date")
+                                        else
+                                            if CustLedgEntry."Closed at Date" = 0D then begin
+                                                CustLedgEntry2.Reset();
+                                                CustLedgEntry2.SetCurrentKey("Closed by Entry No.");
+                                                CustLedgEntry2.SetRange("Document Type", CustLedgEntry2."Document Type"::Payment);
+                                                CustLedgEntry2.SetRange("Closed by Entry No.", CustLedgEntry."Entry No.");
+                                                if CustLedgEntry2.FindFirst() and
+                                                   (CustLedgEntry2."Closed at Date" > CustLedgEntry."Due Date")
+                                                then
+                                                    DaysOverdue := DaysOverdue + (CustLedgEntry2."Closed at Date" - CustLedgEntry."Due Date");
+                                            end;
+                                    until CustLedgEntry.Next() = 0;
                                     InsertContactValue(ProfileQuestionnaireLine, CustContactNo, DaysOverdue / NoOfInvoices, 0D, 0);
                                 end else begin
                                     IsHandled := false;
@@ -331,7 +342,7 @@ report 5199 "Update Contact Classification"
         NoOfRecs := Vend.Count();
         if Vend.Find('-') then
             repeat
-                    RecCount := RecCount + 1;
+                RecCount := RecCount + 1;
                 Window.Update(5, Vend."No.");
                 Window.Update(6, Round(10000 * RecCount / NoOfRecs, 1));
                 VendContactNo := GetContactNo(ProfileQuestionnaireLine, DATABASE::Vendor, Vend."No.");
@@ -411,21 +422,21 @@ report 5199 "Update Contact Classification"
                                 if NoOfInvoices <> 0 then begin
                                     DaysOverdue := 0;
                                     VendLedgEntry.Find('-');
-                                                              repeat
-                                                                  if VendLedgEntry."Closed at Date" > VendLedgEntry."Due Date" then
-                                                                      DaysOverdue := DaysOverdue + (VendLedgEntry."Closed at Date" - VendLedgEntry."Due Date")
-                                                                  else
-                                                                      if VendLedgEntry."Closed at Date" = 0D then begin
-                                                                          VendLedgEntry2.Reset();
-                                                                          VendLedgEntry2.SetCurrentKey("Closed by Entry No.");
-                                                                          VendLedgEntry2.SetRange("Document Type", VendLedgEntry2."Document Type"::Payment);
-                                                                          VendLedgEntry2.SetRange("Closed by Entry No.", VendLedgEntry."Entry No.");
-                                                                          if VendLedgEntry2.FindFirst() and
-                                                                             (VendLedgEntry2."Closed at Date" > VendLedgEntry."Due Date")
-                                                                          then
-                                                                              DaysOverdue := DaysOverdue + (VendLedgEntry2."Closed at Date" - VendLedgEntry."Due Date");
-                                                                      end;
-                                                              until VendLedgEntry.Next() = 0;
+                                    repeat
+                                        if VendLedgEntry."Closed at Date" > VendLedgEntry."Due Date" then
+                                            DaysOverdue := DaysOverdue + (VendLedgEntry."Closed at Date" - VendLedgEntry."Due Date")
+                                        else
+                                            if VendLedgEntry."Closed at Date" = 0D then begin
+                                                VendLedgEntry2.Reset();
+                                                VendLedgEntry2.SetCurrentKey("Closed by Entry No.");
+                                                VendLedgEntry2.SetRange("Document Type", VendLedgEntry2."Document Type"::Payment);
+                                                VendLedgEntry2.SetRange("Closed by Entry No.", VendLedgEntry."Entry No.");
+                                                if VendLedgEntry2.FindFirst() and
+                                                   (VendLedgEntry2."Closed at Date" > VendLedgEntry."Due Date")
+                                                then
+                                                    DaysOverdue := DaysOverdue + (VendLedgEntry2."Closed at Date" - VendLedgEntry."Due Date");
+                                            end;
+                                    until VendLedgEntry.Next() = 0;
                                     InsertContactValue(ProfileQuestionnaireLine, VendContactNo, DaysOverdue / NoOfInvoices, 0D, 0);
                                 end else
                                     InsertContactValue(ProfileQuestionnaireLine, VendContactNo, 0, 0D, 0);
@@ -449,7 +460,7 @@ report 5199 "Update Contact Classification"
         NoOfRecs := Cont.Count();
         if Cont.Find('-') then
             repeat
-                    OnFindContactValuesOnBeforeContLoop(ProfileQuestionnaireLine, Cont);
+                OnFindContactValuesOnBeforeContLoop(ProfileQuestionnaireLine, Cont);
                 RecCount := RecCount + 1;
                 Window.Update(5, Cont."No.");
                 Window.Update(6, Round(10000 * RecCount / NoOfRecs, 1));
@@ -583,10 +594,10 @@ report 5199 "Update Contact Classification"
         TempContactValue.Reset();
         if TempContactValue.Find('-') then
             repeat
-                    if InRange(TempContactValue.Value, ProfileQuestnLineAnswer."From Value", ProfileQuestnLineAnswer."To Value") then
-                        MarkContact(
-                          ProfileQuestnLineQuestion, ProfileQuestnLineAnswer, TempContactValue."Contact No.",
-                          TempContactValue."Last Date Updated", TempContactValue."Questions Answered (%)")
+                if InRange(TempContactValue.Value, ProfileQuestnLineAnswer."From Value", ProfileQuestnLineAnswer."To Value") then
+                    MarkContact(
+                      ProfileQuestnLineQuestion, ProfileQuestnLineAnswer, TempContactValue."Contact No.",
+                      TempContactValue."Last Date Updated", TempContactValue."Questions Answered (%)")
             until TempContactValue.Next() = 0;
     end;
 
@@ -612,16 +623,16 @@ report 5199 "Update Contact Classification"
         end;
 
         if TempContactValue.FindSet() then
-                repeat
-                    if TotalValue <> 0 then
-                        Prc := Round(100 * TempContactValue.Value / TotalValue, 1 / Power(10, ProfileQuestnLineQuestion."No. of Decimals"))
-                    else
-                        Prc := 0;
-                    if InRange(Prc, ProfileQuestnLineAnswer."From Value", ProfileQuestnLineAnswer."To Value") then
-                        MarkContact(
-                          ProfileQuestnLineQuestion, ProfileQuestnLineAnswer, TempContactValue."Contact No.",
-                          TempContactValue."Last Date Updated", TempContactValue."Questions Answered (%)");
-                until TempContactValue.Next() = 0
+            repeat
+                if TotalValue <> 0 then
+                    Prc := Round(100 * TempContactValue.Value / TotalValue, 1 / Power(10, ProfileQuestnLineQuestion."No. of Decimals"))
+                else
+                    Prc := 0;
+                if InRange(Prc, ProfileQuestnLineAnswer."From Value", ProfileQuestnLineAnswer."To Value") then
+                    MarkContact(
+                      ProfileQuestnLineQuestion, ProfileQuestnLineAnswer, TempContactValue."Contact No.",
+                      TempContactValue."Last Date Updated", TempContactValue."Questions Answered (%)");
+            until TempContactValue.Next() = 0
     end;
 
     local procedure MarkByPercentageOfContacts(ProfileQuestnLineQuestion: Record "Profile Questionnaire Line"; ProfileQuestnLineAnswer: Record "Profile Questionnaire Line")
@@ -650,14 +661,14 @@ report 5199 "Update Contact Classification"
         if TempContactValue.Find('-') then begin
             ContactValueCount := TempContactValue.Count();
             RecNo := 0;
-                                               repeat
-                                                   RecNo := RecNo + 1;
-                                                   Prc := Round(100 * RecNo / ContactValueCount, 1 / Power(10, ProfileQuestnLineQuestion."No. of Decimals"));
-                                                   if InRange(Prc, ProfileQuestnLineAnswer."From Value", ProfileQuestnLineAnswer."To Value") then
-                                                       MarkContact(
-                                                         ProfileQuestnLineQuestion, ProfileQuestnLineAnswer, TempContactValue."Contact No.",
-                                                         TempContactValue."Last Date Updated", TempContactValue."Questions Answered (%)")
-                                               until TempContactValue.Next() = 0
+            repeat
+                RecNo := RecNo + 1;
+                Prc := Round(100 * RecNo / ContactValueCount, 1 / Power(10, ProfileQuestnLineQuestion."No. of Decimals"));
+                if InRange(Prc, ProfileQuestnLineAnswer."From Value", ProfileQuestnLineAnswer."To Value") then
+                    MarkContact(
+                      ProfileQuestnLineQuestion, ProfileQuestnLineAnswer, TempContactValue."Contact No.",
+                      TempContactValue."Last Date Updated", TempContactValue."Questions Answered (%)")
+            until TempContactValue.Next() = 0
         end;
     end;
 
@@ -695,9 +706,9 @@ report 5199 "Update Contact Classification"
             ContPers.SetRange("Company No.", Cont."No.");
             ContPers.SetRange(Type, Cont.Type::Person);
             if ContPers.Find('-') then
-                    repeat
-                        MarkContact(ProfileQuestnLineQuestion, ProfileQuestnLineAnswer, ContPers."No.", UpdateDate, QuestionsAnsweredPrc);
-                    until ContPers.Next() = 0
+                repeat
+                    MarkContact(ProfileQuestnLineQuestion, ProfileQuestnLineAnswer, ContPers."No.", UpdateDate, QuestionsAnsweredPrc);
+                until ContPers.Next() = 0
         end;
 
         IsHandled := false;
@@ -762,59 +773,59 @@ report 5199 "Update Contact Classification"
         repeat
             Changed := false;
             if ProfileQuestnLine.Find('-') then
-                    repeat
-                        Leaf := true;
-                        Rating.SetRange("Profile Questionnaire Code", ProfileQuestnLine."Profile Questionnaire Code");
-                        Rating.SetRange("Profile Questionnaire Line No.", ProfileQuestnLine."Line No.");
-                        if Rating.Find('-') then
-                                repeat
-                                    ProfileQuestnLine2.Get(Rating."Rating Profile Quest. Code", Rating."Rating Profile Quest. Line No.");
-                                    RatingQuestion.SetRange("Profile Questionnaire Code", Rating."Rating Profile Quest. Code");
-                                    RatingQuestion.SetRange("Profile Questionnaire Line No.", ProfileQuestnLine2.FindQuestionLine());
-                                    if RatingQuestion.FindFirst() then begin
-                                        ProfileQuestnLine2 := ProfileQuestnLine;
-                                        ProfileQuestnLine.Get(
-                                          RatingQuestion."Profile Questionnaire Code", RatingQuestion."Profile Questionnaire Line No.");
-                                        if ProfileQuestnLine.Mark() then
-                                            Leaf := false;
-                                        ProfileQuestnLine := ProfileQuestnLine2;
-                                    end;
-                                until (Rating.Next() = 0) or (not Leaf);
-
-                        // Calculate Rating
-                        if Leaf then begin
-                            if UpdateContNo = '' then begin
-                                RatingLineNo := RatingLineNo + 1;
-                                Window.Update(1, ProfileQuestnLine."Profile Questionnaire Code");
-                                Window.Update(3, ProfileQuestnLine."Line No.");
-                                Window.Update(4, Round(10000 * RatingLineNo / NoOfRatingLines, 1));
-                                NoOfRecs := Cont.Count();
-                                RecCount := 0;
-                                TotalValue := 0;
+                repeat
+                    Leaf := true;
+                    Rating.SetRange("Profile Questionnaire Code", ProfileQuestnLine."Profile Questionnaire Code");
+                    Rating.SetRange("Profile Questionnaire Line No.", ProfileQuestnLine."Line No.");
+                    if Rating.Find('-') then
+                        repeat
+                            ProfileQuestnLine2.Get(Rating."Rating Profile Quest. Code", Rating."Rating Profile Quest. Line No.");
+                            RatingQuestion.SetRange("Profile Questionnaire Code", Rating."Rating Profile Quest. Code");
+                            RatingQuestion.SetRange("Profile Questionnaire Line No.", ProfileQuestnLine2.FindQuestionLine());
+                            if RatingQuestion.FindFirst() then begin
+                                ProfileQuestnLine2 := ProfileQuestnLine;
+                                ProfileQuestnLine.Get(
+                                  RatingQuestion."Profile Questionnaire Code", RatingQuestion."Profile Questionnaire Line No.");
+                                if ProfileQuestnLine.Mark() then
+                                    Leaf := false;
+                                ProfileQuestnLine := ProfileQuestnLine2;
                             end;
-                            TempContactValue.DeleteAll();
-                            AnswersExists(ProfileQuestnLine, UpdateContNo, true);
-                            if UpdateContNo <> '' then
-                                Cont.SetRange("No.", UpdateContNo);
-                            if Cont.Find('-') then
-                                    repeat
-                                        if UpdateContNo = '' then begin
-                                            RecCount := RecCount + 1;
-                                            Window.Update(5, Cont."No.");
-                                            Window.Update(6, Round(10000 * RecCount / NoOfRecs, 1));
-                                        end;
-                                        ContNo := GetContactNo(ProfileQuestnLine, DATABASE::Contact, Cont."No.");
-                                        if ContNo <> '' then begin
-                                            Points := FindContactRatingValue(ProfileQuestnLine, Cont, UpdateDate, QuestionsAnsweredPrc);
-                                            if QuestionsAnsweredPrc >= ProfileQuestnLine."Min. % Questions Answered" then
-                                                InsertContactValue(ProfileQuestnLine, Cont."No.", Points, UpdateDate, QuestionsAnsweredPrc);
-                                        end;
-                                    until Cont.Next() = 0;
-                            MarkContactByMethod(ProfileQuestnLine, UpdateContNo);
-                            ProfileQuestnLine.Mark(false);
-                            Changed := true;
+                        until (Rating.Next() = 0) or (not Leaf);
+
+                    // Calculate Rating
+                    if Leaf then begin
+                        if UpdateContNo = '' then begin
+                            RatingLineNo := RatingLineNo + 1;
+                            Window.Update(1, ProfileQuestnLine."Profile Questionnaire Code");
+                            Window.Update(3, ProfileQuestnLine."Line No.");
+                            Window.Update(4, Round(10000 * RatingLineNo / NoOfRatingLines, 1));
+                            NoOfRecs := Cont.Count();
+                            RecCount := 0;
+                            TotalValue := 0;
                         end;
-                    until ProfileQuestnLine.Next() = 0;
+                        TempContactValue.DeleteAll();
+                        AnswersExists(ProfileQuestnLine, UpdateContNo, true);
+                        if UpdateContNo <> '' then
+                            Cont.SetRange("No.", UpdateContNo);
+                        if Cont.Find('-') then
+                            repeat
+                                if UpdateContNo = '' then begin
+                                    RecCount := RecCount + 1;
+                                    Window.Update(5, Cont."No.");
+                                    Window.Update(6, Round(10000 * RecCount / NoOfRecs, 1));
+                                end;
+                                ContNo := GetContactNo(ProfileQuestnLine, DATABASE::Contact, Cont."No.");
+                                if ContNo <> '' then begin
+                                    Points := FindContactRatingValue(ProfileQuestnLine, Cont, UpdateDate, QuestionsAnsweredPrc);
+                                    if QuestionsAnsweredPrc >= ProfileQuestnLine."Min. % Questions Answered" then
+                                        InsertContactValue(ProfileQuestnLine, Cont."No.", Points, UpdateDate, QuestionsAnsweredPrc);
+                                end;
+                            until Cont.Next() = 0;
+                        MarkContactByMethod(ProfileQuestnLine, UpdateContNo);
+                        ProfileQuestnLine.Mark(false);
+                        Changed := true;
+                    end;
+                until ProfileQuestnLine.Next() = 0;
         until Changed = false;
 
         if ProfileQuestnLine.Find('-') then
@@ -834,7 +845,7 @@ report 5199 "Update Contact Classification"
         Rating.SetRange("Profile Questionnaire Line No.", ProfileQuestnLine."Line No.");
         if Rating.Find('-') then
             repeat
-                    ProfileQuestionnaireLine.Get(Rating."Rating Profile Quest. Code", Rating."Rating Profile Quest. Line No.");
+                ProfileQuestionnaireLine.Get(Rating."Rating Profile Quest. Code", Rating."Rating Profile Quest. Line No.");
                 ProfileQuestionnaireLine.Get(
                   ProfileQuestionnaireLine."Profile Questionnaire Code", ProfileQuestionnaireLine.FindQuestionLine());
                 if not TempProfileQuestnLine.Get(
@@ -874,8 +885,8 @@ report 5199 "Update Contact Classification"
            (ProfileQuestnLine2.Type = ProfileQuestnLine2.Type::Answer)
         then
             repeat
-                    if UpdateContNo = '' then
-                        Window.Update(3, ProfileQuestnLine2."Line No.");
+                if UpdateContNo = '' then
+                    Window.Update(3, ProfileQuestnLine2."Line No.");
                 case ProfileQuestnLine."Classification Method" of
                     ProfileQuestnLine."Classification Method"::"Defined Value":
                         MarkByDefinedValue(ProfileQuestnLine, ProfileQuestnLine2);

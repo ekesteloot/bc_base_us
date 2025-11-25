@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.Manufacturing.StandardCost;
+
 page 916 "Assembly Order Statistics"
 {
     Caption = 'Assembly Order Statistics';
@@ -14,7 +18,8 @@ page 916 "Assembly Order Statistics"
         {
             group(Control1)
             {
-                ShowCaption = false;
+                Caption = 'General';
+
                 fixed(Control1903895301)
                 {
                     ShowCaption = false;
@@ -217,6 +222,18 @@ page 916 "Assembly Order Statistics"
                             ShowCaption = false;
                         }
                     }
+                }
+            }
+            group(Components)
+            {
+                Caption = 'Components';
+
+                field("Reserved From Stock"; Rec.GetQtyReservedFromStockState())
+                {
+                    ApplicationArea = Reservation;
+                    Editable = false;
+                    Caption = 'Reserved from stock';
+                    ToolTip = 'Specifies what part of the component items is reserved from inventory.';
                 }
             }
         }

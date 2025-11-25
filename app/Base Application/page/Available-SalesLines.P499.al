@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using System.Utilities;
+
 page 499 "Available - Sales Lines"
 {
     Caption = 'Available - Sales Lines';
@@ -10,7 +17,7 @@ page 499 "Available - Sales Lines"
     PageType = List;
     Permissions = TableData "Sales Line" = rm;
     SourceTable = "Sales Line";
-    SourceTableView = SORTING("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date");
+    SourceTableView = sorting("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date");
 
     layout
     {
@@ -136,7 +143,7 @@ page 499 "Available - Sales Lines"
                             exit;
 
                         ReservEntry2.Copy(ReservEntry);
-                        SetReservationFilters(ReservEntry2);
+                        Rec.SetReservationFilters(ReservEntry2);
                         if ReservEntry2.Find('-') then begin
                             UpdateReservMgt();
                             repeat
@@ -247,7 +254,7 @@ page 499 "Available - Sales Lines"
         CheckSalesLine();
 
         TrackingSpecification.InitTrackingSpecification(
-            DATABASE::"Sales Line", Rec."Document Type".AsInteger(), Rec."Document No.", '', 0, Rec."Line No.",
+            Enum::TableID::"Sales Line".AsInteger(), Rec."Document Type".AsInteger(), Rec."Document No.", '', 0, Rec."Line No.",
             Rec."Variant Code", Rec."Location Code", Rec."Qty. per Unit of Measure");
         ReservMgt.CreateReservation(
           ReservEntry.Description, Rec."Shipment Date", ReserveQuantity, ReserveQuantityBase, TrackingSpecification);

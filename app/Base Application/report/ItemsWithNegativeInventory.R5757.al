@@ -1,7 +1,17 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Worksheet;
+using System.Utilities;
+
 report 5757 "Items with Negative Inventory"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemswithNegativeInventory.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemswithNegativeInventory.rdlc';
     Caption = 'Items with Negative Inventory';
     DataAccessIntent = ReadOnly;
 
@@ -9,7 +19,7 @@ report 5757 "Items with Negative Inventory"
     {
         dataitem(Output; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             column(TodayFormatted; Format(Today, 0, 4))
             {
             }
@@ -119,7 +129,7 @@ report 5757 "Items with Negative Inventory"
         }
         dataitem(ErrorLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             column(ErrorTextNumber; ErrorText[Number])
             {
             }

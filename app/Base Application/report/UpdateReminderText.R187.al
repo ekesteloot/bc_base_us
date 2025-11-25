@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 report 187 "Update Reminder Text"
 {
     Caption = 'Update Reminder Text';

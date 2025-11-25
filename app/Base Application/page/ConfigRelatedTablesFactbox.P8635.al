@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8635 "Config. Related Tables FactBox"
 {
     Caption = 'Related Tables';

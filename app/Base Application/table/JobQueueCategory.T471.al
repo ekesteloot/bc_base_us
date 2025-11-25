@@ -1,3 +1,5 @@
+namespace System.Threading;
+
 table 471 "Job Queue Category"
 {
     Caption = 'Job Queue Category';

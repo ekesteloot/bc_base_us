@@ -1,3 +1,23 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item.Attribute;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Pricing.PriceList;
+#if not CLEAN21
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+#endif
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Resources;
+using System.Environment.Configuration;
+
 codeunit 730 "Copy Item"
 {
     TableNo = Item;
@@ -234,7 +254,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."Item Variants" then
             exit;
 
-        CopyItemRelatedTable(DATABASE::"Item Variant", ItemVariant.FieldNo("Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Enum::TableID::"Item Variant".AsInteger(), ItemVariant.FieldNo("Item No."), FromItemNo, ToItemNo);
         ItemVariant.SetRange("Item No.", ToItemNo);
         if not ItemVariant.IsEmpty() then
             ItemVariant.ModifyAll("Item Id", ToItemId);
@@ -296,7 +316,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."BOM Components" then
             exit;
 
-        CopyItemRelatedTable(DATABASE::"BOM Component", BOMComponent.FieldNo("Parent Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Enum::TableID::"BOM Component".AsInteger(), BOMComponent.FieldNo("Parent Item No."), FromItemNo, ToItemNo);
     end;
 
     local procedure CopyItemVendors(FromItemNo: Code[20]; ToItemNo: Code[20])
@@ -306,7 +326,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."Item Vendors" then
             exit;
 
-        CopyItemRelatedTable(DATABASE::"Item Vendor", ItemVendor.FieldNo("Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Enum::TableID::"Item Vendor".AsInteger(), ItemVendor.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
 
     local procedure CopyItemDimensions(FromItem: Record Item; ToItemNo: Code[20])
@@ -315,7 +335,7 @@ codeunit 730 "Copy Item"
         NewDefaultDim: Record "Default Dimension";
     begin
         if TempCopyItemBuffer.Dimensions then begin
-            DefaultDim.SetRange("Table ID", DATABASE::Item);
+            DefaultDim.SetRange("Table ID", Enum::TableID::Item);
             DefaultDim.SetRange("No.", FromItem."No.");
             if DefaultDim.FindSet() then
                 repeat
@@ -375,18 +395,18 @@ codeunit 730 "Copy Item"
             exit;
 
         if TempCopyItemBuffer."Sales Prices" then
-            CopyItemPriceListLines(FromItemNo, ToItemNo, "Price Type"::Sale, "Price Amount Type"::Price);
+            CopyItemPriceListLines(FromItemNo, ToItemNo, Enum::"Price Type"::Sale, Enum::"Price Amount Type"::Price);
         if TempCopyItemBuffer."Sales Line Discounts" then
-            CopyItemPriceListLines(FromItemNo, ToItemNo, "Price Type"::Sale, "Price Amount Type"::Discount);
+            CopyItemPriceListLines(FromItemNo, ToItemNo, Enum::"Price Type"::Sale, Enum::"Price Amount Type"::Discount);
         if TempCopyItemBuffer."Sales Prices" or TempCopyItemBuffer."Sales Line Discounts" then
-            CopyItemPriceListLines(FromItemNo, ToItemNo, "Price Type"::Sale, "Price Amount Type"::Any);
+            CopyItemPriceListLines(FromItemNo, ToItemNo, Enum::"Price Type"::Sale, Enum::"Price Amount Type"::Any);
 
         if TempCopyItemBuffer."Purchase Prices" then
-            CopyItemPriceListLines(FromItemNo, ToItemNo, "Price Type"::Purchase, "Price Amount Type"::Price);
+            CopyItemPriceListLines(FromItemNo, ToItemNo, Enum::"Price Type"::Purchase, Enum::"Price Amount Type"::Price);
         if TempCopyItemBuffer."Purchase Line Discounts" then
-            CopyItemPriceListLines(FromItemNo, ToItemNo, "Price Type"::Purchase, "Price Amount Type"::Discount);
+            CopyItemPriceListLines(FromItemNo, ToItemNo, Enum::"Price Type"::Purchase, Enum::"Price Amount Type"::Discount);
         if TempCopyItemBuffer."Purchase Prices" or TempCopyItemBuffer."Purchase Line Discounts" then
-            CopyItemPriceListLines(FromItemNo, ToItemNo, "Price Type"::Purchase, "Price Amount Type"::Any);
+            CopyItemPriceListLines(FromItemNo, ToItemNo, Enum::"Price Type"::Purchase, Enum::"Price Amount Type"::Any);
     end;
 
     local procedure CopyItemPriceListLines(FromItemNo: Code[20]; ToItemNo: Code[20]; PriceType: Enum "Price Type"; AmountType: Enum "Price Amount Type")
@@ -396,7 +416,7 @@ codeunit 730 "Copy Item"
     begin
         PriceListLine.SetRange("Price Type", PriceType);
         PriceListLine.SetRange("Amount Type", AmountType);
-        PriceListLine.SetRange("Asset Type", "Price Asset Type"::Item);
+        PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
         PriceListLine.SetRange("Asset No.", FromItemNo);
         OnCopyItemPriceListLinesOnAfterPriceListLineSetFilters(PriceListLine);
         if PriceListLine.FindSet() then
@@ -417,7 +437,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."Sales Prices" then
             exit;
 
-        CopyItemRelatedTable(DATABASE::"Sales Price", SalesPrice.FieldNo("Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Database::"Sales Price", SalesPrice.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
 
     [Obsolete('Replaced by the method CopyItemPriceListLines()', '17.0')]
@@ -443,7 +463,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."Purchase Prices" then
             exit;
 
-        CopyItemRelatedTable(DATABASE::"Purchase Price", PurchasePrice.FieldNo("Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Database::"Purchase Price", PurchasePrice.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
 
     [Obsolete('Replaced by the method CopyItemPriceListLines()', '17.0')]
@@ -454,7 +474,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."Purchase Line Discounts" then
             exit;
 
-        CopyItemRelatedTable(DATABASE::"Purchase Line Discount", PurchLineDiscount.FieldNo("Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Enum::TableID::"Purchase Line Discount".AsInteger(), PurchLineDiscount.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
 #endif
 
@@ -466,7 +486,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer.Attributes then
             exit;
 
-        ItemAttributeValueMapping.SetRange("Table ID", DATABASE::Item);
+        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::Item);
 
         RecRef.GetTable(ItemAttributeValueMapping);
         CopyItemRelatedTableFromRecRef(RecRef, ItemAttributeValueMapping.FieldNo("No."), FromItemNo, ToItemNo);
@@ -479,7 +499,7 @@ codeunit 730 "Copy Item"
         if not TempCopyItemBuffer."Item References" then
             exit;
 
-        CopyItemRelatedTable(DATABASE::"Item Reference", ItemReference.FieldNo("Item No."), FromItemNo, ToItemNo);
+        CopyItemRelatedTable(Enum::TableID::"Item Reference".AsInteger(), ItemReference.FieldNo("Item No."), FromItemNo, ToItemNo);
     end;
 
     local procedure ShowNotification(Item: Record Item)

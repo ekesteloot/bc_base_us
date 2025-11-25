@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Task;
+
 enum 5081 "Task Status"
 {
     Extensible = true;

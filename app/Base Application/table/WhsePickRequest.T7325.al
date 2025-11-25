@@ -1,3 +1,14 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Structure;
+
 table 7325 "Whse. Pick Request"
 {
     Caption = 'Whse. Pick Request';
@@ -18,17 +29,17 @@ table 7325 "Whse. Pick Request"
         {
             Caption = 'Document No.';
             NotBlank = true;
-            TableRelation = IF ("Document Type" = CONST(Shipment)) "Warehouse Shipment Header"."No."
-            ELSE
-            IF ("Document Type" = CONST("Internal Pick")) "Whse. Internal Pick Header"."No."
-            ELSE
+            TableRelation = if ("Document Type" = const(Shipment)) "Warehouse Shipment Header"."No."
+            else
+            if ("Document Type" = const("Internal Pick")) "Whse. Internal Pick Header"."No."
+            else
 #pragma warning disable AL0603
-            IF ("Document Type" = CONST(Production)) "Production Order"."No." WHERE(Status = FIELD("Document Subtype"))
-            ELSE
-            IF ("Document Type" = CONST(Assembly)) "Assembly Header"."No." WHERE("Document Type" = FIELD("Document Subtype"))
+            if ("Document Type" = const(Production)) "Production Order"."No." where(Status = field("Document Subtype"))
+            else
+            if ("Document Type" = const(Assembly)) "Assembly Header"."No." where("Document Type" = field("Document Subtype"))
 #pragma warning restore AL0603
-            ELSE
-            IF ("Document Type" = const(Job)) Job."No." where(Status = const(Open));
+            else
+            if ("Document Type" = const(Job)) Job."No." where(Status = const(Open));
 
             trigger OnLookup()
             begin
@@ -43,15 +54,15 @@ table 7325 "Whse. Pick Request"
         field(5; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
         }
         field(6; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                               "Zone Code" = FIELD("Zone Code"));
+            TableRelation = if ("Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                               "Zone Code" = field("Zone Code"));
         }
         field(7; Status; Option)
         {
@@ -66,7 +77,7 @@ table 7325 "Whse. Pick Request"
         }
         field(9; "Shipment Method Code"; Code[10])
         {
-            CalcFormula = Lookup("Warehouse Shipment Header"."Shipment Method Code" WHERE("No." = FIELD("Document No.")));
+            CalcFormula = Lookup("Warehouse Shipment Header"."Shipment Method Code" where("No." = field("Document No.")));
             Caption = 'Shipment Method Code';
             Editable = false;
             FieldClass = FlowField;
@@ -75,7 +86,7 @@ table 7325 "Whse. Pick Request"
         field(10; "Shipping Agent Code"; Code[10])
         {
             AccessByPermission = TableData "Shipping Agent Services" = R;
-            CalcFormula = Lookup("Warehouse Shipment Header"."Shipping Agent Code" WHERE("No." = FIELD("Document No.")));
+            CalcFormula = Lookup("Warehouse Shipment Header"."Shipping Agent Code" where("No." = field("Document No.")));
             Caption = 'Shipping Agent Code';
             Editable = false;
             FieldClass = FlowField;
@@ -83,11 +94,11 @@ table 7325 "Whse. Pick Request"
         }
         field(11; "Shipping Agent Service Code"; Code[10])
         {
-            CalcFormula = Lookup("Warehouse Shipment Header"."Shipping Agent Service Code" WHERE("No." = FIELD("Document No.")));
+            CalcFormula = Lookup("Warehouse Shipment Header"."Shipping Agent Service Code" where("No." = field("Document No.")));
             Caption = 'Shipping Agent Service Code';
             Editable = false;
             FieldClass = FlowField;
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
     }
 

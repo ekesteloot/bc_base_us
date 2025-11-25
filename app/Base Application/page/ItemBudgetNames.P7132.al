@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 7132 "Item Budget Names"
 {
     Caption = 'Item Budget Names';
@@ -21,7 +23,7 @@ page 7132 "Item Budget Names"
                     ApplicationArea = ItemBudget;
                     ToolTip = 'Specifies a description of the item budget.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = ItemBudget;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example an item that is placed in quarantine.';

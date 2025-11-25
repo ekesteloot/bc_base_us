@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+
 page 417 "Post Pmts and Rec. Bank Acc."
 {
     PageType = StandardDialog;
@@ -46,7 +50,7 @@ page 417 "Post Pmts and Rec. Bank Acc."
                 Caption = 'Total Balance';
                 ToolTip = 'Specifies the accumulated balance of the bank reconciliation, which consists of the Balance Last Statement field, plus the balance in the Statement Amount field.';
             }
-            field(StatementDate; "Statement Date")
+            field(StatementDate; Rec."Statement Date")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Statement Date';

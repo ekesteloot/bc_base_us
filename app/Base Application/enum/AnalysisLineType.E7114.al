@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 7114 "Analysis Line Type"
 {
     Extensible = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.StandardCost;
+
 table 5840 "Standard Cost Worksheet Name"
 {
     Caption = 'Standard Cost Worksheet Name';

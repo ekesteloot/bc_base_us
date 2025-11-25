@@ -1,3 +1,11 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.Purchases.Vendor;
+using System.Environment;
+using System.Utilities;
+
 page 5551 "Fixed Asset Acquisition Wizard"
 {
     Caption = 'Fixed Asset Acquisition';
@@ -78,11 +86,11 @@ page 5551 "Fixed Asset Acquisition Wizard"
                         begin
                             case AcquisitionOptions of
                                 AcquisitionOptions::"G/L Account":
-                                    Validate("Bal. Account Type", "Bal. Account Type"::"G/L Account");
+                                    Rec.Validate("Bal. Account Type", Rec."Bal. Account Type"::"G/L Account");
                                 AcquisitionOptions::Vendor:
-                                    "Bal. Account Type" := "Bal. Account Type"::Vendor;
+                                    Rec."Bal. Account Type" := Rec."Bal. Account Type"::Vendor;
                                 AcquisitionOptions::"Bank Account":
-                                    Validate("Bal. Account Type", "Bal. Account Type"::"Bank Account");
+                                    Rec.Validate("Bal. Account Type", Rec."Bal. Account Type"::"Bank Account");
                             end;
                             ValidateCurrentStep(Step);
                         end;
@@ -91,7 +99,7 @@ page 5551 "Fixed Asset Acquisition Wizard"
                     {
                         ShowCaption = false;
                         Visible = AcquisitionOptions = AcquisitionOptions::"G/L Account";
-                        field(BalancingAccountNo; "Bal. Account No.")
+                        field(BalancingAccountNo; Rec."Bal. Account No.")
                         {
                             ApplicationArea = FixedAssets;
                             Caption = 'Balancing Account No.';
@@ -107,7 +115,7 @@ page 5551 "Fixed Asset Acquisition Wizard"
                     {
                         ShowCaption = false;
                         Visible = AcquisitionOptions = AcquisitionOptions::Vendor;
-                        field(VendorNo; "Bal. Account No.")
+                        field(VendorNo; Rec."Bal. Account No.")
                         {
                             ApplicationArea = FixedAssets;
                             Caption = 'Vendor';
@@ -117,11 +125,11 @@ page 5551 "Fixed Asset Acquisition Wizard"
                             var
                                 Vendor: Record Vendor;
                             begin
-                                if Vendor.Get("Bal. Account No.") then
-                                    Validate("Currency Code", Vendor."Currency Code");
+                                if Vendor.Get(Rec."Bal. Account No.") then
+                                    Rec.Validate("Currency Code", Vendor."Currency Code");
                             end;
                         }
-                        field(ExternalDocNo; "External Document No.")
+                        field(ExternalDocNo; Rec."External Document No.")
                         {
                             ApplicationArea = FixedAssets;
                             Caption = 'External Document No.';
@@ -149,7 +157,7 @@ page 5551 "Fixed Asset Acquisition Wizard"
                             end;
                         }
                     }
-                    field(AcquisitionCurrencyCode; "Currency Code")
+                    field(AcquisitionCurrencyCode; Rec."Currency Code")
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Currency Code';
@@ -164,7 +172,7 @@ page 5551 "Fixed Asset Acquisition Wizard"
                 group("Para3.1")
                 {
                     Caption = 'Provide information about the fixed asset.';
-                    field(AcquisitionCost; Amount)
+                    field(AcquisitionCost; Rec.Amount)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Acquisition Cost Incl. VAT';
@@ -175,7 +183,7 @@ page 5551 "Fixed Asset Acquisition Wizard"
                             ValidateCurrentStep(Step);
                         end;
                     }
-                    field(AcquisitionDate; "Posting Date")
+                    field(AcquisitionDate; Rec."Posting Date")
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Acquisition Date';
@@ -186,7 +194,7 @@ page 5551 "Fixed Asset Acquisition Wizard"
                             ValidateCurrentStep(Step);
                         end;
                     }
-                    field(CurrencyCode; "Currency Code")
+                    field(CurrencyCode; Rec."Currency Code")
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Currency Code';
@@ -279,13 +287,13 @@ page 5551 "Fixed Asset Acquisition Wizard"
                     PageGenJnlLine: Record "Gen. Journal Line";
                 begin
                     if Step <> Step::"Already In Journal" then
-                        CreateFAAcquisitionLines(GenJnlLine);
+                        Rec.CreateFAAcquisitionLines(GenJnlLine);
 
                     if OpenFAGLJournal then begin
-                        PageGenJnlLine.Validate("Journal Template Name", "Journal Template Name");
-                        PageGenJnlLine.Validate("Journal Batch Name", "Journal Batch Name");
-                        PageGenJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-                        PageGenJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
+                        PageGenJnlLine.Validate("Journal Template Name", Rec."Journal Template Name");
+                        PageGenJnlLine.Validate("Journal Batch Name", Rec."Journal Batch Name");
+                        PageGenJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+                        PageGenJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
                         PAGE.Run(PAGE::"Fixed Asset G/L Journal", PageGenJnlLine);
                     end else
                         CODEUNIT.Run(CODEUNIT::"Gen. Jnl.-Post Batch", GenJnlLine);
@@ -314,17 +322,17 @@ page 5551 "Fixed Asset Acquisition Wizard"
     trigger OnOpenPage()
     begin
         // We could check if values like FA Posting code, descirption are in the temp
-        if not Get() then begin
-            Init();
-            "Journal Template Name" := FixedAssetAcquisitionWizard.SelectFATemplate();
-            "Journal Batch Name" := FixedAssetAcquisitionWizard.GetGenJournalBatchName(
-                CopyStr(Rec.GetFilter("Account No."), 1, MaxStrLen("Account No.")));
-            "Document Type" := "Document Type"::Invoice;
-            "Account Type" := "Account Type"::"Fixed Asset";
-            "FA Posting Type" := "FA Posting Type"::"Acquisition Cost";
-            "Posting Date" := WorkDate();
-            SetAccountNoFromFilter();
-            Insert();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec."Journal Template Name" := FixedAssetAcquisitionWizard.SelectFATemplate();
+            Rec."Journal Batch Name" := FixedAssetAcquisitionWizard.GetGenJournalBatchName(
+                CopyStr(Rec.GetFilter("Account No."), 1, MaxStrLen(Rec."Account No.")));
+            Rec."Document Type" := Rec."Document Type"::Invoice;
+            Rec."Account Type" := Rec."Account Type"::"Fixed Asset";
+            Rec."FA Posting Type" := Rec."FA Posting Type"::"Acquisition Cost";
+            Rec."Posting Date" := WorkDate();
+            Rec.SetAccountNoFromFilter();
+            Rec.Insert();
         end;
 
         EnableOpenFAGLJournal := JournalBatchIsEmpty();
@@ -385,12 +393,12 @@ page 5551 "Fixed Asset Acquisition Wizard"
                 CurrStepIsValid := true;
             Step::"Register Details":
                 begin
-                    CurrStepIsValid := "Bal. Account No." <> '';
+                    CurrStepIsValid := Rec."Bal. Account No." <> '';
                     if AcquisitionOptions = AcquisitionOptions::Vendor then
-                        CurrStepIsValid := CurrStepIsValid and ("External Document No." <> '');
+                        CurrStepIsValid := CurrStepIsValid and (Rec."External Document No." <> '');
                 end;
             Step::"FA Details":
-                CurrStepIsValid := (Amount >= 0.0) and ("Posting Date" <> 0D);
+                CurrStepIsValid := (Rec.Amount >= 0.0) and (Rec."Posting Date" <> 0D);
             Step::Done:
                 CurrStepIsValid := true;
             else
@@ -402,8 +410,8 @@ page 5551 "Fixed Asset Acquisition Wizard"
     var
         GenJournalLine: Record "Gen. Journal Line";
     begin
-        GenJournalLine.SetRange("Journal Template Name", "Journal Template Name");
-        GenJournalLine.SetRange("Journal Batch Name", "Journal Batch Name");
+        GenJournalLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+        GenJournalLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
         exit(GenJournalLine.IsEmpty());
     end;
 
@@ -411,14 +419,14 @@ page 5551 "Fixed Asset Acquisition Wizard"
     var
         GenJournalLine: Record "Gen. Journal Line";
     begin
-        GenJournalLine.SetRange("Account No.", "Account No.");
+        GenJournalLine.SetRange("Account No.", Rec."Account No.");
         GenJournalLine.SetRange("Account Type", GenJournalLine."Account Type"::"Fixed Asset");
-        GenJournalLine.SetRange("FA Posting Type", "FA Posting Type"::"Acquisition Cost");
+        GenJournalLine.SetRange("FA Posting Type", Rec."FA Posting Type"::"Acquisition Cost");
         if GenJournalLine.FindFirst() then begin
             Step := Step::"Already In Journal";
             OpenFAGLJournal := true;
-            Copy(GenJournalLine);
-            Insert();
+            Rec.Copy(GenJournalLine);
+            Rec.Insert();
         end
     end;
 }

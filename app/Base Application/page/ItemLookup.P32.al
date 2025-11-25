@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 page 32 "Item Lookup"
 {
     Caption = 'Items';
@@ -165,7 +167,7 @@ page 32 "Item Lookup"
                     ToolTip = 'Specifies the category that the item belongs to. Item categories also contain any assigned item attributes.';
                     Visible = false;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that transactions with the item cannot be posted, for example, because the item is in quarantine.';

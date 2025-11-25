@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1530 "Archived WF Step Instances"
 {
     ApplicationArea = Suite;
@@ -17,7 +19,7 @@ page 1530 "Archived WF Step Instances"
         {
             repeater(Group)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies, for the archived workflow step instance, the workflow step ID of the workflow step instance.';
@@ -57,7 +59,7 @@ page 1530 "Archived WF Step Instances"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies, for the archived workflow step instance, the name of the function that is used by the workflow step instance.';
                 }
-                field(Argument; Argument)
+                field(Argument; Rec.Argument)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies, for the archived workflow step instance, the values of the parameters that are required by the workflow step instance.';
@@ -116,7 +118,7 @@ page 1530 "Archived WF Step Instances"
                 trigger OnAction()
                 begin
                     if Confirm(DeleteArchiveQst) then
-                        DeleteAll(true);
+                        Rec.DeleteAll(true);
                 end;
             }
         }
@@ -135,7 +137,7 @@ page 1530 "Archived WF Step Instances"
 
     trigger OnAfterGetRecord()
     begin
-        RecordIDText := Format("Record ID", 0, 1);
+        RecordIDText := Format(Rec."Record ID", 0, 1);
     end;
 
     var
@@ -144,7 +146,7 @@ page 1530 "Archived WF Step Instances"
 
     procedure SetWorkflowCode(WorkflowCode: Code[20])
     begin
-        SetRange("Workflow Code", WorkflowCode);
+        Rec.SetRange("Workflow Code", WorkflowCode);
     end;
 }
 

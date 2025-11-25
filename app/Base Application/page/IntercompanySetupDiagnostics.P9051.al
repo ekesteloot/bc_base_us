@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Setup;
+
 page 9051 "Intercompany Setup Diagnostics"
 {
     PageType = ListPart;
@@ -19,7 +21,7 @@ page 9051 "Intercompany Setup Diagnostics"
                     trigger OnDrillDown()
                     begin
                         DrilldownDiagnostics(ICSetupDiagnostics.GetPartnerSetupId());
-                   end;
+                    end;
                 }
                 field(MappingSetup; GetDiagnosticsErrorsCount(ICSetupDiagnostics.GetMappingSetupId()))
                 {
@@ -30,7 +32,7 @@ page 9051 "Intercompany Setup Diagnostics"
                     trigger OnDrillDown()
                     begin
                         DrilldownDiagnostics(ICSetupDiagnostics.GetMappingSetupId());
-                   end;
+                    end;
                 }
             }
         }
@@ -91,20 +93,20 @@ page 9051 "Intercompany Setup Diagnostics"
     begin
         Rec.SetRange(Id, ICSetupDiagnostics.GetPartnerSetupId());
         if Rec.FindFirst() then
-        case Rec.Status of
-            Rec.Status::Ok:
-                PartnerSetupStyleExpr := 'Favorable';
-            else
-                PartnerSetupStyleExpr := 'Unfavorable';
-        end;
+            case Rec.Status of
+                Rec.Status::Ok:
+                    PartnerSetupStyleExpr := 'Favorable';
+                else
+                    PartnerSetupStyleExpr := 'Unfavorable';
+            end;
         Rec.SetRange(Id, ICSetupDiagnostics.GetMappingSetupId());
         if Rec.FindFirst() then
-        case Rec.Status of
-            Rec.Status::Ok:
-                MappingSetupStyleExpr := 'Favorable';
-            else
-                MappingSetupStyleExpr := 'Unfavorable';
-        end;
+            case Rec.Status of
+                Rec.Status::Ok:
+                    MappingSetupStyleExpr := 'Favorable';
+                else
+                    MappingSetupStyleExpr := 'Unfavorable';
+            end;
         Rec.SetRange(Id);
     end;
 }

@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.Foundation.Enums;
+
 table 5936 "Service Document Register"
 {
     Caption = 'Service Document Register';
@@ -93,12 +97,12 @@ table 5936 "Service Document Register"
                         case ServDocReg."Source Document Type" of
                             ServDocReg."Source Document Type"::Order:
                                 begin
-                                    ServTable := DATABASE::"Service Header";
+                                    ServTable := Enum::TableID::"Service Header".AsInteger();
                                     ServDocNo := ServDocReg."Source Document No.";
                                 end;
                             ServDocReg."Source Document Type"::Contract:
                                 begin
-                                    ServTable := DATABASE::"Service Contract Header";
+                                    ServTable := Enum::TableID::"Service Contract Header".AsInteger();
                                     ServDocNo := ServDocReg."Source Document No.";
                                 end;
                         end;
@@ -113,12 +117,12 @@ table 5936 "Service Document Register"
                         case ServDocReg."Source Document Type" of
                             ServDocReg."Source Document Type"::Order:
                                 begin
-                                    ServTable := DATABASE::"Service Header";
+                                    ServTable := Enum::TableID::"Service Header".AsInteger();
                                     ServDocNo := ServDocReg."Source Document No.";
                                 end;
                             ServDocReg."Source Document Type"::Contract:
                                 begin
-                                    ServTable := DATABASE::"Service Contract Header";
+                                    ServTable := Enum::TableID::"Service Contract Header".AsInteger();
                                     ServDocNo := ServDocReg."Source Document No.";
                                 end;
                         end;

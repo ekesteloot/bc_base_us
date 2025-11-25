@@ -11,7 +11,7 @@ report 7052 "Suggest Sales Price on Wksh."
     {
         dataitem("Sales Price"; "Sales Price")
         {
-            DataItemTableView = SORTING("Item No.");
+            DataItemTableView = sorting("Item No.");
             RequestFilterFields = "Sales Type", "Sales Code", "Item No.", "Currency Code", "Starting Date";
 
             trigger OnAfterGetRecord()
@@ -455,11 +455,8 @@ report 7052 "Suggest Sales Price on Wksh."
         ReplaceCurrency: Boolean;
         ReplaceStartingDate: Boolean;
         ReplaceEndingDate: Boolean;
-        [InDataSet]
         SalesCodeCtrlEnable: Boolean;
-        [InDataSet]
         ToStartDateCtrlEnable: Boolean;
-        [InDataSet]
         ToEndDateCtrlEnable: Boolean;
 
         Text001: Label 'Processing items  #1##########';

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 table 4800 "VATGroup Approved Member"
 {
     ObsoleteState = Removed;

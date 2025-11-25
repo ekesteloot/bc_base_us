@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
 page 7021 "Suggest Price Lines"
 {
     Caption = 'Price Lines';
@@ -198,15 +204,10 @@ page 7021 "Suggest Price Lines"
         DataCaptionCopyLbl: Label 'Copy existing';
         DataCaptionSuggestLbl: Label 'Create new';
         DefaultsLbl: Label '%1 = %2; ', Locked = true;
-        [InDataSet]
         CopyToWorksheet: Boolean;
-        [InDataSet]
         ShowForceDefaults: Boolean;
-        [InDataSet]
         ShowDefaults: Boolean;
-        [InDataSet]
         CreateNewLinesEditable: Boolean;
-        [InDataSet]
         CopyLines: Boolean;
 
     procedure GetDefaults(var PriceListHeader: Record "Price List Header")

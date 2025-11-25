@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.Foundation.ExtendedText;
+
 page 447 "Finance Charge Memo Lines"
 {
     AutoSplitKey = true;
@@ -30,7 +34,7 @@ page 447 "Finance Charge Memo Lines"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Basic, Suite;
-                    ShowMandatory = Type = Type::"G/L Account";
+                    ShowMandatory = Rec.Type = Rec.Type::"G/L Account";
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
 
                     trigger OnValidate()
@@ -53,7 +57,7 @@ page 447 "Finance Charge Memo Lines"
                 field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = Basic, Suite;
-                    ShowMandatory = Type = Type::"Customer Ledger Entry";
+                    ShowMandatory = Rec.Type = Rec.Type::"Customer Ledger Entry";
                     ToolTip = 'Specifies the document type of the customer ledger entry this finance charge memo line is for.';
 
                     trigger OnValidate()
@@ -64,12 +68,12 @@ page 447 "Finance Charge Memo Lines"
                 field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = Basic, Suite;
-                    ShowMandatory = Type = Type::"Customer Ledger Entry";
+                    ShowMandatory = Rec.Type = Rec.Type::"Customer Ledger Entry";
                     ToolTip = 'Specifies the document number of the customer ledger entry this finance charge memo line is for.';
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupDocNo();
+                        Rec.LookupDocNo();
                         CurrPage.Update();
                     end;
 
@@ -149,13 +153,9 @@ page 447 "Finance Charge Memo Lines"
 
     var
         TransferExtendedText: Codeunit "Transfer Extended Text";
-        [InDataSet]
         DescriptionEmphasize: Boolean;
-        [InDataSet]
         DescriptionIndent: Integer;
-        [InDataSet]
         RemainingAmountEmphasize: Boolean;
-        [InDataSet]
         AmountEmphasize: Boolean;
 
     procedure InsertExtendedText(Unconditionally: Boolean)
@@ -172,9 +172,9 @@ page 447 "Finance Charge Memo Lines"
 
     local procedure FormUpdateAttachedLines()
     begin
-        if CheckAttachedLines() then begin
+        if Rec.CheckAttachedLines() then begin
             CurrPage.SaveRecord();
-            UpdateAttachedLines();
+            Rec.UpdateAttachedLines();
             CurrPage.Update(false);
         end;
     end;
@@ -203,20 +203,20 @@ page 447 "Finance Charge Memo Lines"
 
     local procedure DescriptionOnFormat()
     begin
-        if "Detailed Interest Rates Entry" then
+        if Rec."Detailed Interest Rates Entry" then
             DescriptionIndent := 2;
 
-        DescriptionEmphasize := not "Detailed Interest Rates Entry";
+        DescriptionEmphasize := not Rec."Detailed Interest Rates Entry";
     end;
 
     local procedure RemainingAmountOnFormat()
     begin
-        RemainingAmountEmphasize := not "Detailed Interest Rates Entry";
+        RemainingAmountEmphasize := not Rec."Detailed Interest Rates Entry";
     end;
 
     local procedure AmountOnFormat()
     begin
-        AmountEmphasize := not "Detailed Interest Rates Entry";
+        AmountEmphasize := not Rec."Detailed Interest Rates Entry";
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 table 338 "Entry Summary"
 {
     Caption = 'Entry Summary';
@@ -111,7 +113,6 @@ table 338 "Entry Summary"
         }
         field(6508; "Bin Content"; Decimal)
         {
-            AccessByPermission = TableData "Warehouse Source Filter" = R;
             Caption = 'Bin Content';
             DecimalPlaces = 0 : 5;
             Editable = false;

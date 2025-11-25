@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.Posting;
+
 codeunit 9067 "Check Purchase Document"
 {
     TableNo = "Purchase Header";

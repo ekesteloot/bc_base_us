@@ -88,9 +88,9 @@ page 10147 "Posted Deposit List"
                     Caption = 'Comments';
                     Image = ViewComments;
                     RunObject = Page "Bank Comment Sheet";
-                    RunPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                                  "No." = FIELD("No.");
-                    RunPageView = WHERE("Table Name" = CONST("Posted Deposit"));
+                    RunPageLink = "Bank Account No." = field("Bank Account No."),
+                                  "No." = field("No.");
+                    RunPageView = where("Table Name" = const("Posted Deposit"));
                     ToolTip = 'View a list of deposit comments.';
                 }
                 action(Dimensions)
@@ -102,7 +102,7 @@ page 10147 "Posted Deposit List"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
             }

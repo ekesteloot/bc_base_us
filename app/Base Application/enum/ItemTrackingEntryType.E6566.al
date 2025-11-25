@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 enum 6566 "Item Tracking Entry Type"
 {
     Extensible = true;

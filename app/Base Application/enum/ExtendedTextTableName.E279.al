@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.ExtendedText;
+
 enum 279 "Extended Text Table Name"
 {
     Extensible = true;

@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Threading;
+
 codeunit 250 "Gen. Jnl.-Post via Job Queue"
 {
     TableNo = "Job Queue Entry";
@@ -12,8 +18,8 @@ codeunit 250 "Gen. Jnl.-Post via Job Queue"
         RecRefToPrint: RecordRef;
         PrintPostDocuments: Boolean;
     begin
-        TestField("Record ID to Process");
-        RecRef.Get("Record ID to Process");
+        Rec.TestField("Record ID to Process");
+        RecRef.Get(Rec."Record ID to Process");
         RecRef.SetTable(GenJrnlLine);
         PrintPostDocuments := GenJrnlLine."Print Posted Documents";
 

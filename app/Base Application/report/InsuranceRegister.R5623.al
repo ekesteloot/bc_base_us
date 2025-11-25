@@ -1,7 +1,11 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FixedAssets.FixedAsset;
+
 report 5623 "Insurance Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/InsuranceRegister.rdlc';
+    RDLCLayout = './FixedAssets/Insurance/InsuranceRegister.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Insurance Register';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5623 "Insurance Register"
     {
         dataitem("Insurance Register"; "Insurance Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
@@ -75,7 +79,7 @@ report 5623 "Insurance Register"
             }
             dataitem("Ins. Coverage Ledger Entry"; "Ins. Coverage Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(Ins__Coverage_Ledger_Entry__Posting_Date_; Format("Posting Date"))
                 {
                 }

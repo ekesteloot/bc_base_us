@@ -47,7 +47,7 @@ table 30128 "Shpfy Shop Collection Map"
             TableRelation = if ("Product Collection" = const("Tax Group")) "Tax Group".Code else
             if ("Product Collection" = const("VAT Prod. Posting Group")) "VAT Product Posting Group".Code;
         }
-#pragma warning restore AS0086
+#pragma warning disable AS0086
         field(5; "Collection Id"; BigInteger)
         {
             Caption = 'Collection Id';

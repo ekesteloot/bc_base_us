@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1215 "Data Exch Line Def Part"
 {
     Caption = 'Line Definitions';
@@ -17,7 +19,7 @@ page 1215 "Data Exch Line Def Part"
                     Caption = 'Line Type';
                     ToolTip = 'Specifies the type of the line in the file.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the line in the file.';
@@ -37,7 +39,7 @@ page 1215 "Data Exch Line Def Part"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the position in the related XML schema of the element that represents the main entry of the data file.';
                 }
-                field(Namespace; Namespace)
+                field(Namespace; Rec.Namespace)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = IsXMLFileType;
@@ -63,8 +65,8 @@ page 1215 "Data Exch Line Def Part"
                 Image = MapAccounts;
                 Promoted = false;
                 RunObject = Page "Data Exch Mapping Card";
-                RunPageLink = "Data Exch. Def Code" = FIELD("Data Exch. Def Code"),
-                              "Data Exch. Line Def Code" = FIELD(Code);
+                RunPageLink = "Data Exch. Def Code" = field("Data Exch. Def Code"),
+                              "Data Exch. Line Def Code" = field(Code);
                 RunPageMode = Edit;
                 ShortCutKey = 'Return';
                 ToolTip = 'Associates columns in the data file with fields in Dynamics 365.';
@@ -76,7 +78,7 @@ page 1215 "Data Exch Line Def Part"
     var
         DataExchDef: Record "Data Exch. Def";
     begin
-        DataExchDef.Get("Data Exch. Def Code");
+        DataExchDef.Get(Rec."Data Exch. Def Code");
         IsXMLFileType := not DataExchDef.CheckEnableDisableIsNonXMLFileType();
     end;
 

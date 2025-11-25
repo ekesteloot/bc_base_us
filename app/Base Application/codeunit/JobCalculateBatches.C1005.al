@@ -1,3 +1,12 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Jobs.Posting;
+
 codeunit 1005 "Job Calculate Batches"
 {
 
@@ -77,7 +86,7 @@ codeunit 1005 "Job Calculate Batches"
                 JobLedgEntry.TestField("Job No.");
                 JobLedgEntry.TestField("Job Task No.");
                 JobLedgEntry.TestField("Entry Type", JobLedgEntry."Entry Type"::Usage);
-                JobLedgEntry."Line Type" := "Job Line Type".FromInteger(LineType);
+                JobLedgEntry."Line Type" := Enum::"Job Line Type".FromInteger(LineType);
                 Clear(JobPostLine);
                 JobPostLine.InsertPlLineFromLedgEntry(JobLedgEntry);
             until JobLedgEntry.Next() = 0;

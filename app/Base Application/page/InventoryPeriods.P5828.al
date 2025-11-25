@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Costing;
+
 page 5828 "Inventory Periods"
 {
     AdditionalSearchTerms = 'accounting period';
@@ -24,7 +29,7 @@ page 5828 "Inventory Periods"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a descriptive name that helps users identify the inventory period.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that an inventory period can be open or closed.';
@@ -60,8 +65,8 @@ page 5828 "Inventory Periods"
                     Caption = 'Invt. Period E&ntries';
                     Image = PeriodEntries;
                     RunObject = Page "Inventory Period Entries";
-                    RunPageLink = "Ending Date" = FIELD("Ending Date");
-                    RunPageView = SORTING("Ending Date", "Entry No.");
+                    RunPageLink = "Ending Date" = field("Ending Date");
+                    RunPageView = sorting("Ending Date", "Entry No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'Define how to track the closings and re-openings of an inventory period.';
                 }

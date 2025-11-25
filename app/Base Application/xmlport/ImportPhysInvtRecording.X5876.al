@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
 xmlport 5876 "Import Phys. Invt. Recording"
 {
     Caption = 'Import Phys. Invt. Recording';
@@ -12,7 +14,7 @@ xmlport 5876 "Import Phys. Invt. Recording"
             tableelement("Phys. Invt. Record Line"; "Phys. Invt. Record Line")
             {
                 XmlName = 'PhysInvtRecordLine';
-                SourceTableView = SORTING("Order No.", "Recording No.", "Line No.");
+                SourceTableView = sorting("Order No.", "Recording No.", "Line No.");
                 UseTemporary = true;
                 fieldelement(OrderNo; "Phys. Invt. Record Line"."Order No.")
                 {

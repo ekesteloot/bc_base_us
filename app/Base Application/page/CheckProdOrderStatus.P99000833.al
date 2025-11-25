@@ -1,3 +1,11 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Sales.Document;
+
 page 99000833 "Check Prod. Order Status"
 {
     Caption = 'Check Prod. Order Status';
@@ -103,7 +111,7 @@ page 99000833 "Check Prod. Order Status"
             repeat
                 if ReservEntry2.Get(ReservEntry."Entry No.", not ReservEntry.Positive) then
                     case ReservEntry2."Source Type" of
-                        DATABASE::"Prod. Order Line":
+                        Enum::TableID::"Prod. Order Line".AsInteger():
                             if ReservEntry2."Source Subtype" <> 1 then begin
                                 ProdOrderLine.Get(
                                   ReservEntry2."Source Subtype", ReservEntry2."Source ID", ReservEntry2."Source Prod. Order Line");

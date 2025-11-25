@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
 page 7509 "Filter Items by Att. Phone"
 {
     Caption = 'Filter Items by Attribute';
@@ -13,13 +15,13 @@ page 7509 "Filter Items by Att. Phone"
             repeater(Control2)
             {
                 ShowCaption = false;
-                field(Attribute; Attribute)
+                field(Attribute; Rec.Attribute)
                 {
                     ApplicationArea = Basic, Suite;
                     TableRelation = "Item Attribute".Name;
                     ToolTip = 'Specifies the name of the attribute to filter on.';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = Basic, Suite;
                     AssistEdit = true;
@@ -27,7 +29,7 @@ page 7509 "Filter Items by Att. Phone"
 
                     trigger OnAssistEdit()
                     begin
-                        ValueAssistEdit();
+                        Rec.ValueAssistEdit();
                     end;
                 }
             }
@@ -40,8 +42,8 @@ page 7509 "Filter Items by Att. Phone"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        SetRange(Value, '');
-        DeleteAll();
+        Rec.SetRange(Value, '');
+        Rec.DeleteAll();
     end;
 }
 

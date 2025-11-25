@@ -3,7 +3,7 @@ page 5390 "Product Item Availability"
     Caption = 'Product Item Availability';
     PageType = List;
     SourceTable = "CRM Integration Record";
-    SourceTableView = WHERE("Table ID" = CONST(27));
+    SourceTableView = where("Table ID" = const(27));
     ObsoleteState = Pending;
     ObsoleteReason = 'This functionality is replaced with new item availability job queue entry.';
     ObsoleteTag = '18.0';
@@ -60,10 +60,10 @@ page 5390 "Product Item Availability"
     trigger OnAfterGetRecord()
     begin
         Clear(Item);
-        if IsNullGuid("Integration ID") or ("Table ID" <> DATABASE::Item) then
+        if IsNullGuid(Rec."Integration ID") or (Rec."Table ID" <> DATABASE::Item) then
             exit;
 
-        if Item.GetBySystemId("Integration ID") then
+        if Item.GetBySystemId(Rec."Integration ID") then
             Item.CalcFields(Inventory);
     end;
 

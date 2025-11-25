@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
 codeunit 5875 "Phys. Invt. Rec.-Finish (Y/N)"
 {
     TableNo = "Phys. Invt. Record Header";

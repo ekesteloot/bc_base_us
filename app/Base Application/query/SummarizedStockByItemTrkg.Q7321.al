@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Tracking;
+
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Tracking;
+
 query 7321 "Summarized Stock By Item Trkg."
 {
     QueryType = Normal;

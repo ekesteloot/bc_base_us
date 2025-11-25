@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 enum 81 "Gen. Journal Account Type"
 {
     Extensible = true;
@@ -10,4 +12,5 @@ enum 81 "Gen. Journal Account Type"
     value(4; "Fixed Asset") { Caption = 'Fixed Asset'; }
     value(5; "IC Partner") { Caption = 'IC Partner'; }
     value(6; "Employee") { Caption = 'Employee'; }
+    value(10; "Allocation Account") { Caption = 'Allocation Account'; }
 }

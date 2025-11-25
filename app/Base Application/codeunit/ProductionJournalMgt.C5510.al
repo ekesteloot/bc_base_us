@@ -1,3 +1,14 @@
+﻿namespace Microsoft.Manufacturing.Journal;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+
 codeunit 5510 "Production Journal Mgt"
 {
 
@@ -19,7 +30,7 @@ codeunit 5510 "Production Journal Mgt"
         NextLineNo: Integer;
         Text000: Label '%1 journal';
         Text001: Label 'Do you want to leave the Production Journal?';
-        Text002: Label 'Item %1 is blocked and therefore, no journal line is created for this item.';
+        BlockedMsg: Label '%2 %1 is blocked and therefore, no journal line is created for this %2.', Comment = '%1 - Entity No, %2 - Table caption';
         Text003: Label 'DEFAULT';
         Text004: Label 'Production Journal';
         Text005: Label '%1 %2 for operation %3 is blocked and therefore, no journal line is created for this operation.';
@@ -180,18 +191,29 @@ codeunit 5510 "Production Journal Mgt"
     procedure InsertConsumptionItemJnlLine(ProdOrderComp: Record "Prod. Order Component"; ProdOrderLine: Record "Prod. Order Line"; Level: Integer)
     var
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         Location: Record Location;
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         NeededQty: Decimal;
         OriginalNeededQty: Decimal;
         IsHandled: Boolean;
         ShouldAdjustQty: Boolean;
+        ItemItemVariantLbl: Label '%1 %2', Comment = '%1 - Item No., %2 - Variant Code';
     begin
         with ProdOrderComp do begin
             Item.Get("Item No.");
             if Item.Blocked then begin
-                Message(Text002, "Item No.");
+                Message(BlockedMsg, ProdOrderComp."Item No.", Item.TableCaption());
                 exit;
+            end;
+
+            if ProdOrderComp."Variant Code" <> '' then begin
+                ItemVariant.SetLoadFields(Blocked);
+                ItemVariant.Get(ProdOrderComp."Item No.", ProdOrderComp."Variant Code");
+                if ItemVariant.Blocked then begin
+                    Message(BlockedMsg, StrSubstNo(ItemItemVariantLbl, ProdOrderComp."Item No.", ProdOrderComp."Variant Code"), ItemVariant.TableCaption());
+                    exit;
+                end;
             end;
 
             IsHandled := false;
@@ -210,7 +232,11 @@ codeunit 5510 "Production Journal Mgt"
                 if "Location Code" <> Location.Code then
                     if not Location.Get("Location Code") then
                         Clear(Location);
-                ShouldAdjustQty := Location."Require Shipment" and Location."Require Pick";
+
+                if Location.Code = '' then
+                    ShouldAdjustQty := Location."Require Shipment" and Location."Require Pick"
+                else
+                    ShouldAdjustQty := Location."Prod. Consump. Whse. Handling" = Location."Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)";
                 OnInsertConsumptionItemJnlLineOnAfterCalcShouldAdjustQty(ProdOrderComp, Location, NeededQty, ShouldAdjustQty);
                 if ShouldAdjustQty then
                     AdjustQtyToQtyPicked(NeededQty);
@@ -739,7 +765,6 @@ codeunit 5510 "Production Journal Mgt"
     local procedure OnInsertOutputItemJnlLineOnAfterAssignTimes(var ItemJournalLine: Record "Item Journal Line"; ProdOrderLine: Record "Prod. Order Line"; ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var QtyToPost: Decimal)
     begin
     end;
-
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertComponents(ProdOrderLine: Record "Prod. Order Line"; CheckRoutingLink: Boolean; Level: Integer; var IsHandled: Boolean)

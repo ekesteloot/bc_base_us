@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 table 130403 "CAL Test Enabled Codeunit"
 {
     Caption = 'CAL Test Enabled Codeunit';

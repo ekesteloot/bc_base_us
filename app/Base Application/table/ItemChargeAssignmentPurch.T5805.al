@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.InventoryMgt.Item;
+
+using Microsoft.Purchases.History;
+
 table 5805 "Item Charge Assignment (Purch)"
 {
     Caption = 'Item Charge Assignment (Purch)';
@@ -11,13 +18,13 @@ table 5805 "Item Charge Assignment (Purch)"
         field(2; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Purchase Header"."No." WHERE("Document Type" = FIELD("Document Type"));
+            TableRelation = "Purchase Header"."No." where("Document Type" = field("Document Type"));
         }
         field(3; "Document Line No."; Integer)
         {
             Caption = 'Document Line No.';
-            TableRelation = "Purchase Line"."Line No." WHERE("Document Type" = FIELD("Document Type"),
-                                                              "Document No." = FIELD("Document No."));
+            TableRelation = "Purchase Line"."Line No." where("Document Type" = field("Document Type"),
+                                                              "Document No." = field("Document No."));
         }
         field(4; "Line No."; Integer)
         {
@@ -95,36 +102,36 @@ table 5805 "Item Charge Assignment (Purch)"
         field(13; "Applies-to Doc. No."; Code[20])
         {
             Caption = 'Applies-to Doc. No.';
-            TableRelation = IF ("Applies-to Doc. Type" = CONST(Order)) "Purchase Header"."No." WHERE("Document Type" = CONST(Order))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST(Invoice)) "Purchase Header"."No." WHERE("Document Type" = CONST(Invoice))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Return Order")) "Purchase Header"."No." WHERE("Document Type" = CONST("Return Order"))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Credit Memo")) "Purchase Header"."No." WHERE("Document Type" = CONST("Credit Memo"))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST(Receipt)) "Purch. Rcpt. Header"."No."
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Return Shipment")) "Return Shipment Header"."No.";
+            TableRelation = if ("Applies-to Doc. Type" = const(Order)) "Purchase Header"."No." where("Document Type" = const(Order))
+            else
+            if ("Applies-to Doc. Type" = const(Invoice)) "Purchase Header"."No." where("Document Type" = const(Invoice))
+            else
+            if ("Applies-to Doc. Type" = const("Return Order")) "Purchase Header"."No." where("Document Type" = const("Return Order"))
+            else
+            if ("Applies-to Doc. Type" = const("Credit Memo")) "Purchase Header"."No." where("Document Type" = const("Credit Memo"))
+            else
+            if ("Applies-to Doc. Type" = const(Receipt)) "Purch. Rcpt. Header"."No."
+            else
+            if ("Applies-to Doc. Type" = const("Return Shipment")) "Return Shipment Header"."No.";
         }
         field(14; "Applies-to Doc. Line No."; Integer)
         {
             Caption = 'Applies-to Doc. Line No.';
-            TableRelation = IF ("Applies-to Doc. Type" = CONST(Order)) "Purchase Line"."Line No." WHERE("Document Type" = CONST(Order),
-                                                                                                       "Document No." = FIELD("Applies-to Doc. No."))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST(Invoice)) "Purchase Line"."Line No." WHERE("Document Type" = CONST(Invoice),
-                                                                                                                                                                                         "Document No." = FIELD("Applies-to Doc. No."))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Return Order")) "Purchase Line"."Line No." WHERE("Document Type" = CONST("Return Order"),
-                                                                                                                                                                                                                                                                                  "Document No." = FIELD("Applies-to Doc. No."))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Credit Memo")) "Purchase Line"."Line No." WHERE("Document Type" = CONST("Credit Memo"),
-                                                                                                                                                                                                                                                                                                                                                                          "Document No." = FIELD("Applies-to Doc. No."))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST(Receipt)) "Purch. Rcpt. Line"."Line No." WHERE("Document No." = FIELD("Applies-to Doc. No."))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Return Shipment")) "Return Shipment Line"."Line No." WHERE("Document No." = FIELD("Applies-to Doc. No."));
+            TableRelation = if ("Applies-to Doc. Type" = const(Order)) "Purchase Line"."Line No." where("Document Type" = const(Order),
+                                                                                                       "Document No." = field("Applies-to Doc. No."))
+            else
+            if ("Applies-to Doc. Type" = const(Invoice)) "Purchase Line"."Line No." where("Document Type" = const(Invoice),
+                                                                                                                                                                                         "Document No." = field("Applies-to Doc. No."))
+            else
+            if ("Applies-to Doc. Type" = const("Return Order")) "Purchase Line"."Line No." where("Document Type" = const("Return Order"),
+                                                                                                                                                                                                                                                                                  "Document No." = field("Applies-to Doc. No."))
+            else
+            if ("Applies-to Doc. Type" = const("Credit Memo")) "Purchase Line"."Line No." where("Document Type" = const("Credit Memo"),
+                                                                                                                                                                                                                                                                                                                                                                          "Document No." = field("Applies-to Doc. No."))
+            else
+            if ("Applies-to Doc. Type" = const(Receipt)) "Purch. Rcpt. Line"."Line No." where("Document No." = field("Applies-to Doc. No."))
+            else
+            if ("Applies-to Doc. Type" = const("Return Shipment")) "Return Shipment Line"."Line No." where("Document No." = field("Applies-to Doc. No."));
         }
         field(15; "Applies-to Doc. Line Amount"; Decimal)
         {

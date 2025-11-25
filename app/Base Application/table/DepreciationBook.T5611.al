@@ -1,3 +1,11 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.FixedAssets.Setup;
+
 table 5611 "Depreciation Book"
 {
     Caption = 'Depreciation Book';

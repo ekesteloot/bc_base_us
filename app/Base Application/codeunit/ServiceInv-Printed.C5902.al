@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 codeunit 5902 "Service Inv.-Printed"
 {
     Permissions = TableData "Service Invoice Header" = rimd;
@@ -8,10 +10,10 @@ codeunit 5902 "Service Inv.-Printed"
         SuppressCommit: Boolean;
     begin
         OnBeforeOnRun(Rec, SuppressCommit);
-        Find();
-        "No. Printed" := "No. Printed" + 1;
+        Rec.Find();
+        Rec."No. Printed" := Rec."No. Printed" + 1;
         OnBeforeModify(Rec);
-        Modify();
+        Rec.Modify();
         if not SuppressCommit then
             Commit();
     end;

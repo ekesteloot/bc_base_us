@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using System.Threading;
+
 page 2593 "Dim Correction Schedule"
 {
     PageType = StandardDialog;
@@ -47,7 +51,7 @@ page 2593 "Dim Correction Schedule"
                         ToolTip = 'Specifies the earliest date and time when the dimension correction should be run.  The format for the date and time must be month/day/year hour:minute, and then AM or PM. For example, 3/10/2021 12:00 AM.';
                     }
 
-                    field(Timeout; "Job Timeout")
+                    field(Timeout; Rec."Job Timeout")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Maximum Duration';

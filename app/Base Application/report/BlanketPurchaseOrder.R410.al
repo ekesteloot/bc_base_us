@@ -1,7 +1,23 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Shared.Archive;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 410 "Blanket Purchase Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/BlanketPurchaseOrder.rdlc';
+    RDLCLayout = './Purchases/Document/BlanketPurchaseOrder.rdlc';
     Caption = 'Blanket Purchase Order';
     PreviewMode = PrintLayout;
 
@@ -9,7 +25,7 @@ report 410 "Blanket Purchase Order"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Blanket Order"));
+            DataItemTableView = sorting("Document Type", "No.") WHERE("Document Type" = const("Blanket Order"));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Blanket Purchase Order';
             column(No_PurchaseHdr; "No.")
@@ -80,10 +96,10 @@ report 410 "Blanket Purchase Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) WHERE(Number = const(1));
                     column(BlanketPurchOrderCopyText; StrSubstNo(Text002, CopyText))
                     {
                     }
@@ -234,7 +250,7 @@ report 410 "Blanket Purchase Order"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) WHERE(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -281,9 +297,9 @@ report 410 "Blanket Purchase Order"
                     }
                     dataitem("Purchase Line"; "Purchase Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -292,7 +308,7 @@ report 410 "Blanket Purchase Order"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ShowInternalInfo; ShowInternalInfo)
                         {
                         }
@@ -328,7 +344,7 @@ report 410 "Blanket Purchase Order"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) WHERE(Number = filter(1 ..));
                             column(DimText1; DimText)
                             {
                             }
@@ -406,11 +422,11 @@ report 410 "Blanket Purchase Order"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) WHERE(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) WHERE(Number = const(1));
 
                         trigger OnPreDataItem()
                         begin
@@ -420,7 +436,7 @@ report 410 "Blanket Purchase Order"
                     }
                     dataitem(Total3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) WHERE(Number = const(1));
                         column(SelltoCustNo_PurchaseHdr; "Purchase Header"."Sell-to Customer No.")
                         {
                         }
@@ -495,6 +511,7 @@ report 410 "Blanket Purchase Order"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Purchase Header");
@@ -634,7 +651,6 @@ report 410 "Blanket Purchase Order"
         LogInteraction: Boolean;
         OutputNo: Integer;
         ArchiveDocument: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
 
         Text002: Label 'Blanket Purchase Order %1', Comment = '%1 = Document No.';
@@ -684,7 +700,7 @@ report 410 "Blanket Purchase Order"
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Purch. Blnkt. Ord.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch. Blnkt. Ord.") <> '';
     end;
 
     local procedure IsReportInPreviewMode(): Boolean

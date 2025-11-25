@@ -1,7 +1,13 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+
 report 5805 "Item Register - Value"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemRegisterValue.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemRegisterValue.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Register Value';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 5805 "Item Register - Value"
     {
         dataitem("Item Register"; "Item Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
@@ -302,7 +308,7 @@ report 5805 "Item Register - Value"
             }
             dataitem("Value Entry"; "Value Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(EntryNo_ValueEntry; "Entry No.")
                 {
                     IncludeCaption = true;
@@ -671,7 +677,7 @@ report 5805 "Item Register - Value"
         end;
 
         for i := 1 to ArrayLen(EntryTypeDescription) do begin
-            "Value Entry"."Entry Type" := "Cost Entry Type".FromInteger(i - 1);
+            "Value Entry"."Entry Type" := Enum::"Cost Entry Type".FromInteger(i - 1);
             EntryTypeDescription[i] := Format("Value Entry"."Entry Type");
         end;
     end;

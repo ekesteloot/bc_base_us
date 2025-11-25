@@ -31,7 +31,7 @@ page 1871 "Credit Limit Details"
 
                 trigger OnDrillDown()
                 begin
-                    OpenCustomerLedgerEntries(false);
+                    Rec.OpenCustomerLedgerEntries(false);
                 end;
             }
             field(OutstandingAmtLCY; OrderAmountTotalLCY)
@@ -71,7 +71,7 @@ page 1871 "Credit Limit Details"
                 Editable = false;
                 ToolTip = 'Specifies the maximum amount you allow the customer to exceed the payment balance before warnings are issued.';
             }
-            field(OverdueBalance; CalcOverdueBalance())
+            field(OverdueBalance; Rec.CalcOverdueBalance())
             {
                 ApplicationArea = Basic, Suite;
                 CaptionClass = OverdueAmountsTxt;
@@ -83,14 +83,14 @@ page 1871 "Credit Limit Details"
                     DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
                     CustLedgEntry: Record "Cust. Ledger Entry";
                 begin
-                    DtldCustLedgEntry.SetFilter("Customer No.", "No.");
-                    CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
-                    CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
-                    CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
+                    DtldCustLedgEntry.SetFilter("Customer No.", Rec."No.");
+                    Rec.CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                    Rec.CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                    Rec.CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
                     CustLedgEntry.DrillDownOnOverdueEntries(DtldCustLedgEntry);
                 end;
             }
-            field(GetInvoicedPrepmtAmountLCY; GetInvoicedPrepmtAmountLCY())
+            field(GetInvoicedPrepmtAmountLCY; Rec.GetInvoicedPrepmtAmountLCY())
             {
                 ApplicationArea = Prepayments;
                 Caption = 'Invoiced Prepayment Amount (LCY)';
@@ -106,9 +106,9 @@ page 1871 "Credit Limit Details"
 
     trigger OnOpenPage()
     begin
-        if GetFilter("Date Filter") = '' then
-            SetFilter("Date Filter", '..%1', WorkDate());
-        CalcFields("Balance (LCY)", "Shipped Not Invoiced (LCY)", "Serv Shipped Not Invoiced(LCY)");
+        if Rec.GetFilter("Date Filter") = '' then
+            Rec.SetFilter("Date Filter", '..%1', WorkDate());
+        Rec.CalcFields("Balance (LCY)", "Shipped Not Invoiced (LCY)", "Serv Shipped Not Invoiced(LCY)");
     end;
 
     var
@@ -116,23 +116,17 @@ page 1871 "Credit Limit Details"
         ShippedRetRcdNotIndLCY: Decimal;
         OrderAmountThisOrderLCY: Decimal;
         CustCreditAmountLCY: Decimal;
-#if not CLEAN20
-        ExtensionAmounts: List of [Decimal];
-#endif
         ExtensionAmountsDic: Dictionary of [Guid, Decimal];
         OverdueAmountsTxt: Label 'Overdue Amounts (LCY)';
 
     procedure PopulateDataOnNotification(var CreditLimitNotification: Notification)
     begin
-        CreditLimitNotification.SetData(FieldName("No."), Format("No."));
+        CreditLimitNotification.SetData(Rec.FieldName("No."), Format(Rec."No."));
         CreditLimitNotification.SetData('OrderAmountTotalLCY', Format(OrderAmountTotalLCY));
         CreditLimitNotification.SetData('ShippedRetRcdNotIndLCY', Format(ShippedRetRcdNotIndLCY));
         CreditLimitNotification.SetData('OrderAmountThisOrderLCY', Format(OrderAmountThisOrderLCY));
         CreditLimitNotification.SetData('CustCreditAmountLCY', Format(CustCreditAmountLCY));
 
-#if not CLEAN20
-        OnAfterPopulateDataOnNotification(CreditLimitNotification, ExtensionAmounts);
-#endif
         OnAfterPopulateDataOnNotificationProcedure(CreditLimitNotification, ExtensionAmountsDic);
     end;
 
@@ -140,27 +134,24 @@ page 1871 "Credit Limit Details"
     var
         Customer: Record Customer;
     begin
-        Get(CreditLimitNotification.GetData(Customer.FieldName("No.")));
-        SetRange("No.", "No.");
+        Rec.Get(CreditLimitNotification.GetData(Customer.FieldName("No.")));
+        Rec.SetRange("No.", Rec."No.");
 
-        if GetFilter("Date Filter") = '' then
-            SetFilter("Date Filter", '..%1', WorkDate());
-        CalcFields("Balance (LCY)", "Shipped Not Invoiced (LCY)", "Serv Shipped Not Invoiced(LCY)");
+        if Rec.GetFilter("Date Filter") = '' then
+            Rec.SetFilter("Date Filter", '..%1', WorkDate());
+        Rec.CalcFields("Balance (LCY)", "Shipped Not Invoiced (LCY)", "Serv Shipped Not Invoiced(LCY)");
 
         Evaluate(OrderAmountTotalLCY, CreditLimitNotification.GetData('OrderAmountTotalLCY'));
         Evaluate(ShippedRetRcdNotIndLCY, CreditLimitNotification.GetData('ShippedRetRcdNotIndLCY'));
         Evaluate(OrderAmountThisOrderLCY, CreditLimitNotification.GetData('OrderAmountThisOrderLCY'));
         Evaluate(CustCreditAmountLCY, CreditLimitNotification.GetData('CustCreditAmountLCY'));
 
-#if not CLEAN20
-        OnAfterInitializeFromNotificationVar(CreditLimitNotification, ExtensionAmounts);
-#endif
         OnAfterInitializeFromNotificationVarProcedure(CreditLimitNotification, ExtensionAmountsDic);
     end;
 
     procedure SetCustomerNumber(Value: Code[20])
     begin
-        Get(Value);
+        Rec.Get(Value);
     end;
 
     procedure SetOrderAmountTotalLCY(Value: Decimal)
@@ -183,20 +174,6 @@ page 1871 "Credit Limit Details"
         CustCreditAmountLCY := Value;
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by SetExtensionAmounts(FromExtensionAmounts: Dictionary of [Guid, Decimal])', '20.0')]
-    procedure SetExtensionAmounts(FromExtensionAmounts: List of [Decimal])
-    begin
-        ExtensionAmounts := FromExtensionAmounts;
-    end;
-
-    [Obsolete('Replaced by GetExtensionAmounts(var ToExtensionAmounts: Dictionary of [Guid, Decimal])', '20.0')]
-    procedure GetExtensionAmounts(var ToExtensionAmounts: List of [Decimal])
-    begin
-        ToExtensionAmounts := ExtensionAmounts;
-    end;
-#endif
-
     procedure SetExtensionAmounts(FromExtensionAmounts: Dictionary of [Guid, Decimal])
     begin
         ExtensionAmountsDic := FromExtensionAmounts;
@@ -206,20 +183,6 @@ page 1871 "Credit Limit Details"
     begin
         ToExtensionAmounts := ExtensionAmountsDic;
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by OnAfterPopulateDataOnNotificationProcedure()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPopulateDataOnNotification(var CreditLimitNotification: Notification; var ExtensionAmounts: List of [Decimal])
-    begin
-    end;
-
-    [Obsolete('Replaced by OnAfterInitializeFromNotificationVarProcedure()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInitializeFromNotificationVar(CreditLimitNotification: Notification; var ExtensionAmounts: List of [Decimal])
-    begin
-    end;
-#endif    
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterPopulateDataOnNotificationProcedure(CreditLimitNotification: Notification; var ExtensionAmountsDic: Dictionary of [Guid, Decimal])

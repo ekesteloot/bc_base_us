@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Setup;
+
 page 1112 "Cost Object Card"
 {
     Caption = 'Cost Object Card';
@@ -12,7 +17,7 @@ page 1112 "Cost Object Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the code for the cost object.';
@@ -28,12 +33,12 @@ page 1112 "Cost Object Card"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the purpose of the cost object, such as Cost Object, Heading, or Begin-Total. Newly created cost objects are automatically assigned the Cost Object type, but you can change this.';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies a comment that applies to the cost object.';
@@ -59,7 +64,7 @@ page 1112 "Cost Object Card"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies if you want a new page to start immediately after this cost center when you print the chart of cash flow accounts.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -82,8 +87,8 @@ page 1112 "Cost Object Card"
                     Caption = 'E&ntries';
                     Image = Entries;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Cost Object Code" = FIELD(Code);
-                    RunPageView = SORTING("Cost Object Code", "Cost Type No.", Allocated, "Posting Date");
+                    RunPageLink = "Cost Object Code" = field(Code);
+                    RunPageView = sorting("Cost Object Code", "Cost Type No.", Allocated, "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the entries for the cost object.';
                 }
@@ -102,10 +107,10 @@ page 1112 "Cost Object Card"
                     var
                         CostType: Record "Cost Type";
                     begin
-                        if Totaling = '' then
-                            CostType.SetFilter("Cost Object Filter", Code)
+                        if Rec.Totaling = '' then
+                            CostType.SetFilter("Cost Object Filter", Rec.Code)
                         else
-                            CostType.SetFilter("Cost Object Filter", Totaling);
+                            CostType.SetFilter("Cost Object Filter", Rec.Totaling);
 
                         PAGE.Run(PAGE::"Cost Type Balance", CostType);
                     end;

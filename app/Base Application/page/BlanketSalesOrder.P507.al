@@ -1,10 +1,23 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Shared.Archive;
+using System.Automation;
+using System.Security.User;
+
 page 507 "Blanket Sales Order"
 {
     Caption = 'Blanket Sales Order';
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = FILTER("Blanket Order"));
+    SourceTableView = where("Document Type" = filter("Blanket Order"));
 
     layout
     {
@@ -22,7 +35,7 @@ page 507 "Blanket Sales Order"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -37,7 +50,7 @@ page 507 "Blanket Sales Order"
                     trigger OnValidate()
                     begin
                         IsSalesLinesEditable := Rec.SalesLinesEditable();
-                        SelltoCustomerNoOnAfterValidate(Rec, xRec);
+                        Rec.SelltoCustomerNoOnAfterValidate(Rec, xRec);
                         CurrPage.Update();
                     end;
                 }
@@ -50,7 +63,7 @@ page 507 "Blanket Sales Order"
 
                     trigger OnValidate()
                     begin
-                        SelltoCustomerNoOnAfterValidate(Rec, xRec);
+                        Rec.SelltoCustomerNoOnAfterValidate(Rec, xRec);
 
                         CurrPage.Update();
                     end;
@@ -109,7 +122,7 @@ page 507 "Blanket Sales Order"
 
                         trigger OnLookup(var Text: Text): Boolean
                         begin
-                            if not SelltoContactLookup() then
+                            if not Rec.SelltoContactLookup() then
                                 exit(false);
                             Text := Rec."Sell-to Contact No.";
                             CurrPage.Update();
@@ -118,10 +131,10 @@ page 507 "Blanket Sales Order"
 
                         trigger OnValidate()
                         begin
-                            if GetFilter("Sell-to Contact No.") = xRec."Sell-to Contact No." then
-                                if "Sell-to Contact No." <> xRec."Sell-to Contact No." then
-                                    SetRange("Sell-to Contact No.");
-                            if "Sell-to Contact No." <> xRec."Sell-to Contact No." then
+                            if Rec.GetFilter("Sell-to Contact No.") = xRec."Sell-to Contact No." then
+                                if Rec."Sell-to Contact No." <> xRec."Sell-to Contact No." then
+                                    Rec.SetRange("Sell-to Contact No.");
+                            if Rec."Sell-to Contact No." <> xRec."Sell-to Contact No." then
                                 CurrPage.Update();
                         end;
                     }
@@ -157,7 +170,7 @@ page 507 "Blanket Sales Order"
                 {
                     ApplicationArea = Suite;
                     Caption = 'Contact';
-                    Editable = "Sell-to Customer No." <> '';
+                    Editable = Rec."Sell-to Customer No." <> '';
                     ToolTip = 'Specifies the name of the contact person at the customer.';
                 }
                 field("No. of Archived Versions"; Rec."No. of Archived Versions")
@@ -223,13 +236,25 @@ page 507 "Blanket Sales Order"
                     StyleExpr = StatusStyleTxt;
                     ToolTip = 'Specifies whether the document is open, waiting to be approved, has been invoiced for prepayment, or has been released to the next stage of processing.';
                 }
+                field("Language Code"; Rec."Language Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the language to be used on printouts for this document.';
+                    Visible = false;
+                }
+                field("Format Region"; Rec."Format Region")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the format to be used on printouts for this document.';
+                    Visible = false;
+                }
             }
             part(SalesLines; "Blanket Sales Order Subform")
             {
                 ApplicationArea = Suite;
                 Editable = IsSalesLinesEditable;
                 Enabled = IsSalesLinesEditable;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
                 UpdatePropagation = Both;
             }
             group("Invoice Details")
@@ -243,9 +268,9 @@ page 507 "Blanket Sales Order"
                     trigger OnAssistEdit()
                     begin
                         Clear(ChangeExchangeRate);
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", WorkDate());
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
                             SaveInvoiceDiscountAmount();
                         end;
                         Clear(ChangeExchangeRate);
@@ -362,7 +387,7 @@ page 507 "Blanket Sales Order"
             group("Shipping and Billing")
             {
                 Caption = 'Shipping and Billing';
-                Enabled = "Sell-to Customer No." <> '';
+                Enabled = Rec."Sell-to Customer No." <> '';
                 group(Control25)
                 {
                     ShowCaption = false;
@@ -385,23 +410,23 @@ page 507 "Blanket Sales Order"
                                 case ShipToOptions of
                                     ShipToOptions::"Default (Sell-to Address)":
                                         begin
-                                            Validate("Ship-to Code", '');
-                                            CopySellToAddressToShipToAddress();
+                                            Rec.Validate("Ship-to Code", '');
+                                            Rec.CopySellToAddressToShipToAddress();
                                         end;
                                     ShipToOptions::"Alternate Shipping Address":
                                         begin
-                                            ShipToAddress.SetRange("Customer No.", "Sell-to Customer No.");
+                                            ShipToAddress.SetRange("Customer No.", Rec."Sell-to Customer No.");
                                             ShipToAddressList.LookupMode := true;
                                             ShipToAddressList.SetTableView(ShipToAddress);
 
                                             if ShipToAddressList.RunModal() = ACTION::LookupOK then begin
                                                 ShipToAddressList.GetRecord(ShipToAddress);
-                                                Validate("Ship-to Code", ShipToAddress.Code);
+                                                Rec.Validate("Ship-to Code", ShipToAddress.Code);
                                             end else
                                                 ShipToOptions := ShipToOptions::"Custom Address";
                                         end;
                                     ShipToOptions::"Custom Address":
-                                        Validate("Ship-to Code", '');
+                                        Rec.Validate("Ship-to Code", '');
                                 end;
 
                                 OnAfterValidateShipToOptions(Rec, ShipToOptions.AsInteger());
@@ -421,7 +446,7 @@ page 507 "Blanket Sales Order"
 
                                 trigger OnValidate()
                                 begin
-                                    if (xRec."Ship-to Code" <> '') and ("Ship-to Code" = '') then
+                                    if (xRec."Ship-to Code" <> '') and (Rec."Ship-to Code" = '') then
                                         Error(EmptyShipToCodeErr);
                                 end;
                             }
@@ -537,11 +562,11 @@ page 507 "Blanket Sales Order"
                         trigger OnValidate()
                         begin
                             if BillToOptions = BillToOptions::"Default (Customer)" then begin
-                                Validate("Bill-to Customer No.", "Sell-to Customer No.");
-                                RecallModifyAddressNotification(GetModifyBillToCustomerAddressNotificationId());
+                                Rec.Validate("Bill-to Customer No.", Rec."Sell-to Customer No.");
+                                Rec.RecallModifyAddressNotification(Rec.GetModifyBillToCustomerAddressNotificationId());
                             end;
 
-                            CopySellToAddressToBillToAddress();
+                            Rec.CopySellToAddressToBillToAddress();
                         end;
                     }
                     group(Control43)
@@ -559,9 +584,9 @@ page 507 "Blanket Sales Order"
 
                             trigger OnValidate()
                             begin
-                                if GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
-                                    if "Bill-to Customer No." <> xRec."Bill-to Customer No." then
-                                        SetRange("Bill-to Customer No.");
+                                if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
+                                    if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
+                                        Rec.SetRange("Bill-to Customer No.");
                                 CurrPage.Update();
                             end;
                         }
@@ -569,8 +594,8 @@ page 507 "Blanket Sales Order"
                         {
                             ApplicationArea = Suite;
                             Caption = 'Address';
-                            Editable = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
-                            Enabled = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
+                            Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
+                            Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the address of the customer that you will send the invoice to.';
@@ -579,8 +604,8 @@ page 507 "Blanket Sales Order"
                         {
                             ApplicationArea = Suite;
                             Caption = 'Address 2';
-                            Editable = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
-                            Enabled = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
+                            Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
+                            Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies an additional part of the billing address.';
@@ -589,8 +614,8 @@ page 507 "Blanket Sales Order"
                         {
                             ApplicationArea = Suite;
                             Caption = 'City';
-                            Editable = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
-                            Enabled = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
+                            Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
+                            Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the city of the billing address.';
@@ -598,8 +623,8 @@ page 507 "Blanket Sales Order"
                         field("Bill-to County"; Rec."Bill-to County")
                         {
                             Caption = 'State';
-                            Editable = "Bill-to Customer No." <> "Sell-to Customer No.";
-                            Enabled = "Bill-to Customer No." <> "Sell-to Customer No.";
+                            Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
+                            Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                             QuickEntry = false;
                             ToolTip = 'Specifies the state that is used to calculate and post sales tax.';
                         }
@@ -607,8 +632,8 @@ page 507 "Blanket Sales Order"
                         {
                             ApplicationArea = Suite;
                             Caption = 'Post Code';
-                            Editable = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
-                            Enabled = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
+                            Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
+                            Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                             Importance = Additional;
                             QuickEntry = false;
                             ToolTip = 'Specifies the postal code of the billing address.';
@@ -617,8 +642,8 @@ page 507 "Blanket Sales Order"
                         {
                             ApplicationArea = Suite;
                             Caption = 'Contact No.';
-                            Editable = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
-                            Enabled = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
+                            Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
+                            Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                             Importance = Additional;
                             ToolTip = 'Specifies the number of the contact person at the billing address.';
                         }
@@ -626,8 +651,8 @@ page 507 "Blanket Sales Order"
                         {
                             ApplicationArea = Suite;
                             Caption = 'Contact';
-                            Editable = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
-                            Enabled = (BillToOptions = BillToOptions::"Custom Address") OR ("Bill-to Customer No." <> "Sell-to Customer No.");
+                            Editable = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
+                            Enabled = (BillToOptions = BillToOptions::"Custom Address") or (Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.");
                             ToolTip = 'Specifies the name of the contact person at the billing address';
                         }
                         field(BillToContactPhoneNo; BillToContact."Phone No.")
@@ -683,7 +708,7 @@ page 507 "Blanket Sales Order"
                     ApplicationArea = BasicEU;
                     ToolTip = 'Specifies the point of exit through which you ship the items out of your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU;
                     ToolTip = 'Specifies the country or region of origin for the purpose of Intrastat reporting.';
@@ -696,38 +721,38 @@ page 507 "Blanket Sales Order"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Sales Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Sales Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(Control13; "Pending Approval FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Table ID" = CONST(36),
-                              "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No."),
+                SubPageLink = "Table ID" = const(36),
+                              "Document Type" = field("Document Type"),
+                              "Document No." = field("No."),
                               Status = const(Open);
                 Visible = OpenApprovalEntriesExistForCurrUser;
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
+                SubPageLink = "No." = field("Bill-to Customer No."),
                               "Date Filter" = field("Date Filter");
             }
             part(Control1900316107; "Customer Details FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Sell-to Customer No."),
+                SubPageLink = "No." = field("Sell-to Customer No."),
                               "Date Filter" = field("Date Filter");
             }
             part(Control1906127307; "Sales Line FactBox")
             {
                 ApplicationArea = Suite;
                 Provider = SalesLines;
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("Document No."),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("Document No."),
+                              "Line No." = field("Line No.");
                 Visible = false;
             }
             part(ApprovalFactBox; "Approval FactBox")
@@ -739,7 +764,7 @@ page 507 "Blanket Sales Order"
             {
                 ApplicationArea = Suite;
                 Provider = SalesLines;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = false;
             }
             part(WorkflowStatus; "Workflow Status FactBox")
@@ -787,9 +812,9 @@ page 507 "Blanket Sales Order"
                         if Handled then
                             exit;
 
-                        PrepareOpeningDocumentStatistics();
+                        Rec.PrepareOpeningDocumentStatistics();
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        ShowDocumentStatisticsPage();
+                        Rec.ShowDocumentStatisticsPage();
                     end;
                 }
                 action(Card)
@@ -798,7 +823,7 @@ page 507 "Blanket Sales Order"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No.");
+                    RunPageLink = "No." = field("Sell-to Customer No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer on the sales document.';
                 }
@@ -808,9 +833,9 @@ page 507 "Blanket Sales Order"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Blanket Order"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const("Blanket Order"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -818,14 +843,14 @@ page 507 "Blanket Sales Order"
                     AccessByPermission = TableData Dimension = R;
                     ApplicationArea = Dimensions;
                     Caption = 'Dimensions';
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = Dimensions;
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Approvals)
@@ -879,7 +904,7 @@ page 507 "Blanket Sales Order"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ApproveRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.ApproveRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Reject)
@@ -894,7 +919,7 @@ page 507 "Blanket Sales Order"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.RejectRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.RejectRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Delegate)
@@ -909,7 +934,7 @@ page 507 "Blanket Sales Order"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.DelegateRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.DelegateRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Comment)
@@ -954,13 +979,13 @@ page 507 "Blanket Sales Order"
                     ApplicationArea = Suite;
                     Caption = 'Copy Document';
                     Ellipsis = true;
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = CopyDocument;
                     ToolTip = 'Copy document lines and header information from another sales document to this document. You can copy a posted sales invoice into a new sales invoice to quickly create a similar document.';
 
                     trigger OnAction()
                     begin
-                        CopyDocument();
+                        Rec.CopyDocument();
                     end;
                 }
                 action("Archi&ve Document")
@@ -999,7 +1024,7 @@ page 507 "Blanket Sales Order"
                 {
                     ApplicationArea = Suite;
                     Caption = 'Re&open';
-                    Enabled = Status <> Status::Open;
+                    Enabled = Rec.Status <> Rec.Status::Open;
                     Image = ReOpen;
                     ToolTip = 'Reopen the document to change it after it has been approved. Approved documents have the Released status and must be opened before they can be changed';
 
@@ -1206,39 +1231,39 @@ page 507 "Blanket Sales Order"
     trigger OnAfterGetCurrRecord()
     begin
         SetControlAppearance();
-        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(RecordId);
-        CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(RecordId);
-        StatusStyleTxt := GetStatusStyleText();
+        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
+        CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(Rec.RecordId);
+        StatusStyleTxt := Rec.GetStatusStyleText();
     end;
 
     trigger OnAfterGetRecord()
     begin
         UpdateShipToBillToGroupVisibility();
-        SellToContact.GetOrClear("Sell-to Contact No.");
-        BillToContact.GetOrClear("Bill-to Contact No.");
+        SellToContact.GetOrClear(Rec."Sell-to Contact No.");
+        BillToContact.GetOrClear(Rec."Bill-to Contact No.");
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SaveRecord();
-        exit(ConfirmDeletion());
+        exit(Rec.ConfirmDeletion());
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         if DocNoVisible then
-            CheckCreditMaxBeforeInsert();
+            Rec.CheckCreditMaxBeforeInsert();
 
-        if ("Sell-to Customer No." = '') and (GetFilter("Sell-to Customer No.") <> '') then
+        if (Rec."Sell-to Customer No." = '') and (Rec.GetFilter("Sell-to Customer No.") <> '') then
             CurrPage.Update(false);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         xRec.Init();
-        "Responsibility Center" := UserMgt.GetSalesFilter();
-        if (not DocNoVisible) and ("No." = '') then
-            SetSellToCustomerFromFilter();
+        Rec."Responsibility Center" := UserMgt.GetSalesFilter();
+        if (not DocNoVisible) and (Rec."No." = '') then
+            Rec.SetSellToCustomerFromFilter();
         UpdateShipToBillToGroupVisibility();
     end;
 
@@ -1269,13 +1294,9 @@ page 507 "Blanket Sales Order"
         OpenApprovalEntriesExist: Boolean;
         ShowWorkflowStatus: Boolean;
         CanCancelApprovalForRecord: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
-        [InDataSet]
         IsJournalTemplNameVisible: Boolean;
-        [InDataSet]
         IsPaymentMethodCodeVisible: Boolean;
-        [InDataSet]
         IsSalesLinesEditable: Boolean;
 
         EmptyShipToCodeErr: Label 'The Code field can only be empty if you select Custom Address in the Ship-to field.';
@@ -1324,16 +1345,16 @@ page 507 "Blanket Sales Order"
         DocumentNoVisibility: Codeunit DocumentNoVisibility;
         DocType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order",Reminder,FinChMemo;
     begin
-        DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::"Blanket Order", "No.");
+        DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::"Blanket Order", Rec."No.");
     end;
 
     local procedure SetControlAppearance()
     var
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
     begin
-        OpenApprovalEntriesExistForCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        OpenApprovalEntriesExistForCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(Rec.RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
         IsSalesLinesEditable := Rec.SalesLinesEditable();
     end;
 
@@ -1345,8 +1366,8 @@ page 507 "Blanket Sales Order"
         ShipToOptionsOpt := ShipToOptions.AsInteger();
         BillToOptionsOpt := BillToOptions.AsInteger();
         CustomerMgt.CalculateShipToBillToOptions(ShipToOptionsOpt, BillToOptionsOpt, Rec);
-        ShipToOptions := "Sales Ship-To Options".FromInteger(ShipToOptionsOpt);
-        BillToOptions := "Sales Bill-To Options".FromInteger(BillToOptionsOpt);
+        ShipToOptions := Enum::"Sales Ship-To Options".FromInteger(ShipToOptionsOpt);
+        BillToOptions := Enum::"Sales Bill-To Options".FromInteger(BillToOptionsOpt);
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using System.Threading;
+
 codeunit 2583 "Dim Correction Validate"
 {
     TableNo = "Job Queue Entry";

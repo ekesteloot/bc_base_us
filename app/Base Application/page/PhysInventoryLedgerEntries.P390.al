@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 390 "Phys. Inventory Ledger Entries"
 {
     AdditionalSearchTerms = 'physical count entries,inventory cycle entries';
@@ -106,7 +112,7 @@ page 390 "Phys. Inventory Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -215,7 +221,7 @@ page 390 "Phys. Inventory Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -229,7 +235,7 @@ page 390 "Phys. Inventory Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -246,7 +252,7 @@ page 390 "Phys. Inventory Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

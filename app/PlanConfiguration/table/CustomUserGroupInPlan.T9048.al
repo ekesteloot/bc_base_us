@@ -3,6 +3,11 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Azure.Identity;
+
+using System.Security.AccessControl;
+using System.Environment;
+
 table 9048 "Custom User Group In Plan"
 {
     Caption = 'User Group Plan Assignment';

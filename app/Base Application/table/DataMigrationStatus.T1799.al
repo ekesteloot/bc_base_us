@@ -1,3 +1,5 @@
+namespace System.Integration;
+
 table 1799 "Data Migration Status"
 {
     Caption = 'Data Migration Status';
@@ -46,8 +48,8 @@ table 1799 "Data Migration Status"
         }
         field(9; "Error Count"; Integer)
         {
-            CalcFormula = Count("Data Migration Error" WHERE("Migration Type" = FIELD("Migration Type"),
-                                                              "Destination Table ID" = FIELD("Destination Table ID")));
+            CalcFormula = count("Data Migration Error" where("Migration Type" = field("Migration Type"),
+                                                              "Destination Table ID" = field("Destination Table ID")));
             Caption = 'Error Count';
             FieldClass = FlowField;
         }

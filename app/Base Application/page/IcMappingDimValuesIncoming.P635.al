@@ -1,10 +1,14 @@
+namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 635 "IC Mapping Dim Values Incoming"
 {
     PageType = ListPart;
     SourceTable = "IC Dimension Value";
     Editable = true;
-    DeleteAllowed = false;
-    InsertAllowed = false;
+    DeleteAllowed = true;
+    InsertAllowed = true;
 
     layout
     {
@@ -17,8 +21,6 @@ page 635 "IC Mapping Dim Values Incoming"
                     Caption = 'IC Dim. Code';
                     ToolTip = 'Specifies the intercompany''s dimension value code.';
                     ApplicationArea = All;
-                    Editable = false;
-                    Enabled = false;
                     Style = Strong;
                     StyleExpr = Emphasize;
                 }
@@ -27,8 +29,6 @@ page 635 "IC Mapping Dim Values Incoming"
                     Caption = 'IC Dim. Name';
                     ToolTip = 'Specifies the intercompany''s dimension value name.';
                     ApplicationArea = All;
-                    Editable = false;
-                    Enabled = false;
                     Style = Strong;
                     StyleExpr = Emphasize;
                 }
@@ -37,8 +37,6 @@ page 635 "IC Mapping Dim Values Incoming"
                     Caption = 'Blocked';
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
                     ApplicationArea = All;
-                    Editable = false;
-                    Enabled = false;
                 }
                 field(CompanyDimCode; Rec."Map-to Dimension Code")
                 {
@@ -55,8 +53,6 @@ page 635 "IC Mapping Dim Values Incoming"
                     ToolTip = 'Specifies the dimension''s value code associated with the corresponding intercompany''s dimension value.';
                     ApplicationArea = All;
                     TableRelation = "Dimension Value".Code;
-                    Editable = true;
-                    Enabled = true;
                 }
             }
         }

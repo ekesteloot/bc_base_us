@@ -1,3 +1,20 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Calculation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Pricing;
+
 table 7008 "Dtld. Price Calculation Setup"
 {
     Caption = 'Detailed Price Calculation Setup';
@@ -127,17 +144,17 @@ table 7008 "Dtld. Price Calculation Setup"
         {
             Caption = 'Product No.';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Asset Type" = CONST(Item)) Item where("No." = field("Product No."))
-            ELSE
-            IF ("Asset Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Asset Type" = CONST(Resource)) Resource
-            ELSE
-            IF ("Asset Type" = CONST("Resource Group")) "Resource Group"
-            ELSE
-            IF ("Asset Type" = CONST("Item Discount Group")) "Item Discount Group"
-            ELSE
-            IF ("Asset Type" = CONST("Service Cost")) "Service Cost";
+            TableRelation = if ("Asset Type" = const(Item)) Item where("No." = field("Product No."))
+            else
+            if ("Asset Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Asset Type" = const(Resource)) Resource
+            else
+            if ("Asset Type" = const("Resource Group")) "Resource Group"
+            else
+            if ("Asset Type" = const("Item Discount Group")) "Item Discount Group"
+            else
+            if ("Asset Type" = const("Service Cost")) "Service Cost";
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -148,11 +165,11 @@ table 7008 "Dtld. Price Calculation Setup"
         field(14; "Assign-to No."; Code[20])
         {
             DataClassification = CustomerContent;
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Job)) Job
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Job)) Job
+            else
+            if ("Source Type" = const(Vendor)) Vendor;
             ValidateTableRelation = false;
 
             trigger OnValidate()

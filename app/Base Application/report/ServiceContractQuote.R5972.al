@@ -1,9 +1,22 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 5972 "Service Contract Quote"
 {
     // CurrReport.SHOWOUTPUT := FALSE;
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ServiceContractQuote.rdlc';
-
+    RDLCLayout = './ServiceMgt/Reports/ServiceContractQuote.rdlc';
     Caption = 'Service Contract Quote';
 
     dataset
@@ -11,7 +24,7 @@ report 5972 "Service Contract Quote"
         dataitem("Service Contract Header"; "Service Contract Header")
         {
             CalcFields = "Bill-to Name";
-            DataItemTableView = SORTING("Contract Type", "Contract No.") WHERE("Contract Type" = FILTER(Quote));
+            DataItemTableView = sorting("Contract Type", "Contract No.") where("Contract Type" = filter(Quote));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Contract No.", "Customer No.";
             column(ContType_ServContractHdr; "Contract Type")
@@ -23,13 +36,13 @@ report 5972 "Service Contract Quote"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(OutputNo; OutputNo)
                 {
                 }
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfoPicture; CompanyInfo.Picture)
                     {
                     }
@@ -146,9 +159,9 @@ report 5972 "Service Contract Quote"
                     }
                     dataitem("Contract/Service Discount"; "Contract/Service Discount")
                     {
-                        DataItemLink = "Contract Type" = FIELD("Contract Type"), "Contract No." = FIELD("Contract No.");
+                        DataItemLink = "Contract Type" = field("Contract Type"), "Contract No." = field("Contract No.");
                         DataItemLinkReference = "Service Contract Header";
-                        DataItemTableView = SORTING("Contract Type", "Contract No.", Type, "No.", "Starting Date");
+                        DataItemTableView = sorting("Contract Type", "Contract No.", Type, "No.", "Starting Date");
                         column(Type_ContractServDisc; Type)
                         {
                             IncludeCaption = true;
@@ -176,9 +189,9 @@ report 5972 "Service Contract Quote"
                     }
                     dataitem("Service Contract Line"; "Service Contract Line")
                     {
-                        DataItemLink = "Contract Type" = FIELD("Contract Type"), "Contract No." = FIELD("Contract No.");
+                        DataItemLink = "Contract Type" = field("Contract Type"), "Contract No." = field("Contract No.");
                         DataItemLinkReference = "Service Contract Header";
-                        DataItemTableView = SORTING("Contract Type", "Contract No.", "Line No.");
+                        DataItemTableView = sorting("Contract Type", "Contract No.", "Line No.");
                         column(ServItemNo_ServContractLine; "Service Item No.")
                         {
                             IncludeCaption = true;
@@ -222,8 +235,8 @@ report 5972 "Service Contract Quote"
                         }
                         dataitem("Service Comment Line"; "Service Comment Line")
                         {
-                            DataItemLink = "Table Subtype" = FIELD("Contract Type"), "Table Line No." = FIELD("Line No."), "No." = FIELD("Contract No.");
-                            DataItemTableView = SORTING("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") ORDER(Ascending) WHERE("Table Name" = FILTER("Service Contract"));
+                            DataItemLink = "Table Subtype" = field("Contract Type"), "Table Line No." = field("Line No."), "No." = field("Contract No.");
+                            DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") ORDER(Ascending) where("Table Name" = filter("Service Contract"));
                             column(ShowComments; ShowComments)
                             {
                             }
@@ -257,7 +270,7 @@ report 5972 "Service Contract Quote"
                 }
                 dataitem(Shipto; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(ShipToAddr6; ShipToAddr[6])
                     {
                     }
@@ -291,9 +304,9 @@ report 5972 "Service Contract Quote"
                 }
                 dataitem(ServCommentLine2; "Service Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Contract No."), "Table Subtype" = FIELD("Contract Type");
+                    DataItemLink = "No." = field("Contract No."), "Table Subtype" = field("Contract Type");
                     DataItemLinkReference = "Service Contract Header";
-                    DataItemTableView = SORTING("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") ORDER(Ascending) WHERE("Table Name" = FILTER("Service Contract"), "Table Line No." = FILTER(0));
+                    DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") ORDER(Ascending) where("Table Name" = filter("Service Contract"), "Table Line No." = filter(0));
                     column(ShowComments1; ShowComments)
                     {
                     }
@@ -349,6 +362,7 @@ report 5972 "Service Contract Quote"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddr.GetCompanyAddr("Responsibility Center", RespCenter, CompanyInfo, CompanyAddr);
@@ -404,7 +418,7 @@ report 5972 "Service Contract Quote"
 
         trigger OnOpenPage()
         begin
-            LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Service Contract Quote") <> '';
+            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Service Contract Quote") <> '';
             LogInteractionEnable := LogInteraction;
         end;
     }
@@ -426,19 +440,15 @@ report 5972 "Service Contract Quote"
             if "Service Contract Header".FindSet() then
                 repeat
                     if "Service Contract Header"."Contact No." <> '' then
-                        SegManagement.LogDocument(24, "Service Contract Header"."Contract No.", 0, 0, DATABASE::Contact,
+                        SegManagement.LogDocument(24, "Service Contract Header"."Contract No.", 0, 0, Enum::TableID::Contact,
                           "Service Contract Header"."Contact No.", "Service Contract Header"."Salesperson Code", '', '', '')
                     else
-                        SegManagement.LogDocument(24, "Service Contract Header"."Contract No.", 0, 0, DATABASE::Customer,
+                        SegManagement.LogDocument(24, "Service Contract Header"."Contract No.", 0, 0, Enum::TableID::Customer,
                           "Service Contract Header"."Customer No.", "Service Contract Header"."Salesperson Code", '', '', '')
                 until "Service Contract Header".Next() = 0;
     end;
 
     var
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         ServiceSetup: Record "Service Mgt. Setup";
         RespCenter: Record "Responsibility Center";
         Language: Codeunit Language;
@@ -457,7 +467,6 @@ report 5972 "Service Contract Quote"
         Text002: Label 'Page %1';
         LogInteraction: Boolean;
         OutputNo: Integer;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         ServContractStartDtCptnLbl: Label 'Starting Date';
         ServContractNextInvDtCptnLbl: Label 'Next Invoice Date';
@@ -472,6 +481,12 @@ report 5972 "Service Contract Quote"
         ShiptoAddressCaptionLbl: Label 'Ship-to Address';
         CommentsCaptionLbl: Label 'Comments';
         ServCommentLine2DtCaptionLbl: Label 'Date';
+
+    protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     local procedure IsReportInPreviewMode(): Boolean
     var

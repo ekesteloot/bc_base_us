@@ -8,7 +8,7 @@ report 14030 "Official journal ledger Summ."
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             PrintOnlyIfDetail = true;
             column(USERID; UserId)
             {
@@ -85,7 +85,7 @@ report 14030 "Official journal ledger Summ."
             dataitem(Cuenta2; "G/L Account")
             {
                 CalcFields = "Debit Amount", "Credit Amount", "Add.-Currency Debit Amount", "Add.-Currency Credit Amount";
-                DataItemTableView = SORTING("No.");
+                DataItemTableView = sorting("No.");
                 column(j; j)
                 {
                 }
@@ -175,7 +175,7 @@ report 14030 "Official journal ledger Summ."
             dataitem("G/L Account"; "G/L Account")
             {
                 CalcFields = "Debit Amount", "Credit Amount", "Add.-Currency Debit Amount", "Add.-Currency Credit Amount", "Net Change", "Additional-Currency Net Change";
-                DataItemTableView = SORTING("No.");
+                DataItemTableView = sorting("No.");
                 column(j___AddPeriod; j + AddPeriod)
                 {
                 }

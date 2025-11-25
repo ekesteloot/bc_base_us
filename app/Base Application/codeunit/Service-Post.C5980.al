@@ -1,4 +1,21 @@
-﻿codeunit 5980 "Service-Post"
+﻿namespace Microsoft.ServiceMgt.Posting;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Setup;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+
+codeunit 5980 "Service-Post"
 {
     Permissions = TableData "Service Header" = rimd,
                   TableData "Service Item Line" = rimd,

@@ -1,3 +1,8 @@
+namespace System.Azure.Identity;
+
+using System;
+using System.Utilities;
+
 codeunit 6303 "Azure AD Auth Flow"
 {
     // // This codeunit should never be called directly. It should only be called through COD6300.

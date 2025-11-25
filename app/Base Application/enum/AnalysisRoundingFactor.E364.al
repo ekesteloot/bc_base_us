@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 364 "Analysis Rounding Factor"
 {
     AssignmentCompatibility = true;

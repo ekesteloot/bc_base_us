@@ -1,4 +1,6 @@
-﻿enum 5531 "Inventory Page Data Type"
+﻿namespace Microsoft.InventoryMgt.Availability;
+
+enum 5531 "Inventory Page Data Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

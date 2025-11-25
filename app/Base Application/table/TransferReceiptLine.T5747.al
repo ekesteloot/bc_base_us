@@ -1,3 +1,13 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Purchases.Document;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5747 "Transfer Receipt Line"
 {
     Caption = 'Transfer Receipt Line';
@@ -35,13 +45,13 @@ table 5747 "Transfer Receipt Line"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(9; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(10; "Gen. Prod. Posting Group"; Code[20])
         {
@@ -67,7 +77,7 @@ table 5747 "Transfer Receipt Line"
         field(15; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(16; "Gross Weight"; Decimal)
         {
@@ -87,7 +97,7 @@ table 5747 "Transfer Receipt Line"
         field(21; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(22; "Units per Parcel"; Decimal)
         {
@@ -102,8 +112,6 @@ table 5747 "Transfer Receipt Line"
         {
             Caption = 'Transfer Order No.';
             TableRelation = "Transfer Header";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(25; "Receipt Date"; Date)
@@ -119,25 +127,25 @@ table 5747 "Transfer Receipt Line"
         field(27; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(28; "In-Transit Code"; Code[10])
         {
             Caption = 'In-Transit Code';
             Editable = false;
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(true));
+            TableRelation = Location where("Use As In-Transit" = const(true));
         }
         field(29; "Transfer-from Code"; Code[10])
         {
             Caption = 'Transfer-from Code';
             Editable = false;
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(30; "Transfer-to Code"; Code[10])
         {
             Caption = 'Transfer-to Code';
             Editable = false;
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(31; "Item Rcpt. Entry No."; Integer)
         {
@@ -156,7 +164,7 @@ table 5747 "Transfer Receipt Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(5704; "Item Category Code"; Code[20])
@@ -174,9 +182,9 @@ table 5747 "Transfer Receipt Line"
         field(7301; "Transfer-To Bin Code"; Code[20])
         {
             Caption = 'Transfer-To Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Transfer-to Code"),
-                                            "Item Filter" = FIELD("Item No."),
-                                            "Variant Filter" = FIELD("Variant Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Transfer-to Code"),
+                                            "Item Filter" = field("Item No."),
+                                            "Variant Filter" = field("Variant Code"));
         }
     }
 
@@ -199,7 +207,7 @@ table 5747 "Transfer Receipt Line"
     var
         ItemChargeAssignmentPurch: Record "Item Charge Assignment (Purch)";
     begin
-        ItemChargeAssignmentPurch.CheckAssignment("Purchase Applies-to Document Type"::"Transfer Receipt", "Document No.", "Line No.");
+        ItemChargeAssignmentPurch.CheckAssignment(Enum::"Purchase Applies-to Document Type"::"Transfer Receipt", "Document No.", "Line No.");
     end;
 
     var

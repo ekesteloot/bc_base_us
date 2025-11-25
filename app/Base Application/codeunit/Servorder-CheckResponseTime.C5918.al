@@ -1,3 +1,11 @@
+﻿namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Email;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Setup;
+using System.Threading;
+
 codeunit 5918 "ServOrder-Check Response Time"
 {
     TableNo = "Job Queue Entry";
@@ -52,7 +60,7 @@ codeunit 5918 "ServOrder-Check Response Time"
                 end;
             until ServHeader.Next() = 0
         else  // No Pending ServiceHeaders -> deactivate the job queue entry.
-            SetStatus(Status::"On Hold");
+            Rec.SetStatus(Rec.Status::"On Hold");
     end;
 
     var

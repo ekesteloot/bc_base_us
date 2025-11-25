@@ -1,7 +1,22 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace System.Security.AccessControl;
+
+using System.Apps;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Reflection;
+using System.Tooling;
+
 permissionset 2000000002 D365BCInfrastructure
 {
     Assignable = false;
-    IncludedPermissionSets = BaseSystemPermissionSet;
+    IncludedPermissionSets = BaseSystemPermissionSet,
+                             "Role Configuration - Read";
     Permissions = tabledata "All Profile" = RIMD,
                   tabledata "API Webhook Notification" = RIMD,
                   tabledata "API Webhook Notification Aggr" = RIMD,
@@ -25,13 +40,7 @@ permissionset 2000000002 D365BCInfrastructure
                   tabledata "NAV App Object Prerequisites" = Rimd,
                   tabledata "NAV App Tenant Add-In" = Rimd,
                   tabledata "NAV App Tenant Operation" = RIMD,
-                  tabledata Profile = RIMD,
-                  tabledata "Profile Configuration Symbols" = RIMD,
                   tabledata "Published Application" = Rimd,
-                  tabledata "Tenant Profile" = RIMD,
-                  tabledata "Tenant Profile Extension" = RIMD,
-                  tabledata "Tenant Profile Page Metadata" = RIMD,
-                  tabledata "Tenant Profile Setting" = RIMD,
                   tabledata "User Default Style Sheet" = RIMD,
                   tabledata "User Page Metadata" = RIMD,
                   tabledata "Webhook Notification" = RIMD;

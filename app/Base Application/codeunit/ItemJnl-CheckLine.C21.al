@@ -1,4 +1,22 @@
-﻿codeunit 21 "Item Jnl.-Check Line"
+﻿namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using System.Security.User;
+
+codeunit 21 "Item Jnl.-Check Line"
 {
     TableNo = "Item Journal Line";
 
@@ -299,14 +317,14 @@
                     end;
 
                     if WhseValidateSourceLine.WhseLinesExist(
-                         DATABASE::"Prod. Order Line", 3, ItemJnlLine."Order No.", ItemJnlLine."Order Line No.", 0, ItemJnlLine.Quantity)
+                         Enum::TableID::"Prod. Order Line", 3, ItemJnlLine."Order No.", ItemJnlLine."Order Line No.", 0, ItemJnlLine.Quantity)
                     then
                         ShowError := true;
                 end;
             ItemJnlLine."Entry Type"::Consumption:
                 if WhseOrderHandlingRequired(ItemJnlLine, Location) then
                     if WhseValidateSourceLine.WhseLinesExist(
-                         DATABASE::"Prod. Order Component",
+                         Enum::TableID::"Prod. Order Component",
                          3,
                          ItemJnlLine."Order No.",
                          ItemJnlLine."Order Line No.",
@@ -317,7 +335,7 @@
             ItemJnlLine."Entry Type"::"Assembly Consumption":
                 if WhseOrderHandlingRequired(ItemJnlLine, Location) then
                     if WhseValidateSourceLine.WhseLinesExist(
-                         DATABASE::"Assembly Line",
+                         Enum::TableID::"Assembly Line",
                          AssemblyLine."Document Type"::Order.AsInteger(),
                          ItemJnlLine."Order No.",
                          ItemJnlLine."Order Line No.",
@@ -507,19 +525,19 @@
                                 DimCombBlockedErr, "Journal Template Name", "Journal Batch Name", "Line No.", DimMgt.GetDimCombErr()),
                             true));
                 if "Item Charge No." = '' then begin
-                    TableID[1] := DATABASE::Item;
+                    TableID[1] := Enum::TableID::Item;
                     No[1] := "Item No.";
                 end else begin
-                    TableID[1] := DATABASE::"Item Charge";
+                    TableID[1] := Enum::TableID::"Item Charge";
                     No[1] := "Item Charge No.";
                 end;
-                TableID[2] := DATABASE::"Salesperson/Purchaser";
+                TableID[2] := Enum::TableID::"Salesperson/Purchaser";
                 No[2] := "Salespers./Purch. Code";
-                TableID[3] := DATABASE::"Work Center";
+                TableID[3] := Enum::TableID::"Work Center";
                 No[3] := "Work Center No.";
-                TableID[4] := DATABASE::Location;
+                TableID[4] := Enum::TableID::Location;
                 No[4] := "Location Code";
-                TableID[5] := DATABASE::Location;
+                TableID[5] := Enum::TableID::Location;
                 No[5] := "New Location Code";
                 OnCheckDimensionsOnAfterAssignDimTableIDs(ItemJnlLine, TableID, No);
                 if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then begin

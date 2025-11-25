@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Item;
+
 page 6513 "Enter Quantity to Create"
 {
     Caption = 'Enter Quantity to Create';

@@ -1,3 +1,9 @@
+﻿namespace Microsoft.BankMgt.Setup;
+
+using Microsoft.BankMgt.PositivePay;
+using System.IO;
+using System.Reflection;
+
 table 1200 "Bank Export/Import Setup"
 {
     Caption = 'Bank Export/Import Setup';
@@ -40,43 +46,47 @@ table 1200 "Bank Export/Import Setup"
         field(4; "Processing Codeunit ID"; Integer)
         {
             Caption = 'Processing Codeunit ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Codeunit));
         }
-        field(5; "Processing Codeunit Name"; Text[80])
+#pragma warning disable AS0086
+        field(5; "Processing Codeunit Name"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
-                                                                           "Object ID" = FIELD("Processing Codeunit ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Codeunit),
+                                                                           "Object ID" = field("Processing Codeunit ID")));
             Caption = 'Processing Codeunit Name';
             Editable = false;
             FieldClass = FlowField;
         }
+#pragma warning restore AS0086
         field(6; "Processing XMLport ID"; Integer)
         {
             Caption = 'Processing XMLport ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(XMLport));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(XMLport));
         }
-        field(7; "Processing XMLport Name"; Text[80])
+#pragma warning disable AS0086
+        field(7; "Processing XMLport Name"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(XMLport),
-                                                                           "Object ID" = FIELD("Processing XMLport ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(XMLport),
+                                                                           "Object ID" = field("Processing XMLport ID")));
             Caption = 'Processing XMLport Name';
             Editable = false;
             FieldClass = FlowField;
         }
+#pragma warning restore AS0086
         field(8; "Data Exch. Def. Code"; Code[20])
         {
             Caption = 'Data Exch. Def. Code';
-            TableRelation = IF (Direction = CONST(Import)) "Data Exch. Def".Code WHERE(Type = CONST("Bank Statement Import"))
-            ELSE
-            IF (Direction = CONST(Export)) "Data Exch. Def".Code WHERE(Type = CONST("Payment Export"))
-            ELSE
-            IF (Direction = CONST("Export-Positive Pay")) "Data Exch. Def".Code WHERE(Type = CONST("Positive Pay Export"))
-            ELSE
-            IF (Direction = CONST("Export-EFT")) "Data Exch. Def".Code WHERE(Type = CONST("EFT Payment Export"));
+            TableRelation = if (Direction = const(Import)) "Data Exch. Def".Code where(Type = const("Bank Statement Import"))
+            else
+            if (Direction = const(Export)) "Data Exch. Def".Code where(Type = const("Payment Export"))
+            else
+            if (Direction = const("Export-Positive Pay")) "Data Exch. Def".Code where(Type = const("Positive Pay Export"))
+            else
+            if (Direction = const("Export-EFT")) "Data Exch. Def".Code where(Type = const("EFT Payment Export"));
         }
         field(9; "Data Exch. Def. Name"; Text[100])
         {
-            CalcFormula = Lookup ("Data Exch. Def".Name WHERE(Code = FIELD("Data Exch. Def. Code")));
+            CalcFormula = Lookup("Data Exch. Def".Name where(Code = field("Data Exch. Def. Code")));
             Caption = 'Data Exch. Def. Name';
             Editable = false;
             FieldClass = FlowField;
@@ -89,16 +99,18 @@ table 1200 "Bank Export/Import Setup"
         field(11; "Check Export Codeunit"; Integer)
         {
             Caption = 'Check Export Codeunit';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Codeunit));
         }
-        field(12; "Check Export Codeunit Name"; Text[30])
+#pragma warning disable AS0086
+        field(12; "Check Export Codeunit Name"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
-                                                                           "Object ID" = FIELD("Check Export Codeunit")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Codeunit),
+                                                                           "Object ID" = field("Check Export Codeunit")));
             Caption = 'Check Export Codeunit Name';
             Editable = false;
             FieldClass = FlowField;
         }
+#pragma warning restore AS0086
     }
 
     keys

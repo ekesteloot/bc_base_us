@@ -1,7 +1,12 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+
 report 809 "Where-Used List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/WhereUsedList.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/WhereUsedList.rdlc';
     ApplicationArea = Assembly;
     Caption = 'Where-Used List';
     UsageCategory = ReportsAndAnalysis;
@@ -35,12 +40,12 @@ report 809 "Where-Used List"
             }
             dataitem("BOM Component"; "BOM Component")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING(Type, "No.") WHERE(Type = CONST(Item));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting(Type, "No.") where(Type = const(Item));
                 dataitem(Item2; Item)
                 {
-                    DataItemLink = "No." = FIELD("Parent Item No.");
-                    DataItemTableView = SORTING("No.");
+                    DataItemLink = "No." = field("Parent Item No.");
+                    DataItemTableView = sorting("No.");
                     column(Position_BOMComponent; "BOM Component".Position)
                     {
                         IncludeCaption = true;

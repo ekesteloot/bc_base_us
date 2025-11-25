@@ -1,3 +1,12 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.Foundation.NoSeries;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 5605 "FA Journal Setup"
 {
     Caption = 'FA Journal Setup';
@@ -15,8 +24,6 @@ table 5605 "FA Journal Setup"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -40,7 +47,7 @@ table 5605 "FA Journal Setup"
         field(4; "FA Jnl. Batch Name"; Code[10])
         {
             Caption = 'FA Jnl. Batch Name';
-            TableRelation = "FA Journal Batch".Name WHERE("Journal Template Name" = FIELD("FA Jnl. Template Name"));
+            TableRelation = "FA Journal Batch".Name where("Journal Template Name" = field("FA Jnl. Template Name"));
         }
         field(5; "Gen. Jnl. Template Name"; Code[10])
         {
@@ -55,7 +62,7 @@ table 5605 "FA Journal Setup"
         field(6; "Gen. Jnl. Batch Name"; Code[10])
         {
             Caption = 'Gen. Jnl. Batch Name';
-            TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Gen. Jnl. Template Name"));
+            TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = field("Gen. Jnl. Template Name"));
         }
         field(7; "Insurance Jnl. Template Name"; Code[10])
         {
@@ -70,7 +77,7 @@ table 5605 "FA Journal Setup"
         field(8; "Insurance Jnl. Batch Name"; Code[10])
         {
             Caption = 'Insurance Jnl. Batch Name';
-            TableRelation = "Insurance Journal Batch".Name WHERE("Journal Template Name" = FIELD("Insurance Jnl. Template Name"));
+            TableRelation = "Insurance Journal Batch".Name where("Journal Template Name" = field("Insurance Jnl. Template Name"));
         }
     }
 

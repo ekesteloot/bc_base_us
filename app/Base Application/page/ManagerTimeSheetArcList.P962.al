@@ -6,7 +6,7 @@ page 962 "Manager Time Sheet Arc. List"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Time Sheet Header Archive";
-    SourceTableView = SORTING("Resource No.", "Starting Date") order(descending);
+    SourceTableView = sorting("Resource No.", "Starting Date") order(descending);
     UsageCategory = History;
 
     layout
@@ -70,8 +70,8 @@ page 962 "Manager Time Sheet Arc. List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Time Sheet Arc. Comment Sheet";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Time Sheet Line No." = CONST(0);
+                    RunPageLink = "No." = field("No."),
+                                  "Time Sheet Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Posting E&ntries")
@@ -80,7 +80,7 @@ page 962 "Manager Time Sheet Arc. List"
                     Caption = 'Posting E&ntries';
                     Image = PostingEntries;
                     RunObject = Page "Time Sheet Posting Entries";
-                    RunPageLink = "Time Sheet No." = FIELD("No.");
+                    RunPageLink = "Time Sheet No." = field("No.");
                     ToolTip = 'View the resource ledger entries that have been posted in connection with the.';
                 }
             }
@@ -108,7 +108,7 @@ page 962 "Manager Time Sheet Arc. List"
     begin
         if UserSetup.Get(UserId) then
             CurrPage.Editable := UserSetup."Time Sheet Admin.";
-        TimeSheetMgt.FilterTimeSheetsArchive(Rec, FieldNo("Approver User ID"));
+        TimeSheetMgt.FilterTimeSheetsArchive(Rec, Rec.FieldNo("Approver User ID"));
         OnAfterOnOpenPage(Rec);
     end;
 
@@ -124,7 +124,7 @@ page 962 "Manager Time Sheet Arc. List"
     begin
 #if not CLEAN22
         if not TimeSheetMgt.TimeSheetV2Enabled() then begin
-            TimeSheetMgt.SetTimeSheetArchiveNo("No.", TimeSheetLineArchive);
+            TimeSheetMgt.SetTimeSheetArchiveNo(Rec."No.", TimeSheetLineArchive);
             Page.Run(Page::"Manager Time Sheet Archive", TimeSheetLineArchive);
             exit;
         end;

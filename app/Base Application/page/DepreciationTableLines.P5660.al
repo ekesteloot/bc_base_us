@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 page 5660 "Depreciation Table Lines"
 {
     Caption = 'Lines';
@@ -38,7 +40,7 @@ page 5660 "Depreciation Table Lines"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        NewRecord();
+        Rec.NewRecord();
     end;
 }
 

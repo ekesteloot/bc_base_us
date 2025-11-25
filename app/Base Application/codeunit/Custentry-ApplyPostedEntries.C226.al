@@ -1,3 +1,14 @@
+namespace Microsoft.Sales.Receivables;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+
 codeunit 226 "CustEntry-Apply Posted Entries"
 {
     EventSubscriberInstance = Manual;
@@ -52,18 +63,6 @@ codeunit 226 "CustEntry-Apply Posted Entries"
         CannotUnapplyExchRateErr: Label 'You cannot unapply the entry with the posting date %1, because the exchange rate for the additional reporting currency has been changed.';
         CannotUnapplyInReversalErr: Label 'You cannot unapply Cust. Ledger Entry No. %1 because the entry is part of a reversal.';
         CannotApplyClosedEntriesErr: Label 'One or more of the entries that you selected is closed. You cannot apply closed entries.';
-
-#if not CLEAN20
-    [Obsolete('Replaced by W1 implementation of Apply()', '20.0')]
-    procedure Apply(CustLedgEntry: Record "Cust. Ledger Entry"; DocumentNo: Code[20]; ApplicationDate: Date): Boolean
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        exit(Apply(CustLedgEntry, ApplyUnapplyParameters));
-    end;
-#endif
 
     procedure Apply(CustLedgEntry: Record "Cust. Ledger Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters"): Boolean
     var
@@ -288,34 +287,10 @@ codeunit 226 "CustEntry-Apply Posted Entries"
         OnAfterUnApplyCustomer(DtldCustLedgEntry);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by PostUnApplyCustomer(DtldCustLedgEntry2; ApplyUnapplyParameters)', '20.0')]
-    procedure PostUnApplyCustomer(DtldCustLedgEntry2: Record "Detailed Cust. Ledg. Entry"; DocNo: Code[20]; PostingDate: Date)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocNo;
-        ApplyUnapplyParameters."Posting Date" := PostingDate;
-        PostUnApplyCustomerCommit(DtldCustLedgEntry2, ApplyUnapplyParameters, true);
-    end;
-#endif
-
     procedure PostUnApplyCustomer(DtldCustLedgEntry2: Record "Detailed Cust. Ledg. Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     begin
         PostUnApplyCustomerCommit(DtldCustLedgEntry2, ApplyUnapplyParameters, true);
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by PostUnApplyCustomerCommit(DtldCustLedgEntry2; ApplyUnapplyParameters; CommitChanges)', '20.0')]
-    procedure PostUnApplyCustomerCommit(DtldCustLedgEntry2: Record "Detailed Cust. Ledg. Entry"; DocNo: Code[20]; PostingDate: Date; CommitChanges: Boolean)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocNo;
-        ApplyUnapplyParameters."Posting Date" := PostingDate;
-        PostUnApplyCustomerCommit(DtldCustLedgEntry2, ApplyUnapplyParameters, CommitChanges);
-    end;
-#endif
 
     procedure PostUnApplyCustomerCommit(DtldCustLedgEntry2: Record "Detailed Cust. Ledg. Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters"; CommitChanges: Boolean)
     var
@@ -563,18 +538,6 @@ codeunit 226 "CustEntry-Apply Posted Entries"
         exit(LastTransactionNo);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by PreviewApply(CustLedgEntry; ApplyUnapplyParameters)', '20.0')]
-    procedure PreviewApply(CustLedgEntry: Record "Cust. Ledger Entry"; DocumentNo: Code[20]; ApplicationDate: Date)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        PreviewApply(CustLedgEntry, ApplyUnapplyParameters);
-    end;
-#endif
-
     procedure PreviewApply(CustLedgEntry: Record "Cust. Ledger Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     var
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
@@ -589,18 +552,6 @@ codeunit 226 "CustEntry-Apply Posted Entries"
         GenJnlPostPreview.Preview(CustEntryApplyPostedEntries, CustLedgEntry);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by PreviewUnapply(DetailedCustLedgEntry; ApplyUnapplyParameters)', '20.0')]
-    procedure PreviewUnapply(DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; DocumentNo: Code[20]; ApplicationDate: Date)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        PreviewUnapply(DetailedCustLedgEntry, ApplyUnapplyParameters);
-    end;
-#endif
-
     procedure PreviewUnapply(DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
@@ -612,35 +563,11 @@ codeunit 226 "CustEntry-Apply Posted Entries"
         GenJnlPostPreview.Preview(CustEntryApplyPostedEntries, CustLedgEntry);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by SetApplyContext(ApplyUnapplyParameters)', '20.0')]
-    procedure SetApplyContext(ApplicationDate: Date; DocumentNo: Code[20])
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        SetApplyContext(ApplyUnapplyParameters);
-    end;
-#endif
-
     procedure SetApplyContext(ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     begin
         ApplyUnapplyParametersContext := ApplyUnapplyParameters;
         RunOptionPreviewContext := RunOptionPreview::Apply;
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by SetUnapplyContext(DetailedCustLedgEntry, ApplyUnapplyParameters)', '20.0')]
-    procedure SetUnapplyContext(var DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; ApplicationDate: Date; DocumentNo: Code[20])
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        SetUnapplyContext(DetailedCustLedgEntry, ApplyUnapplyParameters);
-    end;
-#endif
 
     procedure SetUnapplyContext(var DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     begin

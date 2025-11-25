@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 page 99000753 "Shop Calendar Holidays"
 {
     Caption = 'Shop Calendar Holidays';
@@ -13,7 +15,7 @@ page 99000753 "Shop Calendar Holidays"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the date to set up as a shop calendar holiday.';

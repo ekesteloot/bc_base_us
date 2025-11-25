@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Posting;
+
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Document;
+
 codeunit 5979 "Service-Post and Send"
 {
     TableNo = "Service Header";

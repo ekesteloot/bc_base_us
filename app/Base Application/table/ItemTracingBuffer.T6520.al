@@ -1,3 +1,13 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Security.AccessControl;
+
 table 6520 "Item Tracing Buffer"
 {
     Caption = 'Item Tracing Buffer';
@@ -52,11 +62,11 @@ table 6520 "Item Tracing Buffer"
             Caption = 'Source No.';
             DataClassification = SystemMetadata;
             Editable = false;
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type" = CONST(Item)) Item;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor
+            else
+            if ("Source Type" = const(Item)) Item;
         }
         field(9; "Source Name"; Text[100])
         {
@@ -119,7 +129,7 @@ table 6520 "Item Tracing Buffer"
             Caption = 'Variant Code';
             DataClassification = SystemMetadata;
             Editable = false;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(19; "Serial No."; Code[50])
         {
@@ -156,8 +166,6 @@ table 6520 "Item Tracing Buffer"
             DataClassification = SystemMetadata;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(23; "Created on"; Date)
         {

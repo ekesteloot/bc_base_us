@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.GLAccount;
+
 page 606 "IC G/L Account Card"
 {
     Caption = 'Intercompany G/L Account Card';
@@ -31,7 +33,7 @@ page 606 "IC G/L Account Card"
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies whether a general ledger account is an income statement account or a balance sheet account.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';

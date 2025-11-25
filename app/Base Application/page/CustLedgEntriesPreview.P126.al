@@ -1,3 +1,8 @@
+namespace Microsoft.Sales.Receivables;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 page 126 "Cust. Ledg. Entries Preview"
 {
     Caption = 'Cust. Ledg. Entries Preview';
@@ -96,7 +101,7 @@ page 126 "Cust. Ledg. Entries Preview"
                     Caption = 'Original Amount';
                     Editable = false;
                     ToolTip = 'Specifies the amount on the customer ledger entry before you post.';
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
 
                     trigger OnDrillDown()
@@ -124,7 +129,7 @@ page 126 "Cust. Ledg. Entries Preview"
                     DrillDown = true;
                     Editable = false;
                     ToolTip = 'Specifies the net amount of all the lines in the customer entry.';
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
 
                     trigger OnDrillDown()
@@ -176,7 +181,7 @@ page 126 "Cust. Ledg. Entries Preview"
                     Caption = 'Remaining Amount';
                     Editable = false;
                     ToolTip = 'Specifies the remaining amount on the customer ledger entry before you post.';
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
 
                     trigger OnDrillDown()
@@ -247,7 +252,7 @@ page 126 "Cust. Ledg. Entries Preview"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies how to make payment, such as with bank transfer, cash, or check.';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the amount on the entry has been fully paid or there is still a remaining amount that must be applied to.';
@@ -363,7 +368,7 @@ page 126 "Cust. Ledg. Entries Preview"
                     var
                         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
                     begin
-                        GenJnlPostPreview.ShowDimensions(DATABASE::"Cust. Ledger Entry", "Entry No.", "Dimension Set ID");
+                        GenJnlPostPreview.ShowDimensions(DATABASE::"Cust. Ledger Entry", Rec."Entry No.", Rec."Dimension Set ID");
                     end;
                 }
                 action(SetDimensionFilter)
@@ -376,7 +381,7 @@ page 126 "Cust. Ledg. Entries Preview"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -399,7 +404,7 @@ page 126 "Cust. Ledg. Entries Preview"
 
     trigger OnAfterGetRecord()
     begin
-        StyleTxt := SetStyle();
+        StyleTxt := Rec.SetStyle();
         CalcAmounts();
     end;
 
@@ -441,7 +446,7 @@ page 126 "Cust. Ledg. Entries Preview"
         if TempCustLedgerEntry.FindSet() then
             repeat
                 Rec := TempCustLedgerEntry;
-                Insert();
+                Rec.Insert();
             until TempCustLedgerEntry.Next() = 0;
 
         if TempDetailedCustLedgEntry2.Find('-') then
@@ -460,7 +465,7 @@ page 126 "Cust. Ledg. Entries Preview"
         OriginalAmountLCY := 0;
         OriginalAmountFCY := 0;
 
-        TempDetailedCustLedgEntry.SetRange("Cust. Ledger Entry No.", "Entry No.");
+        TempDetailedCustLedgEntry.SetRange("Cust. Ledger Entry No.", Rec."Entry No.");
         if TempDetailedCustLedgEntry.FindSet() then
             repeat
                 if TempDetailedCustLedgEntry."Entry Type" = TempDetailedCustLedgEntry."Entry Type"::"Initial Entry" then begin

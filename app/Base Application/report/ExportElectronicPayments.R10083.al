@@ -8,7 +8,7 @@ report 10083 "Export Electronic Payments"
     {
         dataitem("Gen. Journal Line"; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.") WHERE("Bank Payment Type" = FILTER("Electronic Payment" | "Electronic Payment-IAT"), "Document Type" = FILTER(Payment | Refund));
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.") where("Bank Payment Type" = filter("Electronic Payment" | "Electronic Payment-IAT"), "Document Type" = filter(Payment | Refund));
             RequestFilterFields = "Journal Template Name", "Journal Batch Name";
             column(Gen__Journal_Line_Journal_Template_Name; "Journal Template Name")
             {
@@ -24,10 +24,10 @@ report 10083 "Export Electronic Payments"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyAddress_1_; CompanyAddress[1])
                     {
                     }
@@ -195,9 +195,9 @@ report 10083 "Export Electronic Payments"
                     }
                     dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
                     {
-                        DataItemLink = "Applies-to ID" = FIELD("Applies-to ID");
+                        DataItemLink = "Applies-to ID" = field("Applies-to ID");
                         DataItemLinkReference = "Gen. Journal Line";
-                        DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) WHERE(Open = CONST(true));
+                        DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) where(Open = const(true));
                         column(Cust__Ledger_Entry__Document_Type_; "Document Type")
                         {
                         }
@@ -261,9 +261,9 @@ report 10083 "Export Electronic Payments"
                     }
                     dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
                     {
-                        DataItemLink = "Applies-to ID" = FIELD("Applies-to ID");
+                        DataItemLink = "Applies-to ID" = field("Applies-to ID");
                         DataItemLinkReference = "Gen. Journal Line";
-                        DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) WHERE(Open = CONST(true));
+                        DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) where(Open = const(true));
                         column(Vendor_Ledger_Entry__Document_Type_; "Document Type")
                         {
                         }
@@ -327,7 +327,7 @@ report 10083 "Export Electronic Payments"
                     }
                     dataitem(Unapplied; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Text004; Text004Lbl)
                         {
                         }
@@ -610,7 +610,6 @@ report 10083 "Export Electronic Payments"
         SupportedOutputMethod: Option Print,Preview,PDF,Email,Excel,XML;
         ChosenOutputMethod: Integer;
         PrintIfEmailIsMissing: Boolean;
-        [InDataSet]
         ShowPrintIfEmailIsMissing: Boolean;
 
     local procedure MapOutputMethod()

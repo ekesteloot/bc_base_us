@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.StandardCost;
+
+using Microsoft.InventoryMgt.Item;
+
 page 5841 "Standard Cost Worksheet"
 {
     ApplicationArea = Basic, Suite;
@@ -26,10 +30,10 @@ page 5841 "Standard Cost Worksheet"
                     Commit();
                     if PAGE.RunModal(0, StdCostWkshName) = ACTION::LookupOK then begin
                         CurrWkshName := StdCostWkshName.Name;
-                        FilterGroup := 2;
-                        SetRange("Standard Cost Worksheet Name", CurrWkshName);
-                        FilterGroup := 0;
-                        if Find('-') then;
+                        Rec.FilterGroup := 2;
+                        Rec.SetRange("Standard Cost Worksheet Name", CurrWkshName);
+                        Rec.FilterGroup := 0;
+                        if Rec.Find('-') then;
                     end;
                     CurrPage.Update(false);
                 end;
@@ -88,7 +92,7 @@ page 5841 "Standard Cost Worksheet"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the updated value based on either the batch job or what you have entered manually.';
                 }
-                field(Implemented; Implemented)
+                field(Implemented; Rec.Implemented)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that you have run the Implement Standard Cost Changes batch job.';
@@ -357,15 +361,15 @@ page 5841 "Standard Cost Worksheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        StdCostWkshName.Get("Standard Cost Worksheet Name");
-        Type := xRec.Type;
-        "Replenishment System" := "Replenishment System"::Assembly;
+        StdCostWkshName.Get(Rec."Standard Cost Worksheet Name");
+        Rec.Type := xRec.Type;
+        Rec."Replenishment System" := Rec."Replenishment System"::Assembly;
     end;
 
     trigger OnOpenPage()
     begin
-        if "Standard Cost Worksheet Name" <> '' then // called from batch
-            CurrWkshName := "Standard Cost Worksheet Name";
+        if Rec."Standard Cost Worksheet Name" <> '' then // called from batch
+            CurrWkshName := Rec."Standard Cost Worksheet Name";
 
         if not StdCostWkshName.Get(CurrWkshName) then
             if not StdCostWkshName.FindFirst() then begin
@@ -375,9 +379,9 @@ page 5841 "Standard Cost Worksheet"
             end;
         CurrWkshName := StdCostWkshName.Name;
 
-        FilterGroup := 2;
-        SetRange("Standard Cost Worksheet Name", CurrWkshName);
-        FilterGroup := 0;
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Standard Cost Worksheet Name", CurrWkshName);
+        Rec.FilterGroup := 0;
     end;
 
     var
@@ -389,10 +393,10 @@ page 5841 "Standard Cost Worksheet"
     begin
         CurrPage.SaveRecord();
         Commit();
-        FilterGroup := 2;
-        SetRange("Standard Cost Worksheet Name", CurrWkshName);
-        FilterGroup := 0;
-        if Find('-') then;
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Standard Cost Worksheet Name", CurrWkshName);
+        Rec.FilterGroup := 0;
+        if Rec.Find('-') then;
         CurrPage.Update(false);
     end;
 }

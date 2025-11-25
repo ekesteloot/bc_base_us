@@ -1,3 +1,8 @@
+namespace Microsoft.Intercompany.BankAccount;
+
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+
 page 697 "IC Bank Account List"
 {
     ApplicationArea = Intercompany;
@@ -26,7 +31,7 @@ page 697 "IC Bank Account List"
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies the name of the bank where the IC partner has the bank account.';
                 }
-                field(BankAccountNo; "Bank Account No.")
+                field(BankAccountNo; Rec."Bank Account No.")
                 {
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies the number used by the IC partner''s bank for the bank account.';

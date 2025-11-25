@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
 enum 99000772 "Production BOM Line Type"
 {
     Extensible = true;

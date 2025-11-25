@@ -1,3 +1,25 @@
+﻿namespace Microsoft.FinancialMgt.RoleCenters;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Deposit;
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.BankMgt.Statement;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Reports;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+using System.Threading;
+
 page 9003 "Acc. Receivables Adm. RC"
 {
     Caption = 'Accounts Receivable Administrator';
@@ -201,7 +223,7 @@ page 9003 "Acc. Receivables Adm. RC"
                 Caption = 'Balance';
                 Image = Balance;
                 RunObject = Page "Customer List";
-                RunPageView = WHERE("Balance (LCY)" = FILTER(<> 0));
+                RunPageView = where("Balance (LCY)" = filter(<> 0));
                 ToolTip = 'View a summary of the bank account balance in different periods.';
             }
             action("Sales Orders")
@@ -272,8 +294,8 @@ page 9003 "Acc. Receivables Adm. RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales Journals';
                 RunObject = Page "General Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Sales),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Sales),
+                                    Recurring = const(false));
                 ToolTip = 'Post any sales-related transaction directly to a customer, bank, or general ledger account instead of using dedicated documents. You can post all types of financial sales transactions, including payments, refunds, and finance charge amounts. Note that you cannot post item quantities with a sales journal.';
             }
             action(CashReceiptJournals)
@@ -282,8 +304,8 @@ page 9003 "Acc. Receivables Adm. RC"
                 Caption = 'Cash Receipt Journals';
                 Image = Journals;
                 RunObject = Page "General Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST("Cash Receipts"),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const("Cash Receipts"),
+                                    Recurring = const(false));
                 ToolTip = 'Register received payments by manually applying them to the related customer, vendor, or bank ledger entries. Then, post the payments to G/L accounts and thereby close the related ledger entries.';
             }
             action(GeneralJournals)
@@ -292,8 +314,8 @@ page 9003 "Acc. Receivables Adm. RC"
                 Caption = 'General Journals';
                 Image = Journal;
                 RunObject = Page "General Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(General),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(General),
+                                    Recurring = const(false));
                 ToolTip = 'Post financial transactions directly to general ledger accounts and other accounts, such as bank, customer, vendor, and employee accounts. Posting with a general journal always creates entries on general ledger accounts. This is true even when, for example, you post a journal line to a customer account, because an entry is posted to a general ledger receivables account through a posting group.';
             }
             action("Direct Debit Collections")
@@ -420,9 +442,6 @@ page 9003 "Acc. Receivables Adm. RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'C&ustomer';
                 Image = Customer;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Customer Card";
                 RunPageMode = Create;
                 ToolTip = 'Create a new customer card.';
@@ -432,9 +451,6 @@ page 9003 "Acc. Receivables Adm. RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Register Customer Payments';
                 Image = Payment;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Payment Registration";
                 ToolTip = 'Process your customer payments by matching amounts received on your bank account with the related unpaid sales invoices, and then post the payments.';
             }
@@ -447,9 +463,6 @@ page 9003 "Acc. Receivables Adm. RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales &Order';
                     Image = Document;
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
                     RunObject = Page "Sales Order";
                     RunPageMode = Create;
                     ToolTip = 'Create a new sales order for items or services.';
@@ -459,9 +472,6 @@ page 9003 "Acc. Receivables Adm. RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales &Invoice';
                     Image = NewSalesInvoice;
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
                     RunObject = Page "Sales Invoice";
                     RunPageMode = Create;
                     ToolTip = 'Create a new invoice for the sales of items or services. Invoice quantities cannot be posted partially.';
@@ -471,9 +481,6 @@ page 9003 "Acc. Receivables Adm. RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales &Credit Memo';
                     Image = CreditMemo;
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
                     RunObject = Page "Sales Credit Memo";
                     RunPageMode = Create;
                     ToolTip = 'Create a new sales credit memo to revert a posted sales invoice.';
@@ -483,9 +490,6 @@ page 9003 "Acc. Receivables Adm. RC"
                     ApplicationArea = Suite;
                     Caption = 'Sales &Fin. Charge Memo';
                     Image = FinChargeMemo;
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
                     RunObject = Page "Finance Charge Memo";
                     RunPageMode = Create;
                     ToolTip = 'Create a new finance charge memo to fine a customer for late payment.';
@@ -495,9 +499,6 @@ page 9003 "Acc. Receivables Adm. RC"
                     ApplicationArea = Suite;
                     Caption = 'Sales &Reminder';
                     Image = Reminder;
-                    Promoted = false;
-                    //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                    //PromotedCategory = Process;
                     RunObject = Page Reminder;
                     RunPageMode = Create;
                     ToolTip = 'Create a new reminder for a customer who has overdue payments.';

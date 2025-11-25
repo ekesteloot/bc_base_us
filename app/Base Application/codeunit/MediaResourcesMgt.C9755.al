@@ -1,3 +1,7 @@
+namespace System.Utilities;
+
+using System.Environment;
+
 codeunit 9755 "Media Resources Mgt."
 {
 

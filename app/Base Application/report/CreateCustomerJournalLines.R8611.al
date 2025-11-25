@@ -9,7 +9,7 @@ report 8611 "Create Customer Journal Lines"
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.") WHERE("Bill-to Customer No." = FILTER(''));
+            DataItemTableView = sorting("No.") where("Bill-to Customer No." = filter(''));
             RequestFilterFields = "No.", "Currency Code", "Country/Region Code", "Salesperson Code", "Customer Posting Group", Blocked;
 
             trigger OnAfterGetRecord()

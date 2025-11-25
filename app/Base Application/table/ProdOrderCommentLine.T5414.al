@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 table 5414 "Prod. Order Comment Line"
 {
     Caption = 'Prod. Order Comment Line';
@@ -14,7 +16,7 @@ table 5414 "Prod. Order Comment Line"
         {
             Caption = 'Prod. Order No.';
             NotBlank = true;
-            TableRelation = "Production Order"."No." WHERE(Status = FIELD(Status));
+            TableRelation = "Production Order"."No." where(Status = field(Status));
         }
         field(3; "Line No."; Integer)
         {

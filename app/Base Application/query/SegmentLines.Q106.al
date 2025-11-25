@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Segment;
+
 query 106 "Segment Lines"
 {
     Caption = 'Segment Lines';

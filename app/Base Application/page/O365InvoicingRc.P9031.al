@@ -47,7 +47,7 @@ page 9031 "O365 Invoicing RC"
                 ApplicationArea = Invoicing;
                 Caption = 'Draft Invoices';
                 RunObject = Page "O365 Invoicing Sales Doc. List";
-                RunPageView = WHERE(Posted = CONST(false));
+                RunPageView = where(Posted = const(false));
                 ToolTip = 'Open the list of draft invoices';
             }
             action("Sent Invoices")
@@ -55,7 +55,7 @@ page 9031 "O365 Invoicing RC"
                 ApplicationArea = Invoicing;
                 Caption = 'Sent Invoices';
                 RunObject = Page "O365 Invoicing Sales Doc. List";
-                RunPageView = WHERE(Posted = CONST(true));
+                RunPageView = where(Posted = const(true));
                 ToolTip = 'Open the list of sent invoices';
             }
             action(Items)

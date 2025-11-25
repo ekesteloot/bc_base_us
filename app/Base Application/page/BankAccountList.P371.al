@@ -1,3 +1,16 @@
+﻿namespace Microsoft.BankMgt.BankAccount;
+
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.PositivePay;
+using Microsoft.BankMgt.Reports;
+using Microsoft.BankMgt.Statement;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.Foundation.Comment;
+using System.Diagnostics;
+using System.Email;
+
 page 371 "Bank Account List"
 {
     ApplicationArea = Basic, Suite;
@@ -59,28 +72,28 @@ page 371 "Bank Account List"
                     ToolTip = 'Specifies the fax number associated with the address.';
                     Visible = false;
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank employee regularly contacted in connection with this bank account.';
                 }
-                field(BalanceAmt; Balance)
+                field(BalanceAmt; Rec.Balance)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account''s balance.';
                 }
-                field(BalanceLCY; "Balance (LCY)")
+                field(BalanceLCY; Rec."Balance (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account''s balance in LCY.';
                 }
-                field(BalanceAtDate; "Balance at Date")
+                field(BalanceAtDate; Rec."Balance at Date")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account''s balance on the last date included in the Date Filter field.';
                     Visible = false;
                 }
-                field(BalanceAtDateLCY; "Balance at Date (LCY)")
+                field(BalanceAtDateLCY; Rec."Balance at Date (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account''s balance in LCY on the last date included in the Date Filter field.';
@@ -98,7 +111,7 @@ page 371 "Bank Account List"
                     ToolTip = 'Specifies the international bank identifier code (SWIFT) of the bank where you have the account.';
                     Visible = false;
                 }
-                field(IBAN; IBAN)
+                field(IBAN; Rec.IBAN)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account''s international bank account number.';
@@ -128,6 +141,12 @@ page 371 "Bank Account List"
                     ToolTip = 'Specifies the language that is used when translating specified text on documents to foreign business partner, such as an item description on an order confirmation.';
                     Visible = false;
                 }
+                field("Format Region"; Rec."Format Region")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the region format that is used when formatting specified dates and numbers on documents to foreign business partner, such as an item amount on an order confirmation.';
+                    Visible = false;
+                }
                 field("Search Name"; Rec."Search Name")
                 {
                     ApplicationArea = Basic, Suite;
@@ -141,8 +160,8 @@ page 371 "Bank Account List"
             part(Control1905532107; "Dimensions FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Table ID" = CONST(270),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(270),
+                              "No." = field("No.");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -171,10 +190,10 @@ page 371 "Bank Account List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Bank Account Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -184,8 +203,8 @@ page 371 "Bank Account List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Bank Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Bank Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(PositivePayExport)
@@ -194,7 +213,7 @@ page 371 "Bank Account List"
                     Caption = 'Positive Pay Export';
                     Image = Export;
                     RunObject = Page "Positive Pay Export";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'Export a Positive Pay file with relevant payment information that you then send to the bank for reference when you process payments to make sure that your bank only clears validated checks and amounts.';
                 }
                 group(Dimensions)
@@ -207,8 +226,8 @@ page 371 "Bank Account List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(270),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(270),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -226,7 +245,7 @@ page 371 "Bank Account List"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(BankAcc);
-                            DefaultDimMultiple.SetMultiRecord(BankAcc, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(BankAcc, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -237,10 +256,10 @@ page 371 "Bank Account List"
                     Caption = 'Balance';
                     Image = Balance;
                     RunObject = Page "Bank Account Balance";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'View a summary of the bank account balance in different periods.';
                 }
                 action(Statements)
@@ -249,7 +268,7 @@ page 371 "Bank Account List"
                     Caption = 'St&atements';
                     Image = List;
                     RunObject = Page "Bank Account Statement List";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
+                    RunPageLink = "Bank Account No." = field("No.");
                     ToolTip = 'View posted bank statements and reconciliations.';
                 }
                 action(PostedReconciliations)
@@ -258,7 +277,7 @@ page 371 "Bank Account List"
                     Caption = 'Posted Reconciliations';
                     Image = List;
                     RunObject = Page "Posted Bank Rec. List";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
+                    RunPageLink = "Bank Account No." = field("No.");
                     ToolTip = 'View the entries and the balance on your bank accounts against a statement from the bank.';
                 }
                 action(Deposits)
@@ -267,8 +286,8 @@ page 371 "Bank Account List"
                     Caption = 'Deposits';
                     Image = DepositSlip;
                     RunObject = Page "Posted Deposit List";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
-                    RunPageView = SORTING("Bank Account No.");
+                    RunPageLink = "Bank Account No." = field("No.");
+                    RunPageView = sorting("Bank Account No.");
                     ToolTip = 'View the list of posted deposits for the bank account.';
                 }
                 action("Ledger E&ntries")
@@ -277,9 +296,9 @@ page 371 "Bank Account List"
                     Caption = 'Ledger E&ntries';
                     Image = BankAccountLedger;
                     RunObject = Page "Bank Account Ledger Entries";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
-                    RunPageView = SORTING("Bank Account No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Bank Account No." = field("No.");
+                    RunPageView = sorting("Bank Account No.")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -289,9 +308,9 @@ page 371 "Bank Account List"
                     Caption = 'Chec&k Ledger Entries';
                     Image = CheckLedger;
                     RunObject = Page "Check Ledger Entries";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
-                    RunPageView = SORTING("Bank Account No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Bank Account No." = field("No.");
+                    RunPageView = sorting("Bank Account No.")
+                                  order(Descending);
                     ToolTip = 'View check ledger entries that result from posting transactions in a payment journal for the relevant bank account.';
                 }
                 action("C&ontact")
@@ -303,7 +322,7 @@ page 371 "Bank Account List"
 
                     trigger OnAction()
                     begin
-                        ShowContact();
+                        Rec.ShowContact();
                     end;
                 }
                 action(CreateNewLinkedBankAccount)
@@ -334,7 +353,7 @@ page 371 "Bank Account List"
                     trigger OnAction()
                     begin
                         VerifySingleSelection();
-                        LinkStatementProvider(Rec);
+                        Rec.LinkStatementProvider(Rec);
                     end;
                 }
                 action(UnlinkOnlineBankAccount)
@@ -349,7 +368,7 @@ page 371 "Bank Account List"
                     trigger OnAction()
                     begin
                         VerifySingleSelection();
-                        UnlinkStatementProvider();
+                        Rec.UnlinkStatementProvider();
                         CurrPage.Update(true);
                     end;
                 }
@@ -365,7 +384,7 @@ page 371 "Bank Account List"
                     trigger OnAction()
                     begin
                         VerifySingleSelection();
-                        RefreshStatementProvider(Rec);
+                        Rec.RefreshStatementProvider(Rec);
                     end;
                 }
                 action(EditOnlineBankAccount)
@@ -379,7 +398,7 @@ page 371 "Bank Account List"
 
                     trigger OnAction()
                     begin
-                        EditAccountStatementProvider(Rec);
+                        Rec.EditAccountStatementProvider(Rec);
                     end;
                 }
                 action(RenewAccessConsentOnlineBankAccount)
@@ -393,7 +412,7 @@ page 371 "Bank Account List"
 
                     trigger OnAction()
                     begin
-                        RenewAccessConsentStatementProvider(Rec);
+                        Rec.RenewAccessConsentStatementProvider(Rec);
                     end;
                 }
                 action(UpdateBankAccountLinking)
@@ -406,7 +425,7 @@ page 371 "Bank Account List"
 
                     trigger OnAction()
                     begin
-                        UpdateBankAccountLinking();
+                        Rec.UpdateBankAccountLinking();
                     end;
                 }
                 action(AutomaticBankStatementImportSetup)
@@ -426,9 +445,9 @@ page 371 "Bank Account List"
                     Caption = 'Positive Pay Entries';
                     Image = CheckLedger;
                     RunObject = Page "Positive Pay Entries";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
-                    RunPageView = SORTING("Bank Account No.", "Upload Date-Time")
-                                  ORDER(Descending);
+                    RunPageLink = "Bank Account No." = field("No.");
+                    RunPageView = sorting("Bank Account No.", "Upload Date-Time")
+                                  order(Descending);
                     ToolTip = 'View the bank ledger entries that are related to Positive Pay transactions.';
                 }
             }
@@ -678,8 +697,8 @@ page 371 "Bank Account List"
     var
         BankAccount: Record "Bank Account";
     begin
-        GetOnlineFeedStatementStatus(OnlineFeedStatementStatus, Linked);
-        ShowBankLinkingActions := StatementProvidersExist();
+        Rec.GetOnlineFeedStatementStatus(OnlineFeedStatementStatus, Linked);
+        ShowBankLinkingActions := Rec.StatementProvidersExist();
 
         CurrPage.SetSelectionFilter(BankAccount);
         CanSendEmail := BankAccount.Count() = 1;
@@ -687,21 +706,20 @@ page 371 "Bank Account List"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Check Report Name");
-        GetOnlineFeedStatementStatus(OnlineFeedStatementStatus, Linked);
+        Rec.CalcFields("Check Report Name");
+        Rec.GetOnlineFeedStatementStatus(OnlineFeedStatementStatus, Linked);
     end;
 
     trigger OnOpenPage()
     var
         MonitorSensitiveField: Codeunit "Monitor Sensitive Field";
     begin
-        ShowBankLinkingActions := StatementProvidersExist();
+        ShowBankLinkingActions := Rec.StatementProvidersExist();
         MonitorSensitiveField.ShowPromoteMonitorSensitiveFieldNotification();
     end;
 
     var
         MultiselectNotSupportedErr: Label 'You can only link to one online bank account at a time.';
-        [InDataSet]
         CanSendEmail: Boolean;
         Linked: Boolean;
         ShowBankLinkingActions: Boolean;

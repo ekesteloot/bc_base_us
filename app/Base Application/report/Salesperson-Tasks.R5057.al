@@ -1,7 +1,11 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Task;
+
 report 5057 "Salesperson - Tasks"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/SalespersonTasks.rdlc';
+    RDLCLayout = './CRM/Reports/SalespersonTasks.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Salesperson Tasks';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5057 "Salesperson - Tasks"
     {
         dataitem("To-do"; "To-do")
         {
-            DataItemTableView = SORTING("Salesperson Code", Date) WHERE("Salesperson Code" = FILTER(<> ''), "System To-do Type" = FILTER(= Organizer | "Salesperson Attendee"));
+            DataItemTableView = sorting("Salesperson Code", Date) where("Salesperson Code" = filter(<> ''), "System To-do Type" = filter(= Organizer | "Salesperson Attendee"));
             RequestFilterFields = "Salesperson Code", "Team Code", "Campaign No.", Date;
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

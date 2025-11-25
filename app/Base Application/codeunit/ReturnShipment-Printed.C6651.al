@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.History;
+
 codeunit 6651 "Return Shipment - Printed"
 {
     Permissions = TableData "Return Shipment Header" = rimd;
@@ -5,10 +7,10 @@ codeunit 6651 "Return Shipment - Printed"
 
     trigger OnRun()
     begin
-        Find();
-        "No. Printed" := "No. Printed" + 1;
+        Rec.Find();
+        Rec."No. Printed" := Rec."No. Printed" + 1;
         OnBeforeModify(Rec);
-        Modify();
+        Rec.Modify();
         Commit();
     end;
 

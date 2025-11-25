@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Family;
+
+using Microsoft.Manufacturing.Routing;
+
 table 99000773 Family
 {
     Caption = 'Family';

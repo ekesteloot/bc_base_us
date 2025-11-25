@@ -12,31 +12,15 @@ codeunit 63 "Sales-Explode BOM"
         if IsHandled then
             exit;
 
-        TestField(Type, Type::Item);
-        TestField("Quantity Shipped", 0);
-        TestField("Return Qty. Received", 0);
+        SalesHeader := Rec.GetSalesHeader();
+        SalesHeader.TestStatusOpen();
+        CheckSalesLine(Rec);
 
-        CalcFields("Reserved Qty. (Base)");
-        TestField("Reserved Qty. (Base)", 0);
         ReservMgt.SetReservSource(Rec);
         ReservMgt.SetItemTrackingHandling(1);
         ReservMgt.DeleteReservEntries(true, 0);
 
-        if "Purch. Order Line No." <> 0 then
-            Error(
-              Text000,
-              "Purchase Order No.");
-        if "Job Contract Entry No." <> 0 then begin
-            TestField("Job No.", '');
-            TestField("Job Contract Entry No.", 0);
-        end;
-        SalesHeader.Get("Document Type", "Document No.");
-        SalesHeader.TestField(Status, SalesHeader.Status::Open);
-
-        FromBOMComp.SetRange("Parent Item No.", "No.");
-#if not CLEAN20        
-        OnAfterFromBOMCompSetFilters(FromBOMComp, Rec);
-#endif        
+        FromBOMComp.SetRange("Parent Item No.", Rec."No.");
         OnRunOnBeforeCalcNoOfBOMComp(FromBOMComp, Rec);
         NoOfBOMComp := FromBOMComp.Count();
 
@@ -44,7 +28,7 @@ codeunit 63 "Sales-Explode BOM"
 
         if not HideDialog then begin
             if NoOfBOMComp = 0 then
-                Error(Text001, "No.");
+                Error(Text001, Rec."No.");
 
             Selection := StrMenu(Text004, 2);
             if Selection = 0 then
@@ -54,13 +38,10 @@ codeunit 63 "Sales-Explode BOM"
 
         OnAfterConfirmExplosion(Rec, Selection, HideDialog);
 
-        if "Document Type" in ["Document Type"::Order, "Document Type"::Invoice] then begin
+        if Rec."Document Type" in [Rec."Document Type"::Order, Rec."Document Type"::Invoice] then begin
             ToSalesLine := Rec;
             FromBOMComp.SetRange(Type, FromBOMComp.Type::Item);
             FromBOMComp.SetFilter("No.", '<>%1', '');
-#if not CLEAN20            
-            OnAfterFromBOMCompSetFilters(FromBOMComp, Rec);
-#endif 
             IsHandled := false;
             OnRunOnAfterFromBOMCompSetFilters(FromBOMComp, Rec, IsHandled);
             if not IsHandled then
@@ -74,7 +55,7 @@ codeunit 63 "Sales-Explode BOM"
                         ToSalesLine."Variant Code" := FromBOMComp."Variant Code";
                         ToSalesLine."Unit of Measure Code" := FromBOMComp."Unit of Measure Code";
                         ToSalesLine."Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, FromBOMComp."Unit of Measure Code");
-                        ToSalesLine."Outstanding Quantity" := Round("Quantity (Base)" * FromBOMComp."Quantity per", UOMMgt.QtyRndPrecision());
+                        ToSalesLine."Outstanding Quantity" := Round(Rec."Quantity (Base)" * FromBOMComp."Quantity per", UOMMgt.QtyRndPrecision());
                         IsHandled := false;
                         OnRunOnBeforeItemCheckAvailSalesLineCheck(ToSalesLine, FromBOMComp, Rec, IsHandled, HideDialog);
                         if not IsHandled then
@@ -84,22 +65,15 @@ codeunit 63 "Sales-Explode BOM"
                     until FromBOMComp.Next() = 0;
         end;
 
-        if "BOM Item No." = '' then
-            BOMItemNo := "No."
+        if Rec."BOM Item No." = '' then
+            BOMItemNo := Rec."No."
         else
-            BOMItemNo := "BOM Item No.";
+            BOMItemNo := Rec."BOM Item No.";
 
-        if Type = Type::Item then
+        if Rec.Type = Rec.Type::Item then
             AssembleToOrderLink.DeleteAsmFromSalesLine(Rec);
 
-        ToSalesLine := Rec;
-        ToSalesLine.Init();
-        ToSalesLine.Description := Description;
-        ToSalesLine."Description 2" := "Description 2";
-        ToSalesLine."BOM Item No." := BOMItemNo;
-        OnBeforeToSalesLineModify(ToSalesLine, Rec);
-        ToSalesLine.Modify();
-
+        InitParentItemLine(Rec);
         if TransferExtendedText.SalesCheckIfAnyExtText(ToSalesLine, false) then
             TransferExtendedText.InsertSalesExtText(ToSalesLine);
 
@@ -196,24 +170,13 @@ codeunit 63 "Sales-Explode BOM"
                         Item.Get(FromBOMComp."No.");
                         ToSalesLine.Validate("Unit of Measure Code", FromBOMComp."Unit of Measure Code");
                         ToSalesLine."Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, ToSalesLine."Unit of Measure Code");
-                        ToSalesLine.Validate(Quantity,
-                          Round(
-                            "Quantity (Base)" * FromBOMComp."Quantity per" *
-                            UOMMgt.GetQtyPerUnitOfMeasure(
-                              Item, ToSalesLine."Unit of Measure Code") / ToSalesLine."Qty. per Unit of Measure",
-                            UOMMgt.QtyRndPrecision()));
+                        ToSalesLine.Validate(Quantity, Round("Quantity (Base)" * FromBOMComp."Quantity per", UOMMgt.QtyRndPrecision()));
                     end else
                         if ToSalesLine.Type = ToSalesLine.Type::Resource then begin
                             Resource.Get(FromBOMComp."No.");
                             ToSalesLine.Validate("Unit of Measure Code", FromBOMComp."Unit of Measure Code");
-                            ToSalesLine."Qty. per Unit of Measure" :=
-                              UOMMgt.GetResQtyPerUnitOfMeasure(Resource, ToSalesLine."Unit of Measure Code");
-                            ToSalesLine.Validate(Quantity,
-                              Round(
-                                "Quantity (Base)" * FromBOMComp."Quantity per" *
-                                UOMMgt.GetResQtyPerUnitOfMeasure(
-                                  Resource, ToSalesLine."Unit of Measure Code") / ToSalesLine."Qty. per Unit of Measure",
-                                UOMMgt.QtyRndPrecision()));
+                            ToSalesLine."Qty. per Unit of Measure" := UOMMgt.GetResQtyPerUnitOfMeasure(Resource, ToSalesLine."Unit of Measure Code");
+                            ToSalesLine.Validate(Quantity, Round("Quantity (Base)" * FromBOMComp."Quantity per", UOMMgt.QtyRndPrecision()));
                         end else
                             ToSalesLine.Validate(Quantity, "Quantity (Base)" * FromBOMComp."Quantity per");
 
@@ -258,13 +221,37 @@ codeunit 63 "Sales-Explode BOM"
 
         OnAfterExplodeBOMCompLines(SalesLine, Selection, LineSpacing);
     end;
-#if not CLEAN20
-    [Obsolete('Replaced with OnRunOnBeforeCalcNoOfBOMComp and OnRunOnAfterFromBOMCompSetFilters', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterFromBOMCompSetFilters(var BOMComponent: Record "BOM Component"; SalesLine: Record "Sales Line")
+
+    local procedure CheckSalesLine(SalesLine: Record "Sales Line")
     begin
+        SalesLine.TestField(Type, SalesLine.Type::Item);
+        SalesLine.TestField("Quantity Shipped", 0);
+        SalesLine.TestField("Return Qty. Received", 0);
+
+        SalesLine.CalcFields("Reserved Qty. (Base)");
+        SalesLine.TestField("Reserved Qty. (Base)", 0);
+
+        if SalesLine."Purch. Order Line No." <> 0 then
+            Error(Text000, SalesLine."Purchase Order No.");
+        if SalesLine."Job Contract Entry No." <> 0 then begin
+            SalesLine.TestField("Job No.", '');
+            SalesLine.TestField("Job Contract Entry No.", 0);
+        end;
+
+        OnAfterCheckSalesLine(SalesLine);
     end;
-#endif
+
+    local procedure InitParentItemLine(var FromSalesLine: Record "Sales Line")
+    begin
+        ToSalesLine := FromSalesLine;
+        ToSalesLine.Init();
+        ToSalesLine.Description := FromSalesLine.Description;
+        ToSalesLine."Description 2" := FromSalesLine."Description 2";
+        ToSalesLine."BOM Item No." := BOMItemNo;
+        OnBeforeToSalesLineModify(ToSalesLine, FromSalesLine);
+        ToSalesLine.Modify();
+    end;
+
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterConfirmExplosion(var SalesLine: Record "Sales Line"; var Selection: Integer; var HideDialog: Boolean)
@@ -338,6 +325,11 @@ codeunit 63 "Sales-Explode BOM"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnBeforeExplodeBOMCompLines(var SalesLine: Record "Sales Line"; var ToSalesLine: Record "Sales Line"; var NoOfBOMComp: Integer; var Selection: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCheckSalesLine(SalesLine: Record "Sales Line")
     begin
     end;
 }

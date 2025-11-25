@@ -1,20 +1,25 @@
+namespace Microsoft.AssemblyMgt.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using System.Utilities;
+
 report 910 "Posted Assembly Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Assembly/PostedAssemblyOrder.rdlc';
+    RDLCLayout = './AssemblyMgt/History/PostedAssemblyOrder.rdlc';
     Caption = 'Posted Assembly Order';
 
     dataset
     {
         dataitem(CopyLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             column(Number; Number)
             {
             }
             dataitem("Posted Assembly Header"; "Posted Assembly Header")
             {
-                DataItemTableView = SORTING("No.");
+                DataItemTableView = sorting("No.");
                 RequestFilterFields = "No.", "Posting Date";
                 column(No_PostedAssemblyHeader; "No.")
                 {
@@ -59,7 +64,7 @@ report 910 "Posted Assembly Order"
                 }
                 dataitem(DimensionLoop1; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -115,8 +120,8 @@ report 910 "Posted Assembly Order"
                 }
                 dataitem("Posted Assembly Line"; "Posted Assembly Line")
                 {
-                    DataItemLink = "Document No." = FIELD("No.");
-                    DataItemTableView = SORTING("Document No.", "Line No.");
+                    DataItemLink = "Document No." = field("No.");
+                    DataItemTableView = sorting("Document No.", "Line No.");
                     column(LineNo_PostedAssemblyLine; "Line No.")
                     {
                     }
@@ -145,7 +150,7 @@ report 910 "Posted Assembly Order"
                     }
                     dataitem(DimensionLoop2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText2; DimText2)
                         {
                         }

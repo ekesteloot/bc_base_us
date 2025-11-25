@@ -11,6 +11,7 @@ permissionset 30102 "Shpfy - Edit"
         "Shpfy Indirect Perm";
 
     Permissions =
+        tabledata "Shpfy Bulk Operation" = IMD,
         tabledata "Shpfy Credit Card Company" = IMD,
         tabledata "Shpfy Cue" = IMD,
         tabledata "Shpfy Customer" = IMD,

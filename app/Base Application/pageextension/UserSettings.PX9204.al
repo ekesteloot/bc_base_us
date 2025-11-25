@@ -1,3 +1,10 @@
+﻿namespace System.Security.User;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Security.AccessControl;
+
 pageextension 9204 "User Settings" extends "User Settings"
 {
     layout

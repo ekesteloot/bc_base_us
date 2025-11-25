@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 xmlport 130403 "CAL Export Test Result"
 {
     Caption = 'CAL Export Test Result';

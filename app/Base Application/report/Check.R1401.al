@@ -1,7 +1,25 @@
+﻿namespace Microsoft.BankMgt.Check;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Automation;
+using System.Utilities;
+
 report 1401 Check
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/Check.rdlc';
+    RDLCLayout = './BankMgt/Check/Check.rdlc';
     Caption = 'Check';
     Permissions = TableData "Bank Account" = m;
 
@@ -9,7 +27,7 @@ report 1401 Check
     {
         dataitem(VoidGenJnlLine; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
             RequestFilterFields = "Journal Template Name", "Journal Batch Name", "Posting Date";
 
             trigger OnAfterGetRecord()
@@ -43,7 +61,7 @@ report 1401 Check
         }
         dataitem(TestGenJnlLine; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -117,7 +135,7 @@ report 1401 Check
         }
         dataitem(GenJnlLine; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
             column(JnlTemplateName_GenJnlLine; "Journal Template Name")
             {
             }
@@ -129,7 +147,7 @@ report 1401 Check
             }
             dataitem(CheckPages; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(CheckToAddr1; CheckToAddr[1])
                 {
                 }
@@ -147,7 +165,7 @@ report 1401 Check
                 }
                 dataitem(PrintSettledLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 30;
                     column(LineAmt; LineAmount)
                     {
@@ -387,7 +405,7 @@ report 1401 Check
                 }
                 dataitem(PrintCheck; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     column(PrnChkCheckDateTextCheckStyleUS; PrnChkCheckDateText[CheckStyle::US])
                     {

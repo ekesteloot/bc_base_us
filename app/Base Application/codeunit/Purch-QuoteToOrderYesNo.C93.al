@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Document;
+
+using System.Utilities;
+
 codeunit 93 "Purch.-Quote to Order (Yes/No)"
 {
     TableNo = "Purchase Header";
@@ -7,7 +11,7 @@ codeunit 93 "Purch.-Quote to Order (Yes/No)"
         ConfirmManagement: Codeunit "Confirm Management";
         IsHandled: Boolean;
     begin
-        TestField("Document Type", "Document Type"::Quote);
+        Rec.TestField("Document Type", Rec."Document Type"::Quote);
         if not ConfirmManagement.GetResponseOrDefault(ConvertQuoteToOrderQst, true) then
             exit;
 

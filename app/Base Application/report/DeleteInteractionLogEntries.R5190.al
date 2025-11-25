@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Interaction;
+
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Document;
+
 report 5190 "Delete Interaction Log Entries"
 {
     Caption = 'Delete Interaction Log Entries';
@@ -7,7 +14,7 @@ report 5190 "Delete Interaction Log Entries"
     {
         dataitem("Interaction Log Entry"; "Interaction Log Entry")
         {
-            DataItemTableView = SORTING(Canceled, "Campaign No.", "Campaign Entry No.", Date) WHERE(Canceled = CONST(true));
+            DataItemTableView = sorting(Canceled, "Campaign No.", "Campaign Entry No.", Date) where(Canceled = const(true));
             RequestFilterFields = "Entry No.", "Contact No.", Date, "Campaign No.", "Interaction Group Code", "Interaction Template Code", "Salesperson Code";
 
             trigger OnAfterGetRecord()

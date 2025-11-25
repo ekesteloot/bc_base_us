@@ -1,3 +1,5 @@
+namespace System.Security.User;
+
 page 9078 "User Tasks Activities"
 {
     Caption = 'User Tasks';

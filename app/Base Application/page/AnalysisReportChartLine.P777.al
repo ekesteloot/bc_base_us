@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 777 "Analysis Report Chart Line"
 {
     Caption = 'Analysis Report Chart Line';
@@ -59,9 +61,9 @@ page 777 "Analysis Report Chart Line"
                     trigger OnValidate()
                     begin
                         if Show then
-                            "Chart Type" := GetDefaultChartType()
+                            Rec."Chart Type" := Rec.GetDefaultChartType()
                         else
-                            "Chart Type" := "Chart Type"::" ";
+                            Rec."Chart Type" := Rec."Chart Type"::" ";
                     end;
                 }
             }
@@ -123,7 +125,7 @@ page 777 "Analysis Report Chart Line"
 
     trigger OnAfterGetRecord()
     begin
-        Show := "Chart Type" <> "Chart Type"::" ";
+        Show := Rec."Chart Type" <> Rec."Chart Type"::" ";
     end;
 
     var

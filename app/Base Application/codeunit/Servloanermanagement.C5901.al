@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.Loaner;
+
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using System.Utilities;
+
 codeunit 5901 ServLoanerManagement
 {
     Permissions = TableData "Loaner Entry" = rimd;

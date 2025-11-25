@@ -1,4 +1,12 @@
-﻿table 7338 "Bin Creation Worksheet Line"
+﻿namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Setup;
+using System.Security.AccessControl;
+
+table 7338 "Bin Creation Worksheet Line"
 {
     Caption = 'Bin Creation Worksheet Line';
     LookupPageID = "Bin Creation Worksheet";

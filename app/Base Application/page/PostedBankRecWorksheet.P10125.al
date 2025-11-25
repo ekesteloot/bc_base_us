@@ -47,35 +47,35 @@ page 10125 "Posted Bank Rec. Worksheet"
                     Editable = false;
                     ToolTip = 'Specifies the general ledger balance for the assigned account number.';
                 }
-                field("""Positive Adjustments"" - ""Negative Bal. Adjustments"""; Rec."Positive Adjustments" - "Negative Bal. Adjustments")
+                field("""Positive Adjustments"" - ""Negative Bal. Adjustments"""; Rec."Positive Adjustments" - Rec."Negative Bal. Adjustments")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = '+ Positive Adjustments';
                     Editable = false;
                     ToolTip = 'Specifies the total amount of positive adjustments for the bank statement.';
                 }
-                field("""G/L Balance"" + (""Positive Adjustments"" - ""Negative Bal. Adjustments"")"; Rec."G/L Balance" + ("Positive Adjustments" - "Negative Bal. Adjustments"))
+                field("""G/L Balance"" + (""Positive Adjustments"" - ""Negative Bal. Adjustments"")"; Rec."G/L Balance" + (Rec."Positive Adjustments" - Rec."Negative Bal. Adjustments"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Subtotal';
                     Editable = false;
                     ToolTip = 'Specifies a subtotal amount for the posted worksheet. The subtotal is calculated by using the general ledger balance and any positive or negative adjustments.';
                 }
-                field("""Negative Adjustments"" - ""Positive Bal. Adjustments"""; Rec."Negative Adjustments" - "Positive Bal. Adjustments")
+                field("""Negative Adjustments"" - ""Positive Bal. Adjustments"""; Rec."Negative Adjustments" - Rec."Positive Bal. Adjustments")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = '- Negative Adjustments';
                     Editable = false;
                     ToolTip = 'Specifies the total of the negative adjustment lines for the bank statement.';
                 }
-                field("Ending G/L Balance"; Rec."G/L Balance" + ("Positive Adjustments" - "Negative Bal. Adjustments") + ("Negative Adjustments" - "Positive Bal. Adjustments"))
+                field("Ending G/L Balance"; Rec."G/L Balance" + (Rec."Positive Adjustments" - Rec."Negative Bal. Adjustments") + (Rec."Negative Adjustments" - Rec."Positive Bal. Adjustments"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Ending G/L Balance';
                     Editable = false;
                     ToolTip = 'Specifies the sum of values in the G/L Balance field, plus the Positive Adjustments field, minus the Negative Adjustments field. This is what the G/L balance will be after the bank reconciliation worksheet is posted and the adjustments are posted to the general ledger.';
                 }
-                field(Difference; ("G/L Balance" + ("Positive Adjustments" - "Negative Bal. Adjustments") + ("Negative Adjustments" - "Positive Bal. Adjustments")) - (("Statement Balance" + "Outstanding Deposits") - "Outstanding Checks"))
+                field(Difference; (Rec."G/L Balance" + (Rec."Positive Adjustments" - Rec."Negative Bal. Adjustments") + (Rec."Negative Adjustments" - Rec."Positive Bal. Adjustments")) - ((Rec."Statement Balance" + Rec."Outstanding Deposits") - Rec."Outstanding Checks"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Difference';
@@ -108,7 +108,7 @@ page 10125 "Posted Bank Rec. Worksheet"
                     Editable = false;
                     ToolTip = 'Specifies the total of outstanding deposits of type Increase for the bank statement.';
                 }
-                field("""Statement Balance"" + ""Outstanding Deposits"""; Rec."Statement Balance" + "Outstanding Deposits")
+                field("""Statement Balance"" + ""Outstanding Deposits"""; Rec."Statement Balance" + Rec."Outstanding Deposits")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Subtotal';
@@ -122,7 +122,7 @@ page 10125 "Posted Bank Rec. Worksheet"
                     Editable = false;
                     ToolTip = 'Specifies the total of outstanding check withdrawals for the bank statement.';
                 }
-                field("(""Statement Balance"" + ""Outstanding Deposits"") - ""Outstanding Checks"""; ("Statement Balance" + "Outstanding Deposits") - "Outstanding Checks")
+                field("(""Statement Balance"" + ""Outstanding Deposits"") - ""Outstanding Checks"""; (Rec."Statement Balance" + Rec."Outstanding Deposits") - Rec."Outstanding Checks")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Ending Balance';
@@ -136,9 +136,9 @@ page 10125 "Posted Bank Rec. Worksheet"
                 part(ChecksSubForm; "Posted Bank Rec. Chk Lines Sub")
                 {
                     ApplicationArea = Basic, Suite;
-                    SubPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                                  "Statement No." = FIELD("Statement No."),
-                                  "Record Type" = CONST(Check);
+                    SubPageLink = "Bank Account No." = field("Bank Account No."),
+                                  "Statement No." = field("Statement No."),
+                                  "Record Type" = const(Check);
                 }
             }
             group("Deposits/Transfers")
@@ -147,9 +147,9 @@ page 10125 "Posted Bank Rec. Worksheet"
                 part(DepositsSubForm; "Posted Bank Rec. Dep Lines Sub")
                 {
                     ApplicationArea = Basic, Suite;
-                    SubPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                                  "Statement No." = FIELD("Statement No.");
-                    SubPageView = WHERE("Record Type" = CONST(Deposit));
+                    SubPageLink = "Bank Account No." = field("Bank Account No."),
+                                  "Statement No." = field("Statement No.");
+                    SubPageView = where("Record Type" = const(Deposit));
                 }
             }
             group(Adjustments)
@@ -158,9 +158,9 @@ page 10125 "Posted Bank Rec. Worksheet"
                 part(AdjustmentsSubForm; "Posted Bank Rec. Adj Lines Sub")
                 {
                     ApplicationArea = Basic, Suite;
-                    SubPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                                  "Statement No." = FIELD("Statement No.");
-                    SubPageView = WHERE("Record Type" = CONST(Adjustment));
+                    SubPageLink = "Bank Account No." = field("Bank Account No."),
+                                  "Statement No." = field("Statement No.");
+                    SubPageView = where("Record Type" = const(Adjustment));
                 }
             }
             group("Control Info")
@@ -250,9 +250,9 @@ page 10125 "Posted Bank Rec. Worksheet"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Bank Comment Sheet";
-                    RunPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                                  "No." = FIELD("Statement No.");
-                    RunPageView = WHERE("Table Name" = CONST("Posted Bank Rec."));
+                    RunPageLink = "Bank Account No." = field("Bank Account No."),
+                                  "No." = field("Statement No.");
+                    RunPageView = where("Table Name" = const("Posted Bank Rec."));
                     ToolTip = 'View comments that apply.';
                 }
                 action("C&ard")
@@ -261,7 +261,7 @@ page 10125 "Posted Bank Rec. Worksheet"
                     Caption = 'C&ard';
                     Image = EditLines;
                     RunObject = Page "Bank Account Card";
-                    RunPageLink = "No." = FIELD("Bank Account No.");
+                    RunPageLink = "No." = field("Bank Account No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the card for the bank account that is being reconciled. ';
                 }
@@ -292,7 +292,7 @@ page 10125 "Posted Bank Rec. Worksheet"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }
@@ -333,8 +333,8 @@ page 10125 "Posted Bank Rec. Worksheet"
 
     procedure SetupRecord()
     begin
-        SetRange("Date Filter", "Statement Date");
-        CalcFields("Positive Adjustments",
+        Rec.SetRange("Date Filter", Rec."Statement Date");
+        Rec.CalcFields("Positive Adjustments",
           "Negative Adjustments",
           "Positive Bal. Adjustments",
           "Negative Bal. Adjustments");

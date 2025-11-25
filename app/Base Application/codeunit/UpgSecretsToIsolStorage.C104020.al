@@ -144,7 +144,7 @@ codeunit 104020 "Upg Secrets to Isol. Storage"
 
         IF NOT ENCRYPTIONENABLED() THEN
             ISOLATEDSTORAGE.SET(ServicePassword.Key, ServicePasswordValue, DATASCOPE::Company)
-        ELSE
+        else
             ISOLATEDSTORAGE.SETENCRYPTED(ServicePassword.Key, ServicePasswordValue, DATASCOPE::Company);
 
         ServicePassword.Delete();

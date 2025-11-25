@@ -1,7 +1,13 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ServiceMgt.Contract;
+using System.Utilities;
+
 report 5985 "Contract Price Update - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ContractPriceUpdateTest.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ContractPriceUpdateTest.rdlc';
     Caption = 'Contract Price Update - Test';
 
     dataset
@@ -9,7 +15,7 @@ report 5985 "Contract Price Update - Test"
         dataitem("Service Contract Header"; "Service Contract Header")
         {
             CalcFields = Name;
-            DataItemTableView = SORTING("Next Price Update Date") WHERE("Contract Type" = CONST(Contract), Status = CONST(Signed), "Change Status" = CONST(Locked));
+            DataItemTableView = sorting("Next Price Update Date") where("Contract Type" = const(Contract), Status = const(Signed), "Change Status" = const(Locked));
             RequestFilterFields = "Contract No.", "Item Filter";
             RequestFilterHeading = 'Service Contract';
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -83,7 +89,7 @@ report 5985 "Contract Price Update - Test"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(OldUpdateDate; Format(OldUpdateDate))
                 {
                 }

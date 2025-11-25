@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.RoleCenters;
+
 profile "SHOP SUPERVISOR"
 {
     Caption = 'Shop Supervisor - Manufacturing Comprehensive';

@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Reminder;
+
+using System.Reflection;
+
 page 524 "Report Selection - Reminder"
 {
     ApplicationArea = Suite;
@@ -53,6 +57,17 @@ page 524 "Report Selection - Reminder"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether to attach the related document to the email.';
                 }
+                field(EmailBodyName; Rec."Email Body Layout Name")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the name of the email body layout that is used.';
+                }
+                field(EmailBodyPublisher; Rec."Email Body Layout Publisher")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the publisher of the email body layout that is used.';
+                    Visible = false;
+                }
                 field("Email Body Layout Code"; Rec."Email Body Layout Code")
                 {
                     ApplicationArea = Basic, Suite;
@@ -62,7 +77,8 @@ page 524 "Report Selection - Reminder"
                 field("Email Body Layout Description"; Rec."Email Body Layout Description")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies a description of the email body layout that is used.';
+                    ToolTip = 'Specifies a description of the email body custom layout that is used.';
+                    Visible = CustomLayoutsExist;
 
                     trigger OnDrillDown()
                     var
@@ -102,10 +118,12 @@ page 524 "Report Selection - Reminder"
     begin
         InitUsageFilter();
         SetUsageFilter(false);
+        CustomLayoutsExist := Rec.DoesAnyCustomLayotExist();
     end;
 
     var
         ReportUsage2: Enum "Report Selection Usage Reminder";
+        CustomLayoutsExist: Boolean;
 
     local procedure SetUsageFilter(ModifyRec: Boolean)
     begin
@@ -113,14 +131,14 @@ page 524 "Report Selection - Reminder"
             if Rec.Modify() then;
         Rec.FilterGroup(2);
         case ReportUsage2 of
-            "Report Selection Usage Reminder"::Reminder:
-                Rec.SetRange(Usage, "Report Selection Usage"::Reminder);
-            "Report Selection Usage Reminder"::"Fin. Charge":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Fin.Charge");
-            "Report Selection Usage Reminder"::"Reminder Test":
-                Rec.SetRange(Usage, "Report Selection Usage"::"Rem.Test");
-            "Report Selection Usage Reminder"::"Fin. Charge Test":
-                Rec.SetRange(Usage, "Report Selection Usage"::"F.C.Test");
+            Enum::"Report Selection Usage Reminder"::Reminder:
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::Reminder);
+            Enum::"Report Selection Usage Reminder"::"Fin. Charge":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"Fin.Charge");
+            Enum::"Report Selection Usage Reminder"::"Reminder Test":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"Rem.Test");
+            Enum::"Report Selection Usage Reminder"::"Fin. Charge Test":
+                Rec.SetRange(Usage, Enum::"Report Selection Usage"::"F.C.Test");
         end;
         OnSetUsageFilterOnAfterSetFiltersByReportUsage(Rec, ReportUsage2);
         Rec.FilterGroup(0);
@@ -134,13 +152,13 @@ page 524 "Report Selection - Reminder"
         if Rec.GetFilter(Usage) <> '' then begin
             if Evaluate(ReportUsage, Rec.GetFilter(Usage)) then
                 case ReportUsage of
-                    "Report Selection Usage"::Reminder:
+                    Enum::"Report Selection Usage"::Reminder:
                         ReportUsage2 := ReportUsage2::Reminder;
-                    "Report Selection Usage"::"Fin.Charge":
+                    Enum::"Report Selection Usage"::"Fin.Charge":
                         ReportUsage2 := ReportUsage2::"Fin. Charge";
-                    "Report Selection Usage"::"Rem.Test":
+                    Enum::"Report Selection Usage"::"Rem.Test":
                         ReportUsage2 := ReportUsage2::"Reminder Test";
-                    "Report Selection Usage"::"F.C.Test":
+                    Enum::"Report Selection Usage"::"F.C.Test":
                         ReportUsage2 := ReportUsage2::"Fin. Charge Test";
                     else
                         OnInitUsageFilterOnElseCase(ReportUsage, ReportUsage2);

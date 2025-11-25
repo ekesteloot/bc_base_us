@@ -1,3 +1,9 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.InventoryDocument;
+
 page 7397 "Posted Invt. Pick Lines"
 {
     Caption = 'Posted Invt. Pick Lines';
@@ -163,7 +169,7 @@ page 7397 "Posted Invt. Pick Lines"
 
                     trigger OnAction()
                     begin
-                        PostedInvtPickHeader.Get("No.");
+                        PostedInvtPickHeader.Get(Rec."No.");
                         PAGE.Run(PAGE::"Posted Invt. Pick", PostedInvtPickHeader);
                     end;
                 }

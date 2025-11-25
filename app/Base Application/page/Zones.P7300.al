@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 7300 Zones
 {
     Caption = 'Zones';
@@ -18,7 +20,7 @@ page 7300 Zones
                     ToolTip = 'Specifies the location code of the zone.';
                     Visible = false;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the code of the zone.';
@@ -85,10 +87,16 @@ page 7300 Zones
                     Caption = '&Bins';
                     Image = Bins;
                     RunObject = Page Bins;
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Zone Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Zone Code" = field(Code);
                     ToolTip = 'View or edit information about zones that you use in your warehouse to hold items.';
                 }
+            }
+        }
+        area(Promoted)
+        {
+            actionref(Bins_Promoted; "&Bins")
+            {
             }
         }
     }

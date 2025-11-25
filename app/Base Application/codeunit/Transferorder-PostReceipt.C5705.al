@@ -1,3 +1,27 @@
+﻿namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Comment;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using System.Utilities;
+
 codeunit 5705 "TransferOrder-Post Receipt"
 {
     Permissions = TableData "Item Entry Relation" = i;
@@ -18,6 +42,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
     internal procedure RunWithCheck(var TransferHeader2: Record "Transfer Header")
     var
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         SourceCodeSetup: Record "Source Code Setup";
         ValueEntry: Record "Value Entry";
         ItemLedgEntry: Record "Item Ledger Entry";
@@ -114,6 +139,11 @@ codeunit 5705 "TransferOrder-Post Receipt"
                         OnRunOnBeforeCheckItemBlocked(TransLine, Item, TransHeader, Location, WhseReceive, IsHandled);
                         if not IsHandled then
                             Item.TestField(Blocked, false);
+
+                        if TransLine."Variant Code" <> '' then begin
+                            ItemVariant.Get(TransLine."Item No.", TransLine."Variant Code");
+                            CheckItemVariantNotBlocked(ItemVariant);
+                        end;
                     end;
 
                     OnCheckTransLine(TransLine, TransHeader, Location, WhseReceive);
@@ -158,7 +188,6 @@ codeunit 5705 "TransferOrder-Post Receipt"
             end;
 
             "Last Receipt No." := TransRcptHeader."No.";
-            OnRunWithCheckOnBeforeModifyTransferHeader(TransHeader);
             Modify();
 
             TransLine.SetRange(Quantity);
@@ -170,7 +199,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
                 DeleteOneTransferOrder(TransHeader, TransLine)
             else begin
                 WhseTransferRelease.Release(TransHeader);
-                ReserveTransLine.UpdateItemTrackingAfterPosting(TransHeader, "Transfer Direction"::Inbound);
+                ReserveTransLine.UpdateItemTrackingAfterPosting(TransHeader, Enum::"Transfer Direction"::Inbound);
             end;
 
             OnRunOnBeforeCommit(TransHeader, TransRcptHeader, PostedWhseRcptHeader, SuppressCommit);
@@ -295,6 +324,18 @@ codeunit 5705 "TransferOrder-Post Receipt"
         OnAfterPostItemJnlLine(ItemJnlLine, TransLine3, TransRcptHeader2, TransRcptLine2, ItemJnlPostLine);
     end;
 
+    local procedure CheckItemVariantNotBlocked(var ItemVariant: Record "Item Variant")
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCheckItemVariantNotBlocked(TransLine, ItemVariant, Transheader, Location, WhseReceive, IsHandled);
+        if IsHandled then
+            exit;
+
+        ItemVariant.TestField(Blocked, false);
+    end;
+
     local procedure CheckDim()
     begin
         TransLine."Line No." := 0;
@@ -415,7 +456,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
                 end;
                 if TransLine4."Qty. to Receive (Base)" <= BaseQtyToReceive then begin
                     ReserveTransLine.TransferTransferToItemJnlLine(
-                      TransLine4, ItemJnlLine, TransLine4."Qty. to Receive (Base)", "Transfer Direction"::Inbound);
+                      TransLine4, ItemJnlLine, TransLine4."Qty. to Receive (Base)", Enum::"Transfer Direction"::Inbound);
                     TransLine4."Quantity (Base)" :=
                       TransLine4."Quantity (Base)" - TransLine4."Qty. to Receive (Base)";
                     TransLine4.Quantity :=
@@ -424,7 +465,7 @@ codeunit 5705 "TransferOrder-Post Receipt"
                     QtyToReceive := QtyToReceive - TransLine4."Qty. to Receive";
                 end else begin
                     ReserveTransLine.TransferTransferToItemJnlLine(
-                      TransLine4, ItemJnlLine, BaseQtyToReceive, "Transfer Direction"::Inbound);
+                      TransLine4, ItemJnlLine, BaseQtyToReceive, Enum::"Transfer Direction"::Inbound);
                     TransLine4.Quantity := TransLine4.Quantity - QtyToReceive;
                     TransLine4."Quantity (Base)" := TransLine4."Quantity (Base)" - BaseQtyToReceive;
                     BaseQtyToReceive := 0;
@@ -938,12 +979,12 @@ codeunit 5705 "TransferOrder-Post Receipt"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnBeforeUpdateWithWarehouseShipReceive(var TransferLine: Record "Transfer Line")
+    local procedure OnBeforeCheckItemVariantNotBlocked(TransLine: Record "Transfer Line"; ItemVariant: Record "Item Variant"; TransHeader: Record "Transfer Header"; Location: Record Location; WhseReceive: Boolean; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunWithCheckOnBeforeModifyTransferHeader(var TransferHeader: Record "Transfer Header");
+    local procedure OnRunOnBeforeUpdateWithWarehouseShipReceive(var TransferLine: Record "Transfer Line")
     begin
     end;
 }

@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+
 codeunit 5652 "Insurance Jnl.-Post Line"
 {
     Permissions = TableData "Ins. Coverage Ledger Entry" = rimd,

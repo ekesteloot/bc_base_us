@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+
 codeunit 1314 "Purch. Doc. From Sales Doc."
 {
 

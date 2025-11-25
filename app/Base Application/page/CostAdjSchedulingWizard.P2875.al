@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using System.Environment;
+using System.Threading;
+
 page 2875 "Cost Adj. Scheduling Wizard"
 {
     PageType = NavigatePage;

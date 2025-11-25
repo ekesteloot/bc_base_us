@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 table 355 "Dimension Set ID Filter Line"
 {
     Caption = 'Dimension Set ID Filter Line';

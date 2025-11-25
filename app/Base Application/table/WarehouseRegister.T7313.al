@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Ledger;
+
+using Microsoft.InventoryMgt.Journal;
+using System.Security.AccessControl;
+
 table 7313 "Warehouse Register"
 {
     Caption = 'Warehouse Register';
@@ -33,15 +38,11 @@ table 7313 "Warehouse Register"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(7; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
             TableRelation = "Item Journal Batch".Name;
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(9; "Creation Time"; Time)
         {

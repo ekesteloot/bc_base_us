@@ -20,8 +20,8 @@ table 552 "VAT Rate Change Log Entry"
         }
         field(11; "Table Caption"; Text[80])
         {
-            CalcFormula = Lookup(AllObj."Object Name" WHERE("Object Type" = CONST(Table),
-                                                             "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObj."Object Name" where("Object Type" = const(Table),
+                                                             "Object ID" = field("Table ID")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;

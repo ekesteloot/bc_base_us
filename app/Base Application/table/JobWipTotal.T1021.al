@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+
 table 1021 "Job WIP Total"
 {
     Caption = 'Job WIP Total';
@@ -22,7 +26,7 @@ table 1021 "Job WIP Total"
         {
             Caption = 'Job Task No.';
             NotBlank = true;
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
             ValidateTableRelation = false;
         }
         field(4; "WIP Method"; Code[20])
@@ -48,7 +52,7 @@ table 1021 "Job WIP Total"
         }
         field(8; "WIP Warnings"; Boolean)
         {
-            CalcFormula = Exist ("Job WIP Warning" WHERE("Job WIP Total Entry No." = FIELD("Entry No.")));
+            CalcFormula = Exist("Job WIP Warning" where("Job WIP Total Entry No." = field("Entry No.")));
             Caption = 'WIP Warnings';
             FieldClass = FlowField;
         }

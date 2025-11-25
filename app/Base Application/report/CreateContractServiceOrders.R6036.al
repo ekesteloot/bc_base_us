@@ -1,3 +1,12 @@
+namespace Microsoft.ServiceMgt.Contract;
+
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Reports;
+using Microsoft.ServiceMgt.Setup;
+
 report 6036 "Create Contract Service Orders"
 {
     ApplicationArea = Service;
@@ -9,12 +18,12 @@ report 6036 "Create Contract Service Orders"
     {
         dataitem("Service Contract Header"; "Service Contract Header")
         {
-            DataItemTableView = WHERE("Contract Type" = CONST(Contract), "Change Status" = CONST(Locked), Status = CONST(Signed));
+            DataItemTableView = where("Contract Type" = const(Contract), "Change Status" = const(Locked), Status = const(Signed));
             RequestFilterFields = "Contract No.";
             dataitem("Service Contract Line"; "Service Contract Line")
             {
-                DataItemLink = "Contract Type" = FIELD("Contract Type"), "Contract No." = FIELD("Contract No.");
-                DataItemTableView = WHERE("Service Period" = FILTER(<> ''));
+                DataItemLink = "Contract Type" = field("Contract Type"), "Contract No." = field("Contract No.");
+                DataItemTableView = where("Service Period" = filter(<> ''));
 
                 trigger OnAfterGetRecord()
                 begin

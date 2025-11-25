@@ -1,9 +1,29 @@
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.AssemblyMgt.History;
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Globalization;
+using System.Text;
+using System.Utilities;
+
 report 1307 "Standard Sales - Credit Memo"
 {
-    RDLCLayout = './SalesReceivables/Document/StandardSalesCreditMemo.rdlc';
-    WordLayout = './StandardSalesCreditMemo.docx';
     Caption = 'Sales - Credit Memo';
-    DefaultLayout = Word;
+    DefaultRenderingLayout = "StandardSalesCreditMemo.docx";
     Permissions = TableData "Sales Shipment Buffer" = rimd;
     PreviewMode = PrintLayout;
     WordMergeDataItem = Header;
@@ -12,7 +32,7 @@ report 1307 "Standard Sales - Credit Memo"
     {
         dataitem(Header; "Sales Cr.Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Sales Credit Memo';
             column(CompanyAddress1; CompanyAddr[1])
@@ -111,19 +131,19 @@ report 1307 "Standard Sales - Credit Memo"
             column(CompanyVATRegistrationNo_Lbl; CompanyInfo.GetVATRegistrationNumberLbl())
             {
             }
-            column(CompanyLegalOffice; CompanyInfo.GetLegalOffice())
+            column(CompanyLegalOffice; LegalOfficeTxt)
             {
             }
-            column(CompanyLegalOffice_Lbl; CompanyInfo.GetLegalOfficeLbl())
+            column(CompanyLegalOffice_Lbl; LegalOfficeLbl)
             {
             }
-            column(CompanyCustomGiro; CompanyInfo.GetCustomGiro())
+            column(CompanyCustomGiro; CustomGiroTxt)
             {
             }
-            column(CompanyCustomGiro_Lbl; CompanyInfo.GetCustomGiroLbl())
+            column(CompanyCustomGiro_Lbl; CustomGiroLbl)
             {
             }
-            column(CompanyLegalStatement; GetLegalStatement())
+            column(CompanyLegalStatement; LegalStatementLbl)
             {
             }
             column(CustomerAddress1; CustAddr[1])
@@ -407,9 +427,9 @@ report 1307 "Standard Sales - Credit Memo"
             }
             dataitem(Line; "Sales Cr.Memo Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
+                DataItemLink = "Document No." = field("No.");
                 DataItemLinkReference = Header;
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 column(LineNo_Line; "Line No.")
                 {
                 }
@@ -520,7 +540,7 @@ report 1307 "Standard Sales - Credit Memo"
                 }
                 dataitem(ShipmentLine; "Sales Shipment Buffer")
                 {
-                    DataItemTableView = SORTING("Document No.", "Line No.", "Entry No.");
+                    DataItemTableView = sorting("Document No.", "Line No.", "Entry No.");
                     UseTemporary = true;
                     column(DocumentNo_ShipmentLine; "Document No.")
                     {
@@ -546,7 +566,7 @@ report 1307 "Standard Sales - Credit Memo"
                 }
                 dataitem(AssemblyLine; "Posted Assembly Line")
                 {
-                    DataItemTableView = SORTING("Document No.", "Line No.");
+                    DataItemTableView = sorting("Document No.", "Line No.");
                     UseTemporary = true;
                     column(LineNo_AssemblyLine; "No.")
                     {
@@ -642,7 +662,7 @@ report 1307 "Standard Sales - Credit Memo"
             }
             dataitem(WorkDescriptionLines; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 .. 99999));
+                DataItemTableView = sorting(Number) where(Number = filter(1 .. 99999));
                 column(WorkDescriptionLineNumber; Number)
                 {
                 }
@@ -671,7 +691,7 @@ report 1307 "Standard Sales - Credit Memo"
             }
             dataitem(VATAmountLine; "VAT Amount Line")
             {
-                DataItemTableView = SORTING("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
+                DataItemTableView = sorting("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
                 UseTemporary = true;
                 column(InvoiceDiscountAmount_VATAmountLine; "Invoice Discount Amount")
                 {
@@ -773,7 +793,7 @@ report 1307 "Standard Sales - Credit Memo"
             }
             dataitem(VATClauseLine; "VAT Amount Line")
             {
-                DataItemTableView = SORTING("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
+                DataItemTableView = sorting("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
                 UseTemporary = true;
                 column(VATIdentifier_VATClauseLine; "VAT Identifier")
                 {
@@ -810,7 +830,7 @@ report 1307 "Standard Sales - Credit Memo"
             }
             dataitem(ReportTotalsLine; "Report Totals Buffer")
             {
-                DataItemTableView = SORTING("Line No.");
+                DataItemTableView = sorting("Line No.");
                 UseTemporary = true;
                 column(Description_ReportTotalsLine; Description)
                 {
@@ -833,7 +853,7 @@ report 1307 "Standard Sales - Credit Memo"
             }
             dataitem(USReportTotalsLine; "Report Totals Buffer")
             {
-                DataItemTableView = SORTING("Line No.");
+                DataItemTableView = sorting("Line No.");
                 UseTemporary = true;
                 column(Description_USReportTotalsLine; Description)
                 {
@@ -858,7 +878,7 @@ report 1307 "Standard Sales - Credit Memo"
             }
             dataitem(LetterText; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(GreetingText; GreetingLbl)
                 {
                 }
@@ -871,7 +891,7 @@ report 1307 "Standard Sales - Credit Memo"
             }
             dataitem(Totals; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(TotalNetAmount; Format(TotalAmount, 0, AutoFormat.ResolveAutoFormat("Auto Format"::AmountFormat, Header."Currency Code")))
                 {
                 }
@@ -922,7 +942,7 @@ report 1307 "Standard Sales - Credit Memo"
                 }
                 column(AmountExemptFromSalesTaxLbl; AmtExemptfromSalesTaxLbl)
                 {
-                }                
+                }
                 column(CurrencyCode; CurrCode)
                 {
                 }
@@ -945,6 +965,7 @@ report 1307 "Standard Sales - Credit Memo"
                 CalcFields("Work Description");
                 ShowWorkDescription := "Work Description".HasValue;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields(Header);
@@ -1037,17 +1058,59 @@ report 1307 "Standard Sales - Credit Memo"
         end;
     }
 
+    rendering
+    {
+        layout("StandardSalesCreditMemo.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/History/StandardSalesCreditMemo.rdlc';
+            Caption = 'Standard Sales Credit Memo (RDLC)';
+            Summary = 'The Standard Sales Credit Memo (RDLC) provides a detailed layout.';
+        }
+        layout("StandardSalesCreditMemo.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesCreditMemo.docx';
+            Caption = 'Standard Sales Credit Memo (Word)';
+            Summary = 'The Standard Sales Credit Memo (Word) provides a basic layout.';
+        }
+        layout("StandardSalesCreditMemoEmail.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesCreditMemoEmail.docx';
+            Caption = 'Standard Sales Credit Memo Email (Word)';
+            Summary = 'The Standard Sales Credit Memo Email (Word) provides an email body layout.';
+        }
+    }
+
     labels
     {
     }
 
     trigger OnInitReport()
+    var
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        IsHandled: Boolean;
     begin
         GLSetup.Get();
         CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
         SalesSetup.Get();
         CompanyInfo.VerifyAndSetPaymentInfo();
+
+        if SalesCrMemoHeader.GetLegalStatement() <> '' then
+            LegalStatementLbl := SalesCrMemoHeader.GetLegalStatement();
+
+        IsHandled := false;
+        OnInitReportForGlobalVariable(IsHandled, LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl, LegalStatementLbl);
+#if not CLEAN23
+        if not IsHandled then begin
+            LegalOfficeTxt := CompanyInfo.GetLegalOffice();
+            LegalOfficeLbl := CompanyInfo.GetLegalOfficeLbl();
+            CustomGiroTxt := CompanyInfo.GetCustomGiro();
+            CustomGiroLbl := CompanyInfo.GetCustomGiroLbl();
+        end;
+#endif
     end;
 
     trigger OnPostReport()
@@ -1082,7 +1145,6 @@ report 1307 "Standard Sales - Credit Memo"
         PaymentMethod: Record "Payment Method";
         CompanyBankAccount: Record "Bank Account";
         DummyCompanyInfo: Record "Company Information";
-        CompanyInfo: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         Cust: Record Customer;
         RespCenter: Record "Responsibility Center";
@@ -1098,7 +1160,6 @@ report 1307 "Standard Sales - Credit Memo"
         ShowWorkDescription: Boolean;
         LogInteraction: Boolean;
         TransHeaderAmount: Decimal;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         CompanyLogoPosition: Integer;
         CalculatedExchRate: Decimal;
@@ -1107,7 +1168,6 @@ report 1307 "Standard Sales - Credit Memo"
         AppliesToText: Text;
         CurrCode: Text[10];
         CurrSymbol: Text[10];
-
         SalesCreditMemoNoLbl: Label 'Sales - Credit Memo %1';
         SalespersonLbl: Label 'Sales person';
         CompanyInfoBankAccNoLbl: Label 'Account No.';
@@ -1162,8 +1222,10 @@ report 1307 "Standard Sales - Credit Memo"
         UnitPriceLbl: Label 'Unit Price';
         LineAmountLbl: Label 'Line Amount';
         SalespersonLbl2: Label 'Salesperson';
+        LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl, LegalStatementLbl : Text;
 
     protected var
+        CompanyInfo: Record "Company Information";
         PaymentTerms: Record "Payment Terms";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         ShipmentMethod: Record "Shipment Method";
@@ -1196,12 +1258,11 @@ report 1307 "Standard Sales - Credit Memo"
         VATAmountLCY: Decimal;
         TotalVATBaseLCY: Decimal;
         TotalVATAmountLCY: Decimal;
-
         VATAmtLbl: Label 'VAT Amount';
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Cr. Memo") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Cr. Memo") <> '';
     end;
 
     local procedure InitializeSalesShipmentLine(): Date
@@ -1239,11 +1300,11 @@ report 1307 "Standard Sales - Credit Memo"
         exit(Header."Posting Date");
     end;
 
-    local procedure IsReportInPreviewMode(): Boolean
+    protected procedure IsReportInPreviewMode(): Boolean
     var
         MailManagement: Codeunit "Mail Management";
     begin
-        exit(CurrReport.Preview or MailManagement.IsHandlingGetEmailBody());
+        exit(CurrReport.Preview() or MailManagement.IsHandlingGetEmailBody());
     end;
 
     local procedure DocumentCaption(): Text[250]
@@ -1392,6 +1453,11 @@ report 1307 "Standard Sales - Credit Memo"
 
     [IntegrationEvent(false, false)]
     local procedure OnLineOnAfterGetRecordOnBeforeCheckLineDiscount(var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitReportForGlobalVariable(var IsHandled: Boolean; var LegalOfficeTxt: Text; var LegalOfficeLbl: Text; var CustomGiroTxt: Text; var CustomGiroLbl: Text; var LegalStatementLbl: Text)
     begin
     end;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Costing;
+
 enum 5895 "Inventory Adjustment Impl." implements "Inventory Adjustment"
 {
     Extensible = true;

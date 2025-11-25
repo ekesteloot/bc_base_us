@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 enum 98 "G/L Setup VAT Calculation"
 {
     Extensible = true;

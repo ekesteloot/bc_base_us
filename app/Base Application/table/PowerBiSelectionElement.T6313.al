@@ -1,3 +1,5 @@
+namespace System.Integration.PowerBI;
+
 /// <summary>
 /// Represents a Power BI Report or Power BI Workspace as returned by the Power BI backend.
 /// </summary>

@@ -1,3 +1,23 @@
+﻿namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.Statement;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.IO;
+using System.Utilities;
+
 table 274 "Bank Acc. Reconciliation Line"
 {
     Caption = 'Bank Acc. Reconciliation Line';
@@ -13,7 +33,7 @@ table 274 "Bank Acc. Reconciliation Line"
         field(2; "Statement No."; Code[20])
         {
             Caption = 'Statement No.';
-            TableRelation = "Bank Acc. Reconciliation"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."));
+            TableRelation = "Bank Acc. Reconciliation"."Statement No." where("Bank Account No." = field("Bank Account No."));
         }
         field(3; "Statement Line No."; Integer)
         {
@@ -103,7 +123,7 @@ table 274 "Bank Acc. Reconciliation Line"
 
             trigger OnLookup()
             begin
-                DisplayApplication();
+                Rec.DisplayApplication();
             end;
         }
         field(12; "Value Date"; Date)
@@ -137,11 +157,9 @@ table 274 "Bank Acc. Reconciliation Line"
             Caption = 'Data Exch. Line No.';
             Editable = false;
         }
-        field(20; "Statement Type"; Option)
+        field(20; "Statement Type"; Enum "Bank Acc. Rec. Stmt. Type")
         {
             Caption = 'Statement Type';
-            OptionCaption = 'Bank Reconciliation,Payment Application';
-            OptionMembers = "Bank Reconciliation","Payment Application";
         }
         field(21; "Account Type"; Enum "Gen. Journal Account Type")
         {
@@ -162,20 +180,20 @@ table 274 "Bank Acc. Reconciliation Line"
         field(22; "Account No."; Code[20])
         {
             Caption = 'Account No.';
-            TableRelation = IF ("Account Type" = CONST("G/L Account")) "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                                                          Blocked = CONST(false))
-            ELSE
-            IF ("Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Account Type" = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF ("Account Type" = CONST("IC Partner")) "IC Partner"
-            ELSE
-            IF ("Account Type" = CONST(Employee)) Employee;
+            TableRelation = if ("Account Type" = const("G/L Account")) "G/L Account" where("Account Type" = const(Posting),
+                                                                                          Blocked = const(false))
+            else
+            if ("Account Type" = const(Customer)) Customer
+            else
+            if ("Account Type" = const(Vendor)) Vendor
+            else
+            if ("Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Account Type" = const("Fixed Asset")) "Fixed Asset"
+            else
+            if ("Account Type" = const("IC Partner")) "IC Partner"
+            else
+            if ("Account Type" = const(Employee)) Employee;
 
             trigger OnValidate()
             begin
@@ -213,45 +231,43 @@ table 274 "Bank Acc. Reconciliation Line"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(32; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
-        field(50; "Match Confidence"; Option)
+        field(50; "Match Confidence"; Enum "Bank Rec. Match Confidence")
         {
-            CalcFormula = Max("Applied Payment Entry"."Match Confidence" WHERE("Statement Type" = FIELD("Statement Type"),
-                                                                                "Bank Account No." = FIELD("Bank Account No."),
-                                                                                "Statement No." = FIELD("Statement No."),
-                                                                                "Statement Line No." = FIELD("Statement Line No.")));
+            CalcFormula = max("Applied Payment Entry"."Match Confidence" where("Statement Type" = field("Statement Type"),
+                                                                                "Bank Account No." = field("Bank Account No."),
+                                                                                "Statement No." = field("Statement No."),
+                                                                                "Statement Line No." = field("Statement Line No.")));
             Caption = 'Match Confidence';
             Editable = false;
             FieldClass = FlowField;
             InitValue = "None";
-            OptionCaption = 'None,Low,Medium,High,High - Text-to-Account Mapping,Manual,Accepted';
-            OptionMembers = "None",Low,Medium,High,"High - Text-to-Account Mapping",Manual,Accepted;
         }
         field(51; "Match Quality"; Integer)
         {
-            CalcFormula = Max("Applied Payment Entry".Quality WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                     "Statement No." = FIELD("Statement No."),
-                                                                     "Statement Line No." = FIELD("Statement Line No."),
-                                                                     "Statement Type" = FIELD("Statement Type")));
+            CalcFormula = max("Applied Payment Entry".Quality where("Bank Account No." = field("Bank Account No."),
+                                                                     "Statement No." = field("Statement No."),
+                                                                     "Statement Line No." = field("Statement Line No."),
+                                                                     "Statement Type" = field("Statement Type")));
             Caption = 'Match Quality';
             Editable = false;
             FieldClass = FlowField;
@@ -277,7 +293,7 @@ table 274 "Bank Acc. Reconciliation Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -364,7 +380,6 @@ table 274 "Bank Acc. Reconciliation Line"
         ICPartnerAccountTypeQst: Label 'The resulting entry will be of type IC Transaction, but no Intercompany Outbox transaction will be created. \\Do you want to use the IC Partner account type anyway?';
         AppliedEntriesFilterLbl: Label '|%1', Locked = true;
         MatchedAutomaticallyFilterLbl: Label '=%1|%2|%3|%4', Locked = true;
-        PaymentReconciliationJournalUXImprovementsLbl: Label 'PaymentReconciliationJournalUXImprovements', Locked = true;
         NotAppliedTxt: Label 'Not applied';
         MatchedAutomaticallyTxt: Label 'Matched Automatically';
         MatchedFromTextMappingRulesTxt: Label 'Matched - Text-To-Account Mapping';
@@ -489,47 +504,16 @@ table 274 "Bank Acc. Reconciliation Line"
         OnAfterShowDimensions(Rec);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        BankAccReconciliation: Record "Bank Acc. Reconciliation";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        TableID[2] := Type2;
-        No[2] := No2;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, TableID, No, SourceCodeSetup."Payment Reconciliation Journal",
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", BankAccReconciliation."Dimension Set ID", DATABASE::"Bank Account");
-
-        DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
         BankAccReconciliation: Record "Bank Acc. Reconciliation";
     begin
         SourceCodeSetup.Get();
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
-        BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
+        BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
         "Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup."Payment Reconciliation Journal",
@@ -560,7 +544,7 @@ table 274 "Bank Acc. Reconciliation Line"
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure AcceptAppliedPaymentEntriesSelectedLines()
@@ -818,7 +802,7 @@ table 274 "Bank Acc. Reconciliation Line"
     local procedure SetAppliedPaymentEntryFromRec(var AppliedPaymentEntry: Record "Applied Payment Entry")
     begin
         AppliedPaymentEntry.TransferFromBankAccReconLine(Rec);
-        AppliedPaymentEntry."Account Type" := "Gen. Journal Account Type".FromInteger(GetAppliedToAccountType());
+        AppliedPaymentEntry."Account Type" := Enum::"Gen. Journal Account Type".FromInteger(GetAppliedToAccountType());
         AppliedPaymentEntry."Account No." := GetAppliedToAccountNo();
     end;
 
@@ -1315,7 +1299,7 @@ table 274 "Bank Acc. Reconciliation Line"
         BankAccReconciliation: Record "Bank Acc. Reconciliation";
     begin
         BankAccReconciliation.SetLoadFields("Allow Duplicated Transactions");
-        BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
+        BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
         exit(BankAccReconciliation."Allow Duplicated Transactions");
     end;
 
@@ -1323,7 +1307,7 @@ table 274 "Bank Acc. Reconciliation Line"
     var
         BankAccReconciliation: Record "Bank Acc. Reconciliation";
     begin
-        BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
+        BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
         if BankAccReconciliation."Import Posted Transactions" = BankAccReconciliation."Import Posted Transactions"::" " then begin
             BankAccReconciliation."Import Posted Transactions" := BankAccReconciliation."Import Posted Transactions"::No;
             if GuiAllowed then
@@ -1374,17 +1358,6 @@ table 274 "Bank Acc. Reconciliation Line"
                 if Vendor.Get("Account No.") then
                     exit(Vendor."Purchaser Code");
         end;
-    end;
-
-    [Obsolete('This function will be removed once the feature switch is removed. The old ux and the ability to switch will be removed.', '17.0')]
-    internal procedure GetNewExperienceActive(): Boolean
-    var
-        FeatureKey: Record "Feature Key";
-    begin
-        if not FeatureKey.Get(PaymentReconciliationJournalUXImprovementsLbl) then
-            exit(true);
-
-        exit(FeatureKey.Enabled = FeatureKey.Enabled::"All Users");
     end;
 
     internal procedure GetAppliesToIDForBankStatement(): Code[50]
@@ -1440,48 +1413,10 @@ table 274 "Bank Acc. Reconciliation Line"
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Bank Acc. Reconciliation Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Bank Acc. Reconciliation Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Bank Acc. Reconciliation Line") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
-
-#if not CLEAN20
-    [IntegrationEvent(false, false)]
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    local procedure OnAfterCreateDimTableIDs(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; var FieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetUpNewLine(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"; xBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line");

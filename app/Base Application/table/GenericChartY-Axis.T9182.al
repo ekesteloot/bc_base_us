@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 9182 "Generic Chart Y-Axis"
 {
     Caption = 'Generic Chart Y-Axis';

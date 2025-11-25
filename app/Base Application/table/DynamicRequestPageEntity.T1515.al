@@ -26,13 +26,13 @@ table 1515 "Dynamic Request Page Entity"
         }
         field(4; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup ("Table Metadata".Name WHERE(ID = FIELD("Table ID")));
+            CalcFormula = Lookup ("Table Metadata".Name where(ID = field("Table ID")));
             Caption = 'Table Name';
             FieldClass = FlowField;
         }
         field(5; "Table Caption"; Text[80])
         {
-            CalcFormula = Lookup ("Table Metadata".Caption WHERE(ID = FIELD("Table ID")));
+            CalcFormula = Lookup ("Table Metadata".Caption where(ID = field("Table ID")));
             Caption = 'Table Caption';
             FieldClass = FlowField;
         }
@@ -50,13 +50,13 @@ table 1515 "Dynamic Request Page Entity"
         }
         field(7; "Related Table Name"; Text[30])
         {
-            CalcFormula = Lookup ("Table Metadata".Name WHERE(ID = FIELD("Related Table ID")));
+            CalcFormula = Lookup ("Table Metadata".Name where(ID = field("Related Table ID")));
             Caption = 'Related Table Name';
             FieldClass = FlowField;
         }
         field(8; "Related Table Caption"; Text[80])
         {
-            CalcFormula = Lookup ("Table Metadata".Caption WHERE(ID = FIELD("Related Table ID")));
+            CalcFormula = Lookup ("Table Metadata".Caption where(ID = field("Related Table ID")));
             Caption = 'Related Table Caption';
             FieldClass = FlowField;
         }

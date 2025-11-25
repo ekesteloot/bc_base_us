@@ -1,3 +1,5 @@
+namespace System.Integration;
+
 page 6725 "OData EDM Definitions"
 {
     Caption = 'OData EDM Definitions';
@@ -11,7 +13,7 @@ page 6725 "OData EDM Definitions"
         {
             repeater(Group)
             {
-                field("Key"; Key)
+                field("Key"; Rec.Key)
                 {
                     ApplicationArea = All;
                 }

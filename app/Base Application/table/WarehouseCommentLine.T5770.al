@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Comment;
+
+using Microsoft.WarehouseMgt.Activity;
+
 table 5770 "Warehouse Comment Line"
 {
     Caption = 'Warehouse Comment Line';

@@ -1,3 +1,29 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Availability;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using System.Utilities;
+
 codeunit 99000845 "Reservation Management"
 {
     Permissions = TableData "Item Ledger Entry" = rm,
@@ -83,7 +109,7 @@ codeunit 99000845 "Reservation Management"
     procedure SetReservSource(NewRecordVar: Variant)
     begin
         SourceRecRef.GetTable(NewRecordVar);
-        SetReservSource(SourceRecRef, "Transfer Direction"::Outbound);
+        SetReservSource(SourceRecRef, Enum::"Transfer Direction"::Outbound);
     end;
 
     procedure SetReservSource(NewRecordVar: Variant; Direction: Enum "Transfer Direction")
@@ -94,7 +120,7 @@ codeunit 99000845 "Reservation Management"
 
     procedure SetReservSource(NewSourceRecRef: RecordRef)
     begin
-        SetReservSource(NewSourceRecRef, "Transfer Direction"::Outbound);
+        SetReservSource(NewSourceRecRef, Enum::"Transfer Direction"::Outbound);
     end;
 
     procedure SetReservSource(NewSourceRecRef: RecordRef; Direction: Enum "Transfer Direction")
@@ -106,35 +132,35 @@ codeunit 99000845 "Reservation Management"
 
         OnSetReservSource(SourceRecRef, CalcReservEntry, Direction);
         case SourceRecRef.Number of
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 SetSourceForSalesLine();
-            DATABASE::"Requisition Line":
+            Enum::TableID::"Requisition Line".AsInteger():
                 SetSourceForReqLine();
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 SetSourceForPurchLine();
-            DATABASE::"Item Journal Line":
+            Enum::TableID::"Item Journal Line".AsInteger():
                 SetSourceForItemJnlLine();
-            DATABASE::"Item Ledger Entry":
+            Enum::TableID::"Item Ledger Entry".AsInteger():
                 SetSourceForItemLedgerEntry();
-            DATABASE::"Prod. Order Line":
+            Enum::TableID::"Prod. Order Line".AsInteger():
                 SetSourceForProdOrderLine();
-            DATABASE::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component".AsInteger():
                 SetSourceForProdOrderComp();
-            DATABASE::"Planning Component":
+            Enum::TableID::"Planning Component".AsInteger():
                 SetSourceForPlanningComp();
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line".AsInteger():
                 SetSourceForTransferLine(Direction);
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 SetSourceForServiceLine();
-            DATABASE::"Job Journal Line":
+            Enum::TableID::"Job Journal Line".AsInteger():
                 SetSourceForJobJournalLine();
-            DATABASE::"Job Planning Line":
+            Enum::TableID::"Job Planning Line".AsInteger():
                 SetSourceForJobPlanningLine();
-            DATABASE::"Assembly Header":
+            Enum::TableID::"Assembly Header".AsInteger():
                 SetSourceForAssemblyHeader();
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line".AsInteger():
                 SetSourceForAssemblyLine();
-            DATABASE::"Invt. Document Line":
+            Enum::TableID::"Invt. Document Line".AsInteger():
                 SetSourceForInvtDocLine();
         end;
 
@@ -338,9 +364,9 @@ codeunit 99000845 "Reservation Management"
             TempEntrySummary."Entry No." := ValueArray[i];
 
             case ValueArray[i] of
-                "Reservation Summary Type"::"Item Ledger Entry".AsInteger():
+                Enum::"Reservation Summary Type"::"Item Ledger Entry".AsInteger():
                     UpdateItemLedgEntryStats(CalcReservEntry, TempEntrySummary, TotalQuantity, HandleItemTracking2);
-                "Reservation Summary Type"::"Item Tracking Line".AsInteger():
+                Enum::"Reservation Summary Type"::"Item Tracking Line".AsInteger():
                     UpdateItemTrackingLineStats(CalcReservEntry, TempEntrySummary, AvailabilityDate);
             end;
 
@@ -398,7 +424,7 @@ codeunit 99000845 "Reservation Management"
                     if QtyAllocInWhse < 0 then
                         QtyAllocInWhse := 0;
 
-                    TempEntrySummary."Table ID" := DATABASE::"Item Ledger Entry";
+                    TempEntrySummary."Table ID" := Enum::TableID::"Item Ledger Entry".AsInteger();
                     TempEntrySummary."Summary Type" :=
                       CopyStr(CalcItemLedgEntry.TableCaption(), 1, MaxStrLen(TempEntrySummary."Summary Type"));
                     TempEntrySummary."Total Quantity" := CalcSumValue;
@@ -439,7 +465,7 @@ codeunit 99000845 "Reservation Management"
           "Item No.", "Source Type", "Source Subtype", "Reservation Status", "Location Code",
           "Variant Code", "Shipment Date", "Expected Receipt Date", "Serial No.", "Lot No.");
         ReservEntry.SetRange("Item No.", CalcReservEntry."Item No.");
-        ReservEntry.SetFilter("Source Type", '<> %1', DATABASE::"Item Ledger Entry");
+        ReservEntry.SetFilter("Source Type", '<> %1', Enum::TableID::"Item Ledger Entry");
         ReservEntry.SetRange("Reservation Status",
           ReservEntry."Reservation Status"::Reservation, ReservEntry."Reservation Status"::Surplus);
         ReservEntry.SetRange("Location Code", CalcReservEntry."Location Code");
@@ -496,17 +522,17 @@ codeunit 99000845 "Reservation Management"
 
         CalcReservEntry.TestField("Source Type");
 
-        if CalcReservEntry."Source Type" in [DATABASE::"Sales Line", DATABASE::"Purchase Line", DATABASE::"Service Line"] then
+        if CalcReservEntry."Source Type" in [Enum::TableID::"Sales Line".AsInteger(), Enum::TableID::"Purchase Line".AsInteger(), Enum::TableID::"Service Line".AsInteger()] then
             StopReservation := not (CalcReservEntry."Source Subtype" in [1, 5]); // Only order and return order
 
-        if CalcReservEntry."Source Type" in [DATABASE::"Assembly Line", DATABASE::"Assembly Header"] then
+        if CalcReservEntry."Source Type" in [Enum::TableID::"Assembly Line".AsInteger(), Enum::TableID::"Assembly Header".AsInteger()] then
             StopReservation := not (CalcReservEntry."Source Subtype" = 1); // Only Assembly Order
 
-        if CalcReservEntry."Source Type" in [DATABASE::"Prod. Order Line", DATABASE::"Prod. Order Component"]
+        if CalcReservEntry."Source Type" in [Enum::TableID::"Prod. Order Line".AsInteger(), Enum::TableID::"Prod. Order Component".AsInteger()]
         then
             StopReservation := CalcReservEntry."Source Subtype" < 2; // Not simulated or planned
 
-        if CalcReservEntry."Source Type" = DATABASE::"Sales Line" then begin
+        if CalcReservEntry."Source Type" = Enum::TableID::"Sales Line".AsInteger() then begin
             SourceRecRef.SetTable(SalesLine);
             if (CalcReservEntry."Source Subtype" = 1) and (SalesLine.Quantity < 0) then
                 StopReservation := true;
@@ -514,7 +540,7 @@ codeunit 99000845 "Reservation Management"
                 StopReservation := true;
         end;
 
-        if CalcReservEntry."Source Type" = DATABASE::"Job Planning Line" then
+        if CalcReservEntry."Source Type" = Enum::TableID::"Job Planning Line".AsInteger() then
             StopReservation := CalcReservEntry."Source Subtype" <> 2;
 
         OnAutoReserveOnBeforeStopReservation(CalcReservEntry, FullAutoReservation, AvailabilityDate, MaxQtyToReserve, MaxQtyToReserveBase, StopReservation);
@@ -590,53 +616,53 @@ codeunit 99000845 "Reservation Management"
             InvNextStep := 1;
         end;
 
-        ReservSummaryType := "Reservation Summary Type".FromInteger(ReservSummEntryNo);
+        ReservSummaryType := Enum::"Reservation Summary Type".FromInteger(ReservSummEntryNo);
 
         OnAutoReserveOneLineOnAfterUpdateSearchNextStep(Item, Positive, Search, NextStep, InvSearch, InvNextStep, RemainingQtyToReserve);
 
         case ReservSummaryType of
-            "Reservation Summary Type"::"Item Ledger Entry":
+            Enum::"Reservation Summary Type"::"Item Ledger Entry":
                 AutoReserveItemLedgEntry(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate);
-            "Reservation Summary Type"::"Purchase Order",
-            "Reservation Summary Type"::"Purchase Return Order":
+            Enum::"Reservation Summary Type"::"Purchase Order",
+            Enum::"Reservation Summary Type"::"Purchase Return Order":
                 AutoReservePurchLine(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            "Reservation Summary Type"::"Sales Quote",
-            "Reservation Summary Type"::"Sales Order",
-            "Reservation Summary Type"::"Sales Return Order":
+            Enum::"Reservation Summary Type"::"Sales Quote",
+            Enum::"Reservation Summary Type"::"Sales Order",
+            Enum::"Reservation Summary Type"::"Sales Return Order":
                 AutoReserveSalesLine(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            "Reservation Summary Type"::"Simulated Production Order",
-            "Reservation Summary Type"::"Planned Production Order",
-            "Reservation Summary Type"::"Firm Planned Production Order",
-            "Reservation Summary Type"::"Released Production Order":
+            Enum::"Reservation Summary Type"::"Simulated Production Order",
+            Enum::"Reservation Summary Type"::"Planned Production Order",
+            Enum::"Reservation Summary Type"::"Firm Planned Production Order",
+            Enum::"Reservation Summary Type"::"Released Production Order":
                 AutoReserveProdOrderLine(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            "Reservation Summary Type"::"Simulated Prod. Order Comp.",
-            "Reservation Summary Type"::"Planned Prod. Order Comp.",
-            "Reservation Summary Type"::"Firm Planned Prod. Order Comp.",
-            "Reservation Summary Type"::"Released Prod. Order Comp.":
+            Enum::"Reservation Summary Type"::"Simulated Prod. Order Comp.",
+            Enum::"Reservation Summary Type"::"Planned Prod. Order Comp.",
+            Enum::"Reservation Summary Type"::"Firm Planned Prod. Order Comp.",
+            Enum::"Reservation Summary Type"::"Released Prod. Order Comp.":
                 AutoReserveProdOrderComp(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            "Reservation Summary Type"::"Transfer Shipment",
-            "Reservation Summary Type"::"Transfer Receipt":
+            Enum::"Reservation Summary Type"::"Transfer Shipment",
+            Enum::"Reservation Summary Type"::"Transfer Receipt":
                 AutoReserveTransLine(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            "Reservation Summary Type"::"Service Order":
+            Enum::"Reservation Summary Type"::"Service Order":
                 AutoReserveServLine(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            "Reservation Summary Type"::"Job Planning Order":
+            Enum::"Reservation Summary Type"::"Job Planning Order":
                 AutoReserveJobPlanningLine(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            "Reservation Summary Type"::"Assembly Order Header":
+            Enum::"Reservation Summary Type"::"Assembly Order Header":
                 AutoReserveAssemblyHeader(
                     ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            "Reservation Summary Type"::"Assembly Order Line":
+            Enum::"Reservation Summary Type"::"Assembly Order Line":
                 AutoReserveAssemblyLine(
                   ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
-            "Reservation Summary Type"::"Inventory Receipt",
-            "Reservation Summary Type"::"Inventory Shipment":
+            Enum::"Reservation Summary Type"::"Inventory Receipt",
+            Enum::"Reservation Summary Type"::"Inventory Shipment":
                 AutoInvtDocLineReserve(
                   ReservSummEntryNo, RemainingQtyToReserve, RemainingQtyToReserveBase, Description, AvailabilityDate, Search, NextStep);
             else
@@ -722,7 +748,7 @@ codeunit 99000845 "Reservation Management"
                     OnAfterCalcReservation(CalcReservEntry, CalcItemLedgEntry, ReservSummEntryNo, QtyThisLine, QtyThisLineBase, TotalAvailQty);
 
                     CallTrackingSpecification.InitTrackingSpecification(
-                      DATABASE::"Item Ledger Entry", 0, '', '', 0, CalcItemLedgEntry."Entry No.",
+                      Enum::TableID::"Item Ledger Entry".AsInteger(), 0, '', '', 0, CalcItemLedgEntry."Entry No.",
                       CalcItemLedgEntry."Variant Code", CalcItemLedgEntry."Location Code", CalcItemLedgEntry."Qty. per Unit of Measure");
                     CallTrackingSpecification.CopyTrackingFromItemLedgEntry(CalcItemLedgEntry);
 
@@ -760,7 +786,7 @@ codeunit 99000845 "Reservation Management"
             exit;
 
         PurchLine.FilterLinesForReservation(
-          CalcReservEntry, "Purchase Document Type".FromInteger(ReservSummEntryNo - "Reservation Summary Type"::"Purchase Quote".AsInteger()),
+          CalcReservEntry, Enum::"Purchase Document Type".FromInteger(ReservSummEntryNo - Enum::"Reservation Summary Type"::"Purchase Quote".AsInteger()),
           GetAvailabilityFilter(AvailabilityDate), Positive);
         if PurchLine.Find(Search) then
             repeat
@@ -769,12 +795,12 @@ codeunit 99000845 "Reservation Management"
                     QtyThisLine := PurchLine."Outstanding Quantity";
                     QtyThisLineBase := PurchLine."Outstanding Qty. (Base)";
                 end;
-                if ReservSummEntryNo = "Reservation Summary Type"::"Purchase Return Order".AsInteger() then
+                if ReservSummEntryNo = Enum::"Reservation Summary Type"::"Purchase Return Order".AsInteger() then
                     ReservQty := -PurchLine."Reserved Qty. (Base)"
                 else
                     ReservQty := PurchLine."Reserved Qty. (Base)";
-                if (Positive = (QtyThisLineBase < 0)) and (ReservSummEntryNo <> "Reservation Summary Type"::"Purchase Return Order".AsInteger()) or
-                   (Positive = (QtyThisLineBase > 0)) and (ReservSummEntryNo = "Reservation Summary Type"::"Purchase Return Order".AsInteger())
+                if (Positive = (QtyThisLineBase < 0)) and (ReservSummEntryNo <> Enum::"Reservation Summary Type"::"Purchase Return Order".AsInteger()) or
+                   (Positive = (QtyThisLineBase > 0)) and (ReservSummEntryNo = Enum::"Reservation Summary Type"::"Purchase Return Order".AsInteger())
                 then begin
                     QtyThisLine := 0;
                     QtyThisLineBase := 0;
@@ -785,7 +811,7 @@ codeunit 99000845 "Reservation Management"
                 SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, PurchLine.RowID1(), QtyThisLine, QtyThisLineBase);
 
                 CallTrackingSpecification.InitTrackingSpecification(
-                    DATABASE::"Purchase Line", PurchLine."Document Type".AsInteger(), PurchLine."Document No.", '', 0, PurchLine."Line No.",
+                    Enum::TableID::"Purchase Line".AsInteger(), PurchLine."Document Type".AsInteger(), PurchLine."Document No.", '', 0, PurchLine."Line No.",
                     PurchLine."Variant Code", PurchLine."Location Code", PurchLine."Qty. per Unit of Measure");
                 CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
 
@@ -812,18 +838,18 @@ codeunit 99000845 "Reservation Management"
             exit;
 
         SalesLine.FilterLinesForReservation(
-          CalcReservEntry, "Sales Document Type".FromInteger(ReservSummEntryNo - "Reservation Summary Type"::"Sales Quote".AsInteger()), GetAvailabilityFilter(AvailabilityDate), Positive);
+          CalcReservEntry, Enum::"Sales Document Type".FromInteger(ReservSummEntryNo - Enum::"Reservation Summary Type"::"Sales Quote".AsInteger()), GetAvailabilityFilter(AvailabilityDate), Positive);
         if SalesLine.Find(Search) then
             repeat
                 SalesLine.CalcFields("Reserved Qty. (Base)");
                 QtyThisLine := SalesLine."Outstanding Quantity";
                 QtyThisLineBase := SalesLine."Outstanding Qty. (Base)";
-                if ReservSummEntryNo = "Reservation Summary Type"::"Sales Return Order".AsInteger() then // Return Order
+                if ReservSummEntryNo = Enum::"Reservation Summary Type"::"Sales Return Order".AsInteger() then // Return Order
                     ReservQty := -SalesLine."Reserved Qty. (Base)"
                 else
                     ReservQty := SalesLine."Reserved Qty. (Base)";
-                if (Positive = (QtyThisLineBase > 0)) and (ReservSummEntryNo <> "Reservation Summary Type"::"Sales Return Order".AsInteger()) or
-                   (Positive = (QtyThisLineBase < 0)) and (ReservSummEntryNo = "Reservation Summary Type"::"Sales Return Order".AsInteger())
+                if (Positive = (QtyThisLineBase > 0)) and (ReservSummEntryNo <> Enum::"Reservation Summary Type"::"Sales Return Order".AsInteger()) or
+                   (Positive = (QtyThisLineBase < 0)) and (ReservSummEntryNo = Enum::"Reservation Summary Type"::"Sales Return Order".AsInteger())
                 then begin
                     QtyThisLine := 0;
                     QtyThisLineBase := 0;
@@ -832,7 +858,7 @@ codeunit 99000845 "Reservation Management"
                 SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, SalesLine.RowID1(), QtyThisLine, QtyThisLineBase);
 
                 CallTrackingSpecification.InitTrackingSpecification(
-                  DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", '', 0, SalesLine."Line No.",
+                  Enum::TableID::"Sales Line".AsInteger(), SalesLine."Document Type".AsInteger(), SalesLine."Document No.", '', 0, SalesLine."Line No.",
                   SalesLine."Variant Code", SalesLine."Location Code", SalesLine."Qty. per Unit of Measure");
                 CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
 
@@ -857,7 +883,7 @@ codeunit 99000845 "Reservation Management"
             exit;
 
         ProdOrderLine.FilterLinesForReservation(
-            CalcReservEntry, ReservSummEntryNo - "Reservation Summary Type"::"Simulated Production Order".AsInteger(),
+            CalcReservEntry, ReservSummEntryNo - Enum::"Reservation Summary Type"::"Simulated Production Order".AsInteger(),
             GetAvailabilityFilter(AvailabilityDate), Positive);
         if ProdOrderLine.Find(Search) then
             repeat
@@ -873,7 +899,7 @@ codeunit 99000845 "Reservation Management"
                 SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, ProdOrderLine.RowID1(), QtyThisLine, QtyThisLineBase);
 
                 CallTrackingSpecification.InitTrackingSpecification(
-                    DATABASE::"Prod. Order Line", ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", '', ProdOrderLine."Line No.", 0,
+                    Enum::TableID::"Prod. Order Line".AsInteger(), ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", '', ProdOrderLine."Line No.", 0,
                     ProdOrderLine."Variant Code", ProdOrderLine."Location Code", ProdOrderLine."Qty. per Unit of Measure");
                 CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
 
@@ -898,7 +924,7 @@ codeunit 99000845 "Reservation Management"
             exit;
 
         ProdOrderComp.FilterLinesForReservation(
-            CalcReservEntry, ReservSummEntryNo - "Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger(),
+            CalcReservEntry, ReservSummEntryNo - Enum::"Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger(),
             GetAvailabilityFilter(AvailabilityDate), Positive);
         if ProdOrderComp.Find(Search) then
             repeat
@@ -914,7 +940,7 @@ codeunit 99000845 "Reservation Management"
                 SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, ProdOrderComp.RowID1(), QtyThisLine, QtyThisLineBase);
 
                 CallTrackingSpecification.InitTrackingSpecification(
-                    DATABASE::"Prod. Order Component", ProdOrderComp.Status.AsInteger(), ProdOrderComp."Prod. Order No.", '',
+                    Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComp.Status.AsInteger(), ProdOrderComp."Prod. Order No.", '',
                     ProdOrderComp."Prod. Order Line No.", ProdOrderComp."Line No.",
                     ProdOrderComp."Variant Code", ProdOrderComp."Location Code", ProdOrderComp."Qty. per Unit of Measure");
                 CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
@@ -940,7 +966,7 @@ codeunit 99000845 "Reservation Management"
             exit;
 
         AssemblyHeader.FilterLinesForReservation(
-            CalcReservEntry, ReservSummEntryNo - "Reservation Summary Type"::"Assembly Quote Header".AsInteger(),
+            CalcReservEntry, ReservSummEntryNo - Enum::"Reservation Summary Type"::"Assembly Quote Header".AsInteger(),
             GetAvailabilityFilter(AvailabilityDate), Positive);
         if AssemblyHeader.Find(Search) then
             repeat
@@ -956,7 +982,7 @@ codeunit 99000845 "Reservation Management"
                 SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, AssemblyHeader.RowID1(), QtyThisLine, QtyThisLineBase);
 
                 CallTrackingSpecification.InitTrackingSpecification(
-                  DATABASE::"Assembly Header", AssemblyHeader."Document Type".AsInteger(), AssemblyHeader."No.", '', 0, 0,
+                  Enum::TableID::"Assembly Header".AsInteger(), AssemblyHeader."Document Type".AsInteger(), AssemblyHeader."No.", '', 0, 0,
                   AssemblyHeader."Variant Code", AssemblyHeader."Location Code", AssemblyHeader."Qty. per Unit of Measure");
                 CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
 
@@ -981,7 +1007,7 @@ codeunit 99000845 "Reservation Management"
             exit;
 
         AssemblyLine.FilterLinesForReservation(
-            CalcReservEntry, ReservSummEntryNo - "Reservation Summary Type"::"Assembly Quote Line".AsInteger(),
+            CalcReservEntry, ReservSummEntryNo - Enum::"Reservation Summary Type"::"Assembly Quote Line".AsInteger(),
             GetAvailabilityFilter(AvailabilityDate), Positive);
         if AssemblyLine.Find(Search) then
             repeat
@@ -997,7 +1023,7 @@ codeunit 99000845 "Reservation Management"
                 SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, AssemblyLine.RowID1(), QtyThisLine, QtyThisLineBase);
 
                 CallTrackingSpecification.InitTrackingSpecification(
-                  DATABASE::"Assembly Line", AssemblyLine."Document Type".AsInteger(), AssemblyLine."Document No.", '', 0, AssemblyLine."Line No.",
+                  Enum::TableID::"Assembly Line".AsInteger(), AssemblyLine."Document Type".AsInteger(), AssemblyLine."Document No.", '', 0, AssemblyLine."Line No.",
                   AssemblyLine."Variant Code", AssemblyLine."Location Code", AssemblyLine."Qty. per Unit of Measure");
                 CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
 
@@ -1025,15 +1051,15 @@ codeunit 99000845 "Reservation Management"
             exit;
 
         case ReservSummEntryNo of
-            "Reservation Summary Type"::"Transfer Shipment".AsInteger():
+            Enum::"Reservation Summary Type"::"Transfer Shipment".AsInteger():
                 TransLine.FilterOutboundLinesForReservation(CalcReservEntry, GetAvailabilityFilter(AvailabilityDate), Positive);
-            "Reservation Summary Type"::"Transfer Receipt".AsInteger():
+            Enum::"Reservation Summary Type"::"Transfer Receipt".AsInteger():
                 TransLine.FilterInboundLinesForReservation(CalcReservEntry, GetAvailabilityFilter(AvailabilityDate), Positive);
         end;
         if TransLine.Find(Search) then
             repeat
                 case ReservSummEntryNo of
-                    "Reservation Summary Type"::"Transfer Shipment".AsInteger():
+                    Enum::"Reservation Summary Type"::"Transfer Shipment".AsInteger():
                         begin
                             TransLine.CalcFields("Reserved Qty. Outbnd. (Base)");
                             QtyThisLine := -TransLine."Outstanding Quantity";
@@ -1048,7 +1074,7 @@ codeunit 99000845 "Reservation Management"
                             SetQtyToReserveDownToTrackedQuantity(
                                 CalcReservEntry, TransLine.RowID1(TransferDirection::Outbound), QtyThisLine, QtyThisLineBase);
                         end;
-                    "Reservation Summary Type"::"Transfer Receipt".AsInteger():
+                    Enum::"Reservation Summary Type"::"Transfer Receipt".AsInteger():
                         begin
                             TransLine.CalcFields("Reserved Qty. Inbnd. (Base)");
                             QtyThisLine := TransLine."Outstanding Quantity";
@@ -1066,7 +1092,7 @@ codeunit 99000845 "Reservation Management"
                 end;
 
                 CallTrackingSpecification.InitTrackingSpecification(
-                  DATABASE::"Transfer Line", ReservSummEntryNo - "Reservation Summary Type"::"Transfer Shipment".AsInteger(),
+                  Enum::TableID::"Transfer Line".AsInteger(), ReservSummEntryNo - Enum::"Reservation Summary Type"::"Transfer Shipment".AsInteger(),
                   TransLine."Document No.", '', TransLine."Derived From Line No.", TransLine."Line No.",
                   TransLine."Variant Code", LocationCode, TransLine."Qty. per Unit of Measure");
                 CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
@@ -1106,7 +1132,7 @@ codeunit 99000845 "Reservation Management"
                 SetQtyToReserveDownToTrackedQuantity(CalcReservEntry, ServiceLine.RowID1(), QtyThisLine, QtyThisLineBase);
 
                 CallTrackingSpecification.InitTrackingSpecification(
-                  DATABASE::"Service Line", ServiceLine."Document Type".AsInteger(), ServiceLine."Document No.", '', 0, ServiceLine."Line No.",
+                  Enum::TableID::"Service Line".AsInteger(), ServiceLine."Document Type".AsInteger(), ServiceLine."Document No.", '', 0, ServiceLine."Line No.",
                   ServiceLine."Variant Code", ServiceLine."Location Code", ServiceLine."Qty. per Unit of Measure");
                 CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
 
@@ -1144,7 +1170,7 @@ codeunit 99000845 "Reservation Management"
                 end;
 
                 CallTrackingSpecification.InitTrackingSpecification(
-                  DATABASE::"Job Planning Line", JobPlanningLine.Status.AsInteger(), JobPlanningLine."Job No.", '',
+                  Enum::TableID::"Job Planning Line".AsInteger(), JobPlanningLine.Status.AsInteger(), JobPlanningLine."Job No.", '',
                   0, JobPlanningLine."Job Contract Entry No.",
                   JobPlanningLine."Variant Code", JobPlanningLine."Location Code", JobPlanningLine."Qty. per Unit of Measure");
                 CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
@@ -1163,16 +1189,16 @@ codeunit 99000845 "Reservation Management"
         ReservQty: Decimal;
     begin
         case ReservSummEntryNo of
-            "Reservation Summary Type"::"Inventory Receipt".AsInteger():
+            Enum::"Reservation Summary Type"::"Inventory Receipt".AsInteger():
                 InvtDocLine.FilterReceiptLinesForReservation(CalcReservEntry, GetAvailabilityFilter(AvailabilityDate), Positive);
-            "Reservation Summary Type"::"Inventory Shipment".AsInteger():
+            Enum::"Reservation Summary Type"::"Inventory Shipment".AsInteger():
                 InvtDocLine.FilterShipmentLinesForReservation(CalcReservEntry, GetAvailabilityFilter(AvailabilityDate), Positive);
         end;
 
         if InvtDocLine.Find(Search) then
             repeat
                 case ReservSummEntryNo of
-                    "Reservation Summary Type"::"Inventory Shipment".AsInteger():
+                    Enum::"Reservation Summary Type"::"Inventory Shipment".AsInteger():
                         begin
                             InvtDocLine.CalcFields("Reserved Qty. Outbnd. (Base)");
                             QtyThisLine := -InvtDocLine.Quantity;
@@ -1183,7 +1209,7 @@ codeunit 99000845 "Reservation Management"
                                 QtyThisLineBase := 0;
                             end;
                         end;
-                    "Reservation Summary Type"::"Inventory Receipt".AsInteger():
+                    Enum::"Reservation Summary Type"::"Inventory Receipt".AsInteger():
                         begin
                             InvtDocLine.CalcFields("Reserved Qty. Inbnd. (Base)");
                             QtyThisLine := InvtDocLine.Quantity;
@@ -1209,7 +1235,7 @@ codeunit 99000845 "Reservation Management"
                         CopySign(RemainingQtyToReserveBase, QtyThisLineBase);
 
                         CallTrackingSpecification.InitTrackingSpecification(
-                          DATABASE::"Invt. Document Line", ReservSummEntryNo - "Reservation Summary Type"::"Inventory Receipt".AsInteger(),
+                          Enum::TableID::"Invt. Document Line".AsInteger(), ReservSummEntryNo - Enum::"Reservation Summary Type"::"Inventory Receipt".AsInteger(),
                           InvtDocLine."Document No.", '', 0, InvtDocLine."Line No.", InvtDocLine."Variant Code", InvtDocLine."Location Code", InvtDocLine."Qty. per Unit of Measure");
                         CallTrackingSpecification.CopyTrackingFromReservEntry(CalcReservEntry);
 
@@ -1272,7 +1298,7 @@ codeunit 99000845 "Reservation Management"
         DeleteReservEntries(DeleteAll, DownToQuantity, CalcReservEntry2);
 
         // Handle both sides of a req. line related to a transfer line:
-        if ((CalcReservEntry."Source Type" = DATABASE::"Requisition Line") and
+        if ((CalcReservEntry."Source Type" = Enum::TableID::"Requisition Line".AsInteger()) and
             (RefOrderType = ReqLine."Ref. Order Type"::Transfer))
         then begin
             CalcReservEntry4 := CalcReservEntry;
@@ -1282,9 +1308,9 @@ codeunit 99000845 "Reservation Management"
         end;
 
         if DeleteAll then
-            if ((CalcReservEntry."Source Type" = DATABASE::"Requisition Line") and
+            if ((CalcReservEntry."Source Type" = Enum::TableID::"Requisition Line".AsInteger()) and
                 (PlanningLineOrigin <> ReqLine."Planning Line Origin"::" ")) or
-               (CalcReservEntry."Source Type" = DATABASE::"Planning Component")
+               (CalcReservEntry."Source Type" = Enum::TableID::"Planning Component".AsInteger())
             then begin
                 CalcReservEntry4.Reset();
                 if TrackingMgt.DerivePlanningFilter(CalcReservEntry2, CalcReservEntry4) then
@@ -1301,7 +1327,7 @@ codeunit 99000845 "Reservation Management"
                             CalcReservEntry4.CalcSums("Quantity (Base)");
                             QtyTracked += CalcReservEntry4."Quantity (Base)";
                         end;
-                        if CalcReservEntry."Source Type" = DATABASE::"Planning Component" then
+                        if CalcReservEntry."Source Type" = Enum::TableID::"Planning Component".AsInteger() then
                             QtyTracked := -QtyTracked;
                         ReservMgt.DeleteReservEntries(QtyTracked = 0, QtyTracked);
                         ReservMgt.AutoTrack(QtyToReTrack);
@@ -1385,7 +1411,7 @@ codeunit 99000845 "Reservation Management"
             ReservEntry.SetRange("Reservation Status", ReservStatus);
             if ReservEntry.FindSet() and (QtyToRelease <> 0) then
                 case ReservStatus of
-                    "Reservation Status"::Prospect:
+                    Enum::"Reservation Status"::Prospect:
                         repeat
                             if (Abs(ReservEntry."Quantity (Base)") <= Abs(QtyToRelease)) or DeleteAll then begin
                                 ReservEntry.Delete();
@@ -1398,7 +1424,7 @@ codeunit 99000845 "Reservation Management"
                                 QtyToRelease := 0;
                             end;
                         until (ReservEntry.Next() = 0) or ((not DeleteAll) and (QtyToRelease = 0));
-                    "Reservation Status"::Surplus:
+                    Enum::"Reservation Status"::Surplus:
                         repeat
                             if CalcReservEntry4.Get(ReservEntry."Entry No.", not ReservEntry.Positive) then // Find related entry
                                 Error(Text007);
@@ -1419,14 +1445,14 @@ codeunit 99000845 "Reservation Management"
                                 QtyToRelease := 0;
                             end;
                         until (ReservEntry.Next() = 0) or ((not DeleteAll) and (QtyToRelease = 0));
-                    "Reservation Status"::Tracking,
-                    "Reservation Status"::Reservation:
+                    Enum::"Reservation Status"::Tracking,
+                    Enum::"Reservation Status"::Reservation:
                         for Release := Release::"Non-Inventory" to Release::Inventory do begin
                             // Release non-inventory reservations in first cycle
                             repeat
                                 CalcReservEntry4.Get(ReservEntry."Entry No.", not ReservEntry.Positive); // Find related entry
                                 OnDeleteReservEntriesOnReservationOnAfterCalcReservEntry4Get(CalcReservEntry4, ReservEntry);
-                                if (Release = Release::Inventory) = (CalcReservEntry4."Source Type" = DATABASE::"Item Ledger Entry") then
+                                if (Release = Release::Inventory) = (CalcReservEntry4."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger()) then
                                     if (Abs(ReservEntry."Quantity (Base)") <= Abs(QtyToRelease)) or DeleteAll then begin
                                         ReservEngineMgt.CloseReservEntry(ReservEntry, false, DeleteAll);
                                         SaveTrackingSpecification(ReservEntry, ReservEntry."Quantity (Base)");
@@ -1520,60 +1546,60 @@ codeunit 99000845 "Reservation Management"
             case EntryStatus of
                 0:
                     begin // Reservation
-                        ValueArray[1] := "Reservation Summary Type"::"Item Ledger Entry".AsInteger();
-                        ValueArray[2] := "Reservation Summary Type"::"Sales Order".AsInteger();
-                        ValueArray[3] := "Reservation Summary Type"::"Sales Return Order".AsInteger();
-                        ValueArray[4] := "Reservation Summary Type"::"Purchase Order".AsInteger();
-                        ValueArray[5] := "Reservation Summary Type"::"Purchase Return Order".AsInteger();
-                        ValueArray[6] := "Reservation Summary Type"::"Firm Planned Production Order".AsInteger();
-                        ValueArray[7] := "Reservation Summary Type"::"Released Production Order".AsInteger();
-                        ValueArray[8] := "Reservation Summary Type"::"Firm Planned Prod. Order Comp.".AsInteger();
-                        ValueArray[9] := "Reservation Summary Type"::"Released Prod. Order Comp.".AsInteger();
-                        ValueArray[10] := "Reservation Summary Type"::"Transfer Shipment".AsInteger();
-                        ValueArray[11] := "Reservation Summary Type"::"Transfer Receipt".AsInteger();
-                        ValueArray[12] := "Reservation Summary Type"::"Service Order".AsInteger();
-                        ValueArray[13] := "Reservation Summary Type"::"Job Planning Order".AsInteger();
-                        ValueArray[14] := "Reservation Summary Type"::"Assembly Order Header".AsInteger();
-                        ValueArray[15] := "Reservation Summary Type"::"Assembly Order Line".AsInteger();
-                        ValueArray[16] := "Reservation Summary Type"::"Inventory Receipt".AsInteger();
-                        ValueArray[17] := "Reservation Summary Type"::"Inventory Shipment".AsInteger();
+                        ValueArray[1] := Enum::"Reservation Summary Type"::"Item Ledger Entry".AsInteger();
+                        ValueArray[2] := Enum::"Reservation Summary Type"::"Sales Order".AsInteger();
+                        ValueArray[3] := Enum::"Reservation Summary Type"::"Sales Return Order".AsInteger();
+                        ValueArray[4] := Enum::"Reservation Summary Type"::"Purchase Order".AsInteger();
+                        ValueArray[5] := Enum::"Reservation Summary Type"::"Purchase Return Order".AsInteger();
+                        ValueArray[6] := Enum::"Reservation Summary Type"::"Firm Planned Production Order".AsInteger();
+                        ValueArray[7] := Enum::"Reservation Summary Type"::"Released Production Order".AsInteger();
+                        ValueArray[8] := Enum::"Reservation Summary Type"::"Firm Planned Prod. Order Comp.".AsInteger();
+                        ValueArray[9] := Enum::"Reservation Summary Type"::"Released Prod. Order Comp.".AsInteger();
+                        ValueArray[10] := Enum::"Reservation Summary Type"::"Transfer Shipment".AsInteger();
+                        ValueArray[11] := Enum::"Reservation Summary Type"::"Transfer Receipt".AsInteger();
+                        ValueArray[12] := Enum::"Reservation Summary Type"::"Service Order".AsInteger();
+                        ValueArray[13] := Enum::"Reservation Summary Type"::"Job Planning Order".AsInteger();
+                        ValueArray[14] := Enum::"Reservation Summary Type"::"Assembly Order Header".AsInteger();
+                        ValueArray[15] := Enum::"Reservation Summary Type"::"Assembly Order Line".AsInteger();
+                        ValueArray[16] := Enum::"Reservation Summary Type"::"Inventory Receipt".AsInteger();
+                        ValueArray[17] := Enum::"Reservation Summary Type"::"Inventory Shipment".AsInteger();
                         ArrayCounter := 17;
                     end;
                 1:
                     begin // Order Tracking
-                        ValueArray[1] := "Reservation Summary Type"::"Item Ledger Entry".AsInteger();
-                        ValueArray[2] := "Reservation Summary Type"::"Sales Order".AsInteger();
-                        ValueArray[3] := "Reservation Summary Type"::"Sales Return Order".AsInteger();
-                        ValueArray[4] := "Reservation Summary Type"::"Requisition Line".AsInteger();
-                        ValueArray[5] := "Reservation Summary Type"::"Purchase Order".AsInteger();
-                        ValueArray[6] := "Reservation Summary Type"::"Purchase Return Order".AsInteger();
-                        ValueArray[7] := "Reservation Summary Type"::"Planned Production Order".AsInteger();
-                        ValueArray[8] := "Reservation Summary Type"::"Firm Planned Production Order".AsInteger();
-                        ValueArray[9] := "Reservation Summary Type"::"Released Production Order".AsInteger();
-                        ValueArray[10] := "Reservation Summary Type"::"Planned Prod. Order Comp.".AsInteger();
-                        ValueArray[11] := "Reservation Summary Type"::"Firm Planned Prod. Order Comp.".AsInteger();
-                        ValueArray[12] := "Reservation Summary Type"::"Released Prod. Order Comp.".AsInteger();
-                        ValueArray[13] := "Reservation Summary Type"::"Transfer Shipment".AsInteger();
-                        ValueArray[14] := "Reservation Summary Type"::"Transfer Receipt".AsInteger();
-                        ValueArray[15] := "Reservation Summary Type"::"Service Order".AsInteger();
-                        ValueArray[16] := "Reservation Summary Type"::"Job Planning Order".AsInteger();
-                        ValueArray[17] := "Reservation Summary Type"::"Assembly Order Header".AsInteger();
-                        ValueArray[18] := "Reservation Summary Type"::"Assembly Order Line".AsInteger();
-                        ValueArray[19] := "Reservation Summary Type"::"Inventory Receipt".AsInteger();
-                        ValueArray[20] := "Reservation Summary Type"::"Inventory Shipment".AsInteger();
+                        ValueArray[1] := Enum::"Reservation Summary Type"::"Item Ledger Entry".AsInteger();
+                        ValueArray[2] := Enum::"Reservation Summary Type"::"Sales Order".AsInteger();
+                        ValueArray[3] := Enum::"Reservation Summary Type"::"Sales Return Order".AsInteger();
+                        ValueArray[4] := Enum::"Reservation Summary Type"::"Requisition Line".AsInteger();
+                        ValueArray[5] := Enum::"Reservation Summary Type"::"Purchase Order".AsInteger();
+                        ValueArray[6] := Enum::"Reservation Summary Type"::"Purchase Return Order".AsInteger();
+                        ValueArray[7] := Enum::"Reservation Summary Type"::"Planned Production Order".AsInteger();
+                        ValueArray[8] := Enum::"Reservation Summary Type"::"Firm Planned Production Order".AsInteger();
+                        ValueArray[9] := Enum::"Reservation Summary Type"::"Released Production Order".AsInteger();
+                        ValueArray[10] := Enum::"Reservation Summary Type"::"Planned Prod. Order Comp.".AsInteger();
+                        ValueArray[11] := Enum::"Reservation Summary Type"::"Firm Planned Prod. Order Comp.".AsInteger();
+                        ValueArray[12] := Enum::"Reservation Summary Type"::"Released Prod. Order Comp.".AsInteger();
+                        ValueArray[13] := Enum::"Reservation Summary Type"::"Transfer Shipment".AsInteger();
+                        ValueArray[14] := Enum::"Reservation Summary Type"::"Transfer Receipt".AsInteger();
+                        ValueArray[15] := Enum::"Reservation Summary Type"::"Service Order".AsInteger();
+                        ValueArray[16] := Enum::"Reservation Summary Type"::"Job Planning Order".AsInteger();
+                        ValueArray[17] := Enum::"Reservation Summary Type"::"Assembly Order Header".AsInteger();
+                        ValueArray[18] := Enum::"Reservation Summary Type"::"Assembly Order Line".AsInteger();
+                        ValueArray[19] := Enum::"Reservation Summary Type"::"Inventory Receipt".AsInteger();
+                        ValueArray[20] := Enum::"Reservation Summary Type"::"Inventory Shipment".AsInteger();
                         ArrayCounter := 20;
                     end;
                 2:
                     begin // Simulation order tracking
-                        ValueArray[1] := "Reservation Summary Type"::"Sales Quote".AsInteger();
-                        ValueArray[2] := "Reservation Summary Type"::"Simulated Production Order".AsInteger();
-                        ValueArray[3] := "Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger();
+                        ValueArray[1] := Enum::"Reservation Summary Type"::"Sales Quote".AsInteger();
+                        ValueArray[2] := Enum::"Reservation Summary Type"::"Simulated Production Order".AsInteger();
+                        ValueArray[3] := Enum::"Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger();
                         ArrayCounter := 3;
                     end;
                 3:
                     begin // Item Tracking
-                        ValueArray[1] := "Reservation Summary Type"::"Item Ledger Entry".AsInteger();
-                        ValueArray[2] := "Reservation Summary Type"::"Item Tracking Line".AsInteger();
+                        ValueArray[1] := Enum::"Reservation Summary Type"::"Item Ledger Entry".AsInteger();
+                        ValueArray[2] := Enum::"Reservation Summary Type"::"Item Tracking Line".AsInteger();
                         ArrayCounter := 2;
                     end;
             end;
@@ -1657,16 +1683,16 @@ codeunit 99000845 "Reservation Management"
     begin
         CalcReservEntry.TestField("Source Type");
 
-        if CalcReservEntry."Source Type" in [DATABASE::"Sales Line", DATABASE::"Purchase Line", DATABASE::"Service Line"] then
+        if CalcReservEntry."Source Type" in [Enum::TableID::"Sales Line".AsInteger(), Enum::TableID::"Purchase Line".AsInteger(), Enum::TableID::"Service Line".AsInteger()] then
             if not (CalcReservEntry."Source Subtype" in [1, 5]) then
                 exit; // Only order, return order
 
-        if CalcReservEntry."Source Type" in [DATABASE::"Prod. Order Line", DATABASE::"Prod. Order Component"]
+        if CalcReservEntry."Source Type" in [Enum::TableID::"Prod. Order Line".AsInteger(), Enum::TableID::"Prod. Order Component".AsInteger()]
         then
             if CalcReservEntry."Source Subtype" = 0 then
                 exit; // Not simulation
 
-        if CalcReservEntry."Source Type" = DATABASE::"Item Journal Line" then
+        if CalcReservEntry."Source Type" = Enum::TableID::"Item Journal Line".AsInteger() then
             exit;
 
         if CalcReservEntry."Item No." = '' then
@@ -1800,9 +1826,9 @@ codeunit 99000845 "Reservation Management"
         CreateReservEntry.SetUntrackedSurplus(ToReservEntry."Untracked Surplus");
 
         if IsSpecialOrderOrDropShipment(ToReservEntry) then begin
-            if FromReservEntry."Source Type" = DATABASE::"Purchase Line" then
+            if FromReservEntry."Source Type" = Enum::TableID::"Purchase Line".AsInteger() then
                 ToReservEntry."Shipment Date" := 0D;
-            if FromReservEntry."Source Type" = DATABASE::"Sales Line" then
+            if FromReservEntry."Source Type" = Enum::TableID::"Sales Line".AsInteger() then
                 ToReservEntry."Expected Receipt Date" := 0D;
         end;
         CreateReservEntry.CreateEntry(
@@ -1969,7 +1995,7 @@ codeunit 99000845 "Reservation Management"
         if SurplusEntry."Quantity (Base)" > 0 then begin // Supply: Issue AM directly
             if SurplusEntry."Planning Flexibility" = SurplusEntry."Planning Flexibility"::None then
                 exit;
-            if not (SurplusEntry."Source Type" in [DATABASE::"Prod. Order Line", DATABASE::"Purchase Line"]) then
+            if not (SurplusEntry."Source Type" in [Enum::TableID::"Prod. Order Line".AsInteger(), Enum::TableID::"Purchase Line".AsInteger()]) then
                 exit;
 
             ActionMessageEntry.TransferFromReservEntry(SurplusEntry);
@@ -1998,7 +2024,7 @@ codeunit 99000845 "Reservation Management"
                         end;
                         ReservEntry.SetRange(Binding, ReservEntry.Binding::" ");
                         ReservEntry.SetRange("Planning Flexibility", ReservEntry."Planning Flexibility"::Unlimited);
-                        ReservEntry.SetFilter("Source Type", '=%1|=%2', DATABASE::"Purchase Line", DATABASE::"Prod. Order Line");
+                        ReservEntry.SetFilter("Source Type", '=%1|=%2', Enum::TableID::"Purchase Line", Enum::TableID::"Prod. Order Line");
                     end;
                 SurplusEntry.Binding::"Order-to-Order":
                     begin
@@ -2047,13 +2073,13 @@ codeunit 99000845 "Reservation Management"
 
                 case SKU."Replenishment System" of
                     SKU."Replenishment System"::Purchase:
-                        ActionMessageEntry."Source Type" := DATABASE::"Purchase Line";
+                        ActionMessageEntry."Source Type" := Enum::TableID::"Purchase Line".AsInteger();
                     SKU."Replenishment System"::"Prod. Order":
-                        ActionMessageEntry."Source Type" := DATABASE::"Prod. Order Line";
+                        ActionMessageEntry."Source Type" := Enum::TableID::"Prod. Order Line".AsInteger();
                     SKU."Replenishment System"::Transfer:
-                        ActionMessageEntry."Source Type" := DATABASE::"Transfer Line";
+                        ActionMessageEntry."Source Type" := Enum::TableID::"Transfer Line".AsInteger();
                     SKU."Replenishment System"::Assembly:
-                        ActionMessageEntry."Source Type" := DATABASE::"Assembly Header";
+                        ActionMessageEntry."Source Type" := Enum::TableID::"Assembly Header".AsInteger();
                 end;
 
                 ActionMessageEntry.Type := ActionMessageEntry.Type::New;
@@ -2065,7 +2091,7 @@ codeunit 99000845 "Reservation Management"
         ReservEntry2.SetRange(
           "Reservation Status", ReservEntry2."Reservation Status"::Reservation, ReservEntry2."Reservation Status"::Tracking);
 
-        if ReservEntry2."Source Type" <> DATABASE::"Item Ledger Entry" then
+        if ReservEntry2."Source Type" <> Enum::TableID::"Item Ledger Entry".AsInteger() then
             if ReservEntry2.FindFirst() then begin
                 FirstDate := FindDate(ReservEntry2, 0, true);
                 if FirstDate <> 0D then begin
@@ -2165,13 +2191,13 @@ codeunit 99000845 "Reservation Management"
         ReservEntry2: Record "Reservation Entry";
         ReqLine: Record "Requisition Line";
     begin
-        if CalcReservEntry2."Source Type" = DATABASE::"Planning Component" then
+        if CalcReservEntry2."Source Type" = Enum::TableID::"Planning Component".AsInteger() then
             exit;
 
         if Item."Order Tracking Policy" <> Item."Order Tracking Policy"::"Tracking & Action Msg." then
             exit;
 
-        if CalcReservEntry2."Source Type" = DATABASE::"Requisition Line" then
+        if CalcReservEntry2."Source Type" = Enum::TableID::"Requisition Line".AsInteger() then
             if PlanningLineOrigin <> ReqLine."Planning Line Origin"::" " then
                 exit;
 
@@ -2181,7 +2207,7 @@ codeunit 99000845 "Reservation Management"
         if not FilterReservEntry.FindFirst() then
             exit;
 
-        if CalcReservEntry2."Source Type" in [DATABASE::"Prod. Order Line", DATABASE::"Purchase Line"]
+        if CalcReservEntry2."Source Type" in [Enum::TableID::"Prod. Order Line".AsInteger(), Enum::TableID::"Purchase Line".AsInteger()]
         then
             ReservEngineMgt.ModifyActionMessageDating(FilterReservEntry)
         else begin
@@ -2436,7 +2462,7 @@ codeunit 99000845 "Reservation Management"
         if ReservEntry."Item Tracking" = ReservEntry."Item Tracking"::None then
             exit;
 
-        if ReservEntry."Source Type" = DATABASE::"Item Ledger Entry" then
+        if ReservEntry."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then
             exit;
 
         if QtyToSaveBase * ReservEntry."Quantity (Base)" < 0 then
@@ -2531,14 +2557,14 @@ codeunit 99000845 "Reservation Management"
     local procedure ProdJnlLineEntry(ReservationEntry: Record "Reservation Entry"): Boolean
     begin
         with ReservationEntry do
-            exit(("Source Type" = DATABASE::"Item Journal Line") and ("Source Subtype" = 6));
+            exit(("Source Type" = Enum::TableID::"Item Journal Line".AsInteger()) and ("Source Subtype" = 6));
     end;
 
     local procedure CalcDownToQtySyncingToAssembly(ReservEntry: Record "Reservation Entry"): Decimal
     var
         SynchronizingSalesLine: Record "Sales Line";
     begin
-        if ReservEntry."Source Type" = DATABASE::"Sales Line" then begin
+        if ReservEntry."Source Type" = Enum::TableID::"Sales Line".AsInteger() then begin
             SynchronizingSalesLine.Get(ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Ref. No.");
             if (Item."Order Tracking Policy" <> Item."Order Tracking Policy"::None) and
                (Item."Assembly Policy" = Item."Assembly Policy"::"Assemble-to-Order") and
@@ -2638,7 +2664,7 @@ codeunit 99000845 "Reservation Management"
         ReservationEntryPositive: Record "Reservation Entry";
     begin
         if ReservationEntryPositive.Get(ReservationEntryNo, true) then
-            exit(ReservationEntryPositive."Source Type" = DATABASE::"Item Ledger Entry");
+            exit(ReservationEntryPositive."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger());
 
         exit(true);
     end;
@@ -2657,18 +2683,18 @@ codeunit 99000845 "Reservation Management"
         ReservEntry.SetCurrentKey(
             "Source ID", "Source Ref. No.", "Source Type", "Source Subtype",
             "Source Batch Name", "Source Prod. Order Line", "Reservation Status");
-        if TableID <> DATABASE::"Prod. Order Line" then begin
+        if TableID <> Enum::TableID::"Prod. Order Line".AsInteger() then begin
             ReservEntry.SetRange("Source Type", TableID);
             ReservEntry.SetRange("Source Prod. Order Line", 0);
         end else
-            ReservEntry.SetFilter("Source Type", '%1|%2', DATABASE::"Prod. Order Line", DATABASE::"Prod. Order Component");
+            ReservEntry.SetFilter("Source Type", '%1|%2', Enum::TableID::"Prod. Order Line", Enum::TableID::"Prod. Order Component");
 
         case TableID of
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line".AsInteger():
                 ReservEntry.SetRange("Source Subtype");
-            DATABASE::"Prod. Order Line":
+            Enum::TableID::"Prod. Order Line".AsInteger():
                 ReservEntry.SetRange("Source Subtype", DocType);
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line".AsInteger():
                 ReservEntry.SetRange("Source Subtype", DocType);
             else
                 ReservEntry.SetRange("Source Subtype", DocType);
@@ -2676,7 +2702,7 @@ codeunit 99000845 "Reservation Management"
 
         ReservEntry.SetRange("Source ID", DocNo);
         ReservEntry.SetRange("Source Batch Name", '');
-        ReservEntry.SetFilter("Item Tracking", '> %1', "Item Tracking Entry Type"::None);
+        ReservEntry.SetFilter("Item Tracking", '> %1', Enum::"Item Tracking Entry Type"::None);
         if ReservEntry.IsEmpty() then
             exit;
 
@@ -2707,23 +2733,23 @@ codeunit 99000845 "Reservation Management"
         IsHandled: Boolean;
     begin
         case TableID of
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line".AsInteger():
                 exit(StrSubstNo(DeleteTransLineWithItemReservQst, DocNo));
-            DATABASE::"Prod. Order Line":
+            Enum::TableID::"Prod. Order Line".AsInteger():
                 begin
                     RecRef.Open(TableID);
                     FldRef := RecRef.FieldIndex(1);
                     exit(StrSubstNo(DeleteProdOrderLineWithItemReservQst, SelectStr(DocType + 1, FldRef.OptionCaption), DocNo));
                 end;
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line".AsInteger():
                 begin
                     RecRef.Open(TableID);
                     FldRef := RecRef.FieldIndex(1);
                     case DocType of
-                        "Assembly Document Type"::Quote.AsInteger(),
-                        "Assembly Document Type"::"Order".AsInteger():
+                        Enum::"Assembly Document Type"::Quote.AsInteger(),
+                        Enum::"Assembly Document Type"::"Order".AsInteger():
                             exit(StrSubstNo(DeleteDocLineWithItemReservQst, SelectStr(DocType + 1, FldRef.OptionCaption), DocNo));
-                        "Assembly Document Type"::"Blanket Order".AsInteger():
+                        Enum::"Assembly Document Type"::"Blanket Order".AsInteger():
                             exit(StrSubstNo(DeleteDocLineWithItemReservQst, SelectStr(3, FldRef.OptionCaption), DocNo));
                     end;
                 end;
@@ -2774,11 +2800,11 @@ codeunit 99000845 "Reservation Management"
         SalesLine: Record "Sales Line";
         PurchaseLine: Record "Purchase Line";
     begin
-        if ReservationEntry."Source Type" = DATABASE::"Sales Line" then
+        if ReservationEntry."Source Type" = Enum::TableID::"Sales Line".AsInteger() then
             if SalesLine.Get(ReservationEntry."Source Subtype", ReservationEntry."Source ID", ReservationEntry."Source Ref. No.") then
                 if SalesLine."Special Order" or SalesLine."Drop Shipment" then
                     exit(true);
-        if ReservationEntry."Source Type" = DATABASE::"Purchase Line" then
+        if ReservationEntry."Source Type" = Enum::TableID::"Purchase Line".AsInteger() then
             if PurchaseLine.Get(ReservationEntry."Source Subtype", ReservationEntry."Source ID", ReservationEntry."Source Ref. No.") then
                 if PurchaseLine."Special Order" or PurchaseLine."Drop Shipment" then
                     exit(true);
@@ -2832,27 +2858,27 @@ codeunit 99000845 "Reservation Management"
         ServiceLine: Record "Service Line";
     begin
         case SourceRecRef.Number of
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line".AsInteger():
                 begin
                     SourceRecRef.SetTable(AssemblyLine);
                     AssemblyLine.TestField(Type, AssemblyLine.Type::Item);
                 end;
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 begin
                     SourceRecRef.SetTable(SalesLine);
                     SalesLine.TestField(Type, SalesLine.Type::Item);
                 end;
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 begin
                     SourceRecRef.SetTable(PurchaseLine);
                     PurchaseLine.TestField(Type, PurchaseLine.Type::Item);
                 end;
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 begin
                     SourceRecRef.SetTable(ServiceLine);
                     ServiceLine.TestField(Type, ServiceLine.Type::Item);
                 end;
-            DATABASE::"Job Planning Line":
+            Enum::TableID::"Job Planning Line".AsInteger():
                 begin
                     SourceRecRef.SetTable(JobPlanningLine);
                     JobPlanningLine.TestField(Type, JobPlanningLine.Type::Item);

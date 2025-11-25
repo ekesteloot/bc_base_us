@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ProjectMgt.Jobs.Planning;
+
 page 1004 "Job Task List"
 {
     Caption = 'Job Task List';
@@ -43,7 +48,7 @@ page 1004 "Job Task List"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the job tasks you want to group together when calculating Work In Process (WIP) and Recognition.';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies an interval or a list of job task numbers.';
@@ -88,8 +93,8 @@ page 1004 "Job Task List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Job Task Dimensions";
-                        RunPageLink = "Job No." = FIELD("Job No."),
-                                      "Job Task No." = FIELD("Job Task No.");
+                        RunPageLink = "Job No." = field("Job No."),
+                                      "Job Task No." = field("Job Task No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -147,7 +152,7 @@ page 1004 "Job Task List"
                     Job: Record Job;
                     CopyJobTasks: Page "Copy Job Tasks";
                 begin
-                    if Job.Get("Job No.") then begin
+                    if Job.Get(Rec."Job No.") then begin
                         CopyJobTasks.SetToJob(Job);
                         CopyJobTasks.RunModal();
                     end;
@@ -166,7 +171,7 @@ page 1004 "Job Task List"
                     Job: Record Job;
                     CopyJobTasks: Page "Copy Job Tasks";
                 begin
-                    if Job.Get("Job No.") then begin
+                    if Job.Get(Rec."Job No.") then begin
                         CopyJobTasks.SetFromJob(Job);
                         CopyJobTasks.RunModal();
                     end;
@@ -278,11 +283,10 @@ page 1004 "Job Task List"
 
     trigger OnAfterGetRecord()
     begin
-        StyleIsStrong := "Job Task Type" <> "Job Task Type"::Posting;
+        StyleIsStrong := Rec."Job Task Type" <> Rec."Job Task Type"::Posting;
     end;
 
     var
-        [InDataSet]
         StyleIsStrong: Boolean;
 }
 

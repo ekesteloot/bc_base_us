@@ -8,7 +8,7 @@ report 10089 "Payment Journal - Test"
     {
         dataitem("Gen. Journal Batch"; "Gen. Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             column(Gen__Journal_Batch_Journal_Template_Name; "Journal Template Name")
             {
             }
@@ -17,7 +17,7 @@ report 10089 "Payment Journal - Test"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 PrintOnlyIfDetail = true;
                 column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
                 {
@@ -114,9 +114,9 @@ report 10089 "Payment Journal - Test"
                 }
                 dataitem("Gen. Journal Line"; "Gen. Journal Line")
                 {
-                    DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
+                    DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
                     DataItemLinkReference = "Gen. Journal Batch";
-                    DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+                    DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
                     RequestFilterFields = "Posting Date";
                     column(Gen__Journal_Line__Posting_Date_; "Posting Date")
                     {
@@ -183,7 +183,7 @@ report 10089 "Payment Journal - Test"
                     }
                     dataitem(TempLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Gen__Journal_Line___Amount__LCY__; "Gen. Journal Line"."Amount (LCY)")
                         {
                         }
@@ -196,7 +196,7 @@ report 10089 "Payment Journal - Test"
                     }
                     dataitem(DimensionLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -246,7 +246,7 @@ report 10089 "Payment Journal - Test"
                     }
                     dataitem(ErrorLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number_; ErrorText[Number])
                         {
                         }
@@ -727,7 +727,7 @@ report 10089 "Payment Journal - Test"
                 }
                 dataitem(ReconcileLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(GLAccNetChange__No__; GLAccNetChange."No.")
                     {
                     }

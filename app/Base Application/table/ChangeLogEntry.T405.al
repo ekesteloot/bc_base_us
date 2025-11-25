@@ -1,3 +1,9 @@
+﻿namespace System.Diagnostics;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Reflection;
+using System.Security.AccessControl;
+
 #pragma warning disable AS0039
 table 405 "Change Log Entry"
 {
@@ -26,30 +32,28 @@ table 405 "Change Log Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(5; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(6; "Table Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table No.")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table No.")));
             Caption = 'Table Caption';
             FieldClass = FlowField;
         }
         field(7; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            TableRelation = Field."No." where(TableNo = field("Table No."));
         }
         field(8; "Field Caption"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No."),
-                                                              "No." = FIELD("Field No.")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table No."),
+                                                              "No." = field("Field No.")));
             Caption = 'Field Caption';
             FieldClass = FlowField;
         }
@@ -72,12 +76,12 @@ table 405 "Change Log Entry"
         field(13; "Primary Key Field 1 No."; Integer)
         {
             Caption = 'Primary Key Field 1 No.';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            TableRelation = Field."No." where(TableNo = field("Table No."));
         }
         field(14; "Primary Key Field 1 Caption"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No."),
-                                                              "No." = FIELD("Primary Key Field 1 No.")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table No."),
+                                                              "No." = field("Primary Key Field 1 No.")));
             Caption = 'Primary Key Field 1 Caption';
             FieldClass = FlowField;
         }
@@ -88,12 +92,12 @@ table 405 "Change Log Entry"
         field(16; "Primary Key Field 2 No."; Integer)
         {
             Caption = 'Primary Key Field 2 No.';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            TableRelation = Field."No." where(TableNo = field("Table No."));
         }
         field(17; "Primary Key Field 2 Caption"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No."),
-                                                              "No." = FIELD("Primary Key Field 2 No.")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table No."),
+                                                              "No." = field("Primary Key Field 2 No.")));
             Caption = 'Primary Key Field 2 Caption';
             FieldClass = FlowField;
         }
@@ -104,12 +108,12 @@ table 405 "Change Log Entry"
         field(19; "Primary Key Field 3 No."; Integer)
         {
             Caption = 'Primary Key Field 3 No.';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
+            TableRelation = Field."No." where(TableNo = field("Table No."));
         }
         field(20; "Primary Key Field 3 Caption"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No."),
-                                                              "No." = FIELD("Primary Key Field 3 No.")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table No."),
+                                                              "No." = field("Primary Key Field 3 No.")));
             Caption = 'Primary Key Field 3 Caption';
             FieldClass = FlowField;
         }

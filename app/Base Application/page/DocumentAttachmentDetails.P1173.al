@@ -5,7 +5,7 @@ page 1173 "Document Attachment Details"
     Editable = true;
     PageType = List;
     SourceTable = "Document Attachment";
-    SourceTableView = SORTING(ID, "Table ID");
+    SourceTableView = sorting(ID, "Table ID");
 
     layout
     {
@@ -13,7 +13,7 @@ page 1173 "Document Attachment Details"
         {
             repeater(Group)
             {
-                field(Name; "File Name")
+                field(Name; Rec."File Name")
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -23,8 +23,8 @@ page 1173 "Document Attachment Details"
                     var
                         Selection: Integer;
                     begin
-                        if "Document Reference ID".HasValue() then
-                            Export(true)
+                        if Rec."Document Reference ID".HasValue() then
+                            Rec.Export(true)
                         else
                             if not IsOfficeAddin or not EmailHasAttachments then
                                 InitiateUploadFile()
@@ -52,7 +52,7 @@ page 1173 "Document Attachment Details"
                     Editable = false;
                     ToolTip = 'Specifies the type of document that the attachment is.';
                 }
-                field(User; User)
+                field(User; Rec.User)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -106,7 +106,7 @@ page 1173 "Document Attachment Details"
                     FileName := FileManagement.StripNotsupportChrInFileName(Rec."File Name");
                     FileExtension := StrSubstNo(FileExtensionLbl, Rec."File Extension");
 
-                    DocumentServiceMgt.OpenInOneDriveFromMedia(FileName, FileExtension, "Document Reference ID".MediaId());
+                    DocumentServiceMgt.OpenInOneDriveFromMedia(FileName, FileExtension, Rec."Document Reference ID".MediaId());
                 end;
             }
             action(EditInOneDrive)
@@ -129,7 +129,7 @@ page 1173 "Document Attachment Details"
                     FileName := FileManagement.StripNotsupportChrInFileName(Rec."File Name");
                     FileExtension := StrSubstNo(FileExtensionLbl, Rec."File Extension");
 
-                    if DocumentServiceMgt.EditInOneDriveFromMedia(FileName, FileExtension, "Document Reference ID".MediaId()) then begin
+                    if DocumentServiceMgt.EditInOneDriveFromMedia(FileName, FileExtension, Rec."Document Reference ID".MediaId()) then begin
                         Rec."Attached Date" := CurrentDateTime();
                         Rec.Modify();
                     end;
@@ -154,7 +154,7 @@ page 1173 "Document Attachment Details"
                     FileName := FileManagement.StripNotsupportChrInFileName(Rec."File Name");
                     FileExtension := StrSubstNo(FileExtensionLbl, Rec."File Extension");
 
-                    DocumentServiceMgt.ShareWithOneDriveFromMedia(FileName, FileExtension, "Document Reference ID".MediaId());
+                    DocumentServiceMgt.ShareWithOneDriveFromMedia(FileName, FileExtension, Rec."Document Reference ID".MediaId());
                 end;
             }
             action(Preview)
@@ -168,8 +168,8 @@ page 1173 "Document Attachment Details"
 
                 trigger OnAction()
                 begin
-                    if "File Name" <> '' then
-                        Export(true);
+                    if Rec."File Name" <> '' then
+                        Rec.Export(true);
                 end;
             }
             action(AttachFromEmail)
@@ -267,7 +267,7 @@ page 1173 "Document Attachment Details"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "File Name" := SelectFileTxt;
+        Rec."File Name" := SelectFileTxt;
     end;
 
     var

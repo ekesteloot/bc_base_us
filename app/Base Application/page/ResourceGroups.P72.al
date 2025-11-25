@@ -1,3 +1,15 @@
+﻿namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Comment;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Analysis;
+#if not CLEAN21
+using Microsoft.ProjectMgt.Resources.Pricing;
+#endif
+using Microsoft.ServiceMgt.Analysis;
+
 page 72 "Resource Groups"
 {
     ApplicationArea = Jobs;
@@ -54,10 +66,10 @@ page 72 "Resource Groups"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Res. Gr. Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Unit of Measure Filter" = FIELD("Unit of Measure Filter"),
-                                  "Chargeable Filter" = FIELD("Chargeable Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Unit of Measure Filter" = field("Unit of Measure Filter"),
+                                  "Chargeable Filter" = field("Chargeable Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -67,8 +79,8 @@ page 72 "Resource Groups"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Resource Group"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Resource Group"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 group(Dimensions)
@@ -81,8 +93,8 @@ page 72 "Resource Groups"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(152),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(152),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -100,7 +112,7 @@ page 72 "Resource Groups"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(ResGr);
-                            DefaultDimMultiple.SetMultiRecord(ResGr, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(ResGr, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -117,8 +129,8 @@ page 72 "Resource Groups"
                     Caption = 'Costs';
                     Image = ResourceCosts;
                     RunObject = Page "Resource Costs";
-                    RunPageLink = Type = CONST("Group(Resource)"),
-                                  Code = FIELD("No.");
+                    RunPageLink = Type = const("Group(Resource)"),
+                                  Code = field("No.");
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View or change detailed information about costs for the resource.';
                     ObsoleteState = Pending;
@@ -131,8 +143,8 @@ page 72 "Resource Groups"
                     Caption = 'Prices';
                     Image = Price;
                     RunObject = Page "Resource Prices";
-                    RunPageLink = Type = CONST("Group(Resource)"),
-                                  Code = FIELD("No.");
+                    RunPageLink = Type = const("Group(Resource)"),
+                                  Code = field("No.");
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View or edit prices for the resource.';
                     ObsoleteState = Pending;
@@ -192,7 +204,7 @@ page 72 "Resource Groups"
                     Caption = 'Res. Group All&ocated per Job';
                     Image = ViewJob;
                     RunObject = Page "Res. Gr. Allocated per Job";
-                    RunPageLink = "Resource Gr. Filter" = FIELD("No.");
+                    RunPageLink = "Resource Gr. Filter" = field("No.");
                     ToolTip = 'View the job allocations of the resource group.';
                 }
                 action("Res. Group Allocated per Service &Order")
@@ -201,7 +213,7 @@ page 72 "Resource Groups"
                     Caption = 'Res. Group Allocated per Service &Order';
                     Image = ViewServiceOrder;
                     RunObject = Page "Res. Gr. Alloc. per Serv Order";
-                    RunPageLink = "Resource Group Filter" = FIELD("No.");
+                    RunPageLink = "Resource Group Filter" = field("No.");
                     ToolTip = 'View the service order allocations of the resource group.';
                 }
                 action("Res. Group Availa&bility")
@@ -210,9 +222,9 @@ page 72 "Resource Groups"
                     Caption = 'Res. Group Availa&bility';
                     Image = Calendar;
                     RunObject = Page "Res. Group Availability";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Unit of Measure Filter" = FIELD("Unit of Measure Filter"),
-                                  "Chargeable Filter" = FIELD("Chargeable Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Unit of Measure Filter" = field("Unit of Measure Filter"),
+                                  "Chargeable Filter" = field("Chargeable Filter");
                     ToolTip = 'View a summary of resource group capacities, the quantity of resource hours allocated to jobs on order, the quantity allocated to service orders, the capacity assigned to jobs on quote, and the resource group availability.';
                 }
             }
@@ -225,7 +237,7 @@ page 72 "Resource Groups"
                 Caption = 'New Resource';
                 Image = NewResource;
                 RunObject = Page "Resource Card";
-                RunPageLink = "Resource Group No." = FIELD("No.");
+                RunPageLink = "Resource Group No." = field("No.");
                 RunPageMode = Create;
                 ToolTip = 'Create a new resource.';
             }
@@ -282,7 +294,7 @@ page 72 "Resource Groups"
                 actionref(SalesPriceLists_Promoted; SalesPriceLists)
                 {
                 }
-#if not CLEAN19
+#if not CLEAN21
                 actionref(Costs_Promoted; Costs)
                 {
                     ObsoleteState = Pending;
@@ -290,7 +302,7 @@ page 72 "Resource Groups"
                     ObsoleteTag = '17.0';
                 }
 #endif
-#if not CLEAN19
+#if not CLEAN21
                 actionref(Prices_Promoted; Prices)
                 {
                     ObsoleteState = Pending;

@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 page 7380 "Phys. Invt. Item Selection"
 {
     Caption = 'Phys. Invt. Item Selection';
@@ -96,7 +101,7 @@ page 7380 "Phys. Invt. Item Selection"
                     Caption = 'Item Card';
                     Image = Item;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the item.';
                 }
@@ -106,9 +111,9 @@ page 7380 "Phys. Invt. Item Selection"
                     Caption = 'SKU Card';
                     Image = SKU;
                     RunObject = Page "Stockkeeping Unit List";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Location Code" = FIELD("Location Code");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Location Code" = field("Location Code");
                     ToolTip = 'View or edit detailed information for the stockkeeping unit.';
                 }
             }
@@ -124,7 +129,7 @@ page 7380 "Phys. Invt. Item Selection"
     local procedure LookupOKOnPush()
     begin
         CurrPage.SetSelectionFilter(Rec);
-        ModifyAll(Selected, true);
+        Rec.ModifyAll(Selected, true);
     end;
 }
 

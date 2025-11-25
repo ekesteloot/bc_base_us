@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
+using Microsoft.InventoryMgt.Item;
+using System.Text;
+
 codeunit 7500 "Item Attribute Management"
 {
 
@@ -187,12 +192,13 @@ codeunit 7500 "Item Attribute Management"
         end;
     end;
 
-    procedure InheritAttributesFromItemCategory(Item: Record Item; NewItemCategoryCode: Code[20]; OldItemCategoryCode: Code[20])
+    procedure InheritAttributesFromItemCategory(var Item: Record Item; NewItemCategoryCode: Code[20]; OldItemCategoryCode: Code[20])
     var
         TempItemAttributeValueToInsert: Record "Item Attribute Value" temporary;
         TempItemAttributeValueToDelete: Record "Item Attribute Value" temporary;
         IsHandled: Boolean;
     begin
+        IsHandled := false;
         OnBeforeInheritAttributesFromItemCategory(Item, NewItemCategoryCode, OldItemCategoryCode, IsHandled);
         if IsHandled then
             exit;

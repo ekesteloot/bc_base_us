@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Forecast;
+
 page 99000921 "Demand Forecast Names"
 {
     ApplicationArea = Planning;

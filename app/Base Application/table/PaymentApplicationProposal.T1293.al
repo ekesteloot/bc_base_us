@@ -1,4 +1,22 @@
-﻿table 1293 "Payment Application Proposal"
+﻿namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
+table 1293 "Payment Application Proposal"
 {
     Caption = 'Payment Application Proposal';
 
@@ -12,18 +30,16 @@
         field(2; "Statement No."; Code[20])
         {
             Caption = 'Statement No.';
-            TableRelation = "Bank Acc. Reconciliation"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                              "Statement Type" = FIELD("Statement Type"));
+            TableRelation = "Bank Acc. Reconciliation"."Statement No." where("Bank Account No." = field("Bank Account No."),
+                                                                              "Statement Type" = field("Statement Type"));
         }
         field(3; "Statement Line No."; Integer)
         {
             Caption = 'Statement Line No.';
         }
-        field(20; "Statement Type"; Option)
+        field(20; "Statement Type"; Enum "Bank Acc. Rec. Stmt. Type")
         {
             Caption = 'Statement Type';
-            OptionCaption = 'Bank Reconciliation,Payment Application';
-            OptionMembers = "Bank Reconciliation","Payment Application";
         }
         field(21; "Account Type"; Enum "Gen. Journal Account Type")
         {
@@ -37,18 +53,18 @@
         field(22; "Account No."; Code[20])
         {
             Caption = 'Account No.';
-            TableRelation = IF ("Account Type" = CONST("G/L Account")) "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                                                          Blocked = CONST(false))
-            ELSE
-            IF ("Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Account Type" = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF ("Account Type" = CONST("IC Partner")) "IC Partner";
+            TableRelation = if ("Account Type" = const("G/L Account")) "G/L Account" where("Account Type" = const(Posting),
+                                                                                          Blocked = const(false))
+            else
+            if ("Account Type" = const(Customer)) Customer
+            else
+            if ("Account Type" = const(Vendor)) Vendor
+            else
+            if ("Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Account Type" = const("Fixed Asset")) "Fixed Asset"
+            else
+            if ("Account Type" = const("IC Partner")) "IC Partner";
 
             trigger OnValidate()
             begin
@@ -58,18 +74,18 @@
         field(23; "Applies-to Entry No."; Integer)
         {
             Caption = 'Applies-to Entry No.';
-            TableRelation = IF ("Account Type" = CONST("G/L Account")) "G/L Entry"
-            ELSE
-            IF ("Account Type" = CONST(Customer)) "Cust. Ledger Entry" WHERE(Open = CONST(true))
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) "Vendor Ledger Entry" WHERE(Open = CONST(true))
-            ELSE
-            IF ("Account Type" = CONST("Bank Account")) "Bank Account Ledger Entry" WHERE(Open = CONST(true));
+            TableRelation = if ("Account Type" = const("G/L Account")) "G/L Entry"
+            else
+            if ("Account Type" = const(Customer)) "Cust. Ledger Entry" where(Open = const(true))
+            else
+            if ("Account Type" = const(Vendor)) "Vendor Ledger Entry" where(Open = const(true))
+            else
+            if ("Account Type" = const("Bank Account")) "Bank Account Ledger Entry" where(Open = const(true));
         }
         field(24; "Applied Amount"; Decimal)
         {
             Caption = 'Applied Amount';
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
 
             trigger OnValidate()
@@ -109,7 +125,7 @@
         }
         field(29; "Applied Pmt. Discount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Applied Pmt. Discount';
             AutoFormatType = 1;
         }
@@ -148,13 +164,11 @@
         {
             Caption = 'External Document No.';
         }
-        field(50; "Match Confidence"; Option)
+        field(50; "Match Confidence"; Enum "Bank Rec. Match Confidence")
         {
             Caption = 'Match Confidence';
             Editable = false;
             InitValue = "None";
-            OptionCaption = 'None,Low,Medium,High,High - Text-to-Account Mapping,Manual,Accepted';
-            OptionMembers = "None",Low,Medium,High,"High - Text-to-Account Mapping",Manual,Accepted;
         }
         field(51; "Pmt. Disc. Due Date"; Date)
         {
@@ -168,7 +182,7 @@
         field(52; "Remaining Pmt. Disc. Possible"; Decimal)
         {
             Caption = 'Remaining Pmt. Disc. Possible';
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
 
             trigger OnValidate()
@@ -188,7 +202,7 @@
         field(60; "Applied Amt. Incl. Discount"; Decimal)
         {
             Caption = 'Applied Amt. Incl. Discount';
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
 
             trigger OnValidate()
@@ -203,14 +217,14 @@
         {
             Caption = 'Remaining Amount';
             Editable = false;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
         }
         field(62; "Remaining Amt. Incl. Discount"; Decimal)
         {
             Caption = 'Remaining Amt. Incl. Discount';
             Editable = false;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
         }
         field(63; Type; Option)
@@ -228,7 +242,7 @@
         {
             Caption = 'Stmt To Rem. Amount Difference';
             Editable = false;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
         }
     }
@@ -375,7 +389,8 @@
 
         GetLedgEntryInfo();
         Quality := TempBankStmtMatchingBuffer.Quality;
-        "Match Confidence" := BankPmtApplRule.GetMatchConfidence(TempBankStmtMatchingBuffer.Quality);
+        "Match Confidence" :=
+            Enum::"Bank Rec. Match Confidence".FromInteger(BankPmtApplRule.GetMatchConfidence(TempBankStmtMatchingBuffer.Quality));
 
         UpdateDefaultCalculatedFields(BankAccount, Rec."Applies-to Entry No.");
 

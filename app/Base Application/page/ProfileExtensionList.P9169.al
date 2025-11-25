@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 page 9169 "Profile Extension List"
 {
     Caption = 'Profile Extensions';
@@ -14,19 +16,19 @@ page 9169 "Profile Extension List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(ProfileIdField; "Base Profile ID")
+                field(ProfileIdField; Rec."Base Profile ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Base Profile ID';
                     ToolTip = 'Specifies the ID of the profile that this profile extension is applied to.';
                 }
-                field(BaseProfileAppNameField; ExtensionManagement.GetAppName("Base Profile App ID"))
+                field(BaseProfileAppNameField; ExtensionManagement.GetAppName(Rec."Base Profile App ID"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Base Profile Source';
                     ToolTip = 'Specifies the origin of the profile that this profile extension applies to, which can be either an extension (as indicated by its name) or a custom profile created by a user (indicated as user-created).';
                 }
-                field(AppNameField; ExtensionManagement.GetAppName("App ID"))
+                field(AppNameField; ExtensionManagement.GetAppName(Rec."App ID"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Profile Extension Source';
@@ -37,6 +39,6 @@ page 9169 "Profile Extension List"
         }
     }
 
-    var 
+    var
         ExtensionManagement: Codeunit "Extension Management";
 }

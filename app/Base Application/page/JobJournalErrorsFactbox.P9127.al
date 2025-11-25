@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using System.Utilities;
+
 page 9127 "Job Journal Errors Factbox"
 {
     PageType = ListPart;
@@ -115,8 +119,8 @@ page 9127 "Job Journal Errors Factbox"
     var
         ResJnlLine: Record "Job Journal Line";
     begin
-        ResJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-        ResJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
+        ResJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+        ResJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
         exit(ResJnlLine.Count());
     end;
 

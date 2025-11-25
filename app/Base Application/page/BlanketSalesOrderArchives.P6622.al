@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Archive;
+
+using System.Security.User;
+
 page 6622 "Blanket Sales Order Archives"
 {
     ApplicationArea = Suite;
@@ -6,7 +10,7 @@ page 6622 "Blanket Sales Order Archives"
     Editable = false;
     PageType = List;
     SourceTable = "Sales Header Archive";
-    SourceTableView = WHERE("Document Type" = CONST("Blanket Order"));
+    SourceTableView = where("Document Type" = const("Blanket Order"));
     UsageCategory = History;
 
     layout
@@ -45,7 +49,7 @@ page 6622 "Blanket Sales Order Archives"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Archived By");
+                        UserMgt.DisplayUserInformation(Rec."Archived By");
                     end;
                 }
                 field("Interaction Exist"; Rec."Interaction Exist")
@@ -201,7 +205,7 @@ page 6622 "Blanket Sales Order Archives"
                 Caption = 'Comments';
                 Image = ViewComments;
                 RunObject = Page "Sales Archive Comment Sheet";
-                RunPageLink = "Document Type" = CONST("Blanket Order");
+                RunPageLink = "Document Type" = const("Blanket Order");
                 ToolTip = 'View or add comments for the record.';
             }
         }

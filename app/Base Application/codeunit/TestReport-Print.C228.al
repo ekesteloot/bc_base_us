@@ -29,9 +29,6 @@ codeunit 228 "Test Report-Print"
         InsuranceJnlTempl: Record "Insurance Journal Template";
         WhseJnlTemplate: Record "Warehouse Journal Template";
         WhseJnlLine: Record "Warehouse Journal Line";
-#if not CLEAN21
-        BankRecHdr: Record "Bank Rec. Header";
-#endif
 
     procedure PrintGenJnlBatch(GenJnlBatch: Record "Gen. Journal Batch")
     begin
@@ -278,19 +275,6 @@ codeunit 228 "Test Report-Print"
         JobJnlTemplate.TestField("Test Report ID");
         REPORT.Run(JobJnlTemplate."Test Report ID", true, false, JobJnlLine);
     end;
-
-#if not CLEAN21
-    [Obsolete('NA Bank Rec. Header deprecated in favor of W1 bank reconciliation. Use reports for "Bank Acc. Reconciliation" like PrintBankAccRecon', '21.0')]
-    procedure PrintBankRec(NewBankRecHdr: Record "Bank Rec. Header")
-    begin
-        BankRecHdr := NewBankRecHdr;
-        BankRecHdr.SetRecFilter();
-        ReportSelection.Reset();
-        ReportSelection.SetRange(Usage, ReportSelection.Usage::"B.Recon.Test");
-        ReportSelection.Find('-');
-        REPORT.Run(ReportSelection."Report ID", true, false, BankRecHdr);
-    end;
-#endif
 
     local procedure CalcSalesDiscount(var SalesHeader: Record "Sales Header")
     var

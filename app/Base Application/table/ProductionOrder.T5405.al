@@ -1,3 +1,30 @@
+﻿namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Family;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Worksheet;
+using System.Security.User;
+
 table 5405 "Production Order"
 {
     Caption = 'Production Order';
@@ -15,7 +42,7 @@ table 5405 "Production Order"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = "Production Order"."No." WHERE(Status = FIELD(Status));
+            TableRelation = "Production Order"."No." where(Status = field(Status));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -67,15 +94,15 @@ table 5405 "Production Order"
         field(10; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(Item)) Item WHERE(Type = CONST(Inventory))
-            ELSE
-            IF ("Source Type" = CONST(Family)) Family
-            ELSE
-            IF (Status = CONST(Simulated),
-                                     "Source Type" = CONST("Sales Header")) "Sales Header"."No." WHERE("Document Type" = CONST(Quote))
-            ELSE
-            IF (Status = FILTER(Planned ..),
-                                              "Source Type" = CONST("Sales Header")) "Sales Header"."No." WHERE("Document Type" = CONST(Order));
+            TableRelation = if ("Source Type" = const(Item)) Item where(Type = const(Inventory))
+            else
+            if ("Source Type" = const(Family)) Family
+            else
+            if (Status = const(Simulated),
+                                     "Source Type" = const("Sales Header")) "Sales Header"."No." where("Document Type" = const(Quote))
+            else
+            if (Status = filter(Planned ..),
+                                              "Source Type" = const("Sales Header")) "Sales Header"."No." where("Document Type" = const(Order));
 
             trigger OnValidate()
             var
@@ -137,12 +164,13 @@ table 5405 "Production Order"
         field(12; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF ("Source Type" = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("Source No."),
-                                                                                        Code = FIELD("Variant Code"));
+            TableRelation = if ("Source Type" = const(Item)) "Item Variant".Code where("Item No." = field("Source No."),
+                                                                                        Code = field("Variant Code"));
 
             trigger OnValidate()
             var
                 Item: Record Item;
+                ItemVariant: Record "Item Variant";
                 StockkeepingUnit: Record "Stockkeeping Unit";
                 IsHandled: Boolean;
             begin
@@ -153,6 +181,12 @@ table 5405 "Production Order"
 
                 if Rec."Variant Code" = xRec."Variant Code" then
                     exit;
+
+                if Rec."Variant Code" <> '' then begin
+                    ItemVariant.SetLoadFields(Blocked);
+                    ItemVariant.Get(Rec."Source No.", Rec."Variant Code");
+                    ItemVariant.TestField(Blocked, false);
+                end;
 
                 TestField("Source Type", "Source Type"::Item);
                 TestField("Source No.");
@@ -188,8 +222,8 @@ table 5405 "Production Order"
         }
         field(19; Comment; Boolean)
         {
-            CalcFormula = Exist("Prod. Order Comment Line" WHERE(Status = FIELD(Status),
-                                                                  "Prod. Order No." = FIELD("No.")));
+            CalcFormula = exist("Prod. Order Comment Line" where(Status = field(Status),
+                                                                  "Prod. Order No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -296,30 +330,30 @@ table 5405 "Production Order"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(31; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(32; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             begin
@@ -332,10 +366,10 @@ table 5405 "Production Order"
         field(33; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Source Type" = CONST(Item)) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                           "Item Filter" = FIELD("Source No."))
-            ELSE
-            IF ("Source Type" = FILTER(<> Item)) Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = if ("Source Type" = const(Item)) Bin.Code where("Location Code" = field("Location Code"),
+                                                                           "Item Filter" = field("Source No."))
+            else
+            if ("Source Type" = filter(<> Item)) Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             var
@@ -402,9 +436,9 @@ table 5405 "Production Order"
         {
             Caption = 'Capacity No. Filter';
             FieldClass = FlowFilter;
-            TableRelation = IF ("Capacity Type Filter" = CONST("Machine Center")) "Machine Center"
-            ELSE
-            IF ("Capacity Type Filter" = CONST("Work Center")) "Work Center";
+            TableRelation = if ("Capacity Type Filter" = const("Machine Center")) "Machine Center"
+            else
+            if ("Capacity Type Filter" = const("Work Center")) "Work Center";
         }
         field(50; "Date Filter"; Date)
         {
@@ -414,8 +448,8 @@ table 5405 "Production Order"
         field(51; "Expected Operation Cost Amt."; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Prod. Order Routing Line"."Expected Operation Cost Amt." WHERE(Status = FIELD(Status),
-                                                                                               "Prod. Order No." = FIELD("No.")));
+            CalcFormula = sum("Prod. Order Routing Line"."Expected Operation Cost Amt." where(Status = field(Status),
+                                                                                               "Prod. Order No." = field("No.")));
             Caption = 'Expected Operation Cost Amt.';
             Editable = false;
             FieldClass = FlowField;
@@ -423,20 +457,20 @@ table 5405 "Production Order"
         field(52; "Expected Component Cost Amt."; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Prod. Order Component"."Cost Amount" WHERE(Status = FIELD(Status),
-                                                                           "Prod. Order No." = FIELD("No."),
-                                                                           "Due Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Prod. Order Component"."Cost Amount" where(Status = field(Status),
+                                                                           "Prod. Order No." = field("No."),
+                                                                           "Due Date" = field("Date Filter")));
             Caption = 'Expected Component Cost Amt.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(55; "Actual Time Used"; Decimal)
         {
-            CalcFormula = Sum("Capacity Ledger Entry".Quantity WHERE("Order Type" = CONST(Production),
-                                                                      "Order No." = FIELD("No."),
-                                                                      Type = FIELD("Capacity Type Filter"),
-                                                                      "No." = FIELD("Capacity No. Filter"),
-                                                                      "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Capacity Ledger Entry".Quantity where("Order Type" = const(Production),
+                                                                      "Order No." = field("No."),
+                                                                      Type = field("Capacity Type Filter"),
+                                                                      "No." = field("Capacity No. Filter"),
+                                                                      "Posting Date" = field("Date Filter")));
             Caption = 'Actual Time Used';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -444,13 +478,13 @@ table 5405 "Production Order"
         }
         field(56; "Allocated Capacity Need"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Capacity Need"."Needed Time" WHERE(Status = FIELD(Status),
-                                                                               "Prod. Order No." = FIELD("No."),
-                                                                               Type = FIELD("Capacity Type Filter"),
-                                                                               "No." = FIELD("Capacity No. Filter"),
-                                                                               "Work Center No." = FIELD("Work Center Filter"),
-                                                                               Date = FIELD("Date Filter"),
-                                                                               "Requested Only" = CONST(false)));
+            CalcFormula = sum("Prod. Order Capacity Need"."Needed Time" where(Status = field(Status),
+                                                                               "Prod. Order No." = field("No."),
+                                                                               Type = field("Capacity Type Filter"),
+                                                                               "No." = field("Capacity No. Filter"),
+                                                                               "Work Center No." = field("Work Center Filter"),
+                                                                               Date = field("Date Filter"),
+                                                                               "Requested Only" = const(false)));
             Caption = 'Allocated Capacity Need';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -458,13 +492,13 @@ table 5405 "Production Order"
         }
         field(57; "Expected Capacity Need"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Capacity Need"."Needed Time" WHERE(Status = FIELD(Status),
-                                                                               "Prod. Order No." = FIELD("No."),
-                                                                               Type = FIELD("Capacity Type Filter"),
-                                                                               "No." = FIELD("Capacity No. Filter"),
-                                                                               "Work Center No." = FIELD("Work Center Filter"),
-                                                                               Date = FIELD("Date Filter"),
-                                                                               "Requested Only" = CONST(false)));
+            CalcFormula = sum("Prod. Order Capacity Need"."Needed Time" where(Status = field(Status),
+                                                                               "Prod. Order No." = field("No."),
+                                                                               Type = field("Capacity Type Filter"),
+                                                                               "No." = field("Capacity No. Filter"),
+                                                                               "Work Center No." = field("Work Center Filter"),
+                                                                               Date = field("Date Filter"),
+                                                                               "Requested Only" = const(false)));
             Caption = 'Expected Capacity Need';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -490,8 +524,8 @@ table 5405 "Production Order"
         }
         field(92; "Expected Material Ovhd. Cost"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Component"."Overhead Amount" WHERE(Status = FIELD(Status),
-                                                                               "Prod. Order No." = FIELD("No.")));
+            CalcFormula = sum("Prod. Order Component"."Overhead Amount" where(Status = field(Status),
+                                                                               "Prod. Order No." = field("No.")));
             Caption = 'Expected Material Ovhd. Cost';
             DecimalPlaces = 2 : 2;
             Editable = false;
@@ -500,8 +534,8 @@ table 5405 "Production Order"
         field(94; "Expected Capacity Ovhd. Cost"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Prod. Order Routing Line"."Expected Capacity Ovhd. Cost" WHERE(Status = FIELD(Status),
-                                                                                               "Prod. Order No." = FIELD("No.")));
+            CalcFormula = sum("Prod. Order Routing Line"."Expected Capacity Ovhd. Cost" where(Status = field(Status),
+                                                                                               "Prod. Order No." = field("No.")));
             Caption = 'Expected Capacity Ovhd. Cost';
             Editable = false;
             FieldClass = FlowField;
@@ -536,7 +570,7 @@ table 5405 "Production Order"
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
 
             trigger OnValidate()
@@ -546,9 +580,9 @@ table 5405 "Production Order"
         }
         field(7300; "Completely Picked"; Boolean)
         {
-            CalcFormula = Min("Prod. Order Component"."Completely Picked" WHERE(Status = FIELD(Status),
-                                                                                 "Prod. Order No." = FIELD("No."),
-                                                                                 "Supplied-by Line No." = FILTER(0)));
+            CalcFormula = min("Prod. Order Component"."Completely Picked" where(Status = field(Status),
+                                                                                 "Prod. Order No." = field("No."),
+                                                                                 "Supplied-by Line No." = filter(0)));
             Caption = 'Completely Picked';
             FieldClass = FlowField;
         }
@@ -842,7 +876,7 @@ table 5405 "Production Order"
         ProdOrderComment.SetRange("Prod. Order No.", "No.");
         ProdOrderComment.DeleteAll();
 
-        ReservMgt.DeleteDocumentReservation(DATABASE::"Prod. Order Line", Status.AsInteger(), "No.", HideValidationDialog);
+        ReservMgt.DeleteDocumentReservation(Enum::TableID::"Prod. Order Line".AsInteger(), Status.AsInteger(), "No.", HideValidationDialog);
 
         DeleteProdOrderLines();
 
@@ -852,7 +886,7 @@ table 5405 "Production Order"
         if not WhseRequest.IsEmpty() then
             WhseRequest.DeleteAll(true);
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          DATABASE::"Prod. Order Component", Status.AsInteger(), "No.", '', 0, 0, '', false);
+          Enum::TableID::"Prod. Order Component".AsInteger(), Status.AsInteger(), "No.", '', 0, 0, '', false);
     end;
 
     local procedure DeleteProdOrderLines()
@@ -976,27 +1010,6 @@ table 5405 "Production Order"
         OnAfterUpdateDateTime(Rec, xRec, CurrFieldNo);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-    begin
-        TableID[1] := Type1;
-        No[1] := No1;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, DefaultDimSource, '', "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         IsHandled: Boolean;
@@ -1004,9 +1017,6 @@ table 5405 "Production Order"
         IsHandled := false;
         OnBeforeCreateDim(Rec, IsHandled);
         if not IsHandled then begin
-#if not CLEAN20
-            RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
             "Shortcut Dimension 1 Code" := '';
             "Shortcut Dimension 2 Code" := '';
             "Dimension Set ID" :=
@@ -1057,8 +1067,8 @@ table 5405 "Production Order"
         if ProdOrderCompLine.Find('-') then
             repeat
                 ItemTrackingMgt.InitItemTrackingForTempWhseWorksheetLine(
-                  "Warehouse Worksheet Document Type"::Production, ProdOrderCompLine."Prod. Order No.",
-                  ProdOrderCompLine."Prod. Order Line No.", DATABASE::"Prod. Order Component",
+                  Enum::"Warehouse Worksheet Document Type"::Production, ProdOrderCompLine."Prod. Order No.",
+                  ProdOrderCompLine."Prod. Order Line No.", Enum::TableID::"Prod. Order Component".AsInteger(),
                   ProdOrderCompLine.Status.AsInteger(), ProdOrderCompLine."Prod. Order No.",
                   ProdOrderCompLine."Prod. Order Line No.", ProdOrderCompLine."Line No.");
             until ProdOrderCompLine.Next() = 0;
@@ -1100,7 +1110,7 @@ table 5405 "Production Order"
         CreatePickFromWhseSource.SetHideValidationDialog(HideValidationDialog);
         if HideValidationDialog then
             CreatePickFromWhseSource.Initialize(
-                AssignedUserID, "Whse. Activity Sorting Method".FromInteger(SortingMethod), PrintDocument, DoNotFillQtyToHandle, SetBreakBulkFilter);
+                AssignedUserID, Enum::"Whse. Activity Sorting Method".FromInteger(SortingMethod), PrintDocument, DoNotFillQtyToHandle, SetBreakBulkFilter);
         CreatePickFromWhseSource.UseRequestPage(not HideValidationDialog);
         CreatePickFromWhseSource.RunModal();
         CreatePickFromWhseSource.GetResultMessage(2);
@@ -1131,7 +1141,7 @@ table 5405 "Production Order"
     var
         Item: Record Item;
         StockkeepingUnit: Record "Stockkeeping Unit";
-        WMSManagement: Codeunit "WMS Management";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
         VersionManagement: Codeunit VersionManagement;
         RoutingNo: Code[20];
         IsHandled: Boolean;
@@ -1156,8 +1166,8 @@ table 5405 "Production Order"
         // 1st priority - output bin from work/machine center
         if RoutingNo <> '' then
             "Bin Code" :=
-              WMSManagement.GetLastOperationFromBinCode(
-                RoutingNo, VersionManagement.GetRtngVersion(RoutingNo, "Due Date", true), "Location Code", false, 0);
+              ProdOrderWarehouseMgt.GetLastOperationFromBinCode(
+                RoutingNo, VersionManagement.GetRtngVersion(RoutingNo, "Due Date", true), "Location Code", false, Enum::"Flushing Method"::Manual);
 
         // 2nd priority - default output bin at location
         if "Bin Code" = '' then
@@ -1168,7 +1178,7 @@ table 5405 "Production Order"
         OnGetDefaultBinOnBeforeThirdPrioritySetBinCode(Rec, xRec, IsHandled);
         if not IsHandled then
             if ("Bin Code" = '') and ("Source No." <> '') then
-                WMSManagement.GetDefaultBin("Source No.", '', "Location Code", "Bin Code");
+                ProdOrderWarehouseMgt.GetDefaultBin("Source No.", '', "Location Code", "Bin Code");
     end;
 
     local procedure GetLocation(LocationCode: Code[10])
@@ -1410,47 +1420,27 @@ table 5405 "Production Order"
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, CurrFieldNo);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
+    internal procedure GetQtyReservedFromStockState() Result: Enum "Reservation From Stock"
     var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
+        ProdOrderComponent: Record "Prod. Order Component";
+        ProdOrderCompReserve: Codeunit "Prod. Order Comp.-Reserve";
+        QtyReservedFromStock: Decimal;
     begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Production Order", DefaultDimSource, TableID, No);
+        QtyReservedFromStock := ProdOrderCompReserve.GetReservedQtyFromInventory(Rec);
+
+        ProdOrderComponent.SetRange(Status, Rec.Status);
+        ProdOrderComponent.SetRange("Prod. Order No.", Rec."No.");
+        ProdOrderComponent.CalcSums("Remaining Qty. (Base)");
+
+        case QtyReservedFromStock of
+            0:
+                exit(Result::None);
+            ProdOrderComponent."Remaining Qty. (Base)":
+                exit(Result::Full);
+            else
+                exit(Result::Partial);
+        end;
     end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Production Order", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDimTableIDs(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Production Order") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDimTableIDs(var ProductionOrder: Record "Production Order"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var ProductionOrder: Record "Production Order"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CallingFieldNo: Integer)
@@ -1462,13 +1452,6 @@ table 5405 "Production Order"
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var ProductionOrder: Record "Production Order"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterOnDelete(var ProductionOrder: Record "Production Order"; var RefreshOrder: Boolean)
     begin

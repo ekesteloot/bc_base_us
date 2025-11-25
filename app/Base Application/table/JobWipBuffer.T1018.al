@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.ProjectMgt.Jobs.Job;
+
 table 1018 "Job WIP Buffer"
 {
     Caption = 'Job WIP Buffer';

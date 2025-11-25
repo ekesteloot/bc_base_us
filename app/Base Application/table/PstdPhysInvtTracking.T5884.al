@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Counting.Tracking;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5884 "Pstd. Phys. Invt. Tracking"
 {
     Caption = 'Pstd. Phys. Invt. Tracking';
@@ -43,10 +50,8 @@ table 5884 "Pstd. Phys. Invt. Tracking"
         field(15; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
-            TableRelation = "Serial No. Information"."Serial No." WHERE("Item No." = FIELD("Item No."),
-                                                                         "Variant Code" = FIELD("Variant Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Serial No. Information"."Serial No." where("Item No." = field("Item No."),
+                                                                         "Variant Code" = field("Variant Code"));
             ValidateTableRelation = false;
         }
         field(18; Positive; Boolean)
@@ -65,10 +70,8 @@ table 5884 "Pstd. Phys. Invt. Tracking"
         field(5400; "Lot No."; Code[50])
         {
             Caption = 'Lot No.';
-            TableRelation = "Lot No. Information"."Lot No." WHERE("Item No." = FIELD("Item No."),
-                                                                   "Variant Code" = FIELD("Variant Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Lot No. Information"."Lot No." where("Item No." = field("Item No."),
+                                                                   "Variant Code" = field("Variant Code"));
             ValidateTableRelation = false;
         }
         field(5401; "Variant Code"; Code[10])
@@ -80,7 +83,7 @@ table 5884 "Pstd. Phys. Invt. Tracking"
         {
             Caption = 'Bin Code';
             Editable = false;
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(5403; "Entry Type"; Option)
         {

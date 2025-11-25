@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.InventoryMgt.Item;
+
 page 9125 "Item Application FactBox"
 {
     Caption = 'Item Application';
@@ -73,11 +77,11 @@ page 9125 "Item Application FactBox"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Reserved Quantity");
-        Available := Quantity - "Reserved Quantity";
-        Applied := ItemApplnEntry.OutboundApplied("Entry No.", false) - ItemApplnEntry.InboundApplied("Entry No.", false);
+        Rec.CalcFields("Reserved Quantity");
+        Available := Rec.Quantity - Rec."Reserved Quantity";
+        Applied := ItemApplnEntry.OutboundApplied(Rec."Entry No.", false) - ItemApplnEntry.InboundApplied(Rec."Entry No.", false);
 
-        if not Item.Get("Item No.") then
+        if not Item.Get(Rec."Item No.") then
             Item.Reset();
     end;
 
@@ -87,7 +91,7 @@ page 9125 "Item Application FactBox"
         Applied := 0;
         Clear(Item);
 
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     var

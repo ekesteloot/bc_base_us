@@ -1,3 +1,17 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Reports;
+using Microsoft.Sales.Setup;
+using System.Automation;
+using System.Environment.Configuration;
+using System.Text;
+using System.Threading;
+
 page 9302 "Sales Credit Memos"
 {
     AdditionalSearchTerms = 'refund credit return refund correct cancel undo sale';
@@ -10,7 +24,7 @@ page 9302 "Sales Credit Memos"
     QueryCategory = 'Sales Credit Memos';
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = CONST("Credit Memo"));
+    SourceTableView = where("Document Type" = const("Credit Memo"));
     UsageCategory = Lists;
 
     layout
@@ -202,7 +216,7 @@ page 9302 "Sales Credit Memos"
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
-                    StyleExpr = "Job Queue Status" = "Job Queue Status"::ERROR;
+                    StyleExpr = Rec."Job Queue Status" = Rec."Job Queue Status"::ERROR;
                     ToolTip = 'Specifies the status of a job queue entry or task that handles the posting of sales credit memos.';
                     Visible = JobQueueActive;
 
@@ -210,9 +224,9 @@ page 9302 "Sales Credit Memos"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
                 field(Amount; Rec.Amount)
@@ -241,14 +255,14 @@ page 9302 "Sales Credit Memos"
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             part(Control1900316107; "Customer Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -286,9 +300,9 @@ page 9302 "Sales Credit Memos"
 
                     trigger OnAction()
                     begin
-                        PrepareOpeningDocumentStatistics();
+                        Rec.PrepareOpeningDocumentStatistics();
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        ShowDocumentStatisticsPage();
+                        Rec.ShowDocumentStatisticsPage();
                     end;
                 }
                 action("Co&mments")
@@ -297,9 +311,9 @@ page 9302 "Sales Credit Memos"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -313,7 +327,7 @@ page 9302 "Sales Credit Memos"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Approvals)
@@ -336,10 +350,10 @@ page 9302 "Sales Credit Memos"
                     Caption = 'CFDI Relation Documents';
                     Image = Allocations;
                     RunObject = Page "CFDI Relation Documents";
-                    RunPageLink = "Document Table ID" = CONST(36),
-                                  "Document Type" = FIELD("Document Type"),
-                                  "Document No." = FIELD("No."),
-                                  "Customer No." = FIELD("Bill-to Customer No.");
+                    RunPageLink = "Document Table ID" = const(36),
+                                  "Document Type" = field("Document Type"),
+                                  "Document No." = field("No."),
+                                  "Customer No." = field("Bill-to Customer No.");
                     ToolTip = 'View or add CFDI relation documents for the record.';
                 }
             }
@@ -357,8 +371,8 @@ page 9302 "Sales Credit Memos"
                     Enabled = CustomerSelected;
                     Image = Customer;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
                     Scope = Repeater;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer.';
@@ -381,7 +395,7 @@ page 9302 "Sales Credit Memos"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualRelease(SalesHeader);
+                        Rec.PerformManualRelease(SalesHeader);
                     end;
                 }
                 action("Re&open")
@@ -396,7 +410,7 @@ page 9302 "Sales Credit Memos"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualReopen(SalesHeader);
+                        Rec.PerformManualReopen(SalesHeader);
                     end;
                 }
             }
@@ -434,7 +448,7 @@ page 9302 "Sales Credit Memos"
                         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelSalesApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
             }
@@ -474,7 +488,7 @@ page 9302 "Sales Credit Memos"
                             repeat
                                 CheckSalesCheckAllLinesHaveQuantityAssigned(SalesHeader);
                             until SalesHeader.Next() = 0;
-                            SalesBatchPostMgt.RunWithUI(SalesHeader, Count, ReadyToPostQst);
+                            SalesBatchPostMgt.RunWithUI(SalesHeader, Rec.Count(), ReadyToPostQst);
                         end else
                             PostDocument(CODEUNIT::"Sales-Post (Yes/No)");
                     end;
@@ -538,7 +552,7 @@ page 9302 "Sales Credit Memos"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                     end;
                 }
             }
@@ -716,17 +730,17 @@ page 9302 "Sales Credit Memos"
 
     trigger OnAfterGetRecord()
     begin
-        StatusStyleTxt := GetStatusStyleText();
+        StatusStyleTxt := Rec.GetStatusStyleText();
     end;
 
     trigger OnOpenPage()
     var
         SalesSetup: Record "Sales & Receivables Setup";
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
         JobQueueActive := SalesSetup.JobQueueActive();
 
-        CopySellToCustomerFilter();
+        Rec.CopySellToCustomerFilter();
     end;
 
     var
@@ -737,14 +751,12 @@ page 9302 "Sales Credit Memos"
         CustomerSelected: Boolean;
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
 
         OpenPostedSalesCrMemoQst: Label 'The credit memo is posted as number %1 and moved to the Posted Sales Credit Memo window.\\Do you want to open the posted credit memo?', Comment = '%1 = posted document number';
         ReadyToPostQst: Label 'The number of credit memos that will be posted is %1. \Do you want to continue?', Comment = '%1 - selected count';
 
     protected var
-        [InDataSet]
         JobQueueActive: Boolean;
 
     local procedure SetControlAppearance()
@@ -752,12 +764,12 @@ page 9302 "Sales Credit Memos"
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
-        CustomerSelected := "Sell-to Customer No." <> '';
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
+        CustomerSelected := Rec."Sell-to Customer No." <> '';
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
     end;
 
     local procedure PostDocument(PostingCodeunitID: Integer)
@@ -771,14 +783,14 @@ page 9302 "Sales Credit Memos"
         PreAssignedNo := Rec."No.";
         xLastPostingNo := Rec."Last Posting No.";
 
-        SendToPosting(PostingCodeunitID);
+        Rec.SendToPosting(PostingCodeunitID);
 
         IsHandled := false;
         OnPostDocumentBeforeNavigateAfterPosting(Rec, PostingCodeunitID, IsHandled);
         if IsHandled then
             exit;
 
-        if "Job Queue Status" = "Job Queue Status"::"Scheduled for Posting" then
+        if Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting" then
             CurrPage.Close()
         else
             if ApplicationAreaMgmtFacade.IsFoundationEnabled() then

@@ -1,3 +1,10 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
+
 codeunit 5605 "Calculate Disposal"
 {
     Permissions = TableData "FA Ledger Entry" = r,

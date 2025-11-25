@@ -141,6 +141,7 @@ page 30145 "Shpfy Refund"
                 Caption = 'Retrieved Shopify Data';
                 Image = Entry;
                 ToolTip = 'View the data retrieved from Shopify.';
+
                 trigger OnAction();
                 var
                     DataCapture: Record "Shpfy Data Capture";

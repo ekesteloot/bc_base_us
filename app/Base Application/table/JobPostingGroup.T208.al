@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+
 table 208 "Job Posting Group"
 {
     Caption = 'Job Posting Group';

@@ -9,7 +9,7 @@ report 10104 "Vendor Comment List"
     {
         dataitem("Comment Line"; "Comment Line")
         {
-            DataItemTableView = SORTING("Table Name", "No.", "Line No.") WHERE("Table Name" = CONST(Vendor));
+            DataItemTableView = sorting("Table Name", "No.", "Line No.") where("Table Name" = const(Vendor));
             RequestFilterFields = "No.", Date, "Code";
             column(Vendor_Comment_List_; 'Vendor Comment List')
             {

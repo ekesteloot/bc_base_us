@@ -1,3 +1,10 @@
+﻿namespace System.Automation;
+
+using System;
+using System.Azure.Identity;
+using System.Environment;
+using System.Integration;
+
 codeunit 6400 "Flow Service Management"
 {
     // // Manages access to Microsoft Power Automate (previously called Microsoft Flow) service API
@@ -241,12 +248,17 @@ codeunit 6400 "Flow Service Management"
     var
         WebRequestHelper: Codeunit "Web Request Helper";
         ResponseText: Text;
+        Handled: Boolean;
     begin
-        // Gets a list of Flow user environments from the Flow API.
-        if not WebRequestHelper.GetResponseTextUsingCharset(
-             'GET', GetFlowEnvironmentsApi(), AzureAdMgt.GetAccessToken(FlowARMResourceUrlTxt, FlowResourceNameTxt, false), ResponseText)
-        then
-            Error(GenericErr);
+        Handled := false;
+        OnBeforeSendGetEnvironmentRequest(ResponseText, Handled);
+        if not Handled then begin
+            // Gets a list of Flow user environments from the Flow API.
+            if not WebRequestHelper.GetResponseTextUsingCharset(
+                'GET', GetFlowEnvironmentsApi(), AzureAdMgt.GetAccessToken(FlowARMResourceUrlTxt, FlowResourceNameTxt, false), ResponseText)
+            then
+                Error(GenericErr);
+        end;
 
         ParseResponseTextForEnvironments(ResponseText, TempFlowUserEnvironmentBuffer);
     end;
@@ -354,24 +366,29 @@ codeunit 6400 "Flow Service Management"
         WebRequestHelper: Codeunit "Web Request Helper";
         ResponseText: Text;
         PostResult: Boolean;
+        Handled: Boolean;
     begin
-        GetEnvironments(TempFlowUserEnvironmentBuffer);
-        TempFlowUserEnvironmentBuffer.SetRange(Default, true);
-        if TempFlowUserEnvironmentBuffer.FindFirst() then
-            SaveFlowUserEnvironmentSelection(TempFlowUserEnvironmentBuffer)
-        else begin
-            // No environment found so make a post call to create default environment. Post call returns error but actually creates environment
-            PostResult := WebRequestHelper.GetResponseTextUsingCharset(
-                'POST', GetFlowEnvironmentsApi(), AzureAdMgt.GetAccessToken(FlowARMResourceUrlTxt, FlowResourceNameTxt, false), ResponseText);
-
-            if not PostResult then
-                ; // Do nothing. Need to store the result of the POST call so that error from POST call doesn't bubble up. May need to look at this later.
-
-            // we should have environments now so go ahead and set selected environment
+        Handled := false;
+        OnBeforeSetDefaultEnvironmentRequest(ResponseText, Handled);
+        if not Handled then begin
             GetEnvironments(TempFlowUserEnvironmentBuffer);
             TempFlowUserEnvironmentBuffer.SetRange(Default, true);
             if TempFlowUserEnvironmentBuffer.FindFirst() then
                 SaveFlowUserEnvironmentSelection(TempFlowUserEnvironmentBuffer)
+            else begin
+                // No environment found so make a post call to create default environment. Post call returns error but actually creates environment
+                PostResult := WebRequestHelper.GetResponseTextUsingCharset(
+                    'POST', GetFlowEnvironmentsApi(), AzureAdMgt.GetAccessToken(FlowARMResourceUrlTxt, FlowResourceNameTxt, false), ResponseText);
+
+                if not PostResult then
+                    ; // Do nothing. Need to store the result of the POST call so that error from POST call doesn't bubble up. May need to look at this later.
+
+                // we should have environments now so go ahead and set selected environment
+                GetEnvironments(TempFlowUserEnvironmentBuffer);
+                TempFlowUserEnvironmentBuffer.SetRange(Default, true);
+                if TempFlowUserEnvironmentBuffer.FindFirst() then
+                    SaveFlowUserEnvironmentSelection(TempFlowUserEnvironmentBuffer)
+            end;
         end;
     end;
 
@@ -416,6 +433,16 @@ codeunit 6400 "Flow Service Management"
                 FlowServiceConfiguration."Flow Service"::"Testing Service (TIP 1)":
                     FlowEnvironmentsApi := FlowEnvironmentsTip1ApiTxt;
             end;
+    end;
+
+    [InternalEvent(false)]
+    internal procedure OnBeforeSendGetEnvironmentRequest(var ResponseText: Text; var Handled: Boolean)
+    begin
+    end;
+
+    [InternalEvent(false)]
+    internal procedure OnBeforeSetDefaultEnvironmentRequest(var ResponseText: Text; var Handled: Boolean)
+    begin
     end;
 }
 

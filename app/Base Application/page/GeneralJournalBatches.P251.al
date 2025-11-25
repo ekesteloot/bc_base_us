@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using System.Environment;
+
 page 251 "General Journal Batches"
 {
     Caption = 'General Journal Batches';
@@ -74,17 +81,6 @@ page 251 "General Journal Batches"
                     ToolTip = 'Specifies the format of the bank statement file that can be imported into this general journal batch.';
                     Visible = false;
                 }
-#if not CLEAN20
-                field(BackgroundErrorCheck; "Background Error Check")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies if you want the journal lines to be checked automatically for potential issues.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced with GLSetup.Enable Data Check';
-                    ObsoleteTag = '20.0';
-                    Visible = false;
-                }
-#endif                
                 field("Copy to Posted Jnl. Lines"; Rec."Copy to Posted Jnl. Lines")
                 {
                     ApplicationArea = Suite;
@@ -187,7 +183,7 @@ page 251 "General Journal Batches"
 
                     trigger OnAction()
                     begin
-                        MarkedOnly(not MarkedOnly);
+                        Rec.MarkedOnly(not Rec.MarkedOnly);
                         CurrPage.Update(false);
                     end;
                 }
@@ -304,8 +300,8 @@ page 251 "General Journal Batches"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         if GenJnlTemplateName <> '' then
-            "Journal Template Name" := GenJnlTemplateName;
-        SetupNewBatch();
+            Rec."Journal Template Name" := GenJnlTemplateName;
+        Rec.SetupNewBatch();
     end;
 
     trigger OnOpenPage()
@@ -320,7 +316,7 @@ page 251 "General Journal Batches"
         // Doing this because if user is using web client then filters on REC are being removed
         // Since filter is removed we need to persist value for template
         // name and use it 'OnNewRecord'
-        GenJnlTemplateName := "Journal Template Name";
+        GenJnlTemplateName := Rec."Journal Template Name";
     end;
 
     var
@@ -334,8 +330,8 @@ page 251 "General Journal Batches"
         GenJnlTemplate: Record "Gen. Journal Template";
     begin
         if not CurrPage.LookupMode then
-            if GetFilter("Journal Template Name") <> '' then begin
-                GenJnlTemplate.SetFilter(Name, GetFilter("Journal Template Name"));
+            if Rec.GetFilter("Journal Template Name") <> '' then begin
+                GenJnlTemplate.SetFilter(Name, Rec.GetFilter("Journal Template Name"));
                 if GenJnlTemplate.FindSet() then
                     if GenJnlTemplate.Next() = 0 then
                         exit(GenJnlTemplate.Name + ' ' + GenJnlTemplate.Description);
@@ -363,7 +359,7 @@ page 251 "General Journal Batches"
     var
         GenJournalTemplate: Record "Gen. Journal Template";
     begin
-        if GenJournalTemplate.Get("Journal Template Name") then
+        if GenJournalTemplate.Get(Rec."Journal Template Name") then
             IsPaymentTemplate := GenJournalTemplate.Type = GenJournalTemplate.Type::Payments;
     end;
 }

@@ -33,7 +33,7 @@ page 1263 Certificate
                             PasswordNotification.Recall();
                             CertificateManagement.SetCertPassword(CertPassword);
                             if CertificateManagement.VerifyCert(Rec) then begin
-                                if IsCertificateExpired() then
+                                if Rec.IsCertificateExpired() then
                                     HandleExpiredCert()
                                 else begin
                                     IsShowCertInfo := true;
@@ -46,7 +46,7 @@ page 1263 Certificate
                         end;
                     }
                 }
-                field(Scope; Scope)
+                field(Scope; Rec.Scope)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = IsNewRecord;
@@ -62,7 +62,7 @@ page 1263 Certificate
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the certificate has a private key.';
                 }
-                field(ThumbPrint; ThumbPrint)
+                field(ThumbPrint; Rec.ThumbPrint)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Thumbprint';
@@ -103,7 +103,7 @@ page 1263 Certificate
                     IsolatedCertificate := Rec;
                     CertPassword := '';
                     CertificateManagement.SetCertPassword(CertPassword);
-                    
+
                     CheckEncryption();
 
                     if not CertificateManagement.UploadAndVerifyCert(Rec) then begin
@@ -112,11 +112,11 @@ page 1263 Certificate
                     end else begin
                         IsPasswordRequired := false;
                         IsShowCertInfo := true;
-                        if IsCertificateExpired() then begin
+                        if Rec.IsCertificateExpired() then begin
                             HandleExpiredCert();
 
                             Rec := IsolatedCertificate;
-                            if ThumbPrint = '' then
+                            if Rec.ThumbPrint = '' then
                                 IsShowCertInfo := false;
                         end;
                     end;
@@ -145,33 +145,33 @@ page 1263 Certificate
 
     trigger OnOpenPage()
     begin
-        if Code = '' then begin
+        if Rec.Code = '' then begin
             IsNewRecord := true;
             CheckEncryption();
             if not CertificateManagement.UploadAndVerifyCert(Rec) then
                 HandleRequirePassword()
             else begin
                 IsShowCertInfo := true;
-                if IsCertificateExpired() then
+                if Rec.IsCertificateExpired() then
                     HandleExpiredCert();
             end;
 
             IsolatedCertificate := Rec;
         end else
-            if ThumbPrint <> '' then begin
+            if Rec.ThumbPrint <> '' then begin
                 IsShowCertInfo := true;
-                if IsCertificateExpired() then
+                if Rec.IsCertificateExpired() then
                     NotfiyExpiredCert(CertHasExpiredMsg);
             end;
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if Code <> '' then
-            TestField(Name);
+        if Rec.Code <> '' then
+            Rec.TestField(Name);
 
         if IsNewRecord then
-            SetScope();
+            Rec.SetScope();
 
         if (IsNewRecord or IsUploadedCertValid) and not IsExpired then
             SaveCertToIsolatedStorage();
@@ -230,7 +230,7 @@ page 1263 Certificate
         else
             Rec := IsolatedCertificate;
 
-        IsShowCertInfo := ThumbPrint <> '';
+        IsShowCertInfo := Rec.ThumbPrint <> '';
         IsPasswordRequired := false;
     end;
 

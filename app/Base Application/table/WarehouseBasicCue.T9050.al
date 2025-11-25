@@ -1,3 +1,12 @@
+namespace Microsoft.WarehouseMgt.RoleCenters;
+
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.WarehouseMgt.Activity;
+
 table 9050 "Warehouse Basic Cue"
 {
     Caption = 'Warehouse Basic Cue';
@@ -11,18 +20,18 @@ table 9050 "Warehouse Basic Cue"
         field(2; "Rlsd. Sales Orders Until Today"; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count ("Sales Header" WHERE("Document Type" = FILTER(Order),
-                                                      Status = FILTER(Released),
-                                                      "Shipment Date" = FIELD("Date Filter"),
-                                                      "Location Code" = FIELD("Location Filter")));
+            CalcFormula = Count("Sales Header" where("Document Type" = filter(Order),
+                                                      Status = filter(Released),
+                                                      "Shipment Date" = field("Date Filter"),
+                                                      "Location Code" = field("Location Filter")));
             Caption = 'Rlsd. Sales Orders Until Today';
             Editable = false;
             FieldClass = FlowField;
         }
         field(3; "Posted Sales Shipments - Today"; Integer)
         {
-            CalcFormula = Count ("Sales Shipment Header" WHERE("Posting Date" = FIELD("Date Filter2"),
-                                                               "Location Code" = FIELD("Location Filter")));
+            CalcFormula = Count("Sales Shipment Header" where("Posting Date" = field("Date Filter2"),
+                                                               "Location Code" = field("Location Filter")));
             Caption = 'Posted Sales Shipments - Today';
             Editable = false;
             FieldClass = FlowField;
@@ -30,43 +39,43 @@ table 9050 "Warehouse Basic Cue"
         field(4; "Exp. Purch. Orders Until Today"; Integer)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Count ("Purchase Header" WHERE("Document Type" = FILTER(Order),
-                                                         Status = FILTER(Released),
-                                                         "Expected Receipt Date" = FIELD("Date Filter"),
-                                                         "Location Code" = FIELD("Location Filter")));
+            CalcFormula = Count("Purchase Header" where("Document Type" = filter(Order),
+                                                         Status = filter(Released),
+                                                         "Expected Receipt Date" = field("Date Filter"),
+                                                         "Location Code" = field("Location Filter")));
             Caption = 'Exp. Purch. Orders Until Today';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; "Posted Purch. Receipts - Today"; Integer)
         {
-            CalcFormula = Count ("Purch. Rcpt. Header" WHERE("Posting Date" = FIELD("Date Filter2"),
-                                                             "Location Code" = FIELD("Location Filter")));
+            CalcFormula = Count("Purch. Rcpt. Header" where("Posting Date" = field("Date Filter2"),
+                                                             "Location Code" = field("Location Filter")));
             Caption = 'Posted Purch. Receipts - Today';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Invt. Picks Until Today"; Integer)
         {
-            CalcFormula = Count ("Warehouse Activity Header" WHERE(Type = FILTER("Invt. Pick"),
-                                                                   "Shipment Date" = FIELD("Date Filter"),
-                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = Count("Warehouse Activity Header" where(Type = filter("Invt. Pick"),
+                                                                   "Shipment Date" = field("Date Filter"),
+                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Invt. Picks Until Today';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; "Invt. Put-aways Until Today"; Integer)
         {
-            CalcFormula = Count ("Warehouse Activity Header" WHERE(Type = FILTER("Invt. Put-away"),
-                                                                   "Shipment Date" = FIELD("Date Filter"),
-                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = Count("Warehouse Activity Header" where(Type = filter("Invt. Put-away"),
+                                                                   "Shipment Date" = field("Date Filter"),
+                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Invt. Put-aways Until Today';
             Editable = false;
             FieldClass = FlowField;
         }
         field(8; "Open Phys. Invt. Orders"; Integer)
         {
-            CalcFormula = Count ("Phys. Invt. Order Header" WHERE(Status = CONST(Open)));
+            CalcFormula = Count("Phys. Invt. Order Header" where(Status = const(Open)));
             Caption = 'Open Phys. Invt. Orders';
             Editable = false;
             FieldClass = FlowField;

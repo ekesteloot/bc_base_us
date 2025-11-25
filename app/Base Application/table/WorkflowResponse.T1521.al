@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Reflection;
+
 table 1521 "Workflow Response"
 {
     Caption = 'Workflow Response';
@@ -14,7 +18,7 @@ table 1521 "Workflow Response"
         field(2; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(3; Description; Text[250])
         {

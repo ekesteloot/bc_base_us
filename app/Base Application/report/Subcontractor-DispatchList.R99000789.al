@@ -1,7 +1,14 @@
+﻿namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+
 report 99000789 "Subcontractor - Dispatch List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/SubcontractorDispatchList.rdlc';
+    RDLCLayout = './Manufacturing/Reports/SubcontractorDispatchList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Subcontractor - Dispatch List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +17,7 @@ report 99000789 "Subcontractor - Dispatch List"
     {
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
@@ -63,8 +70,8 @@ report 99000789 "Subcontractor - Dispatch List"
             }
             dataitem("Work Center"; "Work Center")
             {
-                DataItemLink = "Subcontractor No." = FIELD("No.");
-                DataItemTableView = SORTING("Subcontractor No.");
+                DataItemLink = "Subcontractor No." = field("No.");
+                DataItemTableView = sorting("Subcontractor No.");
                 PrintOnlyIfDetail = true;
                 RequestFilterFields = "No.";
                 column(No_WorkCenter; "No.")
@@ -81,8 +88,8 @@ report 99000789 "Subcontractor - Dispatch List"
                 }
                 dataitem("Prod. Order Routing Line"; "Prod. Order Routing Line")
                 {
-                    DataItemLink = "Work Center No." = FIELD("No.");
-                    DataItemTableView = SORTING(Status, "Work Center No.") WHERE(Status = CONST(Released));
+                    DataItemLink = "Work Center No." = field("No.");
+                    DataItemTableView = sorting(Status, "Work Center No.") where(Status = const(Released));
                     PrintOnlyIfDetail = true;
                     RequestFilterFields = "Prod. Order No.", "Starting Date", "Ending Date";
                     column(OprtnNo_ProdOrderRtngLine; "Operation No.")
@@ -102,8 +109,8 @@ report 99000789 "Subcontractor - Dispatch List"
                     }
                     dataitem("Prod. Order Line"; "Prod. Order Line")
                     {
-                        DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("Prod. Order No."), "Routing No." = FIELD("Routing No.");
-                        DataItemTableView = SORTING(Status, "Prod. Order No.", "Routing No.");
+                        DataItemLink = Status = field(Status), "Prod. Order No." = field("Prod. Order No."), "Routing No." = field("Routing No.");
+                        DataItemTableView = sorting(Status, "Prod. Order No.", "Routing No.");
                         column(ItemNo_ProdOrderLine; "Item No.")
                         {
                         }
@@ -125,8 +132,8 @@ report 99000789 "Subcontractor - Dispatch List"
                         }
                         dataitem("Prod. Order Component"; "Prod. Order Component")
                         {
-                            DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("Prod. Order No."), "Prod. Order Line No." = FIELD("Line No.");
-                            DataItemTableView = SORTING(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
+                            DataItemLink = Status = field(Status), "Prod. Order No." = field("Prod. Order No."), "Prod. Order Line No." = field("Line No.");
+                            DataItemTableView = sorting(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
                             column(ItemNo_ProdOrderComp; "Item No.")
                             {
                             }

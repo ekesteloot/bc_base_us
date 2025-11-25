@@ -1,3 +1,15 @@
+namespace Microsoft.WarehouseMgt.Journal;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using System.Utilities;
+
 report 7315 "Calculate Whse. Adjustment"
 {
     Caption = 'Calculate Warehouse Adjustment';
@@ -7,11 +19,11 @@ report 7315 "Calculate Whse. Adjustment"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Location Filter", "Variant Filter";
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
 
                 trigger OnAfterGetRecord()
                 var
@@ -74,7 +86,7 @@ report 7315 "Calculate Whse. Adjustment"
                                 OnAfterGetRecordItemOnAfterItemJnlLineSetFilters(ItemJnlLine, TempAdjmtBinContentBuffer);
                                 if ItemJnlLine.FindSet() then
                                     repeat
-                                        ReservationEntry.SetRange("Source Type", DATABASE::"Item Journal Line");
+                                        ReservationEntry.SetRange("Source Type", Enum::TableID::"Item Journal Line");
                                         ReservationEntry.SetRange("Source ID", ItemJnlLine."Journal Template Name");
                                         ReservationEntry.SetRange("Source Batch Name", ItemJnlLine."Journal Batch Name");
                                         ReservationEntry.SetRange("Source Ref. No.", ItemJnlLine."Line No.");
@@ -372,7 +384,7 @@ report 7315 "Calculate Whse. Adjustment"
         TempReservationEntryBuffer.Reset();
         TempReservationEntryBuffer.DeleteAll();
         ReservationEntry.Reset();
-        ReservationEntry.SetRange("Source Type", DATABASE::"Item Journal Line");
+        ReservationEntry.SetRange("Source Type", Enum::TableID::"Item Journal Line");
         ReservationEntry.SetRange("Source ID", JournalTemplateName);
         ReservationEntry.SetRange("Source Batch Name", JournalBatchName);
         ReservationEntry.SetRange("Reservation Status", ReservationEntry."Reservation Status"::Prospect);
@@ -447,7 +459,7 @@ report 7315 "Calculate Whse. Adjustment"
 
                 ReservEntry.CopyTrackingFromWhseEntry(WarehouseEntry);
                 CreateReservEntry.CreateReservEntryFor(
-                  DATABASE::"Item Journal Line", ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
+                  Enum::TableID::"Item Journal Line".AsInteger(), ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
                   ItemJournalLine."Journal Batch Name", OrderLineNo, ItemJournalLine."Line No.", ItemJournalLine."Qty. per Unit of Measure",
                   Abs(WarehouseEntry.Quantity), Abs(WarehouseEntry."Qty. (Base)"), ReservEntry);
 

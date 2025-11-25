@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.ProjectMgt.Jobs.Pricing;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Jobs.Job;
+
 table 1013 "Job Item Price"
 {
     Caption = 'Job Item Price';
@@ -8,7 +18,7 @@ table 1013 "Job Item Price"
     ObsoleteTag = '16.0';
 #else
     ObsoleteState = Removed;
-    ObsoleteTag = '22.0';
+    ObsoleteTag = '24.0';
 #endif    
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
 
@@ -31,7 +41,7 @@ table 1013 "Job Item Price"
         field(2; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
 
 #if not CLEAN21
             trigger OnValidate()
@@ -59,11 +69,11 @@ table 1013 "Job Item Price"
         field(4; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(5; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
 
@@ -104,7 +114,7 @@ table 1013 "Job Item Price"
         }
         field(9; Description; Text[100])
         {
-            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item.Description where("No." = field("Item No.")));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;
@@ -112,7 +122,7 @@ table 1013 "Job Item Price"
         field(10; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(11; "Apply Job Price"; Boolean)
         {

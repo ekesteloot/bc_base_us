@@ -1,3 +1,16 @@
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.CRM.BusinessRelation;
+#if not CLEAN21
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Segment;
+#endif
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Sales.Customer;
+
 table 1304 "Sales Price and Line Disc Buff"
 {
     Caption = 'Sales Price and Line Disc Buff';
@@ -6,7 +19,7 @@ table 1304 "Sales Price and Line Disc Buff"
     ObsoleteTag = '16.0';
 #else
     ObsoleteState = Removed;
-    ObsoleteTag = '22.0';
+    ObsoleteTag = '24.0';
 #endif    
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price Worksheet Line';
 
@@ -18,9 +31,9 @@ table 1304 "Sales Price and Line Disc Buff"
             DataClassification = SystemMetadata;
 #if not CLEAN21
             NotBlank = true;
-            TableRelation = IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST("Item Disc. Group")) "Item Discount Group";
+            TableRelation = if (Type = const(Item)) Item
+            else
+            if (Type = const("Item Disc. Group")) "Item Discount Group";
 
             trigger OnLookup()
             var
@@ -67,13 +80,13 @@ table 1304 "Sales Price and Line Disc Buff"
         {
             Caption = 'Sales Code';
             DataClassification = SystemMetadata;
-            TableRelation = IF ("Sales Type" = CONST("Customer Price/Disc. Group"),
-                                "Line Type" = CONST("Sales Line Discount")) "Customer Discount Group"
-            ELSE
-            IF ("Sales Type" = CONST("Customer Price/Disc. Group"),
-                                         "Line Type" = CONST("Sales Price")) "Customer Price Group"
-            ELSE
-            IF ("Sales Type" = CONST(Customer)) Customer;
+            TableRelation = if ("Sales Type" = const("Customer Price/Disc. Group"),
+                                "Line Type" = const("Sales Line Discount")) "Customer Discount Group"
+            else
+            if ("Sales Type" = const("Customer Price/Disc. Group"),
+                                         "Line Type" = const("Sales Price")) "Customer Price Group"
+            else
+            if ("Sales Type" = const(Customer)) Customer;
 
             trigger OnValidate()
             var
@@ -132,7 +145,7 @@ table 1304 "Sales Price and Line Disc Buff"
         }
         field(6; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
             DataClassification = SystemMetadata;
@@ -285,7 +298,7 @@ table 1304 "Sales Price and Line Disc Buff"
         {
             Caption = 'Unit of Measure Code';
             DataClassification = SystemMetadata;
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD(Code));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field(Code));
 
             trigger OnValidate()
             begin
@@ -296,7 +309,7 @@ table 1304 "Sales Price and Line Disc Buff"
         {
             Caption = 'Variant Code';
             DataClassification = SystemMetadata;
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD(Code));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field(Code));
 
             trigger OnValidate()
             begin

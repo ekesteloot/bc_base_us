@@ -1,3 +1,20 @@
+﻿namespace Microsoft.WarehouseMgt.Worksheet;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using System.Reflection;
+
 codeunit 7311 "Whse. Worksheet-Create"
 {
 
@@ -131,9 +148,8 @@ codeunit 7311 "Whse. Worksheet-Create"
         WhseWkshLine: Record "Whse. Worksheet Line";
     begin
         with ProdOrderCompLine do begin
-            WhseWkshLine.SetCurrentKey(
-              "Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-            WhseWkshLine.SetRange("Source Type", DATABASE::"Prod. Order Component");
+            WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+            WhseWkshLine.SetRange("Source Type", Enum::TableID::"Prod. Order Component");
             WhseWkshLine.SetRange("Source Subtype", Status);
             WhseWkshLine.SetRange("Source No.", "Prod. Order No.");
             WhseWkshLine.SetRange("Source Line No.", "Prod. Order Line No.");
@@ -149,7 +165,7 @@ codeunit 7311 "Whse. Worksheet-Create"
             WhseWkshLine."Whse. Document Type" := WhseWkshLine."Whse. Document Type"::Production;
             WhseWkshLine."Whse. Document No." := "Prod. Order No.";
             WhseWkshLine."Whse. Document Line No." := "Prod. Order Line No.";
-            WhseWkshLine."Source Type" := DATABASE::"Prod. Order Component";
+            WhseWkshLine."Source Type" := Enum::TableID::"Prod. Order Component".AsInteger();
             WhseWkshLine."Source Subtype" := Status.AsInteger();
             WhseWkshLine."Source No." := "Prod. Order No.";
             WhseWkshLine."Source Line No." := "Prod. Order Line No.";
@@ -213,7 +229,7 @@ codeunit 7311 "Whse. Worksheet-Create"
         WhseWkshLine."Whse. Document Type" := WhseWkshLine."Whse. Document Type"::Job;
         WhseWkshLine."Whse. Document No." := JobPlanningLine."Job No.";
         WhseWkshLine."Whse. Document Line No." := JobPlanningLine."Job Contract Entry No.";
-        WhseWkshLine."Source Type" := DATABASE::Job;
+        WhseWkshLine."Source Type" := Enum::TableID::Job.AsInteger();
         WhseWkshLine."Source Subtype" := 0;
         WhseWkshLine."Source No." := JobPlanningLine."Job No.";
         WhseWkshLine."Source Line No." := JobPlanningLine."Job Contract Entry No.";
@@ -266,9 +282,8 @@ codeunit 7311 "Whse. Worksheet-Create"
     var
         WhseWkshLine: Record "Whse. Worksheet Line";
     begin
-        WhseWkshLine.SetCurrentKey(
-          "Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-        WhseWkshLine.SetRange("Source Type", DATABASE::"Assembly Line");
+        WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+        WhseWkshLine.SetRange("Source Type", Enum::TableID::"Assembly Line");
         WhseWkshLine.SetRange("Source Subtype", AssemblyLine."Document Type");
         WhseWkshLine.SetRange("Source No.", AssemblyLine."Document No.");
         WhseWkshLine.SetRange("Source Line No.", AssemblyLine."Line No.");
@@ -279,7 +294,7 @@ codeunit 7311 "Whse. Worksheet-Create"
     local procedure WhseWkshLineForJobPlanLineExists(var WhseWkshLine: Record "Whse. Worksheet Line"; var JobPlanningLine: Record "Job Planning Line"): Boolean
     begin
         WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-        WhseWkshLine.SetRange("Source Type", DATABASE::Job);
+        WhseWkshLine.SetRange("Source Type", Enum::TableID::Job);
         WhseWkshLine.SetRange("Source Subtype", 0);
         WhseWkshLine.SetRange("Source No.", JobPlanningLine."Job No.");
         WhseWkshLine.SetRange("Source Line No.", JobPlanningLine."Job Contract Entry No.");
@@ -297,7 +312,7 @@ codeunit 7311 "Whse. Worksheet-Create"
             WhseWkshLine.SetHideValidationDialog(true);
             FindLastWhseWkshLine(WhseWkshLine1, WhseWkshLine."Worksheet Template Name", WhseWkshLine.Name, WhseWkshLine."Location Code");
             WhseWkshLine."Line No." := WhseWkshLine1."Line No." + 10000;
-            WhseWkshLine."Source Type" := DATABASE::"Assembly Line";
+            WhseWkshLine."Source Type" := Enum::TableID::"Assembly Line".AsInteger();
             WhseWkshLine."Source Subtype" := "Document Type".AsInteger();
             WhseWkshLine."Source No." := "Document No.";
             WhseWkshLine."Source Line No." := "Line No.";
@@ -479,12 +494,10 @@ codeunit 7311 "Whse. Worksheet-Create"
         TypeHelper: Codeunit "Type Helper";
         AvailQtyToPick: Decimal;
     begin
-        with WhseWkshLine do begin
-            AvailQtyToPick := AvailableQtyToPickExcludingQCBins();
-            "Qty. to Handle" := TypeHelper.Minimum(AvailQtyToPick, "Qty. Outstanding");
-            "Qty. to Handle (Base)" := CalcBaseQty("Qty. to Handle");
-            CalcReservedNotFromILEQty(AvailQtyToPick, "Qty. to Handle", "Qty. to Handle (Base)");
-        end;
+        AvailQtyToPick := WhseWkshLine."Qty. to Handle (Base)";
+        WhseWkshLine."Qty. to Handle" := TypeHelper.Minimum(WhseWkshLine."Qty. to Handle", WhseWkshLine."Qty. Outstanding");
+        WhseWkshLine."Qty. to Handle (Base)" := WhseWkshLine.CalcBaseQty(WhseWkshLine."Qty. to Handle");
+        WhseWkshLine.CalcReservedNotFromILEQty(AvailQtyToPick, WhseWkshLine."Qty. to Handle", WhseWkshLine."Qty. to Handle (Base)");
     end;
 
     [IntegrationEvent(false, false)]

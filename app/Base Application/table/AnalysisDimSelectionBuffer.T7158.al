@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 table 7158 "Analysis Dim. Selection Buffer"
 {
     Caption = 'Analysis Dim. Selection Buffer';
@@ -31,11 +37,11 @@ table 7158 "Analysis Dim. Selection Buffer"
         {
             Caption = 'New Dimension Value Code';
             DataClassification = SystemMetadata;
-            TableRelation = IF (Code = CONST('Item')) Item."No."
-            ELSE
-            IF (Code = CONST('Location')) Location.Code
-            ELSE
-            "Dimension Value".Code WHERE("Dimension Code" = FIELD(Code), Blocked = CONST(false));
+            TableRelation = if (Code = const('Item')) Item."No."
+            else
+            if (Code = const('Location')) Location.Code
+            else
+            "Dimension Value".Code where("Dimension Code" = field(Code), Blocked = const(false));
 
             trigger OnValidate()
             begin
@@ -46,11 +52,11 @@ table 7158 "Analysis Dim. Selection Buffer"
         {
             Caption = 'Dimension Value Filter';
             DataClassification = SystemMetadata;
-            TableRelation = IF (Code = CONST('Item')) Item."No."
-            ELSE
-            IF (Code = CONST('Location')) Location.Code
-            ELSE
-            "Dimension Value".Code WHERE("Dimension Code" = FIELD(Code));
+            TableRelation = if (Code = const('Item')) Item."No."
+            else
+            if (Code = const('Location')) Location.Code
+            else
+            "Dimension Value".Code where("Dimension Code" = field(Code));
             ValidateTableRelation = false;
 
             trigger OnValidate()

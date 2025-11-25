@@ -1,3 +1,11 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Vendor;
+
 table 432 "Handled IC Outbox Purch. Hdr"
 {
     Caption = 'Handled IC Outbox Purch. Hdr';
@@ -80,8 +88,6 @@ table 432 "Handled IC Outbox Purch. Hdr"
             Caption = 'Currency Code';
             Editable = false;
             TableRelation = Currency;
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(35; "Prices Including VAT"; Boolean)
         {

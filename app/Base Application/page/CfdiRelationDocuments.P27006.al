@@ -53,7 +53,7 @@ page 27006 "CFDI Relation Documents"
 
                 trigger OnAction()
                 begin
-                    InsertRelatedCreditMemos();
+                    Rec.InsertRelatedCreditMemos();
                 end;
             }
         }

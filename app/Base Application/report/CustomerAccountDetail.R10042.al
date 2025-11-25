@@ -181,8 +181,8 @@ report 10042 "Customer Account Detail"
             }
             dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
             {
-                DataItemLink = "Customer No." = FIELD("No."), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter");
-                DataItemTableView = SORTING("Customer No.", "Posting Date");
+                DataItemLink = "Customer No." = field("No."), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter");
+                DataItemTableView = sorting("Customer No.", "Posting Date");
                 RequestFilterFields = "Document Type", Open;
                 column(Cust__Ledger_Entry__Posting_Date_; "Posting Date")
                 {
@@ -255,7 +255,7 @@ report 10042 "Customer Account Detail"
                 }
                 dataitem(OtherInfo; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(Cust__Ledger_Entry___Entry_No__; "Cust. Ledger Entry"."Entry No.")
                     {
                     }
@@ -335,7 +335,7 @@ report 10042 "Customer Account Detail"
                 }
                 dataitem(AppliedEntries; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(TempAppliedCustLedgEntry__Document_No___Control83; TempAppliedCustLedgEntry."Document No.")
                     {
                     }
@@ -363,7 +363,7 @@ report 10042 "Customer Account Detail"
                 }
                 dataitem(Blank; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
 
                     trigger OnPreDataItem()
                     begin

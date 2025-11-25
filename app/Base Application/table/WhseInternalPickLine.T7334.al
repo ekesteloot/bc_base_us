@@ -1,3 +1,16 @@
+﻿namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.WarehouseMgt.Worksheet;
+
 table 7334 "Whse. Internal Pick Line"
 {
     Caption = 'Whse. Internal Pick Line';
@@ -28,10 +41,10 @@ table 7334 "Whse. Internal Pick Line"
         field(12; "To Bin Code"; Code[20])
         {
             Caption = 'To Bin Code';
-            TableRelation = IF ("To Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("To Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                                  "Zone Code" = FIELD("To Zone Code"));
+            TableRelation = if ("To Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("To Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                                  "Zone Code" = field("To Zone Code"));
 
             trigger OnValidate()
             begin
@@ -56,7 +69,7 @@ table 7334 "Whse. Internal Pick Line"
         field(13; "To Zone Code"; Code[10])
         {
             Caption = 'To Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -172,14 +185,14 @@ table 7334 "Whse. Internal Pick Line"
         }
         field(27; "Pick Qty."; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding" WHERE("Activity Type" = CONST(Pick),
-                                                                                  "Whse. Document Type" = CONST("Internal Pick"),
-                                                                                  "Whse. Document No." = FIELD("No."),
-                                                                                  "Whse. Document Line No." = FIELD("Line No."),
-                                                                                  "Action Type" = FILTER(" " | Place),
-                                                                                  "Unit of Measure Code" = FIELD("Unit of Measure Code"),
-                                                                                  "Original Breakbulk" = CONST(false),
-                                                                                  "Breakbulk No." = CONST(0)));
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding" where("Activity Type" = const(Pick),
+                                                                                  "Whse. Document Type" = const("Internal Pick"),
+                                                                                  "Whse. Document No." = field("No."),
+                                                                                  "Whse. Document Line No." = field("Line No."),
+                                                                                  "Action Type" = filter(" " | Place),
+                                                                                  "Unit of Measure Code" = field("Unit of Measure Code"),
+                                                                                  "Original Breakbulk" = const(false),
+                                                                                  "Breakbulk No." = const(0)));
             Caption = 'Pick Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -187,13 +200,13 @@ table 7334 "Whse. Internal Pick Line"
         }
         field(28; "Pick Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding (Base)" WHERE("Activity Type" = CONST(Pick),
-                                                                                         "Whse. Document Type" = CONST("Internal Pick"),
-                                                                                         "Whse. Document No." = FIELD("No."),
-                                                                                         "Whse. Document Line No." = FIELD("Line No."),
-                                                                                         "Action Type" = FILTER(" " | Place),
-                                                                                         "Original Breakbulk" = CONST(false),
-                                                                                         "Breakbulk No." = CONST(0)));
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding (Base)" where("Activity Type" = const(Pick),
+                                                                                         "Whse. Document Type" = const("Internal Pick"),
+                                                                                         "Whse. Document No." = field("No."),
+                                                                                         "Whse. Document Line No." = field("Line No."),
+                                                                                         "Action Type" = filter(" " | Place),
+                                                                                         "Original Breakbulk" = const(false),
+                                                                                         "Breakbulk No." = const(0)));
             Caption = 'Pick Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -203,7 +216,7 @@ table 7334 "Whse. Internal Pick Line"
         {
             Caption = 'Unit of Measure Code';
             NotBlank = true;
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             begin
@@ -227,13 +240,13 @@ table 7334 "Whse. Internal Pick Line"
         field(31; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             var
                 ItemVariant: Record "Item Variant";
             begin
-                if "Variant Code" = '' then
+                if Rec."Variant Code" = '' then
                     Validate("Item No.")
                 else begin
                     ItemVariant.Get("Item No.", "Variant Code");
@@ -330,7 +343,7 @@ table 7334 "Whse. Internal Pick Line"
                     Error(Text003);
 
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          DATABASE::"Whse. Internal Pick Line", 0, "No.", '', 0, "Line No.", "Location Code", true);
+          Enum::TableID::"Whse. Internal Pick Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true);
 
         DocStatus :=
           WhseInternalPickHeader.GetDocumentStatus("Line No.");
@@ -519,7 +532,7 @@ table 7334 "Whse. Internal Pick Line"
           "Qty. (Base)" - "Qty. Picked (Base)" - "Pick Qty. (Base)";
 
         OnOpenItemTrackingLinesOnBeforeSetSource(Rec, WhseWorksheetLine);
-        WhseItemTrackingLines.SetSource(WhseWorksheetLine, DATABASE::"Whse. Internal Pick Line");
+        WhseItemTrackingLines.SetSource(WhseWorksheetLine, Enum::TableID::"Whse. Internal Pick Line".AsInteger());
         WhseItemTrackingLines.RunModal();
         Clear(WhseItemTrackingLines);
     end;

@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.InventoryMgt.Tracking;
+
 query 7320 CalcQtyInReservEntry
 {
     QueryType = Normal;

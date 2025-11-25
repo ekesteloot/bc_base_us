@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.BankAccount;
+
 enum 272 "Bank Payment Type"
 {
     Extensible = true;

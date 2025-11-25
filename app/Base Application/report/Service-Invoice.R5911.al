@@ -1,7 +1,27 @@
+﻿namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 5911 "Service - Invoice"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Document/ServiceInvoice.rdlc';
+    RDLCLayout = './ServiceMgt/History/ServiceInvoice.rdlc';
     Caption = 'Service - Invoice';
     Permissions = TableData "Sales Shipment Buffer" = rimd;
 
@@ -9,7 +29,7 @@ report 5911 "Service - Invoice"
     {
         dataitem("Service Invoice Header"; "Service Invoice Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Service Invoice';
             column(No_ServiceInvHeader; "No.")
@@ -20,10 +40,10 @@ report 5911 "Service - Invoice"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -213,7 +233,7 @@ report 5911 "Service - Invoice"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Service Invoice Header";
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DimText; DimText)
                         {
                         }
@@ -239,9 +259,9 @@ report 5911 "Service - Invoice"
                     }
                     dataitem("Service Invoice Line"; "Service Invoice Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Service Invoice Header";
-                        DataItemTableView = SORTING("Document No.", "Service Item Line No.");
+                        DataItemTableView = sorting("Document No.", "Service Item Line No.");
                         column(TypeInt; TypeInt)
                         {
                         }
@@ -363,7 +383,7 @@ report 5911 "Service - Invoice"
                         }
                         dataitem("Service Shipment Buffer"; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(PostingDate_ServiceShiptBuffer; Format(TempServiceShipmentBuffer."Posting Date"))
                             {
                             }
@@ -393,7 +413,7 @@ report 5911 "Service - Invoice"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(DimText1; DimText)
                             {
                             }
@@ -477,7 +497,7 @@ report 5911 "Service - Invoice"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATBase_VATAmountLine; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Service Invoice Line".GetCurrencyCode();
@@ -552,7 +572,7 @@ report 5911 "Service - Invoice"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Description_PaymentTerms; PaymentTerms.Description)
                         {
                         }
@@ -562,7 +582,7 @@ report 5911 "Service - Invoice"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(CustomerNo_ServiceInvHdr; "Service Invoice Header"."Customer No.")
                         {
                         }
@@ -605,7 +625,7 @@ report 5911 "Service - Invoice"
                     }
                     dataitem(LineFee; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = filter(1 ..));
                         column(LineFeeCaptionLbl; TempLineFeeNoteOnReportHist.ReportText)
                         {
                         }
@@ -652,6 +672,7 @@ report 5911 "Service - Invoice"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Service Invoice Header");
@@ -723,10 +744,6 @@ report 5911 "Service - Invoice"
         PaymentTerms: Record "Payment Terms";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyBankAccount: Record "Bank Account";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         ServiceSetup: Record "Service Mgt. Setup";
         Cust: Record Customer;
         DimSetEntry: Record "Dimension Set Entry";
@@ -804,6 +821,12 @@ report 5911 "Service - Invoice"
         Text037: Label 'Ship-to Address';
         QuantityCaptionLbl: Label 'Qty';
         SerialNoCaptionLbl: Label 'Serial No.';
+
+    protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     procedure FindPostedShipmentDate(): Date
     var

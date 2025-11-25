@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Source;
+
+using Microsoft.Pricing.PriceList;
+using Microsoft.Purchases.Vendor;
+
 codeunit 7035 "Price Source - Vendor" implements "Price Source"
 {
     var

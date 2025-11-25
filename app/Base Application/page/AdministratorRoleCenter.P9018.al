@@ -149,13 +149,18 @@ page 9018 "Administrator Role Center"
                 RunObject = Page "Reason Codes";
                 ToolTip = 'View or set up codes that specify reasons why entries were created, such as Return, to specify why a purchase credit memo was posted.';
             }
+#if not CLEAN23
             action("Extended Text")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Extended Text';
                 RunObject = Page "Extended Text List";
                 ToolTip = 'View or edit additional text for the descriptions of items. Extended text can be inserted under the Description field on document lines for the item.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Page should not get opened without any filters.';
+                ObsoleteTag = '23.0';
             }
+#endif
         }
         area(sections)
         {
@@ -327,7 +332,7 @@ page 9018 "Administrator Role Center"
                     ApplicationArea = All;
                     Caption = 'Classified Fields';
                     RunObject = Page "Data Classification Worksheet";
-                    RunPageView = WHERE("Data Sensitivity" = FILTER(<> Unclassified));
+                    RunPageView = where("Data Sensitivity" = filter(<> Unclassified));
                     ToolTip = 'View only classified fields';
                 }
                 action(Unclassified)
@@ -335,7 +340,7 @@ page 9018 "Administrator Role Center"
                     ApplicationArea = All;
                     Caption = 'Unclassified Fields';
                     RunObject = Page "Data Classification Worksheet";
-                    RunPageView = WHERE("Data Sensitivity" = CONST(Unclassified));
+                    RunPageView = where("Data Sensitivity" = const(Unclassified));
                     ToolTip = 'View only unclassified fields';
                 }
                 action("Page Data Subjects")
@@ -361,9 +366,6 @@ page 9018 "Administrator Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Purchase &Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase order.';
@@ -583,20 +585,6 @@ page 9018 "Administrator Role Center"
                     RunObject = Page "Online Map Setup";
                     ToolTip = 'Configure an online map service to show addresses on a map.';
                 }
-#if not CLEAN20
-                action("SMTP Mai&l Setup")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'SMTP Mai&l Setup';
-                    Image = MailSetup;
-                    RunObject = Page "Email Account Wizard";
-                    ToolTip = 'Set up the integration and security of the mail server at your site that handles email.';
-                    ObsoleteReason = 'Action is replaced with "Email Account Setup".';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '20.0';
-                    Visible = false;
-                }
-#endif
                 action("Email Account Setup")
                 {
                     ApplicationArea = Basic, Suite;
@@ -876,8 +864,8 @@ page 9018 "Administrator Role Center"
                     Caption = 'Sales Analysis &Line Templates';
                     Image = SetupLines;
                     RunObject = Page "Analysis Line Templates";
-                    RunPageView = SORTING("Analysis Area", Name)
-                                  WHERE("Analysis Area" = CONST(Sales));
+                    RunPageView = sorting("Analysis Area", Name)
+                                  where("Analysis Area" = const(Sales));
                     ToolTip = 'Define the layout of your views to analyze the dynamics of your sales volumes.';
                 }
                 action(SalesAnalysisColumnTmpl)
@@ -886,8 +874,8 @@ page 9018 "Administrator Role Center"
                     Caption = 'Sales Analysis &Column Templates';
                     Image = SetupColumns;
                     RunObject = Page "Analysis Column Templates";
-                    RunPageView = SORTING("Analysis Area", Name)
-                                  WHERE("Analysis Area" = CONST(Sales));
+                    RunPageView = sorting("Analysis Area", Name)
+                                  where("Analysis Area" = const(Sales));
                     ToolTip = 'Define the layout of your views to analyze the dynamics of your sales volumes.';
                 }
             }
@@ -901,8 +889,8 @@ page 9018 "Administrator Role Center"
                     Caption = 'Purchase &Analysis Line Templates';
                     Image = SetupLines;
                     RunObject = Page "Analysis Line Templates";
-                    RunPageView = SORTING("Analysis Area", Name)
-                                  WHERE("Analysis Area" = CONST(Purchase));
+                    RunPageView = sorting("Analysis Area", Name)
+                                  where("Analysis Area" = const(Purchase));
                     ToolTip = 'Define the layout of your views to analyze the dynamics of your purchase volumes.';
                 }
                 action(PurchaseAnalysisColumnTmpl)
@@ -911,8 +899,8 @@ page 9018 "Administrator Role Center"
                     Caption = 'Purchase Analysis &Column Templates';
                     Image = SetupColumns;
                     RunObject = Page "Analysis Column Templates";
-                    RunPageView = SORTING("Analysis Area", Name)
-                                  WHERE("Analysis Area" = CONST(Purchase));
+                    RunPageView = sorting("Analysis Area", Name)
+                                  where("Analysis Area" = const(Purchase));
                     ToolTip = 'Define the layout of your views to analyze the dynamics of your purchase volumes.';
                 }
             }

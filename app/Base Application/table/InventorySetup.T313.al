@@ -1,4 +1,20 @@
-﻿table 313 "Inventory Setup"
+﻿namespace Microsoft.InventoryMgt.Setup;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using System.Utilities;
+
+table 313 "Inventory Setup"
 {
     Caption = 'Inventory Setup';
     Permissions = TableData "Inventory Adjmt. Entry (Order)" = m;
@@ -73,6 +89,11 @@
                     UpdateNameInLedgerEntries.NotifyAboutBlankNamesInLedgerEntries(RecordId);
             end;
         }
+        field(60; "Allow Inventory Adjustment"; Boolean)
+        {
+            Caption = 'Allow Inventory Adjustment';
+            InitValue = true;
+        }
         field(180; "Invt. Cost Jnl. Template Name"; Code[10])
         {
             Caption = 'Invt. Cost Jnl. Template Name';
@@ -87,7 +108,7 @@
         field(181; "Invt. Cost Jnl. Batch Name"; Code[10])
         {
             Caption = 'Jnl. Batch Name Cost Posting';
-            TableRelation = IF ("Invt. Cost Jnl. Template Name" = FILTER(<> '')) "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Invt. Cost Jnl. Template Name"));
+            TableRelation = if ("Invt. Cost Jnl. Template Name" = filter(<> '')) "Gen. Journal Batch".Name where("Journal Template Name" = field("Invt. Cost Jnl. Template Name"));
 
             trigger OnValidate()
             begin
@@ -321,11 +342,20 @@
         Item: Record Item;
         InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)";
         ObjTransl: Record "Object Translation";
+        RecordHasBeenRead: Boolean;
 
         Text000: Label 'Some unadjusted value entries will not be covered with the new setting. You must run the Adjust Cost - Item Entries batch job once to adjust these.';
         Text004: Label 'The program has cancelled the change that would have caused an adjustment of all items.';
         Text005: Label '%1 has been changed to %2. You should now run %3.';
         ItemEntriesAdjustQst: Label 'If you change the %1, the program must adjust all item entries.The adjustment of all entries can take several hours.\Do you really want to change the %1?', Comment = '%1 - field caption';
+
+    procedure GetRecordOnce()
+    begin
+        if RecordHasBeenRead then
+            exit;
+        Get();
+        RecordHasBeenRead := true;
+    end;
 
     local procedure UpdateInvtAdjmtEntryOrder()
     var

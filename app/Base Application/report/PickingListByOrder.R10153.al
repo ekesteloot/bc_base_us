@@ -9,7 +9,7 @@ report 10153 "Picking List by Order"
     {
         dataitem(Location; Location)
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
 
             trigger OnAfterGetRecord()
             begin
@@ -28,7 +28,7 @@ report 10153 "Picking List by Order"
         }
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.";
             column(Sales_Header_Document_Type; "Document Type")
@@ -39,13 +39,13 @@ report 10153 "Picking List by Order"
             }
             dataitem(LocationLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(CopyNo; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     dataitem(PageLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(CompanyInfo2_Picture; CompanyInfo2.Picture)
                         {
                         }
@@ -189,9 +189,9 @@ report 10153 "Picking List by Order"
                         }
                         dataitem("Sales Line"; "Sales Line")
                         {
-                            DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                            DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                             DataItemLinkReference = "Sales Header";
-                            DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE(Type = CONST(Item), "Outstanding Quantity" = FILTER(<> 0));
+                            DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where(Type = const(Item), "Outstanding Quantity" = filter(<> 0));
                             RequestFilterFields = "Shipment Date";
                             column(Item__Shelf_No__; Item."Shelf No.")
                             {
@@ -237,8 +237,8 @@ report 10153 "Picking List by Order"
                             }
                             dataitem("Reservation Entry"; "Reservation Entry")
                             {
-                                DataItemLink = "Source ID" = FIELD("Document No."), "Source Ref. No." = FIELD("Line No.");
-                                DataItemTableView = SORTING("Source ID", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Source Ref. No.") WHERE("Source Type" = CONST(37), "Source Subtype" = CONST("1"));
+                                DataItemLink = "Source ID" = field("Document No."), "Source Ref. No." = field("Line No.");
+                                DataItemTableView = sorting("Source ID", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Source Ref. No.") where("Source Type" = const(37), "Source Subtype" = const("1"));
                                 column(Reservation_Entry__Serial_No__; "Serial No.")
                                 {
                                 }
@@ -286,9 +286,9 @@ report 10153 "Picking List by Order"
                         }
                         dataitem("Sales Comment Line"; "Sales Comment Line")
                         {
-                            DataItemLink = "No." = FIELD("No.");
+                            DataItemLink = "No." = field("No.");
                             DataItemLinkReference = "Sales Header";
-                            DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST(Order), "Print On Pick Ticket" = CONST(true));
+                            DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const(Order), "Print On Pick Ticket" = const(true));
                             column(Sales_Comment_Line_Comment; Comment)
                             {
                             }
@@ -307,9 +307,9 @@ report 10153 "Picking List by Order"
                         }
                         dataitem("<Sales Line Comment>"; "Sales Line")
                         {
-                            DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                            DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                             DataItemLinkReference = "Sales Header";
-                            DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE(Type = CONST(" "), Description = FILTER(<> ''));
+                            DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where(Type = const(" "), Description = filter(<> ''));
                             column(Sales_Line_Comment; Description)
                             {
                             }
@@ -432,9 +432,6 @@ report 10153 "Picking List by Order"
         TempLocation: Record Location temporary;
         TrackSpec2: Record "Tracking Specification";
         SalesSetup: Record "Sales & Receivables Setup";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         FormatAddress: Codeunit "Format Address";
         Address: array[8] of Text[100];
         ShipToAddress: array[8] of Text[100];
@@ -458,6 +455,11 @@ report 10153 "Picking List by Order"
         Item__Shelf_No__CaptionLbl: Label 'Shelf/Bin No.';
         TempLocation_CodeCaptionLbl: Label 'Location:';
         Sold_To_CaptionLbl: Label 'Sold To:';
+
+    protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     procedure AnySalesLinesThisLocation(LocationCode: Code[10]): Boolean
     var

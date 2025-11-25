@@ -1,7 +1,13 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using System.Utilities;
+
 report 503 "Foreign Currency Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/ForeignCurrencyBalance.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/ForeignCurrencyBalance.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Foreign Currency Balance';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 503 "Foreign Currency Balance"
     {
         dataitem(Currency; Currency)
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Code";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
@@ -94,8 +100,8 @@ report 503 "Foreign Currency Balance"
             }
             dataitem("Bank Account"; "Bank Account")
             {
-                DataItemLink = "Currency Code" = FIELD(Code);
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "Currency Code" = field(Code);
+                DataItemTableView = sorting("No.");
                 column(BankAccCurrentBalanceLCY; BankAccCurrentBalanceLCY)
                 {
                     AutoFormatType = 1;
@@ -141,7 +147,7 @@ report 503 "Foreign Currency Balance"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(TotalBalance; TotalBalance)
                 {
                     AutoFormatExpression = Currency.Code;

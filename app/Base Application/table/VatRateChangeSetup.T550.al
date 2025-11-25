@@ -201,24 +201,18 @@ table 550 "VAT Rate Change Setup"
         field(100; "Item Filter"; Text[250])
         {
             Caption = 'Item Filter';
-            //This property is currently not supported
-            //TestTableRelation = false;
             //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
             //ValidateTableRelation = false;
         }
         field(101; "Account Filter"; Text[250])
         {
             Caption = 'Account Filter';
-            //This property is currently not supported
-            //TestTableRelation = false;
             //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
             //ValidateTableRelation = false;
         }
         field(102; "Resource Filter"; Text[250])
         {
             Caption = 'Resource Filter';
-            //This property is currently not supported
-            //TestTableRelation = false;
             //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
             //ValidateTableRelation = false;
         }

@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
 page 1205 "Credit Transfer Registers"
 {
     AdditionalSearchTerms = 'payment file export,bank file export,re-export payment file,payment history';
@@ -21,13 +23,13 @@ page 1205 "Credit Transfer Registers"
                     Editable = false;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Identifier; Identifier)
+                field(Identifier; Rec.Identifier)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies a serial number for a successful credit transfer. Failed file exports are excluded from the sequence of serial numbers. For more information, see the Status field.';
                 }
-                field("FORMAT(""Created Date-Time"")"; Format("Created Date-Time"))
+                field("FORMAT(""Created Date-Time"")"; Format(Rec."Created Date-Time"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Created Date-Time';
@@ -88,7 +90,7 @@ page 1205 "Credit Transfer Registers"
                 Caption = 'Entries';
                 Image = List;
                 RunObject = Page "Credit Transfer Reg. Entries";
-                RunPageLink = "Credit Transfer Register No." = FIELD("No.");
+                RunPageLink = "Credit Transfer Register No." = field("No.");
                 ShortCutKey = 'Return';
                 ToolTip = 'Specify the credit transfer entries that are related to the payment file export for a selected credit transfer.';
             }
@@ -98,7 +100,7 @@ page 1205 "Credit Transfer Registers"
                 Caption = 'Reexported Payments History';
                 Image = History;
                 RunObject = Page "Credit Trans Re-export History";
-                RunPageLink = "Credit Transfer Register No." = FIELD("No.");
+                RunPageLink = "Credit Transfer Register No." = field("No.");
                 ToolTip = 'View a list of payment files that have already been re-exported.';
             }
         }
@@ -113,7 +115,7 @@ page 1205 "Credit Transfer Registers"
 
                 trigger OnAction()
                 begin
-                    Reexport();
+                    Rec.Reexport();
                 end;
             }
         }

@@ -1,3 +1,5 @@
+namespace System.Xml;
+
 page 9611 "XML Schema Restrictions Part"
 {
     Caption = 'XML Schema Restrictions Part';
@@ -11,7 +13,7 @@ page 9611 "XML Schema Restrictions Part"
         {
             repeater(Group)
             {
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the value of the imported record.';

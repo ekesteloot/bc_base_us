@@ -1,3 +1,12 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Task;
+using System.Environment;
+
 page 5077 "Create Interaction"
 {
     Caption = 'Create Interaction';
@@ -5,7 +14,9 @@ page 5077 "Create Interaction"
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
+#pragma warning disable AS0035 // Changed from Card to NavigatePage
     PageType = NavigatePage;
+#pragma warning restore AS0035
     ShowFilter = false;
     SourceTable = "Segment Line";
 
@@ -43,7 +54,7 @@ page 5077 "Create Interaction"
                             Contact: Record Contact;
                         begin
                             if IsContactEditable then begin
-                                if Contact.Get("Contact No.") then;
+                                if Contact.Get(Rec."Contact No.") then;
                                 if PAGE.RunModal(0, Contact) = ACTION::LookupOK then
                                     SetContactNo(Contact);
                             end;
@@ -54,13 +65,13 @@ page 5077 "Create Interaction"
                             Contact: Record Contact;
                             FilterWithoutQuotes: Text;
                         begin
-                            "Wizard Contact Name" := DelChr("Wizard Contact Name", '<>');
-                            if "Wizard Contact Name" = "Contact Name" then
+                            Rec."Wizard Contact Name" := DelChr(Rec."Wizard Contact Name", '<>');
+                            if Rec."Wizard Contact Name" = Rec."Contact Name" then
                                 exit;
-                            if "Wizard Contact Name" = '' then
+                            if Rec."Wizard Contact Name" = '' then
                                 Clear(Contact)
                             else begin
-                                FilterWithoutQuotes := ConvertStr("Wizard Contact Name", '''', '?');
+                                FilterWithoutQuotes := ConvertStr(Rec."Wizard Contact Name", '''', '?');
                                 Contact.SetFilter(Name, '''@*' + FilterWithoutQuotes + '*''');
                                 if not Contact.FindFirst() then
                                     Clear(Contact);
@@ -133,14 +144,14 @@ page 5077 "Create Interaction"
 
                             trigger OnLookup(var Text: Text): Boolean
                             begin
-                                LanguageCodeOnLookup();
-                                if "Attachment No." <> xRec."Attachment No." then
+                                Rec.LanguageCodeOnLookup();
+                                if Rec."Attachment No." <> xRec."Attachment No." then
                                     AttachmentReload();
                             end;
 
                             trigger OnValidate()
                             begin
-                                if "Attachment No." <> xRec."Attachment No." then
+                                if Rec."Attachment No." <> xRec."Attachment No." then
                                     AttachmentReload();
                             end;
                         }
@@ -238,7 +249,7 @@ page 5077 "Create Interaction"
 
                             trigger OnValidate()
                             begin
-                                UpdateContentBodyTextInCustomLayoutAttachment(HTMLContentBodyText);
+                                Rec.UpdateContentBodyTextInCustomLayoutAttachment(HTMLContentBodyText);
                             end;
                         }
                     }
@@ -275,11 +286,11 @@ page 5077 "Create Interaction"
                         var
                             Campaign: Record Campaign;
                         begin
-                            if GetFilter("Campaign No.") = '' then begin
-                                if Campaign.Get("Campaign No.") then;
+                            if Rec.GetFilter(Rec."Campaign No.") = '' then begin
+                                if Campaign.Get(Rec."Campaign No.") then;
                                 if PAGE.RunModal(0, Campaign) = ACTION::LookupOK then begin
-                                    Validate("Campaign No.", Campaign."No.");
-                                    "Campaign Description" := Campaign.Description;
+                                    Rec.Validate(Rec."Campaign No.", Campaign."No.");
+                                    Rec."Campaign Description" := Campaign.Description;
                                 end;
                             end;
                         end;
@@ -315,7 +326,7 @@ page 5077 "Create Interaction"
                         var
                             Opportunity: Record Opportunity;
                         begin
-                            FilterContactCompanyOpportunities(Opportunity);
+                            Rec.FilterContactCompanyOpportunities(Opportunity);
                             if PAGE.RunModal(0, Opportunity) = ACTION::LookupOK then begin
                                 Rec.Validate("Opportunity No.", Opportunity."No.");
                                 Rec."Opportunity Description" := Opportunity.Description;
@@ -344,7 +355,7 @@ page 5077 "Create Interaction"
                         Caption = 'Interaction Result Description';
                         ToolTip = 'Specifies a description of the interaction.';
                     }
-                    field(Evaluation; Evaluation)
+                    field(Evaluation; Rec.Evaluation)
                     {
                         ApplicationArea = RelationshipMgmt;
                         Enabled = IsMainInfoSet;
@@ -411,7 +422,7 @@ page 5077 "Create Interaction"
 
                 trigger OnAction()
                 begin
-                    PreviewSegLineHTMLContent();
+                    Rec.PreviewSegLineHTMLContent();
                 end;
             }
             action(Finish)
@@ -503,10 +514,11 @@ page 5077 "Create Interaction"
 
                 trigger OnAction()
                 begin
-                    ShowComment();
+                    Rec.ShowComment();
                 end;
             }
         }
+#pragma warning disable AL0788
         area(Promoted)
         {
             group(Category_Process)
@@ -524,6 +536,7 @@ page 5077 "Create Interaction"
                 }
             }
         }
+#pragma warning restore AL0788
     }
 
     trigger OnInit()
@@ -564,11 +577,8 @@ page 5077 "Create Interaction"
         ClientTypeManagement: Codeunit "Client Type Management";
         Step: Option "Step 1","Step 2","Step 3","Step 4";
         HTMLContentBodyText: Text;
-        [InDataSet]
         CampaignDescriptionEditable: Boolean;
-        [InDataSet]
         OpportunityDescriptionEditable: Boolean;
-        [InDataSet]
         SalespersonCodeEditable: Boolean;
         HTMLAttachment: Boolean;
         UntitledTxt: Label 'untitled';
@@ -597,9 +607,9 @@ page 5077 "Create Interaction"
         Contact: Record Contact;
         CaptionStr: Text;
     begin
-        if Contact.Get(GetFilter("Contact Company No.")) then
+        if Contact.Get(Rec.GetFilter("Contact Company No.")) then
             CaptionStr := CopyStr(Contact."No." + ' ' + Contact.Name, 1, MaxStrLen(CaptionStr));
-        if Contact.Get(GetFilter("Contact No.")) then
+        if Contact.Get(Rec.GetFilter("Contact No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + Contact."No." + ' ' + Contact.Name, 1, MaxStrLen(CaptionStr));
         if SalespersonPurchaser.Get(Rec.GetFilter("Salesperson Code")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + SalespersonPurchaser.Code + ' ' + SalespersonPurchaser.Name, 1, MaxStrLen(CaptionStr));
@@ -617,12 +627,12 @@ page 5077 "Create Interaction"
 
     procedure UpdateUIFlags()
     begin
-        IsMainInfoSet := "Interaction Template Code" <> '';
+        IsMainInfoSet := Rec."Interaction Template Code" <> '';
     end;
 
     procedure AttachmentReload()
     begin
-        LoadSegLineAttachment(true);
+        Rec.LoadSegLineAttachment(true);
         HTMLAttachment := Rec.IsHTMLAttachment();
         if HTMLAttachment then
             HTMLContentBodyText := Rec.LoadContentBodyTextFromCustomLayoutAttachment();
@@ -636,7 +646,7 @@ page 5077 "Create Interaction"
 
     local procedure SetContactEditable()
     begin
-        IsContactEditable := (GetFilter("Contact No.") = '') and (GetFilter("Contact Company No.") = '');
+        IsContactEditable := (Rec.GetFilter("Contact No.") = '') and (Rec.GetFilter("Contact Company No.") = '');
 
         OnAfterSetContactEditable(Rec, IsContactEditable);
     end;

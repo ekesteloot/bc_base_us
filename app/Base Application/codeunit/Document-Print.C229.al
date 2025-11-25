@@ -267,11 +267,6 @@ codeunit 229 "Document-Print"
 
     procedure PrintBankRecStmt(PostedBankRecHdr: Record "Posted Bank Rec. Header")
     begin
-#if not CLEAN20
-        PostedBankRecHdr.SetRecFilter();
-
-        Report.RunModal(Report::"Bank Reconciliation", true, false, PostedBankRecHdr);
-#endif
     end;
 
     procedure PrintCheck(var NewGenJnlLine: Record "Gen. Journal Line")

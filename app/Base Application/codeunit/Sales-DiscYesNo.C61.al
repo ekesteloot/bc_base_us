@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Document;
+
+using System.Utilities;
+
 codeunit 61 "Sales-Disc. (Yes/No)"
 {
     TableNo = "Sales Line";

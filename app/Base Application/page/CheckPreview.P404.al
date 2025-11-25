@@ -1,7 +1,18 @@
+namespace Microsoft.BankMgt.Check;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 page 404 "Check Preview"
 {
     Caption = 'Check Preview';
-    DataCaptionExpression = "Document No." + ' ' + CheckToAddr[1];
+    DataCaptionExpression = Rec."Document No." + ' ' + CheckToAddr[1];
     Editable = false;
     LinksAllowed = false;
     PageType = Card;
@@ -124,7 +135,7 @@ page 404 "Check Preview"
                         field(CheckAmount; CheckAmount)
                         {
                             ApplicationArea = Basic, Suite;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             ShowCaption = false;
                             ToolTip = 'Specifies the amount that will appear on the check.';
@@ -193,35 +204,35 @@ page 404 "Check Preview"
 
     local procedure CalcCheck()
     begin
-        if ("Bal. Account Type" <> "Bal. Account Type"::"Bank Account") or
-           not BankAcc2.Get("Bal. Account No.")
+        if (Rec."Bal. Account Type" <> Rec."Bal. Account Type"::"Bank Account") or
+           not BankAcc2.Get(Rec."Bal. Account No.")
         then
             Clear(BankAcc2);
-        if "Check Printed" then begin
+        if Rec."Check Printed" then begin
             GenJnlLine.Reset();
             GenJnlLine.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
-            GenJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-            GenJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
-            GenJnlLine.SetRange("Posting Date", "Posting Date");
-            GenJnlLine.SetRange("Document No.", "Document No.");
-            if "Bal. Account No." = '' then
-                GenJnlLine.SetRange("Bank Payment Type", "Bank Payment Type"::" ")
+            GenJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+            GenJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+            GenJnlLine.SetRange("Posting Date", Rec."Posting Date");
+            GenJnlLine.SetRange("Document No.", Rec."Document No.");
+            if Rec."Bal. Account No." = '' then
+                GenJnlLine.SetRange("Bank Payment Type", GenJnlLine."Bank Payment Type"::" ")
             else
-                GenJnlLine.SetRange("Bank Payment Type", "Bank Payment Type"::"Computer Check");
+                GenJnlLine.SetRange("Bank Payment Type", GenJnlLine."Bank Payment Type"::"Computer Check");
             GenJnlLine.SetRange("Check Printed", true);
             CheckStatusText := Text000;
         end else begin
             GenJnlLine.Reset();
             GenJnlLine.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
-            GenJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-            GenJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
-            GenJnlLine.SetRange("Posting Date", "Posting Date");
-            GenJnlLine.SetRange("Document No.", "Document No.");
-            GenJnlLine.SetRange("Account Type", "Account Type");
-            GenJnlLine.SetRange("Account No.", "Account No.");
-            GenJnlLine.SetRange("Bal. Account Type", "Bal. Account Type");
-            GenJnlLine.SetRange("Bal. Account No.", "Bal. Account No.");
-            GenJnlLine.SetRange("Bank Payment Type", "Bank Payment Type");
+            GenJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+            GenJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+            GenJnlLine.SetRange("Posting Date", Rec."Posting Date");
+            GenJnlLine.SetRange("Document No.", Rec."Document No.");
+            GenJnlLine.SetRange("Account Type", Rec."Account Type");
+            GenJnlLine.SetRange("Account No.", Rec."Account No.");
+            GenJnlLine.SetRange("Bal. Account Type", Rec."Bal. Account Type");
+            GenJnlLine.SetRange("Bal. Account No.", Rec."Bal. Account No.");
+            GenJnlLine.SetRange("Bank Payment Type", Rec."Bank Payment Type");
             CheckStatusText := Text001;
         end;
 
@@ -341,7 +352,7 @@ page 404 "Check Preview"
 
         if not ChkTransMgt.FormatNoText(NumberText, CheckAmount, CheckLanguage, GenJnlLine."Currency Code") then
             Error(NumberText[1]);
-        CheckDateText := ChkTransMgt.FormatDate("Document Date", CheckDateFormat, DateSeparator, CheckLanguage, DateIndicator);
+        CheckDateText := ChkTransMgt.FormatDate(Rec."Document Date", CheckDateFormat, DateSeparator, CheckLanguage, DateIndicator);
 
         OnAfterFormatTextFieldsForCheck(CheckToAddr);
     end;

@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 254 "Tax Calculation Type"
 {
     Extensible = true;

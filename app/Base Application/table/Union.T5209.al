@@ -1,3 +1,9 @@
+﻿namespace Microsoft.HumanResources.Setup;
+
+using Microsoft.Foundation.Address;
+using Microsoft.HumanResources.Employee;
+using System.Email;
+
 table 5209 Union
 {
     Caption = 'Union';
@@ -24,11 +30,9 @@ table 5209 Union
         field(4; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -49,11 +53,9 @@ table 5209 Union
         field(5; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -78,8 +80,8 @@ table 5209 Union
         }
         field(7; "No. of Members Employed"; Integer)
         {
-            CalcFormula = Count(Employee WHERE(Status = FILTER(<> Terminated),
-                                                "Union Code" = FIELD(Code)));
+            CalcFormula = count(Employee where(Status = filter(<> Terminated),
+                                                "Union Code" = field(Code)));
             Caption = 'No. of Members Employed';
             Editable = false;
             FieldClass = FlowField;

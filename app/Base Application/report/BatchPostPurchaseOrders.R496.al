@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using System.Environment;
+using System.Security.User;
+
 report 496 "Batch Post Purchase Orders"
 {
     Caption = 'Batch Post Purchase Orders';
@@ -7,7 +15,7 @@ report 496 "Batch Post Purchase Orders"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             RequestFilterFields = "No.", Status;
             RequestFilterHeading = 'Purchase Order';
 
@@ -19,7 +27,7 @@ report 496 "Batch Post Purchase Orders"
 
                 PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::Print, PrintDoc);
                 PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Replace VAT Date", ReplaceVATDateReq);
-                PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"VAT Date", VATDateReq);    
+                PurchaseBatchPostMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"VAT Date", VATDateReq);
                 PurchaseBatchPostMgt.RunBatch(
                   "Purchase Header", ReplacePostingDate, PostingDateReq, ReplaceDocumentDate, CalcInvDisc, ReceiveReq, InvReq);
 
@@ -81,7 +89,7 @@ report 496 "Batch Post Purchase Orders"
                         begin
                             if ReplacePostingDate then
                                 Message(Text003);
-                            
+
                             if VATReportingDateMgt.IsVATDateUsageSetToPostingDate() then
                                 ReplaceVATDateReq := ReplacePostingDate;
                             UpdateVATDate();
@@ -92,7 +100,7 @@ report 496 "Batch Post Purchase Orders"
                         ApplicationArea = Suite;
                         Caption = 'Replace Document Date';
                         ToolTip = 'Specifies if you want to replace the purchase orders'' document date with the date in the Posting Date field.';
-                        
+
                         trigger OnValidate()
                         begin
                             if VATReportingDateMgt.IsVATDateUsageSetToDocumentDate() then
@@ -186,12 +194,11 @@ report 496 "Batch Post Purchase Orders"
     protected var
         ReceiveReq: Boolean;
         InvReq: Boolean;
-        PostingDateReq, VATDateReq: Date;
-        ReplacePostingDate, ReplaceVATDateReq: Boolean;
+        PostingDateReq, VATDateReq : Date;
+        ReplacePostingDate, ReplaceVATDateReq : Boolean;
         ReplaceDocumentDate: Boolean;
         CalcInvDisc: Boolean;
         PrintDoc: Boolean;
-        [InDataSet]
         PrintDocVisible: Boolean;
         VATDateEnabled: Boolean;
         PostInvoiceEditable: Boolean;

@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Contact;
+
+using System.Utilities;
+
 xmlport 5050 "Export Contact"
 {
     Caption = 'Export Contact';
@@ -14,7 +18,7 @@ xmlport 5050 "Export Contact"
             tableelement(Integer; Integer)
             {
                 XmlName = 'ContactHeader';
-                SourceTableView = SORTING(Number) WHERE(Number = CONST(1));
+                SourceTableView = sorting(Number) where(Number = const(1));
                 textelement(ContNoTitle)
                 {
 

@@ -13,7 +13,7 @@ page 259 "Reason Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a reason code to attach to the entry.';

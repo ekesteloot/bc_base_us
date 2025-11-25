@@ -87,18 +87,18 @@ page 1050 "Additional Fee Setup"
     begin
         ShowChart := ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::Windows;
         if ShowChart then begin
-            ReminderLevel.Get("Reminder Terms Code", "Reminder Level No.");
-            CurrPage.Chart.PAGE.SetViewMode(ReminderLevel, "Charge Per Line", false);
+            ReminderLevel.Get(Rec."Reminder Terms Code", Rec."Reminder Level No.");
+            CurrPage.Chart.PAGE.SetViewMode(ReminderLevel, Rec."Charge Per Line", false);
             CurrPage.Chart.PAGE.UpdateData();
         end;
 
-        if "Charge Per Line" then
+        if Rec."Charge Per Line" then
             PageCaption := AddFeePerLineTxt;
 
-        PageCaption += ' ' + ReminderTermsTxt + ' ' + "Reminder Terms Code" + ' ' +
-          ReminderLevelTxt + ' ' + Format("Reminder Level No.");
+        PageCaption += ' ' + ReminderTermsTxt + ' ' + Rec."Reminder Terms Code" + ' ' +
+          ReminderLevelTxt + ' ' + Format(Rec."Reminder Level No.");
 
-        if "Charge Per Line" then begin
+        if Rec."Charge Per Line" then begin
             AddFeeCaptionExpression := AddFeeperLineCaptionTxt;
             AddFeePercCaptionExpression := AddFeeperLineCaptionTxt + ' %';
         end else begin

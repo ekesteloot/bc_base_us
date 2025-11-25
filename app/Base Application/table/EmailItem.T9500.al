@@ -1,3 +1,10 @@
+﻿namespace System.Email;
+
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.IO;
+using System.Utilities;
+
 table 9500 "Email Item"
 {
     Caption = 'Email Item';
@@ -265,28 +272,6 @@ table 9500 "Email Item"
         Attachments.Add(TempBlob);
         AttachmentNames.Add(AttachmentName);
     end;
-
-#if not CLEAN20
-    [Obsolete('Automatically added when calling AddSourceDocument', '20.0')]
-    procedure AddRelatedSourceDocuments(TableID: Integer; SourceID: Guid)
-    var
-        ContactBusinessRelation: Record "Contact Business Relation";
-        RelatedRecord: Dictionary of [Integer, List of [Guid]];
-        RelatedRecordTableIds: List of [Integer];
-        RelatedRecordSystemIds: List of [Guid];
-        RelatedRecordTableId: Integer;
-        TableIdCount, SystemIdCount : Integer;
-    begin
-        ContactBusinessRelation.GetBusinessRelatedSystemIds(TableID, SourceID, RelatedRecord);
-        RelatedRecordTableIds := RelatedRecord.Keys();
-        for TableIdCount := 1 to RelatedRecordTableIds.Count() do begin
-            RelatedRecordTableId := RelatedRecordTableIds.Get(TableIdCount);
-            RelatedRecordSystemIds := RelatedRecord.Get(RelatedRecordTableId);
-            for SystemIdCount := 1 to RelatedRecordSystemIds.Count() do
-                AddSourceDocument(RelatedRecordTableId, RelatedRecordSystemIds.Get(SystemIdCount), Enum::"Email Relation Type"::"Related Entity");
-        end;
-    end;
-#endif
 
     procedure AddSourceDocument(TableID: Integer; SourceID: Guid)
     begin

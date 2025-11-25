@@ -4,7 +4,7 @@ page 130409 "AL Test Objects To Select"
     Editable = false;
     PageType = List;
     SourceTable = AllObj;
-    SourceTableView = WHERE("Object Type" = FILTER(<> TableData));
+    SourceTableView = where("Object Type" = filter(<> TableData));
 
     layout
     {
@@ -13,16 +13,16 @@ page 130409 "AL Test Objects To Select"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Type; "Object Type")
+                field(Type; Rec."Object Type")
                 {
                     ApplicationArea = All;
                 }
-                field(ID; "Object ID")
+                field(ID; Rec."Object ID")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the ID that applies.';
                 }
-                field(Name; "Object Name")
+                field(Name; Rec."Object Name")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the name of the test objects selected.';
@@ -54,8 +54,8 @@ page 130409 "AL Test Objects To Select"
 
     trigger OnAfterGetRecord()
     begin
-        CALTestCoverageMap.SetRange("Object Type", "Object Type");
-        CALTestCoverageMap.SetRange("Object ID", "Object ID");
+        CALTestCoverageMap.SetRange("Object Type", Rec."Object Type");
+        CALTestCoverageMap.SetRange("Object ID", Rec."Object ID");
     end;
 
     var

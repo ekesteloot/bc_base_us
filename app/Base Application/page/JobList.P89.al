@@ -1,3 +1,20 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Comment;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Analysis;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+#if not CLEAN21
+using Microsoft.ProjectMgt.Jobs.Pricing;
+#endif
+using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+
 page 89 "Job List"
 {
     AdditionalSearchTerms = 'projects';
@@ -59,7 +76,7 @@ page 89 "Job List"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the additional name for the job. The field is used for searching purposes.';
                 }
-                field("% of Overdue Planning Lines"; PercentOverdue())
+                field("% of Overdue Planning Lines"; Rec.PercentOverdue())
                 {
                     ApplicationArea = Jobs;
                     Caption = '% of Overdue Planning Lines';
@@ -67,7 +84,7 @@ page 89 "Job List"
                     ToolTip = 'Specifies the percent of planning lines that are overdue for this job.';
                     Visible = false;
                 }
-                field("% Completed"; PercentCompleted())
+                field("% Completed"; Rec.PercentCompleted())
                 {
                     ApplicationArea = Jobs;
                     Caption = '% Completed';
@@ -75,7 +92,7 @@ page 89 "Job List"
                     ToolTip = 'Specifies the completion percentage for this job.';
                     Visible = false;
                 }
-                field("% Invoiced"; PercentInvoiced())
+                field("% Invoiced"; Rec.PercentInvoiced())
                 {
                     ApplicationArea = Jobs;
                     Caption = '% Invoiced';
@@ -96,26 +113,26 @@ page 89 "Job List"
             part(Control1907234507; "Sales Hist. Bill-to FactBox")
             {
                 ApplicationArea = Jobs;
-                SubPageLink = "No." = FIELD("Bill-to Customer No.");
+                SubPageLink = "No." = field("Bill-to Customer No.");
                 Visible = false;
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Jobs;
-                SubPageLink = "No." = FIELD("Bill-to Customer No.");
+                SubPageLink = "No." = field("Bill-to Customer No.");
                 Visible = false;
             }
             part(Control1905650007; "Job WIP/Recognition FactBox")
             {
                 ApplicationArea = Jobs;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::Job),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::Job),
+                              "No." = field("No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -143,7 +160,7 @@ page 89 "Job List"
                     Caption = 'Job Task &Lines';
                     Image = TaskList;
                     RunObject = Page "Job Task Lines";
-                    RunPageLink = "Job No." = FIELD("No.");
+                    RunPageLink = "Job No." = field("No.");
                     ToolTip = 'Plan how you want to set up your planning information. In this window you can specify the tasks involved in a job. To start planning a job or to post usage for a job, you must set up at least one job task.';
                 }
                 group("&Dimensions")
@@ -156,8 +173,8 @@ page 89 "Job List"
                         Caption = 'Dimensions-&Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(167),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(167),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -175,7 +192,7 @@ page 89 "Job List"
                             DefaultDimensionsMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(Job);
-                            DefaultDimensionsMultiple.SetMultiRecord(Job, FieldNo("No."));
+                            DefaultDimensionsMultiple.SetMultiRecord(Job, Rec.FieldNo("No."));
                             DefaultDimensionsMultiple.RunModal();
                         end;
                     }
@@ -186,7 +203,7 @@ page 89 "Job List"
                     Caption = '&Statistics';
                     Image = Statistics;
                     RunObject = Page "Job Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View this job''s statistics.';
                 }
@@ -211,8 +228,8 @@ page 89 "Job List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Job),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Job),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -226,9 +243,9 @@ page 89 "Job List"
                     Caption = '&WIP Entries';
                     Image = WIPEntries;
                     RunObject = Page "Job WIP Entries";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    RunPageView = SORTING("Job No.", "Job Posting Group", "WIP Posting Date")
-                                  ORDER(Descending);
+                    RunPageLink = "Job No." = field("No.");
+                    RunPageView = sorting("Job No.", "Job Posting Group", "WIP Posting Date")
+                                  order(Descending);
                     ToolTip = 'View entries for the job that are posted as work in process.';
                 }
                 action("WIP &G/L Entries")
@@ -237,9 +254,9 @@ page 89 "Job List"
                     Caption = 'WIP &G/L Entries';
                     Image = WIPLedger;
                     RunObject = Page "Job WIP G/L Entries";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    RunPageView = SORTING("Job No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Job No." = field("No.");
+                    RunPageView = sorting("Job No.")
+                                  order(Descending);
                     ToolTip = 'View the job''s WIP G/L entries.';
                 }
             }
@@ -259,7 +276,7 @@ page 89 "Job List"
                     Image = Resource;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Job Resource Prices";
-                    RunPageLink = "Job No." = FIELD("No.");
+                    RunPageLink = "Job No." = field("No.");
                     ToolTip = 'View this job''s resource prices.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -272,7 +289,7 @@ page 89 "Job List"
                     Image = Item;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Job Item Prices";
-                    RunPageLink = "Job No." = FIELD("No.");
+                    RunPageLink = "Job No." = field("No.");
                     ToolTip = 'View this job''s item prices.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -285,7 +302,7 @@ page 89 "Job List"
                     Image = JobPrice;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Job G/L Account Prices";
-                    RunPageLink = "Job No." = FIELD("No.");
+                    RunPageLink = "Job No." = field("No.");
                     ToolTip = 'View this job''s G/L account prices.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -310,7 +327,7 @@ page 89 "Job List"
                     var
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        PriceUXManagement.ShowPriceLists(Rec, "Price Type"::Sale, "Price Amount Type"::Any);
+                        PriceUXManagement.ShowPriceLists(Rec, Enum::"Price Type"::Sale, Enum::"Price Amount Type"::Any);
                     end;
                 }
                 action(SalesPriceLines)
@@ -328,8 +345,8 @@ page 89 "Job List"
                         PriceSource: Record "Price Source";
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        Rec.ToPriceSource(PriceSource, "Price Type"::Sale);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Price);
+                        Rec.ToPriceSource(PriceSource, Enum::"Price Type"::Sale);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Price);
                     end;
                 }
                 action(SalesDiscountLines)
@@ -347,8 +364,8 @@ page 89 "Job List"
                         PriceSource: Record "Price Source";
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        Rec.ToPriceSource(PriceSource, "Price Type"::Sale);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Discount);
+                        Rec.ToPriceSource(PriceSource, Enum::"Price Type"::Sale);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
 #if not CLEAN21
@@ -385,7 +402,7 @@ page 89 "Job List"
                     var
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        PriceUXManagement.ShowPriceLists(Rec, "Price Type"::Purchase, "Price Amount Type"::Any);
+                        PriceUXManagement.ShowPriceLists(Rec, Enum::"Price Type"::Purchase, Enum::"Price Amount Type"::Any);
                     end;
                 }
                 action(PurchPriceLines)
@@ -403,8 +420,8 @@ page 89 "Job List"
                         PriceSource: Record "Price Source";
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        Rec.ToPriceSource(PriceSource, "Price Type"::Purchase);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Price);
+                        Rec.ToPriceSource(PriceSource, Enum::"Price Type"::Purchase);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Price);
                     end;
                 }
                 action(PurchDiscountLines)
@@ -422,8 +439,8 @@ page 89 "Job List"
                         PriceSource: Record "Price Source";
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        Rec.ToPriceSource(PriceSource, "Price Type"::Purchase);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Discount);
+                        Rec.ToPriceSource(PriceSource, Enum::"Price Type"::Purchase);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
 #if not CLEAN21
@@ -480,9 +497,9 @@ page 89 "Job List"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     RunObject = Page "Job Ledger Entries";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    RunPageView = SORTING("Job No.", "Job Task No.", "Entry Type", "Posting Date")
-                                  ORDER(Descending);
+                    RunPageLink = "Job No." = field("No.");
+                    RunPageView = sorting("Job No.", "Job Task No.", "Entry Type", "Posting Date")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -535,11 +552,13 @@ page 89 "Job List"
                         trigger OnAction()
                         var
                             Job: Record Job;
+                            JobCalculateWIP: Report "Job Calculate WIP";
                         begin
-                            TestField("No.");
+                            Rec.TestField("No.");
                             Job.Copy(Rec);
-                            Job.SetRange("No.", "No.");
-                            REPORT.RunModal(REPORT::"Job Calculate WIP", true, false, Job);
+                            Job.SetRange("No.", Rec."No.");
+                            JobCalculateWIP.SetTableView(Job);
+                            JobCalculateWIP.Run();
                         end;
                     }
                     action("<Action152>")
@@ -556,9 +575,9 @@ page 89 "Job List"
                         var
                             Job: Record Job;
                         begin
-                            TestField("No.");
+                            Rec.TestField("No.");
                             Job.Copy(Rec);
-                            Job.SetRange("No.", "No.");
+                            Job.SetRange("No.", Rec."No.");
                             REPORT.RunModal(REPORT::"Job Post WIP to G/L", true, false, Job);
                         end;
                     }

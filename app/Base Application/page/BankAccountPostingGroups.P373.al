@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.BankAccount;
+
 page 373 "Bank Account Posting Groups"
 {
     ApplicationArea = Basic, Suite;
@@ -13,7 +15,7 @@ page 373 "Bank Account Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code for the G/L account that bank transactions, such as bank payment reconciliations, are posted to when the bank account card contains this code.';

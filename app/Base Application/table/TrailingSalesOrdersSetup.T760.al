@@ -40,7 +40,7 @@ table 760 "Trailing Sales Orders Setup"
         field(7; "Latest Order Document Date"; Date)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Max("Sales Header"."Document Date" WHERE("Document Type" = CONST(Order)));
+            CalcFormula = max("Sales Header"."Document Date" where("Document Type" = const(Order)));
             Caption = 'Latest Order Document Date';
             FieldClass = FlowField;
         }

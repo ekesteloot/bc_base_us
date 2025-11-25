@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Journal;
+
 page 5636 "FA Reclass. Journal"
 {
     AdditionalSearchTerms = 'move fixed asset,split fixed asset';
@@ -208,7 +210,7 @@ page 5636 "FA Reclass. Journal"
                 trigger OnAction()
                 begin
                     CODEUNIT.Run(CODEUNIT::"FA Reclass. Jnl.-Transfer", Rec);
-                    CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                    CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                     CurrPage.Update(false);
                 end;
             }
@@ -233,15 +235,15 @@ page 5636 "FA Reclass. Journal"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
     end;
 
     trigger OnOpenPage()
     var
         JnlSelected: Boolean;
     begin
-        if IsOpenedFromBatch() then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+        if Rec.IsOpenedFromBatch() then begin
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             FAReclassJnlManagement.OpenJournal(CurrentJnlBatchName, Rec);
             exit;
         end;

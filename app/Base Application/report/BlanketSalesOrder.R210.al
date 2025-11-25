@@ -1,7 +1,29 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Archive;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 210 "Blanket Sales Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/BlanketSalesOrder.rdlc';
+    RDLCLayout = './Sales/Document/BlanketSalesOrder.rdlc';
     Caption = 'Blanket Sales Order';
     PreviewMode = PrintLayout;
 
@@ -9,7 +31,7 @@ report 210 "Blanket Sales Order"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Blanket Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Blanket Order"));
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
             RequestFilterHeading = 'Blanket Sales Order';
             column(No_SalesHdr; "No.")
@@ -71,10 +93,10 @@ report 210 "Blanket Sales Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(BlanketSalesOrderCopyText; StrSubstNo(Text004, CopyText))
                     {
                     }
@@ -240,7 +262,7 @@ report 210 "Blanket Sales Order"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Sales Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText1; DimText)
                         {
                         }
@@ -287,9 +309,9 @@ report 210 "Blanket Sales Order"
                     }
                     dataitem("Sales Line"; "Sales Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Sales Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -298,7 +320,7 @@ report 210 "Blanket Sales Order"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(TypeInt_SalesLine; SalesLineTypeInt)
                         {
                         }
@@ -427,7 +449,7 @@ report 210 "Blanket Sales Order"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText2; DimText)
                             {
                             }
@@ -517,7 +539,7 @@ report 210 "Blanket Sales Order"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmtLineVATBase; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Sales Header"."Currency Code";
@@ -589,7 +611,7 @@ report 210 "Blanket Sales Order"
                     }
                     dataitem(VATCounterLCY; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VALExchRate; VALExchRate)
                         {
                         }
@@ -646,11 +668,11 @@ report 210 "Blanket Sales Order"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(SellToCustNo_SalesHdr; "Sales Header"."Sell-to Customer No.")
                         {
                         }
@@ -735,6 +757,7 @@ report 210 "Blanket Sales Order"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Sales Header");
@@ -838,13 +861,13 @@ report 210 "Blanket Sales Order"
                     if "Sales Header"."Bill-to Contact No." <> '' then
                         SegManagement.LogDocument(
                           2, "Sales Header"."No.", "Sales Header"."Doc. No. Occurrence",
-                          "Sales Header"."No. of Archived Versions", DATABASE::Contact, "Sales Header"."Bill-to Contact No.",
+                          "Sales Header"."No. of Archived Versions", Enum::TableID::Contact.AsInteger(), "Sales Header"."Bill-to Contact No.",
                           "Sales Header"."Salesperson Code", "Sales Header"."Campaign No.", "Sales Header"."Posting Description",
                           "Sales Header"."Opportunity No.")
                     else
                         SegManagement.LogDocument(
                           2, "Sales Header"."No.", "Sales Header"."Doc. No. Occurrence",
-                          "Sales Header"."No. of Archived Versions", DATABASE::Customer, "Sales Header"."Bill-to Customer No.",
+                          "Sales Header"."No. of Archived Versions", Enum::TableID::Customer.AsInteger(), "Sales Header"."Bill-to Customer No.",
                           "Sales Header"."Salesperson Code", "Sales Header"."Campaign No.", "Sales Header"."Posting Description",
                           "Sales Header"."Opportunity No.");
 
@@ -859,9 +882,6 @@ report 210 "Blanket Sales Order"
 
     var
         GLSetup: Record "General Ledger Setup";
-        CompanyInfo3: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         CompanyBankAccount: Record "Bank Account";
         CompanyInfo: Record "Company Information";
@@ -897,7 +917,6 @@ report 210 "Blanket Sales Order"
         Text008: Label 'Local Currency';
         Text009: Label 'Exchange rate: %1/%2';
         ArchiveDocument: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
 
         Text004: Label 'Blanket Sales Order %1', Comment = '%1 = Document No.';
@@ -942,6 +961,9 @@ report 210 "Blanket Sales Order"
         ShipmentMethod: Record "Shipment Method";
         PaymentTerms: Record "Payment Terms";
         SalesPurchPerson: Record "Salesperson/Purchaser";
+        CompanyInfo3: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         CustAddr: array[8] of Text[100];
         ShipToAddr: array[8] of Text[100];
@@ -977,7 +999,7 @@ report 210 "Blanket Sales Order"
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Blnkt. Ord") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Blnkt. Ord") <> '';
     end;
 
     local procedure FormatAddressFields(var SalesHeader: Record "Sales Header")

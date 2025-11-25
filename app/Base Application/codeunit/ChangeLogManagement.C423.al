@@ -1,3 +1,9 @@
+namespace System.Diagnostics;
+
+using System.IO;
+using System.Security.AccessControl;
+using System.Telemetry;
+
 codeunit 423 "Change Log Management"
 {
     Permissions = TableData "Change Log Setup" = r,
@@ -22,6 +28,10 @@ codeunit 423 "Change Log Management"
         ChangeLogSetupRead: Boolean;
         MonitorSensitiveFieldSetupRead: Boolean;
         CannotSelectTableErr: Label 'Change log cannot be enabled for the table %1.', Comment = '%1: Table caption.';
+        ChangeLogFieldAddedTxt: Label 'Field added to changelog configuration', Locked = true;
+        ChangeLogFieldUpdatedTxt: Label 'Field logging changed in changelog configuration', Locked = true;
+        ChangeLogFieldDeletedTxt: Label 'Field removed from changelog configuration', Locked = true;
+        ChangeLogCategoryLbl: Label 'Change Log', Locked = true;
 
     procedure GetDatabaseTableTriggerSetup(TableID: Integer; var LogInsert: Boolean; var LogModify: Boolean; var LogDelete: Boolean; var LogRename: Boolean)
     var
@@ -196,9 +206,6 @@ codeunit 423 "Change Log Management"
 #endif
            9004, // Plan
            9005, // UserPlan
-#if not CLEAN20
-           Database::"Plan Permission Set",
-#endif
            Database::"Tenant Permission Set Rel.",
            Database::"Tenant Permission Set",
            Database::"Tenant Permission",
@@ -530,6 +537,18 @@ codeunit 423 "Change Log Management"
         exit(false);
     end;
 
+    local procedure AddChangeLogSetupFieldToDimensions(var ChangeLogSetupFieldRec: Record "Change Log Setup (Field)"; var Dimensions: Dictionary of [Text, Text])
+    begin
+        Dimensions.Add('Category', ChangelogCategoryLbl);
+        Dimensions.Add('TableNumber', Format(ChangeLogSetupFieldRec."Table No."));
+        Dimensions.Add('TableCaption', ChangeLogSetupFieldRec."Table Caption");
+        Dimensions.Add('FieldNumber', Format(ChangeLogSetupFieldRec."Field No."));
+        Dimensions.Add('FieldCaption', ChangeLogSetupFieldRec."Field Caption");
+        Dimensions.Add('LogInsertion', Format(ChangeLogSetupFieldRec."Log Insertion"));
+        Dimensions.Add('LogModification', Format(ChangeLogSetupFieldRec."Log Modification"));
+        Dimensions.Add('LogDeletion', Format(ChangeLogSetupFieldRec."Log Deletion"));
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Change Log Setup (Table)", 'OnBeforeInsertEvent', '', false, false)]
     local procedure OnBeforeInsertChangeLogSetup(var Rec: Record "Change Log Setup (Table)"; RunTrigger: Boolean)
     begin
@@ -546,6 +565,72 @@ codeunit 423 "Change Log Management"
             Rec.CalcFields("Table Caption");
             Error(CannotSelectTableErr, ChangeLogSetupTable."Table Caption");
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Change Log Setup (Field)", 'OnAfterRenameEvent', '', false, false)]
+    local procedure OnAfterRenameChangeLogSetupField(var Rec: Record "Change Log Setup (Field)"; var xRec: Record "Change Log Setup (Field)"; RunTrigger: Boolean)
+    var
+        Telemetry: Codeunit "Telemetry";
+        TranslationHelper: Codeunit "Translation Helper";
+        Dimensions: Dictionary of [Text, Text];
+    begin
+        TranslationHelper.SetGlobalLanguageToDefault();
+
+        AddChangeLogSetupFieldToDimensions(Rec, Dimensions);
+        Dimensions.Add('LogInsertionOld', Format(xRec."Log Insertion"));
+        Dimensions.Add('LogModificationOld', Format(xRec."Log Modification"));
+        Dimensions.Add('LogDeletionOld', Format(xRec."Log Deletion"));
+        Telemetry.LogMessage('0000LA0', ChangeLogFieldUpdatedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, Dimensions);
+
+        TranslationHelper.RestoreGlobalLanguage();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Change Log Setup (Field)", 'OnAfterModifyEvent', '', false, false)]
+    local procedure OnAfterModifyChangeLogSetupField(var Rec: Record "Change Log Setup (Field)"; var xRec: Record "Change Log Setup (Field)"; RunTrigger: Boolean)
+    var
+        Telemetry: Codeunit "Telemetry";
+        TranslationHelper: Codeunit "Translation Helper";
+        Dimensions: Dictionary of [Text, Text];
+    begin
+        TranslationHelper.SetGlobalLanguageToDefault();
+
+        AddChangeLogSetupFieldToDimensions(Rec, Dimensions);
+        Dimensions.Add('LogInsertionOld', Format(xRec."Log Insertion"));
+        Dimensions.Add('LogModificationOld', Format(xRec."Log Modification"));
+        Dimensions.Add('LogDeletionOld', Format(xRec."Log Deletion"));
+        Telemetry.LogMessage('0000LA1', ChangeLogFieldUpdatedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, Dimensions);
+
+        TranslationHelper.RestoreGlobalLanguage();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Change Log Setup (Field)", 'OnAfterInsertEvent', '', false, false)]
+    local procedure OnAfterInsertChangeLogSetupField(var Rec: Record "Change Log Setup (Field)")
+    var
+        Telemetry: Codeunit "Telemetry";
+        TranslationHelper: Codeunit "Translation Helper";
+        Dimensions: Dictionary of [Text, Text];
+    begin
+        TranslationHelper.SetGlobalLanguageToDefault();
+
+        AddChangeLogSetupFieldToDimensions(Rec, Dimensions);
+        Telemetry.LogMessage('0000LA2', ChangeLogFieldAddedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, Dimensions);
+
+        TranslationHelper.RestoreGlobalLanguage();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Change Log Setup (Field)", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure OnAfterDeleteChangeLogSetupField(var Rec: Record "Change Log Setup (Field)")
+    var
+        Telemetry: Codeunit "Telemetry";
+        TranslationHelper: Codeunit "Translation Helper";
+        Dimensions: Dictionary of [Text, Text];
+    begin
+        TranslationHelper.SetGlobalLanguageToDefault();
+
+        AddChangeLogSetupFieldToDimensions(Rec, Dimensions);
+        Telemetry.LogMessage('0000LA3', ChangeLogFieldDeletedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, Dimensions);
+
+        TranslationHelper.RestoreGlobalLanguage();
     end;
 
     [IntegrationEvent(false, false)]

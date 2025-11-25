@@ -1,4 +1,17 @@
-﻿codeunit 1393 "Cancel Issued Reminder"
+﻿namespace Microsoft.Sales.Reminder;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Environment.Configuration;
+using System.Utilities;
+
+codeunit 1393 "Cancel Issued Reminder"
 {
     Permissions = TableData "Cust. Ledger Entry" = rm,
                   TableData "Issued Reminder Header" = rm,

@@ -1,3 +1,18 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using System.Environment.Configuration;
+using System.Threading;
+
 codeunit 1520 "Workflow Event Handling"
 {
 

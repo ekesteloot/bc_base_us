@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+
 page 5877 "Physical Inventory Order Subf."
 {
     AutoSplitKey = true;
@@ -190,84 +196,84 @@ page 5877 "Physical Inventory Order Subf."
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
             }
@@ -290,7 +296,7 @@ page 5877 "Physical Inventory Order Subf."
 
                     trigger OnAction()
                     begin
-                        ShowPhysInvtRecordingLines();
+                        Rec.ShowPhysInvtRecordingLines();
                     end;
                 }
                 action(Dimensions)
@@ -303,7 +309,7 @@ page 5877 "Physical Inventory Order Subf."
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 group("Item &Tracking Lines")
@@ -318,7 +324,7 @@ page 5877 "Physical Inventory Order Subf."
 
                         trigger OnAction()
                         begin
-                            ShowExpectPhysInvtTrackLines();
+                            Rec.ShowExpectPhysInvtTrackLines();
                         end;
                     }
                     action("&All Diff. Tracking Lines")
@@ -329,7 +335,7 @@ page 5877 "Physical Inventory Order Subf."
 
                         trigger OnAction()
                         begin
-                            ShowItemTrackingLines(0);
+                            Rec.ShowItemTrackingLines(0);
                         end;
                     }
                     action("&Pos. Diff. Tracking Lines")
@@ -340,7 +346,7 @@ page 5877 "Physical Inventory Order Subf."
 
                         trigger OnAction()
                         begin
-                            ShowItemTrackingLines(1);
+                            Rec.ShowItemTrackingLines(1);
                         end;
                     }
                     action("&Neg. Diff. Tracking Lines")
@@ -351,7 +357,7 @@ page 5877 "Physical Inventory Order Subf."
 
                         trigger OnAction()
                         begin
-                            ShowItemTrackingLines(2);
+                            Rec.ShowItemTrackingLines(2);
                         end;
                     }
                 }
@@ -367,7 +373,7 @@ page 5877 "Physical Inventory Order Subf."
 
                         trigger OnAction()
                         begin
-                            ShowItemLedgerEntries();
+                            Rec.ShowItemLedgerEntries();
                         end;
                     }
                     action("&Phys. Inventory Ledger Entries")
@@ -379,7 +385,7 @@ page 5877 "Physical Inventory Order Subf."
 
                         trigger OnAction()
                         begin
-                            ShowPhysInvtLedgerEntries();
+                            Rec.ShowPhysInvtLedgerEntries();
                         end;
                     }
                 }
@@ -391,7 +397,7 @@ page 5877 "Physical Inventory Order Subf."
 
                     trigger OnAction()
                     begin
-                        ShowBinContentItem();
+                        Rec.ShowBinContentItem();
                     end;
                 }
                 action("Bin Content (&Bin)")
@@ -402,7 +408,7 @@ page 5877 "Physical Inventory Order Subf."
 
                     trigger OnAction()
                     begin
-                        ShowBinContentBin();
+                        Rec.ShowBinContentBin();
                     end;
                 }
             }
@@ -429,7 +435,7 @@ page 5877 "Physical Inventory Order Subf."
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
         SetVariantCodeMandatory();
     end;
 
@@ -488,8 +494,8 @@ page 5877 "Physical Inventory Order Subf."
     var
         Item: Record Item;
     begin
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(true, "Item No.");
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(true, Rec."Item No.");
     end;
 
     [IntegrationEvent(false, false)]

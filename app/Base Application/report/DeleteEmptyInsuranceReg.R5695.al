@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using System.Utilities;
+
 report 5695 "Delete Empty Insurance Reg."
 {
     Caption = 'Delete Empty Insurance Reg.';
@@ -8,7 +12,7 @@ report 5695 "Delete Empty Insurance Reg."
     {
         dataitem("Insurance Register"; "Insurance Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "Creation Date";
 
             trigger OnAfterGetRecord()

@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+
 table 364 "Analysis View Filter"
 {
     Caption = 'Analysis View Filter';
@@ -19,9 +23,7 @@ table 364 "Analysis View Filter"
         field(3; "Dimension Value Filter"; Code[250])
         {
             Caption = 'Dimension Value Filter';
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"));
             ValidateTableRelation = false;
         }
     }

@@ -1,3 +1,11 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+
 codeunit 5642 "FA Reclass. Transfer Line"
 {
 
@@ -294,7 +302,7 @@ codeunit 5642 "FA Reclass. Transfer Line"
         GenJnlLine."Line No." := 0;
         FAJnlSetup.SetGenJnlTrailCodes(GenJnlLine);
         GenJnlLine."Account Type" := GenJnlLine."Account Type"::"Fixed Asset";
-        GenJnlLine."FA Posting Type" := "Gen. Journal Line FA Posting Type".FromInteger(FAPostingType.AsInteger() + 1);
+        GenJnlLine."FA Posting Type" := Enum::"Gen. Journal Line FA Posting Type".FromInteger(FAPostingType.AsInteger() + 1);
         GenJnlLine.Validate("Account No.", FANo);
         GenJnlLine.Validate("Depreciation Book Code", FAReclassJnlLine."Depreciation Book Code");
         GenJnlLine."FA Posting Date" := FAReclassJnlLine."FA Posting Date";

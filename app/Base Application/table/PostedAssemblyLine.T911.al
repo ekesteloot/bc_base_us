@@ -1,3 +1,17 @@
+namespace Microsoft.AssemblyMgt.History;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.History;
+using Microsoft.WarehouseMgt.Request;
+
 table 911 "Posted Assembly Line"
 {
     Caption = 'Posted Assembly Line';
@@ -29,15 +43,15 @@ table 911 "Posted Assembly Line"
         field(11; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST(Resource)) Resource;
+            TableRelation = if (Type = const(Item)) Item
+            else
+            if (Type = const(Resource)) Resource;
         }
         field(12; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."),
-                                                                               Code = FIELD("Variant Code"));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."),
+                                                                               Code = field("Variant Code"));
         }
         field(13; Description; Text[100])
         {
@@ -60,19 +74,19 @@ table 911 "Posted Assembly Line"
         field(20; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(21; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(22; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(23; "Bin Code"; Code[20])
         {
@@ -145,9 +159,9 @@ table 911 "Posted Assembly Line"
         field(80; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
-            IF (Type = CONST(Resource)) "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
+            if (Type = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("No."));
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -157,7 +171,7 @@ table 911 "Posted Assembly Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
     }
@@ -209,7 +223,7 @@ table 911 "Posted Assembly Line"
     var
         DimMgt: Codeunit DimensionManagement;
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure GetAssemblyLinesForDocument(var TempPostedAssemblyLine: Record "Posted Assembly Line" temporary; ValueEntryDocType: Enum "Item Ledger Document Type"; DocNo: Code[20]; DocLineNo: Integer)

@@ -1,3 +1,8 @@
+namespace System.Threading;
+
+using System.Automation;
+using System.Azure.Identity;
+
 page 673 "Job Queue Entry Card"
 {
     Caption = 'Job Queue Entry Card';
@@ -98,7 +103,7 @@ page 673 "Job Queue Entry Card"
             {
                 Caption = 'Report Parameters';
                 Editable = Rec.Status = Rec.Status::"On Hold";
-                Visible = "Object Type to Run" = Rec."Object Type to Run"::Report;
+                Visible = Rec."Object Type to Run" = Rec."Object Type to Run"::Report;
                 field("Report Request Page Options"; Rec."Report Request Page Options")
                 {
                     ApplicationArea = Basic, Suite;
@@ -263,7 +268,7 @@ page 673 "Job Queue Entry Card"
 
                     trigger OnAction()
                     begin
-                        SetStatus(Status::"On Hold");
+                        Rec.SetStatus(Rec.Status::"On Hold");
                         RecallModifyOnlyWhenReadOnlyNotification();
                     end;
                 }
@@ -359,7 +364,7 @@ page 673 "Job Queue Entry Card"
                     Caption = 'Log Entries';
                     Image = Log;
                     RunObject = Page "Job Queue Log Entries";
-                    RunPageLink = ID = FIELD(ID);
+                    RunPageLink = ID = field(ID);
                     ToolTip = 'View the job queue log entries.';
                 }
                 action(ShowRecord)

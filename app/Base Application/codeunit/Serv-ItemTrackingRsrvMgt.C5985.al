@@ -1,3 +1,13 @@
+﻿namespace Microsoft.ServiceMgt.Posting;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+
 codeunit 5985 "Serv-Item Tracking Rsrv. Mgt."
 {
     Permissions = TableData "Value Entry Relation" = ri;

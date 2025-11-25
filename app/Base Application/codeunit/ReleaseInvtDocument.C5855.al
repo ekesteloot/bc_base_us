@@ -12,7 +12,7 @@ codeunit 5855 "Release Invt. Document"
         InvtSetup.Get();
         if InvtSetup."Location Mandatory" then
             Rec.TestField("Location Code");
-        Rec.TestField(Status, Status::Open);
+        Rec.TestField(Status, Rec.Status::Open);
 
         IsHandled := false;
         OnRunOnBeforeCheckInvtDocLines(Rec, IsHandled);
@@ -23,7 +23,7 @@ codeunit 5855 "Release Invt. Document"
             if not InvtDocLine.FindFirst() then
                 Error(NothingToReleaseErr, Rec."No.");
             InvtDocLine.Reset();
-        end;    
+        end;
 
         Rec.Validate(Status, Rec.Status::Released);
         Rec.Modify();

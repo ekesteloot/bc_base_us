@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Segment;
+using System.Environment;
+
 page 5126 "Create Opportunity"
 {
     Caption = 'Create Opportunity';
@@ -25,7 +32,7 @@ page 5126 "Create Opportunity"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the date that the opportunity was created.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the priority of the opportunity. There are three options:';
@@ -43,12 +50,12 @@ page 5126 "Create Opportunity"
                     var
                         Cont: Record Contact;
                     begin
-                        if (GetFilter("Contact No.") = '') and (GetFilter("Contact Company No.") = '') then
-                            if (Cont."No." = '') and ("Segment Description" = '') then begin
-                                if Cont.Get("Contact No.") then;
+                        if (Rec.GetFilter("Contact No.") = '') and (Rec.GetFilter("Contact Company No.") = '') then
+                            if (Cont."No." = '') and (Rec."Segment Description" = '') then begin
+                                if Cont.Get(Rec."Contact No.") then;
                                 if PAGE.RunModal(0, Cont) = ACTION::LookupOK then begin
-                                    Validate("Contact No.", Cont."No.");
-                                    "Wizard Contact Name" := Cont.Name;
+                                    Rec.Validate("Contact No.", Cont."No.");
+                                    Rec."Wizard Contact Name" := Cont.Name;
                                 end;
                             end;
                     end;
@@ -80,10 +87,10 @@ page 5126 "Create Opportunity"
                     var
                         Campaign: Record Campaign;
                     begin
-                        if GetFilter("Campaign No.") = '' then
+                        if Rec.GetFilter("Campaign No.") = '' then
                             if PAGE.RunModal(0, Campaign) = ACTION::LookupOK then begin
-                                Validate("Campaign No.", Campaign."No.");
-                                "Wizard Campaign Description" := Campaign.Description;
+                                Rec.Validate("Campaign No.", Campaign."No.");
+                                Rec."Wizard Campaign Description" := Campaign.Description;
                             end;
                     end;
                 }
@@ -103,8 +110,8 @@ page 5126 "Create Opportunity"
                     begin
                         if SegHeader."No." = '' then
                             if PAGE.RunModal(0, SegmentHeader) = ACTION::LookupOK then begin
-                                Validate("Segment No.", SegmentHeader."No.");
-                                "Segment Description" := SegmentHeader.Description;
+                                Rec.Validate("Segment No.", SegmentHeader."No.");
+                                Rec."Segment Description" := SegmentHeader.Description;
                             end;
                     end;
                 }
@@ -120,10 +127,10 @@ page 5126 "Create Opportunity"
 
                     trigger OnValidate()
                     begin
-                        if not "Activate First Stage" then begin
-                            "Wizard Estimated Value (LCY)" := 0;
-                            "Wizard Chances of Success %" := 0;
-                            "Wizard Estimated Closing Date" := 0D;
+                        if not Rec."Activate First Stage" then begin
+                            Rec."Wizard Estimated Value (LCY)" := 0;
+                            Rec."Wizard Chances of Success %" := 0;
+                            Rec."Wizard Estimated Closing Date" := 0D;
                         end;
                     end;
                 }
@@ -131,7 +138,7 @@ page 5126 "Create Opportunity"
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Estimated Sales Value (LCY)';
-                    Enabled = "Activate First Stage";
+                    Enabled = Rec."Activate First Stage";
                     ToolTip = 'Specifies the value in the wizard for the opportunity. You can specify an estimated value of the opportunity in local currency in this field.';
                 }
                 field("Wizard Chances of Success %"; Rec."Wizard Chances of Success %")
@@ -139,7 +146,7 @@ page 5126 "Create Opportunity"
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Chances of Success (%)';
                     DecimalPlaces = 0 : 0;
-                    Enabled = "Activate First Stage";
+                    Enabled = Rec."Activate First Stage";
                     MaxValue = 100;
                     ToolTip = 'Specifies the value in the wizard for the opportunity. You can specify a percentage completion estimate in this field.';
                 }
@@ -147,7 +154,7 @@ page 5126 "Create Opportunity"
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Estimated Closing Date';
-                    Enabled = "Activate First Stage";
+                    Enabled = Rec."Activate First Stage";
                     ToolTip = 'Specifies a closing date for the opportunity from the wizard.';
                 }
             }
@@ -189,7 +196,7 @@ page 5126 "Create Opportunity"
 
     trigger OnAfterGetRecord()
     begin
-        WizardContactNameOnFormat(Format("Wizard Contact Name"));
+        WizardContactNameOnFormat(Format(Rec."Wizard Contact Name"));
     end;
 
     trigger OnInit()
@@ -216,11 +223,8 @@ page 5126 "Create Opportunity"
         Campaign: Record Campaign;
         SegHeader: Record "Segment Header";
         ClientTypeManagement: Codeunit "Client Type Management";
-        [InDataSet]
         WizardContactNameEditable: Boolean;
-        [InDataSet]
         SalespersonCodeEditable: Boolean;
-        [InDataSet]
         WizardCampaignDescriptionEdita: Boolean;
         IsOnMobile: Boolean;
 
@@ -231,15 +235,15 @@ page 5126 "Create Opportunity"
     var
         CaptionStr: Text;
     begin
-        if Cont.Get(GetFilter("Contact Company No.")) then
+        if Cont.Get(Rec.GetFilter("Contact Company No.")) then
             CaptionStr := CopyStr(Cont."No." + ' ' + Cont.Name, 1, MaxStrLen(CaptionStr));
-        if Cont.Get(GetFilter("Contact No.")) then
+        if Cont.Get(Rec.GetFilter("Contact No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + Cont."No." + ' ' + Cont.Name, 1, MaxStrLen(CaptionStr));
-        if SalesPurchPerson.Get(GetFilter("Salesperson Code")) then
+        if SalesPurchPerson.Get(Rec.GetFilter("Salesperson Code")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + SalesPurchPerson.Code + ' ' + SalesPurchPerson.Name, 1, MaxStrLen(CaptionStr));
-        if Campaign.Get(GetFilter("Campaign No.")) then
+        if Campaign.Get(Rec.GetFilter("Campaign No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + Campaign."No." + ' ' + Campaign.Description, 1, MaxStrLen(CaptionStr));
-        if SegHeader.Get(GetFilter("Segment No.")) then
+        if SegHeader.Get(Rec.GetFilter("Segment No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + SegHeader."No." + ' ' + SegHeader.Description, 1, MaxStrLen(CaptionStr));
         if CaptionStr = '' then
             CaptionStr := Text001;
@@ -249,14 +253,14 @@ page 5126 "Create Opportunity"
 
     local procedure WizardContactNameOnFormat(Text: Text[1024])
     begin
-        if SegHeader.Get(GetFilter("Segment No.")) then
+        if SegHeader.Get(Rec.GetFilter("Segment No.")) then
             Text := Text000;
     end;
 
     local procedure FinishPage()
     begin
-        CheckStatus();
-        FinishWizard();
+        Rec.CheckStatus();
+        Rec.FinishWizard();
     end;
 }
 

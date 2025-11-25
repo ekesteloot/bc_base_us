@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using System.Security.User;
+
 page 122 "G/L Entries Preview"
 {
     Caption = 'G/L Entries Preview';
@@ -142,7 +149,7 @@ page 122 "G/L Entries Preview"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -157,7 +164,7 @@ page 122 "G/L Entries Preview"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry has been part of a reverse transaction (correction) made by the Reverse function.';
@@ -257,7 +264,7 @@ page 122 "G/L Entries Preview"
 
                     trigger OnAction()
                     begin
-                        GenJnlPostPreview.ShowDimensions(DATABASE::"G/L Entry", "Entry No.", "Dimension Set ID");
+                        GenJnlPostPreview.ShowDimensions(DATABASE::"G/L Entry", Rec."Entry No.", Rec."Dimension Set ID");
                     end;
                 }
                 action(SetDimensionFilter)
@@ -270,7 +277,7 @@ page 122 "G/L Entries Preview"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -320,10 +327,10 @@ page 122 "G/L Entries Preview"
 
     local procedure GetCaption(): Text[250]
     begin
-        if GLAcc."No." <> "G/L Account No." then
-            if not GLAcc.Get("G/L Account No.") then
-                if GetFilter("G/L Account No.") <> '' then
-                    if GLAcc.Get(GetRangeMin("G/L Account No.")) then;
+        if GLAcc."No." <> Rec."G/L Account No." then
+            if not GLAcc.Get(Rec."G/L Account No.") then
+                if Rec.GetFilter(Rec."G/L Account No.") <> '' then
+                    if GLAcc.Get(Rec.GetRangeMin("G/L Account No.")) then;
         exit(StrSubstNo('%1 %2', GLAcc."No.", GLAcc.Name))
     end;
 }

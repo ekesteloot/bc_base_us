@@ -1,7 +1,16 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Foundation.NoSeries;
+
+using System.Utilities;
+
 report 21 "No. Series"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './NoSeries.rdlc';
+    RDLCLayout = './Foundation/NoSeries/NoSeries.rdlc';
     Caption = 'No. Series';
 
     dataset
@@ -71,8 +80,8 @@ report 21 "No. Series"
             }
             dataitem("No. Series Line"; "No. Series Line")
             {
-                DataItemLink = "Series Code" = FIELD(Code);
-                DataItemTableView = SORTING("Series Code");
+                DataItemLink = "Series Code" = field(Code);
+                DataItemTableView = sorting("Series Code");
                 RequestFilterFields = "Starting Date";
                 column(No__Series_Line__Starting_Date_; Format("Starting Date"))
                 {
@@ -101,8 +110,8 @@ report 21 "No. Series"
             }
             dataitem("No. Series Relationship"; "No. Series Relationship")
             {
-                DataItemLink = Code = FIELD(Code);
-                DataItemTableView = SORTING(Code);
+                DataItemLink = Code = field(Code);
+                DataItemTableView = sorting(Code);
                 column(No__Series_Relationship__Series_Code_; "Series Code")
                 {
                 }
@@ -117,8 +126,8 @@ report 21 "No. Series"
                 }
                 dataitem(NoSeriesLine2; "No. Series Line")
                 {
-                    DataItemLink = "Series Code" = FIELD("Series Code");
-                    DataItemTableView = SORTING("Series Code");
+                    DataItemLink = "Series Code" = field("Series Code");
+                    DataItemTableView = sorting("Series Code");
                     column(NoSeriesLine2__Starting_Date_; Format("Starting Date"))
                     {
                     }
@@ -147,7 +156,7 @@ report 21 "No. Series"
             }
             dataitem(BlankLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
             }
         }
     }

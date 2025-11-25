@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Journal;
+using Microsoft.CostAccounting.Posting;
+
 report 1137 "Transfer Budget to Actual"
 {
     ApplicationArea = CostAccounting;
@@ -9,7 +14,7 @@ report 1137 "Transfer Budget to Actual"
     {
         dataitem("Cost Budget Entry"; "Cost Budget Entry")
         {
-            DataItemTableView = SORTING("Budget Name", "Cost Type No.", Date);
+            DataItemTableView = sorting("Budget Name", "Cost Type No.", Date);
             RequestFilterFields = "Budget Name", Date, Allocated, "Cost Type No.", "Cost Center Code", "Cost Object Code";
 
             trigger OnAfterGetRecord()

@@ -1,7 +1,15 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 report 37 "Balance Comp. - Prev. Year"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/BalanceCompPrevYear.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/BalanceCompPrevYear.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Balance Comp. - Prev. Year';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +18,7 @@ report 37 "Balance Comp. - Prev. Year"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Account Type", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(STRSUBSTNO_Text000_PeriodStartingDate_PeriodEndingDate_; StrSubstNo(Text000, PeriodStartingDate, PeriodEndingDate))
@@ -93,7 +101,7 @@ report 37 "Balance Comp. - Prev. Year"
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
 
                 trigger OnPreDataItem()
                 begin
@@ -102,7 +110,7 @@ report 37 "Balance Comp. - Prev. Year"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(G_L_Account___No__; "G/L Account"."No.")
                 {
                 }

@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 codeunit 1222 "SEPA CT-Prepare Source"
 {
     TableNo = "Gen. Journal Line";

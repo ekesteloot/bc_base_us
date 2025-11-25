@@ -9,7 +9,7 @@ report 10479 "Elec. Service Invoice MX"
     {
         dataitem("Service Invoice Header"; "Service Invoice Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Service Invoice';
             column(Service_Invoice_Header_No_; "No.")
@@ -20,10 +20,10 @@ report 10479 "Elec. Service Invoice MX"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2_Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -240,7 +240,7 @@ report 10479 "Elec. Service Invoice MX"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Service Invoice Header";
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DimText; DimText)
                         {
                         }
@@ -269,9 +269,9 @@ report 10479 "Elec. Service Invoice MX"
                     }
                     dataitem("Service Invoice Line"; "Service Invoice Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Service Invoice Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(TypeInt; TypeInt)
                         {
                         }
@@ -482,7 +482,7 @@ report 10479 "Elec. Service Invoice MX"
                         }
                         dataitem("Service Shipment Buffer"; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(ServiceShipmentBuffer__Posting_Date_; Format(ServiceShipmentBuffer."Posting Date"))
                             {
                             }
@@ -515,7 +515,7 @@ report 10479 "Elec. Service Invoice MX"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(DimText_Control82; DimText)
                             {
                             }
@@ -602,7 +602,7 @@ report 10479 "Elec. Service Invoice MX"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmountLine__VAT_Base_; VATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Service Invoice Line".GetCurrencyCode();
@@ -761,7 +761,7 @@ report 10479 "Elec. Service Invoice MX"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(PaymentTerms_Description; PaymentTerms.Description)
                         {
                         }
@@ -774,7 +774,7 @@ report 10479 "Elec. Service Invoice MX"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Service_Invoice_Header___Customer_No__; "Service Invoice Header"."Customer No.")
                         {
                         }
@@ -820,7 +820,7 @@ report 10479 "Elec. Service Invoice MX"
                     }
                     dataitem(OriginalStringLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(OriginalStringText; OriginalStringText)
                         {
                         }
@@ -846,7 +846,7 @@ report 10479 "Elec. Service Invoice MX"
                     }
                     dataitem(DigitalSignaturePACLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DigitalSignaturePACText; DigitalSignaturePACText)
                         {
                         }
@@ -872,7 +872,7 @@ report 10479 "Elec. Service Invoice MX"
                     }
                     dataitem(DigitalSignatureLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DigitalSignatureText; DigitalSignatureText)
                         {
                         }
@@ -898,7 +898,7 @@ report 10479 "Elec. Service Invoice MX"
                     }
                     dataitem(QRCode; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Service_Invoice_Header___QR_Code_; "Service Invoice Header"."QR Code")
                         {
                         }
@@ -948,6 +948,7 @@ report 10479 "Elec. Service Invoice MX"
                     Error(Text007);
 
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if not CompanyBankAccount.Get("Service Invoice Header"."Company Bank Account Code") then
                     CompanyBankAccount.CopyBankFieldsFromCompanyInfo(CompanyInfo);
@@ -1096,9 +1097,6 @@ report 10479 "Elec. Service Invoice MX"
         PaymentTerms: Record "Payment Terms";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyBankAccount: Record "Bank Account";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         ServiceSetup: Record "Service Mgt. Setup";
         Cust: Record Customer;
         DimSetEntry: Record "Dimension Set Entry";
@@ -1201,6 +1199,11 @@ report 10479 "Elec. Service Invoice MX"
         SATPaymentMethod: Text[50];
         SATPaymentTerm: Text[50];
         SATTaxRegimeClassification: Text[100];
+
+    protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     procedure FindPostedShipmentDate(): Date
     var

@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 page 9834 "User Group Permission Sets"
 {
     Caption = 'User Group Permission Sets';
@@ -29,11 +31,11 @@ page 9834 "User Group Permission Sets"
                         PermissionSets.LookupMode(true);
                         if PermissionSets.RunModal() = ACTION::LookupOK then begin
                             PermissionSets.GetRecord(TempPermissionSetBuffer);
-                            "Role ID" := TempPermissionSetBuffer."Role ID";
-                            Scope := TempPermissionSetBuffer.Scope;
-                            "App ID" := TempPermissionSetBuffer."App ID";
-                            CalcFields("Extension Name", "Role Name");
-                            Text := "Role ID";
+                            Rec."Role ID" := TempPermissionSetBuffer."Role ID";
+                            Rec.Scope := TempPermissionSetBuffer.Scope;
+                            Rec."App ID" := TempPermissionSetBuffer."App ID";
+                            Rec.CalcFields("Extension Name", "Role Name");
+                            Text := Rec."Role ID";
                             AppRoleName := TempPermissionSetBuffer.Name;
                         end;
                     end;
@@ -42,11 +44,11 @@ page 9834 "User Group Permission Sets"
                     var
                         AggregatePermissionSet: Record "Aggregate Permission Set";
                     begin
-                        AggregatePermissionSet.SetRange("Role ID", "Role ID");
+                        AggregatePermissionSet.SetRange("Role ID", Rec."Role ID");
                         AggregatePermissionSet.FindFirst();
-                        Scope := AggregatePermissionSet.Scope;
-                        "App ID" := AggregatePermissionSet."App ID";
-                        CalcFields("Extension Name", "Role Name");
+                        Rec.Scope := AggregatePermissionSet.Scope;
+                        Rec."App ID" := AggregatePermissionSet."App ID";
+                        Rec.CalcFields("Extension Name", "Role Name");
                         AppRoleName := AggregatePermissionSet.Name;
                     end;
                 }
@@ -91,22 +93,22 @@ page 9834 "User Group Permission Sets"
 
     trigger OnAfterGetRecord()
     begin
-        if Scope = Scope::Tenant then begin
-            if TenantPermissionSetRec.Get("App ID", "Role ID") then
-                AppRoleName := TenantPermissionSetRec.Name
+        if Rec.Scope = Rec.Scope::Tenant then begin
+            if TenantPermissionSet.Get(Rec."App ID", Rec."Role ID") then
+                AppRoleName := TenantPermissionSet.Name
         end else
-            if PermissionSetRec.Get("Role ID") then
-                AppRoleName := PermissionSetRec.Name;
+            if MetadataPermissionSet.Get(Rec."App ID", Rec."Role ID") then
+                AppRoleName := MetadataPermissionSet.Name;
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        exit("Role ID" <> '');
+        exit(Rec."Role ID" <> '');
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        TestField("Role ID");
+        Rec.TestField("Role ID");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -116,13 +118,13 @@ page 9834 "User Group Permission Sets"
 
     trigger OnOpenPage()
     begin
-        if "User Group Code" = IntelligentCloudTok then
+        if Rec."User Group Code" = IntelligentCloudTok then
             CurrPage.Editable(false);
     end;
 
     var
-        PermissionSetRec: Record "Permission Set";
-        TenantPermissionSetRec: Record "Tenant Permission Set";
+        MetadataPermissionSet: Record "Metadata Permission Set";
+        TenantPermissionSet: Record "Tenant Permission Set";
         AppRoleName: Text[30];
         IntelligentCloudTok: Label 'INTELLIGENT CLOUD', Locked = true;
 }

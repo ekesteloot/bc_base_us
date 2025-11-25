@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
 page 1206 "Credit Transfer Reg. Entries"
 {
     Caption = 'Credit Transfer Reg. Entries';
@@ -46,7 +48,7 @@ page 1206 "Credit Transfer Reg. Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the amount that is paid with the SEPA credit transfer.';
                 }
-                field(Canceled; Canceled)
+                field(Canceled; Rec.Canceled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the exported payment file for this credit transfer register entry has been canceled.';
@@ -80,37 +82,37 @@ page 1206 "Credit Transfer Reg. Entries"
                     Caption = 'Message to Recipient';
                     ToolTip = 'Specifies the text that was entered in the Message to Recipient field on the payment journal line that this credit transfer file was exported from.';
                 }
-                field(AppliesToEntryDocumentNo; AppliesToEntryDocumentNo())
+                field(AppliesToEntryDocumentNo; Rec.AppliesToEntryDocumentNo())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Applies-to Entry Document No.';
                     ToolTip = 'Specifies the entry number of the purchase invoice that the vendor ledger entry behind this credit transfer was applied to.';
                 }
-                field(AppliesToEntryPostingDate; AppliesToEntryPostingDate())
+                field(AppliesToEntryPostingDate; Rec.AppliesToEntryPostingDate())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Applies-to Entry Posting Date';
                     ToolTip = 'Specifies when the purchase invoice that the vendor ledger entry behind this credit transfer entry applies to was posted.';
                 }
-                field(AppliesToEntryDescription; AppliesToEntryDescription())
+                field(AppliesToEntryDescription; Rec.AppliesToEntryDescription())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Applies-to Entry Description';
                     ToolTip = 'Specifies the description of the purchase invoice that the vendor ledger entry behind this credit transfer entry applies to.';
                 }
-                field(AppliesToEntryCurrencyCode; AppliesToEntryCurrencyCode())
+                field(AppliesToEntryCurrencyCode; Rec.AppliesToEntryCurrencyCode())
                 {
                     ApplicationArea = Suite;
                     Caption = 'Applies-to Entry Currency Code';
                     ToolTip = 'Specifies the currency of the purchase invoice that the vendor ledger entry behind this credit transfer entry applies to.';
                 }
-                field(AppliesToEntryAmount; AppliesToEntryAmount())
+                field(AppliesToEntryAmount; Rec.AppliesToEntryAmount())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Applies-to Entry Amount';
                     ToolTip = 'Specifies the payment amount on the purchase invoice that the vendor ledger entry behind this credit transfer entry applies to.';
                 }
-                field(AppliesToEntryRemainingAmount; AppliesToEntryRemainingAmount())
+                field(AppliesToEntryRemainingAmount; Rec.AppliesToEntryRemainingAmount())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Applies-to Entry Remaining Amount';

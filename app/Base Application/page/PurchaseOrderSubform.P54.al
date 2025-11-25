@@ -1,4 +1,27 @@
-﻿page 54 "Purchase Order Subform"
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.AllocationAccount;
+using Microsoft.FinancialMgt.AllocationAccount.Purchase;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Environment.Configuration;
+using System.Integration.Excel;
+using System.Utilities;
+
+page 54 "Purchase Order Subform"
 {
     AutoSplitKey = true;
     Caption = 'Lines';
@@ -7,7 +30,7 @@
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Purchase Line";
-    SourceTableView = WHERE("Document Type" = FILTER(Order));
+    SourceTableView = where("Document Type" = filter(Order));
 
     layout
     {
@@ -36,15 +59,15 @@
                     Caption = 'Type';
                     Editable = CurrPageIsEditable;
                     LookupPageID = "Option Lookup List";
-                    TableRelation = "Option Lookup Buffer"."Option Caption" WHERE("Lookup Type" = CONST(Purchases));
+                    TableRelation = "Option Lookup Buffer"."Option Caption" where("Lookup Type" = const(Purchases));
                     ToolTip = 'Specifies the type of transaction that will be posted with the document line. If you select Comment, then you can enter any text in the Description field, such as a message to a customer. ';
                     Visible = IsFoundation;
 
                     trigger OnValidate()
                     begin
-                        TempOptionLookupBuffer.SetCurrentType(Type.AsInteger());
+                        TempOptionLookupBuffer.SetCurrentType(Rec.Type.AsInteger());
                         if TempOptionLookupBuffer.AutoCompleteLookup(TypeAsText, TempOptionLookupBuffer."Lookup Type"::Purchases) then
-                            Validate(Type, TempOptionLookupBuffer.ID);
+                            Rec.Validate(Type, TempOptionLookupBuffer.ID);
                         TempOptionLookupBuffer.ValidateOption(TypeAsText);
                         UpdateEditableOnRow();
                         UpdateTypeText();
@@ -54,12 +77,12 @@
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Suite;
-                    ShowMandatory = Type <> Type::" ";
+                    ShowMandatory = not IsCommentLine;
                     ToolTip = 'Specifies what you are buying, such as a product or a fixed asset. You’ll see different lists of things to choose from depending on your choice in the Type field.';
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         NoOnAfterValidate();
 
                         UpdateTypeText();
@@ -80,14 +103,11 @@
                     var
                         ItemReferenceMgt: Codeunit "Item Reference Management";
                     begin
-                        PurchaseHeader.Get("Document Type", "Document No.");
+                        PurchaseHeader.Get(Rec."Document Type", Rec."Document No.");
                         ItemReferenceMgt.PurchaseReferenceNoLookUp(Rec, PurchaseHeader);
                         InsertExtendedText(false);
                         NoOnAfterValidate();
                         DeltaUpdateTotals();
-#if not CLEAN20                        
-                        OnCrossReferenceNoOnLookup(Rec);
-#endif                        
                         OnItemReferenceNoOnLookup(Rec);
                         CurrPage.Update();
                     end;
@@ -130,11 +150,11 @@
                         Item: Record "Item";
                     begin
                         DeltaUpdateTotals();
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that this item is a catalog item.';
@@ -233,13 +253,13 @@
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
-                    Editable = NOT IsBlankNumber;
-                    Enabled = NOT IsBlankNumber;
+                    Editable = not IsBlankNumber;
+                    Enabled = not IsBlankNumber;
                     ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         DeltaUpdateTotals();
                     end;
                 }
@@ -253,16 +273,16 @@
                 {
                     ApplicationArea = Suite;
                     BlankZero = true;
-                    Editable = NOT IsBlankNumber;
-                    Enabled = NOT IsBlankNumber;
-                    ShowMandatory = (Type <> Type::" ") AND ("No." <> '');
+                    Editable = not IsBlankNumber;
+                    Enabled = not IsBlankNumber;
+                    ShowMandatory = (Rec.Type <> Rec.Type::" ") and (Rec."No." <> '');
                     ToolTip = 'Specifies the quantity of what you''re buying. The number is based on the unit chosen in the Unit of Measure Code field.';
 
                     trigger OnValidate()
                     begin
                         DeltaUpdateTotals();
                         SetItemChargeFieldsStyle();
-                        if PurchasesPayablesSetup."Calc. Inv. Discount" and (Quantity = 0) then
+                        if PurchasesPayablesSetup."Calc. Inv. Discount" and (Rec.Quantity = 0) then
                             CurrPage.Update(false);
                     end;
                 }
@@ -299,9 +319,9 @@
                 {
                     ApplicationArea = Suite;
                     BlankZero = true;
-                    Editable = NOT IsBlankNumber;
-                    Enabled = NOT IsBlankNumber;
-                    ShowMandatory = (Type <> Type::" ") AND ("No." <> '');
+                    Editable = not IsBlankNumber;
+                    Enabled = not IsBlankNumber;
+                    ShowMandatory = (Rec.Type <> Rec.Type::" ") and (Rec."No." <> '');
                     ToolTip = 'Specifies the price of one unit of what you''re buying.';
 
                     trigger OnValidate()
@@ -372,8 +392,8 @@
                 {
                     ApplicationArea = Suite;
                     BlankZero = true;
-                    Editable = NOT IsBlankNumber;
-                    Enabled = NOT IsBlankNumber;
+                    Editable = not IsBlankNumber;
+                    Enabled = not IsBlankNumber;
                     ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
                     Visible = false;
 
@@ -386,8 +406,8 @@
                 {
                     ApplicationArea = Suite;
                     BlankZero = true;
-                    Editable = NOT IsBlankNumber;
-                    Enabled = NOT IsBlankNumber;
+                    Editable = not IsBlankNumber;
+                    Enabled = not IsBlankNumber;
                     ToolTip = 'Specifies the net amount, excluding any invoice discount amount, that must be paid for products on the line.';
 
                     trigger OnValidate()
@@ -480,6 +500,17 @@
                     ApplicationArea = Suite;
                     BlankZero = true;
                     ToolTip = 'Specifies how many units of the item on the line have been posted as received.';
+
+                    trigger OnDrillDown()
+                    var
+                        PurchRcptLine: Record "Purch. Rcpt. Line";
+                    begin
+                        PurchRcptLine.SetCurrentKey("Document No.", "No.", "Planned Receipt Date");
+                        PurchRcptLine.SetRange("Order No.", Rec."Document No.");
+                        PurchRcptLine.SetRange("Order Line No.", Rec."Line No.");
+                        PurchRcptLine.SetFilter(Quantity, '<>%1', 0);
+                        PAGE.RunModal(0, PurchRcptLine);
+                    end;
                 }
                 field("Qty. to Invoice"; Rec."Qty. to Invoice")
                 {
@@ -497,6 +528,17 @@
                     ApplicationArea = Suite;
                     BlankZero = true;
                     ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
+
+                    trigger OnDrillDown()
+                    var
+                        PurchInvLine: Record "Purch. Inv. Line";
+                    begin
+                        PurchInvLine.SetCurrentKey("Document No.", "No.", "Expected Receipt Date");
+                        PurchInvLine.SetRange("Order No.", Rec."Document No.");
+                        PurchInvLine.SetRange("Order Line No.", Rec."Line No.");
+                        PurchInvLine.SetFilter(Quantity, '<>%1', 0);
+                        PAGE.RunModal(0, PurchInvLine);
+                    end;
                 }
                 field("Prepmt Amt to Deduct"; Rec."Prepmt Amt to Deduct")
                 {
@@ -525,7 +567,7 @@
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        ShowItemChargeAssgnt();
+                        Rec.ShowItemChargeAssgnt();
                         UpdateForm(false);
                     end;
                 }
@@ -539,7 +581,7 @@
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        ShowItemChargeAssgnt();
+                        Rec.ShowItemChargeAssgnt();
                         UpdateForm(false);
                     end;
                 }
@@ -552,8 +594,21 @@
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        ShowItemChargeAssgnt();
+                        Rec.ShowItemChargeAssgnt();
                         UpdateForm(false);
+                    end;
+                }
+                field("Allocation Account No."; Rec."Selected Alloc. Account No.")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Allocation Account No.';
+                    ToolTip = 'Specifies the allocation account number that will be used to distribute the amounts during the posting process.';
+                    Visible = UseAllocationAccountNumber;
+                    trigger OnValidate()
+                    var
+                        PurchaseAllocAccMgt: Codeunit "Purchase Alloc. Acc. Mgt.";
+                    begin
+                        PurchaseAllocAccMgt.VerifySelectedAllocationAccountNo(Rec);
                     end;
                 }
                 field("Job No."; Rec."Job No.")
@@ -564,7 +619,7 @@
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field("Job Task No."; Rec."Job Task No.")
@@ -575,7 +630,7 @@
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field("Job Planning Line No."; Rec."Job Planning Line No.")
@@ -708,7 +763,7 @@
                     ToolTip = 'Specifies the work center number of the journal line.';
                     Visible = false;
                 }
-                field(Finished; Finished)
+                field(Finished; Rec.Finished)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies that any related service or operation is finished.';
@@ -747,7 +802,7 @@
                 field("Deferral Code"; Rec."Deferral Code")
                 {
                     ApplicationArea = Suite;
-                    Enabled = (Type <> Type::"Fixed Asset") AND (Type <> Type::" ");
+                    Enabled = (Rec.Type <> Rec.Type::"Fixed Asset") AND (Rec.Type <> Rec.Type::" ");
                     TableRelation = "Deferral Template"."Deferral Code";
                     ToolTip = 'Specifies the deferral template that governs how expenses paid with this purchase document are deferred to the different accounting periods when the expenses were incurred.';
                     Visible = false;
@@ -756,7 +811,7 @@
                     begin
                         CurrPage.SaveRecord();
                         Commit();
-                        ShowDeferralSchedule();
+                        Rec.ShowDeferralSchedule();
                     end;
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
@@ -775,14 +830,14 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 3);
                     end;
@@ -791,14 +846,14 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 4);
                     end;
@@ -807,14 +862,14 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 5);
                     end;
@@ -823,14 +878,14 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 6);
                     end;
@@ -839,14 +894,14 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 7);
                     end;
@@ -855,14 +910,14 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
@@ -975,7 +1030,7 @@
                         ApplicationArea = Suite;
                         AutoFormatExpression = Currency.Code;
                         AutoFormatType = 1;
-                        CaptionClass = DocumentTotals.GetInvoiceDiscAmountWithVATAndCurrencyCaption(FieldCaption("Inv. Discount Amount"), Currency.Code);
+                        CaptionClass = DocumentTotals.GetInvoiceDiscAmountWithVATAndCurrencyCaption(Rec.FieldCaption("Inv. Discount Amount"), Currency.Code);
                         Caption = 'Invoice Discount Amount';
                         Editable = InvDiscAmountEditable;
                         ToolTip = 'Specifies a discount amount that is deducted from the value of the Total Incl. VAT field, based on purchase lines where the Allow Invoice Disc. field is selected. You can enter or change the amount manually.';
@@ -1057,7 +1112,7 @@
 
                 trigger OnAction()
                 begin
-                    SelectMultipleItems();
+                    Rec.SelectMultipleItems();
                 end;
             }
             group("&Line")
@@ -1068,7 +1123,7 @@
                 {
                     Caption = 'Item Availability by';
                     Image = ItemAvailability;
-                    Enabled = Type = Type::Item;
+                    Enabled = Rec.Type = Rec.Type::Item;
                     action("Event")
                     {
                         ApplicationArea = Basic, Suite;
@@ -1149,12 +1204,12 @@
                     ApplicationArea = Reservation;
                     Caption = 'Reservation Entries';
                     Image = ReservationLedger;
-                    Enabled = Type = Type::Item;
+                    Enabled = Rec.Type = Rec.Type::Item;
                     ToolTip = 'View all reservation entries for the selected item. This action is available only for lines that contain an item.';
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
                 action("Item Tracking Lines")
@@ -1163,12 +1218,12 @@
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
                     ShortCutKey = 'Ctrl+Alt+I';
-                    Enabled = Type = Type::Item;
+                    Enabled = Rec.Type = Rec.Type::Item;
                     ToolTip = 'View or edit serial and lot numbers for the selected item. This action is available only for lines that contain an item.';
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
                 action(Dimensions)
@@ -1182,7 +1237,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Co&mments")
@@ -1194,7 +1249,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowLineComments();
+                        Rec.ShowLineComments();
                     end;
                 }
                 action(ItemChargeAssignment)
@@ -1203,12 +1258,12 @@
                     ApplicationArea = ItemCharges;
                     Caption = 'Item Charge &Assignment';
                     Image = ItemCosts;
-                    Enabled = Type = Type::"Charge (Item)";
+                    Enabled = Rec.Type = Rec.Type::"Charge (Item)";
                     ToolTip = 'Record additional direct costs, for example for freight. This action is available only for Charge (Item) line types.';
 
                     trigger OnAction()
                     begin
-                        ShowItemChargeAssgnt();
+                        Rec.ShowItemChargeAssgnt();
                         SetItemChargeFieldsStyle();
                     end;
                 }
@@ -1227,13 +1282,34 @@
                 {
                     ApplicationArea = Suite;
                     Caption = 'Deferral Schedule';
-                    Enabled = "Deferral Code" <> '';
+                    Enabled = Rec."Deferral Code" <> '';
                     Image = PaymentPeriod;
                     ToolTip = 'View or edit the deferral schedule that governs how revenue made with this sales document is deferred to different accounting periods when the document is posted.';
 
                     trigger OnAction()
                     begin
-                        ShowDeferralSchedule();
+                        Rec.ShowDeferralSchedule();
+                    end;
+                }
+                action(RedistributeAccAllocations)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Redistribute Account Allocations';
+                    Image = EditList;
+#pragma warning disable AA0219
+                    ToolTip = 'Use this action to redistribute the account allocations for this line.';
+#pragma warning restore AA0219
+
+                    trigger OnAction()
+                    var
+                        AllocAccManualOverride: Page Microsoft.FinancialMgt.AllocationAccount."Redistribute Acc. Allocations";
+                    begin
+                        if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                            Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                        AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
+                        AllocAccManualOverride.SetParentTableId(Database::"Purchase Line");
+                        AllocAccManualOverride.RunModal();
                     end;
                 }
                 action(DocAttach)
@@ -1264,7 +1340,7 @@
                     ApplicationArea = Suite;
                     Caption = 'E&xplode BOM';
                     Image = ExplodeBOM;
-                    Enabled = Type = Type::Item;
+                    Enabled = Rec.Type = Rec.Type::Item;
                     ToolTip = 'Add a line for each component on the bill of materials for the selected item. For example, this is useful for selling the parent item as a kit. CAUTION: The line for the parent item will be deleted and only its description will display. To undo this action, delete the component lines and add a line for the parent item again. This action is available only for lines that contain an item.';
 
                     trigger OnAction()
@@ -1308,13 +1384,13 @@
                     Caption = '&Reserve';
                     Ellipsis = true;
                     Image = Reserve;
-                    Enabled = Type = Type::Item;
+                    Enabled = Rec.Type = Rec.Type::Item;
                     ToolTip = 'Reserve the quantity of the selected item that is required on the document line from which you opened this page. This action is available only for lines that contain an item.';
 
                     trigger OnAction()
                     begin
-                        Find();
-                        ShowReservation();
+                        Rec.Find();
+                        Rec.ShowReservation();
                     end;
                 }
                 action(OrderTracking)
@@ -1322,7 +1398,7 @@
                     ApplicationArea = Suite;
                     Caption = 'Order &Tracking';
                     Image = OrderTracking;
-                    Enabled = Type = Type::Item;
+                    Enabled = Rec.Type = Rec.Type::Item;
                     ToolTip = 'Track the connection of a supply to its corresponding demand for the selected item. This can help you find the original demand that created a specific production order or purchase order. This action is available only for lines that contain an item.';
 
                     trigger OnAction()
@@ -1383,8 +1459,8 @@
                         PurchaseHeader: Record "Purchase Header";
                         BlanketPurchaseOrder: Page "Blanket Purchase Order";
                     begin
-                        TestField("Blanket Order No.");
-                        PurchaseHeader.SetRange("No.", "Blanket Order No.");
+                        Rec.TestField("Blanket Order No.");
+                        PurchaseHeader.SetRange("No.", Rec."Blanket Order No.");
                         if not PurchaseHeader.IsEmpty() then begin
                             BlanketPurchaseOrder.SetTableView(PurchaseHeader);
                             BlanketPurchaseOrder.Editable := false;
@@ -1411,7 +1487,7 @@
 
                     trigger OnAction()
                     begin
-                        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                     end;
                 }
                 action(ShowAllLines)
@@ -1425,7 +1501,7 @@
 
                     trigger OnAction()
                     begin
-                        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                     end;
                 }
             }
@@ -1478,18 +1554,18 @@
     var
         Item: Record "Item";
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
         UpdateTypeText();
         SetItemChargeFieldsStyle();
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
     end;
 
     trigger OnDeleteRecord(): Boolean
     var
         PurchLineReserve: Codeunit "Purch. Line-Reserve";
     begin
-        if (Quantity <> 0) and ItemExists("No.") then begin
+        if (Rec.Quantity <> 0) and Rec.ItemExists(Rec."No.") then begin
             Commit();
             if not PurchLineReserve.DeleteLineConfirm(Rec) then
                 exit(false);
@@ -1502,7 +1578,7 @@
     trigger OnFindRecord(Which: Text): Boolean
     begin
         DocumentTotals.PurchaseCheckAndClearTotals(Rec, xRec, TotalPurchaseLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnInit()
@@ -1523,7 +1599,7 @@
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        InitType();
+        Rec.InitType();
         SetDefaultType();
 
         Clear(ShortcutDimCode);
@@ -1531,7 +1607,10 @@
     end;
 
     trigger OnOpenPage()
+    var
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
     begin
+        UseAllocationAccountNumber := AllocationAccountMgt.UseAllocationAccountNoField();
         SetOpenPage();
 
         SetDimensionsVisibility();
@@ -1541,7 +1620,6 @@
 
     var
         PurchaseHeader: Record "Purchase Header";
-        Currency: Record Currency;
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
         InventorySetup: Record "Inventory Setup";
         TempOptionLookupBuffer: Record "Option Lookup Buffer" temporary;
@@ -1565,9 +1643,12 @@
         UpdateInvDiscountQst: Label 'One or more lines have been invoiced. The discount distributed to invoiced lines will not be taken into account.\\Do you want to update the invoice discount?';
         CurrPageIsEditable: Boolean;
         SuppressTotals: Boolean;
+        UseAllocationAccountNumber: Boolean;
+        ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Type.';
         ExcelFileNameTxt: Label 'Purchase Order %1 - Lines', Comment = '%1 = document number, ex. 10000';
 
     protected var
+        Currency: Record Currency;
         TotalPurchaseHeader: Record "Purchase Header";
         TotalPurchaseLine: Record "Purchase Line";
         ShortcutDimCode: array[8] of Code[20];
@@ -1583,10 +1664,8 @@
         DimVisible7: Boolean;
         DimVisible8: Boolean;
         IsBlankNumber: Boolean;
-        [InDataSet]
         IsCommentLine: Boolean;
         OverReceiptAllowed: Boolean;
-        [InDataSet]
         ItemReferenceVisible: Boolean;
         AttachToInvtItemEnabled: Boolean;
 
@@ -1619,7 +1698,7 @@
         if SuppressTotals then
             exit;
 
-        PurchaseHeader.Get("Document Type", "Document No.");
+        PurchaseHeader.Get(Rec."Document Type", Rec."Document No.");
         if PurchaseHeader.InvoicedLineExists() then
             if not ConfirmManagement.GetResponseOrDefault(UpdateInvDiscountQst, true) then
                 exit;
@@ -1631,7 +1710,7 @@
 
     local procedure ExplodeBOM()
     begin
-        if "Prepmt. Amt. Inv." <> 0 then
+        if Rec."Prepmt. Amt. Inv." <> 0 then
             Error(Text001);
         CODEUNIT.Run(CODEUNIT::"Purch.-Explode BOM", Rec);
         DocumentTotals.PurchaseDocTotalsNotUpToDate();
@@ -1648,8 +1727,8 @@
         if IsHandled then
             exit;
 
-        TestField("Sales Order No.");
-        SalesHeader.SetRange("No.", "Sales Order No.");
+        Rec.TestField("Sales Order No.");
+        SalesHeader.SetRange("No.", Rec."Sales Order No.");
         SalesOrder.SetTableView(SalesHeader);
         SalesOrder.Editable := false;
         SalesOrder.Run();
@@ -1691,8 +1770,8 @@
         if IsHandled then
             exit;
 
-        TestField("Special Order Sales No.");
-        SalesHeader.SetRange("No.", "Special Order Sales No.");
+        Rec.TestField("Special Order Sales No.");
+        SalesHeader.SetRange("No.", Rec."Special Order Sales No.");
         SalesOrder.SetTableView(SalesHeader);
         SalesOrder.Editable := false;
         SalesOrder.Run();
@@ -1707,7 +1786,7 @@
     begin
         UpdateEditableOnRow();
         InsertExtendedText(false);
-        if (Type = Type::"Charge (Item)") and ("No." <> xRec."No.") and
+        if (Rec.Type = Rec.Type::"Charge (Item)") and (Rec."No." <> xRec."No.") and
            (xRec."No." <> '')
         then
             CurrPage.SaveRecord();
@@ -1720,7 +1799,7 @@
         DocumentLineTracking: Page "Document Line Tracking";
     begin
         Clear(DocumentLineTracking);
-        DocumentLineTracking.SetDoc(1, "Document No.", "Line No.", "Blanket Order No.", "Blanket Order Line No.", '', 0);
+        DocumentLineTracking.SetDoc(1, Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", '', 0);
         DocumentLineTracking.RunModal();
     end;
 
@@ -1787,13 +1866,13 @@
         if IsHandled then
             exit;
 
-        if "Line Amount" <> xRec."Line Amount" then
-            SendLineInvoiceDiscountResetNotification();
+        if Rec."Line Amount" <> xRec."Line Amount" then
+            Rec.SendLineInvoiceDiscountResetNotification();
     end;
 
     procedure UpdateEditableOnRow()
     begin
-        IsCommentLine := Type = Type::" ";
+        IsCommentLine := Rec.Type = Rec.Type::" ";
         IsBlankNumber := IsCommentLine;
         if AttachingLinesEnabled then
             AttachToInvtItemEnabled := not Rec.IsInventoriableItem();
@@ -1816,17 +1895,17 @@
         OnBeforeUpdateTypeText(Rec);
 
         RecRef.GetTable(Rec);
-        TypeAsText := TempOptionLookupBuffer.FormatOption(RecRef.Field(FieldNo(Type)));
+        TypeAsText := TempOptionLookupBuffer.FormatOption(RecRef.Field(Rec.FieldNo(Type)));
     end;
 
     local procedure SetItemChargeFieldsStyle()
     begin
         ItemChargeStyleExpression := '';
         ItemChargeToHandleStyleExpression := '';
-        if AssignedItemCharge() then begin
-            if "Qty. To Assign" <> (Quantity - "Qty. Assigned") then
+        if Rec.AssignedItemCharge() then begin
+            if Rec."Qty. To Assign" <> (Rec.Quantity - Rec."Qty. Assigned") then
                 ItemChargeStyleExpression := 'Unfavorable';
-            if "Item Charge Qty. to Handle" <> "Qty. to Invoice" then
+            if Rec."Item Charge Qty. to Handle" <> Rec."Qty. to Invoice" then
                 ItemChargeToHandleStyleExpression := 'Unfavorable';
         end;
     end;
@@ -1869,7 +1948,7 @@
             exit;
 
         if xRec."Document No." = '' then
-            Type := GetDefaultLineType();
+            Rec.Type := Rec.GetDefaultLineType();
     end;
 
     local procedure SetOverReceiptControlsVisibility()
@@ -1923,14 +2002,6 @@
     local procedure OnBeforeUpdateTypeText(var PurchaseLine: Record "Purchase Line")
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by event OnItemReferenceNoOnLookup()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnCrossReferenceNoOnLookup(var PurchaseLine: Record "Purchase Line")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnItemReferenceNoOnLookup(var PurchaseLine: Record "Purchase Line")

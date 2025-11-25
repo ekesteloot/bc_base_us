@@ -1,3 +1,5 @@
+namespace System.IO;
+
 codeunit 1238 "Suggest Col. Definition - Json"
 {
 

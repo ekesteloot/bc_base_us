@@ -19,8 +19,8 @@ page 1006 "Job Task Dimensions Multiple"
 
                     trigger OnValidate()
                     begin
-                        if (xRec."Dimension Code" <> '') and (xRec."Dimension Code" <> "Dimension Code") then
-                            Error(Text000, TableCaption);
+                        if (xRec."Dimension Code" <> '') and (xRec."Dimension Code" <> Rec."Dimension Code") then
+                            Error(Text000, Rec.TableCaption);
                     end;
                 }
                 field("Dimension Value Code"; Rec."Dimension Value Code")
@@ -38,13 +38,13 @@ page 1006 "Job Task Dimensions Multiple"
 
     trigger OnAfterGetRecord()
     begin
-        DimensionValueCodeOnFormat(Format("Dimension Value Code"));
+        DimensionValueCodeOnFormat(Format(Rec."Dimension Value Code"));
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
-        "Multiple Selection Action" := "Multiple Selection Action"::Delete;
-        Modify();
+        Rec."Multiple Selection Action" := Rec."Multiple Selection Action"::Delete;
+        Rec.Modify();
         exit(false);
     end;
 
@@ -55,19 +55,19 @@ page 1006 "Job Task Dimensions Multiple"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        SetRange("Dimension Code", "Dimension Code");
-        if not Find('-') and ("Dimension Code" <> '') then begin
-            "Multiple Selection Action" := "Multiple Selection Action"::Change;
-            Insert();
+        Rec.SetRange("Dimension Code", Rec."Dimension Code");
+        if not Rec.Find('-') and (Rec."Dimension Code" <> '') then begin
+            Rec."Multiple Selection Action" := Rec."Multiple Selection Action"::Change;
+            Rec.Insert();
         end;
-        SetRange("Dimension Code");
+        Rec.SetRange("Dimension Code");
         exit(false);
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        "Multiple Selection Action" := "Multiple Selection Action"::Change;
-        Modify();
+        Rec."Multiple Selection Action" := Rec."Multiple Selection Action"::Change;
+        Rec.Modify();
         exit(false);
     end;
 
@@ -94,38 +94,36 @@ page 1006 "Job Task Dimensions Multiple"
     var
         JobTaskDim: Record "Job Task Dimension";
     begin
-        SetRange(
-          "Multiple Selection Action", "Multiple Selection Action"::Delete);
-        if Find('-') then
+        Rec.SetRange("Multiple Selection Action", Rec."Multiple Selection Action"::Delete);
+        if Rec.Find('-') then
             repeat
                 if TempJobTaskDim3.Find('-') then
                     repeat
-                        if JobTaskDim.Get(TempJobTaskDim3."Job No.", TempJobTaskDim3."Job Task No.", "Dimension Code")
+                        if JobTaskDim.Get(TempJobTaskDim3."Job No.", TempJobTaskDim3."Job Task No.", Rec."Dimension Code")
                         then
                             JobTaskDim.Delete(true);
                     until TempJobTaskDim3.Next() = 0;
-            until Next() = 0;
-        SetRange(
-          "Multiple Selection Action", "Multiple Selection Action"::Change);
-        if Find('-') then
+            until Rec.Next() = 0;
+        Rec.SetRange("Multiple Selection Action", Rec."Multiple Selection Action"::Change);
+        if Rec.Find('-') then
             repeat
                 if TempJobTaskDim3.Find('-') then
                     repeat
-                        if JobTaskDim.Get(TempJobTaskDim3."Job No.", TempJobTaskDim3."Job Task No.", "Dimension Code")
+                        if JobTaskDim.Get(TempJobTaskDim3."Job No.", TempJobTaskDim3."Job Task No.", Rec."Dimension Code")
                         then begin
-                            JobTaskDim."Dimension Code" := "Dimension Code";
-                            JobTaskDim."Dimension Value Code" := "Dimension Value Code";
+                            JobTaskDim."Dimension Code" := Rec."Dimension Code";
+                            JobTaskDim."Dimension Value Code" := Rec."Dimension Value Code";
                             JobTaskDim.Modify(true);
                         end else begin
                             JobTaskDim.Init();
                             JobTaskDim."Job No." := TempJobTaskDim3."Job No.";
                             JobTaskDim."Job Task No." := TempJobTaskDim3."Job Task No.";
-                            JobTaskDim."Dimension Code" := "Dimension Code";
-                            JobTaskDim."Dimension Value Code" := "Dimension Value Code";
+                            JobTaskDim."Dimension Code" := Rec."Dimension Code";
+                            JobTaskDim."Dimension Value Code" := Rec."Dimension Value Code";
                             JobTaskDim.Insert(true);
                         end;
                     until TempJobTaskDim3.Next() = 0;
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     procedure SetMultiJobTask(var JobTask: Record "Job Task")
@@ -164,48 +162,47 @@ page 1006 "Job Task Dimensions Multiple"
         Dim: Record Dimension;
         RecNo: Integer;
     begin
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         if Dim.Find('-') then
             repeat
                 RecNo := 0;
                 TempJobTaskDim2.SetRange("Dimension Code", Dim.Code);
-                SetRange("Dimension Code", Dim.Code);
+                Rec.SetRange("Dimension Code", Dim.Code);
                 if TempJobTaskDim2.Find('-') then
                     repeat
-                        if Find('-') then begin
-                            if "Dimension Value Code" <> TempJobTaskDim2."Dimension Value Code" then
-                                if ("Multiple Selection Action" <> 10) and
-                                   ("Multiple Selection Action" <> 21)
+                        if Rec.Find('-') then begin
+                            if Rec."Dimension Value Code" <> TempJobTaskDim2."Dimension Value Code" then
+                                if (Rec."Multiple Selection Action" <> 10) and
+                                   (Rec."Multiple Selection Action" <> 21)
                                 then begin
-                                    "Multiple Selection Action" :=
-                                      "Multiple Selection Action" + 10;
-                                    "Dimension Value Code" := '';
+                                    Rec."Multiple Selection Action" :=
+                                      Rec."Multiple Selection Action" + 10;
+                                    Rec."Dimension Value Code" := '';
                                 end;
-                            Modify();
+                            Rec.Modify();
                             RecNo := RecNo + 1;
                         end else begin
                             Rec := TempJobTaskDim2;
-                            Insert();
+                            Rec.Insert();
                             RecNo := RecNo + 1;
                         end;
                     until TempJobTaskDim2.Next() = 0;
 
-                if Find('-') and (RecNo <> TotalRecNo) then
-                    if ("Multiple Selection Action" <> 10) and
-                       ("Multiple Selection Action" <> 21)
+                if Rec.Find('-') and (RecNo <> TotalRecNo) then
+                    if (Rec."Multiple Selection Action" <> 10) and
+                       (Rec."Multiple Selection Action" <> 21)
                     then begin
-                        "Multiple Selection Action" :=
-                          "Multiple Selection Action" + 10;
-                        "Dimension Value Code" := '';
-                        Modify();
+                        Rec."Multiple Selection Action" :=
+                          Rec."Multiple Selection Action" + 10;
+                        Rec."Dimension Value Code" := '';
+                        Rec.Modify();
                     end;
             until Dim.Next() = 0;
 
-        Reset();
-        SetCurrentKey("Dimension Code");
-        SetFilter(
-          "Multiple Selection Action", '<>%1', "Multiple Selection Action"::Delete)
+        Rec.Reset();
+        Rec.SetCurrentKey("Dimension Code");
+        Rec.SetFilter("Multiple Selection Action", '<>%1', Rec."Multiple Selection Action"::Delete)
     end;
 
     local procedure LookupOKOnPush()
@@ -215,9 +212,9 @@ page 1006 "Job Task Dimensions Multiple"
 
     local procedure DimensionValueCodeOnFormat(Text: Text[1024])
     begin
-        if "Dimension Code" <> '' then
-            if ("Multiple Selection Action" = 10) or
-               ("Multiple Selection Action" = 21)
+        if Rec."Dimension Code" <> '' then
+            if (Rec."Multiple Selection Action" = 10) or
+               (Rec."Multiple Selection Action" = 21)
             then
                 Text := Text001;
     end;

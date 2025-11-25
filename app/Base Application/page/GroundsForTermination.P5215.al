@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 page 5215 "Grounds for Termination"
 {
     ApplicationArea = BasicHR;
@@ -13,7 +15,7 @@ page 5215 "Grounds for Termination"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a grounds for termination code.';

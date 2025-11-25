@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 enum 338 "Reservation Summary Type"
 {
     Extensible = true;

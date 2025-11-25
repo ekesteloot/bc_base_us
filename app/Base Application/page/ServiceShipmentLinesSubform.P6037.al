@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 page 6037 "Service Shipment Lines Subform"
 {
     Caption = 'Lines';
@@ -51,7 +53,7 @@ page 6037 "Service Shipment Lines Subform"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that the item on the shipment line is a catalog item.';
@@ -157,9 +159,7 @@ page 6037 "Service Shipment Lines Subform"
 
     var
         TempServShptLine: Record "Service Shipment Line" temporary;
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     local procedure IsFirstDocLine(): Boolean
@@ -168,16 +168,16 @@ page 6037 "Service Shipment Lines Subform"
     begin
         TempServShptLine.Reset();
         TempServShptLine.CopyFilters(Rec);
-        TempServShptLine.SetRange("Document No.", "Document No.");
+        TempServShptLine.SetRange("Document No.", Rec."Document No.");
         if not TempServShptLine.FindFirst() then begin
             ServShptLine.CopyFilters(Rec);
-            ServShptLine.SetRange("Document No.", "Document No.");
+            ServShptLine.SetRange("Document No.", Rec."Document No.");
             if not ServShptLine.FindFirst() then
                 exit(false);
             TempServShptLine := ServShptLine;
             TempServShptLine.Insert();
         end;
-        if "Line No." = TempServShptLine."Line No." then
+        if Rec."Line No." = TempServShptLine."Line No." then
             exit(true);
     end;
 }

@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Ledger;
+
 query 7150 "Item Analysis View Source"
 {
     Caption = 'Item Analysis View Source';

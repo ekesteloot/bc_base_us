@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.ServiceMgt.Comment;
+
 page 5971 "Posted Service Credit Memos"
 {
     ApplicationArea = Service;
@@ -6,8 +10,8 @@ page 5971 "Posted Service Credit Memos"
     Editable = false;
     PageType = List;
     SourceTable = "Service Cr.Memo Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -223,10 +227,10 @@ page 5971 "Posted Service Credit Memos"
                     trigger OnAction()
                     begin
                         OnBeforeCalculateSalesTaxStatistics(Rec);
-                        if "Tax Area Code" = '' then
-                            PAGE.RunModal(PAGE::"Service Credit Memo Statistics", Rec, "No.")
+                        if Rec."Tax Area Code" = '' then
+                            PAGE.RunModal(PAGE::"Service Credit Memo Statistics", Rec, Rec."No.")
                         else
-                            PAGE.RunModal(PAGE::"Service Credit Memo Stats.", Rec, "No.");
+                            PAGE.RunModal(PAGE::"Service Credit Memo Stats.", Rec, Rec."No.");
                     end;
                 }
                 action("Co&mments")
@@ -235,9 +239,9 @@ page 5971 "Posted Service Credit Memos"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Service Comment Sheet";
-                    RunPageLink = Type = CONST(General),
-                                  "Table Name" = CONST("Service Cr.Memo Header"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = Type = const(General),
+                                  "Table Name" = const("Service Cr.Memo Header"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -278,7 +282,7 @@ page 5971 "Posted Service Credit Memos"
 
                     trigger OnAction()
                     begin
-                        ExportEDocument();
+                        Rec.ExportEDocument();
                     end;
                 }
                 action(ExportEDocumentPDF)
@@ -289,7 +293,7 @@ page 5971 "Posted Service Credit Memos"
 
                     trigger OnAction()
                     begin
-                        ExportEDocumentPDF();
+                        Rec.ExportEDocumentPDF();
                     end;
                 }
                 action("&Cancel")
@@ -320,9 +324,9 @@ page 5971 "Posted Service Credit Memos"
                     Caption = 'CFDI Relation Documents';
                     Image = Allocations;
                     RunObject = Page "CFDI Relation Documents";
-                    RunPageLink = "Document Table ID" = CONST(5994),
-                                  "Document No." = FIELD("No."),
-                                  "Customer No." = FIELD("Bill-to Customer No.");
+                    RunPageLink = "Document Table ID" = const(5994),
+                                  "Document No." = field("No."),
+                                  "Customer No." = field("Bill-to Customer No.");
                     RunPageMode = View;
                     ToolTip = 'View or add CFDI relation documents for the record.';
                 }
@@ -366,7 +370,7 @@ page 5971 "Posted Service Credit Memos"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action(ActivityLog)
@@ -380,7 +384,7 @@ page 5971 "Posted Service Credit Memos"
                 var
                     ActivityLog: Record "Activity Log";
                 begin
-                    ActivityLog.ShowEntries(RecordId);
+                    ActivityLog.ShowEntries(Rec.RecordId);
                 end;
             }
         }
@@ -419,22 +423,22 @@ page 5971 "Posted Service Credit Memos"
 
     trigger OnAfterGetCurrRecord()
     begin
-        DocExchStatusStyle := GetDocExchStatusStyle();
+        DocExchStatusStyle := Rec.GetDocExchStatusStyle();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        DocExchStatusStyle := GetDocExchStatusStyle();
+        DocExchStatusStyle := Rec.GetDocExchStatusStyle();
     end;
 
     trigger OnOpenPage()
     var
         ServiceCrMemoHeader: Record "Service Cr.Memo Header";
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
         ServiceCrMemoHeader.CopyFilters(Rec);
-        ServiceCrMemoHeader.SetFilter("Document Exchange Status", '<>%1', "Document Exchange Status"::"Not Sent");
+        ServiceCrMemoHeader.SetFilter("Document Exchange Status", '<>%1', Rec."Document Exchange Status"::"Not Sent");
         DocExchStatusVisible := not ServiceCrMemoHeader.IsEmpty();
     end;
 

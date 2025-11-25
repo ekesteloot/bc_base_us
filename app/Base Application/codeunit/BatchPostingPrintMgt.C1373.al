@@ -10,6 +10,7 @@
         BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
         Print: Boolean;
     begin
+        OnBeforePrintDocumentOnAfterBatchPosting(RecRef, PostingResult);
         if not PostingResult then
             exit;
 
@@ -156,7 +157,6 @@
         OnAfterPrintPurchaseDocument(RecRef);
     end;
 
-    [Scope('OnPrem')]
     procedure PrintJournal(RecRef: RecordRef)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
@@ -234,13 +234,13 @@
             REPORT.Run(GenJnlTemplate."Posting Report ID", false, false, GLReg);
     end;
 
-    local procedure PrintDocument(ReportUsage: Enum "Report Selection Usage"; RecVar: Variant; PrintViaJobQueue: Boolean; ReportOutputType: Enum "Job Queue Report Output Type")
+    local procedure PrintDocument(ReportUsage: Enum "Report Selection Usage"; RecVariant: Variant; PrintViaJobQueue: Boolean; ReportOutputType: Enum "Job Queue Report Output Type")
     var
         ReportSelections: Record "Report Selections";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforePrintDocument(ReportUsage.AsInteger(), RecVar, IsHandled);
+        OnBeforePrintDocument(ReportUsage.AsInteger(), RecVariant, IsHandled);
         if IsHandled then
             exit;
 
@@ -250,9 +250,9 @@
         repeat
             ReportSelections.TestField("Report ID");
             if PrintViaJobQueue then
-                SchedulePrintJobQueueEntry(RecVar, ReportSelections."Report ID", ReportOutputType)
+                SchedulePrintJobQueueEntry(RecVariant, ReportSelections."Report ID", ReportOutputType)
             else
-                REPORT.Run(ReportSelections."Report ID", false, false, RecVar);
+                REPORT.Run(ReportSelections."Report ID", false, false, RecVariant);
         until ReportSelections.Next() = 0;
     end;
 
@@ -291,6 +291,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePrintDocument(ReportUsage: Option; RecVar: Variant; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforePrintDocumentOnAfterBatchPosting(var RecRef: RecordRef; PostingResult: Boolean)
     begin
     end;
 

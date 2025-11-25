@@ -1,7 +1,14 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Sales.Document;
+using System.Utilities;
+
 report 99003804 "Demand Forecast"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/DemandForecast.rdlc';
+    RDLCLayout = './Manufacturing/Reports/DemandForecast.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Demand Forecast';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +17,7 @@ report 99003804 "Demand Forecast"
     {
         dataitem("Production Forecast Entry"; "Production Forecast Entry")
         {
-            DataItemTableView = SORTING("Production Forecast Name", "Item No.", "Variant Code", "Location Code", "Forecast Date", "Component Forecast");
+            DataItemTableView = sorting("Production Forecast Name", "Item No.", "Variant Code", "Location Code", "Forecast Date", "Component Forecast");
             RequestFilterFields = "Production Forecast Name", "Item No.", "Forecast Date";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -69,7 +76,7 @@ report 99003804 "Demand Forecast"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemTableView = SORTING("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date");
+                DataItemTableView = sorting("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date");
                 column(DocNo_SalesLine; "Document No.")
                 {
                 }
@@ -113,7 +120,7 @@ report 99003804 "Demand Forecast"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 MaxIteration = 1;
                 column(Total; Total)
                 {

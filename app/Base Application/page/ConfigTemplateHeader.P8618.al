@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8618 "Config. Template Header"
 {
     Caption = 'Config. Template Header';
@@ -12,7 +14,7 @@ page 8618 "Config. Template Header"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code of the data template.';
@@ -33,7 +35,7 @@ page 8618 "Config. Template Header"
                     DrillDown = false;
                     ToolTip = 'Specifies the name of the table on which the data template is based.';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the template is ready to be used.';
@@ -42,9 +44,9 @@ page 8618 "Config. Template Header"
             part(ConfigTemplateSubform; "Config. Template Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Data Template Code" = FIELD(Code);
-                SubPageView = SORTING("Data Template Code", "Line No.")
-                              ORDER(Ascending);
+                SubPageLink = "Data Template Code" = field(Code);
+                SubPageView = sorting("Data Template Code", "Line No.")
+                              order(Ascending);
             }
         }
         area(factboxes)
@@ -82,10 +84,10 @@ page 8618 "Config. Template Header"
                         ConfigTemplateMgt: Codeunit "Config. Template Management";
                         RecRef: RecordRef;
                     begin
-                        if "Table ID" <> 0 then begin
-                            RecRef.Open("Table ID");
+                        if Rec."Table ID" <> 0 then begin
+                            RecRef.Open(Rec."Table ID");
                             ConfigTemplateMgt.UpdateRecord(Rec, RecRef);
-                            ConfirmNewInstance(RecRef);
+                            Rec.ConfirmNewInstance(RecRef);
                         end;
                     end;
                 }
@@ -101,12 +103,12 @@ page 8618 "Config. Template Header"
                         ConfigTemplateHeader: Record "Config. Template Header";
                         ConfigTemplateList: Page "Config. Template List";
                     begin
-                        ConfigTemplateHeader.SetFilter(Code, '<>%1', Code);
+                        ConfigTemplateHeader.SetFilter(Code, '<>%1', Rec.Code);
                         ConfigTemplateList.LookupMode(true);
                         ConfigTemplateList.SetTableView(ConfigTemplateHeader);
                         if ConfigTemplateList.RunModal() = ACTION::LookupOK then begin
                             ConfigTemplateList.GetRecord(ConfigTemplateHeader);
-                            CopyConfigTemplate(ConfigTemplateHeader.Code);
+                            Rec.CopyConfigTemplate(ConfigTemplateHeader.Code);
                         end;
                     end;
                 }

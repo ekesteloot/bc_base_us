@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Campaign;
+
 report 5189 "Delete Campaign Entries"
 {
     Caption = 'Delete Campaign Entries';

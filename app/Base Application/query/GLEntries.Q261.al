@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 query 261 "G/L Entries"
 {
     Caption = 'G/L Entries';

@@ -1,4 +1,19 @@
-﻿page 118 "General Ledger Setup"
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Setup;
+using Microsoft.CashFlow.Setup;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using System.Telemetry;
+using System.Security.User;
+using System.Utilities;
+
+page 118 "General Ledger Setup"
 {
     AdditionalSearchTerms = 'finance setup,general ledger setup,g/l setup';
     ApplicationArea = Basic, Suite;
@@ -90,25 +105,25 @@
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies how to round invoice amounts. The contents of this field determine whether the invoice amount to be rounded will be rounded up or down to the nearest interval as specified in the Invoice Rounding Precision field. If you select Nearest, digits that are higher than or equal to 5 will be rounded up, and digits that are lower than or equal to 5 will be rounded down.';
                 }
-                field(AmountRoundingPrecision; "Amount Rounding Precision")
+                field(AmountRoundingPrecision; Rec."Amount Rounding Precision")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Amount Rounding Precision (LCY)';
                     ToolTip = 'Specifies the size of the interval to be used when rounding amounts in LCY. This covers amounts created with all types of transactions and is useful to avoid inconsistencies when viewing or summing different amounts. Amounts will be rounded to the nearest digit. Example: To have amounts rounded to whole numbers, enter 1.00 in this field. In this case, amounts less than 0.5 will be rounded down and amounts greater than or equal to 0.5 will be rounded up. On the Currencies page, you specify how amounts in foreign currencies are rounded.';
                 }
-                field(AmountDecimalPlaces; "Amount Decimal Places")
+                field(AmountDecimalPlaces; Rec."Amount Decimal Places")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Amount Decimal Places (LCY)';
                     ToolTip = 'Specifies the number of decimal places that are shown for amounts in LCY. This covers amounts created with all types of transactions and is useful to avoid inconsistencies when viewing or summing different amounts. The default setting, 2:2, specifies that all amounts in LCY are shown with a minimum of 2 decimal places and a maximum of 2 decimal places. You can also enter a fixed number, such as 2, which also means that amounts are shown with two decimals. On the Currencies page, you specify how many decimal places to show for amounts in foreign currencies.';
                 }
-                field(UnitAmountRoundingPrecision; "Unit-Amount Rounding Precision")
+                field(UnitAmountRoundingPrecision; Rec."Unit-Amount Rounding Precision")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Unit-Amount Rounding Precision (LCY)';
                     ToolTip = 'Specifies the size of the interval to be used when rounding unit amounts, item or resource prices per unit, in LCY. Amounts will be rounded to the nearest digit. Example: To have unit amounts rounded to whole numbers, enter 1.00 in this field. In this case, amounts less than 0.5 will be rounded down and amounts greater than or equal to 0.5 will be rounded up. On the Currencies page, you specify how unit amounts in foreign currencies are rounded.';
                 }
-                field(UnitAmountDecimalPlaces; "Unit-Amount Decimal Places")
+                field(UnitAmountDecimalPlaces; Rec."Unit-Amount Decimal Places")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Unit-Amount Decimal Places (LCY)';
@@ -241,23 +256,6 @@
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if you are posting US or CA sales tax and do not want to have to set up posting groups on G/L accounts.';
                 }
-#if not CLEAN21
-                field("Bank Recon. with Auto. Match"; Rec."Bank Recon. with Auto. Match")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the feature to use for reconciling bank accounts. If you turn on this toggle, you will use the Payment Reconciliation Journals page, which supports the import of bank statement files. If it is turned off, you will use the Bank Rec. Worksheet page, which is better for checks and deposits but does not offer the import of bank statement files.';
-                    Visible = BankReconWithAutoMatchVisible;
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'This setting is also controlled by Feature Management.';
-                    ObsoleteTag = '21.0';
-                    trigger OnValidate()
-                    begin
-                        Rec.Validate("Bank Recon. with Auto. Match", xRec."Bank Recon. with Auto. Match");
-                        if Confirm(DeprecatedFeatureMsg) then
-                            Page.Run(Page::"Feature Management");
-                    end;
-                }
-#endif
                 field("Show Amounts"; Rec."Show Amounts")
                 {
                     ApplicationArea = Basic, Suite;
@@ -270,19 +268,19 @@
                     Importance = Additional;
                     ToolTip = 'Specifies if payment method code is shown in sales and purchase documents.';
                 }
-                field(PostingPreviewType; "Posting Preview Type")
+                field(PostingPreviewType; Rec."Posting Preview Type")
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies the amount of detail to include in the posting preview. Standard gives an overview of entries grouped by type, and you can choose the type of entry to view details. Extended displays the details for G/L entries and VAT entries.';
                 }
-                field(SEPANonEuroExport; "SEPA Non-Euro Export")
+                field(SEPANonEuroExport; Rec."SEPA Non-Euro Export")
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies whether to use SEPA export for journal lines with currencies different from Euro.';
                 }
-                field(SEPAExportWoBankAccData; "SEPA Export w/o Bank Acc. Data")
+                field(SEPAExportWoBankAccData; Rec."SEPA Export w/o Bank Acc. Data")
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
@@ -301,13 +299,10 @@
                         CurrPage.Update();
                     end;
                 }
-                field(EnableDataCheck; "Enable Data Check")
+                field(EnableDataCheck; Rec."Enable Data Check")
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
-#if not CLEAN20       
-                    Visible = BackgroundValidationEnabled;
-#endif
                     ToolTip = 'Specifies whether Business Central validates the data you enter in documents and journals while you type. For documents, you can turn on the check and messages will be shown in the Document Check FactBox. For journals, messages are always shown in the Journal Check FactBox.';
                 }
             }
@@ -439,8 +434,8 @@
                         ConfirmManagement: Codeunit "Confirm Management";
                         Confirmed: Boolean;
                     begin
-                        if "Additional Reporting Currency" <> xRec."Additional Reporting Currency" then begin
-                            if "Additional Reporting Currency" = '' then
+                        if Rec."Additional Reporting Currency" <> xRec."Additional Reporting Currency" then begin
+                            if Rec."Additional Reporting Currency" = '' then
                                 Confirmed := ConfirmManagement.GetResponseOrDefault(Text002, true)
                             else
                                 Confirmed := ConfirmManagement.GetResponseOrDefault(Text003, true);
@@ -484,7 +479,7 @@
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
                         if ConfirmManagement.GetResponseOrDefault(Text001, true) then
-                            PaymentToleranceMgt.CalcGracePeriodCVLedgEntry("Payment Discount Grace Period");
+                            PaymentToleranceMgt.CalcGracePeriodCVLedgEntry(Rec."Payment Discount Grace Period");
                     end;
                 }
                 field("Payment Tolerance Warning"; Rec."Payment Tolerance Warning")
@@ -545,7 +540,7 @@
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies if tax information is disabled in payment reports to Mexican SAT authorities.';
                 }
-                field("USD Currency Code"; "USD Currency Code")
+                field("USD Currency Code"; Rec."USD Currency Code")
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the code for USD currency that is used to calculate exchange rate to report foreing trade electronic invoices to Mexican SAT authorities.';
@@ -933,10 +928,6 @@
     end;
 
     trigger OnOpenPage()
-#if not CLEAN21
-    var
-        BankDepositFeatureMgt: Codeunit "Bank Deposit Feature Mgt.";
-#endif
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -945,29 +936,13 @@
         end;
         xGeneralLedgerSetup := Rec;
 
-#if not CLEAN20
-        BackgroundValidationEnabled := BackgroundErrorHandlingMgt.IsEnabled();
-#endif
-#if not CLEAN21
-        BankReconWithAutoMatchVisible := not BankDepositFeatureMgt.IsEnabled();
-#endif
         IsJournalTemplatesVisible := Rec."Journal Templ. Name Mandatory";
     end;
 
     var
+        xGeneralLedgerSetup: Record "General Ledger Setup";
         FeatureTelemetry: Codeunit "Feature Telemetry";
         MXInvoiceTok: Label 'MX Electronic Invoice', Locked = true;
-#if not CLEAN21
-        DeprecatedFeatureMsg: Label 'This configuration is now configured through the "Standardized Bank Reconciliation and Deposits" capability in the Feature Management page. Do you want to open that page now?';
-#endif
-        xGeneralLedgerSetup: Record "General Ledger Setup";
-#if not CLEAN21        
-        BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
-        [InDataSet]
-        BackgroundValidationEnabled: Boolean;
-        BankReconWithAutoMatchVisible: Boolean;
-#endif
-        [InDataSet]
         IsJournalTemplatesVisible: Boolean;
 
         Text001: Label 'Do you want to change all open entries for every customer and vendor that are not blocked?';
@@ -977,14 +952,14 @@
     local procedure IsShortcutDimensionModified(): Boolean
     begin
         exit(
-          ("Shortcut Dimension 1 Code" <> xGeneralLedgerSetup."Shortcut Dimension 1 Code") or
-          ("Shortcut Dimension 2 Code" <> xGeneralLedgerSetup."Shortcut Dimension 2 Code") or
-          ("Shortcut Dimension 3 Code" <> xGeneralLedgerSetup."Shortcut Dimension 3 Code") or
-          ("Shortcut Dimension 4 Code" <> xGeneralLedgerSetup."Shortcut Dimension 4 Code") or
-          ("Shortcut Dimension 5 Code" <> xGeneralLedgerSetup."Shortcut Dimension 5 Code") or
-          ("Shortcut Dimension 6 Code" <> xGeneralLedgerSetup."Shortcut Dimension 6 Code") or
-          ("Shortcut Dimension 7 Code" <> xGeneralLedgerSetup."Shortcut Dimension 7 Code") or
-          ("Shortcut Dimension 8 Code" <> xGeneralLedgerSetup."Shortcut Dimension 8 Code"));
+          (Rec."Shortcut Dimension 1 Code" <> xGeneralLedgerSetup."Shortcut Dimension 1 Code") or
+          (Rec."Shortcut Dimension 2 Code" <> xGeneralLedgerSetup."Shortcut Dimension 2 Code") or
+          (Rec."Shortcut Dimension 3 Code" <> xGeneralLedgerSetup."Shortcut Dimension 3 Code") or
+          (Rec."Shortcut Dimension 4 Code" <> xGeneralLedgerSetup."Shortcut Dimension 4 Code") or
+          (Rec."Shortcut Dimension 5 Code" <> xGeneralLedgerSetup."Shortcut Dimension 5 Code") or
+          (Rec."Shortcut Dimension 6 Code" <> xGeneralLedgerSetup."Shortcut Dimension 6 Code") or
+          (Rec."Shortcut Dimension 7 Code" <> xGeneralLedgerSetup."Shortcut Dimension 7 Code") or
+          (Rec."Shortcut Dimension 8 Code" <> xGeneralLedgerSetup."Shortcut Dimension 8 Code"));
     end;
 }
 

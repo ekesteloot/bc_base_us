@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Foundation.Enums;
+
 page 156 "Vendor Purchases"
 {
     Caption = 'Vendor Purchases';

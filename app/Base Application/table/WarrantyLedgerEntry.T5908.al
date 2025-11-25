@@ -1,3 +1,17 @@
+namespace Microsoft.ServiceMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Pricing;
+
 table 5908 "Warranty Ledger Entry"
 {
     Caption = 'Warranty Ledger Entry';
@@ -26,7 +40,7 @@ table 5908 "Warranty Ledger Entry"
         field(6; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Customer No."));
         }
         field(7; "Bill-to Customer No."; Code[20])
         {
@@ -36,7 +50,7 @@ table 5908 "Warranty Ledger Entry"
         field(8; "Variant Code (Serviced)"; Code[10])
         {
             Caption = 'Variant Code (Serviced)';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No. (Serviced)"));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No. (Serviced)"));
         }
         field(9; "Service Item No. (Serviced)"; Code[20])
         {
@@ -70,7 +84,7 @@ table 5908 "Warranty Ledger Entry"
         field(14; "Service Contract No."; Code[20])
         {
             Caption = 'Service Contract No.';
-            TableRelation = "Service Contract Header"."Contract No." WHERE("Contract Type" = CONST(Contract));
+            TableRelation = "Service Contract Header"."Contract No." where("Contract Type" = const(Contract));
         }
         field(15; "Fault Reason Code"; Code[10])
         {
@@ -85,8 +99,8 @@ table 5908 "Warranty Ledger Entry"
         field(17; "Fault Code"; Code[10])
         {
             Caption = 'Fault Code';
-            TableRelation = "Fault Code".Code WHERE("Fault Area Code" = FIELD("Fault Area Code"),
-                                                     "Symptom Code" = FIELD("Symptom Code"));
+            TableRelation = "Fault Code".Code where("Fault Area Code" = field("Fault Area Code"),
+                                                     "Symptom Code" = field("Symptom Code"));
         }
         field(18; "Symptom Code"; Code[10])
         {
@@ -107,13 +121,13 @@ table 5908 "Warranty Ledger Entry"
         field(21; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(" ")) "Standard Text"
-            ELSE
-            IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST("Cost")) "Service Cost";
+            TableRelation = if (Type = const(" ")) "Standard Text"
+            else
+            if (Type = const(Item)) Item
+            else
+            if (Type = const(Resource)) Resource
+            else
+            if (Type = const("Cost")) "Service Cost";
         }
         field(22; Quantity; Decimal)
         {
@@ -128,8 +142,8 @@ table 5908 "Warranty Ledger Entry"
         field(25; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
             "Unit of Measure";
         }
         field(26; Amount; Decimal)
@@ -155,13 +169,13 @@ table 5908 "Warranty Ledger Entry"
         {
             CaptionClass = '1,2,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(32; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(33; Open; Boolean)
         {
@@ -179,7 +193,7 @@ table 5908 "Warranty Ledger Entry"
         field(38; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(39; "Service Order Line No."; Integer)
         {
@@ -193,7 +207,7 @@ table 5908 "Warranty Ledger Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])

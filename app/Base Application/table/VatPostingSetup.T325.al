@@ -1,4 +1,11 @@
-﻿table 325 "VAT Posting Setup"
+﻿namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+
+table 325 "VAT Posting Setup"
 {
     Caption = 'VAT Posting Setup';
     DrillDownPageID = "VAT Posting Setup";

@@ -8,7 +8,7 @@ report 10121 "Purchase Invoice NA"
     {
         dataitem("Purch. Inv. Header"; "Purch. Inv. Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Buy-from Vendor No.", "Pay-to Vendor No.", "No. Printed";
             column(No_PurchInvHeader; "No.")
@@ -16,10 +16,10 @@ report 10121 "Purchase Invoice NA"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyAddress1; CompanyAddress[1])
                     {
                     }
@@ -184,9 +184,9 @@ report 10121 "Purchase Invoice NA"
                     }
                     dataitem("Purch. Inv. Line"; "Purch. Inv. Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Purch. Inv. Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(AmountExclInvDisc; AmountExclInvDisc)
                         {
                         }
@@ -354,6 +354,7 @@ report 10121 "Purchase Invoice NA"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Purchaser Code" = '' then
                     Clear(SalesPurchPerson)
@@ -563,7 +564,6 @@ report 10121 "Purchase Invoice NA"
         Text007: Label 'Total Tax:';
         Text008: Label 'Tax:';
         Text009: Label 'VOID INVOICE';
-        [InDataSet]
         LogInteractionEnable: Boolean;
         ToCaptionLbl: Label 'To:';
         ReceiveByCaptionLbl: Label 'Receive By';

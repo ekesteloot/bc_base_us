@@ -1,3 +1,5 @@
+namespace System.Utilities;
+
 page 700 "Error Messages"
 {
     Caption = 'Error Messages';
@@ -9,8 +11,8 @@ page 700 "Error Messages"
     PageType = List;
     SourceTable = "Error Message";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Message Type", ID)
-                      ORDER(Ascending);
+    SourceTableView = sorting("Message Type", ID)
+                      order(Ascending);
 
     layout
     {
@@ -37,11 +39,15 @@ page 700 "Error Messages"
                     Caption = 'Context';
                     ToolTip = 'Specifies the context record.';
                     trigger OnDrillDown()
+#if not CLEAN23
                     var
                         IsHandled: Boolean;
+#endif
                     begin
+#if not CLEAN23
                         OnDrillDownSource(Rec, Rec.FieldNo("Context Record ID"), IsHandled);
                         if not IsHandled then
+#endif
                             Rec.HandleDrillDown(Rec.FieldNo("Context Record ID"));
                     end;
                 }
@@ -59,11 +65,15 @@ page 700 "Error Messages"
                     ToolTip = 'Specifies the record source of the error.';
 
                     trigger OnDrillDown()
+#if not CLEAN23
                     var
                         IsHandled: Boolean;
+#endif
                     begin
+#if not CLEAN23
                         OnDrillDownSource(Rec, Rec.FieldNo("Record ID"), IsHandled);
                         if not IsHandled then
+#endif
                             Rec.HandleDrillDown(Rec.FieldNo("Record ID"));
                     end;
                 }
@@ -94,7 +104,7 @@ page 700 "Error Messages"
 
                     trigger OnDrillDown()
                     begin
-                        ShowErrorCallStack();
+                        Rec.ShowErrorCallStack();
                     end;
                 }
                 field(TimeOfError; Rec."Created On")
@@ -125,7 +135,7 @@ page 700 "Error Messages"
                 begin
                     OnOpenRelatedRecord(Rec, IsHandled);
                     if not IsHandled then
-                        PageManagement.PageRun("Record ID");
+                        PageManagement.PageRun(Rec."Record ID");
                 end;
             }
         }
@@ -155,7 +165,6 @@ page 700 "Error Messages"
 
     var
         PageManagement: Codeunit "Page Management";
-        [InDataSet]
         StyleText: Text[20];
         CallStack: Text;
         EnableOpenRelatedEntity: Boolean;
@@ -164,7 +173,7 @@ page 700 "Error Messages"
     begin
         if TempErrorMessage.FindFirst() then;
         if TempErrorMessage.IsTemporary then
-            Copy(TempErrorMessage, true)
+            Rec.Copy(TempErrorMessage, true)
         else
             TempErrorMessage.CopyToTemp(Rec);
     end;
@@ -184,14 +193,17 @@ page 700 "Error Messages"
     var
         RecID: RecordID;
     begin
-        RecID := "Record ID";
+        RecID := Rec."Record ID";
         EnableOpenRelatedEntity := RecID.TableNo <> 0;
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced with the event OnDrillDownSource in Table 700 "Error Message"', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnDrillDownSource(ErrorMessage: Record "Error Message"; SourceFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnOpenRelatedRecord(ErrorMessage: Record "Error Message"; var IsHandled: Boolean)

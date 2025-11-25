@@ -1,12 +1,32 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.AssemblyMgt.History;
+using Microsoft.AssemblyMgt.Posting;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+
 page 900 "Assembly Order"
 {
     Caption = 'Assembly Order';
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Assembly Header";
-    SourceTableView = SORTING("Document Type", "No.")
+    SourceTableView = sorting("Document Type", "No.")
                       ORDER(Ascending)
-                      WHERE("Document Type" = CONST(Order));
+                      where("Document Type" = const(Order));
 
     layout
     {
@@ -23,7 +43,7 @@ page 900 "Assembly Order"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -33,7 +53,7 @@ page 900 "Assembly Order"
                     Editable = IsAsmToOrderEditable;
                     Importance = Promoted;
                     ShowMandatory = true;
-                    TableRelation = Item."No." WHERE("Assembly BOM" = CONST(true));
+                    TableRelation = Item."No." where("Assembly BOM" = const(true));
                     ToolTip = 'Specifies the number of the item that is being assembled with the assembly order.';
 
                     trigger OnValidate()
@@ -45,6 +65,12 @@ page 900 "Assembly Order"
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the description of the assembly item.';
+                }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Assembly;
+                    ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
                 }
                 group(Control33)
                 {
@@ -138,7 +164,7 @@ page 900 "Assembly Order"
 
                     trigger OnDrillDown()
                     begin
-                        ShowAsmToOrder();
+                        Rec.ShowAsmToOrder();
                     end;
                 }
                 field(Status; Rec.Status)
@@ -151,8 +177,8 @@ page 900 "Assembly Order"
             {
                 ApplicationArea = Assembly;
                 Caption = 'Lines';
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("No.");
                 UpdatePropagation = Both;
             }
             group(Posting)
@@ -246,21 +272,21 @@ page 900 "Assembly Order"
             part(Control11; "Assembly Item - Details")
             {
                 ApplicationArea = Assembly;
-                SubPageLink = "No." = FIELD("Item No.");
+                SubPageLink = "No." = field("Item No.");
             }
             part(Control44; "Component - Item FactBox")
             {
                 ApplicationArea = Assembly;
                 Provider = Lines;
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("Document No."),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("Document No."),
+                              "Line No." = field("Line No.");
             }
             part(Control43; "Component - Resource Details")
             {
                 ApplicationArea = Assembly;
                 Provider = Lines;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             systempart(Control8; Links)
             {
@@ -367,7 +393,7 @@ page 900 "Assembly Order"
 
                     trigger OnAction()
                     begin
-                        ShowAssemblyList();
+                        Rec.ShowAssemblyList();
                     end;
                 }
                 action(Dimensions)
@@ -381,7 +407,7 @@ page 900 "Assembly Order"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item Tracking Lines")
@@ -394,7 +420,7 @@ page 900 "Assembly Order"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
                 action("Co&mments")
@@ -403,9 +429,9 @@ page 900 "Assembly Order"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Assembly Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "Document No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "Document No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -424,7 +450,7 @@ page 900 "Assembly Order"
 
                     trigger OnAction()
                     begin
-                        ShowStatistics();
+                        Rec.ShowStatistics();
                     end;
                 }
             }
@@ -438,10 +464,10 @@ page 900 "Assembly Order"
                     Caption = 'Pick Lines/Movement Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Source Type" = CONST(901),
-                                  "Source Subtype" = CONST("1"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.", "Unit of Measure Code", "Action Type", "Breakbulk No.", "Original Breakbulk");
+                    RunPageLink = "Source Type" = const(901),
+                                  "Source Subtype" = const("1"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.", "Unit of Measure Code", "Action Type", "Breakbulk No.", "Original Breakbulk");
                     ToolTip = 'View the related picks or movements.';
                 }
                 action("Registered P&ick Lines")
@@ -450,10 +476,10 @@ page 900 "Assembly Order"
                     Caption = 'Registered P&ick Lines';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Act.-Lines";
-                    RunPageLink = "Source Type" = CONST(901),
-                                  "Source Subtype" = CONST("1"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+                    RunPageLink = "Source Type" = const(901),
+                                  "Source Subtype" = const("1"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
                     ToolTip = 'View the list of warehouse picks that have been made for the order.';
                 }
                 action("Registered Invt. Movement Lines")
@@ -462,10 +488,10 @@ page 900 "Assembly Order"
                     Caption = 'Registered Invt. Movement Lines';
                     Image = RegisteredDocs;
                     RunObject = Page "Reg. Invt. Movement Lines";
-                    RunPageLink = "Source Type" = CONST(901),
-                                  "Source Subtype" = CONST("1"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+                    RunPageLink = "Source Type" = const(901),
+                                  "Source Subtype" = const("1"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
                     ToolTip = 'View the list of inventory movements that have been made for the order.';
                 }
                 action("Asm.-to-Order Whse. Shpt. Line")
@@ -487,10 +513,10 @@ page 900 "Assembly Order"
                         if IsHandled then
                             exit;
 
-                        TestField("Assemble to Order", true);
-                        ATOLink.Get("Document Type", "No.");
+                        Rec.TestField("Assemble to Order", true);
+                        ATOLink.Get(Rec."Document Type", Rec."No.");
                         WhseShptLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Assemble to Order");
-                        WhseShptLine.SetRange("Source Type", DATABASE::"Sales Line");
+                        WhseShptLine.SetRange("Source Type", Enum::TableID::"Sales Line");
                         WhseShptLine.SetRange("Source Subtype", ATOLink."Document Type");
                         WhseShptLine.SetRange("Source No.", ATOLink."Document No.");
                         WhseShptLine.SetRange("Source Line No.", ATOLink."Document Line No.");
@@ -513,9 +539,9 @@ page 900 "Assembly Order"
                         Caption = 'Item Ledger Entries';
                         Image = ItemLedger;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Assembly),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Assembly),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ShortCutKey = 'Ctrl+F7';
                         ToolTip = 'View the item ledger entries of the item on the document or journal line.';
                     }
@@ -525,9 +551,9 @@ page 900 "Assembly Order"
                         Caption = 'Capacity Ledger Entries';
                         Image = CapacityLedger;
                         RunObject = Page "Capacity Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Assembly),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Assembly),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                     }
                     action("Resource Ledger Entries")
@@ -536,9 +562,9 @@ page 900 "Assembly Order"
                         Caption = 'Resource Ledger Entries';
                         Image = ResourceLedger;
                         RunObject = Page "Resource Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Assembly),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Assembly),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the ledger entries for the resource.';
                     }
                     action("Value Entries")
@@ -547,9 +573,9 @@ page 900 "Assembly Order"
                         Caption = 'Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Order Type" = CONST(Assembly),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Assembly),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the value entries of the item on the document or journal line.';
                     }
                     action("Warehouse Entries")
@@ -558,10 +584,10 @@ page 900 "Assembly Order"
                         Caption = 'Warehouse Entries';
                         Image = BinLedger;
                         RunObject = Page "Warehouse Entries";
-                        RunPageLink = "Source Type" = FILTER(83 | 901),
-                                      "Source Subtype" = FILTER("1" | "6"),
-                                      "Source No." = FIELD("No.");
-                        RunPageView = SORTING("Source Type", "Source Subtype", "Source No.");
+                        RunPageLink = "Source Type" = filter(83 | 901),
+                                      "Source Subtype" = filter("1" | "6"),
+                                      "Source No." = field("No.");
+                        RunPageView = sorting("Source Type", "Source Subtype", "Source No.");
                         ToolTip = 'View completed warehouse activities related to the document.';
                     }
                     action("Reservation Entries")
@@ -574,7 +600,7 @@ page 900 "Assembly Order"
 
                         trigger OnAction()
                         begin
-                            ShowReservationEntries(true);
+                            Rec.ShowReservationEntries(true);
                         end;
                     }
                 }
@@ -584,8 +610,8 @@ page 900 "Assembly Order"
                     Caption = 'Posted Assembly Orders';
                     Image = PostedOrder;
                     RunObject = Page "Posted Assembly Orders";
-                    RunPageLink = "Order No." = FIELD("No.");
-                    RunPageView = SORTING("Order No.");
+                    RunPageLink = "Order No." = field("No.");
+                    RunPageView = sorting("Order No.");
                     ToolTip = 'View completed assembly orders.';
                 }
             }
@@ -643,7 +669,7 @@ page 900 "Assembly Order"
 
                     trigger OnAction()
                     begin
-                        ShowAvailability();
+                        Rec.ShowAvailability();
                     end;
                 }
                 action("Refresh availability warnings")
@@ -668,7 +694,7 @@ page 900 "Assembly Order"
 
                     trigger OnAction()
                     begin
-                        UpdateUnitCost();
+                        Rec.UpdateUnitCost();
                     end;
                 }
                 action("Refresh Lines")
@@ -695,7 +721,7 @@ page 900 "Assembly Order"
 
                     trigger OnAction()
                     begin
-                        ShowReservation();
+                        Rec.ShowReservation();
                     end;
                 }
                 action("Copy Document")
@@ -711,7 +737,7 @@ page 900 "Assembly Order"
                     begin
                         CopyAssemblyDocument.SetAssemblyHeader(Rec);
                         CopyAssemblyDocument.RunModal();
-                        if Get("Document Type", "No.") then;
+                        if Rec.Get(Rec."Document Type", Rec."No.") then;
                     end;
                 }
                 separator(Action53)
@@ -736,7 +762,7 @@ page 900 "Assembly Order"
                         TotalATOMovementsToBeCreated: Integer;
                     begin
                         Rec.PerformManualRelease();
-                        CreateInvtMovement(false, false, false, ATOMovementsCreated, TotalATOMovementsToBeCreated);
+                        Rec.CreateInvtMovement(false, false, false, ATOMovementsCreated, TotalATOMovementsToBeCreated);
                     end;
                 }
                 action("Create Warehouse Pick")
@@ -750,7 +776,7 @@ page 900 "Assembly Order"
                     trigger OnAction()
                     begin
                         Rec.PerformManualRelease();
-                        CreatePick(true, UserId, 0, false, false, false);
+                        Rec.CreatePick(true, UserId, 0, false, false, false);
                     end;
                 }
                 action("Order &Tracking")
@@ -762,7 +788,7 @@ page 900 "Assembly Order"
 
                     trigger OnAction()
                     begin
-                        ShowTracking();
+                        Rec.ShowTracking();
                     end;
                 }
             }
@@ -974,10 +1000,10 @@ page 900 "Assembly Order"
     var
         Item: Record "Item";
     begin
-        IsUnitCostEditable := not IsStandardCostItem();
-        IsAsmToOrderEditable := not IsAsmToOrder();
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(true, "Item No.");
+        IsUnitCostEditable := not Rec.IsStandardCostItem();
+        IsAsmToOrderEditable := not Rec.IsAsmToOrder();
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(true, Rec."Item No.");
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -985,8 +1011,8 @@ page 900 "Assembly Order"
         AssemblyHeaderReserve: Codeunit "Assembly Header-Reserve";
     begin
         OnBeforeDeleteRecord(Rec);
-        TestField("Assemble to Order", false);
-        if (Quantity <> 0) and ItemExists("Item No.") then begin
+        Rec.TestField("Assemble to Order", false);
+        if (Rec.Quantity <> 0) and Rec.ItemExists(Rec."Item No.") then begin
             Commit();
             if not AssemblyHeaderReserve.DeleteLineConfirm(Rec) then
                 exit(false);
@@ -1006,9 +1032,7 @@ page 900 "Assembly Order"
         VariantCodeMandatory: Boolean;
 
     protected var
-        [InDataSet]
         IsUnitCostEditable: Boolean;
-        [InDataSet]
         IsAsmToOrderEditable: Boolean;
 
     local procedure ShowPreview()

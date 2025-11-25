@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Comment;
+
 page 5751 "Inventory Comment List"
 {
     Caption = 'Comment List';
@@ -19,12 +21,12 @@ page 5751 "Inventory Comment List"
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies when the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the actual comment text.';

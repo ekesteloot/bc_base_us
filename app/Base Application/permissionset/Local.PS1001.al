@@ -16,11 +16,6 @@
                   tabledata "ACH US Header" = RIMD,
                   tabledata "B10 Adjustment" = RIMD,
                   tabledata "Bank Comment Line" = RIMD,
-#if not CLEAN21
-                  tabledata "Bank Rec. Header" = RIMD,
-                  tabledata "Bank Rec. Line" = RIMD,
-                  tabledata "Bank Rec. Sub-line" = RIMD,
-#endif
                   tabledata "CFDI Cancellation Reason" = RIMD,
                   tabledata "CFDI Export Code" = RIMD,
                   tabledata "CFDI Subject to Tax" = RIMD,
@@ -29,9 +24,6 @@
                   tabledata "CFDI Transport Operator" = RIMD,
                   tabledata "Credit Manager Cue" = RIMD,
                   tabledata "Data Dictionary Info" = RIMD,
-#if not CLEAN21
-                  tabledata "Deposit Header" = RIMD,
-#endif
                   tabledata "Document Header" = RIMD,
                   tabledata "Document Line" = RIMD,
                   tabledata "EFT Export" = RIMD,

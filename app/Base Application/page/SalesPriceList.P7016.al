@@ -1,10 +1,21 @@
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Pricing;
+
 page 7016 "Sales Price List"
 {
     Caption = 'Sales Price List';
     PageType = ListPlus;
     RefreshOnActivate = true;
     SourceTable = "Price List Header";
-    SourceTableView = WHERE("Price Type" = CONST(Sale));
+    SourceTableView = where("Price Type" = const(Sale));
 
     layout
     {
@@ -266,7 +277,7 @@ page 7016 "Sales Price List"
             {
                 ApplicationArea = Basic, Suite;
                 Editable = PriceListIsEditable;
-                SubPageLink = "Price List Code" = FIELD(Code);
+                SubPageLink = "Price List Code" = field(Code);
             }
         }
         area(factboxes)
@@ -492,6 +503,7 @@ page 7016 "Sales Price List"
         FeaturePriceCalculation.FailIfFeatureDisabled();
     end;
 #endif
+
     trigger OnOpenPage()
     var
         IntegrationTableMapping: Record "Integration Table Mapping";
@@ -563,7 +575,14 @@ page 7016 "Sales Price List"
     trigger OnQueryClosePage(CloseAction: Action): Boolean;
     var
         PriceListManagement: Codeunit "Price List Management";
+        IsHandled: Boolean;
+        Result: Boolean;
     begin
+        IsHandled := false;
+        OnQueryClosePageOnBeforeDraftLineCheck(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if Rec.Find() then
             if Rec.HasDraftLines() then begin
                 PriceListManagement.SendVerifyLinesNotification(Rec);
@@ -613,37 +632,27 @@ page 7016 "Sales Price List"
         PriceUXManagement: Codeunit "Price UX Management";
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
-        [InDataSet]
         CRMIntegrationAllowed: Boolean;
-        [InDataSet]
         CRMIntegrationEnabled: Boolean;
-        [InDataSet]
         CRMIsCoupledToRecord: Boolean;
         StatusActiveFilterApplied: Boolean;
         AllowUpdatingDefaultsFilterApplied: Boolean;
         JobSourceType: Enum "Job Price Source Type";
         SourceType: Enum "Sales Price Source Type";
         ViewAmountType: Enum "Price Amount Type";
-        [InDataSet]
+
+    protected var
         CodeIsEditable: Boolean;
-        [InDataSet]
         IsJobGroup: Boolean;
-        [InDataSet]
         ParentSourceNoEnabled: Boolean;
-        [InDataSet]
         ParentSourceNoVisible: Boolean;
-        [InDataSet]
         SourceNoEnabled: Boolean;
-        [InDataSet]
         PriceListIsEditable: Boolean;
-        [InDataSet]
         CopyLinesEnabled: Boolean;
-        [InDataSet]
         ViewGroupIsVisible: Boolean;
-        [InDataSet]
         UseCustomLookup: Boolean;
 
-    local procedure SetSourceNoEnabled()
+    protected procedure SetSourceNoEnabled()
     var
         PriceSource: Record "Price Source";
     begin
@@ -653,9 +662,9 @@ page 7016 "Sales Price List"
         ParentSourceNoVisible := ParentSourceNoEnabled and not UseCustomLookup;
     end;
 
-    local procedure ValidateSourceType(SourceType: Integer)
+    protected procedure ValidateSourceType(SourceType2: Integer)
     begin
-        Rec.Validate("Source Type", SourceType);
+        Rec.Validate("Source Type", SourceType2);
         SetSourceNoEnabled();
         CurrPage.SaveRecord();
     end;
@@ -667,6 +676,11 @@ page 7016 "Sales Price List"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterGetDefaultSourceType(PriceSourceGroup: Enum "Price Source Group"; var DefaultPriceSourceType: Enum "Price Source Type")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnQueryClosePageOnBeforeDraftLineCheck(PriceListHeader: Record "Price List Header"; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

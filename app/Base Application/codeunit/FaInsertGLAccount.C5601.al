@@ -1,3 +1,13 @@
+﻿namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Maintenance;
+
 codeunit 5601 "FA Insert G/L Account"
 {
     TableNo = "FA Ledger Entry";
@@ -9,12 +19,12 @@ codeunit 5601 "FA Insert G/L Account"
     begin
         Clear(FAGLPostBuf);
         DisposalEntry :=
-          ("FA Posting Category" = "FA Posting Category"::" ") and
-          ("FA Posting Type" = "FA Posting Type"::"Proceeds on Disposal");
+          (Rec."FA Posting Category" = Rec."FA Posting Category"::" ") and
+          (Rec."FA Posting Type" = Rec."FA Posting Type"::"Proceeds on Disposal");
         if not BookValueEntry then
             BookValueEntry :=
-              ("FA Posting Category" = "FA Posting Category"::Disposal) and
-              ("FA Posting Type" = "FA Posting Type"::"Book Value on Disposal");
+              (Rec."FA Posting Category" = Rec."FA Posting Category"::Disposal) and
+              (Rec."FA Posting Type" = Rec."FA Posting Type"::"Book Value on Disposal");
 
         IsHandled := false;
         OnBeforeFAInsertGLAccount(
@@ -25,20 +35,20 @@ codeunit 5601 "FA Insert G/L Account"
 
         if not DisposalEntry then
             FAGLPostBuf."Account No." := FAGetGLAccNo.GetAccNo(Rec);
-        FAGLPostBuf.Amount := Amount;
-        FAGLPostBuf.Correction := Correction;
-        FAGLPostBuf."Global Dimension 1 Code" := "Global Dimension 1 Code";
-        FAGLPostBuf."Global Dimension 2 Code" := "Global Dimension 2 Code";
-        FAGLPostBuf."Dimension Set ID" := "Dimension Set ID";
-        FAGLPostBuf."FA Entry No." := "Entry No.";
+        FAGLPostBuf.Amount := Rec.Amount;
+        FAGLPostBuf.Correction := Rec.Correction;
+        FAGLPostBuf."Global Dimension 1 Code" := Rec."Global Dimension 1 Code";
+        FAGLPostBuf."Global Dimension 2 Code" := Rec."Global Dimension 2 Code";
+        FAGLPostBuf."Dimension Set ID" := Rec."Dimension Set ID";
+        FAGLPostBuf."FA Entry No." := Rec."Entry No.";
         OnAfterCopyFAGLPostBufFromFALederEntry(FAGLPostBuf, Rec);
 
-        if "Entry No." > 0 then
+        if Rec."Entry No." > 0 then
             FAGLPostBuf."FA Entry Type" := FAGLPostBuf."FA Entry Type"::"Fixed Asset";
-        FAGLPostBuf."Automatic Entry" := "Automatic Entry";
-        GLEntryNo := "G/L Entry No.";
+        FAGLPostBuf."Automatic Entry" := Rec."Automatic Entry";
+        GLEntryNo := Rec."G/L Entry No.";
         InsertBufferEntry();
-        "G/L Entry No." := TempFAGLPostBuf."Entry No.";
+        Rec."G/L Entry No." := TempFAGLPostBuf."Entry No.";
         if DisposalEntry then
             CalcDisposalAmount(Rec);
 
@@ -215,7 +225,7 @@ codeunit 5601 "FA Insert G/L Account"
         OnAfterInsertBalAcc(FALedgEntry);
     end;
 
-    local procedure GetPostingType(var FALedgEntry: Record "FA Ledger Entry"): Enum "FA Posting Group Account Type"
+    procedure GetPostingType(var FALedgEntry: Record "FA Ledger Entry"): Enum "FA Posting Group Account Type"
     var
         FAPostingGroupAccountType: Enum "FA Posting Group Account Type";
         IsHandled: Boolean;
@@ -307,7 +317,7 @@ codeunit 5601 "FA Insert G/L Account"
         if IsHandled then
             exit;
 
-        GenJnlLine.TestField("Account Type", "Gen. Journal Account Type"::"Fixed Asset");
+        GenJnlLine.TestField("Account Type", Enum::"Gen. Journal Account Type"::"Fixed Asset");
     end;
 
     procedure GetBalAccBuffer(var GenJnlLine: Record "Gen. Journal Line"): Integer
@@ -859,12 +869,25 @@ codeunit 5601 "FA Insert G/L Account"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertBufferBalAccOnAfterInsertBufferEntryFromFAAllocAcc(FAAllocation: Record "FA Allocation"; var TempFAGLPostBuf: Record "FA G/L Posting Buffer" temporary; FAPostingType: Enum "FA Posting Group Account Type"; DeprBookCode: Code[10]; PostingGrCode: Code[20]; NewAmount: Decimal; AutomaticEntry: Boolean; Correction: Boolean; var NumberOfEntries: Integer; OrgGenJnlLine: Boolean; NetDisp: Boolean)
+    local procedure OnInsertBufferBalAccOnAfterInsertBufferEntryFromFAAllocAcc(FAAllocation: Record "FA Allocation"; var TempFAGLPostBuf: Record "FA G/L Posting Buffer" temporary; FAPostingType: Enum "FA Posting Group Account Type"; DeprBookCode: Code[10];
+                                                                                                                                                                                                       PostingGrCode: Code[20];
+                                                                                                                                                                                                       NewAmount: Decimal;
+                                                                                                                                                                                                       AutomaticEntry: Boolean;
+                                                                                                                                                                                                       Correction: Boolean; var NumberOfEntries: Integer; OrgGenJnlLine: Boolean; NetDisp: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertBufferBalAccOnAfterInsertBufferEntryFromFAPostingGrAcc(FAAllocation: Record "FA Allocation"; var TempFAGLPostBuf: Record "FA G/L Posting Buffer" temporary; FAPostingType: Enum "FA Posting Group Account Type"; DeprBookCode: Code[10]; PostingGrCode: Code[20]; AllocAmount: Decimal; TotalAllocAmount: Decimal; GLAccNo: Code[20]; GlobalDim1Code: Code[20]; GlobalDim2Code: Code[20]; DimSetID: Integer; AutomaticEntry: Boolean; Correction: Boolean; var NumberOfEntries: Integer; OrgGenJnlLine: Boolean; NetDisp: Boolean)
+    local procedure OnInsertBufferBalAccOnAfterInsertBufferEntryFromFAPostingGrAcc(FAAllocation: Record "FA Allocation"; var TempFAGLPostBuf: Record "FA G/L Posting Buffer" temporary; FAPostingType: Enum "FA Posting Group Account Type"; DeprBookCode: Code[10];
+                                                                                                                                                                                                           PostingGrCode: Code[20];
+                                                                                                                                                                                                           AllocAmount: Decimal;
+                                                                                                                                                                                                           TotalAllocAmount: Decimal;
+                                                                                                                                                                                                           GLAccNo: Code[20];
+                                                                                                                                                                                                           GlobalDim1Code: Code[20];
+                                                                                                                                                                                                           GlobalDim2Code: Code[20];
+                                                                                                                                                                                                           DimSetID: Integer;
+                                                                                                                                                                                                           AutomaticEntry: Boolean;
+                                                                                                                                                                                                           Correction: Boolean; var NumberOfEntries: Integer; OrgGenJnlLine: Boolean; NetDisp: Boolean)
     begin
     end;
 

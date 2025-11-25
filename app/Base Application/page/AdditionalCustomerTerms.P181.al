@@ -24,7 +24,7 @@ page 181 "Additional Customer Terms"
 
                     trigger OnDrillDown()
                     begin
-                        ShowEULA();
+                        Rec.ShowEULA();
                     end;
                 }
                 label(Control3)
@@ -33,7 +33,7 @@ page 181 "Additional Customer Terms"
                     CaptionClass = ConfirmationForAcceptingLicenseTermsQst;
                     ShowCaption = false;
                 }
-                field(Accepted; Accepted)
+                field(Accepted; Rec.Accepted)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the license agreement was accepted.';
@@ -67,7 +67,7 @@ page 181 "Additional Customer Terms"
 
                 trigger OnAction()
                 begin
-                    ShowEULA();
+                    Rec.ShowEULA();
                 end;
             }
             action("&Accept the Additional Customer Terms")
@@ -79,7 +79,7 @@ page 181 "Additional Customer Terms"
 
                 trigger OnAction()
                 begin
-                    Validate(Accepted, true);
+                    Rec.Validate(Accepted, true);
                     CurrPage.Update();
                 end;
             }

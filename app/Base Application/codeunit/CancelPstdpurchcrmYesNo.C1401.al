@@ -1,7 +1,9 @@
+namespace Microsoft.Purchases.History;
+
 codeunit 1401 "Cancel PstdPurchCrM (Yes/No)"
 {
-    Permissions = TableData "Sales Invoice Header" = rm,
-                  TableData "Sales Cr.Memo Header" = rm;
+    Permissions = TableData "Purch. Inv. Header" = rm,
+                  TableData "Purch. Cr. Memo Hdr." = rm;
     TableNo = "Purch. Cr. Memo Hdr.";
 
     trigger OnRun()

@@ -1,3 +1,17 @@
+﻿namespace Microsoft.Foundation.Company;
+
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 table 79 "Company Information"
 {
     Caption = 'Company Information';
@@ -27,11 +41,9 @@ table 79 "Company Information"
         field(6; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -149,11 +161,9 @@ table 79 "Company Information"
         field(26; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -174,7 +184,7 @@ table 79 "Company Information"
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(29; Picture; BLOB)
         {
@@ -189,11 +199,9 @@ table 79 "Company Information"
         field(30; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".Code
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".Code WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".Code
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".Code where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -219,11 +227,9 @@ table 79 "Company Information"
         field(32; "Ship-to Post Code"; Code[20])
         {
             Caption = 'Ship-to Post Code';
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code".Code
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code".Code WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".Code
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".Code where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -303,18 +309,8 @@ table 79 "Company Information"
             AccessByPermission = TableData "IC G/L Account" = R;
             Caption = 'IC Partner Code';
             ObsoleteReason = 'Replaced by the same field from "IC Setup" table.';
-#if CLEAN20
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-
-            trigger OnValidate()
-            begin
-                UpdateICSetup();
-            end;
-#endif
         }
         field(42; "IC Inbox Type"; Option)
         {
@@ -324,58 +320,24 @@ table 79 "Company Information"
             OptionCaption = 'File Location,Database';
             OptionMembers = "File Location",Database;
             ObsoleteReason = 'Replaced by the same field from "IC Setup" table.';
-#if CLEAN20
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-
-            trigger OnValidate()
-            begin
-                if "IC Inbox Type" = "IC Inbox Type"::Database then
-                    "IC Inbox Details" := '';
-                UpdateICSetup();
-            end;
-#endif
         }
         field(43; "IC Inbox Details"; Text[250])
         {
             AccessByPermission = TableData "IC G/L Account" = R;
             Caption = 'IC Inbox Details';
             ObsoleteReason = 'Replaced by the same field from "IC Setup" table.';
-#if not CLEAN20
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#endif
-
-#if not CLEAN20
-            trigger OnValidate()
-            begin
-                UpdateICSetup();
-            end;
-#endif
         }
         field(44; "Auto. Send Transactions"; Boolean)
         {
             AccessByPermission = TableData "IC G/L Account" = R;
             Caption = 'Auto. Send Transactions';
             ObsoleteReason = 'Replaced by the same field from "IC Setup" table.';
-#if CLEAN20
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-
-            trigger OnValidate()
-            begin
-                UpdateICSetup();
-            end;
-#endif
         }
         field(46; "System Indicator"; Option)
         {
@@ -546,7 +508,7 @@ table 79 "Company Information"
         field(10021; "Provincial Tax Area Code"; Code[20])
         {
             Caption = 'Provincial Tax Area Code';
-            TableRelation = "Tax Area" WHERE("Country/Region" = CONST(CA));
+            TableRelation = "Tax Area" where("Country/Region" = const(CA));
         }
         field(10022; "Software Identification Code"; Code[10])
         {
@@ -829,25 +791,31 @@ table 79 "Company Information"
         exit(FieldCaption("VAT Registration No."));
     end;
 
+#if not CLEAN23
+    [Obsolete('The procedure is not used and will be obsoleted', '23.0')]
     procedure GetLegalOffice(): Text
     begin
         exit('');
     end;
 
+    [Obsolete('The procedure is not used and will be obsoleted', '23.0')]
     procedure GetLegalOfficeLbl(): Text
     begin
         exit('');
     end;
 
+    [Obsolete('The procedure is not used and will be obsoleted', '23.0')]
     procedure GetCustomGiro(): Text
     begin
         exit('');
     end;
 
+    [Obsolete('The procedure is not used and will be obsoleted', '23.0')]
     procedure GetCustomGiroLbl(): Text
     begin
         exit('');
     end;
+#endif
 
     procedure GetRecordOnce()
     begin
@@ -962,14 +930,6 @@ table 79 "Company Information"
         exit('');
     end;
 
-#if not CLEAN20
-    [Obsolete('The functionality is deprecated, the method will be deleted.', '20.0')]
-    procedure IsSyncEnabledForOtherCompany() SyncEnabled: Boolean
-    begin
-        exit(false);
-    end;
-#endif
-
     local procedure SetBrandColorValue()
     var
         O365BrandColor: Record "O365 Brand Color";
@@ -980,26 +940,6 @@ table 79 "Company Information"
         end else
             "Brand Color Value" := '';
     end;
-
-#if not CLEAN20
-    local procedure UpdateICSetup()
-    var
-        ICSetup: Record "IC Setup";
-    begin
-        if not ICSetup.Get() then
-            exit;
-
-        if Rec."IC Partner Code" <> xRec."IC Partner Code" then
-            ICSetup."IC Partner Code" := Rec."IC Partner Code";
-        if Rec."IC Inbox Type" <> xRec."IC Inbox Type" then
-            ICSetup."IC Inbox Type" := Rec."IC Inbox Type";
-        if Rec."IC Inbox Details" <> xRec."IC Inbox Details" then
-            ICSetup."IC Inbox Details" := Rec."IC Inbox Details";
-        if Rec."Auto. Send Transactions" <> xRec."Auto. Send Transactions" then
-            ICSetup."Auto. Send Transactions" := Rec."Auto. Send Transactions";
-        ICSetup.Modify();
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetSystemIndicator(var Text: Text[250]; var Style: Option Standard,Accent1,Accent2,Accent3,Accent4,Accent5,Accent6,Accent7,Accent8,Accent9)

@@ -9,7 +9,7 @@ codeunit 84 "Blnkt Sales Ord. to Ord. (Y/N)"
         if IsOnRunHandled(Rec) then
             exit;
 
-        TestField("Document Type", "Document Type"::"Blanket Order");
+        Rec.TestField("Document Type", Rec."Document Type"::"Blanket Order");
         if ShouldExit(Rec) then
             exit;
 
@@ -18,7 +18,7 @@ codeunit 84 "Blnkt Sales Ord. to Ord. (Y/N)"
 
         OnAfterCreateSalesOrder(SalesOrderHeader, SkipMessage);
         if not SkipMessage then
-            Message(OrderCreatedMsg, SalesOrderHeader."No.", "No.");
+            Message(OrderCreatedMsg, SalesOrderHeader."No.", Rec."No.");
     end;
 
     var

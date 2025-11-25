@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.BankAccount;
+
 page 1282 "Payment Bank Account List"
 {
     Caption = 'Payment Bank Account List';
@@ -27,7 +29,7 @@ page 1282 "Payment Bank Account List"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the relevant currency code for the bank account.';
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account''s current balance denominated in the applicable foreign currency.';
@@ -48,7 +50,7 @@ page 1282 "Payment Bank Account List"
 
     trigger OnAfterGetRecord()
     begin
-        Linked := IsLinkedToBankStatementServiceProvider();
+        Linked := Rec.IsLinkedToBankStatementServiceProvider();
     end;
 
     var

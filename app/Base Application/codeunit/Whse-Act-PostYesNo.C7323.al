@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 codeunit 7323 "Whse.-Act.-Post (Yes/No)"
 {
     TableNo = "Warehouse Activity Line";
@@ -7,7 +11,7 @@ codeunit 7323 "Whse.-Act.-Post (Yes/No)"
     begin
         WhseActivLine.Copy(Rec);
         Code();
-        Copy(WhseActivLine);
+        Rec.Copy(WhseActivLine);
     end;
 
     var

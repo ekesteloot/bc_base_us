@@ -1,21 +1,30 @@
+﻿namespace Microsoft.InventoryMgt.Counting.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Item;
+using System.Security.User;
+using System.Utilities;
+
 report 5877 "Phys. Invt. Order - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/PhysInventory/PhysInvtOrderTest.rdlc';
+    RDLCLayout = './InventoryMgt/Counting/Reports/PhysInvtOrderTest.rdlc';
     Caption = 'Phys. Invt. Order - Test';
 
     dataset
     {
         dataitem("Phys. Invt. Order Header"; "Phys. Invt. Order Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             column(Phys__Inventory_Order_Header_No_; "No.")
             {
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(USERID; UserId)
                 {
                 }
@@ -69,7 +78,7 @@ report 5877 "Phys. Invt. Order - Test"
                 }
                 dataitem(HeaderErrorCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -92,9 +101,9 @@ report 5877 "Phys. Invt. Order - Test"
                 }
                 dataitem("Phys. Invt. Order Line"; "Phys. Invt. Order Line")
                 {
-                    DataItemLink = "Document No." = FIELD("No.");
+                    DataItemLink = "Document No." = field("No.");
                     DataItemLinkReference = "Phys. Invt. Order Header";
-                    DataItemTableView = SORTING("Document No.", "Line No.");
+                    DataItemTableView = sorting("Document No.", "Line No.");
                     column(Phys__Inventory_Order_Line__Item_No__; "Item No.")
                     {
                     }
@@ -169,7 +178,7 @@ report 5877 "Phys. Invt. Order - Test"
                     }
                     dataitem(LineDimensionLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -221,7 +230,7 @@ report 5877 "Phys. Invt. Order - Test"
                     }
                     dataitem(LineErrorCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number__Control41; ErrorText[Number])
                         {
                         }
@@ -244,6 +253,9 @@ report 5877 "Phys. Invt. Order - Test"
                     }
 
                     trigger OnAfterGetRecord()
+                    var
+                        ItemVariant: Record "Item Variant";
+                        ItemItemVariantLbl: Label '%1 %2', Comment = '%1 - Item No., %2 - Variant Code';
                     begin
                         OnBeforePhysInvtOrderLineOnAfterGetRecord("Phys. Invt. Order Line", ErrorCounter, ErrorText);
                         LineIsEmpty := EmptyLine();
@@ -255,13 +267,18 @@ report 5877 "Phys. Invt. Order - Test"
 
                             if Item.Get("Item No.") then begin
                                 if Item.Blocked then
-                                    AddError(
-                                      StrSubstNo(
-                                        MustBeForErr,
-                                        Item.FieldCaption(Blocked), false, Item.TableCaption(), "Item No."));
+                                    AddError(StrSubstNo(MustBeForErr, Item.FieldCaption(Blocked), false, Item.TableCaption(), "Item No."));
+
+                                if "Phys. Invt. Order Line"."Variant Code" <> '' then begin
+                                    ItemVariant.SetLoadFields(Blocked);
+                                    if ItemVariant.Get("Phys. Invt. Order Line"."Item No.", "Phys. Invt. Order Line"."Variant Code") then begin
+                                        if ItemVariant.Blocked then
+                                            AddError(StrSubstNo(MustBeForErr, ItemVariant.FieldCaption(Blocked), false, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, "Phys. Invt. Order Line"."Item No.", "Phys. Invt. Order Line"."Variant Code")));
+                                    end else
+                                        AddError(StrSubstNo(DoesNotExistErr, StrSubstNo(ItemItemVariantLbl, "Phys. Invt. Order Line"."Item No.", "Phys. Invt. Order Line"."Variant Code"), ItemVariant.TableCaption()));
+                                end;
                             end else
-                                AddError(
-                                  StrSubstNo(ItemDoesNotExistErr, "Item No."));
+                                AddError(StrSubstNo(DoesNotExistErr, "Item No.", Item.TableCaption()));
 
                             if "Gen. Prod. Posting Group" = '' then
                                 AddError(StrSubstNo(MustBeSpecifiedErr, FieldCaption("Gen. Prod. Posting Group")));
@@ -367,7 +384,7 @@ report 5877 "Phys. Invt. Order - Test"
         FinishedTxt: Label 'Finished';
         NotAllowedDateRangeErr: Label '%1 is not within your allowed range of posting dates.', Comment = '%1 = field caption';
         MustBeForErr: Label '%1 must be %2 for %3 %4.', Comment = '%1 = field caption, %2 = value, %3 = table caption, %4 = field caption';
-        ItemDoesNotExistErr: Label 'Item %1 does not exist.', Comment = '%1 = Item No.';
+        DoesNotExistErr: Label '%2 %1 does not exist.', Comment = '%1 = Entity No., %2 - Table Caption';
         GLSetup: Record "General Ledger Setup";
         UserSetup: Record "User Setup";
         PhysInvtOrderLine: Record "Phys. Invt. Order Line";

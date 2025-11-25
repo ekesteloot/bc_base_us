@@ -14,7 +14,7 @@ page 5210 "Causes of Absence"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a cause of absence code.';

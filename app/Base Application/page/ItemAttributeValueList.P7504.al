@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
+using Microsoft.Foundation.Enums;
+
 page 7504 "Item Attribute Value List"
 {
     Caption = 'Item Attribute Values';
@@ -19,7 +23,7 @@ page 7504 "Item Attribute Value List"
                     ApplicationArea = Basic, Suite;
                     AssistEdit = false;
                     Caption = 'Attribute';
-                    TableRelation = "Item Attribute".Name WHERE(Blocked = CONST(false));
+                    TableRelation = "Item Attribute".Name where(Blocked = const(false));
                     ToolTip = 'Specifies the item attribute.';
 
                     trigger OnValidate()
@@ -34,13 +38,13 @@ page 7504 "Item Attribute Value List"
                             DeleteItemAttributeValueMapping(ItemAttribute.ID);
                         end;
 
-                        if not FindAttributeValue(ItemAttributeValue) then
-                            InsertItemAttributeValue(ItemAttributeValue, Rec);
+                        if not Rec.FindAttributeValue(ItemAttributeValue) then
+                            Rec.InsertItemAttributeValue(ItemAttributeValue, Rec);
 
                         if ItemAttributeValue.Get(ItemAttributeValue."Attribute ID", ItemAttributeValue.ID) then begin
                             ItemAttributeValueMapping.Reset();
                             ItemAttributeValueMapping.Init();
-                            ItemAttributeValueMapping."Table ID" := DATABASE::Item;
+                            ItemAttributeValueMapping."Table ID" := Enum::TableID::Item.AsInteger();
                             ItemAttributeValueMapping."No." := RelatedRecordCode;
                             ItemAttributeValueMapping."Item Attribute ID" := ItemAttributeValue."Attribute ID";
                             ItemAttributeValueMapping."Item Attribute Value ID" := ItemAttributeValue.ID;
@@ -49,12 +53,12 @@ page 7504 "Item Attribute Value List"
                         end;
                     end;
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Value';
-                    TableRelation = IF ("Attribute Type" = CONST(Option)) "Item Attribute Value".Value WHERE("Attribute ID" = FIELD("Attribute ID"),
-                                                                                                            Blocked = CONST(false));
+                    TableRelation = if ("Attribute Type" = const(Option)) "Item Attribute Value".Value where("Attribute ID" = field("Attribute ID"),
+                                                                                                            Blocked = const(false));
                     ToolTip = 'Specifies the value of the item attribute.';
 
                     trigger OnValidate()
@@ -63,10 +67,10 @@ page 7504 "Item Attribute Value List"
                         ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
                         ItemAttribute: Record "Item Attribute";
                     begin
-                        if not FindAttributeValue(ItemAttributeValue) then
-                            InsertItemAttributeValue(ItemAttributeValue, Rec);
+                        if not Rec.FindAttributeValue(ItemAttributeValue) then
+                            Rec.InsertItemAttributeValue(ItemAttributeValue, Rec);
 
-                        ItemAttributeValueMapping.SetRange("Table ID", DATABASE::Item);
+                        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::Item);
                         ItemAttributeValueMapping.SetRange("No.", RelatedRecordCode);
                         ItemAttributeValueMapping.SetRange("Item Attribute ID", ItemAttributeValue."Attribute ID");
                         if ItemAttributeValueMapping.FindFirst() then begin
@@ -76,9 +80,9 @@ page 7504 "Item Attribute Value List"
                             OnAfterItemAttributeValueMappingModify(ItemAttributeValueMapping, Rec);
                         end;
 
-                        ItemAttribute.Get("Attribute ID");
+                        ItemAttribute.Get(Rec."Attribute ID");
                         if ItemAttribute.Type <> ItemAttribute.Type::Option then
-                            if FindAttributeValueFromRecord(ItemAttributeValue, xRec) then
+                            if Rec.FindAttributeValueFromRecord(ItemAttributeValue, xRec) then
                                 if not ItemAttributeValue.HasBeenUsed() then
                                     ItemAttributeValue.Delete();
                     end;
@@ -98,7 +102,7 @@ page 7504 "Item Attribute Value List"
 
     trigger OnDeleteRecord(): Boolean
     begin
-        DeleteItemAttributeValueMapping("Attribute ID");
+        DeleteItemAttributeValueMapping(Rec."Attribute ID");
     end;
 
     trigger OnOpenPage()
@@ -116,7 +120,7 @@ page 7504 "Item Attribute Value List"
         ItemAttributeValue: Record "Item Attribute Value";
     begin
         RelatedRecordCode := ItemNo;
-        ItemAttributeValueMapping.SetRange("Table ID", DATABASE::Item);
+        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::Item);
         ItemAttributeValueMapping.SetRange("No.", ItemNo);
         if ItemAttributeValueMapping.FindSet() then
             repeat
@@ -126,7 +130,7 @@ page 7504 "Item Attribute Value List"
                 TempItemAttributeValue.Insert();
             until ItemAttributeValueMapping.Next() = 0;
 
-        PopulateItemAttributeValueSelection(TempItemAttributeValue, DATABASE::Item, ItemNo);
+        Rec.PopulateItemAttributeValueSelection(TempItemAttributeValue, Enum::TableID::Item.AsInteger(), ItemNo);
     end;
 
     local procedure DeleteItemAttributeValueMapping(AttributeToDeleteID: Integer)
@@ -134,7 +138,7 @@ page 7504 "Item Attribute Value List"
         ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
         ItemAttribute: Record "Item Attribute";
     begin
-        ItemAttributeValueMapping.SetRange("Table ID", DATABASE::Item);
+        ItemAttributeValueMapping.SetRange("Table ID", Enum::TableID::Item);
         ItemAttributeValueMapping.SetRange("No.", RelatedRecordCode);
         ItemAttributeValueMapping.SetRange("Item Attribute ID", AttributeToDeleteID);
         if ItemAttributeValueMapping.FindFirst() then begin

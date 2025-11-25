@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 page 555 "Analysis View Card"
 {
     Caption = 'Analysis View Card';
@@ -11,7 +13,7 @@ page 555 "Analysis View Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the code for this card.';
@@ -75,7 +77,7 @@ page 555 "Analysis View Card"
                     Editable = GLAccountSource;
                     ToolTip = 'Specifies whether to include an update of analysis view budget entries, when updating an analysis view.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -135,7 +137,7 @@ page 555 "Analysis View Card"
                     Caption = 'Filter';
                     Image = "Filter";
                     RunObject = Page "Analysis View Filter";
-                    RunPageLink = "Analysis View Code" = FIELD(Code);
+                    RunPageLink = "Analysis View Code" = field(Code);
                     ToolTip = 'Apply the filter.';
                 }
             }
@@ -159,7 +161,7 @@ page 555 "Analysis View Card"
 
                 trigger OnAction()
                 begin
-                    SetUpdateOnPosting(true);
+                    Rec.SetUpdateOnPosting(true);
                 end;
             }
             action("Disable Update on Posting")
@@ -171,7 +173,7 @@ page 555 "Analysis View Card"
 
                 trigger OnAction()
                 begin
-                    SetUpdateOnPosting(false);
+                    Rec.SetUpdateOnPosting(false);
                 end;
             }
             action(ResetAnalysisView)
@@ -236,7 +238,7 @@ page 555 "Analysis View Card"
 
     local procedure SetGLAccountSource()
     begin
-        GLAccountSource := "Account Source" = "Account Source"::"G/L Account";
+        GLAccountSource := Rec."Account Source" = Rec."Account Source"::"G/L Account";
     end;
 
     var

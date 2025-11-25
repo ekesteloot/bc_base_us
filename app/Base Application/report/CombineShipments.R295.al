@@ -1,4 +1,15 @@
-﻿report 295 "Combine Shipments"
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using System.Globalization;
+
+report 295 "Combine Shipments"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Combine Shipments';
@@ -9,19 +20,19 @@
     {
         dataitem(SalesOrderHeader; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order), "Combine Shipments" = CONST(true));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order), "Combine Shipments" = const(true));
             RequestFilterFields = "Sell-to Customer No.", "Bill-to Customer No.";
             RequestFilterHeading = 'Sales Order';
             dataitem("Sales Shipment Header"; "Sales Shipment Header")
             {
-                DataItemLink = "Order No." = FIELD("No.");
-                DataItemTableView = SORTING("Order No.");
+                DataItemLink = "Order No." = field("No.");
+                DataItemTableView = sorting("Order No.");
                 RequestFilterFields = "Posting Date";
                 RequestFilterHeading = 'Posted Sales Shipment';
                 dataitem("Sales Shipment Line"; "Sales Shipment Line")
                 {
-                    DataItemLink = "Document No." = FIELD("No.");
-                    DataItemTableView = SORTING("Document No.", "Line No.");
+                    DataItemLink = "Document No." = field("No.");
+                    DataItemTableView = sorting("Document No.", "Line No.");
 
                     trigger OnAfterGetRecord()
                     var
@@ -133,6 +144,7 @@
                     CurrReport.Skip();
 
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 Window.Update(1, "Bill-to Customer No.");
                 Window.Update(2, "No.");
@@ -141,6 +153,8 @@
             trigger OnPostDataItem()
             begin
                 CurrReport.Language := ReportLanguage;
+                if ReportFormatRegion <> '' then
+                    CurrReport.FormatRegion := ReportFormatRegion;
                 Window.Close();
                 ShowResult();
             end;
@@ -164,6 +178,7 @@
 
                 OnSalesOrderHeaderOnPreDataItem(SalesOrderHeader);
                 ReportLanguage := CurrReport.Language();
+                ReportFormatRegion := CopyStr(CurrReport.FormatRegion(), 1, StrLen(ReportFormatRegion));
             end;
         }
     }
@@ -298,7 +313,7 @@
         NoOfSalesInv: Integer;
         NoOfskippedShiment: Integer;
         ReportLanguage: Integer;
-
+        ReportFormatRegion: Text[80];
         Text000: Label 'Enter the posting date.';
         Text001: Label 'Enter the document date.';
         Text002: Label 'Combining shipments...\\';

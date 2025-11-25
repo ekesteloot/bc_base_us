@@ -27,7 +27,7 @@ page 351 "Customer Sales Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period that you want to view.';
                 }
-                field(BalanceDueLCY; "Balance Due (LCY)")
+                field(BalanceDueLCY; Rec."Balance Due (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
@@ -76,7 +76,7 @@ page 351 "Customer Sales Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcLine();
     end;
 
@@ -100,7 +100,7 @@ page 351 "Customer Sales Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -155,9 +155,9 @@ page 351 "Customer Sales Lines"
     begin
         SetDateFilter();
         Cust.CalcFields("Balance Due (LCY)", "Sales (LCY)", "Profit (LCY)");
-        "Balance Due (LCY)" := Cust."Balance Due (LCY)";
-        "Sales (LCY)" := Cust."Sales (LCY)";
-        "Profit (LCY)" := Cust."Profit (LCY)";
+        Rec."Balance Due (LCY)" := Cust."Balance Due (LCY)";
+        Rec."Sales (LCY)" := Cust."Sales (LCY)";
+        Rec."Profit (LCY)" := Cust."Profit (LCY)";
 
         OnAfterCalcLine(Cust, Rec);
     end;
@@ -165,9 +165,9 @@ page 351 "Customer Sales Lines"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            Cust.SetRange("Date Filter", "Period Start", "Period End")
+            Cust.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            Cust.SetRange("Date Filter", 0D, "Period End");
+            Cust.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentRegistration;
+
 page 985 "Document Search"
 {
     Caption = 'Document Search';

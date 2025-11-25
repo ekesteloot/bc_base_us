@@ -50,9 +50,7 @@ page 1443 "Headline RC Project Manager"
 
     var
         RCHeadlinesPageCommon: Codeunit "RC Headlines Page Common";
-        [InDataSet]
         DefaultFieldsVisible: Boolean;
-        [InDataSet]
         UserGreetingVisible: Boolean;
 }
 

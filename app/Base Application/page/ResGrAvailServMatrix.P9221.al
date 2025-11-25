@@ -1,3 +1,11 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Setup;
+using System.Utilities;
+
 page 9221 "Res. Gr. Avail. (Serv.) Matrix"
 {
     Caption = 'Res.Gr. Availability (Service)';
@@ -421,7 +429,7 @@ page 9221 "Res. Gr. Avail. (Serv.) Matrix"
 
                         Clear(ServOrderAllocMgt);
                         ServOrderAllocMgt.AllocateDate(
-                          CurrentDocumentType, CurrentDocumentNo, CurrentEntryNo, '', "No.", SelectedDate, QtytoAllocate);
+                          CurrentDocumentType, CurrentDocumentNo, CurrentEntryNo, '', Rec."No.", SelectedDate, QtytoAllocate);
                         CurrPage.Close();
                     end;
                 }
@@ -489,71 +497,38 @@ page 9221 "Res. Gr. Avail. (Serv.) Matrix"
         QtytoAllocate: Decimal;
         MATRIX_CellData: array[32] of Text[1024];
         MatrixColumnCaptions: array[32] of Text[100];
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
-        [InDataSet]
         QtytoallocateEnable: Boolean;
 
         Text000: Label 'You cannot allocate a resource when selected period is %1.';
@@ -575,7 +550,7 @@ page 9221 "Res. Gr. Avail. (Serv.) Matrix"
     begin
         MatrixRec.Reset();
 
-        MatrixRec.SetRange("No.", "No.");
+        MatrixRec.SetRange("No.", Rec."No.");
 
         for I := 1 to ArrayLen(MatrixColumnDateFilters) do begin
             MATRIX_CellData[I] := '';
@@ -600,7 +575,7 @@ page 9221 "Res. Gr. Avail. (Serv.) Matrix"
     begin
         Clear(ResGr);
         Clear(ResGrAvailOverview);
-        ResGr.SetRange("No.", "No.");
+        ResGr.SetRange("No.", Rec."No.");
         ResGr.SetRange("Date Filter", MatrixColumnDateFilters[Column]."Period Start",
           MatrixColumnDateFilters[Column]."Period End");
         ResGrAvailOverview.SetTableView(ResGr);

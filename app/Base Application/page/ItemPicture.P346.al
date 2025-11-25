@@ -1,3 +1,10 @@
+﻿namespace Microsoft.InventoryMgt.Item.Picture;
+
+using Microsoft.InventoryMgt.Item;
+using System.Device;
+using System.IO;
+using System.Text;
+
 page 346 "Item Picture"
 {
     Caption = 'Item Picture';
@@ -11,7 +18,7 @@ page 346 "Item Picture"
     {
         area(content)
         {
-            field(Picture; Picture)
+            field(Picture; Rec.Picture)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
                 ShowCaption = false;
@@ -71,13 +78,13 @@ page 346 "Item Picture"
                     ConvertedCodeType: Text;
                     ExportPath: Text;
                 begin
-                    TestField("No.");
-                    TestField(Description);
-                    ConvertedCodeType := Format("No.");
+                    Rec.TestField("No.");
+                    Rec.TestField(Description);
+                    ConvertedCodeType := Format(Rec."No.");
                     ToFile := DummyPictureEntity.GetDefaultMediaDescription(Rec);
                     ConvertedCodeType := StringConversionManager.RemoveNonAlphaNumericCharacters(ConvertedCodeType);
-                    ExportPath := TemporaryPath + ConvertedCodeType + Format(Picture.MediaId);
-                    Picture.ExportFile(ExportPath + '.' + DummyPictureEntity.GetDefaultExtension());
+                    ExportPath := TemporaryPath + ConvertedCodeType + Format(Rec.Picture.MediaId);
+                    Rec.Picture.ExportFile(ExportPath + '.' + DummyPictureEntity.GetDefaultExtension());
 
                     FileManagement.ExportImage(ExportPath, ToFile);
                 end;
@@ -111,7 +118,6 @@ page 346 "Item Picture"
 
     var
         Camera: Codeunit Camera;
-        [InDataSet]
         CameraAvailable: Boolean;
         OverrideImageQst: Label 'The existing picture will be replaced. Do you want to continue?';
         DeleteImageQst: Label 'Are you sure you want to delete the picture?';
@@ -137,12 +143,12 @@ page 346 "Item Picture"
         FileName: Text;
         ClientFileName: Text;
     begin
-        Find();
-        TestField("No.");
-        if Description = '' then
+        Rec.Find();
+        Rec.TestField("No.");
+        if Rec.Description = '' then
             Error(MustSpecifyDescriptionErr);
 
-        if Picture.Count > 0 then
+        if Rec.Picture.Count > 0 then
             if not Confirm(OverrideImageQst) then
                 Error('');
 
@@ -151,9 +157,9 @@ page 346 "Item Picture"
         if FileName = '' then
             Error('');
 
-        Clear(Picture);
-        Picture.ImportFile(FileName, ClientFileName);
-        Modify(true);
+        Clear(Rec.Picture);
+        Rec.Picture.ImportFile(FileName, ClientFileName);
+        Rec.Modify(true);
         OnImportFromDeviceOnAfterModify(Rec);
 
         if FileManagement.DeleteServerFile(FileName) then;
@@ -180,7 +186,7 @@ page 346 "Item Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Picture.Count <> 0;
+        DeleteExportEnabled := Rec.Picture.Count <> 0;
     end;
 
     procedure IsCameraAvailable(): Boolean
@@ -195,13 +201,13 @@ page 346 "Item Picture"
 
     procedure DeleteItemPicture()
     begin
-        TestField("No.");
+        Rec.TestField("No.");
 
         if not Confirm(DeleteImageQst) then
             exit;
 
-        Clear(Picture);
-        Modify(true);
+        Clear(Rec.Picture);
+        Rec.Modify(true);
 
         OnAfterDeleteItemPicture(Rec);
     end;

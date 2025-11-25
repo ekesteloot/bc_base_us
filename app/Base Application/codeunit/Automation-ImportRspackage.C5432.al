@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Utilities;
+
 codeunit 5432 "Automation - Import RSPackage"
 {
     TableNo = "Config. Package";
@@ -10,22 +14,22 @@ codeunit 5432 "Automation - Import RSPackage"
         ConfigXMLExchange: Codeunit "Config. XML Exchange";
         InStream: InStream;
     begin
-        Validate("Import Status", "Import Status"::InProgress);
-        Clear("Import Error");
-        Modify(true);
+        Rec.Validate("Import Status", Rec."Import Status"::InProgress);
+        Clear(Rec."Import Error");
+        Rec.Modify(true);
 
-        TenantConfigPackageFile.Get(Code);
+        TenantConfigPackageFile.Get(Rec.Code);
         TempBlob.FromRecord(TenantConfigPackageFile, TenantConfigPackageFile.FieldNo(Content));
 
         ConfigXMLExchange.SetHideDialog(true);
         ConfigXMLExchange.DecompressPackageToBlob(TempBlob, TempBlobDecompressed);
         TempBlobDecompressed.CreateInStream(InStream);
-        ConfigXMLExchange.ImportPackageXMLWithCodeFromStream(InStream, Code);
+        ConfigXMLExchange.ImportPackageXMLWithCodeFromStream(InStream, Rec.Code);
 
         // refreshing the record as ImportPackageXMLWithCodeFromStream updated the Configuration package with the number of records in the package, etc.
-        Find();
-        Validate("Import Status", "Import Status"::Completed);
-        Modify(true);
+        Rec.Find();
+        Rec.Validate("Import Status", Rec."Import Status"::Completed);
+        Rec.Modify(true);
         Commit();
     end;
 }

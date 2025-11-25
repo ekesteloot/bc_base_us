@@ -1,3 +1,8 @@
+namespace Microsoft.Foundation.Address;
+
+using Microsoft.Foundation.Company;
+using System.Reflection;
+
 table 726 "Custom Address Format Line"
 {
     Caption = 'Custom Address Format Line';
@@ -24,8 +29,8 @@ table 726 "Custom Address Format Line"
         {
             Caption = 'Field ID';
             DataClassification = SystemMetadata;
-            TableRelation = Field."No." WHERE(TableNo = CONST(79),
-                                               "No." = FILTER(2 | 3 | 4 | 5 | 6 | 30 | 31 | 36 | 51));
+            TableRelation = Field."No." where(TableNo = const(79),
+                                               "No." = filter(2 | 3 | 4 | 5 | 6 | 30 | 31 | 36 | 51));
 
             trigger OnValidate()
             begin

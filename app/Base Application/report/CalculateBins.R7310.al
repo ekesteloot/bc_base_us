@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using System.Utilities;
+
 report 7310 "Calculate Bins"
 {
     Caption = 'Calculate Bins';

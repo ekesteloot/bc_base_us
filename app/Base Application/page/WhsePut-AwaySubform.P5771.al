@@ -1,3 +1,11 @@
+﻿namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 5771 "Whse. Put-away Subform"
 {
     AutoSplitKey = true;
@@ -8,7 +16,7 @@ page 5771 "Whse. Put-away Subform"
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Warehouse Activity Line";
-    SourceTableView = WHERE("Activity Type" = CONST("Put-away"));
+    SourceTableView = where("Activity Type" = const("Put-away"));
 
     layout
     {
@@ -403,15 +411,10 @@ page 5771 "Whse. Put-away Subform"
         WMSMgt: Codeunit "WMS Management";
 
     protected var
-        [InDataSet]
         ZoneCodeEditable: Boolean;
-        [InDataSet]
         BinCodeEditable: Boolean;
-        [InDataSet]
         HideBinFields: Boolean;
-        [InDataSet]
         QtyToHandleEditable: Boolean;
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     local procedure ShowSourceLine()

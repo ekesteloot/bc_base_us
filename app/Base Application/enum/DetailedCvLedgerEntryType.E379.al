@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
 enum 379 "Detailed CV Ledger Entry Type"
 {
     Extensible = true;

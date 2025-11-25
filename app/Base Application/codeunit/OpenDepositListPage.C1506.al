@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Deposit;
+
 codeunit 1506 "Open Deposit List Page"
 {
     trigger OnRun()

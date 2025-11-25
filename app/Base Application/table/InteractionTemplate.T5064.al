@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Campaign;
+using System.Integration.Word;
+
 table 5064 "Interaction Template"
 {
     Caption = 'Interaction Template';
@@ -47,8 +52,8 @@ table 5064 "Interaction Template"
         }
         field(8; "Attachment No."; Integer)
         {
-            CalcFormula = Lookup("Interaction Tmpl. Language"."Attachment No." WHERE("Interaction Template Code" = FIELD(Code),
-                                                                                      "Language Code" = FIELD("Language Code (Default)")));
+            CalcFormula = Lookup("Interaction Tmpl. Language"."Attachment No." where("Interaction Template Code" = field(Code),
+                                                                                      "Language Code" = field("Language Code (Default)")));
             Caption = 'Attachment No.';
             Editable = false;
             FieldClass = FlowField;
@@ -101,10 +106,10 @@ table 5064 "Interaction Template"
         }
         field(14; "No. of Interactions"; Integer)
         {
-            CalcFormula = Count("Interaction Log Entry" WHERE("Interaction Template Code" = FIELD(Code),
-                                                               Canceled = CONST(false),
-                                                               Date = FIELD("Date Filter"),
-                                                               Postponed = CONST(false)));
+            CalcFormula = count("Interaction Log Entry" where("Interaction Template Code" = field(Code),
+                                                               Canceled = const(false),
+                                                               Date = field("Date Filter"),
+                                                               Postponed = const(false)));
             Caption = 'No. of Interactions';
             Editable = false;
             FieldClass = FlowField;
@@ -112,20 +117,20 @@ table 5064 "Interaction Template"
         field(15; "Cost (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Interaction Log Entry"."Cost (LCY)" WHERE("Interaction Template Code" = FIELD(Code),
-                                                                          Canceled = CONST(false),
-                                                                          Date = FIELD("Date Filter"),
-                                                                          Postponed = CONST(false)));
+            CalcFormula = sum("Interaction Log Entry"."Cost (LCY)" where("Interaction Template Code" = field(Code),
+                                                                          Canceled = const(false),
+                                                                          Date = field("Date Filter"),
+                                                                          Postponed = const(false)));
             Caption = 'Cost (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(16; "Duration (Min.)"; Decimal)
         {
-            CalcFormula = Sum("Interaction Log Entry"."Duration (Min.)" WHERE("Interaction Template Code" = FIELD(Code),
-                                                                               Canceled = CONST(false),
-                                                                               Date = FIELD("Date Filter"),
-                                                                               Postponed = CONST(false)));
+            CalcFormula = sum("Interaction Log Entry"."Duration (Min.)" where("Interaction Template Code" = field(Code),
+                                                                               Canceled = const(false),
+                                                                               Date = field("Date Filter"),
+                                                                               Postponed = const(false)));
             Caption = 'Duration (Min.)';
             DecimalPlaces = 0 : 0;
             Editable = false;
@@ -134,18 +139,12 @@ table 5064 "Interaction Template"
         field(17; "Language Code (Default)"; Code[10])
         {
             Caption = 'Language Code (Default)';
-            TableRelation = "Interaction Tmpl. Language"."Language Code" WHERE("Interaction Template Code" = FIELD(Code));
+            TableRelation = "Interaction Tmpl. Language"."Language Code" where("Interaction Template Code" = field(Code));
 
             trigger OnValidate()
             var
                 InteractTmplLanguage: Record "Interaction Tmpl. Language";
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateLanguageCodeDefault(Rec, xRec, IsHandled);
-                if IsHandled then
-                    exit;
-
                 if not InteractTmplLanguage.Get(Code, "Language Code (Default)") then
                     if Confirm(Text004, true, InteractTmplLanguage.TableCaption(), "Language Code (Default)") then begin
                         InteractTmplLanguage.Init();
@@ -156,7 +155,7 @@ table 5064 "Interaction Template"
                     end else
                         Error('');
 
-                if InteractTmplLanguage."Custom Layout Code" <> '' then
+                if (InteractTmplLanguage."Custom Layout Code" <> '') or (InteractTmplLanguage."Report Layout Name" <> '') then
                     "Wizard Action" := "Wizard Action"::Merge
                 else
                     if "Wizard Action" = "Wizard Action"::Merge then
@@ -186,8 +185,8 @@ table 5064 "Interaction Template"
 
                 if InteractionTmplLanguage.Get(Code, "Language Code (Default)") then begin
                     Rec.CalcFields("Attachment No.");
-                    if ((InteractionTmplLanguage."Custom Layout Code" <> '') and ("Wizard Action" <> "Wizard Action"::Merge) and ("Word Template Code" = '')) or
-                       ((InteractionTmplLanguage."Custom Layout Code" = '') and ("Wizard Action" = "Wizard Action"::Merge) and ("Word Template Code" = '')) or
+                    if (((InteractionTmplLanguage."Custom Layout Code" <> '') or (InteractionTmplLanguage."Report Layout Name" <> '')) and ("Wizard Action" <> "Wizard Action"::Merge) and ("Word Template Code" = '')) or
+                       ((InteractionTmplLanguage."Custom Layout Code" = '') and (InteractionTmplLanguage."Report Layout Name" = '') and ("Wizard Action" = "Wizard Action"::Merge) and ("Word Template Code" = '')) or
                        (("Word Template Code" <> '') and ("Wizard Action" = "Wizard Action"::Import)) or
                        (("Attachment No." = 0) and ("Word Template Code" = '') and ("Wizard Action" = "Wizard Action"::Merge))
                     then
@@ -202,7 +201,7 @@ table 5064 "Interaction Template"
         field(20; "Word Template Code"; Code[30])
         {
             DataClassification = CustomerContent;
-            TableRelation = "Word Template".Code where("Table ID" = const(5106)); // Only Interaction Merge Data word templates are allowed
+            TableRelation = "Word Template".Code where("Table ID" = const(Database::"Interaction Merge Data"));
 
             trigger OnValidate()
             var
@@ -277,11 +276,6 @@ table 5064 "Interaction Template"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateWizardAction(var InteractionTemplate: Record "Interaction Template"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateLanguageCodeDefault(var InteractionTemplate: Record "Interaction Template"; var xInteractionTemplate: Record "Interaction Template"; var IsHandled: Boolean)
     begin
     end;
 }

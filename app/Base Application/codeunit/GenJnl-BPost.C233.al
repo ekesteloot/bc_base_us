@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Utilities;
+
 codeunit 233 "Gen. Jnl.-B.Post"
 {
     TableNo = "Gen. Journal Batch";
@@ -6,7 +12,7 @@ codeunit 233 "Gen. Jnl.-B.Post"
     begin
         GenJnlBatch.Copy(Rec);
         Code();
-        Copy(GenJnlBatch);
+        Rec.Copy(GenJnlBatch);
     end;
 
     var

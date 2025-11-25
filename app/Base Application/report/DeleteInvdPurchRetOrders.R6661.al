@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.History;
+using Microsoft.Shared.Archive;
+using Microsoft.WarehouseMgt.Request;
+
 report 6661 "Delete Invd Purch. Ret. Orders"
 {
     AccessByPermission = TableData "Purchase Header" = RD;
@@ -10,7 +17,7 @@ report 6661 "Delete Invd Purch. Ret. Orders"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Return Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Return Order"));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "Pay-to Vendor No.";
             RequestFilterHeading = 'Purchase Return Order';
 

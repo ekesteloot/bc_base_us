@@ -1,7 +1,14 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 104 "Customer - Detail Trial Bal."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/CustomerDetailTrialBal.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerDetailTrialBal.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Customer - Detail Trial Bal.';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +17,7 @@ report 104 "Customer - Detail Trial Bal."
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Name", "Customer Posting Group", "Date Filter";
             column(TodayFormatted; Format(Today))
@@ -108,8 +115,8 @@ report 104 "Customer - Detail Trial Bal."
             }
             dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
             {
-                DataItemLink = "Customer No." = FIELD("No."), "Posting Date" = FIELD("Date Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Date Filter" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Customer No.", "Posting Date");
+                DataItemLink = "Customer No." = field("No."), "Posting Date" = field("Date Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Date Filter" = field("Date Filter");
+                DataItemTableView = sorting("Customer No.", "Posting Date");
                 column(PostDate_CustLedgEntry; Format("Posting Date"))
                 {
                 }
@@ -205,7 +212,7 @@ report 104 "Customer - Detail Trial Bal."
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(Name1_Cust; Customer.Name)
                 {
                 }

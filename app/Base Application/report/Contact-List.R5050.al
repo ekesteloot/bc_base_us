@@ -1,7 +1,12 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Foundation.Address;
+
 report 5050 "Contact - List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/ContactList.rdlc';
+    RDLCLayout = './CRM/Reports/ContactList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Contact List';
     UsageCategory = ReportsAndAnalysis;

@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Duplicates;
+
+using Microsoft.CRM.Contact;
+
 page 5134 "Contact Duplicates"
 {
     ApplicationArea = RelationshipMgmt;
@@ -93,7 +97,7 @@ page 5134 "Contact Duplicates"
                 var
                     ContactDuplicateDetails: Page "Contact Duplicate Details";
                 begin
-                    ContactDuplicateDetails.SetContactNo("Contact No.", "Duplicate Contact No.");
+                    ContactDuplicateDetails.SetContactNo(Rec."Contact No.", Rec."Duplicate Contact No.");
                     ContactDuplicateDetails.Run();
                 end;
             }
@@ -101,7 +105,7 @@ page 5134 "Contact Duplicates"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Merge Contacts';
-                Enabled = not "Separate Contacts";
+                Enabled = not Rec."Separate Contacts";
                 Ellipsis = true;
                 Image = ItemSubstitution;
                 ToolTip = 'Merge two contact records into one. Before merging, review which field values you want to keep or override. The merge action cannot be undone.';
@@ -112,8 +116,8 @@ page 5134 "Contact Duplicates"
                     MergeDuplicate: Page "Merge Duplicate";
                 begin
                     MergeDuplBuffer.Validate("Table ID", DATABASE::Contact);
-                    MergeDuplBuffer.Current := "Contact No.";
-                    MergeDuplBuffer.Duplicate := "Duplicate Contact No.";
+                    MergeDuplBuffer.Current := Rec."Contact No.";
+                    MergeDuplBuffer.Duplicate := Rec."Duplicate Contact No.";
                     MergeDuplicate.Set(MergeDuplBuffer);
                     MergeDuplicate.Run();
                 end;

@@ -1,6 +1,22 @@
+﻿namespace System.Environment.Configuration;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Automation;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Utilities;
+
 report 1320 "Notification Email"
 {
-    WordLayout = './NotificationEmail.docx';
+    WordLayout = './System/Notifications/NotificationEmail.docx';
     Caption = 'Notification Email';
     DefaultLayout = Word;
 
@@ -8,7 +24,7 @@ report 1320 "Notification Email"
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(Line1; Line1)
             {
             }
@@ -167,9 +183,15 @@ report 1320 "Notification Email"
             exit;
 
         SettingsURL := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, Page::"Notification Setup");
-        SettingsURL += StrSubstNo(NotificationSetupFilterStringTxt, ReceipientUser."User Name");
+        SettingsURL += StrSubstNo(NotificationSetupFilterStringTxt, GetNotificationUser());
+    end;
 
-        OnAfterCreateSettingsLink(SettingsURL);
+    local procedure GetNotificationUser(): Text
+    begin
+        if not GuiAllowed then
+            exit(ReceipientUser."User Name");
+
+        exit(UserId);
     end;
 
     local procedure SetDocumentTypeAndNumber(SourceRecRef: RecordRef)
@@ -508,11 +530,6 @@ report 1320 "Notification Email"
 
     [IntegrationEvent(false, false)]
     local procedure OnSetReportFieldPlaceholdersOnBeforeGetWebUrl(RecRef: RecordRef; var Field1Label: Text; var Field1Value: Text; var Field2Label: Text; var Field2Value: Text; var Field3Label: Text; var Field3Value: Text; var SourceRecRef: RecordRef; var DetailsLabel: Text; var DetailsValue: Text; NotificationEntry: Record "Notification Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateSettingsLink(var SettingsURL: Text)
     begin
     end;
 }

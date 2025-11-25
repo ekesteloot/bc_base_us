@@ -1,7 +1,11 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.HumanResources.Employee;
+
 report 5203 "Employee - Confidential Info."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeConfidentialInfo.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeConfidentialInfo.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee Confidential Information';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5203 "Employee - Confidential Info."
     {
         dataitem("Confidential Information"; "Confidential Information")
         {
-            DataItemTableView = SORTING("Employee No.", "Confidential Code", "Line No.");
+            DataItemTableView = sorting("Employee No.", "Confidential Code", "Line No.");
             RequestFilterFields = "Employee No.", "Confidential Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

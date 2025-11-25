@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
+using Microsoft.Integration.Dataverse;
+
 table 5360 "CRM Customeraddress"
 {
     // Dynamics CRM Version: 7.1.0.2040
@@ -15,9 +23,9 @@ table 5360 "CRM Customeraddress"
             Description = 'Choose the customer''s address.';
             ExternalName = 'parentid';
             ExternalType = 'Lookup';
-            TableRelation = IF (ParentIdTypeCode = CONST(account)) "CRM Account".AccountId
-            ELSE
-            IF (ParentIdTypeCode = CONST(contact)) "CRM Contact".ContactId;
+            TableRelation = if (ParentIdTypeCode = const(account)) "CRM Account".AccountId
+            else
+            if (ParentIdTypeCode = const(contact)) "CRM Contact".ContactId;
         }
         field(2; CustomerAddressId; Guid)
         {
@@ -251,7 +259,7 @@ table 5360 "CRM Customeraddress"
         }
         field(31; CreatedByName; Text[200])
         {
-            CalcFormula = Lookup("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(CreatedBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(CreatedBy)));
             Caption = 'CreatedByName';
             ExternalAccess = Read;
             ExternalName = 'createdbyname';
@@ -260,7 +268,7 @@ table 5360 "CRM Customeraddress"
         }
         field(32; ModifiedByName; Text[200])
         {
-            CalcFormula = Lookup("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(ModifiedBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(ModifiedBy)));
             Caption = 'ModifiedByName';
             ExternalAccess = Read;
             ExternalName = 'modifiedbyname';
@@ -333,9 +341,9 @@ table 5360 "CRM Customeraddress"
             ExternalAccess = Read;
             ExternalName = 'ownerid';
             ExternalType = 'Owner';
-            TableRelation = IF (OwnerIdType = CONST(systemuser)) "CRM Systemuser".SystemUserId
-            ELSE
-            IF (OwnerIdType = CONST(team)) "CRM Team".TeamId;
+            TableRelation = if (OwnerIdType = const(systemuser)) "CRM Systemuser".SystemUserId
+            else
+            if (OwnerIdType = const(team)) "CRM Team".TeamId;
         }
         field(41; ParentIdTypeCode; Option)
         {
@@ -356,7 +364,7 @@ table 5360 "CRM Customeraddress"
         }
         field(43; CreatedOnBehalfByName; Text[200])
         {
-            CalcFormula = Lookup("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(CreatedOnBehalfBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(CreatedOnBehalfBy)));
             Caption = 'CreatedOnBehalfByName';
             ExternalAccess = Read;
             ExternalName = 'createdonbehalfbyname';
@@ -374,7 +382,7 @@ table 5360 "CRM Customeraddress"
         }
         field(45; ModifiedOnBehalfByName; Text[200])
         {
-            CalcFormula = Lookup("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(ModifiedOnBehalfBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(ModifiedOnBehalfBy)));
             Caption = 'ModifiedOnBehalfByName';
             ExternalAccess = Read;
             ExternalName = 'modifiedonbehalfbyname';
@@ -391,7 +399,7 @@ table 5360 "CRM Customeraddress"
         }
         field(47; TransactionCurrencyIdName; Text[100])
         {
-            CalcFormula = Lookup("CRM Transactioncurrency".CurrencyName WHERE(TransactionCurrencyId = FIELD(TransactionCurrencyId)));
+            CalcFormula = Lookup("CRM Transactioncurrency".CurrencyName where(TransactionCurrencyId = field(TransactionCurrencyId)));
             Caption = 'TransactionCurrencyIdName';
             ExternalAccess = Read;
             ExternalName = 'transactioncurrencyidname';

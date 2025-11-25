@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Task;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+
 page 5197 "Attendee Subform"
 {
     AutoSplitKey = true;
@@ -114,7 +120,7 @@ page 5197 "Attendee Subform"
         AttendanceTypeIndent := 0;
         SendInvitationEditable := true;
 
-        if "Attendance Type" = "Attendance Type"::"To-do Organizer" then begin
+        if Rec."Attendance Type" = Rec."Attendance Type"::"To-do Organizer" then begin
             StyleIsStrong := true;
             SendInvitationEditable := false;
         end else
@@ -123,9 +129,7 @@ page 5197 "Attendee Subform"
 
     var
         Text004: Label 'The Make Phone Call function is not available for a salesperson.';
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         SendInvitationEditable: Boolean;
         AttendanceTypeIndent: Integer;
 
@@ -140,11 +144,11 @@ page 5197 "Attendee Subform"
         if IsHandled then
             exit;
 
-        if "Attendee Type" = "Attendee Type"::Contact then begin
-            if Cont.Get("Attendee No.") then
+        if Rec."Attendee Type" = Rec."Attendee Type"::Contact then begin
+            if Cont.Get(Rec."Attendee No.") then
                 PAGE.Run(PAGE::"Contact Card", Cont);
         end else
-            if Salesperson.Get("Attendee No.") then
+            if Salesperson.Get(Rec."Attendee No.") then
                 PAGE.Run(PAGE::"Salesperson/Purchaser Card", Salesperson);
     end;
 
@@ -155,9 +159,9 @@ page 5197 "Attendee Subform"
         Cont: Record Contact;
         Task: Record "To-do";
     begin
-        if "Attendee Type" = "Attendee Type"::Salesperson then
+        if Rec."Attendee Type" = Rec."Attendee Type"::Salesperson then
             Error(Text004);
-        if Cont.Get("Attendee No.") then begin
+        if Cont.Get(Rec."Attendee No.") then begin
             if Task.FindAttendeeTask(Task, Attendee) then
                 TempSegmentLine."To-do No." := Task."No.";
             TempSegmentLine."Contact No." := Cont."No.";

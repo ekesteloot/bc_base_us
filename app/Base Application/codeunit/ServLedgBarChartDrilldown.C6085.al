@@ -1,14 +1,19 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.ServiceMgt.Ledger;
+using System.Visualization;
+
 codeunit 6085 "Serv. Ledg Bar Chart DrillDown"
 {
     TableNo = "Bar Chart Buffer";
 
     trigger OnRun()
     begin
-        if Tag = '' then
+        if Rec.Tag = '' then
             Error(Text000);
-        ServLedgEntry.SetView(Tag);
+        ServLedgEntry.SetView(Rec.Tag);
         ServLedgEntry.SetRange(Open, false);
-        case "Series No." of
+        case Rec."Series No." of
             1:
                 ServLedgEntry.SetRange("Entry Type", ServLedgEntry."Entry Type"::Sale);
             2:

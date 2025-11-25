@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.Foundation.Enums;
+
 codeunit 1318 "Trial Balance Mgt."
 {
 

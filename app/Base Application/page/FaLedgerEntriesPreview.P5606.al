@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using System.Security.User;
+
 page 5606 "FA Ledger Entries Preview"
 {
     Caption = 'FA Ledger Entries Preview';
@@ -121,7 +126,7 @@ page 5606 "FA Ledger Entries Preview"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -136,7 +141,7 @@ page 5606 "FA Ledger Entries Preview"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies whether the entry has been part of a reverse transaction (correction) made by the Reverse function.';
@@ -225,7 +230,7 @@ page 5606 "FA Ledger Entries Preview"
 
                 trigger OnAction()
                 begin
-                    SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                    Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                 end;
             }
         }
@@ -261,7 +266,7 @@ page 5606 "FA Ledger Entries Preview"
         if TempFALedgerEntry.FindSet() then
             repeat
                 Rec := TempFALedgerEntry;
-                Insert();
+                Rec.Insert();
             until TempFALedgerEntry.Next() = 0;
     end;
 }

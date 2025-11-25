@@ -1,3 +1,8 @@
+﻿namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Tracking;
+
 page 6505 "Lot No. Information Card"
 {
     Caption = 'Lot No. Information Card';
@@ -42,7 +47,7 @@ page 6505 "Lot No. Information Card"
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies the number provided by the supplier to indicate that the batch or lot meets the specified requirements.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -51,7 +56,7 @@ page 6505 "Lot No. Information Card"
             group(Inventory)
             {
                 Caption = 'Inventory';
-                field(InventoryField; Inventory)
+                field(InventoryField; Rec.Inventory)
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies the inventory quantity of the specified lot number.';
@@ -99,8 +104,8 @@ page 6505 "Lot No. Information Card"
                         ItemTrackingSetup: Record "Item Tracking Setup";
                         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
                     begin
-                        ItemTrackingSetup."Lot No." := "Lot No.";
-                        ItemTrackingDocMgt.ShowItemTrackingForEntity(0, '', "Item No.", "Variant Code", '', ItemTrackingSetup);
+                        ItemTrackingSetup."Lot No." := Rec."Lot No.";
+                        ItemTrackingDocMgt.ShowItemTrackingForEntity(0, '', Rec."Item No.", Rec."Variant Code", '', ItemTrackingSetup);
                     end;
                 }
                 action(Comment)
@@ -109,10 +114,10 @@ page 6505 "Lot No. Information Card"
                     Caption = 'Comment';
                     Image = ViewComments;
                     RunObject = Page "Item Tracking Comments";
-                    RunPageLink = Type = CONST("Lot No."),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Serial/Lot No." = FIELD("Lot No.");
+                    RunPageLink = Type = const("Lot No."),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Serial/Lot No." = field("Lot No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 separator(Action28)
@@ -131,12 +136,31 @@ page 6505 "Lot No. Information Card"
                         ItemTracing: Page "Item Tracing";
                     begin
                         Clear(ItemTracing);
-                        ItemTracingBuffer.SetRange("Item No.", "Item No.");
-                        ItemTracingBuffer.SetRange("Variant Code", "Variant Code");
-                        ItemTracingBuffer.SetRange("Lot No.", "Lot No.");
+                        ItemTracingBuffer.SetRange("Item No.", Rec."Item No.");
+                        ItemTracingBuffer.SetRange("Variant Code", Rec."Variant Code");
+                        ItemTracingBuffer.SetRange("Lot No.", Rec."Lot No.");
                         ItemTracing.InitFilters(ItemTracingBuffer);
                         ItemTracing.FindRecords();
                         ItemTracing.RunModal();
+                    end;
+                }
+                action(PrintLabel)
+                {
+                    AccessByPermission = TableData "Serial No. Information" = I;
+                    ApplicationArea = ItemTracking;
+                    Image = Print;
+                    Caption = 'Print Label';
+                    ToolTip = 'Print Label';
+
+                    trigger OnAction()
+                    var
+                        LotNoInfo: Record "Lot No. Information";
+                        LotNoLabel: Report "Lot No Label";
+                    begin
+                        LotNoInfo := Rec;
+                        CurrPage.SetSelectionFilter(LotNoInfo);
+                        LotNoLabel.SetTableView(LotNoInfo);
+                        LotNoLabel.RunModal();
                     end;
                 }
             }
@@ -164,8 +188,8 @@ page 6505 "Lot No. Information Card"
                         ItemTrackingMgt: Codeunit "Item Tracking Management";
                         LotNoInfoList: Page "Lot No. Information List";
                     begin
-                        ShowRecords.SetRange("Item No.", "Item No.");
-                        ShowRecords.SetRange("Variant Code", "Variant Code");
+                        ShowRecords.SetRange("Item No.", Rec."Item No.");
+                        ShowRecords.SetRange("Variant Code", Rec."Variant Code");
 
                         FocusOnRecord.Copy(ShowRecords);
                         FocusOnRecord.SetRange("Lot No.", TrackingSpecification."Lot No.");
@@ -176,7 +200,7 @@ page 6505 "Lot No. Information Card"
                             LotNoInfoList.SetRecord(FocusOnRecord);
                         if LotNoInfoList.RunModal() = ACTION::LookupOK then begin
                             LotNoInfoList.GetRecord(SelectedRecord);
-                            ItemTrackingMgt.CopyLotNoInformation(SelectedRecord, "Lot No.");
+                            ItemTrackingMgt.CopyLotNoInformation(SelectedRecord, Rec."Lot No.");
                         end;
                     end;
                 }
@@ -212,6 +236,9 @@ page 6505 "Lot No. Information Card"
                 actionref(CopyInfo_Promoted; CopyInfo)
                 {
                 }
+                actionref(PrintLabel_Promoted; PrintLabel)
+                {
+                }
             }
             group("Category_Lot No.")
             {
@@ -239,7 +266,6 @@ page 6505 "Lot No. Information Card"
 
     var
         ShowButtonFunctions: Boolean;
-        [InDataSet]
         ButtonFunctionsVisible: Boolean;
 
     protected var

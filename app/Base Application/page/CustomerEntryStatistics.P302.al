@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Sales.Receivables;
+
 page 302 "Customer Entry Statistics"
 {
     Caption = 'Customer Entry Statistics';
@@ -502,14 +506,14 @@ page 302 "Customer Entry Statistics"
         for j := 1 to 6 do begin
             CustLedgEntry[j].SetCurrentKey("Document Type", "Customer No.", "Posting Date");
             CustLedgEntry[j].SetRange("Document Type", j); // Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund
-            CustLedgEntry[j].SetRange("Customer No.", "No.");
+            CustLedgEntry[j].SetRange("Customer No.", Rec."No.");
             OnAfterGetRecordOnAfterCustLedgEntrySetFiltersCalcAmount(CustLedgEntry[j]);
             if CustLedgEntry[j].FindLast() then
                 CustLedgEntry[j].CalcFields(Amount, "Remaining Amount");
         end;
 
         CustLedgEntry2.SetCurrentKey("Customer No.", Open);
-        CustLedgEntry2.SetRange("Customer No.", "No.");
+        CustLedgEntry2.SetRange("Customer No.", Rec."No.");
         CustLedgEntry2.SetRange(Open, true);
         OnAfterGetRecordOnAfterCustLedgEntrySetFiltersCalcRemainingAmountLCY(CustLedgEntry2);
         if CustLedgEntry2.Find('+') then
@@ -528,7 +532,7 @@ page 302 "Customer Entry Statistics"
         for i := 1 to 3 do begin
             CustLedgEntry2.Reset();
             CustLedgEntry2.SetCurrentKey("Customer No.", "Posting Date");
-            CustLedgEntry2.SetRange("Customer No.", "No.");
+            CustLedgEntry2.SetRange("Customer No.", Rec."No.");
 
             CustLedgEntry2.SetFilter("Posting Date", CustDateFilter[i]);
             CustLedgEntry2.SetRange("Posting Date", 0D, CustLedgEntry2.GetRangeMax("Posting Date"));

@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 codeunit 99000753 "Routing Line-Copy Lines"
 {
 

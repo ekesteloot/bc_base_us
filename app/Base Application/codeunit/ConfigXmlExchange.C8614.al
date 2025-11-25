@@ -1,3 +1,13 @@
+namespace System.IO;
+
+using Microsoft.FinancialMgt.Dimension;
+using System;
+using System.Reflection;
+using System.Telemetry;
+using System.Text;
+using System.Utilities;
+using System.Xml;
+
 codeunit 8614 "Config. XML Exchange"
 {
 
@@ -224,6 +234,8 @@ codeunit 8614 "Config. XML Exchange"
         ExportMetadata: Boolean;
         ShowDialog: Boolean;
         IsHandled: Boolean;
+        FieldNameLookup: Dictionary of [Integer, Text];
+        FieldElementName: Text;
     begin
         IsHandled := false;
         OnBeforeCreateRecordNodes(ConfigPackageTable, ConfigPackageField, TypeHelper, XMLDOMMgt, WorkingFolder, ExcelMode, Advanced, HideDialog, IsHandled);
@@ -285,9 +297,16 @@ codeunit 8614 "Config. XML Exchange"
                                     AddDimensionFieldsWhenProcessingOrder(ConfigPackageField, RecRef, PackageXML, RecordNode, FieldNode, true);
                             end else begin
                                 FieldRef := RecRef.Field(ConfigPackageField."Field ID");
-                                if TypeHelper.GetField(RecRef.Number, FieldRef.Number, Field) then begin
-                                    FieldNode :=
-                                      PackageXML.CreateElement(GetFieldElementName(ConfigPackageField.GetValidatedElementName()));
+
+                                // Reuse validated field name. Validating and creating field names is expensive when done many times.
+                                if not (FieldNameLookup.Get(FieldRef.Number, FieldElementName)) then
+                                    if TypeHelper.GetField(RecRef.Number, FieldRef.Number, Field) then begin
+                                        FieldElementName := GetFieldElementName(ConfigPackageField.GetValidatedElementName());
+                                        FieldNameLookup.Add(FieldRef.Number, FieldElementName);
+                                    end;
+
+                                if (FieldElementName <> '') then begin
+                                    FieldNode := PackageXML.CreateElement(FieldElementName);
                                     FieldNode.InnerText := FormatFieldValue(FieldRef, ConfigPackage);
                                     if Advanced and ConfigPackageField."Localize Field" then
                                         AddXMLComment(PackageXML, FieldNode, '_locComment_text="{MaxLength=' + Format(Field.Len) + '}"');
@@ -487,7 +506,7 @@ codeunit 8614 "Config. XML Exchange"
               DocumentElement, GetElementName(ConfigPackage.FieldName("Product Version")), ConfigPackage."Product Version");
             XMLDOMMgt.AddAttribute(DocumentElement, GetElementName(ConfigPackage.FieldName("Package Name")), ConfigPackage."Package Name");
             XMLDOMMgt.AddAttribute(DocumentElement, GetElementName(ConfigPackage.FieldName(Code)), ConfigPackage.Code);
-            OnExportPackageXMLDocumentOnAfterSetAttributes(ConfigPackage, XMLDOMMgt, DocumentElement);
+            OnExportPackageXMLDocumentOnAfterSetAttributes(ConfigPackage, XMLDOMMgt);
         end;
 
         OnExportPackageXMLDocumentOnBeforeConfigProgressBarInit(ConfigPackageTable, ConfigPackage, XMLDOMMgt, Advanced, HideDialog);
@@ -550,7 +569,6 @@ codeunit 8614 "Config. XML Exchange"
         exit(ImportPackageXML(DecompressedFileName));
     end;
 
-    [Scope('OnPrem')]
     procedure ImportPackageXML(XMLDataFile: Text): Boolean
     var
         PackageXML: DotNet XmlDocument;
@@ -665,7 +683,6 @@ codeunit 8614 "Config. XML Exchange"
                 if not IsHandled then
                     Evaluate(ConfigPackage."Min. Count For Async Import", Value);
             end;
-            OnImportPackageXMLDocumentOnBeforeModify(ConfigPackage, DocumentElement);
             ConfigPackage.Modify();
         end;
 
@@ -1635,7 +1652,7 @@ codeunit 8614 "Config. XML Exchange"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnExportPackageXMLDocumentOnAfterSetAttributes(var ConfigPackage: Record "Config. Package"; var XMLDOMMgt: Codeunit "XML DOM Management"; var DocumentElement: DotNet XmlElement)
+    local procedure OnExportPackageXMLDocumentOnAfterSetAttributes(var ConfigPackage: Record "Config. Package"; var XMLDOMMgt: Codeunit "XML DOM Management")
     begin
     end;
 
@@ -1686,11 +1703,6 @@ codeunit 8614 "Config. XML Exchange"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateRecordNodesOnBeforeApplyPackageFilter(var ConfigPackageTable: Record "Config. Package Table"; var RecordReference: RecordRef; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnImportPackageXMLDocumentOnBeforeModify(var ConfigPackage: Record "Config. Package"; var DocumentElement: DotNet XmlElement)
     begin
     end;
 }

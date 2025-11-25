@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Costing;
+
 enum 30 "Automatic Cost Adjustment Type"
 {
     AssignmentCompatibility = true;

@@ -1,3 +1,9 @@
+﻿namespace Microsoft.ProjectMgt.Resources.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Resources.Resource;
+using System.Utilities;
+
 page 361 "Res. Availability Lines"
 {
     Caption = 'Lines';
@@ -29,7 +35,7 @@ page 361 "Res. Availability Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period shown in the line.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Capacity';
@@ -43,7 +49,7 @@ page 361 "Res. Availability Lines"
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the amount of measuring units allocated to jobs with the status order.';
                 }
-                field(CapacityAfterOrders; "Availability After Orders")
+                field(CapacityAfterOrders; Rec."Availability After Orders")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Availability After Orders';
@@ -57,7 +63,7 @@ page 361 "Res. Availability Lines"
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the amount of measuring units allocated to jobs with the status quote.';
                 }
-                field(CapacityAfterQuotes; "Availability After Quotes")
+                field(CapacityAfterQuotes; Rec."Availability After Quotes")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Availability After Quotes';
@@ -71,14 +77,14 @@ page 361 "Res. Availability Lines"
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies how many units of the item are allocated to service orders, meaning listed on outstanding service order lines.';
                 }
-                field(QtyOnAssemblyOrder; "Qty. on Assembly Order")
+                field(QtyOnAssemblyOrder; Rec."Qty. on Assembly Order")
                 {
                     ApplicationArea = Assembly;
                     Caption = 'Qty. on Assembly Order';
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies how many units of the item are allocated to assembly orders, which is how many are listed on outstanding assembly order headers.';
                 }
-                field(NetAvailability; "Net Availability")
+                field(NetAvailability; Rec."Net Availability")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
@@ -96,7 +102,7 @@ page 361 "Res. Availability Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcLine();
     end;
 
@@ -120,7 +126,7 @@ page 361 "Res. Availability Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -147,9 +153,9 @@ page 361 "Res. Availability Lines"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            Resource.SetRange("Date Filter", "Period Start", "Period End")
+            Resource.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            Resource.SetRange("Date Filter", 0D, "Period End");
+            Resource.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     local procedure CalcLine()
@@ -157,14 +163,14 @@ page 361 "Res. Availability Lines"
         SetDateFilter();
         Resource.CalcFields(Capacity, "Qty. on Order (Job)", "Qty. Quoted (Job)", "Qty. on Service Order", "Qty. on Assembly Order");
 
-        Capacity := Resource.Capacity;
-        "Qty. on Order (Job)" := Resource."Qty. on Order (Job)";
-        "Availability After Orders" := Resource.Capacity - Resource."Qty. on Order (Job)";
-        "Job Quotes Allocation" := Resource."Qty. Quoted (Job)";
-        "Availability After Quotes" := "Availability After Orders" - Resource."Qty. Quoted (Job)";
-        "Qty. on Service Order" := Resource."Qty. on Service Order";
-        "Qty. on Assembly Order" := Resource."Qty. on Assembly Order";
-        "Net Availability" := "Availability After Quotes" - Resource."Qty. on Service Order" - Resource."Qty. on Assembly Order";
+        Rec.Capacity := Resource.Capacity;
+        Rec."Qty. on Order (Job)" := Resource."Qty. on Order (Job)";
+        Rec."Availability After Orders" := Resource.Capacity - Resource."Qty. on Order (Job)";
+        Rec."Job Quotes Allocation" := Resource."Qty. Quoted (Job)";
+        Rec."Availability After Quotes" := Rec."Availability After Orders" - Resource."Qty. Quoted (Job)";
+        Rec."Qty. on Service Order" := Resource."Qty. on Service Order";
+        Rec."Qty. on Assembly Order" := Resource."Qty. on Assembly Order";
+        Rec."Net Availability" := Rec."Availability After Quotes" - Resource."Qty. on Service Order" - Resource."Qty. on Assembly Order";
 
         CapacityAfterOrders := Resource.Capacity - Resource."Qty. on Order (Job)";
         CapacityAfterQuotes := CapacityAfterOrders - Resource."Qty. Quoted (Job)";

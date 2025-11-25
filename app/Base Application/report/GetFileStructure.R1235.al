@@ -1,3 +1,5 @@
+namespace System.IO;
+
 report 1235 "Get File Structure"
 {
     Caption = 'Get File Structure';

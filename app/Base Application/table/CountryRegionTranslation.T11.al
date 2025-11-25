@@ -1,3 +1,7 @@
+namespace Microsoft.Foundation.Address;
+
+using System.Globalization;
+
 table 11 "Country/Region Translation"
 {
     Caption = 'Country/Region Translation';

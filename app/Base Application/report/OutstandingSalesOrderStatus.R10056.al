@@ -131,8 +131,8 @@ report 10056 "Outstanding Sales Order Status"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "Sell-to Customer No." = FIELD("No."), "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE("Document Type" = CONST(Order), "Outstanding Quantity" = FILTER(<> 0));
+                DataItemLink = "Sell-to Customer No." = field("No."), "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where("Document Type" = const(Order), "Outstanding Quantity" = filter(<> 0));
                 RequestFilterFields = "Shipment Date";
                 column(SalesHeader__No__; SalesHeader."No.")
                 {

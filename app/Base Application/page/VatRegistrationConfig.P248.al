@@ -18,13 +18,13 @@ page 248 "VAT Registration Config"
             {
                 Caption = 'General';
                 InstructionalText = 'VAT Information Exchange System is an electronic means of validating VAT identification numbers of economic operators registered in the European Union for cross-border transactions on goods and services.';
-                field(ServiceEndpoint; "Service Endpoint")
+                field(ServiceEndpoint; Rec."Service Endpoint")
                 {
                     ApplicationArea = Basic, Suite;
-                    Editable = NOT Enabled;
+                    Editable = NOT Rec.Enabled;
                     ToolTip = 'Specifies the endpoint of the VAT registration number validation service.';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the service is enabled.';
@@ -33,15 +33,15 @@ page 248 "VAT Registration Config"
                     var
                         CustomerConsentMgt: Codeunit "Customer Consent Mgt.";
                     begin
-                        if Enabled = xRec.Enabled then
+                        if Rec.Enabled = xRec.Enabled then
                             exit;
 
-                        if Enabled then begin
+                        if Rec.Enabled then begin
                             if not CustomerConsentMgt.ConfirmUserConsent() then begin
-                                Enabled := false;
+                                Rec.Enabled := false;
                                 exit;
                             end;
-                            TestField("Service Endpoint");
+                            Rec.TestField("Service Endpoint");
                             Message(TermsAndAgreementMsg);
                         end;
                     end;
@@ -88,14 +88,14 @@ page 248 "VAT Registration Config"
                     var
                         VATLookupExtDataHndl: Codeunit "VAT Lookup Ext. Data Hndl";
                     begin
-                        if Enabled then
+                        if Rec.Enabled then
                             if Confirm(DisableServiceQst) then
-                                Enabled := false
+                                Rec.Enabled := false
                             else
                                 exit;
 
-                        "Service Endpoint" := VATLookupExtDataHndl.GetVATRegNrValidationWebServiceURL();
-                        Modify(true);
+                        Rec."Service Endpoint" := VATLookupExtDataHndl.GetVATRegNrValidationWebServiceURL();
+                        Rec.Modify(true);
                     end;
                 }
                 action(VATRegNoValidationTemplates)
@@ -134,7 +134,7 @@ page 248 "VAT Registration Config"
     var
         VATRegNoSrvTemplate: Record "VAT Reg. No. Srv. Template";
     begin
-        if not Get() then
+        if not Rec.Get() then
             InitVATRegNrValidationSetup();
 
         VATRegNoSrvTemplate.CheckInitDefaultTemplate(Rec);
@@ -150,13 +150,13 @@ page 248 "VAT Registration Config"
         EnvironmentInfo: Codeunit "Environment Information";
         VATLookupExtDataHndl: Codeunit "VAT Lookup Ext. Data Hndl";
     begin
-        if FindFirst() then
+        if Rec.FindFirst() then
             exit;
 
-        Init();
-        "Service Endpoint" := VATLookupExtDataHndl.GetVATRegNrValidationWebServiceURL();
-        Enabled := not EnvironmentInfo.IsSaaS();
-        Insert();
+        Rec.Init();
+        Rec."Service Endpoint" := VATLookupExtDataHndl.GetVATRegNrValidationWebServiceURL();
+        Rec.Enabled := not EnvironmentInfo.IsSaaS();
+        Rec.Insert();
     end;
 }
 

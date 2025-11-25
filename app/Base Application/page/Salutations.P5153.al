@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Setup;
+
 page 5153 Salutations
 {
     ApplicationArea = RelationshipMgmt;
@@ -13,7 +15,7 @@ page 5153 Salutations
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the salutation code.';
@@ -54,7 +56,7 @@ page 5153 Salutations
                     Caption = 'Formulas';
                     Image = SalutationFormula;
                     RunObject = Page "Salutation Formulas";
-                    RunPageLink = "Salutation Code" = FIELD(Code);
+                    RunPageLink = "Salutation Code" = field(Code);
                     ToolTip = 'View or edit formal and an informal salutations for each language you want to use when interacting with your contacts.';
                 }
             }

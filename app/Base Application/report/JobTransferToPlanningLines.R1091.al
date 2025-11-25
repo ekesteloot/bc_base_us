@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+
 report 1091 "Job Transfer To Planning Lines"
 {
     Caption = 'Job Transfer To Planning Lines';

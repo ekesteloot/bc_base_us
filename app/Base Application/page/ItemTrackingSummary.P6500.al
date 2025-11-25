@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+
 page 6500 "Item Tracking Summary"
 {
     Caption = 'Item Tracking Summary';
@@ -212,19 +217,12 @@ page 6500 "Item Tracking Summary"
         CurrBinCode: Code[20];
 
     protected var
-        [InDataSet]
         SelectedQuantityVisible: Boolean;
-        [InDataSet]
         BinContentVisible: Boolean;
-        [InDataSet]
         MaxQuantity1Visible: Boolean;
-        [InDataSet]
         Selected1Visible: Boolean;
-        [InDataSet]
         Undefined1Visible: Boolean;
-        [InDataSet]
         SelectedQuantityEditable: Boolean;
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     procedure SetSources(var ReservEntry: Record "Reservation Entry"; var EntrySummary: Record "Entry Summary")
@@ -305,7 +303,7 @@ page 6500 "Item Tracking Summary"
 
                 AvailableQty := Rec."Total Available Quantity";
                 if Rec."Bin Active" then
-                    AvailableQty := MinValueAbs(QtyAvailableToSelectFromBin(), Rec."Total Available Quantity");
+                    AvailableQty := MinValueAbs(Rec.QtyAvailableToSelectFromBin(), Rec."Total Available Quantity");
 
                 AvailableQty -= Rec."Non-specific Reserved Qty.";
 

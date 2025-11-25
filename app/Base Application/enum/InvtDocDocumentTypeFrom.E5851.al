@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Document;
+
 enum 5851 "Invt. Doc. Document Type From"
 {
     Extensible = true;

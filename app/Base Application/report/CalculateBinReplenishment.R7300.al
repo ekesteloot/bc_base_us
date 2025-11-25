@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Worksheet;
+
 report 7300 "Calculate Bin Replenishment"
 {
     Caption = 'Calculate Bin Replenishment';

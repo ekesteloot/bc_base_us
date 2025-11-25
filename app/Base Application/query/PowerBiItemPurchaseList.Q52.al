@@ -15,7 +15,7 @@ query 52 "Power BI Item Purchase List"
             dataitem(Item_Ledger_Entry; "Item Ledger Entry")
             {
                 DataItemLink = "Item No." = Item."No.";
-                DataItemTableFilter = "Entry Type" = CONST(Purchase);
+                DataItemTableFilter = "Entry Type" = const(Purchase);
                 column(Purchase_Post_Date; "Posting Date")
                 {
                 }

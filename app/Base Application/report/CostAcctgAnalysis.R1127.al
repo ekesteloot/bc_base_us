@@ -1,7 +1,11 @@
+namespace Microsoft.CostAccounting.Reports;
+
+using Microsoft.CostAccounting.Account;
+
 report 1127 "Cost Acctg. Analysis"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/CostAccounting/CostAcctgAnalysis.rdlc';
+    RDLCLayout = './CostAccounting/Reports/CostAcctgAnalysis.rdlc';
     ApplicationArea = CostAccounting;
     Caption = 'Cost Acctg. Analysis';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 1127 "Cost Acctg. Analysis"
     {
         dataitem("Cost Type"; "Cost Type")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Cost Classification", Type, "Date Filter";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

@@ -6,8 +6,8 @@ page 6662 "Posted Return Receipts"
     Editable = false;
     PageType = List;
     SourceTable = "Return Receipt Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -209,7 +209,7 @@ page 6662 "Posted Return Receipts"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Return Receipt Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -219,8 +219,8 @@ page 6662 "Posted Return Receipts"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Return Receipt"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Return Receipt"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -234,7 +234,7 @@ page 6662 "Posted Return Receipts"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -267,7 +267,7 @@ page 6662 "Posted Return Receipts"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action("Update Document")
@@ -313,10 +313,10 @@ page 6662 "Posted Return Receipts"
     var
         HasFilters: Boolean;
     begin
-        HasFilters := GetFilters <> '';
-        SetSecurityFilterOnRespCenter();
-        if HasFilters and not Find() then
-            if FindFirst() then;
+        HasFilters := Rec.GetFilters() <> '';
+        Rec.SetSecurityFilterOnRespCenter();
+        if HasFilters and not Rec.Find() then
+            if Rec.FindFirst() then;
     end;
 
     var

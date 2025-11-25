@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Task;
+
 page 5196 "Task Interaction Languages"
 {
     Caption = 'Task Interaction Languages';
@@ -30,10 +32,10 @@ page 5196 "Task Interaction Languages"
 
                     trigger OnAssistEdit()
                     begin
-                        if "Attachment No." = 0 then
-                            CreateAttachment(("To-do No." = '') or Task.Closed)
+                        if Rec."Attachment No." = 0 then
+                            Rec.CreateAttachment((Rec."To-do No." = '') or Task.Closed)
                         else
-                            OpenAttachment(("To-do No." = '') or Task.Closed);
+                            Rec.OpenAttachment((Rec."To-do No." = '') or Task.Closed);
                         CurrPage.Update();
                     end;
                 }
@@ -72,7 +74,7 @@ page 5196 "Task Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        OpenAttachment(("To-do No." = '') or Task.Closed);
+                        Rec.OpenAttachment((Rec."To-do No." = '') or Task.Closed);
                     end;
                 }
                 action(Create)
@@ -85,7 +87,7 @@ page 5196 "Task Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        CreateAttachment(("To-do No." = '') or Task.Closed);
+                        Rec.CreateAttachment((Rec."To-do No." = '') or Task.Closed);
                     end;
                 }
                 action("Copy &from")
@@ -98,7 +100,7 @@ page 5196 "Task Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        CopyFromAttachment();
+                        Rec.CopyFromAttachment();
                     end;
                 }
                 action(Import)
@@ -111,7 +113,7 @@ page 5196 "Task Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        ImportAttachment();
+                        Rec.ImportAttachment();
                     end;
                 }
                 action("E&xport")
@@ -124,7 +126,7 @@ page 5196 "Task Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        ExportAttachment();
+                        Rec.ExportAttachment();
                     end;
                 }
                 action(Remove)
@@ -137,7 +139,7 @@ page 5196 "Task Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        RemoveAttachment(true);
+                        Rec.RemoveAttachment(true);
                     end;
                 }
             }
@@ -148,9 +150,9 @@ page 5196 "Task Interaction Languages"
     var
         RecordsFound: Boolean;
     begin
-        RecordsFound := Find(Which);
-        CurrPage.Editable := ("To-do No." <> '');
-        if Task.Get("To-do No.") then
+        RecordsFound := Rec.Find(Which);
+        CurrPage.Editable := (Rec."To-do No." <> '');
+        if Task.Get(Rec."To-do No.") then
             CurrPage.Editable := not Task.Closed;
 
         exit(RecordsFound);

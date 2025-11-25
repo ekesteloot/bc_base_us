@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Statement;
+
 codeunit 382 "BankAccStmtLines-Delete"
 {
     Permissions = TableData "Bank Account Statement Line" = d;
@@ -5,8 +7,8 @@ codeunit 382 "BankAccStmtLines-Delete"
 
     trigger OnRun()
     begin
-        BankAccStmtLine.SetRange("Bank Account No.", "Bank Account No.");
-        BankAccStmtLine.SetRange("Statement No.", "Statement No.");
+        BankAccStmtLine.SetRange("Bank Account No.", Rec."Bank Account No.");
+        BankAccStmtLine.SetRange("Statement No.", Rec."Statement No.");
         BankAccStmtLine.DeleteAll();
     end;
 

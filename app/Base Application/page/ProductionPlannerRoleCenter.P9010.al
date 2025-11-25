@@ -1,3 +1,33 @@
+﻿namespace Microsoft.Manufacturing.RoleCenters;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Family;
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Reports;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.StandardCost;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+using Microsoft.Shared.Navigate;
+using System.Email;
+using System.Integration.PowerBI;
+using System.Security.User;
+using System.Threading;
+
 page 9010 "Production Planner Role Center"
 {
     Caption = 'Manufacturing Manager';
@@ -273,33 +303,27 @@ page 9010 "Production Planner Role Center"
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Item Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Item),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Item),
+                                        Recurring = const(false));
                     ToolTip = 'Post item transactions directly to the item ledger to adjust inventory in connection with purchases, sales, and positive or negative adjustments without using documents. You can save sets of item journal lines as standard journals so that you can perform recurring postings quickly. A condensed version of the item journal function exists on item cards for quick adjustment of an items inventory quantity.';
                 }
                 action(ItemReclassificationJournals)
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Item Reclassification Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Transfer),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Transfer),
+                                        Recurring = const(false));
                     ToolTip = 'Change information recorded on item ledger entries. Typical inventory information to reclassify includes dimensions and sales campaign codes, but you can also perform basic inventory transfers by reclassifying location and bin codes. Serial or lot numbers and their expiration dates must be reclassified with the Item Tracking Reclassification journal.';
                 }
                 action(RevaluationJournals)
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Revaluation Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Revaluation),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Revaluation),
+                                        Recurring = const(false));
                     ToolTip = 'Change the inventory value of items, for example after doing a physical inventory.';
                 }
                 action(ConsumptionJournals)
@@ -307,8 +331,8 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Consumption Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Consumption),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Consumption),
+                                        Recurring = const(false));
                     ToolTip = 'Post the consumption of material as operations are performed.';
                 }
                 action(OutputJournals)
@@ -316,8 +340,8 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Output Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Output),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Output),
+                                        Recurring = const(false));
                     ToolTip = 'Post finished end items and time spent in production. ';
                 }
                 action(RecurringConsumptionJournals)
@@ -325,8 +349,8 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Recurring Consumption Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Consumption),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(Consumption),
+                                        Recurring = const(true));
                     ToolTip = 'Post the consumption of material as operations are performed.';
                 }
                 action(RecurringOutputJournals)
@@ -334,8 +358,8 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Recurring Output Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Output),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(Output),
+                                        Recurring = const(true));
                     ToolTip = 'View all recurring output journals.';
                 }
                 action(CapacityJournals)
@@ -343,8 +367,8 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Capacity Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Capacity),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Capacity),
+                                        Recurring = const(false));
                     ToolTip = 'Post consumed capacities that are not assigned to the production order. For example, maintenance work must be assigned to capacity, but not to a production order.';
                 }
                 action(RecurringCapacityJournals)
@@ -352,8 +376,8 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Recurring Capacity Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Capacity),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(Capacity),
+                                        Recurring = const(true));
                     ToolTip = 'Post consumed capacities that are not posted as part of production order output, such as maintenance work.';
                 }
 
@@ -367,41 +391,33 @@ page 9010 "Production Planner Role Center"
                 {
                     ApplicationArea = Planning;
                     Caption = 'Planning Worksheets';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Req. Wksh. Names";
-                    RunPageView = WHERE("Template Type" = CONST(Planning),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Planning),
+                                        Recurring = const(false));
                     ToolTip = 'Plan supply orders automatically to fulfill new demand.';
                 }
                 action(RequisitionWorksheets)
                 {
                     ApplicationArea = Planning;
                     Caption = 'Requisition Worksheets';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Req. Wksh. Names";
-                    RunPageView = WHERE("Template Type" = CONST("Req."),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const("Req."),
+                                        Recurring = const(false));
                     ToolTip = 'Calculate a supply plan to fulfill item demand with purchases or transfers.';
                 }
                 action(SubcontractingWorksheets)
                 {
                     ApplicationArea = Planning;
                     Caption = 'Subcontracting Worksheets';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Req. Wksh. Names";
-                    RunPageView = WHERE("Template Type" = CONST("For. Labor"),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const("For. Labor"),
+                                        Recurring = const(false));
                     ToolTip = 'Calculate the needed production supply, find the production orders that have material ready to send to a subcontractor, and automatically create purchase orders for subcontracted operations from production order routings.';
                 }
                 action("Standard Cost Worksheet")
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Standard Cost Worksheet';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Standard Cost Worksheet Names";
                     ToolTip = 'Review or update standard costs. Purchasers, production or assembly managers can use the worksheet to simulate the effect on the cost of the manufactured or assembled item if the standard cost for consumption, production capacity usage, or assembly resource usage is changed. You can set a cost change to take effect on a specified date.';
                 }
@@ -415,8 +431,6 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Production BOM';
                     Image = BOM;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Production BOM List";
                     ToolTip = 'Open the item''s production bill of material to view or edit its components.';
                 }
@@ -425,7 +439,7 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Certified';
                     RunObject = Page "Production BOM List";
-                    RunPageView = WHERE(Status = CONST(Certified));
+                    RunPageView = where(Status = const(Certified));
                     ToolTip = 'View the list of certified production BOMs.';
                 }
                 action(ProductionBOMUnderDevelopment)
@@ -433,7 +447,7 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Under Development';
                     RunObject = Page "Production BOM List";
-                    RunPageView = WHERE(Status = CONST("Under Development"));
+                    RunPageView = where(Status = const("Under Development"));
                     ToolTip = 'View the list of production BOMs that are not yet certified.';
                 }
                 action(Routings)
@@ -441,8 +455,6 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Routings';
                     Image = Route;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Routing List";
                     ToolTip = 'View or edit operation sequences and process times for produced items.';
                 }
@@ -450,8 +462,6 @@ page 9010 "Production Planner Role Center"
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Routing Links';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Routing Links";
                     ToolTip = 'View or edit links that are set up between production BOM lines and routing lines to ensure just-in-time flushing of components.';
                 }
@@ -460,8 +470,6 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Standard Tasks';
                     Image = TaskList;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Standard Tasks";
                     ToolTip = 'View or edit standard production operations.';
                 }
@@ -469,8 +477,6 @@ page 9010 "Production Planner Role Center"
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Families';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Family List";
                     ToolTip = 'View or edit a grouping of production items whose relationship is based on the similarity of their manufacturing processes. By forming production families, some items can be manufactured twice or more in one production, which will optimize material consumption.';
                 }
@@ -479,8 +485,6 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Items';
                     Image = Item;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item List";
                     ToolTip = 'View or edit detailed information for the products that you trade in. The item card can be of type Inventory or Service to specify if the item is a physical unit or a labor time unit. Here you also define if items in inventory or on incoming orders are automatically reserved for outbound documents and whether order tracking links are created between demand and supply to reflect planning actions.';
                 }
@@ -488,21 +492,17 @@ page 9010 "Production Planner Role Center"
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Produced';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item List";
-                    RunPageView = WHERE("Replenishment System" = CONST("Prod. Order"));
+                    RunPageView = where("Replenishment System" = const("Prod. Order"));
                     ToolTip = 'View the list of production items.';
                 }
                 action(ProdDesign_ItemsRawMaterials)
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Raw Materials';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Item List";
-                    RunPageView = WHERE("Low-Level Code" = FILTER(> 0),
-                                        "Replenishment System" = CONST(Purchase));
+                    RunPageView = where("Low-Level Code" = filter(> 0),
+                                        "Replenishment System" = const(Purchase));
                     ToolTip = 'View the list of items that are not bills of material.';
                 }
                 action("Stockkeeping Units")
@@ -510,8 +510,6 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Warehouse;
                     Caption = 'Stockkeeping Units';
                     Image = SKU;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Stockkeeping Unit List";
                     ToolTip = 'Open the list of item SKUs to view or edit instances of item at different locations or with different variants. ';
                 }
@@ -525,8 +523,6 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Work Centers';
                     Image = WorkCenter;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Work Center List";
                     ToolTip = 'View or edit the list of work centers.';
                 }
@@ -536,7 +532,7 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Internal';
                     Image = Comment;
                     RunObject = Page "Work Center List";
-                    RunPageView = WHERE("Subcontractor No." = FILTER(= ''));
+                    RunPageView = where("Subcontractor No." = filter(= ''));
                     ToolTip = 'View or register internal comments for the service item. Internal comments are for internal use only and are not printed on reports.';
                 }
                 action(WorkCentersSubcontracted)
@@ -544,7 +540,7 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Subcontracted';
                     RunObject = Page "Work Center List";
-                    RunPageView = WHERE("Subcontractor No." = FILTER(<> ''));
+                    RunPageView = where("Subcontractor No." = filter(<> ''));
                     ToolTip = 'View the list of ongoing purchase orders for subcontracted production orders.';
                 }
                 action("Machine Centers")
@@ -552,8 +548,6 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Machine Centers';
                     Image = MachineCenter;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Machine Center List";
                     ToolTip = 'View the list of machine centers.';
                 }
@@ -562,8 +556,6 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Registered Absence';
                     Image = Absence;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Registered Absences";
                     ToolTip = 'View absence hours for work or machine centers.';
                 }
@@ -572,8 +564,6 @@ page 9010 "Production Planner Role Center"
                     ApplicationArea = Manufacturing;
                     Caption = 'Vendors';
                     Image = Vendor;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Vendor List";
                     ToolTip = 'View or edit detailed information for the vendors that you trade with. From each vendor card, you can open related information, such as purchase statistics and ongoing orders, and you can define special prices and line discounts that the vendor grants you if certain conditions are met.';
                 }
@@ -623,9 +613,6 @@ page 9010 "Production Planner Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = '&Item';
                 Image = Item;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Item Card";
                 RunPageMode = Create;
                 ToolTip = 'Create a new item.';
@@ -635,7 +622,6 @@ page 9010 "Production Planner Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = 'Planned Production &Order';
                 Image = "Order";
-                Promoted = false;
                 RunObject = Page "Planned Production Order";
                 RunPageMode = Create;
                 ToolTip = 'Create a new planned production order to supply a produced item.';
@@ -661,9 +647,6 @@ page 9010 "Production Planner Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = 'Production &BOM';
                 Image = BOM;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Production BOM";
                 RunPageMode = Create;
                 ToolTip = 'Create a new bill of material for a produced item.';
@@ -673,9 +656,6 @@ page 9010 "Production Planner Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = '&Routing';
                 Image = Route;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page Routing;
                 RunPageMode = Create;
                 ToolTip = 'Create a routing defining the operations that are required to produce an end item.';
@@ -685,9 +665,6 @@ page 9010 "Production Planner Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = '&Purchase Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
                 ToolTip = 'Purchase goods or services from a vendor.';

@@ -10,7 +10,7 @@ report 6250 "Auto Posting Errors"
     {
         dataitem("Gen. Journal Batch"; "Gen. Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             column(JnlTmplName_GenJnlBatch; "Journal Template Name")
             {
             }
@@ -25,7 +25,7 @@ report 6250 "Auto Posting Errors"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 PrintOnlyIfDetail = true;
                 column(JnlTemplateName_GenJnlBatch; "Gen. Journal Batch"."Journal Template Name")
                 {
@@ -92,9 +92,9 @@ report 6250 "Auto Posting Errors"
                 }
                 dataitem("Gen. Journal Line"; "Gen. Journal Line")
                 {
-                    DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
+                    DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
                     DataItemLinkReference = "Gen. Journal Batch";
-                    DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+                    DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
                     RequestFilterFields = "Posting Date";
                     column(PostingDate_GenJnlLine; Format("Posting Date"))
                     {
@@ -164,7 +164,7 @@ report 6250 "Auto Posting Errors"
                     }
                     dataitem(DimensionLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -197,8 +197,8 @@ report 6250 "Auto Posting Errors"
                     }
                     dataitem("Gen. Jnl. Allocation"; "Gen. Jnl. Allocation")
                     {
-                        DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD("Journal Batch Name"), "Journal Line No." = FIELD("Line No.");
-                        DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Journal Line No.", "Line No.");
+                        DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field("Journal Batch Name"), "Journal Line No." = field("Line No.");
+                        DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Journal Line No.", "Line No.");
                         column(AccountNo_GenJnlAllocation; "Account No.")
                         {
                         }
@@ -243,7 +243,7 @@ report 6250 "Auto Posting Errors"
                         }
                         dataitem(DimensionLoopAllocations; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(AllocationDimText; AllocationDimText)
                             {
                             }
@@ -277,7 +277,7 @@ report 6250 "Auto Posting Errors"
                     }
                     dataitem(ErrorLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorTextNumber; ErrorText[Number])
                         {
                         }
@@ -448,7 +448,7 @@ report 6250 "Auto Posting Errors"
                 }
                 dataitem(ReconcileLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(GLAccNetChangeNo; TempGLAccNetChange."No.")
                     {
                     }

@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Contact;
+
 page 5066 "Industry Groups"
 {
     ApplicationArea = RelationshipMgmt;
@@ -13,7 +17,7 @@ page 5066 "Industry Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the industry group.';
@@ -60,7 +64,7 @@ page 5066 "Industry Groups"
                     Caption = 'C&ontacts';
                     Image = CustomerContact;
                     RunObject = Page "Industry Group Contacts";
-                    RunPageLink = "Industry Group Code" = FIELD(Code);
+                    RunPageLink = "Industry Group Code" = field(Code);
                     ToolTip = 'View a list of the contact companies you have assigned the industry group to.';
                 }
             }

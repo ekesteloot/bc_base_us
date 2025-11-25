@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using System.Text;
+
 codeunit 341 "VAT CaptionClass Mgmt"
 {
     SingleInstance = true;

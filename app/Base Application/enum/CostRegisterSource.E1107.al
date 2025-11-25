@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Ledger;
+
 enum 1107 "Cost Register Source"
 {
     Extensible = true;

@@ -1,9 +1,14 @@
+namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.InventoryMgt.Comment;
+using Microsoft.InventoryMgt.Tracking;
+
 page 6564 "Invt. Shipment"
 {
     Caption = 'Inventory Shipment';
     PageType = Document;
     SourceTable = "Invt. Document Header";
-    SourceTableView = WHERE("Document Type" = CONST(Shipment));
+    SourceTableView = where("Document Type" = const(Shipment));
 
     layout
     {
@@ -83,8 +88,8 @@ page 6564 "Invt. Shipment"
             part(ShipmentLines; "Invt. Shipment Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("No.");
             }
             group(Control1900309501)
             {
@@ -139,8 +144,8 @@ page 6564 "Invt. Shipment"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Invt. Document Statistics";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -150,8 +155,8 @@ page 6564 "Invt. Shipment"
                     Image = ViewComments;
                     ToolTip = 'View or edit comments.';
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Inventory Shipment"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Inventory Shipment"),
+                                  "No." = field("No.");
                 }
                 action(Dimensions)
                 {
@@ -185,7 +190,7 @@ page 6564 "Invt. Shipment"
                     var
                         ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
                     begin
-                        ItemTrackingDocMgt.CopyDocTrkgFromReservation(DATABASE::"Invt. Document Header", 1, "No.", false);
+                        ItemTrackingDocMgt.CopyDocTrkgFromReservation(DATABASE::"Invt. Document Header", 1, Rec."No.", false);
                     end;
                 }
                 action("Copy Document...")

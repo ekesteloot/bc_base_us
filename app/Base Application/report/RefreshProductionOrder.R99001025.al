@@ -1,3 +1,13 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Family;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+
 report 99001025 "Refresh Production Order"
 {
     Caption = 'Refresh Production Order';
@@ -8,7 +18,7 @@ report 99001025 "Refresh Production Order"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             RequestFilterFields = Status, "No.";
 
             trigger OnAfterGetRecord()
@@ -252,8 +262,8 @@ report 99001025 "Refresh Production Order"
                     ProdOrderLine2.CalcFields("Reserved Qty. (Base)");
                     if ProdOrderLine2."Reserved Qty. (Base)" <> 0 then
                         if ShouldCheckReservedQty(
-                             ProdOrderLine2."Prod. Order No.", 0, DATABASE::"Prod. Order Line",
-                             ProdOrderLine2.Status, ProdOrderLine2."Line No.", DATABASE::"Prod. Order Component")
+                             ProdOrderLine2."Prod. Order No.", 0, Enum::TableID::"Prod. Order Line".AsInteger(),
+                             ProdOrderLine2.Status, ProdOrderLine2."Line No.", Enum::TableID::"Prod. Order Component".AsInteger())
                         then
                             ProdOrderLine2.TestField("Reserved Qty. (Base)", 0);
                 end;
@@ -269,8 +279,8 @@ report 99001025 "Refresh Production Order"
                             if ProdOrderComp2."Reserved Qty. (Base)" <> 0 then
                                 if ShouldCheckReservedQty(
                                      ProdOrderComp2."Prod. Order No.", ProdOrderComp2."Line No.",
-                                     DATABASE::"Prod. Order Component", ProdOrderComp2.Status,
-                                     ProdOrderComp2."Prod. Order Line No.", DATABASE::"Prod. Order Line")
+                                     Enum::TableID::"Prod. Order Component".AsInteger(), ProdOrderComp2.Status,
+                                     ProdOrderComp2."Prod. Order Line No.", Enum::TableID::"Prod. Order Line".AsInteger())
                                 then
                                     ProdOrderComp2.TestField("Reserved Qty. (Base)", 0);
                         until ProdOrderComp2.Next() = 0;

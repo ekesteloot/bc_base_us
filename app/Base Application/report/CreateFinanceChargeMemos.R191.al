@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 191 "Create Finance Charge Memos"
 {
     Caption = 'Create Finance Charge Memos';
@@ -7,7 +13,7 @@ report 191 "Create Finance Charge Memos"
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
 
             trigger OnAfterGetRecord()
@@ -62,7 +68,7 @@ report 191 "Create Finance Charge Memos"
         }
         dataitem(CustLedgEntry2; "Cust. Ledger Entry")
         {
-            DataItemTableView = SORTING("Customer No.");
+            DataItemTableView = sorting("Customer No.");
             RequestFilterFields = "Document Type";
 
             trigger OnPreDataItem()

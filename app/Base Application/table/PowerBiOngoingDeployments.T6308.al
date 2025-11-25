@@ -1,3 +1,5 @@
+namespace System.Integration.PowerBI;
+
 /// <summary>
 /// Tracks if a user has active background sessions to deploy, delete or retry deployment of Power BI reports.
 /// </summary>

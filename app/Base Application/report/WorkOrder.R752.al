@@ -1,19 +1,19 @@
 report 752 "Work Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/WorkOrder.rdlc';
+    RDLCLayout = './Sales/Document/WorkOrder.rdlc';
     Caption = 'Work Order';
 
     dataset
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             RequestFilterFields = "No.", "Sell-to Customer No.";
             RequestFilterHeading = 'Sales Order';
             dataitem(PageLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(No1_SalesHeader; "Sales Header"."No.")
                 {
                 }
@@ -61,9 +61,9 @@ report 752 "Work Order"
                 }
                 dataitem("Sales Line"; "Sales Line")
                 {
-                    DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                    DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                     DataItemLinkReference = "Sales Header";
-                    DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                    DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
                     column(No_SalesLine; "No.")
                     {
                         IncludeCaption = true;
@@ -96,9 +96,9 @@ report 752 "Work Order"
                 }
                 dataitem("Sales Comment Line"; "Sales Comment Line")
                 {
-                    DataItemLink = "Document Type" = FIELD("Document Type"), "No." = FIELD("No.");
+                    DataItemLink = "Document Type" = field("Document Type"), "No." = field("No.");
                     DataItemLinkReference = "Sales Header";
-                    DataItemTableView = WHERE("Document Line No." = CONST(0));
+                    DataItemTableView = where("Document Line No." = const(0));
                     column(Date_SalesCommentLine; Format(Date))
                     {
                     }
@@ -119,7 +119,7 @@ report 752 "Work Order"
                 }
                 dataitem("Extra Lines"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(NoCaption; NoCaptionLbl)
                     {
                     }

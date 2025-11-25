@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using System.Telemetry;
+using System.Utilities;
+
 table 189 "VAT Setup"
 {
     Caption = 'VAT Setup';

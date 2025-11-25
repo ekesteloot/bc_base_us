@@ -1,4 +1,12 @@
 #if not CLEAN21
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Calculation;
+
+using System.Environment.Configuration;
+
 pageextension 7049 "Price Calc. Update Parameters" extends "Schedule Feature Data Update"
 {
     ObsoleteState = Pending;

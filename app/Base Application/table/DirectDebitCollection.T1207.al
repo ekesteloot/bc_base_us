@@ -1,3 +1,9 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.Security.AccessControl;
+
 table 1207 "Direct Debit Collection"
 {
     Caption = 'Direct Debit Collection';
@@ -33,7 +39,7 @@ table 1207 "Direct Debit Collection"
         }
         field(6; "No. of Transfers"; Integer)
         {
-            CalcFormula = Count("Direct Debit Collection Entry" WHERE("Direct Debit Collection No." = FIELD("No.")));
+            CalcFormula = count("Direct Debit Collection Entry" where("Direct Debit Collection No." = field("No.")));
             Caption = 'No. of Transfers';
             FieldClass = FlowField;
         }
@@ -44,7 +50,7 @@ table 1207 "Direct Debit Collection"
         }
         field(8; "To Bank Account Name"; Text[100])
         {
-            CalcFormula = Lookup("Bank Account".Name WHERE("No." = FIELD("To Bank Account No.")));
+            CalcFormula = Lookup("Bank Account".Name where("No." = field("To Bank Account No.")));
             Caption = 'To Bank Account Name';
             FieldClass = FlowField;
         }

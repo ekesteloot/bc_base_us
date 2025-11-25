@@ -10,7 +10,7 @@ report 10212 "Completed Jobs"
     {
         dataitem(Job; Job)
         {
-            DataItemTableView = WHERE(Status = CONST(Completed));
+            DataItemTableView = where(Status = const(Completed));
             RequestFilterFields = "No.", "Bill-to Customer No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

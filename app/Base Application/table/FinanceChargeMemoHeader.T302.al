@@ -1,4 +1,23 @@
-﻿table 302 "Finance Charge Memo Header"
+﻿namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using System.Globalization;
+using System.IO;
+using System.Security.User;
+using System.Text;
+using System.Utilities;
+
+table 302 "Finance Charge Memo Header"
 {
     Caption = 'Finance Charge Memo Header';
     DataCaptionFields = "No.", Name;
@@ -46,6 +65,7 @@
                 Contact := Cust.Contact;
                 "Country/Region Code" := Cust."Country/Region Code";
                 "Language Code" := Cust."Language Code";
+                "Format Region" := Cust."Format Region";
                 "Currency Code" := Cust."Currency Code";
                 "Shortcut Dimension 1 Code" := Cust."Global Dimension 1 Code";
                 "Shortcut Dimension 2 Code" := Cust."Global Dimension 2 Code";
@@ -81,11 +101,9 @@
         field(7; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -106,11 +124,9 @@
         field(8; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -175,24 +191,24 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(16; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(17; "Customer Posting Group"; Code[20])
@@ -296,49 +312,49 @@
         }
         field(30; Comment; Boolean)
         {
-            CalcFormula = Exist("Fin. Charge Comment Line" WHERE(Type = CONST("Finance Charge Memo"),
-                                                                  "No." = FIELD("No.")));
+            CalcFormula = exist("Fin. Charge Comment Line" where(Type = const("Finance Charge Memo"),
+                                                                  "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
         }
         field(31; "Remaining Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Finance Charge Memo Line"."Remaining Amount" WHERE("Finance Charge Memo No." = FIELD("No."),
-                                                                                   "Detailed Interest Rates Entry" = CONST(false)));
+            CalcFormula = sum("Finance Charge Memo Line"."Remaining Amount" where("Finance Charge Memo No." = field("No."),
+                                                                                   "Detailed Interest Rates Entry" = const(false)));
             Caption = 'Remaining Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(32; "Interest Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Finance Charge Memo Line".Amount WHERE("Finance Charge Memo No." = FIELD("No."),
-                                                                       Type = CONST("Customer Ledger Entry"),
-                                                                       "Detailed Interest Rates Entry" = CONST(false)));
+            CalcFormula = sum("Finance Charge Memo Line".Amount where("Finance Charge Memo No." = field("No."),
+                                                                       Type = const("Customer Ledger Entry"),
+                                                                       "Detailed Interest Rates Entry" = const(false)));
             Caption = 'Interest Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(33; "Additional Fee"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Finance Charge Memo Line".Amount WHERE("Finance Charge Memo No." = FIELD("No."),
-                                                                       Type = CONST("G/L Account")));
+            CalcFormula = sum("Finance Charge Memo Line".Amount where("Finance Charge Memo No." = field("No."),
+                                                                       Type = const("G/L Account")));
             Caption = 'Additional Fee';
             Editable = false;
             FieldClass = FlowField;
         }
         field(34; "VAT Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Finance Charge Memo Line"."VAT Amount" WHERE("Finance Charge Memo No." = FIELD("No."),
-                                                                             "Detailed Interest Rates Entry" = CONST(false)));
+            CalcFormula = sum("Finance Charge Memo Line"."VAT Amount" where("Finance Charge Memo No." = field("No."),
+                                                                             "Detailed Interest Rates Entry" = const(false)));
             Caption = 'VAT Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -403,10 +419,15 @@
                     InitVATDate();
             end;
         }
+        field(54; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(163; "Company Bank Account Code"; Code[20])
         {
             Caption = 'Company Bank Account Code';
-            TableRelation = "Bank Account" where("Currency Code" = FIELD("Currency Code"));
+            TableRelation = "Bank Account" where("Currency Code" = field("Currency Code"));
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -416,7 +437,7 @@
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
 
             trigger OnValidate()
@@ -875,46 +896,17 @@
         exit(true);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, TableID, No, SourceCodeSetup."Finance Charge Memo",
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-
-        DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-
-        OnAfterCreateDim(Rec, CurrFieldNo, TableID, No);
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
         IsHandled: Boolean;
     begin
+        SourceCodeSetup.Get();
+
         IsHandled := false;
         OnBeforeCreateDim(Rec, CurrFieldNo, DefaultDimSource, IsHandled);
         if IsHandled then
             exit;
-
-        SourceCodeSetup.Get();
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -925,9 +917,6 @@
 
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
-#if not CLEAN20
-        RunEventOnAfterCreateDim(DefaultDimSource);
-#endif
         OnAfterCreateDimProcedure(Rec, CurrFieldNo, DefaultDimSource);
     end;
 
@@ -1071,69 +1060,6 @@
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Finance Charge Memo Header", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Finance Charge Memo Header", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDimTableIDs(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Finance Charge Memo Header") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDim(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDim(Rec, CurrFieldNo, TableID, No);
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDimTableIDs(var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDim(var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
@@ -1144,13 +1070,6 @@
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetNoSeriesCode(var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; SalesSetup: Record "Sales & Receivables Setup"; var NoSeriesCode: Code[20])
     begin
@@ -1166,13 +1085,6 @@
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; CurrFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterTestNoSeries(var FinanceChargeMemoHeader: Record "Finance Charge Memo Header")
     begin

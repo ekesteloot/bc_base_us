@@ -761,18 +761,6 @@ page 8900 "Administrator Main Role Center"
                     RunObject = page "CRM Connection Setup";
                     AccessByPermission = TableData "CRM Connection Setup" = IM;
                 }
-#if not CLEAN20
-                action("SMTP Mail Setup")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Mail Setup';
-                    RunObject = Page "Email Account Wizard";
-                    Visible = false;
-                    ObsoleteReason = 'Action is replaced with "Email Account Setup".';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '20.0';
-                }
-#endif
                 action("Email Account Setup")
                 {
                     ApplicationArea = Basic, Suite;

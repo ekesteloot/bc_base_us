@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 table 130402 "CAL Test Codeunit"
 {
     Caption = 'CAL Test Codeunit';

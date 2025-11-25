@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 enum 6567 "Item Tracking Comment Type"
 {
     Extensible = true;

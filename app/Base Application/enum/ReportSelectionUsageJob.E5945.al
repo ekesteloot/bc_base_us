@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Setup;
+
 enum 5945 "Report Selection Usage Job"
 {
     Extensible = true;

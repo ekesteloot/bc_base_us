@@ -1,3 +1,19 @@
+﻿namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 5902 "Service Quote"
 {
     DefaultLayout = RDLC;
@@ -8,7 +24,7 @@ report 5902 "Service Quote"
     {
         dataitem("Service Header"; "Service Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Quote));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Quote));
             RequestFilterFields = "No.", "Customer No.";
             column(Service_Header_Document_Type; "Document Type")
             {
@@ -18,10 +34,10 @@ report 5902 "Service Quote"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo_Picture; CompanyInfo.Picture)
                     {
                     }
@@ -141,7 +157,7 @@ report 5902 "Service Quote"
                     }
                     dataitem(DimensionLoop1; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -191,9 +207,9 @@ report 5902 "Service Quote"
                     }
                     dataitem("Service Order Comment"; "Service Comment Line")
                     {
-                        DataItemLink = "Table Subtype" = FIELD("Document Type"), "No." = FIELD("No.");
+                        DataItemLink = "Table Subtype" = field("Document Type"), "No." = field("No.");
                         DataItemLinkReference = "Service Header";
-                        DataItemTableView = SORTING("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") WHERE("Table Name" = CONST("Service Header"), Type = CONST(General));
+                        DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") where("Table Name" = const("Service Header"), Type = const(General));
                         column(Service_Order_Comment__Line_No__; "Line No.")
                         {
                         }
@@ -215,9 +231,9 @@ report 5902 "Service Quote"
                     }
                     dataitem("Service Item Line"; "Service Item Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Service Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
                         column(NoOfCopies; NoOfCopies)
                         {
                         }
@@ -289,8 +305,8 @@ report 5902 "Service Quote"
                         }
                         dataitem("Fault Comment"; "Service Comment Line")
                         {
-                            DataItemLink = "Table Subtype" = FIELD("Document Type"), "No." = FIELD("Document No."), "Table Line No." = FIELD("Line No.");
-                            DataItemTableView = SORTING("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") WHERE("Table Name" = CONST("Service Header"), Type = CONST(Fault));
+                            DataItemLink = "Table Subtype" = field("Document Type"), "No." = field("Document No."), "Table Line No." = field("Line No.");
+                            DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") where("Table Name" = const("Service Header"), Type = const(Fault));
                             column(Fault_Comment_Comment; Comment)
                             {
                             }
@@ -327,8 +343,8 @@ report 5902 "Service Quote"
                         }
                         dataitem("Resolution Comment"; "Service Comment Line")
                         {
-                            DataItemLink = "Table Subtype" = FIELD("Document Type"), "No." = FIELD("Document No."), "Table Line No." = FIELD("Line No.");
-                            DataItemTableView = SORTING("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") WHERE("Table Name" = CONST("Service Header"), Type = CONST(Resolution));
+                            DataItemLink = "Table Subtype" = field("Document Type"), "No." = field("Document No."), "Table Line No." = field("Line No.");
+                            DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") where("Table Name" = const("Service Header"), Type = const(Resolution));
                             column(Resolution_Comment_Comment; Comment)
                             {
                             }
@@ -372,9 +388,9 @@ report 5902 "Service Quote"
                     }
                     dataitem("Service Line"; "Service Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Service Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
                         column(Service_Line__Service_Item_Serial_No__; "Service Item Serial No.")
                         {
                         }
@@ -458,7 +474,7 @@ report 5902 "Service Quote"
                         }
                         dataitem(DimesionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_Control12; DimText)
                             {
                             }
@@ -530,7 +546,7 @@ report 5902 "Service Quote"
                     }
                     dataitem(Shipto; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(ShipToAddr_6_; ShipToAddr[6])
                         {
                         }
@@ -594,6 +610,7 @@ report 5902 "Service Quote"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Service Header");
@@ -648,7 +665,7 @@ report 5902 "Service Quote"
 
         trigger OnOpenPage()
         begin
-            LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Service Quote") <> '';
+            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Service Quote") <> '';
             LogInteractionEnable := LogInteraction;
         end;
     }
@@ -694,10 +711,7 @@ report 5902 "Service Quote"
                 until "Service Header".Next() = 0;
     end;
 
-    var
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
+    var        
         ServiceSetup: Record "Service Mgt. Setup";
         RespCenter: Record "Responsibility Center";
         DimSetEntry1: Record "Dimension Set Entry";
@@ -725,7 +739,6 @@ report 5902 "Service Quote"
         GrossAmt: Decimal;
         TotGrossAmt: Decimal;
         OutputNo: Integer;
-        [InDataSet]
         LogInteractionEnable: Boolean;
 
         Text001: Label 'Service Quote %1';
@@ -746,6 +759,11 @@ report 5902 "Service Quote"
         TotalCaptionLbl: Label 'Total';
         Line_DimensionsCaptionLbl: Label 'Line Dimensions';
         Ship_to_AddressCaptionLbl: Label 'Ship-to Address';
+	
+    protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     local procedure IsReportInPreviewMode(): Boolean
     var

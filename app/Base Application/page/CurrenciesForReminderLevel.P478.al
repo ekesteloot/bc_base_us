@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 page 478 "Currencies for Reminder Level"
 {
     Caption = 'Currencies for Reminder Level';

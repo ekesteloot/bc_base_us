@@ -1,4 +1,6 @@
-﻿enum 5605 "FA Journal Line Document Type"
+﻿namespace Microsoft.FixedAssets.Journal;
+
+enum 5605 "FA Journal Line Document Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

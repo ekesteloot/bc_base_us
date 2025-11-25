@@ -1,9 +1,12 @@
+namespace Microsoft.Intercompany.Dimension;
+
 page 601 "IC Dimension Values"
 {
     Caption = 'Intercompany Dimension Values';
     DataCaptionFields = "Dimension Code";
     PageType = List;
     SourceTable = "IC Dimension Value";
+    RefreshOnActivate = true;
 
     layout
     {
@@ -14,26 +17,22 @@ page 601 "IC Dimension Values"
                 IndentationColumn = NameIndent;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Dimensions;
-                    Style = Strong;
-                    StyleExpr = Emphasize;
-                    ToolTip = 'Specifies the code for the dimension value.';
+                    ToolTip = 'Specifies the code for the intercompany dimension value.';
                 }
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = Dimensions;
-                    Style = Strong;
-                    StyleExpr = Emphasize;
-                    ToolTip = 'Specifies the name of the dimension code.';
+                    ToolTip = 'Specifies the name of the intercompany dimension value.';
                 }
                 field("Dimension Value Type"; Rec."Dimension Value Type")
                 {
                     ApplicationArea = Dimensions;
-                    ToolTip = 'Specifies the dimension value.';
+                    ToolTip = 'Specifies the intercompany dimension value type.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -41,7 +40,7 @@ page 601 "IC Dimension Values"
                 field("Map-to Dimension Value Code"; Rec."Map-to Dimension Value Code")
                 {
                     ApplicationArea = Dimensions;
-                    ToolTip = 'Specifies which intercompany dimension value corresponds to the dimension value on the line.';
+                    ToolTip = 'Specifies which dimension value corresponds to the intercompany dimension value on the line.';
                 }
             }
         }
@@ -68,13 +67,36 @@ page 601 "IC Dimension Values"
             {
                 Caption = 'F&unctions';
                 Image = "Action";
+                action(CopyFromDimensionValues)
+                {
+                    ApplicationArea = Dimensions;
+                    Caption = 'Copy from Dimension Values';
+                    Image = CopyDimensions;
+                    RunPageMode = View;
+                    ToolTip = 'Creates intercompany dimension values from existing dimension values.';
+
+                    trigger OnAction()
+                    var
+                        ICDimValuesSelector: Page "IC Dim Values Selector";
+                    begin
+                        ICDimValuesSelector.SetDimensionCode(DimensionCode);
+                        ICDimValuesSelector.Run();
+                    end;
+                }
                 action("Indent IC Dimension Values")
                 {
                     ApplicationArea = Dimensions;
                     Caption = 'Indent IC Dimension Values';
                     Image = Indent;
-                    RunObject = Codeunit "IC Dimension Value-Indent";
                     ToolTip = 'Indent the names of all dimension values between each set of Begin-Total and End-Total dimension values. It will also enter a totaling interval for each End-Total dimension value.';
+
+                    trigger OnAction()
+                    var
+                        ICDimensionValueIndent: Codeunit "IC Dimension Value-Indent";
+                    begin
+                        ICDimensionValueIndent.Run(Rec);
+                        CurrPage.Update();
+                    end;
                 }
             }
         }
@@ -83,7 +105,9 @@ page 601 "IC Dimension Values"
             group(Category_Process)
             {
                 Caption = 'Process';
-
+                actionref(CopyFromDimensionValues_Promoted; CopyFromDimensionValues)
+                {
+                }
                 actionref("Indent IC Dimension Values_Promoted"; "Indent IC Dimension Values")
                 {
                 }
@@ -91,22 +115,23 @@ page 601 "IC Dimension Values"
         }
     }
 
+    trigger OnOpenPage()
+    begin
+        Rec.SetRange("Dimension Code", DimensionCode);
+    end;
+
     trigger OnAfterGetRecord()
     begin
         NameIndent := 0;
-        FormatLine();
+        NameIndent := Rec.Indentation;
     end;
 
     var
-        [InDataSet]
-        Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
+        DimensionCode: Code[20];
 
-    local procedure FormatLine()
+    procedure SetDimensionCode(DimCode: Code[20])
     begin
-        Emphasize := "Dimension Value Type" <> "Dimension Value Type"::Standard;
-        NameIndent := Indentation;
+        DimensionCode := DimCode;
     end;
 }
-

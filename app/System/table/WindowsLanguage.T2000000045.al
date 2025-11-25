@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Globalization;
+
 table 2000000045 "Windows Language"
 {
     Scope = Cloud;
@@ -49,7 +55,7 @@ table 2000000045 "Windows Language"
         field(34; "Localization Exist"; Boolean)
         {
         }
-        field(35;"Language Tag"; Text[80]) // https://www.w3.org/International/articles/language-tags/
+        field(35; "Language Tag"; Text[80]) // https://www.w3.org/International/articles/language-tags/
         {
         }
     }

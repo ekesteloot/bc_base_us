@@ -1,4 +1,8 @@
 #if not CLEAN21
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.ProjectMgt.Resources.Pricing;
+
 report 1193 "Implement Res. Price Change"
 {
     Caption = 'Implement Res. Price Change';
@@ -11,7 +15,7 @@ report 1193 "Implement Res. Price Change"
     {
         dataitem("Resource Price Change"; "Resource Price Change")
         {
-            DataItemTableView = SORTING(Type, Code, "Work Type Code", "Currency Code");
+            DataItemTableView = sorting(Type, Code, "Work Type Code", "Currency Code");
             RequestFilterFields = Type, "Code", "Currency Code";
 
             trigger OnAfterGetRecord()

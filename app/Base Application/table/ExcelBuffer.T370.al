@@ -1,3 +1,11 @@
+﻿namespace System.IO;
+
+using System;
+using System.Integration;
+using System.Reflection;
+using System.Utilities;
+using System.Xml;
+
 table 370 "Excel Buffer"
 {
     Caption = 'Excel Buffer';

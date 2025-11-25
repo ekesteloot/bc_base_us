@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5170 "Answer Where-Used"
 {
     Caption = 'Answer Where-Used';
@@ -5,7 +7,7 @@ page 5170 "Answer Where-Used"
     Editable = false;
     PageType = List;
     SourceTable = Rating;
-    SourceTableView = SORTING("Rating Profile Quest. Code", "Rating Profile Quest. Line No.");
+    SourceTableView = sorting("Rating Profile Quest. Code", "Rating Profile Quest. Line No.");
 
     layout
     {
@@ -25,7 +27,7 @@ page 5170 "Answer Where-Used"
                     DrillDown = false;
                     ToolTip = 'Specifies the description you have entered for this rating question in the Description field in the Profile Questionnaire Setup window.';
                 }
-                field(Points; Points)
+                field(Points; Rec.Points)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the number of points you have assigned to this answer.';

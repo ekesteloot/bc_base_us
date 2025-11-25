@@ -27,7 +27,7 @@ page 482 "Gen. Jnl. Dim. Filters"
                     var
                         DimensionValue: Record "Dimension Value";
                     begin
-                        exit(DimensionValue.LookUpDimFilter("Dimension Code", Text));
+                        exit(DimensionValue.LookUpDimFilter(Rec."Dimension Code", Text));
                     end;
                 }
             }
@@ -43,9 +43,9 @@ page 482 "Gen. Jnl. Dim. Filters"
         GenJnlDimFilter.SetRange("Journal Line No.", GenJournalLine."Line No.");
         if GenJnlDimFilter.FindSet() then
             repeat
-                Init();
-                TransferFields(GenJnlDimFilter);
-                Insert();
+                Rec.Init();
+                Rec.TransferFields(GenJnlDimFilter);
+                Rec.Insert();
             until GenJnlDimFilter.Next() = 0;
     end;
 
@@ -57,7 +57,7 @@ page 482 "Gen. Jnl. Dim. Filters"
         GenJnlDimFilter.SetRange("Journal Batch Name", GenJournalLine."Journal Batch Name");
         GenJnlDimFilter.SetRange("Journal Line No.", GenJournalLine."Line No.");
         GenJnlDimFilter.DeleteAll();
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
                 GenJnlDimFilter.Init();
                 GenJnlDimFilter.TransferFields(Rec);
@@ -65,7 +65,7 @@ page 482 "Gen. Jnl. Dim. Filters"
                 GenJnlDimFilter."Journal Batch Name" := GenJournalLine."Journal Batch Name";
                 GenJnlDimFilter."Journal Line No." := GenJournalLine."Line No.";
                 GenJnlDimFilter.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     var

@@ -1,3 +1,7 @@
+namespace System.AI;
+
+using System.Azure.KeyVault;
+
 codeunit 2004 "Machine Learning KeyVaultMgmt."
 {
     SingleInstance = true;

@@ -1,14 +1,24 @@
+﻿namespace Microsoft.WarehouseMgt.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.WarehouseMgt.Journal;
+using System.Security.User;
+using System.Utilities;
+
 report 7302 "Whse. Invt.-Registering - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/WhseInvtRegisteringTest.rdlc';
+    RDLCLayout = './WarehouseMgt/Reports/WhseInvtRegisteringTest.rdlc';
     Caption = 'Whse. Invt.-Registering - Test';
 
     dataset
     {
         dataitem("Warehouse Journal Batch"; "Warehouse Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name, "Location Code");
+            DataItemTableView = sorting("Journal Template Name", Name, "Location Code");
             RequestFilterFields = "Journal Template Name", Name;
             column(Warehouse_Journal_Batch_Journal_Template_Name; "Journal Template Name")
             {
@@ -21,8 +31,8 @@ report 7302 "Whse. Invt.-Registering - Test"
             }
             dataitem("Warehouse Journal Line"; "Warehouse Journal Line")
             {
-                DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
-                DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Location Code", "Line No.");
+                DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
+                DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Location Code", "Line No.");
                 RequestFilterFields = "Registering Date";
                 column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
                 {
@@ -137,7 +147,7 @@ report 7302 "Whse. Invt.-Registering - Test"
                 }
                 dataitem(ErrorLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -160,8 +170,10 @@ report 7302 "Whse. Invt.-Registering - Test"
                 var
                     WhseJnlLine2: Record "Warehouse Journal Line";
                     WhseJnlLine3: Record "Warehouse Journal Line";
+                    ItemVariant: Record "Item Variant";
                     UserSetupManagement: Codeunit "User Setup Management";
                     InvtPeriodEndDate: Date;
+                    ItemItemVariantLbl: Label '%1 %2', Comment = '%1 - Item No., %2 - Variant Code';
                 begin
                     OnBeforeWarehouseJournalLineOnAfterGetRecord("Warehouse Journal Line", ErrorCounter, ErrorText);
 
@@ -170,18 +182,22 @@ report 7302 "Whse. Invt.-Registering - Test"
 
                     if "Item No." = '' then
                         AddError(StrSubstNo(Text001, FieldCaption("Item No.")))
-                    else
+                    else begin
                         if not Item.Get("Item No.") then
-                            AddError(
-                              StrSubstNo(
-                                Text002,
-                                Item.TableCaption(), "Item No."))
+                            AddError(StrSubstNo(Text002, Item.TableCaption(), "Item No."))
                         else
                             if Item.Blocked then
-                                AddError(
-                                  StrSubstNo(
-                                    Text003,
-                                    Item.FieldCaption(Blocked), false, Item.TableCaption(), "Item No."));
+                                AddError(StrSubstNo(MustBeForErr, Item.FieldCaption(Blocked), false, Item.TableCaption(), "Item No."));
+
+                        if "Warehouse Journal Line"."Variant Code" <> '' then begin
+                            ItemVariant.SetLoadFields(Blocked);
+                            if ItemVariant.Get("Warehouse Journal Line"."Item No.", "Warehouse Journal Line"."Variant Code") then begin
+                                if ItemVariant.Blocked then
+                                    AddError(StrSubstNo(MustBeForErr, ItemVariant.FieldCaption(Blocked), false, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, "Warehouse Journal Line"."Item No.", "Warehouse Journal Line"."Variant Code")));
+                            end else
+                                AddError(StrSubstNo(Text002, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, "Warehouse Journal Line"."Item No.", "Warehouse Journal Line"."Variant Code")));
+                        end;
+                    end;
 
                     if "Registering Date" = 0D then
                         AddError(StrSubstNo(Text001, FieldCaption("Registering Date")))
@@ -311,7 +327,7 @@ report 7302 "Whse. Invt.-Registering - Test"
 
         Text001: Label '%1 must be specified.';
         Text002: Label '%1 %2 does not exist.';
-        Text003: Label '%1 must be %2 for %3 %4.';
+        MustBeForErr: Label '%1 must be %2 for %3 %4.';
         Text005: Label '%1 must not be a closing date.';
         Text006: Label 'The lines are not listed according to Registering Date because they were not entered in that order.';
         Text007: Label '%1 is not within your allowed range of registering dates.';

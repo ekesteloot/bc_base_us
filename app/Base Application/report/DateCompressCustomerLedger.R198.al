@@ -1,3 +1,12 @@
+namespace Microsoft.Sales.Receivables;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.FinanceCharge;
+using System.DataAdministration;
+using System.Utilities;
+
 report 198 "Date Compress Customer Ledger"
 {
     Caption = 'Date Compress Customer Ledger';
@@ -14,7 +23,7 @@ report 198 "Date Compress Customer Ledger"
     {
         dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
         {
-            DataItemTableView = SORTING("Customer No.", "Posting Date") WHERE(Open = CONST(false));
+            DataItemTableView = sorting("Customer No.", "Posting Date") where(Open = const(false));
             RequestFilterFields = "Customer No.", "Customer Posting Group", "Currency Code";
 
             trigger OnAfterGetRecord()
@@ -313,7 +322,6 @@ report 198 "Date Compress Customer Ledger"
         DimEntryNo: Integer;
         RetainDimText: Text[250];
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
         SummarizePositive: Boolean;
 
@@ -653,31 +661,6 @@ report 198 "Date Compress Customer Ledger"
 
         RetainDimText := DimSelectionBuf.GetDimSelectionText(3, REPORT::"Date Compress Customer Ledger", '');
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by InitializeRequest with parameter DateComprRetainFields', '20.0')]
-    procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; Description: Text[100]; RetainDocumentNo: Boolean; RetainSelltoCustomerNo: Boolean; RetainSalespersonCode: Boolean; RetainDimensionText: Text[250])
-    begin
-        InitializeRequest(StartingDate, EndingDate, PeriodLength, Description, RetainDocumentNo, RetainSelltoCustomerNo, RetainSalespersonCode, RetainDimensionText, true);
-    end;
-#endif
-
-#if not CLEAN20
-    [Obsolete('Replaced by InitializeRequest with parameter DateComprRetainFields', '20.0')]
-    procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; Description: Text[100]; RetainDocumentNo: Boolean; RetainSelltoCustomerNo: Boolean; RetainSalespersonCode: Boolean; RetainDimensionText: Text[250]; DoUseDataArchive: Boolean)
-    begin
-        InitializeParameter();
-        EntrdDateComprReg."Starting Date" := StartingDate;
-        EntrdDateComprReg."Ending Date" := EndingDate;
-        EntrdDateComprReg."Period Length" := PeriodLength;
-        EntrdCustLedgEntry.Description := Description;
-        DateComprRetainFields."Retain Document No." := RetainDocumentNo;
-        DateComprRetainFields."Retain Sell-to Customer No." := RetainSelltoCustomerNo;
-        DateComprRetainFields."Retain Salesperson Code" := RetainSalespersonCode;
-        RetainDimText := RetainDimensionText;
-        UseDataArchive := DoUseDataArchive and DataArchiveProviderExists;
-    end;
-#endif
 
     procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; Description: Text[100]; NewDateComprRetainFields: Record "Date Compr. Retain Fields"; RetainDimensionText: Text[250]; DoUseDataArchive: Boolean)
     begin

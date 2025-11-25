@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Employee;
+
 page 1377 "Select Employee Templ. List"
 {
     Caption = 'Select a template for a new employee';

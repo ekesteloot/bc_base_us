@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8636 "Config. Field Mapping"
 {
     Caption = 'Config. Field Mapping';

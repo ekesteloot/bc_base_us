@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 page 314 "General Posting Setup"
 {
     ApplicationArea = Basic, Suite;
@@ -32,7 +34,7 @@ page 314 "General Posting Setup"
                             PurchLineDiscVisible := true;
                             PurchInvDiscVisible := true;
                         end else
-                            SetAccountsVisibility(
+                            Rec.SetAccountsVisibility(
                               PmtToleranceVisible, PmtDiscountVisible, SalesInvDiscVisible, SalesLineDiscVisible, PurchInvDiscVisible, PurchLineDiscVisible);
 
                         CurrPage.Update();
@@ -243,7 +245,7 @@ page 314 "General Posting Setup"
 
                 trigger OnAction()
                 begin
-                    SuggestSetupAccounts();
+                    Rec.SuggestSetupAccounts();
                 end;
             }
             action("&Copy")
@@ -281,7 +283,7 @@ page 314 "General Posting Setup"
 
     trigger OnOpenPage()
     begin
-        SetAccountsVisibility(
+        Rec.SetAccountsVisibility(
           PmtToleranceVisible, PmtDiscountVisible, SalesInvDiscVisible, SalesLineDiscVisible, PurchInvDiscVisible, PurchLineDiscVisible);
     end;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Contract;
+
 codeunit 5941 "ContractDiscount-Find"
 {
     TableNo = "Contract/Service Discount";

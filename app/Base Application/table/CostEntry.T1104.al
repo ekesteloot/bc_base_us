@@ -1,3 +1,14 @@
+namespace Microsoft.CostAccounting.Ledger;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Allocation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Security.AccessControl;
+
 table 1104 "Cost Entry"
 {
     Caption = 'Cost Entry';
@@ -93,15 +104,11 @@ table 1104 "Cost Entry"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(41; "Batch Name"; Code[10])
         {
             Caption = 'Batch Name';
             TableRelation = "Gen. Journal Batch";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(50; "Allocation Description"; Text[80])
         {

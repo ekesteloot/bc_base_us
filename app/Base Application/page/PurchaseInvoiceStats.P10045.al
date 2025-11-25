@@ -15,7 +15,7 @@ page 10045 "Purchase Invoice Stats."
                 field("VendAmount + InvDiscAmount"; VendAmount + InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Amount';
                     ToolTip = 'Specifies the transaction amount.';
@@ -23,7 +23,7 @@ page 10045 "Purchase Invoice Stats."
                 field(InvDiscAmount; InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     ToolTip = 'Specifies the invoice discount amount for the entire sales document. If the Calc. Inv. Discount field in the Purchases & Payables Setup window is selected, the discount is automatically calculated.';
@@ -31,7 +31,7 @@ page 10045 "Purchase Invoice Stats."
                 field(VendAmount; VendAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total amount less any invoice discount amount and exclusive of VAT for the posted document.';
@@ -39,7 +39,7 @@ page 10045 "Purchase Invoice Stats."
                 field(TaxAmount; TaxAmount)
                 {
                     ApplicationArea = SalesTax;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Tax Amount';
                     ToolTip = 'Specifies the tax amount.';
@@ -47,7 +47,7 @@ page 10045 "Purchase Invoice Stats."
                 field(AmountInclVAT; AmountInclVAT)
                 {
                     ApplicationArea = SalesTax;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total Incl. Tax';
                     ToolTip = 'Specifies the total amount, including tax, that has been posted as invoiced.';
@@ -161,20 +161,20 @@ page 10045 "Purchase Invoice Stats."
         SalesTaxCalculationOverridden: Boolean;
     begin
         ClearAll();
-        TaxArea.Get("Tax Area Code");
+        TaxArea.Get(Rec."Tax Area Code");
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             Currency.InitRoundingPrecision()
         else
-            Currency.Get("Currency Code");
+            Currency.Get(Rec."Currency Code");
 
-        PurchInvLine.SetRange("Document No.", "No.");
+        PurchInvLine.SetRange("Document No.", Rec."No.");
 
         if PurchInvLine.Find('-') then
             repeat
                 VendAmount := VendAmount + PurchInvLine.Amount;
                 AmountInclVAT := AmountInclVAT + PurchInvLine."Amount Including VAT";
-                if "Prices Including VAT" then
+                if Rec."Prices Including VAT" then
                     InvDiscAmount := InvDiscAmount + PurchInvLine."Inv. Discount Amount" / (1 + PurchInvLine."VAT %" / 100)
                 else
                     InvDiscAmount := InvDiscAmount + PurchInvLine."Inv. Discount Amount";
@@ -193,14 +193,14 @@ page 10045 "Purchase Invoice Stats."
         TaxAmount := AmountInclVAT - VendAmount;
         InvDiscAmount := Round(InvDiscAmount, Currency."Amount Rounding Precision");
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             AmountLCY := VendAmount
         else
             AmountLCY :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                WorkDate(), "Currency Code", VendAmount, "Currency Factor");
+                WorkDate(), Rec."Currency Code", VendAmount, Rec."Currency Factor");
 
-        if not Vend.Get("Pay-to Vendor No.") then
+        if not Vend.Get(Rec."Pay-to Vendor No.") then
             Clear(Vend);
         Vend.CalcFields("Balance (LCY)");
 
@@ -213,10 +213,10 @@ page 10045 "Purchase Invoice Stats."
         OnAfterCalculateSalesTax(PurchInvLine, TempSalesTaxLine, TempSalesTaxAmtLine, SalesTaxCalculationOverridden);
         if not SalesTaxCalculationOverridden then
             if TaxArea."Use External Tax Engine" then
-                SalesTaxCalculate.CallExternalTaxEngineForDoc(DATABASE::"Purch. Inv. Header", 0, "No.")
+                SalesTaxCalculate.CallExternalTaxEngineForDoc(DATABASE::"Purch. Inv. Header", 0, Rec."No.")
             else begin
-                SalesTaxCalculate.AddPurchInvoiceLines("No.");
-                SalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
+                SalesTaxCalculate.AddPurchInvoiceLines(Rec."No.");
+                SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
             end;
 
         SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine);
@@ -251,7 +251,7 @@ page 10045 "Purchase Invoice Stats."
             end;
         end;
         CurrPage.SubForm.PAGE.SetTempTaxAmountLine(TempSalesTaxLine);
-        CurrPage.SubForm.PAGE.InitGlobals("Currency Code", false, false, false, false, "VAT Base Discount %");
+        CurrPage.SubForm.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var

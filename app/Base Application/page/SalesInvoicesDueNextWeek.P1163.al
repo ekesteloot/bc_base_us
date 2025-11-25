@@ -8,8 +8,8 @@ page 1163 "Sales Invoices Due Next Week"
     PageType = CardPart;
     ShowFilter = false;
     SourceTable = "Sales Invoice Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
 
     layout
     {
@@ -42,7 +42,7 @@ page 1163 "Sales Invoices Due Next Week"
                         HyperLinkUrl: Text[250];
                     begin
                         HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 573) +
-                          StrSubstNo(FilterForRemAmountDrillDwnTxt, "Cust. Ledger Entry No.");
+                          StrSubstNo(FilterForRemAmountDrillDwnTxt, Rec."Cust. Ledger Entry No.");
                         HyperLink(HyperLinkUrl);
                     end;
                 }
@@ -51,7 +51,7 @@ page 1163 "Sales Invoices Due Next Week"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the relevant currency code for the sales invoices.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies whether or not the sales invoice on the line has been closed.';
@@ -61,7 +61,7 @@ page 1163 "Sales Invoices Due Next Week"
                         HyperLinkUrl: Text[250];
                     begin
                         HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 25) +
-                          StrSubstNo(FilterForClosedDrillDwnTxt, "Cust. Ledger Entry No.");
+                          StrSubstNo(FilterForClosedDrillDwnTxt, Rec."Cust. Ledger Entry No.");
                         HyperLink(HyperLinkUrl);
                     end;
                 }
@@ -75,9 +75,9 @@ page 1163 "Sales Invoices Due Next Week"
 
     trigger OnOpenPage()
     begin
-        SetRange(Closed, false);
-        SetFilter("Due Date", '%1..%2', CalcDate('<1D>', WorkDate()), CalcDate('<1W>', WorkDate()));
-        Ascending := false;
+        Rec.SetRange(Closed, false);
+        Rec.SetFilter("Due Date", '%1..%2', CalcDate('<1D>', WorkDate()), CalcDate('<1W>', WorkDate()));
+        Rec.Ascending := false;
     end;
 
     var

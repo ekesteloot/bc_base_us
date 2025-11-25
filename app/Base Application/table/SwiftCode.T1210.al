@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Setup;
+
 table 1210 "SWIFT Code"
 {
     Caption = 'SWIFT Code';

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 8460 "G/L Acc. Cat. Buffer"
 {
     DataClassification = SystemMetadata;

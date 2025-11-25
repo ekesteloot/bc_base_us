@@ -1,3 +1,19 @@
+﻿namespace Microsoft.Sales.Receivables;
+
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Navigate;
+using System.Diagnostics;
+using System.Security.User;
+using System.Utilities;
+
 page 25 "Customer Ledger Entries"
 {
     ApplicationArea = Basic, Suite;
@@ -8,7 +24,7 @@ page 25 "Customer Ledger Entries"
     PageType = List;
     Permissions = TableData "Cust. Ledger Entry" = m;
     SourceTable = "Cust. Ledger Entry";
-    SourceTableView = SORTING("Customer No.", "Posting Date") ORDER(Descending);
+    SourceTableView = sorting("Customer No.", "Posting Date") order(descending);
     UsageCategory = History;
 
     layout
@@ -61,7 +77,7 @@ page 25 "Customer Ledger Entries"
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Basic, Suite;
-                    Editable = false;
+                    Editable = true;
                     ToolTip = 'Specifies a description of the customer entry.';
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
@@ -224,11 +240,17 @@ page 25 "Customer Ledger Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies how to make payment, such as with bank transfer, cash, or check.';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies whether the amount on the entry has been fully paid or there is still a remaining amount that must be applied to.';
+                }
+                field("Closed at Date"; Rec."Closed at Date")
+                {
+                    Visible = false;
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies when the entry was closed.';
                 }
                 field("On Hold"; Rec."On Hold")
                 {
@@ -246,7 +268,7 @@ page 25 "Customer Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -263,7 +285,7 @@ page 25 "Customer Ledger Entries"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -335,7 +357,7 @@ page 25 "Customer Ledger Entries"
                     ToolTip = 'Specifies the customer''s reference.';
                     Visible = false;
                 }
-                field(RecipientBankAccount; "Recipient Bank Account")
+                field(RecipientBankAccount; Rec."Recipient Bank Account")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account to transfer the amount to.';
@@ -419,7 +441,7 @@ page 25 "Customer Ledger Entries"
             part(Control1903096107; "Customer Ledger Entry FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Entry No." = FIELD("Entry No.");
+                SubPageLink = "Entry No." = field("Entry No.");
                 Visible = true;
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
@@ -431,7 +453,7 @@ page 25 "Customer Ledger Entries"
             part(Control38; "Customer Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Customer No."),
+                SubPageLink = "No." = field("Customer No."),
                               "Date Filter" = field("Date Filter");
             }
             part(GLEntriesPart; "G/L Entries Part")
@@ -468,8 +490,8 @@ page 25 "Customer Ledger Entries"
                     Caption = 'Reminder/Fin. Charge Entries';
                     Image = Reminder;
                     RunObject = Page "Reminder/Fin. Charge Entries";
-                    RunPageLink = "Customer Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Customer Entry No.");
+                    RunPageLink = "Customer Entry No." = field("Entry No.");
+                    RunPageView = sorting("Customer Entry No.");
                     Scope = Repeater;
                     ToolTip = 'View the reminders and finance charge entries that you have entered for the customer.';
                 }
@@ -489,7 +511,7 @@ page 25 "Customer Ledger Entries"
                     Caption = 'Customer';
                     Image = Customer;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Customer No.");
+                    RunPageLink = "No." = field("Customer No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer.';
                 }
@@ -505,7 +527,7 @@ page 25 "Customer Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -518,7 +540,7 @@ page 25 "Customer Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
                 action("Detailed &Ledger Entries")
@@ -527,9 +549,9 @@ page 25 "Customer Ledger Entries"
                     Caption = 'Detailed &Ledger Entries';
                     Image = View;
                     RunObject = Page "Detailed Cust. Ledg. Entries";
-                    RunPageLink = "Cust. Ledger Entry No." = FIELD("Entry No."),
-                                  "Customer No." = FIELD("Customer No.");
-                    RunPageView = SORTING("Cust. Ledger Entry No.", "Posting Date");
+                    RunPageLink = "Cust. Ledger Entry No." = field("Entry No."),
+                                  "Customer No." = field("Customer No.");
+                    RunPageView = sorting("Cust. Ledger Entry No.", "Posting Date");
                     Scope = Repeater;
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a summary of the all posted entries and adjustments related to a specific customer ledger entry.';
@@ -555,14 +577,14 @@ page 25 "Customer Ledger Entries"
                         Customer: Record "Customer";
                         ReminderHeader: Record "Reminder Header";
                     begin
-                        ReminderHeader.setrange("Customer No.", Rec."Customer No.");
+                        ReminderHeader.SetRange("Customer No.", Rec."Customer No.");
                         if ReminderHeader.FindFirst() then begin
                             page.RunModal(Page::Reminder, ReminderHeader);
                             exit
                         end;
-                        Customer.setrange("No.", Rec."Customer No.");
+                        Customer.SetRange("No.", Rec."Customer No.");
                         REPORT.RunModal(REPORT::"Create Reminders", true, true, Customer);
-                        ReminderHeader.setrange("Customer No.", Rec."Customer No.");
+                        ReminderHeader.SetRange("Customer No.", Rec."Customer No.");
                         if ReminderHeader.FindFirst() then begin
                             commit();
                             page.RunModal(Page::Reminder, ReminderHeader);
@@ -584,16 +606,16 @@ page 25 "Customer Ledger Entries"
                         Customer: Record "Customer";
                         FinanceChargeMemoHeader: Record "Finance Charge Memo Header";
                     begin
-                        FinanceChargeMemoHeader.setrange("Customer No.", Rec."Customer No.");
+                        FinanceChargeMemoHeader.SetRange("Customer No.", Rec."Customer No.");
                         if FinanceChargeMemoHeader.FindFirst() then begin
                             page.RunModal(Page::"Finance Charge Memo", FinanceChargeMemoHeader);
                             exit
                         end;
-                        Customer.setrange("No.", Rec."Customer No.");
+                        Customer.SetRange("No.", Rec."Customer No.");
                         REPORT.RunModal(REPORT::"Create Finance Charge Memos", true, true, Customer);
-                        FinanceChargeMemoHeader.setrange("Customer No.", Rec."Customer No.");
+                        FinanceChargeMemoHeader.SetRange("Customer No.", Rec."Customer No.");
                         if FinanceChargeMemoHeader.FindFirst() then begin
-                            commit();
+                            Commit();
                             page.RunModal(Page::"Finance Charge Memo", FinanceChargeMemoHeader);
                             exit
                         end;
@@ -634,7 +656,7 @@ page 25 "Customer Ledger Entries"
                     var
                         CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
                     begin
-                        CustEntryApplyPostedEntries.UnApplyCustLedgEntry("Entry No.");
+                        CustEntryApplyPostedEntries.UnApplyCustLedgEntry(Rec."Entry No.");
                     end;
                 }
                 action(ReverseTransaction)
@@ -652,7 +674,7 @@ page 25 "Customer Ledger Entries"
                         ReversePaymentRecJournal: Codeunit "Reverse Payment Rec. Journal";
                     begin
                         ReversePaymentRecJournal.ErrorIfEntryIsNotReversable(Rec);
-                        ReversalEntry.ReverseTransaction("Transaction No.");
+                        ReversalEntry.ReverseTransaction(Rec."Transaction No.");
                     end;
                 }
                 group(IncomingDocument)
@@ -671,7 +693,7 @@ page 25 "Customer Ledger Entries"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            IncomingDocument.ShowCard("Document No.", "Posting Date");
+                            IncomingDocument.ShowCard(Rec."Document No.", Rec."Posting Date");
                         end;
                     }
                     action(SelectIncomingDoc)
@@ -687,7 +709,7 @@ page 25 "Customer Ledger Entries"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            IncomingDocument.SelectIncomingDocumentForPostedDocument("Document No.", "Posting Date", RecordId);
+                            IncomingDocument.SelectIncomingDocumentForPostedDocument(Rec."Document No.", Rec."Posting Date", Rec.RecordId);
                         end;
                     }
                     action(IncomingDocAttachFile)
@@ -703,7 +725,7 @@ page 25 "Customer Ledger Entries"
                         var
                             IncomingDocumentAttachment: Record "Incoming Document Attachment";
                         begin
-                            IncomingDocumentAttachment.NewAttachmentFromPostedDocument("Document No.", "Posting Date");
+                            IncomingDocumentAttachment.NewAttachmentFromPostedDocument(Rec."Document No.", Rec."Posting Date");
                         end;
                     }
                 }
@@ -744,7 +766,7 @@ page 25 "Customer Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ExportEDocument();
+                        Rec.ExportEDocument();
                     end;
                 }
                 action("&Cancel")
@@ -782,7 +804,7 @@ page 25 "Customer Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -796,7 +818,7 @@ page 25 "Customer Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    ShowDoc();
+                    Rec.ShowDoc();
                 end;
             }
             action(ShowDocumentAttachment)
@@ -809,7 +831,22 @@ page 25 "Customer Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    ShowPostedDocAttachment();
+                    Rec.ShowPostedDocAttachment();
+                end;
+            }
+            action(ShowChangeHistory)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Show Change History';
+                Image = History;
+                ToolTip = 'View the history of changes for this entry.';
+
+                trigger OnAction()
+                var
+                    ChangeLogEntry: Record "Change Log Entry";
+                begin
+                    SetChangeLogEntriesFilter(ChangeLogEntry);
+                    Page.RunModal(Page::"Change Log Entries", ChangeLogEntry);
                 end;
             }
         }
@@ -899,13 +936,13 @@ page 25 "Customer Ledger Entries"
     var
         IncomingDocument: Record "Incoming Document";
     begin
-        HasIncomingDocument := IncomingDocument.PostedDocExists("Document No.", "Posting Date");
-        HasDocumentAttachment := HasPostedDocAttachment();
+        HasIncomingDocument := IncomingDocument.PostedDocExists(Rec."Document No.", Rec."Posting Date");
+        HasDocumentAttachment := Rec.HasPostedDocAttachment();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        StyleTxt := SetStyle();
+        StyleTxt := Rec.SetStyle();
     end;
 
     trigger OnInit()
@@ -924,8 +961,8 @@ page 25 "Customer Ledger Entries"
         SetControlVisibility();
         SetDimVisibility();
 
-        if (GetFilters() <> '') and not Find() then
-            if FindFirst() then;
+        if (Rec.GetFilters() <> '') and not Rec.Find() then
+            if Rec.FindFirst() then;
     end;
 
     var
@@ -969,6 +1006,12 @@ page 25 "Customer Ledger Entries"
         DebitCreditVisible := not (GLSetup."Show Amounts" = GLSetup."Show Amounts"::"Amount Only");
         SalesSetup.Get();
         CustNameVisible := SalesSetup."Copy Customer Name to Entries";
+    end;
+
+    local procedure SetChangeLogEntriesFilter(var ChangeLogEntry: Record "Change Log Entry")
+    begin
+        ChangeLogEntry.SetRange("Table No.", Database::"Cust. Ledger Entry");
+        ChangeLogEntry.SetRange("Primary Key Field 1 Value", Format(Rec."Entry No.", 0, 9));
     end;
 }
 

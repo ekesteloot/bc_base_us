@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Comment;
+
+using Microsoft.HumanResources.Employee;
+
 page 5222 "Human Resource Comment Sheet"
 {
     AutoSplitKey = true;
@@ -16,17 +20,17 @@ page 5222 "Human Resource Comment Sheet"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the date the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the comment itself.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a code for the comment.';
@@ -42,7 +46,7 @@ page 5222 "Human Resource Comment Sheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
     end;
 
     var

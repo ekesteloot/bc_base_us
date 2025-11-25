@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Counting.Tracking;
+
+using Microsoft.InventoryMgt.Tracking;
+using System.Security.User;
+
 page 5893 "Phys. Invt. Item Track. List"
 {
     Caption = 'Phys. Invt. Item Track. List';
@@ -37,7 +42,7 @@ page 5893 "Phys. Invt. Item Track. List"
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies the location of the traced item.';
                 }
-                field(Positive; Positive)
+                field(Positive; Rec.Positive)
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies that the difference is positive.';
@@ -101,7 +106,7 @@ page 5893 "Phys. Invt. Item Track. List"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Created By");
+                        UserMgt.DisplayUserInformation(Rec."Created By");
                     end;
                 }
                 field("Creation Date"; Rec."Creation Date")
@@ -134,9 +139,9 @@ page 5893 "Phys. Invt. Item Track. List"
                     Caption = 'Serial No. Information Card';
                     Image = SNInfo;
                     RunObject = Page "Serial No. Information List";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Serial No." = FIELD("Serial No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Serial No." = field("Serial No.");
                     ToolTip = 'Show Serial No. Information Card';
                 }
                 action("Lot No. Information Card")
@@ -145,9 +150,9 @@ page 5893 "Phys. Invt. Item Track. List"
                     Caption = 'Lot No. Information Card';
                     Image = LotInfo;
                     RunObject = Page "Lot No. Information List";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Lot No." = FIELD("Lot No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Lot No." = field("Lot No.");
                     ToolTip = 'Show Lot No. Information Card';
                 }
             }

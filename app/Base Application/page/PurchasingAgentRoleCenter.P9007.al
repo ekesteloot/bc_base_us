@@ -1,3 +1,27 @@
+﻿namespace Microsoft.Purchases.RoleCenters;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.History;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.StandardCost;
+using Microsoft.Purchases.Analysis;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+#if CLEAN21
+using Microsoft.Purchases.Pricing;
+#endif
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+using System.Threading;
+
 page 9007 "Purchasing Agent Role Center"
 {
     Caption = 'Purchasing Agent';
@@ -160,7 +184,7 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Pending Confirmation';
                 RunObject = Page "Purchase Order List";
-                RunPageView = WHERE(Status = FILTER(Open));
+                RunPageView = where(Status = filter(Open));
                 ToolTip = 'View the list of purchase orders that await the vendor''s confirmation. ';
             }
             action(PurchaseOrdersPartDeliv)
@@ -168,9 +192,9 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Partially Delivered';
                 RunObject = Page "Purchase Order List";
-                RunPageView = WHERE(Status = FILTER(Released),
-                                    Receive = FILTER(true),
-                                    "Completely Received" = FILTER(false));
+                RunPageView = where(Status = filter(Released),
+                                    Receive = filter(true),
+                                    "Completely Received" = filter(false));
                 ToolTip = 'View the list of purchases that are partially received.';
             }
             action("Purchase Quotes")
@@ -260,7 +284,7 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Purchase Analysis Reports';
                 RunObject = Page "Analysis Report Purchase";
-                RunPageView = WHERE("Analysis Area" = FILTER(Purchase));
+                RunPageView = where("Analysis Area" = filter(Purchase));
                 ToolTip = 'Analyze the dynamics of your purchase volumes. You can also use the report to analyze your vendors'' performance and purchase prices.';
             }
             action("Inventory Analysis Reports")
@@ -268,7 +292,7 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Inventory Analysis Reports';
                 RunObject = Page "Analysis Report Inventory";
-                RunPageView = WHERE("Analysis Area" = FILTER(Inventory));
+                RunPageView = where("Analysis Area" = filter(Inventory));
                 ToolTip = 'Analyze the dynamics of your inventory according to key performance indicators that you select, for example inventory turnover. You can also use the report to analyze your inventory costs, in terms of direct and indirect costs, as well as the value and quantities of your different types of inventory.';
             }
             action("Item Journals")
@@ -276,8 +300,8 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Item Journals';
                 RunObject = Page "Item Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Item),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Item),
+                                    Recurring = const(false));
                 ToolTip = 'Post item transactions directly to the item ledger to adjust inventory in connection with purchases, sales, and positive or negative adjustments without using documents. You can save sets of item journal lines as standard journals so that you can perform recurring postings quickly. A condensed version of the item journal function exists on item cards for quick adjustment of an items inventory quantity.';
             }
             action("Purchase Journals")
@@ -285,8 +309,8 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Purchase Journals';
                 RunObject = Page "General Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Purchases),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Purchases),
+                                    Recurring = const(false));
                 ToolTip = 'Post any purchase-related transaction directly to a vendor, bank, or general ledger account instead of using dedicated documents. You can post all types of financial purchase transactions, including payments, refunds, and finance charge amounts. Note that you cannot post item quantities with a purchase journal.';
             }
             action(RequisitionWorksheets)
@@ -294,8 +318,8 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Planning;
                 Caption = 'Requisition Worksheets';
                 RunObject = Page "Req. Wksh. Names";
-                RunPageView = WHERE("Template Type" = CONST("Req."),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const("Req."),
+                                    Recurring = const(false));
                 ToolTip = 'Calculate a supply plan to fulfill item demand with purchases or transfers.';
             }
             action(SubcontractingWorksheets)
@@ -303,8 +327,8 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Planning;
                 Caption = 'Subcontracting Worksheets';
                 RunObject = Page "Req. Wksh. Names";
-                RunPageView = WHERE("Template Type" = CONST("For. Labor"),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const("For. Labor"),
+                                    Recurring = const(false));
                 ToolTip = 'Calculate the needed production supply, find the production orders that have material ready to send to a subcontractor, and automatically create purchase orders for subcontracted operations from production order routings.';
             }
             action("Standard Cost Worksheets")
@@ -365,9 +389,6 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Suite;
                 Caption = 'Purchase &Quote';
                 Image = Quote;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Quote";
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase quote, for example to reflect a request for quote.';
@@ -377,9 +398,6 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Purchase &Invoice';
                 Image = NewPurchaseInvoice;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Invoice";
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase invoice.';
@@ -389,9 +407,6 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Suite;
                 Caption = 'Purchase &Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase order.';
@@ -401,9 +416,6 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = PurchReturnOrder;
                 Caption = 'Purchase &Return Order';
                 Image = ReturnOrder;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Return Order";
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase return order to return received items.';
@@ -449,8 +461,8 @@ page 9007 "Purchasing Agent Role Center"
                 Caption = 'Requisition &Worksheet';
                 Image = Worksheet;
                 RunObject = Page "Req. Wksh. Names";
-                RunPageView = WHERE("Template Type" = CONST("Req."),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const("Req."),
+                                    Recurring = const(false));
                 ToolTip = 'Calculate a supply plan to fulfill item demand with purchases or transfers.';
             }
 #if not CLEAN21
@@ -459,7 +471,7 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Pur&chase Prices';
                 Image = Price;
-                RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7012)); // "Purchase Prices";
+                RunPageView = where("Object Type" = const(Page), "Object ID" = const(7012)); // "Purchase Prices";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'View or set up different prices for items that you buy from the vendor. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
                 ObsoleteState = Pending;
@@ -471,7 +483,7 @@ page 9007 "Purchasing Agent Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Purchase &Line Discounts';
                 Image = LineDiscount;
-                RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7014)); // "Purchase Line Discounts";
+                RunPageView = where("Object Type" = const(Page), "Object ID" = const(7014)); // "Purchase Line Discounts";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'View or set up different discounts for items that you buy from the vendor. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
                 ObsoleteState = Pending;

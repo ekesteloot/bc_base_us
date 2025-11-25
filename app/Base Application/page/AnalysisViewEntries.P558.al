@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 page 558 "Analysis View Entries"
 {
     ApplicationArea = Dimensions;
@@ -71,7 +73,7 @@ page 558 "Analysis View Entries"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDown();
+                        Rec.DrillDown();
                     end;
                 }
                 field("Debit Amount"; Rec."Debit Amount")

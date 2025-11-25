@@ -13,12 +13,12 @@ page 405 Areas
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies a code for the area.';
                 }
-                field(Text; Text)
+                field(Text; Rec.Text)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies a description of the area.';

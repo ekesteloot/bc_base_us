@@ -4,7 +4,7 @@ codeunit 1811 "Excel Post Processor"
 
     trigger OnRun()
     begin
-        case "Table ID" of
+        case Rec."Table ID" of
             DATABASE::Item:
                 PostProcessItem(Rec);
             else

@@ -1,3 +1,10 @@
+namespace System.IO;
+
+using System;
+using System.Reflection;
+using System.Utilities;
+using System.Xml;
+
 codeunit 8610 "Questionnaire Management"
 {
 

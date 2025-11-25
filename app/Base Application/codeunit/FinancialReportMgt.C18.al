@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using System.Environment.Configuration;
+using System.IO;
+
 codeunit 18 "Financial Report Mgt."
 {
 

@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.InventoryMgt.Item.Attribute;
+
 table 5722 "Item Category"
 {
     Caption = 'Item Category';

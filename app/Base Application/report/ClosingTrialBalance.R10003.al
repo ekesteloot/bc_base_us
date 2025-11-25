@@ -1,7 +1,16 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using System.Utilities;
+
 report 10003 "Closing Trial Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ClosingTrialBalance.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/ClosingTrialBalance.rdlc';
+    AdditionalSearchTerms = 'year closing balance,close accounting period balance,close fiscal year balance';
     ApplicationArea = Basic, Suite;
     Caption = 'Closing Trial Balance';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +19,7 @@ report 10003 "Closing Trial Balance"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Account Type", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -71,7 +80,7 @@ report 10003 "Closing Trial Balance"
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
 
                 trigger OnPreDataItem()
                 begin
@@ -80,7 +89,7 @@ report 10003 "Closing Trial Balance"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(G_L_Account___No__; "G/L Account"."No.")
                 {
                 }

@@ -1,3 +1,8 @@
+namespace Microsoft.AssemblyMgt.History;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.Posting;
+
 codeunit 911 "Pstd. Assembly - Undo (Yes/No)"
 {
     TableNo = "Posted Assembly Header";

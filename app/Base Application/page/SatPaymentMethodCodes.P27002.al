@@ -10,7 +10,7 @@ page 27002 "SAT Payment Method Codes"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the SAT payment method.';

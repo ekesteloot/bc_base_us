@@ -61,8 +61,8 @@ page 10060 "Sales Tax Lines Serv. Subform"
                     trigger OnValidate()
                     begin
                         if AllowVATDifference and not AllowVATDifferenceOnThisTab then
-                            Error(Text000, FieldCaption("Tax Amount"));
-                        "Amount Including Tax" := "Tax Amount" + "Tax Base Amount";
+                            Error(Text000, Rec.FieldCaption("Tax Amount"));
+                        Rec."Amount Including Tax" := Rec."Tax Amount" + Rec."Tax Base Amount";
 
                         FormCheckVATDifference();
                         ModifyRec();
@@ -140,7 +140,6 @@ page 10060 "Sales Tax Lines Serv. Subform"
         PricesIncludingVAT: Boolean;
         AllowInvDisc: Boolean;
         VATBaseDiscPct: Decimal;
-        [InDataSet]
         "Tax AmountEditable": Boolean;
 
     procedure SetTempTaxAmountLine(var NewSalesTaxLine: Record "Sales Tax Amount Line" temporary)
@@ -185,9 +184,9 @@ page 10060 "Sales Tax Lines Serv. Subform"
         TaxAmountLine2: Record "Sales Tax Amount Line";
         TotalVATDifference: Decimal;
     begin
-        CheckTaxDifference(CurrencyCode, AllowVATDifference, PricesIncludingVAT);
+        Rec.CheckTaxDifference(CurrencyCode, AllowVATDifference, PricesIncludingVAT);
         TaxAmountLine2 := TempSalesTaxLine;
-        TotalVATDifference := Abs("Tax Difference") - Abs(xRec."Tax Difference");
+        TotalVATDifference := Abs(Rec."Tax Difference") - Abs(xRec."Tax Difference");
         if TempSalesTaxLine.Find('-') then
             repeat
                 TotalVATDifference := TotalVATDifference + Abs(TempSalesTaxLine."Tax Difference");
@@ -195,7 +194,7 @@ page 10060 "Sales Tax Lines Serv. Subform"
         TempSalesTaxLine := TaxAmountLine2;
         if TotalVATDifference > Currency."Max. VAT Difference Allowed" then
             Error(
-              Text001, FieldCaption("Tax Difference"),
+              Text001, Rec.FieldCaption("Tax Difference"),
               Currency.FieldCaption("Max. VAT Difference Allowed"), Currency."Max. VAT Difference Allowed");
     end;
 

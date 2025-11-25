@@ -1,3 +1,10 @@
+﻿namespace System.Xml;
+
+using System;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 6224 "XML DOM Management"
 {
 

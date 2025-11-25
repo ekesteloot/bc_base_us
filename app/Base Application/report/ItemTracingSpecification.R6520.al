@@ -1,7 +1,14 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using System.Reflection;
+using System.Utilities;
+
 report 6520 "Item Tracing Specification"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemTracking/ItemTracingSpecification.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemTracingSpecification.rdlc';
     Caption = 'Item Tracing Specification';
     AllowScheduling = false;
 
@@ -9,7 +16,7 @@ report 6520 "Item Tracing Specification"
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             column(FormatToday; Format(Today, 0, 4))
             {
             }

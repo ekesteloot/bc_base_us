@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Duplicates;
+
+using System.Reflection;
+
 table 66 "Merge Duplicates Conflict"
 {
     Caption = 'Merge Duplicates Conflict';

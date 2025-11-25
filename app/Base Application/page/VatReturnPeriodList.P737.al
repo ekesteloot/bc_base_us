@@ -49,7 +49,7 @@ page 737 "VAT Return Period List"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownVATReturn();
+                        Rec.DrillDownVATReturn();
                     end;
                 }
                 field(VATReturnStatus; VATReturnStatus)
@@ -61,7 +61,7 @@ page 737 "VAT Return Period List"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownVATReturn();
+                        Rec.DrillDownVATReturn();
                     end;
                 }
             }
@@ -71,7 +71,7 @@ page 737 "VAT Return Period List"
             part(Control9; "VAT Return Period FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
         }
     }
@@ -183,14 +183,14 @@ page 737 "VAT Return Period List"
 
     local procedure InitPageControllers()
     begin
-        CreateVATReturnEnabled := (Status = Status::Open) and ("VAT Return No." = '');
-        OpenVATReturnEnabled := (Status = Status::Open) or ("VAT Return No." <> '');
-        CalcFields("VAT Return Status");
-        if "VAT Return No." <> '' then
-            VATReturnStatus := "VAT Return Status" + 1
+        CreateVATReturnEnabled := (Rec.Status = Rec.Status::Open) and (Rec."VAT Return No." = '');
+        OpenVATReturnEnabled := (Rec.Status = Rec.Status::Open) or (Rec."VAT Return No." <> '');
+        Rec.CalcFields("VAT Return Status");
+        if Rec."VAT Return No." <> '' then
+            VATReturnStatus := Rec."VAT Return Status" + 1
         else
             VATReturnStatus := VATReturnStatus::" ";
-        CheckOpenOrOverdue();
+        Rec.CheckOpenOrOverdue();
     end;
 }
 

@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Security.AccessControl;
+
 table 9153 "My Account"
 {
     Caption = 'My Account';
@@ -9,8 +14,6 @@ table 9153 "My Account"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(2; "Account No."; Code[20])
@@ -31,7 +34,7 @@ table 9153 "My Account"
         }
         field(4; Balance; Decimal)
         {
-            CalcFormula = Sum("G/L Entry".Amount WHERE("G/L Account No." = FIELD("Account No.")));
+            CalcFormula = sum("G/L Entry".Amount where("G/L Account No." = field("Account No.")));
             Caption = 'Balance';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,12 @@
+namespace Microsoft.CashFlow.Worksheet;
+
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CashFlow.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using System.Environment.Configuration;
+using System.Integration.Excel;
+using System.Utilities;
+
 page 841 "Cash Flow Worksheet"
 {
     ApplicationArea = Basic, Suite;
@@ -21,7 +30,7 @@ page 841 "Cash Flow Worksheet"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the cash flow date that the entry is posted to.';
                 }
-                field(Overdue; Overdue)
+                field(Overdue; Rec.Overdue)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry is related to an overdue payment. ';
@@ -38,7 +47,7 @@ page 841 "Cash Flow Worksheet"
 
                     trigger OnValidate()
                     begin
-                        CFName := CashFlowManagement.CashFlowNameFullLength("Cash Flow Forecast No.");
+                        CFName := CashFlowManagement.CashFlowNameFullLength(Rec."Cash Flow Forecast No.");
                     end;
                 }
                 field(Description; Rec.Description)
@@ -64,7 +73,7 @@ page 841 "Cash Flow Worksheet"
 
                     trigger OnValidate()
                     begin
-                        CFAccName := CashFlowManagement.CashFlowAccountName("Cash Flow Account No.");
+                        CFAccName := CashFlowManagement.CashFlowAccountName(Rec."Cash Flow Account No.");
                     end;
                 }
                 field("Amount (LCY)"; Rec."Amount (LCY)")
@@ -88,84 +97,84 @@ page 841 "Cash Flow Worksheet"
                 {
                     ApplicationArea = Suite;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Suite;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Suite;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Suite;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Suite;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Suite;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
             }
@@ -226,7 +235,7 @@ page 841 "Cash Flow Worksheet"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -241,7 +250,7 @@ page 841 "Cash Flow Worksheet"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Cash Flow Forecast Card";
-                    RunPageLink = "No." = FIELD("Cash Flow Forecast No.");
+                    RunPageLink = "No." = field("Cash Flow Forecast No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -251,8 +260,8 @@ page 841 "Cash Flow Worksheet"
                     Caption = 'Entries';
                     Image = Entries;
                     RunObject = Page "Cash Flow Forecast Entries";
-                    RunPageLink = "Cash Flow Forecast No." = FIELD("Cash Flow Forecast No.");
-                    RunPageView = SORTING("Cash Flow Forecast No.", "Cash Flow Date");
+                    RunPageLink = "Cash Flow Forecast No." = field("Cash Flow Forecast No.");
+                    RunPageView = sorting("Cash Flow Forecast No.", "Cash Flow Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the entries that exist for the cash flow account. ';
                 }
@@ -309,7 +318,7 @@ page 841 "Cash Flow Worksheet"
 
                 trigger OnAction()
                 begin
-                    ShowSource();
+                    Rec.ShowSource();
                 end;
             }
             group("Page")
@@ -382,14 +391,14 @@ page 841 "Cash Flow Worksheet"
     trigger OnAfterGetCurrRecord()
     begin
         ShowErrors();
-        CFName := CashFlowManagement.CashFlowNameFullLength("Cash Flow Forecast No.");
-        CFAccName := CashFlowManagement.CashFlowAccountName("Cash Flow Account No.");
+        CFName := CashFlowManagement.CashFlowNameFullLength(Rec."Cash Flow Forecast No.");
+        CFAccName := CashFlowManagement.CashFlowAccountName(Rec."Cash Flow Account No.");
     end;
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
-        SourceNumEnabled := "Source Type" <> "Source Type"::Tax;
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
+        SourceNumEnabled := Rec."Source Type" <> Rec."Source Type"::Tax;
     end;
 
     trigger OnClosePage()

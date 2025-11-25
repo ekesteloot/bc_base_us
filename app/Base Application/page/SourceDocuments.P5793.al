@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Request;
+
 page 5793 "Source Documents"
 {
     Caption = 'Source Documents';
@@ -5,7 +7,7 @@ page 5793 "Source Documents"
     Editable = false;
     PageType = List;
     SourceTable = "Warehouse Request";
-    SourceTableView = SORTING(Type, "Location Code", "Completely Handled", "Document Status", "Expected Receipt Date", "Shipment Date", "Source Document", "Source No.");
+    SourceTableView = sorting(Type, "Location Code", "Completely Handled", "Document Status", "Expected Receipt Date", "Shipment Date", "Source Document", "Source No.");
 
     layout
     {
@@ -113,7 +115,7 @@ page 5793 "Source Documents"
 
                     trigger OnAction()
                     begin
-                        ShowSourceDocumentCard();
+                        Rec.ShowSourceDocumentCard();
                     end;
                 }
             }
@@ -143,9 +145,7 @@ page 5793 "Source Documents"
     end;
 
     var
-        [InDataSet]
         ExpectedReceiptDateVisible: Boolean;
-        [InDataSet]
         ShipmentDateVisible: Boolean;
 
     procedure GetResult(var WhseReq: Record "Warehouse Request")
@@ -155,8 +155,8 @@ page 5793 "Source Documents"
 
     local procedure UpdateVisible()
     begin
-        ExpectedReceiptDateVisible := Type = Type::Inbound;
-        ShipmentDateVisible := Type = Type::Outbound;
+        ExpectedReceiptDateVisible := Rec.Type = Rec.Type::Inbound;
+        ShipmentDateVisible := Rec.Type = Rec.Type::Outbound;
     end;
 
 }

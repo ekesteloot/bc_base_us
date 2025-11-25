@@ -5,6 +5,7 @@ page 512 "Customer Disc. Groups"
     PageType = List;
     SourceTable = "Customer Discount Group";
     UsageCategory = Administration;
+    AdditionalSearchTerms = 'Customer Discount Groups';
 
     layout
     {
@@ -13,7 +14,7 @@ page 512 "Customer Disc. Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the customer discount group.';
@@ -66,7 +67,7 @@ page 512 "Customer Disc. Groups"
                     begin
                         SalesLineDiscount.SetCurrentKey("Sales Type", "Sales Code");
                         SalesLineDiscount.SetRange("Sales Type", SalesLineDiscount."Sales Type"::"Customer Disc. Group");
-                        SalesLineDiscount.SetRange("Sales Code", Code);
+                        SalesLineDiscount.SetRange("Sales Code", Rec.Code);
                         Page.Run(Page::"Sales Line Discounts", SalesLineDiscount);
                     end;
                 }

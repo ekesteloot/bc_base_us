@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 page 1511 "Notification Entries"
 {
     ApplicationArea = Suite;
@@ -5,8 +7,8 @@ page 1511 "Notification Entries"
     Editable = false;
     PageType = List;
     SourceTable = "Notification Entry";
-    SourceTableView = SORTING("Created Date-Time")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Created Date-Time")
+                      order(Ascending);
     UsageCategory = Lists;
 
     layout
@@ -15,7 +17,7 @@ page 1511 "Notification Entries"
         {
             repeater(Group)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the ID of the notification entry.';
@@ -31,7 +33,7 @@ page 1511 "Notification Entries"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the user who received the notification.';
                 }
-                field("FORMAT(""Triggered By Record"")"; Format("Triggered By Record"))
+                field("FORMAT(""Triggered By Record"")"; Format(Rec."Triggered By Record"))
                 {
                     ApplicationArea = Suite;
                     Caption = 'Triggered By Record';

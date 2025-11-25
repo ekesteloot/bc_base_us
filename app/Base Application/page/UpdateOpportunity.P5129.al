@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Task;
+using Microsoft.Sales.Document;
+using System.Environment;
+
 page 5129 "Update Opportunity"
 {
     Caption = 'Update Opportunity';
@@ -20,20 +27,20 @@ page 5129 "Update Opportunity"
 
                 trigger OnValidate()
                 begin
-                    if "Action Type" = "Action Type"::Update then
+                    if Rec."Action Type" = Rec."Action Type"::Update then
                         UpdateActionTypeOnValidate();
-                    if "Action Type" = "Action Type"::Jump then
+                    if Rec."Action Type" = Rec."Action Type"::Jump then
                         JumpActionTypeOnValidate();
-                    if "Action Type" = "Action Type"::Skip then
+                    if Rec."Action Type" = Rec."Action Type"::Skip then
                         SkipActionTypeOnValidate();
-                    if "Action Type" = "Action Type"::Previous then
+                    if Rec."Action Type" = Rec."Action Type"::Previous then
                         PreviousActionTypeOnValidate();
-                    if "Action Type" = "Action Type"::Next then
+                    if Rec."Action Type" = Rec."Action Type"::Next then
                         NextActionTypeOnValidate();
-                    if "Action Type" = "Action Type"::First then
+                    if Rec."Action Type" = Rec."Action Type"::First then
                         FirstActionTypeOnValidate();
 
-                    WizardActionTypeValidate2();
+                    Rec.WizardActionTypeValidate2();
                     UpdateCntrls();
                 end;
             }
@@ -45,13 +52,13 @@ page 5129 "Update Opportunity"
 
                 trigger OnLookup(var Text: Text): Boolean
                 begin
-                    LookupSalesCycleStage();
-                    ValidateSalesCycleStage();
+                    Rec.LookupSalesCycleStage();
+                    Rec.ValidateSalesCycleStage();
                 end;
 
                 trigger OnValidate()
                 begin
-                    WizardSalesCycleStageValidate2();
+                    Rec.WizardSalesCycleStageValidate2();
                     SalesCycleStageOnAfterValidate();
                 end;
             }
@@ -126,10 +133,10 @@ page 5129 "Update Opportunity"
                 var
                     SalesHeader: Record "Sales Header";
                 begin
-                    if Opportunity.Get("Opportunity No.") then begin
+                    if Opportunity.Get(Rec."Opportunity No.") then begin
                         Opportunity.ShowQuote();
                         if SalesHeader.Get(SalesHeader."Document Type"::Quote, Opportunity."Sales Document No.") then begin
-                            "Estimated Value (LCY)" := GetSalesDocValue(SalesHeader);
+                            Rec."Estimated Value (LCY)" := Rec.GetSalesDocValue(SalesHeader);
                             CurrPage.Update();
                         end;
                     end;
@@ -168,9 +175,9 @@ page 5129 "Update Opportunity"
     trigger OnOpenPage()
     begin
         IsOnMobile := ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::Phone;
-        CreateStageList();
+        Rec.CreateStageList();
         UpdateEditable();
-        if Opportunity.Get("Opportunity No.") then
+        if Opportunity.Get(Rec."Opportunity No.") then
             if Opportunity."Sales Document No." <> '' then
                 SalesQuoteEnable := true
             else
@@ -182,7 +189,7 @@ page 5129 "Update Opportunity"
 
     trigger OnAfterGetCurrRecord()
     begin
-        Validate("Sales Cycle Stage");
+        Rec.Validate("Sales Cycle Stage");
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -195,21 +202,13 @@ page 5129 "Update Opportunity"
         Cont: Record Contact;
         SalesCycleStage: Record "Sales Cycle Stage";
         ClientTypeManagement: Codeunit "Client Type Management";
-        [InDataSet]
         SalesCycleStageEditable: Boolean;
-        [InDataSet]
         OptionOneEnable: Boolean;
-        [InDataSet]
         OptionTwoEnable: Boolean;
-        [InDataSet]
         OptionThreeEnable: Boolean;
-        [InDataSet]
         OptionFiveEnable: Boolean;
-        [InDataSet]
         OptionFourEnable: Boolean;
-        [InDataSet]
         OptionSixEnable: Boolean;
-        [InDataSet]
         CancelOldTaskEnable: Boolean;
         IsOnMobile: Boolean;
 
@@ -218,16 +217,15 @@ page 5129 "Update Opportunity"
 
     protected var
         Opportunity: Record Opportunity;
-        [InDataSet]
         SalesQuoteEnable: Boolean;
 
     procedure Caption(): Text
     var
         CaptionStr: Text;
     begin
-        if Cont.Get("Contact Company No.") then
+        if Cont.Get(Rec."Contact Company No.") then
             CaptionStr := CopyStr(Cont."No." + ' ' + Cont.Name, 1, MaxStrLen(CaptionStr));
-        if Cont.Get("Contact No.") then
+        if Cont.Get(Rec."Contact No.") then
             CaptionStr := CopyStr(CaptionStr + ' ' + Cont."No." + ' ' + Cont.Name, 1, MaxStrLen(CaptionStr));
         if CaptionStr = '' then
             CaptionStr := Text000;
@@ -237,45 +235,45 @@ page 5129 "Update Opportunity"
 
     local procedure UpdateEditable()
     begin
-        OptionOneEnable := NoOfSalesCyclesFirst() > 0;
-        OptionTwoEnable := NoOfSalesCyclesNext() > 0;
-        OptionThreeEnable := NoOfSalesCyclesPrev() > 0;
-        OptionFourEnable := NoOfSalesCyclesSkip() > 1;
-        OptionFiveEnable := NoOfSalesCyclesUpdate() > 0;
-        OptionSixEnable := NoOfSalesCyclesJump() > 1;
+        OptionOneEnable := Rec.NoOfSalesCyclesFirst() > 0;
+        OptionTwoEnable := Rec.NoOfSalesCyclesNext() > 0;
+        OptionThreeEnable := Rec.NoOfSalesCyclesPrev() > 0;
+        OptionFourEnable := Rec.NoOfSalesCyclesSkip() > 1;
+        OptionFiveEnable := Rec.NoOfSalesCyclesUpdate() > 0;
+        OptionSixEnable := Rec.NoOfSalesCyclesJump() > 1;
     end;
 
     local procedure UpdateCntrls()
     var
         Task: Record "To-do";
     begin
-        case "Action Type" of
-            "Action Type"::First:
+        case Rec."Action Type" of
+            Rec."Action Type"::First:
                 begin
                     SalesCycleStageEditable := false;
                     CancelOldTaskEnable := false;
                 end;
-            "Action Type"::Next:
+            Rec."Action Type"::Next:
                 begin
                     SalesCycleStageEditable := false;
                     CancelOldTaskEnable := true;
                 end;
-            "Action Type"::Previous:
+            Rec."Action Type"::Previous:
                 begin
                     SalesCycleStageEditable := false;
                     CancelOldTaskEnable := true;
                 end;
-            "Action Type"::Skip:
+            Rec."Action Type"::Skip:
                 begin
                     SalesCycleStageEditable := true;
                     CancelOldTaskEnable := true;
                 end;
-            "Action Type"::Update:
+            Rec."Action Type"::Update:
                 begin
                     SalesCycleStageEditable := false;
                     CancelOldTaskEnable := false;
                 end;
-            "Action Type"::Jump:
+            Rec."Action Type"::Jump:
                 begin
                     SalesCycleStageEditable := true;
                     CancelOldTaskEnable := true;
@@ -283,58 +281,58 @@ page 5129 "Update Opportunity"
         end;
         Task.Reset();
         Task.SetCurrentKey("Opportunity No.");
-        Task.SetRange("Opportunity No.", "Opportunity No.");
+        Task.SetRange("Opportunity No.", Rec."Opportunity No.");
         if Task.FindFirst() then
             CancelOldTaskEnable := true;
-        Modify();
+        Rec.Modify();
     end;
 
     local procedure SalesCycleStageOnAfterValidate()
     begin
-        if SalesCycleStage.Get("Sales Cycle Code", "Sales Cycle Stage") then
-            "Sales Cycle Stage Description" := SalesCycleStage.Description;
+        if SalesCycleStage.Get(Rec."Sales Cycle Code", Rec."Sales Cycle Stage") then
+            Rec."Sales Cycle Stage Description" := SalesCycleStage.Description;
     end;
 
     local procedure FirstActionTypeOnValidate()
     begin
         if not OptionOneEnable then
-            Error(Text666, "Action Type");
+            Error(Text666, Rec."Action Type");
     end;
 
     local procedure NextActionTypeOnValidate()
     begin
         if not OptionTwoEnable then
-            Error(Text666, "Action Type");
+            Error(Text666, Rec."Action Type");
     end;
 
     local procedure PreviousActionTypeOnValidate()
     begin
         if not OptionThreeEnable then
-            Error(Text666, "Action Type");
+            Error(Text666, Rec."Action Type");
     end;
 
     local procedure SkipActionTypeOnValidate()
     begin
         if not OptionFourEnable then
-            Error(Text666, "Action Type");
+            Error(Text666, Rec."Action Type");
     end;
 
     local procedure JumpActionTypeOnValidate()
     begin
         if not OptionSixEnable then
-            Error(Text666, "Action Type");
+            Error(Text666, Rec."Action Type");
     end;
 
     local procedure UpdateActionTypeOnValidate()
     begin
         if not OptionFiveEnable then
-            Error(Text666, "Action Type");
+            Error(Text666, Rec."Action Type");
     end;
 
     local procedure FinishPage()
     begin
-        CheckStatus2();
-        FinishWizard2();
+        Rec.CheckStatus2();
+        Rec.FinishWizard2();
     end;
 
     local procedure UpdateEstimatedValues()
@@ -348,15 +346,15 @@ page 5129 "Update Opportunity"
         if IsHandled then
             exit;
 
-        if SalesCycleStage.Get("Sales Cycle Code", "Sales Cycle Stage") then begin
-            "Estimated Close Date" := CalcDate(SalesCycleStage."Date Formula", "Date of Change");
-            "Chances of Success %" := SalesCycleStage."Chances of Success %";
+        if SalesCycleStage.Get(Rec."Sales Cycle Code", Rec."Sales Cycle Stage") then begin
+            Rec."Estimated Close Date" := CalcDate(SalesCycleStage."Date Formula", Rec."Date of Change");
+            Rec."Chances of Success %" := SalesCycleStage."Chances of Success %";
         end;
         if SalesHeader.Get(SalesHeader."Document Type"::Quote, Opportunity."Sales Document No.") then
-            "Estimated Value (LCY)" := GetSalesDocValue(SalesHeader);
+            Rec."Estimated Value (LCY)" := Rec.GetSalesDocValue(SalesHeader);
 
         OnUpdateEstimatedValuesOnBeforeModify(Rec, SalesHeader);
-        Modify();
+        Rec.Modify();
     end;
 
     [IntegrationEvent(false, false)]

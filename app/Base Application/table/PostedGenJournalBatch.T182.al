@@ -1,3 +1,13 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 182 "Posted Gen. Journal Batch"
 {
     Caption = 'Posted Gen. Journal Batch';
@@ -32,15 +42,15 @@ table 182 "Posted Gen. Journal Batch"
         field(6; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Bal. Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Fixed Asset")) "Fixed Asset";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const(Customer)) Customer
+            else
+            if ("Bal. Account Type" = const(Vendor)) Vendor
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset";
         }
         field(7; "No. Series"; Code[20])
         {
@@ -68,7 +78,7 @@ table 182 "Posted Gen. Journal Batch"
         field(12; "Bank Statement Import Format"; Code[20])
         {
             Caption = 'Bank Statement Import Format';
-            TableRelation = "Bank Export/Import Setup".Code WHERE(Direction = CONST(Import));
+            TableRelation = "Bank Export/Import Setup".Code where(Direction = const(Import));
         }
         field(23; "Suggest Balancing Amount"; Boolean)
         {

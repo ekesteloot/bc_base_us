@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 page 5217 "Employment Contracts"
 {
     ApplicationArea = BasicHR;
@@ -13,7 +15,7 @@ page 5217 "Employment Contracts"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a code for the employment contract.';

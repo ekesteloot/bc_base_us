@@ -1,3 +1,5 @@
+namespace System.Threading;
+
 query 472 "Failed Job Queue Entry"
 {
     Caption = 'Failed Job Queue Entry';
@@ -6,7 +8,7 @@ query 472 "Failed Job Queue Entry"
     {
         dataitem(Job_Queue_Entry; "Job Queue Entry")
         {
-            DataItemTableFilter = Status = FILTER(Error), "Recurring Job" = CONST(false);
+            DataItemTableFilter = Status = filter(Error), "Recurring Job" = const(false);
             column(ID; ID)
             {
             }

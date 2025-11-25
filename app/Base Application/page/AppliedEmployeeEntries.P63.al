@@ -1,3 +1,10 @@
+namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 63 "Applied Employee Entries"
 {
     Caption = 'Applied Employee Entries';
@@ -94,7 +101,7 @@ page 63 "Applied Employee Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Entry No."; Rec."Entry No.")
@@ -138,7 +145,7 @@ page 63 "Applied Employee Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Detailed &Ledger Entries")
@@ -147,9 +154,9 @@ page 63 "Applied Employee Entries"
                     Caption = 'Detailed &Ledger Entries';
                     Image = View;
                     RunObject = Page "Detailed Empl. Ledger Entries";
-                    RunPageLink = "Employee Ledger Entry No." = FIELD("Entry No."),
-                                  "Employee No." = FIELD("Employee No.");
-                    RunPageView = SORTING("Employee Ledger Entry No.", "Posting Date");
+                    RunPageLink = "Employee Ledger Entry No." = field("Entry No."),
+                                  "Employee No." = field("Employee No.");
+                    RunPageView = sorting("Employee Ledger Entry No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a summary of all the posted entries and adjustments related to a specific employee ledger entry.';
                 }
@@ -167,7 +174,7 @@ page 63 "Applied Employee Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -203,10 +210,10 @@ page 63 "Applied Employee Entries"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
         SetControlVisibility();
 
-        if "Entry No." <> 0 then begin
+        if Rec."Entry No." <> 0 then begin
             CreateEmplLedgEntry := Rec;
             if CreateEmplLedgEntry."Document Type" = CreateEmplLedgEntry."Document Type"::" " then
                 Heading := DocumentTxt
@@ -215,26 +222,26 @@ page 63 "Applied Employee Entries"
             Heading := Heading + ' ' + CreateEmplLedgEntry."Document No.";
 
             FindApplnEntriesDtldtLedgEntry();
-            SetCurrentKey("Entry No.");
-            SetRange("Entry No.");
+            Rec.SetCurrentKey("Entry No.");
+            Rec.SetRange("Entry No.");
 
             if CreateEmplLedgEntry."Closed by Entry No." <> 0 then begin
-                "Entry No." := CreateEmplLedgEntry."Closed by Entry No.";
-                Mark(true);
+                Rec."Entry No." := CreateEmplLedgEntry."Closed by Entry No.";
+                Rec.Mark(true);
             end;
 
-            SetCurrentKey("Closed by Entry No.");
-            SetRange("Closed by Entry No.", CreateEmplLedgEntry."Entry No.");
-            if Find('-') then
+            Rec.SetCurrentKey("Closed by Entry No.");
+            Rec.SetRange("Closed by Entry No.", CreateEmplLedgEntry."Entry No.");
+            if Rec.Find('-') then
                 repeat
-                    Mark(true);
-                until Next() = 0;
+                    Rec.Mark(true);
+                until Rec.Next() = 0;
 
-            SetCurrentKey("Entry No.");
-            SetRange("Closed by Entry No.");
+            Rec.SetCurrentKey("Entry No.");
+            Rec.SetRange("Closed by Entry No.");
         end;
 
-        MarkedOnly(true);
+        Rec.MarkedOnly(true);
     end;
 
     var
@@ -272,17 +279,17 @@ page 63 "Applied Employee Entries"
                             if DtldEmplLedgEntry2."Employee Ledger Entry No." <>
                                DtldEmplLedgEntry2."Applied Empl. Ledger Entry No."
                             then begin
-                                SetCurrentKey("Entry No.");
-                                SetRange("Entry No.", DtldEmplLedgEntry2."Employee Ledger Entry No.");
-                                if Find('-') then
-                                    Mark(true);
+                                Rec.SetCurrentKey("Entry No.");
+                                Rec.SetRange("Entry No.", DtldEmplLedgEntry2."Employee Ledger Entry No.");
+                                if Rec.Find('-') then
+                                    Rec.Mark(true);
                             end;
                         until DtldEmplLedgEntry2.Next() = 0;
                 end else begin
-                    SetCurrentKey("Entry No.");
-                    SetRange("Entry No.", DtldEmplLedgEntry1."Applied Empl. Ledger Entry No.");
-                    if Find('-') then
-                        Mark(true);
+                    Rec.SetCurrentKey("Entry No.");
+                    Rec.SetRange("Entry No.", DtldEmplLedgEntry1."Applied Empl. Ledger Entry No.");
+                    if Rec.Find('-') then
+                        Rec.Mark(true);
                 end;
             until DtldEmplLedgEntry1.Next() = 0;
     end;

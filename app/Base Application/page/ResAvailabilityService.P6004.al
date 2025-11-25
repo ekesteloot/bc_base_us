@@ -1,3 +1,12 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Setup;
+using System.Text;
+using System.Utilities;
+
 page 6004 "Res. Availability (Service)"
 {
     Caption = 'Res. Availability (Service)';
@@ -119,11 +128,11 @@ page 6004 "Res. Availability (Service)"
     trigger OnAfterGetRecord()
     begin
         if ServHeader.Get(CurrentDocumentType, CurrentDocumentNo) then
-            "Service Zone Filter" := ServHeader."Service Zone Code"
+            Rec."Service Zone Filter" := ServHeader."Service Zone Code"
         else
-            "Service Zone Filter" := '';
+            Rec."Service Zone Filter" := '';
 
-        CalcFields("In Customer Zone");
+        Rec.CalcFields("In Customer Zone");
     end;
 
     trigger OnOpenPage()

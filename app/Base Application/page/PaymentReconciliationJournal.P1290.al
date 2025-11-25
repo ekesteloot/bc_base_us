@@ -1,13 +1,25 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Statement;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Sales.FinanceCharge;
+using System.Environment.Configuration;
+using System.Integration.Excel;
+using System.Telemetry;
+using System.Utilities;
+
 page 1290 "Payment Reconciliation Journal"
 {
     AutoSplitKey = true;
     Caption = 'Payment Reconciliation Journal';
-    DataCaptionExpression = "Bank Account No.";
+    DataCaptionExpression = Rec."Bank Account No.";
     DelayedInsert = true;
     LinksAllowed = false;
     PageType = Worksheet;
     SourceTable = "Bank Acc. Reconciliation Line";
-    SourceTableView = WHERE("Statement Type" = CONST("Payment Application"));
+    SourceTableView = where("Statement Type" = const("Payment Application"));
     RefreshOnActivate = true;
 
     layout
@@ -31,13 +43,12 @@ page 1290 "Payment Reconciliation Journal"
                         BankPmtApplRule: Record "Bank Pmt. Appl. Rule";
                     begin
                         CurrPage.SetSelectionFilter(BankAccReconciliationLine);
-                        if not PreviousUXExperienceActive then
-                            if BankPmtApplRule.IsMatchedAutomatically(Rec."Match Confidence", Rec."Applied Entries") then begin
-                                Page.RunModal(Page::"Payment Application Review", BankAccReconciliationLine);
-                                exit;
-                            end;
+                        if BankPmtApplRule.IsMatchedAutomatically(Rec."Match Confidence".AsInteger(), Rec."Applied Entries") then begin
+                            Page.RunModal(Page::"Payment Application Review", BankAccReconciliationLine);
+                            exit;
+                        end;
 
-                        DisplayApplication();
+                        Rec.DisplayApplication();
                     end;
                 }
                 field("Transaction Date"; Rec."Transaction Date")
@@ -78,7 +89,7 @@ page 1290 "Payment Reconciliation Journal"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the amount that has been applied to one or more open entries.';
                 }
-                field(Difference; Difference)
+                field(Difference; Rec.Difference)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -94,7 +105,7 @@ page 1290 "Payment Reconciliation Journal"
                     ToolTip = 'Specifies the difference between the values in the Statement Amount and the Remaining Amount After Posting fields.';
                     Visible = false;
                 }
-                field(GetAppliedToDocumentNo; GetAppliedToDocumentNo())
+                field(GetAppliedToDocumentNo; Rec.GetAppliedToDocumentNo())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Document No.';
@@ -113,7 +124,7 @@ page 1290 "Payment Reconciliation Journal"
                     Caption = 'Due Date';
                     ToolTip = 'Specifies the due date on the open entry that the payment is applied to.';
                 }
-                field(AccountName; GetAppliedToName())
+                field(AccountName; Rec.GetAppliedToName())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Account Name';
@@ -122,7 +133,7 @@ page 1290 "Payment Reconciliation Journal"
 
                     trigger OnDrillDown()
                     begin
-                        AppliedToDrillDown();
+                        Rec.AppliedToDrillDown();
                     end;
                 }
                 field("Account Type"; Rec."Account Type")
@@ -138,8 +149,8 @@ page 1290 "Payment Reconciliation Journal"
                     trigger OnValidate()
                     begin
                         CurrPage.Update();
-                        if Difference <> 0 then
-                            TransferRemainingAmountToAccount();
+                        if Rec.Difference <> 0 then
+                            Rec.TransferRemainingAmountToAccount();
                     end;
                 }
                 field(PostingDateAppliedEntry; AppliedPmtEntry."Posting Date")
@@ -171,13 +182,12 @@ page 1290 "Payment Reconciliation Journal"
                         BankPmtApplRule: Record "Bank Pmt. Appl. Rule";
                     begin
                         CurrPage.SetSelectionFilter(BankAccReconciliationLine);
-                        if not PreviousUXExperienceActive then
-                            if BankPmtApplRule.IsMatchedAutomatically(Rec."Match Confidence", Rec."Applied Entries") then begin
-                                Page.RunModal(Page::"Payment Application Review", BankAccReconciliationLine);
-                                exit;
-                            end;
+                        if BankPmtApplRule.IsMatchedAutomatically(Rec."Match Confidence".AsInteger(), Rec."Applied Entries") then begin
+                            Page.RunModal(Page::"Payment Application Review", BankAccReconciliationLine);
+                            exit;
+                        end;
 
-                        DisplayApplication();
+                        Rec.DisplayApplication();
                     end;
                 }
                 field("Applied Entries"; Rec."Applied Entries")
@@ -251,15 +261,15 @@ page 1290 "Payment Reconciliation Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 3);
                     end;
@@ -268,15 +278,15 @@ page 1290 "Payment Reconciliation Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 4);
                     end;
@@ -285,15 +295,15 @@ page 1290 "Payment Reconciliation Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 5);
                     end;
@@ -302,15 +312,15 @@ page 1290 "Payment Reconciliation Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 6);
                     end;
@@ -319,15 +329,15 @@ page 1290 "Payment Reconciliation Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 7);
                     end;
@@ -336,15 +346,15 @@ page 1290 "Payment Reconciliation Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the dimension value code linked to the journal line.';
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
@@ -358,7 +368,6 @@ page 1290 "Payment Reconciliation Journal"
                 {
                     ShowCaption = false;
                     Editable = false;
-                    Visible = not PreviousUXExperienceActive;
                     GridLayout = columns;
 
                     grid(TotalLinesGroup)
@@ -370,7 +379,6 @@ page 1290 "Payment Reconciliation Journal"
                         {
                             field(TotalLines; TotalLinesCount)
                             {
-                                Visible = not PreviousUXExperienceActive;
                                 ShowCaption = false;
                                 Caption = 'Number of Lines';
                                 ApplicationArea = Basic, Suite;
@@ -387,8 +395,6 @@ page 1290 "Payment Reconciliation Journal"
                                 ApplicationArea = Basic, Suite;
                                 Editable = false;
                                 Style = StrongAccent;
-
-                                Visible = not PreviousUXExperienceActive;
                                 Caption = 'For Review';
                                 ToolTip = 'Specifies the number of lines that you should review because they were matched automatically. The matching rule used is marked as Review Required on the Payment Application Rules page.';
 
@@ -408,7 +414,6 @@ page 1290 "Payment Reconciliation Journal"
                                 {
                                     ApplicationArea = Basic, Suite;
                                     Editable = false;
-                                    Visible = not PreviousUXExperienceActive;
                                     Caption = 'With differences';
                                     ToolTip = 'Specifies the number of lines that must be addressed before posting.';
 
@@ -426,7 +431,6 @@ page 1290 "Payment Reconciliation Journal"
                     grid(TotalTransactionAmountGroup)
                     {
 
-                        Visible = not PreviousUXExperienceActive;
                         group("Transaction Total")
                         {
                             field(TotalTransactionAmountFixedLayout; BankAccReconciliation."Total Transaction Amount")
@@ -473,7 +477,6 @@ page 1290 "Payment Reconciliation Journal"
                                 {
                                     ApplicationArea = Basic, Suite;
                                     AutoFormatType = 1;
-                                    Visible = not PreviousUXExperienceActive;
                                     Caption = 'Balance on Bank Account';
                                     ToolTip = 'Specifies the balance of the bank account per the last time you reconciled the bank account.';
 
@@ -488,7 +491,6 @@ page 1290 "Payment Reconciliation Journal"
                                 ShowCaption = false;
                                 field(BalanceOnBankAccountAfterPostingFixedLayout; BankAccReconciliation."Total Balance on Bank Account" + BankAccReconciliation."Total Unposted Applied Amount" + AppliedBankAmounts)
                                 {
-                                    Visible = not PreviousUXExperienceActive;
                                     Caption = 'Balance After Posting';
                                     ApplicationArea = Basic, Suite;
                                     AutoFormatType = 1;
@@ -499,7 +501,6 @@ page 1290 "Payment Reconciliation Journal"
 
                         group(StatementEndingBalanceGroup)
                         {
-                            Visible = not PreviousUXExperienceActive;
                             ShowCaption = false;
                             field(StatementEndingBalanceFixedLayout; StatementEndingBalance)
                             {
@@ -519,14 +520,13 @@ page 1290 "Payment Reconciliation Journal"
         {
             part(Control2; "Payment Rec Match Details")
             {
-                Visible = not PreviousUXExperienceActive;
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                              "Statement No." = FIELD("Statement No."),
-                              "Statement Line No." = FIELD("Statement Line No."),
-                              "Statement Type" = FIELD("Statement Type"),
-                              "Account Type" = FIELD("Account Type"),
-                              "Account No." = FIELD("Account No.");
+                SubPageLink = "Bank Account No." = field("Bank Account No."),
+                              "Statement No." = field("Statement No."),
+                              "Statement Line No." = field("Statement Line No."),
+                              "Statement Type" = field("Statement Type"),
+                              "Account Type" = field("Account Type"),
+                              "Account No." = field("Account No.");
             }
         }
     }
@@ -552,7 +552,7 @@ page 1290 "Payment Reconciliation Journal"
                     begin
                         OnAfterImportBankTransactions(SubscriberInvoked, Rec);
                         if not SubscriberInvoked then begin
-                            BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
+                            BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
                             BankAccReconciliation.ImportBankStatement();
                             if BankAccReconciliation.Find() then;
                         end;
@@ -575,9 +575,9 @@ page 1290 "Payment Reconciliation Journal"
                         SubscriberInvoked: Boolean;
                         Overwrite: Boolean;
                     begin
-                        AppliedPaymentEntry.SetRange("Statement Type", "Statement Type");
-                        AppliedPaymentEntry.SetRange("Bank Account No.", "Bank Account No.");
-                        AppliedPaymentEntry.SetRange("Statement No.", "Statement No.");
+                        AppliedPaymentEntry.SetRange("Statement Type", Rec."Statement Type");
+                        AppliedPaymentEntry.SetRange("Bank Account No.", Rec."Bank Account No.");
+                        AppliedPaymentEntry.SetRange("Statement No.", Rec."Statement No.");
                         AppliedPaymentEntry.SetRange("Match Confidence", AppliedPaymentEntry."Match Confidence"::Accepted);
                         AppliedPaymentEntry.SetRange("Match Confidence", AppliedPaymentEntry."Match Confidence"::Manual);
 
@@ -586,7 +586,7 @@ page 1290 "Payment Reconciliation Journal"
                         else
                             Overwrite := true;
 
-                        BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
+                        BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
                         OnAtActionApplyAutomatically(BankAccReconciliation, SubscriberInvoked);
                         if not SubscriberInvoked then
                             if Overwrite then
@@ -611,7 +611,7 @@ page 1290 "Payment Reconciliation Journal"
                         var
                             TestReportPrint: Codeunit "Test Report-Print";
                         begin
-                            BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
+                            BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
                             TestReportPrint.PrintBankAccRecon(BankAccReconciliation);
                         end;
                     }
@@ -655,7 +655,7 @@ page 1290 "Payment Reconciliation Journal"
                             BankAccReconciliation: Record "Bank Acc. Reconciliation";
                             BankAccReconciliationPost: Codeunit "Bank Acc. Reconciliation Post";
                         begin
-                            BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
+                            BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
                             BankAccReconciliationPost.Preview(BankAccReconciliation);
                         end;
                     }
@@ -673,7 +673,7 @@ page 1290 "Payment Reconciliation Journal"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "Finance Charge Memo";
-                    RunPageLink = "Customer No." = FIELD("Account No.");
+                    RunPageLink = "Customer No." = field("Account No.");
                     RunPageMode = Create;
                     ToolTip = 'Define a memo that includes information about the calculated interest on outstanding balances of an account. You can then send the memo in an email to the customer.';
                 }
@@ -745,8 +745,8 @@ page 1290 "Payment Reconciliation Journal"
 
                     trigger OnAction()
                     begin
-                        DisplayApplication();
-                        GetAppliedPmtData(AppliedPmtEntry, RemainingAmountAfterPosting, StatementToRemAmtDifference, PmtAppliedToTxt);
+                        Rec.DisplayApplication();
+                        Rec.GetAppliedPmtData(AppliedPmtEntry, RemainingAmountAfterPosting, StatementToRemAmtDifference, PmtAppliedToTxt);
                     end;
                 }
             }
@@ -796,7 +796,7 @@ page 1290 "Payment Reconciliation Journal"
 
                     trigger OnAction()
                     begin
-                        SetFilter(Difference, '<>0');
+                        Rec.SetFilter(Difference, '<>0');
                         CurrPage.Update();
                     end;
                 }
@@ -809,7 +809,7 @@ page 1290 "Payment Reconciliation Journal"
 
                     trigger OnAction()
                     begin
-                        SetRange(Difference);
+                        Rec.SetRange(Difference);
                         CurrPage.Update();
                     end;
                 }
@@ -851,7 +851,7 @@ page 1290 "Payment Reconciliation Journal"
 
                 trigger OnAction()
                 begin
-                    BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
+                    BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
                     BankAccReconciliation.ShowDocDim();
                     CurrPage.SaveRecord();
                 end;
@@ -865,7 +865,7 @@ page 1290 "Payment Reconciliation Journal"
 
                 trigger OnAction()
                 begin
-                    ShowDimensions();
+                    Rec.ShowDimensions();
                 end;
             }
             action("Bank Account Card")
@@ -874,7 +874,7 @@ page 1290 "Payment Reconciliation Journal"
                 Caption = 'Bank Account Card';
                 Image = BankAccount;
                 RunObject = Page "Payment Bank Account Card";
-                RunPageLink = "No." = FIELD("Bank Account No.");
+                RunPageLink = "No." = field("Bank Account No.");
                 ToolTip = 'View or edit information about the bank account that is related to the payment reconciliation journal.';
             }
             group(Details)
@@ -886,8 +886,8 @@ page 1290 "Payment Reconciliation Journal"
                     Caption = 'Bank Transaction Details';
                     Image = ExternalDocument;
                     RunObject = Page "Bank Statement Line Details";
-                    RunPageLink = "Data Exch. No." = FIELD("Data Exch. Entry No."),
-                                  "Line No." = FIELD("Data Exch. Line No.");
+                    RunPageLink = "Data Exch. No." = field("Data Exch. Entry No."),
+                                  "Line No." = field("Data Exch. Line No.");
                     ToolTip = 'View the values that exist in an imported bank statement file for the selected line.';
                 }
             }
@@ -1018,12 +1018,9 @@ page 1290 "Payment Reconciliation Journal"
         BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
         AppliedAmountSum: Decimal;
     begin
-        if not IsBankAccReconInitialized then begin
-            BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
-            IsBankAccReconInitialized := true;
-        end;
+        InitializeBankAccRecon();
 
-        FinanceChargeMemoEnabled := "Account Type" = "Account Type"::Customer;
+        FinanceChargeMemoEnabled := Rec."Account Type" = Rec."Account Type"::Customer;
         BankAccReconciliation.CalcFields("Total Balance on Bank Account", "Total Unposted Applied Amount", "Total Transaction Amount",
           "Total Applied Amount", "Total Outstd Bank Transactions", "Total Outstd Payments",
           "Total Paid Amount", "Total Received Amount");
@@ -1036,19 +1033,17 @@ page 1290 "Payment Reconciliation Journal"
         if BankAccReconciliation."Statement Ending Balance" <> 0 then
             StatementEndingBalance := Format(BankAccReconciliation."Statement Ending Balance");
 
-        if not PreviousUXExperienceActive then begin
-            GetLinesForReview(BankAccReconciliationLine);
-            LinesForReviewCount := BankAccReconciliationLine.Count();
-            BankAccReconciliationLine.CalcSums("Applied Amount");
-            AppliedAmountSum := BankAccReconciliationLine."Applied Amount";
-            CLEAR(BankAccReconciliationLine);
-            GetLinesWithDifference(BankAccReconciliationLine);
-            LinesWithDifferenceCount := BankAccReconciliationLine.Count();
+        GetLinesForReview(BankAccReconciliationLine);
+        LinesForReviewCount := BankAccReconciliationLine.Count();
+        BankAccReconciliationLine.CalcSums("Applied Amount");
+        AppliedAmountSum := BankAccReconciliationLine."Applied Amount";
+        CLEAR(BankAccReconciliationLine);
+        GetLinesWithDifference(BankAccReconciliationLine);
+        LinesWithDifferenceCount := BankAccReconciliationLine.Count();
 
-            TotalLinesCount := Count();
+        TotalLinesCount := Rec.Count();
 
-            UpdateLinesForReviewNotification(AppliedAmountSum);
-        end;
+        UpdateLinesForReviewNotification(AppliedAmountSum);
 
         UpdateEmptyListNotification();
         UpdateNumberSeriesNotification();
@@ -1074,17 +1069,17 @@ page 1290 "Payment Reconciliation Journal"
         MatchDetails := PaymentMatchingDetails.MergeMessages(Rec);
 
         if CurrentClientType() in [ClientType::OData, ClientType::ODataV4, ClientType::SOAP, ClientType::Api] then
-            GetAppliedPmtData(AppliedPmtEntry, PmtAppliedToTxt)
+            Rec.GetAppliedPmtData(AppliedPmtEntry, PmtAppliedToTxt)
         else
-            GetAppliedPmtData(AppliedPmtEntry, RemainingAmountAfterPosting, StatementToRemAmtDifference, PmtAppliedToTxt);
-        ShowShortcutDimCode(ShortcutDimCode);
+            Rec.GetAppliedPmtData(AppliedPmtEntry, RemainingAmountAfterPosting, StatementToRemAmtDifference, PmtAppliedToTxt);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
 
         ReviewStatusStyleTxt := GetReviewStatusStyle(Rec);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
         AppliedPmtEntry.Init();
         StatementToRemAmtDifference := 0;
         RemainingAmountAfterPosting := 0;
@@ -1104,7 +1099,6 @@ page 1290 "Payment Reconciliation Journal"
         SetDimensionsVisibility();
         ReviewScoreFilter := BankPmtApplRule.GetReviewRequiredScoreFilter();
 
-        PreviousUXExperienceActive := not GetNewExperienceActive();
         StatementEndingBalance := '-';
     end;
 
@@ -1112,10 +1106,7 @@ page 1290 "Payment Reconciliation Journal"
     var
         BankAccReconciliationTest: Record "Bank Acc. Reconciliation";
     begin
-        if not IsBankAccReconInitialized then begin
-            BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
-            IsBankAccReconInitialized := true;
-        end;
+        InitializeBankAccRecon();
         if BankAccReconciliationTest.get(BankAccReconciliation."Statement Type", BankAccReconciliation."Bank Account No.", BankAccReconciliation."Statement No.") then begin
             BankAccReconciliation.Validate("Statement Ending Balance", 0.0);
             BankAccReconciliation.Modify();
@@ -1126,10 +1117,7 @@ page 1290 "Payment Reconciliation Journal"
     var
         BankAccReconciliationTest: Record "Bank Acc. Reconciliation";
     begin
-        if not IsBankAccReconInitialized then begin
-            BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
-            IsBankAccReconInitialized := true;
-        end;
+        InitializeBankAccRecon();
         if BankAccReconciliationTest.get(BankAccReconciliation."Statement Type", BankAccReconciliation."Bank Account No.", BankAccReconciliation."Statement No.") then begin
             BankAccReconciliation.Validate("Statement Ending Balance", 0.0);
             BankAccReconciliation.Modify();
@@ -1138,10 +1126,18 @@ page 1290 "Payment Reconciliation Journal"
 
     local procedure GetReviewStatusStyle(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line"): Text
     begin
-        if (BankAccReconciliationLine."Match Confidence" in ["Match Confidence"::Accepted, "Match Confidence"::Manual]) then
+        if (BankAccReconciliationLine."Match Confidence" in [Rec."Match Confidence"::Accepted, Rec."Match Confidence"::Manual]) then
             exit('Favorable');
 
         exit('Standard');
+    end;
+
+    local procedure InitializeBankAccRecon()
+    begin
+        if not IsBankAccReconInitialized then begin
+            BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
+            IsBankAccReconInitialized := true;
+        end;
     end;
 
     local procedure GetLinesForReview(var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line")
@@ -1171,7 +1167,7 @@ page 1290 "Payment Reconciliation Journal"
     begin
         ImportTransactionsNotification.Id := GetImportTransactionsNotificationId();
         ImportTransactionsNotification.Recall();
-        if not BankStatementLinesListIsEmpty("Statement No.", "Statement Type", "Bank Account No.") then
+        if not Rec.BankStatementLinesListIsEmpty(Rec."Statement No.", Rec."Statement Type".AsInteger(), Rec."Bank Account No.") then
             exit;
 
         ImportTransactionsNotification.Message := ListEmptyMsg;
@@ -1194,9 +1190,9 @@ page 1290 "Payment Reconciliation Journal"
 
         LinesForReviewNotification.Message := LinesForReviewNotificationMsg;
         LinesForReviewNotification.Scope := NotificationScope::LocalScope;
-        LinesForReviewNotification.SetData(FieldName("Statement No."), "Statement No.");
-        LinesForReviewNotification.SetData(FieldName("Statement Type"), Format("Statement Type"));
-        LinesForReviewNotification.SetData(FieldName("Bank Account No."), "Bank Account No.");
+        LinesForReviewNotification.SetData(Rec.FieldName("Statement No."), Rec."Statement No.");
+        LinesForReviewNotification.SetData(Rec.FieldName("Statement Type"), Format(Rec."Statement Type"));
+        LinesForReviewNotification.SetData(Rec.FieldName("Bank Account No."), Rec."Bank Account No.");
         LinesForReviewNotification.SetData('ReviewScoreFilter', ReviewScoreFilter);
         LinesForReviewNotification.AddAction(LinesForReviewDifferenceActionLbl, CODEUNIT::"Match Bank Payments", 'OpenLinesForReviewPage');
         LinesForReviewNotification.Send();
@@ -1221,7 +1217,7 @@ page 1290 "Payment Reconciliation Journal"
 
         NumberSeriesNotification.Message := NoNumberSeriesMsg;
         NumberSeriesNotification.Scope := NotificationScope::LocalScope;
-        NumberSeriesNotification.SetData(FieldName("Bank Account No."), BankAccReconciliation."Bank Account No.");
+        NumberSeriesNotification.SetData(Rec.FieldName("Bank Account No."), BankAccReconciliation."Bank Account No.");
         NumberSeriesNotification.AddAction(ShowDetailsTxt, CODEUNIT::"Match Bank Payments", 'OpenBankAccountCard');
         NumberSeriesNotification.AddAction(DisableNotificationTxt, CODEUNIT::"Match Bank Payments", 'DisableNotification');
         NumberSeriesNotification.Send();
@@ -1231,7 +1227,7 @@ page 1290 "Payment Reconciliation Journal"
     var
         BankPmtApplRule: Record "Bank Pmt. Appl. Rule";
     begin
-        BankPmtApplRule.SetRange("Match Confidence", "Match Confidence");
+        BankPmtApplRule.SetRange("Match Confidence", Rec."Match Confidence");
         BankPmtApplRule.SetRange("Review Required", true);
 
         exit(not BankPmtApplRule.IsEmpty());
@@ -1273,7 +1269,6 @@ page 1290 "Payment Reconciliation Journal"
         NoNumberSeriesMsg: Label 'You can specify a number series for this journal. Open the bank account card and choose a number series in the Payment Reconciliation No. Series field.';
         ShowDetailsTxt: Label 'Open bank account card';
         DisableNotificationTxt: Label 'Don''t show this again';
-        PreviousUXExperienceActive: Boolean;
         WouldYouLikeToRunMapTexttoAccountAgainQst: Label 'Do you want to re-apply the text to account mapping rules to all lines in the bank statement?';
         StatementEndingBalance: Text;
 
@@ -1297,25 +1292,25 @@ page 1290 "Payment Reconciliation Journal"
         ScoreRange: Integer;
         SubscriberInvoked: Boolean;
     begin
-        BankAccReconciliationLine.SetRange("Statement Type", "Statement Type");
-        BankAccReconciliationLine.SetRange("Bank Account No.", "Bank Account No.");
-        BankAccReconciliationLine.SetRange("Statement No.", "Statement No.");
+        BankAccReconciliationLine.SetRange("Statement Type", Rec."Statement Type");
+        BankAccReconciliationLine.SetRange("Bank Account No.", Rec."Bank Account No.");
+        BankAccReconciliationLine.SetRange("Statement No.", Rec."Statement No.");
         BankAccReconciliationLine.SetAutoCalcFields("Match Confidence");
 
         if BankAccReconciliationLine.FindSet() then begin
             repeat
                 ScoreRange := 10000;
-                BankAccReconciliationLine."Sorting Order" := BankAccReconciliationLine."Match Confidence" * ScoreRange;
+                BankAccReconciliationLine."Sorting Order" := BankAccReconciliationLine."Match Confidence".AsInteger() * ScoreRange;
 
                 // Update sorting for same match confidence based onother criteria
-                GetAppliedPmtData(AppliedPaymentEntry2, RemainingAmountAfterPosting, AmountDifference, PmtAppliedToTxt);
+                Rec.GetAppliedPmtData(AppliedPaymentEntry2, RemainingAmountAfterPosting, AmountDifference, PmtAppliedToTxt);
 
                 ScoreRange := ScoreRange / 10;
                 if AmountDifference <> 0 then
                     BankAccReconciliationLine."Sorting Order" -= ScoreRange;
 
                 ScoreRange := ScoreRange / 10;
-                if Difference <> 0 then
+                if Rec.Difference <> 0 then
                     BankAccReconciliationLine."Sorting Order" -= ScoreRange;
 
                 ScoreRange := ScoreRange / 10;
@@ -1327,11 +1322,11 @@ page 1290 "Payment Reconciliation Journal"
 
             OnUpdateSorting(BankAccReconciliation, SubscriberInvoked);
             if not SubscriberInvoked then
-                SetCurrentKey("Sorting Order");
-            Ascending(IsAscending);
+                Rec.SetCurrentKey("Sorting Order");
+            Rec.Ascending(IsAscending);
 
             CurrPage.Update(false);
-            FindFirst();
+            Rec.FindFirst();
         end;
     end;
 
@@ -1340,13 +1335,13 @@ page 1290 "Payment Reconciliation Journal"
         BankAccReconciliation: Record "Bank Acc. Reconciliation";
         BankAccReconPostYesNo: Codeunit "Bank Acc. Recon. Post (Yes/No)";
     begin
-        BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
+        BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
         BankAccReconciliation."Post Payments Only" := OnlyPayments;
 
         OnBeforeInvokePost(BankAccReconciliation);
 
         if BankAccReconPostYesNo.BankAccReconPostYesNo(BankAccReconciliation) then begin
-            Reset();
+            Rec.Reset();
             PageClosedByPosting := true;
             CurrPage.Close();
         end;
@@ -1367,13 +1362,13 @@ page 1290 "Payment Reconciliation Journal"
 
     local procedure TestIfFiltershaveBeenRemovedWithRefreshAndClose()
     begin
-        FilterGroup := 2;
+        Rec.FilterGroup := 2;
         if not PageClosedByPosting then
-            if GetFilter("Bank Account No.") + GetFilter("Statement Type") + GetFilter("Statement No.") = '' then begin
+            if Rec.GetFilter("Bank Account No.") + Rec.GetFilter("Statement Type") + Rec.GetFilter("Statement No.") = '' then begin
                 Message(PageMustCloseMsg);
                 CurrPage.Close();
             end;
-        FilterGroup := 0;
+        Rec.FilterGroup := 0;
     end;
 
     local procedure SetDimensionsVisibility()

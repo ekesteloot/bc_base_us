@@ -47,18 +47,6 @@ page 9024 "Security Admin Role Center"
             {
                 ApplicationArea = Basic, Suite;
             }
-#if not CLEAN20
-            part("Subscription Plans"; "Plans FactBox")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Licenses';
-                Editable = false;
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The part is not actionable.';
-                ObsoleteTag = '20.0';
-            }
-#endif
 #if not CLEAN22
             part(Control4; "User Groups FactBox")
             {
@@ -75,18 +63,6 @@ page 9024 "Security Admin Role Center"
                 ApplicationArea = All;
                 Caption = 'Default Permissions per License';
             }
-#if not CLEAN20
-            part("Plan Permission Set"; "Plan Permission Set")
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Plan Permission Set';
-                Editable = false;
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The part is irrelevant as it shows only the default permission sets plans since now custom permissions set can be configured per plan.';
-                ObsoleteTag = '20.0';
-            }
-#endif
             part(PowerBIEmbeddedReportPart; "Power BI Embedded Report Part")
             {
                 AccessByPermission = TableData "Power BI User Configuration" = I;
@@ -156,7 +132,7 @@ page 9024 "Security Admin Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'User Review Log';
                 RunObject = Page "Activity Log";
-                RunPageView = WHERE("Table No Filter" = FILTER(9062));
+                RunPageView = where("Table No Filter" = filter(9062));
                 ToolTip = 'Monitor users'' activities in the database by reviewing changes that are made to data in tables that you select to track. Change log entries are chronologically ordered and show changes that are made to the fields on the specified tables. ';
             }
             action("Permission Sets")
@@ -184,8 +160,6 @@ page 9024 "Security Admin Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Users';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page Users;
                     ToolTip = 'View or edit users that will be configured in the database.';
                 }
@@ -194,8 +168,6 @@ page 9024 "Security Admin Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'User Groups';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "User Groups";
                     ToolTip = 'Set up or modify user groups as a fast way of giving users access to the functionality that is relevant to their work.';
                     Visible = false; // cannot control the visibility with the feature switch
@@ -215,8 +187,6 @@ page 9024 "Security Admin Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Permission Sets';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Permission Sets";
                     ToolTip = 'View or edit which feature objects that users need to access and set up the related permissions in permission sets that you can assign to the users of the database.';
                 }
@@ -224,8 +194,6 @@ page 9024 "Security Admin Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Plans';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page Plans;
                     RunPageMode = View;
                     ToolTip = 'View subscription plans.';
@@ -235,7 +203,7 @@ page 9024 "Security Admin Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'User Review Log';
                     RunObject = Page "Activity Log";
-                    RunPageView = WHERE("Table No Filter" = FILTER(9062));
+                    RunPageView = where("Table No Filter" = filter(9062));
                     ToolTip = 'View a log of users'' activities in the database.';
                 }
             }
@@ -246,8 +214,6 @@ page 9024 "Security Admin Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Apps';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "AAD Application List";
                     ToolTip = 'View or edit apps.';
                 }
@@ -269,7 +235,7 @@ page 9024 "Security Admin Role Center"
                     ApplicationArea = All;
                     Caption = 'Classified Fields';
                     RunObject = Page "Data Classification Worksheet";
-                    RunPageView = WHERE("Data Sensitivity" = FILTER(<> Unclassified));
+                    RunPageView = where("Data Sensitivity" = filter(<> Unclassified));
                     ToolTip = 'View only classified fields';
                 }
                 action(Unclassified)
@@ -277,7 +243,7 @@ page 9024 "Security Admin Role Center"
                     ApplicationArea = All;
                     Caption = 'Unclassified Fields';
                     RunObject = Page "Data Classification Worksheet";
-                    RunPageView = WHERE("Data Sensitivity" = CONST(Unclassified));
+                    RunPageView = where("Data Sensitivity" = const(Unclassified));
                     ToolTip = 'View only unclassified fields';
                 }
                 action("Page Data Subjects")

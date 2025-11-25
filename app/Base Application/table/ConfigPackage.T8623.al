@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Globalization;
+
 table 8623 "Config. Package"
 {
     Caption = 'Config. Package';
@@ -21,7 +25,7 @@ table 8623 "Config. Package"
         }
         field(5; "No. of Tables"; Integer)
         {
-            CalcFormula = Count ("Config. Package Table" WHERE("Package Code" = FIELD(Code)));
+            CalcFormula = Count("Config. Package Table" where("Package Code" = field(Code)));
             Caption = 'No. of Tables';
             Editable = false;
             FieldClass = FlowField;
@@ -48,14 +52,14 @@ table 8623 "Config. Package"
         }
         field(13; "No. of Records"; Integer)
         {
-            CalcFormula = Count ("Config. Package Record" WHERE("Package Code" = FIELD(Code)));
+            CalcFormula = Count("Config. Package Record" where("Package Code" = field(Code)));
             Caption = 'No. of Records';
             Editable = false;
             FieldClass = FlowField;
         }
         field(16; "No. of Errors"; Integer)
         {
-            CalcFormula = Count ("Config. Package Error" WHERE("Package Code" = FIELD(Code)));
+            CalcFormula = Count("Config. Package Error" where("Package Code" = field(Code)));
             Caption = 'No. of Errors';
             Editable = false;
             FieldClass = FlowField;

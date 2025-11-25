@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Maintenance;
+
 page 5642 Maintenance
 {
     ApplicationArea = FixedAssets;
@@ -13,7 +15,7 @@ page 5642 Maintenance
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies a maintenance code.';

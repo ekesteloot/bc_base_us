@@ -1,3 +1,11 @@
+namespace Microsoft.Intercompany.Inbox;
+
+using Microsoft.Intercompany.Journal;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using System.Utilities;
+
 table 418 "IC Inbox Transaction"
 {
     Caption = 'IC Inbox Transaction';
@@ -60,7 +68,7 @@ table 418 "IC Inbox Transaction"
                 if (("Line Action" = "Line Action"::"Return to IC Partner") or ("Line Action" = "Line Action"::Accept)) and
                    ("Transaction Source" = "Transaction Source"::"Returned by Partner")
                 then
-                    Error(Text000, "Transaction No.", "IC Partner Code");
+                    Error(InvalidActionForReturnedTransactionErr, "Transaction No.", "IC Partner Code");
 
                 if "Line Action" = "Line Action"::Accept then
                     InboxCheckAccept();
@@ -149,7 +157,11 @@ table 418 "IC Inbox Transaction"
     end;
 
     var
-        Text000: Label 'Transaction No. %1 has been returned by IC Partner %2.\You can only cancel returned transactions.';
+        InvalidActionForReturnedTransactionErr: Label 'Transaction No. %1 has been returned by IC Partner %2.\You can only cancel returned transactions.', Comment = '%1 - Transaction No, %2 - IC parthner code';
+        TransactionAlreadyExistsInInboxHandledQst: Label '%1 %2 has already been received from intercompany partner %3. Accepting it again will create a duplicate %1. Do you want to accept the %1?', Comment = '%1 - Document Type, %2 - Document No, %3 - IC parthner code';
+        DuplicateTransactionNoMsg: Label 'Transaction No. %2 is a copy of Transaction No. %1, which has already been set to Accept.\Do you also want to accept Transaction No. %2?', Comment = '%1 - New Transaction No, %2 - Old Transaction No';
+        DuplicatePurchaseOrderMsg: Label 'A purchase order already exists for transaction %1. If you accept and post this document, you should delete the original purchase order %2 to avoid duplicate postings.', Comment = '%1 - New Transaction No, %2 - Old Transaction No';
+        DuplicatePurchaseInvoiceMsg: Label 'Purchase invoice %1 has already been posted for transaction %2. If you accept and post this document, you will have duplicate postings.\Are you sure you want to accept the transaction?', Comment = '%1 - Purchase Invoice No, %2 - Transaction No';
 
     procedure ShowDetails()
     var
@@ -202,11 +214,6 @@ table 418 "IC Inbox Transaction"
         PurchInvHeader: Record "Purch. Inv. Header";
         ConfirmManagement: Codeunit "Confirm Management";
         IsHandled: Boolean;
-
-        TransactionAlreadyExistsInInboxHandledQst: Label '%1 %2 has already been received from intercompany partner %3. Accepting it again will create a duplicate %1. Do you want to accept the %1?', Comment = '%1 - Document Type, %2 - Document No, %3 - IC parthner code';
-        Text001: Label 'Transaction No. %2 is a copy of Transaction No. %1, which has already been set to Accept.\Do you also want to accept Transaction No. %2?';
-        Text003: Label 'A purchase order already exists for transaction %1. If you accept and post this document, you should delete the original purchase order %2 to avoid duplicate postings.';
-        Text004: Label 'Purchase invoice %1 has already been posted for transaction %2. If you accept and post this document, you will have duplicate postings.\Are you sure you want to accept the transaction?';
     begin
         IsHandled := false;
         OnBeforeInboxCheckAccept(Rec, IsHandled, xRec);
@@ -240,7 +247,7 @@ table 418 "IC Inbox Transaction"
         ICInboxTransaction2.SetRange("Line Action", "Line Action"::Accept);
         if ICInboxTransaction2.FindFirst() then
             if not ConfirmManagement.GetResponseOrDefault(
-                 StrSubstNo(Text001, ICInboxTransaction2."Transaction No.", "Transaction No."), true)
+                 StrSubstNo(DuplicateTransactionNoMsg, ICInboxTransaction2."Transaction No.", "Transaction No."), true)
             then
                 Error('');
         if ("Source Type" = "Source Type"::"Purchase Document") and
@@ -250,13 +257,13 @@ table 418 "IC Inbox Transaction"
             if ICInboxPurchHeader."Your Reference" <> '' then begin
                 PurchHeader.SetRange("Your Reference", ICInboxPurchHeader."Your Reference");
                 if not PurchHeader.IsEmpty() then
-                    Message(Text003, ICInboxPurchHeader."IC Transaction No.", ICInboxPurchHeader."Your Reference")
+                    Message(DuplicatePurchaseOrderMsg, ICInboxPurchHeader."IC Transaction No.", ICInboxPurchHeader."Your Reference")
                 else begin
                     PurchInvHeader.SetRange("Your Reference", ICInboxPurchHeader."Your Reference");
                     if PurchInvHeader.FindFirst() then
                         if not ConfirmManagement.GetResponseOrDefault(
                              StrSubstNo(
-                               Text004, ICInboxPurchHeader."Your Reference",
+                               DuplicatePurchaseInvoiceMsg, ICInboxPurchHeader."Your Reference",
                                ICInboxPurchHeader."IC Transaction No."), true)
                         then
                             "Line Action" := xRec."Line Action";

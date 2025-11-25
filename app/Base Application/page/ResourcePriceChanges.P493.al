@@ -1,4 +1,8 @@
 #if not CLEAN21
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.Pricing.Calculation;
+
 page 493 "Resource Price Changes"
 {
     ApplicationArea = Jobs;
@@ -22,7 +26,7 @@ page 493 "Resource Price Changes"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the type of resource for which the alternate unit price is valid.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the resource code for which the alternate unit price is valid.';

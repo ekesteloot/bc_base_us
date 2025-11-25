@@ -1,7 +1,14 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Sales.Document;
+
 report 209 "Sales Reservation Avail."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/SalesReservationAvail.rdlc';
+    RDLCLayout = './Sales/Reports/SalesReservationAvail.rdlc';
     ApplicationArea = Reservation;
     Caption = 'Sales Reservation Avail.';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +17,7 @@ report 209 "Sales Reservation Avail."
     {
         dataitem("Sales Line"; "Sales Line")
         {
-            DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE(Type = CONST(Item));
+            DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where(Type = const(Item));
             RequestFilterFields = "Document Type", "Document No.", "No.", "Location Code";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -103,8 +110,8 @@ report 209 "Sales Reservation Avail."
             }
             dataitem("Reservation Entry"; "Reservation Entry")
             {
-                DataItemLink = "Source ID" = FIELD("Document No."), "Source Ref. No." = FIELD("Line No.");
-                DataItemTableView = SORTING("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Reservation Status", "Shipment Date", "Expected Receipt Date") WHERE("Reservation Status" = CONST(Reservation), "Source Type" = CONST(37), "Source Batch Name" = CONST(''), "Source Prod. Order Line" = CONST(0));
+                DataItemLink = "Source ID" = field("Document No."), "Source Ref. No." = field("Line No.");
+                DataItemTableView = sorting("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Reservation Status", "Shipment Date", "Expected Receipt Date") where("Reservation Status" = const(Reservation), "Source Type" = const(37), "Source Batch Name" = const(''), "Source Prod. Order Line" = const(0));
                 column(ReservText; ReservText)
                 {
                 }

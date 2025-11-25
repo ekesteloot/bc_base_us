@@ -1,7 +1,12 @@
+namespace Microsoft.ProjectMgt.Resources.Ledger;
+
+using Microsoft.Foundation.Company;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 report 10198 "Resource Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ResourceRegister.rdlc';
+    RDLCLayout = './ProjectMgt/Resources/Reports/ResourceRegister.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Resource Register';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 10198 "Resource Register"
     {
         dataitem("Resource Register"; "Resource Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Creation Date", "Source Code", "Journal Batch Name";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -93,7 +98,7 @@ report 10198 "Resource Register"
             }
             dataitem("Res. Ledger Entry"; "Res. Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 RequestFilterFields = "Entry Type", "Posting Date", "Work Type Code";
                 column(Res__Ledger_Entry__Posting_Date_; "Posting Date")
                 {

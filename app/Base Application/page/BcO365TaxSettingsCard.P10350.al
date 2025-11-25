@@ -95,8 +95,8 @@ page 10350 "BC O365 Tax Settings Card"
                         ApplicationArea = Invoicing, Basic, Suite;
                         Caption = 'GST/HST';
                         Editable = false;
-                        TableRelation = "Tax Jurisdiction" WHERE("Country/Region" = CONST(CA),
-                                                                  "Report-to Jurisdiction" = CONST('CA'));
+                        TableRelation = "Tax Jurisdiction" where("Country/Region" = const(CA),
+                                                                  "Report-to Jurisdiction" = const('CA'));
 
                         trigger OnValidate()
                         begin
@@ -122,8 +122,8 @@ page 10350 "BC O365 Tax Settings Card"
                         ApplicationArea = Invoicing, Basic, Suite;
                         Caption = 'PST';
                         Editable = false;
-                        TableRelation = "Tax Jurisdiction" WHERE("Country/Region" = CONST(CA),
-                                                                  "Report-to Jurisdiction" = FILTER(<> 'CA'));
+                        TableRelation = "Tax Jurisdiction" where("Country/Region" = const(CA),
+                                                                  "Report-to Jurisdiction" = filter(<> 'CA'));
 
                         trigger OnValidate()
                         begin
@@ -186,7 +186,7 @@ page 10350 "BC O365 Tax Settings Card"
                     TaxArea: Record "Tax Area";
                 begin
                     // Page runs on a temporary record: delete the real record and then the temporary one
-                    if TaxArea.Get(Code) then
+                    if TaxArea.Get(Rec.Code) then
                         Deleted := O365TaxSettingsManagement.DeleteTaxArea(TaxArea);
 
                     if Deleted then
@@ -262,7 +262,7 @@ page 10350 "BC O365 Tax Settings Card"
         InitializeDefaultTaxArea();
         InitializeDefaultCountryCode();
         TempSalesTaxSetupWizard.Initialize();
-        TempSalesTaxSetupWizard."Tax Area Code" := DelChr(Code, '<>', ' ');
+        TempSalesTaxSetupWizard."Tax Area Code" := DelChr(Rec.Code, '<>', ' ');
         InitializeTaxAreaLines();
         if not IsCanada then
             UpdateDescription();
@@ -270,7 +270,7 @@ page 10350 "BC O365 Tax Settings Card"
 
     local procedure InitializeDefaultTaxArea()
     begin
-        IsDefaultArea := O365TaxSettingsManagement.IsDefaultTaxAreaAPI(Code);
+        IsDefaultArea := O365TaxSettingsManagement.IsDefaultTaxAreaAPI(Rec.Code);
         if IsDefaultArea then
             DefaultTxt := ThisIsDefaultTxt
         else
@@ -283,9 +283,9 @@ page 10350 "BC O365 Tax Settings Card"
     begin
         if CompanyInformation.IsCanada() then begin
             IsCanada := true;
-            "Country/Region" := "Country/Region"::CA;
+            Rec."Country/Region" := Rec."Country/Region"::CA;
         end else
-            "Country/Region" := "Country/Region"::US;
+            Rec."Country/Region" := Rec."Country/Region"::US;
     end;
 
     local procedure InitializeTaxAreaLines()
@@ -403,7 +403,7 @@ page 10350 "BC O365 Tax Settings Card"
             Result := StrSubstNo('%1%2%3', TempSalesTaxSetupWizard.State, ', ', Result);
         if StrLen(TempSalesTaxSetupWizard.City) > 0 then
             Result := StrSubstNo('%1%2%3', TempSalesTaxSetupWizard.City, ', ', Result);
-        Result := CopyStr(Result, 1, MaxStrLen(Description));
+        Result := CopyStr(Result, 1, MaxStrLen(Rec.Description));
         exit(Result);
     end;
 }

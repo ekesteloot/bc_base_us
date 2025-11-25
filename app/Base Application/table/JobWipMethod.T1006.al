@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.ProjectMgt.Jobs.Setup;
+
 table 1006 "Job WIP Method"
 {
     Caption = 'Job WIP Method';

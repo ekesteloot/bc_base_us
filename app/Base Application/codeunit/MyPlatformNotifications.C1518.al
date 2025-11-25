@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using System.Environment;
+
 codeunit 1518 "My Platform Notifications"
 {
 

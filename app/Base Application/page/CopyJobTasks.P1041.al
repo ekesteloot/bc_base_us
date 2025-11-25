@@ -188,28 +188,22 @@ page 1041 "Copy Job Tasks"
     end;
 
     var
-        SourceJob: Record Job;
-        TargetJob: Record Job;
-        CopyJob: Codeunit "Copy Job";
-        SourceJobNo: Code[20];
-        FromJobTaskNo: Code[20];
-        ToJobTaskNo: Code[20];
-        TargetJobNo: Code[20];
-        FromDate: Date;
-        ToDate: Date;
-        Source: Option "Job Planning Lines","Job Ledger Entries","None";
-        PlanningLineType: Option "Budget+Billable",Budget,Billable;
-        LedgerEntryType: Option "Usage+Sale",Usage,Sale;
         Text001: Label 'The job was successfully copied.';
         Text003: Label '%1 %2 does not exist.', Comment = 'Job Task 1000 does not exist.';
-        CopyQuantity: Boolean;
-        CopyDimensions: Boolean;
-        [InDataSet]
         PlanningLineTypeEnable: Boolean;
-        [InDataSet]
         LedgerEntryLineTypeEnable: Boolean;
         Text004: Label 'Provide a valid source %1.';
         Text005: Label 'Provide a valid target %1.';
+
+    protected var
+        SourceJob, TargetJob : Record Job;
+        CopyJob: Codeunit "Copy Job";
+        SourceJobNo, FromJobTaskNo, ToJobTaskNo, TargetJobNo : Code[20];
+        FromDate, ToDate : Date;
+        Source: Option "Job Planning Lines","Job Ledger Entries","None";
+        PlanningLineType: Option "Budget+Billable",Budget,Billable;
+        LedgerEntryType: Option "Usage+Sale",Usage,Sale;
+        CopyQuantity, CopyDimensions : Boolean;
 
     local procedure ValidateUserInput()
     begin

@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Outbox;
+
 enum 438 "IC Outb. Sales Item No. Type"
 {
     Extensible = true;

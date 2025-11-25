@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment.Configuration;
+
 table 2000000196 "Object Options"
 {
     Caption = 'Object Options';
@@ -24,7 +30,7 @@ table 2000000196 "Object Options"
         field(4; "Company Name"; Text[30])
         {
             Caption = 'Company Name';
-            TableRelation = Company.Name;
+            TableRelation = System.Environment.Company.Name;
         }
         field(5; "User Name"; Code[50])
         {

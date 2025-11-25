@@ -1,3 +1,5 @@
+namespace System.Security.User;
+
 table 1314 "User Tours"
 {
     Caption = 'User Tours';

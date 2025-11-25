@@ -1,6 +1,23 @@
+﻿namespace System.Environment.Configuration;
+
+using Microsoft.FinancialMgt.RoleCenters;
+using System;
+using System.Azure.Identity;
+using System.Environment;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Utilities;
+
 codeunit 9170 "Conf./Personalization Mgt."
 {
+    SingleInstance = true;
+
     var
+        CurrentAllProfile: Record "All Profile";
+        CurrentAllProfileFetched: Boolean;
+        ProfileFound: Boolean;
         BusinessManagerProfileIDTxt: Label 'BUSINESS MANAGER', Locked = true;
         DeleteConfigurationChangesQst: Label 'This will delete all user-made customization changes for this profile. It will not clear the customizations coming from your extensions.\\Do you want to continue?';
         DeletePersonalizationChangesQst: Label 'This will delete all personalization changes made by this user.  Do you want to continue?';
@@ -41,9 +58,8 @@ codeunit 9170 "Conf./Personalization Mgt."
     procedure GetCurrentProfile(var AllProfile: Record "All Profile")
     begin
         if GetCurrentProfileNoError(AllProfile) then
-            if not AllProfile.IsEmpty() then
-                if AllProfile."Profile ID" <> '' then
-                    exit;
+            if AllProfile."Profile ID" <> '' then
+                exit;
 
         Error(NoCurrentProfileErr);
     end;
@@ -52,12 +68,24 @@ codeunit 9170 "Conf./Personalization Mgt."
     var
         UserPersonalization: Record "User Personalization";
     begin
+        if CurrentAllProfileFetched then begin
+            AllProfile := CurrentAllProfile;
+            exit(ProfileFound);
+        end;
         // Try to find the current profile, otherwise it means we are using the default one for this user (coming from Azure or from demodata)
         if UserPersonalization.Get(UserSecurityId()) then
             if UserPersonalization."Profile ID" <> '' then
-                exit(AllProfile.Get(UserPersonalization.Scope, UserPersonalization."App ID", UserPersonalization."Profile ID"));
+                if AllProfile.Get(UserPersonalization.Scope, UserPersonalization."App ID", UserPersonalization."Profile ID") then begin
+                    CurrentAllProfile := AllProfile;
+                    CurrentAllProfileFetched := true;
+                    ProfileFound := true;
+                    exit(true);
+                end;
 
-        exit(TryGetDefaultProfileForCurrentUser(AllProfile));
+        ProfileFound := TryGetDefaultProfileForCurrentUser(AllProfile);
+        CurrentAllProfile := AllProfile;
+        CurrentAllProfileFetched := true;
+        exit(ProfileFound);
     end;
 
     [TryFunction]
@@ -503,7 +531,7 @@ codeunit 9170 "Conf./Personalization Mgt."
         NavDesignerALFunctions.RecompileProfileConfiguration(ProfileID, ProfileAppID)
     end;
 
-    // Events
+    // Events   
 
     [IntegrationEvent(false, false)]
     local procedure OnProfileChanged(PrevAllProfile: Record "All Profile"; CurrentAllProfile: Record "All Profile")
@@ -534,5 +562,23 @@ codeunit 9170 "Conf./Personalization Mgt."
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateDeleteProfile(AllProfile: Record "All Profile"; var IsHandled: Boolean)
     begin
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"All Profile", 'OnBeforeInsertEvent', '', false, false)]
+    local procedure OnBeforeInsertAllProfile(var Rec: Record "All Profile")
+    begin
+        CurrentAllProfileFetched := false;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"All Profile", 'OnBeforeModifyEvent', '', false, false)]
+    local procedure OnBeforeModifyAllProfile(var Rec: Record "All Profile"; var xRec: Record "All Profile")
+    begin
+        CurrentAllProfileFetched := false;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"All Profile", 'OnBeforeDeleteEvent', '', false, false)]
+    local procedure OnBeforeDeleteAllProfile(var Rec: Record "All Profile")
+    begin
+        CurrentAllProfileFetched := false;
     end;
 }

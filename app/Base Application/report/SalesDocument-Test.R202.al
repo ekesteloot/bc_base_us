@@ -1,14 +1,38 @@
+﻿namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Security.User;
+using System.Utilities;
+
 report 202 "Sales Document - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/Document/SalesDocumentTest.rdlc';
+    RDLCLayout = './Sales/Reports/SalesDocumentTest.rdlc';
     Caption = 'Sales Document - Test';
 
     dataset
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = WHERE("Document Type" = FILTER(<> Quote));
+            DataItemTableView = where("Document Type" = filter(<> Quote));
             RequestFilterFields = "Document Type", "No.";
             RequestFilterHeading = 'Sales Document';
             column(USERID; UserId)
@@ -127,7 +151,7 @@ report 202 "Sales Document - Test"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(FORMAT_TODAY_0_4__Control1029001; Format(Today, 0, 4))
                 {
                 }
@@ -511,7 +535,7 @@ report 202 "Sales Document - Test"
                 }
                 dataitem(DimensionLoop1; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -560,7 +584,7 @@ report 202 "Sales Document - Test"
                 }
                 dataitem(HeaderErrorCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -583,13 +607,13 @@ report 202 "Sales Document - Test"
                 }
                 dataitem(CopyLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     dataitem("Sales Line"; "Sales Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Sales Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
                         column(Sales_Line_Document_Type; "Document Type")
                         {
                         }
@@ -609,7 +633,7 @@ report 202 "Sales Document - Test"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(QtyToHandleCaption; QtyToHandleCaption)
                         {
                         }
@@ -778,7 +802,7 @@ report 202 "Sales Document - Test"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_Control159; DimText)
                             {
                             }
@@ -833,7 +857,7 @@ report 202 "Sales Document - Test"
                         }
                         dataitem(LineErrorCounter; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(ErrorText_Number__Control97; ErrorText[Number])
                             {
                             }
@@ -1056,7 +1080,7 @@ report 202 "Sales Document - Test"
 
                                         TableID[1] := DimMgt.SalesLineTypeToTableID(Type);
                                         No[1] := "No.";
-                                        TableID[2] := DATABASE::Job;
+                                        TableID[2] := Enum::TableID::Job.AsInteger();
                                         No[2] := "Job No.";
                                         OnBeforeCheckDimValuePostingLine("Sales Line", TableID, No);
                                         if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
@@ -1110,7 +1134,7 @@ report 202 "Sales Document - Test"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmountLine__VAT_Amount_; TempVATAmountLine."VAT Amount")
                         {
                             AutoFormatExpression = "Sales Header"."Currency Code";
@@ -1267,7 +1291,7 @@ report 202 "Sales Document - Test"
                     }
                     dataitem(SalesTaxCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(SalesHeader__Currency_Code_; "Sales Header"."Currency Code")
                         {
                         }
@@ -1394,9 +1418,9 @@ report 202 "Sales Document - Test"
                     }
                     dataitem("Item Charge Assignment (Sales)"; "Item Charge Assignment (Sales)")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("Document No.");
-                        DataItemLinkReference = "Sales Line";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Document Line No.", "Line No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
+                        DataItemLinkReference = "Sales Header";
+                        DataItemTableView = sorting("Document Type", "Document No.", "Document Line No.", "Line No.");
                         column(Item_Charge_Assignment__Sales___Qty__to_Assign_; "Qty. to Assign")
                         {
                         }
@@ -1552,8 +1576,6 @@ report 202 "Sales Document - Test"
                 end else
                     SalesTaxCountry := SalesTaxCountry::NoTax;
 
-                OnSalesHeaderOnAfterGetRecordOnBeforeVerifySellToCust("Sales Header", ErrorText, ErrorCounter);
-
                 VerifySellToCust("Sales Header");
                 VerifyBillToCust("Sales Header");
 
@@ -1699,13 +1721,13 @@ report 202 "Sales Document - Test"
                 if not DimMgt.CheckDimIDComb("Dimension Set ID") then
                     AddError(DimMgt.GetDimCombErr());
 
-                TableID[1] := DATABASE::Customer;
+                TableID[1] := Enum::TableID::Customer.AsInteger();
                 No[1] := "Bill-to Customer No.";
-                TableID[3] := DATABASE::"Salesperson/Purchaser";
+                TableID[3] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
                 No[3] := "Salesperson Code";
-                TableID[4] := DATABASE::Campaign;
+                TableID[4] := Enum::TableID::Campaign.AsInteger();
                 No[4] := "Campaign No.";
-                TableID[5] := DATABASE::"Responsibility Center";
+                TableID[5] := Enum::TableID::"Responsibility Center".AsInteger();
                 No[5] := "Responsibility Center";
                 OnBeforeCheckDimValuePostingHeader("Sales Header", TableID, No);
                 if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
@@ -1850,7 +1872,7 @@ report 202 "Sales Document - Test"
         Text004: Label 'Total %1';
         Text005: Label 'Total %1 Incl. VAT';
         Text006: Label '%1 must be specified.';
-        Text007: Label '%1 must be %2 for %3 %4.';
+        MustBeForErr: Label '%1 must be %2 for %3 %4.';
         Text008: Label '%1 %2 does not exist.';
         Text009: Label '%1 must not be a closing date.';
         Text010: Label '%1 is not within your allowed range of posting dates.';
@@ -2060,7 +2082,7 @@ report 202 "Sales Document - Test"
                     repeat
                         DimMgt.GetDimensionSet(TempPostedDimSetEntry, SaleShptLine."Dimension Set ID");
                         if not DimMgt.CheckDimIDConsistency(
-                             TempDimSetEntry, TempPostedDimSetEntry, DATABASE::"Sales Line", DATABASE::"Sales Shipment Line")
+                             TempDimSetEntry, TempPostedDimSetEntry, Enum::TableID::"Sales Line".AsInteger(), Enum::TableID::"Sales Shipment Line".AsInteger())
                         then
                             AddError(DimMgt.GetDocDimConsistencyErr());
                         if SaleShptLine."Sell-to Customer No." <> "Sell-to Customer No." then
@@ -2155,7 +2177,7 @@ report 202 "Sales Document - Test"
                     repeat
                         DimMgt.GetDimensionSet(TempPostedDimSetEntry, ReturnRcptLine."Dimension Set ID");
                         if not DimMgt.CheckDimIDConsistency(
-                             TempDimSetEntry, TempPostedDimSetEntry, DATABASE::"Sales Line", DATABASE::"Return Receipt Line")
+                             TempDimSetEntry, TempPostedDimSetEntry, Enum::TableID::"Sales Line".AsInteger(), Enum::TableID::"Return Receipt Line".AsInteger())
                         then
                             AddError(DimMgt.GetDocDimConsistencyErr());
                         if ReturnRcptLine."Sell-to Customer No." <> "Sell-to Customer No." then
@@ -2259,19 +2281,12 @@ report 202 "Sales Document - Test"
         SourceCodeSetup.Get();
 
         with SalesLine do begin
-#if CLEAN20
             CreateDimFromDefaultDim(0);
-#else
-            DimMgt.AddDimSource(DefaultDimSource, DimMgt.SalesLineTypeToTableID(Type), "No.");
-            DimMgt.AddDimSource(DefaultDimSource, Database::Job, "Job No.");
-            DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", "Responsibility Center");
-            RunEventOnAfterCreateDimTableIDs(DefaultDimSource, SalesLine);
-#endif
             "Shortcut Dimension 1 Code" := '';
             "Shortcut Dimension 2 Code" := '';
             "Dimension Set ID" :=
               DimMgt.GetDefaultDimID(DefaultDimSource, SourceCodeSetup.Sales, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code",
-                "Dimension Set ID", DATABASE::Customer);
+                "Dimension Set ID", Enum::TableID::Customer.AsInteger());
         end;
 
         OnAfterAddDimToTempLine(SalesLine);
@@ -2293,8 +2308,10 @@ report 202 "Sales Document - Test"
 
     local procedure CheckSalesLine(SalesLine2: Record "Sales Line")
     var
+        ItemVariant: Record "Item Variant";
         ErrorTextLocal: Text[250];
         IsHandled: Boolean;
+        ItemItemVariantLbl: Label '%1 %2', Comment = '%1 - Item No., %2 - Variant Code';
     begin
         IsHandled := false;
         OnBeforeCheckSalesLine(SalesLine2, IsHandled, ErrorCounter, ErrorText);
@@ -2313,12 +2330,12 @@ report 202 "Sales Document - Test"
                                 if GLAcc.Blocked then
                                     AddError(
                                       StrSubstNo(
-                                        Text007,
+                                        MustBeForErr,
                                         GLAcc.FieldCaption(Blocked), false, GLAcc.TableCaption(), "No."));
                                 if (not GLAcc."Direct Posting") and (not "System-Created Entry") and ("Line No." <= OrigMaxLineNo) then
                                     AddError(
                                       StrSubstNo(
-                                        Text007,
+                                        MustBeForErr,
                                         GLAcc.FieldCaption("Direct Posting"), true, GLAcc.TableCaption(), "No."));
                             end else
                                 AddError(
@@ -2334,10 +2351,17 @@ report 202 "Sales Document - Test"
                         if "No." <> '' then
                             if Item.Get("No.") then begin
                                 if Item.Blocked then
-                                    AddError(
-                                      StrSubstNo(
-                                        Text007,
-                                        Item.FieldCaption(Blocked), false, Item.TableCaption(), "No."));
+                                    AddError(StrSubstNo(MustBeForErr, Item.FieldCaption(Blocked), false, Item.TableCaption(), "No."));
+
+                                if SalesLine2."Variant Code" <> '' then begin
+                                    ItemVariant.SetLoadFields(Blocked);
+                                    if ItemVariant.Get(SalesLine2."No.", SalesLine2."Variant Code") then begin
+                                        if ItemVariant.Blocked then
+                                            AddError(StrSubstNo(MustBeForErr, ItemVariant.FieldCaption(Blocked), false, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, SalesLine2."No.", SalesLine2."Variant Code")));
+                                    end else
+                                        AddError(StrSubstNo(Text008, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, SalesLine2."No.", SalesLine2."Variant Code")));
+                                end;
+
                                 if Item.Reserve = Item.Reserve::Always then begin
                                     CalcFields("Reserved Quantity");
                                     if "Document Type" in ["Document Type"::"Return Order", "Document Type"::"Credit Memo"] then begin
@@ -2368,12 +2392,12 @@ report 202 "Sales Document - Test"
                             if Res."Privacy Blocked" then
                                 AddError(
                                   StrSubstNo(
-                                    Text007,
+                                    MustBeForErr,
                                     Res.FieldCaption("Privacy Blocked"), false, Res.TableCaption(), "No."));
                             if Res.Blocked then
                                 AddError(
                                   StrSubstNo(
-                                    Text007,
+                                    MustBeForErr,
                                     Res.FieldCaption(Blocked), false, Res.TableCaption(), "No."));
                         end else
                             AddError(
@@ -2390,12 +2414,12 @@ report 202 "Sales Document - Test"
                                 if FA.Blocked then
                                     AddError(
                                       StrSubstNo(
-                                        Text007,
+                                        MustBeForErr,
                                         FA.FieldCaption(Blocked), false, FA.TableCaption(), "No."));
                                 if FA.Inactive then
                                     AddError(
                                       StrSubstNo(
-                                        Text007,
+                                        MustBeForErr,
                                         FA.FieldCaption(Inactive), false, FA.TableCaption(), "No."));
                                 if "Depreciation Book Code" = '' then
                                     AddError(StrSubstNo(Text006, FieldCaption("Depreciation Book Code")))
@@ -2423,7 +2447,7 @@ report 202 "Sales Document - Test"
     var
         ShipQtyExist: Boolean;
     begin
-        with SalesHeader do begin
+        with SalesHeader do
             if "Sell-to Customer No." = '' then
                 AddError(StrSubstNo(Text006, FieldCaption("Sell-to Customer No.")))
             else
@@ -2452,7 +2476,6 @@ report 202 "Sales Document - Test"
                       StrSubstNo(
                         Text008,
                         Cust.TableCaption(), "Sell-to Customer No."));
-        end;
     end;
 
     local procedure VerifyBillToCust(SalesHeader: Record "Sales Header")
@@ -2460,7 +2483,7 @@ report 202 "Sales Document - Test"
         with SalesHeader do
             if "Bill-to Customer No." = '' then
                 AddError(StrSubstNo(Text006, FieldCaption("Bill-to Customer No.")))
-            else begin
+            else
                 if "Bill-to Customer No." <> "Sell-to Customer No." then
                     if Cust.Get("Bill-to Customer No.") then begin
                         if Cust."Privacy Blocked" then
@@ -2479,7 +2502,6 @@ report 202 "Sales Document - Test"
                           StrSubstNo(
                             Text008,
                             Cust.TableCaption(), "Bill-to Customer No."));
-            end;
     end;
 
     local procedure VerifyPostingDate(SalesHeader: Record "Sales Header")
@@ -2506,36 +2528,6 @@ report 202 "Sales Document - Test"
                 end;
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Sales Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Sales Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var SalesLine: Record "Sales Line")
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Sales Line") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(SalesLine, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalculateSalesTax(var VATBaseAmount: Decimal; var VATAmount: Decimal; SalesTaxAmountLineParm: Record "Sales Tax Amount Line");
     begin
@@ -2561,13 +2553,6 @@ report 202 "Sales Document - Test"
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var SalesLine: Record "Sales Line"; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckDimValuePostingHeader(var SalesHeader: Record "Sales Header"; var TableID: array[10] of Integer; var No: array[10] of Code[20]);
     begin
@@ -2590,11 +2575,6 @@ report 202 "Sales Document - Test"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetRecordSalesLineOnBeforeCheckDim(SalesLine: Record "Sales Line"; var GLAcc: Record "G/L Account"; OrigMaxLineNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSalesHeaderOnAfterGetRecordOnBeforeVerifySellToCust(SalesHeader: Record "Sales Header"; var ErrorText: array[99] of Text[250]; var ErrorCounter: Integer)
     begin
     end;
 }

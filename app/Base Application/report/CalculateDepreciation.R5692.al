@@ -1,4 +1,15 @@
-﻿report 5692 "Calculate Depreciation"
+﻿namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Setup;
+using System.Environment;
+using System.Utilities;
+
+report 5692 "Calculate Depreciation"
 {
     AdditionalSearchTerms = 'write down fixed asset';
     ApplicationArea = FixedAssets;

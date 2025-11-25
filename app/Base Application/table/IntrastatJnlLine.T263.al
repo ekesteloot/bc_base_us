@@ -23,7 +23,7 @@ table 263 "Intrastat Jnl. Line"
         {
             Caption = 'Journal Batch Name';
 #if not CLEAN22
-            TableRelation = "Intrastat Jnl. Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Intrastat Jnl. Batch".Name where("Journal Template Name" = field("Journal Template Name"));
 #endif
         }
         field(3; "Line No."; Integer)
@@ -91,9 +91,9 @@ table 263 "Intrastat Jnl. Line"
         {
             Caption = 'Source Entry No.';
             Editable = false;
-            TableRelation = IF ("Source Type" = CONST("Item Entry")) "Item Ledger Entry"
-            ELSE
-            IF ("Source Type" = CONST("Job Entry")) "Job Ledger Entry";
+            TableRelation = if ("Source Type" = const("Item Entry")) "Item Ledger Entry"
+            else
+            if ("Source Type" = const("Job Entry")) "Job Ledger Entry";
         }
         field(13; "Net Weight"; Decimal)
         {

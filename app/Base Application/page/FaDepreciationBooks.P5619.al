@@ -1,3 +1,12 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
+
 page 5619 "FA Depreciation Books"
 {
     Caption = 'FA Depreciation Books';
@@ -32,9 +41,9 @@ page 5619 "FA Depreciation Books"
 
                     trigger OnAssistEdit()
                     begin
-                        ChangeExchangeRate.SetParameterFA("FA Add.-Currency Factor", GetACYCode(), WorkDate());
+                        ChangeExchangeRate.SetParameterFA(Rec."FA Add.-Currency Factor", GetACYCode(), WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then
-                            "FA Add.-Currency Factor" := ChangeExchangeRate.GetParameter();
+                            Rec."FA Add.-Currency Factor" := ChangeExchangeRate.GetParameter();
 
                         Clear(ChangeExchangeRate);
                     end;
@@ -238,9 +247,9 @@ page 5619 "FA Depreciation Books"
                     Caption = 'Ledger E&ntries';
                     Image = FixedAssetLedger;
                     RunObject = Page "FA Ledger Entries";
-                    RunPageLink = "FA No." = FIELD("FA No."),
-                                  "Depreciation Book Code" = FIELD("Depreciation Book Code");
-                    RunPageView = SORTING("FA No.", "Depreciation Book Code");
+                    RunPageLink = "FA No." = field("FA No."),
+                                  "Depreciation Book Code" = field("Depreciation Book Code");
+                    RunPageView = sorting("FA No.", "Depreciation Book Code");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -250,9 +259,9 @@ page 5619 "FA Depreciation Books"
                     Caption = 'Error Ledger Entries';
                     Image = ErrorFALedgerEntries;
                     RunObject = Page "FA Error Ledger Entries";
-                    RunPageLink = "Canceled from FA No." = FIELD("FA No."),
-                                  "Depreciation Book Code" = FIELD("Depreciation Book Code");
-                    RunPageView = SORTING("Canceled from FA No.", "Depreciation Book Code");
+                    RunPageLink = "Canceled from FA No." = field("FA No."),
+                                  "Depreciation Book Code" = field("Depreciation Book Code");
+                    RunPageView = sorting("Canceled from FA No.", "Depreciation Book Code");
                     ToolTip = 'View the entries that have been posted as a result of you using the Cancel function to cancel an entry.';
                 }
                 action("Maintenance Ledger Entries")
@@ -261,9 +270,9 @@ page 5619 "FA Depreciation Books"
                     Caption = 'Maintenance Ledger Entries';
                     Image = MaintenanceLedgerEntries;
                     RunObject = Page "Maintenance Ledger Entries";
-                    RunPageLink = "FA No." = FIELD("FA No."),
-                                  "Depreciation Book Code" = FIELD("Depreciation Book Code");
-                    RunPageView = SORTING("FA No.", "Depreciation Book Code");
+                    RunPageLink = "FA No." = field("FA No."),
+                                  "Depreciation Book Code" = field("Depreciation Book Code");
+                    RunPageView = sorting("FA No.", "Depreciation Book Code");
                     ToolTip = 'View the maintenance ledger entries for the selected fixed asset.';
                 }
                 separator(Action65)
@@ -275,8 +284,8 @@ page 5619 "FA Depreciation Books"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Fixed Asset Statistics";
-                    RunPageLink = "FA No." = FIELD("FA No."),
-                                  "Depreciation Book Code" = FIELD("Depreciation Book Code");
+                    RunPageLink = "FA No." = field("FA No."),
+                                  "Depreciation Book Code" = field("Depreciation Book Code");
                     ShortCutKey = 'F7';
                     ToolTip = 'View detailed historical information about the fixed asset.';
                 }
@@ -286,8 +295,8 @@ page 5619 "FA Depreciation Books"
                     Caption = 'Main &Asset Statistics';
                     Image = StatisticsDocument;
                     RunObject = Page "Main Asset Statistics";
-                    RunPageLink = "FA No." = FIELD("FA No."),
-                                  "Depreciation Book Code" = FIELD("Depreciation Book Code");
+                    RunPageLink = "FA No." = field("FA No."),
+                                  "Depreciation Book Code" = field("Depreciation Book Code");
                     ToolTip = 'View statistics for all the components that make up the main asset for the selected book. The left side of the General FastTab displays the main asset''s book value, depreciable basis and any maintenance expenses posted to the components that comprise the main asset. The right side shows the number of components for the main asset, the first date on which an acquisition and/or disposal entry was posted to one of the assets that comprise the main asset.';
                 }
                 action("FA Posting Types Overview")

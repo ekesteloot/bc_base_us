@@ -1,3 +1,11 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7315 "Warehouse Movement"
 {
     Caption = 'Warehouse Movement';
@@ -6,7 +14,7 @@ page 7315 "Warehouse Movement"
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "Warehouse Activity Header";
-    SourceTableView = WHERE(Type = FILTER(Movement));
+    SourceTableView = where(Type = filter(Movement));
 
     layout
     {
@@ -24,7 +32,7 @@ page 7315 "Warehouse Movement"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -77,10 +85,10 @@ page 7315 "Warehouse Movement"
             part(WhseMovLines; "Warehouse Movement Subform")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "Activity Type" = FIELD(Type),
-                              "No." = FIELD("No.");
-                SubPageView = SORTING("Activity Type", "No.", "Sorting Sequence No.")
-                              WHERE(Breakbulk = CONST(false));
+                SubPageLink = "Activity Type" = field(Type),
+                              "No." = field("No.");
+                SubPageView = sorting("Activity Type", "No.", "Sorting Sequence No.")
+                              where(Breakbulk = const(false));
             }
         }
         area(factboxes)
@@ -89,16 +97,16 @@ page 7315 "Warehouse Movement"
             {
                 ApplicationArea = Warehouse;
                 Provider = WhseMovLines;
-                SubPageLink = "No." = FIELD("Item No.");
+                SubPageLink = "No." = field("Item No.");
                 Visible = true;
             }
             part(Control5; "Lot Numbers by Bin FactBox")
             {
                 ApplicationArea = ItemTracking;
                 Provider = WhseMovLines;
-                SubPageLink = "Item No." = FIELD("Item No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Location Code" = FIELD("Location Code");
+                SubPageLink = "Item No." = field("Item No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Location Code" = field("Location Code");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -128,9 +136,9 @@ page 7315 "Warehouse Movement"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Whse. Activity Header"),
-                                  Type = FIELD(Type),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Whse. Activity Header"),
+                                  Type = field(Type),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Registered Movements")
@@ -139,9 +147,9 @@ page 7315 "Warehouse Movement"
                     Caption = 'Registered Movements';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Activity List";
-                    RunPageLink = Type = FIELD(Type),
-                                  "Whse. Activity No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Activity No.");
+                    RunPageLink = Type = field(Type),
+                                  "Whse. Activity No." = field("No.");
+                    RunPageView = sorting("Whse. Activity No.");
                     ToolTip = 'View any quantities that have already been moved.';
                 }
             }
@@ -239,7 +247,7 @@ page 7315 "Warehouse Movement"
 
     trigger OnAfterGetRecord()
     begin
-        CurrentLocationCode := "Location Code";
+        CurrentLocationCode := Rec."Location Code";
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -251,10 +259,10 @@ page 7315 "Warehouse Movement"
     var
         WMSManagement: Codeunit "WMS Management";
     begin
-        ErrorIfUserIsNotWhseEmployee();
-        FilterGroup(2); // set group of filters user cannot change
-        SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
-        FilterGroup(0); // set filter group back to standard
+        Rec.ErrorIfUserIsNotWhseEmployee();
+        Rec.FilterGroup(2); // set group of filters user cannot change
+        Rec.SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
+        Rec.FilterGroup(0); // set filter group back to standard
     end;
 
     var

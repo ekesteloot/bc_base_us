@@ -1,4 +1,8 @@
 #if not CLEAN21
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.Pricing.Calculation;
+
 page 7023 "Sales Price Worksheet"
 {
     AdditionalSearchTerms = 'special price,alternate price';
@@ -199,7 +203,7 @@ page 7023 "Sales Price Worksheet"
             }
         }
     }
-    
+
     trigger OnInit()
     var
         FeaturePriceCalculation: Codeunit "Feature - Price Calculation";

@@ -1,3 +1,10 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+
 codeunit 915 "Assembly Info-Pane Management"
 {
 
@@ -82,6 +89,22 @@ codeunit 915 "Assembly Info-Pane Management"
             SetItemFilter(Item, AsmLine);
 
             exit(AvailableToPromise.CalcReservedRequirement(Item));
+        end;
+    end;
+
+    procedure GetQtyReservedFromStockState(AssemblyLine: Record "Assembly Line") Result: Enum "Reservation From Stock"
+    var
+        AssemblyLineReserve: Codeunit "Assembly Line-Reserve";
+        QtyReservedFromStock: Decimal;
+    begin
+        QtyReservedFromStock := AssemblyLineReserve.GetReservedQtyFromInventory(AssemblyLine);
+        case QtyReservedFromStock of
+            0:
+                exit(Result::None);
+            AssemblyLine."Remaining Quantity (Base)":
+                exit(Result::Full);
+            else
+                exit(Result::Partial);
         end;
     end;
 

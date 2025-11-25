@@ -1,3 +1,12 @@
+namespace Microsoft.BankMgt.PaymentRegistration;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Shared.Navigate;
+
 table 981 "Payment Registration Buffer"
 {
     Caption = 'Payment Registration Buffer';
@@ -137,9 +146,9 @@ table 981 "Payment Registration Buffer"
         {
             Caption = 'Bal. Account No.';
             DataClassification = SystemMetadata;
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
         }
         field(19; "External Document No."; Code[35])
         {
@@ -202,7 +211,7 @@ table 981 "Payment Registration Buffer"
                     "Rem. Amt. after Discount" := "Remaining Amount" - CustLedgerEntry."Remaining Pmt. Disc. Possible";
                     if CustLedgerEntry."Payment Method Code" <> '' then
                         "Payment Method Code" := CustLedgerEntry."Payment Method Code";
-                    "Bal. Account Type" := "Payment Balance Account Type".FromInteger(PaymentRegistrationSetup."Bal. Account Type");
+                    "Bal. Account Type" := Enum::"Payment Balance Account Type".FromInteger(PaymentRegistrationSetup."Bal. Account Type");
                     "Bal. Account No." := PaymentRegistrationSetup."Bal. Account No.";
                     "External Document No." := CustLedgerEntry."External Document No.";
                     OnPopulateTableOnBeforeInsert(Rec, CustLedgerEntry);
@@ -279,15 +288,8 @@ table 981 "Payment Registration Buffer"
         exit('');
     end;
 
-    procedure GetDueDateStyle() ReturnValue: Text
-    var
-        IsHandled: Boolean;
+    procedure GetDueDateStyle(): Text
     begin
-        IsHandled := false;
-        OnBeforeGetDueDateStyle(Rec, ReturnValue, IsHandled);
-        if IsHandled then
-            exit(ReturnValue);
-
         if "Due Date" < "Date Received" then
             exit('Unfavorable');
         exit('');
@@ -365,11 +367,6 @@ table 981 "Payment Registration Buffer"
 
     [IntegrationEvent(false, false)]
     local procedure OnRestoreUserValuesOnBeforeModify(var PaymentRegistrationBuffer: Record "Payment Registration Buffer"; var TempSavePmtRegnBuf: Record "Payment Registration Buffer" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetDueDateStyle(var PaymentRegistrationBuffer: Record "Payment Registration Buffer"; var ReturnValue: Text; var IsHandled: Boolean)
     begin
     end;
 }

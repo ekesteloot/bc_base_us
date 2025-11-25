@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
+using Microsoft.Foundation.Enums;
+using System.IO;
+
 table 1302 "Dimensions Template"
 {
     Caption = 'Dimensions Template';
@@ -27,8 +32,8 @@ table 1302 "Dimensions Template"
         field(4; "Dimension Value Code"; Code[20])
         {
             Caption = 'Dimension Value Code';
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"),
-                                                         Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"),
+                                                         Blocked = const(false));
         }
         field(5; "Value Posting"; Enum "Default Dimension Value Posting Type")
         {
@@ -109,7 +114,7 @@ table 1302 "Dimensions Template"
 
         RecRef.GetTable(Rec);
         CreateFieldRefArray(FieldRefArray, RecRef);
-        ConfigTemplateManagement.UpdateConfigTemplateAndLines(Code, Description, DATABASE::"Default Dimension", FieldRefArray);
+        ConfigTemplateManagement.UpdateConfigTemplateAndLines(Code, Description, Enum::TableID::"Default Dimension".AsInteger(), FieldRefArray);
     end;
 
     var
@@ -174,7 +179,7 @@ table 1302 "Dimensions Template"
     begin
         RecRef.GetTable(Rec);
         CreateFieldRefArray(FieldRefArray, RecRef);
-        ConfigTemplateManagement.CreateConfigTemplateAndLines(Code, Description, DATABASE::"Default Dimension", FieldRefArray);
+        ConfigTemplateManagement.CreateConfigTemplateAndLines(Code, Description, Enum::TableID::"Default Dimension".AsInteger(), FieldRefArray);
         ConfigTemplateManagement.AddRelatedTemplate(GetParentTemplateCode(), Code);
     end;
 
@@ -188,7 +193,7 @@ table 1302 "Dimensions Template"
         if ConfigTemplateLine.FindSet() then
             repeat
                 ConfigTemplateHeader.Get(ConfigTemplateLine."Template Code");
-                if ConfigTemplateHeader."Table ID" = DATABASE::"Default Dimension" then
+                if ConfigTemplateHeader."Table ID" = Enum::TableID::"Default Dimension".AsInteger() then
                     InsertDimensionFromTemplate(ConfigTemplateHeader, MasterRecordNo, TableID);
             until ConfigTemplateLine.Next() = 0;
     end;
@@ -256,7 +261,7 @@ table 1302 "Dimensions Template"
         CreateFieldRefArray(FieldRefArray, RecRef);
 
         ConfigTemplateManagement.CreateConfigTemplateAndLines(
-          NewTemplateCode, MasterRecordTemplateCode, DATABASE::"Default Dimension", FieldRefArray);
+          NewTemplateCode, MasterRecordTemplateCode, Enum::TableID::"Default Dimension".AsInteger(), FieldRefArray);
         ConfigTemplateManagement.AddRelatedTemplate(MasterRecordTemplateCode, NewTemplateCode);
     end;
 

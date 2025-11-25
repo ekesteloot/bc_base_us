@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Document;
+
 page 5943 "Service Order Status Setup"
 {
     ApplicationArea = Service;
@@ -18,7 +20,7 @@ page 5943 "Service Order Status Setup"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the service order status to which you are assigning a priority.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the priority level for the service order status.';

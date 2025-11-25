@@ -16,7 +16,7 @@ page 5715 "Responsibility Center List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Location;
                     ToolTip = 'Specifies the responsibility center list code.';
@@ -66,8 +66,8 @@ page 5715 "Responsibility Center List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(5714),
-                                      "No." = FIELD(Code);
+                        RunPageLink = "Table ID" = const(5714),
+                                      "No." = field(Code);
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -85,7 +85,7 @@ page 5715 "Responsibility Center List"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(RespCenter);
-                            DefaultDimMultiple.SetMultiRecord(RespCenter, FieldNo(Code));
+                            DefaultDimMultiple.SetMultiRecord(RespCenter, Rec.FieldNo(Code));
                             DefaultDimMultiple.RunModal();
                         end;
                     }

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 enum 5099 "Interaction Log Entry Document Type"
 {
     Extensible = true;

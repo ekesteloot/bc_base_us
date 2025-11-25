@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+
 page 1027 "Job WIP Cockpit"
 {
     ApplicationArea = Jobs;
@@ -8,8 +13,8 @@ page 1027 "Job WIP Cockpit"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = Job;
-    SourceTableView = WHERE(Status = FILTER(Open | Completed),
-                            "WIP Completion Posted" = CONST(false));
+    SourceTableView = where(Status = filter(Open | Completed),
+                            "WIP Completion Posted" = const(false));
     UsageCategory = Tasks;
 
     layout
@@ -54,31 +59,31 @@ page 1027 "Job WIP Cockpit"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the total Recognized Sales amount that was last posted to the general ledger for the job. The Recognized Sales G/L amount for the job is the sum of the Recognized Sales Job WIP G/L Entries.';
                 }
-                field("Recog. Costs Amount Difference"; Rec."Recog. Costs Amount" - "Recog. Costs G/L Amount")
+                field("Recog. Costs Amount Difference"; Rec."Recog. Costs Amount" - Rec."Recog. Costs G/L Amount")
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Recog. Costs Amount Difference';
                     ToolTip = 'Specifies the difference in recognized costs for the job.';
                 }
-                field("Recog. Sales Amount Difference"; Rec."Recog. Sales Amount" - "Recog. Sales G/L Amount")
+                field("Recog. Sales Amount Difference"; Rec."Recog. Sales Amount" - Rec."Recog. Sales G/L Amount")
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Recog. Sales Amount Difference';
                     ToolTip = 'Specifies the difference in recognized sales for the job.';
                 }
-                field("Recog. Profit Amount"; CalcRecognizedProfitAmount())
+                field("Recog. Profit Amount"; Rec.CalcRecognizedProfitAmount())
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Recog. Profit Amount';
                     ToolTip = 'Specifies the recognized profit amount for the job.';
                 }
-                field("Recog. Profit G/L Amount"; CalcRecognizedProfitGLAmount())
+                field("Recog. Profit G/L Amount"; Rec.CalcRecognizedProfitGLAmount())
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Recog. Profit G/L Amount';
                     ToolTip = 'Specifies the total recognized profit G/L amount for this job.';
                 }
-                field("Recog. Profit Amount Difference"; CalcRecognizedProfitAmount() - CalcRecognizedProfitGLAmount())
+                field("Recog. Profit Amount Difference"; Rec.CalcRecognizedProfitAmount() - Rec.CalcRecognizedProfitGLAmount())
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Recog. Profit Amount Difference';
@@ -104,7 +109,7 @@ page 1027 "Job WIP Cockpit"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the total WIP Cost amount that was last posted to the G/L for the job. The WIP Cost Amount for the job is the value WIP Cost Job WIP G/L Entries less the value of the Recognized Cost Job WIP G/L Entries. For jobs with WIP Methods of Sales Value or Percentage of Completion, the WIP Cost Amount is normally 0.';
                 }
-                field("Total WIP Cost Difference"; Rec."Total WIP Cost Amount" - "Total WIP Cost G/L Amount")
+                field("Total WIP Cost Difference"; Rec."Total WIP Cost Amount" - Rec."Total WIP Cost G/L Amount")
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Total WIP Cost Difference';
@@ -120,7 +125,7 @@ page 1027 "Job WIP Cockpit"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the total WIP sales amount that was last calculated for the job. It is calculated as the value in the WIP Sales field minus the value in the Recognized Sales field in the Job G/L WIP Entries window. For jobs that use the Cost Value or Cost of Sales WIP methods, the WIP sales amount is normally 0. ';
                 }
-                field("Total WIP Sales Difference"; Rec."Total WIP Sales Amount" - "Total WIP Sales G/L Amount")
+                field("Total WIP Sales Difference"; Rec."Total WIP Sales Amount" - Rec."Total WIP Sales G/L Amount")
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Total WIP Sales Difference';
@@ -133,8 +138,8 @@ page 1027 "Job WIP Cockpit"
                 part(Control28; "Job WIP Totals")
                 {
                     ApplicationArea = Jobs;
-                    SubPageLink = "Job No." = FIELD("No."),
-                                "Posted to G/L" = CONST(false);
+                    SubPageLink = "Job No." = field("No."),
+                                "Posted to G/L" = const(false);
                 }
             }
         }
@@ -143,11 +148,11 @@ page 1027 "Job WIP Cockpit"
             part(Control34; "Job WIP/Recognition FactBox")
             {
                 ApplicationArea = Jobs;
-                SubPageLink = "No." = FIELD("No."),
-                              "Planning Date Filter" = FIELD("Planning Date Filter"),
-                              "Resource Filter" = FIELD("Resource Filter"),
-                              "Posting Date Filter" = FIELD("Posting Date Filter"),
-                              "Resource Gr. Filter" = FIELD("Resource Gr. Filter");
+                SubPageLink = "No." = field("No."),
+                              "Planning Date Filter" = field("Planning Date Filter"),
+                              "Resource Filter" = field("Resource Filter"),
+                              "Posting Date Filter" = field("Posting Date Filter"),
+                              "Resource Gr. Filter" = field("Resource Gr. Filter");
                 Visible = true;
             }
             systempart(Control6; Links)
@@ -186,7 +191,7 @@ page 1027 "Job WIP Cockpit"
                     Caption = 'Job Task Lines';
                     Image = TaskList;
                     RunObject = Page "Job Task Lines";
-                    RunPageLink = "Job No." = FIELD("No.");
+                    RunPageLink = "Job No." = field("No.");
                     ToolTip = 'Plan how you want to set up your planning information. In this window you can specify the tasks involved in a job. To start planning a job or to post usage for a job, you must set up at least one job task.';
                 }
                 action("<Action31>")
@@ -195,8 +200,8 @@ page 1027 "Job WIP Cockpit"
                     Caption = 'Ledger E&ntries';
                     Image = JobLedger;
                     RunObject = Page "Job Ledger Entries";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    RunPageView = SORTING("Job No.", "Job Task No.", "Entry Type", "Posting Date");
+                    RunPageLink = "Job No." = field("No.");
+                    RunPageView = sorting("Job No.", "Job Task No.", "Entry Type", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -206,7 +211,7 @@ page 1027 "Job WIP Cockpit"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Job Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -248,8 +253,8 @@ page 1027 "Job WIP Cockpit"
                     Caption = 'WIP Entries';
                     Image = WIPEntries;
                     RunObject = Page "Job WIP Entries";
-                    RunPageLink = "Job No." = FIELD("No.");
-                    RunPageView = SORTING("Job No.", "Job Posting Group", "WIP Posting Date");
+                    RunPageLink = "Job No." = field("No.");
+                    RunPageView = sorting("Job No.", "Job Posting Group", "WIP Posting Date");
                     ToolTip = 'View the job''s WIP entries.';
                 }
                 action("WIP G/L Entries")
@@ -258,9 +263,9 @@ page 1027 "Job WIP Cockpit"
                     Caption = 'WIP G/L Entries';
                     Image = WIPLedger;
                     RunObject = Page "Job WIP G/L Entries";
-                    RunPageLink = "Job No." = FIELD("No."),
-                                  Reversed = CONST(false);
-                    RunPageView = SORTING("Job No.");
+                    RunPageLink = "Job No." = field("No."),
+                                  Reversed = const(false);
+                    RunPageView = sorting("Job No.");
                     ToolTip = 'View the job''s WIP G/L entries.';
                 }
             }
@@ -283,9 +288,9 @@ page 1027 "Job WIP Cockpit"
                     var
                         Job: Record Job;
                     begin
-                        TestField("No.");
+                        Rec.TestField("No.");
                         Job.Copy(Rec);
-                        Job.SetRange("No.", "No.");
+                        Job.SetRange("No.", Rec."No.");
                         REPORT.RunModal(REPORT::"Job Calculate WIP", true, false, Job);
                     end;
                 }
@@ -301,9 +306,9 @@ page 1027 "Job WIP Cockpit"
                     var
                         Job: Record Job;
                     begin
-                        TestField("No.");
+                        Rec.TestField("No.");
                         Job.Copy(Rec);
-                        Job.SetRange("No.", "No.");
+                        Job.SetRange("No.", Rec."No.");
                         REPORT.RunModal(REPORT::"Job Post WIP to G/L", true, false, Job);
                     end;
                 }
@@ -379,9 +384,9 @@ page 1027 "Job WIP Cockpit"
                 var
                     Job: Record Job;
                 begin
-                    TestField("No.");
+                    Rec.TestField("No.");
                     Job.Copy(Rec);
-                    Job.SetRange("No.", "No.");
+                    Job.SetRange("No.", Rec."No.");
                     REPORT.RunModal(REPORT::"Job WIP To G/L", true, false, Job);
                 end;
             }

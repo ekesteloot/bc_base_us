@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 page 99000759 "Calendar Entries"
 {
     Caption = 'Calendar Entries';
@@ -32,7 +34,7 @@ page 99000759 "Calendar Entries"
 
                     trigger OnValidate()
                     begin
-                        Validate(Date, CurrDate);
+                        Rec.Validate(Date, CurrDate);
                         CurrPage.Update(true);
                     end;
                 }
@@ -48,8 +50,8 @@ page 99000759 "Calendar Entries"
 
                     trigger OnValidate()
                     begin
-                        GetStartingEndingDateAndTime(StartingTime, EndingTime, CurrDate);
-                        Validate("Starting Time", StartingTime);
+                        Rec.GetStartingEndingDateAndTime(StartingTime, EndingTime, CurrDate);
+                        Rec.Validate("Starting Time", StartingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -62,7 +64,7 @@ page 99000759 "Calendar Entries"
 
                     trigger OnValidate()
                     begin
-                        Validate("Starting Time", StartingTime);
+                        Rec.Validate("Starting Time", StartingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -73,8 +75,8 @@ page 99000759 "Calendar Entries"
 
                     trigger OnValidate()
                     begin
-                        GetStartingEndingDateAndTime(StartingTime, EndingTime, CurrDate);
-                        Validate("Ending Time", EndingTime);
+                        Rec.GetStartingEndingDateAndTime(StartingTime, EndingTime, CurrDate);
+                        Rec.Validate("Ending Time", EndingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -87,16 +89,16 @@ page 99000759 "Calendar Entries"
 
                     trigger OnValidate()
                     begin
-                        Validate("Ending Time", EndingTime);
+                        Rec.Validate("Ending Time", EndingTime);
                         CurrPage.Update(true);
                     end;
                 }
-                field(Efficiency; Efficiency)
+                field(Efficiency; Rec.Efficiency)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the efficiency of this calendar entry.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the capacity of this calendar entry.';
@@ -134,7 +136,7 @@ page 99000759 "Calendar Entries"
 
     trigger OnAfterGetRecord()
     begin
-        GetStartingEndingDateAndTime(StartingTime, EndingTime, CurrDate);
+        Rec.GetStartingEndingDateAndTime(StartingTime, EndingTime, CurrDate);
     end;
 
     trigger OnInit()

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
 page 5878 "Physical Inventory Order Lines"
 {
     Caption = 'Physical Inventory Order Lines';
@@ -137,8 +139,8 @@ page 5878 "Physical Inventory Order Lines"
                     Caption = 'Show Document';
                     Image = View;
                     RunObject = Page "Physical Inventory Order";
-                    RunPageLink = "No." = FIELD("Document No.");
-                    RunPageView = SORTING("No.");
+                    RunPageLink = "No." = field("Document No.");
+                    RunPageView = sorting("No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the document that the selected line exists on.';
                 }

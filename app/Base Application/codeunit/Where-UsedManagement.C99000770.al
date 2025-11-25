@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+
 codeunit 99000770 "Where-Used Management"
 {
     Permissions = TableData "Production BOM Header" = r,

@@ -1,3 +1,9 @@
+namespace Microsoft.CostAccounting.Posting;
+
+using Microsoft.CostAccounting.Journal;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 codeunit 1113 "CA Jnl.-Post+Print"
 {
     TableNo = "Cost Journal Line";
@@ -6,7 +12,7 @@ codeunit 1113 "CA Jnl.-Post+Print"
     begin
         CostJnlLine.Copy(Rec);
         Code();
-        Copy(CostJnlLine);
+        Rec.Copy(CostJnlLine);
     end;
 
     var

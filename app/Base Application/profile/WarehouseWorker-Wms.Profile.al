@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.RoleCenters;
+
 profile "WAREHOUSE WORKER - WMS"
 {
     Caption = 'Warehouse Worker - Warehouse Management System';

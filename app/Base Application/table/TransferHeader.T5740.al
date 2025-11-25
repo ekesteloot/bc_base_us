@@ -1,4 +1,22 @@
-﻿table 5740 "Transfer Header"
+﻿namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Comment;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.WarehouseMgt.Request;
+using System.Security.User;
+using System.Text;
+using System.Utilities;
+
+table 5740 "Transfer Header"
 {
     Caption = 'Transfer Header';
     DataCaptionFields = "No.";
@@ -22,7 +40,7 @@
         field(2; "Transfer-from Code"; Code[10])
         {
             Caption = 'Transfer-from Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             var
@@ -96,11 +114,9 @@
         field(7; "Transfer-from Post Code"; Code[20])
         {
             Caption = 'Transfer-from Post Code';
-            TableRelation = IF ("Trsf.-from Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Trsf.-from Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Trsf.-from Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Trsf.-from Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Trsf.-from Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Trsf.-from Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -124,11 +140,9 @@
         field(8; "Transfer-from City"; Text[30])
         {
             Caption = 'Transfer-from City';
-            TableRelation = IF ("Trsf.-from Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Trsf.-from Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Trsf.-from Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Trsf.-from Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Trsf.-from Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Trsf.-from Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -169,7 +183,7 @@
         field(11; "Transfer-to Code"; Code[10])
         {
             Caption = 'Transfer-to Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             var
@@ -241,8 +255,6 @@
         {
             Caption = 'Transfer-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -266,11 +278,9 @@
         field(17; "Transfer-to City"; Text[30])
         {
             Caption = 'Transfer-to City';
-            TableRelation = IF ("Trsf.-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Trsf.-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Trsf.-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Trsf.-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Trsf.-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Trsf.-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -362,8 +372,8 @@
         }
         field(24; Comment; Boolean)
         {
-            CalcFormula = Exist("Inventory Comment Line" WHERE("Document Type" = CONST("Transfer Order"),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = exist("Inventory Comment Line" where("Document Type" = const("Transfer Order"),
+                                                                "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -372,30 +382,30 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(26; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(27; "In-Transit Code"; Code[10])
         {
             Caption = 'In-Transit Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(true));
+            TableRelation = Location where("Use As In-Transit" = const(true));
 
             trigger OnValidate()
             begin
@@ -457,7 +467,7 @@
         field(35; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
 
             trigger OnValidate()
             begin
@@ -546,7 +556,7 @@
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
 
             trigger OnValidate()
@@ -559,10 +569,12 @@
             Caption = 'Shipping Advice';
 
             trigger OnValidate()
+            var
+                TransferWarehouseMgt: Codeunit "Transfer Warehouse Mgt.";
             begin
                 if "Shipping Advice" <> xRec."Shipping Advice" then begin
                     TestStatusOpen();
-                    WhseSourceHeader.TransHeaderVerifyChange(Rec, xRec);
+                    TransferWarehouseMgt.TransHeaderVerifyChange(Rec, xRec);
                 end;
             end;
         }
@@ -572,20 +584,20 @@
         }
         field(5752; "Completely Shipped"; Boolean)
         {
-            CalcFormula = Min("Transfer Line"."Completely Shipped" WHERE("Document No." = FIELD("No."),
-                                                                          "Shipment Date" = FIELD("Date Filter"),
-                                                                          "Transfer-from Code" = FIELD("Location Filter"),
-                                                                          "Derived From Line No." = CONST(0)));
+            CalcFormula = min("Transfer Line"."Completely Shipped" where("Document No." = field("No."),
+                                                                          "Shipment Date" = field("Date Filter"),
+                                                                          "Transfer-from Code" = field("Location Filter"),
+                                                                          "Derived From Line No." = const(0)));
             Caption = 'Completely Shipped';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5753; "Completely Received"; Boolean)
         {
-            CalcFormula = Min("Transfer Line"."Completely Received" WHERE("Document No." = FIELD("No."),
-                                                                           "Receipt Date" = FIELD("Date Filter"),
-                                                                           "Transfer-to Code" = FIELD("Location Filter"),
-                                                                           "Derived From Line No." = CONST(0)));
+            CalcFormula = min("Transfer Line"."Completely Received" where("Document No." = field("No."),
+                                                                           "Receipt Date" = field("Date Filter"),
+                                                                           "Transfer-to Code" = field("Location Filter"),
+                                                                           "Derived From Line No." = const(0)));
             Caption = 'Completely Received';
             Editable = false;
             FieldClass = FlowField;
@@ -627,8 +639,8 @@
         }
         field(8000; "Has Shipped Lines"; Boolean)
         {
-            CalcFormula = Exist("Transfer Line" WHERE("Document No." = FIELD("No."),
-                                                       "Quantity Shipped" = FILTER(> 0)));
+            CalcFormula = exist("Transfer Line" where("Document No." = field("No."),
+                                                       "Quantity Shipped" = filter(> 0)));
             Caption = 'Has Shipped Lines';
             FieldClass = FlowField;
         }
@@ -641,8 +653,8 @@
         field(10044; "Transport Operators"; Integer)
         {
             Caption = 'Transport Operators';
-            CalcFormula = Count("CFDI Transport Operator" WHERE("Document Table ID" = CONST(5740),
-                                                                 "Document No." = FIELD("No.")));
+            CalcFormula = count("CFDI Transport Operator" where("Document Table ID" = const(5740),
+                                                                 "Document No." = field("No.")));
             FieldClass = FlowField;
         }
         field(10045; "Transit-from Date/Time"; DateTime)
@@ -677,12 +689,12 @@
         field(10052; "Trailer 1"; Code[20])
         {
             Caption = 'Trailer 1';
-            TableRelation = "Fixed Asset" WHERE("SAT Trailer Type" = FILTER(<> ''));
+            TableRelation = "Fixed Asset" where("SAT Trailer Type" = filter(<> ''));
         }
         field(10053; "Trailer 2"; Code[20])
         {
             Caption = 'Trailer 2';
-            TableRelation = "Fixed Asset" WHERE("SAT Trailer Type" = FILTER(<> ''));
+            TableRelation = "Fixed Asset" where("SAT Trailer Type" = filter(<> ''));
         }
         field(10056; "Medical Insurer Name"; Text[50])
         {
@@ -761,7 +773,6 @@
         WhseRequest: Record "Warehouse Request";
         DimMgt: Codeunit DimensionManagement;
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        WhseSourceHeader: Codeunit "Whse. Validate Source Header";
         ErrorMessageMgt: Codeunit "Error Message Management";
         HasInventorySetup: Boolean;
         CalledFromWhse: Boolean;
@@ -1535,6 +1546,27 @@
         ReservationEntry.SetRange("Source Prod. Order Line", TransferLine."Line No.");
         if ReservationEntry.FindFirst() then
             exit(ReservationEntry."Source Ref. No.");
+    end;
+
+    internal procedure GetQtyReservedFromStockState() Result: Enum "Reservation From Stock"
+    var
+        TransferLineLocal: Record "Transfer Line";
+        TransferLineReserve: Codeunit "Transfer Line-Reserve";
+        QtyReservedFromStock: Decimal;
+    begin
+        QtyReservedFromStock := TransferLineReserve.GetReservedQtyFromInventory(Rec);
+
+        TransferLineLocal.SetRange("Document No.", Rec."No.");
+        TransferLineLocal.CalcSums("Outstanding Qty. (Base)");
+
+        case QtyReservedFromStock of
+            0:
+                exit(Result::None);
+            TransferLineLocal."Outstanding Qty. (Base)":
+                exit(Result::Full);
+            else
+                exit(Result::Partial);
+        end;
     end;
 
     [IntegrationEvent(false, false)]

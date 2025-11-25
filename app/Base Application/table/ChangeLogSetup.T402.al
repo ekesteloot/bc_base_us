@@ -1,3 +1,5 @@
+namespace System.Diagnostics;
+
 table 402 "Change Log Setup"
 {
     Caption = 'Change Log Setup';

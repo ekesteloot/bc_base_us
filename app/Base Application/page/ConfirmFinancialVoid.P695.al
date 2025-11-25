@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Check;
+
 page 695 "Confirm Financial Void"
 {
     Caption = 'Confirm Financial Void';

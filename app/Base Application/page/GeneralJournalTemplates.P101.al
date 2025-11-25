@@ -1,4 +1,10 @@
-﻿page 101 "General Journal Templates"
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Reflection;
+using System.Utilities;
+
+page 101 "General Journal Templates"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'General Journal Templates';
@@ -77,9 +83,9 @@
                     var
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        if "Copy VAT Setup to Jnl. Lines" <> xRec."Copy VAT Setup to Jnl. Lines" then
+                        if Rec."Copy VAT Setup to Jnl. Lines" <> xRec."Copy VAT Setup to Jnl. Lines" then
                             if not ConfirmManagement.GetResponseOrDefault(
-                                 StrSubstNo(Text001, FieldCaption("Copy VAT Setup to Jnl. Lines")), true)
+                                 StrSubstNo(Text001, Rec.FieldCaption("Copy VAT Setup to Jnl. Lines")), true)
                             then
                                 Error(Text002);
                     end;
@@ -98,9 +104,9 @@
                     var
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        if "Allow VAT Difference" <> xRec."Allow VAT Difference" then
+                        if Rec."Allow VAT Difference" <> xRec."Allow VAT Difference" then
                             if not ConfirmManagement.GetResponseOrDefault(
-                                 StrSubstNo(Text001, FieldCaption("Allow VAT Difference")), true)
+                                 StrSubstNo(Text001, Rec.FieldCaption("Allow VAT Difference")), true)
                             then
                                 Error(Text002);
                     end;
@@ -202,7 +208,7 @@
                     var
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        if "Copy to Posted Jnl. Lines" <> xRec."Copy to Posted Jnl. Lines" then
+                        if Rec."Copy to Posted Jnl. Lines" <> xRec."Copy to Posted Jnl. Lines" then
                             if not ConfirmManagement.GetResponseOrDefault(EnableCopyToPostedQst, true) then
                                 Error(Text002);
                     end;
@@ -238,7 +244,7 @@
                     Caption = 'Batches';
                     Image = Description;
                     RunObject = Page "General Journal Batches";
-                    RunPageLink = "Journal Template Name" = FIELD(Name);
+                    RunPageLink = "Journal Template Name" = field(Name);
                     ToolTip = 'View or edit multiple journals for a specific template. You can use batches when you need multiple journals of a certain type.';
                     Scope = Repeater;
                 }

@@ -15,7 +15,7 @@ page 10044 "Sales Credit Memo Stats."
                 field("CustAmount + InvDiscAmount"; CustAmount + InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Amount';
                     ToolTip = 'Specifies the transaction amount.';
@@ -23,7 +23,7 @@ page 10044 "Sales Credit Memo Stats."
                 field(InvDiscAmount; InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     ToolTip = 'Specifies the invoice discount amount for the entire sales document. If the Calc. Inv. Discount field in the Sales & Receivables Setup window is selected, the discount is automatically calculated.';
@@ -31,7 +31,7 @@ page 10044 "Sales Credit Memo Stats."
                 field(CustAmount; CustAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total amount less any invoice discount amount and exclusive of VAT for the posted document.';
@@ -39,7 +39,7 @@ page 10044 "Sales Credit Memo Stats."
                 field(TaxAmount; TaxAmount)
                 {
                     ApplicationArea = SalesTax;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Tax Amount';
                     ToolTip = 'Specifies the tax amount.';
@@ -47,7 +47,7 @@ page 10044 "Sales Credit Memo Stats."
                 field(AmountInclTax; AmountInclTax)
                 {
                     ApplicationArea = SalesTax;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total Incl. Tax';
                     ToolTip = 'Specifies the total amount, including tax, that has been posted as invoiced.';
@@ -195,20 +195,20 @@ page 10044 "Sales Credit Memo Stats."
         PrevTaxPercent: Decimal;
     begin
         ClearAll();
-        TaxArea.Get("Tax Area Code");
+        TaxArea.Get(Rec."Tax Area Code");
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             Currency.InitRoundingPrecision()
         else
-            Currency.Get("Currency Code");
+            Currency.Get(Rec."Currency Code");
 
-        SalesCrMemoLine.SetRange("Document No.", "No.");
+        SalesCrMemoLine.SetRange("Document No.", Rec."No.");
 
         if SalesCrMemoLine.Find('-') then
             repeat
                 CustAmount := CustAmount + SalesCrMemoLine.Amount;
                 AmountInclTax := AmountInclTax + SalesCrMemoLine."Amount Including VAT";
-                if "Prices Including VAT" then
+                if Rec."Prices Including VAT" then
                     InvDiscAmount := InvDiscAmount + SalesCrMemoLine."Inv. Discount Amount" / (1 + SalesCrMemoLine."VAT %" / 100)
                 else
                     InvDiscAmount := InvDiscAmount + SalesCrMemoLine."Inv. Discount Amount";
@@ -228,17 +228,17 @@ page 10044 "Sales Credit Memo Stats."
         TaxAmount := AmountInclTax - CustAmount;
         InvDiscAmount := Round(InvDiscAmount, Currency."Amount Rounding Precision");
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             AmountLCY := CustAmount
         else
             AmountLCY :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                WorkDate(), "Currency Code", CustAmount, "Currency Factor");
+                WorkDate(), Rec."Currency Code", CustAmount, Rec."Currency Factor");
         ProfitLCY := AmountLCY - CostLCY;
         if AmountLCY <> 0 then
             ProfitPct := Round(100 * ProfitLCY / AmountLCY, 0.1);
 
-        if Cust.Get("Bill-to Customer No.") then
+        if Cust.Get(Rec."Bill-to Customer No.") then
             Cust.CalcFields("Balance (LCY)")
         else
             Clear(Cust);
@@ -259,10 +259,10 @@ page 10044 "Sales Credit Memo Stats."
         OnAfterCalculateSalesTax(SalesCrMemoLine, TempSalesTaxLine, TempSalesTaxAmtLine, SalesTaxCalculationOverridden);
         if not SalesTaxCalculationOverridden then
             if TaxArea."Use External Tax Engine" then
-                SalesTaxCalculate.CallExternalTaxEngineForDoc(DATABASE::"Sales Cr.Memo Header", 0, "No.")
+                SalesTaxCalculate.CallExternalTaxEngineForDoc(DATABASE::"Sales Cr.Memo Header", 0, Rec."No.")
             else begin
-                SalesTaxCalculate.AddSalesCrMemoLines("No.");
-                SalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
+                SalesTaxCalculate.AddSalesCrMemoLines(Rec."No.");
+                SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
             end;
 
         SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine);
@@ -294,7 +294,7 @@ page 10044 "Sales Credit Memo Stats."
                 until Next() = 0;
         end;
         CurrPage.Subform.PAGE.SetTempTaxAmountLine(TempSalesTaxLine);
-        CurrPage.Subform.PAGE.InitGlobals("Currency Code", false, false, false, false, "VAT Base Discount %");
+        CurrPage.Subform.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var

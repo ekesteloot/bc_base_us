@@ -1,3 +1,10 @@
+﻿namespace System.Automation;
+
+using System.Environment;
+using System.IO;
+using System.Telemetry;
+using System.Utilities;
+
 page 1500 Workflows
 {
     ApplicationArea = Suite;
@@ -7,7 +14,7 @@ page 1500 Workflows
     RefreshOnActivate = true;
     SourceTable = "Workflow Buffer";
     SourceTableTemporary = true;
-    SourceTableView = WHERE(Template = CONST(false));
+    SourceTableView = where(Template = const(false));
     UsageCategory = Lists;
 
     layout
@@ -16,7 +23,7 @@ page 1500 Workflows
         {
             repeater(Group)
             {
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 IndentationControls = Description;
                 ShowAsTree = true;
                 field(Description; Rec.Description)
@@ -43,7 +50,7 @@ page 1500 Workflows
                     ToolTip = 'Specifies the workflow that the workflow step belongs to.';
                     Visible = false;
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     BlankZero = true;
@@ -85,9 +92,9 @@ page 1500 Workflows
                         Workflow: Record Workflow;
                         WorkflowPage: Page Workflow;
                     begin
-                        if IsEmpty() then begin
+                        if Rec.IsEmpty() then begin
                             Clear(Rec);
-                            Insert();
+                            Rec.Insert();
                         end;
                         Workflow.SetRange(Template, false);
                         if Workflow.IsEmpty() then
@@ -110,15 +117,15 @@ page 1500 Workflows
                     var
                         TempWorkflowBuffer: Record "Workflow Buffer" temporary;
                     begin
-                        if IsEmpty() then begin
+                        if Rec.IsEmpty() then begin
                             Clear(Rec);
-                            Insert();
+                            Rec.Insert();
                         end;
                         if PAGE.RunModal(PAGE::"Workflow Templates", TempWorkflowBuffer) = ACTION::LookupOK then begin
-                            CopyWorkflow(TempWorkflowBuffer);
+                            Rec.CopyWorkflow(TempWorkflowBuffer);
 
                             // If first workflow on an empty page
-                            if Count = 1 then
+                            if Rec.Count = 1 then
                                 Rec := TempWorkflowBuffer;
 
                             RefreshTempWorkflowBuffer();
@@ -129,13 +136,13 @@ page 1500 Workflows
                 {
                     ApplicationArea = Suite;
                     Caption = 'Copy Workflow';
-                    Enabled = "Workflow Code" <> '';
+                    Enabled = Rec."Workflow Code" <> '';
                     Image = Copy;
                     ToolTip = 'Copy an existing workflow.';
 
                     trigger OnAction()
                     begin
-                        CopyWorkflow(Rec);
+                        Rec.CopyWorkflow(Rec);
                     end;
                 }
             }
@@ -146,7 +153,7 @@ page 1500 Workflows
                 {
                     ApplicationArea = Suite;
                     Caption = 'Edit';
-                    Enabled = "Workflow Code" <> '';
+                    Enabled = Rec."Workflow Code" <> '';
                     Image = Edit;
                     ShortCutKey = 'Return';
                     ToolTip = 'Edit an existing workflow.';
@@ -155,7 +162,7 @@ page 1500 Workflows
                     var
                         Workflow: Record Workflow;
                     begin
-                        if Workflow.Get("Workflow Code") then
+                        if Workflow.Get(Rec."Workflow Code") then
                             PAGE.Run(PAGE::Workflow, Workflow);
                     end;
                 }
@@ -163,7 +170,7 @@ page 1500 Workflows
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'View';
-                    Enabled = "Workflow Code" <> '';
+                    Enabled = Rec."Workflow Code" <> '';
                     Image = View;
                     ToolTip = 'View an existing workflow.';
 
@@ -172,7 +179,7 @@ page 1500 Workflows
                         Workflow: Record Workflow;
                         WorkflowPage: Page Workflow;
                     begin
-                        Workflow.Get("Workflow Code");
+                        Workflow.Get(Rec."Workflow Code");
                         WorkflowPage.SetRecord(Workflow);
                         WorkflowPage.SetOpenView(true);
                         WorkflowPage.Run();
@@ -182,13 +189,13 @@ page 1500 Workflows
                 {
                     ApplicationArea = Suite;
                     Caption = 'Delete';
-                    Enabled = "Workflow Code" <> '';
+                    Enabled = Rec."Workflow Code" <> '';
                     Image = Delete;
                     ToolTip = 'Delete the record.';
 
                     trigger OnAction()
                     begin
-                        Delete(true);
+                        Rec.Delete(true);
                         CurrPage.Update(false);
                     end;
                 }
@@ -256,8 +263,8 @@ page 1500 Workflows
                     var
                         WorkflowMgt: Codeunit "Workflow Management";
                     begin
-                        CalcFields("External Client Type");
-                        HyperLink(WorkflowMgt.GetWebhookClientLink("External Client ID", "External Client Type"));
+                        Rec.CalcFields("External Client Type");
+                        HyperLink(WorkflowMgt.GetWebhookClientLink(Rec."External Client ID", Rec."External Client Type"));
                     end;
                 }
             }
@@ -339,9 +346,9 @@ page 1500 Workflows
     trigger OnAfterGetRecord()
     begin
         RefreshTempWorkflowBuffer();
-        ExportEnabled := not IsEmpty();
+        ExportEnabled := not Rec.IsEmpty();
 
-        if "Workflow Code" = '' then begin
+        if Rec."Workflow Code" = '' then begin
             DescriptionStyle := 'Strong';
             ExternalLinkEnabled := false;
             Source := '';
@@ -349,8 +356,8 @@ page 1500 Workflows
             DescriptionStyle := 'Standard';
 
             // Enable/disable external links
-            CalcFields("External Client ID");
-            ExternalLinkEnabled := not IsNullGuid("External Client ID");
+            Rec.CalcFields("External Client ID");
+            ExternalLinkEnabled := not IsNullGuid(Rec."External Client ID");
 
             if ExternalLinkEnabled then
                 Source := FlowSourceText
@@ -368,7 +375,7 @@ page 1500 Workflows
 
         WorkflowSetup.InitWorkflow();
         if not WorkflowBufferInitialized then
-            InitBufferForWorkflows(Rec);
+            Rec.InitBufferForWorkflows(Rec);
 
         IsSaaS := EnvironmentInfo.IsSaaS();
     end;
@@ -395,9 +402,9 @@ page 1500 Workflows
         CurrentWorkflowChanged: Boolean;
         WorkflowCountChanged: Boolean;
     begin
-        WorkflowCode := "Workflow Code";
+        WorkflowCode := Rec."Workflow Code";
         if Workflow.Get(WorkflowCode) then
-            CurrentWorkflowChanged := ("Category Code" <> Workflow.Category) or (Description <> Workflow.Description)
+            CurrentWorkflowChanged := (Rec."Category Code" <> Workflow.Category) or (Rec.Description <> Workflow.Description)
         else
             CurrentWorkflowChanged := WorkflowCode <> '';
 
@@ -411,7 +418,7 @@ page 1500 Workflows
         WorkflowCountChanged := Workflow.Count <> TempWorkflowBuffer.Count();
 
         if CurrentWorkflowChanged or WorkflowCountChanged then begin
-            InitBufferForWorkflows(Rec);
+            Rec.InitBufferForWorkflows(Rec);
             Refresh := true;
         end;
     end;
@@ -426,13 +433,13 @@ page 1500 Workflows
             exit;
         end;
 
-        if "Workflow Code" = '' then
+        if Rec."Workflow Code" = '' then
             exit;
 
-        Workflow.Get("Workflow Code");
-        "Category Code" := Workflow.Category;
-        Description := Workflow.Description;
-        Modify();
+        Workflow.Get(Rec."Workflow Code");
+        Rec."Category Code" := Workflow.Category;
+        Rec.Description := Workflow.Description;
+        Rec.Modify();
     end;
 
     procedure GetFilterFromSelection() "Filter": Text
@@ -455,11 +462,11 @@ page 1500 Workflows
     procedure SetWorkflowBufferRec(var TempWorkflowBuffer: Record "Workflow Buffer" temporary)
     begin
         WorkflowBufferInitialized := true;
-        InitBufferForWorkflows(Rec);
-        CopyFilters(TempWorkflowBuffer);
-        if StrLen(GetFilter("Workflow Code")) > 0 then
-            SetFilter("Workflow Code", TempWorkflowBuffer.GetFilter("Workflow Code") + '|''''');
-        if FindLast() then;
+        Rec.InitBufferForWorkflows(Rec);
+        Rec.CopyFilters(TempWorkflowBuffer);
+        if StrLen(Rec.GetFilter("Workflow Code")) > 0 then
+            Rec.SetFilter("Workflow Code", TempWorkflowBuffer.GetFilter("Workflow Code") + '|''''');
+        if Rec.FindLast() then;
     end;
 }
 

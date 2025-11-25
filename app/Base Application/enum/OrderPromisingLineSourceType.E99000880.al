@@ -1,4 +1,6 @@
-﻿enum 99000880 "Order Promising Line Source Type"
+﻿namespace Microsoft.InventoryMgt.Availability;
+
+enum 99000880 "Order Promising Line Source Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

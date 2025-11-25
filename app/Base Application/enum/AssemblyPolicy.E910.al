@@ -1,3 +1,5 @@
+namespace Microsoft.AssemblyMgt.Setup;
+
 enum 910 "Assembly Policy"
 {
     Extensible = true;

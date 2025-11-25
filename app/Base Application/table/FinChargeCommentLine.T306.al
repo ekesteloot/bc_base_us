@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 table 306 "Fin. Charge Comment Line"
 {
     Caption = 'Fin. Charge Comment Line';
@@ -16,9 +18,9 @@ table 306 "Fin. Charge Comment Line"
         {
             Caption = 'No.';
             NotBlank = true;
-            TableRelation = IF (Type = CONST("Finance Charge Memo")) "Finance Charge Memo Header"
-            ELSE
-            IF (Type = CONST("Issued Finance Charge Memo")) "Issued Fin. Charge Memo Header";
+            TableRelation = if (Type = const("Finance Charge Memo")) "Finance Charge Memo Header"
+            else
+            if (Type = const("Issued Finance Charge Memo")) "Issued Fin. Charge Memo Header";
         }
         field(3; "Line No."; Integer)
         {

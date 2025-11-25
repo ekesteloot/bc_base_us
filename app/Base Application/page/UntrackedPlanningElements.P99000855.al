@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Planning;
+
 page 99000855 "Untracked Planning Elements"
 {
     Caption = 'Untracked Planning Elements';
@@ -31,7 +33,7 @@ page 99000855 "Untracked Planning Elements"
                     ToolTip = 'Specifies the location code in the requisition line associated with the untracked planning surplus.';
                     Visible = false;
                 }
-                field(Source; Source)
+                field(Source; Rec.Source)
                 {
                     ApplicationArea = Planning;
                     StyleExpr = SourceEmphasize;
@@ -93,7 +95,6 @@ page 99000855 "Untracked Planning Elements"
 
     var
         CaptionText: Text;
-        [InDataSet]
         SourceEmphasize: Text;
 
     procedure SetCaption(NewCaption: Text)
@@ -103,7 +104,7 @@ page 99000855 "Untracked Planning Elements"
 
     local procedure FormatLine()
     begin
-        if "Warning Level" > 0 then
+        if Rec."Warning Level" > 0 then
             SourceEmphasize := 'Strong'
         else
             SourceEmphasize := '';

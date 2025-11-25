@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using Microsoft.Foundation.Company;
+using System.Environment;
+
 page 8639 "Copy Company Data"
 {
     Caption = 'Copy Company Data';
@@ -7,7 +12,7 @@ page 8639 "Copy Company Data"
     PageType = Worksheet;
     SaveValues = true;
     SourceTable = "Config. Line";
-    SourceTableView = SORTING("Line No.");
+    SourceTableView = sorting("Line No.");
 
     layout
     {
@@ -59,7 +64,7 @@ page 8639 "Copy Company Data"
                     Editable = false;
                     ToolTip = 'Specifies the name of the line type.';
                 }
-                field(NoOfRecordsSourceTable; GetNoOfRecordsSourceTable())
+                field(NoOfRecordsSourceTable; Rec.GetNoOfRecordsSourceTable())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'No. of Records (Source Table)';
@@ -103,19 +108,19 @@ page 8639 "Copy Company Data"
 
     trigger OnAfterGetRecord()
     begin
-        "Company Filter (Source Table)" := NewCompanyName;
+        Rec."Company Filter (Source Table)" := NewCompanyName;
     end;
 
     trigger OnOpenPage()
     begin
-        FilterGroup := 2;
-        SetRange("Company Filter", CompanyName);
-        FilterGroup := 0;
-        SetRange("Line Type", "Line Type"::Table);
-        SetRange("Copying Available", true);
-        SetRange("Licensed Table", true);
-        SetRange("No. of Records", 0);
-        SetFilter("No. of Records (Source Table)", '<>0');
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Company Filter", CompanyName);
+        Rec.FilterGroup := 0;
+        Rec.SetRange("Line Type", Rec."Line Type"::Table);
+        Rec.SetRange("Copying Available", true);
+        Rec.SetRange("Licensed Table", true);
+        Rec.SetRange("No. of Records", 0);
+        Rec.SetFilter("No. of Records (Source Table)", '<>0');
         if NewCompanyName <> '' then
             if NewCompanyName = CompanyName then
                 NewCompanyName := ''
@@ -146,11 +151,11 @@ page 8639 "Copy Company Data"
         ConfigLine: Record "Config. Line";
     begin
         CurrPage.SetSelectionFilter(ConfigLine);
-        FilterGroup := 2;
+        Rec.FilterGroup := 2;
         ConfigLine.FilterGroup := 2;
-        CopyFilter("Company Filter (Source Table)", ConfigLine."Company Filter (Source Table)");
-        CopyFilter("Company Filter", ConfigLine."Company Filter");
-        FilterGroup := 0;
+        Rec.CopyFilter("Company Filter (Source Table)", ConfigLine."Company Filter (Source Table)");
+        Rec.CopyFilter("Company Filter", ConfigLine."Company Filter");
+        Rec.FilterGroup := 0;
         ConfigLine.FilterGroup := 0;
         ConfigLine := Rec;
         ConfigMgt.CopyDataDialog(NewCompanyName, ConfigLine);
@@ -158,9 +163,9 @@ page 8639 "Copy Company Data"
 
     procedure SetCompanyFilter()
     begin
-        FilterGroup := 2;
-        SetRange("Company Filter (Source Table)", NewCompanyName);
-        FilterGroup := 0;
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Company Filter (Source Table)", NewCompanyName);
+        Rec.FilterGroup := 0;
     end;
 }
 

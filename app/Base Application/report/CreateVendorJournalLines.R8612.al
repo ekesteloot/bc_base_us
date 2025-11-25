@@ -9,7 +9,7 @@ report 8612 "Create Vendor Journal Lines"
     {
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Currency Code", "Country/Region Code", "Vendor Posting Group", Blocked;
 
             trigger OnAfterGetRecord()

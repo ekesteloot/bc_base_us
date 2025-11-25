@@ -1,3 +1,14 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Reports;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Task;
+using Microsoft.Integration.Dataverse;
+
 page 5123 "Opportunity List"
 {
     AdditionalSearchTerms = 'prospects';
@@ -23,7 +34,7 @@ page 5123 "Opportunity List"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies that the opportunity is closed.';
@@ -148,7 +159,7 @@ page 5123 "Opportunity List"
             part(Control5; "Opportunity Statistics FactBox")
             {
                 ApplicationArea = RelationshipMgmt;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -177,7 +188,7 @@ page 5123 "Opportunity List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Opportunity Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -187,8 +198,8 @@ page 5123 "Opportunity List"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Opportunity No." = FIELD("No.");
-                    RunPageView = SORTING("Opportunity No.", Date);
+                    RunPageLink = "Opportunity No." = field("No.");
+                    RunPageView = sorting("Opportunity No.", Date);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
@@ -198,8 +209,8 @@ page 5123 "Opportunity List"
                     Caption = 'Postponed &Interactions';
                     Image = PostponedInteractions;
                     RunObject = Page "Postponed Interactions";
-                    RunPageLink = "Opportunity No." = FIELD("No.");
-                    RunPageView = SORTING("Opportunity No.", Date);
+                    RunPageLink = "Opportunity No." = field("No.");
+                    RunPageView = sorting("Opportunity No.", Date);
                     Scope = Repeater;
                     ToolTip = 'View postponed interactions for opportunities.';
                 }
@@ -209,9 +220,9 @@ page 5123 "Opportunity List"
                     Caption = 'T&asks';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    RunPageLink = "Opportunity No." = FIELD("No."),
-                                  "System To-do Type" = FILTER(Organizer);
-                    RunPageView = SORTING("Opportunity No.");
+                    RunPageLink = "Opportunity No." = field("No."),
+                                  "System To-do Type" = filter(Organizer);
+                    RunPageView = sorting("Opportunity No.");
                     ToolTip = 'View all marketing tasks that involve the opportunity. ';
                 }
                 action("Co&mments")
@@ -220,8 +231,8 @@ page 5123 "Opportunity List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Rlshp. Mgt. Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Opportunity),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Opportunity),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Show Sales Quote")
@@ -234,7 +245,7 @@ page 5123 "Opportunity List"
 
                     trigger OnAction()
                     begin
-                        ShowSalesQuoteWithCheck();
+                        Rec.ShowSalesQuoteWithCheck();
                     end;
                 }
             }
@@ -253,7 +264,7 @@ page 5123 "Opportunity List"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -298,7 +309,7 @@ page 5123 "Opportunity List"
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(MatchBasedCoupling)
@@ -352,7 +363,7 @@ page 5123 "Opportunity List"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -374,7 +385,7 @@ page 5123 "Opportunity List"
 
                     trigger OnAction()
                     begin
-                        UpdateOpportunity();
+                        Rec.UpdateOpportunity();
                     end;
                 }
                 action(Close)
@@ -388,7 +399,7 @@ page 5123 "Opportunity List"
 
                     trigger OnAction()
                     begin
-                        CloseOpportunity();
+                        Rec.CloseOpportunity();
                     end;
                 }
                 action("Activate First Stage")
@@ -402,7 +413,7 @@ page 5123 "Opportunity List"
 
                     trigger OnAction()
                     begin
-                        StartActivateFirstStage();
+                        Rec.StartActivateFirstStage();
                     end;
                 }
                 action(CreateSalesQuote)
@@ -416,7 +427,7 @@ page 5123 "Opportunity List"
 
                     trigger OnAction()
                     begin
-                        CreateQuote();
+                        Rec.CreateQuote();
                     end;
                 }
                 action("Print Details")
@@ -530,9 +541,9 @@ page 5123 "Opportunity List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CalcFields("Contact Name", "Contact Company Name");
-        OppNotStarted := Status = Status::"Not Started";
-        OppInProgress := Status = Status::"In Progress";
+        Rec.CalcFields("Contact Name", "Contact Company Name");
+        OppNotStarted := Rec.Status = Rec.Status::"Not Started";
+        OppInProgress := Rec.Status = Rec.Status::"In Progress";
     end;
 
     trigger OnAfterGetRecord()
@@ -540,20 +551,20 @@ page 5123 "Opportunity List"
         SalesCycleStage: Record "Sales Cycle Stage";
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
     begin
-        CalcFields("Current Sales Cycle Stage");
+        Rec.CalcFields("Current Sales Cycle Stage");
         CurrSalesCycleStage := '';
-        if SalesCycleStage.Get("Sales Cycle Code", "Current Sales Cycle Stage") then
+        if SalesCycleStage.Get(Rec."Sales Cycle Code", Rec."Current Sales Cycle Stage") then
             CurrSalesCycleStage := SalesCycleStage.Description;
 
         if CRMIntegrationEnabled then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
     var
         RecordsFound: Boolean;
     begin
-        RecordsFound := Find(Which);
+        RecordsFound := Rec.Find(Which);
         exit(RecordsFound);
     end;
 
@@ -578,11 +589,11 @@ page 5123 "Opportunity List"
         CaptionStr: Text;
     begin
         case true of
-            BuildCaptionContact(CaptionStr, GetFilter("Contact Company No.")),
-            BuildCaptionContact(CaptionStr, GetFilter("Contact No.")),
-            BuildCaptionSalespersonPurchaser(CaptionStr, GetFilter("Salesperson Code")),
-            BuildCaptionCampaign(CaptionStr, GetFilter("Campaign No.")),
-            BuildCaptionSegmentHeader(CaptionStr, GetFilter("Segment No.")):
+            BuildCaptionContact(CaptionStr, Rec.GetFilter("Contact Company No.")),
+            BuildCaptionContact(CaptionStr, Rec.GetFilter("Contact No.")),
+            BuildCaptionSalespersonPurchaser(CaptionStr, Rec.GetFilter("Salesperson Code")),
+            BuildCaptionCampaign(CaptionStr, Rec.GetFilter("Campaign No.")),
+            BuildCaptionSegmentHeader(CaptionStr, Rec.GetFilter("Segment No.")):
                 exit(CaptionStr);
         end;
 

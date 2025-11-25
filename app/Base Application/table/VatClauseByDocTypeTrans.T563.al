@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using System.Globalization;
+
 table 563 "VAT Clause by Doc. Type Trans."
 {
     Caption = 'VAT Clause by Document Type Translation';

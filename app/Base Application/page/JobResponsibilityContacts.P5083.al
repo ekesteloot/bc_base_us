@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5083 "Job Responsibility Contacts"
 {
     Caption = 'Job Responsibility Contacts';

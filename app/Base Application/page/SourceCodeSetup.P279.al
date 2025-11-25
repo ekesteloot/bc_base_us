@@ -50,7 +50,7 @@ page 279 "Source Code Setup"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the code linked to entries that are posted when you change the additional reporting currency in the General Ledger Setup table.';
                 }
-                field(Reversal; Reversal)
+                field(Reversal; Rec.Reversal)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code assigned to entries that are posted from the Reverse Entries window.';
@@ -95,7 +95,7 @@ page 279 "Source Code Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the source code assigned to entries that are posted from the cash flow worksheet.';
                 }
-                field(Deposits; Deposits)
+                field(Deposits; Rec.Deposits)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the source code that is assigned to entries that are posted from a deposit.';
@@ -106,7 +106,7 @@ page 279 "Source Code Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code linked to entries that are posted from a payment reconciliation journal.';
                 }
-                field(Consolidation; Consolidation)
+                field(Consolidation; Rec.Consolidation)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code linked to entries that are posted from Consolidation.';
@@ -130,7 +130,7 @@ page 279 "Source Code Setup"
             group(Sales)
             {
                 Caption = 'Sales';
-                field(Control14; Sales)
+                field(Control14; Rec.Sales)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code linked to entries that are posted in connection with sales, such as orders, invoices, and credit memos.';
@@ -155,7 +155,7 @@ page 279 "Source Code Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code assigned to entries that are posted from the Unapply Customer Entries window.';
                 }
-                field(Reminder; Reminder)
+                field(Reminder; Rec.Reminder)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the code linked to entries that are posted from a Reminder.';
@@ -174,7 +174,7 @@ page 279 "Source Code Setup"
             group(Purchases)
             {
                 Caption = 'Purchases';
-                field(Control26; Purchases)
+                field(Control26; Rec.Purchases)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code linked to entries that are posted in connection with purchases, such as orders, invoices, and credit memos.';
@@ -222,7 +222,7 @@ page 279 "Source Code Setup"
             group(Inventory)
             {
                 Caption = 'Inventory';
-                field(Transfer; Transfer)
+                field(Transfer; Rec.Transfer)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code linked to entries that are posted in connection with transfer orders.';
@@ -272,7 +272,7 @@ page 279 "Source Code Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code linked to entries that are the result of a cost adjustment.';
                 }
-                field(Assembly; Assembly)
+                field(Assembly; Rec.Assembly)
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the code that is linked to entries that are posted with assembly orders.';
@@ -373,7 +373,7 @@ page 279 "Source Code Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code linked to entries that are posted from an output journal.';
                 }
-                field(Flushing; Flushing)
+                field(Flushing; Rec.Flushing)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code linked to consumption entries that are posted when you change the status of a released production order to Finished.';
@@ -487,20 +487,13 @@ page 279 "Source Code Setup"
     }
 
     trigger OnOpenPage()
-#if not CLEAN21
-    var
-        BankDepositFeatureMgt: Codeunit "Bank Deposit Feature Mgt.";
-#endif
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
         BankDepositFeatureEnabled := true;
-#if not CLEAN21
-        BankDepositFeatureEnabled := BankDepositFeatureMgt.IsEnabled();
-#endif
     end;
 
     var

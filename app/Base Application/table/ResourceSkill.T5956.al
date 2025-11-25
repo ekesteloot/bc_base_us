@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.Resources;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Setup;
+
 table 5956 "Resource Skill"
 {
     Caption = 'Resource Skill';
@@ -13,13 +20,13 @@ table 5956 "Resource Skill"
         {
             Caption = 'No.';
             NotBlank = true;
-            TableRelation = IF (Type = CONST(Resource)) Resource."No."
-            ELSE
-            IF (Type = CONST("Service Item Group")) "Service Item Group".Code
-            ELSE
-            IF (Type = CONST(Item)) Item."No."
-            ELSE
-            IF (Type = CONST("Service Item")) "Service Item"."No.";
+            TableRelation = if (Type = const(Resource)) Resource."No."
+            else
+            if (Type = const("Service Item Group")) "Service Item Group".Code
+            else
+            if (Type = const(Item)) Item."No."
+            else
+            if (Type = const("Service Item")) "Service Item"."No.";
         }
         field(3; "Skill Code"; Code[10])
         {

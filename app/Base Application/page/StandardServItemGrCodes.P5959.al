@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Item;
+
+using Microsoft.ServiceMgt.Document;
+
 page 5959 "Standard Serv. Item Gr. Codes"
 {
     Caption = 'Standard Serv. Item Gr. Codes';
@@ -37,7 +41,7 @@ page 5959 "Standard Serv. Item Gr. Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies a standard service code assigned to the specified service item group.';
@@ -86,9 +90,9 @@ page 5959 "Standard Serv. Item Gr. Codes"
                     var
                         StandardServiceCode: Record "Standard Service Code";
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
 
-                        StandardServiceCode.Get(Code);
+                        StandardServiceCode.Get(Rec.Code);
                         PAGE.Run(PAGE::"Standard Service Code Card", StandardServiceCode);
                     end;
                 }
@@ -98,12 +102,12 @@ page 5959 "Standard Serv. Item Gr. Codes"
 
     trigger OnAfterGetCurrRecord()
     begin
-        SetServItemGroupCode(GetFilter("Service Item Group Code"), false);
+        SetServItemGroupCode(Rec.GetFilter("Service Item Group Code"), false);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        SetServItemGroupCode(GetFilter("Service Item Group Code"), false);
+        SetServItemGroupCode(Rec.GetFilter("Service Item Group Code"), false);
     end;
 
     trigger OnInit()
@@ -126,7 +130,6 @@ page 5959 "Standard Serv. Item Gr. Codes"
         CurrentServiceItemGroupCode: Code[10];
         NotCloseForm: Boolean;
         FormCaption: Text[250];
-        [InDataSet]
         CurrServItemGroupCodeCtrlEdita: Boolean;
 
     local procedure LookupServItemGroupCode()
@@ -145,13 +148,13 @@ page 5959 "Standard Serv. Item Gr. Codes"
             ComposeFormCaption(NewCode);
 
             if CurrentServiceItemGroupCode = '' then begin
-                Reset();
-                FilterGroup := 2;
-                SetFilter("Service Item Group Code", '''''');
-                FilterGroup := 0;
+                Rec.Reset();
+                Rec.FilterGroup := 2;
+                Rec.SetFilter("Service Item Group Code", '''''');
+                Rec.FilterGroup := 0;
             end else begin
-                Reset();
-                SetRange("Service Item Group Code", CurrentServiceItemGroupCode);
+                Rec.Reset();
+                Rec.SetRange("Service Item Group Code", CurrentServiceItemGroupCode);
             end;
         end;
     end;

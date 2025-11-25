@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5056 "Contact Alt. Address Card"
 {
     Caption = 'Contact Alt. Address Card';
@@ -12,7 +14,7 @@ page 5056 "Contact Alt. Address Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the alternate address.';
@@ -22,7 +24,7 @@ page 5056 "Contact Alt. Address Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the company for the alternate address.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the alternate address of the contact.';
@@ -32,12 +34,12 @@ page 5056 "Contact Alt. Address Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies additional address information.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the contact''s alternate address.';
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'State / ZIP Code';
@@ -83,7 +85,7 @@ page 5056 "Contact Alt. Address Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the telex number for the alternate address.';
                 }
-                field(Pager; Pager)
+                field(Pager; Rec.Pager)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the pager number for the contact at the alternate address.';
@@ -134,8 +136,8 @@ page 5056 "Contact Alt. Address Card"
                     Caption = 'Date Ranges';
                     Image = DateRange;
                     RunObject = Page "Alt. Addr. Date Ranges";
-                    RunPageLink = "Contact No." = FIELD("Contact No."),
-                                  "Contact Alt. Address Code" = FIELD(Code);
+                    RunPageLink = "Contact No." = field("Contact No."),
+                                  "Contact Alt. Address Code" = field(Code);
                     ToolTip = 'Specify date ranges that apply to the contact''s alternate address.';
                 }
             }
@@ -149,8 +151,8 @@ page 5056 "Contact Alt. Address Card"
     var
         Cont: Record Contact;
     begin
-        if Cont.Get("Contact No.") then
-            exit("Contact No." + ' ' + Cont.Name + ' ' + Code + ' ' + "Company Name");
+        if Cont.Get(Rec."Contact No.") then
+            exit(Rec."Contact No." + ' ' + Cont.Name + ' ' + Rec.Code + ' ' + Rec."Company Name");
 
         exit(Text000);
     end;

@@ -1,3 +1,10 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using System.Telemetry;
+
 report 1496 "Suggest Bank Acc. Recon. Lines"
 {
     Caption = 'Suggest Bank Acc. Recon. Lines';
@@ -7,7 +14,7 @@ report 1496 "Suggest Bank Acc. Recon. Lines"
     {
         dataitem("Bank Account"; "Bank Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
 
             trigger OnAfterGetRecord()
             var

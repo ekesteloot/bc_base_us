@@ -41,7 +41,7 @@ page 550 "VAT Rate Change Setup"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        exit(LookUpGLAccountFilter(Text));
+                        exit(Rec.LookUpGLAccountFilter(Text));
                     end;
                 }
                 field("Update Items"; Rec."Update Items")
@@ -56,7 +56,7 @@ page 550 "VAT Rate Change Setup"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        exit(LookUpItemFilter(Text));
+                        exit(Rec.LookUpItemFilter(Text));
                     end;
                 }
                 field("Update Resources"; Rec."Update Resources")
@@ -71,7 +71,7 @@ page 550 "VAT Rate Change Setup"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        exit(LookUpResourceFilter(Text));
+                        exit(Rec.LookUpResourceFilter(Text));
                     end;
                 }
                 field("Update Item Templates"; Rec."Update Item Templates")
@@ -291,10 +291,10 @@ page 550 "VAT Rate Change Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

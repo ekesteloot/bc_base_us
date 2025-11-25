@@ -1,3 +1,9 @@
+﻿namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+
 page 449 "Finance Charge Memo Statistics"
 {
     Caption = 'Finance Charge Memo Statistics';
@@ -36,7 +42,7 @@ page 449 "Finance Charge Memo Statistics"
                 field(FinChrgMemoTotal; FinChrgMemoTotal)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total amount that has been calculated on the finance charge memo.';
@@ -87,24 +93,24 @@ page 449 "Finance Charge Memo Statistics"
         VATPostingSetup: Record "VAT Posting Setup";
         VATInterest: Decimal;
     begin
-        CalcFields("Interest Amount", "VAT Amount");
-        FinChrgMemoTotal := "Additional Fee" + "Interest Amount" + "VAT Amount";
-        InvoiceRoundingAmount := GetInvoiceRoundingAmount();
-        if "Customer No." <> '' then begin
-            CustPostingGr.Get("Customer Posting Group");
+        Rec.CalcFields("Interest Amount", "VAT Amount");
+        FinChrgMemoTotal := Rec."Additional Fee" + Rec."Interest Amount" + Rec."VAT Amount";
+        InvoiceRoundingAmount := Rec.GetInvoiceRoundingAmount();
+        if Rec."Customer No." <> '' then begin
+            CustPostingGr.Get(Rec."Customer Posting Group");
             GLAcc.Get(CustPostingGr.GetInterestAccount());
-            VATPostingSetup.Get("VAT Bus. Posting Group", GLAcc."VAT Prod. Posting Group");
+            VATPostingSetup.Get(Rec."VAT Bus. Posting Group", GLAcc."VAT Prod. Posting Group");
             OnAfterGetVATPostingSetup(VATPostingSetup);
             VATInterest := VATPostingSetup."VAT %";
             GLAcc.Get(CustPostingGr.GetAdditionalFeeAccount());
-            VATPostingSetup.Get("VAT Bus. Posting Group", GLAcc."VAT Prod. Posting Group");
+            VATPostingSetup.Get(Rec."VAT Bus. Posting Group", GLAcc."VAT Prod. Posting Group");
             OnAfterGetVATPostingSetup(VATPostingSetup);
-            Interest := (FinChrgMemoTotal - "Additional Fee" * (VATPostingSetup."VAT %" / 100 + 1)) /
+            Interest := (FinChrgMemoTotal - Rec."Additional Fee" * (VATPostingSetup."VAT %" / 100 + 1)) /
               (VATInterest / 100 + 1);
             VatAmount := Interest * VATInterest / 100 +
-              "Additional Fee" * VATPostingSetup."VAT %" / 100;
+              Rec."Additional Fee" * VATPostingSetup."VAT %" / 100;
         end;
-        if Cust.Get("Customer No.") then
+        if Cust.Get(Rec."Customer No.") then
             Cust.CalcFields("Balance (LCY)")
         else
             Clear(Cust);

@@ -1,3 +1,11 @@
+namespace Microsoft.BankMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.DataAdministration;
+using System.Utilities;
+
 report 1498 "Date Compress Bank Acc. Ledger"
 {
     ApplicationArea = Suite;
@@ -14,7 +22,7 @@ report 1498 "Date Compress Bank Acc. Ledger"
     {
         dataitem("Bank Account Ledger Entry"; "Bank Account Ledger Entry")
         {
-            DataItemTableView = SORTING("Bank Account No.", "Posting Date") WHERE(Open = CONST(false));
+            DataItemTableView = sorting("Bank Account No.", "Posting Date") where(Open = const(false));
             RequestFilterFields = "Bank Account No.", "Bank Acc. Posting Group", "Currency Code";
 
             trigger OnAfterGetRecord()
@@ -279,7 +287,6 @@ report 1498 "Date Compress Bank Acc. Ledger"
         DimEntryNo: Integer;
         RetainDimText: Text[250];
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
 
         CompressEntriesQst: Label 'This batch job deletes entries. We recommend that you create a backup of the database before you run the batch job.\\Do you want to continue?';
@@ -478,30 +485,6 @@ report 1498 "Date Compress Bank Acc. Ledger"
         DataArchiveProviderExists := DataArchive.DataArchiveProviderExists();
         UseDataArchive := DataArchiveProviderExists;
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by InitializeRequest with DateComprRetainFields parameter', '20.0')]
-    procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; Description: Text[100]; RetainDocumentNo: Boolean; RetainOurContactCode: Boolean; RetainDimensionText: Text[250])
-    begin
-        InitializeRequest(StartingDate, EndingDate, PeriodLength, Description, RetainDocumentNo, RetainOurContactCode, RetainDimensionText, true);
-    end;
-#endif
-
-#if not CLEAN20
-    [Obsolete('Replaced by InitializeRequest with DateComprRetainFields parameter', '20.0')]
-    procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; Description: Text[100]; RetainDocumentNo: Boolean; RetainOurContactCode: Boolean; RetainDimensionText: Text[250]; DoUseDataArchive: Boolean)
-    begin
-        InitializeParameter();
-        EntrdDateComprReg."Starting Date" := StartingDate;
-        EntrdDateComprReg."Ending Date" := EndingDate;
-        EntrdDateComprReg."Period Length" := PeriodLength;
-        EntrdBankAccLedgEntry.Description := Description;
-        DateComprRetainFields."Retain Document No." := RetainDocumentNo;
-        DateComprRetainFields."Retain Contact Code" := RetainOurContactCode;
-        RetainDimText := RetainDimensionText;
-        UseDataArchive := DoUseDataArchive and DataArchiveProviderExists;
-    end;
-#endif
 
     procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; Description: Text[100]; NewDateComprRetainFields: Record "Date Compr. Retain Fields"; RetainDimensionText: Text[250]; DoUseDataArchive: Boolean)
     begin

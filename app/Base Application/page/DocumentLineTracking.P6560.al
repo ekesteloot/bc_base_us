@@ -195,7 +195,6 @@ page 6560 "Document Line Tracking"
         DocLineUnit: Text[10];
         DocLineQuantity: Decimal;
         DocExists: Boolean;
-        [InDataSet]
         ShowEnable: Boolean;
         UseBlanketOrderNo: Boolean;
         UseOrderNo: Boolean;

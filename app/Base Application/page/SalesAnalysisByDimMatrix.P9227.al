@@ -1,3 +1,9 @@
+﻿namespace Microsoft.Sales.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Analysis;
+
 page 9227 "Sales Analysis by Dim Matrix"
 {
     Caption = 'Sales Analysis by Dim Matrix';
@@ -12,10 +18,10 @@ page 9227 "Sales Analysis by Dim Matrix"
         {
             repeater(Control1)
             {
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Dimensions;
                     StyleExpr = 'Strong';
@@ -27,7 +33,7 @@ page 9227 "Sales Analysis by Dim Matrix"
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the name of the record.';
                 }
-                field(TotalQuantity; +Quantity)
+                field(TotalQuantity; Rec.Quantity)
                 {
                     ApplicationArea = All;
                     AutoFormatExpression = FormatStr();
@@ -49,7 +55,7 @@ page 9227 "Sales Analysis by Dim Matrix"
                           false, "Item Analysis Value Type"::Quantity, ShowActualBudget);
                     end;
                 }
-                field(TotalInvtValue; +Amount)
+                field(TotalInvtValue; Rec.Amount)
                 {
                     ApplicationArea = All;
                     AutoFormatExpression = FormatStr();
@@ -754,73 +760,39 @@ page 9227 "Sales Analysis by Dim Matrix"
         NoOfRecords: Integer;
         MatrixData: array[32] of Decimal;
         ShowColumnName: Boolean;
-        [InDataSet]
         TotalQuantityVisible: Boolean;
-        [InDataSet]
         TotalInvtValueVisible: Boolean;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
         Emphasize: Boolean;
 
@@ -899,7 +871,7 @@ page 9227 "Sales Analysis by Dim Matrix"
         AmtFromBuffer: Boolean;
     begin
         if SetColFilter then
-            if TempDimensionCodeAmountBuffer.Get(Code, DimCodeBufferColumn1.Code) then begin
+            if TempDimensionCodeAmountBuffer.Get(Rec.Code, DimCodeBufferColumn1.Code) then begin
                 Amt := TempDimensionCodeAmountBuffer.Amount;
                 AmtFromBuffer := true;
             end;
@@ -915,7 +887,7 @@ page 9227 "Sales Analysis by Dim Matrix"
                 ShowActualBudget);
 
             if SetColFilter then begin
-                TempDimensionCodeAmountBuffer."Line Code" := Code;
+                TempDimensionCodeAmountBuffer."Line Code" := Rec.Code;
                 TempDimensionCodeAmountBuffer."Column Code" := DimCodeBufferColumn1.Code;
                 TempDimensionCodeAmountBuffer.Amount := Amt;
                 TempDimensionCodeAmountBuffer.Insert();
@@ -957,7 +929,7 @@ page 9227 "Sales Analysis by Dim Matrix"
 
     local procedure FormatLine()
     begin
-        Emphasize := "Show in Bold";
+        Emphasize := Rec."Show in Bold";
     end;
 
     procedure GetMatrixDimension(): Integer

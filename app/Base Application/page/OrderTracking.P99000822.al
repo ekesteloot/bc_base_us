@@ -102,7 +102,7 @@ page 99000822 "Order Tracking"
                         LookupLine();
                     end;
                 }
-                field(Warning; Warning)
+                field(Warning; Rec.Warning)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies there is a date conflict in the order tracking entries for this line.';
@@ -248,13 +248,9 @@ page 99000822 "Order Tracking"
         DerivedTrackingQty: Decimal;
         IsPlanning: Boolean;
         Text001: Label 'Information about untracked quantity is only available for calculated planning lines.';
-        [InDataSet]
         DemandedByVisible: Boolean;
-        [InDataSet]
         SuppliedByVisible: Boolean;
-        [InDataSet]
         UntrackedButtonEnable: Boolean;
-        [InDataSet]
         SuppliedByIndent: Integer;
 
     procedure SetSalesLine(var CurrentSalesLine: Record "Sales Line")
@@ -401,19 +397,19 @@ page 99000822 "Order Tracking"
     var
         ReservationMgt: Codeunit "Reservation Management";
     begin
-        ReservationMgt.LookupLine("For Type", "For Subtype", "For ID", "For Batch Name", "For Prod. Order Line", "For Ref. No.");
+        ReservationMgt.LookupLine(Rec."For Type", Rec."For Subtype", Rec."For ID", Rec."For Batch Name", Rec."For Prod. Order Line", Rec."For Ref. No.");
     end;
 
     local procedure LookupName()
     var
         ReservationMgt: Codeunit "Reservation Management";
     begin
-        ReservationMgt.LookupDocument("From Type", "From Subtype", "From ID", "From Batch Name", "From Prod. Order Line", "From Ref. No.");
+        ReservationMgt.LookupDocument(Rec."From Type", Rec."From Subtype", Rec."From ID", Rec."From Batch Name", Rec."From Prod. Order Line", Rec."From Ref. No.");
     end;
 
     local procedure SuppliedbyOnFormat()
     begin
-        SuppliedByIndent := Level - 1;
+        SuppliedByIndent := Rec.Level - 1;
     end;
 }
 

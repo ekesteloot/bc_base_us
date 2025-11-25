@@ -1,3 +1,22 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Counting.Comment;
+using Microsoft.InventoryMgt.Counting.History;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Counting.Recording;
+using Microsoft.InventoryMgt.Counting.Tracking;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Journal;
+
 codeunit 5884 "Phys. Invt. Order-Post"
 {
     Permissions = TableData "Item Entry Relation" = ri,
@@ -154,7 +173,6 @@ codeunit 5884 "Phys. Invt. Order-Post"
             if PhysInvtOrderLine.FindSet() then
                 repeat
                     PostPhysInventoryOrderLine();
-                    OnCodeOnAferPostPhysInventoryOrderLineNonNegative(PhysInvtOrderHeader, PhysInvtOrderLine, ItemJnlPostLine);
                 until PhysInvtOrderLine.Next() = 0;
 
             // Insert posted expected phys. invt. tracking Lines
@@ -201,12 +219,11 @@ codeunit 5884 "Phys. Invt. Order-Post"
                 GenJnlPostPreview.ThrowError();
             FinalizePost("No.");
         end;
-
-        OnAfterCode(PhysInvtOrderHeader, PstdPhysInvtOrderHdr);
     end;
 
     local procedure CheckOrderLine(PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var Item: Record Item)
     var
+        ItemVariant: Record "Item Variant";
         IsHandled: Boolean;
     begin
         PhysInvtOrderLine.CheckLine();
@@ -215,6 +232,15 @@ codeunit 5884 "Phys. Invt. Order-Post"
         OnCheckOrderLineOnBeforeTestFieldItemBlocked(Item, IsHandled);
         if not IsHandled then
             Item.TestField(Blocked, false);
+
+        if PhysInvtOrderLine."Variant Code" <> '' then begin
+            ItemVariant.Get(PhysInvtOrderLine."Item No.", PhysInvtOrderLine."Variant Code");
+
+            IsHandled := false;
+            OnCheckOrderLineOnBeforeTestFieldItemVariantBlocked(ItemVariant, IsHandled);
+            if not IsHandled then
+                ItemVariant.TestField(Blocked, false);
+        end;
 
         IsHandled := false;
         OnCheckOrderLineOnBeforeGetSamePhysInvtOrderLine(PhysInvtOrderHeader, PhysInvtOrderLine, PhysInvtOrderLine2, ErrorText, IsHandled);
@@ -274,9 +300,9 @@ codeunit 5884 "Phys. Invt. Order-Post"
         ItemJnlLine."Document Date" := PstdPhysInvtOrderHdr."Posting Date";
         ItemJnlLine."Document No." := PstdPhysInvtOrderHdr."No.";
         if Positive then
-            ItemJnlLine."Entry Type" := "Item Ledger Entry Type"::"Positive Adjmt."
+            ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Positive Adjmt."
         else
-            ItemJnlLine."Entry Type" := "Item Ledger Entry Type"::"Negative Adjmt.";
+            ItemJnlLine."Entry Type" := ItemJnlLine."Entry Type"::"Negative Adjmt.";
         ItemJnlLine."Item No." := PhysInvtOrderLine."Item No.";
         ItemJnlLine."Variant Code" := PhysInvtOrderLine."Variant Code";
         ItemJnlLine.Description := PhysInvtOrderLine.Description;
@@ -711,12 +737,7 @@ codeunit 5884 "Phys. Invt. Order-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnAferPostPhysInventoryOrderLineNonNegative(var PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; var PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line");
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCode(var PhysInvtOrderHeader: Record "Phys. Invt. Order Header"; var PstdPhysInvtOrderHdr: Record "Pstd. Phys. Invt. Order Hdr");
+    local procedure OnCheckOrderLineOnBeforeTestFieldItemVariantBlocked(ItemVariant: Record "Item Variant"; var IsHandled: Boolean)
     begin
     end;
 }

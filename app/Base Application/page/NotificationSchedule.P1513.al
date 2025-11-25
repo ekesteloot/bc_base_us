@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 page 1513 "Notification Schedule"
 {
     Caption = 'Notification Schedule';
@@ -14,29 +16,29 @@ page 1513 "Notification Schedule"
             group("Recurrence Pattern")
             {
                 Caption = 'Recurrence Pattern';
-                field(Recurrence; Recurrence)
+                field(Recurrence; Rec.Recurrence)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the recurrence pattern in which the user receives notifications. The value in this field is displayed in the Schedule field in the Notification Setup window.';
 
                     trigger OnValidate()
                     begin
-                        if Recurrence = Recurrence::Daily then
-                            Validate("Daily Frequency", "Daily Frequency");
+                        if Rec.Recurrence = Rec.Recurrence::Daily then
+                            Rec.Validate("Daily Frequency", Rec."Daily Frequency");
                     end;
                 }
-                field(Time; Time)
+                field(Time; Rec.Time)
                 {
                     ApplicationArea = Suite;
-                    Enabled = Recurrence <> Recurrence::Instantly;
+                    Enabled = Rec.Recurrence <> Rec.Recurrence::Instantly;
                     ToolTip = 'Specifies what time of the day the user receives notifications when the value in the Recurrence field is different from Instantly..';
                 }
             }
             group(Daily)
             {
                 Caption = 'Daily';
-                Visible = Recurrence = Recurrence::Daily;
-                field(Frequency; "Daily Frequency")
+                Visible = Rec.Recurrence = Rec.Recurrence::Daily;
+                field(Frequency; Rec."Daily Frequency")
                 {
                     ApplicationArea = Suite;
                     Caption = 'Frequency';
@@ -47,38 +49,38 @@ page 1513 "Notification Schedule"
             {
                 Caption = 'Weekly';
                 Enabled = true;
-                Visible = Recurrence = Recurrence::Weekly;
-                field(Monday; Monday)
+                Visible = Rec.Recurrence = Rec.Recurrence::Weekly;
+                field(Monday; Rec.Monday)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the user receives notifications on Mondays.';
                 }
-                field(Tuesday; Tuesday)
+                field(Tuesday; Rec.Tuesday)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the user receives notifications on Tuesdays.';
                 }
-                field(Wednesday; Wednesday)
+                field(Wednesday; Rec.Wednesday)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the user receives notifications on Wednesdays.';
                 }
-                field(Thursday; Thursday)
+                field(Thursday; Rec.Thursday)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the user receives notifications on Thursdays.';
                 }
-                field(Friday; Friday)
+                field(Friday; Rec.Friday)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the user receives notifications on Fridays.';
                 }
-                field(Saturday; Saturday)
+                field(Saturday; Rec.Saturday)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the user receives notifications on Saturdays.';
                 }
-                field(Sunday; Sunday)
+                field(Sunday; Rec.Sunday)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the user receives notifications on Sundays.';
@@ -87,7 +89,7 @@ page 1513 "Notification Schedule"
             group(Monthly)
             {
                 Caption = 'Monthly';
-                Visible = Recurrence = Recurrence::Monthly;
+                Visible = Rec.Recurrence = Rec.Recurrence::Monthly;
                 field("Monthly Notification Date"; Rec."Monthly Notification Date")
                 {
                     ApplicationArea = Suite;
@@ -97,7 +99,7 @@ page 1513 "Notification Schedule"
                 field("Date of Month"; Rec."Date of Month")
                 {
                     ApplicationArea = Suite;
-                    Editable = "Monthly Notification Date" = "Monthly Notification Date"::Custom;
+                    Editable = Rec."Monthly Notification Date" = Rec."Monthly Notification Date"::Custom;
                     MaxValue = 31;
                     MinValue = 1;
                     ToolTip = 'Specifies that the user receives notifications on the first, last, or a specific date of the month. Select Custom to specify a specific day in the Monthly Notification Date field.';
@@ -112,9 +114,9 @@ page 1513 "Notification Schedule"
 
     trigger OnOpenPage()
     begin
-        if HasFilter() then
-            if not FindFirst() then
-                CreateNewRecord(GetRangeMin("User ID"), GetRangeMin("Notification Type"));
+        if Rec.HasFilter() then
+            if not Rec.FindFirst() then
+                Rec.CreateNewRecord(Rec.GetRangeMin("User ID"), Rec.GetRangeMin("Notification Type"));
     end;
 }
 

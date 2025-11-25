@@ -4,9 +4,9 @@ codeunit 8624 "Setup Company Name"
 
     trigger OnRun()
     begin
-        Validate(Name, CompanyName);
-        Validate("Ship-to Name", CompanyName);
-        Modify();
+        Rec.Validate(Name, CompanyName);
+        Rec.Validate("Ship-to Name", CompanyName);
+        Rec.Modify();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Config. Table Processing Rule", 'OnDoesTableHaveCustomRuleInRapidStart', '', false, false)]

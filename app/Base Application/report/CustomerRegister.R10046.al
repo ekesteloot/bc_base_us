@@ -1,7 +1,17 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Reflection;
+
 report 10046 "Customer Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/CustomerRegister.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerRegister.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Customer Register';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +21,7 @@ report 10046 "Customer Register"
     {
         dataitem("G/L Register"; "G/L Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Creation Date", "Source Code", "Journal Batch Name";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -94,7 +104,7 @@ report 10046 "Customer Register"
             }
             dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 RequestFilterFields = "Customer No.", "Document Type";
                 column(Cust__Ledger_Entry__Customer_No__; "Customer No.")
                 {

@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.RoleCenters;
+
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Reports;
+
 page 9066 "Serv Outbound Technician Act."
 {
     Caption = 'Activities';

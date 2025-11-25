@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Setup;
+
 table 99000761 Stop
 {
     Caption = 'Stop';

@@ -66,7 +66,7 @@ codeunit 3994 "Reten. Pol. Doc. Arch. Fltrng." Implements "Reten. Pol. Filtering
 
             // if max records exceeded, exit loop
             RecordRef.MarkedOnly(true);
-            TotalRecords := Count(RecordRef);
+            TotalRecords := count(RecordRef);
             if TotalRecords >= MaxNumberOfRecordsToDelete() then begin
                 RetenPolFilteringParam."Expired Record Expiration Date" := CurrDate;
                 exit(true);

@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using System.Upgrade;
+
 codeunit 8821 "AAD Application Setup"
 {
     trigger OnRun()
@@ -40,6 +44,7 @@ codeunit 8821 "AAD Application Setup"
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
+#if not CLEAN23
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCreateDefaultAADApplicationTag()) then begin
             if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetDefaultAADApplicationDescriptionTag()) then
                 exit;
@@ -50,6 +55,12 @@ codeunit 8821 "AAD Application Setup"
             UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCreateDefaultAADApplicationTag());
             UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetDefaultAADApplicationDescriptionTag());
         end;
+#else
+        if not UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCreateDefaultAADApplicationTag()) then begin
+            CreateDynamics365BusinessCentralforVirtualEntitiesAAdApplication();
+            UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCreateDefaultAADApplicationTag());
+        end;
+#endif
     end;
 
     [Scope('OnPrem')]

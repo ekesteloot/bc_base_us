@@ -1,4 +1,28 @@
-﻿table 270 "Bank Account"
+﻿namespace Microsoft.BankMgt.BankAccount;
+
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.BankMgt.Setup;
+using Microsoft.BankMgt.Statement;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.NoSeries;
+using System;
+using System.Email;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+
+table 270 "Bank Account"
 {
     Caption = 'Bank Account';
     DataCaptionFields = "No.", Name;
@@ -51,11 +75,9 @@
         field(7; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -108,24 +130,24 @@
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(17; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(18; "Chain Name"; Code[10])
@@ -134,7 +156,7 @@
         }
         field(20; "Min. Balance"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Min. Balance';
         }
@@ -178,6 +200,11 @@
             Caption = 'Language Code';
             TableRelation = Language;
         }
+        field(25; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(26; "Statistics Group"; Integer)
         {
             Caption = 'Statistics Group';
@@ -199,14 +226,14 @@
         }
         field(37; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
         }
         field(38; Comment; Boolean)
         {
-            CalcFormula = Exist("Comment Line" WHERE("Table Name" = CONST("Bank Account"),
-                                                      "No." = FIELD("No.")));
+            CalcFormula = exist("Comment Line" where("Table Name" = const("Bank Account"),
+                                                      "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -226,7 +253,7 @@
             trigger OnValidate()
             begin
                 if IncStr("Last Payment Statement No.") = '' then
-                    Error(StrSubstNo(UnincrementableStringErr, FieldCaption("Last Payment Statement No.")));
+                    Error(UnincrementableStringErr, FieldCaption("Last Payment Statement No."));
             end;
         }
         field(43; "Pmt. Rec. No. Series"; Code[20])
@@ -261,23 +288,23 @@
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(57; "Global Dimension 2 Filter"; Code[20])
         {
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(58; Balance; Decimal)
         {
             AccessByPermission = TableData "Bank Account Ledger Entry" = R;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Bank Account Ledger Entry".Amount WHERE("Bank Account No." = FIELD("No."),
-                                                                        "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                        "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+            CalcFormula = sum("Bank Account Ledger Entry".Amount where("Bank Account No." = field("No."),
+                                                                        "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                        "Global Dimension 2 Code" = field("Global Dimension 2 Filter")));
             Caption = 'Balance';
             Editable = false;
             FieldClass = FlowField;
@@ -286,21 +313,21 @@
         {
             AccessByPermission = TableData "Bank Account Ledger Entry" = R;
             AutoFormatType = 1;
-            CalcFormula = Sum("Bank Account Ledger Entry"."Amount (LCY)" WHERE("Bank Account No." = FIELD("No."),
-                                                                                "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+            CalcFormula = sum("Bank Account Ledger Entry"."Amount (LCY)" where("Bank Account No." = field("No."),
+                                                                                "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Global Dimension 2 Code" = field("Global Dimension 2 Filter")));
             Caption = 'Balance (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(60; "Net Change"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Bank Account Ledger Entry".Amount WHERE("Bank Account No." = FIELD("No."),
-                                                                        "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                        "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                        "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Bank Account Ledger Entry".Amount where("Bank Account No." = field("No."),
+                                                                        "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                        "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                        "Posting Date" = field("Date Filter")));
             Caption = 'Net Change';
             Editable = false;
             FieldClass = FlowField;
@@ -308,21 +335,21 @@
         field(61; "Net Change (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Bank Account Ledger Entry"."Amount (LCY)" WHERE("Bank Account No." = FIELD("No."),
-                                                                                "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Bank Account Ledger Entry"."Amount (LCY)" where("Bank Account No." = field("No."),
+                                                                                "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Posting Date" = field("Date Filter")));
             Caption = 'Net Change (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(62; "Total on Checks"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Check Ledger Entry".Amount WHERE("Bank Account No." = FIELD("No."),
-                                                                 "Entry Status" = FILTER(Posted),
-                                                                 "Statement Status" = FILTER(<> Closed)));
+            CalcFormula = sum("Check Ledger Entry".Amount where("Bank Account No." = field("No."),
+                                                                 "Entry Status" = filter(Posted),
+                                                                 "Statement Status" = filter(<> Closed)));
             Caption = 'Total on Checks';
             Editable = false;
             FieldClass = FlowField;
@@ -355,11 +382,9 @@
         field(91; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -389,18 +414,18 @@
         }
         field(94; "Balance Last Statement"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Balance Last Statement';
         }
         field(95; "Balance at Date"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Bank Account Ledger Entry".Amount WHERE("Bank Account No." = FIELD("No."),
-                                                                        "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                        "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                        "Posting Date" = FIELD(UPPERLIMIT("Date Filter"))));
+            CalcFormula = sum("Bank Account Ledger Entry".Amount where("Bank Account No." = field("No."),
+                                                                        "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                        "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                        "Posting Date" = field(UPPERLIMIT("Date Filter"))));
             Caption = 'Balance at Date';
             Editable = false;
             FieldClass = FlowField;
@@ -408,36 +433,36 @@
         field(96; "Balance at Date (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Bank Account Ledger Entry"."Amount (LCY)" WHERE("Bank Account No." = FIELD("No."),
-                                                                                "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Posting Date" = FIELD(UPPERLIMIT("Date Filter"))));
+            CalcFormula = sum("Bank Account Ledger Entry"."Amount (LCY)" where("Bank Account No." = field("No."),
+                                                                                "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Posting Date" = field(UPPERLIMIT("Date Filter"))));
             Caption = 'Balance at Date (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(97; "Debit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Bank Account Ledger Entry"."Debit Amount" WHERE("Bank Account No." = FIELD("No."),
-                                                                                "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Bank Account Ledger Entry"."Debit Amount" where("Bank Account No." = field("No."),
+                                                                                "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Posting Date" = field("Date Filter")));
             Caption = 'Debit Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(98; "Credit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Bank Account Ledger Entry"."Credit Amount" WHERE("Bank Account No." = FIELD("No."),
-                                                                                 "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Bank Account Ledger Entry"."Credit Amount" where("Bank Account No." = field("No."),
+                                                                                 "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                 "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                 "Posting Date" = field("Date Filter")));
             Caption = 'Credit Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -446,10 +471,10 @@
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Bank Account Ledger Entry"."Debit Amount (LCY)" WHERE("Bank Account No." = FIELD("No."),
-                                                                                      "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                      "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                      "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Bank Account Ledger Entry"."Debit Amount (LCY)" where("Bank Account No." = field("No."),
+                                                                                      "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                      "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                      "Posting Date" = field("Date Filter")));
             Caption = 'Debit Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -458,10 +483,10 @@
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Bank Account Ledger Entry"."Credit Amount (LCY)" WHERE("Bank Account No." = FIELD("No."),
-                                                                                       "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                       "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                       "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Bank Account Ledger Entry"."Credit Amount (LCY)" where("Bank Account No." = field("No."),
+                                                                                       "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                       "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                       "Posting Date" = field("Date Filter")));
             Caption = 'Credit Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -501,12 +526,12 @@
         field(108; "Check Report ID"; Integer)
         {
             Caption = 'Check Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(109; "Check Report Name"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Name" WHERE("Object Type" = CONST(Report),
-                                                                        "Object ID" = FIELD("Check Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Name" where("Object Type" = const(Report),
+                                                                        "Object ID" = field("Check Report ID")));
             Caption = 'Check Report Name';
             Editable = false;
             FieldClass = FlowField;
@@ -537,7 +562,7 @@
         field(113; "Bank Statement Import Format"; Code[20])
         {
             Caption = 'Bank Statement Import Format';
-            TableRelation = "Bank Export/Import Setup".Code WHERE(Direction = CONST(Import));
+            TableRelation = "Bank Export/Import Setup".Code where(Direction = const(Import));
         }
         field(115; "Credit Transfer Msg. Nos."; Code[20])
         {
@@ -552,7 +577,7 @@
         field(117; "SEPA Direct Debit Exp. Format"; Code[20])
         {
             Caption = 'SEPA Direct Debit Exp. Format';
-            TableRelation = "Bank Export/Import Setup".Code WHERE(Direction = CONST(Export));
+            TableRelation = "Bank Export/Import Setup".Code where(Direction = const(Export));
         }
         field(121; "Bank Stmt. Service Record ID"; RecordID)
         {
@@ -656,7 +681,7 @@
         field(1260; "Positive Pay Export Code"; Code[20])
         {
             Caption = 'Positive Pay Export Code';
-            TableRelation = "Bank Export/Import Setup".Code WHERE(Direction = CONST("Export-Positive Pay"));
+            TableRelation = "Bank Export/Import Setup".Code where(Direction = const("Export-Positive Pay"));
         }
         field(5061; "Mobile Phone No."; Text[30])
         {
@@ -756,7 +781,7 @@
         field(10020; "EFT Export Code"; Code[20])
         {
             Caption = 'EFT IAT Export Format';
-            TableRelation = "Bank Export/Import Setup".Code WHERE(Direction = CONST("Export-EFT"));
+            TableRelation = "Bank Export/Import Setup".Code where(Direction = const("Export-EFT"));
         }
         field(27000; "Bank Code"; Code[3])
         {
@@ -1413,6 +1438,7 @@
           ("Territory Code" <> xRec."Territory Code") or
           ("Currency Code" <> xRec."Currency Code") or
           ("Language Code" <> xRec."Language Code") or
+          ("Format Region" <> xRec."Format Region") or
           ("Our Contact Code" <> xRec."Our Contact Code") or
           ("Country/Region Code" <> xRec."Country/Region Code") or
           ("Fax No." <> xRec."Fax No.") or

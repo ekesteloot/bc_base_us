@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 8626 "Config. Package Records"
 {
     Caption = 'Config. Package Records';
@@ -13,7 +17,7 @@ page 8626 "Config. Package Records"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Invalid; Invalid)
+                field(Invalid; Rec.Invalid)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -1156,10 +1160,10 @@ page 8626 "Config. Package Records"
                     var
                         ConfigPackageError: Record "Config. Package Error";
                     begin
-                        if Invalid then begin
-                            ConfigPackageError.SetRange("Package Code", "Package Code");
-                            ConfigPackageError.SetRange("Table ID", "Table ID");
-                            ConfigPackageError.SetRange("Record No.", "No.");
+                        if Rec.Invalid then begin
+                            ConfigPackageError.SetRange("Package Code", Rec."Package Code");
+                            ConfigPackageError.SetRange("Table ID", Rec."Table ID");
+                            ConfigPackageError.SetRange("Record No.", Rec."No.");
                             PAGE.RunModal(PAGE::"Config. Package Errors", ConfigPackageError);
                         end else
                             Message(Text002);
@@ -1176,9 +1180,9 @@ page 8626 "Config. Package Records"
                     var
                         ConfigPackageTable: Record "Config. Package Table";
                     begin
-                        ConfigPackageTable.Get("Package Code", "Table ID");
-                        ConfigPackageTable.SetRange("Package Code", "Package Code");
-                        ConfigPackageTable.SetRange("Table ID", "Table ID");
+                        ConfigPackageTable.Get(Rec."Package Code", Rec."Table ID");
+                        ConfigPackageTable.SetRange("Package Code", Rec."Package Code");
+                        ConfigPackageTable.SetRange("Table ID", Rec."Table ID");
 
                         if ConfigPackageTable."Processing Report ID" > 0 then
                             REPORT.RunModal(ConfigPackageTable."Processing Report ID", false, false, ConfigPackageTable)
@@ -1236,7 +1240,7 @@ page 8626 "Config. Package Records"
         if FindPackageFields(ConfigPackageField) then
             repeat
                 MatrixColumnOrdinal := MatrixColumnOrdinal + 1;
-                if ConfigPackageData.Get("Package Code", "Table ID", "No.", ConfigPackageField."Field ID") then begin
+                if ConfigPackageData.Get(Rec."Package Code", Rec."Table ID", Rec."No.", ConfigPackageField."Field ID") then begin
                     MatrixCellData[MatrixColumnOrdinal] := ConfigPackageData.Value;
                     PackageColumnField[MatrixColumnOrdinal] := ConfigPackageData."Field ID";
                     MatrixDimension[MatrixColumnOrdinal] := ConfigPackageField.Dimension;
@@ -1275,205 +1279,105 @@ page 8626 "Config. Package Records"
         Text001: Label '%1 value ''%2'' does not exist.';
         Text002: Label 'There are no data migration errors in this record.';
         ErrorFieldNo: Integer;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
-        [InDataSet]
         Field33Visible: Boolean;
-        [InDataSet]
         Field34Visible: Boolean;
-        [InDataSet]
         Field35Visible: Boolean;
-        [InDataSet]
         Field36Visible: Boolean;
-        [InDataSet]
         Field37Visible: Boolean;
-        [InDataSet]
         Field38Visible: Boolean;
-        [InDataSet]
         Field39Visible: Boolean;
-        [InDataSet]
         Field40Visible: Boolean;
-        [InDataSet]
         Field41Visible: Boolean;
-        [InDataSet]
         Field42Visible: Boolean;
-        [InDataSet]
         Field43Visible: Boolean;
-        [InDataSet]
         Field44Visible: Boolean;
-        [InDataSet]
         Field45Visible: Boolean;
-        [InDataSet]
         Field46Visible: Boolean;
-        [InDataSet]
         Field47Visible: Boolean;
-        [InDataSet]
         Field48Visible: Boolean;
-        [InDataSet]
         Field49Visible: Boolean;
-        [InDataSet]
         Field50Visible: Boolean;
-        [InDataSet]
         Field51Visible: Boolean;
-        [InDataSet]
         Field52Visible: Boolean;
-        [InDataSet]
         Field53Visible: Boolean;
-        [InDataSet]
         Field54Visible: Boolean;
-        [InDataSet]
         Field55Visible: Boolean;
-        [InDataSet]
         Field56Visible: Boolean;
-        [InDataSet]
         Field57Visible: Boolean;
-        [InDataSet]
         Field58Visible: Boolean;
-        [InDataSet]
         Field59Visible: Boolean;
-        [InDataSet]
         Field60Visible: Boolean;
-        [InDataSet]
         Field61Visible: Boolean;
-        [InDataSet]
         Field62Visible: Boolean;
-        [InDataSet]
         Field63Visible: Boolean;
-        [InDataSet]
         Field64Visible: Boolean;
-        [InDataSet]
         Field65Visible: Boolean;
-        [InDataSet]
         Field66Visible: Boolean;
-        [InDataSet]
         Field67Visible: Boolean;
-        [InDataSet]
         Field68Visible: Boolean;
-        [InDataSet]
         Field69Visible: Boolean;
-        [InDataSet]
         Field70Visible: Boolean;
-        [InDataSet]
         Field71Visible: Boolean;
-        [InDataSet]
         Field72Visible: Boolean;
-        [InDataSet]
         Field73Visible: Boolean;
-        [InDataSet]
         Field74Visible: Boolean;
-        [InDataSet]
         Field75Visible: Boolean;
-        [InDataSet]
         Field76Visible: Boolean;
-        [InDataSet]
         Field77Visible: Boolean;
-        [InDataSet]
         Field78Visible: Boolean;
-        [InDataSet]
         Field79Visible: Boolean;
-        [InDataSet]
         Field80Visible: Boolean;
-        [InDataSet]
         Field81Visible: Boolean;
-        [InDataSet]
         Field82Visible: Boolean;
-        [InDataSet]
         Field83Visible: Boolean;
-        [InDataSet]
         Field84Visible: Boolean;
-        [InDataSet]
         Field85Visible: Boolean;
-        [InDataSet]
         Field86Visible: Boolean;
-        [InDataSet]
         Field87Visible: Boolean;
-        [InDataSet]
         Field88Visible: Boolean;
-        [InDataSet]
         Field89Visible: Boolean;
-        [InDataSet]
         Field90Visible: Boolean;
-        [InDataSet]
         Field91Visible: Boolean;
-        [InDataSet]
         Field92Visible: Boolean;
-        [InDataSet]
         Field93Visible: Boolean;
-        [InDataSet]
         Field94Visible: Boolean;
-        [InDataSet]
         Field95Visible: Boolean;
-        [InDataSet]
         Field96Visible: Boolean;
-        [InDataSet]
         Field97Visible: Boolean;
-        [InDataSet]
         Field98Visible: Boolean;
-        [InDataSet]
         Field99Visible: Boolean;
-        [InDataSet]
         Field100Visible: Boolean;
         ShowDim: Boolean;
 
@@ -1635,16 +1539,16 @@ page 8626 "Config. Package Records"
             if MatrixCellData[ColumnID] <> '' then
                 if not DimValue.Get(MatrixColumnCaptions[ColumnID], MatrixCellData[ColumnID]) then
                     Error(Text001, Dimension.TableCaption(), MatrixCellData[ColumnID]);
-            ConfigPackageData.Get("Package Code", "Table ID", "No.", PackageColumnField[ColumnID]);
+            ConfigPackageData.Get(Rec."Package Code", Rec."Table ID", Rec."No.", PackageColumnField[ColumnID]);
             ConfigPackageData.Validate(Value, MatrixCellData[ColumnID]);
             ConfigPackageData.Modify();
         end else begin
-            RecRef.Open("Table ID", true);
+            RecRef.Open(Rec."Table ID", true);
             FieldRef := RecRef.Field(PackageColumnField[ColumnID]);
-            ConfigPackageField.Get("Package Code", "Table ID", PackageColumnField[ColumnID]);
+            ConfigPackageField.Get(Rec."Package Code", Rec."Table ID", PackageColumnField[ColumnID]);
             ConfigPackageField.TestField(Dimension, false);
 
-            ConfigPackageData.Get("Package Code", "Table ID", "No.", PackageColumnField[ColumnID]);
+            ConfigPackageData.Get(Rec."Package Code", Rec."Table ID", Rec."No.", PackageColumnField[ColumnID]);
             ConfigPackageMgt.CleanFieldError(ConfigPackageData);
             ErrorText := ConfigValidateMgt.EvaluateValue(FieldRef, MatrixCellData[ColumnID], false);
             if ErrorText <> '' then

@@ -1,7 +1,9 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5189 "Create Rating"
 {
     Caption = 'Create Rating';
-    DataCaptionExpression = "Profile Questionnaire Code" + ' ' + Description;
+    DataCaptionExpression = Rec."Profile Questionnaire Code" + ' ' + Rec.Description;
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
@@ -17,7 +19,7 @@ page 5189 "Create Rating"
                 Caption = 'Step 3';
                 InstructionalText = 'Please specify the range of points required to get the different answer options.';
                 Visible = Step3Visible;
-                field(GetProfileLineAnswerDesc; GetProfileLineAnswerDesc())
+                field(GetProfileLineAnswerDesc; Rec.GetProfileLineAnswerDesc())
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Please select one of the options below to specify the points your contact must earn in order to receive this rating.';
@@ -34,7 +36,7 @@ page 5189 "Create Rating"
 
                         trigger OnValidate()
                         begin
-                            if "Interval Option" = "Interval Option"::Interval then
+                            if Rec."Interval Option" = Rec."Interval Option"::Interval then
                                 IntervalIntervalOptionOnValida();
                         end;
                     }
@@ -65,11 +67,11 @@ page 5189 "Create Rating"
 
                         trigger OnValidate()
                         begin
-                            if "Interval Option" = "Interval Option"::Minimum then
+                            if Rec."Interval Option" = Rec."Interval Option"::Minimum then
                                 MinimumIntervalOptionOnValidat();
                         end;
                     }
-                    field(Minimum; "Wizard From Value")
+                    field(Minimum; Rec."Wizard From Value")
                     {
                         ApplicationArea = RelationshipMgmt;
                         BlankZero = true;
@@ -88,11 +90,11 @@ page 5189 "Create Rating"
 
                         trigger OnValidate()
                         begin
-                            if "Interval Option" = "Interval Option"::Maximum then
+                            if Rec."Interval Option" = Rec."Interval Option"::Maximum then
                                 MaximumIntervalOptionOnValidat();
                         end;
                     }
-                    field(Maximum; "Wizard To Value")
+                    field(Maximum; Rec."Wizard To Value")
                     {
                         ApplicationArea = RelationshipMgmt;
                         BlankZero = true;
@@ -150,15 +152,15 @@ page 5189 "Create Rating"
 
                     trigger OnValidate()
                     begin
-                        if "Answer Option" = "Answer Option"::Custom then
+                        if Rec."Answer Option" = Rec."Answer Option"::Custom then
                             CustomAnswerOptionOnValidate();
-                        if "Answer Option" = "Answer Option"::ABC then
+                        if Rec."Answer Option" = Rec."Answer Option"::ABC then
                             ABCAnswerOptionOnValidate();
-                        if "Answer Option" = "Answer Option"::HighLow then
+                        if Rec."Answer Option" = Rec."Answer Option"::HighLow then
                             HighLowAnswerOptionOnValidate();
                     end;
                 }
-                field(NoOfAnswers; NoOfProfileAnswers())
+                field(NoOfAnswers; Rec.NoOfProfileAnswers())
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Number of possible answers:';
@@ -166,7 +168,7 @@ page 5189 "Create Rating"
 
                     trigger OnDrillDown()
                     begin
-                        ShowAnswers();
+                        Rec.ShowAnswers();
                         CurrPage.Update();
                     end;
                 }
@@ -189,7 +191,7 @@ page 5189 "Create Rating"
                 trigger OnAction()
                 begin
                     ShowStep(false);
-                    PerformPrevWizardStatus();
+                    Rec.PerformPrevWizardStatus();
                     ShowStep(true);
                     UpdateCntrls();
                     CurrPage.Update(true);
@@ -205,9 +207,9 @@ page 5189 "Create Rating"
 
                 trigger OnAction()
                 begin
-                    CheckStatus();
+                    Rec.CheckStatus();
                     ShowStep(false);
-                    PerformNextWizardStatus();
+                    Rec.PerformNextWizardStatus();
                     ShowStep(true);
                     UpdateCntrls();
                     CurrPage.Update(true);
@@ -223,8 +225,8 @@ page 5189 "Create Rating"
 
                 trigger OnAction()
                 begin
-                    CheckStatus();
-                    FinishWizard();
+                    Rec.CheckStatus();
+                    Rec.FinishWizard();
                     CurrPage.Close();
                 end;
             }
@@ -248,12 +250,12 @@ page 5189 "Create Rating"
         FrmXPos := Round((FrmWidth - FormWidth) / 2, 1) + FrmXPos;
         FrmWidth := FormWidth;
 
-        Validate("Auto Contact Classification", true);
-        Validate("Contact Class. Field", "Contact Class. Field"::Rating);
-        Modify();
+        Rec.Validate("Auto Contact Classification", true);
+        Rec.Validate("Contact Class. Field", Rec."Contact Class. Field"::Rating);
+        Rec.Modify();
 
-        ValidateAnswerOption();
-        ValidateIntervalOption();
+        Rec.ValidateAnswerOption();
+        Rec.ValidateIntervalOption();
 
         ShowStep(true);
 
@@ -267,50 +269,37 @@ page 5189 "Create Rating"
         CancelWidth: Integer;
         FrmXPos: Integer;
         FrmWidth: Integer;
-        [InDataSet]
         Step1Visible: Boolean;
-        [InDataSet]
         Step2Visible: Boolean;
-        [InDataSet]
         Step3Visible: Boolean;
-        [InDataSet]
         Step4Visible: Boolean;
-        [InDataSet]
         SubFormVisible: Boolean;
-        [InDataSet]
         NextEnable: Boolean;
-        [InDataSet]
         BackEnable: Boolean;
-        [InDataSet]
         FinishEnable: Boolean;
-        [InDataSet]
         NoOfAnswersEnable: Boolean;
-        [InDataSet]
         WizardFromValueEnable: Boolean;
-        [InDataSet]
         WizardToValueEnable: Boolean;
-        [InDataSet]
         MinimumEnable: Boolean;
-        [InDataSet]
         MaximumEnable: Boolean;
 
     local procedure ShowStep(Visible: Boolean)
     begin
-        case "Wizard Step" of
-            "Wizard Step"::"1":
+        case Rec."Wizard Step" of
+            Rec."Wizard Step"::"1":
                 begin
                     NextEnable := true;
                     BackEnable := false;
                     Step1Visible := Visible;
                     if Visible then;
                 end;
-            "Wizard Step"::"2":
+            Rec."Wizard Step"::"2":
                 begin
                     Step2Visible := Visible;
                     BackEnable := true;
                     NextEnable := true;
                 end;
-            "Wizard Step"::"3":
+            Rec."Wizard Step"::"3":
                 begin
                     Step3Visible := Visible;
                     if Visible then begin
@@ -319,10 +308,10 @@ page 5189 "Create Rating"
                         FinishEnable := false;
                     end;
                 end;
-            "Wizard Step"::"4":
+            Rec."Wizard Step"::"4":
                 begin
                     if Visible then begin
-                        GetAnswers(TempProfileLineAnswer);
+                        Rec.GetAnswers(TempProfileLineAnswer);
                         CurrPage.SubForm.PAGE.SetRecords(Rec, TempProfileLineAnswer);
                     end;
                     FinishEnable := true;
@@ -335,47 +324,47 @@ page 5189 "Create Rating"
 
     local procedure UpdateCntrls()
     begin
-        NoOfAnswersEnable := "Answer Option" = "Answer Option"::Custom;
-        WizardFromValueEnable := "Interval Option" = "Interval Option"::Interval;
-        WizardToValueEnable := "Interval Option" = "Interval Option"::Interval;
-        MinimumEnable := "Interval Option" = "Interval Option"::Minimum;
-        MaximumEnable := "Interval Option" = "Interval Option"::Maximum;
+        NoOfAnswersEnable := Rec."Answer Option" = Rec."Answer Option"::Custom;
+        WizardFromValueEnable := Rec."Interval Option" = Rec."Interval Option"::Interval;
+        WizardToValueEnable := Rec."Interval Option" = Rec."Interval Option"::Interval;
+        MinimumEnable := Rec."Interval Option" = Rec."Interval Option"::Minimum;
+        MaximumEnable := Rec."Interval Option" = Rec."Interval Option"::Maximum;
     end;
 
     local procedure IntervalIntervalOptionOnValida()
     begin
-        ValidateIntervalOption();
+        Rec.ValidateIntervalOption();
         UpdateCntrls();
     end;
 
     local procedure MinimumIntervalOptionOnValidat()
     begin
-        ValidateIntervalOption();
+        Rec.ValidateIntervalOption();
         UpdateCntrls();
     end;
 
     local procedure MaximumIntervalOptionOnValidat()
     begin
-        ValidateIntervalOption();
+        Rec.ValidateIntervalOption();
         UpdateCntrls();
     end;
 
     local procedure HighLowAnswerOptionOnValidate()
     begin
-        ValidateAnswerOption();
+        Rec.ValidateAnswerOption();
         UpdateCntrls();
     end;
 
     local procedure ABCAnswerOptionOnValidate()
     begin
-        ValidateAnswerOption();
+        Rec.ValidateAnswerOption();
         UpdateCntrls();
     end;
 
     local procedure CustomAnswerOptionOnValidate()
     begin
-        ValidateAnswerOption();
-        ShowAnswers();
+        Rec.ValidateAnswerOption();
+        Rec.ShowAnswers();
         UpdateCntrls();
     end;
 }

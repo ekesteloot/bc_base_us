@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Apps;
+
 /// <summary>
 /// This table contains published applications.
 /// </summary>
@@ -108,7 +114,7 @@ table 2000000160 "NAV App"
         }
         field(24; Installed; Boolean)
         {
-            CalcFormula = Exist ("NAV App Installed App" WHERE("Package ID" = FIELD("Package ID")));
+            CalcFormula = Exist("NAV App Installed App" WHERE("Package ID" = FIELD("Package ID")));
             Caption = 'Installed';
             FieldClass = FlowField;
         }
@@ -138,13 +144,13 @@ table 2000000160 "NAV App"
         }
         field(31; "Tenant Visible"; Boolean)
         {
-            CalcFormula = Lookup ("NAV App Extra"."Tenant Visible" WHERE("Package ID" = FIELD("Package ID")));
+            CalcFormula = Lookup("NAV App Extra"."Tenant Visible" WHERE("Package ID" = FIELD("Package ID")));
             Caption = 'Tenant Visible';
             FieldClass = FlowField;
         }
         field(32; "PerTenant Or Installed"; Boolean)
         {
-            CalcFormula = Lookup ("NAV App Extra"."PerTenant Or Installed" WHERE("Package ID" = FIELD("Package ID")));
+            CalcFormula = Lookup("NAV App Extra"."PerTenant Or Installed" WHERE("Package ID" = FIELD("Package ID")));
             Caption = 'PerTenant Or Installed';
             FieldClass = FlowField;
         }

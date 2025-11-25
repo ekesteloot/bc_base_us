@@ -1,4 +1,4 @@
-page 10900 "IRS 1099 Form-Box Entity"
+﻿page 10900 "IRS 1099 Form-Box Entity"
 {
     Caption = 'irs1099Codes', Locked = true;
     DelayedInsert = true;
@@ -14,42 +14,42 @@ page 10900 "IRS 1099 Form-Box Entity"
         {
             repeater(Group)
             {
-                field(id; SystemId)
+                field(id; Rec.SystemId)
                 {
                     ApplicationArea = All;
                     Caption = 'Id', Locked = true;
                 }
-                field("code"; Code)
+                field("code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Caption = 'Code', Locked = true;
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Code));
+                        RegisterFieldSet(Rec.FieldNo(Code));
                     end;
                 }
-                field(displayName; Description)
+                field(displayName; Rec.Description)
                 {
                     ApplicationArea = All;
                     Caption = 'Description', Locked = true;
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo(Description));
+                        RegisterFieldSet(Rec.FieldNo(Description));
                     end;
                 }
-                field(minimumReportable; "Minimum Reportable")
+                field(minimumReportable; Rec."Minimum Reportable")
                 {
                     ApplicationArea = All;
                     Caption = 'MinimumReportable', Locked = true;
 
                     trigger OnValidate()
                     begin
-                        RegisterFieldSet(FieldNo("Minimum Reportable"));
+                        RegisterFieldSet(Rec.FieldNo("Minimum Reportable"));
                     end;
                 }
-                field(lastModifiedDateTime; "Last Modified Date Time")
+                field(lastModifiedDateTime; Rec."Last Modified Date Time")
                 {
                     ApplicationArea = All;
                     Caption = 'LastModifiedDateTime', Locked = true;
@@ -67,7 +67,7 @@ page 10900 "IRS 1099 Form-Box Entity"
         GraphMgtGeneralTools: Codeunit "Graph Mgt - General Tools";
         RecRef: RecordRef;
     begin
-        Insert(true);
+        Rec.Insert(true);
 
         RecRef.GetTable(Rec);
         GraphMgtGeneralTools.ProcessNewRecordFromAPI(RecRef, TempFieldSet, CurrentDateTime);
@@ -80,14 +80,14 @@ page 10900 "IRS 1099 Form-Box Entity"
     var
         IRS1099FormBox: Record "IRS 1099 Form-Box";
     begin
-        IRS1099FormBox.GetBySystemId(SystemId);
+        IRS1099FormBox.GetBySystemId(Rec.SystemId);
 
-        if Code = IRS1099FormBox.Code then
-            Modify(true)
+        if Rec.Code = IRS1099FormBox.Code then
+            Rec.Modify(true)
         else begin
             IRS1099FormBox.TransferFields(Rec, false);
-            IRS1099FormBox.Rename(Code);
-            TransferFields(IRS1099FormBox);
+            IRS1099FormBox.Rename(Rec.Code);
+            Rec.TransferFields(IRS1099FormBox);
         end;
     end;
 

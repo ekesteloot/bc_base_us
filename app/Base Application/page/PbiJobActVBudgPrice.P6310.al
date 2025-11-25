@@ -24,7 +24,7 @@ page 6310 "PBI Job Act. v. Budg. Price"
                     Caption = 'Measure Name';
                     ToolTip = 'Specifies the name.';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     Caption = 'Value';

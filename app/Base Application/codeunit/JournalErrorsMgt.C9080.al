@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FixedAssets.Journal;
+using Microsoft.Intercompany.Journal;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using System.Utilities;
+
 codeunit 9080 "Journal Errors Mgt."
 {
     SingleInstance = true;
@@ -21,27 +28,6 @@ codeunit 9080 "Journal Errors Mgt."
     begin
         exit(NothingToPostErr);
     end;
-
-#if not CLEAN20
-    [Obsolete('FeatureKey JournalErrorBackgroundCheck removed', '19.0')]
-    procedure IsEnabled() Result: Boolean
-    begin
-        Result := true;
-
-        OnAfterIsEnabled(Result);
-    end;
-
-    [Obsolete('FeatureKey JournalErrorBackgroundCheck removed', '19.0')]
-    procedure GetFeatureKey(): Text[50]
-    begin
-        exit('JournalErrorBackgroundCheck');
-    end;
-
-    [Obsolete('FeatureKey JournalErrorBackgroundCheck removed', '19.0')]
-    procedure TestIsEnabled()
-    begin
-    end;
-#endif
 
     procedure SetErrorMessages(var SourceTempErrorMessage: Record "Error Message" temporary)
     begin
@@ -137,13 +123,6 @@ codeunit 9080 "Journal Errors Mgt."
         end;
     end;
 
-#if not CLEAN20
-    [Obsolete('FeatureKey JournalErrorBackgroundCheck removed', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterIsEnabled(var Result: Boolean)
-    begin
-    end;
-#endif
     [EventSubscriber(ObjectType::Page, Page::"General Journal", 'OnDeleteRecordEvent', '', false, false)]
     local procedure OnDeleteRecordEventGeneralJournal(var Rec: Record "Gen. Journal Line"; var AllowDelete: Boolean)
     begin

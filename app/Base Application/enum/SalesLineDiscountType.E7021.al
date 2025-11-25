@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Pricing;
+
 enum 7021 "Sales Line Discount Type"
 {
     Extensible = true;

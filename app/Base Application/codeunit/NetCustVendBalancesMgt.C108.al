@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
 codeunit 108 "Net Cust/Vend Balances Mgt."
 {
     var
@@ -390,7 +398,7 @@ codeunit 108 "Net Cust/Vend Balances Mgt."
         GenJnlLine."Document Type" := "Gen. Journal Document Type"::" ";
         GenJnlLine."Posting No. Series" := GenJnlBatch."Posting No. Series";
         GenJnlLine."Document No." := NetBalancesParameters."Document No.";
-        GenJnlLine."Gen. Posting Type" := "General Posting Type"::" ";
+        GenJnlLine."Gen. Posting Type" := GenJnlLine."Gen. Posting Type"::" ";
         GenJnlLine."Gen. Bus. Posting Group" := '';
         GenJnlLine."Gen. Prod. Posting Group" := '';
         GenJnlLine."VAT Bus. Posting Group" := '';

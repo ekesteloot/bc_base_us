@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.WarehouseMgt.Journal;
+
 report 7380 "Calculate Phys. Invt. Counting"
 {
     Caption = 'Calculate Phys. Invt. Counting';
@@ -134,13 +140,9 @@ report 7380 "Calculate Phys. Invt. Counting"
         ShowQtyCalculated: Boolean;
         ZeroQty: Boolean;
         OKPressed: Boolean;
-        [InDataSet]
         ShowQtyCalcEnable: Boolean;
-        [InDataSet]
         PrintPerItemEnable: Boolean;
-        [InDataSet]
         SortMethodVisible: Boolean;
-        [InDataSet]
         PrintPerItemVisible: Boolean;
 
     procedure GetRequest(var PostingDate2: Date; var NextDocNo2: Code[20]; var SortingMethod2: Option " ",Item,Bin; var PrintDoc2: Boolean; var PrintDocPerItem2: Boolean; var ZeroQty2: Boolean; var ShowQtyCalculated2: Boolean): Boolean

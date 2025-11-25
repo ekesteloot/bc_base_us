@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 page 9197 "Profile Designer Diagnostics"
 {
     PageType = ListPart;
@@ -19,7 +21,7 @@ page 9197 "Profile Designer Diagnostics"
                     Editable = false;
                     ToolTip = 'Specifies an ID that is used to identify the profile (role). There can be more than one profile with the same ID if they come from different extensions.';
                 }
-                field(Message; Message)
+                field(Message; Rec.Message)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -29,10 +31,10 @@ page 9197 "Profile Designer Diagnostics"
                     var
                         ProfileDesignerDiagnosticForProfile: Record "Profile Designer Diagnostic";
                     begin
-                        ProfileDesignerDiagnosticForProfile.SetRange("Import ID", "Import ID");
-                        ProfileDesignerDiagnosticForProfile.SetRange("Profile App ID", "Profile App ID");
-                        ProfileDesignerDiagnosticForProfile.SetRange("Profile ID", "Profile ID");
-                        ProfileDesignerDiagnosticForProfile.SetFilter(Severity, '<>%1', Severity::Hidden);
+                        ProfileDesignerDiagnosticForProfile.SetRange("Import ID", Rec."Import ID");
+                        ProfileDesignerDiagnosticForProfile.SetRange("Profile App ID", Rec."Profile App ID");
+                        ProfileDesignerDiagnosticForProfile.SetRange("Profile ID", Rec."Profile ID");
+                        ProfileDesignerDiagnosticForProfile.SetFilter(Severity, '<>%1', Enum::Severity::Hidden);
                         if not ProfileDesignerDiagnosticForProfile.IsEmpty() then
                             Page.Run(Page::"Profile Import Result List", ProfileDesignerDiagnosticForProfile);
                     end;
@@ -51,7 +53,7 @@ page 9197 "Profile Designer Diagnostics"
 
     trigger OnAfterGetRecord()
     begin
-        ApplicationName := ExtensionManagement.GetAppName("Profile App ID");
+        ApplicationName := ExtensionManagement.GetAppName(Rec."Profile App ID");
     end;
 
     procedure SetRecords(ImportID: Guid)
@@ -64,8 +66,8 @@ page 9197 "Profile Designer Diagnostics"
         NumWarnings: Integer;
         NumInformation: Integer;
     begin
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         ProfileDesignerDiagnostic.SetRange("Import ID", ImportID);
         ProfileDesignerDiagnosticCounter.SetRange("Import ID", ImportID);
         PreviousProfileId := '';
@@ -77,16 +79,16 @@ page 9197 "Profile Designer Diagnostics"
                     PreviousProfileId := ProfileDesignerDiagnostic."Profile ID";
                     ProfileDesignerDiagnosticCounter.SetRange("Profile App ID", ProfileDesignerDiagnostic."Profile App ID");
                     ProfileDesignerDiagnosticCounter.SetRange("Profile ID", ProfileDesignerDiagnostic."Profile ID");
-                    ProfileDesignerDiagnosticCounter.SetRange(Severity, Severity::Error);
+                    ProfileDesignerDiagnosticCounter.SetRange(Severity, Enum::Severity::Error);
                     NumErrors := ProfileDesignerDiagnosticCounter.Count();
-                    ProfileDesignerDiagnosticCounter.SetRange(Severity, Severity::Warning);
+                    ProfileDesignerDiagnosticCounter.SetRange(Severity, Enum::Severity::Warning);
                     NumWarnings := ProfileDesignerDiagnosticCounter.Count();
-                    ProfileDesignerDiagnosticCounter.SetRange(Severity, Severity::Information);
+                    ProfileDesignerDiagnosticCounter.SetRange(Severity, Enum::Severity::Information);
                     NumInformation := ProfileDesignerDiagnosticCounter.Count();
 
                     Rec := ProfileDesignerDiagnostic;
-                    Message := CreateImportDiagnosticsMessage(NumErrors, NumWarnings, NumInformation);
-                    Insert();
+                    Rec.Message := CreateImportDiagnosticsMessage(NumErrors, NumWarnings, NumInformation);
+                    Rec.Insert();
                 end;
             until ProfileDesignerDiagnostic.Next() = 0;
     end;

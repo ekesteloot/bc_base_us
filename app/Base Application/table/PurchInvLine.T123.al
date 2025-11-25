@@ -1,3 +1,36 @@
+﻿namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.Foundation.Enums;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.WarehouseMgt.Structure;
+using System.Reflection;
+using System.Security.User;
+
 table 123 "Purch. Inv. Line"
 {
     Caption = 'Purch. Inv. Line';
@@ -30,28 +63,28 @@ table 123 "Purch. Inv. Line"
         field(6; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF (Type = CONST("Charge (Item)")) "Item Charge"
+            TableRelation = if (Type = const("G/L Account")) "G/L Account"
+            else
+            if (Type = const(Item)) Item
+            else
+            if (Type = const("Fixed Asset")) "Fixed Asset"
+            else
+            if (Type = const("Charge (Item)")) "Item Charge"
             else
             if (Type = const(Resource)) Resource;
         }
         field(7; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(8; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
             Editable = false;
-            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group"
-            ELSE
-            IF (Type = CONST("Fixed Asset")) "FA Posting Group";
+            TableRelation = if (Type = const(Item)) "Inventory Posting Group"
+            else
+            if (Type = const("Fixed Asset")) "FA Posting Group";
         }
         field(10; "Expected Receipt Date"; Date)
         {
@@ -156,13 +189,13 @@ table 123 "Purch. Inv. Line"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(41; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(45; "Job No."; Code[20])
         {
@@ -236,7 +269,7 @@ table 123 "Purch. Inv. Line"
         field(80; "Attached to Line No."; Integer)
         {
             Caption = 'Attached to Line No.';
-            TableRelation = "Purch. Inv. Line"."Line No." WHERE("Document No." = FIELD("Document No."));
+            TableRelation = "Purch. Inv. Line"."Line No." where("Document No." = field("Document No."));
         }
         field(81; "Entry Point"; Code[10])
         {
@@ -284,17 +317,13 @@ table 123 "Purch. Inv. Line"
         field(97; "Blanket Order No."; Code[20])
         {
             Caption = 'Blanket Order No.';
-            TableRelation = "Purchase Header"."No." WHERE("Document Type" = CONST("Blanket Order"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Purchase Header"."No." where("Document Type" = const("Blanket Order"));
         }
         field(98; "Blanket Order Line No."; Integer)
         {
             Caption = 'Blanket Order Line No.';
-            TableRelation = "Purchase Line"."Line No." WHERE("Document Type" = CONST("Blanket Order"),
-                                                              "Document No." = FIELD("Blanket Order No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Purchase Line"."Line No." where("Document Type" = const("Blanket Order"),
+                                                              "Document No." = field("Blanket Order No."));
         }
         field(99; "VAT Base Amount"; Decimal)
         {
@@ -374,13 +403,13 @@ table 123 "Purch. Inv. Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(1001; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(1002; "Job Line Type"; Enum "Job Line Type")
         {
@@ -454,25 +483,28 @@ table 123 "Purch. Inv. Line"
             Caption = 'Deferral Code';
             TableRelation = "Deferral Template"."Deferral Code";
         }
+        field(2678; "Allocation Account No."; Code[20])
+        {
+            Caption = 'Allocation Account No.';
+            DataClassification = CustomerContent;
+        }
         field(5401; "Prod. Order No."; Code[20])
         {
             Caption = 'Prod. Order No.';
-            TableRelation = "Production Order"."No." WHERE(Status = FILTER(Released | Finished));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Production Order"."No." where(Status = filter(Released | Finished));
             ValidateTableRelation = false;
         }
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                            "Item Filter" = FIELD("No."),
-                                            "Variant Filter" = FIELD("Variant Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"),
+                                            "Item Filter" = field("No."),
+                                            "Variant Filter" = field("Variant Code"));
         }
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
@@ -483,8 +515,8 @@ table 123 "Purch. Inv. Line"
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
             "Unit of Measure";
         }
         field(5415; "Quantity (Base)"; Decimal)
@@ -557,7 +589,7 @@ table 123 "Purch. Inv. Line"
         field(5706; "Unit of Measure (Cross Ref.)"; Code[10])
         {
             Caption = 'Unit of Measure (Cross Ref.)';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."));
             ObsoleteReason = 'Cross-Reference replaced by Item Reference feature.';
             ObsoleteState = Removed;
             ObsoleteTag = '22.0';
@@ -581,7 +613,7 @@ table 123 "Purch. Inv. Line"
         field(5709; "Item Category Code"; Code[20])
         {
             Caption = 'Item Category Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Category";
+            TableRelation = if (Type = const(Item)) "Item Category";
         }
         field(5710; Nonstock; Boolean)
         {
@@ -607,7 +639,7 @@ table 123 "Purch. Inv. Line"
         field(5726; "Item Reference Unit of Measure"; Code[10])
         {
             Caption = 'Unit of Measure (Item Ref.)';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."));
         }
         field(5727; "Item Reference Type"; Enum "Item Reference Type")
         {
@@ -619,7 +651,7 @@ table 123 "Purch. Inv. Line"
         }
         field(6200; "Non-Deductible VAT %"; Decimal)
         {
-            Caption = 'Non-Deductible VAT %"';
+            Caption = 'Non-Deductible VAT %';
             DecimalPlaces = 0 : 5;
         }
         field(6201; "Non-Deductible VAT Base"; Decimal)
@@ -647,7 +679,7 @@ table 123 "Purch. Inv. Line"
         field(10017; "Provincial Tax Area Code"; Code[20])
         {
             Caption = 'Provincial Tax Area Code';
-            TableRelation = "Tax Area" WHERE("Country/Region" = CONST(CA));
+            TableRelation = "Tax Area" where("Country/Region" = const(CA));
         }
         field(10022; "IRS 1099 Liable"; Boolean)
         {
@@ -661,9 +693,9 @@ table 123 "Purch. Inv. Line"
         field(99000751; "Operation No."; Code[10])
         {
             Caption = 'Operation No.';
-            TableRelation = "Prod. Order Routing Line"."Operation No." WHERE(Status = FILTER(Released ..),
-                                                                              "Prod. Order No." = FIELD("Prod. Order No."),
-                                                                              "Routing No." = FIELD("Routing No."));
+            TableRelation = "Prod. Order Routing Line"."Operation No." where(Status = filter(Released ..),
+                                                                              "Prod. Order No." = field("Prod. Order No."),
+                                                                              "Routing No." = field("Routing No."));
         }
         field(99000752; "Work Center No."; Code[20])
         {
@@ -673,8 +705,8 @@ table 123 "Purch. Inv. Line"
         field(99000754; "Prod. Order Line No."; Integer)
         {
             Caption = 'Prod. Order Line No.';
-            TableRelation = "Prod. Order Line"."Line No." WHERE(Status = FILTER(Released ..),
-                                                                 "Prod. Order No." = FIELD("Prod. Order No."));
+            TableRelation = "Prod. Order Line"."Line No." where(Status = filter(Released ..),
+                                                                 "Prod. Order No." = field("Prod. Order No."));
         }
         field(99000755; "Overhead Rate"; Decimal)
         {
@@ -935,7 +967,7 @@ table 123 "Purch. Inv. Line"
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure InitFromPurchLine(PurchInvHeader: Record "Purch. Inv. Header"; PurchLine: Record "Purchase Line")

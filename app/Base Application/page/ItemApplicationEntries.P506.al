@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
 page 506 "Item Application Entries"
 {
     Caption = 'Item Application Entries';

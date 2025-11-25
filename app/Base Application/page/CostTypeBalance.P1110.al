@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 1110 "Cost Type Balance"
 {
     Caption = 'Cost Type Balance';
@@ -162,8 +167,8 @@ page 1110 "Cost Type Balance"
     trigger OnOpenPage()
     begin
         SetMatrixColumns("Matrix Page Step Type"::Initial);
-        CostCenterFilter := GetFilter("Cost Center Filter");
-        CostObjectFilter := GetFilter("Cost Object Filter");
+        CostCenterFilter := Rec.GetFilter("Cost Center Filter");
+        CostObjectFilter := Rec.GetFilter("Cost Object Filter");
         GenerateColumnCaptions("Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;

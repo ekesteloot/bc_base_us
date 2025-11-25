@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
 enum 1207 "Credit Transfer Account Type"
 {
     Extensible = true;

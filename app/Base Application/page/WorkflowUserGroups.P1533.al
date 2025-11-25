@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1533 "Workflow User Groups"
 {
     ApplicationArea = Suite;
@@ -13,7 +15,7 @@ page 1533 "Workflow User Groups"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the workflow user group.';

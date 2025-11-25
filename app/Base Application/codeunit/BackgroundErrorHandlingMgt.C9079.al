@@ -468,26 +468,6 @@ codeunit 9079 "Background Error Handling Mgt."
                 FeatureTelemetry.LogUptake('0000GNL', TelemetryFeatureNameTxt, "Feature Uptake Status"::"Set up")
     end;
 
-#if not CLEAN20
-    [EventSubscriber(ObjectType::Table, Database::"Feature Key", 'OnAfterValidateEvent', 'Enabled', false, false)]
-    [Obsolete('Temporary subscriber to set GLSetup.Enable Data Check when feature key enabled', '20.0')]
-    local procedure AfterValidateEnabledHandler(var Rec: Record "Feature Key"; var xRec: Record "Feature Key"; CurrFieldNo: Integer)
-    begin
-        if (Rec.ID = GetFeatureKey()) and (Rec.Enabled = Rec.Enabled::"All Users") and (Rec.Enabled <> xRec.Enabled) then
-            SetGLSetupEnableDataCheck();
-    end;
-
-    [Obsolete('Temporary function to set GLSetup.Enable Data Check when feature key enabled', '20.0')]
-    local procedure SetGLSetupEnableDataCheck()
-    var
-        GLSetup: Record "General Ledger Setup";
-    begin
-        GLSetup.Get();
-        GLSetup.Validate("Enable Data Check", true);
-        GLSetup.Modify();
-    end;
-#endif
-
 #if not CLEAN22
     [Obsolete('Feature made enabled by default', '22.0')]
     [IntegrationEvent(false, false)]

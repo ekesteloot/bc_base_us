@@ -1,3 +1,13 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Ledger;
+using System.DataAdministration;
+using System.Utilities;
+
 report 98 "Date Compress General Ledger"
 {
     Caption = 'Date Compress General Ledger';
@@ -13,7 +23,7 @@ report 98 "Date Compress General Ledger"
     {
         dataitem("G/L Entry"; "G/L Entry")
         {
-            DataItemTableView = SORTING("G/L Account No.", "Posting Date");
+            DataItemTableView = sorting("G/L Account No.", "Posting Date");
 
             trigger OnAfterGetRecord()
             begin
@@ -333,7 +343,6 @@ report 98 "Date Compress General Ledger"
         DimEntryNo: Integer;
         RetainDimText: Text[250];
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
         SkipAnalysisViewUpdateCheck: Boolean;
 
@@ -558,33 +567,6 @@ report 98 "Date Compress General Ledger"
 
         RetainDimText := DimSelectionBuf.GetDimSelectionText(3, REPORT::"Date Compress General Ledger", '');
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by InitializeRequest with parameter DateComprRetainFields', '20.0')]
-    procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; Description: Text[100]; RetainDocumentType: Boolean; RetainDocumentNo: Boolean; RetainJobNo: Boolean; RetainBuisnessUnitCode: Boolean; RetainQuantity: Boolean; RetainDimensionText: Text[250])
-    begin
-        InitializeRequest(StartingDate, EndingDate, PeriodLength, Description, RetainDocumentType, RetainDocumentNo, RetainJobNo, RetainBuisnessUnitCode, RetainQuantity, RetainDimensionText, true)
-    end;
-#endif
-
-#if not CLEAN20
-    [Obsolete('Replaced by InitializeRequest with parameter DateComprRetainFields', '20.0')]
-    procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; Description: Text[100]; RetainDocumentType: Boolean; RetainDocumentNo: Boolean; RetainJobNo: Boolean; RetainBuisnessUnitCode: Boolean; RetainQuantity: Boolean; RetainDimensionText: Text[250]; DoUseDataArchive: Boolean)
-    begin
-        InitializeParameter();
-        EntrdDateComprReg."Starting Date" := StartingDate;
-        EntrdDateComprReg."Ending Date" := EndingDate;
-        EntrdDateComprReg."Period Length" := PeriodLength;
-        EntrdGLEntry.Description := Description;
-        DateComprRetainFields."Retain Document Type" := RetainDocumentType;
-        DateComprRetainFields."Retain Document No." := RetainDocumentNo;
-        DateComprRetainFields."Retain Job No." := RetainJobNo;
-        DateComprRetainFields."Retain Business Unit Code" := RetainBuisnessUnitCode;
-        DateComprRetainFields."Retain Quantity" := RetainQuantity;
-        RetainDimText := RetainDimensionText;
-        UseDataArchive := DataArchiveProviderExists and DoUseDataArchive;
-    end;
-#endif
 
     procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; Description: Text[100]; NewDateComprRetainFields: Record "Date Compr. Retain Fields"; RetainDimensionText: Text[250]; DoUseDataArchive: Boolean)
     begin

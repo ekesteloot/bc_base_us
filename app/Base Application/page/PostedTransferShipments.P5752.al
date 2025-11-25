@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Comment;
+
 page 5752 "Posted Transfer Shipments"
 {
     ApplicationArea = Location;
@@ -6,8 +11,8 @@ page 5752 "Posted Transfer Shipments"
     Editable = false;
     PageType = List;
     SourceTable = "Transfer Shipment Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -104,7 +109,7 @@ page 5752 "Posted Transfer Shipments"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Transfer Shipment Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information about the transfer order, such as the quantity and total weight transferred.';
                 }
@@ -114,8 +119,8 @@ page 5752 "Posted Transfer Shipments"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Transfer Shipment"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Transfer Shipment"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -129,7 +134,7 @@ page 5752 "Posted Transfer Shipments"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -160,7 +165,7 @@ page 5752 "Posted Transfer Shipments"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }

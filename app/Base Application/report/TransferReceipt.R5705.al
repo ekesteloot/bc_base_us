@@ -1,14 +1,20 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using System.Utilities;
+
 report 5705 "Transfer Receipt"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/TransferOrder/TransferReceipt.rdlc';
+    RDLCLayout = './InventoryMgt/Transfer/TransferReceipt.rdlc';
     Caption = 'Transfer Receipt';
 
     dataset
     {
         dataitem("Transfer Receipt Header"; "Transfer Receipt Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Transfer-from Code";
             RequestFilterHeading = 'Posted Transfer Receipt';
             column(No_TransRcptHdr; "No.")
@@ -16,10 +22,10 @@ report 5705 "Transfer Receipt"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CopyText; StrSubstNo(Text001, CopyText))
                     {
                     }
@@ -97,7 +103,7 @@ report 5705 "Transfer Receipt"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Transfer Receipt Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -144,9 +150,9 @@ report 5705 "Transfer Receipt"
                     }
                     dataitem("Transfer Receipt Line"; "Transfer Receipt Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Transfer Receipt Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(ShowInternalInfo; ShowInternalInfo)
                         {
                         }
@@ -171,7 +177,7 @@ report 5705 "Transfer Receipt"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText2; DimText)
                             {
                             }

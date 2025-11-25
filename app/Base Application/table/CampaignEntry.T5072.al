@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Campaign;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using System.Security.AccessControl;
+
 table 5072 "Campaign Entry"
 {
     Caption = 'Campaign Entry';
@@ -30,8 +36,6 @@ table 5072 "Campaign Entry"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(6; "Segment No."; Code[20])
         {
@@ -45,9 +49,9 @@ table 5072 "Campaign Entry"
         }
         field(8; "No. of Interactions"; Integer)
         {
-            CalcFormula = Count("Interaction Log Entry" WHERE("Campaign No." = FIELD("Campaign No."),
-                                                               "Campaign Entry No." = FIELD("Entry No."),
-                                                               Canceled = FIELD(Canceled)));
+            CalcFormula = count("Interaction Log Entry" where("Campaign No." = field("Campaign No."),
+                                                               "Campaign Entry No." = field("Entry No."),
+                                                               Canceled = field(Canceled)));
             Caption = 'No. of Interactions';
             Editable = false;
             FieldClass = FlowField;
@@ -55,18 +59,18 @@ table 5072 "Campaign Entry"
         field(10; "Cost (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Interaction Log Entry"."Cost (LCY)" WHERE("Campaign No." = FIELD("Campaign No."),
-                                                                          "Campaign Entry No." = FIELD("Entry No."),
-                                                                          Canceled = FIELD(Canceled)));
+            CalcFormula = sum("Interaction Log Entry"."Cost (LCY)" where("Campaign No." = field("Campaign No."),
+                                                                          "Campaign Entry No." = field("Entry No."),
+                                                                          Canceled = field(Canceled)));
             Caption = 'Cost (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(11; "Duration (Min.)"; Decimal)
         {
-            CalcFormula = Sum("Interaction Log Entry"."Duration (Min.)" WHERE("Campaign No." = FIELD("Campaign No."),
-                                                                               "Campaign Entry No." = FIELD("Entry No."),
-                                                                               Canceled = FIELD(Canceled)));
+            CalcFormula = sum("Interaction Log Entry"."Duration (Min.)" where("Campaign No." = field("Campaign No."),
+                                                                               "Campaign Entry No." = field("Entry No."),
+                                                                               Canceled = field(Canceled)));
             Caption = 'Duration (Min.)';
             DecimalPlaces = 0 : 0;
             Editable = false;

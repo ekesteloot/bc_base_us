@@ -1,3 +1,12 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using System.IO;
+using System.Utilities;
+
 report 10022 "Trial Balance"
 {
     // This report is copied from 10011 GL - Fin Stm. Even though it does not and
@@ -5,7 +14,7 @@ report 10022 "Trial Balance"
     // ease of conversion, the 4 Percent To Total columns are still within the array,
     // even though the user can NEVER select them. These are columns 2, 4, 6 & 8.
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/TrialBalance.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/TrialBalance.rdlc';
     AdditionalSearchTerms = 'year closing,close accounting period,close fiscal year';
     ApplicationArea = Basic, Suite;
     Caption = 'Trial Balance';
@@ -16,7 +25,7 @@ report 10022 "Trial Balance"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Account Type", "Date Filter", "Global Dimension 1 Filter", "Global Dimension 2 Filter", "Budget Filter";
             column(TodayFormatted; Format(Today, 0, 4))
@@ -114,7 +123,7 @@ report 10022 "Trial Balance"
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
 
                 trigger OnPreDataItem()
                 begin
@@ -123,7 +132,7 @@ report 10022 "Trial Balance"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(DescriptionLine1; DescriptionLine1)
                 {
                 }

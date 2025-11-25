@@ -1,4 +1,23 @@
-﻿table 846 "Cash Flow Worksheet Line"
+﻿namespace Microsoft.CashFlow.Worksheet;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CashFlow.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Receivables;
+using Microsoft.ServiceMgt.Document;
+
+table 846 "Cash Flow Worksheet Line"
 {
     Caption = 'Cash Flow Worksheet Line';
 
@@ -104,24 +123,24 @@
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(18; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(30; "Amount (LCY)"; Decimal)
@@ -131,29 +150,29 @@
         field(34; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST("Liquid Funds")) "G/L Account"
-            ELSE
-            IF ("Source Type" = CONST(Receivables)) "Cust. Ledger Entry"."Document No."
-            ELSE
-            IF ("Source Type" = CONST(Payables)) "Vendor Ledger Entry"."Document No."
-            ELSE
-            IF ("Source Type" = CONST("Fixed Assets Budget")) "Fixed Asset"
-            ELSE
-            IF ("Source Type" = CONST("Fixed Assets Disposal")) "Fixed Asset"
-            ELSE
-            IF ("Source Type" = CONST("Sales Orders")) "Sales Header"."No." WHERE("Document Type" = CONST(Order))
-            ELSE
-            IF ("Source Type" = CONST("Purchase Orders")) "Purchase Header"."No." WHERE("Document Type" = CONST(Order))
-            ELSE
-            IF ("Source Type" = CONST("Service Orders")) "Service Header"."No." WHERE("Document Type" = CONST(Order))
-            ELSE
-            IF ("Source Type" = CONST("Cash Flow Manual Expense")) "Cash Flow Manual Expense"
-            ELSE
-            IF ("Source Type" = CONST("Cash Flow Manual Revenue")) "Cash Flow Manual Revenue"
-            ELSE
-            IF ("Source Type" = CONST("G/L Budget")) "G/L Account"
-            ELSE
-            IF ("Source Type" = CONST(Job)) Job."No.";
+            TableRelation = if ("Source Type" = const("Liquid Funds")) "G/L Account"
+            else
+            if ("Source Type" = const(Receivables)) "Cust. Ledger Entry"."Document No."
+            else
+            if ("Source Type" = const(Payables)) "Vendor Ledger Entry"."Document No."
+            else
+            if ("Source Type" = const("Fixed Assets Budget")) "Fixed Asset"
+            else
+            if ("Source Type" = const("Fixed Assets Disposal")) "Fixed Asset"
+            else
+            if ("Source Type" = const("Sales Orders")) "Sales Header"."No." where("Document Type" = const(Order))
+            else
+            if ("Source Type" = const("Purchase Orders")) "Purchase Header"."No." where("Document Type" = const(Order))
+            else
+            if ("Source Type" = const("Service Orders")) "Service Header"."No." where("Document Type" = const(Order))
+            else
+            if ("Source Type" = const("Cash Flow Manual Expense")) "Cash Flow Manual Expense"
+            else
+            if ("Source Type" = const("Cash Flow Manual Revenue")) "Cash Flow Manual Revenue"
+            else
+            if ("Source Type" = const("G/L Budget")) "G/L Account"
+            else
+            if ("Source Type" = const(Job)) Job."No.";
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -204,7 +223,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -233,8 +252,8 @@
     trigger OnInsert()
     begin
         LockTable();
-        ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
-        ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+        Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+        Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
     end;
 
     var
@@ -262,7 +281,7 @@
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure ShowDimensions()

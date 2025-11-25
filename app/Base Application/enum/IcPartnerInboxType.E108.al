@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Partner;
+
 enum 108 "IC Partner Inbox Type"
 {
     Extensible = true;

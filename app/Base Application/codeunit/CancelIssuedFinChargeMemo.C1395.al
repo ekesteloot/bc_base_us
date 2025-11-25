@@ -1,4 +1,16 @@
-﻿codeunit 1395 "Cancel Issued Fin. Charge Memo"
+﻿namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Environment.Configuration;
+using System.Utilities;
+
+codeunit 1395 "Cancel Issued Fin. Charge Memo"
 {
     Permissions = TableData "Cust. Ledger Entry" = rm,
                   TableData "Reminder/Fin. Charge Entry" = rm,
@@ -76,7 +88,7 @@
                             SetFinChargeMemoEntryCancelled(IssuedFinChargeMemoLine);
                             InterestAmount := InterestAmount + IssuedFinChargeMemoLine.Amount;
                             InterestVATAmount := InterestVATAmount + IssuedFinChargeMemoLine."VAT Amount";
-                        end;                
+                        end;
                     IssuedFinChargeMemoLine.Type::"G/L Account":
                         if FinanceChargeTerms."Post Additional Fee" or (IssuedFinChargeMemoLine."Line Type" = IssuedFinChargeMemoLine."Line Type"::Rounding) then
                             InsertGenJnlLineForFee(IssuedFinChargeMemoHeader, IssuedFinChargeMemoLine, DocumentNo, PostingDate);

@@ -23,34 +23,34 @@ page 30075 "APIV2 - Aut. User Group Perm."
         {
             repeater(Group)
             {
-                field(id; SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'Id';
                     Editable = false;
                 }
-                field(userGroupCode; "User Group Code")
+                field(userGroupCode; Rec."User Group Code")
                 {
                     Caption = 'User Group Code';
                 }
-                field(roleId; "Role ID")
+                field(roleId; Rec."Role ID")
                 {
                     Caption = 'Role Id';
                 }
-                field(displayName; "Role Name")
+                field(displayName; Rec."Role Name")
                 {
                     Caption = 'Display Name';
                     Editable = false;
                 }
-                field(appId; "App ID")
+                field(appId; Rec."App ID")
                 {
                     Caption = 'App Id';
                 }
-                field(extensionName; "Extension Name")
+                field(extensionName; Rec."Extension Name")
                 {
                     Caption = 'Extension Name';
                     Editable = false;
                 }
-                field(scope; Scope)
+                field(scope; Rec.Scope)
                 {
                     Caption = 'Scope';
 

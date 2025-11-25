@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 page 515 "Item Avail. by Location Lines"
 {
     Caption = 'Lines';
@@ -310,7 +316,7 @@ page 515 "Item Avail. by Location Lines"
         PeriodStart := 0D;
         PeriodEnd := DMY2Date(31, 12, 1999);
 
-        GetLocationsIncludingUnspecifiedLocation(false, false);
+        Rec.GetLocationsIncludingUnspecifiedLocation(false, false);
     end;
 
     protected var
@@ -351,8 +357,8 @@ page 515 "Item Avail. by Location Lines"
             Item.SetRange("Date Filter", PeriodStart, PeriodEnd)
         else
             Item.SetRange("Date Filter", 0D, PeriodEnd);
-        LocationCode := Code;
-        Item.SetRange("Location Filter", Code);
+        LocationCode := Rec.Code;
+        Item.SetRange("Location Filter", Rec.Code);
 
         OnAfterSetItemFilter(Item, PeriodStart, PeriodEnd);
     end;

@@ -1,3 +1,11 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using System;
+using System.Visualization;
+using System.Xml;
+
 codeunit 783 "Relationship Performance Mgt."
 {
 
@@ -74,7 +82,6 @@ codeunit 783 "Relationship Performance Mgt."
         BusinessChartBuffer.AddColumn(TempOpportunity.Description);
     end;
 
-    [Scope('OnPrem')]
     procedure SendCreateOpportunityNotification(SegmentLine: Record "Segment Line")
     var
         InteractionLogEntry: Record "Interaction Log Entry";

@@ -1,3 +1,27 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Reports;
+using Microsoft.Sales.Setup;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Request;
+using System.Automation;
+using System.Integration.PowerBI;
+using System.Text;
+using System.Threading;
+
 page 9305 "Sales Order List"
 {
     ApplicationArea = Basic, Suite, Assembly;
@@ -9,7 +33,7 @@ page 9305 "Sales Order List"
     QueryCategory = 'Sales Order List';
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = CONST(Order));
+    SourceTableView = where("Document Type" = const(Order));
     UsageCategory = Lists;
 
     AboutTitle = 'About sales orders';
@@ -255,7 +279,7 @@ page 9305 "Sales Order List"
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
-                    StyleExpr = "Job Queue Status" = "Job Queue Status"::ERROR;
+                    StyleExpr = Rec."Job Queue Status" = Rec."Job Queue Status"::ERROR;
                     ToolTip = 'Specifies the status of a job queue entry or task that handles the posting of sales orders.';
                     Visible = JobQueueActive;
 
@@ -263,9 +287,9 @@ page 9305 "Sales Order List"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
                 field("Amt. Ship. Not Inv. (LCY) Base"; Rec."Amt. Ship. Not Inv. (LCY) Base")
@@ -301,7 +325,7 @@ page 9305 "Sales Order List"
                     Visible = false;
                 }
 #if not CLEAN23
-                field("Coupled to CRM"; "Coupled to CRM")
+                field("Coupled to CRM"; Rec."Coupled to CRM")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies that the sales order is coupled to an order in Dynamics 365 Sales.';
@@ -325,9 +349,9 @@ page 9305 "Sales Order List"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Sales Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Sales Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(PowerBIEmbeddedReportPart; "Power BI Embedded Report Part")
             {
@@ -337,14 +361,14 @@ page 9305 "Sales Order List"
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             part(Control1900316107; "Customer Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -393,7 +417,7 @@ page 9305 "Sales Order List"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Statistics)
@@ -407,7 +431,7 @@ page 9305 "Sales Order List"
                     trigger OnAction()
                     begin
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        OpenSalesOrderStatistics();
+                        Rec.OpenSalesOrderStatistics();
                     end;
                 }
                 action(Approvals)
@@ -430,9 +454,9 @@ page 9305 "Sales Order List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(CFDIRelationDocuments)
@@ -441,10 +465,10 @@ page 9305 "Sales Order List"
                     Caption = 'CFDI Relation Documents';
                     Image = Allocations;
                     RunObject = Page "CFDI Relation Documents";
-                    RunPageLink = "Document Table ID" = CONST(36),
-                                  "Document Type" = FIELD("Document Type"),
-                                  "Document No." = FIELD("No."),
-                                  "Customer No." = FIELD("Bill-to Customer No.");
+                    RunPageLink = "Document Table ID" = const(36),
+                                  "Document Type" = field("Document Type"),
+                                  "Document No." = field("No."),
+                                  "Customer No." = field("Bill-to Customer No.");
                     ToolTip = 'View or add CFDI relation documents for the record.';
                 }
             }
@@ -458,8 +482,8 @@ page 9305 "Sales Order List"
                     Caption = 'S&hipments';
                     Image = Shipment;
                     RunObject = Page "Posted Sales Shipments";
-                    RunPageLink = "Order No." = FIELD("No.");
-                    RunPageView = SORTING("Order No.");
+                    RunPageLink = "Order No." = field("No.");
+                    RunPageView = sorting("Order No.");
                     ToolTip = 'View related posted sales shipments.';
                 }
                 action(PostedSalesInvoices)
@@ -467,13 +491,19 @@ page 9305 "Sales Order List"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Invoices';
                     Image = Invoice;
-                    RunObject = Page "Posted Sales Invoices";
-                    RunPageLink = "Order No." = FIELD("No.");
-                    RunPageView = SORTING("Order No.");
                     ToolTip = 'View a list of ongoing sales invoices for the order.';
 
                     AboutTitle = 'What has been invoiced?';
                     AboutText = 'Here you can look up what has already been invoiced on an order.';
+
+                    trigger OnAction()
+                    var
+                        TempSalesInvoiceHeader: Record "Sales Invoice Header" temporary;
+                        SalesGetShipment: Codeunit "Sales-Get Shipment";
+                    begin
+                        SalesGetShipment.GetSalesOrderInvoices(TempSalesInvoiceHeader, Rec."No.");
+                        Page.Run(Page::"Posted Sales Invoices", TempSalesInvoiceHeader);
+                    end;
                 }
                 action(PostedSalesPrepmtInvoices)
                 {
@@ -481,8 +511,8 @@ page 9305 "Sales Order List"
                     Caption = 'Prepa&yment Invoices';
                     Image = PrepaymentInvoice;
                     RunObject = Page "Posted Sales Invoices";
-                    RunPageLink = "Prepayment Order No." = FIELD("No.");
-                    RunPageView = SORTING("Prepayment Order No.");
+                    RunPageLink = "Prepayment Order No." = field("No.");
+                    RunPageView = sorting("Prepayment Order No.");
                     ToolTip = 'View related posted sales invoices that involve a prepayment. ';
                 }
                 action("Prepayment Credi&t Memos")
@@ -491,8 +521,8 @@ page 9305 "Sales Order List"
                     Caption = 'Prepayment Credi&t Memos';
                     Image = PrepaymentCreditMemo;
                     RunObject = Page "Posted Sales Credit Memos";
-                    RunPageLink = "Prepayment Order No." = FIELD("No.");
-                    RunPageView = SORTING("Prepayment Order No.");
+                    RunPageLink = "Prepayment Order No." = field("No.");
+                    RunPageView = sorting("Prepayment Order No.");
                     ToolTip = 'View related posted sales credit memos that involve a prepayment. ';
                 }
             }
@@ -506,12 +536,12 @@ page 9305 "Sales Order List"
                     Caption = 'Warehouse Shipment Lines';
                     Image = ShipmentLines;
                     RunObject = Page "Whse. Shipment Lines";
-                    RunPageLink = "Source Type" = CONST(37),
+                    RunPageLink = "Source Type" = const(37),
 #pragma warning disable AL0603
-                                  "Source Subtype" = FIELD("Document Type"),
+                                  "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.");
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.");
                     ToolTip = 'View ongoing warehouse shipments for the document, in advanced warehouse configurations.';
                 }
                 action("In&vt. Put-away/Pick Lines")
@@ -520,9 +550,9 @@ page 9305 "Sales Order List"
                     Caption = 'In&vt. Put-away/Pick Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity List";
-                    RunPageLink = "Source Document" = CONST("Sales Order"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Document", "Source No.", "Location Code");
+                    RunPageLink = "Source Document" = const("Sales Order"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Document", "Source No.", "Location Code");
                     ToolTip = 'View items that are inbound or outbound on inventory put-away or inventory pick documents for the sales order.';
                 }
                 action("Whse. Pick Lines")
@@ -569,7 +599,7 @@ page 9305 "Sales Order List"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -679,7 +709,7 @@ page 9305 "Sales Order List"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualRelease(SalesHeader);
+                        Rec.PerformManualRelease(SalesHeader);
                     end;
                 }
                 action(Reopen)
@@ -694,7 +724,7 @@ page 9305 "Sales Order List"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualReopen(SalesHeader);
+                        Rec.PerformManualReopen(SalesHeader);
                     end;
                 }
             }
@@ -713,7 +743,7 @@ page 9305 "Sales Order List"
                     var
                         SalesOrderPlanningForm: Page "Sales Order Planning";
                     begin
-                        SalesOrderPlanningForm.SetSalesOrder("No.");
+                        SalesOrderPlanningForm.SetSalesOrder(Rec."No.");
                         SalesOrderPlanningForm.RunModal();
                     end;
                 }
@@ -729,8 +759,8 @@ page 9305 "Sales Order List"
                     var
                         TempOrderPromisingLine: Record "Order Promising Line" temporary;
                     begin
-                        TempOrderPromisingLine.SetRange("Source Type", "Document Type");
-                        TempOrderPromisingLine.SetRange("Source ID", "No.");
+                        TempOrderPromisingLine.SetRange("Source Type", Rec."Document Type");
+                        TempOrderPromisingLine.SetRange("Source ID", Rec."No.");
                         PAGE.RunModal(PAGE::"Order Promising Lines", TempOrderPromisingLine);
                     end;
                 }
@@ -793,7 +823,7 @@ page 9305 "Sales Order List"
                         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelSalesApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
             }
@@ -813,10 +843,10 @@ page 9305 "Sales Order List"
                     trigger OnAction()
                     begin
                         Rec.PerformManualRelease();
-                        CreateInvtPutAwayPick();
+                        Rec.CreateInvtPutAwayPick();
 
-                        if not Find('=><') then
-                            Init();
+                        if not Rec.Find('=><') then
+                            Rec.Init();
                     end;
                 }
                 action("Create &Warehouse Shipment")
@@ -834,8 +864,8 @@ page 9305 "Sales Order List"
                         Rec.PerformManualRelease();
                         GetSourceDocOutbound.CreateFromSalesOrder(Rec);
 
-                        if not Find('=><') then
-                            Init();
+                        if not Rec.Find('=><') then
+                            Rec.Init();
                     end;
                 }
             }
@@ -863,7 +893,7 @@ page 9305 "Sales Order List"
                             BatchProcessingMgt.SetParametersForPageID(Page::"Sales Order List");
 
                             SalesBatchPostMgt.SetBatchProcessor(BatchProcessingMgt);
-                            SalesBatchPostMgt.RunWithUI(SalesHeader, Count, ReadyToPostQst);
+                            SalesBatchPostMgt.RunWithUI(SalesHeader, Rec.Count, ReadyToPostQst);
                         end else
                             PostDocument(CODEUNIT::"Sales-Post (Yes/No)");
                     end;
@@ -923,7 +953,7 @@ page 9305 "Sales Order List"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                     end;
                 }
                 action("Preview Posting")
@@ -1189,18 +1219,18 @@ page 9305 "Sales Order List"
         CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
 
         if CRMIntegrationEnabled then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
 
 #if not CLEAN21
         // Contextual Power BI FactBox: send data to filter the report in the FactBox
-        CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection("No.", false, PowerBIVisible);
+        CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection(Rec."No.", false, PowerBIVisible);
 #endif
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection("No.");
+        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection(Rec."No.");
     end;
 
     trigger OnAfterGetRecord()
     begin
-        StatusStyleTxt := GetStatusStyleText();
+        StatusStyleTxt := Rec.GetStatusStyleText();
     end;
 
     trigger OnInit()
@@ -1222,14 +1252,14 @@ page 9305 "Sales Order List"
     begin
         Rec.SetSecurityFilterOnRespCenter();
 
-        SetRange("Date Filter", 0D, WorkDate());
+        Rec.SetRange("Date Filter", 0D, WorkDate());
 
         JobQueueActive := SalesSetup.JobQueueActive();
         CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled();
         BidirectionalSalesOrderIntEnabled := CRMConnectionSetup.IsBidirectionalSalesOrderIntEnabled();
         IsOfficeAddin := OfficeMgt.IsAvailable();
 
-        CopySellToCustomerFilter();
+        Rec.CopySellToCustomerFilter();
         if OnlyShowHeadersWithVat then
             SetFilterOnPositiveVatPostingGroups();
     end;
@@ -1239,7 +1269,6 @@ page 9305 "Sales Order List"
         ReportPrint: Codeunit "Test Report-Print";
         PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
         Usage: Option "Order Confirmation","Work Order","Pick Instruction";
-        [InDataSet]
         JobQueueActive: Boolean;
         OnlyShowHeadersWithVat: Boolean;
         OpenApprovalEntriesExist: Boolean;
@@ -1251,7 +1280,6 @@ page 9305 "Sales Order List"
 #if not CLEAN21
         PowerBIVisible: Boolean;
 #endif
-        [InDataSet]
         StatusStyleTxt: Text;
         ReadyToPostQst: Label 'The number of orders that will be posted is %1. \Do you want to continue?', Comment = '%1 - selected count';
         CanRequestApprovalForFlow: Boolean;
@@ -1269,11 +1297,11 @@ page 9305 "Sales Order List"
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
     end;
 
     protected procedure PostDocument(PostingCodeunitID: Integer)

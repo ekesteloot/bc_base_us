@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Comment;
+using System.Utilities;
+
 page 9291 "Work Center Calendar Matrix"
 {
     Caption = 'Work Center Calendar Matrix';
@@ -426,9 +432,9 @@ page 9291 "Work Center Calendar Matrix"
                     Caption = 'Capacity Ledger E&ntries';
                     Image = CapacityLedger;
                     RunObject = Page "Capacity Ledger Entries";
-                    RunPageLink = "Work Center No." = FIELD("No."),
-                                  "Posting Date" = FIELD("Date Filter");
-                    RunPageView = SORTING("Work Center No.", "Work Shift Code", "Posting Date");
+                    RunPageLink = "Work Center No." = field("No."),
+                                  "Posting Date" = field("Date Filter");
+                    RunPageView = sorting("Work Center No.", "Work Shift Code", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                 }
@@ -438,8 +444,8 @@ page 9291 "Work Center Calendar Matrix"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Manufacturing Comment Sheet";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = WHERE("Table Name" = CONST("Work Center"));
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = where("Table Name" = const("Work Center"));
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Lo&ad")
@@ -448,8 +454,8 @@ page 9291 "Work Center Calendar Matrix"
                     Caption = 'Lo&ad';
                     Image = WorkCenterLoad;
                     RunObject = Page "Work Center Load";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = SORTING("No.");
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = sorting("No.");
                     ToolTip = 'View the availability of the machine or work center, including its capacity, the allocated quantity, availability after orders, and the load in percent of its total capacity.';
                 }
                 action(Statistics)
@@ -458,9 +464,9 @@ page 9291 "Work Center Calendar Matrix"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Work Center Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Work Shift Filter" = FIELD("Work Shift Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Work Shift Filter" = field("Work Shift Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -475,10 +481,10 @@ page 9291 "Work Center Calendar Matrix"
                     Caption = 'A&bsence';
                     Image = WorkCenterAbsence;
                     RunObject = Page "Capacity Absence";
-                    RunPageLink = "Capacity Type" = CONST("Work Center"),
-                                  "No." = FIELD("No."),
-                                  Date = FIELD("Date Filter");
-                    RunPageView = SORTING("Capacity Type", "No.", Date);
+                    RunPageLink = "Capacity Type" = const("Work Center"),
+                                  "No." = field("No."),
+                                  Date = field("Date Filter");
+                    RunPageView = sorting("Capacity Type", "No.", Date);
                     ToolTip = 'View which working days are not available. ';
                 }
                 action("Ta&sk List")
@@ -487,10 +493,10 @@ page 9291 "Work Center Calendar Matrix"
                     Caption = 'Ta&sk List';
                     Image = TaskList;
                     RunObject = Page "Work Center Task List";
-                    RunPageLink = Type = CONST("Work Center"),
-                                  "No." = FIELD("No."),
-                                  "Routing Status" = FILTER(<> Finished);
-                    RunPageView = SORTING(Type, "No.", "Starting Date");
+                    RunPageLink = Type = const("Work Center"),
+                                  "No." = field("No."),
+                                  "Routing Status" = filter(<> Finished);
+                    RunPageView = sorting(Type, "No.", "Starting Date");
                     ToolTip = 'View the list of operations that are scheduled for the work center.';
                 }
             }
@@ -569,9 +575,9 @@ page 9291 "Work Center Calendar Matrix"
     local procedure SetDateFilter(MATRIX_ColumnOrdinal: Integer)
     begin
         if MatrixRecords[MATRIX_ColumnOrdinal]."Period Start" = MatrixRecords[MATRIX_ColumnOrdinal]."Period End" then
-            SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start")
+            Rec.SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start")
         else
-            SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start", MatrixRecords[MATRIX_ColumnOrdinal]."Period End")
+            Rec.SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start", MatrixRecords[MATRIX_ColumnOrdinal]."Period End")
     end;
 
     procedure Load(MatrixColumns1: array[32] of Text[1024]; var MatrixRecords1: array[32] of Record Date; CurrentNoOfMatrixColumns: Integer)
@@ -586,7 +592,7 @@ page 9291 "Work Center Calendar Matrix"
         CalendarEntry: Record "Calendar Entry";
     begin
         CalendarEntry.SetRange("Capacity Type", CalendarEntry."Capacity Type"::"Work Center");
-        CalendarEntry.SetRange("No.", "No.");
+        CalendarEntry.SetRange("No.", Rec."No.");
 
         if MatrixRecords[MATRIX_ColumnOrdinal]."Period Start" = MatrixRecords[MATRIX_ColumnOrdinal]."Period End" then
             CalendarEntry.SetRange(Date, MatrixRecords[MATRIX_ColumnOrdinal]."Period Start")
@@ -600,8 +606,8 @@ page 9291 "Work Center Calendar Matrix"
     local procedure MATRIX_OnAfterGetRecord(MATRIX_ColumnOrdinal: Integer)
     begin
         SetDateFilter(MATRIX_ColumnOrdinal);
-        CalcFields("Capacity (Effective)");
-        MATRIX_CellData[MATRIX_ColumnOrdinal] := "Capacity (Effective)";
+        Rec.CalcFields("Capacity (Effective)");
+        MATRIX_CellData[MATRIX_ColumnOrdinal] := Rec."Capacity (Effective)";
     end;
 }
 

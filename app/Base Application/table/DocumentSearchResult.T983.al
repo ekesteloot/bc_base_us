@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentRegistration;
+
 table 983 "Document Search Result"
 {
     Caption = 'Document Search Result';

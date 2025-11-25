@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8634 "Config. Package Table FactBox"
 {
     Caption = 'Package Table';
@@ -26,7 +28,7 @@ page 8634 "Config. Package Table FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    ShowPackageRecords(Show::All, "Dimensions as Columns");
+                    Rec.ShowPackageRecords(Show::All, Rec."Dimensions as Columns");
                 end;
             }
             field("No. of Package Errors"; Rec."No. of Package Errors")
@@ -37,10 +39,10 @@ page 8634 "Config. Package Table FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    ShowPackageRecords(Show::Errors, "Dimensions as Columns");
+                    Rec.ShowPackageRecords(Show::Errors, Rec."Dimensions as Columns");
                 end;
             }
-            field(NoOfDatabaseRecords; GetNoOfDatabaseRecords())
+            field(NoOfDatabaseRecords; Rec.GetNoOfDatabaseRecords())
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'No. of Database Records';
@@ -49,7 +51,7 @@ page 8634 "Config. Package Table FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    ShowDatabaseRecords();
+                    Rec.ShowDatabaseRecords();
                 end;
             }
             field("No. of Fields Included"; Rec."No. of Fields Included")
@@ -84,7 +86,7 @@ page 8634 "Config. Package Table FactBox"
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies the number of the processing order. This is used to track the migration process.';
             }
-            field(Filtered; Filtered)
+            field(Filtered; Rec.Filtered)
             {
                 ApplicationArea = Basic, Suite;
                 DrillDown = true;
@@ -105,19 +107,17 @@ page 8634 "Config. Package Table FactBox"
 
     trigger OnAfterGetRecord()
     begin
-        NoOfRecordsStyleTxt := SetFieldStyle(FieldNo("No. of Package Records"));
-        NoOfErrorsStyleTxt := SetFieldStyle(FieldNo("No. of Package Errors"));
+        NoOfRecordsStyleTxt := Rec.SetFieldStyle(Rec.FieldNo("No. of Package Records"));
+        NoOfErrorsStyleTxt := Rec.SetFieldStyle(Rec.FieldNo("No. of Package Errors"));
     end;
 
     trigger OnOpenPage()
     begin
-        SetFilter("Company Filter (Source Table)", '%1', CompanyName);
+        Rec.SetFilter("Company Filter (Source Table)", '%1', CompanyName);
     end;
 
     var
-        [InDataSet]
         NoOfRecordsStyleTxt: Text;
-        [InDataSet]
         NoOfErrorsStyleTxt: Text;
         Show: Option Records,Errors,All;
 }

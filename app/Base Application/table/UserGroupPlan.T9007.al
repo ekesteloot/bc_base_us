@@ -1,3 +1,9 @@
+namespace System.Security.AccessControl;
+
+#pragma warning disable AL0792
+using System.Azure.Identity;
+#pragma warning restore AL0792
+
 table 9007 "User Group Plan"
 {
     Caption = 'User Group Plan';
@@ -26,13 +32,13 @@ table 9007 "User Group Plan"
         }
         field(10; "Plan Name"; Text[50])
         {
-            CalcFormula = Lookup(Plan.Name WHERE("Plan ID" = FIELD("Plan ID")));
+            CalcFormula = Lookup(Plan.Name where("Plan ID" = field("Plan ID")));
             Caption = 'Plan Name';
             FieldClass = FlowField;
         }
         field(11; "User Group Name"; Text[50])
         {
-            CalcFormula = Lookup("User Group".Name WHERE(Code = FIELD("User Group Code")));
+            CalcFormula = Lookup("User Group".Name where(Code = field("User Group Code")));
             Caption = 'User Group Name';
             FieldClass = FlowField;
         }

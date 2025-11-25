@@ -1,3 +1,13 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.BankMgt.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 codeunit 14 "Gen. Jnl.-Show Entries"
 {
     TableNo = "Gen. Journal Line";
@@ -7,73 +17,73 @@ codeunit 14 "Gen. Jnl.-Show Entries"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        case "Account Type" of
-            "Account Type"::"G/L Account":
+        case Rec."Account Type" of
+            Rec."Account Type"::"G/L Account":
                 begin
                     GLEntry.SetCurrentKey("G/L Account No.", "Posting Date");
-                    GLEntry.SetRange("G/L Account No.", "Account No.");
+                    GLEntry.SetRange("G/L Account No.", Rec."Account No.");
                     if GLEntry.FindLast() then;
                     OnBeforeShowGLEntries(Rec, GLEntry, IsHandled);
                     if not IsHandled then
                         PAGE.Run(PAGE::"General Ledger Entries", GLEntry);
                 end;
-            "Account Type"::Customer:
+            Rec."Account Type"::Customer:
                 begin
                     CustLedgEntry.SetCurrentKey("Customer No.", "Posting Date");
-                    CustLedgEntry.SetRange("Customer No.", "Account No.");
+                    CustLedgEntry.SetRange("Customer No.", Rec."Account No.");
                     if CustLedgEntry.FindLast() then;
                     OnBeforeShowCustomerLedgerEntries(Rec, CustLedgEntry, IsHandled);
                     if not IsHandled then
                         PAGE.Run(PAGE::"Customer Ledger Entries", CustLedgEntry);
                 end;
-            "Account Type"::Vendor:
+            Rec."Account Type"::Vendor:
                 begin
                     VendLedgEntry.SetCurrentKey("Vendor No.", "Posting Date");
-                    VendLedgEntry.SetRange("Vendor No.", "Account No.");
+                    VendLedgEntry.SetRange("Vendor No.", Rec."Account No.");
                     if VendLedgEntry.FindLast() then;
                     OnBeforeShowVendorLedgerEntries(Rec, VendLedgEntry, IsHandled);
                     if not IsHandled then
                         PAGE.Run(PAGE::"Vendor Ledger Entries", VendLedgEntry);
                 end;
-            "Account Type"::Employee:
+            Rec."Account Type"::Employee:
                 begin
                     EmplLedgEntry.SetCurrentKey("Employee No.", "Posting Date");
-                    EmplLedgEntry.SetRange("Employee No.", "Account No.");
+                    EmplLedgEntry.SetRange("Employee No.", Rec."Account No.");
                     if EmplLedgEntry.FindLast() then;
                     OnBeforeShowEmployeeLedgerEntries(Rec, EmplLedgEntry, IsHandled);
                     if not IsHandled then
                         PAGE.Run(PAGE::"Employee Ledger Entries", EmplLedgEntry);
                 end;
-            "Account Type"::"Bank Account":
+            Rec."Account Type"::"Bank Account":
                 begin
                     BankAccLedgEntry.SetCurrentKey("Bank Account No.", "Posting Date");
-                    BankAccLedgEntry.SetRange("Bank Account No.", "Account No.");
+                    BankAccLedgEntry.SetRange("Bank Account No.", Rec."Account No.");
                     if BankAccLedgEntry.FindLast() then;
                     OnBeforeShowBankAccountLedgerEntries(Rec, BankAccLedgEntry, IsHandled);
                     if not IsHandled then
                         PAGE.Run(PAGE::"Bank Account Ledger Entries", BankAccLedgEntry);
                 end;
-            "Account Type"::"Fixed Asset":
-                if "FA Posting Type" <> "FA Posting Type"::Maintenance then begin
+            Rec."Account Type"::"Fixed Asset":
+                if Rec."FA Posting Type" <> Rec."FA Posting Type"::Maintenance then begin
                     FALedgEntry.SetCurrentKey("FA No.", "Depreciation Book Code", "FA Posting Date");
-                    FALedgEntry.SetRange("FA No.", "Account No.");
-                    if "Depreciation Book Code" <> '' then
-                        FALedgEntry.SetRange("Depreciation Book Code", "Depreciation Book Code");
+                    FALedgEntry.SetRange("FA No.", Rec."Account No.");
+                    if Rec."Depreciation Book Code" <> '' then
+                        FALedgEntry.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
                     if FALedgEntry.FindLast() then;
                     OnBeforeShowFALedgerEntries(Rec, FALedgEntry, IsHandled);
                     if not IsHandled then
                         PAGE.Run(PAGE::"FA Ledger Entries", FALedgEntry);
                 end else begin
                     MaintenanceLedgEntry.SetCurrentKey("FA No.", "Depreciation Book Code", "FA Posting Date");
-                    MaintenanceLedgEntry.SetRange("FA No.", "Account No.");
-                    if "Depreciation Book Code" <> '' then
-                        MaintenanceLedgEntry.SetRange("Depreciation Book Code", "Depreciation Book Code");
+                    MaintenanceLedgEntry.SetRange("FA No.", Rec."Account No.");
+                    if Rec."Depreciation Book Code" <> '' then
+                        MaintenanceLedgEntry.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
                     if MaintenanceLedgEntry.FindLast() then;
                     OnBeforeShowMaintenanceLedgerEntries(Rec, MaintenanceLedgEntry, IsHandled);
                     if not IsHandled then
                         PAGE.Run(PAGE::"Maintenance Ledger Entries", MaintenanceLedgEntry);
                 end;
-            "Account Type"::"IC Partner":
+            Rec."Account Type"::"IC Partner":
                 Error(Text001);
         end;
 

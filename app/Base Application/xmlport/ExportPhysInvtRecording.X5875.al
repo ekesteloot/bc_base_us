@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
 xmlport 5875 "Export Phys. Invt. Recording"
 {
     Caption = 'Export Phys. Invt. Recording';

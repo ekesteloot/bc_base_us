@@ -29,7 +29,7 @@ table 378 "Report List Translation"
         }
         field(4; "Language Name"; Text[80])
         {
-            CalcFormula = Lookup ("Windows Language".Name WHERE("Language ID" = FIELD("Language ID")));
+            CalcFormula = Lookup ("Windows Language".Name where("Language ID" = field("Language ID")));
             Caption = 'Language Name';
             Editable = false;
             FieldClass = FlowField;

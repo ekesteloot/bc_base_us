@@ -32,41 +32,41 @@ table 10123 "Posted Bank Rec. Header"
         }
         field(6; "Positive Adjustments"; Decimal)
         {
-            CalcFormula = Sum("Posted Bank Rec. Line".Amount WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                    "Statement No." = FIELD("Statement No."),
-                                                                    "Record Type" = CONST(Adjustment),
-                                                                    Positive = CONST(true),
-                                                                    "Account Type" = CONST("Bank Account"),
-                                                                    "Account No." = FIELD("Bank Account No.")));
+            CalcFormula = sum("Posted Bank Rec. Line".Amount where("Bank Account No." = field("Bank Account No."),
+                                                                    "Statement No." = field("Statement No."),
+                                                                    "Record Type" = const(Adjustment),
+                                                                    Positive = const(true),
+                                                                    "Account Type" = const("Bank Account"),
+                                                                    "Account No." = field("Bank Account No.")));
             Caption = 'Positive Adjustments';
             FieldClass = FlowField;
         }
         field(7; "Negative Adjustments"; Decimal)
         {
-            CalcFormula = Sum("Posted Bank Rec. Line".Amount WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                    "Statement No." = FIELD("Statement No."),
-                                                                    "Record Type" = CONST(Adjustment),
-                                                                    Positive = CONST(false),
-                                                                    "Account Type" = CONST("Bank Account"),
-                                                                    "Account No." = FIELD("Bank Account No.")));
+            CalcFormula = sum("Posted Bank Rec. Line".Amount where("Bank Account No." = field("Bank Account No."),
+                                                                    "Statement No." = field("Statement No."),
+                                                                    "Record Type" = const(Adjustment),
+                                                                    Positive = const(false),
+                                                                    "Account Type" = const("Bank Account"),
+                                                                    "Account No." = field("Bank Account No.")));
             Caption = 'Negative Adjustments';
             FieldClass = FlowField;
         }
         field(8; "Outstanding Deposits"; Decimal)
         {
-            CalcFormula = Sum("Posted Bank Rec. Line".Amount WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                    "Statement No." = FIELD("Statement No."),
-                                                                    "Record Type" = CONST(Deposit),
-                                                                    Cleared = CONST(false)));
+            CalcFormula = sum("Posted Bank Rec. Line".Amount where("Bank Account No." = field("Bank Account No."),
+                                                                    "Statement No." = field("Statement No."),
+                                                                    "Record Type" = const(Deposit),
+                                                                    Cleared = const(false)));
             Caption = 'Outstanding Deposits';
             FieldClass = FlowField;
         }
         field(9; "Outstanding Checks"; Decimal)
         {
-            CalcFormula = Sum("Posted Bank Rec. Line".Amount WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                    "Statement No." = FIELD("Statement No."),
-                                                                    "Record Type" = CONST(Check),
-                                                                    Cleared = CONST(false)));
+            CalcFormula = sum("Posted Bank Rec. Line".Amount where("Bank Account No." = field("Bank Account No."),
+                                                                    "Statement No." = field("Statement No."),
+                                                                    "Record Type" = const(Check),
+                                                                    Cleared = const(false)));
             Caption = 'Outstanding Checks';
             FieldClass = FlowField;
         }
@@ -102,27 +102,27 @@ table 10123 "Posted Bank Rec. Header"
         }
         field(19; "Total Cleared Checks"; Decimal)
         {
-            CalcFormula = Sum("Posted Bank Rec. Line"."Cleared Amount" WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                              "Statement No." = FIELD("Statement No."),
-                                                                              "Record Type" = CONST(Check),
-                                                                              Cleared = CONST(true)));
+            CalcFormula = sum("Posted Bank Rec. Line"."Cleared Amount" where("Bank Account No." = field("Bank Account No."),
+                                                                              "Statement No." = field("Statement No."),
+                                                                              "Record Type" = const(Check),
+                                                                              Cleared = const(true)));
             Caption = 'Total Cleared Checks';
             FieldClass = FlowField;
         }
         field(20; "Total Cleared Deposits"; Decimal)
         {
-            CalcFormula = Sum("Posted Bank Rec. Line"."Cleared Amount" WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                              "Statement No." = FIELD("Statement No."),
-                                                                              "Record Type" = CONST(Deposit),
-                                                                              Cleared = CONST(true)));
+            CalcFormula = sum("Posted Bank Rec. Line"."Cleared Amount" where("Bank Account No." = field("Bank Account No."),
+                                                                              "Statement No." = field("Statement No."),
+                                                                              "Record Type" = const(Deposit),
+                                                                              Cleared = const(true)));
             Caption = 'Total Cleared Deposits';
             FieldClass = FlowField;
         }
         field(21; "Total Adjustments"; Decimal)
         {
-            CalcFormula = Sum("Posted Bank Rec. Line".Amount WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                    "Statement No." = FIELD("Statement No."),
-                                                                    "Record Type" = CONST(Adjustment)));
+            CalcFormula = sum("Posted Bank Rec. Line".Amount where("Bank Account No." = field("Bank Account No."),
+                                                                    "Statement No." = field("Statement No."),
+                                                                    "Record Type" = const(Adjustment)));
             Caption = 'Total Adjustments';
             FieldClass = FlowField;
         }
@@ -139,9 +139,9 @@ table 10123 "Posted Bank Rec. Header"
         }
         field(24; Comment; Boolean)
         {
-            CalcFormula = Exist("Bank Comment Line" WHERE("Table Name" = CONST("Posted Bank Rec."),
-                                                           "Bank Account No." = FIELD("Bank Account No."),
-                                                           "No." = FIELD("Statement No.")));
+            CalcFormula = exist("Bank Comment Line" where("Table Name" = const("Posted Bank Rec."),
+                                                           "Bank Account No." = field("Bank Account No."),
+                                                           "No." = field("Statement No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -163,32 +163,32 @@ table 10123 "Posted Bank Rec. Header"
         }
         field(28; "Total Balanced Adjustments"; Decimal)
         {
-            CalcFormula = Sum("Posted Bank Rec. Line".Amount WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                    "Statement No." = FIELD("Statement No."),
-                                                                    "Record Type" = CONST(Adjustment),
-                                                                    "Bal. Account No." = FILTER(<> '')));
+            CalcFormula = sum("Posted Bank Rec. Line".Amount where("Bank Account No." = field("Bank Account No."),
+                                                                    "Statement No." = field("Statement No."),
+                                                                    "Record Type" = const(Adjustment),
+                                                                    "Bal. Account No." = filter(<> '')));
             Caption = 'Total Balanced Adjustments';
             FieldClass = FlowField;
         }
         field(29; "Positive Bal. Adjustments"; Decimal)
         {
-            CalcFormula = Sum("Posted Bank Rec. Line".Amount WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                    "Statement No." = FIELD("Statement No."),
-                                                                    "Record Type" = CONST(Adjustment),
-                                                                    Positive = CONST(true),
-                                                                    "Bal. Account No." = FIELD("Bank Account No."),
-                                                                    "Bal. Account Type" = CONST("Bank Account")));
+            CalcFormula = sum("Posted Bank Rec. Line".Amount where("Bank Account No." = field("Bank Account No."),
+                                                                    "Statement No." = field("Statement No."),
+                                                                    "Record Type" = const(Adjustment),
+                                                                    Positive = const(true),
+                                                                    "Bal. Account No." = field("Bank Account No."),
+                                                                    "Bal. Account Type" = const("Bank Account")));
             Caption = 'Positive Bal. Adjustments';
             FieldClass = FlowField;
         }
         field(30; "Negative Bal. Adjustments"; Decimal)
         {
-            CalcFormula = Sum("Posted Bank Rec. Line".Amount WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                    "Statement No." = FIELD("Statement No."),
-                                                                    "Record Type" = CONST(Adjustment),
-                                                                    Positive = CONST(false),
-                                                                    "Bal. Account No." = FIELD("Bank Account No."),
-                                                                    "Bal. Account Type" = CONST("Bank Account")));
+            CalcFormula = sum("Posted Bank Rec. Line".Amount where("Bank Account No." = field("Bank Account No."),
+                                                                    "Statement No." = field("Statement No."),
+                                                                    "Record Type" = const(Adjustment),
+                                                                    Positive = const(false),
+                                                                    "Bal. Account No." = field("Bank Account No."),
+                                                                    "Bal. Account Type" = const("Bank Account")));
             Caption = 'Negative Bal. Adjustments';
             FieldClass = FlowField;
         }
@@ -200,7 +200,7 @@ table 10123 "Posted Bank Rec. Header"
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
         }
     }
@@ -223,9 +223,6 @@ table 10123 "Posted Bank Rec. Header"
     end;
 
     var
-#if not CLEAN20
-        PostedBankRecHdr: Record "Posted Bank Rec. Header";
-#endif
         PostedBankRecLines: Record "Posted Bank Rec. Line";
         PostedBankRecDelete: Codeunit "Posted Bank Rec.-Delete";
         DimMgt: Codeunit DimensionManagement;
@@ -233,10 +230,6 @@ table 10123 "Posted Bank Rec. Header"
 
     procedure PrintRecords(ShowRequestForm: Boolean)
     begin
-#if not CLEAN20
-        PostedBankRecHdr.Copy(Rec);
-        Report.RunModal(Report::"Bank Reconciliation", ShowRequestForm, false, PostedBankRecHdr);
-#endif
     end;
 
     procedure Navigate()

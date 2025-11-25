@@ -1,3 +1,21 @@
+﻿namespace Microsoft.CashFlow.Setup;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.Document;
+using System.AI;
+using System.Environment;
+using System.Security.Encryption;
+
 table 843 "Cash Flow Setup"
 {
     Caption = 'Cash Flow Setup';
@@ -162,9 +180,9 @@ table 843 "Cash Flow Setup"
         field(22; "Tax Bal. Account No."; Code[20])
         {
             Caption = 'Tax Bal. Account No.';
-            TableRelation = IF ("Tax Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Tax Bal. Account Type" = CONST(Vendor)) Vendor;
+            TableRelation = if ("Tax Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Tax Bal. Account Type" = const(Vendor)) Vendor;
         }
         field(23; "API Key"; Text[250])
         {

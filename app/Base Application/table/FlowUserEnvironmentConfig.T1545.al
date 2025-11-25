@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 1545 "Flow User Environment Config"
 {
     Caption = 'Power Automate User Environment Config';

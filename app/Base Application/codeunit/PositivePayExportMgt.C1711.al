@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.PositivePay;
+
+using System.IO;
+using System.Text;
+
 codeunit 1711 "Positive Pay Export Mgt"
 {
     Permissions = TableData "Data Exch." = rimd,

@@ -3,7 +3,7 @@ codeunit 1876 "Business Setup Subscribers"
 
     trigger OnRun()
     begin
-    end; 
+    end;
 
     var
         CompanyShortTitleTxt: Label 'Company';
@@ -471,14 +471,9 @@ codeunit 1876 "Business Setup Subscribers"
 
         // Intercompany
         IF ApplicationAreaMgmtFacade.IsIntercompanyEnabled() OR ApplicationAreaMgmtFacade.IsAllDisabled() then begin
-#if not CLEAN20          
-            Sender.InsertManualSetup(ICSetupTitleTxt, ICSetupShortTitleTxt, ICSetupDescriptionTxt, 2, ObjectType::Page,
-              Page::"IC Setup", ManualSetupCategory::Intercompany, ICSetupKeywordsTxt);
-#else
             Sender.InsertManualSetup(
                 ICSetupTitleTxt, ICSetupShortTitleTxt, ICSetupDescriptionTxt, 2, ObjectType::Page,
                 Page::"Intercompany Setup", ManualSetupCategory::Intercompany, ICSetupKeywordsTxt);
-#endif
 
             Sender.InsertManualSetup(ICPartnersTitleTxt, ICPartnersShortTitleTxt, ICPartnersDescriptionTxt, 5, ObjectType::Page,
               Page::"IC Partner List", ManualSetupCategory::Intercompany, ICPartnersKeywordsTxt);

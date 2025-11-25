@@ -10,7 +10,7 @@ page 1171 "User Task Card"
         {
             group(General)
             {
-                Caption = 'General'; 
+                Caption = 'General';
                 field(Title; Rec.Title)
                 {
                     ApplicationArea = Basic, Suite;

@@ -1,3 +1,17 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Calculation;
+
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Setup;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Telemetry;
+
 codeunit 7001 "Price Calculation Mgt."
 {
     trigger OnRun()

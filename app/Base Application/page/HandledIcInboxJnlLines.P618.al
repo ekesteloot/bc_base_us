@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Inbox;
+
 page 618 "Handled IC Inbox Jnl. Lines"
 {
     Caption = 'Handled IC Inbox Jnl. Lines';
@@ -105,11 +107,11 @@ page 618 "Handled IC Inbox Jnl. Lines"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "IC Inbox/Outbox Jnl. Line Dim.";
-                    RunPageLink = "Table ID" = CONST(421),
-                                  "Transaction No." = FIELD("Transaction No."),
-                                  "IC Partner Code" = FIELD("IC Partner Code"),
-                                  "Transaction Source" = FIELD("Transaction Source"),
-                                  "Line No." = FIELD("Line No.");
+                    RunPageLink = "Table ID" = const(421),
+                                  "Transaction No." = field("Transaction No."),
+                                  "IC Partner Code" = field("IC Partner Code"),
+                                  "Transaction Source" = field("Transaction Source"),
+                                  "Line No." = field("Line No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }

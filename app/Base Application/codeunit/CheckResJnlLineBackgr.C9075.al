@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using System.Utilities;
+
 codeunit 9075 "Check Res. Jnl. Line. Backgr."
 {
     trigger OnRun()

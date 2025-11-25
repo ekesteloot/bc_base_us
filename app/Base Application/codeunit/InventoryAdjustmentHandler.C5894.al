@@ -1,4 +1,8 @@
-﻿codeunit 5894 "Inventory Adjustment Handler"
+﻿namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.InventoryMgt.Item;
+
+codeunit 5894 "Inventory Adjustment Handler"
 {
     var
         Item: Record Item;

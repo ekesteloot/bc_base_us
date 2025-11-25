@@ -1,3 +1,9 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 1130 "Cost Type Balance Matrix"
 {
     Caption = 'Cost Type Balance Matrix';
@@ -232,10 +238,10 @@ page 1130 "Cost Type Balance Matrix"
                     Caption = '&Card';
                     Image = EditLines;
                     RunObject = Page "Cost Type Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Cost Center Filter" = FIELD("Cost Center Filter"),
-                                  "Cost Object Filter" = FIELD("Cost Object Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Cost Center Filter" = field("Cost Center Filter"),
+                                  "Cost Object Filter" = field("Cost Object Filter");
                     RunPageOnRec = true;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information for the cost type.';
@@ -246,8 +252,8 @@ page 1130 "Cost Type Balance Matrix"
                     Caption = 'E&ntries';
                     Image = Entries;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Cost Type No." = FIELD("No.");
-                    RunPageView = SORTING("Cost Type No.", "Posting Date");
+                    RunPageLink = "Cost Type No." = field("No.");
+                    RunPageView = sorting("Cost Type No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the entries for the cost type balance matrix.';
                 }
@@ -261,8 +267,8 @@ page 1130 "Cost Type Balance Matrix"
     begin
         for MATRIX_CurrentColumnOrdinal := 1 to MATRIX_CurrentNoOfMatrixColumn do
             MATRIX_OnAfterGetRecord(MATRIX_CurrentColumnOrdinal);
-        NameIndent := Indentation;
-        Emphasize := Type <> Type::"Cost Type";
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec.Type <> Rec.Type::"Cost Type";
     end;
 
     var
@@ -276,31 +282,19 @@ page 1130 "Cost Type Balance Matrix"
         RoundingFactor: Enum "Analysis Rounding Factor";
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[12] of Decimal;
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     local procedure SetDateFilter(MATRIX_ColumnOrdinal: Integer)
     begin
         if AmtType = AmtType::"Net Change" then
             if MatrixRecords[MATRIX_ColumnOrdinal]."Period Start" = MatrixRecords[MATRIX_ColumnOrdinal]."Period End" then
-                SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start")
+                Rec.SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start")
             else
-                SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start", MatrixRecords[MATRIX_ColumnOrdinal]."Period End")
+                Rec.SetRange("Date Filter", MatrixRecords[MATRIX_ColumnOrdinal]."Period Start", MatrixRecords[MATRIX_ColumnOrdinal]."Period End")
         else
-            SetRange("Date Filter", 0D, MatrixRecords[MATRIX_ColumnOrdinal]."Period End");
+            Rec.SetRange("Date Filter", 0D, MatrixRecords[MATRIX_ColumnOrdinal]."Period End");
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by LoadMatrix()', '20.0')]
-    procedure Load(MatrixColumns1: array[12] of Text[80]; var MatrixRecords1: array[12] of Record Date; CurrentNoOfMatrixColumns: Integer; CostCenterFilter1: Code[20]; CostObjectFilter1: Code[20]; RoundingFactor1: Option "None","1","1000","1000000"; AmtType1: Option "Balance at Date","Net Change")
-    begin
-        LoadMatrix(
-            MatrixColumns1, MatrixRecords1, CurrentNoOfMatrixColumns, CostCenterFilter1, CostObjectFilter1,
-            "Analysis Rounding Factor".FromInteger(RoundingFactor1), "Analysis Amount Type".FromInteger(AmtType1));
-    end;
-#endif
 
     procedure LoadMatrix(MatrixColumns1: array[12] of Text[80]; var MatrixRecords1: array[12] of Record Date; CurrentNoOfMatrixColumns: Integer; NewCostCenterFilter: Code[20]; NewCostObjectFilter: Code[20]; NewRoundingFactor: Enum "Analysis Rounding Factor"; NewAmountType: Enum "Analysis Amount Type")
     var
@@ -333,13 +327,13 @@ page 1130 "Cost Type Balance Matrix"
         CostEntry: Record "Cost Entry";
     begin
         SetDateFilter(ColumnID);
-        if Type in [Type::Total, Type::"End-Total"] then
-            CostEntry.SetFilter("Cost Type No.", Totaling)
+        if Rec.Type in [Rec.Type::Total, Rec.Type::"End-Total"] then
+            CostEntry.SetFilter("Cost Type No.", Rec.Totaling)
         else
-            CostEntry.SetRange("Cost Type No.", "No.");
+            CostEntry.SetRange("Cost Type No.", Rec."No.");
         CostEntry.SetFilter("Cost Center Code", CostCenterFilter);
         CostEntry.SetFilter("Cost Object Code", CostObjectFilter);
-        CostEntry.SetFilter("Posting Date", GetFilter("Date Filter"));
+        CostEntry.SetFilter("Posting Date", Rec.GetFilter("Date Filter"));
         OnMATRIX_OnDrillDownOnBeforePageRun(CostEntry);
         PAGE.Run(0, CostEntry);
     end;
@@ -348,7 +342,7 @@ page 1130 "Cost Type Balance Matrix"
     begin
         SetFilters(ColumnID);
         Rec.CalcFields("Net Change");
-        MATRIX_CellData[ColumnID] := MatrixMgt.RoundAmount("Net Change", RoundingFactor);
+        MATRIX_CellData[ColumnID] := MatrixMgt.RoundAmount(Rec."Net Change", RoundingFactor);
 
         OnAfterMATRIX_OnAfterGetRecord(Rec, MATRIX_CellData, ColumnID, RoundingFactor);
     end;
@@ -356,8 +350,8 @@ page 1130 "Cost Type Balance Matrix"
     local procedure SetFilters(ColumnID: Integer)
     begin
         SetDateFilter(ColumnID);
-        SetFilter("Cost Center Filter", CostCenterFilter);
-        SetFilter("Cost Object Filter", CostObjectFilter);
+        Rec.SetFilter("Cost Center Filter", CostCenterFilter);
+        Rec.SetFilter("Cost Object Filter", CostObjectFilter);
         OnAfterSetFilters(Rec);
     end;
 

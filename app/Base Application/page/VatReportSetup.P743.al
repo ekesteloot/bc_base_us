@@ -109,7 +109,7 @@ page 743 "VAT Report Setup"
                         Caption = 'Auto Receive Codeunit ID';
                         Importance = Additional;
                         ToolTip = 'Specifies the codeunit ID associated with an automatic receipt of the VAT return periods. You can only edit this field if the Update Period Job Frequency field contains Never.';
-                        Editable = "Update Period Job Frequency" = "Update Period Job Frequency"::Never;
+                        Editable = Rec."Update Period Job Frequency" = Rec."Update Period Job Frequency"::Never;
                     }
                     field("Auto Receive Period CU Cap"; Rec."Auto Receive Period CU Cap")
                     {
@@ -129,10 +129,10 @@ page 743 "VAT Report Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

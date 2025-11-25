@@ -1,3 +1,5 @@
+namespace System.Integration;
+
 page 6726 "OData EDM Definition Card"
 {
     Caption = 'OData EDM Definition Card';
@@ -11,7 +13,7 @@ page 6726 "OData EDM Definition Card"
             group(General)
             {
                 Caption = 'General';
-                field("Key"; Key)
+                field("Key"; Rec.Key)
                 {
                     ApplicationArea = All;
                 }
@@ -57,11 +59,11 @@ page 6726 "OData EDM Definition Card"
         EDMDefinitionInStream: InStream;
         EDMText: Text;
     begin
-        CalcFields("Edm Xml");
-        if not "Edm Xml".HasValue() then
+        Rec.CalcFields("Edm Xml");
+        if not Rec."Edm Xml".HasValue() then
             exit('');
 
-        "Edm Xml".CreateInStream(EDMDefinitionInStream, TEXTENCODING::UTF8);
+        Rec."Edm Xml".CreateInStream(EDMDefinitionInStream, TEXTENCODING::UTF8);
         EDMDefinitionInStream.Read(EDMText);
         exit(EDMText);
     end;
@@ -70,10 +72,10 @@ page 6726 "OData EDM Definition Card"
     var
         EDMDefinitionOutStream: OutStream;
     begin
-        Clear("Edm Xml");
-        "Edm Xml".CreateOutStream(EDMDefinitionOutStream, TEXTENCODING::UTF8);
+        Clear(Rec."Edm Xml");
+        Rec."Edm Xml".CreateOutStream(EDMDefinitionOutStream, TEXTENCODING::UTF8);
         EDMDefinitionOutStream.WriteText(EDMXml);
-        Modify(true);
+        Rec.Modify(true);
     end;
 }
 

@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
 page 9107 "Resource Statistics FactBox"
 {
     Caption = 'Resource Statistics';
@@ -84,23 +86,23 @@ page 9107 "Resource Statistics FactBox"
 
         Clear(TotalUsageUnits);
 
-        SetFilter("Date Filter", ResDateFilter);
-        SetRange("Chargeable Filter");
-        CalcFields(Capacity, "Usage (Cost)", "Sales (Price)");
+        Rec.SetFilter("Date Filter", ResDateFilter);
+        Rec.SetRange("Chargeable Filter");
+        Rec.CalcFields(Capacity, "Usage (Cost)", "Sales (Price)");
 
-        ResCapacity := Capacity;
-        ResUsageCost := "Usage (Cost)";
-        UnitPrice := "Sales (Price)";
+        ResCapacity := Rec.Capacity;
+        ResUsageCost := Rec."Usage (Cost)";
+        UnitPrice := Rec."Sales (Price)";
 
         for j := 1 to 2 do begin
             if j = 1 then
                 Chargeable := false
             else
                 Chargeable := true;
-            SetRange("Chargeable Filter", Chargeable);
-            CalcFields("Usage (Qty.)", "Usage (Price)");
-            ResUsagePrice := "Usage (Price)";
-            TotalUsageUnits := TotalUsageUnits + "Usage (Qty.)";
+            Rec.SetRange("Chargeable Filter", Chargeable);
+            Rec.CalcFields("Usage (Qty.)", "Usage (Price)");
+            ResUsagePrice := Rec."Usage (Price)";
+            TotalUsageUnits := TotalUsageUnits + Rec."Usage (Qty.)";
         end;
 
         UnusedCapacity := ResCapacity - TotalUsageUnits;
@@ -108,8 +110,8 @@ page 9107 "Resource Statistics FactBox"
         Profit := UnitPrice - ResUsageCost;
         ResProfitPct := CalcPercentage(Profit, UnitPrice);
 
-        SetRange("Date Filter");
-        SetRange("Chargeable Filter");
+        Rec.SetRange("Date Filter");
+        Rec.SetRange("Chargeable Filter");
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -122,7 +124,7 @@ page 9107 "Resource Statistics FactBox"
         Profit := 0;
         ResProfitPct := 0;
 
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     var

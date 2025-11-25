@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Setup;
+
 enum 99000917 "Report Selection Usage Prod."
 {
     Extensible = true;

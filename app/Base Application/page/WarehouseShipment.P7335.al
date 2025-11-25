@@ -1,3 +1,13 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+
 page 7335 "Warehouse Shipment"
 {
     Caption = 'Warehouse Shipment';
@@ -21,7 +31,7 @@ page 7335 "Warehouse Shipment"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -34,7 +44,7 @@ page 7335 "Warehouse Shipment"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         CurrPage.SaveRecord();
-                        LookupLocation(Rec);
+                        Rec.LookupLocation(Rec);
                         CurrPage.Update(true);
                         SetBinFieldsVisibility(true);
                     end;
@@ -110,8 +120,8 @@ page 7335 "Warehouse Shipment"
                 ApplicationArea = Warehouse;
                 Editable = IsShipmentLinesEditable;
                 Enabled = IsShipmentLinesEditable;
-                SubPageLink = "No." = FIELD("No.");
-                SubPageView = SORTING("No.", "Sorting Sequence No.");
+                SubPageLink = "No." = field("No.");
+                SubPageView = sorting("No.", "Sorting Sequence No.");
             }
             group(Shipping)
             {
@@ -152,7 +162,7 @@ page 7335 "Warehouse Shipment"
             {
                 ApplicationArea = Warehouse;
                 Provider = WhseShptLines;
-                SubPageLink = "No." = FIELD("Item No.");
+                SubPageLink = "No." = field("Item No.");
                 Visible = true;
             }
             systempart(Control1900383207; Links)
@@ -182,9 +192,9 @@ page 7335 "Warehouse Shipment"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Whse. Shipment"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Whse. Shipment"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Pick Lines")
@@ -193,10 +203,10 @@ page 7335 "Warehouse Shipment"
                     Caption = 'Pick Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Whse. Document Type" = CONST(Shipment),
-                                  "Whse. Document No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Document No.", "Whse. Document Type", "Activity Type")
-                                  WHERE("Activity Type" = CONST(Pick));
+                    RunPageLink = "Whse. Document Type" = const(Shipment),
+                                  "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document No.", "Whse. Document Type", "Activity Type")
+                                  where("Activity Type" = const(Pick));
                     ToolTip = 'View the related picks.';
                 }
                 action("Registered P&ick Lines")
@@ -205,9 +215,9 @@ page 7335 "Warehouse Shipment"
                     Caption = 'Registered P&ick Lines';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Act.-Lines";
-                    RunPageLink = "Whse. Document No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Document Type", "Whse. Document No.", "Whse. Document Line No.")
-                                  WHERE("Whse. Document Type" = CONST(Shipment));
+                    RunPageLink = "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document Type", "Whse. Document No.", "Whse. Document Line No.")
+                                  where("Whse. Document Type" = const(Shipment));
                     ToolTip = 'View the list of warehouse picks that have been made for the order.';
                 }
                 action("Posted &Whse. Shipments")
@@ -216,8 +226,8 @@ page 7335 "Warehouse Shipment"
                     Caption = 'Posted &Warehouse Shipments';
                     Image = PostedReceipt;
                     RunObject = Page "Posted Whse. Shipment List";
-                    RunPageLink = "Whse. Shipment No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Shipment No.");
+                    RunPageLink = "Whse. Shipment No." = field("No.");
+                    RunPageView = sorting("Whse. Shipment No.");
                     ToolTip = 'View the quantity that has been posted as shipped.';
                 }
             }
@@ -241,7 +251,7 @@ page 7335 "Warehouse Shipment"
                         GetSourceDocOutbound: Codeunit "Get Source Doc. Outbound";
                     begin
                         OnBeforeOnActionUseFilterstoGetSrcDocs(Rec);
-                        TestField(Status, Status::Open);
+                        Rec.TestField(Status, Rec.Status::Open);
                         GetSourceDocOutbound.GetOutboundDocs(Rec);
                     end;
                 }
@@ -258,7 +268,7 @@ page 7335 "Warehouse Shipment"
                     var
                         GetSourceDocOutbound: Codeunit "Get Source Doc. Outbound";
                     begin
-                        TestField(Status, Status::Open);
+                        Rec.TestField(Status, Rec.Status::Open);
                         GetSourceDocOutbound.GetSingleOutboundDoc(Rec);
                     end;
                 }
@@ -278,7 +288,7 @@ page 7335 "Warehouse Shipment"
                         ReleaseWhseShptDoc: Codeunit "Whse.-Shipment Release";
                     begin
                         CurrPage.Update(true);
-                        if Status = Status::Open then
+                        if Rec.Status = Rec.Status::Open then
                             ReleaseWhseShptDoc.Release(Rec);
                     end;
                 }
@@ -523,9 +533,7 @@ page 7335 "Warehouse Shipment"
 
     var
         WhseDocPrint: Codeunit "Warehouse Document-Print";
-        [InDataSet]
         IsShipmentLinesEditable: Boolean;
-        [InDataSet]
         HideBinFields: Boolean;
         LocationCodeWhenHideBinLastChecked: Code[20];
 
@@ -548,7 +556,7 @@ page 7335 "Warehouse Shipment"
         if (Rec."Location Code" = LocationCodeWhenHideBinLastChecked) then
             exit(false);
 
-        if "Location Code" <> '' then
+        if Rec."Location Code" <> '' then
             HideBinFieldsLocal := not Rec.BinCodeMandatory();
 
         LocationCodeWhenHideBinLastChecked := Rec."Location Code";

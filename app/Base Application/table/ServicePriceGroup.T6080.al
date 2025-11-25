@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Pricing;
+
 table 6080 "Service Price Group"
 {
     Caption = 'Service Price Group';

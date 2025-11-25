@@ -10,7 +10,7 @@ report 10118 "Vendor 1099 Div 2021"
     {
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Vendor Filter';
             column(Void; Void)
@@ -114,7 +114,7 @@ report 10118 "Vendor 1099 Div 2021"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 MaxIteration = 1;
                 column(FormCounter; FormCounter)
                 {

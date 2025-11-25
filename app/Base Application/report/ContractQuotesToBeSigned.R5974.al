@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Contract;
+
 report 5974 "Contract Quotes to Be Signed"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ContractQuotestoBeSigned.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ContractQuotestoBeSigned.rdlc';
     ApplicationArea = Service;
     Caption = 'Contract Quotes to Be Signed';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5974 "Contract Quotes to Be Signed"
     {
         dataitem("Service Contract Header"; "Service Contract Header")
         {
-            DataItemTableView = SORTING("Responsibility Center", "Service Zone Code", Status, "Contract Group Code") WHERE("Contract Type" = CONST(Quote));
+            DataItemTableView = sorting("Responsibility Center", "Service Zone Code", Status, "Contract Group Code") where("Contract Type" = const(Quote));
             RequestFilterFields = "Responsibility Center", "Contract No.", "Salesperson Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

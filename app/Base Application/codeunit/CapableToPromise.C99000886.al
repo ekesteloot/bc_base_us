@@ -1,3 +1,14 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Sales.Document;
+
 codeunit 99000886 "Capable to Promise"
 {
 
@@ -57,17 +68,6 @@ codeunit 99000886 "Capable to Promise"
             DueDateOfReqLine := NeededDate;
         exit(Ok);
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by CalcCapableToPromiseDate()', '20.0')]
-    procedure CalcCapableToPromise(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; NeededDate: Date; NeededQty: Decimal; UnitOfMeasure: Code[10]; var LocOrderPromisingID: Code[20]; LocSourceLineNo: Integer; var LastValidLine: Integer; PeriodType: Option Day,Week,Month,Quarter,Year; PeriodLengthFormula: DateFormula): Date
-    begin
-        exit(
-            CalcCapableToPromiseDate(
-                ItemNo, VariantCode, LocationCode, NeededDate, NeededQty, UnitOfMeasure, LocOrderPromisingID, LocSourceLineNo,
-                LastValidLine, "Analysis Period Type".FromInteger(PeriodType), PeriodLengthFormula));
-    end;
-#endif
 
     procedure CalcCapableToPromiseDate(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; NeededDate: Date; NeededQty: Decimal; UnitOfMeasure: Code[10]; var LocOrderPromisingID: Code[20]; LocSourceLineNo: Integer; var LastValidLine: Integer; PeriodType: Enum "Analysis Line Type"; PeriodLengthFormula: DateFormula) Result: Date
     var
@@ -194,7 +194,7 @@ codeunit 99000886 "Capable to Promise"
                 ReqLine."Sales Order Line No." := SalesLine."Line No.";
                 ReqLine."Sell-to Customer No." := SalesLine."Sell-to Customer No.";
                 ReqLine."Purchasing Code" := SalesLine."Purchasing Code";
-                SalesHeader.Get("Sales Document Type"::Order, ReqLine."Order Promising ID");
+                SalesHeader.Get(Enum::"Sales Document Type"::Order, ReqLine."Order Promising ID");
                 ReqLine."Ship-to Code" := SalesHeader."Ship-to Code";
             end;
         OnBeforeReqLineModify(ReqLine);

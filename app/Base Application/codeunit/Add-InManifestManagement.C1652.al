@@ -1,3 +1,13 @@
+﻿namespace System.Integration;
+
+using Microsoft.CRM.Outlook;
+using System;
+using System.Environment;
+using System.IO;
+using System.Privacy;
+using System.Utilities;
+using System.Xml;
+
 codeunit 1652 "Add-in Manifest Management"
 {
 

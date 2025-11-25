@@ -60,7 +60,7 @@ page 5226 "Empl. Absences by Categories"
                 var
                     MatrixForm: Page "Empl. Absences by Cat. Matrix";
                 begin
-                    EmployeeNoFilter := "No.";
+                    EmployeeNoFilter := Rec."No.";
                     MatrixForm.Load(MATRIX_CaptionSet, MatrixRecords, PeriodType, AbsenceAmountType, EmployeeNoFilter);
                     MatrixForm.RunModal();
                 end;

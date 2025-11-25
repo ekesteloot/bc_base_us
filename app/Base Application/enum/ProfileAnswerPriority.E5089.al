@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 enum 5089 "Profile Answer Priority"
 {
     Extensible = true;

@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Setup;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 5908 "Service Order Types"
 {
     ApplicationArea = Service;
@@ -13,7 +17,7 @@ page 5908 "Service Order Types"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies a code for the service order type.';
@@ -58,8 +62,8 @@ page 5908 "Service Order Types"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(5903),
-                                      "No." = FIELD(Code);
+                        RunPageLink = "Table ID" = const(5903),
+                                      "No." = field(Code);
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -77,7 +81,7 @@ page 5908 "Service Order Types"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(ServiceOrderType);
-                            DefaultDimMultiple.SetMultiRecord(ServiceOrderType, FieldNo(Code));
+                            DefaultDimMultiple.SetMultiRecord(ServiceOrderType, Rec.FieldNo(Code));
                             DefaultDimMultiple.RunModal();
                         end;
                     }

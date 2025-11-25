@@ -1,9 +1,23 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Reports;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+
 page 99000831 "Released Production Order"
 {
     Caption = 'Released Production Order';
     PageType = Document;
     SourceTable = "Production Order";
-    SourceTableView = WHERE(Status = CONST(Released));
+    SourceTableView = where(Status = const(Released));
 
     layout
     {
@@ -21,7 +35,7 @@ page 99000831 "Released Production Order"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -45,8 +59,8 @@ page 99000831 "Released Production Order"
 
                     trigger OnValidate()
                     begin
-                        if xRec."Source Type" <> "Source Type" then
-                            "Source No." := '';
+                        if xRec."Source Type" <> Rec."Source Type" then
+                            Rec."Source No." := '';
                     end;
                 }
                 field("Source No."; Rec."Source No.")
@@ -58,8 +72,8 @@ page 99000831 "Released Production Order"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory("Source Type" = "Source Type"::Item, "Source No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec."Source Type" = Rec."Source Type"::Item, Rec."Source No.");
                     end;
                 }
                 field("Variant Code"; Rec."Variant Code")
@@ -73,8 +87,8 @@ page 99000831 "Released Production Order"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory("Source Type" = "Source Type"::Item, "Source No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec."Source Type" = Rec."Source Type"::Item, Rec."Source No.");
                     end;
                 }
                 field("Search Description"; Rec."Search Description")
@@ -105,7 +119,7 @@ page 99000831 "Released Production Order"
                     QuickEntry = false;
                     ToolTip = 'Specifies the ID of the user who is responsible for the document.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Manufacturing;
                     QuickEntry = false;
@@ -121,7 +135,7 @@ page 99000831 "Released Production Order"
             part(ProdOrderLines; "Released Prod. Order Lines")
             {
                 ApplicationArea = Manufacturing;
-                SubPageLink = "Prod. Order No." = FIELD("No.");
+                SubPageLink = "Prod. Order No." = field("No.");
                 UpdatePropagation = Both;
             }
             group(Schedule)
@@ -140,7 +154,7 @@ page 99000831 "Released Production Order"
 
                     trigger OnValidate()
                     begin
-                        Validate("Starting Time", StartingTime);
+                        Rec.Validate("Starting Time", StartingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -156,7 +170,7 @@ page 99000831 "Released Production Order"
 
                     trigger OnValidate()
                     begin
-                        Validate("Starting Date", StartingDate);
+                        Rec.Validate("Starting Date", StartingDate);
                         CurrPage.Update(true);
                     end;
                 }
@@ -172,7 +186,7 @@ page 99000831 "Released Production Order"
 
                     trigger OnValidate()
                     begin
-                        Validate("Ending Time", EndingTime);
+                        Rec.Validate("Ending Time", EndingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -188,7 +202,7 @@ page 99000831 "Released Production Order"
 
                     trigger OnValidate()
                     begin
-                        Validate("Ending Date", EndingDate);
+                        Rec.Validate("Ending Date", EndingDate);
                         CurrPage.Update(true);
                     end;
                 }
@@ -302,9 +316,9 @@ page 99000831 "Released Production Order"
                         Caption = 'Item Ledger E&ntries';
                         Image = ItemLedger;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ShortCutKey = 'Ctrl+F7';
                         ToolTip = 'View the item ledger entries of the item on the document or journal line.';
                     }
@@ -314,9 +328,9 @@ page 99000831 "Released Production Order"
                         Caption = 'Capacity Ledger Entries';
                         Image = CapacityLedger;
                         RunObject = Page "Capacity Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                     }
                     action("Value Entries")
@@ -325,9 +339,9 @@ page 99000831 "Released Production Order"
                         Caption = 'Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the value entries of the item on the document or journal line.';
                     }
                     action("&Warehouse Entries")
@@ -336,10 +350,10 @@ page 99000831 "Released Production Order"
                         Caption = '&Warehouse Entries';
                         Image = BinLedger;
                         RunObject = Page "Warehouse Entries";
-                        RunPageLink = "Source Type" = FILTER(83 | 5406 | 5407),
-                                      "Source Subtype" = FILTER("3" | "4" | "5"),
-                                      "Source No." = FIELD("No.");
-                        RunPageView = SORTING("Source Type", "Source Subtype", "Source No.");
+                        RunPageLink = "Source Type" = filter(83 | 5406 | 5407),
+                                      "Source Subtype" = filter("3" | "4" | "5"),
+                                      "Source No." = field("No.");
+                        RunPageView = sorting("Source Type", "Source Subtype", "Source No.");
                         ToolTip = 'View the history of quantities that are registered for the item in warehouse activities. ';
                     }
                 }
@@ -354,7 +368,7 @@ page 99000831 "Released Production Order"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Planning)
@@ -378,9 +392,9 @@ page 99000831 "Released Production Order"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Production Order Statistics";
-                    RunPageLink = Status = FIELD(Status),
-                                  "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = Status = field(Status),
+                                  "No." = field("No."),
+                                  "Date Filter" = field("Date Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -390,8 +404,8 @@ page 99000831 "Released Production Order"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Prod. Order Comment Sheet";
-                    RunPageLink = Status = FIELD(Status),
-                                  "Prod. Order No." = FIELD("No.");
+                    RunPageLink = Status = field(Status),
+                                  "Prod. Order No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Put-away/Pick Lines/Movement Lines")
@@ -400,10 +414,10 @@ page 99000831 "Released Production Order"
                     Caption = 'Put-away/Pick Lines/Movement Lines';
                     Image = PutawayLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Source Type" = FILTER(5406 | 5407),
-                                  "Source Subtype" = CONST("3"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.", "Unit of Measure Code", "Action Type", "Breakbulk No.", "Original Breakbulk");
+                    RunPageLink = "Source Type" = filter(5406 | 5407),
+                                  "Source Subtype" = const("3"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.", "Unit of Measure Code", "Action Type", "Breakbulk No.", "Original Breakbulk");
                     ToolTip = 'View the list of ongoing inventory put-aways, picks, or movements for the order.';
                 }
                 action("Registered P&ick Lines")
@@ -412,10 +426,10 @@ page 99000831 "Released Production Order"
                     Caption = 'Registered P&ick Lines';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Act.-Lines";
-                    RunPageLink = "Source Type" = CONST(5407),
-                                  "Source Subtype" = CONST("3"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+                    RunPageLink = "Source Type" = const(5407),
+                                  "Source Subtype" = const("3"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
                     ToolTip = 'View the list of warehouse picks that have been made for the order.';
                 }
                 action("Registered Invt. Movement Lines")
@@ -424,10 +438,10 @@ page 99000831 "Released Production Order"
                     Caption = 'Registered Invt. Movement Lines';
                     Image = RegisteredDocs;
                     RunObject = Page "Reg. Invt. Movement Lines";
-                    RunPageLink = "Source Type" = CONST(5407),
-                                  "Source Subtype" = CONST("3"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+                    RunPageLink = "Source Type" = const(5407),
+                                  "Source Subtype" = const("3"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
                     ToolTip = 'View the list of inventory movements that have been made for the order.';
                 }
             }
@@ -450,8 +464,8 @@ page 99000831 "Released Production Order"
                     var
                         ProdOrder: Record "Production Order";
                     begin
-                        ProdOrder.SetRange(Status, Status);
-                        ProdOrder.SetRange("No.", "No.");
+                        ProdOrder.SetRange(Status, Rec.Status);
+                        ProdOrder.SetRange("No.", Rec."No.");
                         REPORT.RunModal(REPORT::"Refresh Production Order", true, true, ProdOrder);
                     end;
                 }
@@ -467,8 +481,8 @@ page 99000831 "Released Production Order"
                     var
                         ProdOrder: Record "Production Order";
                     begin
-                        ProdOrder.SetRange(Status, Status);
-                        ProdOrder.SetRange("No.", "No.");
+                        ProdOrder.SetRange(Status, Rec.Status);
+                        ProdOrder.SetRange("No.", Rec."No.");
                         REPORT.RunModal(REPORT::"Replan Production Order", true, true, ProdOrder);
                     end;
                 }
@@ -498,8 +512,8 @@ page 99000831 "Released Production Order"
                     var
                         ProdOrder: Record "Production Order";
                     begin
-                        ProdOrder.SetRange(Status, Status);
-                        ProdOrder.SetRange("No.", "No.");
+                        ProdOrder.SetRange(Status, Rec.Status);
+                        ProdOrder.SetRange("No.", Rec."No.");
 
                         REPORT.RunModal(REPORT::"Update Unit Cost", true, true, ProdOrder);
                     end;
@@ -558,7 +572,7 @@ page 99000831 "Released Production Order"
 
                     trigger OnAction()
                     begin
-                        CreateInvtPutAwayPick();
+                        Rec.CreateInvtPutAwayPick();
                     end;
                 }
                 action("Create I&nbound Whse. Request")
@@ -593,8 +607,8 @@ page 99000831 "Released Production Order"
 
                     trigger OnAction()
                     begin
-                        SetHideValidationDialog(false);
-                        CreatePick(UserId, 0, false, false, false);
+                        Rec.SetHideValidationDialog(false);
+                        Rec.CreatePick(UserId, 0, false, false, false);
                     end;
                 }
             }
@@ -718,10 +732,10 @@ page 99000831 "Released Production Order"
         Item: Record Item;
     begin
 #if not CLEAN17
-        GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
+        Rec.GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
 #endif
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory("Source Type" = "Source Type"::Item, "Source No.");
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec."Source Type" = Rec."Source Type"::Item, Rec."Source No.");
     end;
 
 #if not CLEAN17

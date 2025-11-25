@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Contact;
+using System.Utilities;
+
 xmlport 5051 "Export Segment Contact"
 {
     Caption = 'Export Segment Contact';
@@ -13,7 +18,7 @@ xmlport 5051 "Export Segment Contact"
             tableelement(Integer; Integer)
             {
                 XmlName = 'ContactHeader';
-                SourceTableView = SORTING(Number) WHERE(Number = CONST(1));
+                SourceTableView = sorting(Number) where(Number = const(1));
                 textelement(ContNoTitle)
                 {
 
@@ -306,7 +311,7 @@ xmlport 5051 "Export Segment Contact"
             tableelement("Segment Line"; "Segment Line")
             {
                 XmlName = 'SegmentLine';
-                SourceTableView = SORTING("Segment No.", "Line No.");
+                SourceTableView = sorting("Segment No.", "Line No.");
                 textelement(ContNo)
                 {
 

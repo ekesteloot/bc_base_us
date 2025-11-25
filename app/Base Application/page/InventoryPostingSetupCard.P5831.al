@@ -100,7 +100,7 @@ page 5831 "Inventory Posting Setup Card"
 
                 trigger OnAction()
                 begin
-                    SuggestSetupAccounts();
+                    Rec.SuggestSetupAccounts();
                 end;
             }
         }

@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 xmlport 9172 "Import/Export Permissions"
 {
     Caption = 'Import/Export Permissions';
@@ -83,13 +85,13 @@ xmlport 9172 "Import/Export Permissions"
 
     local procedure InsertPermissionSet(Permission: Record Permission)
     var
-        PermissionSet: Record "Permission Set";
+        MetadataPermissionSet: Record "Metadata Permission Set";
     begin
-        if not PermissionSet.Get(Permission."Role ID") then begin
-            PermissionSet.Init();
-            PermissionSet."Role ID" := Permission."Role ID";
-            PermissionSet.Name := Permission."Role Name";
-            PermissionSet.Insert();
+        if not MetadataPermissionSet.Get(Permission."Role ID") then begin
+            MetadataPermissionSet.Init();
+            MetadataPermissionSet."Role ID" := Permission."Role ID";
+            MetadataPermissionSet.Name := Permission."Role Name";
+            MetadataPermissionSet.Insert();
         end;
     end;
 }

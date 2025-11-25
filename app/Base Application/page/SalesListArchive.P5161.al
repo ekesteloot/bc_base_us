@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Archive;
+
+using System.Security.User;
+
 page 5161 "Sales List Archive"
 {
     Caption = 'Sales List Archive';
@@ -41,7 +45,7 @@ page 5161 "Sales List Archive"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Archived By");
+                        UserMgt.DisplayUserInformation(Rec."Archived By");
                     end;
                 }
                 field("Interaction Exist"; Rec."Interaction Exist")

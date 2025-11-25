@@ -1,7 +1,11 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.HumanResources.Employee;
+
 report 5202 "Employee - Misc. Article Info."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeMiscArticleInfo.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeMiscArticleInfo.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee Miscellaneous Article Information';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5202 "Employee - Misc. Article Info."
     {
         dataitem("Misc. Article Information"; "Misc. Article Information")
         {
-            DataItemTableView = SORTING("Employee No.", "Misc. Article Code", "Line No.");
+            DataItemTableView = sorting("Employee No.", "Misc. Article Code", "Line No.");
             RequestFilterFields = "Employee No.", "Misc. Article Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 page 5188 "Inter. Log Entry Comment List"
 {
     Caption = 'Inter. Log Entry Comment List';
@@ -18,12 +20,12 @@ page 5188 "Inter. Log Entry Comment List"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the number of the entry, as assigned from the specified number series when the entry was created.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the date on which the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the comment itself. You can enter a maximum of 80 characters, both numbers and letters.';

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
 page 5755 "Transfer Statistics"
 {
     Caption = 'Transfer Statistics';
@@ -48,6 +50,13 @@ page 5755 "Transfer Statistics"
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the volume of items for this transfer order.';
                 }
+                field("Reserved from Stock"; Rec.GetQtyReservedFromStockState())
+                {
+                    ApplicationArea = Reservation;
+                    Editable = false;
+                    Caption = 'Reserved from stock';
+                    ToolTip = 'Specifies what part of the quantity is reserved from stock.';
+                }
             }
         }
     }
@@ -80,7 +89,7 @@ page 5755 "Transfer Statistics"
         if IsHandled then
             exit;
 
-        TransLine.SetRange("Document No.", "No.");
+        TransLine.SetRange("Document No.", Rec."No.");
         TransLine.SetRange("Derived From Line No.", 0);
         if TransLine.Find('-') then
             repeat

@@ -1,3 +1,9 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.NoSeries;
+using System.Utilities;
+
 codeunit 1387 "Employee Templ. Mgt."
 {
     trigger OnRun()

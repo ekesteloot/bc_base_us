@@ -1,3 +1,27 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Graph;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Integration.Entity;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System;
+using System.Environment;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 5503 "Graph Mgt - Attachment Buffer"
 {
     Permissions = TableData "Incoming Document Attachment" = rimd, tabledata "Tenant Media" = r;

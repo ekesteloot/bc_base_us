@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.InventoryMgt.Costing;
+using System.Security.AccessControl;
+using System.Utilities;
+
 table 339 "Item Application Entry"
 {
     Caption = 'Item Application Entry';
@@ -50,8 +56,6 @@ table 339 "Item Application Entry"
             Caption = 'Created By User';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(27; "Last Modified Date"; DateTime)
         {
@@ -62,8 +66,6 @@ table 339 "Item Application Entry"
             Caption = 'Last Modified By User';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(5800; "Cost Application"; Boolean)
         {
@@ -86,8 +88,9 @@ table 339 "Item Application Entry"
         {
             Clustered = true;
         }
-        key(Key2; "Inbound Item Entry No.", "Item Ledger Entry No.", "Outbound Item Entry No.", "Cost Application")
+        key(Key2; "Posting Date", "Inbound Item Entry No.", "Item Ledger Entry No.", "Outbound Item Entry No.", "Cost Application")
         {
+            IncludedFields = Quantity;
         }
         key(Key3; "Outbound Item Entry No.", "Item Ledger Entry No.", "Cost Application", "Transferred-from Entry No.")
         {

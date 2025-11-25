@@ -1,3 +1,14 @@
+﻿namespace System.IO;
+
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using System.Utilities;
+
 codeunit 1224 "Map Incoming Doc to Gen. Line"
 {
     TableNo = "Incoming Document";
@@ -159,7 +170,7 @@ codeunit 1224 "Map Incoming Doc to Gen. Line"
                 ErrorMessage.LogMessage(GenJournalLine, GenJournalLine.FieldNo("Document Type"),
                   ErrorMessage."Message Type"::Error, PreMapIncomingPurchDoc.ConstructDocumenttypeUnknownErr());
         end;
-        exit("Gen. Journal Document Type"::" ");
+        exit(Enum::"Gen. Journal Document Type"::" ");
     end;
 
     local procedure UseDefaultGLAccount(var GenJournalLine: Record "Gen. Journal Line"; FieldName: Text; VendorName: Text)

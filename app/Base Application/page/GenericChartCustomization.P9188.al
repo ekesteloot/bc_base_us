@@ -1,3 +1,10 @@
+﻿namespace System.Visualization;
+
+using System;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 page 9188 "Generic Chart Customization"
 {
     Caption = 'Generic Chart Customization';
@@ -667,7 +674,7 @@ page 9188 "Generic Chart Customization"
                 var
                     CopyGenericChart: Page "Copy Generic Chart";
                 begin
-                    CalcFields(BLOB);
+                    Rec.CalcFields(BLOB);
                     CopyGenericChart.SetSourceChart(Rec);
                     CopyGenericChart.RunModal();
                 end;
@@ -716,26 +723,18 @@ page 9188 "Generic Chart Customization"
         ChartDescription: Text;
         DummyInt: Integer;
         DummyCaption: Text[50];
-        [InDataSet]
         OptionalMeasuresEnabled: Boolean;
         Text002: Label 'Field %1 is already assigned to a measure or dimension. Select a different field.';
-        [InDataSet]
         ZAxisEnabled: Boolean;
         Text004: Label 'You can only select one Measure with aggregation type Count.';
         Text005: Label 'If you select Aggregation Count, the Data Column will be modified for this measure. Do you want to continue?';
         TitleEnabled: Boolean;
         XMLRetrieved: Boolean;
-        [InDataSet]
         DataColumn1Enabled: Boolean;
-        [InDataSet]
         DataColumn2Enabled: Boolean;
-        [InDataSet]
         DataColumn3Enabled: Boolean;
-        [InDataSet]
         DataColumn4Enabled: Boolean;
-        [InDataSet]
         DataColumn5Enabled: Boolean;
-        [InDataSet]
         DataColumn6Enabled: Boolean;
 
     local procedure SetFieldValues()
@@ -814,7 +813,7 @@ page 9188 "Generic Chart Customization"
         for i := 1 to Count do
             if AddYAxisMeasure(i) then begin
                 Clear(TempGenericChartYAxis);
-                TempGenericChartYAxis.ID := ID;
+                TempGenericChartYAxis.ID := Rec.ID;
                 TempGenericChartYAxis."Line No." := i * 10000;
                 TempGenericChartYAxis."Y-Axis Measure Field Name" := DataColumn[i];
                 TempGenericChartYAxis."Y-Axis Measure Field Caption" := MeasureCaption[i];
@@ -912,7 +911,7 @@ page 9188 "Generic Chart Customization"
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
     begin
-        TempBlob.FromRecord(Rec, FieldNo(BLOB));
+        TempBlob.FromRecord(Rec, Rec.FieldNo(BLOB));
         if TempBlob.HasValue() then
             FileMgt.BLOBExport(TempBlob, '*.xml', true);
     end;

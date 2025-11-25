@@ -1,3 +1,14 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Loaner;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Setup;
+using System.Utilities;
+
 codeunit 5923 "Service-Quote to Order"
 {
     Permissions = TableData "Loaner Entry" = rm,
@@ -22,20 +33,20 @@ codeunit 5923 "Service-Quote to Order"
 
         ServMgtSetup.Get();
 
-        ServOrderHeader."Document Type" := "Document Type"::Order;
+        ServOrderHeader."Document Type" := Rec."Document Type"::Order;
         OnRunOnAfterGetServMgtSetup(ServOrderHeader, Rec);
-        Customer.Get("Customer No.");
+        Customer.Get(Rec."Customer No.");
         IsHandled := false;
         OnRunOnBeforeCheckBlockedCustOnDocs(ServOrderHeader, Rec, IsHandled);
         if not IsHandled then begin
             Customer.CheckBlockedCustOnDocs(Customer, DocType::Quote, false, false);
-            if "Customer No." <> "Bill-to Customer No." then begin
-                Customer.Get("Bill-to Customer No.");
+            if Rec."Customer No." <> Rec."Bill-to Customer No." then begin
+                Customer.Get(Rec."Bill-to Customer No.");
                 Customer.CheckBlockedCustOnDocs(Customer, DocType::Quote, false, false);
             end;
-        end;    
+        end;
 
-        ValidateSalesPersonOnServiceHeader(Rec, true, false);
+        Rec.ValidateSalesPersonOnServiceHeader(Rec, true, false);
 
         CustCheckCreditLimit.ServiceHeaderCheck(ServOrderHeader);
 
@@ -46,7 +57,7 @@ codeunit 5923 "Service-Quote to Order"
         SkipDelete := false;
         OnBeforeServHeaderDelete(Rec, SkipDelete);
         if not SkipDelete then
-            Delete(true);
+            Rec.Delete(true);
     end;
 
     var

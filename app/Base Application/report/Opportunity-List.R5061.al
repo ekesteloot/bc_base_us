@@ -1,7 +1,11 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Opportunity;
+
 report 5061 "Opportunity - List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/OpportunityList.rdlc';
+    RDLCLayout = './CRM/Reports/OpportunityList.rdlc';
     AdditionalSearchTerms = 'prospects';
     ApplicationArea = RelationshipMgmt;
     Caption = 'Opportunity - List';

@@ -1,3 +1,11 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Reports;
+using Microsoft.CRM.Task;
+using System.Environment;
+
 page 5091 Segment
 {
     Caption = 'Segment';
@@ -20,7 +28,7 @@ page 5091 Segment
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -44,7 +52,7 @@ page 5091 Segment
                         SalespersonCodeOnAfterValidate();
                     end;
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the date that the segment was created.';
@@ -285,7 +293,7 @@ page 5091 Segment
                     Caption = 'Criteria';
                     Image = "Filter";
                     RunObject = Page "Segment Criteria";
-                    RunPageLink = "Segment No." = FIELD("No.");
+                    RunPageLink = "Segment No." = field("No.");
                     ToolTip = 'View a list of the actions that you have performed (adding or removing contacts) in order to define the segment criteria.';
                 }
                 action("Oppo&rtunities")
@@ -294,8 +302,8 @@ page 5091 Segment
                     Caption = 'Oppo&rtunities';
                     Image = OpportunityList;
                     RunObject = Page "Opportunity List";
-                    RunPageLink = "Segment No." = FIELD("No.");
-                    RunPageView = SORTING("Segment No.");
+                    RunPageLink = "Segment No." = field("No.");
+                    RunPageView = sorting("Segment No.");
                     ToolTip = 'View the sales opportunities that are handled by salespeople for the segment. Opportunities must involve a contact and can be linked to campaigns.';
                 }
                 action("Create opportunity")
@@ -304,7 +312,7 @@ page 5091 Segment
                     Caption = 'Create Opportunity';
                     Image = NewOpportunity;
                     RunObject = Page "Opportunity Card";
-                    RunPageLink = "Segment No." = FIELD("No.");
+                    RunPageLink = "Segment No." = field("No.");
                     RunPageMode = Create;
                     ToolTip = 'Create a new opportunity card.';
                 }
@@ -325,9 +333,9 @@ page 5091 Segment
                     Caption = 'T&asks';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    RunPageLink = "Segment No." = FIELD("No."),
-                                  "System To-do Type" = FILTER(Organizer | "Salesperson Attendee");
-                    RunPageView = SORTING("Segment No.");
+                    RunPageLink = "Segment No." = field("No."),
+                                  "System To-do Type" = filter(Organizer | "Salesperson Attendee");
+                    RunPageView = sorting("Segment No.");
                     ToolTip = 'View all marketing tasks that involve the segment.';
                 }
                 action("Modify Word Template")
@@ -548,8 +556,8 @@ page 5091 Segment
 
                         trigger OnAction()
                         begin
-                            TestField("Interaction Template Code");
-                            ExportAttachment();
+                            Rec.TestField("Interaction Template Code");
+                            Rec.ExportAttachment();
                         end;
                     }
                     action(Remove)
@@ -578,7 +586,7 @@ page 5091 Segment
                         SegLineLocal: Record "Segment Line";
                         EnvironmentInfo: Codeunit "Environment Information";
                     begin
-                        SegLineLocal.SetRange("Segment No.", "No.");
+                        SegLineLocal.SetRange("Segment No.", Rec."No.");
                         if EnvironmentInfo.IsSaaS() then
                             SegLineLocal.ExportODataFields()
                         else
@@ -691,27 +699,16 @@ page 5091 Segment
     var
         LoggedSegmentLbl: Label 'Segment %1 has been logged.', Comment = '%1 = Segment No.';
         UndoLastCriteriaMsg: Label 'This will undo the last criteria action.\Do you want to continue?';
-        [InDataSet]
         CampaignTargetEnable: Boolean;
-        [InDataSet]
         CampaignResponseEnable: Boolean;
-        [InDataSet]
         CorrespondenceTypeDefaultEnabl: Boolean;
-        [InDataSet]
         SubjectDefaultEnable: Boolean;
-        [InDataSet]
         LanguageCodeDefaultEnable: Boolean;
-        [InDataSet]
         AttachmentEnable: Boolean;
-        [InDataSet]
         IgnoreContactCorresTypeEnable: Boolean;
-        [InDataSet]
         InformationFlowEnable: Boolean;
-        [InDataSet]
         InitiatedByEnable: Boolean;
-        [InDataSet]
         UnitCostLCYEnable: Boolean;
-        [InDataSet]
         UnitDurationMinEnable: Boolean;
         CreateOppQst: Label 'Do you want to create an opportunity for all contacts in segment?';
 
@@ -817,21 +814,21 @@ page 5091 Segment
 
     local procedure CampaignNoOnAfterValidate()
     begin
-        if "Campaign No." = '' then begin
-            "Campaign Target" := false;
-            "Campaign Response" := false;
+        if Rec."Campaign No." = '' then begin
+            Rec."Campaign Target" := false;
+            Rec."Campaign Response" := false;
         end;
 
-        CalcFields("Campaign Description");
-        CampaignTargetEnable := "Campaign No." <> '';
-        CampaignResponseEnable := "Campaign No." <> '';
+        Rec.CalcFields("Campaign Description");
+        CampaignTargetEnable := Rec."Campaign No." <> '';
+        CampaignResponseEnable := Rec."Campaign No." <> '';
         CurrPage.SegLines.PAGE.UpdateForm();
     end;
 
     local procedure CreateOpportunitiesForAllContacts()
     begin
         if Confirm(CreateOppQst) then
-            CreateOpportunities();
+            Rec.CreateOpportunities();
     end;
 
     [IntegrationEvent(TRUE, false)]

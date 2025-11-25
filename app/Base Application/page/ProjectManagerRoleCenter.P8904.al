@@ -1,3 +1,14 @@
+namespace Microsoft.ProjectMgt.RoleCenters;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Shared.Navigate;
+
 page 8904 "Project Manager Role Center"
 {
     Caption = 'Project Manager Role Center';

@@ -1,16 +1,14 @@
 report 1005 "Job Journal - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/JobJournalTest.rdlc';
-    ApplicationArea = Jobs;
+    RDLCLayout = './ProjectMgt/Jobs/Reports/JobJournalTest.rdlc';
     Caption = 'Job Journal - Test';
-    UsageCategory = ReportsAndAnalysis;
 
     dataset
     {
         dataitem("Job Journal Batch"; "Job Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Journal Template Name", Name;
             column(Job_Journal_Batch_Name; Name)
@@ -18,7 +16,7 @@ report 1005 "Job Journal - Test"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 PrintOnlyIfDetail = true;
                 column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
                 {
@@ -88,9 +86,9 @@ report 1005 "Job Journal - Test"
                 }
                 dataitem("Job Journal Line"; "Job Journal Line")
                 {
-                    DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
+                    DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
                     DataItemLinkReference = "Job Journal Batch";
-                    DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+                    DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
                     RequestFilterFields = "Posting Date";
                     column(Job_Journal_Line__Line_Amount_; "Line Amount")
                     {
@@ -136,7 +134,7 @@ report 1005 "Job Journal - Test"
                     }
                     dataitem(DimensionLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -186,7 +184,7 @@ report 1005 "Job Journal - Test"
                     }
                     dataitem(ErrorLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number_; ErrorText[Number])
                         {
                         }
@@ -207,10 +205,12 @@ report 1005 "Job Journal - Test"
 
                     trigger OnAfterGetRecord()
                     var
+                        ItemVariant: Record "Item Variant";
                         UserSetupManagement: Codeunit "User Setup Management";
                         InvtPeriodEndDate: Date;
                         TempErrorText: Text[250];
                         IsHandled: Boolean;
+                        ItemItemVariantLbl: Label '%1 %2', Comment = '%1 - Item No., %2 - Variant Code';
                     begin
                         if EmptyLine() then
                             exit;
@@ -259,10 +259,20 @@ report 1005 "Job Journal - Test"
                                     end;
                                 Type::Item:
                                     if not Item.Get("No.") then
-                                        AddError(StrSubstNo(Text007, "No."))
-                                    else
+                                        AddError(StrSubstNo(DoesNotExistErr, "No.", Item.TableCaption()))
+                                    else begin
                                         if Item.Blocked then
-                                            AddError(StrSubstNo(Text008, Item.FieldCaption(Blocked), false, "No."));
+                                            AddError(StrSubstNo(MustBeForErr, Item.FieldCaption(Blocked), false, Item.TableCaption(), "No."));
+
+                                        if "Job Journal Line"."Variant Code" <> '' then begin
+                                            ItemVariant.SetLoadFields(Blocked);
+                                            if ItemVariant.Get("Job Journal Line"."No.", "Job Journal Line"."Variant Code") then begin
+                                                if ItemVariant.Blocked then
+                                                    AddError(StrSubstNo(MustBeForErr, ItemVariant.FieldCaption(Blocked), false, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, "Job Journal Line"."No.", "Job Journal Line"."Variant Code")));
+                                            end else
+                                                AddError(StrSubstNo(DoesNotExistErr, StrSubstNo(ItemItemVariantLbl, "Job Journal Line"."No.", "Job Journal Line"."Variant Code"), ItemVariant.TableCaption()));
+                                        end;
+                                    end;
                                 Type::"G/L Account":
                                     ;
                             end;
@@ -408,8 +418,8 @@ report 1005 "Job Journal - Test"
         Text004: Label '%1 %2 %3 does not exist.';
         Text005: Label 'Resource %1 does not exist.';
         Text006: Label '%1 must be %2 for resource %3.';
-        Text007: Label 'Item %1 does not exist.';
-        Text008: Label '%1 must be %2 for item %3.';
+        MustBeForErr: Label '%1 must be %2 for %3 %4.', Comment = '%1 = field caption, %2 = value, %3 = table caption, %4 = field caption';
+        DoesNotExistErr: Label '%2 %1 does not exist.', Comment = '%1 = Entity No., %2 - Table Caption';
         Text009: Label '%1 must not be a closing date.';
         Text010: Label 'The lines are not listed according to posting date because they were not entered in that order.';
         Text011: Label '%1 is not within your allowed range of posting dates.';

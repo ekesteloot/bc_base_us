@@ -1,3 +1,16 @@
+namespace Microsoft.CRM.Team;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Task;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Integration.Dataverse;
+using System.Email;
+using System.Text;
+
 page 14 "Salespersons/Purchasers"
 {
     AdditionalSearchTerms = 'sales representative';
@@ -16,7 +29,7 @@ page 14 "Salespersons/Purchasers"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code of the record.';
@@ -91,8 +104,8 @@ page 14 "Salespersons/Purchasers"
                     Caption = 'Tea&ms';
                     Image = TeamSales;
                     RunObject = Page "Salesperson Teams";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View or edit any teams that the salesperson/purchaser is a member of.';
                 }
                 action("Con&tacts")
@@ -101,8 +114,8 @@ page 14 "Salespersons/Purchasers"
                     Caption = 'Con&tacts';
                     Image = CustomerContact;
                     RunObject = Page "Contact List";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View a list of contacts that are associated with the salesperson/purchaser.';
                 }
                 group(Dimensions)
@@ -115,8 +128,8 @@ page 14 "Salespersons/Purchasers"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(13),
-                                      "No." = FIELD(Code);
+                        RunPageLink = "Table ID" = const(13),
+                                      "No." = field(Code);
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -134,7 +147,7 @@ page 14 "Salespersons/Purchasers"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(SalespersonPurchaser);
-                            DefaultDimMultiple.SetMultiRecord(SalespersonPurchaser, FieldNo(Code));
+                            DefaultDimMultiple.SetMultiRecord(SalespersonPurchaser, Rec.FieldNo(Code));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -145,7 +158,7 @@ page 14 "Salespersons/Purchasers"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Salesperson Statistics";
-                    RunPageLink = Code = FIELD(Code);
+                    RunPageLink = Code = field(Code);
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -155,8 +168,8 @@ page 14 "Salespersons/Purchasers"
                     Caption = 'C&ampaigns';
                     Image = Campaign;
                     RunObject = Page "Campaign List";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View or edit any campaigns that the salesperson/purchaser is assigned to.';
                 }
                 action("S&egments")
@@ -165,8 +178,8 @@ page 14 "Salespersons/Purchasers"
                     Caption = 'S&egments';
                     Image = Segment;
                     RunObject = Page "Segment List";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View a list of all segments.';
                 }
                 separator(Action22)
@@ -179,8 +192,8 @@ page 14 "Salespersons/Purchasers"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
@@ -190,8 +203,8 @@ page 14 "Salespersons/Purchasers"
                     Caption = 'Postponed &Interactions';
                     Image = PostponedInteractions;
                     RunObject = Page "Postponed Interactions";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View postponed interactions for the salesperson/purchaser.';
                 }
                 action("T&asks")
@@ -200,9 +213,9 @@ page 14 "Salespersons/Purchasers"
                     Caption = 'T&asks';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    RunPageLink = "Salesperson Code" = FIELD(Code),
-                                  "System To-do Type" = FILTER(Organizer | "Salesperson Attendee");
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code),
+                                  "System To-do Type" = filter(Organizer | "Salesperson Attendee");
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View tasks for the salesperson/purchaser.';
                 }
                 action("Oppo&rtunities")
@@ -211,8 +224,8 @@ page 14 "Salespersons/Purchasers"
                     Caption = 'Oppo&rtunities';
                     Image = OpportunitiesList;
                     RunObject = Page "Opportunity List";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View opportunities for the salesperson/purchaser.';
                 }
             }
@@ -231,7 +244,7 @@ page 14 "Salespersons/Purchasers"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -276,7 +289,7 @@ page 14 "Salespersons/Purchasers"
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(MatchBasedCoupling)
@@ -330,7 +343,7 @@ page 14 "Salespersons/Purchasers"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -368,7 +381,7 @@ page 14 "Salespersons/Purchasers"
 
                 trigger OnAction()
                 begin
-                    CreateInteraction();
+                    Rec.CreateInteraction();
                 end;
             }
             action(Email)
@@ -466,7 +479,7 @@ page 14 "Salespersons/Purchasers"
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
     begin
         if CDSIntegrationEnabled or CRMIntegrationEnabled then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
 
         CurrPage.SetSelectionFilter(Record);
         CanSendEmail := Record.Count() = 1;
@@ -488,9 +501,7 @@ page 14 "Salespersons/Purchasers"
     end;
 
     var
-        [InDataSet]
         CanSendEmail: Boolean;
-        [InDataSet]
         CreateInteractionVisible: Boolean;
         CDSIntegrationEnabled: Boolean;
         CRMIntegrationEnabled: Boolean;

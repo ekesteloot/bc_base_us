@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 page 99000820 "Prod. Order Capacity Need"
 {
     Caption = 'Prod. Order Capacity Need';
@@ -38,7 +40,7 @@ page 99000820 "Prod. Order Capacity Need"
 
                     trigger OnValidate()
                     begin
-                        Validate("Starting Time", StartingTime);
+                        Rec.Validate("Starting Time", StartingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -61,7 +63,7 @@ page 99000820 "Prod. Order Capacity Need"
 
                     trigger OnValidate()
                     begin
-                        Validate("Ending Time", EndingTime);
+                        Rec.Validate("Ending Time", EndingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -83,7 +85,7 @@ page 99000820 "Prod. Order Capacity Need"
 
                     trigger OnValidate()
                     begin
-                        Validate(Date, CurrDate);
+                        Rec.Validate(Date, CurrDate);
                         CurrPage.Update(true);
                     end;
                 }
@@ -125,7 +127,7 @@ page 99000820 "Prod. Order Capacity Need"
 
     trigger OnAfterGetRecord()
     begin
-        GetStartingEndingDateAndTime(StartingTime, EndingTime, CurrDate);
+        Rec.GetStartingEndingDateAndTime(StartingTime, EndingTime, CurrDate);
     end;
 
     trigger OnInit()

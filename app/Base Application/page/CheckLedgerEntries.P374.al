@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Check;
+
+using Microsoft.Shared.Navigate;
+
 page 374 "Check Ledger Entries"
 {
     ApplicationArea = Basic, Suite;
@@ -8,8 +12,8 @@ page 374 "Check Ledger Entries"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "Check Ledger Entry";
-    SourceTableView = SORTING("Bank Account No.", "Check Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Bank Account No.", "Check Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -149,7 +153,7 @@ page 374 "Check Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -193,8 +197,8 @@ page 374 "Check Ledger Entries"
     trigger OnOpenPage()
     begin
         OnBeforeOnOpenPage();
-        if (GetFilters() <> '') and not Find() then
-            if FindFirst() then;
+        if (Rec.GetFilters() <> '') and not Rec.Find() then
+            if Rec.FindFirst() then;
     end;
 
     var

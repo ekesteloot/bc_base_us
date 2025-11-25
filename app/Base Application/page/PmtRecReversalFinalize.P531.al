@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 page 531 "Pmt. Rec. Reversal Finalize"
 {
     PageType = NavigatePage;

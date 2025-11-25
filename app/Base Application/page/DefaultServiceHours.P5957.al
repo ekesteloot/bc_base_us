@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Contract;
+
 page 5957 "Default Service Hours"
 {
     ApplicationArea = Service;
@@ -5,7 +7,7 @@ page 5957 "Default Service Hours"
     DelayedInsert = true;
     PageType = List;
     SourceTable = "Service Hour";
-    SourceTableView = WHERE("Service Contract No." = CONST(''));
+    SourceTableView = where("Service Contract No." = const(''));
     UsageCategory = Administration;
 
     layout
@@ -26,7 +28,7 @@ page 5957 "Default Service Hours"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the date when the service hours become valid.';
                 }
-                field(Day; Day)
+                field(Day; Rec.Day)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the day when the service hours are valid.';

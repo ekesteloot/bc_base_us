@@ -1,3 +1,11 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Document;
+using System.Text;
+using System.Utilities;
+
 page 6009 "Res. Gr. Alloc. per Serv Order"
 {
     Caption = 'Resource Group Allocated per Service Order';
@@ -133,8 +141,8 @@ page 6009 "Res. Gr. Alloc. per Serv Order"
     trigger OnOpenPage()
     begin
         SetMatrixColumns("Matrix Page Step Type"::Initial);
-        if HasFilter then
-            ResourceGrFilter := GetFilter("Resource Group Filter");
+        if Rec.HasFilter then
+            ResourceGrFilter := Rec.GetFilter("Resource Group Filter");
     end;
 
     var

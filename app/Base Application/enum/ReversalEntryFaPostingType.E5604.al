@@ -1,4 +1,6 @@
-﻿enum 5604 "Reversal Entry FA Posting Type"
+﻿namespace Microsoft.FixedAssets.Posting;
+
+enum 5604 "Reversal Entry FA Posting Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

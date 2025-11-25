@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Counting.Tracking;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+
 codeunit 5889 "Phys. Invt. Tracking Mgt."
 {
     Permissions = TableData "Reservation Entry" = rimd,
@@ -79,7 +88,7 @@ codeunit 5889 "Phys. Invt. Tracking Mgt."
           "Source Type", "Source Subtype", "Source ID",
           "Source Batch Name", "Source Prod. Order Line",
           "Source Ref. No.");
-        ReservEntry.SetRange("Source Type", DATABASE::"Phys. Invt. Order Line");
+        ReservEntry.SetRange("Source Type", Enum::TableID::"Phys. Invt. Order Line");
         ReservEntry.SetRange("Source Subtype", 0);
         ReservEntry.SetRange("Source ID", PhysInvtOrderLine."Document No.");
         ReservEntry.SetRange("Source Batch Name", '');
@@ -99,7 +108,7 @@ codeunit 5889 "Phys. Invt. Tracking Mgt."
 
                 Qty :=
                   CreateReservEntry.TransferReservEntry(
-                    DATABASE::"Item Journal Line",
+                    Enum::TableID::"Item Journal Line",
                     ItemJnlLine."Entry Type".AsInteger(),
                     ItemJnlLine."Journal Template Name",
                     ItemJnlLine."Journal Batch Name",

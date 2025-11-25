@@ -1,3 +1,9 @@
+namespace Microsoft.CashFlow.Worksheet;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 codeunit 846 "Cash Flow Wksh. -Register Line"
 {
     Permissions = TableData "Cash Flow Forecast Entry" = rimd;

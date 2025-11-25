@@ -1,3 +1,13 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
+using Microsoft.CostAccounting.Setup;
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Intercompany.Dimension;
+using Microsoft.InventoryMgt.Analysis;
+
 table 349 "Dimension Value"
 {
     Caption = 'Dimension Value';
@@ -51,9 +61,7 @@ table 349 "Dimension Value"
         field(5; Totaling; Text[250])
         {
             Caption = 'Totaling';
-            TableRelation = IF ("Dimension Value Type" = CONST(Total)) "Dimension Value"."Dimension Code" WHERE("Dimension Code" = FIELD("Dimension Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Dimension Value Type" = const(Total)) "Dimension Value"."Dimension Code" where("Dimension Code" = field("Dimension Code"));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -94,7 +102,7 @@ table 349 "Dimension Value"
         field(11; "Map-to IC Dimension Value Code"; Code[20])
         {
             Caption = 'Map-to IC Dimension Value Code';
-            TableRelation = "IC Dimension Value".Code WHERE("Dimension Code" = FIELD("Map-to IC Dimension Code"));
+            TableRelation = "IC Dimension Value".Code where("Dimension Code" = field("Map-to IC Dimension Code"));
         }
         field(12; "Dimension Value ID"; Integer)
         {

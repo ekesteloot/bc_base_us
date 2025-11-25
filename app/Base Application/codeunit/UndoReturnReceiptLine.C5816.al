@@ -1,3 +1,16 @@
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+
 codeunit 5816 "Undo Return Receipt Line"
 {
     Permissions = TableData "Sales Line" = rimd,
@@ -159,7 +172,7 @@ codeunit 5816 "Undo Return Receipt Line"
             if ReturnRcptLine."Return Qty. Rcd. Not Invd." <> ReturnRcptLine.Quantity then
                 Error(Text004);
 
-        if ReturnRcptLine.Type = "Sales Line Type"::Item then begin
+        if ReturnRcptLine.Type = ReturnRcptLine.Type::Item then begin
             UndoPostingMgt.TestReturnRcptLine(ReturnRcptLine);
             IsHandled := false;
             OnCheckReturnRcptLineOnBeforeCollectItemLedgEntries(ReturnRcptLine, TempItemLedgEntry, IsHandled);

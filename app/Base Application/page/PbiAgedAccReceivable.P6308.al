@@ -13,13 +13,13 @@ page 6308 "PBI Aged Acc. Receivable"
             repeater(Control8)
             {
                 ShowCaption = false;
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = All;
                     Caption = 'ID';
                     ToolTip = 'Specifies the ID.';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     Caption = 'Value';
@@ -31,7 +31,7 @@ page 6308 "PBI Aged Acc. Receivable"
                     Caption = 'Period Type';
                     ToolTip = 'Specifies the date.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = All;
                     Caption = 'Date';

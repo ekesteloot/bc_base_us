@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Item;
+
+using Microsoft.InventoryMgt.Item.Substitution;
+
 page 5954 "Service Item Substitutions"
 {
     Caption = 'Service Item Substitutions';
@@ -40,12 +44,12 @@ page 5954 "Service Item Substitutions"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the item number of the catalog substitute item.';
                 }
-                field(Condition; Condition)
+                field(Condition; Rec.Condition)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that a condition exists for this substitution.';
                 }
-                field(Inventory; Inventory)
+                field(Inventory; Rec.Inventory)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies how many units (such as pieces, boxes, or cans) of the item are available.';
@@ -82,12 +86,12 @@ page 5954 "Service Item Substitutions"
                 Caption = '&Condition';
                 Image = ViewComments;
                 RunObject = Page "Sub. Conditions";
-                RunPageLink = Type = FIELD(Type),
-                              "No." = FIELD("No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Substitute Type" = FIELD("Substitute Type"),
-                              "Substitute No." = FIELD("Substitute No."),
-                              "Substitute Variant Code" = FIELD("Substitute Variant Code");
+                RunPageLink = Type = field(Type),
+                              "No." = field("No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Substitute Type" = field("Substitute Type"),
+                              "Substitute No." = field("Substitute No."),
+                              "Substitute Variant Code" = field("Substitute Variant Code");
                 ToolTip = 'Specify a condition for the item substitution, which is for information only and does not affect the item substitution.';
             }
         }
@@ -106,10 +110,10 @@ page 5954 "Service Item Substitutions"
 
     trigger OnAfterGetRecord()
     begin
-        if ("Substitute Type" <> "Substitute Type"::"Nonstock Item") and
-           ("Sub. Item No." <> '')
+        if (Rec."Substitute Type" <> Rec."Substitute Type"::"Nonstock Item") and
+           (Rec."Sub. Item No." <> '')
         then
-            Clear("Sub. Item No.");
+            Clear(Rec."Sub. Item No.");
     end;
 }
 

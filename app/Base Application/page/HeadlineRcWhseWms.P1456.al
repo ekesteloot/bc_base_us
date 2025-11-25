@@ -50,9 +50,7 @@ page 1456 "Headline RC Whse. WMS"
 
     var
         RCHeadlinesPageCommon: Codeunit "RC Headlines Page Common";
-        [InDataSet]
         DefaultFieldsVisible: Boolean;
-        [InDataSet]
         UserGreetingVisible: Boolean;
 }
 

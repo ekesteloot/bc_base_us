@@ -1,3 +1,12 @@
+﻿namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using System.Utilities;
+
 page 5827 "Item Statistics"
 {
     Caption = 'Item Statistics';
@@ -380,13 +389,13 @@ page 5827 "Item Statistics"
     begin
         case DimCode of
             '':
-                exit("Item Statistics Column Option"::Undefined);
+                exit(Enum::"Item Statistics Column Option"::Undefined);
             Text002:
-                exit("Item Statistics Column Option"::Period);
+                exit(Enum::"Item Statistics Column Option"::Period);
             Location.TableCaption():
-                exit("Item Statistics Column Option"::Location);
+                exit(Enum::"Item Statistics Column Option"::Location);
             else
-                exit("Item Statistics Column Option"::Undefined);
+                exit(Enum::"Item Statistics Column Option"::Undefined);
         end;
     end;
 

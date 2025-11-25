@@ -1,3 +1,5 @@
+namespace System.Threading;
+
 page 671 "Job Queue Category List"
 {
     ApplicationArea = Basic, Suite;
@@ -12,7 +14,7 @@ page 671 "Job Queue Category List"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the category of job queue. You can enter a maximum of 10 characters, both numbers and letters.';

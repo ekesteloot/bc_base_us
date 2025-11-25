@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Picture;
+
 table 7499 "Item From Picture Buffer"
 {
     TableType = Temporary;

@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 xmlport 5901 "Import IRIS to Fault Codes"
 {
     Caption = 'Import IRIS to Fault Codes';

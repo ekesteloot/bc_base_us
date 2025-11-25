@@ -6,7 +6,7 @@ page 10026 "Sales Order Shipment"
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = FILTER(Order));
+    SourceTableView = where("Document Type" = filter(Order));
 
     layout
     {
@@ -23,7 +23,7 @@ page 10026 "Sales Order Shipment"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -125,7 +125,7 @@ page 10026 "Sales Order Shipment"
             part(SalesLines; "Sales Order Shipment Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group(Shipping)
             {
@@ -259,21 +259,21 @@ page 10026 "Sales Order Shipment"
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "No." = FIELD("Sell-to Customer No.");
+                SubPageLink = "No." = field("Sell-to Customer No.");
                 Visible = true;
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "No." = FIELD("Bill-to Customer No.");
+                SubPageLink = "No." = field("Bill-to Customer No.");
                 Visible = true;
             }
             part(Control1900316107; "Customer Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "No." = FIELD("Sell-to Customer No.");
+                SubPageLink = "No." = field("Sell-to Customer No.");
                 Visible = true;
             }
             part(Control1906127307; "Sales Line FactBox")
@@ -281,9 +281,9 @@ page 10026 "Sales Order Shipment"
                 ApplicationArea = Basic, Suite;
                 Editable = false;
                 Provider = SalesLines;
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("Document No."),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("Document No."),
+                              "Line No." = field("Line No.");
                 Visible = true;
             }
             part(Control1901314507; "Item Invoicing FactBox")
@@ -291,17 +291,17 @@ page 10026 "Sales Order Shipment"
                 ApplicationArea = Basic, Suite;
                 Editable = false;
                 Provider = SalesLines;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = true;
             }
             part(Control1906354007; "Approval FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "Table ID" = CONST(36),
-                              "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No."),
-                              Status = CONST(Open);
+                SubPageLink = "Table ID" = const(36),
+                              "Document Type" = field("Document Type"),
+                              "Document No." = field("No."),
+                              Status = const(Open);
                 Visible = true;
             }
             part(Control1901796907; "Item Warehouse FactBox")
@@ -309,14 +309,14 @@ page 10026 "Sales Order Shipment"
                 ApplicationArea = Basic, Suite;
                 Editable = false;
                 Provider = SalesLines;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = false;
             }
             part(Control1907234507; "Sales Hist. Bill-to FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "No." = FIELD("Bill-to Customer No.");
+                SubPageLink = "No." = field("Bill-to Customer No.");
                 Visible = false;
             }
             systempart(Control1905767507; Notes)
@@ -352,7 +352,7 @@ page 10026 "Sales Order Shipment"
                             Commit();
                         end;
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        if "Tax Area Code" = '' then
+                        if Rec."Tax Area Code" = '' then
                             PAGE.RunModal(PAGE::"Sales Order Statistics", Rec)
                         else
                             PAGE.RunModal(PAGE::"Sales Order Stats.", Rec)
@@ -364,7 +364,7 @@ page 10026 "Sales Order Shipment"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No.");
+                    RunPageLink = "No." = field("Sell-to Customer No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the card for the customer.';
                 }
@@ -374,8 +374,8 @@ page 10026 "Sales Order Shipment"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No.");
                     ToolTip = 'View comments that apply.';
                 }
                 action("S&hipments")
@@ -384,8 +384,8 @@ page 10026 "Sales Order Shipment"
                     Caption = 'S&hipments';
                     Image = Shipment;
                     RunObject = Page "Posted Sales Shipments";
-                    RunPageLink = "Order No." = FIELD("No.");
-                    RunPageView = SORTING("Order No.");
+                    RunPageLink = "Order No." = field("No.");
+                    RunPageView = sorting("Order No.");
                     ToolTip = 'View posted sales shipments for the customer.';
                 }
                 action(Invoices)
@@ -394,8 +394,8 @@ page 10026 "Sales Order Shipment"
                     Caption = 'Invoices';
                     Image = Invoice;
                     RunObject = Page "Posted Sales Invoices";
-                    RunPageLink = "Order No." = FIELD("No.");
-                    RunPageView = SORTING("Order No.");
+                    RunPageLink = "Order No." = field("No.");
+                    RunPageView = sorting("Order No.");
                     ToolTip = 'View the history of posted sales invoices that have been posted for the document.';
                 }
                 action(Dimensions)
@@ -407,7 +407,7 @@ page 10026 "Sales Order Shipment"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -422,8 +422,8 @@ page 10026 "Sales Order Shipment"
                     var
                         OrderPromisingLine: Record "Order Promising Line" temporary;
                     begin
-                        OrderPromisingLine.SetRange("Source Type", "Document Type");
-                        OrderPromisingLine.SetRange("Source ID", "No.");
+                        OrderPromisingLine.SetRange("Source Type", Rec."Document Type");
+                        OrderPromisingLine.SetRange("Source ID", Rec."No.");
                         PAGE.RunModal(PAGE::"Order Promising Lines", OrderPromisingLine);
                     end;
                 }
@@ -497,16 +497,16 @@ page 10026 "Sales Order Shipment"
                     begin
                         if ApprovalsMgmt.PrePostApprovalCheckSales(Rec) then begin
                             if PrepaymentMgt.TestSalesPrepayment(Rec) then
-                                Error(Text001, "Document Type", "No.");
+                                Error(Text001, Rec."Document Type", Rec."No.");
 
                             if PrepaymentMgt.TestSalesPayment(Rec) then
-                                Error(Text002, "Document Type", "No.");
+                                Error(Text002, Rec."Document Type", Rec."No.");
 
-                            SalesLine.Validate("Document Type", "Document Type");
-                            SalesLine.Validate("Document No.", "No.");
+                            SalesLine.Validate("Document Type", Rec."Document Type");
+                            SalesLine.Validate("Document No.", Rec."No.");
                             SalesLine.InsertFreightLine(FreightAmount);
                             CODEUNIT.Run(CODEUNIT::"Ship-Post (Yes/No)", Rec);
-                            if "Shipping No." = '-1' then
+                            if Rec."Shipping No." = '-1' then
                                 Error('');
                         end;
                     end;
@@ -527,16 +527,16 @@ page 10026 "Sales Order Shipment"
                     begin
                         if ApprovalsMgmt.PrePostApprovalCheckSales(Rec) then begin
                             if PrepaymentMgt.TestSalesPrepayment(Rec) then
-                                Error(Text001, "Document Type", "No.");
+                                Error(Text001, Rec."Document Type", Rec."No.");
 
                             if PrepaymentMgt.TestSalesPayment(Rec) then
-                                Error(Text002, "Document Type", "No.");
+                                Error(Text002, Rec."Document Type", Rec."No.");
 
-                            SalesLine.Validate("Document Type", "Document Type");
-                            SalesLine.Validate("Document No.", "No.");
+                            SalesLine.Validate("Document Type", Rec."Document Type");
+                            SalesLine.Validate("Document No.", Rec."No.");
                             SalesLine.InsertFreightLine(FreightAmount);
                             CODEUNIT.Run(CODEUNIT::"Ship-Post + Print", Rec);
-                            if "Shipping No." = '-1' then
+                            if Rec."Shipping No." = '-1' then
                                 Error('');
                         end;
                     end;
@@ -570,7 +570,7 @@ page 10026 "Sales Order Shipment"
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SaveRecord();
-        exit(ConfirmDeletion());
+        exit(Rec.ConfirmDeletion());
     end;
 
     trigger OnInit()
@@ -596,19 +596,19 @@ page 10026 "Sales Order Shipment"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Responsibility Center" := UserMgt.GetSalesFilter();
+        Rec."Responsibility Center" := UserMgt.GetSalesFilter();
         AfterGetCurrentRecord();
     end;
 
     trigger OnOpenPage()
     begin
         if UserMgt.GetSalesFilter() <> '' then begin
-            FilterGroup(2);
-            SetRange("Responsibility Center", UserMgt.GetSalesFilter());
-            FilterGroup(0);
+            Rec.FilterGroup(2);
+            Rec.SetRange("Responsibility Center", UserMgt.GetSalesFilter());
+            Rec.FilterGroup(0);
         end;
 
-        SetRange("Date Filter", 0D, WorkDate() - 1);
+        Rec.SetRange("Date Filter", 0D, WorkDate() - 1);
     end;
 
     var
@@ -620,41 +620,23 @@ page 10026 "Sales Order Shipment"
         FreightAmount: Decimal;
         Text001: Label 'There are non posted Prepayment Amounts on %1 %2.';
         Text002: Label 'There are unpaid Prepayment Invoices related to %1 %2.';
-        [InDataSet]
         "Posting DateEditable": Boolean;
-        [InDataSet]
         "Order DateEditable": Boolean;
-        [InDataSet]
         "Salesperson CodeEditable": Boolean;
-        [InDataSet]
         "Document DateEditable": Boolean;
-        [InDataSet]
         "Ship-to NameEditable": Boolean;
-        [InDataSet]
         "Ship-to AddressEditable": Boolean;
-        [InDataSet]
         "Ship-to Address 2Editable": Boolean;
-        [InDataSet]
         "Ship-to CityEditable": Boolean;
-        [InDataSet]
         "Ship-to ContactEditable": Boolean;
-        [InDataSet]
         "Ship-to Post CodeEditable": Boolean;
-        [InDataSet]
         "Ship-to CodeEditable": Boolean;
-        [InDataSet]
         "Ship-to CountyEditable": Boolean;
-        [InDataSet]
         "Location CodeEditable": Boolean;
-        [InDataSet]
         "Shipment DateEditable": Boolean;
-        [InDataSet]
         "Shipping Agent CodeEditable": Boolean;
-        [InDataSet]
         "Shipment Method CodeEditable": Boolean;
-        [InDataSet]
         "Package Tracking No.Editable": Boolean;
-        [InDataSet]
         "Tax Area CodeEditable": Boolean;
 
     procedure UpdateAllowed(): Boolean
@@ -697,9 +679,9 @@ page 10026 "Sales Order Shipment"
     local procedure AfterGetCurrentRecord()
     begin
         xRec := Rec;
-        SetRange("Date Filter", 0D, WorkDate() - 1);
+        Rec.SetRange("Date Filter", 0D, WorkDate() - 1);
 
-        OrderOnHold("On Hold" <> '');
+        OrderOnHold(Rec."On Hold" <> '');
     end;
 
     [IntegrationEvent(false, false)]

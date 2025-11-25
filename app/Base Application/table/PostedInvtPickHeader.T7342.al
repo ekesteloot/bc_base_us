@@ -1,3 +1,27 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.InventoryDocument;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Family;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+
 table 7342 "Posted Invt. Pick Header"
 {
     Caption = 'Posted Invt. Pick Header';
@@ -19,7 +43,7 @@ table 7342 "Posted Invt. Pick Header"
         {
             Caption = 'Assigned User ID';
             DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "Warehouse Employee" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = "Warehouse Employee" where("Location Code" = field("Location Code"));
         }
         field(5; "Assignment Date"; Date)
         {
@@ -41,9 +65,9 @@ table 7342 "Posted Invt. Pick Header"
         }
         field(10; Comment; Boolean)
         {
-            CalcFormula = Exist ("Warehouse Comment Line" WHERE("Table Name" = CONST("Posted Invt. Pick"),
-                                                                Type = CONST(" "),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = Exist("Warehouse Comment Line" where("Table Name" = const("Posted Invt. Pick"),
+                                                                Type = const(" "),
+                                                                "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -64,20 +88,20 @@ table 7342 "Posted Invt. Pick Header"
         field(7306; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(120)) "Purch. Rcpt. Header" WHERE("No." = FIELD("Source No."))
-            ELSE
-            IF ("Source Type" = CONST(110)) "Sales Shipment Header" WHERE("No." = FIELD("Source No."))
-            ELSE
-            IF ("Source Type" = CONST(6650)) "Return Shipment Header" WHERE("No." = FIELD("Source No."))
-            ELSE
-            IF ("Source Type" = CONST(6660)) "Return Receipt Header" WHERE("No." = FIELD("Source No."))
-            ELSE
-            IF ("Source Type" = CONST(5744)) "Transfer Shipment Header" WHERE("No." = FIELD("Source No."))
-            ELSE
-            IF ("Source Type" = CONST(5746)) "Transfer Receipt Header" WHERE("No." = FIELD("Source No."))
-            ELSE
-            IF ("Source Type" = CONST(5405)) "Production Order"."No." WHERE(Status = FILTER(Released | Finished),
-                                                                                                "No." = FIELD("Source No."));
+            TableRelation = if ("Source Type" = const(120)) "Purch. Rcpt. Header" where("No." = field("Source No."))
+            else
+            if ("Source Type" = const(110)) "Sales Shipment Header" where("No." = field("Source No."))
+            else
+            if ("Source Type" = const(6650)) "Return Shipment Header" where("No." = field("Source No."))
+            else
+            if ("Source Type" = const(6660)) "Return Receipt Header" where("No." = field("Source No."))
+            else
+            if ("Source Type" = const(5744)) "Transfer Shipment Header" where("No." = field("Source No."))
+            else
+            if ("Source Type" = const(5746)) "Transfer Receipt Header" where("No." = field("Source No."))
+            else
+            if ("Source Type" = const(5405)) "Production Order"."No." where(Status = filter(Released | Finished),
+                                                                                                "No." = field("Source No."));
         }
         field(7307; "Source Document"; Enum "Warehouse Activity Source Document")
         {
@@ -102,17 +126,17 @@ table 7342 "Posted Invt. Pick Header"
         field(7311; "Destination No."; Code[20])
         {
             Caption = 'Destination No.';
-            TableRelation = IF ("Destination Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Destination Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Destination Type" = CONST(Location)) Location
-            ELSE
-            IF ("Destination Type" = CONST(Item)) Item
-            ELSE
-            IF ("Destination Type" = CONST(Family)) Family
-            ELSE
-            IF ("Destination Type" = CONST("Sales Order")) "Sales Header"."No." WHERE("Document Type" = CONST(Order));
+            TableRelation = if ("Destination Type" = const(Vendor)) Vendor
+            else
+            if ("Destination Type" = const(Customer)) Customer
+            else
+            if ("Destination Type" = const(Location)) Location
+            else
+            if ("Destination Type" = const(Item)) Item
+            else
+            if ("Destination Type" = const(Family)) Family
+            else
+            if ("Destination Type" = const("Sales Order")) "Sales Header"."No." where("Document Type" = const(Order));
         }
         field(7312; "External Document No."; Code[35])
         {

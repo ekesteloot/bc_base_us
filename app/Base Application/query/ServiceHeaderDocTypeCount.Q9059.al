@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Document;
+
 query 9059 "Service Header Doc. Type Count"
 {
     elements

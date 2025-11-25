@@ -1,4 +1,13 @@
-﻿table 172 "Standard Customer Sales Code"
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Customer;
+
+table 172 "Standard Customer Sales Code"
 {
     Caption = 'Standard Customer Sales Code';
 
@@ -52,9 +61,9 @@
         field(8; "Direct Debit Mandate ID"; Code[35])
         {
             Caption = 'Direct Debit Mandate ID';
-            TableRelation = "SEPA Direct Debit Mandate" WHERE("Customer No." = FIELD("Customer No."),
-                                                               Blocked = CONST(false),
-                                                               Closed = CONST(false));
+            TableRelation = "SEPA Direct Debit Mandate" where("Customer No." = field("Customer No."),
+                                                               Blocked = const(false),
+                                                               Closed = const(false));
         }
         field(9; Blocked; Boolean)
         {

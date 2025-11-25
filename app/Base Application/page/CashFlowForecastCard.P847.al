@@ -1,3 +1,8 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Comment;
+using Microsoft.CashFlow.Worksheet;
+
 page 847 "Cash Flow Forecast Card"
 {
     Caption = 'Cash Flow Forecast Card';
@@ -18,7 +23,7 @@ page 847 "Cash Flow Forecast Card"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -67,7 +72,7 @@ page 847 "Cash Flow Forecast Card"
 
                     trigger OnValidate()
                     begin
-                        if not ValidateShowInChart(ShowInChart) then;
+                        if not Rec.ValidateShowInChart(ShowInChart) then;
                         CurrPage.Update();
                     end;
                 }
@@ -95,7 +100,7 @@ page 847 "Cash Flow Forecast Card"
 
                     trigger OnValidate()
                     begin
-                        ValidateFromDatePrecedesToDate("G/L Budget From", "G/L Budget To", 'G/L Budget');
+                        ValidateFromDatePrecedesToDate(Rec."G/L Budget From", Rec."G/L Budget To", 'G/L Budget');
                     end;
                 }
                 field("G/L Budget To"; Rec."G/L Budget To")
@@ -105,7 +110,7 @@ page 847 "Cash Flow Forecast Card"
 
                     trigger OnValidate()
                     begin
-                        ValidateFromDatePrecedesToDate("G/L Budget From", "G/L Budget To", 'G/L Budget');
+                        ValidateFromDatePrecedesToDate(Rec."G/L Budget From", Rec."G/L Budget To", 'G/L Budget');
                     end;
                 }
                 field("Manual Payments From"; Rec."Manual Payments From")
@@ -115,7 +120,7 @@ page 847 "Cash Flow Forecast Card"
 
                     trigger OnValidate()
                     begin
-                        ValidateFromDatePrecedesToDate("Manual Payments From", "Manual Payments To", 'Manual Payments');
+                        ValidateFromDatePrecedesToDate(Rec."Manual Payments From", Rec."Manual Payments To", 'Manual Payments');
                     end;
                 }
                 field("Manual Payments To"; Rec."Manual Payments To")
@@ -125,7 +130,7 @@ page 847 "Cash Flow Forecast Card"
 
                     trigger OnValidate()
                     begin
-                        ValidateFromDatePrecedesToDate("Manual Payments From", "Manual Payments To", 'Manual Payments');
+                        ValidateFromDatePrecedesToDate(Rec."Manual Payments From", Rec."Manual Payments To", 'Manual Payments');
                     end;
                 }
                 field("Overdue CF Dates to Work Date"; Rec."Overdue CF Dates to Work Date")
@@ -146,7 +151,7 @@ page 847 "Cash Flow Forecast Card"
             part(Control1905906307; "CF Forecast Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = true;
             }
             systempart(Control1905767507; Notes)
@@ -171,7 +176,7 @@ page 847 "Cash Flow Forecast Card"
                     Caption = 'E&ntries';
                     Image = Entries;
                     RunObject = Page "Cash Flow Forecast Entries";
-                    RunPageLink = "Cash Flow Forecast No." = FIELD("No.");
+                    RunPageLink = "Cash Flow Forecast No." = field("No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View entries for the cash flow account.';
                 }
@@ -181,7 +186,7 @@ page 847 "Cash Flow Forecast Card"
                     Caption = '&Statistics';
                     Image = Statistics;
                     RunObject = Page "Cash Flow Forecast Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View detailed historical information for the cash flow forecast.';
                 }
@@ -191,8 +196,8 @@ page 847 "Cash Flow Forecast Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Cash Flow Comment";
-                    RunPageLink = "Table Name" = CONST("Cash Flow Forecast"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Cash Flow Forecast"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 separator(Action1037)
@@ -205,7 +210,7 @@ page 847 "Cash Flow Forecast Card"
                     Caption = 'CF &Availability by Periods';
                     Image = ShowMatrix;
                     RunObject = Page "CF Availability by Periods";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'View a scrollable summary of the forecasted amounts per source type, by period. The rows represent individual periods, and the columns represent the source types in the cash flow forecast.';
                 }
             }
@@ -290,15 +295,14 @@ page 847 "Cash Flow Forecast Card"
     end;
 
     var
-        [InDataSet]
         ConsiderPmtDiscTolDateEnable: Boolean;
         ShowInChart: Boolean;
         FromDatePrecedesToDateErr: Label 'The "%1 To" date precedes the "%1 From" date. Select an end date after the start date.', Comment = '%1 = Field area';
 
     local procedure UpdateEnabled()
     begin
-        ConsiderPmtDiscTolDateEnable := "Consider Discount";
-        ShowInChart := GetShowInChart();
+        ConsiderPmtDiscTolDateEnable := Rec."Consider Discount";
+        ShowInChart := Rec.GetShowInChart();
     end;
 
     local procedure ValidateFromDatePrecedesToDate(FromDate: Date; ToDate: Date; FieldArea: Text)

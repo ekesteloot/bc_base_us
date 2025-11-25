@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Security.AccessControl;
+
 table 2000000253 "Tenant Permission Set Rel."
 {
     Caption = 'Tenant Permission Set Rel.';

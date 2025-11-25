@@ -1,3 +1,10 @@
+namespace System.IO;
+
+using System.Environment;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 8622 "Config. Line"
 {
     Caption = 'Config. Line';
@@ -25,8 +32,8 @@ table 8622 "Config. Line"
         field(3; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = IF ("Line Type" = CONST(Table)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table),
-                                                                                               "Object ID" = FILTER(.. 1260 | 1262 .. 99999999 | 2000000004 | 2000000005));
+            TableRelation = if ("Line Type" = const(Table)) AllObjWithCaption."Object ID" where("Object Type" = const(Table),
+                                                                                               "Object ID" = filter(.. 1260 | 1262 .. 99999999 | 2000000004 | 2000000005));
 
             trigger OnLookup()
             var
@@ -85,8 +92,8 @@ table 8622 "Config. Line"
         field(8; "No. of Records"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Sum("Table Information"."No. of Records" WHERE("Company Name" = FIELD("Company Filter"),
-                                                                          "Table No." = FIELD("Table ID")));
+            CalcFormula = sum("Table Information"."No. of Records" where("Company Name" = field("Company Filter"),
+                                                                          "Table No." = field("Table ID")));
             Caption = 'No. of Records';
             Editable = false;
             FieldClass = FlowField;
@@ -94,8 +101,8 @@ table 8622 "Config. Line"
         field(9; "No. of Records (Source Table)"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Sum("Table Information"."No. of Records" WHERE("Company Name" = FIELD("Company Filter (Source Table)"),
-                                                                          "Table No." = FIELD("Table ID")));
+            CalcFormula = sum("Table Information"."No. of Records" where("Company Name" = field("Company Filter (Source Table)"),
+                                                                          "Table No." = field("Table ID")));
             Caption = 'No. of Records (Source Table)';
             Editable = false;
             FieldClass = FlowField;
@@ -103,12 +110,12 @@ table 8622 "Config. Line"
         field(10; "Licensed Table"; Boolean)
         {
             BlankZero = true;
-            CalcFormula = Exist("License Permission" WHERE("Object Type" = CONST(TableData),
-                                                            "Object Number" = FIELD("Table ID"),
-                                                            "Read Permission" = CONST(Yes),
-                                                            "Insert Permission" = CONST(Yes),
-                                                            "Modify Permission" = CONST(Yes),
-                                                            "Delete Permission" = CONST(Yes)));
+            CalcFormula = exist("License Permission" where("Object Type" = const(TableData),
+                                                            "Object Number" = field("Table ID"),
+                                                            "Read Permission" = const(Yes),
+                                                            "Insert Permission" = const(Yes),
+                                                            "Modify Permission" = const(Yes),
+                                                            "Delete Permission" = const(Yes)));
             Caption = 'Licensed Table';
             Editable = false;
             FieldClass = FlowField;
@@ -148,7 +155,7 @@ table 8622 "Config. Line"
         field(14; "Page ID"; Integer)
         {
             Caption = 'Page ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Page));
 
             trigger OnLookup()
             var
@@ -160,8 +167,8 @@ table 8622 "Config. Line"
         }
         field(15; "Page Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Name" WHERE("Object Type" = CONST(Page),
-                                                                        "Object ID" = FIELD("Page ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Name" where("Object Type" = const(Page),
+                                                                        "Object ID" = field("Page ID")));
             Caption = 'Page Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -185,8 +192,6 @@ table 8622 "Config. Line"
             Caption = 'Responsible ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -218,16 +223,16 @@ table 8622 "Config. Line"
         field(30; "Licensed Page"; Boolean)
         {
             BlankZero = true;
-            CalcFormula = Exist("License Permission" WHERE("Object Type" = CONST(Page),
-                                                            "Object Number" = FIELD("Page ID"),
-                                                            "Execute Permission" = CONST(Yes)));
+            CalcFormula = exist("License Permission" where("Object Type" = const(Page),
+                                                            "Object Number" = field("Page ID"),
+                                                            "Execute Permission" = const(Yes)));
             Caption = 'Licensed Page';
             Editable = false;
             FieldClass = FlowField;
         }
         field(31; "No. of Question Groups"; Integer)
         {
-            CalcFormula = Count("Config. Question Area" WHERE("Table ID" = FIELD("Table ID")));
+            CalcFormula = count("Config. Question Area" where("Table ID" = field("Table ID")));
             Caption = 'No. of Question Groups';
             Editable = false;
             FieldClass = FlowField;
@@ -243,14 +248,14 @@ table 8622 "Config. Line"
         }
         field(37; "Package Caption"; Text[50])
         {
-            CalcFormula = Lookup("Config. Package"."Package Name" WHERE(Code = FIELD("Package Code")));
+            CalcFormula = Lookup("Config. Package"."Package Name" where(Code = field("Package Code")));
             Caption = 'Package Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(38; "Package Exists"; Boolean)
         {
-            CalcFormula = Exist("Config. Package" WHERE(Code = FIELD("Package Code")));
+            CalcFormula = exist("Config. Package" where(Code = field("Package Code")));
             Caption = 'Package Exists';
             Editable = false;
             FieldClass = FlowField;

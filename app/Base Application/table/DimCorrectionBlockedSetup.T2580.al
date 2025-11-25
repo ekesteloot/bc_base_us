@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using Microsoft.FinancialMgt.Dimension;
+
 table 2580 "Dim Correction Blocked Setup"
 {
     DataClassification = CustomerContent;

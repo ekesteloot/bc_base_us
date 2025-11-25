@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 1500 "Workflow Buffer"
 {
     Caption = 'Workflow Buffer';
@@ -16,8 +18,6 @@ table 1500 "Workflow Buffer"
             Caption = 'Workflow Code';
             DataClassification = SystemMetadata;
             TableRelation = Workflow.Code;
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(3; Indentation; Integer)
         {
@@ -32,30 +32,30 @@ table 1500 "Workflow Buffer"
         }
         field(6; Template; Boolean)
         {
-            CalcFormula = Lookup (Workflow.Template WHERE(Code = FIELD("Workflow Code")));
+            CalcFormula = Lookup(Workflow.Template where(Code = field("Workflow Code")));
             Caption = 'Template';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; Enabled; Boolean)
         {
-            CalcFormula = Lookup (Workflow.Enabled WHERE(Code = FIELD("Workflow Code")));
+            CalcFormula = Lookup(Workflow.Enabled where(Code = field("Workflow Code")));
             Caption = 'Enabled';
             Editable = false;
             FieldClass = FlowField;
         }
         field(8; "External Client ID"; Guid)
         {
-            CalcFormula = Lookup ("Workflow Webhook Subscription"."Client Id" WHERE("WF Definition Id" = FIELD("Workflow Code"),
-                                                                                    Enabled = CONST(true)));
+            CalcFormula = Lookup("Workflow Webhook Subscription"."Client Id" where("WF Definition Id" = field("Workflow Code"),
+                                                                                    Enabled = const(true)));
             Caption = 'External Client ID';
             Editable = false;
             FieldClass = FlowField;
         }
         field(9; "External Client Type"; Text[50])
         {
-            CalcFormula = Lookup ("Workflow Webhook Subscription"."Client Type" WHERE("WF Definition Id" = FIELD("Workflow Code"),
-                                                                                      Enabled = CONST(true)));
+            CalcFormula = Lookup("Workflow Webhook Subscription"."Client Type" where("WF Definition Id" = field("Workflow Code"),
+                                                                                      Enabled = const(true)));
             Caption = 'External Client Type';
             Editable = false;
             FieldClass = FlowField;

@@ -8,7 +8,7 @@ report 10474 "Service Invoice-Sales Tax"
     {
         dataitem("Service Invoice Header"; "Service Invoice Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Customer No.", "No. Printed";
             RequestFilterHeading = 'Service Invoice';
@@ -20,8 +20,8 @@ report 10474 "Service Invoice-Sales Tax"
             }
             dataitem("Service Invoice Line"; "Service Invoice Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
 
                 trigger OnAfterGetRecord()
                 begin
@@ -37,10 +37,10 @@ report 10474 "Service Invoice-Sales Tax"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo3Picture; CompanyInfo3.Picture)
                     {
                     }
@@ -208,7 +208,7 @@ report 10474 "Service Invoice-Sales Tax"
                     }
                     dataitem(ServInvLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ServInvLineNumber; Number)
                         {
                         }
@@ -316,7 +316,7 @@ report 10474 "Service Invoice-Sales Tax"
                         }
                         dataitem("Service Shipment Buffer"; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(ServShpBufferPostingDate; ServiceShipmentBuffer."Posting Date")
                             {
                             }
@@ -421,7 +421,7 @@ report 10474 "Service Invoice-Sales Tax"
                     }
                     dataitem(LineFee; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = filter(1 ..));
                         column(LineFeeCaptionLbl; TempLineFeeNoteOnReportHist.ReportText)
                         {
                         }
@@ -472,10 +472,11 @@ report 10474 "Service Invoice-Sales Tax"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 /*?????
                 IF "Order No." = '' THEN
                   OrderNoText := ''
-                ELSE
+                else
                   OrderNoText := FIELDCAPTION("Order No."); */
                 if "Salesperson Code" = '' then
                     Clear(SalesPurchPerson)
@@ -645,10 +646,6 @@ report 10474 "Service Invoice-Sales Tax"
         AmountExclInvDisc: Decimal;
         PaymentTerms: Record "Payment Terms";
         SalesPurchPerson: Record "Salesperson/Purchaser";
-        CompanyInformation: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         GLSetup: Record "General Ledger Setup";
         ServiceSetup: Record "Sales & Receivables Setup";
         Customer: Record Customer;
@@ -722,6 +719,12 @@ report 10474 "Service Invoice-Sales Tax"
         TotalCaptionLbl: Label 'Total:';
         ShipmentCaptionLbl: Label 'Shipment';
         DisplayAdditionalFeeNote: Boolean;
+
+    protected var
+        CompanyInformation: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     procedure FindPostedShipmentDate(): Date
     var

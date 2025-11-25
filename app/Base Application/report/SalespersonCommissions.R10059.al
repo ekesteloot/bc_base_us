@@ -10,7 +10,7 @@ report 10059 "Salesperson Commissions"
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Code", "Date Filter";
             RequestFilterHeading = 'Salesperson';
@@ -109,8 +109,8 @@ report 10059 "Salesperson Commissions"
             }
             dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
             {
-                DataItemLink = "Salesperson Code" = FIELD(Code), "Posting Date" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Salesperson Code", "Posting Date") WHERE("Document Type" = FILTER(Invoice | "Credit Memo"));
+                DataItemLink = "Salesperson Code" = field(Code), "Posting Date" = field("Date Filter");
+                DataItemTableView = sorting("Salesperson Code", "Posting Date") where("Document Type" = filter(Invoice | "Credit Memo"));
                 column(Cust__Ledger_Entry__Posting_Date_; "Posting Date")
                 {
                 }

@@ -1,4 +1,19 @@
-﻿table 5855 "Invt. Shipment Line"
+﻿namespace Microsoft.InventoryMgt.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Structure;
+
+table 5855 "Invt. Shipment Line"
 {
     Caption = 'Item Shipment Line';
 
@@ -88,13 +103,13 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(35; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(37; "Indirect Cost %"; Decimal)
         {
@@ -132,8 +147,6 @@
             Caption = 'Last Item Ledger Entry No.';
             Editable = false;
             TableRelation = "Item Ledger Entry";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(57; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -164,20 +177,20 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                            "Item Filter" = FIELD("Item No."),
-                                            "Variant Filter" = FIELD("Variant Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"),
+                                            "Item Filter" = field("Item No."),
+                                            "Variant Filter" = field("Variant Code"));
         }
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
@@ -207,7 +220,7 @@
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(5413; "Quantity (Base)"; Decimal)
         {
@@ -223,6 +236,26 @@
         {
             Caption = 'Purchasing Code';
             TableRelation = Purchasing;
+        }
+        field(5725; "Item Reference No."; Code[50])
+        {
+            AccessByPermission = TableData "Item Reference" = R;
+            Caption = 'Item Reference No.';
+            ExtendedDatatype = Barcode;
+        }
+        field(5726; "Item Reference Unit of Measure"; Code[10])
+        {
+            AccessByPermission = TableData "Item Reference" = R;
+            Caption = 'Item Reference Unit of Measure';
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
+        }
+        field(5727; "Item Reference Type"; Enum "Item Reference Type")
+        {
+            Caption = 'Item Reference Type';
+        }
+        field(5728; "Item Reference Type No."; Code[30])
+        {
+            Caption = 'Item Reference Type No.';
         }
         field(5807; "Applies-from Entry"; Integer)
         {
@@ -246,12 +279,12 @@
         field(12451; "FA Entry No."; Integer)
         {
             Caption = 'FA Entry No.';
-            TableRelation = "FA Ledger Entry" WHERE("Entry No." = FIELD("FA Entry No."));
+            TableRelation = "FA Ledger Entry" where("Entry No." = field("FA Entry No."));
         }
         field(12452; "Depreciation Book Code"; Code[10])
         {
             Caption = 'Depreciation Book Code';
-            TableRelation = "FA Depreciation Book"."Depreciation Book Code" WHERE("FA No." = FIELD("FA No."));
+            TableRelation = "FA Depreciation Book"."Depreciation Book Code" where("FA No." = field("FA No."));
         }
     }
 

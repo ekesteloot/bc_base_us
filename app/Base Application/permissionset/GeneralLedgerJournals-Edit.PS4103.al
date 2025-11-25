@@ -4,7 +4,12 @@ permissionset 4103 "General Ledger Journals - Edit"
     Assignable = false;
     Caption = 'Create entries in G/L journals';
 
-    Permissions = tabledata "Bank Account" = R,
+    Permissions = 
+                  tabledata "Alloc. Acc. Manual Override" = R,
+                  tabledata "Alloc. Account Distribution" = R,
+                  tabledata "Allocation Account" = RIMD,
+                  tabledata "Allocation Line" = RIMD,
+                  tabledata "Bank Account" = R,
                   tabledata "Comment Line" = R,
                   tabledata Currency = R,
                   tabledata "Currency Exchange Rate" = R,
@@ -30,9 +35,6 @@ permissionset 4103 "General Ledger Journals - Edit"
                   tabledata "Gen. Product Posting Group" = R,
                   tabledata "General Posting Setup" = R,
                   tabledata "Intermediate Data Import" = Rimd,
-#if not CLEAN20
-                  tabledata "Native - Payment" = RIMD,
-#endif
                   tabledata "Reason Code" = R,
                   tabledata "Referenced XML Schema" = RIMD,
                   tabledata "Source Code Setup" = R,

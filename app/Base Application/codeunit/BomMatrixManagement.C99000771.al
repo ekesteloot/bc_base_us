@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+
 codeunit 99000771 "BOM Matrix Management"
 {
     Permissions = TableData Item = r,

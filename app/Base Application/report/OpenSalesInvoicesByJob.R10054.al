@@ -73,8 +73,8 @@ report 10054 "Open Sales Invoices by Job"
             }
             dataitem("Sales Invoice Line"; "Sales Invoice Line")
             {
-                DataItemLink = "Job No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Job No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 PrintOnlyIfDetail = true;
                 column(Job_TABLECAPTION__________Job__No________Total_____; Job.TableCaption + ': ' + Job."No." + '  Total ($)')
                 {
@@ -99,8 +99,8 @@ report 10054 "Open Sales Invoices by Job"
                 }
                 dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
                 {
-                    DataItemLink = "Document No." = FIELD("Document No.");
-                    DataItemTableView = SORTING("Document No.", "Document Type", "Customer No.") WHERE("Document Type" = CONST(Invoice), Open = CONST(true));
+                    DataItemLink = "Document No." = field("Document No.");
+                    DataItemTableView = sorting("Document No.", "Document Type", "Customer No.") where("Document Type" = const(Invoice), Open = const(true));
                     column(Cust__Ledger_Entry__Document_No__; "Document No.")
                     {
                     }

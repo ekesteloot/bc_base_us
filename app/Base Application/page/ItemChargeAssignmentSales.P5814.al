@@ -57,9 +57,9 @@ page 5814 "Item Charge Assignment (Sales)"
 
                     trigger OnValidate()
                     begin
-                        if SalesLine2.Quantity * "Qty. to Assign" < 0 then
+                        if SalesLine2.Quantity * Rec."Qty. to Assign" < 0 then
                             Error(Text000,
-                              FieldCaption("Qty. to Assign"), SalesLine2.FieldCaption(Quantity));
+                              Rec.FieldCaption("Qty. to Assign"), SalesLine2.FieldCaption(Quantity));
                         QtytoAssignOnAfterValidate();
                     end;
                 }
@@ -472,7 +472,7 @@ page 5814 "Item Charge Assignment (Sales)"
         case Rec."Applies-to Doc. Type" of
             "Sales Applies-to Document Type"::Order, "Sales Applies-to Document Type"::Invoice:
                 begin
-                    SalesLine.Get("Applies-to Doc. Type", "Applies-to Doc. No.", "Applies-to Doc. Line No.");
+                    SalesLine.Get(Rec."Applies-to Doc. Type", Rec."Applies-to Doc. No.", Rec."Applies-to Doc. Line No.");
                     QtyToShipBase := SalesLine."Qty. to Ship (Base)";
                     QtyShippedBase := SalesLine."Qty. Shipped (Base)";
                     QtyToRetReceiveBase := 0;

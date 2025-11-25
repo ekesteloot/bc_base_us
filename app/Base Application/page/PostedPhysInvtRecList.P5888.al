@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.History;
+
 page 5888 "Posted Phys. Invt. Rec. List"
 {
     ApplicationArea = Warehouse;

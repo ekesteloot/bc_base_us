@@ -1,3 +1,10 @@
+namespace Microsoft.Intercompany.Setup;
+
+using Microsoft.Intercompany.Dimension;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+
+
 page 653 "Intercompany Setup"
 {
     Caption = 'Intercompany Setup';
@@ -134,15 +141,6 @@ page 653 "Intercompany Setup"
             }
         }
     }
-
-#if not CLEAN20
-    trigger OnInit()
-    var
-        ICAutoAcceptFeatureMgt: Codeunit "IC Auto Accept Feature Mgt.";
-    begin
-        ICAutoAcceptFeatureMgt.FailIfFeatureDisabled();
-    end;
-#endif
 
     trigger OnOpenPage()
     begin

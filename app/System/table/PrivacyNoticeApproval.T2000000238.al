@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Privacy;
+
+using System.Security.AccessControl;
+
 table 2000000238 "Privacy Notice Approval"
 {
     Caption = 'Privacy Notice Approval';

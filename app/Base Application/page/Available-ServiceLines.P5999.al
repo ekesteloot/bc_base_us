@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using System.Utilities;
+
 page 5999 "Available - Service Lines"
 {
     Caption = 'Available - Service Lines';
@@ -9,7 +16,7 @@ page 5999 "Available - Service Lines"
     PageType = List;
     Permissions = TableData "Service Line" = rm;
     SourceTable = "Service Line";
-    SourceTableView = SORTING(Type, "No.", "Variant Code", "Location Code", "Needed by Date", "Document Type", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
+    SourceTableView = sorting(Type, "No.", "Variant Code", "Location Code", "Needed by Date", "Document Type", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
     layout
     {
@@ -168,7 +175,7 @@ page 5999 "Available - Service Lines"
 
     trigger OnAfterGetRecord()
     begin
-        GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
+        Rec.GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
     end;
 
     trigger OnOpenPage()

@@ -14,12 +14,12 @@ codeunit 10330 "Exp. Mapping Foot EFT US"
         // Range through the Footer record
         LineNo := 1;
         DataExchLineDef.Init();
-        DataExchLineDef.SetRange("Data Exch. Def Code", "Data Exch. Def Code");
+        DataExchLineDef.SetRange("Data Exch. Def Code", Rec."Data Exch. Def Code");
         DataExchLineDef.SetRange("Line Type", DataExchLineDef."Line Type"::Footer);
         if DataExchLineDef.FindFirst() then begin
-            DataExch.SetRange("Entry No.", "Entry No.");
+            DataExch.SetRange("Entry No.", Rec."Entry No.");
             if DataExch.FindFirst() then
-                if ACHUSFooter.Get("Entry No.") then begin
+                if ACHUSFooter.Get(Rec."Entry No.") then begin
                     RecordRef.GetTable(ACHUSFooter);
                     EFTExportMgt.InsertDataExchLineForFlatFile(
                       DataExch,

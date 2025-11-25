@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Worksheet;
+
+using Microsoft.WarehouseMgt.Activity;
+
 codeunit 5778 "Whse. Create Pick"
 {
     TableNo = "Whse. Worksheet Line";
@@ -15,16 +19,16 @@ codeunit 5778 "Whse. Create Pick"
         WhseCreatePick.SetWkshPickLine(WkshPickLine);
         WhseCreatePick.RunModal();
         if WhseCreatePick.GetResultMessage() then
-            AutofillQtyToHandle(Rec);
+            Rec.AutofillQtyToHandle(Rec);
         Clear(WhseCreatePick);
 
-        Reset();
-        SetCurrentKey("Worksheet Template Name", Name, "Location Code", "Sorting Sequence No.");
-        FilterGroup := 2;
-        SetRange("Worksheet Template Name", "Worksheet Template Name");
-        SetRange(Name, Name);
-        SetRange("Location Code", "Location Code");
-        FilterGroup := 0;
+        Rec.Reset();
+        Rec.SetCurrentKey("Worksheet Template Name", Name, "Location Code", "Sorting Sequence No.");
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+        Rec.SetRange(Name, Rec.Name);
+        Rec.SetRange("Location Code", Rec."Location Code");
+        Rec.FilterGroup := 0;
     end;
 
     var

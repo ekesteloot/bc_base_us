@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Environment.Configuration;
+
 page 1800 "Configuration Package Files"
 {
     Caption = 'Configuration Package Files';
@@ -12,7 +16,7 @@ page 1800 "Configuration Package Files"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;

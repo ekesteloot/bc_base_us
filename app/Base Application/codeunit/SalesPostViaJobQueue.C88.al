@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.Posting;
+
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+using System.Threading;
+
 codeunit 88 "Sales Post via Job Queue"
 {
     TableNo = "Job Queue Entry";
@@ -12,12 +18,12 @@ codeunit 88 "Sales Post via Job Queue"
         SavedLockTimeout: Boolean;
         IsHandled: Boolean;
     begin
-        TestField("Record ID to Process");
-        RecRef.Get("Record ID to Process");
+        Rec.TestField("Record ID to Process");
+        RecRef.Get(Rec."Record ID to Process");
         RecRef.SetTable(SalesHeader);
         SalesHeader.Find();
 
-        BatchProcessingMgt.GetBatchFromSession("Record ID to Process", "User Session ID");
+        BatchProcessingMgt.GetBatchFromSession(Rec."Record ID to Process", Rec."User Session ID");
 
         SavedLockTimeout := LockTimeout;
         SetJobQueueStatus(SalesHeader, SalesHeader."Job Queue Status"::Posting, Rec);

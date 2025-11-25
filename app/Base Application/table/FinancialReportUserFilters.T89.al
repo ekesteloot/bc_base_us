@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.Foundation.Enums;
+using System.Security.AccessControl;
+
 table 89 "Financial Report User Filters"
 {
     Caption = 'Financial Report User Filters';

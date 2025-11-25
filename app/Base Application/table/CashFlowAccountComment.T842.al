@@ -1,3 +1,9 @@
+namespace Microsoft.CashFlow.Comment;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CashFlow.Setup;
+
 table 842 "Cash Flow Account Comment"
 {
     Caption = 'Cash Flow Account Comment';
@@ -13,9 +19,9 @@ table 842 "Cash Flow Account Comment"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF ("Table Name" = CONST("Cash Flow Forecast")) "Cash Flow Forecast"
-            ELSE
-            IF ("Table Name" = CONST("Cash Flow Account")) "Cash Flow Account";
+            TableRelation = if ("Table Name" = const("Cash Flow Forecast")) "Cash Flow Forecast"
+            else
+            if ("Table Name" = const("Cash Flow Account")) "Cash Flow Account";
         }
         field(3; "Line No."; Integer)
         {

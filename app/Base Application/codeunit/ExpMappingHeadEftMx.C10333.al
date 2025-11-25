@@ -14,12 +14,12 @@ codeunit 10333 "Exp. Mapping Head EFT MX"
         // Range through the Header record
         LineNo := 1;
         DataExchLineDef.Init();
-        DataExchLineDef.SetRange("Data Exch. Def Code", "Data Exch. Def Code");
+        DataExchLineDef.SetRange("Data Exch. Def Code", Rec."Data Exch. Def Code");
         DataExchLineDef.SetRange("Line Type", DataExchLineDef."Line Type"::Header);
         if DataExchLineDef.FindFirst() then begin
-            DataExch.SetRange("Entry No.", "Entry No.");
+            DataExch.SetRange("Entry No.", Rec."Entry No.");
             if DataExch.FindFirst() then
-                if ACHCecobanHeader.Get("Entry No.") then begin
+                if ACHCecobanHeader.Get(Rec."Entry No.") then begin
                     RecordRef.GetTable(ACHCecobanHeader);
                     EFTExportMgt.InsertDataExchLineForFlatFile(
                       DataExch,

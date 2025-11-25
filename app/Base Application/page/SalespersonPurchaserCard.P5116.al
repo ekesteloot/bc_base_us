@@ -1,3 +1,15 @@
+namespace Microsoft.CRM.Team;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Task;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Integration.Dataverse;
+using System.Email;
+
 page 5116 "Salesperson/Purchaser Card"
 {
     Caption = 'Salesperson/Purchaser Card';
@@ -11,7 +23,7 @@ page 5116 "Salesperson/Purchaser Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies a code for the salesperson or purchaser.';
@@ -79,7 +91,7 @@ page 5116 "Salesperson/Purchaser Card"
             part(Control3; "Salesperson/Purchaser Picture")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = Code = FIELD(Code);
+                SubPageLink = Code = field(Code);
             }
             systempart(Control1900383207; Links)
             {
@@ -108,8 +120,8 @@ page 5116 "Salesperson/Purchaser Card"
                     Caption = 'Tea&ms';
                     Image = TeamSales;
                     RunObject = Page "Salesperson Teams";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View or edit any teams that the salesperson/purchaser is a member of.';
                 }
                 action("Con&tacts")
@@ -118,8 +130,8 @@ page 5116 "Salesperson/Purchaser Card"
                     Caption = 'Con&tacts';
                     Image = CustomerContact;
                     RunObject = Page "Contact List";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View a list of contacts that are associated with the salesperson/purchaser.';
                 }
                 action(Dimensions)
@@ -128,8 +140,8 @@ page 5116 "Salesperson/Purchaser Card"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(13),
-                                  "No." = FIELD(Code);
+                    RunPageLink = "Table ID" = const(13),
+                                  "No." = field(Code);
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -139,7 +151,7 @@ page 5116 "Salesperson/Purchaser Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Salesperson Statistics";
-                    RunPageLink = Code = FIELD(Code);
+                    RunPageLink = Code = field(Code);
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -149,8 +161,8 @@ page 5116 "Salesperson/Purchaser Card"
                     Caption = 'C&ampaigns';
                     Image = Campaign;
                     RunObject = Page "Campaign List";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View or edit any campaigns that the salesperson/purchaser is assigned to.';
                 }
                 action("S&egments")
@@ -159,8 +171,8 @@ page 5116 "Salesperson/Purchaser Card"
                     Caption = 'S&egments';
                     Image = Segment;
                     RunObject = Page "Segment List";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View a list of all segments.';
                 }
                 separator(Action33)
@@ -173,8 +185,8 @@ page 5116 "Salesperson/Purchaser Card"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View interaction log entries for the salesperson/purchaser.';
                 }
@@ -184,8 +196,8 @@ page 5116 "Salesperson/Purchaser Card"
                     Caption = 'Postponed &Interactions';
                     Image = PostponedInteractions;
                     RunObject = Page "Postponed Interactions";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View postponed interactions for the salesperson/purchaser.';
                 }
                 action("T&asks")
@@ -194,9 +206,9 @@ page 5116 "Salesperson/Purchaser Card"
                     Caption = 'T&asks';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    RunPageLink = "Salesperson Code" = FIELD(Code),
-                                  "System To-do Type" = FILTER(Organizer | "Salesperson Attendee");
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code),
+                                  "System To-do Type" = filter(Organizer | "Salesperson Attendee");
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View tasks for the salesperson/purchaser.';
                 }
                 action("Oppo&rtunities")
@@ -205,8 +217,8 @@ page 5116 "Salesperson/Purchaser Card"
                     Caption = 'Oppo&rtunities';
                     Image = OpportunitiesList;
                     RunObject = Page "Opportunity List";
-                    RunPageLink = "Salesperson Code" = FIELD(Code);
-                    RunPageView = SORTING("Salesperson Code");
+                    RunPageLink = "Salesperson Code" = field(Code);
+                    RunPageView = sorting("Salesperson Code");
                     ToolTip = 'View opportunities for the salesperson/purchaser.';
                 }
             }
@@ -225,7 +237,7 @@ page 5116 "Salesperson/Purchaser Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -240,7 +252,7 @@ page 5116 "Salesperson/Purchaser Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.UpdateOneNow(RecordId);
+                        CRMIntegrationManagement.UpdateOneNow(Rec.RecordId);
                     end;
                 }
                 group(Coupling)
@@ -260,7 +272,7 @@ page 5116 "Salesperson/Purchaser Card"
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(DeleteCRMCoupling)
@@ -276,7 +288,7 @@ page 5116 "Salesperson/Purchaser Card"
                         var
                             CRMCouplingManagement: Codeunit "CRM Coupling Management";
                         begin
-                            CRMCouplingManagement.RemoveCoupling(RecordId);
+                            CRMCouplingManagement.RemoveCoupling(Rec.RecordId);
                         end;
                     }
                 }
@@ -291,7 +303,7 @@ page 5116 "Salesperson/Purchaser Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -327,7 +339,7 @@ page 5116 "Salesperson/Purchaser Card"
 
                 trigger OnAction()
                 begin
-                    CreateInteraction();
+                    Rec.CreateInteraction();
                 end;
             }
             action(Email)
@@ -435,8 +447,8 @@ page 5116 "Salesperson/Purchaser Card"
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
     begin
         if CDSIntegrationEnabled or CRMIntegrationEnabled then begin
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
-            if Code <> xRec.Code then
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
+            if Rec.Code <> xRec.Code then
                 CRMIntegrationManagement.SendResultNotification(Rec);
         end;
     end;
@@ -444,7 +456,7 @@ page 5116 "Salesperson/Purchaser Card"
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         if xRec.Code = '' then
-            Reset();
+            Rec.Reset();
     end;
 
     trigger OnOpenPage()

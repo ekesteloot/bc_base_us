@@ -1,3 +1,8 @@
+namespace Microsoft.AssemblyMgt.Reports;
+
+using Microsoft.AssemblyMgt.History;
+using Microsoft.InventoryMgt.Ledger;
+
 table 915 "ATO Sales Buffer"
 {
     Caption = 'ATO Sales Buffer';

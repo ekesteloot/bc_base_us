@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
 page 1230 "SEPA Direct Debit Mandates"
 {
     Caption = 'SEPA Direct Debit Mandates';
@@ -11,7 +13,7 @@ page 1230 "SEPA Direct Debit Mandates"
         {
             repeater(Group)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the ID of the direct-debit mandate.';
@@ -63,12 +65,12 @@ page 1230 "SEPA Direct Debit Mandates"
                     Editable = false;
                     ToolTip = 'Specifies how many direct-debit transactions have been performed using the direct-debit mandate.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the direct-debit mandate is closed, for example because the date in the Valid To field has been exceeded.';
@@ -94,12 +96,12 @@ page 1230 "SEPA Direct Debit Mandates"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        if "Customer No." = '' then
-            if GetFilter("Customer No.") <> '' then
-                Validate("Customer No.", GetRangeMin("Customer No."));
-        if "Customer Bank Account Code" = '' then
-            if GetFilter("Customer Bank Account Code") <> '' then
-                Validate("Customer Bank Account Code", GetRangeMin("Customer Bank Account Code"));
+        if Rec."Customer No." = '' then
+            if Rec.GetFilter("Customer No.") <> '' then
+                Rec.Validate("Customer No.", Rec.GetRangeMin("Customer No."));
+        if Rec."Customer Bank Account Code" = '' then
+            if Rec.GetFilter("Customer Bank Account Code") <> '' then
+                Rec.Validate("Customer Bank Account Code", Rec.GetRangeMin("Customer Bank Account Code"));
     end;
 }
 

@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.Check;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Utilities;
+
 report 1495 "Delete Check Ledger Entries"
 {
     Caption = 'Delete Check Ledger Entries';
@@ -10,7 +15,7 @@ report 1495 "Delete Check Ledger Entries"
     {
         dataitem("Check Ledger Entry"; "Check Ledger Entry")
         {
-            DataItemTableView = SORTING("Bank Account No.", "Check Date") WHERE("Entry Status" = FILTER(<> Printed));
+            DataItemTableView = sorting("Bank Account No.", "Check Date") where("Entry Status" = filter(<> Printed));
             RequestFilterFields = "Bank Account No.", "Bank Payment Type";
 
             trigger OnAfterGetRecord()

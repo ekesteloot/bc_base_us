@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 enum 99000849 "Action Message Type"
 {
     AssignmentCompatibility = true;

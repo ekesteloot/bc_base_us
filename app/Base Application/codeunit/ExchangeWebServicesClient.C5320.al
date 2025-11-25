@@ -1,3 +1,9 @@
+﻿namespace System.Integration;
+
+using Microsoft.CRM.Outlook;
+using System;
+using System.Environment;
+
 codeunit 5320 "Exchange Web Services Client"
 {
 

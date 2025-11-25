@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Pricing;
+
 enum 7006 "Sales Price Source Type"
 {
     Extensible = true;

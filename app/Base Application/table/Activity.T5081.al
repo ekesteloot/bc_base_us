@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Task;
+
 table 5081 Activity
 {
     Caption = 'Activity';

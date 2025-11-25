@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Setup;
+
 page 99000780 "Scrap Codes"
 {
     AdditionalSearchTerms = 'material waste';
@@ -14,7 +16,7 @@ page 99000780 "Scrap Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies a code to identify why an item has been scrapped.';

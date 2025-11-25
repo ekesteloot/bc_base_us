@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment.Configuration;
+
+using System.Security.AccessControl;
+
 table 2000000080 "Page Data Personalization"
 {
     Caption = 'Page Data Personalization';
@@ -14,7 +22,7 @@ table 2000000080 "Page Data Personalization"
         }
         field(6; "User ID"; Code[50])
         {
-            CalcFormula = Lookup (User."User Name" WHERE("User Security ID" = FIELD("User SID")));
+            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("User SID")));
             Caption = 'User ID';
             FieldClass = FlowField;
         }
@@ -27,7 +35,7 @@ table 2000000080 "Page Data Personalization"
         field(12; "Object ID"; Integer)
         {
             Caption = 'Object ID';
-            TableRelation = Object.ID WHERE(Type = FIELD("Object Type"));
+            TableRelation = System.Reflection.Object.ID WHERE(Type = FIELD("Object Type"));
         }
         field(15; Date; Date)
         {

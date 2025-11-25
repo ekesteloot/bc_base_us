@@ -53,11 +53,11 @@ page 99000883 "Sales Order Planning"
                     begin
                         SalesLine.Get(
                           SalesLine."Document Type"::Order,
-                          "Sales Order No.", "Sales Order Line No.");
+                          Rec."Sales Order No.", Rec."Sales Order Line No.");
                         SalesLine.ShowReservationEntries(true);
                     end;
                 }
-                field(Available; Available)
+                field(Available; Rec.Available)
                 {
                     ApplicationArea = Planning;
                     DecimalPlaces = 0 : 5;
@@ -97,7 +97,7 @@ page 99000883 "Sales Order Planning"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -109,9 +109,9 @@ page 99000883 "Sales Order Planning"
                     //The property 'PromotedIsBig' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedIsBig = true;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Item No.", Open, "Variant Code");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Item No.", Open, "Variant Code");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -130,7 +130,7 @@ page 99000883 "Sales Order Planning"
                         var
                             Item: Record Item;
                         begin
-                            if Item.Get("Item No.") then
+                            if Item.Get(Rec."Item No.") then
                                 ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByEvent());
                         end;
                     }
@@ -140,7 +140,7 @@ page 99000883 "Sales Order Planning"
                         Caption = 'Period';
                         Image = Period;
                         RunObject = Page "Item Availability by Periods";
-                        RunPageLink = "No." = FIELD("Item No.");
+                        RunPageLink = "No." = field("Item No.");
                         ToolTip = 'View the projected quantity of the item over time according to time periods, such as day, week, or month.';
                     }
                     action("BOM Level")
@@ -154,7 +154,7 @@ page 99000883 "Sales Order Planning"
                         var
                             Item: Record Item;
                         begin
-                            if Item.Get("Item No.") then
+                            if Item.Get(Rec."Item No.") then
                                 ItemAvailFormsMgt.ShowItemAvailFromItem(Item, ItemAvailFormsMgt.ByBOM());
                         end;
                     }
@@ -175,7 +175,7 @@ page 99000883 "Sales Order Planning"
                         Item: Record Item;
                         ItemStatistics: Page "Item Statistics";
                     begin
-                        if Item.Get("Item No.") then;
+                        if Item.Get(Rec."Item No.") then;
                         ItemStatistics.SetItem(Item);
                         ItemStatistics.RunModal();
                     end;
@@ -213,25 +213,25 @@ page 99000883 "Sales Order Planning"
                         SalesHeader.Get(SalesHeader."Document Type"::Order, SalesHeader."No.");
 
                         if Choice = 1 then begin
-                            if Find('-') then
+                            if Rec.Find('-') then
                                 repeat
-                                    if "Expected Delivery Date" > LastShipmentDate then
-                                        LastShipmentDate := "Expected Delivery Date";
-                                until Next() = 0;
+                                    if Rec."Expected Delivery Date" > LastShipmentDate then
+                                        LastShipmentDate := Rec."Expected Delivery Date";
+                                until Rec.Next() = 0;
                             SalesHeader.Validate("Shipment Date", LastShipmentDate);
                             SalesHeader.Modify();
                         end
                         else begin
                             SalesLine.LockTable();
-                            if Find('-') then
+                            if Rec.Find('-') then
                                 repeat
                                     SalesLine.Get(
                                       SalesLine."Document Type"::Order,
-                                      "Sales Order No.",
-                                      "Sales Order Line No.");
-                                    SalesLine."Shipment Date" := "Expected Delivery Date";
+                                      Rec."Sales Order No.",
+                                      Rec."Sales Order Line No.");
+                                    SalesLine."Shipment Date" := Rec."Expected Delivery Date";
                                     SalesLine.Modify();
-                                until Next() = 0;
+                                until Rec.Next() = 0;
                         end;
                         BuildForm();
                     end;
@@ -266,8 +266,8 @@ page 99000883 "Sales Order Planning"
                     begin
                         SalesOrderLine.Get(
                           SalesOrderLine."Document Type"::Order,
-                          "Sales Order No.",
-                          "Sales Order Line No.");
+                          Rec."Sales Order No.",
+                          Rec."Sales Order Line No.");
 
                         TrackingForm.SetSalesLine(SalesOrderLine);
                         TrackingForm.RunModal();
@@ -334,10 +334,10 @@ page 99000883 "Sales Order Planning"
 
     procedure BuildForm()
     begin
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         MakeLines();
-        SetRange("Sales Order No.", SalesHeader."No.");
+        Rec.SetRange("Sales Order No.", SalesHeader."No.");
     end;
 
     local procedure MakeLines()
@@ -354,17 +354,17 @@ page 99000883 "Sales Order Planning"
         OnMakeLinesSetOnAfterSetFilters(SalesLine);
         if SalesLine.Find('-') then
             repeat
-                Init();
-                "Sales Order No." := SalesLine."Document No.";
-                "Sales Order Line No." := SalesLine."Line No.";
-                "Item No." := SalesLine."No.";
+                Rec.Init();
+                Rec."Sales Order No." := SalesLine."Document No.";
+                Rec."Sales Order Line No." := SalesLine."Line No.";
+                Rec."Item No." := SalesLine."No.";
 
-                "Variant Code" := SalesLine."Variant Code";
-                Description := SalesLine.Description;
-                "Shipment Date" := SalesLine."Shipment Date";
-                "Planning Status" := "Planning Status"::None;
+                Rec."Variant Code" := SalesLine."Variant Code";
+                Rec.Description := SalesLine.Description;
+                Rec."Shipment Date" := SalesLine."Shipment Date";
+                Rec."Planning Status" := Rec."Planning Status"::None;
                 SalesLine.CalcFields("Reserved Qty. (Base)");
-                "Planned Quantity" := SalesLine."Reserved Qty. (Base)";
+                Rec."Planned Quantity" := SalesLine."Reserved Qty. (Base)";
                 ReservEntry.InitSortingAndFilters(false);
                 SalesLine.SetReservationFilters(ReservEntry);
                 ReservEntry.SetRange("Reservation Status", ReservEntry."Reservation Status"::Reservation);
@@ -372,44 +372,44 @@ page 99000883 "Sales Order Planning"
                     repeat
                         if ReservEntry2.Get(ReservEntry."Entry No.", not ReservEntry.Positive) then
                             case ReservEntry2."Source Type" of
-                                DATABASE::"Item Ledger Entry":
+                                Enum::TableID::"Item Ledger Entry".AsInteger():
                                     begin
-                                        "Planning Status" := "Planning Status"::Inventory;
-                                        "Expected Delivery Date" := SalesLine."Shipment Date";
+                                        Rec."Planning Status" := Rec."Planning Status"::Inventory;
+                                        Rec."Expected Delivery Date" := SalesLine."Shipment Date";
                                     end;
-                                DATABASE::"Requisition Line":
+                                Enum::TableID::"Requisition Line".AsInteger():
                                     begin
                                         ReqLine.Get(
                                           ReservEntry2."Source ID", ReservEntry2."Source Batch Name", ReservEntry2."Source Ref. No.");
-                                        "Planning Status" := "Planning Status"::Planned;
-                                        "Expected Delivery Date" := ReqLine."Due Date";
+                                        Rec."Planning Status" := Rec."Planning Status"::Planned;
+                                        Rec."Expected Delivery Date" := ReqLine."Due Date";
                                     end;
-                                DATABASE::"Purchase Line":
+                                Enum::TableID::"Purchase Line".AsInteger():
                                     begin
                                         PurchLine.Get(
                                           ReservEntry2."Source Subtype", ReservEntry2."Source ID", ReservEntry2."Source Ref. No.");
-                                        "Planning Status" := "Planning Status"::"Firm Planned";
-                                        "Expected Delivery Date" := PurchLine."Expected Receipt Date";
+                                        Rec."Planning Status" := Rec."Planning Status"::"Firm Planned";
+                                        Rec."Expected Delivery Date" := PurchLine."Expected Receipt Date";
                                     end;
-                                DATABASE::"Prod. Order Line":
+                                Enum::TableID::"Prod. Order Line".AsInteger():
                                     begin
                                         ProdOrderLine.Get(
                                           ReservEntry2."Source Subtype", ReservEntry2."Source ID", ReservEntry2."Source Prod. Order Line");
-                                        if ProdOrderLine."Due Date" > "Expected Delivery Date" then
-                                            "Expected Delivery Date" := ProdOrderLine."Ending Date";
-                                        if ((ProdOrderLine.Status.AsInteger() + 1) < "Planning Status") or
-                                           ("Planning Status" = "Planning Status"::None)
+                                        if ProdOrderLine."Due Date" > Rec."Expected Delivery Date" then
+                                            Rec."Expected Delivery Date" := ProdOrderLine."Ending Date";
+                                        if ((ProdOrderLine.Status.AsInteger() + 1) < Rec."Planning Status") or
+                                           (Rec."Planning Status" = Rec."Planning Status"::None)
                                         then
-                                            "Planning Status" := ProdOrderLine.Status.AsInteger() + 1;
+                                            Rec."Planning Status" := ProdOrderLine.Status.AsInteger() + 1;
                                     end;
                             end;
                     until ReservEntry.Next() = 0;
-                "Needs Replanning" :=
-                  ("Planned Quantity" <> SalesLine."Outstanding Qty. (Base)") or
-                  ("Expected Delivery Date" > "Shipment Date");
+                Rec."Needs Replanning" :=
+                  (Rec."Planned Quantity" <> SalesLine."Outstanding Qty. (Base)") or
+                  (Rec."Expected Delivery Date" > Rec."Shipment Date");
                 CalculateDisposalPlan(SalesLine."Variant Code", SalesLine."Location Code");
                 OnMakeLinesOnBeforeInsertSalesOrderPlanningLine(Rec, SalesLine);
-                Insert();
+                Rec.Insert();
             until SalesLine.Next() = 0;
     end;
 
@@ -417,10 +417,10 @@ page 99000883 "Sales Order Planning"
     var
         Item: Record Item;
     begin
-        if not "Needs Replanning" then
+        if not Rec."Needs Replanning" then
             exit;
 
-        Item.Get("Item No.");
+        Item.Get(Rec."Item No.");
         Item.SetRange("Variant Filter", VariantCode);
         Item.SetRange("Location Filter", LocationCode);
         Item.CalcFields(
@@ -432,7 +432,7 @@ page 99000883 "Sales Order Planning"
           "Qty. on Component Lines");
 
         if Item.Type = Item.Type::Inventory then
-            Available :=
+            Rec.Available :=
               Item.Inventory -
               Item."Qty. on Sales Order" +
               Item."Qty. on Purch. Order" -
@@ -440,11 +440,11 @@ page 99000883 "Sales Order Planning"
               Item."Scheduled Receipt (Qty.)" +
               Item."Planned Order Receipt (Qty.)"
         else
-            Available := 0;
+            Rec.Available := 0;
 
-        "Next Planning Date" := WorkDate();
+        Rec."Next Planning Date" := WorkDate();
 
-        CalculatePlanAndDelivDates(Item, "Next Planning Date", "Expected Delivery Date");
+        CalculatePlanAndDelivDates(Item, Rec."Next Planning Date", Rec."Expected Delivery Date");
     end;
 
     local procedure CalculatePlanAndDelivDates(Item: Record Item; var NextPlanningDate: Date; var ExpectedDeliveryDate: Date)
@@ -453,7 +453,7 @@ page 99000883 "Sales Order Planning"
 
         NextPlanningDate := CalcDate(Item."Lot Accumulation Period", NextPlanningDate);
 
-        if (Available > 0) or ("Planning Status" <> "Planning Status"::None) then
+        if (Rec.Available > 0) or (Rec."Planning Status" <> Rec."Planning Status"::None) then
             ExpectedDeliveryDate := CalcDate(Item."Safety Lead Time", WorkDate())
         else
             ExpectedDeliveryDate :=
@@ -475,11 +475,11 @@ page 99000883 "Sales Order Planning"
 
         OnCreateOrdersOnBeforeFindSet(Rec);
 
-        if not FindSet() then
+        if not Rec.FindSet() then
             exit;
 
         repeat
-            SalesLine.Get(SalesLine."Document Type"::Order, "Sales Order No.", "Sales Order Line No.");
+            SalesLine.Get(SalesLine."Document Type"::Order, Rec."Sales Order No.", Rec."Sales Order Line No.");
             SalesLine.TestField("Shipment Date");
             SalesLine.CalcFields("Reserved Qty. (Base)");
 
@@ -498,7 +498,7 @@ page 99000883 "Sales Order Planning"
 
                 CreateOrder(CreateProdOrder, SalesLine, EndLoop, OrdersCreated);
             end;
-        until (Next() = 0) or EndLoop;
+        until (Rec.Next() = 0) or EndLoop;
 
         Rec := xSalesPlanLine;
     end;
@@ -535,7 +535,7 @@ page 99000883 "Sales Order Planning"
         if not CreateOrders() then
             Message(Text001);
 
-        SetRange("Planning Status");
+        Rec.SetRange("Planning Status");
 
         BuildForm();
 

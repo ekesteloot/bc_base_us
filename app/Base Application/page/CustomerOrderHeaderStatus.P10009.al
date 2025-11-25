@@ -5,8 +5,8 @@ page 10009 "Customer Order Header Status"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "Sales Header";
-    SourceTableView = SORTING("Document Type", "Sell-to Customer No.", "No.")
-                      WHERE("Document Type" = FILTER(Order | "Return Order"));
+    SourceTableView = sorting("Document Type", "Sell-to Customer No.", "No.")
+                      where("Document Type" = filter(Order | "Return Order"));
 
     layout
     {
@@ -29,11 +29,11 @@ page 10009 "Customer Order Header Status"
 
                     trigger OnDrillDown()
                     begin
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 if PAGE.RunModal(PAGE::"Sales Order", Rec) = ACTION::LookupOK then
                                     ;
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 if PAGE.RunModal(PAGE::"Sales Return Order", Rec) = ACTION::LookupOK then
                                     ;
                         end;
@@ -59,13 +59,13 @@ page 10009 "Customer Order Header Status"
 
                     trigger OnDrillDown()
                     begin
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 begin
                                     GetLastShipment();
                                     if PAGE.RunModal(PAGE::"Posted Sales Shipments", SalesShipmentHeader) = ACTION::LookupOK then;
                                 end;
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 begin
                                     GetLastRetReceipt();
                                     if PAGE.RunModal(PAGE::"Posted Return Receipts", RetReceiptHeader) = ACTION::LookupOK then;
@@ -113,13 +113,13 @@ page 10009 "Customer Order Header Status"
 
                     trigger OnDrillDown()
                     begin
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 begin
                                     GetLastInvoice();
                                     if PAGE.RunModal(PAGE::"Posted Sales Invoices", SalesInvoiceHeader) = ACTION::LookupOK then;
                                 end;
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 begin
                                     GetLastCrMemo();
                                     if PAGE.RunModal(PAGE::"Posted Sales Credit Memos", RetCreditMemoHeader) = ACTION::LookupOK then;
@@ -172,28 +172,28 @@ page 10009 "Customer Order Header Status"
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "No." = FIELD("Bill-to Customer No.");
+                SubPageLink = "No." = field("Bill-to Customer No.");
                 Visible = true;
             }
             part(Control1904036807; "Order Lines Status Factbox")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "Document Type" = FILTER(Order | "Return Order"),
-                              "Document No." = FIELD("No.");
+                SubPageLink = "Document Type" = filter(Order | "Return Order"),
+                              "Document No." = field("No.");
                 Visible = true;
             }
             part(Control1904036507; "Customer Credit FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "No." = FIELD("Bill-to Customer No.");
+                SubPageLink = "No." = field("Bill-to Customer No.");
                 Visible = true;
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No.");
+                SubPageLink = "No." = field("Bill-to Customer No.");
                 Visible = true;
             }
             systempart(Control1905767507; Notes)
@@ -248,7 +248,6 @@ page 10009 "Customer Order Header Status"
         LastInvoiceDate: Date;
         TotalOpenAmount: Decimal;
         TotalOpenAmountOnHold: Decimal;
-        [InDataSet]
         "On HoldEditable": Boolean;
 
     procedure OnCreditManagementForm(SetOnCreditManagementForm: Boolean)
@@ -275,8 +274,8 @@ page 10009 "Customer Order Header Status"
     procedure GetLastShipmentInvoice()
     begin
         // Calculate values for this row
-        case "Document Type" of
-            "Document Type"::Order:
+        case Rec."Document Type" of
+            Rec."Document Type"::Order:
                 begin
                     if GetLastShipment() then
                         LastShipmentDate := SalesShipmentHeader."Shipment Date"
@@ -287,7 +286,7 @@ page 10009 "Customer Order Header Status"
                     else
                         LastInvoiceDate := 0D;
                 end;
-            "Document Type"::"Return Order":
+            Rec."Document Type"::"Return Order":
                 begin
                     if GetLastRetReceipt() then
                         LastShipmentDate := RetReceiptHeader."Posting Date"
@@ -299,16 +298,16 @@ page 10009 "Customer Order Header Status"
                         LastInvoiceDate := 0D;
                 end;
             else begin
-                    LastShipmentDate := 0D;
-                    LastInvoiceDate := 0D;
-                end;
+                LastShipmentDate := 0D;
+                LastInvoiceDate := 0D;
+            end;
         end;
     end;
 
     procedure GetLastShipment(): Boolean
     begin
         SalesShipmentHeader.SetCurrentKey("Order No."/*, "Shipment Date"*/); // may want to create this key
-        SalesShipmentHeader.SetRange("Order No.", "No.");
+        SalesShipmentHeader.SetRange("Order No.", Rec."No.");
         exit(SalesShipmentHeader.FindLast());
 
     end;
@@ -316,7 +315,7 @@ page 10009 "Customer Order Header Status"
     procedure GetLastInvoice(): Boolean
     begin
         SalesInvoiceHeader.SetCurrentKey("Order No."/*, "Shipment Date"*/); // may want to create this key
-        SalesInvoiceHeader.SetRange("Order No.", "No.");
+        SalesInvoiceHeader.SetRange("Order No.", Rec."No.");
         exit(SalesInvoiceHeader.FindLast());
 
     end;
@@ -324,7 +323,7 @@ page 10009 "Customer Order Header Status"
     procedure GetLastRetReceipt(): Boolean
     begin
         RetReceiptHeader.SetCurrentKey("Return Order No."/*, "Shipment Date"*/); // may want to create this key
-        RetReceiptHeader.SetRange("Return Order No.", "No.");
+        RetReceiptHeader.SetRange("Return Order No.", Rec."No.");
         exit(RetReceiptHeader.FindLast());
 
     end;
@@ -332,7 +331,7 @@ page 10009 "Customer Order Header Status"
     procedure GetLastCrMemo(): Boolean
     begin
         RetCreditMemoHeader.SetCurrentKey("Return Order No."/*, "Shipment Date"*/); // may want to create this key
-        RetCreditMemoHeader.SetRange("Return Order No.", "No.");
+        RetCreditMemoHeader.SetRange("Return Order No.", Rec."No.");
         exit(RetCreditMemoHeader.FindLast());
 
     end;

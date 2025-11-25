@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Manufacturing.Capacity;
+
 report 99003805 "Reg. Abs. (from Work Center)"
 {
     ApplicationArea = Manufacturing;

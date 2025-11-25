@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Statement;
+
 page 384 "Bank Account Statement Lines"
 {
     AutoSplitKey = true;
@@ -60,10 +62,10 @@ page 384 "Bank Account Statement Lines"
 
                     trigger OnDrillDown()
                     begin
-                        DisplayApplication();
+                        Rec.DisplayApplication();
                     end;
                 }
-                field(Difference; Difference)
+                field(Difference; Rec.Difference)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the difference between the amount in the Statement Amount field and Applied Amount field on this line.';
@@ -76,37 +78,37 @@ page 384 "Bank Account Statement Lines"
 
                     trigger OnDrillDown()
                     begin
-                        DisplayApplication();
+                        Rec.DisplayApplication();
                     end;
                 }
             }
             group(Control16)
             {
                 ShowCaption = false;
-                field(Balance; Balance + "Statement Amount")
+                field(Balance; Balance + Rec."Statement Amount")
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = GetCurrencyCode();
+                    AutoFormatExpression = Rec.GetCurrencyCode();
                     AutoFormatType = 1;
                     Caption = 'Balance';
                     Editable = false;
                     Enabled = BalanceEnable;
                     ToolTip = 'Specifies a balance, consisting of the Balance Last Statement field, plus the balance that has accumulated in the Statement Amount field.';
                 }
-                field(TotalBalance; TotalBalance + "Statement Amount")
+                field(TotalBalance; TotalBalance + Rec."Statement Amount")
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = GetCurrencyCode();
+                    AutoFormatExpression = Rec.GetCurrencyCode();
                     AutoFormatType = 1;
                     Caption = 'Total Balance';
                     Editable = false;
                     Enabled = TotalBalanceEnable;
                     ToolTip = 'Specifies the accumulated balance of the Bank Account Statement, which consists of the Balance Last Statement field, plus the balance in the Statement Amount field.';
                 }
-                field(TotalDiff; TotalDiff + Difference)
+                field(TotalDiff; TotalDiff + Rec.Difference)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = GetCurrencyCode();
+                    AutoFormatExpression = Rec.GetCurrencyCode();
                     AutoFormatType = 1;
                     Caption = 'Total Difference';
                     Editable = false;
@@ -123,7 +125,7 @@ page 384 "Bank Account Statement Lines"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CalcBalance("Statement Line No.");
+        CalcBalance(Rec."Statement Line No.");
     end;
 
     trigger OnInit()
@@ -137,11 +139,8 @@ page 384 "Bank Account Statement Lines"
         TotalDiff: Decimal;
         TotalBalance: Decimal;
         Balance: Decimal;
-        [InDataSet]
         TotalDiffEnable: Boolean;
-        [InDataSet]
         TotalBalanceEnable: Boolean;
-        [InDataSet]
         BalanceEnable: Boolean;
 
     local procedure CalcBalance(BankAccStmtLineNo: Integer)
@@ -149,25 +148,25 @@ page 384 "Bank Account Statement Lines"
         BankAccStmt: Record "Bank Account Statement";
         TempBankAccStmtLine: Record "Bank Account Statement Line";
     begin
-        if BankAccStmt.Get("Bank Account No.", "Statement No.") then;
+        if BankAccStmt.Get(Rec."Bank Account No.", Rec."Statement No.") then;
 
         TempBankAccStmtLine.Copy(Rec);
 
-        TotalDiff := -Difference;
+        TotalDiff := -Rec.Difference;
         if TempBankAccStmtLine.CalcSums(Difference) then begin
             TotalDiff := TotalDiff + TempBankAccStmtLine.Difference;
             TotalDiffEnable := true;
         end else
             TotalDiffEnable := false;
 
-        TotalBalance := BankAccStmt."Balance Last Statement" - "Statement Amount";
+        TotalBalance := BankAccStmt."Balance Last Statement" - Rec."Statement Amount";
         if TempBankAccStmtLine.CalcSums("Statement Amount") then begin
             TotalBalance := TotalBalance + TempBankAccStmtLine."Statement Amount";
             TotalBalanceEnable := true;
         end else
             TotalBalanceEnable := false;
 
-        Balance := BankAccStmt."Balance Last Statement" - "Statement Amount";
+        Balance := BankAccStmt."Balance Last Statement" - Rec."Statement Amount";
         TempBankAccStmtLine.SetRange("Statement Line No.", 0, BankAccStmtLineNo);
         if TempBankAccStmtLine.CalcSums("Statement Amount") then begin
             Balance := Balance + TempBankAccStmtLine."Statement Amount";

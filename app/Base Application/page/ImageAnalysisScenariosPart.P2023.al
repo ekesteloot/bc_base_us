@@ -1,3 +1,7 @@
+namespace System.AI;
+
+using System.Privacy;
+
 page 2023 "Image Analysis Scenarios Part"
 {
     PageType = ListPart;

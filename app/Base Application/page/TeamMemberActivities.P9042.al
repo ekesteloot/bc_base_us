@@ -119,19 +119,19 @@ page 9042 "Team Member Activities"
         RoleCenterNotificationMgt: Codeunit "Role Center Notification Mgt.";
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
         TimeSheetHeader.SetRange("Approver User ID", UserId);
         if TimeSheetHeader.FindFirst() then begin
-            SetRange("Approve ID Filter", UserId);
-            SetRange("User ID Filter", UserId);
+            Rec.SetRange("Approve ID Filter", UserId);
+            Rec.SetRange("User ID Filter", UserId);
             ShowTimeSheetsToApprove := true;
         end else begin
-            SetRange("User ID Filter", UserId);
+            Rec.SetRange("User ID Filter", UserId);
             ShowTimeSheetsToApprove := false;
         end;
 #if not CLEAN22

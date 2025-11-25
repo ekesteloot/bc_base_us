@@ -1,3 +1,5 @@
+namespace System.Integration;
+
 table 1738 "OData Initialized Status"
 {
     Access = Internal;

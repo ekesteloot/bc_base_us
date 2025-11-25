@@ -1,3 +1,14 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.Setup;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ProjectMgt.Resources.Setup;
+using System.Environment;
+using System.Security.User;
+using System.Utilities;
+
 page 1824 "Jobs Setup Wizard"
 {
     Caption = 'Jobs Setup';
@@ -434,7 +445,7 @@ page 1824 "Jobs Setup Wizard"
 
     trigger OnOpenPage()
     begin
-        Init();
+        Rec.Init();
 
         Step := Step::Welcome;
         EnableControls();

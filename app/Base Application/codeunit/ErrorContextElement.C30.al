@@ -1,3 +1,5 @@
+namespace System.Utilities;
+
 codeunit 30 "Error Context Element"
 {
     EventSubscriberInstance = Manual;

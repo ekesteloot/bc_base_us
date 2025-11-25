@@ -4,25 +4,25 @@ codeunit 5847 "Get Average Cost Calc Overview"
 
     trigger OnRun()
     begin
-        AvgCostAdjmtEntryPoint.SetRange("Item No.", "Item No.");
-        AvgCostAdjmtEntryPoint.SetFilter("Location Code", GetFilter("Location Code"));
-        AvgCostAdjmtEntryPoint.SetFilter("Variant Code", GetFilter("Variant Code"));
-        AvgCostAdjmtEntryPoint.SetFilter("Valuation Date", GetFilter("Valuation Date"));
+        AvgCostAdjmtEntryPoint.SetRange("Item No.", Rec."Item No.");
+        AvgCostAdjmtEntryPoint.SetFilter("Location Code", Rec.GetFilter("Location Code"));
+        AvgCostAdjmtEntryPoint.SetFilter("Variant Code", Rec.GetFilter("Variant Code"));
+        AvgCostAdjmtEntryPoint.SetFilter("Valuation Date", Rec.GetFilter("Valuation Date"));
         OnRunOnSetAvgCostAdjmtEntryPointFilters(AvgCostAdjmtEntryPoint, Rec);
 
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         if AvgCostAdjmtEntryPoint.Find('-') then
             repeat
-                Init();
-                Type := Type::"Closing Entry";
-                "Entry No." := "Entry No." + 1;
+                Rec.Init();
+                Rec.Type := Rec.Type::"Closing Entry";
+                Rec."Entry No." := Rec."Entry No." + 1;
                 CopyAvgCostAdjmtEntryPointFieldsToAverageCostCalcOverview(AvgCostAdjmtEntryPoint, Rec);
-                "Attached to Valuation Date" := "Valuation Date";
-                "Attached to Entry No." := "Entry No.";
+                Rec."Attached to Valuation Date" := Rec."Valuation Date";
+                Rec."Attached to Entry No." := Rec."Entry No.";
                 if EntriesExist(Rec) then begin
                     OnBeforeAvgCostAdjmtEntryPointInsert(Rec, AvgCostAdjmtEntryPoint);
-                    Insert();
+                    Rec.Insert();
                 end else
                     AvgCostAdjmtEntryPoint.Delete();
             until AvgCostAdjmtEntryPoint.Next() = 0;

@@ -1,4 +1,10 @@
 #if not CLEAN23
+namespace Microsoft.Intercompany.GLAccount;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Intercompany.Partner;
+using System.Telemetry;
+
 codeunit 438 "IC Mapping Accounts"
 {
     Access = Internal;

@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
 table 1255 "Direct Debit Collection Buffer"
 {
     DataClassification = CustomerContent;

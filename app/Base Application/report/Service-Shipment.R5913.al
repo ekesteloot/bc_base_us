@@ -1,14 +1,27 @@
+﻿namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.ServiceMgt.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 5913 "Service - Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Document/ServiceShipment.rdlc';
+    RDLCLayout = './ServiceMgt/History/ServiceShipment.rdlc';
     Caption = 'Service - Shipment';
 
     dataset
     {
         dataitem("Service Shipment Header"; "Service Shipment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Service Shipment';
             column(No_ServiceShptHrd; "No.")
@@ -31,10 +44,10 @@ report 5913 "Service - Shipment"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -176,7 +189,7 @@ report 5913 "Service - Shipment"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Service Shipment Header";
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DimText; DimText)
                         {
                         }
@@ -202,9 +215,9 @@ report 5913 "Service - Shipment"
                     }
                     dataitem("Service Shipment Item Line"; "Service Shipment Item Line")
                     {
-                        DataItemLink = "No." = FIELD("No.");
+                        DataItemLink = "No." = field("No.");
                         DataItemLinkReference = "Service Shipment Header";
-                        DataItemTableView = SORTING("No.", "Line No.");
+                        DataItemTableView = sorting("No.", "Line No.");
                         column(ContractNo_ServShptItemLn; "Contract No.")
                         {
                         }
@@ -253,9 +266,9 @@ report 5913 "Service - Shipment"
                     }
                     dataitem("Service Shipment Line"; "Service Shipment Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Service Shipment Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(ServShptLnDescription; Description)
                         {
                         }
@@ -312,7 +325,7 @@ report 5913 "Service - Shipment"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(DimText_DimLoop2; DimText)
                             {
                             }
@@ -363,11 +376,11 @@ report 5913 "Service - Shipment"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(BilltoCustNo_ServShptHrd; "Service Shipment Header"."Bill-to Customer No.")
                         {
                         }
@@ -410,7 +423,7 @@ report 5913 "Service - Shipment"
                     }
                     dataitem(ItemTrackingLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(TrackingSpecBufItemNo; TempTrackingSpecification."Item No.")
                         {
                         }
@@ -446,7 +459,7 @@ report 5913 "Service - Shipment"
                         }
                         dataitem(TotalItemTracking; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                            DataItemTableView = sorting(Number) where(Number = const(1));
                             column(TotalQty; TotalQty)
                             {
                             }
@@ -529,6 +542,7 @@ report 5913 "Service - Shipment"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Service Shipment Header");
@@ -598,10 +612,6 @@ report 5913 "Service - Shipment"
     var
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyBankAccount: Record "Bank Account";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         ServiceSetup: Record "Service Mgt. Setup";
         DimSetEntry: Record "Dimension Set Entry";
         RespCenter: Record "Responsibility Center";
@@ -661,6 +671,12 @@ report 5913 "Service - Shipment"
         HomePageCaptionLbl: Label 'HomePage';
         SrvcShipHeaderCustNoCaptionLbl: Label 'Customer No';
         WarrantyCaptionLbl: Label 'Warranty';
+
+    protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     local procedure FindDimTxt(DimSetID: Integer)
     var

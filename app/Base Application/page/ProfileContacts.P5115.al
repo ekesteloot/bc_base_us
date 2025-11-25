@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5115 "Profile Contacts"
 {
     Caption = 'Profile Contacts';

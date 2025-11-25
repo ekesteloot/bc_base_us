@@ -1,3 +1,5 @@
+namespace System.Tooling;
+
 page 9620 "Page Fields"
 {
     Caption = 'Add Field to Page';
@@ -20,7 +22,7 @@ page 9620 "Page Fields"
                 {
                     ApplicationArea = All;
                     Caption = 'Page ID';
-                    ToolTip = 'Specifies the number of the page that is used to show the journal or worksheet that uses the template.';
+                    ToolTip = 'Specifies the number of the page.';
                 }
                 field("Field ID"; Rec."Field ID")
                 {
@@ -35,13 +37,13 @@ page 9620 "Page Fields"
                     OptionCaption = 'TableFilter,RecordID,OemText,Date,Time,DateFormula,Decimal,Media,MediaSet,Text,Code,NotSupported_Binary,BLOB,Boolean,Integer,OemCode,Option,BigInteger,Duration,GUID,DateTime';
                     ToolTip = 'Specifies the type of the field.';
                 }
-                field(Length; Length)
+                field(Length; Rec.Length)
                 {
                     ApplicationArea = All;
                     Caption = 'Length';
                     ToolTip = 'Specifies the length of the field.';
                 }
-                field(Caption; Caption)
+                field(Caption; Rec.Caption)
                 {
                     ApplicationArea = All;
                     Caption = 'Caption';
@@ -56,6 +58,24 @@ page 9620 "Page Fields"
                     StyleExpr = FieldPlaced;
                     ToolTip = 'Specifies the field''s status, such as if the field is already placed on the page.';
                 }
+                field(Tooltip; Rec.Tooltip)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Tooltip';
+                    ToolTip = 'Specifies the field''s tooltip.';
+                }
+                field(Scope; Rec.Scope)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Scope';
+                    ToolTip = 'Specifies the scope of the field.';
+                }
+                field(FieldKind; Rec.FieldKind)
+                {
+                    ApplicationArea = All;
+                    Caption = 'FieldKind';
+                    ToolTip = 'Specifies the kind of the field.';
+                }
             }
         }
     }
@@ -69,8 +89,7 @@ page 9620 "Page Fields"
                 ApplicationArea = Basic, Suite;
                 Caption = 'View';
                 ShortCutKey = 'Return';
-                //The property 'ToolTip' cannot be empty.
-                //ToolTip = '';
+                ToolTip = 'View information for the selected field.';
 
                 trigger OnAction()
                 begin
@@ -98,11 +117,10 @@ page 9620 "Page Fields"
     var
         DesignerPageId: Codeunit DesignerPageId;
     begin
-        FieldPlaced := Status = 1;
-        DesignerPageId.SetPageId("Page ID");
+        FieldPlaced := Rec.Status = 1;
+        DesignerPageId.SetPageId(Rec."Page ID");
     end;
 
     var
         FieldPlaced: Boolean;
 }
-

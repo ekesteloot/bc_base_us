@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Capacity;
+
 codeunit 5896 "Calc. Inventory Adjmt. - Order"
 {
     Permissions = TableData "Capacity Ledger Entry" = r,
@@ -279,15 +285,10 @@ codeunit 5896 "Calc. Inventory Adjmt. - Order"
     var
         ValueEntry: Record "Value Entry";
     begin
-        with ValueEntry do begin
-            SetCurrentKey("Item Ledger Entry No.", "Entry Type");
-            SetRange("Item Ledger Entry No.", ItemLedgEntryNo);
-            SetRange("Entry Type", "Entry Type"::Revaluation);
-            if FindSet() then
-                repeat
-                    InvtAdjmtEntryOrder.AddSingleLvlMaterialCost("Cost Amount (Actual)", "Cost Amount (Actual) (ACY)");
-                until Next() = 0;
-        end;
+        ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgEntryNo);
+        ValueEntry.SetRange("Entry Type", ValueEntry."Entry Type"::Revaluation);
+        ValueEntry.CalcSums("Cost Amount (Actual)", "Cost Amount (Actual) (ACY)");
+        InvtAdjmtEntryOrder.AddSingleLvlMaterialCost(ValueEntry."Cost Amount (Actual)", ValueEntry."Cost Amount (Actual) (ACY)");
     end;
 
     local procedure CalcActualCapacityCosts(var InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)")
@@ -324,7 +325,7 @@ codeunit 5896 "Calc. Inventory Adjmt. - Order"
                               "Direct Cost" * ShareOfTotalCapCost, "Direct Cost (ACY)" * ShareOfTotalCapCost);
                         InvtAdjmtEntryOrder.AddSingleLvlCapOvhdCost(
                           "Overhead Cost" * ShareOfTotalCapCost, "Overhead Cost (ACY)" * ShareOfTotalCapCost);
-                    until Next() = 0;            
+                    until Next() = 0;
         end;
     end;
 

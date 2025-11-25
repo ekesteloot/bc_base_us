@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.SalesTax;
+
 page 485 "Tax Setup"
 {
     ApplicationArea = SalesTax;

@@ -1,4 +1,14 @@
-﻿table 290 "VAT Amount Line"
+﻿namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Foundation.Enums;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.History;
+
+table 290 "VAT Amount Line"
 {
     Caption = 'VAT Amount Line';
 

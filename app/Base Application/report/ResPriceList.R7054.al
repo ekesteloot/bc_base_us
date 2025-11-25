@@ -1,7 +1,25 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Document;
+using System.Utilities;
+
 report 7054 "Res. Price List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Pricing/ResPriceList.rdlc';
+    RDLCLayout = './Pricing/Reports/ResPriceList.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Resource Price List';
     PreviewMode = PrintLayout;
@@ -108,7 +126,7 @@ report 7054 "Res. Price List"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(UnitPrice_ResPrice; UnitPrice)
                 {
                     AutoFormatType = 2;
@@ -368,7 +386,6 @@ report 7054 "Res. Price List"
         LookupIsComplete: Boolean;
         Ok: Boolean;
         CurrencyText: Text[30];
-        [InDataSet]
         SourceNoCtrlEnable: Boolean;
         ParentSourceNo: Code[20];
         SourceNo: Code[20];

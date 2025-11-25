@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Setup;
+
 table 7305 "Special Equipment"
 {
     Caption = 'Special Equipment';

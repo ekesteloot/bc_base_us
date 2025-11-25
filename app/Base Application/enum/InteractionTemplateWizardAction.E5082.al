@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 enum 5082 "Interaction Template Wizard Action"
 {
     Extensible = true;

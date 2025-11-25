@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.Analysis;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using System.Visualization;
+
 codeunit 759 "Job Chart Mgt"
 {
 
@@ -25,7 +30,7 @@ codeunit 759 "Job Chart Mgt"
     [Scope('OnPrem')]
     procedure CreateJobChart(var BusChartBuf: Record "Business Chart Buffer"; var TempJob: Record Job temporary; ChartType: Option Point,,Bubble,Line,,StepLine,,,,,Column,StackedColumn,StackedColumn100,"Area",,StackedArea,StackedArea100,Pie,Doughnut,,,Range,,,,Radar,,,,,,,,Funnel; JobChartType: Option Profitability,"Actual to Budget Cost","Actual to Budget Price")
     begin
-        CreateChart(BusChartBuf, TempJob, "Business Chart Type".FromInteger(ChartType), "Job Chart Type".FromInteger(JobChartType));
+        CreateChart(BusChartBuf, TempJob, Enum::"Business Chart Type".FromInteger(ChartType), Enum::"Job Chart Type".FromInteger(JobChartType));
     end;
 
     procedure CreateChart(var BusChartBuf: Record "Business Chart Buffer"; var TempJob: Record Job temporary; ChartType: Enum "Business Chart Type"; JobChartType: Enum "Job Chart Type")

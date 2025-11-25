@@ -1,7 +1,9 @@
+namespace System.Threading;
+
 page 676 "Schedule a Job"
 {
     Caption = 'Schedule a Job';
-    DataCaptionExpression = Description;
+    DataCaptionExpression = Rec.Description;
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = StandardDialog;
@@ -54,7 +56,7 @@ page 676 "Schedule a Job"
     procedure SetJob(JobQueueEntry: Record "Job Queue Entry")
     begin
         Rec := JobQueueEntry;
-        Insert(true);
+        Rec.Insert(true);
     end;
 }
 

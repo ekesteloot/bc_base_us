@@ -1,3 +1,9 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.Foundation.Enums;
+
 page 1132 "Cost Bdgt. per Center Matrix"
 {
     Caption = 'Cost Bdgt. per Center Matrix';
@@ -292,11 +298,11 @@ page 1132 "Cost Bdgt. per Center Matrix"
                     Caption = '&Card';
                     Image = EditLines;
                     RunObject = Page "Cost Type Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Cost Center Filter" = FIELD("Cost Center Filter"),
-                                  "Cost Object Filter" = FIELD("Cost Object Filter"),
-                                  "Budget Filter" = FIELD("Budget Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Cost Center Filter" = field("Cost Center Filter"),
+                                  "Cost Object Filter" = field("Cost Object Filter"),
+                                  "Budget Filter" = field("Budget Filter");
                     RunPageOnRec = true;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information for the cost type.';
@@ -307,8 +313,8 @@ page 1132 "Cost Bdgt. per Center Matrix"
                     Caption = 'E&ntries';
                     Image = Entries;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Cost Type No." = FIELD("No.");
-                    RunPageView = SORTING("Cost Type No.", "Posting Date");
+                    RunPageLink = "Cost Type No." = field("No.");
+                    RunPageView = sorting("Cost Type No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the entries for the cost budget per center.';
                 }
@@ -337,21 +343,9 @@ page 1132 "Cost Bdgt. per Center Matrix"
         RoundingFactor: Enum "Analysis Rounding Factor";
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[12] of Decimal;
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
         Text000: Label 'Set View As to Net Change before you edit entries.';
-
-#if not CLEAN20
-    [Obsolete('Replaced by procedure LoadMatrix()', '20.0')]
-    procedure Load(MatrixColumns1: array[12] of Text[80]; var CostCenterMatrixRecords1: array[12] of Record "Cost Center"; CurrentNoOfMatrixColumns: Integer; DateFilter1: Text; BudgetFilter1: Text; RoundingFactor1: Option)
-    begin
-        LoadMatrix(
-            MatrixColumns1, CostCenterMatrixRecords1, CurrentNoOfMatrixColumns, DateFilter1, BudgetFilter1,
-            "Analysis Rounding Factor".FromInteger(RoundingFactor1));
-    end;
-#endif
 
     procedure LoadMatrix(NewMatrixColumns: array[12] of Text[80]; var NewCostCenterMatrixRecords: array[12] of Record "Cost Center"; CurrentNoOfMatrixColumns: Integer; NewDateFilter: Text; NewBudgetFilter: Text; NewRoundingFactor: Enum "Analysis Rounding Factor")
     var

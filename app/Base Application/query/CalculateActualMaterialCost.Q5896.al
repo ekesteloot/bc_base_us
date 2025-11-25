@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.InventoryMgt.Ledger;
+
 query 5896 "Calculate Actual Material Cost"
 {
     Access = Internal;

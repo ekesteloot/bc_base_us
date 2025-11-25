@@ -113,10 +113,17 @@ table 30147 "Shpfy Return Header"
     trigger OnDelete()
     var
         ReturnLine: Record "Shpfy Return Line";
+        DataCapture: Record "Shpfy Data Capture";
     begin
         ReturnLine.SetRange("Return Id");
         if not ReturnLine.IsEmpty() then
             ReturnLine.DeleteAll(true);
+
+        DataCapture.SetCurrentKey("Linked To Table", "Linked To Id");
+        DataCapture.SetRange("Linked To Table", Database::"Shpfy Return Header");
+        DataCapture.SetRange("Linked To Id", Rec.SystemId);
+        if not DataCapture.IsEmpty then
+            DataCapture.DeleteAll(false);
     end;
 
     internal procedure GetDeclineNote(): Text

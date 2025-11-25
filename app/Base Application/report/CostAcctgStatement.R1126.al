@@ -1,7 +1,12 @@
+namespace Microsoft.CostAccounting.Reports;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 report 1126 "Cost Acctg. Statement"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/CostAccounting/CostAcctgStatement.rdlc';
+    RDLCLayout = './CostAccounting/Reports/CostAcctgStatement.rdlc';
     ApplicationArea = CostAccounting;
     Caption = 'Cost Acctg. Statement';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 1126 "Cost Acctg. Statement"
     {
         dataitem("Cost Type"; "Cost Type")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Cost Classification", Type, "Date Filter", "Cost Center Filter", "Cost Object Filter";
             column(StrsubstnodatePeriodtxt; StrSubstNo(Text000, PeriodTxt))
             {

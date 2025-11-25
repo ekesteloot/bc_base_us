@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
 page 1025 "Job Statistics"
 {
     Caption = 'Job Statistics';
@@ -1335,6 +1337,18 @@ page 1025 "Job Statistics"
                         }
                     }
                 }
+            }
+            group("Job Planning Lines")
+            {
+                Caption = 'Job Planning Lines';
+
+                field("Reserved From Stock"; Rec.GetQtyReservedFromStockState())
+                {
+                    ApplicationArea = Reservation;
+                    Editable = false;
+                    Caption = 'Reserved from stock';
+                    ToolTip = 'Specifies what part of the job planning lines is reserved from inventory.';
+                }                
             }
         }
     }

@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 5615 "FA Allocation"
 {
     Caption = 'FA Allocation';
@@ -46,24 +51,24 @@ table 5615 "FA Allocation"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(6; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(7; "Allocation %"; Decimal)
@@ -79,7 +84,7 @@ table 5615 "FA Allocation"
         }
         field(9; "Account Name"; Text[100])
         {
-            CalcFormula = Lookup("G/L Account".Name WHERE("No." = FIELD("Account No.")));
+            CalcFormula = Lookup("G/L Account".Name where("No." = field("Account No.")));
             Caption = 'Account Name';
             Editable = false;
             FieldClass = FlowField;
@@ -92,7 +97,7 @@ table 5615 "FA Allocation"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()

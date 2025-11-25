@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.InventoryMgt.History;
+
 codeunit 5852 "Invt. Doc.-Post + Print"
 {
     TableNo = "Invt. Document Header";

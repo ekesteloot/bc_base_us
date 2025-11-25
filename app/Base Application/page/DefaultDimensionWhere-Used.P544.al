@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 page 544 "Default Dimension Where-Used"
 {
     PageType = List;

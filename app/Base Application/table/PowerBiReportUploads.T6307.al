@@ -1,3 +1,8 @@
+namespace System.Integration.PowerBI;
+
+using System.Integration;
+using System.Security.AccessControl;
+
 /// <summary>
 /// Persists information about the reports that Business Central has uploaded to the user's Power BI personal workspace.
 /// </summary>
@@ -45,6 +50,20 @@ table 6307 "Power BI Report Uploads"
             Caption = 'Is Selection Done';
             DataClassification = CustomerContent;
             Description = 'Whether or not the one-time selection process has been done after uploading.';
+            ObsoleteReason = 'Use Report Upload Status instead to track the upload status.';
+#if not CLEAN23
+            ObsoleteState = Pending;
+            ObsoleteTag = '23.0';
+
+            trigger OnValidate()
+            begin
+                if Rec."Is Selection Done" then
+                    Rec."Report Upload Status" := Rec."Report Upload Status"::Completed;
+            end;
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
+#endif
         }
         field(7; "Embed Url"; Text[250])
         {
@@ -60,6 +79,20 @@ table 6307 "Power BI Report Uploads"
             Caption = 'Should Retry';
             DataClassification = CustomerContent;
             Description = 'Whether or not we expect the upload to succeed if we try again.';
+            ObsoleteReason = 'Use Report Upload Status instead to track the upload status.';
+#if not CLEAN23
+            ObsoleteState = Pending;
+            ObsoleteTag = '23.0';
+
+            trigger OnValidate()
+            begin
+                if (not Rec."Should Retry") and (Rec."Report Embed Url" = '') then
+                    Rec."Report Upload Status" := Rec."Report Upload Status"::Failed;
+            end;
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
+#endif
         }
         field(9; "Retry After"; DateTime)
         {
@@ -72,6 +105,20 @@ table 6307 "Power BI Report Uploads"
             Caption = 'Needs Deletion';
             DataClassification = CustomerContent;
             Description = 'Determines if the report needs to be deleted.';
+            ObsoleteReason = 'Use Report Upload Status instead to track the upload status.';
+#if not CLEAN23
+            ObsoleteState = Pending;
+            ObsoleteTag = '23.0';
+
+            trigger OnValidate()
+            begin
+                if Rec."Needs Deletion" then
+                    Rec."Report Upload Status" := Rec."Report Upload Status"::PendingDeletion;
+            end;
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
+#endif
         }
         field(11; IsGP; Boolean)
         {
@@ -84,6 +131,19 @@ table 6307 "Power BI Report Uploads"
             Caption = 'Report Embed Url';
             DataClassification = CustomerContent;
             Description = 'URL to cache when selecting the reporting.';
+        }
+        field(23; "Report Upload Status"; Enum "Power BI Upload Status")
+        {
+            Caption = 'Report Upload Status';
+            DataClassification = SystemMetadata;
+            Description = 'Specifies the stage of the upload process that this report upload reached.';
+
+#if not CLEAN23
+            trigger OnValidate()
+            begin
+                ValidateUploadStatus();
+            end;
+#endif
         }
     }
 
@@ -98,4 +158,48 @@ table 6307 "Power BI Report Uploads"
     fieldgroups
     {
     }
+
+#if not CLEAN23
+    trigger OnInsert()
+    begin
+        ValidateUploadStatus();
+    end;
+
+    trigger OnModify()
+    begin
+        ValidateUploadStatus();
+    end;
+
+    local procedure ValidateUploadStatus()
+    begin
+        case Rec."Report Upload Status" of
+            Rec."Report Upload Status"::PendingDeletion:
+                begin
+                    Rec."Is Selection Done" := true;
+                    Rec."Needs Deletion" := true;
+                    Rec."Should Retry" := false;
+                    exit;
+                end;
+            Rec."Report Upload Status"::Completed:
+                begin
+                    Rec."Is Selection Done" := true;
+                    Rec."Needs Deletion" := false;
+                    Rec."Should Retry" := false;
+                    exit;
+                end;
+            Rec."Report Upload Status"::Failed,
+            Rec."Report Upload Status"::Skipped:
+                begin
+                    Rec."Is Selection Done" := true;
+                    Rec."Needs Deletion" := false;
+                    Rec."Should Retry" := false;
+                    exit;
+                end;
+        end;
+
+        Rec."Is Selection Done" := false;
+        Rec."Needs Deletion" := false;
+        Rec."Should Retry" := true;
+    end;
+#endif
 }

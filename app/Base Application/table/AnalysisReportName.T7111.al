@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 table 7111 "Analysis Report Name"
 {
     Caption = 'Analysis Report Name';
@@ -22,12 +24,12 @@ table 7111 "Analysis Report Name"
         field(4; "Analysis Line Template Name"; Code[10])
         {
             Caption = 'Analysis Line Template Name';
-            TableRelation = "Analysis Line Template".Name WHERE("Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Analysis Line Template".Name where("Analysis Area" = field("Analysis Area"));
         }
         field(5; "Analysis Column Template Name"; Code[10])
         {
             Caption = 'Analysis Column Template Name';
-            TableRelation = "Analysis Column Template".Name WHERE("Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Analysis Column Template".Name where("Analysis Area" = field("Analysis Area"));
         }
     }
 

@@ -1,7 +1,15 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 128 "Customer Document Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/CustomerDocumentNos.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerDocumentNos.rdlc';
     Caption = 'Customer Document Nos.';
     ObsoleteState = Pending;
     ObsoleteReason = 'Infrequently used report.';
@@ -11,7 +19,7 @@ report 128 "Customer Document Nos."
     {
         dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
         {
-            DataItemTableView = SORTING("Document No.");
+            DataItemTableView = sorting("Document No.");
             RequestFilterFields = "Document Type", "Document No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -60,7 +68,7 @@ report 128 "Customer Document Nos."
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorText_Number_; ErrorText[Number])
                 {
                 }
@@ -86,8 +94,8 @@ report 128 "Customer Document Nos."
             }
             dataitem(CustLedgerEntry; "Cust. Ledger Entry")
             {
-                DataItemLink = "Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("Entry No.");
+                DataItemLink = "Entry No." = field("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(CustLedgerEntry__User_ID_; "User ID")
                 {
                 }

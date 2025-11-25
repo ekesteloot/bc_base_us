@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.Capacity;
+
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+
 table 99000848 "Registered Absence"
 {
     Caption = 'Registered Absence';
@@ -11,9 +16,9 @@ table 99000848 "Registered Absence"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF ("Capacity Type" = CONST("Work Center")) "Work Center"
-            ELSE
-            IF ("Capacity Type" = CONST("Machine Center")) "Machine Center";
+            TableRelation = if ("Capacity Type" = const("Work Center")) "Work Center"
+            else
+            if ("Capacity Type" = const("Machine Center")) "Machine Center";
         }
         field(3; Date; Date)
         {

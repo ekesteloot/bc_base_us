@@ -15,7 +15,7 @@ page 1264 "Change User"
 
                 trigger OnValidate()
                 begin
-                    TestField("User ID");
+                    Rec.TestField("User ID");
                 end;
             }
         }

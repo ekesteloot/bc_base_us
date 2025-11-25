@@ -1,3 +1,14 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Pricing;
+using Microsoft.ServiceMgt.Reports;
+using Microsoft.ServiceMgt.Setup;
+
 page 5906 "Service Item Worksheet"
 {
     Caption = 'Service Item Worksheet';
@@ -102,10 +113,10 @@ page 5906 "Service Item Worksheet"
             part(ServInvLines; "Service Item Worksheet Subform")
             {
                 ApplicationArea = Service;
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("Document No."),
-                              "Service Item No." = FIELD("Service Item No."),
-                              "Service Item Line No." = FIELD("Line No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("Document No."),
+                              "Service Item No." = field("Service Item No."),
+                              "Service Item Line No." = field("Line No.");
             }
             group(Customer)
             {
@@ -288,7 +299,7 @@ page 5906 "Service Item Worksheet"
                     Editable = false;
                     ToolTip = 'Specifies the number of the service contract associated with the item or service on the line.';
                 }
-                field(Warranty; Warranty)
+                field(Warranty; Rec.Warranty)
                 {
                     ApplicationArea = Service;
                     Editable = false;
@@ -306,7 +317,7 @@ page 5906 "Service Item Worksheet"
                     Editable = false;
                     ToolTip = 'Specifies the estimated time when service should start on this service item.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Service;
                     Editable = false;
@@ -376,11 +387,11 @@ page 5906 "Service Item Worksheet"
                         Caption = 'Faults';
                         Image = Error;
                         RunObject = Page "Service Comment Sheet";
-                        RunPageLink = "Table Name" = CONST("Service Header"),
-                                      "Table Subtype" = FIELD("Document Type"),
-                                      "No." = FIELD("Document No."),
-                                      "Table Line No." = FIELD("Line No."),
-                                      Type = CONST(Fault);
+                        RunPageLink = "Table Name" = const("Service Header"),
+                                      "Table Subtype" = field("Document Type"),
+                                      "No." = field("Document No."),
+                                      "Table Line No." = field("Line No."),
+                                      Type = const(Fault);
                         ToolTip = 'View or edit the different fault codes that you can assign to service items. You can use fault codes to identify the different service item faults or the actions taken on service items for each combination of fault area and symptom codes.';
                     }
                     action(Resolutions)
@@ -389,11 +400,11 @@ page 5906 "Service Item Worksheet"
                         Caption = 'Resolutions';
                         Image = Completed;
                         RunObject = Page "Service Comment Sheet";
-                        RunPageLink = "Table Name" = CONST("Service Header"),
-                                      "Table Subtype" = FIELD("Document Type"),
-                                      "No." = FIELD("Document No."),
-                                      "Table Line No." = FIELD("Line No."),
-                                      Type = CONST(Resolution);
+                        RunPageLink = "Table Name" = const("Service Header"),
+                                      "Table Subtype" = field("Document Type"),
+                                      "No." = field("Document No."),
+                                      "Table Line No." = field("Line No."),
+                                      Type = const(Resolution);
                         ToolTip = 'View or edit the different resolution codes that you can assign to service items. You can use resolution codes to identify methods used to solve typical service problems.';
                     }
                     action(Internal)
@@ -402,11 +413,11 @@ page 5906 "Service Item Worksheet"
                         Caption = 'Internal';
                         Image = Comment;
                         RunObject = Page "Service Comment Sheet";
-                        RunPageLink = "Table Name" = CONST("Service Header"),
-                                      "Table Subtype" = FIELD("Document Type"),
-                                      "No." = FIELD("Document No."),
-                                      "Table Line No." = FIELD("Line No."),
-                                      Type = CONST(Internal);
+                        RunPageLink = "Table Name" = const("Service Header"),
+                                      "Table Subtype" = field("Document Type"),
+                                      "No." = field("Document No."),
+                                      "Table Line No." = field("Line No."),
+                                      Type = const(Internal);
                         ToolTip = 'View or register internal comments for the service item. Internal comments are for internal use only and are not printed on reports.';
                     }
                     action(Accessories)
@@ -415,11 +426,11 @@ page 5906 "Service Item Worksheet"
                         Caption = 'Accessories';
                         Image = ServiceAccessories;
                         RunObject = Page "Service Comment Sheet";
-                        RunPageLink = "Table Name" = CONST("Service Header"),
-                                      "Table Subtype" = FIELD("Document Type"),
-                                      "No." = FIELD("Document No."),
-                                      "Table Line No." = FIELD("Line No."),
-                                      Type = CONST(Accessory);
+                        RunPageLink = "Table Name" = const("Service Header"),
+                                      "Table Subtype" = field("Document Type"),
+                                      "No." = field("Document No."),
+                                      "Table Line No." = field("Line No."),
+                                      Type = const(Accessory);
                         ToolTip = 'View or register comments for the accessories to the service item.';
                     }
                     action(Loaners)
@@ -428,11 +439,11 @@ page 5906 "Service Item Worksheet"
                         Caption = 'Loaners';
                         Image = Loaners;
                         RunObject = Page "Service Comment Sheet";
-                        RunPageLink = "Table Name" = CONST("Service Header"),
-                                      "Table Subtype" = FIELD("Document Type"),
-                                      "No." = FIELD("Document No."),
-                                      "Table Line No." = FIELD("Line No."),
-                                      Type = CONST("Service Item Loaner");
+                        RunPageLink = "Table Name" = const("Service Header"),
+                                      "Table Subtype" = field("Document Type"),
+                                      "No." = field("Document No."),
+                                      "Table Line No." = field("Line No."),
+                                      Type = const("Service Item Loaner");
                         ToolTip = 'View or select from items that you lend out temporarily to customers to replace items that they have in service.';
                     }
                 }
@@ -446,7 +457,7 @@ page 5906 "Service Item Worksheet"
                         Caption = 'Card';
                         Image = EditLines;
                         RunObject = Page "Service Item Card";
-                        RunPageLink = "No." = FIELD("Service Item No.");
+                        RunPageLink = "No." = field("Service Item No.");
                         ShortCutKey = 'Shift+F7';
                         ToolTip = 'View or change detailed information about the record on the document or journal line.';
                     }
@@ -456,7 +467,7 @@ page 5906 "Service Item Worksheet"
                         Caption = '&Log';
                         Image = Approve;
                         RunObject = Page "Service Item Log";
-                        RunPageLink = "Service Item No." = FIELD("Service Item No.");
+                        RunPageLink = "Service Item No." = field("Service Item No.");
                         ToolTip = 'View a list of the service item changes that have been logged, for example, when the warranty has changed or a component has been added. This window displays the field that was changed, the old value and the new value, and the date and time that the field was changed.';
                     }
                 }
@@ -496,7 +507,7 @@ page 5906 "Service Item Worksheet"
                         DemandOverview: Page "Demand Overview";
                     begin
                         DemandOverview.SetCalculationParameter(true);
-                        DemandOverview.Initialize(0D, 4, "Document No.", '', '');
+                        DemandOverview.Initialize(0D, 4, Rec."Document No.", '', '');
                         DemandOverview.RunModal();
                     end;
                 }
@@ -534,9 +545,9 @@ page 5906 "Service Item Worksheet"
                 trigger OnAction()
                 begin
                     Clear(ServItemLine);
-                    ServItemLine.SetRange("Document Type", "Document Type");
-                    ServItemLine.SetRange("Document No.", "Document No.");
-                    ServItemLine.SetRange("Line No.", "Line No.");
+                    ServItemLine.SetRange("Document Type", Rec."Document Type");
+                    ServItemLine.SetRange("Document No.", Rec."Document No.");
+                    ServItemLine.SetRange("Line No.", Rec."Line No.");
                     REPORT.Run(REPORT::"Service Item Worksheet", true, false, ServItemLine);
                 end;
             }
@@ -568,16 +579,16 @@ page 5906 "Service Item Worksheet"
 
     trigger OnAfterGetCurrRecord()
     begin
-        ServHeader.Get("Document Type", "Document No.");
+        ServHeader.Get(Rec."Document Type", Rec."Document No.");
         UpdateShiptoCode();
-        if "Serial No." = '' then
-            "No. of Previous Services" := 0;
+        if Rec."Serial No." = '' then
+            Rec."No. of Previous Services" := 0;
 
-        SetRange("Line No.");
-        if not ServItem.Get("Service Item No.") then
+        Rec.SetRange("Line No.");
+        if not ServItem.Get(Rec."Service Item No.") then
             Clear(ServItem);
 
-        CurrPage.ServInvLines.PAGE.SetValues("Line No.");
+        CurrPage.ServInvLines.PAGE.SetValues(Rec."Line No.");
     end;
 
     trigger OnOpenPage()
@@ -607,11 +618,11 @@ page 5906 "Service Item Worksheet"
 
     procedure Caption(): Text
     begin
-        if "Service Item No." <> '' then
-            exit(StrSubstNo('%1 %2', "Service Item No.", Description));
-        if "Item No." <> '' then
-            exit(StrSubstNo('%1 %2', "Item No.", Description));
-        exit(StrSubstNo('%1 %2', "Serial No.", Description));
+        if Rec."Service Item No." <> '' then
+            exit(StrSubstNo('%1 %2', Rec."Service Item No.", Rec.Description));
+        if Rec."Item No." <> '' then
+            exit(StrSubstNo('%1 %2', Rec."Item No.", Rec.Description));
+        exit(StrSubstNo('%1 %2', Rec."Serial No.", Rec.Description));
     end;
 
     local procedure SelectFaultResolutionCode()
@@ -627,16 +638,16 @@ page 5906 "Service Item Worksheet"
                   ServSetup.FieldCaption("Fault Reporting Level"), ServSetup."Fault Reporting Level", ServSetup.TableCaption());
         end;
         Clear(FaultResolutionRelation);
-        FaultResolutionRelation.SetDocument(DATABASE::"Service Item Line", "Document Type".AsInteger(), "Document No.", "Line No.");
-        FaultResolutionRelation.SetFilters("Symptom Code", "Fault Code", "Fault Area Code", "Service Item Group Code");
+        FaultResolutionRelation.SetDocument(DATABASE::"Service Item Line", Rec."Document Type".AsInteger(), Rec."Document No.", Rec."Line No.");
+        FaultResolutionRelation.SetFilters(Rec."Symptom Code", Rec."Fault Code", Rec."Fault Area Code", Rec."Service Item Group Code");
         FaultResolutionRelation.RunModal();
         CurrPage.Update(false);
     end;
 
     local procedure UpdateShiptoCode()
     begin
-        ServHeader.Get("Document Type", "Document No.");
-        if "Ship-to Code" = '' then begin
+        ServHeader.Get(Rec."Document Type", Rec."Document No.");
+        if Rec."Ship-to Code" = '' then begin
             ShiptoName := ServHeader.Name;
             ShiptoAddress := ServHeader.Address;
             ShiptoAddress2 := ServHeader."Address 2";
@@ -645,7 +656,7 @@ page 5906 "Service Item Worksheet"
             ShiptoCounty := ServHeader.County;
             ShiptoCountryRegion := ServHeader."Country/Region Code";
         end else begin
-            ShiptoAddr.Get("Customer No.", "Ship-to Code");
+            ShiptoAddr.Get(Rec."Customer No.", Rec."Ship-to Code");
             ShiptoName := ShiptoAddr.Name;
             ShiptoAddress := ShiptoAddr.Address;
             ShiptoAddress2 := ShiptoAddr."Address 2";

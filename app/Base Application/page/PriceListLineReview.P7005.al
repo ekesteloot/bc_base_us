@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Source;
+using Microsoft.Purchases.Pricing;
+
 page 7005 "Price List Line Review"
 {
     Caption = 'Price List Lines';
@@ -315,48 +326,6 @@ page 7005 "Price List Line Review"
                     PriceListManagement.ActivateDraftLines(PriceListLine);
                 end;
             }
-#if not CLEAN20
-            group(New)
-            {
-                Image = New;
-                Caption = 'New';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'No actions under the New group.';
-                ObsoleteTag = '20.0';
-                action(PriceLists)
-                {
-                    ApplicationArea = All;
-                    Caption = 'New Price List';
-                    Image = NewOrder;
-                    ToolTip = 'Review the existing price lists and create a new price list or add a line to the existing one.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Duplicate to the action SalesPriceLists.';
-                    ObsoleteTag = '20.0';
-                    Visible = false;
-
-                    trigger OnAction()
-                    begin
-                        ShowPriceLists();
-                    end;
-                }
-                action(JobPriceLists)
-                {
-                    ApplicationArea = Jobs;
-                    Caption = 'New Job Price List';
-                    Image = NewResource;
-                    ToolTip = 'Review the existing price lists that apply to all jobs, to one job, or to a job task and create a new price list or add a line to the existing one.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Duplicate to the action SalesJobPriceLists.';
-                    ObsoleteTag = '20.0';
-                    Visible = false;
-
-                    trigger OnAction()
-                    begin
-                        ShowJobPriceLists();
-                    end;
-                }
-            }
-#endif
             action(SalesPriceLists)
             {
                 ApplicationArea = All;
@@ -367,7 +336,7 @@ page 7005 "Price List Line Review"
 
                 trigger OnAction()
                 begin
-                    Page.Run(Page::"Sales Price Lists");
+                    Page.Run(Enum::PageID::"Sales Price Lists".AsInteger());
                 end;
             }
             action(SalesJobPriceLists)
@@ -380,7 +349,7 @@ page 7005 "Price List Line Review"
 
                 trigger OnAction()
                 begin
-                    Page.Run(Page::"Sales Job Price Lists");
+                    Page.Run(Enum::PageID::"Sales Job Price Lists".AsInteger());
                 end;
             }
             action(PurchPriceLists)
@@ -388,12 +357,12 @@ page 7005 "Price List Line Review"
                 ApplicationArea = All;
                 Caption = 'Purchase Price Lists';
                 Image = Purchase;
-                Visible = not IsSalesPrice;
+                Visible = IsPurchPrice;
                 ToolTip = 'View the list of all purchase price lists.';
 
                 trigger OnAction()
                 begin
-                    Page.Run(Page::"Purchase Price Lists");
+                    Page.Run(Enum::PageID::"Purchase Price Lists".AsInteger());
                 end;
             }
             action(PurchJobPriceLists)
@@ -401,12 +370,12 @@ page 7005 "Price List Line Review"
                 ApplicationArea = All;
                 Caption = 'Purchase Job Price Lists';
                 Image = Purchase;
-                Visible = not IsSalesPrice;
+                Visible = IsPurchPrice;
                 ToolTip = 'View the list of all purchase job price lists.';
 
                 trigger OnAction()
                 begin
-                    Page.Run(Page::"Purchase Job Price Lists");
+                    Page.Run(Enum::PageID::"Purchase Job Price Lists".AsInteger());
                 end;
             }
         }
@@ -422,20 +391,6 @@ page 7005 "Price List Line Review"
                 actionref(VerifyLines_Promoted; VerifyLines)
                 {
                 }
-#if not CLEAN20
-                actionref(PriceLists_Promoted; PriceLists)
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Duplicate to the action SalesPriceLists.';
-                    ObsoleteTag = '20.0';
-                }
-                actionref(JobPriceLists_Promoted; JobPriceLists)
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Duplicate to the action SalesJobPriceLists.';
-                    ObsoleteTag = '20.0';
-                }
-#endif
                 actionref(SalesPriceLists_Promoted; SalesPriceLists)
                 {
                 }
@@ -486,65 +441,38 @@ page 7005 "Price List Line Review"
     protected var
         PriceListHeader: Record "Price List Header";
         PriceUXManagement: Codeunit "Price UX Management";
-        [InDataSet]
         AmountEditable: Boolean;
-        [InDataSet]
         UnitPriceEditable: Boolean;
-        [InDataSet]
         UnitCostEditable: Boolean;
-        [InDataSet]
         DiscountEditable: Boolean;
-        [InDataSet]
         AllowDiscEditable: Boolean;
-        [InDataSet]
         UOMEditable: Boolean;
-        [InDataSet]
         ItemAsset: Boolean;
-        [InDataSet]
         VariantCodeEditable: Boolean;
-        [InDataSet]
         ResourceAsset: Boolean;
-        [InDataSet]
         WorkTypeCodeEditable: Boolean;
-        [InDataSet]
         DiscountMandatory: Boolean;
-        [InDataSet]
         DiscountStyle: Text;
-        [InDataSet]
         DiscountVisible: Boolean;
-        [InDataSet]
         PriceMandatory: Boolean;
         PriceStyle: Text;
-        [InDataSet]
         PriceVisible: Boolean;
-        [InDataSet]
         IsSalesPrice: Boolean;
-        [InDataSet]
+        IsPurchPrice: Boolean;
         DirectUnitCostVisible: Boolean;
-        [InDataSet]
         UnitCostVisible: Boolean;
-        [InDataSet]
         SalesPriceVisible: Boolean;
-        [InDataSet]
         PurchLineDiscVisible: Boolean;
-        [InDataSet]
         SalesLineDiscVisible: Boolean;
-        [InDataSet]
         PriceEditable: Boolean;
-        [InDataSet]
         AmountTypeIsVisible: Boolean;
-        [InDataSet]
         AmountTypeIsEditable: Boolean;
-        [InDataSet]
         LineExists: Boolean;
-        [InDataSet]
         LineToVerify: Boolean;
         DataCaptionExpr: Text;
         PriceType: Enum "Price Type";
         ViewAmountType: Enum "Price Amount Type";
-        [InDataSet]
         HideProductControls: Boolean;
-        [InDataSet]
         HideSourceControls: Boolean;
 
     local procedure GetStyle(Mandatory: Boolean): Text;
@@ -569,28 +497,6 @@ page 7005 "Price List Line Review"
             until PriceListLine.Next() = 0;
         exit(false);
     end;
-
-#if not CLEAN20
-    local procedure ShowPriceLists()
-    begin
-        case PriceType of
-            PriceType::Sale:
-                PAGE.RunModal(PAGE::"Sales Price Lists");
-            PriceType::Purchase:
-                PAGE.RunModal(PAGE::"Purchase Price Lists");
-        end;
-    end;
-
-    local procedure ShowJobPriceLists()
-    begin
-        case PriceType of
-            PriceType::Sale:
-                PAGE.RunModal(PAGE::"Sales Job Price Lists");
-            PriceType::Purchase:
-                PAGE.RunModal(PAGE::"Purchase Job Price Lists");
-        end;
-    end;
-#endif
 
     procedure Set(PriceAssetList: Codeunit "Price Asset List"; NewPriceType: Enum "Price Type"; NewAmountType: Enum "Price Amount Type")
     var
@@ -707,11 +613,12 @@ page 7005 "Price List Line Review"
         DiscountVisible := ViewAmountType in [ViewAmountType::Any, ViewAmountType::Discount];
         PriceVisible := ViewAmountType in [ViewAmountType::Any, ViewAmountType::Price];
         IsSalesPrice := PriceType = PriceType::Sale;
+        IsPurchPrice := PriceType = PriceType::Purchase;
         SalesPriceVisible := PriceVisible and IsSalesPrice;
-        DirectUnitCostVisible := PriceVisible and not IsSalesPrice;
+        DirectUnitCostVisible := PriceVisible and IsPurchPrice;
         UnitCostVisible := DirectUnitCostVisible and ResourceAsset;
         SalesLineDiscVisible := DiscountVisible and IsSalesPrice;
-        PurchLineDiscVisible := DiscountVisible and not IsSalesPrice;
+        PurchLineDiscVisible := DiscountVisible and IsPurchPrice;
     end;
 
     local procedure GetPriceListDescription(): Text

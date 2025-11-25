@@ -1,4 +1,15 @@
-﻿table 6502 "Item Tracking Code"
+﻿namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.History;
+using Microsoft.WarehouseMgt.Ledger;
+
+table 6502 "Item Tracking Code"
 {
     Caption = 'Item Tracking Code';
     DataCaptionFields = "Code", Description;

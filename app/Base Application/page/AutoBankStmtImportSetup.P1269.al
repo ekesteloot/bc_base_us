@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Statement;
+
+using Microsoft.BankMgt.BankAccount;
+
 page 1269 "Auto. Bank Stmt. Import Setup"
 {
     Caption = 'Automatic Bank Statement Import Setup';
@@ -16,8 +20,8 @@ page 1269 "Auto. Bank Stmt. Import Setup"
 
                 trigger OnValidate()
                 begin
-                    if not ("Transaction Import Timespan" in [0 .. 9999]) then begin
-                        "Transaction Import Timespan" := xRec."Transaction Import Timespan";
+                    if not (Rec."Transaction Import Timespan" in [0 .. 9999]) then begin
+                        Rec."Transaction Import Timespan" := xRec."Transaction Import Timespan";
                         Message(TransactionImportTimespanMustBePositiveMsg);
                     end;
                 end;

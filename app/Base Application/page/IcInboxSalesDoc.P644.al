@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.Inbox;
+
+using Microsoft.Intercompany.Dimension;
+
 page 644 "IC Inbox Sales Doc."
 {
     Caption = 'IC Inbox Sales Doc.';
@@ -82,9 +86,9 @@ page 644 "IC Inbox Sales Doc."
             part(ICInboxSalesLines; "IC Inbox Sales Lines")
             {
                 ApplicationArea = Intercompany;
-                SubPageLink = "IC Transaction No." = FIELD("IC Transaction No."),
-                              "IC Partner Code" = FIELD("IC Partner Code"),
-                              "Transaction Source" = FIELD("Transaction Source");
+                SubPageLink = "IC Transaction No." = field("IC Transaction No."),
+                              "IC Partner Code" = field("IC Partner Code"),
+                              "Transaction Source" = field("Transaction Source");
             }
             group(Shipping)
             {
@@ -140,11 +144,11 @@ page 644 "IC Inbox Sales Doc."
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "IC Document Dimensions";
-                    RunPageLink = "Table ID" = CONST(434),
-                                  "Transaction No." = FIELD("IC Transaction No."),
-                                  "IC Partner Code" = FIELD("IC Partner Code"),
-                                  "Transaction Source" = FIELD("Transaction Source"),
-                                  "Line No." = CONST(0);
+                    RunPageLink = "Table ID" = const(434),
+                                  "Transaction No." = field("IC Transaction No."),
+                                  "IC Partner Code" = field("IC Partner Code"),
+                                  "Transaction Source" = field("Transaction Source"),
+                                  "Line No." = const(0);
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }

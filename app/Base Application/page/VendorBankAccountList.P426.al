@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using System.Diagnostics;
+
 page 426 "Vendor Bank Account List"
 {
     Caption = 'Vendor Bank Account List';
@@ -14,7 +18,7 @@ page 426 "Vendor Bank Account List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code to identify this vendor bank account.';
@@ -47,7 +51,7 @@ page 426 "Vendor Bank Account List"
                     ToolTip = 'Specifies the fax number associated with the address.';
                     Visible = false;
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank employee regularly contacted in connection with this bank account.';
@@ -64,7 +68,7 @@ page 426 "Vendor Bank Account List"
                     ToolTip = 'Specifies the SWIFT code (international bank identifier code) of the bank where the vendor has the account.';
                     Visible = false;
                 }
-                field(IBAN; IBAN)
+                field(IBAN; Rec.IBAN)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account''s international bank account number.';

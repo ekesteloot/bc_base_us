@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Setup;
+using Microsoft.Foundation.NoSeries;
+
 codeunit 5058 "BankCont-Update"
 {
 
@@ -34,7 +41,7 @@ codeunit 5058 "BankCont-Update"
         if IsHandled then
             exit;
 
-        ContBusRel.SetCurrentKey("Link to Table", ContBusRel."No.");
+        ContBusRel.SetCurrentKey("Link to Table", "No.");
         ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::"Bank Account");
         ContBusRel.SetRange("No.", BankAcc."No.");
         if not ContBusRel.FindFirst() then

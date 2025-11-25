@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Text;
+
 page 121 "G/L Budget Names"
 {
     AdditionalSearchTerms = 'general ledger budgets,general ledger forecast';
@@ -58,7 +65,7 @@ page 121 "G/L Budget Names"
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies a code for a budget dimension. You can specify four additional dimensions on each budget that you create.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -96,7 +103,7 @@ page 121 "G/L Budget Names"
                 var
                     Budget: Page Budget;
                 begin
-                    Budget.SetBudgetName(Name);
+                    Budget.SetBudgetName(Rec.Name);
                     Budget.Run();
                 end;
             }

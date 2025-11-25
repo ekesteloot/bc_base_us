@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using System.Environment;
+
 codeunit 9022 "Pmt. Rec. Journals Launcher"
 {
 

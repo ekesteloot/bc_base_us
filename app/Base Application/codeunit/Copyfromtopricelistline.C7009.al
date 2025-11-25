@@ -1,4 +1,25 @@
-Codeunit 7009 CopyFromToPriceListLine
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+#if not CLEAN21
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.InventoryMgt.Item;
+#endif
+using Microsoft.Pricing.Source;
+#if not CLEAN21
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+#endif
+
+codeunit 7009 CopyFromToPriceListLine
 {
     var
         GenerateHeader: Boolean;

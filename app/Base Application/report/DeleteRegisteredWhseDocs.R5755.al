@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.WarehouseMgt.Activity.History;
+
 report 5755 "Delete Registered Whse. Docs."
 {
     Caption = 'Delete Registered Whse. Docs.';
@@ -8,7 +12,7 @@ report 5755 "Delete Registered Whse. Docs."
     {
         dataitem("Registered Whse. Activity Hdr."; "Registered Whse. Activity Hdr.")
         {
-            DataItemTableView = SORTING(Type, "No.");
+            DataItemTableView = sorting(Type, "No.");
             RequestFilterFields = Type, "No.";
             RequestFilterHeading = 'Registered Whse. Docs.';
 

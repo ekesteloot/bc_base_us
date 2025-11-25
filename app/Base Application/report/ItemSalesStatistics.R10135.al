@@ -217,8 +217,8 @@ report 10135 "Item Sales Statistics"
             }
             dataitem("Item Variant"; "Item Variant")
             {
-                DataItemLink = "Item No." = FIELD("No.");
-                DataItemTableView = SORTING("Item No.", Code);
+                DataItemLink = "Item No." = field("No.");
+                DataItemTableView = sorting("Item No.", Code);
                 column(Item_Variant_Code; Code)
                 {
                 }

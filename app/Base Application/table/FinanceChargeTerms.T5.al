@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 table 5 "Finance Charge Terms"
 {
     Caption = 'Finance Charge Terms';

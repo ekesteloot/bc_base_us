@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Setup;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.Purchases.Vendor;
+
 page 9658 "Vendor Report Selections"
 {
     Caption = 'Document Layouts';
@@ -23,25 +28,25 @@ page 9658 "Vendor Report Selections"
                     begin
                         case Usage2 of
                             Usage2::"Purchase Order":
-                                Usage := Usage::"P.Order";
+                                Rec.Usage := Rec.Usage::"P.Order";
                             Usage2::"Vendor Remittance":
-                                Usage := Usage::"V.Remittance";
+                                Rec.Usage := Rec.Usage::"V.Remittance";
                             Usage2::"Vendor Remittance - Posted Entries":
-                                Usage := Usage::"P.V.Remit.";
+                                Rec.Usage := Rec.Usage::"P.V.Remit.";
                             Usage2::"Posted Return Shipment":
-                                Usage := Usage::"P.Ret.Shpt.";
+                                Rec.Usage := Rec.Usage::"P.Ret.Shpt.";
                             else
                                 OnValidateUsage2OnCaseElse(Rec, Usage2);
                         end;
                     end;
                 }
-                field(ReportID; "Report ID")
+                field(ReportID; Rec."Report ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Report ID';
                     ToolTip = 'Specifies the ID of the report.';
                 }
-                field(ReportCaption; "Report Caption")
+                field(ReportCaption; Rec."Report Caption")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Report Caption';
@@ -57,13 +62,13 @@ page 9658 "Vendor Report Selections"
 
                     trigger OnDrillDown()
                     begin
-                        LookupCustomReportDescription();
+                        Rec.LookupCustomReportDescription();
                         CurrPage.Update(true);
                     end;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupCustomReportDescription();
+                        Rec.LookupCustomReportDescription();
                         CurrPage.Update(true);
                     end;
 
@@ -71,21 +76,21 @@ page 9658 "Vendor Report Selections"
                     var
                         CustomReportLayout: Record "Custom Report Layout";
                     begin
-                        if "Custom Report Description" = '' then begin
-                            Validate("Custom Report Layout Code", '');
-                            Modify(true);
+                        if Rec."Custom Report Description" = '' then begin
+                            Rec.Validate("Custom Report Layout Code", '');
+                            Rec.Modify(true);
                         end else begin
-                            CustomReportLayout.SetRange("Report ID", "Report ID");
-                            CustomReportLayout.SetFilter(Description, StrSubstNo('@*%1*', "Custom Report Description"));
+                            CustomReportLayout.SetRange("Report ID", Rec."Report ID");
+                            CustomReportLayout.SetFilter(Description, StrSubstNo('@*%1*', Rec."Custom Report Description"));
                             if not CustomReportLayout.FindFirst() then
-                                Error(CouldNotFindCustomReportLayoutErr, "Custom Report Description");
+                                Error(CouldNotFindCustomReportLayoutErr, Rec."Custom Report Description");
 
-                            Validate("Custom Report Layout Code", CustomReportLayout.Code);
-                            Modify(true);
+                            Rec.Validate("Custom Report Layout Code", CustomReportLayout.Code);
+                            Rec.Modify(true);
                         end;
                     end;
                 }
-                field(SendToEmail; "Send To Email")
+                field(SendToEmail; Rec."Send To Email")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Send To Email';
@@ -93,7 +98,7 @@ page 9658 "Vendor Report Selections"
 
                     trigger OnAssistEdit()
                     begin
-                        ShowSelectedContacts();
+                        Rec.ShowSelectedContacts();
                     end;
                 }
                 field("Use for Email Body"; Rec."Use for Email Body")
@@ -112,17 +117,17 @@ page 9658 "Vendor Report Selections"
                     ApplicationArea = Basic, Suite;
                     DrillDown = true;
                     Lookup = true;
-                    ToolTip = 'Specifies a description of the email body layout that is used.';
+                    ToolTip = 'Specifies a description of the email body custom layout that is used.';
 
                     trigger OnDrillDown()
                     begin
-                        LookupEmailBodyDescription();
+                        Rec.LookupEmailBodyDescription();
                         CurrPage.Update(true);
                     end;
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupEmailBodyDescription();
+                        Rec.LookupEmailBodyDescription();
                         CurrPage.Update(true);
                     end;
                 }
@@ -149,8 +154,8 @@ page 9658 "Vendor Report Selections"
                 begin
                     CustomReportSelection := Rec;
                     FilterVendorUsageReportSelections(ReportSelections);
-                    Vendor.Get("Source No.");
-                    CopyFromReportSelections(ReportSelections, Database::Vendor, Vendor."No.");
+                    Vendor.Get(Rec."Source No.");
+                    Rec.CopyFromReportSelections(ReportSelections, Database::Vendor, Vendor."No.");
                     CurrPage.SetRecord(CustomReportSelection);
                 end;
             }
@@ -166,7 +171,7 @@ page 9658 "Vendor Report Selections"
                 var
                     ContBusRel: Record "Contact Business Relation";
                 begin
-                    GetSendToEmailFromContactsSelection(ContBusRel."Link to Table"::Vendor.AsInteger(), GetFilter("Source No."));
+                    Rec.GetSendToEmailFromContactsSelection(ContBusRel."Link to Table"::Vendor.AsInteger(), Rec.GetFilter("Source No."));
                 end;
             }
         }
@@ -189,14 +194,14 @@ page 9658 "Vendor Report Selections"
     trigger OnAfterGetRecord()
     begin
         MapTableUsageValueToPageValue();
-        GetSendToEmail(false);
+        Rec.GetSendToEmail(false);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         // Set the default usage to the same as the page default.
-        if Usage = Usage::"S.Quote" then
-            Usage := Usage::"P.Order";
+        if Rec.Usage = Rec.Usage::"S.Quote" then
+            Rec.Usage := Rec.Usage::"P.Order";
 
         MapTableUsageValueToPageValue();
     end;
@@ -211,7 +216,7 @@ page 9658 "Vendor Report Selections"
     var
         CustomReportSelection: Record "Custom Report Selection";
     begin
-        case Usage of
+        case Rec.Usage of
             CustomReportSelection.Usage::"P.Order":
                 Usage2 := Usage2::"Purchase Order";
             CustomReportSelection.Usage::"V.Remittance":

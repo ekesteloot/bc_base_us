@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Foundation.Address;
+
 page 368 "Order Address"
 {
     Caption = 'Order Address';
@@ -12,7 +16,7 @@ page 368 "Order Address"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an order-from address code.';
@@ -22,7 +26,7 @@ page 368 "Order Address"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the company located at the address.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the street address.';
@@ -32,7 +36,7 @@ page 368 "Order Address"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies additional address information.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the address.';
@@ -41,7 +45,7 @@ page 368 "Order Address"
                 {
                     ShowCaption = false;
                     Visible = IsCountyVisible;
-                    field(County; County)
+                    field(County; Rec.County)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'State / ZIP Code';
@@ -60,10 +64,10 @@ page 368 "Order Address"
 
                     trigger OnValidate()
                     begin
-                        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                     end;
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the person you regularly contact when you do business with this vendor at this address.';
@@ -136,7 +140,7 @@ page 368 "Order Address"
 
                     trigger OnAction()
                     begin
-                        DisplayMap();
+                        Rec.DisplayMap();
                     end;
                 }
             }
@@ -145,7 +149,7 @@ page 368 "Order Address"
 
     trigger OnOpenPage()
     begin
-        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
     end;
 
     var

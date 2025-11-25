@@ -1,7 +1,13 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+using System.Utilities;
+
 report 99000786 "Machine Center Load/Bar"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/MachineCenterLoadBar.rdlc';
+    RDLCLayout = './Manufacturing/Reports/MachineCenterLoadBar.rdlc';
     AdditionalSearchTerms = 'production resource load/bar,production personnel  load/bar';
     ApplicationArea = Manufacturing;
     Caption = 'Machine Center Load/Bar';
@@ -60,7 +66,7 @@ report 99000786 "Machine Center Load/Bar"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 PrintOnlyIfDetail = true;
                 column(PeriodStartingDate; Format(PeriodStartingDate))
                 {
@@ -82,9 +88,9 @@ report 99000786 "Machine Center Load/Bar"
                 }
                 dataitem("Machine Center"; "Machine Center")
                 {
-                    DataItemLink = "Work Center No." = FIELD("No."), "Work Shift Filter" = FIELD("Work Shift Filter");
+                    DataItemLink = "Work Center No." = field("No."), "Work Shift Filter" = field("Work Shift Filter");
                     DataItemLinkReference = "Work Center";
-                    DataItemTableView = SORTING("Work Center No.");
+                    DataItemTableView = sorting("Work Center No.");
                     column(Machine_Center__No__; "No.")
                     {
                     }

@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Statement;
+
+using Microsoft.BankMgt.BankAccount;
+
 page 383 "Bank Account Statement"
 {
     Caption = 'Bank Account Statement';
@@ -47,8 +51,8 @@ page 383 "Bank Account Statement"
             part(Control11; "Bank Account Statement Lines")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                              "Statement No." = FIELD("Statement No.");
+                SubPageLink = "Bank Account No." = field("Bank Account No."),
+                              "Statement No." = field("Statement No.");
             }
         }
         area(factboxes)
@@ -79,7 +83,7 @@ page 383 "Bank Account Statement"
                     Caption = '&Card';
                     Image = EditLines;
                     RunObject = Page "Bank Account Card";
-                    RunPageLink = "No." = FIELD("Bank Account No.");
+                    RunPageLink = "No." = field("Bank Account No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record that is being processed on the journal line.';
                 }

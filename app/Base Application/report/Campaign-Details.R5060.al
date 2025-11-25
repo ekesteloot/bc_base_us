@@ -1,7 +1,12 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Segment;
+
 report 5060 "Campaign - Details"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/CampaignDetails.rdlc';
+    RDLCLayout = './CRM/Reports/CampaignDetails.rdlc';
     ApplicationArea = RelationshipMgmt;
     Caption = 'Campaign - Details';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5060 "Campaign - Details"
     {
         dataitem(Campaign; Campaign)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Salesperson Code", "Starting Date", "Ending Date";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -96,8 +101,8 @@ report 5060 "Campaign - Details"
             }
             dataitem("Segment Header"; "Segment Header")
             {
-                DataItemLink = "Campaign No." = FIELD("No.");
-                DataItemTableView = SORTING("Campaign No.");
+                DataItemLink = "Campaign No." = field("No.");
+                DataItemTableView = sorting("Campaign No.");
                 column(Date_SegmentHdr; Format(Date))
                 {
                 }
@@ -134,8 +139,8 @@ report 5060 "Campaign - Details"
             }
             dataitem("Campaign Entry"; "Campaign Entry")
             {
-                DataItemLink = "Campaign No." = FIELD("No.");
-                DataItemTableView = SORTING("Campaign No.", Date);
+                DataItemLink = "Campaign No." = field("No.");
+                DataItemTableView = sorting("Campaign No.", Date);
                 column(EntryNo_CampaignEntry; "Entry No.")
                 {
                 }

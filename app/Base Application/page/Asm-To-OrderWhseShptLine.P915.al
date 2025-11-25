@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.WarehouseMgt.Document;
+
 page 915 "Asm.-to-Order Whse. Shpt. Line"
 {
     Caption = 'Asm.-to-Order Whse. Shpt. Line';

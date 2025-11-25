@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Outlook;
+
 table 6701 "Exchange Contact"
 {
     Caption = 'Exchange Contact';

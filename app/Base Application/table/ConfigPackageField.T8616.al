@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8616 "Config. Package Field"
 {
     Caption = 'Config. Package Field';
@@ -15,13 +19,13 @@ table 8616 "Config. Package Field"
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(3; "Field ID"; Integer)
         {
             Caption = 'Field ID';
             NotBlank = true;
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table ID"));
+            TableRelation = Field."No." where(TableNo = field("Table ID"));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -99,14 +103,12 @@ table 8616 "Config. Package Field"
         {
             Caption = 'Relation Table ID';
             Editable = false;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(10; "Relation Table Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Name" WHERE("Object Type" = CONST(Table),
-                                                                        "Object ID" = FIELD("Relation Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Name" where("Object Type" = const(Table),
+                                                                        "Object ID" = field("Relation Table ID")));
             Caption = 'Relation Table Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -137,9 +139,9 @@ table 8616 "Config. Package Field"
         }
         field(15; "Mapping Exists"; Boolean)
         {
-            CalcFormula = Exist("Config. Field Map" WHERE("Package Code" = FIELD("Package Code"),
-                                                               "Table ID" = FIELD("Table ID"),
-                                                               "Field ID" = FIELD("Field ID")));
+            CalcFormula = exist("Config. Field Map" where("Package Code" = field("Package Code"),
+                                                               "Table ID" = field("Table ID"),
+                                                               "Field ID" = field("Field ID")));
             Caption = 'Mapping Exists';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 enum 5 "Interest Calculation Method"
 {
     Extensible = true;

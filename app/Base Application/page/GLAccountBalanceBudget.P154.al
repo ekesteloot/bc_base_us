@@ -1,3 +1,14 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
+
 page 154 "G/L Account Balance/Budget"
 {
     Caption = 'G/L Account Balance/Budget';
@@ -80,9 +91,9 @@ page 154 "G/L Account Balance/Budget"
                     trigger OnValidate()
                     begin
                         if DateFilter = '' then
-                            SetRange("Date Filter")
+                            Rec.SetRange("Date Filter")
                         else
-                            SetFilter("Date Filter", DateFilter);
+                            Rec.SetFilter("Date Filter", DateFilter);
                         UpdateSubForm();
                     end;
                 }
@@ -104,9 +115,9 @@ page 154 "G/L Account Balance/Budget"
                     trigger OnValidate()
                     begin
                         if GlobalDim1Filter = '' then
-                            SetRange("Global Dimension 1 Filter")
+                            Rec.SetRange("Global Dimension 1 Filter")
                         else
-                            SetFilter("Global Dimension 1 Filter", GlobalDim1Filter);
+                            Rec.SetFilter("Global Dimension 1 Filter", GlobalDim1Filter);
                         UpdateSubForm();
                     end;
                 }
@@ -128,9 +139,9 @@ page 154 "G/L Account Balance/Budget"
                     trigger OnValidate()
                     begin
                         if GlobalDim2Filter = '' then
-                            SetRange("Global Dimension 2 Filter")
+                            Rec.SetRange("Global Dimension 2 Filter")
                         else
-                            SetFilter("Global Dimension 2 Filter", GlobalDim2Filter);
+                            Rec.SetFilter("Global Dimension 2 Filter", GlobalDim2Filter);
                         UpdateSubForm();
                     end;
                 }
@@ -152,12 +163,12 @@ page 154 "G/L Account Balance/Budget"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "G/L Account Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Budget Filter" = FIELD("Budget Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Budget Filter" = field("Budget Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the G/L account card for the selected record.';
                 }
@@ -169,8 +180,8 @@ page 154 "G/L Account Balance/Budget"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     RunObject = Page "General Ledger Entries";
-                    RunPageLink = "G/L Account No." = FIELD("No.");
-                    RunPageView = SORTING("G/L Account No.");
+                    RunPageLink = "G/L Account No." = field("No.");
+                    RunPageView = sorting("G/L Account No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -180,8 +191,8 @@ page 154 "G/L Account Balance/Budget"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -190,8 +201,8 @@ page 154 "G/L Account Balance/Budget"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(15),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(15),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -201,9 +212,9 @@ page 154 "G/L Account Balance/Budget"
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     ToolTip = 'View additional information that has been added to the description for the current account.';
                 }
             }
@@ -238,7 +249,7 @@ page 154 "G/L Account Balance/Budget"
                         trigger OnAction()
                         begin
                             GLAcc.Copy(Rec);
-                            GLAcc.SetRange("No.", "No.");
+                            GLAcc.SetRange("No.", Rec."No.");
                             GLAcc.SetRange("Date Filter");
                             REPORT.Run(REPORT::"Budget Amount by Period", true, false, GLAcc);
                         end;
@@ -254,7 +265,7 @@ page 154 "G/L Account Balance/Budget"
                         trigger OnAction()
                         begin
                             GLAcc.Copy(Rec);
-                            GLAcc.SetRange("No.", "No.");
+                            GLAcc.SetRange("No.", Rec."No.");
                             GLAcc.SetRange("Date Filter");
                             REPORT.Run(REPORT::"Budget from History", true, false, GLAcc);
                         end;

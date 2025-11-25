@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 page 6 "Finance Charge Terms"
 {
     ApplicationArea = Basic, Suite;
@@ -14,7 +16,7 @@ page 6 "Finance Charge Terms"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the finance charge terms.';
@@ -120,7 +122,7 @@ page 6 "Finance Charge Terms"
                     Caption = 'Interest Rates';
                     Image = Percentage;
                     RunObject = Page "Finance Charge Interest Rates";
-                    RunPageLink = "Fin. Charge Terms Code" = FIELD(Code);
+                    RunPageLink = "Fin. Charge Terms Code" = field(Code);
                     ToolTip = 'Set up interest rates.';
                 }
                 action(BeginningText)
@@ -129,8 +131,8 @@ page 6 "Finance Charge Terms"
                     Caption = 'Beginning Text';
                     Image = BeginningText;
                     RunObject = Page "Finance Charge Text";
-                    RunPageLink = "Fin. Charge Terms Code" = FIELD(Code),
-                                  Position = CONST(Beginning);
+                    RunPageLink = "Fin. Charge Terms Code" = field(Code),
+                                  Position = const(Beginning);
                     ToolTip = 'Define a beginning text for each finance charge term. The text will then be printed on the finance charge memo.';
                 }
                 action(EndingText)
@@ -139,8 +141,8 @@ page 6 "Finance Charge Terms"
                     Caption = 'Ending Text';
                     Image = EndingText;
                     RunObject = Page "Finance Charge Text";
-                    RunPageLink = "Fin. Charge Terms Code" = FIELD(Code),
-                                  Position = CONST(Ending);
+                    RunPageLink = "Fin. Charge Terms Code" = field(Code),
+                                  Position = const(Ending);
                     ToolTip = 'Define an ending text for each finance charge term. The text will then be printed on the finance charge memo.';
                 }
                 separator(Action35)
@@ -152,7 +154,7 @@ page 6 "Finance Charge Terms"
                     Caption = 'C&urrencies';
                     Image = Currency;
                     RunObject = Page "Currencies for Fin. Chrg Terms";
-                    RunPageLink = "Fin. Charge Terms Code" = FIELD(Code);
+                    RunPageLink = "Fin. Charge Terms Code" = field(Code);
                     ToolTip = 'Set up finance charge terms in foreign currencies. For example, you can use this table to set up finance charge terms with an additional fee of FRF 100.';
                 }
             }

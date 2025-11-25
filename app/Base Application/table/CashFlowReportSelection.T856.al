@@ -1,3 +1,7 @@
+namespace Microsoft.CashFlow.Setup;
+
+using System.Reflection;
+
 table 856 "Cash Flow Report Selection"
 {
     Caption = 'Cash Flow Report Selection';
@@ -12,7 +16,7 @@ table 856 "Cash Flow Report Selection"
         field(3; "Report ID"; Integer)
         {
             Caption = 'Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
 
             trigger OnValidate()
             begin
@@ -21,8 +25,8 @@ table 856 "Cash Flow Report Selection"
         }
         field(4; "Report Caption"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Report ID")));
             Caption = 'Report Caption';
             Editable = false;
             FieldClass = FlowField;

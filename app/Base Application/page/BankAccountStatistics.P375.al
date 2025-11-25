@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.BankAccount;
+
 page 375 "Bank Account Statistics"
 {
     Caption = 'Bank Account Statistics';
@@ -23,17 +25,17 @@ page 375 "Bank Account Statistics"
                     Caption = 'Balance (LCY)';
                     ToolTip = 'Specifies the bank account''s current balance in LCY.';
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     ToolTip = 'Specifies the bank account''s current balance denominated in the applicable foreign currency.';
                 }
                 field("Min. Balance"; Rec."Min. Balance")
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     ToolTip = 'Specifies a minimum balance for the bank account.';
                 }
@@ -63,7 +65,7 @@ page 375 "Bank Account Statistics"
                         field("BankAccNetChange[1]"; BankAccNetChange[1])
                         {
                             ApplicationArea = Basic, Suite;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Net Change';
                             ToolTip = 'Specifies the net value of entries in LCY on the bank account for the periods: Current Month, This Year, Last Year and To Date.';
@@ -87,7 +89,7 @@ page 375 "Bank Account Statistics"
                         field("BankAccNetChange[2]"; BankAccNetChange[2])
                         {
                             ApplicationArea = Basic, Suite;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Net Change';
                             ToolTip = 'Specifies the net value of entries in LCY on the bank account for the periods: Current Month, This Year, Last Year and To Date.';
@@ -111,7 +113,7 @@ page 375 "Bank Account Statistics"
                         field("BankAccNetChange[3]"; BankAccNetChange[3])
                         {
                             ApplicationArea = Basic, Suite;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Net Change';
                             ToolTip = 'Specifies the net value of entries in LCY on the bank account for the periods: Current Month, This Year, Last Year and To Date.';
@@ -135,7 +137,7 @@ page 375 "Bank Account Statistics"
                         field("BankAccNetChange[4]"; BankAccNetChange[4])
                         {
                             ApplicationArea = Basic, Suite;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Net Change';
                             ToolTip = 'Specifies the net value of entries in LCY on the bank account for the periods: Current Month, This Year, Last Year and To Date.';
@@ -166,16 +168,16 @@ page 375 "Bank Account Statistics"
             DateFilterCalc.CreateFiscalYearFilter(BankAccDateFilter[3], BankAccDateName[3], CurrentDate, -1);
         end;
 
-        SetRange("Date Filter", 0D, CurrentDate);
-        CalcFields(Balance, "Balance (LCY)");
+        Rec.SetRange("Date Filter", 0D, CurrentDate);
+        Rec.CalcFields(Balance, "Balance (LCY)");
 
         for i := 1 to 4 do begin
-            SetFilter("Date Filter", BankAccDateFilter[i]);
-            CalcFields("Net Change", "Net Change (LCY)");
-            BankAccNetChange[i] := "Net Change";
-            BankAccNetChangeLCY[i] := "Net Change (LCY)";
+            Rec.SetFilter("Date Filter", BankAccDateFilter[i]);
+            Rec.CalcFields("Net Change", "Net Change (LCY)");
+            BankAccNetChange[i] := Rec."Net Change";
+            BankAccNetChangeLCY[i] := Rec."Net Change (LCY)";
         end;
-        SetRange("Date Filter", 0D, CurrentDate);
+        Rec.SetRange("Date Filter", 0D, CurrentDate);
     end;
 
     var

@@ -42,10 +42,10 @@ page 30057 "APIV2 - Aut. Conf. Pack. File"
         CodeFilter: Text;
     begin
         if not FilesLoaded then begin
-            CodeFilter := GetFilter(Code);
+            CodeFilter := Rec.GetFilter(Code);
             if CodeFilter = '' then
                 Error(CodeNotSpecifiedForLinesErr);
-            if not FindFirst() then
+            if not Rec.FindFirst() then
                 exit(false);
             FilesLoaded := true;
         end;

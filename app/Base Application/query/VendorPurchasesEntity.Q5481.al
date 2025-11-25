@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Purchases.Payables;
+
 query 5481 "Vendor Purchases Entity"
 {
     Caption = 'vendorPurchases', Locked = true;

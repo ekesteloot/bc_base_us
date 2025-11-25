@@ -1,3 +1,13 @@
+namespace Microsoft.CRM.Task;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+
 page 5096 "Task List"
 {
     Caption = 'Task List';
@@ -175,8 +185,8 @@ page 5096 "Task List"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "To-do No." = FIELD("Organizer To-do No.");
-                    RunPageView = SORTING("To-do No.");
+                    RunPageLink = "To-do No." = field("Organizer To-do No.");
+                    RunPageView = sorting("To-do No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View interaction log entries for the task.';
                 }
@@ -186,8 +196,8 @@ page 5096 "Task List"
                     Caption = 'Postponed &Interactions';
                     Image = PostponedInteractions;
                     RunObject = Page "Postponed Interactions";
-                    RunPageLink = "To-do No." = FIELD("Organizer To-do No.");
-                    RunPageView = SORTING("To-do No.");
+                    RunPageLink = "To-do No." = field("Organizer To-do No.");
+                    RunPageView = sorting("To-do No.");
                     ToolTip = 'View postponed interactions for the task.';
                 }
                 action("A&ttendee Scheduling")
@@ -290,7 +300,7 @@ page 5096 "Task List"
                 Caption = 'Edit Organizer Task';
                 Image = Edit;
                 RunObject = Page "Task Card";
-                RunPageLink = "No." = FIELD("Organizer To-do No.");
+                RunPageLink = "No." = field("Organizer To-do No.");
                 ToolTip = 'View general information about the task such as type, description, priority and status of the task, as well as the salesperson or team the task is assigned to.';
             }
         }
@@ -314,12 +324,12 @@ page 5096 "Task List"
 
     trigger OnAfterGetRecord()
     begin
-        ContactNoOnFormat(Format("Contact No."));
+        ContactNoOnFormat(Format(Rec."Contact No."));
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        RecordsFound := Find(Which);
+        RecordsFound := Rec.Find(Which);
         exit(RecordsFound);
     end;
 

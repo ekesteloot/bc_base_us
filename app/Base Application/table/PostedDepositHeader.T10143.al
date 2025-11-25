@@ -3,9 +3,6 @@ table 10143 "Posted Deposit Header"
     Caption = 'Posted Deposit Header';
     DataCaptionFields = "No.";
     LookupPageID = "Posted Deposit List";
-    ObsoleteReason = 'Deposits are now on the extension "Bank Deposit". Use/extend Posted Bank Deposit Header. Posted deposits will be kept just for querying historical information.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '22.0';
 
     fields
     {
@@ -37,7 +34,7 @@ table 10143 "Posted Deposit Header"
         }
         field(6; "Total Deposit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Deposit Amount';
         }
@@ -49,13 +46,13 @@ table 10143 "Posted Deposit Header"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(9; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(10; "Bank Acc. Posting Group"; Code[20])
         {
@@ -93,18 +90,18 @@ table 10143 "Posted Deposit Header"
         }
         field(21; Comment; Boolean)
         {
-            CalcFormula = Exist("Bank Comment Line" WHERE("Table Name" = CONST("Posted Deposit"),
-                                                           "Bank Account No." = FIELD("Bank Account No."),
-                                                           "No." = FIELD("No.")));
+            CalcFormula = exist("Bank Comment Line" where("Table Name" = const("Posted Deposit"),
+                                                           "Bank Account No." = field("Bank Account No."),
+                                                           "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
         }
         field(22; "Total Deposit Lines"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Posted Deposit Line".Amount WHERE("Deposit No." = FIELD("No.")));
+            CalcFormula = sum("Posted Deposit Line".Amount where("Deposit No." = field("No.")));
             Caption = 'Total Deposit Lines';
             Editable = false;
             FieldClass = FlowField;
@@ -117,7 +114,7 @@ table 10143 "Posted Deposit Header"
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
         }
     }

@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 table 2585 "Dim Correct Selection Criteria"
 {
     DataClassification = CustomerContent;

@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
 enum 5615 "FA Allocation Type"
 {
     Extensible = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
 enum 5875 "Phys. Invt. Order Status"
 {
     Extensible = true;

@@ -10,7 +10,7 @@ report 6651 "Delete Invd Sales Ret. Orders"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Return Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Return Order"));
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.";
             RequestFilterHeading = 'Sales Return Order';
 

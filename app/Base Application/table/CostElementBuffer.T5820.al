@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.InventoryMgt.Ledger;
+
 table 5820 "Cost Element Buffer"
 {
     Caption = 'Cost Element Buffer';

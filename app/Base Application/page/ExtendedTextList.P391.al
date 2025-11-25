@@ -1,13 +1,14 @@
+namespace Microsoft.Foundation.ExtendedText;
+
 page 391 "Extended Text List"
 {
-    ApplicationArea = Basic, Suite;
     Caption = 'Extended Text List';
     CardPageID = "Extended Text";
     DataCaptionFields = "No.";
     Editable = false;
     PageType = List;
     SourceTable = "Extended Text Header";
-    UsageCategory = Lists;
+    UsageCategory = None;
 
     layout
     {

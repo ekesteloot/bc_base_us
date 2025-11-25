@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.WarehouseMgt.Journal;
+
 page 7341 "Whse. Shipment Lines"
 {
     Caption = 'Whse. Shipment Lines';
@@ -217,7 +221,7 @@ page 7341 "Whse. Shipment Lines"
                     var
                         WhseShptHeader: Record "Warehouse Shipment Header";
                     begin
-                        WhseShptHeader.Get("No.");
+                        WhseShptHeader.Get(Rec."No.");
                         PAGE.Run(PAGE::"Warehouse Shipment", WhseShptHeader);
                     end;
                 }
@@ -233,7 +237,7 @@ page 7341 "Whse. Shipment Lines"
                     var
                         WhseShptHeader: Record "Warehouse Shipment Header";
                     begin
-                        WhseShptHeader.Get("No.");
+                        WhseShptHeader.Get(Rec."No.");
                         PAGE.Run(PAGE::"Warehouse Shipment", WhseShptHeader);
                     end;
                 }
@@ -249,7 +253,7 @@ page 7341 "Whse. Shipment Lines"
                         WMSMgt: Codeunit "WMS Management";
                     begin
                         WMSMgt.ShowSourceDocLine(
-                          "Source Type", "Source Subtype", "Source No.", "Source Line No.", 0)
+                          Rec."Source Type", Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.", 0)
                     end;
                 }
             }

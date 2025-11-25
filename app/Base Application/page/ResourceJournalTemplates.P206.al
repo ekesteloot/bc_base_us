@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using System.Reflection;
+
 page 206 "Resource Journal Templates"
 {
     ApplicationArea = Jobs;
@@ -132,7 +136,7 @@ page 206 "Resource Journal Templates"
                     Caption = 'Batches';
                     Image = Description;
                     RunObject = Page "Resource Jnl. Batches";
-                    RunPageLink = "Journal Template Name" = FIELD(Name);
+                    RunPageLink = "Journal Template Name" = field(Name);
                     ToolTip = 'View or edit multiple journals for a specific template. You can use batches when you need multiple journals of a certain type.';
                     Scope = Repeater;
                 }

@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 527 "Posted Sales Credit Memo Lines"
 {
     ApplicationArea = Basic, Suite;
@@ -176,7 +180,7 @@ page 527 "Posted Sales Credit Memo Lines"
 
                     trigger OnAction()
                     begin
-                        SalesCrMemoHeader.Get("Document No.");
+                        SalesCrMemoHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
                     end;
                 }
@@ -191,7 +195,7 @@ page 527 "Posted Sales Credit Memo Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Lines")
@@ -204,7 +208,7 @@ page 527 "Posted Sales Credit Memo Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }

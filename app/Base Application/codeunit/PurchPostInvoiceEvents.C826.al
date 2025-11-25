@@ -1,4 +1,16 @@
-﻿codeunit 826 "Purch. Post Invoice Events"
+﻿namespace Microsoft.Purchases.Posting;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+
+codeunit 826 "Purch. Post Invoice Events"
 {
     // OnAfter events
 
@@ -211,6 +223,16 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnCalculateVATAmountsOnReverseChargeVATOnBeforeModify(PurchHeader: Record "Purchase Header"; Currency: Record Currency; VATPostingSetup: Record "VAT Posting Setup"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
+    begin
+    end;
+
+    procedure RunOnCalculateVATAmountInBufferOnBeforeTempInvoicePostingBufferAssign(var VATAmount: Decimal; var VATAmountACY: Decimal; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
+    begin
+        OnCalculateVATAmountInBufferOnBeforeTempInvoicePostingBufferAssign(VATAmount, VATAmountACY, TempInvoicePostingBuffer);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalculateVATAmountInBufferOnBeforeTempInvoicePostingBufferAssign(var VATAmount: Decimal; var VATAmountACY: Decimal; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
     begin
     end;
 

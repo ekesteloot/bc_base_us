@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 table 5101 "Contact Value"
 {
     Caption = 'Contact Value';

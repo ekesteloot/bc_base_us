@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.AssemblyMgt.Document;
+
 page 7343 "Pick Selection"
 {
     Caption = 'Pick Selection';
@@ -90,8 +94,8 @@ page 7343 "Pick Selection"
     var
         AsmHeader: Record "Assembly Header";
     begin
-        if "Document Type" = "Document Type"::Assembly then begin
-            AsmHeader.Get("Document Subtype", "Document No.");
+        if Rec."Document Type" = Rec."Document Type"::Assembly then begin
+            AsmHeader.Get(Rec."Document Subtype", Rec."Document No.");
             AsmHeader.CalcFields("Assemble to Order");
             exit(AsmHeader."Assemble to Order");
         end;

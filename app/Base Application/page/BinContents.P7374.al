@@ -1,3 +1,14 @@
+﻿namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Integration.Excel;
+using System.Text;
+
 page 7374 "Bin Contents"
 {
     ApplicationArea = Warehouse;
@@ -139,12 +150,12 @@ page 7374 "Bin Contents"
                         CheckQty();
                     end;
                 }
-                field(Default; Default)
+                field(Default; Rec.Default)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if the bin is the default bin for the associated item.';
                 }
-                field(Dedicated; Dedicated)
+                field(Dedicated; Rec.Dedicated)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if the bin is used as a dedicated bin, which means that its bin content is available only to certain resources.';
@@ -179,7 +190,7 @@ page 7374 "Bin Contents"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the maximum number of units of the item that you want to have in the bin.';
                 }
-                field(CalcQtyUOM; CalcQtyUOM())
+                field(CalcQtyUOM; Rec.CalcQtyUOM())
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Quantity';
@@ -216,7 +227,7 @@ page 7374 "Bin Contents"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies how many item units, in the base unit of measure, will be posted on journal lines as positive quantities.';
                 }
-                field(CalcQtyAvailToTakeUOM; CalcQtyAvailToTakeUOM())
+                field(CalcQtyAvailToTakeUOM; Rec.CalcQtyAvailToTakeUOM())
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Available Qty. to Take';
@@ -224,7 +235,7 @@ page 7374 "Bin Contents"
                     Editable = false;
                     ToolTip = 'Specifies the quantity of the item that is available in the bin.';
                 }
-                field("Fixed"; Fixed)
+                field("Fixed"; Rec.Fixed)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies that the item (bin content) has been associated with this bin, and that the bin should normally contain the item.';
@@ -254,7 +265,7 @@ page 7374 "Bin Contents"
                     group("Qty. on Adjustment Bin")
                     {
                         Caption = 'Qty. on Adjustment Bin';
-                        field(CalcQtyonAdjmtBin; CalcQtyonAdjmtBin())
+                        field(CalcQtyonAdjmtBin; Rec.CalcQtyonAdjmtBin())
                         {
                             ApplicationArea = Warehouse;
                             Caption = 'Qty. on Adjustment Bin';
@@ -266,14 +277,14 @@ page 7374 "Bin Contents"
                             var
                                 WhseEntry: Record "Warehouse Entry";
                             begin
-                                LocationGet("Location Code");
+                                LocationGet(Rec."Location Code");
                                 WhseEntry.SetCurrentKey(
                                   "Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code");
-                                WhseEntry.SetRange("Item No.", "Item No.");
+                                WhseEntry.SetRange("Item No.", Rec."Item No.");
                                 WhseEntry.SetRange("Bin Code", AdjmtLocation."Adjustment Bin Code");
-                                WhseEntry.SetRange("Location Code", "Location Code");
-                                WhseEntry.SetRange("Variant Code", "Variant Code");
-                                WhseEntry.SetRange("Unit of Measure Code", "Unit of Measure Code");
+                                WhseEntry.SetRange("Location Code", Rec."Location Code");
+                                WhseEntry.SetRange("Variant Code", Rec."Variant Code");
+                                WhseEntry.SetRange("Unit of Measure Code", Rec."Unit of Measure Code");
 
                                 PAGE.RunModal(PAGE::"Warehouse Entries", WhseEntry);
                             end;
@@ -328,18 +339,52 @@ page 7374 "Bin Contents"
                 }
             }
         }
+        area(processing)
+        {
+            group("Page")
+            {
+                Caption = 'Page';
+                action(EditInExcel)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Edit in Excel';
+                    Image = Excel;
+                    ToolTip = 'Send the data in the journal to an Excel file for analysis or editing.';
+                    Visible = IsSaaSExcelAddinEnabled;
+                    AccessByPermission = System "Allow Action Export To Excel" = X;
+
+                    trigger OnAction()
+                    var
+                        EditinExcel: Codeunit "Edit in Excel";
+                        EditinExcelFilters: Codeunit "Edit in Excel Filters";
+                        ODataUtility: Codeunit "ODataUtility";
+                    begin
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Location Code")), Enum::"Edit in Excel Filter Type"::Equal, Rec."Location Code", Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Zone Code")), Enum::"Edit in Excel Filter Type"::Equal, Rec."Zone Code", Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcel.EditPageInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), Page::"Bin Contents", EditinExcelFilters, StrSubstNo(ExcelFileNameTxt, Rec."Location Code", Rec."Zone Code"));
+                    end;
+                }
+            }
+        }
     }
 
     trigger OnAfterGetCurrRecord()
     begin
-        GetItemDescr("Item No.", "Variant Code", ItemDescription);
-        DataCaption := StrSubstNo('%1 ', "Bin Code");
+        Rec.GetItemDescr(Rec."Item No.", Rec."Variant Code", ItemDescription);
+        DataCaption := StrSubstNo('%1 ', Rec."Bin Code");
     end;
 
     trigger OnOpenPage()
+    var
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ServerSetting: Codeunit "Server Setting";
     begin
+        IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        // if called from API (such as edit-in-excel), do not filter 
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
         ItemDescription := '';
-        GetWhseLocation(LocationCode, ZoneCode);
+        Rec.GetWhseLocation(LocationCode, ZoneCode);
         DefFilter();
     end;
 
@@ -358,15 +403,17 @@ page 7374 "Bin Contents"
         DataCaption: Text[80];
         ItemDescription: Text[100];
         Text000: Label 'Location code is not allowed for user %1.';
+        ExcelFileNameTxt: Label 'BinContents - LocationCode %1 - ZoneCode %2', Comment = '%1 = Location Code; %2 = Zone Code';
         LocFilter: Text;
+        IsSaaSExcelAddinEnabled: Boolean;
 
     local procedure DefFilter()
     var
         SelectionFilterManagement: Codeunit SelectionFilterManagement;
     begin
-        FilterGroup := 2;
+        Rec.FilterGroup := 2;
         if LocationCode <> '' then
-            SetRange("Location Code", LocationCode)
+            Rec.SetRange("Location Code", LocationCode)
         else begin
             Clear(LocFilter);
             Clear(Location);
@@ -378,13 +425,13 @@ page 7374 "Bin Contents"
                 until Location.Next() = 0;
             Location.MarkedOnly(true);
             LocFilter := SelectionFilterManagement.GetSelectionFilterForLocation(Location);
-            SetFilter("Location Code", LocFilter);
+            Rec.SetFilter("Location Code", LocFilter);
         end;
         if ZoneCode <> '' then
-            SetRange("Zone Code", ZoneCode)
+            Rec.SetRange("Zone Code", ZoneCode)
         else
-            SetRange("Zone Code");
-        FilterGroup := 0;
+            Rec.SetRange("Zone Code");
+        Rec.FilterGroup := 0;
     end;
 
     protected procedure CheckQty()

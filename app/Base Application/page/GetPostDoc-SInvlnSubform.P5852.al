@@ -67,7 +67,7 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that this item is a catalog item.';
@@ -382,7 +382,6 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
         ShowRec: Boolean;
 
     protected var
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     local procedure IsFirstDocLine(): Boolean
@@ -483,7 +482,7 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
 
     local procedure ShowDocument()
     begin
-        if not SalesInvHeader.Get("Document No.") then
+        if not SalesInvHeader.Get(Rec."Document No.") then
             exit;
         PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
     end;

@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 7367 "Bin Templates"
 {
     ApplicationArea = Warehouse;
@@ -15,12 +17,12 @@ page 7367 "Bin Templates"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a code for the bin template.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a description for the bin creation template.';

@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Setup;
+
 table 5954 "Work-Hour Template"
 {
     Caption = 'Work-Hour Template';

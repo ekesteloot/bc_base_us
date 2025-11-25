@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Deferral;
+
 enum 1702 "Deferral Document Type"
 {
     Extensible = true;

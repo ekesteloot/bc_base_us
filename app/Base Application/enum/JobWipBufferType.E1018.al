@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
 enum 1018 "Job WIP Buffer Type"
 {
     Extensible = true;

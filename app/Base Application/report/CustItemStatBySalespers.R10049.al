@@ -10,7 +10,7 @@ report 10049 "Cust./Item Stat. by Salespers."
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Code", Name;
             RequestFilterHeading = 'Salesperson';
@@ -122,7 +122,7 @@ report 10049 "Cust./Item Stat. by Salespers."
             }
             dataitem(Customer; Customer)
             {
-                DataItemTableView = SORTING("Salesperson Code", "No.");
+                DataItemTableView = sorting("Salesperson Code", "No.");
                 PrintOnlyIfDetail = true;
                 RequestFilterFields = "No.", "Search Name";
                 column(Customer__No__; "No.")
@@ -170,8 +170,8 @@ report 10049 "Cust./Item Stat. by Salespers."
                 }
                 dataitem("Value Entry"; "Value Entry")
                 {
-                    DataItemLink = "Source No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                    DataItemTableView = SORTING("Source Type", "Source No.", "Item Ledger Entry Type", "Item No.", "Posting Date") WHERE("Source Type" = CONST(Customer), "Item Ledger Entry Type" = CONST(Sale), "Expected Cost" = CONST(false));
+                    DataItemLink = "Source No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                    DataItemTableView = sorting("Source Type", "Source No.", "Item Ledger Entry Type", "Item No.", "Posting Date") where("Source Type" = const(Customer), "Item Ledger Entry Type" = const(Sale), "Expected Cost" = const(false));
                     RequestFilterFields = "Item No.", "Inventory Posting Group", "Posting Date";
                     column(Value_Entry__Item_No__; "Item No.")
                     {

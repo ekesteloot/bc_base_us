@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 7112 "Analysis Line Templates"
 {
     Caption = 'Analysis Line Templates';
@@ -38,9 +40,9 @@ page 7112 "Analysis Line Templates"
                         ItemAnalysisView: Record "Item Analysis View";
                     begin
                         ItemAnalysisView.FilterGroup := 2;
-                        ItemAnalysisView.SetRange("Analysis Area", "Analysis Area");
+                        ItemAnalysisView.SetRange("Analysis Area", Rec."Analysis Area");
                         ItemAnalysisView.FilterGroup := 0;
-                        ItemAnalysisView."Analysis Area" := "Analysis Area";
+                        ItemAnalysisView."Analysis Area" := Rec."Analysis Area";
                         ItemAnalysisView.Code := Text;
                         if PAGE.RunModal(0, ItemAnalysisView) = ACTION::LookupOK then begin
                             Text := ItemAnalysisView.Code;
@@ -82,9 +84,9 @@ page 7112 "Analysis Line Templates"
                     AnalysisReportMngt: Codeunit "Analysis Report Management";
                 begin
                     AnalysisLine.FilterGroup := 2;
-                    AnalysisLine.SetRange("Analysis Area", "Analysis Area");
+                    AnalysisLine.SetRange("Analysis Area", Rec."Analysis Area");
                     AnalysisLine.FilterGroup := 0;
-                    AnalysisReportMngt.OpenAnalysisLinesForm(AnalysisLine, Name);
+                    AnalysisReportMngt.OpenAnalysisLinesForm(AnalysisLine, Rec.Name);
                 end;
             }
         }

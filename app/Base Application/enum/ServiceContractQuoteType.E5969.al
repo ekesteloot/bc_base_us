@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Contract;
+
 enum 5969 "Service Contract Quote Type"
 {
     Extensible = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Setup;
+
 page 1060 "Payment Services"
 {
     AdditionalSearchTerms = 'paypal,microsoft pay payments,worldpay,online payment';
@@ -29,7 +31,7 @@ page 1060 "Payment Services"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the description of the payment service.';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the payment service is enabled.';
@@ -46,7 +48,7 @@ page 1060 "Payment Services"
 
                     trigger OnDrillDown()
                     begin
-                        TermsOfServiceDrillDown();
+                        Rec.TermsOfServiceDrillDown();
                     end;
                 }
             }
@@ -66,10 +68,10 @@ page 1060 "Payment Services"
 
                 trigger OnAction()
                 begin
-                    if NewPaymentService() then begin
-                        Reset();
-                        DeleteAll();
-                        OnRegisterPaymentServices(Rec);
+                    if Rec.NewPaymentService() then begin
+                        Rec.Reset();
+                        Rec.DeleteAll();
+                        Rec.OnRegisterPaymentServices(Rec);
                     end;
                 end;
             }
@@ -83,10 +85,10 @@ page 1060 "Payment Services"
 
                 trigger OnAction()
                 begin
-                    OpenSetupCard();
-                    Reset();
-                    DeleteAll();
-                    OnRegisterPaymentServices(Rec);
+                    Rec.OpenSetupCard();
+                    Rec.Reset();
+                    Rec.DeleteAll();
+                    Rec.OnRegisterPaymentServices(Rec);
                 end;
             }
         }
@@ -125,8 +127,8 @@ page 1060 "Payment Services"
     var
         TempPaymentServiceSetupProviders: Record "Payment Service Setup" temporary;
     begin
-        OnRegisterPaymentServices(Rec);
-        OnRegisterPaymentServiceProviders(TempPaymentServiceSetupProviders);
+        Rec.OnRegisterPaymentServices(Rec);
+        Rec.OnRegisterPaymentServiceProviders(TempPaymentServiceSetupProviders);
         if TempPaymentServiceSetupProviders.IsEmpty() then
             Error(NoServicesInstalledErr);
     end;
@@ -137,7 +139,7 @@ page 1060 "Payment Services"
 
     local procedure UpdateSetupEditable()
     begin
-        SetupEditable := not IsEmpty();
+        SetupEditable := not Rec.IsEmpty();
     end;
 }
 

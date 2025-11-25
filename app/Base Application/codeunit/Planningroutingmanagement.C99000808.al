@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Routing;
+
+using Microsoft.InventoryMgt.Requisition;
+
 codeunit 99000808 PlanningRoutingManagement
 {
 

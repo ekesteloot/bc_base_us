@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 page 5208 Relatives
 {
     ApplicationArea = BasicHR;
@@ -13,7 +15,7 @@ page 5208 Relatives
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a code for the employee''s relative or other close contact.';

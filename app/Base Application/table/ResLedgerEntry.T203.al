@@ -1,3 +1,16 @@
+﻿namespace Microsoft.ProjectMgt.Resources.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Security.AccessControl;
+
 table 203 "Res. Ledger Entry"
 {
     Caption = 'Res. Ledger Entry';
@@ -85,21 +98,19 @@ table 203 "Res. Ledger Entry"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(18; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(20; "User ID"; Code[50])
         {
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(21; "Source Code"; Code[10])
         {
@@ -150,9 +161,9 @@ table 203 "Res. Ledger Entry"
         field(31; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer."No."
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor."No.";
+            TableRelation = if ("Source Type" = const(Customer)) Customer."No."
+            else
+            if ("Source Type" = const(Vendor)) Vendor."No.";
         }
         field(32; "Qty. per Unit of Measure"; Decimal)
         {
@@ -182,7 +193,7 @@ table 203 "Res. Ledger Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])
@@ -264,6 +275,13 @@ table 203 "Res. Ledger Entry"
         key(Key6; "Order Type", "Order No.", "Order Line No.", "Entry Type")
         {
             SumIndexFields = Quantity;
+        }
+        key(Key7; "Source No.", "Source Type", "Entry Type", "Posting Date")
+        {
+            SumIndexFields = "Total Cost";
+        }
+        key(Key8; "Job No.")
+        {
         }
     }
 

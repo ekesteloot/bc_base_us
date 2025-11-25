@@ -12,7 +12,7 @@ report 95 "Date Compress VAT Entries"
     {
         dataitem("VAT Entry"; "VAT Entry")
         {
-            DataItemTableView = SORTING(Type, Closed);
+            DataItemTableView = sorting(Type, Closed);
             RequestFilterFields = Type, "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Tax Jurisdiction Code", "Use Tax", Closed;
 
             trigger OnAfterGetRecord()
@@ -21,10 +21,10 @@ report 95 "Date Compress VAT Entries"
                 with VATEntry2 do begin
                     if not
                        SetCurrentKey(
-                         Type, Closed, "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Posting Date")
+                         Type, Closed, "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT Reporting Date")
                     then
                         SetCurrentKey(
-                          Type, Closed, "Tax Jurisdiction Code", "Use Tax", "Posting Date");
+                          Type, Closed, "Tax Jurisdiction Code", "Use Tax", "VAT Reporting Date");
                     CopyFilters("VAT Entry");
                     SetRange(Type, Type);
                     SetRange(Closed, Closed);
@@ -32,7 +32,7 @@ report 95 "Date Compress VAT Entries"
                     SetRange("VAT Prod. Posting Group", "VAT Prod. Posting Group");
                     SetRange("Tax Jurisdiction Code", "Tax Jurisdiction Code");
                     SetRange("Use Tax", "Use Tax");
-                    SetFilter("Posting Date", DateComprMgt.GetDateFilter("Posting Date", EntrdDateComprReg, true));
+                    SetFilter("VAT Reporting Date", DateComprMgt.GetDateFilter("VAT Reporting Date", EntrdDateComprReg, true));
                     SetRange("Document Type", "Document Type");
 
                     LastVATEntryNo := LastVATEntryNo + 1;
@@ -45,7 +45,7 @@ report 95 "Date Compress VAT Entries"
                     NewVATEntry."VAT Prod. Posting Group" := "VAT Prod. Posting Group";
                     NewVATEntry."Tax Jurisdiction Code" := "Tax Jurisdiction Code";
                     NewVATEntry."Use Tax" := "Use Tax";
-                    NewVATEntry."Posting Date" := GetRangeMin("Posting Date");
+                    NewVATEntry."VAT Reporting Date" := GetRangeMin("VAT Reporting Date");
                     NewVATEntry."Document Type" := "Document Type";
                     NewVATEntry."Source Code" := SourceCodeSetup."Compress VAT Entries";
                     NewVATEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
@@ -55,7 +55,7 @@ report 95 "Date Compress VAT Entries"
                     Window.Update(3, NewVATEntry."VAT Prod. Posting Group");
                     Window.Update(4, NewVATEntry."Tax Jurisdiction Code");
                     Window.Update(5, NewVATEntry."Use Tax");
-                    Window.Update(6, NewVATEntry."Posting Date");
+                    Window.Update(6, NewVATEntry."VAT Reporting Date");
                     DateComprReg."No. of New Records" := DateComprReg."No. of New Records" + 1;
                     Window.Update(7, DateComprReg."No. of New Records");
 
@@ -165,7 +165,7 @@ report 95 "Date Compress VAT Entries"
                 NextTransactionNo := LastTransactionNo + 1;
                 LastVATEntryNo := NewVATEntry.GetLastEntryNo();
                 SetRange("Entry No.", 0, LastVATEntryNo);
-                SetRange("Posting Date", EntrdDateComprReg."Starting Date", EntrdDateComprReg."Ending Date");
+                SetRange("VAT Reporting Date", EntrdDateComprReg."Starting Date", EntrdDateComprReg."Ending Date");
 
                 InitRegisters();
 
@@ -334,7 +334,6 @@ report 95 "Date Compress VAT Entries"
         NoOfDeleted: Integer;
         GLRegExists: Boolean;
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
 
         Text003: Label '%1 must be specified.';
@@ -395,6 +394,7 @@ report 95 "Date Compress VAT Entries"
         LastGLEntryNo := LastGLEntryNo + 1;
         GLEntry."Entry No." := LastGLEntryNo;
         GLEntry."Posting Date" := Today;
+        GLEntry."VAT Reporting Date" := Today();
         GLEntry."Source Code" := SourceCodeSetup."Compress VAT Entries";
         GLEntry."System-Created Entry" := true;
         GLEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(GLEntry."User ID"));
@@ -438,32 +438,6 @@ report 95 "Date Compress VAT Entries"
         if EntrdDateComprReg."Ending Date" = 0D then
             EntrdDateComprReg."Ending Date" := DateCompression.CalcMaxEndDate();
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by InitializeRequest with parameter DateComprRetainFields', '20.0')]
-    procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; RetainDocumentNo: Boolean; RetainBilltoPaytoNo: Boolean; RetainEU3PartyTrade: Boolean; RetainCountryRegionCode: Boolean; RetainInternalRefNo: Boolean)
-    begin
-        InitializeRequest(StartingDate, EndingDate, PeriodLength, RetainDocumentNo, RetainBilltoPaytoNo, RetainEU3PartyTrade, RetainCountryRegionCode, RetainInternalRefNo, true);
-    end;
-#endif
-
-#if not CLEAN20
-    [Obsolete('Replaced by InitializeRequest with parameter DateComprRetainFields', '20.0')]
-    procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; RetainDocumentNo: Boolean; RetainBilltoPaytoNo: Boolean; RetainEU3PartyTrade: Boolean; RetainCountryRegionCode: Boolean; RetainInternalRefNo: Boolean; DoUseDataArchive: Boolean)
-    begin
-        InitializeParameter();
-        EntrdDateComprReg."Starting Date" := StartingDate;
-        EntrdDateComprReg."Ending Date" := EndingDate;
-        EntrdDateComprReg."Period Length" := PeriodLength;
-        DateComprRetainFields."Retain Document No." := RetainDocumentNo;
-        DateComprRetainFields."Retain Bill-to/Pay-to No." := RetainBilltoPaytoNo;
-        DateComprRetainFields."Retain EU 3-Party Trade" := RetainEU3PartyTrade;
-        DateComprRetainFields."Retain Country/Region Code" := RetainCountryRegionCode;
-        DateComprRetainFields."Retain Internal Ref. No." := RetainInternalRefNo;
-        DataArchiveProviderExists := DataArchive.DataArchiveProviderExists();
-        UseDataArchive := DataArchiveProviderExists and DoUseDataArchive;
-    end;
-#endif
 
     procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; NewDateComprRetainFields: Record "Date Compr. Retain Fields"; DoUseDataArchive: Boolean)
     begin

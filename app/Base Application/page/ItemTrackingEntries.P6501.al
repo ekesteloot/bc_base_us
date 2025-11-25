@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Shared.Navigate;
+
 page 6501 "Item Tracking Entries"
 {
     Caption = 'Item Tracking Entries';
@@ -13,7 +18,7 @@ page 6501 "Item Tracking Entries"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Positive; Positive)
+                field(Positive; Rec.Positive)
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies whether the item in the item ledge entry is positive.';
@@ -208,7 +213,7 @@ page 6501 "Item Tracking Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

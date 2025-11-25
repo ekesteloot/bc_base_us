@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 page 1379 "Select Vendor Templ. List"
 {
     Caption = 'Select a template for a new vendor';

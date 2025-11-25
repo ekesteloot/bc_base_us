@@ -1,3 +1,56 @@
+﻿namespace Microsoft.FinancialMgt.RoleCenters;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Deposit;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.BankMgt.Reports;
+using Microsoft.BankMgt.Statement;
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CashFlow.Reports;
+using Microsoft.CashFlow.Setup;
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Allocation;
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Reports;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+using System.Threading;
+
 page 9001 "Accounting Manager Role Center"
 {
     Caption = 'Accounting Manager';
@@ -461,7 +514,7 @@ page 9001 "Accounting Manager Role Center"
                 Caption = 'Balance';
                 Image = Balance;
                 RunObject = Page "Vendor List";
-                RunPageView = WHERE("Balance (LCY)" = FILTER(<> 0));
+                RunPageView = where("Balance (LCY)" = filter(<> 0));
                 ToolTip = 'View a summary of the bank account balance in different periods.';
             }
             action("Purchase Orders")
@@ -523,7 +576,7 @@ page 9001 "Accounting Manager Role Center"
                 Caption = 'Balance';
                 Image = Balance;
                 RunObject = Page "Customer List";
-                RunPageView = WHERE("Balance (LCY)" = FILTER(<> 0));
+                RunPageView = where("Balance (LCY)" = filter(<> 0));
                 ToolTip = 'View a summary of the bank account balance in different periods.';
             }
             action("Sales Orders")
@@ -577,8 +630,8 @@ page 9001 "Accounting Manager Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Purchase Journals';
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Purchases),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Purchases),
+                                        Recurring = const(false));
                     ToolTip = 'Post any purchase-related transaction directly to a vendor, bank, or general ledger account instead of using dedicated documents. You can post all types of financial purchase transactions, including payments, refunds, and finance charge amounts. Note that you cannot post item quantities with a purchase journal.';
                 }
                 action(SalesJournals)
@@ -586,8 +639,8 @@ page 9001 "Accounting Manager Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Journals';
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Sales),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Sales),
+                                        Recurring = const(false));
                     ToolTip = 'Post any sales-related transaction directly to a customer, bank, or general ledger account instead of using dedicated documents. You can post all types of financial sales transactions, including payments, refunds, and finance charge amounts. Note that you cannot post item quantities with a sales journal.';
                 }
                 action(CashReceiptJournals)
@@ -596,8 +649,8 @@ page 9001 "Accounting Manager Role Center"
                     Caption = 'Cash Receipt Journals';
                     Image = Journals;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST("Cash Receipts"),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const("Cash Receipts"),
+                                        Recurring = const(false));
                     ToolTip = 'Register received payments by manually applying them to the related customer, vendor, or bank ledger entries. Then, post the payments to G/L accounts and thereby close the related ledger entries.';
                 }
                 action(PaymentJournals)
@@ -606,8 +659,8 @@ page 9001 "Accounting Manager Role Center"
                     Caption = 'Payment Journals';
                     Image = Journals;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Payments),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Payments),
+                                        Recurring = const(false));
                     ToolTip = 'Register payments to vendors. A payment journal is a type of general journal that is used to post outgoing payment transactions to G/L, bank, customer, vendor, employee, and fixed assets accounts. The Suggest Vendor Payments functions automatically fills the journal with payments that are due. When payments are posted, you can export the payments to a bank file for upload to your bank if your system is set up for electronic banking. You can also issue computer checks from the payment journal.';
                 }
                 action(ICGeneralJournals)
@@ -615,8 +668,8 @@ page 9001 "Accounting Manager Role Center"
                     ApplicationArea = Intercompany;
                     Caption = 'IC General Journals';
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Intercompany),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Intercompany),
+                                        Recurring = const(false));
                     ToolTip = 'Post intercompany transactions. IC general journal lines must contain either an IC partner account or a customer or vendor account that has been assigned an intercompany partner code.';
                 }
                 action(GeneralJournals)
@@ -625,8 +678,8 @@ page 9001 "Accounting Manager Role Center"
                     Caption = 'General Journals';
                     Image = Journal;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(General),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(General),
+                                        Recurring = const(false));
                     ToolTip = 'Post financial transactions directly to general ledger accounts and other accounts, such as bank, customer, vendor, and employee accounts. Posting with a general journal always creates entries on general ledger accounts. This is true even when, for example, you post a journal line to a customer account, because an entry is posted to a general ledger receivables account through a posting group.';
                 }
 #if not CLEAN22
@@ -666,8 +719,8 @@ page 9001 "Accounting Manager Role Center"
                     ApplicationArea = FixedAssets;
                     Caption = 'Fixed Assets G/L Journals';
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Assets),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Assets),
+                                        Recurring = const(false));
                     ToolTip = 'Post fixed asset transactions, such as acquisition and depreciation, in integration with the general ledger. The FA G/L Journal is a general journal, which is integrated into the general ledger.';
                 }
                 action("Fixed Assets Journals")
@@ -675,7 +728,7 @@ page 9001 "Accounting Manager Role Center"
                     ApplicationArea = FixedAssets;
                     Caption = 'Fixed Assets Journals';
                     RunObject = Page "FA Journal Batches";
-                    RunPageView = WHERE(Recurring = CONST(false));
+                    RunPageView = where(Recurring = const(false));
                     ToolTip = 'Post fixed asset transactions, such as acquisition and depreciation book without integration to the general ledger.';
                 }
                 action("Fixed Assets Reclass. Journals")
@@ -697,8 +750,8 @@ page 9001 "Accounting Manager Role Center"
                     ApplicationArea = FixedAssets;
                     Caption = 'Recurring General Journals';
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(General),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(General),
+                                        Recurring = const(true));
                     ToolTip = 'Define how to post transactions that recur with few or no changes to general ledger, bank, customer, vendor, or fixed asset accounts';
                 }
                 action("Recurring Fixed Asset Journals")
@@ -706,7 +759,7 @@ page 9001 "Accounting Manager Role Center"
                     ApplicationArea = FixedAssets;
                     Caption = 'Recurring Fixed Asset Journals';
                     RunObject = Page "FA Journal Batches";
-                    RunPageView = WHERE(Recurring = CONST(true));
+                    RunPageView = where(Recurring = const(true));
                     ToolTip = 'Post recurring fixed asset transactions, such as acquisition and depreciation book without integration to the general ledger.';
                 }
             }
@@ -1026,9 +1079,6 @@ page 9001 "Accounting Manager Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales &Credit Memo';
                 Image = CreditMemo;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
                 ToolTip = 'Create a new sales credit memo to revert a posted sales invoice.';
@@ -1038,9 +1088,6 @@ page 9001 "Accounting Manager Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'P&urchase Credit Memo';
                 Image = CreditMemo;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Credit Memo";
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase credit memo so you can manage returned items to a vendor.';
@@ -1148,9 +1195,6 @@ page 9001 "Accounting Manager Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Payment Reconciliation Journals';
                 Image = ApplyEntries;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
                 RunObject = Page "Pmt. Reconciliation Journals";
                 RunPageMode = View;
                 ToolTip = 'Reconcile unpaid documents automatically with their related bank transactions by importing a bank statement feed or file. In the payment reconciliation journal, incoming or outgoing payments on your bank are automatically, or semi-automatically, applied to their related open customer or vendor ledger entries. Any open bank account ledger entries related to the applied customer or vendor ledger entries will be closed when you choose the Post Payments and Reconcile Bank Account action. This means that the bank account is automatically reconciled for payments that you post with the journal.';

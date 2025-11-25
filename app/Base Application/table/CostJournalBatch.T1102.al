@@ -1,3 +1,7 @@
+namespace Microsoft.CostAccounting.Journal;
+
+using Microsoft.CostAccounting.Account;
+
 table 1102 "Cost Journal Batch"
 {
     Caption = 'Cost Journal Batch';

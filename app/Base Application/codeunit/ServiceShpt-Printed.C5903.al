@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 codeunit 5903 "Service Shpt.-Printed"
 {
     Permissions = TableData "Service Shipment Header" = rimd;
@@ -5,10 +7,10 @@ codeunit 5903 "Service Shpt.-Printed"
 
     trigger OnRun()
     begin
-        Find();
-        "No. Printed" := "No. Printed" + 1;
+        Rec.Find();
+        Rec."No. Printed" := Rec."No. Printed" + 1;
         OnBeforeModify(Rec);
-        Modify();
+        Rec.Modify();
         Commit();
     end;
 

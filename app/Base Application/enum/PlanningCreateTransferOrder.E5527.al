@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Planning;
+
 enum 5527 "Planning Create Transfer Order"
 {
     Extensible = true;

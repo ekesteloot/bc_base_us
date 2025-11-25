@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Tooling;
+
 table 2000000204 "Page Info And Fields"
 {
     Caption = 'Page Info And Fields';
@@ -73,6 +79,10 @@ table 2000000204 "Page Info And Fields"
         field(17; "Field Info"; Text[1024])
         {
             Caption = 'Field Info';
+        }
+        field(18; Tooltip; Text[2048])
+        {
+            Caption = 'Tooltip';
         }
     }
     keys

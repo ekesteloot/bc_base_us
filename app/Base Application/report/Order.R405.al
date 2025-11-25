@@ -1,7 +1,28 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Shared.Archive;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 405 "Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/Order.rdlc';
+    RDLCLayout = './Purchases/Document/Order.rdlc';
     Caption = 'Order';
     PreviewMode = PrintLayout;
 
@@ -9,7 +30,7 @@ report 405 "Order"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Purchase Order';
             column(DocType_PurchaseHeader; "Document Type")
@@ -62,10 +83,10 @@ report 405 "Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(ReportTitleCopyText; StrSubstNo(Text004, CopyText))
                     {
                     }
@@ -246,7 +267,7 @@ report 405 "Order"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(HeaderDimensionsCaption; HeaderDimensionsCaptionLbl)
                         {
                         }
@@ -287,9 +308,9 @@ report 405 "Order"
                     }
                     dataitem("Purchase Line"; "Purchase Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -298,7 +319,7 @@ report 405 "Order"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(PurchLineLineAmt; TempPurchaseLine."Line Amount")
                         {
                             AutoFormatExpression = "Purchase Line"."Currency Code";
@@ -433,7 +454,7 @@ report 405 "Order"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(LineDimensionsCaption; LineDimensionsCaptionLbl)
                             {
                             }
@@ -520,7 +541,7 @@ report 405 "Order"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmtLineVATBase; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -592,7 +613,7 @@ report 405 "Order"
                     }
                     dataitem(VATCounterLCY; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VALExchRate; VALExchRate)
                         {
                         }
@@ -649,11 +670,11 @@ report 405 "Order"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(PaytoVendNo_PurchaseHeader; "Purchase Header"."Pay-to Vendor No.")
                         {
                         }
@@ -696,7 +717,7 @@ report 405 "Order"
                     }
                     dataitem(Total3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(SelltoCustNo_PurchaseHeader; "Purchase Header"."Sell-to Customer No.")
                         {
                         }
@@ -739,7 +760,7 @@ report 405 "Order"
                     }
                     dataitem(PrepmtLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(PrepmtLineAmt; PrepmtLineAmount)
                         {
                             AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -795,7 +816,7 @@ report 405 "Order"
                         }
                         dataitem(PrepmtDimLoop; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DummyColumn; 0)
                             {
                             }
@@ -863,7 +884,7 @@ report 405 "Order"
                     }
                     dataitem(PrepmtVATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(PrepmtVATAmtLineVATAmt; TempPrepmtVATAmountLine."VAT Amount")
                         {
                             AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -961,6 +982,7 @@ report 405 "Order"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Purchase Header");
@@ -1150,9 +1172,7 @@ report 405 "Order"
         PrepmtLineAmount: Decimal;
         PricesInclVATtxt: Text[30];
         AllowInvDisctxt: Text[30];
-        [InDataSet]
         ArchiveDocumentEnable: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -1226,7 +1246,7 @@ report 405 "Order"
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Purch. Ord.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch. Ord.") <> '';
     end;
 
     local procedure FormatAddressFields(var PurchaseHeader: Record "Purchase Header")

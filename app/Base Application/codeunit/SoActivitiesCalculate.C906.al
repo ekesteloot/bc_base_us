@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.RoleCenters;
+
 codeunit 906 "SO Activities Calculate"
 {
     Permissions = tabledata "Sales Cue" = r;

@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FixedAssets.FixedAsset;
+
 query 267 "FA Ledger Entries"
 {
     Caption = 'FA Ledger Entries';

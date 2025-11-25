@@ -1,3 +1,8 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Reports;
+
 page 452 "Issued Fin. Charge Memo List"
 {
     ApplicationArea = Suite;
@@ -49,7 +54,7 @@ page 452 "Issued Fin. Charge Memo List"
                     ToolTip = 'Specifies the postal code.';
                     Visible = false;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city name of the customer the finance charge memo is for.';
@@ -73,7 +78,7 @@ page 452 "Issued Fin. Charge Memo List"
                     ToolTip = 'Specifies the code for Shortcut Dimension 2, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
                     Visible = false;
                 }
-                field(Canceled; Canceled)
+                field(Canceled; Rec.Canceled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the issued finance charge memo has been canceled.';
@@ -109,8 +114,8 @@ page 452 "Issued Fin. Charge Memo List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Fin. Charge Comment Sheet";
-                    RunPageLink = Type = CONST("Issued Finance Charge Memo"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = Type = const("Issued Finance Charge Memo"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("C&ustomer")
@@ -119,7 +124,7 @@ page 452 "Issued Fin. Charge Memo List"
                     Caption = 'C&ustomer';
                     Image = Customer;
                     RunObject = Page "Customer List";
-                    RunPageLink = "No." = FIELD("Customer No.");
+                    RunPageLink = "No." = field("Customer No.");
                     ToolTip = 'Open the card of the customer that the reminder or finance charge applies to. ';
                 }
                 separator(Action27)
@@ -131,7 +136,7 @@ page 452 "Issued Fin. Charge Memo List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Issued Fin. Charge Memo Stat.";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -181,7 +186,7 @@ page 452 "Issued Fin. Charge Memo List"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action(Cancel)
@@ -197,7 +202,7 @@ page 452 "Issued Fin. Charge Memo List"
                     IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
                 begin
                     CurrPage.SetSelectionFilter(IssuedFinChargeMemoHeader);
-                    RunCancelIssuedFinChargeMemo(IssuedFinChargeMemoHeader);
+                    Rec.RunCancelIssuedFinChargeMemo(IssuedFinChargeMemoHeader);
                 end;
             }
         }

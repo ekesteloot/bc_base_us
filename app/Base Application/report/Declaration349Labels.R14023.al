@@ -8,7 +8,7 @@ report 14023 "Declaration 349 Labels"
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             column(A; A)
             {
             }

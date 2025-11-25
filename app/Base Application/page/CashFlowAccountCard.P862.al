@@ -1,3 +1,8 @@
+namespace Microsoft.CashFlow.Account;
+
+using Microsoft.CashFlow.Comment;
+using Microsoft.CashFlow.Forecast;
+
 page 862 "Cash Flow Account Card"
 {
     Caption = 'Cash Flow Account Card';
@@ -26,7 +31,7 @@ page 862 "Cash Flow Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the purpose of the cash flow account. Newly created cash flow accounts are automatically assigned the Entry account type, but you can change this.';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
@@ -46,7 +51,7 @@ page 862 "Cash Flow Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an alternate name that you can use to search for the record in question when you cannot remember the value in the Name field.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -94,8 +99,8 @@ page 862 "Cash Flow Account Card"
                     Caption = 'Entries';
                     Image = Entries;
                     RunObject = Page "Cash Flow Forecast Entries";
-                    RunPageLink = "Cash Flow Account No." = FIELD("No.");
-                    RunPageView = SORTING("Cash Flow Account No.");
+                    RunPageLink = "Cash Flow Account No." = field("No.");
+                    RunPageView = sorting("Cash Flow Account No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the entries that exist for the cash flow account. ';
                 }
@@ -105,8 +110,8 @@ page 862 "Cash Flow Account Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Cash Flow Comment";
-                    RunPageLink = "Table Name" = CONST("Cash Flow Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Cash Flow Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

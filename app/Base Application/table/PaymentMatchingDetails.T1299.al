@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+
 table 1299 "Payment Matching Details"
 {
     Caption = 'Payment Matching Details';
@@ -12,17 +16,15 @@ table 1299 "Payment Matching Details"
         field(2; "Statement No."; Code[20])
         {
             Caption = 'Statement No.';
-            TableRelation = "Bank Acc. Reconciliation"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."));
+            TableRelation = "Bank Acc. Reconciliation"."Statement No." where("Bank Account No." = field("Bank Account No."));
         }
         field(3; "Statement Line No."; Integer)
         {
             Caption = 'Statement Line No.';
         }
-        field(4; "Statement Type"; Option)
+        field(4; "Statement Type"; Enum "Bank Acc. Rec. Stmt. Type")
         {
             Caption = 'Statement Type';
-            OptionCaption = 'Bank Reconciliation,Payment Application';
-            OptionMembers = "Bank Reconciliation","Payment Application";
         }
         field(5; "Line No."; Integer)
         {

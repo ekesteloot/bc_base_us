@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Request;
+
 page 7334 "Put-away Selection"
 {
     Caption = 'Put-away Selection';

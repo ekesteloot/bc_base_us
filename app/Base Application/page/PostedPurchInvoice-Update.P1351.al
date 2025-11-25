@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.History;
+
 page 1351 "Posted Purch. Invoice - Update"
 {
     Caption = 'Posted Purch. Invoice - Update';
@@ -56,6 +58,12 @@ page 1351 "Posted Purch. Invoice - Update"
                     Editable = true;
                     ToolTip = 'Specifies the number of the vendor.';
                 }
+                field("Posting Description"; Rec."Posting Description")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Editable = true;
+                    ToolTip = 'Specifies any text that is entered to accompany the posting, for example for information to auditors.';
+                }
             }
             group(Shipping)
             {
@@ -93,10 +101,11 @@ page 1351 "Posted Purch. Invoice - Update"
     local procedure RecordChanged() IsChanged: Boolean
     begin
         IsChanged :=
-            ("Payment Reference" <> xPurchInvHeader."Payment Reference") or
-            ("Payment Method Code" <> xPurchInvHeader."Payment Method Code") or
-            ("Creditor No." <> xPurchInvHeader."Creditor No.") or
-            ("Ship-to Code" <> xPurchInvHeader."Ship-to Code");
+            (Rec."Payment Reference" <> xPurchInvHeader."Payment Reference") or
+            (Rec."Payment Method Code" <> xPurchInvHeader."Payment Method Code") or
+            (Rec."Creditor No." <> xPurchInvHeader."Creditor No.") or
+            (Rec."Ship-to Code" <> xPurchInvHeader."Ship-to Code") or
+            (Rec."Posting Description" <> xPurchInvHeader."Posting Description");
 
         OnAfterRecordChanged(Rec, xRec, IsChanged, xPurchInvHeader);
     end;
@@ -104,7 +113,7 @@ page 1351 "Posted Purch. Invoice - Update"
     procedure SetRec(PurchInvHeader: Record "Purch. Inv. Header")
     begin
         Rec := PurchInvHeader;
-        Insert();
+        Rec.Insert();
     end;
 
     [IntegrationEvent(false, false)]

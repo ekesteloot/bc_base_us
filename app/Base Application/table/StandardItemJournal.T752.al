@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Journal;
+
 table 752 "Standard Item Journal"
 {
     Caption = 'Standard Item Journal';

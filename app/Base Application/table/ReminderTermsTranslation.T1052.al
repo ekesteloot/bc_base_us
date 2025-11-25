@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Reminder;
+
+using System.Globalization;
+
 table 1052 "Reminder Terms Translation"
 {
     Caption = 'Reminder Terms Translation';

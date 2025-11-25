@@ -1,3 +1,12 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.ExtendedText;
+
 page 569 "Chart of Accs. (Analysis View)"
 {
     Caption = 'Chart of Accs. (Analysis View)';
@@ -45,7 +54,7 @@ page 569 "Chart of Accs. (Analysis View)"
                     ToolTip = 'Specifies whether you will be able to post directly or only indirectly to this general ledger account.';
                     Visible = false;
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
@@ -92,7 +101,7 @@ page 569 "Chart of Accs. (Analysis View)"
                     ToolTip = 'Specifies the G/L account balance on the last date included in the Date Filter field.';
                     Visible = false;
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = Basic, Suite;
                     BlankZero = true;
@@ -157,12 +166,12 @@ page 569 "Chart of Accs. (Analysis View)"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "G/L Account Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Budget Filter" = FIELD("Budget Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Budget Filter" = field("Budget Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -174,8 +183,8 @@ page 569 "Chart of Accs. (Analysis View)"
                     //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                     //PromotedCategory = Process;
                     RunObject = Page "General Ledger Entries";
-                    RunPageLink = "G/L Account No." = FIELD("No.");
-                    RunPageView = SORTING("G/L Account No.");
+                    RunPageLink = "G/L Account No." = field("No.");
+                    RunPageView = sorting("G/L Account No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -185,8 +194,8 @@ page 569 "Chart of Accs. (Analysis View)"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 group(Dimensions)
@@ -199,8 +208,8 @@ page 569 "Chart of Accs. (Analysis View)"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(15),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(15),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -218,7 +227,7 @@ page 569 "Chart of Accs. (Analysis View)"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(GLAcc);
-                            DefaultDimMultiple.SetMultiRecord(GLAcc, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(GLAcc, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -229,9 +238,9 @@ page 569 "Chart of Accs. (Analysis View)"
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     ToolTip = 'View additional information about a general ledger account, this supplements the Description field.';
                 }
                 action("Receivables-Payables")
@@ -253,10 +262,10 @@ page 569 "Chart of Accs. (Analysis View)"
                     Caption = 'G/L &Account Balance';
                     Image = GLAccountBalance;
                     RunObject = Page "G/L Account Balance";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter");
                     ToolTip = 'View a summary of the debit and credit balances for different time periods, for the account that you select in the chart of accounts.';
                 }
                 action("G/L &Balance")
@@ -314,19 +323,17 @@ page 569 "Chart of Accs. (Analysis View)"
     end;
 
     var
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     procedure InsertTempGLAccAnalysisViews(var GLAcc: Record "G/L Account")
     begin
         if GLAcc.Find('-') then
             repeat
-                Init();
-                TransferFields(GLAcc, true);
-                "Account Source" := "Account Source"::"G/L Account";
-                Insert();
+                Rec.Init();
+                Rec.TransferFields(GLAcc, true);
+                Rec."Account Source" := Rec."Account Source"::"G/L Account";
+                Rec.Insert();
             until GLAcc.Next() = 0;
     end;
 
@@ -345,15 +352,15 @@ page 569 "Chart of Accs. (Analysis View)"
                 Rec."Last Date Modified" := CFAccount."Last Date Modified";
                 Rec.Totaling := CFAccount.Totaling;
                 Rec.Comment := CFAccount.Comment;
-                Rec."Account Source" := "Account Source"::"Cash Flow Account";
+                Rec."Account Source" := Rec."Account Source"::"Cash Flow Account";
                 Rec.Insert();
             until CFAccount.Next() = 0;
     end;
 
     local procedure FormatLine()
     begin
-        NameIndent := Indentation;
-        Emphasize := "Account Type" <> "Account Type"::Posting;
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
     end;
 }
 

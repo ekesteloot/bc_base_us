@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.Text;
+
 page 9209 "Invt. Analys by Dim. Matrix"
 {
     Caption = 'Invt. Analys by Dim. Matrix';
@@ -16,7 +23,7 @@ page 9209 "Invt. Analys by Dim. Matrix"
                 IndentationColumn = NameIndent;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     StyleExpr = 'Strong';
@@ -24,7 +31,7 @@ page 9209 "Invt. Analys by Dim. Matrix"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        ItemAnalysisMgt.LookupDimCode(LineDimType, LineDimCode, Code);
+                        ItemAnalysisMgt.LookupDimCode(LineDimType, LineDimCode, Rec.Code);
                     end;
                 }
                 field(Name; Rec.Name)
@@ -33,7 +40,7 @@ page 9209 "Invt. Analys by Dim. Matrix"
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the name of the record.';
                 }
-                field(TotalQuantity; +Quantity)
+                field(TotalQuantity; Rec.Quantity)
                 {
                     ApplicationArea = Suite;
                     BlankZero = true;
@@ -53,7 +60,7 @@ page 9209 "Invt. Analys by Dim. Matrix"
                         // Line with .. ColumnDimOption,MatrixRecord, might be wrong...
                     end;
                 }
-                field(TotalInvtValue; +Amount)
+                field(TotalInvtValue; Rec.Amount)
                 {
                     ApplicationArea = Suite;
                     BlankZero = true;
@@ -469,9 +476,9 @@ page 9209 "Invt. Analys by Dim. Matrix"
     trigger OnAfterGetCurrRecord()
     begin
         // IF CurrForm.TotalQuantity.VISIBLE THEN
-        Quantity := CalcAmt("Item Analysis Value Type"::Quantity, false);
+        Rec.Quantity := CalcAmt("Item Analysis Value Type"::Quantity, false);
         // IF CurrForm.TotalInvtValue.VISIBLE THEN
-        Amount := CalcAmt("Item Analysis Value Type"::"Cost Amount", false);
+        Rec.Amount := CalcAmt("Item Analysis Value Type"::"Cost Amount", false);
     end;
 
     trigger OnAfterGetRecord()
@@ -480,9 +487,9 @@ page 9209 "Invt. Analys by Dim. Matrix"
     begin
         NameIndent := 0;
         // IF CurrForm.TotalQuantity.VISIBLE THEN
-        Quantity := CalcAmt("Item Analysis Value Type"::Quantity, false);
+        Rec.Quantity := CalcAmt("Item Analysis Value Type"::Quantity, false);
         // IF CurrForm.TotalQuantity.VISIBLE THEN
-        Amount := CalcAmt("Item Analysis Value Type"::"Cost Amount", false);
+        Rec.Amount := CalcAmt("Item Analysis Value Type"::"Cost Amount", false);
         MATRIX_CurrentColumnOrdinal := 0;
         while MATRIX_CurrentColumnOrdinal < MATRIX_CurrentNoOfMatrixColumn do begin
             MATRIX_CurrentColumnOrdinal := MATRIX_CurrentColumnOrdinal + 1;
@@ -490,8 +497,8 @@ page 9209 "Invt. Analys by Dim. Matrix"
         end;
 
         FormatLine();
-        QuantityOnFormat(Format(+Quantity));
-        AmountOnFormat(Format(+Amount));
+        QuantityOnFormat(Format(Rec.Quantity));
+        AmountOnFormat(Format(Rec.Amount));
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -558,7 +565,6 @@ page 9209 "Invt. Analys by Dim. Matrix"
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[32] of Decimal;
         MATRIX_CaptionSet: array[32] of Text[80];
-        [InDataSet]
         NameIndent: Integer;
 
     protected var
@@ -647,7 +653,7 @@ page 9209 "Invt. Analys by Dim. Matrix"
 
     local procedure FormatLine()
     begin
-        NameIndent := Indentation;
+        NameIndent := Rec.Indentation;
     end;
 
     local procedure QuantityOnFormat(Text: Text[1024])

@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.InventoryMgt.Item;
+
 query 265 "Item Ledger Entries"
 {
     Caption = 'Item Ledger Entries';

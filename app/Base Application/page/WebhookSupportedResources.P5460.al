@@ -19,7 +19,7 @@ page 5460 "Webhook Supported Resources"
         {
             repeater(Group)
             {
-                field(resource; "Value Long")
+                field(resource; Rec."Value Long")
                 {
                     ApplicationArea = All;
                     Caption = 'resource', Locked = true;
@@ -48,8 +48,8 @@ page 5460 "Webhook Supported Resources"
             exit(false);
         end;
 
-        View := GetView();
-        Reset();
+        View := Rec.GetView();
+        Rec.Reset();
 
         ApiWebhookEntity.SetRange("Object Type", ApiWebhookEntity."Object Type"::Page);
         ApiWebhookEntity.SetRange("Table Temporary", false);
@@ -61,14 +61,14 @@ page 5460 "Webhook Supported Resources"
             if not IsSystemTable(ApiWebhookEntity) then
                 if not IsCompositeKey(ApiWebhookEntity) then begin
                     I += 1;
-                    ID := I;
-                    "Value Long" := CopyStr(GetResourceUri(ApiWebhookEntity), 1, MaxStrLen("Value Long"));
-                    Insert();
+                    Rec.ID := I;
+                    Rec."Value Long" := CopyStr(GetResourceUri(ApiWebhookEntity), 1, MaxStrLen(Rec."Value Long"));
+                    Rec.Insert();
                 end;
         until ApiWebhookEntity.Next() = 0;
 
-        SetView(View);
-        FindFirst();
+        Rec.SetView(View);
+        Rec.FindFirst();
         Initialized := true;
         exit(true);
     end;

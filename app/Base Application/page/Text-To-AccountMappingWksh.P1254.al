@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Purchases.Setup;
+
 page 1254 "Text-to-Account Mapping Wksh."
 {
     AutoSplitKey = true;
@@ -118,14 +123,14 @@ page 1254 "Text-to-Account Mapping Wksh."
     var
         VendorFilter: Text;
     begin
-        VendorFilter := GetFilter("Vendor No.");
+        VendorFilter := Rec.GetFilter("Vendor No.");
         if VendorFilter <> '' then
-            "Vendor No." := CopyStr(VendorFilter, 1, StrLen(VendorFilter));
+            Rec."Vendor No." := CopyStr(VendorFilter, 1, StrLen(VendorFilter));
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        exit(CheckEntriesAreConsistent());
+        exit(Rec.CheckEntriesAreConsistent());
     end;
 
     var

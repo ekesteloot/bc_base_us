@@ -1,3 +1,7 @@
+namespace System.AI;
+
+using System;
+
 codeunit 2021 "Image Analysis Result"
 {
     var

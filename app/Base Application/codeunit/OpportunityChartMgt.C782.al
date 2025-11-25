@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Analysis;
+
+using Microsoft.CRM.Opportunity;
+using System.Utilities;
+using System.Visualization;
+
 codeunit 782 "Opportunity Chart Mgt."
 {
 

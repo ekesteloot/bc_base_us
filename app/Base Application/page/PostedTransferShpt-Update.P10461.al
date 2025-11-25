@@ -81,14 +81,14 @@ page 10461 "Posted Transfer Shpt. - Update"
     local procedure RecordChanged() IsChanged: Boolean
     begin
         IsChanged :=
-          ("CFDI Cancellation Reason Code" <> xTransferShipmentHeader."CFDI Cancellation Reason Code") or
-          ("Substitution Document No." <> xTransferShipmentHeader."Substitution Document No.");
+          (Rec."CFDI Cancellation Reason Code" <> xTransferShipmentHeader."CFDI Cancellation Reason Code") or
+          (Rec."Substitution Document No." <> xTransferShipmentHeader."Substitution Document No.");
     end;
 
     procedure SetRec(TransferShipmentHeader: Record "Transfer Shipment Header")
     begin
         Rec := TransferShipmentHeader;
-        Insert();
+        Rec.Insert();
     end;
 }
 

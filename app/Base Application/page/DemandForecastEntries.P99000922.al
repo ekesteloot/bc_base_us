@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Forecast;
+
 page 99000922 "Demand Forecast Entries"
 {
     Caption = 'Demand Forecast Entries';
@@ -105,14 +107,14 @@ page 99000922 "Demand Forecast Entries"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         if CurrentForecastName <> '' then
-            "Production Forecast Name" := CopyStr(CurrentForecastName, 1, MaxStrLen("Production Forecast Name"))
+            Rec."Production Forecast Name" := CopyStr(CurrentForecastName, 1, MaxStrLen(Rec."Production Forecast Name"))
         else
-            "Production Forecast Name" := xRec."Production Forecast Name";
+            Rec."Production Forecast Name" := xRec."Production Forecast Name";
             if GUIAllowed() then begin
-            "Item No." := xRec."Item No.";
-            "Unit of Measure Code" := xRec."Unit of Measure Code";
-            "Qty. per Unit of Measure" := xRec."Qty. per Unit of Measure";
-            "Forecast Date" := xRec."Forecast Date";
+            Rec."Item No." := xRec."Item No.";
+            Rec."Unit of Measure Code" := xRec."Unit of Measure Code";
+            Rec."Qty. per Unit of Measure" := xRec."Qty. per Unit of Measure";
+            Rec."Forecast Date" := xRec."Forecast Date";
         end;
     end;
 

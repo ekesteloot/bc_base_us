@@ -1,7 +1,13 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.History;
+using System.Utilities;
+
 report 125 "Sales Credit Memo Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/SalesCreditMemoNos.rdlc';
+    RDLCLayout = './Sales/Reports/SalesCreditMemoNos.rdlc';
     Caption = 'Sales Credit Memo Nos.';
     ObsoleteState = Pending;
     ObsoleteReason = 'Infrequently used report.';
@@ -11,7 +17,7 @@ report 125 "Sales Credit Memo Nos."
     {
         dataitem("Sales Cr.Memo Header"; "Sales Cr.Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Posted Sales Credit Memo';
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
@@ -58,7 +64,7 @@ report 125 "Sales Credit Memo Nos."
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorText_Number_; ErrorText[Number])
                 {
                 }
@@ -84,8 +90,8 @@ report 125 "Sales Credit Memo Nos."
             }
             dataitem(SalesCrMemoHeader; "Sales Cr.Memo Header")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("No.");
                 column(SalesCrMemoHeader__User_ID_; "User ID")
                 {
                 }

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 page 5079 "Interaction Tmpl. Statistics"
 {
     Caption = 'Interaction Tmpl. Statistics';

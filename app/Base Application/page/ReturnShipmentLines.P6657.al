@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Document;
+
 page 6657 "Return Shipment Lines"
 {
     Caption = 'Return Shipment Lines';
@@ -144,7 +149,7 @@ page 6657 "Return Shipment Lines"
                     var
                         ReturnShptHeader: Record "Return Shipment Header";
                     begin
-                        ReturnShptHeader.Get("Document No.");
+                        ReturnShptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Return Shipment", ReturnShptHeader);
                     end;
                 }
@@ -159,7 +164,7 @@ page 6657 "Return Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -174,13 +179,13 @@ page 6657 "Return Shipment Lines"
 
     trigger OnOpenPage()
     begin
-        FilterGroup(2);
-        SetRange(Type, Type::Item);
-        SetFilter(Quantity, '<>0');
-        SetRange(Correction, false);
-        SetRange("Job No.", '');
+        Rec.FilterGroup(2);
+        Rec.SetRange(Type, Rec.Type::Item);
+        Rec.SetFilter(Quantity, '<>0');
+        Rec.SetRange(Correction, false);
+        Rec.SetRange("Job No.", '');
         OnOpenPageOnSetFilters(Rec);
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -195,7 +200,6 @@ page 6657 "Return Shipment Lines"
         ItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)";
         AssignItemChargePurch: Codeunit "Item Charge Assgnt. (Purch.)";
         UnitCost: Decimal;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     procedure Initialize(NewItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)"; NewUnitCost: Decimal)
@@ -234,7 +238,7 @@ page 6657 "Return Shipment Lines"
 
     local procedure DocumentNoOnFormat()
     begin
-        if not IsFirstLine("Document No.", "Line No.") then
+        if not IsFirstLine(Rec."Document No.", Rec."Line No.") then
             DocumentNoHideValue := true;
     end;
 

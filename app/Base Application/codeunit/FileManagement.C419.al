@@ -1,3 +1,10 @@
+﻿namespace System.IO;
+
+using System;
+using System.Environment;
+using System.Integration;
+using System.Utilities;
+
 codeunit 419 "File Management"
 {
 
@@ -209,7 +216,6 @@ codeunit 419 "File Management"
         OnAfterDownloadHandler(ToFolder, ToFile, FromFile, Downloaded);
     end;
 
-    [Scope('OnPrem')]
     procedure DownloadFromStreamHandler(FromInStream: InStream; DialogTitle: Text; ToFolder: Text; ToFilter: Text; ToFile: Text): Boolean
     var
         Downloaded: Boolean;

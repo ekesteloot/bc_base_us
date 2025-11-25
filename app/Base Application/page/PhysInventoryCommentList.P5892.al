@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Comment;
+
 page 5892 "Phys. Inventory Comment List"
 {
     Caption = 'Phys. Inventory Comment List';
@@ -23,12 +25,12 @@ page 5892 "Phys. Inventory Comment List"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the document number of the physical inventory recording to which the comment applies.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the date when the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the comment itself.';

@@ -94,6 +94,10 @@ permissionset 207 "D365 BASIC"
                   tabledata "Administration Cue" = RIMD,
                   tabledata "Aged Report Entity" = RIMD,
                   tabledata "Aging Band Buffer" = Rimd,
+                  tabledata "Alloc. Acc. Manual Override" = RIMD,
+                  tabledata "Alloc. Account Distribution" = R,
+                  tabledata "Allocation Account" = R,
+                  tabledata "Allocation Line" = RIMD,
                   tabledata "Analysis by Dim. Parameters" = RIMD,
                   tabledata "Analysis by Dim. User Param." = RIMD,
                   tabledata "Analysis Dim. Selection Buffer" = RIMD,
@@ -135,6 +139,7 @@ permissionset 207 "D365 BASIC"
                   tabledata "Booking Staff" = RIMD,
                   tabledata "Booking Sync" = RIMD,
                   tabledata "Budget Buffer" = RIMD,
+                  tabledata "Bus. Unit In Cons. Process" = R,
                   tabledata "Business Chart Buffer" = RIMD,
                   tabledata "Business Chart Map" = RIMD,
                   tabledata "Business Chart User Setup" = RIMD,
@@ -187,6 +192,8 @@ permissionset 207 "D365 BASIC"
                   tabledata "Config. Template Line" = R,
                   tabledata "Config. Tmpl. Selection Rules" = R,
                   tabledata "Consolidation Account" = R,
+                  tabledata "Consolidation Process" = R,
+                  tabledata "Consolidation Setup" = R,
                   tabledata Contact = Rim,
                   tabledata "Contact Alt. Addr. Date Range" = RIMD,
                   tabledata "Contact Alt. Address" = RIMD,
@@ -344,10 +351,6 @@ permissionset 207 "D365 BASIC"
 #if not CLEAN21
                   tabledata "Graph Mail Setup" = RIMD,
 #endif
-#if not CLEAN20
-                  tabledata "Graph Subscription" = RIMD,
-                  tabledata "Graph Business Setting" = RIMD,
-#endif                  
                   tabledata "Human Resources Setup" = R,
                   tabledata "IC Setup" = R,
                   tabledata "Image Analysis Setup" = RIMD,
@@ -377,7 +380,7 @@ permissionset 207 "D365 BASIC"
                   tabledata "Inventory Posting Group" = R,
                   tabledata "Inventory Posting Setup" = R,
                   tabledata "Inventory Setup" = R,
-#if not CLEAN20
+#if not CLEAN23
                   tabledata "Invoice Post. Buffer" = Rimd,
 #endif
                   tabledata "Invoice Posting Buffer" = Rimd,
@@ -440,12 +443,6 @@ permissionset 207 "D365 BASIC"
                   tabledata "My Vendor" = RIMD,
                   tabledata "Name/Value Buffer" = RIMD,
                   tabledata "Named Forward Link" = RIMD,
-#if not CLEAN20
-                  tabledata "Native - API Tax Setup" = RIMD,
-                  tabledata "Native - Export Invoices" = RIMD,
-                  tabledata "Native - Gen. Settings Buffer" = RIMD,
-                  tabledata "Native - Payment" = RIMD,
-#endif
                   tabledata "No. Series" = Rim,
                   tabledata "No. Series Line" = Rim,
                   tabledata "No. Series Relationship" = Rim,
@@ -563,7 +560,9 @@ permissionset 207 "D365 BASIC"
 #if not CLEAN21
                   tabledata "Power BI User License" = RIMD,
 #endif
+#if not CLEAN23
                   tabledata "Power BI User Status" = RIMD,
+#endif
                   tabledata "Prepayment Inv. Line Buffer" = RIMD,
                   tabledata "Price Asset" = Rim,
                   tabledata "Price Calculation Buffer" = Rim,

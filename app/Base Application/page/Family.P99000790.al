@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Family;
+
 page 99000790 Family
 {
     Caption = 'Family';
@@ -36,7 +38,7 @@ page 99000790 Family
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the number of the routing which is used for the production of the family.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -50,8 +52,8 @@ page 99000790 Family
             part(Control13; "Family Lines")
             {
                 ApplicationArea = Manufacturing;
-                SubPageLink = "Family No." = FIELD("No.");
-                SubPageView = SORTING("Family No.", "Line No.");
+                SubPageLink = "Family No." = field("No.");
+                SubPageView = sorting("Family No.", "Line No.");
             }
         }
         area(factboxes)

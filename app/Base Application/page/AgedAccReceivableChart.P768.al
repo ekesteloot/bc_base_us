@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Sales.Customer;
+using System;
+using System.Visualization;
+
 page 768 "Aged Acc. Receivable Chart"
 {
     Caption = 'Aged Accounts Receivable';

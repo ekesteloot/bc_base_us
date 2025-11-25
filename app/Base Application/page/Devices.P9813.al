@@ -1,3 +1,7 @@
+namespace System.Device;
+
+using System.Security.AccessControl;
+
 page 9813 Devices
 {
     ApplicationArea = Basic, Suite;
@@ -30,7 +34,7 @@ page 9813 Devices
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the device type.';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the device is enabled.';

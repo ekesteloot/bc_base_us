@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
 enum 1562 "Resource Type"
 {
     Extensible = true;

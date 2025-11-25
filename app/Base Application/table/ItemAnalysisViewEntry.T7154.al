@@ -1,3 +1,15 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+
 table 7154 "Item Analysis View Entry"
 {
     Caption = 'Item Analysis View Entry';
@@ -14,8 +26,8 @@ table 7154 "Item Analysis View Entry"
         {
             Caption = 'Analysis View Code';
             NotBlank = true;
-            TableRelation = "Item Analysis View".Code WHERE("Analysis Area" = FIELD("Analysis Area"),
-                                                             Code = FIELD("Analysis View Code"));
+            TableRelation = "Item Analysis View".Code where("Analysis Area" = field("Analysis Area"),
+                                                             Code = field("Analysis View Code"));
         }
         field(3; "Item No."; Code[20])
         {
@@ -29,11 +41,11 @@ table 7154 "Item Analysis View Entry"
         field(5; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type" = CONST(Item)) Item;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor
+            else
+            if ("Source Type" = const(Item)) Item;
         }
         field(8; "Location Code"; Code[10])
         {

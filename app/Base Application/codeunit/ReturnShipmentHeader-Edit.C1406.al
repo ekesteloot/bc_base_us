@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.History;
+
 codeunit 1406 "Return Shipment Header - Edit"
 {
     Permissions = TableData "Return Shipment Header" = rm;
@@ -10,10 +12,10 @@ codeunit 1406 "Return Shipment Header - Edit"
         ReturnShipmentHeader := Rec;
         ReturnShipmentHeader.LockTable();
         ReturnShipmentHeader.Find();
-        ReturnShipmentHeader."Ship-to County" := "Ship-to County";
-        ReturnShipmentHeader."Ship-to Country/Region Code" := "Ship-to Country/Region Code";
+        ReturnShipmentHeader."Ship-to County" := Rec."Ship-to County";
+        ReturnShipmentHeader."Ship-to Country/Region Code" := Rec."Ship-to Country/Region Code";
         OnBeforeReturnShipmentHeaderModify(ReturnShipmentHeader, Rec);
-        ReturnShipmentHeader.TestField("No.", "No.");
+        ReturnShipmentHeader.TestField("No.", Rec."No.");
         ReturnShipmentHeader.Modify();
         Rec := ReturnShipmentHeader;
 

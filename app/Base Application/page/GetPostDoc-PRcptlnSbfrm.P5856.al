@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item.Catalog;
+
 page 5856 "Get Post.Doc - P.RcptLn Sbfrm"
 {
     Caption = 'Lines';
@@ -61,7 +66,7 @@ page 5856 "Get Post.Doc - P.RcptLn Sbfrm"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = SalesReturnOrder;
                     ToolTip = 'Specifies that this item is a catalog item.';
@@ -283,7 +288,7 @@ page 5856 "Get Post.Doc - P.RcptLn Sbfrm"
 
         PurchRcptLine := Rec;
         repeat
-            NextSteps := Next(Steps / Abs(Steps));
+            NextSteps := Rec.Next(Steps / Abs(Steps));
             ShowRec := IsShowRec(Rec);
             if ShowRec then begin
                 RealSteps := RealSteps + NextSteps;
@@ -291,7 +296,7 @@ page 5856 "Get Post.Doc - P.RcptLn Sbfrm"
             end;
         until (NextSteps = 0) or (RealSteps = Steps);
         Rec := PurchRcptLine;
-        Find();
+        Rec.Find();
         exit(RealSteps);
     end;
 
@@ -308,7 +313,6 @@ page 5856 "Get Post.Doc - P.RcptLn Sbfrm"
         FillExactCostReverse: Boolean;
         Visible: Boolean;
         ShowRec: Boolean;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     local procedure IsFirstDocLine(): Boolean
@@ -319,12 +323,12 @@ page 5856 "Get Post.Doc - P.RcptLn Sbfrm"
     begin
         TempPurchRcptLine.Reset();
         TempPurchRcptLine.CopyFilters(Rec);
-        TempPurchRcptLine.SetRange("Document No.", "Document No.");
+        TempPurchRcptLine.SetRange("Document No.", Rec."Document No.");
         if not TempPurchRcptLine.FindFirst() then begin
             RemainingQty2 := RemainingQty;
             RevUnitCostLCY2 := RevUnitCostLCY;
             PurchRcptLine2.CopyFilters(Rec);
-            PurchRcptLine2.SetRange("Document No.", "Document No.");
+            PurchRcptLine2.SetRange("Document No.", Rec."Document No.");
             if not PurchRcptLine2.FindSet() then
                 exit(false);
             repeat
@@ -338,7 +342,7 @@ page 5856 "Get Post.Doc - P.RcptLn Sbfrm"
             RevUnitCostLCY := RevUnitCostLCY2;
         end;
 
-        exit("Line No." = TempPurchRcptLine."Line No.");
+        exit(Rec."Line No." = TempPurchRcptLine."Line No.");
     end;
 
     local procedure IsShowRec(PurchRcptLine2: Record "Purch. Rcpt. Line") Result: Boolean
@@ -373,8 +377,8 @@ page 5856 "Get Post.Doc - P.RcptLn Sbfrm"
 
     local procedure GetAppliedQty(): Decimal
     begin
-        if (Type = Type::Item) and (Quantity - RemainingQty > 0) then
-            exit(Quantity - RemainingQty);
+        if (Rec.Type = Rec.Type::Item) and (Rec.Quantity - RemainingQty > 0) then
+            exit(Rec.Quantity - RemainingQty);
         exit(0);
     end;
 
@@ -400,7 +404,7 @@ page 5856 "Get Post.Doc - P.RcptLn Sbfrm"
     var
         PurchRcptHeader: Record "Purch. Rcpt. Header";
     begin
-        if not PurchRcptHeader.Get("Document No.") then
+        if not PurchRcptHeader.Get(Rec."Document No.") then
             exit;
         PAGE.Run(PAGE::"Posted Purchase Receipt", PurchRcptHeader);
     end;

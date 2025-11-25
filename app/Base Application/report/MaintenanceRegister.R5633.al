@@ -1,7 +1,12 @@
+namespace Microsoft.FixedAssets.Maintenance;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+
 report 5633 "Maintenance Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/MaintenanceRegister.rdlc';
+    RDLCLayout = './FixedAssets/Maintenance/MaintenanceRegister.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Maintenance Register';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5633 "Maintenance Register"
     {
         dataitem("FA Register"; "FA Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
@@ -81,7 +86,7 @@ report 5633 "Maintenance Register"
             }
             dataitem("Maintenance Ledger Entry"; "Maintenance Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(Maintenance_Ledger_Entry__FA_Posting_Date_; Format("FA Posting Date"))
                 {
                 }

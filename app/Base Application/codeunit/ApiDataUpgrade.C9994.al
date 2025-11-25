@@ -60,6 +60,7 @@ codeunit 9994 "API Data Upgrade"
                             GraphMgtSalCrMemoBuf.UpdateBufferTableRecords();
                             UpgradeSalesCrMemoShortcutDimension(false);
                             UpgradeSalesCreditMemoReasonCode(false);
+                            UpgradeSalesCrMemoShipmentMethod();
                             SetStatus(APIDataUpgrade, APIDataUpgrade.Status::Completed);
                         end;
                     'SALES INVOICES':
@@ -73,7 +74,9 @@ codeunit 9994 "API Data Upgrade"
                     'SALES ORDERS':
                         begin
                             GraphMgtSalesOrderBuffer.UpdateBufferTableRecords();
+                            GraphMgtSalesOrderBuffer.DeleteOrphanedRecords();
                             UpgradeSalesOrderShortcutDimension(false);
+                            UpgradeSalesOrderShipmentMethod();
                             SetStatus(APIDataUpgrade, APIDataUpgrade.Status::Completed);
                         end;
                     'SALES QUOTES':
@@ -100,6 +103,7 @@ codeunit 9994 "API Data Upgrade"
                     'PURCHASE ORDERS':
                         begin
                             GraphMgtPurchOrderBuffer.UpdateBufferTableRecords();
+                            GraphMgtPurchOrderBuffer.DeleteOrphanedRecords();
                             UpgradePurchaseOrderShortcutDimension(false);
                             SetStatus(APIDataUpgrade, APIDataUpgrade.Status::Completed);
                         end;
@@ -606,23 +610,13 @@ codeunit 9994 "API Data Upgrade"
     procedure UpgradeDefaultDimensions()
     var
         DefaultDimension: Record "Default Dimension";
+        RecordCount: Integer;
     begin
-        DefaultDimension.SetRange("Table ID", Database::Item);
-        DefaultDimension.ModifyAll("Parent Type", DefaultDimension."Parent Type"::Item);
-
-        DefaultDimension.Reset();
-        DefaultDimension.SetRange("Table ID", Database::Customer);
-        DefaultDimension.ModifyAll("Parent Type", DefaultDimension."Parent Type"::Customer);
-
-        DefaultDimension.Reset();
-        DefaultDimension.SetRange("Table ID", Database::Vendor);
-        DefaultDimension.ModifyAll("Parent Type", DefaultDimension."Parent Type"::Vendor);
-
-        DefaultDimension.Reset();
-        DefaultDimension.SetRange("Table ID", Database::Employee);
-        DefaultDimension.ModifyAll("Parent Type", DefaultDimension."Parent Type"::Employee);
-
-        Commit();
+        if DefaultDimension.FindSet() then
+            repeat
+                DefaultDimension.UpdateReferencedIds();
+                CountRecordsAndCommit(RecordCount);
+            until DefaultDimension.Next() = 0;
     end;
 
     procedure UpgradeDimensionValues()
@@ -709,6 +703,101 @@ codeunit 9994 "API Data Upgrade"
             UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetPurchaseCreditMemoUpgradeTag());
     end;
 
+    internal procedure UpgradeSalesOrderShipmentMethod()
+    var
+        SalesOrderEntityBuffer: Record "Sales Order Entity Buffer";
+        SalesHeader: Record "Sales Header";
+        SourceRecordRef: RecordRef;
+        TargetRecordRef: RecordRef;
+        RecordCount: Integer;
+    begin
+        if SalesOrderEntityBuffer.FindSet() then
+            repeat
+                SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+                SalesHeader.SetRange(SystemId, SalesOrderEntityBuffer.Id);
+                if SalesHeader.FindFirst() then begin
+                    SourceRecordRef.GetTable(SalesHeader);
+                    TargetRecordRef.GetTable(SalesOrderEntityBuffer);
+                    UpdateSalesDocumentShipmentMethodFields(SourceRecordRef, TargetRecordRef);
+                end;
+                CountRecordsAndCommit(RecordCount);
+            until SalesOrderEntityBuffer.Next() = 0;
+    end;
+
+    internal procedure UpgradeSalesCrMemoShipmentMethod()
+    var
+        SalesCrMemoEntityBuffer: Record "Sales Cr. Memo Entity Buffer";
+        SalesHeader: Record "Sales Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SourceRecordRef: RecordRef;
+        TargetRecordRef: RecordRef;
+        RecordCount: Integer;
+    begin
+        if SalesCrMemoEntityBuffer.FindSet() then
+            repeat
+                if SalesCrMemoEntityBuffer.Posted then begin
+                    SalesCrMemoHeader.SetRange(SystemId, SalesCrMemoEntityBuffer.Id);
+                    if SalesCrMemoHeader.FindFirst() then begin
+                        SourceRecordRef.GetTable(SalesCrMemoHeader);
+                        TargetRecordRef.GetTable(SalesCrMemoEntityBuffer);
+                        UpdateSalesDocumentShipmentMethodFields(SourceRecordRef, TargetRecordRef);
+                    end;
+                end else begin
+                    SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::"Credit Memo");
+                    SalesHeader.SetRange(SystemId, SalesCrMemoEntityBuffer.Id);
+                    if SalesHeader.FindFirst() then begin
+                        SourceRecordRef.GetTable(SalesHeader);
+                        TargetRecordRef.GetTable(SalesCrMemoEntityBuffer);
+                        UpdateSalesDocumentShipmentMethodFields(SourceRecordRef, TargetRecordRef);
+                    end;
+                end;
+                CountRecordsAndCommit(RecordCount);
+            until SalesCrMemoEntityBuffer.Next() = 0;
+    end;
+
+    local procedure UpdateSalesDocumentShipmentMethodFields(var SourceRecordRef: RecordRef; var TargetRecordRef: RecordRef)
+    var
+        SalesHeader: Record "Sales Header";
+        SalesOrderEntityBuffer: Record "Sales Order Entity Buffer";
+        ShipmentMethod: Record "Shipment Method";
+        CodeFieldRef: FieldRef;
+        IdFieldRef: FieldRef;
+        EmptyGuid: Guid;
+        OldId: Guid;
+        NewId: Guid;
+        Changed: Boolean;
+    begin
+        if CopyFieldValue(SourceRecordRef, TargetRecordRef, SalesHeader.FieldNo("Shipment Method Code")) then
+            Changed := true;
+        CodeFieldRef := TargetRecordRef.Field(SalesOrderEntityBuffer.FieldNo("Shipment Method Code"));
+        IdFieldRef := TargetRecordRef.Field(SalesOrderEntityBuffer.FieldNo("Shipment Method Id"));
+        OldId := IdFieldRef.Value;
+        if ShipmentMethod.Get(CodeFieldRef.Value) then
+            NewId := ShipmentMethod.SystemId
+        else
+            NewId := EmptyGuid;
+        if OldId <> NewId then begin
+            IdFieldRef.Value := NewId;
+            Changed := true;
+        end;
+        if Changed then
+            TargetRecordRef.Modify();
+    end;
+
+    local procedure CopyFieldValue(var SourceRecordRef: RecordRef; var TargetRecordRef: RecordRef; FieldNo: Integer): Boolean
+    var
+        SourceFieldRef: FieldRef;
+        TargetFieldRef: FieldRef;
+    begin
+        SourceFieldRef := SourceRecordRef.Field(FieldNo);
+        TargetFieldRef := TargetRecordRef.Field(FieldNo);
+        if TargetFieldRef.Value <> SourceFieldRef.Value then begin
+            TargetFieldRef.Value := SourceFieldRef.Value;
+            exit(true);
+        end;
+        exit(false);
+    end;
+
     local procedure GetSafeRecordCountForSaaSUpgrade(): Integer
     begin
         exit(300000);
@@ -757,6 +846,11 @@ codeunit 9994 "API Data Upgrade"
             Commit();
             RecordCount := 0;
         end;
+    end;
+
+    internal procedure GetDisableAPIDataUpgradesTag(): Code[250]
+    begin
+        exit('MS-469217-DisableAPIDataUpgrade-20230411');
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.Sales.Posting;
+using System.Threading;
+
 codeunit 2849 "Cost Adj. Scheduling Manager"
 {
     var

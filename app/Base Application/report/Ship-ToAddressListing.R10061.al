@@ -82,8 +82,8 @@ report 10061 "Ship-To Address Listing"
             }
             dataitem("Ship-to Address"; "Ship-to Address")
             {
-                DataItemLink = "Customer No." = FIELD("No.");
-                DataItemTableView = SORTING("Customer No.", Code);
+                DataItemLink = "Customer No." = field("No.");
+                DataItemTableView = sorting("Customer No.", Code);
                 RequestFilterFields = "Code", "Shipment Method Code";
                 column(Customer__No___Control24; Customer."No.")
                 {

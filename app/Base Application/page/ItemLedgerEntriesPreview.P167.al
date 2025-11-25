@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+
 page 167 "Item Ledger Entries Preview"
 {
     Caption = 'Item Ledger Entries Preview';
@@ -365,8 +371,8 @@ page 167 "Item Ledger Entries Preview"
                     Caption = '&Value Entries';
                     Image = ValueLedger;
                     RunObject = Page "Value Entries";
-                    RunPageLink = "Item Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Item Ledger Entry No.");
+                    RunPageLink = "Item Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Item Ledger Entry No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of posted amounts that affect the value of the item. Value entries are created for every transaction with the item.';
                     ObsoleteTag = '17.0';
@@ -496,9 +502,7 @@ page 167 "Item Ledger Entries Preview"
         Dim6Visible: Boolean;
         Dim7Visible: Boolean;
         Dim8Visible: Boolean;
-        [InDataSet]
         ItemTrackingVisible: Boolean;
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     local procedure SetDimVisibility()

@@ -1,3 +1,12 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 codeunit 1522 "Workflow Request Page Handling"
 {
 

@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Insurance;
+
 page 5646 "Insurance Statistics"
 {
     Caption = 'Insurance Statistics';
@@ -28,7 +30,7 @@ page 5646 "Insurance Statistics"
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies the total value of fixed assets linked to this insurance policy. This is the value of fixed assets for which insurance is required.';
                 }
-                field("""Policy Coverage"" - ""Total Value Insured"""; Rec."Policy Coverage" - "Total Value Insured")
+                field("""Policy Coverage"" - ""Total Value Insured"""; Rec."Policy Coverage" - Rec."Total Value Insured")
                 {
                     ApplicationArea = FixedAssets;
                     AutoFormatType = 1;

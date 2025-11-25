@@ -1,4 +1,22 @@
-﻿page 77 "Resource List"
+﻿namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Reports;
+using Microsoft.ProjectMgt.Resources.Analysis;
+using Microsoft.ProjectMgt.Resources.Ledger;
+#if not CLEAN21
+using Microsoft.ProjectMgt.Resources.Pricing;
+#endif
+using Microsoft.ServiceMgt.Analysis;
+using System.Text;
+
+page 77 "Resource List"
 {
     AdditionalSearchTerms = 'capacity,job,project';
     ApplicationArea = Jobs;
@@ -134,24 +152,24 @@
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::Resource), "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::Resource), "No." = field("No.");
             }
             part(Control1906609707; "Resource Statistics FactBox")
             {
                 ApplicationArea = Jobs;
-                SubPageLink = "No." = FIELD("No."),
-                              "Chargeable Filter" = FIELD("Chargeable Filter"),
-                              "Service Zone Filter" = FIELD("Service Zone Filter"),
-                              "Unit of Measure Filter" = FIELD("Unit of Measure Filter");
+                SubPageLink = "No." = field("No."),
+                              "Chargeable Filter" = field("Chargeable Filter"),
+                              "Service Zone Filter" = field("Service Zone Filter"),
+                              "Unit of Measure Filter" = field("Unit of Measure Filter");
                 Visible = true;
             }
             part(Control1907012907; "Resource Details FactBox")
             {
                 ApplicationArea = Jobs;
-                SubPageLink = "No." = FIELD("No."),
-                              "Chargeable Filter" = FIELD("Chargeable Filter"),
-                              "Service Zone Filter" = FIELD("Service Zone Filter"),
-                              "Unit of Measure Filter" = FIELD("Unit of Measure Filter");
+                SubPageLink = "No." = field("No."),
+                              "Chargeable Filter" = field("Chargeable Filter"),
+                              "Service Zone Filter" = field("Service Zone Filter"),
+                              "Unit of Measure Filter" = field("Unit of Measure Filter");
                 Visible = true;
             }
             systempart(Control1900383207; Links)
@@ -181,7 +199,7 @@
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Resource Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -191,8 +209,8 @@
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Resource),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Resource),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 group(Dimensions)
@@ -205,8 +223,8 @@
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(156),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(156),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -224,7 +242,7 @@
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(Res);
-                            DefaultDimMultiple.SetMultiRecord(Res, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(Res, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -235,7 +253,7 @@
                     Caption = '&Picture';
                     Image = Picture;
                     RunObject = Page "Resource Picture";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'View or add a picture of the resource or, for example, the company''s logo.';
                 }
                 action("Ledger E&ntries")
@@ -244,9 +262,9 @@
                     Caption = 'Ledger E&ntries';
                     Image = ResourceLedger;
                     RunObject = Page "Resource Ledger Entries";
-                    RunPageLink = "Resource No." = FIELD("No.");
-                    RunPageView = SORTING("Resource No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Resource No." = field("No.");
+                    RunPageView = sorting("Resource No.")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -256,9 +274,9 @@
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST(Resource),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const(Resource),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     ToolTip = 'View the extended description that is set up.';
                 }
                 action("Units of Measure")
@@ -267,7 +285,7 @@
                     Caption = 'Units of Measure';
                     Image = UnitOfMeasure;
                     RunObject = Page "Resource Units of Measure";
-                    RunPageLink = "Resource No." = FIELD("No.");
+                    RunPageLink = "Resource No." = field("No.");
                     ToolTip = 'View or edit the units of measure that are set up for the resource.';
                 }
             }
@@ -275,7 +293,7 @@
             {
                 Caption = 'Dynamics 365 Sales';
                 Visible = CRMIntegrationEnabled;
-                Enabled = (BlockedFilterApplied and (not Blocked)) or not BlockedFilterApplied;
+                Enabled = (BlockedFilterApplied and (not Rec.Blocked)) or not BlockedFilterApplied;
                 action(CRMGoToProduct)
                 {
                     ApplicationArea = Suite;
@@ -287,7 +305,7 @@
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -332,7 +350,7 @@
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(MatchBasedCoupling)
@@ -386,7 +404,7 @@
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -401,8 +419,8 @@
                     Caption = 'Costs';
                     Image = ResourceCosts;
                     RunObject = Page "Resource Costs";
-                    RunPageLink = Type = CONST(Resource),
-                                  Code = FIELD("No.");
+                    RunPageLink = Type = const(Resource),
+                                  Code = field("No.");
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View or change detailed information about costs for the resource.';
                     ObsoleteState = Pending;
@@ -415,8 +433,8 @@
                     Caption = 'Prices';
                     Image = Price;
                     RunObject = Page "Resource Prices";
-                    RunPageLink = Type = CONST(Resource),
-                                  Code = FIELD("No.");
+                    RunPageLink = Type = const(Resource),
+                                  Code = field("No.");
                     Visible = not ExtendedPriceEnabled;
                     ToolTip = 'View or edit prices for the resource.';
                     ObsoleteState = Pending;
@@ -476,7 +494,7 @@
                     Caption = 'Resource Allocated per Service &Order';
                     Image = ViewServiceOrder;
                     RunObject = Page "Res. Alloc. per Service Order";
-                    RunPageLink = "Resource Filter" = FIELD("No.");
+                    RunPageLink = "Resource Filter" = field("No.");
                     ToolTip = 'View the service order allocations of the resource.';
                 }
                 action("Resource A&vailability")
@@ -485,9 +503,9 @@
                     Caption = 'Resource A&vailability';
                     Image = Calendar;
                     RunObject = Page "Resource Availability";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Unit of Measure Filter" = FIELD("Unit of Measure Filter"),
-                                  "Chargeable Filter" = FIELD("Chargeable Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Unit of Measure Filter" = field("Unit of Measure Filter"),
+                                  "Chargeable Filter" = field("Chargeable Filter");
                     ToolTip = 'View a summary of resource capacities, the quantity of resource hours allocated to jobs on order, the quantity allocated to service orders, the capacity assigned to jobs on quote, and the resource availability.';
                 }
             }
@@ -590,7 +608,7 @@
 
                     trigger OnAction()
                     begin
-                        CreateTimeSheets();
+                        Rec.CreateTimeSheets();
                     end;
                 }
             }
@@ -751,7 +769,7 @@
     begin
         CRMIsCoupledToRecord := CRMIntegrationEnabled;
         if CRMIsCoupledToRecord then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
     end;
 
     trigger OnOpenPage()

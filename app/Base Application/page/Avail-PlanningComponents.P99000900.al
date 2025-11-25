@@ -1,3 +1,18 @@
+﻿namespace Microsoft.InventoryMgt.Planning;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
+
 page 99000900 "Avail. - Planning Components"
 {
     Caption = 'Avail. - Planning Components';
@@ -55,7 +70,7 @@ page 99000900 "Avail. - Planning Components"
                     trigger OnDrillDown()
                     begin
                         ReservEntry2.Reset();
-                        SetReservationFilters(ReservEntry2);
+                        Rec.SetReservationFilters(ReservEntry2);
                         ReservEntry2.SetRange("Reservation Status", ReservEntry2."Reservation Status"::Reservation);
                         ReservMgt.MarkReservConnection(ReservEntry2, ReservEntry);
                         PAGE.RunModal(PAGE::"Reservation Entries", ReservEntry2);
@@ -99,7 +114,7 @@ page 99000900 "Avail. - Planning Components"
                     begin
                         ReservEntry.LockTable();
                         UpdateReservMgt();
-                        GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
+                        Rec.GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
                         ReservMgt.CalculateRemainingQty(NewQtyReserved, NewQtyReservedBase);
                         ReservMgt.CopySign(NewQtyReserved, QtyToReserve);
                         ReservMgt.CopySign(NewQtyReservedBase, QtyToReserveBase);
@@ -126,7 +141,7 @@ page 99000900 "Avail. - Planning Components"
                             exit;
 
                         ReservEntry2.Copy(ReservEntry);
-                        SetReservationFilters(ReservEntry2);
+                        Rec.SetReservationFilters(ReservEntry2);
                         if ReservEntry2.Find('-') then begin
                             UpdateReservMgt();
                             repeat
@@ -145,21 +160,21 @@ page 99000900 "Avail. - Planning Components"
 
     trigger OnAfterGetRecord()
     begin
-        GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
+        Rec.GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
     end;
 
     trigger OnOpenPage()
     begin
         ReservEntry.TestField("Source Type");
 
-        SetRange("Item No.", ReservEntry."Item No.");
-        SetRange("Variant Code", ReservEntry."Variant Code");
-        SetRange("Location Code", ReservEntry."Location Code");
-        SetFilter("Due Date", ReservMgt.GetAvailabilityFilter(ReservEntry."Shipment Date"));
+        Rec.SetRange("Item No.", ReservEntry."Item No.");
+        Rec.SetRange("Variant Code", ReservEntry."Variant Code");
+        Rec.SetRange("Location Code", ReservEntry."Location Code");
+        Rec.SetFilter("Due Date", ReservMgt.GetAvailabilityFilter(ReservEntry."Shipment Date"));
         if ReservMgt.IsPositive() then
-            SetFilter("Quantity (Base)", '<0')
+            Rec.SetFilter("Quantity (Base)", '<0')
         else
-            SetFilter("Quantity (Base)", '>0');
+            Rec.SetFilter("Quantity (Base)", '>0');
     end;
 
     var
@@ -270,20 +285,20 @@ page 99000900 "Avail. - Planning Components"
     var
         TrackingSpecification: Record "Tracking Specification";
     begin
-        CalcFields("Reserved Qty. (Base)");
-        if "Quantity (Base)" + "Reserved Qty. (Base)" < ReserveQuantityBase then
-            Error(Text003, "Quantity (Base)" + "Reserved Qty. (Base)");
+        Rec.CalcFields("Reserved Qty. (Base)");
+        if Rec."Quantity (Base)" + Rec."Reserved Qty. (Base)" < ReserveQuantityBase then
+            Error(Text003, Rec."Quantity (Base)" + Rec."Reserved Qty. (Base)");
 
-        TestField("Item No.", ReservEntry."Item No.");
-        TestField("Variant Code", ReservEntry."Variant Code");
-        TestField("Location Code", ReservEntry."Location Code");
+        Rec.TestField("Item No.", ReservEntry."Item No.");
+        Rec.TestField("Variant Code", ReservEntry."Variant Code");
+        Rec.TestField("Location Code", ReservEntry."Location Code");
 
         UpdateReservMgt();
         TrackingSpecification.InitTrackingSpecification(
-          DATABASE::"Planning Component", 0, "Worksheet Template Name",
-          "Worksheet Batch Name", "Worksheet Line No.", "Line No.", "Variant Code", "Location Code", "Qty. per Unit of Measure");
+          Enum::TableID::"Planning Component".AsInteger(), 0, Rec."Worksheet Template Name",
+          Rec."Worksheet Batch Name", Rec."Worksheet Line No.", Rec."Line No.", Rec."Variant Code", Rec."Location Code", Rec."Qty. per Unit of Measure");
         ReservMgt.CreateReservation(
-          ReservEntry.Description, "Due Date", ReserveQuantity, ReserveQuantityBase, TrackingSpecification);
+          ReservEntry.Description, Rec."Due Date", ReserveQuantity, ReserveQuantityBase, TrackingSpecification);
         UpdateReservFrom();
     end;
 
@@ -305,7 +320,7 @@ page 99000900 "Avail. - Planning Components"
     protected procedure GetReservedQtyInLine(): Decimal
     begin
         ReservEntry2.Reset();
-        SetReservationFilters(ReservEntry2);
+        Rec.SetReservationFilters(ReservEntry2);
         ReservEntry2.SetRange("Reservation Status", ReservEntry2."Reservation Status"::Reservation);
         exit(ReservMgt.MarkReservConnection(ReservEntry2, ReservEntry));
     end;

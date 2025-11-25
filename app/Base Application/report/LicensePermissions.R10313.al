@@ -2,18 +2,18 @@
 report 10313 "License Permissions"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './LicensePermissions.rdlc';
-    
+    RDLCLayout = './System/Permissions/LicensePermissions.rdlc';
+
     Caption = 'License Permissions';
     ObsoleteReason = 'This report is being replaced with report 8313 Get License Permissions, which is available in W1.';
     ObsoleteState = Pending;
     ObsoleteTag = '21.0';
-    
+
     dataset
     {
         dataitem("Permission Range"; "Permission Range")
         {
-            DataItemTableView = SORTING("Object Type", Index);
+            DataItemTableView = sorting("Object Type", Index);
             RequestFilterFields = "Object Type";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -99,7 +99,7 @@ report 10313 "License Permissions"
         }
         dataitem("License Information"; "License Information")
         {
-            DataItemTableView = SORTING("Line No.");
+            DataItemTableView = sorting("Line No.");
             column(USERID_Control12; UserId)
             {
             }

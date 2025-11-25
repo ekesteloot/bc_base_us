@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+
 page 504 "Available - Item Ledg. Entries"
 {
     Caption = 'Available - Item Ledg. Entries';
@@ -10,7 +17,7 @@ page 504 "Available - Item Ledg. Entries"
     PageType = List;
     Permissions = TableData "Item Ledger Entry" = rm;
     SourceTable = "Item Ledger Entry";
-    SourceTableView = SORTING("Item No.", Open);
+    SourceTableView = sorting("Item No.", Open);
 
     layout
     {
@@ -235,7 +242,6 @@ page 504 "Available - Item Ledg. Entries"
         ReservEngineMgt: Codeunit "Reservation Engine Mgt.";
         NewQtyReserved: Decimal;
         CaptionText: Text;
-        [InDataSet]
         PackageTrackingVisible: Boolean;
         FullyReservedErr: Label 'Fully reserved.';
         CancelReservationQst: Label 'Do you want to cancel the reservation?';

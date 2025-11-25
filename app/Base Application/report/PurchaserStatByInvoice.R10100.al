@@ -10,7 +10,7 @@ report 10100 "Purchaser Stat. by Invoice"
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Code", "Date Filter";
             RequestFilterHeading = 'Purchaser';
@@ -160,8 +160,8 @@ report 10100 "Purchaser Stat. by Invoice"
             }
             dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
             {
-                DataItemLink = "Purchaser Code" = FIELD(Code), "Posting Date" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Vendor No.", "Posting Date") WHERE("Document Type" = CONST(Invoice));
+                DataItemLink = "Purchaser Code" = field(Code), "Posting Date" = field("Date Filter");
+                DataItemTableView = sorting("Vendor No.", "Posting Date") where("Document Type" = const(Invoice));
                 column(Vendor_Ledger_Entry__Posting_Date_; "Posting Date")
                 {
                 }

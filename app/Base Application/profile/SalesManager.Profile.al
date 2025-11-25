@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.RoleCenters;
+
 profile "SALES MANAGER"
 {
     Caption = 'Sales Manager';

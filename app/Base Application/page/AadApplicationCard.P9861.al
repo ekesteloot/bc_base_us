@@ -1,6 +1,13 @@
+﻿namespace System.Environment.Configuration;
+
+using Microsoft.Integration.Graph;
+using System.Security.AccessControl;
+using System.Security.Authentication;
+using System.Security.User;
+
 page 9861 "AAD Application Card"
 {
-    Caption = 'Azure Active Directory Application Card', Comment = 'Azure Active Directory Application should not be translated';
+    Caption = 'Microsoft Entra Application Card';
     PageType = Card;
     RefreshOnActivate = true;
     SourceTable = "AAD Application";
@@ -32,7 +39,7 @@ page 9861 "AAD Application Card"
                         UpdateControl();
                     end;
                 }
-                field(State; State)
+                field(State; Rec.State)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Standard;
@@ -200,7 +207,7 @@ page 9861 "AAD Application Card"
         Success: Boolean;
         ErrorMsgTxt: Text;
     begin
-        OAuth2.RequestClientCredentialsAdminPermissions(GraphMgtGeneralTools.StripBrackets(Format("Client Id")), CommonOAuthAuthorityUrlLbl, '', Success, ErrorMsgTxt);
+        OAuth2.RequestClientCredentialsAdminPermissions(GraphMgtGeneralTools.StripBrackets(Format(Rec."Client Id")), CommonOAuthAuthorityUrlLbl, '', Success, ErrorMsgTxt);
         if not Success then
             if ErrorMsgTxt <> '' then
                 Error(ErrorMsgTxt)
@@ -223,14 +230,14 @@ page 9861 "AAD Application Card"
         if CurrPage.Editable and (Rec.State = Rec.State::Enabled) then
             ShowEnableWarning := EnabledWarningTok;
         UserName := '';
-        If User.Get("User Id") then
+        If User.Get(Rec."User Id") then
             UserName := USer."User Name";
     end;
 
     local procedure DrilldownCode()
     begin
         IF Confirm(DisableEnableQst, true) then begin
-            Validate(Rec.State, Rec.State::Disabled);
+            Rec.Validate(Rec.State, Rec.State::Disabled);
             UpdateControl();
             CurrPage.Update();
         end;

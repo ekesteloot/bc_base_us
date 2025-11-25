@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Environment.Configuration;
+using System.Text;
+
 table 570 "G/L Account Category"
 {
     Caption = 'G/L Account Category';
@@ -80,7 +87,7 @@ table 570 "G/L Account Category"
         }
         field(12; "Has Children"; Boolean)
         {
-            CalcFormula = Exist("G/L Account Category" WHERE("Parent Entry No." = FIELD("Entry No.")));
+            CalcFormula = exist("G/L Account Category" where("Parent Entry No." = field("Entry No.")));
             Caption = 'Has Children';
             FieldClass = FlowField;
         }

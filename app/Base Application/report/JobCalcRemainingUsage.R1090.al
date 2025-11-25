@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.ProjectMgt.Jobs.Planning;
+
 report 1090 "Job Calc. Remaining Usage"
 {
     Caption = 'Job Calc. Remaining Usage';
@@ -7,12 +12,12 @@ report 1090 "Job Calc. Remaining Usage"
     {
         dataitem("Job Task"; "Job Task")
         {
-            DataItemTableView = SORTING("Job No.", "Job Task No.");
+            DataItemTableView = sorting("Job No.", "Job Task No.");
             RequestFilterFields = "Job No.", "Job Task No.";
             dataitem("Job Planning Line"; "Job Planning Line")
             {
-                DataItemLink = "Job No." = FIELD("Job No."), "Job Task No." = FIELD("Job Task No.");
-                DataItemTableView = SORTING("Job No.", "Job Task No.", "Line No.");
+                DataItemLink = "Job No." = field("Job No."), "Job Task No." = field("Job Task No.");
+                DataItemTableView = sorting("Job No.", "Job Task No.", "Line No.");
                 RequestFilterFields = Type, "No.", "Planning Date", "Currency Date", "Location Code", "Variant Code", "Work Type Code";
 
                 trigger OnAfterGetRecord()

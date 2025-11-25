@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+
 codeunit 7027 "Std. Item Jnl. Line - Price" implements "Line With Price"
 {
     var

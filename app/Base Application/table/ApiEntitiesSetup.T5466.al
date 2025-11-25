@@ -11,7 +11,7 @@ table 5466 "API Entities Setup"
         field(3; "Customer Payments Batch Name"; Code[10])
         {
             Caption = 'Customer Payments Batch Name';
-            TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = CONST('CASHRCPT'));
+            TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = const('CASHRCPT'));
         }
         field(4; "Demo Company API Initialized"; Boolean)
         {

@@ -99,7 +99,6 @@
         GLAddCurrNetChangeTotal: Decimal;
         GLNetChangeBase: Decimal;
         GLAddCurrNetChangeBase: Decimal;
-        AdjPerEntry: Boolean;
         AddCurrCurrencyFactor: Decimal;
         VATEntryNoTotal: Decimal;
         VATEntryNo: Decimal;
@@ -125,20 +124,20 @@
 
     local procedure RunAdjustment()
     begin
-        AdjustCurrency(ExchRateAdjmtParameters);
+        AdjustCurrency();
 
         if ExchRateAdjmtParameters."Adjust Customers" then
-            AdjustCustomers(ExchRateAdjmtParameters);
+            AdjustCustomers();
 
         if ExchRateAdjmtParameters."Adjust Vendors" then
-            AdjustVendors(ExchRateAdjmtParameters);
+            AdjustVendors();
 
-        AdjustGLAccountsAndVATEntries(ExchRateAdjmtParameters);
+        AdjustGLAccountsAndVATEntries();
 
         OnAfterRunAdjustment(ExchRateAdjmtParameters);
     end;
 
-    local procedure AdjustCurrency(var ExchRateAdjmtParameters: Record "Exch. Rate Adjmt. Parameters" temporary)
+    local procedure AdjustCurrency()
     var
         BankAccount: Record "Bank Account";
     begin
@@ -172,7 +171,7 @@
             until Currency.Next() = 0;
     end;
 
-    local procedure AdjustCustomers(var ExchRateAdjmtParameters: Record "Exch. Rate Adjmt. Parameters" temporary)
+    local procedure AdjustCustomers()
     var
         Customer: Record Customer;
     begin
@@ -194,7 +193,7 @@
             HandlePostAdjmt("Exch. Rate Adjmt. Account Type"::Customer);
     end;
 
-    local procedure AdjustVendors(var ExchRateAdjmtParameters: Record "Exch. Rate Adjmt. Parameters" temporary);
+    local procedure AdjustVendors();
     var
         Vendor: Record Vendor;
     begin
@@ -216,20 +215,20 @@
             HandlePostAdjmt("Exch. Rate Adjmt. Account Type"::Vendor);
     end;
 
-    local procedure AdjustGLAccountsAndVATEntries(ExchRateAdjmtParameters: Record "Exch. Rate Adjmt. Parameters")
+    local procedure AdjustGLAccountsAndVATEntries()
     begin
         OnBeforeAdjustGLAccountsAndVATEntries(ExchRateAdjmtParameters, Currency, GenJnlPostLine);
 
         if ExchRateAdjmtParameters."Adjust G/L Accounts" and
             (GLSetup."VAT Exchange Rate Adjustment" <> GLSetup."VAT Exchange Rate Adjustment"::"No Adjustment")
         then
-            AdjustVAT(ExchRateAdjmtParameters);
+            AdjustVAT();
 
         if ExchRateAdjmtParameters."Adjust G/L Accounts" then
-            AdjustGLAccounts(ExchRateAdjmtParameters);
+            AdjustGLAccounts();
     end;
 
-    local procedure AdjustVAT(var ExchRateAdjmtParameters: Record "Exch. Rate Adjmt. Parameters" temporary)
+    local procedure AdjustVAT()
     var
         VATEntry: Record "VAT Entry";
         VATPostingSetup: Record "VAT Posting Setup";
@@ -247,7 +246,7 @@
             until VATPostingSetup.Next() = 0;
     end;
 
-    local procedure AdjustGLAccounts(var ExchRateAdjmtParameters: Record "Exch. Rate Adjmt. Parameters" temporary)
+    local procedure AdjustGLAccounts()
     var
         GLAccount: Record "G/L Account";
     begin
@@ -865,7 +864,7 @@
         TempExchRateAdjmtBuffer.SetRange("Dimension Entry No.", DimEntryNo2);
         TempExchRateAdjmtBuffer.SetRange("IC Partner Code", ICCode2);
         TempExchRateAdjmtBuffer.SetRange("Posting Date", PostingDate2);
-        if AdjPerEntry then
+        if ExchRateAdjmtParameters."Adjust Per Entry" then
             TempExchRateAdjmtBuffer.SetRange("Entry No.", EntryNo2);
 
         Found := TempExchRateAdjmtBuffer.FindFirst();
@@ -883,7 +882,7 @@
             TempExchRateAdjmtBuffer."Adjmt. Amount" := AdjAmount2;
             TempExchRateAdjmtBuffer."Gains Amount" := GainsAmount2;
             TempExchRateAdjmtBuffer."Losses Amount" := LossesAmount2;
-            if AdjPerEntry then
+            if ExchRateAdjmtParameters."Adjust Per Entry" then
                 TempExchRateAdjmtBuffer."Entry No." := EntryNo2;
             MaxAdjExchRateBufIndex += 1;
             TempExchRateAdjmtBuffer.Index := MaxAdjExchRateBufIndex;
@@ -907,6 +906,7 @@
         SummarizeExchRateAdjmtBuffer(TempExchRateAdjmtBuffer, TempExchRateAdjmtBuffer2);
 
         // Post per posting group and per currency
+        TempExchRateAdjmtBuffer2.Reset();
         if TempExchRateAdjmtBuffer2.Find('-') then
             repeat
                 TempExchRateAdjmtBuffer.SetRange("Currency Code", TempExchRateAdjmtBuffer2."Currency Code");
@@ -963,6 +963,7 @@
     var
         Found: Boolean;
     begin
+        TempExchRateAdjmtBuffer.Reset();
         if TempExchRateAdjmtBuffer.Find('-') then
             // Summarize per currency and dimension combination
             repeat
@@ -971,7 +972,7 @@
                 TempExchRateAdjmtBuffer2.SetRange("Dimension Entry No.", TempExchRateAdjmtBuffer."Dimension Entry No.");
                 TempExchRateAdjmtBuffer2.SetRange("Posting Date", TempExchRateAdjmtBuffer."Posting Date");
                 TempExchRateAdjmtBuffer2.SetRange("IC Partner Code", TempExchRateAdjmtBuffer."IC Partner Code");
-                if AdjPerEntry then
+                if ExchRateAdjmtParameters."Adjust Per Entry" then
                     TempExchRateAdjmtBuffer2.SetRange("Entry No.", TempExchRateAdjmtBuffer."Entry No.");
 
                 Found := TempExchRateAdjmtBuffer2.FindFirst();
@@ -982,7 +983,7 @@
                     TempExchRateAdjmtBuffer2."Dimension Entry No." := TempExchRateAdjmtBuffer."Dimension Entry No.";
                     TempExchRateAdjmtBuffer2."Posting Date" := TempExchRateAdjmtBuffer."Posting Date";
                     TempExchRateAdjmtBuffer2."IC Partner Code" := TempExchRateAdjmtBuffer."IC Partner Code";
-                    if AdjPerEntry then
+                    if ExchRateAdjmtParameters."Adjust Per Entry" then
                         TempExchRateAdjmtBuffer2."Entry No." := TempExchRateAdjmtBuffer."Entry No.";
                     TempExchRateAdjmtBuffer2."Adjmt. Base" := TempExchRateAdjmtBuffer."Adjmt. Base";
                     TempExchRateAdjmtBuffer2."Gains Amount" := TempExchRateAdjmtBuffer."Gains Amount";
@@ -1172,10 +1173,10 @@
                 Accumulate(TotalVATEntry."Add.-Currency Unrealized Base", -VATEntry."Add.-Currency Unrealized Base");
                 Accumulate(TotalVATEntry."Add.-Curr. Rem. Unreal. Amount", -VATEntry."Add.-Curr. Rem. Unreal. Amount");
                 Accumulate(TotalVATEntry."Add.-Curr. Rem. Unreal. Base", -VATEntry."Add.-Curr. Rem. Unreal. Base");
-                until VATEntry.Next() = 0;
+            until VATEntry.Next() = 0;
     end;
 
-        local procedure AdjustVATAmount(var AmountLCY: Decimal; var AmountAddCurr: Decimal)
+    local procedure AdjustVATAmount(var AmountLCY: Decimal; var AmountAddCurr: Decimal)
     begin
         case GLSetup."VAT Exchange Rate Adjustment" of
             GLSetup."VAT Exchange Rate Adjustment"::"Adjust Amount":
@@ -1467,17 +1468,46 @@
         exit(DimEntryNo);
     end;
 
-    local procedure PostGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; var DimSetEntry: Record "Dimension Set Entry"): Integer
+    local procedure PostGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; var DimensionSetEntry: Record "Dimension Set Entry"): Integer
     begin
-        GenJnlLine."Journal Template Name" := ExchRateAdjmtParameters."Journal Template Name";
-        GenJnlLine."Journal Batch Name" := ExchRateAdjmtParameters."Journal Batch Name";
-        GenJnlLine."Shortcut Dimension 1 Code" := GetGlobalDimVal(GLSetup."Global Dimension 1 Code", DimSetEntry);
-        GenJnlLine."Shortcut Dimension 2 Code" := GetGlobalDimVal(GLSetup."Global Dimension 2 Code", DimSetEntry);
-        GenJnlLine."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
-        OnPostGenJnlLineOnBeforeGenJnlPostLineRun(GenJnlLine, ExchRateAdjmtParameters);
-        GenJnlPostLine.Run(GenJnlLine);
-        OnPostGenJnlLineOnAfterGenJnlPostLineRun(GenJnlLine, GenJnlPostLine);
+        GenJournalLine."Journal Template Name" := ExchRateAdjmtParameters."Journal Template Name";
+        GenJournalLine."Journal Batch Name" := ExchRateAdjmtParameters."Journal Batch Name";
+        SetPostingDimensions(GenJournalLine, DimensionSetEntry);
+        OnPostGenJnlLineOnBeforeGenJnlPostLineRun(GenJournalLine, ExchRateAdjmtParameters);
+        GenJnlPostLine.Run(GenJournalLine);
+        OnPostGenJnlLineOnAfterGenJnlPostLineRun(GenJournalLine, GenJnlPostLine);
         exit(GenJnlPostLine.GetNextTransactionNo());
+    end;
+
+    local procedure SetPostingDimensions(var GenJournalLine: Record "Gen. Journal Line"; var DimensionSetEntry: Record "Dimension Set Entry")
+    var
+        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
+    begin
+        case ExchRateAdjmtParameters."Dimension Posting" of
+            "Exch. Rate Adjmt. Dimensions"::"No Dimensions":
+                begin
+                    GenJournalLine."Shortcut Dimension 1 Code" := '';
+                    GenJournalLine."Shortcut Dimension 2 Code" := '';
+                    GenJournalLine."Dimension Set ID" := 0;
+                end;
+            "Exch. Rate Adjmt. Dimensions"::"Source Entry Dimensions":
+                begin
+                    GenJournalLine."Shortcut Dimension 1 Code" := GetGlobalDimVal(GLSetup."Global Dimension 1 Code", DimensionSetEntry);
+                    GenJournalLine."Shortcut Dimension 2 Code" := GetGlobalDimVal(GLSetup."Global Dimension 2 Code", DimensionSetEntry);
+                    GenJournalLine."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
+                end;
+            "Exch. Rate Adjmt. Dimensions"::"G/L Account Dimensions":
+                if GenJournalLine."Account Type" = "Gen. Journal Account Type"::"G/L Account" then begin
+                    DimMgt.AddDimSource(
+                        DefaultDimSource, DimMgt.TypeToTableID1(GenJournalLine."Account Type".AsInteger()), GenJournalLine."Account No.", true);
+                    GenJournalLine."Dimension Set ID" :=
+                        DimMgt.GetRecDefaultDimID(
+                            GenJournalLine, 0, DefaultDimSource, GenJournalLine."Source Code",
+                            GenJournalLine."Shortcut Dimension 1 Code", GenJournalLine."Shortcut Dimension 2 Code", 0, 0);
+                end;
+            else
+                OnSetPostingDimensionsElseCase(GenJournalLine, DimensionSetEntry);
+        end;
     end;
 
     local procedure GetGlobalDimVal(GlobalDimCode: Code[20]; var DimSetEntry: Record "Dimension Set Entry"): Code[20]
@@ -2172,42 +2202,42 @@
         TempExchRateAdjmtLedgEntry.Insert();
     end;
 
-    local procedure InsertExchRateAdjmtCustLedgerEntry(CustLedgEntry: Record "Cust. Ledger Entry"; DtldCustledgEntry: Record "Detailed Cust. Ledg. Entry");
+    local procedure InsertExchRateAdjmtCustLedgerEntry(CustLedgerEntry: Record "Cust. Ledger Entry"; DetailedCustLedgEntry2: Record "Detailed Cust. Ledg. Entry");
     begin
         TempExchRateAdjmtLedgEntry.Init();
         NewRegLedgEntryNo += 1;
         TempExchRateAdjmtLedgEntry."Entry No." := NewRegLedgEntryNo;
-        TempExchRateAdjmtLedgEntry."Detailed Ledger Entry Type" := DtldCustLedgEntry."Entry Type";
-        TempExchRateAdjmtLedgEntry."Detailed Ledger Entry No." := DtldCustLedgEntry."Entry No.";
+        TempExchRateAdjmtLedgEntry."Detailed Ledger Entry Type" := DetailedCustLedgEntry2."Entry Type";
+        TempExchRateAdjmtLedgEntry."Detailed Ledger Entry No." := DetailedCustLedgEntry2."Entry No.";
         TempExchRateAdjmtLedgEntry."Account Type" := "Exch. Rate Adjmt. Account Type"::Customer;
-        TempExchRateAdjmtLedgEntry."Account No." := CustLedgEntry."Customer No.";
-        TempExchRateAdjmtLedgEntry."Document Type" := CustLedgEntry."Document Type";
-        TempExchRateAdjmtLedgEntry."Document No." := CustLedgEntry."Document No.";
+        TempExchRateAdjmtLedgEntry."Account No." := CustLedgerEntry."Customer No.";
+        TempExchRateAdjmtLedgEntry."Document Type" := CustLedgerEntry."Document Type";
+        TempExchRateAdjmtLedgEntry."Document No." := CustLedgerEntry."Document No.";
         TempExchRateAdjmtLedgEntry."Posting Date" := ExchRateAdjmtParameters."Posting Date";
-        TempExchRateAdjmtLedgEntry."Currency Code" := Currency.Code;
-        TempExchRateAdjmtLedgEntry."Currency Factor" := Currency."Currency Factor";
-        TempExchRateAdjmtLedgEntry."Base Amount" := CustLedgEntry."Remaining Amount";
-        TempExchRateAdjmtLedgEntry."Base Amount (LCY)" := CustLedgEntry."Remaining Amt. (LCY)";
+        TempExchRateAdjmtLedgEntry."Currency Code" := CustLedgerEntry."Currency Code";
+        TempExchRateAdjmtLedgEntry."Currency Factor" := CustLedgerEntry."Adjusted Currency Factor";
+        TempExchRateAdjmtLedgEntry."Base Amount" := CustLedgerEntry."Remaining Amount";
+        TempExchRateAdjmtLedgEntry."Base Amount (LCY)" := CustLedgerEntry."Remaining Amt. (LCY)";
         TempExchRateAdjmtLedgEntry."Adjustment Amount" := CurrAdjAmount;
         TempExchRateAdjmtLedgEntry.Insert();
     end;
 
-    local procedure InsertExchRateAdjmtVendLedgerEntry(VendLedgEntry: Record "Vendor Ledger Entry"; DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry");
+    local procedure InsertExchRateAdjmtVendLedgerEntry(VendorLedgerEntry: Record "Vendor Ledger Entry"; DetailedVendorLedgEntry2: Record "Detailed Vendor Ledg. Entry");
     begin
         TempExchRateAdjmtLedgEntry.Init();
         NewRegLedgEntryNo += 1;
         TempExchRateAdjmtLedgEntry."Entry No." := NewRegLedgEntryNo;
-        TempExchRateAdjmtLedgEntry."Detailed Ledger Entry Type" := DtldVendLedgEntry."Entry Type";
-        TempExchRateAdjmtLedgEntry."Detailed Ledger Entry No." := DtldVendLedgEntry."Entry No.";
+        TempExchRateAdjmtLedgEntry."Detailed Ledger Entry Type" := DetailedVendorLedgEntry2."Entry Type";
+        TempExchRateAdjmtLedgEntry."Detailed Ledger Entry No." := DetailedVendorLedgEntry2."Entry No.";
         TempExchRateAdjmtLedgEntry."Account Type" := "Exch. Rate Adjmt. Account Type"::Vendor;
-        TempExchRateAdjmtLedgEntry."Account No." := VendLedgEntry."Vendor No.";
-        TempExchRateAdjmtLedgEntry."Document Type" := VendLedgEntry."Document Type";
-        TempExchRateAdjmtLedgEntry."Document No." := VendLedgEntry."Document No.";
+        TempExchRateAdjmtLedgEntry."Account No." := VendorLedgerEntry."Vendor No.";
+        TempExchRateAdjmtLedgEntry."Document Type" := VendorLedgerEntry."Document Type";
+        TempExchRateAdjmtLedgEntry."Document No." := VendorLedgerEntry."Document No.";
         TempExchRateAdjmtLedgEntry."Posting Date" := ExchRateAdjmtParameters."Posting Date";
-        TempExchRateAdjmtLedgEntry."Currency Code" := Currency.Code;
-        TempExchRateAdjmtLedgEntry."Currency Factor" := Currency."Currency Factor";
-        TempExchRateAdjmtLedgEntry."Base Amount" := VendLedgEntry."Remaining Amount";
-        TempExchRateAdjmtLedgEntry."Base Amount (LCY)" := VendLedgEntry."Remaining Amt. (LCY)";
+        TempExchRateAdjmtLedgEntry."Currency Code" := VendorLedgerEntry."Currency Code";
+        TempExchRateAdjmtLedgEntry."Currency Factor" := VendorLedgerEntry."Adjusted Currency Factor";
+        TempExchRateAdjmtLedgEntry."Base Amount" := VendorLedgerEntry."Remaining Amount";
+        TempExchRateAdjmtLedgEntry."Base Amount (LCY)" := VendorLedgerEntry."Remaining Amt. (LCY)";
         TempExchRateAdjmtLedgEntry."Adjustment Amount" := CurrAdjAmount;
         TempExchRateAdjmtLedgEntry.Insert();
     end;
@@ -2359,6 +2389,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeAdjustGLAccountsAndVATEntries(var ExchRateAdjmtParameters: Record "Exch. Rate Adjmt. Parameters"; var Currency: Record Currency; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSetPostingDimensionsElseCase(var GenJournalLine: Record "Gen. Journal Line"; var DimensionSetEntry: Record "Dimension Set Entry")
     begin
     end;
 }

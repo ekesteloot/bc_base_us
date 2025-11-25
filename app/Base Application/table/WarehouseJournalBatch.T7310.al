@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.Journal;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Setup;
+
 table 7310 "Warehouse Journal Batch"
 {
     Caption = 'Warehouse Journal Batch';
@@ -87,7 +93,7 @@ table 7310 "Warehouse Journal Batch"
         }
         field(21; "Template Type"; Enum "Warehouse Journal Template Type")
         {
-            CalcFormula = Lookup("Warehouse Journal Template".Type WHERE(Name = FIELD("Journal Template Name")));
+            CalcFormula = Lookup("Warehouse Journal Template".Type where(Name = field("Journal Template Name")));
             Caption = 'Template Type';
             Editable = false;
             FieldClass = FlowField;
@@ -96,7 +102,7 @@ table 7310 "Warehouse Journal Batch"
         {
             Caption = 'Assigned User ID';
             DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "Warehouse Employee" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = "Warehouse Employee" where("Location Code" = field("Location Code"));
         }
     }
 

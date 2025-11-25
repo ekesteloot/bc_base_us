@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 enum 140 "Vendor Blocked"
 {
     Extensible = true;

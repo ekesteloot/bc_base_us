@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Setup;
+
 page 110 "Customer Posting Groups"
 {
     ApplicationArea = Basic, Suite;
@@ -33,7 +39,7 @@ page 110 "Customer Posting Groups"
                             AddFeeAccountVisible := true;
                             AddFeePerLineAccountVisible := true;
                         end else begin
-                            SetAccountVisibility(PmtToleranceVisible, PmtDiscountVisible, InvRoundingVisible, ApplnRoundingVisible);
+                            Rec.SetAccountVisibility(PmtToleranceVisible, PmtDiscountVisible, InvRoundingVisible, ApplnRoundingVisible);
                             ReminderTerms.SetAccountVisibility(InterestAccountVisible, AddFeeAccountVisible, AddFeePerLineAccountVisible);
                             UpdateAccountVisibilityBasedOnFinChargeTerms(InterestAccountVisible, AddFeeAccountVisible);
                         end;
@@ -45,7 +51,7 @@ page 110 "Customer Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the identifier for the customer posting group. This is what you choose when you assign the group to an entity or document.';
@@ -184,7 +190,7 @@ page 110 "Customer Posting Groups"
                     Caption = 'Alternative Groups';
                     Image = Relationship;
                     RunObject = Page "Alt. Customer Posting Groups";
-                    RunPageLink = "Customer Posting Group" = FIELD(Code);
+                    RunPageLink = "Customer Posting Group" = field(Code);
                     ToolTip = 'Specifies alternative customer posting groups.';
                     Visible = AltPostingGroupsVisible;
                 }

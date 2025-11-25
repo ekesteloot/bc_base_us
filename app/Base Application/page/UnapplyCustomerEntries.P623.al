@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.Receivables;
+
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Sales.Customer;
+using System.Security.User;
+using System.Utilities;
+
 page 623 "Unapply Customer Entries"
 {
     Caption = 'Unapply Customer Entries';
@@ -268,7 +275,7 @@ page 623 "Unapply Customer Entries"
         end;
         DtldCustLedgEntry.SetRange("Customer No.", DtldCustLedgEntry2."Customer No.");
         OnInsertEntriesOnAfterSetFilters(DtldCustLedgEntry, DtldCustLedgEntry2);
-        DeleteAll();
+        Rec.DeleteAll();
         if DtldCustLedgEntry.FindSet() then
             repeat
                 if (DtldCustLedgEntry."Entry Type" <> DtldCustLedgEntry."Entry Type"::"Initial Entry") and
@@ -276,7 +283,7 @@ page 623 "Unapply Customer Entries"
                 then begin
                     Rec := DtldCustLedgEntry;
                     OnBeforeRecInsert(Rec, DtldCustLedgEntry, DtldCustLedgEntry2);
-                    Insert();
+                    Rec.Insert();
                 end;
             until DtldCustLedgEntry.Next() = 0;
     end;
@@ -285,7 +292,7 @@ page 623 "Unapply Customer Entries"
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
     begin
-        if CustLedgEntry.Get("Cust. Ledger Entry No.") then;
+        if CustLedgEntry.Get(Rec."Cust. Ledger Entry No.") then;
         exit(CustLedgEntry."Document No.");
     end;
 

@@ -1,3 +1,7 @@
+namespace System.Utilities;
+
+using System.Security.AccessControl;
+
 table 701 "Error Message Register"
 {
     Caption = 'Error Message Register';
@@ -19,8 +23,6 @@ table 701 "Error Message Register"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(4; "Description"; Text[250])
         {
@@ -28,32 +30,33 @@ table 701 "Error Message Register"
             DataClassification = SystemMetadata;
 #if not CLEAN22
             ObsoleteState = Pending;
+            ObsoleteTag = '22.0';
 #else
             ObsoleteState = Removed;
+            ObsoleteTag = '25.0';
 #endif
-            ObsoleteTag = '22.0';
             ObsoleteReason = 'Replaced by "Message"';
         }
         field(5; Errors; Integer)
         {
-            CalcFormula = Count("Error Message" WHERE("Register ID" = FIELD(ID),
-                                                       "Message Type" = CONST(Error)));
+            CalcFormula = count("Error Message" where("Register ID" = field(ID),
+                                                       "Message Type" = const(Error)));
             Caption = 'Errors';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; Warnings; Integer)
         {
-            CalcFormula = Count("Error Message" WHERE("Register ID" = FIELD(ID),
-                                                       "Message Type" = CONST(Warning)));
+            CalcFormula = count("Error Message" where("Register ID" = field(ID),
+                                                       "Message Type" = const(Warning)));
             Caption = 'Warnings';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; Information; Integer)
         {
-            CalcFormula = Count("Error Message" WHERE("Register ID" = FIELD(ID),
-                                                       "Message Type" = CONST(Information)));
+            CalcFormula = count("Error Message" where("Register ID" = field(ID),
+                                                       "Message Type" = const(Information)));
             Caption = 'Information';
             Editable = false;
             FieldClass = FlowField;

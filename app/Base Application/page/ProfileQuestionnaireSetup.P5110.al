@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Profiling;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Reports;
+
 page 5110 "Profile Questionnaire Setup"
 {
     AutoSplitKey = true;
@@ -60,7 +65,7 @@ page 5110 "Profile Questionnaire Setup"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies that the question has more than one possible answer.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = RelationshipMgmt;
                     HideValue = PriorityHideValue;
@@ -123,10 +128,10 @@ page 5110 "Profile Questionnaire Setup"
 
                     trigger OnAction()
                     begin
-                        case Type of
-                            Type::Question:
+                        case Rec.Type of
+                            Rec.Type::Question:
                                 PAGE.RunModal(PAGE::"Profile Question Details", Rec);
-                            Type::Answer:
+                            Rec.Type::Answer:
                                 Error(Text000);
                         end;
                     end;
@@ -142,13 +147,13 @@ page 5110 "Profile Questionnaire Setup"
                     var
                         Rating: Record Rating;
                     begin
-                        case Type of
-                            Type::Question:
+                        case Rec.Type of
+                            Rec.Type::Question:
                                 Error(Text001);
-                            Type::Answer:
+                            Rec.Type::Answer:
                                 begin
-                                    Rating.SetRange("Rating Profile Quest. Code", "Profile Questionnaire Code");
-                                    Rating.SetRange("Rating Profile Quest. Line No.", "Line No.");
+                                    Rating.SetRange("Rating Profile Quest. Code", Rec."Profile Questionnaire Code");
+                                    Rating.SetRange("Rating Profile Quest. Line No.", Rec."Line No.");
                                     PAGE.RunModal(PAGE::"Answer Where-Used", Rating);
                                 end;
                         end;
@@ -194,7 +199,7 @@ page 5110 "Profile Questionnaire Setup"
 
                     trigger OnAction()
                     begin
-                        MoveUp();
+                        Rec.MoveUp();
                     end;
                 }
                 action("Move &Down")
@@ -207,7 +212,7 @@ page 5110 "Profile Questionnaire Setup"
 
                     trigger OnAction()
                     begin
-                        MoveDown();
+                        Rec.MoveDown();
                     end;
                 }
                 separator(Action32)
@@ -293,7 +298,7 @@ page 5110 "Profile Questionnaire Setup"
         StyleIsStrong := false;
         DescriptionIndent := 0;
 
-        if Type = Type::Question then begin
+        if Rec.Type = Rec.Type::Question then begin
             StyleIsStrong := true;
             PriorityHideValue := true;
         end else
@@ -307,16 +312,16 @@ page 5110 "Profile Questionnaire Setup"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Profile Questionnaire Code" := CurrentQuestionsChecklistCode;
-        Type := Type::Answer;
+        Rec."Profile Questionnaire Code" := CurrentQuestionsChecklistCode;
+        Rec.Type := Rec.Type::Answer;
     end;
 
     trigger OnOpenPage()
     var
         ProfileQuestionnaireHeader: Record "Profile Questionnaire Header";
     begin
-        if GetFilter("Profile Questionnaire Code") <> '' then begin
-            ProfileQuestionnaireHeader.SetFilter(Code, GetFilter("Profile Questionnaire Code"));
+        if Rec.GetFilter("Profile Questionnaire Code") <> '' then begin
+            ProfileQuestionnaireHeader.SetFilter(Code, Rec.GetFilter("Profile Questionnaire Code"));
             if ProfileQuestionnaireHeader.Count = 1 then begin
                 ProfileQuestionnaireHeader.FindFirst();
                 CurrentQuestionsChecklistCode := ProfileQuestionnaireHeader.Code;
@@ -328,7 +333,7 @@ page 5110 "Profile Questionnaire Setup"
 
         ProfileManagement.SetName(CurrentQuestionsChecklistCode, Rec, 0);
 
-        CaptionExpr := "Profile Questionnaire Code";
+        CaptionExpr := Rec."Profile Questionnaire Code";
         ProfileQuestionnaireCodeNameVi := false;
     end;
 
@@ -338,13 +343,9 @@ page 5110 "Profile Questionnaire Setup"
         ProfileManagement: Codeunit ProfileManagement;
         Text001: Label 'Where-Used only available for answers.';
         CaptionExpr: Text[100];
-        [InDataSet]
         ProfileQuestionnaireCodeNameVi: Boolean;
-        [InDataSet]
         DescriptionIndent: Integer;
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         PriorityHideValue: Boolean;
 
     protected var

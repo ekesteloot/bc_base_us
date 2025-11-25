@@ -1,3 +1,11 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
 codeunit 1250 "Match General Journal Lines"
 {
     TableNo = "Gen. Journal Line";
@@ -136,12 +144,12 @@ codeunit 1250 "Match General Journal Lines"
                             TextToAccMapping."Bal. Source Type"::Vendor:
                                 if TextToAccMapping."Bal. Source No." <> '' then begin
                                     TextToAccMapping.GetPaymentDocType(PaymentDocTypeOption, TextToAccMapping."Bal. Source Type", GenJournalLine.Amount);
-                                    PaymentDocType := "Gen. Journal Document Type".FromInteger(PaymentDocTypeOption);
+                                    PaymentDocType := Enum::"Gen. Journal Document Type".FromInteger(PaymentDocTypeOption);
                                     TextToAccMapping.GetDocTypeForPmt(InvoiceDocTypeOption, PaymentDocType.AsInteger());
-                                    InvoiceDocType := "Gen. Journal Document Type".FromInteger(InvoiceDocTypeOption);
+                                    InvoiceDocType := Enum::"Gen. Journal Document Type".FromInteger(InvoiceDocTypeOption);
                                     UpdateGenJnlLine(
                                       GenJournalLine, PaymentDocType,
-                                      "Gen. Journal Account Type".FromInteger(TextToAccMapping."Bal. Source Type"), TextToAccMapping."Bal. Source No.", '');
+                                      Enum::"Gen. Journal Account Type".FromInteger(TextToAccMapping."Bal. Source Type"), TextToAccMapping."Bal. Source No.", '');
                                     CreateInvoiceLineFromPayment(
                                       GenJournalLine, InvoiceDocType,
                                       PaymentDocType, TextToAccMapping.GetAccountNo(GenJournalLine.Amount));

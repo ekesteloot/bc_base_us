@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using System.Tooling;
+
 page 9196 "Profile Import Diagnostics"
 {
     PageType = List;
@@ -14,13 +18,13 @@ page 9196 "Profile Import Diagnostics"
         {
             repeater(repeater)
             {
-                field(Severity; Severity)
+                field(Severity; Rec.Severity)
                 {
                     ApplicationArea = All;
                     width = 5;
                     ToolTip = 'Specifies the severity of this diagnostics message.';
                 }
-                field(Message; Message)
+                field(Message; Rec.Message)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the diagnostics message from the compiler.';

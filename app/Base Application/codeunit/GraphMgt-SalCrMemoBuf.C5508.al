@@ -1,3 +1,16 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Graph;
+
+using Microsoft.Integration.Entity;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Receivables;
+using System.Reflection;
+
 codeunit 5508 "Graph Mgt - Sal. Cr. Memo Buf."
 {
     Permissions = TableData "Sales Cr.Memo Header" = rimd,
@@ -737,9 +750,6 @@ codeunit 5508 "Graph Mgt - Sal. Cr. Memo Buf."
             exit;
 
         if SalesLine."Document Type" <> SalesLine."Document Type"::"Credit Memo" then
-            exit;
-
-        if not SalesLine."Recalculate Invoice Disc." then
             exit;
 
         if not SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") then

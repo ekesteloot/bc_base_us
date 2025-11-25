@@ -9,7 +9,7 @@ report 10149 "Location List"
     {
         dataitem(Location; Location)
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code", Name;
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

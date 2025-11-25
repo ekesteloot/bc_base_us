@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
+using Microsoft.CRM.Team;
+using Microsoft.Integration.Dataverse;
+
 page 5340 "CRM Systemuser List"
 {
     Caption = 'Users - Dataverse';
@@ -6,7 +15,7 @@ page 5340 "CRM Systemuser List"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "CRM Systemuser";
-    SourceTableView = SORTING(FullName) WHERE(IsIntegrationUser = CONST(false), IsDisabled = CONST(false), IsLicensed = CONST(true));
+    SourceTableView = sorting(FullName) where(IsIntegrationUser = const(false), IsDisabled = const(false), IsLicensed = const(true));
     UsageCategory = Lists;
 
     layout
@@ -16,7 +25,7 @@ page 5340 "CRM Systemuser List"
             repeater(Control2)
             {
                 ShowCaption = false;
-                field(FullName; FullName)
+                field(FullName; Rec.FullName)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Name';
@@ -24,7 +33,7 @@ page 5340 "CRM Systemuser List"
                     StyleExpr = FirstColumnStyle;
                     ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 }
-                field(InternalEMailAddress; InternalEMailAddress)
+                field(InternalEMailAddress; Rec.InternalEMailAddress)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Email Address';
@@ -32,7 +41,7 @@ page 5340 "CRM Systemuser List"
                     ExtendedDatatype = EMail;
                     ToolTip = 'Specifies the email address.';
                 }
-                field(MobilePhone; MobilePhone)
+                field(MobilePhone; Rec.MobilePhone)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Mobile Phone';
@@ -64,7 +73,7 @@ page 5340 "CRM Systemuser List"
                         if SalespersonsPurchasers.RunModal() = ACTION::LookupOK then begin
                             SalespersonsPurchasers.GetRecord(SalespersonPurchaser);
                             InsertUpdateTempCRMSystemUser(SalespersonPurchaser.Code, true);
-                            CleanDuplicateSalespersonRecords(SalespersonPurchaser.Code, SystemUserId);
+                            CleanDuplicateSalespersonRecords(SalespersonPurchaser.Code, Rec.SystemUserId);
                         end;
                         CurrPage.Update(false);
                     end;
@@ -76,7 +85,7 @@ page 5340 "CRM Systemuser List"
                         if TempCRMSystemuser.FirstName <> '' then begin
                             SalespersonPurchaser.Get(TempCRMSystemuser.FirstName);
                             InsertUpdateTempCRMSystemUser(SalespersonPurchaser.Code, true);
-                            CleanDuplicateSalespersonRecords(SalespersonPurchaser.Code, SystemUserId);
+                            CleanDuplicateSalespersonRecords(SalespersonPurchaser.Code, Rec.SystemUserId);
                         end else
                             if (TempCRMSystemuser.FirstName = '') and (Coupled = Coupled::Yes) then
                                 InsertUpdateTempCRMSystemUser('', true);
@@ -206,7 +215,7 @@ page 5340 "CRM Systemuser List"
 
                 trigger OnAction()
                 begin
-                    MarkedOnly(true);
+                    Rec.MarkedOnly(true);
                 end;
             }
             action(ShowAll)
@@ -218,7 +227,7 @@ page 5340 "CRM Systemuser List"
 
                 trigger OnAction()
                 begin
-                    MarkedOnly(false);
+                    Rec.MarkedOnly(false);
                 end;
             }
         }
@@ -256,28 +265,28 @@ page 5340 "CRM Systemuser List"
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         RecordID: RecordID;
     begin
-        if CRMIntegrationRecord.FindRecordIDFromID(SystemUserId, DATABASE::"Salesperson/Purchaser", RecordID) then begin
+        if CRMIntegrationRecord.FindRecordIDFromID(Rec.SystemUserId, DATABASE::"Salesperson/Purchaser", RecordID) then begin
             if SalespersonPurchaser.Get(RecordID) then
                 InsertUpdateTempCRMSystemUser(SalespersonPurchaser.Code, false)
             else
                 InsertUpdateTempCRMSystemUser('', false);
-            if CurrentlyCoupledCRMSystemuser.SystemUserId = SystemUserId then begin
+            if CurrentlyCoupledCRMSystemuser.SystemUserId = Rec.SystemUserId then begin
                 Coupled := Coupled::Current;
                 FirstColumnStyle := 'Strong';
-                Mark(true);
+                Rec.Mark(true);
             end else begin
                 Coupled := Coupled::Yes;
                 FirstColumnStyle := 'Subordinate';
-                Mark(false);
+                Rec.Mark(false);
             end
         end else begin
             InsertUpdateTempCRMSystemUser('', false);
             Coupled := Coupled::No;
             FirstColumnStyle := 'None';
-            Mark(true);
+            Rec.Mark(true);
         end;
         if IsCDSIntegrationEnabled then begin
-            TempCDSTeammembership.SetRange(SystemUserId, SystemUserId);
+            TempCDSTeammembership.SetRange(SystemUserId, Rec.SystemUserId);
             if not TempCDSTeammembership.IsEmpty() then
                 TeamMember := TeamMember::Yes
             else
@@ -449,7 +458,7 @@ page 5340 "CRM Systemuser List"
     begin
         // FirstName is used to store coupled/ready to couple Salesperson
         // IsSyncWithDirectory is used to mark CRM User for coupling
-        if TempCRMSystemuser.Get(SystemUserId) then begin
+        if TempCRMSystemuser.Get(Rec.SystemUserId) then begin
             if not TempCRMSystemuser.IsDisabled or SyncNeeded then begin
                 TempCRMSystemuser.FirstName := SalespersonCode;
                 TempCRMSystemuser.IsSyncWithDirectory := SyncNeeded;
@@ -457,7 +466,7 @@ page 5340 "CRM Systemuser List"
                 TempCRMSystemuser.Modify();
             end
         end else begin
-            TempCRMSystemuser.SystemUserId := SystemUserId;
+            TempCRMSystemuser.SystemUserId := Rec.SystemUserId;
             TempCRMSystemuser.FirstName := SalespersonCode;
             TempCRMSystemuser.IsSyncWithDirectory := SyncNeeded;
             TempCRMSystemuser.IsDisabled := SyncNeeded;

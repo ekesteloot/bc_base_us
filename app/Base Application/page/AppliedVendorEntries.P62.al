@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 62 "Applied Vendor Entries"
 {
     Caption = 'Applied Vendor Entries';
@@ -98,7 +105,7 @@ page 62 "Applied Vendor Entries"
                 field("Closed by Currency Amount"; Rec."Closed by Currency Amount")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = "Closed by Currency Code";
+                    AutoFormatExpression = Rec."Closed by Currency Code";
                     AutoFormatType = 1;
                     ToolTip = 'Specifies the amount that was finally applied to (and closed) this vendor ledger entry.';
                 }
@@ -112,7 +119,7 @@ page 62 "Applied Vendor Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -168,7 +175,7 @@ page 62 "Applied Vendor Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Detailed &Ledger Entries")
@@ -177,9 +184,9 @@ page 62 "Applied Vendor Entries"
                     Caption = 'Detailed &Ledger Entries';
                     Image = View;
                     RunObject = Page "Detailed Vendor Ledg. Entries";
-                    RunPageLink = "Vendor Ledger Entry No." = FIELD("Entry No."),
-                                  "Vendor No." = FIELD("Vendor No.");
-                    RunPageView = SORTING("Vendor Ledger Entry No.", "Posting Date");
+                    RunPageLink = "Vendor Ledger Entry No." = field("Entry No."),
+                                  "Vendor No." = field("Vendor No.");
+                    RunPageView = sorting("Vendor Ledger Entry No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a summary of the all posted entries and adjustments related to a specific vendor ledger entry.';
                 }
@@ -197,7 +204,7 @@ page 62 "Applied Vendor Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -210,7 +217,7 @@ page 62 "Applied Vendor Entries"
 
                 trigger OnAction()
                 begin
-                    ShowDoc();
+                    Rec.ShowDoc();
                 end;
             }
             action(ShowDocumentAttachment)
@@ -223,7 +230,7 @@ page 62 "Applied Vendor Entries"
 
                 trigger OnAction()
                 begin
-                    ShowPostedDocAttachment();
+                    Rec.ShowPostedDocAttachment();
                 end;
             }
         }
@@ -269,7 +276,7 @@ page 62 "Applied Vendor Entries"
 
     trigger OnAfterGetCurrRecord()
     begin
-        HasDocumentAttachment := HasPostedDocAttachment();
+        HasDocumentAttachment := Rec.HasPostedDocAttachment();
     end;
 
     trigger OnInit()
@@ -279,10 +286,10 @@ page 62 "Applied Vendor Entries"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
         SetControlVisibility();
 
-        if "Entry No." <> 0 then begin
+        if Rec."Entry No." <> 0 then begin
             CreateVendLedgEntry := Rec;
             if CreateVendLedgEntry."Document Type" = CreateVendLedgEntry."Document Type"::" " then
                 Heading := Text000
@@ -291,26 +298,26 @@ page 62 "Applied Vendor Entries"
             Heading := Heading + ' ' + CreateVendLedgEntry."Document No.";
 
             FindApplnEntriesDtldtLedgEntry();
-            SetCurrentKey("Entry No.");
-            SetRange("Entry No.");
+            Rec.SetCurrentKey("Entry No.");
+            Rec.SetRange("Entry No.");
 
             if CreateVendLedgEntry."Closed by Entry No." <> 0 then begin
-                "Entry No." := CreateVendLedgEntry."Closed by Entry No.";
-                Mark(true);
+                Rec."Entry No." := CreateVendLedgEntry."Closed by Entry No.";
+                Rec.Mark(true);
             end;
 
-            SetCurrentKey("Closed by Entry No.");
-            SetRange("Closed by Entry No.", CreateVendLedgEntry."Entry No.");
-            if Find('-') then
+            Rec.SetCurrentKey("Closed by Entry No.");
+            Rec.SetRange("Closed by Entry No.", CreateVendLedgEntry."Entry No.");
+            if Rec.Find('-') then
                 repeat
-                    Mark(true);
-                until Next() = 0;
+                    Rec.Mark(true);
+                until Rec.Next() = 0;
 
-            SetCurrentKey("Entry No.");
-            SetRange("Closed by Entry No.");
+            Rec.SetCurrentKey("Entry No.");
+            Rec.SetRange("Closed by Entry No.");
         end;
 
-        MarkedOnly(true);
+        Rec.MarkedOnly(true);
     end;
 
     var
@@ -349,17 +356,17 @@ page 62 "Applied Vendor Entries"
                             if DtldVendLedgEntry2."Vendor Ledger Entry No." <>
                                DtldVendLedgEntry2."Applied Vend. Ledger Entry No."
                             then begin
-                                SetCurrentKey("Entry No.");
-                                SetRange("Entry No.", DtldVendLedgEntry2."Vendor Ledger Entry No.");
-                                if Find('-') then
-                                    Mark(true);
+                                Rec.SetCurrentKey("Entry No.");
+                                Rec.SetRange("Entry No.", DtldVendLedgEntry2."Vendor Ledger Entry No.");
+                                if Rec.Find('-') then
+                                    Rec.Mark(true);
                             end;
                         until DtldVendLedgEntry2.Next() = 0;
                 end else begin
-                    SetCurrentKey("Entry No.");
-                    SetRange("Entry No.", DtldVendLedgEntry1."Applied Vend. Ledger Entry No.");
-                    if Find('-') then
-                        Mark(true);
+                    Rec.SetCurrentKey("Entry No.");
+                    Rec.SetRange("Entry No.", DtldVendLedgEntry1."Applied Vend. Ledger Entry No.");
+                    if Rec.Find('-') then
+                        Rec.Mark(true);
                 end;
             until DtldVendLedgEntry1.Next() = 0;
     end;

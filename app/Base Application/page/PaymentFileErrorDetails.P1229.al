@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
 page 1229 "Payment File Error Details"
 {
     Caption = 'Payment File Error Details';

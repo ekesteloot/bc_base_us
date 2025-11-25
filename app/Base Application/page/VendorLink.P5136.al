@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Purchases.Vendor;
+
 page 5136 "Vendor Link"
 {
     Caption = 'Vendor Link';
@@ -37,8 +42,8 @@ page 5136 "Vendor Link"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if ("No." <> '') and (CloseAction = ACTION::LookupOK) then begin
-            TestField("No.");
+        if (Rec."No." <> '') and (CloseAction = ACTION::LookupOK) then begin
+            Rec.TestField("No.");
             ContBusRel := Rec;
             ContBusRel.Insert(true);
             OnQueryClosePageOnAfterContBusRelInsert(CurrMasterFields, ContBusRel);

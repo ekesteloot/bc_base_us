@@ -1,3 +1,12 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 report 1136 "Copy Cost Acctg. Budget to G/L"
 {
     Caption = 'Copy Cost Acctg. Budget to G/L';
@@ -7,7 +16,7 @@ report 1136 "Copy Cost Acctg. Budget to G/L"
     {
         dataitem("Cost Budget Entry"; "Cost Budget Entry")
         {
-            DataItemTableView = SORTING("Budget Name", "Cost Type No.", Date);
+            DataItemTableView = sorting("Budget Name", "Cost Type No.", Date);
             RequestFilterFields = "Budget Name", "Cost Type No.", "Cost Center Code", "Cost Object Code", Date;
 
             trigger OnAfterGetRecord()
@@ -252,7 +261,7 @@ report 1136 "Copy Cost Acctg. Budget to G/L"
     local procedure OnAfterGetRecordOnAfterGLBudgetEntryTargetPopulated(var GLBudgetEntryTarget: Record "G/L Budget Entry"; CostBudgetEntry: Record "Cost Budget Entry")
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnCostBudgetEntryOnAfterGetRecordOnAfterGLAccSetfilter(var CostType: Record "Cost Type"; var GLAccount: Record "G/L Account")
     begin

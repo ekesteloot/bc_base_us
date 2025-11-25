@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 7118 "Analysis Column Type"
 {
     Extensible = true;

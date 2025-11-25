@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Family;
+
 page 99000791 "Family List"
 {
     ApplicationArea = Manufacturing;
@@ -36,7 +38,7 @@ page 99000791 "Family List"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the number of the routing which is used for the production of the family.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';

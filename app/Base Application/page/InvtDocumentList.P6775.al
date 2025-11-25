@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Document;
+
 page 6775 "Invt. Document List"
 {
     Caption = 'Invt. Document List';
@@ -90,10 +92,10 @@ page 6775 "Invt. Document List"
 
                     trigger OnAction()
                     begin
-                        case "Document Type" of
-                            "Document Type"::Receipt:
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Receipt:
                                 PAGE.RunModal(PAGE::"Invt. Receipt", Rec);
-                            "Document Type"::Shipment:
+                            Rec."Document Type"::Shipment:
                                 PAGE.RunModal(PAGE::"Invt. Shipment", Rec);
                         end;
                     end;

@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Insurance;
+
 page 5655 "Insurance Journal Batches"
 {
     Caption = 'Insurance Journal Batches';
@@ -137,12 +139,12 @@ page 5655 "Insurance Journal Batches"
 
     trigger OnInit()
     begin
-        SetRange("Journal Template Name");
+        Rec.SetRange("Journal Template Name");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetupNewBatch();
+        Rec.SetupNewBatch();
     end;
 
     trigger OnOpenPage()
@@ -159,9 +161,9 @@ page 5655 "Insurance Journal Batches"
         InsuranceJnlTempl: Record "Insurance Journal Template";
     begin
         if not CurrPage.LookupMode then
-            if GetFilter("Journal Template Name") <> '' then
-                if GetRangeMin("Journal Template Name") = GetRangeMax("Journal Template Name") then
-                    if InsuranceJnlTempl.Get(GetRangeMin("Journal Template Name")) then
+            if Rec.GetFilter("Journal Template Name") <> '' then
+                if Rec.GetRangeMin("Journal Template Name") = Rec.GetRangeMax("Journal Template Name") then
+                    if InsuranceJnlTempl.Get(Rec.GetRangeMin("Journal Template Name")) then
                         exit(InsuranceJnlTempl.Name + ' ' + InsuranceJnlTempl.Description);
     end;
 }

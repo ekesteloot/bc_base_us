@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Purchases.Pricing;
+
 page 114 "Item Vendor Catalog"
 {
     Caption = 'Item Vendor Catalog';
@@ -72,9 +78,9 @@ page 114 "Item Vendor Catalog"
                     Image = Price;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Purchase Prices";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Vendor No." = FIELD("Vendor No.");
-                    RunPageView = SORTING("Item No.", "Vendor No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Vendor No." = field("Vendor No.");
+                    RunPageView = sorting("Item No.", "Vendor No.");
                     ToolTip = 'Define purchase price agreements with vendors for specific items.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -87,9 +93,9 @@ page 114 "Item Vendor Catalog"
                     Image = LineDiscount;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Purchase Line Discounts";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Vendor No." = FIELD("Vendor No.");
-                    RunPageView = SORTING("Item No.", "Vendor No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Vendor No." = field("Vendor No.");
+                    RunPageView = sorting("Item No.", "Vendor No.");
                     ToolTip = 'Define purchase line discounts with vendors. For example, you may get for a line discount if you buy items from a vendor in large quantities.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -107,7 +113,7 @@ page 114 "Item Vendor Catalog"
 
                     trigger OnAction()
                     begin
-                        Rec.ShowPriceListLines("Price Amount Type"::Price);
+                        Rec.ShowPriceListLines(Enum::"Price Amount Type"::Price);
                     end;
                 }
                 action(Discounts)
@@ -121,7 +127,7 @@ page 114 "Item Vendor Catalog"
 
                     trigger OnAction()
                     begin
-                        Rec.ShowPriceListLines("Price Amount Type"::Discount);
+                        Rec.ShowPriceListLines(Enum::"Price Amount Type"::Discount);
                     end;
                 }
             }

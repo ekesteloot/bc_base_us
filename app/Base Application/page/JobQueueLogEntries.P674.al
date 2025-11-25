@@ -1,3 +1,5 @@
+namespace System.Threading;
+
 page 674 "Job Queue Log Entries"
 {
     ApplicationArea = Basic, Suite;
@@ -6,8 +8,8 @@ page 674 "Job Queue Log Entries"
     LinksAllowed = false;
     PageType = List;
     SourceTable = "Job Queue Log Entry";
-    SourceTableView = SORTING("Start Date/Time", ID)
-                      ORDER(Descending);
+    SourceTableView = sorting("Start Date/Time", ID)
+                      order(Descending);
     UsageCategory = Lists;
 
     layout
@@ -57,7 +59,7 @@ page 674 "Job Queue Log Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the date and time when the job was started.';
                 }
-                field(Duration; Duration())
+                field(Duration; Rec.Duration())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Duration';
@@ -82,20 +84,9 @@ page 674 "Job Queue Log Entries"
 
                     trigger OnAssistEdit()
                     begin
-                        ShowErrorMessage();
+                        Rec.ShowErrorMessage();
                     end;
                 }
-#if not CLEAN20
-                field("Processed by User ID"; Rec."Processed by User ID")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the user ID of the job queue entry processor. The user ID comes from the job queue entry card.';
-                    Visible = false;
-                    ObsoleteTag = '20.0';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'The Processed by User ID is the same as User ID';
-                }
-#endif
                 field("Job Queue Category Code"; Rec."Job Queue Category Code")
                 {
                     ApplicationArea = Basic, Suite;
@@ -119,7 +110,7 @@ page 674 "Job Queue Log Entries"
 
                 trigger OnAction()
                 begin
-                    DeleteEntries(7);
+                    Rec.DeleteEntries(7);
                 end;
             }
             action(Delete0days)
@@ -131,33 +122,33 @@ page 674 "Job Queue Log Entries"
 
                 trigger OnAction()
                 begin
-                    DeleteEntries(0);
+                    Rec.DeleteEntries(0);
                 end;
             }
             action("Show Error Message")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Show Error Message';
-                Enabled = Status = Status::Error;
+                Enabled = Rec.Status = Rec.Status::Error;
                 Image = Error;
                 ToolTip = 'Show the error message that has stopped the entry.';
 
                 trigger OnAction()
                 begin
-                    ShowErrorMessage();
+                    Rec.ShowErrorMessage();
                 end;
             }
             action("Show Error Call Stack")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Show Error Call Stack';
-                Enabled = Status = Status::Error;
+                Enabled = Rec.Status = Rec.Status::Error;
                 Image = StepInto;
                 ToolTip = 'Show the call stack for the error that has stopped the entry.';
 
                 trigger OnAction()
                 begin
-                    ShowErrorCallStack();
+                    Rec.ShowErrorCallStack();
                 end;
             }
             action(SetStatusToError)
@@ -170,7 +161,7 @@ page 674 "Job Queue Log Entries"
                 trigger OnAction()
                 begin
                     if Confirm(JobQueueEntryRunningQst, false) then
-                        MarkAsError();
+                        Rec.MarkAsError();
                 end;
             }
         }

@@ -1,3 +1,5 @@
+namespace Microsoft.CashFlow.Comment;
+
 page 858 "Cash Flow Comment List"
 {
     Caption = 'Cash Flow Comment List';
@@ -17,17 +19,17 @@ page 858 "Cash Flow Comment List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the date of the cash flow comment.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the comment for the record.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code of the record.';

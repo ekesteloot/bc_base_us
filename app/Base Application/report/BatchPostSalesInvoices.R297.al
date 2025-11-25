@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Setup;
+using System.Environment;
+
 report 297 "Batch Post Sales Invoices"
 {
     Caption = 'Batch Post Sales Invoices';
@@ -7,7 +13,7 @@ report 297 "Batch Post Sales Invoices"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Invoice));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Invoice));
             RequestFilterFields = "No.", Status;
             RequestFilterHeading = 'Sales Invoice';
 
@@ -69,7 +75,7 @@ report 297 "Batch Post Sales Invoices"
                         begin
                             if ReplacePostingDate then
                                 Message(Text003);
-                            
+
                             if VATReportingDateMgt.IsVATDateUsageSetToPostingDate() then
                                 ReplaceVATDateReq := ReplacePostingDate;
                             UpdateVATDate();
@@ -173,12 +179,11 @@ report 297 "Batch Post Sales Invoices"
         Text003: Label 'The exchange rate associated with the new posting date on the sales header will apply to the sales lines.';
 
     protected var
-        PostingDateReq, VATDateReq: Date;
+        PostingDateReq, VATDateReq : Date;
         ReplacePostingDate: Boolean;
-        ReplaceDocumentDate, ReplaceVATDateReq: Boolean;
+        ReplaceDocumentDate, ReplaceVATDateReq : Boolean;
         CalcInvDisc: Boolean;
         PrintDoc: Boolean;
-        [InDataSet]
         PrintDocVisible: Boolean;
         VATDateEnabled: Boolean;
 

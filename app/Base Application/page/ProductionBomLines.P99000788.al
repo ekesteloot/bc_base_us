@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Document;
+
 page 99000788 "Production BOM Lines"
 {
     AutoSplitKey = true;
@@ -31,8 +36,8 @@ page 99000788 "Production BOM Lines"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field("Variant Code"; Rec."Variant Code")
@@ -46,8 +51,8 @@ page 99000788 "Production BOM Lines"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field(Description; Rec.Description)
@@ -61,25 +66,25 @@ page 99000788 "Production BOM Lines"
                     ToolTip = 'Specifies how to calculate the Quantity field.';
                     Visible = false;
                 }
-                field(Length; Length)
+                field(Length; Rec.Length)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the length of one item unit when measured in the specified unit of measure.';
                     Visible = false;
                 }
-                field(Width; Width)
+                field(Width; Rec.Width)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the width of one item unit when measured in the specified unit of measure.';
                     Visible = false;
                 }
-                field(Depth; Depth)
+                field(Depth; Rec.Depth)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the depth of one item unit when measured in the specified unit of measure.';
                     Visible = false;
                 }
-                field(Weight; Weight)
+                field(Weight; Rec.Weight)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the weight of one item unit when measured in the specified unit of measure.';
@@ -105,7 +110,7 @@ page 99000788 "Production BOM Lines"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the routing link code.';
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the position of the component on the bill of material.';
@@ -185,22 +190,22 @@ page 99000788 "Production BOM Lines"
     var
         Item: Record Item;
     begin
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Type := xRec.Type;
+        Rec.Type := xRec.Type;
     end;
 
     local procedure ShowComment()
     var
         ProdOrderCompComment: Record "Production BOM Comment Line";
     begin
-        ProdOrderCompComment.SetRange("Production BOM No.", "Production BOM No.");
-        ProdOrderCompComment.SetRange("BOM Line No.", "Line No.");
-        ProdOrderCompComment.SetRange("Version Code", "Version Code");
+        ProdOrderCompComment.SetRange("Production BOM No.", Rec."Production BOM No.");
+        ProdOrderCompComment.SetRange("BOM Line No.", Rec."Line No.");
+        ProdOrderCompComment.SetRange("Version Code", Rec."Version Code");
 
         PAGE.Run(PAGE::"Prod. Order BOM Cmt. Sheet", ProdOrderCompComment);
     end;
@@ -211,18 +216,18 @@ page 99000788 "Production BOM Lines"
         ProdBomHeader: Record "Production BOM Header";
         ProdBOMWhereUsed: Page "Prod. BOM Where-Used";
     begin
-        if Type = Type::" " then
+        if Rec.Type = Rec.Type::" " then
             exit;
 
-        case Type of
-            Type::Item:
+        case Rec.Type of
+            Rec.Type::Item:
                 begin
-                    Item.Get("No.");
+                    Item.Get(Rec."No.");
                     ProdBOMWhereUsed.SetItem(Item, WorkDate());
                 end;
-            Type::"Production BOM":
+            Rec.Type::"Production BOM":
                 begin
-                    ProdBomHeader.Get("No.");
+                    ProdBomHeader.Get(Rec."No.");
                     ProdBOMWhereUsed.SetProdBOM(ProdBomHeader, WorkDate());
                 end;
         end;

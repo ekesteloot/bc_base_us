@@ -1,3 +1,5 @@
+namespace Microsoft.AssemblyMgt.Comment;
+
 enum 906 "Assembly Comment Document Type"
 {
     Extensible = true;

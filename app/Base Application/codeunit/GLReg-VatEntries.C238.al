@@ -4,7 +4,7 @@ codeunit 238 "G/L Reg.-VAT Entries"
 
     trigger OnRun()
     begin
-        VATEntry.SetRange("Entry No.", "From VAT Entry No.", "To VAT Entry No.");
+        VATEntry.SetRange("Entry No.", Rec."From VAT Entry No.", Rec."To VAT Entry No.");
         PAGE.Run(PAGE::"VAT Entries", VATEntry);
     end;
 

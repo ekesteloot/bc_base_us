@@ -19,7 +19,7 @@ page 10457 "MX Electronic Invoice Setup"
             {
                 ApplicationArea = Basic, Suite;
             }
-            field("Download XML with Requests"; "Download XML with Requests")
+            field("Download XML with Requests"; Rec."Download XML with Requests")
             {
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Download the XML document when sending a request to an electronic invoicing authority.';
@@ -58,11 +58,11 @@ page 10457 "MX Electronic Invoice Setup"
            PACWebService.CheckIfMissingMXEInvRequiredFields() and
            GeneralLedgerSetup.CheckIfMissingMXEInvRequiredFields()
         then
-            Enabled := false
+            Rec.Enabled := false
         else
-            Enabled := true;
+            Rec.Enabled := true;
 
-        Modify();
+        Rec.Modify();
     end;
 
     var

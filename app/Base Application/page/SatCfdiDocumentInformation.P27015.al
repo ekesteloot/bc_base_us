@@ -20,12 +20,12 @@ page 27015 "SAT CFDI Document Information"
             }
             group("Electronic Document")
             {
-                field(Prepayment; Prepayment)
+                field(Prepayment; Rec.Prepayment)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the CFDI documents involves a prepayment.';
                 }
-                field(Reversal; Reversal)
+                field(Reversal; Rec.Reversal)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the CFDI documents involves a payment reversal.';
@@ -96,7 +96,7 @@ page 27015 "SAT CFDI Document Information"
 
                     trigger OnAction()
                     begin
-                        SendEDocument();
+                        Rec.SendEDocument();
                     end;
                 }
                 action("Export E-Document as &XML")
@@ -108,7 +108,7 @@ page 27015 "SAT CFDI Document Information"
 
                     trigger OnAction()
                     begin
-                        ExportEDocument();
+                        Rec.ExportEDocument();
                     end;
                 }
             }

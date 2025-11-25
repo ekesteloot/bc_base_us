@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using System.Utilities;
+
 table 173 "Standard Purchase Code"
 {
     Caption = 'Standard Purchase Code';

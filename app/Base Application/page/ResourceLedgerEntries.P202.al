@@ -1,3 +1,9 @@
+namespace Microsoft.ProjectMgt.Resources.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 202 "Resource Ledger Entries"
 {
     ApplicationArea = Jobs;
@@ -6,8 +12,8 @@ page 202 "Resource Ledger Entries"
     Editable = false;
     PageType = List;
     SourceTable = "Res. Ledger Entry";
-    SourceTableView = SORTING("Resource No.", "Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Resource No.", "Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -109,7 +115,7 @@ page 202 "Resource Ledger Entries"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the total price of the posted entry.';
                 }
-                field(Chargeable; Chargeable)
+                field(Chargeable; Rec.Chargeable)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies if a resource transaction is chargeable.';
@@ -124,7 +130,7 @@ page 202 "Resource Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -228,7 +234,7 @@ page 202 "Resource Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -241,7 +247,7 @@ page 202 "Resource Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -258,7 +264,7 @@ page 202 "Resource Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -291,8 +297,8 @@ page 202 "Resource Ledger Entries"
     begin
         SetDimVisibility();
 
-        if (GetFilters() <> '') and not Find() then
-            if FindFirst() then;
+        if (Rec.GetFilters() <> '') and not Rec.Find() then
+            if Rec.FindFirst() then;
     end;
 
     var

@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Statement;
+
 codeunit 372 "Bank Acc. Recon. Post+Print"
 {
     TableNo = "Bank Acc. Reconciliation";
@@ -13,7 +17,7 @@ codeunit 372 "Bank Acc. Recon. Post+Print"
         Rec := BankAccRecon;
         Commit();
 
-        if BankAccStmt.Get("Bank Account No.", "Statement No.") then
+        if BankAccStmt.Get(Rec."Bank Account No.", Rec."Statement No.") then
             DocPrint.PrintBankAccStmt(BankAccStmt);
     end;
 

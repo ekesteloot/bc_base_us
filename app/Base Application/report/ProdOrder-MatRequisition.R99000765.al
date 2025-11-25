@@ -1,7 +1,7 @@
 report 99000765 "Prod. Order - Mat. Requisition"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrder/ProdOrderMatRequisition.rdlc';
+    RDLCLayout = './Manufacturing/Document/ProdOrderMatRequisition.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Mat. Requisition';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +10,7 @@ report 99000765 "Prod. Order - Mat. Requisition"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = Status, "No.", "Source Type", "Source No.";
             column(TodayFormatted; Format(Today, 0, 4))
@@ -50,8 +50,8 @@ report 99000765 "Prod. Order - Mat. Requisition"
             }
             dataitem("Prod. Order Component"; "Prod. Order Component")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
                 column(ItemNo_ProdOrderComp; "Item No.")
                 {
                     IncludeCaption = true;

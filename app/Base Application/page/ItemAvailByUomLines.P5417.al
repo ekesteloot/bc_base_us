@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+
 page 5417 "Item Avail. by UOM Lines"
 {
     Caption = 'Lines';
@@ -18,7 +23,7 @@ page 5417 "Item Avail. by UOM Lines"
             {
                 Editable = false;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code to identify the unit of measure.';
@@ -323,8 +328,8 @@ page 5417 "Item Avail. by UOM Lines"
 
     local procedure AdjustQty(QtyInUoM: Decimal): Decimal;
     begin
-        if "Qty. per Unit of Measure" <> 0 then
-            exit(QtyInUoM / "Qty. per Unit of Measure");
+        if Rec."Qty. per Unit of Measure" <> 0 then
+            exit(QtyInUoM / Rec."Qty. per Unit of Measure");
     end;
 
     procedure Set(var NewItem: Record Item; NewAmountType: Enum "Analysis Amount Type")
@@ -342,13 +347,13 @@ page 5417 "Item Avail. by UOM Lines"
             Item.SetRange("Date Filter", PeriodStart, PeriodEnd)
         else
             Item.SetRange("Date Filter", 0D, PeriodEnd);
-        Item.SetRange("Unit of Measure Filter", Code);
+        Item.SetRange("Unit of Measure Filter", Rec.Code);
     end;
 
     local procedure ShowItemAvailLineList(What: Integer)
     begin
         SetItemFilter();
-        ItemAvailFormsMgt.SetQtyByUnitOfMeasure("Qty. per Unit of Measure");
+        ItemAvailFormsMgt.SetQtyByUnitOfMeasure(Rec."Qty. per Unit of Measure");
         ItemAvailFormsMgt.ShowItemAvailLineList(Item, What);
     end;
 

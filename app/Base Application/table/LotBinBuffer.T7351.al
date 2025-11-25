@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 table 7351 "Lot Bin Buffer"
 {
     Caption = 'Lot Bin Buffer';

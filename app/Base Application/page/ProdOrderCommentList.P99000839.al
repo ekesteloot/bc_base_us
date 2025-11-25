@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 page 99000839 "Prod. Order Comment List"
 {
     Caption = 'Comment List';
@@ -19,12 +21,12 @@ page 99000839 "Prod. Order Comment List"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the number of the related production order.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies a date.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the comment.';

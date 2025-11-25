@@ -152,7 +152,7 @@ page 5824 "Sales Shipment Lines"
                     var
                         SalesShptHeader: Record "Sales Shipment Header";
                     begin
-                        SalesShptHeader.Get("Document No.");
+                        SalesShptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Sales Shipment", SalesShptHeader);
                     end;
                 }
@@ -167,7 +167,7 @@ page 5824 "Sales Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -197,12 +197,12 @@ page 5824 "Sales Shipment Lines"
     trigger OnOpenPage()
     begin
         if AssignmentType = AssignmentType::Sale then begin
-            SetCurrentKey("Sell-to Customer No.");
-            SetRange("Sell-to Customer No.", SellToCustomerNo);
+            Rec.SetCurrentKey("Sell-to Customer No.");
+            Rec.SetRange("Sell-to Customer No.", SellToCustomerNo);
         end;
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         SetFilters();
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -222,7 +222,6 @@ page 5824 "Sales Shipment Lines"
         SellToCustomerNo: Code[20];
         UnitCost: Decimal;
         AssignmentType: Option Sale,Purchase;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     procedure InitializeSales(NewItemChargeAssgnt: Record "Item Charge Assignment (Sales)"; NewSellToCustomerNo: Code[20]; NewUnitCost: Decimal)
@@ -261,10 +260,10 @@ page 5824 "Sales Shipment Lines"
 
     local procedure SetFilters()
     begin
-        SetRange(Type, Type::Item);
-        SetFilter(Quantity, '<>0');
-        SetRange(Correction, false);
-        SetRange("Job No.", '');
+        Rec.SetRange(Type, Rec.Type::Item);
+        Rec.SetFilter(Quantity, '<>0');
+        Rec.SetRange(Correction, false);
+        Rec.SetRange("Job No.", '');
 
         OnAfterSetFilters(Rec);
     end;
@@ -286,7 +285,7 @@ page 5824 "Sales Shipment Lines"
 
     local procedure DocumentNoOnFormat()
     begin
-        if not IsFirstLine("Document No.", "Line No.") then
+        if not IsFirstLine(Rec."Document No.", Rec."Line No.") then
             DocumentNoHideValue := true;
     end;
 

@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 report 31 "VAT Exceptions"
 {
     DefaultLayout = RDLC;

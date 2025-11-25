@@ -1,3 +1,12 @@
+﻿namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Intercompany.DataExchange;
+using Microsoft.Intercompany.Dimension;
+using Microsoft.Intercompany.Inbox;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Intercompany.Setup;
+
 report 513 "Move IC Trans. to Partner Comp"
 {
     Caption = 'Move IC Trans. to Partner Comp';
@@ -7,15 +16,15 @@ report 513 "Move IC Trans. to Partner Comp"
     {
         dataitem("IC Outbox Transaction"; "IC Outbox Transaction")
         {
-            DataItemTableView = SORTING("Transaction No.", "IC Partner Code", "Transaction Source", "Document Type") ORDER(Ascending);
+            DataItemTableView = sorting("Transaction No.", "IC Partner Code", "Transaction Source", "Document Type") order(Ascending);
             dataitem("IC Outbox Jnl. Line"; "IC Outbox Jnl. Line")
             {
-                DataItemLink = "Transaction No." = FIELD("Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
-                DataItemTableView = SORTING("Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
+                DataItemLink = "Transaction No." = field("Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
+                DataItemTableView = sorting("Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
                 dataitem("IC Inbox/Outbox Jnl. Line Dim."; "IC Inbox/Outbox Jnl. Line Dim.")
                 {
-                    DataItemLink = "IC Partner Code" = FIELD("IC Partner Code"), "Transaction No." = FIELD("Transaction No."), "Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Table ID", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.", "Dimension Code") ORDER(Ascending) WHERE("Table ID" = CONST(415));
+                    DataItemLink = "IC Partner Code" = field("IC Partner Code"), "Transaction No." = field("Transaction No."), "Line No." = field("Line No.");
+                    DataItemTableView = sorting("Table ID", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.", "Dimension Code") ORDER(Ascending) where("Table ID" = const(415));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -34,12 +43,12 @@ report 513 "Move IC Trans. to Partner Comp"
             }
             dataitem("IC Outbox Sales Header"; "IC Outbox Sales Header")
             {
-                DataItemLink = "IC Partner Code" = FIELD("IC Partner Code"), "IC Transaction No." = FIELD("Transaction No."), "Transaction Source" = FIELD("Transaction Source");
-                DataItemTableView = SORTING("IC Transaction No.", "IC Partner Code", "Transaction Source");
+                DataItemLink = "IC Partner Code" = field("IC Partner Code"), "IC Transaction No." = field("Transaction No."), "Transaction Source" = field("Transaction Source");
+                DataItemTableView = sorting("IC Transaction No.", "IC Partner Code", "Transaction Source");
                 dataitem("IC Document Dimension SH"; "IC Document Dimension")
                 {
-                    DataItemLink = "Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
-                    DataItemTableView = SORTING("Table ID", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.", "Dimension Code") ORDER(Ascending) WHERE("Table ID" = CONST(426), "Line No." = CONST(0));
+                    DataItemLink = "Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
+                    DataItemTableView = sorting("Table ID", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.", "Dimension Code") ORDER(Ascending) where("Table ID" = const(426), "Line No." = const(0));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -51,12 +60,12 @@ report 513 "Move IC Trans. to Partner Comp"
                 }
                 dataitem("IC Outbox Sales Line"; "IC Outbox Sales Line")
                 {
-                    DataItemLink = "IC Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
-                    DataItemTableView = SORTING("IC Transaction No.", "IC Partner Code", "Transaction Source");
+                    DataItemLink = "IC Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
+                    DataItemTableView = sorting("IC Transaction No.", "IC Partner Code", "Transaction Source");
                     dataitem("IC Document Dimension SL"; "IC Document Dimension")
                     {
-                        DataItemLink = "Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source"), "Line No." = FIELD("Line No.");
-                        DataItemTableView = SORTING("Table ID", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.", "Dimension Code") ORDER(Ascending) WHERE("Table ID" = CONST(427));
+                        DataItemLink = "Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source"), "Line No." = field("Line No.");
+                        DataItemTableView = sorting("Table ID", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.", "Dimension Code") ORDER(Ascending) where("Table ID" = const(427));
 
                         trigger OnAfterGetRecord()
                         begin
@@ -82,12 +91,12 @@ report 513 "Move IC Trans. to Partner Comp"
             }
             dataitem("IC Outbox Purchase Header"; "IC Outbox Purchase Header")
             {
-                DataItemLink = "IC Partner Code" = FIELD("IC Partner Code"), "IC Transaction No." = FIELD("Transaction No."), "Transaction Source" = FIELD("Transaction Source");
-                DataItemTableView = SORTING("IC Transaction No.", "IC Partner Code", "Transaction Source");
+                DataItemLink = "IC Partner Code" = field("IC Partner Code"), "IC Transaction No." = field("Transaction No."), "Transaction Source" = field("Transaction Source");
+                DataItemTableView = sorting("IC Transaction No.", "IC Partner Code", "Transaction Source");
                 dataitem("IC Document Dimension PH"; "IC Document Dimension")
                 {
-                    DataItemLink = "Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
-                    DataItemTableView = SORTING("Table ID", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.", "Dimension Code") ORDER(Ascending) WHERE("Table ID" = CONST(428), "Line No." = CONST(0));
+                    DataItemLink = "Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
+                    DataItemTableView = sorting("Table ID", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.", "Dimension Code") ORDER(Ascending) where("Table ID" = const(428), "Line No." = const(0));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -99,12 +108,12 @@ report 513 "Move IC Trans. to Partner Comp"
                 }
                 dataitem("IC Outbox Purchase Line"; "IC Outbox Purchase Line")
                 {
-                    DataItemLink = "IC Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
-                    DataItemTableView = SORTING("IC Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
+                    DataItemLink = "IC Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
+                    DataItemTableView = sorting("IC Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
                     dataitem("IC Document Dimension PL"; "IC Document Dimension")
                     {
-                        DataItemLink = "Transaction No." = FIELD("IC Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source"), "Line No." = FIELD("Line No.");
-                        DataItemTableView = SORTING("Table ID", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.", "Dimension Code") ORDER(Ascending) WHERE("Table ID" = CONST(429));
+                        DataItemLink = "Transaction No." = field("IC Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source"), "Line No." = field("Line No.");
+                        DataItemTableView = sorting("Table ID", "Transaction No.", "IC Partner Code", "Transaction Source", "Line No.", "Dimension Code") ORDER(Ascending) where("Table ID" = const(429));
 
                         trigger OnAfterGetRecord()
                         begin
@@ -193,9 +202,6 @@ report 513 "Move IC Trans. to Partner Comp"
         GLSetup: Record "General Ledger Setup";
         ICInboxOutboxMgt: Codeunit ICInboxOutboxMgt;
 
-        Text001: Label 'Your IC registration code %1 is not recognized by IC Partner %2.';
-        Text002: Label '%1 %2 to IC Partner %3 already exists in the IC inbox of IC Partner %3. IC Partner %3 must complete the line action for transaction %2 in their IC inbox.';
-
     protected var
         CurrentPartner: Record "IC Partner";
         TempICInboxTransaction: Record "IC Inbox Transaction" temporary;
@@ -210,101 +216,26 @@ report 513 "Move IC Trans. to Partner Comp"
 
     local procedure TransferToPartner()
     var
-        PartnerInboxTransaction: Record "IC Inbox Transaction";
-        PartnerInboxJnlLine: Record "IC Inbox Jnl. Line";
-        PartnerInboxSalesHeader: Record "IC Inbox Sales Header";
-        PartnerInboxSalesLine: Record "IC Inbox Sales Line";
-        PartnerInboxPurchHeader: Record "IC Inbox Purchase Header";
-        PartnerInboxPurchLine: Record "IC Inbox Purchase Line";
-        PartnerInboxOutboxJnlLineDim: Record "IC Inbox/Outbox Jnl. Line Dim.";
-        PartnerICDocDim: Record "IC Document Dimension";
-        PartnerICPartner: Record "IC Partner";
-        PartnerICCommentLine: Record "IC Comment Line";
+        TempRegisteredPartner: Record "IC Partner" temporary;
+        ICDataExchange: Interface "IC Data Exchange";
     begin
-        PartnerICPartner.ChangeCompany(CurrentPartner."Inbox Details");
-        if not PartnerICPartner.Get(ICSetup."IC Partner Code") then
-            Error(Text001, ICSetup."IC Partner Code", CurrentPartner.Code);
+        ICDataExchange := CurrentPartner."Data Exchange Type";
+        ICDataExchange.GetICPartnerFromICPartner(CurrentPartner, TempRegisteredPartner);
 
-        PartnerInboxTransaction.ChangeCompany(CurrentPartner."Inbox Details");
-        PartnerInboxTransaction.LockTable();
-        if TempICInboxTransaction.Find('-') then
-            repeat
-                PartnerInboxTransaction := TempICInboxTransaction;
-                OnTransferToPartnerOnBeforePartnerInboxTransactionInsert(PartnerInboxTransaction, CurrentPartner);
-                if not PartnerInboxTransaction.Insert() then
-                    Error(
-                      Text002, TempICInboxTransaction.FieldCaption("Transaction No."),
-                      TempICInboxTransaction."Transaction No.",
-                      TempICInboxTransaction."IC Partner Code");
-            until TempICInboxTransaction.Next() = 0;
+        ICDataExchange.PostICTransactionToICPartnerInbox(CurrentPartner, TempICInboxTransaction);
+        ICDataExchange.PostICJournalLineToICPartnerInbox(CurrentPartner, TempICInboxJnlLine);
 
-        PartnerInboxJnlLine.ChangeCompany(CurrentPartner."Inbox Details");
-        if TempICInboxJnlLine.Find('-') then
-            repeat
-                PartnerInboxJnlLine := TempICInboxJnlLine;
-                if PartnerInboxJnlLine."Currency Code" = '' then
-                    PartnerInboxJnlLine."Currency Code" := GLSetup."LCY Code";
-                if PartnerInboxJnlLine."Currency Code" = CurrentPartner."Currency Code" then
-                    PartnerInboxJnlLine."Currency Code" := '';
-                PartnerInboxJnlLine.Insert();
-            until TempICInboxJnlLine.Next() = 0;
+        ICDataExchange.PostICPurchaseHeaderToICPartnerInbox(CurrentPartner, TempInboxPurchHeader, TempRegisteredPartner);
+        ICDataExchange.PostICPurchaseLineToICPartnerInbox(CurrentPartner, TempInboxPurchLine);
 
-        PartnerInboxPurchHeader.ChangeCompany(CurrentPartner."Inbox Details");
-        if TempInboxPurchHeader.Find('-') then
-            repeat
-                PartnerInboxPurchHeader := TempInboxPurchHeader;
-                PartnerInboxPurchHeader."Buy-from Vendor No." := PartnerICPartner."Vendor No.";
-                PartnerInboxPurchHeader."Pay-to Vendor No." := PartnerICPartner."Vendor No.";
-                OnBeforePartnerInboxPurchHeaderInsert(PartnerInboxPurchHeader, CurrentPartner);
-                PartnerInboxPurchHeader.Insert();
-            until TempInboxPurchHeader.Next() = 0;
+        ICDataExchange.PostICSalesHeaderToICPartnerInbox(CurrentPartner, TempInboxSalesHeader, TempRegisteredPartner);
+        ICDataExchange.PostICSalesLineToICPartnerInbox(CurrentPartner, TempInboxSalesLine);
 
-        PartnerInboxPurchLine.ChangeCompany(CurrentPartner."Inbox Details");
-        if TempInboxPurchLine.Find('-') then
-            repeat
-                PartnerInboxPurchLine := TempInboxPurchLine;
-                PartnerInboxPurchLine.Insert();
-            until TempInboxPurchLine.Next() = 0;
+        ICDataExchange.PostICJournalLineDimensionToICPartnerInbox(CurrentPartner, TempInboxOutboxJnlLineDim);
+        ICDataExchange.PostICDocumentDimensionToICPartnerInbox(CurrentPartner, TempICDocDim);
+        ICDataExchange.PostICCommentLineToICPartnerInbox(CurrentPartner, TempICCommentLine);
 
-        PartnerInboxSalesHeader.ChangeCompany(CurrentPartner."Inbox Details");
-        if TempInboxSalesHeader.Find('-') then
-            repeat
-                PartnerInboxSalesHeader := TempInboxSalesHeader;
-                PartnerInboxSalesHeader."Sell-to Customer No." := PartnerICPartner."Customer No.";
-                PartnerInboxSalesHeader."Bill-to Customer No." := PartnerICPartner."Customer No.";
-                OnBeforePartnerInboxSalesHeaderInsert(PartnerInboxSalesHeader, CurrentPartner, TempInboxSalesHeader);
-                PartnerInboxSalesHeader.Insert();
-            until TempInboxSalesHeader.Next() = 0;
-
-        PartnerInboxSalesLine.ChangeCompany(CurrentPartner."Inbox Details");
-        if TempInboxSalesLine.Find('-') then
-            repeat
-                PartnerInboxSalesLine := TempInboxSalesLine;
-                PartnerInboxSalesLine.Insert();
-            until TempInboxSalesLine.Next() = 0;
-
-        PartnerInboxOutboxJnlLineDim.ChangeCompany(CurrentPartner."Inbox Details");
-        if TempInboxOutboxJnlLineDim.Find('-') then
-            repeat
-                PartnerInboxOutboxJnlLineDim := TempInboxOutboxJnlLineDim;
-                PartnerInboxOutboxJnlLineDim.Insert();
-            until TempInboxOutboxJnlLineDim.Next() = 0;
-
-        PartnerICDocDim.ChangeCompany(CurrentPartner."Inbox Details");
-        if TempICDocDim.Find('-') then
-            repeat
-                PartnerICDocDim := TempICDocDim;
-                PartnerICDocDim.Insert();
-            until TempICDocDim.Next() = 0;
-
-        PartnerICCommentLine.ChangeCompany(CurrentPartner."Inbox Details");
-        if TempICCommentLine.Find('-') then
-            repeat
-                PartnerICCommentLine := TempICCommentLine;
-                PartnerICCommentLine.Insert();
-            until TempICCommentLine.Next() = 0;
-
-        OnICInboxTransactionCreated(PartnerInboxTransaction, CurrentPartner."Inbox Details");
+        OnICInboxTransactionCreated(TempICInboxTransaction, CurrentPartner."Inbox Details");
 
         TempICInboxTransaction.DeleteAll();
         TempInboxPurchHeader.DeleteAll();
@@ -482,15 +413,21 @@ report 513 "Move IC Trans. to Partner Comp"
     begin
     end;
 
+#if not CLEAN23
+    [Obsolete('It is no longer applicable due to the implementation of cross-environment intercompany capabilities using APIs.', '23.0')]
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePartnerInboxPurchHeaderInsert(var ICInboxPurchaseHeader: Record "IC Inbox Purchase Header"; ICPartner: Record "IC Partner")
+    internal procedure OnBeforePartnerInboxPurchHeaderInsert(var ICInboxPurchaseHeader: Record "IC Inbox Purchase Header"; ICPartner: Record "IC Partner")
     begin
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('It is no longer applicable due to the implementation of cross-environment intercompany capabilities using APIs.', '23.0')]
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePartnerInboxSalesHeaderInsert(var ICInboxSalesHeader: Record "IC Inbox Sales Header"; ICPartner: Record "IC Partner"; TempICInboxSalesHeader: Record "IC Inbox Sales Header" temporary)
+    internal procedure OnBeforePartnerInboxSalesHeaderInsert(var ICInboxSalesHeader: Record "IC Inbox Sales Header"; ICPartner: Record "IC Partner"; TempICInboxSalesHeader: Record "IC Inbox Sales Header" temporary)
     begin
     end;
+#endif
 
     [IntegrationEvent(true, false)]
     [Scope('OnPrem')]
@@ -498,9 +435,12 @@ report 513 "Move IC Trans. to Partner Comp"
     begin
     end;
 
+#if not CLEAN23
+    [Obsolete('It is no longer applicable due to the implementation of cross-environment intercompany capabilities using APIs.', '23.0')]
     [IntegrationEvent(false, false)]
-    local procedure OnTransferToPartnerOnBeforePartnerInboxTransactionInsert(var PartnerInboxTransaction: Record "IC Inbox Transaction"; CurrentICPartner: Record "IC Partner")
+    internal procedure OnTransferToPartnerOnBeforePartnerInboxTransactionInsert(var PartnerInboxTransaction: Record "IC Inbox Transaction"; CurrentICPartner: Record "IC Partner")
     begin
     end;
+#endif
 }
 

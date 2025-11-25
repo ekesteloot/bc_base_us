@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 page 1378 "Select Item Templ. List"
 {
     Caption = 'Select a template for a new item';

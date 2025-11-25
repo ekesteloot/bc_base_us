@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.Comment;
+
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Loaner;
+
 table 5906 "Service Comment Line"
 {
     Caption = 'Service Comment Line';
@@ -15,13 +22,13 @@ table 5906 "Service Comment Line"
         {
             Caption = 'No.';
             NotBlank = true;
-            TableRelation = IF ("Table Name" = CONST("Service Contract")) "Service Contract Header"."Contract No."
-            ELSE
-            IF ("Table Name" = CONST("Service Header")) "Service Header"."No."
-            ELSE
-            IF ("Table Name" = CONST("Service Item")) "Service Item"
-            ELSE
-            IF ("Table Name" = CONST(Loaner)) Loaner;
+            TableRelation = if ("Table Name" = const("Service Contract")) "Service Contract Header"."Contract No."
+            else
+            if ("Table Name" = const("Service Header")) "Service Header"."No."
+            else
+            if ("Table Name" = const("Service Item")) "Service Item"
+            else
+            if ("Table Name" = const(Loaner)) Loaner;
         }
         field(3; "Table Line No."; Integer)
         {

@@ -1,10 +1,18 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Analysis;
+
+using Microsoft.InventoryMgt.Analysis;
+
 page 9373 "Budget Names Purchase"
 {
     ApplicationArea = PurchaseBudget;
     Caption = 'Purchase Budgets';
     PageType = List;
     SourceTable = "Item Budget Name";
-    SourceTableView = WHERE("Analysis Area" = CONST(Purchase));
+    SourceTableView = where("Analysis Area" = const(Purchase));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -24,7 +32,7 @@ page 9373 "Budget Names Purchase"
                     ApplicationArea = PurchaseBudget;
                     ToolTip = 'Specifies a description of the item budget.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = PurchaseBudget;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -77,7 +85,7 @@ page 9373 "Budget Names Purchase"
                 var
                     PurchBudgetOverview: Page "Purchase Budget Overview";
                 begin
-                    PurchBudgetOverview.SetNewBudgetName(Name);
+                    PurchBudgetOverview.SetNewBudgetName(Rec.Name);
                     PurchBudgetOverview.Run();
                 end;
             }

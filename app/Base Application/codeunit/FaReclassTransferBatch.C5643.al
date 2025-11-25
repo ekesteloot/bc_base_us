@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Journal;
+
 codeunit 5643 "FA Reclass. Transfer Batch"
 {
     Permissions = TableData "FA Reclass. Journal Batch" = rimd;

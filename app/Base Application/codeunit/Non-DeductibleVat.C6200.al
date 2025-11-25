@@ -1,7 +1,18 @@
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
-//
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Foundation.Enums;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
 
 /// <summary>
 /// Provides an interface of the Non-Deductible VAT functionality.
@@ -59,7 +70,7 @@ codeunit 6200 "Non-Deductible VAT"
     /// <returns>The non-deductible VAT percent</returns>
     procedure GetNonDeductibleVATPct(VATPostingSetup: Record "VAT Posting Setup"): Decimal
     begin
-        exit(NonDedVATImpl.GetNonDeductibleVATPct(VATPostingSetup, "General Posting Type"::Purchase));
+        exit(NonDedVATImpl.GetNonDeductibleVATPct(VATPostingSetup, Enum::"General Posting Type"::Purchase));
     end;
 
     /// <summary>

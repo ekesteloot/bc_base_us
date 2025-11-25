@@ -1,3 +1,13 @@
+namespace Microsoft.CRM.Duplicates;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Comment;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Reflection;
+using System.Utilities;
+
 table 64 "Merge Duplicates Buffer"
 {
     Caption = 'Merge Duplicates Buffer';
@@ -19,11 +29,11 @@ table 64 "Merge Duplicates Buffer"
         {
             Caption = 'Duplicate';
             DataClassification = SystemMetadata;
-            TableRelation = IF ("Table ID" = CONST(18)) Customer
-            ELSE
-            IF ("Table ID" = CONST(23)) Vendor
-            ELSE
-            IF ("Table ID" = CONST(5050)) Contact;
+            TableRelation = if ("Table ID" = const(18)) Customer
+            else
+            if ("Table ID" = const(23)) Vendor
+            else
+            if ("Table ID" = const(5050)) Contact;
 
             trigger OnValidate()
             begin
@@ -37,7 +47,7 @@ table 64 "Merge Duplicates Buffer"
         {
             Caption = 'Current';
             DataClassification = SystemMetadata;
-            TableRelation = IF ("Table ID" = CONST(18)) Customer;
+            TableRelation = if ("Table ID" = const(18)) Customer;
         }
         field(4; "Table Name"; Text[30])
         {
@@ -225,7 +235,7 @@ table 64 "Merge Duplicates Buffer"
                    (TableMetadata.ObsoleteState <> TableMetadata.ObsoleteState::Removed)
                 then begin
                     Field.Get(TableRelationsMetadata."Table ID", TableRelationsMetadata."Field No.");
-                    if (Field.Class = Field.Class::Normal) and (Field.ObsoleteState <> Field.ObsoleteState::Removed) then
+                    if (Field.Class = Field.Class::Normal) and Field.Enabled and (Field.ObsoleteState <> Field.ObsoleteState::Removed) then
                         if (TempTableRelationsMetadata."Table ID" <> TableRelationsMetadata."Table ID") or
                         (TempTableRelationsMetadata."Field No." <> TableRelationsMetadata."Field No.")
                         then begin

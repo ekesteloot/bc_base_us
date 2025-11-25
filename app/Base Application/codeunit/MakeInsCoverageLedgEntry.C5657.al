@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Setup;
+
 codeunit 5657 "Make Ins. Coverage Ledg. Entry"
 {
     Permissions = TableData "Ins. Coverage Ledger Entry" = rm;

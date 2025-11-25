@@ -1,7 +1,12 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Setup;
+
 report 5211 "Employee - Unions"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeUnions.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeUnions.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee Unions';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5211 "Employee - Unions"
     {
         dataitem(Union; Union)
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -44,8 +49,8 @@ report 5211 "Employee - Unions"
             }
             dataitem(Employee; Employee)
             {
-                DataItemLink = "Union Code" = FIELD(Code);
-                DataItemTableView = SORTING(Status, "Union Code");
+                DataItemLink = "Union Code" = field(Code);
+                DataItemTableView = sorting(Status, "Union Code");
                 column(Employee__No__; "No.")
                 {
                 }

@@ -10,7 +10,7 @@ report 10114 "Vendor Item Stat. by Purchaser"
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Code", Name;
             RequestFilterHeading = 'Purchaser';
@@ -106,8 +106,8 @@ report 10114 "Vendor Item Stat. by Purchaser"
             }
             dataitem(Vendor; Vendor)
             {
-                DataItemLink = "Purchaser Code" = FIELD(Code);
-                DataItemTableView = SORTING("Purchaser Code", "No.");
+                DataItemLink = "Purchaser Code" = field(Code);
+                DataItemTableView = sorting("Purchaser Code", "No.");
                 PrintOnlyIfDetail = true;
                 RequestFilterFields = "No.", "Search Name";
                 column(Vendor__No__; "No.")
@@ -151,8 +151,8 @@ report 10114 "Vendor Item Stat. by Purchaser"
                 }
                 dataitem("Value Entry"; "Value Entry")
                 {
-                    DataItemLink = "Source No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                    DataItemTableView = SORTING("Source Type", "Source No.", "Item Ledger Entry Type", "Item No.", "Posting Date") WHERE("Source Type" = CONST(Vendor), "Item Ledger Entry Type" = CONST(Purchase));
+                    DataItemLink = "Source No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                    DataItemTableView = sorting("Source Type", "Source No.", "Item Ledger Entry Type", "Item No.", "Posting Date") where("Source Type" = const(Vendor), "Item Ledger Entry Type" = const(Purchase));
                     RequestFilterFields = "Item Ledger Entry Type", "Inventory Posting Group", "Posting Date";
                     column(Value_Entry__Item_No__; "Item No.")
                     {

@@ -15,17 +15,17 @@ page 10130 "Bank Comment Sheet"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the date the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the comment itself.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies a code for the comment.';
@@ -41,7 +41,7 @@ page 10130 "Bank Comment Sheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
     end;
 }
 

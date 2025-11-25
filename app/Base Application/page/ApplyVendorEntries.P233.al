@@ -1,3 +1,19 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Shared.Navigate;
+
 page 233 "Apply Vendor Entries"
 {
     Caption = 'Apply Vendor Entries';
@@ -97,6 +113,8 @@ page 233 "Apply Vendor Entries"
                             Error(CannotSetAppliesToIDErr);
 
                         SetVendApplId(true);
+                        if Rec."Applies-to ID" <> '' then
+                            UpdateCustomAppliesToIDForGenJournal(Rec."Applies-to ID");
 
                         CurrPage.Update(false);
                     end;
@@ -257,7 +275,7 @@ page 233 "Apply Vendor Entries"
                         RecalcApplnAmount();
                     end;
                 }
-                field("CalcApplnRemainingAmount(""Remaining Pmt. Disc. Possible"")"; CalcApplnRemainingAmount("Remaining Pmt. Disc. Possible"))
+                field("CalcApplnRemainingAmount(""Remaining Pmt. Disc. Possible"")"; CalcApplnRemainingAmount(Rec."Remaining Pmt. Disc. Possible"))
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatExpression = ApplnCurrencyCode;
@@ -287,7 +305,7 @@ page 233 "Apply Vendor Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the address for the remit-to code.';
                     Visible = true;
-                    TableRelation = "Remit Address".Code WHERE("Vendor No." = FIELD("Vendor No."));
+                    TableRelation = "Remit Address".Code where("Vendor No." = field("Vendor No."));
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
@@ -438,8 +456,8 @@ page 233 "Apply Vendor Entries"
                     Caption = 'Detailed &Ledger Entries';
                     Image = View;
                     RunObject = Page "Detailed Vendor Ledg. Entries";
-                    RunPageLink = "Vendor Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Vendor Ledger Entry No.", "Posting Date");
+                    RunPageLink = "Vendor Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Vendor Ledger Entry No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a summary of the all posted entries and adjustments related to a specific vendor ledger entry.';
                 }
@@ -646,6 +664,16 @@ page 233 "Apply Vendor Entries"
         exit(false);
     end;
 
+    local procedure JournalHasDocumentNo(AppliesToIDCode: Code[50]): Boolean
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+    begin
+        GenJournalLine.SetRange("Journal Template Name", GenJnlLine."Journal Template Name");
+        GenJournalLine.SetRange("Journal Batch Name", GenJnlLine."Journal Batch Name");
+        GenJournalLine.SetRange("Document No.", CopyStr(AppliesToIDCode, 1, MaxStrLen(GenJournalLine."Document No.")));
+        exit(not GenJournalLine.IsEmpty());
+    end;
+
     trigger OnOpenPage()
     var
         OfficeMgt: Codeunit "Office Management";
@@ -725,18 +753,18 @@ page 233 "Apply Vendor Entries"
         Navigate: Page Navigate;
         GenJnlLineApply: Boolean;
         StyleTxt: Text;
-        VendEntryApplID: Code[50];
         AppliesToID: Code[50];
+        CustomAppliesToID: Code[50];
         ValidExchRate: Boolean;
         MustSelectEntryErr: Label 'You must select an applying entry before you can post the application.';
         PostingInWrongContextErr: Label 'You must post the application from the window where you entered the applying entry.';
         CannotSetAppliesToIDErr: Label 'You cannot set Applies-to ID while selecting Applies-to Doc. No.';
+        TimesSetCustomAppliesToID: Integer;
         CalledFromEntry: Boolean;
         ShowAppliedEntries: Boolean;
         OK: Boolean;
         EarlierPostingDateErr: Label 'You cannot apply and post an entry to an entry with an earlier posting date.\\Instead, post the document of type %1 with the number %2 and then apply it to the document of type %3 with the number %4.', Comment = '%1 - document type, %2 - document number,%3 - document type,%4 - document number';
         PostingDone: Boolean;
-        [InDataSet]
         AppliesToIDVisible: Boolean;
         ApplicationPostedMsg: Label 'The application was successfully posted.';
         ApplicationDateErr: Label 'The %1 entered must not be before the %1 on the %2.';
@@ -761,6 +789,7 @@ page 233 "Apply Vendor Entries"
         AppliedAmount: Decimal;
         ApplyingAmount: Decimal;
         PmtDiscAmount: Decimal;
+        VendEntryApplID: Code[50];
         ApplnCurrencyCode: Code[10];
         DifferentCurrenciesInAppln: Boolean;
         CalcType: Enum "Vendor Apply Calculation Type";
@@ -786,6 +815,25 @@ page 233 "Apply Vendor Entries"
         end;
 
         SetApplyingVendLedgEntry();
+    end;
+
+    internal procedure GetCustomAppliesToID(): Code[50]
+    begin
+        if TimesSetCustomAppliesToID <> 1 then
+            exit('');
+        exit(CustomAppliesToID);
+    end;
+
+    local procedure UpdateCustomAppliesToIDForGenJournal(NewAppliesToID: Code[50])
+    begin
+        if (not GenJnlLineApply) or (ApplnType <> ApplnType::"Applies-to ID") then
+            exit;
+        if JournalHasDocumentNo(NewAppliesToID) then
+            exit;
+        if (CustomAppliesToID = '') or ((CustomAppliesToID <> '') and (CustomAppliesToID <> NewAppliesToID)) then
+            TimesSetCustomAppliesToID += 1;
+
+        CustomAppliesToID := NewAppliesToID;
     end;
 
     local procedure RunVendEntryEdit(var VendorLedgerEntry: Record "Vendor Ledger Entry")
@@ -938,9 +986,9 @@ page 233 "Apply Vendor Entries"
             ApplyingAmount := TempApplyingVendLedgEntry."Remaining Amount";
             ApplnDate := TempApplyingVendLedgEntry."Posting Date";
             ApplnCurrencyCode := TempApplyingVendLedgEntry."Currency Code";
-            "Remit-to Code" := TempApplyingVendLedgEntry."Remit-to Code";
+            Rec."Remit-to Code" := TempApplyingVendLedgEntry."Remit-to Code";
         end;
-        OnSetApplyingVendLedgEntryOnBeforeCalcTypeDirectCalcApplnAmount(ApplyingAmount, TempApplyingVendLedgEntry, Rec);
+        OnSetApplyingVendLedgEntryOnBeforeCalcTypeDirectCalcApplnAmount(ApplyingAmount, TempApplyingVendLedgEntry);
     end;
 
     procedure SetVendApplId(CurrentRec: Boolean)
@@ -954,9 +1002,6 @@ page 233 "Apply Vendor Entries"
             VendLedgEntry.SetRecFilter()
         else
             CurrPage.SetSelectionFilter(VendLedgEntry);
-
-        OnSetVendApplIdOnAfterSetFilter(Rec, CurrentRec, VendLedgEntry, TempApplyingVendLedgEntry);
-
         CallVendEntrySetApplIDSetApplId();
 
         CalcApplnAmount();
@@ -1035,6 +1080,7 @@ page 233 "Apply Vendor Entries"
                         if TempApplyingVendLedgEntry."Entry No." <> 0 then begin
                             VendLedgEntry.CalcFields("Remaining Amount");
                             AppliedVendLedgEntry.SetFilter("Entry No.", '<>%1', VendLedgEntry."Entry No.");
+
                             OnCalcApplnAmountOnAfterAppliedVendLedgEntrySetFilter(AppliedVendLedgEntry, VendLedgEntry, Rec);
                         end;
 
@@ -1629,7 +1675,7 @@ page 233 "Apply Vendor Entries"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnSetApplyingVendLedgEntryOnBeforeCalcTypeDirectCalcApplnAmount(var ApplyingAmount: Decimal; var ApplyingVendorLedgerEntry: Record "Vendor Ledger Entry"; var VendorLedgerEntry: Record "Vendor Ledger Entry")
+    local procedure OnSetApplyingVendLedgEntryOnBeforeCalcTypeDirectCalcApplnAmount(var ApplyingAmount: Decimal; var ApplyingVendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 
@@ -1665,11 +1711,6 @@ page 233 "Apply Vendor Entries"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcApplnAmountOnAfterAppliedVendLedgEntrySetFilter(var AppliedVendorLedgerEntry: Record "Vendor Ledger Entry"; VendorLedgerEntry: Record "Vendor Ledger Entry"; var RecVendorLedgerEntry: Record "Vendor Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetVendApplIdOnAfterSetFilter(var RecVendorLedgerEntry: Record "Vendor Ledger Entry"; CurrentRec: Boolean; var VendorLedgerEntry: Record "Vendor Ledger Entry"; var TempApplyingVendorLedgerEntry: Record "Vendor Ledger Entry" temporary)
     begin
     end;
 }

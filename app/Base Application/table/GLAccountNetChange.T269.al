@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 table 269 "G/L Account Net Change"
 {
     Tabletype = temporary;

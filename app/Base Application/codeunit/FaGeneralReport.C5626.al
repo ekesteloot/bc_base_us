@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Ledger;
+
 codeunit 5626 "FA General Report"
 {
     Permissions = TableData "Fixed Asset" = rm;

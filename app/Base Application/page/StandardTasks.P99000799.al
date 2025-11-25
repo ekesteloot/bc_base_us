@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000799 "Standard Tasks"
 {
     ApplicationArea = Manufacturing;
@@ -13,12 +15,12 @@ page 99000799 "Standard Tasks"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the standard task code.';
                 }
-                field(Control4; Description)
+                field(Control4; Rec.Description)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the description of the standard task.';
@@ -54,7 +56,7 @@ page 99000799 "Standard Tasks"
                     Caption = 'Tools';
                     Image = Tools;
                     RunObject = Page "Standard Task Tools";
-                    RunPageLink = "Standard Task Code" = FIELD(Code);
+                    RunPageLink = "Standard Task Code" = field(Code);
                     ToolTip = 'View or edit information about tools that apply to operations that represent the standard task.';
                 }
                 action(Personnel)
@@ -63,7 +65,7 @@ page 99000799 "Standard Tasks"
                     Caption = 'Personnel';
                     Image = User;
                     RunObject = Page "Standard Task Personnel";
-                    RunPageLink = "Standard Task Code" = FIELD(Code);
+                    RunPageLink = "Standard Task Code" = field(Code);
                     ToolTip = 'View or edit information about personnel that applies to operations that represent the standard task.';
                 }
                 action(Description)
@@ -72,7 +74,7 @@ page 99000799 "Standard Tasks"
                     Caption = 'Description';
                     Image = Description;
                     RunObject = Page "Standard Task Descript. Sheet";
-                    RunPageLink = "Standard Task Code" = FIELD(Code);
+                    RunPageLink = "Standard Task Code" = field(Code);
                     ToolTip = 'View or edit a special description that applies to operations that represent the standard task. ';
                 }
                 action("Quality Measures")
@@ -81,7 +83,7 @@ page 99000799 "Standard Tasks"
                     Caption = 'Quality Measures';
                     Image = TaskQualityMeasure;
                     RunObject = Page "Standard Task Qlty Measures";
-                    RunPageLink = "Standard Task Code" = FIELD(Code);
+                    RunPageLink = "Standard Task Code" = field(Code);
                     ToolTip = 'View or edit information about quality measures that apply to operations that represent the standard task.';
                 }
             }

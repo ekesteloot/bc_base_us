@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Journal;
+
 enum 84 "IC Journal Account Type"
 {
     Extensible = true;

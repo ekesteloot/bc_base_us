@@ -1,3 +1,9 @@
+namespace System.Environment.Configuration;
+
+using System;
+using System.Reflection;
+using System.Tooling;
+
 page 9190 "Profile Customization List"
 {
     ApplicationArea = Basic, Suite;
@@ -29,14 +35,14 @@ page 9190 "Profile Customization List"
                     ToolTip = 'Specifies the ID of the app that provided the profile that this page customization applies to.';
                     Visible = false;
                 }
-                field("App Name"; ExtensionManagement.GetAppName("App ID"))
+                field("App Name"; ExtensionManagement.GetAppName(Rec."App ID"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Profile Source';
                     ToolTip = 'Specifies the origin of the profile that this page customization applies to, which can be either an extension, shown by its name, or a custom profile created by a user.';
                     Visible = false;
                 }
-                field(PageIdField; "Page ID")
+                field(PageIdField; Rec."Page ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Page ID';
@@ -50,7 +56,7 @@ page 9190 "Profile Customization List"
                     ToolTip = 'Specifies the caption of the page object that has been customized.';
                     Editable = false;
                 }
-                field(OwnerField; Owner)
+                field(OwnerField; Rec.Owner)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Owner';
@@ -110,7 +116,7 @@ page 9190 "Profile Customization List"
                 begin
                     ShowingOnlyErrors := true;
                     TempDesignerDiagnostics.Reset();
-                    TempDesignerDiagnostics.SetRange(Severity, Severity::Error);
+                    TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Error);
 
                     TenantProfilePageMetadata.CopyFilters(Rec);
                     if TenantProfilePageMetadata.FindSet() then
@@ -138,10 +144,10 @@ page 9190 "Profile Customization List"
 
                 trigger OnAction()
                 begin
-                    ClearMarks();
-                    MarkedOnly(false);
+                    Rec.ClearMarks();
+                    Rec.MarkedOnly(false);
                     ShowingOnlyErrors := false;
-                    if FindFirst() then;
+                    if Rec.FindFirst() then;
                     UpdateProfileDiagnosticsListPart();
                 end;
             }
@@ -170,7 +176,7 @@ page 9190 "Profile Customization List"
         Errors: Integer;
     begin
         TempDesignerDiagnostics.Reset();
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Error);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Error);
         Errors := TempDesignerDiagnostics.Count();
 
         if Errors > 0 then
@@ -204,12 +210,12 @@ page 9190 "Profile Customization List"
         CurrentProfileId: Code[30];
         CurrentAppId: Guid;
     begin
-        TotalProfiles := Count();
+        TotalProfiles := Rec.Count();
         TenantProfilePageMetadata.CopyFilters(Rec);
         TenantProfilePageMetadata.SetCurrentKey("App ID", "Profile ID");
         TenantProfilePageMetadata.SetAscending("App ID", true);
         TenantProfilePageMetadata.SetAscending("Profile ID", true);
-        TenantProfilePageMetadata.SetRange(Owner, Owner::Tenant); // We can only scan user created page customizations
+        TenantProfilePageMetadata.SetRange(Owner, Rec.Owner::Tenant); // We can only scan user created page customizations
         TotalProfiles := CountNumberOfProfilesWithinFilter(TenantProfilePageMetadata);
 
         TempDesignerDiagnostics.Reset();
@@ -257,25 +263,25 @@ page 9190 "Profile Customization List"
         OperationId: Guid;
     begin
         HealthStatusStyleExpr := 'Favorable';
-        if Owner = Owner::System then
+        if Rec.Owner = Rec.Owner::System then
             exit(CustomizationFromExtensionCannotBeScannedTxt);
 
-        if not SystemIdToOperationId.Get(SystemId, OperationId) then
+        if not SystemIdToOperationId.Get(Rec.SystemId, OperationId) then
             exit;
 
         TempDesignerDiagnostics.Reset();
         TempDesignerDiagnostics.SetRange("Operation ID", OperationId);
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Error);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Error);
         if TempDesignerDiagnostics.Count() > 0 then begin
             HealthStatusStyleExpr := 'Unfavorable';
             exit(StrSubstNo(PageValidationFailedWithErrorsTxt, TempDesignerDiagnostics.Count()));
         end;
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Warning);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Warning);
         if TempDesignerDiagnostics.Count() > 0 then begin
             HealthStatusStyleExpr := 'Ambiguous';
             exit(StrSubstNo(PageSuccessfullyValidatedWithWarningsTxt, TempDesignerDiagnostics.Count()));
         end;
-        TempDesignerDiagnostics.SetRange(Severity, Severity::Information);
+        TempDesignerDiagnostics.SetRange(Severity, Enum::Severity::Information);
         if TempDesignerDiagnostics.Count() > 0 then begin
             HealthStatusStyleExpr := 'Favorable';
             exit(StrSubstNo(PageSuccessfullyValidatedWithInformationalMessagesTxt, TempDesignerDiagnostics.Count()));
@@ -287,10 +293,10 @@ page 9190 "Profile Customization List"
     var
         PageMetadata: Record "Page Metadata";
     begin
-        if PageMetadata.Get("Page ID") then
+        if PageMetadata.Get(Rec."Page ID") then
             PageCaption := PageMetadata.Caption
         else
-            PageCaption := StrSubstNo(PageTxt, "Page ID");
+            PageCaption := StrSubstNo(PageTxt, Rec."Page ID");
 
         HealthStatus := CreatePageDiagnosticsMessageAndSetStyleExpr();
     end;
@@ -304,7 +310,7 @@ page 9190 "Profile Customization List"
     var
         OperationId: Guid;
     begin
-        if SystemIdToOperationId.Get(SystemId, OperationId) then;
+        if SystemIdToOperationId.Get(Rec.SystemId, OperationId) then;
         TempDesignerDiagnostics.Reset();
         TempDesignerDiagnostics.SetRange("Operation ID", OperationId);
         CurrPage.ProfileDiagnosticsListPart.Page.SetRecords(TempDesignerDiagnostics);
@@ -313,7 +319,7 @@ page 9190 "Profile Customization List"
 
     trigger OnDeleteRecord(): Boolean
     begin
-        if Owner <> Owner::Tenant then
+        if Rec.Owner <> Rec.Owner::Tenant then
             Error(CannotDeleteExtensionProfileErr);
     end;
 

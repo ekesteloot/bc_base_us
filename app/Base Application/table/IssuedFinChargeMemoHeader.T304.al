@@ -1,3 +1,19 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+using Microsoft.Shared.Navigate;
+using System.Globalization;
+using System.Security.AccessControl;
+using System.Text;
+
 table 304 "Issued Fin. Charge Memo Header"
 {
     Caption = 'Issued Fin. Charge Memo Header';
@@ -37,16 +53,12 @@ table 304 "Issued Fin. Charge Memo Header"
         {
             Caption = 'Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(8; City; Text[30])
         {
             Caption = 'City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(9; County; Text[30])
@@ -81,13 +93,13 @@ table 304 "Issued Fin. Charge Memo Header"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(16; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(17; "Customer Posting Group"; Code[20])
         {
@@ -139,49 +151,49 @@ table 304 "Issued Fin. Charge Memo Header"
         }
         field(30; Comment; Boolean)
         {
-            CalcFormula = Exist("Fin. Charge Comment Line" WHERE(Type = CONST("Issued Finance Charge Memo"),
-                                                                  "No." = FIELD("No.")));
+            CalcFormula = exist("Fin. Charge Comment Line" where(Type = const("Issued Finance Charge Memo"),
+                                                                  "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
         }
         field(31; "Remaining Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Issued Fin. Charge Memo Line"."Remaining Amount" WHERE("Finance Charge Memo No." = FIELD("No."),
-                                                                                       "Detailed Interest Rates Entry" = CONST(false)));
+            CalcFormula = sum("Issued Fin. Charge Memo Line"."Remaining Amount" where("Finance Charge Memo No." = field("No."),
+                                                                                       "Detailed Interest Rates Entry" = const(false)));
             Caption = 'Remaining Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(32; "Interest Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Issued Fin. Charge Memo Line".Amount WHERE("Finance Charge Memo No." = FIELD("No."),
-                                                                           Type = CONST("Customer Ledger Entry"),
-                                                                           "Detailed Interest Rates Entry" = CONST(false)));
+            CalcFormula = sum("Issued Fin. Charge Memo Line".Amount where("Finance Charge Memo No." = field("No."),
+                                                                           Type = const("Customer Ledger Entry"),
+                                                                           "Detailed Interest Rates Entry" = const(false)));
             Caption = 'Interest Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(33; "Additional Fee"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Issued Fin. Charge Memo Line".Amount WHERE("Finance Charge Memo No." = FIELD("No."),
-                                                                           Type = CONST("G/L Account")));
+            CalcFormula = sum("Issued Fin. Charge Memo Line".Amount where("Finance Charge Memo No." = field("No."),
+                                                                           Type = const("G/L Account")));
             Caption = 'Additional Fee';
             Editable = false;
             FieldClass = FlowField;
         }
         field(34; "VAT Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Issued Fin. Charge Memo Line"."VAT Amount" WHERE("Finance Charge Memo No." = FIELD("No."),
-                                                                                 "Detailed Interest Rates Entry" = CONST(false)));
+            CalcFormula = sum("Issued Fin. Charge Memo Line"."VAT Amount" where("Finance Charge Memo No." = field("No."),
+                                                                                 "Detailed Interest Rates Entry" = const(false)));
             Caption = 'VAT Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -195,8 +207,6 @@ table 304 "Issued Fin. Charge Memo Header"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(37; "No. Series"; Code[20])
         {
@@ -247,8 +257,6 @@ table 304 "Issued Fin. Charge Memo Header"
             Caption = 'Canceled By';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(52; "Canceled Date"; Date)
@@ -261,10 +269,15 @@ table 304 "Issued Fin. Charge Memo Header"
             Caption = 'Canceled By Document No.';
             DataClassification = CustomerContent;
         }
+        field(54; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(163; "Company Bank Account Code"; Code[20])
         {
             Caption = 'Company Bank Account Code';
-            TableRelation = "Bank Account" where("Currency Code" = FIELD("Currency Code"));
+            TableRelation = "Bank Account" where("Currency Code" = field("Currency Code"));
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -274,7 +287,7 @@ table 304 "Issued Fin. Charge Memo Header"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
     }

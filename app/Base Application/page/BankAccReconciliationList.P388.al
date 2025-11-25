@@ -1,7 +1,10 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 page 388 "Bank Acc. Reconciliation List"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Bank Account Reconciliations';
+    CardPageID = "Bank Acc. Reconciliation";
     Editable = false;
     PageType = List;
     SourceTable = "Bank Acc. Reconciliation";
@@ -16,32 +19,32 @@ page 388 "Bank Acc. Reconciliation List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(BankAccountNo; "Bank Account No.")
+                field(BankAccountNo; Rec."Bank Account No.")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the bank account that you want to reconcile with the bank''s statement.';
                 }
-                field("Bank Account Name"; "Bank Account Name")
+                field("Bank Account Name"; Rec."Bank Account Name")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank account that you want to reconcile.';
                 }
-                field(StatementNo; "Statement No.")
+                field(StatementNo; Rec."Statement No.")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the bank account statement.';
                 }
-                field(StatementDate; "Statement Date")
+                field(StatementDate; Rec."Statement Date")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the date on the bank account statement.';
                 }
-                field(BalanceLastStatement; "Balance Last Statement")
+                field(BalanceLastStatement; Rec."Balance Last Statement")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the ending balance shown on the last bank statement, which was used in the last posted bank reconciliation for this bank account.';
                 }
-                field(StatementEndingBalance; "Statement Ending Balance")
+                field(StatementEndingBalance; Rec."Statement Ending Balance")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the ending balance shown on the bank''s statement that you want to reconcile with the bank account.';
@@ -49,7 +52,7 @@ page 388 "Bank Acc. Reconciliation List"
                 field(AllowDuplicatedTransactions; Rec."Allow Duplicated Transactions")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies if the import of bank account reconciliation lines with the same transaction ID is allowed.';
+                    ToolTip = 'Specifies whether to allow bank account reconciliation lines to have the same transaction ID. Although it’s rare, this is useful when your bank statement file contains transactions with duplicate IDs. Most businesses leave this toggle turned off.';
                 }
             }
         }
@@ -169,11 +172,7 @@ page 388 "Bank Acc. Reconciliation List"
                         BankReconciliationMgt.Post(
                             Rec,
                             CODEUNIT::"Bank Acc. Recon. Post (Yes/No)",
-#if not CLEAN21
-                            CODEUNIT::"Bank Rec.-Post (Yes/No)"
-#else
                             CODEUNIT::"Bank Acc. Recon. Post (Yes/No)"
-#endif
                         );
                         Refresh();
                     end;
@@ -193,11 +192,7 @@ page 388 "Bank Acc. Reconciliation List"
                         BankReconciliationMgt.Post(
                             Rec,
                             CODEUNIT::"Bank Acc. Recon. Post+Print",
-#if not CLEAN21
-                            CODEUNIT::"Bank Rec.-Post + Print"
-#else
                             CODEUNIT::"Bank Acc. Recon. Post+Print"
-#endif
                         );
                         Refresh();
                     end;
@@ -209,9 +204,6 @@ page 388 "Bank Acc. Reconciliation List"
                 Caption = 'Change Statement No.';
                 Ellipsis = true;
                 Image = ChangeTo;
-#if not CLEAN20
-                Visible = ChangeStatementNoVisible;
-#endif                
                 ToolTip = 'Change the statement number of the bank account reconciliation. Typically, this is used when you have created a new reconciliation to correct a mistake, and you want to use the same statement number.';
 
                 trigger OnAction()
@@ -291,33 +283,17 @@ page 388 "Bank Acc. Reconciliation List"
     trigger OnOpenPage()
     begin
         Refresh();
-#if not CLEAN20
-        SetChangeStatementNoVisible();
-#endif                
     end;
 
     var
         UseSharedTable: Boolean;
-#if not CLEAN20
-        ChangeStatementNoVisible: Boolean;
-#endif                
         DeleteConfirmQst: Label 'Do you want to delete the Reconciliation?';
-
-#if not CLEAN20
-    local procedure SetChangeStatementNoVisible()
-    var
-        GLSetup: Record "General Ledger Setup";
-    begin
-        GLSetup.Get();
-        ChangeStatementNoVisible := GLSetup."Bank Recon. with Auto. Match";
-    end;
-#endif                
 
     local procedure Refresh()
     var
         BankReconciliationMgt: Codeunit "Bank Reconciliation Mgt.";
     begin
-        DeleteAll();
+        Rec.DeleteAll();
         BankReconciliationMgt.Refresh(Rec);
     end;
 }

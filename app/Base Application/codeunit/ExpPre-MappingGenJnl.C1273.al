@@ -1,4 +1,14 @@
-﻿codeunit 1273 "Exp. Pre-Mapping Gen. Jnl."
+namespace System.IO;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Vendor;
+
+codeunit 1273 "Exp. Pre-Mapping Gen. Jnl."
 {
     Permissions = TableData "Payment Export Data" = rimd;
     TableNo = "Data Exch.";
@@ -9,7 +19,7 @@
         Window: Dialog;
         LineNo: Integer;
     begin
-        GenJnlLine.SetRange("Data Exch. Entry No.", "Entry No.");
+        GenJnlLine.SetRange("Data Exch. Entry No.", Rec."Entry No.");
         GenJnlLine.FindSet();
 
         Window.Open(ProgressMsg);

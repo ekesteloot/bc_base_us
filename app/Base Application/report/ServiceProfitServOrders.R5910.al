@@ -1,7 +1,13 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Ledger;
+using System.Utilities;
+
 report 5910 "Service Profit (Serv. Orders)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceProfitServOrders.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceProfitServOrders.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Profit (Serv. Orders)';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 5910 "Service Profit (Serv. Orders)"
     {
         dataitem("Service Shipment Header"; "Service Shipment Header")
         {
-            DataItemTableView = SORTING("Order No.");
+            DataItemTableView = sorting("Order No.");
             RequestFilterFields = "Order No.", "Posting Date";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -68,8 +74,8 @@ report 5910 "Service Profit (Serv. Orders)"
             }
             dataitem("Service Ledger Entry"; "Service Ledger Entry")
             {
-                DataItemLink = "Service Order No." = FIELD("Order No.");
-                DataItemTableView = SORTING("Service Order No.", "Service Item No. (Serviced)", "Entry Type", "Moved from Prepaid Acc.", "Posting Date", Open, Type, "Service Contract No.") WHERE("Entry Type" = FILTER(Sale | Consume), Open = CONST(false));
+                DataItemLink = "Service Order No." = field("Order No.");
+                DataItemTableView = sorting("Service Order No.", "Service Item No. (Serviced)", "Entry Type", "Moved from Prepaid Acc.", "Posting Date", Open, Type, "Service Contract No.") where("Entry Type" = filter(Sale | Consume), Open = const(false));
                 column(TotalForServOrder; TotalForServOrderLbl)
                 {
                 }
@@ -118,8 +124,8 @@ report 5910 "Service Profit (Serv. Orders)"
                 }
                 dataitem("Service Ledger Entry 2"; "Service Ledger Entry")
                 {
-                    DataItemLink = "Service Order No." = FIELD("Service Order No."), Type = FIELD(Type), "No." = FIELD("No.");
-                    DataItemTableView = SORTING(Type, "No.", "Entry Type", "Moved from Prepaid Acc.", "Posting Date", Open, Prepaid) WHERE("Entry Type" = FILTER(Sale | Consume), Open = CONST(false));
+                    DataItemLink = "Service Order No." = field("Service Order No."), Type = field(Type), "No." = field("No.");
+                    DataItemTableView = sorting(Type, "No.", "Entry Type", "Moved from Prepaid Acc.", "Posting Date", Open, Prepaid) where("Entry Type" = filter(Sale | Consume), Open = const(false));
                     column(Description2_ServLedgEntry; Description)
                     {
                         IncludeCaption = true;
@@ -171,7 +177,7 @@ report 5910 "Service Profit (Serv. Orders)"
         }
         dataitem(GrandTotal; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(NCTotalAmountLCY; NCTotalAmountLCY)
             {
             }

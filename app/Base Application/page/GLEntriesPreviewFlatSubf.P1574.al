@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Security.User;
+
 page 1574 "G/L Entries Preview Flat Subf."
 {
     PageType = ListPart;
@@ -109,7 +115,7 @@ page 1574 "G/L Entries Preview Flat Subf."
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -124,7 +130,7 @@ page 1574 "G/L Entries Preview Flat Subf."
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry has been part of a reverse transaction (correction) made by the Reverse function.';
@@ -232,7 +238,7 @@ page 1574 "G/L Entries Preview Flat Subf."
 
                 trigger OnAction()
                 begin
-                    GenJnlPostPreview.ShowDimensions(DATABASE::"G/L Entry", "Entry No.", "Dimension Set ID");
+                    GenJnlPostPreview.ShowDimensions(DATABASE::"G/L Entry", Rec."Entry No.", Rec."Dimension Set ID");
                 end;
             }
         }
@@ -267,8 +273,8 @@ page 1574 "G/L Entries Preview Flat Subf."
     var
         RecRef: RecordRef;
     begin
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
 
         PostingPreviewEventHandler.GetEntries(DATABASE::"G/L Entry", RecRef);
         if RecRef.FindSet() then

@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 page 9804 "Permissions FactBox"
 {
     ObsoleteState = Pending;

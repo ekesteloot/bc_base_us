@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 page 5073 "Contact Int. Entries Subform"
 {
     Caption = 'Interaction Entries';
@@ -5,8 +7,8 @@ page 5073 "Contact Int. Entries Subform"
     LinksAllowed = false;
     PageType = ListPart;
     SourceTable = "Interaction Log Entry";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Entry No.")
+                      order(Descending);
 
     layout
     {
@@ -49,7 +51,7 @@ page 5073 "Contact Int. Entries Subform"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the description of the interaction.';
                 }
-                field(Attachment; "Attachment No." <> 0)
+                field(Attachment; Rec."Attachment No." <> 0)
                 {
                     ApplicationArea = RelationshipMgmt;
                     BlankZero = true;
@@ -58,11 +60,11 @@ page 5073 "Contact Int. Entries Subform"
 
                     trigger OnAssistEdit()
                     begin
-                        if "Attachment No." <> 0 then
-                            OpenAttachment();
+                        if Rec."Attachment No." <> 0 then
+                            Rec.OpenAttachment();
                     end;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies that a comment exists for this interaction log entry.';
@@ -77,12 +79,12 @@ page 5073 "Contact Int. Entries Subform"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the number of the campaign (if any) to which the interaction is linked. This field is not editable.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the date that you have entered in the Date field in the Create Interaction wizard or the Segment window when you created the interaction. The field is not editable.';
                 }
-                field(Evaluation; Evaluation)
+                field(Evaluation; Rec.Evaluation)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the evaluation of the interaction. There are five options: Very Positive, Positive, Neutral, Negative, and Very Negative.';
@@ -94,7 +96,7 @@ page 5073 "Contact Int. Entries Subform"
                     ToolTip = 'Specifies the time when the interaction was created. This field is not editable.';
                     Visible = false;
                 }
-                field(Canceled; Canceled)
+                field(Canceled; Rec.Canceled)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies whether the interaction has been canceled. The field is not editable.';
@@ -156,8 +158,8 @@ page 5073 "Contact Int. Entries Subform"
                     var
                         InteractLogEntry: Record "Interaction Log Entry";
                     begin
-                        InteractLogEntry.SetRange("Logged Segment Entry No.", "Logged Segment Entry No.");
-                        InteractLogEntry.SetRange("Entry No.", "Entry No.");
+                        InteractLogEntry.SetRange("Logged Segment Entry No.", Rec."Logged Segment Entry No.");
+                        InteractLogEntry.SetRange("Entry No.", Rec."Entry No.");
                         REPORT.RunModal(REPORT::"Resend Attachments", true, false, InteractLogEntry);
                     end;
                 }
@@ -222,7 +224,7 @@ page 5073 "Contact Int. Entries Subform"
                 var
                     InteractionMgt: Codeunit "Interaction Mgt.";
                 begin
-                    AssignNewOpportunity();
+                    Rec.AssignNewOpportunity();
                     InteractionMgt.ShowNotificationOpportunityCreated(Rec);
                     CurrPage.Update(false);
                 end;
@@ -235,7 +237,7 @@ page 5073 "Contact Int. Entries Subform"
                 Promoted = true;
                 PromotedCategory = Category4;
                 RunObject = Page "Inter. Log Entry Comment Sheet";
-                RunPageLink = "Entry No." = FIELD("Entry No.");
+                RunPageLink = "Entry No." = field("Entry No.");
                 ToolTip = 'View or add comments for the record.';
                 Scope = Repeater;
             }
@@ -244,23 +246,22 @@ page 5073 "Contact Int. Entries Subform"
 
     trigger OnAfterGetRecord()
     begin
-        EntryTitle := GetEntryTitle();
+        EntryTitle := Rec.GetEntryTitle();
 
-        ShowCreateOpportunity := CanCreateOpportunity();
+        ShowCreateOpportunity := Rec.CanCreateOpportunity();
     end;
 
     var
         InteractionLogEntry: Record "Interaction Log Entry";
         EntryTitle: Text;
-        [InDataSet]
         ShowCreateOpportunity: Boolean;
 
     local procedure ShowEntryAttachments()
     begin
-        if "Attachment No." <> 0 then
-            OpenAttachment()
+        if Rec."Attachment No." <> 0 then
+            Rec.OpenAttachment()
         else
-            ShowDocument();
+            Rec.ShowDocument();
     end;
 
     local procedure CreateInteractionBySubPageLink()

@@ -1,3 +1,7 @@
+namespace System.Threading;
+
+using System.IO;
+
 codeunit 448 "Job Queue Dispatcher"
 {
     Permissions = TableData "Job Queue Entry" = rimd;
@@ -12,7 +16,7 @@ codeunit 448 "Job Queue Dispatcher"
             exit;
 
         SelectLatestVersion();
-        Rec.Get(ID);
+        Rec.Get(Rec.ID);
         if not Rec.IsReadyToStart() then
             exit;
 
@@ -50,10 +54,9 @@ codeunit 448 "Job Queue Dispatcher"
         JobQueueEntry."User Session Started" := CurrentDateTime();
         JobQueueEntry."User Session ID" := SessionId();
         JobQueueEntry."User Service Instance ID" := ServiceInstanceId();
-        JobQueueEntry.Modify(); // Modify incase it fails when inserting Log Entry
+        JobQueueEntry.Modify(); 
 
         JobQueueEntry.InsertLogEntry(JobQueueLogEntry);
-        JobQueueEntry.Modify();
         // Codeunit.Run is limited during write transactions because one or more tables will be locked.
         // To avoid NavCSideException we have either to add the COMMIT before the call or do not use a returned value.
         Commit();
@@ -106,6 +109,9 @@ codeunit 448 "Job Queue Dispatcher"
         if not JobQueueCategory.Get(CurrJobQueueEntry."Job Queue Category Code") then
             exit(false);
 
+        JobQueueEntry.ReadIsolation := JobQueueEntry.ReadIsolation::ReadCommitted;
+        JobQueueEntry.SetLoadFields(ID, "Job Queue Category Code", Status, "User ID", "System Task ID");
+        JobQueueEntryCheck.SetLoadFields(ID, "Job Queue Category Code", Status, "User ID");
         JobQueueEntry.SetFilter(ID, '<>%1', CurrJobQueueEntry.ID);
         JobQueueEntry.SetRange("Job Queue Category Code", CurrJobQueueEntry."Job Queue Category Code");
         JobQueueEntry.SetRange(Status, JobQueueEntry.Status::"In Process");
@@ -117,6 +123,7 @@ codeunit 448 "Job Queue Dispatcher"
                     if (JobQueueEntry."User ID" = UserId()) and JobQueueEntryCheck.Get(JobQueueEntry.ID) then
                         Reschedule(JobQueueEntry);
             until JobQueueEntry.Next() = 0;
+        exit(false);
     end;
 
     local procedure DoesSystemTaskExist(TaskID: Guid): Boolean

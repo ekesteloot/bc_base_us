@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+
 page 1042 "Copy Job Planning Lines"
 {
     Caption = 'Copy Job Planning Lines';

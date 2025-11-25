@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Setup;
+
+using System.Reflection;
+
 page 5932 "Report Selection - Service"
 {
     ApplicationArea = Service;
@@ -53,6 +57,17 @@ page 5932 "Report Selection - Service"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the related document will be attached to the email.';
                 }
+                field(EmailBodyName; Rec."Email Body Layout Name")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the name of the email body layout that is used.';
+                }
+                field(EmailBodyPublisher; Rec."Email Body Layout Publisher")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the publisher of the email body layout that is used.';
+                    Visible = false;
+                }
                 field("Email Body Layout Code"; Rec."Email Body Layout Code")
                 {
                     ApplicationArea = Basic, Suite;
@@ -62,7 +77,8 @@ page 5932 "Report Selection - Service"
                 field("Email Body Layout Description"; Rec."Email Body Layout Description")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies a description of the email body layout that is used.';
+                    ToolTip = 'Specifies a description of the email body custom layout that is used.';
+                    Visible = CustomLayoutsExist;
 
                     trigger OnDrillDown()
                     var
@@ -102,10 +118,12 @@ page 5932 "Report Selection - Service"
     begin
         InitUsageFilter();
         SetUsageFilter(false);
+        CustomLayoutsExist := Rec.DoesAnyCustomLayotExist();
     end;
 
     var
         ReportUsage2: Enum "Report Selection Usage Service";
+        CustomLayoutsExist: Boolean;
 
     local procedure SetUsageFilter(ModifyRec: Boolean)
     begin
@@ -113,22 +131,22 @@ page 5932 "Report Selection - Service"
             if Rec.Modify() then;
         Rec.FilterGroup(2);
         case ReportUsage2 of
-            "Report Selection Usage Service"::Quote:
-                Rec.SetRange(Usage, "Report Selection Usage"::"SM.Quote");
-            "Report Selection Usage Service"::Order:
-                Rec.SetRange(Usage, "Report Selection Usage"::"SM.Order");
-            "Report Selection Usage Service"::Shipment:
-                Rec.SetRange(Usage, "Report Selection Usage"::"SM.Shipment");
-            "Report Selection Usage Service"::Invoice:
-                Rec.SetRange(Usage, "Report Selection Usage"::"SM.Invoice");
-            "Report Selection Usage Service"::"Credit Memo":
-                Rec.SetRange(Usage, "Report Selection Usage"::"SM.Credit Memo");
-            "Report Selection Usage Service"::"Contract Quote":
-                Rec.SetRange(Usage, "Report Selection Usage"::"SM.Contract Quote");
-            "Report Selection Usage Service"::Contract:
-                Rec.SetRange(Usage, "Report Selection Usage"::"SM.Contract");
-            "Report Selection Usage Service"::"Service Document - Test":
-                Rec.SetRange(Usage, "Report Selection Usage"::"SM.Test");
+            ReportUsage2::Quote:
+                Rec.SetRange(Usage, Rec.Usage::"SM.Quote");
+            ReportUsage2::Order:
+                Rec.SetRange(Usage, Rec.Usage::"SM.Order");
+            ReportUsage2::Shipment:
+                Rec.SetRange(Usage, Rec.Usage::"SM.Shipment");
+            ReportUsage2::Invoice:
+                Rec.SetRange(Usage, Rec.Usage::"SM.Invoice");
+            ReportUsage2::"Credit Memo":
+                Rec.SetRange(Usage, Rec.Usage::"SM.Credit Memo");
+            ReportUsage2::"Contract Quote":
+                Rec.SetRange(Usage, Rec.Usage::"SM.Contract Quote");
+            ReportUsage2::Contract:
+                Rec.SetRange(Usage, Rec.Usage::"SM.Contract");
+            ReportUsage2::"Service Document - Test":
+                Rec.SetRange(Usage, Rec.Usage::"SM.Test");
         end;
         OnSetUsageFilterOnAfterSetFiltersByReportUsage(Rec, ReportUsage2);
         Rec.FilterGroup(0);
@@ -142,22 +160,22 @@ page 5932 "Report Selection - Service"
         if Rec.GetFilter(Usage) <> '' then begin
             if Evaluate(ReportUsage, Rec.GetFilter(Usage)) then
                 case ReportUsage of
-                    "Report Selection Usage"::"SM.Quote":
-                        ReportUsage2 := "Report Selection Usage Service"::Quote;
-                    "Report Selection Usage"::"SM.Order":
-                        ReportUsage2 := "Report Selection Usage Service"::Order;
-                    "Report Selection Usage"::"SM.Shipment":
-                        ReportUsage2 := "Report Selection Usage Service"::Shipment;
-                    "Report Selection Usage"::"SM.Invoice":
-                        ReportUsage2 := "Report Selection Usage Service"::Invoice;
-                    "Report Selection Usage"::"SM.Credit Memo":
-                        ReportUsage2 := "Report Selection Usage Service"::"Credit Memo";
-                    "Report Selection Usage"::"SM.Contract Quote":
-                        ReportUsage2 := "Report Selection Usage Service"::"Contract Quote";
-                    "Report Selection Usage"::"SM.Contract":
-                        ReportUsage2 := "Report Selection Usage Service"::Contract;
-                    "Report Selection Usage"::"SM.Test":
-                        ReportUsage2 := "Report Selection Usage Service"::"Service Document - Test";
+                    ReportUsage::"SM.Quote":
+                        ReportUsage2 := ReportUsage2::Quote;
+                    ReportUsage::"SM.Order":
+                        ReportUsage2 := ReportUsage2::Order;
+                    ReportUsage::"SM.Shipment":
+                        ReportUsage2 := ReportUsage2::Shipment;
+                    ReportUsage::"SM.Invoice":
+                        ReportUsage2 := ReportUsage2::Invoice;
+                    ReportUsage::"SM.Credit Memo":
+                        ReportUsage2 := ReportUsage2::"Credit Memo";
+                    ReportUsage::"SM.Contract Quote":
+                        ReportUsage2 := ReportUsage2::"Contract Quote";
+                    ReportUsage::"SM.Contract":
+                        ReportUsage2 := ReportUsage2::Contract;
+                    ReportUsage::"SM.Test":
+                        ReportUsage2 := ReportUsage2::"Service Document - Test";
                     else
                         OnInitUsageFilterOnElseCase(ReportUsage, ReportUsage2);
                 end;

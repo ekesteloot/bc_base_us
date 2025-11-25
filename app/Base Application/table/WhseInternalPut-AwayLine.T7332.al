@@ -1,3 +1,16 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.WarehouseMgt.Worksheet;
+
 table 7332 "Whse. Internal Put-away Line"
 {
     Caption = 'Whse. Internal Put-away Line';
@@ -184,13 +197,13 @@ table 7332 "Whse. Internal Put-away Line"
         }
         field(25; "Put-away Qty."; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding" WHERE("Activity Type" = CONST("Put-away"),
-                                                                                  "Whse. Document Type" = CONST("Internal Put-away"),
-                                                                                  "Whse. Document No." = FIELD("No."),
-                                                                                  "Whse. Document Line No." = FIELD("Line No."),
-                                                                                  "Unit of Measure Code" = FIELD("Unit of Measure Code"),
-                                                                                  "Action Type" = FILTER(" " | Take),
-                                                                                  "Original Breakbulk" = CONST(false)));
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding" where("Activity Type" = const("Put-away"),
+                                                                                  "Whse. Document Type" = const("Internal Put-away"),
+                                                                                  "Whse. Document No." = field("No."),
+                                                                                  "Whse. Document Line No." = field("Line No."),
+                                                                                  "Unit of Measure Code" = field("Unit of Measure Code"),
+                                                                                  "Action Type" = filter(" " | Take),
+                                                                                  "Original Breakbulk" = const(false)));
             Caption = 'Put-away Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -198,12 +211,12 @@ table 7332 "Whse. Internal Put-away Line"
         }
         field(26; "Put-away Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding (Base)" WHERE("Activity Type" = CONST("Put-away"),
-                                                                                         "Whse. Document Type" = CONST("Internal Put-away"),
-                                                                                         "Whse. Document No." = FIELD("No."),
-                                                                                         "Whse. Document Line No." = FIELD("Line No."),
-                                                                                         "Action Type" = FILTER(" " | Take),
-                                                                                         "Original Breakbulk" = CONST(false)));
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding (Base)" where("Activity Type" = const("Put-away"),
+                                                                                         "Whse. Document Type" = const("Internal Put-away"),
+                                                                                         "Whse. Document No." = field("No."),
+                                                                                         "Whse. Document Line No." = field("Line No."),
+                                                                                         "Action Type" = filter(" " | Take),
+                                                                                         "Original Breakbulk" = const(false)));
             Caption = 'Put-away Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -249,7 +262,7 @@ table 7332 "Whse. Internal Put-away Line"
         {
             Caption = 'Variant Code';
             Editable = true;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
             trigger OnLookup()
             begin
@@ -260,7 +273,7 @@ table 7332 "Whse. Internal Put-away Line"
             var
                 ItemVariant: Record "Item Variant";
             begin
-                if "Variant Code" = '' then
+                if Rec."Variant Code" = '' then
                     Validate("Item No.")
                 else begin
                     ItemVariant.Get("Item No.", "Variant Code");
@@ -351,7 +364,7 @@ table 7332 "Whse. Internal Put-away Line"
                     Error(Text005);
 
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          DATABASE::"Whse. Internal Put-away Line", 0, "No.", '', 0, "Line No.", "Location Code", true);
+          Enum::TableID::"Whse. Internal Put-away Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true);
 
         DocStatus :=
           WhseInternalPutAwayHeader.GetDocumentStatus("Line No.");
@@ -682,7 +695,7 @@ table 7332 "Whse. Internal Put-away Line"
           "Qty. (Base)", "Qty. (Base)" - "Qty. Put Away (Base)" - "Put-away Qty. (Base)", "Qty. per Unit of Measure");
 
         OnOpenItemTrackingLinesOnBeforeSetSource(Rec, TempWhseWorksheetLine);
-        WhseItemTrackingLines.SetSource(TempWhseWorksheetLine, DATABASE::"Whse. Internal Put-away Line");
+        WhseItemTrackingLines.SetSource(TempWhseWorksheetLine, Enum::TableID::"Whse. Internal Put-away Line".AsInteger());
         WhseItemTrackingLines.RunModal();
         Clear(WhseItemTrackingLines);
     end;
@@ -800,7 +813,7 @@ table 7332 "Whse. Internal Put-away Line"
 
         Clear(WhseItemTrackingLines);
         OnSetItemTrackingLinesOnBeforeSetSource(Rec, TempWhseWorksheetLine);
-        WhseItemTrackingLines.SetSource(TempWhseWorksheetLine, DATABASE::"Whse. Internal Put-away Line");
+        WhseItemTrackingLines.SetSource(TempWhseWorksheetLine, Enum::TableID::"Whse. Internal Put-away Line".AsInteger());
         WhseItemTrackingLines.InsertItemTrackingLine(TempWhseWorksheetLine, WhseEntry, QtyToEmpty);
     end;
 

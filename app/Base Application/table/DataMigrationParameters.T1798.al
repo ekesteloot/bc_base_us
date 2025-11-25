@@ -1,3 +1,5 @@
+namespace System.Integration;
+
 table 1798 "Data Migration Parameters"
 {
     Caption = 'Data Migration Parameters';

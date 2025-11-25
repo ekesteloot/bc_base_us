@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.Foundation.ExtendedText;
+
 page 435 "Reminder Lines"
 {
     AutoSplitKey = true;
@@ -65,7 +69,7 @@ page 435 "Reminder Lines"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupDocNo();
+                        Rec.LookupDocNo();
                     end;
 
                     trigger OnValidate()
@@ -184,15 +188,10 @@ page 435 "Reminder Lines"
 
     var
         TransferExtendedText: Codeunit "Transfer Extended Text";
-        [InDataSet]
         DescriptionEmphasize: Boolean;
-        [InDataSet]
         DescriptionIndent: Integer;
-        [InDataSet]
         OriginalAmountEmphasize: Boolean;
-        [InDataSet]
         RemainingAmountEmphasize: Boolean;
-        [InDataSet]
         AmountEmphasize: Boolean;
         TypeIsGLAccount: Boolean;
         TypeIsCustomerLedgerEntry: Boolean;
@@ -221,30 +220,30 @@ page 435 "Reminder Lines"
 
     local procedure DescriptionOnFormat()
     begin
-        if "Detailed Interest Rates Entry" then
+        if Rec."Detailed Interest Rates Entry" then
             DescriptionIndent := 2;
-        DescriptionEmphasize := not "Detailed Interest Rates Entry";
+        DescriptionEmphasize := not Rec."Detailed Interest Rates Entry";
     end;
 
     local procedure OriginalAmountOnFormat()
     begin
-        OriginalAmountEmphasize := not "Detailed Interest Rates Entry";
+        OriginalAmountEmphasize := not Rec."Detailed Interest Rates Entry";
     end;
 
     local procedure RemainingAmountOnFormat()
     begin
-        RemainingAmountEmphasize := not "Detailed Interest Rates Entry";
+        RemainingAmountEmphasize := not Rec."Detailed Interest Rates Entry";
     end;
 
     local procedure AmountOnFormat()
     begin
-        AmountEmphasize := not "Detailed Interest Rates Entry";
+        AmountEmphasize := not Rec."Detailed Interest Rates Entry";
     end;
 
     local procedure SetShowMandatoryConditions()
     begin
-        TypeIsGLAccount := Type = Type::"G/L Account";
-        TypeIsCustomerLedgerEntry := Type = Type::"Customer Ledger Entry"
+        TypeIsGLAccount := Rec.Type = Rec.Type::"G/L Account";
+        TypeIsCustomerLedgerEntry := Rec.Type = Rec.Type::"Customer Ledger Entry"
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,4 +1,56 @@
-﻿table 18 Customer
+﻿namespace Microsoft.Sales.Customer;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.CRM.Setup;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.Graph;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Ledger;
+using Microsoft.ServiceMgt.Setup;
+using System;
+using System.Email;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+using System.Security.User;
+using System.Utilities;
+
+table 18 Customer
 {
     Caption = 'Customer';
     DataCaptionFields = "No.", Name;
@@ -24,7 +76,9 @@
                   tabledata "Customer Templ." = rm,
                   tabledata "General Ledger Setup" = r,
                   tabledata "Sales & Receivables Setup" = r,
-                  tabledata "Marketing Setup" = r;
+                  tabledata "Marketing Setup" = r,
+                  tabledata Language = r,
+                  tabledata "Language Selection" = r;
 
     fields
     {
@@ -68,11 +122,9 @@
         field(7; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -151,7 +203,7 @@
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("No."));
         }
         field(14; "Our Account No."; Text[20])
         {
@@ -166,24 +218,24 @@
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(17; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(18; "Chain Name"; Code[10])
@@ -192,7 +244,7 @@
         }
         field(19; "Budgeted Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Budgeted Amount';
         }
@@ -225,6 +277,11 @@
         {
             Caption = 'Language Code';
             TableRelation = Language;
+
+            trigger OnValidate()
+            begin
+                UpdateFormatRegion();
+            end;
         }
         field(25; "Registration Number"; Text[50])
         {
@@ -301,8 +358,6 @@
         {
             Caption = 'Invoice Disc. Code';
             TableRelation = Customer;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(34; "Customer Disc. Group"; Code[20])
@@ -329,14 +384,14 @@
         }
         field(37; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
         }
         field(38; Comment; Boolean)
         {
-            CalcFormula = Exist("Comment Line" WHERE("Table Name" = CONST(Customer),
-                                                      "No." = FIELD("No.")));
+            CalcFormula = exist("Comment Line" where("Table Name" = const(Customer),
+                                                      "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -393,6 +448,11 @@
                 UpdateDirectDebitPmtTermsCode();
             end;
         }
+        field(48; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(53; "Last Modified Date Time"; DateTime)
         {
             Caption = 'Last Modified Date Time';
@@ -413,23 +473,23 @@
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(57; "Global Dimension 2 Filter"; Code[20])
         {
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(58; Balance; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Customer No." = FIELD("No."),
-                                                                         "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Customer No." = field("No."),
+                                                                         "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                         "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Balance';
             Editable = false;
             FieldClass = FlowField;
@@ -437,23 +497,23 @@
         field(59; "Balance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                                 "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
+                                                                                 "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Balance (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(60; "Net Change"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Customer No." = FIELD("No."),
-                                                                         "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Posting Date" = FIELD("Date Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Customer No." = field("No."),
+                                                                         "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                         "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                         "Posting Date" = field("Date Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Net Change';
             Editable = false;
             FieldClass = FlowField;
@@ -461,11 +521,11 @@
         field(61; "Net Change (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                                 "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Posting Date" = FIELD("Date Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
+                                                                                 "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Posting Date" = field("Date Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Net Change (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -473,11 +533,11 @@
         field(62; "Sales (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Cust. Ledger Entry"."Sales (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                        "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                        "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                        "Posting Date" = FIELD("Date Filter"),
-                                                                        "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Cust. Ledger Entry"."Sales (LCY)" where("Customer No." = field("No."),
+                                                                        "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                        "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                        "Posting Date" = field("Date Filter"),
+                                                                        "Currency Code" = field("Currency Filter")));
             Caption = 'Sales (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -485,11 +545,11 @@
         field(63; "Profit (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Cust. Ledger Entry"."Profit (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                         "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Posting Date" = FIELD("Date Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Cust. Ledger Entry"."Profit (LCY)" where("Customer No." = field("No."),
+                                                                         "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                         "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                         "Posting Date" = field("Date Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Profit (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -497,11 +557,11 @@
         field(64; "Inv. Discounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Cust. Ledger Entry"."Inv. Discount (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                                "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Posting Date" = FIELD("Date Filter"),
-                                                                                "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Cust. Ledger Entry"."Inv. Discount (LCY)" where("Customer No." = field("No."),
+                                                                                "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Posting Date" = field("Date Filter"),
+                                                                                "Currency Code" = field("Currency Filter")));
             Caption = 'Inv. Discounts (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -509,25 +569,25 @@
         field(65; "Pmt. Discounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                                  "Entry Type" = FILTER("Payment Discount" .. "Payment Discount (VAT Adjustment)"),
-                                                                                  "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                  "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                  "Posting Date" = FIELD("Date Filter"),
-                                                                                  "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = - sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
+                                                                                  "Entry Type" = filter("Payment Discount" .. "Payment Discount (VAT Adjustment)"),
+                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                  "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                  "Posting Date" = field("Date Filter"),
+                                                                                  "Currency Code" = field("Currency Filter")));
             Caption = 'Pmt. Discounts (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(66; "Balance Due"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Customer No." = FIELD("No."),
-                                                                         "Initial Entry Due Date" = FIELD(UPPERLIMIT("Date Filter")),
-                                                                         "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Customer No." = field("No."),
+                                                                         "Initial Entry Due Date" = field(UPPERLIMIT("Date Filter")),
+                                                                         "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                         "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Balance Due';
             Editable = false;
             FieldClass = FlowField;
@@ -535,71 +595,71 @@
         field(67; "Balance Due (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                                 "Initial Entry Due Date" = FIELD(UPPERLIMIT("Date Filter")),
-                                                                                 "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
+                                                                                 "Initial Entry Due Date" = field(UPPERLIMIT("Date Filter")),
+                                                                                 "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Balance Due (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(69; Payments; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Initial Document Type" = CONST(Payment),
-                                                                          "Entry Type" = CONST("Initial Entry"),
-                                                                          "Customer No." = FIELD("No."),
-                                                                          "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                          "Posting Date" = FIELD("Date Filter"),
-                                                                          "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = - sum("Detailed Cust. Ledg. Entry".Amount where("Initial Document Type" = const(Payment),
+                                                                          "Entry Type" = const("Initial Entry"),
+                                                                          "Customer No." = field("No."),
+                                                                          "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                          "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                          "Posting Date" = field("Date Filter"),
+                                                                          "Currency Code" = field("Currency Filter")));
             Caption = 'Payments';
             Editable = false;
             FieldClass = FlowField;
         }
         field(70; "Invoice Amounts"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Initial Document Type" = CONST(Invoice),
-                                                                         "Entry Type" = CONST("Initial Entry"),
-                                                                         "Customer No." = FIELD("No."),
-                                                                         "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Posting Date" = FIELD("Date Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Initial Document Type" = const(Invoice),
+                                                                         "Entry Type" = const("Initial Entry"),
+                                                                         "Customer No." = field("No."),
+                                                                         "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                         "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                         "Posting Date" = field("Date Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Invoice Amounts';
             Editable = false;
             FieldClass = FlowField;
         }
         field(71; "Cr. Memo Amounts"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Initial Document Type" = CONST("Credit Memo"),
-                                                                          "Entry Type" = CONST("Initial Entry"),
-                                                                          "Customer No." = FIELD("No."),
-                                                                          "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                          "Posting Date" = FIELD("Date Filter"),
-                                                                          "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = - sum("Detailed Cust. Ledg. Entry".Amount where("Initial Document Type" = const("Credit Memo"),
+                                                                          "Entry Type" = const("Initial Entry"),
+                                                                          "Customer No." = field("No."),
+                                                                          "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                          "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                          "Posting Date" = field("Date Filter"),
+                                                                          "Currency Code" = field("Currency Filter")));
             Caption = 'Cr. Memo Amounts';
             Editable = false;
             FieldClass = FlowField;
         }
         field(72; "Finance Charge Memo Amounts"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Initial Document Type" = CONST("Finance Charge Memo"),
-                                                                         "Entry Type" = CONST("Initial Entry"),
-                                                                         "Customer No." = FIELD("No."),
-                                                                         "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Posting Date" = FIELD("Date Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Initial Document Type" = const("Finance Charge Memo"),
+                                                                         "Entry Type" = const("Initial Entry"),
+                                                                         "Customer No." = field("No."),
+                                                                         "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                         "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                         "Posting Date" = field("Date Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Finance Charge Memo Amounts';
             Editable = false;
             FieldClass = FlowField;
@@ -607,13 +667,13 @@
         field(74; "Payments (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Initial Document Type" = CONST(Payment),
-                                                                                  "Entry Type" = CONST("Initial Entry"),
-                                                                                  "Customer No." = FIELD("No."),
-                                                                                  "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                  "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                  "Posting Date" = FIELD("Date Filter"),
-                                                                                  "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = - sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const(Payment),
+                                                                                  "Entry Type" = const("Initial Entry"),
+                                                                                  "Customer No." = field("No."),
+                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                  "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                  "Posting Date" = field("Date Filter"),
+                                                                                  "Currency Code" = field("Currency Filter")));
             Caption = 'Payments (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -621,13 +681,13 @@
         field(75; "Inv. Amounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Initial Document Type" = CONST(Invoice),
-                                                                                 "Entry Type" = CONST("Initial Entry"),
-                                                                                 "Customer No." = FIELD("No."),
-                                                                                 "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Posting Date" = FIELD("Date Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const(Invoice),
+                                                                                 "Entry Type" = const("Initial Entry"),
+                                                                                 "Customer No." = field("No."),
+                                                                                 "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Posting Date" = field("Date Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Inv. Amounts (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -635,13 +695,13 @@
         field(76; "Cr. Memo Amounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Initial Document Type" = CONST("Credit Memo"),
-                                                                                  "Entry Type" = CONST("Initial Entry"),
-                                                                                  "Customer No." = FIELD("No."),
-                                                                                  "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                  "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                  "Posting Date" = FIELD("Date Filter"),
-                                                                                  "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = - sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const("Credit Memo"),
+                                                                                  "Entry Type" = const("Initial Entry"),
+                                                                                  "Customer No." = field("No."),
+                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                  "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                  "Posting Date" = field("Date Filter"),
+                                                                                  "Currency Code" = field("Currency Filter")));
             Caption = 'Cr. Memo Amounts (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -649,13 +709,13 @@
         field(77; "Fin. Charge Memo Amounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Initial Document Type" = CONST("Finance Charge Memo"),
-                                                                                 "Entry Type" = CONST("Initial Entry"),
-                                                                                 "Customer No." = FIELD("No."),
-                                                                                 "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Posting Date" = FIELD("Date Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const("Finance Charge Memo"),
+                                                                                 "Entry Type" = const("Initial Entry"),
+                                                                                 "Customer No." = field("No."),
+                                                                                 "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Posting Date" = field("Date Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Fin. Charge Memo Amounts (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -663,13 +723,13 @@
         field(78; "Outstanding Orders"; Decimal)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line"."Outstanding Amount" WHERE("Document Type" = CONST(Order),
-                                                                       "Bill-to Customer No." = FIELD("No."),
-                                                                       "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                       "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                       "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Sales Line"."Outstanding Amount" where("Document Type" = const(Order),
+                                                                       "Bill-to Customer No." = field("No."),
+                                                                       "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                       "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                       "Currency Code" = field("Currency Filter")));
             Caption = 'Outstanding Orders';
             Editable = false;
             FieldClass = FlowField;
@@ -677,13 +737,13 @@
         field(79; "Shipped Not Invoiced"; Decimal)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line"."Shipped Not Invoiced" WHERE("Document Type" = CONST(Order),
-                                                                         "Bill-to Customer No." = FIELD("No."),
-                                                                         "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Sales Line"."Shipped Not Invoiced" where("Document Type" = const(Order),
+                                                                         "Bill-to Customer No." = field("No."),
+                                                                         "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                         "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Shipped Not Invoiced';
             Editable = false;
             FieldClass = FlowField;
@@ -699,7 +759,7 @@
         field(83; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(84; "Fax No."; Text[30])
         {
@@ -768,11 +828,9 @@
         field(91; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -811,30 +869,30 @@
         }
         field(97; "Debit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Debit Amount" WHERE("Customer No." = FIELD("No."),
-                                                                                 "Entry Type" = FILTER(<> Application),
-                                                                                 "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Posting Date" = FIELD("Date Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Debit Amount" where("Customer No." = field("No."),
+                                                                                 "Entry Type" = filter(<> Application),
+                                                                                 "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Posting Date" = field("Date Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Debit Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(98; "Credit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Credit Amount" WHERE("Customer No." = FIELD("No."),
-                                                                                  "Entry Type" = FILTER(<> Application),
-                                                                                  "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                  "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                  "Posting Date" = FIELD("Date Filter"),
-                                                                                  "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Credit Amount" where("Customer No." = field("No."),
+                                                                                  "Entry Type" = filter(<> Application),
+                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                  "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                  "Posting Date" = field("Date Filter"),
+                                                                                  "Currency Code" = field("Currency Filter")));
             Caption = 'Credit Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -843,12 +901,12 @@
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Debit Amount (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                                       "Entry Type" = FILTER(<> Application),
-                                                                                       "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                       "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                       "Posting Date" = FIELD("Date Filter"),
-                                                                                       "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Debit Amount (LCY)" where("Customer No." = field("No."),
+                                                                                       "Entry Type" = filter(<> Application),
+                                                                                       "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                       "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                       "Posting Date" = field("Date Filter"),
+                                                                                       "Currency Code" = field("Currency Filter")));
             Caption = 'Debit Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -857,12 +915,12 @@
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Credit Amount (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                                        "Entry Type" = FILTER(<> Application),
-                                                                                        "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                        "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                        "Posting Date" = FIELD("Date Filter"),
-                                                                                        "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Credit Amount (LCY)" where("Customer No." = field("No."),
+                                                                                        "Entry Type" = filter(<> Application),
+                                                                                        "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                        "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                        "Posting Date" = field("Date Filter"),
+                                                                                        "Currency Code" = field("Currency Filter")));
             Caption = 'Credit Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -889,15 +947,15 @@
         }
         field(105; "Reminder Amounts"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Initial Document Type" = CONST(Reminder),
-                                                                         "Entry Type" = CONST("Initial Entry"),
-                                                                         "Customer No." = FIELD("No."),
-                                                                         "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Posting Date" = FIELD("Date Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Initial Document Type" = const(Reminder),
+                                                                         "Entry Type" = const("Initial Entry"),
+                                                                         "Customer No." = field("No."),
+                                                                         "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                         "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                         "Posting Date" = field("Date Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Reminder Amounts';
             Editable = false;
             FieldClass = FlowField;
@@ -905,13 +963,13 @@
         field(106; "Reminder Amounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Initial Document Type" = CONST(Reminder),
-                                                                                 "Entry Type" = CONST("Initial Entry"),
-                                                                                 "Customer No." = FIELD("No."),
-                                                                                 "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Posting Date" = FIELD("Date Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const(Reminder),
+                                                                                 "Entry Type" = const("Initial Entry"),
+                                                                                 "Customer No." = field("No."),
+                                                                                 "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Posting Date" = field("Date Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Reminder Amounts (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -956,11 +1014,11 @@
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line"."Outstanding Amount (LCY)" WHERE("Document Type" = CONST(Order),
-                                                                             "Bill-to Customer No." = FIELD("No."),
-                                                                             "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                             "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                             "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Sales Line"."Outstanding Amount (LCY)" where("Document Type" = const(Order),
+                                                                             "Bill-to Customer No." = field("No."),
+                                                                             "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                             "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                             "Currency Code" = field("Currency Filter")));
             Caption = 'Outstanding Orders (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -969,11 +1027,11 @@
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line"."Shipped Not Invoiced (LCY)" WHERE("Document Type" = CONST(Order),
-                                                                               "Bill-to Customer No." = FIELD("No."),
-                                                                               "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                               "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                               "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Sales Line"."Shipped Not Invoiced (LCY)" where("Document Type" = const(Order),
+                                                                               "Bill-to Customer No." = field("No."),
+                                                                               "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                               "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                               "Currency Code" = field("Currency Filter")));
             Caption = 'Shipped Not Invoiced (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -996,12 +1054,12 @@
         field(117; "Pmt. Disc. Tolerance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                                  "Entry Type" = FILTER("Payment Discount Tolerance" | "Payment Discount Tolerance (VAT Adjustment)" | "Payment Discount Tolerance (VAT Excl.)"),
-                                                                                  "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                  "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                  "Posting Date" = FIELD("Date Filter"),
-                                                                                  "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = - sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
+                                                                                  "Entry Type" = filter("Payment Discount Tolerance" | "Payment Discount Tolerance (VAT Adjustment)" | "Payment Discount Tolerance (VAT Excl.)"),
+                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                  "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                  "Posting Date" = field("Date Filter"),
+                                                                                  "Currency Code" = field("Currency Filter")));
             Caption = 'Pmt. Disc. Tolerance (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -1009,12 +1067,12 @@
         field(118; "Pmt. Tolerance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                                  "Entry Type" = FILTER("Payment Tolerance" | "Payment Tolerance (VAT Adjustment)" | "Payment Tolerance (VAT Excl.)"),
-                                                                                  "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                  "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                  "Posting Date" = FIELD("Date Filter"),
-                                                                                  "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = - sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
+                                                                                  "Entry Type" = filter("Payment Tolerance" | "Payment Tolerance (VAT Adjustment)" | "Payment Tolerance (VAT Excl.)"),
+                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                  "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                  "Posting Date" = field("Date Filter"),
+                                                                                  "Currency Code" = field("Currency Filter")));
             Caption = 'Pmt. Tolerance (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -1067,49 +1125,49 @@
         }
         field(120; Refunds; Decimal)
         {
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Initial Document Type" = CONST(Refund),
-                                                                         "Entry Type" = CONST("Initial Entry"),
-                                                                         "Customer No." = FIELD("No."),
-                                                                         "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Posting Date" = FIELD("Date Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Initial Document Type" = const(Refund),
+                                                                         "Entry Type" = const("Initial Entry"),
+                                                                         "Customer No." = field("No."),
+                                                                         "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                         "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                         "Posting Date" = field("Date Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Refunds';
             FieldClass = FlowField;
         }
         field(121; "Refunds (LCY)"; Decimal)
         {
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Initial Document Type" = CONST(Refund),
-                                                                                 "Entry Type" = CONST("Initial Entry"),
-                                                                                 "Customer No." = FIELD("No."),
-                                                                                 "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Posting Date" = FIELD("Date Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const(Refund),
+                                                                                 "Entry Type" = const("Initial Entry"),
+                                                                                 "Customer No." = field("No."),
+                                                                                 "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Posting Date" = field("Date Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Refunds (LCY)';
             FieldClass = FlowField;
         }
         field(122; "Other Amounts"; Decimal)
         {
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Initial Document Type" = CONST(" "),
-                                                                         "Entry Type" = CONST("Initial Entry"),
-                                                                         "Customer No." = FIELD("No."),
-                                                                         "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Posting Date" = FIELD("Date Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Initial Document Type" = const(" "),
+                                                                         "Entry Type" = const("Initial Entry"),
+                                                                         "Customer No." = field("No."),
+                                                                         "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                         "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                         "Posting Date" = field("Date Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Other Amounts';
             FieldClass = FlowField;
         }
         field(123; "Other Amounts (LCY)"; Decimal)
         {
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Initial Document Type" = CONST(" "),
-                                                                                 "Entry Type" = CONST("Initial Entry"),
-                                                                                 "Customer No." = FIELD("No."),
-                                                                                 "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Posting Date" = FIELD("Date Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const(" "),
+                                                                                 "Entry Type" = const("Initial Entry"),
+                                                                                 "Customer No." = field("No."),
+                                                                                 "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Posting Date" = field("Date Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Other Amounts (LCY)';
             FieldClass = FlowField;
         }
@@ -1124,11 +1182,11 @@
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line"."Outstanding Amount (LCY)" WHERE("Document Type" = CONST(Invoice),
-                                                                             "Bill-to Customer No." = FIELD("No."),
-                                                                             "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                             "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                             "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Sales Line"."Outstanding Amount (LCY)" where("Document Type" = const(Invoice),
+                                                                             "Bill-to Customer No." = field("No."),
+                                                                             "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                             "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                             "Currency Code" = field("Currency Filter")));
             Caption = 'Outstanding Invoices (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -1136,28 +1194,28 @@
         field(126; "Outstanding Invoices"; Decimal)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line"."Outstanding Amount" WHERE("Document Type" = CONST(Invoice),
-                                                                       "Bill-to Customer No." = FIELD("No."),
-                                                                       "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                       "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                       "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Sales Line"."Outstanding Amount" where("Document Type" = const(Invoice),
+                                                                       "Bill-to Customer No." = field("No."),
+                                                                       "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                       "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                       "Currency Code" = field("Currency Filter")));
             Caption = 'Outstanding Invoices';
             Editable = false;
             FieldClass = FlowField;
         }
         field(130; "Bill-to No. Of Archived Doc."; Integer)
         {
-            CalcFormula = Count("Sales Header Archive" WHERE("Document Type" = CONST(Order),
-                                                              "Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header Archive" where("Document Type" = const(Order),
+                                                              "Bill-to Customer No." = field("No.")));
             Caption = 'Bill-to No. Of Archived Doc.';
             FieldClass = FlowField;
         }
         field(131; "Sell-to No. Of Archived Doc."; Integer)
         {
-            CalcFormula = Count("Sales Header Archive" WHERE("Document Type" = CONST(Order),
-                                                              "Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header Archive" where("Document Type" = const(Order),
+                                                              "Sell-to Customer No." = field("No.")));
             Caption = 'Sell-to No. Of Archived Doc.';
             FieldClass = FlowField;
         }
@@ -1203,7 +1261,7 @@
         field(288; "Preferred Bank Account Code"; Code[20])
         {
             Caption = 'Preferred Bank Account Code';
-            TableRelation = "Customer Bank Account".Code WHERE("Customer No." = FIELD("No."));
+            TableRelation = "Customer Bank Account".Code where("Customer No." = field("No."));
         }
         field(720; "Coupled to CRM"; Boolean)
         {
@@ -1307,7 +1365,7 @@
         field(5792; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
 
             trigger OnValidate()
             begin
@@ -1328,9 +1386,9 @@
         field(5902; "Contract Gain/Loss Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Contract Gain/Loss Entry".Amount WHERE("Customer No." = FIELD("No."),
-                                                                       "Ship-to Code" = FIELD("Ship-to Filter"),
-                                                                       "Change Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Contract Gain/Loss Entry".Amount where("Customer No." = field("No."),
+                                                                       "Ship-to Code" = field("Ship-to Filter"),
+                                                                       "Change Date" = field("Date Filter")));
             Caption = 'Contract Gain/Loss Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -1339,16 +1397,16 @@
         {
             Caption = 'Ship-to Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("No."));
         }
         field(5910; "Outstanding Serv. Orders (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Service Line"."Outstanding Amount (LCY)" WHERE("Document Type" = CONST(Order),
-                                                                               "Bill-to Customer No." = FIELD("No."),
-                                                                               "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                               "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                               "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Service Line"."Outstanding Amount (LCY)" where("Document Type" = const(Order),
+                                                                               "Bill-to Customer No." = field("No."),
+                                                                               "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                               "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                               "Currency Code" = field("Currency Filter")));
             Caption = 'Outstanding Serv. Orders (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -1356,11 +1414,11 @@
         field(5911; "Serv Shipped Not Invoiced(LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Service Line"."Shipped Not Invoiced (LCY)" WHERE("Document Type" = CONST(Order),
-                                                                                 "Bill-to Customer No." = FIELD("No."),
-                                                                                 "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Service Line"."Shipped Not Invoiced (LCY)" where("Document Type" = const(Order),
+                                                                                 "Bill-to Customer No." = field("No."),
+                                                                                 "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                 "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Serv Shipped Not Invoiced(LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -1368,11 +1426,11 @@
         field(5912; "Outstanding Serv.Invoices(LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Service Line"."Outstanding Amount (LCY)" WHERE("Document Type" = CONST(Invoice),
-                                                                               "Bill-to Customer No." = FIELD("No."),
-                                                                               "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                               "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                               "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Service Line"."Outstanding Amount (LCY)" where("Document Type" = const(Invoice),
+                                                                               "Bill-to Customer No." = field("No."),
+                                                                               "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                               "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                               "Currency Code" = field("Currency Filter")));
             Caption = 'Outstanding Serv.Invoices(LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -1397,8 +1455,8 @@
         }
         field(7171; "No. of Quotes"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Quote),
-                                                      "Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Quote),
+                                                      "Sell-to Customer No." = field("No.")));
             Caption = 'No. of Quotes';
             Editable = false;
             FieldClass = FlowField;
@@ -1406,8 +1464,8 @@
         field(7172; "No. of Blanket Orders"; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST("Blanket Order"),
-                                                      "Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const("Blanket Order"),
+                                                      "Sell-to Customer No." = field("No.")));
             Caption = 'No. of Blanket Orders';
             Editable = false;
             FieldClass = FlowField;
@@ -1415,16 +1473,16 @@
         field(7173; "No. of Orders"; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Order),
-                                                      "Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Order),
+                                                      "Sell-to Customer No." = field("No.")));
             Caption = 'No. of Orders';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7174; "No. of Invoices"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Invoice),
-                                                      "Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Invoice),
+                                                      "Sell-to Customer No." = field("No.")));
             Caption = 'No. of Invoices';
             Editable = false;
             FieldClass = FlowField;
@@ -1432,59 +1490,59 @@
         field(7175; "No. of Return Orders"; Integer)
         {
             AccessByPermission = TableData "Return Receipt Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST("Return Order"),
-                                                      "Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const("Return Order"),
+                                                      "Sell-to Customer No." = field("No.")));
             Caption = 'No. of Return Orders';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7176; "No. of Credit Memos"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST("Credit Memo"),
-                                                      "Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const("Credit Memo"),
+                                                      "Sell-to Customer No." = field("No.")));
             Caption = 'No. of Credit Memos';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7177; "No. of Pstd. Shipments"; Integer)
         {
-            CalcFormula = Count("Sales Shipment Header" WHERE("Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Shipment Header" where("Sell-to Customer No." = field("No.")));
             Caption = 'No. of Pstd. Shipments';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7178; "No. of Pstd. Invoices"; Integer)
         {
-            CalcFormula = Count("Sales Invoice Header" WHERE("Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Invoice Header" where("Sell-to Customer No." = field("No.")));
             Caption = 'No. of Pstd. Invoices';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7179; "No. of Pstd. Return Receipts"; Integer)
         {
-            CalcFormula = Count("Return Receipt Header" WHERE("Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Return Receipt Header" where("Sell-to Customer No." = field("No.")));
             Caption = 'No. of Pstd. Return Receipts';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7180; "No. of Pstd. Credit Memos"; Integer)
         {
-            CalcFormula = Count("Sales Cr.Memo Header" WHERE("Sell-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Cr.Memo Header" where("Sell-to Customer No." = field("No.")));
             Caption = 'No. of Pstd. Credit Memos';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7181; "No. of Ship-to Addresses"; Integer)
         {
-            CalcFormula = Count("Ship-to Address" WHERE("Customer No." = FIELD("No.")));
+            CalcFormula = count("Ship-to Address" where("Customer No." = field("No.")));
             Caption = 'No. of Ship-to Addresses';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7182; "Bill-To No. of Quotes"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Quote),
-                                                      "Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Quote),
+                                                      "Bill-to Customer No." = field("No.")));
             Caption = 'Bill-To No. of Quotes';
             Editable = false;
             FieldClass = FlowField;
@@ -1492,8 +1550,8 @@
         field(7183; "Bill-To No. of Blanket Orders"; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST("Blanket Order"),
-                                                      "Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const("Blanket Order"),
+                                                      "Bill-to Customer No." = field("No.")));
             Caption = 'Bill-To No. of Blanket Orders';
             Editable = false;
             FieldClass = FlowField;
@@ -1501,16 +1559,16 @@
         field(7184; "Bill-To No. of Orders"; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Order),
-                                                      "Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Order),
+                                                      "Bill-to Customer No." = field("No.")));
             Caption = 'Bill-To No. of Orders';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7185; "Bill-To No. of Invoices"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST(Invoice),
-                                                      "Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const(Invoice),
+                                                      "Bill-to Customer No." = field("No.")));
             Caption = 'Bill-To No. of Invoices';
             Editable = false;
             FieldClass = FlowField;
@@ -1518,44 +1576,44 @@
         field(7186; "Bill-To No. of Return Orders"; Integer)
         {
             AccessByPermission = TableData "Return Receipt Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST("Return Order"),
-                                                      "Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const("Return Order"),
+                                                      "Bill-to Customer No." = field("No.")));
             Caption = 'Bill-To No. of Return Orders';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7187; "Bill-To No. of Credit Memos"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = CONST("Credit Memo"),
-                                                      "Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Header" where("Document Type" = const("Credit Memo"),
+                                                      "Bill-to Customer No." = field("No.")));
             Caption = 'Bill-To No. of Credit Memos';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7188; "Bill-To No. of Pstd. Shipments"; Integer)
         {
-            CalcFormula = Count("Sales Shipment Header" WHERE("Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Shipment Header" where("Bill-to Customer No." = field("No.")));
             Caption = 'Bill-To No. of Pstd. Shipments';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7189; "Bill-To No. of Pstd. Invoices"; Integer)
         {
-            CalcFormula = Count("Sales Invoice Header" WHERE("Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Invoice Header" where("Bill-to Customer No." = field("No.")));
             Caption = 'Bill-To No. of Pstd. Invoices';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7190; "Bill-To No. of Pstd. Return R."; Integer)
         {
-            CalcFormula = Count("Return Receipt Header" WHERE("Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Return Receipt Header" where("Bill-to Customer No." = field("No.")));
             Caption = 'Bill-To No. of Pstd. Return R.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7191; "Bill-To No. of Pstd. Cr. Memos"; Integer)
         {
-            CalcFormula = Count("Sales Cr.Memo Header" WHERE("Bill-to Customer No." = FIELD("No.")));
+            CalcFormula = count("Sales Cr.Memo Header" where("Bill-to Customer No." = field("No.")));
             Caption = 'Bill-To No. of Pstd. Cr. Memos';
             Editable = false;
             FieldClass = FlowField;
@@ -1632,7 +1690,7 @@
         }
         field(9004; "Tax Area Display Name"; Text[100])
         {
-            CalcFormula = Lookup("Tax Area".Description WHERE(Code = FIELD("Tax Area Code")));
+            CalcFormula = Lookup("Tax Area".Description where(Code = field("Tax Area Code")));
             Caption = 'Tax Area Display Name';
             FieldClass = FlowField;
             ObsoleteReason = 'This field is not needed and it should not be used.';
@@ -1675,13 +1733,13 @@
         }
         field(10021; "Balance on Date"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Customer No." = FIELD("No."),
-                                                                         "Posting Date" = FIELD(UPPERLIMIT("Date Filter")),
-                                                                         "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                         "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                         "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Customer No." = field("No."),
+                                                                         "Posting Date" = field(UPPERLIMIT("Date Filter")),
+                                                                         "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                         "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                         "Currency Code" = field("Currency Filter")));
             Caption = 'Balance on Date';
             Editable = false;
             FieldClass = FlowField;
@@ -1689,11 +1747,11 @@
         field(10022; "Balance on Date (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Customer No." = FIELD("No."),
-                                                                                 "Posting Date" = FIELD(UPPERLIMIT("Date Filter")),
-                                                                                 "Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Currency Code" = FIELD("Currency Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
+                                                                                 "Posting Date" = field(UPPERLIMIT("Date Filter")),
+                                                                                 "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Currency Code" = field("Currency Filter")));
             Caption = 'Balance on Date (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -1763,11 +1821,11 @@
         {
             Caption = 'CFDI General Public';
         }
-        field(27006; "CFDI Period"; Option) 
+        field(27006; "CFDI Period"; Option)
         {
             Caption = 'CFDI Period';
             OptionCaption = 'Diario,Semanal,Quincenal,Mensual';
-            OptionMembers = "Diario","Semanal","Quincenal","Mensual"; 
+            OptionMembers = "Diario","Semanal","Quincenal","Mensual";
         }
         field(27007; "CFDI Customer Name"; Text[300])
         {
@@ -2645,8 +2703,8 @@
     begin
         exit(
             ContBusRel.GetLinkedTables(
-                "Contact Business Relation Link To Table"::Customer, "No.",
-                "Contact Business Relation Link To Table"::Vendor))
+                Enum::"Contact Business Relation Link To Table"::Customer, "No.",
+                Enum::"Contact Business Relation Link To Table"::Vendor))
     end;
 
     procedure GetCustNo(CustomerText: Text): Text
@@ -2871,7 +2929,7 @@
     procedure ToPriceSource(var PriceSource: Record "Price Source")
     begin
         PriceSource.Init();
-        PriceSource."Price Type" := "Price Type"::Sale;
+        PriceSource."Price Type" := PriceSource."Price Type"::Sale;
         PriceSource.Validate("Source Type", PriceSource."Source Type"::Customer);
         PriceSource.Validate("Source No.", "No.");
     end;
@@ -3430,6 +3488,21 @@
         SalesSetup.Get();
         if SalesSetup."Allow Multiple Posting Groups" then
             TestField("Allow Multiple Posting Groups");
+    end;
+
+    local procedure UpdateFormatRegion();
+    var
+        Language: Record Language;
+        LanguageSelection: Record "Language Selection";
+    begin
+        if (Rec."Format Region" <> '') then
+            exit;
+        if not Language.Get("Language Code") then
+            exit;
+
+        LanguageSelection.SetRange("Language ID", Language."Windows Language ID");
+        if LanguageSelection.FindFirst() then
+            Rec.Validate("Format Region", LanguageSelection."Language Tag");
     end;
 
     [IntegrationEvent(false, false)]

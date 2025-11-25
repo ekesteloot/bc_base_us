@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8620 "Config. Template List"
 {
     AdditionalSearchTerms = 'rapid start implementation migrate setup templates';
@@ -19,7 +21,7 @@ page 8620 "Config. Template List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code of the data template.';

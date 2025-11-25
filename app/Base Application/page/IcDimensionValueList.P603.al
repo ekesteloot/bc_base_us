@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Dimension;
+
 page 603 "IC Dimension Value List"
 {
     Caption = 'Intercompany Dimension Value List';
@@ -14,7 +16,7 @@ page 603 "IC Dimension Value List"
                 IndentationColumn = NameIndent;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Dimensions;
                     Style = Strong;
@@ -56,15 +58,13 @@ page 603 "IC Dimension Value List"
     end;
 
     var
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     local procedure FormatLine()
     begin
-        Emphasize := "Dimension Value Type" <> "Dimension Value Type"::Standard;
-        NameIndent := Indentation;
+        Emphasize := Rec."Dimension Value Type" <> Rec."Dimension Value Type"::Standard;
+        NameIndent := Rec.Indentation;
     end;
 }
 

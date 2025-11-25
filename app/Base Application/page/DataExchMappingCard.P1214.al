@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1214 "Data Exch Mapping Card"
 {
     Caption = 'Field Mapping';

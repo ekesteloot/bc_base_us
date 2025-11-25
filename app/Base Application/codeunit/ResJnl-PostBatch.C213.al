@@ -1,3 +1,11 @@
+﻿namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using System.Utilities;
+
 codeunit 213 "Res. Jnl.-Post Batch"
 {
     Permissions = TableData "Res. Journal Batch" = rimd;

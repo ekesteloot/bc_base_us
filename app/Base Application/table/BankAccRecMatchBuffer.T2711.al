@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 table 2711 "Bank Acc. Rec. Match Buffer"
 {
     Caption = 'Bank Account Reconciliation Many-to-One Matchings';

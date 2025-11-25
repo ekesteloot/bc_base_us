@@ -1,13 +1,15 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
 codeunit 5888 "Phys. Invt.-Calc. Qty. One"
 {
     TableNo = "Phys. Invt. Order Line";
 
     trigger OnRun()
     begin
-        PhysInvtOrderLine.Get("Document No.", "Line No.");
+        PhysInvtOrderLine.Get(Rec."Document No.", Rec."Line No.");
 
         if not Confirm(
-             StrSubstNo(ConfirmCalculationQst, FieldCaption("Qty. Expected (Base)")), false)
+             StrSubstNo(ConfirmCalculationQst, Rec.FieldCaption("Qty. Expected (Base)")), false)
         then
             exit;
 

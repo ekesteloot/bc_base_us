@@ -1,3 +1,9 @@
+﻿namespace System.Telemetry;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Threading;
+
 codeunit 1350 "Telemetry Management"
 {
     var
@@ -43,50 +49,6 @@ codeunit 1350 "Telemetry Management"
 
         Session.LogMessage('0000ADZ', TelemetryJobCreatedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', DailyTelemetryCategoryTxt);
     end;
-
-#if not CLEAN20
-    [Obsolete('Calendar events are not used for sending telemetry anymore. Subscibe to OnSendDailyTelemetry event instead.', '20.0')]
-    procedure ScheduleCalEventsForTelemetryAsync(TelemetryCodeunitRecID: RecordID; CalEventsCodeunit: Integer; ExecutionDelayInSeconds: Integer)
-    var
-        ClientTypeManagement: Codeunit "Client Type Management";
-    begin
-        if not GuiAllowed then
-            exit;
-
-        if CanScheduleTask() and (ExecutionDelayInSeconds >= 0) and (CalEventsCodeunit > 0) then
-            if not (ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::Background, CLIENTTYPE::NAS, CLIENTTYPE::Management]) then
-                TASKSCHEDULER.CreateTask(CalEventsCodeunit, 0, true, CompanyName,
-                  CurrentDateTime + (ExecutionDelayInSeconds * 1000), TelemetryCodeunitRecID);
-    end;
-
-    [Obsolete('Calendar events are not used for sending telemetry anymore. Subscibe to OnSendDailyTelemetry event instead.', '20.0')]
-    procedure DoesTelemetryCalendarEventExist(EventDate: Date; Description: Text[100]; CodeunitID: Integer): Boolean
-    var
-        CalendarEvent: Record "Calendar Event";
-    begin
-        if not CalendarEvent.ReadPermission then
-            exit;
-        CalendarEvent.SetRange(Description, Description);
-        CalendarEvent.SetRange("Scheduled Date", EventDate);
-        CalendarEvent.SetRange("Object ID to Run", CodeunitID);
-        CalendarEvent.SetRange(Type, CalendarEvent.Type::System);
-        exit(not CalendarEvent.IsEmpty);
-    end;
-
-    local procedure CanScheduleTask(): Boolean
-    var
-        DoNotScheduleTask: Boolean;
-    begin
-        OnBeforeTelemetryScheduleTask(DoNotScheduleTask);
-        exit(not DoNotScheduleTask and TASKSCHEDULER.CanCreateTask());
-    end;
-
-    [Obsolete('Calendar events are not used for sending telemetry anymore. Subscibe to OnSendDailyTelemetry event instead.', '20.0')]
-    [IntegrationEvent(false, false)]
-    procedure OnBeforeTelemetryScheduleTask(var DoNotScheduleTask: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnSendDailyTelemetry()

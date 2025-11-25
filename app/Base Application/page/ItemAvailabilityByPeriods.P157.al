@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using System.Utilities;
+
 page 157 "Item Availability by Periods"
 {
     Caption = 'Item Availability by Periods';
@@ -91,12 +97,12 @@ page 157 "Item Availability by Periods"
                         Caption = 'Variant';
                         Image = ItemVariant;
                         RunObject = Page "Item Availability by Variant";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'View or edit the item''s variants. Instead of setting up each color of an item as a separate item, you can set up the various colors as variants of the item.';
                     }
                     action(Location)
@@ -105,12 +111,12 @@ page 157 "Item Availability by Periods"
                         Caption = 'Location';
                         Image = Warehouse;
                         RunObject = Page "Item Availability by Location";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'View the actual and projected quantity of the item per location.';
                     }
                     action("BOM Level")
@@ -132,7 +138,7 @@ page 157 "Item Availability by Periods"
 
     trigger OnAfterGetRecord()
     begin
-        SetRange("Drop Shipment Filter", false);
+        Rec.SetRange("Drop Shipment Filter", false);
         UpdateSubForm();
     end;
 

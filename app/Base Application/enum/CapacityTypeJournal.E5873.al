@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 enum 5873 "Capacity Type Journal"
 {
     Extensible = true;

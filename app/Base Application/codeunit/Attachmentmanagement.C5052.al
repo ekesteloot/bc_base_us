@@ -1,3 +1,16 @@
+﻿namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using System.Azure.Identity;
+using System.Email;
+using System.Integration;
+using System.IO;
+using System.Security.AccessControl;
+using System.Utilities;
+
 codeunit 5052 AttachmentManagement
 {
 
@@ -240,17 +253,21 @@ codeunit 5052 AttachmentManagement
         FileManagement: Codeunit "File Management";
         ContentBodyText: Text;
         CustomLayoutNo: Code[20];
+        CustomLayoutName: Text[250];
     begin
         Clear(EmailMerge);
         FileName := FileManagement.ServerTempFileName('html');
         if FileName = '' then
             exit;
 
-        Attachment.ReadHTMLCustomLayoutAttachment(ContentBodyText, CustomLayoutNo);
-        ReportLayoutSelection.SetTempLayoutSelected(CustomLayoutNo);
+        Attachment.ReadHTMLCustomLayoutAttachment(ContentBodyText, CustomLayoutNo, CustomLayoutName);
+        if CustomLayoutName <> '' then
+            ReportLayoutSelection.SetTempLayoutSelectedName(CustomLayoutName)
+        else
+            ReportLayoutSelection.SetTempLayoutSelected(CustomLayoutNo);
         EmailMerge.InitializeRequest(SegmentLine, ContentBodyText);
         EmailMerge.SaveAsHtml(FileName);
-        ReportLayoutSelection.SetTempLayoutSelected('');
+        ReportLayoutSelection.ClearTempLayoutSelected();
     end;
 
     local procedure InitializeExchange(var ExchangeWebServicesServer: Codeunit "Exchange Web Services Server")
@@ -535,7 +552,6 @@ codeunit 5052 AttachmentManagement
             InteractLogEntry."Delivery Status" := InteractLogEntry."Delivery Status"::" "
         else
             InteractLogEntry."Delivery Status" := InteractLogEntry."Delivery Status"::Error;
-        OnSetDeliveryStateOnBeforeModifyInteractLogEntry(InteractLogEntry, IsSent);
         InteractLogEntry.Modify();
         Commit();
     end;
@@ -547,13 +563,7 @@ codeunit 5052 AttachmentManagement
         Window: Dialog;
         NoOfAttachments: Integer;
         I: Integer;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeProcessDeliverySorter(DeliverySorter, TempDeliverySorterHtml, TempDeliverySorterWord, TempDeliverySorterOther, IsHandled);
-        if IsHandled then
-            exit;
-
         Window.Open(
           Text000Msg +
           '#1############ @2@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\' +
@@ -642,12 +652,12 @@ codeunit 5052 AttachmentManagement
     begin
         case CorrespondenceType of
             CorrespondenceType::"Hard Copy":
-                exit("Correspondence Type"::"Hard Copy");
+                exit(Enum::"Correspondence Type"::"Hard Copy");
             CorrespondenceType::Email:
-                exit("Correspondence Type"::Email);
+                exit(Enum::"Correspondence Type"::Email);
 #if not CLEAN23
             CorrespondenceType::Fax:
-                exit("Correspondence Type"::Fax);
+                exit(Enum::"Correspondence Type"::Fax);
 #endif
             else begin
                 OnConvertCorrespondenceTypeElse(CorrespondenceType, ReturnType, IsHandled);
@@ -722,16 +732,6 @@ codeunit 5052 AttachmentManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnConvertCorrespondenceTypeElse(CorrespondenceType: Option; var ReturnType: Enum "Correspondence Type"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetDeliveryStateOnBeforeModifyInteractLogEntry(var InteractionLogEntry: Record "Interaction Log Entry"; IsSent: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeProcessDeliverySorter(var DeliverySorter: Record "Delivery Sorter"; var TempDeliverySorterHtml: Record "Delivery Sorter" temporary; var TempDeliverySorterWord: Record "Delivery Sorter" temporary; var TempDeliverySorterOther: Record "Delivery Sorter" temporary; var IsHandled: Boolean);
     begin
     end;
 }

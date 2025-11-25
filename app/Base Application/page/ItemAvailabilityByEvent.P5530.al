@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Manufacturing.Setup;
+
 page 5530 "Item Availability by Event"
 {
     Caption = 'Item Availability by Event';
@@ -9,8 +16,8 @@ page 5530 "Item Availability by Event"
     PageType = Worksheet;
     SourceTable = "Inventory Page Data";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Period Start", "Line No.")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Period Start", "Line No.")
+                      order(Ascending);
 
     layout
     {
@@ -366,7 +373,7 @@ page 5530 "Item Availability by Event"
 
                 trigger OnAction()
                 begin
-                    CalcInventoryPageData.ShowDocument("Source Document ID");
+                    CalcInventoryPageData.ShowDocument(Rec."Source Document ID");
                 end;
             }
         }
@@ -483,13 +490,9 @@ page 5530 "Item Availability by Event"
         ForecastName: Code[10];
         LastUpdateTime: DateTime;
         SelectedDate: Date;
-        [InDataSet]
         IncludePlanningSuggestions: Boolean;
-        [InDataSet]
         IncludeBlanketOrders: Boolean;
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         EnableShowDocumentAction: Boolean;
 
     protected var

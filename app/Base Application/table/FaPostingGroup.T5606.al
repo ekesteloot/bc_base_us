@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 5606 "FA Posting Group"
 {
     Caption = 'FA Posting Group';
@@ -303,8 +307,8 @@ table 5606 "FA Posting Group"
         }
         field(31; "Allocated Acquisition Cost %"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST(Acquisition)));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const(Acquisition)));
             Caption = 'Allocated Acquisition Cost %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -312,8 +316,8 @@ table 5606 "FA Posting Group"
         }
         field(32; "Allocated Depreciation %"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST(Depreciation)));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const(Depreciation)));
             Caption = 'Allocated Depreciation %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -321,8 +325,8 @@ table 5606 "FA Posting Group"
         }
         field(33; "Allocated Write-Down %"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST("Write-Down")));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const("Write-Down")));
             Caption = 'Allocated Write-Down %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -330,8 +334,8 @@ table 5606 "FA Posting Group"
         }
         field(34; "Allocated Appreciation %"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST(Appreciation)));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const(Appreciation)));
             Caption = 'Allocated Appreciation %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -339,8 +343,8 @@ table 5606 "FA Posting Group"
         }
         field(35; "Allocated Custom 1 %"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST("Custom 1")));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const("Custom 1")));
             Caption = 'Allocated Custom 1 %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -348,8 +352,8 @@ table 5606 "FA Posting Group"
         }
         field(36; "Allocated Custom 2 %"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST("Custom 2")));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const("Custom 2")));
             Caption = 'Allocated Custom 2 %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -357,8 +361,8 @@ table 5606 "FA Posting Group"
         }
         field(37; "Allocated Sales Price %"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST(Disposal)));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const(Disposal)));
             Caption = 'Allocated Sales Price %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -366,8 +370,8 @@ table 5606 "FA Posting Group"
         }
         field(38; "Allocated Maintenance %"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST(Maintenance)));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const(Maintenance)));
             Caption = 'Allocated Maintenance %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -375,8 +379,8 @@ table 5606 "FA Posting Group"
         }
         field(39; "Allocated Gain %"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST(Gain)));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const(Gain)));
             Caption = 'Allocated Gain %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -384,8 +388,8 @@ table 5606 "FA Posting Group"
         }
         field(40; "Allocated Loss %"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST(Loss)));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const(Loss)));
             Caption = 'Allocated Loss %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -393,8 +397,8 @@ table 5606 "FA Posting Group"
         }
         field(41; "Allocated Book Value % (Gain)"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST("Book Value (Gain)")));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const("Book Value (Gain)")));
             Caption = 'Allocated Book Value % (Gain)';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -402,8 +406,8 @@ table 5606 "FA Posting Group"
         }
         field(42; "Allocated Book Value % (Loss)"; Decimal)
         {
-            CalcFormula = Sum("FA Allocation"."Allocation %" WHERE(Code = FIELD(Code),
-                                                                    "Allocation Type" = CONST("Book Value (Loss)")));
+            CalcFormula = sum("FA Allocation"."Allocation %" where(Code = field(Code),
+                                                                    "Allocation Type" = const("Book Value (Loss)")));
             Caption = 'Allocated Book Value % (Loss)';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -467,7 +471,7 @@ table 5606 "FA Posting Group"
         if DirectPosting then
             GLAcc.TestField("Direct Posting");
 
-        OnAfterCheckGLAcc(AccNo, DirectPosting, Rec);
+        OnAfterCheckGLAcc(AccNo, DirectPosting, Rec);    
     end;
 
     procedure IsReadyForAcqusition(): Boolean

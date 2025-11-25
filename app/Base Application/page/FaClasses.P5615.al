@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Setup;
+
 page 5615 "FA Classes"
 {
     AdditionalSearchTerms = 'fixed asset classes category';
@@ -14,7 +16,7 @@ page 5615 "FA Classes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies a code for the class that the fixed asset belongs to.';

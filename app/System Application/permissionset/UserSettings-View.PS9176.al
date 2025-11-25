@@ -3,6 +3,15 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Environment.Configuration;
+
+using System.Globalization;
+using System.Environment;
+using System.DateTime;
+using System.Security.User;
+using System.Azure.Identity;
+using System.Reflection;
+
 permissionset 9176 "User Settings - View"
 {
     Assignable = false;
@@ -18,7 +27,6 @@ permissionset 9176 "User Settings - View"
 
     Permissions = tabledata "All Profile" = r,
                   tabledata Company = r,
-                  tabledata "Tenant Profile" = r,
                   tabledata "Tenant Profile Setting" = rim,
                   tabledata "User Personalization" = rim;
 }

@@ -54,7 +54,7 @@ page 318 "VAT Statement Templates"
                     Caption = 'Statement Names';
                     Image = List;
                     RunObject = Page "VAT Statement Names";
-                    RunPageLink = "Statement Template Name" = FIELD(Name);
+                    RunPageLink = "Statement Template Name" = field(Name);
                     ToolTip = 'View or edit special tables to manage the tasks necessary for settling Tax and reporting to the customs and tax authorities.';
                 }
             }

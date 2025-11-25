@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 page 1265 "Data Exch. Setup Subform"
 {
     Caption = 'Field Mapping';
@@ -11,7 +15,7 @@ page 1265 "Data Exch. Setup Subform"
         {
             repeater(Group)
             {
-                IndentationColumn = Depth;
+                IndentationColumn = Rec.Depth;
                 IndentationControls = CaptionField;
                 field(CaptionField; Caption)
                 {
@@ -23,10 +27,10 @@ page 1265 "Data Exch. Setup Subform"
 
                     trigger OnAssistEdit()
                     begin
-                        CaptionAssistEdit();
+                        Rec.CaptionAssistEdit();
                     end;
                 }
-                field(SourceField; Source)
+                field(SourceField; Rec.Source)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Source';
@@ -35,7 +39,7 @@ page 1265 "Data Exch. Setup Subform"
 
                     trigger OnAssistEdit()
                     begin
-                        SourceAssistEdit(TempXMLBuffer);
+                        Rec.SourceAssistEdit(TempXMLBuffer);
                     end;
                 }
                 field("Default Value"; Rec."Default Value")
@@ -66,7 +70,7 @@ page 1265 "Data Exch. Setup Subform"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 RunObject = Page "Data Exch Def Card";
-                RunPageLink = Code = FIELD("Data Exchange Def Code");
+                RunPageLink = Code = field("Data Exchange Def Code");
                 ToolTip = 'Set up a data exchange definition that enables you to exchange data, such as by sending electronic documents or importing bank files.';
 
                 trigger OnAction()
@@ -83,7 +87,7 @@ page 1265 "Data Exch. Setup Subform"
 
     trigger OnAfterGetCurrRecord()
     begin
-        IsRecordOfTypeField := Type = Type::Field;
+        IsRecordOfTypeField := Rec.Type = Rec.Type::Field;
         SetStyle();
     end;
 
@@ -95,7 +99,7 @@ page 1265 "Data Exch. Setup Subform"
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         SetStyle();
-        Depth := 1;
+        Rec.Depth := 1;
     end;
 
     var
@@ -110,15 +114,15 @@ page 1265 "Data Exch. Setup Subform"
     var
         DataExchDef: Record "Data Exch. Def";
     begin
-        DeleteAll();
+        Rec.DeleteAll();
         Clear(Rec);
 
         if DataExchDef.Get(DataExchDefCode) then begin
-            InsertFromDataExchDefinition(Rec, DataExchDef, TempSuggestedField);
-            SetRange("Data Exchange Def Code", DataExchDefCode);
-            SetRange("Data Exchange Line Def Code", "Data Exchange Line Def Code");
-            SetRange("Table ID", "Table ID");
-            if FindFirst() then;
+            Rec.InsertFromDataExchDefinition(Rec, DataExchDef, TempSuggestedField);
+            Rec.SetRange("Data Exchange Def Code", DataExchDefCode);
+            Rec.SetRange("Data Exchange Line Def Code", Rec."Data Exchange Line Def Code");
+            Rec.SetRange("Table ID", Rec."Table ID");
+            if Rec.FindFirst() then;
         end;
     end;
 
@@ -153,8 +157,8 @@ page 1265 "Data Exch. Setup Subform"
 
     local procedure SetStyle()
     begin
-        case Type of
-            Type::Table:
+        case Rec.Type of
+            Rec.Type::Table:
                 StyleTxt := 'Strong'
             else
                 StyleTxt := '';

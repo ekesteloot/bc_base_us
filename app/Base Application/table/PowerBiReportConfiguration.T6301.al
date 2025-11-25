@@ -1,3 +1,5 @@
+namespace System.Integration.PowerBI;
+
 /// <summary>
 /// Saves a list of reports to be displayed for a user in each specific context.
 /// </summary>
@@ -53,6 +55,16 @@ table 6301 "Power BI Report Configuration"
         {
             Caption = 'Workspace Display Name';
             DataClassification = CustomerContent;
+        }
+        field(50; "Report Page"; Text[200])
+        {
+            Caption = 'Report Page';
+            DataClassification = CustomerContent;
+        }
+        field(51; "Show Panes"; Boolean)
+        {
+            Caption = 'Show Panes';
+            DataClassification = SystemMetadata;
         }
     }
 

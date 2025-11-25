@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
 report 5883 "Copy Phys. Invt. Recording"
 {
     Caption = 'Copy Phys. Invt. Rec. Line';

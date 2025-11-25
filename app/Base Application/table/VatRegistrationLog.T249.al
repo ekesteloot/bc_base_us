@@ -22,9 +22,9 @@ table 249 "VAT Registration Log"
         field(4; "Account No."; Code[20])
         {
             Caption = 'Account No.';
-            TableRelation = IF ("Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) Vendor;
+            TableRelation = if ("Account Type" = const(Customer)) Customer
+            else
+            if ("Account Type" = const(Vendor)) Vendor;
         }
         field(5; "Country/Region Code"; Code[10])
         {
@@ -37,8 +37,6 @@ table 249 "VAT Registration Log"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(10; Status; Option)
         {

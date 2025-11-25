@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 9126 "Lot Numbers by Bin FactBox"
 {
     Caption = 'Lot Numbers by Bin';
@@ -50,7 +52,7 @@ page 9126 "Lot Numbers by Bin FactBox"
     trigger OnFindRecord(Which: Text): Boolean
     begin
         FillTempTable();
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     local procedure FillTempTable()
@@ -63,30 +65,30 @@ page 9126 "Lot Numbers by Bin FactBox"
         if IsHandled then
             exit;
 
-        LotNosByBinCode.SetRange(Item_No, GetRangeMin("Item No."));
-        LotNosByBinCode.SetRange(Variant_Code, GetRangeMin("Variant Code"));
-        LotNosByBinCode.SetRange(Location_Code, GetRangeMin("Location Code"));
+        LotNosByBinCode.SetRange(Item_No, Rec.GetRangeMin("Item No."));
+        LotNosByBinCode.SetRange(Variant_Code, Rec.GetRangeMin("Variant Code"));
+        LotNosByBinCode.SetRange(Location_Code, Rec.GetRangeMin("Location Code"));
         LotNosByBinCode.SetFilter(Lot_No, '<>%1', '');
         OnFillTempTableOnAfterLotNosByBinCodeSetFilters(LotNosByBinCode);
         LotNosByBinCode.Open();
 
-        DeleteAll();
+        Rec.DeleteAll();
 
         while LotNosByBinCode.Read() do begin
-            Init();
-            "Item No." := LotNosByBinCode.Item_No;
-            "Variant Code" := LotNosByBinCode.Variant_Code;
-            "Zone Code" := LotNosByBinCode.Zone_Code;
-            "Bin Code" := LotNosByBinCode.Bin_Code;
-            "Location Code" := LotNosByBinCode.Location_Code;
-            "Lot No." := LotNosByBinCode.Lot_No;
+            Rec.Init();
+            Rec."Item No." := LotNosByBinCode.Item_No;
+            Rec."Variant Code" := LotNosByBinCode.Variant_Code;
+            Rec."Zone Code" := LotNosByBinCode.Zone_Code;
+            Rec."Bin Code" := LotNosByBinCode.Bin_Code;
+            Rec."Location Code" := LotNosByBinCode.Location_Code;
+            Rec."Lot No." := LotNosByBinCode.Lot_No;
             OnFillTempTableOnAfterPopulateLotNosByBinCodeFields(Rec, LotNosByBinCode);
-            if Find() then begin
-                "Qty. (Base)" += LotNosByBinCode.Sum_Qty_Base;
-                Modify();
+            if Rec.Find() then begin
+                Rec."Qty. (Base)" += LotNosByBinCode.Sum_Qty_Base;
+                Rec.Modify();
             end else begin
-                "Qty. (Base)" := LotNosByBinCode.Sum_Qty_Base;
-                Insert();
+                Rec."Qty. (Base)" := LotNosByBinCode.Sum_Qty_Base;
+                Rec.Insert();
             end;
         end;
     end;

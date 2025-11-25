@@ -1,3 +1,13 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 9203 "Budget Matrix"
 {
     Caption = 'Budget Matrix';
@@ -18,7 +28,7 @@ page 9203 "Budget Matrix"
                 IndentationColumn = NameIndent;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     Editable = false;
@@ -28,7 +38,7 @@ page 9203 "Budget Matrix"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookUpCode(LineDimType, LineDimCode, Code);
+                        LookUpCode(LineDimType, LineDimCode, Rec.Code);
                     end;
                 }
                 field(Name; Rec.Name)
@@ -39,7 +49,7 @@ page 9203 "Budget Matrix"
                     StyleExpr = Emphasize;
                     ToolTip = 'Specifies the name of the record.';
                 }
-                field(TotalBudgetedAmount; Amount)
+                field(TotalBudgetedAmount; Rec.Amount)
                 {
                     ApplicationArea = Suite;
                     AutoFormatExpression = FormatStr();
@@ -333,7 +343,7 @@ page 9203 "Budget Matrix"
         NameIndent := 0;
         for MATRIX_CurrentColumnOrdinal := 1 to MATRIX_CurrentNoOfMatrixColumn do
             MATRIX_OnAfterGetRecord(MATRIX_CurrentColumnOrdinal);
-        Amount := MatrixMgt.RoundAmount(CalcAmount(false), RoundingFactor);
+        Rec.Amount := MatrixMgt.RoundAmount(CalcAmount(false), RoundingFactor);
         FormatLine();
     end;
 
@@ -387,9 +397,7 @@ page 9203 "Budget Matrix"
         MATRIX_CellData: array[12] of Decimal;
         MATRIX_CaptionSet: array[12] of Text[80];
         RoundingFactorFormatString: Text;
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
         Text001: Label 'Period';
@@ -923,7 +931,7 @@ page 9203 "Budget Matrix"
         NewAmount := FromRoundedValue(MATRIX_CellData[MATRIX_ColumnOrdinal]);
         if CalcAmount(true) = 0 then; // To set filters correctly
         CalcFieldsAndSetNewBudgetedAmount(GLAccBudgetBuf, NewAmount);
-        Amount := MatrixMgt.RoundAmount(CalcAmount(false), RoundingFactor);
+        Rec.Amount := MatrixMgt.RoundAmount(CalcAmount(false), RoundingFactor);
         CurrPage.Update();
         OnAfterUpdateAmount();
     end;
@@ -946,7 +954,7 @@ page 9203 "Budget Matrix"
         GLAcc: Record "G/L Account";
     begin
         if DimCodeToOption(LineDimCode) = 0 then
-            GLAcc.Get(Code)
+            GLAcc.Get(Rec.Code)
         else begin
             if GLAccFilter <> '' then
                 GLAcc.SetFilter("No.", GLAccFilter);
@@ -977,8 +985,8 @@ page 9203 "Budget Matrix"
 
     local procedure FormatLine()
     begin
-        Emphasize := "Show in Bold";
-        NameIndent := Indentation;
+        Emphasize := Rec."Show in Bold";
+        NameIndent := Rec.Indentation;
     end;
 
     local procedure FormatStr(): Text

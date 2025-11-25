@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 codeunit 5764 "Whse.-Post Shipment (Yes/No)"
 {
     TableNo = "Warehouse Shipment Line";

@@ -1,3 +1,27 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Pricing;
+
 table 7001 "Price List Line"
 {
     fields
@@ -298,7 +322,7 @@ table 7001 "Price List Line"
         {
             AccessByPermission = tabledata "Sales Price Access" = R;
             DataClassification = CustomerContent;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
             MinValue = 0;
@@ -332,7 +356,7 @@ table 7001 "Price List Line"
         {
             AccessByPermission = tabledata "Purchase Price Access" = R;
             DataClassification = CustomerContent;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Cost';
             MinValue = 0;
@@ -428,7 +452,7 @@ table 7001 "Price List Line"
         field(27; "Line Amount"; Decimal)
         {
             DataClassification = CustomerContent;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Line Amount';
             MinValue = 0;
@@ -468,7 +492,7 @@ table 7001 "Price List Line"
         {
             AccessByPermission = tabledata "Purchase Price Access" = R;
             DataClassification = CustomerContent;
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Direct Unit Cost';
             MinValue = 0;
@@ -489,17 +513,17 @@ table 7001 "Price List Line"
         {
             Caption = 'Product No.';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Asset Type" = CONST(Item)) Item where("No." = field("Product No."))
-            ELSE
-            IF ("Asset Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Asset Type" = CONST(Resource)) Resource
-            ELSE
-            IF ("Asset Type" = CONST("Resource Group")) "Resource Group"
-            ELSE
-            IF ("Asset Type" = CONST("Item Discount Group")) "Item Discount Group"
-            ELSE
-            IF ("Asset Type" = CONST("Service Cost")) "Service Cost";
+            TableRelation = if ("Asset Type" = const(Item)) Item where("No." = field("Product No."))
+            else
+            if ("Asset Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Asset Type" = const(Resource)) Resource
+            else
+            if ("Asset Type" = const("Resource Group")) "Resource Group"
+            else
+            if ("Asset Type" = const("Item Discount Group")) "Item Discount Group"
+            else
+            if ("Asset Type" = const("Service Cost")) "Service Cost";
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -511,21 +535,21 @@ table 7001 "Price List Line"
         {
             Caption = 'Assign-to No.';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Source Type" = CONST(Campaign)) Campaign
-            ELSE
-            IF ("Source Type" = CONST(Contact)) Contact
-            ELSE
-            IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST("Customer Disc. Group")) "Customer Discount Group"
-            ELSE
-            IF ("Source Type" = CONST("Customer Price Group")) "Customer Price Group"
-            ELSE
-            IF ("Source Type" = CONST(Job)) Job
-            ELSE
-            IF ("Source Type" = CONST("Job Task")) "Job Task"."Job Task No." where("Job No." = field("Parent Source No."), "Job Task Type" = CONST(Posting))
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor;
+            TableRelation = if ("Source Type" = const(Campaign)) Campaign
+            else
+            if ("Source Type" = const(Contact)) Contact
+            else
+            if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const("Customer Disc. Group")) "Customer Discount Group"
+            else
+            if ("Source Type" = const("Customer Price Group")) "Customer Price Group"
+            else
+            if ("Source Type" = const(Job)) Job
+            else
+            if ("Source Type" = const("Job Task")) "Job Task"."Job Task No." where("Job No." = field("Parent Source No."), "Job Task Type" = const(Posting))
+            else
+            if ("Source Type" = const(Vendor)) Vendor;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -537,7 +561,7 @@ table 7001 "Price List Line"
         {
             Caption = 'Assign-to Parent No.';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Source Type" = CONST("Job Task")) Job;
+            TableRelation = if ("Source Type" = const("Job Task")) Job;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -548,7 +572,7 @@ table 7001 "Price List Line"
         field(36; "Variant Code Lookup"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF ("Asset Type" = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("Asset No."));
+            TableRelation = if ("Asset Type" = const(Item)) "Item Variant".Code where("Item No." = field("Asset No."));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -559,11 +583,11 @@ table 7001 "Price List Line"
         field(37; "Unit of Measure Code Lookup"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF ("Asset Type" = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("Asset No."))
-            ELSE
-            IF ("Asset Type" = CONST(Resource)) "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("Asset No."))
-            ELSE
-            IF ("Asset Type" = CONST("Resource Group")) "Unit of Measure";
+            TableRelation = if ("Asset Type" = const(Item)) "Item Unit of Measure".Code where("Item No." = field("Asset No."))
+            else
+            if ("Asset Type" = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("Asset No."))
+            else
+            if ("Asset Type" = const("Resource Group")) "Unit of Measure";
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -785,16 +809,14 @@ table 7001 "Price List Line"
         "Variant Code" := PriceAsset."Variant Code";
         "Work Type Code" := PriceAsset."Work Type Code";
 
+        "Allow Invoice Disc." := PriceAsset."Allow Invoice Disc.";
         if not GetHeader() or PriceListHeader."Allow Updating Defaults" then
             if "VAT Bus. Posting Gr. (Price)" = '' then begin
                 "Price Includes VAT" := PriceAsset."Price Includes VAT";
                 "VAT Bus. Posting Gr. (Price)" := PriceAsset."VAT Bus. Posting Gr. (Price)";
             end;
-
-        if (PriceListHeader.Code = '') or (IsNullGuid(PriceListHeader.SystemId)) or (not PriceListHeader."Allow Invoice Disc.") then
-            "Allow Invoice Disc." := PriceAsset."Allow Invoice Disc.";
-
         CopyFromAssetType();
+
 #if not CLEAN23
         OnAfterCopyFromPriceAsset(PriceAsset, Rec);
 #endif
@@ -896,7 +918,7 @@ table 7001 "Price List Line"
         Clear(PriceListHeader);
     end;
 
-    internal procedure SetHeader(var NewPriceListHeader: Record "Price List Header")
+    procedure SetHeader(var NewPriceListHeader: Record "Price List Header")
     begin
         PriceListHeader := NewPriceListHeader;
     end;
@@ -1002,7 +1024,7 @@ table 7001 "Price List Line"
             end;
     end;
 
-    local procedure TestStatusDraft()
+    procedure TestStatusDraft()
     begin
         if not IsEditable() then
             TestField(Status, Status::Draft);

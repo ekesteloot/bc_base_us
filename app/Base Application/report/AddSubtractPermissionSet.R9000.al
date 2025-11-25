@@ -1,3 +1,7 @@
+namespace System.Security.AccessControl;
+
+using System.Text;
+
 report 9000 "Add/Subtract Permission Set"
 {
     Caption = 'Add/Subtract Permission Set';
@@ -7,7 +11,7 @@ report 9000 "Add/Subtract Permission Set"
     {
         dataitem(SourcePermissionSet; "Aggregate Permission Set")
         {
-            DataItemTableView = SORTING(Scope, "App ID", "Role ID") ORDER(Ascending);
+            DataItemTableView = sorting(Scope, "App ID", "Role ID") order(Ascending);
 
             trigger OnAfterGetRecord()
             var

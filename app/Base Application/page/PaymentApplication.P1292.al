@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Statement;
+using System.IO;
+
 page 1292 "Payment Application"
 {
     Caption = 'Payment Application';
@@ -6,8 +11,8 @@ page 1292 "Payment Application"
     PageType = Worksheet;
     SourceTable = "Payment Application Proposal";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Sorting Order")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Sorting Order")
+                      order(Ascending);
 
     layout
     {
@@ -53,7 +58,7 @@ page 1292 "Payment Application"
                 repeater(Control28)
                 {
                     Caption = 'Open Entries';
-                    field(AppliedAmount; "Applied Amt. Incl. Discount")
+                    field(AppliedAmount; Rec."Applied Amt. Incl. Discount")
                     {
                         ApplicationArea = Basic, Suite;
                         BlankZero = true;
@@ -67,7 +72,7 @@ page 1292 "Payment Application"
                             UpdateAfterChangingApplication();
                         end;
                     }
-                    field(Applied; Applied)
+                    field(Applied; Rec.Applied)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies that the payment specified on the header of the Payment Application window is applied to the open entry.';
@@ -77,7 +82,7 @@ page 1292 "Payment Application"
                             UpdateAfterChangingApplication();
                         end;
                     }
-                    field(RemainingAmountAfterPosting; GetRemainingAmountAfterPostingValue())
+                    field(RemainingAmountAfterPosting; Rec.GetRemainingAmountAfterPostingValue())
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Remaining Amount After Posting';
@@ -91,7 +96,7 @@ page 1292 "Payment Application"
 
                         trigger OnDrillDown()
                         begin
-                            AppliesToEntryNoDrillDown();
+                            Rec.AppliesToEntryNoDrillDown();
                         end;
                     }
                     field("Due Date"; Rec."Due Date")
@@ -167,7 +172,7 @@ page 1292 "Payment Application"
                             UpdateAfterChangingApplication();
                         end;
                     }
-                    field(AccountName; GetAccountName())
+                    field(AccountName; Rec.GetAccountName())
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Account Name';
@@ -176,7 +181,7 @@ page 1292 "Payment Application"
 
                         trigger OnDrillDown()
                         begin
-                            AccountNameDrillDown();
+                            Rec.AccountNameDrillDown();
                         end;
                     }
                     field("Account Type"; Rec."Account Type")
@@ -246,23 +251,23 @@ page 1292 "Payment Application"
             part(Control2; "Payment-to-Entry Match")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                              "Statement No." = FIELD("Statement No."),
-                              "Statement Line No." = FIELD("Statement Line No."),
-                              "Statement Type" = FIELD("Statement Type"),
-                              "Account Type" = FIELD("Account Type"),
-                              "Account No." = FIELD("Account No."),
-                              "Applies-to Entry No." = FIELD("Applies-to Entry No."),
-                              "Match Confidence" = FIELD("Match Confidence"),
-                              Quality = FIELD(Quality);
+                SubPageLink = "Bank Account No." = field("Bank Account No."),
+                              "Statement No." = field("Statement No."),
+                              "Statement Line No." = field("Statement Line No."),
+                              "Statement Type" = field("Statement Type"),
+                              "Account Type" = field("Account Type"),
+                              "Account No." = field("Account No."),
+                              "Applies-to Entry No." = field("Applies-to Entry No."),
+                              "Match Confidence" = field("Match Confidence"),
+                              Quality = field(Quality);
             }
             part(Control1; "Additional Match Details")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                              "Statement No." = FIELD("Statement No."),
-                              "Statement Line No." = FIELD("Statement Line No."),
-                              "Statement Type" = FIELD("Statement Type");
+                SubPageLink = "Bank Account No." = field("Bank Account No."),
+                              "Statement No." = field("Statement No."),
+                              "Statement Line No." = field("Statement Line No."),
+                              "Statement Type" = field("Statement Type");
             }
         }
     }
@@ -324,7 +329,7 @@ page 1292 "Payment Application"
                     trigger OnAction()
                     begin
                         if Confirm(RemoveApplicationsQst) then
-                            RemoveApplications();
+                            Rec.RemoveApplications();
                     end;
                 }
             }
@@ -340,12 +345,12 @@ page 1292 "Payment Application"
 
                     trigger OnAction()
                     begin
-                        SetRange(Applied);
-                        SetRange("Account Type");
-                        SetRange("Account No.");
-                        SetRange(Type, Type::"Bank Account Ledger Entry", Type::"Check Ledger Entry");
+                        Rec.SetRange(Applied);
+                        Rec.SetRange("Account Type");
+                        Rec.SetRange("Account No.");
+                        Rec.SetRange(Type, Rec.Type::"Bank Account Ledger Entry", Rec.Type::"Check Ledger Entry");
 
-                        if FindFirst() then;
+                        if Rec.FindFirst() then;
                     end;
                 }
                 action(SortEntriesBasedOnProbability)
@@ -382,19 +387,19 @@ page 1292 "Payment Application"
 
                     trigger OnAction()
                     begin
-                        SetRange(Applied);
+                        Rec.SetRange(Applied);
 
                         BankAccReconLine.Get(
                           BankAccReconLine."Statement Type", BankAccReconLine."Bank Account No.",
                           BankAccReconLine."Statement No.", BankAccReconLine."Statement Line No.");
 
                         if BankAccReconLine."Account No." <> '' then begin
-                            SetRange("Account No.", BankAccReconLine."Account No.");
-                            SetRange("Account Type", BankAccReconLine."Account Type");
+                            Rec.SetRange("Account No.", BankAccReconLine."Account No.");
+                            Rec.SetRange("Account Type", BankAccReconLine."Account Type");
                         end;
-                        SetRange(Type, Type::"Bank Account Ledger Entry", Type::"Check Ledger Entry");
+                        Rec.SetRange(Type, Rec.Type::"Bank Account Ledger Entry", Rec.Type::"Check Ledger Entry");
 
-                        if FindFirst() then;
+                        if Rec.FindFirst() then;
                     end;
                 }
                 action(AppliedEntries)
@@ -406,12 +411,12 @@ page 1292 "Payment Application"
 
                     trigger OnAction()
                     begin
-                        SetRange(Applied, true);
-                        SetRange("Account Type");
-                        SetRange("Account No.");
-                        SetRange(Type, Type::"Bank Account Ledger Entry", Type::"Check Ledger Entry");
+                        Rec.SetRange(Applied, true);
+                        Rec.SetRange("Account Type");
+                        Rec.SetRange("Account No.");
+                        Rec.SetRange(Type, Rec.Type::"Bank Account Ledger Entry", Rec.Type::"Check Ledger Entry");
 
-                        if FindFirst() then;
+                        if Rec.FindFirst() then;
                     end;
                 }
                 action(AllOpenBankTransactions)
@@ -423,12 +428,12 @@ page 1292 "Payment Application"
 
                     trigger OnAction()
                     begin
-                        SetRange(Applied);
-                        SetRange("Account Type", "Account Type"::"Bank Account");
-                        SetRange("Account No.");
-                        SetRange(Type, Type::"Bank Account Ledger Entry");
+                        Rec.SetRange(Applied);
+                        Rec.SetRange("Account Type", Rec."Account Type"::"Bank Account");
+                        Rec.SetRange("Account No.");
+                        Rec.SetRange(Type, Rec.Type::"Bank Account Ledger Entry");
 
-                        if FindFirst() then;
+                        if Rec.FindFirst() then;
                     end;
                 }
                 action(AllOpenPayments)
@@ -440,11 +445,11 @@ page 1292 "Payment Application"
 
                     trigger OnAction()
                     begin
-                        SetRange(Applied);
-                        SetRange("Account Type", "Account Type"::"Bank Account");
-                        SetRange("Account No.");
-                        SetRange(Type, Type::"Check Ledger Entry");
-                        if FindFirst() then;
+                        Rec.SetRange(Applied);
+                        Rec.SetRange("Account Type", Rec."Account Type"::"Bank Account");
+                        Rec.SetRange("Account No.");
+                        Rec.SetRange(Type, Rec.Type::"Check Ledger Entry");
+                        if Rec.FindFirst() then;
                     end;
                 }
             }
@@ -495,12 +500,12 @@ page 1292 "Payment Application"
     trigger OnAfterGetCurrRecord()
     begin
         UpdateTotals();
-        LineEditable := "Applies-to Entry No." = 0;
+        LineEditable := Rec."Applies-to Entry No." = 0;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        TransferFromBankAccReconLine(BankAccReconLine);
+        Rec.TransferFromBankAccReconLine(BankAccReconLine);
     end;
 
     trigger OnOpenPage()
@@ -519,13 +524,13 @@ page 1292 "Payment Application"
         SortEntriesBasedOnProbabilityVisible := BankPmtApplSettings."Apply Man. Disable Suggestions";
 
         CODEUNIT.Run(CODEUNIT::"Get Bank Stmt. Line Candidates", Rec);
-        SetCurrentKey("Sorting Order", "Stmt To Rem. Amount Difference");
-        Ascending(true);
+        Rec.SetCurrentKey("Sorting Order", "Stmt To Rem. Amount Difference");
+        Rec.Ascending(true);
         if BankAccReconLine."Account No." <> '' then begin
             Rec.SetRange("Account No.", BankAccReconLine."Account No.");
             Rec.SetRange("Account Type", BankAccReconLine."Account Type");
         end;
-        if FindFirst() then;
+        if Rec.FindFirst() then;
 
         if not BankPmtApplSettings."Apply Man. Disable Suggestions" then begin
             TimePassed := CurrentDateTime - StartTime;
@@ -537,7 +542,6 @@ page 1292 "Payment Application"
     end;
 
     var
-        BankAccReconLine: Record "Bank Acc. Reconciliation Line";
         RemAmtToApplyStyleExpr: Text;
         RemoveApplicationsQst: Label 'Are you sure you want to remove all applications?';
         Status: Text;
@@ -549,10 +553,13 @@ page 1292 "Payment Application"
         SortEntriesBasedOnProbabilityVisible: Boolean;
         ExcessiveAmountErr: Label 'The remaining amount to apply is %1.', Comment = '%1 is the amount that is not applied (there is filed on the page named Remaining Amount To Apply)';
 
+    protected var
+        BankAccReconLine: Record "Bank Acc. Reconciliation Line";
+
     procedure SetBankAccReconcLine(NewBankAccReconLine: Record "Bank Acc. Reconciliation Line")
     begin
         BankAccReconLine := NewBankAccReconLine;
-        TransferFromBankAccReconLine(NewBankAccReconLine);
+        Rec.TransferFromBankAccReconLine(NewBankAccReconLine);
 
         OnSetBankAccReconcLine(BankAccReconLine);
     end;
@@ -604,11 +611,11 @@ page 1292 "Payment Application"
     var
         BankPmtApplRule: Record "Bank Pmt. Appl. Rule";
     begin
-        if ("Match Confidence" = "Match Confidence"::Accepted) or ("Match Confidence" = "Match Confidence"::Manual) then
-            "Match Confidence" := BankPmtApplRule.GetMatchConfidence(Quality);
+        if (Rec."Match Confidence" = Rec."Match Confidence"::Accepted) or (Rec."Match Confidence" = Rec."Match Confidence"::Manual) then
+            Rec."Match Confidence" := Enum::"Bank Rec. Match Confidence".FromInteger(BankPmtApplRule.GetMatchConfidence(Rec.Quality));
     end;
 
-    [IntegrationEvent(TRUE, false)]
+    [IntegrationEvent(true, false)]
     [Scope('OnPrem')]
     procedure OnSetBankAccReconcLine(BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line")
     begin

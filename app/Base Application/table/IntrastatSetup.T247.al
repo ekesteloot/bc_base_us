@@ -49,9 +49,9 @@ table 247 "Intrastat Setup"
         field(7; "Intrastat Contact No."; Code[20])
         {
             Caption = 'Intrastat Contact No.';
-            TableRelation = IF ("Intrastat Contact Type" = CONST(Contact)) Contact."No."
-            ELSE
-            IF ("Intrastat Contact Type" = CONST(Vendor)) Vendor."No.";
+            TableRelation = if ("Intrastat Contact Type" = const(Contact)) Contact."No."
+            else
+            if ("Intrastat Contact Type" = const(Vendor)) Vendor."No.";
         }
         field(8; "Use Advanced Checklist"; Boolean)
         {

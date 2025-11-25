@@ -1,3 +1,8 @@
+namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.HumanResources.Employee;
+
 table 5224 "Payable Employee Ledger Entry"
 {
     Caption = 'Payable Employee Ledger Entry';

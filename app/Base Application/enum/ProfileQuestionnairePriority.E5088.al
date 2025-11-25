@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 enum 5088 "Profile Questionnaire Priority"
 {
     Extensible = true;

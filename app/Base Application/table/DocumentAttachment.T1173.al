@@ -14,7 +14,7 @@ table 1173 "Document Attachment"
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(3; "No."; Code[20])
         {
@@ -81,12 +81,12 @@ table 1173 "Document Attachment"
         {
             Caption = 'Attached By';
             Editable = false;
-            TableRelation = User."User Security ID" WHERE("License Type" = CONST("Full User"));
+            TableRelation = User."User Security ID" where("License Type" = const("Full User"));
         }
         field(10; User; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("Attached By"),
-                                                         "License Type" = CONST("Full User")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("Attached By"),
+                                                         "License Type" = const("Full User")));
             Caption = 'User';
             Editable = false;
             FieldClass = FlowField;
@@ -145,6 +145,9 @@ table 1173 "Document Attachment"
         key(Key1; "Table ID", "No.", "Document Type", "Line No.", ID)
         {
             Clustered = true;
+        }
+        key(Key2; "Document Reference ID")
+        {
         }
     }
 

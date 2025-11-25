@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 page 5078 "Interaction Group Statistics"
 {
     Caption = 'Interaction Group Statistics';

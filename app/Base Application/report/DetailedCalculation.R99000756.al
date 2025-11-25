@@ -1,7 +1,15 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using System.Utilities;
+
 report 99000756 "Detailed Calculation"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/DetailedCalculation.rdlc';
+    RDLCLayout = './Manufacturing/Reports/DetailedCalculation.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Detailed Calculation';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +18,7 @@ report 99000756 "Detailed Calculation"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("Low-Level Code");
+            DataItemTableView = sorting("Low-Level Code");
             RequestFilterFields = "No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -64,8 +72,8 @@ report 99000756 "Detailed Calculation"
             }
             dataitem("Routing Line"; "Routing Line")
             {
-                DataItemLink = "Routing No." = FIELD("Routing No.");
-                DataItemTableView = SORTING("Routing No.", "Version Code", "Operation No.");
+                DataItemLink = "Routing No." = field("Routing No.");
+                DataItemTableView = sorting("Routing No.", "Version Code", "Operation No.");
                 column(InRouting; InRouting)
                 {
                 }
@@ -114,18 +122,14 @@ report 99000756 "Detailed Calculation"
 
                 trigger OnAfterGetRecord()
                 var
-                    UnitCostCalculation: Option Time,Unit;
+                    UnitCostCalculation: Enum "Unit Cost Calculation Type";
                 begin
                     ProdUnitCost := "Unit Cost per";
 
-                    CostCalcMgt.RoutingCostPerUnit(
-                      Type,
-                      "No.",
-                      DirectUnitCost,
-                      IndirectCostPct,
-                      OverheadRate, ProdUnitCost, UnitCostCalculation);
+                    CostCalcMgt.CalcRoutingCostPerUnit(
+                      Type, "No.", DirectUnitCost, IndirectCostPct, OverheadRate, ProdUnitCost, UnitCostCalculation);
                     CostTime :=
-                      CostCalcMgt.CalcCostTime(
+                      CostCalcMgt.CalculateCostTime(
                         CostCalcMgt.CalcQtyAdjdForBOMScrap(Item."Lot Size", Item."Scrap %"),
                         "Setup Time", "Setup Time Unit of Meas. Code",
                         "Run Time", "Run Time Unit of Meas. Code", "Lot Size",
@@ -154,7 +158,7 @@ report 99000756 "Detailed Calculation"
             }
             dataitem(BOMLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(InBOM; InBOM)
                 {
                 }
@@ -178,7 +182,7 @@ report 99000756 "Detailed Calculation"
                 }
                 dataitem(BOMComponentLine; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     column(ProdBOMLineLevelType; Format(ProdBOMLine[Level].Type))
                     {
@@ -288,12 +292,12 @@ report 99000756 "Detailed Calculation"
             }
             dataitem(Footer; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 MaxIteration = 1;
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 MaxIteration = 1;
                 column(UnitCost_Item; Item."Unit Cost")
                 {

@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.Consolidation;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 codeunit 439 "Export F/O Consolidation"
 {
     trigger OnRun()

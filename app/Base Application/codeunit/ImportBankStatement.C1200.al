@@ -1,3 +1,9 @@
+namespace Microsoft.BankMgt.Statement;
+
+using System;
+using System.IO;
+using System.Xml;
+
 codeunit 1200 "Import Bank Statement"
 {
     Permissions = TableData "Data Exch. Field" = rimd;
@@ -11,13 +17,13 @@ codeunit 1200 "Import Bank Statement"
         XMLStream: InStream;
         LineNo: Integer;
     begin
-        "File Content".CreateInStream(XMLStream);
+        Rec."File Content".CreateInStream(XMLStream);
         XMLDOMManagement.LoadXMLNodeFromInStream(XMLStream, XmlNode);
 
-        DataExchLineDef.Get("Data Exch. Def Code", "Data Exch. Line Def Code");
+        DataExchLineDef.Get(Rec."Data Exch. Def Code", Rec."Data Exch. Line Def Code");
 
         ProgressWindow.Open(ProgressMsg);
-        Parse(DataExchLineDef, "Entry No.", XmlNode, '', '', LineNo, LineNo);
+        Parse(DataExchLineDef, Rec."Entry No.", XmlNode, '', '', LineNo, LineNo);
         ProgressWindow.Close();
         OnRunOnAfterRun(Rec);
     end;

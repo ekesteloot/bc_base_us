@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
 page 5757 "Transfer Receipt Statistics"
 {
     Caption = 'Transfer Receipt Statistics';
@@ -80,7 +82,7 @@ page 5757 "Transfer Receipt Statistics"
         if IsHandled then
             exit;
 
-        TransRcptLine.SetRange("Document No.", "No.");
+        TransRcptLine.SetRange("Document No.", Rec."No.");
         if TransRcptLine.Find('-') then
             repeat
                 LineQty += TransRcptLine.Quantity;

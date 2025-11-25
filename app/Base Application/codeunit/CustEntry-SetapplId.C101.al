@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Receivables;
+
 codeunit 101 "Cust. Entry-SetAppl.ID"
 {
     Permissions = TableData "Cust. Ledger Entry" = rimd;

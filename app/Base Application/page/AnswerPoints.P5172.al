@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Profiling;
+
+using System.Environment;
+
 page 5172 "Answer Points"
 {
     Caption = 'Answer Points';
@@ -49,9 +53,9 @@ page 5172 "Answer Points"
                     var
                         Rating: Record Rating;
                     begin
-                        TestField(Type, Type::Answer);
+                        Rec.TestField(Type, Rec.Type::Answer);
 
-                        if Rating.Get(TargetQuestnCode, TargetQuestLineNo, "Profile Questionnaire Code", "Line No.") then
+                        if Rating.Get(TargetQuestnCode, TargetQuestLineNo, Rec."Profile Questionnaire Code", Rec."Line No.") then
                             if Points = 0 then
                                 Rating.Delete()
                             else begin
@@ -61,8 +65,8 @@ page 5172 "Answer Points"
                         else begin
                             Rating."Profile Questionnaire Code" := TargetQuestnCode;
                             Rating."Profile Questionnaire Line No." := TargetQuestLineNo;
-                            Rating."Rating Profile Quest. Code" := "Profile Questionnaire Code";
-                            Rating."Rating Profile Quest. Line No." := "Line No.";
+                            Rating."Rating Profile Quest. Code" := Rec."Profile Questionnaire Code";
+                            Rating."Rating Profile Quest. Line No." := Rec."Line No.";
                             Rating.Points := Points;
                             Rating.Insert(true);
                         end;
@@ -98,11 +102,11 @@ page 5172 "Answer Points"
                 var
                     ProfileQuestnHeader: Record "Profile Questionnaire Header";
                 begin
-                    if ProfileQuestnHeader.Get("Profile Questionnaire Code") then
+                    if ProfileQuestnHeader.Get(Rec."Profile Questionnaire Code") then
                         if PAGE.RunModal(
                              PAGE::"Profile Questionnaire List", ProfileQuestnHeader) = ACTION::LookupOK
                         then begin
-                            SetRange("Profile Questionnaire Code", ProfileQuestnHeader.Code);
+                            Rec.SetRange("Profile Questionnaire Code", ProfileQuestnHeader.Code);
                             CurrQuestnCode := ProfileQuestnHeader.Code;
                             SetRatingFilter();
                             CurrPage.Update();
@@ -127,8 +131,8 @@ page 5172 "Answer Points"
                         Rating.SetRange("Profile Questionnaire Line No.", TargetQuestLineNo);
                         if PAGE.RunModal(PAGE::"Answer Points List", Rating) = ACTION::LookupOK then begin
                             CurrQuestnCode := Rating."Rating Profile Quest. Code";
-                            SetRange("Profile Questionnaire Code", CurrQuestnCode);
-                            Get(CurrQuestnCode, Rating."Rating Profile Quest. Line No.");
+                            Rec.SetRange("Profile Questionnaire Code", CurrQuestnCode);
+                            Rec.Get(CurrQuestnCode, Rating."Rating Profile Quest. Line No.");
                         end;
                     end;
                 }
@@ -151,7 +155,7 @@ page 5172 "Answer Points"
     var
         Rating: Record Rating;
     begin
-        if Rating.Get(TargetQuestnCode, TargetQuestLineNo, "Profile Questionnaire Code", "Line No.") then
+        if Rating.Get(TargetQuestnCode, TargetQuestLineNo, Rec."Profile Questionnaire Code", Rec."Line No.") then
             Points := Rating.Points
         else
             Points := 0;
@@ -161,13 +165,13 @@ page 5172 "Answer Points"
     var
         Rating: Record Rating;
     begin
-        if Rating.Get(TargetQuestnCode, TargetQuestLineNo, "Profile Questionnaire Code", "Line No.") then
+        if Rating.Get(TargetQuestnCode, TargetQuestLineNo, Rec."Profile Questionnaire Code", Rec."Line No.") then
             Points := Rating.Points
         else
             Points := 0;
 
-        StyleIsStrong := Type = Type::Question;
-        if Type <> Type::Question then
+        StyleIsStrong := Rec.Type = Rec.Type::Question;
+        if Rec.Type <> Rec.Type::Question then
             DescriptionIndent := 1
         else
             DescriptionIndent := 0;
@@ -177,12 +181,12 @@ page 5172 "Answer Points"
     var
         TempProfileQuestnLine: Record "Profile Questionnaire Line";
     begin
-        TargetQuestnCode := "Profile Questionnaire Code";
-        TargetQuestLineNo := "Line No.";
-        TargetQuestnLineNoEnd := "Line No.";
-        CurrQuestnCode := "Profile Questionnaire Code";
+        TargetQuestnCode := Rec."Profile Questionnaire Code";
+        TargetQuestLineNo := Rec."Line No.";
+        TargetQuestnLineNoEnd := Rec."Line No.";
+        CurrQuestnCode := Rec."Profile Questionnaire Code";
 
-        if TempProfileQuestnLine.Get(TargetQuestnCode, "Line No.") then
+        if TempProfileQuestnLine.Get(TargetQuestnCode, Rec."Line No.") then
             while (TempProfileQuestnLine.Next() <> 0) and
                   (TempProfileQuestnLine.Type = TempProfileQuestnLine.Type::Answer)
             do
@@ -198,27 +202,25 @@ page 5172 "Answer Points"
         TargetQuestLineNo: Integer;
         TargetQuestnLineNoEnd: Integer;
         Points: Decimal;
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         DescriptionIndent: Integer;
 
     procedure SetRatingFilter()
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         if CurrQuestnCode = TargetQuestnCode then
-            SetFilter("Line No.", '<%1|>%2', TargetQuestLineNo, TargetQuestnLineNoEnd)
+            Rec.SetFilter("Line No.", '<%1|>%2', TargetQuestLineNo, TargetQuestnLineNoEnd)
         else
-            SetRange("Line No.");
-        FilterGroup(0);
+            Rec.SetRange("Line No.");
+        Rec.FilterGroup(0);
     end;
 
     local procedure GetCaption(): Text
     begin
         if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::Phone then
-            exit(StrSubstNo('%1 %2', CurrPage.Caption, "Profile Questionnaire Code"));
+            exit(StrSubstNo('%1 %2', CurrPage.Caption, Rec."Profile Questionnaire Code"));
 
-        exit(Format("Profile Questionnaire Code"));
+        exit(Format(Rec."Profile Questionnaire Code"));
     end;
 }
 

@@ -1,3 +1,31 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Shared.Navigate;
+using System.Globalization;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 124 "Purch. Cr. Memo Hdr."
 {
     Caption = 'Purch. Cr. Memo Hdr.';
@@ -43,8 +71,6 @@ table 124 "Purch. Cr. Memo Hdr."
         {
             Caption = 'Pay-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(10; "Pay-to Contact"; Text[100])
@@ -58,7 +84,7 @@ table 124 "Purch. Cr. Memo Hdr."
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Sell-to Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Sell-to Customer No."));
         }
         field(13; "Ship-to Name"; Text[100])
         {
@@ -80,8 +106,6 @@ table 124 "Purch. Cr. Memo Hdr."
         {
             Caption = 'Ship-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
@@ -126,19 +150,19 @@ table 124 "Purch. Cr. Memo Hdr."
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(31; "Vendor Posting Group"; Code[20])
         {
@@ -171,6 +195,11 @@ table 124 "Purch. Cr. Memo Hdr."
             Caption = 'Language Code';
             TableRelation = Language;
         }
+        field(42; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(43; "Purchaser Code"; Code[20])
         {
             Caption = 'Purchaser Code';
@@ -178,9 +207,9 @@ table 124 "Purch. Cr. Memo Hdr."
         }
         field(46; Comment; Boolean)
         {
-            CalcFormula = Exist("Purch. Comment Line" WHERE("Document Type" = CONST("Posted Credit Memo"),
-                                                             "No." = FIELD("No."),
-                                                             "Document Line No." = CONST(0)));
+            CalcFormula = exist("Purch. Comment Line" where("Document Type" = const("Posted Credit Memo"),
+                                                             "No." = field("No."),
+                                                             "Document Line No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -216,24 +245,24 @@ table 124 "Purch. Cr. Memo Hdr."
         field(55; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
         }
         field(60; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Purch. Cr. Memo Line".Amount WHERE("Document No." = FIELD("No.")));
+            CalcFormula = sum("Purch. Cr. Memo Line".Amount where("Document No." = field("No.")));
             Caption = 'Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(61; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Purch. Cr. Memo Line"."Amount Including VAT" WHERE("Document No." = FIELD("No.")));
+            CalcFormula = sum("Purch. Cr. Memo Line"."Amount Including VAT" where("Document No." = field("No.")));
             Caption = 'Amount Including VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -296,8 +325,6 @@ table 124 "Purch. Cr. Memo Hdr."
         {
             Caption = 'Buy-from City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(84; "Buy-from Contact"; Text[100])
@@ -308,8 +335,6 @@ table 124 "Purch. Cr. Memo Hdr."
         {
             Caption = 'Pay-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(86; "Pay-to County"; Text[30])
@@ -326,8 +351,6 @@ table 124 "Purch. Cr. Memo Hdr."
         {
             Caption = 'Buy-from Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(89; "Buy-from County"; Text[30])
@@ -344,8 +367,6 @@ table 124 "Purch. Cr. Memo Hdr."
         {
             Caption = 'Ship-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(92; "Ship-to County"; Text[30])
@@ -365,7 +386,7 @@ table 124 "Purch. Cr. Memo Hdr."
         field(95; "Order Address Code"; Code[10])
         {
             Caption = 'Order Address Code';
-            TableRelation = "Order Address".Code WHERE("Vendor No." = FIELD("Buy-from Vendor No."));
+            TableRelation = "Order Address".Code where("Vendor No." = field("Buy-from Vendor No."));
         }
         field(97; "Entry Point"; Code[10])
         {
@@ -415,8 +436,6 @@ table 124 "Purch. Cr. Memo Hdr."
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(113; "Source Code"; Code[10])
         {
@@ -470,22 +489,22 @@ table 124 "Purch. Cr. Memo Hdr."
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(1302; Paid; Boolean)
         {
-            CalcFormula = - Exist("Vendor Ledger Entry" WHERE("Entry No." = FIELD("Vendor Ledger Entry No."),
-                                                              Open = FILTER(true)));
+            CalcFormula = - Exist("Vendor Ledger Entry" where("Entry No." = field("Vendor Ledger Entry No."),
+                                                              Open = filter(true)));
             Caption = 'Paid';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1303; "Remaining Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Vendor Ledg. Entry".Amount WHERE("Vendor Ledger Entry No." = FIELD("Vendor Ledger Entry No.")));
+            CalcFormula = - sum("Detailed Vendor Ledg. Entry".Amount where("Vendor Ledger Entry No." = field("Vendor Ledger Entry No.")));
             Caption = 'Remaining Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -495,29 +514,27 @@ table 124 "Purch. Cr. Memo Hdr."
             Caption = 'Vendor Ledger Entry No.';
             Editable = false;
             TableRelation = "Vendor Ledger Entry"."Entry No.";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(1305; "Invoice Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Purch. Cr. Memo Line"."Inv. Discount Amount" WHERE("Document No." = FIELD("No.")));
+            CalcFormula = sum("Purch. Cr. Memo Line"."Inv. Discount Amount" where("Document No." = field("No.")));
             Caption = 'Invoice Discount Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1310; Cancelled; Boolean)
         {
-            CalcFormula = Exist("Cancelled Document" WHERE("Source ID" = CONST(124),
-                                                            "Cancelled Doc. No." = FIELD("No.")));
+            CalcFormula = exist("Cancelled Document" where("Source ID" = const(124),
+                                                            "Cancelled Doc. No." = field("No.")));
             Caption = 'Cancelled';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1311; Corrective; Boolean)
         {
-            CalcFormula = Exist("Cancelled Document" WHERE("Source ID" = CONST(122),
-                                                            "Cancelled By Doc. No." = FIELD("No.")));
+            CalcFormula = exist("Cancelled Document" where("Source ID" = const(122),
+                                                            "Cancelled By Doc. No." = field("No.")));
             Caption = 'Corrective';
             Editable = false;
             FieldClass = FlowField;
@@ -572,7 +589,7 @@ table 124 "Purch. Cr. Memo Hdr."
         field(10017; "Provincial Tax Area Code"; Code[20])
         {
             Caption = 'Provincial Tax Area Code';
-            TableRelation = "Tax Area" WHERE("Country/Region" = CONST(CA));
+            TableRelation = "Tax Area" where("Country/Region" = const(CA));
         }
         field(10018; "STE Transaction ID"; Text[20])
         {
@@ -726,9 +743,9 @@ table 124 "Purch. Cr. Memo Hdr."
         CalcFields(Cancelled, Corrective);
         case true of
             Cancelled:
-                ShowCorrectiveInvoice();
+                Rec.ShowCorrectiveInvoice();
             Corrective:
-                ShowCancelledInvoice();
+                Rec.ShowCancelledInvoice();
         end;
     end;
 

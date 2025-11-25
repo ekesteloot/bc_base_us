@@ -1,3 +1,8 @@
+﻿namespace Microsoft.HumanResources.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.HumanResources.Setup;
+
 page 5230 "Qualification Overview"
 {
     Caption = 'Qualification Overview';

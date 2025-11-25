@@ -11,7 +11,7 @@ report 10040 "Aged Accounts Receivable NA"
     {
         dataitem(Header; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(FORMAT_TODAY_0_4_; Format(Today(), 0, 4))
             {
             }
@@ -210,8 +210,8 @@ report 10040 "Aged Accounts Receivable NA"
                 }
                 dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
                 {
-                    DataItemLink = "Customer No." = FIELD("No."), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter");
-                    DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date", "Currency Code");
+                    DataItemLink = "Customer No." = field("No."), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter");
+                    DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date", "Currency Code");
 
                     trigger OnAfterGetRecord()
                     begin
@@ -234,7 +234,7 @@ report 10040 "Aged Accounts Receivable NA"
                 }
                 dataitem(Totals; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(AmountDueToPrint; AmountDueToPrint)
                     {
                     }

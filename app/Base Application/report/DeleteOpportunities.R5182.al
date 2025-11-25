@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Comment;
+
 report 5182 "Delete Opportunities"
 {
     Caption = 'Delete Opportunities';
@@ -7,7 +11,7 @@ report 5182 "Delete Opportunities"
     {
         dataitem(Opportunity; Opportunity)
         {
-            DataItemTableView = WHERE(Closed = CONST(true));
+            DataItemTableView = where(Closed = const(true));
             RequestFilterFields = "No.", "Date Closed", "Salesperson Code", "Campaign No.", "Contact No.", "Sales Cycle Code";
 
             trigger OnAfterGetRecord()

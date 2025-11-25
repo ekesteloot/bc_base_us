@@ -1,3 +1,8 @@
+namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.Intercompany.GLAccount;
+using System.Telemetry;
+
 xmlport 11 "IC Dimension Import/Export"
 {
     Caption = 'IC Dimension Import/Export';
@@ -21,7 +26,7 @@ xmlport 11 "IC Dimension Import/Export"
                 }
                 tableelement(icdimval; "IC Dimension Value")
                 {
-                    LinkFields = "Dimension Code" = FIELD(Code);
+                    LinkFields = "Dimension Code" = field(Code);
                     LinkTable = ICDim;
                     XmlName = 'ICDimVal';
                     fieldattribute(DimCode; ICDimVal."Dimension Code")

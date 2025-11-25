@@ -1,4 +1,10 @@
-﻿report 292 "Copy Sales Document"
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+
+report 292 "Copy Sales Document"
 {
     Caption = 'Copy Sales Document';
     ProcessingOnly = true;

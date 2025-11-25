@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FixedAssets.FixedAsset;
+
 table 5650 "Total Value Insured"
 {
     Caption = 'Total Value Insured';

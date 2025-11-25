@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.Diagnostics;
+
 codeunit 482 "Update Dim. Set Glbl. Dim. No."
 {
     EventSubscriberInstance = Manual;
@@ -96,7 +102,7 @@ codeunit 482 "Update Dim. Set Glbl. Dim. No."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Change Log Management", 'OnAfterIsAlwaysLoggedTable', '', false, false)]
     local procedure OnAfterIsAlwaysLoggedTableHandler(TableID: Integer; var AlwaysLogTable: Boolean)
     begin
-        if TableID = Database::"Dimension Set Entry" then
+        if TableID = Enum::TableID::"Dimension Set Entry".AsInteger() then
             AlwaysLogTable := true;
     end;
 }

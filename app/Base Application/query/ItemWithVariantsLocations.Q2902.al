@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.Forecast;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 query 2902 "Item With Variants & Locations"
 {
     QueryType = Normal;

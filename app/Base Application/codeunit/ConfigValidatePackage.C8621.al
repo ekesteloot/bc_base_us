@@ -1,3 +1,5 @@
+namespace System.IO;
+
 codeunit 8621 "Config. Validate Package"
 {
     TableNo = "Config. Package Table";

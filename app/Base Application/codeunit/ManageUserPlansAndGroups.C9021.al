@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 Codeunit 9021 "Manage User Plans And Groups"
 {
     ObsoleteState = Pending;

@@ -1,4 +1,25 @@
-﻿codeunit 333 "Req. Wksh.-Make Order"
+﻿namespace Microsoft.InventoryMgt.Requisition;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
+codeunit 333 "Req. Wksh.-Make Order"
 {
     Permissions = TableData "Sales Line" = m;
     TableNo = "Requisition Line";
@@ -13,7 +34,7 @@
             exit;
 
         if PlanningResiliency then
-            LockTable();
+            Rec.LockTable();
 
         CarryOutReqLineAction(Rec);
     end;
@@ -274,7 +295,7 @@
     procedure CheckRequisitionLine(var ReqLine2: Record "Requisition Line")
     var
         SalesLine: Record "Sales Line";
-        Item: Record "Item";
+        Item: Record Item;
         Purchasing: Record Purchasing;
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
@@ -349,7 +370,7 @@
                 Item.SetLoadFields("Variant Mandatory if Exists");
                 if Item.Get("No.") then
                     if Item.IsVariantMandatory() then
-                        TestField("Variant Code");
+                        ReqLine2.TestField("Variant Code");
             end;
 
             if IsDropShipment() then
@@ -865,7 +886,7 @@
             PurchOrderHeader.Modify();
             PurchOrderHeader.Mark(true);
             TempDocumentEntry.Init();
-            TempDocumentEntry."Table ID" := DATABASE::"Purchase Header";
+            TempDocumentEntry."Table ID" := Enum::TableID::"Purchase Header".AsInteger();
             TempDocumentEntry."Document Type" := PurchOrderHeader."Document Type"::Order;
             TempDocumentEntry."Document No." := PurchOrderHeader."No.";
             TempDocumentEntry."Entry No." := TempDocumentEntry.Count + 1;
@@ -1054,13 +1075,13 @@
         end;
 
         case ReqLine."Demand Type" of
-            DATABASE::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component".AsInteger():
                 begin
                     ProdOrderComp.Get(
                       ReqLine."Demand Subtype", ReqLine."Demand Order No.", ReqLine."Demand Line No.", ReqLine."Demand Ref. No.");
                     ProdOrderCompReserve.BindToPurchase(ProdOrderComp, PurchLine, ReservQty, ReservQtyBase);
                 end;
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 begin
                     SalesLine.Get(ReqLine."Demand Subtype", ReqLine."Demand Order No.", ReqLine."Demand Line No.");
                     SalesLineReserve.BindToPurchase(SalesLine, PurchLine, ReservQty, ReservQtyBase);
@@ -1069,7 +1090,7 @@
                         SalesLine.Modify();
                     end;
                 end;
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 begin
                     ServLine.Get(ReqLine."Demand Subtype", ReqLine."Demand Order No.", ReqLine."Demand Line No.");
                     ServLineReserve.BindToPurchase(ServLine, PurchLine, ReservQty, ReservQtyBase);
@@ -1078,7 +1099,7 @@
                         ServLine.Modify();
                     end;
                 end;
-            DATABASE::"Job Planning Line":
+            Enum::TableID::"Job Planning Line".AsInteger():
                 begin
                     JobPlanningLine.SetRange("Job Contract Entry No.", ReqLine."Demand Line No.");
                     JobPlanningLine.FindFirst();
@@ -1088,7 +1109,7 @@
                         JobPlanningLine.Modify();
                     end;
                 end;
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line".AsInteger():
                 begin
                     AsmLine.Get(ReqLine."Demand Subtype", ReqLine."Demand Order No.", ReqLine."Demand Line No.");
                     AsmLineReserve.BindToPurchase(AsmLine, PurchLine, ReservQty, ReservQtyBase);
@@ -1448,7 +1469,7 @@
         JobPlanningLine: Record "Job Planning Line";
     begin
         if (RequisitionLine."Planning Line Origin" = RequisitionLine."Planning Line Origin"::"Order Planning") and
-           (RequisitionLine."Demand Type" = DATABASE::"Job Planning Line")
+           (RequisitionLine."Demand Type" = Enum::TableID::"Job Planning Line".AsInteger())
         then begin
             JobPlanningLine.SetRange("Job Contract Entry No.", RequisitionLine."Demand Line No.");
             JobPlanningLine.FindFirst();

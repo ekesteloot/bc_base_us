@@ -1,7 +1,12 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.HumanResources.Employee;
+
 report 5201 "Employee - List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeList.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeList.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee List';
     UsageCategory = ReportsAndAnalysis;

@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Location;
+
 query 5002 "Locations from items Purch"
 {
     Caption = 'Locations from items Purch';
@@ -6,7 +10,7 @@ query 5002 "Locations from items Purch"
     {
         dataitem(Purchase_Line; "Purchase Line")
         {
-            DataItemTableFilter = "Document Type" = CONST(Order), Type = CONST(Item), "Location Code" = FILTER(<> ''), "No." = FILTER(<> ''), Quantity = FILTER(<> 0);
+            DataItemTableFilter = "Document Type" = const(Order), Type = const(Item), "Location Code" = filter(<> ''), "No." = filter(<> ''), Quantity = filter(<> 0);
             column(Document_No; "Document No.")
             {
             }
@@ -16,7 +20,7 @@ query 5002 "Locations from items Purch"
             dataitem(Location; Location)
             {
                 DataItemLink = Code = Purchase_Line."Location Code";
-                DataItemTableFilter = "Use As In-Transit" = CONST(false);
+                DataItemTableFilter = "Use As In-Transit" = const(false);
                 column(Require_Put_away; "Require Put-away")
                 {
                 }

@@ -1,7 +1,14 @@
+namespace Microsoft.FixedAssets.Reports;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.FixedAssets.Setup;
+
 report 5605 "Fixed Asset - Book Value 01"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/FixedAssetBookValue01.rdlc';
+    RDLCLayout = './FixedAssets/Reports/FixedAssetBookValue01.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset Book Value 01';
     PreviewMode = PrintLayout;
@@ -289,26 +296,26 @@ report 5605 "Fixed Asset - Book Value 01"
                         ApplicationArea = FixedAssets;
                         Caption = 'Depreciation Book';
                         TableRelation = "Depreciation Book";
-                        ToolTip = 'Specifies a code for the depreciation book that is included in the report. You can set up an unlimited number of depreciation books to accommodate various depreciation purposes (such as tax and financial statements). For each depreciation book, you must define the terms and conditions, such as integration with general ledger.';
+                        ToolTip = 'Specifies the code for the depreciation book to be included in the report or batch job.';
                     }
                     field(StartingDate; StartingDate)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Starting Date';
-                        ToolTip = 'Specifies the date from which the report or batch job processes information.';
+                        ToolTip = 'Specifies the date when you want the report to start.';
                     }
                     field(EndingDate; EndingDate)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Ending Date';
-                        ToolTip = 'Specifies the date to which the report or batch job processes information.';
+                        ToolTip = 'Specifies the date when you want the report to end.';
                     }
                     field(GroupTotals; GroupTotals)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Group Totals';
                         OptionCaption = ' ,FA Class,FA Subclass,FA Location,Main Asset,Global Dimension 1,Global Dimension 2,FA Posting Group';
-                        ToolTip = 'Specifies that you want the report to group the fixed assets and print group totals. For example, if you have set up six FA classes, then select the FA Class option to have group totals printed for each of the six class codes. Select to see the available options. If you do not want group totals to be printed, select the blank option.';
+                        ToolTip = 'Specifies if you want the report to group fixed assets and print totals using the category defined in this field. For example, maintenance expenses for fixed assets can be shown for each fixed asset class.';
                     }
                     field(PrintDetails; PrintDetails)
                     {
@@ -320,7 +327,7 @@ report 5605 "Fixed Asset - Book Value 01"
                     {
                         ApplicationArea = Suite;
                         Caption = 'Budget Report';
-                        ToolTip = 'Specifies if you want the report to calculate future depreciation and book value. This is valid only if you have selected Depreciation and Book Value in Amount Field 1, 2 or 3.';
+                        ToolTip = 'Specifies if you want the report to calculate future depreciation and book value. This is valid only if you have selected Depreciation and Book Value for Amount Field 1, 2 or 3.';
                     }
                 }
             }

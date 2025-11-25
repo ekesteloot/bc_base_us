@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Sales.Document;
+using System.Environment;
+
 page 5128 "Close Opportunity"
 {
     Caption = 'Close Opportunity';
@@ -15,7 +21,7 @@ page 5128 "Close Opportunity"
             group(General)
             {
                 Caption = 'General';
-                field(OptionWon; "Action Taken")
+                field(OptionWon; Rec."Action Taken")
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Opportunity Status';
@@ -26,41 +32,41 @@ page 5128 "Close Opportunity"
                     var
                         CloseOpportunityCode: Record "Close Opportunity Code";
                     begin
-                        if "Action Taken" = "Action Taken"::Lost then
+                        if Rec."Action Taken" = Rec."Action Taken"::Lost then
                             LostActionTakenOnValidate();
-                        if "Action Taken" = "Action Taken"::Won then
+                        if Rec."Action Taken" = Rec."Action Taken"::Won then
                             WonActionTakenOnValidate();
 
-                        case "Action Taken" of
-                            "Action Taken"::Won:
+                        case Rec."Action Taken" of
+                            Rec."Action Taken"::Won:
                                 begin
                                     CalcdCurrentValueLCYEnable := true;
-                                    if Opp.Get("Opportunity No.") then
+                                    if Opp.Get(Rec."Opportunity No.") then
                                         SalesQuoteEnable := Opp."Sales Document No." <> '';
                                 end;
-                            "Action Taken"::Lost:
+                            Rec."Action Taken"::Lost:
                                 begin
                                     CalcdCurrentValueLCYEnable := false;
                                     SalesQuoteEnable := false;
                                 end;
                         end;
 
-                        UpdateEstimates();
-                        case "Action Taken" of
-                            "Action Taken"::Won:
+                        Rec.UpdateEstimates();
+                        case Rec."Action Taken" of
+                            Rec."Action Taken"::Won:
                                 begin
                                     CloseOpportunityCode.SetRange(Type, CloseOpportunityCode.Type::Won);
                                     if CloseOpportunityCode.Count = 1 then begin
                                         CloseOpportunityCode.FindFirst();
-                                        "Close Opportunity Code" := CloseOpportunityCode.Code;
+                                        Rec."Close Opportunity Code" := CloseOpportunityCode.Code;
                                     end;
                                 end;
-                            "Action Taken"::Lost:
+                            Rec."Action Taken"::Lost:
                                 begin
                                     CloseOpportunityCode.SetRange(Type, CloseOpportunityCode.Type::Lost);
                                     if CloseOpportunityCode.Count = 1 then begin
                                         CloseOpportunityCode.FindFirst();
-                                        "Close Opportunity Code" := CloseOpportunityCode.Code;
+                                        Rec."Close Opportunity Code" := CloseOpportunityCode.Code;
                                     end;
                                 end;
                         end;
@@ -110,8 +116,8 @@ page 5128 "Close Opportunity"
 
                 trigger OnAction()
                 begin
-                    CheckStatus();
-                    FinishWizard();
+                    Rec.CheckStatus();
+                    Rec.FinishWizard();
                     CurrPage.Close();
                 end;
             }
@@ -128,10 +134,10 @@ page 5128 "Close Opportunity"
                 var
                     SalesHeader: Record "Sales Header";
                 begin
-                    if Opp.Get("Opportunity No.") then begin
+                    if Opp.Get(Rec."Opportunity No.") then begin
                         Opp.ShowQuote();
                         if SalesHeader.Get(SalesHeader."Document Type"::Quote, Opp."Sales Document No.") then begin
-                            "Calcd. Current Value (LCY)" := GetSalesDocValue(SalesHeader);
+                            Rec."Calcd. Current Value (LCY)" := Rec.GetSalesDocValue(SalesHeader);
                             CurrPage.Update();
                         end;
                     end;
@@ -165,26 +171,23 @@ page 5128 "Close Opportunity"
     trigger OnOpenPage()
     begin
         UpdateEditable();
-        "Cancel Old To Do" := true;
+        Rec."Cancel Old To Do" := true;
         IsOnMobile := ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::Phone;
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if CloseAction in [ACTION::OK, ACTION::LookupOK] then begin
-            CheckStatus();
-            FinishWizard();
+            Rec.CheckStatus();
+            Rec.FinishWizard();
         end;
     end;
 
     var
         Cont: Record Contact;
         ClientTypeManagement: Codeunit "Client Type Management";
-        [InDataSet]
         CalcdCurrentValueLCYEnable: Boolean;
-        [InDataSet]
         OptionWonEnable: Boolean;
-        [InDataSet]
         OptionLostEnable: Boolean;
         IsOnMobile: Boolean;
 
@@ -193,16 +196,15 @@ page 5128 "Close Opportunity"
 
     protected var
         Opp: Record Opportunity;
-        [InDataSet]
         SalesQuoteEnable: Boolean;
 
     procedure Caption(): Text
     var
         CaptionStr: Text;
     begin
-        if Cont.Get("Contact Company No.") then
+        if Cont.Get(Rec."Contact Company No.") then
             CaptionStr := CopyStr(Cont."No." + ' ' + Cont.Name, 1, MaxStrLen(CaptionStr));
-        if Cont.Get("Contact No.") then
+        if Cont.Get(Rec."Contact No.") then
             CaptionStr := CopyStr(CaptionStr + ' ' + Cont."No." + ' ' + Cont.Name, 1, MaxStrLen(CaptionStr));
         if CaptionStr = '' then
             CaptionStr := Text000;
@@ -212,7 +214,7 @@ page 5128 "Close Opportunity"
 
     local procedure UpdateEditable()
     begin
-        if GetFilter("Action Taken") <> '' then begin
+        if Rec.GetFilter("Action Taken") <> '' then begin
             OptionWonEnable := false;
             OptionLostEnable := false;
         end;
@@ -221,13 +223,13 @@ page 5128 "Close Opportunity"
     local procedure WonActionTakenOnValidate()
     begin
         if not OptionWonEnable then
-            Error(IsNotAValidSelectionErr, "Action Taken");
+            Error(IsNotAValidSelectionErr, Rec."Action Taken");
     end;
 
     local procedure LostActionTakenOnValidate()
     begin
         if not OptionLostEnable then
-            Error(IsNotAValidSelectionErr, "Action Taken");
+            Error(IsNotAValidSelectionErr, Rec."Action Taken");
     end;
 }
 

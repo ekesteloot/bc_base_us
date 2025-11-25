@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Planning;
+
 enum 5520 "Unplanned Demand Type"
 {
     Extensible = true;

@@ -1,3 +1,8 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Posting;
+using System.Environment;
+
 report 900 "Batch Post Assembly Orders"
 {
     Caption = 'Batch Post Assembly Orders';
@@ -7,7 +12,7 @@ report 900 "Batch Post Assembly Orders"
     {
         dataitem("Assembly Header"; "Assembly Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             RequestFilterFields = "No.";
 
             trigger OnPreDataItem()
@@ -19,8 +24,8 @@ report 900 "Batch Post Assembly Orders"
                     Error(Text000);
 
                 BatchProcessingMgt.SetProcessingCodeunit(CODEUNIT::"Assembly-Post");
-                BatchProcessingMgt.SetParameter("Batch Posting Parameter Type"::"Replace Posting Date", ReplacePostingDate);
-                BatchProcessingMgt.SetParameter("Batch Posting Parameter Type"::"Posting Date", PostingDateReq);
+                BatchProcessingMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Replace Posting Date", ReplacePostingDate);
+                BatchProcessingMgt.SetParameter(Enum::"Batch Posting Parameter Type"::"Posting Date", PostingDateReq);
 
                 RecRef.GetTable("Assembly Header");
                 BatchProcessingMgt.BatchProcess(RecRef);

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Task;
+
 page 5198 "Attendee Wizard Subform"
 {
     AutoSplitKey = true;
@@ -65,20 +67,20 @@ page 5198 "Attendee Wizard Subform"
         AttendanceTypeIndent := 0;
         SendInvitationEditable := true;
 
-        if "Attendance Type" = "Attendance Type"::"To-do Organizer" then begin
+        if Rec."Attendance Type" = Rec."Attendance Type"::"To-do Organizer" then begin
             StyleIsStrong := true;
             SendInvitationEditable := false;
-            "Send Invitation" := true;
+            Rec."Send Invitation" := true;
         end else
             AttendanceTypeIndent := 1;
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
-        Get("To-do No.", "Line No.");
-        if "Attendee No." in [SalespersonFilter, ContactFilter] then
-            Error(Text001, TableCaption);
-        Delete();
+        Rec.Get(Rec."To-do No.", Rec."Line No.");
+        if Rec."Attendee No." in [SalespersonFilter, ContactFilter] then
+            Error(Text001, Rec.TableCaption);
+        Rec.Delete();
         exit(false);
     end;
 
@@ -88,18 +90,18 @@ page 5198 "Attendee Wizard Subform"
         SplitResult: Integer;
     begin
         xAttendee.Copy(Rec);
-        ValidateAttendee(Rec, Rec);
-        Reset();
+        Rec.ValidateAttendee(Rec, Rec);
+        Rec.Reset();
         Rec := xAttendee;
-        if Get("To-do No.", "Line No.") then begin
+        if Rec.Get(Rec."To-do No.", Rec."Line No.") then begin
             repeat
-            until (Next() = 0) or ("Line No." = xRec."Line No.");
-            Next(-1);
-            SplitResult := Round((xRec."Line No." - "Line No.") / 2, 1, '=');
+            until (Rec.Next() = 0) or (Rec."Line No." = xRec."Line No.");
+            Rec.Next(-1);
+            SplitResult := Round((xRec."Line No." - Rec."Line No.") / 2, 1, '=');
         end;
-        Copy(xAttendee);
-        "Line No." := "Line No." + SplitResult;
-        Insert();
+        Rec.Copy(xAttendee);
+        Rec."Line No." := Rec."Line No." + SplitResult;
+        Rec.Insert();
         exit(false);
     end;
 
@@ -108,17 +110,17 @@ page 5198 "Attendee Wizard Subform"
         xAttendee: Record Attendee;
     begin
         xAttendee.Copy(Rec);
-        Get("To-do No.", "Line No.");
-        if ("Attendee No." in [SalespersonFilter, ContactFilter]) and
-           (("Attendee Type" <> "Attendee Type") or
-            ("Attendee No." <> "Attendee No.") or
-            (("Attendance Type" = "Attendance Type"::"To-do Organizer") and
-             ("Attendance Type" <> "Attendance Type"::"To-do Organizer")))
+        Rec.Get(Rec."To-do No.", Rec."Line No.");
+        if (Rec."Attendee No." in [SalespersonFilter, ContactFilter]) and
+           ((Rec."Attendee Type" <> Rec."Attendee Type") or
+            (Rec."Attendee No." <> Rec."Attendee No.") or
+            ((Rec."Attendance Type" = Rec."Attendance Type"::"To-do Organizer") and
+             (Rec."Attendance Type" <> Rec."Attendance Type"::"To-do Organizer")))
         then
-            Error(Text001, TableCaption);
-        ValidateAttendee(xAttendee, Rec);
-        Copy(xAttendee);
-        Modify();
+            Error(Text001, Rec.TableCaption);
+        Rec.ValidateAttendee(xAttendee, Rec);
+        Rec.Copy(xAttendee);
+        Rec.Modify();
         exit(false);
     end;
 
@@ -126,21 +128,18 @@ page 5198 "Attendee Wizard Subform"
         SalespersonFilter: Code[20];
         Text001: Label 'You cannot delete or change this %1.';
         ContactFilter: Code[20];
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         SendInvitationEditable: Boolean;
-        [InDataSet]
         AttendanceTypeIndent: Integer;
 
     procedure SetAttendee(var Attendee: Record Attendee)
     begin
-        DeleteAll();
+        Rec.DeleteAll();
 
         if Attendee.FindSet() then
             repeat
                 Rec := Attendee;
-                Insert();
+                Rec.Insert();
             until Attendee.Next() = 0;
     end;
 
@@ -148,11 +147,11 @@ page 5198 "Attendee Wizard Subform"
     begin
         Attendee.DeleteAll();
 
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
                 Attendee := Rec;
                 Attendee.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     procedure UpdateForm()

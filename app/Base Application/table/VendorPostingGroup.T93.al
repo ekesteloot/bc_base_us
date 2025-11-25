@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Setup;
+
 table 93 "Vendor Posting Group"
 {
     Caption = 'Vendor Posting Group';

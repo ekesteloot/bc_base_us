@@ -1,7 +1,13 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
 report 119 "Customer - Sales List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/CustomerSalesList.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerSalesList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Customer - Sales List';
     PreviewMode = PrintLayout;

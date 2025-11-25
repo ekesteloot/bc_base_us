@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentRegistration;
+
 page 986 "Document Search Result"
 {
     Caption = 'Document Search Result';
@@ -5,8 +7,8 @@ page 986 "Document Search Result"
     PageType = List;
     SourceTable = "Document Search Result";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Doc. No.")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Doc. No.")
+                      order(Ascending);
 
     layout
     {

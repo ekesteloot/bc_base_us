@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Utilities;
+
 table 2000000007 "Date"
 {
     DataPerCompany = False;
@@ -21,7 +27,7 @@ table 2000000007 "Date"
         }
         field(5; "Period Name"; Text[31])
         {
-        } 
+        }
         field(6; "Period Invariant Name"; Text[31])
         {
         }

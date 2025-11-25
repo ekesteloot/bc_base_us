@@ -1,4 +1,12 @@
-﻿codeunit 99000835 "Item Jnl. Line-Reserve"
+﻿namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Tracking;
+
+codeunit 99000835 "Item Jnl. Line-Reserve"
 {
     Permissions = TableData "Reservation Entry" = rimd;
 
@@ -53,7 +61,7 @@
         OnCreateReservationOnBeforeCreateReservEntry(ItemJournalLine, Quantity, QuantityBase, ForReservationEntry, IsHandled);
         if not IsHandled then begin
             CreateReservEntry.CreateReservEntryFor(
-                DATABASE::"Item Journal Line",
+                Enum::TableID::"Item Journal Line".AsInteger(),
                 ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
                 ItemJournalLine."Journal Batch Name", 0, ItemJournalLine."Line No.", ItemJournalLine."Qty. per Unit of Measure",
                 Quantity, QuantityBase, ForReservationEntry);
@@ -163,7 +171,7 @@
                (not ReservationManagement.CalcIsAvailTrackedQtyInBin(
                   NewItemJournalLine."Item No.", NewItemJournalLine."Bin Code",
                   NewItemJournalLine."Location Code", NewItemJournalLine."Variant Code",
-                  DATABASE::"Item Journal Line", NewItemJournalLine."Entry Type".AsInteger(),
+                  Enum::TableID::"Item Journal Line".AsInteger(), NewItemJournalLine."Entry Type".AsInteger(),
                   NewItemJournalLine."Journal Template Name", NewItemJournalLine."Journal Batch Name",
                   0, NewItemJournalLine."Line No."))
             then begin
@@ -214,21 +222,19 @@
         if Blocked then
             exit;
 
-        with NewItemJournalLine do begin
-            if "Line No." = OldItemJournalLine."Line No." then
-                if "Quantity (Base)" = OldItemJournalLine."Quantity (Base)" then
-                    exit;
-            if "Line No." = 0 then
-                if not ItemJournalLine.Get("Journal Template Name", "Journal Batch Name", "Line No.") then
-                    exit;
-            ReservationManagement.SetReservSource(NewItemJournalLine);
-            if "Qty. per Unit of Measure" <> OldItemJournalLine."Qty. per Unit of Measure" then
-                ReservationManagement.ModifyUnitOfMeasure();
-            if "Quantity (Base)" * OldItemJournalLine."Quantity (Base)" < 0 then
-                ReservationManagement.DeleteReservEntries(true, 0)
-            else
-                ReservationManagement.DeleteReservEntries(false, "Quantity (Base)");
-        end;
+        if NewItemJournalLine."Line No." = OldItemJournalLine."Line No." then
+            if NewItemJournalLine."Quantity (Base)" = OldItemJournalLine."Quantity (Base)" then
+                exit;
+        if NewItemJournalLine."Line No." = 0 then
+            if not ItemJournalLine.Get(NewItemJournalLine."Journal Template Name", NewItemJournalLine."Journal Batch Name", NewItemJournalLine."Line No.") then
+                exit;
+        ReservationManagement.SetReservSource(NewItemJournalLine);
+        if NewItemJournalLine."Qty. per Unit of Measure" <> OldItemJournalLine."Qty. per Unit of Measure" then
+            ReservationManagement.ModifyUnitOfMeasure();
+        if NewItemJournalLine."Quantity (Base)" * OldItemJournalLine."Quantity (Base)" < 0 then
+            ReservationManagement.DeleteReservEntries(true, 0)
+        else
+            ReservationManagement.DeleteReservEntries(false, NewItemJournalLine."Quantity (Base)");
     end;
 
     procedure TransferItemJnlToItemLedgEntry(var ItemJournalLine: Record "Item Journal Line"; var ItemLedgerEntry: Record "Item Ledger Entry"; TransferQty: Decimal; SkipInventory: Boolean): Boolean
@@ -265,7 +271,7 @@
                     if SkipInventory then
                         if OldReservationEntry.IsReservationOrTracking() then begin
                             OldReservationEntry2.Get(OldReservationEntry."Entry No.", not OldReservationEntry.Positive);
-                            SkipThisRecord := OldReservationEntry2."Source Type" = DATABASE::"Item Ledger Entry";
+                            SkipThisRecord := OldReservationEntry2."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger();
                         end else
                             SkipThisRecord := false;
 
@@ -280,7 +286,7 @@
                         OnTransferItemJnlToItemLedgEntryOnBeforeTransferReservEntry(ItemLedgerEntry);
                         TransferQty :=
                           CreateReservEntry.TransferReservEntry(
-                            DATABASE::"Item Ledger Entry", 0, '', '', 0,
+                            Enum::TableID::"Item Ledger Entry".AsInteger(), 0, '', '', 0,
                             ItemLedgerEntry."Entry No.", ItemLedgerEntry."Qty. per Unit of Measure",
                             OldReservationEntry, TransferQty);
                         OnTransferItemJnlToItemLedgEntryOnAfterTransferReservEntry(OldReservationEntry2, ReservStatus, ItemLedgerEntry);
@@ -310,17 +316,18 @@
 
     procedure RenameLine(var NewItemJournalLine: Record "Item Journal Line"; var OldItemJournalLine: Record "Item Journal Line")
     begin
-        ReservationEngineMgt.RenamePointer(DATABASE::"Item Journal Line",
-          OldItemJournalLine."Entry Type".AsInteger(),
-          OldItemJournalLine."Journal Template Name",
-          OldItemJournalLine."Journal Batch Name",
-          0,
-          OldItemJournalLine."Line No.",
-          NewItemJournalLine."Entry Type".AsInteger(),
-          NewItemJournalLine."Journal Template Name",
-          NewItemJournalLine."Journal Batch Name",
-          0,
-          NewItemJournalLine."Line No.");
+        ReservationEngineMgt.RenamePointer(
+            Enum::TableID::"Item Journal Line".AsInteger(),
+            OldItemJournalLine."Entry Type".AsInteger(),
+            OldItemJournalLine."Journal Template Name",
+            OldItemJournalLine."Journal Batch Name",
+            0,
+            OldItemJournalLine."Line No.",
+            NewItemJournalLine."Entry Type".AsInteger(),
+            NewItemJournalLine."Journal Template Name",
+            NewItemJournalLine."Journal Batch Name",
+            0,
+            NewItemJournalLine."Line No.");
     end;
 
     procedure DeleteLineConfirm(var ItemJournalLine: Record "Item Journal Line"): Boolean
@@ -395,7 +402,7 @@
         if not IsHandled then begin
             TrackingSpecification.InitFromItemJnlLine(ItemJournalLine);
             if IsReclass then
-                ItemTrackingLines.SetRunMode("Item Tracking Run Mode"::Reclass);
+                ItemTrackingLines.SetRunMode(Enum::"Item Tracking Run Mode"::Reclass);
             ItemTrackingLines.SetSourceSpec(TrackingSpecification, ItemJournalLine."Posting Date");
             ItemTrackingLines.SetInbound(ItemJournalLine.IsInbound());
             OnCallItemTrackingOnBeforeItemTrackingLinesRunModal(ItemJournalLine, ItemTrackingLines);
@@ -447,7 +454,7 @@
         SourceTrackingSpecification.InitFromItemJnlLine(ItemJournalLine);
 
         Clear(ItemTrackingLines);
-        ItemTrackingLines.SetRunMode("Item Tracking Run Mode"::Reclass);
+        ItemTrackingLines.SetRunMode(Enum::"Item Tracking Run Mode"::Reclass);
         ItemTrackingLines.RegisterItemTrackingLines(
           SourceTrackingSpecification, ItemJournalLine."Posting Date", TempTrackingSpecification);
     end;
@@ -477,7 +484,7 @@
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = 83); // DATABASE::"Item Journal Line"
+        exit(TableID = Enum::TableID::"Item Journal Line".AsInteger());
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnSetReservSource', '', false, false)]
@@ -491,7 +498,7 @@
     local procedure OnFilterReservEntry(var FilterReservEntry: Record "Reservation Entry"; ReservEntrySummary: Record "Entry Summary")
     begin
         if MatchThisEntry(ReservEntrySummary."Entry No.") then begin
-            FilterReservEntry.SetRange("Source Type", DATABASE::"Item Journal Line");
+            FilterReservEntry.SetRange("Source Type", Enum::TableID::"Item Journal Line");
             FilterReservEntry.SetRange("Source Subtype", ReservEntrySummary."Entry No." - EntryStartNo());
         end;
     end;
@@ -501,7 +508,7 @@
     begin
         if MatchThisEntry(FromEntrySummary."Entry No.") then
             IsHandled :=
-                (FilterReservEntry."Source Type" = DATABASE::"Item Journal Line") and
+                (FilterReservEntry."Source Type" = Enum::TableID::"Item Journal Line".AsInteger()) and
                 (FilterReservEntry."Source Subtype" = FromEntrySummary."Entry No." - EntryStartNo());
     end;
 
@@ -559,6 +566,25 @@
             ReturnOption::"Gross Qty. (Base)":
                 exit(ItemJournalLine."Quantity (Base)");
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Reservation Entries", 'OnLookupReserved', '', false, false)]
+    local procedure OnLookupReserved(var ReservationEntry: Record "Reservation Entry")
+    begin
+        if MatchThisTable(ReservationEntry."Source Type") then
+            ShowSourceLines(ReservationEntry);
+    end;
+
+    local procedure ShowSourceLines(var ReservationEntry: Record "Reservation Entry")
+    var
+        ItemJournalLine: Record "Item Journal Line";
+    begin
+        ItemJournalLine.Reset();
+        ItemJournalLine.SetRange("Journal Template Name", ReservationEntry."Source ID");
+        ItemJournalLine.SetRange("Journal Batch Name", ReservationEntry."Source Batch Name");
+        ItemJournalLine.SetRange("Line No.", ReservationEntry."Source Ref. No.");
+        ItemJournalLine.SetRange("Entry Type", ReservationEntry."Source Subtype");
+        PAGE.RunModal(PAGE::"Item Journal Lines", ItemJournalLine);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reservation Management", 'OnGetSourceRecordValue', '', false, false)]

@@ -1,3 +1,12 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Document;
+using Microsoft.WarehouseMgt.CrossDock;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 5769 "Whse. Receipt Subform"
 {
     AutoSplitKey = true;
@@ -330,7 +339,6 @@ page 5769 "Whse. Receipt Subform"
     var
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         Text001: Label 'Cross-docking has been disabled for item %1 or location %2.';
-        [InDataSet]
         HideBinFields: Boolean;
 
     protected var

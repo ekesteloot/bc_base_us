@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.BOM;
+
 page 5874 "BOM Warning Log"
 {
     Caption = 'BOM Warning Log';
@@ -45,7 +47,7 @@ page 5874 "BOM Warning Log"
 
                 trigger OnAction()
                 begin
-                    ShowWarning();
+                    Rec.ShowWarning();
                 end;
             }
         }

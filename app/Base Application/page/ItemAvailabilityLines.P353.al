@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using System.Utilities;
+
 page 353 "Item Availability Lines"
 {
     Caption = 'Lines';
@@ -30,7 +36,7 @@ page 353 "Item Availability Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the type of period that item availability is shown for.';
                 }
-                field(GrossRequirement; "Gross Requirement")
+                field(GrossRequirement; Rec."Gross Requirement")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Gross Requirement';
@@ -42,7 +48,7 @@ page 353 "Item Availability Lines"
                         ShowItemAvailLineList(0)
                     end;
                 }
-                field(ScheduledRcpt; "Scheduled Receipt")
+                field(ScheduledRcpt; Rec."Scheduled Receipt")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Scheduled Receipt';
@@ -54,7 +60,7 @@ page 353 "Item Availability Lines"
                         ShowItemAvailLineList(2);
                     end;
                 }
-                field(PlannedOrderRcpt; "Planned Order Receipt")
+                field(PlannedOrderRcpt; Rec."Planned Order Receipt")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Planned Order Receipt';
@@ -66,7 +72,7 @@ page 353 "Item Availability Lines"
                         ShowItemAvailLineList(1);
                     end;
                 }
-                field(ProjAvailableBalance; "Projected Available Balance")
+                field(ProjAvailableBalance; Rec."Projected Available Balance")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Projected Available Balance';
@@ -78,7 +84,7 @@ page 353 "Item Availability Lines"
                         ShowItemAvailLineList(4);
                     end;
                 }
-                field("Item.Inventory"; Inventory)
+                field("Item.Inventory"; Rec.Inventory)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Inventory';
@@ -212,7 +218,7 @@ page 353 "Item Availability Lines"
                         ItemAvailFormsMgt.ShowAsmOrders(Item);
                     end;
                 }
-                field(ExpectedInventory; "Expected Inventory")
+                field(ExpectedInventory; Rec."Expected Inventory")
                 {
                     ApplicationArea = Assembly;
                     Caption = 'Expected Inventory';
@@ -220,7 +226,7 @@ page 353 "Item Availability Lines"
                     ToolTip = 'Specifies how many units of the assembly component are expected to be available for the current assembly order on the due date.';
                     Visible = false;
                 }
-                field(QtyAvailable; "Available Inventory")
+                field(QtyAvailable; Rec."Available Inventory")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Available Inventory';
@@ -256,7 +262,7 @@ page 353 "Item Availability Lines"
                         ItemAvailFormsMgt.ShowSchedNeed(Item);
                     end;
                 }
-                field(PlannedOrderReleases; "Planned Order Releases")
+                field(PlannedOrderReleases; Rec."Planned Order Releases")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Planned Order Releases';
@@ -293,7 +299,7 @@ page 353 "Item Availability Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcAvailQuantities(Item);
     end;
 
@@ -322,7 +328,7 @@ page 353 "Item Availability Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -349,10 +355,10 @@ page 353 "Item Availability Lines"
     local procedure SetItemFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            Item.SetRange("Date Filter", "Period Start", "Period End")
+            Item.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            Item.SetRange("Date Filter", 0D, "Period End");
-        OnAfterSetItemFilter(Item, "Period Start", "Period End");
+            Item.SetRange("Date Filter", 0D, Rec."Period End");
+        OnAfterSetItemFilter(Item, Rec."Period Start", Rec."Period End");
     end;
 
     local procedure ShowItemAvailLineList(What: Integer)
@@ -368,22 +374,22 @@ page 353 "Item Availability Lines"
         SetItemFilter();
         ItemAvailFormsMgt.CalcAvailQuantities(
           Item, AmountType = AmountType::"Balance at Date",
-          "Gross Requirement", "Planned Order Receipt", "Scheduled Receipt",
-          "Planned Order Releases", "Projected Available Balance", "Expected Inventory", DummyQtyAvailable, "Available Inventory");
+          Rec."Gross Requirement", Rec."Planned Order Receipt", Rec."Scheduled Receipt",
+          Rec."Planned Order Releases", Rec."Projected Available Balance", Rec."Expected Inventory", DummyQtyAvailable, Rec."Available Inventory");
 
-        Inventory := Item.Inventory;
-        "Qty. on Purch. Order" := Item."Qty. on Purch. Order";
-        "Qty. on Sales Order" := Item."Qty. on Sales Order";
-        "Qty. on Service Order" := Item."Qty. on Service Order";
-        "Qty. on Job Order" := Item."Qty. on Job Order";
-        "Trans. Ord. Shipment (Qty.)" := Item."Trans. Ord. Shipment (Qty.)";
-        "Qty. in Transit" := Item."Qty. in Transit";
-        "Trans. Ord. Receipt (Qty.)" := Item."Trans. Ord. Receipt (Qty.)";
-        "Qty. on Asm. Comp. Lines" := Item."Qty. on Asm. Component";
-        "Qty. on Assembly Order" := Item."Qty. on Assembly Order";
-        "Scheduled Receipt (Qty.)" := Item."Scheduled Receipt (Qty.)";
-        "Scheduled Issue (Qty.)" := Item."Qty. on Component Lines";
-        "Net Change" := Item."Net Change";
+        Rec.Inventory := Item.Inventory;
+        Rec."Qty. on Purch. Order" := Item."Qty. on Purch. Order";
+        Rec."Qty. on Sales Order" := Item."Qty. on Sales Order";
+        Rec."Qty. on Service Order" := Item."Qty. on Service Order";
+        Rec."Qty. on Job Order" := Item."Qty. on Job Order";
+        Rec."Trans. Ord. Shipment (Qty.)" := Item."Trans. Ord. Shipment (Qty.)";
+        Rec."Qty. in Transit" := Item."Qty. in Transit";
+        Rec."Trans. Ord. Receipt (Qty.)" := Item."Trans. Ord. Receipt (Qty.)";
+        Rec."Qty. on Asm. Comp. Lines" := Item."Qty. on Asm. Component";
+        Rec."Qty. on Assembly Order" := Item."Qty. on Assembly Order";
+        Rec."Scheduled Receipt (Qty.)" := Item."Scheduled Receipt (Qty.)";
+        Rec."Scheduled Issue (Qty.)" := Item."Qty. on Component Lines";
+        Rec."Net Change" := Item."Net Change";
 
         OnAfterCalcAvailQuantities(Rec, Item);
     end;

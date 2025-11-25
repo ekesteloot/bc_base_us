@@ -14,7 +14,7 @@ page 683 "Server Printers"
             repeater(Control2)
             {
                 ShowCaption = false;
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Printer Name';
@@ -32,8 +32,8 @@ page 683 "Server Printers"
     begin
         CODEUNIT.Run(CODEUNIT::"Init. Server Printer Table", Rec);
         if SelectedPrinterName <> '' then begin
-            ID := SelectedPrinterName;
-            if Find() then;
+            Rec.ID := SelectedPrinterName;
+            if Rec.Find() then;
         end;
     end;
 
@@ -47,7 +47,7 @@ page 683 "Server Printers"
 
     procedure GetSelectedPrinterName(): Text[250]
     begin
-        exit(ID);
+        exit(Rec.ID);
     end;
 }
 

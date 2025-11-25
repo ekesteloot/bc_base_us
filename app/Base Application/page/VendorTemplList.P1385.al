@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 page 1385 "Vendor Templ. List"
 {
     Caption = 'Vendor Templates';

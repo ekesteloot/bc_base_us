@@ -1,8 +1,10 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 table 301 "Finance Charge Text"
 {
     Caption = 'Finance Charge Text';
-    DrillDownPageID = "Reminder Text";
-    LookupPageID = "Reminder Text";
+    DrillDownPageID = "Finance Charge Text";
+    LookupPageID = "Finance Charge Text";
 
     fields
     {

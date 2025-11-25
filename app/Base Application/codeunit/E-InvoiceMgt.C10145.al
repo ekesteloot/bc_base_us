@@ -5972,10 +5972,10 @@ IsVATExemptLine(TempDocumentLine));
             repeat
                 AddElementCFDI(XMLCurrNode, 'Retencion', '', DocNameSpace, XMLNewChild);
                 AddNodeTrasladoRetentionPerLine(
-                    XMLDoc, XMLCurrNode, XMLNewChild,
-                    TempDocumentLine.Amount, TempDocumentLineRetention."Retention VAT %",
-                    TempDocumentLineRetention."Unit Price/Direct Unit Cost" * TempDocumentLineRetention.Quantity,
-                    IsVATExemptLine(TempDocumentLineRetention));
+    XMLDoc, XMLCurrNode, XMLNewChild,
+    TempDocumentLine.Amount, TempDocumentLineRetention."Retention VAT %",
+    TempDocumentLineRetention."Unit Price/Direct Unit Cost" * TempDocumentLineRetention.Quantity,
+    IsVATExemptLine(TempDocumentLineRetention));
             until TempDocumentLineRetention.Next() = 0;
             XMLCurrNode := XMLCurrNode.ParentNode; // Retenciones
         end;
@@ -6259,7 +6259,7 @@ IsVATExemptLine(TempDocumentLine));
     end;
 
     local procedure AddNodePagoImpuestosDR(var TempVATAmountLine: Record "VAT Amount Line" temporary; var XMLDoc: DotNet XmlDocument; XMLCurrNode: DotNet XmlNode;
-                                                                                          XMLNewChild: DotNet XmlNode)
+                                                                                                                      XMLNewChild: DotNet XmlNode)
     begin
         if TempVATAmountLine.IsEmpty then
             exit;

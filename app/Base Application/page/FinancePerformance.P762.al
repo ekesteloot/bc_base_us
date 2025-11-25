@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.RoleCenters;
+
+using Microsoft.FinancialMgt.FinancialReports;
+using System;
+using System.Visualization;
+
 page 762 "Finance Performance"
 {
     Caption = 'Finance Performance';
@@ -24,7 +30,7 @@ page 762 "Finance Performance"
 
                 trigger DataPointClicked(point: DotNet BusinessChartDataPoint)
                 begin
-                    SetDrillDownIndexes(point);
+                    Rec.SetDrillDownIndexes(point);
                     AccSchedChartManagement.DrillDown(Rec, AccountSchedulesChartSetup);
                 end;
 
@@ -41,7 +47,7 @@ page 762 "Finance Performance"
                 trigger Refresh()
                 begin
                     if IsChartAddInReady then begin
-                        InitializePeriodFilter(0D, 0D);
+                        Rec.InitializePeriodFilter(0D, 0D);
                         UpdateChart(Period::" ");
                     end;
                 end;
@@ -68,7 +74,7 @@ page 762 "Finance Performance"
                     AccountSchedulesChartSetup2 := AccountSchedulesChartSetup;
                     if PAGE.RunModal(0, AccountSchedulesChartSetup2) = ACTION::LookupOK then begin
                         AccountSchedulesChartSetup := AccountSchedulesChartSetup2;
-                        InitializePeriodFilter(0D, 0D);
+                        Rec.InitializePeriodFilter(0D, 0D);
                         UpdateChart(Period::" ");
                     end;
                 end;
@@ -235,8 +241,8 @@ page 762 "Finance Performance"
             exit;
         AccSchedChartManagement.GetSetupRecordset(AccountSchedulesChartSetup, AccountSchedulesChartSetup.Name, Move);
         AccSchedChartManagement.UpdateData(Rec, Period, AccountSchedulesChartSetup);
-        Update(CurrPage.BusinessChart);
-        StatusText := GetCurrentSelectionText("Period Filter Start Date", "Period Filter End Date");
+        Rec.Update(CurrPage.BusinessChart);
+        StatusText := GetCurrentSelectionText(Rec."Period Filter Start Date", Rec."Period Filter End Date");
     end;
 
     local procedure GetCurrentSelectionText(FromDate: Date; ToDate: Date): Text[100]

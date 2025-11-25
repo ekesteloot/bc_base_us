@@ -8,7 +8,7 @@ report 10122 "Purchase Order"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Buy-from Vendor No.", "Pay-to Vendor No.", "No. Printed";
             column(No_PurchaseHeader; "No.")
@@ -16,10 +16,10 @@ report 10122 "Purchase Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyAddress1; CompanyAddress[1])
                     {
                     }
@@ -187,9 +187,9 @@ report 10122 "Purchase Order"
                     }
                     dataitem("Purchase Line"; "Purchase Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE("Document Type" = CONST(Order));
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where("Document Type" = const(Order));
                         column(AmountExclInvDisc; AmountExclInvDisc)
                         {
                         }
@@ -415,6 +415,7 @@ report 10122 "Purchase Order"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Purchaser Code" = '' then
                     Clear(SalesPurchPerson)
@@ -592,9 +593,7 @@ report 10122 "Purchase Order"
         Text007: Label 'Total Tax:';
         Text008: Label 'Tax:';
         UseExternalTaxEngine: Boolean;
-        [InDataSet]
         ArchiveDocumentEnable: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         ToCaptionLbl: Label 'To:';
         ReceiveByCaptionLbl: Label 'Receive By';

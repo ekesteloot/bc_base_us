@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Contact;
+
+using Microsoft.CRM.Setup;
+using System.Integration.Word;
+
 codeunit 5070 "Custom Word Template Fields"
 {
     Access = internal;

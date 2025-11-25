@@ -1,3 +1,13 @@
+﻿namespace System.Threading;
+
+using System.DateTime;
+using System.Device;
+using System.Environment;
+using System.Globalization;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Utilities;
+
 table 472 "Job Queue Entry"
 {
     Caption = 'Job Queue Entry';
@@ -76,7 +86,7 @@ table 472 "Job Queue Entry"
         field(8; "Object ID to Run"; Integer)
         {
             Caption = 'Object ID to Run';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = FIELD("Object Type to Run"));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = field("Object Type to Run"));
 
             trigger OnLookup()
             var
@@ -118,8 +128,8 @@ table 472 "Job Queue Entry"
         }
         field(9; "Object Caption to Run"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = FIELD("Object Type to Run"),
-                                                                           "Object ID" = FIELD("Object ID to Run")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = field("Object Type to Run"),
+                                                                           "Object ID" = field("Object ID to Run")));
             Caption = 'Object Caption to Run';
             Editable = false;
             FieldClass = FlowField;
@@ -444,7 +454,7 @@ table 472 "Job Queue Entry"
         }
         field(49; Scheduled; Boolean)
         {
-            CalcFormula = Exist("Scheduled Task" WHERE(ID = FIELD("System Task ID")));
+            CalcFormula = exist("Scheduled Task" where(ID = field("System Task ID")));
             Caption = 'Scheduled';
             FieldClass = FlowField;
         }
@@ -481,13 +491,8 @@ table 472 "Job Queue Entry"
             Caption = 'Recovery Task Id';
             Editable = false;
             DataClassification = SystemMetadata;
-#if not CLEAN19
-            ObsoleteState = Pending;
-            ObsoleteTag = '19.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#endif
             ObsoleteReason = 'The recovery job is no longer needed.';
         }
     }
@@ -500,6 +505,7 @@ table 472 "Job Queue Entry"
         }
         key(Key2; "Job Queue Category Code")
         {
+            IncludedFields = Status, "User ID", "System Task ID", "Object Type to Run", "Object ID to Run", "Earliest Start Date/Time";
         }
         key(Key3; "Last Ready State")
         {
@@ -512,6 +518,10 @@ table 472 "Job Queue Entry"
         }
         key(Key6; "User ID", Status, "Recurring Job")
         {
+        }
+        key(Key7; "Object ID to Run", "Object Type to Run")
+        {
+            IncludedFields = Status, "User ID", "System Task ID", "Job Queue Category Code", "Earliest Start Date/Time";
         }
     }
 
@@ -544,7 +554,6 @@ table 472 "Job Queue Entry"
         RunParametersChanged: Boolean;
     begin
         RunParametersChanged := AreRunParametersChanged();
-        OnModifyOnAfterRunParametersChangedCalculated(Rec, xRec, RunParametersChanged);
         if RunParametersChanged then
             Reschedule();
         SetDefaultValues(RunParametersChanged);
@@ -575,6 +584,7 @@ table 472 "Job Queue Entry"
 
     procedure RefreshLocked()
     begin
+        SetLoadFields();
         LockTable();
         Get(ID);
     end;
@@ -584,15 +594,8 @@ table 472 "Job Queue Entry"
         exit((AtDateTime <> 0DT) and ("Expiration Date/Time" <> 0DT) and ("Expiration Date/Time" < AtDateTime));
     end;
 
-    procedure IsReadyToStart() Result: Boolean
-    var
-        IsHandled: Boolean;
+    procedure IsReadyToStart(): Boolean
     begin
-        IsHandled := false;
-        OnBeforeIsReadyToStart(Rec, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         exit(Status in [Status::Ready, Status::"In Process", Status::"On Hold with Inactivity Timeout"]);
     end;
 
@@ -694,9 +697,6 @@ table 472 "Job Queue Entry"
         JobQueueLogEntry."Object ID to Run" := Rec."Object ID to Run";
         JobQueueLogEntry.Description := Rec.Description;
         JobQueueLogEntry.Status := JobQueueLogEntry.Status::"In Process";
-#if not CLEAN20
-        JobQueueLogEntry."Processed by User ID" := CopyStr(UserId(), 1, MaxStrLen(JobQueueLogEntry."Processed by User ID"));
-#endif
         JobQueueLogEntry."Job Queue Category Code" := Rec."Job Queue Category Code";
         JobQueueLogEntry."System Task Id" := Rec."System Task ID";
         JobQueueLogEntry."User Session ID" := Rec."User Session ID";
@@ -776,7 +776,7 @@ table 472 "Job Queue Entry"
         CODEUNIT.Run(CODEUNIT::"Job Queue - Enqueue", Rec);
     end;
 
-    internal procedure CheckRequiredPermissions()
+    procedure CheckRequiredPermissions()
     var
         DummyJobQueueLogEntry: Record "Job Queue Log Entry";
         DummyErrorMessageRegister: Record "Error Message Register";
@@ -878,14 +878,6 @@ table 472 "Job Queue Entry"
         exit(false);
     end;
 
-#if not CLEAN20
-    [Obsolete('Renamed function to ReuseExistingJobFromCategory', '20.0')]
-    procedure ReuseExistingJobFromCatagory(JobQueueCategoryCode: Code[10]; ExecutionDateTime: DateTime): Boolean
-    begin
-        exit(ReuseExistingJobFromCategory(JobQueueCategoryCode, ExecutionDateTime));
-    end;
-#endif
-
     procedure ReuseExistingJobFromCategory(JobQueueCategoryCode: Code[10]; ExecutionDateTime: DateTime): Boolean
     begin
         SetRange("Job Queue Category Code", JobQueueCategoryCode);
@@ -957,21 +949,18 @@ table 472 "Job Queue Entry"
         "User Session Started" := 0DT;
         "User Service Instance ID" := 0;
         "User Session ID" := 0;
+        "No. of Attempts to Run" := 0;
     end;
 
     procedure CleanupAfterExecution()
     var
         JobQueueDispatcher: Codeunit "Job Queue Dispatcher";
-        SessionId: Integer;
         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeCleanupAfterExecution(Rec, IsHandled);
-        If IsHandled then
+        if IsHandled then
             exit;
-
-        if "Notify On Success" then
-            if Session.StartSession(SessionId, Codeunit::"Job Queue - Send Notification", CurrentCompany(), Rec) then;
 
         if "Recurring Job" then begin
             ClearServiceValues();
@@ -990,13 +979,7 @@ table 472 "Job Queue Entry"
     var
         JobQueueLogEntry: Record "Job Queue Log Entry";
         TelemetrySubscribers: Codeunit "Telemetry Subscribers";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeHandleExecutionError(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         if Rec."Maximum No. of Attempts to Run" > Rec."No. of Attempts to Run" then begin
             Rec."No. of Attempts to Run" += 1;
             Rec."Earliest Start Date/Time" := CurrentDateTime + 1000 * Rec."Rerun Delay (sec.)";
@@ -1348,7 +1331,7 @@ table 472 "Job Queue Entry"
         end;
     end;
 
-    internal procedure ScheduleRecurrentJobQueueEntryWithRunDateFormula(ObjType: Option; ObjID: Integer; RecId: RecordID; JobQueueCategoryCode: Code[10]; MaxAttemptsToRun: Integer; NextRunDateFormula: DateFormula; StartingTime: Time)
+    procedure ScheduleRecurrentJobQueueEntryWithRunDateFormula(ObjType: Option; ObjID: Integer; RecId: RecordID; JobQueueCategoryCode: Code[10]; MaxAttemptsToRun: Integer; NextRunDateFormula: DateFormula; StartingTime: Time)
     begin
         ScheduleRecurrentJobQueueEntryWithRunDateFormula(ObjType, ObjID, RecId, JobQueueCategoryCode, MaxAttemptsToRun, NextRunDateFormula, StartingTime, DefaultJobTimeout());
     end;
@@ -1544,21 +1527,6 @@ table 472 "Job Queue Entry"
 
     [IntegrationEvent(false, false)]
     local procedure OnScheduleRecurrentJobQueueEntryOnBeforeEnqueueTask(var JobQueueEntry: Record "Job Queue Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnModifyOnAfterRunParametersChangedCalculated(var JobQueueEntry: Record "Job Queue Entry"; var xJobQueueEntry: Record "Job Queue Entry"; var RunParametersChanged: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeHandleExecutionError(var JobQueueEntry: Record "Job Queue Entry"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsReadyToStart(var JobQueueEntry: Record "Job Queue Entry"; var ReadyToStart: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

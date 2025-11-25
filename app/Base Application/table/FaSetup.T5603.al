@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Setup;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.Foundation.NoSeries;
+
 table 5603 "FA Setup"
 {
     Caption = 'FA Setup';

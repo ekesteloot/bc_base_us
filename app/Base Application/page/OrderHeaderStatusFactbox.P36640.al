@@ -5,8 +5,8 @@ page 36640 "Order Header Status Factbox"
     InsertAllowed = false;
     PageType = ListPart;
     SourceTable = "Sales Header";
-    SourceTableView = SORTING("Document Type", "Combine Shipments", "Bill-to Customer No.", "Currency Code")
-                      WHERE("Document Type" = FILTER(Order | "Return Order"));
+    SourceTableView = sorting("Document Type", "Combine Shipments", "Bill-to Customer No.", "Currency Code")
+                      where("Document Type" = filter(Order | "Return Order"));
 
     layout
     {
@@ -29,11 +29,11 @@ page 36640 "Order Header Status Factbox"
 
                     trigger OnDrillDown()
                     begin
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 if PAGE.RunModal(PAGE::"Sales Order", Rec) = ACTION::LookupOK then
                                     ;
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 if PAGE.RunModal(PAGE::"Sales Return Order", Rec) = ACTION::LookupOK then
                                     ;
                         end;
@@ -59,13 +59,13 @@ page 36640 "Order Header Status Factbox"
 
                     trigger OnDrillDown()
                     begin
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 begin
                                     GetLastShipment();
                                     if PAGE.RunModal(PAGE::"Posted Sales Shipments", SalesShipmentHeader) = ACTION::LookupOK then;
                                 end;
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 begin
                                     GetLastRetReceipt();
                                     if PAGE.RunModal(PAGE::"Posted Return Receipts", RetReceiptHeader) = ACTION::LookupOK then;
@@ -113,13 +113,13 @@ page 36640 "Order Header Status Factbox"
 
                     trigger OnDrillDown()
                     begin
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 begin
                                     GetLastInvoice();
                                     if PAGE.RunModal(PAGE::"Posted Sales Invoices", SalesInvoiceHeader) = ACTION::LookupOK then;
                                 end;
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 begin
                                     GetLastCrMemo();
                                     if PAGE.RunModal(PAGE::"Posted Sales Credit Memos", RetCreditMemoHeader) = ACTION::LookupOK then;
@@ -225,8 +225,8 @@ page 36640 "Order Header Status Factbox"
     procedure GetLastShipmentInvoice()
     begin
         // Calculate values for this row
-        case "Document Type" of
-            "Document Type"::Order:
+        case Rec."Document Type" of
+            Rec."Document Type"::Order:
                 begin
                     if GetLastShipment() then
                         LastShipmentDate := SalesShipmentHeader."Shipment Date"
@@ -237,7 +237,7 @@ page 36640 "Order Header Status Factbox"
                     else
                         LastInvoiceDate := 0D;
                 end;
-            "Document Type"::"Return Order":
+            Rec."Document Type"::"Return Order":
                 begin
                     if GetLastRetReceipt() then
                         LastShipmentDate := RetReceiptHeader."Posting Date"
@@ -258,7 +258,7 @@ page 36640 "Order Header Status Factbox"
     procedure GetLastShipment(): Boolean
     begin
         SalesShipmentHeader.SetCurrentKey("Order No."/*, "Shipment Date"*/); // may want to create this key
-        SalesShipmentHeader.SetRange("Order No.", "No.");
+        SalesShipmentHeader.SetRange("Order No.", Rec."No.");
         exit(SalesShipmentHeader.FindLast());
 
     end;
@@ -266,7 +266,7 @@ page 36640 "Order Header Status Factbox"
     procedure GetLastInvoice(): Boolean
     begin
         SalesInvoiceHeader.SetCurrentKey("Order No."/*, "Shipment Date"*/); // may want to create this key
-        SalesInvoiceHeader.SetRange("Order No.", "No.");
+        SalesInvoiceHeader.SetRange("Order No.", Rec."No.");
         exit(SalesInvoiceHeader.FindLast());
 
     end;
@@ -274,7 +274,7 @@ page 36640 "Order Header Status Factbox"
     procedure GetLastRetReceipt(): Boolean
     begin
         RetReceiptHeader.SetCurrentKey("Return Order No."/*, "Shipment Date"*/); // may want to create this key
-        RetReceiptHeader.SetRange("Return Order No.", "No.");
+        RetReceiptHeader.SetRange("Return Order No.", Rec."No.");
         exit(RetReceiptHeader.FindLast());
 
     end;
@@ -282,7 +282,7 @@ page 36640 "Order Header Status Factbox"
     procedure GetLastCrMemo(): Boolean
     begin
         RetCreditMemoHeader.SetCurrentKey("Return Order No."/*, "Shipment Date"*/); // may want to create this key
-        RetCreditMemoHeader.SetRange("Return Order No.", "No.");
+        RetCreditMemoHeader.SetRange("Return Order No.", Rec."No.");
         exit(RetCreditMemoHeader.FindLast());
 
     end;

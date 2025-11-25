@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.Currency;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Text;
+
 codeunit 342 "Currency CaptionClass Mgmt"
 {
     SingleInstance = true;

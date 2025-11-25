@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Shared.Navigate;
+
 page 9241 "G/L Entries Dim. Overv. Matrix"
 {
     Caption = 'G/L Entries Dim. Overv. Matrix';
@@ -470,7 +477,7 @@ page 9241 "G/L Entries Dim. Overv. Matrix"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -487,7 +494,7 @@ page 9241 "G/L Entries Dim. Overv. Matrix"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -547,7 +554,7 @@ page 9241 "G/L Entries Dim. Overv. Matrix"
                 Rec := TempGLEntry;
             exit(Found);
         end;
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnInit()
@@ -597,7 +604,7 @@ page 9241 "G/L Entries Dim. Overv. Matrix"
                 Rec := TempGLEntry;
             exit(ResultSteps);
         end;
-        exit(Next(Steps));
+        exit(Rec.Next(Steps));
     end;
 
     trigger OnOpenPage()
@@ -619,75 +626,43 @@ page 9241 "G/L Entries Dim. Overv. Matrix"
         MATRIX_CurrentColumnOrdinal: Integer;
         MATRIX_PKFirstCaptionInSet: Text;
         MATRIX_CurrSetLength: Integer;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
 
     local procedure GetCaption(): Text[250]
     begin
-        if GLAcc."No." <> "G/L Account No." then
-            GLAcc.Get("G/L Account No.");
+        if GLAcc."No." <> Rec."G/L Account No." then
+            GLAcc.Get(Rec."G/L Account No.");
         exit(StrSubstNo('%1 %2', GLAcc."No.", GLAcc.Name));
     end;
 
@@ -701,7 +676,7 @@ page 9241 "G/L Entries Dim. Overv. Matrix"
 
     local procedure MATRIX_OnAfterGetRecord()
     begin
-        if not DimSetEntry.Get("Dimension Set ID", MatrixRecord.Code)
+        if not DimSetEntry.Get(Rec."Dimension Set ID", MatrixRecord.Code)
         then begin
             DimSetEntry.Init();
             DimSetEntry."Dimension Code" := MatrixRecord.Code;

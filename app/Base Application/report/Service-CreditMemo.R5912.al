@@ -1,7 +1,23 @@
+﻿namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 5912 "Service - Credit Memo"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Document/ServiceCreditMemo.rdlc';
+    RDLCLayout = './ServiceMgt/History/ServiceCreditMemo.rdlc';
     Caption = 'Service - Credit Memo';
     Permissions = TableData "Sales Shipment Buffer" = rimd;
 
@@ -9,15 +25,15 @@ report 5912 "Service - Credit Memo"
     {
         dataitem("Service Cr.Memo Header"; "Service Cr.Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Service Credit Memo';
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfoPicture; CompanyInfo.Picture)
                     {
                     }
@@ -183,7 +199,7 @@ report 5912 "Service - Credit Memo"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Service Cr.Memo Header";
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DimText; DimText)
                         {
                         }
@@ -209,9 +225,9 @@ report 5912 "Service - Credit Memo"
                     }
                     dataitem("Service Cr.Memo Line"; "Service Cr.Memo Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Service Cr.Memo Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(TypeInt; TypeInt)
                         {
                         }
@@ -339,7 +355,7 @@ report 5912 "Service - Credit Memo"
                         }
                         dataitem("Service Shipment Buffer"; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(PostDate_ServShiptBuffer; Format(TempServiceShipmentBuffer."Posting Date"))
                             {
                             }
@@ -366,7 +382,7 @@ report 5912 "Service - Credit Memo"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(DimText_DimLoop2; DimText)
                             {
                             }
@@ -440,7 +456,7 @@ report 5912 "Service - Credit Memo"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATBase_VATAmountLine; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Service Cr.Memo Header"."Currency Code";
@@ -515,11 +531,11 @@ report 5912 "Service - Credit Memo"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(CustomerNo_ServCrMemoHdr; "Service Cr.Memo Header"."Customer No.")
                         {
                         }
@@ -588,6 +604,7 @@ report 5912 "Service - Credit Memo"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Service Cr.Memo Header");
@@ -669,9 +686,6 @@ report 5912 "Service - Credit Memo"
         GLSetup: Record "General Ledger Setup";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyBankAccount: Record "Bank Account";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         CompanyInfo3: Record "Company Information";
         ServiceSetup: Record "Service Mgt. Setup";
         TempVATAmountLine: Record "VAT Amount Line" temporary;
@@ -744,6 +758,11 @@ report 5912 "Service - Credit Memo"
         VATAmtLineInvDisAmtCaptionLbl: Label 'Invoice Discount Amount';
         VATAmtLineVATBase1CaptionLbl: Label 'Total';
         ShiptoAddressCaptionLbl: Label 'Ship-to Address';
+
+    protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     procedure FindPostedShipmentDate(): Date
     var

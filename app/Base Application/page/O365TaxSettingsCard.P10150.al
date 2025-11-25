@@ -94,8 +94,8 @@ page 10150 "O365 Tax Settings Card"
                         ApplicationArea = Invoicing, Basic, Suite;
                         Caption = 'GST/HST';
                         Editable = false;
-                        TableRelation = "Tax Jurisdiction" WHERE("Country/Region" = CONST(CA),
-                                                                  "Report-to Jurisdiction" = CONST('CA'));
+                        TableRelation = "Tax Jurisdiction" where("Country/Region" = const(CA),
+                                                                  "Report-to Jurisdiction" = const('CA'));
 
                         trigger OnValidate()
                         begin
@@ -121,8 +121,8 @@ page 10150 "O365 Tax Settings Card"
                         ApplicationArea = Invoicing, Basic, Suite;
                         Caption = 'PST';
                         Editable = false;
-                        TableRelation = "Tax Jurisdiction" WHERE("Country/Region" = CONST(CA),
-                                                                  "Report-to Jurisdiction" = FILTER(<> 'CA'));
+                        TableRelation = "Tax Jurisdiction" where("Country/Region" = const(CA),
+                                                                  "Report-to Jurisdiction" = filter(<> 'CA'));
 
                         trigger OnValidate()
                         begin
@@ -235,7 +235,7 @@ page 10150 "O365 Tax Settings Card"
     begin
         InitializeDefaultTaxAreaLabel();
         TempSalesTaxSetupWizard.Initialize();
-        TempSalesTaxSetupWizard."Tax Area Code" := DelChr(Code, '<>', ' ');
+        TempSalesTaxSetupWizard."Tax Area Code" := DelChr(Rec.Code, '<>', ' ');
         InitializeTaxAreaLines();
         if not IsCanada then
             UpdateDescriptionUS();
@@ -243,7 +243,7 @@ page 10150 "O365 Tax Settings Card"
 
     local procedure InitializeDefaultTaxAreaLabel()
     begin
-        IsDefaultArea := O365TaxSettingsManagement.IsDefaultTaxAreaAPI(Code);
+        IsDefaultArea := O365TaxSettingsManagement.IsDefaultTaxAreaAPI(Rec.Code);
         if IsDefaultArea then
             DefaultTxt := ThisIsDefaultTxt
         else
@@ -256,9 +256,9 @@ page 10150 "O365 Tax Settings Card"
     begin
         if CompanyInformation.IsCanada() then begin
             IsCanada := true;
-            "Country/Region" := "Country/Region"::CA;
+            Rec."Country/Region" := Rec."Country/Region"::CA;
         end else
-            "Country/Region" := "Country/Region"::US;
+            Rec."Country/Region" := Rec."Country/Region"::US;
     end;
 
     local procedure InitializeTaxAreaLines()

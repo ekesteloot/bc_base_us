@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using System.Utilities;
+
 page 9121 "Journal Errors Factbox"
 {
     PageType = ListPart;
@@ -115,8 +119,8 @@ page 9121 "Journal Errors Factbox"
     var
         GenJnlLine: Record "Gen. Journal Line";
     begin
-        GenJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-        GenJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
+        GenJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+        GenJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
         exit(GenJnlLine.Count());
     end;
 

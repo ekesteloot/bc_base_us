@@ -1,3 +1,17 @@
+namespace Microsoft.Foundation.ExtendedText;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.Document;
+using System.Globalization;
+
 table 279 "Extended Text Header"
 {
     Caption = 'Extended Text Header';
@@ -13,15 +27,15 @@ table 279 "Extended Text Header"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF ("Table Name" = CONST("Standard Text")) "Standard Text"
-            ELSE
-            IF ("Table Name" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Table Name" = CONST(Item)) Item
-            ELSE
-            IF ("Table Name" = CONST (Resource)) Resource
-            ELSE
-            IF ("Table Name" = CONST ("VAT Clause")) "VAT Clause";
+            TableRelation = if ("Table Name" = const("Standard Text")) "Standard Text"
+            else
+            if ("Table Name" = const("G/L Account")) "G/L Account"
+            else
+            if ("Table Name" = const(Item)) Item
+            else
+            if ("Table Name" = CONST(Resource)) Resource
+            else
+            if ("Table Name" = CONST("VAT Clause")) "VAT Clause";
         }
         field(3; "Language Code"; Code[10])
         {

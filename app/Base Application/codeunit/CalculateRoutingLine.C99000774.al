@@ -1,3 +1,12 @@
+namespace Microsoft.Manufacturing.Routing;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+
 codeunit 99000774 "Calculate Routing Line"
 {
     Permissions = TableData "Production Order" = r,
@@ -1331,7 +1340,7 @@ codeunit 99000774 "Calculate Routing Line"
                 else
                     CalcRoutingLineForward(CalcStartEndDate);
 
-        OnAfterCalculateRoutingLine(ProdOrderRoutingLine, "Transfer Direction".FromInteger(Direction));
+        OnAfterCalculateRoutingLine(ProdOrderRoutingLine, Enum::"Transfer Direction".FromInteger(Direction));
 
         ProdOrderRoutingLine2 := ProdOrderRoutingLine;
     end;
@@ -1666,7 +1675,7 @@ codeunit 99000774 "Calculate Routing Line"
                 DampTime := DampTimeWorkCenter
             else
                 if AvailCap + DampTime = AvailCapWorkCenter + DampTimeWorkCenter then
-                    DampTime := Max(DampTime, DampTimeWorkCenter);
+                    DampTime := max(DampTime, DampTimeWorkCenter);
             AvailCap := Round(Min(AvailCap, AvailCapWorkCenter), 1);
         end;
     end;
@@ -1915,7 +1924,7 @@ codeunit 99000774 "Calculate Routing Line"
 
         CriticalLoadPct := CapacityConstrainedResource."Critical Load %";
         AvailCapBaseMax := Round(CapEffectiveBase * CriticalLoadPct / 100, Rounding);
-        AvailCapBase := Max(0, AvailCapBaseMax - LoadBase);
+        AvailCapBase := max(0, AvailCapBaseMax - LoadBase);
         AvailCap := Round(AvailCapBase / TimeFactor, Rounding);
 
         LoadPct := Round(LoadBase / CapEffectiveBase * 100, Rounding);

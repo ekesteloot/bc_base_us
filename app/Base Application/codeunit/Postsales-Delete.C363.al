@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+
 codeunit 363 "PostSales-Delete"
 {
     Permissions = TableData "Sales Shipment Header" = ri,
@@ -114,7 +120,7 @@ codeunit 363 "PostSales-Delete"
             until SalesShptLine.Next() = 0;
 
         ItemChargeAssignmentSales.CheckAssignment(
-            "Sales Applies-to Document Type"::Shipment, SalesShptLine."Document No.", SalesShptLine."Line No.");
+            Enum::"Sales Applies-to Document Type"::Shipment, SalesShptLine."Document No.", SalesShptLine."Line No.");
 
         ItemTrackingMgt.DeleteItemEntryRelation(
           DATABASE::"Sales Shipment Line", 0, SalesShptHeader."No.", '', 0, 0, true);
@@ -167,7 +173,7 @@ codeunit 363 "PostSales-Delete"
             until ReturnRcptLine.Next() = 0;
 
         ItemChargeAssignmentSales.CheckAssignment(
-            "Sales Applies-to Document Type"::"Return Receipt", ReturnRcptLine."Document No.", ReturnRcptLine."Line No.");
+            Enum::"Sales Applies-to Document Type"::"Return Receipt", ReturnRcptLine."Document No.", ReturnRcptLine."Line No.");
 
         ItemTrackingMgt.DeleteItemEntryRelation(
           DATABASE::"Return Receipt Line", 0, ReturnRcptHeader."No.", '', 0, 0, true);

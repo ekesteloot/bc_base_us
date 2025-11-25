@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 codeunit 1211 "Payment Export Gen. Jnl Check"
 {
     TableNo = "Gen. Journal Line";

@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 table 5555 "Permission Conflicts Overview"
 {
     access = Internal;
@@ -10,7 +12,6 @@ table 5555 "Permission Conflicts Overview"
         {
             DataClassification = SystemMetadata;
         }
-
         field(2; Type; Option)
         {
             DataClassification = SystemMetadata;
@@ -53,6 +54,10 @@ table 5555 "Permission Conflicts Overview"
             DataClassification = SystemMetadata;
         }
         field(12; Viral; Boolean)
+        {
+            DataClassification = SystemMetadata;
+        }
+        field(13; "D365 Admin"; Boolean)
         {
             DataClassification = SystemMetadata;
         }

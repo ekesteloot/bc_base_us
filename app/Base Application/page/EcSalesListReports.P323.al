@@ -7,7 +7,7 @@ page 323 "EC Sales List Reports"
     Editable = false;
     PageType = List;
     SourceTable = "VAT Report Header";
-    SourceTableView = WHERE("VAT Report Config. Code" = FILTER("EC Sales List"));
+    SourceTableView = where("VAT Report Config. Code" = filter("EC Sales List"));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -133,7 +133,7 @@ page 323 "EC Sales List Reports"
     var
         VATReportArchive: Record "VAT Report Archive";
     begin
-        if VATReportArchive.Get("VAT Report Type", "No.") then begin
+        if VATReportArchive.Get(Rec."VAT Report Type", Rec."No.") then begin
             SubmittedBy := VATReportArchive."Submitted By";
             SubmittedDate := VATReportArchive."Submittion Date";
         end;

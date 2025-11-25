@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+
 page 7013 "Price List Filters"
 {
     Caption = 'Price List Filters';
@@ -181,19 +192,12 @@ page 7013 "Price List Filters"
         JobSourceType: Enum "Job Price Source Type";
         CustomerSourceType: Enum "Sales Price Source Type";
         VendorSourceType: Enum "Purchase Price Source Type";
-        [InDataSet]
         IsCustomerGroup: Boolean;
-        [InDataSet]
         IsVendorGroup: Boolean;
-        [InDataSet]
         IsJobGroup: Boolean;
-        [InDataSet]
         SourceNoEnabled: Boolean;
-        [InDataSet]
         ParentSourceNoEnabled: Boolean;
-        [InDataSet]
         EditablePage: Boolean;
-        [InDataSet]
         UseCustomLookup: Boolean;
 
     procedure Set(PriceListHeader: Record "Price List Header")

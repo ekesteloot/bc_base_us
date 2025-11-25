@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000808 "Routing Version List"
 {
     Caption = 'Routing Version List';

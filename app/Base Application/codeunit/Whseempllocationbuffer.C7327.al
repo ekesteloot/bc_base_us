@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Setup;
+
 codeunit 7327 WhseEmplLocationBuffer
 {
     SingleInstance = true;

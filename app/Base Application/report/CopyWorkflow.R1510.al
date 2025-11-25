@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 report 1510 "Copy Workflow"
 {
     Caption = 'Copy Workflow';

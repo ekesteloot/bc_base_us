@@ -10,7 +10,7 @@ report 10214 "Customer Jobs (Price)"
     {
         dataitem(Job; Job)
         {
-            DataItemTableView = SORTING("Bill-to Customer No.") WHERE(Status = CONST(Open), "Bill-to Customer No." = FILTER(<> ''));
+            DataItemTableView = sorting("Bill-to Customer No.") where(Status = const(Open), "Bill-to Customer No." = filter(<> ''));
             RequestFilterFields = "Bill-to Customer No.", "Starting Date", "Ending Date";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

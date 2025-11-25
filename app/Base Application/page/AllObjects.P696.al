@@ -1,3 +1,5 @@
+namespace System.Reflection;
+
 page 696 "All Objects"
 {
     Caption = 'All Objects';

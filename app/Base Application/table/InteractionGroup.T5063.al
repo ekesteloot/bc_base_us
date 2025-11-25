@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 table 5063 "Interaction Group"
 {
     Caption = 'Interaction Group';
@@ -22,10 +24,10 @@ table 5063 "Interaction Group"
         }
         field(4; "No. of Interactions"; Integer)
         {
-            CalcFormula = Count ("Interaction Log Entry" WHERE("Interaction Group Code" = FIELD(Code),
-                                                               Canceled = CONST(false),
-                                                               Date = FIELD("Date Filter"),
-                                                               Postponed = CONST(false)));
+            CalcFormula = Count ("Interaction Log Entry" where("Interaction Group Code" = field(Code),
+                                                               Canceled = const(false),
+                                                               Date = field("Date Filter"),
+                                                               Postponed = const(false)));
             Caption = 'No. of Interactions';
             Editable = false;
             FieldClass = FlowField;
@@ -33,20 +35,20 @@ table 5063 "Interaction Group"
         field(5; "Cost (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("Interaction Log Entry"."Cost (LCY)" WHERE("Interaction Group Code" = FIELD(Code),
-                                                                          Canceled = CONST(false),
-                                                                          Date = FIELD("Date Filter"),
-                                                                          Postponed = CONST(false)));
+            CalcFormula = Sum ("Interaction Log Entry"."Cost (LCY)" where("Interaction Group Code" = field(Code),
+                                                                          Canceled = const(false),
+                                                                          Date = field("Date Filter"),
+                                                                          Postponed = const(false)));
             Caption = 'Cost (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Duration (Min.)"; Decimal)
         {
-            CalcFormula = Sum ("Interaction Log Entry"."Duration (Min.)" WHERE("Interaction Group Code" = FIELD(Code),
-                                                                               Canceled = CONST(false),
-                                                                               Date = FIELD("Date Filter"),
-                                                                               Postponed = CONST(false)));
+            CalcFormula = Sum ("Interaction Log Entry"."Duration (Min.)" where("Interaction Group Code" = field(Code),
+                                                                               Canceled = const(false),
+                                                                               Date = field("Date Filter"),
+                                                                               Postponed = const(false)));
             Caption = 'Duration (Min.)';
             DecimalPlaces = 0 : 0;
             Editable = false;

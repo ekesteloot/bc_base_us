@@ -1,3 +1,30 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Shared.Navigate;
+using System.Globalization;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 120 "Purch. Rcpt. Header"
 {
     Caption = 'Purch. Rcpt. Header';
@@ -43,8 +70,6 @@ table 120 "Purch. Rcpt. Header"
         {
             Caption = 'Pay-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(10; "Pay-to Contact"; Text[100])
@@ -58,7 +83,7 @@ table 120 "Purch. Rcpt. Header"
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Sell-to Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Sell-to Customer No."));
         }
         field(13; "Ship-to Name"; Text[100])
         {
@@ -80,8 +105,6 @@ table 120 "Purch. Rcpt. Header"
         {
             Caption = 'Ship-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
@@ -132,19 +155,19 @@ table 120 "Purch. Rcpt. Header"
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(31; "Vendor Posting Group"; Code[20])
         {
@@ -173,6 +196,11 @@ table 120 "Purch. Rcpt. Header"
             Caption = 'Language Code';
             TableRelation = Language;
         }
+        field(42; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(43; "Purchaser Code"; Code[20])
         {
             Caption = 'Purchaser Code';
@@ -185,9 +213,9 @@ table 120 "Purch. Rcpt. Header"
         }
         field(46; Comment; Boolean)
         {
-            CalcFormula = Exist("Purch. Comment Line" WHERE("Document Type" = CONST(Receipt),
-                                                             "No." = FIELD("No."),
-                                                             "Document Line No." = CONST(0)));
+            CalcFormula = exist("Purch. Comment Line" where("Document Type" = const(Receipt),
+                                                             "No." = field("No."),
+                                                             "Document Line No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -223,9 +251,9 @@ table 120 "Purch. Rcpt. Header"
         field(55; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
         }
         field(66; "Vendor Order No."; Code[35])
         {
@@ -289,8 +317,6 @@ table 120 "Purch. Rcpt. Header"
         {
             Caption = 'Buy-from City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(84; "Buy-from Contact"; Text[100])
@@ -301,8 +327,6 @@ table 120 "Purch. Rcpt. Header"
         {
             Caption = 'Pay-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(86; "Pay-to County"; Text[30])
@@ -319,8 +343,6 @@ table 120 "Purch. Rcpt. Header"
         {
             Caption = 'Buy-from Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(89; "Buy-from County"; Text[30])
@@ -337,8 +359,6 @@ table 120 "Purch. Rcpt. Header"
         {
             Caption = 'Ship-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(92; "Ship-to County"; Text[30])
@@ -358,7 +378,7 @@ table 120 "Purch. Rcpt. Header"
         field(95; "Order Address Code"; Code[10])
         {
             Caption = 'Order Address Code';
-            TableRelation = "Order Address".Code WHERE("Vendor No." = FIELD("Buy-from Vendor No."));
+            TableRelation = "Order Address".Code where("Vendor No." = field("Buy-from Vendor No."));
         }
         field(97; "Entry Point"; Code[10])
         {
@@ -404,8 +424,6 @@ table 120 "Purch. Rcpt. Header"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(113; "Source Code"; Code[10])
         {
@@ -446,7 +464,7 @@ table 120 "Purch. Rcpt. Header"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(5050; "Campaign No."; Code[20])

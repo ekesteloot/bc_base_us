@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 page 5213 Unions
 {
     ApplicationArea = BasicHR;
@@ -13,7 +15,7 @@ page 5213 Unions
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a union code.';
@@ -23,7 +25,7 @@ page 5213 Unions
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the name of the union.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the union''s address.';
@@ -35,7 +37,7 @@ page 5213 Unions
                     ToolTip = 'Specifies the postal code.';
                     Visible = false;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the city of the address.';

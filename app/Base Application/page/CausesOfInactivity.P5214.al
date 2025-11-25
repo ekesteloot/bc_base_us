@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 page 5214 "Causes of Inactivity"
 {
     AdditionalSearchTerms = 'vacation holiday sickness leave cause';
@@ -14,7 +16,7 @@ page 5214 "Causes of Inactivity"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a cause of inactivity code.';

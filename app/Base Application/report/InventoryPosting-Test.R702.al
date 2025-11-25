@@ -1,14 +1,27 @@
+﻿namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using System.Security.User;
+using System.Utilities;
+
 report 702 "Inventory Posting - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InventoryPostingTest.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InventoryPostingTest.rdlc';
     Caption = 'Inventory Posting - Test';
 
     dataset
     {
         dataitem("Item Journal Batch"; "Item Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             RequestFilterFields = "Journal Template Name", Name;
             column(Item_Journal_Batch_Journal_Template_Name; "Journal Template Name")
             {
@@ -18,8 +31,8 @@ report 702 "Inventory Posting - Test"
             }
             dataitem("Item Journal Line"; "Item Journal Line")
             {
-                DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
-                DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+                DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
+                DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
                 RequestFilterFields = "Posting Date";
                 column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
                 {
@@ -313,7 +326,7 @@ report 702 "Inventory Posting - Test"
                 }
                 dataitem(DimensionLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -360,7 +373,7 @@ report 702 "Inventory Posting - Test"
                 }
                 dataitem(ErrorLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -381,6 +394,7 @@ report 702 "Inventory Posting - Test"
 
                 trigger OnAfterGetRecord()
                 var
+                    ItemVariant: Record "Item Variant";
                     ItemJnlLine2: Record "Item Journal Line";
                     ItemJnlLine3: Record "Item Journal Line";
                     ItemJnlLine4: Record "Item Journal Line";
@@ -388,6 +402,7 @@ report 702 "Inventory Posting - Test"
                     InvtPeriodEndDate: Date;
                     QtyToPostBase: Decimal;
                     TempErrorText: Text[250];
+                    ItemItemVariantLbl: Label '%1 %2', Comment = '%1 - Item No., %2 - Variant Code';
                 begin
                     OnBeforeItemJournalLineOnAfterGetRecord("Item Journal Line", ErrorCounter, ErrorText);
 
@@ -418,18 +433,22 @@ report 702 "Inventory Posting - Test"
                     if EmptyLine() then begin
                         if not IsValueEntryForDeletedItem() then
                             AddError(StrSubstNo(Text001, FieldCaption("Item No.")))
-                    end else
+                    end else begin
                         if not Item.Get("Item No.") then
-                            AddError(
-                              StrSubstNo(
-                                Text002,
-                                Item.TableCaption(), "Item No."))
+                            AddError(StrSubstNo(Text002, Item.TableCaption(), "Item No."))
                         else
                             if Item.Blocked then
-                                AddError(
-                                  StrSubstNo(
-                                    Text003,
-                                    Item.FieldCaption(Blocked), false, Item.TableCaption(), "Item No."));
+                                AddError(StrSubstNo(Text003, Item.FieldCaption(Blocked), false, Item.TableCaption(), "Item No."));
+
+                        if "Item Journal Line"."Variant Code" <> '' then begin
+                            ItemVariant.SetLoadFields(Blocked);
+                            if not ItemVariant.Get("Item Journal Line"."Item No.", "Item Journal Line"."Variant Code") then
+                                AddError(StrSubstNo(Text002, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, "Item Journal Line"."Item No.", "Item Journal Line"."Variant Code")))
+                            else
+                                if ItemVariant.Blocked then
+                                    AddError(StrSubstNo(Text003, ItemVariant.FieldCaption(Blocked), false, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, "Item Journal Line"."Item No.", "Item Journal Line"."Variant Code")));
+                        end;
+                    end;
 
                     CheckRecurringLine("Item Journal Line");
 

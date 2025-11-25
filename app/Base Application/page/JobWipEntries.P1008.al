@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 1008 "Job WIP Entries"
 {
     ApplicationArea = Jobs;
@@ -75,7 +79,7 @@ page 1008 "Job WIP Entries"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the posting group related to this entry.';
                 }
-                field(Reverse; Reverse)
+                field(Reverse; Rec.Reverse)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies whether the entry has been part of a reverse transaction (correction) made by the reverse function.';
@@ -176,7 +180,7 @@ page 1008 "Job WIP Entries"
                     Caption = 'WIP Totals';
                     Image = EntriesList;
                     RunObject = Page "Job WIP Totals";
-                    RunPageLink = "Entry No." = FIELD("Job WIP Total Entry No.");
+                    RunPageLink = "Entry No." = field("Job WIP Total Entry No.");
                     ToolTip = 'View the job''s WIP totals.';
                 }
                 action(Dimensions)
@@ -190,7 +194,7 @@ page 1008 "Job WIP Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -203,7 +207,7 @@ page 1008 "Job WIP Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }

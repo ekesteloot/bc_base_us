@@ -143,8 +143,8 @@ report 10055 "Outstanding Sales Order Aging"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "Bill-to Customer No." = FIELD("No."), "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Document Type", "Bill-to Customer No.") WHERE("Document Type" = CONST(Order));
+                DataItemLink = "Bill-to Customer No." = field("No."), "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Document Type", "Bill-to Customer No.") where("Document Type" = const(Order));
                 column(Sales_Line__Document_No__; "Document No.")
                 {
                 }

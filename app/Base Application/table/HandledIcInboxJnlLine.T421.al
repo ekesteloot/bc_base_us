@@ -1,3 +1,13 @@
+namespace Microsoft.Intercompany.Inbox;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 421 "Handled IC Inbox Jnl. Line"
 {
     Caption = 'Handled IC Inbox Jnl. Line';
@@ -31,15 +41,15 @@ table 421 "Handled IC Inbox Jnl. Line"
         {
             Caption = 'Account No.';
             Editable = false;
-            TableRelation = IF ("Account Type" = CONST("G/L Account")) "IC G/L Account"
-            ELSE
-            IF ("Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Account Type" = CONST("IC Partner")) "IC Partner"
-            ELSE
-            IF ("Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Account Type" = const("G/L Account")) "IC G/L Account"
+            else
+            if ("Account Type" = const(Customer)) Customer
+            else
+            if ("Account Type" = const(Vendor)) Vendor
+            else
+            if ("Account Type" = const("IC Partner")) "IC Partner"
+            else
+            if ("Account Type" = const("Bank Account")) "Bank Account";
         }
         field(6; Amount; Decimal)
         {

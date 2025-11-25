@@ -89,10 +89,10 @@ page 10351 "BC O365 Tax Settings List"
 
     trigger OnAfterGetRecord()
     begin
-        if Code = O365TaxSettingsManagement.GetDefaultTaxArea() then
-            TaxAreaDescription := StrSubstNo(DefaultTaxDescriptionTxt, GetDescriptionInCurrentLanguageFullLength())
+        if Rec.Code = O365TaxSettingsManagement.GetDefaultTaxArea() then
+            TaxAreaDescription := StrSubstNo(DefaultTaxDescriptionTxt, Rec.GetDescriptionInCurrentLanguageFullLength())
         else
-            TaxAreaDescription := GetDescriptionInCurrentLanguageFullLength();
+            TaxAreaDescription := Rec.GetDescriptionInCurrentLanguageFullLength();
     end;
 
     trigger OnInit()

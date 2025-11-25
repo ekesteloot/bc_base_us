@@ -8,7 +8,7 @@ page 1175 "User Task Group"
     {
         area(content)
         {
-            field("Code"; Code)
+            field("Code"; Rec.Code)
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Group Code';
@@ -23,7 +23,7 @@ page 1175 "User Task Group"
             part(Control4; "User Task Group Members")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "User Task Group Code" = FIELD(Code);
+                SubPageLink = "User Task Group Code" = field(Code);
             }
         }
     }

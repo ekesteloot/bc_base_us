@@ -1,7 +1,11 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
+
+namespace System.Environment.Configuration;
+
+using System.Apps;
 
 /// <summary>
 /// Displays the deployment status for extensions that are deployed or are scheduled for deployment.
@@ -44,7 +48,7 @@ page 2508 "Extension Deployment Status"
                     ToolTip = 'Specifies the deployment type.';
                     OptionCaption = 'Upload,Install';
                 }
-                field(Status; Status)
+                field(Status; Rec.Status)
                 {
                     ApplicationArea = All;
                     Caption = 'Status';
@@ -64,7 +68,7 @@ page 2508 "Extension Deployment Status"
                     ToolTip = 'Specifies the version of the app.';
                     Width = 6;
                 }
-                field("Started On"; "Started On")
+                field("Started On"; Rec."Started On")
                 {
                     ApplicationArea = All;
                     Caption = 'Started Date';
@@ -104,21 +108,21 @@ page 2508 "Extension Deployment Status"
     var
         ExtensionOperationImpl: Codeunit "Extension Operation Impl";
     begin
-        if "Operation Type" = 0 then
+        if Rec."Operation Type" = 0 then
             OperationType := OperationType::Install
         else
             OperationType := OperationType::Upload;
 
-        ExtensionOperationImpl.GetDeployOperationInfo("Operation ID", Version, DeploymentSchedule, AppPublisher, AppName, Description);
+        ExtensionOperationImpl.GetDeployOperationInfo(Rec."Operation ID", Version, DeploymentSchedule, AppPublisher, AppName, Rec.Description);
 
-        if Status = Status::InProgress then
-            ExtensionOperationImpl.RefreshStatus("Operation ID");
+        if Rec.Status = Rec.Status::InProgress then
+            ExtensionOperationImpl.RefreshStatus(Rec."Operation ID");
     end;
 
     trigger OnOpenPage()
     begin
-        SetCurrentKey("Started On");
-        Ascending(false);
+        Rec.SetCurrentKey("Started On");
+        Rec.Ascending(false);
     end;
 
     var
@@ -128,4 +132,5 @@ page 2508 "Extension Deployment Status"
         AppName: Text;
         OperationType: Option Upload,Install;
 }
+
 

@@ -1,3 +1,11 @@
+namespace Microsoft.CRM.Analysis;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Team;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 5099 Tasks
 {
     ApplicationArea = Basic, Suite;
@@ -62,7 +70,7 @@ page 5099 Tasks
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Contact Company No. Filter';
-                    TableRelation = Contact WHERE(Type = CONST(Company));
+                    TableRelation = Contact where(Type = const(Company));
                     ToolTip = 'Specifies which contacts will be included in the Tasks matrix view.';
                 }
                 field(StatusFilter; StatusFilter)
@@ -97,7 +105,7 @@ page 5099 Tasks
 
                     trigger OnValidate()
                     begin
-                        CreateCaptionSet("Matrix Page Step Type"::Initial);
+                        CreateCaptionSet(Enum::"Matrix Page Step Type"::Initial);
                     end;
                 }
                 field(ColumnSet; ColumnSet)
@@ -141,7 +149,7 @@ page 5099 Tasks
 
                 trigger OnAction()
                 begin
-                    CreateCaptionSet("Matrix Page Step Type"::Previous);
+                    CreateCaptionSet(Enum::"Matrix Page Step Type"::Previous);
                 end;
             }
             action("Next Set")
@@ -153,7 +161,7 @@ page 5099 Tasks
 
                 trigger OnAction()
                 begin
-                    CreateCaptionSet("Matrix Page Step Type"::Next);
+                    CreateCaptionSet(Enum::"Matrix Page Step Type"::Next);
                 end;
             }
         }
@@ -184,7 +192,7 @@ page 5099 Tasks
     trigger OnOpenPage()
     begin
         CurrSetLength := 32;
-        CreateCaptionSet("Matrix Page Step Type"::Initial);
+        CreateCaptionSet(Enum::"Matrix Page Step Type"::Initial);
     end;
 
     var

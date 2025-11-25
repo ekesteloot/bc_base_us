@@ -1,3 +1,9 @@
+﻿namespace System.Azure.Identity;
+
+using System;
+using System.Environment;
+using System.Utilities;
+
 codeunit 6300 "Azure AD Mgt."
 {
     // // Provides functions to authorize NAV app to use Azure Active Directory resources on behalf of a user.
@@ -67,7 +73,7 @@ codeunit 6300 "Azure AD Mgt."
 
         if IsSaaS() then
             exit('');
-        
+
         if ShowDialog then
             AuthorizationCode := AzureADAccessDialog.GetAuthorizationCode(ResourceUrl, ResourceName);
         if AuthorizationCode <> '' then

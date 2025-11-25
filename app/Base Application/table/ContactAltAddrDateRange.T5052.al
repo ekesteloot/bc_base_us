@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 table 5052 "Contact Alt. Addr. Date Range"
 {
     Caption = 'Contact Alt. Addr. Date Range';
@@ -13,7 +15,7 @@ table 5052 "Contact Alt. Addr. Date Range"
         field(2; "Contact Alt. Address Code"; Code[10])
         {
             Caption = 'Contact Alt. Address Code';
-            TableRelation = "Contact Alt. Address".Code WHERE("Contact No." = FIELD("Contact No."));
+            TableRelation = "Contact Alt. Address".Code where("Contact No." = field("Contact No."));
         }
         field(3; "Starting Date"; Date)
         {

@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Contract;
+
+using System.Utilities;
+
 table 5910 "Service Hour"
 {
     Caption = 'Service Hour';
@@ -8,9 +12,9 @@ table 5910 "Service Hour"
         field(1; "Service Contract No."; Code[20])
         {
             Caption = 'Service Contract No.';
-            TableRelation = IF ("Service Contract Type" = CONST(Contract)) "Service Contract Header"."Contract No." WHERE("Contract Type" = CONST(Contract))
-            ELSE
-            IF ("Service Contract Type" = CONST(Quote)) "Service Contract Header"."Contract No." WHERE("Contract Type" = CONST(Quote));
+            TableRelation = if ("Service Contract Type" = const(Contract)) "Service Contract Header"."Contract No." where("Contract Type" = const(Contract))
+            else
+            if ("Service Contract Type" = const(Quote)) "Service Contract Header"."Contract No." where("Contract Type" = const(Quote));
         }
         field(2; "Starting Date"; Date)
         {
@@ -48,11 +52,9 @@ table 5910 "Service Hour"
         {
             Caption = 'Valid on Holidays';
         }
-        field(7; "Service Contract Type"; Option)
+        field(7; "Service Contract Type"; Enum "Service Hour Contract Type")
         {
             Caption = 'Service Contract Type';
-            OptionCaption = ' ,Quote,Contract';
-            OptionMembers = " ",Quote,Contract;
         }
     }
 

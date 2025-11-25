@@ -174,6 +174,7 @@ codeunit 6154 "API Webhook Notification Send"
         NoPermissionsTxt: Label 'No permissions.', Locked = true;
         PostEmittedTxt: Label 'Notification POST emitted to URL %1.', Locked = true;
         PostFailedTxt: Label 'Notification POST failed. Notification URL: %1. Response code %2.', Locked = true;
+        PostCorrelationGuidTxt: Label 'Correlation GUID for notification POST created: %1', Locked = true;
         SameNotificationUrlDifferentTypeErr: Label 'Same notification URL cannot have multiple subscrition types.', Locked = true;
 
     local procedure Initialize()
@@ -1144,6 +1145,7 @@ codeunit 6154 "API Webhook Notification Send"
         MaskedUrl: Text;
         HttpStatusCodeNumber: Integer;
         HttpStatusCodeText: Integer;
+        CorrelationGuid: Text;
     begin
         if NotificationUrl = '' then begin
             Session.LogMessage('00002A1', StrSubstNo(EmptyNotificationUrlErr, NotificationUrlNumber), Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', APIWebhookCategoryLbl);
@@ -1155,11 +1157,17 @@ codeunit 6154 "API Webhook Notification Send"
             Error(EmptyPayloadPerNotificationUrlErr, NotificationUrlNumber);
         end;
 
+        CorrelationGuid := LowerCase(System.Format(CreateGuid(), 0, 4));
+
         HttpWebRequestMgt.Initialize(NotificationUrl);
         HttpWebRequestMgt.DisableUI();
         HttpWebRequestMgt.SetMethod('POST');
         HttpWebRequestMgt.SetReturnType('application/json');
         HttpWebRequestMgt.SetContentType('application/json');
+        HttpWebRequestMgt.AddHeader('clientRequestId', CorrelationGuid);
+        HttpWebRequestMgt.AddHeader('x-ms-correlation-id', CorrelationGuid);
+
+        Session.LogMessage('0000KX7', StrSubstNo(PostCorrelationGuidTxt, CorrelationGuid), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', APIWebhookCategoryLbl);
 
         if SubscriptionsTypeNotificationUrlDictionary.Get(NotificationUrl) = APIWebhookSubscription."Subscription Type"::Dataverse then
             AddTokenToRequestHeader(HttpWebRequestMgt);

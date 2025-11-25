@@ -1,3 +1,13 @@
+﻿namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.HumanResources.Analysis;
+using Microsoft.HumanResources.Comment;
+using Microsoft.HumanResources.Payables;
+using System.Email;
+
 page 5201 "Employee List"
 {
     ApplicationArea = BasicHR;
@@ -20,7 +30,7 @@ page 5201 "Employee List"
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(FullName; FullName())
+                field(FullName; Rec.FullName())
                 {
                     ApplicationArea = BasicHR;
                     Caption = 'Full Name';
@@ -45,7 +55,7 @@ page 5201 "Employee List"
                     NotBlank = true;
                     ToolTip = 'Specifies the employee''s last name.';
                 }
-                field(Initials; Initials)
+                field(Initials; Rec.Initials)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the employee''s initials.';
@@ -74,7 +84,7 @@ page 5201 "Employee List"
                     Caption = 'Company Phone No.';
                     ToolTip = 'Specifies the employee''s telephone number.';
                 }
-                field(Extension; Extension)
+                field(Extension; Rec.Extension)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the employee''s telephone extension.';
@@ -117,7 +127,7 @@ page 5201 "Employee List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an alternate name that you can use to search for the record in question when you cannot remember the value in the Name field.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies if a comment has been entered for this entry.';
@@ -130,7 +140,7 @@ page 5201 "Employee List"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::Employee), "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::Employee), "No." = field("No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -159,8 +169,8 @@ page 5201 "Employee List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Human Resource Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Employee),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Employee),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 group(Dimensions)
@@ -173,8 +183,8 @@ page 5201 "Employee List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(5200),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(5200),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -192,7 +202,7 @@ page 5201 "Employee List"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(Employee);
-                            DefaultDimMultiple.SetMultiRecord(Employee, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(Employee, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -203,7 +213,7 @@ page 5201 "Employee List"
                     Caption = '&Picture';
                     Image = Picture;
                     RunObject = Page "Employee Picture";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'View or add a picture of the employee or, for example, the company''s logo.';
                 }
                 action(AlternativeAddresses)
@@ -212,7 +222,7 @@ page 5201 "Employee List"
                     Caption = '&Alternate Addresses';
                     Image = Addresses;
                     RunObject = Page "Alternative Address List";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'Open the list of addresses that are registered for the employee.';
                 }
                 action("&Relatives")
@@ -221,7 +231,7 @@ page 5201 "Employee List"
                     Caption = '&Relatives';
                     Image = Relatives;
                     RunObject = Page "Employee Relatives";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'Open the list of relatives that are registered for the employee.';
                 }
                 action("Mi&sc. Article Information")
@@ -230,7 +240,7 @@ page 5201 "Employee List"
                     Caption = 'Mi&sc. Article Information';
                     Image = Filed;
                     RunObject = Page "Misc. Article Information";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'Open the list of miscellaneous articles that are registered for the employee.';
                 }
                 action("Co&nfidential Information")
@@ -239,7 +249,7 @@ page 5201 "Employee List"
                     Caption = 'Co&nfidential Information';
                     Image = Lock;
                     RunObject = Page "Confidential Information";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'Open the list of any confidential information that is registered for the employee.';
                 }
                 action("Q&ualifications")
@@ -248,7 +258,7 @@ page 5201 "Employee List"
                     Caption = 'Q&ualifications';
                     Image = Certificate;
                     RunObject = Page "Employee Qualifications";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'Open the list of qualifications that are registered for the employee.';
                 }
                 action("A&bsences")
@@ -257,7 +267,7 @@ page 5201 "Employee List"
                     Caption = 'A&bsences';
                     Image = Absence;
                     RunObject = Page "Employee Absences";
-                    RunPageLink = "Employee No." = FIELD("No.");
+                    RunPageLink = "Employee No." = field("No.");
                     ToolTip = 'View absence information for the employee.';
                 }
                 separator(Action51)
@@ -269,8 +279,8 @@ page 5201 "Employee List"
                     Caption = 'Absences by Ca&tegories';
                     Image = AbsenceCategory;
                     RunObject = Page "Empl. Absences by Categories";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Employee No. Filter" = FIELD("No.");
+                    RunPageLink = "No." = field("No."),
+                                  "Employee No. Filter" = field("No.");
                     ToolTip = 'View categorized absence information for the employee.';
                 }
                 action("Misc. Articles &Overview")
@@ -301,7 +311,7 @@ page 5201 "Employee List"
                         ContBusRel: Record "Contact Business Relation";
                         Contact: Record Contact;
                     begin
-                        if ContBusRel.FindByRelation(ContBusRel."Link to Table"::Employee, "No.") then begin
+                        if ContBusRel.FindByRelation(ContBusRel."Link to Table"::Employee, Rec."No.") then begin
                             Contact.Get(ContBusRel."Contact No.");
                             Page.Run(Page::"Contact Card", Contact);
                         end;
@@ -344,9 +354,9 @@ page 5201 "Employee List"
                 Caption = 'Ledger E&ntries';
                 Image = VendorLedger;
                 RunObject = Page "Employee Ledger Entries";
-                RunPageLink = "Employee No." = FIELD("No.");
-                RunPageView = SORTING("Employee No.")
-                              ORDER(Descending);
+                RunPageLink = "Employee No." = field("No.");
+                RunPageView = sorting("Employee No.")
+                              order(Descending);
                 ShortCutKey = 'Ctrl+F7';
                 ToolTip = 'View the history of transactions that have been posted for the selected record.';
             }
@@ -356,9 +366,9 @@ page 5201 "Employee List"
                 Caption = 'Pay Employee';
                 Image = SuggestVendorPayments;
                 RunObject = Page "Employee Ledger Entries";
-                RunPageLink = "Employee No." = FIELD("No."),
-                              "Remaining Amount" = FILTER(< 0),
-                              "Applies-to ID" = FILTER('');
+                RunPageLink = "Employee No." = field("No."),
+                              "Remaining Amount" = filter(< 0),
+                              "Applies-to ID" = filter('');
                 ToolTip = 'View employee ledger entries for the selected record with remaining amount that have not been paid yet.';
             }
             action(ApplyTemplate)
@@ -457,7 +467,6 @@ page 5201 "Employee List"
     end;
 
     var
-        [InDataSet]
         CanSendEmail: Boolean;
 
 }

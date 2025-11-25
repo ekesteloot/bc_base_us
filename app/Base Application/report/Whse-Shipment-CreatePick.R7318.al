@@ -1,3 +1,17 @@
+﻿namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.WarehouseMgt.Worksheet;
+
 report 7318 "Whse.-Shipment - Create Pick"
 {
     Caption = 'Whse.-Shipment - Create Pick';
@@ -7,14 +21,14 @@ report 7318 "Whse.-Shipment - Create Pick"
     {
         dataitem("Warehouse Shipment Line"; "Warehouse Shipment Line")
         {
-            DataItemTableView = SORTING("No.", "Line No.");
+            DataItemTableView = sorting("No.", "Line No.");
             dataitem("Assembly Header"; "Assembly Header")
             {
-                DataItemTableView = SORTING("Document Type", "No.");
+                DataItemTableView = sorting("Document Type", "No.");
                 dataitem("Assembly Line"; "Assembly Line")
                 {
-                    DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
-                    DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                    DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
+                    DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                     trigger OnAfterGetRecord()
                     var
@@ -43,9 +57,8 @@ report 7318 "Whse.-Shipment - Create Pick"
                         SetRange(Type, Type::Item);
                         SetFilter("Remaining Quantity (Base)", '>0');
 
-                        WhseWkshLine.SetCurrentKey(
-                          "Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-                        WhseWkshLine.SetRange("Source Type", DATABASE::"Assembly Line");
+                        WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+                        WhseWkshLine.SetRange("Source Type", Enum::TableID::"Assembly Line");
                         WhseWkshLine.SetRange("Source Subtype", "Assembly Header"."Document Type");
                         WhseWkshLine.SetRange("Source No.", "Assembly Header"."No.");
                     end;
@@ -104,7 +117,7 @@ report 7318 "Whse.-Shipment - Create Pick"
                           WhseShptHeader."Shipping Agent Service Code", WhseShptHeader."Shipment Method Code");
                         if not "Assemble to Order" then begin
                             CreatePick.SetTempWhseItemTrkgLine(
-                              "No.", DATABASE::"Warehouse Shipment Line",
+                              "No.", Enum::TableID::"Warehouse Shipment Line",
                               '', 0, "Line No.", "Location Code");
 
                             OnAfterGetRecordWarehouseShipmentLineOnBeforeCreatePickTempLine("Warehouse Shipment Line");
@@ -148,6 +161,7 @@ report 7318 "Whse.-Shipment - Create Pick"
                 CreatePickParameters."Whse. Document" := CreatePickParameters."Whse. Document"::Shipment;
                 CreatePickParameters."Whse. Document Type" := CreatePickParameters."Whse. Document Type"::Pick;
                 CreatePick.SetParameters(CreatePickParameters);
+                CreatePick.SetSaveSummary(ShowSummary);
 
                 CopyFilters(WhseShptLine);
                 SetFilter("Qty. (Base)", '>0');
@@ -230,6 +244,12 @@ report 7318 "Whse.-Shipment - Create Pick"
                         Caption = 'Print Document';
                         ToolTip = 'Specifies if you want the pick document to be printed. Otherwise, you can print it later from the Whse. Pick window.';
                     }
+                    field(ShowSummaryField; ShowSummary)
+                    {
+                        ApplicationArea = Warehouse;
+                        Caption = 'Show Summary (Directed Put-away and Pick)';
+                        ToolTip = 'Specifies if you want the summary window to be shown after creating pick lines.';
+                    }
                 }
             }
         }
@@ -258,7 +278,7 @@ report 7318 "Whse.-Shipment - Create Pick"
         WarehouseDocumentPrint: Codeunit "Warehouse Document-Print";
         IsHandled: Boolean;
     begin
-        CreatePick.CreateWhseDocument(FirstActivityNo, LastActivityNo, not HideNothingToHandleErr);
+        CreatePick.CreateWhseDocument(FirstActivityNo, LastActivityNo, not HideNothingToHandleErr and not ShowSummary);
 
         CreatePick.ReturnTempItemTrkgLines(TempWhseItemTrkgLine);
         ItemTrackingMgt.UpdateWhseItemTrkgLines(TempWhseItemTrkgLine);
@@ -283,7 +303,10 @@ report 7318 "Whse.-Shipment - Create Pick"
             end;
         end else
             if not HideNothingToHandleErr then
-                Error(NothingToHandleErr);
+                if ShowSummary then
+                    ShowCalculationSummary(NothingToHandleErr)
+                else
+                    Error(NothingToHandleErr);
 
         OnAfterPostReport(FirstActivityNo, LastActivityNo);
     end;
@@ -307,6 +330,7 @@ report 7318 "Whse.-Shipment - Create Pick"
         AssignedID: Code[50];
         SortActivity: Enum "Whse. Activity Sorting Method";
         PrintDoc: Boolean;
+        ShowSummary: Boolean;
         EverythingHandled: Boolean;
         WhseWkshLineFound: Boolean;
         HideNothingToHandleErr: Boolean;
@@ -340,6 +364,7 @@ report 7318 "Whse.-Shipment - Create Pick"
     var
         WhseActivHeader: Record "Warehouse Activity Header";
         CannotBeHandledReason: Text;
+        MessageTxt: Text;
     begin
         CannotBeHandledReason := CreatePick.GetCannotBeHandledReason();
         if FirstActivityNo = '' then
@@ -349,27 +374,43 @@ report 7318 "Whse.-Shipment - Create Pick"
             WhseActivHeader.Type := WhseActivHeader.Type::Pick;
             if WhseWkshLineFound then begin
                 if FirstActivityNo = LastActivityNo then
-                    Message(
+                    MessageTxt :=
                       StrSubstNo(
                         SingleActivAndWhseShptCreatedMsg, Format(WhseActivHeader.Type), FirstActivityNo,
-                        Format(WhseActivHeader.Type), CannotBeHandledReason))
+                        Format(WhseActivHeader.Type), CannotBeHandledReason)
                 else
-                    Message(
+                    MessageTxt :=
                       StrSubstNo(
                         MultipleActivAndWhseShptCreatedMsg, Format(WhseActivHeader.Type), FirstActivityNo, LastActivityNo,
-                        Format(WhseActivHeader.Type), CannotBeHandledReason));
+                        Format(WhseActivHeader.Type), CannotBeHandledReason);
             end else
                 if FirstActivityNo = LastActivityNo then
-                    Message(
-                      StrSubstNo(SingleActivCreatedMsg, Format(WhseActivHeader.Type), FirstActivityNo, CannotBeHandledReason))
+                    MessageTxt :=
+                      StrSubstNo(SingleActivCreatedMsg, Format(WhseActivHeader.Type), FirstActivityNo, CannotBeHandledReason)
                 else
-                    Message(
+                    MessageTxt :=
                       StrSubstNo(MultipleActivCreatedMsg, Format(WhseActivHeader.Type),
-                        FirstActivityNo, LastActivityNo, CannotBeHandledReason));
+                        FirstActivityNo, LastActivityNo, CannotBeHandledReason);
 
-            OnGetResultMessageOnAfterShowResultMessage();
+            if ShowSummary then
+                ShowCalculationSummary(MessageTxt)
+            else begin
+                Message(MessageTxt);
+                OnGetResultMessageOnAfterShowResultMessage();
+            end;
         end;
+
         exit(EverythingHandled);
+    end;
+
+    local procedure ShowCalculationSummary(MessageTxt: Text)
+    var
+        TempWarehousePickSummary: Record "Warehouse Pick Summary" temporary;
+        WarehousePickSummaryPage: Page "Warehouse Pick Summary";
+    begin
+        CreatePick.GetWarehousePickSummary(TempWarehousePickSummary);
+        WarehousePickSummaryPage.SetRecords(TempWarehousePickSummary, MessageTxt, CreatePick.GetCalledFromMoveWksh());
+        WarehousePickSummaryPage.Run();
     end;
 
     procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
@@ -393,11 +434,17 @@ report 7318 "Whse.-Shipment - Create Pick"
 
     procedure Initialize(AssignedID2: Code[50]; SortActivity2: Enum "Whse. Activity Sorting Method"; PrintDoc2: Boolean; DoNotFillQtytoHandle2: Boolean; BreakbulkFilter2: Boolean)
     begin
+        Initialize(AssignedID2, SortActivity2, PrintDoc2, DoNotFillQtytoHandle2, BreakbulkFilter2, false);
+    end;
+
+    procedure Initialize(AssignedID2: Code[50]; SortActivity2: Enum "Whse. Activity Sorting Method"; PrintDoc2: Boolean; DoNotFillQtytoHandle2: Boolean; BreakbulkFilter2: Boolean; ShowSummary2: Boolean)
+    begin
         AssignedID := AssignedID2;
         SortActivity := SortActivity2;
         PrintDoc := PrintDoc2;
         DoNotFillQtytoHandle := DoNotFillQtytoHandle2;
         BreakbulkFilter := BreakbulkFilter2;
+        ShowSummary := ShowSummary2;
     end;
 
     local procedure CheckIfAsmToOrderExists(var WarehouseShipmentLine: Record "Warehouse Shipment Line"; var AssemblyHeader: Record "Assembly Header")

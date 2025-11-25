@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Setup;
+
 table 5929 "Service Shelf"
 {
     Caption = 'Service Shelf';

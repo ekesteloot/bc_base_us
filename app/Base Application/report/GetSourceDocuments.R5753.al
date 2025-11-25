@@ -1,4 +1,18 @@
-﻿report 5753 "Get Source Documents"
+﻿namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Setup;
+
+report 5753 "Get Source Documents"
 {
     Caption = 'Get Source Documents';
     ProcessingOnly = true;
@@ -7,19 +21,20 @@
     {
         dataitem("Warehouse Request"; "Warehouse Request")
         {
-            DataItemTableView = WHERE("Document Status" = CONST(Released), "Completely Handled" = FILTER(false));
+            DataItemTableView = where("Document Status" = const(Released), "Completely Handled" = filter(false));
             RequestFilterFields = "Source Document", "Source No.";
             dataitem("Sales Header"; "Sales Header")
             {
-                DataItemLink = "Document Type" = FIELD("Source Subtype"), "No." = FIELD("Source No.");
-                DataItemTableView = SORTING("Document Type", "No.");
+                DataItemLink = "Document Type" = field("Source Subtype"), "No." = field("Source No.");
+                DataItemTableView = sorting("Document Type", "No.");
                 dataitem("Sales Line"; "Sales Line")
                 {
-                    DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
-                    DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                    DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
+                    DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                     trigger OnAfterGetRecord()
                     var
+                        SalesWarehouseMgt: Codeunit "Sales Warehouse Mgt.";
                         IsHandled: Boolean;
                     begin
                         IsHandled := false;
@@ -31,19 +46,19 @@
                         if not SkipWarehouseRequest("Sales Line", "Warehouse Request") then
                             case RequestType of
                                 RequestType::Receive:
-                                    if WhseActivityCreate.CheckIfSalesLine2ReceiptLine("Sales Line") then begin
+                                    if SalesWarehouseMgt.CheckIfSalesLine2ReceiptLine("Sales Line") then begin
                                         OnSalesLineOnAfterGetRecordOnBeforeCreateRcptHeader(
                                           "Sales Line", "Warehouse Request", WhseReceiptHeader, WhseHeaderCreated, OneHeaderCreated);
                                         if not OneHeaderCreated and not WhseHeaderCreated then begin
                                             CreateReceiptHeader();
                                             OnSalesLineOnAfterCreateRcptHeader(WhseReceiptHeader, WhseHeaderCreated, "Sales Header", "Sales Line", "Warehouse Request");
                                         end;
-                                        if not WhseActivityCreate.SalesLine2ReceiptLine(WhseReceiptHeader, "Sales Line") then
+                                        if not SalesWarehouseMgt.SalesLine2ReceiptLine(WhseReceiptHeader, "Sales Line") then
                                             ErrorOccured := true;
                                         LineCreated := true;
                                     end;
                                 RequestType::Ship:
-                                    if WhseActivityCreate.CheckIfFromSalesLine2ShptLine("Sales Line") then begin
+                                    if SalesWarehouseMgt.CheckIfFromSalesLine2ShptLine("Sales Line", ReservedFromStock) then begin
                                         IsHandled := false;
                                         OnSalesLineOnAfterGetRecordOnBeforeCheckCustBlocked(Cust, IsHandled);
                                         if not IsHandled then
@@ -119,7 +134,7 @@
 
                 trigger OnPreDataItem()
                 begin
-                    if "Warehouse Request"."Source Type" <> DATABASE::"Sales Line" then
+                    if "Warehouse Request"."Source Type" <> Enum::TableID::"Sales Line".AsInteger() then
                         CurrReport.Break();
 
                     OnAfterSalesHeaderOnPreDataItem("Sales Header");
@@ -132,15 +147,16 @@
             }
             dataitem("Purchase Header"; "Purchase Header")
             {
-                DataItemLink = "Document Type" = FIELD("Source Subtype"), "No." = FIELD("Source No.");
-                DataItemTableView = SORTING("Document Type", "No.");
+                DataItemLink = "Document Type" = field("Source Subtype"), "No." = field("Source No.");
+                DataItemTableView = sorting("Document Type", "No.");
                 dataitem("Purchase Line"; "Purchase Line")
                 {
-                    DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
-                    DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                    DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
+                    DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                     trigger OnAfterGetRecord()
                     var
+                        PurchasesWarehouseMgt: Codeunit "Purchases Warehouse Mgt.";
                         IsHandled: Boolean;
                     begin
                         IsHandled := false;
@@ -152,20 +168,20 @@
                         if "Location Code" = "Warehouse Request"."Location Code" then
                             case RequestType of
                                 RequestType::Receive:
-                                    if WhseActivityCreate.CheckIfPurchLine2ReceiptLine("Purchase Line") then begin
+                                    if PurchasesWarehouseMgt.CheckIfPurchLine2ReceiptLine("Purchase Line") then begin
                                         OnPurchaseLineOnAfterGetRecordOnBeforeCreateRcptHeader(
                                           "Purchase Line", "Warehouse Request", WhseReceiptHeader, WhseHeaderCreated, OneHeaderCreated);
                                         if not OneHeaderCreated and not WhseHeaderCreated then begin
                                             CreateReceiptHeader();
                                             OnPurchaseLineOnAfterCreateRcptHeader(WhseReceiptHeader, WhseHeaderCreated, "Purchase Header", "Purchase Line", "Warehouse Request");
                                         end;
-                                        if not WhseActivityCreate.PurchLine2ReceiptLine(WhseReceiptHeader, "Purchase Line") then
+                                        if not PurchasesWarehouseMgt.PurchLine2ReceiptLine(WhseReceiptHeader, "Purchase Line") then
                                             ErrorOccured := true;
                                         LineCreated := true;
                                         OnPurchaseLineOnAfterGetRecordOnAfterCreateRcptHeader("Purchase Line", "Warehouse Request", WhseReceiptHeader, WhseHeaderCreated, OneHeaderCreated, ErrorOccured, LineCreated);
                                     end;
                                 RequestType::Ship:
-                                    if WhseActivityCreate.CheckIfFromPurchLine2ShptLine("Purchase Line") then begin
+                                    if PurchasesWarehouseMgt.CheckIfFromPurchLine2ShptLine("Purchase Line", ReservedFromStock) then begin
                                         IsHandled := false;
                                         OnPurchaseLineOnAfterGetRecordOnBeforeCreateShptHeader(
                                           "Purchase Line", "Warehouse Request", WhseShptHeader, WhseHeaderCreated, OneHeaderCreated, IsHandled);
@@ -174,7 +190,7 @@
                                                 CreateShptHeader();
                                                 OnPurchaseLineOnAfterCreateShptHeader(WhseShptHeader, WhseHeaderCreated, "Purchase Header", "Purchase Line", "Warehouse Request");
                                             end;
-                                            if not WhseActivityCreate.FromPurchLine2ShptLine(WhseShptHeader, "Purchase Line") then
+                                            if not PurchasesWarehouseMgt.FromPurchLine2ShptLine(WhseShptHeader, "Purchase Line") then
                                                 ErrorOccured := true;
                                             LineCreated := true;
                                         end;
@@ -217,7 +233,7 @@
 
                 trigger OnPreDataItem()
                 begin
-                    if "Warehouse Request"."Source Type" <> DATABASE::"Purchase Line" then
+                    if "Warehouse Request"."Source Type" <> Enum::TableID::"Purchase Line".AsInteger() then
                         CurrReport.Break();
 
                     OnAfterOnPreDataItemPurchaseLine("Purchase Header");
@@ -230,15 +246,16 @@
             }
             dataitem("Transfer Header"; "Transfer Header")
             {
-                DataItemLink = "No." = FIELD("Source No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("Source No.");
+                DataItemTableView = sorting("No.");
                 dataitem("Transfer Line"; "Transfer Line")
                 {
-                    DataItemLink = "Document No." = FIELD("No.");
-                    DataItemTableView = SORTING("Document No.", "Line No.");
+                    DataItemLink = "Document No." = field("No.");
+                    DataItemTableView = sorting("Document No.", "Line No.");
 
                     trigger OnAfterGetRecord()
                     var
+                        TransferWarehouseMgt: Codeunit "Transfer Warehouse Mgt.";
                         IsHandled: Boolean;
                     begin
                         IsHandled := false;
@@ -248,19 +265,19 @@
 
                         case RequestType of
                             RequestType::Receive:
-                                if WhseActivityCreate.CheckIfTransLine2ReceiptLine("Transfer Line") then begin
+                                if TransferWarehouseMgt.CheckIfTransLine2ReceiptLine("Transfer Line") then begin
                                     OnTransferLineOnAfterGetRecordOnBeforeCreateRcptHeader(
                                       "Transfer Line", "Warehouse Request", WhseReceiptHeader, WhseHeaderCreated, OneHeaderCreated);
                                     if not OneHeaderCreated and not WhseHeaderCreated then begin
                                         CreateReceiptHeader();
                                         OnTransferLineOnAfterCreateRcptHeader(WhseReceiptHeader, WhseHeaderCreated, "Transfer Header", "Transfer Line", "Warehouse Request");
                                     end;
-                                    if not WhseActivityCreate.TransLine2ReceiptLine(WhseReceiptHeader, "Transfer Line") then
+                                    if not TransferWarehouseMgt.TransLine2ReceiptLine(WhseReceiptHeader, "Transfer Line") then
                                         ErrorOccured := true;
                                     LineCreated := true;
                                 end;
                             RequestType::Ship:
-                                if WhseActivityCreate.CheckIfFromTransLine2ShptLine("Transfer Line") then begin
+                                if TransferWarehouseMgt.CheckIfFromTransLine2ShptLine("Transfer Line", ReservedFromStock) then begin
                                     IsHandled := false;
                                     OnTransferLineOnAfterGetRecordOnBeforeCreateShptHeader(
                                       "Transfer Line", "Warehouse Request", WhseShptHeader, WhseHeaderCreated, OneHeaderCreated, IsHandled);
@@ -269,7 +286,7 @@
                                             CreateShptHeader();
                                             OnTransferLineOnAfterCreateShptHeader(WhseShptHeader, WhseHeaderCreated, "Transfer Header", "Transfer Line");
                                         end;
-                                        if not WhseActivityCreate.FromTransLine2ShptLine(WhseShptHeader, "Transfer Line") then
+                                        if not TransferWarehouseMgt.FromTransLine2ShptLine(WhseShptHeader, "Transfer Line") then
                                             ErrorOccured := true;
                                         LineCreated := true;
                                     end;
@@ -317,7 +334,7 @@
 
                 trigger OnPreDataItem()
                 begin
-                    if "Warehouse Request"."Source Type" <> DATABASE::"Transfer Line" then
+                    if "Warehouse Request"."Source Type" <> Enum::TableID::"Transfer Line".AsInteger() then
                         CurrReport.Break();
 
                     OnAfterOnPreDataItemTransferLine("Transfer Header");
@@ -325,15 +342,16 @@
             }
             dataitem("Service Header"; "Service Header")
             {
-                DataItemLink = "Document Type" = FIELD("Source Subtype"), "No." = FIELD("Source No.");
-                DataItemTableView = SORTING("Document Type", "No.");
+                DataItemLink = "Document Type" = field("Source Subtype"), "No." = field("Source No.");
+                DataItemTableView = sorting("Document Type", "No.");
                 dataitem("Service Line"; "Service Line")
                 {
-                    DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
-                    DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                    DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
+                    DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                     trigger OnAfterGetRecord()
                     var
+                        ServiceWarehouseMgt: Codeunit "Service Warehouse Mgt.";
                         IsHandled: Boolean;
                     begin
                         IsHandled := false;
@@ -344,10 +362,10 @@
                         if ("Location Code" = "Warehouse Request"."Location Code") and IsInventoriableItem() then
                             case RequestType of
                                 RequestType::Ship:
-                                    if WhseActivityCreate.CheckIfFromServiceLine2ShptLin("Service Line") then begin
+                                    if ServiceWarehouseMgt.CheckIfFromServiceLine2ShptLine("Service Line", ReservedFromStock) then begin
                                         if not OneHeaderCreated and not WhseHeaderCreated then
                                             CreateShptHeader();
-                                        if not WhseActivityCreate.FromServiceLine2ShptLine(WhseShptHeader, "Service Line") then
+                                        if not ServiceWarehouseMgt.FromServiceLine2ShptLine(WhseShptHeader, "Service Line") then
                                             ErrorOccured := true;
                                         LineCreated := true;
                                     end;
@@ -387,7 +405,7 @@
 
                 trigger OnPreDataItem()
                 begin
-                    if "Warehouse Request"."Source Type" <> DATABASE::"Service Line" then
+                    if "Warehouse Request"."Source Type" <> Enum::TableID::"Service Line".AsInteger() then
                         CurrReport.Break();
                 end;
             }
@@ -480,6 +498,13 @@
                         Caption = 'Do Not Fill Qty. to Handle';
                         ToolTip = 'Specifies if the Quantity to Handle field in the warehouse document is prefilled according to the source document quantities.';
                     }
+                    field("Reserved From Stock"; ReservedFromStock)
+                    {
+                        ApplicationArea = Warehouse;
+                        Caption = 'Reserved stock only';
+                        ToolTip = 'Specifies if you want to include only source document lines that are fully or partially reserved from current stock.';
+                        ValuesAllowed = " ", "Full and Partial", Full;
+                    }
                 }
             }
         }
@@ -496,15 +521,16 @@
     trigger OnPostReport()
     begin
         OnBeforePostReport("Warehouse Request", RequestType, OneHeaderCreated, WhseShptHeader, WhseHeaderCreated, ErrorOccured, LineCreated, ActivitiesCreated, Location, WhseShptLine, WhseReceiptHeader, HideDialog, WhseReceiptLine);
-        if not HideDialog then
+        if not HideDialog then begin
             case RequestType of
                 RequestType::Receive:
                     ShowReceiptDialog();
                 RequestType::Ship:
                     ShowShipmentDialog();
             end;
-        if SkippedSourceDoc > 0 then
-            Message(CustomerIsBlockedMsg, SkippedSourceDoc);
+            if SkippedSourceDoc > 0 then
+                Message(CustomerIsBlockedMsg, SkippedSourceDoc);
+        end;
         Completed := true;
 
         OnAfterPostReport("Warehouse Request", RequestType, OneHeaderCreated, WhseShptHeader, WhseHeaderCreated, ErrorOccured, LineCreated, ActivitiesCreated, Location, WhseShptLine);
@@ -521,7 +547,6 @@
         WhseShptLine: Record "Warehouse Shipment Line";
         Location: Record Location;
         Cust: Record Customer;
-        WhseActivityCreate: Codeunit "Whse.-Create Source Document";
         ActivitiesCreated: Integer;
         Completed: Boolean;
         DoNotFillQtytoHandle: Boolean;
@@ -553,6 +578,7 @@
         SkipBlockedCustomer: Boolean;
         SkipBlockedItem: Boolean;
         HideDialog: Boolean;
+        ReservedFromStock: Enum "Reservation From Stock";
 
     procedure SetHideDialog(NewHideDialog: Boolean)
     begin
@@ -580,9 +606,14 @@
         DoNotFillQtytoHandle := DoNotFillQtytoHandle2;
     end;
 
+    procedure SetReservedFromStock(NewReservedFromStock: Enum "Reservation From Stock")
+    begin
+        ReservedFromStock := NewReservedFromStock;
+    end;
+
     procedure SetSalesLineFilters(var SalesLine: Record "Sales Line"; WarehouseRequest: Record "Warehouse Request")
     begin
-        SalesLine.SetRange(Type, "Sales Line Type"::Item);
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
         if ((WarehouseRequest.Type = WarehouseRequest.Type::Outbound) and
             (WarehouseRequest."Source Document" = WarehouseRequest."Source Document"::"Sales Order")) or
             ((WarehouseRequest.Type = "Warehouse Request".Type::Inbound) and
@@ -597,7 +628,7 @@
 
     procedure SetPurchLineFilters(var PurchLine: Record "Purchase Line"; WarehouseRequest: Record "Warehouse Request")
     begin
-        PurchLine.SetRange(Type, "Purchase Line Type"::Item);
+        PurchLine.SetRange(Type, PurchLine.Type::Item);
         if ((WarehouseRequest.Type = WarehouseRequest.Type::Inbound) and
             (WarehouseRequest."Source Document" = WarehouseRequest."Source Document"::"Purchase Order")) or
             ((WarehouseRequest.Type = WarehouseRequest.Type::Outbound) and
@@ -629,13 +660,15 @@
 
     local procedure CreateActivityFromSalesLine2ShptLine(WhseShptHeader: Record "Warehouse Shipment Header"; SalesLine: Record "Sales Line"): Boolean
     var
+        SalesWarehouseMgt: Codeunit "Sales Warehouse Mgt.";
         IsHandled: Boolean;
     begin
+        IsHandled := false;
         OnBeforeCreateActivityFromSalesLine2ShptLine(WhseShptHeader, SalesLine, IsHandled);
         if IsHandled then
             exit(true);
 
-        exit(WhseActivityCreate.FromSalesLine2ShptLine(WhseShptHeader, SalesLine));
+        exit(SalesWarehouseMgt.FromSalesLine2ShptLine(WhseShptHeader, SalesLine));
     end;
 
     procedure CreateShptHeader()
@@ -725,7 +758,7 @@
     begin
         OnBeforeVerifySalesItemNotBlocked(SalesHeader, SalesLine, IsHandled, SkipBlockedItem);
         if not IsHandled then
-            VerifyItemNotBlocked(SalesLine."No.");
+            VerifyItemNotBlocked(SalesLine."No.", SalesLine."Variant Code");
     end;
 
     local procedure VerifyPurchaseItemNotBlocked(PurchaseHeader: Record "Purchase Header"; PurchaseLine: Record "Purchase Line")
@@ -737,18 +770,28 @@
         if IsHandled then
             exit;
 
-        VerifyItemNotBlocked(PurchaseLine."No.");
+        VerifyItemNotBlocked(PurchaseLine."No.", PurchaseLine."Variant Code");
     end;
 
-    local procedure VerifyItemNotBlocked(ItemNo: Code[20])
+    local procedure VerifyItemNotBlocked(ItemNo: Code[20]; VariantCode: Code[10])
     var
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
     begin
         Item.Get(ItemNo);
         if SkipBlockedItem and Item.Blocked then
             CurrReport.Skip();
 
         Item.TestField(Blocked, false);
+
+        if VariantCode = '' then
+            exit;
+        ItemVariant.SetLoadFields(Blocked);
+        ItemVariant.Get(ItemNo, VariantCode);
+        if SkipBlockedItem and ItemVariant.Blocked then
+            CurrReport.Skip();
+
+        ItemVariant.TestField(Blocked, false);
     end;
 
     procedure ShowReceiptDialog()
@@ -766,7 +809,7 @@
             ErrorNoLinesToCreate.Title := Text007Err;
             ErrorNoLinesToCreate.Message := StrSubstNo(Text006Err);
             ErrorNoLinesToCreate.PageNo := Page::"Whse. Receipt Lines";
-            ErrorNoLinesToCreate.CustomDimensions.Add('Source Type', Format(Database::"Purchase Line"));
+            ErrorNoLinesToCreate.CustomDimensions.Add('Source Type', Format(Enum::TableID::"Purchase Line".AsInteger()));
             ErrorNoLinesToCreate.CustomDimensions.Add('Source Subtype', Format("Purchase Header"."Document Type"));
             ErrorNoLinesToCreate.CustomDimensions.Add('Source No.', Format("Purchase Header"."No."));
             ErrorNoLinesToCreate.AddAction(NoWhseShipmLinesActionCaptionMsg, 5753, 'ReturnListofPurchaseReceipts');
@@ -801,7 +844,7 @@
             ErrorNoLinesToCreate.Message := StrSubstNo(Text009Err, "Sales Header"."Document Type");
             ErrorNoLinesToCreate.PageNo := Page::"Warehouse Shipment List";
             WhseShptLine.SetRange("Source No.", "Sales Header"."No.", "Sales Header"."No.");
-            ErrorNoLinesToCreate.CustomDimensions.Add('Source Type', Format(Database::"Sales Line"));
+            ErrorNoLinesToCreate.CustomDimensions.Add('Source Type', Format(Enum::TableID::"Sales Line".AsInteger()));
             ErrorNoLinesToCreate.CustomDimensions.Add('Source Subtype', Format("Sales Header"."Document Type"));
             ErrorNoLinesToCreate.CustomDimensions.Add('Source No.', Format("Sales Header"."No."));
             ErrorNoLinesToCreate.AddAction(NoWhseShipmLinesActionCaptionMsg, 5753, 'ReturnListofWhseShipments');

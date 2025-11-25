@@ -3,6 +3,8 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Integration.Word;
+
 permissionset 9988 "Word Templates - Objects"
 {
     Access = Internal;
@@ -19,7 +21,9 @@ permissionset 9988 "Word Templates - Objects"
                   Page "Word Templates Related Edit" = X,
                   Page "Word Templates Related FactBox" = X,
 #if not CLEAN22
+#pragma warning disable AL0432
                   Page "Word Templates Related List" = X,
+#pragma warning restore AL0432
 #endif
                   Page "Word Templates Related Part" = X,
                   Page "Word Templates Tables Part" = X,

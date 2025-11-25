@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Text;
+
 page 790 "G/L Account Categories"
 {
     AccessByPermission = TableData "G/L Account Category" = R;
@@ -9,7 +15,7 @@ page 790 "G/L Account Categories"
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "G/L Account Category";
-    SourceTableView = SORTING("Presentation Order", "Sibling Sequence No.");
+    SourceTableView = sorting("Presentation Order", "Sibling Sequence No.");
     UsageCategory = Lists;
 
     layout
@@ -18,14 +24,14 @@ page 790 "G/L Account Categories"
         {
             repeater(Group)
             {
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 IndentationControls = Description;
                 ShowAsTree = true;
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Basic, Suite;
                     Style = Strong;
-                    StyleExpr = "Has Children" OR (Indentation = 0);
+                    StyleExpr = Rec."Has Children" OR (Rec.Indentation = 0);
                     ToolTip = 'Specifies a description of the record.';
                 }
                 field("Account Category"; Rec."Account Category")
@@ -42,13 +48,13 @@ page 790 "G/L Account Categories"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupTotaling();
+                        Rec.LookupTotaling();
                         CurrPage.Update(false);
                     end;
 
                     trigger OnValidate()
                     begin
-                        ValidateTotaling(GLAccTotaling);
+                        Rec.ValidateTotaling(GLAccTotaling);
                     end;
                 }
                 field("Additional Report Definition"; Rec."Additional Report Definition")
@@ -56,13 +62,13 @@ page 790 "G/L Account Categories"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies additional attributes that are used to create the cash flow statement.';
                 }
-                field(GetBalance; GetBalance())
+                field(GetBalance; Rec.GetBalance())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Balance';
                     Editable = false;
                     Style = Strong;
-                    StyleExpr = "Has Children" OR (Indentation = 0);
+                    StyleExpr = Rec."Has Children" OR (Rec.Indentation = 0);
                     ToolTip = 'Specifies the balance of the G/L account.';
                 }
             }
@@ -74,13 +80,13 @@ page 790 "G/L Account Categories"
                 ApplicationArea = Basic, Suite;
                 Caption = 'G/L Accounts in Category';
                 Editable = false;
-                SubPageLink = "Account Subcategory Entry No." = FIELD("Entry No.");
+                SubPageLink = "Account Subcategory Entry No." = field("Entry No.");
             }
             part("G/L Accounts without Category"; "G/L Accounts ListPart")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'G/L Accounts without Category';
-                SubPageView = WHERE("Account Subcategory Entry No." = CONST(0));
+                SubPageView = where("Account Subcategory Entry No." = const(0));
             }
         }
     }
@@ -100,7 +106,7 @@ page 790 "G/L Account Categories"
 
                 trigger OnAction()
                 begin
-                    SetRow(InsertRow());
+                    SetRow(Rec.InsertRow());
                 end;
             }
         }
@@ -117,7 +123,7 @@ page 790 "G/L Account Categories"
 
                 trigger OnAction()
                 begin
-                    MoveUp();
+                    Rec.MoveUp();
                 end;
             }
             action(MoveDown)
@@ -131,7 +137,7 @@ page 790 "G/L Account Categories"
 
                 trigger OnAction()
                 begin
-                    MoveDown();
+                    Rec.MoveDown();
                 end;
             }
             action(Indent)
@@ -144,7 +150,7 @@ page 790 "G/L Account Categories"
 
                 trigger OnAction()
                 begin
-                    MakeChildOfPreviousSibling();
+                    Rec.MakeChildOfPreviousSibling();
                 end;
             }
             action(Outdent)
@@ -157,7 +163,7 @@ page 790 "G/L Account Categories"
 
                 trigger OnAction()
                 begin
-                    MakeSiblingOfParent();
+                    Rec.MakeSiblingOfParent();
                 end;
             }
             action(GenerateAccSched)
@@ -248,15 +254,15 @@ page 790 "G/L Account Categories"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Has Children");
-        GLAccTotaling := GetTotaling();
+        Rec.CalcFields("Has Children");
+        GLAccTotaling := Rec.GetTotaling();
     end;
 
     trigger OnOpenPage()
     begin
-        if IsEmpty() then
-            InitializeDataSet();
-        SetAutoCalcFields("Has Children");
+        if Rec.IsEmpty() then
+            Rec.InitializeDataSet();
+        Rec.SetAutoCalcFields("Has Children");
 
         PageEditable := CurrPage.Editable;
     end;
@@ -278,7 +284,7 @@ page 790 "G/L Account Categories"
     begin
         if EntryNo = 0 then
             exit;
-        if Get(EntryNo) then;
+        if Rec.Get(EntryNo) then;
         CurrPage.Update(false);
     end;
 }

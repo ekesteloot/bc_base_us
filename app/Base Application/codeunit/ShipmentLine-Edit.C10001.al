@@ -8,7 +8,7 @@ codeunit 10001 "Shipment Line - Edit"
         SalesShipmentLine := Rec;
         SalesShipmentLine.LockTable();
         SalesShipmentLine.Find();
-        SalesShipmentLine."Package Tracking No." := "Package Tracking No.";
+        SalesShipmentLine."Package Tracking No." := Rec."Package Tracking No.";
         SalesShipmentLine.Modify();
         Rec := SalesShipmentLine;
     end;

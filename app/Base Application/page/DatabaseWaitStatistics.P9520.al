@@ -1,3 +1,8 @@
+namespace System.DataAdministration;
+
+using System.Diagnostics;
+using System.Telemetry;
+
 page 9520 "Database Wait Statistics"
 {
     Caption = 'Database Wait Statistics';

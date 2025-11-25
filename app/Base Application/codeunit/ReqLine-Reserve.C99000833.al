@@ -1,3 +1,14 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Purchases.Document;
+
 codeunit 99000833 "Req. Line-Reserve"
 {
     Permissions = TableData "Reservation Entry" = rimd,
@@ -10,10 +21,10 @@ codeunit 99000833 "Req. Line-Reserve"
     var
         FromTrackingSpecification: Record "Tracking Specification";
         CreateReservEntry: Codeunit "Create Reserv. Entry";
-        ReservMgt: Codeunit "Reservation Management";
+        ReservationManagement: Codeunit "Reservation Management";
         Blocked: Boolean;
 
-        Text000: Label 'Reserved quantity cannot be greater than %1';
+        Text000: Label 'Reserved quantity cannot be greater than %1', Comment = '%1 - quantity';
         Text002: Label 'must be filled in when a quantity is reserved';
         Text003: Label 'must not be filled in when a quantity is reserved';
         Text004: Label 'must not be changed when a quantity is reserved';
@@ -53,7 +64,7 @@ codeunit 99000833 "Req. Line-Reserve"
         OnCreateReservationOnBeforeCreateReservEntry(ReqLine, Quantity, QuantityBase, ForReservEntry, IsHandled);
         if not IsHandled then begin
             CreateReservEntry.CreateReservEntryFor(
-            DATABASE::"Requisition Line", 0,
+            Enum::TableID::"Requisition Line".AsInteger(), 0,
             ReqLine."Worksheet Template Name", ReqLine."Journal Batch Name", 0, ReqLine."Line No.",
             ReqLine."Qty. per Unit of Measure", Quantity, QuantityBase, ForReservEntry);
             CreateReservEntry.CreateReservEntryFrom(FromTrackingSpecification);
@@ -72,374 +83,375 @@ codeunit 99000833 "Req. Line-Reserve"
         FromTrackingSpecification := TrackingSpecification;
     end;
 
-    procedure Caption(ReqLine: Record "Requisition Line") CaptionText: Text
+    procedure Caption(RequisitionLine: Record "Requisition Line") CaptionText: Text
     begin
-        CaptionText := ReqLine.GetSourceCaption();
+        CaptionText := RequisitionLine.GetSourceCaption();
     end;
 
-    procedure FindReservEntry(ReqLine: Record "Requisition Line"; var ReservEntry: Record "Reservation Entry"): Boolean
+    procedure FindReservEntry(RequisitionLine: Record "Requisition Line"; var ReservationEntry: Record "Reservation Entry"): Boolean
     begin
-        ReservEntry.InitSortingAndFilters(false);
-        ReqLine.SetReservationFilters(ReservEntry);
-        exit(ReservEntry.FindLast());
+        ReservationEntry.InitSortingAndFilters(false);
+        RequisitionLine.SetReservationFilters(ReservationEntry);
+        exit(ReservationEntry.FindLast());
     end;
 
-    procedure VerifyChange(var NewReqLine: Record "Requisition Line"; var OldReqLine: Record "Requisition Line")
+    procedure VerifyChange(var NewRequisitionLine: Record "Requisition Line"; var OldRequisitionLine: Record "Requisition Line")
     var
-        ReqLine: Record "Requisition Line";
+        RequisitionLine: Record "Requisition Line";
         ShowError: Boolean;
         HasError: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeVerifyChange(NewReqLine, OldReqLine, IsHandled);
+        OnBeforeVerifyChange(NewRequisitionLine, OldRequisitionLine, IsHandled);
         if IsHandled then
             exit;
 
-        if (NewReqLine.Type <> NewReqLine.Type::Item) and (OldReqLine.Type <> OldReqLine.Type::Item) then
+        if (NewRequisitionLine.Type <> NewRequisitionLine.Type::Item) and (OldRequisitionLine.Type <> OldRequisitionLine.Type::Item) then
             exit;
         if Blocked then
             exit;
-        if NewReqLine."Line No." = 0 then
-            if not ReqLine.Get(NewReqLine."Worksheet Template Name", NewReqLine."Journal Batch Name", NewReqLine."Line No.")
+        if NewRequisitionLine."Line No." = 0 then
+            if not RequisitionLine.Get(NewRequisitionLine."Worksheet Template Name", NewRequisitionLine."Journal Batch Name", NewRequisitionLine."Line No.")
             then
                 exit;
 
-        NewReqLine.CalcFields("Reserved Qty. (Base)");
-        ShowError := NewReqLine."Reserved Qty. (Base)" <> 0;
+        NewRequisitionLine.CalcFields("Reserved Qty. (Base)");
+        ShowError := NewRequisitionLine."Reserved Qty. (Base)" <> 0;
 
-        if NewReqLine."Due Date" = 0D then
+        if NewRequisitionLine."Due Date" = 0D then
             if ShowError then
-                NewReqLine.FieldError("Due Date", Text002)
+                NewRequisitionLine.FieldError("Due Date", Text002)
             else
                 HasError := true;
 
-        if NewReqLine."Sales Order No." <> '' then
+        if NewRequisitionLine."Sales Order No." <> '' then
             if ShowError then
-                NewReqLine.FieldError("Sales Order No.", Text003)
+                NewRequisitionLine.FieldError("Sales Order No.", Text003)
             else
                 HasError := true;
 
-        if NewReqLine."Sales Order Line No." <> 0 then
+        if NewRequisitionLine."Sales Order Line No." <> 0 then
             if ShowError then
-                NewReqLine.FieldError("Sales Order Line No.", Text003)
+                NewRequisitionLine.FieldError("Sales Order Line No.", Text003)
             else
                 HasError := true;
 
-        CheckSellToCustomerNo(NewReqLine, OldReqLine, ShowError, HasError);
+        CheckSellToCustomerNo(NewRequisitionLine, OldRequisitionLine, ShowError, HasError);
 
-        if NewReqLine."Variant Code" <> OldReqLine."Variant Code" then
+        if NewRequisitionLine."Variant Code" <> OldRequisitionLine."Variant Code" then
             if ShowError then
-                NewReqLine.FieldError("Variant Code", Text004)
+                NewRequisitionLine.FieldError("Variant Code", Text004)
             else
                 HasError := true;
 
-        if NewReqLine."No." <> OldReqLine."No." then
+        if NewRequisitionLine."No." <> OldRequisitionLine."No." then
             if ShowError then
-                NewReqLine.FieldError("No.", Text004)
+                NewRequisitionLine.FieldError("No.", Text004)
             else
                 HasError := true;
 
-        if NewReqLine."Location Code" <> OldReqLine."Location Code" then
+        if NewRequisitionLine."Location Code" <> OldRequisitionLine."Location Code" then
             if ShowError then
-                NewReqLine.FieldError("Location Code", Text004)
+                NewRequisitionLine.FieldError("Location Code", Text004)
             else
                 HasError := true;
 
-        VerifyBinInReqLine(NewReqLine, OldReqLine, HasError);
+        VerifyBinInReqLine(NewRequisitionLine, OldRequisitionLine, HasError);
 
-        OnVerifyChangeOnBeforeHasError(NewReqLine, OldReqLine, HasError, ShowError);
+        OnVerifyChangeOnBeforeHasError(NewRequisitionLine, OldRequisitionLine, HasError, ShowError);
 
         if HasError then
-            if (NewReqLine."No." <> OldReqLine."No.") or NewReqLine.ReservEntryExist() then begin
-                if NewReqLine."No." <> OldReqLine."No." then begin
-                    ReservMgt.SetReservSource(OldReqLine);
-                    ReservMgt.DeleteReservEntries(true, 0);
-                    ReservMgt.SetReservSource(NewReqLine);
+            if (NewRequisitionLine."No." <> OldRequisitionLine."No.") or NewRequisitionLine.ReservEntryExist() then begin
+                if NewRequisitionLine."No." <> OldRequisitionLine."No." then begin
+                    ReservationManagement.SetReservSource(OldRequisitionLine);
+                    ReservationManagement.DeleteReservEntries(true, 0);
+                    ReservationManagement.SetReservSource(NewRequisitionLine);
                 end else begin
-                    ReservMgt.SetReservSource(NewReqLine);
-                    ReservMgt.DeleteReservEntries(true, 0);
+                    ReservationManagement.SetReservSource(NewRequisitionLine);
+                    ReservationManagement.DeleteReservEntries(true, 0);
                 end;
-                ReservMgt.AutoTrack(NewReqLine."Quantity (Base)");
+                ReservationManagement.AutoTrack(NewRequisitionLine."Quantity (Base)");
             end;
 
-        if HasError or (NewReqLine."Due Date" <> OldReqLine."Due Date") then begin
-            AssignForPlanning(NewReqLine);
-            if (NewReqLine."No." <> OldReqLine."No.") or
-               (NewReqLine."Variant Code" <> OldReqLine."Variant Code") or
-               (NewReqLine."Location Code" <> OldReqLine."Location Code")
+        if HasError or (NewRequisitionLine."Due Date" <> OldRequisitionLine."Due Date") then begin
+            AssignForPlanning(NewRequisitionLine);
+            if (NewRequisitionLine."No." <> OldRequisitionLine."No.") or
+               (NewRequisitionLine."Variant Code" <> OldRequisitionLine."Variant Code") or
+               (NewRequisitionLine."Location Code" <> OldRequisitionLine."Location Code")
             then
-                AssignForPlanning(OldReqLine);
+                AssignForPlanning(OldRequisitionLine);
         end;
     end;
 
-    local procedure CheckSellToCustomerNo(var NewReqLine: Record "Requisition Line"; var OldReqLine: Record "Requisition Line"; ShowError: Boolean; var HasError: Boolean)
+    local procedure CheckSellToCustomerNo(var NewRequisitionLine: Record "Requisition Line"; var OldRequisitionLine: Record "Requisition Line"; ShowError: Boolean; var HasError: Boolean)
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckSellToCustomerNo(NewReqLine, OldReqLine, ShowError, HasError, IsHandled);
+        OnBeforeCheckSellToCustomerNo(NewRequisitionLine, OldRequisitionLine, ShowError, HasError, IsHandled);
         if IsHandled then
             exit;
 
-        if NewReqLine."Sell-to Customer No." <> '' then
+        if NewRequisitionLine."Sell-to Customer No." <> '' then
             if ShowError then
-                NewReqLine.FieldError("Sell-to Customer No.", Text003)
+                NewRequisitionLine.FieldError("Sell-to Customer No.", Text003)
             else
                 HasError := true;
     end;
 
-    procedure VerifyQuantity(var NewReqLine: Record "Requisition Line"; var OldReqLine: Record "Requisition Line")
+    procedure VerifyQuantity(var NewRequisitionLine: Record "Requisition Line"; var OldRequisitionLine: Record "Requisition Line")
     var
-        ReqLine: Record "Requisition Line";
+        RequisitionLine: Record "Requisition Line";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeVerifyQuantity(NewReqLine, OldReqLine, IsHandled);
+        OnBeforeVerifyQuantity(NewRequisitionLine, OldRequisitionLine, IsHandled);
         if IsHandled then
             exit;
 
         if Blocked then
             exit;
 
-        with NewReqLine do begin
-            if "Line No." = OldReqLine."Line No." then
-                if "Quantity (Base)" = OldReqLine."Quantity (Base)" then
+        with NewRequisitionLine do begin
+            if "Line No." = OldRequisitionLine."Line No." then
+                if "Quantity (Base)" = OldRequisitionLine."Quantity (Base)" then
                     exit;
             if "Line No." = 0 then
-                if not ReqLine.Get("Worksheet Template Name", "Journal Batch Name", "Line No.") then
+                if not RequisitionLine.Get("Worksheet Template Name", "Journal Batch Name", "Line No.") then
                     exit;
-            ReservMgt.SetReservSource(NewReqLine);
-            if "Qty. per Unit of Measure" <> OldReqLine."Qty. per Unit of Measure" then
-                ReservMgt.ModifyUnitOfMeasure();
-            if "Quantity (Base)" * OldReqLine."Quantity (Base)" < 0 then
-                ReservMgt.DeleteReservEntries(true, 0)
+            ReservationManagement.SetReservSource(NewRequisitionLine);
+            if "Qty. per Unit of Measure" <> OldRequisitionLine."Qty. per Unit of Measure" then
+                ReservationManagement.ModifyUnitOfMeasure();
+            if "Quantity (Base)" * OldRequisitionLine."Quantity (Base)" < 0 then
+                ReservationManagement.DeleteReservEntries(true, 0)
             else
-                ReservMgt.DeleteReservEntries(false, "Quantity (Base)");
-            ReservMgt.ClearSurplus();
-            ReservMgt.AutoTrack("Quantity (Base)");
-            AssignForPlanning(NewReqLine);
+                ReservationManagement.DeleteReservEntries(false, "Quantity (Base)");
+            ReservationManagement.ClearSurplus();
+            ReservationManagement.AutoTrack("Quantity (Base)");
+            AssignForPlanning(NewRequisitionLine);
         end;
     end;
 
-    procedure UpdatePlanningFlexibility(var ReqLine: Record "Requisition Line")
+    procedure UpdatePlanningFlexibility(var RequisitionLine: Record "Requisition Line")
     var
-        ReservEntry: Record "Reservation Entry";
+        ReservationEntry: Record "Reservation Entry";
     begin
-        if FindReservEntry(ReqLine, ReservEntry) then
-            ReservEntry.ModifyAll("Planning Flexibility", ReqLine."Planning Flexibility");
+        if FindReservEntry(RequisitionLine, ReservationEntry) then
+            ReservationEntry.ModifyAll("Planning Flexibility", RequisitionLine."Planning Flexibility");
     end;
 
-    procedure TransferReqLineToReqLine(var OldReqLine: Record "Requisition Line"; var NewReqLine: Record "Requisition Line"; TransferQty: Decimal; TransferAll: Boolean)
+    procedure TransferReqLineToReqLine(var OldRequisitionLine: Record "Requisition Line"; var NewRequisitionLine: Record "Requisition Line"; TransferQty: Decimal; TransferAll: Boolean)
     var
-        OldReservEntry: Record "Reservation Entry";
-        NewReservEntry: Record "Reservation Entry";
+        OldReservationEntry: Record "Reservation Entry";
+        NewReservationEntry: Record "Reservation Entry";
     begin
-        if not FindReservEntry(OldReqLine, OldReservEntry) then
+        if not FindReservEntry(OldRequisitionLine, OldReservationEntry) then
             exit;
 
-        OldReservEntry.Lock();
+        OldReservationEntry.Lock();
 
-        NewReqLine.TestField("No.", OldReqLine."No.");
-        NewReqLine.TestField("Variant Code", OldReqLine."Variant Code");
-        NewReqLine.TestField("Location Code", OldReqLine."Location Code");
+        NewRequisitionLine.TestField("No.", OldRequisitionLine."No.");
+        NewRequisitionLine.TestField("Variant Code", OldRequisitionLine."Variant Code");
+        NewRequisitionLine.TestField("Location Code", OldRequisitionLine."Location Code");
 
-        OnTransferReqLineToReqLineOnBeforeTransfer(OldReservEntry, OldReqLine, NewReqLine);
+        OnTransferReqLineToReqLineOnBeforeTransfer(OldReservationEntry, OldRequisitionLine, NewRequisitionLine);
 
         if TransferAll then begin
-            OldReservEntry.SetRange("Source Subtype", 0);
-            OldReservEntry.TransferReservations(
-              OldReservEntry, OldReqLine."No.", OldReqLine."Variant Code", OldReqLine."Location Code",
-              TransferAll, TransferQty, NewReqLine."Qty. per Unit of Measure",
-              DATABASE::"Requisition Line", 0, NewReqLine."Worksheet Template Name", NewReqLine."Journal Batch Name", 0, NewReqLine."Line No.");
+            OldReservationEntry.SetRange("Source Subtype", 0);
+            OldReservationEntry.TransferReservations(
+              OldReservationEntry, OldRequisitionLine."No.", OldRequisitionLine."Variant Code", OldRequisitionLine."Location Code",
+              TransferAll, TransferQty, NewRequisitionLine."Qty. per Unit of Measure",
+              Enum::TableID::"Requisition Line".AsInteger(), 0, NewRequisitionLine."Worksheet Template Name", NewRequisitionLine."Journal Batch Name", 0, NewRequisitionLine."Line No.");
 
-            if OldReqLine."Ref. Order Type" <> OldReqLine."Ref. Order Type"::Transfer then
+            if OldRequisitionLine."Ref. Order Type" <> OldRequisitionLine."Ref. Order Type"::Transfer then
                 exit;
 
-            if NewReqLine."Order Promising ID" <> '' then begin
-                OldReservEntry.SetSourceFilter(
-                  DATABASE::"Sales Line", NewReqLine."Order Promising Line No.", NewReqLine."Order Promising ID",
-                  NewReqLine."Order Promising Line ID", false);
-                OldReservEntry.SetRange("Source Batch Name", '');
+            if NewRequisitionLine."Order Promising ID" <> '' then begin
+                OldReservationEntry.SetSourceFilter(
+                  Enum::TableID::"Sales Line".AsInteger(), NewRequisitionLine."Order Promising Line No.", NewRequisitionLine."Order Promising ID",
+                  NewRequisitionLine."Order Promising Line ID", false);
+                OldReservationEntry.SetRange("Source Batch Name", '');
             end;
-            OldReservEntry.SetRange("Source Subtype", 1);
-            if OldReservEntry.FindSet() then begin
-                OldReservEntry.TestField("Qty. per Unit of Measure", NewReqLine."Qty. per Unit of Measure");
+            OldReservationEntry.SetRange("Source Subtype", 1);
+            if OldReservationEntry.FindSet() then begin
+                OldReservationEntry.TestField("Qty. per Unit of Measure", NewRequisitionLine."Qty. per Unit of Measure");
                 repeat
-                    OldReservEntry.TestField("Item No.", OldReqLine."No.");
-                    OldReservEntry.TestField("Variant Code", OldReqLine."Variant Code");
-                    if NewReqLine."Order Promising ID" = '' then
-                        OldReservEntry.TestField("Location Code", OldReqLine."Transfer-from Code");
+                    OldReservationEntry.TestField("Item No.", OldRequisitionLine."No.");
+                    OldReservationEntry.TestField("Variant Code", OldRequisitionLine."Variant Code");
+                    if NewRequisitionLine."Order Promising ID" = '' then
+                        OldReservationEntry.TestField("Location Code", OldRequisitionLine."Transfer-from Code");
 
-                    NewReservEntry := OldReservEntry;
-                    NewReservEntry."Source ID" := NewReqLine."Worksheet Template Name";
-                    NewReservEntry."Source Batch Name" := NewReqLine."Journal Batch Name";
-                    NewReservEntry."Source Prod. Order Line" := 0;
-                    NewReservEntry."Source Ref. No." := NewReqLine."Line No.";
+                    NewReservationEntry := OldReservationEntry;
+                    NewReservationEntry."Source ID" := NewRequisitionLine."Worksheet Template Name";
+                    NewReservationEntry."Source Batch Name" := NewRequisitionLine."Journal Batch Name";
+                    NewReservationEntry."Source Prod. Order Line" := 0;
+                    NewReservationEntry."Source Ref. No." := NewRequisitionLine."Line No.";
 
-                    NewReservEntry.UpdateActionMessageEntries(OldReservEntry);
-                until OldReservEntry.Next() = 0;
+                    NewReservationEntry.UpdateActionMessageEntries(OldReservationEntry);
+                until OldReservationEntry.Next() = 0;
             end;
         end else
-            OldReservEntry.TransferReservations(
-              OldReservEntry, OldReqLine."No.", OldReqLine."Variant Code", OldReqLine."Location Code",
-              TransferAll, TransferQty, NewReqLine."Qty. per Unit of Measure",
-              DATABASE::"Requisition Line", 0, NewReqLine."Worksheet Template Name", NewReqLine."Journal Batch Name", 0, NewReqLine."Line No.");
+            OldReservationEntry.TransferReservations(
+              OldReservationEntry, OldRequisitionLine."No.", OldRequisitionLine."Variant Code", OldRequisitionLine."Location Code",
+              TransferAll, TransferQty, NewRequisitionLine."Qty. per Unit of Measure",
+              Enum::TableID::"Requisition Line".AsInteger(), 0, NewRequisitionLine."Worksheet Template Name", NewRequisitionLine."Journal Batch Name", 0, NewRequisitionLine."Line No.");
     end;
 
-    procedure TransferReqLineToPurchLine(var OldReqLine: Record "Requisition Line"; var PurchLine: Record "Purchase Line"; TransferQty: Decimal; TransferAll: Boolean)
+    procedure TransferReqLineToPurchLine(var OldRequisitionLine: Record "Requisition Line"; var PurchaseLine: Record "Purchase Line"; TransferQty: Decimal; TransferAll: Boolean)
     var
-        OldReservEntry: Record "Reservation Entry";
+        OldReservationEntry: Record "Reservation Entry";
     begin
-        if not FindReservEntry(OldReqLine, OldReservEntry) then
+        if not FindReservEntry(OldRequisitionLine, OldReservationEntry) then
             exit;
 
-        PurchLine.TestField("No.", OldReqLine."No.");
-        PurchLine.TestField("Variant Code", OldReqLine."Variant Code");
-        PurchLine.TestField("Location Code", OldReqLine."Location Code");
+        PurchaseLine.TestField("No.", OldRequisitionLine."No.");
+        PurchaseLine.TestField("Variant Code", OldRequisitionLine."Variant Code");
+        PurchaseLine.TestField("Location Code", OldRequisitionLine."Location Code");
 
-        OnTransferReqLineToPurchLineOnBeforeTransfer(OldReservEntry, OldReqLine, PurchLine);
+        OnTransferReqLineToPurchLineOnBeforeTransfer(OldReservationEntry, OldRequisitionLine, PurchaseLine);
 
-        OldReservEntry.TransferReservations(
-          OldReservEntry, OldReqLine."No.", OldReqLine."Variant Code", OldReqLine."Location Code",
-          TransferAll, TransferQty, PurchLine."Qty. per Unit of Measure",
-          DATABASE::"Purchase Line", PurchLine."Document Type".AsInteger(), PurchLine."Document No.", '', 0, PurchLine."Line No.");
+        OldReservationEntry.TransferReservations(
+          OldReservationEntry, OldRequisitionLine."No.", OldRequisitionLine."Variant Code", OldRequisitionLine."Location Code",
+          TransferAll, TransferQty, PurchaseLine."Qty. per Unit of Measure",
+          Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.", '', 0, PurchaseLine."Line No.");
     end;
 
-    procedure TransferPlanningLineToPOLine(var OldReqLine: Record "Requisition Line"; var NewProdOrderLine: Record "Prod. Order Line"; TransferQty: Decimal; TransferAll: Boolean)
+    procedure TransferPlanningLineToPOLine(var OldRequisitionLine: Record "Requisition Line"; var NewProdOrderLine: Record "Prod. Order Line"; TransferQty: Decimal; TransferAll: Boolean)
     var
-        OldReservEntry: Record "Reservation Entry";
-        IsHandled: Boolean;
+        OldReservationEntry: Record "Reservation Entry";
+        IsHandled: Boolean;        
     begin
         IsHandled := false;
-        OnBeforeTransferPlanningLineToPOLine(OldReqLine, NewProdOrderLine, TransferQty, TransferAll, IsHandled);
+        OnBeforeTransferPlanningLineToPOLine(OldRequisitionLine, NewProdOrderLine, TransferQty, TransferAll, IsHandled);
         if IsHandled then
             exit;
 
-        if not FindReservEntry(OldReqLine, OldReservEntry) then
+        if not FindReservEntry(OldRequisitionLine, OldReservationEntry) then
             exit;
 
         IsHandled := false;
-        OnTransferPlanningLineToPOLineOnBeforeCheckFields(OldReqLine, NewProdOrderLine, TransferQty, TransferAll, IsHandled);
+        OnTransferPlanningLineToPOLineOnBeforeCheckFields(OldRequisitionLine, NewProdOrderLine, TransferQty, TransferAll, IsHandled);
         if not IsHandled then begin
-            NewProdOrderLine.TestField("Item No.", OldReqLine."No.");
-            NewProdOrderLine.TestField("Variant Code", OldReqLine."Variant Code");
-            NewProdOrderLine.TestField("Location Code", OldReqLine."Location Code");
+            NewProdOrderLine.TestField("Item No.", OldRequisitionLine."No.");
+            NewProdOrderLine.TestField("Variant Code", OldRequisitionLine."Variant Code");
+            NewProdOrderLine.TestField("Location Code", OldRequisitionLine."Location Code");
         end;
 
-        OnTransferReqLineToPOLineOnBeforeTransfer(OldReservEntry, OldReqLine, NewProdOrderLine);
+        OnTransferReqLineToPOLineOnBeforeTransfer(OldReservationEntry, OldRequisitionLine, NewProdOrderLine);
 
-        OldReservEntry.TransferReservations(
-            OldReservEntry, OldReqLine."No.", OldReqLine."Variant Code", OldReqLine."Location Code",
+        OldReservationEntry.TransferReservations(
+            OldReservationEntry, OldRequisitionLine."No.", OldRequisitionLine."Variant Code", OldRequisitionLine."Location Code",
             TransferAll, TransferQty, NewProdOrderLine."Qty. per Unit of Measure",
-            DATABASE::"Prod. Order Line", NewProdOrderLine.Status.AsInteger(), NewProdOrderLine."Prod. Order No.", '', NewProdOrderLine."Line No.", 0);
+            Enum::TableID::"Prod. Order Line".AsInteger(), NewProdOrderLine.Status.AsInteger(), NewProdOrderLine."Prod. Order No.", '', NewProdOrderLine."Line No.", 0);
     end;
 
-    procedure TransferPlanningLineToAsmHdr(var OldReqLine: Record "Requisition Line"; var NewAsmHeader: Record "Assembly Header"; TransferQty: Decimal; TransferAll: Boolean)
+    procedure TransferPlanningLineToAsmHdr(var OldRequisitionLine: Record "Requisition Line"; var NewAssemblyHeader: Record "Assembly Header"; TransferQty: Decimal; TransferAll: Boolean)
     var
-        OldReservEntry: Record "Reservation Entry";
+        OldReservationEntry: Record "Reservation Entry";
     begin
-        if not FindReservEntry(OldReqLine, OldReservEntry) then
+        if not FindReservEntry(OldRequisitionLine, OldReservationEntry) then
             exit;
 
-        NewAsmHeader.TestField("Item No.", OldReqLine."No.");
-        NewAsmHeader.TestField("Variant Code", OldReqLine."Variant Code");
-        NewAsmHeader.TestField("Location Code", OldReqLine."Location Code");
+        NewAssemblyHeader.TestField("Item No.", OldRequisitionLine."No.");
+        NewAssemblyHeader.TestField("Variant Code", OldRequisitionLine."Variant Code");
+        NewAssemblyHeader.TestField("Location Code", OldRequisitionLine."Location Code");
 
-        OnTransferReqLineToAsmHdrOnBeforeTransfer(OldReservEntry, OldReqLine, NewAsmHeader);
+        OnTransferReqLineToAsmHdrOnBeforeTransfer(OldReservationEntry, OldRequisitionLine, NewAssemblyHeader);
 
-        OldReservEntry.TransferReservations(
-            OldReservEntry, OldReqLine."No.", OldReqLine."Variant Code", OldReqLine."Location Code",
-            TransferAll, TransferQty, NewAsmHeader."Qty. per Unit of Measure",
-            DATABASE::"Assembly Header", NewAsmHeader."Document Type".AsInteger(), NewAsmHeader."No.", '', 0, 0);
+        OldReservationEntry.TransferReservations(
+            OldReservationEntry, OldRequisitionLine."No.", OldRequisitionLine."Variant Code", OldRequisitionLine."Location Code",
+            TransferAll, TransferQty, NewAssemblyHeader."Qty. per Unit of Measure",
+            Enum::TableID::"Assembly Header".AsInteger(), NewAssemblyHeader."Document Type".AsInteger(), NewAssemblyHeader."No.", '', 0, 0);
     end;
 
-    procedure TransferReqLineToTransLine(var ReqLine: Record "Requisition Line"; var TransLine: Record "Transfer Line"; TransferQty: Decimal; TransferAll: Boolean)
+    procedure TransferReqLineToTransLine(var RequisitionLine: Record "Requisition Line"; var TransferLine: Record "Transfer Line"; TransferQty: Decimal; TransferAll: Boolean)
     var
-        OldReservEntry: Record "Reservation Entry";
-        NewReservEntry: Record "Reservation Entry";
+        OldReservationEntry: Record "Reservation Entry";
+        NewReservationEntry: Record "Reservation Entry";
         OrigTransferQty: Decimal;
         ReservStatus: Enum "Reservation Status";
         Direction: Enum "Transfer Direction";
         Subtype: Enum "Transfer Direction";
     begin
-        if not FindReservEntry(ReqLine, OldReservEntry) then
+        if not FindReservEntry(RequisitionLine, OldReservationEntry) then
             exit;
 
-        OldReservEntry.Lock();
+        OldReservationEntry.Lock();
 
-        TransLine.TestField("Item No.", ReqLine."No.");
-        TransLine.TestField("Variant Code", ReqLine."Variant Code");
-        TransLine.TestField("Transfer-to Code", ReqLine."Location Code");
-        TransLine.TestField("Transfer-from Code", ReqLine."Transfer-from Code");
+        TransferLine.TestField("Item No.", RequisitionLine."No.");
+        TransferLine.TestField("Variant Code", RequisitionLine."Variant Code");
+        TransferLine.TestField("Transfer-to Code", RequisitionLine."Location Code");
+        TransferLine.TestField("Transfer-from Code", RequisitionLine."Transfer-from Code");
 
         if TransferAll then begin
-            OldReservEntry.FindSet();
-            OldReservEntry.TestField("Qty. per Unit of Measure", TransLine."Qty. per Unit of Measure");
+            OldReservationEntry.FindSet();
+            OldReservationEntry.TestField("Qty. per Unit of Measure", TransferLine."Qty. per Unit of Measure");
 
             repeat
                 // Swap 0/1 (outbound/inbound)
-                if OldReservEntry."Source Subtype" = 0 then
+                if OldReservationEntry."Source Subtype" = 0 then
                     Direction := Direction::Inbound
                 else
                     Direction := Direction::Outbound;
-                if (Direction = Direction::Inbound) or (OldReservEntry."Source Type" <> DATABASE::"Transfer Line") then
-                    OldReservEntry.TestItemFields(ReqLine."No.", ReqLine."Variant Code", ReqLine."Location Code")
+                if (Direction = Direction::Inbound) or (OldReservationEntry."Source Type" <> Enum::TableID::"Transfer Line".AsInteger()) then
+                    OldReservationEntry.TestItemFields(RequisitionLine."No.", RequisitionLine."Variant Code", RequisitionLine."Location Code")
                 else
-                    OldReservEntry.TestItemFields(ReqLine."No.", ReqLine."Variant Code", ReqLine."Transfer-from Code");
+                    OldReservationEntry.TestItemFields(RequisitionLine."No.", RequisitionLine."Variant Code", RequisitionLine."Transfer-from Code");
 
-                NewReservEntry := OldReservEntry;
+                NewReservationEntry := OldReservationEntry;
                 if Direction = Direction::Inbound then
-                    NewReservEntry.SetSource(
-                      DATABASE::"Transfer Line", 1, TransLine."Document No.", TransLine."Line No.", '', TransLine."Derived From Line No.")
+                    NewReservationEntry.SetSource(
+                      Enum::TableID::"Transfer Line".AsInteger(), 1, TransferLine."Document No.", TransferLine."Line No.", '', TransferLine."Derived From Line No.")
                 else
-                    NewReservEntry.SetSource(
-                      DATABASE::"Transfer Line", 0, TransLine."Document No.", TransLine."Line No.", '', TransLine."Derived From Line No.");
+                    NewReservationEntry.SetSource(
+                      Enum::TableID::"Transfer Line".AsInteger(), 0, TransferLine."Document No.", TransferLine."Line No.", '', TransferLine."Derived From Line No.");
 
-                NewReservEntry.UpdateActionMessageEntries(OldReservEntry);
-            until (OldReservEntry.Next() = 0);
+                NewReservationEntry.UpdateActionMessageEntries(OldReservationEntry);
+            until (OldReservationEntry.Next() = 0);
         end else begin
             OrigTransferQty := TransferQty;
 
             for Subtype := Subtype::Outbound to Subtype::Inbound do begin
-                OldReservEntry.SetRange("Source Subtype", Subtype);
+                OldReservationEntry.SetRange("Source Subtype", Subtype);
                 TransferQty := OrigTransferQty;
                 if TransferQty = 0 then
                     exit;
 
                 for ReservStatus := ReservStatus::Reservation to ReservStatus::Prospect do begin
-                    OldReservEntry.SetRange("Reservation Status", ReservStatus);
+                    OldReservationEntry.SetRange("Reservation Status", ReservStatus);
 
-                    if OldReservEntry.FindSet() then
+                    if OldReservationEntry.FindSet() then
                         repeat
                             // Swap outbound/inbound
-                            if OldReservEntry.GetTransferDirection() = Direction::Outbound then
+                            if OldReservationEntry.GetTransferDirection() = Direction::Outbound then
                                 Direction := Direction::Inbound
                             else
                                 Direction := Direction::Outbound;
-                            OldReservEntry.TestField("Item No.", ReqLine."No.");
-                            OldReservEntry.TestField("Variant Code", ReqLine."Variant Code");
+                            OldReservationEntry.TestField("Item No.", RequisitionLine."No.");
+                            OldReservationEntry.TestField("Variant Code", RequisitionLine."Variant Code");
                             if Direction = Direction::Inbound then
-                                OldReservEntry.TestField("Location Code", ReqLine."Location Code")
+                                OldReservationEntry.TestField("Location Code", RequisitionLine."Location Code")
                             else
-                                OldReservEntry.TestField("Location Code", ReqLine."Transfer-from Code");
+                                OldReservationEntry.TestField("Location Code", RequisitionLine."Transfer-from Code");
 
                             TransferQty :=
-                                CreateReservEntry.TransferReservEntry(DATABASE::"Transfer Line",
-                                    Direction.AsInteger(), TransLine."Document No.", '', TransLine."Derived From Line No.",
-                                    TransLine."Line No.", TransLine."Qty. per Unit of Measure", OldReservEntry, TransferQty);
+                                CreateReservEntry.TransferReservEntry(
+                                    Enum::TableID::"Transfer Line".AsInteger(),
+                                    Direction.AsInteger(), TransferLine."Document No.", '', TransferLine."Derived From Line No.",
+                                    TransferLine."Line No.", TransferLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
 
-                        until (OldReservEntry.Next() = 0) or (TransferQty = 0);
+                        until (OldReservationEntry.Next() = 0) or (TransferQty = 0);
                 end;
             end;
         end;
     end;
 
-    local procedure AssignForPlanning(var ReqLine: Record "Requisition Line")
+    local procedure AssignForPlanning(var RequisitionLine: Record "Requisition Line")
     var
         PlanningAssignment: Record "Planning Assignment";
     begin
-        with ReqLine do begin
+        with RequisitionLine do begin
             if Type <> Type::Item then
                 exit;
             if "No." <> '' then
@@ -452,84 +464,84 @@ codeunit 99000833 "Req. Line-Reserve"
         Blocked := SetBlocked;
     end;
 
-    procedure DeleteLine(var ReqLine: Record "Requisition Line")
+    procedure DeleteLine(var RequisitionLine: Record "Requisition Line")
     var
-        ProdOrderComp: Record "Prod. Order Component";
-        CalcReservEntry4: Record "Reservation Entry";
+        ProdOrderComponent: Record "Prod. Order Component";
+        ReservationEntry: Record "Reservation Entry";
         QtyTracked: Decimal;
     begin
         if Blocked then
             exit;
 
-        with ReqLine do begin
-            ReservMgt.SetReservSource(ReqLine);
-            ReservMgt.SetItemTrackingHandling(1); // Allow Deletion
-            ReservMgt.DeleteReservEntries(true, 0);
+        with RequisitionLine do begin
+            ReservationManagement.SetReservSource(RequisitionLine);
+            ReservationManagement.SetItemTrackingHandling(1); // Allow Deletion
+            ReservationManagement.DeleteReservEntries(true, 0);
             CalcFields("Reserved Qty. (Base)");
-            AssignForPlanning(ReqLine);
+            AssignForPlanning(RequisitionLine);
 
             // Retracking of components:
             if ("Action Message" = "Action Message"::Cancel) and
                ("Planning Line Origin" = "Planning Line Origin"::Planning) and
                ("Ref. Order Type" = "Ref. Order Type"::"Prod. Order")
             then begin
-                ProdOrderComp.SetCurrentKey(Status, "Prod. Order No.", "Prod. Order Line No.");
-                ProdOrderComp.SetRange(Status, "Ref. Order Status");
-                ProdOrderComp.SetRange("Prod. Order No.", "Ref. Order No.");
-                ProdOrderComp.SetRange("Prod. Order Line No.", "Ref. Line No.");
-                if ProdOrderComp.FindSet() then
+                ProdOrderComponent.SetCurrentKey(Status, "Prod. Order No.", "Prod. Order Line No.");
+                ProdOrderComponent.SetRange(Status, "Ref. Order Status");
+                ProdOrderComponent.SetRange("Prod. Order No.", "Ref. Order No.");
+                ProdOrderComponent.SetRange("Prod. Order Line No.", "Ref. Line No.");
+                if ProdOrderComponent.FindSet() then
                     repeat
-                        ProdOrderComp.CalcFields("Reserved Qty. (Base)");
-                        QtyTracked := ProdOrderComp."Reserved Qty. (Base)";
-                        CalcReservEntry4.Reset();
-                        CalcReservEntry4.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype");
-                        ProdOrderComp.SetReservationFilters(CalcReservEntry4);
-                        CalcReservEntry4.SetFilter("Reservation Status", '<>%1', CalcReservEntry4."Reservation Status"::Reservation);
-                        if CalcReservEntry4.FindSet() then
+                        ProdOrderComponent.CalcFields("Reserved Qty. (Base)");
+                        QtyTracked := ProdOrderComponent."Reserved Qty. (Base)";
+                        ReservationEntry.Reset();
+                        ReservationEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype");
+                        ProdOrderComponent.SetReservationFilters(ReservationEntry);
+                        ReservationEntry.SetFilter("Reservation Status", '<>%1', ReservationEntry."Reservation Status"::Reservation);
+                        if ReservationEntry.FindSet() then
                             repeat
-                                QtyTracked := QtyTracked - CalcReservEntry4."Quantity (Base)";
-                            until CalcReservEntry4.Next() = 0;
-                        ReservMgt.SetReservSource(ProdOrderComp);
-                        ReservMgt.DeleteReservEntries(QtyTracked = 0, QtyTracked);
-                        ReservMgt.AutoTrack(ProdOrderComp."Remaining Qty. (Base)");
-                    until ProdOrderComp.Next() = 0;
+                                QtyTracked := QtyTracked - ReservationEntry."Quantity (Base)";
+                            until ReservationEntry.Next() = 0;
+                        ReservationManagement.SetReservSource(ProdOrderComponent);
+                        ReservationManagement.DeleteReservEntries(QtyTracked = 0, QtyTracked);
+                        ReservationManagement.AutoTrack(ProdOrderComponent."Remaining Qty. (Base)");
+                    until ProdOrderComponent.Next() = 0;
             end
         end;
     end;
 
-    procedure UpdateDerivedTracking(var ReqLine: Record "Requisition Line")
+    procedure UpdateDerivedTracking(var RequisitionLine: Record "Requisition Line")
     var
-        ReservEntry: Record "Reservation Entry";
-        ReservEntry2: Record "Reservation Entry";
+        ReservationEntry: Record "Reservation Entry";
+        ReservationEntry2: Record "Reservation Entry";
         ActionMessageEntry: Record "Action Message Entry";
     begin
-        ReservEntry.InitSortingAndFilters(false);
+        ReservationEntry.InitSortingAndFilters(false);
         ActionMessageEntry.SetCurrentKey("Reservation Entry");
 
-        with ReservEntry do begin
-            SetFilter("Expected Receipt Date", '<>%1', ReqLine."Due Date");
-            case ReqLine."Ref. Order Type" of
-                ReqLine."Ref. Order Type"::Purchase:
-                    SetSourceFilter(DATABASE::"Purchase Line", 1, ReqLine."Ref. Order No.", ReqLine."Ref. Line No.", true);
-                ReqLine."Ref. Order Type"::"Prod. Order":
+        with ReservationEntry do begin
+            SetFilter("Expected Receipt Date", '<>%1', RequisitionLine."Due Date");
+            case RequisitionLine."Ref. Order Type" of
+                RequisitionLine."Ref. Order Type"::Purchase:
+                    SetSourceFilter(Enum::TableID::"Purchase Line".AsInteger(), 1, RequisitionLine."Ref. Order No.", RequisitionLine."Ref. Line No.", true);
+                RequisitionLine."Ref. Order Type"::"Prod. Order":
                     begin
-                        SetSourceFilter(DATABASE::"Prod. Order Line", ReqLine."Ref. Order Status", ReqLine."Ref. Order No.", -1, true);
-                        SetRange("Source Prod. Order Line", ReqLine."Ref. Line No.");
+                        SetSourceFilter(Enum::TableID::"Prod. Order Line".AsInteger(), RequisitionLine."Ref. Order Status", RequisitionLine."Ref. Order No.", -1, true);
+                        SetRange("Source Prod. Order Line", RequisitionLine."Ref. Line No.");
                     end;
-                ReqLine."Ref. Order Type"::Transfer:
-                    SetSourceFilter(DATABASE::"Transfer Line", 1, ReqLine."Ref. Order No.", ReqLine."Ref. Line No.", true);
-                ReqLine."Ref. Order Type"::Assembly:
-                    SetSourceFilter(DATABASE::"Assembly Header", 1, ReqLine."Ref. Order No.", 0, true);
+                RequisitionLine."Ref. Order Type"::Transfer:
+                    SetSourceFilter(Enum::TableID::"Transfer Line".AsInteger(), 1, RequisitionLine."Ref. Order No.", RequisitionLine."Ref. Line No.", true);
+                RequisitionLine."Ref. Order Type"::Assembly:
+                    SetSourceFilter(Enum::TableID::"Assembly Header".AsInteger(), 1, RequisitionLine."Ref. Order No.", 0, true);
             end;
 
             if FindSet() then
                 repeat
-                    ReservEntry2 := ReservEntry;
-                    ReservEntry2."Expected Receipt Date" := ReqLine."Due Date";
-                    ReservEntry2.Modify();
-                    if ReservEntry2.Get(ReservEntry2."Entry No.", not ReservEntry2.Positive) then begin
-                        ReservEntry2."Expected Receipt Date" := ReqLine."Due Date";
-                        ReservEntry2.Modify();
+                    ReservationEntry2 := ReservationEntry;
+                    ReservationEntry2."Expected Receipt Date" := RequisitionLine."Due Date";
+                    ReservationEntry2.Modify();
+                    if ReservationEntry2.Get(ReservationEntry2."Entry No.", not ReservationEntry2.Positive) then begin
+                        ReservationEntry2."Expected Receipt Date" := RequisitionLine."Due Date";
+                        ReservationEntry2.Modify();
                     end;
                     ActionMessageEntry.SetRange("Reservation Entry", "Entry No.");
                     ActionMessageEntry.DeleteAll();
@@ -537,30 +549,30 @@ codeunit 99000833 "Req. Line-Reserve"
         end;
     end;
 
-    procedure CallItemTracking(var ReqLine: Record "Requisition Line")
+    procedure CallItemTracking(var RequisitionLine: Record "Requisition Line")
     var
         TrackingSpecification: Record "Tracking Specification";
         ItemTrackingLines: Page "Item Tracking Lines";
     begin
-        TrackingSpecification.InitFromReqLine(ReqLine);
-        ItemTrackingLines.SetSourceSpec(TrackingSpecification, ReqLine."Due Date");
+        TrackingSpecification.InitFromReqLine(RequisitionLine);
+        ItemTrackingLines.SetSourceSpec(TrackingSpecification, RequisitionLine."Due Date");
         ItemTrackingLines.RunModal();
     end;
 
-    local procedure VerifyBinInReqLine(var NewReqLine: Record "Requisition Line"; var OldReqLine: Record "Requisition Line"; var HasError: Boolean)
+    local procedure VerifyBinInReqLine(var NewRequisitionLine: Record "Requisition Line"; var OldRequisitionLine: Record "Requisition Line"; var HasError: Boolean)
     begin
-        if (NewReqLine.Type = NewReqLine.Type::Item) and (OldReqLine.Type = OldReqLine.Type::Item) then
-            if (NewReqLine."Bin Code" <> OldReqLine."Bin Code") and
-               (not ReservMgt.CalcIsAvailTrackedQtyInBin(
-                  NewReqLine."No.", NewReqLine."Bin Code",
-                  NewReqLine."Location Code", NewReqLine."Variant Code",
-                  DATABASE::"Requisition Line", 0,
-                  NewReqLine."Worksheet Template Name", NewReqLine."Journal Batch Name", 0,
-                  NewReqLine."Line No."))
+        if (NewRequisitionLine.Type = NewRequisitionLine.Type::Item) and (OldRequisitionLine.Type = OldRequisitionLine.Type::Item) then
+            if (NewRequisitionLine."Bin Code" <> OldRequisitionLine."Bin Code") and
+               (not ReservationManagement.CalcIsAvailTrackedQtyInBin(
+                  NewRequisitionLine."No.", NewRequisitionLine."Bin Code",
+                  NewRequisitionLine."Location Code", NewRequisitionLine."Variant Code",
+                  Enum::TableID::"Requisition Line".AsInteger(), 0,
+                  NewRequisitionLine."Worksheet Template Name", NewRequisitionLine."Journal Batch Name", 0,
+                  NewRequisitionLine."Line No."))
             then
                 HasError := true;
 
-        if NewReqLine."Line No." <> OldReqLine."Line No." then
+        if NewRequisitionLine."Line No." <> OldRequisitionLine."Line No." then
             HasError := true;
     end;
 
@@ -569,37 +581,37 @@ codeunit 99000833 "Req. Line-Reserve"
     var
         ReqLine: Record "Requisition Line";
     begin
-        if SourceRecRef.Number = Database::"Requisition Line" then begin
+        if SourceRecRef.Number = Enum::TableID::"Requisition Line".AsInteger() then begin
             SourceRecRef.SetTable(ReqLine);
             ReqLine.Find();
             QtyPerUOM := ReqLine.GetReservationQty(QtyReserved, QtyReservedBase, QtyToReserve, QtyToReserveBase);
         end;
     end;
 
-    local procedure SetReservSourceFor(SourceRecRef: RecordRef; var ReservEntry: Record "Reservation Entry"; var CaptionText: Text)
+    local procedure SetReservSourceFor(SourceRecordRef: RecordRef; var ReservationEntry: Record "Reservation Entry"; var CaptionText: Text)
     var
-        ReqLine: Record "Requisition Line";
+        RequisitionLine: Record "Requisition Line";
     begin
-        SourceRecRef.SetTable(ReqLine);
-        ReqLine.TestField("Sales Order No.", '');
-        ReqLine.TestField("Sales Order Line No.", 0);
-        ReqLine.TestField("Sell-to Customer No.", '');
-        ReqLine.TestField(Type, ReqLine.Type::Item);
-        ReqLine.TestField("Due Date");
+        SourceRecordRef.SetTable(RequisitionLine);
+        RequisitionLine.TestField("Sales Order No.", '');
+        RequisitionLine.TestField("Sales Order Line No.", 0);
+        RequisitionLine.TestField("Sell-to Customer No.", '');
+        RequisitionLine.TestField(Type, RequisitionLine.Type::Item);
+        RequisitionLine.TestField("Due Date");
 
-        ReqLine.SetReservationEntry(ReservEntry);
+        RequisitionLine.SetReservationEntry(ReservationEntry);
 
-        CaptionText := ReqLine.GetSourceCaption();
+        CaptionText := RequisitionLine.GetSourceCaption();
     end;
 
     local procedure MatchThisEntry(EntryNo: Integer): Boolean
     begin
-        exit(EntryNo = "Reservation Summary Type"::"Requisition Line".AsInteger());
+        exit(EntryNo = Enum::"Reservation Summary Type"::"Requisition Line".AsInteger());
     end;
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = 246); // DATABASE::"Requisition Line"
+        exit(TableID = 246); // Enum::TableID::"Requisition Line"
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnSetReservSource', '', false, false)]
@@ -625,7 +637,7 @@ codeunit 99000833 "Req. Line-Reserve"
     local procedure OnFilterReservEntry(var FilterReservEntry: Record "Reservation Entry"; ReservEntrySummary: Record "Entry Summary")
     begin
         if MatchThisEntry(ReservEntrySummary."Entry No.") then begin
-            FilterReservEntry.SetRange("Source Type", DATABASE::"Requisition Line");
+            FilterReservEntry.SetRange("Source Type", Enum::TableID::"Requisition Line".AsInteger());
             FilterReservEntry.SetRange("Source Subtype", 0);
         end;
     end;
@@ -635,7 +647,7 @@ codeunit 99000833 "Req. Line-Reserve"
     begin
         if MatchThisEntry(FromEntrySummary."Entry No.") then
             IsHandled :=
-                (FilterReservEntry."Source Type" = DATABASE::"Requisition Line") and
+                (FilterReservEntry."Source Type" = Enum::TableID::"Requisition Line".AsInteger()) and
                 (FilterReservEntry."Source Subtype" = 0);
     end;
 
@@ -702,17 +714,17 @@ codeunit 99000833 "Req. Line-Reserve"
         end;
     end;
 
-    local procedure GetSourceValue(ReservEntry: Record "Reservation Entry"; var SourceRecRef: RecordRef; ReturnOption: Option "Net Qty. (Base)","Gross Qty. (Base)"): Decimal
+    local procedure GetSourceValue(ReservationEntry: Record "Reservation Entry"; var SourceRecordRef: RecordRef; ReturnOption: Option "Net Qty. (Base)","Gross Qty. (Base)"): Decimal
     var
-        ReqLine: Record "Requisition Line";
+        RequisitionLine: Record "Requisition Line";
     begin
-        ReqLine.Get(ReservEntry."Source ID", ReservEntry."Source Batch Name", ReservEntry."Source Ref. No.");
-        SourceRecRef.GetTable(ReqLine);
+        RequisitionLine.Get(ReservationEntry."Source ID", ReservationEntry."Source Batch Name", ReservationEntry."Source Ref. No.");
+        SourceRecordRef.GetTable(RequisitionLine);
         case ReturnOption of
             ReturnOption::"Net Qty. (Base)":
-                exit(ReqLine."Net Quantity (Base)");
+                exit(RequisitionLine."Net Quantity (Base)");
             ReturnOption::"Gross Qty. (Base)":
-                exit(ReqLine."Quantity (Base)");
+                exit(RequisitionLine."Quantity (Base)");
         end;
     end;
 
@@ -721,6 +733,40 @@ codeunit 99000833 "Req. Line-Reserve"
     begin
         if MatchThisTable(ReservEntry."Source Type") then
             ReturnQty := GetSourceValue(ReservEntry, SourceRecRef, ReturnOption);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Reservation Entries", 'OnLookupReserved', '', false, false)]
+    local procedure OnLookupReserved(var ReservationEntry: Record "Reservation Entry")
+    begin
+        case ReservationEntry."Source Type" of
+            Enum::TableID::"Requisition Line".AsInteger():
+                ShowRequisitionLines(ReservationEntry);
+            Enum::TableID::"Planning Component".AsInteger():
+                ShowPlanningComponentLines(ReservationEntry);
+        end;
+    end;
+
+    local procedure ShowRequisitionLines(var ReservationEntry: Record "Reservation Entry")
+    var
+        RequisitionLine: Record "Requisition Line";
+    begin
+        RequisitionLine.Reset();
+        RequisitionLine.SetRange("Worksheet Template Name", ReservationEntry."Source ID");
+        RequisitionLine.SetRange("Journal Batch Name", ReservationEntry."Source Batch Name");
+        RequisitionLine.SetRange("Line No.", ReservationEntry."Source Ref. No.");
+        PAGE.RunModal(PAGE::"Requisition Lines", RequisitionLine);
+    end;
+
+    local procedure ShowPlanningComponentLines(var ReservationEntry: Record "Reservation Entry")
+    var
+        PlanningComponent: Record "Planning Component";
+    begin
+        PlanningComponent.Reset();
+        PlanningComponent.SetRange("Worksheet Template Name", ReservationEntry."Source ID");
+        PlanningComponent.SetRange("Worksheet Batch Name", ReservationEntry."Source Batch Name");
+        PlanningComponent.SetRange("Worksheet Line No.", ReservationEntry."Source Prod. Order Line");
+        PlanningComponent.SetRange("Line No.", ReservationEntry."Source Ref. No.");
+        PAGE.RunModal(0, PlanningComponent);
     end;
 
     [IntegrationEvent(false, false)]

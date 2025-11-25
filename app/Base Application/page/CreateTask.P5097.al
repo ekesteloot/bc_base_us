@@ -1,3 +1,13 @@
+namespace Microsoft.CRM.Task;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+using System.Environment;
+
 page 5097 "Create Task"
 {
     Caption = 'Create Task';
@@ -15,7 +25,7 @@ page 5097 "Create Task"
             group(General)
             {
                 Caption = 'General';
-                field(TypeSaaS; Type)
+                field(TypeSaaS; Rec.Type)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Type';
@@ -27,7 +37,7 @@ page 5097 "Create Task"
                         ValidateTypeField();
                     end;
                 }
-                field(TypeOnPrem; Type)
+                field(TypeOnPrem; Rec.Type)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Type';
@@ -44,7 +54,7 @@ page 5097 "Create Task"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the description of the Task.';
                 }
-                field(AllDayEvent; "All Day Event")
+                field(AllDayEvent; Rec."All Day Event")
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'All Day Event';
@@ -56,7 +66,7 @@ page 5097 "Create Task"
                         AllDayEventOnAfterValidate();
                     end;
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Start Date';
@@ -69,7 +79,7 @@ page 5097 "Create Task"
                     Enabled = StartTimeEnable;
                     ToolTip = 'Specifies the time when the Task of the Meeting type should be started.';
                 }
-                field(Duration; Duration)
+                field(Duration; Rec.Duration)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Duration';
@@ -89,7 +99,7 @@ page 5097 "Create Task"
                     Enabled = EndingTimeEnable;
                     ToolTip = 'Specifies the time of when the Task of the Meeting type should end.';
                 }
-                field(TeamTask; "Team To-do")
+                field(TeamTask; Rec."Team To-do")
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Team Task';
@@ -97,16 +107,16 @@ page 5097 "Create Task"
 
                     trigger OnValidate()
                     begin
-                        if not "Team To-do" then begin
-                            "Team Code" := '';
+                        if not Rec."Team To-do" then begin
+                            Rec."Team Code" := '';
                             SalespersonCodeEnable := true;
-                            if Type = Type::Meeting then begin
-                                ClearDefaultAttendeeInfo();
-                                AssignDefaultAttendeeInfo();
+                            if Rec.Type = Rec.Type::Meeting then begin
+                                Rec.ClearDefaultAttendeeInfo();
+                                Rec.AssignDefaultAttendeeInfo();
                             end;
                         end else begin
                             SalespersonCodeEnable := false;
-                            "Salesperson Code" := '';
+                            Rec."Salesperson Code" := '';
                         end;
                     end;
                 }
@@ -124,11 +134,11 @@ page 5097 "Create Task"
                     var
                         Cont: Record Contact;
                     begin
-                        if (GetFilter("Contact No.") = '') and (GetFilter("Contact Company No.") = '') and ("Segment Description" = '') then begin
-                            if Cont.Get("Contact No.") then;
+                        if (Rec.GetFilter("Contact No.") = '') and (Rec.GetFilter("Contact Company No.") = '') and (Rec."Segment Description" = '') then begin
+                            if Cont.Get(Rec."Contact No.") then;
                             if PAGE.RunModal(0, Cont) = ACTION::LookupOK then begin
-                                Validate("Contact No.", Cont."No.");
-                                "Wizard Contact Name" := Cont.Name;
+                                Rec.Validate("Contact No.", Cont."No.");
+                                Rec."Wizard Contact Name" := Cont.Name;
                             end;
                         end;
                     end;
@@ -144,18 +154,18 @@ page 5097 "Create Task"
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Team';
-                    Editable = "Team To-do";
-                    Enabled = "Team To-do" OR NOT IsMeeting;
+                    Editable = Rec."Team To-do";
+                    Enabled = Rec."Team To-do" or not IsMeeting;
                     ToolTip = 'Specifies the code of the Team to which the Task is assigned.';
 
                     trigger OnValidate()
                     begin
-                        if (xRec."Team Code" <> "Team Code") and
-                           ("Team Code" <> '') and
-                           (Type = Type::Meeting)
+                        if (xRec."Team Code" <> Rec."Team Code") and
+                           (Rec."Team Code" <> '') and
+                           (Rec.Type = Rec.Type::Meeting)
                         then begin
-                            ClearDefaultAttendeeInfo();
-                            AssignDefaultAttendeeInfo();
+                            Rec.ClearDefaultAttendeeInfo();
+                            Rec.AssignDefaultAttendeeInfo();
                         end
                     end;
                 }
@@ -173,11 +183,11 @@ page 5097 "Create Task"
                     var
                         Campaign: Record Campaign;
                     begin
-                        if GetFilter("Campaign No.") = '' then begin
-                            if Campaign.Get("Campaign No.") then;
+                        if Rec.GetFilter("Campaign No.") = '' then begin
+                            if Campaign.Get(Rec."Campaign No.") then;
                             if PAGE.RunModal(0, Campaign) = ACTION::LookupOK then begin
-                                Validate("Campaign No.", Campaign."No.");
-                                "Wizard Campaign Description" := Campaign.Description;
+                                Rec.Validate("Campaign No.", Campaign."No.");
+                                Rec."Wizard Campaign Description" := Campaign.Description;
                             end;
                         end;
                     end;
@@ -196,16 +206,16 @@ page 5097 "Create Task"
                     var
                         Opp: Record Opportunity;
                     begin
-                        if GetFilter("Opportunity No.") = '' then begin
-                            if Opp.Get("Opportunity No.") then;
+                        if Rec.GetFilter("Opportunity No.") = '' then begin
+                            if Opp.Get(Rec."Opportunity No.") then;
                             if PAGE.RunModal(0, Opp) = ACTION::LookupOK then begin
-                                Validate("Opportunity No.", Opp."No.");
-                                "Wizard Opportunity Description" := Opp.Description;
+                                Rec.Validate("Opportunity No.", Opp."No.");
+                                Rec."Wizard Opportunity Description" := Opp.Description;
                             end;
                         end;
                     end;
                 }
-                field(SegmentDesc; "Segment Description")
+                field(SegmentDesc; Rec."Segment Description")
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Create Tasks for Segment Contacts';
@@ -219,23 +229,23 @@ page 5097 "Create Task"
                     var
                         SegmentHeader: Record "Segment Header";
                     begin
-                        if GetFilter("Segment No.") = '' then begin
-                            if SegmentHeader.Get("Segment No.") then;
+                        if Rec.GetFilter("Segment No.") = '' then begin
+                            if SegmentHeader.Get(Rec."Segment No.") then;
                             if PAGE.RunModal(0, SegmentHeader) = ACTION::LookupOK then begin
-                                Validate("Segment No.", SegmentHeader."No.");
-                                "Segment Description" := SegmentHeader.Description;
+                                Rec.Validate("Segment No.", SegmentHeader."No.");
+                                Rec."Segment Description" := SegmentHeader.Description;
                             end;
                         end;
                     end;
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Priority';
                     Importance = Additional;
                     ToolTip = 'Specifies the priority of the Task. There are three options:';
                 }
-                field(Location; Location)
+                field(Location; Rec.Location)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Location';
@@ -251,7 +261,7 @@ page 5097 "Create Task"
                 part(AttendeeSubform; "Attendee Wizard Subform")
                 {
                     ApplicationArea = RelationshipMgmt;
-                    SubPageLink = "To-do No." = FIELD("No.");
+                    SubPageLink = "To-do No." = field("No.");
                 }
                 group(MeetingInteraction)
                 {
@@ -271,7 +281,7 @@ page 5097 "Create Task"
 
                         trigger OnValidate()
                         begin
-                            ValidateInteractionTemplCode();
+                            Rec.ValidateInteractionTemplCode();
                             InteractionTemplateCodeOnAfter();
                         end;
                     }
@@ -283,15 +293,15 @@ page 5097 "Create Task"
 
                         trigger OnLookup(var Text: Text): Boolean
                         begin
-                            LookupLanguageCode();
+                            Rec.LookupLanguageCode();
                         end;
 
                         trigger OnValidate()
                         begin
-                            ValidateLanguageCode();
+                            Rec.ValidateLanguageCode();
                         end;
                     }
-                    field(Attachment; "Attachment No." > 0)
+                    field(Attachment; Rec."Attachment No." > 0)
                     {
                         ApplicationArea = RelationshipMgmt;
                         AssistEdit = true;
@@ -302,7 +312,7 @@ page 5097 "Create Task"
 
                         trigger OnAssistEdit()
                         begin
-                            AssistEditAttachment();
+                            Rec.AssistEditAttachment();
                         end;
                     }
                 }
@@ -375,7 +385,7 @@ page 5097 "Create Task"
     trigger OnAfterGetRecord()
     begin
         EnableFields();
-        WizardContactNameOnFormat(Format("Wizard Contact Name"));
+        WizardContactNameOnFormat(Format(Rec."Wizard Contact Name"));
     end;
 
     trigger OnInit()
@@ -407,10 +417,10 @@ page 5097 "Create Task"
         WizardCampaignDescriptionEdita := false;
         WizardOpportunityDescriptionEd := false;
 
-        if "Segment Description" <> '' then
+        if Rec."Segment Description" <> '' then
             SegmentDescEditable := false;
 
-        IsMeeting := (Type = Type::Meeting);
+        IsMeeting := (Rec.Type = Rec.Type::Meeting);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -432,59 +442,44 @@ page 5097 "Create Task"
         ClientTypeManagement: Codeunit "Client Type Management";
         SalespersonFilter: Code[20];
         ContactFilter: Code[20];
-        [InDataSet]
         WizardContactNameEditable: Boolean;
-        [InDataSet]
         WizardCampaignDescriptionEdita: Boolean;
-        [InDataSet]
         WizardOpportunityDescriptionEd: Boolean;
-        [InDataSet]
         SegmentDescEditable: Boolean;
         IsMeeting: Boolean;
         IsOnMobile: Boolean;
-        [InDataSet]
         DurationEnable: Boolean;
-        [InDataSet]
         LocationEnable: Boolean;
-        [InDataSet]
         AllDayEventEnable: Boolean;
-        [InDataSet]
         WizardContactNameEnable: Boolean;
-        [InDataSet]
         RecurringDateIntervalEnable: Boolean;
-        [InDataSet]
         CalcDueDateFromEnable: Boolean;
-        [InDataSet]
         LanguageCodeEnable: Boolean;
-        [InDataSet]
         AttachmentEnable: Boolean;
         IsSoftwareAsAService: Boolean;
 
     protected var
-        [InDataSet]
         StartTimeEnable: Boolean;
-        [InDataSet]
         EndingTimeEnable: Boolean;
-        [InDataSet]
         SalespersonCodeEnable: Boolean;
 
     procedure Caption(): Text
     var
         CaptionStr: Text;
     begin
-        if Cont.Get(GetFilter("Contact Company No.")) then
+        if Cont.Get(Rec.GetFilter(Rec."Contact Company No.")) then
             CaptionStr := CopyStr(Cont."No." + ' ' + Cont.Name, 1, MaxStrLen(CaptionStr));
-        if Cont.Get(GetFilter("Contact No.")) then
+        if Cont.Get(Rec.GetFilter(Rec."Contact No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + Cont."No." + ' ' + Cont.Name, 1, MaxStrLen(CaptionStr));
-        if SalesPurchPerson.Get(GetFilter("Salesperson Code")) then
+        if SalesPurchPerson.Get(Rec.GetFilter(Rec."Salesperson Code")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + SalesPurchPerson.Code + ' ' + SalesPurchPerson.Name, 1, MaxStrLen(CaptionStr));
-        if Team.Get(GetFilter("Team Code")) then
+        if Team.Get(Rec.GetFilter(Rec."Team Code")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + Team.Code + ' ' + Team.Name, 1, MaxStrLen(CaptionStr));
-        if Campaign.Get(GetFilter("Campaign No.")) then
+        if Campaign.Get(Rec.GetFilter(Rec."Campaign No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + Campaign."No." + ' ' + Campaign.Description, 1, MaxStrLen(CaptionStr));
-        if Opp.Get(GetFilter("Opportunity No.")) then
+        if Opp.Get(Rec.GetFilter(Rec."Opportunity No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + Opp."No." + ' ' + Opp.Description, 1, MaxStrLen(CaptionStr));
-        if SegHeader.Get(GetFilter("Segment No.")) then
+        if SegHeader.Get(Rec.GetFilter(Rec."Segment No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + SegHeader."No." + ' ' + SegHeader.Description, 1, MaxStrLen(CaptionStr));
         if CaptionStr = '' then
             CaptionStr := Text001;
@@ -494,28 +489,28 @@ page 5097 "Create Task"
 
     local procedure EnableFields()
     begin
-        RecurringDateIntervalEnable := Recurring;
-        CalcDueDateFromEnable := Recurring;
+        RecurringDateIntervalEnable := Rec.Recurring;
+        CalcDueDateFromEnable := Rec.Recurring;
 
-        if not Recurring then begin
-            Evaluate("Recurring Date Interval", '');
-            Clear("Calc. Due Date From");
+        if not Rec.Recurring then begin
+            Evaluate(Rec."Recurring Date Interval", '');
+            Clear(Rec."Calc. Due Date From");
         end;
 
-        IsMeeting := Type = Type::Meeting;
+        IsMeeting := Rec.Type = Rec.Type::Meeting;
 
         if IsMeeting then begin
-            StartTimeEnable := not "All Day Event";
-            EndingTimeEnable := not "All Day Event";
-            DurationEnable := not "All Day Event";
+            StartTimeEnable := not Rec."All Day Event";
+            EndingTimeEnable := not Rec."All Day Event";
+            DurationEnable := not Rec."All Day Event";
             LocationEnable := true;
             AllDayEventEnable := true;
-            LanguageCodeEnable := "Interaction Template Code" <> '';
-            AttachmentEnable := "Interaction Template Code" <> '';
+            LanguageCodeEnable := Rec."Interaction Template Code" <> '';
+            AttachmentEnable := Rec."Interaction Template Code" <> '';
         end else begin
-            StartTimeEnable := Type = Type::"Phone Call";
-            EndingTimeEnable := Type = Type::"Phone Call";
-            DurationEnable := Type = Type::"Phone Call";
+            StartTimeEnable := Rec.Type = Rec.Type::"Phone Call";
+            EndingTimeEnable := Rec.Type = Rec.Type::"Phone Call";
+            DurationEnable := Rec.Type = Rec.Type::"Phone Call";
             LocationEnable := false;
             AllDayEventEnable := false;
         end;
@@ -523,40 +518,40 @@ page 5097 "Create Task"
         OnAfterEnableFields(Rec);
     end;
 
-    local procedure ValidateTypeField()
+    procedure ValidateTypeField()
     begin
-        if Type <> xRec.Type then
-            if Type = Type::Meeting then begin
-                ClearDefaultAttendeeInfo();
-                AssignDefaultAttendeeInfo();
-                LoadTempAttachment();
-                if not "Team To-do" then
-                    if "Salesperson Code" = '' then begin
-                        if Cont.Get("Contact No.") then
-                            Validate("Salesperson Code", Cont."Salesperson Code")
+        if Rec.Type <> xRec.Type then
+            if Rec.Type = Rec.Type::Meeting then begin
+                Rec.ClearDefaultAttendeeInfo();
+                Rec.AssignDefaultAttendeeInfo();
+                Rec.LoadTempAttachment();
+                if not Rec."Team To-do" then
+                    if Rec."Salesperson Code" = '' then begin
+                        if Cont.Get(Rec."Contact No.") then
+                            Rec.Validate("Salesperson Code", Cont."Salesperson Code")
                         else
-                            if Cont.Get("Contact Company No.") then
-                                Validate("Salesperson Code", Cont."Salesperson Code");
-                        if Campaign.Get(GetFilter("Campaign No.")) then
-                            Validate("Salesperson Code", Campaign."Salesperson Code");
-                        if Opp.Get(GetFilter("Opportunity No.")) then
-                            Validate("Salesperson Code", Opp."Salesperson Code");
-                        if SegHeader.Get(GetFilter("Segment No.")) then
-                            Validate("Salesperson Code", SegHeader."Salesperson Code");
-                        Modify();
+                            if Cont.Get(Rec."Contact Company No.") then
+                                Rec.Validate("Salesperson Code", Cont."Salesperson Code");
+                        if Campaign.Get(Rec.GetFilter("Campaign No.")) then
+                            Rec.Validate("Salesperson Code", Campaign."Salesperson Code");
+                        if Opp.Get(Rec.GetFilter("Opportunity No.")) then
+                            Rec.Validate("Salesperson Code", Opp."Salesperson Code");
+                        if SegHeader.Get(Rec.GetFilter("Segment No.")) then
+                            Rec.Validate("Salesperson Code", SegHeader."Salesperson Code");
+                        Rec.Modify();
                     end;
-                GetAttendee(AttendeeTemp);
+                Rec.GetAttendee(AttendeeTemp);
                 CurrPage.AttendeeSubform.PAGE.SetAttendee(AttendeeTemp);
                 CurrPage.AttendeeSubform.PAGE.SetTaskFilter(SalespersonFilter, ContactFilter);
                 CurrPage.AttendeeSubform.PAGE.UpdateForm();
             end else begin
-                ClearDefaultAttendeeInfo();
+                Rec.ClearDefaultAttendeeInfo();
                 CurrPage.AttendeeSubform.PAGE.GetAttendee(AttendeeTemp);
-                SetAttendee(AttendeeTemp);
-                SalespersonCodeEnable := not "Team To-do";
+                Rec.SetAttendee(AttendeeTemp);
+                SalespersonCodeEnable := not Rec."Team To-do";
                 WizardContactNameEnable := true;
             end;
-        IsMeeting := (Type = Type::Meeting);
+        IsMeeting := (Rec.Type = Rec.Type::Meeting);
         TypeOnAfterValidate();
         CurrPage.Update();
     end;
@@ -583,17 +578,17 @@ page 5097 "Create Task"
 
     local procedure WizardContactNameOnFormat(Text: Text[1024])
     begin
-        if SegHeader.Get(GetFilter("Segment No.")) then
+        if SegHeader.Get(Rec.GetFilter("Segment No.")) then
             Text := Text000;
     end;
 
     local procedure FinishPage()
     begin
         CurrPage.AttendeeSubform.PAGE.GetAttendee(AttendeeTemp);
-        SetAttendee(AttendeeTemp);
+        Rec.SetAttendee(AttendeeTemp);
 
-        CheckStatus();
-        FinishWizard(false);
+        Rec.CheckStatus();
+        Rec.FinishWizard(false);
         OnAfterFinishPage(Rec);
     end;
 

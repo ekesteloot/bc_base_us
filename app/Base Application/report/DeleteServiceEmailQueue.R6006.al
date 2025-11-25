@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Email;
+
 report 6006 "Delete Service Email Queue"
 {
     Caption = 'Delete Service Email Queue';
@@ -7,7 +9,7 @@ report 6006 "Delete Service Email Queue"
     {
         dataitem("Service Email Queue"; "Service Email Queue")
         {
-            DataItemTableView = SORTING(Status, "Sending Date");
+            DataItemTableView = sorting(Status, "Sending Date");
             RequestFilterFields = Status, "Sending Date";
 
             trigger OnAfterGetRecord()

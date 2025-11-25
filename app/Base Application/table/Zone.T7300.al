@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Setup;
+
 table 7300 Zone
 {
     Caption = 'Zone';

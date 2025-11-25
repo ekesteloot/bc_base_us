@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
 codeunit 5881 "Phys. Invt. Order-Reopen (Y/N)"
 {
     TableNo = "Phys. Invt. Order Header";

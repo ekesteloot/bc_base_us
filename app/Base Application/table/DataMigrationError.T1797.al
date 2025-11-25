@@ -1,3 +1,5 @@
+namespace System.Integration;
+
 table 1797 "Data Migration Error"
 {
     Caption = 'Data Migration Error';

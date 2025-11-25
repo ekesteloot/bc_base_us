@@ -1,3 +1,10 @@
+﻿namespace System.TestTools.TestRunner;
+
+using System;
+using System.IO;
+using System.Reflection;
+using System.Xml;
+
 codeunit 130404 "CAL Test Project Mgt."
 {
 

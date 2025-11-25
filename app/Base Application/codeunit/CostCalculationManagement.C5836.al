@@ -17,7 +17,15 @@ codeunit 5836 "Cost Calculation Management"
         UnitCost := Resource."Unit Cost";
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by procedure CalcRoutingCostPerUnit()', '23.0')]
     procedure RoutingCostPerUnit(Type: Enum "Capacity Type"; No: Code[20]; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Option Time,Unit)
+    begin
+        CalcRoutingCostPerUnit(Type, No, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation);
+    end;
+#endif
+
+    procedure CalcRoutingCostPerUnit(Type: Enum "Capacity Type"; No: Code[20]; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type")
     var
         WorkCenter: Record "Work Center";
         MachineCenter: Record "Machine Center";
@@ -28,15 +36,30 @@ codeunit 5836 "Cost Calculation Management"
             Type::"Machine Center":
                 MachineCenter.Get(No);
         end;
-        RoutingCostPerUnit(Type, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter);
+        CalcRoutingCostPerUnit(Type, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter);
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by procedure CalcRoutingCostPerUnit()', '23.0')]
     procedure RoutingCostPerUnit(Type: Enum "Capacity Type"; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Option Time,Unit; WorkCenter: Record "Work Center"; MachineCenter: Record "Machine Center")
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeRoutingCostPerUnit(Type, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter, IsHandled);
+        if IsHandled then
+            exit;
+
+        CalcRoutingCostPerUnit(Type, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter);
+    end;
+#endif
+
+    procedure CalcRoutingCostPerUnit(Type: Enum "Capacity Type"; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type"; WorkCenter: Record "Work Center"; MachineCenter: Record "Machine Center")
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCalcRoutingCostPerUnit(Type, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter, IsHandled);
         if IsHandled then
             exit;
 
@@ -47,9 +70,9 @@ codeunit 5836 "Cost Calculation Management"
                     UnitCostCalculation := WorkCenter."Unit Cost Calculation";
                     IndirCostPct := WorkCenter."Indirect Cost %";
                     OvhdRate := WorkCenter."Overhead Rate";
-                    if WorkCenter."Specific Unit Cost" then begin
-                        DirUnitCost := CalcDirUnitCost(UnitCost, OvhdRate, IndirCostPct);
-                    end else begin
+                    if WorkCenter."Specific Unit Cost" then
+                        DirUnitCost := CalcDirUnitCost(UnitCost, OvhdRate, IndirCostPct)
+                    else begin
                         DirUnitCost := WorkCenter."Direct Unit Cost";
                         UnitCost := WorkCenter."Unit Cost";
                     end;
@@ -63,7 +86,10 @@ codeunit 5836 "Cost Calculation Management"
                     UnitCost := MachineCenter."Unit Cost";
                 end;
         end;
+#if not CLEAN23
         OnAfterRoutingCostPerUnit(Type, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter);
+#endif
+        OnAfterCalcRoutingCostPerUnit(Type, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter);
     end;
 
     procedure CalcShareOfTotalCapCost(ProdOrderLine: Record "Prod. Order Line"; var ShareOfTotalCapCost: Decimal)
@@ -533,10 +559,18 @@ codeunit 5836 "Cost Calculation Management"
         end;
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by procedure CalculateCostTime()', '23.0')]
     procedure CalcCostTime(MfgItemQtyBase: Decimal; SetupTime: Decimal; SetupTimeUOMCode: Code[10]; RunTime: Decimal; RunTimeUOMCode: Code[10]; RtngLotSize: Decimal; ScrapFactorPctAccum: Decimal; FixedScrapQtyAccum: Decimal; WorkCenterNo: Code[20]; UnitCostCalculation: Option Time,Unit; CostInclSetup: Boolean; ConcurrentCapacities: Decimal) CostTime: Decimal
+    begin
+        exit(CalculateCostTime(MfgItemQtyBase, SetupTime, SetupTimeUOMCode, RunTime, RunTimeUOMCode, RtngLotSize, ScrapFactorPctAccum, FixedScrapQtyAccum, WorkCenterNo, UnitCostCalculation, CostInclSetup, ConcurrentCapacities));
+    end;
+#endif
+
+    procedure CalculateCostTime(MfgItemQtyBase: Decimal; SetupTime: Decimal; SetupTimeUOMCode: Code[10]; RunTime: Decimal; RunTimeUOMCode: Code[10]; RtngLotSize: Decimal; ScrapFactorPctAccum: Decimal; FixedScrapQtyAccum: Decimal; WorkCenterNo: Code[20]; UnitCostCalculation: Enum "Unit Cost Calculation Type"; CostInclSetup: Boolean; ConcurrentCapacities: Decimal) CostTime: Decimal
     var
-        CalendarMgt: Codeunit "Shop Calendar Management";
-        UOMMgt: Codeunit "Unit of Measure Management";
+        ShopCalendarManagement: Codeunit "Shop Calendar Management";
+        UnitOfMeasureManagement: Codeunit "Unit of Measure Management";
         RunTimePer: Decimal;
     begin
         if ConcurrentCapacities = 0 then
@@ -551,21 +585,21 @@ codeunit 5836 "Cost Calculation Management"
                     CostTime :=
                       CalcQtyAdjdForRoutingScrap(
                         Round(
-                          RunTimePer * MfgItemQtyBase * CalendarMgt.QtyperTimeUnitofMeasure(WorkCenterNo, RunTimeUOMCode),
-                          UOMMgt.TimeRndPrecision()),
+                          RunTimePer * MfgItemQtyBase * ShopCalendarManagement.QtyperTimeUnitofMeasure(WorkCenterNo, RunTimeUOMCode),
+                          UnitOfMeasureManagement.TimeRndPrecision()),
                         ScrapFactorPctAccum,
                         Round(
-                          RunTimePer * FixedScrapQtyAccum * CalendarMgt.QtyperTimeUnitofMeasure(WorkCenterNo, RunTimeUOMCode),
-                          UOMMgt.TimeRndPrecision()));
+                          RunTimePer * FixedScrapQtyAccum * ShopCalendarManagement.QtyperTimeUnitofMeasure(WorkCenterNo, RunTimeUOMCode),
+                          UnitOfMeasureManagement.TimeRndPrecision()));
                     if CostInclSetup then
                         CostTime :=
                           CostTime +
                           Round(
                             ConcurrentCapacities *
-                            SetupTime * CalendarMgt.QtyperTimeUnitofMeasure(WorkCenterNo, SetupTimeUOMCode),
-                            UOMMgt.TimeRndPrecision());
+                            SetupTime * ShopCalendarManagement.QtyperTimeUnitofMeasure(WorkCenterNo, SetupTimeUOMCode),
+                            UnitOfMeasureManagement.TimeRndPrecision());
                 end;
-            UnitCostCalculation::Unit:
+            UnitCostCalculation::Units:
                 CostTime := CalcQtyAdjdForRoutingScrap(MfgItemQtyBase, ScrapFactorPctAccum, FixedScrapQtyAccum);
         end;
     end;
@@ -907,16 +941,11 @@ codeunit 5836 "Cost Calculation Management"
                     CalcFields("Cost Amount (Expected)");
                     AdjCostLCY := AdjCostLCY + "Cost Amount (Expected)";
                 end else begin
-                    ValueEntry.SetCurrentKey("Item Ledger Entry No.");
                     ValueEntry.SetRange("Item Ledger Entry No.", "Entry No.");
-                    if ValueEntry.FindSet() then
-                        repeat
-                            if (ValueEntry."Entry Type" <> ValueEntry."Entry Type"::Revaluation) and
-                               (ValueEntry."Item Charge No." = '')
-                            then
-                                AdjCostLCY :=
-                                  AdjCostLCY + ValueEntry."Cost Amount (Expected)" + ValueEntry."Cost Amount (Actual)";
-                        until ValueEntry.Next() = 0;
+                    ValueEntry.SetFilter("Entry Type", '<>%1', ValueEntry."Entry Type"::Revaluation);
+                    ValueEntry.SetRange("Item Charge No.", '');
+                    ValueEntry.CalcSums("Cost Amount (Expected)", "Cost Amount (Actual)");
+                    AdjCostLCY += ValueEntry."Cost Amount (Expected)" + ValueEntry."Cost Amount (Actual)";
                 end;
             until Next() = 0;
         end;
@@ -1109,11 +1138,8 @@ codeunit 5836 "Cost Calculation Management"
 
     procedure SumValueEntriesCostAmt(var ValueEntry: Record "Value Entry") CostAmt: Decimal
     begin
-        with ValueEntry do
-            if FindSet() then
-                repeat
-                    CostAmt := CostAmt + "Cost Amount (Actual)";
-                until Next() = 0;
+        ValueEntry.CalcSums("Cost Amount (Actual)");
+        CostAmt := ValueEntry."Cost Amount (Actual)";
         exit(CostAmt);
     end;
 
@@ -1123,27 +1149,27 @@ codeunit 5836 "Cost Calculation Management"
     begin
         with ItemLedgEntry do
             case TableNo of
-                DATABASE::"Purch. Rcpt. Header":
+                Enum::TableID::"Purch. Rcpt. Header".AsInteger():
                     exit("Document Type"::"Purchase Receipt".AsInteger());
-                DATABASE::"Purch. Inv. Header":
+                Enum::TableID::"Purch. Inv. Header".AsInteger():
                     exit("Document Type"::"Purchase Invoice".AsInteger());
-                DATABASE::"Purch. Cr. Memo Hdr.":
+                Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
                     exit("Document Type"::"Purchase Credit Memo".AsInteger());
-                DATABASE::"Return Shipment Header":
+                Enum::TableID::"Return Shipment Header".AsInteger():
                     exit("Document Type"::"Purchase Return Shipment".AsInteger());
-                DATABASE::"Sales Shipment Header":
+                Enum::TableID::"Sales Shipment Header".AsInteger():
                     exit("Document Type"::"Sales Shipment".AsInteger());
-                DATABASE::"Sales Invoice Header":
+                Enum::TableID::"Sales Invoice Header".AsInteger():
                     exit("Document Type"::"Sales Invoice".AsInteger());
-                DATABASE::"Sales Cr.Memo Header":
+                Enum::TableID::"Sales Cr.Memo Header".AsInteger():
                     exit("Document Type"::"Sales Credit Memo".AsInteger());
-                DATABASE::"Return Receipt Header":
+                Enum::TableID::"Return Receipt Header".AsInteger():
                     exit("Document Type"::"Sales Return Receipt".AsInteger());
-                DATABASE::"Transfer Shipment Header":
+                Enum::TableID::"Transfer Shipment Header".AsInteger():
                     exit("Document Type"::"Transfer Shipment".AsInteger());
-                DATABASE::"Transfer Receipt Header":
+                Enum::TableID::"Transfer Receipt Header".AsInteger():
                     exit("Document Type"::"Transfer Receipt".AsInteger());
-                DATABASE::"Posted Assembly Header":
+                Enum::TableID::"Posted Assembly Header".AsInteger():
                     exit("Document Type"::"Posted Assembly".AsInteger());
             end;
     end;
@@ -1279,11 +1305,9 @@ codeunit 5836 "Cost Calculation Management"
             repeat
                 ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgEntry."Entry No.");
                 ValueEntry.SetRange("Entry Type", ValueEntry."Entry Type"::Revaluation);
-                if ValueEntry.FindSet() then
-                    repeat
-                        ActMatCost += ValueEntry."Cost Amount (Actual)";
-                        ActMatCostCostACY += ValueEntry."Cost Amount (Actual) (ACY)";
-                    until ValueEntry.Next() = 0;
+                ValueEntry.CalcSums("Cost Amount (Actual)", "Cost Amount (Actual) (ACY)");
+                ActMatCost += ValueEntry."Cost Amount (Actual)";
+                ActMatCostCostACY += ValueEntry."Cost Amount (Actual) (ACY)";
             until ItemLedgEntry.Next() = 0;
     end;
 
@@ -1337,8 +1361,16 @@ codeunit 5836 "Cost Calculation Management"
     begin
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by event OnBeforeCalcRoutingCostPerUnit()', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeRoutingCostPerUnit(Type: Enum "Capacity Type"; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Option Time,Unit; WorkCenter: Record "Work Center"; MachineCenter: Record "Machine Center"; var IsHandled: Boolean)
+    begin
+    end;
+#endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalcRoutingCostPerUnit(Type: Enum "Capacity Type"; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type"; WorkCenter: Record "Work Center"; MachineCenter: Record "Machine Center"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1372,8 +1404,16 @@ codeunit 5836 "Cost Calculation Management"
     begin
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by event OnAfterCalcRoutingCostPerUnit()', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterRoutingCostPerUnit(Type: Enum "Capacity Type"; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Option Time,Unit; WorkCenter: Record "Work Center"; MachineCenter: Record "Machine Center")
+    begin
+    end;
+#endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcRoutingCostPerUnit(Type: Enum "Capacity Type"; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type"; WorkCenter: Record "Work Center"; MachineCenter: Record "Machine Center")
     begin
     end;
 

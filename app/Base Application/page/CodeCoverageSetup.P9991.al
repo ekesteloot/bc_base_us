@@ -1,3 +1,5 @@
+namespace System.TestTools.CodeCoverage;
+
 page 9991 "Code Coverage Setup"
 {
     Caption = 'Code Coverage Setup';

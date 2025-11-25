@@ -1,20 +1,22 @@
+namespace System.IO;
+
 codeunit 5434 "Automation - Failure RSPackage"
 {
     TableNo = "Config. Package";
 
     trigger OnRun()
     begin
-        if "Import Status" in ["Import Status"::InProgress, "Import Status"::Scheduled] then begin
-            "Import Error" := CopyStr(GetLastErrorText(), 1, MaxStrLen("Import Error"));
-            Validate("Import Status", "Import Status"::Error);
+        if Rec."Import Status" in [Rec."Import Status"::InProgress, Rec."Import Status"::Scheduled] then begin
+            Rec."Import Error" := CopyStr(GetLastErrorText(), 1, MaxStrLen(Rec."Import Error"));
+            Rec.Validate("Import Status", Rec."Import Status"::Error);
         end else
-            if "Apply Status" in ["Apply Status"::InProgress, "Apply Status"::Scheduled] then begin
-                "Apply Error" := CopyStr(GetLastErrorText(), 1, MaxStrLen("Apply Error"));
-                if "Apply Error" = '' then
-                    "Apply Error" := ApplyErrorLbl;
-                Validate("Apply Status", "Apply Status"::Error);
+            if Rec."Apply Status" in [Rec."Apply Status"::InProgress, Rec."Apply Status"::Scheduled] then begin
+                Rec."Apply Error" := CopyStr(GetLastErrorText(), 1, MaxStrLen(Rec."Apply Error"));
+                if Rec."Apply Error" = '' then
+                    Rec."Apply Error" := ApplyErrorLbl;
+                Rec.Validate("Apply Status", Rec."Apply Status"::Error);
             end;
-        Modify(true);
+        Rec.Modify(true);
         Commit();
     end;
 

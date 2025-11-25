@@ -1,6 +1,6 @@
 codeunit 8810 "Customer Layout - Statement"
 {
-
+    
     trigger OnRun()
     begin
     end;

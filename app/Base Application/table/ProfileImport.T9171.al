@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 table 9171 "Profile Import"
 {
     fields

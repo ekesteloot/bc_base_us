@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Resources;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Setup;
+
 table 5958 "Resource Service Zone"
 {
     Caption = 'Resource Service Zone';

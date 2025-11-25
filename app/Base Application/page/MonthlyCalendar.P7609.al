@@ -8,7 +8,7 @@ page 7609 "Monthly Calendar"
     PageType = Card;
     SaveValues = true;
     SourceTable = Date;
-    SourceTableView = WHERE("Period Type" = CONST(Week));
+    SourceTableView = where("Period Type" = const(Week));
 
     layout
     {

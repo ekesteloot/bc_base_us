@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Enums;
+
 page 9275 "T. Value Insured per FA Matrix"
 {
     Caption = 'T. Value Insured per FA Matrix';
@@ -569,80 +574,38 @@ page 9275 "T. Value Insured per FA Matrix"
         MATRIX_CaptionSet: array[32] of Text[80];
         DateFilter: Text[250];
         RoundingFactorFormatString: Text;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
-
-#if not CLEAN20
-    [Obsolete('Replaced by LoadMatrix()', '20.0')]
-    procedure Load(MatrixColumns1: array[32] of Text[1024]; var MatrixRecords1: array[32] of Record Insurance; CurrentNoOfMatrixColumns: Integer; DateFilterLocal: Text[250]; RoundingFactorLocal: Option "None","1","1000","1000000")
-    begin
-        LoadMatrix(
-            MatrixColumns1, MatrixRecords1, CurrentNoOfMatrixColumns, DateFilterLocal,
-            "Analysis Rounding Factor".FromInteger(RoundingFactorLocal));
-    end;
-#endif
 
     procedure LoadMatrix(NewMatrixColumns: array[32] of Text[1024]; var NewMatrixRecords: array[32] of Record Insurance; CurrentNoOfMatrixColumns: Integer; NewDateFilter: Text[250]; NewRoundingFactor: Enum "Analysis Rounding Factor")
     begin
@@ -659,7 +622,7 @@ page 9275 "T. Value Insured per FA Matrix"
         InsCov.SetFilter("Posting Date", DateFilter);
         InsCov.SetRange("Insurance No.", MatrixRecords[MATRIX_ColumnOrdinal]."No.");
         InsCov.SetRange("Disposed FA", false);
-        InsCov.SetRange("FA No.", "No.");
+        InsCov.SetRange("FA No.", Rec."No.");
 
         PAGE.RunModal(PAGE::"Ins. Coverage Ledger Entries", InsCov);
     end;
@@ -669,7 +632,7 @@ page 9275 "T. Value Insured per FA Matrix"
         InsCoverageLedgEntry.Reset();
         InsCoverageLedgEntry.SetCurrentKey("FA No.", "Insurance No.");
         InsCoverageLedgEntry.SetRange("Insurance No.", MatrixRecords[MATRIX_ColumnOrdinal]."No.");
-        InsCoverageLedgEntry.SetRange("FA No.", "No.");
+        InsCoverageLedgEntry.SetRange("FA No.", Rec."No.");
         InsCoverageLedgEntry.SetRange("Disposed FA", false);
         InsCoverageLedgEntry.SetFilter("Posting Date", DateFilter);
         InsCoverageLedgEntry.CalcSums(Amount);

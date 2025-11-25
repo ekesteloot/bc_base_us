@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.StandardCost;
+
 report 5853 "Copy Standard Cost Worksheet"
 {
     Caption = 'Copy Standard Cost Worksheet';
@@ -7,7 +9,7 @@ report 5853 "Copy Standard Cost Worksheet"
     {
         dataitem("Standard Cost Worksheet"; "Standard Cost Worksheet")
         {
-            DataItemTableView = SORTING("Standard Cost Worksheet Name", Type, "No.");
+            DataItemTableView = sorting("Standard Cost Worksheet Name", Type, "No.");
 
             trigger OnAfterGetRecord()
             begin

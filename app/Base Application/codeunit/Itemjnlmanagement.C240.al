@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+
 codeunit 240 ItemJnlManagement
 {
     Permissions = TableData "Item Journal Template" = rimd,

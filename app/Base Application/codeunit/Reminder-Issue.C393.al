@@ -1,3 +1,15 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 codeunit 393 "Reminder-Issue"
 {
     Permissions = TableData "Cust. Ledger Entry" = rm,
@@ -197,6 +209,7 @@ codeunit 393 "Reminder-Issue"
         MultipleLineFeesSameDocErr: Label 'You cannot issue multiple line fees for the same level for the same document. Error with line fees for %1 %2.', Comment = '%1 = Document Type, %2 = Document No. E.g. You cannot issue multiple line fees for the same level for the same document. Error with line fees for Invoice 1312312.';
         MissingJournalFieldErr: Label 'Please enter a %1 when posting Additional Fees or Interest.', Comment = '%1 - field caption';
         VATDateNotAllowedErr: Label '%1 is not within your range of allowed posting dates.', Comment = '%1 - VAT Date field caption';
+
 
     procedure Set(var NewReminderHeader: Record "Reminder Header"; NewReplacePostingDate: Boolean; NewPostingDate: Date; NewReplaceVATDate: Boolean; NewVATDate: Date)
     begin

@@ -1,3 +1,17 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+using System.Environment.Configuration;
+using System.Threading;
+
 codeunit 1521 "Workflow Response Handling"
 {
     Permissions = TableData "Sales Header" = rm,
@@ -131,7 +145,7 @@ codeunit 1521 "Workflow Response Handling"
                     AddResponsePredecessor(
                         SetStatusToPendingApprovalCode(), WorkflowEventHandling.RunWorkflowOnCustomerCreditLimitNotExceededCode());
                     AddResponsePredecessor(
-		        SetStatusToPendingApprovalCode(), WorkflowEventHandling.RunWorkflowOnSendJobQueueEntryForApprovalCode());
+                SetStatusToPendingApprovalCode(), WorkflowEventHandling.RunWorkflowOnSendJobQueueEntryForApprovalCode());
                 end;
             CreateApprovalRequestsCode():
                 begin
@@ -164,7 +178,7 @@ codeunit 1521 "Workflow Response Handling"
                     AddResponsePredecessor(
                         CreateApprovalRequestsCode(), WorkflowEventHandling.RunWorkflowOnGeneralJournalBatchBalancedCode());
                     AddResponsePredecessor(
-		        CreateApprovalRequestsCode(), WorkflowEventHandling.RunWorkflowOnSendJobQueueEntryForApprovalCode());
+                CreateApprovalRequestsCode(), WorkflowEventHandling.RunWorkflowOnSendJobQueueEntryForApprovalCode());
                 end;
             SendApprovalRequestForApprovalCode():
                 begin
@@ -201,7 +215,7 @@ codeunit 1521 "Workflow Response Handling"
                     AddResponsePredecessor(
                         SendApprovalRequestForApprovalCode(), WorkflowEventHandling.RunWorkflowOnDelegateApprovalRequestCode());
                     AddResponsePredecessor(
-		        SendApprovalRequestForApprovalCode(), WorkflowEventHandling.RunWorkflowOnSendJobQueueEntryForApprovalCode());
+                SendApprovalRequestForApprovalCode(), WorkflowEventHandling.RunWorkflowOnSendJobQueueEntryForApprovalCode());
                 end;
             ReleaseDocumentCode():
                 begin
@@ -241,7 +255,7 @@ codeunit 1521 "Workflow Response Handling"
                     AddResponsePredecessor(
                         CancelAllApprovalRequestsCode(), WorkflowEventHandling.RunWorkflowOnCancelGeneralJournalBatchApprovalRequestCode());
                     AddResponsePredecessor(
-		        CancelAllApprovalRequestsCode(), WorkflowEventHandling.RunWorkflowOnCancelJobQueueEntryApprovalRequestCode());
+                CancelAllApprovalRequestsCode(), WorkflowEventHandling.RunWorkflowOnCancelJobQueueEntryApprovalRequestCode());
                 end;
             RevertValueForFieldCode():
                 begin

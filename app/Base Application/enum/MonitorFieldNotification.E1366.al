@@ -1,3 +1,5 @@
+namespace System.Diagnostics;
+
 enum 1366 "Monitor Field Notification"
 {
     Extensible = false;

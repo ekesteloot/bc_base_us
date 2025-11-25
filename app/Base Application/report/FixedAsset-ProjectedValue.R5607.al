@@ -1,7 +1,17 @@
+namespace Microsoft.FixedAssets.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Setup;
+using System.Utilities;
+
 report 5607 "Fixed Asset - Projected Value"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/FixedAssetProjectedValue.rdlc';
+    RDLCLayout = './FixedAssets/Reports/FixedAssetProjectedValue.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset Projected Value';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +21,7 @@ report 5607 "Fixed Asset - Projected Value"
     {
         dataitem("Fixed Asset"; "Fixed Asset")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "FA Class Code", "FA Subclass Code", "Budgeted Asset";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -122,7 +132,7 @@ report 5607 "Fixed Asset - Projected Value"
             }
             dataitem("FA Ledger Entry"; "FA Ledger Entry")
             {
-                DataItemTableView = SORTING("FA No.", "Depreciation Book Code", "FA Posting Date");
+                DataItemTableView = sorting("FA No.", "Depreciation Book Code", "FA Posting Date");
                 column(FAPostingDt_FALedgerEntry; Format("FA Posting Date"))
                 {
                 }
@@ -172,7 +182,7 @@ report 5607 "Fixed Asset - Projected Value"
             }
             dataitem(ProjectedDepreciation; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 .. 1000000));
+                DataItemTableView = sorting(Number) where(Number = filter(1 .. 1000000));
                 column(DeprAmount; DeprAmount)
                 {
                     AutoFormatType = 1;
@@ -355,7 +365,7 @@ report 5607 "Fixed Asset - Projected Value"
         }
         dataitem(ProjectionTotal; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(TotalBookValue2; TotalBookValue[2])
             {
                 AutoFormatType = 1;
@@ -407,7 +417,7 @@ report 5607 "Fixed Asset - Projected Value"
         }
         dataitem(Buffer; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(DeprBookText_Buffer; DeprBookText)
             {
             }
@@ -477,7 +487,7 @@ report 5607 "Fixed Asset - Projected Value"
                         ApplicationArea = FixedAssets;
                         Caption = 'Depreciation Book';
                         TableRelation = "Depreciation Book";
-                        ToolTip = 'Specifies a code for the depreciation book that is included in the report. You can set up an unlimited number of depreciation books to accommodate various depreciation purposes (such as tax and financial statements). For each depreciation book, you must define the terms and conditions, such as integration with general ledger.';
+                        ToolTip = 'Specifies the code for the depreciation book to be included in the report or batch job.';
 
                         trigger OnValidate()
                         begin
@@ -523,21 +533,21 @@ report 5607 "Fixed Asset - Projected Value"
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Posted Entries From';
-                        ToolTip = 'Specifies the date from which you want the report to include posted entries. The report will include all types of posted entries that have been posted from that FA posting date.';
+                        ToolTip = 'Specifies the fixed asset posting date from which the report includes all types of posted entries.';
                     }
                     field(GroupTotals; GroupTotals)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Group Totals';
                         OptionCaption = ' ,FA Class,FA Subclass,FA Location,Main Asset,Global Dimension 1,Global Dimension 2,FA Posting Group';
-                        ToolTip = 'Specifies that you want the report to group the fixed assets and print group totals. For example, if you have set up six FA classes, then select the FA Class option to have group totals printed for each of the six class codes. Select to see the available options. If you do not want group totals to be printed, select the blank option.';
+                        ToolTip = 'Specifies if you want the report to group fixed assets and print totals using the category defined in this field. For example, maintenance expenses for fixed assets can be shown for each fixed asset class.';
                     }
                     field(CopyToGLBudgetName; BudgetNameCode)
                     {
                         ApplicationArea = Suite;
                         Caption = 'Copy to G/L Budget Name';
                         TableRelation = "G/L Budget Name";
-                        ToolTip = 'Specifies the name of the budget that you want to copy to.';
+                        ToolTip = 'Specifies the name of the budget you want to copy projected values to.';
 
                         trigger OnValidate()
                         begin
@@ -549,7 +559,7 @@ report 5607 "Fixed Asset - Projected Value"
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Insert Bal. Account';
-                        ToolTip = 'Specifies F9772if you want the program to automatically insert budget entries with balancing accounts.';
+                        ToolTip = 'Specifies if you want the batch job to automatically insert fixed asset entries with balancing accounts.';
 
                         trigger OnValidate()
                         begin
@@ -568,19 +578,19 @@ report 5607 "Fixed Asset - Projected Value"
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Projected Disposal';
-                        ToolTip = 'Specifies if you want the report to include projected disposals. The contents of the Projected Proceeds on Disposal field and the Projected Disposal Date field on the fixed asset depreciation book.';
+                        ToolTip = 'Specifies if you want the report to include projected disposals: the contents of the Projected Proceeds on Disposal field and the Projected Disposal Date field on the FA depreciation book.';
                     }
                     field(PrintAmountsPerDate; PrintAmountsPerDate)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Print Amounts per Date';
-                        ToolTip = 'Specifies that you want the report to include a summary of the calculated depreciation for all assets on the last page.';
+                        ToolTip = 'Specifies if you want the program to include on the last page of the report a summary of the calculated depreciation for all assets.';
                     }
                     field(UseAccountingPeriod; UseAccountingPeriod)
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Use Accounting Period';
-                        ToolTip = 'Specifies if you want the periods between the starting date and the ending date to correspond to the accounting periods you have specified in the Accounting Periods window. When you select this field, the Number of Days field is cleared.';
+                        ToolTip = 'Specifies if you want the periods between the starting date and the ending date to correspond to the accounting periods you have specified in the Accounting Period table. When you select this field, the Number of Days field is cleared.';
 
                         trigger OnValidate()
                         begin
@@ -711,11 +721,9 @@ report 5607 "Fixed Asset - Projected Value"
         OldValue: Code[20];
         NewValue: Code[20];
         BalAccount: Boolean;
-
         TempDeprDate: Date;
         GroupTotalsInt: Integer;
         Year365Days: Boolean;
-        [InDataSet]
         NumberOfDaysCtrlEditable: Boolean;
 
         NumberOfDaysMustNotBeGreaterThanErr: Label 'Number of Days must not be greater than %1 or less than 5.', Comment = '1 - Number of days in fiscal year';

@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.ProjectMgt.Jobs.Journal;
+
 report 1088 "Job Split Planning Line"
 {
     ApplicationArea = Jobs;
@@ -9,7 +13,7 @@ report 1088 "Job Split Planning Line"
     {
         dataitem("Job Task"; "Job Task")
         {
-            DataItemTableView = SORTING("Job No.", "Job Task No.");
+            DataItemTableView = sorting("Job No.", "Job Task No.");
             RequestFilterFields = "Job No.", "Job Task No.", "Planning Date Filter";
 
             trigger OnAfterGetRecord()

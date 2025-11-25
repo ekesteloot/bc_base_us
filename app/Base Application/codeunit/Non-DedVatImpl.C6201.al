@@ -3,6 +3,18 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Foundation.Enums;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+
 /// <summary>
 /// Defines the implementation of Non-Deductible VAT
 /// </summary>
@@ -883,7 +895,7 @@ codeunit 6201 "Non-Ded. VAT Impl."
         NonDeductibleBaseAmount := 0;
         NonDeductibleVATAmtPerUnit := 0;
         NonDeductibleVATAmtPerUnitLCY := 0;
-        if PurchaseLine."VAT Calculation Type" = "Tax Calculation Type"::"Reverse Charge VAT" then
+        if PurchaseLine."VAT Calculation Type" = PurchaseLine."VAT Calculation Type"::"Reverse Charge VAT" then
             VATAmount := CalcRevChargeVATAmountInPurchLine(PurchaseLine)
         else
             VATAmount := PurchaseLine."Amount Including VAT" - PurchaseLine.Amount;
@@ -992,11 +1004,17 @@ codeunit 6201 "Non-Ded. VAT Impl."
         GenJournalLine."Non-Deductible VAT Amount" := CopiedGenJournalLine."Bal. Non-Ded. VAT Amount";
         GenJournalLine."Non-Deductible VAT Base LCY" := CopiedGenJournalLine."Bal. Non-Ded. VAT Base LCY";
         GenJournalLine."Non-Deductible VAT Amount LCY" := CopiedGenJournalLine."Bal. Non-Ded. VAT Amount LCY";
+        GenJournalLine."Non-Deductible VAT Base ACY" := CopiedGenJournalLine."Bal. Non-Ded. VAT Base ACY";
+        GenJournalLine."Non-Deductible VAT Amount ACY" := CopiedGenJournalLine."Bal. Non-Ded. VAT Amount ACY";
+        GenJournalLine."Non-Deductible VAT Diff." := CopiedGenJournalLine."Bal. Non-Ded. VAT Diff.";
         GenJournalLine."Bal. Non-Ded. VAT %" := CopiedGenJournalLine."Non-Deductible VAT %";
         GenJournalLine."Bal. Non-Ded. VAT Base" := CopiedGenJournalLine."Non-Deductible VAT Base";
         GenJournalLine."Bal. Non-Ded. VAT Amount" := CopiedGenJournalLine."Non-Deductible VAT Amount";
         GenJournalLine."Bal. Non-Ded. VAT Base LCY" := CopiedGenJournalLine."Non-Deductible VAT Base LCY";
         GenJournalLine."Bal. Non-Ded. VAT Amount LCY" := CopiedGenJournalLine."Non-Deductible VAT Amount LCY";
+        GenJournalLine."Bal. Non-Ded. VAT Base ACY" := CopiedGenJournalLine."Non-Deductible VAT Base ACY";
+        GenJournalLine."Bal. Non-Ded. VAT Amount ACY" := CopiedGenJournalLine."Non-Deductible VAT Amount ACY";
+        GenJournalLine."Bal. Non-Ded. VAT Diff." := CopiedGenJournalLine."Non-Deductible VAT Diff.";
     end;
 
     procedure AdjustVATAmountsFromGenJnlLine(var VATAmount: Decimal; var BaseAmount: Decimal; var VATAmountACY: Decimal; var BaseAmountACY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
@@ -1139,7 +1157,7 @@ codeunit 6201 "Non-Ded. VAT Impl."
 
     local procedure ApplyRoundingValueForFinalPosting(var Rounding: Decimal; var Value: Decimal)
     begin
-        IF (Rounding <> 0) and (Value <> 0) then begin
+        if (Rounding <> 0) and (Value <> 0) then begin
             Value += Rounding;
             Rounding := 0;
         end;

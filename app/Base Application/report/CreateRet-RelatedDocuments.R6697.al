@@ -131,7 +131,6 @@ report 6697 "Create Ret.-Related Documents"
         Vend: Record Vendor;
         TempRetRelDoc: Record "Returns-Related Document" temporary;
         CopyDocMgt: Codeunit "Copy Document Mgt.";
-        VendorNo: Code[20];
 
     protected var
         POPurchHeader: Record "Purchase Header";
@@ -141,6 +140,7 @@ report 6697 "Create Ret.-Related Documents"
         CreatePRO: Boolean;
         CreatePO: Boolean;
         CreateSO: Boolean;
+        VendorNo: Code[20];
 
     procedure SetSalesHeader(NewSROSalesHeader: Record "Sales Header")
     begin

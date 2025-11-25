@@ -1,3 +1,5 @@
+namespace System.IO;
+
 enum 1237 "Transformation Rule Type"
 {
     Extensible = true;

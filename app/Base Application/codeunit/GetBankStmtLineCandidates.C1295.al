@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using System.Environment.Configuration;
+
 codeunit 1295 "Get Bank Stmt. Line Candidates"
 {
     TableNo = "Payment Application Proposal";
@@ -6,7 +11,7 @@ codeunit 1295 "Get Bank Stmt. Line Candidates"
     var
         BankAccReconLine: Record "Bank Acc. Reconciliation Line";
     begin
-        BankAccReconLine.Get("Statement Type", "Bank Account No.", "Statement No.", "Statement Line No.");
+        BankAccReconLine.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.", Rec."Statement Line No.");
 
         TransferExistingAppliedPmtEntries(Rec, BankAccReconLine);
 
@@ -127,7 +132,8 @@ codeunit 1295 "Get Bank Stmt. Line Candidates"
                 PaymentApplicationProposal.CreateFromBankStmtMacthingBuffer(TempBankStmtMatchingBuffer, BankAccReconLine, BankAccount);
                 if not PaymentApplicationProposal.Insert(true) then begin
                     PaymentApplicationProposal.Find();
-                    PaymentApplicationProposal."Match Confidence" := BankPmtApplRule.GetMatchConfidence(PaymentApplicationProposal.Quality);
+                    PaymentApplicationProposal."Match Confidence" :=
+                        Enum::"Bank Rec. Match Confidence".FromInteger(BankPmtApplRule.GetMatchConfidence(PaymentApplicationProposal.Quality));
                     PaymentApplicationProposal.Modify(true);
                 end;
             until TempBankStmtMatchingBuffer.Next() = 0;

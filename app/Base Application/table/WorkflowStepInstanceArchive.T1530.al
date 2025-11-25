@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Security.AccessControl;
+
 table 1530 "Workflow Step Instance Archive"
 {
     Caption = 'Workflow Step Instance Archive';

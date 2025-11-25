@@ -1,10 +1,14 @@
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.InventoryMgt.Analysis;
+
 page 9374 "Budget Names Sales"
 {
     ApplicationArea = SalesBudget;
     Caption = 'Sales Budgets';
     PageType = List;
     SourceTable = "Item Budget Name";
-    SourceTableView = WHERE("Analysis Area" = CONST(Sales));
+    SourceTableView = where("Analysis Area" = const(Sales));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -24,7 +28,7 @@ page 9374 "Budget Names Sales"
                     ApplicationArea = SalesBudget;
                     ToolTip = 'Specifies a description of the item budget.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = SalesBudget;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -77,7 +81,7 @@ page 9374 "Budget Names Sales"
                 var
                     SalesBudgetOverview: Page "Sales Budget Overview";
                 begin
-                    SalesBudgetOverview.SetNewBudgetName(Name);
+                    SalesBudgetOverview.SetNewBudgetName(Rec.Name);
                     SalesBudgetOverview.Run();
                 end;
             }

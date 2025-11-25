@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 page 369 "Order Address List"
 {
     Caption = 'Order Address List';
@@ -14,7 +16,7 @@ page 369 "Order Address List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an order-from address code.';
@@ -24,7 +26,7 @@ page 369 "Order Address List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the company name for the order address.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the order address.';
@@ -42,7 +44,7 @@ page 369 "Order Address List"
                     ToolTip = 'Specifies the postal code.';
                     Visible = false;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the order address.';
@@ -65,7 +67,7 @@ page 369 "Order Address List"
                     ToolTip = 'Specifies the fax number associated with the address.';
                     Visible = false;
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the person you regularly contact when you do business with this vendor at this address.';
@@ -108,7 +110,7 @@ page 369 "Order Address List"
 
                     trigger OnAction()
                     begin
-                        DisplayMap();
+                        Rec.DisplayMap();
                     end;
                 }
             }

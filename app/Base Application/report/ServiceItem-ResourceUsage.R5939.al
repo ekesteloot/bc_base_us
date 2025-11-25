@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Item;
+
 report 5939 "Service Item - Resource Usage"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceItemResourceUsage.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceItemResourceUsage.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Item - Resource Usage';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5939 "Service Item - Resource Usage"
     {
         dataitem("Service Item"; "Service Item")
         {
-            DataItemTableView = SORTING("Item No.", "Serial No.") WHERE("Type Filter" = CONST(Resource));
+            DataItemTableView = sorting("Item No.", "Serial No.") where("Type Filter" = const(Resource));
             RequestFilterFields = "No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

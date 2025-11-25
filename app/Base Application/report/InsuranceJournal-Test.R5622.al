@@ -1,21 +1,28 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+using System.Utilities;
+
 report 5622 "Insurance Journal - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/InsuranceJournalTest.rdlc';
+    RDLCLayout = './FixedAssets/Insurance/InsuranceJournalTest.rdlc';
     Caption = 'Insurance Journal - Test';
 
     dataset
     {
         dataitem("Insurance Journal Batch"; "Insurance Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             RequestFilterFields = "Journal Template Name", Name;
             column(Insurance_Journal_Batch_Journal_Template_Name; "Journal Template Name")
             {
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 PrintOnlyIfDetail = true;
                 column(Insurance_Journal_Batch__Name; "Insurance Journal Batch".Name)
                 {
@@ -70,9 +77,9 @@ report 5622 "Insurance Journal - Test"
                 }
                 dataitem("Insurance Journal Line"; "Insurance Journal Line")
                 {
-                    DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
+                    DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
                     DataItemLinkReference = "Insurance Journal Batch";
-                    DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+                    DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
                     RequestFilterFields = "Posting Date";
                     column(Insurance_Journal_Line__Posting_Date_; Format("Posting Date"))
                     {
@@ -100,7 +107,7 @@ report 5622 "Insurance Journal - Test"
                     }
                     dataitem(ErrorLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number_; ErrorText[Number])
                         {
                         }

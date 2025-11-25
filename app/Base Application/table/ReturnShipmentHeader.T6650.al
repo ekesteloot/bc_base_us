@@ -1,3 +1,30 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Shared.Navigate;
+using System.Globalization;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 6650 "Return Shipment Header"
 {
     Caption = 'Return Shipment Header';
@@ -42,11 +69,9 @@ table 6650 "Return Shipment Header"
         field(9; "Pay-to City"; Text[30])
         {
             Caption = 'Pay-to City';
-            TableRelation = IF ("Pay-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Pay-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Pay-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Pay-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Pay-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Pay-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(10; "Pay-to Contact"; Text[100])
@@ -60,7 +85,7 @@ table 6650 "Return Shipment Header"
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Sell-to Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Sell-to Customer No."));
         }
         field(13; "Ship-to Name"; Text[100])
         {
@@ -81,11 +106,9 @@ table 6650 "Return Shipment Header"
         field(17; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
@@ -132,19 +155,19 @@ table 6650 "Return Shipment Header"
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(31; "Vendor Posting Group"; Code[20])
         {
@@ -173,6 +196,11 @@ table 6650 "Return Shipment Header"
             Caption = 'Language Code';
             TableRelation = Language;
         }
+        field(42; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(43; "Purchaser Code"; Code[20])
         {
             Caption = 'Purchaser Code';
@@ -180,9 +208,9 @@ table 6650 "Return Shipment Header"
         }
         field(46; Comment; Boolean)
         {
-            CalcFormula = Exist("Purch. Comment Line" WHERE("Document Type" = CONST("Posted Return Shipment"),
-                                                             "No." = FIELD("No."),
-                                                             "Document Line No." = CONST(0)));
+            CalcFormula = exist("Purch. Comment Line" where("Document Type" = const("Posted Return Shipment"),
+                                                             "No." = field("No."),
+                                                             "Document Line No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -218,9 +246,9 @@ table 6650 "Return Shipment Header"
         field(55; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
         }
         field(70; "VAT Registration No."; Text[20])
         {
@@ -275,11 +303,9 @@ table 6650 "Return Shipment Header"
         field(83; "Buy-from City"; Text[30])
         {
             Caption = 'Buy-from City';
-            TableRelation = IF ("Buy-from Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Buy-from Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Buy-from Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Buy-from Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Buy-from Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Buy-from Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(84; "Buy-from Contact"; Text[100])
@@ -289,11 +315,9 @@ table 6650 "Return Shipment Header"
         field(85; "Pay-to Post Code"; Code[20])
         {
             Caption = 'Pay-to Post Code';
-            TableRelation = IF ("Pay-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Pay-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Pay-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Pay-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Pay-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Pay-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(86; "Pay-to County"; Text[30])
@@ -309,11 +333,9 @@ table 6650 "Return Shipment Header"
         field(88; "Buy-from Post Code"; Code[20])
         {
             Caption = 'Buy-from Post Code';
-            TableRelation = IF ("Buy-from Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Buy-from Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Buy-from Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Buy-from Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Buy-from Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Buy-from Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(89; "Buy-from County"; Text[30])
@@ -329,11 +351,9 @@ table 6650 "Return Shipment Header"
         field(91; "Ship-to Post Code"; Code[20])
         {
             Caption = 'Ship-to Post Code';
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(92; "Ship-to County"; Text[30])
@@ -353,7 +373,7 @@ table 6650 "Return Shipment Header"
         field(95; "Order Address Code"; Code[10])
         {
             Caption = 'Order Address Code';
-            TableRelation = "Order Address".Code WHERE("Vendor No." = FIELD("Buy-from Vendor No."));
+            TableRelation = "Order Address".Code where("Vendor No." = field("Buy-from Vendor No."));
         }
         field(97; "Entry Point"; Code[10])
         {
@@ -394,8 +414,6 @@ table 6650 "Return Shipment Header"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(113; "Source Code"; Code[10])
         {
@@ -431,7 +449,7 @@ table 6650 "Return Shipment Header"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(5050; "Campaign No."; Code[20])

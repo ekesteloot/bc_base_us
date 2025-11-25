@@ -1,3 +1,13 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using System.Security.AccessControl;
+using System.Security.User;
+
 codeunit 1804 "Approval Workflow Setup Mgt."
 {
     // // This codeunit creates and edits purchase invoice and sales invoice approval workflows.
@@ -197,12 +207,12 @@ codeunit 1804 "Approval Workflow Setup Mgt."
             UpdateWorkflow(Workflow, DATABASE::"Sales Header", BlankDateFormula)
         else begin
             EventConditions :=
-                WorkflowSetup.BuildSalesHeaderTypeConditionsText("Sales Document Type".FromInteger(DocumentType), SalesHeader.Status::Open);
+                WorkflowSetup.BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type".FromInteger(DocumentType), SalesHeader.Status::Open);
             DisableWorkflowWithEntryPointEventConditions(
                 DATABASE::"Sales Header", WorkflowEventHandling.RunWorkflowOnSendSalesDocForApprovalCode(), EventConditions);
 
             WorkflowSetup.InsertSalesDocumentApprovalWorkflowSteps(
-                Workflow, "Sales Document Type".FromInteger(DocumentType), WorkflowStepArgument."Approver Type"::Approver,
+                Workflow, Enum::"Sales Document Type".FromInteger(DocumentType), WorkflowStepArgument."Approver Type"::Approver,
                 WorkflowStepArgument."Approver Limit Type"::"First Qualified Approver", '', BlankDateFormula);
 
             if Workflow.Rename(WizardWorkflowCode) then;

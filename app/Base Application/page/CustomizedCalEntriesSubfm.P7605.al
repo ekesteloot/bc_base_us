@@ -100,7 +100,7 @@ page 7605 "Customized Cal. Entries Subfm"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get(DateRec."Period Type"::Date, Date) then;
+        if DateRec.Get(DateRec."Period Type"::Date, Rec.Date) then;
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -146,19 +146,19 @@ page 7605 "Customized Cal. Entries Subfm"
 
     local procedure FindLine(TargetDate: Date) FoundLine: Boolean;
     begin
-        Reset();
-        SetRange(Date, TargetDate);
-        FoundLine := FindFirst();
-        Reset();
+        Rec.Reset();
+        Rec.SetRange(Date, TargetDate);
+        FoundLine := Rec.FindFirst();
+        Rec.Reset();
     end;
 
     local procedure InsertLine(): Boolean;
     begin
         Rec := CurrCalendarChange;
-        Date := DateRec."Period Start";
-        Day := DateRec."Period No.";
+        Rec.Date := DateRec."Period Start";
+        Rec.Day := DateRec."Period No.";
         CalendarMgmt.CheckDateStatus(Rec);
-        exit(Insert());
+        exit(Rec.Insert());
     end;
 
     procedure SetCalendarSource(CustomizedCalendarEntry: record "Customized Calendar Entry")
@@ -173,12 +173,12 @@ page 7605 "Customized Cal. Entries Subfm"
         CustomizedCalendarChange: Record "Customized Calendar Change";
     begin
         CustomizedCalendarChange.Reset();
-        CustomizedCalendarChange.SetRange("Source Type", "Source Type");
-        CustomizedCalendarChange.SetRange("Source Code", "Source Code");
-        CustomizedCalendarChange.SetRange("Additional Source Code", "Additional Source Code");
-        CustomizedCalendarChange.SetRange("Base Calendar Code", "Base Calendar Code");
+        CustomizedCalendarChange.SetRange("Source Type", Rec."Source Type");
+        CustomizedCalendarChange.SetRange("Source Code", Rec."Source Code");
+        CustomizedCalendarChange.SetRange("Additional Source Code", Rec."Additional Source Code");
+        CustomizedCalendarChange.SetRange("Base Calendar Code", Rec."Base Calendar Code");
         CustomizedCalendarChange.SetRange("Recurring System", CustomizedCalendarChange."Recurring System"::" ");
-        CustomizedCalendarChange.SetRange(Date, Date);
+        CustomizedCalendarChange.SetRange(Date, Rec.Date);
         if CustomizedCalendarChange.FindFirst() then
             CustomizedCalendarChange.Delete();
 

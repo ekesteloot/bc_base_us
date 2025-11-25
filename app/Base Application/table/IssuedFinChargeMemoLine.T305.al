@@ -1,3 +1,13 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Enums;
+using Microsoft.Sales.Receivables;
+
 table 305 "Issued Fin. Charge Memo Line"
 {
     Caption = 'Issued Fin. Charge Memo Line';
@@ -16,7 +26,7 @@ table 305 "Issued Fin. Charge Memo Line"
         field(3; "Attached to Line No."; Integer)
         {
             Caption = 'Attached to Line No.';
-            TableRelation = "Issued Fin. Charge Memo Line"."Line No." WHERE("Finance Charge Memo No." = FIELD("Finance Charge Memo No."));
+            TableRelation = "Issued Fin. Charge Memo Line"."Line No." where("Finance Charge Memo No." = field("Finance Charge Memo No."));
         }
         field(4; Type; Option)
         {
@@ -91,9 +101,9 @@ table 305 "Issued Fin. Charge Memo Line"
         field(15; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(" ")) "Standard Text"
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account";
+            TableRelation = if (Type = const(" ")) "Standard Text"
+            else
+            if (Type = const("G/L Account")) "G/L Account";
         }
         field(16; Amount; Decimal)
         {

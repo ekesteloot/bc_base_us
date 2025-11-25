@@ -1,3 +1,15 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.Text;
+using System.Utilities;
+
 page 113 Budget
 {
     Caption = 'Budget';
@@ -83,7 +95,7 @@ page 113 Budget
                             ValidateColumnDimCode();
                         end;
                         ValidateLineDimCode();
-                        GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+                        GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
                         LineDimCodeOnAfterValidate();
                     end;
                 }
@@ -499,7 +511,7 @@ page 113 Budget
                         ValidateLineDimCode();
                         ValidateColumnDimCode();
 
-                        GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+                        GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
                         UpdateMatrixSubform();
                     end;
                 }
@@ -580,7 +592,7 @@ page 113 Budget
 
                 trigger OnAction()
                 begin
-                    GenerateColumnCaptions("Matrix Page Step Type"::Previous);
+                    GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Previous);
                     UpdateMatrixSubform();
                 end;
             }
@@ -593,7 +605,7 @@ page 113 Budget
 
                 trigger OnAction()
                 begin
-                    GenerateColumnCaptions("Matrix Page Step Type"::PreviousColumn);
+                    GenerateColumnCaptions(Enum::"Matrix Page Step Type"::PreviousColumn);
                     UpdateMatrixSubform();
                 end;
             }
@@ -606,7 +618,7 @@ page 113 Budget
 
                 trigger OnAction()
                 begin
-                    GenerateColumnCaptions("Matrix Page Step Type"::NextColumn);
+                    GenerateColumnCaptions(Enum::"Matrix Page Step Type"::NextColumn);
                     UpdateMatrixSubform();
                 end;
             }
@@ -619,7 +631,7 @@ page 113 Budget
 
                 trigger OnAction()
                 begin
-                    GenerateColumnCaptions("Matrix Page Step Type"::Next);
+                    GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Next);
                     UpdateMatrixSubform();
                 end;
             }
@@ -785,19 +797,12 @@ page 113 Budget
         Text011: Label '1,6,,Budget Dimension 4 Filter';
         InternalDateFilter: Text[30];
         BusUnitFilter: Text;
-        [InDataSet]
         GlobalDim1FilterEnable: Boolean;
-        [InDataSet]
         GlobalDim2FilterEnable: Boolean;
-        [InDataSet]
         PeriodTypeEnable: Boolean;
-        [InDataSet]
         BudgetDim1FilterEnable: Boolean;
-        [InDataSet]
         BudgetDim2FilterEnable: Boolean;
-        [InDataSet]
         BudgetDim3FilterEnable: Boolean;
-        [InDataSet]
         BudgetDim4FilterEnable: Boolean;
 
     protected var
@@ -887,7 +892,7 @@ page 113 Budget
                         MATRIX_MatrixRecords[i].Code := CopyStr(MATRIX_CaptionSet[i], 1, MaxStrLen(MATRIX_MatrixRecords[i].Code));
                     if ShowColumnName then
                         MatrixMgt.GenerateMatrixData(
-                          RecRef, "Matrix Page Step Type"::Same.AsInteger(), 12, GLAccount.FieldNo(Name),
+                          RecRef, Enum::"Matrix Page Step Type"::Same.AsInteger(), 12, GLAccount.FieldNo(Name),
                           MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
                 end;
             BusUnit.TableCaption:
@@ -906,7 +911,7 @@ page 113 Budget
                         MATRIX_MatrixRecords[i].Code := CopyStr(MATRIX_CaptionSet[i], 1, MaxStrLen(MATRIX_MatrixRecords[i].Code));
                     if ShowColumnName then
                         MatrixMgt.GenerateMatrixData(
-                          RecRef, "Matrix Page Step Type"::Same.AsInteger(), 12, BusUnit.FieldNo(Name),
+                          RecRef, Enum::"Matrix Page Step Type"::Same.AsInteger(), 12, BusUnit.FieldNo(Name),
                           MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
                 end;
             // Apply dimension filter
@@ -951,27 +956,27 @@ page 113 Budget
     begin
         case DimCode of
             '':
-                Result := "G/L Budget Matrix Dimensions"::Undefined;
+                Result := Enum::"G/L Budget Matrix Dimensions"::Undefined;
             GLAcc.TableCaption():
-                Result := "G/L Budget Matrix Dimensions"::"G/L Account";
+                Result := Enum::"G/L Budget Matrix Dimensions"::"G/L Account";
             Text001:
-                Result := "G/L Budget Matrix Dimensions"::Period;
+                Result := Enum::"G/L Budget Matrix Dimensions"::Period;
             BusUnit.TableCaption():
-                Result := "G/L Budget Matrix Dimensions"::"Business Unit";
+                Result := Enum::"G/L Budget Matrix Dimensions"::"Business Unit";
             GLSetup."Global Dimension 1 Code":
-                Result := "G/L Budget Matrix Dimensions"::"Global Dimension 1";
+                Result := Enum::"G/L Budget Matrix Dimensions"::"Global Dimension 1";
             GLSetup."Global Dimension 2 Code":
-                Result := "G/L Budget Matrix Dimensions"::"Global Dimension 2";
+                Result := Enum::"G/L Budget Matrix Dimensions"::"Global Dimension 2";
             GLBudgetName."Budget Dimension 1 Code":
-                Result := "G/L Budget Matrix Dimensions"::"Budget Dimension 1";
+                Result := Enum::"G/L Budget Matrix Dimensions"::"Budget Dimension 1";
             GLBudgetName."Budget Dimension 2 Code":
-                Result := "G/L Budget Matrix Dimensions"::"Budget Dimension 2";
+                Result := Enum::"G/L Budget Matrix Dimensions"::"Budget Dimension 2";
             GLBudgetName."Budget Dimension 3 Code":
-                Result := "G/L Budget Matrix Dimensions"::"Budget Dimension 3";
+                Result := Enum::"G/L Budget Matrix Dimensions"::"Budget Dimension 3";
             GLBudgetName."Budget Dimension 4 Code":
-                Result := "G/L Budget Matrix Dimensions"::"Budget Dimension 4";
+                Result := Enum::"G/L Budget Matrix Dimensions"::"Budget Dimension 4";
             else
-                Result := "G/L Budget Matrix Dimensions"::Undefined;
+                Result := Enum::"G/L Budget Matrix Dimensions"::Undefined;
         end;
         OnAfterDimCodeToType(DimCode, Result);
     end;
@@ -1248,7 +1253,7 @@ page 113 Budget
     local procedure PeriodTypeOnAfterValidate()
     begin
         if ColumnDimType = ColumnDimType::Period then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
@@ -1256,7 +1261,7 @@ page 113 Budget
     begin
         GLAccBudgetBuf.SetFilter("G/L Account Filter", GLAccFilter);
         if ColumnDimType = ColumnDimType::"G/L Account" then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
@@ -1264,7 +1269,7 @@ page 113 Budget
     begin
         GLAccBudgetBuf.SetRange("Income/Balance", IncomeBalanceGLAccFilter);
         if ColumnDimType = ColumnDimType::"G/L Account" then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
@@ -1272,7 +1277,7 @@ page 113 Budget
     begin
         GLAccBudgetBuf.SetRange("Account Category", GLAccCategoryFilter);
         if ColumnDimType = ColumnDimType::"G/L Account" then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
@@ -1280,7 +1285,7 @@ page 113 Budget
     begin
         GLAccBudgetBuf.SetFilter("Global Dimension 2 Filter", GlobalDim2Filter);
         if ColumnDimType = ColumnDimType::"Global Dimension 2" then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
@@ -1288,7 +1293,7 @@ page 113 Budget
     begin
         GLAccBudgetBuf.SetFilter("Global Dimension 1 Filter", GlobalDim1Filter);
         if ColumnDimType = ColumnDimType::"Global Dimension 1" then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
@@ -1296,7 +1301,7 @@ page 113 Budget
     begin
         GLAccBudgetBuf.SetFilter("Budget Dimension 2 Filter", BudgetDim2Filter);
         if ColumnDimType = ColumnDimType::"Budget Dimension 2" then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
@@ -1304,7 +1309,7 @@ page 113 Budget
     begin
         GLAccBudgetBuf.SetFilter("Budget Dimension 1 Filter", BudgetDim1Filter);
         if ColumnDimType = ColumnDimType::"Budget Dimension 1" then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
@@ -1312,7 +1317,7 @@ page 113 Budget
     begin
         GLAccBudgetBuf.SetFilter("Budget Dimension 4 Filter", BudgetDim4Filter);
         if ColumnDimType = ColumnDimType::"Budget Dimension 4" then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
@@ -1320,20 +1325,20 @@ page 113 Budget
     begin
         GLAccBudgetBuf.SetFilter("Budget Dimension 3 Filter", BudgetDim3Filter);
         if ColumnDimType = ColumnDimType::"Budget Dimension 3" then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
     local procedure DateFilterOnAfterValidate()
     begin
         if ColumnDimType = ColumnDimType::Period then
-            GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+            GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;
 
     local procedure ShowColumnNameOnPush()
     begin
-        GenerateColumnCaptions("Matrix Page Step Type"::Same);
+        GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Same);
         UpdateMatrixSubform();
     end;
 

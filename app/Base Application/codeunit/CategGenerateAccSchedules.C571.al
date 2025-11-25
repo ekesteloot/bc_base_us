@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Text;
+
 codeunit 571 "Categ. Generate Acc. Schedules"
 {
 

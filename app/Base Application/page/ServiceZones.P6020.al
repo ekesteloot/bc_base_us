@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Setup;
+
+using Microsoft.ServiceMgt.Resources;
+
 page 6020 "Service Zones"
 {
     ApplicationArea = Service;
@@ -13,7 +17,7 @@ page 6020 "Service Zones"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies a code for the service zone.';
@@ -54,8 +58,8 @@ page 6020 "Service Zones"
                     Caption = 'Resource Service Zones';
                     Image = Resource;
                     RunObject = Page "Resource Service Zones";
-                    RunPageLink = "Service Zone Code" = FIELD(Code);
-                    RunPageView = SORTING("Service Zone Code");
+                    RunPageLink = "Service Zone Code" = field(Code);
+                    RunPageView = sorting("Service Zone Code");
                     ToolTip = 'View the assignment of resources to service zones. When you allocate a resource to a service task that is to be performed at the customer site, you can select a resource that is located in the same service zone as the customer.';
                 }
             }

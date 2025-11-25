@@ -17,11 +17,11 @@ table 186 "Exch. Rate Adjmt. Ledg. Entry"
         field(3; "Account No."; Code[20])
         {
             Caption = 'Account No.';
-            TableRelation = IF ("Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Account Type" = const(Customer)) Customer
+            else
+            if ("Account Type" = const(Vendor)) Vendor
+            else
+            if ("Account Type" = const("Bank Account")) "Bank Account";
         }
         field(4; "Posting Date"; Date)
         {
@@ -45,7 +45,7 @@ table 186 "Exch. Rate Adjmt. Ledg. Entry"
         }
         field(10; "Account Name"; Text[100])
         {
-            Caption = 'Customer Name';
+            Caption = 'Account Name';
         }
         field(11; "Currency Code"; Code[10])
         {
@@ -59,7 +59,7 @@ table 186 "Exch. Rate Adjmt. Ledg. Entry"
         }
         field(15; "Base Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Base Amount';
             Editable = false;

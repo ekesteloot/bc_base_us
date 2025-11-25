@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.RoleCenters;
+
 profile "MANUFACTURING"
 {
     Enabled = true;

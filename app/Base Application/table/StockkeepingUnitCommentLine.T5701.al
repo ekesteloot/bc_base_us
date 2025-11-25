@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Location;
+
+using Microsoft.InventoryMgt.Item;
+
 table 5701 "Stockkeeping Unit Comment Line"
 {
     Caption = 'Stockkeeping Unit Comment Line';
@@ -15,12 +19,12 @@ table 5701 "Stockkeeping Unit Comment Line"
         field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(3; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(4; "Line No."; Integer)
         {

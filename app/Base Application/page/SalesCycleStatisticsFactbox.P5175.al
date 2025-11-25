@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 page 5175 "Sales Cycle Statistics FactBox"
 {
     Caption = 'Sales Cycle Statistics';

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 enum 53 "Gen. Journal Recurring Method"
 {
     Extensible = true;

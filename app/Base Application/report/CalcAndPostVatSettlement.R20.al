@@ -12,7 +12,7 @@ report 20 "Calc. and Post VAT Settlement"
     {
         dataitem("VAT Posting Setup"; "VAT Posting Setup")
         {
-            DataItemTableView = SORTING("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+            DataItemTableView = sorting("VAT Bus. Posting Group", "VAT Prod. Posting Group");
             RequestFilterFields = "VAT Bus. Posting Group", "VAT Prod. Posting Group";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -28,7 +28,7 @@ report 20 "Calc. and Post VAT Settlement"
             }
             column(PostingDate; Format(PostingDate))
             {
-            }            
+            }
             column(VATDate; Format(VATDate))
             {
             }
@@ -119,7 +119,7 @@ report 20 "Calc. and Post VAT Settlement"
             }
             dataitem("Closing G/L and VAT Entry"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(VATBusPstGr_VATPostSetup; "VAT Posting Setup"."VAT Bus. Posting Group")
                 {
                 }
@@ -137,7 +137,7 @@ report 20 "Calc. and Post VAT Settlement"
                 }
                 dataitem("VAT Entry"; "VAT Entry")
                 {
-                    DataItemTableView = SORTING(Type, Closed) WHERE(Closed = CONST(false), Type = FILTER(Purchase | Sale));
+                    DataItemTableView = sorting(Type, Closed) where(Closed = const(false), Type = filter(Purchase | Sale));
                     column(VATDate_VATEntry; Format("VAT Reporting Date"))
                     {
                     }
@@ -219,7 +219,7 @@ report 20 "Calc. and Post VAT Settlement"
                 }
                 dataitem("Close VAT Entries"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     column(PostingDate1; Format(PostingDate))
                     {
@@ -594,7 +594,7 @@ report 20 "Calc. and Post VAT Settlement"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Document No.';
-                        ToolTip = 'Specifies the number of the document that is processed by the report or batch job.';
+                        ToolTip = 'Specifies a document number. This field must be filled in.';
                     }
                     field(SettlementAcc; GLAccSettle."No.")
                     {
@@ -655,6 +655,9 @@ report 20 "Calc. and Post VAT Settlement"
         ConfirmManagement: Codeunit "Confirm Management";
     begin
         OnBeforePreReport("VAT Posting Setup", PostSettlement, GLAccSettle);
+
+        if CurrReport.Preview() then
+            PostSettlement := false;
 
         if PostingDate = 0D then
             Error(Text000);
@@ -719,7 +722,6 @@ report 20 "Calc. and Post VAT Settlement"
         DateFilter: Text;
         UseAmtsInAddCurr: Boolean;
         HeaderText: Text[30];
-        [InDataSet]
         IsVATDateEnabled: Boolean;
         Text000: Label 'Enter the posting date.';
         Text001: Label 'Enter the document no.';
@@ -754,7 +756,6 @@ report 20 "Calc. and Post VAT Settlement"
     begin
         InitializeRequest(NewStartDate, NewEndDate, NewPostingDate, NewPostingDate, NewDocNo, NewSettlementAcc, ShowVATEntries, Post);
     end;
-
 
     /// <summary>
     /// InitializeRequest with specified "VAT Date"

@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System;
+
 codeunit 1235 "XML Buffer Writer"
 {
 

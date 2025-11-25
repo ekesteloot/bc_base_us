@@ -1,3 +1,12 @@
+﻿namespace System.Email;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.Integration.Graph;
+using System;
+using System.Environment;
+using System.IO;
+using System.Utilities;
+
 codeunit 9520 "Mail Management"
 {
     Permissions = TableData "Email Attachments" = rimd;
@@ -171,6 +180,7 @@ codeunit 9520 "Mail Management"
     [TryFunction]
     procedure CheckValidEmailAddress(EmailAddress: Text)
     var
+        EmailAccount: Codeunit "Email Account";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -180,13 +190,11 @@ codeunit 9520 "Mail Management"
 
         EmailAddress := DelChr(EmailAddress, '<>');
 
-        if EmailAddress.StartsWith('@') or EmailAddress.EndsWith('@') then
-            Error(InvalidEmailAddressErr, EmailAddress);
-
-        if EmailAddress.Contains(' ') then
-            Error(InvalidEmailAddressErr, EmailAddress);
-
+        // Check that only one address is validated.
         if EmailAddress.Split('@').Count() <> 2 then
+            Error(InvalidEmailAddressErr, EmailAddress);
+
+        if not EmailAccount.ValidateEmailAddress(EmailAddress) then
             Error(InvalidEmailAddressErr, EmailAddress);
     end;
 
@@ -518,14 +526,6 @@ codeunit 9520 "Mail Management"
     local procedure OnBeforeQualifyFromAddress(var TempEmailItem: Record "Email Item" temporary)
     begin
     end;
-
-#if not CLEAN20
-    [IntegrationEvent(false, false)]
-    [Obsolete('Email dialog has been removed, event no longer relevant.', '20.0')]
-    local procedure OnBeforeRunMailDialog(var TempEmailItem: Record "Email Item"; OutlookSupported: Boolean; SMTPSupported: Boolean; var ReturnValue: Boolean; var IsHandled: Boolean; var DoEdit: Boolean; var Cancelled: Boolean);
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateEmailAddressField(var EmailAddress: Text; var IsHandled: Boolean)

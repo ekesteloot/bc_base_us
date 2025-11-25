@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+
 table 1295 "Posted Payment Recon. Hdr"
 {
     Caption = 'Posted Payment Recon. Hdr';

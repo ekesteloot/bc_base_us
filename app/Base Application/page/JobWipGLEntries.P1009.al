@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Shared.Navigate;
+
 page 1009 "Job WIP G/L Entries"
 {
     AdditionalSearchTerms = 'work in process to general ledger entries,work in progress to general ledger entries';
@@ -16,7 +21,7 @@ page 1009 "Job WIP G/L Entries"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies whether the entry has been reversed. If the check box is selected, the entry has been reversed from the G/L.';
@@ -96,7 +101,7 @@ page 1009 "Job WIP G/L Entries"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the transaction number assigned to all the entries involved in the same transaction.';
                 }
-                field(Reverse; Reverse)
+                field(Reverse; Rec.Reverse)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies whether the entry has been part of a reverse transaction (correction) made by the reverse function.';
@@ -202,7 +207,7 @@ page 1009 "Job WIP G/L Entries"
                     Caption = 'WIP Totals';
                     Image = EntriesList;
                     RunObject = Page "Job WIP Totals";
-                    RunPageLink = "Entry No." = FIELD("Job WIP Total Entry No.");
+                    RunPageLink = "Entry No." = field("Job WIP Total Entry No.");
                     ToolTip = 'View the job''s WIP totals.';
                 }
                 action(Dimensions)
@@ -216,7 +221,7 @@ page 1009 "Job WIP G/L Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -229,7 +234,7 @@ page 1009 "Job WIP G/L Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -246,7 +251,7 @@ page 1009 "Job WIP G/L Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

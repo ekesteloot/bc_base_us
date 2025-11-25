@@ -1,13 +1,17 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 query 5400 "Delayed Prod. Orders - by Cost"
 {
     Caption = 'Delayed Prod. Orders - by Cost';
-    OrderBy = Descending(Cost_of_Open_Production_Orders);
+    OrderBy = descending(Cost_of_Open_Production_Orders);
 
     elements
     {
         dataitem(Prod_Order_Line; "Prod. Order Line")
         {
-            DataItemTableFilter = Status = FILTER(Planned | "Firm Planned" | Released);
+            DataItemTableFilter = Status = filter(Planned | "Firm Planned" | Released);
             column(Item_No; "Item No.")
             {
             }

@@ -120,8 +120,8 @@ page 5231 "Absence Overview by Categories"
     trigger OnOpenPage()
     begin
         GenerateColumnCaptions("Matrix Page Step Type"::Initial);
-        if HasFilter then
-            EmployeeNoFilter := GetFilter("Employee No. Filter");
+        if Rec.HasFilter then
+            EmployeeNoFilter := Rec.GetFilter("Employee No. Filter");
     end;
 
     var

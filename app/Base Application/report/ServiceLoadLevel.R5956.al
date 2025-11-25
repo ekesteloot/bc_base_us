@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+
 report 5956 "Service Load Level"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceLoadLevel.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceLoadLevel.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Load Level';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5956 "Service Load Level"
     {
         dataitem(Resource; Resource)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Resource Group No.", "Date Filter", "Unit of Measure Filter", "Chargeable Filter", "Service Zone Filter";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

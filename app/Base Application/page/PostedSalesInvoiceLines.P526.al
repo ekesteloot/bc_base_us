@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 526 "Posted Sales Invoice Lines"
 {
     ApplicationArea = Basic, Suite;
@@ -176,7 +180,7 @@ page 526 "Posted Sales Invoice Lines"
 
                     trigger OnAction()
                     begin
-                        SalesInvHeader.Get("Document No.");
+                        SalesInvHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Sales Invoice", SalesInvHeader);
                     end;
                 }
@@ -191,7 +195,7 @@ page 526 "Posted Sales Invoice Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Lines")
@@ -204,7 +208,7 @@ page 526 "Posted Sales Invoice Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }

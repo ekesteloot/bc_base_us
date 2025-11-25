@@ -168,7 +168,7 @@ report 10044 "Customer Labels NA"
             }
             dataitem(BlankLine; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(NumOfBlanks; NumOfBlanks)
                 {
                 }

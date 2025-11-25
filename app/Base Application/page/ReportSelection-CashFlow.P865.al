@@ -1,3 +1,7 @@
+namespace Microsoft.CashFlow.Setup;
+
+using System.Reflection;
+
 page 865 "Report Selection - Cash Flow"
 {
     ApplicationArea = Basic, Suite;
@@ -14,7 +18,7 @@ page 865 "Report Selection - Cash Flow"
             repeater(Control1002)
             {
                 ShowCaption = false;
-                field(Sequence; Sequence)
+                field(Sequence; Rec.Sequence)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a number that indicates where this report is in the printing order.';
@@ -42,7 +46,7 @@ page 865 "Report Selection - Cash Flow"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        NewRecord();
+        Rec.NewRecord();
     end;
 }
 

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.RoleCenters;
+
 profile "AR ADMINISTRATOR"
 {
     Caption = 'Accounts Receivable Administrator';

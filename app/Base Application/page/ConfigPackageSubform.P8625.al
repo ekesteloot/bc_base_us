@@ -1,3 +1,9 @@
+﻿namespace System.IO;
+
+using System.Reflection;
+using System.Security.User;
+using System.Telemetry;
+
 page 8625 "Config. Package Subform"
 {
     Caption = 'Tables';
@@ -20,7 +26,7 @@ page 8625 "Config. Package Subform"
 
                     trigger OnValidate()
                     begin
-                        CalcFields("Table Name");
+                        Rec.CalcFields("Table Name");
                     end;
                 }
                 field("Table Name"; Rec."Table Name")
@@ -51,9 +57,9 @@ page 8625 "Config. Package Subform"
                     var
                         ConfigTemplateHeader: Record "Config. Template Header";
                     begin
-                        ConfigTemplateHeader.SetRange("Table ID", "Table ID");
+                        ConfigTemplateHeader.SetRange("Table ID", Rec."Table ID");
                         if PAGE.RunModal(PAGE::"Config. Template List", ConfigTemplateHeader, ConfigTemplateHeader.Code) = ACTION::LookupOK then
-                            "Data Template" := ConfigTemplateHeader.Code;
+                            Rec."Data Template" := ConfigTemplateHeader.Code;
                     end;
                 }
                 field("Processing Order"; Rec."Processing Order")
@@ -94,7 +100,7 @@ page 8625 "Config. Package Subform"
 
                     trigger OnDrillDown()
                     begin
-                        ShowPackageRecords(Show::All, "Dimensions as Columns");
+                        Rec.ShowPackageRecords(Show::All, Rec."Dimensions as Columns");
                         CurrPage.Update();
                     end;
                 }
@@ -129,11 +135,11 @@ page 8625 "Config. Package Subform"
 
                     trigger OnDrillDown()
                     begin
-                        ShowPackageRecords(Show::Errors, "Dimensions as Columns");
+                        Rec.ShowPackageRecords(Show::Errors, Rec."Dimensions as Columns");
                         CurrPage.Update();
                     end;
                 }
-                field(NoOfDatabaseRecords; GetNoOfDatabaseRecordsText())
+                field(NoOfDatabaseRecords; Rec.GetNoOfDatabaseRecordsText())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'No. of Database Records';
@@ -142,10 +148,10 @@ page 8625 "Config. Package Subform"
 
                     trigger OnDrillDown()
                     begin
-                        ShowDatabaseRecords();
+                        Rec.ShowDatabaseRecords();
                     end;
                 }
-                field(Filtered; Filtered)
+                field(Filtered; Rec.Filtered)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the package is filtered. This field is set depending on filter settings you have specified.';
@@ -155,7 +161,7 @@ page 8625 "Config. Package Subform"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the page that is used to show the journal or worksheet that uses the template.';
                 }
-                field(Comments; Comments)
+                field(Comments; Rec.Comments)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a comment in which you can provide a description';
@@ -174,7 +180,7 @@ page 8625 "Config. Package Subform"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Created by User ID");
+                        UserMgt.DisplayUserInformation(Rec."Created by User ID");
                     end;
                 }
                 field("Imported Date and Time"; Rec."Imported Date and Time")
@@ -192,7 +198,7 @@ page 8625 "Config. Package Subform"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Imported by User ID");
+                        UserMgt.DisplayUserInformation(Rec."Imported by User ID");
                     end;
                 }
                 field("Delayed Insert"; Rec."Delayed Insert")
@@ -220,7 +226,7 @@ page 8625 "Config. Package Subform"
 
                     trigger OnAction()
                     begin
-                        ShowPackageRecords(Show::Records, "Dimensions as Columns");
+                        Rec.ShowPackageRecords(Show::Records, Rec."Dimensions as Columns");
                     end;
                 }
                 action(DatabaseRecords)
@@ -232,7 +238,7 @@ page 8625 "Config. Package Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDatabaseRecords();
+                        Rec.ShowDatabaseRecords();
                     end;
                 }
                 action(PackageErrors)
@@ -244,7 +250,7 @@ page 8625 "Config. Package Subform"
 
                     trigger OnAction()
                     begin
-                        ShowPackageRecords(Show::Errors, "Dimensions as Columns");
+                        Rec.ShowPackageRecords(Show::Errors, Rec."Dimensions as Columns");
                     end;
                 }
                 action(PackageFields)
@@ -256,7 +262,7 @@ page 8625 "Config. Package Subform"
 
                     trigger OnAction()
                     begin
-                        ShowPackageFields();
+                        Rec.ShowPackageFields();
                     end;
                 }
                 action(PackageFilters)
@@ -268,7 +274,7 @@ page 8625 "Config. Package Subform"
 
                     trigger OnAction()
                     begin
-                        ShowFilters();
+                        Rec.ShowFilters();
                     end;
                 }
                 action(ProcessingRules)
@@ -280,7 +286,7 @@ page 8625 "Config. Package Subform"
 
                     trigger OnAction()
                     begin
-                        ShowProcessingRules();
+                        Rec.ShowProcessingRules();
                     end;
                 }
             }
@@ -336,7 +342,7 @@ page 8625 "Config. Package Subform"
                     begin
                         CurrPage.SetSelectionFilter(ConfigPackageTable);
                         if Confirm(SelectionConfirmMessage(), true) then begin
-                            ConfigPackage.Get("Package Code");
+                            ConfigPackage.Get(Rec."Package Code");
                             ConfigPackageMgt.ApplyPackage(ConfigPackage, ConfigPackageTable, true);
                         end;
                     end;
@@ -375,7 +381,7 @@ page 8625 "Config. Package Subform"
                     begin
                         CurrPage.SetSelectionFilter(ConfigPackageTable);
                         ConfigExcelExchange.SetSelectedTables(ConfigPackageTable);
-                        ConfigExcelExchange.ImportExcelFromSelectedPackage("Package Code");
+                        ConfigExcelExchange.ImportExcelFromSelectedPackage(Rec."Package Code");
                     end;
                 }
             }
@@ -384,7 +390,7 @@ page 8625 "Config. Package Subform"
 
     trigger OnAfterGetRecord()
     begin
-        NoOfErrorsStyleTxt := SetFieldStyle(FieldNo("No. of Package Errors"));
+        NoOfErrorsStyleTxt := Rec.SetFieldStyle(Rec.FieldNo("No. of Package Errors"));
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
@@ -399,15 +405,14 @@ page 8625 "Config. Package Subform"
     var
         ConfigPackageManagement: Codeunit "Config. Package Management";
     begin
-        SetFilter("Company Filter (Source Table)", '%1', CompanyName);
+        Rec.SetFilter("Company Filter (Source Table)", '%1', CompanyName);
         ConfigPackageManagement.RemoveRecordsWithObsoleteTableID(
-          DATABASE::"Config. Package Table", FieldNo("Table ID"));
+          DATABASE::"Config. Package Table", Rec.FieldNo("Table ID"));
     end;
 
     var
         MultipleTablesSelectedQst: Label '%1 tables have been selected. Do you want to continue?', Comment = '%1 = Number of selected tables';
         Show: Option Records,Errors,All;
-        [InDataSet]
         NoOfErrorsStyleTxt: Text;
         SingleTableSelectedQst: Label 'One table has been selected. Do you want to continue?', Comment = '%1 = Table name';
         MultiRelationQst: Label 'Some fields have two or more related tables.\Do you want to check them?';
@@ -430,17 +435,17 @@ page 8625 "Config. Package Subform"
         FieldsWithMultiRelations: Boolean;
         FilterMultiRelationFields: Text;
     begin
-        ConfigPackageManagement.SetFieldFilter(Field, "Table ID", 0);
+        ConfigPackageManagement.SetFieldFilter(Field, Rec."Table ID", 0);
         if Field.FindSet() then
             repeat
-                if ConfigPackageManagement.IsFieldMultiRelation("Table ID", Field."No.") then begin
+                if ConfigPackageManagement.IsFieldMultiRelation(Rec."Table ID", Field."No.") then begin
                     FieldsWithMultiRelations := true;
                     FilterMultiRelationFields += Format(Field."No.") + '|';
                 end;
             until Field.Next() = 0;
         if FieldsWithMultiRelations then
             if Confirm(MultiRelationQst) then
-                ShowFilteredPackageFields(DelChr(FilterMultiRelationFields, '>', '|'));
+                Rec.ShowFilteredPackageFields(DelChr(FilterMultiRelationFields, '>', '|'));
     end;
 }
 

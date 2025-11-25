@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Posting;
+
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.WarehouseMgt.Ledger;
+
 codeunit 244 "Item Jnl.-B.Post+Print"
 {
     TableNo = "Item Journal Batch";

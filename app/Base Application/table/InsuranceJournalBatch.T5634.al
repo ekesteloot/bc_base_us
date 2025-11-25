@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.Foundation.NoSeries;
+
 table 5634 "Insurance Journal Batch"
 {
     Caption = 'Insurance Journal Batch';

@@ -1,4 +1,8 @@
 #if not CLEAN21
+namespace Microsoft.Purchases.Pricing;
+
+using Microsoft.InventoryMgt.Item;
+
 page 1346 "Purchases Price and Line Disc."
 {
     Caption = 'Purchase Prices';
@@ -78,7 +82,7 @@ page 1346 "Purchases Price and Line Disc."
     begin
         Clear(Rec);
 
-        LoadDataForItem(Item);
+        Rec.LoadDataForItem(Item);
     end;
 }
 #endif

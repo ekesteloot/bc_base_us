@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.InventoryMgt.Counting.Reports;
+
 page 5876 "Physical Inventory Orders"
 {
     ApplicationArea = Warehouse;

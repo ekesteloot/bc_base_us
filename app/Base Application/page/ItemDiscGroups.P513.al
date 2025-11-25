@@ -1,3 +1,12 @@
+﻿namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+#if not CLEAN21
+using Microsoft.Sales.Pricing;
+#endif
+using System.Text;
+
 page 513 "Item Disc. Groups"
 {
     ApplicationArea = Basic, Suite;
@@ -13,7 +22,7 @@ page 513 "Item Disc. Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code for the item discount group.';
@@ -65,7 +74,7 @@ page 513 "Item Disc. Groups"
                     begin
                         SalesLineDiscount.SetCurrentKey(Type, Code);
                         SalesLineDiscount.SetRange(Type, SalesLineDiscount.Type::"Item Disc. Group");
-                        SalesLineDiscount.SetRange(Code, Code);
+                        SalesLineDiscount.SetRange(Code, Rec.Code);
                         Page.Run(Page::"Sales Line Discounts", SalesLineDiscount);
                     end;
                 }

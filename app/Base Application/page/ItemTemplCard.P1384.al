@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Setup;
+
 page 1384 "Item Templ. Card"
 {
     Caption = 'Item Template';
@@ -30,7 +36,7 @@ page 1384 "Item Templ. Card"
             group(Item)
             {
                 Caption = 'Item';
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example an item that is placed in quarantine.';
@@ -62,7 +68,7 @@ page 1384 "Item Templ. Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the category that the item belongs to. Item categories also contain any assigned item attributes.';
                 }
-                field("Manufacturer Code"; "Manufacturer Code")
+                field("Manufacturer Code"; Rec."Manufacturer Code")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the manufacturer of the catalog item.';
@@ -94,21 +100,21 @@ page 1384 "Item Templ. Card"
                     ToolTip = 'Specifies the code for a special procurement method, such as drop shipment.';
                     Visible = false;
                 }
-                field(GTIN; GTIN)
+                field(GTIN; Rec.GTIN)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies the Global Trade Item Number (GTIN) for the item. For example, the GTIN is used with bar codes to track items, and when sending and receiving documents electronically. The GTIN number typically contains a Universal Product Code (UPC), or European Article Number (EAN).';
                     Visible = false;
                 }
-                field(VariantMandatoryDefaultYes; "Variant Mandatory if Exists")
+                field(VariantMandatoryDefaultYes; Rec."Variant Mandatory if Exists")
                 {
                     ApplicationArea = Basic, Suite;
                     OptionCaption = 'Default (Yes),No,Yes';
                     ToolTip = 'Specifies whether a variant must be selected if variants exist for the item.';
                     Visible = ShowVariantMandatoryDefaultYes;
                 }
-                field(VariantMandatoryDefaultNo; "Variant Mandatory if Exists")
+                field(VariantMandatoryDefaultNo; Rec."Variant Mandatory if Exists")
                 {
                     ApplicationArea = Basic, Suite;
                     OptionCaption = 'Default (No),No,Yes';
@@ -411,7 +417,7 @@ page 1384 "Item Templ. Card"
                         EnablePlanningControls();
                     end;
                 }
-                field(Reserve; Reserve)
+                field(Reserve; Rec.Reserve)
                 {
                     ApplicationArea = Reservation;
                     Importance = Additional;
@@ -441,7 +447,7 @@ page 1384 "Item Templ. Card"
                     Visible = false;
                     Enabled = DampenerQtyEnable;
                 }
-                field(Critical; Critical)
+                field(Critical; Rec.Critical)
                 {
                     ApplicationArea = OrderPromising;
                     ToolTip = 'Specifies if the item is included in availability calculations to promise a shipment date for its parent item.';
@@ -654,13 +660,13 @@ page 1384 "Item Templ. Card"
                     ItemTempl: Record "Item Templ.";
                     ItemTemplList: Page "Item Templ. List";
                 begin
-                    TestField(Code);
-                    ItemTempl.SetFilter(Code, '<>%1', Code);
+                    Rec.TestField(Code);
+                    ItemTempl.SetFilter(Code, '<>%1', Rec.Code);
                     ItemTemplList.LookupMode(true);
                     ItemTemplList.SetTableView(ItemTempl);
                     if ItemTemplList.RunModal() = Action::LookupOK then begin
                         ItemTemplList.GetRecord(ItemTempl);
-                        CopyFromTemplate(ItemTempl);
+                        Rec.CopyFromTemplate(ItemTempl);
                     end;
                 end;
             }
@@ -685,13 +691,13 @@ page 1384 "Item Templ. Card"
     var
         InventorySetup: Record "Inventory Setup";
     begin
-        if Code <> '' then
+        if Rec.Code <> '' then
             exit;
 
         if not InventorySetup.Get() then
             exit;
 
-        "Costing Method" := InventorySetup."Default Costing Method";
+        Rec."Costing Method" := InventorySetup."Default Costing Method";
     end;
 
     trigger OnInit()

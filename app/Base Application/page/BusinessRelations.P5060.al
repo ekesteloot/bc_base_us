@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.BusinessRelation;
+
 page 5060 "Business Relations"
 {
     ApplicationArea = RelationshipMgmt;
@@ -13,7 +15,7 @@ page 5060 "Business Relations"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the business relation.';
@@ -60,7 +62,7 @@ page 5060 "Business Relations"
                     Caption = 'C&ontacts';
                     Image = CustomerContact;
                     RunObject = Page "Business Relation Contacts";
-                    RunPageLink = "Business Relation Code" = FIELD(Code);
+                    RunPageLink = "Business Relation Code" = field(Code);
                     ToolTip = 'View a list of the contact companies you have assigned the business relation to.';
                 }
             }

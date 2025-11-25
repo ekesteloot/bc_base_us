@@ -1,4 +1,9 @@
 #if not CLEAN21
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ProjectMgt.Resources.Pricing;
+
 report 1192 "Suggest Res. Price Chg.(Price)"
 {
     Caption = 'Suggest Res. Price Chg.(Price)';
@@ -11,7 +16,7 @@ report 1192 "Suggest Res. Price Chg.(Price)"
     {
         dataitem("Resource Price"; "Resource Price")
         {
-            DataItemTableView = SORTING(Type, Code, "Work Type Code", "Currency Code");
+            DataItemTableView = sorting(Type, Code, "Work Type Code", "Currency Code");
             RequestFilterFields = Type, "Code", "Work Type Code", "Currency Code";
 
             trigger OnAfterGetRecord()

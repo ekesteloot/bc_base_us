@@ -1,3 +1,11 @@
+namespace Microsoft.CostAccounting.Allocation;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Journal;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Posting;
+
 report 1131 "Cost Allocation"
 {
     ApplicationArea = CostAccounting;
@@ -9,11 +17,11 @@ report 1131 "Cost Allocation"
     {
         dataitem(CostAllocationSource; "Cost Allocation Source")
         {
-            DataItemTableView = SORTING(Level, "Valid From", "Valid To", "Cost Type Range") ORDER(Ascending);
+            DataItemTableView = sorting(Level, "Valid From", "Valid To", "Cost Type Range") order(ascending);
             dataitem(CostAllocationTarget; "Cost Allocation Target")
             {
-                DataItemLink = ID = FIELD(ID);
-                DataItemTableView = SORTING(ID, "Line No.") ORDER(Ascending);
+                DataItemLink = ID = field(ID);
+                DataItemTableView = sorting(ID, "Line No.") order(ascending);
 
                 trigger OnAfterGetRecord()
                 begin
@@ -48,10 +56,10 @@ report 1131 "Cost Allocation"
         }
         dataitem("Cost Allocation Source"; "Cost Allocation Source")
         {
-            DataItemTableView = SORTING(Level, "Valid From", "Valid To", "Cost Type Range");
+            DataItemTableView = sorting(Level, "Valid From", "Valid To", "Cost Type Range");
             dataitem("Cost Entry"; "Cost Entry")
             {
-                DataItemTableView = SORTING("Entry No.") ORDER(Ascending);
+                DataItemTableView = sorting("Entry No.") order(Ascending);
 
                 trigger OnAfterGetRecord()
                 begin
@@ -91,7 +99,7 @@ report 1131 "Cost Allocation"
             }
             dataitem("Cost Budget Entry"; "Cost Budget Entry")
             {
-                DataItemTableView = SORTING("Entry No.") ORDER(Ascending);
+                DataItemTableView = sorting("Entry No.") order(Ascending);
 
                 trigger OnAfterGetRecord()
                 begin
@@ -116,10 +124,10 @@ report 1131 "Cost Allocation"
                         CurrReport.Break();
 
                     if "Cost Allocation Source"."Cost Center Code" <> '' then begin
-                        SetCurrentKey("Budget Name", "Cost Center Code", "Cost Type No.", Allocated);
+                        SetCurrentKey("Budget Name", "Cost Center Code", "Cost Type No.", Allocated, Date);
                         SetFilter("Cost Center Code", "Cost Allocation Source"."Cost Center Code");
                     end else begin
-                        SetCurrentKey("Budget Name", "Cost Object Code", "Cost Type No.", Allocated);
+                        SetCurrentKey("Budget Name", "Cost Object Code", "Cost Type No.", Allocated, Date);
                         SetFilter("Cost Object Code", "Cost Allocation Source"."Cost Object Code");
                     end;
                     SetRange("Budget Name", CostBudgetName.Name);
@@ -132,7 +140,7 @@ report 1131 "Cost Allocation"
             }
             dataitem("Cost Allocation Target"; "Cost Allocation Target")
             {
-                DataItemTableView = SORTING(ID, "Line No.");
+                DataItemTableView = sorting(ID, "Line No.");
 
                 trigger OnAfterGetRecord()
                 begin

@@ -4,6 +4,8 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Azure.Identity;
+
 /// <summary>
 /// List page that hold the custom user groups assigned to a plan.
 /// </summary>

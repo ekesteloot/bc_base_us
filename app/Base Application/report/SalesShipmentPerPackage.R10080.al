@@ -8,7 +8,7 @@ report 10080 "Sales Shipment per Package"
     {
         dataitem("Sales Shipment Header"; "Sales Shipment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.", "Ship-to Code", "No. Printed";
             column(Sales_Shipment_Header_No_; "No.")
@@ -16,16 +16,16 @@ report 10080 "Sales Shipment per Package"
             }
             dataitem(PackageNoLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem("Sales Shipment Line"; "Sales Shipment Line")
                 {
-                    DataItemLink = "Document No." = FIELD("No.");
+                    DataItemLink = "Document No." = field("No.");
                     DataItemLinkReference = "Sales Shipment Header";
-                    DataItemTableView = SORTING("Document No.", "Package Tracking No.");
+                    DataItemTableView = sorting("Document No.", "Package Tracking No.");
                     dataitem(SalesLineComments; "Sales Comment Line")
                     {
-                        DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                        DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST(Shipment), "Print On Shipment" = CONST(true));
+                        DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                        DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const(Shipment), "Print On Shipment" = const(true));
 
                         trigger OnAfterGetRecord()
                         begin
@@ -49,9 +49,9 @@ report 10080 "Sales Shipment per Package"
                 }
                 dataitem("Sales Comment Line"; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("No.");
+                    DataItemLink = "No." = field("No.");
                     DataItemLinkReference = "Sales Shipment Header";
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST(Shipment), "Print On Shipment" = CONST(true), "Document Line No." = CONST(0));
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const(Shipment), "Print On Shipment" = const(true), "Document Line No." = const(0));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -71,10 +71,10 @@ report 10080 "Sales Shipment per Package"
                 }
                 dataitem(CopyLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     dataitem(PageLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(CompanyInformation_Picture; CompanyInformation.Picture)
                         {
                         }
@@ -254,7 +254,7 @@ report 10080 "Sales Shipment per Package"
                         }
                         dataitem(SalesShipmentLine; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(SalesShipmentLine_SalesShipmentLine_Number; Number)
                             {
                             }
@@ -436,6 +436,7 @@ report 10080 "Sales Shipment per Package"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Salesperson Code" = '' then
                     Clear(SalesPurchPerson)
@@ -571,9 +572,6 @@ report 10080 "Sales Shipment per Package"
         ReceiptLine: Record "Sales Shipment Line";
         OrderLine: Record "Sales Line";
         SalesPurchPerson: Record "Salesperson/Purchaser";
-        CompanyInformation: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         TempSalesShipmentLine: Record "Sales Shipment Line" temporary;
         RespCenter: Record "Responsibility Center";
@@ -606,7 +604,6 @@ report 10080 "Sales Shipment per Package"
         LastPackageTrNo: Text;
         TaxRegLabel: Text;
         Text009: Label 'VOID SHIPMENT';
-        [InDataSet]
         LogInteractionEnable: Boolean;
         BillCaptionLbl: Label 'Bill';
         To_CaptionLbl: Label 'To:';
@@ -632,6 +629,11 @@ report 10080 "Sales Shipment per Package"
         Back_OrderedCaptionLbl: Label 'Back Ordered';
         OrderedQuantity: Decimal;
         BackOrderedQuantity: Decimal;
+
+    protected var
+        CompanyInformation: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     procedure InitLogInteraction()
     begin

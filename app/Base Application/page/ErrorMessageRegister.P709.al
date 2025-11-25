@@ -1,3 +1,5 @@
+namespace System.Utilities;
+
 page 709 "Error Message Register"
 {
     ApplicationArea = Basic, Suite;
@@ -8,8 +10,8 @@ page 709 "Error Message Register"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Error Message Register";
-    SourceTableView = SORTING("Created On")
-                      ORDER(Descending);
+    SourceTableView = sorting("Created On")
+                      order(Descending);
     UsageCategory = Administration;
 
     layout
@@ -18,7 +20,7 @@ page 709 "Error Message Register"
         {
             repeater(Group)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
@@ -35,7 +37,7 @@ page 709 "Error Message Register"
                 {
                     ApplicationArea = Basic, Suite;
                 }
-                field(Errors; Errors)
+                field(Errors; Rec.Errors)
                 {
                     ApplicationArea = Basic, Suite;
 
@@ -44,7 +46,7 @@ page 709 "Error Message Register"
                         DrillDownErrors(MessageType::Error);
                     end;
                 }
-                field(Warnings; Warnings)
+                field(Warnings; Rec.Warnings)
                 {
                     ApplicationArea = Basic, Suite;
 
@@ -53,7 +55,7 @@ page 709 "Error Message Register"
                         DrillDownErrors(MessageType::Warning);
                     end;
                 }
-                field(Information; Information)
+                field(Information; Rec.Information)
                 {
                     ApplicationArea = Basic, Suite;
 
@@ -105,7 +107,7 @@ page 709 "Error Message Register"
         TempErrorMessage: Record "Error Message" temporary;
         ErrorMessages: Page "Error Messages";
     begin
-        ErrorMessage.SetRange("Register ID", ID);
+        ErrorMessage.SetRange("Register ID", Rec.ID);
         if Type <> MessageType::All then
             ErrorMessage.SetRange("Message Type", Type);
         ErrorMessage.CopyToTemp(TempErrorMessage);

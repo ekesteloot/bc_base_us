@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 1550 "Restricted Record"
 {
     Caption = 'Restricted Record';

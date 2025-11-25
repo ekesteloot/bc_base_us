@@ -1,14 +1,21 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Foundation.NoSeries;
+
 report 22 "No. Series Check"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './NoSeriesCheck.rdlc';
+    RDLCLayout = './Foundation/NoSeries/NoSeriesCheck.rdlc';
     Caption = 'No. Series Check';
 
     dataset
     {
         dataitem("No. Series"; "No. Series")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code";
 
             trigger OnPreDataItem()
@@ -18,7 +25,7 @@ report 22 "No. Series Check"
         }
         dataitem("No. Series Line"; "No. Series Line")
         {
-            DataItemTableView = SORTING("Starting No.");
+            DataItemTableView = sorting("Starting No.");
             RequestFilterFields = "Starting Date";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {

@@ -1,3 +1,31 @@
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Enums;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Structure;
+using System.Reflection;
+using System.Security.User;
+
 table 113 "Sales Invoice Line"
 {
     Caption = 'Sales Invoice Line';
@@ -31,28 +59,28 @@ table 113 "Sales Invoice Line"
         {
             CaptionClass = GetCaptionClass(FieldNo("No."));
             Caption = 'No.';
-            TableRelation = IF (Type = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF (Type = CONST("Charge (Item)")) "Item Charge";
+            TableRelation = if (Type = const("G/L Account")) "G/L Account"
+            else
+            if (Type = const(Item)) Item
+            else
+            if (Type = const(Resource)) Resource
+            else
+            if (Type = const("Fixed Asset")) "Fixed Asset"
+            else
+            if (Type = const("Charge (Item)")) "Item Charge";
         }
         field(7; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(8; "Posting Group"; Code[20])
         {
             Caption = 'Posting Group';
             Editable = false;
-            TableRelation = IF (Type = CONST(Item)) "Inventory Posting Group"
-            ELSE
-            IF (Type = CONST("Fixed Asset")) "FA Posting Group";
+            TableRelation = if (Type = const(Item)) "Inventory Posting Group"
+            else
+            if (Type = const("Fixed Asset")) "FA Posting Group";
         }
         field(10; "Shipment Date"; Date)
         {
@@ -152,13 +180,13 @@ table 113 "Sales Invoice Line"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(41; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(42; "Customer Price Group"; Code[10])
         {
@@ -237,7 +265,7 @@ table 113 "Sales Invoice Line"
         field(80; "Attached to Line No."; Integer)
         {
             Caption = 'Attached to Line No.';
-            TableRelation = "Sales Invoice Line"."Line No." WHERE("Document No." = FIELD("Document No."));
+            TableRelation = "Sales Invoice Line"."Line No." where("Document No." = field("Document No."));
         }
         field(81; "Exit Point"; Code[10])
         {
@@ -290,17 +318,13 @@ table 113 "Sales Invoice Line"
         field(97; "Blanket Order No."; Code[20])
         {
             Caption = 'Blanket Order No.';
-            TableRelation = "Sales Header"."No." WHERE("Document Type" = CONST("Blanket Order"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Sales Header"."No." where("Document Type" = const("Blanket Order"));
         }
         field(98; "Blanket Order Line No."; Integer)
         {
             Caption = 'Blanket Order Line No.';
-            TableRelation = "Sales Line"."Line No." WHERE("Document Type" = CONST("Blanket Order"),
-                                                           "Document No." = FIELD("Blanket Order No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Sales Line"."Line No." where("Document Type" = const("Blanket Order"),
+                                                           "Document No." = field("Blanket Order No."));
         }
         field(99; "VAT Base Amount"; Decimal)
         {
@@ -386,14 +410,14 @@ table 113 "Sales Invoice Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(1001; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
             Editable = false;
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(1002; "Job Contract Entry No."; Integer)
         {
@@ -405,17 +429,22 @@ table 113 "Sales Invoice Line"
             Caption = 'Deferral Code';
             TableRelation = "Deferral Template"."Deferral Code";
         }
+        field(2678; "Allocation Account No."; Code[20])
+        {
+            Caption = 'Allocation Account No.';
+            DataClassification = CustomerContent;
+        }
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                            "Item Filter" = FIELD("No."),
-                                            "Variant Filter" = FIELD("Variant Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"),
+                                            "Item Filter" = field("No."),
+                                            "Variant Filter" = field("Variant Code"));
         }
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
@@ -426,8 +455,8 @@ table 113 "Sales Invoice Line"
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
             "Unit of Measure";
         }
         field(5415; "Quantity (Base)"; Decimal)
@@ -495,7 +524,7 @@ table 113 "Sales Invoice Line"
         field(5709; "Item Category Code"; Code[20])
         {
             Caption = 'Item Category Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Category";
+            TableRelation = if (Type = const(Item)) "Item Category";
         }
         field(5710; Nonstock; Boolean)
         {
@@ -521,7 +550,7 @@ table 113 "Sales Invoice Line"
         field(5726; "Item Reference Unit of Measure"; Code[10])
         {
             Caption = 'Unit of Measure (Item Ref.)';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."));
         }
         field(5727; "Item Reference Type"; Enum "Item Reference Type")
         {
@@ -591,11 +620,6 @@ table 113 "Sales Invoice Line"
         key(Key3; "Sell-to Customer No.")
         {
         }
-        key(Key4; "Sell-to Customer No.", Type, "Document No.")
-        {
-            Enabled = false;
-            MaintainSQLIndex = false;
-        }
         key(Key5; "Shipment No.", "Shipment Line No.")
         {
         }
@@ -612,6 +636,13 @@ table 113 "Sales Invoice Line"
         {
             MaintainSQLIndex = false;
             SumIndexFields = Amount, "Amount Including VAT", "Inv. Discount Amount";
+        }
+        key(Key10; Type, "No.")
+        {
+            IncludedFields = "Quantity (Base)";
+        }
+        key(Key11; "Job No.", "Job Task No.")
+        {
         }
     }
 
@@ -884,7 +915,7 @@ table 113 "Sales Invoice Line"
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure InitFromSalesLine(SalesInvHeader: Record "Sales Invoice Header"; SalesLine: Record "Sales Line")
@@ -973,6 +1004,13 @@ table 113 "Sales Invoice Line"
             SetRange("Responsibility Center", UserSetupManagement.GetSalesFilter());
             FilterGroup(0);
         end;
+    end;
+
+    procedure GetDateForCalculations() CalculationDate: Date;
+    begin
+        CalculationDate := Rec."Posting Date";
+        if CalculationDate = 0D then
+            CalculationDate := WorkDate();
     end;
 
     [IntegrationEvent(false, false)]

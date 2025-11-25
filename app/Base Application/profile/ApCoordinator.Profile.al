@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.RoleCenters;
+
 profile "AP COORDINATOR"
 {
     Caption = 'Accounts Payable Coordinator';

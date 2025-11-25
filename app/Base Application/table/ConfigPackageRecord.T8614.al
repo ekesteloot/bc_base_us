@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8614 "Config. Package Record"
 {
     Caption = 'Config. Package Record';
@@ -16,7 +20,7 @@ table 8614 "Config. Package Record"
             Caption = 'Table ID';
             Editable = true;
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(3; "No."; Integer)
         {

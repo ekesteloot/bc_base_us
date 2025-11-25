@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Profiling;
+using Microsoft.CRM.Setup;
+using Microsoft.Foundation.Address;
+
 table 5096 "Segment Wizard Filter"
 {
     Caption = 'Segment Wizard Filter';
@@ -67,8 +74,8 @@ table 5096 "Segment Wizard Filter"
         {
             Caption = 'Profile Questn. Line Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Profile Questionnaire Line"."Line No." WHERE("Profile Questionnaire Code" = FIELD("Profile Questn. Code Filter"),
-                                                                           Type = CONST(Answer));
+            TableRelation = "Profile Questionnaire Line"."Line No." where("Profile Questionnaire Code" = field("Profile Questn. Code Filter"),
+                                                                           Type = const(Answer));
         }
         field(12; "Job Responsibility Code Filter"; Code[10])
         {

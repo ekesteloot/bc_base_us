@@ -5,6 +5,10 @@ permissionset 6720 "General Ledger - Edit"
     Caption = 'G/L periodic activities';
 
     Permissions = tabledata "Accounting Period" = RIMD,
+                  tabledata "Alloc. Acc. Manual Override" = RIMD,
+                  tabledata "Alloc. Account Distribution" = RIMD,
+                  tabledata "Allocation Account" = RIMD,
+                  tabledata "Allocation Line" = RIMD,
                   tabledata "Analysis View" = RIMD,
                   tabledata "Analysis View Budget Entry" = RIMD,
                   tabledata "Analysis View Entry" = RIMD,
@@ -72,9 +76,6 @@ permissionset 6720 "General Ledger - Edit"
                   tabledata "General Posting Setup" = R,
                   tabledata "Intermediate Data Import" = Rimd,
                   tabledata "Ledger Entry Matching Buffer" = RIMD,
-#if not CLEAN20
-                  tabledata "Native - Payment" = RIMD,
-#endif
                   tabledata "Outstanding Bank Transaction" = RIMD,
                   tabledata "Payment Application Proposal" = RIMD,
                   tabledata "Payment Export Data" = Rimd,

@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+
 codeunit 1312 "Vendor Mgt."
 {
 

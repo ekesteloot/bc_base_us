@@ -1,18 +1,24 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Segment;
+using Microsoft.Foundation.Address;
+
 report 5065 "Segment - Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/SegmentLabels.rdlc';
+    RDLCLayout = './CRM/Reports/SegmentLabels.rdlc';
     Caption = 'Segment - Labels';
 
     dataset
     {
         dataitem("Segment Header"; "Segment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             dataitem("Segment Line"; "Segment Line")
             {
-                DataItemLink = "Segment No." = FIELD("No.");
-                DataItemTableView = SORTING("Segment No.", "Line No.");
+                DataItemLink = "Segment No." = field("No.");
+                DataItemTableView = sorting("Segment No.", "Line No.");
                 column(ContAddr11; ContAddr[1] [1])
                 {
                 }

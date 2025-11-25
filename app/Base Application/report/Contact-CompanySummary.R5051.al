@@ -1,7 +1,14 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Task;
+using Microsoft.Foundation.Address;
+
 report 5051 "Contact - Company Summary"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/ContactCompanySummary.rdlc';
+    RDLCLayout = './CRM/Reports/ContactCompanySummary.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Contact - Company Summary';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +17,7 @@ report 5051 "Contact - Company Summary"
     {
         dataitem(Contact; Contact)
         {
-            DataItemTableView = SORTING("Company No.") WHERE(Type = CONST(Company));
+            DataItemTableView = sorting("Company No.") where(Type = const(Company));
             RequestFilterFields = "Company No.", "Salesperson Code", "Post Code", "Country/Region Code";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {
@@ -74,8 +81,8 @@ report 5051 "Contact - Company Summary"
             }
             dataitem("<ContactPerson>"; Contact)
             {
-                DataItemLink = "Company No." = FIELD("Company No.");
-                DataItemTableView = SORTING("Company No.") WHERE(Type = FILTER(Person));
+                DataItemLink = "Company No." = field("Company No.");
+                DataItemTableView = sorting("Company No.") where(Type = filter(Person));
                 column(ContactPerson___No__; "No.")
                 {
                 }
@@ -112,8 +119,8 @@ report 5051 "Contact - Company Summary"
             }
             dataitem("To-do"; "To-do")
             {
-                DataItemLink = "Contact Company No." = FIELD("Company No.");
-                DataItemTableView = SORTING("Contact Company No.", "Contact No.", Closed, Date) WHERE("System To-do Type" = CONST("Contact Attendee"));
+                DataItemLink = "Contact Company No." = field("Company No.");
+                DataItemTableView = sorting("Contact Company No.", "Contact No.", Closed, Date) where("System To-do Type" = const("Contact Attendee"));
                 RequestFilterFields = Closed, Date, Type;
                 column(Task_Description; Description)
                 {
@@ -181,8 +188,8 @@ report 5051 "Contact - Company Summary"
             }
             dataitem("<Interaction Log Entry>"; "Interaction Log Entry")
             {
-                DataItemLink = "Contact Company No." = FIELD("Company No.");
-                DataItemTableView = SORTING("Contact Company No.", "Contact No.", Date) WHERE(Postponed = CONST(false));
+                DataItemLink = "Contact Company No." = field("Company No.");
+                DataItemTableView = sorting("Contact Company No.", "Contact No.", Date) where(Postponed = const(false));
                 RequestFilterFields = Date, "Interaction Group Code", "Interaction Template Code", "Information Flow", "Initiated By";
                 column(Interaction_Log_Entry__Description; Description)
                 {

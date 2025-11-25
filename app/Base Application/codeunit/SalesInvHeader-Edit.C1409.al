@@ -7,19 +7,43 @@ codeunit 1409 "Sales Inv. Header - Edit"
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
     begin
-        SalesInvoiceHeader := Rec;
-        SalesInvoiceHeader.LockTable();
+        SalesInvoiceHeader.Copy(Rec);
+        SalesInvoiceHeader.ReadIsolation(IsolationLevel::UpdLock);
         SalesInvoiceHeader.Find();
         OnRunOnBeforeAssignValues(SalesInvoiceHeader, Rec);
-        SalesInvoiceHeader."Payment Method Code" := "Payment Method Code";
-        SalesInvoiceHeader."Payment Reference" := "Payment Reference";
-        SalesInvoiceHeader."Company Bank Account Code" := "Company Bank Account Code";
+        SalesInvoiceHeader."Payment Method Code" := Rec."Payment Method Code";
+        SalesInvoiceHeader."Payment Reference" := Rec."Payment Reference";
+        SalesInvoiceHeader."Company Bank Account Code" := Rec."Company Bank Account Code";
+        SalesInvoiceHeader."Posting Description" := Rec."Posting Description";
         OnOnRunOnBeforeTestFieldNo(SalesInvoiceHeader, Rec);
-        SalesInvoiceHeader.TestField("No.", "No.");
+        SalesInvoiceHeader.TestField("No.", Rec."No.");
         SalesInvoiceHeader.Modify();
-        Rec := SalesInvoiceHeader;
+        Rec.Copy(SalesInvoiceHeader);
+
+        UpdateCustLedgerEntry(Rec);
 
         OnRunOnAfterSalesInvoiceHeaderEdit(Rec);
+    end;
+
+    local procedure UpdateCustLedgerEntry(SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+    begin
+        if not GetCustLedgerEntry(CustLedgerEntry, SalesInvoiceHeader) then
+            exit;
+        CustLedgerEntry."Payment Method Code" := SalesInvoiceHeader."Payment Method Code";
+        CustLedgerEntry."Payment Reference" := SalesInvoiceHeader."Payment Reference";
+        CustLedgerEntry.Description := SalesInvoiceHeader."Posting Description";
+        OnBeforeUpdateCustLedgerEntryAfterSetValues(CustLedgerEntry, SalesInvoiceHeader);
+        Codeunit.Run(Codeunit::"Cust. Entry-Edit", CustLedgerEntry);
+    end;
+
+    local procedure GetCustLedgerEntry(var CustLedgerEntry: Record "Cust. Ledger Entry"; SalesInvoiceHeader: Record "Sales Invoice Header"): Boolean
+    begin
+        if SalesInvoiceHeader."Cust. Ledger Entry No." = 0 then
+            exit(false);
+        CustLedgerEntry.ReadIsolation(IsolationLevel::UpdLock);
+        exit(CustLedgerEntry.Get(SalesInvoiceHeader."Cust. Ledger Entry No."));
     end;
 
     [IntegrationEvent(false, false)]
@@ -29,6 +53,11 @@ codeunit 1409 "Sales Inv. Header - Edit"
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnBeforeAssignValues(var SalesInvoiceHeader: Record "Sales Invoice Header"; SalesInvoiceHeaderRec: Record "Sales Invoice Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateCustLedgerEntryAfterSetValues(var CustLedgerEntry: Record "Cust. Ledger Entry"; SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
     end;
 

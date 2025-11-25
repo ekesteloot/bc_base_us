@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System;
+
 codeunit 8619 "Config. Pckg. Compression Mgt."
 {
 

@@ -1,7 +1,12 @@
+namespace Microsoft.InventoryMgt.Counting.Reports;
+
+using Microsoft.InventoryMgt.Counting.Recording;
+using System.Utilities;
+
 report 5878 "Phys. Invt. Recording"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/PhysInventory/PhysInvtRecording.rdlc';
+    RDLCLayout = './InventoryMgt/Counting/Reports/PhysInvtRecording.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Phys. Invt. Recording';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5878 "Phys. Invt. Recording"
     {
         dataitem("Phys. Invt. Record Header"; "Phys. Invt. Record Header")
         {
-            DataItemTableView = SORTING("Order No.", "Recording No.");
+            DataItemTableView = sorting("Order No.", "Recording No.");
             RequestFilterFields = "Order No.", "Recording No.";
             column(Phys__Invt__Recording_Header_Order_No_; "Order No.")
             {
@@ -20,7 +25,7 @@ report 5878 "Phys. Invt. Recording"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(USERID; UserId)
                 {
                 }
@@ -89,9 +94,9 @@ report 5878 "Phys. Invt. Recording"
                 }
                 dataitem("Phys. Invt. Record Line"; "Phys. Invt. Record Line")
                 {
-                    DataItemLink = "Order No." = FIELD("Order No."), "Recording No." = FIELD("Recording No.");
+                    DataItemLink = "Order No." = field("Order No."), "Recording No." = field("Recording No.");
                     DataItemLinkReference = "Phys. Invt. Record Header";
-                    DataItemTableView = SORTING("Order No.", "Recording No.", "Line No.");
+                    DataItemTableView = sorting("Order No.", "Recording No.", "Line No.");
                     column(Phys__Invt__Recording_Line__FIELDCAPTION_Quantity_; FieldCaption(Quantity))
                     {
                     }

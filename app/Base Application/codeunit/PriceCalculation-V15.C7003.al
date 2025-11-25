@@ -1,4 +1,25 @@
 #if not CLEAN21
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Calculation;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Pricing;
+using Microsoft.ServiceMgt.Document;
+
 codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
 {
     ObsoleteState = Pending;
@@ -66,11 +87,11 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
     begin
         CurrLineWithPrice.GetLine(Header, Line);
         case CurrLineWithPrice.GetTableNo() of
-            Database::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 Result := SalesPriceCalcMgt.NoOfSalesLineLineDisc(Header, Line, ShowAll);
-            Database::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 Result := SalesPriceCalcMgt.NoOfServLineLineDisc(Header, Line, ShowAll);
-            Database::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 Result := PurchPriceCalcMgt.NoOfPurchLineLineDisc(Header, Line, ShowAll);
         end;
     end;
@@ -82,11 +103,11 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
     begin
         CurrLineWithPrice.GetLine(Header, Line);
         case CurrLineWithPrice.GetTableNo() of
-            Database::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 Result := SalesPriceCalcMgt.NoOfSalesLinePrice(Header, Line, ShowAll);
-            Database::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 Result := SalesPriceCalcMgt.NoOfServLinePrice(Header, Line, ShowAll);
-            Database::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 Result := PurchPriceCalcMgt.NoOfPurchLinePrice(Header, Line, ShowAll);
         end;
     end;
@@ -121,7 +142,7 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
 
         CopyFromToPriceListLine.CopyFrom(TempSalesLineDiscount, TempPriceListLine);
         Found := not TempPriceListLine.IsEmpty();
-        if Not Found then
+        if not Found then
             PriceCalculationBufferMgt.FillBestLine(AmountType::Discount, TempPriceListLine);
     end;
 
@@ -154,7 +175,7 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
 
         CopyFromToPriceListLine.CopyFrom(TempSalesPrice, TempPriceListLine);
         Found := not TempPriceListLine.IsEmpty();
-        if Not Found then
+        if not Found then
             PriceCalculationBufferMgt.FillBestLine(AmountType::Price, TempPriceListLine);
     end;
 
@@ -165,11 +186,11 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
     begin
         CurrLineWithPrice.GetLine(Header, Line);
         case CurrLineWithPrice.GetTableNo() of
-            Database::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 Result := SalesPriceCalcMgt.SalesLineLineDiscExists(Header, Line, ShowAll);
-            Database::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 Result := SalesPriceCalcMgt.ServLineLineDiscExists(Header, Line, ShowAll);
-            Database::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 Result := PurchPriceCalcMgt.PurchLineLineDiscExists(Header, Line, ShowAll);
         end;
     end;
@@ -181,11 +202,11 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
     begin
         CurrLineWithPrice.GetLine(Header, Line);
         case CurrLineWithPrice.GetTableNo() of
-            Database::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 Result := SalesPriceCalcMgt.SalesLinePriceExists(Header, Line, ShowAll);
-            Database::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 Result := SalesPriceCalcMgt.ServLinePriceExists(Header, Line, ShowAll);
-            Database::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 Result := PurchPriceCalcMgt.PurchLinePriceExists(Header, Line, ShowAll);
         end;
     end;
@@ -198,17 +219,17 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
     begin
         CurrLineWithPrice.GetLine(Header, Line);
         case CurrLineWithPrice.GetTableNo() of
-            Database::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 begin
                     SalesPriceCalcMgt.GetSalesLineLineDisc(Header, Line);
                     PriceType := PriceType::Sale;
                 end;
-            Database::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 begin
                     SalesPriceCalcMgt.GetServLineLineDisc(Header, Line);
                     PriceType := PriceType::Sale;
                 end;
-            Database::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 begin
                     PurchPriceCalcMgt.GetPurchLineLineDisc(Header, Line);
                     PriceType := PriceType::Purchase;
@@ -224,11 +245,11 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
     begin
         CurrLineWithPrice.GetLine(Header, Line);
         case CurrLineWithPrice.GetTableNo() of
-            Database::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 SalesPriceCalcMgt.GetSalesLinePrice(Header, Line);
-            Database::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 SalesPriceCalcMgt.GetServLinePrice(Header, Line);
-            Database::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 PurchPriceCalcMgt.GetPurchLinePrice(Header, Line);
         end;
         CurrLineWithPrice.SetLine(CurrLineWithPrice.GetPriceType(), Header, Line);
@@ -291,7 +312,7 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
 
         CurrLineWithPrice.GetLine(Header, Line);
         case CurrLineWithPrice.GetTableNo() of
-            Database::"Item Journal Line":
+            Enum::TableID::"Item Journal Line".AsInteger():
                 begin
                     ItemJournalLine := Line;
                     if ItemJournalLine."Entry Type" = ItemJournalLine."Entry Type"::Sale then begin
@@ -299,13 +320,13 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
                         CurrLineWithPrice.SetLine(PriceType::Sale, ItemJournalLine);
                     end;
                 end;
-            Database::"Job Journal Line":
+            Enum::TableID::"Job Journal Line".AsInteger():
                 begin
                     JobJournalLine := Line;
                     SalesPriceCalcMgt.FindJobJnlLinePrice(JobJournalLine, CalledByFieldNo);
                     CurrLineWithPrice.SetLine(PriceType::Sale, JobJournalLine);
                 end;
-            Database::"Job Planning Line":
+            Enum::TableID::"Job Planning Line".AsInteger():
                 begin
                     JobPlanningLine := Line;
                     if CalledByFieldNo = JobTransferLine.JobTransferMarkerFieldNo() then
@@ -314,25 +335,25 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
                         SalesPriceCalcMgt.FindJobPlanningLinePrice(JobPlanningLine, CalledByFieldNo);
                     CurrLineWithPrice.SetLine(PriceType::Sale, JobPlanningLine);
                 end;
-            Database::"Res. Journal Line":
+            Enum::TableID::"Res. Journal Line".AsInteger():
                 begin
                     ResJournalLine := Line;
                     SalesPriceCalcMgt.FindResPrice(ResJournalLine);
                     CurrLineWithPrice.SetLine(PriceType::Sale, ResJournalLine);
                 end;
-            Database::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 begin
                     SalesLine := Line;
                     SalesPriceCalcMgt.FindSalesLinePrice(Header, SalesLine, CalledByFieldNo);
                     CurrLineWithPrice.SetLine(PriceType::Sale, SalesLine);
                 end;
-            Database::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 begin
                     ServiceLine := Line;
                     SalesPriceCalcMgt.FindServLinePrice(Header, ServiceLine, CalledByFieldNo);
                     CurrLineWithPrice.SetLine(PriceType::Sale, ServiceLine);
                 end;
-            Database::"Standard Item Journal Line":
+            Enum::TableID::"Standard Item Journal Line".AsInteger():
                 begin
                     StandardItemJournalLine := Line;
                     if StandardItemJournalLine."Entry Type" = StandardItemJournalLine."Entry Type"::Sale then begin
@@ -364,13 +385,13 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
 
         CurrLineWithPrice.GetLine(Header, Line);
         case CurrLineWithPrice.GetTableNo() of
-            Database::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 begin
                     SalesLine := Line;
                     SalesPriceCalcMgt.FindSalesLineLineDisc(Header, SalesLine);
                     CurrLineWithPrice.SetLine(PriceType::Sale, SalesLine);
                 end;
-            Database::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 begin
                     ServiceLine := Line;
                     SalesPriceCalcMgt.FindServLineDisc(Header, ServiceLine);
@@ -397,7 +418,7 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
     begin
         CurrLineWithPrice.GetLine(Header, Line);
         case CurrLineWithPrice.GetTableNo() of
-            Database::"Item Journal Line":
+            Enum::TableID::"Item Journal Line".AsInteger():
                 begin
                     ItemJournalLine := Line;
                     if ItemJournalLine."Entry Type" in
@@ -409,43 +430,43 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
                         CurrLineWithPrice.SetLine(PriceType::Purchase, ItemJournalLine);
                     end;
                 end;
-            Database::"Job Journal Line":
+            Enum::TableID::"Job Journal Line".AsInteger():
                 begin
                     JobJournalLine := Line;
                     PurchPriceCalcMgt.FindJobJnlLinePrice(JobJournalLine, CalledByFieldNo);
                     CurrLineWithPrice.SetLine(PriceType::Purchase, JobJournalLine);
                 end;
-            Database::"Job Planning Line":
+            Enum::TableID::"Job Planning Line".AsInteger():
                 begin
                     JobPlanningLine := Line;
                     PurchPriceCalcMgt.FindJobPlanningLinePrice(JobPlanningLine, CalledByFieldNo);
                     CurrLineWithPrice.SetLine(PriceType::Purchase, JobPlanningLine);
                 end;
-            Database::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 begin
                     PurchaseLine := Line;
                     PurchPriceCalcMgt.FindPurchLinePrice(Header, PurchaseLine, CalledByFieldNo);
                     CurrLineWithPrice.SetLine(PriceType::Purchase, PurchaseLine);
                 end;
-            Database::"Price List Line":
+            Enum::TableID::"Price List Line".AsInteger():
                 begin
                     PriceListLine := Line;
                     FindPriceListLine(PriceListLine);
                     CurrLineWithPrice.SetLine(PriceType::Purchase, PriceListLine);
                 end;
-            Database::"Res. Journal Line":
+            Enum::TableID::"Res. Journal Line".AsInteger():
                 begin
                     ResJournalLine := Line;
                     PurchPriceCalcMgt.FindResUnitCost(ResJournalLine);
                     CurrLineWithPrice.SetLine(PriceType::Purchase, ResJournalLine);
                 end;
-            Database::"Requisition Line":
+            Enum::TableID::"Requisition Line".AsInteger():
                 begin
                     RequisitionLine := Line;
                     PurchPriceCalcMgt.FindReqLinePrice(RequisitionLine, CalledByFieldNo);
                     CurrLineWithPrice.SetLine(PriceType::Purchase, RequisitionLine);
                 end;
-            Database::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 begin
                     SalesLine := Line;
                     if SalesLine.Type <> SalesLine.Type::Resource then
@@ -453,7 +474,7 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
                     PurchPriceCalcMgt.FindResUnitCost(SalesLine);
                     CurrLineWithPrice.SetLine(PriceType::Purchase, SalesLine);
                 end;
-            Database::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 begin
                     ServiceLine := Line;
                     if ServiceLine.Type <> ServiceLine.Type::Resource then
@@ -461,7 +482,7 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
                     PurchPriceCalcMgt.FindResUnitCost(ServiceLine);
                     CurrLineWithPrice.SetLine(PriceType::Purchase, ServiceLine);
                 end;
-            Database::"Standard Item Journal Line":
+            Enum::TableID::"Standard Item Journal Line".AsInteger():
                 begin
                     StandardItemJournalLine := Line;
                     if StandardItemJournalLine."Entry Type" in
@@ -510,13 +531,13 @@ codeunit 7003 "Price Calculation - V15" implements "Price Calculation"
 
         CurrLineWithPrice.GetLine(Header, Line);
         case CurrLineWithPrice.GetTableNo() of
-            Database::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 begin
                     PurchaseLine := Line;
                     PurchPriceCalcMgt.FindPurchLineLineDisc(Header, PurchaseLine);
                     CurrLineWithPrice.SetLine(PriceType::Purchase, PurchaseLine);
                 end;
-            Database::"Requisition Line":
+            Enum::TableID::"Requisition Line".AsInteger():
                 begin
                     RequisitionLine := Line;
                     PurchPriceCalcMgt.FindReqLineDisc(RequisitionLine);

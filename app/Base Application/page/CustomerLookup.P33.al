@@ -37,12 +37,12 @@ page 33 "Customer Lookup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the post code.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the street and number.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the city.';
@@ -59,7 +59,7 @@ page 33 "Customer Lookup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the phone number.';
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the assigned contact person.';
@@ -147,7 +147,7 @@ page 33 "Customer Lookup"
                     ToolTip = 'Specifies the maximum amount you allow the customer to exceed the payment balance before warnings are issued.';
                     Visible = false;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -177,7 +177,7 @@ page 33 "Customer Lookup"
                     ToolTip = 'Specifies if several orders delivered to the customer can appear on the same sales invoice.';
                     Visible = false;
                 }
-                field(Reserve; Reserve)
+                field(Reserve; Rec.Reserve)
                 {
                     ApplicationArea = Reservation;
                     ToolTip = 'Specifies whether items will never, automatically (Always), or optionally be reserved for this customer. Optional means that you must manually reserve items for this customer.';

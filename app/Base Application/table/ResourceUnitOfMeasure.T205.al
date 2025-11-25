@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.ProjectMgt.Resources.Ledger;
+
 table 205 "Resource Unit of Measure"
 {
     Caption = 'Resource Unit of Measure';

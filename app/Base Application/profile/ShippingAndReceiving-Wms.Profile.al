@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.RoleCenters;
+
 profile "SHIPPING AND RECEIVING - WMS"
 {
     Caption = 'Shipping and Receiving - Warehouse Management System';

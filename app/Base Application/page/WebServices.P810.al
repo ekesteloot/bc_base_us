@@ -1,3 +1,9 @@
+﻿namespace System.Integration;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Reflection;
+
 page 810 "Web Services"
 {
     AdditionalSearchTerms = 'odata,soap';
@@ -27,7 +33,7 @@ page 810 "Web Services"
                 {
                     ApplicationArea = Basic, Suite;
                     LookupPageID = Objects;
-                    TableRelation = AllObj."Object ID" WHERE("Object Type" = FIELD("Object Type"));
+                    TableRelation = AllObj."Object ID" where("Object Type" = field("Object Type"));
                     ToolTip = 'Specifies the ID of the object.';
                 }
                 field(ObjectName; WebServiceManagement.GetObjectCaption(Rec))
@@ -49,19 +55,19 @@ page 810 "Web Services"
                     Enabled = IsWebServiceWriteable;
                     ToolTip = 'Specifies that the service is available to all tenants.';
                 }
-                field(ExcludeFieldsOutsideRepeater; ExcludeFieldsOutsideRepeater)
+                field(ExcludeFieldsOutsideRepeater; Rec.ExcludeFieldsOutsideRepeater)
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                     ToolTip = 'Specifies whether fields outside the repeater on the page are included in the eTag calculation.';
                 }
-                field(ExcludeNonEditableFlowFields; ExcludeNonEditableFlowFields)
+                field(ExcludeNonEditableFlowFields; Rec.ExcludeNonEditableFlowFields)
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                     ToolTip = 'Specifies whether non-editable FlowFields on the page are included in the eTag calculation. Note that FlowFields can interfere with publishing changes.';
                 }
-                field(Published; Published)
+                field(Published; Rec.Published)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the web service is published. A published web service is available on the Business Central Server computer that you were connected to when you published. The web service is available across all Business Central Server instances running on the server computer.';
@@ -152,7 +158,7 @@ page 810 "Web Services"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "All Tenants" := IsWebServiceWriteable;
+        Rec."All Tenants" := IsWebServiceWriteable;
     end;
 
     trigger OnOpenPage()

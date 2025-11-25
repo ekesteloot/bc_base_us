@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Location;
+
 page 5702 "Stockkeeping Unit Comment List"
 {
     AutoSplitKey = true;
@@ -31,17 +33,17 @@ page 5702 "Stockkeeping Unit Comment List"
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the location code (for example, warehouse of distribution center) to which the SKU applies.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the date the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the comment itself.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies a code for the comment.';
@@ -57,7 +59,7 @@ page 5702 "Stockkeeping Unit Comment List"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
     end;
 }
 

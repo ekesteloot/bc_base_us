@@ -1,3 +1,8 @@
+﻿namespace System.Security.User;
+
+using System.Azure.Identity;
+using System.Security.AccessControl;
+
 Codeunit 9020 "User Access Update"
 {
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Azure AD Plan", 'OnUpdateUserAccessForSaaS', '', false, false)]

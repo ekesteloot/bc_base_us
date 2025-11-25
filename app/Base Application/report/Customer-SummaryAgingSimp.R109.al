@@ -1,7 +1,12 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
 report 109 "Customer - Summary Aging Simp."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/CustomerSummaryAgingSimp.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerSummaryAgingSimp.rdlc';
     AdditionalSearchTerms = 'customer balance simplify,payment due simplify';
     ApplicationArea = Suite;
     Caption = 'Customer - Summary Aging Simp.';

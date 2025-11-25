@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.MachineCenter;
+
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 99000770 "Machine Center Calendar"
 {
     Caption = 'Machine Center Calendar';
@@ -24,7 +29,7 @@ page 99000770 "Machine Center Calendar"
 
                     trigger OnValidate()
                     begin
-                        GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+                        GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
                     end;
                 }
                 field(MATRIX_CaptionRange; MATRIX_CaptionRange)
@@ -68,7 +73,7 @@ page 99000770 "Machine Center Calendar"
 
                 trigger OnAction()
                 begin
-                    GenerateColumnCaptions("Matrix Page Step Type"::Previous);
+                    GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Previous);
                 end;
             }
             action("Next Set")
@@ -80,7 +85,7 @@ page 99000770 "Machine Center Calendar"
 
                 trigger OnAction()
                 begin
-                    GenerateColumnCaptions("Matrix Page Step Type"::Next);
+                    GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Next);
                 end;
             }
         }
@@ -105,7 +110,7 @@ page 99000770 "Machine Center Calendar"
 
     trigger OnOpenPage()
     begin
-        GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+        GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         MATRIX_UseNameForCaption := false;
         MATRIX_CurrentSetLenght := ArrayLen(MATRIX_CaptionSet);
     end;

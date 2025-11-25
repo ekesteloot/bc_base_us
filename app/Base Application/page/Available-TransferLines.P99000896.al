@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+
 page 99000896 "Available - Transfer Lines"
 {
     Caption = 'Available - Transfer Lines';
@@ -8,7 +14,7 @@ page 99000896 "Available - Transfer Lines"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Transfer Line";
-    SourceTableView = SORTING("Document No.", "Line No.");
+    SourceTableView = sorting("Document No.", "Line No.");
 
     layout
     {

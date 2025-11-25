@@ -1,8 +1,16 @@
 #if not CLEAN21
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.ProjectMgt.Resources.Pricing;
+using System.Utilities;
+
 report 1115 "Resource - Price List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Resources/ResourcePriceList.rdlc';
+    RDLCLayout = './ProjectMgt/Resources/Reports/ResourcePriceList.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Resource - Price List';
     UsageCategory = ReportsAndAnalysis;
@@ -111,7 +119,7 @@ report 1115 "Resource - Price List"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(UnitPrice_ResPrice; ResPrice."Unit Price")
                 {
                     AutoFormatType = 2;
@@ -224,7 +232,7 @@ report 1115 "Resource - Price List"
                         ApplicationArea = Jobs;
                         Caption = 'Currency Code';
                         TableRelation = Currency;
-                        ToolTip = 'Specifies the currency that prices are shown in.';
+                        ToolTip = 'Specifies the code for the currency that amounts are shown in.';
                     }
                 }
             }

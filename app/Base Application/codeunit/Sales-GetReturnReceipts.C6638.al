@@ -6,7 +6,7 @@
     var
         IsHandled: Boolean;
     begin
-        SalesHeader.Get("Document Type", "Document No.");
+        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
         SalesHeader.TestField("Document Type", SalesHeader."Document Type"::"Credit Memo");
         SalesHeader.TestField(Status, SalesHeader.Status::Open);
 
@@ -193,8 +193,27 @@
         end;
     end;
 
+    procedure GetSalesRetOrderCrMemos(var TempSalesCrMemoHeader: Record "Sales Cr.Memo Header" temporary; ReturnOrderNo: Code[20])
+    var
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesCrMemosByRetOrder: Query "Sales Cr. Memos By Ret. Order";
+    begin
+        TempSalesCrMemoHeader.Reset();
+        TempSalesCrMemoHeader.DeleteAll();
+
+        SalesCrMemosByRetOrder.SetRange(Order_No_, ReturnOrderNo);
+        SalesCrMemosByRetOrder.SetFilter(Quantity, '<>0');
+        SalesCrMemosByRetOrder.Open();
+
+        while SalesCrMemosByRetOrder.Read() do begin
+            SalesCrMemoHeader.Get(SalesCrMemosByRetOrder.Document_No_);
+            TempSalesCrMemoHeader := SalesCrMemoHeader;
+            TempSalesCrMemoHeader.Insert();
+        end;
+    end;
+
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateInvLines(var SalesHeader: Record "Sales Header")
+    local procedure OnAfterCreateInvLines(SalesHeader: Record "Sales Header")
     begin
     end;
 

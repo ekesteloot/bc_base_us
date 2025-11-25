@@ -1,3 +1,5 @@
+namespace System.IO;
+
 enum 1222 "Data Exchange Definition Type"
 {
     Extensible = true;

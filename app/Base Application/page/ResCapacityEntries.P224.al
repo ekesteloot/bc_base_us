@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
 page 224 "Res. Capacity Entries"
 {
     ApplicationArea = Jobs;
@@ -15,7 +17,7 @@ page 224 "Res. Capacity Entries"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the date for which the capacity entry is valid.';
@@ -30,7 +32,7 @@ page 224 "Res. Capacity Entries"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the number of the corresponding resource group assigned to the resource.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the capacity that is calculated and recorded. The capacity is in the unit of measure.';

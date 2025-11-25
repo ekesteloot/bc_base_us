@@ -1,3 +1,8 @@
+namespace Microsoft.AssemblyMgt.Posting;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 codeunit 901 "Assembly-Post (Yes/No)"
 {
     TableNo = "Assembly Header";

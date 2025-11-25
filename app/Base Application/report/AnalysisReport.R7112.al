@@ -1,20 +1,27 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 report 7112 "Analysis Report"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './OtherCapabilities/Analysis/AnalysisReport.rdlc';
+    RDLCLayout = './InventoryMgt/Analysis/AnalysisReport.rdlc';
     Caption = 'Analysis Report';
 
     dataset
     {
         dataitem(AnalysisLineTemplate; "Analysis Line Template")
         {
-            DataItemTableView = SORTING("Analysis Area", Name);
+            DataItemTableView = sorting("Analysis Area", Name);
             column(TempName_AnlysLine; Name)
             {
             }
             dataitem(Heading; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(TemplNameAnalysisColumn; AnalysisColumnTemplName)
                 {
                 }
@@ -80,9 +87,9 @@ report 7112 "Analysis Report"
                 }
                 dataitem(AnalysisLineSpec; "Analysis Line")
                 {
-                    DataItemLink = "Analysis Area" = FIELD("Analysis Area"), "Analysis Line Template Name" = FIELD(Name);
+                    DataItemLink = "Analysis Area" = field("Analysis Area"), "Analysis Line Template Name" = field(Name);
                     DataItemLinkReference = AnalysisLineTemplate;
-                    DataItemTableView = SORTING("Analysis Area", "Analysis Line Template Name", "Line No.");
+                    DataItemTableView = sorting("Analysis Area", "Analysis Line Template Name", "Line No.");
                     column(FormatUnderline; Format(Underline))
                     {
                     }
@@ -172,7 +179,7 @@ report 7112 "Analysis Report"
                 }
                 dataitem(PageBreak; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -187,9 +194,9 @@ report 7112 "Analysis Report"
                 }
                 dataitem("Analysis Line"; "Analysis Line")
                 {
-                    DataItemLink = "Analysis Area" = FIELD("Analysis Area"), "Analysis Line Template Name" = FIELD(Name);
+                    DataItemLink = "Analysis Area" = field("Analysis Area"), "Analysis Line Template Name" = field(Name);
                     DataItemLinkReference = AnalysisLineTemplate;
-                    DataItemTableView = SORTING("Analysis Area", "Analysis Line Template Name", "Line No.");
+                    DataItemTableView = sorting("Analysis Area", "Analysis Line Template Name", "Line No.");
                     column(Header1; Header[1])
                     {
                     }
@@ -686,11 +693,8 @@ report 7112 "Analysis Report"
         ShowAnalysisReportSetup: Boolean;
         HeaderText: Text[100];
         NoOfRecords: Integer;
-        [InDataSet]
         Dim1FilterEnable: Boolean;
-        [InDataSet]
         Dim2FilterEnable: Boolean;
-        [InDataSet]
         Dim3FilterEnable: Boolean;
 
         Text000: Label '(Thousands)';
@@ -779,7 +783,7 @@ report 7112 "Analysis Report"
         Dim1FilterHidden := NewDim1Filter;
         Dim2FilterHidden := NewDim2Filter;
         Dim3FilterHidden := NewDim3Filter;
-        SourceTypeFilterHidden := "Analysis Source Type".FromInteger(NewSourceTypeFilter);
+        SourceTypeFilterHidden := Enum::"Analysis Source Type".FromInteger(NewSourceTypeFilter);
         SourceNoFilterHidden := NewSourceNoFilter;
     end;
 

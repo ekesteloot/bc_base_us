@@ -21,7 +21,7 @@ page 972 "Time Sheet Chart"
 
                 trigger DataPointClicked(point: DotNet BusinessChartDataPoint)
                 begin
-                    SetDrillDownIndexes(point);
+                    Rec.SetDrillDownIndexes(point);
                     TimeSheetChartMgt.DrillDown(Rec);
                 end;
 
@@ -153,7 +153,7 @@ page 972 "Time Sheet Chart"
         if not IsChartAddInReady then
             exit;
         TimeSheetChartMgt.UpdateData(Rec);
-        Update(CurrPage.BusinessChart);
+        Rec.Update(CurrPage.BusinessChart);
         UpdateStatus();
 
         NeedsUpdate := false;

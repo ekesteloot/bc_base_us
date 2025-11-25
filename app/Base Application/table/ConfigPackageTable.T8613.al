@@ -1,3 +1,11 @@
+namespace System.IO;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using System.Environment;
+using System.Reflection;
+using System.Security.AccessControl;
+
 table 8613 "Config. Package Table"
 {
     Caption = 'Config. Package Table';
@@ -14,7 +22,7 @@ table 8613 "Config. Package Table"
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Table));
 
             trigger OnLookup()
             begin
@@ -34,24 +42,24 @@ table 8613 "Config. Package Table"
         }
         field(3; "Table Name"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Name" WHERE("Object Type" = CONST(Table),
-                                                                        "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Name" where("Object Type" = const(Table),
+                                                                        "Object ID" = field("Table ID")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "No. of Package Records"; Integer)
         {
-            CalcFormula = Count("Config. Package Record" WHERE("Package Code" = FIELD("Package Code"),
-                                                                "Table ID" = FIELD("Table ID")));
+            CalcFormula = count("Config. Package Record" where("Package Code" = field("Package Code"),
+                                                                "Table ID" = field("Table ID")));
             Caption = 'No. of Package Records';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; "No. of Package Errors"; Integer)
         {
-            CalcFormula = Count("Config. Package Error" WHERE("Package Code" = FIELD("Package Code"),
-                                                               "Table ID" = FIELD("Table ID")));
+            CalcFormula = count("Config. Package Error" where("Package Code" = field("Package Code"),
+                                                               "Table ID" = field("Table ID")));
             Caption = 'No. of Package Errors';
             Editable = false;
             FieldClass = FlowField;
@@ -82,8 +90,8 @@ table 8613 "Config. Package Table"
         }
         field(12; "Table Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -101,7 +109,7 @@ table 8613 "Config. Package Table"
         field(15; "Page ID"; Integer)
         {
             Caption = 'Page ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Page));
 
             trigger OnLookup()
             begin
@@ -115,33 +123,33 @@ table 8613 "Config. Package Table"
         }
         field(17; "No. of Fields Included"; Integer)
         {
-            CalcFormula = Count("Config. Package Field" WHERE("Package Code" = FIELD("Package Code"),
-                                                               "Table ID" = FIELD("Table ID"),
-                                                               "Include Field" = CONST(true)));
+            CalcFormula = count("Config. Package Field" where("Package Code" = field("Package Code"),
+                                                               "Table ID" = field("Table ID"),
+                                                               "Include Field" = const(true)));
             Caption = 'No. of Fields Included';
             Editable = false;
             FieldClass = FlowField;
         }
         field(18; "No. of Fields Available"; Integer)
         {
-            CalcFormula = Count("Config. Package Field" WHERE("Package Code" = FIELD("Package Code"),
-                                                               "Table ID" = FIELD("Table ID")));
+            CalcFormula = count("Config. Package Field" where("Package Code" = field("Package Code"),
+                                                               "Table ID" = field("Table ID")));
             Caption = 'No. of Fields Available';
             Editable = false;
             FieldClass = FlowField;
         }
         field(19; "No. of Fields to Validate"; Integer)
         {
-            CalcFormula = Count("Config. Package Field" WHERE("Package Code" = FIELD("Package Code"),
-                                                               "Table ID" = FIELD("Table ID"),
-                                                               "Validate Field" = CONST(true)));
+            CalcFormula = count("Config. Package Field" where("Package Code" = field("Package Code"),
+                                                               "Table ID" = field("Table ID"),
+                                                               "Validate Field" = const(true)));
             Caption = 'No. of Fields to Validate';
             Editable = false;
             FieldClass = FlowField;
         }
         field(20; "Package Caption"; Text[50])
         {
-            CalcFormula = Lookup("Config. Package"."Package Name" WHERE(Code = FIELD("Package Code")));
+            CalcFormula = Lookup("Config. Package"."Package Name" where(Code = field("Package Code")));
             Caption = 'Package Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -152,8 +160,6 @@ table 8613 "Config. Package Table"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(22; "Created by User ID"; Code[50])
         {
@@ -161,8 +167,6 @@ table 8613 "Config. Package Table"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(24; "Dimensions as Columns"; Boolean)
         {
@@ -179,8 +183,8 @@ table 8613 "Config. Package Table"
         }
         field(25; Filtered; Boolean)
         {
-            CalcFormula = Exist("Config. Package Filter" WHERE("Package Code" = FIELD("Package Code"),
-                                                                "Table ID" = FIELD("Table ID")));
+            CalcFormula = exist("Config. Package Filter" where("Package Code" = field("Package Code"),
+                                                                "Table ID" = field("Table ID")));
             Caption = 'Filtered';
             Editable = false;
             FieldClass = FlowField;
@@ -196,12 +200,12 @@ table 8613 "Config. Package Table"
         field(28; "Processing Report ID"; Integer)
         {
             Caption = 'Processing Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(29; "Parent Table ID"; Integer)
         {
             Caption = 'Parent Table ID';
-            TableRelation = "Config. Package Table"."Table ID" WHERE("Package Code" = FIELD("Package Code"));
+            TableRelation = "Config. Package Table"."Table ID" where("Package Code" = field("Package Code"));
 
             trigger OnValidate()
             var
@@ -365,7 +369,7 @@ table 8613 "Config. Package Table"
             ConfigPackageField.SetRange("Package Code", "Package Code");
             ConfigPackageField.SetRange("Table ID", "Table ID");
             ConfigPackageField.SetRange("Primary Key", false);
-            if "Table ID" <> DATABASE::"Config. Line" then
+            if "Table ID" <> Enum::TableID::"Config. Line" then
                 SetProcessingOrderFields(ConfigPackageField, ProcessingOrder)
             else begin
                 ConfigPackageField.SetRange("Field ID", ConfigLine.FieldNo("Line Type"), ConfigLine.FieldNo("Table ID"));
@@ -424,14 +428,14 @@ table 8613 "Config. Package Table"
 
         if ConfigMgt.IsDefaultDimTable("Table ID") then begin
             Confirmed :=
-              (ConfigPackageTable.Get("Package Code", DATABASE::"Dimension Value") and
-               ConfigPackageTable.Get("Package Code", DATABASE::"Default Dimension")) or
+              (ConfigPackageTable.Get("Package Code", Enum::TableID::"Dimension Value".AsInteger()) and
+               ConfigPackageTable.Get("Package Code", Enum::TableID::"Default Dimension".AsInteger())) or
               (HideValidationDialog or not GuiAllowed);
             if not Confirmed then
                 Confirmed := Confirm(Text003, true, "Package Code");
             if Confirmed then begin
-                ConfigPackageMgt.InsertPackageTable(ConfigPackageTable, "Package Code", DATABASE::"Dimension Value");
-                ConfigPackageMgt.InsertPackageTable(ConfigPackageTable, "Package Code", DATABASE::"Default Dimension");
+                ConfigPackageMgt.InsertPackageTable(ConfigPackageTable, "Package Code", Enum::TableID::"Dimension Value".AsInteger());
+                ConfigPackageMgt.InsertPackageTable(ConfigPackageTable, "Package Code", Enum::TableID::"Default Dimension".AsInteger());
             end else
                 Error(Text005);
         end;

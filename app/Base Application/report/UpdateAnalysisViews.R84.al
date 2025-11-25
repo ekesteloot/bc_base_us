@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 report 84 "Update Analysis Views"
 {
     ApplicationArea = Dimensions;
@@ -9,7 +11,7 @@ report 84 "Update Analysis Views"
     {
         dataitem("Analysis View"; "Analysis View")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code";
 
             trigger OnAfterGetRecord()

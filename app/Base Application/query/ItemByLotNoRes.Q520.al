@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.InventoryMgt.Tracking;
+
 query 520 "Item By Lot No. Res."
 {
     QueryType = Normal;

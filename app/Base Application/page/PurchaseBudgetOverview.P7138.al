@@ -1,3 +1,16 @@
+﻿namespace Microsoft.Purchases.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Text;
+using System.Utilities;
+
 page 7138 "Purchase Budget Overview"
 {
     Caption = 'Purchase Budget Overview';
@@ -652,11 +665,8 @@ page 7138 "Purchase Budget Overview"
         Text005: Label '1,6,,Budget Dimension 3 Filter';
         Text100: Label 'Period';
         NewBudgetName: Code[10];
-        [InDataSet]
         BudgetDim1FilterEnable: Boolean;
-        [InDataSet]
         BudgetDim2FilterEnable: Boolean;
-        [InDataSet]
         BudgetDim3FilterEnable: Boolean;
 
     protected var

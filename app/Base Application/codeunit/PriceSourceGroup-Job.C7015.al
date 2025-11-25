@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Source;
+
+using Microsoft.ProjectMgt.Jobs.Pricing;
+
 codeunit 7015 "Price Source Group - Job" implements "Price Source Group"
 {
     var

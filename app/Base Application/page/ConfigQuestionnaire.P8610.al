@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8610 "Config. Questionnaire"
 {
     AdditionalSearchTerms = 'rapid start implementation migrate setup questionnaire';
@@ -14,7 +16,7 @@ page 8610 "Config. Questionnaire"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the configuration questionnaire that you are creating.';
@@ -59,7 +61,7 @@ page 8610 "Config. Questionnaire"
 
                     trigger OnAction()
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
                         if QuestionnaireMgt.ExportQuestionnaireToExcel('', Rec) then
                             Message(Text000);
                     end;
@@ -141,7 +143,7 @@ page 8610 "Config. Questionnaire"
                     Caption = '&Question Areas';
                     Image = View;
                     RunObject = Page "Config. Question Areas";
-                    RunPageLink = "Questionnaire Code" = FIELD(Code);
+                    RunPageLink = "Questionnaire Code" = field(Code);
                     ToolTip = 'View the areas that questions are grouped by.';
                 }
             }

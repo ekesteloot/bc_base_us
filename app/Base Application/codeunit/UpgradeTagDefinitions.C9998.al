@@ -58,6 +58,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetNewItemTemplatesUpgradeTag());
         PerCompanyUpgradeTags.Add(PurchRcptLineOverReceiptCodeUpgradeTag());
         PerCompanyUpgradeTags.Add(GetIntegrationTableMappingUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetAddExtraIntegrationFieldMappingsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetIntegrationTableMappingFilterForOpportunitiesUpgradeTag());
         PerCompanyUpgradeTags.Add(GetIntegrationFieldMappingForOpportunitiesUpgradeTag());
         PerCompanyUpgradeTags.Add(GetIntegrationFieldMappingForContactsUpgradeTag());
@@ -116,6 +117,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetItemCrossReferenceInPEPPOLUpgradeTag());
         PerCompanyUpgradeTags.Add(GetItemChargeHandleQtyUpgradeTag());
         PerCompanyUpgradeTags.Add(GetItemCrossReferenceUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetPowerBIUploadsStatusUpgradeTag());
         PerCompanyUpgradeTags.Add(GetUseCustomLookupUpgradeTag());
         PerCompanyUpgradeTags.Add(SanitizeCloudMigratedDataUpgradeTag());
         PerCompanyUpgradeTags.Add(GetAccountSchedulesToFinancialReportsUpgradeTag());
@@ -134,11 +136,16 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetICPartnerGLAccountNoUpgradeTag());
         PerCompanyUpgradeTags.Add(GetCheckWhseClassOnLocationUpgradeTag());
         PerCompanyUpgradeTags.Add(GetDeferralSourceCodeUpdateTag());
+        PerCompanyUpgradeTags.Add(GetServiceLineOrderNoUpgradeTag());
         PerCompanyUpgradeTags.Add(GetMapCurrencySymbolUpgradeTag());
         PerCompanyUpgradeTags.Add(GetOptionMappingUpgradeTag());
         PerCompanyUpgradeTags.Add(GetProductionSourceCodeUpdateTag());
         PerCompanyUpgradeTags.Add(GetPurchaseCreditMemoUpgradeTag());
         PerCompanyUpgradeTags.Add(GetWorkflowDelegatedAdminSetupTemplateUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetPurchasesPayablesAndSalesReceivablesSetupsUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetLocationBinPolicySetupsUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetAllowInventoryAdjmtUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetLocationGranularWarehouseHandlingSetupsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetVATSetupUpgradeTag());
     end;
 
@@ -157,13 +164,12 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerDatabaseUpgradeTags.Add(GetHideBlankProfileUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetSharePointConnectionUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetCreateDefaultAADApplicationTag());
+#if not CLEAN23
         PerDatabaseUpgradeTags.Add(GetDefaultAADApplicationDescriptionTag());
+#endif
         PerDatabaseUpgradeTags.Add(GetMonitorSensitiveFieldPermissionUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetUpdateInitialPrivacyNoticesTag());
         PerDatabaseUpgradeTags.Add(GetDataOutOfGeoAppUpgradeTag());
-#if not CLEAN20
-        PerDatabaseUpgradeTags.Add(GetUserSettingsUpgradeTag());
-#endif
         PerDatabaseUpgradeTags.Add(GetUpgradePowerBIOptinImageUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetUserGroupsSetAppIdUpgradeTag());
         PerDatabaseUpgradeTags.Add(GetAutomateActionPermissionSetUpgradeTag());
@@ -536,6 +542,11 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-368854-IntegrationTableMapping-20200818');
     end;
 
+    internal procedure GetAddExtraIntegrationFieldMappingsUpgradeTag(): Code[250];
+    begin
+        exit('MS-481366-AddExtraIntegrationFieldMappings-20230818');
+    end;
+
     internal procedure GetDataverseAuthenticationUpgradeTag(): Code[250];
     begin
         exit('MS-423171-DataverseAuthentication-20220127');
@@ -642,12 +653,13 @@ codeunit 9998 "Upgrade Tag Definitions"
     begin
         exit('MS-385184-PurchaseOrderEntityBuffer-20210104');
     end;
-
+#if not CLEAN23
     [Obsolete('Function will be removed or moved to internal', '20.0')]
     procedure GetDefaultAADApplicationDescriptionTag(): Code[250]
     begin
         exit('MS-379473-DefaultAADApplicationDescriptionTag-20201217');
     end;
+#endif    
 
     procedure GetUpdateInitialPrivacyNoticesTag(): Code[250]
     begin
@@ -695,20 +707,6 @@ codeunit 9998 "Upgrade Tag Definitions"
     begin
         exit('MS-330739-PowerBIOptinImage-20210129');
     end;
-
-#if not CLEAN20
-    [Obsolete('Function will be removed or moved to internal', '19.0')]
-    procedure GetUserCalloutsUpgradeTag(): Code[250]
-    begin
-        exit('MS-77747-UserCallouts-20210209');
-    end;
-
-    [Obsolete('Function will be removed or moved to internal', '19.0')]
-    procedure GetUserSettingsUpgradeTag(): Code[250]
-    begin
-        exit('MS-390343-UserSettings-20210707');
-    end;
-#endif
 
     [Obsolete('Function will be removed or moved to internal', '20.0')]
     procedure GetUpgradeMonitorNotificationUpgradeTag(): Code[250]
@@ -967,6 +965,11 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-460562-AutomateActionAccessControl-20230116');
     end;
 
+    internal procedure GetPowerBIUploadsStatusUpgradeTag(): Code[250];
+    begin
+        exit('MS-430659-PowerBIUploadsStatus-20230703');
+    end;
+
     internal procedure GetAccountSchedulesToFinancialReportsUpgradeTag(): Code[250]
     begin
         exit('MS-441563-GetAccountSchedulesToFinancialReportsUpgradeTag-20220705');
@@ -1067,6 +1070,11 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-422924-GetDeferralSourceCodeUpdateTag-20230124');
     end;
 
+    internal procedure GetServiceLineOrderNoUpgradeTag(): Code[250]
+    begin
+        exit('97-GetServiceLineOrderNoUpgradeTag-20230403');
+    end;
+
     internal procedure GetMapCurrencySymbolUpgradeTag(): Code[250]
     begin
         exit('MS-461764-GetMapCurrencySymbolUpgradeTag-20230130');
@@ -1092,14 +1100,29 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-325010-PurchasesPayablesAndSalesReceivablesSetupsUpgrade-20230414');
     end;
 
+    internal procedure GetReceivedFromCountryCodeUpgradeTag(): Code[250]
+    begin
+        exit('MS-474260-ReceivedFromCountryCode-20230531');
+    end;
+
     internal procedure GetWorkflowDelegatedAdminSetupTemplateUpgradeTag(): Code[250]
     begin
         exit('MS-473204-GetWorkflowDelegatedAdminSetupTemplateUpgradeTag-20230531');
     end;
 
-    internal procedure GetReceivedFromCountryCodeUpgradeTag(): Code[250]
+    internal procedure GetLocationBinPolicySetupsUpgradeTag(): Code[250]
     begin
-        exit('MS-474260-ReceivedFromCountryCode-20230531');
+        exit('MS-464698-LocationBinPolicySetupsUpgrade-20230602');
+    end;
+
+    internal procedure GetAllowInventoryAdjmtUpgradeTag(): Code[250]
+    begin
+        exit('MS-474798-AllowInventoryAdjmtUpgradeTag-20230518');
+    end;
+
+    internal procedure GetLocationGranularWarehouseHandlingSetupsUpgradeTag(): Code[250]
+    begin
+        exit('MS-321913-LocationGranularWarehouseHandlingSetupsUpgrade-20230710');
     end;
 
     internal procedure GetVATSetupUpgradeTag(): Code[250]
@@ -1114,4 +1137,3 @@ codeunit 9998 "Upgrade Tag Definitions"
     end;
 #endif
 }
-

@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using System.Reflection;
+
 page 271 "Res. Journal Template List"
 {
     Caption = 'Res. Journal Template List';

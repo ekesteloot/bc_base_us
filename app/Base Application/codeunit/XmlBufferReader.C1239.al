@@ -1,3 +1,9 @@
+namespace System.IO;
+
+using System;
+using System.Utilities;
+using System.Xml;
+
 codeunit 1239 "XML Buffer Reader"
 {
 

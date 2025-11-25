@@ -16,7 +16,7 @@ report 10023 "Trial Balance, per Global Dim."
     {
         dataitem("Dimension Value"; "Dimension Value")
         {
-            DataItemTableView = SORTING("Dimension Code", Code);
+            DataItemTableView = sorting("Dimension Code", Code);
             PrintOnlyIfDetail = true;
             column(DimCode_DimValue; "Dimension Code")
             {
@@ -26,7 +26,7 @@ report 10023 "Trial Balance, per Global Dim."
             }
             dataitem("G/L Account"; "G/L Account")
             {
-                DataItemTableView = SORTING("No.");
+                DataItemTableView = sorting("No.");
                 PrintOnlyIfDetail = true;
                 RequestFilterFields = "No.", "Account Type", "Date Filter", "Global Dimension 1 Filter", "Global Dimension 2 Filter", "Budget Filter";
                 column(DimensionValueName; "Dimension Value".Name + ' ' + Text014)
@@ -124,7 +124,7 @@ report 10023 "Trial Balance, per Global Dim."
                 }
                 dataitem(BlankLineCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
 
                     trigger OnPreDataItem()
                     begin
@@ -133,7 +133,7 @@ report 10023 "Trial Balance, per Global Dim."
                 }
                 dataitem("Integer"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(DescriptionLine1; DescriptionLine1)
                     {
                     }

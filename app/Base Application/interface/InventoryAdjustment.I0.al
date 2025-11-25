@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.InventoryMgt.Item;
+
 interface "Inventory Adjustment"
 {
     /// <summary>

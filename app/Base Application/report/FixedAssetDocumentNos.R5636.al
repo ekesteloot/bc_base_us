@@ -1,14 +1,22 @@
+namespace Microsoft.FixedAssets.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.Foundation.NoSeries;
+using System.Utilities;
+
 report 5636 "Fixed Asset Document Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/FixedAssetDocumentNos.rdlc';
+    RDLCLayout = './FixedAssets/Reports/FixedAssetDocumentNos.rdlc';
     Caption = 'Fixed Asset Document Nos.';
 
     dataset
     {
         dataitem("FA Ledger Entry"; "FA Ledger Entry")
         {
-            DataItemTableView = SORTING("Document Type", "Document No.");
+            DataItemTableView = sorting("Document Type", "Document No.");
             RequestFilterFields = "Document Type", "Document No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -63,7 +71,7 @@ report 5636 "Fixed Asset Document Nos."
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorText_Number_; ErrorText[Number])
                 {
                 }
@@ -86,8 +94,8 @@ report 5636 "Fixed Asset Document Nos."
             }
             dataitem(FALedgEntry; "FA Ledger Entry")
             {
-                DataItemLink = "Entry No." = FIELD("Entry No.");
-                DataItemTableView = SORTING("Entry No.");
+                DataItemLink = "Entry No." = field("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(FALedgEntry__User_ID_; "User ID")
                 {
                 }

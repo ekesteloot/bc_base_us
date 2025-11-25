@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Posting;
+
 codeunit 1327 "Adjust Item Inventory"
 {
 
@@ -42,7 +47,7 @@ codeunit 1327 "Adjust Item Inventory"
             Item.Get(TempItemJournalLine."Item No.");
             Item.SetFilter("Location Filter", '%1', TempItemJournalLine."Location Code");
             OnPostMultipleAdjustmentsToItemLedgerOnAfterItemSetFilters(TempItemJournalLine, Item);
-            Item.CalcFields(Inventory);
+            Item.Inventory := TempItemJournalLine."Qty. (Calculated)";
             if Item.Inventory <> TempItemJournalLine.Quantity then begin
                 CreateItemJnlLine(ItemJnlLine, Item, ItemTemplate, ItemBatch, TempItemJournalLine.Quantity);
                 ItemJnlLine.Validate("Line No.", TempItemJournalLine."Line No.");

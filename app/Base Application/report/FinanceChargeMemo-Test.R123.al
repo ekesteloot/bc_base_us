@@ -1,14 +1,26 @@
+﻿namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Sales.Customer;
+using System.Security.User;
+using System.Utilities;
+
 report 123 "Finance Charge Memo - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/FinanceCharge/FinanceChargeMemoTest.rdlc';
+    RDLCLayout = './Sales/FinanceCharge/FinanceChargeMemoTest.rdlc';
     Caption = 'Finance Charge Memo - Test';
 
     dataset
     {
         dataitem("Finance Charge Memo Header"; "Finance Charge Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Finance Charge Memo';
             column(ContactPhoneNoLbl; ContactPhoneNoLbl)
@@ -31,7 +43,7 @@ report 123 "Finance Charge Memo - Test"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(TODAY; Today)
                 {
                 }
@@ -142,7 +154,7 @@ report 123 "Finance Charge Memo - Test"
                 }
                 dataitem(DimensionLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -187,7 +199,7 @@ report 123 "Finance Charge Memo - Test"
                 }
                 dataitem(HeaderErrorCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -207,9 +219,9 @@ report 123 "Finance Charge Memo - Test"
                 }
                 dataitem(BeginningText; "Finance Charge Memo Line")
                 {
-                    DataItemLink = "Finance Charge Memo No." = FIELD("No.");
+                    DataItemLink = "Finance Charge Memo No." = field("No.");
                     DataItemLinkReference = "Finance Charge Memo Header";
-                    DataItemTableView = SORTING("Finance Charge Memo No.", "Line No.");
+                    DataItemTableView = sorting("Finance Charge Memo No.", "Line No.");
                     column(BeginningText_Description; Description)
                     {
                     }
@@ -232,9 +244,9 @@ report 123 "Finance Charge Memo - Test"
                 }
                 dataitem("Finance Charge Memo Line"; "Finance Charge Memo Line")
                 {
-                    DataItemLink = "Finance Charge Memo No." = FIELD("No.");
+                    DataItemLink = "Finance Charge Memo No." = field("No.");
                     DataItemLinkReference = "Finance Charge Memo Header";
-                    DataItemTableView = SORTING("Finance Charge Memo No.", "Line No.");
+                    DataItemTableView = sorting("Finance Charge Memo No.", "Line No.");
                     column(ShowFinChMemoLine1; ("Line No." > StartLineNo) and (Type = Type::"Customer Ledger Entry"))
                     {
                     }
@@ -337,7 +349,7 @@ report 123 "Finance Charge Memo - Test"
                     }
                     dataitem(LineErrorCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number__Control97; ErrorText[Number])
                         {
                         }
@@ -402,9 +414,9 @@ report 123 "Finance Charge Memo - Test"
                 }
                 dataitem(ReminderLine2; "Finance Charge Memo Line")
                 {
-                    DataItemLink = "Finance Charge Memo No." = FIELD("No.");
+                    DataItemLink = "Finance Charge Memo No." = field("No.");
                     DataItemLinkReference = "Finance Charge Memo Header";
-                    DataItemTableView = SORTING("Finance Charge Memo No.", "Line No.");
+                    DataItemTableView = sorting("Finance Charge Memo No.", "Line No.");
                     column(ReminderLine2_Description; Description)
                     {
                     }
@@ -419,7 +431,7 @@ report 123 "Finance Charge Memo - Test"
                 }
                 dataitem(VATCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(VATAmountLine__VAT_Amount_; TempVATAmountLine."VAT Amount")
                     {
                         AutoFormatExpression = "Finance Charge Memo Line".GetCurrencyCode();
@@ -501,7 +513,7 @@ report 123 "Finance Charge Memo - Test"
                 }
                 dataitem(VATCounterLCY; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(VALExchRate; VALExchRate)
                     {
                     }

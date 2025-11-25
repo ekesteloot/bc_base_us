@@ -1,3 +1,13 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 1523 "Workflow Step Argument"
 {
     Caption = 'Workflow Step Argument';
@@ -17,7 +27,7 @@ table 1523 "Workflow Step Argument"
             Caption = 'Type';
             OptionCaption = 'Event,Response';
             OptionMembers = "Event",Response;
-            TableRelation = "Workflow Step".Type WHERE(Argument = FIELD(ID));
+            TableRelation = "Workflow Step".Type where(Argument = field(ID));
         }
         field(3; "General Journal Template Name"; Code[10])
         {
@@ -27,7 +37,7 @@ table 1523 "Workflow Step Argument"
         field(4; "General Journal Batch Name"; Code[10])
         {
             Caption = 'General Journal Batch Name';
-            TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("General Journal Template Name"));
+            TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = field("General Journal Template Name"));
         }
         field(5; "Notification User ID"; Code[50])
         {
@@ -37,7 +47,7 @@ table 1523 "Workflow Step Argument"
         }
         field(6; "Notification User License Type"; Option)
         {
-            CalcFormula = Lookup(User."License Type" WHERE("User Name" = FIELD("Notification User ID")));
+            CalcFormula = Lookup(User."License Type" where("User Name" = field("Notification User ID")));
             Caption = 'Notification User License Type';
             FieldClass = FlowField;
             OptionCaption = 'Full User,Limited User,Device Only User,Windows Group,External User';
@@ -61,7 +71,7 @@ table 1523 "Workflow Step Argument"
         field(9; "Link Target Page"; Integer)
         {
             Caption = 'Link Target Page';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Page));
         }
         field(10; "Custom Link"; Text[250])
         {
@@ -127,8 +137,8 @@ table 1523 "Workflow Step Argument"
         }
         field(21; "Field Caption"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No."),
-                                                              "No." = FIELD("Field No.")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table No."),
+                                                              "No." = field("Field No.")));
             Caption = 'Field Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -173,7 +183,7 @@ table 1523 "Workflow Step Argument"
         }
         field(100; "Response Option Group"; Code[20])
         {
-            CalcFormula = Lookup("Workflow Response"."Response Option Group" WHERE("Function Name" = FIELD("Response Function Name")));
+            CalcFormula = Lookup("Workflow Response"."Response Option Group" where("Function Name" = field("Response Function Name")));
             Caption = 'Response Option Group';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Posting;
+
 page 5608 "FA Posting Type Setup"
 {
     Caption = 'FA Posting Type Setup';
@@ -60,7 +62,7 @@ page 5608 "FA Posting Type Setup"
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies that entries posted with the FA Posting Type field will be regarded as part of the total depreciation for the fixed asset.';
                 }
-                field(Sign; Sign)
+                field(Sign; Rec.Sign)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies whether the type in the FA Posting Type field should be a debit or a credit.';

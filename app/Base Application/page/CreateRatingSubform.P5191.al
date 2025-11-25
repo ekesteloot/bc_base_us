@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5191 "Create Rating Subform"
 {
     Caption = 'Lines';
@@ -47,32 +49,30 @@ page 5191 "Create Rating Subform"
 
     trigger OnAfterGetRecord()
     begin
-        StyleIsStrong := Type = Type::Question;
-        if Type <> Type::Question then
+        StyleIsStrong := Rec.Type = Rec.Type::Question;
+        if Rec.Type <> Rec.Type::Question then
             DescriptionIndent := 1
         else
             DescriptionIndent := 0;
     end;
 
     var
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         DescriptionIndent: Integer;
 
     procedure SetRecords(var ProfileLineQuestion: Record "Profile Questionnaire Line"; var ProfileLineAnswer: Record "Profile Questionnaire Line")
     begin
-        DeleteAll();
+        Rec.DeleteAll();
 
         Rec := ProfileLineQuestion;
-        "Line No." := -1;
-        Insert();
+        Rec."Line No." := -1;
+        Rec.Insert();
 
         if ProfileLineAnswer.Find('-') then
             repeat
                 Rec := ProfileLineAnswer;
-                "Profile Questionnaire Code" := ProfileLineQuestion."Profile Questionnaire Code";
-                Insert();
+                Rec."Profile Questionnaire Code" := ProfileLineQuestion."Profile Questionnaire Code";
+                Rec.Insert();
             until ProfileLineAnswer.Next() = 0;
     end;
 

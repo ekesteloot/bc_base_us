@@ -1,3 +1,15 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Calculation;
+
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+
 codeunit 7002 "Price Calculation - V16" implements "Price Calculation"
 {
     trigger OnRun()
@@ -379,11 +391,18 @@ codeunit 7002 "Price Calculation - V16" implements "Price Calculation"
         var PriceListLine: Record "Price List Line";
         PriceSource: Record "Price Source";
         PriceAsset: Record "Price Asset";
-        var TempPriceListLine: Record "Price List Line" temporary): Boolean;
+        var TempPriceListLine: Record "Price List Line" temporary) FoundLines: Boolean;
+    var
+        PriceListLineFilters: Record "Price List Line";
     begin
+        PriceListLineFilters.CopyFilters(PriceListLine);
+
         PriceSource.FilterPriceLines(PriceListLine);
         PriceAsset.FilterPriceLines(PriceListLine);
-        exit(PriceListLine.CopyFilteredLinesToTemporaryBuffer(TempPriceListLine));
+        FoundLines := PriceListLine.CopyFilteredLinesToTemporaryBuffer(TempPriceListLine);
+
+        PriceListLine.Reset();
+        PriceListLine.CopyFilters(PriceListLineFilters);
     end;
 
     procedure CalcBestAmount(AmountType: Enum "Price Amount Type"; var PriceCalculationBufferMgt: Codeunit "Price Calculation Buffer Mgt."; var PriceListLine: Record "Price List Line") FoundBestPrice: Boolean;

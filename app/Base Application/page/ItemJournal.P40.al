@@ -1,3 +1,21 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+
 page 40 "Item Journal"
 {
     AdditionalSearchTerms = 'increase inventory,decrease inventory,adjust inventory';
@@ -98,6 +116,28 @@ page 40 "Item Journal"
                         ItemNoOnAfterValidate();
                     end;
                 }
+                field("Item Reference No."; Rec."Item Reference No.")
+                {
+                    AccessByPermission = tabledata "Item Reference" = R;
+                    ApplicationArea = Suite, ItemReferences;
+                    QuickEntry = false;
+                    ToolTip = 'Specifies a reference to the item number as defined by the item''s barcode.';
+                    Visible = false;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        ItemReferenceManagement: Codeunit "Item Reference Management";
+                    begin
+                        ItemReferenceManagement.ItemJournalReferenceNoLookup(Rec);
+                        ItemNoOnAfterValidate();
+                        OnReferenceNoOnAfterLookup(Rec);
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        ItemNoOnAfterValidate();
+                    end;
+                }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = Planning;
@@ -119,7 +159,7 @@ page 40 "Item Journal"
                         Item: Record Item;
                         WMSManagement: Codeunit "WMS Management";
                     begin
-                        if Item.Get("Item No.") then
+                        if Item.Get(Rec."Item No.") then
                             if Item.IsNonInventoriableType() then
                                 exit;
                         WMSManagement.CheckItemJnlLineLocation(Rec, xRec);
@@ -225,6 +265,7 @@ page 40 "Item Journal"
                     ToolTip = 'Specifies the serial number of the item.';
                     Editable = ItemTrackingEditable;
                     Visible = CanSelectItemTrackingOnLines;
+                    ExtendedDatatype = Barcode;
 
                     trigger OnAssistEdit()
                     begin
@@ -239,6 +280,7 @@ page 40 "Item Journal"
                     ToolTip = 'Specifies the lot number of the item.';
                     Editable = ItemTrackingEditable;
                     Visible = CanSelectItemTrackingOnLines;
+                    ExtendedDatatype = Barcode;
 
                     trigger OnAssistEdit()
                     begin
@@ -253,6 +295,7 @@ page 40 "Item Journal"
                     ToolTip = 'Specifies the package number of the item.';
                     Editable = ItemTrackingEditable;
                     Visible = PackageNoVisible;
+                    ExtendedDatatype = Barcode;
 
                     trigger OnAssistEdit()
                     begin
@@ -291,14 +334,14 @@ page 40 "Item Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 3);
                     end;
@@ -307,14 +350,14 @@ page 40 "Item Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 4);
                     end;
@@ -323,14 +366,14 @@ page 40 "Item Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 5);
                     end;
@@ -339,14 +382,14 @@ page 40 "Item Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 6);
                     end;
@@ -355,14 +398,14 @@ page 40 "Item Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 7);
                     end;
@@ -371,14 +414,14 @@ page 40 "Item Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
@@ -411,14 +454,14 @@ page 40 "Item Journal"
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
                 Visible = BackgroundErrorCheck;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             part(Control1903326807; "Item Replenishment FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Item No.");
+                SubPageLink = "No." = field("Item No.");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -453,7 +496,7 @@ page 40 "Item Journal"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -481,10 +524,10 @@ page 40 "Item Journal"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Item No.", "Variant Code");
                     ToolTip = 'View items in the bin if the selected line contains a bin code.';
                 }
                 action("&Recalculate Unit Amount")
@@ -496,7 +539,7 @@ page 40 "Item Journal"
 
                     trigger OnAction()
                     begin
-                        RecalculateUnitAmount();
+                        Rec.RecalculateUnitAmount();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -511,7 +554,7 @@ page 40 "Item Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -521,8 +564,8 @@ page 40 "Item Journal"
                     Caption = 'Ledger E&ntries';
                     Image = ItemLedger;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Item No." = FIELD("Item No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("Item No.");
+                    RunPageView = sorting("Item No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -554,7 +597,7 @@ page 40 "Item Journal"
                             ItemAvailFormsMgt.ShowItemAvailFromItemJnlLine(Rec, ItemAvailFormsMgt.ByPeriod())
                         end;
                     }
-                    action(Variant)
+                    action("Variant")
                     {
                         ApplicationArea = Planning;
                         Caption = 'Variant';
@@ -649,7 +692,7 @@ page 40 "Item Journal"
                         StdItemJnl: Record "Standard Item Journal";
                     begin
                         StdItemJnl.FilterGroup := 2;
-                        StdItemJnl.SetRange("Journal Template Name", "Journal Template Name");
+                        StdItemJnl.SetRange("Journal Template Name", Rec."Journal Template Name");
                         StdItemJnl.FilterGroup := 0;
                         if PAGE.RunModal(PAGE::"Standard Item Journals", StdItemJnl) = ACTION::LookupOK then begin
                             StdItemJnl.CreateItemJnlFromStdJnl(StdItemJnl, CurrentJnlBatchName);
@@ -672,12 +715,12 @@ page 40 "Item Journal"
                         StdItemJnl: Record "Standard Item Journal";
                         SaveAsStdItemJnl: Report "Save as Standard Item Journal";
                     begin
-                        ItemJnlLines.SetFilter("Journal Template Name", "Journal Template Name");
+                        ItemJnlLines.SetFilter("Journal Template Name", Rec."Journal Template Name");
                         ItemJnlLines.SetFilter("Journal Batch Name", CurrentJnlBatchName);
                         CurrPage.SetSelectionFilter(ItemJnlLines);
                         ItemJnlLines.CopyFilters(Rec);
 
-                        ItemJnlBatch.Get("Journal Template Name", CurrentJnlBatchName);
+                        ItemJnlBatch.Get(Rec."Journal Template Name", CurrentJnlBatchName);
                         SaveAsStdItemJnl.Initialise(ItemJnlLines, ItemJnlBatch);
                         SaveAsStdItemJnl.RunModal();
                         if not SaveAsStdItemJnl.GetStdItemJournal(StdItemJnl) then
@@ -695,7 +738,7 @@ page 40 "Item Journal"
 
                     trigger OnAction()
                     begin
-                        RenumberDocumentNo();
+                        Rec.RenumberDocumentNo();
                     end;
                 }
                 action("Update Item Tracking Lines")
@@ -716,6 +759,28 @@ page 40 "Item Journal"
                             repeat
                                 ItemJournalLine.CreateItemTrackingLines(true);
                             until ItemJournalLine.Next() = 0;
+                    end;
+                }
+                action("Get Bin Content")
+                {
+                    AccessByPermission = TableData "Bin Content" = R;
+                    ApplicationArea = Warehouse;
+                    Caption = 'Get Bin Content';
+                    Ellipsis = true;
+                    Image = GetBinContent;
+                    ToolTip = 'Use a function to create journal lines based on the actual content in the specified bin.';
+
+                    trigger OnAction()
+                    var
+                        BinContent: Record "Bin Content";
+                        GetBinContent: Report "Whse. Get Bin Content";
+                    begin
+                        BinContent.SetRange("Location Code", Rec."Location Code");
+                        OnActionGetBinContentOnAfterSetFilters(Rec, BinContent);
+                        GetBinContent.SetTableView(BinContent);
+                        GetBinContent.InitializeItemJournalLine(Rec);
+                        GetBinContent.RunModal();
+                        CurrPage.Update(false);
                     end;
                 }
             }
@@ -747,7 +812,7 @@ page 40 "Item Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post", Rec);
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -777,7 +842,7 @@ page 40 "Item Journal"
                     trigger OnAction()
                     begin
                         CODEUNIT.Run(CODEUNIT::"Item Jnl.-Post+Print", Rec);
-                        CurrentJnlBatchName := GetRangeMax("Journal Batch Name");
+                        CurrentJnlBatchName := Rec.GetRangeMax("Journal Batch Name");
                         CurrPage.Update(false);
                     end;
                 }
@@ -795,9 +860,7 @@ page 40 "Item Journal"
                     ItemJnlLine: Record "Item Journal Line";
                 begin
                     ItemJnlLine.Copy(Rec);
-                    ItemJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-                    ItemJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
-                    REPORT.RunModal(REPORT::"Inventory Movement", true, true, ItemJnlLine);
+                    ItemJnlLine.PrintInventoryMovement();
                 end;
             }
             group("Page")
@@ -816,7 +879,7 @@ page 40 "Item Journal"
                     var
                         ODataUtility: Codeunit ODataUtility;
                     begin
-                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption, CurrPage.ObjectId(false), "Journal Batch Name", "Journal Template Name");
+                        ODataUtility.EditJournalWorksheetInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), CurrPage.ObjectId(false), Rec."Journal Batch Name", Rec."Journal Template Name");
                     end;
                 }
                 group(Errors)
@@ -835,7 +898,7 @@ page 40 "Item Journal"
 
                         trigger OnAction()
                         begin
-                            SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                            Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                         end;
                     }
                     action(ShowAllLines)
@@ -849,7 +912,7 @@ page 40 "Item Journal"
 
                         trigger OnAction()
                         begin
-                            SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                            Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                         end;
                     }
                 }
@@ -1046,9 +1109,6 @@ page 40 "Item Journal"
         BackgroundErrorCheck: Boolean;
         ShowAllLinesEnabled: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
-        ItemTrackingEditable: Boolean;
-        CanSelectItemTrackingOnLines: Boolean;
-        PackageNoVisible: Boolean;
         Text000: Label 'You cannot use entry type %1 in this journal.';
         Text001: Label 'Item Journal lines have been successfully inserted from Standard Item Journal %1.';
         Text002: Label 'Standard Item Journal %1 has been successfully created.';
@@ -1063,7 +1123,7 @@ page 40 "Item Journal"
         DimVisible5: Boolean;
         DimVisible6: Boolean;
         DimVisible7: Boolean;
-        DimVisible8: Boolean;
+        DimVisible8, CanSelectItemTrackingOnLines, ItemTrackingEditable, PackageNoVisible : Boolean;
 
     local procedure CurrentJnlBatchNameOnAfterVali()
     begin
@@ -1083,8 +1143,8 @@ page 40 "Item Journal"
         if IsHandled then
             exit;
 
-        if IsOpenedFromBatch() then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+        if Rec.IsOpenedFromBatch() then begin
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
             SetControlAppearanceFromBatch();
             exit;
@@ -1129,7 +1189,7 @@ page 40 "Item Journal"
         ItemTrackingCode: Record "Item Tracking Code";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
     begin
-        if not ItemJournalBatch.Get(GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
+        if not ItemJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
 
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
@@ -1139,7 +1199,7 @@ page 40 "Item Journal"
         ItemTrackingCode.SetRange("Package Specific Tracking", true);
         PackageNoVisible := CanSelectItemTrackingOnLines and not ItemTrackingCode.IsEmpty();
 
-        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
         ItemJournalErrorsMgt.SetFullBatchCheck(true);
     end;
 
@@ -1163,5 +1223,16 @@ page 40 "Item Journal"
     local procedure OnBeforeOpenJournal(var ItemJournalLine: Record "Item Journal Line"; var ItemJnlMgt: Codeunit ItemJnlManagement; CurrentJnlBatchName: Code[10]; var IsHandled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReferenceNoOnAfterLookup(var ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnActionGetBinContentOnAfterSetFilters(var ItemJournalLine: Record "Item Journal Line"; var BinContent: Record "Bin Content")
+    begin
+    end;
+
 }
 

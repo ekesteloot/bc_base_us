@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 page 1296 "Pstd. Pmt. Recon. Subform"
 {
     AutoSplitKey = true;
@@ -42,7 +47,7 @@ page 1296 "Pstd. Pmt. Recon. Subform"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the amount that was applied to the related invoice or credit memo before this payment was posted.';
                 }
-                field(Difference; Difference)
+                field(Difference; Rec.Difference)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the difference between the amount in the Statement Amount field and the Applied Amount field.';
@@ -87,15 +92,15 @@ page 1296 "Pstd. Pmt. Recon. Subform"
                         VendorLedgerEntry: Record "Vendor Ledger Entry";
                         FilterValue: Text;
                     begin
-                        if "Applied Document No." <> '' then begin
-                            FilterValue := ConvertStr("Applied Document No.", ',', '|');
-                            case "Account Type" of
-                                "Account Type"::Customer:
+                        if Rec."Applied Document No." <> '' then begin
+                            FilterValue := ConvertStr(Rec."Applied Document No.", ',', '|');
+                            case Rec."Account Type" of
+                                Rec."Account Type"::Customer:
                                     begin
                                         CustLedgerEntry.SetFilter("Document No.", FilterValue);
                                         PAGE.RunModal(PAGE::"Customer Ledger Entries", CustLedgerEntry);
                                     end;
-                                "Account Type"::Vendor:
+                                Rec."Account Type"::Vendor:
                                     begin
                                         VendorLedgerEntry.SetFilter("Document No.", FilterValue);
                                         PAGE.RunModal(PAGE::"Vendor Ledger Entries", VendorLedgerEntry);

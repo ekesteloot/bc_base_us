@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 table 5210 "Cause of Inactivity"
 {
     Caption = 'Cause of Inactivity';

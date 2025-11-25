@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 page 5661 "FA Date Types"
 {
     Caption = 'FA Date Types';

@@ -1,3 +1,10 @@
+﻿namespace System.Security.AccessControl;
+
+using System.Environment;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 table 9000 "User Group"
 {
     Caption = 'User Group';

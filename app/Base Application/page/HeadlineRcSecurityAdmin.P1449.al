@@ -50,9 +50,7 @@ page 1449 "Headline RC Security Admin"
 
     var
         RCHeadlinesPageCommon: Codeunit "RC Headlines Page Common";
-        [InDataSet]
         DefaultFieldsVisible: Boolean;
-        [InDataSet]
         UserGreetingVisible: Boolean;
 }
 

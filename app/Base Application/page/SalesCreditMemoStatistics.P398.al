@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+
 page 398 "Sales Credit Memo Statistics"
 {
     Caption = 'Sales Credit Memo Statistics';
@@ -16,7 +22,7 @@ page 398 "Sales Credit Memo Statistics"
                 field("CustAmount + InvDiscAmount"; CustAmount + InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Amount';
                     ToolTip = 'Specifies the net amount of all the lines in the sales document.';
@@ -24,7 +30,7 @@ page 398 "Sales Credit Memo Statistics"
                 field(InvDiscAmount; InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     ToolTip = 'Specifies the invoice discount amount for the sales document.';
@@ -32,7 +38,7 @@ page 398 "Sales Credit Memo Statistics"
                 field(CustAmount; CustAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total amount, less any invoice discount amount, and excluding VAT for the sales document.';
@@ -40,7 +46,7 @@ page 398 "Sales Credit Memo Statistics"
                 field(VATAmount; VATAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = '3,' + Format(VATAmountText);
                     Caption = 'VAT Amount';
@@ -49,7 +55,7 @@ page 398 "Sales Credit Memo Statistics"
                 field(AmountInclVAT; AmountInclVAT)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total Incl. VAT';
                     ToolTip = 'Specifies the total amount, including VAT, that will be posted to the customer''s account for all the lines in the sales document.';
@@ -147,7 +153,7 @@ page 398 "Sales Credit Memo Statistics"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupAdjmtValueEntries();
+                        Rec.LookupAdjmtValueEntries();
                     end;
                 }
             }
@@ -192,7 +198,7 @@ page 398 "Sales Credit Memo Statistics"
     begin
         ClearAll();
 
-        Currency.Initialize("Currency Code");
+        Currency.Initialize(Rec."Currency Code");
 
         CalculateTotals();
 
@@ -204,12 +210,12 @@ page 398 "Sales Credit Memo Statistics"
         else
             VATAmountText := StrSubstNo(Text001, VATpercentage);
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             AmountLCY := CustAmount
         else
             AmountLCY :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                WorkDate(), "Currency Code", CustAmount, "Currency Factor");
+                WorkDate(), Rec."Currency Code", CustAmount, Rec."Currency Factor");
 
         ProfitLCY := AmountLCY - CostLCY;
 
@@ -223,7 +229,7 @@ page 398 "Sales Credit Memo Statistics"
         if AmountLCY <> 0 then
             AdjProfitPct := Round(100 * AdjProfitLCY / AmountLCY, 0.1);
 
-        if Cust.Get("Bill-to Customer No.") then
+        if Cust.Get(Rec."Bill-to Customer No.") then
             Cust.CalcFields("Balance (LCY)")
         else
             Clear(Cust);
@@ -241,7 +247,7 @@ page 398 "Sales Credit Memo Statistics"
 
         SalesCrMemoLine.CalcVATAmountLines(Rec, TempVATAmountLine);
         CurrPage.Subform.PAGE.SetTempVATAmountLine(TempVATAmountLine);
-        CurrPage.Subform.PAGE.InitGlobals("Currency Code", false, false, false, false, "VAT Base Discount %");
+        CurrPage.Subform.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var
@@ -287,13 +293,13 @@ page 398 "Sales Credit Memo Statistics"
         if IsHandled then
             exit;
 
-        SalesCrMemoLine.SetRange("Document No.", "No.");
+        SalesCrMemoLine.SetRange("Document No.", Rec."No.");
         OnCalculateTotalsOnAfterSalesCrMemoLineSetFilters(SalesCrMemoLine, Rec);
         if SalesCrMemoLine.Find('-') then
             repeat
                 CustAmount += SalesCrMemoLine.Amount;
                 AmountInclVAT += SalesCrMemoLine."Amount Including VAT";
-                if "Prices Including VAT" then
+                if Rec."Prices Including VAT" then
                     InvDiscAmount += SalesCrMemoLine."Inv. Discount Amount" / (1 + SalesCrMemoLine."VAT %" / 100)
                 else
                     InvDiscAmount += SalesCrMemoLine."Inv. Discount Amount";

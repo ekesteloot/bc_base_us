@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 table 99000784 "Standard Task Quality Measure"
 {
     Caption = 'Standard Task Quality Measure';

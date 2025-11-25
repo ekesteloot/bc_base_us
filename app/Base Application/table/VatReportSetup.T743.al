@@ -31,7 +31,7 @@ table 743 "VAT Report Setup"
         field(21; "Report Version"; Code[10])
         {
             Caption = 'Report Version';
-            TableRelation = "VAT Reports Configuration"."VAT Report Version" WHERE("VAT Report Type" = CONST("VAT Return"));
+            TableRelation = "VAT Reports Configuration"."VAT Report Version" where("VAT Report Type" = const("VAT Return"));
         }
         field(22; "Period Reminder Time"; Integer)
         {
@@ -61,8 +61,8 @@ table 743 "VAT Report Setup"
         }
         field(25; "Manual Receive Period CU Cap"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
-                                                                           "Object ID" = FIELD("Manual Receive Period CU ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Codeunit),
+                                                                           "Object ID" = field("Manual Receive Period CU ID")));
             Caption = 'Manual Receive Period CU Cap';
             Editable = false;
             FieldClass = FlowField;
@@ -81,8 +81,8 @@ table 743 "VAT Report Setup"
         }
         field(27; "Auto Receive Period CU Cap"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
-                                                                           "Object ID" = FIELD("Auto Receive Period CU ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Codeunit),
+                                                                           "Object ID" = field("Auto Receive Period CU ID")));
             Caption = 'Auto Receive Period CU Cap';
             Editable = false;
             FieldClass = FlowField;
@@ -94,8 +94,8 @@ table 743 "VAT Report Setup"
         }
         field(29; "Receive Submitted Return CUCap"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Codeunit),
-                                                                           "Object ID" = FIELD("Receive Submitted Return CU ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Codeunit),
+                                                                           "Object ID" = field("Receive Submitted Return CU ID")));
             Caption = 'Receive Submitted Return CUCap';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,10 @@
+namespace Microsoft.BankMgt.Statement;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Reconciliation;
+using System.IO;
+using System.Threading;
+
 codeunit 1415 "Automatic Import of Bank Stmt."
 {
     TableNo = "Job Queue Entry";
@@ -12,8 +19,8 @@ codeunit 1415 "Automatic Import of Bank Stmt."
         RecRef: RecordRef;
         LastStatementNo: Code[20];
     begin
-        TestField("Record ID to Process");
-        RecRef.Get("Record ID to Process");
+        Rec.TestField("Record ID to Process");
+        RecRef.Get(Rec."Record ID to Process");
         RecRef.SetTable(BankAccount);
 
         if not BankAccount."Automatic Stmt. Import Enabled" then

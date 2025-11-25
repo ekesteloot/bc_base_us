@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Budget;
+
 page 1115 "Cost Budget Entries"
 {
     Caption = 'Cost Budget Entries';
@@ -19,7 +21,7 @@ page 1115 "Cost Budget Entries"
                     ToolTip = 'Specifies the name of the cost budget that the entry belongs to.';
                     Visible = false;
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the date of the cost budget entry.';
@@ -69,7 +71,7 @@ page 1115 "Cost Budget Entries"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the ID of the allocation key that the cost budget entry comes from.';
                 }
-                field(Allocated; Allocated)
+                field(Allocated; Rec.Allocated)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies whether the cost entry has been allocated.';
@@ -104,33 +106,33 @@ page 1115 "Cost Budget Entries"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        SetCostBudgetRegNo(CurrRegNo);
-        Insert(true);
-        CurrRegNo := GetCostBudgetRegNo();
+        Rec.SetCostBudgetRegNo(CurrRegNo);
+        Rec.Insert(true);
+        CurrRegNo := Rec.GetCostBudgetRegNo();
         exit(false);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Budget Name" := CostBudgetName.Name;
-        if CostBudgetName.Name <> "Budget Name" then
-            CostBudgetName.Get("Budget Name");
-        if GetFilter("Cost Type No.") <> '' then
-            "Cost Type No." := GetFirstCostType(GetFilter("Cost Type No."));
-        if GetFilter("Cost Center Code") <> '' then
-            "Cost Center Code" := GetFirstCostCenter(GetFilter("Cost Center Code"));
-        if GetFilter("Cost Object Code") <> '' then
-            "Cost Object Code" := GetFirstCostObject(GetFilter("Cost Object Code"));
-        Date := GetFirstDate(GetFilter(Date));
-        "Last Modified By User" := UserId();
+        Rec."Budget Name" := CostBudgetName.Name;
+        if CostBudgetName.Name <> Rec."Budget Name" then
+            CostBudgetName.Get(Rec."Budget Name");
+        if Rec.GetFilter("Cost Type No.") <> '' then
+            Rec."Cost Type No." := Rec.GetFirstCostType(Rec.GetFilter("Cost Type No."));
+        if Rec.GetFilter("Cost Center Code") <> '' then
+            Rec."Cost Center Code" := Rec.GetFirstCostCenter(Rec.GetFilter("Cost Center Code"));
+        if Rec.GetFilter("Cost Object Code") <> '' then
+            Rec."Cost Object Code" := Rec.GetFirstCostObject(Rec.GetFilter("Cost Object Code"));
+        Rec.Date := Rec.GetFirstDate(Rec.GetFilter(Date));
+        Rec."Last Modified By User" := UserId();
     end;
 
     trigger OnOpenPage()
     begin
-        if GetFilter("Budget Name") = '' then
+        if Rec.GetFilter("Budget Name") = '' then
             CostBudgetName.Init()
         else begin
-            CopyFilter("Budget Name", CostBudgetName.Name);
+            Rec.CopyFilter("Budget Name", CostBudgetName.Name);
             CostBudgetName.FindFirst();
         end;
     end;

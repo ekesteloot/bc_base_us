@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Receivables;
+
 enum 234 "Customer Apply-to Type"
 {
     Extensible = true;

@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.BankMgt.PaymentExport;
+using System.Utilities;
+
 page 1208 "Direct Debit Collect. Entries"
 {
     Caption = 'Direct Debit Collect. Entries';
@@ -123,8 +128,8 @@ page 1208 "Direct Debit Collect. Entries"
             {
                 ApplicationArea = Suite;
                 Caption = 'File Export Errors';
-                SubPageLink = "Document No." = FIELD(FILTER("Direct Debit Collection No.")),
-                              "Journal Line No." = FIELD("Entry No.");
+                SubPageLink = "Document No." = field(FILTER("Direct Debit Collection No.")),
+                              "Journal Line No." = field("Entry No.");
             }
         }
     }
@@ -143,7 +148,7 @@ page 1208 "Direct Debit Collect. Entries"
 
                 trigger OnAction()
                 begin
-                    ExportSEPA();
+                    Rec.ExportSEPA();
                 end;
             }
             action(Reject)
@@ -155,7 +160,7 @@ page 1208 "Direct Debit Collect. Entries"
 
                 trigger OnAction()
                 begin
-                    Reject();
+                    Rec.Reject();
                 end;
             }
             action(Close)
@@ -169,7 +174,7 @@ page 1208 "Direct Debit Collect. Entries"
                 var
                     DirectDebitCollection: Record "Direct Debit Collection";
                 begin
-                    DirectDebitCollection.Get("Direct Debit Collection No.");
+                    DirectDebitCollection.Get(Rec."Direct Debit Collection No.");
                     DirectDebitCollection.CloseCollection();
                 end;
             }
@@ -186,10 +191,10 @@ page 1208 "Direct Debit Collect. Entries"
                     DirectDebitCollection: Record "Direct Debit Collection";
                     PostDirectDebitCollection: Report "Post Direct Debit Collection";
                 begin
-                    TestField("Direct Debit Collection No.");
-                    DirectDebitCollection.Get("Direct Debit Collection No.");
+                    Rec.TestField("Direct Debit Collection No.");
+                    DirectDebitCollection.Get(Rec."Direct Debit Collection No.");
                     DirectDebitCollection.TestField(Status, DirectDebitCollection.Status::"File Created");
-                    PostDirectDebitCollection.SetCollectionEntry("Direct Debit Collection No.");
+                    PostDirectDebitCollection.SetCollectionEntry(Rec."Direct Debit Collection No.");
                     PostDirectDebitCollection.SetTableView(Rec);
                     PostDirectDebitCollection.Run();
                 end;
@@ -206,13 +211,13 @@ page 1208 "Direct Debit Collect. Entries"
                     DirectDebitCollectionEntry: Record "Direct Debit Collection Entry";
                     ConfirmMgt: Codeunit "Confirm Management";
                 begin
-                    DirectDebitCollectionEntry.SetRange("Direct Debit Collection No.", "Direct Debit Collection No.");
+                    DirectDebitCollectionEntry.SetRange("Direct Debit Collection No.", Rec."Direct Debit Collection No.");
                     DirectDebitCollectionEntry.SetRange(Status, DirectDebitCollectionEntry.Status::New);
                     if DirectDebitCollectionEntry.IsEmpty() then
-                        Error(ResetTransferDateNotAllowedErr, "Direct Debit Collection No.");
+                        Error(ResetTransferDateNotAllowedErr, Rec."Direct Debit Collection No.");
 
                     if ConfirmMgt.GetResponse(ResetTransferDateQst, false) then
-                        SetTodayAsTransferDateForOverdueEnries();
+                        Rec.SetTodayAsTransferDateForOverdueEnries();
                 end;
             }
         }
@@ -243,35 +248,35 @@ page 1208 "Direct Debit Collect. Entries"
 
     trigger OnAfterGetRecord()
     begin
-        HasLineErrors := HasPaymentFileErrors();
-        LineIsEditable := Status = Status::New;
+        HasLineErrors := Rec.HasPaymentFileErrors();
+        LineIsEditable := Rec.Status = Rec.Status::New;
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
-        TestField(Status, Status::New);
-        CalcFields("Direct Debit Collection Status");
-        TestField("Direct Debit Collection Status", "Direct Debit Collection Status"::New);
+        Rec.TestField(Status, Rec.Status::New);
+        Rec.CalcFields("Direct Debit Collection Status");
+        Rec.TestField("Direct Debit Collection Status", Rec."Direct Debit Collection Status"::New);
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        CalcFields("Direct Debit Collection Status");
-        TestField("Direct Debit Collection Status", "Direct Debit Collection Status"::New);
+        Rec.CalcFields("Direct Debit Collection Status");
+        Rec.TestField("Direct Debit Collection Status", Rec."Direct Debit Collection Status"::New);
     end;
 
     trigger OnModifyRecord(): Boolean
     var
         IsHandled: Boolean;
     begin
-        TestField(Status, Status::New);
-        CalcFields("Direct Debit Collection Status");
-        TestField("Direct Debit Collection Status", "Direct Debit Collection Status"::New);
+        Rec.TestField(Status, Rec.Status::New);
+        Rec.CalcFields("Direct Debit Collection Status");
+        Rec.TestField("Direct Debit Collection Status", Rec."Direct Debit Collection Status"::New);
         IsHandled := false;
         OnBeforeRunSEPACheckLine(Rec, IsHandled);
         if not IsHandled then
             CODEUNIT.Run(CODEUNIT::"SEPA DD-Check Line", Rec);
-        HasLineErrors := HasPaymentFileErrors();
+        HasLineErrors := Rec.HasPaymentFileErrors();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -282,13 +287,12 @@ page 1208 "Direct Debit Collect. Entries"
 
     trigger OnOpenPage()
     begin
-        FilterGroup(2);
-        SetRange("Direct Debit Collection No.", GetRangeMin("Direct Debit Collection No."));
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetRange("Direct Debit Collection No.", Rec.GetRangeMin("Direct Debit Collection No."));
+        Rec.FilterGroup(0);
     end;
 
     var
-        [InDataSet]
         HasLineErrors: Boolean;
         LineIsEditable: Boolean;
         ResetTransferDateQst: Label 'Do you want to insert today''s date in the Transfer Date field on all overdue entries?';

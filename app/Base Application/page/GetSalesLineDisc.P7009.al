@@ -37,7 +37,7 @@ page 7009 "Get Sales Line Disc."
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of item that the sales discount line is valid for. That is, either an item or an item discount group.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies one of two values, depending on the value in the Type field.';

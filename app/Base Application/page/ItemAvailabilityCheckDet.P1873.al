@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.InventoryMgt.Item;
+
 page 1873 "Item Availability Check Det."
 {
     Caption = 'Details';
@@ -85,7 +89,7 @@ page 1873 "Item Availability Check Det."
                 Editable = false;
                 ToolTip = 'Specifies the arrival date of an inbound supply that can cover the needed quantity on a date later than the due date. Note that if the inbound supply only covers parts of the needed quantity, it is not considered available and the field will not contain a date.';
             }
-            field(SubsituteExists; "Substitutes Exist")
+            field(SubsituteExists; Rec."Substitutes Exist")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;

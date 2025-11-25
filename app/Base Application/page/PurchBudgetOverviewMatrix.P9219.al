@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Analysis;
+
 page 9219 "Purch. Budget Overview Matrix"
 {
     Caption = 'Purch. Budget Overview Matrix';
@@ -17,7 +24,7 @@ page 9219 "Purch. Budget Overview Matrix"
                 IndentationColumn = NameIndent;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = PurchaseBudget;
                     Editable = false;
@@ -31,7 +38,7 @@ page 9219 "Purch. Budget Overview Matrix"
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies the name of the record.';
                 }
-                field(Quantity; +Quantity)
+                field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
@@ -47,7 +54,7 @@ page 9219 "Purch. Budget Overview Matrix"
                         DrillDown(true, ValueType::Quantity);
                     end;
                 }
-                field(Amount; +Amount)
+                field(Amount; Rec.Amount)
                 {
                     ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
@@ -301,9 +308,9 @@ page 9219 "Purch. Budget Overview Matrix"
     trigger OnAfterGetCurrRecord()
     begin
         if AmountVisible then
-            Amount := CalcAmt("Item Analysis Value Type"::"Cost Amount", false);
+            Rec.Amount := CalcAmt("Item Analysis Value Type"::"Cost Amount", false);
         if QuantityVisible then
-            Quantity := CalcAmt("Item Analysis Value Type"::Quantity, false);
+            Rec.Quantity := CalcAmt("Item Analysis Value Type"::Quantity, false);
     end;
 
     trigger OnAfterGetRecord()
@@ -312,9 +319,9 @@ page 9219 "Purch. Budget Overview Matrix"
     begin
         NameIndent := 0;
         if AmountVisible then
-            Amount := MatrixMgt.RoundAmount(CalcAmt(ValueType::"Cost Amount", false), RoundingFactor);
+            Rec.Amount := MatrixMgt.RoundAmount(CalcAmt(ValueType::"Cost Amount", false), RoundingFactor);
         if QuantityVisible then
-            Quantity := MatrixMgt.RoundAmount(CalcAmt(ValueType::Quantity, false), RoundingFactor);
+            Rec.Quantity := MatrixMgt.RoundAmount(CalcAmt(ValueType::Quantity, false), RoundingFactor);
 
         MATRIX_CurrentColumnOrdinal := 0;
         while MATRIX_CurrentColumnOrdinal < MATRIX_CurrentNoOfMatrixColumn do begin
@@ -323,7 +330,7 @@ page 9219 "Purch. Budget Overview Matrix"
         end;
 
         FormatLine();
-        AmountOnFormat(Format(Amount));
+        AmountOnFormat(Format(Rec.Amount));
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -379,11 +386,8 @@ page 9219 "Purch. Budget Overview Matrix"
         MATRIX_CellData: array[32] of Decimal;
         MATRIX_CaptionSet: array[32] of Text[80];
         RoundingFactorFormatString: Text;
-        [InDataSet]
         AmountVisible: Boolean;
-        [InDataSet]
         QuantityVisible: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     protected var
@@ -495,8 +499,8 @@ page 9219 "Purch. Budget Overview Matrix"
 
         NewAmount := FromRoundedValue(MATRIX_CellData[MATRIX_ColumnOrdinal]);
         SetAmt(ValueType, true, NewAmount);
-        Amount := MatrixMgt.RoundAmount(CalcAmt(ValueType::"Cost Amount", false), RoundingFactor);
-        Quantity := MatrixMgt.RoundAmount(CalcAmt(ValueType::Quantity, false), RoundingFactor);
+        Rec.Amount := MatrixMgt.RoundAmount(CalcAmt(ValueType::"Cost Amount", false), RoundingFactor);
+        Rec.Quantity := MatrixMgt.RoundAmount(CalcAmt(ValueType::Quantity, false), RoundingFactor);
     end;
 
     local procedure FromRoundedValue(OrgAmount: Decimal): Decimal
@@ -515,7 +519,7 @@ page 9219 "Purch. Budget Overview Matrix"
 
     local procedure FormatLine()
     begin
-        NameIndent := Indentation;
+        NameIndent := Rec.Indentation;
     end;
 
     local procedure AmountOnFormat(Text: Text[1024])

@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment.Configuration;
+
+using System.Globalization;
+using System.Reflection;
+using System.Security.AccessControl;
+
 table 2000000073 "User Personalization"
 {
     Caption = 'User Personalization';
@@ -54,7 +64,7 @@ table 2000000073 "User Personalization"
         field(15; Company; Text[30])
         {
             Caption = 'Company';
-            TableRelation = Company.Name;
+            TableRelation = System.Environment.Company.Name;
         }
         field(18; "Debugger Break On Error"; Boolean)
         {

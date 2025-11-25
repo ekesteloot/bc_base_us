@@ -1,3 +1,24 @@
+﻿namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+#if not CLEAN22
+using Microsoft.CRM.Outlook;
+#endif
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+#if not CLEAN22
+using System;
+#endif
+using System.Globalization;
+using System.Utilities;
+using System.Integration;
+
 table 5079 "Marketing Setup"
 {
     Caption = 'Marketing Setup';
@@ -104,6 +125,11 @@ table 5079 "Marketing Setup"
         {
             Caption = 'Default Language Code';
             TableRelation = Language;
+        }
+        field(32; "Default Format Region"; Text[80])
+        {
+            Caption = 'Default Format Region';
+            TableRelation = "Language Selection"."Language Tag";
         }
         field(33; "Default Sales Cycle Code"; Code[10])
         {
@@ -392,6 +418,11 @@ table 5079 "Marketing Setup"
                 ResetExchangeTenantId();
             end;
 #endif
+        }
+        field(83; "Inherit Format Region"; Boolean)
+        {
+            Caption = 'Inherit Format Region';
+            InitValue = true;
         }
     }
 

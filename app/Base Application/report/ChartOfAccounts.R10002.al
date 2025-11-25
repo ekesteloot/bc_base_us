@@ -1,7 +1,13 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Foundation.Company;
+using System.Utilities;
+
 report 10002 "Chart of Accounts"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ChartofAccounts.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/ChartofAccounts.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Chart of Accounts';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 10002 "Chart of Accounts"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Account Type";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -60,7 +66,7 @@ report 10002 "Chart of Accounts"
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
 
                 trigger OnPreDataItem()
                 begin
@@ -70,7 +76,7 @@ report 10002 "Chart of Accounts"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(G_L_Account___No__; "G/L Account"."No.")
                 {
                 }

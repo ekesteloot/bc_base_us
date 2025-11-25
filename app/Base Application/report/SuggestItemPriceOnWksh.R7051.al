@@ -1,4 +1,11 @@
-#if not CLEAN21
+﻿#if not CLEAN21
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Sales.Customer;
+
 report 7051 "Suggest Item Price on Wksh."
 {
     Caption = 'Suggest Item Price on Wksh.';
@@ -11,7 +18,7 @@ report 7051 "Suggest Item Price on Wksh."
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Vendor No.", "Inventory Posting Group";
 
             trigger OnAfterGetRecord()
@@ -100,7 +107,6 @@ report 7051 "Suggest Item Price on Wksh."
                         {
                             ApplicationArea = Basic, Suite;
                             Caption = 'Sales Type';
-                            OptionCaption = 'Customer,Customer Price Group,All Customers,Campaign';
                             ToolTip = 'Specifies the sales type for the sales price agreement. To see the existing sales types, click the field.';
 
                             trigger OnValidate()
@@ -317,19 +323,18 @@ report 7051 "Suggest Item Price on Wksh."
         CreateNewPrices: Boolean;
         UnitPriceFactor: Decimal;
         PriceLowerLimit: Decimal;
-        ToSalesType: Option Customer,"Customer Price Group","All Customers",Campaign;
-        ToSalesCode: Code[20];
-        ToStartDate: Date;
-        ToEndDate: Date;
-        [InDataSet]
         SalesCodeCtrlEnable: Boolean;
-        [InDataSet]
         ToStartDateCtrlEnable: Boolean;
-        [InDataSet]
         ToEndDateCtrlEnable: Boolean;
 
         Text000: Label 'Processing items  #1##########';
         Text002: Label '%1 must be specified.';
+
+    protected var
+        ToSalesType: Enum "Sales Price Type";
+        ToSalesCode: Code[20];
+        ToStartDate: Date;
+        ToEndDate: Date;
 
     procedure InitializeRequest(NewToSalesType: Option; NewToSalesCode: Code[20]; NewToStartDateText: Date; NewToEndDateText: Date; NewToCurrCode: Code[10]; NewToUOMCode: Code[10])
     begin

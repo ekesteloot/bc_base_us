@@ -1,3 +1,7 @@
+namespace System.Device;
+
+using System.Security.AccessControl;
+
 page 9814 "Device Card"
 {
     Caption = 'Device Card';
@@ -28,7 +32,7 @@ page 9814 "Device Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the device type.';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the device is enabled.';

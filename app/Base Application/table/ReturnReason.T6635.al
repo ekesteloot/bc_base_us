@@ -18,7 +18,7 @@ table 6635 "Return Reason"
         field(3; "Default Location Code"; Code[10])
         {
             Caption = 'Default Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(4; "Inventory Value Zero"; Boolean)
         {

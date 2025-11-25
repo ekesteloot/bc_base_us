@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.RoleCenters;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 page 9067 "Resource Manager Activities"
 {
     Caption = 'Activities';

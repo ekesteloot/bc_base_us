@@ -1,6 +1,8 @@
+namespace System.Azure.Identity;
+
 table 6300 "Azure AD App Setup"
 {
-    Caption = 'Azure AD App Setup';
+    Caption = 'Microsoft Entra App Setup';
     DataPerCompany = false;
     ReplicateData = false;
 
@@ -52,7 +54,7 @@ table 6300 "Azure AD App Setup"
     end;
 
     var
-        OnlyOneRecordErr: Label 'There should be only one record for Azure AD App Setup.';
+        OnlyOneRecordErr: Label 'There should be only one record for Microsoft Entra App Setup.';
 
     [NonDebuggable]
     [Scope('OnPrem')]

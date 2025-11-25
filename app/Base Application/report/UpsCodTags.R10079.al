@@ -10,7 +10,7 @@ report 10079 "UPS COD Tags"
     {
         dataitem("Sales Invoice Header"; "Sales Invoice Header")
         {
-            DataItemTableView = SORTING("Order No.", "No.");
+            DataItemTableView = sorting("Order No.", "No.");
             RequestFilterFields = "Sell-to Customer No.", "No.", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code";
             RequestFilterHeading = 'Sales Invoice';
             column(UPSshipperNumber; UPSshipperNumber)

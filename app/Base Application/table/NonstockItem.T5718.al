@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Purchases.Vendor;
+using System.IO;
+
 table 5718 "Nonstock Item"
 {
     Caption = 'Nonstock Item';
@@ -143,7 +152,7 @@ table 5718 "Nonstock Item"
         field(12; "Item Template Code"; Code[10])
         {
             Caption = 'Item Template Code';
-            TableRelation = "Config. Template Header".Code WHERE("Table ID" = CONST(27));
+            TableRelation = "Config. Template Header".Code where("Table ID" = const(27));
             ObsoleteReason = 'This field will be removed with other functionality related to "old" templates. Use "Item Templ. Code" field instead.';
             ObsoleteState = Removed;
             ;
@@ -189,8 +198,8 @@ table 5718 "Nonstock Item"
         }
         field(53; Comment; Boolean)
         {
-            CalcFormula = Exist("Comment Line" WHERE("Table Name" = CONST("Nonstock Item"),
-                                                      "No." = FIELD("Entry No.")));
+            CalcFormula = exist("Comment Line" where("Table Name" = const("Nonstock Item"),
+                                                      "No." = field("Entry No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,19 @@
+﻿namespace Microsoft.FinancialMgt.RoleCenters;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Reports;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+using System.Threading;
+
 page 9002 "Acc. Payables Coordinator RC"
 {
     Caption = 'Accounts Payable Coordinator';
@@ -203,7 +219,7 @@ page 9002 "Acc. Payables Coordinator RC"
                 Caption = 'Balance';
                 Image = Balance;
                 RunObject = Page "Vendor List";
-                RunPageView = WHERE("Balance (LCY)" = FILTER(<> 0));
+                RunPageView = where("Balance (LCY)" = filter(<> 0));
                 ToolTip = 'View a summary of the bank account balance in different periods.';
             }
             action("Purchase Orders")
@@ -255,8 +271,8 @@ page 9002 "Acc. Payables Coordinator RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Purchase Journals';
                 RunObject = Page "General Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Purchases),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Purchases),
+                                    Recurring = const(false));
                 ToolTip = 'Post any purchase-related transaction directly to a vendor, bank, or general ledger account instead of using dedicated documents. You can post all types of financial purchase transactions, including payments, refunds, and finance charge amounts. Note that you cannot post item quantities with a purchase journal.';
             }
             action(PaymentJournals)
@@ -265,8 +281,8 @@ page 9002 "Acc. Payables Coordinator RC"
                 Caption = 'Payment Journals';
                 Image = Journals;
                 RunObject = Page "General Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Payments),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Payments),
+                                    Recurring = const(false));
                 ToolTip = 'Register payments to vendors. A payment journal is a type of general journal that is used to post outgoing payment transactions to G/L, bank, customer, vendor, employee, and fixed assets accounts. The Suggest Vendor Payments functions automatically fills the journal with payments that are due. When payments are posted, you can export the payments to a bank file for upload to your bank if your system is set up for electronic banking. You can also issue computer checks from the payment journal.';
             }
             action(GeneralJournals)
@@ -275,8 +291,8 @@ page 9002 "Acc. Payables Coordinator RC"
                 Caption = 'General Journals';
                 Image = Journal;
                 RunObject = Page "General Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(General),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(General),
+                                    Recurring = const(false));
                 ToolTip = 'Post financial transactions directly to general ledger accounts and other accounts, such as bank, customer, vendor, and employee accounts. Posting with a general journal always creates entries on general ledger accounts. This is true even when, for example, you post a journal line to a customer account, because an entry is posted to a general ledger receivables account through a posting group.';
             }
         }
@@ -332,9 +348,6 @@ page 9002 "Acc. Payables Coordinator RC"
                 ApplicationArea = Basic, Suite;
                 Caption = '&Vendor';
                 Image = Vendor;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Vendor Card";
                 RunPageMode = Create;
                 ToolTip = 'Set up a new vendor from whom you buy goods or services. ';
@@ -344,9 +357,6 @@ page 9002 "Acc. Payables Coordinator RC"
                 ApplicationArea = Basic, Suite;
                 Caption = '&Purchase Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
                 ToolTip = 'Purchase goods or services from a vendor.';
@@ -356,9 +366,6 @@ page 9002 "Acc. Payables Coordinator RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Purchase &Invoice';
                 Image = NewPurchaseInvoice;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Invoice";
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase invoice.';
@@ -368,9 +375,6 @@ page 9002 "Acc. Payables Coordinator RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Purchase Credit &Memo';
                 Image = CreditMemo;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Credit Memo";
                 RunPageMode = Create;
                 ToolTip = 'Create a new purchase credit memo to revert a posted purchase invoice.';
@@ -404,12 +408,10 @@ page 9002 "Acc. Payables Coordinator RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Create Vendor Payments';
                 Image = SuggestVendorPayments;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Vendor Ledger Entries";
-                RunPageView = WHERE("Document Type" = FILTER(Invoice),
-                                    "Remaining Amount" = FILTER(< 0),
-                                    "Applies-to ID" = FILTER(''));
+                RunPageView = where("Document Type" = filter(Invoice),
+                                    "Remaining Amount" = filter(< 0),
+                                    "Applies-to ID" = filter(''));
                 ToolTip = 'Opens vendor ledger entries for all vendors with invoices that have not been paid yet.';
             }
             action("Reconcile AP to GL")

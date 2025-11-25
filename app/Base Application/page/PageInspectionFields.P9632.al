@@ -1,3 +1,5 @@
+namespace System.Tooling;
+
 page 9632 "Page Inspection Fields"
 {
     Caption = 'Page Inspection Fields';
@@ -26,21 +28,59 @@ page 9632 "Page Inspection Fields"
                 field(EmptyText; EmptyText)
                 {
                     ApplicationArea = All;
-                    Caption = 'EmptyText';
                     ShowCaption = false;
                     ToolTip = 'Specifies an empty field. This field is used for layout purposes.';
                 }
-                field(ExtensionSource; ExtensionSource)
+                field(ExtensionSource; Rec.ExtensionSource)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the extension that adds the field.';
                 }
+                field(EmptyText2; EmptyText)
+                {
+                    ApplicationArea = All;
+                    ShowCaption = false;
+                    ToolTip = 'Specifies an empty field. This field is used for layout purposes.';
+                }
+                field("Field No."; Rec."Field No.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the field''s number.';
+                }
+                field(Tooltip; Rec.Tooltip)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the field''s tooltip.';
+                }
+
             }
         }
     }
 
     actions
     {
+        area(Processing)
+        {
+            group(VSCodeRequests)
+            {
+                Caption = 'Visual Studio Code';
+                action(NavigateToSource)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Navigate to code definition';
+                    Image = View;
+                    ToolTip = 'Navigate the field definition in source code in Visual Studio Code.';
+                    Scope = Repeater;
+
+                    trigger OnAction()
+                    var
+                        VSCodeRequestHelper: Codeunit "VS Code Request Helper";
+                    begin
+                        HyperLink(VSCodeRequestHelper.GetUrlToNavigateFieldInVSCode(Rec));
+                    end;
+                }
+            }
+        }
     }
 
     trigger OnInit()
@@ -58,12 +98,12 @@ page 9632 "Page Inspection Fields"
     procedure UpdatePage(FormServerHandleId: Text; FormServerBookmark: Text)
     begin
         // that performs actual data retrieval
-        Reset();
-        SetFilter("Current Form ID", '%1', FormServerHandleId);
-        SetFilter("Current Form Bookmark", '%1', FormServerBookmark);
+        Rec.Reset();
+        Rec.SetFilter("Current Form ID", '%1', FormServerHandleId);
+        Rec.SetFilter("Current Form Bookmark", '%1', FormServerBookmark);
         // sets current record to the first one
         // so we always are in the first data block when fields are loaded
-        FindFirst();
+        Rec.FindFirst();
 
         // this will actually update the content of the page
         CurrPage.Update(false);

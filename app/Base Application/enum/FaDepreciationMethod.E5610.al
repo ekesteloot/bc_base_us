@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 enum 5610 "FA Depreciation Method"
 {
     Extensible = true;

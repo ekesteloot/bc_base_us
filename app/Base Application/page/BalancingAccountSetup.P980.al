@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentRegistration;
+
 page 980 "Balancing Account Setup"
 {
     Caption = 'Balancing Account Setup';
@@ -35,7 +37,7 @@ page 980 "Balancing Account Setup"
 
     trigger OnOpenPage()
     begin
-        Get(UserId);
+        Rec.Get(UserId);
         PageCaption := '';
     end;
 

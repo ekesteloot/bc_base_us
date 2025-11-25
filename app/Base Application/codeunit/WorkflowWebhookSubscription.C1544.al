@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 codeunit 1544 "Workflow Webhook Subscription"
 {
 

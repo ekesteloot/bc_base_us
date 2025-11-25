@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Address;
+
 page 10 "Countries/Regions"
 {
     ApplicationArea = Basic, Suite;
@@ -13,7 +15,7 @@ page 10 "Countries/Regions"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Invoicing, Basic, Suite;
                     ToolTip = 'Specifies the country/region of the address.';
@@ -75,8 +77,8 @@ page 10 "Countries/Regions"
             part(Control8; "Custom Address Format Factbox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Country/Region Code" = FIELD(Code);
-                Visible = "Address Format" = "Address Format"::Custom;
+                SubPageLink = "Country/Region Code" = field(Code);
+                Visible = Rec."Address Format" = Rec."Address Format"::Custom;
             }
             systempart(Control1900383207; Links)
             {
@@ -105,7 +107,7 @@ page 10 "Countries/Regions"
                     Caption = 'VAT Reg. No. Formats';
                     Image = NumberSetup;
                     RunObject = Page "VAT Registration No. Formats";
-                    RunPageLink = "Country/Region Code" = FIELD(Code);
+                    RunPageLink = "Country/Region Code" = field(Code);
                     ToolTip = 'Specify that the tax registration number for an account, such as a customer, corresponds to the standard format for tax registration numbers in an account''s country/region.';
                 }
                 action(Translations)
@@ -121,7 +123,7 @@ page 10 "Countries/Regions"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Custom Address Format';
-                    Enabled = "Address Format" = "Address Format"::Custom;
+                    Enabled = Rec."Address Format" = Rec."Address Format"::Custom;
                     Image = Addresses;
                     ToolTip = 'Define the scope and order of fields that make up the country/region address.';
 
@@ -130,11 +132,11 @@ page 10 "Countries/Regions"
                         CustomAddressFormat: Record "Custom Address Format";
                         CustomAddressFormatPage: Page "Custom Address Format";
                     begin
-                        if "Address Format" <> "Address Format"::Custom then
+                        if Rec."Address Format" <> Rec."Address Format"::Custom then
                             exit;
 
                         CustomAddressFormat.FilterGroup(2);
-                        CustomAddressFormat.SetRange("Country/Region Code", Code);
+                        CustomAddressFormat.SetRange("Country/Region Code", Rec.Code);
                         CustomAddressFormat.FilterGroup(0);
 
                         Clear(CustomAddressFormatPage);

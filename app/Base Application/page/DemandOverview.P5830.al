@@ -11,7 +11,7 @@ page 5830 "Demand Overview"
     RefreshOnActivate = true;
     SourceTable = "Availability Calc. Overview";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Item No.", Date, "Attached to Entry No.", Type);
+    SourceTableView = sorting("Item No.", Date, "Attached to Entry No.", Type);
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -189,7 +189,7 @@ page 5830 "Demand Overview"
                     StyleExpr = TypeEmphasize;
                     ToolTip = 'Specifies the type of availability being calculated.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Planning;
                     Editable = false;
@@ -200,9 +200,10 @@ page 5830 "Demand Overview"
                 field(SourceTypeText; SourceTypeText)
                 {
                     ApplicationArea = Planning;
-                    CaptionClass = FieldCaption("Source Type");
+                    CaptionClass = Rec.FieldCaption("Source Type");
                     Editable = false;
                     HideValue = SourceTypeHideValue;
+                    ToolTip = 'Specifies the source type of the availability calculation.';
                 }
                 field("Source Order Status"; Rec."Source Order Status")
                 {
@@ -242,7 +243,7 @@ page 5830 "Demand Overview"
                 field(QuantityText; QuantityText)
                 {
                     ApplicationArea = Planning;
-                    CaptionClass = FieldCaption(Quantity);
+                    CaptionClass = Rec.FieldCaption(Quantity);
                     Caption = 'Quantity';
                     Editable = false;
                     ToolTip = 'Specifies how many units of the item are demanded.';
@@ -250,7 +251,7 @@ page 5830 "Demand Overview"
                 field(ReservedQuantityText; ReservedQuantityText)
                 {
                     ApplicationArea = Reservation;
-                    CaptionClass = FieldCaption("Reserved Quantity");
+                    CaptionClass = Rec.FieldCaption("Reserved Quantity");
                     Caption = 'Reserved Quantity';
                     Editable = false;
                     ToolTip = 'Specifies how many units of the demanded item are reserved.';
@@ -258,7 +259,7 @@ page 5830 "Demand Overview"
                 field("Running Total"; Rec."Running Total")
                 {
                     ApplicationArea = Planning;
-                    CaptionClass = FieldCaption("Running Total");
+                    CaptionClass = Rec.FieldCaption("Running Total");
                     Editable = false;
                     HideValue = RunningTotalHideValue;
                     Style = Strong;
@@ -268,7 +269,7 @@ page 5830 "Demand Overview"
                 field("Inventory Running Total"; Rec."Inventory Running Total")
                 {
                     ApplicationArea = Planning;
-                    CaptionClass = FieldCaption("Inventory Running Total");
+                    CaptionClass = Rec.FieldCaption("Inventory Running Total");
                     Editable = false;
                     HideValue = InventoryRunningTotalHideValue;
                     Style = Strong;
@@ -279,7 +280,7 @@ page 5830 "Demand Overview"
                 field("Supply Running Total"; Rec."Supply Running Total")
                 {
                     ApplicationArea = Planning;
-                    CaptionClass = FieldCaption("Supply Running Total");
+                    CaptionClass = Rec.FieldCaption("Supply Running Total");
                     Editable = false;
                     HideValue = SupplyRunningTotalHideValue;
                     Style = Strong;
@@ -290,7 +291,7 @@ page 5830 "Demand Overview"
                 field("Demand Running Total"; Rec."Demand Running Total")
                 {
                     ApplicationArea = Planning;
-                    CaptionClass = FieldCaption("Demand Running Total");
+                    CaptionClass = Rec.FieldCaption("Demand Running Total");
                     Editable = false;
                     HideValue = DemandRunningTotalHideValue;
                     Style = Strong;
@@ -402,9 +403,9 @@ page 5830 "Demand Overview"
                     CalculationOfDemand := true;
                     InitTempTable();
                     IsCalculated := true;
-                    SetRange("Matches Criteria");
+                    Rec.SetRange("Matches Criteria");
                     if MatchCriteria then
-                        SetRange("Matches Criteria", true);
+                        Rec.SetRange("Matches Criteria", true);
                     CurrPage.Update(false);
                 end;
             }
@@ -425,36 +426,36 @@ page 5830 "Demand Overview"
     trigger OnAfterGetRecord()
     begin
         TypeIndent := 0;
-        ItemNoHideValue := Type <> Type::Item;
-        if Type = Type::Item then
-            ItemNoEmphasize := "Matches Criteria";
+        ItemNoHideValue := Rec.Type <> Rec.Type::Item;
+        if Rec.Type = Rec.Type::Item then
+            ItemNoEmphasize := Rec."Matches Criteria";
 
-        TypeEmphasize := "Matches Criteria" and (Type in [Type::Item, Type::"As of Date"]);
-        TypeIndent := Level;
+        TypeEmphasize := Rec."Matches Criteria" and (Rec.Type in [Rec.Type::Item, Rec.Type::"As of Date"]);
+        TypeIndent := Rec.Level;
 
-        SourceTypeText := Format("Source Type");
+        SourceTypeText := Format(Rec."Source Type");
         SourceTypeTextOnFormat(SourceTypeText);
 
-        if Type in [Type::Item, Type::"As of Date"] then begin
+        if Rec.Type in [Rec.Type::Item, Rec.Type::"As of Date"] then begin
             QuantityText := '';
             ReservedQuantityText := '';
         end else begin
-            QuantityText := Format(Quantity);
-            ReservedQuantityText := Format("Reserved Quantity");
+            QuantityText := Format(Rec.Quantity);
+            ReservedQuantityText := Format(Rec."Reserved Quantity");
         end;
 
-        SupplyRunningTotalHideValue := Type = Type::Item;
-        SourceOrderStatusHideValue := Type = Type::Item;
-        RunningTotalHideValue := Type = Type::Item;
-        InventoryRunningTotalHideValue := Type = Type::Item;
-        DemandRunningTotalHideValue := Type = Type::Item;
+        SupplyRunningTotalHideValue := Rec.Type = Rec.Type::Item;
+        SourceOrderStatusHideValue := Rec.Type = Rec.Type::Item;
+        RunningTotalHideValue := Rec.Type = Rec.Type::Item;
+        InventoryRunningTotalHideValue := Rec.Type = Rec.Type::Item;
+        DemandRunningTotalHideValue := Rec.Type = Rec.Type::Item;
 
-        DateEmphasize := "Running Total" < 0;
-        DescriptionEmphasize := Type = Type::Item;
-        SupplyRunningTotalEmphasize := Type = Type::"As of Date";
-        DemandRunningTotalEmphasize := Type = Type::"As of Date";
-        RunningTotalEmphasize := Type = Type::"As of Date";
-        InventoryRunningTotalEmphasize := Type = Type::"As of Date";
+        DateEmphasize := Rec."Running Total" < 0;
+        DescriptionEmphasize := Rec.Type = Rec.Type::Item;
+        SupplyRunningTotalEmphasize := Rec.Type = Rec.Type::"As of Date";
+        DemandRunningTotalEmphasize := Rec.Type = Rec.Type::"As of Date";
+        RunningTotalEmphasize := Rec.Type = Rec.Type::"As of Date";
+        InventoryRunningTotalEmphasize := Rec.Type = Rec.Type::"As of Date";
     end;
 
     trigger OnInit()
@@ -467,9 +468,9 @@ page 5830 "Demand Overview"
     begin
         InitTempTable();
 
-        SetRange("Matches Criteria");
+        Rec.SetRange("Matches Criteria");
         if MatchCriteria then
-            SetRange("Matches Criteria", true);
+            Rec.SetRange("Matches Criteria", true);
         DemandNoCtrlEnable := DemandType <> DemandType::" ";
         CurrPage.Update(false);
     end;
@@ -503,45 +504,25 @@ page 5830 "Demand Overview"
         Text026: Label 'Displaying results';
 
     protected var
-        [InDataSet]
         DemandNoCtrlEnable: Boolean;
-        [InDataSet]
         ItemNoHideValue: Boolean;
-        [InDataSet]
         ItemNoEmphasize: Boolean;
-        [InDataSet]
         TypeEmphasize: Boolean;
-        [InDataSet]
         TypeIndent: Integer;
-        [InDataSet]
         SourceTypeHideValue: Boolean;
-        [InDataSet]
         SourceTypeText: Text[1024];
-        [InDataSet]
         SourceOrderStatusHideValue: Boolean;
-        [InDataSet]
         DescriptionEmphasize: Boolean;
-        [InDataSet]
         QuantityText: Text[1024];
-        [InDataSet]
         DateEmphasize: Boolean;
-        [InDataSet]
         ReservedQuantityText: Text[1024];
-        [InDataSet]
         RunningTotalHideValue: Boolean;
-        [InDataSet]
         RunningTotalEmphasize: Boolean;
-        [InDataSet]
         InventoryRunningTotalHideValue: Boolean;
-        [InDataSet]
         InventoryRunningTotalEmphasize: Boolean;
-        [InDataSet]
         SupplyRunningTotalHideValue: Boolean;
-        [InDataSet]
         SupplyRunningTotalEmphasize: Boolean;
-        [InDataSet]
         DemandRunningTotalHideValue: Boolean;
-        [InDataSet]
         DemandRunningTotalEmphasize: Boolean;
         CalculationOfDemand: Boolean;
 
@@ -572,19 +553,19 @@ page 5830 "Demand Overview"
         CalcAvailOverview.SetParam(DemandType, DemandNo);
         CalcAvailOverview.Run(TempAvailCalcOverview);
         TempAvailCalcOverview.Reset();
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         if TempAvailCalcOverview.Find('-') then
             repeat
                 if TempAvailCalcOverview.Level = 0 then begin
                     Rec := TempAvailCalcOverview;
-                    Insert();
+                    Rec.Insert();
                 end;
             until TempAvailCalcOverview.Next() = 0;
-        CopyFilters(AvailCalcOverviewFilters);
+        Rec.CopyFilters(AvailCalcOverviewFilters);
         ExpandAll(TempAvailCalcOverview);
-        Copy(AvailCalcOverviewFilters);
-        if Find('-') then;
+        Rec.Copy(AvailCalcOverviewFilters);
+        if Rec.Find('-') then;
         IsCalculated := true;
     end;
 
@@ -605,46 +586,46 @@ page 5830 "Demand Overview"
 
         // Fetching Items
         Window.Update(1, Text023);
-        Reset();
-        if Find('+') then
+        Rec.Reset();
+        if Rec.Find('+') then
             repeat
-                if Type = Type::Item then begin
+                if Rec.Type = Rec.Type::Item then begin
                     AvailCalcOverview := Rec;
                     if CalcAvailOverview.EntriesExist(AvailCalcOverview) then begin
                         AvailCalcOverview.Insert();
                         CalcAvailOverview.CalculateItem(AvailCalcOverview);
                     end;
                 end;
-            until Next(-1) = 0;
+            until Rec.Next(-1) = 0;
 
         // Fetch Entries in Dates
         Window.Update(1, Text025);
         if AvailCalcOverview.Find('+') then
             repeat
                 Rec := AvailCalcOverview;
-                if AvailCalcOverview.Type = Type::"As of Date" then
+                if AvailCalcOverview.Type = Rec.Type::"As of Date" then
                     CalcAvailOverview.CalculateDate(AvailCalcOverview);
                 AvailCalcOverview := Rec;
             until AvailCalcOverview.Next(-1) = 0;
 
         // Copy to View Table
         Window.Update(1, Text026);
-        DeleteAll();
+        Rec.DeleteAll();
         if AvailCalcOverview.Find('-') then
             repeat
                 Rec := AvailCalcOverview;
-                Insert();
+                Rec.Insert();
             until AvailCalcOverview.Next() = 0;
 
         Window.Close();
-        Copy(AvailCalcOverviewFilters);
-        if Find('-') then;
+        Rec.Copy(AvailCalcOverviewFilters);
+        if Rec.Find('-') then;
     end;
 
     procedure SetRecFilters()
     begin
-        Reset();
-        SetCurrentKey("Item No.", Date, "Attached to Entry No.", Type);
+        Rec.Reset();
+        Rec.SetCurrentKey("Item No.", Date, "Attached to Entry No.", Type);
         CurrPage.Update(false);
     end;
 
@@ -661,7 +642,7 @@ page 5830 "Demand Overview"
     local procedure SourceTypeTextOnFormat(var Text: Text[1024])
     begin
         SourceTypeHideValue := false;
-        case "Source Type" of
+        case Rec."Source Type" of
             DATABASE::"Sales Line":
                 Text := Text001;
             DATABASE::"Service Line":

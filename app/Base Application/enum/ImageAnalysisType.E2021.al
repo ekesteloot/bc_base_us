@@ -1,3 +1,5 @@
+namespace System.AI;
+
 enum 2021 "Image Analysis Type"
 {
     Extensible = false;

@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.History;
+
 report 901 "Copy Assembly Document"
 {
     Caption = 'Copy Assembly Document';

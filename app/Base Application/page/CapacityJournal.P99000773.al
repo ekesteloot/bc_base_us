@@ -1,3 +1,13 @@
+namespace Microsoft.Manufacturing.Capacity;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+
 page 99000773 "Capacity Journal"
 {
     ApplicationArea = Manufacturing;
@@ -65,6 +75,28 @@ page 99000773 "Capacity Journal"
                     begin
                         Rec.LookupItemNo();
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        ItemNoOnAfterValidate();
+                    end;
+                }
+                field("Item Reference No."; Rec."Item Reference No.")
+                {
+                    AccessByPermission = tabledata "Item Reference" = R;
+                    ApplicationArea = Manufacturing, ItemReferences;
+                    QuickEntry = false;
+                    ToolTip = 'Specifies a reference to the item number as defined by the item''s barcode.';
+                    Visible = false;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        ItemReferenceManagement: Codeunit "Item Reference Management";
+                    begin
+                        ItemReferenceManagement.ItemJournalReferenceNoLookup(Rec);
+                        ItemNoOnAfterValidate();
+                        OnReferenceNoOnAfterLookup(Rec);
                     end;
 
                     trigger OnValidate()
@@ -200,9 +232,9 @@ page 99000773 "Capacity Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
@@ -214,9 +246,9 @@ page 99000773 "Capacity Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
@@ -228,9 +260,9 @@ page 99000773 "Capacity Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
@@ -242,9 +274,9 @@ page 99000773 "Capacity Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
@@ -256,9 +288,9 @@ page 99000773 "Capacity Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
@@ -270,9 +302,9 @@ page 99000773 "Capacity Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
@@ -307,9 +339,9 @@ page 99000773 "Capacity Journal"
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
                 Visible = BackgroundErrorCheck;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -382,12 +414,12 @@ page 99000773 "Capacity Journal"
                             Rec.Type::"Work Center":
                                 begin
                                     WorkCenter.SetRange("No.", Rec."No.");
-                                    PAGE.Run(PAGE::"Work Center Card", WorkCenter);
+                                    PAGE.Run(Enum::PageID::"Work Center Card".AsInteger(), WorkCenter);
                                 end;
                             Rec.Type::"Machine Center":
                                 begin
                                     MachCenter.SetRange("No.", Rec."No.");
-                                    PAGE.Run(PAGE::"Machine Center Card", MachCenter);
+                                    PAGE.Run(Enum::PageID::"Machine Center Card".AsInteger(), MachCenter);
                                 end;
                         end;
                     end;
@@ -398,9 +430,9 @@ page 99000773 "Capacity Journal"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     RunObject = Page "Capacity Ledger Entries";
-                    RunPageLink = "Order Type" = CONST(Production),
-                                  "Order No." = FIELD("Order No.");
-                    RunPageView = SORTING("Order Type", "Order No.");
+                    RunPageLink = "Order Type" = const(Production),
+                                  "Order No." = field("Order No.");
+                    RunPageView = sorting("Order Type", "Order No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -489,7 +521,7 @@ page 99000773 "Capacity Journal"
 
                         trigger OnAction()
                         begin
-                            SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                            Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                         end;
                     }
                     action(ShowAllLines)
@@ -503,7 +535,7 @@ page 99000773 "Capacity Journal"
 
                         trigger OnAction()
                         begin
-                            SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                            Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                         end;
                     }
 
@@ -607,7 +639,7 @@ page 99000773 "Capacity Journal"
             SetControlAppearanceFromBatch();
             exit;
         end;
-        ItemJnlMgt.TemplateSelection(PAGE::"Capacity Journal", 6, false, Rec, JnlSelected);
+        ItemJnlMgt.TemplateSelection(Enum::PageID::"Capacity Journal".AsInteger(), 6, false, Rec, JnlSelected);
         if not JnlSelected then
             Error('');
         ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
@@ -647,12 +679,12 @@ page 99000773 "Capacity Journal"
         ItemJournalBatch: Record "Item Journal Batch";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
     begin
-        if not ItemJournalBatch.Get(GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
+        if not ItemJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
 
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
-        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
         ItemJournalErrorsMgt.SetFullBatchCheck(true);
     end;
 
@@ -685,6 +717,11 @@ page 99000773 "Capacity Journal"
         ItemJnlPost: Codeunit "Item Jnl.-Post";
     begin
         ItemJnlPost.Preview(Rec);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReferenceNoOnAfterLookup(var ItemJournalLine: Record "Item Journal Line")
+    begin
     end;
 }
 

@@ -1,3 +1,11 @@
+namespace Microsoft.FixedAssets.Maintenance;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Ledger;
+using System.DataAdministration;
+using System.Utilities;
+
 report 5698 "Date Compress Maint. Ledger"
 {
     Caption = 'Date Compress Maint. Ledger';
@@ -11,7 +19,7 @@ report 5698 "Date Compress Maint. Ledger"
     {
         dataitem("Maintenance Ledger Entry"; "Maintenance Ledger Entry")
         {
-            DataItemTableView = SORTING("FA No.", "Depreciation Book Code", "FA Posting Date");
+            DataItemTableView = sorting("FA No.", "Depreciation Book Code", "FA Posting Date");
             RequestFilterFields = "FA No.", "Depreciation Book Code";
 
             trigger OnAfterGetRecord()
@@ -303,7 +311,6 @@ report 5698 "Date Compress Maint. Ledger"
         DimEntryNo: Integer;
         RetainDimText: Text[250];
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
 
         CompressEntriesQst: Label 'This batch job deletes entries. We recommend that you create a backup of the database before you run the batch job.\\Do you want to continue?';

@@ -10,7 +10,7 @@ report 10102 "Top __ Vendor List"
     {
         dataitem(Heading; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             MaxIteration = 1;
             column(MainTitle_; MainTitle)
             {
@@ -59,7 +59,7 @@ report 10102 "Top __ Vendor List"
             }
             dataitem(Vendor; Vendor)
             {
-                DataItemTableView = SORTING("No.");
+                DataItemTableView = sorting("No.");
                 RequestFilterFields = "No.", "Vendor Posting Group", "Purchaser Code", "Date Filter";
 
                 trigger OnAfterGetRecord()
@@ -103,7 +103,7 @@ report 10102 "Top __ Vendor List"
             }
             dataitem(PrintLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 MaxIteration = 99;
                 column(i; i)
                 {

@@ -1,3 +1,8 @@
+namespace Microsoft.Intercompany.BankAccount;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Foundation.Company;
+
 table 422 "IC Bank Account"
 {
     Caption = 'IC Bank Account';

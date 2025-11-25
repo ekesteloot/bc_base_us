@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 page 471 "VAT Product Posting Groups"
 {
     ApplicationArea = Basic, Suite;
@@ -13,7 +15,7 @@ page 471 "VAT Product Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the posting group the determines how to calculate VAT for items or resources that you purchase or sell.';
@@ -50,7 +52,7 @@ page 471 "VAT Product Posting Groups"
                 Caption = '&Setup';
                 Image = Setup;
                 RunObject = Page "VAT Posting Setup";
-                RunPageLink = "VAT Prod. Posting Group" = FIELD(Code);
+                RunPageLink = "VAT Prod. Posting Group" = field(Code);
                 ToolTip = 'View or edit combinations of VAT business posting groups and VAT product posting groups, which determine which G/L accounts to post to when you post journals and documents.';
             }
         }

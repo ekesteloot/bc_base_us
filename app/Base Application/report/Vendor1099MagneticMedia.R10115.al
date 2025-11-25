@@ -9,7 +9,7 @@ report 10115 "Vendor 1099 Magnetic Media"
     {
         dataitem("T Record"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             MaxIteration = 1;
 
             trigger OnAfterGetRecord()
@@ -19,11 +19,11 @@ report 10115 "Vendor 1099 Magnetic Media"
         }
         dataitem("A Record"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             MaxIteration = 4;
             dataitem(Vendor; Vendor)
             {
-                DataItemTableView = SORTING("No.");
+                DataItemTableView = sorting("No.");
                 RequestFilterFields = "No.";
                 RequestFilterHeading = 'Vendor Filter';
 
@@ -72,7 +72,7 @@ report 10115 "Vendor 1099 Magnetic Media"
             }
             dataitem("C Record"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 MaxIteration = 1;
 
                 trigger OnAfterGetRecord()
@@ -157,7 +157,7 @@ report 10115 "Vendor 1099 Magnetic Media"
         }
         dataitem("F Record"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             MaxIteration = 1;
 
             trigger OnAfterGetRecord()

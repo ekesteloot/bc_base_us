@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
 enum 246 "Requisition Line Type"
 {
     Extensible = true;

@@ -1,3 +1,8 @@
+namespace System.Tooling;
+
+using System.Apps;
+using System.Reflection;
+
 page 9633 "Page Inspection Extensions"
 {
     Caption = 'Page Inspection Extensions';
@@ -65,15 +70,15 @@ page 9633 "Page Inspection Extensions"
         ExtensionInfo: Text;
         SeparatorText: Text;
     begin
-        Version := StrSubstNo('%1.%2.%3', "Version Major", "Version Minor", "Version Build");
-        PublishedBy := StrSubstNo('by %1', Publisher);
+        Version := StrSubstNo('%1.%2.%3', Rec."Version Major", Rec."Version Minor", Rec."Version Build");
+        PublishedBy := StrSubstNo('by %1', Rec.Publisher);
 
         ExtensionType := '';
         ExtensionInfo := '';
 
         if AllObjWithCaption.ReadPermission() then begin
             AllObjWithCaption.Reset();
-            AllObjWithCaption.SetRange("App Package ID", "Package ID");
+            AllObjWithCaption.SetRange("App Package ID", Rec."Package ID");
 
             // page added by extension
             AllObjWithCaption.SetRange("Object ID", CurrentPageId);
@@ -88,7 +93,7 @@ page 9633 "Page Inspection Extensions"
                 ExtensionType := ExtensionType + ', ' + NewTableLbl;
 
             AllObjWithCaption.Reset();
-            AllObjWithCaption.SetRange("App Package ID", "Package ID");
+            AllObjWithCaption.SetRange("App Package ID", Rec."Package ID");
 
             // page extended by extension
             AllObjWithCaption.SetRange("Object Subtype", StrSubstNo('%1', CurrentPageId));
@@ -103,27 +108,25 @@ page 9633 "Page Inspection Extensions"
                 ExtensionType := ExtensionType + ', ' + ExtTableLbl;
 
             ExtensionType := DelChr(ExtensionType, '<', ',');
-        end;
 
-        if AllObjWithCaption.ReadPermission() then begin
             AllObjWithCaption.Reset();
             AllObjWithCaption.SetRange("App Package ID", Rec."Package ID");
 
-            if AllObjWithCaption.FindFirst() then begin
-                ExtensionExecutionInfo.Reset();
-                ExtensionExecutionInfo.SetRange("Form ID", CurrentFormId);
-                ExtensionExecutionInfo.SetRange("Runtime Package ID", AllObjWithCaption."App Runtime Package ID");
+            if AllObjWithCaption.FindFirst() then
+                if ExtensionExecutionInfo.ReadPermission() then begin
+                    ExtensionExecutionInfo.Reset();
+                    ExtensionExecutionInfo.SetRange("Form ID", CurrentFormId);
+                    ExtensionExecutionInfo.SetRange("Runtime Package ID", AllObjWithCaption."App Runtime Package ID");
 
-                if ExtensionExecutionInfo.FindFirst() then
-                    ExtensionInfo := StrSubstNo(
-                        MillisecondsAndSubscribersLbl,
-                        Format(ExtensionExecutionInfo."Execution Time"),
-                        Format(ExtensionExecutionInfo."Subscriber Execution Count"))
-                else
-                    ExtensionInfo := NoExtensionInfoLbl;
-            end;
+                    if ExtensionExecutionInfo.FindFirst() then
+                        ExtensionInfo := StrSubstNo(
+                            MillisecondsAndSubscribersLbl,
+                            Format(ExtensionExecutionInfo."Execution Time"),
+                            Format(ExtensionExecutionInfo."Subscriber Execution Count"))
+                    else
+                        ExtensionInfo := NoExtensionInfoLbl;
+                end;
         end;
-
 
         if (StrLen(ExtensionType) > 0) and (StrLen(ExtensionInfo) > 0) then
             SeparatorText := '; '
@@ -141,7 +144,6 @@ page 9633 "Page Inspection Extensions"
         CurrentFormId: Guid;
         CurrentPageId: Integer;
         CurrentTableId: Integer;
-        FilterConditions: Text;
         NewPageLbl: Label 'Adds page';
         NewTableLbl: Label 'Adds table';
         ExtPageLbl: Label 'Extends page';
@@ -149,84 +151,12 @@ page 9633 "Page Inspection Extensions"
         MillisecondsAndSubscribersLbl: Label '%1ms, %2 subs.', Comment = '%1 is millisceonds, %2 is subscribers. "subs." is an abbreviation of "subscribers"';
         NoExtensionInfoLbl: Label 'No extension info';
         TypeOfExtensionFmtLbl: Label '%1%2%3', Locked = true;
-        OrFilterFmtLbl: Label '%1|', Locked = true;
 
-    [Scope('OnPrem')]
     procedure FilterForExtAffectingPage(PageId: Integer; TableId: Integer; FormId: Guid)
     var
-        AllObjWithCaption: Record AllObjWithCaption;
-        ExtensionExecutionInfo: Record "Extension Execution Info";
-        TempGuid: Guid;
+        VSCodeRequestHelper: Codeunit "VS Code Request Helper";
     begin
-        if (PageId = CurrentPageId) and (TableId = CurrentTableId) then
-            exit;
-
-        CurrentPageId := PageId;
-        CurrentTableId := TableId;
-        FilterConditions := '';
-
-        CurrentFormId := FormId;
-
-        if AllObjWithCaption.ReadPermission() then begin
-            // check if this page was added by extension
-            AllObjWithCaption.Reset();
-            AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Page);
-            AllObjWithCaption.SetRange("Object ID", PageId);
-            if AllObjWithCaption.Find('-') then
-                repeat
-                    FilterConditions := FilterConditions + StrSubstNo('%1|', AllObjWithCaption."App Package ID");
-                until AllObjWithCaption.Next() = 0;
-
-            // check if page was extended
-            AllObjWithCaption.Reset();
-            AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::PageExtension);
-            AllObjWithCaption.SetRange("Object Subtype", StrSubstNo('%1', PageId));
-            if AllObjWithCaption.Find('-') then
-                repeat
-                    FilterConditions := FilterConditions + StrSubstNo('%1|', AllObjWithCaption."App Package ID");
-                until AllObjWithCaption.Next() = 0;
-
-            // check if source table was added by extension
-            AllObjWithCaption.Reset();
-            AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
-            AllObjWithCaption.SetRange("Object ID", TableId);
-            if AllObjWithCaption.Find('-') then
-                repeat
-                    FilterConditions := FilterConditions + StrSubstNo('%1|', AllObjWithCaption."App Package ID");
-                until AllObjWithCaption.Next() = 0;
-
-            // check if source table was extended by extension
-            AllObjWithCaption.Reset();
-            AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::TableExtension);
-            AllObjWithCaption.SetRange("Object Subtype", StrSubstNo('%1', TableId));
-            if AllObjWithCaption.Find('-') then
-                repeat
-                    FilterConditions := FilterConditions + StrSubstNo('%1|', AllObjWithCaption."App Package ID");
-                until AllObjWithCaption.Next() = 0;
-
-            // Add filters for arbitrary code which has executed on the form
-            if ExtensionExecutionInfo.ReadPermission() then begin
-                ExtensionExecutionInfo.SetRange("Form ID", CurrentFormId);
-                if ExtensionExecutionInfo.Find('-') then
-                    repeat
-                        AllObjWithCaption.Reset();
-                        AllObjWithCaption.SetRange("App Runtime Package ID", ExtensionExecutionInfo."Runtime Package ID");
-                        if AllObjWithCaption.FindFirst() then
-                            FilterConditions := FilterConditions + StrSubstNo(OrFilterFmtLbl, AllObjWithCaption."App Package ID");
-                    until ExtensionExecutionInfo.Next() = 0;
-            end;
-        end;
-
-        Reset();
-        if FilterConditions <> '' then begin
-            FilterConditions := DelChr(FilterConditions, '>', '|');
-            SetFilter("Package ID", FilterConditions);
-        end else begin
-            TempGuid := CreateGuid();
-            Clear(TempGuid);
-            SetFilter("Package ID", '%1', TempGuid);
-        end;
-
+        VSCodeRequestHelper.FilterForExtAffectingPage(PageId, TableId, FormId, Rec);
         CurrPage.Update(false);
     end;
 

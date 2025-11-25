@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5145 "Contact Through"
 {
     Caption = 'Contact Through';
@@ -23,7 +25,7 @@ page 5145 "Contact Through"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the description of the phone number or e-mail address.';
                 }
-                field(Number; Number)
+                field(Number; Rec.Number)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the telephone number.';
@@ -65,15 +67,15 @@ page 5145 "Contact Through"
 
     trigger OnOpenPage()
     begin
-        SetFilter(Number, '<>''''');
-        if Find('-') then begin
+        Rec.SetFilter(Number, '<>''''');
+        if Rec.Find('-') then begin
             CurrPage.Caption := Text000;
             NumberVisible := true;
             EmailVisible := false;
         end else begin
-            Reset();
-            SetFilter("E-Mail", '<>''''');
-            if Find('-') then begin
+            Rec.Reset();
+            Rec.SetFilter("E-Mail", '<>''''');
+            if Rec.Find('-') then begin
                 CurrPage.Caption := Text001;
                 NumberVisible := false;
                 EmailVisible := true;
@@ -85,9 +87,7 @@ page 5145 "Contact Through"
     var
         Text000: Label 'Contact Phone Numbers';
         Text001: Label 'Contact Emails';
-        [InDataSet]
         NumberVisible: Boolean;
-        [InDataSet]
         EmailVisible: Boolean;
 }
 

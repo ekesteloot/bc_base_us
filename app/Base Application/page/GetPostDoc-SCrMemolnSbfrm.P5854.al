@@ -67,7 +67,7 @@ page 5854 "Get Post.Doc-S.Cr.MemoLn Sbfrm"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = SalesReturnOrder;
                     ToolTip = 'Specifies that this item is a catalog item.';
@@ -258,7 +258,7 @@ page 5854 "Get Post.Doc-S.Cr.MemoLn Sbfrm"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Lines")
@@ -326,7 +326,7 @@ page 5854 "Get Post.Doc-S.Cr.MemoLn Sbfrm"
 
         SalesCrMemoLine := Rec;
         repeat
-            NextSteps := Next(Steps / Abs(Steps));
+            NextSteps := Rec.Next(Steps / Abs(Steps));
             ShowRec := IsShowRec(Rec);
             if ShowRec then begin
                 RealSteps := RealSteps + NextSteps;
@@ -334,7 +334,7 @@ page 5854 "Get Post.Doc-S.Cr.MemoLn Sbfrm"
             end;
         until (NextSteps = 0) or (RealSteps = Steps);
         Rec := SalesCrMemoLine;
-        Find();
+        Rec.Find();
         exit(RealSteps);
     end;
 
@@ -348,7 +348,6 @@ page 5854 "Get Post.Doc-S.Cr.MemoLn Sbfrm"
         TempSalesCrMemoLine: Record "Sales Cr.Memo Line" temporary;
         UnitPrice: Decimal;
         LineAmount: Decimal;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
         ShowRec: Boolean;
 
@@ -356,23 +355,23 @@ page 5854 "Get Post.Doc-S.Cr.MemoLn Sbfrm"
     begin
         TempSalesCrMemoLine.Reset();
         TempSalesCrMemoLine.CopyFilters(Rec);
-        TempSalesCrMemoLine.SetRange("Document No.", "Document No.");
+        TempSalesCrMemoLine.SetRange("Document No.", Rec."Document No.");
         if not TempSalesCrMemoLine.FindFirst() then begin
             SalesCrMemoLine.CopyFilters(Rec);
-            SalesCrMemoLine.SetRange("Document No.", "Document No.");
+            SalesCrMemoLine.SetRange("Document No.", Rec."Document No.");
             if not SalesCrMemoLine.FindFirst() then
                 exit(false);
             TempSalesCrMemoLine := SalesCrMemoLine;
             TempSalesCrMemoLine.Insert();
         end;
 
-        if "Document No." <> SalesCrMemoHeader."No." then
-            SalesCrMemoHeader.Get("Document No.");
+        if Rec."Document No." <> SalesCrMemoHeader."No." then
+            SalesCrMemoHeader.Get(Rec."Document No.");
 
-        UnitPrice := "Unit Price";
-        LineAmount := "Line Amount";
+        UnitPrice := Rec."Unit Price";
+        LineAmount := Rec."Line Amount";
 
-        exit("Line No." = TempSalesCrMemoLine."Line No.");
+        exit(Rec."Line No." = TempSalesCrMemoLine."Line No.");
     end;
 
     local procedure IsShowRec(SalesCrMemoLine2: Record "Sales Cr.Memo Line"): Boolean
@@ -402,7 +401,7 @@ page 5854 "Get Post.Doc-S.Cr.MemoLn Sbfrm"
 
     local procedure ShowDocument()
     begin
-        if not SalesCrMemoHeader.Get("Document No.") then
+        if not SalesCrMemoHeader.Get(Rec."Document No.") then
             exit;
         PAGE.Run(PAGE::"Posted Sales Credit Memo", SalesCrMemoHeader);
     end;

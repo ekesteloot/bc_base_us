@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 page 9828 "User Group Plan FactBox"
 {
     Caption = 'User Groups in Plan';

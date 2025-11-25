@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Comment;
+
 enum 43 "Purchase Comment Document Type"
 {
     Extensible = true;

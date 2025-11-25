@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
 page 7503 "Item Attribute"
 {
     Caption = 'Item Attribute';
@@ -31,7 +33,7 @@ page 7503 "Item Attribute"
                             UpdateControlVisibility();
                         end;
                     }
-                    field(Blocked; Blocked)
+                    field(Blocked; Rec.Blocked)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies that the attribute cannot be assigned to an item. Items to which the attribute is already assigned are not affected.';
@@ -41,7 +43,7 @@ page 7503 "Item Attribute"
                 {
                     ShowCaption = false;
                     Visible = ValuesDrillDownVisible;
-                    field(Values; GetValues())
+                    field(Values; Rec.GetValues())
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Values';
@@ -50,7 +52,7 @@ page 7503 "Item Attribute"
 
                         trigger OnDrillDown()
                         begin
-                            OpenItemAttributeValues();
+                            Rec.OpenItemAttributeValues();
                         end;
                     }
                 }
@@ -66,7 +68,7 @@ page 7503 "Item Attribute"
 
                         trigger OnDrillDown()
                         begin
-                            OpenItemAttributeValues();
+                            Rec.OpenItemAttributeValues();
                         end;
                     }
                 }
@@ -85,7 +87,7 @@ page 7503 "Item Attribute"
                 Enabled = ValuesDrillDownVisible;
                 Image = CalculateInventory;
                 RunObject = Page "Item Attribute Values";
-                RunPageLink = "Attribute ID" = FIELD(ID);
+                RunPageLink = "Attribute ID" = field(ID);
                 ToolTip = 'Opens a window in which you can define the values for the selected item attribute.';
             }
             action(ItemAttributeTranslations)
@@ -94,7 +96,7 @@ page 7503 "Item Attribute"
                 Caption = 'Translations';
                 Image = Translations;
                 RunObject = Page "Item Attribute Translations";
-                RunPageLink = "Attribute ID" = FIELD(ID);
+                RunPageLink = "Attribute ID" = field(ID);
                 ToolTip = 'Opens a window in which you can define the translations for the selected item attribute.';
             }
         }
@@ -130,8 +132,8 @@ page 7503 "Item Attribute"
 
     local procedure UpdateControlVisibility()
     begin
-        ValuesDrillDownVisible := (Type = Type::Option);
-        UnitOfMeasureVisible := (Type = Type::Decimal) or (Type = Type::Integer);
+        ValuesDrillDownVisible := (Rec.Type = Rec.Type::Option);
+        UnitOfMeasureVisible := (Rec.Type = Rec.Type::Decimal) or (Rec.Type = Rec.Type::Integer);
     end;
 }
 

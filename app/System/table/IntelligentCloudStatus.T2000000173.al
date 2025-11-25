@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Integration;
+
 table 2000000173 "Intelligent Cloud Status"
 {
     Caption = 'Intelligent Cloud Status';
@@ -26,6 +32,14 @@ table 2000000173 "Intelligent Cloud Status"
         field(5; Blocked; Boolean)
         {
             Caption = 'Blocked';
+        }
+        field(6; "Replicate Data"; Boolean)
+        {
+            Caption = 'Replicate Data';
+        }
+        field(7; "Preserve Cloud Data"; Boolean)
+        {
+            Caption = 'Preserve Cloud Data';
         }
     }
 

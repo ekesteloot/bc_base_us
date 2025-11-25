@@ -1,3 +1,7 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+
 table 1114 "Cost Budget Buffer"
 {
     Caption = 'Cost Budget Buffer';

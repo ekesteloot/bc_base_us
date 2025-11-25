@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 Enum 5407 "Prod. Order Source Type"
 {
     Extensible = true;

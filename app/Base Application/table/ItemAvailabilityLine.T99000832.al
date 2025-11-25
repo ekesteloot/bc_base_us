@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Availability;
+
 table 99000832 "Item Availability Line"
 {
     Caption = 'Item Availability Line';

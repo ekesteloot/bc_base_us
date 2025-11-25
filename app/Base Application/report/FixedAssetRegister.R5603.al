@@ -1,7 +1,12 @@
+namespace Microsoft.FixedAssets.Reports;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+
 report 5603 "Fixed Asset Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/FixedAssetRegister.rdlc';
+    RDLCLayout = './FixedAssets/Reports/FixedAssetRegister.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset Register';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5603 "Fixed Asset Register"
     {
         dataitem("FA Register"; "FA Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
@@ -78,7 +83,7 @@ report 5603 "Fixed Asset Register"
             }
             dataitem("FA Ledger Entry"; "FA Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(FA_Ledger_Entry__FA_Posting_Date_; Format("FA Posting Date"))
                 {
                 }

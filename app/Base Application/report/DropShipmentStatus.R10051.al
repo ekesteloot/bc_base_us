@@ -9,7 +9,7 @@ report 10051 "Drop Shipment Status"
     {
         dataitem("Sales Line"; "Sales Line")
         {
-            DataItemTableView = SORTING("Document Type", Type, "No.") WHERE("Document Type" = CONST(Order), "Drop Shipment" = CONST(true), Type = CONST(Item));
+            DataItemTableView = sorting("Document Type", Type, "No.") where("Document Type" = const(Order), "Drop Shipment" = const(true), Type = const(Item));
             RequestFilterFields = "Bill-to Customer No.", "Document No.", Type, "No.", "Shipment Date";
             RequestFilterHeading = 'Drop Shipments';
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))

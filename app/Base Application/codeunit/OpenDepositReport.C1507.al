@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Deposit;
+
 codeunit 1507 "Open Deposit Report"
 {
     trigger OnRun()

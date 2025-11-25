@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.InventoryMgt.Analysis;
+
 report 7117 "Run Sales Analysis Col. Temp."
 {
     ApplicationArea = SalesAnalysis;

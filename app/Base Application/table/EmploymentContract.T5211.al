@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Setup;
+
+using Microsoft.HumanResources.Employee;
+
 table 5211 "Employment Contract"
 {
     Caption = 'Employment Contract';
@@ -17,8 +21,8 @@ table 5211 "Employment Contract"
         }
         field(3; "No. of Contracts"; Integer)
         {
-            CalcFormula = Count (Employee WHERE(Status = CONST(Active),
-                                                "Emplymt. Contract Code" = FIELD(Code)));
+            CalcFormula = Count(Employee where(Status = const(Active),
+                                                "Emplymt. Contract Code" = field(Code)));
             Caption = 'No. of Contracts';
             Editable = false;
             FieldClass = FlowField;

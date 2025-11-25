@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Analysis;
+
+using Microsoft.CRM.Opportunity;
+using System;
+using System.Utilities;
+using System.Visualization;
+
 page 782 "Opportunity Chart"
 {
     Caption = 'Opportunities';
@@ -14,7 +21,7 @@ page 782 "Opportunity Chart"
                 Enabled = false;
                 ShowCaption = false;
                 Style = StrongAccent;
-                StyleExpr = TRUE;
+                StyleExpr = true;
                 ToolTip = 'Specifies the status of the chart.';
             }
             usercontrol(BusinessChart; "Microsoft.Dynamics.Nav.Client.BusinessChart")

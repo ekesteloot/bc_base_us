@@ -1,3 +1,12 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Document;
+
 table 7190 "Sales Shipment Buffer"
 {
     Caption = 'Sales Shipment Buffer';
@@ -30,15 +39,15 @@ table 7190 "Sales Shipment Buffer"
         {
             Caption = 'No.';
             DataClassification = SystemMetadata;
-            TableRelation = IF (Type = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF (Type = CONST("Charge (Item)")) "Item Charge";
+            TableRelation = if (Type = const("G/L Account")) "G/L Account"
+            else
+            if (Type = const(Item)) Item
+            else
+            if (Type = const(Resource)) Resource
+            else
+            if (Type = const("Fixed Asset")) "Fixed Asset"
+            else
+            if (Type = const("Charge (Item)")) "Item Charge";
         }
         field(7; Quantity; Decimal)
         {

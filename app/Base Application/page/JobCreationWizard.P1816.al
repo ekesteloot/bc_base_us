@@ -1,3 +1,9 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.Sales.Customer;
+using System.Environment;
+using System.Utilities;
+
 page 1816 "Job Creation Wizard"
 {
     Caption = 'Create New Job';
@@ -98,20 +104,6 @@ page 1816 "Job Creation Wizard"
                                     SellToCustomerNo := Customer."No.";
                             end;
                         }
-#if not CLEAN20
-                        field("Bill-to Customer No."; Rec."Bill-to Customer No.")
-                        {
-                            ApplicationArea = Jobs;
-                            Caption = 'Bill-to Customer No.';
-                            TableRelation = Customer;
-                            ToolTip = 'Specifies the name of the customer who pays for the job.';
-                            Visible = false;
-                            ObsoleteTag = '20.0';
-                            ObsoleteReason = 'Sell-to Customer No. would be used for job creation.';
-                            ObsoleteState = Pending;
-
-                        }
-#endif
                     }
                     group(Control9)
                     {

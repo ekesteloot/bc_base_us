@@ -1,3 +1,8 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.FinancialMgt.Currency;
+using System.Visualization;
+
 table 1051 "Sorting Table"
 {
     Caption = 'Sorting Table';

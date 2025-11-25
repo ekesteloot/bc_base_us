@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FinancialMgt.Dimension;
+
 codeunit 5674 FADimensionManagement
 {
 

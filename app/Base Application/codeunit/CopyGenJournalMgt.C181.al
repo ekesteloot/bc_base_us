@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 codeunit 181 "Copy Gen. Journal Mgt."
 {
     trigger OnRun()

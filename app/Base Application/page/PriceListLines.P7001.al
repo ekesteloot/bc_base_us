@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.Sales.Pricing;
+
 page 7001 "Price List Lines"
 {
     AutoSplitKey = true;
@@ -314,53 +324,30 @@ page 7001 "Price List Lines"
         PriceListHeader: Record "Price List Header";
         PriceType: Enum "Price Type";
         ViewAmountType: Enum "Price Amount Type";
-        [InDataSet]
         AllowUpdatingDefaults: Boolean;
-        [InDataSet]
         AmountEditable: Boolean;
-        [InDataSet]
         AmountTypeIsEditable: Boolean;
-        [InDataSet]
         AmountTypeIsVisible: Boolean;
         DiscountStyle: Text;
-        [InDataSet]
         DiscountMandatory: Boolean;
-        [InDataSet]
         DiscountVisible: Boolean;
-        [InDataSet]
         IsJobGroup: Boolean;
-        [InDataSet]
         IsParentAllowed: Boolean;
-        [InDataSet]
         ItemAsset: Boolean;
         PriceStyle: Text;
-        [InDataSet]
         PriceMandatory: Boolean;
-        [InDataSet]
         AssignToNoVisible: Boolean;
-        [InDataSet]
         AssignToParentNoVisible: Boolean;
-        [InDataSet]
         JobSourceTypeVisible: Boolean;
-        [InDataSet]
         SourceTypeVisible: Boolean;
-        [InDataSet]
         SourceNoVisible: Boolean;
-        [InDataSet]
         PriceVisible: Boolean;
-        [InDataSet]
         ResourceAsset: Boolean;
-        [InDataSet]
         SourceNoEnabled: Boolean;
-        [InDataSet]
         ParentSourceNoVisible: Boolean;
-        [InDataSet]
         LineToVerify: Boolean;
-        [InDataSet]
         UOMEditable: Boolean;
-        [InDataSet]
         CostFactorVisible: Boolean;
-        [InDataSet]
         UseCustomLookup: Boolean;
 
     local procedure GetStyle(Mandatory: Boolean): Text;
@@ -436,12 +423,12 @@ page 7001 "Price List Lines"
     local procedure UpdateSourceType()
     begin
         case PriceListHeader."Source Group" of
-            "Price Source Group"::Customer:
+            PriceListHeader."Source Group"::Customer:
                 begin
                     IsJobGroup := false;
                     SourceType := "Sales Price Source Type".FromInteger(Rec."Source Type".AsInteger());
                 end;
-            "Price Source Group"::Job:
+            PriceListHeader."Source Group"::Job:
                 begin
                     IsJobGroup := true;
                     JobSourceType := "Job Price Source Type".FromInteger(Rec."Source Type".AsInteger());

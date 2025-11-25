@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Ledger;
+
 codeunit 6502 "Late Binding Management"
 {
 
@@ -351,7 +355,7 @@ codeunit 6502 "Late Binding Management"
         ReservEntry: Record "Reservation Entry";
         TotalReservedQty: Decimal;
     begin
-        ReservEntry.LockTable();
+        ReservEntry.ReadIsolation := IsolationLevel::ReadUncommitted; // Read uncommitted to avoid deadlocks during UpdLock transaction
         ReservEntry.SetCurrentKey("Item No.", "Source Type", "Source Subtype", "Reservation Status", "Location Code", "Variant Code");
         ReservEntry.SetRange("Item No.", TempTrackingSpecification."Item No.");
         ReservEntry.SetRange("Variant Code", TempTrackingSpecification."Variant Code");
@@ -363,6 +367,9 @@ codeunit 6502 "Late Binding Management"
 
         if ReservEntry.IsEmpty() then  // No reservations with Item Tracking exist against inventory - no basis for reallocation.
             exit(false);
+
+        ReservEntry.ReadIsolation := IsolationLevel::Default;
+        if ReservEntry.IsEmpty() then;
 
         ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Location Code");
         ItemLedgEntry.SetRange("Item No.", TempTrackingSpecification."Item No.");

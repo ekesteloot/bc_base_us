@@ -1,3 +1,18 @@
+﻿namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.FixedAssets.Setup;
+using System.Telemetry;
+using System.Utilities;
+
 codeunit 5600 "FA Insert Ledger Entry"
 {
     Permissions = TableData "FA Ledger Entry" = rim,
@@ -25,9 +40,6 @@ codeunit 5600 "FA Insert Ledger Entry"
         TempMaintenanceLedgEntry: Record "Maintenance Ledger Entry" temporary;
         FAReg: Record "FA Register";
         FAJnlLine: Record "FA Journal Line";
-#if not CLEAN20
-        TempFALedgerEntryReverse: Record "FA Ledger Entry" temporary;
-#endif
         FAInsertGLAcc: Codeunit "FA Insert G/L Account";
         FAAutomaticEntry: Codeunit "FA Automatic Entry";
         DeprBookCode: Code[10];
@@ -305,8 +317,10 @@ codeunit 5600 "FA Insert Ledger Entry"
     end;
 
     procedure CopyRecordLinksToFALedgEntry(GenJnlLine: Record "Gen. Journal Line")
+    var
+        RecordLinkMgt: Codeunit "Record Link Management";
     begin
-        FALedgEntry.CopyLinks(GenJnlLine);
+        RecordLinkMgt.CopyLinks(GenJnlLine, FALedgEntry);
     end;
 
     local procedure InitRegister(CalledFrom: Enum "FA Register Called From"; GLEntryNo: Integer; SourceCode: Code[10]; BatchName: Code[10])
@@ -316,22 +330,20 @@ codeunit 5600 "FA Insert Ledger Entry"
         if (CalledFrom = "FA Register Called From"::Maintenance) and (NextEntryNo <> 0) then
             exit;
 
-        with FAReg do begin
-            LockTable();
-            if FindLast() and (GLRegisterNo <> 0) and (GLRegisterNo = GetLastGLRegisterNo()) then
-                exit;
-            "No." := GetLastEntryNo() + 1;
+        FAReg.LockTable();
+        if FAReg.FindLast() and (GLRegisterNo <> 0) and (GLRegisterNo = FAReg.GetLastGLRegisterNo()) then
+            exit;
+        FAReg."No." := FAReg.GetLastEntryNo() + 1;
 
-            Init();
-            if GLEntryNo = 0 then
-                "Journal Type" := "Journal Type"::"Fixed Asset";
-            "Creation Date" := Today;
-            "Creation Time" := Time;
-            "Source Code" := SourceCode;
-            "Journal Batch Name" := BatchName;
-            "User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
-            Insert(true);
-        end;
+        FAReg.Init();
+        if GLEntryNo = 0 then
+            FAReg."Journal Type" := FAReg."Journal Type"::"Fixed Asset";
+        FAReg."Creation Date" := Today;
+        FAReg."Creation Time" := Time;
+        FAReg."Source Code" := SourceCode;
+        FAReg."Journal Batch Name" := BatchName;
+        FAReg."User ID" := CopyStr(UserId(), 1, MaxStrLen(FAReg."User ID"));
+        FAReg.Insert(true);
     end;
 
     procedure InsertRegister(CalledFrom: Enum "FA Register Called From"; NextEntryNo: Integer)
@@ -442,6 +454,7 @@ codeunit 5600 "FA Insert Ledger Entry"
                 end;
                 NextEntryNo := NextEntryNo + 1;
                 NewFAEntryNo := NextEntryNo;
+
                 IsHandled := false;
                 OnInsertReverseEntryOnBeforeInsertTempFALedgEntry(FALedgEntry3, IsHandled);
                 if not IsHandled then begin
@@ -548,23 +561,6 @@ codeunit 5600 "FA Insert Ledger Entry"
         end;
     end;
 
-#if not CLEAN20
-    [Obsolete('Reverted FA Disposal Entries sign', '18.0')]
-    procedure FinalizeInsertFA()
-    var
-        FALedgerEntry: Record "FA Ledger Entry";
-    begin
-        if TempFALedgerEntryReverse.FindSet() then begin
-            repeat
-                FALedgerEntry.Get(TempFALedgerEntryReverse."Entry No.");
-                ReverseFALedgerEntryAmounts(FALedgerEntry);
-                FALedgerEntry.Modify();
-            until TempFALedgerEntryReverse.Next() = 0;
-            TempFALedgerEntryReverse.DeleteAll();
-        end;
-    end;
-#endif
-
     local procedure SetFAReversalMark(var FALedgEntry: Record "FA Ledger Entry"; NextEntryNo: Integer)
     var
         FALedgEntry2: Record "FA Ledger Entry";
@@ -639,16 +635,6 @@ codeunit 5600 "FA Insert Ledger Entry"
     begin
         GLRegisterNo := NewGLRegisterNo;
     end;
-
-#if not CLEAN20
-    [Obsolete('Reverted FA Disposal Entries sign', '18.0')]
-    procedure ReverseFALedgerEntryAmounts(var FALedgerEntry: Record "FA Ledger Entry")
-    begin
-        FALedgerEntry.Amount := -FALedgerEntry.Amount;
-        FALedgerEntry."Amount (LCY)" := -FALedgerEntry."Amount (LCY)";
-        UpdateDebitCredit(FALedgerEntry);
-    end;
-#endif
 
     local procedure UpdateDebitCredit(var FALedgerEntry: Record "FA Ledger Entry")
     begin

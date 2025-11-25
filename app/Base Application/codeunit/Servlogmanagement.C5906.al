@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Loaner;
+
 codeunit 5906 ServLogManagement
 {
 

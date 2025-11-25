@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.Purchases.Vendor;
+
 query 263 "Vendor Ledger Entries"
 {
     Caption = 'Vendor Ledger Entries';

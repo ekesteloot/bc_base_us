@@ -1,3 +1,5 @@
+namespace System.Xml;
+
 table 9611 "XML Schema Restriction"
 {
     Caption = 'XML Schema Restriction';
@@ -12,7 +14,7 @@ table 9611 "XML Schema Restriction"
         field(2; "Element ID"; Integer)
         {
             Caption = 'Element ID';
-            TableRelation = "XML Schema Element".ID WHERE("XML Schema Code" = FIELD("XML Schema Code"));
+            TableRelation = "XML Schema Element".ID where("XML Schema Code" = field("XML Schema Code"));
         }
         field(3; ID; Integer)
         {

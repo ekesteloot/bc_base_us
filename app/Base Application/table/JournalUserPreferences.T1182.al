@@ -16,14 +16,14 @@ table 1182 "Journal User Preferences"
         {
             Caption = 'Page ID';
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Page));
         }
         field(3; "User ID"; Guid)
         {
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
-            TableRelation = User."User Security ID" WHERE("License Type" = CONST("Full User"));
+            TableRelation = User."User Security ID" where("License Type" = const("Full User"));
         }
         field(4; "Is Simple View"; Boolean)
         {
@@ -31,8 +31,8 @@ table 1182 "Journal User Preferences"
         }
         field(5; User; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("User ID"),
-                                                         "License Type" = CONST("Full User")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("User ID"),
+                                                         "License Type" = const("Full User")));
             Caption = 'User';
             FieldClass = FlowField;
         }

@@ -1,7 +1,12 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Sales.Customer;
+using System.Utilities;
+
 report 111 "Customer - Top 10 List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/CustomerTop10List.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerTop10List.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Customer - Top 10 List';
     PreviewMode = PrintLayout;
@@ -12,7 +17,7 @@ report 111 "Customer - Top 10 List"
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Customer Posting Group", "Currency Code", "Date Filter";
 
             trigger OnAfterGetRecord()
@@ -53,7 +58,7 @@ report 111 "Customer - Top 10 List"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(SortingCustomersCustDateFilter; StrSubstNo(Text001, CustDateFilter))
             {
             }
@@ -220,7 +225,6 @@ report 111 "Customer - Top 10 List"
         ChartType: Option "Bar chart","Pie chart";
         ChartTypeNo: Integer;
         ShowTypeNo: Integer;
-        [InDataSet]
         ChartTypeVisible: Boolean;
 
         Text000: Label 'Sorting customers    #1##########';

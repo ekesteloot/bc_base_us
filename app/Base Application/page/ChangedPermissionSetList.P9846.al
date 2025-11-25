@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 page 9846 "Changed Permission Set List"
 {
     Caption = 'Changed Permission Set List';

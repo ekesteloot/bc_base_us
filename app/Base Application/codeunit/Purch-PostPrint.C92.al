@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.Posting;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Setup;
+
 codeunit 92 "Purch.-Post + Print"
 {
     TableNo = "Purchase Header";

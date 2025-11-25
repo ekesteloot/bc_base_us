@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Posting;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Setup;
+using System.Threading;
+using System.Utilities;
+
 codeunit 95 "Purch Post Batch via Job Queue"
 {
     TableNo = "Job Queue Entry";
@@ -112,7 +120,7 @@ codeunit 95 "Purch Post Batch via Job Queue"
         case PurchaseHeader."Document Type" of
             PurchaseHeader."Document Type"::Order:
                 begin
-                    if PurchaseHeader.Ship then
+                    if PurchaseHeader.Receive then
                         Result := PrintReceiptDocument(PurchaseHeader, JobQueueEntry);
                     if PurchaseHeader.Invoice then
                         Result := Result or PrintInvoiceDocument(PurchaseHeader, JobQueueEntry);
@@ -132,7 +140,7 @@ codeunit 95 "Purch Post Batch via Job Queue"
         PurchRcptHeader."No." := PurchaseHeader."Last Receiving No.";
         PurchRcptHeader.SetRecFilter();
         RecRef.GetTable(PurchRcptHeader);
-        Result := PrintDocument("Report Selection Usage"::"P.Receipt", RecRef, PurchaseHeader, JobQueueEntry);
+        Result := PrintDocument(Enum::"Report Selection Usage"::"P.Receipt", RecRef, PurchaseHeader, JobQueueEntry);
     end;
 
     local procedure PrintInvoiceDocument(PurchaseHeader: Record "Purchase Header"; JobQueueEntry: Record "Job Queue Entry") Result: Boolean
@@ -146,7 +154,7 @@ codeunit 95 "Purch Post Batch via Job Queue"
             PurchInvHeader."No." := PurchaseHeader."Last Posting No.";
         PurchInvHeader.SetRecFilter();
         RecRef.GetTable(PurchInvHeader);
-        Result := PrintDocument("Report Selection Usage"::"P.Invoice", RecRef, PurchaseHeader, JobQueueEntry);
+        Result := PrintDocument(Enum::"Report Selection Usage"::"P.Invoice", RecRef, PurchaseHeader, JobQueueEntry);
     end;
 
     local procedure PrintCrMemoDocument(PurchaseHeader: Record "Purchase Header"; JobQueueEntry: Record "Job Queue Entry") Result: Boolean
@@ -160,7 +168,7 @@ codeunit 95 "Purch Post Batch via Job Queue"
             PurchCrMemoHdr."No." := PurchaseHeader."Last Posting No.";
         PurchCrMemoHdr.SetRecFilter();
         RecRef.GetTable(PurchCrMemoHdr);
-        Result := PrintDocument("Report Selection Usage"::"P.Cr.Memo", RecRef, PurchaseHeader, JobQueueEntry);
+        Result := PrintDocument(Enum::"Report Selection Usage"::"P.Cr.Memo", RecRef, PurchaseHeader, JobQueueEntry);
     end;
 
     local procedure PrintDocument(ReportUsage: Enum "Report Selection Usage"; RecRef: RecordRef; PurchaseHeader: Record "Purchase Header"; JobQueueEntry: Record "Job Queue Entry") Result: Boolean

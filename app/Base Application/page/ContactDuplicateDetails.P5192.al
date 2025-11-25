@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Duplicates;
+
 page 5192 "Contact Duplicate Details"
 {
     Caption = 'Contact Duplicate Details';
@@ -38,7 +40,7 @@ page 5192 "Contact Duplicate Details"
 
     trigger OnOpenPage()
     begin
-        CreateContactDuplicateDetails(NewContactNo, NewDuplicateContactNo);
+        Rec.CreateContactDuplicateDetails(NewContactNo, NewDuplicateContactNo);
     end;
 
     var

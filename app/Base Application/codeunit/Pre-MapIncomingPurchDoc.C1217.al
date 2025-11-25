@@ -1,4 +1,19 @@
-﻿codeunit 1217 "Pre-map Incoming Purch. Doc"
+namespace System.IO;
+
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
+codeunit 1217 "Pre-map Incoming Purch. Doc"
 {
     TableNo = "Data Exch.";
 
@@ -10,25 +25,25 @@
         CurrRecNo: Integer;
     begin
         ParentRecNo := 0;
-        FindDistinctRecordNos(TempIntegerHeaderRecords, "Entry No.", DATABASE::"Purchase Header", ParentRecNo);
+        FindDistinctRecordNos(TempIntegerHeaderRecords, Rec."Entry No.", DATABASE::"Purchase Header", ParentRecNo);
         if not TempIntegerHeaderRecords.FindSet() then
             exit;
 
         repeat
             CurrRecNo := TempIntegerHeaderRecords.Number;
 
-            ValidateCompanyInfo("Entry No.", CurrRecNo);
-            ValidateCurrency("Entry No.", CurrRecNo);
-            SetDocumentType("Entry No.", ParentRecNo, CurrRecNo);
+            ValidateCompanyInfo(Rec."Entry No.", CurrRecNo);
+            ValidateCurrency(Rec."Entry No.", CurrRecNo);
+            SetDocumentType(Rec."Entry No.", ParentRecNo, CurrRecNo);
 
-            CorrectHeaderData("Entry No.", CurrRecNo);
-            BuyFromVendorNo := FindBuyFromVendor("Entry No.", CurrRecNo);
-            PayToVendorNo := FindPayToVendor("Entry No.", CurrRecNo);
-            FindInvoiceToApplyTo("Entry No.", CurrRecNo);
+            CorrectHeaderData(Rec."Entry No.", CurrRecNo);
+            BuyFromVendorNo := FindBuyFromVendor(Rec."Entry No.", CurrRecNo);
+            PayToVendorNo := FindPayToVendor(Rec."Entry No.", CurrRecNo);
+            FindInvoiceToApplyTo(Rec."Entry No.", CurrRecNo);
 
-            PersistHeaderData("Entry No.", CurrRecNo, BuyFromVendorNo, PayToVendorNo);
+            PersistHeaderData(Rec."Entry No.", CurrRecNo, BuyFromVendorNo, PayToVendorNo);
 
-            ProcessLines("Entry No.", CurrRecNo, BuyFromVendorNo);
+            ProcessLines(Rec."Entry No.", CurrRecNo, BuyFromVendorNo);
         until TempIntegerHeaderRecords.Next() = 0;
     end;
 
@@ -773,9 +788,9 @@
         // Lookup Item Ref, then GTIN/Bar Code, else G/L Account
         if ResolveUnitOfMeasureFromDataImport(ImportedUnitCode, EntryNo, HeaderRecordNo, RecordNo) then
             if not FindItemReferenceForLine(ImportedUnitCode, EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-            if not FindItemForLine(ImportedUnitCode, EntryNo, HeaderRecordNo, RecordNo) then
-                if not FindGLAccountForLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
-                    LogErrorIfItemNotFound(EntryNo, HeaderRecordNo, RecordNo, VendorNo);
+                if not FindItemForLine(ImportedUnitCode, EntryNo, HeaderRecordNo, RecordNo) then
+                    if not FindGLAccountForLine(EntryNo, HeaderRecordNo, RecordNo, VendorNo) then
+                        LogErrorIfItemNotFound(EntryNo, HeaderRecordNo, RecordNo, VendorNo);
 
         ValidateLineDiscount(EntryNo, HeaderRecordNo, RecordNo);
     end;
@@ -1445,12 +1460,12 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFindGLAccountForLineOnBeforeFindAppropriateGLAccount(IntermediateDataImport: Record "Intermediate Data Import"; var GLAccountNo: Code[20]; EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]; var IsHandled: Boolean)
+    local procedure OnBeforeProcessLine(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeProcessLine(EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]; var IsHandled: Boolean)
+    local procedure OnFindGLAccountForLineOnBeforeFindAppropriateGLAccount(IntermediateDataImport: Record "Intermediate Data Import"; var GLAccountNo: Code[20]; EntryNo: Integer; HeaderRecordNo: Integer; RecordNo: Integer; VendorNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
 }

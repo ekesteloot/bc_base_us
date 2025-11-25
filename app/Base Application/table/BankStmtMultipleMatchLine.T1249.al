@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 table 1249 "Bank Stmt Multiple Match Line"
 {
     Caption = 'Bank Stmt Multiple Match Line';

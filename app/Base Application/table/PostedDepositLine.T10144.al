@@ -2,9 +2,6 @@ table 10144 "Posted Deposit Line"
 {
     Caption = 'Posted Deposit Line';
     LookupPageID = "Posted Deposit Lines";
-    ObsoleteReason = 'Deposits are now on the extension "Bank Deposit". Use/extend Posted Bank Deposit Line. Posted deposits will be kept just for querying historical information.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '22.0';
 
     fields
     {
@@ -25,15 +22,15 @@ table 10144 "Posted Deposit Line"
         field(4; "Account No."; Code[20])
         {
             Caption = 'Account No.';
-            TableRelation = IF ("Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Account Type" = CONST("IC Partner")) "IC Partner";
+            TableRelation = if ("Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Account Type" = const(Customer)) Customer
+            else
+            if ("Account Type" = const(Vendor)) Vendor
+            else
+            if ("Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Account Type" = const("IC Partner")) "IC Partner";
         }
         field(5; "Document Date"; Date)
         {
@@ -59,7 +56,7 @@ table 10144 "Posted Deposit Line"
         }
         field(10; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
             MinValue = 0;
@@ -68,21 +65,21 @@ table 10144 "Posted Deposit Line"
         {
             Caption = 'Posting Group';
             Editable = false;
-            TableRelation = IF ("Account Type" = CONST(Customer)) "Customer Posting Group"
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) "Vendor Posting Group";
+            TableRelation = if ("Account Type" = const(Customer)) "Customer Posting Group"
+            else
+            if ("Account Type" = const(Vendor)) "Vendor Posting Group";
         }
         field(12; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(13; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(14; "Posting Date"; Date)
         {
@@ -96,13 +93,13 @@ table 10144 "Posted Deposit Line"
         field(16; "Entry No."; Integer)
         {
             Caption = 'Entry No.';
-            TableRelation = IF ("Account Type" = CONST("G/L Account")) "G/L Entry"
-            ELSE
-            IF ("Account Type" = CONST(Customer)) "Cust. Ledger Entry"
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) "Vendor Ledger Entry"
-            ELSE
-            IF ("Account Type" = CONST("Bank Account")) "Bank Account Ledger Entry";
+            TableRelation = if ("Account Type" = const("G/L Account")) "G/L Entry"
+            else
+            if ("Account Type" = const(Customer)) "Cust. Ledger Entry"
+            else
+            if ("Account Type" = const(Vendor)) "Vendor Ledger Entry"
+            else
+            if ("Account Type" = const("Bank Account")) "Bank Account Ledger Entry";
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -112,7 +109,7 @@ table 10144 "Posted Deposit Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
     }

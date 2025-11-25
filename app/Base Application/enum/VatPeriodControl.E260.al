@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 enum 260 "VAT Period Control"
 {
     Access = Internal;

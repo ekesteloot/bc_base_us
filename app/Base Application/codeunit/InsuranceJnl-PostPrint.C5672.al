@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 codeunit 5672 "Insurance Jnl.-Post+Print"
 {
     TableNo = "Insurance Journal Line";
@@ -6,7 +10,7 @@ codeunit 5672 "Insurance Jnl.-Post+Print"
     begin
         InsuranceJnlLine.Copy(Rec);
         Code();
-        Copy(InsuranceJnlLine);
+        Rec.Copy(InsuranceJnlLine);
     end;
 
     var

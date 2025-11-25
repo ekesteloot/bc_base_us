@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Setup;
+
+using Microsoft.HumanResources.Analysis;
+
 page 5205 Qualifications
 {
     ApplicationArea = BasicHR;
@@ -13,7 +17,7 @@ page 5205 Qualifications
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a qualification code.';

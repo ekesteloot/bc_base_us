@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Document;
+
 page 5759 "Posted Transfer Receipt Lines"
 {
     Caption = 'Posted Transfer Receipt Lines';
@@ -75,19 +80,40 @@ page 5759 "Posted Transfer Receipt Lines"
             {
                 Caption = '&Line';
                 Image = Line;
+#if not CLEAN23
                 action("Show Document")
+                {
+                    ApplicationArea = Location;
+                    Caption = 'Card';
+                    Image = View;
+                    ShortCutKey = 'Shift+F7';
+                    ToolTip = 'Open the document that the selected line exists on.';
+                    ObsoleteReason = 'Replaced by "Show Document" action';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '23.0';
+
+                    trigger OnAction()
+                    var
+                        TransRcptHeader: Record "Transfer Receipt Header";
+                    begin
+                        TransRcptHeader.Get(Rec."Document No.");
+                        PAGE.Run(PAGE::"Posted Transfer Receipt", TransRcptHeader);
+                    end;
+                }
+#endif
+                action(ShowDocument)
                 {
                     ApplicationArea = Location;
                     Caption = 'Show Document';
                     Image = View;
-                    ShortCutKey = 'Shift+F7';
+                    ShortCutKey = 'Return';
                     ToolTip = 'Open the document that the selected line exists on.';
 
                     trigger OnAction()
                     var
                         TransRcptHeader: Record "Transfer Receipt Header";
                     begin
-                        TransRcptHeader.Get("Document No.");
+                        TransRcptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Transfer Receipt", TransRcptHeader);
                     end;
                 }
@@ -102,7 +128,7 @@ page 5759 "Posted Transfer Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -113,7 +139,7 @@ page 5759 "Posted Transfer Receipt Lines"
             {
                 Caption = 'Process';
 
-                actionref("Show Document_Promoted"; "Show Document")
+                actionref("Show Document_Promoted"; ShowDocument)
                 {
                 }
                 actionref(Dimensions_Promoted; Dimensions)
@@ -142,7 +168,6 @@ page 5759 "Posted Transfer Receipt Lines"
         AssignItemChargePurch: Codeunit "Item Charge Assgnt. (Purch.)";
         UnitCost: Decimal;
         CreateCostDistrib: Boolean;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     procedure Initialize(NewItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)"; NewUnitCost: Decimal)
@@ -184,7 +209,7 @@ page 5759 "Posted Transfer Receipt Lines"
 
     local procedure DocumentNoOnFormat()
     begin
-        if not IsFirstLine("Document No.", "Line No.") then
+        if not IsFirstLine(Rec."Document No.", Rec."Line No.") then
             DocumentNoHideValue := true;
     end;
 }

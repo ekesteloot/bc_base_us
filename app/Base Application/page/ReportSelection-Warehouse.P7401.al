@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Setup;
+
+using System.Reflection;
+
 page 7401 "Report Selection - Warehouse"
 {
     ApplicationArea = Basic, Suite;

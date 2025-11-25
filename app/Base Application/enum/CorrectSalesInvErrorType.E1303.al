@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.History;
+
 enum 1303 "Correct Sales Inv. Error Type"
 {
     Extensible = true;
@@ -23,4 +25,5 @@ enum 1303 "Correct Sales Inv. Error Type"
     value(17; "DimCombHeaderErr") { }
     value(18; "ExtDocErr") { }
     value(19; "InventoryPostClosed") { }
+    value(20; "ItemVariantBlocked") { }
 }

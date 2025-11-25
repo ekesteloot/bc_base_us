@@ -1,3 +1,10 @@
+namespace System.Integration.PowerBI;
+
+using System.Azure.Identity;
+using System.Environment;
+using System.Telemetry;
+using System.Utilities;
+
 page 6327 "Power BI Embed Setup Wizard"
 {
     Caption = 'Set Up Power BI Reports in Business Central';
@@ -11,7 +18,7 @@ page 6327 "Power BI Embed Setup Wizard"
             {
                 Editable = false;
                 ShowCaption = false;
-                Visible = TopBannerVisible AND (CurrentStep <> CurrentStep::Done);
+                Visible = TopBannerVisible and (CurrentStep <> CurrentStep::Done);
 
                 field("<MediaRepositoryStandard>"; MediaResourcesStandard."Media Reference")
                 {
@@ -25,7 +32,7 @@ page 6327 "Power BI Embed Setup Wizard"
             {
                 Editable = false;
                 ShowCaption = false;
-                Visible = TopBannerVisible AND (CurrentStep = CurrentStep::Done);
+                Visible = TopBannerVisible and (CurrentStep = CurrentStep::Done);
 
                 field("<MediaRepositoryDone>"; MediaResourcesDone."Media Reference")
                 {
@@ -69,7 +76,7 @@ page 6327 "Power BI Embed Setup Wizard"
             }
             group(Step1)
             {
-                Caption = 'Connect your Azure AD application';
+                Caption = 'Connect your Microsoft Entra application';
                 Visible = CurrentStep = CurrentStep::OnPremAadSetup;
 
                 group("Para1.1")
@@ -95,7 +102,7 @@ page 6327 "Power BI Embed Setup Wizard"
                     label("Para1.1.2")
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Once an Azure AD application has been registered, you''re ready to continue with this setup. During setup, you''ll provide information about Azure AD application. Choose Next to continue.';
+                        Caption = 'Once an Microsoft Entra application has been registered, you''re ready to continue with this setup. During setup, you''ll provide information about Azure AD application. Choose Next to continue.';
                     }
                 }
             }
@@ -280,7 +287,7 @@ page 6327 "Power BI Embed Setup Wizard"
     begin
         LoadTopBanners();
 
-        IsOnPrem := EnvironmentInfo.IsOnPrem();
+        IsOnPrem := not EnvironmentInfo.IsSaas();
     end;
 
     trigger OnOpenPage()
@@ -300,6 +307,7 @@ page 6327 "Power BI Embed Setup Wizard"
         ClientTypeManagement: Codeunit "Client Type Management";
         PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
         PowerBIReportSynchronizer: Codeunit "Power BI Report Synchronizer";
+        FeatureTelemetry: Codeunit "Feature Telemetry";
         CurrentStep: Option Intro,OnPremAadSetup,LicenseCheck,AutoDeployment,Done;
         TopBannerVisible: Boolean;
         NextEnabled: Boolean;
@@ -370,12 +378,18 @@ page 6327 "Power BI Embed Setup Wizard"
     end;
 
     local procedure PerformOperationAfterStep(AfterStep: Option)
+    var
+        PowerBIUserConfiguration: Record "Power BI User Configuration";
     begin
         case AfterStep of
             CurrentStep::OnPremAadSetup:
                 AadOnpremSetup();
             CurrentStep::LicenseCheck:
-                if not PowerBIServiceMgt.CheckForPowerBILicenseInForeground() then
+                if PowerBIServiceMgt.CheckForPowerBILicenseInForeground() then begin
+                    FeatureTelemetry.LogUptake('0000L06', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), Enum::"Feature Uptake Status"::"Set up");
+                    if ParentPageContext <> '' then
+                        PowerBIUserConfiguration.CreateOrReadForCurrentUser(ParentPageContext);
+                end else
                     Error(NoLicenseErr);
             CurrentStep::AutoDeployment:
                 StartAutoDeployment();
@@ -383,29 +397,19 @@ page 6327 "Power BI Embed Setup Wizard"
     end;
 
     local procedure StartAutoDeployment()
-    var
-        DummyPowerBIUserConfiguration: Record "Power BI User Configuration";
     begin
         if ParentPageContext = '' then begin
             IsDeploying := false;
             exit;
         end;
 
-        if PowerBIServiceMgt.IsUserSynchronizingReports() then begin
-            IsDeploying := true;
-            exit;
-        end;
-
-        // Ensure user config for context before deployment
-        DummyPowerBIUserConfiguration.CreateOrReadForCurrentUser(ParentPageContext);
         if not PowerBIReportSynchronizer.UserNeedsToSynchronize(ParentPageContext) then begin
             IsDeploying := false;
             exit;
         end;
 
         IsDeploying := true;
-        PowerBIReportSynchronizer.SelectDefaultReports();
-        PowerBIServiceMgt.SynchronizeReportsInBackground();
+        PowerBIServiceMgt.SynchronizeReportsInBackground(ParentPageContext);
     end;
 
     local procedure AadOnpremSetup()

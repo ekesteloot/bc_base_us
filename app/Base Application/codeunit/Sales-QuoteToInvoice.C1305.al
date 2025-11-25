@@ -13,25 +13,25 @@ codeunit 1305 "Sales-Quote to Invoice"
     begin
         OnBeforeOnRun(Rec);
 
-        TestField("Document Type", "Document Type"::Quote);
+        Rec.TestField("Document Type", Rec."Document Type"::Quote);
 
-        if "Sell-to Customer No." = '' then
+        if Rec."Sell-to Customer No." = '' then
             Error(SpecifyCustomerErr);
 
-        if "Bill-to Customer No." = '' then
-            Error(SpecifyBillToCustomerNoErr, FieldCaption("Bill-to Customer No."));
+        if Rec."Bill-to Customer No." = '' then
+            Error(SpecifyBillToCustomerNoErr, Rec.FieldCaption("Bill-to Customer No."));
 
-        OnCheckSalesPostRestrictions();
+        Rec.OnCheckSalesPostRestrictions();
 
-        Cust.Get("Sell-to Customer No.");
-        Cust.CheckBlockedCustOnDocs(Cust, "Document Type"::Quote, true, false);
-        CalcFields("Amount Including VAT", "Invoice Discount Amount", "Work Description");
+        Cust.Get(Rec."Sell-to Customer No.");
+        Cust.CheckBlockedCustOnDocs(Cust, Rec."Document Type"::Quote, true, false);
+        Rec.CalcFields("Amount Including VAT", "Invoice Discount Amount", "Work Description");
 
-        ValidateSalesPersonOnSalesHeader(Rec, true, false);
+        Rec.ValidateSalesPersonOnSalesHeader(Rec, true, false);
 
         OnRunOnBeforeRunLineChecks(Rec);
 
-        CheckForBlockedLines();
+        Rec.CheckForBlockedLines();
         CheckForAssembleToOrderLines(Rec);
 
         SalesInvoiceHeader := Rec;
@@ -54,9 +54,9 @@ codeunit 1305 "Sales-Quote to Invoice"
         IsHandled := false;
         OnBeforeDeletionOfQuote(Rec, SalesInvoiceHeader, IsHandled, SalesQuoteLine);
         if not IsHandled then begin
-            SalesCommentLine.DeleteComments("Document Type".AsInteger(), "No.");
-            DeleteLinks();
-            Delete();
+            SalesCommentLine.DeleteComments(Rec."Document Type".AsInteger(), Rec."No.");
+            Rec.DeleteLinks();
+            Rec.Delete();
             SalesQuoteLine.DeleteAll();
         end;
 

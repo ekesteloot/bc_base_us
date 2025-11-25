@@ -1,3 +1,8 @@
+﻿namespace System.Integration;
+
+using System.Environment;
+using System.Environment.Configuration;
+
 codeunit 5010 "Web Service Helper"
 {
     ObsoleteState = Pending;

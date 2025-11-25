@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 page 6506 "Item Tracking Comments"
 {
     AutoSplitKey = true;
@@ -14,12 +16,12 @@ page 6506 "Item Tracking Comments"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies a date to reference the comment.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies the item tracking comment.';

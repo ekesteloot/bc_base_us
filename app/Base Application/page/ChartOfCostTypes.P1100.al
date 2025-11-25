@@ -1,3 +1,10 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Reports;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 page 1100 "Chart of Cost Types"
 {
     AdditionalSearchTerms = 'cost accounting allocation types';
@@ -37,7 +44,7 @@ page 1100 "Chart of Cost Types"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the type of the cost type.';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
@@ -77,7 +84,7 @@ page 1100 "Chart of Cost Types"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies either the cost type''s total budget or, if you have specified a filter in the Budget Filter field, a filtered budget. The contents of the field are calculated by using the entries in the Amount field in the Cost Budget Entry table.';
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = CostAccounting;
                     BlankZero = true;
@@ -86,7 +93,7 @@ page 1100 "Chart of Cost Types"
                     ToolTip = 'Specifies the balance of the cost type.';
                     Visible = false;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -131,7 +138,7 @@ page 1100 "Chart of Cost Types"
                     Caption = 'Cost E&ntries';
                     Image = CostEntries;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Cost Type No." = FIELD("No.");
+                    RunPageLink = "Cost Type No." = field("No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View cost entries, which can come from sources such as automatic transfer of general ledger entries to cost entries, manual posting for pure cost entries, internal charges, and manual allocations, and automatic allocation postings for actual costs.';
                 }
@@ -146,11 +153,11 @@ page 1100 "Chart of Cost Types"
                     var
                         GLAccount: Record "G/L Account";
                     begin
-                        if "G/L Account Range" <> '' then
-                            GLAccount.SetFilter("No.", "G/L Account Range")
+                        if Rec."G/L Account Range" <> '' then
+                            GLAccount.SetFilter("No.", Rec."G/L Account Range")
                         else
                             GLAccount.SetRange("No.", '');
-                        OnCorrespondingGLAccountsActionOnAfterGLAccountSetFilter(Rec, GLAccount);    
+                        OnCorrespondingGLAccountsActionOnAfterGLAccountSetFilter(Rec, GLAccount);
                         if PAGE.RunModal(PAGE::"Chart of Accounts", GLAccount) = ACTION::OK then;
                     end;
                 }
@@ -322,21 +329,19 @@ page 1100 "Chart of Cost Types"
 
     var
         CostAccMgt: Codeunit "Cost Account Mgt";
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     local procedure SetEmphasis()
     begin
-        Emphasize := Type <> Type::"Cost Type";
+        Emphasize := Rec.Type <> Rec.Type::"Cost Type";
     end;
 
     local procedure SetIndent()
     begin
-        NameIndent := Indentation;
+        NameIndent := Rec.Indentation;
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnCorrespondingGLAccountsActionOnAfterGLAccountSetFilter(var CostType: Record "Cost Type"; var GLAccount: Record "G/L Account")
     begin

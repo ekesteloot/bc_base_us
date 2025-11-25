@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Availability;
+
 page 99000958 "Order Promising Setup"
 {
     AdditionalSearchTerms = 'calculate delivery,capable to promise,ctp,available to promise,atp';
@@ -59,10 +61,10 @@ page 99000958 "Order Promising Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

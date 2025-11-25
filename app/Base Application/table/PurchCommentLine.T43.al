@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Comment;
+
+using Microsoft.Purchases.Document;
+
 table 43 "Purch. Comment Line"
 {
     Caption = 'Purch. Comment Line';
@@ -79,7 +83,7 @@ table 43 "Purch. Comment Line"
         if PurchCommentLine.FindSet() then
             repeat
                 PurchCommentLine2 := PurchCommentLine;
-                PurchCommentLine2."Document Type" := "Purchase Comment Document Type".FromInteger(ToDocumentType);
+                PurchCommentLine2."Document Type" := Enum::"Purchase Comment Document Type".FromInteger(ToDocumentType);
                 PurchCommentLine2."No." := ToNumber;
                 OnBeforeCopyCommentsOnBeforeInsert(PurchCommentLine2, PurchCommentLine);
                 PurchCommentLine2.Insert();
@@ -104,7 +108,7 @@ table 43 "Purch. Comment Line"
         if PurchCommentLineSource.FindSet() then
             repeat
                 PurchCommentLineTarget := PurchCommentLineSource;
-                PurchCommentLineTarget."Document Type" := "Purchase Comment Document Type".FromInteger(ToDocumentType);
+                PurchCommentLineTarget."Document Type" := Enum::"Purchase Comment Document Type".FromInteger(ToDocumentType);
                 PurchCommentLineTarget."No." := ToNumber;
                 PurchCommentLineTarget."Document Line No." := ToDocumentLineNo;
                 PurchCommentLineTarget.Insert();
@@ -139,7 +143,7 @@ table 43 "Purch. Comment Line"
                 if PurchCommentLineSource.FindSet() then
                     repeat
                         PurchCommentLineTarget := PurchCommentLineSource;
-                        PurchCommentLineTarget."Document Type" := "Purchase Comment Document Type".FromInteger(ToDocumentType);
+                        PurchCommentLineTarget."Document Type" := Enum::"Purchase Comment Document Type".FromInteger(ToDocumentType);
                         PurchCommentLineTarget."No." := ToNumber;
                         PurchCommentLineTarget."Document Line No." := 0;
                         PurchCommentLineTarget."Line No." := NextLineNo;
@@ -166,7 +170,7 @@ table 43 "Purch. Comment Line"
         if PurchCommentLineSource.FindSet() then
             repeat
                 PurchCommentLineTarget := PurchCommentLineSource;
-                PurchCommentLineTarget."Document Type" := "Purchase Comment Document Type".FromInteger(ToDocumentType);
+                PurchCommentLineTarget."Document Type" := Enum::"Purchase Comment Document Type".FromInteger(ToDocumentType);
                 PurchCommentLineTarget."No." := ToNumber;
                 PurchCommentLineTarget.Insert();
             until PurchCommentLineSource.Next() = 0;

@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Remittance;
+
 table 2225 "Remit Address Buffer"
 {
     Caption = 'Remit Address Buffer';

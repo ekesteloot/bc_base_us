@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Security.AccessControl;
+
+using System.Reflection;
+
 table 2000000195 "Membership Entitlement"
 {
     Caption = 'Membership Entitlement';
@@ -28,7 +36,7 @@ table 2000000195 "Membership Entitlement"
         }
         field(5; "Entitlement Set Name"; Text[250])
         {
-            CalcFormula = Lookup ("Entitlement Set".Name WHERE(ID = FIELD("Entitlement Set ID")));
+            CalcFormula = Lookup("Entitlement Set".Name WHERE(ID = FIELD("Entitlement Set ID")));
             Caption = 'Entitlement Set Name';
             FieldClass = FlowField;
         }

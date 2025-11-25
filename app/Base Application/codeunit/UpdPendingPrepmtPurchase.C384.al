@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Document;
+
 codeunit 384 "Upd. Pending Prepmt. Purchase"
 {
 

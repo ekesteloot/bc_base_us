@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
 table 5720 Manufacturer
 {
     Caption = 'Manufacturer';

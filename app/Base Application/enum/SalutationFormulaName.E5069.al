@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Setup;
+
 enum 5069 "Salutation Formula Name"
 {
     Extensible = true;

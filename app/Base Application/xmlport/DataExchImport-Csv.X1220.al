@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 xmlport 1220 "Data Exch. Import - CSV"
 {
     Caption = 'Data Exch. Import - CSV';

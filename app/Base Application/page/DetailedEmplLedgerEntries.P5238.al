@@ -1,3 +1,8 @@
+namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 5238 "Detailed Empl. Ledger Entries"
 {
     ApplicationArea = BasicHR;
@@ -102,7 +107,7 @@ page 5238 "Detailed Empl. Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -117,7 +122,7 @@ page 5238 "Detailed Empl. Ledger Entries"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Unapplied; Unapplied)
+                field(Unapplied; Rec.Unapplied)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies whether the entry has been unapplied (undone) from the Unapply Employee Entries window by the entry number shown in the Unapplied by Entry No. field.';
@@ -178,7 +183,7 @@ page 5238 "Detailed Empl. Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

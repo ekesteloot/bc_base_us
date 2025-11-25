@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 363 "Analysis Amount Type"
 {
     AssignmentCompatibility = true;

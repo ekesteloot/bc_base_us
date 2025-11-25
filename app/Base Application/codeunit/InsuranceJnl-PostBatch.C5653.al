@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.Foundation.NoSeries;
+
 codeunit 5653 "Insurance Jnl.-Post Batch"
 {
     Permissions = TableData "Insurance Journal Batch" = rimd;

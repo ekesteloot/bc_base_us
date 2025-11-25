@@ -22,7 +22,7 @@ report 10211 "Job Actual to Budget (Price)"
             }
             dataitem(PageHeader; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(USERID; UserId)
                 {
                 }
@@ -115,9 +115,9 @@ report 10211 "Job Actual to Budget (Price)"
                 }
                 dataitem("Job Task"; "Job Task")
                 {
-                    DataItemLink = "Job No." = FIELD("No.");
+                    DataItemLink = "Job No." = field("No.");
                     DataItemLinkReference = Job;
-                    DataItemTableView = SORTING("Job No.", "Job Task No.");
+                    DataItemTableView = sorting("Job No.", "Job Task No.");
                     RequestFilterFields = "Job Task No.";
                     column(Job_Task_Job_No_; "Job No.")
                     {
@@ -127,7 +127,7 @@ report 10211 "Job Actual to Budget (Price)"
                     }
                     dataitem(BlankLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
 
                         trigger OnPreDataItem()
                         begin
@@ -136,9 +136,9 @@ report 10211 "Job Actual to Budget (Price)"
                     }
                     dataitem("Job Planning Line"; "Job Planning Line")
                     {
-                        DataItemLink = "Job No." = FIELD("No."), "Planning Date" = FIELD("Planning Date Filter");
+                        DataItemLink = "Job No." = field("No."), "Planning Date" = field("Planning Date Filter");
                         DataItemLinkReference = Job;
-                        DataItemTableView = SORTING("Job No.", "Job Task No.", "Schedule Line", "Planning Date") WHERE(Type = FILTER(<> Text));
+                        DataItemTableView = sorting("Job No.", "Job Task No.", "Schedule Line", "Planning Date") where(Type = filter(<> Text));
 
                         trigger OnAfterGetRecord()
                         begin
@@ -178,9 +178,9 @@ report 10211 "Job Actual to Budget (Price)"
                     }
                     dataitem("Job Ledger Entry"; "Job Ledger Entry")
                     {
-                        DataItemLink = "Job No." = FIELD("No."), "Posting Date" = FIELD("Posting Date Filter");
+                        DataItemLink = "Job No." = field("No."), "Posting Date" = field("Posting Date Filter");
                         DataItemLinkReference = Job;
-                        DataItemTableView = SORTING("Job No.", "Job Task No.", "Entry Type", "Posting Date");
+                        DataItemTableView = sorting("Job No.", "Job Task No.", "Entry Type", "Posting Date");
 
                         trigger OnAfterGetRecord()
                         begin
@@ -231,7 +231,7 @@ report 10211 "Job Actual to Budget (Price)"
                     }
                     dataitem("Integer"; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(PADSTR____2____Job_Task__Indentation_____Job_Task__Description; PadStr('', 2 * "Job Task".Indentation) + "Job Task".Description)
                         {
                         }

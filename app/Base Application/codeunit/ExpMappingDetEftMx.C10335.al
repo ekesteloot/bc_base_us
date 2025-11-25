@@ -10,14 +10,14 @@ codeunit 10335 "Exp. Mapping Det EFT MX"
         RecordRef: RecordRef;
         LineNo: Integer;
     begin
-        if NoDataExchLineDef("Data Exch. Def Code") then
+        if NoDataExchLineDef(Rec."Data Exch. Def Code") then
             exit;
 
         LineNo := 1;
 
         if ACHCecobanDetail.Find('-') then
             repeat
-                DataExch.SetRange("Entry No.", "Entry No.");
+                DataExch.SetRange("Entry No.", Rec."Entry No.");
                 if DataExch.FindFirst() then begin
                     RecordRef.GetTable(ACHCecobanDetail);
                     EFTExportMgt.InsertDataExchLineForFlatFile(

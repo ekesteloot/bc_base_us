@@ -1,3 +1,7 @@
+namespace System.Security.AccessControl;
+
+using System.Reflection;
+
 report 9802 "Copy Permission Set"
 {
     Caption = 'Copy Permission Set';
@@ -8,7 +12,7 @@ report 9802 "Copy Permission Set"
     {
         dataitem(SourceAggregatePermissionSet; "Aggregate Permission Set")
         {
-            DataItemTableView = SORTING(Scope, "App ID", "Role ID");
+            DataItemTableView = sorting(Scope, "App ID", "Role ID");
 
             trigger OnAfterGetRecord()
             var
@@ -120,9 +124,7 @@ report 9802 "Copy Permission Set"
         MultipleSourcesErr: Label 'You can only copy one permission set at a time.';
         TargetExistsErr: Label 'The new permission set already exists.';
         TargetNameMissingErr: Label 'You must specify a name for the new permission set.';
-        [InDataSet]
         CreateLink: Boolean;
-        [InDataSet]
         IsCreateLinkEnabled: Boolean;
 
     procedure GetNewRoleID(): Code[20]

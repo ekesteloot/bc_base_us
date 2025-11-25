@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
 enum 1003 "Job Planning Line Line Type"
 {
     Extensible = true;

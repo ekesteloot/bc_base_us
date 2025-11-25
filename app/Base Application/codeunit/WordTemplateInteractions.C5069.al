@@ -1,3 +1,18 @@
+﻿namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using System.Email;
+using System.Globalization;
+using System.Integration;
+using System.Integration.Word;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 5069 "Word Template Interactions"
 {
     /// <summary>

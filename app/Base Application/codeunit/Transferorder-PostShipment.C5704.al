@@ -1,3 +1,25 @@
+﻿namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Comment;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using System.Utilities;
+
 codeunit 5704 "TransferOrder-Post Shipment"
 {
     Permissions = TableData "Item Entry Relation" = i;
@@ -11,6 +33,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
     internal procedure RunWithCheck(var TransferHeader2: Record "Transfer Header")
     var
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         SourceCodeSetup: Record "Source Code Setup";
         InvtCommentLine: Record "Inventory Comment Line";
         UpdateAnalysisView: Codeunit "Update Analysis View";
@@ -106,6 +129,11 @@ codeunit 5704 "TransferOrder-Post Shipment"
                         if (TransLine."Item No." <> '') and (TransLine."Qty. to Ship" <> 0) then begin
                             Item.Get(TransLine."Item No.");
                             CheckItemNotBlocked(Item);
+
+                            if TransLine."Variant Code" <> '' then begin
+                                ItemVariant.Get(TransLine."Item No.", TransLine."Variant Code");
+                                CheckItemVariantNotBlocked(ItemVariant);
+                            end;
                         end;
 
                         OnCheckTransLine(TransLine, TransHeader, Location, WhseShip, TransShptLine, InvtPickPutaway, WhsePosting);
@@ -305,6 +333,18 @@ codeunit 5704 "TransferOrder-Post Shipment"
         Item.TestField(Blocked, false);
     end;
 
+    local procedure CheckItemVariantNotBlocked(var ItemVariant: Record "Item Variant")
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCheckItemVariantNotBlocked(TransLine, ItemVariant, Transheader, Location, WhseShip, IsHandled);
+        if IsHandled then
+            exit;
+
+        ItemVariant.TestField(Blocked, false);
+    end;
+
     local procedure ReserveItemJnlLine(var ItemJnlLine: Record "Item Journal Line"; var TransferLine: Record "Transfer Line"; WhseShip: Boolean; WhseShptHeader2: Record "Warehouse Shipment Header")
     begin
         GetLocation(TransferLine."Transfer-from Code");
@@ -315,7 +355,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
               TransferLine, ItemJnlLine, WhseShptHeader2, ItemJnlLine."Quantity (Base)")
         else
             ReserveTransLine.TransferTransferToItemJnlLine(
-              TransferLine, ItemJnlLine, ItemJnlLine."Quantity (Base)", "Transfer Direction"::Outbound);
+              TransferLine, ItemJnlLine, ItemJnlLine."Quantity (Base)", Enum::"Transfer Direction"::Outbound);
     end;
 
     local procedure CheckDim()
@@ -383,7 +423,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
             TransHeader.DeleteOneTransferOrder(TransHeader, TransLine)
         else begin
             WhseTransferRelease.Release(TransHeader);
-            ReserveTransLine.UpdateItemTrackingAfterPosting(TransHeader, "Transfer Direction"::Outbound);
+            ReserveTransLine.UpdateItemTrackingAfterPosting(TransHeader, Enum::"Transfer Direction"::Outbound);
         end;
     end;
 
@@ -541,7 +581,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
         if TempHandlingSpecification.Find('-') then begin
             repeat
                 ReserveTransLine.TransferTransferToTransfer(
-                  FromTransLine, ToTransLine, -TempHandlingSpecification."Quantity (Base)", "Transfer Direction"::Inbound, TempHandlingSpecification);
+                  FromTransLine, ToTransLine, -TempHandlingSpecification."Quantity (Base)", Enum::"Transfer Direction"::Inbound, TempHandlingSpecification);
                 TransferQty += TempHandlingSpecification."Quantity (Base)";
             until TempHandlingSpecification.Next() = 0;
             TempHandlingSpecification.DeleteAll();
@@ -551,7 +591,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
 
         if TransferQty > 0 then
             ReserveTransLine.TransferTransferToTransfer(
-              FromTransLine, ToTransLine, TransferQty, "Transfer Direction"::Inbound, DummySpecification);
+              FromTransLine, ToTransLine, TransferQty, Enum::"Transfer Direction"::Inbound, DummySpecification);
     end;
 
     local procedure CheckWarehouse(TransLine: Record "Transfer Line")
@@ -808,6 +848,11 @@ codeunit 5704 "TransferOrder-Post Shipment"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckItemNotBlocked(TransferLine: Record "Transfer Line"; Item: Record Item; TransferHeader: Record "Transfer Header"; Location: Record Location; WhseShip: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckItemVariantNotBlocked(TransferLine: Record "Transfer Line"; ItemVariant: Record "Item Variant"; TransferHeader: Record "Transfer Header"; Location: Record Location; WhseShip: Boolean; var IsHandled: Boolean)
     begin
     end;
 

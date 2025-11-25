@@ -1,3 +1,18 @@
+namespace Microsoft.Shared.Archive;
+
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Purchases.Archive;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+using System.Utilities;
+
 codeunit 5063 ArchiveManagement
 {
     Permissions = tableData "Purch. Comment Line" = r,
@@ -182,7 +197,7 @@ codeunit 5063 ArchiveManagement
                 end;
                 if SalesLine."Deferral Code" <> '' then
                     StoreDeferrals(
-                        "Deferral Document Type"::Sales.AsInteger(), SalesLine."Document Type".AsInteger(),
+                        Enum::"Deferral Document Type"::Sales.AsInteger(), SalesLine."Document Type".AsInteger(),
                         SalesLine."Document No.", SalesLine."Line No.", SalesHeader."Doc. No. Occurrence", SalesHeaderArchive."Version No.");
 
                 OnAfterStoreSalesLineArchive(SalesHeader, SalesLine, SalesHeaderArchive, SalesLineArchive);
@@ -235,7 +250,7 @@ codeunit 5063 ArchiveManagement
                 end;
                 if PurchLine."Deferral Code" <> '' then
                     StoreDeferrals(
-                        "Deferral Document Type"::Purchase.AsInteger(), PurchLine."Document Type".AsInteger(),
+                        Enum::"Deferral Document Type"::Purchase.AsInteger(), PurchLine."Document Type".AsInteger(),
                         PurchLine."Document No.", PurchLine."Line No.", PurchHeader."Doc. No. Occurrence", PurchHeaderArchive."Version No.");
 
                 OnAfterStorePurchLineArchive(PurchHeader, PurchLine, PurchHeaderArchive, PurchLineArchive);
@@ -410,7 +425,7 @@ codeunit 5063 ArchiveManagement
                     "Dimension Set ID" := SalesLineArchive."Dimension Set ID";
                     "Deferral Code" := SalesLineArchive."Deferral Code";
                     RestoreDeferrals(
-                        "Deferral Document Type"::Sales.AsInteger(),
+                        Enum::"Deferral Document Type"::Sales.AsInteger(),
                         SalesLineArchive."Document Type".AsInteger(), SalesLineArchive."Document No.", SalesLineArchive."Line No.",
                         SalesHeaderArchive."Doc. No. Occurrence", SalesHeaderArchive."Version No.");
                     RecordLinkManagement.CopyLinks(SalesLineArchive, SalesLine);
@@ -694,7 +709,7 @@ codeunit 5063 ArchiveManagement
         SalesLine.SetFilter("Deferral Code", '<>%1', '');
         if SalesLine.FindSet() then
             repeat
-                if DeferralHeader.Get("Deferral Document Type"::Sales, '', '',
+                if DeferralHeader.Get(Enum::"Deferral Document Type"::Sales, '', '',
                      SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.")
                 then
                     DeferralUtilities.RoundDeferralAmount(
@@ -714,7 +729,7 @@ codeunit 5063 ArchiveManagement
         PurchaseLine.SetFilter("Deferral Code", '<>%1', '');
         if PurchaseLine.FindSet() then
             repeat
-                if DeferralHeader.Get("Deferral Document Type"::Purchase, '', '',
+                if DeferralHeader.Get(Enum::"Deferral Document Type"::Purchase, '', '',
                      PurchaseLine."Document Type", PurchaseLine."Document No.", PurchaseLine."Line No.")
                 then
                     DeferralUtilities.RoundDeferralAmount(

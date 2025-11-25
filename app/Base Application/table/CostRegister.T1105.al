@@ -1,3 +1,9 @@
+namespace Microsoft.CostAccounting.Ledger;
+
+using Microsoft.CostAccounting.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Security.AccessControl;
+
 table 1105 "Cost Register"
 {
     Caption = 'Cost Register';
@@ -114,16 +120,12 @@ table 1105 "Cost Register"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(32; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
             Editable = false;
             TableRelation = "Cost Journal Template";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
     }
 

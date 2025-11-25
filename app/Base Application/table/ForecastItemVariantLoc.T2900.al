@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.Forecast;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 table 2900 "Forecast Item Variant Loc"
 {
     DataClassification = CustomerContent;
@@ -50,12 +55,12 @@ table 2900 "Forecast Item Variant Loc"
         }
         field(9; "Prod. Forecast Quantity (Base)"; Decimal)
         {
-            CalcFormula = Sum("Production Forecast Entry"."Forecast Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                                            "Production Forecast Name" = FIELD("Production Forecast Name"),
-                                                                                            "Forecast Date" = FIELD("Date Filter"),
-                                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                                            "Component Forecast" = FIELD("Component Forecast"),
-                                                                                            "Variant Code" = FIELD("Variant Filter")));
+            CalcFormula = sum("Production Forecast Entry"."Forecast Quantity (Base)" where("Item No." = field("No."),
+                                                                                            "Production Forecast Name" = field("Production Forecast Name"),
+                                                                                            "Forecast Date" = field("Date Filter"),
+                                                                                            "Location Code" = field("Location Filter"),
+                                                                                            "Component Forecast" = field("Component Forecast"),
+                                                                                            "Variant Code" = field("Variant Filter")));
             Caption = 'Prod. Forecast Quantity (Base)';
             DecimalPlaces = 0 : 5;
             FieldClass = FlowField;

@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Team;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Task;
+
 table 5083 Team
 {
     Caption = 'Team';
@@ -18,8 +24,8 @@ table 5083 Team
         }
         field(3; "Next Task Date"; Date)
         {
-            CalcFormula = Min("To-do".Date WHERE("Team Code" = FIELD(Code),
-                                                  Closed = CONST(false)));
+            CalcFormula = min("To-do".Date where("Team Code" = field(Code),
+                                                  Closed = const(false)));
             Caption = 'Next Task Date';
             Editable = false;
             FieldClass = FlowField;
@@ -39,7 +45,7 @@ table 5083 Team
         {
             Caption = 'Contact Company Filter';
             FieldClass = FlowFilter;
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(7; "Task Status Filter"; Enum "Task Status")
         {
@@ -72,15 +78,15 @@ table 5083 Team
         }
         field(13; "Task Entry Exists"; Boolean)
         {
-            CalcFormula = Exist("To-do" WHERE("Team Code" = FIELD(Code),
-                                               "Contact No." = FIELD("Contact Filter"),
-                                               "Contact Company No." = FIELD("Contact Company Filter"),
-                                               "Salesperson Code" = FIELD("Salesperson Filter"),
-                                               "Campaign No." = FIELD("Campaign Filter"),
-                                               Status = FIELD("Task Status Filter"),
-                                               Closed = FIELD("Task Closed Filter"),
-                                               Priority = FIELD("Priority Filter"),
-                                               Date = FIELD("Date Filter")));
+            CalcFormula = exist("To-do" where("Team Code" = field(Code),
+                                               "Contact No." = field("Contact Filter"),
+                                               "Contact Company No." = field("Contact Company Filter"),
+                                               "Salesperson Code" = field("Salesperson Filter"),
+                                               "Campaign No." = field("Campaign Filter"),
+                                               Status = field("Task Status Filter"),
+                                               Closed = field("Task Closed Filter"),
+                                               Priority = field("Priority Filter"),
+                                               Date = field("Date Filter")));
             Caption = 'Task Entry Exists';
             Editable = false;
             FieldClass = FlowField;

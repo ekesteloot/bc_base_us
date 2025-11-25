@@ -1,3 +1,7 @@
+namespace System.Security.User;
+
+using System.Security.AccessControl;
+
 page 9801 "User Subform"
 {
     Caption = 'User Permission Sets';
@@ -12,7 +16,7 @@ page 9801 "User Subform"
             repeater(Group)
             {
                 Caption = 'User Permissions';
-                field(PermissionSet; "Role ID")
+                field(PermissionSet; Rec."Role ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Permission Set';
@@ -28,10 +32,10 @@ page 9801 "User Subform"
                         LookupPermissionSet.LookupMode := true;
                         if LookupPermissionSet.RunModal() = ACTION::LookupOK then begin
                             LookupPermissionSet.GetRecord(PermissionSetLookupRecord);
-                            Scope := PermissionSetLookupRecord.Scope;
-                            "App ID" := PermissionSetLookupRecord."App ID";
-                            "Role ID" := PermissionSetLookupRecord."Role ID";
-                            CalcFields("App Name", "Role Name");
+                            Rec.Scope := PermissionSetLookupRecord.Scope;
+                            Rec."App ID" := PermissionSetLookupRecord."App ID";
+                            Rec."Role ID" := PermissionSetLookupRecord."Role ID";
+                            Rec.CalcFields("App Name", "Role Name");
                             SkipValidation := true;
                             PermissionScope := Format(PermissionSetLookupRecord.Scope);
                         end;
@@ -48,22 +52,22 @@ page 9801 "User Subform"
                         end;
 
                         // Get the Scope and App ID for a matching Role ID
-                        AggregatePermissionSet.SetRange("Role ID", "Role ID");
+                        AggregatePermissionSet.SetRange("Role ID", Rec."Role ID");
                         AggregatePermissionSet.FindFirst();
 
                         if AggregatePermissionSet.Count > 1 then
-                            Error(MultipleRoleIDErr, "Role ID");
+                            Error(MultipleRoleIDErr, Rec."Role ID");
 
-                        Scope := AggregatePermissionSet.Scope;
-                        "App ID" := AggregatePermissionSet."App ID";
+                        Rec.Scope := AggregatePermissionSet.Scope;
+                        Rec."App ID" := AggregatePermissionSet."App ID";
                         PermissionScope := Format(AggregatePermissionSet.Scope);
 
-                        CalcFields("App Name", "Role Name");
+                        Rec.CalcFields("App Name", "Role Name");
 
                         SkipValidation := false; // re-enable validation
                     end;
                 }
-                field(Description; "Role Name")
+                field(Description; Rec."Role Name")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Description';
@@ -71,13 +75,13 @@ page 9801 "User Subform"
                     Editable = false;
                     ToolTip = 'Specifies the name of the security role that has been given to this Windows login in the current database.';
                 }
-                field(Company; "Company Name")
+                field(Company; Rec."Company Name")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Company';
                     ToolTip = 'Specifies the name of the company that this role is limited to for this Windows login.';
                 }
-                field(ExtensionName; "App Name")
+                field(ExtensionName; Rec."App Name")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Extension Name';
@@ -125,7 +129,6 @@ page 9801 "User Subform"
         MultipleRoleIDErr: Label 'The permission set %1 is defined multiple times in this context. Use the lookup button to select the relevant permission set.', Comment = '%1 will be replaced with a Role ID code value from the Permission Set table';
         SkipValidation: Boolean;
         PermissionScope: Text;
-        [InDataSet]
         PermissionSetNotFound: Boolean;
 
     trigger OnAfterGetRecord()
@@ -136,7 +139,7 @@ page 9801 "User Subform"
         if User."User Name" <> '' then
             CurrPage.Caption := User."User Name";
 
-        PermissionScope := Format(Scope);
+        PermissionScope := Format(Rec.Scope);
 
         PermissionSetNotFound := false;
         if not (Rec."Role ID" in ['SUPER', 'SECURITY']) then begin
@@ -153,9 +156,9 @@ page 9801 "User Subform"
         UserGroupAccessControl: Record "User Group Access Control";
     begin
         UserGroupAccessControl.SetFilter("User Group Code", '<>%1', '');
-        UserGroupAccessControl.SetRange("User Security ID", "User Security ID");
-        UserGroupAccessControl.SetRange("Role ID", "Role ID");
-        UserGroupAccessControl.SetRange("Company Name", "Company Name");
+        UserGroupAccessControl.SetRange("User Security ID", Rec."User Security ID");
+        UserGroupAccessControl.SetRange("Role ID", Rec."Role ID");
+        UserGroupAccessControl.SetRange("Company Name", Rec."Company Name");
         if UserGroupAccessControl.FindFirst() then
             Error(InUserGroupErr, UserGroupAccessControl."User Group Code");
     end;
@@ -164,18 +167,18 @@ page 9801 "User Subform"
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         User.TestField("User Name");
-        CalcFields("App Name", "Role Name");
+        Rec.CalcFields("App Name", Rec."Role Name");
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        CalcFields("App Name", "Role Name");
+        Rec.CalcFields("App Name", Rec."Role Name");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        if User.Get("User Security ID") then;
-        CalcFields("App Name", "Role Name");
+        if User.Get(Rec."User Security ID") then;
+        Rec.CalcFields("App Name", Rec."Role Name");
         PermissionScope := '';
     end;
 }

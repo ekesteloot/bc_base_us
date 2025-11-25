@@ -43,6 +43,10 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Administration Cue" = RIMD,
                   tabledata "Aged Report Entity" = RIMD,
                   tabledata "Aging Band Buffer" = RIMD,
+                  tabledata "Alloc. Acc. Manual Override" = RIMD,
+                  tabledata "Alloc. Account Distribution" = RIMD,
+                  tabledata "Allocation Account" = RIMD,
+                  tabledata "Allocation Line" = RIMD,
                   tabledata "Alt. Customer Posting Group" = RIMD,
                   tabledata "Alt. Vendor Posting Group" = RIMD,
                   tabledata "Analysis by Dim. Parameters" = RIMD,
@@ -99,6 +103,7 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Booking Staff" = RIMD,
                   tabledata "Booking Sync" = RIMD,
                   tabledata "Budget Buffer" = RIMD,
+                  tabledata "Bus. Unit In Cons. Process" = RIMD,
                   tabledata "Business Chart Buffer" = RIMD,
                   tabledata "Business Chart Map" = RIMD,
                   tabledata "Business Chart User Setup" = RIMD,
@@ -161,6 +166,8 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Config. Template Line" = RIMD,
                   tabledata "Config. Tmpl. Selection Rules" = RIMD,
                   tabledata "Consolidation Account" = RIMD,
+                  tabledata "Consolidation Process" = RIMD,
+                  tabledata "Consolidation Setup" = RIMD,
                   tabledata "Cont. Duplicate Search String" = RIMD,
                   tabledata Contact = RIMD,
                   tabledata "Contact Alt. Addr. Date Range" = RIMD,
@@ -215,9 +222,6 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Customer Price Group" = RIMD,
                   tabledata "Customer Sales Buffer" = RIMD,
                   tabledata "Customer Templ." = RIMD,
-#if not CLEAN20
-                  tabledata "Customer Template" = RIMD,
-#endif
                   tabledata "CV Ledger Entry Buffer" = RIMD,
                   tabledata "Data Exch." = RIMD,
                   tabledata "Data Exch. Column Def" = RIMD,
@@ -392,10 +396,6 @@ permissionset 732 "D365 BASIC ISV"
 #if not CLEAN21
                   tabledata "Graph Mail Setup" = RIMD,
 #endif
-#if not CLEAN20
-                  tabledata "Graph Subscription" = RIMD,
-                  tabledata "Graph Business Setting" = RIMD,
-#endif                  
                   tabledata "Human Resource Comment Line" = RIMD,
                   tabledata "Human Resource Unit of Measure" = RIMD,
                   tabledata "Human Resources Setup" = RIMD,
@@ -448,7 +448,7 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Inventory Report Entry" = RIMD,
                   tabledata "Inventory Report Header" = RIMD,
                   tabledata "Inventory Setup" = RIMD,
-#if not CLEAN20
+#if not CLEAN23
                   tabledata "Invoice Post. Buffer" = RIMD,
 #endif
                   tabledata "Invoice Posting Buffer" = RIMD,
@@ -559,12 +559,6 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "My Vendor" = RIMD,
                   tabledata "Name/Value Buffer" = RIMD,
                   tabledata "Named Forward Link" = RIMD,
-#if not CLEAN20
-                  tabledata "Native - API Tax Setup" = RIMD,
-                  tabledata "Native - Export Invoices" = RIMD,
-                  tabledata "Native - Gen. Settings Buffer" = RIMD,
-                  tabledata "Native - Payment" = RIMD,
-#endif
                   tabledata "No. Series" = RIMD,
                   tabledata "No. Series Line" = RIMD,
                   tabledata "No. Series Relationship" = RIMD,
@@ -657,9 +651,6 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Payment Terms" = RIMD,
                   tabledata "Payroll Import Buffer" = RIMD,
                   tabledata "Payroll Setup" = RIMD,
-#if not CLEAN20
-                  tabledata "Plan Permission Set" = Rimd,
-#endif
                   tabledata "Positive Pay Detail" = RIMD,
                   tabledata "Positive Pay Entry" = RIMD,
                   tabledata "Positive Pay Entry Detail" = RIMD,
@@ -690,7 +681,9 @@ permissionset 732 "D365 BASIC ISV"
 #if not CLEAN21
                   tabledata "Power BI User License" = RIMD,
 #endif
+#if not CLEAN23
                   tabledata "Power BI User Status" = RIMD,
+#endif
                   tabledata "Prepayment Inv. Line Buffer" = RIMD,
                   tabledata "Printer Selection" = RIMD,
                   tabledata "Profile Questionnaire Header" = RIMD,
@@ -1004,17 +997,6 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Workflow Webhook Sub Buffer" = RIMD,
                   tabledata "Workflow Webhook Subscription" = RIMD,
                   tabledata "Workflows Entries Buffer" = Rimd,
-#if not CLEAN20
-                  tabledata "XBRL Comment Line" = RIMD,
-                  tabledata "XBRL G/L Map Line" = RIMD,
-                  tabledata "XBRL Line Constant" = RIMD,
-                  tabledata "XBRL Linkbase" = RIMD,
-                  tabledata "XBRL Rollup Line" = RIMD,
-                  tabledata "XBRL Schema" = RIMD,
-                  tabledata "XBRL Taxonomy" = RIMD,
-                  tabledata "XBRL Taxonomy Label" = RIMD,
-                  tabledata "XBRL Taxonomy Line" = RIMD,
-#endif
                   tabledata "XML Buffer" = RIMD,
                   tabledata "XML Schema" = RIMD,
                   tabledata "XML Schema Element" = RIMD,

@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.WarehouseMgt.Comment;
+
 page 7400 "Internal Movement List"
 {
     ApplicationArea = Warehouse;
@@ -76,9 +80,9 @@ page 7400 "Internal Movement List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Internal Movement"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Internal Movement"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

@@ -7,7 +7,7 @@ report 298 "Batch Post Sales Credit Memos"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Credit Memo"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Credit Memo"));
             RequestFilterFields = "No.", Status;
             RequestFilterHeading = 'Sales Credit Memo';
 
@@ -68,7 +68,7 @@ report 298 "Batch Post Sales Credit Memos"
                         begin
                             if ReplacePostingDate then
                                 Message(Text003);
-                            
+
                             if VATReportingDateMgt.IsVATDateUsageSetToPostingDate() then
                                 ReplaceVATDateReq := ReplacePostingDate;
                             UpdateVATDate();
@@ -79,7 +79,7 @@ report 298 "Batch Post Sales Credit Memos"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Replace Document Date';
                         ToolTip = 'Specifies if you want to replace the document date of the credit memo with the date in the Posting/Document Date field.';
-                        
+
                         trigger OnValidate()
                         begin
                             if VATReportingDateMgt.IsVATDateUsageSetToDocumentDate() then
@@ -169,10 +169,9 @@ report 298 "Batch Post Sales Credit Memos"
     protected var
         CalcInvDisc: Boolean;
         ReplacePostingDate: Boolean;
-        ReplaceDocumentDate, ReplaceVATDateReq: Boolean;
-        PostingDateReq, VATDateReq: Date;
+        ReplaceDocumentDate, ReplaceVATDateReq : Boolean;
+        PostingDateReq, VATDateReq : Date;
         PrintDoc: Boolean;
-        [InDataSet]
         PrintDocVisible: Boolean;
         VATDateEnabled: Boolean;
 
@@ -190,6 +189,6 @@ report 298 "Batch Post Sales Credit Memos"
     [IntegrationEvent(true, false)]
     local procedure OnBeforeSalesHeaderOnPreDataItem(var SalesHeader: Record "Sales Header"; var SalesBatchPostMgt: Codeunit "Sales Batch Post Mgt."; var PrintDoc: Boolean)
     begin
-    end;    
+    end;
 }
 

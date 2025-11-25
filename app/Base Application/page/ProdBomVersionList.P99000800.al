@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
 page 99000800 "Prod. BOM Version List"
 {
     Caption = 'Prod. BOM Version List';

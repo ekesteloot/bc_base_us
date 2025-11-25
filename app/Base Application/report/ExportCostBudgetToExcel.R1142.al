@@ -1,3 +1,10 @@
+﻿namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.Foundation.Enums;
+using System.IO;
+using System.Utilities;
+
 report 1142 "Export Cost Budget to Excel"
 {
     Caption = 'Export Cost Budget to Excel';

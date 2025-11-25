@@ -1,3 +1,25 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace System.Security.AccessControl;
+
+using System.Azure.AI;
+using System.DateTime;
+using System.Diagnostics;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Globalization;
+using System.Integration;
+using System.IO;
+using System.Privacy;
+using System.Reflection;
+using System.Security.Authentication;
+using System.Tooling;
+using System.Upgrade;
+using System.Utilities;
+
 permissionset 2000000020 BaseSystemPermissionSet
 {
     Assignable = false;

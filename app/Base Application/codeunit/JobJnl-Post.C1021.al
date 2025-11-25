@@ -1,3 +1,9 @@
+namespace Microsoft.ProjectMgt.Jobs.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.ProjectMgt.Jobs.Journal;
+
 codeunit 1021 "Job Jnl.-Post"
 {
     TableNo = "Job Journal Line";
@@ -7,7 +13,7 @@ codeunit 1021 "Job Jnl.-Post"
     begin
         JobJnlLine.Copy(Rec);
         Code();
-        Copy(JobJnlLine);
+        Rec.Copy(JobJnlLine);
     end;
 
     var

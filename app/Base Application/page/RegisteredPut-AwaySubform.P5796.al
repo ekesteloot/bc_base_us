@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Activity.History;
+
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 5796 "Registered Put-away Subform"
 {
     AutoSplitKey = true;
@@ -169,8 +174,8 @@ page 5796 "Registered Put-away Subform"
                     var
                         RegisteredWhseActivityHdr: Record "Registered Whse. Activity Hdr.";
                     begin
-                        RegisteredWhseActivityHdr.Get("Activity Type", "No.");
-                        ShowWhseEntries(RegisteredWhseActivityHdr."Registering Date");
+                        RegisteredWhseActivityHdr.Get(Rec."Activity Type", Rec."No.");
+                        Rec.ShowWhseEntries(RegisteredWhseActivityHdr."Registering Date");
                     end;
                 }
             }
@@ -183,14 +188,14 @@ page 5796 "Registered Put-away Subform"
     local procedure ShowSourceLine()
     begin
         WMSMgt.ShowSourceDocLine(
-          "Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+          Rec."Source Type", Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.", Rec."Source Subline No.");
     end;
 
     local procedure ShowBinContents()
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", "Bin Code");
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", Rec."Bin Code");
     end;
 }
 

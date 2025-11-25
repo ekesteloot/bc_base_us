@@ -1,16 +1,12 @@
+namespace Microsoft.CRM.Outlook;
+
 #pragma warning disable AS0109
 table 1602 "Exchange Object"
 #pragma warning restore AS0109
 {
     Caption = 'Exchange Object';
     ReplicateData = false;
-#if CLEAN20
     TableType = Temporary;
-#else
-    ObsoleteReason = 'This table is only used as interface for integration with Exchange. Table will be marked as TableType=Temporary. Make sure you are not using this table to store records.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '20.0';
-#endif
 
     fields
     {
@@ -80,13 +76,8 @@ table 1602 "Exchange Object"
             Caption = 'VendorNo';
             Description = 'Vendor Number of the current Vendor';
             ObsoleteReason = 'Use the field RecId instead';
-#if CLEAN20
             ObsoleteState = Removed;
-            ObsoleteTag = '20.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-#endif
+            ObsoleteTag = '23.0';
         }
 
         field(15; IsInline; Boolean)

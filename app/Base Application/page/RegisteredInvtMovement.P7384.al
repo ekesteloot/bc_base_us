@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.InventoryDocument;
+
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+
 page 7384 "Registered Invt. Movement"
 {
     Caption = 'Registered Invt. Movement';
@@ -37,14 +46,14 @@ page 7384 "Registered Invt. Movement"
                 field("Destination No."; Rec."Destination No.")
                 {
                     ApplicationArea = Warehouse;
-                    CaptionClass = Format(WMSMgt.GetCaptionClass("Destination Type", "Source Document", 0));
+                    CaptionClass = Format(WMSMgt.GetCaptionClass(Rec."Destination Type", Rec."Source Document", 0));
                     Editable = false;
                     ToolTip = 'Specifies the same as the field with the same name in the Registered Whse. Activity Hdr. table.';
                 }
-                field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationEntityName("Destination Type", "Destination No."))
+                field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationEntityName(Rec."Destination Type", Rec."Destination No."))
                 {
                     ApplicationArea = Warehouse;
-                    CaptionClass = Format(WMSMgt.GetCaptionClass("Destination Type", "Source Document", 1));
+                    CaptionClass = Format(WMSMgt.GetCaptionClass(Rec."Destination Type", Rec."Source Document", 1));
                     Caption = 'Name';
                     Editable = false;
                     ToolTip = 'Specifies the name of the destination for the registered inventory movement.';
@@ -62,21 +71,21 @@ page 7384 "Registered Invt. Movement"
                 field("External Document No."; Rec."External Document No.")
                 {
                     ApplicationArea = Warehouse;
-                    CaptionClass = Format(WMSMgt.GetCaptionClass("Destination Type", "Source Document", 2));
+                    CaptionClass = Format(WMSMgt.GetCaptionClass(Rec."Destination Type", Rec."Source Document", 2));
                     ToolTip = 'Specifies a document number that refers to the customer''s or vendor''s numbering system.';
                 }
                 field("External Document No.2"; Rec."External Document No.2")
                 {
                     ApplicationArea = Warehouse;
-                    CaptionClass = Format(WMSMgt.GetCaptionClass("Destination Type", "Source Document", 3));
+                    CaptionClass = Format(WMSMgt.GetCaptionClass(Rec."Destination Type", Rec."Source Document", 3));
                     ToolTip = 'Specifies an additional part of the document number that refers to the customer''s or vendor''s numbering system.';
                 }
             }
             part(WhseActivityLines; "Reg. Invt. Movement Subform")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "No." = FIELD("No.");
-                SubPageView = SORTING("No.", "Sorting Sequence No.");
+                SubPageLink = "No." = field("No.");
+                SubPageView = sorting("No.", "Sorting Sequence No.");
             }
         }
         area(factboxes)
@@ -108,9 +117,9 @@ page 7384 "Registered Invt. Movement"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Registered Invt. Movement"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Registered Invt. Movement"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

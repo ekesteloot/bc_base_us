@@ -1,4 +1,33 @@
-﻿table 98 "General Ledger Setup"
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+using System.Environment;
+using System.Globalization;
+using System.IO;
+using System.Security.User;
+using System.Telemetry;
+using System.Threading;
+
+table 98 "General Ledger Setup"
 {
     Caption = 'General Ledger Setup';
 
@@ -85,21 +114,21 @@
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Global Dimension 1 Code"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Global Dimension 1 Code"));
         }
         field(43; "Global Dimension 2 Filter"; Code[20])
         {
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Global Dimension 2 Code"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Global Dimension 2 Code"));
         }
         field(44; "Cust. Balances Due"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" WHERE("Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Initial Entry Due Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                 "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                 "Initial Entry Due Date" = field("Date Filter")));
             Caption = 'Cust. Balances Due';
             Editable = false;
             FieldClass = FlowField;
@@ -107,9 +136,9 @@
         field(45; "Vendor Balances Due"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" WHERE("Initial Entry Global Dim. 1" = FIELD("Global Dimension 1 Filter"),
-                                                                                   "Initial Entry Global Dim. 2" = FIELD("Global Dimension 2 Filter"),
-                                                                                   "Initial Entry Due Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" where("Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
+                                                                                   "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
+                                                                                   "Initial Entry Due Date" = field("Date Filter")));
             Caption = 'Vendor Balances Due';
             Editable = false;
             FieldClass = FlowField;
@@ -723,7 +752,7 @@
         field(160; "Payroll Trans. Import Format"; Code[20])
         {
             Caption = 'Payroll Trans. Import Format';
-            TableRelation = "Data Exch. Def" WHERE(Type = CONST("Payroll Import"));
+            TableRelation = "Data Exch. Def" where(Type = const("Payroll Import"));
         }
         field(161; "VAT Reg. No. Validation URL"; Text[250])
         {
@@ -783,7 +812,7 @@
         field(181; "Apply Jnl. Batch Name"; Code[10])
         {
             Caption = 'Apply Jnl. Batch Name';
-            TableRelation = IF ("Apply Jnl. Template Name" = FILTER(<> '')) "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Apply Jnl. Template Name"));
+            TableRelation = if ("Apply Jnl. Template Name" = filter(<> '')) "Gen. Journal Batch".Name where("Journal Template Name" = field("Apply Jnl. Template Name"));
 
             trigger OnValidate()
             begin
@@ -798,7 +827,7 @@
         field(183; "Job WIP Jnl. Batch Name"; Code[10])
         {
             Caption = 'Job WIP Jnl. Batch Name';
-            TableRelation = IF ("Job WIP Jnl. Template Name" = FILTER(<> '')) "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Job WIP Jnl. Template Name"));
+            TableRelation = if ("Job WIP Jnl. Template Name" = filter(<> '')) "Gen. Journal Batch".Name where("Journal Template Name" = field("Job WIP Jnl. Template Name"));
 
             trigger OnValidate()
             begin
@@ -813,7 +842,7 @@
         field(185; "Adjust ARC Jnl. Batch Name"; Code[10])
         {
             Caption = 'Adjust Add. Rep. Currency Jnl. Batch Name';
-            TableRelation = IF ("Adjust ARC Jnl. Template Name" = FILTER(<> '')) "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Adjust ARC Jnl. Template Name"));
+            TableRelation = if ("Adjust ARC Jnl. Template Name" = filter(<> '')) "Gen. Journal Batch".Name where("Journal Template Name" = field("Adjust ARC Jnl. Template Name"));
 
             trigger OnValidate()
             begin
@@ -828,7 +857,7 @@
         field(187; "Bank Acc. Recon. Batch Name"; Code[10])
         {
             Caption = 'Bank Acc. Recon. Batch Name';
-            TableRelation = IF ("Bank Acc. Recon. Template Name" = FILTER(<> '')) "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Bank Acc. Recon. Template Name"));
+            TableRelation = if ("Bank Acc. Recon. Template Name" = filter(<> '')) "Gen. Journal Batch".Name where("Journal Template Name" = field("Bank Acc. Recon. Template Name"));
         }
         field(188; "Control VAT Period"; Enum "VAT Period Control")
         {
@@ -840,6 +869,24 @@
             begin
                 FeatureTelemetry.LogUsage('0000JWC', VATDateFeatureTok, StrSubstNo(VATPeriodControlUsageMsg, Language.ToDefaultLanguage("Control VAT Period")));
             end;
+        }
+        field(189; "Allow Query From Consolid."; Boolean)
+        {
+            Caption = 'Enable company as subsidiary';
+            DataClassification = SystemMetadata;
+
+            trigger OnValidate()
+            var
+                ImportConsolidationFromApi: Codeunit "Import Consolidation From API";
+            begin
+                if not Rec."Allow Query From Consolid." then
+                    exit;
+                if not GuiAllowed() then
+                    Error(PrivacyStatementAckErr);
+                if not ImportConsolidationFromApi.GetPrivacyConsentChoice() then
+                    Error('');
+            end;
+
         }
         field(10001; "VAT in Use"; Boolean)
         {
@@ -917,16 +964,14 @@
         {
             Caption = 'Bank Recon. with Auto. Match';
             InitValue = true;
-
-            trigger OnValidate()
-            begin
-                if "Bank Recon. with Auto. Match" then
-                    CheckSelectedReports(REPORT::"Bank Account Statement", REPORT::"Bank Acc. Recon. - Test")
-#if not CLEAN21
-                else
-                    CheckSelectedReports(REPORT::"Bank Reconciliation", REPORT::"Bank Rec. Test Report");
+            ObsoleteReason = 'Unused, Bank Reconciliation with automatch (W1) is the default for NA';
+#if not CLEAN23
+            ObsoleteState = Pending;
+            ObsoleteTag = '23.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
 #endif
-            end;
         }
         field(10121; "SAT Certificate"; Code[20])
         {
@@ -991,14 +1036,12 @@
         Text022: Label 'You must close the program and start again in order to activate the unit-amount rounding feature.';
         Text023: Label '%1\You cannot use the same dimension twice in the same setup.';
         DependentFieldActivatedErr: Label 'You cannot change %1 because %2 is selected.';
-        UpdatedReportLayoutsTxt: Label 'We have chosen the following report layouts: %1 for %2.', Comment = '%1 report layout Caption, %2 Report layout usage';
-        ReportIsSelectedTxt: Label 'No report was selected for %1. Based on the current setup of %2, a compatible report has been selected.', Comment = '%1=OptionValue,%2=FieldCaption';
-        TooManyReportsAreSelectedTxt: Label 'One or more reports selected for bank reconciliation may not be compatible with the current setup of %1. Make sure the report %2 is selected for %3.', Comment = '%1=FieldCaption,%2=ReportNumber,%3=OptionValue';
         ObsoleteErr: Label 'This field is obsolete, it has been replaced by Table 248 VAT Reg. No. Srv Config.';
         AccSchedObsoleteErr: Label 'This field is obsolete and it has been replaced by Table 88 Financial Report';
         VATDateFeatureTok: Label 'VAT Date', Locked = true;
         VATPeriodControlUsageMsg: Label 'Control VAT Period set to %1', Locked = true;
         VATDateFeatureUsageMsg: Label 'VAT Reporting Date Usage set to %1', Locked = true;
+        PrivacyStatementAckErr: Label 'Enabling requires privacy statement acknowledgement.';
 
     procedure CheckDecimalPlacesFormat(var DecimalPlaces: Text[5])
     var
@@ -1197,47 +1240,13 @@
 
             DimensionSetEntry.UpdateGlobalDimensionNo(DimCode, ShortcutDimNo);
         end;
+        OnAfterUpdateDimValueGlobalDimNo(ShortcutDimNo, xDimCode, DimCode);
         Modify();
     end;
 
     local procedure HideDialog(): Boolean
     begin
         exit((CurrFieldNo = 0) or not GuiAllowed);
-    end;
-
-    local procedure CheckSelectedReports(PrintingReportID: Integer; TestingReportID: Integer)
-    var
-        ReportSelections: Record "Report Selections";
-    begin
-        SelectReport(ReportSelections.Usage::"B.Stmt", Format(ReportSelections.Usage::"B.Stmt"), PrintingReportID);
-        SelectReport(ReportSelections.Usage::"B.Recon.Test", Format(ReportSelections.Usage::"B.Recon.Test"), TestingReportID);
-    end;
-
-    local procedure SelectReport(UsageValue: Enum "Report Selection Usage"; Description: Text; ReportID: Integer): Text
-    var
-        ReportSelections: Record "Report Selections";
-    begin
-        ReportSelections.SetRange(Usage, UsageValue);
-
-        case true of
-            ReportSelections.IsEmpty:
-                begin
-                    ReportSelections.Reset();
-                    ReportSelections.InsertRecord(UsageValue, '1', ReportID);
-                    exit(StrSubstNo(ReportIsSelectedTxt, Description, FieldCaption("Bank Recon. with Auto. Match")));
-                end;
-            ReportSelections.Count = 1:
-                begin
-                    ReportSelections.FindFirst();
-                    if ReportSelections."Report ID" <> ReportID then begin
-                        ReportSelections.Validate("Report ID", ReportID);
-                        ReportSelections.Modify();
-                        exit(StrSubstNo(UpdatedReportLayoutsTxt, ReportSelections."Report Caption", Description));
-                    end;
-                end;
-            else
-                exit(StrSubstNo(TooManyReportsAreSelectedTxt, FieldCaption("Bank Recon. with Auto. Match"), ReportID, Description));
-        end;
     end;
 
     procedure UseVat(): Boolean
@@ -1297,6 +1306,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeFirstAllowedPostingDate(GeneralLedgerSetup: Record "General Ledger Setup"; var AllowedPostingDate: Date; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdateDimValueGlobalDimNo(ShortCutDimNo: Integer; OldDimensionCode: Code[20]; NewDimensionCode: Code[20])
     begin
     end;
 }

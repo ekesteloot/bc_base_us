@@ -1,3 +1,10 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Comment;
+using Microsoft.CashFlow.Worksheet;
+using System.Text;
+
 page 849 "Cash Flow Forecast List"
 {
     ApplicationArea = Basic, Suite;
@@ -37,7 +44,7 @@ page 849 "Cash Flow Forecast List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an additional description of a forecast.';
                 }
-                field(ShowInChart; GetShowInChart())
+                field(ShowInChart; Rec.GetShowInChart())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Show In Chart on Role Center';
@@ -64,7 +71,7 @@ page 849 "Cash Flow Forecast List"
                     ToolTip = 'Specifies a starting date to which manual payments should be included in cash flow forecast.';
                     Visible = false;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the comment for the record.';
@@ -119,7 +126,7 @@ page 849 "Cash Flow Forecast List"
             part(Control1905906307; "CF Forecast Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = false;
             }
         }
@@ -139,7 +146,7 @@ page 849 "Cash Flow Forecast List"
                     Caption = 'E&ntries';
                     Image = Entries;
                     RunObject = Page "Cash Flow Forecast Entries";
-                    RunPageLink = "Cash Flow Forecast No." = FIELD("No.");
+                    RunPageLink = "Cash Flow Forecast No." = field("No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the entries that exist for the cash flow account. ';
                 }
@@ -149,7 +156,7 @@ page 849 "Cash Flow Forecast List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Cash Flow Forecast Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View when you expect money for each source type to be received and paid out by your business for the cash flow forecast.';
                 }
@@ -159,8 +166,8 @@ page 849 "Cash Flow Forecast List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Cash Flow Comment";
-                    RunPageLink = "Table Name" = CONST("Cash Flow Forecast"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Cash Flow Forecast"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 separator(Action1023)
@@ -173,7 +180,7 @@ page 849 "Cash Flow Forecast List"
                     Caption = 'CF &Availability by Periods';
                     Image = ShowMatrix;
                     RunObject = Page "CF Availability by Periods";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'View a scrollable summary of the forecasted amounts per source type, by period. The rows represent individual periods, and the columns represent the source types in the cash flow forecast.';
                 }
             }

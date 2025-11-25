@@ -10322,6 +10322,8 @@ Fields!CustAddr_7_.Value + Chr(177)+ Fields!CustAddr_8_.Value + Chr(177), 1)</Hi
           </ReportItems>
           <Style />
         </PageHeader>
+        <PageHeight>29.7cm</PageHeight>
+        <PageWidth>21cm</PageWidth>
         <InteractiveHeight>11in</InteractiveHeight>
         <InteractiveWidth>8.5in</InteractiveWidth>
         <LeftMargin>1.5cm</LeftMargin>

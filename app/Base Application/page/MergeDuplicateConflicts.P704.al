@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Duplicates;
+
 page 704 "Merge Duplicate Conflicts"
 {
     Caption = 'Merge Duplicate Conflicts';
@@ -21,13 +23,13 @@ page 704 "Merge Duplicate Conflicts"
                 {
                     ApplicationArea = Basic, Suite;
                 }
-                field(Current; GetPK(Current))
+                field(Current; GetPK(Rec.Current))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Current';
                     ToolTip = 'Specifies values of the fields in the primary key of the current record.';
                 }
-                field(Duplicate; GetPK(Duplicate))
+                field(Duplicate; GetPK(Rec.Duplicate))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Duplicate';
@@ -50,8 +52,8 @@ page 704 "Merge Duplicate Conflicts"
 
                 trigger OnAction()
                 begin
-                    if Merge() then
-                        Delete();
+                    if Rec.Merge() then
+                        Rec.Delete();
                 end;
             }
         }
@@ -70,7 +72,7 @@ page 704 "Merge Duplicate Conflicts"
 
     procedure Set(var TempMergeDuplicatesConflict: Record "Merge Duplicates Conflict" temporary)
     begin
-        Copy(TempMergeDuplicatesConflict, true);
+        Rec.Copy(TempMergeDuplicatesConflict, true);
     end;
 
     local procedure GetPK(RecordID: RecordID) PrimaryKey: Text

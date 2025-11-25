@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.Manufacturing.Capacity;
+using System.Security.AccessControl;
+
 table 46 "Item Register"
 {
     Caption = 'Item Register';
@@ -33,15 +40,11 @@ table 46 "Item Register"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(7; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
             TableRelation = "Item Journal Batch".Name;
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(9; "Creation Time"; Time)
         {

@@ -1,10 +1,15 @@
+namespace Microsoft.ServiceMgt.Item;
+
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+
 codeunit 5921 "ServComponent-Copy from BOM"
 {
     TableNo = "Service Item";
 
     trigger OnRun()
     begin
-        ServItem.Get("No.");
+        ServItem.Get(Rec."No.");
         ServItem.TestField("Item No.");
 
         ServItemComponent.LockTable();

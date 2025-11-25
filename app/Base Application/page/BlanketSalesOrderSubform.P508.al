@@ -1,4 +1,21 @@
-﻿page 508 "Blanket Sales Order Subform"
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Setup;
+using System.Utilities;
+
+page 508 "Blanket Sales Order Subform"
 {
     AutoSplitKey = true;
     Caption = 'Lines';
@@ -7,7 +24,7 @@
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Sales Line";
-    SourceTableView = WHERE("Document Type" = FILTER("Blanket Order"));
+    SourceTableView = where("Document Type" = filter("Blanket Order"));
 
     layout
     {
@@ -39,8 +56,8 @@
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
                         NoOnAfterValidate();
                         DeltaUpdateTotals();
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field("Item Reference No."; Rec."Item Reference No.")
@@ -80,11 +97,11 @@
                     begin
                         VariantCodeOnAfterValidate();
                         DeltaUpdateTotals();
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that this item is a catalog item.';
@@ -179,7 +196,7 @@
                     begin
                         QuantityOnAfterValidate();
                         DeltaUpdateTotals();
-                        if SalesReceivablesSetup."Calc. Inv. Discount" and (Quantity = 0) then
+                        if SalesReceivablesSetup."Calc. Inv. Discount" and (Rec.Quantity = 0) then
                             CurrPage.Update(false);
                     end;
                 }
@@ -370,9 +387,9 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
@@ -384,9 +401,9 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
@@ -398,9 +415,9 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
@@ -412,9 +429,9 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
@@ -426,9 +443,9 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
@@ -440,9 +457,9 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
@@ -498,7 +515,7 @@
                         ApplicationArea = Suite;
                         AutoFormatExpression = Currency.Code;
                         AutoFormatType = 1;
-                        CaptionClass = DocumentTotals.GetInvoiceDiscAmountWithVATAndCurrencyCaption(FieldCaption("Inv. Discount Amount"), Currency.Code);
+                        CaptionClass = DocumentTotals.GetInvoiceDiscAmountWithVATAndCurrencyCaption(Rec.FieldCaption("Inv. Discount Amount"), Currency.Code);
                         Caption = 'Invoice Discount Amount';
                         Editable = InvDiscAmountEditable;
                         ToolTip = 'Specifies a discount amount that is deducted from the value of the Total Incl. VAT field, based on sales lines where the Allow Invoice Disc. field is selected. You can enter or change the amount manually.';
@@ -664,7 +681,7 @@
 
                         trigger OnAction()
                         begin
-                            Rec.ShowBlanketOrderSalesLines("Sales Document Type"::Order);
+                            Rec.ShowBlanketOrderSalesLines(Enum::"Sales Document Type"::Order);
                         end;
                     }
                     action(Invoices)
@@ -676,7 +693,7 @@
 
                         trigger OnAction()
                         begin
-                            Rec.ShowBlanketOrderSalesLines("Sales Document Type"::Invoice);
+                            Rec.ShowBlanketOrderSalesLines(Enum::"Sales Document Type"::Invoice);
                         end;
                     }
                     action("Return Orders")
@@ -689,7 +706,7 @@
 
                         trigger OnAction()
                         begin
-                            Rec.ShowBlanketOrderSalesLines("Sales Document Type"::"Return Order");
+                            Rec.ShowBlanketOrderSalesLines(Enum::"Sales Document Type"::"Return Order");
                         end;
                     }
                     action("Credit Memos")
@@ -701,7 +718,7 @@
 
                         trigger OnAction()
                         begin
-                            Rec.ShowBlanketOrderSalesLines("Sales Document Type"::"Credit Memo");
+                            Rec.ShowBlanketOrderSalesLines(Enum::"Sales Document Type"::"Credit Memo");
                         end;
                     }
                 }
@@ -969,7 +986,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowNonstock();
+                        Rec.ShowNonstock();
                     end;
                 }
             }
@@ -989,8 +1006,8 @@
     begin
         Rec.ShowShortcutDimCode(ShortcutDimCode);
         Clear(DocumentTotals);
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -1059,9 +1076,7 @@
         InvoiceDiscountAmount: Decimal;
         InvoiceDiscountPct: Decimal;
         IsBlankNumber: Boolean;
-        [InDataSet]
         IsCommentLine: Boolean;
-        [InDataSet]
         ItemReferenceVisible: Boolean;
         VATAmount: Decimal;
 
@@ -1192,7 +1207,7 @@
     begin
         if Rec.Reserve = Rec.Reserve::Always then begin
             CurrPage.SaveRecord();
-            AutoReserve();
+            Rec.AutoReserve();
         end;
     end;
 
@@ -1253,7 +1268,7 @@
     var
         AssembleToOrderLink: Record "Assemble-to-Order Link";
     begin
-        ValidateShortcutDimCode(DimIndex, ShortcutDimCode[DimIndex]);
+        Rec.ValidateShortcutDimCode(DimIndex, ShortcutDimCode[DimIndex]);
         AssembleToOrderLink.UpdateAsmDimFromSalesLine(Rec);
 
         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, DimIndex);
@@ -1269,7 +1284,7 @@
             exit;
 
         if xRec."Document No." = '' then
-            Type := GetDefaultLineType();
+            Rec.Type := Rec.GetDefaultLineType();
     end;
 
     [IntegrationEvent(TRUE, false)]

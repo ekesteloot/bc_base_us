@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 page 750 "Standard General Journals"
 {
     Caption = 'Standard General Journals';
@@ -15,7 +17,7 @@ page 750 "Standard General Journals"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a code to identify the standard general journal that you are about to save.';
@@ -62,8 +64,8 @@ page 750 "Standard General Journals"
                     var
                         StdGenJnl: Record "Standard General Journal";
                     begin
-                        StdGenJnl.SetRange("Journal Template Name", "Journal Template Name");
-                        StdGenJnl.SetRange(Code, Code);
+                        StdGenJnl.SetRange("Journal Template Name", Rec."Journal Template Name");
+                        StdGenJnl.SetRange(Code, Rec.Code);
 
                         PAGE.Run(PAGE::"Standard General Journal", StdGenJnl);
                     end;

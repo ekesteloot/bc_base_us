@@ -1,4 +1,27 @@
-﻿codeunit 1303 "Correct Posted Sales Invoice"
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using Microsoft.WarehouseMgt.Request;
+using System.Environment.Configuration;
+
+codeunit 1303 "Correct Posted Sales Invoice"
 {
     Permissions = TableData "Sales Invoice Header" = rm,
                   TableData "Sales Cr.Memo Header" = rm;
@@ -9,13 +32,13 @@
         SalesHeader: Record "Sales Header";
         IsHandled: Boolean;
     begin
-        UnapplyCostApplication("No.");
+        UnapplyCostApplication(Rec."No.");
 
         OnBeforeCreateCorrectiveSalesCrMemo(Rec);
         CreateCopyDocument(Rec, SalesHeader, SalesHeader."Document Type"::"Credit Memo", false);
         OnAfterCreateCorrectiveSalesCrMemo(Rec, SalesHeader, CancellingOnly);
 
-        if SalesInvoiceLinesContainJob("No.") then
+        if SalesInvoiceLinesContainJob(Rec."No.") then
             CreateAndProcessJobPlanningLines(SalesHeader);
 
         IsHandled := false;
@@ -23,7 +46,7 @@
         if not IsHandled then begin
             CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
             SetTrackInfoForCancellation(Rec);
-            UpdateSalesOrderLinesFromCancelledInvoice("No.");
+            UpdateSalesOrderLinesFromCancelledInvoice(Rec."No.");
         end;
         OnOnRunOnAfterUpdateSalesOrderLinesFromCancelledInvoice(Rec, SalesHeader);
 
@@ -44,6 +67,8 @@
         CustomerIsBlockedCancelErr: Label 'You cannot cancel this posted sales invoice because customer %1 is blocked.', Comment = '%1 = Customer name';
         ItemIsBlockedCorrectErr: Label 'You cannot correct this posted sales invoice because item %1 %2 is blocked.', Comment = '%1 = Item No. %2 = Item Description';
         ItemIsBlockedCancelErr: Label 'You cannot cancel this posted sales invoice because item %1 %2 is blocked.', Comment = '%1 = Item No. %2 = Item Description';
+        ItemVariantIsBlockedCorrectErr: Label 'You cannot correct this posted sales invoice because item variant %1 for item %2 %3 is blocked.', Comment = '%1 - Item Variant Code, %2 = Item No. %3 = Item Description';
+        ItemVariantIsBlockedCancelErr: Label 'You cannot cancel this posted sales invoice because item variant %1 for item %2 %3 is blocked.', Comment = '%1 - Item Variant Code, %2 = Item No. %3 = Item Description';
         AccountIsBlockedCorrectErr: Label 'You cannot correct this posted sales invoice because %1 %2 is blocked.', Comment = '%1 = Table Caption %2 = Account number.';
         AccountIsBlockedCancelErr: Label 'You cannot cancel this posted sales invoice because %1 %2 is blocked.', Comment = '%1 = Table Caption %2 = Account number.';
         NoFreeInvoiceNoSeriesCorrectErr: Label 'You cannot correct this posted sales invoice because no unused invoice numbers are available. \\You must extend the range of the number series for sales invoices.';
@@ -329,7 +354,7 @@
         DimensionManagement: Codeunit DimensionManagement;
     begin
         if not DimensionManagement.CheckDimIDComb(SalesInvoiceHeader."Dimension Set ID") then
-            ErrorHelperHeader("Correct Sales Inv. Error Type"::DimCombHeaderErr, SalesInvoiceHeader);
+            ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::DimCombHeaderErr, SalesInvoiceHeader);
     end;
 
     local procedure TestIfCustomerIsBlocked(SalesInvoiceHeader: Record "Sales Invoice Header"; CustNo: Code[20])
@@ -338,7 +363,7 @@
     begin
         Customer.Get(CustNo);
         if Customer.Blocked in [Customer.Blocked::Invoice, Customer.Blocked::All] then
-            ErrorHelperHeader("Correct Sales Inv. Error Type"::CustomerBlocked, SalesInvoiceHeader);
+            ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::CustomerBlocked, SalesInvoiceHeader);
     end;
 
     local procedure TestCustomerDimension(SalesInvoiceHeader: Record "Sales Invoice Header"; CustNo: Code[20])
@@ -352,13 +377,14 @@
         TableID[1] := DATABASE::Customer;
         No[1] := Customer."No.";
         if not DimensionManagement.CheckDimValuePosting(TableID, No, SalesInvoiceHeader."Dimension Set ID") then
-            ErrorHelperAccount("Correct Sales Inv. Error Type"::DimErr, Customer."No.", Customer.TableCaption(), Customer."No.", Customer.Name);
+            ErrorHelperAccount(Enum::"Correct Sales Inv. Error Type"::DimErr, Customer."No.", Customer.TableCaption(), Customer."No.", Customer.Name);
     end;
 
     local procedure TestSalesLines(SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         SalesInvoiceLine: Record "Sales Invoice Line";
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         DimensionManagement: Codeunit DimensionManagement;
         ShippedQtyNoReturned: Decimal;
         RevUnitCostLCY: Decimal;
@@ -379,18 +405,23 @@
                             SalesInvoiceLine.CalcShippedSaleNotReturned(ShippedQtyNoReturned, RevUnitCostLCY, false);
                             OnTestSalesLinesOnAfterCalcShippedQtyNoReturned(SalesInvoiceLine, ShippedQtyNoReturned);
                             if SalesInvoiceLine.Quantity <> ShippedQtyNoReturned then
-                                ErrorHelperLine("Correct Sales Inv. Error Type"::ItemIsReturned, SalesInvoiceLine);
+                                ErrorHelperLine(Enum::"Correct Sales Inv. Error Type"::ItemIsReturned, SalesInvoiceLine);
                         end;
 
                         Item.Get(SalesInvoiceLine."No.");
 
                         if Item.Blocked then
-                            ErrorHelperLine("Correct Sales Inv. Error Type"::ItemBlocked, SalesInvoiceLine);
+                            ErrorHelperLine(Enum::"Correct Sales Inv. Error Type"::ItemBlocked, SalesInvoiceLine);
+                        if SalesInvoiceLine."Variant Code" <> '' then begin
+                            ItemVariant.SetLoadFields(Blocked);
+                            if ItemVariant.Get(SalesInvoiceLine."No.", SalesInvoiceLine."Variant Code") and ItemVariant.Blocked then
+                                ErrorHelperLine("Correct Sales Inv. Error Type"::ItemVariantBlocked, SalesInvoiceLine);
+                        end;
 
                         TableID[1] := DATABASE::Item;
                         No[1] := SalesInvoiceLine."No.";
                         if not DimensionManagement.CheckDimValuePosting(TableID, No, SalesInvoiceLine."Dimension Set ID") then
-                            ErrorHelperAccount("Correct Sales Inv. Error Type"::DimErr, No[1], Item.TableCaption(), Item."No.", Item.Description);
+                            ErrorHelperAccount(Enum::"Correct Sales Inv. Error Type"::DimErr, No[1], Item.TableCaption(), Item."No.", Item.Description);
 
                         if Item.Type = Item.Type::Inventory then
                             TestInventoryPostingSetup(SalesInvoiceLine);
@@ -402,7 +433,7 @@
                     TestWMSLocation(SalesInvoiceLine);
 
                     if not DimensionManagement.CheckDimIDComb(SalesInvoiceLine."Dimension Set ID") then
-                        ErrorHelperLine("Correct Sales Inv. Error Type"::DimCombErr, SalesInvoiceLine);
+                        ErrorHelperLine(Enum::"Correct Sales Inv. Error Type"::DimCombErr, SalesInvoiceLine);
                 end;
             until SalesInvoiceLine.Next() = 0;
     end;
@@ -417,14 +448,14 @@
     begin
         GLAccount.Get(AccountNo);
         if GLAccount.Blocked then
-            ErrorHelperAccount("Correct Sales Inv. Error Type"::AccountBlocked, AccountNo, GLAccount.TableCaption(), '', '');
+            ErrorHelperAccount(Enum::"Correct Sales Inv. Error Type"::AccountBlocked, AccountNo, GLAccount.TableCaption(), '', '');
         TableID[1] := DATABASE::"G/L Account";
         No[1] := AccountNo;
 
         if SalesInvoiceLine.Type = SalesInvoiceLine.Type::Item then begin
             Item.Get(SalesInvoiceLine."No.");
             if not DimensionManagement.CheckDimValuePosting(TableID, No, SalesInvoiceLine."Dimension Set ID") then
-                ErrorHelperAccount("Correct Sales Inv. Error Type"::DimErr, AccountNo, GLAccount.TableCaption(), Item."No.", Item.Description);
+                ErrorHelperAccount(Enum::"Correct Sales Inv. Error Type"::DimErr, AccountNo, GLAccount.TableCaption(), Item."No.", Item.Description);
         end;
     end;
 
@@ -438,13 +469,13 @@
     begin
         GLAccount.Get(AccountNo);
         if GLAccount.Blocked then
-            ErrorHelperAccount("Correct Sales Inv. Error Type"::AccountBlocked, AccountNo, GLAccount.TableCaption(), '', '');
+            ErrorHelperAccount(Enum::"Correct Sales Inv. Error Type"::AccountBlocked, AccountNo, GLAccount.TableCaption(), '', '');
         TableID[1] := DATABASE::"G/L Account";
         No[1] := AccountNo;
 
         if not DimensionManagement.CheckDimValuePosting(TableID, No, SalesInvoiceHeader."Dimension Set ID") then
             ErrorHelperAccount(
-                "Correct Sales Inv. Error Type"::DimErr, AccountNo, GLAccount.TableCaption(),
+                Enum::"Correct Sales Inv. Error Type"::DimErr, AccountNo, GLAccount.TableCaption(),
                 SalesInvoiceHeader."Customer Posting Group", CustomerPostingGroup.TableCaption());
     end;
 
@@ -460,7 +491,7 @@
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
         SalesInvoiceHeader.CalcFields("Remaining Amount");
         if SalesInvoiceHeader."Amount Including VAT" <> SalesInvoiceHeader."Remaining Amount" then
-            ErrorHelperHeader("Correct Sales Inv. Error Type"::IsPaid, SalesInvoiceHeader);
+            ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::IsPaid, SalesInvoiceHeader);
     end;
 
     local procedure TestIfInvoiceIsCorrectedOnce(SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -474,7 +505,7 @@
             exit;
 
         if CancelledDocument.FindSalesCancelledInvoice(SalesInvoiceHeader."No.") then
-            ErrorHelperHeader("Correct Sales Inv. Error Type"::IsCorrected, SalesInvoiceHeader);
+            ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::IsCorrected, SalesInvoiceHeader);
     end;
 
     local procedure TestIfInvoiceIsNotCorrectiveDoc(SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -482,7 +513,7 @@
         CancelledDocument: Record "Cancelled Document";
     begin
         if CancelledDocument.FindSalesCorrectiveInvoice(SalesInvoiceHeader."No.") then
-            ErrorHelperHeader("Correct Sales Inv. Error Type"::IsCorrective, SalesInvoiceHeader);
+            ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::IsCorrective, SalesInvoiceHeader);
     end;
 
     local procedure TestIfPostingIsAllowed(SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -490,7 +521,7 @@
         GenJnlCheckLine: Codeunit "Gen. Jnl.-Check Line";
     begin
         if GenJnlCheckLine.DateNotAllowed(SalesInvoiceHeader."Posting Date") then
-            ErrorHelperHeader("Correct Sales Inv. Error Type"::PostingNotAllowed, SalesInvoiceHeader);
+            ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::PostingNotAllowed, SalesInvoiceHeader);
     end;
 
     local procedure TestIfAnyFreeNumberSeries(SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -512,7 +543,7 @@
         SalesReceivablesSetup.Get();
 
         if NoSeriesManagement.TryGetNextNo(SalesReceivablesSetup."Credit Memo Nos.", PostingDate) = '' then
-            ErrorHelperHeader("Correct Sales Inv. Error Type"::SerieNumCM, SalesInvoiceHeader);
+            ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::SerieNumCM, SalesInvoiceHeader);
 
         GeneralLedgerSetup.Get();
         if GeneralLedgerSetup."Journal Templ. Name Mandatory" then begin
@@ -521,10 +552,10 @@
         end else
             PostingNoSeries := SalesReceivablesSetup."Posted Credit Memo Nos.";
         if NoSeriesManagement.TryGetNextNo(PostingNoSeries, PostingDate) = '' then
-            ErrorHelperHeader("Correct Sales Inv. Error Type"::SerieNumPostCM, SalesInvoiceHeader);
+            ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::SerieNumPostCM, SalesInvoiceHeader);
 
         if (not CancellingOnly) and (NoSeriesManagement.TryGetNextNo(SalesReceivablesSetup."Invoice Nos.", PostingDate) = '') then
-            ErrorHelperHeader("Correct Sales Inv. Error Type"::SerieNumInv, SalesInvoiceHeader);
+            ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::SerieNumInv, SalesInvoiceHeader);
     end;
 
     local procedure TestIfJobPostingIsAllowed(SalesInvoiceNo: Code[20])
@@ -547,7 +578,7 @@
     begin
         SalesReceivablesSetup.Get();
         if (SalesInvoiceHeader."External Document No." = '') and SalesReceivablesSetup."Ext. Doc. No. Mandatory" then
-            ErrorHelperHeader("Correct Sales Inv. Error Type"::ExtDocErr, SalesInvoiceHeader);
+            ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::ExtDocErr, SalesInvoiceHeader);
     end;
 
     local procedure TestInventoryPostingClosed(SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -565,7 +596,7 @@
             InventoryPeriod.SetRange(Closed, true);
             InventoryPeriod.SetFilter("Ending Date", '>=%1', SalesInvoiceHeader."Posting Date");
             if not InventoryPeriod.IsEmpty() then
-                ErrorHelperHeader("Correct Sales Inv. Error Type"::InventoryPostClosed, SalesInvoiceHeader);
+                ErrorHelperHeader(Enum::"Correct Sales Inv. Error Type"::InventoryPostClosed, SalesInvoiceHeader);
         end;
     end;
 
@@ -582,7 +613,7 @@
         IsHandled := false;
         OnAfterTestSalesLineType(SalesInvoiceLine, IsHandled);
         if not IsHandled then
-            ErrorHelperLine("Correct Sales Inv. Error Type"::WrongItemType, SalesInvoiceLine);
+            ErrorHelperLine(Enum::"Correct Sales Inv. Error Type"::WrongItemType, SalesInvoiceLine);
     end;
 
     local procedure TestGenPostingSetup(SalesInvoiceLine: Record "Sales Invoice Line")
@@ -766,58 +797,58 @@
 
         if CancellingOnly then
             case HeaderErrorType of
-                "Correct Sales Inv. Error Type"::IsPaid:
+                Enum::"Correct Sales Inv. Error Type"::IsPaid:
                     Error(PostedInvoiceIsPaidCancelErr);
-                "Correct Sales Inv. Error Type"::CustomerBlocked:
+                Enum::"Correct Sales Inv. Error Type"::CustomerBlocked:
                     begin
                         Customer.Get(SalesInvoiceHeader."Bill-to Customer No.");
                         Error(CustomerIsBlockedCancelErr, Customer.Name);
                     end;
-                "Correct Sales Inv. Error Type"::IsCorrected:
+                Enum::"Correct Sales Inv. Error Type"::IsCorrected:
                     Error(AlreadyCancelledErr);
-                "Correct Sales Inv. Error Type"::IsCorrective:
+                Enum::"Correct Sales Inv. Error Type"::IsCorrective:
                     Error(CancelCorrectiveDocErr);
-                "Correct Sales Inv. Error Type"::SerieNumInv:
+                Enum::"Correct Sales Inv. Error Type"::SerieNumInv:
                     Error(NoFreeInvoiceNoSeriesCancelErr);
-                "Correct Sales Inv. Error Type"::SerieNumCM:
+                Enum::"Correct Sales Inv. Error Type"::SerieNumCM:
                     Error(NoFreeCMSeriesCancelErr);
-                "Correct Sales Inv. Error Type"::SerieNumPostCM:
+                Enum::"Correct Sales Inv. Error Type"::SerieNumPostCM:
                     Error(NoFreePostCMSeriesCancelErr);
-                "Correct Sales Inv. Error Type"::PostingNotAllowed:
+                Enum::"Correct Sales Inv. Error Type"::PostingNotAllowed:
                     Error(PostingNotAllowedCancelErr);
-                "Correct Sales Inv. Error Type"::ExtDocErr:
+                Enum::"Correct Sales Inv. Error Type"::ExtDocErr:
                     Error(ExternalDocCancelErr);
-                "Correct Sales Inv. Error Type"::InventoryPostClosed:
+                Enum::"Correct Sales Inv. Error Type"::InventoryPostClosed:
                     Error(InventoryPostClosedCancelErr);
-                "Correct Sales Inv. Error Type"::DimCombHeaderErr:
+                Enum::"Correct Sales Inv. Error Type"::DimCombHeaderErr:
                     Error(InvalidDimCombHeaderCancelErr);
             end
         else
             case HeaderErrorType of
-                "Correct Sales Inv. Error Type"::IsPaid:
+                Enum::"Correct Sales Inv. Error Type"::IsPaid:
                     Error(PostedInvoiceIsPaidCorrectErr);
-                "Correct Sales Inv. Error Type"::CustomerBlocked:
+                Enum::"Correct Sales Inv. Error Type"::CustomerBlocked:
                     begin
                         Customer.Get(SalesInvoiceHeader."Bill-to Customer No.");
                         Error(CustomerIsBlockedCorrectErr, Customer.Name);
                     end;
-                "Correct Sales Inv. Error Type"::IsCorrected:
+                Enum::"Correct Sales Inv. Error Type"::IsCorrected:
                     Error(AlreadyCorrectedErr);
-                "Correct Sales Inv. Error Type"::IsCorrective:
+                Enum::"Correct Sales Inv. Error Type"::IsCorrective:
                     Error(CorrCorrectiveDocErr);
-                "Correct Sales Inv. Error Type"::SerieNumInv:
+                Enum::"Correct Sales Inv. Error Type"::SerieNumInv:
                     Error(NoFreeInvoiceNoSeriesCorrectErr);
-                "Correct Sales Inv. Error Type"::SerieNumPostCM:
+                Enum::"Correct Sales Inv. Error Type"::SerieNumPostCM:
                     Error(NoFreePostCMSeriesCorrectErr);
-                "Correct Sales Inv. Error Type"::SerieNumCM:
+                Enum::"Correct Sales Inv. Error Type"::SerieNumCM:
                     Error(NoFreeCMSeriesCorrectErr);
-                "Correct Sales Inv. Error Type"::PostingNotAllowed:
+                Enum::"Correct Sales Inv. Error Type"::PostingNotAllowed:
                     Error(PostingNotAllowedCorrectErr);
-                "Correct Sales Inv. Error Type"::ExtDocErr:
+                Enum::"Correct Sales Inv. Error Type"::ExtDocErr:
                     Error(ExternalDocCorrectErr);
-                "Correct Sales Inv. Error Type"::InventoryPostClosed:
+                Enum::"Correct Sales Inv. Error Type"::InventoryPostClosed:
                     Error(InventoryPostClosedCorrectErr);
-                "Correct Sales Inv. Error Type"::DimCombHeaderErr:
+                Enum::"Correct Sales Inv. Error Type"::DimCombHeaderErr:
                     Error(InvalidDimCombHeaderCorrectErr);
             end;
     end;
@@ -828,42 +859,54 @@
     begin
         if CancellingOnly then
             case LineErrorType of
-                "Correct Sales Inv. Error Type"::ItemBlocked:
+                Enum::"Correct Sales Inv. Error Type"::ItemBlocked:
                     begin
                         Item.Get(SalesInvoiceLine."No.");
                         Error(ItemIsBlockedCancelErr, Item."No.", Item.Description);
                     end;
-                "Correct Sales Inv. Error Type"::ItemIsReturned:
+                "Correct Sales Inv. Error Type"::ItemVariantBlocked:
+                    begin
+                        Item.SetLoadFields(Description);
+                        Item.Get(SalesInvoiceLine."No.");
+                        Error(ItemVariantIsBlockedCancelErr, SalesInvoiceLine."Variant Code", Item."No.", Item.Description);
+                    end;
+                Enum::"Correct Sales Inv. Error Type"::ItemIsReturned:
                     begin
                         Item.Get(SalesInvoiceLine."No.");
                         Error(ShippedQtyReturnedCancelErr, Item."No.", Item.Description);
                     end;
-                "Correct Sales Inv. Error Type"::WrongItemType:
+                Enum::"Correct Sales Inv. Error Type"::WrongItemType:
                     Error(LineTypeNotAllowedCancelErr, SalesInvoiceLine."No.", SalesInvoiceLine.Description, SalesInvoiceLine.Type);
-                "Correct Sales Inv. Error Type"::LineFromJob:
+                Enum::"Correct Sales Inv. Error Type"::LineFromJob:
                     Error(UsedInJobCancelErr, SalesInvoiceLine."No.", SalesInvoiceLine.Description);
-                "Correct Sales Inv. Error Type"::DimCombErr:
+                Enum::"Correct Sales Inv. Error Type"::DimCombErr:
                     Error(InvalidDimCombinationCancelErr, SalesInvoiceLine."No.", SalesInvoiceLine.Description);
             end
         else
             case LineErrorType of
-                "Correct Sales Inv. Error Type"::ItemBlocked:
+                Enum::"Correct Sales Inv. Error Type"::ItemBlocked:
                     begin
                         Item.Get(SalesInvoiceLine."No.");
                         Error(ItemIsBlockedCorrectErr, Item."No.", Item.Description);
                     end;
-                "Correct Sales Inv. Error Type"::ItemIsReturned:
+                "Correct Sales Inv. Error Type"::ItemVariantBlocked:
+                    begin
+                        Item.SetLoadFields(Description);
+                        Item.Get(SalesInvoiceLine."No.");
+                        Error(ItemVariantIsBlockedCorrectErr, SalesInvoiceLine."Variant Code", Item."No.", Item.Description);
+                    end;
+                Enum::"Correct Sales Inv. Error Type"::ItemIsReturned:
                     begin
                         Item.Get(SalesInvoiceLine."No.");
                         Error(ShippedQtyReturnedCorrectErr, Item."No.", Item.Description);
                     end;
-                "Correct Sales Inv. Error Type"::LineFromOrder:
+                Enum::"Correct Sales Inv. Error Type"::LineFromOrder:
                     Error(SalesLineFromOrderCorrectErr, SalesInvoiceLine."No.", SalesInvoiceLine.Description);
-                "Correct Sales Inv. Error Type"::WrongItemType:
+                Enum::"Correct Sales Inv. Error Type"::WrongItemType:
                     Error(LineTypeNotAllowedCorrectErr, SalesInvoiceLine."No.", SalesInvoiceLine.Description, SalesInvoiceLine.Type);
-                "Correct Sales Inv. Error Type"::LineFromJob:
+                Enum::"Correct Sales Inv. Error Type"::LineFromJob:
                     Error(UsedInJobCorrectErr, SalesInvoiceLine."No.", SalesInvoiceLine.Description);
-                "Correct Sales Inv. Error Type"::DimCombErr:
+                Enum::"Correct Sales Inv. Error Type"::DimCombErr:
                     Error(InvalidDimCombinationCorrectErr, SalesInvoiceLine."No.", SalesInvoiceLine.Description);
             end;
     end;
@@ -872,16 +915,16 @@
     begin
         if CancellingOnly then
             case AccountErrorType of
-                "Correct Sales Inv. Error Type"::AccountBlocked:
+                Enum::"Correct Sales Inv. Error Type"::AccountBlocked:
                     Error(AccountIsBlockedCancelErr, AccountCaption, AccountNo);
-                "Correct Sales Inv. Error Type"::DimErr:
+                Enum::"Correct Sales Inv. Error Type"::DimErr:
                     Error(InvalidDimCodeCancelErr, AccountCaption, AccountNo, No, Name);
             end
         else
             case AccountErrorType of
-                "Correct Sales Inv. Error Type"::AccountBlocked:
+                Enum::"Correct Sales Inv. Error Type"::AccountBlocked:
                     Error(AccountIsBlockedCorrectErr, AccountCaption, AccountNo);
-                "Correct Sales Inv. Error Type"::DimErr:
+                Enum::"Correct Sales Inv. Error Type"::DimErr:
                     Error(InvalidDimCodeCorrectErr, AccountCaption, AccountNo, No, Name);
             end;
     end;
@@ -991,13 +1034,7 @@
     var
         Item: Record Item;
         Location: Record Location;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeTestWMSLocation(SalesInvoiceLine, IsHandled);
-        if IsHandled then
-            exit;
-
         if SalesInvoiceLine.Type <> SalesInvoiceLine.Type::Item then
             exit;
         if not Item.Get(SalesInvoiceLine."No.") then
@@ -1148,11 +1185,6 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnRunOnBeforePostCorrectiveSalesCrMemo(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTestWMSLocation(var SalesInvoiceLine: Record "Sales Invoice Line"; var IsHandled: Boolean)
     begin
     end;
 }

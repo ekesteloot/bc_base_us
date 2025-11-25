@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 page 442 "Reminder Comment Sheet"
 {
     AutoSplitKey = true;
@@ -16,17 +18,17 @@ page 442 "Reminder Comment Sheet"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the date the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the comment itself.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the comment.';
@@ -42,7 +44,7 @@ page 442 "Reminder Comment Sheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
     end;
 
     var

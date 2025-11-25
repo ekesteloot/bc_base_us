@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
 page 5732 "Catalog Item Setup"
 {
     AdditionalSearchTerms = 'non-inventoriable setup,special order setup';
@@ -22,7 +24,7 @@ page 5732 "Catalog Item Setup"
                     ToolTip = 'Specifies the format of the catalog item number that appears on the item card.';
                     trigger OnValidate()
                     begin
-                        NoFormatSeparatorEditable := "No. Format" <> "No. Format"::"Item No. Series";
+                        NoFormatSeparatorEditable := Rec."No. Format" <> Rec."No. Format"::"Item No. Series";
                     end;
                 }
                 field("No. Format Separator"; Rec."No. Format Separator")
@@ -54,19 +56,18 @@ page 5732 "Catalog Item Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 
     trigger OnAfterGetRecord()
     begin
-        NoFormatSeparatorEditable := "No. Format" <> "No. Format"::"Item No. Series";
+        NoFormatSeparatorEditable := Rec."No. Format" <> Rec."No. Format"::"Item No. Series";
     end;
 
     var
-        [InDataSet]
         NoFormatSeparatorEditable: Boolean;
 }

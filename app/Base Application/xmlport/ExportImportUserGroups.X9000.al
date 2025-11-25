@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 xmlport 9000 "Export/Import User Groups"
 {
     Caption = 'Export/Import User Groups';
@@ -25,11 +27,11 @@ xmlport 9000 "Export/Import User Groups"
                 }
                 tableelement("User Group Permission Set"; "User Group Permission Set")
                 {
-                    LinkFields = "User Group Code" = FIELD(Code);
+                    LinkFields = "User Group Code" = field(Code);
                     LinkTable = "User Group";
                     MinOccurs = Zero;
                     XmlName = 'UserGroupPermissionSet';
-                    SourceTableView = SORTING("User Group Code", "Role ID", "App ID") ORDER(Ascending);
+                    SourceTableView = sorting("User Group Code", "Role ID", "App ID") order(Ascending);
                     fieldelement(UserGroupCode; "User Group Permission Set"."User Group Code")
                     {
                     }

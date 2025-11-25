@@ -1,3 +1,9 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 7301 "Zone List"
 {
     Caption = 'Zone List';
@@ -19,7 +25,7 @@ page 7301 "Zone List"
                     ToolTip = 'Specifies the location code of the zone.';
                     Visible = false;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the code of the zone.';
@@ -85,8 +91,8 @@ page 7301 "Zone List"
                     Caption = '&Bins';
                     Image = Bins;
                     RunObject = Page Bins;
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Zone Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Zone Code" = field(Code);
                     ToolTip = 'View or edit information about zones that you use in your warehouse to hold items.';
                 }
             }

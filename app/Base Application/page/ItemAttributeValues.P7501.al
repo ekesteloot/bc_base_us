@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
 page 7501 "Item Attribute Values"
 {
     Caption = 'Item Attribute Values';
@@ -12,12 +14,12 @@ page 7501 "Item Attribute Values"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the value of the item attribute.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the attribute value cannot be assigned to an item. Items to which the attribute value is already assigned are not affected.';
@@ -39,8 +41,8 @@ page 7501 "Item Attribute Values"
                     Caption = 'Translations';
                     Image = Translations;
                     RunObject = Page "Item Attr. Value Translations";
-                    RunPageLink = "Attribute ID" = FIELD("Attribute ID"),
-                                  ID = FIELD(ID);
+                    RunPageLink = "Attribute ID" = field("Attribute ID"),
+                                  ID = field(ID);
                     ToolTip = 'Opens a window in which you can specify the translations of the selected item attribute value.';
                 }
             }
@@ -62,12 +64,12 @@ page 7501 "Item Attribute Values"
     var
         AttributeID: Integer;
     begin
-        if GetFilter("Attribute ID") <> '' then
-            AttributeID := GetRangeMin("Attribute ID");
+        if Rec.GetFilter("Attribute ID") <> '' then
+            AttributeID := Rec.GetRangeMin("Attribute ID");
         if AttributeID <> 0 then begin
-            FilterGroup(2);
-            SetRange("Attribute ID", AttributeID);
-            FilterGroup(0);
+            Rec.FilterGroup(2);
+            Rec.SetRange("Attribute ID", AttributeID);
+            Rec.FilterGroup(0);
         end;
     end;
 }

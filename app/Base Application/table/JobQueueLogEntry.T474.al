@@ -1,3 +1,9 @@
+﻿namespace System.Threading;
+
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Utilities;
+
 table 474 "Job Queue Log Entry"
 {
     Caption = 'Job Queue Log Entry';
@@ -41,8 +47,8 @@ table 474 "Job Queue Log Entry"
         }
         field(8; "Object Caption to Run"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = FIELD("Object Type to Run"),
-                                                                           "Object ID" = FIELD("Object ID to Run")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = field("Object Type to Run"),
+                                                                           "Object ID" = field("Object ID to Run")));
             Caption = 'Object Caption to Run';
             FieldClass = FlowField;
         }
@@ -85,13 +91,8 @@ table 474 "Job Queue Log Entry"
         {
             Caption = 'Processed by User ID';
             DataClassification = EndUserIdentifiableInformation;
-#if not CLEAN20
-            ObsoleteTag = '20.0';
-            ObsoleteState = Pending;
-#else
-            ObsoleteTag = '22.0';
+            ObsoleteTag = '23.0';
             ObsoleteState = Removed;
-#endif
             ObsoleteReason = 'The Processed by User ID is the same as User ID';
         }
         field(17; "Job Queue Category Code"; Code[10])
@@ -149,6 +150,9 @@ table 474 "Job Queue Log Entry"
         {
         }
         key(Key4; Status)
+        {
+        }
+        key(Key5; "Object Type to Run", "Object ID to Run", Status)
         {
         }
     }

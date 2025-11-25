@@ -297,8 +297,8 @@ report 10143 "Item List"
             }
             dataitem("Item Variant"; "Item Variant")
             {
-                DataItemLink = "Item No." = FIELD("No.");
-                DataItemTableView = SORTING("Item No.", Code);
+                DataItemLink = "Item No." = field("No.");
+                DataItemTableView = sorting("Item No.", Code);
                 column(Item_Variant_Code; Code)
                 {
                 }
@@ -317,8 +317,8 @@ report 10143 "Item List"
             }
             dataitem("Stockkeeping Unit"; "Stockkeeping Unit")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter"), "Date Filter" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Item No.", "Location Code", "Variant Code");
+                DataItemLink = "Item No." = field("No."), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter"), "Date Filter" = field("Date Filter");
+                DataItemTableView = sorting("Item No.", "Location Code", "Variant Code");
                 column(TotalValue_Control1480000; TotalValue)
                 {
                 }
@@ -538,7 +538,6 @@ report 10143 "Item List"
         UseSKU: Boolean;
         Text001: Label '(See SKU Comment)';
         NewTotalValue: Decimal;
-        [InDataSet]
         UseSKUEnable: Boolean;
         Item_ListCaptionLbl: Label 'Item List';
         CurrReport_PAGENOCaptionLbl: Label 'Page';

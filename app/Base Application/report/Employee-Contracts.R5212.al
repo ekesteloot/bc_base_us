@@ -1,7 +1,12 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Setup;
+
 report 5212 "Employee - Contracts"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeContracts.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeContracts.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee Contracts';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5212 "Employee - Contracts"
     {
         dataitem("Employment Contract"; "Employment Contract")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -44,8 +49,8 @@ report 5212 "Employee - Contracts"
             }
             dataitem(Employee; Employee)
             {
-                DataItemLink = "Emplymt. Contract Code" = FIELD(Code);
-                DataItemTableView = SORTING(Status, "Emplymt. Contract Code");
+                DataItemLink = "Emplymt. Contract Code" = field(Code);
+                DataItemTableView = sorting(Status, "Emplymt. Contract Code");
                 column(Employee__No__; "No.")
                 {
                 }

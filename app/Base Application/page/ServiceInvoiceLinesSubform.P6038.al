@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 page 6038 "Service Invoice Lines Subform"
 {
     Caption = 'Lines';
@@ -50,7 +52,7 @@ page 6038 "Service Invoice Lines Subform"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that the item on the invoice line is a catalog item.';
@@ -220,9 +222,7 @@ page 6038 "Service Invoice Lines Subform"
 
     var
         TempServInvLine: Record "Service Invoice Line" temporary;
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     local procedure IsFirstDocLine(): Boolean
@@ -231,16 +231,16 @@ page 6038 "Service Invoice Lines Subform"
     begin
         TempServInvLine.Reset();
         TempServInvLine.CopyFilters(Rec);
-        TempServInvLine.SetRange("Document No.", "Document No.");
+        TempServInvLine.SetRange("Document No.", Rec."Document No.");
         if not TempServInvLine.FindFirst() then begin
             ServInvLine.CopyFilters(Rec);
-            ServInvLine.SetRange("Document No.", "Document No.");
+            ServInvLine.SetRange("Document No.", Rec."Document No.");
             if not ServInvLine.FindFirst() then
                 exit(false);
             TempServInvLine := ServInvLine;
             TempServInvLine.Insert();
         end;
-        exit("Line No." = TempServInvLine."Line No.");
+        exit(Rec."Line No." = TempServInvLine."Line No.");
     end;
 }
 

@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Consolidation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 1829 "Consolidation Account"
 {
     Caption = 'Consolidation Account';

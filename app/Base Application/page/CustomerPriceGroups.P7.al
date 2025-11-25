@@ -13,7 +13,7 @@ page 7 "Customer Price Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code to identify the price group.';
@@ -108,7 +108,7 @@ page 7 "Customer Price Groups"
                     begin
                         SalesPrice.SetCurrentKey("Sales Type", "Sales Code");
                         SalesPrice.SetRange("Sales Type", SalesPrice."Sales Type"::"Customer Price Group");
-                        SalesPrice.SetRange("Sales Code", Code);
+                        SalesPrice.SetRange("Sales Code", Rec.Code);
                         Page.Run(Page::"Sales Prices", SalesPrice);
                     end;
                 }
@@ -163,7 +163,7 @@ page 7 "Customer Price Groups"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -178,7 +178,7 @@ page 7 "Customer Price Groups"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.UpdateOneNow(RecordId);
+                        CRMIntegrationManagement.UpdateOneNow(Rec.RecordId);
                     end;
                 }
                 group(Coupling)
@@ -198,7 +198,7 @@ page 7 "Customer Price Groups"
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(DeleteCRMCoupling)
@@ -233,7 +233,7 @@ page 7 "Customer Price Groups"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -301,7 +301,7 @@ page 7 "Customer Price Groups"
     begin
         CRMIsCoupledToRecord := CRMIntegrationEnabled;
         if CRMIsCoupledToRecord then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
     end;
 
     trigger OnOpenPage()

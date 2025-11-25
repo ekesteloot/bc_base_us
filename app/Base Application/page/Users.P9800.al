@@ -1,3 +1,17 @@
+﻿namespace System.Security.User;
+
+using Microsoft.FixedAssets.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.WarehouseMgt.Setup;
+using System;
+using System.Azure.Identity;
+using System.Email;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Security.AccessControl;
+
 page 9800 Users
 {
     AdditionalSearchTerms = 'permission,office 365 admin center,microsoft 365 admin center';
@@ -45,7 +59,7 @@ page 9800 Users
                     Editable = not IsSaaS;
                     ToolTip = 'Specifies the full name of the user.';
                 }
-                field(State; State)
+                field(State; Rec.State)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Status';
@@ -70,12 +84,12 @@ page 9800 Users
                         UserSID: Text;
                     begin
                         if WindowsUserName = '' then
-                            "Windows Security ID" := ''
+                            Rec."Windows Security ID" := ''
                         else begin
                             UserSID := Sid(WindowsUserName);
                             WindowsUserName := IdentityManagement.UserName(UserSID);
                             if WindowsUserName <> '' then begin
-                                "Windows Security ID" := UserSID;
+                                Rec."Windows Security ID" := UserSID;
                                 ValidateSid();
                                 SetUserName();
                             end else
@@ -246,7 +260,7 @@ page 9800 Users
                     var
                         EffectivePermissionsMgt: Codeunit "Effective Permissions Mgt.";
                     begin
-                        EffectivePermissionsMgt.OpenPageForUser("User Security ID");
+                        EffectivePermissionsMgt.OpenPageForUser(Rec."User Security ID");
                     end;
                 }
                 action("Permission Sets")
@@ -417,9 +431,9 @@ page 9800 Users
                     PermissionManager: Codeunit "Permission Manager";
                     AzureADPlan: Codeunit "Azure AD Plan";
                 begin
-                    if Confirm(RestoreUserGroupsToDefaultQst, false, "User Name") then begin
-                        AzureADPlan.RefreshUserPlanAssignments("User Security ID");
-                        PermissionManager.ResetUserToDefaultPermissions("User Security ID");
+                    if Confirm(RestoreUserGroupsToDefaultQst, false, Rec."User Name") then begin
+                        AzureADPlan.RefreshUserPlanAssignments(Rec."User Security ID");
+                        PermissionManager.ResetUserToDefaultPermissions(Rec."User Security ID");
                     end;
                 end;
             }
@@ -554,7 +568,7 @@ page 9800 Users
 
     trigger OnAfterGetRecord()
     begin
-        WindowsUserName := IdentityManagement.UserName("Windows Security ID");
+        WindowsUserName := IdentityManagement.UserName(Rec."Windows Security ID");
         NoUserExists := false;
     end;
 
@@ -580,41 +594,48 @@ page 9800 Users
     begin
         if not UserCard.ManageUsersIsAllowed() then
             Error(CreateUserInSaaSErr);
-        if "User Name" = '' then
-            Error(Text004Err, FieldCaption("User Name"));
+        if Rec."User Name" = '' then
+            Error(Text004Err, Rec.FieldCaption("User Name"));
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "User Security ID" := CreateGuid();
+        Rec."User Security ID" := CreateGuid();
         WindowsUserName := '';
     end;
 
     trigger OnOpenPage()
     var
+#if not CLEAN23
         MyNotification: Record "My Notifications";
+#endif
         UserSelection: Codeunit "User Selection";
+#if not CLEAN23
         UserManagement: Codeunit "User Management";
+#endif
         EnvironmentInfo: Codeunit "Environment Information";
 #if not CLEAN22
         LegacyUserGroups: Codeunit "Legacy User Groups";
 #endif
+#if not CLEAN23
         NavTenantSettingsHelper: DotNet NavTenantSettingsHelper;
+#endif
     begin
 #if not CLEAN22
         LegacyUserGroupsVisible := LegacyUserGroups.UiElementsVisible();
 #endif
-        NoUserExists := IsEmpty;
+        NoUserExists := Rec.IsEmpty();
         UserSelection.HideExternalUsers(Rec);
         RefreshParts();
-
+#if not CLEAN23
         if UserWithWebServiceKeyExist() then begin
-            Usermanagement.BasicAuthDepricationNotificationDefault(true);
+            Usermanagement.BasicAuthDepricationNotificationDefault(false);
             if (not NavTenantSettingsHelper.IsWSKeyAllowed()) and EnvironmentInfo.IsSaaS() then
                 MyNotification.SetStatus(UserManagement.BasicAuthDepricationNotificationId(), false);
             if MyNotification.IsEnabled(UserManagement.BasicAuthDepricationNotificationId()) then
                 UserManagement.BasicAuthUsedNotificationShow(BasicAuthUsedNotification);
         end;
+#endif
     end;
 
     var
@@ -631,7 +652,6 @@ page 9800 Users
         MissingUserSettingsMsg: Label 'Some user settings, such as language, region, or time zone, weren''t specified when %1 was created, so default values were assigned. You can change them if needed.', Comment = '%1=user name';
         NoUserExists: Boolean;
         CreateQst: Label 'Do you want to create %1 as super user?', Comment = '%1=user name, e.g. europe\myaccountname';
-        [InDataSet]
         CanSendEmail: Boolean;
         RestoreUserGroupsToDefaultQst: Label 'Do you want to restore the default permissions for user %1?', Comment = 'Do you want to restore the default permissions for user Annie?';
         CanManageUsersOnTenant: Boolean;
@@ -646,14 +666,14 @@ page 9800 Users
     var
         User: Record User;
     begin
-        if "Windows Security ID" = '' then
-            Error(Text001Err, "User Name");
+        if Rec."Windows Security ID" = '' then
+            Error(Text001Err, Rec."User Name");
 
-        if ("Windows Security ID" = 'S-1-1-0') or ("Windows Security ID" = 'S-1-5-7') then
-            Error(Text003Err, "User Name");
+        if (Rec."Windows Security ID" = 'S-1-1-0') or (Rec."Windows Security ID" = 'S-1-5-7') then
+            Error(Text003Err, Rec."User Name");
 
-        User.SetFilter("Windows Security ID", "Windows Security ID");
-        User.SetFilter("User Security ID", '<>%1', "User Security ID");
+        User.SetFilter("Windows Security ID", Rec."Windows Security ID");
+        User.SetFilter("User Security ID", '<>%1', Rec."User Security ID");
         if not User.IsEmpty() then
             Error(Text002Err, WindowsUserName);
     end;
@@ -668,7 +688,7 @@ page 9800 Users
 
     local procedure SetUserName()
     begin
-        "User Name" := WindowsUserName;
+        Rec."User Name" := WindowsUserName;
         ValidateUserName();
     end;
 
@@ -687,6 +707,8 @@ page 9800 Users
         CurrPage."Inherited Permission Sets".Page.Refresh(SecurityGroupMemberBuffer);
     end;
 
+#if not CLEAN23
+    [Obsolete('Basic Authentication deprecation warning should no longer be shown with from 23.0', '23.0')]
     local procedure UserWithWebServiceKeyExist(): Boolean
     var
         User: Record User;
@@ -704,11 +726,14 @@ page 9800 Users
             until (User.Next() = 0) or UserWithWebServiceKeyFound;
         exit(UserWithWebServiceKeyFound);
     end;
-
+#endif
+#if not CLEAN23
+    [Obsolete('Basic Authentication deprecation warning should no longer be shown with from 23.0', '23.0')]
     local procedure MaxNumberOfUsersToScanWebServcieAccessKey(): Integer
     begin
         exit(1000);
     end;
+#endif
 
 }
 

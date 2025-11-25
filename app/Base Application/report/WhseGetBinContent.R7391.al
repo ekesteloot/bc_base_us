@@ -1,3 +1,15 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Worksheet;
+
 report 7391 "Whse. Get Bin Content"
 {
     Caption = 'Whse. Get Bin Content';
@@ -140,16 +152,14 @@ report 7391 "Whse. Get Bin Content"
         ReportInitialized: Boolean;
         PostingDate: Date;
         DocNo: Code[20];
-        [InDataSet]
         PostingDateEditable: Boolean;
-        [InDataSet]
         DocNoEditable: Boolean;
 
 #if not CLEAN21
     [Obsolete('Replaced by procedure SetParameters()', '21.0')]
     procedure InitializeReport(WhseWorksheetLine2: Record "Whse. Worksheet Line"; WhseInternalPutawayHeader2: Record "Whse. Internal Put-away Header"; DestinationType: Option)
     begin
-        SetParameters(WhseWorksheetLine2, WhseInternalPutawayHeader2, "Warehouse Destination Type 2".FromInteger(DestinationType));
+        SetParameters(WhseWorksheetLine2, WhseInternalPutawayHeader2, Enum::"Warehouse Destination Type 2".FromInteger(DestinationType));
     end;
 #endif
 
@@ -291,24 +301,35 @@ report 7391 "Whse. Get Bin Content"
             "Line No." := "Line No." + 10000;
             "Source Code" := ItemJournalTemplate."Source Code";
             "Posting No. Series" := ItemJournalBatch."Posting No. Series";
-            ItemLedgerEntryType := Enum::"Item Ledger Entry Type"::Transfer;
+            case ItemJournalTemplate.Type of
+                ItemJournalTemplate.Type::Item:
+                    ItemLedgerEntryType := Enum::"Item Ledger Entry Type"::"Negative Adjmt.";
+                ItemJournalTemplate.Type::Transfer:
+                    ItemLedgerEntryType := Enum::"Item Ledger Entry Type"::Transfer;
+                else
+                    ItemLedgerEntryType := Enum::"Item Ledger Entry Type"::" ";
+            end;
             OnInsertItemJournalLineOnBeforeValidateEntryType(ItemJournalLine, BinContent, ItemLedgerEntryType, ItemJournalTemplate, ItemJournalBatch);
             Validate("Entry Type", ItemLedgerEntryType);
             Validate("Item No.", BinContent."Item No.");
             Validate("Posting Date", PostingDate);
             Validate("Document No.", DocNo);
             Validate("Location Code", BinContent."Location Code");
-            IsHandled := false;
-            OnInsertItemJournalLineOnBeforeValidateNewLocationCode(ItemJournalLine, BinContent, IsHandled);
-            if not IsHandled then
-                Validate("New Location Code", BinContent."Location Code");
+            if ItemJournalTemplate.Type = ItemJournalTemplate.Type::Transfer then begin
+                IsHandled := false;
+                OnInsertItemJournalLineOnBeforeValidateNewLocationCode(ItemJournalLine, BinContent, IsHandled);
+                if not IsHandled then
+                    Validate("New Location Code", BinContent."Location Code");
+            end;
             Validate("Variant Code", BinContent."Variant Code");
             Validate("Unit of Measure Code", BinContent."Unit of Measure Code");
             Validate("Bin Code", BinContent."Bin Code");
-            IsHandled := false;
-            OnInsertItemJournalLineOnBeforeValidateNewBinCode(ItemJournalLine, BinContent, IsHandled);
-            if not IsHandled then
-                Validate("New Bin Code", '');
+            if ItemJournalTemplate.Type = ItemJournalTemplate.Type::Transfer then begin
+                IsHandled := false;
+                OnInsertItemJournalLineOnBeforeValidateNewBinCode(ItemJournalLine, BinContent, IsHandled);
+                if not IsHandled then
+                    Validate("New Bin Code", '');
+            end;
             Validate("Unit of Measure Code", BinContent."Unit of Measure Code");
             Validate(Quantity, CalcQtyUOM(QtyToEmptyBase, "Qty. per Unit of Measure"));
             OnInsertItemJournalLineOnBeforeInsert(ItemJournalLine, BinContent);
@@ -443,7 +464,7 @@ report 7391 "Whse. Get Bin Content"
             Location.Get(LocationCode);
     end;
 
-    local procedure InsertTempTrackingSpecification(WarehouseEntry: Record "Warehouse Entry"; QtyOnBin: Decimal; var TempTrackingSpecification: Record "Tracking Specification" temporary)
+    protected procedure InsertTempTrackingSpecification(WarehouseEntry: Record "Warehouse Entry"; QtyOnBin: Decimal; var TempTrackingSpecification: Record "Tracking Specification" temporary)
     begin
         with WarehouseEntry do begin
             TempTrackingSpecification.Init();
@@ -465,7 +486,7 @@ report 7391 "Whse. Get Bin Content"
         end;
     end;
 
-    local procedure CalcQtyUOM(QtyBase: Decimal; QtyPerUOM: Decimal): Decimal
+    protected procedure CalcQtyUOM(QtyBase: Decimal; QtyPerUOM: Decimal): Decimal
     begin
         if QtyPerUOM = 0 then
             exit(0);
@@ -473,7 +494,7 @@ report 7391 "Whse. Get Bin Content"
         exit(Round(QtyBase / QtyPerUOM, UOMMgt.QtyRndPrecision()));
     end;
 
-    local procedure GetQtyToEmptyBase(ItemTrackingSetup: Record "Item Tracking Setup"): Decimal
+    protected procedure GetQtyToEmptyBase(ItemTrackingSetup: Record "Item Tracking Setup"): Decimal
     var
         BinContent: Record "Bin Content";
     begin

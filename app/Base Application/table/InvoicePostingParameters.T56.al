@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 table 56 "Invoice Posting Parameters"
 {
     Caption = 'Invoice Posting Parameters';

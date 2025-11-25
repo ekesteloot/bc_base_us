@@ -1,3 +1,16 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+
 table 6565 "Item Tracking Setup"
 {
     Caption = 'Item Tracking Setup';
@@ -95,17 +108,6 @@ table 6565 "Item Tracking Setup"
 
         OnAfterCopyTrackingFromBinContentBuffer(Rec, BinContentBuffer);
     end;
-
-#if not CLEAN20
-    [Obsolete('Please use CopyTrackingFromItemJnlLine().', '18.0')]
-    procedure CopyTrackingFromItemJournalLine(ItemJournalLine: Record "Item Journal Line");
-    begin
-        "Serial No." := ItemJournalLine."Serial No.";
-        "Lot No." := ItemJournalLine."Lot No.";
-
-        OnAfterCopyTrackingFromItemJournalLine(Rec, ItemJournalLine);
-    end;
-#endif
 
     procedure CopyTrackingFromItemLedgerEntry(ItemLedgerEntry: Record "Item Ledger Entry");
     begin
@@ -326,14 +328,6 @@ table 6565 "Item Tracking Setup"
     local procedure OnAfterCopyTrackingFromItemTrackingCodeWarehouseTracking(var ItemTrackingSetup: Record "Item Tracking Setup"; ItemTrackingCode: Record "Item Tracking Code")
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Please use OnAfterCopyTrackingFromItemJnlLine().', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyTrackingFromItemJournalLine(var ItemTrackingSetup: Record "Item Tracking Setup"; ItemJournalLine: Record "Item Journal Line")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyTrackingFromItemLedgerEntry(var ItemTrackingSetup: Record "Item Tracking Setup"; ItemLedgerEntry: Record "Item Ledger Entry")

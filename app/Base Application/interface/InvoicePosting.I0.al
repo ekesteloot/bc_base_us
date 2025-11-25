@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+
 interface "Invoice Posting"
 {
     /// <summary>

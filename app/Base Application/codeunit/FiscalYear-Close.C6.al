@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 codeunit 6 "Fiscal Year-Close"
 {
     TableNo = "Accounting Period";

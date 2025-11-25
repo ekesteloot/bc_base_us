@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 enum 296 "Reminder Source Type"
 {
     Extensible = true;

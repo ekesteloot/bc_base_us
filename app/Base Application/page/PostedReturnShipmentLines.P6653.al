@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 6653 "Posted Return Shipment Lines"
 {
     Caption = 'Posted Return Shipment Lines';
@@ -142,7 +146,7 @@ page 6653 "Posted Return Shipment Lines"
                     var
                         ReturnShptHeader: Record "Return Shipment Header";
                     begin
-                        ReturnShptHeader.Get("Document No.");
+                        ReturnShptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Return Shipment", ReturnShptHeader);
                     end;
                 }
@@ -157,7 +161,7 @@ page 6653 "Posted Return Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }

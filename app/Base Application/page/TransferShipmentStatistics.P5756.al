@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
 page 5756 "Transfer Shipment Statistics"
 {
     Caption = 'Transfer Shipment Statistics';
@@ -80,7 +82,7 @@ page 5756 "Transfer Shipment Statistics"
         if IsHandled then
             exit;
 
-        TransShptLine.SetRange("Document No.", "No.");
+        TransShptLine.SetRange("Document No.", Rec."No.");
         if TransShptLine.Find('-') then
             repeat
                 LineQty += TransShptLine.Quantity;

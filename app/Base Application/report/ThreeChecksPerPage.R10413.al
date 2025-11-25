@@ -9,7 +9,7 @@ report 10413 "Three Checks per Page"
     {
         dataitem(VoidGenJnlLine; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
             RequestFilterFields = "Journal Template Name", "Journal Batch Name", "Posting Date";
 
             trigger OnAfterGetRecord()
@@ -43,7 +43,7 @@ report 10413 "Three Checks per Page"
         }
         dataitem(TestGenJnlLine; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -112,7 +112,7 @@ report 10413 "Three Checks per Page"
         }
         dataitem(GenJnlLine; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
             column(JnlTemplateName_GenJnlLine; "Journal Template Name")
             {
             }
@@ -124,7 +124,7 @@ report 10413 "Three Checks per Page"
             }
             dataitem(CheckPages; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(CheckToAddr1; CheckToAddr[1])
                 {
                 }
@@ -139,7 +139,7 @@ report 10413 "Three Checks per Page"
                 }
                 dataitem(PrintSettledLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 30;
                     column(LineAmt; LineAmount)
                     {
@@ -352,7 +352,7 @@ report 10413 "Three Checks per Page"
                 }
                 dataitem(PrintCheck; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     column(PrnChkCheckDateTextCheckStyleUS; PrnChkCheckDateText[CheckStyle::US])
                     {

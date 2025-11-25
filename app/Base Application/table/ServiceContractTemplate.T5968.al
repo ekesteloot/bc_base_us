@@ -1,3 +1,11 @@
+namespace Microsoft.ServiceMgt.Contract;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Setup;
+using System.Globalization;
+
 table 5968 "Service Contract Template"
 {
     Caption = 'Service Contract Template';

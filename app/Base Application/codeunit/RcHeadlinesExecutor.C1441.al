@@ -1,3 +1,7 @@
+namespace System.Visualization;
+
+using System.Threading;
+
 codeunit 1441 "RC Headlines Executor"
 {
     TableNo = "Job Queue Entry";
@@ -7,7 +11,7 @@ codeunit 1441 "RC Headlines Executor"
         RCHeadlinesUserData: Record "RC Headlines User Data";
         RoleCenterPageID: Integer;
     begin
-        Evaluate(RoleCenterPageID, "Parameter String");
+        Evaluate(RoleCenterPageID, Rec."Parameter String");
         RCHeadlinesUserData.Get(UserSecurityId(), RoleCenterPageID);
         WorkDate := RCHeadlinesUserData."User workdate";
         OnComputeHeadlines(RoleCenterPageID);

@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 table 1458 "RC Headlines User Data"
 {
     Caption = 'Role Center Headlines User Data';

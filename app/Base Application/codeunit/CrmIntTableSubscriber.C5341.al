@@ -1,3 +1,37 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+#if not CLEAN21
+using Microsoft.Sales.Pricing;
+#endif
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Archive;
+using System.Environment.Configuration;
+using System.Telemetry;
+using System.Threading;
+using System.Utilities;
+
 codeunit 5341 "CRM Int. Table. Subscriber"
 {
     SingleInstance = true;
@@ -1747,7 +1781,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
     begin
         DestinationRecordRef.SetTable(CRMProductpricelevel);
         SourceRecordRef.SetTable(SalesPrice);
-        FindCRMUoMIdForSalesPrice("Price Asset Type"::Item, SalesPrice."Item No.", SalesPrice."Unit of Measure Code", CRMUom);
+        FindCRMUoMIdForSalesPrice(Enum::"Price Asset Type"::Item, SalesPrice."Item No.", SalesPrice."Unit of Measure Code", CRMUom);
         if CRMProductpricelevel.UoMId <> CRMUom.UoMId then begin
             CRMProductpricelevel.UoMId := CRMUom.UoMId;
             CRMProductpricelevel.UoMScheduleId := CRMUom.UoMScheduleId;
@@ -2010,7 +2044,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
         CustomerPriceGroup.Get(SalesPrice."Sales Code");
         if CRMIntegrationRecord.FindByRecordID(CustomerPriceGroup.RecordId()) then begin
             CRMProductpricelevel.SetRange(PriceLevelId, CRMIntegrationRecord."CRM ID");
-            FindCRMUoMIdForSalesPrice("Price Asset Type"::Item, SalesPrice."Item No.", SalesPrice."Unit of Measure Code", CRMUom);
+            FindCRMUoMIdForSalesPrice(Enum::"Price Asset Type"::Item, SalesPrice."Item No.", SalesPrice."Unit of Measure Code", CRMUom);
             CRMProductpricelevel.SetRange(UoMId, CRMUom.UoMId);
             Item.Get(SalesPrice."Item No.");
             CRMIntegrationRecord.FindByRecordID(Item.RecordId());
@@ -2038,12 +2072,12 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             FindCRMUoMIdForSalesPrice(PriceListLine."Asset Type", PriceListLine."Asset No.", PriceListLine."Unit of Measure Code", CRMUom);
             CRMProductpricelevel.SetRange(UoMId, CRMUom.UoMId);
             case PriceListLine."Asset Type" of
-                "Price Asset Type"::Item:
+                PriceListLine."Asset Type"::Item:
                     begin
                         Item.Get(PriceListLine."Asset No.");
                         CRMIntegrationRecord.FindByRecordID(Item.RecordId());
                     end;
-                "Price Asset Type"::Resource:
+                PriceListLine."Asset Type"::Resource:
                     begin
                         Resource.Get(PriceListLine."Asset No.");
                         CRMIntegrationRecord.FindByRecordID(Resource.RecordId());
@@ -2496,7 +2530,7 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             repeat
                 SalesPrice.TestField("Currency Code", ExpectedCurrencyCode);
                 FindCRMProductIdForItem(SalesPrice."Item No.");
-                FindCRMUoMIdForSalesPrice("Price Asset Type"::Item, SalesPrice."Item No.", SalesPrice."Unit of Measure Code", CRMUom);
+                FindCRMUoMIdForSalesPrice(Enum::"Price Asset Type"::Item, SalesPrice."Item No.", SalesPrice."Unit of Measure Code", CRMUom);
             until SalesPrice.Next() = 0;
     end;
 #endif
@@ -2510,9 +2544,9 @@ codeunit 5341 "CRM Int. Table. Subscriber"
             repeat
                 PriceListLine.TestField("Currency Code", ExpectedCurrencyCode);
                 case PriceListLine."Asset Type" of
-                    "Price Asset Type"::Item:
+                    PriceListLine."Asset Type"::Item:
                         FindCRMProductIdForItem(PriceListLine."Asset No.");
-                    "Price Asset Type"::Resource:
+                    PriceListLine."Asset Type"::Resource:
                         FindCRMProductIdForResource(PriceListLine."Asset No.");
                 end;
                 FindCRMUoMIdForSalesPrice(PriceListLine."Asset Type", PriceListLine."Asset No.", PriceListLine."Unit of Measure Code", CRMUom);

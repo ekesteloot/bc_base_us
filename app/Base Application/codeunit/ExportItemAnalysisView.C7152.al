@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using System.IO;
+
 codeunit 7152 "Export Item Analysis View"
 {
 

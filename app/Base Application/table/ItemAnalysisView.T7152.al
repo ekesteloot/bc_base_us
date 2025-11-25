@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+
 table 7152 "Item Analysis View"
 {
     Caption = 'Item Analysis View';
@@ -58,8 +65,6 @@ table 7152 "Item Analysis View"
         {
             Caption = 'Item Filter';
             TableRelation = Item;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -101,8 +106,6 @@ table 7152 "Item Analysis View"
         {
             Caption = 'Location Filter';
             TableRelation = Location;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()

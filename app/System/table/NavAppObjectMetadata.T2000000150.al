@@ -1,6 +1,8 @@
 /// <summary>
 /// This table contains object metadata from published applications.
 /// </summary>
+namespace System.Apps;
+
 table 2000000150 "NAV App Object Metadata"
 {
     Caption = 'NAV App Object Metadata';

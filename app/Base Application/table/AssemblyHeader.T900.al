@@ -1,4 +1,27 @@
-﻿table 900 "Assembly Header"
+﻿namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.AssemblyMgt.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.StandardCost;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using System.Security.User;
+using System.Utilities;
+
+table 900 "Assembly Header"
 {
     Caption = 'Assembly Header';
     DataCaptionFields = "No.", Description;
@@ -65,7 +88,7 @@
         field(10; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            TableRelation = Item WHERE(Type = CONST(Inventory));
+            TableRelation = Item where(Type = const(Inventory));
 
             trigger OnValidate()
             var
@@ -99,8 +122,8 @@
         field(12; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."),
-                                                       Code = FIELD("Variant Code"));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."),
+                                                       Code = field("Variant Code"));
 
             trigger OnValidate()
             var
@@ -110,10 +133,12 @@
                 CheckIsNotAsmToOrder();
                 TestStatusOpen();
                 SetCurrentFieldNum(FieldNo("Variant Code"));
-                if "Variant Code" = '' then
+                if Rec."Variant Code" = '' then
                     SetDescriptionsFromItem()
                 else begin
+                    ItemVariant.SetLoadFields(Description, "Description 2", Blocked);
                     ItemVariant.Get("Item No.", "Variant Code");
+                    ItemVariant.TestField(Blocked, false);
                     Description := ItemVariant.Description;
                     "Description 2" := ItemVariant."Description 2";
                 end;
@@ -149,8 +174,8 @@
         }
         field(19; Comment; Boolean)
         {
-            CalcFormula = Exist("Assembly Comment Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                               "Document No." = FIELD("No.")));
+            CalcFormula = exist("Assembly Comment Line" where("Document Type" = field("Document Type"),
+                                                               "Document No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -158,7 +183,7 @@
         field(20; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             var
@@ -183,24 +208,24 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(22; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(23; "Posting Date"; Date)
@@ -247,11 +272,11 @@
         field(33; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF (Quantity = FILTER(< 0)) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"),
-                                                                                     "Item No." = FIELD("Item No."),
-                                                                                     "Variant Code" = FIELD("Variant Code"))
-            ELSE
-            Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = if (Quantity = filter(< 0)) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
+                                                                                     "Item No." = field("Item No."),
+                                                                                     "Variant Code" = field("Variant Code"))
+            else
+            Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnLookup()
             var
@@ -392,12 +417,12 @@
         }
         field(48; "Reserved Quantity"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("No."),
-                                                                  "Source Type" = CONST(900),
+            CalcFormula = sum("Reservation Entry".Quantity where("Source ID" = field("No."),
+                                                                  "Source Type" = const(900),
 #pragma warning disable AL0603
-                                                                  "Source Subtype" = FIELD("Document Type"),
+                                                                  "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                                                  "Reservation Status" = CONST(Reservation)));
+                                                                  "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -405,12 +430,12 @@
         }
         field(49; "Reserved Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("No."),
-                                                                           "Source Type" = CONST(900),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("No."),
+                                                                           "Source Type" = const(900),
 #pragma warning disable AL0603
-                                                                           "Source Subtype" = FIELD("Document Type"),
+                                                                           "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                                                           "Reservation Status" = CONST(Reservation)));
+                                                                           "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -439,8 +464,8 @@
         }
         field(54; "Assemble to Order"; Boolean)
         {
-            CalcFormula = Exist("Assemble-to-Order Link" WHERE("Assembly Document Type" = FIELD("Document Type"),
-                                                                "Assembly Document No." = FIELD("No.")));
+            CalcFormula = exist("Assemble-to-Order Link" where("Assembly Document Type" = field("Document Type"),
+                                                                "Assembly Document No." = field("No.")));
             Caption = 'Assemble to Order';
             Editable = false;
             FieldClass = FlowField;
@@ -485,9 +510,9 @@
         }
         field(68; "Rolled-up Assembly Cost"; Decimal)
         {
-            CalcFormula = Sum("Assembly Line"."Cost Amount" WHERE("Document Type" = FIELD("Document Type"),
-                                                                   "Document No." = FIELD("No."),
-                                                                   Type = FILTER(Item | Resource)));
+            CalcFormula = sum("Assembly Line"."Cost Amount" where("Document Type" = field("Document Type"),
+                                                                   "Document No." = field("No."),
+                                                                   Type = filter(Item | Resource)));
             Caption = 'Rolled-up Assembly Cost';
             FieldClass = FlowField;
         }
@@ -504,7 +529,7 @@
         field(80; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             var
@@ -615,7 +640,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -908,44 +933,12 @@
         TestReservationDateConflict := NewTestReservationDateConflict;
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        DimMgt: Codeunit DimensionManagement;
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-    begin
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, DefaultDimSource, SourceCodeSetup.Assembly,
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-        if "No." <> '' then
-            DimMgt.UpdateGlobalDimFromDimSetID(
-              "Dimension Set ID",
-              "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
         DimMgt: Codeunit DimensionManagement;
     begin
         SourceCodeSetup.Get();
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -1165,14 +1158,6 @@
         TestField("Item No.");
         PAGE.Run(PAGE::"Assembly Order Statistics", Rec);
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure SetDim()
-    begin
-        CreateDim(DATABASE::Item, "Item No.");
-    end;
-#endif
 
     procedure UpdateUnitCost()
     var
@@ -1542,7 +1527,7 @@
     begin
         if "Bin Code" <> '' then begin
             GetLocation(Location, "Location Code");
-            if not Location."Directed Put-away and Pick" then
+            if not Location."Check Whse. Class" then
                 exit;
 
             if BinContent.Get(
@@ -1643,7 +1628,7 @@
             WhseSourceCreateDocument.SetAssemblyOrder(Rec);
             if not ShowRequestPage then
                 WhseSourceCreateDocument.Initialize(
-                    AssignedUserID, "Whse. Activity Sorting Method".FromInteger(SortingMethod), PrintDocument, DoNotFillQtyToHandle, SetBreakBulkFilter);
+                    AssignedUserID, Enum::"Whse. Activity Sorting Method".FromInteger(SortingMethod), PrintDocument, DoNotFillQtyToHandle, SetBreakBulkFilter);
             WhseSourceCreateDocument.UseRequestPage(ShowRequestPage);
             WhseSourceCreateDocument.RunModal();
             WhseSourceCreateDocument.GetResultMessage(2);
@@ -1935,47 +1920,28 @@
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, CurrFieldNo);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
+    internal procedure GetQtyReservedFromStockState() Result: Enum "Reservation From Stock"
     var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
+        AssemblyLineLocal: Record "Assembly Line";
+        AssemblyLineReserve: Codeunit "Assembly Line-Reserve";
+        QtyReservedFromStock: Decimal;
     begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Assembly Header", DefaultDimSource, TableID, No);
+        QtyReservedFromStock := AssemblyLineReserve.GetReservedQtyFromInventory(Rec);
+
+        AssemblyLineLocal.SetRange("Document Type", "Document Type");
+        AssemblyLineLocal.SetRange("Document No.", "No.");
+        AssemblyLineLocal.SetRange(Type, AssemblyLineLocal.Type::Item);
+        AssemblyLineLocal.CalcSums("Remaining Quantity (Base)");
+
+        case QtyReservedFromStock of
+            0:
+                exit(Result::None);
+            AssemblyLineLocal."Remaining Quantity (Base)":
+                exit(Result::Full);
+            else
+                exit(Result::Partial);
+        end;
     end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Assembly Header", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDimTableIDs(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Assembly Header") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDimTableIDs(var AssemblyHeader: Record "Assembly Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var AssemblyHeader: Record "Assembly Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CallingFieldNo: Integer)
@@ -1991,14 +1957,6 @@
     local procedure OnAfterCalcStartDateFromEndDate(var AssemblyHeader: Record "Assembly Header"; var Result: Date)
     begin
     end;
-
-#if not CLEAN20
-    [IntegrationEvent(false, false)]
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    local procedure OnAfterCreateDimTableIDs(var AssemblyHeader: Record "Assembly Header"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetNoSeriesCode(AssemblyHeader: Record "Assembly Header"; var Result: Code[20])
@@ -2176,17 +2134,17 @@
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnUpdateAllLineDimOnBeforeConfirmUpdatedDimension(var AssemblyHeader: Record "Assembly Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterGetDefaultBin(var AssemblyHeader: Record "Assembly Header")
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterRunWhseSourceCreateDocument(var AssemblyHeader: Record "Assembly Header"; ShowRequestPage: Boolean; AssignedUserID: Code[50]; SortingMethod: Option; SetBreakBulkFilter: Boolean; DoNotFillQtyToHandle: Boolean; PrintDocument: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateAllLineDimOnBeforeConfirmUpdatedDimension(var AssemblyHeader: Record "Assembly Header"; var IsHandled: Boolean)
     begin
     end;
 }

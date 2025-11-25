@@ -1,3 +1,5 @@
+namespace System.AI;
+
 /// <summary>
 /// The types of Azure AI services that are available in Business Central.
 /// </summary>

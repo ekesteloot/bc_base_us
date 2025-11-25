@@ -184,7 +184,7 @@ page 5708 "Get Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        SalesShptHeader.Get("Document No.");
+                        SalesShptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Sales Shipment", SalesShptHeader);
                     end;
                 }
@@ -199,7 +199,7 @@ page 5708 "Get Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -212,7 +212,7 @@ page 5708 "Get Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }
@@ -266,7 +266,6 @@ page 5708 "Get Shipment Lines"
         SalesHeader: Record "Sales Header";
         TempSalesShptLine: Record "Sales Shipment Line" temporary;
         SalesGetShpt: Codeunit "Sales-Get Shipment";
-        [InDataSet]
         DocumentNoHideValue: Boolean;
         OrderNo: Code[20];
         YourReference: Text[35];
@@ -285,29 +284,23 @@ page 5708 "Get Shipment Lines"
         SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Invoice);
     end;
 
-    local procedure IsFirstDocLine() Result: Boolean
+    local procedure IsFirstDocLine(): Boolean
     var
         SalesShptLine: Record "Sales Shipment Line";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeIsFirstDocLine(Rec, TempSalesShptLine, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         TempSalesShptLine.Reset();
         TempSalesShptLine.CopyFilters(Rec);
-        TempSalesShptLine.SetRange("Document No.", "Document No.");
+        TempSalesShptLine.SetRange("Document No.", Rec."Document No.");
         if not TempSalesShptLine.FindFirst() then begin
             SalesShptLine.CopyFilters(Rec);
-            SalesShptLine.SetRange("Document No.", "Document No.");
+            SalesShptLine.SetRange("Document No.", Rec."Document No.");
             SalesShptLine.SetFilter("Qty. Shipped Not Invoiced", '<>0');
             if SalesShptLine.FindFirst() then begin
                 TempSalesShptLine := SalesShptLine;
                 TempSalesShptLine.Insert();
             end;
         end;
-        if "Line No." = TempSalesShptLine."Line No." then
+        if Rec."Line No." = TempSalesShptLine."Line No." then
             exit(true);
     end;
 
@@ -329,7 +322,7 @@ page 5708 "Get Shipment Lines"
     var
         SalesShipmentHeader: Record "Sales Shipment Header";
     begin
-        SalesShipmentHeader.Get("Document No.");
+        SalesShipmentHeader.Get(Rec."Document No.");
 
         OrderNo := SalesShipmentHeader."Order No.";
         YourReference := SalesShipmentHeader."Your Reference";
@@ -348,11 +341,6 @@ page 5708 "Get Shipment Lines"
 
     [IntegrationEvent(true, false)]
     local procedure OnCreateLinesOnAfterSalesGetShptSetSalesHeader(var SalesHeader: Record "Sales Header"; var SalesShipmentLine: Record "Sales Shipment Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsFirstDocLine(var SalesShipmentLine: Record "Sales Shipment Line"; var TempSalesShipmentLine: Record "Sales Shipment Line" temporary; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

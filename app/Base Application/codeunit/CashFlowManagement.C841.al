@@ -1,3 +1,27 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Comment;
+using Microsoft.CashFlow.Setup;
+using Microsoft.CashFlow.Worksheet;
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Posting;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Receivables;
+using Microsoft.ServiceMgt.Document;
+using System.Security.AccessControl;
+using System.Threading;
+
 codeunit 841 "Cash Flow Management"
 {
 
@@ -595,7 +619,7 @@ codeunit 841 "Cash Flow Management"
             CreateCashFlowChartSetupForUser(UserId)
         else
             repeat
-                    CreateCashFlowChartSetupForUser(User."User Name");
+                CreateCashFlowChartSetupForUser(User."User Name");
             until User.Next() = 0;
     end;
 

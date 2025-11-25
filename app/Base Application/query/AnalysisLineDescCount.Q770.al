@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 query 770 "Analysis Line Desc. Count"
 {
     Caption = 'Analysis Line Desc. Count';
@@ -17,7 +19,7 @@ query 770 "Analysis Line Desc. Count"
             }
             column(Count_)
             {
-                ColumnFilter = Count_ = FILTER(> 1);
+                ColumnFilter = Count_ = filter(> 1);
                 Method = Count;
             }
         }

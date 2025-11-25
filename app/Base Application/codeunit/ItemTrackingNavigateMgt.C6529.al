@@ -1,3 +1,34 @@
+﻿namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.History;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Enums;
+using Microsoft.HumanResources.Employee;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Loaner;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Ledger;
+using System.Reflection;
+
 codeunit 6529 "Item Tracking Navigate Mgt."
 {
 
@@ -1062,27 +1093,27 @@ codeunit 6529 "Item Tracking Navigate Mgt."
                     OnFindReservEntryOnBeforeCaseDocumentType(ReservEntry, RecRef, IsHandled);
                     if not IsHandled then
                         case "Source Type" of
-                            DATABASE::"Sales Line":
+                            Enum::TableID::"Sales Line":
                                 FindSalesLines();
-                            DATABASE::"Service Line":
+                            Enum::TableID::"Service Line":
                                 FindServiceLines();
-                            DATABASE::"Purchase Line":
+                            Enum::TableID::"Purchase Line":
                                 FindPurchaseLines();
-                            DATABASE::"Requisition Line":
+                            Enum::TableID::"Requisition Line":
                                 FindRequisitionLines();
-                            DATABASE::"Planning Component":
+                            Enum::TableID::"Planning Component":
                                 FindPlanningComponent();
-                            DATABASE::"Item Journal Line":
+                            Enum::TableID::"Item Journal Line":
                                 FindItemJournalLines();
-                            DATABASE::"Assembly Line":
+                            Enum::TableID::"Assembly Line":
                                 FindAssemblyLines();
-                            DATABASE::"Assembly Header":
+                            Enum::TableID::"Assembly Header":
                                 FindAssemblyHeaders();
-                            DATABASE::"Prod. Order Line":
+                            Enum::TableID::"Prod. Order Line":
                                 FindProdOrderLines();
-                            DATABASE::"Prod. Order Component":
+                            Enum::TableID::"Prod. Order Component":
                                 FindProdOrderComponents();
-                            DATABASE::"Transfer Line":
+                            Enum::TableID::"Transfer Line":
                                 FindTransferLines();
                         end;
                 until Next() = 0;
@@ -1148,101 +1179,101 @@ codeunit 6529 "Item Tracking Navigate Mgt."
     procedure Show(TableNo: Integer)
     begin
         case TableNo of
-            DATABASE::"Item Ledger Entry":
+            Enum::TableID::"Item Ledger Entry":
                 PAGE.Run(0, ItemLedgEntry);
-            DATABASE::"Reservation Entry":
+            Enum::TableID::"Reservation Entry":
                 PAGE.Run(0, ReservEntry);
-            DATABASE::"Misc. Article Information":
+            Enum::TableID::"Misc. Article Information":
                 PAGE.Run(0, MiscArticleInfo);
-            DATABASE::"Fixed Asset":
+            Enum::TableID::"Fixed Asset":
                 PAGE.Run(0, FixedAsset);
-            DATABASE::"Warehouse Activity Line":
+            Enum::TableID::"Warehouse Activity Line":
                 PAGE.Run(0, WhseActivLine);
-            DATABASE::"Registered Whse. Activity Line":
+            Enum::TableID::"Registered Whse. Activity Line":
                 PAGE.Run(0, RgstrdWhseActivLine);
-            DATABASE::"Service Item Line":
+            Enum::TableID::"Service Item Line":
                 PAGE.Run(0, ServItemLine);
-            DATABASE::Loaner:
+            Enum::TableID::Loaner:
                 PAGE.Run(0, Loaner);
-            DATABASE::"Service Item":
+            Enum::TableID::"Service Item":
                 PAGE.Run(0, ServiceItem);
-            DATABASE::"Service Item Component":
+            Enum::TableID::"Service Item Component":
                 PAGE.Run(0, ServiceItemComponent);
-            DATABASE::"Service Contract Line":
+            Enum::TableID::"Service Contract Line":
                 PAGE.Run(0, ServContractLine);
-            DATABASE::"Filed Contract Line":
+            Enum::TableID::"Filed Contract Line":
                 PAGE.Run(0, FiledContractLine);
-            DATABASE::"Serial No. Information":
+            Enum::TableID::"Serial No. Information":
                 PAGE.Run(0, SerialNoInfo);
-            DATABASE::"Lot No. Information":
+            Enum::TableID::"Lot No. Information":
                 PAGE.Run(0, LotNoInfo);
-            DATABASE::"Package No. Information":
+            Enum::TableID::"Package No. Information":
                 PAGE.Run(0, PackageNoInfo);
-            DATABASE::"Warehouse Entry":
+            Enum::TableID::"Warehouse Entry":
                 PAGE.Run(0, WhseEntry);
-            DATABASE::"Posted Whse. Shipment Line":
+            Enum::TableID::"Posted Whse. Shipment Line":
                 PAGE.Run(0, TempPostedWhseShptLine);
-            DATABASE::"Posted Whse. Receipt Line":
+            Enum::TableID::"Posted Whse. Receipt Line":
                 PAGE.Run(0, TempPostedWhseRcptLine);
-            DATABASE::"Posted Invt. Put-away Line":
+            Enum::TableID::"Posted Invt. Put-away Line":
                 PAGE.Run(0, PostedInvtPutAwayLine);
-            DATABASE::"Posted Invt. Pick Line":
+            Enum::TableID::"Posted Invt. Pick Line":
                 PAGE.Run(0, PostedInvtPickLine);
-            DATABASE::"Purch. Rcpt. Header":
+            Enum::TableID::"Purch. Rcpt. Header":
                 PAGE.Run(0, TempPurchRcptHeader);
-            DATABASE::"Purch. Inv. Header":
+            Enum::TableID::"Purch. Inv. Header":
                 PAGE.Run(0, TempPurchInvHeader);
-            DATABASE::"Purch. Cr. Memo Hdr.":
+            Enum::TableID::"Purch. Cr. Memo Hdr.":
                 PAGE.Run(0, TempPurchCrMemoHeader);
-            DATABASE::"Sales Shipment Header":
+            Enum::TableID::"Sales Shipment Header":
                 PAGE.Run(0, TempSalesShptHeader);
-            DATABASE::"Sales Invoice Header":
+            Enum::TableID::"Sales Invoice Header":
                 PAGE.Run(0, TempSalesInvHeader);
-            DATABASE::"Sales Cr.Memo Header":
+            Enum::TableID::"Sales Cr.Memo Header":
                 PAGE.Run(0, TempSalesCrMemoHeader);
-            DATABASE::"Service Shipment Header":
+            Enum::TableID::"Service Shipment Header":
                 PAGE.Run(0, TempServShptHeader);
-            DATABASE::"Service Invoice Header":
+            Enum::TableID::"Service Invoice Header":
                 PAGE.Run(0, TempServInvHeader);
-            DATABASE::"Service Cr.Memo Header":
+            Enum::TableID::"Service Cr.Memo Header":
                 PAGE.Run(0, TempServCrMemoHeader);
-            DATABASE::"Transfer Shipment Header":
+            Enum::TableID::"Transfer Shipment Header":
                 PAGE.Run(0, TempTransShipHeader);
-            DATABASE::"Return Shipment Header":
+            Enum::TableID::"Return Shipment Header":
                 PAGE.Run(0, TempReturnShipHeader);
-            DATABASE::"Return Receipt Header":
+            Enum::TableID::"Return Receipt Header":
                 PAGE.Run(0, TempReturnRcptHeader);
-            DATABASE::"Transfer Receipt Header":
+            Enum::TableID::"Transfer Receipt Header":
                 PAGE.Run(0, TempTransRcptHeader);
-            DATABASE::"Production Order":
+            Enum::TableID::"Production Order":
                 PAGE.Run(0, TempProdOrder);
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line":
                 PAGE.Run(0, TempSalesLine);
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line":
                 PAGE.Run(0, TempServLine);
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line":
                 PAGE.Run(0, TempPurchLine);
-            DATABASE::"Requisition Line":
+            Enum::TableID::"Requisition Line":
                 PAGE.Run(0, TempReqLine);
-            DATABASE::"Item Journal Line":
+            Enum::TableID::"Item Journal Line":
                 PAGE.Run(0, TempItemJnlLine);
-            DATABASE::"Prod. Order Line":
+            Enum::TableID::"Prod. Order Line":
                 PAGE.Run(0, TempProdOrderLine);
-            DATABASE::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component":
                 PAGE.Run(0, TempProdOrderComp);
-            DATABASE::"Planning Component":
+            Enum::TableID::"Planning Component":
                 PAGE.Run(0, TempPlanningComponent);
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line":
                 PAGE.Run(0, TempTransLine);
-            DATABASE::"Job Ledger Entry":
+            Enum::TableID::"Job Ledger Entry":
                 PAGE.Run(0, TempJobLedgEntry);
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line":
                 PAGE.Run(0, TempAssemblyLine);
-            DATABASE::"Assembly Header":
+            Enum::TableID::"Assembly Header":
                 PAGE.Run(0, TempAssemblyHeader);
-            DATABASE::"Posted Assembly Line":
+            Enum::TableID::"Posted Assembly Line":
                 PAGE.Run(0, TempPostedAssemblyLine);
-            DATABASE::"Posted Assembly Header":
+            Enum::TableID::"Posted Assembly Header":
                 PAGE.Run(0, TempPostedAssemblyHeader);
         end;
 

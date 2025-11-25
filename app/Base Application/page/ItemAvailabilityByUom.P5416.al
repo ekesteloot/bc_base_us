@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+
 page 5416 "Item Availability by UOM"
 {
     DataCaptionFields = "No.", Description;
@@ -53,7 +58,7 @@ page 5416 "Item Availability by UOM"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Item Availability by UOM';
                 Editable = false;
-                SubPageLink = "Item No." = FIELD("No.");
+                SubPageLink = "Item No." = field("No.");
             }
         }
     }
@@ -79,7 +84,7 @@ page 5416 "Item Availability by UOM"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByEvent());
+                            ItemAvailabilityFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailabilityFormsMgt.ByEvent());
                         end;
                     }
                     action(Period)
@@ -88,12 +93,12 @@ page 5416 "Item Availability by UOM"
                         Caption = 'Period';
                         Image = Period;
                         RunObject = Page "Item Availability by Periods";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'Show the projected quantity of the item over time according to time periods, such as day, week, or month.';
                     }
                     action(Location)
@@ -102,12 +107,12 @@ page 5416 "Item Availability by UOM"
                         Caption = 'Location';
                         Image = Warehouse;
                         RunObject = Page "Item Availability by Location";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'View the actual and projected quantity of the item per location.';
                     }
                     action("BOM Level")
@@ -119,7 +124,7 @@ page 5416 "Item Availability by UOM"
 
                         trigger OnAction()
                         begin
-                            ItemAvailFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailFormsMgt.ByBOM());
+                            ItemAvailabilityFormsMgt.ShowItemAvailFromItem(Rec, ItemAvailabilityFormsMgt.ByBOM());
                         end;
                     }
                 }
@@ -172,7 +177,7 @@ page 5416 "Item Availability by UOM"
 
     trigger OnAfterGetRecord()
     begin
-        SetRange("Drop Shipment Filter", false);
+        Rec.SetRange("Drop Shipment Filter", false);
         FindPeriod('');
         UpdateSubForm();
     end;
@@ -191,18 +196,20 @@ page 5416 "Item Availability by UOM"
     end;
 
     var
-        ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
+        ItemAvailabilityFormsMgt: Codeunit "Item Availability Forms Mgt";
         PeriodType: Enum "Analysis Period Type";
-        AmountType: Enum "Analysis Amount Type";
         LastUOMCode: Code[10];
         DateFilter: Text;
 
+    protected var
+        AmountType: Enum "Analysis Amount Type";
+
     local procedure FindPeriod(SearchText: Text[3])
     var
-        PeriodPageMgt: Codeunit PeriodPageManagement;
+        PeriodPageManagement: Codeunit PeriodPageManagement;
     begin
-        PeriodPageMgt.FindPeriod(Rec, SearchText, PeriodType, AmountType);
-        DateFilter := GetFilter("Date Filter");
+        PeriodPageManagement.FindPeriod(Rec, SearchText, PeriodType, AmountType);
+        DateFilter := Rec.GetFilter("Date Filter");
     end;
 
     protected procedure UpdateSubForm()

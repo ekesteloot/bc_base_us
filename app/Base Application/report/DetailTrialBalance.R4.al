@@ -1,7 +1,13 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Utilities;
+
 report 4 "Detail Trial Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/DetailTrialBalance.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/DetailTrialBalance.rdlc';
     AdditionalSearchTerms = 'payment due,order status';
     ApplicationArea = Basic, Suite;
     Caption = 'Detail Trial Balance';
@@ -13,7 +19,7 @@ report 4 "Detail Trial Balance"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = WHERE("Account Type" = CONST(Posting));
+            DataItemTableView = where("Account Type" = const(Posting));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Name", "Income/Balance", "Debit/Credit", "Date Filter";
             column(PeriodGLDtFilter; StrSubstNo(Text000, GLDateFilter))
@@ -81,7 +87,7 @@ report 4 "Detail Trial Balance"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(Name_GLAcc; "G/L Account".Name)
                 {
                 }
@@ -91,9 +97,9 @@ report 4 "Detail Trial Balance"
                 }
                 dataitem("G/L Entry"; "G/L Entry")
                 {
-                    DataItemLink = "G/L Account No." = FIELD("No."), "Posting Date" = FIELD("Date Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Business Unit Code" = FIELD("Business Unit Filter");
+                    DataItemLink = "G/L Account No." = field("No."), "Posting Date" = field("Date Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Business Unit Code" = field("Business Unit Filter"), "Dimension Set ID" = field("Dimension Set ID Filter");
                     DataItemLinkReference = "G/L Account";
-                    DataItemTableView = SORTING("G/L Account No.", "Posting Date");
+                    DataItemTableView = sorting("G/L Account No.", "Posting Date");
                     column(VATAmount_GLEntry; "VAT Amount")
                     {
                         IncludeCaption = true;

@@ -10,7 +10,7 @@ report 10008 "Consolidated Trial Balance (4)"
     {
         dataitem("Business Unit"; "Business Unit")
         {
-            DataItemTableView = SORTING(Code) WHERE(Consolidate = CONST(true));
+            DataItemTableView = sorting(Code) where(Consolidate = const(true));
             RequestFilterFields = "Code";
 
             trigger OnAfterGetRecord()
@@ -28,7 +28,7 @@ report 10008 "Consolidated Trial Balance (4)"
         }
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(MainTitle; MainTitle)
             {
@@ -119,7 +119,7 @@ report 10008 "Consolidated Trial Balance (4)"
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
 
                 trigger OnPreDataItem()
                 begin
@@ -128,7 +128,7 @@ report 10008 "Consolidated Trial Balance (4)"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(G_L_Account___No__; "G/L Account"."No.")
                 {
                 }

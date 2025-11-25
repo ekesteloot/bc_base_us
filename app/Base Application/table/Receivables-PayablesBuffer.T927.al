@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 table 927 "Receivables-Payables Buffer"
 {
     DataClassification = SystemMetadata;

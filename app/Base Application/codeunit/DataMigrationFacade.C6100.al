@@ -1,3 +1,5 @@
+namespace System.Integration;
+
 codeunit 6100 "Data Migration Facade"
 {
 

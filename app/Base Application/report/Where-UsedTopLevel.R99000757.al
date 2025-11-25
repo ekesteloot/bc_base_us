@@ -1,7 +1,13 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.ProductionBOM;
+using System.Utilities;
+
 report 99000757 "Where-Used (Top Level)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/WhereUsedTopLevel.rdlc';
+    RDLCLayout = './Manufacturing/Reports/WhereUsedTopLevel.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Where-Used (Top Level)';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 99000757 "Where-Used (Top Level)"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Description";
             column(FormattedToday; Format(Today, 0, 4))
@@ -56,7 +62,7 @@ report 99000757 "Where-Used (Top Level)"
             }
             dataitem(BOMLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(WhereUsedListItemNo; WhereUsedList."Item No.")
                 {
                 }

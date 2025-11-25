@@ -1,7 +1,13 @@
+namespace Microsoft.FixedAssets.Reports;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+
 report 5608 "Fixed Asset - Acquisition List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/FixedAssetAcquisitionList.rdlc';
+    RDLCLayout = './FixedAssets/Reports/FixedAssetAcquisitionList.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset Acquisition List';
     UsageCategory = ReportsAndAnalysis;
@@ -89,7 +95,7 @@ report 5608 "Fixed Asset - Acquisition List"
                         ApplicationArea = FixedAssets;
                         Caption = 'Depreciation Book';
                         TableRelation = "Depreciation Book";
-                        ToolTip = 'Specifies a code for the depreciation book that is included in the report. You can set up an unlimited number of depreciation books to accommodate various depreciation purposes (such as tax and financial statements). For each depreciation book, you must define the terms and conditions, such as integration with general ledger.';
+                        ToolTip = 'Specifies the code for the depreciation book to be included in the report or batch job.';
                     }
                     group("Acquisition Period")
                     {
@@ -98,13 +104,13 @@ report 5608 "Fixed Asset - Acquisition List"
                         {
                             ApplicationArea = FixedAssets;
                             Caption = 'Starting Date';
-                            ToolTip = 'Specifies the date from which the report or batch job processes information.';
+                            ToolTip = 'Specifies the date when you want the report to start.';
                         }
                         field(EndingDate; EndingDate)
                         {
                             ApplicationArea = FixedAssets;
                             Caption = 'Ending Date';
-                            ToolTip = 'Specifies the date to which the report or batch job processes information.';
+                            ToolTip = 'Specifies the date when you want the report to end.';
                         }
                     }
                     field(FAWithoutAcqDate; FAWithoutAcqDate)

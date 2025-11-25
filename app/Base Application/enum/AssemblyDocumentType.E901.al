@@ -1,3 +1,5 @@
+namespace Microsoft.AssemblyMgt.Document;
+
 enum 901 "Assembly Document Type"
 {
     Extensible = true;

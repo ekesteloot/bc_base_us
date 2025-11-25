@@ -10,7 +10,7 @@ report 10138 "Inventory to G/L Reconcile"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE(Type = CONST(Inventory));
+            DataItemTableView = where(Type = const(Inventory));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Inventory Posting Group", "Costing Method", "Location Filter", "Variant Filter";
             column(CompanyInformation_Name; CompanyInformation.Name)
@@ -106,8 +106,8 @@ report 10138 "Inventory to G/L Reconcile"
             }
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter");
-                DataItemTableView = SORTING("Item No.", "Variant Code", "Location Code", "Posting Date");
+                DataItemLink = "Item No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter");
+                DataItemTableView = sorting("Item No.", "Variant Code", "Location Code", "Posting Date");
 
                 trigger OnAfterGetRecord()
                 begin
@@ -130,7 +130,7 @@ report 10138 "Inventory to G/L Reconcile"
             }
             dataitem(BufferLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(RowLabel; TempBuffer.Label)
                 {
                 }

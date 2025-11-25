@@ -1,3 +1,7 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Setup;
+
 page 868 "Cash Flow Forecast Statistics"
 {
     Caption = 'Cash Flow Forecast Statistics';
@@ -12,7 +16,7 @@ page 868 "Cash Flow Forecast Statistics"
             group(General)
             {
                 Caption = 'General';
-                field(LiquidFunds; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Liquid Funds"))
+                field(LiquidFunds; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Liquid Funds"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Liquid Funds';
@@ -20,10 +24,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::"Liquid Funds");
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"Liquid Funds");
                     end;
                 }
-                field(Receivables; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::Receivables))
+                field(Receivables; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::Receivables))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Receivables';
@@ -31,10 +35,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::Receivables);
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::Receivables);
                     end;
                 }
-                field(SalesOrders; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Sales Orders"))
+                field(SalesOrders; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Sales Orders"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Orders';
@@ -42,10 +46,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::"Sales Orders");
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"Sales Orders");
                     end;
                 }
-                field(ServiceOrders; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Service Orders"))
+                field(ServiceOrders; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Service Orders"))
                 {
                     ApplicationArea = Service;
                     Caption = 'Service Orders';
@@ -53,10 +57,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::"Service Orders");
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"Service Orders");
                     end;
                 }
-                field(SalesofFixedAssets; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Fixed Assets Disposal"))
+                field(SalesofFixedAssets; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Fixed Assets Disposal"))
                 {
                     ApplicationArea = FixedAssets;
                     Caption = 'Fixed Assets Disposal';
@@ -64,10 +68,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::"Fixed Assets Disposal");
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"Fixed Assets Disposal");
                     end;
                 }
-                field(ManualRevenues; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Cash Flow Manual Revenue"))
+                field(ManualRevenues; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Cash Flow Manual Revenue"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Cash Flow Manual Revenues';
@@ -75,10 +79,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::"Cash Flow Manual Revenue");
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"Cash Flow Manual Revenue");
                     end;
                 }
-                field(Payables; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::Payables))
+                field(Payables; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::Payables))
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
@@ -87,10 +91,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::Payables);
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::Payables);
                     end;
                 }
-                field(PurchaseOrders; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Purchase Orders"))
+                field(PurchaseOrders; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Purchase Orders"))
                 {
                     ApplicationArea = Suite;
                     Caption = 'Purchase Orders';
@@ -98,10 +102,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::"Purchase Orders");
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"Purchase Orders");
                     end;
                 }
-                field(BudgetedFixedAssets; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Fixed Assets Budget"))
+                field(BudgetedFixedAssets; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Fixed Assets Budget"))
                 {
                     ApplicationArea = FixedAssets;
                     Caption = 'Fixed Assets Budget';
@@ -109,10 +113,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::"Fixed Assets Budget");
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"Fixed Assets Budget");
                     end;
                 }
-                field(ManualExpenses; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Cash Flow Manual Expense"))
+                field(ManualExpenses; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"Cash Flow Manual Expense"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Cash Flow Manual Expenses';
@@ -120,10 +124,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::"Cash Flow Manual Expense");
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"Cash Flow Manual Expense");
                     end;
                 }
-                field(GLBudgets; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"G/L Budget"))
+                field(GLBudgets; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::"G/L Budget"))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'G/L Budgets';
@@ -131,10 +135,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::"G/L Budget");
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::"G/L Budget");
                     end;
                 }
-                field(Job; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::Job))
+                field(Job; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::Job))
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Job';
@@ -142,10 +146,10 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::Job);
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::Job);
                     end;
                 }
-                field(Tax; CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::Tax))
+                field(Tax; Rec.CalcSourceTypeAmount(CashFlowForecastEntry."Source Type"::Tax))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Tax';
@@ -153,19 +157,19 @@ page 868 "Cash Flow Forecast Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Source Type Filter"::Tax);
+                        Rec.DrillDownSourceTypeEntries(Rec."Source Type Filter"::Tax);
                     end;
                 }
-                field(Total; CalcSourceTypeAmount("Cash Flow Source Type"::" "))
+                field(Total; Rec.CalcSourceTypeAmount("Cash Flow Source Type"::" "))
                 {
                     ApplicationArea = Basic, Suite;
-                    CaptionClass = Format(StrSubstNo(Text1000, Format("Manual Payments To")));
+                    CaptionClass = Format(StrSubstNo(Text1000, Format(Rec."Manual Payments To")));
                     Caption = 'Total';
                     ToolTip = 'Specifies total amounts.';
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownSourceTypeEntries("Cash Flow Source Type"::" ");
+                        Rec.DrillDownSourceTypeEntries("Cash Flow Source Type"::" ");
                     end;
                 }
             }
@@ -180,10 +184,10 @@ page 868 "Cash Flow Forecast Statistics"
     begin
         if CurrentDate <> WorkDate() then
             CurrentDate := WorkDate();
-        if "Manual Payments To" <> 0D then
-            CurrentDate := "Manual Payments To";
+        if Rec."Manual Payments To" <> 0D then
+            CurrentDate := Rec."Manual Payments To";
 
-        SetCashFlowDateFilter(0D, CurrentDate);
+        Rec.SetCashFlowDateFilter(0D, CurrentDate);
     end;
 
     var

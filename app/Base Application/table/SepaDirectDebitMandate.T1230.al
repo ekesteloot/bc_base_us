@@ -1,3 +1,9 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+
 table 1230 "SEPA Direct Debit Mandate"
 {
     Caption = 'SEPA Direct Debit Mandate';
@@ -42,7 +48,7 @@ table 1230 "SEPA Direct Debit Mandate"
         {
             Caption = 'Customer Bank Account Code';
             NotBlank = true;
-            TableRelation = "Customer Bank Account".Code WHERE("Customer No." = FIELD("Customer No."));
+            TableRelation = "Customer Bank Account".Code where("Customer No." = field("Customer No."));
         }
         field(4; "Valid From"; Date)
         {

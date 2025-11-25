@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 enum 5087 "Profile Questionnaire Contact Type"
 {
     Extensible = true;

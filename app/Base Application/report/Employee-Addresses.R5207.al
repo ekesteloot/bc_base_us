@@ -1,7 +1,12 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.HumanResources.Employee;
+
 report 5207 "Employee - Addresses"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeAddresses.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeAddresses.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee Addresses';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5207 "Employee - Addresses"
     {
         dataitem(Employee; Employee)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

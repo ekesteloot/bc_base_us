@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.ProjectMgt.Jobs.Journal;
+
 page 1014 "Job Transfer Job Planning Line"
 {
     Caption = 'Job Transfer Job Planning Line';
@@ -23,8 +27,8 @@ page 1014 "Job Transfer Job Planning Line"
                     ApplicationArea = Jobs;
                     Caption = 'Job Journal Template';
                     Lookup = true;
-                    TableRelation = "Job Journal Template".Name WHERE("Page ID" = CONST(201),
-                                                                       Recurring = CONST(false));
+                    TableRelation = "Job Journal Template".Name where("Page ID" = const(201),
+                                                                       Recurring = const(false));
                     ToolTip = 'Specifies the journal template that is used for the job journal.';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -37,7 +41,7 @@ page 1014 "Job Transfer Job Planning Line"
                     ApplicationArea = Jobs;
                     Caption = 'Job Journal Batch';
                     Lookup = true;
-                    TableRelation = "Job Journal Batch".Name WHERE("Journal Template Name" = FIELD(Name));
+                    TableRelation = "Job Journal Batch".Name where("Journal Template Name" = field(Name));
                     ToolTip = 'Specifies the journal batch that is used for the job journal.';
 
                     trigger OnLookup(var Text: Text): Boolean

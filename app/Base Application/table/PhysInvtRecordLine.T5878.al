@@ -1,3 +1,16 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
+using Microsoft.HumanResources.Employee;
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Counting.Tracking;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using System.Security.AccessControl;
+
 table 5878 "Phys. Invt. Record Line"
 {
     Caption = 'Phys. Invt. Record Line';
@@ -14,7 +27,7 @@ table 5878 "Phys. Invt. Record Line"
         field(2; "Recording No."; Integer)
         {
             Caption = 'Recording No.';
-            TableRelation = "Phys. Invt. Record Header"."Recording No." WHERE("Order No." = FIELD("Order No."));
+            TableRelation = "Phys. Invt. Record Header"."Recording No." where("Order No." = field("Order No."));
         }
         field(3; "Line No."; Integer)
         {
@@ -24,7 +37,7 @@ table 5878 "Phys. Invt. Record Line"
         {
             Caption = 'Order Line No.';
             Editable = false;
-            TableRelation = "Phys. Invt. Order Line"."Line No." WHERE("Document No." = FIELD("Order No."));
+            TableRelation = "Phys. Invt. Order Line"."Line No." where("Document No." = field("Order No."));
         }
         field(17; "Recorded Without Order"; Boolean)
         {
@@ -87,17 +100,25 @@ table 5878 "Phys. Invt. Record Line"
         field(21; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
                 TestStatusOpen();
                 TestField("Item No.");
 
-                if "Variant Code" = '' then
+                if Rec."Variant Code" = '' then
                     exit;
 
                 ItemVariant.Get("Item No.", "Variant Code");
+
+                IsHandled := false;
+                OnValidateVariantCodeOnBeforeTestFieldBlocked(Rec, ItemVariant, IsHandled);
+                If not IsHandled then
+                    ItemVariant.TestField(Blocked, false);
+
                 Description := ItemVariant.Description;
                 "Description 2" := ItemVariant."Description 2";
                 GetShelfNo();
@@ -116,7 +137,7 @@ table 5878 "Phys. Invt. Record Line"
         field(23; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             var
@@ -168,7 +189,7 @@ table 5878 "Phys. Invt. Record Line"
         field(40; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             begin
@@ -254,9 +275,13 @@ table 5878 "Phys. Invt. Record Line"
         {
             Caption = 'Person Recorded';
             TableRelation = Employee;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
+        }
+        field(103; "Recorded by User ID"; Code[50])
+        {
+            Caption = 'Created by User';
+            DataClassification = EndUserIdentifiableInformation;
+            TableRelation = User."User Name";
         }
         field(130; "Serial No."; Code[50])
         {
@@ -282,6 +307,37 @@ table 5878 "Phys. Invt. Record Line"
             begin
                 ShowUsedTrackLines();
             end;
+        }
+        field(5725; "Item Reference No."; Code[50])
+        {
+            AccessByPermission = TableData "Item Reference" = R;
+            Caption = 'Item Reference No.';
+
+            trigger OnLookup()
+            begin
+                ItemReferenceManagement.PhysicalInventoryRecordReferenceNoLookup(Rec);
+            end;
+
+            trigger OnValidate()
+            var
+                ItemReference: Record "Item Reference";
+            begin
+                ItemReferenceManagement.ValidatePhysicalInventoryRecordReferenceNo(Rec, ItemReference, true, CurrFieldNo);
+            end;
+        }
+        field(5726; "Item Reference Unit of Measure"; Code[10])
+        {
+            AccessByPermission = TableData "Item Reference" = R;
+            Caption = 'Reference Unit of Measure';
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
+        }
+        field(5727; "Item Reference Type"; Enum "Item Reference Type")
+        {
+            Caption = 'Item Reference Type';
+        }
+        field(5728; "Item Reference Type No."; Code[30])
+        {
+            Caption = 'Item Reference Type No.';
         }
     }
 
@@ -318,6 +374,8 @@ table 5878 "Phys. Invt. Record Line"
     trigger OnInsert()
     begin
         TestStatusOpen();
+
+        "Recorded by User ID" := CopyStr(UserId(), 1, 50);
     end;
 
     trigger OnModify()
@@ -331,9 +389,6 @@ table 5878 "Phys. Invt. Record Line"
     end;
 
     var
-        CannotRenameErr: Label 'You cannot rename a %1.', Comment = '%1 = Table caption';
-        SerialNoAlreadyExistErr: Label 'Serial No. %1 for item %2 already exists.', Comment = '%1 = serial no. %2 = item no.';
-        QuantityCannotBeErr: Label 'Quantity cannot be larger than 1 when Serial No. is assigned.';
         PhysInvtRecordHeader: Record "Phys. Invt. Record Header";
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -341,6 +396,10 @@ table 5878 "Phys. Invt. Record Line"
         Location: Record Location;
         UOMMgt: Codeunit "Unit of Measure Management";
         PhysInvtTrackingMgt: Codeunit "Phys. Invt. Tracking Mgt.";
+        ItemReferenceManagement: Codeunit "Item Reference Management";
+        CannotRenameErr: Label 'You cannot rename a %1.', Comment = '%1 = Table caption';
+        SerialNoAlreadyExistErr: Label 'Serial No. %1 for item %2 already exists.', Comment = '%1 = serial no. %2 = item no.';
+        QuantityCannotBeErr: Label 'Quantity cannot be larger than 1 when Serial No. is assigned.';
 
     local procedure GetPhysInvtRecordHeader()
     begin
@@ -417,7 +476,7 @@ table 5878 "Phys. Invt. Record Line"
         end else begin
             ItemLedgEntry.SetItemVariantLocationFilters(
               "Item No.", "Variant Code", "Location Code", PhysInvtOrderHeader."Posting Date");
-            OnShowUsedTrackLinesSetItemLedgerEntryFilters(ItemLedgEntry, Rec, TempPhysInvtTracking);
+            OnShowUsedTrackLinesSetItemLedgerEntryFilters(ItemLedgEntry, Rec);
             if ItemLedgEntry.Find('-') then
                 repeat
                     InsertTrackingBuffer(
@@ -480,6 +539,13 @@ table 5878 "Phys. Invt. Record Line"
             "Shelf No." := SKU."Shelf No.";
     end;
 
+    procedure GetDateForCalculations() CalculationDate: Date;
+    begin
+        CalculationDate := Rec."Date Recorded";
+        if CalculationDate = 0D then
+            CalculationDate := WorkDate();
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertTrackingBufferLocationIsBinMandatory(var WarehouseEntry: Record "Warehouse Entry"; PhysInvtRecordLine: Record "Phys. Invt. Record Line")
     begin
@@ -506,7 +572,7 @@ table 5878 "Phys. Invt. Record Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnShowUsedTrackLinesSetItemLedgerEntryFilters(var ItemLedgerEntry: Record "Item Ledger Entry"; PhysInvtRecordLine: Record "Phys. Invt. Record Line"; var TempPhysInvtTracking: Record "Phys. Invt. Tracking" temporary)
+    local procedure OnShowUsedTrackLinesSetItemLedgerEntryFilters(var ItemLedgerEntry: Record "Item Ledger Entry"; PhysInvtRecordLine: Record "Phys. Invt. Record Line")
     begin
     end;
 
@@ -527,6 +593,11 @@ table 5878 "Phys. Invt. Record Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateItemNoOnBeforeTestfieldBlocked(var PhysInvtRecordLine: Record "Phys. Invt. Record Line"; var Item: Record Item; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateVariantCodeOnBeforeTestFieldBlocked(var PhysInvtRecordLine: Record "Phys. Invt. Record Line"; var ItemVariant: Record "Item Variant"; var IsHandled: Boolean)
     begin
     end;
 

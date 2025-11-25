@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Location;
+
 codeunit 7318 "Bin Create"
 {
     TableNo = "Bin Creation Worksheet Line";

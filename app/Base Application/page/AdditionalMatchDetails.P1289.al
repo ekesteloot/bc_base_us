@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 page 1289 "Additional Match Details"
 {
     Caption = 'Additional Match Details';
@@ -11,7 +13,7 @@ page 1289 "Additional Match Details"
         {
             repeater(Group)
             {
-                field(Message; Message)
+                field(Message; Rec.Message)
                 {
                     ApplicationArea = Basic, Suite;
                     ShowCaption = false;

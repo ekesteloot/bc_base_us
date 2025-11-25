@@ -1,3 +1,11 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Setup;
+using System.Text;
+using System.Utilities;
+
 page 6010 "Res.Gr. Availability (Service)"
 {
     Caption = 'Res.Gr. Availability (Service)';

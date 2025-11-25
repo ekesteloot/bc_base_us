@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Pricing;
+
 /// <summary>
 /// The purpose of the table is to setup access to UX and logic of the purchase price calculation.
 /// TableType is not set to Temporary only because the ReadPermission() method always returns true.

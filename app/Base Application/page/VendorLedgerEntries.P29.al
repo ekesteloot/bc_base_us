@@ -1,3 +1,18 @@
+﻿namespace Microsoft.Purchases.Payables;
+
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Setup;
+using Microsoft.Shared.Navigate;
+using System.Diagnostics;
+using System.Security.User;
+using System.Utilities;
+
 page 29 "Vendor Ledger Entries"
 {
     ApplicationArea = Basic, Suite;
@@ -8,7 +23,7 @@ page 29 "Vendor Ledger Entries"
     PageType = List;
     Permissions = TableData "Vendor Ledger Entry" = m;
     SourceTable = "Vendor Ledger Entry";
-    SourceTableView = SORTING("Vendor No.", "Posting Date") ORDER(Descending);
+    SourceTableView = sorting("Vendor No.", "Posting Date") order(Descending);
     UsageCategory = History;
     AdditionalSearchTerms = 'Vendor Check, Pay Vendor, Vendor Bills';
 
@@ -80,7 +95,7 @@ page 29 "Vendor Ledger Entries"
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Basic, Suite;
-                    Editable = false;
+                    Editable = true;
                     ToolTip = 'Specifies a description of the vendor entry.';
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
@@ -247,7 +262,7 @@ page 29 "Vendor Ledger Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the maximum tolerated amount the entry can differ from the amount on the invoice or credit memo.';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -269,7 +284,7 @@ page 29 "Vendor Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -286,7 +301,7 @@ page 29 "Vendor Ledger Entries"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -343,7 +358,7 @@ page 29 "Vendor Ledger Entries"
                     ToolTip = 'Specifies a reference to a combination of dimension values. The actual values are stored in the Dimension Set Entry table.';
                     Visible = false;
                 }
-                field(RecipientBankAcc; "Recipient Bank Account")
+                field(RecipientBankAcc; Rec."Recipient Bank Account")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account to transfer the amount to.';
@@ -402,7 +417,7 @@ page 29 "Vendor Ledger Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the address for the remit-to code.';
                     Visible = true;
-                    TableRelation = "Remit Address".Code WHERE("Vendor No." = FIELD("Vendor No."));
+                    TableRelation = "Remit Address".Code where("Vendor No." = field("Vendor No."));
                 }
             }
         }
@@ -463,7 +478,7 @@ page 29 "Vendor Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -476,7 +491,7 @@ page 29 "Vendor Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
                 action("Detailed &Ledger Entries")
@@ -485,9 +500,9 @@ page 29 "Vendor Ledger Entries"
                     Caption = 'Detailed &Ledger Entries';
                     Image = View;
                     RunObject = Page "Detailed Vendor Ledg. Entries";
-                    RunPageLink = "Vendor Ledger Entry No." = FIELD("Entry No."),
-                                  "Vendor No." = FIELD("Vendor No.");
-                    RunPageView = SORTING("Vendor Ledger Entry No.", "Posting Date");
+                    RunPageLink = "Vendor Ledger Entry No." = field("Entry No."),
+                                  "Vendor No." = field("Vendor No.");
+                    RunPageView = sorting("Vendor Ledger Entry No.", "Posting Date");
                     Scope = Repeater;
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a summary of the all posted entries and adjustments related to a specific vendor ledger entry';
@@ -534,7 +549,7 @@ page 29 "Vendor Ledger Entries"
                     var
                         VendEntryApplyPostedEntries: Codeunit "VendEntry-Apply Posted Entries";
                     begin
-                        VendEntryApplyPostedEntries.UnApplyVendLedgEntry("Entry No.");
+                        VendEntryApplyPostedEntries.UnApplyVendLedgEntry(Rec."Entry No.");
                     end;
                 }
                 action(ReverseTransaction)
@@ -552,7 +567,7 @@ page 29 "Vendor Ledger Entries"
                         ReversePaymentRec: Codeunit "Reverse Payment Rec. Journal";
                     begin
                         ReversePaymentRec.ErrorIfEntryIsNotReversable(Rec);
-                        ReversalEntry.ReverseTransaction("Transaction No.");
+                        ReversalEntry.ReverseTransaction(Rec."Transaction No.");
                     end;
                 }
                 group(IncomingDocument)
@@ -571,7 +586,7 @@ page 29 "Vendor Ledger Entries"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            IncomingDocument.ShowCard("Document No.", "Posting Date");
+                            IncomingDocument.ShowCard(Rec."Document No.", Rec."Posting Date");
                         end;
                     }
                     action(SelectIncomingDoc)
@@ -587,7 +602,7 @@ page 29 "Vendor Ledger Entries"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            IncomingDocument.SelectIncomingDocumentForPostedDocument("Document No.", "Posting Date", RecordId);
+                            IncomingDocument.SelectIncomingDocumentForPostedDocument(Rec."Document No.", Rec."Posting Date", Rec.RecordId);
                         end;
                     }
                     action(IncomingDocAttachFile)
@@ -603,7 +618,7 @@ page 29 "Vendor Ledger Entries"
                         var
                             IncomingDocumentAttachment: Record "Incoming Document Attachment";
                         begin
-                            IncomingDocumentAttachment.NewAttachmentFromPostedDocument("Document No.", "Posting Date");
+                            IncomingDocumentAttachment.NewAttachmentFromPostedDocument(Rec."Document No.", Rec."Posting Date");
                         end;
                     }
                 }
@@ -619,7 +634,7 @@ page 29 "Vendor Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -633,7 +648,7 @@ page 29 "Vendor Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    ShowDoc();
+                    Rec.ShowDoc();
                 end;
             }
             action(ShowDocumentAttachment)
@@ -646,7 +661,7 @@ page 29 "Vendor Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    ShowPostedDocAttachment();
+                    Rec.ShowPostedDocAttachment();
                 end;
             }
             action("Create Payment")
@@ -671,6 +686,21 @@ page 29 "Vendor Ledger Entries"
                         Clear(CreatePayment);
                     end else
                         Clear(CreatePayment);
+                end;
+            }
+            action(ShowChangeHistory)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Show Change History';
+                Image = History;
+                ToolTip = 'View the history of changes for this entry.';
+
+                trigger OnAction()
+                var
+                    ChangeLogEntry: Record "Change Log Entry";
+                begin
+                    SetChangeLogEntriesFilter(ChangeLogEntry);
+                    Page.RunModal(Page::"Change Log Entries", ChangeLogEntry);
                 end;
             }
         }
@@ -742,15 +772,15 @@ page 29 "Vendor Ledger Entries"
     var
         IncomingDocument: Record "Incoming Document";
     begin
-        HasIncomingDocument := IncomingDocument.PostedDocExists("Document No.", "Posting Date");
-        HasDocumentAttachment := HasPostedDocAttachment();
+        HasIncomingDocument := IncomingDocument.PostedDocExists(Rec."Document No.", Rec."Posting Date");
+        HasDocumentAttachment := Rec.HasPostedDocAttachment();
         if GuiAllowed() then
             CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        StyleTxt := SetStyle();
+        StyleTxt := Rec.SetStyle();
     end;
 
     trigger OnInit()
@@ -768,8 +798,8 @@ page 29 "Vendor Ledger Entries"
     begin
         SetControlVisibility();
         SetDimVisibility();
-        if (GetFilters() <> '') and not Find() then
-            if FindFirst() then;
+        if (Rec.GetFilters() <> '') and not Rec.Find() then
+            if Rec.FindFirst() then;
     end;
 
     var
@@ -823,6 +853,12 @@ page 29 "Vendor Ledger Entries"
 
         GenJournalTemplate.Get(JournalTemplateName);
         GenJournalBatch.Get(JournalTemplateName, JournalBatchName);
+    end;
+
+    local procedure SetChangeLogEntriesFilter(var ChangeLogEntry: Record "Change Log Entry")
+    begin
+        ChangeLogEntry.SetRange("Table No.", Database::"Vendor Ledger Entry");
+        ChangeLogEntry.SetRange("Primary Key Field 1 Value", Format(Rec."Entry No.", 0, 9));
     end;
 }
 

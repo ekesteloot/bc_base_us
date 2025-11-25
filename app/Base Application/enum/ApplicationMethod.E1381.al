@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
 enum 1381 "Application Method"
 {
     Extensible = true;

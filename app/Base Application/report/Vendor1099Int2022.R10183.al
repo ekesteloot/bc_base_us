@@ -10,7 +10,7 @@ report 10183 "Vendor 1099 Int 2022"
     {
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Vendor Filter';
             column(Void; Void)
@@ -102,7 +102,7 @@ report 10183 "Vendor 1099 Int 2022"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 MaxIteration = 1;
                 column(FormCounter; FormCounter)
                 {

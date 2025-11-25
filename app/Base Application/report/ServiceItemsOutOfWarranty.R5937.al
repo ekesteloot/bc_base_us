@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Item;
+
 report 5937 "Service Items Out of Warranty"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceItemsOutofWarranty.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceItemsOutofWarranty.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Items Out of Warranty';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +15,7 @@ report 5937 "Service Items Out of Warranty"
         dataitem("Service Item"; "Service Item")
         {
             CalcFields = "No. of Active Contracts";
-            DataItemTableView = SORTING("Warranty Ending Date (Parts)", "Customer No.", "Ship-to Code");
+            DataItemTableView = sorting("Warranty Ending Date (Parts)", "Customer No.", "Ship-to Code");
             RequestFilterFields = "Warranty Ending Date (Parts)", "Customer No.", "Ship-to Code";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

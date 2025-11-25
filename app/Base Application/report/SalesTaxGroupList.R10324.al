@@ -10,7 +10,7 @@ report 10324 "Sales Tax Group List"
     {
         dataitem("Tax Group"; "Tax Group")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

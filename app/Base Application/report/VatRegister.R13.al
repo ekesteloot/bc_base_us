@@ -11,7 +11,7 @@ report 13 "VAT Register"
     {
         dataitem("G/L Register"; "G/L Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
@@ -41,9 +41,14 @@ report 13 "VAT Register"
             column(PageNoCaption; PageNoCaptionLbl)
             {
             }
+            column(VATReportingDateCaption; VATReportingDateLbl)
+            {
+            }
+#if not CLEAN23
             column(PostingDateCaption; PostingDateCaptionLbl)
             {
             }
+#endif
             column(DocumentTypeCaption; DocumentTypeCaptionLbl)
             {
             }
@@ -67,8 +72,13 @@ report 13 "VAT Register"
             }
             dataitem("VAT Entry"; "VAT Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
+#if not CLEAN23
                 column(PostingDate_VatEntry; Format("Posting Date"))
+                {
+                }
+#endif
+                column(VATDate_VatEntry; Format("VAT Reporting Date"))
                 {
                 }
                 column(DocumentType_VatEntry; "Document Type")
@@ -189,7 +199,10 @@ report 13 "VAT Register"
         AllamountsareInLbl: Label 'All amounts are in';
         VATRegisterCaptionLbl: Label 'VAT Register';
         PageNoCaptionLbl: Label 'Page';
+#if not CLEAN23
         PostingDateCaptionLbl: Label 'Posting Date';
+#endif
+        VATReportingDateLbl: Label 'VAT Reporting Date';
         DocumentTypeCaptionLbl: Label 'Document Type';
         GenBusPostingGroupCaptionLbl: Label 'Gen. Bus. Posting Group';
         GenProdPostingGroupCaptionLbl: Label 'Gen. Prod. Posting Group';

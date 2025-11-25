@@ -1,3 +1,11 @@
+﻿namespace Microsoft.CostAccounting.Allocation;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.InventoryMgt.Item;
+using System.Security.AccessControl;
+
 table 1107 "Cost Allocation Target"
 {
     Caption = 'Cost Allocation Target';
@@ -247,8 +255,6 @@ table 1107 "Cost Allocation Target"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
     }
 

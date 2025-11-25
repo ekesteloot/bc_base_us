@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 page 1356 "Posted Service Inv. - Update"
 {
     DeleteAllowed = false;
@@ -91,11 +93,10 @@ page 1356 "Posted Service Inv. - Update"
         OnAfterRecordChanged(Rec, xServiceInvoiceHeader, IsChanged);
     end;
 
-    [Scope('OnPrem')]
     procedure SetRec(ServiceInvoiceHeader: Record "Service Invoice Header")
     begin
         Rec := ServiceInvoiceHeader;
-        Insert();
+        Rec.Insert();
     end;
 
     [IntegrationEvent(false, false)]

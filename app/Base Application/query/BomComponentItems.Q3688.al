@@ -1,4 +1,8 @@
-Query 3688 "BOM Component Items"
+namespace Microsoft.InventoryMgt.BOM;
+
+using Microsoft.InventoryMgt.Item;
+
+query 3688 "BOM Component Items"
 {
     QueryType = Normal;
 

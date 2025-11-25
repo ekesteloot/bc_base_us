@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8622 "Config. Related Fields"
 {
     Caption = 'Config. Related Fields';

@@ -42,7 +42,7 @@ page 10143 "Posted Deposit"
                 field(Difference; GetDifference())
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Difference';
                     Editable = false;
@@ -82,7 +82,7 @@ page 10143 "Posted Deposit"
             part(Subform; "Posted Deposit Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Deposit No." = FIELD("No.");
+                SubPageLink = "Deposit No." = field("No.");
             }
         }
         area(factboxes)
@@ -109,9 +109,9 @@ page 10143 "Posted Deposit"
                     Caption = 'Comments';
                     Image = ViewComments;
                     RunObject = Page "Bank Comment Sheet";
-                    RunPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                                  "No." = FIELD("No.");
-                    RunPageView = WHERE("Table Name" = CONST("Posted Deposit"));
+                    RunPageLink = "Bank Account No." = field("Bank Account No."),
+                                  "No." = field("No.");
+                    RunPageView = where("Table Name" = const("Posted Deposit"));
                     ToolTip = 'View deposit comments that apply.';
                 }
                 action(Dimensions)
@@ -123,7 +123,7 @@ page 10143 "Posted Deposit"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
             }
@@ -142,7 +142,7 @@ page 10143 "Posted Deposit"
                 var
                     PostedDepositHeader: Record "Posted Deposit Header";
                 begin
-                    PostedDepositHeader.SetRange("No.", "No.");
+                    PostedDepositHeader.SetRange("No.", Rec."No.");
                     REPORT.Run(REPORT::Deposit, true, false, PostedDepositHeader);
                 end;
             }
@@ -155,7 +155,7 @@ page 10143 "Posted Deposit"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }
@@ -192,8 +192,8 @@ page 10143 "Posted Deposit"
 
     local procedure GetDifference(): Decimal
     begin
-        CalcFields("Total Deposit Lines");
-        exit("Total Deposit Amount" - "Total Deposit Lines");
+        Rec.CalcFields("Total Deposit Lines");
+        exit(Rec."Total Deposit Amount" - Rec."Total Deposit Lines");
     end;
 }
 

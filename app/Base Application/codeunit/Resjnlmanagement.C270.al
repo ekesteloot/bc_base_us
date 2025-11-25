@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+
 codeunit 270 ResJnlManagement
 {
     Permissions = TableData "Res. Journal Template" = rimd,

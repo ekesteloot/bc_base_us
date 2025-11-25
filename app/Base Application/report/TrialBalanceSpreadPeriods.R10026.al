@@ -9,7 +9,7 @@ report 10026 "Trial Balance, Spread Periods"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Account Type", "Date Filter", "Global Dimension 1 Filter", "Global Dimension 2 Filter", "Budget Filter";
             column(TodayFormatted; Format(Today, 0, 4))
@@ -104,7 +104,7 @@ report 10026 "Trial Balance, Spread Periods"
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 PrintOnlyIfDetail = true;
 
                 trigger OnPreDataItem()
@@ -114,7 +114,7 @@ report 10026 "Trial Balance, Spread Periods"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(DescriptionLine1; DescriptionLine1)
                 {
                 }

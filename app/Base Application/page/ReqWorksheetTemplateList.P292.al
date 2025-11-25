@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
+using System.Reflection;
+
 page 292 "Req. Worksheet Template List"
 {
     Caption = 'Req. Worksheet Template List';

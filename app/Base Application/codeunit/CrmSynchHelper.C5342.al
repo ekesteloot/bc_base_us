@@ -1,3 +1,29 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Dataverse;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Setup;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using System.IO;
+using System.Reflection;
+
 codeunit 5342 "CRM Synch. Helper"
 {
     Permissions = TableData "Sales Invoice Header" = m;
@@ -1557,11 +1583,11 @@ codeunit 5342 "CRM Synch. Helper"
                     begin
                         SourceFieldRef.Record().SetTable(PriceListLine);
                         case PriceListLine."Asset Type" of
-                            "Price Asset Type"::Item:
+                            PriceListLine."Asset Type"::Item:
                                 if ItemUnitOfMeasure.Get(PriceListLine."Asset No.", Format(SourceFieldRef.Value())) then
                                     if CRMIntegrationRecord.FindIDFromRecordID(ItemUnitOfMeasure.RecordId, NewValue) then
                                         exit;
-                            "Price Asset Type"::Resource:
+                            PriceListLine."Asset Type"::Resource:
                                 if ResourceUnitOfMeasure.Get(PriceListLine."Asset No.", Format(SourceFieldRef.Value())) then
                                     if CRMIntegrationRecord.FindIDFromRecordID(ResourceUnitOfMeasure.RecordId, NewValue) then
                                         exit;
@@ -1758,6 +1784,7 @@ codeunit 5342 "CRM Synch. Helper"
         end;
     end;
 
+#if not CLEAN23
     [Obsolete('Use another implementation of ConvertTableToOption', '20.0')]
     procedure ConvertTableToOption(SourceFieldRef: FieldRef; var OptionValue: Integer) TableIsMapped: Boolean
     var
@@ -1765,6 +1792,7 @@ codeunit 5342 "CRM Synch. Helper"
     begin
         exit(ConvertTableToOption(SourceFieldRef, FieldRef, OptionValue));
     end;
+#endif
 
     procedure ConvertTableToOption(SourceFieldRef: FieldRef; DestinationFieldRef: FieldRef; var OptionValue: Integer) TableIsMapped: Boolean
     var

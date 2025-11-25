@@ -129,7 +129,7 @@ page 9020 "Small Business Owner RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'List Price Sheet';
 #if not CLEAN21
-                RunPageView = WHERE("Object Type" = CONST(Report), "Object ID" = CONST(10148)); // "List Price Sheet"
+                RunPageView = where("Object Type" = const(Report), "Object ID" = const(10148)); // "List Price Sheet"
                 RunObject = Page "Role Center Page Dispatcher";
 #else
                 RunObject = Report "List Price Sheet V16";
@@ -372,7 +372,7 @@ page 9020 "Small Business Owner RC"
                 Caption = 'Balance';
                 Image = Balance;
                 RunObject = Page "Customer List";
-                RunPageView = WHERE("Balance (LCY)" = FILTER(<> 0));
+                RunPageView = where("Balance (LCY)" = filter(<> 0));
                 ToolTip = 'View a summary of the bank account balance in different periods.';
             }
             action("Purchase Orders")
@@ -396,7 +396,7 @@ page 9020 "Small Business Owner RC"
                 Caption = 'Balance';
                 Image = Balance;
                 RunObject = Page "Vendor List";
-                RunPageView = WHERE("Balance (LCY)" = FILTER(<> 0));
+                RunPageView = where("Balance (LCY)" = filter(<> 0));
                 ToolTip = 'View a summary of the bank account balance in different periods.';
             }
             action(Items)
@@ -419,8 +419,8 @@ page 9020 "Small Business Owner RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Item),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Item),
+                                        Recurring = const(false));
                     ToolTip = 'Open a list of journals where you can adjust the physical quantity of items on inventory.';
                 }
                 action(PhysicalInventoryJournals)
@@ -428,8 +428,8 @@ page 9020 "Small Business Owner RC"
                     ApplicationArea = Warehouse;
                     Caption = 'Physical Inventory Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST("Phys. Inventory"),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const("Phys. Inventory"),
+                                        Recurring = const(false));
                     ToolTip = 'Prepare to count the actual items in inventory to check if the quantity registered in the system is the same as the physical quantity. If there are differences, post them to the item ledger with the physical inventory journal before you do the inventory valuation.';
                 }
                 action(RevaluationJournals)
@@ -437,8 +437,8 @@ page 9020 "Small Business Owner RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Revaluation Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Revaluation),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Revaluation),
+                                        Recurring = const(false));
                     ToolTip = 'Change the inventory value of items, for example after doing a physical inventory.';
                 }
                 action("Resource Journals")
@@ -446,7 +446,7 @@ page 9020 "Small Business Owner RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Resource Journals';
                     RunObject = Page "Resource Jnl. Batches";
-                    RunPageView = WHERE(Recurring = CONST(false));
+                    RunPageView = where(Recurring = const(false));
                     ToolTip = 'View all resource journals.';
                 }
                 action("FA Journals")
@@ -454,7 +454,7 @@ page 9020 "Small Business Owner RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'FA Journals';
                     RunObject = Page "FA Journal Batches";
-                    RunPageView = WHERE(Recurring = CONST(false));
+                    RunPageView = where(Recurring = const(false));
                     ToolTip = 'Post entries to a depreciation book without integration to the general ledger.';
                 }
                 action(CashReceiptJournals)
@@ -463,8 +463,8 @@ page 9020 "Small Business Owner RC"
                     Caption = 'Cash Receipt Journals';
                     Image = Journals;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST("Cash Receipts"),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const("Cash Receipts"),
+                                        Recurring = const(false));
                     ToolTip = 'Register received payments by manually applying them to the related customer, vendor, or bank ledger entries. Then, post the payments to G/L accounts and thereby close the related ledger entries.';
                 }
                 action(PaymentJournals)
@@ -473,8 +473,8 @@ page 9020 "Small Business Owner RC"
                     Caption = 'Payment Journals';
                     Image = Journals;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Payments),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Payments),
+                                        Recurring = const(false));
                     ToolTip = 'Register payments to vendors. A payment journal is a type of general journal that is used to post outgoing payment transactions to G/L, bank, customer, vendor, employee, and fixed assets accounts. The Suggest Vendor Payments functions automatically fills the journal with payments that are due. When payments are posted, you can export the payments to a bank file for upload to your bank if your system is set up for electronic banking. You can also issue computer checks from the payment journal.';
                 }
                 action(GeneralJournals)
@@ -483,8 +483,8 @@ page 9020 "Small Business Owner RC"
                     Caption = 'General Journals';
                     Image = Journal;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(General),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(General),
+                                        Recurring = const(false));
                     ToolTip = 'Post financial transactions directly to general ledger accounts and other accounts, such as bank, customer, vendor, and employee accounts. Posting with a general journal always creates entries on general ledger accounts. This is true even when, for example, you post a journal line to a customer account, because an entry is posted to a general ledger receivables account through a posting group.';
                 }
                 action(RecurringJournals)
@@ -492,8 +492,8 @@ page 9020 "Small Business Owner RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Recurring Journals';
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(General),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(General),
+                                        Recurring = const(true));
                     ToolTip = 'View all recurring journals';
                 }
             }
@@ -506,8 +506,8 @@ page 9020 "Small Business Owner RC"
                     ApplicationArea = Planning;
                     Caption = 'Requisition Worksheets';
                     RunObject = Page "Req. Wksh. Names";
-                    RunPageView = WHERE("Template Type" = CONST("Req."),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const("Req."),
+                                        Recurring = const(false));
                     ToolTip = 'Calculate a supply plan to fulfill item demand with purchases or transfers.';
                 }
             }
@@ -861,6 +861,7 @@ page 9020 "Small Business Owner RC"
                     RunObject = Page "Reason Codes";
                     ToolTip = 'View or set up codes that specify reasons why entries were created, such as Return, to specify why a purchase credit memo was posted.';
                 }
+#if not CLEAN23
                 action("Extended Texts")
                 {
                     ApplicationArea = Basic, Suite;
@@ -868,7 +869,11 @@ page 9020 "Small Business Owner RC"
                     Image = Text;
                     RunObject = Page "Extended Text List";
                     ToolTip = 'View or edit additional text for the descriptions of items. Extended text can be inserted under the Description field on document lines for the item.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Page should not get opened without any filters.';
+                    ObsoleteTag = '23.0';
                 }
+#endif
                 action("IRS 1099 Form-Box")
                 {
                     Caption = 'IRS 1099 Form-Box';
@@ -943,9 +948,6 @@ page 9020 "Small Business Owner RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'C&ustomer';
                 Image = Customer;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Customer Card";
                 RunPageMode = Create;
                 ToolTip = 'Create a new customer card.';
@@ -955,9 +957,6 @@ page 9020 "Small Business Owner RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales &Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
                 ToolTip = 'Create a new sales order for items or services.';
@@ -967,9 +966,6 @@ page 9020 "Small Business Owner RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales Credit &Memo';
                 Image = CreditMemo;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Sales Credit Memo";
                 RunPageMode = Create;
                 ToolTip = 'Create a new sales credit memo to revert a posted sales invoice.';
@@ -979,9 +975,6 @@ page 9020 "Small Business Owner RC"
                 ApplicationArea = Basic, Suite;
                 Caption = '&Sales Reminder';
                 Image = Reminder;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page Reminder;
                 RunPageMode = Create;
                 ToolTip = 'Create a reminder to remind a customer of overdue payment.';
@@ -1001,9 +994,6 @@ page 9020 "Small Business Owner RC"
                 ApplicationArea = Basic, Suite;
                 Caption = '&Vendor';
                 Image = Vendor;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Vendor Card";
                 RunPageMode = Create;
                 ToolTip = 'Set up a new vendor from whom you buy goods or services. ';
@@ -1013,9 +1003,6 @@ page 9020 "Small Business Owner RC"
                 ApplicationArea = Basic, Suite;
                 Caption = '&Purchase Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Purchase Order";
                 RunPageMode = Create;
                 ToolTip = 'Purchase goods or services from a vendor.';
@@ -1057,7 +1044,7 @@ page 9020 "Small Business Owner RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales Price &Worksheet';
                 Image = PriceWorksheet;
-                RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7023)); // "Sales Price Worksheet";
+                RunPageView = where("Object Type" = const(Page), "Object ID" = const(7023)); // "Sales Price Worksheet";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'Manage sales prices for individual customers, for a group of customers, for all customers, or for a campaign.';
                 ObsoleteState = Pending;
@@ -1069,7 +1056,7 @@ page 9020 "Small Business Owner RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales P&rices';
                 Image = SalesPrices;
-                RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7002)); // "Sales Prices";
+                RunPageView = where("Object Type" = const(Page), "Object ID" = const(7002)); // "Sales Prices";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'View or edit special sales prices that you grant when certain conditions are met, such as customer, quantity, or ending date. The price agreements can be for individual customers, for a group of customers, for all customers or for a campaign.';
                 ObsoleteState = Pending;
@@ -1081,7 +1068,7 @@ page 9020 "Small Business Owner RC"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales &Line Discounts';
                 Image = SalesLineDisc;
-                RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7004)); // "Sales Line Discounts";
+                RunPageView = where("Object Type" = const(Page), "Object ID" = const(7004)); // "Sales Line Discounts";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'View the sales line discounts that are available. These discount agreements can be for individual customers, for a group of customers, for all customers or for a campaign.';
                 ObsoleteState = Pending;

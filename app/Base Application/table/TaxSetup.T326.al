@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.SalesTax;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 326 "Tax Setup"
 {
     Caption = 'Tax Setup';

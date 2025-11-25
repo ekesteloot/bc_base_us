@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 table 5641 "FA Buffer Projection"
 {
     Caption = 'FA Buffer Projection';

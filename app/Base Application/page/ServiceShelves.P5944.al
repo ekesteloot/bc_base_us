@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Setup;
+
 page 5944 "Service Shelves"
 {
     ApplicationArea = Service;

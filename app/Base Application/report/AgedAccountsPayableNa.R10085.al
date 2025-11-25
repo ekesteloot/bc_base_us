@@ -11,7 +11,7 @@ report 10085 "Aged Accounts Payable NA"
     {
         dataitem(Header; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(Aged_Accounts_Payable_; 'Aged Accounts Payable')
             {
             }
@@ -33,7 +33,7 @@ report 10085 "Aged Accounts Payable NA"
             column(DateTitle; DateTitle)
             {
             }
-            column(Document_Number_is______Vendor_Ledger_Entry__FIELDCAPTION__External_Document_No___; 'Document Number is ' + "Vendor Ledger Entry".FieldCaption("External Document No."))
+            column(Document_Number_is______Vendor_Ledger_Entry__FIELDCAPTION__External_Document_No___; 'Document Number is ' + TempVendorLedgerEntry.FieldCaption("External Document No."))
             {
             }
             column(Vendor_TABLECAPTION__________FilterString; Vendor.TableCaption() + ': ' + FilterString)
@@ -255,62 +255,65 @@ report 10085 "Aged Accounts Payable NA"
                 }
                 dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
                 {
-                    DataItemLink = "Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                    DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date");
+                    DataItemLink = "Vendor No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                    DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date");
 
                     trigger OnAfterGetRecord()
                     begin
-                        SetRange("Date Filter", 0D, PeriodEndingDate[1]);
                         CalcFields("Remaining Amount");
                         if "Remaining Amount" <> 0 then
                             InsertTemp("Vendor Ledger Entry");
+
                         CurrReport.Skip();    // this fools the system into thinking that no details "printed"...yet
                     end;
 
                     trigger OnPreDataItem()
                     begin
+                        SetLoadFields("Vendor No.", Open, Positive, "Currency Code", "Global Dimension 1 Code", "Global Dimension 2 Code", "Remaining Amount", "Posting Date", "Date Filter", "Due Date", "Document Date");
+
                         // Find ledger entries which are posted before the date of the aging.
                         SetRange("Posting Date", 0D, PeriodEndingDate[1]);
+                        SetRange("Date Filter", 0D, PeriodEndingDate[1]);
 
-                        if (Format(ShowOnlyOverDueBy) <> '') and not ShowAllForOverdue then
+                        if (Format(ShowOnlyOverDueBy) <> '') and (not ShowAllForOverdue) then
                             SetRange("Due Date", 0D, CalculatedDate);
                     end;
                 }
                 dataitem(Totals; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(AmountDueToPrint; -AmountDueToPrint)
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_1_; -AmountDue[1])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_2_; -AmountDue[2])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_3_; -AmountDue[3])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_4_; -AmountDue[4])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AgingDate; AgingDate)
                     {
                     }
-                    column(Vendor_Ledger_Entry__Description; "Vendor Ledger Entry".Description)
+                    column(Vendor_Ledger_Entry__Description; TempVendorLedgerEntry.Description)
                     {
                     }
-                    column(Vendor_Ledger_Entry___Document_Type_; "Vendor Ledger Entry"."Document Type")
+                    column(Vendor_Ledger_Entry___Document_Type_; TempVendorLedgerEntry."Document Type")
                     {
                     }
                     column(DocNo; DocNo)
@@ -318,80 +321,80 @@ report 10085 "Aged Accounts Payable NA"
                     }
                     column(AmountDueToPrint_Control63; -AmountDueToPrint)
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_1__Control64; -AmountDue[1])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_2__Control65; -AmountDue[2])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_3__Control66; -AmountDue[3])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_4__Control67; -AmountDue[4])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
-                    column(Vendor_Ledger_Entry___Currency_Code_; "Vendor Ledger Entry"."Currency Code")
+                    column(Vendor_Ledger_Entry___Currency_Code_; TempVendorLedgerEntry."Currency Code")
                     {
                     }
                     column(AmountDueToPrint_Control68; -AmountDueToPrint)
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_1__Control69; -AmountDue[1])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_2__Control70; -AmountDue[2])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_3__Control71; -AmountDue[3])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_4__Control72; -AmountDue[4])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDueToPrint_Control74; -AmountDueToPrint)
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_1__Control75; -AmountDue[1])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_2__Control76; -AmountDue[2])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_3__Control77; -AmountDue[3])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_4__Control78; -AmountDue[4])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(PercentString_1__Control5; PercentString[1])
@@ -411,27 +414,27 @@ report 10085 "Aged Accounts Payable NA"
                     }
                     column(AmountDueToPrint_Control81; -AmountDueToPrint)
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_1__Control82; -AmountDue[1])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_2__Control83; -AmountDue[2])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_3__Control84; -AmountDue[3])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(AmountDue_4__Control85; -AmountDue[4])
                     {
-                        AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
+                        AutoFormatExpression = TempVendorLedgerEntry."Currency Code";
                         AutoFormatType = 1;
                     }
                     column(PercentString_1__Control87; PercentString[1])
@@ -459,41 +462,32 @@ report 10085 "Aged Accounts Payable NA"
                         Clear(AmountDue);
                         AmountDueToPrint := 0;
                         if Number = 1 then
-                            TempVendLedgEntry.Find('-')
+                            TempVendorLedgerEntry.Find('-')
                         else
-                            TempVendLedgEntry.Next();
-                        TempVendLedgEntry.SetRange("Date Filter", 0D, PeriodEndingDate[1]);
-                        TempVendLedgEntry.CalcFields("Remaining Amount", "Remaining Amt. (LCY)");
-                        if TempVendLedgEntry."Remaining Amount" = 0 then
+                            TempVendorLedgerEntry.Next();
+
+                        TempVendorLedgerEntry.SetRange("Date Filter", 0D, PeriodEndingDate[1]);
+                        TempVendorLedgerEntry.CalcFields("Remaining Amount", "Remaining Amt. (LCY)");
+
+                        if TempVendorLedgerEntry."Remaining Amount" = 0 then
                             CurrReport.Skip();
-                        if TempVendLedgEntry."Currency Code" <> '' then
-                            TempVendLedgEntry."Remaining Amt. (LCY)" :=
-                              Round(
-                                CurrExchRate.ExchangeAmtFCYToFCY(
-                                  PeriodEndingDate[1],
-                                  TempVendLedgEntry."Currency Code",
-                                  '',
-                                  TempVendLedgEntry."Remaining Amount"));
+
+                        if TempVendorLedgerEntry."Currency Code" <> '' then
+                            TempVendorLedgerEntry."Remaining Amt. (LCY)" := Round(CurrencyExchangeRate.ExchangeAmtFCYToFCY(PeriodEndingDate[1], TempVendorLedgerEntry."Currency Code", '', TempVendorLedgerEntry."Remaining Amount"));
+
                         if PrintAmountsInLocal then begin
-                            TempVendLedgEntry."Remaining Amount" :=
-                              Round(
-                                CurrExchRate.ExchangeAmtFCYToFCY(
-                                  PeriodEndingDate[1],
-                                  TempVendLedgEntry."Currency Code",
-                                  Vendor."Currency Code",
-                                  TempVendLedgEntry."Remaining Amount"),
-                                Currency."Amount Rounding Precision");
-                            AmountDueToPrint := TempVendLedgEntry."Remaining Amount";
+                            TempVendorLedgerEntry."Remaining Amount" := Round(CurrencyExchangeRate.ExchangeAmtFCYToFCY(PeriodEndingDate[1], TempVendorLedgerEntry."Currency Code", Vendor."Currency Code", TempVendorLedgerEntry."Remaining Amount"), Currency."Amount Rounding Precision");
+                            AmountDueToPrint := TempVendorLedgerEntry."Remaining Amount";
                         end else
-                            AmountDueToPrint := TempVendLedgEntry."Remaining Amt. (LCY)";
+                            AmountDueToPrint := TempVendorLedgerEntry."Remaining Amt. (LCY)";
 
                         case AgingMethod of
                             AgingMethod::"Due Date":
-                                AgingDate := TempVendLedgEntry."Due Date";
+                                AgingDate := TempVendorLedgerEntry."Due Date";
                             AgingMethod::"Trans Date":
-                                AgingDate := TempVendLedgEntry."Posting Date";
+                                AgingDate := TempVendorLedgerEntry."Posting Date";
                             AgingMethod::"Document Date":
-                                AgingDate := TempVendLedgEntry."Document Date";
+                                AgingDate := TempVendorLedgerEntry."Document Date";
                         end;
                         j := 0;
                         while AgingDate < PeriodEndingDate[j + 1] do
@@ -502,7 +496,7 @@ report 10085 "Aged Accounts Payable NA"
                             j := 1;
 
                         AmountDue[j] := AmountDueToPrint;
-                        "BalanceDue$"[j] := "BalanceDue$"[j] + TempVendLedgEntry."Remaining Amt. (LCY)";
+                        "BalanceDue$"[j] := "BalanceDue$"[j] + TempVendorLedgerEntry."Remaining Amt. (LCY)";
 
                         "TotalBalanceDue$" := 0;
                         VendTotAmountDue[j] := VendTotAmountDue[j] + AmountDueToPrint;
@@ -512,11 +506,10 @@ report 10085 "Aged Accounts Payable NA"
                             "TotalBalanceDue$" := "TotalBalanceDue$" + "BalanceDue$"[j];
                         CalcPercents("TotalBalanceDue$", "BalanceDue$");
 
-                        "Vendor Ledger Entry" := TempVendLedgEntry;
                         if UseExternalDocNo then
-                            DocNo := "Vendor Ledger Entry"."External Document No."
+                            DocNo := TempVendorLedgerEntry."External Document No."
                         else
-                            DocNo := "Vendor Ledger Entry"."Document No.";
+                            DocNo := TempVendorLedgerEntry."Document No.";
 
                         TotalNumberOfEntries -= 1;
                         if TotalNumberOfEntries = 0 then begin
@@ -540,7 +533,7 @@ report 10085 "Aged Accounts Payable NA"
 
                     trigger OnPostDataItem()
                     begin
-                        if TempVendLedgEntry.Count() > 0 then begin
+                        if TempVendorLedgerEntry.Count() > 0 then begin
                             for j := 1 to 4 do
                                 AmountDue[j] := VendTotAmountDue[j];
                             AmountDueToPrint := VendTotAmountDueToPrint;
@@ -553,11 +546,11 @@ report 10085 "Aged Accounts Payable NA"
                     begin
                         Clear(AmountDueToPrint);
                         Clear(AmountDue);
-                        SetRange(Number, 1, TempVendLedgEntry.Count());
-                        TempVendLedgEntry.SetCurrentKey("Vendor No.", "Posting Date");
+                        SetRange(Number, 1, TempVendorLedgerEntry.Count());
+                        TempVendorLedgerEntry.SetCurrentKey("Vendor No.", "Posting Date");
                         Clear(VendTotAmountDue);
                         VendTotAmountDueToPrint := 0;
-                        TotalNumberOfEntries := TempVendLedgEntry.Count();
+                        TotalNumberOfEntries := TempVendorLedgerEntry.Count();
                     end;
                 }
 
@@ -568,7 +561,7 @@ report 10085 "Aged Accounts Payable NA"
                     Clear("BalanceDue$");
                     if PrintAmountsInLocal then begin
                         GetCurrencyRecord(Currency, "Currency Code");
-                        CurrencyFactor := CurrExchRate.ExchangeRate(PeriodEndingDate[1], "Currency Code");
+                        CurrencyFactor := CurrencyExchangeRate.ExchangeRate(PeriodEndingDate[1], "Currency Code");
                     end;
 
                     if "Privacy Blocked" then
@@ -580,10 +573,12 @@ report 10085 "Aged Accounts Payable NA"
                     else
                         BlockedDescription := '';
 
-                    TempVendLedgEntry.DeleteAll();
+                    TempVendorLedgerEntry.DeleteAll();
 
                     if Format(ShowOnlyOverDueBy) <> '' then
                         CalculatedDate := CalcDate(ShowOnlyOverDueBy, PeriodEndingDate[1]);
+
+                    VendLedgEntry.SetLoadFields("Vendor No.", Open, "Due Date");
 
                     if ShowAllForOverdue and (Format(ShowOnlyOverDueBy) <> '') then begin
                         VendLedgEntry.SetRange("Vendor No.", "No.");
@@ -596,6 +591,8 @@ report 10085 "Aged Accounts Payable NA"
 
                 trigger OnPreDataItem()
                 begin
+                    Vendor.SetLoadFields(Name, "Currency Code");
+
                     Clear("BalanceDue$");
                     if PeriodEndingDate[1] = 0D then
                         PeriodEndingDate[1] := WorkDate();
@@ -612,40 +609,28 @@ report 10085 "Aged Accounts Payable NA"
                             begin
                                 DateTitle := DueDateFullLbl;
                                 ShortDateTitle := DueDateShortLbl;
-                                ColumnHead[2] := UpToLbl + ' '
-                                  + Format(PeriodEndingDate[1] - PeriodEndingDate[3])
-                                  + ' ' + DaysLbl;
+                                ColumnHead[2] := UpToLbl + ' ' + Format(PeriodEndingDate[1] - PeriodEndingDate[3]) + ' ' + DaysLbl;
                                 ColumnHeadHead := ' ' + AgedOverdueAmountsLbl + ' ';
                             end;
                         AgingMethod::"Trans Date":
                             begin
                                 DateTitle := TransactionDateLbl;
                                 ShortDateTitle := TrxDateLbl;
-                                ColumnHead[2] := Format(PeriodEndingDate[1] - PeriodEndingDate[2] + 1)
-                                  + ' - '
-                                  + Format(PeriodEndingDate[1] - PeriodEndingDate[3])
-                                  + ' ' + DaysLbl;
+                                ColumnHead[2] := Format(PeriodEndingDate[1] - PeriodEndingDate[2] + 1) + ' - ' + Format(PeriodEndingDate[1] - PeriodEndingDate[3]) + ' ' + DaysLbl;
                                 ColumnHeadHead := ' ' + AgedVendorBalancesLbl + ' ';
                             end;
                         AgingMethod::"Document Date":
                             begin
                                 DateTitle := DocumentDateFullLbl;
                                 ShortDateTitle := DocumentDateShortLbl;
-                                ColumnHead[2] := Format(PeriodEndingDate[1] - PeriodEndingDate[2] + 1)
-                                  + ' - '
-                                  + Format(PeriodEndingDate[1] - PeriodEndingDate[3])
-                                  + ' ' + DaysLbl;
+                                ColumnHead[2] := Format(PeriodEndingDate[1] - PeriodEndingDate[2] + 1) + ' - ' + Format(PeriodEndingDate[1] - PeriodEndingDate[3]) + ' ' + DaysLbl;
                                 ColumnHeadHead := ' ' + AgedVendorBalancesLbl + ' ';
                             end;
                     end;
+
                     ColumnHead[1] := CurrentLbl;
-                    ColumnHead[3] := Format(PeriodEndingDate[1] - PeriodEndingDate[3] + 1)
-                                  + ' - '
-                                  + Format(PeriodEndingDate[1] - PeriodEndingDate[4])
-                                  + ' ' + DaysLbl;
-                    ColumnHead[4] := 'Over '
-                                  + Format(PeriodEndingDate[1] - PeriodEndingDate[4])
-                                  + ' ' + DaysLbl;
+                    ColumnHead[3] := Format(PeriodEndingDate[1] - PeriodEndingDate[3] + 1) + ' - ' + Format(PeriodEndingDate[1] - PeriodEndingDate[4]) + ' ' + DaysLbl;
+                    ColumnHead[4] := 'Over ' + Format(PeriodEndingDate[1] - PeriodEndingDate[4]) + ' ' + DaysLbl;
 
                     if PrintToExcel then
                         MakeExcelInfo();
@@ -791,10 +776,14 @@ report 10085 "Aged Accounts Payable NA"
 
     trigger OnPreReport()
     begin
+        TempVendorLedgerEntry.SetloadFields("Posting Date", "Document Date", "Due Date", "Document No.", "External Document No.", "Document Type", "Date Filter", "Currency Code", Description, "Remaining Amount", "Remaining Amt. (LCY)", "Vendor No.");
+
         if Format(PeriodCalculation) <> '' then
             Evaluate(PeriodCalculation, '-' + Format(PeriodCalculation));
+
         if Format(ShowOnlyOverDueBy) <> '' then
             Evaluate(ShowOnlyOverDueBy, '-' + Format(ShowOnlyOverDueBy));
+
         if AgingMethod = AgingMethod::"Due Date" then begin
             PeriodEndingDate[2] := PeriodEndingDate[1];
             for j := 3 to 4 do
@@ -811,11 +800,11 @@ report 10085 "Aged Accounts Payable NA"
 
     var
         CompanyInformation: Record "Company Information";
-        TempVendLedgEntry: Record "Vendor Ledger Entry" temporary;
+        TempVendorLedgerEntry: Record "Vendor Ledger Entry" temporary;
         Currency: Record Currency;
-        CurrExchRate: Record "Currency Exchange Rate";
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
         GLSetup: Record "General Ledger Setup";
-        ExcelBuf: Record "Excel Buffer" temporary;
+        TempExcelBuffer: Record "Excel Buffer" temporary;
         PeriodCalculation: DateFormula;
         ShowOnlyOverDueBy: DateFormula;
         AgingMethod: Option "Due Date","Trans Date","Document Date";
@@ -906,18 +895,17 @@ report 10085 "Aged Accounts Payable NA"
 
     local procedure InsertTemp(var VendLedgEntry: Record "Vendor Ledger Entry")
     begin
-        with TempVendLedgEntry do begin
-            if Get(VendLedgEntry."Entry No.") then
-                exit;
-            TempVendLedgEntry := VendLedgEntry;
-            case AgingMethod of
-                AgingMethod::"Due Date":
-                    "Posting Date" := "Due Date";
-                AgingMethod::"Document Date":
-                    "Posting Date" := "Document Date";
-            end;
-            Insert();
+        if TempVendorLedgerEntry.Get(VendLedgEntry."Entry No.") then
+            exit;
+
+        TempVendorLedgerEntry := VendLedgEntry;
+        case AgingMethod of
+            AgingMethod::"Due Date":
+                TempVendorLedgerEntry."Posting Date" := TempVendorLedgerEntry."Due Date";
+            AgingMethod::"Document Date":
+                TempVendorLedgerEntry."Posting Date" := TempVendorLedgerEntry."Document Date";
         end;
+        TempVendorLedgerEntry.Insert();
     end;
 
     procedure CalcPercents(Total: Decimal; Amounts: array[4] of Decimal)
@@ -944,15 +932,15 @@ report 10085 "Aged Accounts Payable NA"
             end;
     end;
 
-    local procedure GetCurrencyRecord(var Currency: Record Currency; CurrencyCode: Code[10])
+    local procedure GetCurrencyRecord(var LocalCurrencyVariable: Record Currency; CurrencyCode: Code[10])
     begin
         if CurrencyCode = '' then begin
-            Clear(Currency);
-            Currency.Description := GLSetup."LCY Code";
-            Currency."Amount Rounding Precision" := GLSetup."Amount Rounding Precision";
+            Clear(LocalCurrencyVariable);
+            LocalCurrencyVariable.Description := GLSetup."LCY Code";
+            LocalCurrencyVariable."Amount Rounding Precision" := GLSetup."Amount Rounding Precision";
         end else
-            if Currency.Code <> CurrencyCode then
-                Currency.Get(CurrencyCode);
+            if LocalCurrencyVariable.Code <> CurrencyCode then
+                LocalCurrencyVariable.Get(CurrencyCode);
     end;
 
     local procedure GetCurrencyCaptionCode(CurrencyCode: Code[10]): Text[80]
@@ -969,96 +957,97 @@ report 10085 "Aged Accounts Payable NA"
 
     local procedure MakeExcelInfo()
     begin
-        ExcelBuf.SetUseInfoSheet();
-        ExcelBuf.AddInfoColumn(Format(CompanyNameLbl), false, true, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddInfoColumn(CompanyInformation.Name, false, false, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.NewRow();
-        ExcelBuf.AddInfoColumn(Format(ReportNameLbl), false, true, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddInfoColumn(Format(AgedAccountsPayableLbl), false, false, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.NewRow();
-        ExcelBuf.AddInfoColumn(Format(ReportNoLbl), false, true, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddInfoColumn(REPORT::"Aged Accounts Payable NA", false, false, false, false, '', ExcelBuf."Cell Type"::Number);
-        ExcelBuf.NewRow();
-        ExcelBuf.AddInfoColumn(Format(UserIDLbl), false, true, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddInfoColumn(UserId(), false, false, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.NewRow();
-        ExcelBuf.AddInfoColumn(Format(DateTimeLbl), false, true, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddInfoColumn(Today(), false, false, false, false, '', ExcelBuf."Cell Type"::Date);
-        ExcelBuf.AddInfoColumn(Time(), false, false, false, false, '', ExcelBuf."Cell Type"::Time);
-        ExcelBuf.NewRow();
-        ExcelBuf.AddInfoColumn(Format(VendorFiltersLbl), false, true, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddInfoColumn(FilterString, false, false, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.NewRow();
-        ExcelBuf.AddInfoColumn(Format(Aged_byCaptionLbl), false, true, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddInfoColumn(DateTitle, false, false, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.NewRow();
-        ExcelBuf.AddInfoColumn(Format(AgedAsOf2Lbl), false, true, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddInfoColumn(PeriodEndingDate[1], false, false, false, false, '', ExcelBuf."Cell Type"::Date);
-        ExcelBuf.NewRow();
-        ExcelBuf.AddInfoColumn(Format(AmountsAreLbl), false, true, false, false, '', ExcelBuf."Cell Type"::Text);
+        TempExcelBuffer.SetUseInfoSheet();
+        TempExcelBuffer.AddInfoColumn(Format(CompanyNameLbl), false, true, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddInfoColumn(CompanyInformation.Name, false, false, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.NewRow();
+        TempExcelBuffer.AddInfoColumn(Format(ReportNameLbl), false, true, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddInfoColumn(Format(AgedAccountsPayableLbl), false, false, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.NewRow();
+        TempExcelBuffer.AddInfoColumn(Format(ReportNoLbl), false, true, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddInfoColumn(REPORT::"Aged Accounts Payable NA", false, false, false, false, '', TempExcelBuffer."Cell Type"::Number);
+        TempExcelBuffer.NewRow();
+        TempExcelBuffer.AddInfoColumn(Format(UserIDLbl), false, true, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddInfoColumn(UserId(), false, false, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.NewRow();
+        TempExcelBuffer.AddInfoColumn(Format(DateTimeLbl), false, true, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddInfoColumn(Today(), false, false, false, false, '', TempExcelBuffer."Cell Type"::Date);
+        TempExcelBuffer.AddInfoColumn(Time(), false, false, false, false, '', TempExcelBuffer."Cell Type"::Time);
+        TempExcelBuffer.NewRow();
+        TempExcelBuffer.AddInfoColumn(Format(VendorFiltersLbl), false, true, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddInfoColumn(FilterString, false, false, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.NewRow();
+        TempExcelBuffer.AddInfoColumn(Format(Aged_byCaptionLbl), false, true, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddInfoColumn(DateTitle, false, false, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.NewRow();
+        TempExcelBuffer.AddInfoColumn(Format(AgedAsOf2Lbl), false, true, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddInfoColumn(PeriodEndingDate[1], false, false, false, false, '', TempExcelBuffer."Cell Type"::Date);
+        TempExcelBuffer.NewRow();
+        TempExcelBuffer.AddInfoColumn(Format(AmountsAreLbl), false, true, false, false, '', TempExcelBuffer."Cell Type"::Text);
         if PrintAmountsInLocal then
-            ExcelBuf.AddInfoColumn(Format(AsindicatedinDataLbl), false, false, false, false, '', ExcelBuf."Cell Type"::Text)
+            TempExcelBuffer.AddInfoColumn(Format(AsindicatedinDataLbl), false, false, false, false, '', TempExcelBuffer."Cell Type"::Text)
         else
-            ExcelBuf.AddInfoColumn(Format(InOurFunctionalCurrencyLbl), false, false, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.ClearNewRow();
+            TempExcelBuffer.AddInfoColumn(Format(InOurFunctionalCurrencyLbl), false, false, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.ClearNewRow();
         MakeExcelDataHeader();
     end;
 
     local procedure MakeExcelDataHeader()
     begin
-        ExcelBuf.NewRow();
-        ExcelBuf.AddColumn("Vendor Ledger Entry".FieldCaption("Vendor No."), false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddColumn(Vendor.FieldCaption(Name), false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
+        TempExcelBuffer.NewRow();
+        TempExcelBuffer.AddColumn(TempVendorLedgerEntry.FieldCaption("Vendor No."), false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddColumn(Vendor.FieldCaption(Name), false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
         if PrintDetail then begin
-            ExcelBuf.AddColumn(StrSubstNo(AgingDateLbl, ShortDateTitle), false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
-            ExcelBuf.AddColumn("Vendor Ledger Entry".FieldCaption(Description), false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
-            ExcelBuf.AddColumn("Vendor Ledger Entry".FieldCaption("Document Type"), false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
-            ExcelBuf.AddColumn("Vendor Ledger Entry".FieldCaption("Document No."), false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
+            TempExcelBuffer.AddColumn(StrSubstNo(AgingDateLbl, ShortDateTitle), false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
+            TempExcelBuffer.AddColumn(TempVendorLedgerEntry.FieldCaption(Description), false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
+            TempExcelBuffer.AddColumn(TempVendorLedgerEntry.FieldCaption("Document Type"), false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
+            TempExcelBuffer.AddColumn(TempVendorLedgerEntry.FieldCaption("Document No."), false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
         end;
-        ExcelBuf.AddColumn(Format(BalanceDueLbl), false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddColumn(ColumnHead[1], false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddColumn(ColumnHead[2], false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddColumn(ColumnHead[3], false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddColumn(ColumnHead[4], false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
+        TempExcelBuffer.AddColumn(Format(BalanceDueLbl), false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddColumn(ColumnHead[1], false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddColumn(ColumnHead[2], false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddColumn(ColumnHead[3], false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddColumn(ColumnHead[4], false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
         if PrintAmountsInLocal then
             if PrintDetail then
-                ExcelBuf.AddColumn(Format(DocumentCurrencyLbl), false, '', true, false, true, '', ExcelBuf."Cell Type"::Text)
+                TempExcelBuffer.AddColumn(Format(DocumentCurrencyLbl), false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text)
             else
-                ExcelBuf.AddColumn(Format(VendorCurrency2Lbl), false, '', true, false, true, '', ExcelBuf."Cell Type"::Text);
+                TempExcelBuffer.AddColumn(Format(VendorCurrency2Lbl), false, '', true, false, true, '', TempExcelBuffer."Cell Type"::Text);
     end;
 
     local procedure MakeExcelDataBody()
     var
         CurrencyCodeToPrint: Code[20];
     begin
-        ExcelBuf.NewRow();
-        ExcelBuf.AddColumn(Vendor."No.", false, '', false, false, false, '', ExcelBuf."Cell Type"::Text);
-        ExcelBuf.AddColumn(Vendor.Name, false, '', false, false, false, '', ExcelBuf."Cell Type"::Text);
+        TempExcelBuffer.NewRow();
+        TempExcelBuffer.AddColumn(Vendor."No.", false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
+        TempExcelBuffer.AddColumn(Vendor.Name, false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
         if PrintDetail then begin
-            ExcelBuf.AddColumn(AgingDate, false, '', false, false, false, '', ExcelBuf."Cell Type"::Date);
-            ExcelBuf.AddColumn("Vendor Ledger Entry".Description, false, '', false, false, false, '', ExcelBuf."Cell Type"::Text);
-            ExcelBuf.AddColumn(Format("Vendor Ledger Entry"."Document Type"), false, '', false, false, false, '', ExcelBuf."Cell Type"::Text);
-            ExcelBuf.AddColumn(DocNo, false, '', false, false, false, '', ExcelBuf."Cell Type"::Text);
+            TempExcelBuffer.AddColumn(AgingDate, false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Date);
+            TempExcelBuffer.AddColumn(TempVendorLedgerEntry.Description, false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
+            TempExcelBuffer.AddColumn(Format(TempVendorLedgerEntry."Document Type"), false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
+            TempExcelBuffer.AddColumn(DocNo, false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
         end;
-        ExcelBuf.AddColumn(-AmountDueToPrint, false, '', false, false, false, '#,##0.00', ExcelBuf."Cell Type"::Number);
-        ExcelBuf.AddColumn(-AmountDue[1], false, '', false, false, false, '#,##0.00', ExcelBuf."Cell Type"::Number);
-        ExcelBuf.AddColumn(-AmountDue[2], false, '', false, false, false, '#,##0.00', ExcelBuf."Cell Type"::Number);
-        ExcelBuf.AddColumn(-AmountDue[3], false, '', false, false, false, '#,##0.00', ExcelBuf."Cell Type"::Number);
-        ExcelBuf.AddColumn(-AmountDue[4], false, '', false, false, false, '#,##0.00', ExcelBuf."Cell Type"::Number);
+        TempExcelBuffer.AddColumn(-AmountDueToPrint, false, '', false, false, false, '#,##0.00', TempExcelBuffer."Cell Type"::Number);
+        TempExcelBuffer.AddColumn(-AmountDue[1], false, '', false, false, false, '#,##0.00', TempExcelBuffer."Cell Type"::Number);
+        TempExcelBuffer.AddColumn(-AmountDue[2], false, '', false, false, false, '#,##0.00', TempExcelBuffer."Cell Type"::Number);
+        TempExcelBuffer.AddColumn(-AmountDue[3], false, '', false, false, false, '#,##0.00', TempExcelBuffer."Cell Type"::Number);
+        TempExcelBuffer.AddColumn(-AmountDue[4], false, '', false, false, false, '#,##0.00', TempExcelBuffer."Cell Type"::Number);
         if PrintAmountsInLocal then begin
             if PrintDetail then
-                CurrencyCodeToPrint := "Vendor Ledger Entry"."Currency Code"
+                CurrencyCodeToPrint := TempVendorLedgerEntry."Currency Code"
             else
                 CurrencyCodeToPrint := Vendor."Currency Code";
+
             if CurrencyCodeToPrint = '' then
                 CurrencyCodeToPrint := GLSetup."LCY Code";
-            ExcelBuf.AddColumn(CurrencyCodeToPrint, false, '', false, false, false, '', ExcelBuf."Cell Type"::Text)
+            TempExcelBuffer.AddColumn(CurrencyCodeToPrint, false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text)
         end;
     end;
 
     local procedure CreateExcelbook()
     begin
-        ExcelBuf.CreateBookAndOpenExcel('', DataLbl, AgedAccountsPayableLbl, CompanyName(), UserId());
+        TempExcelBuffer.CreateBookAndOpenExcel('', DataLbl, AgedAccountsPayableLbl, CompanyName(), UserId());
     end;
 }
 

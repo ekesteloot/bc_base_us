@@ -1,8 +1,17 @@
+namespace Microsoft.ProjectMgt.Jobs.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using System.Utilities;
+
 report 1016 "Job Quote"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/JobQuote.rdlc';
-    WordLayout = './JobQuote.docx';
+    DefaultRenderingLayout = "JobQuote.rdlc";
     Caption = 'Job Quote';
     PreviewMode = PrintLayout;
 
@@ -89,8 +98,8 @@ report 1016 "Job Quote"
             }
             dataitem("Job Task"; "Job Task")
             {
-                DataItemLink = "Job No." = FIELD("No.");
-                DataItemTableView = SORTING("Job No.", "Job Task No.");
+                DataItemLink = "Job No." = field("No.");
+                DataItemTableView = sorting("Job No.", "Job Task No.");
                 PrintOnlyIfDetail = true;
                 column(JobTaskNo_JobTask; HeaderJobTaskNo)
                 {
@@ -133,8 +142,8 @@ report 1016 "Job Quote"
                 }
                 dataitem("Job Planning Line"; "Job Planning Line")
                 {
-                    DataItemLink = "Job No." = FIELD("Job No."), "Job Task No." = FIELD("Job Task No.");
-                    DataItemTableView = SORTING("Job No.", "Job Task No.", "Line No.");
+                    DataItemLink = "Job No." = field("Job No."), "Job Task No." = field("Job Task No.");
+                    DataItemTableView = sorting("Job No.", "Job Task No.", "Line No.");
                     RequestFilterFields = "Job Task No.";
                     column(ShowIntBody1; "Job Task"."Job Task Type" in ["Job Task"."Job Task Type"::Heading, "Job Task"."Job Task Type"::"Begin-Total"])
                     {
@@ -229,7 +238,7 @@ report 1016 "Job Quote"
             }
             dataitem(Totals; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(JobTotalValue; JobTotalValue)
                 {
                 }
@@ -258,6 +267,24 @@ report 1016 "Job Quote"
 
         actions
         {
+        }
+    }
+
+    rendering
+    {
+        layout("JobQuote.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './ProjectMgt/Jobs/Reports/JobQuote.rdlc';
+            Caption = 'Job Quote (RDLC)';
+            Summary = 'The Job Quote (RDLC) provides a detailed layout.';
+        }
+        layout("JobQuote.docx")
+        {
+            Type = Word;
+            LayoutFile = './ProjectMgt/Jobs/JobQuote.docx';
+            Caption = 'Job Quote (Word)';
+            Summary = 'The Job Quote (Word) provides a basic layout.';
         }
     }
 
@@ -299,7 +326,6 @@ report 1016 "Job Quote"
     end;
 
     var
-        CompanyInfo: Record "Company Information";
         JobsSetup: Record "Jobs Setup";
         FormatAddr: Codeunit "Format Address";
         JobFilter: Text;
@@ -327,5 +353,8 @@ report 1016 "Job Quote"
         HeaderJobTaskNo: Text[250];
         HeaderJobTask: Text[250];
         CurrencyFormat: Text;
+
+    protected var
+        CompanyInfo: Record "Company Information";
 }
 

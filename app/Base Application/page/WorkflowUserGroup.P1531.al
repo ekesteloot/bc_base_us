@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1531 "Workflow User Group"
 {
     Caption = 'Workflow User Group';
@@ -8,7 +10,7 @@ page 1531 "Workflow User Group"
     {
         area(content)
         {
-            field("Code"; Code)
+            field("Code"; Rec.Code)
             {
                 ApplicationArea = Suite;
                 ToolTip = 'Specifies the workflow user group.';
@@ -21,7 +23,7 @@ page 1531 "Workflow User Group"
             part(Control5; "Workflow User Group Members")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Workflow User Group Code" = FIELD(Code);
+                SubPageLink = "Workflow User Group Code" = field(Code);
             }
         }
     }

@@ -1,4 +1,13 @@
-﻿page 5741 "Transfer Order Subform"
+﻿namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
+page 5741 "Transfer Order Subform"
 {
     AutoSplitKey = true;
     Caption = 'Lines';
@@ -111,11 +120,11 @@
                     var
                         TransShptLine: Record "Transfer Shipment Line";
                     begin
-                        TestField("Document No.");
-                        TestField("Item No.");
+                        Rec.TestField("Document No.");
+                        Rec.TestField("Item No.");
                         TransShptLine.SetCurrentKey("Transfer Order No.", "Item No.", "Shipment Date");
-                        TransShptLine.SetRange("Transfer Order No.", "Document No.");
-                        TransShptLine.SetRange("Line No.", "Line No.");
+                        TransShptLine.SetRange("Transfer Order No.", Rec."Document No.");
+                        TransShptLine.SetRange("Line No.", Rec."Line No.");
                         PAGE.RunModal(0, TransShptLine);
                     end;
                 }
@@ -136,11 +145,11 @@
                     var
                         TransRcptLine: Record "Transfer Receipt Line";
                     begin
-                        TestField("Document No.");
-                        TestField("Item No.");
+                        Rec.TestField("Document No.");
+                        Rec.TestField("Item No.");
                         TransRcptLine.SetCurrentKey("Transfer Order No.", "Item No.", "Receipt Date");
-                        TransRcptLine.SetRange("Transfer Order No.", "Document No.");
-                        TransRcptLine.SetRange("Line No.", "Line No.");
+                        TransRcptLine.SetRange("Transfer Order No.", Rec."Document No.");
+                        TransRcptLine.SetRange("Line No.", Rec."Line No.");
                         PAGE.RunModal(0, TransRcptLine);
                     end;
                 }
@@ -206,84 +215,84 @@
                 {
                     ApplicationArea = Location;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Location;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Location;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Location;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Location;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Location;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
                 field("Custom Transit Number"; Rec."Custom Transit Number")
@@ -310,7 +319,7 @@
 
                 trigger OnAction()
                 begin
-                    SelectMultipleItems();
+                    Rec.SelectMultipleItems();
                 end;
             }
             group("F&unctions")
@@ -340,6 +349,19 @@
                     trigger OnAction()
                     begin
                         ReserveSelectedLines();
+                    end;
+                }
+                action(ExplodeBOM_Functions)
+                {
+                    AccessByPermission = TableData "BOM Component" = R;
+                    ApplicationArea = Suite;
+                    Caption = 'E&xplode BOM';
+                    Image = ExplodeBOM;
+                    ToolTip = 'Add a line for each component on the bill of materials for the selected item. For example, this is useful for selling the parent item as a kit. CAUTION: The line for the parent item will be deleted and only its description will display. To undo this action, delete the component lines and add a line for the parent item again.';
+
+                    trigger OnAction()
+                    begin
+                        ExplodeBOM();
                     end;
                 }
             }
@@ -434,7 +456,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 group("Item &Tracking Lines")
@@ -446,12 +468,12 @@
                         ApplicationArea = ItemTracking;
                         Caption = 'Shipment';
                         Image = Shipment;
-                        ShortCutKey = 'Ctrl+Alt+I';   
+                        ShortCutKey = 'Ctrl+Alt+I';
                         ToolTip = 'View or edit serial numbers and lot numbers that are assigned to the item on the document or journal line.';
 
                         trigger OnAction()
                         begin
-                            OpenItemTrackingLines("Transfer Direction"::Outbound);
+                            Rec.OpenItemTrackingLines("Transfer Direction"::Outbound);
                         end;
                     }
                     action(Receipt)
@@ -464,7 +486,7 @@
 
                         trigger OnAction()
                         begin
-                            OpenItemTrackingLinesWithReclass("Transfer Direction"::Inbound);
+                            Rec.OpenItemTrackingLinesWithReclass("Transfer Direction"::Inbound);
                         end;
                     }
                 }
@@ -474,7 +496,7 @@
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -516,12 +538,17 @@
         CurrPage.Update(SetSaveRecord);
     end;
 
+    procedure ExplodeBOM()
+    begin
+        Codeunit.Run(Codeunit::"Transfer-Explode BOM", Rec);
+    end;
+
     local procedure ReserveSelectedLines()
     var
         TransLine: Record "Transfer Line";
     begin
         CurrPage.SetSelectionFilter(TransLine);
-        ReserveFromInventory(TransLine);
+        Rec.ReserveFromInventory(TransLine);
     end;
 
     local procedure SetDimensionsVisibility()

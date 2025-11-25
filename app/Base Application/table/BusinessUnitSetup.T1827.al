@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.Consolidation;
+
+using System.Environment;
+using System.Globalization;
+
 table 1827 "Business Unit Setup"
 {
     Caption = 'Business Unit Setup';

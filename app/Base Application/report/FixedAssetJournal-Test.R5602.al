@@ -1,14 +1,26 @@
+﻿namespace Microsoft.FixedAssets.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Setup;
+using System.Security.User;
+using System.Utilities;
+
 report 5602 "Fixed Asset Journal - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/FixedAssetJournalTest.rdlc';
+    RDLCLayout = './FixedAssets/Reports/FixedAssetJournalTest.rdlc';
     Caption = 'Fixed Asset Journal - Test';
 
     dataset
     {
         dataitem("FA Journal Batch"; "FA Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             RequestFilterFields = "Journal Template Name", Name;
             column(FA_Journal_Batch_Journal_Template_Name; "Journal Template Name")
             {
@@ -18,7 +30,7 @@ report 5602 "Fixed Asset Journal - Test"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 PrintOnlyIfDetail = true;
                 column(FA_Journal_Batch__Name; "FA Journal Batch".Name)
                 {
@@ -82,9 +94,9 @@ report 5602 "Fixed Asset Journal - Test"
                 }
                 dataitem("FA Journal Line"; "FA Journal Line")
                 {
-                    DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
+                    DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
                     DataItemLinkReference = "FA Journal Batch";
-                    DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+                    DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
                     RequestFilterFields = "FA Posting Date";
                     column(FA_Journal_Line__Depreciation_Book_Code_; "Depreciation Book Code")
                     {
@@ -121,7 +133,7 @@ report 5602 "Fixed Asset Journal - Test"
                     }
                     dataitem(ErrorLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number_; ErrorText[Number])
                         {
                         }

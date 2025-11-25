@@ -1,3 +1,16 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using System.Security.AccessControl;
+
 table 7134 "Item Budget Entry"
 {
     Caption = 'Item Budget Entry';
@@ -18,7 +31,7 @@ table 7134 "Item Budget Entry"
         field(3; "Budget Name"; Code[10])
         {
             Caption = 'Budget Name';
-            TableRelation = "Item Budget Name".Name WHERE("Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Item Budget Name".Name where("Analysis Area" = field("Analysis Area"));
         }
         field(4; Date; Date)
         {
@@ -43,11 +56,11 @@ table 7134 "Item Budget Entry"
         field(7; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type" = CONST(Item)) Item;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor
+            else
+            if ("Source Type" = const(Item)) Item;
         }
         field(8; Description; Text[100])
         {
@@ -74,8 +87,6 @@ table 7134 "Item Budget Entry"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(14; "Location Code"; Code[10])
         {
@@ -86,7 +97,7 @@ table 7134 "Item Budget Entry"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
 
             trigger OnValidate()
             begin
@@ -100,7 +111,7 @@ table 7134 "Item Budget Entry"
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
 
             trigger OnValidate()
             begin
@@ -178,7 +189,7 @@ table 7134 "Item Budget Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
     }
@@ -215,7 +226,6 @@ table 7134 "Item Budget Entry"
     trigger OnInsert()
     var
         TempDimSetEntry: Record "Dimension Set Entry" temporary;
-        IsHandled: Boolean;
     begin
         CheckIfBlocked();
         TestField(Date);
@@ -225,14 +235,11 @@ table 7134 "Item Budget Entry"
             GetSalesSetup();
             GetInventorySetup();
 
-            IsHandled := false;
-            OnInsertOnBeforeCheckGroupDimFilled(Rec, IsHandled);
-            if not IsHandled then
-                if not (CheckGroupDimFilled(SalesSetup."Customer Group Dimension Code") or
-                        CheckGroupDimFilled(SalesSetup."Salesperson Dimension Code") or
-                        CheckGroupDimFilled(InventorySetup."Item Group Dimension Code"))
-                then
-                    TestField("Item No.");
+            if not (CheckGroupDimFilled(SalesSetup."Customer Group Dimension Code") or
+                    CheckGroupDimFilled(SalesSetup."Salesperson Dimension Code") or
+                    CheckGroupDimFilled(InventorySetup."Item Group Dimension Code"))
+            then
+                TestField("Item No.");
         end;
 
         TestField("Budget Name");
@@ -568,11 +575,6 @@ table 7134 "Item Budget Entry"
         ItemAnalysisViewBudgEntry.SetRange("Analysis Area", "Analysis Area");
         ItemAnalysisViewBudgEntry.SetRange("Budget Name", "Budget Name");
         ItemAnalysisViewBudgEntry.DeleteAll();
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertOnBeforeCheckGroupDimFilled(var ItemBudgetEntry: Record "Item Budget Entry"; var IsHandled: Boolean)
-    begin
     end;
 }
 

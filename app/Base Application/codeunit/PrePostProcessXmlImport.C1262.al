@@ -1,3 +1,10 @@
+namespace System.IO;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Utilities;
+
 codeunit 1262 "Pre & Post Process XML Import"
 {
 

@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000807 "Standard Task Descript. Sheet"
 {
     AutoSplitKey = true;
@@ -14,7 +16,7 @@ page 99000807 "Standard Task Descript. Sheet"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Text; Text)
+                field(Text; Rec.Text)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the text for the standard task description.';

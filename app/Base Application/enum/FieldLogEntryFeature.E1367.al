@@ -1,3 +1,5 @@
+namespace System.Diagnostics;
+
 enum 1367 "Field Log Entry Feature"
 {
     Extensible = true;

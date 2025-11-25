@@ -1,3 +1,11 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Security.AccessControl;
+
 table 1103 "Cost Type"
 {
     Caption = 'Cost Type';
@@ -112,8 +120,6 @@ table 1103 "Cost Type"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(28; "Date Filter"; Date)
         {
@@ -135,11 +141,11 @@ table 1103 "Cost Type"
         field(31; "Balance at Date"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum("Cost Entry".Amount WHERE("Cost Type No." = FIELD("No."),
-                                                         "Cost Type No." = FIELD(FILTER(Totaling)),
-                                                         "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                         "Cost Object Code" = FIELD("Cost Object Filter"),
-                                                         "Posting Date" = FIELD(UPPERLIMIT("Date Filter"))));
+            CalcFormula = sum("Cost Entry".Amount where("Cost Type No." = field("No."),
+                                                         "Cost Type No." = field(FILTER(Totaling)),
+                                                         "Cost Center Code" = field("Cost Center Filter"),
+                                                         "Cost Object Code" = field("Cost Object Filter"),
+                                                         "Posting Date" = field(UPPERLIMIT("Date Filter"))));
             Caption = 'Balance at Date';
             Editable = false;
             FieldClass = FlowField;
@@ -147,11 +153,11 @@ table 1103 "Cost Type"
         field(32; "Net Change"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum("Cost Entry".Amount WHERE("Cost Type No." = FIELD("No."),
-                                                         "Cost Type No." = FIELD(FILTER(Totaling)),
-                                                         "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                         "Cost Object Code" = FIELD("Cost Object Filter"),
-                                                         "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Cost Entry".Amount where("Cost Type No." = field("No."),
+                                                         "Cost Type No." = field(FILTER(Totaling)),
+                                                         "Cost Center Code" = field("Cost Center Filter"),
+                                                         "Cost Object Code" = field("Cost Object Filter"),
+                                                         "Posting Date" = field("Date Filter")));
             Caption = 'Net Change';
             Editable = false;
             FieldClass = FlowField;
@@ -159,12 +165,12 @@ table 1103 "Cost Type"
         field(33; "Budget Amount"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum("Cost Budget Entry".Amount WHERE("Cost Type No." = FIELD("No."),
-                                                                "Cost Type No." = FIELD(FILTER(Totaling)),
-                                                                "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                                "Cost Object Code" = FIELD("Cost Object Filter"),
-                                                                Date = FIELD("Date Filter"),
-                                                                "Budget Name" = FIELD("Budget Filter")));
+            CalcFormula = sum("Cost Budget Entry".Amount where("Cost Type No." = field("No."),
+                                                                "Cost Type No." = field(FILTER(Totaling)),
+                                                                "Cost Center Code" = field("Cost Center Filter"),
+                                                                "Cost Object Code" = field("Cost Object Filter"),
+                                                                Date = field("Date Filter"),
+                                                                "Budget Name" = field("Budget Filter")));
             Caption = 'Budget Amount';
             FieldClass = FlowField;
         }
@@ -172,8 +178,6 @@ table 1103 "Cost Type"
         {
             Caption = 'Totaling';
             TableRelation = "Cost Type";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -201,10 +205,10 @@ table 1103 "Cost Type"
         field(36; Balance; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum("Cost Entry".Amount WHERE("Cost Type No." = FIELD("No."),
-                                                         "Cost Type No." = FIELD(FILTER(Totaling)),
-                                                         "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                         "Cost Object Code" = FIELD("Cost Object Filter")));
+            CalcFormula = sum("Cost Entry".Amount where("Cost Type No." = field("No."),
+                                                         "Cost Type No." = field(FILTER(Totaling)),
+                                                         "Cost Center Code" = field("Cost Center Filter"),
+                                                         "Cost Object Code" = field("Cost Object Filter")));
             Caption = 'Balance';
             Editable = false;
             FieldClass = FlowField;
@@ -218,8 +222,6 @@ table 1103 "Cost Type"
         {
             Caption = 'G/L Account Range';
             TableRelation = "G/L Account";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -232,32 +234,32 @@ table 1103 "Cost Type"
         }
         field(47; "Debit Amount"; Decimal)
         {
-            CalcFormula = Sum("Cost Entry"."Debit Amount" WHERE("Cost Type No." = FIELD("No."),
-                                                                 "Cost Type No." = FIELD(FILTER(Totaling)),
-                                                                 "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                                 "Cost Object Code" = FIELD("Cost Object Filter"),
-                                                                 "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Cost Entry"."Debit Amount" where("Cost Type No." = field("No."),
+                                                                 "Cost Type No." = field(FILTER(Totaling)),
+                                                                 "Cost Center Code" = field("Cost Center Filter"),
+                                                                 "Cost Object Code" = field("Cost Object Filter"),
+                                                                 "Posting Date" = field("Date Filter")));
             Caption = 'Debit Amount';
             FieldClass = FlowField;
         }
         field(48; "Credit Amount"; Decimal)
         {
-            CalcFormula = Sum("Cost Entry"."Credit Amount" WHERE("Cost Type No." = FIELD("No."),
-                                                                  "Cost Type No." = FIELD(FILTER(Totaling)),
-                                                                  "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                                  "Cost Object Code" = FIELD("Cost Object Filter"),
-                                                                  "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Cost Entry"."Credit Amount" where("Cost Type No." = field("No."),
+                                                                  "Cost Type No." = field(FILTER(Totaling)),
+                                                                  "Cost Center Code" = field("Cost Center Filter"),
+                                                                  "Cost Object Code" = field("Cost Object Filter"),
+                                                                  "Posting Date" = field("Date Filter")));
             Caption = 'Credit Amount';
             FieldClass = FlowField;
         }
         field(51; "Balance to Allocate"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum("Cost Entry".Amount WHERE("Cost Type No." = FIELD("No."),
-                                                         "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                         "Cost Object Code" = FIELD("Cost Object Filter"),
-                                                         Allocated = CONST(false),
-                                                         "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Cost Entry".Amount where("Cost Type No." = field("No."),
+                                                         "Cost Center Code" = field("Cost Center Filter"),
+                                                         "Cost Object Code" = field("Cost Object Filter"),
+                                                         Allocated = const(false),
+                                                         "Posting Date" = field("Date Filter")));
             Caption = 'Balance to Allocate';
             Editable = false;
             FieldClass = FlowField;
@@ -265,46 +267,46 @@ table 1103 "Cost Type"
         field(60; "Budget Debit Amount"; Decimal)
         {
             BlankNumbers = BlankNegAndZero;
-            CalcFormula = Sum("Cost Budget Entry".Amount WHERE("Cost Type No." = FIELD("No."),
-                                                                "Cost Type No." = FIELD(FILTER(Totaling)),
-                                                                "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                                "Cost Object Code" = FIELD("Cost Object Filter"),
-                                                                Date = FIELD("Date Filter"),
-                                                                "Budget Name" = FIELD("Budget Filter")));
+            CalcFormula = sum("Cost Budget Entry".Amount where("Cost Type No." = field("No."),
+                                                                "Cost Type No." = field(FILTER(Totaling)),
+                                                                "Cost Center Code" = field("Cost Center Filter"),
+                                                                "Cost Object Code" = field("Cost Object Filter"),
+                                                                Date = field("Date Filter"),
+                                                                "Budget Name" = field("Budget Filter")));
             Caption = 'Budget Debit Amount';
             FieldClass = FlowField;
         }
         field(72; "Budget Credit Amount"; Decimal)
         {
             BlankNumbers = BlankNegAndZero;
-            CalcFormula = - Sum("Cost Budget Entry".Amount WHERE("Cost Type No." = FIELD("No."),
-                                                                 "Cost Type No." = FIELD(FILTER(Totaling)),
-                                                                 "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                                 "Cost Object Code" = FIELD("Cost Object Filter"),
-                                                                 Date = FIELD("Date Filter"),
-                                                                 "Budget Name" = FIELD("Budget Filter")));
+            CalcFormula = - sum("Cost Budget Entry".Amount where("Cost Type No." = field("No."),
+                                                                 "Cost Type No." = field(FILTER(Totaling)),
+                                                                 "Cost Center Code" = field("Cost Center Filter"),
+                                                                 "Cost Object Code" = field("Cost Object Filter"),
+                                                                 Date = field("Date Filter"),
+                                                                 "Budget Name" = field("Budget Filter")));
             Caption = 'Budget Credit Amount';
             FieldClass = FlowField;
         }
         field(73; "Add. Currency Net Change"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum("Cost Entry"."Additional-Currency Amount" WHERE("Cost Type No." = FIELD("No."),
-                                                                               "Cost Type No." = FIELD(FILTER(Totaling)),
-                                                                               "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                                               "Cost Object Code" = FIELD("Cost Object Filter"),
-                                                                               "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Cost Entry"."Additional-Currency Amount" where("Cost Type No." = field("No."),
+                                                                               "Cost Type No." = field(FILTER(Totaling)),
+                                                                               "Cost Center Code" = field("Cost Center Filter"),
+                                                                               "Cost Object Code" = field("Cost Object Filter"),
+                                                                               "Posting Date" = field("Date Filter")));
             Caption = 'Add. Currency Net Change';
             Editable = false;
             FieldClass = FlowField;
         }
         field(74; "Add. Currency Balance at Date"; Decimal)
         {
-            CalcFormula = Sum("Cost Entry"."Additional-Currency Amount" WHERE("Cost Type No." = FIELD("No."),
-                                                                               "Cost Type No." = FIELD(FILTER(Totaling)),
-                                                                               "Cost Center Code" = FIELD("Cost Center Filter"),
-                                                                               "Cost Object Code" = FIELD("Cost Object Filter"),
-                                                                               "Posting Date" = FIELD(UPPERLIMIT("Date Filter"))));
+            CalcFormula = sum("Cost Entry"."Additional-Currency Amount" where("Cost Type No." = field("No."),
+                                                                               "Cost Type No." = field(FILTER(Totaling)),
+                                                                               "Cost Center Code" = field("Cost Center Filter"),
+                                                                               "Cost Object Code" = field("Cost Object Filter"),
+                                                                               "Posting Date" = field(UPPERLIMIT("Date Filter"))));
             Caption = 'Add. Currency Balance at Date';
             FieldClass = FlowField;
         }

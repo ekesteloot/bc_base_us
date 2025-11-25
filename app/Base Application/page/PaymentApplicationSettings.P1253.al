@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 page 1253 "Payment Application Settings"
 {
     AdditionalSearchTerms = 'payment matching rules,automatic payment application';

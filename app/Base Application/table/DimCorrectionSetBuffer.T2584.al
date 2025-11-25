@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using Microsoft.FinancialMgt.Dimension;
+
 table 2584 "Dim Correction Set Buffer"
 {
     DataClassification = CustomerContent;

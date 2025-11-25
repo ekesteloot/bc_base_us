@@ -1,3 +1,9 @@
+namespace System.Environment.Configuration;
+
+using System.Environment;
+using System.Reflection;
+using System.Security.AccessControl;
+
 table 9178 "Application Area Setup"
 {
     Caption = 'Application Area Setup';
@@ -141,13 +147,8 @@ table 9178 "Application Area Setup"
         {
             Caption = 'XBRL';
             ObsoleteReason = 'XBRL feature will be discontinued';
-#if not CLEAN20
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#endif
         }
         field(2800; Reservation; Boolean)
         {

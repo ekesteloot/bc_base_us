@@ -1,3 +1,17 @@
+﻿namespace Microsoft.WarehouseMgt.Worksheet;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Integration.Excel;
+
 page 7351 "Movement Worksheet"
 {
     ApplicationArea = Warehouse;
@@ -8,7 +22,7 @@ page 7351 "Movement Worksheet"
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "Whse. Worksheet Line";
-    SourceTableView = SORTING("Worksheet Template Name", Name, "Location Code", "Sorting Sequence No.");
+    SourceTableView = sorting("Worksheet Template Name", Name, "Location Code", "Sorting Sequence No.");
     UsageCategory = Tasks;
 
     layout
@@ -25,13 +39,13 @@ page 7351 "Movement Worksheet"
                 trigger OnLookup(var Text: Text): Boolean
                 begin
                     CurrPage.SaveRecord();
-                    LookupWhseWkshName(Rec, CurrentWkshName, CurrentLocationCode);
+                    Rec.LookupWhseWkshName(Rec, CurrentWkshName, CurrentLocationCode);
                     CurrPage.Update(false);
                 end;
 
                 trigger OnValidate()
                 begin
-                    CheckWhseWkshName(CurrentWkshName, CurrentLocationCode, Rec);
+                    Rec.CheckWhseWkshName(CurrentWkshName, CurrentLocationCode, Rec);
                     CurrentWkshNameOnAfterValidate();
                 end;
             }
@@ -64,7 +78,7 @@ page 7351 "Movement Worksheet"
 
                     trigger OnValidate()
                     begin
-                        GetItem("Item No.", ItemDescription);
+                        Rec.GetItem(Rec."Item No.", ItemDescription);
                         ItemNoOnAfterValidate();
                     end;
                 }
@@ -78,6 +92,12 @@ page 7351 "Movement Worksheet"
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the description of the item on the line.';
+                }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
                 }
                 field("From Zone Code"; Rec."From Zone Code")
                 {
@@ -173,7 +193,7 @@ page 7351 "Movement Worksheet"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
                 }
-                field("ROUND(CheckAvailQtytoMove / ItemUOM.""Qty. per Unit of Measure"",UOMMgt.QtyRndPrecision)"; Round(CheckAvailQtytoMove() / ItemUOM."Qty. per Unit of Measure", UOMMgt.QtyRndPrecision()))
+                field("ROUND(CheckAvailQtytoMove / ItemUOM.""Qty. per Unit of Measure"",UOMMgt.QtyRndPrecision)"; Round(Rec.CheckAvailQtytoMove() / ItemUOM."Qty. per Unit of Measure", UOMMgt.QtyRndPrecision()))
                 {
                     ApplicationArea = Warehouse;
                     Caption = 'Available Qty. to Move';
@@ -206,9 +226,9 @@ page 7351 "Movement Worksheet"
             part(Control8; "Lot Numbers by Bin FactBox")
             {
                 ApplicationArea = ItemTracking;
-                SubPageLink = "Item No." = FIELD("Item No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Location Code" = FIELD("Location Code");
+                SubPageLink = "Item No." = field("Item No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Location Code" = field("Location Code");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -242,7 +262,7 @@ page 7351 "Movement Worksheet"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }
@@ -256,7 +276,7 @@ page 7351 "Movement Worksheet"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -266,10 +286,10 @@ page 7351 "Movement Worksheet"
                     Caption = 'Warehouse Entries';
                     Image = BinLedger;
                     RunObject = Page "Warehouse Entries";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Location Code" = FIELD("Location Code");
-                    RunPageView = SORTING("Item No.", "Location Code", "Variant Code");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Location Code" = field("Location Code");
+                    RunPageView = sorting("Item No.", "Location Code", "Variant Code");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View completed warehouse activities related to the document.';
                 }
@@ -279,10 +299,10 @@ page 7351 "Movement Worksheet"
                     Caption = 'Ledger E&ntries';
                     Image = ItemLedger;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Location Code" = FIELD("Location Code");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Location Code" = field("Location Code");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
                 action("Bin Contents")
@@ -291,10 +311,10 @@ page 7351 "Movement Worksheet"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Item No.", "Variant Code");
                     ToolTip = 'View items in the bin if the selected line contains a bin code.';
                 }
             }
@@ -317,7 +337,7 @@ page 7351 "Movement Worksheet"
                         WhseWkshLine: Record "Whse. Worksheet Line";
                     begin
                         WhseWkshLine.Copy(Rec);
-                        AutofillQtyToHandle(WhseWkshLine);
+                        Rec.AutofillQtyToHandle(WhseWkshLine);
                     end;
                 }
                 action("Delete Qty. to Handle")
@@ -332,7 +352,7 @@ page 7351 "Movement Worksheet"
                         WhseWkshLine: Record "Whse. Worksheet Line";
                     begin
                         WhseWkshLine.Copy(Rec);
-                        DeleteQtyToHandle(WhseWkshLine);
+                        Rec.DeleteQtyToHandle(WhseWkshLine);
                     end;
                 }
                 separator(Action54)
@@ -352,9 +372,9 @@ page 7351 "Movement Worksheet"
                         BinContent: Record "Bin Content";
                         ReplenishBinContent: Report "Calculate Bin Replenishment";
                     begin
-                        Location.Get("Location Code");
+                        Location.Get(Rec."Location Code");
                         ReplenishBinContent.InitializeRequest(
-                          "Worksheet Template Name", Name, "Location Code",
+                          Rec."Worksheet Template Name", Rec.Name, Rec."Location Code",
                           Location."Allow Breakbulk", false, false);
 
                         ReplenishBinContent.SetTableView(BinContent);
@@ -377,9 +397,9 @@ page 7351 "Movement Worksheet"
                         DummyRec: Record "Whse. Internal Put-away Header";
                         GetBinContent: Report "Whse. Get Bin Content";
                     begin
-                        BinContent.SetRange("Location Code", "Location Code");
+                        BinContent.SetRange("Location Code", Rec."Location Code");
                         GetBinContent.SetTableView(BinContent);
-                        GetBinContent.SetParameters(Rec, DummyRec, "Warehouse Destination Type 2"::"MovementWorksheet");
+                        GetBinContent.SetParameters(Rec, DummyRec, Enum::"Warehouse Destination Type 2"::"MovementWorksheet");
                         GetBinContent.Run();
                     end;
                 }
@@ -401,17 +421,42 @@ page 7351 "Movement Worksheet"
                         WhseWkshLine.SetFilter(Quantity, '>0');
                         WhseWkshLine.CopyFilters(Rec);
                         if WhseWkshLine.FindFirst() then
-                            MovementCreate(WhseWkshLine)
+                            Rec.MovementCreate(WhseWkshLine)
                         else
                             Error(Text001);
 
                         WhseWkshLine.Reset();
-                        CopyFilters(WhseWkshLine);
-                        FilterGroup(2);
-                        SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        SetRange(Name, Name);
-                        SetRange("Location Code", CurrentLocationCode);
-                        FilterGroup(0);
+                        Rec.CopyFilters(WhseWkshLine);
+                        Rec.FilterGroup(2);
+                        Rec.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        Rec.SetRange(Name, Rec.Name);
+                        Rec.SetRange("Location Code", CurrentLocationCode);
+                        Rec.FilterGroup(0);
+                    end;
+                }
+            }
+            group("Page")
+            {
+                Caption = 'Page';
+                action(EditInExcel)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Edit in Excel';
+                    Image = Excel;
+                    ToolTip = 'Send the data in the worksheet to an Excel file for analysis or editing.';
+                    Visible = IsSaaSExcelAddinEnabled;
+                    AccessByPermission = System "Allow Action Export To Excel" = X;
+
+                    trigger OnAction()
+                    var
+                        EditinExcel: Codeunit "Edit in Excel";
+                        EditinExcelFilters: Codeunit "Edit in Excel Filters";
+                        ODataUtility: Codeunit "ODataUtility";
+                    begin
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec.Name)), Enum::"Edit in Excel Filter Type"::Equal, CurrentWkshName, Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Worksheet Template Name")), Enum::"Edit in Excel Filter Type"::Equal, CurrentWkshTemplateName, Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Location Code")), Enum::"Edit in Excel Filter Type"::Equal, CurrentLocationCode, Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcel.EditPageInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), Page::"Movement Worksheet", EditInExcelFilters, StrSubstNo(ExcelFileNameTxt, CurrentWkshName, CurrentWkshTemplateName));
                     end;
                 }
             }
@@ -496,12 +541,12 @@ page 7351 "Movement Worksheet"
 
     trigger OnAfterGetCurrRecord()
     begin
-        GetItem("Item No.", ItemDescription);
+        Rec.GetItem(Rec."Item No.", ItemDescription);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        if not ItemUOM.Get("Item No.", "From Unit of Measure Code") then
+        if not ItemUOM.Get(Rec."Item No.", Rec."From Unit of Measure Code") then
             ItemUOM.Init();
     end;
 
@@ -512,36 +557,47 @@ page 7351 "Movement Worksheet"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        "Sorting Sequence No." := GetSortSeqNo("Whse. Activity Sorting Method".FromInteger(CurrentSortingMethod));
+        Rec."Sorting Sequence No." := Rec.GetSortSeqNo("Whse. Activity Sorting Method".FromInteger(CurrentSortingMethod));
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        "Sorting Sequence No." := GetSortSeqNo("Whse. Activity Sorting Method".FromInteger(CurrentSortingMethod));
+        Rec."Sorting Sequence No." := Rec.GetSortSeqNo("Whse. Activity Sorting Method".FromInteger(CurrentSortingMethod));
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
+    var
+        ClientTypeManagement: Codeunit "Client Type Management";
     begin
-        SetUpNewLine(
+        // if called from API (such as edit-in-excel), do not refresh 
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
+        Rec.SetUpNewLine(
           CurrentWkshTemplateName, CurrentWkshName,
           CurrentLocationCode, "Whse. Activity Sorting Method".FromInteger(CurrentSortingMethod), xRec."Line No.");
     end;
 
     trigger OnOpenPage()
     var
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ServerSetting: Codeunit "Server Setting";
         WhseWkshSelected: Boolean;
     begin
-        OpenedFromBatch := (Name <> '') and ("Worksheet Template Name" = '');
+        IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        // if called from API (such as edit-in-excel), do not filter 
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
+        OpenedFromBatch := (Rec.Name <> '') and (Rec."Worksheet Template Name" = '');
         if OpenedFromBatch then begin
-            CurrentWkshName := Name;
-            CurrentLocationCode := "Location Code";
-            OpenWhseWksh(Rec, CurrentWkshTemplateName, CurrentWkshName, CurrentLocationCode);
+            CurrentWkshName := Rec.Name;
+            CurrentLocationCode := Rec."Location Code";
+            Rec.OpenWhseWksh(Rec, CurrentWkshTemplateName, CurrentWkshName, CurrentLocationCode);
             exit;
         end;
-        TemplateSelection(PAGE::"Movement Worksheet", 2, Rec, WhseWkshSelected);
+        Rec.TemplateSelection(PAGE::"Movement Worksheet", 2, Rec, WhseWkshSelected);
         if not WhseWkshSelected then
             Error('');
-        OpenWhseWksh(Rec, CurrentWkshTemplateName, CurrentWkshName, CurrentLocationCode);
+        Rec.OpenWhseWksh(Rec, CurrentWkshTemplateName, CurrentWkshName, CurrentLocationCode);
     end;
 
     var
@@ -553,7 +609,9 @@ page 7351 "Movement Worksheet"
         CurrentSortingMethod: Option " ",Item,,"Shelf/Bin No.","Due Date";
         ItemDescription: Text[100];
         Text001: Label 'There is nothing to handle.';
+        ExcelFileNameTxt: Label 'MovementWorkSheet - CurrentWkshName %1 - CurrentWksTemplateName %2', Comment = '%1 = Worksheet Name; %2 = Worksheet Template Name';
         OpenedFromBatch: Boolean;
+        IsSaaSExcelAddinEnabled: Boolean;
 
     protected procedure ItemNoOnAfterValidate()
     begin
@@ -586,17 +644,17 @@ page 7351 "Movement Worksheet"
     protected procedure CurrentWkshNameOnAfterValidate()
     begin
         CurrPage.SaveRecord();
-        SetWhseWkshName(CurrentWkshName, CurrentLocationCode, Rec);
+        Rec.SetWhseWkshName(CurrentWkshName, CurrentLocationCode, Rec);
         CurrPage.Update(false);
     end;
 
     protected procedure CurrentSortingMethodOnAfterValidate()
     begin
-        SortWhseWkshLines(
+        Rec.SortWhseWkshLines(
           CurrentWkshTemplateName, CurrentWkshName, CurrentLocationCode,
           "Whse. Activity Sorting Method".FromInteger(CurrentSortingMethod));
         CurrPage.Update(false);
-        SetCurrentKey("Worksheet Template Name", Name, "Location Code", "Sorting Sequence No.");
+        Rec.SetCurrentKey("Worksheet Template Name", Name, "Location Code", "Sorting Sequence No.");
     end;
 }
 

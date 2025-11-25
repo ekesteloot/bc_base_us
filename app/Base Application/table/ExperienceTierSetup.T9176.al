@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using System.Environment;
+
 table 9176 "Experience Tier Setup"
 {
     Caption = 'Experience Tier Setup';

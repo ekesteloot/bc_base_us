@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Document;
+
 enum 7301 "Warehouse Receipt Sorting Method"
 {
     Extensible = true;

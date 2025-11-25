@@ -1,3 +1,5 @@
+namespace System.IO;
+
 codeunit 8622 "Config. Insert With Validation"
 {
 

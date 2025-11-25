@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 codeunit 271 "Res. Jnl.-Post"
 {
     TableNo = "Res. Journal Line";
@@ -6,7 +10,7 @@ codeunit 271 "Res. Jnl.-Post"
     begin
         ResJnlLine.Copy(Rec);
         Code();
-        Copy(ResJnlLine);
+        Rec.Copy(ResJnlLine);
     end;
 
     var

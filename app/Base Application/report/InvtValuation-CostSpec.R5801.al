@@ -1,7 +1,14 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using System.Utilities;
+
 report 5801 "Invt. Valuation - Cost Spec."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InvtValuationCostSpec.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InvtValuationCostSpec.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Invt. Valuation - Cost Spec.';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +17,7 @@ report 5801 "Invt. Valuation - Cost Spec."
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE(Type = CONST(Inventory));
+            DataItemTableView = where(Type = const(Inventory));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Inventory Posting Group", "Statistics Group";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
@@ -31,7 +38,7 @@ report 5801 "Invt. Valuation - Cost Spec."
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(= 0));
+                DataItemTableView = sorting(Number) where(Number = filter(= 0));
                 column(AvgCost; ResultForAvgCost)
                 {
                     AutoFormatType = 2;
@@ -209,7 +216,7 @@ report 5801 "Invt. Valuation - Cost Spec."
             ValuationDate := WorkDate();
 
         for i := 1 to ArrayLen(EntryTypeDescription) do begin
-            ValueEntry."Entry Type" := "Cost Entry Type".FromInteger(i - 1);
+            ValueEntry."Entry Type" := Enum::"Cost Entry Type".FromInteger(i - 1);
             EntryTypeDescription[i] := Format(ValueEntry."Entry Type");
         end;
 

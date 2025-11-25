@@ -1,4 +1,9 @@
 #if not CLEAN21
+namespace Microsoft.ProjectMgt.Resources.Pricing;
+
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 page 204 "Resource Prices"
 {
     AccessByPermission = TableData Resource = R;
@@ -24,7 +29,7 @@ page 204 "Resource Prices"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the type.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the code.';

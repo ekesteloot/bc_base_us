@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 page 444 "Reminder/Fin. Charge Entries"
 {
     ApplicationArea = Suite;
@@ -59,7 +61,7 @@ page 444 "Reminder/Fin. Charge Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the reminder level if the Type field contains Reminder.';
                 }
-                field(Canceled; Canceled)
+                field(Canceled; Rec.Canceled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the issued reminder or finance charge has been canceled.';
@@ -100,7 +102,7 @@ page 444 "Reminder/Fin. Charge Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }

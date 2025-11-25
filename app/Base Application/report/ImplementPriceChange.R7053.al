@@ -1,4 +1,8 @@
 #if not CLEAN21
+namespace Microsoft.Sales.Pricing;
+
+using System.Utilities;
+
 report 7053 "Implement Price Change"
 {
     Caption = 'Implement Price Change';
@@ -11,7 +15,7 @@ report 7053 "Implement Price Change"
     {
         dataitem("Sales Price Worksheet"; "Sales Price Worksheet")
         {
-            DataItemTableView = SORTING("Starting Date", "Ending Date", "Sales Type", "Sales Code", "Currency Code", "Item No.", "Variant Code", "Unit of Measure Code", "Minimum Quantity");
+            DataItemTableView = sorting("Starting Date", "Ending Date", "Sales Type", "Sales Code", "Currency Code", "Item No.", "Variant Code", "Unit of Measure Code", "Minimum Quantity");
             RequestFilterFields = "Item No.", "Sales Type", "Sales Code", "Unit of Measure Code", "Currency Code";
 
             trigger OnAfterGetRecord()

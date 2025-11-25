@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 416 "G/L Account Balance Lines"
 {
     Caption = 'Lines';
@@ -30,7 +38,7 @@ page 416 "G/L Account Balance Lines"
                     Editable = false;
                     ToolTip = 'Specifies the name of the period shown in the line.';
                 }
-                field(DebitAmount; "Debit Amount")
+                field(DebitAmount; Rec."Debit Amount")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
@@ -45,7 +53,7 @@ page 416 "G/L Account Balance Lines"
                         BalanceDrillDown();
                     end;
                 }
-                field(CreditAmount; "Credit Amount")
+                field(CreditAmount; Rec."Credit Amount")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
@@ -60,7 +68,7 @@ page 416 "G/L Account Balance Lines"
                         BalanceDrillDown();
                     end;
                 }
-                field(NetChange; "Net Change")
+                field(NetChange; Rec."Net Change")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
@@ -86,7 +94,7 @@ page 416 "G/L Account Balance Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcLine();
     end;
 
@@ -110,7 +118,7 @@ page 416 "G/L Account Balance Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -163,9 +171,9 @@ page 416 "G/L Account Balance Lines"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            GLAcc.SetRange("Date Filter", "Period Start", "Period End")
+            GLAcc.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            GLAcc.SetRange("Date Filter", 0D, "Period End");
+            GLAcc.SetRange("Date Filter", 0D, Rec."Period End");
         if ClosingEntryFilter = ClosingEntryFilter::Exclude then begin
             AccountingPeriod.SetCurrentKey("New Fiscal Year");
             AccountingPeriod.SetRange("New Fiscal Year", true);
@@ -205,9 +213,9 @@ page 416 "G/L Account Balance Lines"
             end
         end;
 
-        "Debit Amount" := GLAcc."Debit Amount";
-        "Credit Amount" := GLAcc."Credit Amount";
-        "Net Change" := GLAcc."Net Change";
+        Rec."Debit Amount" := GLAcc."Debit Amount";
+        Rec."Credit Amount" := GLAcc."Credit Amount";
+        Rec."Net Change" := GLAcc."Net Change";
 
         OnAfterCalcLine(GLAcc, Rec, ClosingEntryFilter, DebitCreditTotals);
     end;

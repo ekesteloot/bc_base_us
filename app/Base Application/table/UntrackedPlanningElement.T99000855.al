@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Planning;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Requisition;
+
 table 99000855 "Untracked Planning Element"
 {
     Caption = 'Untracked Planning Element';
@@ -13,13 +19,13 @@ table 99000855 "Untracked Planning Element"
         field(2; "Worksheet Batch Name"; Code[10])
         {
             Caption = 'Worksheet Batch Name';
-            TableRelation = "Requisition Wksh. Name".Name WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"));
+            TableRelation = "Requisition Wksh. Name".Name where("Worksheet Template Name" = field("Worksheet Template Name"));
         }
         field(3; "Worksheet Line No."; Integer)
         {
             Caption = 'Worksheet Line No.';
-            TableRelation = "Requisition Line"."Line No." WHERE("Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                                                 "Journal Batch Name" = FIELD("Worksheet Batch Name"));
+            TableRelation = "Requisition Line"."Line No." where("Worksheet Template Name" = field("Worksheet Template Name"),
+                                                                 "Journal Batch Name" = field("Worksheet Batch Name"));
         }
         field(4; "Track Line No."; Integer)
         {
@@ -33,8 +39,8 @@ table 99000855 "Untracked Planning Element"
         field(12; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."),
-                                                       Code = FIELD("Variant Code"));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."),
+                                                       Code = field("Variant Code"));
         }
         field(13; "Location Code"; Code[10])
         {

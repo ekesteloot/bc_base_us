@@ -1,4 +1,10 @@
-#if not CLEAN21
+﻿#if not CLEAN21
+namespace System.Security.AccessControl;
+
+using System.Environment;
+using System.Reflection;
+using System.Text;
+
 page 9803 Permissions
 {
     Caption = 'Permissions';
@@ -44,7 +50,7 @@ page 9803 Permissions
             {
                 Caption = 'AllPermission';
                 Editable = false;
-                field(PermissionSet; "Role ID")
+                field(PermissionSet; Rec."Role ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Permission Set';
@@ -73,7 +79,7 @@ page 9803 Permissions
                     var
                         AllObjectswithCaption: Page "All Objects with Caption";
                     begin
-                        exit(AllObjectswithCaption.OnLookupObjectId("Object Type", Text));
+                        exit(AllObjectswithCaption.OnLookupObjectId(Rec."Object Type", Text));
                     end;
                 }
                 field(ObjectName; ObjectName)
@@ -130,7 +136,7 @@ page 9803 Permissions
                 field("Execute Permission"; Rec."Execute Permission")
                 {
                     ApplicationArea = Basic, Suite;
-                    Enabled = NOT IsTableData;
+                    Enabled = not IsTableData;
                     Style = Strong;
                     StyleExpr = ZeroObjStyleExpr;
                     ToolTip = 'Specifies information about whether the permission set has execute permission to this object. The values for the field are blank, Yes, and Indirect. Indirect means permission only through another object. If the field is empty, the permission set does not have execute permission.';
@@ -150,11 +156,11 @@ page 9803 Permissions
                     begin
                         // User cannot edit Security filter field for Systems.
                         // Since this field is empty for System type it can be used as a flag it.
-                        if Format("Security Filter") = '' then
+                        if Format(Rec."Security Filter") = '' then
                             exit;
 
                         if PermissionPagesMgt.ShowSecurityFilterForPermission(OutputSecurityFilter, Rec) then
-                            Evaluate("Security Filter", OutputSecurityFilter);
+                            Evaluate(Rec."Security Filter", OutputSecurityFilter);
                     end;
                 }
             }
@@ -180,10 +186,10 @@ page 9803 Permissions
                     AddSubtractPermissionSet: Report "Add/Subtract Permission Set";
                     NullGuid: Guid;
                 begin
-                    AggregatePermissionSet.Get(AggregatePermissionSet.Scope::System, NullGuid, "Role ID");
+                    AggregatePermissionSet.Get(AggregatePermissionSet.Scope::System, NullGuid, Rec."Role ID");
                     AddSubtractPermissionSet.SetDestination(AggregatePermissionSet);
                     AddSubtractPermissionSet.RunModal();
-                    Reset();
+                    Rec.Reset();
                     FillTempPermissions();
                 end;
             }
@@ -229,19 +235,19 @@ page 9803 Permissions
         end else
             PermissionRecExists := false;
         AllowChangePrimaryKey := not PermissionRecExists and (Show = Show::"Only In Permission Set");
-        ZeroObjStyleExpr := PermissionRecExists and ("Object ID" = 0);
+        ZeroObjStyleExpr := PermissionRecExists and (Rec."Object ID" = 0);
     end;
 
     trigger OnAfterGetRecord()
     begin
         SetObjectZeroName(Rec);
-        ZeroObjStyleExpr := "Object ID" = 0;
+        ZeroObjStyleExpr := Rec."Object ID" = 0;
         IsNewRecord := false;
     end;
 
     trigger OnOpenPage()
     var
-        PermissionSet: Record "Permission Set";
+        MetadataPermissionSet: Record "Metadata Permission Set";
         PermissionPagesMgt: Codeunit "Permission Pages Mgt.";
         EnvironmentInformation: Codeunit "Environment Information";
     begin
@@ -249,19 +255,18 @@ page 9803 Permissions
         IsOnPrem := EnvironmentInformation.IsOnPrem();
 
         if CurrentRoleID = '' then
-            if GetFilter("Role ID") <> '' then
-                CurrentRoleID := GetFilter("Role ID")
+            if Rec.GetFilter("Role ID") <> '' then
+                CurrentRoleID := Rec.GetFilter("Role ID")
             else
-                if PermissionSet.FindFirst() then
-                    CurrentRoleID := PermissionSet."Role ID";
-        Reset();
+                if MetadataPermissionSet.FindFirst() then
+                    CurrentRoleID := MetadataPermissionSet."Role ID";
+        Rec.Reset();
         FillTempPermissions();
     end;
 
     var
         CurrentRoleID: Text;
         Show: Option "Only In Permission Set",All;
-        [InDataSet]
         IsTableData: Boolean;
         IsNewRecord: Boolean;
         PermissionRecExists: Boolean;
@@ -280,10 +285,10 @@ page 9803 Permissions
         TempPermission.Copy(Rec, true);
         TempPermission.Reset();
         TempPermission.DeleteAll();
-        FilterGroup(2);
-        SetFilter("Role ID", CurrentRoleID);
+        Rec.FilterGroup(2);
+        Rec.SetFilter("Role ID", CurrentRoleID);
         Permission.SetFilter("Role ID", CurrentRoleID);
-        FilterGroup(0);
+        Rec.FilterGroup(0);
 
         if Permission.Find('-') then
             repeat
@@ -294,7 +299,7 @@ page 9803 Permissions
         if Show = Show::All then
             FillTempPermissionsForAllObjects(TempPermission);
         IsNewRecord := false;
-        if Find('=<>') then;
+        if Rec.Find('=<>') then;
         CurrPage.Update(false);
     end;
 
@@ -310,11 +315,11 @@ page 9803 Permissions
             repeat
                 TempPermission."Object Type" := AllObj."Object Type";
                 TempPermission."Object ID" := AllObj."Object ID";
-                TempPermission."Read Permission" := "Read Permission"::" ";
-                TempPermission."Insert Permission" := "Insert Permission"::" ";
-                TempPermission."Modify Permission" := "Modify Permission"::" ";
-                TempPermission."Delete Permission" := "Delete Permission"::" ";
-                TempPermission."Execute Permission" := "Execute Permission"::" ";
+                TempPermission."Read Permission" := Rec."Read Permission"::" ";
+                TempPermission."Insert Permission" := Rec."Insert Permission"::" ";
+                TempPermission."Modify Permission" := Rec."Modify Permission"::" ";
+                TempPermission."Delete Permission" := Rec."Delete Permission"::" ";
+                TempPermission."Execute Permission" := Rec."Execute Permission"::" ";
                 SetObjectZeroName(TempPermission);
                 if TempPermission.Insert() then;
             until AllObj.Next() = 0;
@@ -331,14 +336,14 @@ page 9803 Permissions
             PermissionSetList.GetSelectionFilter(AggregatePermissionSet);
             AggregatePermissionSet.SetRange(Scope, AggregatePermissionSet.Scope::System);
             CurrentRoleID := SelectionFilterManagement.GetSelectionFilterForAggregatePermissionSetRoleId(AggregatePermissionSet);
-            Reset();
+            Rec.Reset();
             FillTempPermissions();
         end;
     end;
 
     local procedure ActivateControls()
     begin
-        IsTableData := "Object Type" = "Object Type"::"Table Data"
+        IsTableData := Rec."Object Type" = Rec."Object Type"::"Table Data"
     end;
 
     local procedure SetObjectZeroName(var Permission: Record Permission)

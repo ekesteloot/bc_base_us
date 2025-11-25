@@ -1,3 +1,17 @@
+﻿namespace Microsoft.ServiceMgt.Contract;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Setup;
+using Microsoft.WarehouseMgt.Request;
+using System.Email;
+using System.Globalization;
+using System.Security.AccessControl;
+
 table 5970 "Filed Service Contract Header"
 {
     Caption = 'Filed Service Contract Header';
@@ -65,8 +79,6 @@ table 5970 "Filed Service Contract Header"
             Caption = 'Post Code';
             Editable = false;
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(12; City; Text[30])
@@ -74,8 +86,6 @@ table 5970 "Filed Service Contract Header"
             Caption = 'City';
             Editable = false;
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(13; "Contact Name"; Text[100])
@@ -116,8 +126,6 @@ table 5970 "Filed Service Contract Header"
             Caption = 'Bill-to Post Code';
             Editable = false;
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(21; "Bill-to City"; Text[30])
@@ -125,14 +133,12 @@ table 5970 "Filed Service Contract Header"
             Caption = 'Bill-to City';
             Editable = false;
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(22; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Customer No."));
         }
         field(23; "Ship-to Name"; Text[100])
         {
@@ -154,8 +160,6 @@ table 5970 "Filed Service Contract Header"
             Caption = 'Ship-to Post Code';
             Editable = false;
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(27; "Ship-to City"; Text[30])
@@ -163,8 +167,6 @@ table 5970 "Filed Service Contract Header"
             Caption = 'Ship-to City';
             Editable = false;
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(28; "Serv. Contract Acc. Gr. Code"; Code[10])
@@ -201,7 +203,7 @@ table 5970 "Filed Service Contract Header"
         }
         field(39; "Max. Labor Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Max. Labor Unit Price';
         }
@@ -309,13 +311,13 @@ table 5970 "Filed Service Contract Header"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(68; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(69; "Accept Before"; Date)
         {
@@ -457,8 +459,6 @@ table 5970 "Filed Service Contract Header"
             Caption = 'Filed By';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(104; "Reason for Filing"; Option)
         {
@@ -473,7 +473,7 @@ table 5970 "Filed Service Contract Header"
         field(106; "Contract No. Relation"; Code[20])
         {
             Caption = 'Contract No. Relation';
-            TableRelation = "Service Contract Header"."Contract No." WHERE("Contract Type" = FIELD("Contract Type Relation"));
+            TableRelation = "Service Contract Header"."Contract No." where("Contract Type" = field("Contract Type Relation"));
         }
         field(480; "Dimension Set ID"; Integer)
         {

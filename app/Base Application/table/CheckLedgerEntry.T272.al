@@ -1,3 +1,19 @@
+﻿namespace Microsoft.BankMgt.Check;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.PositivePay;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.IO;
+using System.Security.AccessControl;
+
 table 272 "Check Ledger Entry"
 {
     Caption = 'Check Ledger Entry';
@@ -79,17 +95,17 @@ table 272 "Check Ledger Entry"
         field(16; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Bal. Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Fixed Asset")) "Fixed Asset"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Employee)) Employee;
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const(Customer)) Customer
+            else
+            if ("Bal. Account Type" = const(Vendor)) Vendor
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset"
+            else
+            if ("Bal. Account Type" = const(Employee)) Employee;
         }
         field(17; Open; Boolean)
         {
@@ -104,40 +120,20 @@ table 272 "Check Ledger Entry"
         field(19; "Statement No."; Code[20])
         {
             Caption = 'Statement No.';
-#if not CLEAN21
-            TableRelation = IF ("Statement Status" = FILTER("Bank Acc. Entry Applied" | "Check Entry Applied")) "Bank Rec. Header"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."))
-            ELSE
-            IF ("Statement Status" = CONST(Closed)) "Posted Bank Rec. Header"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."));
-#else
-            TableRelation = "Bank Acc. Reconciliation Line"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."));
+            TableRelation = "Bank Acc. Reconciliation Line"."Statement No." where("Bank Account No." = field("Bank Account No."));
             ValidateTableRelation = false;
-#endif
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(20; "Statement Line No."; Integer)
         {
             Caption = 'Statement Line No.';
-#if not CLEAN21
-            TableRelation = IF ("Statement Status" = FILTER("Bank Acc. Entry Applied" | "Check Entry Applied")) "Bank Rec. Line"."Line No." WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                                                                                               "Statement No." = FIELD("Statement No."))
-            ELSE
-            IF ("Statement Status" = CONST(Closed)) "Posted Bank Rec. Line"."Line No." WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                                                                                                                                                                                    "Statement No." = FIELD("Statement No."));
-#else
-            TableRelation = "Bank Acc. Reconciliation Line"."Statement Line No." WHERE("Bank Account No." = FIELD("Bank Account No."),
-                                                                                        "Statement No." = FIELD("Statement No."));
-#endif
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Bank Acc. Reconciliation Line"."Statement Line No." where("Bank Account No." = field("Bank Account No."),
+                                                                                        "Statement No." = field("Statement No."));
         }
         field(21; "User ID"; Code[50])
         {
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(22; "External Document No."; Code[35])
         {
@@ -339,24 +335,6 @@ table 272 "Check Ledger Entry"
         SetRange("Bank Account No.", BankAccNo);
         SetRange(Open, true);
     end;
-
-#if NOT CLEAN20
-    [Obsolete('Please use the ResetStatementFields(BankAccountNo, StatementNo, StatementType) instead, as we can have payment and bank reconciliations with the same bank account no and statement no and we might be resetting too many ledger entries with this function', '20.0')]
-    procedure ResetStatementFields(BankAccountNo: Code[20]; StatementNo: Code[20])
-    begin
-        Reset();
-        SetRange("Bank Account No.", BankAccountNo);
-        SetRange("Statement No.", StatementNo);
-        if FindSet() then
-            repeat
-                "Statement Line No." := 0;
-                "Statement No." := '';
-                "Statement Status" := "Statement Status"::Open;
-                Open := true;
-                Modify();
-            until Next() = 0;
-    end;
-#endif
 
     procedure ResetStatementFields(BankAccountNo: Code[20]; StatementNo: Code[20]; StatementType: Option)
     var

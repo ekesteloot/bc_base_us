@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.Foundation.Company;
+
 xmlport 1010 "SEPA DD pain.008.001.02"
 {
     Caption = 'SEPA DD pain.008.001.02';
@@ -214,7 +219,7 @@ xmlport 1010 "SEPA DD pain.008.001.02"
                     }
                     tableelement(paymentexportdata; "Payment Export Data")
                     {
-                        LinkFields = "Sender Bank BIC" = FIELD("Sender Bank BIC"), "SEPA Instruction Priority Text" = FIELD("SEPA Instruction Priority Text"), "Transfer Date" = FIELD("Transfer Date"), "SEPA Direct Debit Seq. Text" = FIELD("SEPA Direct Debit Seq. Text"), "SEPA Partner Type Text" = FIELD("SEPA Partner Type Text"), "SEPA Batch Booking" = FIELD("SEPA Batch Booking"), "SEPA Charge Bearer Text" = FIELD("SEPA Charge Bearer Text");
+                        LinkFields = "Sender Bank BIC" = field("Sender Bank BIC"), "SEPA Instruction Priority Text" = field("SEPA Instruction Priority Text"), "Transfer Date" = field("Transfer Date"), "SEPA Direct Debit Seq. Text" = field("SEPA Direct Debit Seq. Text"), "SEPA Partner Type Text" = field("SEPA Partner Type Text"), "SEPA Batch Booking" = field("SEPA Batch Booking"), "SEPA Charge Bearer Text" = field("SEPA Charge Bearer Text");
                         LinkTable = PaymentExportDataGroup;
                         XmlName = 'DrctDbtTxInf';
                         UseTemporary = true;

@@ -98,7 +98,7 @@ page 320 "VAT Statement Names"
 
     trigger OnInit()
     begin
-        SetRange("Statement Template Name");
+        Rec.SetRange("Statement Template Name");
     end;
 
     trigger OnOpenPage()
@@ -115,9 +115,9 @@ page 320 "VAT Statement Names"
         VATStmtTmpl: Record "VAT Statement Template";
     begin
         if not CurrPage.LookupMode then
-            if GetFilter("Statement Template Name") <> '' then
-                if GetRangeMin("Statement Template Name") = GetRangeMax("Statement Template Name") then
-                    if VATStmtTmpl.Get(GetRangeMin("Statement Template Name")) then
+            if Rec.GetFilter("Statement Template Name") <> '' then
+                if Rec.GetRangeMin("Statement Template Name") = Rec.GetRangeMax("Statement Template Name") then
+                    if VATStmtTmpl.Get(Rec.GetRangeMin("Statement Template Name")) then
                         exit(VATStmtTmpl.Name + ' ' + VATStmtTmpl.Description);
     end;
 }

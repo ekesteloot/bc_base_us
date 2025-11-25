@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
+using Microsoft.InventoryMgt.Setup;
+using System.Utilities;
+
 report 789 "Delete Phys. Inventory Ledger"
 {
     Caption = 'Delete Phys. Inventory Ledger';

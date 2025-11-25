@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 page 5120 "Sales Cycle Statistics"
 {
     Caption = 'Sales Cycle Statistics';

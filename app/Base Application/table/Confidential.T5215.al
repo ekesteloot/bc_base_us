@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 table 5215 Confidential
 {
     Caption = 'Confidential';

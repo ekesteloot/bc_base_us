@@ -1,4 +1,11 @@
-#if not CLEAN22
+﻿#if not CLEAN22
+namespace System.Security.AccessControl;
+
+using System.Apps;
+using System.Environment;
+using System.Telemetry;
+using System.Utilities;
+
 page 9045 "User Groups Migration Guide"
 {
     Caption = 'User Groups Migration Guide';
@@ -254,7 +261,6 @@ page 9045 "User Groups Migration Guide"
         TopBannerVisible: Boolean;
         ConfirmedRiskAcknowledgement: Boolean;
         Has3rdPartyExtensions: Boolean;
-        [InDataSet]
         GroupMigrationOption: Option Skip,Convert;
         ThirdPartyExtensionsWarningTxt: Label 'You may have some extensions in your system that still require the user groups functionality to be enabled.';
         AcknowledgingTheRiskTelemetryTxt: Label 'Acknowledging the risk of affecting 3rd party extensions during user group migration: %1', Locked = true;

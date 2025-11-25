@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Deferral;
+
 page 1700 "Deferral Template Card"
 {
     Caption = 'Deferral Template Card';

@@ -1,3 +1,8 @@
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+
 page 1382 "Customer Templ. Card"
 {
     Caption = 'Customer Template';
@@ -25,7 +30,7 @@ page 1382 "Customer Templ. Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of contact that will be used to create a customer with the template.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies which transactions with the customer that cannot be processed, for example, because the customer is insolvent.';
@@ -99,7 +104,7 @@ page 1382 "Customer Templ. Card"
                 group(AddressDetails)
                 {
                     Caption = 'Address';
-                    field(Address; Address)
+                    field(Address; Rec.Address)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the customer''s address. This address will appear on all sales documents for the customer.';
@@ -118,10 +123,10 @@ page 1382 "Customer Templ. Card"
 
                         trigger OnValidate()
                         begin
-                            IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                            IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                         end;
                     }
-                    field(City; City)
+                    field(City; Rec.City)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the customer''s city.';
@@ -130,7 +135,7 @@ page 1382 "Customer Templ. Card"
                     {
                         ShowCaption = false;
                         Visible = IsCountyVisible;
-                        field(County; County)
+                        field(County; Rec.County)
                         {
                             ApplicationArea = Basic, Suite;
                             ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -148,7 +153,7 @@ page 1382 "Customer Templ. Card"
                     ToolTip = 'Specifies the customer''s telephone number.';
                     Visible = false;
                 }
-                field(MobilePhoneNo; "Mobile Phone No.")
+                field(MobilePhoneNo; Rec."Mobile Phone No.")
                 {
                     Caption = 'Mobile Phone No.';
                     ApplicationArea = Basic, Suite;
@@ -216,7 +221,7 @@ page 1382 "Customer Templ. Card"
                     ToolTip = 'Specifies the Economic Operators Registration and Identification number that is used when you exchange information with the customs authorities due to trade into or out of the European Union.';
                     Visible = false;
                 }
-                field(GLN; GLN)
+                field(GLN; Rec.GLN)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the customer in connection with electronic document sending.';
@@ -442,7 +447,7 @@ page 1382 "Customer Templ. Card"
                     ToolTip = 'Specifies if several orders delivered to the customer can appear on the same sales invoice.';
                     Visible = false;
                 }
-                field(Reserve; Reserve)
+                field(Reserve; Rec.Reserve)
                 {
                     ApplicationArea = Reservation;
                     ToolTip = 'Specifies whether items will never, automatically (Always), or optionally be reserved for this customer.';
@@ -525,13 +530,13 @@ page 1382 "Customer Templ. Card"
                     CustomerTempl: Record "Customer Templ.";
                     CustomerTemplList: Page "Select Customer Templ. List";
                 begin
-                    TestField(Code);
-                    CustomerTempl.SetFilter(Code, '<>%1', Code);
+                    Rec.TestField(Code);
+                    CustomerTempl.SetFilter(Code, '<>%1', Rec.Code);
                     CustomerTemplList.LookupMode(true);
                     CustomerTemplList.SetTableView(CustomerTempl);
                     if CustomerTemplList.RunModal() = Action::LookupOK then begin
                         CustomerTemplList.GetRecord(CustomerTempl);
-                        CopyFromTemplate(CustomerTempl);
+                        Rec.CopyFromTemplate(CustomerTempl);
                     end;
                 end;
             }
@@ -554,7 +559,7 @@ page 1382 "Customer Templ. Card"
 
     trigger OnOpenPage()
     begin
-        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
     end;
 
     var

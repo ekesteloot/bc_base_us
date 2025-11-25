@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.HumanResources.Setup;
+
 table 5216 "Confidential Information"
 {
     Caption = 'Confidential Information';
@@ -34,10 +38,10 @@ table 5216 "Confidential Information"
         }
         field(5; Comment; Boolean)
         {
-            CalcFormula = Exist("HR Confidential Comment Line" WHERE("Table Name" = CONST("Confidential Information"),
-                                                                      "No." = FIELD("Employee No."),
-                                                                      "Code" = FIELD("Confidential Code"),
-                                                                      "Table Line No." = FIELD("Line No.")));
+            CalcFormula = exist("HR Confidential Comment Line" where("Table Name" = const("Confidential Information"),
+                                                                      "No." = field("Employee No."),
+                                                                      "Code" = field("Confidential Code"),
+                                                                      "Table Line No." = field("Line No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,10 @@
+namespace Microsoft.ProjectMgt.Resources.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.DataAdministration;
+using System.Utilities;
+
 report 1198 "Date Compress Resource Ledger"
 {
     Caption = 'Date Compress Resource Ledger';
@@ -11,7 +18,7 @@ report 1198 "Date Compress Resource Ledger"
     {
         dataitem("Res. Ledger Entry"; "Res. Ledger Entry")
         {
-            DataItemTableView = SORTING("Resource No.", "Posting Date");
+            DataItemTableView = sorting("Resource No.", "Posting Date");
             RequestFilterFields = "Entry Type", "Resource No.", "Resource Group No.";
 
             trigger OnAfterGetRecord()
@@ -316,7 +323,6 @@ report 1198 "Date Compress Resource Ledger"
         DimEntryNo: Integer;
         RetainDimText: Text[250];
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
 
         CompressEntriesQst: Label 'This batch job deletes entries. We recommend that you create a backup of the database before you run the batch job.\\Do you want to continue?';

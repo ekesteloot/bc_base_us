@@ -1,0 +1,55 @@
+namespace Microsoft.FinancialMgt.AllocationAccount;
+
+table 2670 "Allocation Account"
+{
+    DataClassification = CustomerContent;
+    DrillDownPageId = "Allocation Account";
+    LookupPageId = "Allocation Account List";
+
+    fields
+    {
+        field(1; "No."; Code[20])
+        {
+            Caption = 'No.';
+        }
+        field(2; Name; Text[100])
+        {
+            Caption = 'Name';
+        }
+        field(3; "Account Type"; Option)
+        {
+            Caption = 'Account type';
+            OptionMembers = Fixed,Variable;
+
+            trigger OnValidate()
+            begin
+                DeleteTheExistingSetupRecords();
+            end;
+        }
+    }
+    keys
+    {
+        key(Key1; "No.")
+        {
+            Clustered = true;
+        }
+    }
+
+    local procedure DeleteTheExistingSetupRecords()
+    var
+        AllocAccountDistribution: Record "Alloc. Account Distribution";
+    begin
+        AllocAccountDistribution.SetRange("Allocation Account No.", "No.");
+        if AllocAccountDistribution.IsEmpty() then
+            exit;
+
+        if GuiAllowed() then
+            if not Confirm(ConfirmDeleteQst) then
+                exit;
+
+        AllocAccountDistribution.DeleteAll();
+    end;
+
+    var
+        ConfirmDeleteQst: Label 'Changing the account type will delete the existing distributions. Are you sure you want to continue?';
+}

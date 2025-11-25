@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+
 codeunit 81 "Sales-Post (Yes/No)"
 {
     EventSubscriberInstance = Manual;
@@ -9,7 +15,7 @@ codeunit 81 "Sales-Post (Yes/No)"
     begin
         OnBeforeOnRun(Rec);
 
-        if not Find() then
+        if not Rec.Find() then
             Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
 
         SalesHeader.Copy(Rec);

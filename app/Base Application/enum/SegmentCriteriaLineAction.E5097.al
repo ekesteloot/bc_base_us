@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Segment;
+
 enum 5097 "Segment Criteria Line Action"
 {
     Extensible = true;

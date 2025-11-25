@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using System.Utilities;
+
 page 9117 "Service Doc. Check Factbox"
 {
     PageType = ListPart;

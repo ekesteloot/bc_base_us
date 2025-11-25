@@ -6,7 +6,7 @@ codeunit 10100 "Post Sales Tax Jnl"
     begin
         GenJnlLine.Copy(Rec);
         Code();
-        Copy(GenJnlLine);
+        Rec.Copy(GenJnlLine);
     end;
 
     var

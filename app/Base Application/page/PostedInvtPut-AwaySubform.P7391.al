@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.InventoryDocument;
+
+using Microsoft.WarehouseMgt.Structure;
+
 page 7391 "Posted Invt. Put-away Subform"
 {
     AutoSplitKey = true;
@@ -174,7 +182,7 @@ page 7391 "Posted Invt. Put-away Subform"
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", "Bin Code");
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", Rec."Bin Code");
     end;
 
     local procedure BinCodeOnAfterValidate()

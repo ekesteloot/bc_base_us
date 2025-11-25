@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 7161 "Analysis Dim. Selection-Level"
 {
     Caption = 'Analysis Dim. Selection-Level';
@@ -14,7 +18,7 @@ page 7161 "Analysis Dim. Selection-Level"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Level; Level)
+                field(Level; Rec.Level)
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the level for the selected dimension for analysis.';
@@ -24,19 +28,19 @@ page 7161 "Analysis Dim. Selection-Level"
                         xAnalysisDimSelBuf: Record "Analysis Dim. Selection Buffer";
                         HasError: Boolean;
                     begin
-                        if Level <> Level::" " then begin
+                        if Rec.Level <> Rec.Level::" " then begin
                             xAnalysisDimSelBuf.Copy(Rec);
-                            Reset();
-                            SetFilter(Code, '<>%1', xAnalysisDimSelBuf.Code);
-                            SetRange(Level, xAnalysisDimSelBuf.Level);
-                            HasError := not IsEmpty();
-                            Copy(xAnalysisDimSelBuf);
+                            Rec.Reset();
+                            Rec.SetFilter(Code, '<>%1', xAnalysisDimSelBuf.Code);
+                            Rec.SetRange(Level, xAnalysisDimSelBuf.Level);
+                            HasError := not Rec.IsEmpty();
+                            Rec.Copy(xAnalysisDimSelBuf);
                             if HasError then
-                                Error(Text000, FieldCaption(Level));
+                                Error(Text000, Rec.FieldCaption(Level));
                         end;
                     end;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -67,11 +71,11 @@ page 7161 "Analysis Dim. Selection-Level"
     procedure GetDimSelBuf(var AnalysisDimSelBuf: Record "Analysis Dim. Selection Buffer")
     begin
         AnalysisDimSelBuf.DeleteAll();
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
                 AnalysisDimSelBuf := Rec;
                 AnalysisDimSelBuf.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     procedure InsertDimSelBuf(NewSelected: Boolean; NewCode: Text[30]; NewDescription: Text[30]; NewDimValueFilter: Text[250]; NewLevel: Option)
@@ -82,15 +86,15 @@ page 7161 "Analysis Dim. Selection-Level"
             if Dim.Get(NewCode) then
                 NewDescription := Dim.GetMLName(GlobalLanguage);
 
-        Init();
-        Selected := NewSelected;
-        Code := NewCode;
-        Description := NewDescription;
+        Rec.Init();
+        Rec.Selected := NewSelected;
+        Rec.Code := NewCode;
+        Rec.Description := NewDescription;
         if NewSelected then begin
-            "Dimension Value Filter" := NewDimValueFilter;
-            Level := NewLevel;
+            Rec."Dimension Value Filter" := NewDimValueFilter;
+            Rec.Level := NewLevel;
         end;
-        Insert();
+        Rec.Insert();
     end;
 }
 

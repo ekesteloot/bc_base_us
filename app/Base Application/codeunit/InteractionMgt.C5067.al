@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Opportunity;
+
 codeunit 5067 "Interaction Mgt."
 {
 

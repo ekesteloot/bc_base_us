@@ -1,3 +1,11 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+
 codeunit 1006 "Copy Job"
 {
 
@@ -16,14 +24,6 @@ codeunit 1006 "Copy Job"
         JobTaskRangeTo: Code[20];
         JobTaskDateRangeFrom: Date;
         JobTaskDateRangeTo: Date;
-
-#if not CLEAN20
-    [Obsolete('Pending removal, use CopyJob with TargetJobSellToCustomer as a argument instead.', '20.0')]
-    procedure CopyJob(SourceJob: Record Job; TargetJobNo: Code[20]; TargetJobDescription: Text[100]; TargetJobBillToCustomer: Code[20])
-    begin
-        CopyJob(SourceJob, TargetJobNo, TargetJobDescription, '', TargetJobBillToCustomer);
-    end;
-#endif
 
     procedure CopyJob(
         SourceJob: Record Job;

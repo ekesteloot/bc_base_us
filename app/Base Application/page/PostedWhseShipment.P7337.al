@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.History;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+
 page 7337 "Posted Whse. Shipment"
 {
     Caption = 'Posted Whse. Shipment';
@@ -74,8 +80,8 @@ page 7337 "Posted Whse. Shipment"
             part(WhseShptLines; "Posted Whse. Shipment Subform")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "No." = FIELD("No.");
-                SubPageView = SORTING("No.", "Line No.");
+                SubPageLink = "No." = field("No.");
+                SubPageView = sorting("No.", "Line No.");
             }
             group(Shipping)
             {
@@ -147,7 +153,7 @@ page 7337 "Posted Whse. Shipment"
 
                     trigger OnAction()
                     begin
-                        LookupPostedWhseShptHeader(Rec);
+                        Rec.LookupPostedWhseShptHeader(Rec);
                     end;
                 }
                 action("Co&mments")
@@ -156,9 +162,9 @@ page 7337 "Posted Whse. Shipment"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Posted Whse. Shipment"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Posted Whse. Shipment"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -196,10 +202,10 @@ page 7337 "Posted Whse. Shipment"
     var
         WMSManagement: Codeunit "WMS Management";
     begin
-        ErrorIfUserIsNotWhseEmployee();
-        FilterGroup(2); // set group of filters user cannot change
-        SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
-        FilterGroup(0); // set filter group back to standard
+        Rec.ErrorIfUserIsNotWhseEmployee();
+        Rec.FilterGroup(2); // set group of filters user cannot change
+        Rec.SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
+        Rec.FilterGroup(0); // set filter group back to standard
     end;
 
     var

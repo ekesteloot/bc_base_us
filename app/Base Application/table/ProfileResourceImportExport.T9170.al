@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 table 9170 "Profile Resource Import/Export"
 {
     Caption = 'Profile Resource Import/Export';

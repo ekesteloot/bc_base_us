@@ -88,8 +88,8 @@ report 10323 "Sales Tax Detail List"
             }
             dataitem("Tax Detail"; "Tax Detail")
             {
-                DataItemLink = "Tax Jurisdiction Code" = FIELD(Code);
-                DataItemTableView = SORTING("Tax Jurisdiction Code", "Tax Group Code", "Tax Type", "Effective Date");
+                DataItemLink = "Tax Jurisdiction Code" = field(Code);
+                DataItemTableView = sorting("Tax Jurisdiction Code", "Tax Group Code", "Tax Type", "Effective Date");
                 RequestFilterFields = "Tax Group Code", "Tax Type", "Effective Date";
                 column(Tax_Detail__Tax_Group_Code_; "Tax Group Code")
                 {

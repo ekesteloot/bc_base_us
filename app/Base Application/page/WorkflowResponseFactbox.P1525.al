@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1525 "Workflow Response FactBox"
 {
     Caption = 'Workflow Response';
@@ -32,21 +34,21 @@ page 1525 "Workflow Response FactBox"
     var
         CurrFilterGroup: Integer;
     begin
-        CurrFilterGroup := FilterGroup(0);
-        SetRange("Parent Event Step ID");
-        SetRange("Workflow Code");
-        FilterGroup(4);
-        if (ParentEventStepID <> GetRangeMax("Parent Event Step ID")) or (WorkflowCode <> GetRangeMax("Workflow Code")) then begin
-            ParentEventStepID := GetRangeMax("Parent Event Step ID");
-            WorkflowCode := GetRangeMax("Workflow Code");
-            ClearBuffer();
+        CurrFilterGroup := Rec.FilterGroup(0);
+        Rec.SetRange("Parent Event Step ID");
+        Rec.SetRange("Workflow Code");
+        Rec.FilterGroup(4);
+        if (ParentEventStepID <> Rec.GetRangeMax("Parent Event Step ID")) or (WorkflowCode <> Rec.GetRangeMax("Workflow Code")) then begin
+            ParentEventStepID := Rec.GetRangeMax("Parent Event Step ID");
+            WorkflowCode := Rec.GetRangeMax("Workflow Code");
+            Rec.ClearBuffer();
         end;
-        FilterGroup(CurrFilterGroup);
+        Rec.FilterGroup(CurrFilterGroup);
 
-        if IsEmpty() then
-            PopulateTableFromEvent(WorkflowCode, ParentEventStepID);
+        if Rec.IsEmpty() then
+            Rec.PopulateTableFromEvent(WorkflowCode, ParentEventStepID);
 
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     var
@@ -58,8 +60,8 @@ page 1525 "Workflow Response FactBox"
         if (ParentEventStepID = 0) or (WorkflowCode = '') then
             exit;
 
-        ClearBuffer();
-        PopulateTableFromEvent(WorkflowCode, ParentEventStepID);
+        Rec.ClearBuffer();
+        Rec.PopulateTableFromEvent(WorkflowCode, ParentEventStepID);
         CurrPage.Update(false);
     end;
 }

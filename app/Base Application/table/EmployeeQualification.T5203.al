@@ -1,3 +1,8 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.HumanResources.Comment;
+using Microsoft.HumanResources.Setup;
+
 table 5203 "Employee Qualification"
 {
     Caption = 'Employee Qualification';
@@ -66,9 +71,9 @@ table 5203 "Employee Qualification"
         }
         field(12; Comment; Boolean)
         {
-            CalcFormula = Exist("Human Resource Comment Line" WHERE("Table Name" = CONST("Employee Qualification"),
-                                                                     "No." = FIELD("Employee No."),
-                                                                     "Table Line No." = FIELD("Line No.")));
+            CalcFormula = exist("Human Resource Comment Line" where("Table Name" = const("Employee Qualification"),
+                                                                     "No." = field("Employee No."),
+                                                                     "Table Line No." = field("Line No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;

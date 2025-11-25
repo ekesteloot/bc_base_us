@@ -1,3 +1,11 @@
+﻿namespace Microsoft.WarehouseMgt.Journal;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+
 codeunit 7301 "Whse. Jnl.-Register Line"
 {
     Permissions = TableData "Warehouse Entry" = rimd,

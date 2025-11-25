@@ -1,3 +1,11 @@
+﻿namespace System.IO;
+
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Document;
+using System.Utilities;
+
 codeunit 1218 "Map Incoming Doc to Purch Doc"
 {
     Permissions = TableData "Data Exch. Field" = d;
@@ -8,7 +16,7 @@ codeunit 1218 "Map Incoming Doc to Purch Doc"
         ErrorMessage: Record "Error Message";
         IncomingDocument: Record "Incoming Document";
     begin
-        IncomingDocument.Get("Incoming Entry No.");
+        IncomingDocument.Get(Rec."Incoming Entry No.");
 
         ErrorMessage.SetContext(IncomingDocument);
         if ErrorMessage.HasErrors(false) then

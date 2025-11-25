@@ -1,10 +1,14 @@
+namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 677 "IC Mapping Dim Values Outgoing"
 {
     PageType = ListPart;
     SourceTable = "Dimension Value";
     Editable = true;
-    DeleteAllowed = false;
-    InsertAllowed = false;
+    DeleteAllowed = true;
+    InsertAllowed = true;
 
     layout
     {
@@ -17,8 +21,6 @@ page 677 "IC Mapping Dim Values Outgoing"
                     Caption = 'Dim. Code.';
                     ToolTip = 'Specifies the dimension''s value code.';
                     ApplicationArea = All;
-                    Editable = false;
-                    Enabled = false;
                     Style = Strong;
                     StyleExpr = Emphasize;
                 }
@@ -27,8 +29,6 @@ page 677 "IC Mapping Dim Values Outgoing"
                     Caption = 'Dim. Name';
                     ToolTip = 'Specifies the dimension''s value name.';
                     ApplicationArea = All;
-                    Editable = false;
-                    Enabled = false;
                     Style = Strong;
                     StyleExpr = Emphasize;
                 }
@@ -37,8 +37,6 @@ page 677 "IC Mapping Dim Values Outgoing"
                     Caption = 'Blocked';
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
                     ApplicationArea = All;
-                    Editable = false;
-                    Enabled = false;
                 }
                 field(ICDimCode; Rec."Map-to IC Dimension Code")
                 {
@@ -55,8 +53,6 @@ page 677 "IC Mapping Dim Values Outgoing"
                     ToolTip = 'Specifies the intercompany''s dimension value code associated with the dimension''s value of the current company.';
                     ApplicationArea = All;
                     TableRelation = "IC Dimension Value".Code;
-                    Editable = true;
-                    Enabled = true;
                 }
             }
         }

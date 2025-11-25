@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using System.Telemetry;
+using System.Utilities;
+
 page 8614 "Config. Package Card"
 {
     Caption = 'Config. Package Card';
@@ -11,7 +16,7 @@ page 8614 "Config. Package Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ShowMandatory = true;
@@ -59,8 +64,8 @@ page 8614 "Config. Package Card"
             part(Control10; "Config. Package Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Package Code" = FIELD(Code);
-                SubPageView = SORTING("Package Code", "Table ID");
+                SubPageLink = "Package Code" = field(Code);
+                SubPageView = sorting("Package Code", "Table ID");
             }
         }
     }
@@ -86,7 +91,7 @@ page 8614 "Config. Package Card"
                         GetPackageTables: Report "Get Package Tables";
                     begin
                         CurrPage.SaveRecord();
-                        GetPackageTables.Set(Code);
+                        GetPackageTables.Set(Rec.Code);
                         GetPackageTables.RunModal();
                         Clear(GetPackageTables);
                     end;
@@ -101,7 +106,7 @@ page 8614 "Config. Package Card"
 
                     trigger OnAction()
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
                         ConfigXMLExchange.ExportPackage(Rec);
                     end;
                 }
@@ -131,10 +136,10 @@ page 8614 "Config. Package Card"
                         ConfigExcelExchange: Codeunit "Config. Excel Exchange";
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
 
-                        ConfigPackageTable.SetRange("Package Code", Code);
-                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text004, Code, ConfigPackageTable.Count), true) then
+                        ConfigPackageTable.SetRange("Package Code", Rec.Code);
+                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text004, Rec.Code, ConfigPackageTable.Count), true) then
                             ConfigExcelExchange.ExportExcelFromTables(ConfigPackageTable);
                     end;
                 }
@@ -149,7 +154,7 @@ page 8614 "Config. Package Card"
                     var
                         ConfigExcelExchange: Codeunit "Config. Excel Exchange";
                     begin
-                        ConfigExcelExchange.ImportExcelFromSelectedPackage(Code);
+                        ConfigExcelExchange.ImportExcelFromSelectedPackage(Rec.Code);
                     end;
                 }
                 action(ShowError)
@@ -162,7 +167,7 @@ page 8614 "Config. Package Card"
 
                     trigger OnAction()
                     begin
-                        ShowErrors();
+                        Rec.ShowErrors();
                     end;
                 }
             }
@@ -183,9 +188,9 @@ page 8614 "Config. Package Card"
                         ConfigPackageMgt: Codeunit "Config. Package Management";
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        TestField(Code);
-                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text003, Code), true) then begin
-                            ConfigPackageTable.SetRange("Package Code", Code);
+                        Rec.TestField(Code);
+                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(ApplyDataConfirmMsg, Rec.Code), true) then begin
+                            ConfigPackageTable.SetRange("Package Code", Rec.Code);
                             ConfigPackageMgt.ApplyPackage(Rec, ConfigPackageTable, true);
                         end;
                     end;
@@ -201,7 +206,7 @@ page 8614 "Config. Package Card"
                     var
                         CopyPackage: Report "Copy Package";
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
                         CopyPackage.Set(Rec);
                         CopyPackage.RunModal();
                         Clear(CopyPackage);
@@ -221,8 +226,8 @@ page 8614 "Config. Package Card"
                         ConfigPackageMgt: Codeunit "Config. Package Management";
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text002, "Package Name"), true) then begin
-                            ConfigPackageTable.SetRange("Package Code", Code);
+                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text002, Rec."Package Name"), true) then begin
+                            ConfigPackageTable.SetRange("Package Code", Rec.Code);
                             ConfigPackageMgt.ValidatePackageRelations(ConfigPackageTable, TempConfigPackageTable, true);
                         end;
                     end;
@@ -240,11 +245,11 @@ page 8614 "Config. Package Card"
                         ConfigPackageTable: Record "Config. Package Table";
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
 
                         ConfigXMLExchange.SetAdvanced(true);
-                        ConfigPackageTable.SetRange("Package Code", Code);
-                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text004, Code, ConfigPackageTable.Count), true) then
+                        ConfigPackageTable.SetRange("Package Code", Rec.Code);
+                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text004, Rec.Code, ConfigPackageTable.Count), true) then
                             ConfigXMLExchange.ExportPackageXML(ConfigPackageTable, '');
                     end;
                 }
@@ -325,20 +330,22 @@ page 8614 "Config. Package Card"
     trigger OnOpenPage()
     var
         FeatureTelemetry: Codeunit "Feature Telemetry";
+        DimensionsNotifications: Codeunit "Dimensions Notifications";
     begin
         FeatureTelemetry.LogUptake('0000E3C', 'Configuration packages', Enum::"Feature Uptake Status"::Discovered);
+        DimensionsNotifications.SendConfigPackageNotificationIfEligible(Rec.Code);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("No. of Errors");
-        IsErrorTabVisible := "No. of Errors" > 0;
+        Rec.CalcFields("No. of Errors");
+        IsErrorTabVisible := Rec."No. of Errors" > 0;
     end;
 
     var
         ConfigXMLExchange: Codeunit "Config. XML Exchange";
         Text002: Label 'Validate package %1?';
-        Text003: Label 'Apply data from package %1?';
+        ApplyDataConfirmMsg: Label 'Apply data from package %1?';
         Text004: Label 'Export package %1 with %2 tables?';
         IsErrorTabVisible: Boolean;
 
@@ -346,7 +353,7 @@ page 8614 "Config. Package Card"
     var
         ConfigPackageTable: Record "Config. Package Table";
     begin
-        ConfigPackageTable.SetRange("Package Code", Code);
+        ConfigPackageTable.SetRange("Package Code", Rec.Code);
         ConfigPackageTable.SetRange("Processing Report ID", 0);
         if not ConfigPackageTable.IsEmpty() then
             REPORT.RunModal(REPORT::"Config. Package - Process", false, false, ConfigPackageTable);
@@ -356,7 +363,7 @@ page 8614 "Config. Package Card"
     var
         ConfigPackageTable: Record "Config. Package Table";
     begin
-        ConfigPackageTable.SetRange("Package Code", Code);
+        ConfigPackageTable.SetRange("Package Code", Rec.Code);
         ConfigPackageTable.SetFilter("Processing Report ID", '<>0', 0);
         if ConfigPackageTable.FindSet() then
             repeat

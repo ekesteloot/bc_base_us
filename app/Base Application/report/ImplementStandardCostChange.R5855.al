@@ -1,3 +1,21 @@
+namespace Microsoft.Manufacturing.StandardCost;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.PriceList;
+#if not CLEAN21
+using Microsoft.ProjectMgt.Resources.Pricing;
+#endif
+using Microsoft.ProjectMgt.Resources.Resource;
+
 report 5855 "Implement Standard Cost Change"
 {
     Caption = 'Implement Standard Cost Change';
@@ -7,7 +25,7 @@ report 5855 "Implement Standard Cost Change"
     {
         dataitem("Standard Cost Worksheet"; "Standard Cost Worksheet")
         {
-            DataItemTableView = SORTING("Standard Cost Worksheet Name", Type, "No.");
+            DataItemTableView = sorting("Standard Cost Worksheet Name", Type, "No.");
             RequestFilterFields = Type, "No.";
 
             trigger OnAfterGetRecord()
@@ -86,7 +104,7 @@ report 5855 "Implement Standard Cost Change"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Item Journal Template ';
                         NotBlank = true;
-                        TableRelation = "Item Journal Template" WHERE(Type = CONST(Revaluation));
+                        TableRelation = "Item Journal Template" where(Type = const(Revaluation));
                         ToolTip = 'Specifies the name of the revaluation journal template.';
                     }
                     field(ItemJournalBatchName; RevalItemJnlBatch.Name)
@@ -408,23 +426,23 @@ report 5855 "Implement Standard Cost Change"
             exit;
 #endif
         PriceListLine.Reset();
-        PriceListLine.SetRange("Price Type", "Price Type"::Purchase);
-        PriceListLine.SetRange("Source Type", "Price Source Type"::"All Jobs");
-        PriceListLine.SetRange("Asset Type", "Price Asset Type"::Resource);
+        PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Purchase);
+        PriceListLine.SetRange("Source Type", PriceListLine."Source Type"::"All Jobs");
+        PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Resource);
         PriceListLine.SetRange("Asset No.", Resource."No.");
         PriceListLine.SetRange("Work Type Code", '');
         PriceListLine.SetRange("Starting Date", 0D);
         PriceListLine.SetRange("Ending Date", 0D);
         PriceListLine.SetRange("Minimum Quantity", 0);
-        PriceListLine.SetRange(Status, "Price Status"::Draft, "Price Status"::Active);
+        PriceListLine.SetRange(Status, PriceListLine.Status::Draft, PriceListLine.Status::Active);
         if PriceListLine.FindFirst() then begin
-            if PriceListLine.Status = "Price Status"::Active then begin
-                PriceListLine.Status := "Price Status"::Draft;
+            if PriceListLine.Status = PriceListLine.Status::Active then begin
+                PriceListLine.Status := PriceListLine.Status::Draft;
                 PriceListLine.Modify();
             end;
             PriceListLine.Validate("Direct Unit Cost", Resource."Direct Unit Cost");
             PriceListLine.Validate("Unit Cost", StandardCostWorksheet."New Standard Cost");
-            PriceListLine.Status := "Price Status"::Active;
+            PriceListLine.Status := PriceListLine.Status::Active;
             PriceListLine.Modify(true);
         end;
     end;

@@ -1,3 +1,16 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.FixedAssets.Reports;
+using Microsoft.Foundation.Comment;
+using System.Telemetry;
+using System.Text;
+
 page 5601 "Fixed Asset List"
 {
     AdditionalSearchTerms = 'fa list';
@@ -69,7 +82,7 @@ page 5601 "Fixed Asset List"
                     ApplicationArea = Advanced;
                     ToolTip = 'Specifies a search description for the fixed asset.';
                 }
-                field(Acquired; Acquired)
+                field(Acquired; Rec.Acquired)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies that the fixed asset has been acquired.';
@@ -82,7 +95,7 @@ page 5601 "Fixed Asset List"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Fixed Asset"), "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::"Fixed Asset"), "No." = field("No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -110,7 +123,7 @@ page 5601 "Fixed Asset List"
                     Caption = 'Depreciation &Books';
                     Image = DepreciationBooks;
                     RunObject = Page "FA Depreciation Books";
-                    RunPageLink = "FA No." = FIELD("No.");
+                    RunPageLink = "FA No." = field("No.");
                     ToolTip = 'View or edit the depreciation book or books that must be used for each of the fixed assets. Here you also specify the way depreciation must be calculated.';
                 }
                 action(Statistics)
@@ -119,7 +132,7 @@ page 5601 "Fixed Asset List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Fixed Asset Statistics";
-                    RunPageLink = "FA No." = FIELD("No.");
+                    RunPageLink = "FA No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View detailed historical information about the fixed asset.';
                 }
@@ -133,8 +146,8 @@ page 5601 "Fixed Asset List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(5600),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(5600),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -152,7 +165,7 @@ page 5601 "Fixed Asset List"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(FA);
-                            DefaultDimMultiple.SetMultiRecord(FA, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(FA, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -163,8 +176,8 @@ page 5601 "Fixed Asset List"
                     Caption = 'Main&tenance Ledger Entries';
                     Image = MaintenanceLedgerEntries;
                     RunObject = Page "Maintenance Ledger Entries";
-                    RunPageLink = "FA No." = FIELD("No.");
-                    RunPageView = SORTING("FA No.");
+                    RunPageLink = "FA No." = field("No.");
+                    RunPageView = sorting("FA No.");
                     ToolTip = 'View all the maintenance ledger entries for a fixed asset. ';
                 }
                 action(Picture)
@@ -173,7 +186,7 @@ page 5601 "Fixed Asset List"
                     Caption = 'Picture';
                     Image = Picture;
                     RunObject = Page "Fixed Asset Picture";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'Add or view a picture of the fixed asset.';
                 }
                 action("FA Posting Types Overview")
@@ -190,8 +203,8 @@ page 5601 "Fixed Asset List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Fixed Asset"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Fixed Asset"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -205,7 +218,7 @@ page 5601 "Fixed Asset List"
                     Caption = 'M&ain Asset Components';
                     Image = Components;
                     RunObject = Page "Main Asset Components";
-                    RunPageLink = "Main Asset No." = FIELD("No.");
+                    RunPageLink = "Main Asset No." = field("No.");
                     ToolTip = 'View or edit fixed asset components of the main fixed asset that is represented by the fixed asset card.';
                 }
                 action("Ma&in Asset Statistics")
@@ -214,7 +227,7 @@ page 5601 "Fixed Asset List"
                     Caption = 'Ma&in Asset Statistics';
                     Image = StatisticsDocument;
                     RunObject = Page "Main Asset Statistics";
-                    RunPageLink = "FA No." = FIELD("No.");
+                    RunPageLink = "FA No." = field("No.");
                     ToolTip = 'View detailed historical information about all the components that make up the main asset.';
                 }
                 separator(Action45)
@@ -232,9 +245,9 @@ page 5601 "Fixed Asset List"
                     Caption = 'Ledger E&ntries';
                     Image = FixedAssetLedger;
                     RunObject = Page "FA Ledger Entries";
-                    RunPageLink = "FA No." = FIELD("No.");
-                    RunPageView = SORTING("FA No.")
-                                  ORDER(Descending);
+                    RunPageLink = "FA No." = field("No.");
+                    RunPageView = sorting("FA No.")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -244,9 +257,9 @@ page 5601 "Fixed Asset List"
                     Caption = 'Error Ledger Entries';
                     Image = ErrorFALedgerEntries;
                     RunObject = Page "FA Error Ledger Entries";
-                    RunPageLink = "Canceled from FA No." = FIELD("No.");
-                    RunPageView = SORTING("Canceled from FA No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Canceled from FA No." = field("No.");
+                    RunPageView = sorting("Canceled from FA No.")
+                                  order(Descending);
                     ToolTip = 'View the entries that have been posted as a result of you using the Cancel function to cancel an entry.';
                 }
                 action("Maintenance &Registration")
@@ -255,7 +268,7 @@ page 5601 "Fixed Asset List"
                     Caption = 'Maintenance &Registration';
                     Image = MaintenanceRegistrations;
                     RunObject = Page "Maintenance Registration";
-                    RunPageLink = "FA No." = FIELD("No.");
+                    RunPageLink = "FA No." = field("No.");
                     ToolTip = 'View or edit maintenance codes for the various types of maintenance, repairs, and services performed on your fixed assets. You can then enter the code in the Maintenance Code field on journals.';
                 }
             }
@@ -319,7 +332,7 @@ page 5601 "Fixed Asset List"
                 var
                     CopyFA: Report "Copy Fixed Asset";
                 begin
-                    CopyFA.SetFANo("No.");
+                    CopyFA.SetFANo(Rec."No.");
                     CopyFA.RunModal();
                 end;
             }

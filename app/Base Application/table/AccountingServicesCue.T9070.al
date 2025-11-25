@@ -10,15 +10,15 @@ table 9070 "Accounting Services Cue"
         }
         field(2; "Requests to Approve"; Integer)
         {
-            CalcFormula = Count ("Approval Entry" WHERE(Status = CONST(Open),
-                                                        "Approver ID" = CONST('USERID')));
+            CalcFormula = Count ("Approval Entry" where(Status = const(Open),
+                                                        "Approver ID" = const('USERID')));
             Caption = 'Requests to Approve';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Ongoing Sales Invoices"; Integer)
         {
-            CalcFormula = Count ("Sales Header" WHERE("Document Type" = FILTER(Invoice)));
+            CalcFormula = Count ("Sales Header" where("Document Type" = filter(Invoice)));
             Caption = 'Ongoing Sales Invoices';
             FieldClass = FlowField;
         }

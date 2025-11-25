@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Purchases.Document;
+using Microsoft.WarehouseMgt.Activity;
+
 codeunit 99000841 "Item Ledger Entry-Reserve"
 {
     Permissions = TableData "Reservation Entry" = rimd;
@@ -6,91 +14,91 @@ codeunit 99000841 "Item Ledger Entry-Reserve"
     begin
     end;
 
-    procedure FilterReservFor(var FilterReservEntry: Record "Reservation Entry"; ItemLedgEntry: Record "Item Ledger Entry")
+    procedure FilterReservFor(var FilterReservationEntry: Record "Reservation Entry"; ItemLedgerEntry: Record "Item Ledger Entry")
     begin
-        FilterReservFor(FilterReservEntry, ItemLedgEntry."Entry No.", false);
+        FilterReservFor(FilterReservationEntry, ItemLedgerEntry."Entry No.", false);
     end;
 
-    procedure FilterReservFor(var FilterReservEntry: Record "Reservation Entry"; ItemLedgerEntryNo: Integer; SourceKey: Boolean)
+    procedure FilterReservFor(var FilterReservationEntry: Record "Reservation Entry"; ItemLedgerEntryNo: Integer; SourceKey: Boolean)
     begin
-        FilterReservEntry.SetSourceFilter(DATABASE::"Item Ledger Entry", 0, '', ItemLedgerEntryNo, SourceKey);
-        FilterReservEntry.SetSourceFilter('', 0);
+        FilterReservationEntry.SetSourceFilter(Enum::TableID::"Item Ledger Entry".AsInteger(), 0, '', ItemLedgerEntryNo, SourceKey);
+        FilterReservationEntry.SetSourceFilter('', 0);
     end;
 
-    procedure Caption(ItemLedgEntry: Record "Item Ledger Entry") CaptionText: Text
+    procedure Caption(ItemLedgerEntry: Record "Item Ledger Entry") CaptionText: Text
     begin
-        CaptionText := ItemLedgEntry.GetSourceCaption();
+        CaptionText := ItemLedgerEntry.GetSourceCaption();
     end;
 
-    local procedure DrillDownTotalQuantity(SourceRecRef: RecordRef; EntrySummary: Record "Entry Summary"; ReservEntry: Record "Reservation Entry"; Location: Record Location; MaxQtyToReserve: Decimal)
+    local procedure DrillDownTotalQuantity(SourceRecordRef: RecordRef; EntrySummary: Record "Entry Summary"; ReservationEntry: Record "Reservation Entry"; Location: Record Location; MaxQtyToReserve: Decimal)
     var
-        PurchLine: Record "Purchase Line";
+        PurchaseLine: Record "Purchase Line";
         CreatePick: Codeunit "Create Pick";
         AvailableItemLedgEntries: Page "Available - Item Ledg. Entries";
     begin
         Clear(AvailableItemLedgEntries);
-        case ReservEntry."Source Type" of
-            DATABASE::"Sales Line",
-            DATABASE::"Prod. Order Component",
-            DATABASE::"Transfer Line":
+        case ReservationEntry."Source Type" of
+            Enum::TableID::"Sales Line".AsInteger(),
+            Enum::TableID::"Prod. Order Component".AsInteger(),
+            Enum::TableID::"Transfer Line".AsInteger():
                 begin
-                    AvailableItemLedgEntries.SetSource(SourceRecRef, ReservEntry, ReservEntry.GetTransferDirection());
+                    AvailableItemLedgEntries.SetSource(SourceRecordRef, ReservationEntry, ReservationEntry.GetTransferDirection());
                     if Location."Bin Mandatory" or Location."Require Pick" then
                         AvailableItemLedgEntries.SetTotalAvailQty(
                             EntrySummary."Total Available Quantity" +
                             CreatePick.CheckOutBound(
-                            ReservEntry."Source Type", ReservEntry."Source Subtype",
-                            ReservEntry."Source ID", ReservEntry."Source Ref. No.",
-                            ReservEntry."Source Prod. Order Line"))
+                            ReservationEntry."Source Type", ReservationEntry."Source Subtype",
+                            ReservationEntry."Source ID", ReservationEntry."Source Ref. No.",
+                            ReservationEntry."Source Prod. Order Line"))
                     else
                         AvailableItemLedgEntries.SetTotalAvailQty(EntrySummary."Total Available Quantity");
                     AvailableItemLedgEntries.SetMaxQtyToReserve(MaxQtyToReserve);
                     AvailableItemLedgEntries.RunModal();
                 end;
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 begin
-                    AvailableItemLedgEntries.SetSource(SourceRecRef, ReservEntry, ReservEntry.GetTransferDirection());
-                    SourceRecRef.SetTable(PurchLine);
+                    AvailableItemLedgEntries.SetSource(SourceRecordRef, ReservationEntry, ReservationEntry.GetTransferDirection());
+                    SourceRecordRef.SetTable(PurchaseLine);
                     if Location."Bin Mandatory" or Location."Require Pick" and
-                        (PurchLine."Document Type" = PurchLine."Document Type"::"Return Order")
+                        (PurchaseLine."Document Type" = PurchaseLine."Document Type"::"Return Order")
                     then
                         AvailableItemLedgEntries.SetTotalAvailQty(
                             EntrySummary."Total Available Quantity" +
                             CreatePick.CheckOutBound(
-                            ReservEntry."Source Type", ReservEntry."Source Subtype",
-                            ReservEntry."Source ID", ReservEntry."Source Ref. No.",
-                            ReservEntry."Source Prod. Order Line"))
+                            ReservationEntry."Source Type", ReservationEntry."Source Subtype",
+                            ReservationEntry."Source ID", ReservationEntry."Source Ref. No.",
+                            ReservationEntry."Source Prod. Order Line"))
                     else
                         AvailableItemLedgEntries.SetTotalAvailQty(EntrySummary."Total Available Quantity");
                     AvailableItemLedgEntries.RunModal();
                 end;
-            DATABASE::"Requisition Line",
-            DATABASE::"Planning Component",
-            DATABASE::"Prod. Order Line":
+            Enum::TableID::"Requisition Line".AsInteger(),
+            Enum::TableID::"Planning Component".AsInteger(),
+            Enum::TableID::"Prod. Order Line".AsInteger():
                 begin
-                    AvailableItemLedgEntries.SetSource(SourceRecRef, ReservEntry, ReservEntry.GetTransferDirection());
+                    AvailableItemLedgEntries.SetSource(SourceRecordRef, ReservationEntry, ReservationEntry.GetTransferDirection());
                     AvailableItemLedgEntries.SetTotalAvailQty(EntrySummary."Total Available Quantity");
                     AvailableItemLedgEntries.SetMaxQtyToReserve(MaxQtyToReserve);
                     AvailableItemLedgEntries.RunModal();
                 end;
-            DATABASE::"Service Line",
-            DATABASE::"Job Planning Line",
-            DATABASE::"Assembly Header",
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Service Line".AsInteger(),
+            Enum::TableID::"Job Planning Line".AsInteger(),
+            Enum::TableID::"Assembly Header".AsInteger(),
+            Enum::TableID::"Assembly Line".AsInteger():
                 begin
-                    AvailableItemLedgEntries.SetSource(SourceRecRef, ReservEntry, ReservEntry.GetTransferDirection());
+                    AvailableItemLedgEntries.SetSource(SourceRecordRef, ReservationEntry, ReservationEntry.GetTransferDirection());
                     AvailableItemLedgEntries.SetTotalAvailQty(EntrySummary."Total Available Quantity");
                     AvailableItemLedgEntries.SetMaxQtyToReserve(MaxQtyToReserve);
                     AvailableItemLedgEntries.RunModal();
                 end;
             else
-                OnDrillDownTotalQuantityElseCase(SourceRecRef, EntrySummary, ReservEntry, Location, MaxQtyToReserve);
+                OnDrillDownTotalQuantityElseCase(SourceRecordRef, EntrySummary, ReservationEntry, Location, MaxQtyToReserve);
         end;
     end;
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = 32); // DATABASE::"Item Ledger Entry"
+        exit(TableID = Enum::TableID::"Item Ledger Entry".AsInteger());
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnFilterReservEntry', '', false, false)]
@@ -155,18 +163,34 @@ codeunit 99000841 "Item Ledger Entry-Reserve"
         end;
     end;
 
-    local procedure GetSourceValue(ReservEntry: Record "Reservation Entry"; var SourceRecRef: RecordRef; ReturnOption: Option "Net Qty. (Base)","Gross Qty. (Base)"): Decimal
+    local procedure GetSourceValue(ReservationEntry: Record "Reservation Entry"; var SourceRecordRef: RecordRef; ReturnOption: Option "Net Qty. (Base)","Gross Qty. (Base)"): Decimal
     var
-        ItemLedgEntry: Record "Item Ledger Entry";
+        ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        ItemLedgEntry.Get(ReservEntry."Source Ref. No.");
-        SourceRecRef.GetTable(ItemLedgEntry);
+        ItemLedgerEntry.Get(ReservationEntry."Source Ref. No.");
+        SourceRecordRef.GetTable(ItemLedgerEntry);
         case ReturnOption of
             ReturnOption::"Net Qty. (Base)":
-                exit(ItemLedgEntry."Remaining Quantity");
+                exit(ItemLedgerEntry."Remaining Quantity");
             ReturnOption::"Gross Qty. (Base)":
-                exit(ItemLedgEntry.Quantity);
+                exit(ItemLedgerEntry.Quantity);
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Reservation Entries", 'OnLookupReserved', '', false, false)]
+    local procedure OnLookupReserved(var ReservationEntry: Record "Reservation Entry")
+    begin
+        if MatchThisTable(ReservationEntry."Source Type") then
+            ShowSourceLines(ReservationEntry);
+    end;
+
+    local procedure ShowSourceLines(var ReservationEntry: Record "Reservation Entry")
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.Reset();
+        ItemLedgerEntry.SetRange("Entry No.", ReservationEntry."Source Ref. No.");
+        PAGE.RunModal(Page::"Item Ledger Entries", ItemLedgerEntry);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reservation Management", 'OnGetSourceRecordValue', '', false, false)]

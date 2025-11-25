@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Setup;
+
 table 1280 "Bank Clearing Standard"
 {
     Caption = 'Bank Clearing Standard';

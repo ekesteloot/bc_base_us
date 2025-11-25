@@ -5,7 +5,7 @@ page 130416 "Get Semi-Manual Test Codeunits"
     InsertAllowed = false;
     ModifyAllowed = false;
     SourceTable = AllObjWithCaption;
-    SourceTableView = WHERE("Object Type" = CONST(Codeunit));
+    SourceTableView = where("Object Type" = const(Codeunit));
 
     layout
     {

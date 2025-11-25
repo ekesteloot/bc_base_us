@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 page 9094 "Vendor Statistics FactBox"
 {
     Caption = 'Vendor Statistics';
@@ -29,10 +34,10 @@ page 9094 "Vendor Statistics FactBox"
                     VendLedgEntry: Record "Vendor Ledger Entry";
                     DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
                 begin
-                    DtldVendLedgEntry.SetRange("Vendor No.", "No.");
-                    CopyFilter("Global Dimension 1 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 1");
-                    CopyFilter("Global Dimension 2 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 2");
-                    CopyFilter("Currency Filter", DtldVendLedgEntry."Currency Code");
+                    DtldVendLedgEntry.SetRange("Vendor No.", Rec."No.");
+                    Rec.CopyFilter("Global Dimension 1 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 1");
+                    Rec.CopyFilter("Global Dimension 2 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 2");
+                    Rec.CopyFilter("Currency Filter", DtldVendLedgEntry."Currency Code");
                     VendLedgEntry.DrillDownOnEntries(DtldVendLedgEntry);
                 end;
             }
@@ -92,10 +97,10 @@ page 9094 "Vendor Statistics FactBox"
                     VendLedgEntry: Record "Vendor Ledger Entry";
                     DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
                 begin
-                    DtldVendLedgEntry.SetFilter("Vendor No.", "No.");
-                    CopyFilter("Global Dimension 1 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 1");
-                    CopyFilter("Global Dimension 2 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 2");
-                    CopyFilter("Currency Filter", DtldVendLedgEntry."Currency Code");
+                    DtldVendLedgEntry.SetFilter("Vendor No.", Rec."No.");
+                    Rec.CopyFilter("Global Dimension 1 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 1");
+                    Rec.CopyFilter("Global Dimension 2 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 2");
+                    Rec.CopyFilter("Currency Filter", DtldVendLedgEntry."Currency Code");
                     VendLedgEntry.DrillDownOnOverdueEntries(DtldVendLedgEntry);
                 end;
             }
@@ -168,7 +173,7 @@ page 9094 "Vendor Statistics FactBox"
 
     trigger OnOpenPage()
     begin
-        SetAutoCalcFields("Balance (LCY)", "Outstanding Orders (LCY)", "Amt. Rcd. Not Invoiced (LCY)", "Outstanding Invoices (LCY)");
+        Rec.SetAutoCalcFields("Balance (LCY)", "Outstanding Orders (LCY)", "Amt. Rcd. Not Invoiced (LCY)", "Outstanding Invoices (LCY)");
     end;
 
     trigger OnAfterGetRecord()
@@ -176,14 +181,14 @@ page 9094 "Vendor Statistics FactBox"
         VendorNo: Code[20];
         VendorNoFilter: Text;
     begin
-        TotalAmountLCY := "Balance (LCY)" + "Outstanding Orders (LCY)" + "Amt. Rcd. Not Invoiced (LCY)" + "Outstanding Invoices (LCY)";
+        TotalAmountLCY := Rec."Balance (LCY)" + Rec."Outstanding Orders (LCY)" + Rec."Amt. Rcd. Not Invoiced (LCY)" + Rec."Outstanding Invoices (LCY)";
 
         // Get the vendor number and set the current vendor number
-        FilterGroup(4);
-        VendorNoFilter := GetFilter("No.");
+        Rec.FilterGroup(4);
+        VendorNoFilter := Rec.GetFilter("No.");
         if (VendorNoFilter = '') then begin
-            FilterGroup(0);
-            VendorNoFilter := GetFilter("No.");
+            Rec.FilterGroup(0);
+            VendorNoFilter := Rec.GetFilter("No.");
         end;
 
         VendorNo := CopyStr(VendorNoFilter, 1, MaxStrLen(VendorNo));
@@ -197,7 +202,7 @@ page 9094 "Vendor Statistics FactBox"
     begin
         TotalAmountLCY := 0;
 
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     var
@@ -277,7 +282,7 @@ page 9094 "Vendor Statistics FactBox"
     local procedure SetFilterLastPaymentDateEntry(var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
         VendorLedgerEntry.SetCurrentKey("Document Type", "Vendor No.", "Posting Date", "Currency Code");
-        VendorLedgerEntry.SetRange("Vendor No.", "No.");
+        VendorLedgerEntry.SetRange("Vendor No.", Rec."No.");
         VendorLedgerEntry.SetRange("Document Type", VendorLedgerEntry."Document Type"::Payment);
         VendorLedgerEntry.SetRange(Reversed, false);
     end;
@@ -285,7 +290,7 @@ page 9094 "Vendor Statistics FactBox"
     local procedure SetFilterRefundEntry(var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
         VendorLedgerEntry.SetCurrentKey("Document Type", "Vendor No.", "Posting Date", "Currency Code");
-        VendorLedgerEntry.SetRange("Vendor No.", "No.");
+        VendorLedgerEntry.SetRange("Vendor No.", Rec."No.");
         VendorLedgerEntry.SetRange("Document Type", VendorLedgerEntry."Document Type"::Refund);
         VendorLedgerEntry.SetRange(Reversed, false);
     end;

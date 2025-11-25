@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.Currency;
+
 page 9401 "VAT Amount Lines"
 {
     Caption = 'VAT Amount Lines';
@@ -56,7 +60,7 @@ page 9401 "VAT Amount Lines"
 
                     trigger OnValidate()
                     begin
-                        CalcVATFields(CurrencyCode, PricesIncludingVAT, VATBaseDiscPct);
+                        Rec.CalcVATFields(CurrencyCode, PricesIncludingVAT, VATBaseDiscPct);
                         ModifyRec();
                     end;
                 }
@@ -78,12 +82,12 @@ page 9401 "VAT Amount Lines"
                     trigger OnValidate()
                     begin
                         if AllowVATDifference and not AllowVATDifferenceOnThisTab then
-                            Error(Text000, FieldCaption("VAT Amount"));
+                            Error(Text000, Rec.FieldCaption("VAT Amount"));
 
                         if PricesIncludingVAT then
-                            "VAT Base" := "Amount Including VAT" - "VAT Amount"
+                            Rec."VAT Base" := Rec."Amount Including VAT" - Rec."VAT Amount"
                         else
-                            "Amount Including VAT" := "VAT Amount" + "VAT Base";
+                            Rec."Amount Including VAT" := Rec."VAT Amount" + Rec."VAT Base";
 
                         FormCheckVATDifference();
                         ModifyRec();
@@ -141,7 +145,7 @@ page 9401 "VAT Amount Lines"
                     trigger OnValidate()
                     begin
                         if AllowVATDifference and not AllowVATDifferenceOnThisTab then
-                            Error(Text000, FieldCaption("Non-Deductible VAT Amount"));
+                            Error(Text000, Rec.FieldCaption("Non-Deductible VAT Amount"));
                         NonDeductibleVAT.CheckNonDeductibleVATAmountDiff(Rec, xRec, AllowVATDifference, Currency);
                         ModifyRec();
                     end;
@@ -181,8 +185,8 @@ page 9401 "VAT Amount Lines"
 
     trigger OnAfterGetRecord()
     begin
-        VATAmountEditable := AllowVATDifference and not "Includes Prepayment";
-        InvoiceDiscountAmountEditable := AllowInvDisc and not "Includes Prepayment";
+        VATAmountEditable := AllowVATDifference and not Rec."Includes Prepayment";
+        InvoiceDiscountAmountEditable := AllowInvDisc and not Rec."Includes Prepayment";
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -229,11 +233,9 @@ page 9401 "VAT Amount Lines"
         PricesIncludingVAT: Boolean;
         AllowInvDisc: Boolean;
         VATBaseDiscPct: Decimal;
-        NonDeductibleVATVisible: Boolean;
-        [InDataSet]
         VATAmountEditable: Boolean;
-        [InDataSet]
         InvoiceDiscountAmountEditable: Boolean;
+        NonDeductibleVATVisible: Boolean;
 
         Text000: Label '%1 can only be modified on the Invoicing tab.';
         Text001: Label 'The total %1 for a document must not exceed the value %2 in the %3 field.';
@@ -279,9 +281,9 @@ page 9401 "VAT Amount Lines"
         VATAmountLine2: Record "VAT Amount Line";
         TotalVATDifference: Decimal;
     begin
-        CheckVATDifference(CurrencyCode, AllowVATDifference);
+        Rec.CheckVATDifference(CurrencyCode, AllowVATDifference);
         VATAmountLine2 := TempVATAmountLine;
-        TotalVATDifference := Abs("VAT Difference") - Abs(xRec."VAT Difference");
+        TotalVATDifference := Abs(Rec."VAT Difference") - Abs(xRec."VAT Difference");
         if TempVATAmountLine.Find('-') then
             repeat
                 TotalVATDifference := TotalVATDifference + Abs(TempVATAmountLine."VAT Difference");
@@ -289,7 +291,7 @@ page 9401 "VAT Amount Lines"
         TempVATAmountLine := VATAmountLine2;
         if TotalVATDifference > Currency."Max. VAT Difference Allowed" then
             Error(
-              Text001, FieldCaption("VAT Difference"),
+              Text001, Rec.FieldCaption("VAT Difference"),
               Currency."Max. VAT Difference Allowed", Currency.FieldCaption("Max. VAT Difference Allowed"));
     end;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.History;
+
 codeunit 1407 "Return Receipt Header - Edit"
 {
     Permissions = TableData "Return Receipt Header" = rm;
@@ -10,12 +12,12 @@ codeunit 1407 "Return Receipt Header - Edit"
         ReturnReceiptHeader := Rec;
         ReturnReceiptHeader.LockTable();
         ReturnReceiptHeader.Find();
-        ReturnReceiptHeader."Bill-to County" := "Bill-to County";
-        ReturnReceiptHeader."Bill-to Country/Region Code" := "Bill-to Country/Region Code";
-        ReturnReceiptHeader."Shipping Agent Code" := "Shipping Agent Code";
-        ReturnReceiptHeader."Package Tracking No." := "Package Tracking No.";
+        ReturnReceiptHeader."Bill-to County" := Rec."Bill-to County";
+        ReturnReceiptHeader."Bill-to Country/Region Code" := Rec."Bill-to Country/Region Code";
+        ReturnReceiptHeader."Shipping Agent Code" := Rec."Shipping Agent Code";
+        ReturnReceiptHeader."Package Tracking No." := Rec."Package Tracking No.";
         OnBeforeReturnReceiptHeaderModify(ReturnReceiptHeader, Rec);
-        ReturnReceiptHeader.TestField("No.", "No.");
+        ReturnReceiptHeader.TestField("No.", Rec."No.");
         ReturnReceiptHeader.Modify();
         Rec := ReturnReceiptHeader;
 

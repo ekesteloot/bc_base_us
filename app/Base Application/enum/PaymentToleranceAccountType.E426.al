@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
 enum 426 "Payment Tolerance Account Type"
 {
     Extensible = true;

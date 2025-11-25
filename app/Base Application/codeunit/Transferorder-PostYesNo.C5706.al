@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.InventoryMgt.Setup;
+
 codeunit 5706 "TransferOrder-Post (Yes/No)"
 {
     TableNo = "Transfer Header";

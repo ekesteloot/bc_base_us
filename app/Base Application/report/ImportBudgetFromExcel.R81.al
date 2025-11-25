@@ -1,3 +1,13 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.IO;
+using System.Utilities;
+
 report 81 "Import Budget from Excel"
 {
     Caption = 'Import Budget from Excel';
@@ -8,7 +18,7 @@ report 81 "Import Budget from Excel"
         dataitem(BudgetBuf; "Budget Buffer")
         {
             UseTemporary = true;
-            DataItemTableView = SORTING("G/L Account No.", "Dimension Value Code 1", "Dimension Value Code 2", "Dimension Value Code 3", "Dimension Value Code 4", "Dimension Value Code 5", "Dimension Value Code 6", "Dimension Value Code 7", "Dimension Value Code 8", Date);
+            DataItemTableView = sorting("G/L Account No.", "Dimension Value Code 1", "Dimension Value Code 2", "Dimension Value Code 3", "Dimension Value Code 4", "Dimension Value Code 5", "Dimension Value Code 6", "Dimension Value Code 7", "Dimension Value Code 8", Date);
 
             trigger OnAfterGetRecord()
             begin

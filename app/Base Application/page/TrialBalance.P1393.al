@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Environment;
+
 page 1393 "Trial Balance"
 {
     Caption = 'Trial Balance';

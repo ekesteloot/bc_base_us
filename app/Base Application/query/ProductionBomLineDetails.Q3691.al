@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+
 Query 3691 "Production BOM & Line Details"
 {
     QueryType = Normal;

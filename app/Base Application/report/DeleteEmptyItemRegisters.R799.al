@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.Manufacturing.Capacity;
+using System.Utilities;
+
 report 799 "Delete Empty Item Registers"
 {
     Caption = 'Delete Empty Item Registers';
@@ -8,7 +14,7 @@ report 799 "Delete Empty Item Registers"
     {
         dataitem("Item Register"; "Item Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "Creation Date";
 
             trigger OnAfterGetRecord()

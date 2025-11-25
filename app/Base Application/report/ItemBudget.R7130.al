@@ -1,14 +1,20 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Item;
+using System.Utilities;
+
 report 7130 "Item Budget"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemBudget.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemBudget.rdlc';
     Caption = 'Item Budget';
 
     dataset
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -92,7 +98,7 @@ report 7130 "Item Budget"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(No_Item; Item."No.")
                 {
                     IncludeCaption = true;
@@ -194,7 +200,7 @@ report 7130 "Item Budget"
                         ApplicationArea = ItemBudget;
                         Caption = 'Show Value As';
                         OptionCaption = 'Sales Amount,Cost Amount,Quantity';
-                        ToolTip = 'Specifies if you want to view values in the budget by sales amount, cost amount, or quantity.';
+                        ToolTip = 'Specifies if the item budget shows sales amounts, cost amounts, or quantities.';
                     }
                     field(StartingDate; PeriodStartDate[1])
                     {

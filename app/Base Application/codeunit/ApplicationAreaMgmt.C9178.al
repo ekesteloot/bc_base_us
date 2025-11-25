@@ -1,3 +1,11 @@
+﻿namespace System.Environment.Configuration;
+
+using System.Azure.Identity;
+using System.Environment;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.User;
+
 codeunit 9178 "Application Area Mgmt."
 {
     var
@@ -31,7 +39,6 @@ codeunit 9178 "Application Area Mgmt."
         exit(ApplicationAreaSetup.Get(CompanyName));
     end;
 
-    [Scope('OnPrem')]
     procedure GetApplicationAreas() ApplicationAreas: Text
     var
         ApplicationAreaCache: Codeunit "Application Area Cache";
@@ -908,9 +915,6 @@ codeunit 9178 "Application Area Mgmt."
         TempApplicationAreaSetup."Inventory Analysis" := true;
         TempApplicationAreaSetup."Item Tracking" := true;
         TempApplicationAreaSetup.Warehouse := true;
-#if not CLEAN20
-        TempApplicationAreaSetup.XBRL := true;
-#endif
         TempApplicationAreaSetup."Order Promising" := true;
         TempApplicationAreaSetup.Reservation := true;
         TempApplicationAreaSetup.Dimensions := true;

@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 enum 299 "Reminder Comment Line Type"
 {
     Extensible = true;

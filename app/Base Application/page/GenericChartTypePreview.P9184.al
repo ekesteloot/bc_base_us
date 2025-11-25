@@ -1,3 +1,7 @@
+namespace System.Visualization;
+
+using System;
+
 page 9184 "Generic Chart Type Preview"
 {
     Caption = 'Generic Chart Type Preview';

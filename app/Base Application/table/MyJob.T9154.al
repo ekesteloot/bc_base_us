@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using System.Security.AccessControl;
+
 table 9154 "My Job"
 {
     Caption = 'My Job';
@@ -9,8 +13,6 @@ table 9154 "My Job"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(2; "Job No."; Code[20])

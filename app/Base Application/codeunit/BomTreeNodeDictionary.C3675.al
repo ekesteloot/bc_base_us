@@ -2,6 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
+namespace Microsoft.InventoryMgt.BOM.Tree;
 
 /// <summary>
 /// This exposes a collection of the BOM Tree Node objects that are hashed against the key for those instances.
@@ -11,12 +12,13 @@ codeunit 3675 "BOM Tree Node Dictionary"
     var
         InstanceDictionaryImpl: Codeunit "BOM Tree Node Dictionary Impl.";
 
+#pragma warning disable AS0022
     /// <summary>
     /// Adds an instance to the dictionary. The key is fetched from the GetKey() procedure of the Instance implementation.
     /// <param name="Instance">The instance to add.</param>
     /// <remarks>In case there is another instance with a key same as the one being added, an error shall be raised.</remarks>
     /// </summary>
-    procedure Add(Instance: Codeunit "BOM Tree Node")
+    internal procedure Add(Instance: Codeunit "BOM Tree Node")
     begin
         InstanceDictionaryImpl.Add(Instance);
     end;
@@ -26,7 +28,7 @@ codeunit 3675 "BOM Tree Node Dictionary"
     /// Adds an instance to the dictionary by calling the Add() procedure in a TryFunction.
     /// <param name="Instance">The instance to add.</param>
     /// </summary>
-    procedure TryAdd(Instance: Codeunit "BOM Tree Node")
+    internal procedure TryAdd(Instance: Codeunit "BOM Tree Node")
     begin
         InstanceDictionaryImpl.Add(Instance);
     end;
@@ -36,7 +38,7 @@ codeunit 3675 "BOM Tree Node Dictionary"
     /// <param name="InstanceKey">The key given.</param>
     /// <param name="Found">The instance that was fetched.</param>
     /// </summary>
-    procedure Get(InstanceKey: Text; var Found: Codeunit "BOM Tree Node")
+    internal procedure Get(InstanceKey: Text; var Found: Codeunit "BOM Tree Node")
     begin
         InstanceDictionaryImpl.Get(InstanceKey, Found);
     end;
@@ -47,10 +49,11 @@ codeunit 3675 "BOM Tree Node Dictionary"
     /// <param name="InstanceKey">The key given.</param>
     /// <param name="Found">The instance that was fetched.</param>
     /// </summary>
-    procedure TryGet(UniqueKey: Text; var Found: Codeunit "BOM Tree Node")
+    internal procedure TryGet(UniqueKey: Text; var Found: Codeunit "BOM Tree Node")
     begin
         InstanceDictionaryImpl.Get(UniqueKey, Found);
     end;
+#pragma warning restore AS0022
 
     /// <summary>
     /// Removes the instance from the dictionary that correponds to the given key.
@@ -78,14 +81,16 @@ codeunit 3675 "BOM Tree Node Dictionary"
         exit(InstanceDictionaryImpl.MoveNext());
     end;
 
+#pragma warning disable AS0022
     /// <summary>
     /// Gets the element in the dictionary at the current position of the enumerator.
     /// <param name="Instance">The instance pointed at.</param>
     /// </summary>
-    procedure GetCurrent(var Instance: Codeunit "BOM Tree Node")
+    internal procedure GetCurrent(var Instance: Codeunit "BOM Tree Node")
     begin
         InstanceDictionaryImpl.GetCurrent(Instance);
     end;
+#pragma warning restore AS0022    
 
     /// <summary>
     /// Gets the number of items in the dictionary.

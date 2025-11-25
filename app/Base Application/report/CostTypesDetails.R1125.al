@@ -1,7 +1,14 @@
+namespace Microsoft.CostAccounting.Reports;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Utilities;
+
 report 1125 "Cost Types Details"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/CostAccounting/CostTypesDetails.rdlc';
+    RDLCLayout = './CostAccounting/Reports/CostTypesDetails.rdlc';
     ApplicationArea = CostAccounting;
     Caption = 'Cost Types Details';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +18,7 @@ report 1125 "Cost Types Details"
         dataitem("Cost Type"; "Cost Type")
         {
             CalcFields = "Debit Amount", "Credit Amount";
-            DataItemTableView = WHERE(Type = CONST("Cost Type"));
+            DataItemTableView = where(Type = const("Cost Type"));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Combine Entries", "Date Filter", "Cost Center Filter", "Cost Object Filter";
             column(DtFltrCostTypeDateFilter; Text000 + ' ' + CostTypeDateFilter)
@@ -88,7 +95,7 @@ report 1125 "Cost Types Details"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(Name_CostType; "Cost Type".Name)
                 {
                 }
@@ -100,9 +107,9 @@ report 1125 "Cost Types Details"
                 }
                 dataitem("Cost Entry"; "Cost Entry")
                 {
-                    DataItemLink = "Cost Type No." = FIELD("No."), "Posting Date" = FIELD("Date Filter"), "Cost Center Code" = FIELD("Cost Center Filter"), "Cost Object Code" = FIELD("Cost Object Filter");
+                    DataItemLink = "Cost Type No." = field("No."), "Posting Date" = field("Date Filter"), "Cost Center Code" = field("Cost Center Filter"), "Cost Object Code" = field("Cost Object Filter");
                     DataItemLinkReference = "Cost Type";
-                    DataItemTableView = SORTING("Cost Type No.", "Posting Date");
+                    DataItemTableView = sorting("Cost Type No.", "Posting Date");
                     column(DebitAmount_CostEntry; "Debit Amount")
                     {
                     }
@@ -174,7 +181,7 @@ report 1125 "Cost Types Details"
                 }
                 dataitem(AccTotal; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(TotalCostTypeName; Text002 + "Cost Type".Name)
                     {
                     }
@@ -321,7 +328,6 @@ report 1125 "Cost Types Details"
         CostTypeAddCurrBalance: Decimal;
         CumulatedAddCurrDebit: Decimal;
         CumulatedAddCurrCredit: Decimal;
-        [InDataSet]
         ShowAddCurr: Boolean;
 
         Text000: Label 'Date filter:';

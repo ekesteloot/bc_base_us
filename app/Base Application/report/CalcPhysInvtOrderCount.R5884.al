@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
 report 5884 "Calc. Phys. Invt. Order Count"
 {
     Caption = 'Calc. Phys. Invt. Order Count';
@@ -18,17 +20,35 @@ report 5884 "Calc. Phys. Invt. Order Count"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(CalcQtyExpected; CalcQtyExpected)
+                    field(CalcQtyExpected; CalcQtyExpectedReq)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Calculate Qty. Expected';
                         ToolTip = 'Specifies if you want the program to calculate and insert the contents of the field quantity expected for new created physical inventory order lines.';
                     }
-                    field(ZeroQty; ZeroQty)
+                    field(ZeroQty; ZeroQtyReq)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Items Not on Inventory';
-                        ToolTip = 'Specifies if journal lines should be created for items that are not on inventory, that is, items where the value in the Qty. (Calculated) field is 0.';
+                        ToolTip = 'Specifies if physical inventory order lines should be created for items that are not on inventory, that is, items where the value in the Qty. Expected (Base) field is 0.';
+
+                        trigger OnValidate()
+                        begin
+                            if not ZeroQtyReq then
+                                IncludeItemWithNoTransaction := false;
+                        end;
+                    }
+                    field(IncludeItemWithNoTransactionField; IncludeItemWithNoTransaction)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Include Items without Transactions';
+                        ToolTip = 'Specifies if physical inventory order lines should be created for items that are not on inventory and are not used in any transactions.';
+
+                        trigger OnValidate()
+                        begin
+                            if IncludeItemWithNoTransaction then
+                                ZeroQtyReq := true;
+                        end;
                     }
                 }
             }
@@ -48,15 +68,24 @@ report 5884 "Calc. Phys. Invt. Order Count"
         OKPressed := true;
     end;
 
-    var
-        ZeroQty: Boolean;
-        CalcQtyExpected: Boolean;
+    protected var
+        ZeroQtyReq: Boolean;
+        CalcQtyExpectedReq: Boolean;
+        IncludeItemWithNoTransaction: Boolean;
         OKPressed: Boolean;
 
     procedure GetRequest(var ZeroQty2: Boolean; var CalcQtyExpected2: Boolean): Boolean
+    var
+        DummyIncludeItemWithNoTransaction: Boolean;
     begin
-        ZeroQty2 := ZeroQty;
-        CalcQtyExpected2 := CalcQtyExpected;
+        exit(GetRequest(ZeroQty2, CalcQtyExpected2, DummyIncludeItemWithNoTransaction));
+    end;
+
+    procedure GetRequest(var ZeroQty2: Boolean; var CalcQtyExpected2: Boolean; var IncludeItemWithNoTransaction2: Boolean): Boolean
+    begin
+        ZeroQty2 := ZeroQtyReq;
+        CalcQtyExpected2 := CalcQtyExpectedReq;
+        IncludeItemWithNoTransaction2 := IncludeItemWithNoTransaction;
         exit(OKPressed);
     end;
 }

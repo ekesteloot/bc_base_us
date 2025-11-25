@@ -1,3 +1,10 @@
+namespace Microsoft.WarehouseMgt.Setup;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.ADCS;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 7301 "Warehouse Employee"
 {
     Caption = 'Warehouse Employee';
@@ -11,8 +18,6 @@ table 7301 "Warehouse Employee"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()

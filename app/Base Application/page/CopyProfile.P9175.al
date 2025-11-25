@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using System.Reflection;
+
 page 9175 "Copy Profile"
 {
     Caption = 'Copy Profile';

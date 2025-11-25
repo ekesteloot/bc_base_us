@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1529 "Workflow Overview"
 {
     Caption = 'Workflow Overview';
@@ -73,12 +75,12 @@ page 1529 "Workflow Overview"
         WorkflowStepArgument: Record "Workflow Step Argument";
         WorkflowResponseHandling: Codeunit "Workflow Response Handling";
     begin
-        case Type of
-            Type::"Event":
-                if WorkflowEvent.Get("Function Name") then
+        case Rec.Type of
+            Rec.Type::"Event":
+                if WorkflowEvent.Get(Rec."Function Name") then
                     exit(WorkflowEvent.Description);
-            Type::Response:
-                if WorkflowStepArgument.Get(Argument) then
+            Rec.Type::Response:
+                if WorkflowStepArgument.Get(Rec.Argument) then
                     exit(WorkflowResponseHandling.GetDescription(WorkflowStepArgument));
         end;
         exit('');
@@ -86,10 +88,10 @@ page 1529 "Workflow Overview"
 
     local procedure GetStyle(): Text
     begin
-        case Status of
-            Status::Completed:
+        case Rec.Status of
+            Rec.Status::Completed:
                 exit('Favorable');
-            Status::Active:
+            Rec.Status::Active:
                 exit('');
             else
                 exit('Subordinate');
@@ -98,14 +100,14 @@ page 1529 "Workflow Overview"
 
     local procedure UpdatePageControls()
     begin
-        if Type = Type::"Event" then
+        if Rec.Type = Rec.Type::"Event" then
             Indent := 0
         else
             Indent := 2;
 
-        Description := CopyStr(GetDescription(), 1, MaxStrLen(Description));
+        Rec.Description := CopyStr(GetDescription(), 1, MaxStrLen(Rec.Description));
         StyleTxt := GetStyle();
-        WorkflowRecord := Format("Record ID", 0, 1);
+        WorkflowRecord := Format(Rec."Record ID", 0, 1);
     end;
 }
 

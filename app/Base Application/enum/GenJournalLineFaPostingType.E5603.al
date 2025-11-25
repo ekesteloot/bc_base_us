@@ -1,4 +1,6 @@
-﻿enum 5603 "Gen. Journal Line FA Posting Type"
+﻿namespace Microsoft.FixedAssets.Journal;
+
+enum 5603 "Gen. Journal Line FA Posting Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

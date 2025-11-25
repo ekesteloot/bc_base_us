@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Item;
+
 enum 5940 "Service Item Status"
 {
     Extensible = true;

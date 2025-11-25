@@ -1,10 +1,14 @@
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.InventoryMgt.Analysis;
+
 page 9376 "Analysis Report Sale"
 {
     ApplicationArea = SalesAnalysis;
     Caption = 'Sales Analysis Reports';
     PageType = List;
     SourceTable = "Analysis Report Name";
-    SourceTableView = WHERE("Analysis Area" = CONST(Sales));
+    SourceTableView = where("Analysis Area" = const(Sales));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -67,7 +71,7 @@ page 9376 "Analysis Report Sale"
                 var
                     SalesAnalysisReport: Page "Sales Analysis Report";
                 begin
-                    SalesAnalysisReport.SetReportName(Name);
+                    SalesAnalysisReport.SetReportName(Rec.Name);
                     SalesAnalysisReport.Run();
                 end;
             }

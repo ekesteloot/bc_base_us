@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Journal;
+
 page 753 "Standard Item Journals"
 {
     Caption = 'Standard Item Journals';
@@ -14,7 +16,7 @@ page 753 "Standard Item Journals"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the code of the record.';
@@ -61,8 +63,8 @@ page 753 "Standard Item Journals"
                     var
                         StdItemJnl: Record "Standard Item Journal";
                     begin
-                        StdItemJnl.SetRange("Journal Template Name", "Journal Template Name");
-                        StdItemJnl.SetRange(Code, Code);
+                        StdItemJnl.SetRange("Journal Template Name", Rec."Journal Template Name");
+                        StdItemJnl.SetRange(Code, Rec.Code);
 
                         PAGE.Run(PAGE::"Standard Item Journal", StdItemJnl);
                     end;

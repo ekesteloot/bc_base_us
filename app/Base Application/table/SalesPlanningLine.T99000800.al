@@ -8,13 +8,13 @@ table 99000800 "Sales Planning Line"
         field(1; "Sales Order No."; Code[20])
         {
             Caption = 'Sales Order No.';
-            TableRelation = "Sales Header"."No." WHERE("Document Type" = CONST(Order));
+            TableRelation = "Sales Header"."No." where("Document Type" = const(Order));
         }
         field(2; "Sales Order Line No."; Integer)
         {
             Caption = 'Sales Order Line No.';
-            TableRelation = "Sales Line"."Line No." WHERE("Document Type" = CONST(Order),
-                                                           "Document No." = FIELD("Sales Order No."));
+            TableRelation = "Sales Line"."Line No." where("Document Type" = const(Order),
+                                                           "Document No." = field("Sales Order No."));
         }
         field(3; "Item No."; Code[20])
         {
@@ -63,8 +63,8 @@ table 99000800 "Sales Planning Line"
         field(11; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."),
-                                                       Code = FIELD("Variant Code"));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."),
+                                                       Code = field("Variant Code"));
         }
         field(12; "Planned Quantity"; Decimal)
         {

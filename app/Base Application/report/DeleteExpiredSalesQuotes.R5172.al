@@ -7,7 +7,7 @@ report 5172 "Delete Expired Sales Quotes"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = WHERE("Document Type" = CONST(Quote));
+            DataItemTableView = where("Document Type" = const(Quote));
             RequestFilterFields = "No.", "Sell-to Customer No.";
 
             trigger OnPostDataItem()

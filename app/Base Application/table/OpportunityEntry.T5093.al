@@ -1,3 +1,14 @@
+﻿namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Task;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+
 table 5093 "Opportunity Entry"
 {
     Caption = 'Opportunity Entry';
@@ -46,7 +57,7 @@ table 5093 "Opportunity Entry"
         {
             Caption = 'Sales Cycle Stage';
             MinValue = 1;
-            TableRelation = "Sales Cycle Stage".Stage WHERE("Sales Cycle Code" = FIELD("Sales Cycle Code"));
+            TableRelation = "Sales Cycle Stage".Stage where("Sales Cycle Code" = field("Sales Cycle Code"));
 
             trigger OnValidate()
             begin
@@ -62,7 +73,7 @@ table 5093 "Opportunity Entry"
         field(6; "Contact Company No."; Code[20])
         {
             Caption = 'Contact Company No.';
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(7; "Salesperson Code"; Code[20])
         {
@@ -133,14 +144,14 @@ table 5093 "Opportunity Entry"
         field(19; "Close Opportunity Code"; Code[10])
         {
             Caption = 'Close Opportunity Code';
-            TableRelation = IF ("Action Taken" = CONST(Won)) "Close Opportunity Code" WHERE(Type = CONST(Won))
-            ELSE
-            IF ("Action Taken" = CONST(Lost)) "Close Opportunity Code" WHERE(Type = CONST(Lost));
+            TableRelation = if ("Action Taken" = const(Won)) "Close Opportunity Code" where(Type = const(Won))
+            else
+            if ("Action Taken" = const(Lost)) "Close Opportunity Code" where(Type = const(Lost));
         }
         field(20; "Previous Sales Cycle Stage"; Integer)
         {
             Caption = 'Previous Sales Cycle Stage';
-            TableRelation = "Sales Cycle Stage".Stage WHERE("Sales Cycle Code" = FIELD("Sales Cycle Code"));
+            TableRelation = "Sales Cycle Stage".Stage where("Sales Cycle Code" = field("Sales Cycle Code"));
         }
         field(21; "Estimated Close Date"; Date)
         {
@@ -287,7 +298,6 @@ table 5093 "Opportunity Entry"
         exit(FindRecordManagement.GetLastEntryIntFieldValue(Rec, FieldNo("Entry No.")))
     end;
 
-    [Scope('OnPrem')]
     procedure InsertEntry(var OppEntry: Record "Opportunity Entry"; CancelOldTask: Boolean; CreateNewTask: Boolean)
     var
         OppEntry2: Record "Opportunity Entry";
@@ -373,7 +383,6 @@ table 5093 "Opportunity Entry"
         Modify();
     end;
 
-    [Scope('OnPrem')]
     procedure CreateTask(CancelOldTask: Boolean; CreateNewTask: Boolean)
     var
         SalesCycleStage: Record "Sales Cycle Stage";

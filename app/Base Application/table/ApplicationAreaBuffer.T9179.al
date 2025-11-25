@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 table 9179 "Application Area Buffer"
 {
     Caption = 'Application Area Buffer';

@@ -1,3 +1,17 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Purchases.History;
+using System.Utilities;
+
 codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment"
 {
     Permissions = TableData Item = rm,

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Availability;
+
 table 925 "Item Availability Buffer"
 {
     DataClassification = SystemMetadata;

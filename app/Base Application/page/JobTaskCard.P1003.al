@@ -29,7 +29,7 @@ page 1003 "Job Task Card"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the purpose of the account. Newly created accounts are automatically assigned the Posting account type, but you can change this. Choose the field to select one of the following five options:';
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies an interval or a list of job task numbers.';
@@ -80,8 +80,8 @@ page 1003 "Job Task Card"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Job Task Dimensions";
-                    RunPageLink = "Job No." = FIELD("Job No."),
-                                  "Job Task No." = FIELD("Job Task No.");
+                    RunPageLink = "Job No." = field("Job No."),
+                                  "Job Task No." = field("Job Task No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }

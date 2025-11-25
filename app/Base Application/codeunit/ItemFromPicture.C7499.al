@@ -1,3 +1,11 @@
+﻿namespace Microsoft.InventoryMgt.Item.Picture;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Attribute;
+using System.AI;
+using System.Environment;
+using System.Environment.Configuration;
+
 codeunit 7499 "Item From Picture"
 {
     Access = Internal;
@@ -161,6 +169,7 @@ codeunit 7499 "Item From Picture"
 
     procedure AnalyzeImage(MediaId: Guid; var ItemFromPictureBuffer: Record "Item From Picture Buffer" temporary; ImageAnalysisTypes: List of [Enum "Image Analysis Type"]; var NotificationBuffer: List of [Notification])
     var
+        TempAzureAIUsage: Record "Azure AI Usage" temporary;
         ImageAnalysisSetup: Record "Image Analysis Setup";
         ImageAnalysisManagement: Codeunit "Image Analysis Management";
         ImageAnalysisResult: Codeunit "Image Analysis Result";
@@ -194,8 +203,10 @@ codeunit 7499 "Item From Picture"
             ItemFromPictureBuffer.Validate(ItemTemplateCode, BestItemTemplateCode);
 
         ImageAnalysisManagement.GetLimitParams(LimitType, LimitValue);
-        if ImageAnalysisSetup.IsUsageLimitReached(LastError, LimitValue, LimitType) then
-            NotificationBuffer.Add(CreateErrorNotification(LimitReachedMsg));
+        if ImageAnalysisSetup.IsUsageLimitReached(LastError, LimitValue, LimitType) then begin
+            TempAzureAIUsage."Limit Period" := LimitType; // Get the right caption
+            NotificationBuffer.Add(CreateErrorNotification(StrSubstNo(LimitReachedMsg, LimitValue, TempAzureAIUsage."Limit Period")));
+        end;
 
         ItemFromPictureBuffer.SetResult(ImageAnalysisResult.GetResultVerbatim());
 

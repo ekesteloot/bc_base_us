@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Contact;
+
 page 5063 "Mailing Groups"
 {
     ApplicationArea = RelationshipMgmt;
@@ -13,7 +17,7 @@ page 5063 "Mailing Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the mailing group.';
@@ -60,7 +64,7 @@ page 5063 "Mailing Groups"
                     Caption = 'C&ontacts';
                     Image = CustomerContact;
                     RunObject = Page "Mailing Group Contacts";
-                    RunPageLink = "Mailing Group Code" = FIELD(Code);
+                    RunPageLink = "Mailing Group Code" = field(Code);
                     ToolTip = 'View a list of the contact companies you have assigned the mailing group to.';
                 }
             }

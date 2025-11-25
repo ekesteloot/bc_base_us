@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 page 9151 "My Vendors"
 {
     Caption = 'My Vendors';
@@ -64,9 +66,9 @@ page 9151 "My Vendors"
                 Caption = 'Open';
                 Image = ViewDetails;
                 RunObject = Page "Vendor Card";
-                RunPageLink = "No." = FIELD("Vendor No.");
+                RunPageLink = "No." = field("Vendor No.");
                 RunPageMode = View;
-                RunPageView = SORTING("No.");
+                RunPageView = sorting("No.");
                 ShortCutKey = 'Return';
                 ToolTip = 'Open the card for the selected record.';
             }
@@ -85,7 +87,7 @@ page 9151 "My Vendors"
 
     trigger OnOpenPage()
     begin
-        SetRange("User ID", UserId);
+        Rec.SetRange("User ID", UserId);
     end;
 
     var
@@ -97,12 +99,12 @@ page 9151 "My Vendors"
     begin
         Clear(Vendor);
 
-        if Vendor.Get("Vendor No.") then
-            if (Name <> Vendor.Name) or ("Phone No." <> Vendor."Phone No.") then begin
-                Name := Vendor.Name;
-                "Phone No." := Vendor."Phone No.";
-                if MyVendor.Get("User ID", "Vendor No.") then
-                    Modify();
+        if Vendor.Get(Rec."Vendor No.") then
+            if (Rec.Name <> Vendor.Name) or (Rec."Phone No." <> Vendor."Phone No.") then begin
+                Rec.Name := Vendor.Name;
+                Rec."Phone No." := Vendor."Phone No.";
+                if MyVendor.Get(Rec."User ID", Rec."Vendor No.") then
+                    Rec.Modify();
             end;
     end;
 }

@@ -33,9 +33,6 @@ permissionset 9221 "Customer - Edit"
                   tabledata "Customer Posting Group" = R,
                   tabledata "Customer Price Group" = R,
                   tabledata "Customer Templ." = rm,
-#if not CLEAN20
-                  tabledata "Customer Template" = r,
-#endif
                   tabledata "Default Dimension" = RIMD,
                   tabledata "Detailed Cust. Ledg. Entry" = Rim,
                   tabledata "Dtld. Price Calculation Setup" = Rid,
@@ -67,9 +64,6 @@ permissionset 9221 "Customer - Edit"
                   tabledata Location = R,
                   tabledata "Maintenance Ledger Entry" = rm,
                   tabledata "My Customer" = RIMD,
-#if not CLEAN20
-                  tabledata "Native - Payment" = r,
-#endif
                   tabledata Opportunity = R,
                   tabledata "Payment Method" = R,
                   tabledata "Payment Terms" = R,

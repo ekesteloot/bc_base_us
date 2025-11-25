@@ -1,3 +1,16 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Tracking;
+using System.Security.AccessControl;
+
 table 337 "Reservation Entry"
 {
     Caption = 'Reservation Entry';
@@ -99,16 +112,12 @@ table 337 "Reservation Entry"
             Caption = 'Created By';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(27; "Changed By"; Code[50])
         {
             Caption = 'Changed By';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(28; Positive; Boolean)
         {
@@ -134,8 +143,8 @@ table 337 "Reservation Entry"
         }
         field(31; "Action Message Adjustment"; Decimal)
         {
-            CalcFormula = Sum("Action Message Entry".Quantity WHERE("Reservation Entry" = FIELD("Entry No."),
-                                                                     Calculation = CONST(Sum)));
+            CalcFormula = sum("Action Message Entry".Quantity where("Reservation Entry" = field("Entry No."),
+                                                                     Calculation = const(Sum)));
             Caption = 'Action Message Adjustment';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -204,7 +213,7 @@ table 337 "Reservation Entry"
         field(5401; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(5811; "Appl.-from Item Entry"; Integer)
         {
@@ -250,17 +259,21 @@ table 337 "Reservation Entry"
         }
         key(Key2; "Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Reservation Status", "Shipment Date", "Expected Receipt Date")
         {
-            IncludedFields = "Quantity (Base)", "Qty. to Handle (Base)";
+#pragma warning disable AS0038
+            IncludedFields = "Quantity (Base)", "Qty. to Handle (Base)", "Serial No.", "Lot No.", "Package No.", "Item No.", Quantity;
+#pragma warning restore AS0038
         }
         key(Key3; "Item No.", "Variant Code", "Location Code")
         {
+            IncludedFields = "Item Tracking";
         }
         key(Key4; "Item No.", "Variant Code", "Location Code", "Reservation Status", "Shipment Date", "Expected Receipt Date", "Serial No.", "Lot No.", "Package No.")
         {
+            IncludedFields = "Source Type", "Source Subtype", "Quantity (Base)";
         }
         key(Key9; "Source Type", "Source Subtype", "Source ID", "Source Batch Name", "Source Prod. Order Line", "Source Ref. No.")
         {
-            IncludedFields = "Qty. to Handle (Base)", "Item Tracking";
+            IncludedFields = "Qty. to Handle (Base)", "Item Tracking", "Untracked Surplus";
         }
         key(Key10; "Reservation Status", "Item No.", "Variant Code", "Location Code", "Expected Receipt Date")
         {
@@ -268,7 +281,9 @@ table 337 "Reservation Entry"
         }
         key(Key11; "Serial No.", "Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line")
         {
-            IncludedFields = "Quantity (Base)";
+#pragma warning disable AS0038
+            IncludedFields = "Reservation Status", "Quantity (Base)", "Lot No.", "Package No.", Binding;
+#pragma warning restore AS0038
         }
     }
 
@@ -339,32 +354,32 @@ table 337 "Reservation Entry"
             exit(ReturnValue);
 
         case "Source Type" of
-            DATABASE::"Item Ledger Entry":
-                exit("Reservation Summary Type"::"Item Ledger Entry".AsInteger());
-            DATABASE::"Purchase Line":
-                exit("Reservation Summary Type"::"Purchase Quote".AsInteger() + "Source Subtype");
-            DATABASE::"Requisition Line":
-                exit("Reservation Summary Type"::"Requisition Line".AsInteger());
-            DATABASE::"Sales Line":
-                exit("Reservation Summary Type"::"Sales Quote".AsInteger() + "Source Subtype");
-            DATABASE::"Item Journal Line":
-                exit("Reservation Summary Type"::"Item Journal Purchase".AsInteger() + "Source Subtype");
-            DATABASE::"Job Journal Line":
-                exit("Reservation Summary Type"::"Job Journal Usage".AsInteger() + "Source Subtype");
-            DATABASE::"Prod. Order Line":
-                exit("Reservation Summary Type"::"Simulated Production Order".AsInteger() + "Source Subtype");
-            DATABASE::"Prod. Order Component":
-                exit("Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger() + "Source Subtype");
-            DATABASE::"Transfer Line":
-                exit("Reservation Summary Type"::"Transfer Shipment".AsInteger() + "Source Subtype");
-            DATABASE::"Service Line":
-                exit("Reservation Summary Type"::"Service Order".AsInteger());
-            DATABASE::"Assembly Header":
-                exit("Reservation Summary Type"::"Assembly Quote Header".AsInteger() + "Source Subtype");
-            DATABASE::"Assembly Line":
-                exit("Reservation Summary Type"::"Assembly Quote Line".AsInteger() + "Source Subtype");
-            DATABASE::"Invt. Document Line":
-                exit("Reservation Summary Type"::"Inventory Receipt".AsInteger() + "Source Subtype");
+            Enum::TableID::"Item Ledger Entry".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Item Ledger Entry".AsInteger());
+            Enum::TableID::"Purchase Line".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Purchase Quote".AsInteger() + "Source Subtype");
+            Enum::TableID::"Requisition Line".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Requisition Line".AsInteger());
+            Enum::TableID::"Sales Line".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Sales Quote".AsInteger() + "Source Subtype");
+            Enum::TableID::"Item Journal Line".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Item Journal Purchase".AsInteger() + "Source Subtype");
+            Enum::TableID::"Job Journal Line".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Job Journal Usage".AsInteger() + "Source Subtype");
+            Enum::TableID::"Prod. Order Line".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Simulated Production Order".AsInteger() + "Source Subtype");
+            Enum::TableID::"Prod. Order Component".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Simulated Prod. Order Comp.".AsInteger() + "Source Subtype");
+            Enum::TableID::"Transfer Line".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Transfer Shipment".AsInteger() + "Source Subtype");
+            Enum::TableID::"Service Line".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Service Order".AsInteger());
+            Enum::TableID::"Assembly Header".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Assembly Quote Header".AsInteger() + "Source Subtype");
+            Enum::TableID::"Assembly Line".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Assembly Quote Line".AsInteger() + "Source Subtype");
+            Enum::TableID::"Invt. Document Line".AsInteger():
+                exit(Enum::"Reservation Summary Type"::"Inventory Receipt".AsInteger() + "Source Subtype");
             else
                 exit(0);
         end;
@@ -651,9 +666,9 @@ table 337 "Reservation Entry"
     var
         FieldFilter: Text;
     begin
-        if CalcReservEntry.FieldFilterNeeded(FieldFilter, Positive, "Item Tracking Type"::"Lot No.") then
+        if CalcReservEntry.FieldFilterNeeded(FieldFilter, Positive, Enum::"Item Tracking Type"::"Lot No.") then
             SetFilter("Lot No.", FieldFilter);
-        if CalcReservEntry.FieldFilterNeeded(FieldFilter, Positive, "Item Tracking Type"::"Serial No.") then
+        if CalcReservEntry.FieldFilterNeeded(FieldFilter, Positive, Enum::"Item Tracking Type"::"Serial No.") then
             SetFilter("Serial No.", FieldFilter);
 
         OnAfterFilterLinesForTracking(Rec, CalcReservEntry, Positive);
@@ -844,13 +859,13 @@ table 337 "Reservation Entry"
     procedure GetItemTrackingEntryType() TrackingEntryType: Enum "Item Tracking Entry Type"
     begin
         if "Lot No." <> '' then
-            TrackingEntryType := "Item Tracking Entry Type"::"Lot No.";
+            TrackingEntryType := Enum::"Item Tracking Entry Type"::"Lot No.";
 
         if "Serial No." <> '' then
             if "Lot No." <> '' then
-                TrackingEntryType := "Item Tracking Entry Type"::"Lot and Serial No."
+                TrackingEntryType := Enum::"Item Tracking Entry Type"::"Lot and Serial No."
             else
-                TrackingEntryType := "Item Tracking Entry Type"::"Serial No.";
+                TrackingEntryType := Enum::"Item Tracking Entry Type"::"Serial No.";
 
         OnAfterGetItemTrackingEntryType(Rec, TrackingEntryType);
     end;
@@ -927,7 +942,7 @@ table 337 "Reservation Entry"
         exit(
           ("Item Tracking" = "Item Tracking"::None) and
           ("Reservation Status" = "Reservation Status"::Surplus) and not Positive and
-          ("Source Type" = DATABASE::"Sales Line") and ("Source Subtype" = 1));
+          ("Source Type" = Enum::TableID::"Sales Line".AsInteger()) and ("Source Subtype" = 1));
     end;
 
     procedure TestItemFields(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10])

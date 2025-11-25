@@ -1,4 +1,9 @@
-﻿table 1284 "Outstanding Bank Transaction"
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Ledger;
+
+table 1284 "Outstanding Bank Transaction"
 {
     Caption = 'Outstanding Bank Transaction';
 
@@ -100,7 +105,7 @@
         TempOutstandingBankTransactionCopy.DeleteAll();
         if BankAccountLedgerEntry.FindSet() then
             repeat
-                    RemainingAmt := BankAccountLedgerEntry.Amount - GetAppliedAmount(BankAccountLedgerEntry."Entry No.");
+                RemainingAmt := BankAccountLedgerEntry.Amount - GetAppliedAmount(BankAccountLedgerEntry."Entry No.");
                 if RemainingAmt <> 0 then begin
                     TempOutstandingBankTransaction.Init();
                     CreateTheDepositHeaderLine(TempOutstandingBankTransaction, TempOutstandingBankTransactionCopy, BankAccountLedgerEntry);
@@ -206,7 +211,7 @@
         AppliedPaymentEntry.SetRange("Applies-to Entry No.", EntryNo);
         if AppliedPaymentEntry.FindSet() then
             repeat
-                    AppliedAmt += AppliedPaymentEntry."Applied Amount";
+                AppliedAmt += AppliedPaymentEntry."Applied Amount";
             until AppliedPaymentEntry.Next() = 0;
 
         exit(AppliedAmt);

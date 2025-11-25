@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8619 "Config. Template Subform"
 {
     AutoSplitKey = true;
@@ -25,7 +27,7 @@ page 8619 "Config. Template Subform"
 
                     trigger OnAssistEdit()
                     begin
-                        SelectFieldName();
+                        Rec.SelectFieldName();
                     end;
                 }
                 field("Field Caption"; Rec."Field Caption")
@@ -49,12 +51,12 @@ page 8619 "Config. Template Subform"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the relationship between the table fields should not be checked. This can useful when you want to specify a value for a field that is not yet available. For example, you may want to specify a value for a payment term that is not available in the table on which you are basing you configuration. You can specify that value, select the Skip Relation Check box, and then continue to apply data without error.';
                 }
-                field(Mandatory; Mandatory)
+                field(Mandatory; Rec.Mandatory)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether it is required that there be data in the field in the data template. By default, the check box is selected to make a value mandatory. You can clear the check box.';
                 }
-                field(Reference; Reference)
+                field(Reference; Rec.Reference)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a url address. Use this field to provide a url address to a location that specifies additional information about the field in the data template. For example, you could provide the address that specifies information on setup considerations that the solution implementer should consider.';

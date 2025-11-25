@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 enum 5775 "Non-Invt. Item Whse. Policy"
 {
     Extensible = true;

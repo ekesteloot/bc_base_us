@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
 codeunit 5877 "Phys. Invt. Rec.-Reopen (Y/N)"
 {
     TableNo = "Phys. Invt. Record Header";

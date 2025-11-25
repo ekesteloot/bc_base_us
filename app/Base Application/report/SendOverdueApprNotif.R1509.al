@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 report 1509 "Send Overdue Appr. Notif."
 {
     ApplicationArea = Suite;

@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 codeunit 1296 "BankPaymentApplLines-Delete"
 {
     Permissions = TableData "Posted Payment Recon. Line" = d;
@@ -5,8 +7,8 @@ codeunit 1296 "BankPaymentApplLines-Delete"
 
     trigger OnRun()
     begin
-        PostedPaymentReconLine.SetRange("Bank Account No.", "Bank Account No.");
-        PostedPaymentReconLine.SetRange("Statement No.", "Statement No.");
+        PostedPaymentReconLine.SetRange("Bank Account No.", Rec."Bank Account No.");
+        PostedPaymentReconLine.SetRange("Statement No.", Rec."Statement No.");
         PostedPaymentReconLine.DeleteAll();
     end;
 

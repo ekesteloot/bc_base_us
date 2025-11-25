@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Comment;
+
 page 5072 "Rlshp. Mgt. Comment Sheet"
 {
     AutoSplitKey = true;
@@ -15,17 +17,17 @@ page 5072 "Rlshp. Mgt. Comment Sheet"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the date the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the comment itself.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the code for the comment.';
@@ -41,7 +43,7 @@ page 5072 "Rlshp. Mgt. Comment Sheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
     end;
 }
 

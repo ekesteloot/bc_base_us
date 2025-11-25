@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Setup;
+
 page 99000750 "Work Shifts"
 {
     ApplicationArea = Manufacturing;
@@ -13,7 +15,7 @@ page 99000750 "Work Shifts"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies a code to identify this work shift.';

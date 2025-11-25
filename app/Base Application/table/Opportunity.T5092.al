@@ -1,3 +1,21 @@
+﻿namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using Microsoft.CRM.Task;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Security.User;
+using System.Utilities;
+
 table 5092 Opportunity
 {
     Caption = 'Opportunity';
@@ -247,7 +265,7 @@ table 5092 Opportunity
         field(6; "Contact Company No."; Code[20])
         {
             Caption = 'Contact Company No.';
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(7; "Sales Cycle Code"; Code[10])
         {
@@ -265,13 +283,13 @@ table 5092 Opportunity
         field(8; "Sales Document No."; Code[20])
         {
             Caption = 'Sales Document No.';
-            TableRelation = IF ("Sales Document Type" = CONST(Quote)) "Sales Header"."No." WHERE("Document Type" = CONST(Quote),
-                                                                                                "Sell-to Contact No." = FIELD("Contact No."))
-            ELSE
-            IF ("Sales Document Type" = CONST(Order)) "Sales Header"."No." WHERE("Document Type" = CONST(Order),
-                                                                                                                                                                         "Sell-to Contact No." = FIELD("Contact No."))
-            ELSE
-            IF ("Sales Document Type" = CONST("Posted Invoice")) "Sales Invoice Header"."No." WHERE("Sell-to Contact No." = FIELD("Contact No."));
+            TableRelation = if ("Sales Document Type" = const(Quote)) "Sales Header"."No." where("Document Type" = const(Quote),
+                                                                                                "Sell-to Contact No." = field("Contact No."))
+            else
+            if ("Sales Document Type" = const(Order)) "Sales Header"."No." where("Document Type" = const(Order),
+                                                                                                                                                                         "Sell-to Contact No." = field("Contact No."))
+            else
+            if ("Sales Document Type" = const("Posted Invoice")) "Sales Invoice Header"."No." where("Sell-to Contact No." = field("Contact No."));
 
             trigger OnValidate()
             var
@@ -340,8 +358,8 @@ table 5092 Opportunity
         }
         field(16; Comment; Boolean)
         {
-            CalcFormula = Exist("Rlshp. Mgt. Comment Line" WHERE("Table Name" = CONST(Opportunity),
-                                                                  "No." = FIELD("No.")));
+            CalcFormula = exist("Rlshp. Mgt. Comment Line" where("Table Name" = const(Opportunity),
+                                                                  "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -349,8 +367,8 @@ table 5092 Opportunity
         field(17; "Current Sales Cycle Stage"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Lookup("Opportunity Entry"."Sales Cycle Stage" WHERE("Opportunity No." = FIELD("No."),
-                                                                                Active = CONST(true)));
+            CalcFormula = Lookup("Opportunity Entry"."Sales Cycle Stage" where("Opportunity No." = field("No."),
+                                                                                Active = const(true)));
             Caption = 'Current Sales Cycle Stage';
             Editable = false;
             FieldClass = FlowField;
@@ -358,16 +376,16 @@ table 5092 Opportunity
         field(18; "Estimated Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Opportunity Entry"."Estimated Value (LCY)" WHERE("Opportunity No." = FIELD("No."),
-                                                                                 Active = CONST(true)));
+            CalcFormula = sum("Opportunity Entry"."Estimated Value (LCY)" where("Opportunity No." = field("No."),
+                                                                                 Active = const(true)));
             Caption = 'Estimated Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(19; "Probability %"; Decimal)
         {
-            CalcFormula = Lookup("Opportunity Entry"."Probability %" WHERE("Opportunity No." = FIELD("No."),
-                                                                            Active = CONST(true)));
+            CalcFormula = Lookup("Opportunity Entry"."Probability %" where("Opportunity No." = field("No."),
+                                                                            Active = const(true)));
             Caption = 'Probability %';
             DecimalPlaces = 1 : 1;
             Editable = false;
@@ -376,16 +394,16 @@ table 5092 Opportunity
         field(20; "Calcd. Current Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Opportunity Entry"."Calcd. Current Value (LCY)" WHERE("Opportunity No." = FIELD("No."),
-                                                                                      Active = CONST(true)));
+            CalcFormula = sum("Opportunity Entry"."Calcd. Current Value (LCY)" where("Opportunity No." = field("No."),
+                                                                                      Active = const(true)));
             Caption = 'Calcd. Current Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(21; "Chances of Success %"; Decimal)
         {
-            CalcFormula = Lookup("Opportunity Entry"."Chances of Success %" WHERE("Opportunity No." = FIELD("No."),
-                                                                                   Active = CONST(true)));
+            CalcFormula = Lookup("Opportunity Entry"."Chances of Success %" where("Opportunity No." = field("No."),
+                                                                                   Active = const(true)));
             Caption = 'Chances of Success %';
             DecimalPlaces = 0 : 0;
             Editable = false;
@@ -393,8 +411,8 @@ table 5092 Opportunity
         }
         field(22; "Completed %"; Decimal)
         {
-            CalcFormula = Lookup("Opportunity Entry"."Completed %" WHERE("Opportunity No." = FIELD("No."),
-                                                                          Active = CONST(true)));
+            CalcFormula = Lookup("Opportunity Entry"."Completed %" where("Opportunity No." = field("No."),
+                                                                          Active = const(true)));
             Caption = 'Completed %';
             DecimalPlaces = 0 : 0;
             Editable = false;
@@ -402,28 +420,28 @@ table 5092 Opportunity
         }
         field(23; "Contact Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact.Name WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact No.")));
             Caption = 'Contact Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(24; "Contact Company Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact.Name WHERE("No." = FIELD("Contact Company No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact Company No.")));
             Caption = 'Contact Company Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(25; "Salesperson Name"; Text[50])
         {
-            CalcFormula = Lookup("Salesperson/Purchaser".Name WHERE(Code = FIELD("Salesperson Code")));
+            CalcFormula = Lookup("Salesperson/Purchaser".Name where(Code = field("Salesperson Code")));
             Caption = 'Salesperson Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(26; "Campaign Description"; Text[100])
         {
-            CalcFormula = Lookup(Campaign.Description WHERE("No." = FIELD("Campaign No.")));
+            CalcFormula = Lookup(Campaign.Description where("No." = field("Campaign No.")));
             Caption = 'Campaign Description';
             Editable = false;
             FieldClass = FlowField;
@@ -432,8 +450,6 @@ table 5092 Opportunity
         {
             Caption = 'Segment No.';
             TableRelation = "Segment Header";
-            //This property is currently not supported
-            //TestTableRelation = false;
 
             trigger OnLookup()
             begin
@@ -453,8 +469,8 @@ table 5092 Opportunity
         }
         field(28; "Estimated Closing Date"; Date)
         {
-            CalcFormula = Lookup("Opportunity Entry"."Estimated Close Date" WHERE("Opportunity No." = FIELD("No."),
-                                                                                   Active = CONST(true)));
+            CalcFormula = Lookup("Opportunity Entry"."Estimated Close Date" where("Opportunity No." = field("No."),
+                                                                                   Active = const(true)));
             Caption = 'Estimated Closing Date';
             Editable = false;
             FieldClass = FlowField;
@@ -473,9 +489,9 @@ table 5092 Opportunity
         }
         field(30; "No. of Interactions"; Integer)
         {
-            CalcFormula = Count("Interaction Log Entry" WHERE("Opportunity No." = FIELD(FILTER("No.")),
-                                                               Canceled = CONST(false),
-                                                               Postponed = CONST(false)));
+            CalcFormula = count("Interaction Log Entry" where("Opportunity No." = field(FILTER("No.")),
+                                                               Canceled = const(false),
+                                                               Postponed = const(false)));
             Caption = 'No. of Interactions';
             Editable = false;
             FieldClass = FlowField;
@@ -983,7 +999,6 @@ table 5092 Opportunity
         end;
     end;
 
-    [Scope('OnPrem')]
     procedure FinishWizard()
     var
         ActivateFirstStage: Boolean;

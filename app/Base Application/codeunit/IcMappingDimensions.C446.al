@@ -1,4 +1,11 @@
 #if not CLEAN23
+namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using System.Telemetry;
+
 codeunit 446 "IC Mapping Dimensions"
 {
     Access = Internal;

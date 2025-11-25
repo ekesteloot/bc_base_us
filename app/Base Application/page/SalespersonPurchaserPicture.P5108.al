@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Team;
+
+using System.Device;
+using System.IO;
+
 page 5108 "Salesperson/Purchaser Picture"
 {
     Caption = 'Salesperson/Purchaser Picture';
@@ -11,7 +16,7 @@ page 5108 "Salesperson/Purchaser Picture"
     {
         area(content)
         {
-            field(Image; Image)
+            field(Image; Rec.Image)
             {
                 ApplicationArea = Basic, Suite;
                 ShowCaption = false;
@@ -53,10 +58,10 @@ page 5108 "Salesperson/Purchaser Picture"
                     FileName: Text;
                     ClientFileName: Text;
                 begin
-                    TestField(Code);
-                    TestField(Name);
+                    Rec.TestField(Code);
+                    Rec.TestField(Name);
 
-                    if Image.HasValue() then
+                    if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -64,9 +69,9 @@ page 5108 "Salesperson/Purchaser Picture"
                     if FileName = '' then
                         exit;
 
-                    Clear(Image);
-                    Image.ImportFile(FileName, ClientFileName);
-                    Modify(true);
+                    Clear(Rec.Image);
+                    Rec.Image.ImportFile(FileName, ClientFileName);
+                    Rec.Modify(true);
 
                     if FileManagement.DeleteServerFile(FileName) then;
                 end;
@@ -85,12 +90,12 @@ page 5108 "Salesperson/Purchaser Picture"
                     ToFile: Text;
                     ExportPath: Text;
                 begin
-                    TestField(Code);
-                    TestField(Name);
+                    Rec.TestField(Code);
+                    Rec.TestField(Name);
 
-                    ToFile := StrSubstNo('%1 %2.jpg', Code, Name);
-                    ExportPath := TemporaryPath + Code + Format(Image.MediaId);
-                    Image.ExportFile(ExportPath);
+                    ToFile := StrSubstNo('%1 %2.jpg', Rec.Code, Rec.Name);
+                    ExportPath := TemporaryPath + Rec.Code + Format(Rec.Image.MediaId);
+                    Rec.Image.ExportFile(ExportPath);
 
                     FileManagement.ExportImage(ExportPath, ToFile);
                 end;
@@ -105,13 +110,13 @@ page 5108 "Salesperson/Purchaser Picture"
 
                 trigger OnAction()
                 begin
-                    TestField(Code);
+                    Rec.TestField(Code);
 
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    Clear(Image);
-                    Modify(true);
+                    Clear(Rec.Image);
+                    Rec.Modify(true);
                 end;
             }
         }
@@ -129,7 +134,6 @@ page 5108 "Salesperson/Purchaser Picture"
 
     var
         Camera: Codeunit Camera;
-        [InDataSet]
         CameraAvailable: Boolean;
         OverrideImageQst: Label 'The existing picture will be replaced. Do you want to continue?';
         DeleteImageQst: Label 'Are you sure you want to delete the picture?';
@@ -158,7 +162,7 @@ page 5108 "Salesperson/Purchaser Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Image.HasValue;
+        DeleteExportEnabled := Rec.Image.HasValue;
     end;
 }
 

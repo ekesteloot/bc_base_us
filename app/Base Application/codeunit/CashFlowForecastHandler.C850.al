@@ -1,3 +1,16 @@
+﻿namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Receivables;
+using System.AI;
+using System.Environment;
+using System.Utilities;
+using System.Visualization;
+
 codeunit 850 "Cash Flow Forecast Handler"
 {
     Permissions = TableData "Cash Flow Azure AI Buffer" = rimd;

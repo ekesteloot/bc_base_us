@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7399 "Internal Movement"
 {
     Caption = 'Internal Movement';
@@ -20,7 +26,7 @@ page 7399 "Internal Movement"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit() then
+                        if Rec.AssistEdit() then
                             CurrPage.Update();
                     end;
                 }
@@ -70,8 +76,8 @@ page 7399 "Internal Movement"
             part(InternalMovementLines; "Internal Movement Subform")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "No." = FIELD("No.");
-                SubPageView = SORTING("No.", "Sorting Sequence No.");
+                SubPageLink = "No." = field("No.");
+                SubPageView = sorting("No.", "Sorting Sequence No.");
             }
         }
         area(factboxes)
@@ -80,9 +86,9 @@ page 7399 "Internal Movement"
             {
                 ApplicationArea = ItemTracking;
                 Provider = InternalMovementLines;
-                SubPageLink = "Item No." = FIELD("Item No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Location Code" = FIELD("Location Code");
+                SubPageLink = "Item No." = field("Item No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Location Code" = field("Location Code");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -115,7 +121,7 @@ page 7399 "Internal Movement"
 
                     trigger OnAction()
                     begin
-                        LookupInternalMovementHeader(Rec);
+                        Rec.LookupInternalMovementHeader(Rec);
                     end;
                 }
                 action("Co&mments")
@@ -124,9 +130,9 @@ page 7399 "Internal Movement"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Internal Movement"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Internal Movement"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -151,9 +157,9 @@ page 7399 "Internal Movement"
                         BinContent: Record "Bin Content";
                         WhseGetBinContent: Report "Whse. Get Bin Content";
                     begin
-                        TestField("No.");
-                        TestField("Location Code");
-                        BinContent.SetRange("Location Code", "Location Code");
+                        Rec.TestField("No.");
+                        Rec.TestField("Location Code");
+                        BinContent.SetRange("Location Code", Rec."Location Code");
                         WhseGetBinContent.SetTableView(BinContent);
                         WhseGetBinContent.InitializeInternalMovement(Rec);
                         WhseGetBinContent.Run();
@@ -194,7 +200,7 @@ page 7399 "Internal Movement"
 
     trigger OnOpenPage()
     begin
-        OpenInternalMovementHeader(Rec);
+        Rec.OpenInternalMovementHeader(Rec);
     end;
 
     local procedure SortingMethodOnAfterValidate()

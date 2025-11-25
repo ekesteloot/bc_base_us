@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Team;
+
 table 5084 "Team Salesperson"
 {
     Caption = 'Team Salesperson';
@@ -18,14 +20,14 @@ table 5084 "Team Salesperson"
         }
         field(3; "Team Name"; Text[50])
         {
-            CalcFormula = Lookup (Team.Name WHERE(Code = FIELD("Team Code")));
+            CalcFormula = Lookup (Team.Name where(Code = field("Team Code")));
             Caption = 'Team Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Salesperson Name"; Text[50])
         {
-            CalcFormula = Lookup ("Salesperson/Purchaser".Name WHERE(Code = FIELD("Salesperson Code")));
+            CalcFormula = Lookup ("Salesperson/Purchaser".Name where(Code = field("Salesperson Code")));
             Caption = 'Salesperson Name';
             Editable = false;
             FieldClass = FlowField;

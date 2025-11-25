@@ -1,3 +1,10 @@
+namespace Microsoft.FixedAssets.Maintenance;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 5641 "Maintenance Ledger Entries"
 {
     ApplicationArea = FixedAssets;
@@ -101,7 +108,7 @@ page 5641 "Maintenance Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -116,7 +123,7 @@ page 5641 "Maintenance Ledger Entries"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies whether the entry has been part of a reverse transaction (correction) made by the Reverse function.';
@@ -233,7 +240,7 @@ page 5641 "Maintenance Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -246,7 +253,7 @@ page 5641 "Maintenance Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -270,14 +277,14 @@ page 5641 "Maintenance Ledger Entries"
                         ReversalEntry: Record "Reversal Entry";
                     begin
                         Clear(ReversalEntry);
-                        if Reversed then
-                            ReversalEntry.AlreadyReversedEntry(TableCaption, "Entry No.");
-                        if "Journal Batch Name" = '' then
+                        if Rec.Reversed then
+                            ReversalEntry.AlreadyReversedEntry(Rec.TableCaption, Rec."Entry No.");
+                        if Rec."Journal Batch Name" = '' then
                             ReversalEntry.TestFieldError();
-                        if "Transaction No." = 0 then
-                            Error(CannotUndoErr, "Entry No.", "Depreciation Book Code");
-                        TestField("G/L Entry No.");
-                        ReversalEntry.ReverseTransaction("Transaction No.");
+                        if Rec."Transaction No." = 0 then
+                            Error(CannotUndoErr, Rec."Entry No.", Rec."Depreciation Book Code");
+                        Rec.TestField("G/L Entry No.");
+                        ReversalEntry.ReverseTransaction(Rec."Transaction No.");
                     end;
                 }
             }
@@ -291,7 +298,7 @@ page 5641 "Maintenance Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

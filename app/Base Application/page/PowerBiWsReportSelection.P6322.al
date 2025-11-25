@@ -1,3 +1,7 @@
+namespace System.Integration.PowerBI;
+
+using System.Environment;
+
 page 6322 "Power BI WS Report Selection"
 {
     Caption = 'Power BI Reports Selection';
@@ -17,7 +21,7 @@ page 6322 "Power BI WS Report Selection"
                 IndentationColumn = IndentationValue;
                 IndentationControls = Name;
                 ShowAsTree = true;
-                Visible = HasReports AND NOT IsErrorMessageVisible;
+                Visible = HasReports and not IsErrorMessageVisible;
 
                 field(Name; Rec.Name)
                 {
@@ -30,7 +34,7 @@ page 6322 "Power BI WS Report Selection"
 
                     trigger OnDrillDown()
                     begin
-                        if Rec.Type <> Rec.Type::Report then
+                        if Rec.Type <> Rec.Type::"Report" then
                             exit;
 
                         // Event handler for when the user clicks the report name hyperlink. This automatically selects
@@ -45,7 +49,7 @@ page 6322 "Power BI WS Report Selection"
                         SaveAndClose();
                     end;
                 }
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'ID';
@@ -61,7 +65,7 @@ page 6322 "Power BI WS Report Selection"
                     Visible = ShowAdditionalFields;
                     ToolTip = 'Specifies the type of the line (e.g. workspace or report).';
                 }
-                field(WorkspaceID; WorkspaceID)
+                field(WorkspaceID; Rec.WorkspaceID)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Workspace ID';
@@ -69,7 +73,7 @@ page 6322 "Power BI WS Report Selection"
                     Visible = ShowAdditionalFields;
                     ToolTip = 'Specifies the ID of the workspace that this record is in (if the record is a workspace, this is the same as the ID).';
                 }
-                field(WorkspaceName; WorkspaceName)
+                field(WorkspaceName; Rec.WorkspaceName)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Workspace Name';
@@ -77,7 +81,7 @@ page 6322 "Power BI WS Report Selection"
                     Visible = ShowAdditionalFields;
                     ToolTip = 'Specifies the name of the workspace that this record is in (if the record is a workspace, this is the same as the Name).';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that this report is enabled to be shown in the given page. This field has no effect for workspaces.';
@@ -87,7 +91,7 @@ page 6322 "Power BI WS Report Selection"
             group(NoAvailableReportsGroup)
             {
                 ShowCaption = false;
-                Visible = NOT HasReports AND NOT IsErrorMessageVisible;
+                Visible = not HasReports and not IsErrorMessageVisible;
                 label(NoReportsError)
                 {
                     ApplicationArea = Basic, Suite;
@@ -118,7 +122,7 @@ page 6322 "Power BI WS Report Selection"
             {
                 ApplicationArea = All;
                 Caption = 'Enable';
-                Enabled = not Rec.Enabled and (Rec.Type = Rec.Type::Report);
+                Enabled = not Rec.Enabled and (Rec.Type = Rec.Type::"Report");
                 Gesture = LeftSwipe;
                 Image = "Report";
                 Scope = Repeater;
@@ -126,7 +130,7 @@ page 6322 "Power BI WS Report Selection"
 
                 trigger OnAction()
                 begin
-                    Enabled := true;
+                    Rec.Enabled := true;
                     CurrPage.Update();
                 end;
             }
@@ -134,7 +138,7 @@ page 6322 "Power BI WS Report Selection"
             {
                 ApplicationArea = All;
                 Caption = 'Disable';
-                Enabled = Rec.Enabled and (Rec.Type = Rec.Type::Report);
+                Enabled = Rec.Enabled and (Rec.Type = Rec.Type::"Report");
                 Gesture = RightSwipe;
                 Image = "Report";
                 Scope = Repeater;
@@ -142,17 +146,21 @@ page 6322 "Power BI WS Report Selection"
 
                 trigger OnAction()
                 begin
-                    Enabled := false;
+                    Rec.Enabled := false;
                     CurrPage.Update();
                 end;
             }
+#if not CLEAN23
             action(Refresh)
             {
                 ApplicationArea = All;
                 Caption = 'Refresh List';
                 Image = Refresh;
                 ToolTip = 'Update the report list with any newly added reports.';
-
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This page should not stay open for long. Refresh is not necessary.';
+                ObsoleteTag = '23.0';
+                Visible = false;
                 trigger OnAction()
                 begin
                     IsErrorMessageVisible := false;
@@ -161,6 +169,7 @@ page 6322 "Power BI WS Report Selection"
                         ShowLatestErrorMessage();
                 end;
             }
+#endif
             action(MyOrganization)
             {
                 ApplicationArea = All;
@@ -187,6 +196,7 @@ page 6322 "Power BI WS Report Selection"
                     HyperLink(PowerBIServiceMgt.GetContentPacksServicesUrl());
                 end;
             }
+#if not CLEAN23
             action(ConnectionInfo)
             {
                 ApplicationArea = All;
@@ -194,8 +204,12 @@ page 6322 "Power BI WS Report Selection"
                 Image = Setup;
                 RunObject = Page "Content Pack Setup Wizard";
                 ToolTip = 'Show information for connecting to Power BI content packs.';
-                Visible = NOT IsSaaS;
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Instead, follow the Business Central documentation page "Building Power BI Reports to Display Dynamics 365 Business Central Data" available at https://learn.microsoft.com/en-gb/dynamics365/business-central/across-how-use-financials-data-source-powerbi';
+                ObsoleteTag = '23.0';
             }
+#endif
             action(CleanDeployments)
             {
                 ApplicationArea = All;
@@ -205,17 +219,22 @@ page 6322 "Power BI WS Report Selection"
 
                 trigger OnAction()
                 begin
-                    PAGE.RunModal(PAGE::"Power BI Deployments");
+                    Page.RunModal(Page::"Power BI Deployments");
                     // TODO: Set this button's visibility to equal "IsSaaS" so it's not visible for on-prem, where we won't have OOB uploads anyways.
                 end;
             }
         }
         area(Promoted)
         {
+#if not CLEAN23
             group(Category_Report)
             {
                 Caption = 'Report', Comment = 'Generated from the PromotedActionCategories property index 2.';
+                ObsoleteReason = 'This group was empty.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '23.0';
             }
+#endif
             group(Category_Category4)
             {
                 Caption = 'Manage', Comment = 'Generated from the PromotedActionCategories property index 3.';
@@ -234,18 +253,30 @@ page 6322 "Power BI WS Report Selection"
             {
                 Caption = 'Get Reports', Comment = 'Generated from the PromotedActionCategories property index 4.';
 
+#if not CLEAN23
                 actionref(Refresh_Promoted; Refresh)
                 {
+                    ObsoleteReason = 'Action removed.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '23.0';
+                    Visible = false;
                 }
+#endif
                 actionref(MyOrganization_Promoted; MyOrganization)
                 {
                 }
                 actionref(Services_Promoted; Services)
                 {
                 }
+#if not CLEAN23
                 actionref(ConnectionInfo_Promoted; ConnectionInfo)
                 {
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Instead, follow the Business Central documentation page "Building Power BI Reports to Display Dynamics 365 Business Central Data" available at https://learn.microsoft.com/en-gb/dynamics365/business-central/across-how-use-financials-data-source-powerbi';
+                    ObsoleteTag = '23.0';
                 }
+#endif
             }
         }
     }
@@ -255,7 +286,7 @@ page 6322 "Power BI WS Report Selection"
         if not TryLoadReportsList() then
             ShowLatestErrorMessage();
 
-        IsSaaS := EnvironmentInfo.IsSaaS();
+        IsSaaS := EnvironmentInformation.IsSaaS();
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -271,7 +302,7 @@ page 6322 "Power BI WS Report Selection"
         if OriginalFilter <> '' then
             Rec.SetRange(Type, Rec.Type::Workspace);
 
-        FilterGroup(OriginalFilterGroup);
+        Rec.FilterGroup(OriginalFilterGroup);
 
         exit(Rec.Find(Which));
     end;
@@ -284,7 +315,7 @@ page 6322 "Power BI WS Report Selection"
     trigger OnAfterGetRecord()
     begin
         case Rec.Type of
-            Rec.Type::Report:
+            Rec.Type::"Report":
                 IndentationValue := 1;
             Rec.Type::Workspace:
                 IndentationValue := 0;
@@ -297,17 +328,15 @@ page 6322 "Power BI WS Report Selection"
     end;
 
     var
-        EnvironmentInfo: Codeunit "Environment Information";
+        EnvironmentInformation: Codeunit "Environment Information";
         PowerBIServiceMgt: Codeunit "Power BI Service Mgt.";
         PowerBIWorkspaceMgt: Codeunit "Power BI Workspace Mgt.";
         PageContext: Text[30];
-        [InDataSet]
         IndentationValue: Integer;
         IsPgClosedOkay: Boolean;
         IsSaaS: Boolean;
         HasReports: Boolean;
         IsErrorMessageVisible: Boolean;
-        [InDataSet]
         ShowAdditionalFields: Boolean; // This value is always false, but dynamic visibility of fields enables testability
         ErrorMessageText: Text;
         FailedToLoadReportListTelemetryErr: Label 'PowerBIReportSelection failed to load reports. Error message: %1', Locked = true;
@@ -325,13 +354,13 @@ page 6322 "Power BI WS Report Selection"
     local procedure TryLoadReportsList()
     begin
         // Clears and retrieves a list of all reports in the user's Power BI account.
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         PowerBIWorkspaceMgt.GetReportsAndWorkspaces(Rec, PageContext);
 
-        if IsEmpty then begin
+        if Rec.IsEmpty then begin
             HasReports := false;
-            Insert(); // Hack to prevent empty list error.
+            Rec.Insert(); // Hack to prevent empty list error.
         end else begin
             HasReports := true;
 
@@ -359,10 +388,11 @@ page 6322 "Power BI WS Report Selection"
         TempPowerBISelectionElement.SetRange(Enabled, true);
         if TempPowerBISelectionElement.Find('-') then
             repeat
-                if TempPowerBISelectionElement.Type = TempPowerBISelectionElement.Type::Report then begin
+                if TempPowerBISelectionElement.Type = TempPowerBISelectionElement.Type::"Report" then begin
                     PowerBiReportConfiguration.Init();
                     PowerBiReportConfiguration."User Security ID" := UserSecurityId();
                     PowerBiReportConfiguration."Report ID" := TempPowerBISelectionElement.ID;
+                    PowerBiReportConfiguration.ReportName := TempPowerBISelectionElement.Name;
                     PowerBiReportConfiguration.Context := PageContext;
                     PowerBiReportConfiguration.Validate(ReportEmbedUrl, TempPowerBISelectionElement.EmbedUrl);
                     PowerBiReportConfiguration."Workspace Name" := TempPowerBISelectionElement.WorkspaceName;
@@ -403,7 +433,7 @@ page 6322 "Power BI WS Report Selection"
         TempPowerBISelectionElement.Copy(Rec, true);
         TempPowerBISelectionElement.Reset();
         TempPowerBISelectionElement.SetRange(Enabled, true);
-        TempPowerBISelectionElement.SetRange(Type, TempPowerBISelectionElement.Type::Report);
+        TempPowerBISelectionElement.SetRange(Type, TempPowerBISelectionElement.Type::"Report");
 
         if TempPowerBISelectionElement.FindSet() then
             repeat

@@ -1,3 +1,11 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Ledger;
+using System.Utilities;
+
 codeunit 231 "Gen. Jnl.-Post"
 {
     EventSubscriberInstance = Manual;
@@ -9,7 +17,7 @@ codeunit 231 "Gen. Jnl.-Post"
     begin
         GenJnlLine.Copy(Rec);
         Code(GenJnlLine);
-        Copy(GenJnlLine);
+        Rec.Copy(GenJnlLine);
     end;
 
     var

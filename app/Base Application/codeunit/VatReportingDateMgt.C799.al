@@ -1,3 +1,16 @@
+﻿namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.ServiceMgt.History;
+using System.Security.User;
+using System.Telemetry;
+using System.Utilities;
+
 codeunit 799 "VAT Reporting Date Mgt"
 {
     SingleInstance = true;
@@ -29,7 +42,13 @@ codeunit 799 "VAT Reporting Date Mgt"
         VATDateNotAllowedErr: Label 'The VAT Date is not within your range of allowed posting dates.';
 
     procedure UpdateLinkedEntries(VATEntry: Record "VAT Entry")
+    var
+        IsHandled: Boolean;
     begin
+        OnBeforeUpdateLinkedEntries(VATEntry, IsHandled);
+        if IsHandled then
+            exit;
+
         FeatureTelemetry.LogUsage('0000I9D', VATDateFeatureTok, 'VAT Date field populated');
 
         UpdateVATEntries(VATEntry);
@@ -117,9 +136,9 @@ codeunit 799 "VAT Reporting Date Mgt"
             exit(false);
         if VATReturnPeriod.FindVATPeriodByDate(VATDate) then
             case GLSetup."Control VAT Period" of
-                "VAT Period Control"::Disabled:
+                GLSetup."Control VAT Period"::Disabled:
                     exit(true);
-                "VAT Period Control"::"Block posting within closed and warn for released period":
+                GLSetup."Control VAT Period"::"Block posting within closed and warn for released period":
                     begin
                         if VATReturnPeriod.Status = VATReturnPeriod.Status::Closed then
                             Error(ErrorMsg);
@@ -128,10 +147,10 @@ codeunit 799 "VAT Reporting Date Mgt"
                         if VATReturnPeriod."VAT Return Status" in [VATReturnPeriod."VAT Return Status"::Released, VATReturnPeriod."VAT Return Status"::Submitted] then
                             exit(ConfirmManagement.GetResponseOrDefault(StrSubstNo(WarningMsg, Format(VATReturnPeriod."VAT Return Status")), true));
                     end;
-                "VAT Period Control"::"Block posting within closed period":
+                GLSetup."Control VAT Period"::"Block posting within closed period":
                     if VATReturnPeriod.Status = VATReturnPeriod.Status::Closed then
                         Error(ErrorMsg);
-                "VAT Period Control"::"Warn when posting in closed period":
+                GLSetup."Control VAT Period"::"Warn when posting in closed period":
                     if VATReturnPeriod.Status = VATReturnPeriod.Status::Closed then
                         exit(ConfirmManagement.GetResponseOrDefault(StrSubstNo(WarningMsg, Format(VATReturnPeriod.Status::Closed)), true));
             end;
@@ -313,12 +332,19 @@ codeunit 799 "VAT Reporting Date Mgt"
     end;
 
 #if not CLEAN23
+#pragma warning disable AS0025
     [Obsolete('Replaced by OnBeforeIsVATDateEnabledForUse with correct parameter name', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeIsVATDateEnabled(var IsModifiable: Boolean; var IsHandled: Boolean);
     begin
     end;
+#pragma warning restore AS0025
 #endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateLinkedEntries(VATEntry: Record "VAT Entry"; var IsHandled: Boolean);
+    begin
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdateLinkedEntries(VATEntry: Record "VAT Entry");

@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using System.Reflection;
+
 table 7336 "Bin Creation Wksh. Template"
 {
     Caption = 'Bin Creation Wksh. Template';
@@ -44,7 +48,7 @@ table 7336 "Bin Creation Wksh. Template"
         }
         field(16; "Page Caption"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
                                                                            "Object ID" = FIELD("Page ID")));
             Caption = 'Page Caption';
             Editable = false;

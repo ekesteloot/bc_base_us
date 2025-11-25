@@ -12,13 +12,13 @@ table 1020 "Job Usage Link"
         field(2; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(3; "Line No."; Integer)
         {
             Caption = 'Line No.';
-            TableRelation = "Job Planning Line"."Line No." WHERE("Job No." = FIELD("Job No."),
-                                                                  "Job Task No." = FIELD("Job Task No."));
+            TableRelation = "Job Planning Line"."Line No." where("Job No." = field("Job No."),
+                                                                  "Job Task No." = field("Job Task No."));
         }
         field(4; "Entry No."; Integer)
         {

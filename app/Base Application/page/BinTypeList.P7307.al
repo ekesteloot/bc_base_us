@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 7307 "Bin Type List"
 {
     Caption = 'Bin Type List';
@@ -12,22 +14,22 @@ page 7307 "Bin Type List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a unique code for the bin type.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a description of the bin type.';
                 }
-                field(Receive; Receive)
+                field(Receive; Rec.Receive)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies to use the bin for items that have just arrived at the warehouse.';
                 }
-                field(Ship; Ship)
+                field(Ship; Rec.Ship)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies to use the bin for items that are about to be shipped out of the warehouse.';
@@ -37,7 +39,7 @@ page 7307 "Bin Type List"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies to use the bin for items that are being put away, such as receipts and internal put-always.';
                 }
-                field(Pick; Pick)
+                field(Pick; Rec.Pick)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies to use the bin for items that can be picked for shipment, internal picks, and production.';

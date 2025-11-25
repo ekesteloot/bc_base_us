@@ -1,4 +1,34 @@
-﻿table 5107 "Sales Header Archive"
+﻿namespace Microsoft.Sales.Archive;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Globalization;
+using System.Security.AccessControl;
+using System.Security.User;
+
+table 5107 "Sales Header Archive"
 {
     Caption = 'Sales Header Archive';
     DataCaptionFields = "No.", "Sell-to Customer Name", "Version No.";
@@ -46,8 +76,6 @@
         {
             Caption = 'Bill-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(10; "Bill-to Contact"; Text[100])
@@ -61,7 +89,7 @@
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Sell-to Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Sell-to Customer No."));
         }
         field(13; "Ship-to Name"; Text[100])
         {
@@ -83,8 +111,6 @@
         {
             Caption = 'Ship-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
@@ -135,19 +161,19 @@
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(31; "Customer Posting Group"; Code[20])
         {
@@ -188,6 +214,11 @@
             Caption = 'Language Code';
             TableRelation = Language;
         }
+        field(42; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(43; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
@@ -199,11 +230,11 @@
         }
         field(46; Comment; Boolean)
         {
-            CalcFormula = Exist("Sales Comment Line Archive" WHERE("Document Type" = FIELD("Document Type"),
-                                                                    "No." = FIELD("No."),
-                                                                    "Document Line No." = CONST(0),
-                                                                    "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                                                    "Version No." = FIELD("Version No.")));
+            CalcFormula = exist("Sales Comment Line Archive" where("Document Type" = field("Document Type"),
+                                                                    "No." = field("No."),
+                                                                    "Document Line No." = const(0),
+                                                                    "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                                                    "Version No." = field("Version No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -227,9 +258,9 @@
         field(55; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
         }
         field(57; Ship; Boolean)
         {
@@ -241,24 +272,24 @@
         }
         field(60; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line Archive".Amount WHERE("Document Type" = FIELD("Document Type"),
-                                                                 "Document No." = FIELD("No."),
-                                                                 "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                                                 "Version No." = FIELD("Version No.")));
+            CalcFormula = sum("Sales Line Archive".Amount where("Document Type" = field("Document Type"),
+                                                                 "Document No." = field("No."),
+                                                                 "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                                                 "Version No." = field("Version No.")));
             Caption = 'Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(61; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Sales Line Archive"."Amount Including VAT" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                 "Document No." = FIELD("No."),
-                                                                                 "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                                                                 "Version No." = FIELD("Version No.")));
+            CalcFormula = sum("Sales Line Archive"."Amount Including VAT" where("Document Type" = field("Document Type"),
+                                                                                 "Document No." = field("No."),
+                                                                                 "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                                                                 "Version No." = field("Version No.")));
             Caption = 'Amount Including VAT';
             Editable = false;
             FieldClass = FlowField;
@@ -356,8 +387,6 @@
         {
             Caption = 'Sell-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(84; "Sell-to Contact"; Text[100])
@@ -368,8 +397,6 @@
         {
             Caption = 'Bill-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(86; "Bill-to County"; Text[30])
@@ -386,8 +413,6 @@
         {
             Caption = 'Sell-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(89; "Sell-to County"; Text[30])
@@ -404,8 +429,6 @@
         {
             Caption = 'Ship-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(92; "Ship-to County"; Text[30])
@@ -600,9 +623,9 @@
         }
         field(145; "No. of Archived Versions"; Integer)
         {
-            CalcFormula = Max("Sales Header Archive"."Version No." WHERE("Document Type" = FIELD("Document Type"),
-                                                                          "No." = FIELD("No."),
-                                                                          "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence")));
+            CalcFormula = max("Sales Header Archive"."Version No." where("Document Type" = field("Document Type"),
+                                                                          "No." = field("No."),
+                                                                          "Doc. No. Occurrence" = field("Doc. No. Occurrence")));
             Caption = 'No. of Archived Versions';
             Editable = false;
             FieldClass = FlowField;
@@ -611,10 +634,8 @@
         {
             Caption = 'Sales Quote No.';
             Editable = false;
-            TableRelation = "Sales Header"."No." WHERE("Document Type" = CONST(Quote),
-                                                        "No." = FIELD("Sales Quote No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Sales Header"."No." where("Document Type" = const(Quote),
+                                                        "No." = field("Sales Quote No."));
             ValidateTableRelation = false;
         }
         field(152; "Quote Valid Until Date"; Date)
@@ -637,7 +658,7 @@
         field(163; "Company Bank Account Code"; Code[20])
         {
             Caption = 'Company Bank Account Code';
-            TableRelation = "Bank Account" where("Currency Code" = FIELD("Currency Code"));
+            TableRelation = "Bank Account" where("Currency Code" = field("Currency Code"));
         }
         field(171; "Sell-to Phone No."; Text[30])
         {
@@ -680,7 +701,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(827; "Credit Card No."; Code[20])
@@ -693,8 +714,8 @@
         field(3998; "Source Doc. Exists"; Boolean)
         {
             FieldClass = Flowfield;
-            CalcFormula = Exist("Sales Header" WHERE("Document Type" = FIELD("Document Type"),
-                                                            "No." = FIELD("No.")));
+            CalcFormula = exist("Sales Header" where("Document Type" = field("Document Type"),
+                                                            "No." = field("No.")));
             Caption = 'Source Doc. Exists';
             Editable = false;
         }
@@ -702,9 +723,9 @@
         {
             Caption = 'Last Archived Date';
             FieldClass = FlowField;
-            CalcFormula = Max("Sales Header Archive".SystemCreatedAt where("Document Type" = FIELD("Document Type"),
-                                                            "No." = FIELD("No."),
-                                                            "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence")));
+            CalcFormula = max("Sales Header Archive".SystemCreatedAt where("Document Type" = field("Document Type"),
+                                                            "No." = field("No."),
+                                                            "Doc. No. Occurrence" = field("Doc. No. Occurrence")));
             Editable = false;
         }
         field(5043; "Interaction Exist"; Boolean)
@@ -725,8 +746,6 @@
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(5047; "Version No."; Integer)
         {
@@ -773,8 +792,8 @@
         field(5055; "Opportunity No."; Code[20])
         {
             Caption = 'Opportunity No.';
-            TableRelation = Opportunity."No." WHERE("Contact No." = FIELD("Sell-to Contact No."),
-                                                     Closed = CONST(false));
+            TableRelation = Opportunity."No." where("Contact No." = field("Sell-to Contact No."),
+                                                     Closed = const(false));
         }
         field(5056; "Sell-to Customer Templ. Code"; Code[20])
         {
@@ -798,11 +817,11 @@
         }
         field(5752; "Completely Shipped"; Boolean)
         {
-            CalcFormula = Min("Sales Line Archive"."Completely Shipped" WHERE("Document Type" = FIELD("Document Type"),
-                                                                               "Document No." = FIELD("No."),
-                                                                               "Version No." = FIELD("Version No."),
-                                                                               "Shipment Date" = FIELD("Date Filter"),
-                                                                               "Location Code" = FIELD("Location Filter")));
+            CalcFormula = min("Sales Line Archive"."Completely Shipped" where("Document Type" = field("Document Type"),
+                                                                               "Document No." = field("No."),
+                                                                               "Version No." = field("Version No."),
+                                                                               "Shipment Date" = field("Date Filter"),
+                                                                               "Location Code" = field("Location Filter")));
             Caption = 'Completely Shipped';
             Editable = false;
             FieldClass = FlowField;
@@ -837,16 +856,16 @@
         field(5794; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(5795; "Late Order Shipping"; Boolean)
         {
-            CalcFormula = Exist("Sales Line Archive" WHERE("Document Type" = FIELD("Document Type"),
-                                                            "Sell-to Customer No." = FIELD("Sell-to Customer No."),
-                                                            "Document No." = FIELD("No."),
-                                                            "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                                            "Version No." = FIELD("Version No."),
-                                                            "Shipment Date" = FIELD("Date Filter")));
+            CalcFormula = exist("Sales Line Archive" where("Document Type" = field("Document Type"),
+                                                            "Sell-to Customer No." = field("Sell-to Customer No."),
+                                                            "Document No." = field("No."),
+                                                            "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                                            "Version No." = field("Version No."),
+                                                            "Shipment Date" = field("Date Filter")));
             Caption = 'Late Order Shipping';
             Editable = false;
             FieldClass = FlowField;
@@ -899,8 +918,8 @@
         }
         field(10009; "Outstanding Amount ($)"; Decimal)
         {
-            CalcFormula = Sum("Sales Line"."Outstanding Amount" WHERE("Document Type" = FIELD("Document Type"),
-                                                                       "Document No." = FIELD("No.")));
+            CalcFormula = sum("Sales Line"."Outstanding Amount" where("Document Type" = field("Document Type"),
+                                                                       "Document No." = field("No.")));
             Caption = 'Outstanding Amount ($)';
             Editable = false;
             FieldClass = FlowField;

@@ -51,9 +51,7 @@ page 1440 "Headline RC Business Manager"
     var
         RCHeadlinesPageCommon: Codeunit "RC Headlines Page Common";
 
-        [InDataSet]
         DefaultFieldsVisible: Boolean;
-        [InDataSet]
         UserGreetingVisible: Boolean;
 }
 

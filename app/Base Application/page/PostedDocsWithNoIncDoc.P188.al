@@ -136,7 +136,7 @@ page 188 "Posted Docs. With No Inc. Doc."
                     var
                         IncomingDocument: Record "Incoming Document";
                     begin
-                        IncomingDocument.ShowCard("Document No.", "Posting Date");
+                        IncomingDocument.ShowCard(Rec."Document No.", Rec."Posting Date");
                     end;
                 }
                 action(SelectIncomingDoc)
@@ -149,7 +149,7 @@ page 188 "Posted Docs. With No Inc. Doc."
 
                     trigger OnAction()
                     begin
-                        UpdateIncomingDocuments();
+                        Rec.UpdateIncomingDocuments();
                     end;
                 }
                 action(IncomingDocAttachFile)
@@ -165,8 +165,8 @@ page 188 "Posted Docs. With No Inc. Doc."
                     var
                         IncomingDocumentAttachment: Record "Incoming Document Attachment";
                     begin
-                        IncomingDocumentAttachment.SetRange("Document No.", "Document No.");
-                        IncomingDocumentAttachment.SetRange("Posting Date", "Posting Date");
+                        IncomingDocumentAttachment.SetRange("Document No.", Rec."Document No.");
+                        IncomingDocumentAttachment.SetRange("Posting Date", Rec."Posting Date");
                         IncomingDocumentAttachment.NewAttachment();
                     end;
                 }
@@ -183,7 +183,7 @@ page 188 "Posted Docs. With No Inc. Doc."
                 var
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -238,15 +238,15 @@ page 188 "Posted Docs. With No Inc. Doc."
         if DateFilter = '' then begin
             FiscalStartDate := AccountingPeriod.GetFiscalYearStartDate(WorkDate());
             if FiscalStartDate <> 0D then
-                SetRange("Posting Date", FiscalStartDate, WorkDate())
+                Rec.SetRange("Posting Date", FiscalStartDate, WorkDate())
             else
-                SetRange("Posting Date", CalcDate('<CY>', WorkDate()), WorkDate());
-            DateFilter := CopyStr(GetFilter("Posting Date"), 1, MaxStrLen(DateFilter));
-            SetRange("Posting Date");
+                Rec.SetRange("Posting Date", CalcDate('<CY>', WorkDate()), WorkDate());
+            DateFilter := CopyStr(Rec.GetFilter("Posting Date"), 1, MaxStrLen(DateFilter));
+            Rec.SetRange("Posting Date");
         end;
         FilterGroupNo := 0;
         while (FilterGroupNo <= 4) and (GLAccFilter = '') do begin
-            GLAccFilter := CopyStr(GetFilter("G/L Account No. Filter"), 1, MaxStrLen(GLAccFilter));
+            GLAccFilter := CopyStr(Rec.GetFilter("G/L Account No. Filter"), 1, MaxStrLen(GLAccFilter));
             FilterGroupNo += 2;
         end;
         SearchForDocNos();
@@ -264,9 +264,9 @@ page 188 "Posted Docs. With No Inc. Doc."
         PostedDocsWithNoIncBuf: Record "Posted Docs. With No Inc. Buf.";
     begin
         PostedDocsWithNoIncBuf := Rec;
-        GetDocNosWithoutIncomingDoc(Rec, DateFilter, DocNoFilter, GLAccFilter, ExternalDocNoFilter);
+        Rec.GetDocNosWithoutIncomingDoc(Rec, DateFilter, DocNoFilter, GLAccFilter, ExternalDocNoFilter);
         Rec := PostedDocsWithNoIncBuf;
-        if Find('=<>') then;
+        if Rec.Find('=<>') then;
         CurrPage.Update(false);
     end;
 
@@ -275,8 +275,8 @@ page 188 "Posted Docs. With No Inc. Doc."
         IncomingDocument: Record "Incoming Document";
     begin
         IncomingDocument.SetRange(Posted, true);
-        IncomingDocument.SetRange("Document No.", "Document No.");
-        IncomingDocument.SetRange("Posting Date", "Posting Date");
+        IncomingDocument.SetRange("Document No.", Rec."Document No.");
+        IncomingDocument.SetRange("Posting Date", Rec."Posting Date");
         exit(not IncomingDocument.IsEmpty);
     end;
 }

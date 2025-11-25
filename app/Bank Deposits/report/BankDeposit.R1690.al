@@ -384,6 +384,7 @@ report 1690 "Bank Deposit"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if not BankAccount.Get("Bank Account No.") then
                     BankAccount.Name := StrSubstNo(InvalidAccountTxt, BankAccount.TableCaption);

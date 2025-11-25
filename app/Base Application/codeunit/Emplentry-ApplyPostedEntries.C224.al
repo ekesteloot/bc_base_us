@@ -1,4 +1,15 @@
-﻿codeunit 224 "EmplEntry-Apply Posted Entries"
+﻿namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+
+codeunit 224 "EmplEntry-Apply Posted Entries"
 {
     EventSubscriberInstance = Manual;
     Permissions = TableData "Employee Ledger Entry" = rimd,
@@ -52,18 +63,6 @@
         LatestEntryMustBeApplicationErr: Label 'The latest transaction number must be an application in employee ledger entry number %1.', Comment = '%1 - arbitrary text, the identifier of the ledger entry';
         CannotUnapplyExchRateErr: Label 'You cannot unapply the entry with the posting date %1, because the exchange rate for the additional reporting currency has been changed.', Comment = '%1 - a date';
         CannotApplyClosedEntriesErr: Label 'One or more of the entries that you selected is closed. You cannot apply closed entries.';
-
-#if not CLEAN20
-    [Obsolete('Replaced by Apply(EmplLedgEntry; ApplyUnapplyParameters)', '20.0')]
-    procedure Apply(EmplLedgEntry: Record "Employee Ledger Entry"; DocumentNo: Code[20]; ApplicationDate: Date)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        Apply(EmplLedgEntry, ApplyUnapplyParameters)
-    end;
-#endif
 
     procedure Apply(EmplLedgEntry: Record "Employee Ledger Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     begin
@@ -242,18 +241,6 @@
         UnapplyEmplEntries.RunModal();
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by PostUnApplyEmployee(DtldCustLedgEntry2; ApplyUnapplyParameters)', '20.0')]
-    procedure PostUnApplyEmployee(DtldEmplLedgEntry2: Record "Detailed Employee Ledger Entry"; DocNo: Code[20]; PostingDate: Date)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocNo;
-        ApplyUnapplyParameters."Posting Date" := PostingDate;
-        PostUnApplyEmployee(DtldEmplLedgEntry2, ApplyUnapplyParameters);
-    end;
-#endif
-
     procedure PostUnApplyEmployee(DtldEmplLedgEntry2: Record "Detailed Employee Ledger Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     var
         GLEntry: Record "G/L Entry";
@@ -424,18 +411,6 @@
         exit(LastTransactionNo);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by PreviewApply(EmployeeLedgerEntry, ApplyUnapplyParameters)', '20.0')]
-    procedure PreviewApply(EmployeeLedgerEntry: Record "Employee Ledger Entry"; DocumentNo: Code[20]; ApplicationDate: Date)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        PreviewApply(EmployeeLedgerEntry, ApplyUnapplyParameters);
-    end;
-#endif
-
     procedure PreviewApply(EmployeeLedgerEntry: Record "Employee Ledger Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     var
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
@@ -445,18 +420,6 @@
         EmplEntryApplyPostedEntries.SetApplyContext(ApplyUnapplyParameters);
         GenJnlPostPreview.Preview(EmplEntryApplyPostedEntries, EmployeeLedgerEntry);
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by PreviewUnapply(DetailedEmployeeLedgEntry, ApplyUnapplyParameters)', '20.0')]
-    procedure PreviewUnapply(DetailedEmployeeLedgEntry: Record "Detailed Employee Ledger Entry"; DocumentNo: Code[20]; ApplicationDate: Date)
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        PreviewUnapply(DetailedEmployeeLedgEntry, ApplyUnapplyParameters);
-    end;
-#endif
 
     procedure PreviewUnapply(DetailedEmployeeLedgEntry: Record "Detailed Employee Ledger Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     var
@@ -469,35 +432,11 @@
         GenJnlPostPreview.Preview(EmplEntryApplyPostedEntries, EmployeeLedgerEntry);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by SetApplyContext(ApplyUnapplyParameters)', '20.0')]
-    procedure SetApplyContext(ApplicationDate: Date; DocumentNo: Code[20])
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        SetApplyContext(ApplyUnapplyParameters);
-    end;
-#endif
-
     procedure SetApplyContext(ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     begin
         ApplyUnapplyParametersContext := ApplyUnapplyParameters;
         RunOptionPreviewContext := RunOptionPreview::Apply;
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by SetUnapplyContext(DetailedEmployeeLedgEntry; ApplyUnapplyParameters)', '20.0')]
-    procedure SetUnapplyContext(var DetailedEmployeeLedgEntry: Record "Detailed Employee Ledger Entry"; ApplicationDate: Date; DocumentNo: Code[20])
-    var
-        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
-    begin
-        ApplyUnapplyParameters."Document No." := DocumentNo;
-        ApplyUnapplyParameters."Posting Date" := ApplicationDate;
-        SetUnapplyContext(DetailedEmployeeLedgEntry, ApplyUnapplyParameters);
-    end;
-#endif
 
     procedure SetUnapplyContext(var DetailedEmployeeLedgEntry: Record "Detailed Employee Ledger Entry"; ApplyUnapplyParameters: Record "Apply Unapply Parameters")
     begin

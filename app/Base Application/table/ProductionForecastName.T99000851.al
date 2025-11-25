@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.Forecast;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using System.Utilities;
+
 table 99000851 "Production Forecast Name"
 {
     Caption = 'Demand Forecast Name';

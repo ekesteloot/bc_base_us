@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 table 5643 "Depreciation Table Line"
 {
     Caption = 'Depreciation Table Line';

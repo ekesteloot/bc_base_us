@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
 page 105 "New Account Schedule Name"
 {
     Caption = 'New Row Definition';

@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Task;
+
+using System.Environment;
+
 page 5199 "Attendee Scheduling"
 {
     Caption = 'Attendee Scheduling';
@@ -25,7 +29,7 @@ page 5199 "Attendee Scheduling"
                     Editable = false;
                     ToolTip = 'Specifies the description of the task.';
                 }
-                field(Location; Location)
+                field(Location; Rec.Location)
                 {
                     ApplicationArea = Location;
                     Editable = false;
@@ -49,7 +53,7 @@ page 5199 "Attendee Scheduling"
                     Editable = false;
                     ToolTip = 'Specifies the status of the task. There are five options: Not Started, In Progress, Completed, Waiting and Postponed.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Editable = false;
@@ -59,8 +63,8 @@ page 5199 "Attendee Scheduling"
             part(AttendeeSubform; "Attendee Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "To-do No." = FIELD("Organizer To-do No.");
-                SubPageView = SORTING("To-do No.", "Line No.");
+                SubPageLink = "To-do No." = field("Organizer To-do No.");
+                SubPageView = sorting("To-do No.", "Line No.");
             }
             group(Interaction)
             {
@@ -81,13 +85,13 @@ page 5199 "Attendee Scheduling"
                     Enabled = LanguageCodeEnable;
                     ToolTip = 'Specifies the language that is used when translating specified text on documents to foreign business partner, such as an item description on an order confirmation.';
                 }
-                field(Subject; Subject)
+                field(Subject; Rec.Subject)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Enabled = SubjectEnable;
                     ToolTip = 'Specifies the subject of the task. The subject is used for e-mail messages or Outlook meetings that you create.';
                 }
-                field(Attachment; "Attachment No." > 0)
+                field(Attachment; Rec."Attachment No." > 0)
                 {
                     ApplicationArea = RelationshipMgmt;
                     AssistEdit = true;
@@ -151,7 +155,7 @@ page 5199 "Attendee Scheduling"
 
                         trigger OnAction()
                         begin
-                            OpenAttachment(not CurrPage.Editable);
+                            Rec.OpenAttachment(not CurrPage.Editable);
                         end;
                     }
                     action(Create)
@@ -163,7 +167,7 @@ page 5199 "Attendee Scheduling"
 
                         trigger OnAction()
                         begin
-                            CreateAttachment(not CurrPage.Editable);
+                            Rec.CreateAttachment(not CurrPage.Editable);
                         end;
                     }
                     action(Import)
@@ -175,7 +179,7 @@ page 5199 "Attendee Scheduling"
 
                         trigger OnAction()
                         begin
-                            ImportAttachment();
+                            Rec.ImportAttachment();
                         end;
                     }
                     action(Export)
@@ -187,7 +191,7 @@ page 5199 "Attendee Scheduling"
 
                         trigger OnAction()
                         begin
-                            ExportAttachment();
+                            Rec.ExportAttachment();
                         end;
                     }
                     action(Remove)
@@ -199,7 +203,7 @@ page 5199 "Attendee Scheduling"
 
                         trigger OnAction()
                         begin
-                            RemoveAttachment(true);
+                            Rec.RemoveAttachment(true);
                         end;
                     }
                 }
@@ -220,7 +224,7 @@ page 5199 "Attendee Scheduling"
                         if IsHandled then
                             exit;
 
-                        SendMAPIInvitations(Rec, false);
+                        Rec.SendMAPIInvitations(Rec, false);
                     end;
                 }
             }
@@ -234,10 +238,10 @@ page 5199 "Attendee Scheduling"
 
     trigger OnAfterGetRecord()
     begin
-        if "No." <> "Organizer To-do No." then
+        if Rec."No." <> Rec."Organizer To-do No." then
             CurrPage.Editable := false;
 
-        if Closed then
+        if Rec.Closed then
             CurrPage.Editable := false;
     end;
 
@@ -254,40 +258,35 @@ page 5199 "Attendee Scheduling"
     var
         EnvironmentInfo: Codeunit "Environment Information";
         IsSaas: Boolean;
-        [InDataSet]
         LanguageCodeEnable: Boolean;
-        [InDataSet]
         SubjectEnable: Boolean;
-        [InDataSet]
         AttachmentEnable: Boolean;
-        [InDataSet]
         UnitCostLCYEnable: Boolean;
-        [InDataSet]
         UnitDurationMinEnable: Boolean;
 
     local procedure MaintainAttachment()
     begin
-        if "Interaction Template Code" = '' then
+        if Rec."Interaction Template Code" = '' then
             exit;
 
-        if "Attachment No." <> 0 then begin
+        if Rec."Attachment No." <> 0 then begin
             if not CurrPage.Editable then begin
                 CurrPage.Editable := true;
-                OpenAttachment(true);
+                Rec.OpenAttachment(true);
                 CurrPage.Editable := false;
             end else
-                OpenAttachment(false);
+                Rec.OpenAttachment(false);
         end else
-            CreateAttachment(not CurrPage.Editable);
+            Rec.CreateAttachment(not CurrPage.Editable);
     end;
 
     local procedure EnableFields()
     begin
-        LanguageCodeEnable := "Interaction Template Code" <> '';
-        SubjectEnable := "Interaction Template Code" <> '';
-        AttachmentEnable := "Interaction Template Code" <> '';
-        UnitCostLCYEnable := "Interaction Template Code" <> '';
-        UnitDurationMinEnable := "Interaction Template Code" <> ''
+        LanguageCodeEnable := Rec."Interaction Template Code" <> '';
+        SubjectEnable := Rec."Interaction Template Code" <> '';
+        AttachmentEnable := Rec."Interaction Template Code" <> '';
+        UnitCostLCYEnable := Rec."Interaction Template Code" <> '';
+        UnitDurationMinEnable := Rec."Interaction Template Code" <> ''
     end;
 
     local procedure InteractionTemplateCodeOnAfter()

@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.History;
+
 report 5908 "Service Order - Response Time"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceOrderResponseTime.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceOrderResponseTime.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Order - Response Time';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5908 "Service Order - Response Time"
     {
         dataitem("Service Shipment Header"; "Service Shipment Header")
         {
-            DataItemTableView = SORTING("Responsibility Center", "Posting Date");
+            DataItemTableView = sorting("Responsibility Center", "Posting Date");
             RequestFilterFields = "Responsibility Center", "Posting Date";
             column(TodayFormatted; Format(Today, 0, 4))
             {

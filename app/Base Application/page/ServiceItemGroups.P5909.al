@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.Item;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Resources;
+
 page 5909 "Service Item Groups"
 {
     ApplicationArea = Service;
@@ -13,7 +19,7 @@ page 5909 "Service Item Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies a code for the service item group.';
@@ -74,8 +80,8 @@ page 5909 "Service Item Groups"
                     Caption = 'Resource Skills';
                     Image = ResourceSkills;
                     RunObject = Page "Resource Skills";
-                    RunPageLink = Type = CONST("Service Item Group"),
-                                  "No." = FIELD(Code);
+                    RunPageLink = Type = const("Service Item Group"),
+                                  "No." = field(Code);
                     ToolTip = 'View the assignment of skills to resources, items, service item groups, and service items. You can use skill codes to allocate skilled resources to service items or items that need special skills for servicing.';
                 }
                 action("Skilled Resources")
@@ -90,7 +96,7 @@ page 5909 "Service Item Groups"
                         ResourceSkill: Record "Resource Skill";
                     begin
                         Clear(SkilledResourceList);
-                        SkilledResourceList.Initialize(ResourceSkill.Type::"Service Item Group", Code, Description);
+                        SkilledResourceList.Initialize(ResourceSkill.Type::"Service Item Group", Rec.Code, Rec.Description);
                         SkilledResourceList.RunModal();
                     end;
                 }
@@ -104,8 +110,8 @@ page 5909 "Service Item Groups"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(5904),
-                                      "No." = FIELD(Code);
+                        RunPageLink = "Table ID" = const(5904),
+                                      "No." = field(Code);
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -123,7 +129,7 @@ page 5909 "Service Item Groups"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(ServiceItemGroup);
-                            DefaultDimMultiple.SetMultiRecord(ServiceItemGroup, FieldNo(Code));
+                            DefaultDimMultiple.SetMultiRecord(ServiceItemGroup, Rec.FieldNo(Code));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -134,8 +140,8 @@ page 5909 "Service Item Groups"
                     Caption = 'Trou&bleshooting Setup';
                     Image = Troubleshoot;
                     RunObject = Page "Troubleshooting Setup";
-                    RunPageLink = Type = CONST("Service Item Group"),
-                                  "No." = FIELD(Code);
+                    RunPageLink = Type = const("Service Item Group"),
+                                  "No." = field(Code);
                     ToolTip = 'Define how you troubleshoot service items.';
                 }
                 action("S&td. Serv. Item Gr. Codes")
@@ -144,7 +150,7 @@ page 5909 "Service Item Groups"
                     Caption = 'S&td. Serv. Item Gr. Codes';
                     Image = ItemGroup;
                     RunObject = Page "Standard Serv. Item Gr. Codes";
-                    RunPageLink = "Service Item Group Code" = FIELD(Code);
+                    RunPageLink = "Service Item Group Code" = field(Code);
                     ToolTip = 'View or edit recurring service item groups that you add to service lines. ';
                 }
             }

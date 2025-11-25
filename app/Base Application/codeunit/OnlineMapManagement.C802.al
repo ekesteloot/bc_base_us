@@ -20,7 +20,7 @@ codeunit 802 "Online Map Management"
         Text008: Label 'The specified record could not be found.';
         Text015: Label 'Bing Maps';
 
-    internal procedure MakeSelectionIfMapEnabled(TableID: Integer; Position: Text[1000])
+    procedure MakeSelectionIfMapEnabled(TableID: Integer; Position: Text[1000])
     var
         OnlineMapSetupLocal: Record "Online Map Setup";
         MapSetupPage: Page "Online Map Setup";

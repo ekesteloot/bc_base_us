@@ -8,7 +8,7 @@ report 10075 "Sales Order"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "Bill-to Customer No.", "Ship-to Code", "No. Printed";
             RequestFilterHeading = 'Sales Order';
@@ -17,12 +17,12 @@ report 10075 "Sales Order"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE("Document Type" = CONST(Order));
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where("Document Type" = const(Order));
                 dataitem(SalesLineComments; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST(Order), "Print On Order Confirmation" = CONST(true));
+                    DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const(Order), "Print On Order Confirmation" = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -96,8 +96,8 @@ report 10075 "Sales Order"
             }
             dataitem("Sales Comment Line"; "Sales Comment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST(Order), "Print On Order Confirmation" = CONST(true), "Document Line No." = CONST(0));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const(Order), "Print On Order Confirmation" = const(true), "Document Line No." = const(0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -118,10 +118,10 @@ report 10075 "Sales Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -286,7 +286,7 @@ report 10075 "Sales Order"
                     }
                     dataitem(SalesLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(AmountExclInvDisc; AmountExclInvDisc)
                         {
                         }
@@ -396,7 +396,7 @@ report 10075 "Sales Order"
                         }
                         dataitem(AsmLoop; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(AsmLineUnitOfMeasureText; GetUnitOfMeasureDescr(AsmLine."Unit of Measure Code"))
                             {
                             }
@@ -536,6 +536,7 @@ report 10075 "Sales Order"
                     end;
 
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 FormatDocumentFields("Sales Header");
 
@@ -697,9 +698,6 @@ report 10075 "Sales Order"
         PaymentTerms: Record "Payment Terms";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyInformation: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         TempSalesLine: Record "Sales Line" temporary;
         TempSalesLineAsm: Record "Sales Line" temporary;
@@ -749,9 +747,7 @@ report 10075 "Sales Order"
         PrevTaxPercent: Decimal;
         UseDate: Date;
         UseExternalTaxEngine: Boolean;
-        [InDataSet]
         ArchiveDocumentEnable: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         DisplayAssemblyInformation: Boolean;
         AsmInfoExistsForLine: Boolean;
@@ -781,6 +777,11 @@ report 10075 "Sales Order"
         TotalCaptionLbl: Label 'Total:';
         AmtSubjecttoSalesTaxCptnLbl: Label 'Amount Subject to Sales Tax';
         AmtExemptfromSalesTaxCptnLbl: Label 'Amount Exempt from Sales Tax';
+
+    protected var
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     procedure GetUnitOfMeasureDescr(UOMCode: Code[10]): Text[10]
     var

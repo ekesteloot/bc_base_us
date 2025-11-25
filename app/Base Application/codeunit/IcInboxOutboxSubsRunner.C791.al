@@ -6,7 +6,7 @@ codeunit 791 "IC Inbox Outbox Subs. Runner"
     var
         ICInboxTransaction: Record "IC Inbox Transaction";
     begin
-        ICInboxTransaction.Get("Record ID to Process");
+        ICInboxTransaction.Get(Rec."Record ID to Process");
         Codeunit.Run(Codeunit::"IC Inbox Outbox Subscribers", ICInboxTransaction)
     end;
 }

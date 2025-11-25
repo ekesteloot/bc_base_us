@@ -6,7 +6,7 @@ page 551 "VAT Prod. Posting Group Conv."
     DelayedInsert = true;
     PageType = List;
     SourceTable = "VAT Rate Change Conversion";
-    SourceTableView = WHERE(Type = CONST("VAT Prod. Posting Group"));
+    SourceTableView = where(Type = const("VAT Prod. Posting Group"));
     UsageCategory = Administration;
 
     layout

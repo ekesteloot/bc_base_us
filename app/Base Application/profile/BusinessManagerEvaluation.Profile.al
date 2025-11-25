@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.RoleCenters;
+
 profile "Business Manager Evaluation"
 {
     Caption = 'Business Manager Evaluation';

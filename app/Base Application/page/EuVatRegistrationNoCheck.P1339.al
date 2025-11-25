@@ -15,7 +15,7 @@ page 1339 "EU VAT Registration No Check"
                 {
                     ApplicationArea = Basic, Suite;
                     Lookup = true;
-                    TableRelation = "Country/Region" WHERE("EU Country/Region Code" = FILTER(<> ''));
+                    TableRelation = "Country/Region" where("EU Country/Region Code" = filter(<> ''));
                     ToolTip = 'Specifies the country/region.';
 
                     trigger OnValidate()

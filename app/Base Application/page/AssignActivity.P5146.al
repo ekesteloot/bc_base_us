@@ -1,3 +1,11 @@
+namespace Microsoft.CRM.Task;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Team;
+using System.Environment;
+
 page 5146 "Assign Activity"
 {
     Caption = 'Assign Activity';
@@ -24,17 +32,17 @@ page 5146 "Assign Activity"
 
                     trigger OnValidate()
                     begin
-                        if not Activity.IncludesMeeting("Activity Code") then begin
+                        if not Activity.IncludesMeeting(Rec."Activity Code") then begin
                             TeamMeetingOrganizerEditable := false;
-                            "Team Meeting Organizer" := ''
+                            Rec."Team Meeting Organizer" := ''
                         end else
-                            if "Team Code" <> '' then begin
+                            if Rec."Team Code" <> '' then begin
                                 TeamMeetingOrganizerEditable := true;
-                                "Team Meeting Organizer" := ''
+                                Rec."Team Meeting Organizer" := ''
                             end;
                     end;
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Activity Start Date';
@@ -53,12 +61,12 @@ page 5146 "Assign Activity"
                     var
                         Cont: Record Contact;
                     begin
-                        if ("Wizard Contact Name" = '') and not SegHeader.Get(GetFilter("Segment No.")) then begin
-                            if Cont.Get("Contact No.") then;
+                        if (Rec."Wizard Contact Name" = '') and not SegHeader.Get(Rec.GetFilter("Segment No.")) then begin
+                            if Cont.Get(Rec."Contact No.") then;
                             if PAGE.RunModal(0, Cont) = ACTION::LookupOK then begin
-                                Validate("Contact No.", Cont."No.");
+                                Rec.Validate("Contact No.", Cont."No.");
                                 CurrPage.SetSelectionFilter(Rec);
-                                "Wizard Contact Name" := Cont.Name;
+                                Rec."Wizard Contact Name" := Cont.Name;
                             end;
                         end;
                     end;
@@ -72,14 +80,14 @@ page 5146 "Assign Activity"
 
                     trigger OnValidate()
                     begin
-                        if SalesPurchPerson.Get("Salesperson Code") then begin
+                        if SalesPurchPerson.Get(Rec."Salesperson Code") then begin
                             TeamMeetingOrganizerEditable := false;
-                            "Team Meeting Organizer" := '';
-                            "Team Code" := ''
+                            Rec."Team Meeting Organizer" := '';
+                            Rec."Team Code" := ''
                         end else
-                            if Activity.IncludesMeeting("Activity Code") or
-                               ("Activity Code" = '') and
-                               ("Team Code" <> '')
+                            if Activity.IncludesMeeting(Rec."Activity Code") or
+                               (Rec."Activity Code" = '') and
+                               (Rec."Team Code" <> '')
                             then
                                 TeamMeetingOrganizerEditable := true
                     end;
@@ -93,14 +101,14 @@ page 5146 "Assign Activity"
 
                     trigger OnValidate()
                     begin
-                        if Team.Get("Team Code") then begin
-                            if Activity.IncludesMeeting("Activity Code") then
+                        if Team.Get(Rec."Team Code") then begin
+                            if Activity.IncludesMeeting(Rec."Activity Code") then
                                 TeamMeetingOrganizerEditable := true;
-                            "Salesperson Code" := '';
+                            Rec."Salesperson Code" := '';
                         end;
-                        if "Team Code" = '' then begin
+                        if Rec."Team Code" = '' then begin
                             TeamMeetingOrganizerEditable := false;
-                            "Team Meeting Organizer" := ''
+                            Rec."Team Meeting Organizer" := ''
                         end;
                     end;
                 }
@@ -120,7 +128,7 @@ page 5146 "Assign Activity"
                         if SalesPurchPerson.RunModal() = ACTION::LookupOK then begin
                             SalesPurchPerson.GetRecord(Salesperson);
                             if TeamMeetingOrganizerEditable then
-                                "Team Meeting Organizer" := Salesperson.Code
+                                Rec."Team Meeting Organizer" := Salesperson.Code
                         end;
                     end;
 
@@ -128,7 +136,7 @@ page 5146 "Assign Activity"
                     var
                         SalesPurchPerson: Record "Salesperson/Purchaser";
                     begin
-                        SalesPurchPerson.Get("Team Meeting Organizer");
+                        SalesPurchPerson.Get(Rec."Team Meeting Organizer");
                     end;
                 }
                 field("Wizard Campaign Description"; Rec."Wizard Campaign Description")
@@ -144,11 +152,11 @@ page 5146 "Assign Activity"
                     var
                         Campaign: Record Campaign;
                     begin
-                        if not Campaign.Get(GetFilter("Campaign No.")) then begin
-                            if Campaign.Get("Campaign No.") then;
+                        if not Campaign.Get(Rec.GetFilter("Campaign No.")) then begin
+                            if Campaign.Get(Rec."Campaign No.") then;
                             if PAGE.RunModal(0, Campaign) = ACTION::LookupOK then begin
-                                Validate("Campaign No.", Campaign."No.");
-                                "Wizard Campaign Description" := Campaign.Description;
+                                Rec.Validate("Campaign No.", Campaign."No.");
+                                Rec."Wizard Campaign Description" := Campaign.Description;
                             end;
                         end;
                     end;
@@ -167,10 +175,10 @@ page 5146 "Assign Activity"
                     var
                         Segment: Record "Segment Header";
                     begin
-                        if Segment.Get("Segment No.") then;
+                        if Segment.Get(Rec."Segment No.") then;
                         if PAGE.RunModal(0, Segment) = ACTION::LookupOK then begin
-                            Validate("Segment No.", Segment."No.");
-                            "Segment Description" := Segment.Description;
+                            Rec.Validate("Segment No.", Segment."No.");
+                            Rec."Segment Description" := Segment.Description;
                         end;
                     end;
                 }
@@ -193,8 +201,8 @@ page 5146 "Assign Activity"
 
                 trigger OnAction()
                 begin
-                    CheckAssignActivityStatus();
-                    FinishAssignActivity();
+                    Rec.CheckAssignActivityStatus();
+                    Rec.FinishAssignActivity();
                     CurrPage.Close();
                 end;
             }
@@ -214,7 +222,7 @@ page 5146 "Assign Activity"
 
     trigger OnAfterGetRecord()
     begin
-        WizardContactNameOnFormat(Format("Wizard Contact Name"));
+        WizardContactNameOnFormat(Format(Rec."Wizard Contact Name"));
     end;
 
     trigger OnInit()
@@ -230,31 +238,31 @@ page 5146 "Assign Activity"
         WizardContactNameEditable := false;
         IsOnMobile := ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::Phone;
 
-        if SalesPurchPerson.Get(GetFilter("Salesperson Code")) or
-           Team.Get(GetFilter("Team Code"))
+        if SalesPurchPerson.Get(Rec.GetFilter("Salesperson Code")) or
+           Team.Get(Rec.GetFilter("Team Code"))
         then begin
             SalespersonCodeEditable := false;
             TeamCodeEditable := false;
         end;
 
-        if SalesPurchPerson.Get(GetFilter("Salesperson Code")) or
-           ("Salesperson Code" <> '') or
-           ("Activity Code" = '')
+        if SalesPurchPerson.Get(Rec.GetFilter("Salesperson Code")) or
+           (Rec."Salesperson Code" <> '') or
+           (Rec."Activity Code" = '')
         then
             TeamMeetingOrganizerEditable := false;
 
-        if Campaign.Get(GetFilter("Campaign No.")) then
-            "Campaign Description" := Campaign.Description;
+        if Campaign.Get(Rec.GetFilter("Campaign No.")) then
+            Rec."Campaign Description" := Campaign.Description;
 
-        if SegHeader.Get(GetFilter("Segment No.")) then
-            "Segment Description" := SegHeader.Description;
+        if SegHeader.Get(Rec.GetFilter("Segment No.")) then
+            Rec."Segment Description" := SegHeader.Description;
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if CloseAction in [ACTION::OK, ACTION::LookupOK] then begin
-            CheckAssignActivityStatus();
-            FinishAssignActivity();
+            Rec.CheckAssignActivityStatus();
+            Rec.FinishAssignActivity();
         end;
     end;
 
@@ -266,13 +274,9 @@ page 5146 "Assign Activity"
         SegHeader: Record "Segment Header";
         Activity: Record Activity;
         ClientTypeManagement: Codeunit "Client Type Management";
-        [InDataSet]
         TeamMeetingOrganizerEditable: Boolean;
-        [InDataSet]
         WizardContactNameEditable: Boolean;
-        [InDataSet]
         SalespersonCodeEditable: Boolean;
-        [InDataSet]
         TeamCodeEditable: Boolean;
         IsOnMobile: Boolean;
 
@@ -281,17 +285,17 @@ page 5146 "Assign Activity"
 
     procedure Caption() CaptionStr: Text
     begin
-        if Cont.Get(GetFilter("Contact Company No.")) then
+        if Cont.Get(Rec.GetFilter("Contact Company No.")) then
             CaptionStr := CopyStr(Cont."No." + ' ' + Cont.Name, 1, MaxStrLen(CaptionStr));
-        if Cont.Get(GetFilter("Contact No.")) then
+        if Cont.Get(Rec.GetFilter("Contact No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + Cont."No." + ' ' + Cont.Name, 1, MaxStrLen(CaptionStr));
-        if SalesPurchPerson.Get(GetFilter("Salesperson Code")) then
+        if SalesPurchPerson.Get(Rec.GetFilter("Salesperson Code")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + SalesPurchPerson.Code + ' ' + SalesPurchPerson.Name, 1, MaxStrLen(CaptionStr));
-        if Team.Get(GetFilter("Team Code")) then
+        if Team.Get(Rec.GetFilter("Team Code")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + Team.Code + ' ' + Team.Name, 1, MaxStrLen(CaptionStr));
-        if Campaign.Get(GetFilter("Campaign No.")) then
+        if Campaign.Get(Rec.GetFilter("Campaign No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + Campaign."No." + ' ' + Campaign.Description, 1, MaxStrLen(CaptionStr));
-        if SegHeader.Get(GetFilter("Segment No.")) then
+        if SegHeader.Get(Rec.GetFilter("Segment No.")) then
             CaptionStr := CopyStr(CaptionStr + ' ' + SegHeader."No." + ' ' + SegHeader.Description, 1, MaxStrLen(CaptionStr));
         if CaptionStr = '' then
             CaptionStr := Text000;
@@ -301,7 +305,7 @@ page 5146 "Assign Activity"
 
     local procedure WizardContactNameOnFormat(Text: Text[1024])
     begin
-        if SegHeader.Get(GetFilter("Segment No.")) then
+        if SegHeader.Get(Rec.GetFilter("Segment No.")) then
             Text := Text005;
     end;
 

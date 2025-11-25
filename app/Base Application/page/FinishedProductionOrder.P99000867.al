@@ -1,3 +1,12 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Ledger;
+
 page 99000867 "Finished Production Order"
 {
     Caption = 'Finished Production Order';
@@ -6,7 +15,7 @@ page 99000867 "Finished Production Order"
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Production Order";
-    SourceTableView = WHERE(Status = CONST(Finished));
+    SourceTableView = where(Status = const(Finished));
 
     layout
     {
@@ -84,7 +93,7 @@ page 99000867 "Finished Production Order"
             part(ProdOrderLines; "Finished Prod. Order Lines")
             {
                 ApplicationArea = Manufacturing;
-                SubPageLink = "Prod. Order No." = FIELD("No.");
+                SubPageLink = "Prod. Order No." = field("No.");
                 UpdatePropagation = Both;
             }
             group(Schedule)
@@ -231,9 +240,9 @@ page 99000867 "Finished Production Order"
                         Caption = 'Item Ledger E&ntries';
                         Image = ItemLedger;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ShortCutKey = 'Ctrl+F7';
                         ToolTip = 'View the item ledger entries of the item on the document or journal line.';
                     }
@@ -243,9 +252,9 @@ page 99000867 "Finished Production Order"
                         Caption = 'Capacity Ledger Entries';
                         Image = CapacityLedger;
                         RunObject = Page "Capacity Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                     }
                     action("Value Entries")
@@ -254,9 +263,9 @@ page 99000867 "Finished Production Order"
                         Caption = 'Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the value entries of the item on the document or journal line.';
                     }
                     action("&Warehouse Entries")
@@ -265,10 +274,10 @@ page 99000867 "Finished Production Order"
                         Caption = '&Warehouse Entries';
                         Image = BinLedger;
                         RunObject = Page "Warehouse Entries";
-                        RunPageLink = "Source Type" = FILTER(83 | 5407),
-                                      "Source Subtype" = FILTER("3" | "4" | "5"),
-                                      "Source No." = FIELD("No.");
-                        RunPageView = SORTING("Source Type", "Source Subtype", "Source No.");
+                        RunPageLink = "Source Type" = filter(83 | 5407),
+                                      "Source Subtype" = filter("3" | "4" | "5"),
+                                      "Source No." = field("No.");
+                        RunPageView = sorting("Source Type", "Source Subtype", "Source No.");
                         ToolTip = 'View the history of quantities that are registered for the item in warehouse activities. ';
                     }
                 }
@@ -278,8 +287,8 @@ page 99000867 "Finished Production Order"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Prod. Order Comment Sheet";
-                    RunPageLink = Status = FIELD(Status),
-                                  "Prod. Order No." = FIELD("No.");
+                    RunPageLink = Status = field(Status),
+                                  "Prod. Order No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -293,7 +302,7 @@ page 99000867 "Finished Production Order"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Statistics)
@@ -302,9 +311,9 @@ page 99000867 "Finished Production Order"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Production Order Statistics";
-                    RunPageLink = Status = FIELD(Status),
-                                  "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = Status = field(Status),
+                                  "No." = field("No."),
+                                  "Date Filter" = field("Date Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -314,10 +323,10 @@ page 99000867 "Finished Production Order"
                     Caption = 'Registered P&ick Lines';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Act.-Lines";
-                    RunPageLink = "Source Type" = CONST(5407),
-                                  "Source Subtype" = CONST("3"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+                    RunPageLink = "Source Type" = const(5407),
+                                  "Source Subtype" = const("3"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
                     ToolTip = 'View the list of warehouse picks that have been made for the order.';
                 }
                 action("<Action2>")
@@ -326,10 +335,10 @@ page 99000867 "Finished Production Order"
                     Caption = 'Registered Invt. M&ovement Lines';
                     Image = RegisteredDocs;
                     RunObject = Page "Reg. Invt. Movement Lines";
-                    RunPageLink = "Source Type" = CONST(5407),
-                                  "Source Subtype" = CONST("3"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+                    RunPageLink = "Source Type" = const(5407),
+                                  "Source Subtype" = const("3"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
                     ToolTip = 'View the list of inventory movements that have been made for the order.';
                 }
             }
@@ -376,7 +385,7 @@ page 99000867 "Finished Production Order"
 #if not CLEAN17
     trigger OnAfterGetRecord()
     begin
-        GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
+        Rec.GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
     end;
 
     trigger OnInit()

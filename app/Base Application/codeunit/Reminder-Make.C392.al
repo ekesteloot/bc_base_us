@@ -1,3 +1,12 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Receivables;
+using System.Globalization;
+using System.Utilities;
+
 codeunit 392 "Reminder-Make"
 {
 
@@ -477,7 +486,7 @@ codeunit 392 "Reminder-Make"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSetReminderLine(LineLevel2, ReminderDueDate2, IsHandled, CustLedgEntry, ReminderEntry);
+        OnBeforeSetReminderLine(LineLevel2, ReminderDueDate2, IsHandled);
         if not IsHandled then begin
             if CustLedgEntry."Last Issued Reminder Level" > 0 then begin
                 ReminderEntry.SetCurrentKey("Customer Entry No.", Type);
@@ -812,7 +821,7 @@ codeunit 392 "Reminder-Make"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetReminderLine(var LineLevel2: Integer; var ReminderDueDate2: Date; var IsHandled: Boolean; var CustLedgerEntry: Record "Cust. Ledger Entry"; var ReminderFinChargeEntry: Record "Reminder/Fin. Charge Entry")
+    local procedure OnBeforeSetReminderLine(var LineLevel2: Integer; var ReminderDueDate2: Date; var IsHandled: Boolean)
     begin
     end;
 }

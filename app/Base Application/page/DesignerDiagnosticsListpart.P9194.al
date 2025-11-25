@@ -1,3 +1,5 @@
+namespace System.Tooling;
+
 page 9194 "Designer Diagnostics ListPart"
 {
     PageType = ListPart;
@@ -15,14 +17,14 @@ page 9194 "Designer Diagnostics ListPart"
         {
             repeater(repeater)
             {
-                field(Severity; Severity)
+                field(Severity; Rec.Severity)
                 {
                     ApplicationArea = All;
                     width = 5;
                     ToolTip = 'Specifies the severity of this diagnostics message.';
                     StyleExpr = SeverityStyleExpr;
                 }
-                field(Message; Message)
+                field(Message; Rec.Message)
                 {
                     Caption = 'Technical details';
                     ApplicationArea = All;
@@ -34,12 +36,12 @@ page 9194 "Designer Diagnostics ListPart"
 
     trigger OnAfterGetRecord()
     begin
-        case Severity of
-            Severity::Error:
+        case Rec.Severity of
+            Enum::Severity::Error:
                 SeverityStyleExpr := 'Unfavorable';
-            Severity::Warning:
+            Enum::Severity::Warning:
                 SeverityStyleExpr := 'Ambiguous';
-            Severity::Information:
+            Enum::Severity::Information:
                 SeverityStyleExpr := 'Favorable';
             else
                 SeverityStyleExpr := 'Favorable';

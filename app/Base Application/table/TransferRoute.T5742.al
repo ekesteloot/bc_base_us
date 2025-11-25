@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.InventoryMgt.Location;
+
 table 5742 "Transfer Route"
 {
     Caption = 'Transfer Route';
@@ -8,17 +12,17 @@ table 5742 "Transfer Route"
         field(1; "Transfer-from Code"; Code[10])
         {
             Caption = 'Transfer-from Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(2; "Transfer-to Code"; Code[10])
         {
             Caption = 'Transfer-to Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(4; "In-Transit Code"; Code[10])
         {
             Caption = 'In-Transit Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(true));
+            TableRelation = Location where("Use As In-Transit" = const(true));
         }
         field(5; "Shipping Agent Code"; Code[10])
         {
@@ -35,7 +39,7 @@ table 5742 "Transfer Route"
         field(6; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
     }
 

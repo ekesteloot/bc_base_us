@@ -1,4 +1,25 @@
-﻿table 32 "Item Ledger Entry"
+﻿namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
+table 32 "Item Ledger Entry"
 {
     Caption = 'Item Ledger Entry';
     DrillDownPageID = "Item Ledger Entries";
@@ -27,11 +48,11 @@
         field(5; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type" = CONST(Item)) Item;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor
+            else
+            if ("Source Type" = const(Item)) Item;
         }
         field(6; "Document No."; Code[20])
         {
@@ -73,13 +94,13 @@
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(34; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(36; Positive; Boolean)
         {
@@ -145,13 +166,13 @@
         field(70; "Reserved Quantity"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = CONST(''),
-                                                                           "Source Ref. No." = FIELD("Entry No."),
-                                                                           "Source Type" = CONST(32),
-                                                                           "Source Subtype" = CONST("0"),
-                                                                           "Source Batch Name" = CONST(''),
-                                                                           "Source Prod. Order Line" = CONST(0),
-                                                                           "Reservation Status" = CONST(Reservation)));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Source ID" = const(''),
+                                                                           "Source Ref. No." = field("Entry No."),
+                                                                           "Source Type" = const(32),
+                                                                           "Source Subtype" = const("0"),
+                                                                           "Source Batch Name" = const(''),
+                                                                           "Source Prod. Order Line" = const(0),
+                                                                           "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -188,7 +209,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])
@@ -258,7 +279,7 @@
         field(1001; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(1002; "Job Purchase"; Boolean)
         {
@@ -267,7 +288,7 @@
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
@@ -277,7 +298,7 @@
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(5408; "Derived from Blanket Order"; Boolean)
         {
@@ -300,7 +321,7 @@
         {
             AccessByPermission = TableData "Item Substitution" = R;
             Caption = 'Originally Ordered Var. Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Originally Ordered No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Originally Ordered No."));
         }
         field(5703; "Out-of-Stock Substitution"; Boolean)
         {
@@ -346,7 +367,7 @@
         field(5803; "Cost Amount (Expected)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Expected)" WHERE("Item Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Expected)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Cost Amount (Expected)';
             Editable = false;
             FieldClass = FlowField;
@@ -354,7 +375,7 @@
         field(5804; "Cost Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Actual)" WHERE("Item Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Actual)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Cost Amount (Actual)';
             Editable = false;
             FieldClass = FlowField;
@@ -362,7 +383,7 @@
         field(5805; "Cost Amount (Non-Invtbl.)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Non-Invtbl.)" WHERE("Item Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Non-Invtbl.)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Cost Amount (Non-Invtbl.)';
             Editable = false;
             FieldClass = FlowField;
@@ -371,7 +392,7 @@
         {
             AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Expected) (ACY)" WHERE("Item Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Expected) (ACY)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Cost Amount (Expected) (ACY)';
             Editable = false;
             FieldClass = FlowField;
@@ -380,7 +401,7 @@
         {
             AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Actual) (ACY)" WHERE("Item Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Actual) (ACY)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Cost Amount (Actual) (ACY)';
             Editable = false;
             FieldClass = FlowField;
@@ -389,7 +410,7 @@
         {
             AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Non-Invtbl.)(ACY)" WHERE("Item Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Non-Invtbl.)(ACY)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Cost Amount (Non-Invtbl.)(ACY)';
             Editable = false;
             FieldClass = FlowField;
@@ -397,7 +418,7 @@
         field(5813; "Purchase Amount (Expected)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Purchase Amount (Expected)" WHERE("Item Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = sum("Value Entry"."Purchase Amount (Expected)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Purchase Amount (Expected)';
             Editable = false;
             FieldClass = FlowField;
@@ -405,7 +426,7 @@
         field(5814; "Purchase Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Purchase Amount (Actual)" WHERE("Item Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = sum("Value Entry"."Purchase Amount (Actual)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Purchase Amount (Actual)';
             Editable = false;
             FieldClass = FlowField;
@@ -413,7 +434,7 @@
         field(5815; "Sales Amount (Expected)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Sales Amount (Expected)" WHERE("Item Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = sum("Value Entry"."Sales Amount (Expected)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Sales Amount (Expected)';
             Editable = false;
             FieldClass = FlowField;
@@ -421,7 +442,7 @@
         field(5816; "Sales Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry No." = FIELD("Entry No.")));
+            CalcFormula = sum("Value Entry"."Sales Amount (Actual)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Sales Amount (Actual)';
             Editable = false;
             FieldClass = FlowField;
@@ -513,6 +534,7 @@
         key(Key6; "Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date")
         {
             SumIndexFields = Quantity, "Remaining Quantity";
+            IncludedFields = "Job No.", "Job Task No.", "Document Type", "Document No.", "Order Type", "Order No.";
         }
         key(Key8; "Country/Region Code", "Entry Type", "Posting Date")
         {

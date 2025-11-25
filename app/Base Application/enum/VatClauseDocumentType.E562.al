@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 enum 562 "VAT Clause Document Type"
 {
     Extensible = true;

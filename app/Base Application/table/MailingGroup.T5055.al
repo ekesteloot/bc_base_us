@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Contact;
+
 table 5055 "Mailing Group"
 {
     Caption = 'Mailing Group';
@@ -17,7 +21,7 @@ table 5055 "Mailing Group"
         }
         field(3; "No. of Contacts"; Integer)
         {
-            CalcFormula = Count ("Contact Mailing Group" WHERE("Mailing Group Code" = FIELD(Code)));
+            CalcFormula = Count("Contact Mailing Group" where("Mailing Group Code" = field(Code)));
             Caption = 'No. of Contacts';
             Editable = false;
             FieldClass = FlowField;

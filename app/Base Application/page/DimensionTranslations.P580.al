@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
+using System.Globalization;
+
 page 580 "Dimension Translations"
 {
     Caption = 'Dimension Translations';

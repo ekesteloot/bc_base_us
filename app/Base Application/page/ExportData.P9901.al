@@ -71,7 +71,7 @@ page 9901 "Export Data"
                                 if TempSelectedCompany.Insert() then;
                             end else begin
                                 IncludeAllCompanies := false;
-                                if TempSelectedCompany.Get(Name) then
+                                if TempSelectedCompany.Get(Rec.Name) then
                                     TempSelectedCompany.Delete();
                             end;
                         end;
@@ -94,7 +94,7 @@ page 9901 "Export Data"
 
     trigger OnAfterGetRecord()
     begin
-        Selected := TempSelectedCompany.Get(Name);
+        Selected := TempSelectedCompany.Get(Rec.Name);
     end;
 
     trigger OnInit()
@@ -118,7 +118,7 @@ page 9901 "Export Data"
         if Company.FindSet() then
             repeat
                 Rec := Company;
-                Insert();
+                Rec.Insert();
             until Company.Next() = 0;
 
         MarkAll();
@@ -164,11 +164,11 @@ page 9901 "Export Data"
     begin
         TempSelectedCompany.DeleteAll();
         if IncludeAllCompanies then
-            if FindSet() then
+            if Rec.FindSet() then
                 repeat
                     TempSelectedCompany := Rec;
                     TempSelectedCompany.Insert();
-                until Next() = 0;
+                until Rec.Next() = 0;
 
         CurrPage.Update(false);
     end;

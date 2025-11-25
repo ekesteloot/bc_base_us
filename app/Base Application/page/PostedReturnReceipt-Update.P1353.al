@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.History;
+
 page 1353 "Posted Return Receipt - Update"
 {
     Caption = 'Posted Return Receipt - Update';
@@ -92,19 +94,18 @@ page 1353 "Posted Return Receipt - Update"
     local procedure RecordChanged() IsChanged: Boolean
     begin
         IsChanged :=
-            ("Bill-to County" <> xReturnReceiptHeader."Bill-to County") or
-            ("Bill-to Country/Region Code" <> xReturnReceiptHeader."Bill-to Country/Region Code") or
-            ("Shipping Agent Code" <> xReturnReceiptHeader."Shipping Agent Code") or
-            ("Package Tracking No." <> xReturnReceiptHeader."Package Tracking No.");
+            (Rec."Bill-to County" <> xReturnReceiptHeader."Bill-to County") or
+            (Rec."Bill-to Country/Region Code" <> xReturnReceiptHeader."Bill-to Country/Region Code") or
+            (Rec."Shipping Agent Code" <> xReturnReceiptHeader."Shipping Agent Code") or
+            (Rec."Package Tracking No." <> xReturnReceiptHeader."Package Tracking No.");
 
         OnAfterRecordChanged(Rec, xRec, IsChanged, xReturnReceiptHeader);
     end;
 
-    [Scope('OnPrem')]
     procedure SetRec(ReturnReceiptHeader: Record "Return Receipt Header")
     begin
         Rec := ReturnReceiptHeader;
-        Insert();
+        Rec.Insert();
     end;
 
     [IntegrationEvent(false, false)]

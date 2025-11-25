@@ -1,3 +1,22 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.Posting;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+#if not CLEAN23
+using Microsoft.FinancialMgt.ReceivablesPayables;
+#endif
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 codeunit 1001 "Job Post-Line"
 {
     Permissions = TableData "Job Ledger Entry" = rm,
@@ -445,7 +464,7 @@ codeunit 1001 "Job Post-Line"
               PurchaseLine.FieldCaption("Line No."), PurchaseLine."Line No.");
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by PostJobPurchaseLines().', '19.0')]
     procedure PostPurchaseGLAccounts(TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary; GLEntryNo: Integer)
     var
@@ -502,7 +521,7 @@ codeunit 1001 "Job Post-Line"
         TempPurchaseLineJob.DeleteAll();
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by PostJobSalesLines().', '19.0')]
     procedure PostSalesGLAccounts(TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary; GLEntryNo: Integer)
     begin
@@ -555,21 +574,6 @@ codeunit 1001 "Job Post-Line"
         TempJobJournalLine.Insert();
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by UpdateJobLedgerEntryNoOnJobPlanLineInvoice()', '20.0')]
-    procedure FindNextJobLedgEntryNo(JobPlanningLineInvoice: Record "Job Planning Line Invoice"): Integer
-    var
-        RelatedJobPlanningLineInvoice: Record "Job Planning Line Invoice";
-        JobLedgEntry: Record "Job Ledger Entry";
-    begin
-        RelatedJobPlanningLineInvoice.SetCurrentKey("Document Type", "Document No.", "Job Ledger Entry No.");
-        RelatedJobPlanningLineInvoice.SetRange("Document Type", JobPlanningLineInvoice."Document Type");
-        RelatedJobPlanningLineInvoice.SetRange("Document No.", JobPlanningLineInvoice."Document No.");
-        if RelatedJobPlanningLineInvoice.FindLast() then
-            exit(RelatedJobPlanningLineInvoice."Job Ledger Entry No." + 1);
-        exit(JobLedgEntry.GetLastEntryNo() + 1);
-    end;
-#endif
     local procedure CheckCurrency(Job: Record Job; SalesHeader: Record "Sales Header"; JobPlanningLine: Record "Job Planning Line")
     var
         IsHandled: Boolean;
@@ -617,13 +621,14 @@ codeunit 1001 "Job Post-Line"
     begin
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [IntegrationEvent(true, false)]
     [Obsolete('Replaced by new implementation in codeunit Purch. Post Invoice', '20.0')]
     local procedure OnAfterPostPurchaseGLAccounts(TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary; var JobJnlPostLine: Codeunit "Job Jnl.-Post Line"; GLEntryNo: Integer)
     begin
     end;
 #endif
+
     [IntegrationEvent(true, false)]
     local procedure OnAfterPostJobPurchaseLines(var TempPurchaseLineJob: Record "Purchase Line" temporary; var JobJnlPostLine: Codeunit "Job Jnl.-Post Line"; GLEntryNo: Integer)
     begin
@@ -699,7 +704,7 @@ codeunit 1001 "Job Post-Line"
     begin
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by PostJobPurchaseLines().', '20.0')]
     [IntegrationEvent(false, false)]
     local procedure OnPostPurchaseGLAccountsOnAfterTempPurchaseLineJobSetFilters(var TempPurchaseLineJob: Record "Purchase Line" temporary; var TempInvoicePostBuffer: Record "Invoice Post. Buffer" temporary)
@@ -723,7 +728,7 @@ codeunit 1001 "Job Post-Line"
     begin
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by OnPostJobSalesLinesOnBeforeJobJnlPostLine().', '19.0')]
     [IntegrationEvent(false, false)]
     local procedure OnPostSalesGLAccountsOnBeforeJobJnlPostLine(var JobJournalLine: Record "Job Journal Line"; SalesLine: Record "Sales Line")

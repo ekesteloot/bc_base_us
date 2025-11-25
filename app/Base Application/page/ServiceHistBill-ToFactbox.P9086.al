@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.History;
+
 page 9086 "Service Hist. Bill-to FactBox"
 {
     Caption = 'Bill-to Customer Service History';
@@ -35,7 +40,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceHeader: Record "Service Header";
                     begin
-                        ServiceHeader.SetRange("Bill-to Customer No.", "No.");
+                        ServiceHeader.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Service Quotes", ServiceHeader);
                     end;
                 }
@@ -51,7 +56,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceHeader: Record "Service Header";
                     begin
-                        ServiceHeader.SetRange("Bill-to Customer No.", "No.");
+                        ServiceHeader.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Service Orders", ServiceHeader);
                     end;
                 }
@@ -67,7 +72,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceHeader: Record "Service Header";
                     begin
-                        ServiceHeader.SetRange("Bill-to Customer No.", "No.");
+                        ServiceHeader.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Service Invoices", ServiceHeader);
                     end;
                 }
@@ -83,7 +88,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceHeader: Record "Service Header";
                     begin
-                        ServiceHeader.SetRange("Bill-to Customer No.", "No.");
+                        ServiceHeader.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Service Credit Memos", ServiceHeader);
                     end;
                 }
@@ -99,7 +104,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceShipmentHdr: Record "Service Shipment Header";
                     begin
-                        ServiceShipmentHdr.SetRange("Bill-to Customer No.", "No.");
+                        ServiceShipmentHdr.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Posted Service Shipments", ServiceShipmentHdr);
                     end;
                 }
@@ -115,7 +120,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceInvoiceHdr: Record "Service Invoice Header";
                     begin
-                        ServiceInvoiceHdr.SetRange("Bill-to Customer No.", "No.");
+                        ServiceInvoiceHdr.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Posted Service Invoices", ServiceInvoiceHdr);
                     end;
                 }
@@ -131,7 +136,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceCrMemoHdr: Record "Service Cr.Memo Header";
                     begin
-                        ServiceCrMemoHdr.SetRange("Bill-to Customer No.", "No.");
+                        ServiceCrMemoHdr.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Posted Service Credit Memos", ServiceCrMemoHdr);
                     end;
                 }
@@ -152,7 +157,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceHeader: Record "Service Header";
                     begin
-                        ServiceHeader.SetRange("Bill-to Customer No.", "No.");
+                        ServiceHeader.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Service Quotes", ServiceHeader);
                     end;
                 }
@@ -168,7 +173,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceHeader: Record "Service Header";
                     begin
-                        ServiceHeader.SetRange("Bill-to Customer No.", "No.");
+                        ServiceHeader.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Service Orders", ServiceHeader);
                     end;
                 }
@@ -184,7 +189,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceHeader: Record "Service Header";
                     begin
-                        ServiceHeader.SetRange("Bill-to Customer No.", "No.");
+                        ServiceHeader.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Service Invoices", ServiceHeader);
                     end;
                 }
@@ -200,7 +205,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceHeader: Record "Service Header";
                     begin
-                        ServiceHeader.SetRange("Bill-to Customer No.", "No.");
+                        ServiceHeader.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Service Credit Memos", ServiceHeader);
                     end;
                 }
@@ -216,7 +221,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceShipmentHdr: Record "Service Shipment Header";
                     begin
-                        ServiceShipmentHdr.SetRange("Bill-to Customer No.", "No.");
+                        ServiceShipmentHdr.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Posted Service Shipments", ServiceShipmentHdr);
                     end;
                 }
@@ -232,7 +237,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceInvoiceHdr: Record "Service Invoice Header";
                     begin
-                        ServiceInvoiceHdr.SetRange("Bill-to Customer No.", "No.");
+                        ServiceInvoiceHdr.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Posted Service Invoices", ServiceInvoiceHdr);
                     end;
                 }
@@ -248,7 +253,7 @@ page 9086 "Service Hist. Bill-to FactBox"
                     var
                         ServiceCrMemoHdr: Record "Service Cr.Memo Header";
                     begin
-                        ServiceCrMemoHdr.SetRange("Bill-to Customer No.", "No.");
+                        ServiceCrMemoHdr.SetRange("Bill-to Customer No.", Rec."No.");
                         PAGE.Run(PAGE::"Posted Service Credit Memos", ServiceCrMemoHdr);
                     end;
                 }

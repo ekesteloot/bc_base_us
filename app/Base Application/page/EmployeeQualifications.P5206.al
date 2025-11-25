@@ -1,3 +1,8 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.HumanResources.Analysis;
+using Microsoft.HumanResources.Comment;
+
 page 5206 "Employee Qualifications"
 {
     AutoSplitKey = true;
@@ -49,7 +54,7 @@ page 5206 "Employee Qualifications"
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the institution from which the employee obtained the qualification.';
                 }
-                field(Cost; Cost)
+                field(Cost; Rec.Cost)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the cost of the qualification.';
@@ -61,7 +66,7 @@ page 5206 "Employee Qualifications"
                     ToolTip = 'Specifies the grade that the employee received for the course, specified by the qualification on this line.';
                     Visible = false;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies whether a comment was entered for this entry.';
@@ -97,9 +102,9 @@ page 5206 "Employee Qualifications"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Human Resource Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Employee Qualification"),
-                                  "No." = FIELD("Employee No."),
-                                  "Table Line No." = FIELD("Line No.");
+                    RunPageLink = "Table Name" = const("Employee Qualification"),
+                                  "No." = field("Employee No."),
+                                  "Table Line No." = field("Line No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 separator(Action23)

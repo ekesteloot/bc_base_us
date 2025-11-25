@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
 enum 333 "Account Schedule Amount Type"
 {
     Extensible = true;

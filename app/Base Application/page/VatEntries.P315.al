@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Shared.Navigate;
+
 page 315 "VAT Entries"
 {
     ApplicationArea = Basic, Suite;
@@ -43,7 +49,7 @@ page 315 "VAT Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the VAT specification of the involved item or resource to link transactions made for this record with the appropriate general ledger account according to the VAT posting setup.';
                 }
-                field("VAT Reporting Date"; Rec."VAT Reporting Date") 
+                field("VAT Reporting Date"; Rec."VAT Reporting Date")
                 {
                     ApplicationArea = VAT;
                     ToolTip = 'Specifies the VAT date on the VAT entry. This is either the date that the document was created or posted, depending on your setting on the General Ledger Setup page.';
@@ -81,7 +87,7 @@ page 315 "VAT Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of the VAT entry.';
                 }
-                field(Base; Base)
+                field(Base; Rec.Base)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the amount that the VAT amount (the amount shown in the Amount field) is calculated from.';
@@ -195,7 +201,7 @@ page 315 "VAT Entries"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies if the transaction is related to trade with a third party within the EU.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the VAT entry has been closed by the Calc. and Post VAT Settlement batch job.';
@@ -210,7 +216,7 @@ page 315 "VAT Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the internal reference number for the line.';
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry has been part of a reverse transaction.';
@@ -285,7 +291,7 @@ page 315 "VAT Entries"
                     if IsHandled then
                         exit;
 
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -341,7 +347,7 @@ page 315 "VAT Entries"
                     var
                         IncomingDocument: Record "Incoming Document";
                     begin
-                        IncomingDocument.ShowCard("Document No.", "Posting Date");
+                        IncomingDocument.ShowCard(Rec."Document No.", Rec."Posting Date");
                     end;
                 }
                 action(SelectIncomingDoc)
@@ -357,7 +363,7 @@ page 315 "VAT Entries"
                     var
                         IncomingDocument: Record "Incoming Document";
                     begin
-                        IncomingDocument.SelectIncomingDocumentForPostedDocument("Document No.", "Posting Date", RecordId);
+                        IncomingDocument.SelectIncomingDocumentForPostedDocument(Rec."Document No.", Rec."Posting Date", Rec.RecordId);
                     end;
                 }
                 action(IncomingDocAttachFile)
@@ -373,7 +379,7 @@ page 315 "VAT Entries"
                     var
                         IncomingDocumentAttachment: Record "Incoming Document Attachment";
                     begin
-                        IncomingDocumentAttachment.NewAttachmentFromPostedDocument("Document No.", "Posting Date");
+                        IncomingDocumentAttachment.NewAttachmentFromPostedDocument(Rec."Document No.", Rec."Posting Date");
                     end;
                 }
             }
@@ -395,7 +401,7 @@ page 315 "VAT Entries"
     var
         IncomingDocument: Record "Incoming Document";
     begin
-        HasIncomingDocument := IncomingDocument.PostedDocExists("Document No.", "Posting Date");
+        HasIncomingDocument := IncomingDocument.PostedDocExists(Rec."Document No.", Rec."Posting Date");
     end;
 
     trigger OnModifyRecord(): Boolean
@@ -419,9 +425,7 @@ page 315 "VAT Entries"
         Navigate: Page Navigate;
         HasIncomingDocument: Boolean;
         IsUnrealizedVATEnabled: Boolean;
-        [InDataSet]
         IsVATDateEditable: Boolean;
-        [InDataSet]
         IsVATDateEnabled: Boolean;
         AdjustTitleMsg: Label 'Adjust G/L account number in VAT entries.\';
         ProgressMsg: Label 'Processed: @2@@@@@@@@@@@@@@@@@\';

@@ -1,3 +1,27 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.WarehouseMgt.Worksheet;
+using System.Utilities;
+
 codeunit 6500 "Item Tracking Management"
 {
     Permissions = TableData "Item Entry Relation" = rd,
@@ -282,9 +306,8 @@ codeunit 6500 "Item Tracking Management"
         if ItemJnlLine.Subcontracting then
             exit(RetrieveSubcontrItemTracking(ItemJnlLine, TempTrackingSpec));
 
-        ReservEntry.SetSourceFilter(
-          DATABASE::"Item Journal Line", ItemJnlLine."Entry Type".AsInteger(), ItemJnlLine."Journal Template Name", ItemJnlLine."Line No.", true);
-        ReservEntry.SetSourceFilter(ItemJnlLine."Journal Batch Name", 0);
+        ItemJnlLine.SetReservEntrySourceFilters(ReservEntry, true);
+
         OnAfterReserveEntryFilter(ItemJnlLine, ReservEntry);
         ReservEntry.SetFilter("Qty. to Handle (Base)", '<>0');
         OnRetrieveItemTrackingFromReservEntryFilter(ReservEntry, ItemJnlLine);
@@ -329,7 +352,7 @@ codeunit 6500 "Item Tracking Management"
         if not IsLastOperation then
             exit(false);
 
-        ReservEntry.SetSourceFilter(DATABASE::"Prod. Order Line", 3, ItemJnlLine."Order No.", 0, true);
+        ReservEntry.SetSourceFilter(Enum::TableID::"Prod. Order Line".AsInteger(), 3, ItemJnlLine."Order No.", 0, true);
         ReservEntry.SetSourceFilter('', ItemJnlLine."Order Line No.");
         ReservEntry.SetFilter("Qty. to Handle (Base)", '<>0');
         if SumUpItemTracking(ReservEntry, TempHandlingSpecification, false, true) then begin
@@ -348,7 +371,7 @@ codeunit 6500 "Item Tracking Management"
     begin
         ItemJnlLine.TestField("Order Type", ItemJnlLine."Order Type"::Production);
         ReservEntry.SetSourceFilter(
-          DATABASE::"Prod. Order Component", 3, ItemJnlLine."Order No.", ItemJnlLine."Prod. Order Comp. Line No.", true);
+          Enum::TableID::"Prod. Order Component".AsInteger(), 3, ItemJnlLine."Order No.", ItemJnlLine."Prod. Order Comp. Line No.", true);
         ReservEntry.SetSourceFilter('', ItemJnlLine."Order Line No.");
         ReservEntry.SetFilter("Qty. to Handle (Base)", '<>0');
         ReservEntry.SetTrackingFilterFromItemJnlLine(ItemJnlLine);
@@ -473,7 +496,7 @@ codeunit 6500 "Item Tracking Management"
             exit(false);
 
         ReservationEntry2.Get(ReservationEntry."Entry No.", not ReservationEntry.Positive);
-        if ReservationEntry2."Source Type" = DATABASE::"Item Ledger Entry" then
+        if ReservationEntry2."Source Type" = Enum::TableID::"Item Ledger Entry".AsInteger() then
             exit(true);
 
         exit(IsResEntryReservedAgainstATO(ReservationEntry));
@@ -485,7 +508,7 @@ codeunit 6500 "Item Tracking Management"
         SalesLine: Record "Sales Line";
         AssembleToOrderLink: Record "Assemble-to-Order Link";
     begin
-        if (ReservationEntry."Source Type" <> DATABASE::"Sales Line") or
+        if (ReservationEntry."Source Type" <> Enum::TableID::"Sales Line".AsInteger()) or
            (ReservationEntry."Source Subtype" <> SalesLine."Document Type"::Order.AsInteger()) or
            (not SalesLine.Get(ReservationEntry."Source Subtype", ReservationEntry."Source ID", ReservationEntry."Source Ref. No.")) or
            (not AssembleToOrderLink.AsmExistsForSalesLine(SalesLine))
@@ -493,7 +516,7 @@ codeunit 6500 "Item Tracking Management"
             exit(false);
 
         ReservationEntry2.Get(ReservationEntry."Entry No.", not ReservationEntry.Positive);
-        if (ReservationEntry2."Source Type" <> DATABASE::"Assembly Header") or
+        if (ReservationEntry2."Source Type" <> Enum::TableID::"Assembly Header".AsInteger()) or
            (ReservationEntry2."Source Subtype" <> AssembleToOrderLink."Assembly Document Type".AsInteger()) or
            (ReservationEntry2."Source ID" <> AssembleToOrderLink."Assembly Document No.")
         then
@@ -607,7 +630,7 @@ codeunit 6500 "Item Tracking Management"
             ReservEntry.SetFilter("Reservation Status", '<>%1', ReservEntry."Reservation Status"::Reservation);
 
         // Skip lines where Qty. to Handle (Base) = 0 because they cause errors while posting 
-        if ReservEntry."Source Type" = Database::"Job Planning Line" then
+        if ReservEntry."Source Type" = Enum::TableID::"Job Planning Line".AsInteger() then
             ReservEntry.SetFilter("Qty. to Handle (Base)", '<> 0');
 
         if ReservEntry.FindSet() then begin
@@ -663,13 +686,13 @@ codeunit 6500 "Item Tracking Management"
             ToSalesInvLine."Document Type"::Invoice:
                 begin
                     ItemEntryRelation.SetSourceFilter(
-                      DATABASE::"Sales Shipment Line", 0, ToSalesInvLine."Shipment No.", ToSalesInvLine."Shipment Line No.", true);
+                      Enum::TableID::"Sales Shipment Line", 0, ToSalesInvLine."Shipment No.", ToSalesInvLine."Shipment Line No.", true);
                     ItemEntryRelation.SetSourceFilter2('', 0);
                 end;
             ToSalesInvLine."Document Type"::"Credit Memo":
                 begin
                     ItemEntryRelation.SetSourceFilter(
-                      DATABASE::"Return Receipt Line", 0, ToSalesInvLine."Return Receipt No.", ToSalesInvLine."Return Receipt Line No.", true);
+                      Enum::TableID::"Return Receipt Line", 0, ToSalesInvLine."Return Receipt No.", ToSalesInvLine."Return Receipt Line No.", true);
                     ItemEntryRelation.SetSourceFilter2('', 0);
                 end;
             else
@@ -714,13 +737,13 @@ codeunit 6500 "Item Tracking Management"
             ToPurchLine."Document Type"::Invoice:
                 begin
                     ItemEntryRelation.SetSourceFilter(
-                      DATABASE::"Purch. Rcpt. Line", 0, ToPurchLine."Receipt No.", ToPurchLine."Receipt Line No.", true);
+                      Enum::TableID::"Purch. Rcpt. Line", 0, ToPurchLine."Receipt No.", ToPurchLine."Receipt Line No.", true);
                     ItemEntryRelation.SetSourceFilter2('', 0);
                 end;
             ToPurchLine."Document Type"::"Credit Memo":
                 begin
                     ItemEntryRelation.SetSourceFilter(
-                      DATABASE::"Return Shipment Line", 0, ToPurchLine."Return Shipment No.", ToPurchLine."Return Shipment Line No.", true);
+                      Enum::TableID::"Return Shipment Line", 0, ToPurchLine."Return Shipment No.", ToPurchLine."Return Shipment Line No.", true);
                     ItemEntryRelation.SetSourceFilter2('', 0);
                 end;
             else
@@ -754,7 +777,7 @@ codeunit 6500 "Item Tracking Management"
             ToServLine."Document Type"::Invoice:
                 begin
                     ItemEntryRelation.SetSourceFilter(
-                      DATABASE::"Service Shipment Line", 0, ToServLine."Shipment No.", ToServLine."Shipment Line No.", true);
+                      Enum::TableID::"Service Shipment Line", 0, ToServLine."Shipment No.", ToServLine."Shipment Line No.", true);
                     ItemEntryRelation.SetSourceFilter2('', 0);
                 end;
             else
@@ -797,23 +820,23 @@ codeunit 6500 "Item Tracking Management"
         IsNetworkEntity: Boolean;
     begin
         case Type of
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 exit(Subtype in [1, 5]);
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 exit(Subtype in [1, 5]);
-            DATABASE::"Prod. Order Line":
+            Enum::TableID::"Prod. Order Line".AsInteger():
                 exit(Subtype in [2, 3]);
-            DATABASE::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component".AsInteger():
                 exit(Subtype in [2, 3]);
-            DATABASE::"Assembly Header":
+            Enum::TableID::"Assembly Header".AsInteger():
                 exit(Subtype in [1]);
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line".AsInteger():
                 exit(Subtype in [1]);
-            DATABASE::"Job Planning Line":
+            Enum::TableID::"Job Planning Line".AsInteger():
                 exit(Subtype in [2]);
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line".AsInteger():
                 exit(true);
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 exit(Subtype in [1]);
             else begin
                 OnIsOrderNetworkEntity(Type, Subtype, IsNetworkEntity);
@@ -891,13 +914,13 @@ codeunit 6500 "Item Tracking Management"
         with TempWhseSplitTrackingSpec do begin
             Reset();
             case TempWhseJnlLine."Source Type" of
-                DATABASE::"Item Journal Line",
-                DATABASE::"Job Journal Line":
+                Enum::TableID::"Item Journal Line".AsInteger(),
+                Enum::TableID::"Job Journal Line".AsInteger():
                     SetSourceFilter(
                         TempWhseJnlLine."Source Type", -1, TempWhseJnlLine."Journal Template Name", TempWhseJnlLine."Source Line No.", true);
                 0: // Whse. journal line
                     SetSourceFilter(
-                        DATABASE::"Warehouse Journal Line", -1, TempWhseJnlLine."Journal Batch Name", TempWhseJnlLine."Line No.", true);
+                        Enum::TableID::"Warehouse Journal Line".AsInteger(), -1, TempWhseJnlLine."Journal Batch Name", TempWhseJnlLine."Line No.", true);
                 else
                     SetSourceFilter(
                         TempWhseJnlLine."Source Type", -1, TempWhseJnlLine."Source No.", TempWhseJnlLine."Source Line No.", true);
@@ -1001,7 +1024,7 @@ codeunit 6500 "Item Tracking Management"
 
         WhseItemEntryRelation.Reset();
         WhseItemEntryRelation.SetSourceFilter(
-          DATABASE::"Posted Whse. Receipt Line", 0, PostedWhseRcptLine."No.", PostedWhseRcptLine."Line No.", true);
+          Enum::TableID::"Posted Whse. Receipt Line", 0, PostedWhseRcptLine."No.", PostedWhseRcptLine."Line No.", true);
         if WhseItemEntryRelation.FindSet() then begin
             repeat
                 ItemLedgEntry.Get(WhseItemEntryRelation."Item Entry No.");
@@ -1098,7 +1121,7 @@ codeunit 6500 "Item Tracking Management"
 
         WhseItemTrackingLine.Reset();
         WhseItemTrackingLine.SetSourceFilter(
-          DATABASE::"Whse. Internal Put-away Line", 0, PostedWhseRcptLine."No.", PostedWhseRcptLine."Line No.", true);
+          Enum::TableID::"Whse. Internal Put-away Line", 0, PostedWhseRcptLine."No.", PostedWhseRcptLine."Line No.", true);
         WhseItemTrackingLine.SetSourceFilter('', 0);
         WhseItemTrackingLine.SetFilter("Qty. to Handle (Base)", '<>0');
         if WhseItemTrackingLine.FindSet() then
@@ -1152,7 +1175,7 @@ codeunit 6500 "Item Tracking Management"
                     // be modified/deleted as well in order to remove this item tracking information again.
                     if DeleteReservationEntries and
                        "Created by Whse. Activity Line" and
-                       ("Source Type" = DATABASE::"Warehouse Shipment Line")
+                       ("Source Type" = Enum::TableID::"Warehouse Shipment Line".AsInteger())
                     then
                         RemoveItemTrkgFromReservEntry(WhseItemTrkgLine);
                     Delete(RunDeleteTrigger);
@@ -1221,7 +1244,7 @@ codeunit 6500 "Item Tracking Management"
                     InsertWhseItemTrkgLines(PostedWhseReceiptLine, SourceType);
             end;
 
-            if SourceType = DATABASE::"Prod. Order Component" then begin
+            if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then begin
                 WhseItemTrackingLine.SetSourceFilter(SourceType, "Source Subtype", "Source No.", "Source Subline No.", true);
                 WhseItemTrackingLine.SetRange("Source Prod. Order Line", "Source Line No.");
             end else
@@ -1234,7 +1257,7 @@ codeunit 6500 "Item Tracking Management"
                 repeat
                     CalcWhseItemTrkgLine(WhseItemTrackingLine);
                     WhseItemTrackingLine.Modify();
-                    if SourceType in [DATABASE::"Prod. Order Component", DATABASE::"Assembly Line", DATABASE::Job] then begin
+                    if SourceType in [Enum::TableID::"Prod. Order Component".AsInteger(), Enum::TableID::"Assembly Line", Enum::TableID::Job.AsInteger()] then begin
                         TempWhseItemTrackingLine := WhseItemTrackingLine;
                         TempWhseItemTrackingLine.Insert();
                     end;
@@ -1243,14 +1266,14 @@ codeunit 6500 "Item Tracking Management"
                     CheckWhseItemTrkg(TempWhseItemTrackingLine, WhseWkshLine);
             end else
                 case SourceType of
-                    DATABASE::"Posted Whse. Receipt Line":
+                    Enum::TableID::"Posted Whse. Receipt Line".AsInteger():
                         CreateWhseItemTrackingForReceipt(WhseWkshLine);
-                    DATABASE::"Warehouse Shipment Line":
+                    Enum::TableID::"Warehouse Shipment Line".AsInteger():
                         CreateWhseItemTrackingBatch(WhseWkshLine);
-                    DATABASE::"Prod. Order Component":
+                    Enum::TableID::"Prod. Order Component".AsInteger():
                         CreateWhseItemTrackingBatch(WhseWkshLine);
-                    DATABASE::"Assembly Line",
-                    DATABASE::Job:
+                    Enum::TableID::"Assembly Line".AsInteger(),
+                    Enum::TableID::Job.AsInteger():
                         CreateWhseItemTrackingBatch(WhseWkshLine);
                 end;
         end;
@@ -1268,7 +1291,7 @@ codeunit 6500 "Item Tracking Management"
             EntryNo := WhseItemTrackingLine.GetLastEntryNo();
 
             WhseItemEntryRelation.SetSourceFilter(
-              DATABASE::"Posted Whse. Receipt Line", 0, "Whse. Document No.", "Whse. Document Line No.", true);
+              Enum::TableID::"Posted Whse. Receipt Line".AsInteger(), 0, "Whse. Document No.", "Whse. Document Line No.", true);
             if WhseItemEntryRelation.FindSet() then
                 repeat
                     WhseItemTrackingLine.Init();
@@ -1280,7 +1303,7 @@ codeunit 6500 "Item Tracking Management"
                     WhseItemTrackingLine.Description := Description;
                     WhseItemTrackingLine."Qty. per Unit of Measure" := "Qty. per From Unit of Measure";
                     WhseItemTrackingLine.SetSource(
-                      DATABASE::"Posted Whse. Receipt Line", 0, "Whse. Document No.", "Whse. Document Line No.", '', 0);
+                      Enum::TableID::"Posted Whse. Receipt Line".AsInteger(), 0, "Whse. Document No.", "Whse. Document Line No.", '', 0);
                     ItemLedgEntry.Get(WhseItemEntryRelation."Item Entry No.");
                     WhseItemTrackingLine.CopyTrackingFromItemLedgEntry(ItemLedgEntry);
                     WhseItemTrackingLine."Quantity (Base)" := ItemLedgEntry.Quantity;
@@ -1307,14 +1330,14 @@ codeunit 6500 "Item Tracking Management"
 
         with WhseWkshLine do begin
             case SourceType of
-                DATABASE::"Prod. Order Component":
+                Enum::TableID::"Prod. Order Component".AsInteger():
                     begin
                         SourceReservEntry.SetSourceFilter("Source Type", "Source Subtype", "Source No.", "Source Subline No.", true);
                         SourceReservEntry.SetSourceFilter('', "Source Line No.");
                     end;
-                Database::Job:
+                Enum::TableID::Job.AsInteger():
                     begin
-                        SourceReservEntry.SetSourceFilter(Database::"Job Planning Line", 2, "Source No.", "Source Line No.", true);
+                        SourceReservEntry.SetSourceFilter(Enum::TableID::"Job Planning Line".AsInteger(), 2, "Source No.", "Source Line No.", true);
                         SourceReservEntry.SetSourceFilter('', 0);
                     end;
                 else begin
@@ -1356,21 +1379,21 @@ codeunit 6500 "Item Tracking Management"
 
         with WhseWkshLine do
             case SourceType of
-                DATABASE::"Posted Whse. Receipt Line":
+                Enum::TableID::"Posted Whse. Receipt Line".AsInteger():
                     WhseItemTrackingLine.SetSource(
-                      DATABASE::"Posted Whse. Receipt Line", 0, "Whse. Document No.", "Whse. Document Line No.", '', 0);
-                DATABASE::"Warehouse Shipment Line":
+                      Enum::TableID::"Posted Whse. Receipt Line".AsInteger(), 0, "Whse. Document No.", "Whse. Document Line No.", '', 0);
+                Enum::TableID::"Warehouse Shipment Line".AsInteger():
                     WhseItemTrackingLine.SetSource(
-                      DATABASE::"Warehouse Shipment Line", 0, "Whse. Document No.", "Whse. Document Line No.", '', 0);
-                DATABASE::"Assembly Line":
+                      Enum::TableID::"Warehouse Shipment Line".AsInteger(), 0, "Whse. Document No.", "Whse. Document Line No.", '', 0);
+                Enum::TableID::"Assembly Line".AsInteger():
                     WhseItemTrackingLine.SetSource(
-                      DATABASE::"Assembly Line", "Source Subtype", "Whse. Document No.", "Whse. Document Line No.", '', 0);
-                DATABASE::"Prod. Order Component":
+                      Enum::TableID::"Assembly Line".AsInteger(), "Source Subtype", "Whse. Document No.", "Whse. Document Line No.", '', 0);
+                Enum::TableID::"Prod. Order Component".AsInteger():
                     WhseItemTrackingLine.SetSource(
                       "Source Type", "Source Subtype", "Source No.", "Source Subline No.", '', "Source Line No.");
-                DATABASE::Job, Database::"Job Planning Line":
+                Enum::TableID::Job.AsInteger(), Enum::TableID::"Job Planning Line".AsInteger():
                     WhseItemTrackingLine.SetSource(
-                      DATABASE::"Job Planning Line", 2, "Whse. Document No.", "Whse. Document Line No.", '', 0);
+                      Enum::TableID::"Job Planning Line".AsInteger(), 2, "Whse. Document No.", "Whse. Document Line No.", '', 0);
             end;
 
         WhseItemTrackingLine."Entry No." := EntryNo + 1;
@@ -1402,21 +1425,21 @@ codeunit 6500 "Item Tracking Management"
         WhseActivQtyBase: Decimal;
     begin
         case WhseItemTrkgLine."Source Type" of
-            DATABASE::"Posted Whse. Receipt Line":
+            Enum::TableID::"Posted Whse. Receipt Line".AsInteger():
                 WhseItemTrkgLine."Source Type Filter" := WhseItemTrkgLine."Source Type Filter"::Receipt;
-            DATABASE::"Whse. Internal Put-away Line":
+            Enum::TableID::"Whse. Internal Put-away Line".AsInteger():
                 WhseItemTrkgLine."Source Type Filter" := WhseItemTrkgLine."Source Type Filter"::"Internal Put-away";
-            DATABASE::"Warehouse Shipment Line":
+            Enum::TableID::"Warehouse Shipment Line".AsInteger():
                 WhseItemTrkgLine."Source Type Filter" := WhseItemTrkgLine."Source Type Filter"::Shipment;
-            DATABASE::"Whse. Internal Pick Line":
+            Enum::TableID::"Whse. Internal Pick Line".AsInteger():
                 WhseItemTrkgLine."Source Type Filter" := WhseItemTrkgLine."Source Type Filter"::"Internal Pick";
-            DATABASE::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component".AsInteger():
                 WhseItemTrkgLine."Source Type Filter" := WhseItemTrkgLine."Source Type Filter"::Production;
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line".AsInteger():
                 WhseItemTrkgLine."Source Type Filter" := WhseItemTrkgLine."Source Type Filter"::Assembly;
-            DATABASE::Job:
+            Enum::TableID::Job.AsInteger():
                 WhseItemTrkgLine."Source Type Filter" := WhseItemTrkgLine."Source Type Filter"::Job;
-            DATABASE::"Whse. Worksheet Line":
+            Enum::TableID::"Whse. Worksheet Line".AsInteger():
                 WhseItemTrkgLine."Source Type Filter" := WhseItemTrkgLine."Source Type Filter"::"Movement Worksheet";
         end;
         WhseItemTrkgLine.CalcFields("Put-away Qty. (Base)", "Pick Qty. (Base)");
@@ -1469,7 +1492,7 @@ codeunit 6500 "Item Tracking Management"
         WhseWorksheetLine."Source Line No." := SourceLineNo;
         WhseWorksheetLine."Source Subline No." := SourceSublineNo;
 
-        if WhseDocType = "Warehouse Worksheet Document Type"::Production then begin
+        if WhseDocType = Enum::"Warehouse Worksheet Document Type"::Production then begin
             ProdOrderComponent.Get(SourceSubtype, SourceNo, SourceLineNo, SourceSublineNo);
             WhseWorksheetLine."Qty. Handled (Base)" := ProdOrderComponent."Qty. Picked (Base)";
         end;
@@ -1606,7 +1629,7 @@ codeunit 6500 "Item Tracking Management"
                 exit(true);
         end;
 
-        if Type in [DATABASE::"Prod. Order Component", DATABASE::"Prod. Order Line"] then begin
+        if Type in [Enum::TableID::"Prod. Order Component".AsInteger(), Enum::TableID::"Prod. Order Line".AsInteger()] then begin
             WhseWkshLine.SetSourceFilter(Type, Subtype, ID, ProdOrderLine, true);
             WhseWkshLine.SetRange("Source Subline No.", RefNo);
         end else
@@ -1616,7 +1639,7 @@ codeunit 6500 "Item Tracking Management"
                 if WhseWkshTemplate.Type = WhseWkshTemplate.Type::Pick then
                     exit(true);
 
-        if Type in [DATABASE::"Prod. Order Component", DATABASE::"Prod. Order Line"] then
+        if Type in [Enum::TableID::"Prod. Order Component".AsInteger(), Enum::TableID::"Prod. Order Line".AsInteger()] then
             WhseActivLine.SetSourceFilter(Type, Subtype, ID, ProdOrderLine, RefNo, true)
         else
             WhseActivLine.SetSourceFilter(Type, Subtype, ID, RefNo, 0, true);
@@ -1632,15 +1655,15 @@ codeunit 6500 "Item Tracking Management"
 
     local procedure ItemTrkgTypeIsManagedByWhse(Type: Integer) TypeIsManagedByWhse: Boolean
     begin
-        TypeIsManagedByWhse := Type in [DATABASE::"Sales Line",
-                         DATABASE::"Purchase Line",
-                         DATABASE::"Transfer Line",
-                         DATABASE::"Assembly Header",
-                         DATABASE::"Assembly Line",
-                         DATABASE::"Prod. Order Line",
-                         DATABASE::"Service Line",
-                         DATABASE::"Prod. Order Component",
-                         DATABASE::Job];
+        TypeIsManagedByWhse := Type in [Enum::TableID::"Sales Line".AsInteger(),
+                         Enum::TableID::"Purchase Line".AsInteger(),
+                         Enum::TableID::"Transfer Line".AsInteger(),
+                         Enum::TableID::"Assembly Header".AsInteger(),
+                         Enum::TableID::"Assembly Line".AsInteger(),
+                         Enum::TableID::"Prod. Order Line".AsInteger(),
+                         Enum::TableID::"Service Line".AsInteger(),
+                         Enum::TableID::"Prod. Order Component".AsInteger(),
+                         Enum::TableID::Job.AsInteger()];
 
         OnAfterItemTrkgTypeIsManagedByWhse(Type, TypeIsManagedByWhse);
     end;
@@ -1848,7 +1871,7 @@ codeunit 6500 "Item Tracking Management"
                         exit;
                     end;
                 TempSourceSpec."Quantity (Base)" := ReservMgt.GetSourceRecordValue(ReservEntry2, false, 1);
-                if TempTrkgSpec3."Source Type" = DATABASE::"Transfer Line" then begin
+                if TempTrkgSpec3."Source Type" = Enum::TableID::"Transfer Line".AsInteger() then begin
                     TempTrkgSpec3.ModifyAll("Location Code", ReservEntry2."Location Code");
                     ItemTrackingLines.SetRunMode("Item Tracking Run Mode"::Transfer);
                 end else
@@ -1880,7 +1903,7 @@ codeunit 6500 "Item Tracking Management"
         if IsHandled then
             exit;
 
-        if TempReservEntry."Source Type" = DATABASE::"Transfer Line" then begin
+        if TempReservEntry."Source Type" = Enum::TableID::"Transfer Line".AsInteger() then begin
             TransLine.Get(TempReservEntry."Source ID", TempReservEntry."Source Ref. No.");
             TempReservEntry.ModifyAll("Reservation Status", TempReservEntry."Reservation Status"::Surplus);
             if TempReservEntry."Source Subtype" = 0 then begin
@@ -1987,7 +2010,7 @@ codeunit 6500 "Item Tracking Management"
         with WhseWkshLine do begin
             EntryNo := WhseItemTrackingLine.GetLastEntryNo();
 
-            if "Source Type" = DATABASE::"Prod. Order Component" then begin
+            if "Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then begin
                 SourceReservEntry.SetSourceFilter("Source Type", "Source Subtype", "Source No.", "Source Subline No.", true);
                 SourceReservEntry.SetSourceFilter('', "Source Line No.");
             end else begin
@@ -1997,7 +2020,7 @@ codeunit 6500 "Item Tracking Management"
             if SourceReservEntry.FindSet() then
                 repeat
                     if SourceReservEntry.TrackingExists() then begin
-                        if "Source Type" = DATABASE::"Prod. Order Component" then begin
+                        if "Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then begin
                             TempWhseItemTrkgLine.SetSourceFilter("Source Type", "Source Subtype", "Source No.", "Source Subline No.", true);
                             TempWhseItemTrkgLine.SetRange("Source Prod. Order Line", "Source Line No.");
                         end else begin
@@ -2017,7 +2040,7 @@ codeunit 6500 "Item Tracking Management"
                             WhseItemTrackingLine."Location Code" := SourceReservEntry."Location Code";
                             WhseItemTrackingLine.Description := SourceReservEntry.Description;
                             WhseItemTrackingLine."Qty. per Unit of Measure" := SourceReservEntry."Qty. per Unit of Measure";
-                            if "Source Type" = DATABASE::"Prod. Order Component" then
+                            if "Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then
                                 WhseItemTrackingLine.SetSource("Source Type", "Source Subtype", "Source No.", "Source Subline No.", '', "Source Line No.")
                             else
                                 WhseItemTrackingLine.SetSource("Source Type", "Source Subtype", "Source No.", "Source Line No.", '', 0);
@@ -2126,7 +2149,7 @@ codeunit 6500 "Item Tracking Management"
             SetCurrentKey(
               "Source ID", "Source Type", "Source Subtype", "Source Batch Name",
               "Source Prod. Order Line", "Source Ref. No.", "Location Code");
-            SetRange("Source Type", DATABASE::"Warehouse Journal Line");
+            SetRange("Source Type", Enum::TableID::"Warehouse Journal Line");
             SetRange("Source Subtype", 0);
             SetRange("Source Batch Name", TemplateName);
             SetRange("Source ID", BatchName);
@@ -2615,6 +2638,7 @@ codeunit 6500 "Item Tracking Management"
         TempTrackingSpec: Record "Tracking Specification" temporary;
         TempReservEntry: Record "Reservation Entry" temporary;
         ReservEntry: Record "Reservation Entry";
+        xReservEntry: Record "Reservation Entry";
         ReservEntryBindingCheck: Record "Reservation Entry";
         ATOSalesLine: Record "Sales Line";
         AsmHeader: Record "Assembly Header";
@@ -2632,9 +2656,9 @@ codeunit 6500 "Item Tracking Management"
             SetRange("Assemble to Order", "Assemble to Order");
             if FindSet() then begin
                 // Transfer receipt needs special treatment:
-                IsTransferReceipt := ("Source Type" = DATABASE::"Transfer Line") and ("Source Subtype" = 1);
-                IsATOPosting := ("Source Type" = DATABASE::"Sales Line") and "Assemble to Order";
-                if ("Source Type" in [DATABASE::"Prod. Order Line", DATABASE::"Prod. Order Component"]) or IsTransferReceipt then
+                IsTransferReceipt := ("Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and ("Source Subtype" = 1);
+                IsATOPosting := ("Source Type" = Enum::TableID::"Sales Line".AsInteger()) and "Assemble to Order";
+                if ("Source Type" in [Enum::TableID::"Prod. Order Line".AsInteger(), Enum::TableID::"Prod. Order Component".AsInteger()]) or IsTransferReceipt then
                     ToRowID :=
                       ItemTrackingMgt.ComposeRowID(
                         "Source Type", "Source Subtype", "Source No.", '', "Source Line No.", "Source Subline No.")
@@ -2644,11 +2668,11 @@ codeunit 6500 "Item Tracking Management"
                         ATOSalesLine.AsmToOrderExists(AsmHeader);
                         ToRowID :=
                           ItemTrackingMgt.ComposeRowID(
-                            DATABASE::"Assembly Header", AsmHeader."Document Type".AsInteger(), AsmHeader."No.", '', 0, 0);
+                            Enum::TableID::"Assembly Header".AsInteger(), AsmHeader."Document Type".AsInteger(), AsmHeader."No.", '', 0, 0);
                     end else
-                        if "Source Type" in [DATABASE::Job, DATABASE::"Job Planning Line"] then
+                        if "Source Type" in [Enum::TableID::Job.AsInteger(), Enum::TableID::"Job Planning Line".AsInteger()] then
                             ToRowID :=
-                              ItemTrackingMgt.ComposeRowID(Database::"Job Planning Line", 2, "Source No.", '', 0, "Source Line No.")
+                              ItemTrackingMgt.ComposeRowID(Enum::TableID::"Job Planning Line".AsInteger(), 2, "Source No.", '', 0, "Source Line No.")
                         else
                             ToRowID :=
                               ItemTrackingMgt.ComposeRowID(
@@ -2702,6 +2726,7 @@ codeunit 6500 "Item Tracking Management"
                     ReservEntry.SetRange("Source Ref. No.");
                 if ReservEntry.FindSet() then begin
                     repeat
+                        xReservEntry.TransferFields(ReservEntry);
                         if Abs(TempTrackingSpec."Qty. to Handle (Base)") > Abs(ReservEntry."Quantity (Base)") then
                             ReservEntry.Validate("Qty. to Handle (Base)", ReservEntry."Quantity (Base)")
                         else
@@ -2726,7 +2751,8 @@ codeunit 6500 "Item Tracking Management"
                             OnSynchronizeWhseActivItemTrkgOnAfterSetExpirationDate(WhseActivLine, ReservEntry);
                         end;
 
-                        ReservEntry.Modify();
+                        if (xReservEntry."Qty. to Handle (Base)" <> ReservEntry."Qty. to Handle (Base)") or (xReservEntry."Qty. to Invoice (Base)" <> ReservEntry."Qty. to Invoice (Base)") or (xReservEntry."Expiration Date" <> ReservEntry."Expiration Date") then
+                            ReservEntry.Modify();
 
                         if IsReservedFromTransferShipment(ReservEntry) then
                             UpdateItemTrackingInTransferReceipt(ReservEntry);
@@ -2758,7 +2784,6 @@ codeunit 6500 "Item Tracking Management"
     begin
         if (TempTrackingSpecificationToCheck."Lot No." = '') and (TempTrackingSpecificationToCheck."Serial No." = '') then
             exit;
-
         TempWarehouseActivityLine.Init();
         TempWarehouseActivityLine."Item No." := TempTrackingSpecificationToCheck."Item No.";
         TempWarehouseActivityLine."Variant Code" := TempTrackingSpecificationToCheck."Variant Code";
@@ -2774,10 +2799,8 @@ codeunit 6500 "Item Tracking Management"
         TempWarehouseActivityLine."Source No." := TempTrackingSpecificationToCheck."Source ID";
         TempWarehouseActivityLine."Source Line No." := TempTrackingSpecificationToCheck."Source Ref. No.";
         TempWarehouseActivityLine."Source Subline No." := TempTrackingSpecificationToCheck."Source Prod. Order Line";
-
         if TempTrackingSpecificationToCheck."Lot No." <> '' then
             TempWarehouseActivityLine.CheckReservedItemTrkg(Enum::"Item Tracking Type"::"Lot No.", TempWarehouseActivityLine."Lot No.");
-
         if TempTrackingSpecificationToCheck."Serial No." <> '' then
             TempWarehouseActivityLine.CheckReservedItemTrkg(Enum::"Item Tracking Type"::"Serial No.", TempWarehouseActivityLine."Serial No.");
     end;
@@ -2811,7 +2834,7 @@ codeunit 6500 "Item Tracking Management"
                 QtyToHandleToNewRegister := TempTrackingSpec."Qty. to Handle (Base)";
                 ReservEntry.TransferFields(TempTrackingSpec);
 
-                if ReservEntry."Source Type" = Database::"Prod. Order Component" then
+                if ReservEntry."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then
                     SourceProdOrderLineForFilter := ReservEntry."Source Prod. Order Line";
 
                 QtyToHandleInItemTracking :=
@@ -2903,7 +2926,7 @@ codeunit 6500 "Item Tracking Management"
             ReservEntry.CalcSums("Quantity (Base)");
             Qty += ReservEntry."Quantity (Base)";
 
-            if "Source Type" = DATABASE::"Transfer Line" then begin
+            if "Source Type" = Enum::TableID::"Transfer Line".AsInteger() then begin
                 TransferLine.Get("Source ID", "Source Ref. No.");
                 Qty -= TransferLine."Qty. Shipped (Base)";
             end;
@@ -2916,7 +2939,7 @@ codeunit 6500 "Item Tracking Management"
         ToRowID: Text[250];
     begin
         ToRowID := ComposeRowID(
-            DATABASE::"Transfer Line", 1, FromReservEntry."Source ID",
+            Enum::TableID::"Transfer Line".AsInteger(), 1, FromReservEntry."Source ID",
             FromReservEntry."Source Batch Name", FromReservEntry."Source Prod. Order Line", FromReservEntry."Source Ref. No.");
         ToReservEntry.SetPointer(ToRowID);
         ToReservEntry.SetPointerFilter();
@@ -2992,7 +3015,7 @@ codeunit 6500 "Item Tracking Management"
     begin
         with WhseItemTrackingLine do begin
             SetSourceFilter(
-              DATABASE::"Warehouse Journal Line", -1, WhseJnlLine."Journal Batch Name", WhseJnlLine."Line No.", true);
+              Enum::TableID::"Warehouse Journal Line".AsInteger(), -1, WhseJnlLine."Journal Batch Name", WhseJnlLine."Line No.", true);
             SetSourceFilter(WhseJnlLine."Journal Template Name", -1);
             SetRange("Location Code", WhseJnlLine."Location Code");
             SetRange("Item No.", WhseJnlLine."Item No.");
@@ -3142,24 +3165,24 @@ codeunit 6500 "Item Tracking Management"
         with TotalWhseItemTrackingLine do begin
             SetRange("Location Code", WhseWorksheetLine."Location Code");
             case SourceType of
-                DATABASE::"Posted Whse. Receipt Line",
-              DATABASE::"Warehouse Shipment Line",
-              DATABASE::"Whse. Internal Put-away Line",
-              DATABASE::"Whse. Internal Pick Line",
-              DATABASE::"Assembly Line",
-              DATABASE::Job,
-              DATABASE::"Internal Movement Line":
+                Enum::TableID::"Posted Whse. Receipt Line".AsInteger(),
+              Enum::TableID::"Warehouse Shipment Line".AsInteger(),
+              Enum::TableID::"Whse. Internal Put-away Line".AsInteger(),
+              Enum::TableID::"Whse. Internal Pick Line".AsInteger(),
+              Enum::TableID::"Assembly Line".AsInteger(),
+              Enum::TableID::Job.AsInteger(),
+              Enum::TableID::"Internal Movement Line".AsInteger():
                     SetSourceFilter(
                       SourceType, -1, WhseWorksheetLine."Whse. Document No.", WhseWorksheetLine."Whse. Document Line No.", true);
-                DATABASE::"Prod. Order Component":
+                Enum::TableID::"Prod. Order Component".AsInteger():
                     begin
                         SetSourceFilter(
                           SourceType, WhseWorksheetLine."Source Subtype", WhseWorksheetLine."Source No.", WhseWorksheetLine."Source Subline No.",
                           true);
                         SetRange("Source Prod. Order Line", WhseWorksheetLine."Source Line No.");
                     end;
-                DATABASE::"Whse. Worksheet Line",
-                DATABASE::"Warehouse Journal Line":
+                Enum::TableID::"Whse. Worksheet Line".AsInteger(),
+                Enum::TableID::"Warehouse Journal Line".AsInteger():
                     begin
                         SetSourceFilter(SourceType, -1, WhseWorksheetLine.Name, WhseWorksheetLine."Line No.", true);
                         SetRange("Source Batch Name", WhseWorksheetLine."Worksheet Template Name");
@@ -3186,7 +3209,7 @@ codeunit 6500 "Item Tracking Management"
             OnInsertReservEntryForSalesLineOnBeforeInitReservEntry(ItemLedgEntryBuf, SalesLine);
             InitReservEntry(ReservEntry, ItemLedgEntryBuf, QtyBase, SalesLine."Shipment Date", EntriesExist);
             SetSource(
-              DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", '', 0);
+              Enum::TableID::"Sales Line".AsInteger(), SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", '', 0);
             if SalesLine."Document Type" in [SalesLine."Document Type"::Order, SalesLine."Document Type"::"Return Order"] then
                 "Reservation Status" := "Reservation Status"::Surplus
             else
@@ -3213,7 +3236,7 @@ codeunit 6500 "Item Tracking Management"
             InitReservEntry(
                 ReservEntry, ItemLedgEntryBuf, QtyBase, PurchaseLine."Expected Receipt Date", EntriesExist);
             SetSource(
-                DATABASE::"Purchase Line", PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.",
+                Enum::TableID::"Purchase Line".AsInteger(), PurchaseLine."Document Type".AsInteger(), PurchaseLine."Document No.",
                 PurchaseLine."Line No.", '', 0);
             if PurchaseLine."Document Type" in [PurchaseLine."Document Type"::Order, PurchaseLine."Document Type"::"Return Order"] then
                 "Reservation Status" := "Reservation Status"::Surplus
@@ -3240,7 +3263,7 @@ codeunit 6500 "Item Tracking Management"
 
         with ReservEntry do begin
             InitReservEntry(ReservEntry, ItemLedgEntryBuf, QtyBase, TransferLine."Shipment Date", EntriesExist);
-            SetSource(DATABASE::"Transfer Line", 0, TransferLine."Document No.", TransferLine."Line No.", '', 0);
+            SetSource(Enum::TableID::"Transfer Line".AsInteger(), 0, TransferLine."Document No.", TransferLine."Line No.", '', 0);
             "Reservation Status" := "Reservation Status"::Surplus;
             Description := TransferLine.Description;
             UpdateItemTracking();
@@ -3324,7 +3347,7 @@ codeunit 6500 "Item Tracking Management"
 
     local procedure IsReservedFromTransferShipment(ReservEntry: Record "Reservation Entry"): Boolean
     begin
-        exit((ReservEntry."Source Type" = DATABASE::"Transfer Line") and (ReservEntry."Source Subtype" = 0));
+        exit((ReservEntry."Source Type" = Enum::TableID::"Transfer Line".AsInteger()) and (ReservEntry."Source Subtype" = 0));
     end;
 
     procedure ItemTrackingExistsOnDocumentLine(SourceType: Integer; SourceSubtype: Option; SourceID: Code[20]; SourceRefNo: Integer): Boolean
@@ -3354,7 +3377,7 @@ codeunit 6500 "Item Tracking Management"
             exit(Result);
 
         ReservEntry.SetSourceFilter(SourceType, SourceSubtype, SourceID, SourceRefNo, true);
-        if SourceType = Database::"Prod. Order Component" then
+        if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then
             ReservEntry.SetSourceFilter('', SourceProdOrderLineForFilter)
         else
             ReservEntry.SetSourceFilter('', 0);

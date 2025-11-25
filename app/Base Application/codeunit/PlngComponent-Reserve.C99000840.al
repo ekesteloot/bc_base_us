@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Planning;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+
 codeunit 99000840 "Plng. Component-Reserve"
 {
     Permissions = TableData "Reservation Entry" = rimd,
@@ -8,14 +17,15 @@ codeunit 99000840 "Plng. Component-Reserve"
     end;
 
     var
+        FromTrackingSpecification: Record "Tracking Specification";
+        CreateReservEntry: Codeunit "Create Reserv. Entry";
+        ReservationManagement: Codeunit "Reservation Management";
+        Blocked: Boolean;
+
         Text000: Label 'Reserved quantity cannot be greater than %1.';
         Text002: Label 'must be filled in when a quantity is reserved';
         Text003: Label 'must not be changed when a quantity is reserved';
         Text004: Label 'Codeunit is not initialized correctly.';
-        FromTrackingSpecification: Record "Tracking Specification";
-        CreateReservEntry: Codeunit "Create Reserv. Entry";
-        ReservMgt: Codeunit "Reservation Management";
-        Blocked: Boolean;
 
     procedure CreateReservation(PlanningComponent: Record "Planning Component"; Description: Text[100]; ExpectedReceiptDate: Date; Quantity: Decimal; QuantityBase: Decimal; ForReservEntry: Record "Reservation Entry")
     var
@@ -43,7 +53,7 @@ codeunit 99000840 "Plng. Component-Reserve"
         end;
 
         CreateReservEntry.CreateReservEntryFor(
-          DATABASE::"Planning Component", 0,
+          Enum::TableID::"Planning Component".AsInteger(), 0,
           PlanningComponent."Worksheet Template Name", PlanningComponent."Worksheet Batch Name",
           PlanningComponent."Worksheet Line No.", PlanningComponent."Line No.",
           PlanningComponent."Qty. per Unit of Measure",
@@ -58,9 +68,9 @@ codeunit 99000840 "Plng. Component-Reserve"
 
     procedure CreateBindingReservation(PlanningComponent: Record "Planning Component"; Description: Text[100]; ExpectedReceiptDate: Date; Quantity: Decimal; QuantityBase: Decimal)
     var
-        DummyReservEntry: Record "Reservation Entry";
+        DummyReservationEntry: Record "Reservation Entry";
     begin
-        CreateReservation(PlanningComponent, Description, ExpectedReceiptDate, Quantity, QuantityBase, DummyReservEntry);
+        CreateReservation(PlanningComponent, Description, ExpectedReceiptDate, Quantity, QuantityBase, DummyReservationEntry);
     end;
 
     procedure CreateReservationSetFrom(TrackingSpecification: Record "Tracking Specification")
@@ -78,11 +88,11 @@ codeunit 99000840 "Plng. Component-Reserve"
         CaptionText := PlanningComponent.GetSourceCaption();
     end;
 
-    procedure FindReservEntry(PlanningComponent: Record "Planning Component"; var ReservEntry: Record "Reservation Entry"): Boolean
+    procedure FindReservEntry(PlanningComponent: Record "Planning Component"; var ReservationEntry: Record "Reservation Entry"): Boolean
     begin
-        ReservEntry.InitSortingAndFilters(false);
-        PlanningComponent.SetReservationFilters(ReservEntry);
-        exit(ReservEntry.FindLast());
+        ReservationEntry.InitSortingAndFilters(false);
+        PlanningComponent.SetReservationFilters(ReservationEntry);
+        exit(ReservationEntry.FindLast());
     end;
 
     procedure VerifyChange(var NewPlanningComponent: Record "Planning Component"; var OldPlanningComponent: Record "Planning Component")
@@ -118,10 +128,10 @@ codeunit 99000840 "Plng. Component-Reserve"
                 NewPlanningComponent.FieldError("Location Code", Text003);
         HasError := true;
         if (NewPlanningComponent."Bin Code" <> OldPlanningComponent."Bin Code") and
-           (not ReservMgt.CalcIsAvailTrackedQtyInBin(
+           (not ReservationManagement.CalcIsAvailTrackedQtyInBin(
               NewPlanningComponent."Item No.", NewPlanningComponent."Bin Code",
               NewPlanningComponent."Location Code", NewPlanningComponent."Variant Code",
-              DATABASE::"Planning Component", 0,
+              Enum::TableID::"Planning Component".AsInteger(), 0,
               NewPlanningComponent."Worksheet Template Name",
               NewPlanningComponent."Worksheet Batch Name", NewPlanningComponent."Worksheet Line No.",
               NewPlanningComponent."Line No."))
@@ -142,14 +152,14 @@ codeunit 99000840 "Plng. Component-Reserve"
         if HasError then
             if (NewPlanningComponent."Item No." <> OldPlanningComponent."Item No.") or NewPlanningComponent.ReservEntryExist() then begin
                 if NewPlanningComponent."Item No." <> OldPlanningComponent."Item No." then begin
-                    ReservMgt.SetReservSource(OldPlanningComponent);
-                    ReservMgt.DeleteReservEntries(true, 0);
-                    ReservMgt.SetReservSource(NewPlanningComponent);
+                    ReservationManagement.SetReservSource(OldPlanningComponent);
+                    ReservationManagement.DeleteReservEntries(true, 0);
+                    ReservationManagement.SetReservSource(NewPlanningComponent);
                 end else begin
-                    ReservMgt.SetReservSource(NewPlanningComponent);
-                    ReservMgt.DeleteReservEntries(true, 0);
+                    ReservationManagement.SetReservSource(NewPlanningComponent);
+                    ReservationManagement.DeleteReservEntries(true, 0);
                 end;
-                ReservMgt.AutoTrack(NewPlanningComponent."Net Quantity (Base)");
+                ReservationManagement.AutoTrack(NewPlanningComponent."Net Quantity (Base)");
             end;
 
         if HasError or (NewPlanningComponent."Due Date" <> OldPlanningComponent."Due Date") then begin
@@ -169,97 +179,93 @@ codeunit 99000840 "Plng. Component-Reserve"
         if Blocked then
             exit;
 
-        with NewPlanningComponent do begin
-            if "Line No." = OldPlanningComponent."Line No." then
-                if "Net Quantity (Base)" = OldPlanningComponent."Net Quantity (Base)" then
-                    exit;
-            if "Line No." = 0 then
-                if not PlanningComponent.Get(
-                     "Worksheet Template Name",
-                     "Worksheet Batch Name",
-                     "Worksheet Line No.",
-                     "Line No.")
-                then
-                    exit;
-            ReservMgt.SetReservSource(NewPlanningComponent);
-            if "Qty. per Unit of Measure" <> OldPlanningComponent."Qty. per Unit of Measure" then
-                ReservMgt.ModifyUnitOfMeasure();
-            if "Net Quantity (Base)" * OldPlanningComponent."Net Quantity (Base)" < 0 then
-                ReservMgt.DeleteReservEntries(true, 0)
-            else
-                ReservMgt.DeleteReservEntries(false, "Net Quantity (Base)");
-            ReservMgt.ClearSurplus();
-            ReservMgt.AutoTrack("Net Quantity (Base)");
-            AssignForPlanning(NewPlanningComponent);
-        end;
+        if NewPlanningComponent."Line No." = OldPlanningComponent."Line No." then
+            if NewPlanningComponent."Net Quantity (Base)" = OldPlanningComponent."Net Quantity (Base)" then
+                exit;
+        if NewPlanningComponent."Line No." = 0 then
+            if not PlanningComponent.Get(
+                    NewPlanningComponent."Worksheet Template Name",
+                    NewPlanningComponent."Worksheet Batch Name",
+                    NewPlanningComponent."Worksheet Line No.",
+                    NewPlanningComponent."Line No.")
+            then
+                exit;
+        ReservationManagement.SetReservSource(NewPlanningComponent);
+        if NewPlanningComponent."Qty. per Unit of Measure" <> OldPlanningComponent."Qty. per Unit of Measure" then
+            ReservationManagement.ModifyUnitOfMeasure();
+        if NewPlanningComponent."Net Quantity (Base)" * OldPlanningComponent."Net Quantity (Base)" < 0 then
+            ReservationManagement.DeleteReservEntries(true, 0)
+        else
+            ReservationManagement.DeleteReservEntries(false, NewPlanningComponent."Net Quantity (Base)");
+        ReservationManagement.ClearSurplus();
+        ReservationManagement.AutoTrack(NewPlanningComponent."Net Quantity (Base)");
+        AssignForPlanning(NewPlanningComponent);
     end;
 
-    procedure TransferPlanningCompToPOComp(var OldPlanningComponent: Record "Planning Component"; var NewProdOrderComp: Record "Prod. Order Component"; TransferQty: Decimal; TransferAll: Boolean)
+    procedure TransferPlanningCompToPOComp(var OldPlanningComponent: Record "Planning Component"; var NewProdOrderComponent: Record "Prod. Order Component"; TransferQty: Decimal; TransferAll: Boolean)
     var
-        OldReservEntry: Record "Reservation Entry";
+        OldReservationEntry: Record "Reservation Entry";
     begin
-        if not FindReservEntry(OldPlanningComponent, OldReservEntry) then
+        if not FindReservEntry(OldPlanningComponent, OldReservationEntry) then
             exit;
 
-        NewProdOrderComp.TestItemFields(
+        NewProdOrderComponent.TestItemFields(
           OldPlanningComponent."Item No.", OldPlanningComponent."Variant Code", OldPlanningComponent."Location Code");
 
         TransferReservations(
-          OldPlanningComponent, OldReservEntry, TransferAll, TransferQty, NewProdOrderComp."Qty. per Unit of Measure",
-          DATABASE::"Prod. Order Component", NewProdOrderComp.Status.AsInteger(), NewProdOrderComp."Prod. Order No.",
-          '', NewProdOrderComp."Prod. Order Line No.", NewProdOrderComp."Line No.");
+          OldPlanningComponent, OldReservationEntry, TransferAll, TransferQty, NewProdOrderComponent."Qty. per Unit of Measure",
+          DATABASE::"Prod. Order Component", NewProdOrderComponent.Status.AsInteger(), NewProdOrderComponent."Prod. Order No.",
+          '', NewProdOrderComponent."Prod. Order Line No.", NewProdOrderComponent."Line No.");
     end;
 
-    procedure TransferPlanningCompToAsmLine(var OldPlanningComponent: Record "Planning Component"; var NewAsmLine: Record "Assembly Line"; TransferQty: Decimal; TransferAll: Boolean)
+    procedure TransferPlanningCompToAsmLine(var OldPlanningComponent: Record "Planning Component"; var NewAssemblyLine: Record "Assembly Line"; TransferQty: Decimal; TransferAll: Boolean)
     var
-        OldReservEntry: Record "Reservation Entry";
+        OldReservationEntry: Record "Reservation Entry";
     begin
-        if not FindReservEntry(OldPlanningComponent, OldReservEntry) then
+        if not FindReservEntry(OldPlanningComponent, OldReservationEntry) then
             exit;
 
-        NewAsmLine.TestItemFields(
+        NewAssemblyLine.TestItemFields(
           OldPlanningComponent."Item No.", OldPlanningComponent."Variant Code", OldPlanningComponent."Location Code");
 
         TransferReservations(
-          OldPlanningComponent, OldReservEntry, TransferAll, TransferQty, NewAsmLine."Qty. per Unit of Measure",
-          DATABASE::"Assembly Line", NewAsmLine."Document Type".AsInteger(), NewAsmLine."Document No.",
-          '', 0, NewAsmLine."Line No.");
+          OldPlanningComponent, OldReservationEntry, TransferAll, TransferQty, NewAssemblyLine."Qty. per Unit of Measure",
+          DATABASE::"Assembly Line", NewAssemblyLine."Document Type".AsInteger(), NewAssemblyLine."Document No.",
+          '', 0, NewAssemblyLine."Line No.");
     end;
 
-    local procedure TransferReservations(var OldPlanningComponent: Record "Planning Component"; var OldReservEntry: Record "Reservation Entry"; TransferAll: Boolean; TransferQty: Decimal; QtyPerUOM: Decimal; SrcType: Integer; SrcSubtype: Option; SrcID: Code[20]; SrcBatchName: Code[10]; SrcProdOrderLine: Integer; SrcRefNo: Integer)
+    local procedure TransferReservations(var OldPlanningComponent: Record "Planning Component"; var OldReservationEntry: Record "Reservation Entry"; TransferAll: Boolean; TransferQty: Decimal; QtyPerUOM: Decimal; SrcType: Integer; SrcSubtype: Option; SrcID: Code[20]; SrcBatchName: Code[10]; SrcProdOrderLine: Integer; SrcRefNo: Integer)
     var
-        NewReservEntry: Record "Reservation Entry";
+        NewReservationEntry: Record "Reservation Entry";
         ReservStatus: Enum "Reservation Status";
     begin
-        OldReservEntry.Lock();
+        OldReservationEntry.Lock();
 
         if TransferAll then begin
-            OldReservEntry.FindSet();
-            OldReservEntry.TestField("Qty. per Unit of Measure", QtyPerUOM);
-
+            OldReservationEntry.FindSet();
+            OldReservationEntry.TestField("Qty. per Unit of Measure", QtyPerUOM);
             repeat
-                OldReservEntry.TestItemFields(
+                OldReservationEntry.TestItemFields(
                   OldPlanningComponent."Item No.", OldPlanningComponent."Variant Code", OldPlanningComponent."Location Code");
-
-                NewReservEntry := OldReservEntry;
-                NewReservEntry.SetSource(SrcType, SrcSubtype, SrcID, SrcRefNo, SrcBatchName, SrcProdOrderLine);
-                NewReservEntry.Modify();
-            until OldReservEntry.Next() = 0;
+                NewReservationEntry := OldReservationEntry;
+                NewReservationEntry.SetSource(SrcType, SrcSubtype, SrcID, SrcRefNo, SrcBatchName, SrcProdOrderLine);
+                NewReservationEntry.Modify();
+            until OldReservationEntry.Next() = 0;
         end else
             for ReservStatus := ReservStatus::Reservation to ReservStatus::Prospect do begin
                 if TransferQty = 0 then
                     exit;
-                OldReservEntry.SetRange("Reservation Status", ReservStatus);
+                OldReservationEntry.SetRange("Reservation Status", ReservStatus);
 
-                if OldReservEntry.FindSet() then
+                if OldReservationEntry.FindSet() then
                     repeat
-                        OldReservEntry.TestItemFields(
+                        OldReservationEntry.TestItemFields(
                           OldPlanningComponent."Item No.", OldPlanningComponent."Variant Code", OldPlanningComponent."Location Code");
 
                         TransferQty :=
                           CreateReservEntry.TransferReservEntry(
-                            SrcType, SrcSubtype, SrcID, SrcBatchName, SrcProdOrderLine, SrcRefNo, QtyPerUOM, OldReservEntry, TransferQty);
-                    until (OldReservEntry.Next() = 0) or (TransferQty = 0);
+                            SrcType, SrcSubtype, SrcID, SrcBatchName, SrcProdOrderLine, SrcRefNo, QtyPerUOM, OldReservationEntry, TransferQty);
+                    until (OldReservationEntry.Next() = 0) or (TransferQty = 0);
             end;
     end;
 
@@ -268,59 +274,54 @@ codeunit 99000840 "Plng. Component-Reserve"
         if Blocked then
             exit;
 
-        with PlanningComponent do begin
-            ReservMgt.SetReservSource(PlanningComponent);
-            ReservMgt.SetItemTrackingHandling(1); // Allow Deletion
-            ReservMgt.DeleteReservEntries(true, 0);
-            CalcFields("Reserved Qty. (Base)");
-            AssignForPlanning(PlanningComponent);
-        end;
+        ReservationManagement.SetReservSource(PlanningComponent);
+        ReservationManagement.SetItemTrackingHandling(1); // Allow Deletion
+        ReservationManagement.DeleteReservEntries(true, 0);
+        PlanningComponent.CalcFields("Reserved Qty. (Base)");
+        AssignForPlanning(PlanningComponent);
     end;
 
     procedure UpdateDerivedTracking(var PlanningComponent: Record "Planning Component")
     var
-        ReservEntry: Record "Reservation Entry";
-        ReservEntry2: Record "Reservation Entry";
+        ReservationEntry: Record "Reservation Entry";
+        ReservationEntry2: Record "Reservation Entry";
         ActionMessageEntry: Record "Action Message Entry";
     begin
-        ReservEntry.InitSortingAndFilters(false);
+        ReservationEntry.InitSortingAndFilters(false);
         ActionMessageEntry.SetCurrentKey("Reservation Entry");
 
-        with ReservEntry do begin
-            SetFilter("Shipment Date", '<>%1', PlanningComponent."Due Date");
-            case PlanningComponent."Ref. Order Type" of
-                PlanningComponent."Ref. Order Type"::"Prod. Order":
-                    SetSourceFilter(
-                      DATABASE::"Prod. Order Component", PlanningComponent."Ref. Order Status".AsInteger(),
-                      PlanningComponent."Ref. Order No.", PlanningComponent."Line No.", false);
-                PlanningComponent."Ref. Order Type"::Assembly:
-                    SetSourceFilter(
-                      DATABASE::"Assembly Line", PlanningComponent."Ref. Order Status".AsInteger(),
-                      PlanningComponent."Ref. Order No.", PlanningComponent."Line No.", false);
-            end;
-            SetRange("Source Prod. Order Line", PlanningComponent."Ref. Order Line No.");
-            if FindSet() then
-                repeat
-                    ReservEntry2 := ReservEntry;
-                    ReservEntry2."Shipment Date" := PlanningComponent."Due Date";
-                    ReservEntry2.Modify();
-                    if ReservEntry2.Get(ReservEntry2."Entry No.", not ReservEntry2.Positive) then begin
-                        ReservEntry2."Shipment Date" := PlanningComponent."Due Date";
-                        ReservEntry2.Modify();
-                    end;
-                    ActionMessageEntry.SetRange("Reservation Entry", "Entry No.");
-                    ActionMessageEntry.DeleteAll();
-                until Next() = 0;
+        ReservationEntry.SetFilter("Shipment Date", '<>%1', PlanningComponent."Due Date");
+        case PlanningComponent."Ref. Order Type" of
+            PlanningComponent."Ref. Order Type"::"Prod. Order":
+                ReservationEntry.SetSourceFilter(
+                    DATABASE::"Prod. Order Component", PlanningComponent."Ref. Order Status".AsInteger(),
+                    PlanningComponent."Ref. Order No.", PlanningComponent."Line No.", false);
+            PlanningComponent."Ref. Order Type"::Assembly:
+                ReservationEntry.SetSourceFilter(
+                    DATABASE::"Assembly Line", PlanningComponent."Ref. Order Status".AsInteger(),
+                    PlanningComponent."Ref. Order No.", PlanningComponent."Line No.", false);
         end;
+        ReservationEntry.SetRange("Source Prod. Order Line", PlanningComponent."Ref. Order Line No.");
+        if ReservationEntry.FindSet() then
+            repeat
+                ReservationEntry2 := ReservationEntry;
+                ReservationEntry2."Shipment Date" := PlanningComponent."Due Date";
+                ReservationEntry2.Modify();
+                if ReservationEntry2.Get(ReservationEntry2."Entry No.", not ReservationEntry2.Positive) then begin
+                    ReservationEntry2."Shipment Date" := PlanningComponent."Due Date";
+                    ReservationEntry2.Modify();
+                end;
+                ActionMessageEntry.SetRange("Reservation Entry", ReservationEntry."Entry No.");
+                ActionMessageEntry.DeleteAll();
+            until ReservationEntry.Next() = 0;
     end;
 
     local procedure AssignForPlanning(var PlanningComponent: Record "Planning Component")
     var
         PlanningAssignment: Record "Planning Assignment";
     begin
-        with PlanningComponent do
-            if "Item No." <> '' then
-                PlanningAssignment.ChkAssignOne("Item No.", "Variant Code", "Location Code", "Due Date");
+        if PlanningComponent."Item No." <> '' then
+            PlanningAssignment.ChkAssignOne(PlanningComponent."Item No.", PlanningComponent."Variant Code", PlanningComponent."Location Code", PlanningComponent."Due Date");
     end;
 
     procedure Block(SetBlocked: Boolean)
@@ -340,21 +341,21 @@ codeunit 99000840 "Plng. Component-Reserve"
         OnAfterCallItemTracking(PlanningComponent);
     end;
 
-    procedure BindToRequisition(PlanningComp: Record "Planning Component"; ReqLine: Record "Requisition Line"; ReservQty: Decimal; ReservQtyBase: Decimal)
+    procedure BindToRequisition(PlanningComponent: Record "Planning Component"; RequisitionLine: Record "Requisition Line"; ReservQty: Decimal; ReservQtyBase: Decimal)
     var
         TrackingSpecification: Record "Tracking Specification";
         ReservationEntry: Record "Reservation Entry";
     begin
-        if PlanningComp."Location Code" <> ReqLine."Location Code" then
+        if PlanningComponent."Location Code" <> RequisitionLine."Location Code" then
             exit;
 
         SetBinding(ReservationEntry.Binding::"Order-to-Order");
         TrackingSpecification.InitTrackingSpecification(
           DATABASE::"Requisition Line", 0,
-          ReqLine."Worksheet Template Name", ReqLine."Journal Batch Name", 0, ReqLine."Line No.",
-          ReqLine."Variant Code", ReqLine."Location Code", ReqLine."Qty. per Unit of Measure");
+          RequisitionLine."Worksheet Template Name", RequisitionLine."Journal Batch Name", 0, RequisitionLine."Line No.",
+          RequisitionLine."Variant Code", RequisitionLine."Location Code", RequisitionLine."Qty. per Unit of Measure");
         CreateReservationSetFrom(TrackingSpecification);
-        CreateBindingReservation(PlanningComp, ReqLine.Description, ReqLine."Ending Date", ReservQty, ReservQtyBase);
+        CreateBindingReservation(PlanningComponent, RequisitionLine.Description, RequisitionLine."Ending Date", ReservQty, ReservQtyBase);
     end;
 
     [EventSubscriber(ObjectType::Page, PAGE::Reservation, 'OnGetQtyPerUOMFromSourceRecRef', '', false, false)]
@@ -369,14 +370,14 @@ codeunit 99000840 "Plng. Component-Reserve"
         end;
     end;
 
-    local procedure SetReservSourceFor(SourceRecRef: RecordRef; var ReservEntry: Record "Reservation Entry"; var CaptionText: Text)
+    local procedure SetReservSourceFor(SourceRecordRef: RecordRef; var ReservationEntry: Record "Reservation Entry"; var CaptionText: Text)
     var
         PlanningComponent: Record "Planning Component";
     begin
-        SourceRecRef.SetTable(PlanningComponent);
+        SourceRecordRef.SetTable(PlanningComponent);
         PlanningComponent.TestField("Due Date");
 
-        PlanningComponent.SetReservationEntry(ReservEntry);
+        PlanningComponent.SetReservationEntry(ReservationEntry);
 
         CaptionText := PlanningComponent.GetSourceCaption();
     end;
@@ -388,7 +389,7 @@ codeunit 99000840 "Plng. Component-Reserve"
 
     local procedure MatchThisTable(TableID: Integer): Boolean
     begin
-        exit(TableID = 99000829); // DATABASE::"Planning Component"
+        exit(TableID = Enum::TableID::"Planning Component".AsInteger());
     end;
 
     [EventSubscriber(ObjectType::Page, Page::Reservation, 'OnSetReservSource', '', false, false)]
@@ -414,7 +415,7 @@ codeunit 99000840 "Plng. Component-Reserve"
     local procedure OnFilterReservEntry(var FilterReservEntry: Record "Reservation Entry"; ReservEntrySummary: Record "Entry Summary")
     begin
         if MatchThisEntry(ReservEntrySummary."Entry No.") then begin
-            FilterReservEntry.SetRange("Source Type", DATABASE::"Planning Component");
+            FilterReservEntry.SetRange("Source Type", Enum::TableID::"Planning Component".AsInteger());
             FilterReservEntry.SetRange("Source Subtype", 0);
         end;
     end;
@@ -424,7 +425,7 @@ codeunit 99000840 "Plng. Component-Reserve"
     begin
         if MatchThisEntry(FromEntrySummary."Entry No.") then
             IsHandled :=
-                (FilterReservEntry."Source Type" = DATABASE::"Planning Component") and
+                (FilterReservEntry."Source Type" = Enum::TableID::"Planning Component".AsInteger()) and
                 (FilterReservEntry."Source Subtype" = 0);
     end;
 

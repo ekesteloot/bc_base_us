@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Foundation.Company;
+using System.Integration.Word;
+
 page 5075 "Interaction Templates"
 {
     ApplicationArea = RelationshipMgmt;
@@ -13,7 +19,7 @@ page 5075 "Interaction Templates"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the interaction template.';
@@ -53,7 +59,7 @@ page 5075 "Interaction Templates"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the default language code for the interaction. If the contact''s preferred language is not available, then the program uses this language as the default language.';
                 }
-                field(Attachment; "Attachment No." <> 0)
+                field(Attachment; Rec."Attachment No." <> 0)
                 {
                     ApplicationArea = RelationshipMgmt;
                     AssistEdit = true;
@@ -67,16 +73,16 @@ page 5075 "Interaction Templates"
                         if Rec."Word Template Code" <> '' then
                             Error(WordTemplateUsedErr);
 
-                        if InteractTmplLanguage.Get(Code, "Language Code (Default)") then begin
+                        if InteractTmplLanguage.Get(Rec.Code, Rec."Language Code (Default)") then begin
                             if InteractTmplLanguage."Attachment No." <> 0 then
                                 InteractTmplLanguage.OpenAttachment()
                             else
                                 InteractTmplLanguage.CreateAttachment();
                         end else begin
                             InteractTmplLanguage.Init();
-                            InteractTmplLanguage."Interaction Template Code" := Code;
-                            InteractTmplLanguage."Language Code" := "Language Code (Default)";
-                            InteractTmplLanguage.Description := Description;
+                            InteractTmplLanguage."Interaction Template Code" := Rec.Code;
+                            InteractTmplLanguage."Language Code" := Rec."Language Code (Default)";
+                            InteractTmplLanguage.Description := Rec.Description;
                             InteractTmplLanguage.CreateAttachment();
                         end;
                         CurrPage.Update();
@@ -153,8 +159,8 @@ page 5075 "Interaction Templates"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Interaction Template Code" = FIELD(Code);
-                    RunPageView = SORTING("Interaction Template Code", Date);
+                    RunPageLink = "Interaction Template Code" = field(Code);
+                    RunPageView = sorting("Interaction Template Code", Date);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
@@ -164,7 +170,7 @@ page 5075 "Interaction Templates"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Interaction Tmpl. Statistics";
-                    RunPageLink = Code = FIELD(Code);
+                    RunPageLink = Code = field(Code);
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -174,7 +180,7 @@ page 5075 "Interaction Templates"
                     Caption = 'Languages';
                     Image = Language;
                     RunObject = Page "Interact. Tmpl. Languages";
-                    RunPageLink = "Interaction Template Code" = FIELD(Code);
+                    RunPageLink = "Interaction Template Code" = field(Code);
                     ToolTip = 'Set up and select the preferred languages for the interactions with your contacts.';
                 }
             }
@@ -197,7 +203,7 @@ page 5075 "Interaction Templates"
                         if Rec."Word Template Code" <> '' then
                             Error(WordTemplateUsedErr);
 
-                        if InteractTemplLanguage.Get(Code, "Language Code (Default)") then
+                        if InteractTemplLanguage.Get(Rec.Code, Rec."Language Code (Default)") then
                             InteractTemplLanguage.OpenAttachment();
                     end;
                 }
@@ -216,11 +222,11 @@ page 5075 "Interaction Templates"
                         if Rec."Word Template Code" <> '' then
                             Error(WordTemplateUsedErr);
 
-                        if not InteractTemplLanguage.Get(Code, "Language Code (Default)") then begin
+                        if not InteractTemplLanguage.Get(Rec.Code, Rec."Language Code (Default)") then begin
                             InteractTemplLanguage.Init();
-                            InteractTemplLanguage."Interaction Template Code" := Code;
-                            InteractTemplLanguage."Language Code" := "Language Code (Default)";
-                            InteractTemplLanguage.Description := Description;
+                            InteractTemplLanguage."Interaction Template Code" := Rec.Code;
+                            InteractTemplLanguage."Language Code" := Rec."Language Code (Default)";
+                            InteractTemplLanguage.Description := Rec.Description;
                         end;
                         InteractTemplLanguage.CreateAttachment();
                         CurrPage.Update();
@@ -241,11 +247,11 @@ page 5075 "Interaction Templates"
                         if Rec."Word Template Code" <> '' then
                             Error(WordTemplateUsedErr);
 
-                        if not InteractTemplLanguage.Get(Code, "Language Code (Default)") then begin
+                        if not InteractTemplLanguage.Get(Rec.Code, Rec."Language Code (Default)") then begin
                             InteractTemplLanguage.Init();
-                            InteractTemplLanguage."Interaction Template Code" := Code;
-                            InteractTemplLanguage."Language Code" := "Language Code (Default)";
-                            InteractTemplLanguage.Description := Description;
+                            InteractTemplLanguage."Interaction Template Code" := Rec.Code;
+                            InteractTemplLanguage."Language Code" := Rec."Language Code (Default)";
+                            InteractTemplLanguage.Description := Rec.Description;
                             InteractTemplLanguage.Insert();
                             Commit();
                         end;
@@ -268,11 +274,11 @@ page 5075 "Interaction Templates"
                         if Rec."Word Template Code" <> '' then
                             Error(WordTemplateUsedErr);
 
-                        if not InteractTemplLanguage.Get(Code, "Language Code (Default)") then begin
+                        if not InteractTemplLanguage.Get(Rec.Code, Rec."Language Code (Default)") then begin
                             InteractTemplLanguage.Init();
-                            InteractTemplLanguage."Interaction Template Code" := Code;
-                            InteractTemplLanguage."Language Code" := "Language Code (Default)";
-                            InteractTemplLanguage.Description := Description;
+                            InteractTemplLanguage."Interaction Template Code" := Rec.Code;
+                            InteractTemplLanguage."Language Code" := Rec."Language Code (Default)";
+                            InteractTemplLanguage.Description := Rec.Description;
                             InteractTemplLanguage.Insert();
                         end;
                         InteractTemplLanguage.ImportAttachment();
@@ -294,7 +300,7 @@ page 5075 "Interaction Templates"
                         if Rec."Word Template Code" <> '' then
                             Error(WordTemplateUsedErr);
 
-                        if InteractTemplLanguage.Get(Code, "Language Code (Default)") then
+                        if InteractTemplLanguage.Get(Rec.Code, Rec."Language Code (Default)") then
                             InteractTemplLanguage.ExportAttachment();
                     end;
                 }
@@ -313,7 +319,7 @@ page 5075 "Interaction Templates"
                         if Rec."Word Template Code" <> '' then
                             Error(WordTemplateUsedErr);
 
-                        if InteractTemplLanguage.Get(Code, "Language Code (Default)") then
+                        if InteractTemplLanguage.Get(Rec.Code, Rec."Language Code (Default)") then
                             InteractTemplLanguage.RemoveAttachment(true);
                     end;
                 }
@@ -391,14 +397,14 @@ page 5075 "Interaction Templates"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("Attachment No.");
+        Rec.CalcFields("Attachment No.");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        if GetFilter("Interaction Group Code") <> '' then
-            if GetRangeMin("Interaction Group Code") = GetRangeMax("Interaction Group Code") then
-                "Interaction Group Code" := GetRangeMin("Interaction Group Code");
+        if Rec.GetFilter("Interaction Group Code") <> '' then
+            if Rec.GetRangeMin("Interaction Group Code") = Rec.GetRangeMax("Interaction Group Code") then
+                Rec."Interaction Group Code" := Rec.GetRangeMin("Interaction Group Code");
     end;
 
     var

@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Capacity;
+
+using Microsoft.Manufacturing.WorkCenter;
+
 codeunit 99000755 "Shop Calendar Management"
 {
     SingleInstance = true;

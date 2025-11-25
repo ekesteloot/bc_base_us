@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using System.Utilities;
+
 page 492 "Item Availability by Location"
 {
     Caption = 'Item Availability by Location';
@@ -101,12 +108,12 @@ page 492 "Item Availability by Location"
                         Caption = 'Period';
                         Image = Period;
                         RunObject = Page "Item Availability by Periods";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'Show the projected quantity of the item over time according to time periods, such as day, week, or month.';
                     }
                     action(Variant)
@@ -115,12 +122,12 @@ page 492 "Item Availability by Location"
                         Caption = 'Variant';
                         Image = ItemVariant;
                         RunObject = Page "Item Availability by Variant";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'View or edit the item''s variants. Instead of setting up each color of an item as a separate item, you can set up the various colors as variants of the item.';
                     }
                     action("BOM Level")
@@ -185,7 +192,7 @@ page 492 "Item Availability by Location"
 
     trigger OnAfterGetRecord()
     begin
-        SetRange("Drop Shipment Filter", false);
+        Rec.SetRange("Drop Shipment Filter", false);
         FindPeriod('');
         UpdateSubForm();
     end;
@@ -206,31 +213,31 @@ page 492 "Item Availability by Location"
     var
         Calendar: Record Date;
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
-        ItemPeriodLength: Enum "Analysis Period Type";
         LastLocation: Code[10];
         DateFilter: Text;
 
     protected var
         AmountType: Enum "Analysis Amount Type";
+        ItemPeriodLength: Enum "Analysis Period Type";
 
     local procedure FindPeriod(SearchText: Code[10])
     var
         PeriodPageMgt: Codeunit PeriodPageManagement;
     begin
-        if GetFilter("Date Filter") <> '' then begin
-            Calendar.SetFilter("Period Start", GetFilter("Date Filter"));
+        if Rec.GetFilter("Date Filter") <> '' then begin
+            Calendar.SetFilter("Period Start", Rec.GetFilter("Date Filter"));
             if not PeriodPageMgt.FindDate('+', Calendar, ItemPeriodLength) then
                 PeriodPageMgt.FindDate('+', Calendar, "Analysis Period Type"::Day);
             Calendar.SetRange("Period Start");
         end;
         PeriodPageMgt.FindDate(SearchText, Calendar, ItemPeriodLength);
         if AmountType = AmountType::"Net Change" then begin
-            SetRange("Date Filter", Calendar."Period Start", Calendar."Period End");
-            if GetRangeMin("Date Filter") = GetRangeMax("Date Filter") then
-                SetRange("Date Filter", GetRangeMin("Date Filter"));
+            Rec.SetRange("Date Filter", Calendar."Period Start", Calendar."Period End");
+            if Rec.GetRangeMin("Date Filter") = Rec.GetRangeMax("Date Filter") then
+                Rec.SetRange("Date Filter", Rec.GetRangeMin("Date Filter"));
         end else
-            SetRange("Date Filter", 0D, Calendar."Period End");
-        DateFilter := GetFilter("Date Filter");
+            Rec.SetRange("Date Filter", 0D, Calendar."Period End");
+        DateFilter := Rec.GetFilter("Date Filter");
     end;
 
     protected procedure UpdateSubForm()

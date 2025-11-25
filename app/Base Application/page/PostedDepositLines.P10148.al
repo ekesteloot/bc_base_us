@@ -88,7 +88,7 @@ page 10148 "Posted Deposit Lines"
                     Caption = 'Show Document';
                     Image = View;
                     RunObject = Page "Posted Deposit List";
-                    RunPageLink = "No." = FIELD("Deposit No.");
+                    RunPageLink = "No." = field("Deposit No.");
                     ToolTip = 'View the document that the deposit is related to.';
                 }
                 action("Account &Card")
@@ -101,7 +101,7 @@ page 10148 "Posted Deposit Lines"
 
                     trigger OnAction()
                     begin
-                        ShowAccountCard();
+                        Rec.ShowAccountCard();
                     end;
                 }
                 action("Account Ledger E&ntries")
@@ -114,7 +114,7 @@ page 10148 "Posted Deposit Lines"
 
                     trigger OnAction()
                     begin
-                        ShowAccountLedgerEntries();
+                        Rec.ShowAccountLedgerEntries();
                     end;
                 }
                 action(Dimensions)
@@ -127,7 +127,7 @@ page 10148 "Posted Deposit Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }

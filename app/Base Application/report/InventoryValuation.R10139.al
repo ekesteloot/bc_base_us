@@ -1,7 +1,17 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using System.Utilities;
+
 report 10139 "Inventory Valuation"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/InventoryValuation.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InventoryValuation.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Valuation';
     UsageCategory = ReportsAndAnalysis;
@@ -11,13 +21,14 @@ report 10139 "Inventory Valuation"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE(Type = CONST(Inventory));
+            DataItemTableView = where(Type = const(Inventory));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Inventory Posting Group", "Costing Method", "Location Filter", "Variant Filter";
+
             column(CompanyInformation_Name; CompanyInformation.Name)
             {
             }
-            column(STRSUBSTNO_Text003_AsOfDate_; StrSubstNo(Text003, AsOfDate))
+            column(STRSUBSTNO_Text003_AsOfDate_; StrSubstNo(EndDatePrefixLbl, EndDate))
             {
             }
             column(ShowVariants; ShowVariants)
@@ -29,7 +40,7 @@ report 10139 "Inventory Valuation"
             column(ShowACY; ShowACY)
             {
             }
-            column(STRSUBSTNO_Text006_Currency_Description_; StrSubstNo(Text006, Currency.Description))
+            column(STRSUBSTNO_Text006_Currency_Description_; StrSubstNo(CurrencyCodePrefixLbl, Currency.Description))
             {
             }
             column(Item_TABLECAPTION__________ItemFilter; Item.TableCaption() + ': ' + ItemFilter)
@@ -38,7 +49,7 @@ report 10139 "Inventory Valuation"
             column(ItemFilter; ItemFilter)
             {
             }
-            column(STRSUBSTNO_Text004_InvPostingGroup_TABLECAPTION_InvPostingGroup_Code_InvPostingGroup_Description_; StrSubstNo(Text004, InvPostingGroup.TableCaption(), InvPostingGroup.Code, InvPostingGroup.Description))
+            column(STRSUBSTNO_Text004_InvPostingGroup_TABLECAPTION_InvPostingGroup_Code_InvPostingGroup_Description_; StrSubstNo(InvoicePostingGroupLbl, InvPostingGroup.TableCaption(), InvPostingGroup.Code, InvPostingGroup.Description))
             {
             }
             column(Item__Inventory_Posting_Group_; "Inventory Posting Group")
@@ -63,7 +74,7 @@ report 10139 "Inventory Valuation"
             {
                 IncludeCaption = true;
             }
-            column(STRSUBSTNO_Text005_InvPostingGroup_TABLECAPTION_InvPostingGroup_Code_InvPostingGroup_Description_; StrSubstNo(Text005, InvPostingGroup.TableCaption(), InvPostingGroup.Code, InvPostingGroup.Description))
+            column(STRSUBSTNO_Text005_InvPostingGroup_TABLECAPTION_InvPostingGroup_Code_InvPostingGroup_Description_; StrSubstNo(InvoicePostingGroupTotalLbl, InvPostingGroup.TableCaption(), InvPostingGroup.Code, InvPostingGroup.Description))
             {
             }
             column(Inventory_ValuationCaption; Inventory_ValuationCaptionLbl)
@@ -86,8 +97,8 @@ report 10139 "Inventory Valuation"
             }
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter");
-                DataItemTableView = SORTING("Item No.", "Variant Code", "Location Code", "Posting Date");
+                DataItemLink = "Item No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter");
+                DataItemTableView = sorting("Item No.", "Variant Code", "Location Code", "Posting Date");
 
                 trigger OnAfterGetRecord()
                 begin
@@ -103,12 +114,12 @@ report 10139 "Inventory Valuation"
 
                 trigger OnPreDataItem()
                 begin
-                    SetRange("Posting Date", 0D, AsOfDate);
+                    SetRange("Posting Date", 0D, EndDate);
                 end;
             }
             dataitem(BufferLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(RowLabel; TempEntryBuffer.Label)
                 {
                 }
@@ -154,7 +165,7 @@ report 10139 "Inventory Valuation"
 
             trigger OnPreDataItem()
             begin
-                SetRange("Date Filter", 0D, AsOfDate);
+                SetRange("Date Filter", 0D, EndDate);
             end;
         }
     }
@@ -170,7 +181,7 @@ report 10139 "Inventory Valuation"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(AsOfDate; AsOfDate)
+                    field(AsOfDate; EndDate)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'As Of Date';
@@ -217,20 +228,22 @@ report 10139 "Inventory Valuation"
     begin
         Grouping := (Item.FieldCaption("Inventory Posting Group") = Item.CurrentKey);
 
-        if AsOfDate = 0D then
-            Error(Text000);
-        if ShowLocations and not ShowVariants then
+        if EndDate = 0D then
+            Error(EndDateErr);
+
+        if ShowLocations and (not ShowVariants) then
             if not "Item Ledger Entry".SetCurrentKey("Item No.", "Location Code") then
-                Error(Text001,
-                  "Item Ledger Entry".TableCaption(),
-                  "Item Ledger Entry".FieldCaption("Item No."),
-                  "Item Ledger Entry".FieldCaption("Location Code"));
+                Error(ShowLocationAndVariantsErr, "Item Ledger Entry".TableCaption(), "Item Ledger Entry".FieldCaption("Item No."), "Item Ledger Entry".FieldCaption("Location Code"));
+
         if Item.GetFilter("Date Filter") <> '' then
-            Error(Text002, Item.FieldCaption("Date Filter"), Item.TableCaption());
+            Error(EndDateFilterErr, Item.FieldCaption("Date Filter"), Item.TableCaption());
 
         CompanyInformation.Get();
         ItemFilter := Item.GetFilters();
         GLSetup.Get();
+
+        Currency.SetLoadFields(Description, "Amount Rounding Precision", "Unit-Amount Rounding Precision");
+
         if GLSetup."Additional Reporting Currency" = '' then
             ShowACY := false
         else begin
@@ -247,14 +260,12 @@ report 10139 "Inventory Valuation"
         CompanyInformation: Record "Company Information";
         InvPostingGroup: Record "Inventory Posting Group";
         Currency: Record Currency;
-        Location: Record Location;
-        ItemVariant: Record "Item Variant";
         TempEntryBuffer: Record "Item Location Variant Buffer" temporary;
         ItemFilter: Text;
         ShowVariants: Boolean;
         ShowLocations: Boolean;
         ShowACY: Boolean;
-        AsOfDate: Date;
+        EndDate: Date;
         LastItemNo: Code[20];
         LastLocationCode: Code[10];
         LastVariantCode: Code[10];
@@ -263,71 +274,70 @@ report 10139 "Inventory Valuation"
         IsCollecting: Boolean;
         Progress: Dialog;
         Grouping: Boolean;
-
-        Text000: Label 'You must enter an As Of Date.';
-        Text001: Label 'If you want to show Locations without also showing Variants, you must add a new key to the %1 table which starts with the %2 and %3 fields.';
-        Text002: Label 'Do not set a %1 on the %2.  Use the As Of Date on the Option tab instead.';
-        Text003: Label 'Quantities and Values As Of %1';
-        Text004: Label '%1 %2 (%3)';
-        Text005: Label '%1 %2 (%3) Total';
-        Text006: Label 'All Inventory Values are shown in %1.';
-        Text007: Label 'No Variant';
-        Text008: Label 'No Location';
+        EndDateErr: Label 'You must enter an As Of Date.';
+        ShowLocationAndVariantsErr: Label 'If you want to show Locations without also showing Variants, you must add a new key to the %1 table which starts with the %2 and %3 fields.', Comment = '%1 = Item Ledger Entry table Caption; %2 = Item No. field Caption; %3 = Location Code field Caption';
+        EndDateFilterErr: Label 'Do not set a %1 on the %2.  Use the As Of Date on the Option tab instead.', Comment = '%1 = Date Filter field Caption; %2 = Item table Caption';
+        EndDatePrefixLbl: Label 'Quantities and Values As Of %1', Comment = '%1 = As Of Date prefix';
+        InvoicePostingGroupLbl: Label '%1 %2 (%3)', Comment = '%1 = Invoice Posting Group table Caption; %2 = Invoice Posting Group''s Code; %3 = Invoice Posting Group''s Description';
+        InvoicePostingGroupTotalLbl: Label '%1 %2 (%3) Total', Comment = '%1 = Invoice Posting Group table Caption; %2 = Invoice Posting Group''s Code; %3 = Invoice Posting Group''s Description';
+        CurrencyCodePrefixLbl: Label 'All Inventory Values are shown in %1.', Comment = '%1 = Curreny Code';
+        NoVariantLbl: Label 'No Variant';
+        NoLocationLbl: Label 'No Location';
         Inventory_ValuationCaptionLbl: Label 'Inventory Valuation';
         CurrReport_PAGENOCaptionLbl: Label 'Page';
         InventoryValue_Control34CaptionLbl: Label 'Inventory Value';
         UnitCost_Control33CaptionLbl: Label 'Unit Cost';
         Total_Inventory_ValueCaptionLbl: Label 'Total Inventory Value';
 
-    local procedure AdjustItemLedgEntryToAsOfDate(var ItemLedgEntry: Record "Item Ledger Entry")
+    local procedure AdjustItemLedgEntryToAsOfDate(var ItemLedgerEntry: Record "Item Ledger Entry")
     var
-        ItemApplnEntry: Record "Item Application Entry";
+        ItemApplicationEntry: Record "Item Application Entry";
         ValueEntry: Record "Value Entry";
-        ItemLedgEntry2: Record "Item Ledger Entry";
+        ItemLedgerEntry2: Record "Item Ledger Entry";
     begin
-        with ItemLedgEntry do begin
-            "Remaining Quantity" := Quantity;
-            if Positive then begin
-                ItemApplnEntry.Reset();
-                ItemApplnEntry.SetCurrentKey(
-                  "Inbound Item Entry No.", "Item Ledger Entry No.", "Outbound Item Entry No.", "Cost Application");
-                ItemApplnEntry.SetRange("Inbound Item Entry No.", "Entry No.");
-                ItemApplnEntry.SetRange("Posting Date", 0D, AsOfDate);
-                ItemApplnEntry.SetFilter("Outbound Item Entry No.", '<>%1', 0);
-                ItemApplnEntry.SetFilter("Item Ledger Entry No.", '<>%1', "Entry No.");
-                ItemApplnEntry.CalcSums(Quantity);
-                "Remaining Quantity" += ItemApplnEntry.Quantity;
-            end else begin
-                ItemApplnEntry.Reset();
-                ItemApplnEntry.SetCurrentKey(
-                  "Outbound Item Entry No.", "Item Ledger Entry No.", "Cost Application", "Transferred-from Entry No.");
-                ItemApplnEntry.SetRange("Item Ledger Entry No.", "Entry No.");
-                ItemApplnEntry.SetRange("Outbound Item Entry No.", "Entry No.");
-                ItemApplnEntry.SetRange("Posting Date", 0D, AsOfDate);
-                if ItemApplnEntry.Find('-') then
-                    repeat
-                        if ItemLedgEntry2.Get(ItemApplnEntry."Inbound Item Entry No.") and
-                           (ItemLedgEntry2."Posting Date" <= AsOfDate)
-                        then
-                            "Remaining Quantity" := "Remaining Quantity" - ItemApplnEntry.Quantity;
-                    until ItemApplnEntry.Next() = 0;
-            end;
+        ItemLedgerEntry."Remaining Quantity" := ItemLedgerEntry.Quantity;
 
-            // calculate adjusted cost of entry
-            ValueEntry.Reset();
-            ValueEntry.SetRange("Item Ledger Entry No.", "Entry No.");
-            ValueEntry.SetRange("Posting Date", 0D, AsOfDate);
-            ValueEntry.CalcSums(
-              "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)");
-            "Cost Amount (Actual)" := Round(ValueEntry."Cost Amount (Actual)" + ValueEntry."Cost Amount (Expected)");
-            "Cost Amount (Actual) (ACY)" :=
-              Round(
-                ValueEntry."Cost Amount (Actual) (ACY)" + ValueEntry."Cost Amount (Expected) (ACY)", Currency."Amount Rounding Precision");
+        ItemLedgerEntry2.SetLoadFields("Posting Date");
+        ItemApplicationEntry.SetLoadFields("Posting Date", "Outbound Item Entry No.", "Inbound Item Entry No.", "Item Ledger Entry No.", Quantity, "Cost Application", "Transferred-from Entry No.");
+
+        if ItemLedgerEntry.Positive then begin
+            ItemApplicationEntry.SetCurrentKey("Inbound Item Entry No.", "Item Ledger Entry No.", "Outbound Item Entry No.", "Cost Application");
+            ItemApplicationEntry.SetRange("Inbound Item Entry No.", ItemLedgerEntry."Entry No.");
+            ItemApplicationEntry.SetRange("Posting Date", 0D, EndDate);
+            ItemApplicationEntry.SetFilter("Outbound Item Entry No.", '<>%1', 0);
+            ItemApplicationEntry.SetFilter("Item Ledger Entry No.", '<>%1', ItemLedgerEntry."Entry No.");
+            ItemApplicationEntry.CalcSums(Quantity);
+            ItemLedgerEntry."Remaining Quantity" += ItemApplicationEntry.Quantity;
+        end else begin
+            ItemApplicationEntry.SetCurrentKey("Outbound Item Entry No.", "Item Ledger Entry No.", "Cost Application", "Transferred-from Entry No.");
+            ItemApplicationEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+            ItemApplicationEntry.SetRange("Outbound Item Entry No.", ItemLedgerEntry."Entry No.");
+            ItemApplicationEntry.SetRange("Posting Date", 0D, EndDate);
+            if ItemApplicationEntry.Find('-') then
+                repeat
+                    if ItemLedgerEntry2.Get(ItemApplicationEntry."Inbound Item Entry No.") and (ItemLedgerEntry2."Posting Date" <= EndDate) then
+                        ItemLedgerEntry."Remaining Quantity" := ItemLedgerEntry."Remaining Quantity" - ItemApplicationEntry.Quantity;
+                until ItemApplicationEntry.Next() = 0;
+        end;
+
+        // calculate adjusted cost of entry
+        ValueEntry.SetLoadFields("Item Ledger Entry No.", "Posting Date", "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)");
+        ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+        ValueEntry.SetRange("Posting Date", 0D, EndDate);
+
+        if ShowACY then begin
+            ValueEntry.CalcSums("Cost Amount (Actual) (ACY)", "Cost Amount (Expected) (ACY)");
+            ItemLedgerEntry."Cost Amount (Actual) (ACY)" := Round(ValueEntry."Cost Amount (Actual) (ACY)" + ValueEntry."Cost Amount (Expected) (ACY)", Currency."Amount Rounding Precision")
+        end else begin
+            ValueEntry.CalcSums("Cost Amount (Actual)", "Cost Amount (Expected)");
+            ItemLedgerEntry."Cost Amount (Actual)" := Round(ValueEntry."Cost Amount (Actual)" + ValueEntry."Cost Amount (Expected)");
         end;
     end;
 
     procedure UpdateBuffer(var ItemLedgEntry: Record "Item Ledger Entry")
     var
+        ItemVariant: Record "Item Variant";
+        Location: Record Location;
         NewRow: Boolean;
     begin
         if ItemLedgEntry."Item No." <> LastItemNo then begin
@@ -340,21 +350,25 @@ report 10139 "Inventory Valuation"
             if ItemLedgEntry."Variant Code" <> LastVariantCode then begin
                 NewRow := true;
                 LastVariantCode := ItemLedgEntry."Variant Code";
-                if ShowVariants then begin
-                    if (ItemLedgEntry."Variant Code" = '') or not ItemVariant.Get(ItemLedgEntry."Item No.", ItemLedgEntry."Variant Code") then
-                        VariantLabel := Text007
+                ItemVariant.SetLoadFields(Description);
+
+                if ShowVariants then
+                    if (ItemLedgEntry."Variant Code" = '') or (not ItemVariant.Get(ItemLedgEntry."Item No.", ItemLedgEntry."Variant Code")) then
+                        VariantLabel := NoVariantLbl
                     else
-                        VariantLabel := ItemVariant.TableCaption() + ' ' + ItemLedgEntry."Variant Code" + '(' + ItemVariant.Description + ')';
-                end
+                        VariantLabel := ItemVariant.TableCaption() + ' ' + ItemLedgEntry."Variant Code" + '(' + ItemVariant.Description + ')'
                 else
                     VariantLabel := ''
             end;
+
             if ItemLedgEntry."Location Code" <> LastLocationCode then begin
                 NewRow := true;
                 LastLocationCode := ItemLedgEntry."Location Code";
+                Location.SetLoadFields(Name);
+
                 if ShowLocations then begin
                     if (ItemLedgEntry."Location Code" = '') or not Location.Get(ItemLedgEntry."Location Code") then
-                        LocationLabel := Text008
+                        LocationLabel := NoLocationLbl
                     else
                         LocationLabel := Location.TableCaption() + ' ' + ItemLedgEntry."Location Code" + '(' + Location.Name + ')';
                 end
@@ -367,10 +381,12 @@ report 10139 "Inventory Valuation"
             UpdateTempEntryBuffer();
 
         TempEntryBuffer."Remaining Quantity" += ItemLedgEntry."Remaining Quantity";
+
         if ShowACY then
             TempEntryBuffer.Value1 += ItemLedgEntry."Cost Amount (Actual) (ACY)"
         else
             TempEntryBuffer.Value1 += ItemLedgEntry."Cost Amount (Actual)";
+
         TempEntryBuffer."Item No." := ItemLedgEntry."Item No.";
         TempEntryBuffer."Variant Code" := LastVariantCode;
         TempEntryBuffer."Location Code" := LastLocationCode;
@@ -390,12 +406,16 @@ report 10139 "Inventory Valuation"
     begin
         if IsCollecting and ((TempEntryBuffer."Remaining Quantity" <> 0) or (TempEntryBuffer.Value1 <> 0)) then
             TempEntryBuffer.Insert();
+
         IsCollecting := false;
         Clear(TempEntryBuffer);
     end;
 
+#if not CLEAN23
     [IntegrationEvent(false, false)]
+    [Obsolete('The event is not used and will be removed', '23.0')]
     local procedure OnBeforeOnAfterItemGetRecord(var Item: Record Item; var SkipItem: Boolean)
     begin
     end;
+#endif
 }

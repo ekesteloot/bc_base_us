@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Setup;
+
 page 99000779 "Stop Codes"
 {
     ApplicationArea = Manufacturing;
@@ -13,7 +15,7 @@ page 99000779 "Stop Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies a code to identify why a machine center has stopped.';

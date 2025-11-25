@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 codeunit 338 "VAT Entry - Edit"
 {
     Permissions = TableData "VAT Entry" = m;
@@ -9,14 +11,14 @@ codeunit 338 "VAT Entry - Edit"
         VATEntry.LockTable();
         VATEntry.Find();
         VATEntry.Validate(Type);
-        VATEntry."VAT Reporting Date" := "VAT Reporting Date";
-        VATEntry."Bill-to/Pay-to No." := "Bill-to/Pay-to No.";
-        VATEntry."Ship-to/Order Address Code" := "Ship-to/Order Address Code";
-        VATEntry."EU 3-Party Trade" := "EU 3-Party Trade";
-        VATEntry."Country/Region Code" := "Country/Region Code";
-        VATEntry."VAT Registration No." := "VAT Registration No.";
+        VATEntry."VAT Reporting Date" := Rec."VAT Reporting Date";
+        VATEntry."Bill-to/Pay-to No." := Rec."Bill-to/Pay-to No.";
+        VATEntry."Ship-to/Order Address Code" := Rec."Ship-to/Order Address Code";
+        VATEntry."EU 3-Party Trade" := Rec."EU 3-Party Trade";
+        VATEntry."Country/Region Code" := Rec."Country/Region Code";
+        VATEntry."VAT Registration No." := Rec."VAT Registration No.";
         OnBeforeVATEntryModify(VATEntry, Rec);
-        VATEntry.TestField("Entry No.", "Entry No.");
+        VATEntry.TestField("Entry No.", Rec."Entry No.");
         VATEntry.Modify();
         Rec := VATEntry;
     end;

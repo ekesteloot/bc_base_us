@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+
 table 5830 "Availability Calc. Overview"
 {
     Caption = 'Availability Calc. Overview';
@@ -31,7 +37,7 @@ table 5830 "Availability Calc. Overview"
         field(6; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(7; "Unit of Measure Code"; Code[10])
         {

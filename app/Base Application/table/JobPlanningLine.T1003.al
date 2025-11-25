@@ -1,3 +1,33 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Resources.Ledger;
+#if not CLEAN21
+using Microsoft.ProjectMgt.Resources.Pricing;
+#endif
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Customer;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using System.Security.AccessControl;
+
 table 1003 "Job Planning Line"
 {
     Caption = 'Job Planning Line';
@@ -77,13 +107,13 @@ table 1003 "Job Planning Line"
         field(7; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST(Item)) Item WHERE(Blocked = CONST(false))
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF (Type = CONST(Text)) "Standard Text";
+            TableRelation = if (Type = const(Resource)) Resource
+            else
+            if (Type = const(Item)) Item where(Blocked = const(false))
+            else
+            if (Type = const("G/L Account")) "G/L Account"
+            else
+            if (Type = const(Text)) "Standard Text";
 
             trigger OnValidate()
             begin
@@ -107,7 +137,7 @@ table 1003 "Job Planning Line"
                     if Type = Type::Item then begin
                         "Bin Code" := '';
                         SetDefaultBin();
-                        WhseValidateSourceLine.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("No."));
+                        JobWarehouseMgt.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("No."));
                     end;
                     if "No." = '' then
                         exit;
@@ -187,7 +217,7 @@ table 1003 "Job Planning Line"
 
                 UpdateAllAmounts();
                 if not BypassQtyValidation then
-                    WhseValidateSourceLine.JobPlanningLineVerifyChange(Rec, xRec, FieldNo(Quantity));
+                    JobWarehouseMgt.JobPlanningLineVerifyChange(Rec, xRec, FieldNo(Quantity));
 
                 BypassQtyValidation := false;
             end;
@@ -266,10 +296,10 @@ table 1003 "Job Planning Line"
         field(17; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
-            IF (Type = CONST(Resource)) "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("No."))
-            ELSE
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
+            if (Type = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("No."))
+            else
             "Unit of Measure";
 
             trigger OnValidate()
@@ -287,7 +317,7 @@ table 1003 "Job Planning Line"
                               UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
                             "Qty. Rounding Precision" := UOMMgt.GetQtyRoundingPrecision(Item, "Unit of Measure Code");
                             "Qty. Rounding Precision (Base)" := UOMMgt.GetQtyRoundingPrecision(Item, Item."Base Unit of Measure");
-                            WhseValidateSourceLine.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Unit of Measure Code"));
+                            JobWarehouseMgt.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Unit of Measure Code"));
                         end;
                     Type::Resource:
                         begin
@@ -335,7 +365,7 @@ table 1003 "Job Planning Line"
         field(20; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             begin
@@ -349,7 +379,7 @@ table 1003 "Job Planning Line"
                     UpdateReservation(FieldNo("Location Code"));
                     Validate(Quantity);
                     SetDefaultBin();
-                    WhseValidateSourceLine.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Location Code"));
+                    JobWarehouseMgt.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Location Code"));
 
                     DeleteWarehouseRequest(xRec);
                     CreateWarehouseRequest();
@@ -367,8 +397,6 @@ table 1003 "Job Planning Line"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(32; "Work Type Code"; Code[10])
         {
@@ -445,14 +473,14 @@ table 1003 "Job Planning Line"
 
             trigger OnValidate()
             begin
-                WhseValidateSourceLine.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Planning Due Date"));
+                JobWarehouseMgt.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Planning Due Date"));
             end;
         }
         field(1000; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
             NotBlank = true;
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(1001; "Line Amount (LCY)"; Decimal)
         {
@@ -473,7 +501,7 @@ table 1003 "Job Planning Line"
         }
         field(1002; "Unit Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Cost';
 
@@ -487,14 +515,14 @@ table 1003 "Job Planning Line"
         }
         field(1003; "Total Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Cost';
             Editable = false;
         }
         field(1004; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
 
@@ -508,14 +536,14 @@ table 1003 "Job Planning Line"
         }
         field(1005; "Total Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Price';
             Editable = false;
         }
         field(1006; "Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Amount';
 
@@ -530,7 +558,7 @@ table 1003 "Job Planning Line"
         }
         field(1007; "Line Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Discount Amount';
 
@@ -676,18 +704,18 @@ table 1003 "Job Planning Line"
         }
         field(1035; "Invoiced Amount (LCY)"; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line Invoice"."Invoiced Amount (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                                         "Job Task No." = FIELD("Job Task No."),
-                                                                                         "Job Planning Line No." = FIELD("Line No.")));
+            CalcFormula = sum("Job Planning Line Invoice"."Invoiced Amount (LCY)" where("Job No." = field("Job No."),
+                                                                                         "Job Task No." = field("Job Task No."),
+                                                                                         "Job Planning Line No." = field("Line No.")));
             Caption = 'Invoiced Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1036; "Invoiced Cost Amount (LCY)"; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line Invoice"."Invoiced Cost Amount (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                                              "Job Task No." = FIELD("Job Task No."),
-                                                                                              "Job Planning Line No." = FIELD("Line No.")));
+            CalcFormula = sum("Job Planning Line Invoice"."Invoiced Cost Amount (LCY)" where("Job No." = field("Job No."),
+                                                                                              "Job Task No." = field("Job Task No."),
+                                                                                              "Job Planning Line No." = field("Line No.")));
             Caption = 'Invoiced Cost Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -727,7 +755,7 @@ table 1003 "Job Planning Line"
 
             trigger OnValidate()
             begin
-                WhseValidateSourceLine.JobPlanningLineVerifyChange(Rec, xRec, FieldNo(Status));
+                JobWarehouseMgt.JobPlanningLineVerifyChange(Rec, xRec, FieldNo(Status));
             end;
         }
         field(1050; "Ledger Entry Type"; Enum "Job Ledger Entry Type")
@@ -738,11 +766,11 @@ table 1003 "Job Planning Line"
         {
             BlankZero = true;
             Caption = 'Ledger Entry No.';
-            TableRelation = IF ("Ledger Entry Type" = CONST(Resource)) "Res. Ledger Entry"
-            ELSE
-            IF ("Ledger Entry Type" = CONST(Item)) "Item Ledger Entry"
-            ELSE
-            IF ("Ledger Entry Type" = CONST("G/L Account")) "G/L Entry";
+            TableRelation = if ("Ledger Entry Type" = const(Resource)) "Res. Ledger Entry"
+            else
+            if ("Ledger Entry Type" = const(Item)) "Item Ledger Entry"
+            else
+            if ("Ledger Entry Type" = const("G/L Account")) "G/L Entry";
         }
         field(1052; "System-Created Entry"; Boolean)
         {
@@ -787,7 +815,7 @@ table 1003 "Job Planning Line"
         }
         field(1062; "Remaining Total Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Remaining Total Cost';
             Editable = false;
@@ -800,7 +828,7 @@ table 1003 "Job Planning Line"
         }
         field(1064; "Remaining Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Remaining Line Amount';
             Editable = false;
@@ -830,7 +858,7 @@ table 1003 "Job Planning Line"
         }
         field(1072; "Posted Total Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Posted Total Cost';
             Editable = false;
@@ -843,7 +871,7 @@ table 1003 "Job Planning Line"
         }
         field(1074; "Posted Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Posted Line Amount';
             Editable = false;
@@ -856,9 +884,9 @@ table 1003 "Job Planning Line"
         }
         field(1080; "Qty. Transferred to Invoice"; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line Invoice"."Quantity Transferred" WHERE("Job No." = FIELD("Job No."),
-                                                                                        "Job Task No." = FIELD("Job Task No."),
-                                                                                        "Job Planning Line No." = FIELD("Line No.")));
+            CalcFormula = sum("Job Planning Line Invoice"."Quantity Transferred" where("Job No." = field("Job No."),
+                                                                                        "Job Task No." = field("Job Task No."),
+                                                                                        "Job Planning Line No." = field("Line No.")));
             Caption = 'Qty. Transferred to Invoice';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -904,10 +932,10 @@ table 1003 "Job Planning Line"
         }
         field(1090; "Qty. Invoiced"; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line Invoice"."Quantity Transferred" WHERE("Job No." = FIELD("Job No."),
-                                                                                        "Job Task No." = FIELD("Job Task No."),
-                                                                                        "Job Planning Line No." = FIELD("Line No."),
-                                                                                        "Document Type" = FILTER("Posted Invoice" | "Posted Credit Memo")));
+            CalcFormula = sum("Job Planning Line Invoice"."Quantity Transferred" where("Job No." = field("Job No."),
+                                                                                        "Job Task No." = field("Job Task No."),
+                                                                                        "Job Planning Line No." = field("Line No."),
+                                                                                        "Document Type" = filter("Posted Invoice" | "Posted Credit Memo")));
             Caption = 'Qty. Invoiced';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -922,13 +950,13 @@ table 1003 "Job Planning Line"
         field(1100; "Reserved Quantity"; Decimal)
         {
             AccessByPermission = TableData Item = R;
-            CalcFormula = - Sum("Reservation Entry".Quantity WHERE("Source Type" = CONST(1003),
+            CalcFormula = - sum("Reservation Entry".Quantity where("Source Type" = const(1003),
 #pragma warning disable AL0603
-                                                                   "Source Subtype" = FIELD(Status),
+                                                                   "Source Subtype" = field(Status),
 #pragma warning restore
-                                                                   "Source ID" = FIELD("Job No."),
-                                                                   "Source Ref. No." = FIELD("Job Contract Entry No."),
-                                                                   "Reservation Status" = CONST(Reservation)));
+                                                                   "Source ID" = field("Job No."),
+                                                                   "Source Ref. No." = field("Job Contract Entry No."),
+                                                                   "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -937,13 +965,13 @@ table 1003 "Job Planning Line"
         field(1101; "Reserved Qty. (Base)"; Decimal)
         {
             AccessByPermission = TableData Item = R;
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Source Type" = CONST(1003),
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Source Type" = const(1003),
 #pragma warning disable AL0603
-                                                                            "Source Subtype" = FIELD(Status),
+                                                                            "Source Subtype" = field(Status),
 #pragma warning restore
-                                                                            "Source ID" = FIELD("Job No."),
-                                                                            "Source Ref. No." = FIELD("Job Contract Entry No."),
-                                                                            "Reservation Status" = CONST(Reservation)));
+                                                                            "Source ID" = field("Job No."),
+                                                                            "Source Ref. No." = field("Job Contract Entry No."),
+                                                                            "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -986,13 +1014,15 @@ table 1003 "Job Planning Line"
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = IF (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."), Blocked = const(false));
 
             trigger OnValidate()
+            var
+                ItemVariant: Record "Item Variant";
             begin
                 ValidateModification(xRec."Variant Code" <> "Variant Code", Rec.FieldNo("Variant Code"));
 
-                if "Variant Code" = '' then begin
+                if Rec."Variant Code" = '' then begin
                     if Type = Type::Item then begin
                         Item.Get("No.");
                         Description := Item.Description;
@@ -1001,21 +1031,22 @@ table 1003 "Job Planning Line"
                     end
                 end else begin
                     TestField(Type, Type::Item);
-
+                    ItemVariant.SetLoadFields(Description, "Description 2", Blocked);
                     ItemVariant.Get("No.", "Variant Code");
+                    ItemVariant.TestField(Blocked, false);
                     Description := ItemVariant.Description;
                     "Description 2" := ItemVariant."Description 2";
                 end;
                 Validate(Quantity);
                 CheckItemAvailable(FieldNo("Variant Code"));
                 UpdateReservation(FieldNo("Variant Code"));
-                WhseValidateSourceLine.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Variant Code"));
+                JobWarehouseMgt.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Variant Code"));
             end;
         }
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             var
@@ -1041,7 +1072,7 @@ table 1003 "Job Planning Line"
                 end;
 
                 UpdateReservation(FieldNo("Bin Code"));
-                WhseValidateSourceLine.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Bin Code"));
+                JobWarehouseMgt.JobPlanningLineVerifyChange(Rec, xRec, FieldNo("Bin Code"));
             end;
 
             trigger OnLookup()
@@ -1149,15 +1180,15 @@ table 1003 "Job Planning Line"
         }
         field(7300; "Pick Qty."; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding" WHERE("Activity Type" = FILTER(<> "Put-away"),
-                                                                                  "Source Type" = CONST(167),
-                                                                                  "Source No." = FIELD("Job No."),
-                                                                                  "Source Line No." = FIELD("Job Contract Entry No."),
-                                                                                  "Source Subline No." = FIELD("Line No."),
-                                                                                  "Unit of Measure Code" = FIELD("Unit of Measure Code"),
-                                                                                  "Action Type" = FILTER(" " | Place),
-                                                                                  "Original Breakbulk" = CONST(false),
-                                                                                  "Breakbulk No." = CONST(0)));
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding" where("Activity Type" = filter(<> "Put-away"),
+                                                                                  "Source Type" = const(167),
+                                                                                  "Source No." = field("Job No."),
+                                                                                  "Source Line No." = field("Job Contract Entry No."),
+                                                                                  "Source Subline No." = field("Line No."),
+                                                                                  "Unit of Measure Code" = field("Unit of Measure Code"),
+                                                                                  "Action Type" = filter(" " | Place),
+                                                                                  "Original Breakbulk" = const(false),
+                                                                                  "Breakbulk No." = const(0)));
             Caption = 'Pick Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1190,14 +1221,14 @@ table 1003 "Job Planning Line"
         }
         field(7304; "Pick Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding (Base)" WHERE("Activity Type" = FILTER(<> "Put-away"),
-                                                                                         "Source Type" = CONST(167),
-                                                                                         "Source No." = FIELD("Job No."),
-                                                                                         "Source Line No." = FIELD("Job Contract Entry No."),
-                                                                                         "Source Subline No." = FIELD("Line No."),
-                                                                                         "Action Type" = FILTER(" " | Place),
-                                                                                         "Original Breakbulk" = CONST(false),
-                                                                                         "Breakbulk No." = CONST(0)));
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding (Base)" where("Activity Type" = filter(<> "Put-away"),
+                                                                                         "Source Type" = const(167),
+                                                                                         "Source No." = field("Job No."),
+                                                                                         "Source Line No." = field("Job Contract Entry No."),
+                                                                                         "Source Subline No." = field("Line No."),
+                                                                                         "Action Type" = filter(" " | Place),
+                                                                                         "Original Breakbulk" = const(false),
+                                                                                         "Breakbulk No." = const(0)));
             Caption = 'Pick Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1205,7 +1236,7 @@ table 1003 "Job Planning Line"
         }
         field(7305; "Qty. on Journal"; Decimal)
         {
-            CalcFormula = Sum("Job Journal Line"."Quantity (Base)" WHERE("Job No." = field("Job No."),
+            CalcFormula = sum("Job Journal Line"."Quantity (Base)" where("Job No." = field("Job No."),
                                                                   "Job Task No." = field("Job Task No."),
                                                                   "Job Planning Line No." = field("Line No."),
                                                                   Type = field(Type),
@@ -1294,7 +1325,7 @@ table 1003 "Job Planning Line"
                     Error(JobUsageLinkErr, TableCaption);
         end;
 
-        if (Quantity <> 0) and ItemExists("No.") then begin
+        if (Rec.Quantity <> 0) and ItemExists(Rec."No.") then begin
             JobPlanningLineReserve.DeleteLine(Rec);
             CalcFields("Reserved Qty. (Base)");
             TestField("Reserved Qty. (Base)", 0);
@@ -1303,7 +1334,7 @@ table 1003 "Job Planning Line"
         if "Schedule Line" then
             Job.UpdateOverBudgetValue("Job No.", false, "Total Cost (LCY)");
 
-        WhseValidateSourceLine.JobPlanningLineDelete(Rec);
+        JobWarehouseMgt.JobPlanningLineDelete(Rec);
 
         DeleteWarehouseRequest(Rec);
     end;
@@ -1367,18 +1398,16 @@ table 1003 "Job Planning Line"
         Location: Record Location;
         Item: Record Item;
         JobTask: Record "Job Task";
-        ItemVariant: Record "Item Variant";
         Res: Record Resource;
         WorkType: Record "Work Type";
-        Job: Record Job;
         ResourceUnitOfMeasure: Record "Resource Unit of Measure";
         CurrExchRate: Record "Currency Exchange Rate";
         SKU: Record "Stockkeeping Unit";
         StandardText: Record "Standard Text";
         ItemTranslation: Record "Item Translation";
         GLSetup: Record "General Ledger Setup";
-        WhseValidateSourceLine: Codeunit "Whse. Validate Source Line";
         JobPlanningLineReserve: Codeunit "Job Planning Line-Reserve";
+        JobWarehouseMgt: Codeunit "Job Warehouse Mgt.";
         UOMMgt: Codeunit "Unit of Measure Management";
         ItemCheckAvail: Codeunit "Item-Check Avail.";
         CurrencyFactorErr: Label 'cannot be specified without %1', Comment = '%1 = Currency Code field name';
@@ -1402,6 +1431,7 @@ table 1003 "Job Planning Line"
         NotPossibleJobPlanningLineErr: Label 'It is not possible to deleted job planning line transferred to an invoice.';
 
     protected var
+        Job: Record Job;
         UnitAmountRoundingPrecision: Decimal;
         AmountRoundingPrecision: Decimal;
         UnitAmountRoundingPrecisionFCY: Decimal;
@@ -1439,7 +1469,7 @@ table 1003 "Job Planning Line"
     begin
         if "Bin Code" <> '' then begin
             GetLocation("Location Code");
-            if not Location."Directed Put-away and Pick" then
+            if not Location."Check Whse. Class" then
                 exit;
 
             if BinContent.Get(
@@ -1669,15 +1699,7 @@ table 1003 "Job Planning Line"
     var
         Job: Record Job;
         JobTask: Record "Job Task";
-        Result: Text;
-        IsHandled: Boolean;
     begin
-        Result := '';
-        IsHandled := false;
-        OnBeforeCaption(Rec, IsHandled, Result);
-        if IsHandled then
-            exit(Result);
-
         if not Job.Get("Job No.") then
             exit('');
         if not JobTask.Get("Job No.", "Job Task No.") then
@@ -1997,7 +2019,7 @@ table 1003 "Job Planning Line"
         "Total Cost (LCY)" := ConvertAmountToLCY("Total Cost", AmountRoundingPrecision);
     end;
 
-    local procedure FindPriceAndDiscount(CalledByFieldNo: Integer)
+    procedure FindPriceAndDiscount(CalledByFieldNo: Integer)
     var
         PriceType: Enum "Price Type";
         IsHandled: Boolean;
@@ -2115,7 +2137,7 @@ table 1003 "Job Planning Line"
         OnAfterUpdateTotalPrice(Rec);
     end;
 
-    local procedure UpdateAmountsAndDiscounts()
+    procedure UpdateAmountsAndDiscounts()
     var
         IsHandled: Boolean;
     begin
@@ -2282,7 +2304,7 @@ table 1003 "Job Planning Line"
         end;
     end;
 
-    local procedure ValidateModification(FieldChanged: Boolean; FieldNo: Integer)
+    procedure ValidateModification(FieldChanged: Boolean; FieldNo: Integer)
     var
         IsHandled: Boolean;
     begin
@@ -2470,7 +2492,7 @@ table 1003 "Job Planning Line"
             if not FullAutoReservation then begin
                 Commit();
                 if Confirm(AutoReserveQst, true) then begin
-                    ShowReservation();
+                    Rec.ShowReservation();
                     Find();
                 end;
             end;
@@ -2697,6 +2719,16 @@ table 1003 "Job Planning Line"
         exit(JobPlanningLine."Line No." + 10000);
     end;
 
+    procedure IsInventoriableItem(): Boolean
+    begin
+        if Type <> Type::Item then
+            exit(false);
+        if "No." = '' then
+            exit(false);
+        GetItem();
+        exit(Item.IsInventoriableType());
+    end;
+
     procedure IsNonInventoriableItem(): Boolean
     begin
         if Type <> Type::Item then
@@ -2709,14 +2741,14 @@ table 1003 "Job Planning Line"
 
     procedure ConvertToJobLineType() JobLineType: Enum "Job Line Type"
     begin
-        JobLineType := "Job Line Type".FromInteger("Line Type".AsInteger() + 1);
+        JobLineType := Enum::"Job Line Type".FromInteger("Line Type".AsInteger() + 1);
 
         OnAfterConvertToJobLineType(Rec, JobLineType);
     end;
 
     procedure ConvertFromJobLineType(JobLineType: Enum "Job Line Type") JobPlanningLineLineType: Enum "Job Planning Line Line Type"
     begin
-        JobPlanningLineLineType := "Job Planning Line Line Type".FromInteger(JobLineType.AsInteger() - 1);
+        JobPlanningLineLineType := Enum::"Job Planning Line Line Type".FromInteger(JobLineType.AsInteger() - 1);
 
         OnAfterConvertFromJobLineType(Rec, JobLineType, JobPlanningLineLineType);
     end;
@@ -2783,7 +2815,7 @@ table 1003 "Job Planning Line"
         JobPlanningLine2.SetRange("Location Code", JobPlanningLine."Location Code");
 
         if JobPlanningLine2.IsEmpty() then
-            if WarehouseRequest.Get("Warehouse Request Type"::Outbound, JobPlanningLine."Location Code", Database::Job, 0, JobPlanningLine."Job No.") then
+            if WarehouseRequest.Get(Enum::"Warehouse Request Type"::Outbound, JobPlanningLine."Location Code", Database::Job, 0, JobPlanningLine."Job No.") then
                 WarehouseRequest.Delete(true)
             else
                 if WhsePickRequest.Get(WhsePickRequest."Document Type"::Job, 0, JobPlanningLine."Job No.", JobPlanningLine."Location Code") then
@@ -2800,8 +2832,9 @@ table 1003 "Job Planning Line"
 
         GetLocation(Rec."Location Code");
 
-        if Location."Require Pick" then
-            if Location."Require Shipment" then begin
+        case Location."Job Consump. Whse. Handling" of
+            Enum::"Job Consump. Whse. Handling"::"Warehouse Pick (mandatory)",
+            Enum::"Job Consump. Whse. Handling"::"Warehouse Pick (optional)":
                 if not WhsePickRequest.Get(WhsePickRequest."Document Type"::Job, 0, Rec."Job No.", Rec."Location Code") then begin
                     WhsePickRequest.Init();
                     WhsePickRequest."Document Type" := WhsePickRequest."Document Type"::Job;
@@ -2810,9 +2843,8 @@ table 1003 "Job Planning Line"
                     WhsePickRequest.Status := WhsePickRequest.Status::Released;
                     WhsePickRequest."Location Code" := Location.Code;
                     if WhsePickRequest.Insert() then;
-                end
-            end
-            else
+                end;
+            Enum::"Job Consump. Whse. Handling"::"Inventory Pick":
                 if not GetWarehouseRequest(WarehouseRequest) then begin
                     WarehouseRequest.Init();
                     WarehouseRequest.Type := WarehouseRequest.Type::Outbound;
@@ -2824,6 +2856,7 @@ table 1003 "Job Planning Line"
                     WarehouseRequest."Document Status" := WarehouseRequest."Document Status"::Released;
                     if WarehouseRequest.Insert() then;
                 end;
+        end;
     end;
 
     local procedure GetWarehouseRequest(var WarehouseRequest: Record "Warehouse Request"): Boolean
@@ -2838,6 +2871,34 @@ table 1003 "Job Planning Line"
         TestField(Status, Status::Order);
         GetJob();
         Job.TestField(Status, Job.Status::Open);
+    end;
+
+    procedure CheckIfJobPlngLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock") Result: Boolean
+    var
+        QtyReservedFromStock: Decimal;
+    begin
+        Result := true;
+
+        if not Rec.IsInventoriableItem() then
+            exit(true);
+
+        if ReservedFromStock = ReservedFromStock::" " then
+            exit(true);
+
+        QtyReservedFromStock := JobPlanningLineReserve.GetReservedQtyFromInventory(Rec);
+
+        case ReservedFromStock of
+            ReservedFromStock::Full:
+                if QtyToPost <> QtyReservedFromStock then
+                    Result := false;
+            ReservedFromStock::"Full and Partial":
+                if QtyReservedFromStock = 0 then
+                    Result := false;
+            else
+                OnCheckIfJobPlngLineMeetsReservedFromStockSetting(QtyToPost, ReservedFromStock, Result);
+        end;
+
+        exit(Result);
     end;
 
     [IntegrationEvent(false, false)]
@@ -3164,8 +3225,8 @@ table 1003 "Job Planning Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCaption(JobPlanningLine: Record "Job Planning Line"; var IsHandled: Boolean; var Result: Text)
+    local procedure OnCheckIfJobPlngLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock"; var Result: Boolean)
     begin
-    end;    
+    end;
 }
 

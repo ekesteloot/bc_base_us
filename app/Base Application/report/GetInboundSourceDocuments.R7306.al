@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Worksheet;
+
 report 7306 "Get Inbound Source Documents"
 {
     Caption = 'Get Inbound Source Documents';
@@ -7,16 +13,16 @@ report 7306 "Get Inbound Source Documents"
     {
         dataitem("Whse. Put-away Request"; "Whse. Put-away Request")
         {
-            DataItemTableView = WHERE("Completely Put Away" = CONST(false));
+            DataItemTableView = where("Completely Put Away" = const(false));
             RequestFilterFields = "Document Type", "Document No.";
             dataitem("Posted Whse. Receipt Header"; "Posted Whse. Receipt Header")
             {
-                DataItemLink = "No." = FIELD("Document No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("Document No.");
+                DataItemTableView = sorting("No.");
                 dataitem("Posted Whse. Receipt Line"; "Posted Whse. Receipt Line")
                 {
-                    DataItemLink = "No." = FIELD("No.");
-                    DataItemTableView = SORTING("No.", "Line No.");
+                    DataItemLink = "No." = field("No.");
+                    DataItemTableView = sorting("No.", "Line No.");
 
                     trigger OnPreDataItem()
                     begin
@@ -45,12 +51,12 @@ report 7306 "Get Inbound Source Documents"
             }
             dataitem("Whse. Internal Put-away Header"; "Whse. Internal Put-away Header")
             {
-                DataItemLink = "No." = FIELD("Document No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("Document No.");
+                DataItemTableView = sorting("No.");
                 dataitem("Whse. Internal Put-away Line"; "Whse. Internal Put-away Line")
                 {
-                    DataItemLink = "No." = FIELD("No.");
-                    DataItemTableView = SORTING("No.", "Line No.");
+                    DataItemLink = "No." = field("No.");
+                    DataItemTableView = sorting("No.", "Line No.");
 
                     trigger OnAfterGetRecord()
                     begin

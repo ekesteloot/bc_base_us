@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using System.Visualization;
+
 table 770 "Analysis Report Chart Setup"
 {
     Caption = 'Analysis Report Chart Setup';
@@ -23,7 +27,7 @@ table 770 "Analysis Report Chart Setup"
         field(20; "Analysis Report Name"; Code[10])
         {
             Caption = 'Analysis Report Name';
-            TableRelation = "Analysis Report Name".Name WHERE("Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Analysis Report Name".Name where("Analysis Area" = field("Analysis Area"));
 
             trigger OnValidate()
             var
@@ -43,8 +47,8 @@ table 770 "Analysis Report Chart Setup"
         {
             Caption = 'Analysis Line Template Name';
             Editable = false;
-            TableRelation = "Analysis Report Name"."Analysis Line Template Name" WHERE("Analysis Area" = FIELD("Analysis Area"),
-                                                                                        Name = FIELD("Analysis Report Name"));
+            TableRelation = "Analysis Report Name"."Analysis Line Template Name" where("Analysis Area" = field("Analysis Area"),
+                                                                                        Name = field("Analysis Report Name"));
 
             trigger OnLookup()
             var
@@ -61,8 +65,8 @@ table 770 "Analysis Report Chart Setup"
         {
             Caption = 'Analysis Column Template Name';
             Editable = false;
-            TableRelation = "Analysis Report Name"."Analysis Column Template Name" WHERE("Analysis Area" = FIELD("Analysis Area"),
-                                                                                          Name = FIELD("Analysis Report Name"));
+            TableRelation = "Analysis Report Name"."Analysis Column Template Name" where("Analysis Area" = field("Analysis Area"),
+                                                                                          Name = field("Analysis Report Name"));
 
             trigger OnLookup()
             var

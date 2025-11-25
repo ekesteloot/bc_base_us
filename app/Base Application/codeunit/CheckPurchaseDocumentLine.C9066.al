@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.Posting;
+
 codeunit 9066 "Check Purchase Document Line"
 {
     TableNo = "Purchase Line";

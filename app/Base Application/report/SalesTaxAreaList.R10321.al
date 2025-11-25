@@ -10,7 +10,7 @@ report 10321 "Sales Tax Area List"
     {
         dataitem("Tax Area"; "Tax Area")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -89,8 +89,8 @@ report 10321 "Sales Tax Area List"
             }
             dataitem("Tax Area Line"; "Tax Area Line")
             {
-                DataItemLink = "Tax Area" = FIELD(Code);
-                DataItemTableView = SORTING("Tax Area", "Tax Jurisdiction Code");
+                DataItemLink = "Tax Area" = field(Code);
+                DataItemTableView = sorting("Tax Area", "Tax Jurisdiction Code");
                 column(Tax_Area_Line__Tax_Jurisdiction_Code_; "Tax Jurisdiction Code")
                 {
                 }

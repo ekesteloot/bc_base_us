@@ -223,10 +223,10 @@ page 9243 "Res. Group Capacity Matrix"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunObject = Page "Res. Gr. Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Unit of Measure Filter" = FIELD("Unit of Measure Filter"),
-                                  "Chargeable Filter" = FIELD("Chargeable Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Unit of Measure Filter" = field("Unit of Measure Filter"),
+                                  "Chargeable Filter" = field("Chargeable Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -236,8 +236,8 @@ page 9243 "Res. Group Capacity Matrix"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Resource Group"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Resource Group"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -246,8 +246,8 @@ page 9243 "Res. Group Capacity Matrix"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(152),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(152),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -264,8 +264,8 @@ page 9243 "Res. Group Capacity Matrix"
                     Image = ResourceCosts;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Resource Costs";
-                    RunPageLink = Type = CONST("Group(Resource)"),
-                                  Code = FIELD("No.");
+                    RunPageLink = Type = const("Group(Resource)"),
+                                  Code = field("No.");
                     ToolTip = 'View or change detailed information about costs for the resource.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -278,8 +278,8 @@ page 9243 "Res. Group Capacity Matrix"
                     Image = Price;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Resource Prices";
-                    RunPageLink = Type = CONST("Group(Resource)"),
-                                  Code = FIELD("No.");
+                    RunPageLink = Type = const("Group(Resource)"),
+                                  Code = field("No.");
                     ToolTip = 'View or edit prices for the resource.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -331,9 +331,9 @@ page 9243 "Res. Group Capacity Matrix"
                     Caption = 'Res. Group Availa&bility';
                     Image = Calendar;
                     RunObject = Page "Res. Group Availability";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Unit of Measure Filter" = FIELD("Unit of Measure Filter"),
-                                  "Chargeable Filter" = FIELD("Chargeable Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Unit of Measure Filter" = field("Unit of Measure Filter"),
+                                  "Chargeable Filter" = field("Chargeable Filter");
                     ToolTip = 'View a summary of resource group capacities, the quantity of resource hours allocated to jobs on order, the quantity allocated to service orders, the capacity assigned to jobs on quote, and the resource group availability.';
                 }
             }
@@ -383,11 +383,11 @@ page 9243 "Res. Group Capacity Matrix"
     begin
         if QtyType = QtyType::"Net Change" then
             if MatrixRecords[ColumnID]."Period Start" = MatrixRecords[ColumnID]."Period End" then
-                SetRange("Date Filter", MatrixRecords[ColumnID]."Period Start")
+                Rec.SetRange("Date Filter", MatrixRecords[ColumnID]."Period Start")
             else
-                SetRange("Date Filter", MatrixRecords[ColumnID]."Period Start", MatrixRecords[ColumnID]."Period End")
+                Rec.SetRange("Date Filter", MatrixRecords[ColumnID]."Period Start", MatrixRecords[ColumnID]."Period End")
         else
-            SetRange("Date Filter", 0D, MatrixRecords[ColumnID]."Period End");
+            Rec.SetRange("Date Filter", 0D, MatrixRecords[ColumnID]."Period End");
     end;
 
     local procedure MATRIX_OnFindRecord(Which: Text[1024]): Boolean
@@ -403,9 +403,9 @@ page 9243 "Res. Group Capacity Matrix"
     local procedure MATRIX_OnAfterGetRecord(ColumnID: Integer)
     begin
         SetDateFilter(ColumnID);
-        CalcFields(Capacity);
-        if Capacity <> 0 then
-            MATRIX_CellData[MATRIX_ColumnOrdinal] := Format(Capacity)
+        Rec.CalcFields(Capacity);
+        if Rec.Capacity <> 0 then
+            MATRIX_CellData[MATRIX_ColumnOrdinal] := Format(Rec.Capacity)
         else
             MATRIX_CellData[MATRIX_ColumnOrdinal] := '';
 
@@ -419,8 +419,8 @@ page 9243 "Res. Group Capacity Matrix"
     begin
         SetDateFilter(ColumnID);
         ResCapacityEntries.SetCurrentKey("Resource Group No.", Date);
-        ResCapacityEntries.SetRange("Resource Group No.", "No.");
-        ResCapacityEntries.SetFilter(Date, GetFilter("Date Filter"));
+        ResCapacityEntries.SetRange("Resource Group No.", Rec."No.");
+        ResCapacityEntries.SetFilter(Date, Rec.GetFilter("Date Filter"));
         IsHandled := false;
         OnAfterMatrixOnDrillDown(ResCapacityEntries, IsHandled);
         if IsHandled then
@@ -443,9 +443,9 @@ page 9243 "Res. Group Capacity Matrix"
     local procedure ValidateCapacity(ColumnID: Integer)
     begin
         SetDateFilter(ColumnID);
-        CalcFields(Capacity);
-        Evaluate(Capacity, MATRIX_CellData[ColumnID]);
-        Validate(Capacity);
+        Rec.CalcFields(Capacity);
+        Evaluate(Rec.Capacity, MATRIX_CellData[ColumnID]);
+        Rec.Validate(Capacity);
 
         OnAfterValidateCapacity(Rec, MATRIX_CellData, ColumnID);
     end;

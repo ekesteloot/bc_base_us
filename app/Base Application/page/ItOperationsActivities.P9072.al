@@ -9,39 +9,6 @@ page 9072 "IT Operations Activities"
     {
         area(content)
         {
-#if not CLEAN20
-            cuegroup("Intelligent Cloud")
-            {
-                Caption = 'Intelligent Cloud';
-                Visible = false;
-                ObsoleteTag = '20.0';
-                ObsoleteReason = 'Intelligent Cloud Insights is discontinued.';
-                ObsoleteState = Pending;
-
-                actions
-                {
-                    action("Learn More")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Learn More';
-                        Image = TileInfo;
-                        RunPageMode = View;
-                        ToolTip = ' Learn more about the Intelligent Cloud and how it can help your business.';
-                        Visible = false;
-                        ObsoleteTag = '20.0';
-                        ObsoleteReason = 'Intelligent Cloud Insights is discontinued.';
-                        ObsoleteState = Pending;
-
-                        trigger OnAction()
-                        var
-                            IntelligentCloudManagement: Codeunit "Intelligent Cloud Management";
-                        begin
-                            HyperLink(IntelligentCloudManagement.GetIntelligentCloudLearnMoreUrl());
-                        end;
-                    }
-                }
-            }
-#endif  
             cuegroup(Administration)
             {
                 Caption = 'Administration';

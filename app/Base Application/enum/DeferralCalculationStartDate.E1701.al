@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Deferral;
+
 enum 1701 "Deferral Calculation Start Date"
 {
     Extensible = true;

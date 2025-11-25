@@ -1,3 +1,9 @@
+﻿namespace System.Environment.Configuration;
+
+using System.Azure.Identity;
+using System.Security.User;
+using System.Threading;
+
 table 1513 "Notification Schedule"
 {
     Caption = 'Notification Schedule';

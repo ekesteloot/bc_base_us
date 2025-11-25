@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Planning;
+
 page 9101 "Untracked Plng. Elements Part"
 {
     Caption = 'Untracked Planning Elements';
@@ -30,7 +32,7 @@ page 9101 "Untracked Plng. Elements Part"
                     ToolTip = 'Specifies the location code in the requisition line associated with the untracked planning surplus.';
                     Visible = false;
                 }
-                field(Source; Source)
+                field(Source; Rec.Source)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies what the source of this untracked surplus quantity is.';

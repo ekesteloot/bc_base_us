@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 page 9837 "Permission Set by User Group"
 {
     Caption = 'Permission Set by User Group';
@@ -194,7 +196,7 @@ page 9837 "Permission Set by User Group"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Permissions';
                 Editable = false;
-                SubPageLink = "Role ID" = FIELD("Role ID");
+                SubPageLink = "Role ID" = field("Role ID");
                 Visible = false;
             }
             part("Tenant Permissions"; "Tenant Permissions FactBox")
@@ -213,8 +215,8 @@ page 9837 "Permission Set by User Group"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Permissions';
                 Editable = false;
-                SubPageLink = "Role ID" = FIELD("Role ID"),
-                              "App ID" = FIELD("App ID");
+                SubPageLink = "Role ID" = field("Role ID"),
+                              "App ID" = field("App ID");
             }
         }
     }
@@ -252,9 +254,9 @@ page 9837 "Permission Set by User Group"
                 var
                     AggregatePermissionSet: Record "Aggregate Permission Set";
                 begin
-                    AggregatePermissionSet.SetRange(Scope, Scope);
-                    AggregatePermissionSet.SetRange("App ID", "App ID");
-                    AggregatePermissionSet.SetRange("Role ID", "Role ID");
+                    AggregatePermissionSet.SetRange(Scope, Rec.Scope);
+                    AggregatePermissionSet.SetRange("App ID", Rec."App ID");
+                    AggregatePermissionSet.SetRange("Role ID", Rec."Role ID");
 
                     REPORT.RunModal(REPORT::"Copy Permission Set", true, true, AggregatePermissionSet);
                 end;
@@ -425,7 +427,7 @@ page 9837 "Permission Set by User Group"
     var
         UserGroupPermissionSet: Record "User Group Permission Set";
     begin
-        if UserGroupPermissionSet.Get(UserGroupCode, "Role ID", Scope, "App ID") then begin
+        if UserGroupPermissionSet.Get(UserGroupCode, Rec."Role ID", Rec.Scope, Rec."App ID") then begin
             if not UserGroupHasPermission then
                 UserGroupPermissionSet.Delete(true);
             exit;
@@ -434,9 +436,9 @@ page 9837 "Permission Set by User Group"
             exit;
         UserGroupPermissionSet.Init();
         UserGroupPermissionSet."User Group Code" := UserGroupCode;
-        UserGroupPermissionSet."Role ID" := "Role ID";
-        UserGroupPermissionSet."App ID" := "App ID";
-        UserGroupPermissionSet.Scope := Scope;
+        UserGroupPermissionSet."Role ID" := Rec."Role ID";
+        UserGroupPermissionSet."App ID" := Rec."App ID";
+        UserGroupPermissionSet.Scope := Rec.Scope;
         UserGroupPermissionSet.Insert(true);
     end;
 }

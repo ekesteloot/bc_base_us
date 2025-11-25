@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Intercompany.Partner;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Intercompany.Setup;
+using System.Text;
+using System.Utilities;
+
 page 608 "IC Partner List"
 {
     ApplicationArea = Intercompany;
@@ -15,7 +22,7 @@ page 608 "IC Partner List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies the intercompany partner code.';
@@ -70,7 +77,7 @@ page 608 "IC Partner List"
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies the general ledger account to use when you post payables due to vendors in this posting group.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -106,8 +113,8 @@ page 608 "IC Partner List"
                     Caption = 'Dimensions-Single';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(413),
-                                  "No." = FIELD(Code);
+                    RunPageLink = "Table ID" = const(413),
+                                  "No." = field(Code);
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to intercompany transactions to distribute costs and analyze transaction history.';
                 }
@@ -120,11 +127,7 @@ page 608 "IC Partner List"
                 ApplicationArea = Intercompany;
                 Caption = 'Intercompany Setup';
                 Image = Intercompany;
-#if not CLEAN20
-                RunObject = Page "IC Setup";
-#else
                 RunObject = Page "Intercompany Setup";
-#endif
                 ToolTip = 'View or edit the intercompany setup for the current company.';
             }
         }
@@ -152,11 +155,7 @@ page 608 "IC Partner List"
         ICSetup.Get();
         if ICSetup."IC Partner Code" = '' then
             if ConfirmManagement.GetResponse(SetupICQst, true) then
-#if not CLEAN20
-                PAGE.RunModal(PAGE::"IC Setup");
-#else
                 Page.RunModal(Page::"Intercompany Setup");
-#endif
 
         ICSetup.Find();
         if ICSetup."IC Partner Code" = '' then

@@ -1,3 +1,40 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Integration.Graph;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Worksheet;
+using System.Email;
+using System.Globalization;
+using System.Reflection;
+using System.Security.User;
+using System.Utilities;
+
 table 167 Job
 {
     Caption = 'Job';
@@ -136,30 +173,30 @@ table 167 Job
         field(20; "Person Responsible"; Code[20])
         {
             Caption = 'Person Responsible';
-            TableRelation = Resource WHERE(Type = CONST(Person));
+            TableRelation = Resource where(Type = const(Person));
         }
         field(21; "Global Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(22; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(23; "Job Posting Group"; Code[20])
@@ -178,8 +215,8 @@ table 167 Job
         }
         field(30; Comment; Boolean)
         {
-            CalcFormula = Exist("Comment Line" WHERE("Table Name" = CONST(Job),
-                                                      "No." = FIELD("No.")));
+            CalcFormula = exist("Comment Line" where("Table Name" = const(Job),
+                                                      "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -201,11 +238,11 @@ table 167 Job
         }
         field(49; "Scheduled Res. Qty."; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line"."Quantity (Base)" WHERE("Job No." = FIELD("No."),
-                                                                           "Schedule Line" = CONST(true),
-                                                                           Type = CONST(Resource),
-                                                                           "No." = FIELD("Resource Filter"),
-                                                                           "Planning Date" = FIELD("Planning Date Filter")));
+            CalcFormula = sum("Job Planning Line"."Quantity (Base)" where("Job No." = field("No."),
+                                                                           "Schedule Line" = const(true),
+                                                                           Type = const(Resource),
+                                                                           "No." = field("Resource Filter"),
+                                                                           "Planning Date" = field("Planning Date Filter")));
             Caption = 'Scheduled Res. Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -230,11 +267,11 @@ table 167 Job
         }
         field(56; "Scheduled Res. Gr. Qty."; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line"."Quantity (Base)" WHERE("Job No." = FIELD("No."),
-                                                                           "Schedule Line" = CONST(true),
-                                                                           Type = CONST(Resource),
-                                                                           "Resource Group No." = FIELD("Resource Gr. Filter"),
-                                                                           "Planning Date" = FIELD("Planning Date Filter")));
+            CalcFormula = sum("Job Planning Line"."Quantity (Base)" where("Job No." = field("No."),
+                                                                           "Schedule Line" = const(true),
+                                                                           Type = const(Resource),
+                                                                           "Resource Group No." = field("Resource Gr. Filter"),
+                                                                           "Planning Date" = field("Planning Date Filter")));
             Caption = 'Scheduled Res. Gr. Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -287,11 +324,9 @@ table 167 Job
         field(61; "Bill-to City"; Text[30])
         {
             Caption = 'Bill-to City';
-            TableRelation = IF ("Bill-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Bill-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Bill-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Bill-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Bill-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Bill-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -321,11 +356,9 @@ table 167 Job
         field(64; "Bill-to Post Code"; Code[20])
         {
             Caption = 'Bill-to Post Code';
-            TableRelation = IF ("Bill-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Bill-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Bill-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Bill-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Bill-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Bill-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -383,7 +416,7 @@ table 167 Job
         field(1000; "WIP Method"; Code[20])
         {
             Caption = 'WIP Method';
-            TableRelation = "Job WIP Method".Code WHERE(Valid = CONST(true));
+            TableRelation = "Job WIP Method".Code where(Valid = const(true));
 
             trigger OnValidate()
             var
@@ -484,9 +517,9 @@ table 167 Job
         field(1005; "Total WIP Cost Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Job WIP Entry"."WIP Entry Amount" WHERE("Job No." = FIELD("No."),
-                                                                         "Job Complete" = CONST(false),
-                                                                         Type = FILTER("Accrued Costs" | "Applied Costs" | "Recognized Costs")));
+            CalcFormula = - sum("Job WIP Entry"."WIP Entry Amount" where("Job No." = field("No."),
+                                                                         "Job Complete" = const(false),
+                                                                         Type = filter("Accrued Costs" | "Applied Costs" | "Recognized Costs")));
             Caption = 'Total WIP Cost Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -494,17 +527,17 @@ table 167 Job
         field(1006; "Total WIP Cost G/L Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Job WIP G/L Entry"."WIP Entry Amount" WHERE("Job No." = FIELD("No."),
-                                                                             Reversed = CONST(false),
-                                                                             "Job Complete" = CONST(false),
-                                                                             Type = FILTER("Accrued Costs" | "Applied Costs" | "Recognized Costs")));
+            CalcFormula = - sum("Job WIP G/L Entry"."WIP Entry Amount" where("Job No." = field("No."),
+                                                                             Reversed = const(false),
+                                                                             "Job Complete" = const(false),
+                                                                             Type = filter("Accrued Costs" | "Applied Costs" | "Recognized Costs")));
             Caption = 'Total WIP Cost G/L Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1007; "WIP Entries Exist"; Boolean)
         {
-            CalcFormula = Exist("Job WIP Entry" WHERE("Job No." = FIELD("No.")));
+            CalcFormula = exist("Job WIP Entry" where("Job No." = field("No.")));
             Caption = 'WIP Entries Exist';
             FieldClass = FlowField;
         }
@@ -515,8 +548,8 @@ table 167 Job
         }
         field(1009; "WIP G/L Posting Date"; Date)
         {
-            CalcFormula = Min("Job WIP G/L Entry"."WIP Posting Date" WHERE(Reversed = CONST(false),
-                                                                            "Job No." = FIELD("No.")));
+            CalcFormula = min("Job WIP G/L Entry"."WIP Posting Date" where(Reversed = const(false),
+                                                                            "Job No." = field("No.")));
             Caption = 'WIP G/L Posting Date';
             Editable = false;
             FieldClass = FlowField;
@@ -561,8 +594,8 @@ table 167 Job
         field(1017; "Recog. Sales Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Job WIP Entry"."WIP Entry Amount" WHERE("Job No." = FIELD("No."),
-                                                                         Type = FILTER("Recognized Sales")));
+            CalcFormula = - sum("Job WIP Entry"."WIP Entry Amount" where("Job No." = field("No."),
+                                                                         Type = filter("Recognized Sales")));
             Caption = 'Recog. Sales Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -570,9 +603,9 @@ table 167 Job
         field(1018; "Recog. Sales G/L Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Job WIP G/L Entry"."WIP Entry Amount" WHERE("Job No." = FIELD("No."),
-                                                                             Reversed = CONST(false),
-                                                                             Type = FILTER("Recognized Sales")));
+            CalcFormula = - sum("Job WIP G/L Entry"."WIP Entry Amount" where("Job No." = field("No."),
+                                                                             Reversed = const(false),
+                                                                             Type = filter("Recognized Sales")));
             Caption = 'Recog. Sales G/L Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -580,8 +613,8 @@ table 167 Job
         field(1019; "Recog. Costs Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Job WIP Entry"."WIP Entry Amount" WHERE("Job No." = FIELD("No."),
-                                                                        Type = FILTER("Recognized Costs")));
+            CalcFormula = sum("Job WIP Entry"."WIP Entry Amount" where("Job No." = field("No."),
+                                                                        Type = filter("Recognized Costs")));
             Caption = 'Recog. Costs Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -589,9 +622,9 @@ table 167 Job
         field(1020; "Recog. Costs G/L Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Job WIP G/L Entry"."WIP Entry Amount" WHERE("Job No." = FIELD("No."),
-                                                                            Reversed = CONST(false),
-                                                                            Type = FILTER("Recognized Costs")));
+            CalcFormula = sum("Job WIP G/L Entry"."WIP Entry Amount" where("Job No." = field("No."),
+                                                                            Reversed = const(false),
+                                                                            Type = filter("Recognized Costs")));
             Caption = 'Recog. Costs G/L Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -599,9 +632,9 @@ table 167 Job
         field(1021; "Total WIP Sales Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Job WIP Entry"."WIP Entry Amount" WHERE("Job No." = FIELD("No."),
-                                                                        "Job Complete" = CONST(false),
-                                                                        Type = FILTER("Accrued Sales" | "Applied Sales" | "Recognized Sales")));
+            CalcFormula = sum("Job WIP Entry"."WIP Entry Amount" where("Job No." = field("No."),
+                                                                        "Job Complete" = const(false),
+                                                                        Type = filter("Accrued Sales" | "Applied Sales" | "Recognized Sales")));
             Caption = 'Total WIP Sales Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -609,26 +642,26 @@ table 167 Job
         field(1022; "Total WIP Sales G/L Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Job WIP G/L Entry"."WIP Entry Amount" WHERE("Job No." = FIELD("No."),
-                                                                            Reversed = CONST(false),
-                                                                            "Job Complete" = CONST(false),
-                                                                            Type = FILTER("Accrued Sales" | "Applied Sales" | "Recognized Sales")));
+            CalcFormula = sum("Job WIP G/L Entry"."WIP Entry Amount" where("Job No." = field("No."),
+                                                                            Reversed = const(false),
+                                                                            "Job Complete" = const(false),
+                                                                            Type = filter("Accrued Sales" | "Applied Sales" | "Recognized Sales")));
             Caption = 'Total WIP Sales G/L Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1023; "WIP Completion Calculated"; Boolean)
         {
-            CalcFormula = Exist("Job WIP Entry" WHERE("Job No." = FIELD("No."),
-                                                       "Job Complete" = CONST(true)));
+            CalcFormula = exist("Job WIP Entry" where("Job No." = field("No."),
+                                                       "Job Complete" = const(true)));
             Caption = 'WIP Completion Calculated';
             FieldClass = FlowField;
         }
         field(1024; "Next Invoice Date"; Date)
         {
-            CalcFormula = Min("Job Planning Line"."Planning Date" WHERE("Job No." = FIELD("No."),
-                                                                         "Contract Line" = CONST(true),
-                                                                         "Qty. to Invoice" = FILTER(<> 0)));
+            CalcFormula = min("Job Planning Line"."Planning Date" where("Job No." = field("No."),
+                                                                         "Contract Line" = const(true),
+                                                                         "Qty. to Invoice" = filter(<> 0)));
             Caption = 'Next Invoice Date';
             FieldClass = FlowField;
         }
@@ -667,7 +700,7 @@ table 167 Job
         }
         field(1026; "WIP Warnings"; Boolean)
         {
-            CalcFormula = Exist("Job WIP Warning" WHERE("Job No." = FIELD("No.")));
+            CalcFormula = exist("Job WIP Warning" where("Job No." = field("No.")));
             Caption = 'WIP Warnings';
             Editable = false;
             FieldClass = FlowField;
@@ -707,10 +740,10 @@ table 167 Job
         field(1028; "Applied Costs G/L Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Job WIP G/L Entry"."WIP Entry Amount" WHERE("Job No." = FIELD("No."),
-                                                                             Reverse = CONST(false),
-                                                                             "Job Complete" = CONST(false),
-                                                                             Type = FILTER("Applied Costs")));
+            CalcFormula = - sum("Job WIP G/L Entry"."WIP Entry Amount" where("Job No." = field("No."),
+                                                                             Reverse = const(false),
+                                                                             "Job Complete" = const(false),
+                                                                             Type = filter("Applied Costs")));
             Caption = 'Applied Costs G/L Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -718,10 +751,10 @@ table 167 Job
         field(1029; "Applied Sales G/L Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Job WIP G/L Entry"."WIP Entry Amount" WHERE("Job No." = FIELD("No."),
-                                                                             Reverse = CONST(false),
-                                                                             "Job Complete" = CONST(false),
-                                                                             Type = FILTER("Applied Sales")));
+            CalcFormula = - sum("Job WIP G/L Entry"."WIP Entry Amount" where("Job No." = field("No."),
+                                                                             Reverse = const(false),
+                                                                             "Job Complete" = const(false),
+                                                                             Type = filter("Applied Sales")));
             Caption = 'Applied Sales G/L Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -729,7 +762,7 @@ table 167 Job
         field(1030; "Calc. Recog. Sales Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Job Task"."Recognized Sales Amount" WHERE("Job No." = FIELD("No.")));
+            CalcFormula = sum("Job Task"."Recognized Sales Amount" where("Job No." = field("No.")));
             Caption = 'Calc. Recog. Sales Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -737,7 +770,7 @@ table 167 Job
         field(1031; "Calc. Recog. Costs Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Job Task"."Recognized Costs Amount" WHERE("Job No." = FIELD("No.")));
+            CalcFormula = sum("Job Task"."Recognized Costs Amount" where("Job No." = field("No.")));
             Caption = 'Calc. Recog. Costs Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -745,7 +778,7 @@ table 167 Job
         field(1032; "Calc. Recog. Sales G/L Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Job Task"."Recognized Sales G/L Amount" WHERE("Job No." = FIELD("No.")));
+            CalcFormula = sum("Job Task"."Recognized Sales G/L Amount" where("Job No." = field("No.")));
             Caption = 'Calc. Recog. Sales G/L Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -753,15 +786,15 @@ table 167 Job
         field(1033; "Calc. Recog. Costs G/L Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Job Task"."Recognized Costs G/L Amount" WHERE("Job No." = FIELD("No.")));
+            CalcFormula = sum("Job Task"."Recognized Costs G/L Amount" where("Job No." = field("No.")));
             Caption = 'Calc. Recog. Costs G/L Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(1034; "WIP Completion Posted"; Boolean)
         {
-            CalcFormula = Exist("Job WIP G/L Entry" WHERE("Job No." = FIELD("No."),
-                                                           "Job Complete" = CONST(true)));
+            CalcFormula = exist("Job WIP G/L Entry" where("Job No." = field("No."),
+                                                           "Job Complete" = const(true)));
             Caption = 'WIP Completion Posted';
             FieldClass = FlowField;
         }
@@ -842,9 +875,9 @@ table 167 Job
         field(2005; "Sell-to City"; Text[30])
         {
             Caption = 'Sell-to City';
-            TableRelation = IF ("Sell-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Sell-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Sell-to Country/Region Code"));
+            TableRelation = if ("Sell-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Sell-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Sell-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -873,9 +906,9 @@ table 167 Job
         field(2007; "Sell-to Post Code"; Code[20])
         {
             Caption = 'Sell-to Post Code';
-            TableRelation = IF ("Sell-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Sell-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Sell-to Country/Region Code"));
+            TableRelation = if ("Sell-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Sell-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Sell-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(2008; "Sell-to County"; Text[30])
@@ -925,7 +958,7 @@ table 167 Job
         field(3000; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Sell-to Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Sell-to Customer No."));
 
             trigger OnValidate()
             begin
@@ -951,9 +984,9 @@ table 167 Job
         field(3005; "Ship-to City"; Text[30])
         {
             Caption = 'Ship-to City';
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -982,9 +1015,9 @@ table 167 Job
         field(3007; "Ship-to Post Code"; Code[20])
         {
             Caption = 'Ship-to Post Code';
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -1050,7 +1083,7 @@ table 167 Job
         }
         field(7300; "Completely Picked"; Boolean)
         {
-            CalcFormula = Min("Job Planning Line"."Completely Picked" WHERE("Job No." = FIELD("No.")));
+            CalcFormula = min("Job Planning Line"."Completely Picked" where("Job No." = field("No.")));
             Caption = 'Completely Picked';
             FieldClass = FlowField;
         }
@@ -1182,9 +1215,6 @@ table 167 Job
         TestBlockedErr: Label '%1 %2 must not be blocked with type %3.', Comment = '%1 = The Job table name; %2 = The Job number; %3 = The value of the Blocked field';
         ReverseCompletionEntriesMsg: Label 'You must run the %1 function to reverse the completion entries that have already been posted for this job.', Comment = '%1 = The name of the Job Post WIP to G/L report';
         CheckDateErr: Label '%1 must be equal to or earlier than %2.', Comment = '%1 = The job''s starting date; %2 = The job''s ending date';
-#if not CLEAN20
-        BlockedCustErr: Label 'You cannot set %1 to %2, as this %3 has set %4 to %5.', Comment = '%1 = The Bill-to Customer No. field name; %2 = The job''s Bill-to Customer No. value; %3 = The Customer table name; %4 = The Blocked field name; %5 = The job''s customer''s Blocked value';
-#endif
         ApplyUsageLinkErr: Label 'A usage link cannot be enabled for the entire %1 because usage without the usage link already has been posted.', Comment = '%1 = The name of the Job table';
         WIPMethodQst: Label 'Do you want to set the %1 on every %2 of type %3?', Comment = '%1 = The WIP Method field name; %2 = The name of the Job Task table; %3 = The current job task''s WIP Total type';
         WIPAlreadyPostedErr: Label '%1 must be %2 because job WIP general ledger entries already were posted with this setting.', Comment = '%1 = The name of the WIP Posting Method field; %2 = The previous WIP Posting Method value of this job';
@@ -1192,7 +1222,7 @@ table 167 Job
         WIPPostMethodErr: Label 'The selected %1 requires the %2 to have %3 enabled.', Comment = '%1 = The name of the WIP Posting Method field; %2 = The name of the WIP Method field; %3 = The field caption represented by the value of this job''s WIP method';
         EndingDateChangedMsg: Label '%1 is set to %2.', Comment = '%1 = The name of the Ending Date field; %2 = This job''s Ending Date value';
         UpdateJobTaskDimQst: Label 'You have changed a dimension.\\Do you want to update the lines?';
-        RunWIPFunctionsQst: Label 'You must run the %1 function to create completion entries for this job. \Do you want to run this function now?', Comment = '%1 = The name of the Job Calculate WIP report';
+        RunWIPFunctionsQst: Label 'You must run the Job Calculate WIP function to create completion entries for this job. \Do you want to run this function now?';
         ReservEntriesItemTrackLinesDeleteQst: Label 'All reservation entries and item tracking lines for this job will be deleted. \Do you want to continue?';
         ReservEntriesItemTrackLinesExistErr: Label 'You cannot set the status to %1 because the job has reservations or item tracking lines on the job planning lines.', Comment = '%1=The job status name';
         AutoReserveNotPossibleMsg: Label 'Automatic reservation is not possible for one or more job planning lines. \Please reserve manually.';
@@ -1486,75 +1516,6 @@ table 167 Job
             exit(true);
         end;
     end;
-
-#if not CLEAN20
-    [Obsolete('Pending removal, replaced with BillToCustomerNoUpdated and SellToCustomerNoUpdated.', '20.0')]
-    procedure UpdateCust()
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeUpdateCust(Rec, xRec, IsHandled);
-        If IsHandled then
-            exit;
-
-        if "Bill-to Customer No." <> '' then begin
-            Cust.Get("Bill-to Customer No.");
-            Cust.TestField("Customer Posting Group");
-            IsHandled := false;
-            OnUpdateCustOnBeforeTestBillToCustomerNo(Rec, Cust, IsHandled);
-            if not IsHandled then
-                Cust.TestField("Bill-to Customer No.", '');
-            if Cust."Privacy Blocked" then
-                Error(Cust.GetPrivacyBlockedGenericErrorText(Cust));
-            if Cust.Blocked = Cust.Blocked::All then
-                Error(
-                  BlockedCustErr,
-                  FieldCaption("Bill-to Customer No."),
-                  "Bill-to Customer No.",
-                  Cust.TableCaption(),
-                  FieldCaption(Blocked),
-                  Cust.Blocked);
-            "Bill-to Name" := Cust.Name;
-            "Bill-to Name 2" := Cust."Name 2";
-            "Bill-to Address" := Cust.Address;
-            "Bill-to Address 2" := Cust."Address 2";
-            "Bill-to City" := Cust.City;
-            "Bill-to Post Code" := Cust."Post Code";
-            "Bill-to Country/Region Code" := Cust."Country/Region Code";
-            IsHandled := false;
-            OnUpdateCustOnBeforeAssignIncoiceCurrencyCode(Rec, xRec, Cust, IsHandled);
-            if not IsHandled then
-                "Invoice Currency Code" := Cust."Currency Code";
-            if "Invoice Currency Code" <> '' then
-                Validate("Currency Code", '');
-            "Customer Disc. Group" := Cust."Customer Disc. Group";
-            "Customer Price Group" := Cust."Customer Price Group";
-            "Language Code" := Cust."Language Code";
-            "Bill-to County" := Cust.County;
-            Reserve := Cust.Reserve;
-            if ((xRec."Bill-to Customer No." = '') and (Rec."Bill-to Contact No." = '')) or ((xRec."Bill-to Customer No." <> '') and (xRec."Bill-to Customer No." <> Rec."Bill-to Customer No.")) or ((xRec."Bill-to Contact No." <> '') and (Rec."Bill-to Contact No." <> xRec."Bill-to Contact No.")) then
-                UpdateBillToContact("Bill-to Customer No.");
-            CopyDefaultDimensionsFromCustomer();
-        end else begin
-            "Bill-to Name" := '';
-            "Bill-to Name 2" := '';
-            "Bill-to Address" := '';
-            "Bill-to Address 2" := '';
-            "Bill-to City" := '';
-            "Bill-to Post Code" := '';
-            "Bill-to Country/Region Code" := '';
-            "Invoice Currency Code" := '';
-            "Customer Disc. Group" := '';
-            "Customer Price Group" := '';
-            "Language Code" := '';
-            "Bill-to County" := '';
-            Validate("Bill-to Contact No.", '');
-        end;
-
-        OnAfterUpdateBillToCust(Rec, Cust);
-    end;
-#endif
 
     procedure InitWIPFields()
     begin
@@ -1871,18 +1832,18 @@ table 167 Job
         ReservEntry.ModifyAll("Source ID", "No.", true);
     end;
 
-    local procedure CheckReservationEntries(): Boolean
+    procedure CheckReservationEntries(): Boolean
     var
-        ReservEntry: Record "Reservation Entry";
+        ReservationEntry: Record "Reservation Entry";
         ConfirmManagement: Codeunit "Confirm Management";
         ReservationToDeleteExists: Boolean;
     begin
         ReservationToDeleteExists := false;
 
         if Status <> Status::Open then begin
-            ReservEntry.SetRange("Source Type", DATABASE::"Job Planning Line");
-            ReservEntry.SetRange("Source ID", "No.");
-            ReservationToDeleteExists := not ReservEntry.IsEmpty();
+            ReservationEntry.SetRange("Source Type", DATABASE::"Job Planning Line");
+            ReservationEntry.SetRange("Source ID", "No.");
+            ReservationToDeleteExists := not ReservationEntry.IsEmpty();
             if ReservationToDeleteExists then
                 if not ConfirmManagement.GetResponseOrDefault(ReservEntriesItemTrackLinesDeleteQst, false) then
                     Error(ReservEntriesItemTrackLinesExistErr, Status);
@@ -1891,7 +1852,7 @@ table 167 Job
         exit(ReservationToDeleteExists);
     end;
 
-    local procedure PerformAutoReserve(var JobPlanningLine: Record "Job Planning Line")
+    procedure PerformAutoReserve(var JobPlanningLine: Record "Job Planning Line")
     var
         JobPlanningLineReserve: Codeunit "Job Planning Line-Reserve";
         ReservationManagement: Codeunit "Reservation Management";
@@ -1984,10 +1945,13 @@ table 167 Job
         end;
     end;
 
+#if not CLEAN23
+    [Obsolete('This method always returns true. Remove this method.', '23.0')]
     procedure IsJobSimplificationAvailable(): Boolean
     begin
         exit(true);
     end;
+#endif
 
     local procedure AddToMyJobs(ProjectManager: Code[50])
     var
@@ -2122,8 +2086,8 @@ table 167 Job
     procedure RecalculateJobWIP()
     var
         Job: Record Job;
+        JobCalculateWIP: Report "Job Calculate WIP";
         Confirmed: Boolean;
-        WIPQst: Text;
         IsHandled: Boolean;
     begin
         OnBeforeRecalculateJobWIP(Rec, IsHandled);
@@ -2135,10 +2099,11 @@ table 167 Job
             exit;
 
         Job.SetRecFilter();
-        WIPQst := StrSubstNo(RunWIPFunctionsQst, GetReportCaption(REPORT::"Job Calculate WIP"));
-        Confirmed := Confirm(WIPQst);
+        Confirmed := Confirm(RunWIPFunctionsQst);
         Commit();
-        REPORT.RunModal(REPORT::"Job Calculate WIP", not Confirmed, false, Job);
+        JobCalculateWIP.UseRequestPage(not Confirmed);
+        JobCalculateWIP.SetTableView(Job);
+        JobCalculateWIP.Run();
     end;
 
     local procedure GetReportCaption(ReportID: Integer): Text
@@ -2308,17 +2273,12 @@ table 167 Job
         OnBeforeSellToCustomerNoUpdated(Job, xJob, CurrFieldNo, IsHandled);
         if IsHandled then
             exit;
-#if not CLEAN20
-        OnBeforeUpdateCust(Job, xJob, IsHandled);
-        If IsHandled then
-            exit;
-#endif
         if Job."Sell-to Customer No." <> '' then begin
             SellToCustomer.Get(Job."Sell-to Customer No.");
             IsHandled := false;
             OnValidateSellToCustomerNoOnBeforeCheckBlockedCustOnDocs(Rec, SellToCustomer, IsHandled);
             if not IsHandled then
-                SellToCustomer.CheckBlockedCustOnDocs(SellToCustomer, "Sales Document Type"::Order, false, false);
+                SellToCustomer.CheckBlockedCustOnDocs(SellToCustomer, Enum::"Sales Document Type"::Order, false, false);
         end;
 
         CheckSellToCustomerAssosEntriesExist(Job, xJob);
@@ -2461,9 +2421,6 @@ table 167 Job
             Job."Payment Terms Code" := '';
         end;
 
-#if not CLEAN20
-        OnAfterUpdateBillToCust(Job, BillToCustomer);
-#endif
         OnAfterBillToCustomerNoUpdated(Job, xJob, BillToCustomer, CurrFieldNo);
     end;
 
@@ -2547,7 +2504,7 @@ table 167 Job
 
         if JobPlanningLine.FindSet() then begin
             repeat
-                ItemTrackingMgt.InitItemTrackingForTempWhseWorksheetLine("Warehouse Worksheet Document Type"::Job, JobPlanningLine."Job No.", JobPlanningLine."Job Contract Entry No.", DATABASE::Job, 0, JobPlanningLine."Job No.", JobPlanningLine."Job Contract Entry No.", JobPlanningLine."Line No.");
+                ItemTrackingMgt.InitItemTrackingForTempWhseWorksheetLine(Enum::"Warehouse Worksheet Document Type"::Job, JobPlanningLine."Job No.", JobPlanningLine."Job Contract Entry No.", DATABASE::Job, 0, JobPlanningLine."Job No.", JobPlanningLine."Job Contract Entry No.", JobPlanningLine."Line No.");
             until JobPlanningLine.Next() = 0;
             Commit();
             RunCreatePickFromWhseSource()
@@ -2564,7 +2521,7 @@ table 167 Job
         CreatePickFromWhseSource.SetHideValidationDialog(false);
         CreatePickFromWhseSource.UseRequestPage(true);
         CreatePickFromWhseSource.RunModal();
-        CreatePickFromWhseSource.GetResultMessage("Warehouse Activity Type"::Pick.AsInteger());
+        CreatePickFromWhseSource.GetResultMessage(Enum::"Warehouse Activity Type"::Pick.AsInteger());
     end;
 
     local procedure InitDefaultJobPostingGroup()
@@ -2580,13 +2537,27 @@ table 167 Job
             Validate("Job Posting Group", JobsSetup."Default Job Posting Group");
     end;
 
-#if not CLEAN20
-    [Obsolete('Pending removal, replaced with BillToCustomerNoUpdated and SellToCustomerNoUpdated.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateBillToCust(var Job: Record Job; Customer: Record Customer)
+    internal procedure GetQtyReservedFromStockState() Result: Enum "Reservation From Stock"
+    var
+        JobPlanningLineLocal: Record "Job Planning Line";
+        JobPlanningLineReserve: Codeunit "Job Planning Line-Reserve";
+        QtyReservedFromStock: Decimal;
     begin
+        QtyReservedFromStock := JobPlanningLineReserve.GetReservedQtyFromInventory(Rec);
+
+        JobPlanningLineLocal.SetRange("Job No.", Rec."No.");
+        JobPlanningLineLocal.SetRange(Type, JobPlanningLineLocal.Type::Item);
+        JobPlanningLineLocal.CalcSums("Remaining Qty. (Base)");
+
+        case QtyReservedFromStock of
+            0:
+                exit(Result::None);
+            JobPlanningLineLocal."Remaining Qty. (Base)":
+                exit(Result::Full);
+            else
+                exit(Result::Partial);
+        end;
     end;
-#endif
 
     [IntegrationEvent(TRUE, false)]
     local procedure OnAfterCalcRecognizedProfitAmount(var Result: Decimal)
@@ -2753,14 +2724,6 @@ table 167 Job
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Pending removal, replaced with BillToCustomerNoUpdated and SellToCustomerNoUpdated.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdateCust(var Job: Record Job; xJob: Record Job; var IsHandled: Boolean)
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateOverBudgetValue(var Job: Record Job; JobNo: Code[20]; Usage: Boolean; Cost: Decimal; var IsHandled: Boolean)
     begin
@@ -2790,14 +2753,6 @@ table 167 Job
     local procedure OnUpdateBillToCustOnAfterAssignBillToContact(var Job: Record Job; Contact: Record Contact)
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Pending removal, replaced with BillToCustomerNoUpdated and SellToCustomerNoUpdated.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateCustOnBeforeTestBillToCustomerNo(var Job: Record Job; Customer: Record Customer; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateCustOnBeforeAssignIncoiceCurrencyCode(var Job: Record Job; xJob: Record Job; Customer: Record Customer; var IsHandled: Boolean)

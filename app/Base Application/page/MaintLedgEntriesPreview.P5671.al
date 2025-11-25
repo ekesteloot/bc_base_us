@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Maintenance;
+
+using Microsoft.FinancialMgt.Dimension;
+using System.Security.User;
+
 page 5671 "Maint. Ledg. Entries Preview"
 {
     Caption = 'Maint. Ledg. Entries Preview';
@@ -100,7 +105,7 @@ page 5671 "Maint. Ledg. Entries Preview"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -115,7 +120,7 @@ page 5671 "Maint. Ledg. Entries Preview"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies whether the entry has been part of a reverse transaction (correction) made by the Reverse function.';
@@ -209,7 +214,7 @@ page 5671 "Maint. Ledg. Entries Preview"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -222,7 +227,7 @@ page 5671 "Maint. Ledg. Entries Preview"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }

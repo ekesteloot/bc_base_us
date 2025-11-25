@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
 query 251 "G/L Budget Entry Dimensions"
 {
     Caption = 'G/L Budget Entry Dimensions';

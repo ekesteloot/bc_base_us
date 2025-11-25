@@ -1,3 +1,18 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Document;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
 codeunit 99000815 "Reservation-Check Date Confl."
 {
 
@@ -6,8 +21,8 @@ codeunit 99000815 "Reservation-Check Date Confl."
     end;
 
     var
-        ReservEntry: Record "Reservation Entry";
-        ReservEngineMgt: Codeunit "Reservation Engine Mgt.";
+        ReservationEntry: Record "Reservation Entry";
+        ReservationEngineMgt: Codeunit "Reservation Engine Mgt.";
         ReservMgt: Codeunit "Reservation Management";
         DateConflictMsg: Label 'The change causes a date conflict with an existing reservation on %2 for %1 units.\ \The reservations have been canceled. The production order must be replanned.', Comment = '%1: Field(Reserved Quantity (Base)), %2: Field(Due Date)';
         DateConflictErr: Label 'The change leads to a date conflict with existing reservations.\Reserved quantity (Base): %1, Date %2\Cancel or change reservations and try again.', Comment = '%1 - reserved quantity, %2 - date';
@@ -17,90 +32,90 @@ codeunit 99000815 "Reservation-Check Date Confl."
         SalesLineReserve: Codeunit "Sales Line-Reserve";
         IsHandled: Boolean;
     begin
-        if not SalesLineReserve.FindReservEntry(SalesLine, ReservEntry) then
+        if not SalesLineReserve.FindReservEntry(SalesLine, ReservationEntry) then
             exit;
 
         IsHandled := false;
-        OnSalesLineCheckOnBeforeIssueError(ReservEntry, SalesLine, IsHandled);
+        OnSalesLineCheckOnBeforeIssueError(ReservationEntry, SalesLine, IsHandled);
         if not IsHandled then
-            if DateConflict(SalesLine."Shipment Date", ForceRequest, ReservEntry) then
+            if DateConflict(SalesLine."Shipment Date", ForceRequest, ReservationEntry) then
                 if ForceRequest then
                     IssueError(SalesLine."Shipment Date");
 
         IsHandled := false;
-        OnSalesLineCheckOnBeforeUpdateDate(ReservEntry, SalesLine, IsHandled);
+        OnSalesLineCheckOnBeforeUpdateDate(ReservationEntry, SalesLine, IsHandled);
         if not IsHandled then
-            UpdateDate(ReservEntry, SalesLine."Shipment Date");
+            UpdateDate(ReservationEntry, SalesLine."Shipment Date");
 
         ReservMgt.SetReservSource(SalesLine);
         ReservMgt.ClearSurplus();
         ReservMgt.AutoTrack(SalesLine."Outstanding Qty. (Base)");
     end;
 
-    procedure PurchLineCheck(PurchLine: Record "Purchase Line"; ForceRequest: Boolean)
+    procedure PurchLineCheck(PurchaseLine: Record "Purchase Line"; ForceRequest: Boolean)
     var
         PurchLineReserve: Codeunit "Purch. Line-Reserve";
         IsHandled: Boolean;
     begin
-        if not PurchLineReserve.FindReservEntry(PurchLine, ReservEntry) then
+        if not PurchLineReserve.FindReservEntry(PurchaseLine, ReservationEntry) then
             exit;
 
-        if DateConflict(PurchLine."Expected Receipt Date", ForceRequest, ReservEntry) then
+        if DateConflict(PurchaseLine."Expected Receipt Date", ForceRequest, ReservationEntry) then
             if ForceRequest then
-                IssueError(PurchLine."Expected Receipt Date");
+                IssueError(PurchaseLine."Expected Receipt Date");
 
         IsHandled := false;
-        OnPurchLineCheckOnBeforeUpdateDate(ReservEntry, PurchLine, IsHandled);
+        OnPurchLineCheckOnBeforeUpdateDate(ReservationEntry, PurchaseLine, IsHandled);
         if not IsHandled then
-            UpdateDate(ReservEntry, PurchLine."Expected Receipt Date");
+            UpdateDate(ReservationEntry, PurchaseLine."Expected Receipt Date");
 
-        ReservMgt.SetReservSource(PurchLine);
+        ReservMgt.SetReservSource(PurchaseLine);
         ReservMgt.ClearSurplus();
-        ReservMgt.AutoTrack(PurchLine."Outstanding Qty. (Base)");
+        ReservMgt.AutoTrack(PurchaseLine."Outstanding Qty. (Base)");
     end;
 
-    procedure ItemJnlLineCheck(ItemJnlLine: Record "Item Journal Line"; ForceRequest: Boolean)
+    procedure ItemJnlLineCheck(ItemJournalLine: Record "Item Journal Line"; ForceRequest: Boolean)
     var
         ItemJnlLineReserve: Codeunit "Item Jnl. Line-Reserve";
         IsHandled: Boolean;
     begin
-        if not ItemJnlLineReserve.FindReservEntry(ItemJnlLine, ReservEntry) then
+        if not ItemJnlLineReserve.FindReservEntry(ItemJournalLine, ReservationEntry) then
             exit;
 
-        if DateConflict(ItemJnlLine."Posting Date", ForceRequest, ReservEntry) then
+        if DateConflict(ItemJournalLine."Posting Date", ForceRequest, ReservationEntry) then
             if ForceRequest then
-                IssueError(ItemJnlLine."Posting Date");
+                IssueError(ItemJournalLine."Posting Date");
 
         IsHandled := false;
-        OnItemJnlLineCheckOnBeforeUpdateDate(ReservEntry, ItemJnlLine, IsHandled);
+        OnItemJnlLineCheckOnBeforeUpdateDate(ReservationEntry, ItemJournalLine, IsHandled);
         if not IsHandled then
-            UpdateDate(ReservEntry, ItemJnlLine."Posting Date");
+            UpdateDate(ReservationEntry, ItemJournalLine."Posting Date");
 
-        ReservMgt.SetReservSource(ItemJnlLine);
+        ReservMgt.SetReservSource(ItemJournalLine);
         ReservMgt.ClearSurplus();
-        ReservMgt.AutoTrack(ItemJnlLine."Quantity (Base)");
+        ReservMgt.AutoTrack(ItemJournalLine."Quantity (Base)");
     end;
 
-    procedure ReqLineCheck(ReqLine: Record "Requisition Line"; ForceRequest: Boolean)
+    procedure ReqLineCheck(RequisitionLine: Record "Requisition Line"; ForceRequest: Boolean)
     var
         ReqLineReserve: Codeunit "Req. Line-Reserve";
         IsHandled: Boolean;
     begin
-        if not ReqLineReserve.FindReservEntry(ReqLine, ReservEntry) then
+        if not ReqLineReserve.FindReservEntry(RequisitionLine, ReservationEntry) then
             exit;
 
-        if DateConflict(ReqLine."Due Date", ForceRequest, ReservEntry) then
+        if DateConflict(RequisitionLine."Due Date", ForceRequest, ReservationEntry) then
             if ForceRequest then
-                IssueError(ReqLine."Due Date");
+                IssueError(RequisitionLine."Due Date");
 
         IsHandled := false;
-        OnReqLineCheckOnBeforeUpdateDate(ReservEntry, ReqLine, IsHandled);
+        OnReqLineCheckOnBeforeUpdateDate(ReservationEntry, RequisitionLine, IsHandled);
         if not IsHandled then
-            UpdateDate(ReservEntry, ReqLine."Due Date");
+            UpdateDate(ReservationEntry, RequisitionLine."Due Date");
 
-        ReservMgt.SetReservSource(ReqLine);
+        ReservMgt.SetReservSource(RequisitionLine);
         ReservMgt.ClearSurplus();
-        ReservMgt.AutoTrack(ReqLine."Quantity (Base)");
+        ReservMgt.AutoTrack(RequisitionLine."Quantity (Base)");
     end;
 
     procedure ProdOrderLineCheck(ProdOrderLine: Record "Prod. Order Line"; ForceRequest: Boolean)
@@ -108,15 +123,15 @@ codeunit 99000815 "Reservation-Check Date Confl."
         ProdOrderLineReserve: Codeunit "Prod. Order Line-Reserve";
         IsHandled: Boolean;
     begin
-        if not ProdOrderLineReserve.FindReservEntry(ProdOrderLine, ReservEntry) then
+        if not ProdOrderLineReserve.FindReservEntry(ProdOrderLine, ReservationEntry) then
             exit;
 
         CheckProdOrderLineDateConflict(ProdOrderLine, ForceRequest);
 
         IsHandled := false;
-        OnProdOrderLineCheckOnBeforeUpdateDate(ReservEntry, ProdOrderLine, IsHandled);
+        OnProdOrderLineCheckOnBeforeUpdateDate(ReservationEntry, ProdOrderLine, IsHandled);
         if not IsHandled then
-            UpdateDate(ReservEntry, ProdOrderLine."Due Date");
+            UpdateDate(ReservationEntry, ProdOrderLine."Due Date");
 
         ReservMgt.SetReservSource(ProdOrderLine);
         ReservMgt.ClearSurplus();
@@ -128,38 +143,38 @@ codeunit 99000815 "Reservation-Check Date Confl."
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckProdOrderLineDateConflict(ProdOrderLine."Due Date", ForceRequest, ReservEntry, IsHandled);
+        OnBeforeCheckProdOrderLineDateConflict(ProdOrderLine."Due Date", ForceRequest, ReservationEntry, IsHandled);
         if IsHandled then
             exit;
 
-        if DateConflict(ProdOrderLine."Due Date", ForceRequest, ReservEntry) then
+        if DateConflict(ProdOrderLine."Due Date", ForceRequest, ReservationEntry) then
             if ForceRequest then
                 IssueError(ProdOrderLine."Due Date");
     end;
 
-    procedure ProdOrderComponentCheck(ProdOrderComp: Record "Prod. Order Component"; ForceRequest: Boolean; IsCritical: Boolean): Boolean
+    procedure ProdOrderComponentCheck(ProdOrderComponent: Record "Prod. Order Component"; ForceRequest: Boolean; IsCritical: Boolean): Boolean
     var
         ProdOrderCompReserve: Codeunit "Prod. Order Comp.-Reserve";
         IsHandled: Boolean;
     begin
-        if not ProdOrderCompReserve.FindReservEntry(ProdOrderComp, ReservEntry) then
+        if not ProdOrderCompReserve.FindReservEntry(ProdOrderComponent, ReservationEntry) then
             exit(false);
 
-        if DateConflict(ProdOrderComp."Due Date", ForceRequest, ReservEntry) then
+        if DateConflict(ProdOrderComponent."Due Date", ForceRequest, ReservationEntry) then
             if ForceRequest then
                 if IsCritical then
-                    IssueError(ProdOrderComp."Due Date")
+                    IssueError(ProdOrderComponent."Due Date")
                 else
-                    IssueWarning(ProdOrderComp."Due Date");
+                    IssueWarning(ProdOrderComponent."Due Date");
 
         IsHandled := false;
-        OnProdOrderComponentCheckOnBeforeUpdateDate(ReservEntry, ProdOrderComp, IsHandled);
+        OnProdOrderComponentCheckOnBeforeUpdateDate(ReservationEntry, ProdOrderComponent, IsHandled);
         if not IsHandled then
-            UpdateDate(ReservEntry, ProdOrderComp."Due Date");
+            UpdateDate(ReservationEntry, ProdOrderComponent."Due Date");
 
-        ReservMgt.SetReservSource(ProdOrderComp);
+        ReservMgt.SetReservSource(ProdOrderComponent);
         ReservMgt.ClearSurplus();
-        ReservMgt.AutoTrack(ProdOrderComp."Remaining Qty. (Base)");
+        ReservMgt.AutoTrack(ProdOrderComponent."Remaining Qty. (Base)");
         exit(ForceRequest);
     end;
 
@@ -168,17 +183,17 @@ codeunit 99000815 "Reservation-Check Date Confl."
         AssemblyHeaderReserve: Codeunit "Assembly Header-Reserve";
         IsHandled: Boolean;
     begin
-        if not AssemblyHeaderReserve.FindReservEntry(AssemblyHeader, ReservEntry) then
+        if not AssemblyHeaderReserve.FindReservEntry(AssemblyHeader, ReservationEntry) then
             exit;
 
-        if DateConflict(AssemblyHeader."Due Date", ForceRequest, ReservEntry) then
+        if DateConflict(AssemblyHeader."Due Date", ForceRequest, ReservationEntry) then
             if ForceRequest then
                 IssueError(AssemblyHeader."Due Date");
 
         IsHandled := false;
-        OnAssemblyHeaderCheckOnBeforeUpdateDate(ReservEntry, AssemblyHeader, IsHandled);
+        OnAssemblyHeaderCheckOnBeforeUpdateDate(ReservationEntry, AssemblyHeader, IsHandled);
         if not IsHandled then
-            UpdateDate(ReservEntry, AssemblyHeader."Due Date");
+            UpdateDate(ReservationEntry, AssemblyHeader."Due Date");
 
         ReservMgt.SetReservSource(AssemblyHeader);
         ReservMgt.ClearSurplus();
@@ -190,17 +205,17 @@ codeunit 99000815 "Reservation-Check Date Confl."
         AssemblyLineReserve: Codeunit "Assembly Line-Reserve";
         IsHandled: Boolean;
     begin
-        if not AssemblyLineReserve.FindReservEntry(AssemblyLine, ReservEntry) then
+        if not AssemblyLineReserve.FindReservEntry(AssemblyLine, ReservationEntry) then
             exit;
 
-        if DateConflict(AssemblyLine."Due Date", ForceRequest, ReservEntry) then
+        if DateConflict(AssemblyLine."Due Date", ForceRequest, ReservationEntry) then
             if ForceRequest then
                 IssueError(AssemblyLine."Due Date");
 
         IsHandled := false;
-        OnAssemblyLineCheckOnBeforeUpdateDate(ReservEntry, AssemblyLine, IsHandled);
+        OnAssemblyLineCheckOnBeforeUpdateDate(ReservationEntry, AssemblyLine, IsHandled);
         if not IsHandled then
-            UpdateDate(ReservEntry, AssemblyLine."Due Date");
+            UpdateDate(ReservationEntry, AssemblyLine."Due Date");
 
         ReservMgt.SetReservSource(AssemblyLine);
         ReservMgt.ClearSurplus();
@@ -209,191 +224,191 @@ codeunit 99000815 "Reservation-Check Date Confl."
 
     procedure PlanningComponentCheck(PlanningComponent: Record "Planning Component"; ForceRequest: Boolean)
     var
-        PlanningComponentReserve: Codeunit "Plng. Component-Reserve";
+        PlngComponentReserve: Codeunit "Plng. Component-Reserve";
         IsHandled: Boolean;
     begin
-        if not PlanningComponentReserve.FindReservEntry(PlanningComponent, ReservEntry) then
+        if not PlngComponentReserve.FindReservEntry(PlanningComponent, ReservationEntry) then
             exit;
 
-        if DateConflict(PlanningComponent."Due Date", ForceRequest, ReservEntry) then
+        if DateConflict(PlanningComponent."Due Date", ForceRequest, ReservationEntry) then
             if ForceRequest then
                 IssueError(PlanningComponent."Due Date");
 
         IsHandled := false;
-        OnPlanningComponentCheckOnBeforeUpdateDate(ReservEntry, PlanningComponent, IsHandled);
+        OnPlanningComponentCheckOnBeforeUpdateDate(ReservationEntry, PlanningComponent, IsHandled);
         if not IsHandled then
-            UpdateDate(ReservEntry, PlanningComponent."Due Date");
+            UpdateDate(ReservationEntry, PlanningComponent."Due Date");
 
         ReservMgt.SetReservSource(PlanningComponent);
         ReservMgt.ClearSurplus();
         ReservMgt.AutoTrack(PlanningComponent."Net Quantity (Base)");
     end;
 
-    procedure TransferLineCheck(TransLine: Record "Transfer Line")
+    procedure TransferLineCheck(TransferLine: Record "Transfer Line")
     var
-        ReserveTransLine: Codeunit "Transfer Line-Reserve";
+        TransferLineReserve: Codeunit "Transfer Line-Reserve";
         ResEntryFound: Boolean;
         ForceRequest: Boolean;
         Direction: Enum "Transfer Direction";
         IsHandled: Boolean;
     begin
-        if ReserveTransLine.FindReservEntry(TransLine, ReservEntry, Direction::Outbound) then begin
+        if TransferLineReserve.FindReservEntry(TransferLine, ReservationEntry, Direction::Outbound) then begin
             ResEntryFound := true;
             ForceRequest := true;
-            if DateConflict(TransLine."Shipment Date", ForceRequest, ReservEntry) then
+            if DateConflict(TransferLine."Shipment Date", ForceRequest, ReservationEntry) then
                 if ForceRequest then
-                    IssueError(TransLine."Shipment Date");
+                    IssueError(TransferLine."Shipment Date");
 
             IsHandled := false;
-            OnTransLineCheckOnBeforeUpdateDate(ReservEntry, TransLine, Direction.AsInteger(), IsHandled);
+            OnTransLineCheckOnBeforeUpdateDate(ReservationEntry, TransferLine, Direction.AsInteger(), IsHandled);
             if not IsHandled then
-                UpdateDate(ReservEntry, TransLine."Shipment Date");
+                UpdateDate(ReservationEntry, TransferLine."Shipment Date");
         end;
 
-        if ReserveTransLine.FindInboundReservEntry(TransLine, ReservEntry) then begin
+        if TransferLineReserve.FindInboundReservEntry(TransferLine, ReservationEntry) then begin
             ResEntryFound := true;
             ForceRequest := true;
-            if DateConflict(TransLine."Receipt Date", ForceRequest, ReservEntry) then
+            if DateConflict(TransferLine."Receipt Date", ForceRequest, ReservationEntry) then
                 if ForceRequest then
-                    IssueError(TransLine."Receipt Date");
+                    IssueError(TransferLine."Receipt Date");
 
             IsHandled := false;
-            OnTransLineCheckOnBeforeUpdateDate(ReservEntry, TransLine, Direction.AsInteger(), IsHandled);
+            OnTransLineCheckOnBeforeUpdateDate(ReservationEntry, TransferLine, Direction.AsInteger(), IsHandled);
             if not IsHandled then
-                UpdateDate(ReservEntry, TransLine."Receipt Date");
+                UpdateDate(ReservationEntry, TransferLine."Receipt Date");
         end;
 
         if not ResEntryFound then
             exit;
 
-        ReservMgt.SetReservSource(TransLine, Direction);
+        ReservMgt.SetReservSource(TransferLine, Direction);
         ReservMgt.ClearSurplus();
-        ReservMgt.AutoTrack(TransLine."Outstanding Qty. (Base)");
+        ReservMgt.AutoTrack(TransferLine."Outstanding Qty. (Base)");
     end;
 
-    procedure ServiceInvLineCheck(ServLine: Record "Service Line"; ForceRequest: Boolean)
+    procedure ServiceInvLineCheck(ServiceLine: Record "Service Line"; ForceRequest: Boolean)
     var
-        ServLineReserve: Codeunit "Service Line-Reserve";
+        ServiceLineReserve: Codeunit "Service Line-Reserve";
     begin
-        if not ServLineReserve.FindReservEntry(ServLine, ReservEntry) then
+        if not ServiceLineReserve.FindReservEntry(ServiceLine, ReservationEntry) then
             exit;
-        if DateConflict(ServLine."Needed by Date", ForceRequest, ReservEntry) then
+        if DateConflict(ServiceLine."Needed by Date", ForceRequest, ReservationEntry) then
             if ForceRequest then
-                IssueError(ServLine."Needed by Date");
-        UpdateDate(ReservEntry, ServLine."Needed by Date");
-        ReservMgt.SetReservSource(ServLine);
+                IssueError(ServiceLine."Needed by Date");
+        UpdateDate(ReservationEntry, ServiceLine."Needed by Date");
+        ReservMgt.SetReservSource(ServiceLine);
         ReservMgt.ClearSurplus();
-        ReservMgt.AutoTrack(ServLine."Outstanding Qty. (Base)");
+        ReservMgt.AutoTrack(ServiceLine."Outstanding Qty. (Base)");
     end;
 
     procedure JobPlanningLineCheck(JobPlanningLine: Record "Job Planning Line"; ForceRequest: Boolean)
     var
         JobPlanningLineReserve: Codeunit "Job Planning Line-Reserve";
     begin
-        if not JobPlanningLineReserve.FindReservEntry(JobPlanningLine, ReservEntry) then
+        if not JobPlanningLineReserve.FindReservEntry(JobPlanningLine, ReservationEntry) then
             exit;
-        if DateConflict(JobPlanningLine."Planning Date", ForceRequest, ReservEntry) then
+        if DateConflict(JobPlanningLine."Planning Date", ForceRequest, ReservationEntry) then
             if ForceRequest then
                 IssueError(JobPlanningLine."Planning Date");
-        UpdateDate(ReservEntry, JobPlanningLine."Planning Date");
+        UpdateDate(ReservationEntry, JobPlanningLine."Planning Date");
         ReservMgt.SetReservSource(JobPlanningLine);
         ReservMgt.ClearSurplus();
         ReservMgt.AutoTrack(JobPlanningLine."Remaining Qty. (Base)");
     end;
 
-    procedure InvtDocLineCheck(InvtDocLine: Record "Invt. Document Line"; ForceRequest: Boolean): Boolean
+    procedure InvtDocLineCheck(InvtDocumentLine: Record "Invt. Document Line"; ForceRequest: Boolean): Boolean
     var
         InvtDocLineReserve: Codeunit "Invt. Doc. Line-Reserve";
     begin
-        if not InvtDocLineReserve.FindReservEntry(InvtDocLine, ReservEntry) then
+        if not InvtDocLineReserve.FindReservEntry(InvtDocumentLine, ReservationEntry) then
             exit;
 
-        if DateConflict(InvtDocLine."Document Date", ForceRequest, ReservEntry) then
-            if ForceRequest then IssueError(InvtDocLine."Document Date");
-        UpdateDate(ReservEntry, InvtDocLine."Document Date");
-        ReservMgt.SetReservSource(InvtDocLine);
+        if DateConflict(InvtDocumentLine."Document Date", ForceRequest, ReservationEntry) then
+            if ForceRequest then IssueError(InvtDocumentLine."Document Date");
+        UpdateDate(ReservationEntry, InvtDocumentLine."Document Date");
+        ReservMgt.SetReservSource(InvtDocumentLine);
         ReservMgt.ClearSurplus();
-        ReservMgt.AutoTrack(InvtDocLine."Quantity (Base)");
+        ReservMgt.AutoTrack(InvtDocumentLine."Quantity (Base)");
     end;
 
-    procedure UpdateDate(var FilterReservEntry: Record "Reservation Entry"; Date: Date)
+    procedure UpdateDate(var FilterReservationEntry: Record "Reservation Entry"; Date: Date)
     var
         ForceModifyShipmentDate: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdateDate(FilterReservEntry, Date, IsHandled);
+        OnBeforeUpdateDate(FilterReservationEntry, Date, IsHandled);
         if IsHandled then
             exit;
 
-        FilterReservEntry.SetRange("Reservation Status");
-        if not FilterReservEntry.Find('-') then
+        FilterReservationEntry.SetRange("Reservation Status");
+        if not FilterReservationEntry.Find('-') then
             exit;
 
         repeat
-            OnUpdateDateFilterReservEntryLoop(FilterReservEntry, ForceModifyShipmentDate, Date);
-            if FilterReservEntry."Quantity (Base)" < 0 then
-                if (FilterReservEntry."Expected Receipt Date" <> 0D) and
-                   (Date < FilterReservEntry."Expected Receipt Date") and not ForceModifyShipmentDate
+            OnUpdateDateFilterReservEntryLoop(FilterReservationEntry, ForceModifyShipmentDate, Date);
+            if FilterReservationEntry."Quantity (Base)" < 0 then
+                if (FilterReservationEntry."Expected Receipt Date" <> 0D) and
+                   (Date < FilterReservationEntry."Expected Receipt Date") and not ForceModifyShipmentDate
                 then
-                    if (FilterReservEntry.Binding <> FilterReservEntry.Binding::"Order-to-Order") and
-                       FilterReservEntry.TrackingExists()
+                    if (FilterReservationEntry.Binding <> FilterReservationEntry.Binding::"Order-to-Order") and
+                       FilterReservationEntry.TrackingExists()
                     then
-                        ReservEngineMgt.SplitTrackingConnection(FilterReservEntry, Date)
+                        ReservationEngineMgt.SplitTrackingConnection(FilterReservationEntry, Date)
                     else
-                        if SameProdOrderAutoReserve(FilterReservEntry) then
-                            ReservEngineMgt.ModifyExpectedReceiptDate(FilterReservEntry, Date)
+                        if SameProdOrderAutoReserve(FilterReservationEntry) then
+                            ReservationEngineMgt.ModifyExpectedReceiptDate(FilterReservationEntry, Date)
                         else
-                            ReservEngineMgt.CloseReservEntry(FilterReservEntry, false, false)
+                            ReservationEngineMgt.CloseReservEntry(FilterReservationEntry, false, false)
                 else
-                    ReservEngineMgt.ModifyShipmentDate(FilterReservEntry, Date)
+                    ReservationEngineMgt.ModifyShipmentDate(FilterReservationEntry, Date)
             else
-                if ((FilterReservEntry."Shipment Date" <> 0D) and
-                    (FilterReservEntry."Shipment Date" < Date))
+                if ((FilterReservationEntry."Shipment Date" <> 0D) and
+                    (FilterReservationEntry."Shipment Date" < Date))
                 then
-                    if (FilterReservEntry.Binding <> FilterReservEntry.Binding::"Order-to-Order") and
-                       FilterReservEntry.TrackingExists()
+                    if (FilterReservationEntry.Binding <> FilterReservationEntry.Binding::"Order-to-Order") and
+                       FilterReservationEntry.TrackingExists()
                     then
-                        ReservEngineMgt.SplitTrackingConnection(FilterReservEntry, Date)
+                        ReservationEngineMgt.SplitTrackingConnection(FilterReservationEntry, Date)
                     else
-                        ReservEngineMgt.CloseReservEntry(FilterReservEntry, false, false)
+                        ReservationEngineMgt.CloseReservEntry(FilterReservationEntry, false, false)
                 else
-                    ReservEngineMgt.ModifyExpectedReceiptDate(FilterReservEntry, Date);
-        until FilterReservEntry.Next() = 0;
+                    ReservationEngineMgt.ModifyExpectedReceiptDate(FilterReservationEntry, Date);
+        until FilterReservationEntry.Next() = 0;
     end;
 
-    procedure DateConflict(Date: Date; var ForceRequest: Boolean; var ReservationEntry: Record "Reservation Entry") IsConflict: Boolean
+    procedure DateConflict(Date: Date; var ForceRequest: Boolean; var ReservationEntry1: Record "Reservation Entry") IsConflict: Boolean
     var
-        ReservEntry2: Record "Reservation Entry";
+        ReservationEntry2: Record "Reservation Entry";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeDateConflict(ReservationEntry, Date, IsConflict, IsHandled);
+        OnBeforeDateConflict(ReservationEntry1, Date, IsConflict, IsHandled);
         if IsHandled then
             exit;
 
-        ReservEntry2.Copy(ReservationEntry);
+        ReservationEntry2.Copy(ReservationEntry1);
 
-        if not ReservEntry2.FindFirst() then
+        if not ReservationEntry2.FindFirst() then
             exit(false);
 
-        if ReservEntry2."Quantity (Base)" < 0 then
-            ReservEntry2.SetFilter("Expected Receipt Date", '>%1', Date)
+        if ReservationEntry2."Quantity (Base)" < 0 then
+            ReservationEntry2.SetFilter("Expected Receipt Date", '>%1', Date)
         else
             if Date <> 0D then
-                ReservEntry2.SetRange("Shipment Date", 00000101D, Date - 1);
+                ReservationEntry2.SetRange("Shipment Date", 00000101D, Date - 1);
 
-        if ReservEntry2.IsEmpty() then
+        if ReservationEntry2.IsEmpty() then
             exit(false);
 
         IsConflict := true;
 
         // Don't look at tracking and surplus:
-        ReservEntry2.SetRange("Reservation Status", ReservEntry2."Reservation Status"::Reservation);
+        ReservationEntry2.SetRange("Reservation Status", ReservationEntry2."Reservation Status"::Reservation);
 
-        ForceRequest := not ReservEntry2.IsEmpty() and ForceRequest;
+        ForceRequest := not ReservationEntry2.IsEmpty() and ForceRequest;
 
-        OnAfterDateConflict(ReservationEntry, Date, IsConflict, ForceRequest);
+        OnAfterDateConflict(ReservationEntry1, Date, IsConflict, ForceRequest);
         exit(IsConflict);
     end;
 
@@ -415,58 +430,58 @@ codeunit 99000815 "Reservation-Check Date Confl."
 
     local procedure CalcReservQty(NewDate: Date): Decimal
     var
-        ReservEntry2: Record "Reservation Entry";
+        ReservationEntry2: Record "Reservation Entry";
         CreateReservEntry: Codeunit "Create Reserv. Entry";
         ReservDueDate: Date;
         ReservExpectDate: Date;
         SumValue: Decimal;
     begin
-        ReservEntry2.Copy(ReservEntry);
+        ReservationEntry2.Copy(ReservationEntry);
         ReservDueDate := NewDate;
         ReservExpectDate := NewDate;
 
-        if not ReservEntry2.Find('-') then
+        if not ReservationEntry2.Find('-') then
             exit(0);
-        if ReservEntry2."Quantity (Base)" < 0 then
+        if ReservationEntry2."Quantity (Base)" < 0 then
             ReservExpectDate := 0D
         else
             ReservDueDate := DMY2Date(31, 12, 9999);
 
         repeat
-            SumValue += ReservEntry2."Quantity (Base)";
-            if ReservEntry2."Quantity (Base)" < 0 then begin
-                if ReservEntry2."Expected Receipt Date" <> 0D then  // Item ledger entries will be 0D.
-                    if (ReservEntry2."Expected Receipt Date" > ReservExpectDate) and
-                       (ReservEntry2."Expected Receipt Date" > ReservDueDate)
+            SumValue += ReservationEntry2."Quantity (Base)";
+            if ReservationEntry2."Quantity (Base)" < 0 then begin
+                if ReservationEntry2."Expected Receipt Date" <> 0D then  // Item ledger entries will be 0D.
+                    if (ReservationEntry2."Expected Receipt Date" > ReservExpectDate) and
+                       (ReservationEntry2."Expected Receipt Date" > ReservDueDate)
                     then
-                        ReservExpectDate := ReservEntry2."Expected Receipt Date";
+                        ReservExpectDate := ReservationEntry2."Expected Receipt Date";
             end else
-                if ReservEntry2."Shipment Date" <> 0D then          // Item ledger entries will be 0D.
-                    if (ReservEntry2."Shipment Date" < ReservDueDate) and (ReservEntry2."Shipment Date" < ReservExpectDate) then
-                        ReservDueDate := ReservEntry2."Shipment Date";
-        until ReservEntry2.Next() = 0;
+                if ReservationEntry2."Shipment Date" <> 0D then          // Item ledger entries will be 0D.
+                    if (ReservationEntry2."Shipment Date" < ReservDueDate) and (ReservationEntry2."Shipment Date" < ReservExpectDate) then
+                        ReservDueDate := ReservationEntry2."Shipment Date";
+        until ReservationEntry2.Next() = 0;
 
-        exit(CreateReservEntry.SignFactor(ReservEntry2) * SumValue);
+        exit(CreateReservEntry.SignFactor(ReservationEntry2) * SumValue);
     end;
 
-    local procedure SameProdOrderAutoReserve(FilterReservEntry: Record "Reservation Entry"): Boolean
+    local procedure SameProdOrderAutoReserve(FilterReservationEntry: Record "Reservation Entry"): Boolean
     var
         ProdOrderLineReservationEntry: Record "Reservation Entry";
     begin
-        if FilterReservEntry."Source Type" = DATABASE::"Prod. Order Component" then
-            if ProdOrderLineReservationEntry.Get(FilterReservEntry."Entry No.", not FilterReservEntry.Positive) then
-                if ProdOrderLineReservationEntry."Source Type" = DATABASE::"Prod. Order Line" then
-                    if FilterReservEntry."Source ID" = ProdOrderLineReservationEntry."Source ID" then
-                        exit(ProdOrderLineReservationEntry."Source Prod. Order Line" = GetSuppliedByLineNoByReservationEntry(FilterReservEntry));
+        if FilterReservationEntry."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then
+            if ProdOrderLineReservationEntry.Get(FilterReservationEntry."Entry No.", not FilterReservationEntry.Positive) then
+                if ProdOrderLineReservationEntry."Source Type" = Enum::TableID::"Prod. Order Line".AsInteger() then
+                    if FilterReservationEntry."Source ID" = ProdOrderLineReservationEntry."Source ID" then
+                        exit(ProdOrderLineReservationEntry."Source Prod. Order Line" = GetSuppliedByLineNoByReservationEntry(FilterReservationEntry));
         exit(false);
     end;
 
-    local procedure GetSuppliedByLineNoByReservationEntry(ReservationEntry: Record "Reservation Entry"): Integer
+    local procedure GetSuppliedByLineNoByReservationEntry(ReservationEntry2: Record "Reservation Entry"): Integer
     var
         ProdOrderComponent: Record "Prod. Order Component";
     begin
-        with ReservationEntry do
-            ProdOrderComponent.Get("Source Subtype", "Source ID", "Source Prod. Order Line", "Source Ref. No.");
+        ProdOrderComponent.Get(
+            ReservationEntry2."Source Subtype", ReservationEntry2."Source ID", ReservationEntry2."Source Prod. Order Line", ReservationEntry2."Source Ref. No.");
         exit(ProdOrderComponent."Supplied-by Line No.");
     end;
 

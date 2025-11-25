@@ -1,3 +1,10 @@
+namespace System.IO;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Telemetry;
+using System.Utilities;
+
 page 8615 "Config. Packages"
 {
     AdditionalSearchTerms = 'rapidstart rapid start implementation migrate setup packages';
@@ -16,7 +23,7 @@ page 8615 "Config. Packages"
             repeater(Control2)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the configuration package.';
@@ -86,7 +93,7 @@ page 8615 "Config. Packages"
                         GetPackageTables: Report "Get Package Tables";
                     begin
                         CurrPage.SaveRecord();
-                        GetPackageTables.Set(Code);
+                        GetPackageTables.Set(Rec.Code);
                         GetPackageTables.RunModal();
                         Clear(GetPackageTables);
                     end;
@@ -102,7 +109,7 @@ page 8615 "Config. Packages"
 
                     trigger OnAction()
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
                         ConfigXMLExchange.ExportPackage(Rec);
                     end;
                 }
@@ -160,10 +167,10 @@ page 8615 "Config. Packages"
                         ConfigExcelExchange: Codeunit "Config. Excel Exchange";
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
 
-                        ConfigPackageTable.SetRange("Package Code", Code);
-                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text004, Code), true) then
+                        ConfigPackageTable.SetRange("Package Code", Rec.Code);
+                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text004, Rec.Code), true) then
                             ConfigExcelExchange.ExportExcelFromTables(ConfigPackageTable);
                     end;
                 }
@@ -199,9 +206,9 @@ page 8615 "Config. Packages"
                         ConfigPackageMgt: Codeunit "Config. Package Management";
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        TestField(Code);
-                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text003, Code), true) then begin
-                            ConfigPackageTable.SetRange("Package Code", Code);
+                        Rec.TestField(Code);
+                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(ApplyDataConfirmMsg, Rec.Code), true) then begin
+                            ConfigPackageTable.SetRange("Package Code", Rec.Code);
                             ConfigPackageMgt.ApplyPackage(Rec, ConfigPackageTable, true);
                         end;
                     end;
@@ -217,7 +224,7 @@ page 8615 "Config. Packages"
                     var
                         CopyPackage: Report "Copy Package";
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
                         CopyPackage.Set(Rec);
                         CopyPackage.RunModal();
                         Clear(CopyPackage);
@@ -239,8 +246,8 @@ page 8615 "Config. Packages"
                         ConfirmManagement: Codeunit "Confirm Management";
                         Canceled: Boolean;
                     begin
-                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text002, "Package Name"), true) then begin
-                            ConfigPackageTable.SetRange("Package Code", Code);
+                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text002, Rec."Package Name"), true) then begin
+                            ConfigPackageTable.SetRange("Package Code", Rec.Code);
                             ConfigProgressBar.Init(ConfigPackageTable.Count, 1, ValidatingTableRelationsMsg);
 
                             BackgroundSessionId := 0;
@@ -285,10 +292,10 @@ page 8615 "Config. Packages"
                         ConfigPackageTable: Record "Config. Package Table";
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
                         ConfigXMLExchange.SetAdvanced(true);
-                        ConfigPackageTable.SetRange("Package Code", Code);
-                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text004, Code), true) then
+                        ConfigPackageTable.SetRange("Package Code", Rec.Code);
+                        if ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text004, Rec.Code), true) then
                             ConfigXMLExchange.ExportPackageXML(ConfigPackageTable, '');
                     end;
                 }
@@ -370,11 +377,10 @@ page 8615 "Config. Packages"
     var
         ConfigXMLExchange: Codeunit "Config. XML Exchange";
         Text002: Label 'Validate package %1?';
-        Text003: Label 'Apply data from package %1?';
+        ApplyDataConfirmMsg: Label 'Apply data from package %1?';
         Text004: Label 'Export package %1?';
         ValidatingTableRelationsMsg: Label 'Validating table relations';
         ValidationCanceledMsg: Label 'Validation canceled.';
         BackgroundSessionId: Integer;
         ImportPredefinedPackageVisible: Boolean;
 }
-

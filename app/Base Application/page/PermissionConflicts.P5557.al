@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 page 5557 "Permission Conflicts"
 {
     PageType = List;
@@ -25,7 +27,7 @@ page 5557 "Permission Conflicts"
             field("Permission Set ID"; PermissionSetId)
             {
                 ApplicationArea = All;
-                TableRelation = "Permission Set";
+                TableRelation = "Aggregate Permission Set"."Role ID";
                 Caption = 'Permission Set ID';
                 ToolTip = 'Specifies the identifier for the permission set.';
 
@@ -117,15 +119,10 @@ page 5557 "Permission Conflicts"
 
     var
         EffectivePermissionsMgt: Codeunit "Effective Permissions Mgt.";
-        [InDataSet]
         ReadPermissionsTxt: Text;
-        [InDataSet]
         InsertPermissionsTxt: Text;
-        [InDataSet]
         ModifyPermissionsTxt: Text;
-        [InDataSet]
         DeletePermissionsTxt: Text;
-        [InDataSet]
         ExecutePermissionsTxt: Text;
         PermissionSetId: Code[20];
         EntitlementId: Enum Licenses;

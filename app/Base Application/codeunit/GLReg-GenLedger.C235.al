@@ -11,7 +11,7 @@ codeunit 235 "G/L Reg.-Gen. Ledger"
         if IsHandled then
             exit;
 
-        GLEntry.SetRange("Entry No.", "From Entry No.", "To Entry No.");
+        GLEntry.SetRange("Entry No.", Rec."From Entry No.", Rec."To Entry No.");
         PAGE.Run(PAGE::"General Ledger Entries", GLEntry);
     end;
 

@@ -1,3 +1,15 @@
+namespace Microsoft.CRM.RoleCenters;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Opportunity;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Sales.Document;
+using System.Environment;
+using System.Visualization;
+
 page 9076 "Sales & Relationship Mgr. Act."
 {
     Caption = 'Activities';
@@ -137,14 +149,14 @@ page 9076 "Sales & Relationship Mgr. Act."
         CDSIntegrationMgt: Codeunit "CDS Integration Mgt.";
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
-        SetFilter("Due Date Filter", '<>%1&%2..%3', 0D, WorkDate(), WorkDate() + 7);
-        SetFilter("Overdue Date Filter", '<>%1&..%2', 0D, WorkDate() - 1);
+        Rec.SetFilter("Due Date Filter", '<>%1&%2..%3', 0D, WorkDate(), WorkDate() + 7);
+        Rec.SetFilter("Overdue Date Filter", '<>%1&..%2', 0D, WorkDate() - 1);
         ShowIntelligentCloud := not EnvironmentInfo.IsSaaS();
         IntegrationSynchJobErrors.SetDataIntegrationUIElementsVisible(ShowDataIntegrationCues);
         ShowD365SIntegrationCues := CRMIntegrationManagement.IsIntegrationEnabled() or CDSIntegrationMgt.IsIntegrationEnabled();

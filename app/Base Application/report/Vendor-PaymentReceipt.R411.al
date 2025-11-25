@@ -1,7 +1,17 @@
+﻿namespace Microsoft.Purchases.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 411 "Vendor - Payment Receipt"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/VendorPaymentReceipt.rdlc';
+    RDLCLayout = './Purchases/Reports/VendorPaymentReceipt.rdlc';
     Caption = 'Vendor - Payment Receipt';
     ApplicationArea = Suite;
     UsageCategory = Documents;
@@ -10,11 +20,11 @@ report 411 "Vendor - Payment Receipt"
     {
         dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
         {
-            DataItemTableView = SORTING("Document Type", "Vendor No.", "Posting Date", "Currency Code") WHERE("Document Type" = FILTER(Payment | Refund));
+            DataItemTableView = sorting("Document Type", "Vendor No.", "Posting Date", "Currency Code") where("Document Type" = filter(Payment | Refund));
             RequestFilterFields = "Vendor No.", "Posting Date", "Document No.";
             dataitem(PageLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(VendAddr6; VendAddr[6])
                 {
                 }
@@ -132,18 +142,18 @@ report 411 "Vendor - Payment Receipt"
                 }
                 dataitem(DetailedVendorLedgEntry1; "Detailed Vendor Ledg. Entry")
                 {
-                    DataItemLink = "Applied Vend. Ledger Entry No." = FIELD("Entry No.");
+                    DataItemLink = "Applied Vend. Ledger Entry No." = field("Entry No.");
                     DataItemLinkReference = "Vendor Ledger Entry";
-                    DataItemTableView = SORTING("Applied Vend. Ledger Entry No.", "Entry Type") WHERE(Unapplied = CONST(false));
-                    PrintOnlyIfDetail = true;                    
+                    DataItemTableView = sorting("Applied Vend. Ledger Entry No.", "Entry Type") where(Unapplied = const(false));
+                    PrintOnlyIfDetail = true;
                     column(AppliedVLENo_DtldVendLedgEntry; "Applied Vend. Ledger Entry No.")
                     {
                     }
                     dataitem(VendLedgEntry1; "Vendor Ledger Entry")
                     {
-                        DataItemLink = "Entry No." = FIELD("Vendor Ledger Entry No.");
+                        DataItemLink = "Entry No." = field("Vendor Ledger Entry No.");
                         DataItemLinkReference = DetailedVendorLedgEntry1;
-                        DataItemTableView = SORTING("Entry No.");
+                        DataItemTableView = sorting("Entry No.");
                         column(PostingDate_VendLedgEntry1; Format("Posting Date"))
                         {
                         }
@@ -207,17 +217,17 @@ report 411 "Vendor - Payment Receipt"
                 }
                 dataitem(DetailedVendorLedgEntry2; "Detailed Vendor Ledg. Entry")
                 {
-                    DataItemLink = "Vendor Ledger Entry No." = FIELD("Entry No.");
+                    DataItemLink = "Vendor Ledger Entry No." = field("Entry No.");
                     DataItemLinkReference = "Vendor Ledger Entry";
-                    DataItemTableView = SORTING("Vendor Ledger Entry No.", "Entry Type", "Posting Date") WHERE(Unapplied = CONST(false));
+                    DataItemTableView = sorting("Vendor Ledger Entry No.", "Entry Type", "Posting Date") where(Unapplied = const(false));
                     column(VLENo_DtldVendLedgEntry; "Vendor Ledger Entry No.")
                     {
                     }
                     dataitem(VendLedgEntry2; "Vendor Ledger Entry")
                     {
-                        DataItemLink = "Entry No." = FIELD("Applied Vend. Ledger Entry No.");
+                        DataItemLink = "Entry No." = field("Applied Vend. Ledger Entry No.");
                         DataItemLinkReference = DetailedVendorLedgEntry2;
-                        DataItemTableView = SORTING("Entry No.");
+                        DataItemTableView = sorting("Entry No.");
                         column(NegAppliedAmt; -AppliedAmount)
                         {
                         }
@@ -274,7 +284,7 @@ report 411 "Vendor - Payment Receipt"
                 }
                 dataitem(Total; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(NegRemainingAmt; -RemainingAmount)
                     {
                     }

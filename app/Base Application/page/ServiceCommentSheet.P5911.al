@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.Comment;
+
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Loaner;
+
 page 5911 "Service Comment Sheet"
 {
     AutoSplitKey = true;
@@ -13,12 +20,12 @@ page 5911 "Service Comment Sheet"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the date you entered the service comment.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the service comment.';
@@ -38,7 +45,7 @@ page 5911 "Service Comment Sheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
     end;
 
     trigger OnOpenPage()
@@ -60,20 +67,20 @@ page 5911 "Service Comment Sheet"
         Loaner: Record Loaner;
     begin
         Clear(ServCommentLine);
-        if GetFilter("Table Name") <> '' then
-            Evaluate(ServCommentLine."Table Name", GetFilter("Table Name"));
+        if Rec.GetFilter("Table Name") <> '' then
+            Evaluate(ServCommentLine."Table Name", Rec.GetFilter("Table Name"));
 
-        if GetFilter("Table Subtype") <> '' then
-            Evaluate(ServCommentLine."Table Subtype", GetFilter("Table Subtype"));
+        if Rec.GetFilter("Table Subtype") <> '' then
+            Evaluate(ServCommentLine."Table Subtype", Rec.GetFilter("Table Subtype"));
 
-        if GetFilter("No.") <> '' then
-            Evaluate(ServCommentLine."No.", GetFilter("No."));
+        if Rec.GetFilter("No.") <> '' then
+            Evaluate(ServCommentLine."No.", Rec.GetFilter("No."));
 
-        if GetFilter(Type) <> '' then
-            Evaluate(ServCommentLine.Type, GetFilter(Type));
+        if Rec.GetFilter(Type) <> '' then
+            Evaluate(ServCommentLine.Type, Rec.GetFilter(Type));
 
-        if GetFilter("Table Line No.") <> '' then
-            Evaluate(ServCommentLine."Table Line No.", GetFilter("Table Line No."));
+        if Rec.GetFilter("Table Line No.") <> '' then
+            Evaluate(ServCommentLine."Table Line No.", Rec.GetFilter("Table Line No."));
 
         if ServCommentLine."Table Line No." > 0 then
             if ServItemLine.Get(ServCommentLine."Table Subtype", ServCommentLine."No.", ServCommentLine."Table Line No.") then

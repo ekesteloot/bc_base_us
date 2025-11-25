@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Ledger;
+
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 1103 "Cost Entries"
 {
     AdditionalSearchTerms = 'entries';
@@ -76,7 +81,7 @@ page 1103 "Cost Entries"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the number of the entry, as assigned from the specified number series when the entry was created.';
                 }
-                field(Allocated; Allocated)
+                field(Allocated; Rec.Allocated)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies whether the cost entry has been allocated.';
@@ -121,7 +126,7 @@ page 1103 "Cost Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Debit Amount"; Rec."Debit Amount")
@@ -156,7 +161,7 @@ page 1103 "Cost Entries"
                 var
                     Navigate: Page Navigate;
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

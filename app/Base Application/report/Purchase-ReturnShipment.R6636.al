@@ -1,7 +1,20 @@
+﻿namespace Microsoft.Purchases.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Vendor;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 6636 "Purchase - Return Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchaseReturnShipment.rdlc';
+    RDLCLayout = './Purchases/Document/ReturnShipment.rdlc';
     Caption = 'Purchase - Return Shipment';
     PreviewMode = PrintLayout;
 
@@ -9,7 +22,7 @@ report 6636 "Purchase - Return Shipment"
     {
         dataitem("Return Shipment Header"; "Return Shipment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Posted Return Shipment';
             column(No_ReturnShipmentHeader; "No.")
@@ -53,10 +66,10 @@ report 6636 "Purchase - Return Shipment"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(PurchReturnShpCaption; StrSubstNo(Text002, CopyText))
                     {
                     }
@@ -186,7 +199,7 @@ report 6636 "Purchase - Return Shipment"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Return Shipment Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -233,9 +246,9 @@ report 6636 "Purchase - Return Shipment"
                     }
                     dataitem("Return Shipment Line"; "Return Shipment Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Return Shipment Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(TypeInt; TypeInt)
                         {
                         }
@@ -271,7 +284,7 @@ report 6636 "Purchase - Return Shipment"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_DimensionLoop2; DimText)
                             {
                             }
@@ -338,7 +351,7 @@ report 6636 "Purchase - Return Shipment"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
 
                         trigger OnAfterGetRecord()
                         begin
@@ -355,7 +368,7 @@ report 6636 "Purchase - Return Shipment"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(ShptShipToAddr1; ShptShipToAddr[1])
                         {
                         }
@@ -423,6 +436,7 @@ report 6636 "Purchase - Return Shipment"
                 Language: Codeunit Language;
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Return Shipment Header");
@@ -557,7 +571,6 @@ report 6636 "Purchase - Return Shipment"
         PayToVendorNo: Code[20];
         BuyFromVendorNo: Code[20];
         PayToCaption: Text[30];
-        [InDataSet]
         LogInteractionEnable: Boolean;
         CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
         CompanyInfoVATRegNoCaptionLbl: Label 'VAT Reg. No.';
@@ -588,7 +601,7 @@ report 6636 "Purchase - Return Shipment"
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Purch. Return Shipment") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch. Return Shipment") <> '';
     end;
 
     local procedure IsReportInPreviewMode(): Boolean

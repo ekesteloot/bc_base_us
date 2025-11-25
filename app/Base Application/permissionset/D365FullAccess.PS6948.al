@@ -5,6 +5,7 @@ permissionset 6948 "D365 FULL ACCESS"
     Caption = 'Dynamics 365 Full access';
 
     IncludedPermissionSets = "D365 BUS PREMIUM",
+                             "D365 Create Fields",
                              "System App - Admin",
                              SECURITY;
 
@@ -21,7 +22,9 @@ permissionset 6948 "D365 FULL ACCESS"
                   tabledata "NAV App Tenant Add-In" = Rimd,
                   tabledata "NAV App Tenant Operation" = RIMD,
                   tabledata "Profile Configuration Symbols" = IMD,
+#pragma warning disable AL0432
                   tabledata "Tenant Profile" = IMD,
+#pragma warning restore AL0432
                   tabledata "Tenant Profile Extension" = IMD,
                   tabledata "Tenant Profile Page Metadata" = IMD,
                   tabledata "Tenant Profile Setting" = IMD,

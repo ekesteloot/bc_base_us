@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 table 5803 "Item Journal Buffer"
 {
     Caption = 'Item Journal Buffer';
@@ -32,7 +37,7 @@ table 5803 "Item Journal Buffer"
         {
             Caption = 'Variant Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(5802; "Inventory Value (Calculated)"; Decimal)
         {

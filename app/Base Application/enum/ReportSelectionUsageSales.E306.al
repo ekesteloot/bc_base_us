@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Setup;
+
 enum 306 "Report Selection Usage Sales"
 {
     Extensible = true;

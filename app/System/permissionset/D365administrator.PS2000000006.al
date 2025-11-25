@@ -1,7 +1,22 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace System.Security.AccessControl;
+
+using System.Apps;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Reflection;
+using System.Tooling;
+
 permissionset 2000000006 D365Administrator
 {
     Assignable = false;
-    IncludedPermissionSets = BaseSystemPermissionSet;
+    IncludedPermissionSets = BaseSystemPermissionSet,
+                             "Role Configuration - Read";
     Permissions = tabledata "All Profile" = RIMD,
                   tabledata "API Webhook Notification" = Rimd,
                   tabledata "API Webhook Notification Aggr" = Rimd,
@@ -15,13 +30,7 @@ permissionset 2000000006 D365Administrator
                   tabledata "External Event Notification" = RIMD,
                   tabledata "Feature Key" = RIMD,
                   tabledata "NAV App Installed App" = R,
-                  tabledata Profile = RIMD,
-                  tabledata "Profile Configuration Symbols" = RIMD,
                   tabledata "Published Application" = R,
-                  tabledata "Tenant Profile" = RIMD,
-                  tabledata "Tenant Profile Extension" = RIMD,
-                  tabledata "Tenant Profile Page Metadata" = RIMD,
-                  tabledata "Tenant Profile Setting" = RIMD,
                   tabledata "User Default Style Sheet" = R,
                   tabledata "User Page Metadata" = Rimd,
                   tabledata "Webhook Notification" = Rimd;

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
 enum 247 "Req. Worksheet Template Type"
 {
     Extensible = true;

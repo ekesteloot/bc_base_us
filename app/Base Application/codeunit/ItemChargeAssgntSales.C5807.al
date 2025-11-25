@@ -236,14 +236,6 @@
         AssignItemCharges(SalesLine, TotalQtyToAssign, TotalAmtToAssign, TotalQtyToHandle, TotalAmtToHandle, SelectionTxt);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by AssignItemCharges()', '20.0')]
-    procedure SuggestAssignment2(SalesLine: Record "Sales Line"; TotalQtyToAssign: Decimal; TotalAmtToAssign: Decimal; Selection: Option Equally,"By Amount","By Weight","By Volume")
-    begin
-        // this function will be deprecated. Please use AssignItemCharges instead
-        AssignItemCharges(SalesLine, TotalQtyToAssign, TotalAmtToAssign, Format(Selection))
-    end;
-#endif
     procedure AssignItemCharges(SalesLine: Record "Sales Line"; TotalQtyToAssign: Decimal; TotalAmtToAssign: Decimal; SelectedOptionValue: Integer)
     begin
         AssignItemCharges(SalesLine, TotalQtyToAssign, TotalAmtToAssign, GetSelectionText(SelectedOptionValue));

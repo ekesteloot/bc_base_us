@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Ledger;
+
+using Microsoft.InventoryMgt.Tracking;
+using System.Security.User;
+
 page 7318 "Warehouse Entries"
 {
     ApplicationArea = Warehouse;
@@ -8,8 +13,8 @@ page 7318 "Warehouse Entries"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Warehouse Entry";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Entry No.")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -315,7 +320,6 @@ page 7318 "Warehouse Entries"
     end;
 
     var
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     local procedure SetPackageTrackingVisibility()

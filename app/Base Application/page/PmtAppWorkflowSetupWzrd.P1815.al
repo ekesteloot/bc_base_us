@@ -1,3 +1,9 @@
+namespace System.Automation;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Utilities;
+
 page 1815 "Pmt. App. Workflow Setup Wzrd."
 {
     Caption = 'Approval Workflow Setup';
@@ -87,8 +93,8 @@ page 1815 "Pmt. App. Workflow Setup Wzrd."
 
                         trigger OnValidate()
                         begin
-                            "For All Batches" := BatchSelection = BatchSelection::"All Batches";
-                            ShowCurrentBatch := not "For All Batches";
+                            Rec."For All Batches" := BatchSelection = BatchSelection::"All Batches";
+                            ShowCurrentBatch := not Rec."For All Batches";
                         end;
                     }
                     group(Control3)
@@ -192,23 +198,23 @@ page 1815 "Pmt. App. Workflow Setup Wzrd."
 
     trigger OnInit()
     begin
-        if not Get() then begin
-            Init();
-            Insert();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
         LoadTopBanners();
-        CurrentBatchIsLabel := StrSubstNo(CurrentBatchTxt, "Journal Batch Name");
+        CurrentBatchIsLabel := StrSubstNo(CurrentBatchTxt, Rec."Journal Batch Name");
     end;
 
     trigger OnOpenPage()
     begin
         ShowIntroStep();
-        if "For All Batches" then
+        if Rec."For All Batches" then
             BatchSelection := BatchSelection::"All Batches"
         else
             BatchSelection := BatchSelection::"Current Batch Only";
 
-        ShowCurrentBatch := not "For All Batches";
+        ShowCurrentBatch := not Rec."For All Batches";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -291,10 +297,10 @@ page 1815 "Pmt. App. Workflow Setup Wzrd."
         NextEnabled := false;
         FinishEnabled := true;
 
-        if "For All Batches" then
-            SummaryText := StrSubstNo(OverviewTemplateTxt, "Approver ID", AllBatchesTxt)
+        if Rec."For All Batches" then
+            SummaryText := StrSubstNo(OverviewTemplateTxt, Rec."Approver ID", AllBatchesTxt)
         else
-            SummaryText := StrSubstNo(OverviewTemplateTxt, "Approver ID", StrSubstNo(BatchNameTxt, "Journal Batch Name"));
+            SummaryText := StrSubstNo(OverviewTemplateTxt, Rec."Approver ID", StrSubstNo(BatchNameTxt, Rec."Journal Batch Name"));
 
         SummaryText := ConvertStr(SummaryText, '\', '/');
     end;
@@ -315,14 +321,14 @@ page 1815 "Pmt. App. Workflow Setup Wzrd."
 
     local procedure ValidateApprover()
     begin
-        if "Approver ID" = '' then
+        if Rec."Approver ID" = '' then
             Error(MandatoryApproverErr);
     end;
 
     local procedure ValidateBatchSelection()
     begin
-        if not "For All Batches" then
-            if "Journal Batch Name" = '' then
+        if not Rec."For All Batches" then
+            if Rec."Journal Batch Name" = '' then
                 Error(MandatoryBatchErr);
     end;
 

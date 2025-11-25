@@ -110,6 +110,11 @@ table 1691 "Posted Bank Deposit Header"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(24; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';

@@ -21,20 +21,20 @@ page 30006 "APIV2 - Aut. Extension Upload"
         {
             repeater(Group)
             {
-                field(systemId; SystemId)
+                field(systemId; Rec.SystemId)
                 {
                     Caption = 'System Id';
                     Editable = false;
                 }
-                field(schedule; Schedule)
+                field(schedule; Rec.Schedule)
                 {
                     Caption = 'Schedule';
                 }
-                field(schemaSyncMode; "Schema Sync Mode")
+                field(schemaSyncMode; Rec."Schema Sync Mode")
                 {
                     Caption = 'Schema Sync Mode';
                 }
-                field(extensionContent; Content)
+                field(extensionContent; Rec.Content)
                 {
                     Caption = 'Content';
                 }
@@ -48,7 +48,7 @@ page 30006 "APIV2 - Aut. Extension Upload"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Insert();
+        Rec.Insert();
     end;
 
     trigger OnOpenPage()
@@ -63,16 +63,16 @@ page 30006 "APIV2 - Aut. Extension Upload"
         ExtensionManagement: Codeunit "Extension Management";
         FileInStream: InStream;
     begin
-        if Content.HasValue() then begin
-            Content.CreateInStream(FileInStream);
+        if Rec.Content.HasValue() then begin
+            Rec.Content.CreateInStream(FileInStream);
             ExtensionManagement.UploadExtensionToVersion(FileInStream, GlobalLanguage(), Rec.Schedule, Rec."Schema Sync Mode");
-            Delete();
+            Rec.Delete();
         end else
             Error(ExtensionContentEmptyErr);
 
         ActionContext.SetObjectType(ObjectType::Page);
         ActionContext.SetObjectId(Page::"APIV2 - Aut. Extension Upload");
-        ActionContext.AddEntityKey(FieldNo(SystemId), SystemId);
+        ActionContext.AddEntityKey(Rec.FieldNo(SystemId), Rec.SystemId);
         ActionContext.SetResultCode(WebServiceActionResultCode::Updated);
     end;
 

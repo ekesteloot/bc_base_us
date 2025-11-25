@@ -17,26 +17,31 @@ page 30050 "APIV2 - Jobs"
         {
             repeater(Group)
             {
-                field(id; SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'Id';
                     Editable = false;
                 }
-                field(number; "No.")
+                field(number; Rec."No.")
                 {
                     Caption = 'No.';
                 }
-                field(displayName; Description)
+                field(displayName; Rec.Description)
                 {
                     Caption = 'Display Name';
                 }
-            }
-            part(documentAttachments; "APIV2 - Document Attachments")
-            {
-                Caption = 'Document Attachments';
-                EntityName = 'documentAttachment';
-                EntitySetName = 'documentAttachments';
-                SubPageLink = "Document Id" = Field(SystemId), "Document Type" = const(Job);
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
+                    Editable = false;
+                }
+                part(documentAttachments; "APIV2 - Document Attachments")
+                {
+                    Caption = 'Document Attachments';
+                    EntityName = 'documentAttachment';
+                    EntitySetName = 'documentAttachments';
+                    SubPageLink = "Document Id" = field(SystemId), "Document Type" = const(Job);
+                }
             }
         }
     }

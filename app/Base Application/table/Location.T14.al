@@ -1,4 +1,24 @@
-﻿table 14 Location
+﻿namespace Microsoft.InventoryMgt.Location;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.ADCS;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+using System.Email;
+
+table 14 Location
 {
     Caption = 'Location';
     DataCaptionFields = "Code", Name;
@@ -19,7 +39,7 @@
         field(130; "Default Bin Code"; Code[20])
         {
             Caption = 'Default Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
         }
         field(5700; "Name 2"; Text[50])
         {
@@ -36,11 +56,9 @@
         field(5703; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -85,11 +103,9 @@
         field(5714; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -317,6 +333,8 @@
                         Error(Text009, FieldCaption("Bin Mandatory"));
 
                     "Default Bin Selection" := "Default Bin Selection"::"Fixed Bin";
+                    "Pick Bin Policy" := "Pick Bin Policy"::"Default Bin";
+                    "Put-away Bin Policy" := "Put-away Bin Policy"::"Default Bin";
                     OnValidateBinMandatoryOnAfterItemLedgEntrySetFilters(Rec);
                 end;
 
@@ -397,6 +415,12 @@
                     "Default Bin Selection" := "Default Bin Selection"::" ";
                     Clear(Rec."To-Job Bin Code");
                     Validate("Check Whse. Class", true);
+                    "Pick Bin Policy" := "Pick Bin Policy"::"Bin Ranking";
+                    "Put-away Bin Policy" := "Put-away Bin Policy"::"Put-away Template";
+                    "Prod. Consump. Whse. Handling" := "Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)";
+                    "Prod. Output Whse. Handling" := "Prod. Output Whse. Handling"::"No Warehouse Handling";
+                    "Asm. Consump. Whse. Handling" := "Asm. Consump. Whse. Handling"::"Warehouse Pick (mandatory)";
+                    "Job Consump. Whse. Handling" := "Job Consump. Whse. Handling"::"No Warehouse Handling";
                 end else
                     Validate("Adjustment Bin Code", '');
 
@@ -455,14 +479,24 @@
             OptionCaption = 'Never Check Capacity,Allow More Than Max. Capacity,Prohibit More Than Max. Cap.';
             OptionMembers = "Never Check Capacity","Allow More Than Max. Capacity","Prohibit More Than Max. Cap.";
         }
+        field(7310; "Pick Bin Policy"; Enum "Pick Bin Policy")
+        {
+            Caption = 'Pick Bin Policy';
+            InitValue = "Default Bin";
+        }
         field(7311; "Check Whse. Class"; Boolean)
         {
             Caption = 'Check Warehouse Class';
         }
+        field(7312; "Put-away Bin Policy"; Enum "Put-away Bin Policy")
+        {
+            Caption = 'Put-away Bin Policy';
+            InitValue = "Default Bin";
+        }
         field(7313; "Open Shop Floor Bin Code"; Code[20])
         {
             Caption = 'Open Shop Floor Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
 
             trigger OnValidate()
             var
@@ -477,7 +511,7 @@
         field(7314; "To-Production Bin Code"; Code[20])
         {
             Caption = 'To-Production Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
 
             trigger OnValidate()
             var
@@ -492,7 +526,7 @@
         field(7315; "From-Production Bin Code"; Code[20])
         {
             Caption = 'From-Production Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
 
             trigger OnValidate()
             var
@@ -504,10 +538,14 @@
                   DATABASE::Location, Code);
             end;
         }
+        field(7316; "Prod. Consump. Whse. Handling"; Enum "Prod. Consump. Whse. Handling")
+        {
+            Caption = 'Prod. Consump. Whse. Handling';
+        }
         field(7317; "Adjustment Bin Code"; Code[20])
         {
             Caption = 'Adjustment Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
 
             trigger OnValidate()
             begin
@@ -522,6 +560,10 @@
                     CheckWhseAdjmtJnl();
                 end;
             end;
+        }
+        field(7318; "Prod. Output Whse. Handling"; Enum "Prod. Output Whse. Handling")
+        {
+            Caption = 'Prod. Output Whse. Handling';
         }
         field(7319; "Always Create Put-away Line"; Boolean)
         {
@@ -549,12 +591,12 @@
         field(7323; "Receipt Bin Code"; Code[20])
         {
             Caption = 'Receipt Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
         }
         field(7325; "Shipment Bin Code"; Code[20])
         {
             Caption = 'Shipment Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
 
             trigger OnValidate()
             begin
@@ -567,12 +609,12 @@
         field(7326; "Cross-Dock Bin Code"; Code[20])
         {
             Caption = 'Cross-Dock Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
         }
         field(7330; "To-Assembly Bin Code"; Code[20])
         {
             Caption = 'To-Assembly Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
 
             trigger OnValidate()
             var
@@ -587,7 +629,7 @@
         field(7331; "From-Assembly Bin Code"; Code[20])
         {
             Caption = 'From-Assembly Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
 
             trigger OnValidate()
             var
@@ -602,7 +644,7 @@
         field(7332; "Asm.-to-Order Shpt. Bin Code"; Code[20])
         {
             Caption = 'Asm.-to-Order Shpt. Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
 
             trigger OnValidate()
             var
@@ -617,7 +659,7 @@
         field(7333; "To-Job Bin Code"; Code[20])
         {
             Caption = 'To-Job Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD(Code));
+            TableRelation = Bin.Code where("Location Code" = field(Code));
 
             trigger OnValidate()
             var
@@ -626,6 +668,14 @@
                 Rec.TestField("Directed Put-away and Pick", false); //Directed Put-away and pick is not supported for Jobs.
                 WhseIntegrationMgt.CheckBinCode(Rec.Code, Rec."To-Job Bin Code", CopyStr(Rec.FieldCaption(Rec."To-Job Bin Code"), 1, 30), DATABASE::Location, Rec.Code);
             end;
+        }
+        field(7334; "Asm. Consump. Whse. Handling"; Enum "Asm. Consump. Whse. Handling")
+        {
+            Caption = 'Asm. Consump. Whse. Handling';
+        }
+        field(7335; "Job Consump. Whse. Handling"; Enum "Job Consump. Whse. Handling")
+        {
+            Caption = 'Job Consump. Whse. Handling';
         }
         field(7600; "Base Calendar Code"; Code[10])
         {
@@ -674,7 +724,7 @@
         field(10017; "Provincial Tax Area Code"; Code[20])
         {
             Caption = 'Provincial Tax Area Code';
-            TableRelation = "Tax Area" WHERE("Country/Region" = CONST(CA));
+            TableRelation = "Tax Area" where("Country/Region" = const(CA));
 
             trigger OnValidate()
             begin
@@ -1121,6 +1171,18 @@
     procedure PickAccordingToFEFO(): Boolean
     begin
         exit(Rec."Require Pick" and ((Rec."Require Shipment" and Rec."Bin Mandatory") or (not Rec."Require Shipment")));
+    end;
+
+    procedure SelectMultipleLocations(): Text
+    var
+        LocationToSelect: Record Location;
+        LocationList: Page "Location List";
+    begin
+        LocationToSelect.SetRange("Use As In-Transit", false);
+        LocationList.SetTableView(LocationToSelect);
+        LocationList.LookupMode(true);
+        if LocationList.RunModal() = ACTION::LookupOK then
+            exit(LocationList.GetSelectionFilter());
     end;
 
     [IntegrationEvent(false, false)]

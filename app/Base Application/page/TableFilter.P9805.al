@@ -1,4 +1,9 @@
-﻿page 9805 "Table Filter"
+﻿namespace System.Text;
+
+using System.Reflection;
+using System.Security.AccessControl;
+
+page 9805 "Table Filter"
 {
     AutoSplitKey = true;
     Caption = 'Table Filter';
@@ -24,11 +29,11 @@
                         "Field": Record "Field";
                         FieldSelection: Codeunit "Field Selection";
                     begin
-                        Field.SetRange(TableNo, "Table Number");
+                        Field.SetRange(TableNo, Rec."Table Number");
                         if FieldSelection.Open(Field) then begin
-                            if Field."No." = "Field Number" then
+                            if Field."No." = Rec."Field Number" then
                                 exit;
-                            CheckDuplicateField(Field);
+                            Rec.CheckDuplicateField(Field);
                             FillSourceRecord(Field);
                             CurrPage.Update(true);
                         end;
@@ -80,14 +85,14 @@
 
     local procedure FillSourceRecord("Field": Record "Field")
     begin
-        SetRange("Field Number");
-        Init();
+        Rec.SetRange("Field Number");
+        Rec.Init();
 
-        "Table Number" := Field.TableNo;
-        "Table Name" := Field.TableName;
-        "Field Number" := Field."No.";
-        "Field Name" := Field.FieldName;
-        "Field Caption" := Field."Field Caption";
+        Rec."Table Number" := Field.TableNo;
+        Rec."Table Name" := Field.TableName;
+        Rec."Field Number" := Field."No.";
+        Rec."Field Name" := Field.FieldName;
+        Rec."Field Caption" := Field."Field Caption";
     end;
 
     procedure SetSourceTable(TableFilterText: Text; NewTableNumber: Integer; NewTableCaption: Text)
@@ -107,10 +112,10 @@
 
     local procedure InitSourceTable()
     begin
-        Init();
-        "Table Number" := SourceTableNumber;
-        "Table Name" := SourceTableName;
-        "Line No." := 0;
+        Rec.Init();
+        Rec."Table Number" := SourceTableNumber;
+        Rec."Table Name" := SourceTableName;
+        Rec."Line No." := 0;
     end;
 
     local procedure ParseTableFilter(TableFilterText: Text)
@@ -216,7 +221,7 @@
     begin
         TextFieldFilter := CreateTextTableFilterWithoutTableName(CurrentLineOnly);
         if StrLen(TextFieldFilter) > 0 then
-            TextTableFilter := QuoteValue("Table Name", ':') + ': ' + TextFieldFilter;
+            TextTableFilter := QuoteValue(Rec."Table Name", ':') + ': ' + TextFieldFilter;
         exit(TextTableFilter);
     end;
 
@@ -230,7 +235,7 @@
         if CurrentLineOnly then
             AppendFieldFilter(TextTableFilter, CreateTextFieldFilter())
         else
-            if Find('-') then
+            if Rec.Find('-') then
                 repeat
                     TextFieldFilter := CreateTextFieldFilter();
                     if StrLen(TextFieldFilter) > 0 then begin
@@ -239,15 +244,15 @@
                         FirstField := false;
                         AppendFieldFilter(TextTableFilter, TextFieldFilter);
                     end;
-                until Next() = 0;
+                until Rec.Next() = 0;
 
         exit(TextTableFilter);
     end;
 
     local procedure CreateTextFieldFilter(): Text
     begin
-        if ("Field Number" > 0) and (StrLen("Field Filter") > 0) then
-            exit(QuoteValue("Field Caption", '=') + '=' + QuoteValue("Field Filter", ','));
+        if (Rec."Field Number" > 0) and (StrLen(Rec."Field Filter") > 0) then
+            exit(QuoteValue(Rec."Field Caption", '=') + '=' + QuoteValue(Rec."Field Filter", ','));
 
         exit('');
     end;
@@ -297,7 +302,7 @@
         else
             TableName2 := GetValue(TableFilterText, ':');
 
-        TableNamesEqual := TableName2 = "Table Name";
+        TableNamesEqual := TableName2 = Rec."Table Name";
 
         if TableNamesEqual then
             // Remove the first blank space:
@@ -319,11 +324,11 @@
             FieldName2 := GetValue(TableFilterText, '=');
 
         FieldTable.Reset();
-        FieldTable.SetRange(TableNo, "Table Number");
+        FieldTable.SetRange(TableNo, Rec."Table Number");
         FieldTable.SetRange("Field Caption", FieldName2);
         FieldTable.FindFirst();
         FillSourceRecord(FieldTable);
-        "Line No." := 0;
+        Rec."Line No." := 0;
     end;
 
     local procedure ExtractFieldFilter(var TableFilterText: Text)
@@ -337,7 +342,7 @@
         else
             FieldFilter2 := GetValue(TableFilterText, ',');
 
-        "Field Filter" := FieldFilter2;
+        Rec."Field Filter" := FieldFilter2;
         CurrPage.Update(true);
     end;
 
@@ -346,10 +351,10 @@
         RecordRef: RecordRef;
         FieldRef: FieldRef;
     begin
-        RecordRef.Open("Table Number");
-        FieldRef := RecordRef.Field("Field Number");
-        FieldRef.SetFilter("Field Filter");
-        "Field Filter" := FieldRef.GetFilter;
+        RecordRef.Open(Rec."Table Number");
+        FieldRef := RecordRef.Field(Rec."Field Number");
+        FieldRef.SetFilter(Rec."Field Filter");
+        Rec."Field Filter" := FieldRef.GetFilter;
         RecordRef.Close();
     end;
 
@@ -363,12 +368,12 @@
         RecRef: RecordRef;
         FldRef: FieldRef;
     begin
-        RecRef.Open("Table Number");
-        if FindSet() then
+        RecRef.Open(Rec."Table Number");
+        if Rec.FindSet() then
             repeat
-                FldRef := RecRef.Field("Field Number");
-                FldRef.SetFilter("Field Filter");
-            until Next() = 0;
+                FldRef := RecRef.Field(Rec."Field Number");
+                FldRef.SetFilter(Rec."Field Filter");
+            until Rec.Next() = 0;
         exit(RecRef.GetView());
     end;
 
@@ -376,12 +381,12 @@
     begin
         TempTableFilter.Reset();
         TempTableFilter.DeleteAll();
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
                 TempTableFilter.Init();
                 TempTableFilter.TransferFields(Rec);
                 TempTableFilter.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 }
 

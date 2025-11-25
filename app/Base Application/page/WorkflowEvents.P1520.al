@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1520 "Workflow Events"
 {
     Caption = 'Workflow Events';
@@ -7,7 +9,7 @@ page 1520 "Workflow Events"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Workflow Event";
-    SourceTableView = SORTING(Independent, Description);
+    SourceTableView = sorting(Independent, Description);
 
     layout
     {
@@ -45,7 +47,7 @@ page 1520 "Workflow Events"
     var
         WorkflowWebhookEvents: Codeunit "Workflow Webhook Events";
     begin
-        SetFilter("Function Name", '<>%1', WorkflowWebhookEvents.WorkflowWebhookResponseReceivedEventCode());
+        Rec.SetFilter("Function Name", '<>%1', WorkflowWebhookEvents.WorkflowWebhookResponseReceivedEventCode());
     end;
 
     var
@@ -53,7 +55,7 @@ page 1520 "Workflow Events"
 
     local procedure GetStyle(): Text
     begin
-        if HasPredecessors() then
+        if Rec.HasPredecessors() then
             exit('Strong');
         exit('');
     end;

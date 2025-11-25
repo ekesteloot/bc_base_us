@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 page 9152 "My Items"
 {
     Caption = 'My Items';
@@ -37,7 +39,7 @@ page 9152 "My Items"
                     Lookup = false;
                     ToolTip = 'Specifies the item''s unit price.';
                 }
-                field(Inventory; Inventory)
+                field(Inventory; Rec.Inventory)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Inventory';
@@ -58,7 +60,7 @@ page 9152 "My Items"
                 Caption = 'Open';
                 Image = ViewDetails;
                 RunObject = Page "Item Card";
-                RunPageLink = "No." = FIELD("Item No.");
+                RunPageLink = "No." = field("Item No.");
                 RunPageMode = View;
                 ShortCutKey = 'Return';
                 ToolTip = 'Open the card for the selected record.';
@@ -78,7 +80,7 @@ page 9152 "My Items"
 
     trigger OnOpenPage()
     begin
-        SetRange("User ID", UserId);
+        Rec.SetRange("User ID", UserId);
     end;
 
     var
@@ -90,12 +92,12 @@ page 9152 "My Items"
     begin
         Clear(Item);
 
-        if Item.Get("Item No.") then
-            if (Description <> Item.Description) or ("Unit Price" <> Item."Unit Price") then begin
-                Description := Item.Description;
-                "Unit Price" := Item."Unit Price";
-                if MyItem.Get("User ID", "Item No.") then
-                    Modify();
+        if Item.Get(Rec."Item No.") then
+            if (Rec.Description <> Item.Description) or (Rec."Unit Price" <> Item."Unit Price") then begin
+                Rec.Description := Item.Description;
+                Rec."Unit Price" := Item."Unit Price";
+                if MyItem.Get(Rec."User ID", Rec."Item No.") then
+                    Rec.Modify();
             end;
     end;
 }

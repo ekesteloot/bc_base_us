@@ -1,3 +1,16 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Integration.Entity;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using System;
+using System.Environment;
+using System.Reflection;
+
 table 469 "Workflow Webhook Subscription"
 {
     Caption = 'Workflow Webhook Subscription';

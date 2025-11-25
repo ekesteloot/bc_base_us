@@ -1,4 +1,11 @@
-﻿report 193 "Issue Finance Charge Memos"
+﻿namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Setup;
+using System.Utilities;
+
+report 193 "Issue Finance Charge Memos"
 {
     Caption = 'Issue Finance Charge Memos';
     ProcessingOnly = true;
@@ -7,7 +14,7 @@
     {
         dataitem("Finance Charge Memo Header"; "Finance Charge Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Finance Charge Memo';
 
@@ -199,7 +206,6 @@
         OldProgress: Integer;
         NewDateTime: DateTime;
         OldDateTime: DateTime;
-        [InDataSet]
         IsJournalTemplNameVisible: Boolean;
 
         EnterPostingDateErr: Label 'Enter the posting date.';

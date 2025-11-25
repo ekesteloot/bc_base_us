@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 page 9848 "User Security Groups Part"
 {
     Caption = 'Security Groups';
@@ -40,7 +42,7 @@ page 9848 "User Security Groups Part"
 
     trigger OnOpenPage()
     begin
-        if Rec.IsEmpty() then
+        if not IsInitializedByParentPage then
             Refresh();
     end;
 
@@ -53,7 +55,11 @@ page 9848 "User Security Groups Part"
 
     internal procedure Refresh(var SecurityGroupMemberBuffer: Record "Security Group Member Buffer")
     begin
+        IsInitializedByParentPage := true;
         Rec.Copy(SecurityGroupMemberBuffer, true);
     end;
+
+    var
+        IsInitializedByParentPage: Boolean;
 }
 

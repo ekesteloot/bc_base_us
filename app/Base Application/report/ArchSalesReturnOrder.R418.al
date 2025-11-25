@@ -1,14 +1,30 @@
+﻿namespace Microsoft.Sales.Archive;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 418 "Arch. Sales Return Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/ArchSalesReturnOrder.rdlc';
+    RDLCLayout = './Sales/Archive/ArchSalesReturnOrder.rdlc';
     Caption = 'Arch. Sales Return Order';
 
     dataset
     {
         dataitem("Sales Header Archive"; "Sales Header Archive")
         {
-            DataItemTableView = SORTING("Document Type", "No.", "Doc. No. Occurrence", "Version No.") WHERE("Document Type" = CONST("Return Order"));
+            DataItemTableView = sorting("Document Type", "No.", "Doc. No. Occurrence", "Version No.") where("Document Type" = const("Return Order"));
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed", "Version No.";
             RequestFilterHeading = 'Archived Sales Order';
             column(Sales_Header_Archive_Document_Type; "Document Type")
@@ -25,10 +41,10 @@ report 418 "Arch. Sales Return Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2_Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -188,7 +204,7 @@ report 418 "Arch. Sales Return Order"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Sales Header Archive";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -238,9 +254,9 @@ report 418 "Arch. Sales Return Order"
                     }
                     dataitem("Sales Line Archive"; "Sales Line Archive")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Sales Header Archive";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -249,7 +265,7 @@ report 418 "Arch. Sales Return Order"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(TypeInt; TypeInt)
                         {
                         }
@@ -442,7 +458,7 @@ report 418 "Arch. Sales Return Order"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_Control82; DimText)
                             {
                             }
@@ -537,7 +553,7 @@ report 418 "Arch. Sales Return Order"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmountLine__VAT_Base_; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Sales Header Archive"."Currency Code";
@@ -699,7 +715,7 @@ report 418 "Arch. Sales Return Order"
                     }
                     dataitem(VATCounterLCY; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VALExchRate; VALExchRate)
                         {
                         }
@@ -809,7 +825,7 @@ report 418 "Arch. Sales Return Order"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(PaymentTerms_Description; PaymentTerms.Description)
                         {
                         }
@@ -828,7 +844,7 @@ report 418 "Arch. Sales Return Order"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Sales_Header_Archive___Sell_to_Customer_No__; "Sales Header Archive"."Sell-to Customer No.")
                         {
                         }
@@ -918,6 +934,7 @@ report 418 "Arch. Sales Return Order"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Sales Header Archive");
@@ -994,9 +1011,6 @@ report 418 "Arch. Sales Return Order"
         PrepmtPaymentTerms: Record "Payment Terms";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyBankAccount: Record "Bank Account";
-        CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         TempSalesLineArchive: Record "Sales Line Archive" temporary;
@@ -1088,6 +1102,11 @@ report 418 "Arch. Sales Return Order"
         PaymentTerms_DescriptionCaptionLbl: Label 'Payment Terms';
         ShipmentMethod_DescriptionCaptionLbl: Label 'Shipment Method';
         Ship_to_AddressCaptionLbl: Label 'Ship-to Address';
+
+    protected var
+        CompanyInfo: Record "Company Information";
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
 
     local procedure IsReportInPreviewMode(): Boolean
     var

@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+
 page 5747 "Transfer Routes"
 {
     AdditionalSearchTerms = 'transit route,in-transit';
@@ -10,7 +15,7 @@ page 5747 "Transfer Routes"
     PageType = Card;
     SaveValues = true;
     SourceTable = Location;
-    SourceTableView = WHERE("Use As In-Transit" = CONST(false));
+    SourceTableView = where("Use As In-Transit" = const(false));
     UsageCategory = Administration;
 
     layout

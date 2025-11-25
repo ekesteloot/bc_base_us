@@ -1433,7 +1433,7 @@ codeunit 99000810 "Calculate Planning Route Line"
                 DampTime := DampTimeWorkCenter
             else
                 if AvailCap + DampTime = AvailCapWorkCenter + DampTimeWorkCenter then
-                    DampTime := Max(DampTime, DampTimeWorkCenter);
+                    DampTime := max(DampTime, DampTimeWorkCenter);
             AvailCap := Round(Min(AvailCap, AvailCapWorkCenter), 1);
         end;
     end;

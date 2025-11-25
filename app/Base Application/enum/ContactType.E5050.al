@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 enum 5050 "Contact Type"
 {
     Extensible = true;

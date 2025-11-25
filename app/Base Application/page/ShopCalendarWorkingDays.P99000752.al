@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 page 99000752 "Shop Calendar Working Days"
 {
     Caption = 'Shop Calendar Working Days';
@@ -12,7 +14,7 @@ page 99000752 "Shop Calendar Working Days"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Day; Day)
+                field(Day; Rec.Day)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies your working days of the week.';

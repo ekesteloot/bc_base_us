@@ -1,8 +1,30 @@
 #if not CLEAN21
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Calculation;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Setup;
+using System.Environment.Configuration;
+using System.Threading;
+
 /// <summary>
 /// Copies pricing data from old tables to "Price List Line" and "Price List Header" table.
 /// </summary>
-Codeunit 7049 "Feature - Price Calculation" implements "Feature Data Update"
+codeunit 7049 "Feature - Price Calculation" implements "Feature Data Update"
 {
     ObsoleteState = Pending;
     ObsoleteTag = '19.0';

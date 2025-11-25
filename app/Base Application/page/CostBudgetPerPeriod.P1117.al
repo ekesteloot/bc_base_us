@@ -1,3 +1,9 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 1117 "Cost Budget per Period"
 {
     Caption = 'Cost Budget per Period';
@@ -282,7 +288,7 @@ page 1117 "Cost Budget per Period"
     begin
         OnBeforeOnOpenPage(PeriodType);
         SetMatrixColumns("Matrix Page Step Type"::Initial);
-        BudgetFilter := GetFilter("Budget Filter");
+        BudgetFilter := Rec.GetFilter("Budget Filter");
         GenerateColumnCaptions("Matrix Page Step Type"::Initial);
         UpdateMatrixSubform();
     end;

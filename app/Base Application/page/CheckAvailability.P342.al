@@ -33,7 +33,7 @@ page 342 "Check Availability"
             part(ItemAvailabilityCheckDet; "Item Availability Check Det.")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
         }
     }
@@ -48,7 +48,7 @@ page 342 "Check Availability"
 
     procedure SetValues(ItemNo: Code[20]; UnitOfMeasureCode: Code[10]; InventoryQty2: Decimal; GrossReq: Decimal; ReservedReq: Decimal; SchedRcpt: Decimal; ReservedRcpt: Decimal; CurrentQuantity: Decimal; CurrentReservedQty: Decimal; TotalQuantity2: Decimal; EarliestAvailDate: Date)
     begin
-        Get(ItemNo);
+        Rec.Get(ItemNo);
         CurrPage.ItemAvailabilityCheckDet.PAGE.SetUnitOfMeasureCode(UnitOfMeasureCode);
         InventoryQty := InventoryQty2;
         CurrPage.ItemAvailabilityCheckDet.PAGE.SetGrossReq(GrossReq);

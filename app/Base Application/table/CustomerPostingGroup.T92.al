@@ -1,3 +1,11 @@
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+
 table 92 "Customer Posting Group"
 {
     Caption = 'Customer Posting Group';

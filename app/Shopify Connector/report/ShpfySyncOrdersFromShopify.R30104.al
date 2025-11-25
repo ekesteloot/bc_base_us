@@ -151,6 +151,7 @@ report 30104 "Shpfy Sync Orders from Shopify"
                 repeat
                     IReturnRefundProcess.CreateSalesDocument("Shpfy Source Document Type"::Refund, RefundHeader."Refund Id");
                     Commit();
+
                     if GuiAllowed then begin
                         ToProcess -= 1;
                         Dialog.Update();

@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.ADCS;
+
+using Microsoft.WarehouseMgt.Activity;
+using System;
+using System.Xml;
+
 codeunit 7708 "Miniform Pick Activity List"
 {
     TableNo = "Miniform Header";
@@ -11,7 +17,7 @@ codeunit 7708 "Miniform Pick Activity List"
           RootNode, XMLDOMMgt, ADCSCommunication, ADCSUserId,
           CurrentCode, StackCode, WhseEmpId, LocationFilter);
 
-        if Code <> CurrentCode then
+        if Rec.Code <> CurrentCode then
             PrepareData()
         else
             ProcessSelection();

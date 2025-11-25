@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using System.Utilities;
+
 report 1393 "Cancel Issued Reminders"
 {
     AdditionalSearchTerms = 'cancel issued reminder';
@@ -181,9 +188,7 @@ report 1393 "Cancel Issued Reminders"
         UseSameDocumentNo: Boolean;
         UseSamePostingDate, UseSameVATDateReq : Boolean;
         NewPostingDate, NewVATDateReq : Date;
-        [InDataSet]
         NewPostingDateEnabled: Boolean;
-        [InDataSet]
         IsJournalTemplNameVisible: Boolean;
         VATDateEnabled: Boolean;
         SpecifyPostingDateErr: Label 'You must specify a Posting Date.';

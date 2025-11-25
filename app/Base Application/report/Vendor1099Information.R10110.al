@@ -10,7 +10,7 @@ report 10110 "Vendor 1099 Information"
     {
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Date Filter";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -50,7 +50,7 @@ report 10110 "Vendor 1099 Information"
             }
             dataitem("1099Loop"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(Codes; Codes[i])
                 {
                 }
@@ -75,7 +75,7 @@ report 10110 "Vendor 1099 Information"
             }
             dataitem(VendorTotal; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) WHERE(Number = const(1));
                 column(VendorNo; Vendor."No.")
                 {
                 }
@@ -121,7 +121,7 @@ report 10110 "Vendor 1099 Information"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             column(FormTypeCount; FormTypeCount)
             {
             }

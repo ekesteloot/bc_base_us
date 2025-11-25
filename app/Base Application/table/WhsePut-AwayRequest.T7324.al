@@ -1,3 +1,11 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Structure;
+
 table 7324 "Whse. Put-away Request"
 {
     Caption = 'Whse. Put-away Request';
@@ -12,9 +20,9 @@ table 7324 "Whse. Put-away Request"
         field(2; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = IF ("Document Type" = CONST(Receipt)) "Posted Whse. Receipt Header"."No."
-            ELSE
-            IF ("Document Type" = CONST("Internal Put-away")) "Whse. Internal Put-away Header"."No.";
+            TableRelation = if ("Document Type" = const(Receipt)) "Posted Whse. Receipt Header"."No."
+            else
+            if ("Document Type" = const("Internal Put-away")) "Whse. Internal Put-away Header"."No.";
 
             trigger OnLookup()
             var
@@ -44,15 +52,15 @@ table 7324 "Whse. Put-away Request"
         field(4; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
         }
         field(5; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                               "Zone Code" = FIELD("Zone Code"));
+            TableRelation = if ("Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                               "Zone Code" = field("Zone Code"));
         }
         field(7; "Completely Put Away"; Boolean)
         {

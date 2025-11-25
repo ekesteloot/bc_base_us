@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 /// <summary>
 /// Specifies the rank of a permission.
 /// The higher the rank (value) is, the more restrictive the persmission is.

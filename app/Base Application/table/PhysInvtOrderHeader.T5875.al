@@ -1,3 +1,17 @@
+﻿namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Employee;
+using Microsoft.InventoryMgt.Counting.Comment;
+using Microsoft.InventoryMgt.Counting.History;
+using Microsoft.InventoryMgt.Counting.Recording;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Sales.History;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5875 "Phys. Invt. Order Header"
 {
     Caption = 'Phys. Invt. Order Header';
@@ -72,9 +86,9 @@ table 5875 "Phys. Invt. Order Header"
         }
         field(30; Comment; Boolean)
         {
-            CalcFormula = Exist("Phys. Invt. Comment Line" WHERE("Document Type" = CONST(Order),
-                                                                  "Order No." = FIELD("No."),
-                                                                  "Recording No." = CONST(0)));
+            CalcFormula = exist("Phys. Invt. Comment Line" where("Document Type" = const(Order),
+                                                                  "Order No." = field("No."),
+                                                                  "Recording No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -83,8 +97,6 @@ table 5875 "Phys. Invt. Order Header"
         {
             Caption = 'Person Responsible';
             TableRelation = Employee;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(40; "Reason Code"; Code[10])
@@ -101,24 +113,24 @@ table 5875 "Phys. Invt. Order Header"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(51; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(60; "Posting No. Series"; Code[20])
@@ -166,8 +178,8 @@ table 5875 "Phys. Invt. Order Header"
         }
         field(71; "No. Finished Recordings"; Integer)
         {
-            CalcFormula = Count("Phys. Invt. Record Header" WHERE("Order No." = FIELD("No."),
-                                                                   Status = CONST(Finished)));
+            CalcFormula = count("Phys. Invt. Record Header" where("Order No." = field("No."),
+                                                                   Status = const(Finished)));
             Caption = 'No. Finished Recordings';
             Editable = false;
             FieldClass = FlowField;
@@ -185,7 +197,7 @@ table 5875 "Phys. Invt. Order Header"
         field(111; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             var
@@ -212,7 +224,7 @@ table 5875 "Phys. Invt. Order Header"
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
 
             trigger OnValidate()

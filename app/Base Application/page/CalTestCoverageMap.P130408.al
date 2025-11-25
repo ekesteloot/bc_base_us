@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 page 130408 "CAL Test Coverage Map"
 {
     Caption = 'CAL Test Coverage Map';
@@ -5,7 +7,7 @@ page 130408 "CAL Test Coverage Map"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "CAL Test Coverage Map";
-    SourceTableView = SORTING("Object Type", "Object ID");
+    SourceTableView = sorting("Object Type", "Object ID");
 
     layout
     {
@@ -35,7 +37,7 @@ page 130408 "CAL Test Coverage Map"
 
                     trigger OnDrillDown()
                     begin
-                        ShowTestCodeunits();
+                        Rec.ShowTestCodeunits();
                     end;
                 }
                 field("Test Codeunit ID"; Rec."Test Codeunit ID")
@@ -83,8 +85,8 @@ page 130408 "CAL Test Coverage Map"
 
     trigger OnOpenPage()
     begin
-        TestCodeunitVisible := GetFilter("Test Codeunit ID") = '';
-        ObjectVisible := (GetFilter("Object ID") = '') and (GetFilter("Object Type") = '');
+        TestCodeunitVisible := Rec.GetFilter("Test Codeunit ID") = '';
+        ObjectVisible := (Rec.GetFilter("Object ID") = '') and (Rec.GetFilter("Object Type") = '');
     end;
 
     var

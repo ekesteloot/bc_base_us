@@ -1,3 +1,14 @@
+﻿namespace Microsoft.Purchases.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using System.Text;
+using System.Utilities;
+
 page 7157 "Purch. Analysis by Dimensions"
 {
     Caption = 'Purch. Analysis by Dimensions';
@@ -69,9 +80,9 @@ page 7157 "Purch. Analysis by Dimensions"
                           ItemAnalysisView, LineDimCode, LineDimType, ColumnDimType,
                           InternalDateFilter, DateFilter, ItemStatisticsBuffer, PeriodInitialized);
                         if LineDimType = LineDimType::Period then
-                            SetCurrentKey("Period Start")
+                            Rec.SetCurrentKey("Period Start")
                         else
-                            SetCurrentKey(Code);
+                            Rec.SetCurrentKey(Code);
                         LineDimCodeOnAfterValidate();
                     end;
                 }
@@ -514,11 +525,8 @@ page 7157 "Purch. Analysis by Dimensions"
         MATRIX_CodeRange: Text[250];
         MATRIX_CurrSetLength: Integer;
         NewItemAnalysisCode: Code[10];
-        [InDataSet]
         Dim1FilterEnable: Boolean;
-        [InDataSet]
         Dim2FilterEnable: Boolean;
-        [InDataSet]
         Dim3FilterEnable: Boolean;
 
     local procedure FindPeriod(SearchText: Code[3])

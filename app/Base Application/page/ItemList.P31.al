@@ -1,4 +1,51 @@
-﻿#pragma warning disable AS0106 // Protected variable PowerBIVisible was removed before AS0106 was introduced.
+﻿namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.AssemblyMgt.Reports;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Item.Attribute;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Item.Picture;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Reports;
+using Microsoft.Manufacturing.StandardCost;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Reports;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Resources;
+using Microsoft.WarehouseMgt.ADCS;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+using System.Automation;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration.PowerBI;
+using System.Reflection;
+using System.Text;
+
+#pragma warning disable AS0106 // Protected variable PowerBIVisible was removed before AS0106 was introduced.
 page 31 "Item List"
 #pragma warning restore AS0106
 {
@@ -44,7 +91,7 @@ page 31 "Item List"
                     ToolTip = 'Specifies if the item card represents a physical inventory unit (Inventory), a labor time unit (Service), or a physical unit that is not tracked in inventory (Non-Inventory).';
                     Visible = IsFoundationEnabled;
                 }
-                field(InventoryField; Inventory)
+                field(InventoryField; Rec.Inventory)
                 {
                     ApplicationArea = Invoicing, Basic, Suite;
                     HideValue = IsNonInventoriable;
@@ -204,7 +251,7 @@ page 31 "Item List"
                     ToolTip = 'Specifies the category that the item belongs to. Item categories also contain any assigned item attributes.';
                     Visible = false;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that transactions with the item cannot be posted, for example, because the item is in quarantine.';
@@ -288,6 +335,12 @@ page 31 "Item List"
                     ToolTip = 'Specifies that the item is coupled to a product in Dynamics 365 Sales.';
                     Visible = CRMIntegrationEnabled;
                 }
+                field(GTIN; Rec.GTIN)
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies Global Trade Item Number for tracking.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)
@@ -300,66 +353,66 @@ page 31 "Item List"
             part(Control1901314507; "Item Invoicing FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                              "Location Filter" = FIELD("Location Filter"),
-                              "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                              "Bin Filter" = FIELD("Bin Filter"),
-                              "Variant Filter" = FIELD("Variant Filter"),
-                              "Lot No. Filter" = FIELD("Lot No. Filter"),
-                              "Serial No. Filter" = FIELD("Serial No. Filter");
+                SubPageLink = "No." = field("No."),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                              "Location Filter" = field("Location Filter"),
+                              "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                              "Bin Filter" = field("Bin Filter"),
+                              "Variant Filter" = field("Variant Filter"),
+                              "Lot No. Filter" = field("Lot No. Filter"),
+                              "Serial No. Filter" = field("Serial No. Filter");
             }
             part(Control1903326807; "Item Replenishment FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                              "Location Filter" = FIELD("Location Filter"),
-                              "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                              "Bin Filter" = FIELD("Bin Filter"),
-                              "Variant Filter" = FIELD("Variant Filter"),
-                              "Lot No. Filter" = FIELD("Lot No. Filter"),
-                              "Serial No. Filter" = FIELD("Serial No. Filter");
+                SubPageLink = "No." = field("No."),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                              "Location Filter" = field("Location Filter"),
+                              "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                              "Bin Filter" = field("Bin Filter"),
+                              "Variant Filter" = field("Variant Filter"),
+                              "Lot No. Filter" = field("Lot No. Filter"),
+                              "Serial No. Filter" = field("Serial No. Filter");
                 Visible = false;
             }
             part(Control1906840407; "Item Planning FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                              "Location Filter" = FIELD("Location Filter"),
-                              "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                              "Bin Filter" = FIELD("Bin Filter"),
-                              "Variant Filter" = FIELD("Variant Filter"),
-                              "Lot No. Filter" = FIELD("Lot No. Filter"),
-                              "Serial No. Filter" = FIELD("Serial No. Filter");
+                SubPageLink = "No." = field("No."),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                              "Location Filter" = field("Location Filter"),
+                              "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                              "Bin Filter" = field("Bin Filter"),
+                              "Variant Filter" = field("Variant Filter"),
+                              "Lot No. Filter" = field("Lot No. Filter"),
+                              "Serial No. Filter" = field("Serial No. Filter");
             }
             part(Control1901796907; "Item Warehouse FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No."),
-                              "Date Filter" = FIELD("Date Filter"),
-                              "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                              "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                              "Location Filter" = FIELD("Location Filter"),
-                              "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                              "Bin Filter" = FIELD("Bin Filter"),
-                              "Variant Filter" = FIELD("Variant Filter"),
-                              "Lot No. Filter" = FIELD("Lot No. Filter"),
-                              "Serial No. Filter" = FIELD("Serial No. Filter");
+                SubPageLink = "No." = field("No."),
+                              "Date Filter" = field("Date Filter"),
+                              "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                              "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                              "Location Filter" = field("Location Filter"),
+                              "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                              "Bin Filter" = field("Bin Filter"),
+                              "Variant Filter" = field("Variant Filter"),
+                              "Lot No. Filter" = field("Lot No. Filter"),
+                              "Serial No. Filter" = field("Serial No. Filter");
                 Visible = false;
             }
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::Item), "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::Item), "No." = field("No.");
             }
             part(ItemAttributesFactBox; "Item Attributes Factbox")
             {
@@ -423,9 +476,9 @@ page 31 "Item List"
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Category5;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Item No." = FIELD("No.");
-                        RunPageView = SORTING("Item No.")
-                                      ORDER(Descending);
+                        RunPageLink = "Item No." = field("No.");
+                        RunPageView = sorting("Item No.")
+                                      order(Descending);
                         Scope = Repeater;
                         ShortCutKey = 'Ctrl+F7';
                         ToolTip = 'View the history of transactions that have been posted for the selected record.';
@@ -438,8 +491,8 @@ page 31 "Item List"
                         //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                         //PromotedCategory = Category5;
                         RunObject = Page "Phys. Inventory Ledger Entries";
-                        RunPageLink = "Item No." = FIELD("No.");
-                        RunPageView = SORTING("Item No.");
+                        RunPageLink = "Item No." = field("No.");
+                        RunPageView = sorting("Item No.");
                         Scope = Repeater;
                         ToolTip = 'View how many units of the item you had in stock at the last physical count.';
                     }
@@ -449,9 +502,9 @@ page 31 "Item List"
                         Caption = '&Reservation Entries';
                         Image = ReservationLedger;
                         RunObject = Page "Reservation Entries";
-                        RunPageLink = "Reservation Status" = CONST(Reservation),
-                                      "Item No." = FIELD("No.");
-                        RunPageView = SORTING("Item No.", "Variant Code", "Location Code", "Reservation Status");
+                        RunPageLink = "Reservation Status" = const(Reservation),
+                                      "Item No." = field("No.");
+                        RunPageView = sorting("Item No.", "Variant Code", "Location Code", "Reservation Status");
                         ToolTip = 'View all reservations that are made for the item, either manually or automatically.';
                     }
                     action("&Value Entries")
@@ -460,8 +513,8 @@ page 31 "Item List"
                         Caption = '&Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Item No." = FIELD("No.");
-                        RunPageView = SORTING("Item No.");
+                        RunPageLink = "Item No." = field("No.");
+                        RunPageView = sorting("Item No.");
                         ToolTip = 'View the history of posted amounts that affect the value of the item. Value entries are created for every transaction with the item.';
                     }
                     action("Item &Tracking Entries")
@@ -475,7 +528,7 @@ page 31 "Item List"
                         var
                             ItemTrackingDocMgt: Codeunit "Item Tracking Doc. Management";
                         begin
-                            ItemTrackingDocMgt.ShowItemTrackingForEntity(3, '', "No.", '', '');
+                            ItemTrackingDocMgt.ShowItemTrackingForEntity(3, '', Rec."No.", '', '');
                         end;
                     }
                     action("&Warehouse Entries")
@@ -484,8 +537,8 @@ page 31 "Item List"
                         Caption = '&Warehouse Entries';
                         Image = BinLedger;
                         RunObject = Page "Warehouse Entries";
-                        RunPageLink = "Item No." = FIELD("No.");
-                        RunPageView = SORTING("Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code", "Lot No.", "Serial No.", "Entry Type", Dedicated);
+                        RunPageLink = "Item No." = field("No.");
+                        RunPageView = sorting("Item No.", "Bin Code", "Location Code", "Variant Code", "Unit of Measure Code", "Lot No.", "Serial No.", "Entry Type", Dedicated);
                         ToolTip = 'View the history of quantities that are registered for the item in warehouse activities. ';
                     }
                 }
@@ -609,8 +662,8 @@ page 31 "Item List"
                     Image = Price;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Purchase Prices";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("No.");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'Set up purchase prices for the item. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -623,7 +676,7 @@ page 31 "Item List"
                     Image = LineDiscount;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Purchase Line Discounts";
-                    RunPageLink = "Item No." = FIELD("No.");
+                    RunPageLink = "Item No." = field("No.");
                     ToolTip = 'Set up purchase discounts for the item. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -764,7 +817,7 @@ page 31 "Item List"
                         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelItemApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
             }
@@ -816,7 +869,7 @@ page 31 "Item List"
                     var
                         Item: Record Item;
                     begin
-                        Item.SetRange("No.", "No.");
+                        Item.SetRange("No.", Rec."No.");
                         REPORT.RunModal(REPORT::"Create Stockkeeping Unit", true, false, Item);
                     end;
                 }
@@ -880,7 +933,7 @@ page 31 "Item List"
                         AdjustInventory: Page "Adjust Inventory";
                     begin
                         Commit();
-                        AdjustInventory.SetItem("No.");
+                        AdjustInventory.SetItem(Rec."No.");
                         AdjustInventory.RunModal();
                     end;
                 }
@@ -920,13 +973,13 @@ page 31 "Item List"
                     FilterText := ItemAttributeManagement.GetItemNoFilterText(TempItemFilteredFromAttributes, ParameterCount);
 
                     if ParameterCount < TypeHelper.GetMaxNumberOfParametersInSQLQuery() - 100 then begin
-                        FilterGroup(0);
-                        MarkedOnly(false);
-                        SetFilter("No.", FilterText);
+                        Rec.FilterGroup(0);
+                        Rec.MarkedOnly(false);
+                        Rec.SetFilter("No.", FilterText);
                     end else begin
                         RunOnTempRec := true;
-                        ClearMarks();
-                        Reset();
+                        Rec.ClearMarks();
+                        Rec.Reset();
                     end;
                 end;
             }
@@ -1166,7 +1219,7 @@ page 31 "Item List"
                     Image = "Report";
                     Visible = not ExtendedPriceEnabled;
 #if not CLEAN21
-                    RunPageView = WHERE("Object Type" = CONST(Report), "Object ID" = CONST(10148)); // "List Price Sheet"
+                    RunPageView = where("Object Type" = const(Report), "Object ID" = const(10148)); // "List Price Sheet"
                     RunObject = Page "Role Center Page Dispatcher";
 #else
                     RunObject = Page "List Price Sheet V16";
@@ -1201,6 +1254,25 @@ page 31 "Item List"
                     Image = "Report";
                     RunObject = Report "Availability Status";
                     ToolTip = 'View, print, or save a summary of historical inventory transactions with selected items, for example, to decide when to purchase the items. The report specifies quantity on sales order, quantity on purchase order, back orders from vendors, minimum inventory, and whether there are reorders.';
+                }
+                action(PrintLabel)
+                {
+                    AccessByPermission = TableData Item = I;
+                    ApplicationArea = Basic, Suite;
+                    Image = Print;
+                    Caption = 'Print Label';
+                    ToolTip = 'Print Label';
+
+                    trigger OnAction()
+                    var
+                        Item: Record Item;
+                        ItemGTINLabel: Report "Item GTIN Label";
+                    begin
+                        Item := Rec;
+                        CurrPage.SetSelectionFilter(Item);
+                        ItemGTINLabel.SetTableView(Item);
+                        ItemGTINLabel.RunModal();
+                    end;
                 }
                 group("Item Register")
                 {
@@ -1457,10 +1529,9 @@ page 31 "Item List"
 
                     trigger OnAction()
                     begin
-                        ApprovalsMgmt.OpenApprovalEntriesPage(RecordId);
+                        ApprovalsMgmt.OpenApprovalEntriesPage(Rec.RecordId);
                     end;
                 }
-                
                 action(Attributes)
                 {
                     AccessByPermission = TableData "Item Attribute" = R;
@@ -1476,7 +1547,7 @@ page 31 "Item List"
                     begin
                         PAGE.RunModal(PAGE::"Item Attribute Value Editor", Rec);
                         CurrPage.SaveRecord();
-                        CurrPage.ItemAttributesFactBox.PAGE.LoadItemAttributesData("No.");
+                        CurrPage.ItemAttributesFactBox.PAGE.LoadItemAttributesData(Rec."No.");
                     end;
                 }
                 action("Va&riants")
@@ -1485,7 +1556,7 @@ page 31 "Item List"
                     Caption = 'Va&riants';
                     Image = ItemVariant;
                     RunObject = Page "Item Variants";
-                    RunPageLink = "Item No." = FIELD("No.");
+                    RunPageLink = "Item No." = field("No.");
                     ToolTip = 'View how the inventory level of an item will develop over time according to the variant that you select.';
                 }
                 action(Identifiers)
@@ -1494,8 +1565,8 @@ page 31 "Item List"
                     Caption = 'Identifiers';
                     Image = BarCode;
                     RunObject = Page "Item Identifiers";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    RunPageView = SORTING("Item No.", "Variant Code", "Unit of Measure Code");
+                    RunPageLink = "Item No." = field("No.");
+                    RunPageView = sorting("Item No.", "Variant Code", "Unit of Measure Code");
                     ToolTip = 'View a unique identifier for each item that you want warehouse employees to keep track of within the warehouse when using handheld devices. The item identifier can include the item number, the variant code and the unit of measure.';
                 }
                 group(Dimensions)
@@ -1508,8 +1579,8 @@ page 31 "Item List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(27),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(27),
+                                      "No." = field("No.");
                         Scope = Repeater;
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
@@ -1528,7 +1599,7 @@ page 31 "Item List"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(Item);
-                            DefaultDimMultiple.SetMultiRecord(Item, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(Item, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -1540,7 +1611,7 @@ page 31 "Item List"
                     Caption = 'Item References';
                     Image = Change;
                     RunObject = Page "Item Reference Entries";
-                    RunPageLink = "Item No." = FIELD("No.");
+                    RunPageLink = "Item No." = field("No.");
                     Scope = Repeater;
                     ToolTip = 'Set up a customer''s or vendor''s own identification of the selected item. References to the customer''s item number means that the item number is automatically shown on sales documents instead of the number that you use.';
                 }
@@ -1550,7 +1621,7 @@ page 31 "Item List"
                     Caption = '&Units of Measure';
                     Image = UnitOfMeasure;
                     RunObject = Page "Item Units of Measure";
-                    RunPageLink = "Item No." = FIELD("No.");
+                    RunPageLink = "Item No." = field("No.");
                     Scope = Repeater;
                     ToolTip = 'Set up the different units that the item can be traded in, such as piece, box, or hour.';
                 }
@@ -1560,9 +1631,9 @@ page 31 "Item List"
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST(Item),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const(Item),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     Scope = Repeater;
                     ToolTip = 'Select or set up additional text for the description of the item. Extended text can be inserted under the Description field on document lines for the item.';
                 }
@@ -1572,8 +1643,8 @@ page 31 "Item List"
                     Caption = 'Translations';
                     Image = Translations;
                     RunObject = Page "Item Translations";
-                    RunPageLink = "Item No." = FIELD("No."),
-                                  "Variant Code" = CONST('');
+                    RunPageLink = "Item No." = field("No."),
+                                  "Variant Code" = const('');
                     Scope = Repeater;
                     ToolTip = 'Set up translated item descriptions for the selected item. Translated item descriptions are automatically inserted on documents according to the language code.';
                 }
@@ -1583,8 +1654,8 @@ page 31 "Item List"
                     Caption = 'Substituti&ons';
                     Image = ItemSubstitution;
                     RunObject = Page "Item Substitution Entry";
-                    RunPageLink = Type = CONST(Item),
-                                  "No." = FIELD("No.");
+                    RunPageLink = Type = const(Item),
+                                  "No." = field("No.");
                     ToolTip = 'View substitute items that are set up to be sold instead of the item.';
                 }
             }
@@ -1629,12 +1700,12 @@ page 31 "Item List"
                         Caption = 'Period';
                         Image = Period;
                         RunObject = Page "Item Availability by Periods";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'Show the projected quantity of the item over time according to time periods, such as day, week, or month.';
                     }
                     action(Variant)
@@ -1643,12 +1714,12 @@ page 31 "Item List"
                         Caption = 'Variant';
                         Image = ItemVariant;
                         RunObject = Page "Item Availability by Variant";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'View the current and projected quantity of the item for each variant.';
                     }
                     action(Location)
@@ -1657,12 +1728,12 @@ page 31 "Item List"
                         Caption = 'Location';
                         Image = Warehouse;
                         RunObject = Page "Item Availability by Location";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'View the actual and projected quantity of the item per location.';
                     }
                     action(Lot)
@@ -1692,12 +1763,12 @@ page 31 "Item List"
                         Caption = 'Unit of Measure';
                         Image = UnitOfMeasure;
                         RunObject = Page "Item Availability by UOM";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'View the item''s availability by a unit of measure.';
                     }
                 }
@@ -1706,7 +1777,7 @@ page 31 "Item List"
             {
                 Caption = 'Dynamics 365 Sales';
                 Visible = CRMIntegrationEnabled;
-                Enabled = (BlockedFilterApplied and (not Blocked)) or not BlockedFilterApplied;
+                Enabled = (BlockedFilterApplied and (not Rec.Blocked)) or not BlockedFilterApplied;
                 action(CRMGoToProduct)
                 {
                     ApplicationArea = Suite;
@@ -1718,7 +1789,7 @@ page 31 "Item List"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -1763,7 +1834,7 @@ page 31 "Item List"
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(MatchBasedCoupling)
@@ -1817,7 +1888,7 @@ page 31 "Item List"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -1865,7 +1936,7 @@ page 31 "Item List"
                         Caption = 'Assembly BOM';
                         Image = BOM;
                         RunObject = Page "Assembly BOM";
-                        RunPageLink = "Parent Item No." = FIELD("No.");
+                        RunPageLink = "Parent Item No." = field("No.");
                         ToolTip = 'View or edit the bill of material that specifies which items and resources are required to assemble the assembly item.';
                     }
                     action("Where-Used")
@@ -1874,9 +1945,9 @@ page 31 "Item List"
                         Caption = 'Where-Used';
                         Image = Track;
                         RunObject = Page "Where-Used List";
-                        RunPageLink = Type = CONST(Item),
-                                      "No." = FIELD("No.");
-                        RunPageView = SORTING(Type, "No.");
+                        RunPageLink = Type = const(Item),
+                                      "No." = field("No.");
+                        RunPageView = sorting(Type, "No.");
                         ToolTip = 'View a list of assembly BOMs in which the item is used.';
                     }
                     action("Calc. Stan&dard Cost")
@@ -1889,7 +1960,7 @@ page 31 "Item List"
 
                         trigger OnAction()
                         begin
-                            CalculateStdCost.CalcItem("No.", true);
+                            CalculateStdCost.CalcItem(Rec."No.", true);
                         end;
                     }
                     action("Calc. Unit Price")
@@ -1902,7 +1973,7 @@ page 31 "Item List"
 
                         trigger OnAction()
                         begin
-                            CalculateStdCost.CalcAssemblyItemPrice("No.");
+                            CalculateStdCost.CalcAssemblyItemPrice(Rec."No.");
                         end;
                     }
                 }
@@ -1916,7 +1987,7 @@ page 31 "Item List"
                         Caption = 'Production BOM';
                         Image = BOM;
                         RunObject = Page "Production BOM";
-                        RunPageLink = "No." = FIELD("Production BOM No.");
+                        RunPageLink = "No." = field("Production BOM No.");
                         ToolTip = 'Open the item''s production bill of material to view or edit its components.';
                     }
                     action(Action29)
@@ -1945,7 +2016,7 @@ page 31 "Item List"
 
                         trigger OnAction()
                         begin
-                            CalculateStdCost.CalcItem("No.", false);
+                            CalculateStdCost.CalcItem(Rec."No.", false);
                         end;
                     }
                 }
@@ -1975,13 +2046,13 @@ page 31 "Item List"
                         Caption = 'Entry Statistics';
                         Image = EntryStatistics;
                         RunObject = Page "Item Entry Statistics";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Date Filter" = FIELD("Date Filter"),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Date Filter" = field("Date Filter"),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'View statistics for item ledger entries.';
                     }
                     action("T&urnover")
@@ -1990,12 +2061,12 @@ page 31 "Item List"
                         Caption = 'T&urnover';
                         Image = Turnover;
                         RunObject = Page "Item Turnover";
-                        RunPageLink = "No." = FIELD("No."),
-                                      "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                      "Location Filter" = FIELD("Location Filter"),
-                                      "Drop Shipment Filter" = FIELD("Drop Shipment Filter"),
-                                      "Variant Filter" = FIELD("Variant Filter");
+                        RunPageLink = "No." = field("No."),
+                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                      "Location Filter" = field("Location Filter"),
+                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
+                                      "Variant Filter" = field("Variant Filter");
                         ToolTip = 'View a detailed account of item turnover by periods after you have set the relevant filters for location and variant.';
                     }
                 }
@@ -2005,8 +2076,8 @@ page 31 "Item List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Item),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Item),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -2051,11 +2122,11 @@ page 31 "Item List"
                 action("Prepa&yment Percentages")
                 {
                     ApplicationArea = Prepayments;
-                    Caption = 'Prepa&yment Percentages';
+                    Caption = 'Sales Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Sales Prepayment Percentages";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    ToolTip = 'View or edit the percentages of the price that can be paid as a prepayment. ';
+                    RunPageLink = "Item No." = field("No.");
+                    ToolTip = 'View or edit the percentages of the sales price that can be paid as a prepayment.';
                 }
                 action(Action37)
                 {
@@ -2063,9 +2134,9 @@ page 31 "Item List"
                     Caption = 'Sales Orders';
                     Image = Document;
                     RunObject = Page "Sales Orders";
-                    RunPageLink = Type = CONST(Item),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", Type, "No.");
+                    RunPageLink = Type = const(Item),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Document Type", Type, "No.");
                     ToolTip = 'View a list of ongoing sales orders for the item.';
                 }
                 action("Returns Orders")
@@ -2074,9 +2145,9 @@ page 31 "Item List"
                     Caption = 'Sales Returns Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Sales Return Orders";
-                    RunPageLink = Type = CONST(Item),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", Type, "No.");
+                    RunPageLink = Type = const(Item),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Document Type", Type, "No.");
                     ToolTip = 'View ongoing sales return orders for the item.';
                 }
             }
@@ -2090,8 +2161,8 @@ page 31 "Item List"
                     Caption = 'Ven&dors';
                     Image = Vendor;
                     RunObject = Page "Item Vendor Catalog";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("No.");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'View the list of vendors who can supply the item, and at which lead time.';
                 }
 #if not CLEAN21
@@ -2102,8 +2173,8 @@ page 31 "Item List"
                     Image = Price;
                     Visible = false;
                     RunObject = Page "Purchase Prices";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("No.");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'View or set up purchase prices for the item. An item price is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -2116,8 +2187,8 @@ page 31 "Item List"
                     Image = LineDiscount;
                     Visible = false;
                     RunObject = Page "Purchase Line Discounts";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("No.");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'View or set up purchase discounts for the item. An item discount is automatically granted on invoice lines when the specified criteria are met, such as vendor, quantity, or ending date.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -2127,11 +2198,11 @@ page 31 "Item List"
                 action(Action125)
                 {
                     ApplicationArea = Prepayments;
-                    Caption = 'Prepa&yment Percentages';
+                    Caption = 'Purchase Prepa&yment Percentages';
                     Image = PrepaymentPercentages;
                     RunObject = Page "Purchase Prepmt. Percentages";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    ToolTip = 'View or edit the percentages of the price that can be paid as a prepayment. ';
+                    RunPageLink = "Item No." = field("No.");
+                    ToolTip = 'View or edit the percentages of the purchase price that can be paid as a prepayment.';
                 }
                 action(Action40)
                 {
@@ -2139,9 +2210,9 @@ page 31 "Item List"
                     Caption = 'Purchase Orders';
                     Image = Document;
                     RunObject = Page "Purchase Orders";
-                    RunPageLink = Type = CONST(Item),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", Type, "No.");
+                    RunPageLink = Type = const(Item),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Document Type", Type, "No.");
                     ToolTip = 'View a list of ongoing purchase orders for the item.';
                 }
                 action("Return Orders")
@@ -2150,9 +2221,9 @@ page 31 "Item List"
                     Caption = 'Purchase Return Orders';
                     Image = ReturnOrder;
                     RunObject = Page "Purchase Return Orders";
-                    RunPageLink = Type = CONST(Item),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Document Type", Type, "No.");
+                    RunPageLink = Type = const(Item),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Document Type", Type, "No.");
                     ToolTip = 'Open the list of ongoing purchase return orders for the item.';
                 }
                 action("Ca&talog Items")
@@ -2174,8 +2245,8 @@ page 31 "Item List"
                     Caption = '&Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Content";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("No.");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'View the quantities of the item in each bin where it exists. You can see all the important parameters relating to bin content, and you can modify certain bin content parameters in this window.';
                 }
                 action("Stockkeepin&g Units")
@@ -2184,8 +2255,8 @@ page 31 "Item List"
                     Caption = 'Stockkeepin&g Units';
                     Image = SKU;
                     RunObject = Page "Stockkeeping Unit List";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("No.");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'Open the item''s SKUs to view or edit instances of the item at different locations or with different variants. ';
                 }
             }
@@ -2199,8 +2270,8 @@ page 31 "Item List"
                     Caption = 'Ser&vice Items';
                     Image = ServiceItem;
                     RunObject = Page "Service Items";
-                    RunPageLink = "Item No." = FIELD("No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("No.");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'View instances of the item as service items, such as machines that you maintain or repair for customers through service orders. ';
                 }
                 action(Troubleshooting)
@@ -2224,8 +2295,8 @@ page 31 "Item List"
                     Caption = 'Troubleshooting Setup';
                     Image = Troubleshoot;
                     RunObject = Page "Troubleshooting Setup";
-                    RunPageLink = Type = CONST(Item),
-                                  "No." = FIELD("No.");
+                    RunPageLink = Type = const(Item),
+                                  "No." = field("No.");
                     ToolTip = 'View or edit your settings for troubleshooting service items.';
                 }
             }
@@ -2239,8 +2310,8 @@ page 31 "Item List"
                     Caption = 'Resource &Skills';
                     Image = ResourceSkills;
                     RunObject = Page "Resource Skills";
-                    RunPageLink = Type = CONST(Item),
-                                  "No." = FIELD("No.");
+                    RunPageLink = Type = const(Item),
+                                  "No." = field("No.");
                     ToolTip = 'View the assignment of skills to resources, items, service item groups, and service items. You can use skill codes to allocate skilled resources to service items or items that need special skills for servicing.';
                 }
                 action("Skilled R&esources")
@@ -2256,7 +2327,7 @@ page 31 "Item List"
                         ResourceSkill: Record "Resource Skill";
                     begin
                         Clear(SkilledResourceList);
-                        SkilledResourceList.Initialize(ResourceSkill.Type::Item, "No.", Description);
+                        SkilledResourceList.Initialize(ResourceSkill.Type::Item, Rec."No.", Rec.Description);
                         SkilledResourceList.RunModal();
                     end;
                 }
@@ -2553,22 +2624,22 @@ page 31 "Item List"
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
         if CRMIntegrationEnabled then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
 
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
-        CurrPage.ItemAttributesFactBox.PAGE.LoadItemAttributesData("No.");
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
+        CurrPage.ItemAttributesFactBox.PAGE.LoadItemAttributesData(Rec."No.");
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
 
         SetWorkflowManagementEnabledState();
 
 #if not CLEAN21
         // Contextual Power BI FactBox: send data to filter the report in the FactBox
-        CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection("No.", false, PowerBIVisible);
+        CurrPage."Power BI Report FactBox".PAGE.SetCurrentListSelection(Rec."No.", false, PowerBIVisible);
 #endif
-        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection("No.");
+        CurrPage.PowerBIEmbeddedReportPart.PAGE.SetCurrentListSelection(Rec."No.");
     end;
 
     trigger OnAfterGetRecord()
@@ -2587,7 +2658,7 @@ page 31 "Item List"
                 Rec := TempItemFilteredFromAttributes;
             exit(Found);
         end;
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnInit()
@@ -2611,7 +2682,7 @@ page 31 "Item List"
                 Rec := TempItemFilteredFromAttributes;
             exit(ResultSteps);
         end;
-        exit(Next(Steps));
+        exit(Rec.Next(Steps));
     end;
 
     trigger OnOpenPage()
@@ -2660,9 +2731,7 @@ page 31 "Item List"
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
         RunOnPickItem: Boolean;
-        [InDataSet]
         IsNonInventoriable: Boolean;
-        [InDataSet]
         IsInventoriable: Boolean;
 #if not CLEAN21
         PowerBIVisible: Boolean;
@@ -2728,8 +2797,8 @@ page 31 "Item List"
 
     local procedure EnableControls()
     begin
-        IsNonInventoriable := IsNonInventoriableType();
-        IsInventoriable := IsInventoriableType();
+        IsNonInventoriable := Rec.IsNonInventoriableType();
+        IsInventoriable := Rec.IsInventoriableType();
     end;
 
     local procedure SetWorkflowManagementEnabledState()
@@ -2745,12 +2814,12 @@ page 31 "Item List"
 
     local procedure ClearAttributesFilter()
     begin
-        ClearMarks();
-        MarkedOnly(false);
+        Rec.ClearMarks();
+        Rec.MarkedOnly(false);
         TempFilterItemAttributesBuffer.Reset();
         TempFilterItemAttributesBuffer.DeleteAll();
-        FilterGroup(0);
-        SetRange("No.");
+        Rec.FilterGroup(0);
+        Rec.SetRange("No.");
     end;
 
     procedure SetTempFilteredItemRec(var Item: Record Item)
@@ -2797,7 +2866,7 @@ page 31 "Item List"
     begin
         SalesLineDiscount.SetCurrentKey(Type, Code);
         SalesLineDiscount.SetRange(Type, SalesLineDiscount.Type::Item);
-        SalesLineDiscount.SetRange(Code, "No.");
+        SalesLineDiscount.SetRange(Code, Rec."No.");
         Page.Run(Page::"Sales Line Discounts", SalesLineDiscount);
     end;
 
@@ -2807,7 +2876,7 @@ page 31 "Item List"
         SalesPrice: Record "Sales Price";
     begin
         SalesPrice.SetCurrentKey("Item No.");
-        SalesPrice.SetRange("Item No.", "No.");
+        SalesPrice.SetRange("Item No.", Rec."No.");
         Page.Run(Page::"Sales Prices", SalesPrice);
     end;
 #endif

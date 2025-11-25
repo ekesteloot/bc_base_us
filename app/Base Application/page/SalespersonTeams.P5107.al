@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Team;
+
 page 5107 "Salesperson Teams"
 {
     Caption = 'Salesperson Sales Teams';

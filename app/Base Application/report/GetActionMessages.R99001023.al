@@ -1,3 +1,17 @@
+﻿namespace Microsoft.InventoryMgt.Requisition;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Purchases.Document;
+
+
 report 99001023 "Get Action Messages"
 {
     Caption = 'Get Action Messages';
@@ -7,7 +21,7 @@ report 99001023 "Get Action Messages"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("Low-Level Code") WHERE("Order Tracking Policy" = CONST("Tracking & Action Msg."));
+            DataItemTableView = sorting("Low-Level Code") where("Order Tracking Policy" = const("Tracking & Action Msg."));
             RequestFilterFields = "No.", "Search Description";
 
             trigger OnAfterGetRecord()
@@ -335,22 +349,22 @@ report 99001023 "Get Action Messages"
     begin
         with ActionMsgEntry do
             case "Source Type" of
-                DATABASE::"Prod. Order Line":
+                Enum::TableID::"Prod. Order Line".AsInteger():
                     if ProdOrderLine.Get("Source Subtype", "Source ID", "Source Prod. Order Line") then begin
                         ReqLine.GetProdOrderLine(ProdOrderLine);
                         exit(false);
                     end;
-                DATABASE::"Purchase Line":
+                Enum::TableID::"Purchase Line".AsInteger():
                     if PurchOrderLine.Get("Source Subtype", "Source ID", "Source Ref. No.") then begin
                         ReqLine.GetPurchOrderLine(PurchOrderLine);
                         exit(false);
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     if TransLine.Get("Source ID", "Source Ref. No.") then begin
                         ReqLine.GetTransLine(TransLine);
                         exit(false);
                     end;
-                DATABASE::"Assembly Header":
+                Enum::TableID::"Assembly Header".AsInteger():
                     if AsmHeader.Get("Source Subtype", "Source ID") then begin
                         ReqLine.GetAsmHeader(AsmHeader);
                         exit(false);

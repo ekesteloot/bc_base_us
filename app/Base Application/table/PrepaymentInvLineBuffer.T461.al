@@ -1,4 +1,17 @@
-﻿table 461 "Prepayment Inv. Line Buffer"
+﻿namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+
+table 461 "Prepayment Inv. Line Buffer"
 {
     Caption = 'Prepayment Inv. Line Buffer';
     ReplicateData = false;
@@ -109,14 +122,14 @@
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(20; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(21; "Job No."; Code[20])
         {

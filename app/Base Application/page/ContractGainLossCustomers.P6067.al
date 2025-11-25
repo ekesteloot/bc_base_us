@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Sales.Customer;
+using System.Utilities;
+
 page 6067 "Contract Gain/Loss (Customers)"
 {
     ApplicationArea = Service;

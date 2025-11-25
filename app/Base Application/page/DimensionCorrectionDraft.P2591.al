@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using System.Security.AccessControl;
+using System.Utilities;
+
 page 2591 "Dimension Correction Draft"
 {
     PageType = ListPlus;

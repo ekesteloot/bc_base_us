@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Vendor;
+
 codeunit 5057 "VendCont-Update"
 {
 

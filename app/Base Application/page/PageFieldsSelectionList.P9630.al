@@ -1,3 +1,5 @@
+namespace System.Tooling;
+
 page 9630 "Page Fields Selection List"
 {
     Caption = 'Select Field';
@@ -21,9 +23,4 @@ page 9630 "Page Fields Selection List"
             }
         }
     }
-
-    actions
-    {
-    }
 }
-

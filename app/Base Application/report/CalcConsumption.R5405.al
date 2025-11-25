@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+
 report 5405 "Calc. Consumption"
 {
     Caption = 'Calc. Consumption';
@@ -7,11 +15,11 @@ report 5405 "Calc. Consumption"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.") WHERE(Status = CONST(Released));
+            DataItemTableView = sorting(Status, "No.") where(Status = const(Released));
             RequestFilterFields = "No.";
             dataitem("Prod. Order Component"; "Prod. Order Component")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
                 RequestFilterFields = "Item No.";
 
                 trigger OnAfterGetRecord()
@@ -25,6 +33,8 @@ report 5405 "Calc. Consumption"
                     ProdOrderLine.Get(Status, "Prod. Order No.", "Prod. Order Line No.");
 
                     NeededQty := GetNeededQty(CalcBasedOn, true);
+
+                    AdjustQtyToReservedFromInventory(NeededQty, ReservedFromStock);
 
                     if NeededQty <> 0 then begin
                         if LocationCode <> '' then
@@ -106,6 +116,13 @@ report 5405 "Calc. Consumption"
                             exit(false);
                         end;
                     }
+                    field("Reserved From Stock"; ReservedFromStock)
+                    {
+                        ApplicationArea = Reservation;
+                        Caption = 'Reserved from stock';
+                        ToolTip = 'Specifies if you want to calculate only components that are fully or partially reserved from current stock.';
+                        ValuesAllowed = " ", "Full and Partial", Full;
+                    }
                 }
             }
         }
@@ -144,6 +161,7 @@ report 5405 "Calc. Consumption"
 
     protected var
         LocationCode: Code[10];
+        ReservedFromStock: Enum "Reservation From Stock";
 
     procedure InitializeRequest(NewPostingDate: Date; NewCalcBasedOn: Option)
     begin

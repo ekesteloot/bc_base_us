@@ -1,7 +1,12 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Profiling;
+using System.Utilities;
+
 report 5067 "Questionnaire - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/QuestionnaireTest.rdlc';
+    RDLCLayout = './CRM/Reports/QuestionnaireTest.rdlc';
     Caption = 'Questionnaire - Test';
 
     dataset
@@ -35,8 +40,8 @@ report 5067 "Questionnaire - Test"
             }
             dataitem("Profile Questionnaire Line"; "Profile Questionnaire Line")
             {
-                DataItemLink = "Profile Questionnaire Code" = FIELD(Code);
-                DataItemTableView = SORTING("Profile Questionnaire Code", "Line No.");
+                DataItemLink = "Profile Questionnaire Code" = field(Code);
+                DataItemTableView = sorting("Profile Questionnaire Code", "Line No.");
                 column(Profile_Questionnaire_Line__Line_No__; "Line No.")
                 {
                 }
@@ -48,7 +53,7 @@ report 5067 "Questionnaire - Test"
                 }
                 dataitem("Integer"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }

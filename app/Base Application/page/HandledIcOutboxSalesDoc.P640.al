@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.Intercompany.Dimension;
+
 page 640 "Handled IC Outbox Sales Doc."
 {
     Caption = 'Handled IC Outbox Sales Doc.';
@@ -82,9 +86,9 @@ page 640 "Handled IC Outbox Sales Doc."
             part(ICOutboxSalesLines; "Handled IC Outbox Sales Lines")
             {
                 ApplicationArea = Intercompany;
-                SubPageLink = "IC Transaction No." = FIELD("IC Transaction No."),
-                              "IC Partner Code" = FIELD("IC Partner Code"),
-                              "Transaction Source" = FIELD("Transaction Source");
+                SubPageLink = "IC Transaction No." = field("IC Transaction No."),
+                              "IC Partner Code" = field("IC Partner Code"),
+                              "Transaction Source" = field("Transaction Source");
             }
             group(Shipping)
             {
@@ -140,11 +144,11 @@ page 640 "Handled IC Outbox Sales Doc."
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "IC Document Dimensions";
-                    RunPageLink = "Table ID" = CONST(430),
-                                  "Transaction No." = FIELD("IC Transaction No."),
-                                  "IC Partner Code" = FIELD("IC Partner Code"),
-                                  "Transaction Source" = FIELD("Transaction Source"),
-                                  "Line No." = CONST(0);
+                    RunPageLink = "Table ID" = const(430),
+                                  "Transaction No." = field("IC Transaction No."),
+                                  "IC Partner Code" = field("IC Partner Code"),
+                                  "Transaction Source" = field("Transaction Source"),
+                                  "Line No." = const(0);
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }

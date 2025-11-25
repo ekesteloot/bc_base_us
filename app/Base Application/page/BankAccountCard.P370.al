@@ -1,3 +1,21 @@
+namespace Microsoft.BankMgt.BankAccount;
+
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.PositivePay;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.BankMgt.Reports;
+using Microsoft.BankMgt.Setup;
+using Microsoft.BankMgt.Statement;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.Foundation.Comment;
+using System.Email;
+
 page 370 "Bank Account Card"
 {
     Caption = 'Bank Account Card';
@@ -20,7 +38,7 @@ page 370 "Bank Account Card"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -49,7 +67,7 @@ page 370 "Bank Account Card"
                     ToolTip = 'Specifies an alternate name that you can use to search for the record in question when you cannot remember the value in the Name field.';
                     Visible = false;
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Promoted;
@@ -73,7 +91,7 @@ page 370 "Bank Account Card"
                     Importance = Additional;
                     ToolTip = 'Specifies a code to specify the employee who is responsible for this bank account.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -152,7 +170,7 @@ page 370 "Bank Account Card"
                         trigger OnValidate()
                         begin
                             if not Linked then
-                                UnlinkStatementProvider()
+                                Rec.UnlinkStatementProvider()
                             else
                                 Error(OnlineBankAccountLinkingErr);
                         end;
@@ -196,7 +214,7 @@ page 370 "Bank Account Card"
             group(Communication)
             {
                 Caption = 'Communication';
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the address of the bank where you have the bank account.';
@@ -206,12 +224,12 @@ page 370 "Bank Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies additional address information.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city of the bank where you have the bank account.';
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'State';
@@ -233,14 +251,14 @@ page 370 "Bank Account Card"
                     ExtendedDatatype = PhoneNo;
                     ToolTip = 'Specifies the telephone number of the bank where you have the bank account.';
                 }
-                field(MobilePhoneNo; "Mobile Phone No.")
+                field(MobilePhoneNo; Rec."Mobile Phone No.")
                 {
                     Caption = 'Mobile Phone No.';
                     ApplicationArea = Basic, Suite;
                     ExtendedDatatype = PhoneNo;
                     ToolTip = 'Specifies the mobile telephone number of the bank where you have the bank account.';
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank employee regularly contacted in connection with this bank account.';
@@ -330,8 +348,8 @@ page 370 "Bank Account Card"
 
                     trigger OnValidate()
                     begin
-                        if "Balance Last Statement" <> xRec."Balance Last Statement" then
-                            if not Confirm(Text001, false, "No.") then
+                        if Rec."Balance Last Statement" <> xRec."Balance Last Statement" then
+                            if not Confirm(Text001, false, Rec."No.") then
                                 Error(Text002);
                     end;
                 }
@@ -348,7 +366,7 @@ page 370 "Bank Account Card"
                     begin
                         BankAccPostingGroup.SetRange(Code, Rec."Bank Acc. Posting Group");
                         if (not BankAccPostingGroup.IsEmpty() and GuiAllowed()) then begin
-                            BankAccPostingGroup.Get("Bank Acc. Posting Group");
+                            BankAccPostingGroup.Get(Rec."Bank Acc. Posting Group");
                             GLAccount.SetRange("No.", BankAccPostingGroup."G/L Account No.");
                             if not GLAccount.IsEmpty() then begin
                                 GLAccount.Get(BankAccPostingGroup."G/L Account No.");
@@ -448,7 +466,7 @@ page 370 "Bank Account Card"
                     Importance = Additional;
                     ToolTip = 'Specifies the international bank identifier code (SWIFT) of the bank where you have the account.';
                 }
-                field(IBAN; IBAN)
+                field(IBAN; Rec.IBAN)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
@@ -511,10 +529,10 @@ page 370 "Bank Account Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Bank Account Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -524,8 +542,8 @@ page 370 "Bank Account Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Bank Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Bank Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -534,8 +552,8 @@ page 370 "Bank Account Card"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(270),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(270),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -545,9 +563,9 @@ page 370 "Bank Account Card"
                     Caption = 'Balance';
                     Image = Balance;
                     RunObject = Page "Bank Account Balance";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'View a summary of the bank account balance in different periods.';
                 }
                 action(Statements)
@@ -555,19 +573,17 @@ page 370 "Bank Account Card"
                     ApplicationArea = Basic, Suite;
                     Caption = 'St&atements';
                     Image = "Report";
-                    Visible = AutoMatchSelected;
                     RunObject = Page "Bank Account Statement List";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
+                    RunPageLink = "Bank Account No." = field("No.");
                     ToolTip = 'View posted bank statements and reconciliations.';
                 }
                 action(PostedReconciliations)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Posted Reconciliations';
+                    Caption = 'Posted Reconciliation Worksheets';
                     Image = "Report";
-                    Visible = not AutoMatchSelected;
                     RunObject = Page "Posted Bank Rec. List";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
+                    RunPageLink = "Bank Account No." = field("No.");
                     ToolTip = 'View the entries and the balance on your bank accounts against a statement from the bank.';
                 }
                 action(Deposits)
@@ -576,8 +592,8 @@ page 370 "Bank Account Card"
                     Caption = 'Deposits';
                     Image = DepositSlip;
                     RunObject = Page "Posted Deposit List";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
-                    RunPageView = SORTING("Bank Account No.");
+                    RunPageLink = "Bank Account No." = field("No.");
+                    RunPageView = sorting("Bank Account No.");
                     ToolTip = 'View the list of posted deposits for the bank account.';
                     Visible = not BankDepositFeatureEnabled;
                 }
@@ -587,9 +603,9 @@ page 370 "Bank Account Card"
                     Caption = 'Ledger E&ntries';
                     Image = BankAccountLedger;
                     RunObject = Page "Bank Account Ledger Entries";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
-                    RunPageView = SORTING("Bank Account No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Bank Account No." = field("No.");
+                    RunPageView = sorting("Bank Account No.")
+                                  order(Descending);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -599,9 +615,9 @@ page 370 "Bank Account Card"
                     Caption = 'Chec&k Ledger Entries';
                     Image = CheckLedger;
                     RunObject = Page "Check Ledger Entries";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
-                    RunPageView = SORTING("Bank Account No.")
-                                  ORDER(Descending);
+                    RunPageLink = "Bank Account No." = field("No.");
+                    RunPageView = sorting("Bank Account No.")
+                                  order(Descending);
                     ToolTip = 'View check ledger entries that result from posting transactions in a payment journal for the relevant bank account.';
                 }
                 action("C&ontact")
@@ -614,7 +630,7 @@ page 370 "Bank Account Card"
 
                     trigger OnAction()
                     begin
-                        ShowContact();
+                        Rec.ShowContact();
                     end;
                 }
                 separator(Action81)
@@ -629,7 +645,7 @@ page 370 "Bank Account Card"
 
                     trigger OnAction()
                     begin
-                        DisplayMap();
+                        Rec.DisplayMap();
                     end;
                 }
                 action(PagePositivePayEntries)
@@ -638,9 +654,9 @@ page 370 "Bank Account Card"
                     Caption = 'Positive Pay Entries';
                     Image = CheckLedger;
                     RunObject = Page "Positive Pay Entries";
-                    RunPageLink = "Bank Account No." = FIELD("No.");
-                    RunPageView = SORTING("Bank Account No.", "Upload Date-Time")
-                                  ORDER(Descending);
+                    RunPageLink = "Bank Account No." = field("No.");
+                    RunPageView = sorting("Bank Account No.", "Upload Date-Time")
+                                  order(Descending);
                     ToolTip = 'View the bank ledger entries that are related to Positive Pay transactions.';
                 }
             }
@@ -669,8 +685,8 @@ page 370 "Bank Account Card"
                 Caption = 'Payment Reconciliation Journals';
                 Image = BankAccountRec;
                 RunObject = Page "Pmt. Reconciliation Journals";
-                RunPageLink = "Bank Account No." = FIELD("No.");
-                RunPageView = SORTING("Bank Account No.");
+                RunPageLink = "Bank Account No." = field("No.");
+                RunPageView = sorting("Bank Account No.");
                 ToolTip = 'Reconcile your bank account by importing transactions and applying them, automatically or manually, to open customer ledger entries, open vendor ledger entries, or open bank account ledger entries.';
             }
             action("Receivables-Payables")
@@ -692,7 +708,7 @@ page 370 "Bank Account Card"
 
                 trigger OnAction()
                 begin
-                    LinkStatementProvider(Rec);
+                    Rec.LinkStatementProvider(Rec);
                 end;
             }
             action(UnlinkOnlineBankAccount)
@@ -706,7 +722,7 @@ page 370 "Bank Account Card"
 
                 trigger OnAction()
                 begin
-                    UnlinkStatementProvider();
+                    Rec.UnlinkStatementProvider();
                     CurrPage.Update(true);
                 end;
             }
@@ -721,7 +737,7 @@ page 370 "Bank Account Card"
 
                 trigger OnAction()
                 begin
-                    RefreshStatementProvider(Rec);
+                    Rec.RefreshStatementProvider(Rec);
                 end;
             }
             action(EditOnlineBankAccount)
@@ -735,7 +751,7 @@ page 370 "Bank Account Card"
 
                 trigger OnAction()
                 begin
-                    EditAccountStatementProvider(Rec);
+                    Rec.EditAccountStatementProvider(Rec);
                 end;
             }
             action(RenewAccessConsentOnlineBankAccount)
@@ -749,7 +765,7 @@ page 370 "Bank Account Card"
 
                 trigger OnAction()
                 begin
-                    RenewAccessConsentStatementProvider(Rec);
+                    Rec.RenewAccessConsentStatementProvider(Rec);
                 end;
             }
             action(AutomaticBankStatementImportSetup)
@@ -788,7 +804,7 @@ page 370 "Bank Account Card"
                 Caption = 'Positive Pay Export';
                 Image = Export;
                 RunObject = Page "Positive Pay Export";
-                RunPageLink = "No." = FIELD("No.");
+                RunPageLink = "No." = field("No.");
                 ToolTip = 'Export a Positive Pay file with relevant payment information that you then send to the bank for reference when you process payments to make sure that your bank only clears validated checks and amounts.';
             }
             action(Email)
@@ -820,7 +836,7 @@ page 370 "Bank Account Card"
 
                 trigger OnAction()
                 begin
-                    RunReport(REPORT::"Bank Account - List", "No.");
+                    RunReport(REPORT::"Bank Account - List", Rec."No.");
                 end;
             }
             action("Detail Trial Balance")
@@ -832,7 +848,7 @@ page 370 "Bank Account Card"
 
                 trigger OnAction()
                 begin
-                    RunReport(REPORT::"Bank Acc. - Detail Trial Bal.", "No.");
+                    RunReport(REPORT::"Bank Acc. - Detail Trial Bal.", Rec."No.");
                 end;
             }
             action(Action1906306806)
@@ -854,7 +870,7 @@ page 370 "Bank Account Card"
 
                 trigger OnAction()
                 begin
-                    RunReport(REPORT::"Bank Account - Check Details", "No.");
+                    RunReport(REPORT::"Bank Account - Check Details", Rec."No.");
                 end;
             }
             action("Bank Account - Reconcile")
@@ -989,27 +1005,22 @@ page 370 "Bank Account Card"
 
     trigger OnAfterGetCurrRecord()
     begin
-        GetOnlineFeedStatementStatus(OnlineFeedStatementStatus, Linked);
-        ShowBankLinkingActions := StatementProvidersExist();
+        Rec.GetOnlineFeedStatementStatus(OnlineFeedStatementStatus, Linked);
+        ShowBankLinkingActions := Rec.StatementProvidersExist();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        GetOnlineFeedStatementStatus(OnlineFeedStatementStatus, Linked);
-        CalcFields("Check Report Name");
+        Rec.GetOnlineFeedStatementStatus(OnlineFeedStatementStatus, Linked);
+        Rec.CalcFields("Check Report Name");
         AfterGetCurrentRecord();
     end;
 
     trigger OnInit()
-    var
-        GeneralLedgerSetup: Record "General Ledger Setup";
     begin
         "Input QualifierEnable" := true;
         "Client NameEnable" := true;
         "Client No.Enable" := true;
-
-        GeneralLedgerSetup.Get();
-        AutoMatchSelected := GeneralLedgerSetup."Bank Recon. with Auto. Match";
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1020,33 +1031,22 @@ page 370 "Bank Account Card"
     trigger OnOpenPage()
     var
         Contact: Record Contact;
-#if not CLEAN21
-        BankDepositFeatureMgt: Codeunit "Bank Deposit Feature Mgt.";
-#endif
     begin
         OnBeforeOnOpenPage();
         ContactActionVisible := Contact.ReadPermission;
         SetNoFieldVisible();
         BankDepositFeatureEnabled := true;
-#if not CLEAN21
-        BankDepositFeatureEnabled := BankDepositFeatureMgt.IsEnabled();
-#endif
     end;
 
     var
         BankDepositFeatureEnabled: Boolean;
-        [InDataSet]
         "Client No.Enable": Boolean;
-        [InDataSet]
         "Client NameEnable": Boolean;
-        [InDataSet]
         "Input QualifierEnable": Boolean;
         Text001: Label 'There may be a statement using the %1.\\Do you want to change Balance Last Statement?';
         Text002: Label 'Canceled.';
-        [InDataSet]
         ContactActionVisible: Boolean;
         Linked: Boolean;
-        AutoMatchSelected: Boolean;
         OnlineBankAccountLinkingErr: Label 'You must link the bank account to an online bank account.\\Choose the Link to Online Bank Account action.';
         ShowBankLinkingActions: Boolean;
         NoFieldVisible: Boolean;
@@ -1058,9 +1058,9 @@ page 370 "Bank Account Card"
 
     local procedure SetCountrySpecificControls()
     begin
-        "Client No.Enable" := "Export Format" = "Export Format"::CA;
-        "Client NameEnable" := "Export Format" = "Export Format"::CA;
-        "Input QualifierEnable" := "Export Format" = "Export Format"::CA;
+        "Client No.Enable" := Rec."Export Format" = Rec."Export Format"::CA;
+        "Client NameEnable" := Rec."Export Format" = Rec."Export Format"::CA;
+        "Input QualifierEnable" := Rec."Export Format" = Rec."Export Format"::CA;
         OnAfterSetCountrySpecificControls();
     end;
 
@@ -1080,13 +1080,13 @@ page 370 "Bank Account Card"
     var
         BankExportImportSetup: Record "Bank Export/Import Setup";
     begin
-        if ("Export Format" > 0) and ("Export Format" < "Export Format"::Other) then
-            if BankExportImportSetup.Get("Payment Export Format") then
+        if (Rec."Export Format" > 0) and (Rec."Export Format" < Rec."Export Format"::Other) then
+            if BankExportImportSetup.Get(Rec."Payment Export Format") then
                 if BankExportImportSetup.Direction <> BankExportImportSetup.Direction::"Export-EFT" then
                     Message(EFTNotSupportedMsg);
 
-        if ("Export Format" = 0) or ("Export Format" = "Export Format"::Other) then
-            if BankExportImportSetup.Get("Payment Export Format") then
+        if (Rec."Export Format" = 0) or (Rec."Export Format" = Rec."Export Format"::Other) then
+            if BankExportImportSetup.Get(Rec."Payment Export Format") then
                 if BankExportImportSetup.Direction = BankExportImportSetup.Direction::"Export-EFT" then
                     Message(EFTSupportedMsg);
     end;

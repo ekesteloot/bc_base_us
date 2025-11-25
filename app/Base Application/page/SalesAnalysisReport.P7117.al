@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Analysis;
+using System.Utilities;
+
 page 7117 "Sales Analysis Report"
 {
     Caption = 'Sales Analysis Report';
@@ -8,7 +15,7 @@ page 7117 "Sales Analysis Report"
     PageType = Card;
     SaveValues = true;
     SourceTable = "Analysis Line";
-    SourceTableView = WHERE("Analysis Area" = CONST(Sales));
+    SourceTableView = where("Analysis Area" = const(Sales));
 
     layout
     {
@@ -94,7 +101,7 @@ page 7117 "Sales Analysis Report"
 
                     trigger OnValidate()
                     begin
-                        SetRange("Source Type Filter", CurrentSourceTypeFilter);
+                        Rec.SetRange("Source Type Filter", CurrentSourceTypeFilter);
                         CurrentSourceTypeNoFilter := '';
                         AnalysisReportMgt.SetSourceNo(Rec, CurrentSourceTypeNoFilter);
                         CurrentSourceTypeFilterOnAfterValidate();
@@ -357,9 +364,9 @@ page 7117 "Sales Analysis Report"
 
         GLSetup.Get();
 
-        if AnalysisLineTemplate.Get(GetRangeMax("Analysis Area"), CurrentLineTemplate) then
+        if AnalysisLineTemplate.Get(Rec.GetRangeMax("Analysis Area"), CurrentLineTemplate) then
             if AnalysisLineTemplate."Item Analysis View Code" <> '' then
-                ItemAnalysisView.Get(GetRangeMax("Analysis Area"), AnalysisLineTemplate."Item Analysis View Code")
+                ItemAnalysisView.Get(Rec.GetRangeMax("Analysis Area"), AnalysisLineTemplate."Item Analysis View Code")
             else begin
                 Clear(ItemAnalysisView);
                 ItemAnalysisView."Dimension 1 Code" := GLSetup."Global Dimension 1 Code";
@@ -405,16 +412,16 @@ page 7117 "Sales Analysis Report"
         Calendar: Record Date;
         PeriodPageMgt: Codeunit PeriodPageManagement;
     begin
-        if GetFilter("Date Filter") <> '' then begin
-            Calendar.SetFilter("Period Start", GetFilter("Date Filter"));
+        if Rec.GetFilter("Date Filter") <> '' then begin
+            Calendar.SetFilter("Period Start", Rec.GetFilter("Date Filter"));
             if not PeriodPageMgt.FindDate('+', Calendar, PeriodType) then
                 PeriodPageMgt.FindDate('+', Calendar, PeriodType::Day);
             Calendar.SetRange("Period Start");
         end;
         PeriodPageMgt.FindDate(SearchText, Calendar, PeriodType);
-        SetRange("Date Filter", Calendar."Period Start", Calendar."Period End");
-        if GetRangeMin("Date Filter") = GetRangeMax("Date Filter") then
-            SetRange("Date Filter", GetRangeMin("Date Filter"));
+        Rec.SetRange("Date Filter", Calendar."Period Start", Calendar."Period End");
+        if Rec.GetRangeMin("Date Filter") = Rec.GetRangeMax("Date Filter") then
+            Rec.SetRange("Date Filter", Rec.GetRangeMin("Date Filter"));
     end;
 
     local procedure ValidateAnalysisTemplateName()
@@ -422,7 +429,7 @@ page 7117 "Sales Analysis Report"
         AnalysisLineTemplate: Record "Analysis Line Template";
         PrevItemAnalysisView: Record "Item Analysis View";
     begin
-        if AnalysisLineTemplate.Get(GetRangeMax("Analysis Area"), CurrentLineTemplate) then
+        if AnalysisLineTemplate.Get(Rec.GetRangeMax("Analysis Area"), CurrentLineTemplate) then
             if (AnalysisLineTemplate."Default Column Template Name" <> '') and
                (CurrentColumnTemplate <> AnalysisLineTemplate."Default Column Template Name")
             then begin
@@ -434,18 +441,18 @@ page 7117 "Sales Analysis Report"
         if AnalysisLineTemplate."Item Analysis View Code" <> ItemAnalysisView.Code then begin
             PrevItemAnalysisView := ItemAnalysisView;
             if AnalysisLineTemplate."Item Analysis View Code" <> '' then
-                ItemAnalysisView.Get(GetRangeMax("Analysis Area"), AnalysisLineTemplate."Item Analysis View Code")
+                ItemAnalysisView.Get(Rec.GetRangeMax("Analysis Area"), AnalysisLineTemplate."Item Analysis View Code")
             else begin
                 Clear(ItemAnalysisView);
                 ItemAnalysisView."Dimension 1 Code" := GLSetup."Global Dimension 1 Code";
                 ItemAnalysisView."Dimension 2 Code" := GLSetup."Global Dimension 2 Code";
             end;
             if PrevItemAnalysisView."Dimension 1 Code" <> ItemAnalysisView."Dimension 1 Code" then
-                SetRange("Dimension 1 Filter");
+                Rec.SetRange("Dimension 1 Filter");
             if PrevItemAnalysisView."Dimension 2 Code" <> ItemAnalysisView."Dimension 2 Code" then
-                SetRange("Dimension 2 Filter");
+                Rec.SetRange("Dimension 2 Filter");
             if PrevItemAnalysisView."Dimension 3 Code" <> ItemAnalysisView."Dimension 3 Code" then
-                SetRange("Dimension 3 Filter");
+                Rec.SetRange("Dimension 3 Filter");
         end;
     end;
 
@@ -453,7 +460,7 @@ page 7117 "Sales Analysis Report"
     var
         AnalysisReportName: Record "Analysis Report Name";
     begin
-        if AnalysisReportName.Get(GetRangeMax("Analysis Area"), CurrentReportName) then begin
+        if AnalysisReportName.Get(Rec.GetRangeMax("Analysis Area"), CurrentReportName) then begin
             if AnalysisReportName."Analysis Line Template Name" <> '' then
                 CurrentLineTemplate := AnalysisReportName."Analysis Line Template Name";
             if AnalysisReportName."Analysis Column Template Name" <> '' then
@@ -466,18 +473,18 @@ page 7117 "Sales Analysis Report"
         AnalysisReportName: Record "Analysis Report Name";
     begin
         if CurrentReportName <> '' then
-            if AnalysisReportName.Get("Analysis Area"::Sales, CurrentReportName) then
+            if AnalysisReportName.Get(Rec."Analysis Area"::Sales, CurrentReportName) then
                 exit(AnalysisReportName.Name + ' ' + AnalysisReportName.Description);
     end;
 
     procedure SetFilters()
     begin
         TempAnalysisColumn.Reset();
-        TempAnalysisColumn.SetRange("Analysis Area", "Analysis Area"::Sales);
+        TempAnalysisColumn.SetRange("Analysis Area", Rec."Analysis Area"::Sales);
         TempAnalysisColumn.SetRange("Analysis Column Template", CurrentColumnTemplate);
 
         AnalysisLine.Copy(Rec);
-        AnalysisLine.SetRange("Analysis Area", "Analysis Area"::Sales);
+        AnalysisLine.SetRange("Analysis Area", Rec."Analysis Area"::Sales);
         AnalysisLine.SetRange("Analysis Line Template Name", CurrentLineTemplate);
     end;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Comment;
+
 page 5891 "Phys. Inventory Comment Sheet"
 {
     AutoSplitKey = true;
@@ -15,17 +17,17 @@ page 5891 "Phys. Inventory Comment Sheet"
             repeater(Control40)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the date when the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the comment itself.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a code for the comment.';
@@ -49,7 +51,7 @@ page 5891 "Phys. Inventory Comment Sheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
     end;
 }
 

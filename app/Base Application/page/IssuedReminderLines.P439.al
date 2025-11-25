@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 page 439 "Issued Reminder Lines"
 {
     AutoSplitKey = true;
@@ -122,30 +124,26 @@ page 439 "Issued Reminder Lines"
     end;
 
     var
-        [InDataSet]
         DescriptionEmphasize: Boolean;
-        [InDataSet]
         DescriptionIndent: Integer;
-        [InDataSet]
         RemainingAmountEmphasize: Boolean;
-        [InDataSet]
         AmountEmphasize: Boolean;
 
     local procedure DescriptionOnFormat()
     begin
-        if "Detailed Interest Rates Entry" then
+        if Rec."Detailed Interest Rates Entry" then
             DescriptionIndent := 2;
-        DescriptionEmphasize := not "Detailed Interest Rates Entry";
+        DescriptionEmphasize := not Rec."Detailed Interest Rates Entry";
     end;
 
     local procedure RemainingAmountOnFormat()
     begin
-        RemainingAmountEmphasize := not "Detailed Interest Rates Entry";
+        RemainingAmountEmphasize := not Rec."Detailed Interest Rates Entry";
     end;
 
     local procedure AmountOnFormat()
     begin
-        AmountEmphasize := not "Detailed Interest Rates Entry";
+        AmountEmphasize := not Rec."Detailed Interest Rates Entry";
     end;
 }
 

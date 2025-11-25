@@ -1,3 +1,9 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.InventoryDocument;
+
 page 7396 "Posted Invt. Put-away Lines"
 {
     Caption = 'Posted Invt. Put-away Lines';
@@ -163,7 +169,7 @@ page 7396 "Posted Invt. Put-away Lines"
 
                     trigger OnAction()
                     begin
-                        PostedInvtPutAway.Get("No.");
+                        PostedInvtPutAway.Get(Rec."No.");
                         PAGE.Run(PAGE::"Posted Invt. Put-away", PostedInvtPutAway);
                     end;
                 }

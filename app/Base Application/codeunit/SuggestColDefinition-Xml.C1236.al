@@ -1,3 +1,5 @@
+namespace System.IO;
+
 codeunit 1236 "Suggest Col. Definition - XML"
 {
 

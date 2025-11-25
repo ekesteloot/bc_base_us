@@ -1,3 +1,5 @@
+namespace Microsoft.CashFlow.Forecast;
+
 table 930 "Cash Flow Availability Buffer"
 {
     DataClassification = SystemMetadata;

@@ -1,3 +1,9 @@
+﻿namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Tracking;
+
 page 6526 "Package No. Information Card"
 {
     Caption = 'Package No. Information Card';
@@ -75,10 +81,10 @@ page 6526 "Package No. Information Card"
                     Caption = 'Comment';
                     Image = ViewComments;
                     RunObject = Page "Item Tracking Comments";
-                    RunPageLink = Type = CONST("Package No."),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Serial/Lot No." = FIELD("Package No.");
+                    RunPageLink = Type = const("Package No."),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Serial/Lot No." = field("Package No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("&Item Tracing")
@@ -183,7 +189,6 @@ page 6526 "Package No. Information Card"
 
     var
         ShowButtonFunctions: Boolean;
-        [InDataSet]
         ButtonFunctionsVisible: Boolean;
         PageCaptionTxt: Label '%1 No. Information Card', Comment = '%1 - package caption';
 

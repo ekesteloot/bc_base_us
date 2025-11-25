@@ -4,7 +4,7 @@ codeunit 236 "G/L Reg.-Cust.Ledger"
 
     trigger OnRun()
     begin
-        CustLedgEntry.SetRange("Entry No.", "From Entry No.", "To Entry No.");
+        CustLedgEntry.SetRange("Entry No.", Rec."From Entry No.", Rec."To Entry No.");
         PAGE.Run(PAGE::"Customer Ledger Entries", CustLedgEntry);
     end;
 

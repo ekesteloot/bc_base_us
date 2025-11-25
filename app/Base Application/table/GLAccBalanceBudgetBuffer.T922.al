@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 table 922 "G/L Acc. Balance/Budget Buffer"
 {
     DataClassification = SystemMetadata;

@@ -10,7 +10,7 @@ report 10088 "Cash Requirements by Due Date"
     {
         dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
         {
-            DataItemTableView = SORTING(Open, "Due Date") WHERE(Open = CONST(true), "On Hold" = CONST(''));
+            DataItemTableView = sorting(Open, "Due Date") where(Open = const(true), "On Hold" = const(''));
             RequestFilterFields = "Vendor No.", "Due Date", "Purchaser Code", "Document Type";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

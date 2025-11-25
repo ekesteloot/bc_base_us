@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
+using System.Globalization;
+
 table 7500 "Item Attribute"
 {
     Caption = 'Item Attribute';

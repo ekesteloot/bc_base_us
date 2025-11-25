@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Reflection;
+
 page 1523 "Workflow Response Options"
 {
     Caption = 'Workflow Response Options';
@@ -15,7 +19,7 @@ page 1523 "Workflow Response Options"
                 group(Control14)
                 {
                     ShowCaption = false;
-                    Visible = "Response Option Group" = 'GROUP 0';
+                    Visible = Rec."Response Option Group" = 'GROUP 0';
                     field(NoArguments; NoArguments)
                     {
                         ApplicationArea = Suite;
@@ -26,7 +30,7 @@ page 1523 "Workflow Response Options"
                 group(Control7)
                 {
                     ShowCaption = false;
-                    Visible = "Response Option Group" = 'GROUP 1';
+                    Visible = Rec."Response Option Group" = 'GROUP 1';
                     field("General Journal Template Name"; Rec."General Journal Template Name")
                     {
                         ApplicationArea = Suite;
@@ -53,8 +57,8 @@ page 1523 "Workflow Response Options"
                 group(Control8)
                 {
                     ShowCaption = false;
-                    Visible = "Response Option Group" = 'GROUP 2';
-                    field(NotifySender2; "Notify Sender")
+                    Visible = Rec."Response Option Group" = 'GROUP 2';
+                    field(NotifySender2; Rec."Notify Sender")
                     {
                         ApplicationArea = Suite;
                         Caption = 'Notify Sender';
@@ -81,8 +85,8 @@ page 1523 "Workflow Response Options"
                 group(Control23)
                 {
                     ShowCaption = false;
-                    Visible = "Response Option Group" = 'GROUP 3';
-                    field(NotifySender3; "Notify Sender")
+                    Visible = Rec."Response Option Group" = 'GROUP 3';
+                    field(NotifySender3; Rec."Notify Sender")
                     {
                         ApplicationArea = Suite;
                         Caption = 'Notify Sender';
@@ -97,8 +101,8 @@ page 1523 "Workflow Response Options"
                     {
                         ApplicationArea = Suite;
                         Caption = 'Recipient User ID';
-                        Editable = not "Notify Sender";
-                        ShowMandatory = not "Notify Sender";
+                        Editable = not Rec."Notify Sender";
+                        ShowMandatory = not Rec."Notify Sender";
                         ToolTip = 'Specifies the ID of the user that will be notified in connection with this workflow step argument.';
 
                         trigger OnValidate()
@@ -127,8 +131,8 @@ page 1523 "Workflow Response Options"
                 group(Control6)
                 {
                     ShowCaption = false;
-                    Visible = "Response Option Group" = 'GROUP 4';
-                    field(MessageField; Message)
+                    Visible = Rec."Response Option Group" = 'GROUP 4';
+                    field(MessageField; Rec.Message)
                     {
                         ApplicationArea = Suite;
                         Caption = 'Message';
@@ -143,7 +147,7 @@ page 1523 "Workflow Response Options"
                 group(Control10)
                 {
                     ShowCaption = false;
-                    Visible = "Response Option Group" = 'GROUP 5';
+                    Visible = Rec."Response Option Group" = 'GROUP 5';
                     field("Show Confirmation Message"; Rec."Show Confirmation Message")
                     {
                         ApplicationArea = Suite;
@@ -205,7 +209,7 @@ page 1523 "Workflow Response Options"
                     {
                         ShowCaption = false;
                         Visible = ShowApproverUserId;
-                        field(ApproverId; "Approver User ID")
+                        field(ApproverId; Rec."Approver User ID")
                         {
                             ApplicationArea = Suite;
                             Caption = 'Approver ID';
@@ -233,7 +237,7 @@ page 1523 "Workflow Response Options"
                 group(Control27)
                 {
                     ShowCaption = false;
-                    Visible = "Response Option Group" = 'GROUP 6';
+                    Visible = Rec."Response Option Group" = 'GROUP 6';
                     field(TableFieldRevert; TableFieldCaption)
                     {
                         ApplicationArea = Suite;
@@ -244,7 +248,7 @@ page 1523 "Workflow Response Options"
                         trigger OnLookup(var Text: Text): Boolean
                         begin
                             GetEventTable();
-                            Text := LookupFieldCaption(Format("Table No."), '');
+                            Text := LookupFieldCaption(Format(Rec."Table No."), '');
                             exit(Text <> '')
                         end;
 
@@ -257,7 +261,7 @@ page 1523 "Workflow Response Options"
                 group(Control29)
                 {
                     ShowCaption = false;
-                    Visible = "Response Option Group" = 'GROUP 7';
+                    Visible = Rec."Response Option Group" = 'GROUP 7';
                     field(ApplyAllValues; ApplyAllValues)
                     {
                         ApplicationArea = Suite;
@@ -267,8 +271,8 @@ page 1523 "Workflow Response Options"
                         trigger OnValidate()
                         begin
                             if ApplyAllValues then begin
-                                "Table No." := 0;
-                                "Field No." := 0;
+                                Rec."Table No." := 0;
+                                Rec."Field No." := 0;
                                 CurrPage.Update(true);
                             end;
                         end;
@@ -300,7 +304,7 @@ page 1523 "Workflow Response Options"
                 group(Control35)
                 {
                     ShowCaption = false;
-                    Visible = "Response Option Group" = 'GROUP 8';
+                    Visible = Rec."Response Option Group" = 'GROUP 8';
                     field("Response Type"; Rec."Response Type")
                     {
                         ApplicationArea = Suite;
@@ -316,7 +320,7 @@ page 1523 "Workflow Response Options"
                     {
                         ShowCaption = false;
                         Visible = ShowResponseUserID;
-                        field(ResponseUserId; "Response User ID")
+                        field(ResponseUserId; Rec."Response User ID")
                         {
                             ApplicationArea = Suite;
                             Caption = 'Response User ID';
@@ -342,9 +346,9 @@ page 1523 "Workflow Response Options"
     begin
         SetVisibilityOptions();
         GetEventTable();
-        CalcFields("Field Caption");
-        TableFieldCaption := "Field Caption";
-        ApplyAllValues := ("Field No." = 0);
+        Rec.CalcFields("Field Caption");
+        TableFieldCaption := Rec."Field Caption";
+        ApplyAllValues := (Rec."Field No." = 0);
     end;
 
     trigger OnAfterGetRecord()
@@ -354,7 +358,7 @@ page 1523 "Workflow Response Options"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnOpenPage()
@@ -363,7 +367,7 @@ page 1523 "Workflow Response Options"
     begin
         NoArguments := NoArgumentsTxt;
         ApprovalUserSetupLabel := StrSubstNo(OpenPageTxt, ApprovalUserSetup.Caption);
-        HideExternalUsers();
+        Rec.HideExternalUsers();
     end;
 
     var
@@ -383,20 +387,20 @@ page 1523 "Workflow Response Options"
         WorkflowStepEvent: Record "Workflow Step";
         WorkflowEvent: Record "Workflow Event";
     begin
-        WorkflowStep.SetRange(Argument, ID);
+        WorkflowStep.SetRange(Argument, Rec.ID);
         if WorkflowStep.FindFirst() then
             if WorkflowStep.HasParentEvent(WorkflowStepEvent) then begin
                 WorkflowEvent.Get(WorkflowStepEvent."Function Name");
-                "Table No." := WorkflowEvent."Table ID";
+                Rec."Table No." := WorkflowEvent."Table ID";
             end;
     end;
 
     local procedure SetVisibilityOptions()
     begin
-        CalcFields("Response Option Group");
-        ShowApprovalLimitType := "Approver Type" <> "Approver Type"::"Workflow User Group";
-        ShowApproverUserId := ShowApprovalLimitType and ("Approver Limit Type" = "Approver Limit Type"::"Specific Approver");
-        ShowResponseUserID := "Response Type" = "Response Type"::"User ID";
+        Rec.CalcFields("Response Option Group");
+        ShowApprovalLimitType := Rec."Approver Type" <> Rec."Approver Type"::"Workflow User Group";
+        ShowApproverUserId := ShowApprovalLimitType and (Rec."Approver Limit Type" = Rec."Approver Limit Type"::"Specific Approver");
+        ShowResponseUserID := Rec."Response Type" = Rec."Response Type"::"User ID";
         OnAfterSetVisibilityOptions(Rec, ShowApprovalLimitType, ShowApproverUserId, ShowResponseUserID);
     end;
 
@@ -424,7 +428,7 @@ page 1523 "Workflow Response Options"
         Field.SetFilter(TableNo, TableNoFilter);
         Field.SetFilter("No.", FieldNoFilter);
         if FieldSelection.Open(Field) then begin
-            "Table No." := Field.TableNo;
+            Rec."Table No." := Field.TableNo;
             exit(Field."Field Caption");
         end;
         exit('');
@@ -441,7 +445,7 @@ page 1523 "Workflow Response Options"
         Separator: Text[1];
         AddSeparator: Boolean;
     begin
-        WorkflowStepApply.SetRange(Argument, ID);
+        WorkflowStepApply.SetRange(Argument, Rec.ID);
         if WorkflowStepApply.FindFirst() then begin
             WorkflowStepRevert.SetRange("Workflow Code", WorkflowStepApply."Workflow Code");
             WorkflowStepRevert.SetRange("Function Name", WorkflowResponseHandling.RevertValueForFieldCode());
@@ -468,12 +472,12 @@ page 1523 "Workflow Response Options"
         "Field": Record "Field";
     begin
         if TableFieldCaption <> '' then begin
-            Field.SetRange(TableNo, "Table No.");
+            Field.SetRange(TableNo, Rec."Table No.");
             Field.SetRange("Field Caption", TableFieldCaption);
             Field.FindFirst();
-            "Field No." := Field."No."
+            Rec."Field No." := Field."No.";
         end else
-            "Field No." := 0;
+            Rec."Field No." := 0;
 
         CurrPage.Update(true);
     end;

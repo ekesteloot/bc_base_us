@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Manufacturing.Capacity;
+
 report 99001046 "Calculate Work Center Calendar"
 {
     Caption = 'Calculate Work Center Calendar';
@@ -7,7 +11,7 @@ report 99001046 "Calculate Work Center Calendar"
     {
         dataitem("Work Center"; "Work Center")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
 
             trigger OnAfterGetRecord()
@@ -84,7 +88,7 @@ report 99001046 "Calculate Work Center Calendar"
                     TestField(Capacity);
                     TestField("Unit of Measure Code");
 
-                    CalendarMgt.CalculateSchedule("Capacity Type"::"Work Center", "No.", "No.", StartingDate, EndingDate);
+                    CalendarMgt.CalculateSchedule(Enum::"Capacity Type"::"Work Center", "No.", "No.", StartingDate, EndingDate);
                 end;
             end;
 

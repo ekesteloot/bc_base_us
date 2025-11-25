@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 enum 136 "Dimension Set Entry Buffer Parent Type"
 {
     Extensible = true;

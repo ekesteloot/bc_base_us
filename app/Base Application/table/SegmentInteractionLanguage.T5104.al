@@ -1,3 +1,11 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using System.Globalization;
+using System.Integration.Word;
+using System.Utilities;
+
 table 5104 "Segment Interaction Language"
 {
     Caption = 'Segment Interaction Language';
@@ -13,7 +21,7 @@ table 5104 "Segment Interaction Language"
         field(2; "Segment Line No."; Integer)
         {
             Caption = 'Segment Line No.';
-            TableRelation = "Segment Line"."Line No." WHERE("Segment No." = FIELD("Segment No."));
+            TableRelation = "Segment Line"."Line No." where("Segment No." = field("Segment No."));
         }
         field(3; "Language Code"; Code[10])
         {

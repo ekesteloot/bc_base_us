@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 1221 "Data Exch. Field"
 {
     Caption = 'Data Exch. Field';
@@ -41,7 +45,7 @@ table 1221 "Data Exch. Field"
         }
         field(11; "Data Exch. Def Code"; Code[20])
         {
-            CalcFormula = Lookup("Data Exch."."Data Exch. Def Code" WHERE("Entry No." = FIELD("Data Exch. No.")));
+            CalcFormula = Lookup("Data Exch."."Data Exch. Def Code" where("Entry No." = field("Data Exch. No.")));
             Caption = 'Data Exch. Def Code';
             FieldClass = FlowField;
         }

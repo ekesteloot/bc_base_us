@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Shared.Navigate;
+
 page 5804 "Applied Item Entries"
 {
     Caption = 'Applied Item Entries';
@@ -93,10 +99,10 @@ page 5804 "Applied Item Entries"
 
                     trigger OnDrillDown()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the entry has been fully applied to.';
@@ -170,7 +176,7 @@ page 5804 "Applied Item Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("&Value Entries")
@@ -179,8 +185,8 @@ page 5804 "Applied Item Entries"
                     Caption = '&Value Entries';
                     Image = ValueLedger;
                     RunObject = Page "Value Entries";
-                    RunPageLink = "Item Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Item Ledger Entry No.");
+                    RunPageLink = "Item Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Item Ledger Entry No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of posted amounts that affect the value of the item. Value entries are created for every transaction with the item.';
                 }
@@ -211,7 +217,7 @@ page 5804 "Applied Item Entries"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
             }
@@ -248,7 +254,7 @@ page 5804 "Applied Item Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -298,16 +304,18 @@ page 5804 "Applied Item Entries"
 
     var
         Navigate: Page Navigate;
+
+    protected var
         ApplQty: Decimal;
         Qty: Decimal;
 
     local procedure GetApplQty()
     var
-        ItemLedgEntry: Record "Item Ledger Entry";
+        ItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        ItemLedgEntry.Get("Entry No.");
-        ApplQty := Quantity;
-        Qty := ItemLedgEntry.Quantity;
+        ItemLedgerEntry.Get(Rec."Entry No.");
+        ApplQty := Rec.Quantity;
+        Qty := ItemLedgerEntry.Quantity;
     end;
 }
 

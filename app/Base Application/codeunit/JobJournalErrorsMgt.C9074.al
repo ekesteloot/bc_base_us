@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using System.Utilities;
+
 codeunit 9074 "Job Journal Errors Mgt."
 {
     SingleInstance = true;

@@ -1,3 +1,50 @@
+﻿namespace Microsoft.CRM.RoleCenters;
+
+using Microsoft.AssemblyMgt.Reports;
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Analysis;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Profiling;
+using Microsoft.CRM.Reports;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.Dataverse;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Attribute;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Forecast;
+#if CLEAN21
+using Microsoft.Pricing.Reports;
+using Microsoft.Pricing.Worksheet;
+#endif
+using Microsoft.Sales.Analysis;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reports;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Navigate;
+
 page 8907 "Sales & Marketing Manager RC"
 {
     Caption = 'Sales & Marketing Manager RC';
@@ -475,12 +522,6 @@ page 8907 "Sales & Marketing Manager RC"
                         Caption = 'Customer - Order Summary';
                         RunObject = report "Customer - Order Summary";
                     }
-                    // action("Order Confirmation")
-                    // {
-                    //     ApplicationArea = Basic, Suite;
-                    //     Caption = 'Sales Order';
-                    //     RunObject = Codeunit 8812;
-                    // }
                     action("Customer - Labels1")
                     {
                         ApplicationArea = Basic, Suite;
@@ -596,7 +637,7 @@ page 8907 "Sales & Marketing Manager RC"
                 {
                     ApplicationArea = Suite;
                     Caption = 'Sales Price Worksheet';
-                    RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(7023)); // "Sales Price Worksheet";
+                    RunPageView = where("Object Type" = const(Page), "Object ID" = const(7023)); // "Sales Price Worksheet";
                     RunObject = Page "Role Center Page Dispatcher";
                 }
 #else
@@ -657,7 +698,7 @@ page 8907 "Sales & Marketing Manager RC"
                     action("Availability Projection")
                     {
                         ApplicationArea = Basic, Suite;
-						Caption = 'Availability Projection';
+                        Caption = 'Availability Projection';
                         RunObject = report "Availability Projection";
                     }
                     action("Availability Status")
@@ -705,7 +746,7 @@ page 8907 "Sales & Marketing Manager RC"
                         ApplicationArea = Basic, Suite;
                         Caption = 'List Price Sheet';
 #if not CLEAN21
-                        RunPageView = WHERE("Object Type" = CONST(Report), "Object ID" = CONST(10148)); // "List Price Sheet"
+                        RunPageView = where("Object Type" = const(Report), "Object ID" = const(10148)); // "List Price Sheet"
                         RunObject = Page "Role Center Page Dispatcher";
 #else
                         RunObject = Report "List Price Sheet V16";
@@ -736,7 +777,7 @@ page 8907 "Sales & Marketing Manager RC"
                     {
                         Caption = 'Sales Promotion';
 #if not CLEAN21
-                        RunPageView = WHERE("Object Type" = CONST(Report), "Object ID" = CONST(10159)); // "Sales Promotion"
+                        RunPageView = where("Object Type" = const(Report), "Object ID" = const(10159)); // "Sales Promotion"
                         RunObject = Page "Role Center Page Dispatcher";
 #else
                         RunObject = report "Sales Promotion V16";

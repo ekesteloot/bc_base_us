@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Counting.Recording;
+
+using Microsoft.HumanResources.Employee;
+using Microsoft.InventoryMgt.Counting.Comment;
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Structure;
+using System.Security.AccessControl;
+
 table 5877 "Phys. Invt. Record Header"
 {
     Caption = 'Phys. Invt. Record Header';
@@ -36,9 +45,9 @@ table 5877 "Phys. Invt. Record Header"
         }
         field(30; Comment; Boolean)
         {
-            CalcFormula = Exist ("Phys. Invt. Comment Line" WHERE("Document Type" = CONST(Recording),
-                                                                  "Order No." = FIELD("Order No."),
-                                                                  "Recording No." = FIELD("Recording No.")));
+            CalcFormula = exist("Phys. Invt. Comment Line" where("Document Type" = const(Recording),
+                                                                  "Order No." = field("Order No."),
+                                                                  "Recording No." = field("Recording No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -47,8 +56,6 @@ table 5877 "Phys. Invt. Record Header"
         {
             Caption = 'Person Responsible';
             TableRelation = Employee;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(40; "Allow Recording Without Order"; Boolean)
@@ -67,9 +74,13 @@ table 5877 "Phys. Invt. Record Header"
         {
             Caption = 'Person Recorded';
             TableRelation = Employee;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
+        }
+        field(103; "Recorded by User ID"; Code[50])
+        {
+            Caption = 'Created by User';
+            DataClassification = EndUserIdentifiableInformation;
+            TableRelation = User."User Name";
         }
         field(110; "Location Code"; Code[10])
         {
@@ -79,7 +90,7 @@ table 5877 "Phys. Invt. Record Header"
         field(111; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -142,6 +153,8 @@ table 5877 "Phys. Invt. Record Header"
             else
                 "Recording No." := 1;
         end;
+
+        "Recorded by User ID" := CopyStr(UserId(), 1, 50);
     end;
 
     trigger OnModify()

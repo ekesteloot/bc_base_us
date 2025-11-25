@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Apps;
+
 /// <summary>
 /// This table contains object metadata from published applications.
 /// </summary>
@@ -128,6 +134,14 @@ table 2000000207 "Application Object Metadata"
         {
             Caption = 'User AL Code Hash';
         }
+
+        /// <summary>
+        /// The object schema hash.
+        /// </summary>
+        field(17; "Schema Hash"; Integer)
+        {
+            Caption = 'Schema Hash';
+        }
     }
 
     keys
@@ -136,7 +150,7 @@ table 2000000207 "Application Object Metadata"
         {
             Clustered = true;
         }
- 
+
         key(Key2; "Emit Version")
         {
             Unique = false;

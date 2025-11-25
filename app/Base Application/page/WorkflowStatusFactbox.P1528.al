@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1528 "Workflow Status FactBox"
 {
     Caption = 'Workflows';
@@ -26,7 +28,7 @@ page 1528 "Workflow Status FactBox"
                     var
                         TempWorkflowStepInstance: Record "Workflow Step Instance" temporary;
                     begin
-                        TempWorkflowStepInstance.BuildTempWorkflowTree(ID);
+                        TempWorkflowStepInstance.BuildTempWorkflowTree(Rec.ID);
                         PAGE.RunModal(PAGE::"Workflow Overview", TempWorkflowStepInstance);
                     end;
                 }
@@ -40,7 +42,7 @@ page 1528 "Workflow Status FactBox"
 
     trigger OnAfterGetRecord()
     begin
-        if Workflow.Get("Workflow Code") then
+        if Workflow.Get(Rec."Workflow Code") then
             WorkflowDescription := Workflow.Description;
     end;
 
@@ -59,7 +61,7 @@ page 1528 "Workflow Status FactBox"
         WorkflowStepInstance: Record "Workflow Step Instance";
         InstanceID: Guid;
     begin
-        DeleteAll();
+        Rec.DeleteAll();
         WorkflowStepInstance.SetRange("Record ID", WorkflowStepRecID);
         if not WorkflowStepInstance.FindSet() then
             exit(false);
@@ -67,11 +69,11 @@ page 1528 "Workflow Status FactBox"
         repeat
             if WorkflowStepInstance.ID <> InstanceID then begin
                 Rec := WorkflowStepInstance;
-                Insert();
+                Rec.Insert();
             end;
             InstanceID := WorkflowStepInstance.ID;
         until WorkflowStepInstance.Next() = 0;
-        exit(not IsEmpty);
+        exit(not Rec.IsEmpty);
     end;
 }
 

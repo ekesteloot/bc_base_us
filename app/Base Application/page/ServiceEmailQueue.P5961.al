@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Email;
+
 page 5961 "Service Email Queue"
 {
     ApplicationArea = Service;
@@ -94,10 +96,10 @@ page 5961 "Service Email Queue"
 
                     trigger OnAction()
                     begin
-                        if IsEmpty() then
+                        if Rec.IsEmpty() then
                             Error(Text001);
 
-                        if Status = Status::Processed then
+                        if Rec.Status = Rec.Status::Processed then
                             Error(Text000);
 
                         Clear(ServMailMgt);
@@ -105,7 +107,7 @@ page 5961 "Service Email Queue"
                         ClearLastError();
 
                         if ServMailMgt.Run(Rec) then begin
-                            Status := Status::Processed;
+                            Rec.Status := Rec.Status::Processed;
                             CurrPage.Update();
                         end else
                             Error(GetLastErrorText);
@@ -125,8 +127,8 @@ page 5961 "Service Email Queue"
                     begin
                         Clear(EMailQueue);
                         EMailQueue.SetCurrentKey("Document Type", "Document No.");
-                        EMailQueue.SetRange("Document Type", "Document Type");
-                        EMailQueue.SetRange("Document No.", "Document No.");
+                        EMailQueue.SetRange("Document Type", Rec."Document Type");
+                        EMailQueue.SetRange("Document No.", Rec."Document No.");
                         REPORT.Run(REPORT::"Delete Service Email Queue", false, false, EMailQueue);
                     end;
                 }

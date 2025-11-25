@@ -1,3 +1,30 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Dataverse;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Integration.D365Sales;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using System;
+using System.Azure.KeyVault;
+using System.Environment;
+using System.Environment.Configuration;
+using System.IO;
+using System.Telemetry;
+using System.Threading;
+using System.Upgrade;
+
 codeunit 7205 "CDS Int. Table. Subscriber"
 {
     SingleInstance = true;
@@ -107,6 +134,9 @@ codeunit 7205 "CDS Int. Table. Subscriber"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Integration Rec. Synch. Invoke", 'OnAfterInsertRecord', '', false, false)]
     local procedure HandleOnAfterInsertRecord(var SourceRecordRef: RecordRef; var DestinationRecordRef: RecordRef)
+    var
+        IntegrationTableMapping: Record "Integration Table Mapping";
+        Customer: Record Customer;
     begin
         case GetSourceDestCode(SourceRecordRef, DestinationRecordRef) of
             'CRM Account-Customer',
@@ -124,6 +154,19 @@ codeunit 7205 "CDS Int. Table. Subscriber"
                 FixPrimaryContactIdInCDS(SourceRecordRef, DestinationRecordRef);
             'CRM Systemuser-Salesperson/Purchaser':
                 AddCoupledUserToDefaultOwningTeam(SourceRecordRef);
+            'Customer-CRM Account':
+                begin
+                    SourceRecordRef.SetTable(Customer);
+                    IntegrationTableMapping.SetRange(Type, IntegrationTableMapping.Type::Dataverse);
+                    IntegrationTableMapping.SetRange("Delete After Synchronization", false);
+                    IntegrationTableMapping.SetRange("Table ID", Database::Contact);
+                    IntegrationTableMapping.SetRange("Integration Table ID", Database::"CRM Contact");
+                    if IntegrationTableMapping.FindFirst() then
+                        if IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." > Customer.SystemCreatedAt then begin
+                            IntegrationTableMapping."Synch. Int. Tbl. Mod. On Fltr." := Customer.SystemCreatedAt;
+                            IntegrationTableMapping.Modify();
+                        end;
+                end;
         end;
     end;
 
@@ -998,6 +1041,31 @@ codeunit 7205 "CDS Int. Table. Subscriber"
                                 if not Confirm(StrSubstNo(CouplingsNeedToBeResetQst, IntegrationTableMappingList.Caption())) then
                                     Error('');
                         end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Integration Rec. Synch. Invoke", 'OnAfterUnchangedRecordHandled', '', false, false)]
+    local procedure OnAfterUnchangedRecordHandled(IntegrationTableMapping: Record "Integration Table Mapping"; SourceRecordRef: RecordRef; DestinationRecordRef: RecordRef)
+    var
+        CDSConnectionSetup: Record "CDS Connection Setup";
+        CRMContact: Record "CRM Contact";
+        EmptyGuid: Guid;
+    begin
+        if not CDSConnectionSetup.Get() then
+            exit;
+
+        if not CDSConnectionSetup."Is Enabled" then
+            exit;
+
+        case GetSourceDestCode(SourceRecordRef, DestinationRecordRef) of
+            'Contact-CRM Contact':
+                begin
+                    DestinationRecordRef.SetTable(CRMContact);
+                    if CRMContact.ParentCustomerId = EmptyGuid then begin
+                        UpdateCRMContactParentCustomerId(SourceRecordRef, DestinationRecordRef);
+                        DestinationRecordRef.Modify();
+                    end
+                end;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"CRM Integration Table Synch.", 'OnQueryPostFilterIgnoreRecord', '', false, false)]

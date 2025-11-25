@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Contract;
+using System.Utilities;
+
 page 9261 "Contr. G/Loss (Cust.) Matrix"
 {
     Caption = 'Contr. Gain/Loss (Customer) Matrix';
@@ -39,9 +46,9 @@ page 9261 "Contr. G/Loss (Cust.) Matrix"
                         if CustomerFilter <> '' then
                             ContractGainLossEntry.SetRange("Customer No.", CustomerFilter);
                         if AmountType = AmountType::"Net Change" then
-                            ContractGainLossEntry.SetRange("Change Date", "Period Start", "Period End")
+                            ContractGainLossEntry.SetRange("Change Date", Rec."Period Start", Rec."Period End")
                         else
-                            ContractGainLossEntry.SetRange("Change Date", 0D, "Period End");
+                            ContractGainLossEntry.SetRange("Change Date", 0D, Rec."Period End");
                         PAGE.Run(0, ContractGainLossEntry);
                     end;
                 }
@@ -503,7 +510,7 @@ page 9261 "Contr. G/Loss (Cust.) Matrix"
     trigger OnOpenPage()
     begin
         StartFilter := Format(PeriodStart) + '..';
-        SetFilter("Period Start", StartFilter);
+        Rec.SetFilter("Period Start", StartFilter);
         MATRIX_CurrentNoOfMatrixColumn := 32;
     end;
 
@@ -523,69 +530,37 @@ page 9261 "Contr. G/Loss (Cust.) Matrix"
         ShipToFilter: Text[250];
         CustomerFilter: Text[250];
         Text000: Label '<Sign><Integer Thousand><Decimals,3>', Locked = true;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
 
     local procedure CalculateTotals()
@@ -598,9 +573,9 @@ page 9261 "Contr. G/Loss (Cust.) Matrix"
         ContractGainLossEntry.SetRange("Customer No.", CustomerFilter);
 
         if AmountType = AmountType::"Net Change" then
-            ContractGainLossEntry.SetRange("Change Date", "Period Start", "Period End")
+            ContractGainLossEntry.SetRange("Change Date", Rec."Period Start", Rec."Period End")
         else
-            ContractGainLossEntry.SetRange("Change Date", PeriodStart, "Period End");
+            ContractGainLossEntry.SetRange("Change Date", PeriodStart, Rec."Period End");
         ContractGainLossEntry.CalcSums(Amount);
         TotalGainLoss := ContractGainLossEntry.Amount;
     end;
@@ -624,9 +599,9 @@ page 9261 "Contr. G/Loss (Cust.) Matrix"
         ContractGainLossEntry.SetRange("Ship-to Code", MatrixRecords[MATRIX_ColumnOrdinal].Code);
         ContractGainLossEntry.SetRange("Customer No.", CustomerFilter);
         if AmountType = AmountType::"Net Change" then
-            ContractGainLossEntry.SetRange("Change Date", "Period Start", "Period End")
+            ContractGainLossEntry.SetRange("Change Date", Rec."Period Start", Rec."Period End")
         else
-            ContractGainLossEntry.SetRange("Change Date", 0D, "Period End");
+            ContractGainLossEntry.SetRange("Change Date", 0D, Rec."Period End");
 
         PAGE.Run(0, ContractGainLossEntry);
     end;
@@ -650,9 +625,9 @@ page 9261 "Contr. G/Loss (Cust.) Matrix"
     begin
         if Cust.Get(CustomerFilter) then begin
             if AmountType = AmountType::"Net Change" then
-                Cust.SetRange("Date Filter", "Period Start", "Period End")
+                Cust.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
             else
-                Cust.SetRange("Date Filter", PeriodStart, "Period End");
+                Cust.SetRange("Date Filter", PeriodStart, Rec."Period End");
 
             Cust.SetFilter("Ship-to Filter", ShipToAddrCode);
 

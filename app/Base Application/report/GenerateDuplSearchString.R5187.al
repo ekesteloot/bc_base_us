@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Duplicates;
+
+using Microsoft.CRM.Contact;
+
 report 5187 "Generate Dupl. Search String"
 {
     ApplicationArea = RelationshipMgmt;
@@ -9,7 +13,7 @@ report 5187 "Generate Dupl. Search String"
     {
         dataitem(Contact; Contact)
         {
-            DataItemTableView = WHERE(Type = CONST(Company));
+            DataItemTableView = where(Type = const(Company));
             RequestFilterFields = "No.", "Company No.", "Last Date Modified", "External ID";
 
             trigger OnAfterGetRecord()

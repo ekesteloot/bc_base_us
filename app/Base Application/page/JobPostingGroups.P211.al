@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
 page 211 "Job Posting Groups"
 {
     ApplicationArea = Jobs;
@@ -13,7 +15,7 @@ page 211 "Job Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies a code for the posting group that defines to which G/L account you post job transactions when the job card contains the job posting group.';

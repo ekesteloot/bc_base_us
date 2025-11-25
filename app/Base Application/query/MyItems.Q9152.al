@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.Manufacturing.Document;
+
 query 9152 "My Items"
 {
     Caption = 'My Items';

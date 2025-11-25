@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ServiceMgt.Item;
+using System.Utilities;
+
 table 5996 "Standard Service Code"
 {
     Caption = 'Standard Service Code';

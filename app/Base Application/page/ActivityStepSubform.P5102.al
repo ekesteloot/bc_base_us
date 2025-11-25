@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Task;
+
 page 5102 "Activity Step Subform"
 {
     AutoSplitKey = true;
@@ -24,7 +26,7 @@ page 5102 "Activity Step Subform"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the description of the step.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the priority of the step.';

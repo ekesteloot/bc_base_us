@@ -1,3 +1,10 @@
+﻿namespace System.Visualization;
+
+using System;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 page 9183 "Generic Chart Setup"
 {
     Caption = 'Generic Chart Setup';
@@ -11,7 +18,7 @@ page 9183 "Generic Chart Setup"
             group(General)
             {
                 Caption = 'General';
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Basic, Suite;
                     NotBlank = true;
@@ -22,7 +29,7 @@ page 9183 "Generic Chart Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the chart.';
                 }
-                field(ChartExists; BLOB.HasValue)
+                field(ChartExists; Rec.BLOB.HasValue)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Chart Exists';
@@ -844,23 +851,15 @@ page 9183 "Generic Chart Setup"
         DummyInt: Integer;
         DummyCaption: Text[50];
         Text001: Label 'All fields will be reset. Are you sure that you want to change the %1?';
-        [InDataSet]
         OptionalMeasuresEnabled: Boolean;
         Text002: Label 'Field %1 is already assigned to a measure or dimension. Select a different field.';
         Text003: Label 'Do you want to replace the existing definition for %1 %2?', Comment = 'Do you want to replace the existing definition for Chart 36-06?';
-        [InDataSet]
         DataColumn1Enabled: Boolean;
-        [InDataSet]
         DataColumn2Enabled: Boolean;
-        [InDataSet]
         DataColumn3Enabled: Boolean;
-        [InDataSet]
         DataColumn4Enabled: Boolean;
-        [InDataSet]
         DataColumn5Enabled: Boolean;
-        [InDataSet]
         DataColumn6Enabled: Boolean;
-        [InDataSet]
         ZAxisEnabled: Boolean;
         Text004: Label 'You can only specify one Measure with aggregation type Count.';
         Text005: Label 'If you select Aggregation Count, the Data Column will be cleared for this measure. Do you want to continue?';
@@ -942,7 +941,7 @@ page 9183 "Generic Chart Setup"
         for i := 1 to Count do
             if AddYAxisMeasure(i) then begin
                 Clear(TempGenericChartYAxis);
-                TempGenericChartYAxis.ID := ID;
+                TempGenericChartYAxis.ID := Rec.ID;
                 TempGenericChartYAxis."Line No." := i * 10000;
                 TempGenericChartYAxis."Y-Axis Measure Field Name" := DataColumn[i];
                 GenericChartMgt.RetrieveFieldColumnIDFromName(
@@ -1130,12 +1129,12 @@ page 9183 "Generic Chart Setup"
         if FileMgt.BLOBImport(TempBlob, '*.xml') = '' then
             exit;
 
-        if BLOB.HasValue() then
-            if not Confirm(Text003, false, TableCaption(), ID) then
+        if Rec.BLOB.HasValue() then
+            if not Confirm(Text003, false, Rec.TableCaption(), Rec.ID) then
                 exit;
 
         RecordRef.GetTable(Rec);
-        TempBlob.ToRecordRef(RecordRef, FieldNo(BLOB));
+        TempBlob.ToRecordRef(RecordRef, Rec.FieldNo(BLOB));
         RecordRef.SetTable(Rec);
         CurrPage.SaveRecord();
     end;
@@ -1145,7 +1144,7 @@ page 9183 "Generic Chart Setup"
         TempBlob: Codeunit "Temp Blob";
         FileMgt: Codeunit "File Management";
     begin
-        TempBlob.FromRecord(Rec, FieldNo(BLOB));
+        TempBlob.FromRecord(Rec, Rec.FieldNo(BLOB));
         if TempBlob.HasValue() then
             FileMgt.BLOBExport(TempBlob, '*.xml', true);
     end;

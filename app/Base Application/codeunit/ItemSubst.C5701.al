@@ -1,3 +1,16 @@
+namespace Microsoft.InventoryMgt.Item.Substitution;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+
 codeunit 5701 "Item Subst."
 {
 

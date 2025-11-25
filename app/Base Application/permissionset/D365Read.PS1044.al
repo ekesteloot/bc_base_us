@@ -75,6 +75,10 @@ permissionset 1044 "D365 READ"
                   tabledata "Administration Cue" = R,
                   tabledata "Aged Report Entity" = R,
                   tabledata "Aging Band Buffer" = R,
+                  tabledata "Alloc. Acc. Manual Override" = R,
+                  tabledata "Alloc. Account Distribution" = R,
+                  tabledata "Allocation Account" = R,
+                  tabledata "Allocation Line" = R,
                   tabledata "Alternative Address" = R,
                   tabledata "Alt. Customer Posting Group" = R,
                   tabledata "Alt. Vendor Posting Group" = R,
@@ -164,6 +168,7 @@ permissionset 1044 "D365 READ"
                   tabledata "Booking Staff" = R,
                   tabledata "Booking Sync" = R,
                   tabledata "Budget Buffer" = R,
+                  tabledata "Bus. Unit In Cons. Process" = R,
                   tabledata "Business Chart Buffer" = R,
                   tabledata "Business Chart Map" = R,
                   tabledata "Business Chart User Setup" = RIM,
@@ -197,6 +202,7 @@ permissionset 1044 "D365 READ"
                   tabledata "Cash Flow Worksheet Line" = R,
                   tabledata "Cause of Absence" = R,
                   tabledata "Cause of Inactivity" = R,
+                  tabledata "CDS Available Virtual Table" = R,
                   tabledata "CDS Company" = R,
                   tabledata "CDS Connection Setup" = R,
                   tabledata "CDS Coupled Business Unit" = R,
@@ -249,6 +255,8 @@ permissionset 1044 "D365 READ"
                   tabledata "Config. Template Line" = R,
                   tabledata "Config. Tmpl. Selection Rules" = R,
                   tabledata "Consolidation Account" = R,
+                  tabledata "Consolidation Process" = R,
+                  tabledata "Consolidation Setup" = R,
                   tabledata "Cont. Duplicate Search String" = R,
                   tabledata Contact = R,
                   tabledata "Contact Alt. Addr. Date Range" = R,
@@ -369,9 +377,6 @@ permissionset 1044 "D365 READ"
                   tabledata "Customer Price Group" = R,
                   tabledata "Customer Sales Buffer" = R,
                   tabledata "Customer Templ." = R,
-#if not CLEAN20
-                  tabledata "Customer Template" = R,
-#endif
                   tabledata "Customized Calendar Change" = R,
                   tabledata "Customized Calendar Entry" = R,
                   tabledata "CV Ledger Entry Buffer" = R,
@@ -570,10 +575,6 @@ permissionset 1044 "D365 READ"
 #if not CLEAN21
                   tabledata "Graph Mail Setup" = R,
 #endif
-#if not CLEAN20
-                  tabledata "Graph Subscription" = RIMD,
-                  tabledata "Graph Business Setting" = RIMD,
-#endif                  
                   tabledata "Grounds for Termination" = R,
                   tabledata "Handled IC Inbox Jnl. Line" = R,
                   tabledata "Handled IC Inbox Purch. Header" = R,
@@ -665,7 +666,7 @@ permissionset 1044 "D365 READ"
                   tabledata "Inventory Report Entry" = R,
                   tabledata "Inventory Report Header" = R,
                   tabledata "Inventory Setup" = R,
-#if not CLEAN20
+#if not CLEAN23
                   tabledata "Invoice Post. Buffer" = R,
 #endif
                   tabledata "Invoice Posting Buffer" = R,
@@ -813,12 +814,6 @@ permissionset 1044 "D365 READ"
                   tabledata "My Vendor" = RIM,
                   tabledata "Name/Value Buffer" = R,
                   tabledata "Named Forward Link" = R,
-#if not CLEAN20
-                  tabledata "Native - API Tax Setup" = R,
-                  tabledata "Native - Export Invoices" = R,
-                  tabledata "Native - Gen. Settings Buffer" = R,
-                  tabledata "Native - Payment" = R,
-#endif
                   tabledata "No. Series" = R,
                   tabledata "No. Series Line" = R,
                   tabledata "No. Series Relationship" = R,
@@ -934,9 +929,6 @@ permissionset 1044 "D365 READ"
                   tabledata "Phys. Invt. Record Line" = R,
                   tabledata "Phys. Invt. Tracking" = R,
                   tabledata "Picture Entity" = R,
-#if not CLEAN20
-                  tabledata "Plan Permission Set" = R,
-#endif
                   tabledata "Planning Assignment" = R,
                   tabledata "Planning Buffer" = R,
                   tabledata "Planning Component" = R,
@@ -985,7 +977,9 @@ permissionset 1044 "D365 READ"
 #if not CLEAN21
                   tabledata "Power BI User License" = R,
 #endif
+#if not CLEAN23
                   tabledata "Power BI User Status" = R,
+#endif
                   tabledata "Prepayment Inv. Line Buffer" = R,
                   tabledata "Price Asset" = R,
                   tabledata "Price Calculation Buffer" = R,
@@ -1483,17 +1477,6 @@ permissionset 1044 "D365 READ"
                   tabledata "Workflow Webhook Sub Buffer" = R,
                   tabledata "Workflow Webhook Subscription" = R,
                   tabledata "Workflows Entries Buffer" = R,
-#if not CLEAN20
-                  tabledata "XBRL Comment Line" = R,
-                  tabledata "XBRL G/L Map Line" = R,
-                  tabledata "XBRL Line Constant" = R,
-                  tabledata "XBRL Linkbase" = R,
-                  tabledata "XBRL Rollup Line" = R,
-                  tabledata "XBRL Schema" = R,
-                  tabledata "XBRL Taxonomy" = R,
-                  tabledata "XBRL Taxonomy Label" = R,
-                  tabledata "XBRL Taxonomy Line" = R,
-#endif
                   tabledata "XML Buffer" = R,
                   tabledata "XML Schema" = R,
                   tabledata "XML Schema Element" = R,

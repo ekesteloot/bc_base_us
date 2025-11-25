@@ -1,3 +1,19 @@
+﻿namespace Microsoft.ServiceMgt.Contract;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Ledger;
+using Microsoft.ServiceMgt.Setup;
+using System.Security.User;
+using System.Utilities;
+
 codeunit 5940 ServContractManagement
 {
     Permissions = TableData "Service Ledger Entry" = rimd,
@@ -779,8 +795,8 @@ codeunit 5940 ServContractManagement
         ServHeader2."Customer No." := ServContract."Customer No.";
         ServHeader2."Responsibility Center" := ServContract."Responsibility Center";
         Cust.Get(ServHeader2."Customer No.");
-	
-	IsHandled := false;
+
+        IsHandled := false;
         OnCreateOrGetCreditHeaderOnBeforeCheckBlockedCustOnDocs(ServHeader2, ServContract, IsHandled);
         if not IsHandled then
             Cust.CheckBlockedCustOnDocs(Cust, ServHeader2."Document Type", false, false);
@@ -2032,7 +2048,7 @@ codeunit 5940 ServContractManagement
         end;
     end;
 
-    local procedure CheckCustomerCurrencyCombination(var ServiceContractHeader: Record "Service Contract Header")
+    procedure CheckCustomerCurrencyCombination(var ServiceContractHeader: Record "Service Contract Header")
     var
         ServiceContractHeader2: Record "Service Contract Header";
     begin

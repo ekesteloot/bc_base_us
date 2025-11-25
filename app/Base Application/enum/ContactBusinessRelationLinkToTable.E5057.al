@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.BusinessRelation;
+
 enum 5057 "Contact Business Relation Link To Table" implements "Contact Business Relation Link"
 {
     Extensible = true;

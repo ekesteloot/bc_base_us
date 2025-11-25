@@ -1,7 +1,17 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 2502 "Day Book Vendor Ledger Entry"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/DayBookVendorLedgerEntry.rdlc';
+    RDLCLayout = './Purchases/Reports/DayBookVendorLedgerEntry.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Day Book Vendor Ledger Entry';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +20,7 @@ report 2502 "Day Book Vendor Ledger Entry"
     {
         dataitem(ReqVendLedgEntry; "Vendor Ledger Entry")
         {
-            DataItemTableView = SORTING("Document Type", "Vendor No.", "Posting Date", "Currency Code");
+            DataItemTableView = sorting("Document Type", "Vendor No.", "Posting Date", "Currency Code");
             RequestFilterFields = "Document Type", "Vendor No.", "Posting Date", "Currency Code";
 
             trigger OnPreDataItem()
@@ -20,7 +30,7 @@ report 2502 "Day Book Vendor Ledger Entry"
         }
         dataitem(Date; Date)
         {
-            DataItemTableView = SORTING("Period Type", "Period Start") WHERE("Period Type" = CONST(Date));
+            DataItemTableView = sorting("Period Type", "Period Start") where("Period Type" = const(Date));
             column(USERID; UserId)
             {
             }
@@ -133,7 +143,7 @@ report 2502 "Day Book Vendor Ledger Entry"
             }
             dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
             {
-                DataItemTableView = SORTING("Document Type", "Vendor No.", "Posting Date", "Currency Code");
+                DataItemTableView = sorting("Document Type", "Vendor No.", "Posting Date", "Currency Code");
                 column(Vendor_Ledger_Entry__FIELDNAME__Posting_Date__________FORMAT_Date__Period_Start__0_4_; FieldCaption("Posting Date") + ' ' + Format(Date."Period Start", 0, 4))
                 {
                 }
@@ -232,7 +242,7 @@ report 2502 "Day Book Vendor Ledger Entry"
                 }
                 dataitem("G/L Entry"; "G/L Entry")
                 {
-                    DataItemTableView = SORTING("Transaction No.");
+                    DataItemTableView = sorting("Transaction No.");
                     column(G_L_Entry__G_L_Account_No__; "G/L Account No.")
                     {
                     }

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 codeunit 5722 "Item Category Management"
 {
     EventSubscriberInstance = Manual;

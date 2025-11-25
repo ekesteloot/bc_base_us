@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.SalesTax;
+
+using System.Environment;
+
 codeunit 399 "Copy Tax Setup From Company"
 {
 

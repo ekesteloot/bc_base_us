@@ -1,7 +1,12 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Manufacturing.Document;
+
 report 99000791 "Production Order Statistics"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrderStatistics.rdlc';
+    RDLCLayout = './Manufacturing/Reports/ProductionOrderStatistics.rdlc';
     AdditionalSearchTerms = 'material cost,capacity cost,material overhead';
     ApplicationArea = Manufacturing;
     Caption = 'Production Order Statistics';
@@ -11,7 +16,7 @@ report 99000791 "Production Order Statistics"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             RequestFilterFields = Status, "No.", "Date Filter";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

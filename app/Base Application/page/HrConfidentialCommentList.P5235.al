@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Employee;
+
 page 5235 "HR Confidential Comment List"
 {
     Caption = 'Comment List';
@@ -19,17 +21,17 @@ page 5235 "HR Confidential Comment List"
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the date when the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the comment itself.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a code for the comment.';

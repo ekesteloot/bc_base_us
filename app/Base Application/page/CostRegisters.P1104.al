@@ -1,3 +1,7 @@
+namespace Microsoft.CostAccounting.Ledger;
+
+using System.Security.User;
+
 page 1104 "Cost Registers"
 {
     ApplicationArea = CostAccounting;
@@ -21,13 +25,13 @@ page 1104 "Cost Registers"
                     Editable = false;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Source; Source)
+                field(Source; Rec.Source)
                 {
                     ApplicationArea = CostAccounting;
                     Editable = false;
                     ToolTip = 'Specifies the source for the cost register.';
                 }
-                field(Level; Level)
+                field(Level; Rec.Level)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies by which level the cost allocation posting is done. For example, this makes sure that costs are allocated at level 1 from the ADM cost center to the WORKSHOP and PROD cost centers, before they are allocated at level 2 from the PROD cost center to the FURNITURE, CHAIRS, and PAINT cost objects.';
@@ -78,7 +82,7 @@ page 1104 "Cost Registers"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the total of the ledger entries that represent credits.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies whether or not the cost has been closed.';
@@ -97,7 +101,7 @@ page 1104 "Cost Registers"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Journal Batch Name"; Rec."Journal Batch Name")
@@ -130,7 +134,7 @@ page 1104 "Cost Registers"
                     var
                         CostEntry: Record "Cost Entry";
                     begin
-                        CostEntry.SetRange("Entry No.", "From Cost Entry No.", "To Cost Entry No.");
+                        CostEntry.SetRange("Entry No.", Rec."From Cost Entry No.", Rec."To Cost Entry No.");
                         PAGE.Run(PAGE::"Cost Entries", CostEntry);
                     end;
                 }
@@ -140,8 +144,8 @@ page 1104 "Cost Registers"
                     Caption = '&Allocated Cost Entries';
                     Image = GLRegisters;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Allocated with Journal No." = FIELD("No.");
-                    RunPageView = SORTING("Allocated with Journal No.");
+                    RunPageLink = "Allocated with Journal No." = field("No.");
+                    RunPageView = sorting("Allocated with Journal No.");
                     ToolTip = 'Specifies the cost allocation entries.';
                 }
             }

@@ -162,7 +162,7 @@ page 189 "Incoming Document"
                         Importance = Additional;
                         ToolTip = 'Specifies the name of the user who created the incoming document line.';
                     }
-                    field(Released; Released)
+                    field(Released; Rec.Released)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies if the incoming document has been approved.';
@@ -382,7 +382,7 @@ page 189 "Incoming Document"
                     var
                         ActivityLog: Record "Activity Log";
                     begin
-                        ActivityLog.ShowEntries(RecordId);
+                        ActivityLog.ShowEntries(Rec.RecordId);
                     end;
                 }
                 action(OCRSetup)
@@ -433,7 +433,7 @@ page 189 "Incoming Document"
 
                 trigger OnAction()
                 begin
-                    Rec."Created Doc. Error Msg. Type" := "Created Doc. Error Msg. Type"::Warning;
+                    Rec."Created Doc. Error Msg. Type" := Rec."Created Doc. Error Msg. Type"::Warning;
                     Rec.Modify();
                     Rec.CreateDocumentWithDataExchange();
                 end;
@@ -576,7 +576,7 @@ page 189 "Incoming Document"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Set To Processed';
-                    Enabled = NOT Processed;
+                    Enabled = NOT Rec.Processed;
                     Image = Archive;
                     ToolTip = 'Set the incoming document to processed. It will then be moved to the Processed Incoming Documents window.';
 
@@ -590,7 +590,7 @@ page 189 "Incoming Document"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Set To Unprocessed';
-                    Enabled = Processed;
+                    Enabled = Rec.Processed;
                     Image = ReOpen;
                     ToolTip = 'Set the incoming document to unprocessed. This allows you to edit information or perform actions for the incoming document.';
 
@@ -617,7 +617,7 @@ page 189 "Incoming Document"
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
                         Rec.TestReadyForApproval();
-                        ApprovalsMgmt.ApproveRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.ApproveRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(RejectApproval)
@@ -632,7 +632,7 @@ page 189 "Incoming Document"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.RejectRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.RejectRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Delegate)
@@ -647,7 +647,7 @@ page 189 "Incoming Document"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.DelegateRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.DelegateRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Comment)
@@ -823,7 +823,7 @@ page 189 "Incoming Document"
                             if not AskUserPermission() then
                                 exit;
 
-                            CreateSalesInvoice();
+                            Rec.CreateSalesInvoice();
                         end;
                     }
                     action(SalesCreditMemo)
@@ -1115,9 +1115,7 @@ page 189 "Incoming Document"
         AutomaticProcessingQst: Label 'The Data Exchange Type field is filled on at least one of the selected Incoming Documents.\\Are you sure you want to create documents manually?', Comment = '%1 is Data Exchange Type';
         ClientTypeManagement: Codeunit "Client Type Management";
         Camera: Codeunit Camera;
-        [InDataSet]
         HasCamera: Boolean;
-        [InDataSet]
         StatusStyleText: Text;
         AttachmentFileName: Text;
         RecordLinkTxt: Text;
@@ -1181,10 +1179,10 @@ page 189 "Incoming Document"
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         RelatedRecord: Variant;
     begin
-        OpenApprovalEntriesExistForCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
-        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(RecordId);
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        OpenApprovalEntriesExistForCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(Rec.RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
+        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
         UpdateOCRSetupVisibility();
         AutomaticCreationActionsAreEnabled := Rec."Data Exchange Type" <> '';
         RecordLinkExists := Rec.GetRecord(RelatedRecord);

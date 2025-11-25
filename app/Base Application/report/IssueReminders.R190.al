@@ -1,3 +1,12 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Setup;
+using System.Utilities;
+
 report 190 "Issue Reminders"
 {
     Caption = 'Issue Reminders';
@@ -7,7 +16,7 @@ report 190 "Issue Reminders"
     {
         dataitem("Reminder Header"; "Reminder Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Reminder';
 
@@ -126,6 +135,7 @@ report 190 "Issue Reminders"
                         begin
                             if VATReportingDateMgt.IsVATDateUsageSetToPostingDate() then
                                 ReplaceVATDateReq := ReplacePostingDate;
+
                             UpdateVATDate();
                         end;
                     }
@@ -257,7 +267,6 @@ report 190 "Issue Reminders"
         OldDateTime: DateTime;
         ReplacePostingDate, ReplaceVATDateReq : Boolean;
         HideDialog: Boolean;
-        [InDataSet]
         IsJournalTemplNameVisible: Boolean;
 
         EnterPostingDateErr: Label 'Enter the Posting Date.';
@@ -270,7 +279,6 @@ report 190 "Issue Reminders"
     protected var
         PostingDateReq, VATDateReq : Date;
         PrintEmailDocument: Option " ",Print,Email;
-        [InDataSet]
         IsOfficeAddin: Boolean;
         VATDateEnabled: Boolean;
 

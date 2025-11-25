@@ -89,7 +89,7 @@ page 36631 "Customer List - Order Status"
                     ToolTip = 'Specifies a balance amount in local currency.';
                     Visible = false;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the customer is blocked from posting.';
@@ -104,7 +104,7 @@ page 36631 "Customer List - Order Status"
                     ToolTip = 'Specifies the email address.';
                     Visible = false;
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the contact person at the customer.';
@@ -177,40 +177,40 @@ page 36631 "Customer List - Order Status"
         }
         area(factboxes)
         {
-            part(Control1901235907; "Comment Sheet")
+            part(Control1901235907; "Comment Sheet Part")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "Table Name" = CONST(Customer),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table Name" = const(Customer),
+                              "No." = field("No.");
                 Visible = true;
             }
             part(Control1904036707; "Order Header Status Factbox")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "Bill-to Customer No." = FIELD("No.");
+                SubPageLink = "Bill-to Customer No." = field("No.");
                 Visible = true;
             }
             part(Control1904036807; "Order Lines Status Factbox")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "Bill-to Customer No." = FIELD("No.");
+                SubPageLink = "Bill-to Customer No." = field("No.");
                 Visible = true;
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = true;
             }
             part(Control1903720907; "Sales Hist. Sell-to FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = true;
             }
             systempart(Control1905767507; Notes)
@@ -236,10 +236,10 @@ page 36631 "Customer List - Order Status"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     RunObject = Page "Customer Ledger Entries";
-                    RunPageLink = "Customer No." = FIELD("No."),
-                                  "Posting Date" = FIELD(UPPERLIMIT("Date Filter")),
-                                  "Date Filter" = FIELD("Date Filter");
-                    RunPageView = SORTING("Customer No.");
+                    RunPageLink = "Customer No." = field("No."),
+                                  "Posting Date" = field(UPPERLIMIT("Date Filter")),
+                                  "Date Filter" = field("Date Filter");
+                    RunPageView = sorting("Customer No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -252,9 +252,9 @@ page 36631 "Customer List - Order Status"
                         Caption = 'Issued &Reminders';
                         Image = OrderReminder;
                         RunObject = Page "Issued Reminder List";
-                        RunPageLink = "Customer No." = FIELD("No."),
-                                      "Document Date" = FIELD("Date Filter");
-                        RunPageView = SORTING("Customer No.", "Posting Date");
+                        RunPageLink = "Customer No." = field("No."),
+                                      "Document Date" = field("Date Filter");
+                        RunPageView = sorting("Customer No.", "Posting Date");
                         ToolTip = 'View the list of issued reminders.';
                     }
                     action("Issued &Finance Charge Memos")
@@ -262,9 +262,9 @@ page 36631 "Customer List - Order Status"
                         Caption = 'Issued &Finance Charge Memos';
                         Image = FinChargeMemo;
                         RunObject = Page "Issued Fin. Charge Memo List";
-                        RunPageLink = "Customer No." = FIELD("No."),
-                                      "Document Date" = FIELD("Date Filter");
-                        RunPageView = SORTING("Customer No.", "Posting Date");
+                        RunPageLink = "Customer No." = field("No."),
+                                      "Document Date" = field("Date Filter");
+                        RunPageView = sorting("Customer No.", "Posting Date");
                         ToolTip = 'View the list of issued finance charge memos.';
                     }
                 }
@@ -273,8 +273,8 @@ page 36631 "Customer List - Order Status"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Customer),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Customer),
+                                  "No." = field("No.");
                     ToolTip = 'View comments that apply.';
                 }
                 action("Bank Accounts")
@@ -283,7 +283,7 @@ page 36631 "Customer List - Order Status"
                     Caption = 'Bank Accounts';
                     Image = BankAccount;
                     RunObject = Page "Customer Bank Account List";
-                    RunPageLink = "Customer No." = FIELD("No.");
+                    RunPageLink = "Customer No." = field("No.");
                     ToolTip = 'View or set up the customer''s bank accounts. You can set up any number of bank accounts for each customer.';
                 }
                 action("C&ontact")
@@ -295,7 +295,7 @@ page 36631 "Customer List - Order Status"
 
                     trigger OnAction()
                     begin
-                        ShowContact();
+                        Rec.ShowContact();
                     end;
                 }
                 separator(Action1020026)
@@ -306,10 +306,10 @@ page 36631 "Customer List - Order Status"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Customer Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -319,10 +319,10 @@ page 36631 "Customer List - Order Status"
                     Caption = 'Statistics by C&urrencies';
                     Image = Currencies;
                     RunObject = Page "Cust. Stats. by Curr. Lines";
-                    RunPageLink = "Customer Filter" = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "Customer Filter" = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Date Filter" = field("Date Filter");
                     ToolTip = 'View the customer''s statistics for each currency for which there are transactions.';
                 }
                 action("Entry Statistics")
@@ -331,10 +331,10 @@ page 36631 "Customer List - Order Status"
                     Caption = 'Entry Statistics';
                     Image = EntryStatistics;
                     RunObject = Page "Customer Entry Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'View statistics for customer ledger entries.';
                 }
                 action("S&ales")
@@ -343,10 +343,10 @@ page 36631 "Customer List - Order Status"
                     Caption = 'S&ales';
                     Image = Sales;
                     RunObject = Page "Customer Sales";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Date Filter" = field("Date Filter");
                     ToolTip = 'View your sales to the customer by different periods.';
                 }
             }
@@ -366,7 +366,7 @@ page 36631 "Customer List - Order Status"
 
     trigger OnOpenPage()
     begin
-        SetRange("Date Filter", 0D, WorkDate() - 1);
+        Rec.SetRange("Date Filter", 0D, WorkDate() - 1);
     end;
 
     procedure GetSelectionFilter(): Code[80]

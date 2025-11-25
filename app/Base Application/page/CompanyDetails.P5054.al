@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5054 "Company Details"
 {
     Caption = 'Company Details';
@@ -25,7 +27,7 @@ page 5054 "Company Details"
                     ToolTip = 'Specifies an additional part of the name.';
                     Visible = false;
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the contact''s address.';
@@ -40,7 +42,7 @@ page 5054 "Company Details"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the postal code.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city where the contact is located.';

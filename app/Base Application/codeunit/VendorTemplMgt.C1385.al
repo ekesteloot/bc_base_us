@@ -1,3 +1,12 @@
+﻿namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.NoSeries;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 1385 "Vendor Templ. Mgt."
 {
     EventSubscriberInstance = StaticAutomatic;

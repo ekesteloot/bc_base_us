@@ -98,8 +98,8 @@ report 10158 "Sales Order Status"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "No." = FIELD("No."), "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter");
-                DataItemTableView = SORTING("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date") WHERE("Document Type" = CONST(Order), Type = CONST(Item), "Outstanding Quantity" = FILTER(<> 0));
+                DataItemLink = "No." = field("No."), "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter");
+                DataItemTableView = sorting("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date") where("Document Type" = const(Order), Type = const(Item), "Outstanding Quantity" = filter(<> 0));
                 RequestFilterFields = "Shipment Date", "Sell-to Customer No.";
                 column(Sales_Line__Document_No__; "Document No.")
                 {

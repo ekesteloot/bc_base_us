@@ -1,3 +1,12 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Reports;
+using Microsoft.ServiceMgt.Resources;
+using Microsoft.ServiceMgt.Setup;
+
 page 6000 "Dispatch Board"
 {
     ApplicationArea = Service;
@@ -9,7 +18,7 @@ page 6000 "Dispatch Board"
     PageType = Worksheet;
     SaveValues = true;
     SourceTable = "Service Header";
-    SourceTableView = SORTING(Status, "Response Date", "Response Time", Priority);
+    SourceTableView = sorting(Status, "Response Date", "Response Time", Priority);
     UsageCategory = Tasks;
 
     layout
@@ -213,7 +222,7 @@ page 6000 "Dispatch Board"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the estimated time when work on the order starts, that is, when the service order status changes from Pending, to In Process.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the priority of the service order.';
@@ -284,7 +293,7 @@ page 6000 "Dispatch Board"
             group(Control94)
             {
                 ShowCaption = false;
-                field(Description2; Description)
+                field(Description2; Rec.Description)
                 {
                     ApplicationArea = Service;
                     Caption = 'Service Order Description';
@@ -342,10 +351,10 @@ page 6000 "Dispatch Board"
                     Caption = 'Resource &Allocations';
                     Image = ResourcePlanning;
                     RunObject = Page "Resource Allocations";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "Document No." = FIELD("No.");
-                    RunPageView = SORTING(Status, "Document Type", "Document No.", "Service Item Line No.", "Allocation Date", "Starting Time", Posted)
-                                  WHERE(Status = FILTER(<> Canceled));
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "Document No." = field("No.");
+                    RunPageView = sorting(Status, "Document Type", "Document No.", "Service Item Line No.", "Allocation Date", "Starting Time", Posted)
+                                  where(Status = filter(<> Canceled));
                     ToolTip = 'View or allocate resources, such as technicians or resource groups to service items. The allocation can be made by resource number or resource group number, allocation date and allocated hours. You can also reallocate and cancel allocations. You can only have one active allocation per service item.';
                 }
                 action("Demand Overview")
@@ -396,8 +405,8 @@ page 6000 "Dispatch Board"
                     trigger OnAction()
                     begin
                         Clear(ServHeader);
-                        ServHeader.SetRange("Document Type", "Document Type");
-                        ServHeader.SetRange("No.", "No.");
+                        ServHeader.SetRange("Document Type", Rec."Document Type");
+                        ServHeader.SetRange("No.", Rec."No.");
                         REPORT.Run(REPORT::"Service Order", true, true, ServHeader);
                     end;
                 }
@@ -427,7 +436,7 @@ page 6000 "Dispatch Board"
         Rec.SetSecurityFilterOnRespCenter();
         SetAllFilters();
 
-        if IsEmpty() then begin
+        if Rec.IsEmpty() then begin
             ServOrderFilter := '';
             SetServOrderFilter();
         end;
@@ -467,9 +476,9 @@ page 6000 "Dispatch Board"
 
     procedure SetDocFilter()
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         SetDocFilter(Rec);
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     procedure SetDocFilter(var ServHeader: Record "Service Header")
@@ -490,118 +499,118 @@ page 6000 "Dispatch Board"
 
     procedure SetStatusFilter()
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         case StatusFilter of
             StatusFilter::" ":
-                SetRange(Status);
+                Rec.SetRange(Status);
             StatusFilter::Pending:
-                SetRange(Status, Status::Pending);
+                Rec.SetRange(Status, Rec.Status::Pending);
             StatusFilter::"In Process":
-                SetRange(Status, Status::"In Process");
+                Rec.SetRange(Status, Rec.Status::"In Process");
             StatusFilter::Finished:
-                SetRange(Status, Status::Finished);
+                Rec.SetRange(Status, Rec.Status::Finished);
             StatusFilter::"On Hold":
-                SetRange(Status, Status::"On Hold");
+                Rec.SetRange(Status, Rec.Status::"On Hold");
         end;
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     procedure SetRespDateFilter()
     begin
-        FilterGroup(2);
-        SetFilter("Response Date", RespDateFilter);
-        RespDateFilter := GetFilter("Response Date");
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetFilter("Response Date", RespDateFilter);
+        RespDateFilter := Rec.GetFilter("Response Date");
+        Rec.FilterGroup(0);
     end;
 
     procedure SetServOrderFilter()
     begin
-        FilterGroup(2);
-        SetFilter("No.", ServOrderFilter);
-        ServOrderFilter := GetFilter("No.");
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetFilter("No.", ServOrderFilter);
+        ServOrderFilter := Rec.GetFilter("No.");
+        Rec.FilterGroup(0);
     end;
 
     procedure SetCustFilter()
     begin
-        FilterGroup(2);
-        SetFilter("Customer No.", CustomFilter);
-        CustomFilter := GetFilter("Customer No.");
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetFilter("Customer No.", CustomFilter);
+        CustomFilter := Rec.GetFilter("Customer No.");
+        Rec.FilterGroup(0);
     end;
 
     procedure SetZoneFilter()
     begin
-        FilterGroup(2);
-        SetFilter("Service Zone Code", ZoneFilter);
-        ZoneFilter := GetFilter("Service Zone Code");
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetFilter("Service Zone Code", ZoneFilter);
+        ZoneFilter := Rec.GetFilter("Service Zone Code");
+        Rec.FilterGroup(0);
     end;
 
     procedure SetContractFilter()
     begin
-        FilterGroup(2);
-        SetFilter("Contract No.", ContractFilter);
-        ContractFilter := GetFilter("Contract No.");
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetFilter("Contract No.", ContractFilter);
+        ContractFilter := Rec.GetFilter("Contract No.");
+        Rec.FilterGroup(0);
     end;
 
     procedure SetResourceFilter()
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         if ResourceFilter <> '' then begin
-            SetFilter("No. of Allocations", '>0');
-            SetFilter("Resource Filter", ResourceFilter);
-            ResourceFilter := GetFilter("Resource Filter");
+            Rec.SetFilter("No. of Allocations", '>0');
+            Rec.SetFilter("Resource Filter", ResourceFilter);
+            ResourceFilter := Rec.GetFilter("Resource Filter");
         end else begin
             if ResourceGroupFilter = '' then
-                SetRange("No. of Allocations");
-            SetRange("Resource Filter");
+                Rec.SetRange("No. of Allocations");
+            Rec.SetRange("Resource Filter");
         end;
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     procedure SetResourceGroupFilter()
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         if ResourceGroupFilter <> '' then begin
-            SetFilter("No. of Allocations", '>0');
-            SetFilter("Resource Group Filter", ResourceGroupFilter);
-            ResourceGroupFilter := GetFilter("Resource Group Filter");
+            Rec.SetFilter("No. of Allocations", '>0');
+            Rec.SetFilter("Resource Group Filter", ResourceGroupFilter);
+            ResourceGroupFilter := Rec.GetFilter("Resource Group Filter");
         end else begin
             if ResourceFilter = '' then
-                SetRange("No. of Allocations");
-            SetRange("Resource Group Filter");
+                Rec.SetRange("No. of Allocations");
+            Rec.SetRange("Resource Group Filter");
         end;
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     procedure SetAllocFilter()
     begin
-        FilterGroup(2);
+        Rec.FilterGroup(2);
         case AllocationFilter of
             AllocationFilter::" ":
                 begin
-                    SetRange("No. of Unallocated Items");
-                    SetRange("Reallocation Needed");
+                    Rec.SetRange("No. of Unallocated Items");
+                    Rec.SetRange("Reallocation Needed");
                 end;
             AllocationFilter::"No or Partial Allocation":
                 begin
-                    SetFilter("No. of Unallocated Items", '>0');
-                    SetRange("Reallocation Needed", false);
+                    Rec.SetFilter("No. of Unallocated Items", '>0');
+                    Rec.SetRange("Reallocation Needed", false);
                 end;
             AllocationFilter::"Full Allocation":
                 begin
-                    SetRange("No. of Unallocated Items", 0);
-                    SetRange("Reallocation Needed", false);
+                    Rec.SetRange("No. of Unallocated Items", 0);
+                    Rec.SetRange("Reallocation Needed", false);
                 end;
             AllocationFilter::"Reallocation Needed":
                 begin
-                    SetRange("No. of Unallocated Items");
-                    SetRange("Reallocation Needed", true);
+                    Rec.SetRange("No. of Unallocated Items");
+                    Rec.SetRange("Reallocation Needed", true);
                 end;
         end;
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     local procedure RespDateFilterOnAfterValidate()

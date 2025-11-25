@@ -1,3 +1,18 @@
+namespace Microsoft.FinancialMgt.Deferral;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+#if not CLEAN23
+using Microsoft.FinancialMgt.ReceivablesPayables;
+#endif
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+
 table 1706 "Deferral Posting Buffer"
 {
     Caption = 'Deferral Posting Buffer';
@@ -21,8 +36,8 @@ table 1706 "Deferral Posting Buffer"
             Caption = 'G/L Account';
             DataClassification = SystemMetadata;
             NotBlank = true;
-            TableRelation = "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                 Blocked = CONST(false));
+            TableRelation = "G/L Account" where("Account Type" = const(Posting),
+                                                 Blocked = const(false));
         }
         field(4; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -101,14 +116,14 @@ table 1706 "Deferral Posting Buffer"
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(18; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(19; Description; Text[100])
         {
@@ -207,7 +222,7 @@ table 1706 "Deferral Posting Buffer"
             "Use Tax" := false;
         end;
         "Deferral Code" := SalesLine."Deferral Code";
-        "Deferral Doc. Type" := "Deferral Document Type"::Sales;
+        "Deferral Doc. Type" := Enum::"Deferral Document Type"::Sales;
         "Document No." := DocumentNo;
 
         OnAfterPrepareSales(Rec, SalesLine);
@@ -238,7 +253,7 @@ table 1706 "Deferral Posting Buffer"
             "Use Tax" := false;
         end;
         "Deferral Code" := PurchLine."Deferral Code";
-        "Deferral Doc. Type" := "Deferral Document Type"::Purchase;
+        "Deferral Doc. Type" := Enum::"Deferral Document Type"::Purchase;
         "Document No." := DocumentNo;
 
         OnAfterPreparePurch(Rec, PurchLine);
@@ -281,7 +296,7 @@ table 1706 "Deferral Posting Buffer"
         OnAfterPrepareRemainderPurchase(Rec, PurchaseLine);
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by PrepareInitialAmounts()', '20.0')]
     procedure PrepareInitialPair(InvoicePostBuffer: Record "Invoice Post. Buffer"; RemainAmtToDefer: Decimal; RemainAmtToDeferACY: Decimal; GLAccount: Code[20]; DeferralAccount: Code[20])
     var
@@ -328,7 +343,7 @@ table 1706 "Deferral Posting Buffer"
         Description := DeferralLine.Description;
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by procedure Update without parameter InvoicePostBuffer.', '19.0')]
     procedure Update(DeferralPostBuffer: Record "Deferral Posting Buffer"; InvoicePostBuffer: Record "Invoice Post. Buffer")
     begin
@@ -437,7 +452,7 @@ table 1706 "Deferral Posting Buffer"
     begin
     end;
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by OnUpdateOnBeforeDeferralPostBufferInsert().', '19.0')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDeferralPostBufferInsert(var ToDeferralPostingBuffer: Record "Deferral Posting Buffer"; FromDeferralPostingBuffer: Record "Deferral Posting Buffer"; InvoicePostBuffer: Record "Invoice Post. Buffer")

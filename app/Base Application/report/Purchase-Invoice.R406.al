@@ -1,7 +1,25 @@
+﻿namespace Microsoft.Purchases.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Vendor;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 406 "Purchase - Invoice"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/PurchaseInvoice.rdlc';
+    RDLCLayout = './Purchases/History/PurchaseInvoice.rdlc';
     Caption = 'Purchase - Invoice';
     PreviewMode = PrintLayout;
 
@@ -9,7 +27,7 @@ report 406 "Purchase - Invoice"
     {
         dataitem("Purch. Inv. Header"; "Purch. Inv. Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Posted Purchase Invoice';
             column(No_PurchInvHdr; "No.")
@@ -71,10 +89,10 @@ report 406 "Purchase - Invoice"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CopyText; StrSubstNo(DocumentCaption(), CopyText))
                     {
                     }
@@ -282,7 +300,7 @@ report 406 "Purchase - Invoice"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purch. Inv. Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -326,9 +344,9 @@ report 406 "Purchase - Invoice"
                     }
                     dataitem("Purch. Inv. Line"; "Purch. Inv. Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Purch. Inv. Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(LineAmt_PurchInvLine; "Line Amount")
                         {
                             AutoFormatExpression = GetCurrencyCode();
@@ -471,7 +489,7 @@ report 406 "Purchase - Invoice"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText1; DimText)
                             {
                             }
@@ -575,7 +593,7 @@ report 406 "Purchase - Invoice"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmtLineVATBase; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
@@ -621,7 +639,7 @@ report 406 "Purchase - Invoice"
                     }
                     dataitem(VATCounterLCY; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VALExchRate; VALExchRate)
                         {
                         }
@@ -680,11 +698,11 @@ report 406 "Purchase - Invoice"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
 
                         trigger OnPreDataItem()
                         begin
@@ -694,7 +712,7 @@ report 406 "Purchase - Invoice"
                     }
                     dataitem(Total3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(ShipToAddr1; ShipToAddr[1])
                         {
                         }
@@ -731,7 +749,7 @@ report 406 "Purchase - Invoice"
                     }
                     dataitem(RemitToAddressDataItem; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(RemitToAddressCaption; RemitToAddressCaptionLbl)
                         {
                         }
@@ -795,6 +813,7 @@ report 406 "Purchase - Invoice"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Purch. Inv. Header");
@@ -941,7 +960,6 @@ report 406 "Purchase - Invoice"
         AllowVATDisctxt: Text[30];
         VATAmountText: Text[30];
         PurchInLineTypeNo: Integer;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;

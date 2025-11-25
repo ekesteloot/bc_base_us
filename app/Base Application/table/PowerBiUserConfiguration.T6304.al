@@ -1,3 +1,5 @@
+namespace System.Integration.PowerBI;
+
 /// <summary>
 /// Persists the first report to be displayed to a user, depending on the page and profile/role they are using.
 /// </summary>
@@ -11,6 +13,7 @@ table 6304 "Power BI User Configuration"
         field(1; "Page ID"; Text[50])
         {
             Caption = 'Page ID';
+            DataClassification = SystemMetadata;
         }
         field(2; "User Security ID"; Guid)
         {
@@ -20,11 +23,13 @@ table 6304 "Power BI User Configuration"
         field(3; "Profile ID"; Code[30])
         {
             Caption = 'Profile ID';
+            DataClassification = CustomerContent;
         }
         field(4; "Report Visibility"; Boolean)
         {
             Caption = 'Report Visibility';
             ObsoleteReason = 'The report part visibility is now handled by the standard personalization experience. Hide the page using Personalization instead of using this value.';
+            DataClassification = SystemMetadata;
 #if not CLEAN21
             ObsoleteState = Pending;
             ObsoleteTag = '21.0';
@@ -36,6 +41,12 @@ table 6304 "Power BI User Configuration"
         field(5; "Selected Report ID"; Guid)
         {
             Caption = 'Selected Report ID';
+            DataClassification = EndUserPseudonymousIdentifiers;
+        }
+        field(10; "Lock to first visual"; Boolean)
+        {
+            Caption = 'Lock to first visual';
+            DataClassification = SystemMetadata;
         }
     }
 

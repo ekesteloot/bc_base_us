@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 page 5663 "Depreciation Table List"
 {
     ApplicationArea = FixedAssets;
@@ -15,7 +17,7 @@ page 5663 "Depreciation Table List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies a code for the depreciation table.';

@@ -19,7 +19,7 @@ page 575 "VAT Registration No. Formats"
                     ToolTip = 'Specifies the country/region of the address.';
                     Visible = false;
                 }
-                field(Format; Format)
+                field(Format; Rec.Format)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a format for a country''s/region''s VAT registration number.';

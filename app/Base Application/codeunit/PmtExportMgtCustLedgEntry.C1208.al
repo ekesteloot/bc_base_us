@@ -1,3 +1,12 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.IO;
+
 codeunit 1208 "Pmt Export Mgt Cust Ledg Entry"
 {
     Permissions = TableData "Cust. Ledger Entry" = rm;

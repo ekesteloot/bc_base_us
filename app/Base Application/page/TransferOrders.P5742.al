@@ -1,3 +1,14 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Comment;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment.Configuration;
+using System.Text;
+
 page 5742 "Transfer Orders"
 {
     ApplicationArea = Location;
@@ -123,7 +134,7 @@ page 5742 "Transfer Orders"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Transfer Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information about the transfer order, such as the quantity and total weight transferred.';
                 }
@@ -133,8 +144,8 @@ page 5742 "Transfer Orders"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Transfer Order"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Transfer Order"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -148,7 +159,7 @@ page 5742 "Transfer Orders"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -163,7 +174,7 @@ page 5742 "Transfer Orders"
                     Caption = 'S&hipments';
                     Image = Shipment;
                     RunObject = Page "Posted Transfer Shipments";
-                    RunPageLink = "Transfer Order No." = FIELD("No.");
+                    RunPageLink = "Transfer Order No." = field("No.");
                     ToolTip = 'View related posted transfer shipments.';
                 }
                 action("Re&ceipts")
@@ -172,7 +183,7 @@ page 5742 "Transfer Orders"
                     Caption = 'Re&ceipts';
                     Image = PostedReceipts;
                     RunObject = Page "Posted Transfer Receipts";
-                    RunPageLink = "Transfer Order No." = FIELD("No.");
+                    RunPageLink = "Transfer Order No." = field("No.");
                     ToolTip = 'View related posted transfer receipts.';
                 }
             }
@@ -186,10 +197,10 @@ page 5742 "Transfer Orders"
                     Caption = 'Whse. Shi&pments';
                     Image = Shipment;
                     RunObject = Page "Whse. Shipment Lines";
-                    RunPageLink = "Source Type" = CONST(5741),
-                                  "Source Subtype" = CONST("0"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.");
+                    RunPageLink = "Source Type" = const(5741),
+                                  "Source Subtype" = const("0"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.");
                     ToolTip = 'View outbound items that have been shipped with warehouse activities for the transfer order.';
                 }
                 action("&Whse. Receipts")
@@ -198,10 +209,10 @@ page 5742 "Transfer Orders"
                     Caption = '&Whse. Receipts';
                     Image = Receipt;
                     RunObject = Page "Whse. Receipt Lines";
-                    RunPageLink = "Source Type" = CONST(5741),
-                                  "Source Subtype" = CONST("1"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.");
+                    RunPageLink = "Source Type" = const(5741),
+                                  "Source Subtype" = const("1"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.");
                     ToolTip = 'View inbound items that have been received with warehouse activities for the transfer order.';
                 }
                 action("In&vt. Put-away/Pick Lines")
@@ -210,9 +221,9 @@ page 5742 "Transfer Orders"
                     Caption = 'In&vt. Put-away/Pick Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity List";
-                    RunPageLink = "Source Document" = FILTER("Inbound Transfer" | "Outbound Transfer"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Document", "Source No.", "Location Code");
+                    RunPageLink = "Source Document" = filter("Inbound Transfer" | "Outbound Transfer"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Document", "Source No.", "Location Code");
                     ToolTip = 'View items that are inbound or outbound on inventory put-away or inventory pick documents for the transfer order.';
                 }
                 action("Whse. Put-away/Pick Lines")
@@ -331,7 +342,7 @@ page 5742 "Transfer Orders"
                     trigger OnAction()
                     begin
                         Rec.PerformManualRelease();
-                        CreateInvtPutAwayPick();
+                        Rec.CreateInvtPutAwayPick();
                     end;
                 }
                 action("Get Bin Content")
@@ -348,7 +359,7 @@ page 5742 "Transfer Orders"
                         BinContent: Record "Bin Content";
                         GetBinContent: Report "Whse. Get Bin Content";
                     begin
-                        BinContent.SetRange("Location Code", "Transfer-from Code");
+                        BinContent.SetRange("Location Code", Rec."Transfer-from Code");
                         GetBinContent.SetTableView(BinContent);
                         GetBinContent.InitializeTransferHeader(Rec);
                         GetBinContent.RunModal();

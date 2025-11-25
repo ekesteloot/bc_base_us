@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Journal;
+
 page 7347 "Locations with Warehouse List"
 {
     Caption = 'Locations with Warehouse List';
@@ -13,7 +18,7 @@ page 7347 "Locations with Warehouse List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Location;
                     ToolTip = 'Specifies a location code for the warehouse or distribution center where your items are handled and stored before being sold.';
@@ -54,7 +59,7 @@ page 7347 "Locations with Warehouse List"
                     Caption = '&Zones';
                     Image = Zones;
                     RunObject = Page Zones;
-                    RunPageLink = "Location Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field(Code);
                     ToolTip = 'View or edit information about zones that you use in your warehouse to structure your bins under zones.';
                 }
                 action("&Bins")
@@ -63,7 +68,7 @@ page 7347 "Locations with Warehouse List"
                     Caption = '&Bins';
                     Image = Bins;
                     RunObject = Page Bins;
-                    RunPageLink = "Location Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field(Code);
                     ToolTip = 'View or edit information about zones that you use in your warehouse to hold items.';
                 }
             }

@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.RoleCenters;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using System.Security.User;
+
 table 9055 "Purchase Cue"
 {
     Caption = 'Purchase Cue';
@@ -10,9 +16,9 @@ table 9055 "Purchase Cue"
         }
         field(2; "To Send or Confirm"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER(Order),
-                                                         Status = FILTER(Open),
-                                                         "Responsibility Center" = FIELD("Responsibility Center Filter")));
+            CalcFormula = count("Purchase Header" where("Document Type" = filter(Order),
+                                                         Status = filter(Open),
+                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'To Send or Confirm';
             Editable = false;
             FieldClass = FlowField;
@@ -20,10 +26,10 @@ table 9055 "Purchase Cue"
         field(3; "Upcoming Orders"; Integer)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER(Order),
-                                                         Status = FILTER(Released),
-                                                         "Expected Receipt Date" = FIELD("Date Filter"),
-                                                         "Responsibility Center" = FIELD("Responsibility Center Filter")));
+            CalcFormula = count("Purchase Header" where("Document Type" = filter(Order),
+                                                         Status = filter(Released),
+                                                         "Expected Receipt Date" = field("Date Filter"),
+                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Upcoming Orders';
             Editable = false;
             FieldClass = FlowField;
@@ -31,10 +37,10 @@ table 9055 "Purchase Cue"
         field(4; "Outstanding Purchase Orders"; Integer)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER(Order),
-                                                         Status = FILTER(Released),
-                                                         "Completely Received" = FILTER(false),
-                                                         "Responsibility Center" = FIELD("Responsibility Center Filter")));
+            CalcFormula = count("Purchase Header" where("Document Type" = filter(Order),
+                                                         Status = filter(Released),
+                                                         "Completely Received" = filter(false),
+                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Outstanding Purchase Orders';
             Editable = false;
             FieldClass = FlowField;
@@ -42,8 +48,8 @@ table 9055 "Purchase Cue"
         field(5; "Purchase Return Orders - All"; Integer)
         {
             AccessByPermission = TableData "Return Shipment Header" = R;
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER("Return Order"),
-                                                         "Responsibility Center" = FIELD("Responsibility Center Filter")));
+            CalcFormula = count("Purchase Header" where("Document Type" = filter("Return Order"),
+                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Purchase Return Orders - All';
             Editable = false;
             FieldClass = FlowField;
@@ -51,10 +57,10 @@ table 9055 "Purchase Cue"
         field(6; "Not Invoiced"; Integer)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER(Order),
-                                                         "Completely Received" = FILTER(true),
-                                                         Invoice = FILTER(false),
-                                                         "Responsibility Center" = FIELD("Responsibility Center Filter")));
+            CalcFormula = count("Purchase Header" where("Document Type" = filter(Order),
+                                                         "Completely Received" = filter(true),
+                                                         Invoice = filter(false),
+                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Not Invoiced';
             Editable = false;
             FieldClass = FlowField;
@@ -62,10 +68,10 @@ table 9055 "Purchase Cue"
         field(7; "Partially Invoiced"; Integer)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER(Order),
-                                                         "Completely Received" = FILTER(true),
-                                                         Invoice = FILTER(true),
-                                                         "Responsibility Center" = FIELD("Responsibility Center Filter")));
+            CalcFormula = count("Purchase Header" where("Document Type" = filter(Order),
+                                                         "Completely Received" = filter(true),
+                                                         Invoice = filter(true),
+                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Partially Invoiced';
             Editable = false;
             FieldClass = FlowField;

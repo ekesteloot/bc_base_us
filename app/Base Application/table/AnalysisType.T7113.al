@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+
 table 7113 "Analysis Type"
 {
     Caption = 'Analysis Type';

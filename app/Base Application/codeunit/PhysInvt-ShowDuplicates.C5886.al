@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
 codeunit 5886 "Phys. Invt.-Show Duplicates"
 {
     TableNo = "Phys. Invt. Order Header";

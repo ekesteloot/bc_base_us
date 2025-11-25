@@ -1,3 +1,6 @@
+namespace Microsoft.ServiceMgt.Email;
+using System.Threading;
+
 codeunit 5917 "Process Service Email Queue"
 {
     TableNo = "Job Queue Entry";
@@ -10,7 +13,7 @@ codeunit 5917 "Process Service Email Queue"
         RecRef: RecordRef;
         Success: Boolean;
     begin
-        if RecRef.Get("Record ID to Process") then begin
+        if RecRef.Get(Rec."Record ID to Process") then begin
             RecRef.SetTable(ServEmailQueue);
             if not ServEmailQueue.Find() then
                 exit;

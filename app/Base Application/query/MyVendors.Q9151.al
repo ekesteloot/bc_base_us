@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 query 9151 "My Vendors"
 {
     Caption = 'My Vendors';

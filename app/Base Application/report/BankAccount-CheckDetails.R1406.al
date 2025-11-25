@@ -1,7 +1,12 @@
+namespace Microsoft.BankMgt.Reports;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+
 report 1406 "Bank Account - Check Details"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/BankAccountCheckDetails.rdlc';
+    RDLCLayout = './BankMgt/Reports/BankAccountCheckDetails.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Bank Account - Check Details';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 1406 "Bank Account - Check Details"
     {
         dataitem("Bank Account"; "Bank Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Name", "Bank Acc. Posting Group", "Date Filter";
             column(BankAccDateFilter; StrSubstNo(Text000, BankAccDateFilter))
@@ -62,8 +67,8 @@ report 1406 "Bank Account - Check Details"
             }
             dataitem("Check Ledger Entry"; "Check Ledger Entry")
             {
-                DataItemLink = "Bank Account No." = FIELD("No."), "Check Date" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Bank Account No.", "Check Date");
+                DataItemLink = "Bank Account No." = field("No."), "Check Date" = field("Date Filter");
+                DataItemTableView = sorting("Bank Account No.", "Check Date");
                 column(AmountPrinted; AmountPrinted)
                 {
                     AutoFormatExpression = "Check Ledger Entry".GetCurrencyCodeFromBank();

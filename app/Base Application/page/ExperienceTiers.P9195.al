@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 page 9195 "Experience Tiers"
 {
     Caption = 'Experience Tiers';
@@ -34,7 +36,7 @@ page 9195 "Experience Tiers"
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
     begin
         if CloseAction = ACTION::LookupOK then
-            exit(ApplicationAreaMgmtFacade.IsValidExperienceTierSelected("Experience Tier"));
+            exit(ApplicationAreaMgmtFacade.IsValidExperienceTierSelected(Rec."Experience Tier"));
 
         exit(true);
     end;

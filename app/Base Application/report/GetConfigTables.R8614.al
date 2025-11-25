@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 report 8614 "Get Config. Tables"
 {
     Caption = 'Get Config. Tables';
@@ -7,7 +11,7 @@ report 8614 "Get Config. Tables"
     {
         dataitem(AllObj; AllObj)
         {
-            DataItemTableView = WHERE("Object Type" = CONST(Table), "Object ID" = FILTER(.. 99000999 | 2000000004 | 2000000005));
+            DataItemTableView = where("Object Type" = const(Table), "Object ID" = filter(.. 99000999 | 2000000004 | 2000000005));
             RequestFilterFields = "Object ID", "Object Name";
 
             trigger OnPreDataItem()

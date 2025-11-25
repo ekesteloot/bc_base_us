@@ -186,29 +186,26 @@ page 664 "Sales Prepayment Percentages"
         SalesCodeFilter: Text;
         ItemNoFilter: Text;
         StartingDateFilter: Text[30];
-        [InDataSet]
         SalesCodeEditable: Boolean;
-        [InDataSet]
         SalesCodeFilterCtrlEnable: Boolean;
-        [InDataSet]
         CodeFilterCtrlEnable: Boolean;
 
     local procedure SetEditable()
     begin
-        SalesCodeEditable := "Sales Type" <> "Sales Type"::"All Customers";
+        SalesCodeEditable := Rec."Sales Type" <> Rec."Sales Type"::"All Customers";
     end;
 
     local procedure GetRecFilters()
     begin
-        if HasFilter then begin
-            if GetFilter("Sales Type") <> '' then
-                SalesTypeFilter := "Sales Type"
+        if Rec.HasFilter then begin
+            if Rec.GetFilter("Sales Type") <> '' then
+                SalesTypeFilter := Rec."Sales Type"
             else
                 SalesTypeFilter := SalesTypeFilter::None;
 
-            SalesCodeFilter := GetFilter("Sales Code");
-            ItemNoFilter := GetFilter("Item No.");
-            Evaluate(StartingDateFilter, GetFilter("Starting Date"));
+            SalesCodeFilter := Rec.GetFilter("Sales Code");
+            ItemNoFilter := Rec.GetFilter("Item No.");
+            Evaluate(StartingDateFilter, Rec.GetFilter("Starting Date"));
         end;
     end;
 
@@ -218,9 +215,9 @@ page 664 "Sales Prepayment Percentages"
         CodeFilterCtrlEnable := true;
 
         if SalesTypeFilter <> SalesTypeFilter::None then
-            SetRange("Sales Type", SalesTypeFilter)
+            Rec.SetRange("Sales Type", SalesTypeFilter)
         else
-            SetRange("Sales Type");
+            Rec.SetRange("Sales Type");
 
         if SalesTypeFilter in [SalesTypeFilter::"All Customers", SalesTypeFilter::None] then begin
             SalesCodeFilterCtrlEnable := false;
@@ -228,19 +225,19 @@ page 664 "Sales Prepayment Percentages"
         end;
 
         if SalesCodeFilter <> '' then
-            SetFilter("Sales Code", SalesCodeFilter)
+            Rec.SetFilter("Sales Code", SalesCodeFilter)
         else
-            SetRange("Sales Code");
+            Rec.SetRange("Sales Code");
 
         if ItemNoFilter <> '' then
-            SetFilter("Item No.", ItemNoFilter)
+            Rec.SetFilter("Item No.", ItemNoFilter)
         else
-            SetRange("Item No.");
+            Rec.SetRange("Item No.");
 
         if StartingDateFilter <> '' then
-            SetFilter("Starting Date", StartingDateFilter)
+            Rec.SetFilter("Starting Date", StartingDateFilter)
         else
-            SetRange("Starting Date");
+            Rec.SetRange("Starting Date");
 
         CurrPage.Update(false);
     end;

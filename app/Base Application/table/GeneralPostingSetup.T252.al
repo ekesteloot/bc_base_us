@@ -1,4 +1,14 @@
-﻿table 252 "General Posting Setup"
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+
+table 252 "General Posting Setup"
 {
     Caption = 'General Posting Setup';
     DrillDownPageID = "General Posting Setup";
@@ -960,7 +970,7 @@
         end;
     end;
 
-    local procedure LookupGLAccount(var AccountNo: Code[20]; AccountCategory: Option; AccountSubcategoryFilter: Text)
+    protected procedure LookupGLAccount(var AccountNo: Code[20]; AccountCategory: Option; AccountSubcategoryFilter: Text)
     begin
         GLAccountCategoryMgt.LookupGLAccount(Database::"General Posting Setup", CurrFieldNo, AccountNo, AccountCategory, AccountSubcategoryFilter);
     end;

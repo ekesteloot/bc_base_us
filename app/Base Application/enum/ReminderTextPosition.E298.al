@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 enum 298 "Reminder Text Position"
 {
     Extensible = true;

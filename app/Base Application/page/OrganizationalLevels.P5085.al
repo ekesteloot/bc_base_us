@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Setup;
+
 page 5085 "Organizational Levels"
 {
     ApplicationArea = RelationshipMgmt;
@@ -13,7 +15,7 @@ page 5085 "Organizational Levels"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code of the organizational level.';

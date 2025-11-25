@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 codeunit 130403 "CAL Test Runner Publisher"
 {
 

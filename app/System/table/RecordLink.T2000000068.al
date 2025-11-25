@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment.Configuration;
+
 table 2000000068 "Record Link"
 {
     Caption = 'Record Link';
@@ -64,7 +70,7 @@ table 2000000068 "Record Link"
         field(12; Company; Text[30])
         {
             Caption = 'Company';
-            TableRelation = Company.Name;
+            TableRelation = System.Environment.Company.Name;
         }
         field(13; Notify; Boolean)
         {

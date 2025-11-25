@@ -1,3 +1,12 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+
 page 146 "Posted Purchase Invoices"
 {
     ApplicationArea = Basic, Suite;
@@ -7,8 +16,8 @@ page 146 "Posted Purchase Invoices"
     PageType = List;
     QueryCategory = 'Posted Purchase Invoices';
     SourceTable = "Purch. Inv. Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -229,35 +238,35 @@ page 146 "Posted Purchase Invoices"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the amount that remains to be paid for the posted purchase invoice.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the posted purchase invoice is paid. The check box will also be selected if a credit memo for the remaining amount has been applied.';
                 }
-                field(Cancelled; Cancelled)
+                field(Cancelled; Rec.Cancelled)
                 {
                     ApplicationArea = Basic, Suite;
-                    HideValue = NOT Cancelled;
+                    HideValue = not Rec.Cancelled;
                     Style = Unfavorable;
-                    StyleExpr = Cancelled;
+                    StyleExpr = Rec.Cancelled;
                     ToolTip = 'Specifies if the posted purchase invoice has been either corrected or canceled.';
 
                     trigger OnDrillDown()
                     begin
-                        ShowCorrectiveCreditMemo();
+                        Rec.ShowCorrectiveCreditMemo();
                     end;
                 }
-                field(Corrective; Corrective)
+                field(Corrective; Rec.Corrective)
                 {
                     ApplicationArea = Basic, Suite;
-                    HideValue = NOT Corrective;
+                    HideValue = not Rec.Corrective;
                     Style = Unfavorable;
-                    StyleExpr = Corrective;
+                    StyleExpr = Rec.Corrective;
                     ToolTip = 'Specifies if the posted purchase invoice is a corrective document.';
 
                     trigger OnDrillDown()
                     begin
-                        ShowCancelledCreditMemo();
+                        Rec.ShowCancelledCreditMemo();
                     end;
                 }
             }
@@ -268,8 +277,8 @@ page 146 "Posted Purchase Invoices"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Purch. Inv. Header"),
-                              "No." = FIELD("No.");
+                SubPageLink = "Table ID" = const(Database::"Purch. Inv. Header"),
+                              "No." = field("No.");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -314,10 +323,10 @@ page 146 "Posted Purchase Invoices"
 
                     trigger OnAction()
                     begin
-                        if "Tax Area Code" = '' then
-                            PAGE.RunModal(PAGE::"Purchase Invoice Statistics", Rec, "No.")
+                        if Rec."Tax Area Code" = '' then
+                            PAGE.RunModal(PAGE::"Purchase Invoice Statistics", Rec, Rec."No.")
                         else
-                            PAGE.RunModal(PAGE::"Purchase Invoice Stats.", Rec, "No.");
+                            PAGE.RunModal(PAGE::"Purchase Invoice Stats.", Rec, Rec."No.");
                     end;
                 }
                 action("Co&mments")
@@ -326,8 +335,8 @@ page 146 "Posted Purchase Invoices"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Invoice"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Invoice"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -341,7 +350,7 @@ page 146 "Posted Purchase Invoices"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(IncomingDoc)
@@ -356,7 +365,7 @@ page 146 "Posted Purchase Invoices"
                     var
                         IncomingDocument: Record "Incoming Document";
                     begin
-                        IncomingDocument.ShowCard("No.", "Posting Date");
+                        IncomingDocument.ShowCard(Rec."No.", Rec."Posting Date");
                     end;
                 }
             }
@@ -394,7 +403,7 @@ page 146 "Posted Purchase Invoices"
                 begin
                     PurchInvHeader := Rec;
                     CurrPage.SetSelectionFilter(PurchInvHeader);
-                    PrintToDocumentAttachment(PurchInvHeader);
+                    Rec.PrintToDocumentAttachment(PurchInvHeader);
                 end;
             }
             action("Purchase - Invoice")
@@ -438,7 +447,7 @@ page 146 "Posted Purchase Invoices"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             group(RelatedInformationNavigation)
@@ -451,7 +460,7 @@ page 146 "Posted Purchase Invoices"
                     Caption = 'Vendor';
                     Image = Vendor;
                     RunObject = Page "Vendor Card";
-                    RunPageLink = "No." = FIELD("Buy-from Vendor No.");
+                    RunPageLink = "No." = field("Buy-from Vendor No.");
                     Scope = Repeater;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
@@ -467,7 +476,7 @@ page 146 "Posted Purchase Invoices"
                     Image = Undo;
                     Scope = Repeater;
                     ToolTip = 'Reverse this posted invoice. A credit memo will be created and matched with the invoice, and the invoice will be canceled. Shipments for the invoice will be reversed. To create a new invoice with the same information, use the Copy function. When you copy an invoice, remember to post shipments for the new invoice.';
-                    Visible = not Cancelled;
+                    Visible = not Rec.Cancelled;
 
                     trigger OnAction()
                     begin
@@ -481,7 +490,7 @@ page 146 "Posted Purchase Invoices"
                     Image = Cancel;
                     Scope = Repeater;
                     ToolTip = 'Create and post a purchase credit memo that reverses this posted purchase invoice. This posted purchase invoice will be canceled.';
-                    Visible = not Cancelled;
+                    Visible = not Rec.Cancelled;
 
                     trigger OnAction()
                     begin
@@ -512,11 +521,11 @@ page 146 "Posted Purchase Invoices"
                     Image = CreditMemo;
                     Scope = Repeater;
                     ToolTip = 'Open the posted purchase credit memo that was created when you canceled the posted purchase invoice. If the posted purchase invoice is the result of a canceled purchase credit memo, then the canceled purchase credit memo will open.';
-                    Visible = Cancelled OR Corrective;
+                    Visible = Rec.Cancelled or Rec.Corrective;
 
                     trigger OnAction()
                     begin
-                        ShowCanceledOrCorrCrMemo();
+                        Rec.ShowCanceledOrCorrCrMemo();
                     end;
                 }
             }
@@ -632,10 +641,10 @@ page 146 "Posted Purchase Invoices"
         OfficeMgt: Codeunit "Office Management";
         HasFilters: Boolean;
     begin
-        HasFilters := GetFilters <> '';
-        SetSecurityFilterOnRespCenter();
-        if HasFilters and not Find() then
-            if FindFirst() then;
+        HasFilters := Rec.GetFilters() <> '';
+        Rec.SetSecurityFilterOnRespCenter();
+        if HasFilters and not Rec.Find() then
+            if Rec.FindFirst() then;
         IsOfficeAddin := OfficeMgt.IsAvailable();
     end;
 

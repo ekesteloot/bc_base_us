@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.History;
+
 page 399 "Purchase Receipt Statistics"
 {
     Caption = 'Purchase Receipt Statistics';
@@ -80,7 +82,7 @@ page 399 "Purchase Receipt Statistics"
         if IsHandled then
             exit;
 
-        PurchRcptLine.SetRange("Document No.", "No.");
+        PurchRcptLine.SetRange("Document No.", Rec."No.");
         if PurchRcptLine.Find('-') then
             repeat
                 LineQty := LineQty + PurchRcptLine.Quantity;

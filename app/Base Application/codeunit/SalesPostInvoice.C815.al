@@ -1,4 +1,17 @@
-﻿codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
+﻿namespace Microsoft.Sales.Posting;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.ProjectMgt.Jobs.Posting;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+
+codeunit 815 "Sales Post Invoice" implements "Invoice Posting"
 {
     Permissions = TableData "Invoice Posting Buffer" = rimd;
 
@@ -372,9 +385,9 @@
         SalesPostInvoiceEvents.RunOnPrepareGenJnlLineOnAfterCopyToGenJnlLine(GenJnlLine, SalesHeader, InvoicePostingBuffer);
 
         if InvoicePostingBuffer.Type <> InvoicePostingBuffer.Type::"Prepmt. Exch. Rate Difference" then
-            GenJnlLine."Gen. Posting Type" := "General Posting Type"::Sale;
+            GenJnlLine."Gen. Posting Type" := GenJnlLine."Gen. Posting Type"::Sale;
         if InvoicePostingBuffer.Type = InvoicePostingBuffer.Type::"Fixed Asset" then begin
-            GenJnlLine."FA Posting Type" := "Gen. Journal Line FA Posting Type"::Disposal;
+            GenJnlLine."FA Posting Type" := GenJnlLine."FA Posting Type"::Disposal;
             InvoicePostingBuffer.CopyToGenJnlLineFA(GenJnlLine);
         end;
 
@@ -450,7 +463,7 @@
             InvoicePostingParameters."Document Type", InvoicePostingParameters."Document No.",
             InvoicePostingParameters."External Document No.", InvoicePostingParameters."Source Code", '');
 
-        GenJnlLine."Account Type" := "Gen. Journal Account Type"::Customer;
+        GenJnlLine."Account Type" := GenJnlLine."Account Type"::Customer;
         GenJnlLine."Account No." := SalesHeader."Bill-to Customer No.";
         GenJnlLine.CopyFromSalesHeader(SalesHeader);
         GenJnlLine.SetCurrencyFactor(SalesHeader."Currency Code", SalesHeader."Currency Factor");
@@ -521,18 +534,18 @@
         SalesPostInvoiceEvents.RunOnPostBalancingEntryOnAfterInitNewLine(SalesHeader, GenJournalLine);
 
         GenJournalLine.CopyDocumentFields(
-            "Gen. Journal Document Type"::" ", InvoicePostingParameters."Document No.",
+            GenJournalLine."Document Type"::" ", InvoicePostingParameters."Document No.",
             InvoicePostingParameters."External Document No.", InvoicePostingParameters."Source Code", '');
 
-        GenJournalLine."Account Type" := "Gen. Journal Account Type"::Customer;
+        GenJournalLine."Account Type" := GenJournalLine."Account Type"::Customer;
         GenJournalLine."Account No." := SalesHeader."Bill-to Customer No.";
         GenJournalLine.CopyFromSalesHeader(SalesHeader);
         GenJournalLine.SetCurrencyFactor(SalesHeader."Currency Code", SalesHeader."Currency Factor");
 
         if SalesHeader.IsCreditDocType() then
-            GenJournalLine."Document Type" := "Gen. Journal Document Type"::Refund
+            GenJournalLine."Document Type" := GenJournalLine."Document Type"::Refund
         else
-            GenJournalLine."Document Type" := "Gen. Journal Document Type"::Payment;
+            GenJournalLine."Document Type" := GenJournalLine."Document Type"::Payment;
 
         SetApplyToDocNo(SalesHeader, GenJournalLine);
 
@@ -574,7 +587,7 @@
     local procedure SetApplyToDocNo(SalesHeader: Record "Sales Header"; var GenJournalLine: Record "Gen. Journal Line")
     begin
         if SalesHeader."Bal. Account Type" = SalesHeader."Bal. Account Type"::"Bank Account" then
-            GenJournalLine."Bal. Account Type" := "Gen. Journal Account Type"::"Bank Account";
+            GenJournalLine."Bal. Account Type" := GenJournalLine."Bal. Account Type"::"Bank Account";
         GenJournalLine."Bal. Account No." := SalesHeader."Bal. Account No.";
         GenJournalLine."Applies-to Doc. Type" := InvoicePostingParameters."Document Type";
         GenJournalLine."Applies-to Doc. No." := InvoicePostingParameters."Document No.";
@@ -610,7 +623,7 @@
         DeferralAccount := DeferralTemplate."Deferral Account";
 
         if TempDeferralHeader.Get(
-            "Deferral Document Type"::Sales, '', '', SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.")
+            Enum::"Deferral Document Type"::Sales, '', '', SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.")
         then begin
             AmtToDeferACY := TempDeferralHeader."Amount to Defer";
             AmtToDefer := TempDeferralHeader."Amount to Defer (LCY)";
@@ -630,11 +643,11 @@
         DeferralTemplate.Get(SalesLine."Deferral Code");
 
         if TempDeferralHeader.Get(
-            "Deferral Document Type"::Sales, '', '', SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.")
+            Enum::"Deferral Document Type"::Sales, '', '', SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.")
         then begin
             if TempDeferralHeader."Amount to Defer" <> 0 then begin
                 DeferralUtilities.FilterDeferralLines(
-                  TempDeferralLine, "Deferral Document Type"::Sales.AsInteger(), '', '',
+                  TempDeferralLine, Enum::"Deferral Document Type"::Sales.AsInteger(), '', '',
                   SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.");
 
                 DeferralPostingBuffer.PrepareSales(SalesLine, InvoicePostingParameters."Document No.");
@@ -694,7 +707,7 @@
         SalesLine := SalesLineVar;
 
         if DeferralHeader.Get(
-             "Deferral Document Type"::Sales, '', '', SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.")
+             Enum::"Deferral Document Type"::Sales, '', '', SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.")
         then begin
             Currency.Initialize(SalesHeader."Currency Code", true);
             TempDeferralHeader := DeferralHeader;
@@ -768,12 +781,12 @@
             DeferralAccount := DeferralTemplate."Deferral Account";
 
         if TempDeferralHeader.Get(
-             "Deferral Document Type"::Sales, '', '', SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.")
+             Enum::"Deferral Document Type"::Sales, '', '', SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.")
         then begin
             PostedDeferralHeader.InitFromDeferralHeader(TempDeferralHeader, '', '',
                 NewDocumentType, NewDocumentNo, NewLineNo, DeferralAccount, SalesLine."Sell-to Customer No.", PostingDate);
             DeferralUtilities.FilterDeferralLines(
-                TempDeferralLine, "Deferral Document Type"::Sales.AsInteger(), '', '',
+                TempDeferralLine, Enum::"Deferral Document Type"::Sales.AsInteger(), '', '',
                 SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.");
             if TempDeferralLine.FindSet() then
                 repeat
@@ -814,258 +827,4 @@
                 else
                     GenPostingSetup.Get(SalesLine."Gen. Bus. Posting Group", SalesLine."Gen. Prod. Posting Group");
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by RunOnAfterCalcInvoiceDiscountPosting in codeunit Sales Post Invoice Events.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCalcInvoiceDiscountPosting(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; SalesLineACY: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnAfterCalcLineDiscountPosting in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCalcLineDiscountPosting(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; SalesLineACY: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnAfterCreatePostedDeferralScheduleFromSalesDoc in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreatePostedDeferralScheduleFromSalesDoc(var SalesLine: Record "Sales Line"; var PostedDeferralHeader: Record "Posted Deferral Header")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnAfterGetSalesAccount in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetSalesAccount(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var SalesAccountNo: Code[20])
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnAfterPrepareGenJnlLine in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPrepareGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; SalesHeader: Record "Sales Header"; InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnAfterSetApplyToDocNo in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetApplyToDocNo(var GenJournalLine: Record "Gen. Journal Line"; SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnAfterSetJobLineFilters in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetJobLineFilters(var JobSalesLine: Record "Sales Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnBeforeCalcInvoiceDiscountPosting in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcInvoiceDiscountPosting(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; SalesLineACY: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnBeforeCalcLineDiscountPosting in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcLineDiscountPosting(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; SalesLineACY: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnBeforeInitGenJnlLine in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; SalesHeader: Record "Sales Header"; InvoicePostingBuffer: Record "Invoice Posting Buffer"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnBeforePostLines in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostLines(SalesHeader: Record "Sales Header"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnBeforePostLedgerEntry in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostLedgerEntry(var SalesHeader: Record "Sales Header"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; InvoicePostingParameters: Record "Invoice Posting Parameters"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnBeforePrepareLine in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePrepareLine(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; SalesLineACY: Record "Sales Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnBeforeSetAmountsForBalancingEntry in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetAmountsForBalancingEntry(var CustLedgEntry: Record "Cust. Ledger Entry"; var GenJnlLine: Record "Gen. Journal Line"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnBeforeTempDeferralLineInsert in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTempDeferralLineInsert(var TempDeferralLine: Record "Deferral Line" temporary; DeferralLine: Record "Deferral Line"; SalesLine: Record "Sales Line"; var DeferralCount: Integer; var TotalDeferralCount: Integer)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPostBalancingEntryOnBeforeFindCustLedgEntry in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostBalancingEntryOnBeforeFindCustLedgEntry(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; InvoicePostingParameters: Record "Invoice Posting Parameters"; var CustLedgerEntry: Record "Cust. Ledger Entry"; var EntryFound: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPostLedgerEntryOnAfterGenJnlPostLine in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostLedgerEntryOnAfterGenJnlPostLine(var GenJnlLine: Record "Gen. Journal Line"; var SalesHeader: Record "Sales Header"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; CommitIsSuppressed: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPostLedgerEntryOnBeforeGenJnlPostLine in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostLedgerEntryOnBeforeGenJnlPostLine(var GenJnlLine: Record "Gen. Journal Line"; var SalesHeader: Record "Sales Header"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPostBalancingEntryOnAfterGenJnlPostLine in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostBalancingEntryOnAfterGenJnlPostLine(var GenJnlLine: Record "Gen. Journal Line"; var SalesHeader: Record "Sales Header"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; CommitIsSuppressed: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPostBalancingEntryOnBeforeGenJnlPostLine in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostBalancingEntryOnBeforeGenJnlPostLine(var GenJnlLine: Record "Gen. Journal Line"; var SalesHeader: Record "Sales Header"; var TotalSalesLine: Record "Sales Line"; var TotalSalesLineLCY: Record "Sales Line"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPostBalancingEntryOnAfterFindCustLedgEntry in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostBalancingEntryOnAfterFindCustLedgEntry(var CustLedgEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnAfterAssignAmounts in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterAssignAmounts(SalesLine: Record "Sales Line"; SalesLineACY: Record "Sales Line"; var TotalAmount: Decimal; var TotalAmountACY: Decimal)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnAfterSetAmounts in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterSetAmounts(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnAfterFillInvoicePostingBuffer in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterFillInvoicePostingBuffer(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnBeforeAdjustTotalAmounts in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeAdjustTotalAmounts(SalesLine: Record "Sales Line"; var TotalAmount: Decimal; var TotalAmountACY: Decimal; UseDate: Date)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnBeforeSetAccount in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeSetAccount(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var SalesAccount: Code[20])
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnBeforeSetAmounts in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeSetAmounts(SalesLine: Record "Sales Line"; SalesLineACY: Record "Sales Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TotalVAT: Decimal; var TotalVATACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; var TotalVATBase: Decimal; var TotalVATBaseACY: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnAfterSetInvoiceDiscAccount in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterSetInvoiceDiscAccount(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnAfterSetLineDiscAccount in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterSetLineDiscAccount(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnBeforeCalcInvoiceDiscountPosting in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeCalcInvoiceDiscountPosting(var TempInvoicePostingBuffer: Record "Invoice Posting Buffer"; var nvoicePostingBuffer: Record "Invoice Posting Buffer"; SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; TotalVAT: Decimal; TotalVATACY: Decimal; TotalAmount: Decimal; TotalAmountACY: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnBeforeCalcLineDiscountPosting in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeCalcLineDiscountPosting(var TempInvoicePostingBuffer: Record "Invoice Posting Buffer"; var nvoicePostingBuffer: Record "Invoice Posting Buffer"; SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; TotalVAT: Decimal; TotalVATACY: Decimal; TotalAmount: Decimal; TotalAmountACY: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPostLinesOnAfterGenJnlLinePost in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostLinesOnAfterGenJnlLinePost(var GenJnlLine: Record "Gen. Journal Line"; SalesHeader: Record "Sales Header"; TempInvoicePostingBuffer: Record "Invoice Posting Buffer"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PreviewMode: Boolean; SuppressCommit: Boolean; GLEntryNo: Integer)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPostLinesOnBeforeGenJnlLinePost in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostLinesOnBeforeGenJnlLinePost(var GenJnlLine: Record "Gen. Journal Line"; SalesHeader: Record "Sales Header"; TempInvoicePostingBuffer: Record "Invoice Posting Buffer"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PreviewMode: Boolean; SuppressCommit: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareGenJnlLineOnAfterCopyToGenJnlLine in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareGenJnlLineOnAfterCopyToGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; SalesHeader: Record "Sales Header"; InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnAfterSetInvoiceDiscountPosting in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterSetInvoiceDiscountPosting(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var InvoiceDiscountPosting: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnAfterSetLineDiscountPosting in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterSetLineDiscountPosting(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var LineDiscountPosting: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnAfterPrepareDeferralLine in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterPrepareDeferralLine(SalesLine: Record "Sales Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer"; UseDate: Date; InvDefLineNo: Integer; DeferralLineNo: Integer; SuppressCommit: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnAfterUpdateInvoicePostingBuffer in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterUpdateInvoicePostingBuffer(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnBeforePrepareDeferralLine in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforePrepareDeferralLine(SalesLine: Record "Sales Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer"; UseDate: Date; InvDefLineNo: Integer; DeferralLineNo: Integer; SuppressCommit: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnBeforePrepareSales in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforePrepareSales(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnBeforeSetInvoiceDiscAccount in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeSetInvoiceDiscAccount(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var InvDiscAccount: Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by RunOnPrepareLineOnBeforeSetLineDiscAccount in codeunit Sales Post Invoice Subscr.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeSetLineDiscAccount(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var InvDiscAccount: Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 }

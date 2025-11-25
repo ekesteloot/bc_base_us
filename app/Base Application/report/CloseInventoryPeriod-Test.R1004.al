@@ -1,7 +1,18 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.AssemblyMgt.History;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Manufacturing.Document;
+using System.Environment;
+using System.Utilities;
+
 report 1004 "Close Inventory Period - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/CloseInventoryPeriodTest.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/CloseInventoryPeriodTest.rdlc';
     Caption = 'Close Inventory Period - Test';
     EnableHyperlinks = true;
 
@@ -9,12 +20,11 @@ report 1004 "Close Inventory Period - Test"
     {
         dataitem("Inventory Period"; "Inventory Period")
         {
-            DataItemLinkReference = Header;
-            DataItemTableView = SORTING("Ending Date");
+            DataItemTableView = sorting("Ending Date");
             RequestFilterFields = "Ending Date";
             dataitem(Header; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(CompanyName; COMPANYPROPERTY.DisplayName())
                 {
                 }
@@ -50,7 +60,7 @@ report 1004 "Close Inventory Period - Test"
                 }
                 dataitem("Avg. Cost Adjmt. Entry Point"; "Avg. Cost Adjmt. Entry Point")
                 {
-                    DataItemTableView = SORTING("Item No.", "Cost Is Adjusted", "Valuation Date");
+                    DataItemTableView = sorting("Item No.", "Cost Is Adjusted", "Valuation Date");
 
                     trigger OnAfterGetRecord()
                     begin
@@ -69,7 +79,7 @@ report 1004 "Close Inventory Period - Test"
                 }
                 dataitem("Inventory Adjmt. Entry (Order)"; "Inventory Adjmt. Entry (Order)")
                 {
-                    DataItemTableView = SORTING("Cost is Adjusted", "Allow Online Adjustment") WHERE("Cost is Adjusted" = CONST(false), "Is Finished" = CONST(true));
+                    DataItemTableView = sorting("Cost is Adjusted", "Allow Online Adjustment") where("Cost is Adjusted" = const(false), "Is Finished" = const(true));
 
                     trigger OnAfterGetRecord()
                     var
@@ -95,7 +105,7 @@ report 1004 "Close Inventory Period - Test"
                 }
                 dataitem("Item Ledger Entry"; "Item Ledger Entry")
                 {
-                    DataItemTableView = SORTING("Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date");
+                    DataItemTableView = sorting("Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date");
 
                     trigger OnAfterGetRecord()
                     begin
@@ -111,7 +121,7 @@ report 1004 "Close Inventory Period - Test"
                 }
                 dataitem(Item; Item)
                 {
-                    DataItemTableView = SORTING("No.");
+                    DataItemTableView = sorting("No.");
                     column(Description_Item; Description)
                     {
                     }
@@ -132,7 +142,7 @@ report 1004 "Close Inventory Period - Test"
                     }
                     dataitem(ItemErrorLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(TempItemErrorBufferErrorText; TempItemErrorBuffer."Error Text")
                         {
                         }
@@ -151,7 +161,7 @@ report 1004 "Close Inventory Period - Test"
                     }
                     dataitem(ItemOrderErrorLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ItemOrderErrorLoopErrorText; TempItemErrorBuffer."Error Text")
                         {
                         }
@@ -184,7 +194,7 @@ report 1004 "Close Inventory Period - Test"
                     }
                     dataitem(ItemLedgErrorLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ItemLedgErrorLoopErrorText; TempItemErrorBuffer."Error Text")
                         {
                         }

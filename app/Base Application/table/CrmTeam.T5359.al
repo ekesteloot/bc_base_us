@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
 table 5359 "CRM Team"
 {
     // Dynamics CRM Version: 7.1.0.2040
@@ -100,7 +106,7 @@ table 5359 "CRM Team"
         }
         field(12; CreatedByName; Text[200])
         {
-            CalcFormula = Lookup ("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(CreatedBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(CreatedBy)));
             Caption = 'CreatedByName';
             ExternalAccess = Read;
             ExternalName = 'createdbyname';
@@ -109,7 +115,7 @@ table 5359 "CRM Team"
         }
         field(13; ModifiedByName; Text[200])
         {
-            CalcFormula = Lookup ("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(ModifiedBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(ModifiedBy)));
             Caption = 'ModifiedByName';
             ExternalAccess = Read;
             ExternalName = 'modifiedbyname';
@@ -118,7 +124,7 @@ table 5359 "CRM Team"
         }
         field(14; BusinessUnitIdName; Text[160])
         {
-            CalcFormula = Lookup ("CRM Businessunit".Name WHERE(BusinessUnitId = FIELD(BusinessUnitId)));
+            CalcFormula = Lookup("CRM Businessunit".Name where(BusinessUnitId = field(BusinessUnitId)));
             Caption = 'BusinessUnitIdName';
             ExternalAccess = Read;
             ExternalName = 'businessunitidname';
@@ -159,7 +165,7 @@ table 5359 "CRM Team"
         }
         field(19; AdministratorIdName; Text[200])
         {
-            CalcFormula = Lookup ("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(AdministratorId)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(AdministratorId)));
             Caption = 'AdministratorIdName';
             ExternalAccess = Read;
             ExternalName = 'administratoridname';
@@ -184,7 +190,7 @@ table 5359 "CRM Team"
         }
         field(22; CreatedOnBehalfByName; Text[200])
         {
-            CalcFormula = Lookup ("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(CreatedOnBehalfBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(CreatedOnBehalfBy)));
             Caption = 'CreatedOnBehalfByName';
             ExternalAccess = Read;
             ExternalName = 'createdonbehalfbyname';
@@ -202,7 +208,7 @@ table 5359 "CRM Team"
         }
         field(24; ModifiedOnBehalfByName; Text[200])
         {
-            CalcFormula = Lookup ("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(ModifiedOnBehalfBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(ModifiedOnBehalfBy)));
             Caption = 'ModifiedOnBehalfByName';
             ExternalAccess = Read;
             ExternalName = 'modifiedonbehalfbyname';
@@ -226,7 +232,7 @@ table 5359 "CRM Team"
         }
         field(27; TransactionCurrencyIdName; Text[100])
         {
-            CalcFormula = Lookup ("CRM Transactioncurrency".CurrencyName WHERE(TransactionCurrencyId = FIELD(TransactionCurrencyId)));
+            CalcFormula = Lookup("CRM Transactioncurrency".CurrencyName where(TransactionCurrencyId = field(TransactionCurrencyId)));
             Caption = 'TransactionCurrencyIdName';
             ExternalAccess = Read;
             ExternalName = 'transactioncurrencyidname';
@@ -260,7 +266,7 @@ table 5359 "CRM Team"
             ExternalAccess = Insert;
             ExternalName = 'regardingobjectid';
             ExternalType = 'Lookup';
-            TableRelation = IF (RegardingObjectTypeCode = CONST(opportunity)) "CRM Opportunity".OpportunityId;
+            TableRelation = if (RegardingObjectTypeCode = const(opportunity)) "CRM Opportunity".OpportunityId;
         }
         field(31; SystemManaged; Boolean)
         {

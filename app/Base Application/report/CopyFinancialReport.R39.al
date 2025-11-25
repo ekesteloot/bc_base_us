@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
 report 39 "Copy Financial Report"
 {
     Caption = 'Copy Financial Report';
@@ -7,7 +9,7 @@ report 39 "Copy Financial Report"
     {
         dataitem(SourceFinancialReport; "Financial Report")
         {
-            DataItemTableView = SORTING(Name) ORDER(Ascending);
+            DataItemTableView = sorting(Name) order(Ascending);
 
             trigger OnAfterGetRecord()
             var

@@ -14,7 +14,7 @@ report 501 "Intrastat - Form"
     {
         dataitem("Intrastat Jnl. Batch"; "Intrastat Jnl. Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             RequestFilterFields = "Journal Template Name", Name;
             column(JnlTmplName_IntraJnlBatch; "Journal Template Name")
             {
@@ -24,8 +24,8 @@ report 501 "Intrastat - Form"
             }
             dataitem("Intrastat Jnl. Line"; "Intrastat Jnl. Line")
             {
-                DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
-                DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", Type, "Country/Region Code", "Tariff No.", "Transaction Type", "Transport Method", "Country/Region of Origin Code", "Partner VAT ID");
+                DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
+                DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", Type, "Country/Region Code", "Tariff No.", "Transaction Type", "Transport Method", "Country/Region of Origin Code", "Partner VAT ID");
                 RequestFilterFields = Type;
                 column(IntraJnlBatchStaticPeriod; StrSubstNo(Text002, "Intrastat Jnl. Batch"."Statistics Period"))
                 {

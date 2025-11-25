@@ -4,7 +4,7 @@ codeunit 237 "G/L Reg.-Vend.Ledger"
 
     trigger OnRun()
     begin
-        VendLedgEntry.SetRange("Entry No.", "From Entry No.", "To Entry No.");
+        VendLedgEntry.SetRange("Entry No.", Rec."From Entry No.", Rec."To Entry No.");
         PAGE.Run(PAGE::"Vendor Ledger Entries", VendLedgEntry);
     end;
 

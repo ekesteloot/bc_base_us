@@ -1,7 +1,9 @@
+namespace Microsoft.Manufacturing.Document;
+
 report 99000767 "Prod. Order - Calculation"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrder/ProdOrderCalculation.rdlc';
+    RDLCLayout = './Manufacturing/Document/ProdOrderCalculation.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Calculation';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +12,7 @@ report 99000767 "Prod. Order - Calculation"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             RequestFilterFields = Status, "No.", "Source Type", "Source No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -69,8 +71,8 @@ report 99000767 "Prod. Order - Calculation"
             }
             dataitem("Prod. Order Line"; "Prod. Order Line")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Line No.") WHERE("Planning Level Code" = CONST(0));
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Line No.") where("Planning Level Code" = const(0));
                 column(Prod__Order_Line__Prod__Order_No__; "Prod. Order No.")
                 {
                 }

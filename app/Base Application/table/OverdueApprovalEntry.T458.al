@@ -1,3 +1,12 @@
+﻿namespace System.Automation;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using System.Email;
+using System.Environment.Configuration;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 458 "Overdue Approval Entry"
 {
     Caption = 'Overdue Approval Entry';
@@ -15,9 +24,9 @@ table 458 "Overdue Approval Entry"
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = IF ("Table ID" = CONST(36)) "Sales Header"."No." WHERE("Document Type" = FIELD("Document Type"))
-            ELSE
-            IF ("Table ID" = CONST(38)) "Purchase Header"."No." WHERE("Document Type" = FIELD("Document Type"));
+            TableRelation = if ("Table ID" = const(36)) "Sales Header"."No." where("Document Type" = field("Document Type"))
+            else
+            if ("Table ID" = const(38)) "Purchase Header"."No." where("Document Type" = field("Document Type"));
         }
         field(4; "Sent to ID"; Code[50])
         {
@@ -61,8 +70,6 @@ table 458 "Overdue Approval Entry"
             Caption = 'Approver ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(12; "Approval Code"; Code[20])
         {

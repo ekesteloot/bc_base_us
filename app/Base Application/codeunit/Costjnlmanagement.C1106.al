@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Journal;
+
 codeunit 1106 CostJnlManagement
 {
     Permissions = TableData "Cost Journal Template" = rimd,

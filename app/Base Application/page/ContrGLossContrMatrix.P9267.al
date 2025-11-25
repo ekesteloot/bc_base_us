@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ServiceMgt.Contract;
+using System.Utilities;
+
 page 9267 "Contr. G/Loss (Contr.) Matrix"
 {
     // ContractGainLossEntry.Reset();
@@ -5,7 +11,7 @@ page 9267 "Contr. G/Loss (Contr.) Matrix"
     // ContractGainLossEntry.SETRANGE("Contract Reason Code",CurrForm.Matrix.MatrixRec.Code);
     // IF AmountType = AmountType::"Net Change" THEN
     //   ContractGainLossEntry.SETRANGE("Change Date","Period Start","Period End")
-    // ELSE
+    // else
     //   ContractGainLossEntry.SETRANGE("Change Date",0D,"Period End");
     // 
     // PAGE.RUN(0,ContractGainLossEntry);
@@ -49,9 +55,9 @@ page 9267 "Contr. G/Loss (Contr.) Matrix"
                         if ContractFilter <> '' then
                             ContractGainLossEntry.SetRange("Contract No.", ContractFilter);
                         if AmountType = AmountType::"Net Change" then
-                            ContractGainLossEntry.SetRange("Change Date", "Period Start", "Period End")
+                            ContractGainLossEntry.SetRange("Change Date", Rec."Period Start", Rec."Period End")
                         else
-                            ContractGainLossEntry.SetRange("Change Date", 0D, "Period End");
+                            ContractGainLossEntry.SetRange("Change Date", 0D, Rec."Period End");
                         PAGE.Run(0, ContractGainLossEntry);
                     end;
                 }
@@ -515,7 +521,7 @@ page 9267 "Contr. G/Loss (Contr.) Matrix"
     trigger OnOpenPage()
     begin
         StartFilter := Format(PeriodStart) + '..';
-        SetFilter("Period Start", StartFilter);
+        Rec.SetFilter("Period Start", StartFilter);
         CurrentNoOfMatrixColumn := 32;
     end;
 
@@ -534,77 +540,45 @@ page 9267 "Contr. G/Loss (Contr.) Matrix"
         StartFilter: Text[1024];
         CurrentNoOfMatrixColumn: Integer;
         Text000: Label '<Sign><Integer Thousand><Decimals,3>', Locked = true;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
 
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            ServiceContract.SetRange("Date Filter", "Period Start", "Period End")
+            ServiceContract.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            ServiceContract.SetRange("Date Filter", PeriodStart, "Period End");
+            ServiceContract.SetRange("Date Filter", PeriodStart, Rec."Period End");
     end;
 
     local procedure CalculateMovement("Code": Code[10]): Decimal
@@ -623,9 +597,9 @@ page 9267 "Contr. G/Loss (Contr.) Matrix"
         ContractGainLossEntry.SetCurrentKey("Contract No.", "Change Date");
         ContractGainLossEntry.SetFilter("Contract No.", ContractFilter);
         if AmountType = AmountType::"Net Change" then
-            ContractGainLossEntry.SetRange("Change Date", "Period Start", "Period End")
+            ContractGainLossEntry.SetRange("Change Date", Rec."Period Start", Rec."Period End")
         else
-            ContractGainLossEntry.SetRange("Change Date", PeriodStart, "Period End");
+            ContractGainLossEntry.SetRange("Change Date", PeriodStart, Rec."Period End");
         ContractGainLossEntry.CalcSums(Amount);
         TotalGainLoss := ContractGainLossEntry.Amount;
     end;
@@ -647,9 +621,9 @@ page 9267 "Contr. G/Loss (Contr.) Matrix"
         ContractGainLossEntry.SetCurrentKey("Contract No.", "Change Date");
         ContractGainLossEntry.SetRange("Contract No.", MatrixRecords[MATRIX_ColumnOrdinal]."Contract No.");
         if AmountType = AmountType::"Net Change" then
-            ContractGainLossEntry.SetRange("Change Date", "Period Start", "Period End")
+            ContractGainLossEntry.SetRange("Change Date", Rec."Period Start", Rec."Period End")
         else
-            ContractGainLossEntry.SetRange("Change Date", 0D, "Period End");
+            ContractGainLossEntry.SetRange("Change Date", 0D, Rec."Period End");
 
         PAGE.Run(0, ContractGainLossEntry);
     end;

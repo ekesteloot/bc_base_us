@@ -11,13 +11,13 @@ codeunit 8811 "Customer Statement via Queue"
         CustomerLayoutStatement: Codeunit "Customer Layout - Statement";
         XmlContent: Text;
     begin
-        CalcFields("Object Caption to Run");
+        Rec.CalcFields("Object Caption to Run");
         ErrorMessageManagement.Activate(ErrorMessageHandler);
-        ErrorMessageManagement.PushContext(ErrorContextElement, RecordId, 0, "Object Caption to Run");
+        ErrorMessageManagement.PushContext(ErrorContextElement, Rec.RecordId, 0, Rec."Object Caption to Run");
 
-        XmlContent := GetXmlContent();
+        XmlContent := Rec.GetXmlContent();
         if XmlContent = '' then
-            ErrorMessageManagement.LogErrorMessage(0, RequestParametersHasNotBeenSetErr, Rec, FieldNo(XML), '')
+            ErrorMessageManagement.LogErrorMessage(0, RequestParametersHasNotBeenSetErr, Rec, Rec.FieldNo(XML), '')
         else
             CustomerLayoutStatement.RunReportWithParameters(XmlContent);
 

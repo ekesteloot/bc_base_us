@@ -1,3 +1,13 @@
+﻿namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Setup;
+using System.Environment;
+using System.Globalization;
+using System.Integration.Word;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 table 5103 "Interaction Tmpl. Language"
 {
     Caption = 'Interaction Tmpl. Language';
@@ -27,16 +37,18 @@ table 5103 "Interaction Tmpl. Language"
         field(5; "Custom Layout Code"; Code[20])
         {
             Caption = 'Custom Layout Code';
-            TableRelation = "Custom Report Layout" WHERE("Report ID" = CONST(5084));
+            TableRelation = "Custom Report Layout" WHERE("Report ID" = CONST(Report::"Email Merge"));
 
             trigger OnValidate()
             begin
+                if Rec."Custom Layout Code" <> '' then
+                    Rec.Validate("Report Layout Name", '');
                 CalcFields("Custom Layout Description");
             end;
         }
         field(6; "Custom Layout Description"; Text[250])
         {
-            CalcFormula = Lookup("Custom Report Layout".Description WHERE(Code = FIELD("Custom Layout Code")));
+            CalcFormula = Lookup("Custom Report Layout".Description where(Code = field("Custom Layout Code")));
             Caption = 'Custom Layout Description';
             Editable = false;
             FieldClass = FlowField;
@@ -44,7 +56,50 @@ table 5103 "Interaction Tmpl. Language"
         field(7; "Word Template Code"; Code[30])
         {
             DataClassification = CustomerContent;
-            TableRelation = "Word Template".Code WHERE("Language Code" = FIELD("Language Code"), "Table ID" = CONST(5106)); // Only Interaction Merge Data word templates with same language code are allowed
+            TableRelation = "Word Template".Code WHERE("Language Code" = FIELD("Language Code"), "Table ID" = CONST(Database::"Interaction Merge Data")); // Only Interaction Merge Data word templates with same language code are allowed
+        }
+        field(8; "Report Layout Name"; Text[250])
+        {
+            Caption = 'Report Layout Name';
+            TableRelation = "Report Layout List".Name WHERE("Report ID" = CONST(Report::"Email Merge"));
+
+            trigger OnLookup()
+            var
+                ReportLayoutList: Record "Report Layout List";
+                ReportManagement: Codeunit ReportManagement;
+                Handled: Boolean;
+            begin
+                ReportLayoutList.SetRange("Report ID", Report::"Email Merge");
+                ReportManagement.OnSelectReportLayout(ReportLayoutList, Handled);
+                if not Handled then
+                    exit;
+                "Report Layout Name" := ReportLayoutList.Name;
+                "Report Layout AppID" := ReportLayoutList."Application ID";
+            end;
+
+            trigger OnValidate()
+            var
+                ReportLayoutList: Record "Report Layout List";
+            begin
+                if "Report Layout Name" <> '' then Begin
+                    ReportLayoutList.SetRange(Name, "Report Layout Name");
+                    ReportLayoutList.SetRange("Report ID", Report::"Email Merge");
+
+                    if not IsNullGuid("Report Layout AppID") then
+                        ReportLayoutList.SetRange("Application ID", "Report Layout AppID");
+                    if not ReportLayoutList.FindFirst() then begin
+                        ReportLayoutList.SetRange("Application ID");
+                        ReportLayoutList.FindFirst();
+                    end;
+                    Rec."Report Layout AppID" := ReportLayoutList."Application ID";
+                end else
+                    Clear(Rec."Report Layout AppID");
+            end;
+        }
+        field(9; "Report Layout AppID"; Guid)
+        {
+            Caption = 'Email Body Layout AppID';
+            TableRelation = "Report Layout List"."Application ID" where("Report ID" = const(Report::"Email Merge"));
         }
     }
 
@@ -90,7 +145,6 @@ table 5103 "Interaction Tmpl. Language"
         Attachment: Record Attachment;
         InteractTmplLanguage: Record "Interaction Tmpl. Language";
         NewAttachNo: Integer;
-        IsHandled: Boolean;
     begin
         if "Attachment No." <> 0 then begin
             if Attachment.Get("Attachment No.") then
@@ -99,12 +153,7 @@ table 5103 "Interaction Tmpl. Language"
                 exit;
         end;
 
-        IsHandled := false;
-        OnCreateAttachmentOnAfterInitialChecks(Rec, NewAttachNo, IsHandled);
-        if IsHandled then
-            exit;
-
-        if "Custom Layout Code" = '' then begin
+        if ("Custom Layout Code" = '') and ("Report Layout Name" = '') then begin
             if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone, CLIENTTYPE::Desktop] then
                 if Attachment.ImportAttachmentFromClientFile('', false, false) then
                     NewAttachNo := Attachment."No.";
@@ -133,7 +182,10 @@ table 5103 "Interaction Tmpl. Language"
         Attachment."Storage Type" := Attachment."Storage Type"::Embedded;
         Attachment."File Extension" := 'HTML';
         Attachment.Insert(true);
-        Attachment.WriteHTMLCustomLayoutAttachment('', "Custom Layout Code");
+        if "Custom Layout Code" <> '' then
+            Attachment.WriteHTMLCustomLayoutAttachment('', "Custom Layout Code")
+        else
+            Attachment.WriteHTMLCustomLayoutAttachment('', "Report Layout Name");
         exit(Attachment."No.");
     end;
 
@@ -143,7 +195,6 @@ table 5103 "Interaction Tmpl. Language"
     begin
         if "Attachment No." = 0 then
             exit;
-        OnOpenAttachmentOnBeforeGetAttachment(Rec, Attachment);
         Attachment.Get("Attachment No.");
         Attachment.OpenAttachment("Interaction Template Code" + ' ' + Description, false, "Language Code");
     end;
@@ -253,16 +304,6 @@ table 5103 "Interaction Tmpl. Language"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateHTMLCustomLayoutAttachment()
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateAttachmentOnAfterInitialChecks(var InteractionTmplLanguage: Record "Interaction Tmpl. Language"; var NewAttachNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnOpenAttachmentOnBeforeGetAttachment(var InteractionTmplLanguage: Record "Interaction Tmpl. Language"; var Attachment: Record Attachment)
     begin
     end;
 }

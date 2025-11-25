@@ -1,3 +1,8 @@
+namespace System.Integration.PowerBI;
+
+using System.Security.AccessControl;
+using System.Security.User;
+
 page 6321 "Power BI Deployments"
 {
     // // Page for letting the user delete their uploaded OOB PBI reports.
@@ -61,13 +66,13 @@ page 6321 "Power BI Deployments"
             repeater("Default Reports")
             {
                 Caption = 'Default Reports';
-                field(ReportName; Name)
+                field(ReportName; Rec.Name)
                 {
                     ApplicationArea = All;
                     Caption = 'Report Name';
                     Editable = false;
                 }
-                field(ReportID; Id)
+                field(ReportID; Rec.Id)
                 {
                     ApplicationArea = All;
                     Caption = 'Report ID';
@@ -102,12 +107,12 @@ page 6321 "Power BI Deployments"
                     if PowerBICustomerReports.FindSet() then
                         repeat
                             if PowerBIReportUploads.Get(PowerBICustomerReports.Id, SelectedUserSecurityId) then begin
-                                PowerBIReportUploads."Needs Deletion" := true;
+                                PowerBIReportUploads.Validate("Report Upload Status", PowerBIReportUploads."Report Upload Status"::PendingDeletion);
                                 PowerBIReportUploads.Modify();
                             end;
                         until PowerBICustomerReports.Next() = 0;
 
-                    PowerBIServiceMgt.SynchronizeReportsInBackground();
+                    PowerBIServiceMgt.SynchronizeReportsInBackground('');
                     LoadReports();
                 end;
             }
@@ -150,20 +155,20 @@ page 6321 "Power BI Deployments"
         PowerBICustomerReports: Record "Power BI Customer Reports";
     begin
         // Clear temp records
-        DeleteAll();
+        Rec.DeleteAll();
 
         if IsNullGuid(SelectedUserSecurityId) then
             exit;
 
         PowerBIReportUploads.SetRange("User ID", SelectedUserSecurityId);
-        PowerBIReportUploads.SetRange("Is Selection Done", false);
+        PowerBIReportUploads.SetFilter("Report Upload Status", '<>%1', PowerBIReportUploads."Report Upload Status"::Completed);
 
         // Check all upload records for the user and find only the ones for customer reports
         if PowerBIReportUploads.FindSet() then
             repeat
                 if PowerBICustomerReports.Get(PowerBIReportUploads."PBIX BLOB ID") then begin
-                    Copy(PowerBICustomerReports);
-                    Insert();
+                    Rec.Copy(PowerBICustomerReports);
+                    Rec.Insert();
                 end;
             until PowerBIReportUploads.Next() = 0;
 

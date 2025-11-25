@@ -1,3 +1,14 @@
+﻿namespace System.Integration;
+
+using System;
+using System.Apps;
+using System.Azure.Identity;
+using System.Environment;
+using System.Integration.Excel;
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 6710 ODataUtility
 {
     Permissions = TableData "Tenant Web Service OData" = rimd,
@@ -241,7 +252,7 @@ codeunit 6710 ODataUtility
         IndexOfKeyStart: Integer;
         IndexOfValueEnd: Integer;
     begin
-        // SORTING(No.) WHERE(No=FILTER(01121212..01454545|31669966),Balance Due=FILTER(>0))
+        // SORTING(No.) where(No=FILTER(01121212..01454545|31669966),Balance Due=FILTER(>0))
 
         foreach KeyValuePair in TableItemFilterTextDictionaryParam do begin
             LocalFilterText := DelStr(KeyValuePair.Value, 1, StrPos(KeyValuePair.Value, 'WHERE') + 5);  // becomes No=FILTER(01121212..01454545|31669966),Balance Due=FILTER(>0))
@@ -320,13 +331,14 @@ codeunit 6710 ODataUtility
         EditinExcel.EditPageInExcel(PageCaption, ObjectId, EditinExcelFilters);
     end;
 
+    [Obsolete('Replaced by EditinExcelHandler.EditPageInExcel(PageCaption: Text[240]; ObjectId: Integer; CodeUnit "Filters")', '23.0')]
     procedure EditWorksheetInExcel(PageCaption: Text[240]; PageId: Text; "Filter": Text)
     var
-        EditinExcelHandler: Codeunit "Edit in Excel";
+        EditinExcel: Codeunit "Edit in Excel";
         ObjectId: Integer;
     begin
         Evaluate(ObjectId, CopyStr(PageId, 5));
-        EditinExcelHandler.EditPageInExcel(PageCaption, ObjectId);
+        EditinExcel.EditPageInExcel(PageCaption, ObjectId);
     end;
 
     [Scope('OnPrem')]

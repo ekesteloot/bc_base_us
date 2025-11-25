@@ -22,17 +22,9 @@ table 10122 "Bank Comment Line"
         {
             Caption = 'No.';
             TableRelation =
-#if not CLEAN21
-            IF ("Table Name" = CONST("Bank Rec.")) "Bank Rec. Header"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."))
-            ELSE
-#endif
-            IF ("Table Name" = CONST("Posted Bank Rec.")) "Posted Bank Rec. Header"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."))
-            ELSE
-#if not CLEAN21
-            IF ("Table Name" = CONST(Deposit)) "Deposit Header"
-            ELSE
-#endif
-            IF ("Table Name" = CONST("Posted Deposit")) "Posted Deposit Header";
+            if ("Table Name" = const("Posted Bank Rec.")) "Posted Bank Rec. Header"."Statement No." where("Bank Account No." = field("Bank Account No."))
+            else
+            if ("Table Name" = const("Posted Deposit")) "Posted Deposit Header";
         }
         field(4; "Line No."; Integer)
         {

@@ -73,7 +73,7 @@ table 381 "VAT Registration No. Format"
             until Check or (Next() = 0);
 
         if not Check then
-            Error(StrSubstNo('%1%2', StrSubstNo(Text000, "Country/Region Code"), StrSubstNo(Text001, TextString)));
+            Error('%1%2', StrSubstNo(Text000, "Country/Region Code"), StrSubstNo(Text001, TextString));
 
         case TableID of
             DATABASE::Customer:
@@ -245,9 +245,9 @@ table 381 "VAT Registration No. Format"
             StrLen(String) + StrLen(AppendText) + 5 <= 250:
                 String += ', ' + AppendText;
             else begin
-                    String += '...';
-                    Finish := true;
-                end;
+                String += '...';
+                Finish := true;
+            end;
         end;
     end;
 

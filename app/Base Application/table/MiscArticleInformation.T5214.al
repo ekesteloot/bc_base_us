@@ -1,3 +1,8 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.HumanResources.Comment;
+using Microsoft.HumanResources.Setup;
+
 table 5214 "Misc. Article Information"
 {
     Caption = 'Misc. Article Information';
@@ -47,10 +52,10 @@ table 5214 "Misc. Article Information"
         }
         field(8; Comment; Boolean)
         {
-            CalcFormula = Exist ("Human Resource Comment Line" WHERE("Table Name" = CONST("Misc. Article Information"),
-                                                                     "No." = FIELD("Employee No."),
-                                                                     "Alternative Address Code" = FIELD("Misc. Article Code"),
-                                                                     "Table Line No." = FIELD("Line No.")));
+            CalcFormula = Exist("Human Resource Comment Line" where("Table Name" = const("Misc. Article Information"),
+                                                                     "No." = field("Employee No."),
+                                                                     "Alternative Address Code" = field("Misc. Article Code"),
+                                                                     "Table Line No." = field("Line No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;

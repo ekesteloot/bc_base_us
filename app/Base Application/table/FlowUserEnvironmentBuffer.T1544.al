@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 1544 "Flow User Environment Buffer"
 {
     Caption = 'Power Automate User Environment Buffer';

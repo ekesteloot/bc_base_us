@@ -1,6 +1,8 @@
+namespace System.Azure.Identity;
+
 page 6301 "Azure AD App Setup Part"
 {
-    Caption = '<Azure AD Application Setup Part>';
+    Caption = '<Microsoft Entra application Setup Part>';
     PageType = CardPart;
     SourceTable = "Azure AD App Setup";
 
@@ -26,7 +28,7 @@ page 6301 "Azure AD App Setup Part"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Application ID';
                 ShowMandatory = true;
-                ToolTip = 'Specifies the ID that is assigned to the application when it is registered in Azure AD.  The ID is used for authenticating with Azure AD. This is also referred to as the client ID.';
+                ToolTip = 'Specifies the ID that is assigned to the application when it is registered in Microsoft Entra ID.  The ID is used for authenticating with Microsoft Entra ID. This is also referred to as the client ID.';
             }
             field(SecretKey; SecretKey)
             {
@@ -34,7 +36,7 @@ page 6301 "Azure AD App Setup Part"
                 Caption = 'Key';
                 NotBlank = true;
                 ShowMandatory = true;
-                ToolTip = 'Specifies the secret key (or client secret) that is used along with the Application ID for authenticating with Azure AD.';
+                ToolTip = 'Specifies the secret key (or client secret) that is used along with the Application ID for authenticating with Microsoft Entra ID.';
             }
         }
     }
@@ -47,13 +49,13 @@ page 6301 "Azure AD App Setup Part"
     var
         AzureADMgt: Codeunit "Azure AD Mgt.";
     begin
-        if not FindFirst() then
-            Init();
+        if not Rec.FindFirst() then
+            Rec.Init();
 
         HomePageUrl := GetUrl(CLIENTTYPE::Web);
         RedirectUrl := AzureADMgt.GetRedirectUrl();
-        AppId := "App ID";
-        SecretKey := GetSecretKeyFromIsolatedStorage();
+        AppId := Rec."App ID";
+        SecretKey := Rec.GetSecretKeyFromIsolatedStorage();
     end;
 
     var
@@ -68,12 +70,12 @@ page 6301 "Azure AD App Setup Part"
     [NonDebuggable]
     procedure Save()
     begin
-        "Redirect URL" := RedirectUrl;
-        "App ID" := AppId;
-        SetSecretKeyToIsolatedStorage(SecretKey);
+        Rec."Redirect URL" := RedirectUrl;
+        Rec."App ID" := AppId;
+        Rec.SetSecretKeyToIsolatedStorage(SecretKey);
 
-        if not Modify(true) then
-            Insert(true);
+        if not Rec.Modify(true) then
+            Rec.Insert(true);
     end;
 
     procedure ValidateFields()

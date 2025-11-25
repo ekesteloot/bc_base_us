@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.BankAccount;
+
 page 698 "IC Bank Account Card"
 {
     Caption = 'Intercompany Bank Account Card';

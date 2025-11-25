@@ -1,3 +1,7 @@
+namespace System.Reflection;
+
+using System.Apps;
+
 page 9174 "All Objects with Caption"
 {
     ApplicationArea = Basic, Suite;
@@ -74,7 +78,7 @@ page 9174 "All Objects with Caption"
         PublishedApplication: Record "Published Application";
     begin
         if PublishedApplication.ReadPermission() then
-            if PublishedApplication.Get("App Runtime Package ID") then
+            if PublishedApplication.Get(Rec."App Runtime Package ID") then
                 AppName := PublishedApplication.Name;
     end;
 

@@ -1,3 +1,11 @@
+﻿namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Profiling;
+using Microsoft.InventoryMgt.Ledger;
+
 report 5197 "Remove Contacts - Reduce"
 {
     Caption = 'Remove Contacts - Reduce';
@@ -7,7 +15,7 @@ report 5197 "Remove Contacts - Reduce"
     {
         dataitem("Segment Header"; "Segment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
 
             trigger OnPreDataItem()
             begin
@@ -16,7 +24,7 @@ report 5197 "Remove Contacts - Reduce"
         }
         dataitem(Contact; Contact)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Search Name", Type, "Salesperson Code", "Post Code", "Country/Region Code", "Territory Code";
 
             trigger OnPreDataItem()
@@ -26,7 +34,7 @@ report 5197 "Remove Contacts - Reduce"
         }
         dataitem("Contact Profile Answer"; "Contact Profile Answer")
         {
-            DataItemTableView = SORTING("Contact No.", "Profile Questionnaire Code", "Line No.");
+            DataItemTableView = sorting("Contact No.", "Profile Questionnaire Code", "Line No.");
             RequestFilterFields = "Profile Questionnaire Code", "Line No.";
 
             trigger OnPreDataItem()
@@ -36,7 +44,7 @@ report 5197 "Remove Contacts - Reduce"
         }
         dataitem("Contact Mailing Group"; "Contact Mailing Group")
         {
-            DataItemTableView = SORTING("Contact No.", "Mailing Group Code");
+            DataItemTableView = sorting("Contact No.", "Mailing Group Code");
             RequestFilterFields = "Mailing Group Code";
 
             trigger OnPreDataItem()
@@ -46,7 +54,7 @@ report 5197 "Remove Contacts - Reduce"
         }
         dataitem("Interaction Log Entry"; "Interaction Log Entry")
         {
-            DataItemTableView = SORTING("Entry No.");
+            DataItemTableView = sorting("Entry No.");
             RequestFilterFields = Date, "Segment No.", "Campaign No.", Evaluation, "Interaction Template Code", "Salesperson Code";
 
             trigger OnPreDataItem()
@@ -56,7 +64,7 @@ report 5197 "Remove Contacts - Reduce"
         }
         dataitem("Contact Job Responsibility"; "Contact Job Responsibility")
         {
-            DataItemTableView = SORTING("Contact No.", "Job Responsibility Code");
+            DataItemTableView = sorting("Contact No.", "Job Responsibility Code");
             RequestFilterFields = "Job Responsibility Code";
 
             trigger OnPreDataItem()
@@ -66,7 +74,7 @@ report 5197 "Remove Contacts - Reduce"
         }
         dataitem("Contact Industry Group"; "Contact Industry Group")
         {
-            DataItemTableView = SORTING("Contact No.", "Industry Group Code");
+            DataItemTableView = sorting("Contact No.", "Industry Group Code");
             RequestFilterFields = "Industry Group Code";
 
             trigger OnPreDataItem()
@@ -76,7 +84,7 @@ report 5197 "Remove Contacts - Reduce"
         }
         dataitem("Contact Business Relation"; "Contact Business Relation")
         {
-            DataItemTableView = SORTING("Contact No.", "Business Relation Code");
+            DataItemTableView = sorting("Contact No.", "Business Relation Code");
             RequestFilterFields = "Business Relation Code";
 
             trigger OnPreDataItem()
@@ -86,7 +94,7 @@ report 5197 "Remove Contacts - Reduce"
         }
         dataitem("Value Entry"; "Value Entry")
         {
-            DataItemTableView = SORTING("Source Type", "Source No.", "Item No.", "Posting Date");
+            DataItemTableView = sorting("Source Type", "Source No.", "Item No.", "Posting Date");
             RequestFilterFields = "Item No.", "Variant Code", "Posting Date", "Inventory Posting Group";
 
             trigger OnPreDataItem()

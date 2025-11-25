@@ -1,7 +1,22 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using System.Utilities;
+
 report 99001048 "Planning Availability"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/PlanningAvailability.rdlc';
+    RDLCLayout = './Manufacturing/Reports/PlanningAvailability.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Planning Availability';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +25,7 @@ report 99001048 "Planning Availability"
     {
         dataitem("Production Forecast Entry"; "Production Forecast Entry")
         {
-            DataItemTableView = SORTING("Production Forecast Name", "Item No.", "Variant Code", "Component Forecast", "Forecast Date", "Location Code");
+            DataItemTableView = sorting("Production Forecast Name", "Item No.", "Variant Code", "Component Forecast", "Forecast Date", "Location Code");
 
             trigger OnAfterGetRecord()
             begin
@@ -39,7 +54,7 @@ report 99001048 "Planning Availability"
         }
         dataitem("Sales Line"; "Sales Line")
         {
-            DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+            DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -73,7 +88,7 @@ report 99001048 "Planning Availability"
         }
         dataitem("Service Line"; "Service Line")
         {
-            DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+            DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -105,7 +120,7 @@ report 99001048 "Planning Availability"
         }
         dataitem("Job Planning Line"; "Job Planning Line")
         {
-            DataItemTableView = SORTING("Job No.", "Job Task No.", "Line No.");
+            DataItemTableView = sorting("Job No.", "Job Task No.", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -137,7 +152,7 @@ report 99001048 "Planning Availability"
         }
         dataitem("Purchase Line"; "Purchase Line")
         {
-            DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+            DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -177,7 +192,7 @@ report 99001048 "Planning Availability"
         }
         dataitem("Transfer Line"; "Transfer Line")
         {
-            DataItemTableView = SORTING("Transfer-from Code", Status, "Derived From Line No.", "Item No.", "Variant Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Shipment Date", "In-Transit Code");
+            DataItemTableView = sorting("Transfer-from Code", Status, "Derived From Line No.", "Item No.", "Variant Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Shipment Date", "In-Transit Code");
 
             trigger OnAfterGetRecord()
             begin
@@ -225,7 +240,7 @@ report 99001048 "Planning Availability"
         }
         dataitem("Prod. Order Line"; "Prod. Order Line")
         {
-            DataItemTableView = SORTING(Status, "Prod. Order No.", "Line No.");
+            DataItemTableView = sorting(Status, "Prod. Order No.", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -292,7 +307,7 @@ report 99001048 "Planning Availability"
         }
         dataitem("Requisition Line"; "Requisition Line")
         {
-            DataItemTableView = SORTING("Worksheet Template Name", "Journal Batch Name", "Line No.");
+            DataItemTableView = sorting("Worksheet Template Name", "Journal Batch Name", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -323,7 +338,7 @@ report 99001048 "Planning Availability"
         }
         dataitem("Prod. Order Component"; "Prod. Order Component")
         {
-            DataItemTableView = SORTING(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
+            DataItemTableView = sorting(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -373,7 +388,7 @@ report 99001048 "Planning Availability"
         }
         dataitem("Planning Component"; "Planning Component")
         {
-            DataItemTableView = SORTING("Worksheet Template Name", "Worksheet Batch Name", "Worksheet Line No.", "Line No.");
+            DataItemTableView = sorting("Worksheet Template Name", "Worksheet Batch Name", "Worksheet Line No.", "Line No.");
 
             trigger OnAfterGetRecord()
             begin
@@ -400,12 +415,12 @@ report 99001048 "Planning Availability"
         }
         dataitem("Planning Buffer"; "Planning Buffer")
         {
-            DataItemTableView = SORTING("Item No.", Date);
+            DataItemTableView = sorting("Item No.", Date);
             RequestFilterFields = "Item No.", Date;
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
             }

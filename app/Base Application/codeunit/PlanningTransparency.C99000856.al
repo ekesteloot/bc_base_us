@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Planning;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+
 codeunit 99000856 "Planning Transparency"
 {
 
@@ -50,10 +57,10 @@ codeunit 99000856 "Planning Transparency"
                         SurplusType := SurplusType::ReorderPoint
                     else
                         SurplusType := SurplusType::Undefined;
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 if DemandInvProfile."Source Order Status" = 4 then
                     SurplusType := SurplusType::BlanketOrder;
-            DATABASE::"Production Forecast Entry":
+            Enum::TableID::"Production Forecast Entry".AsInteger():
                 SurplusType := SurplusType::Forecast;
             else
                 SurplusType := SurplusType::None;
@@ -319,13 +326,13 @@ codeunit 99000856 "Planning Transparency"
                         begin
                             SetRange("Source ID", ReqLine."Ref. Order No.");
                             SetRange("Source Ref. No.", ReqLine."Ref. Line No.");
-                            SetRange("Source Type", DATABASE::"Purchase Line");
+                            SetRange("Source Type", Enum::TableID::"Purchase Line".AsInteger());
                             SetRange("Source Subtype", 1);
                         end;
                     ReqLine."Ref. Order Type"::"Prod. Order":
                         begin
                             SetRange("Source ID", ReqLine."Ref. Order No.");
-                            SetRange("Source Type", DATABASE::"Prod. Order Line");
+                            SetRange("Source Type", Enum::TableID::"Prod. Order Line".AsInteger());
                             SetRange("Source Subtype", ReqLine."Ref. Order Status");
                             SetRange("Source Prod. Order Line", ReqLine."Ref. Line No.");
                         end;
@@ -333,7 +340,7 @@ codeunit 99000856 "Planning Transparency"
                         begin
                             SetRange("Source ID", ReqLine."Ref. Order No.");
                             SetRange("Source Ref. No.", ReqLine."Ref. Line No.");
-                            SetRange("Source Type", DATABASE::"Transfer Line");
+                            SetRange("Source Type", Enum::TableID::"Transfer Line".AsInteger());
                             SetRange("Source Subtype", 1); // Inbound
                             SetRange("Source Prod. Order Line", 0);
                         end;

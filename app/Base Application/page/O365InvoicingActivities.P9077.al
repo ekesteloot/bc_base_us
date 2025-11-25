@@ -27,7 +27,7 @@ page 9077 "O365 Invoicing Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowYearlySalesOverview();
+                        Rec.ShowYearlySalesOverview();
                     end;
                 }
                 field("Invoiced CM"; Rec."Invoiced CM")
@@ -40,7 +40,7 @@ page 9077 "O365 Invoicing Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowMonthlySalesOverview();
+                        Rec.ShowMonthlySalesOverview();
                     end;
                 }
             }
@@ -57,7 +57,7 @@ page 9077 "O365 Invoicing Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowInvoices(false);
+                        Rec.ShowInvoices(false);
                     end;
                 }
                 field("Sales Invoices Overdue"; Rec."Sales Invoices Overdue")
@@ -70,14 +70,14 @@ page 9077 "O365 Invoicing Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowInvoices(true);
+                        Rec.ShowInvoices(true);
                     end;
                 }
             }
             cuegroup(Ongoing)
             {
                 Caption = 'Ongoing';
-                field(NoOfQuotes; "No. of Quotes")
+                field(NoOfQuotes; Rec."No. of Quotes")
                 {
                     ApplicationArea = Invoicing, Basic, Suite;
                     Caption = 'Estimates';
@@ -85,10 +85,10 @@ page 9077 "O365 Invoicing Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowQuotes();
+                        Rec.ShowQuotes();
                     end;
                 }
-                field(NoOfDrafts; "No. of Draft Invoices")
+                field(NoOfDrafts; Rec."No. of Draft Invoices")
                 {
                     ApplicationArea = Invoicing, Basic, Suite;
                     Caption = 'Invoice Drafts';
@@ -96,7 +96,7 @@ page 9077 "O365 Invoicing Activities"
 
                     trigger OnDrillDown()
                     begin
-                        ShowDraftInvoices();
+                        Rec.ShowDraftInvoices();
                     end;
                 }
             }
@@ -137,7 +137,7 @@ page 9077 "O365 Invoicing Activities"
 
     trigger OnOpenPage()
     begin
-        OnOpenActivitiesPage(CurrencyFormatTxt);
+        Rec.OnOpenActivitiesPage(CurrencyFormatTxt);
 
         if PageNotifier.IsAvailable() then begin
             PageNotifier := PageNotifier.Create();

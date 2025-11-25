@@ -1,3 +1,5 @@
+namespace System.IO;
+
 report 8615 "Copy Package"
 {
     Caption = 'Copy - Configuration Package';
@@ -7,7 +9,7 @@ report 8615 "Copy Package"
     {
         dataitem("Config. Package"; "Config. Package")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
 
             trigger OnAfterGetRecord()
             begin

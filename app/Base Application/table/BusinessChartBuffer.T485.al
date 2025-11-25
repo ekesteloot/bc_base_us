@@ -1,3 +1,9 @@
+﻿namespace System.Visualization;
+
+using Microsoft.Foundation.Enums;
+using System;
+using System.Utilities;
+
 table 485 "Business Chart Buffer"
 {
     Caption = 'Business Chart Buffer';
@@ -26,13 +32,8 @@ table 485 "Business Chart Buffer"
         {
             Caption = 'XML';
             DataClassification = SystemMetadata;
-#if not CLEAN20        
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-#else
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#endif  
             ObsoleteReason = 'Use codeunit Temp Blob instead.';
         }
         field(5; "Drill-Down X Index"; Integer)
@@ -456,7 +457,7 @@ table 485 "Business Chart Buffer"
         PeriodPageManagement: Codeunit PeriodPageManagement;
     begin
         if Date.IsDateTime or Date.IsDate then
-            exit(PeriodPageManagement.CreatePeriodFormat("Analysis Period Type".FromInteger("Period Length"), Date));
+            exit(PeriodPageManagement.CreatePeriodFormat(Enum::"Analysis Period Type".FromInteger("Period Length"), Date));
         exit(Format(Date, 0, 9));
     end;
 
@@ -480,8 +481,8 @@ table 485 "Business Chart Buffer"
     begin
         if StartDate <> 0D then begin
             Calendar.SetFilter("Period Start", '%1..%2', StartDate, EndDate);
-            if not PeriodPageMgt.FindDate('+', Calendar, "Analysis Period Type".FromInteger("Period Length")) then
-                PeriodPageMgt.FindDate('+', Calendar, "Analysis Period Type"::Day);
+            if not PeriodPageMgt.FindDate('+', Calendar, Enum::"Analysis Period Type".FromInteger("Period Length")) then
+                PeriodPageMgt.FindDate('+', Calendar, Enum::"Analysis Period Type"::Day);
             Calendar.SetRange("Period Start");
         end;
 
@@ -494,7 +495,7 @@ table 485 "Business Chart Buffer"
                 SearchText := '';
         end;
 
-        PeriodPageMgt.FindDate(SearchText, Calendar, "Analysis Period Type".FromInteger("Period Length"));
+        PeriodPageMgt.FindDate(SearchText, Calendar, Enum::"Analysis Period Type".FromInteger("Period Length"));
 
         StartDate := Calendar."Period Start";
         EndDate := Calendar."Period End";

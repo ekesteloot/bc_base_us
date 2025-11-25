@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Posting;
+
 enum 5607 "Purchase FA Posting Type"
 {
     Extensible = true;

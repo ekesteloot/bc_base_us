@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Setup;
+
 table 33 "Intercompany Setup Diagnostic"
 {
     TableType = Temporary;

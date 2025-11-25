@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.GLAccount;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 page 627 "IC Mapping CoA Incoming"
 {
     PageType = ListPart;

@@ -1,3 +1,5 @@
+namespace System.IO;
+
 table 8632 "Config. Record For Processing"
 {
     Caption = 'Config. Record For Processing';

@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 table 5212 "Employee Statistics Group"
 {
     Caption = 'Employee Statistics Group';

@@ -1,4 +1,30 @@
-﻿page 9015 "Job Project Manager RC"
+﻿namespace Microsoft.ProjectMgt.RoleCenters;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.ProjectMgt.Jobs.Analysis;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Jobs.WIP;
+using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Shared.Navigate;
+using System.Integration.PowerBI;
+using System.Security.User;
+using System.Threading;
+
+page 9015 "Job Project Manager RC"
 {
     Caption = 'Project Manager';
     PageType = RoleCenter;
@@ -104,7 +130,7 @@
                 ApplicationArea = Jobs;
                 Caption = 'Open';
                 RunObject = Page "Job List";
-                RunPageView = WHERE(Status = FILTER(Open));
+                RunPageView = where(Status = filter(Open));
                 ToolTip = 'Open the card for the selected record.';
             }
             action(JobsPlannedAndQuoted)
@@ -112,7 +138,7 @@
                 ApplicationArea = Jobs;
                 Caption = 'Planned and Quoted';
                 RunObject = Page "Job List";
-                RunPageView = WHERE(Status = FILTER(Quote | Planning));
+                RunPageView = where(Status = filter(Quote | Planning));
                 ToolTip = 'View all planned and quoted jobs.';
             }
             action(JobsCompleted)
@@ -120,7 +146,7 @@
                 ApplicationArea = Jobs;
                 Caption = 'Completed';
                 RunObject = Page "Job List";
-                RunPageView = WHERE(Status = FILTER(Completed));
+                RunPageView = where(Status = filter(Completed));
                 ToolTip = 'View all completed jobs.';
             }
             action(JobsUnassigned)
@@ -128,7 +154,7 @@
                 ApplicationArea = Jobs;
                 Caption = 'Unassigned';
                 RunObject = Page "Job List";
-                RunPageView = WHERE("Person Responsible" = FILTER(''));
+                RunPageView = where("Person Responsible" = filter(''));
                 ToolTip = 'View all unassigned jobs.';
             }
             action("Job Tasks")
@@ -214,8 +240,6 @@
                     ApplicationArea = Jobs;
                     Caption = 'Jobs';
                     Image = Job;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Job List";
                     ToolTip = 'Define a project activity by creating a job card with integrated job tasks and job planning lines, structured in two layers. The job task enables you to set up job planning lines and to post consumption to the job. The job planning lines specify the detailed use of resources, items, and various general ledger expenses.';
                 }
@@ -224,7 +248,7 @@
                     ApplicationArea = Jobs;
                     Caption = 'Open';
                     RunObject = Page "Job List";
-                    RunPageView = WHERE(Status = FILTER(Open));
+                    RunPageView = where(Status = filter(Open));
                     ToolTip = 'Open the card for the selected record.';
                 }
                 action(JobsPlannedAndQuotd)
@@ -232,7 +256,7 @@
                     ApplicationArea = Jobs;
                     Caption = 'Planned and Quoted';
                     RunObject = Page "Job List";
-                    RunPageView = WHERE(Status = FILTER(Quote | Planning));
+                    RunPageView = where(Status = filter(Quote | Planning));
                     ToolTip = 'Open the list of all planned and quoted jobs.';
                 }
                 action(JobsComplet)
@@ -240,7 +264,7 @@
                     ApplicationArea = Jobs;
                     Caption = 'Completed';
                     RunObject = Page "Job List";
-                    RunPageView = WHERE(Status = FILTER(Completed));
+                    RunPageView = where(Status = filter(Completed));
                     ToolTip = 'Open the list of all completed jobs.';
                 }
                 action(JobsUnassign)
@@ -248,15 +272,13 @@
                     ApplicationArea = Jobs;
                     Caption = 'Unassigned';
                     RunObject = Page "Job List";
-                    RunPageView = WHERE("Person Responsible" = FILTER(''));
+                    RunPageView = where("Person Responsible" = filter(''));
                     ToolTip = 'Open the list of all unassigned jobs.';
                 }
                 action(Action3)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Job Tasks';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Job Task List";
                     ToolTip = 'Open the list of ongoing job tasks. Job tasks represent the actual work that is performed in a job, and they enable you to set up job planning lines and to post consumption to the job.';
                 }
@@ -272,8 +294,6 @@
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Job Planning Lines';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Job Planning Lines";
                     ToolTip = 'Open the list of ongoing job planning lines for the job. You use this window to plan what items, resources, and general ledger expenses that you expect to use on a job (budget) or you can specify what you actually agreed with your customer that he should pay for the job (billable).';
                 }
@@ -281,31 +301,25 @@
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Job Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Job Journal Batches";
-                    RunPageView = WHERE(Recurring = CONST(false));
+                    RunPageView = where(Recurring = const(false));
                     ToolTip = 'Record job expenses or usage in the job ledger, either by reusing job planning lines or by manual entry.';
                 }
                 action(JobGLJournals)
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Job G/L Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Jobs),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Jobs),
+                                        Recurring = const(false));
                     ToolTip = 'Record job expenses or usage in job accounts in the general ledger. For expenses or usage of type G/L Account, use the job G/L journal instead of the job journal.';
                 }
                 action(RecurringJobJournals)
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Recurring Job Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Job Journal Batches";
-                    RunPageView = WHERE(Recurring = CONST(true));
+                    RunPageView = where(Recurring = const(true));
                     ToolTip = 'Reuse preset journal lines to record recurring job expenses or usage in the job ledger.';
                 }
             }
@@ -318,8 +332,6 @@
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Resources';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Resource List";
                     ToolTip = 'Manage your resources'' job activities by setting up their costs and prices. The job-related prices, discounts, and cost factor rules are set up on the respective job card. You can specify the costs and prices for individual resources, resource groups, or all available resources of the company. When resources are used or sold in a job, the specified prices and costs are recorded for the project.';
                 }
@@ -327,8 +339,6 @@
                 {
                     ApplicationArea = Suite;
                     Caption = 'Resource Groups';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Resource Groups";
                     ToolTip = 'Organize resources in groups, such as Consultants, for easier assignment of common values and to analyze financial figures by groups.';
                 }
@@ -336,20 +346,16 @@
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Resource Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Resource Jnl. Batches";
-                    RunPageView = WHERE(Recurring = CONST(false));
+                    RunPageView = where(Recurring = const(false));
                     ToolTip = 'Post usage and sales of your resources for internal use and statistics. Use time sheet entries as input. Note that unlike with job journals, entries posted with resource journals are not posted to G/L accounts.';
                 }
                 action(RecurringResourceJournals)
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Recurring Resource Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Resource Jnl. Batches";
-                    RunPageView = WHERE(Recurring = CONST(true));
+                    RunPageView = where(Recurring = const(true));
                     ToolTip = 'Post recurring usage and sales of your resources for internal use and statistics in a journal that is preset for your usual posting.';
                 }
                 action("Resource Registers")
@@ -371,8 +377,8 @@
                     ApplicationArea = Jobs;
                     Caption = 'Item Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Item),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Item),
+                                        Recurring = const(false));
                     ToolTip = 'Post item transactions directly to the item ledger to adjust inventory in connection with purchases, sales, and positive or negative adjustments without using documents. You can save sets of item journal lines as standard journals so that you can perform recurring postings quickly. A condensed version of the item journal function exists on item cards for quick adjustment of an items inventory quantity.';
                 }
                 action(RecurringItemJournals)
@@ -380,8 +386,8 @@
                     ApplicationArea = Jobs;
                     Caption = 'Recurring Item Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Item),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(Item),
+                                        Recurring = const(true));
                     ToolTip = 'Post recurring item transactions directly to the item ledger in a journal that is preset for your usual posting.';
                 }
             }
@@ -479,8 +485,6 @@
                     ApplicationArea = Jobs;
                     Caption = 'Job';
                     Image = Job;
-                    Promoted = true;
-                    PromotedCategory = New;
                     RunObject = Page "Job Creation Wizard";
                     RunPageMode = Create;
                     ToolTip = 'Create a new job.';
@@ -491,8 +495,6 @@
                     ApplicationArea = Jobs;
                     Caption = 'Job J&ournal';
                     Image = JobJournal;
-                    Promoted = true;
-                    PromotedCategory = New;
                     RunObject = Page "Job Journal";
                     ToolTip = 'Prepare to post a job activity to the job ledger.';
                 }
@@ -502,8 +504,6 @@
                     ApplicationArea = Jobs;
                     Caption = 'Job G/L &Journal';
                     Image = GLJournal;
-                    Promoted = true;
-                    PromotedCategory = New;
                     RunObject = Page "Job G/L Journal";
                     ToolTip = 'Prepare to post a job activity to the general ledger.';
                 }
@@ -513,8 +513,6 @@
                     ApplicationArea = Suite;
                     Caption = 'R&esource Journal';
                     Image = ResourceJournal;
-                    Promoted = true;
-                    PromotedCategory = New;
                     RunObject = Page "Resource Journal";
                     ToolTip = 'Prepare to post resource usage.';
                 }

@@ -1,4 +1,25 @@
-#if not CLEAN21
+﻿#if not CLEAN21
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.ProjectMgt.Resources.Pricing;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Pricing;
+using System.Utilities;
+
 codeunit 7019 "Price Helper - V15"
 {
     ObsoleteState = Pending;

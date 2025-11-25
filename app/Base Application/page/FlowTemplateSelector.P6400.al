@@ -1,10 +1,16 @@
-#if not CLEAN22
+﻿#if not CLEAN22
+namespace System.Automation;
+
+using System.Azure.Identity;
+using System.Environment;
+using System.Reflection;
+using System.Utilities;
+
 page 6400 "Flow Template Selector"
 {
     ApplicationArea = Suite;
     Caption = 'Select an Existing Power Automate Template';
-    UsageCategory = Lists;
-    AdditionalSearchTerms = 'Power Automate,Microsoft Power Automate,Flow,Microsoft Flow,Flow template';
+
     ObsoleteReason = 'This page will be replaced by a platform feature. You can invoke the platform feature with a customaction of type FlowTemplateGallery.';
     ObsoleteState = Pending;
     ObsoleteTag = '22.0';

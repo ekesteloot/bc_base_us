@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 7116 "Analysis Report Names"
 {
     Caption = 'Analysis Report Names';

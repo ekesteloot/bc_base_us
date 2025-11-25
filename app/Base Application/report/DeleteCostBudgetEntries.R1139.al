@@ -1,3 +1,7 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+
 report 1139 "Delete Cost Budget Entries"
 {
     Caption = 'Delete Cost Budget Entries';
@@ -8,7 +12,7 @@ report 1139 "Delete Cost Budget Entries"
     {
         dataitem("Cost Budget Register"; "Cost Budget Register")
         {
-            DataItemTableView = SORTING("No.") ORDER(Descending);
+            DataItemTableView = sorting("No.") order(Descending);
 
             trigger OnAfterGetRecord()
             begin
@@ -67,7 +71,7 @@ report 1139 "Delete Cost Budget Entries"
                         ApplicationArea = CostAccounting;
                         Caption = 'From Register No.';
                         Lookup = true;
-                        TableRelation = "Cost Budget Register" WHERE(Closed = CONST(false));
+                        TableRelation = "Cost Budget Register" where(Closed = const(false));
                         ToolTip = 'Specifies the starting posted register number to determine the starting point for the deletion of register numbers.';
                     }
                     field(ToRegisterNo; CostBudgetRegister3."No.")
@@ -75,7 +79,7 @@ report 1139 "Delete Cost Budget Entries"
                         ApplicationArea = CostAccounting;
                         Caption = 'To Register No.';
                         Editable = false;
-                        TableRelation = "Cost Budget Register" WHERE(Closed = CONST(false));
+                        TableRelation = "Cost Budget Register" where(Closed = const(false));
                         ToolTip = 'Specifies that the last posted register number is filled in automatically. You cannot change the contents of this field.';
                     }
                 }

@@ -1,3 +1,17 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Reports;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using System.Automation;
+using System.Text;
+using System.Threading;
+
 page 9309 "Purchase Credit Memos"
 {
     ApplicationArea = Basic, Suite;
@@ -9,7 +23,7 @@ page 9309 "Purchase Credit Memos"
     QueryCategory = 'Purchase Credit Memos';
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";
-    SourceTableView = WHERE("Document Type" = CONST("Credit Memo"));
+    SourceTableView = where("Document Type" = const("Credit Memo"));
     UsageCategory = Lists;
 
     layout
@@ -213,7 +227,7 @@ page 9309 "Purchase Credit Memos"
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
-                    StyleExpr = "Job Queue Status" = "Job Queue Status"::ERROR;
+                    StyleExpr = Rec."Job Queue Status" = Rec."Job Queue Status"::ERROR;
                     ToolTip = 'Specifies the status of a job queue entry that handles the posting of purchase credit memos.';
                     Visible = JobQueueActive;
 
@@ -221,9 +235,9 @@ page 9309 "Purchase Credit Memos"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
             }
@@ -246,8 +260,8 @@ page 9309 "Purchase Credit Memos"
             part(Control1901138007; "Vendor Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Buy-from Vendor No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Buy-from Vendor No."),
+                              "Date Filter" = field("Date Filter");
             }
             systempart(Control1900383207; Links)
             {
@@ -279,7 +293,7 @@ page 9309 "Purchase Credit Memos"
 
                     trigger OnAction()
                     begin
-                        OpenDocumentStatistics();
+                        Rec.OpenDocumentStatistics();
                     end;
                 }
                 action("Co&mments")
@@ -288,9 +302,9 @@ page 9309 "Purchase Credit Memos"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Vendor)
@@ -299,8 +313,8 @@ page 9309 "Purchase Credit Memos"
                     Caption = 'Vendor';
                     Image = Vendor;
                     RunObject = Page "Vendor Card";
-                    RunPageLink = "No." = FIELD("Buy-from Vendor No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "No." = field("Buy-from Vendor No."),
+                                  "Date Filter" = field("Date Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
                 }
@@ -315,7 +329,7 @@ page 9309 "Purchase Credit Memos"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Approvals)
@@ -407,7 +421,7 @@ page 9309 "Purchase Credit Memos"
                         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelPurchaseApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
             }
@@ -434,7 +448,7 @@ page 9309 "Purchase Credit Memos"
                             repeat
                                 CheckPurchaseCheckAllLinesHaveQuantityAssigned(PurchaseHeader);
                             until PurchaseHeader.Next() = 0;
-                            PurchaseBatchPostMgt.RunWithUI(PurchaseHeader, Count, ReadyToPostQst);
+                            PurchaseBatchPostMgt.RunWithUI(PurchaseHeader, Rec.Count(), ReadyToPostQst);
                         end else
                             PostDocument(CODEUNIT::"Purch.-Post (Yes/No)");
                     end;
@@ -511,7 +525,7 @@ page 9309 "Purchase Credit Memos"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                     end;
                 }
             }
@@ -669,18 +683,17 @@ page 9309 "Purchase Credit Memos"
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
         OfficeMgt: Codeunit "Office Management";
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
         JobQueueActive := PurchasesPayablesSetup.JobQueueActive();
         IsOfficeAddin := OfficeMgt.IsAvailable();
 
-        CopyBuyFromVendorFilter();
+        Rec.CopyBuyFromVendorFilter();
     end;
 
     var
         ReportPrint: Codeunit "Test Report-Print";
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
-        [InDataSet]
         JobQueueActive: Boolean;
         OpenApprovalEntriesExist: Boolean;
         IsOfficeAddin: Boolean;
@@ -689,7 +702,6 @@ page 9309 "Purchase Credit Memos"
         ReadyToPostQst: Label 'The number of credit memos that will be posted is %1. \Do you want to continue?', Comment = '%1 - selected count';
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
 
     local procedure SetControlAppearance()
@@ -697,11 +709,11 @@ page 9309 "Purchase Credit Memos"
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
     end;
 
     local procedure CheckPurchaseCheckAllLinesHaveQuantityAssigned(PurchaseHeader: Record "Purchase Header")
@@ -724,9 +736,9 @@ page 9309 "Purchase Credit Memos"
         PreAssignedNo := Rec."No.";
         xLastPostingNo := Rec."Last Posting No.";
 
-        SendToPosting(PostingCodeunitID);
+        Rec.SendToPosting(PostingCodeunitID);
 
-        IsScheduledPosting := "Job Queue Status" = "Job Queue Status"::"Scheduled for Posting";
+        IsScheduledPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
 
         if IsScheduledPosting then
             CurrPage.Close();

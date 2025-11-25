@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 page 9821 "Inherited Permission Sets Part"
 {
     Caption = 'Permission Sets from Security Groups';
@@ -47,7 +49,7 @@ page 9821 "Inherited Permission Sets Part"
 
     trigger OnOpenPage()
     begin
-        if Rec.IsEmpty() then
+        if not IsInitializedByParentPage then
             Refresh();
     end;
 
@@ -67,6 +69,7 @@ page 9821 "Inherited Permission Sets Part"
         SecurityGroup: Codeunit "Security Group";
         GroupUserSecId: Guid;
     begin
+        IsInitializedByParentPage := true;
         if not SecurityGroupMemberBuffer.FindSet() then
             exit;
 
@@ -89,7 +92,7 @@ page 9821 "Inherited Permission Sets Part"
     end;
 
     var
-        [InDataSet]
         PermissionSetNotFound: Boolean;
+        IsInitializedByParentPage: Boolean;
 }
 

@@ -1,3 +1,12 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 34 "Change Payment Tolerance"
 {
     Caption = 'Change Payment Tolerance';
@@ -225,7 +234,6 @@ report 34 "Change Payment Tolerance"
         Text002: Label '<Precision,', Locked = true;
         Text003: Label '><Standard Format,0>', Locked = true;
         Text004: Label 'The field can have a maximum of %1 decimal places.';
-        [InDataSet]
         CurrencyCodeEnable: Boolean;
 
     local procedure CheckApplnRounding(AmountDecimalPlaces: Text[5]): Integer

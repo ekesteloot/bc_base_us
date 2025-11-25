@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Contact;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Setup;
+using Microsoft.Sales.Customer;
+
 report 5195 "Create Conts. from Customers"
 {
     ApplicationArea = RelationshipMgmt;

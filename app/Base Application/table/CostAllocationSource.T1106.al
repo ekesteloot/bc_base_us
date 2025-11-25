@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Allocation;
+
+using Microsoft.CostAccounting.Account;
+using System.Security.AccessControl;
+
 table 1106 "Cost Allocation Source"
 {
     Caption = 'Cost Allocation Source';
@@ -81,7 +86,7 @@ table 1106 "Cost Allocation Source"
         }
         field(22; "Total Share"; Decimal)
         {
-            CalcFormula = Sum("Cost Allocation Target".Share WHERE(ID = FIELD(ID)));
+            CalcFormula = sum("Cost Allocation Target".Share where(ID = field(ID)));
             Caption = 'Total Share';
             Editable = false;
             FieldClass = FlowField;
@@ -101,8 +106,6 @@ table 1106 "Cost Allocation Source"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(100; "Allocation Source Type"; Option)
         {

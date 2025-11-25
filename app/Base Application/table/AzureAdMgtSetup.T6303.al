@@ -1,6 +1,11 @@
+﻿namespace System.Azure.Identity;
+
+using System.Integration.PowerBI;
+using System.Reflection;
+
 table 6303 "Azure AD Mgt. Setup"
 {
-    Caption = 'Azure AD Mgt. Setup';
+    Caption = 'Microsoft Entra ID Mgt. Setup';
 
     fields
     {

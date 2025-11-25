@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.Foundation.Enums;
+
 table 88 "Financial Report"
 {
     Caption = 'Financial Report';

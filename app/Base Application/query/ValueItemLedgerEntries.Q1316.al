@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
 query 1316 "Value Item Ledger Entries"
 {
     Caption = 'Value Item Ledger Entries';

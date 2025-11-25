@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.InventoryMgt.Counting.History;
+
 codeunit 5885 "Phys. Invt. Order-Post + Print"
 {
     TableNo = "Phys. Invt. Order Header";

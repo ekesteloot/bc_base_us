@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.PaymentTerms;
+
 page 756 "Payment Term Translations"
 {
     Caption = 'Payment Term Translations';

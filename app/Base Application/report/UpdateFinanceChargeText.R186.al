@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 report 186 "Update Finance Charge Text"
 {
     Caption = 'Update Finance Charge Text';

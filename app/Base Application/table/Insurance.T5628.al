@@ -1,3 +1,12 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Vendor;
+
 table 5628 Insurance
 {
     Caption = 'Insurance';
@@ -51,17 +60,17 @@ table 5628 Insurance
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Ins. Coverage Ledger Entry".Amount WHERE("Insurance No." = FIELD("No."),
-                                                                         "Disposed FA" = CONST(false),
-                                                                         "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Ins. Coverage Ledger Entry".Amount where("Insurance No." = field("No."),
+                                                                         "Disposed FA" = const(false),
+                                                                         "Posting Date" = field("Date Filter")));
             Caption = 'Total Value Insured';
             Editable = false;
             FieldClass = FlowField;
         }
         field(11; Comment; Boolean)
         {
-            CalcFormula = Exist("Comment Line" WHERE("Table Name" = CONST(Insurance),
-                                                      "No." = FIELD("No.")));
+            CalcFormula = exist("Comment Line" where("Table Name" = const(Insurance),
+                                                      "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -100,30 +109,30 @@ table 5628 Insurance
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(19; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(20; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(32; Blocked; Boolean)
         {

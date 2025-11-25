@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 query 771 "Analysis Column Header Count"
 {
     Caption = 'Analysis Column Header Count';
@@ -17,7 +19,7 @@ query 771 "Analysis Column Header Count"
             }
             column(Count_)
             {
-                ColumnFilter = Count_ = FILTER(> 1);
+                ColumnFilter = Count_ = filter(> 1);
                 Method = Count;
             }
         }

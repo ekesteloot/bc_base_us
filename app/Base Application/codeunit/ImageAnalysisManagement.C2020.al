@@ -1,3 +1,11 @@
+﻿namespace System.AI;
+
+using System;
+using System.Azure.KeyVault;
+using System.Environment;
+using System.IO;
+using System.Utilities;
+
 codeunit 2020 "Image Analysis Management"
 {
     var
@@ -334,5 +342,9 @@ codeunit 2020 "Image Analysis Management"
     local procedure OnAfterImageAnalysis(ImageAnalysisResult: Codeunit "Image Analysis Result")
     begin
     end;
-}
 
+    [InternalEvent(false)]
+    internal procedure OnBeforeSendImageAnalysisRequest(HttpContent: HttpContent; RequestUrl: Text; var HttpStatusCode: Integer; var HttpResponseContentText: Text; var Handled: Boolean)
+    begin
+    end;
+}

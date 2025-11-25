@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 enum 5095 "Opportunity Output"
 {
     Extensible = true;

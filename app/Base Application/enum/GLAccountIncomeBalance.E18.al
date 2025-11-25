@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
 enum 18 "G/L Account Income/Balance"
 {
     AssignmentCompatibility = true;

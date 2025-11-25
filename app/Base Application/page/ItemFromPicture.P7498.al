@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item.Picture;
+
+using Microsoft.InventoryMgt.Item;
+using System.AI;
+using System.Environment.Configuration;
+
 page 7498 "Item From Picture"
 {
     PageType = Card;
@@ -81,29 +87,34 @@ page 7498 "Item From Picture"
     var
         ProgressDialog: Dialog;
         ShouldUseImageAnalysis: Boolean;
+        RecIsNew: Boolean;
     begin
+        ShouldUseImageAnalysis := ItemFromPicture.CanRunImageAnalysis(GetImageAnalysisTypes());
+
+        if ShouldUseImageAnalysis then
+            ShouldUseImageAnalysis := ItemFromPicture.ApprovePrivacyNotice(NotificationBuffer);
+
+        Session.LogMessage('0000JYQ', StrSubstNo(ItemFromPictureStartedTelemetryTxt, ShouldUseImageAnalysis), Verbosity::Normal,
+            DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', ItemFromPicture.GetTelemetryCategory());
+
         if Rec.IsEmpty() then begin
             Rec.Init();
-
-            ShouldUseImageAnalysis := ItemFromPicture.CanRunImageAnalysis(GetImageAnalysisTypes());
-
-            if ShouldUseImageAnalysis then
-                ShouldUseImageAnalysis := ItemFromPicture.ApprovePrivacyNotice(NotificationBuffer);
-
-            Session.LogMessage('0000JYQ', StrSubstNo(ItemFromPictureStartedTelemetryTxt, ShouldUseImageAnalysis), Verbosity::Normal,
-                DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', ItemFromPicture.GetTelemetryCategory());
-
             if not ItemFromPicture.ImportFile(Rec) then
                 Error('');
 
-            if ShouldUseImageAnalysis then begin
-                ProgressDialog.Open(AnalyzingPictureProgressTxt);
-                ItemFromPicture.AnalyzeImage(ItemFromPicture.GetFirstMediaFromMediaSet(Rec.ItemMediaSet.MediaId), Rec, GetImageAnalysisTypes(), NotificationBuffer);
-                ProgressDialog.Close();
-            end;
-
-            Rec.Insert();
+            RecIsNew := true;
         end;
+
+        if ShouldUseImageAnalysis then begin
+            ProgressDialog.Open(AnalyzingPictureProgressTxt);
+            ItemFromPicture.AnalyzeImage(ItemFromPicture.GetFirstMediaFromMediaSet(Rec.ItemMediaSet.MediaId), Rec, GetImageAnalysisTypes(), NotificationBuffer);
+            ProgressDialog.Close();
+        end;
+
+        if RecIsNew then
+            Rec.Insert()
+        else
+            Rec.Modify();
     end;
 
     trigger OnAfterGetCurrRecord()

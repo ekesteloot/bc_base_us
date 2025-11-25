@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.RoleCenters;
+
+using Microsoft.InventoryMgt.Analysis;
+using System;
+using System.Visualization;
+
 page 771 "Purchase Performance"
 {
     Caption = 'Purchase Performance';
@@ -23,7 +29,7 @@ page 771 "Purchase Performance"
 
                 trigger DataPointClicked(point: DotNet BusinessChartDataPoint)
                 begin
-                    SetDrillDownIndexes(point);
+                    Rec.SetDrillDownIndexes(point);
                     AnalysisReportChartMgt.DrillDown(Rec, AnalysisReportChartSetup);
                 end;
 
@@ -38,7 +44,7 @@ page 771 "Purchase Performance"
 
                 trigger Refresh()
                 begin
-                    InitializePeriodFilter(0D, 0D);
+                    Rec.InitializePeriodFilter(0D, 0D);
                     UpdateChart(Period::" ");
                 end;
             }
@@ -167,7 +173,7 @@ page 771 "Purchase Performance"
     begin
         AnalysisReportChartMgt.UpdateChart(
           Period, AnalysisReportChartSetup, AnalysisReportChartSetup."Analysis Area"::Purchase.AsInteger(), Rec, StatusText);
-        Update(CurrPage.BusinessChart);
+        Rec.Update(CurrPage.BusinessChart);
     end;
 }
 

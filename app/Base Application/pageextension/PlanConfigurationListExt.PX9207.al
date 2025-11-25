@@ -1,3 +1,7 @@
+namespace System.Azure.Identity;
+
+using System.Security.User;
+
 pageextension 9207 "Plan Configuration List Ext." extends "Plan Configuration List"
 {
     actions

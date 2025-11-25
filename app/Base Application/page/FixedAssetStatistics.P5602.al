@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FixedAssets.Depreciation;
+
 page 5602 "Fixed Asset Statistics"
 {
     Caption = 'Fixed Asset Statistics';
@@ -51,7 +55,7 @@ page 5602 "Fixed Asset Statistics"
                     ToolTip = 'Specifies the total gain (credit) or loss (debit) for the fixed asset.';
                     Visible = GainLossVisible;
                 }
-                field(DisposalValue; "Book Value on Disposal")
+                field(DisposalValue; Rec."Book Value on Disposal")
                 {
                     ApplicationArea = All;
                     AutoFormatType = 1;
@@ -62,7 +66,7 @@ page 5602 "Fixed Asset Statistics"
 
                     trigger OnDrillDown()
                     begin
-                        ShowBookValueAfterDisposal();
+                        Rec.ShowBookValueAfterDisposal();
                     end;
                 }
                 fixed(Control1903895301)
@@ -122,7 +126,7 @@ page 5602 "Fixed Asset Statistics"
                             ApplicationArea = FixedAssets;
                             ToolTip = 'Specifies the total acquisition cost for the fixed asset.';
                         }
-                        field(Depreciation; Depreciation)
+                        field(Depreciation; Rec.Depreciation)
                         {
                             ApplicationArea = FixedAssets;
                             ToolTip = 'Specifies the total depreciation for the fixed asset.';
@@ -132,7 +136,7 @@ page 5602 "Fixed Asset Statistics"
                             ApplicationArea = FixedAssets;
                             ToolTip = 'Specifies the total LCY amount of write-down entries for the fixed asset.';
                         }
-                        field(Appreciation; Appreciation)
+                        field(Appreciation; Rec.Appreciation)
                         {
                             ApplicationArea = FixedAssets;
                             ToolTip = 'Specifies the total appreciation for the fixed asset.';
@@ -170,7 +174,7 @@ page 5602 "Fixed Asset Statistics"
                             ApplicationArea = FixedAssets;
                             ToolTip = 'Specifies the depreciable basis amount for the fixed asset.';
                         }
-                        field(Maintenance; Maintenance)
+                        field(Maintenance; Rec.Maintenance)
                         {
                             ApplicationArea = FixedAssets;
                             ToolTip = 'Specifies the total maintenance cost for the fixed asset.';
@@ -187,12 +191,12 @@ page 5602 "Fixed Asset Statistics"
 
     trigger OnAfterGetRecord()
     begin
-        Disposed := "Disposal Date" > 0D;
+        Disposed := Rec."Disposal Date" > 0D;
         DisposalValueVisible := Disposed;
         ProceedsOnDisposalVisible := Disposed;
         GainLossVisible := Disposed;
         DisposalDateVisible := Disposed;
-        CalcBookValue();
+        Rec.CalcBookValue();
     end;
 
     trigger OnInit()
@@ -205,13 +209,9 @@ page 5602 "Fixed Asset Statistics"
 
     var
         Disposed: Boolean;
-        [InDataSet]
         DisposalValueVisible: Boolean;
-        [InDataSet]
         ProceedsOnDisposalVisible: Boolean;
-        [InDataSet]
         GainLossVisible: Boolean;
-        [InDataSet]
         DisposalDateVisible: Boolean;
 }
 

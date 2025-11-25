@@ -1,3 +1,7 @@
+namespace System.Xml;
+
+using System.IO;
+
 page 9610 "XML Schema Viewer"
 {
     ApplicationArea = Basic, Suite;
@@ -7,7 +11,7 @@ page 9610 "XML Schema Viewer"
     PageType = List;
     SaveValues = true;
     SourceTable = "XML Schema Element";
-    SourceTableView = SORTING("XML Schema Code", "Sort Key");
+    SourceTableView = sorting("XML Schema Code", "Sort Key");
     UsageCategory = Tasks;
 
     layout
@@ -21,7 +25,7 @@ page 9610 "XML Schema Viewer"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'XML Schema Code';
-                    TableRelation = "XML Schema".Code WHERE(Indentation = CONST(0));
+                    TableRelation = "XML Schema".Code where(Indentation = const(0));
                     ToolTip = 'Specifies the XML schema file whose schema content is displayed on the lines in the XML Schema Viewer window.';
 
                     trigger OnValidate()
@@ -30,7 +34,7 @@ page 9610 "XML Schema Viewer"
                             Clear(XMLSchema)
                         else
                             XMLSchema.Get(XMLSchemaCode);
-                        SetRange("XML Schema Code", XMLSchemaCode);
+                        Rec.SetRange("XML Schema Code", XMLSchemaCode);
                         CurrPage.Update(false);
                     end;
                 }
@@ -52,7 +56,7 @@ page 9610 "XML Schema Viewer"
             }
             repeater(Group)
             {
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 IndentationControls = "Node Name";
                 ShowAsTree = true;
                 field("Node Name"; Rec."Node Name")
@@ -62,7 +66,7 @@ page 9610 "XML Schema Viewer"
                     StyleExpr = StyleExpression;
                     ToolTip = 'Specifies the name of the node on the imported file.';
                 }
-                field(Selected; Selected)
+                field(Selected; Rec.Selected)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the node is included in the related XMLport.';
@@ -72,7 +76,7 @@ page 9610 "XML Schema Viewer"
                         SetStyleExpression();
                     end;
                 }
-                field(Choice; Choice)
+                field(Choice; Rec.Choice)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -91,13 +95,13 @@ page 9610 "XML Schema Viewer"
                     Editable = false;
                     ToolTip = 'Specifies the type of the data and provides additional explanation of the tags in the Node Name.';
                 }
-                field(MinOccurs; MinOccurs)
+                field(MinOccurs; Rec.MinOccurs)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies the lowest number of times that the node appears in the XML schema. If the value in this field is 1 or higher, then the node is considered mandatory to create a valid XMLport.';
                 }
-                field(MaxOccurs; MaxOccurs)
+                field(MaxOccurs; Rec.MaxOccurs)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -116,8 +120,8 @@ page 9610 "XML Schema Viewer"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Allowed Values';
-                SubPageLink = "XML Schema Code" = FIELD("XML Schema Code"),
-                              "Element ID" = FIELD(ID);
+                SubPageLink = "XML Schema Code" = field("XML Schema Code"),
+                              "Element ID" = field(ID);
             }
         }
     }
@@ -144,7 +148,7 @@ page 9610 "XML Schema Viewer"
                     if NewObjectNo = 0 then
                         Error(NoObjectIDErr);
 
-                    XSDParser.CreateXMLPortFile(Rec, NewObjectNo, "XML Schema Code", true, false);
+                    XSDParser.CreateXMLPortFile(Rec, NewObjectNo, Rec."XML Schema Code", true, false);
                 end;
             }
             action(GenerateDataExchSetup)
@@ -315,7 +319,7 @@ page 9610 "XML Schema Viewer"
         XMLSchema.Code := XMLSchemaCode;
         if XMLSchema.Find('=<>') then;
         XMLSchemaCode := XMLSchema.Code;
-        SetRange("XML Schema Code", XMLSchema.Code);
+        Rec.SetRange("XML Schema Code", XMLSchema.Code);
         SetInternalVariables();
     end;
 
@@ -344,13 +348,13 @@ page 9610 "XML Schema Viewer"
         ChildXMLSchemaElement: Record "XML Schema Element";
     begin
         StyleExpression := '';
-        if ("Defintion XML Schema Code" <> '') or ("Definition XML Schema ID" <> 0) then begin
+        if (Rec."Defintion XML Schema Code" <> '') or (Rec."Definition XML Schema ID" <> 0) then begin
             StyleExpression := 'Subordinate';
             exit;
         end;
 
-        ChildXMLSchemaElement.SetRange("XML Schema Code", "XML Schema Code");
-        ChildXMLSchemaElement.SetRange("Parent ID", ID);
+        ChildXMLSchemaElement.SetRange("XML Schema Code", Rec."XML Schema Code");
+        ChildXMLSchemaElement.SetRange("Parent ID", Rec.ID);
         if not ChildXMLSchemaElement.IsEmpty() then
             StyleExpression := 'Strong';
     end;

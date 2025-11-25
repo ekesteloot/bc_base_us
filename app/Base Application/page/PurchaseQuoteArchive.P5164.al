@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Archive;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Purchases.Vendor;
+using System.Security.User;
+
 page 5164 "Purchase Quote Archive"
 {
     Caption = 'Purchase Quote Archive';
@@ -5,7 +13,7 @@ page 5164 "Purchase Quote Archive"
     Editable = false;
     PageType = Document;
     SourceTable = "Purchase Header Archive";
-    SourceTableView = WHERE("Document Type" = CONST(Quote));
+    SourceTableView = where("Document Type" = const(Quote));
 
     layout
     {
@@ -162,9 +170,9 @@ page 5164 "Purchase Quote Archive"
             part(PurchLinesArchive; "Purchase Quote Archive Subform")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Document No." = FIELD("No."),
-                              "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                              "Version No." = FIELD("Version No.");
+                SubPageLink = "Document No." = field("No."),
+                              "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                              "Version No." = field("Version No.");
             }
             group(Invoicing)
             {
@@ -428,7 +436,7 @@ page 5164 "Purchase Quote Archive"
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the code of the port of entry where the items pass into your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the destination country or region for the purpose of Intrastat reporting.';
@@ -451,7 +459,7 @@ page 5164 "Purchase Quote Archive"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Archived By");
+                        UserMgt.DisplayUserInformation(Rec."Archived By");
                     end;
                 }
                 field("Date Archived"; Rec."Date Archived")
@@ -500,7 +508,7 @@ page 5164 "Purchase Quote Archive"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Vendor Card";
-                    RunPageLink = "No." = FIELD("Buy-from Vendor No.");
+                    RunPageLink = "No." = field("Buy-from Vendor No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -515,7 +523,7 @@ page 5164 "Purchase Quote Archive"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -525,11 +533,11 @@ page 5164 "Purchase Quote Archive"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Archive Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0),
-                                  "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                  "Version No." = FIELD("Version No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0),
+                                  "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                  "Version No." = field("Version No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Print)
@@ -569,15 +577,15 @@ page 5164 "Purchase Quote Archive"
 
     trigger OnOpenPage()
     begin
-        IsBuyFromCountyVisible := FormatAddress.UseCounty("Buy-from Country/Region Code");
-        IsPayToCountyVisible := FormatAddress.UseCounty("Pay-to Country/Region Code");
-        IsShipToCountyVisible := FormatAddress.UseCounty("Ship-to Country/Region Code");
+        IsBuyFromCountyVisible := FormatAddress.UseCounty(Rec."Buy-from Country/Region Code");
+        IsPayToCountyVisible := FormatAddress.UseCounty(Rec."Pay-to Country/Region Code");
+        IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
     end;
 
     trigger OnAfterGetRecord()
     begin
-        BuyFromContact.GetOrClear("Buy-from Contact No.");
-        PayToContact.GetOrClear("Pay-to Contact No.");
+        BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
+        PayToContact.GetOrClear(Rec."Pay-to Contact No.");
     end;
 
     var

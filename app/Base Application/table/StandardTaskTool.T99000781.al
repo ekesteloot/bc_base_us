@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 table 99000781 "Standard Task Tool"
 {
     Caption = 'Standard Task Tool';

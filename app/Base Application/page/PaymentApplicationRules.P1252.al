@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 page 1252 "Payment Application Rules"
 {
     AdditionalSearchTerms = 'payment matching rules,automatic payment application';
@@ -19,7 +21,7 @@ page 1252 "Payment Application Rules"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies your confidence in the application rule that you defined by the values in the Related Party Matched, Doc. No./Ext. Doc. No. Matched, and Amount Incl. Tolerance Matched fields on the line in the Payment Application Rules window.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the priority of the application rule in relation to other application rules that are defined as lines in the Payment Application Rules window. 1 represents the highest priority.';
@@ -81,8 +83,8 @@ page 1252 "Payment Application Rules"
                     if not Confirm(ResetToDefaultsQst) then
                         exit;
 
-                    DeleteAll();
-                    InsertDefaultMatchingRules();
+                    Rec.DeleteAll();
+                    Rec.InsertDefaultMatchingRules();
                 end;
             }
 
@@ -116,8 +118,8 @@ page 1252 "Payment Application Rules"
     var
         BankPmtApplSettings: Record "Bank Pmt. Appl. Settings";
     begin
-        SetCurrentKey(Score);
-        Ascending(false);
+        Rec.SetCurrentKey(Score);
+        Rec.Ascending(false);
         BankPmtApplSettings.GetOrInsert();
         ApplyAutomaticallyVisible := BankPmtApplSettings."Enable Apply Immediatelly";
     end;

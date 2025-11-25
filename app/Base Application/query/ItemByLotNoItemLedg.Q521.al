@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.InventoryMgt.Ledger;
+
 query 521 "Item By Lot No. Item Ledg."
 {
     QueryType = Normal;

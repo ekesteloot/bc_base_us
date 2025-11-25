@@ -1,10 +1,19 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 codeunit 1223 "SEPA CT-Check Line"
 {
     TableNo = "Gen. Journal Line";
 
     trigger OnRun()
     begin
-        DeletePaymentFileErrors();
+        Rec.DeletePaymentFileErrors();
         CheckGenJnlLine(Rec);
         CheckBank(Rec);
         CheckCustVendEmpl(Rec);

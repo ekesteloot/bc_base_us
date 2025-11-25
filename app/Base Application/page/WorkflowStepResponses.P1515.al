@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1515 "Workflow Step Responses"
 {
     AutoSplitKey = true;
@@ -17,7 +19,7 @@ page 1515 "Workflow Step Responses"
             repeater(Group)
             {
                 Visible = ShowResponseList;
-                field(ResponseDescriptionTableControl; "Response Description")
+                field(ResponseDescriptionTableControl; Rec."Response Description")
                 {
                     ApplicationArea = Suite;
                     Caption = 'Response';
@@ -28,7 +30,7 @@ page 1515 "Workflow Step Responses"
                     var
                         WorkflowResponse: Record "Workflow Response";
                     begin
-                        ResponseDescriptionLookup('', WorkflowResponse);
+                        Rec.ResponseDescriptionLookup('', WorkflowResponse);
                         CurrPage.Update(false);
                     end;
 
@@ -42,7 +44,7 @@ page 1515 "Workflow Step Responses"
             {
                 ShowCaption = false;
                 Visible = NOT ShowResponseList;
-                field(ResponseDescriptionCardControl; "Response Description")
+                field(ResponseDescriptionCardControl; Rec."Response Description")
                 {
                     ApplicationArea = Suite;
                     Caption = 'Select Response';
@@ -52,7 +54,7 @@ page 1515 "Workflow Step Responses"
                     var
                         WorkflowResponse: Record "Workflow Response";
                     begin
-                        ResponseDescriptionLookup('', WorkflowResponse);
+                        Rec.ResponseDescriptionLookup('', WorkflowResponse);
                         CurrPage.Update(false);
                     end;
 
@@ -78,7 +80,7 @@ page 1515 "Workflow Step Responses"
                     UpdatePageData();
                 end;
             }
-            field(NextStepDescription; "Next Step Description")
+            field(NextStepDescription; Rec."Next Step Description")
             {
                 ApplicationArea = Suite;
                 Caption = 'Next Step';
@@ -90,7 +92,7 @@ page 1515 "Workflow Step Responses"
 
                 trigger OnDrillDown()
                 begin
-                    if NextStepLookup() then
+                    if Rec.NextStepLookup() then
                         CurrPage.Update(false);
                 end;
             }
@@ -98,7 +100,7 @@ page 1515 "Workflow Step Responses"
             {
                 ApplicationArea = Suite;
                 Caption = 'Options for the Selected Response';
-                SubPageLink = ID = FIELD(Argument);
+                SubPageLink = ID = field(Argument);
                 UpdatePropagation = Both;
             }
         }
@@ -114,32 +116,32 @@ page 1515 "Workflow Step Responses"
     begin
         TempWorkflowStepBuffer.Copy(Rec, true);
         if TempWorkflowStepBuffer.FindLast() then;
-        if ("Next Step Description" = '') and (Order = TempWorkflowStepBuffer.Order) then
-            "Next Step Description" := NextStepTxt;
+        if (Rec."Next Step Description" = '') and (Rec.Order = TempWorkflowStepBuffer.Order) then
+            Rec."Next Step Description" := NextStepTxt;
 
-        ShowNextStep := "Next Step Description" <> '';
+        ShowNextStep := Rec."Next Step Description" <> '';
 
-        UpdateRecFromWorkflowStep();
+        Rec.UpdateRecFromWorkflowStep();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        WorkflowStep.Get("Workflow Code", "Response Step ID");
-        "Response Description" := WorkflowStep.GetDescription();
-        Modify();
+        WorkflowStep.Get(Rec."Workflow Code", Rec."Response Step ID");
+        Rec."Response Description" := WorkflowStep.GetDescription();
+        Rec.Modify();
 
-        UpdateNextStepDescription();
+        Rec.UpdateNextStepDescription();
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        SetCurrentKey(Order);
-        Ascending(true);
+        Rec.SetCurrentKey(Order);
+        Rec.Ascending(true);
 
-        if IsEmpty() then
-            PopulateTableFromEvent(GetRangeMax("Workflow Code"), GetRangeMax("Parent Event Step ID"));
+        if Rec.IsEmpty() then
+            Rec.PopulateTableFromEvent(Rec.GetRangeMax("Workflow Code"), Rec.GetRangeMax("Parent Event Step ID"));
 
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -147,24 +149,24 @@ page 1515 "Workflow Step Responses"
         xRecWorkflowStep: Record "Workflow Step";
     begin
         if not BelowxRec then
-            "Previous Workflow Step ID" := xRec."Previous Workflow Step ID"
+            Rec."Previous Workflow Step ID" := xRec."Previous Workflow Step ID"
         else
-            if not xRecWorkflowStep.Get("Workflow Code", xRec."Response Step ID") then
-                "Previous Workflow Step ID" := "Parent Event Step ID"
+            if not xRecWorkflowStep.Get(Rec."Workflow Code", xRec."Response Step ID") then
+                Rec."Previous Workflow Step ID" := Rec."Parent Event Step ID"
             else
-                "Previous Workflow Step ID" := xRec."Response Step ID";
+                Rec."Previous Workflow Step ID" := xRec."Response Step ID";
 
-        CalculateNewKey(BelowxRec);
+        Rec.CalculateNewKey(BelowxRec);
 
         WorkflowStep.Init();
-        UpdateNextStepDescription();
+        Rec.UpdateNextStepDescription();
     end;
 
     trigger OnOpenPage()
     begin
-        CalcFields(Template);
-        ShowResponseList := Count > 1;
-        CanAddMoreResponses := not (ShowResponseList or Template);
+        Rec.CalcFields(Template);
+        ShowResponseList := Rec.Count > 1;
+        CanAddMoreResponses := not (ShowResponseList or Rec.Template);
         AddMoreResponsesLabel := AddMoreResponsesLbl;
         UpdatePageCaption();
         ShowNextStep := true;
@@ -185,15 +187,15 @@ page 1515 "Workflow Step Responses"
         WorkflowStep2: Record "Workflow Step";
         WorkflowEvent: Record "Workflow Event";
     begin
-        WorkflowStep2.Get(GetRangeMax("Workflow Code"), GetRangeMax("Parent Event Step ID"));
+        WorkflowStep2.Get(Rec.GetRangeMax("Workflow Code"), Rec.GetRangeMax("Parent Event Step ID"));
         WorkflowEvent.Get(WorkflowStep2."Function Name");
         DataCaptionString := WorkflowEvent.Description;
     end;
 
     local procedure UpdatePageData()
     begin
-        ClearBuffer();
-        PopulateTableFromEvent(GetRangeMax("Workflow Code"), GetRangeMax("Parent Event Step ID"));
+        Rec.ClearBuffer();
+        Rec.PopulateTableFromEvent(Rec.GetRangeMax("Workflow Code"), Rec.GetRangeMax("Parent Event Step ID"));
         CurrPage.Update(false);
     end;
 }

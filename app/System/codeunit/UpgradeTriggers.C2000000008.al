@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Upgrade;
+
 codeunit 2000000008 "Upgrade Triggers"
 {
     SingleInstance = true;
@@ -6,6 +12,7 @@ codeunit 2000000008 "Upgrade Triggers"
     begin
     end;
 
+#pragma warning disable AL0299
     [BusinessEvent(false)]
     procedure OnCheckPreconditionsPerDatabase()
     begin
@@ -45,5 +52,6 @@ codeunit 2000000008 "Upgrade Triggers"
     procedure OnAfterUpgradeCommitPerCompany()
     begin
     end;
+#pragma warning restore AL0299
 }
 

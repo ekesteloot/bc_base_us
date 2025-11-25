@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Vendor;
+
+using System.Device;
+using System.IO;
+
 page 786 "Vendor Picture"
 {
     Caption = 'Vendor Picture';
@@ -11,7 +16,7 @@ page 786 "Vendor Picture"
     {
         area(content)
         {
-            field(Image; Image)
+            field(Image; Rec.Image)
             {
                 ApplicationArea = All;
                 ShowCaption = false;
@@ -53,10 +58,10 @@ page 786 "Vendor Picture"
                     FileName: Text;
                     ClientFileName: Text;
                 begin
-                    TestField("No.");
-                    TestField(Name);
+                    Rec.TestField("No.");
+                    Rec.TestField(Name);
 
-                    if Image.HasValue() then
+                    if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -64,10 +69,10 @@ page 786 "Vendor Picture"
                     if FileName = '' then
                         exit;
 
-                    Clear(Image);
-                    Image.ImportFile(FileName, ClientFileName);
-                    if not Modify(true) then
-                        Insert(true);
+                    Clear(Rec.Image);
+                    Rec.Image.ImportFile(FileName, ClientFileName);
+                    if not Rec.Modify(true) then
+                        Rec.Insert(true);
 
                     if FileManagement.DeleteServerFile(FileName) then;
                 end;
@@ -87,12 +92,12 @@ page 786 "Vendor Picture"
                     ToFile: Text;
                     ExportPath: Text;
                 begin
-                    TestField("No.");
-                    TestField(Name);
+                    Rec.TestField("No.");
+                    Rec.TestField(Name);
 
                     ToFile := DummyPictureEntity.GetDefaultMediaDescription(Rec);
-                    ExportPath := TemporaryPath + "No." + Format(Image.MediaId);
-                    Image.ExportFile(ExportPath);
+                    ExportPath := TemporaryPath + Rec."No." + Format(Rec.Image.MediaId);
+                    Rec.Image.ExportFile(ExportPath);
 
                     FileManagement.ExportImage(ExportPath, ToFile);
                 end;
@@ -107,13 +112,13 @@ page 786 "Vendor Picture"
 
                 trigger OnAction()
                 begin
-                    TestField("No.");
+                    Rec.TestField("No.");
 
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    Clear(Image);
-                    Modify(true);
+                    Clear(Rec.Image);
+                    Rec.Modify(true);
                 end;
             }
         }
@@ -131,7 +136,6 @@ page 786 "Vendor Picture"
 
     var
         Camera: Codeunit Camera;
-        [InDataSet]
         CameraAvailable: Boolean;
         OverrideImageQst: Label 'The existing picture will be replaced. Do you want to continue?';
         DeleteImageQst: Label 'Are you sure you want to delete the picture?';
@@ -160,7 +164,7 @@ page 786 "Vendor Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Image.HasValue;
+        DeleteExportEnabled := Rec.Image.HasValue;
     end;
 }
 

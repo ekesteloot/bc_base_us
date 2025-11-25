@@ -1,3 +1,10 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
 page 397 "Sales Invoice Statistics"
 {
     Caption = 'Sales Invoice Statistics';
@@ -16,7 +23,7 @@ page 397 "Sales Invoice Statistics"
                 field("CustAmount + InvDiscAmount"; CustAmount + InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Amount';
                     ToolTip = 'Specifies the net amount of all the lines in the sales document.';
@@ -24,7 +31,7 @@ page 397 "Sales Invoice Statistics"
                 field(InvDiscAmount; InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     ToolTip = 'Specifies the invoice discount amount for the sales document.';
@@ -32,7 +39,7 @@ page 397 "Sales Invoice Statistics"
                 field(CustAmount; CustAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total amount, less any invoice discount amount, and excluding VAT for the sales document.';
@@ -40,7 +47,7 @@ page 397 "Sales Invoice Statistics"
                 field(VATAmount; VATAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = '3,' + Format(VATAmountText);
                     Caption = 'VAT Amount';
@@ -49,7 +56,7 @@ page 397 "Sales Invoice Statistics"
                 field(AmountInclVAT; AmountInclVAT)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total Incl. VAT';
                     ToolTip = 'Specifies the total amount, including VAT, that will be posted to the customer''s account for all the lines in the sales document.';
@@ -147,7 +154,7 @@ page 397 "Sales Invoice Statistics"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupAdjmtValueEntries();
+                        Rec.LookupAdjmtValueEntries();
                     end;
                 }
             }
@@ -194,7 +201,7 @@ page 397 "Sales Invoice Statistics"
     begin
         ClearAll();
 
-        Currency.Initialize("Currency Code");
+        Currency.Initialize(Rec."Currency Code");
 
         CalculateTotals();
 
@@ -206,17 +213,17 @@ page 397 "Sales Invoice Statistics"
         else
             VATAmountText := StrSubstNo(Text001, VATPercentage);
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             AmountLCY := CustAmount
         else
             AmountLCY :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                WorkDate(), "Currency Code", CustAmount, "Currency Factor");
+                WorkDate(), Rec."Currency Code", CustAmount, Rec."Currency Factor");
 
         CustLedgEntry.SetCurrentKey("Document No.");
-        CustLedgEntry.SetRange("Document No.", "No.");
+        CustLedgEntry.SetRange("Document No.", Rec."No.");
         CustLedgEntry.SetRange("Document Type", CustLedgEntry."Document Type"::Invoice);
-        CustLedgEntry.SetRange("Customer No.", "Bill-to Customer No.");
+        CustLedgEntry.SetRange("Customer No.", Rec."Bill-to Customer No.");
         if not CustLedgEntry.IsEmpty() then begin
             CustLedgEntry.CalcSums("Sales (LCY)");
             AmountLCY := CustLedgEntry."Sales (LCY)";
@@ -233,7 +240,7 @@ page 397 "Sales Invoice Statistics"
         if AmountLCY <> 0 then
             AdjProfitPct := Round(100 * AdjProfitLCY / AmountLCY, 0.1);
 
-        if Cust.Get("Bill-to Customer No.") then
+        if Cust.Get(Rec."Bill-to Customer No.") then
             Cust.CalcFields("Balance (LCY)")
         else
             Clear(Cust);
@@ -251,7 +258,7 @@ page 397 "Sales Invoice Statistics"
 
         SalesInvLine.CalcVATAmountLines(Rec, TempVATAmountLine);
         CurrPage.Subform.PAGE.SetTempVATAmountLine(TempVATAmountLine);
-        CurrPage.Subform.PAGE.InitGlobals("Currency Code", false, false, false, false, "VAT Base Discount %");
+        CurrPage.Subform.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var
@@ -297,13 +304,13 @@ page 397 "Sales Invoice Statistics"
         if IsHandled then
             exit;
 
-        SalesInvLine.SetRange("Document No.", "No.");
+        SalesInvLine.SetRange("Document No.", Rec."No.");
         OnCalculateTotalsOnAfterSalesInvLineSetFilters(SalesInvLine, Rec);
         if SalesInvLine.Find('-') then
             repeat
                 CustAmount += SalesInvLine.Amount;
                 AmountInclVAT += SalesInvLine."Amount Including VAT";
-                if "Prices Including VAT" then
+                if Rec."Prices Including VAT" then
                     InvDiscAmount += SalesInvLine."Inv. Discount Amount" / (1 + SalesInvLine."VAT %" / 100)
                 else
                     InvDiscAmount += SalesInvLine."Inv. Discount Amount";

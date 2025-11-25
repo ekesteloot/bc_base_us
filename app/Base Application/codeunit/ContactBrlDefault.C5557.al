@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.BusinessRelation;
+
 codeunit 5557 "Contact BRL Default" implements "Contact Business Relation Link"
 {
     var

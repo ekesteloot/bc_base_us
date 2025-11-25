@@ -1,4 +1,11 @@
-﻿codeunit 5700 "User Setup Management"
+﻿namespace System.Security.User;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Location;
+
+codeunit 5700 "User Setup Management"
 {
     Permissions = TableData Location = r,
                   TableData "Responsibility Center" = r;
@@ -360,12 +367,12 @@
         if UserId <> '' then
             if LocalUserSetup.Get(UserId) then
                 case LocalUserSetup."Sales Invoice Posting Policy" of
-                    "Invoice Posting Policy"::Prohibited:
+                    Enum::"Invoice Posting Policy"::Prohibited:
                         begin
                             PostQty := true;
                             PostAmount := false;
                         end;
-                    "Invoice Posting Policy"::Mandatory:
+                    Enum::"Invoice Posting Policy"::Mandatory:
                         begin
                             PostQty := true;
                             PostAmount := true;
@@ -383,12 +390,12 @@
         if UserId <> '' then
             if LocalUserSetup.Get(UserId) then
                 case LocalUserSetup."Purch. Invoice Posting Policy" of
-                    "Invoice Posting Policy"::Prohibited:
+                    Enum::"Invoice Posting Policy"::Prohibited:
                         begin
                             PostQty := true;
                             PostAmount := false;
                         end;
-                    "Invoice Posting Policy"::Mandatory:
+                    Enum::"Invoice Posting Policy"::Mandatory:
                         begin
                             PostQty := true;
                             PostAmount := true;

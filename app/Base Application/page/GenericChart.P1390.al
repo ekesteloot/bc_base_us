@@ -1,3 +1,7 @@
+namespace System.Visualization;
+
+using System;
+
 page 1390 "Generic Chart"
 {
     Caption = 'Key Performance Indicators';
@@ -27,7 +31,7 @@ page 1390 "Generic Chart"
 
                 trigger DataPointClicked(point: DotNet BusinessChartDataPoint)
                 begin
-                    SetDrillDownIndexes(point);
+                    Rec.SetDrillDownIndexes(point);
                     ChartManagement.DataPointClicked(Rec, SelectedChartDefinition);
                 end;
 
@@ -112,7 +116,7 @@ page 1390 "Generic Chart"
 
                     trigger OnAction()
                     begin
-                        SetPeriodAndUpdateChart("Period Length"::Day);
+                        SetPeriodAndUpdateChart(Rec."Period Length"::Day);
                     end;
                 }
                 action(Week)
@@ -124,7 +128,7 @@ page 1390 "Generic Chart"
 
                     trigger OnAction()
                     begin
-                        SetPeriodAndUpdateChart("Period Length"::Week);
+                        SetPeriodAndUpdateChart(Rec."Period Length"::Week);
                     end;
                 }
                 action(Month)
@@ -136,7 +140,7 @@ page 1390 "Generic Chart"
 
                     trigger OnAction()
                     begin
-                        SetPeriodAndUpdateChart("Period Length"::Month);
+                        SetPeriodAndUpdateChart(Rec."Period Length"::Month);
                     end;
                 }
                 action(Quarter)
@@ -148,7 +152,7 @@ page 1390 "Generic Chart"
 
                     trigger OnAction()
                     begin
-                        SetPeriodAndUpdateChart("Period Length"::Quarter);
+                        SetPeriodAndUpdateChart(Rec."Period Length"::Quarter);
                     end;
                 }
                 action(Year)
@@ -160,7 +164,7 @@ page 1390 "Generic Chart"
 
                     trigger OnAction()
                     begin
-                        SetPeriodAndUpdateChart("Period Length"::Year);
+                        SetPeriodAndUpdateChart(Rec."Period Length"::Year);
                     end;
                 }
             }
@@ -175,7 +179,7 @@ page 1390 "Generic Chart"
                 trigger OnAction()
                 begin
                     ChartManagement.UpdateChart(SelectedChartDefinition, Rec, Period::Previous);
-                    Update(CurrPage.BusinessChart);
+                    Rec.Update(CurrPage.BusinessChart);
                 end;
             }
             action(NextPeriod)
@@ -189,7 +193,7 @@ page 1390 "Generic Chart"
                 trigger OnAction()
                 begin
                     ChartManagement.UpdateChart(SelectedChartDefinition, Rec, Period::Next);
-                    Update(CurrPage.BusinessChart);
+                    Rec.Update(CurrPage.BusinessChart);
                 end;
             }
             action(ChartInformation)
@@ -220,25 +224,38 @@ page 1390 "Generic Chart"
         ChartManagement: Codeunit "Chart Management";
         StatusText: Text;
         Period: Option " ",Next,Previous;
-        [InDataSet]
         PreviousNextActionEnabled: Boolean;
         NoDescriptionMsg: Label 'A description was not specified for this chart.';
         IsChartAddInReady: Boolean;
 
     local procedure InitializeSelectedChart()
+    var
+        ErrorText: Text;
     begin
         ChartManagement.SetDefaultPeriodLength(SelectedChartDefinition, Rec);
-        ChartManagement.UpdateChart(SelectedChartDefinition, Rec, Period::" ");
+        if ChartManagement.UpdateChartSafe(SelectedChartDefinition, Rec, Period::" ", ErrorText) then
+            ChartManagement.UpdateStatusText(SelectedChartDefinition, Rec, StatusText)
+        else begin
+            StatusText := ErrorText;
+            exit;
+        end;
         PreviousNextActionEnabled := ChartManagement.UpdateNextPrevious(SelectedChartDefinition);
         ChartManagement.UpdateStatusText(SelectedChartDefinition, Rec, StatusText);
         UpdateChart();
     end;
 
     local procedure SetPeriodAndUpdateChart(PeriodLength: Option)
+    var
+        ErrorText: Text;
     begin
         ChartManagement.SetPeriodLength(SelectedChartDefinition, Rec, PeriodLength, false);
-        ChartManagement.UpdateChart(SelectedChartDefinition, Rec, Period::" ");
-        ChartManagement.UpdateStatusText(SelectedChartDefinition, Rec, StatusText);
+        if ChartManagement.UpdateChartSafe(SelectedChartDefinition, Rec, Period::" ", ErrorText) then
+            ChartManagement.UpdateStatusText(SelectedChartDefinition, Rec, StatusText)
+        else begin
+            StatusText := ErrorText;
+            exit;
+        end;
+
         UpdateChart();
     end;
 
@@ -246,7 +263,7 @@ page 1390 "Generic Chart"
     begin
         if not IsChartAddInReady then
             exit;
-        Update(CurrPage.BusinessChart);
+        Rec.Update(CurrPage.BusinessChart);
     end;
 }
 

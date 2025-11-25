@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Purchases.Comment;
+using System.Automation;
+
 page 136 "Posted Purchase Receipt"
 {
     Caption = 'Posted Purchase Receipt';
@@ -199,7 +207,7 @@ page 136 "Posted Purchase Receipt"
             part(PurchReceiptLines; "Posted Purchase Rcpt. Subform")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group(Invoicing)
             {
@@ -451,7 +459,7 @@ page 136 "Posted Purchase Receipt"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Purchase Receipt Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -461,9 +469,9 @@ page 136 "Posted Purchase Receipt"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = CONST(Receipt),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const(Receipt),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -477,7 +485,7 @@ page 136 "Posted Purchase Receipt"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(Approvals)
@@ -492,7 +500,7 @@ page 136 "Posted Purchase Receipt"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ShowPostedApprovalEntries(RecordId);
+                        ApprovalsMgmt.ShowPostedApprovalEntries(Rec.RecordId);
                     end;
                 }
             }
@@ -525,7 +533,7 @@ page 136 "Posted Purchase Receipt"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }
@@ -573,15 +581,15 @@ page 136 "Posted Purchase Receipt"
 
     trigger OnOpenPage()
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
         ActivateFields();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        BuyFromContact.GetOrClear("Buy-from Contact No.");
-        PayToContact.GetOrClear("Pay-to Contact No.");
+        BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
+        PayToContact.GetOrClear(Rec."Pay-to Contact No.");
     end;
 
     var
@@ -595,9 +603,9 @@ page 136 "Posted Purchase Receipt"
 
     local procedure ActivateFields()
     begin
-        IsBuyFromCountyVisible := FormatAddress.UseCounty("Buy-from Country/Region Code");
-        IsPayToCountyVisible := FormatAddress.UseCounty("Pay-to Country/Region Code");
-        IsShipToCountyVisible := FormatAddress.UseCounty("Ship-to Country/Region Code");
+        IsBuyFromCountyVisible := FormatAddress.UseCounty(Rec."Buy-from Country/Region Code");
+        IsPayToCountyVisible := FormatAddress.UseCounty(Rec."Pay-to Country/Region Code");
+        IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
     end;
 
     [IntegrationEvent(false, false)]

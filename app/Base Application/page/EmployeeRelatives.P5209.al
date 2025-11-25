@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.HumanResources.Comment;
+
 page 5209 "Employee Relatives"
 {
     AutoSplitKey = true;
@@ -45,7 +49,7 @@ page 5209 "Employee Relatives"
                     ToolTip = 'Specifies the relative''s employee number, if the relative also works at the company.';
                     Visible = false;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies if a comment was entered for this entry.';
@@ -81,9 +85,9 @@ page 5209 "Employee Relatives"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Human Resource Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Employee Relative"),
-                                  "No." = FIELD("Employee No."),
-                                  "Table Line No." = FIELD("Line No.");
+                    RunPageLink = "Table Name" = const("Employee Relative"),
+                                  "No." = field("Employee No."),
+                                  "Table Line No." = field("Line No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

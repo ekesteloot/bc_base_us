@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 5912 "Service Ledger Entries"
 {
     ApplicationArea = Service;
@@ -6,8 +12,8 @@ page 5912 "Service Ledger Entries"
     Editable = false;
     PageType = List;
     SourceTable = "Service Ledger Entry";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Entry No.")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -225,13 +231,13 @@ page 5912 "Service Ledger Entries"
                     ToolTip = 'Specifies the bin where the items are picked or put away.';
                     Visible = false;
                 }
-                field(Prepaid; Prepaid)
+                field(Prepaid; Rec.Prepaid)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies whether the service contract or contract-related service order was prepaid.';
                     Visible = false;
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies contract-related service ledger entries.';
@@ -245,7 +251,7 @@ page 5912 "Service Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Entry No."; Rec."Entry No.")
@@ -347,7 +353,7 @@ page 5912 "Service Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -360,7 +366,7 @@ page 5912 "Service Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -377,7 +383,7 @@ page 5912 "Service Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

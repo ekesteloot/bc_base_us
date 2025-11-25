@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 page 433 "Reminder Text"
 {
     AutoSplitKey = true;
@@ -28,13 +30,13 @@ page 433 "Reminder Text"
                     ToolTip = 'Specifies the reminder level this text applies to.';
                     Visible = false;
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the text will appear at the beginning or the end of the reminder.';
                     Visible = false;
                 }
-                field(Text; Text)
+                field(Text; Rec.Text)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the text that you want to insert in the reminder.';
@@ -62,7 +64,7 @@ page 433 "Reminder Text"
 
     trigger OnOpenPage()
     begin
-        PageCaption := "Reminder Terms Code" + ' ' + Format("Reminder Level") + ' ' + Format(Position);
+        PageCaption := Rec."Reminder Terms Code" + ' ' + Format(Rec."Reminder Level") + ' ' + Format(Rec.Position);
     end;
 
     var

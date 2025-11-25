@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Outlook;
+
 enum 5059 "Office Contact Type"
 {
     Extensible = true;

@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Item;
+
 page 6515 "Enter Customized SN"
 {
     Caption = 'Enter Customized SN';

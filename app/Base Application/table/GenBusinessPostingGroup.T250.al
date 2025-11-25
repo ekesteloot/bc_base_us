@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 250 "Gen. Business Posting Group"
 {
     Caption = 'Gen. Business Posting Group';

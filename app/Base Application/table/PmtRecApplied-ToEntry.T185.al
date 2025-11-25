@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 table 185 "Pmt. Rec. Applied-to Entry"
 {
     Caption = 'Payment Reconciliation Applied-to Entry';

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Segment;
+
 page 5143 "Segment Criteria"
 {
     Caption = 'Segment Criteria';
@@ -103,9 +105,7 @@ page 5143 "Segment Criteria"
     end;
 
     var
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         ActionTableIndent: Integer;
 
     local procedure GetSegmentCriteriaFilter(): Text

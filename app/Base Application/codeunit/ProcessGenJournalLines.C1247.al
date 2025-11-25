@@ -1,3 +1,10 @@
+namespace Microsoft.BankMgt.Statement;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.IO;
+
 codeunit 1247 "Process Gen. Journal  Lines"
 {
     Permissions = TableData "Data Exch." = rimd;
@@ -9,7 +16,7 @@ codeunit 1247 "Process Gen. Journal  Lines"
         ProcessDataExch: Codeunit "Process Data Exch.";
         RecRef: RecordRef;
     begin
-        DataExch.Get("Data Exch. Entry No.");
+        DataExch.Get(Rec."Data Exch. Entry No.");
         RecRef.GetTable(Rec);
         ProcessDataExch.ProcessAllLinesColumnMapping(DataExch, RecRef);
     end;
@@ -109,10 +116,6 @@ codeunit 1247 "Process Gen. Journal  Lines"
         if IsHandled then
             exit;
 
-#if not CLEAN20
-        OnBeforeUpdateGenJnlLines(GenJournalLineTemplate);
-#endif
-
         GenJournalLine.SetRange("Journal Template Name", GenJournalLineTemplate."Journal Template Name");
         GenJournalLine.SetRange("Journal Batch Name", GenJournalLineTemplate."Journal Batch Name");
         GenJournalLine.SetFilter("Line No.", '>%1', GenJournalLineTemplate."Line No.");
@@ -140,14 +143,6 @@ codeunit 1247 "Process Gen. Journal  Lines"
     local procedure OnBeforeImportBankStatement(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by local OnBeforeUpdateGenJnlLinesProcedure().', '20.0')]
-    [IntegrationEvent(false, false)]
-    procedure OnBeforeUpdateGenJnlLines(var GenJournalLineTemplate: Record "Gen. Journal Line")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateGenJnlLinesProcedure(var GenJournalLineTemplate: Record "Gen. Journal Line"; var IsHandled: Boolean)

@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 table 1228 "Payment Jnl. Export Error Text"
 {
     Caption = 'Payment Jnl. Export Error Text';
@@ -12,7 +16,7 @@ table 1228 "Payment Jnl. Export Error Text"
         field(2; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
         }
         field(3; "Journal Line No."; Integer)
         {

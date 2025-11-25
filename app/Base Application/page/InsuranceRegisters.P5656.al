@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using System.Security.User;
+
 page 5656 "Insurance Registers"
 {
     ApplicationArea = FixedAssets;
@@ -38,7 +42,7 @@ page 5656 "Insurance Registers"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")

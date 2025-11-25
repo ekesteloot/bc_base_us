@@ -4,7 +4,7 @@ page 30151 "Shpfy Return"
     Caption = 'Shopify Return';
     PageType = Document;
     SourceTable = "Shpfy Return Header";
-    UsageCategory = Documents;
+    UsageCategory = None;
 
     layout
     {
@@ -87,6 +87,7 @@ page 30151 "Shpfy Return"
                 Caption = 'Retrieved Shopify Data';
                 Image = Entry;
                 ToolTip = 'View the data retrieved from Shopify.';
+
                 trigger OnAction();
                 var
                     DataCapture: Record "Shpfy Data Capture";

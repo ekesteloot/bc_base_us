@@ -24,8 +24,6 @@ table 710 "Activity Log"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(5; Status; Option)
         {

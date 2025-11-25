@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1212 "Data Exch Line Def Card"
 {
     Caption = 'Line Definitions';
@@ -16,7 +18,7 @@ page 1212 "Data Exch Line Def Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code that identifies the data exchange definition.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the line in the file.';
@@ -31,7 +33,7 @@ page 1212 "Data Exch Line Def Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies how many columns the line in the bank statement file has.';
                 }
-                field(Namespace; Namespace)
+                field(Namespace; Rec.Namespace)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = IsXMLFileType AND IsBankStatementImportType;
@@ -49,11 +51,11 @@ page 1212 "Data Exch Line Def Card"
     var
         DataExchDef: Record "Data Exch. Def";
     begin
-        DataExchDef.Get("Data Exch. Def Code");
+        DataExchDef.Get(Rec."Data Exch. Def Code");
         IsBankStatementImportType := DataExchDef.CheckEnableDisableIsBankStatementImportType();
         IsXMLFileType := not DataExchDef.CheckEnableDisableIsNonXMLFileType();
         if (not IsXMLFileType) or (not IsBankStatementImportType) then
-            Namespace := '';
+            Rec.Namespace := '';
     end;
 
     var

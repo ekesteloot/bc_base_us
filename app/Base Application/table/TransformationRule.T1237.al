@@ -1,3 +1,11 @@
+﻿namespace System.IO;
+
+using System;
+using System.Date;
+using System.Reflection;
+using System.Text;
+using System.Utilities;
+
 table 1237 "Transformation Rule"
 {
     Caption = 'Transformation Rule';

@@ -1,3 +1,12 @@
+﻿namespace Microsoft.WarehouseMgt.History;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 table 7322 "Posted Whse. Shipment Header"
 {
     Caption = 'Posted Whse. Shipment Header';
@@ -13,13 +22,13 @@ table 7322 "Posted Whse. Shipment Header"
         field(2; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(3; "Assigned User ID"; Code[50])
         {
             Caption = 'Assigned User ID';
             DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "Warehouse Employee" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = "Warehouse Employee" where("Location Code" = field("Location Code"));
         }
         field(4; "Assignment Date"; Date)
         {
@@ -38,9 +47,9 @@ table 7322 "Posted Whse. Shipment Header"
         }
         field(11; Comment; Boolean)
         {
-            CalcFormula = Exist ("Warehouse Comment Line" WHERE("Table Name" = CONST("Posted Whse. Shipment"),
-                                                                Type = CONST(" "),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = Exist("Warehouse Comment Line" where("Table Name" = const("Posted Whse. Shipment"),
+                                                                Type = const(" "),
+                                                                "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -48,15 +57,15 @@ table 7322 "Posted Whse. Shipment Header"
         field(12; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                               "Zone Code" = FIELD("Zone Code"));
+            TableRelation = if ("Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                               "Zone Code" = field("Zone Code"));
         }
         field(13; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
         }
         field(39; "Posting Date"; Date)
         {
@@ -75,7 +84,7 @@ table 7322 "Posted Whse. Shipment Header"
         field(42; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(43; "Shipment Method Code"; Code[10])
         {
@@ -148,7 +157,6 @@ table 7322 "Posted Whse. Shipment Header"
     var
         WhseSetup: Record "Warehouse Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
-        Text000: Label 'You must first set up user %1 as a warehouse employee.';
 
     procedure LookupPostedWhseShptHeader(var PostedWhseShptHeader: Record "Posted Whse. Shipment Header")
     begin
@@ -217,7 +225,7 @@ table 7322 "Posted Whse. Shipment Header"
 
     procedure ErrorIfUserIsNotWhseEmployee()
     var
-        WhseEmployee: Record "Warehouse Employee";
+        WMSManagement: Codeunit "WMS Management";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -225,11 +233,7 @@ table 7322 "Posted Whse. Shipment Header"
         if IsHandled then
             exit;
 
-        if UserId <> '' then begin
-            WhseEmployee.SetRange("User ID", UserId);
-            if WhseEmployee.IsEmpty() then
-                Error(Text000, UserId);
-        end;
+        WMSManagement.CheckUserIsWhseEmployee();
     end;
 
     [IntegrationEvent(false, false)]

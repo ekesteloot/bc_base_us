@@ -9,7 +9,7 @@ report 10041 "Cash Applied"
     {
         dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
         {
-            DataItemTableView = SORTING("Document Type", "Customer No.", "Posting Date") WHERE("Document Type" = CONST(Payment));
+            DataItemTableView = sorting("Document Type", "Customer No.", "Posting Date") where("Document Type" = const(Payment));
             PrintOnlyIfDetail = false;
             RequestFilterFields = "Posting Date", "Global Dimension 1 Code", "Global Dimension 2 Code", "Salesperson Code", "Customer No.";
             column(TodayFormatted; Format(Today, 0, 4))
@@ -116,7 +116,7 @@ report 10041 "Cash Applied"
             }
             dataitem(AppliedEntries; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(TempAppliedCustLedgEntryDocType; Format(TempAppliedCustLedgEntry."Document Type"))
                 {
                 }
@@ -160,7 +160,7 @@ report 10041 "Cash Applied"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
             }
 
             trigger OnAfterGetRecord()

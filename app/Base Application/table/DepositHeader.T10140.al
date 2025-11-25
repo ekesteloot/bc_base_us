@@ -2,17 +2,10 @@
 {
     Caption = 'Deposit Header';
     DataCaptionFields = "No.";
-#if not CLEAN21
-    LookupPageID = "Deposit List";
-#endif
     ObsoleteReason = 'Replaced by new Bank Deposits extension';
-#if not CLEAN21
-    ObsoleteState = Pending;
-    ObsoleteTag = '21.0';
-#else
     ObsoleteState = Removed;
-    ObsoleteTag = '24.0';
-#endif
+    ObsoleteTag = '23.0';
+    ReplicateData = false;
 
     fields
     {
@@ -99,7 +92,7 @@
         }
         field(6; "Total Deposit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Deposit Amount';
         }
@@ -117,7 +110,7 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
 
             trigger OnValidate()
             begin
@@ -129,7 +122,7 @@
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
 
             trigger OnValidate()
             begin
@@ -181,23 +174,23 @@
         {
             Caption = 'Journal Batch Name';
             Editable = false;
-            TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
         }
         field(21; Comment; Boolean)
         {
-            CalcFormula = Exist("Bank Comment Line" WHERE("Table Name" = CONST(Deposit),
-                                                           "Bank Account No." = FIELD("Bank Account No."),
-                                                           "No." = FIELD("No.")));
+            CalcFormula = exist("Bank Comment Line" where("Table Name" = const(Deposit),
+                                                           "Bank Account No." = field("Bank Account No."),
+                                                           "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
         }
         field(22; "Total Deposit Lines"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = - Sum("Gen. Journal Line".Amount WHERE("Journal Template Name" = FIELD("Journal Template Name"),
-                                                                 "Journal Batch Name" = FIELD("Journal Batch Name")));
+            CalcFormula = - sum("Gen. Journal Line".Amount where("Journal Template Name" = field("Journal Template Name"),
+                                                                 "Journal Batch Name" = field("Journal Batch Name")));
             Caption = 'Total Deposit Lines';
             Editable = false;
             FieldClass = FlowField;
@@ -210,7 +203,7 @@
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
 
             trigger OnValidate()
@@ -352,7 +345,7 @@
         CurrencyDate: Date;
     begin
         if "Currency Code" <> '' then begin
-            if "Posting Date" <> 0D then
+            if Rec."Posting Date" <> 0D then
                 CurrencyDate := "Posting Date"
             else
                 CurrencyDate := WorkDate();

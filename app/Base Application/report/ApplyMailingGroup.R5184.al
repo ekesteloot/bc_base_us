@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Setup;
+
 report 5184 "Apply Mailing Group"
 {
     Caption = 'Apply Mailing Group';
@@ -7,7 +12,7 @@ report 5184 "Apply Mailing Group"
     {
         dataitem("Contact Mailing Group"; "Contact Mailing Group")
         {
-            DataItemTableView = SORTING("Mailing Group Code");
+            DataItemTableView = sorting("Mailing Group Code");
 
             trigger OnAfterGetRecord()
             begin
@@ -24,14 +29,14 @@ report 5184 "Apply Mailing Group"
         }
         dataitem("Segment Header"; "Segment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             dataitem("Segment Line"; "Segment Line")
             {
-                DataItemLink = "Segment No." = FIELD("No.");
-                DataItemTableView = SORTING("Segment No.", "Line No.");
+                DataItemLink = "Segment No." = field("No.");
+                DataItemTableView = sorting("Segment No.", "Line No.");
                 dataitem("Mailing Group"; "Mailing Group")
                 {
-                    DataItemTableView = SORTING(Code);
+                    DataItemTableView = sorting(Code);
                     RequestFilterFields = "Code";
 
                     trigger OnAfterGetRecord()

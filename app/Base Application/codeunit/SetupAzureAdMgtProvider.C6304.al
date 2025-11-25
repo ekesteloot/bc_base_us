@@ -1,7 +1,11 @@
+namespace System.Azure.Identity;
+
+using System.Telemetry;
+
 codeunit 6304 "Setup Azure AD Mgt. Provider"
 {
     var
-        CustomAzureADMgtSetupTxt: Label 'A custom Azure AD Mgt. Setup is saved', Locked = true;
+        CustomAzureADMgtSetupTxt: Label 'A custom Microsoft Entra ID Mgt. Setup is saved', Locked = true;
 
     trigger OnRun()
     begin

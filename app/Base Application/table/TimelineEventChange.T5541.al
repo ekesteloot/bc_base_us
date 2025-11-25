@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Availability;
+
 table 5541 "Timeline Event Change"
 {
     Caption = 'Timeline Event Change';

@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using Microsoft.FinancialMgt.Analysis;
+
 table 2582 "Dimension Correction"
 {
     DataClassification = CustomerContent;

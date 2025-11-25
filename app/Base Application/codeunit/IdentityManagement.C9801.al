@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 codeunit 9801 "Identity Management"
 {
 

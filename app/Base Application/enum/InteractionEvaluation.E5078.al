@@ -1,4 +1,6 @@
-﻿enum 5078 "Interaction Evaluation"
+﻿namespace Microsoft.CRM.Interaction;
+
+enum 5078 "Interaction Evaluation"
 {
     Extensible = true;
     AssignmentCompatibility = true;

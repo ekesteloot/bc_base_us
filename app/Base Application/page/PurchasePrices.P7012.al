@@ -1,4 +1,10 @@
 #if not CLEAN21
+namespace Microsoft.Purchases.Pricing;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Vendor;
+using System.Text;
+
 page 7012 "Purchase Prices"
 {
     Caption = 'Purchase Prices';
@@ -193,34 +199,33 @@ page 7012 "Purchase Prices"
         StartingDateFilter: Text[30];
         NoDataWithinFilterErr: Label 'There is no %1 within the filter %2.', Comment = '%1: Field(Code), %2: GetFilter(Code)';
         MultipleVendorsSelectedErr: Label 'More than one vendor uses these purchase prices. To copy prices, the Vendor No. Filter field must contain one vendor only.';
-        [InDataSet]
         IsLookupMode: Boolean;
 
     local procedure GetRecFilters()
     begin
-        if GetFilters <> '' then begin
-            VendNoFilter := GetFilter("Vendor No.");
-            ItemNoFilter := GetFilter("Item No.");
-            Evaluate(StartingDateFilter, GetFilter("Starting Date"));
+        if Rec.GetFilters() <> '' then begin
+            VendNoFilter := Rec.GetFilter("Vendor No.");
+            ItemNoFilter := Rec.GetFilter("Item No.");
+            Evaluate(StartingDateFilter, Rec.GetFilter("Starting Date"));
         end;
     end;
 
     procedure SetRecFilters()
     begin
         if VendNoFilter <> '' then
-            SetFilter("Vendor No.", VendNoFilter)
+            Rec.SetFilter("Vendor No.", VendNoFilter)
         else
-            SetRange("Vendor No.");
+            Rec.SetRange("Vendor No.");
 
         if StartingDateFilter <> '' then
-            SetFilter("Starting Date", StartingDateFilter)
+            Rec.SetFilter("Starting Date", StartingDateFilter)
         else
-            SetRange("Starting Date");
+            Rec.SetRange("Starting Date");
 
         if ItemNoFilter <> '' then
-            SetFilter("Item No.", ItemNoFilter)
+            Rec.SetFilter("Item No.", ItemNoFilter)
         else
-            SetRange("Item No.");
+            Rec.SetRange("Item No.");
 
         CheckFilters(DATABASE::Vendor, VendNoFilter);
         CheckFilters(DATABASE::Item, ItemNoFilter);
@@ -251,7 +256,7 @@ page 7012 "Purchase Prices"
     var
         Item: Record Item;
     begin
-        if Item.Get("Item No.") then
+        if Item.Get(Rec."Item No.") then
             CurrPage.SaveRecord();
         SetRecFilters();
     end;
@@ -302,7 +307,7 @@ page 7012 "Purchase Prices"
         PurchasePrices.SetTableView(PurchasePrice);
         if PurchasePrices.RunModal() = ACTION::LookupOK then begin
             PurchasePrices.GetSelectionFilter(SelectedPurchasePrice);
-            CopyPurchPriceToVendorsPurchPrice(SelectedPurchasePrice, CopyToVendorNo);
+            Rec.CopyPurchPriceToVendorsPurchPrice(SelectedPurchasePrice, CopyToVendorNo);
         end;
     end;
 

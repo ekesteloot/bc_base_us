@@ -9,7 +9,7 @@ report 8613 "Create Item Journal Lines"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Statistics Group", "Vendor No.", Blocked;
 
             trigger OnAfterGetRecord()

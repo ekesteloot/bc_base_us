@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 enum 5090 "Profile Questionnaire Line Type"
 {
     Extensible = true;

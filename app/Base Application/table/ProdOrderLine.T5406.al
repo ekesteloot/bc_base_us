@@ -1,3 +1,21 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Purchases.Document;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5406 "Prod. Order Line"
 {
     Caption = 'Prod. Order Line';
@@ -15,7 +33,7 @@ table 5406 "Prod. Order Line"
         field(2; "Prod. Order No."; Code[20])
         {
             Caption = 'Prod. Order No.';
-            TableRelation = "Production Order"."No." WHERE(Status = FIELD(Status));
+            TableRelation = "Production Order"."No." where(Status = field(Status));
         }
         field(3; "Line No."; Integer)
         {
@@ -24,7 +42,7 @@ table 5406 "Prod. Order Line"
         field(11; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            TableRelation = Item WHERE(Type = CONST(Inventory));
+            TableRelation = Item where(Type = const(Inventory));
 
             trigger OnValidate()
             var
@@ -34,7 +52,7 @@ table 5406 "Prod. Order Line"
                 TestField("Finished Quantity", 0);
                 CalcFields("Reserved Quantity");
                 TestField("Reserved Quantity", 0);
-                WhseValidateSourceLine.ProdOrderLineVerifyChange(Rec, xRec);
+                ProdOrderWarehouseMgt.ProdOrderLineVerifyChange(Rec, xRec);
                 if ("Item No." <> xRec."Item No.") and ("Line No." <> 0) then begin
                     DeleteRelations();
                     "Variant Code" := '';
@@ -97,8 +115,8 @@ table 5406 "Prod. Order Line"
         field(12; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."),
-                                                       Code = FIELD("Variant Code"));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."),
+                                                       Code = field("Variant Code"));
 
             trigger OnValidate()
             var
@@ -108,7 +126,7 @@ table 5406 "Prod. Order Line"
                 TestField("Finished Quantity", 0);
                 CalcFields("Reserved Quantity");
                 TestField("Reserved Quantity", 0);
-                WhseValidateSourceLine.ProdOrderLineVerifyChange(Rec, xRec);
+                ProdOrderWarehouseMgt.ProdOrderLineVerifyChange(Rec, xRec);
 
                 if ItemVariant.Get("Item No.", "Variant Code") then begin
                     Description := ItemVariant.Description;
@@ -133,12 +151,12 @@ table 5406 "Prod. Order Line"
         field(20; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             begin
                 ProdOrderLineReserve.VerifyChange(Rec, xRec);
-                WhseValidateSourceLine.ProdOrderLineVerifyChange(Rec, xRec);
+                ProdOrderWarehouseMgt.ProdOrderLineVerifyChange(Rec, xRec);
                 GetUpdateFromSKU();
                 GetDefaultBin();
                 OnValidateLocationCodeOnBeforeCreateDim(Rec);
@@ -149,34 +167,34 @@ table 5406 "Prod. Order Line"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(22; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(23; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF (Quantity = FILTER(< 0)) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"),
-                                                                                     "Item No." = FIELD("Item No."),
-                                                                                     "Variant Code" = FIELD("Variant Code"))
-            ELSE
-            Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = if (Quantity = filter(< 0)) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
+                                                                                     "Item No." = field("Item No."),
+                                                                                     "Variant Code" = field("Variant Code"))
+            else
+            Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnLookup()
             var
@@ -202,7 +220,7 @@ table 5406 "Prod. Order Line"
                         WMSManagement.FindBinContent("Location Code", "Bin Code", "Item No.", "Variant Code", '')
                     else
                         WMSManagement.FindBin("Location Code", "Bin Code", '');
-                    WhseIntegrationMgt.CheckBinTypeCode(DATABASE::"Prod. Order Line",
+                    WhseIntegrationMgt.CheckBinTypeCode(Enum::TableID::"Prod. Order Line".AsInteger(),
                       FieldCaption("Bin Code"),
                       "Location Code",
                       "Bin Code", 0);
@@ -234,7 +252,7 @@ table 5406 "Prod. Order Line"
                     "Remaining Quantity" := 0;
                 "Remaining Qty. (Base)" := CalcBaseQty("Remaining Quantity", FieldCaption("Remaining Quantity"), FieldCaption("Remaining Qty. (Base)"));
                 ProdOrderLineReserve.VerifyQuantity(Rec, xRec);
-                WhseValidateSourceLine.ProdOrderLineVerifyChange(Rec, xRec);
+                ProdOrderWarehouseMgt.ProdOrderLineVerifyChange(Rec, xRec);
 
                 UpdateProdOrderComp(xRec."Qty. per Unit of Measure");
 
@@ -484,15 +502,15 @@ table 5406 "Prod. Order Line"
         }
         field(68; "Reserved Quantity"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("Prod. Order No."),
-                                                                  "Source Ref. No." = CONST(0),
-                                                                  "Source Type" = CONST(5406),
+            CalcFormula = sum("Reservation Entry".Quantity where("Source ID" = field("Prod. Order No."),
+                                                                  "Source Ref. No." = const(0),
+                                                                  "Source Type" = const(5406),
 #pragma warning disable AL0603
-                                                                  "Source Subtype" = FIELD(Status),
+                                                                  "Source Subtype" = field(Status),
 #pragma warning restore
-                                                                  "Source Batch Name" = CONST(''),
-                                                                  "Source Prod. Order Line" = FIELD("Line No."),
-                                                                  "Reservation Status" = CONST(Reservation)));
+                                                                  "Source Batch Name" = const(''),
+                                                                  "Source Prod. Order Line" = field("Line No."),
+                                                                  "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -507,9 +525,9 @@ table 5406 "Prod. Order Line"
         {
             Caption = 'Capacity No. Filter';
             FieldClass = FlowFilter;
-            TableRelation = IF ("Capacity Type Filter" = CONST("Work Center")) "Work Center"
-            ELSE
-            IF ("Capacity Type Filter" = CONST("Machine Center")) "Machine Center";
+            TableRelation = if ("Capacity Type Filter" = const("Work Center")) "Work Center"
+            else
+            if ("Capacity Type Filter" = const("Machine Center")) "Machine Center";
         }
         field(72; "Date Filter"; Date)
         {
@@ -537,13 +555,13 @@ table 5406 "Prod. Order Line"
         field(80; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             begin
                 GetItem();
                 GetGLSetup();
-                WhseValidateSourceLine.ProdOrderLineVerifyChange(Rec, xRec);
+                ProdOrderWarehouseMgt.ProdOrderLineVerifyChange(Rec, xRec);
                 OnValidateUnitOfMeasureCodeOnAfterWhseValidateSourceLine(Rec, xRec, CurrFieldNo);
 
                 "Unit Cost" := Item."Unit Cost";
@@ -596,15 +614,15 @@ table 5406 "Prod. Order Line"
         }
         field(84; "Reserved Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("Prod. Order No."),
-                                                                           "Source Ref. No." = CONST(0),
-                                                                           "Source Type" = CONST(5406),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Prod. Order No."),
+                                                                           "Source Ref. No." = const(0),
+                                                                           "Source Type" = const(5406),
 #pragma warning disable AL0603
-                                                                           "Source Subtype" = FIELD(Status),
+                                                                           "Source Subtype" = field(Status),
 #pragma warning restore
-                                                                           "Source Batch Name" = CONST(''),
-                                                                           "Source Prod. Order Line" = FIELD("Line No."),
-                                                                           "Reservation Status" = CONST(Reservation)));
+                                                                           "Source Batch Name" = const(''),
+                                                                           "Source Prod. Order Line" = field("Line No."),
+                                                                           "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -613,21 +631,21 @@ table 5406 "Prod. Order Line"
         field(90; "Expected Operation Cost Amt."; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Prod. Order Routing Line"."Expected Operation Cost Amt." WHERE(Status = FIELD(Status),
-                                                                                               "Prod. Order No." = FIELD("Prod. Order No."),
-                                                                                               "Routing No." = FIELD("Routing No."),
-                                                                                               "Routing Reference No." = FIELD("Routing Reference No.")));
+            CalcFormula = sum("Prod. Order Routing Line"."Expected Operation Cost Amt." where(Status = field(Status),
+                                                                                               "Prod. Order No." = field("Prod. Order No."),
+                                                                                               "Routing No." = field("Routing No."),
+                                                                                               "Routing Reference No." = field("Routing Reference No.")));
             Caption = 'Expected Operation Cost Amt.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(91; "Total Exp. Oper. Output (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Line".Quantity WHERE(Status = FIELD(Status),
-                                                                 "Prod. Order No." = FIELD("Prod. Order No."),
-                                                                 "Routing No." = FIELD("Routing No."),
-                                                                 "Routing Reference No." = FIELD("Routing Reference No."),
-                                                                 "Ending Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Prod. Order Line".Quantity where(Status = field(Status),
+                                                                 "Prod. Order No." = field("Prod. Order No."),
+                                                                 "Routing No." = field("Routing No."),
+                                                                 "Routing Reference No." = field("Routing Reference No."),
+                                                                 "Ending Date" = field("Date Filter")));
             Caption = 'Total Exp. Oper. Output (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -636,10 +654,10 @@ table 5406 "Prod. Order Line"
         field(94; "Expected Component Cost Amt."; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Prod. Order Component"."Cost Amount" WHERE(Status = FIELD(Status),
-                                                                           "Prod. Order No." = FIELD("Prod. Order No."),
-                                                                           "Prod. Order Line No." = FIELD("Line No."),
-                                                                           "Due Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Prod. Order Component"."Cost Amount" where(Status = field(Status),
+                                                                           "Prod. Order No." = field("Prod. Order No."),
+                                                                           "Prod. Order Line No." = field("Line No."),
+                                                                           "Due Date" = field("Date Filter")));
             Caption = 'Expected Component Cost Amt.';
             Editable = false;
             FieldClass = FlowField;
@@ -674,7 +692,7 @@ table 5406 "Prod. Order Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -699,7 +717,7 @@ table 5406 "Prod. Order Line"
         field(99000750; "Production BOM Version Code"; Code[20])
         {
             Caption = 'Production BOM Version Code';
-            TableRelation = "Production BOM Version"."Version Code" WHERE("Production BOM No." = FIELD("Production BOM No."));
+            TableRelation = "Production BOM Version"."Version Code" where("Production BOM No." = field("Production BOM No."));
 
             trigger OnValidate()
             var
@@ -716,7 +734,7 @@ table 5406 "Prod. Order Line"
         field(99000751; "Routing Version Code"; Code[20])
         {
             Caption = 'Routing Version Code';
-            TableRelation = "Routing Version"."Version Code" WHERE("Routing No." = FIELD("Routing No."));
+            TableRelation = "Routing Version"."Version Code" where("Routing No." = field("Routing No."));
 
             trigger OnValidate()
             var
@@ -862,7 +880,7 @@ table 5406 "Prod. Order Line"
 
         CalcFields("Reserved Qty. (Base)");
         TestField("Reserved Qty. (Base)", 0);
-        WhseValidateSourceLine.ProdOrderLineDelete(Rec);
+        ProdOrderWarehouseMgt.ProdOrderLineDelete(Rec);
 
         DeleteRelations();
 
@@ -907,7 +925,7 @@ table 5406 "Prod. Order Line"
         GLSetup: Record "General Ledger Setup";
         Location: Record Location;
         ProdOrderLineReserve: Codeunit "Prod. Order Line-Reserve";
-        WhseValidateSourceLine: Codeunit "Whse. Validate Source Line";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
         UOMMgt: Codeunit "Unit of Measure Management";
         VersionMgt: Codeunit VersionManagement;
         CalcProdOrder: Codeunit "Calculate Prod. Order";
@@ -1027,33 +1045,8 @@ table 5406 "Prod. Order Line"
         exit(Blocked);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-    begin
-        TableID[1] := Type1;
-        No[1] := No1;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, DefaultDimSource, '',
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", ProdOrder."Dimension Set ID", DATABASE::Item);
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
         "Dimension Set ID" :=
@@ -1099,7 +1092,7 @@ table 5406 "Prod. Order Line"
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     local procedure GetItem()
@@ -1215,7 +1208,7 @@ table 5406 "Prod. Order Line"
         ItemTrackingMgt: Codeunit "Item Tracking Management";
     begin
         exit(
-          ItemTrackingMgt.ComposeRowID(DATABASE::"Prod. Order Line", Status.AsInteger(), "Prod. Order No.", '', "Line No.", 0));
+          ItemTrackingMgt.ComposeRowID(Enum::TableID::"Prod. Order Line".AsInteger(), Status.AsInteger(), "Prod. Order No.", '', "Line No.", 0));
     end;
 
     local procedure GetLocation(LocationCode: Code[10])
@@ -1241,7 +1234,7 @@ table 5406 "Prod. Order Line"
 
         "Bin Code" := '';
         if ("Location Code" <> '') and ("Item No." <> '') then begin
-            "Bin Code" := WMSManagement.GetLastOperationFromBinCode("Routing No.", "Routing Version Code", "Location Code", false, 0);
+            "Bin Code" := ProdOrderWarehouseMgt.GetLastOperationFromBinCode("Routing No.", "Routing Version Code", "Location Code", false, 0);
             GetLocation("Location Code");
             if "Bin Code" = '' then
                 "Bin Code" := Location."From-Production Bin Code";
@@ -1275,7 +1268,7 @@ table 5406 "Prod. Order Line"
 
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSource(DATABASE::"Prod. Order Line", Status.AsInteger(), "Prod. Order No.", 0, '', "Line No.");
+        ReservEntry.SetSource(Enum::TableID::"Prod. Order Line".AsInteger(), Status.AsInteger(), "Prod. Order No.", 0, '', "Line No.");
         ReservEntry.SetItemData("Item No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         ReservEntry."Expected Receipt Date" := "Due Date";
         ReservEntry."Shipment Date" := "Due Date";
@@ -1284,7 +1277,7 @@ table 5406 "Prod. Order Line"
 
     procedure SetReservationFilters(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSourceFilter(DATABASE::"Prod. Order Line", Status.AsInteger(), "Prod. Order No.", 0, false);
+        ReservEntry.SetSourceFilter(Enum::TableID::"Prod. Order Line".AsInteger(), Status.AsInteger(), "Prod. Order No.", 0, false);
         ReservEntry.SetSourceFilter('', "Line No.");
 
         OnAfterSetReservationFilters(ReservEntry, Rec);
@@ -1306,7 +1299,7 @@ table 5406 "Prod. Order Line"
     begin
         if "Bin Code" <> '' then begin
             GetLocation("Location Code");
-            if not Location."Directed Put-away and Pick" then
+            if not Location."Check Whse. Class" then
                 exit;
 
             if BinContent.Get(
@@ -1566,48 +1559,6 @@ table 5406 "Prod. Order Line"
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, CurrFieldNo);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Prod. Order Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Prod. Order Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDimTableIDs(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Prod. Order Line") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDimTableIDs(var ProdOrderLine: Record "Prod. Order Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var ProdOrderLine: Record "Prod. Order Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CallingFieldNo: Integer)
     begin
@@ -1623,13 +1574,6 @@ table 5406 "Prod. Order Line"
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var ProdOrderLine: Record "Prod. Order Line"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyFromItem(var ProdOrderLine: Record "Prod. Order Line"; Item: Record Item; var xProdOrderLine: Record "Prod. Order Line"; CurrentFieldNo: Integer)
     begin

@@ -135,9 +135,7 @@ page 10000 "Import Budget Information"
         BusinessUnitCode: Code[20];
         Description: Text[50];
         ReplaceOption: Option "Replace Current Budget","Add to Current Budget";
-        [InDataSet]
         GlobDim1Enable: Boolean;
-        [InDataSet]
         GlobDim2Enable: Boolean;
         Text19015020: Label '*';
         Text19080001: Label '*';

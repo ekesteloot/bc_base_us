@@ -1,14 +1,27 @@
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 6646 "Sales - Return Receipt"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './SalesReturnReceipt.rdlc';
     Caption = 'Sales - Return Receipt';
+    DefaultRenderingLayout = "SalesReturnReceipt.rdlc";
 
     dataset
     {
         dataitem("Return Receipt Header"; "Return Receipt Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Return Receipt';
             column(No_ReturnRcptHeader; "No.")
@@ -52,10 +65,10 @@ report 6646 "Sales - Return Receipt"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo1Picture; CompanyInfo1.Picture)
                     {
                     }
@@ -203,7 +216,7 @@ report 6646 "Sales - Return Receipt"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Return Receipt Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -250,9 +263,9 @@ report 6646 "Sales - Return Receipt"
                     }
                     dataitem("Return Receipt Line"; "Return Receipt Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Return Receipt Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(ShowInternalInfo; ShowInternalInfo)
                         {
                         }
@@ -288,7 +301,7 @@ report 6646 "Sales - Return Receipt"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText1; DimText)
                             {
                             }
@@ -355,11 +368,11 @@ report 6646 "Sales - Return Receipt"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(BilltoCustNo_ReturnRcptHdr; "Return Receipt Header"."Bill-to Customer No.")
                         {
                         }
@@ -427,6 +440,7 @@ report 6646 "Sales - Return Receipt"
                 Language: Codeunit Language;
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Return Receipt Header");
@@ -500,6 +514,24 @@ report 6646 "Sales - Return Receipt"
         end;
     }
 
+    rendering
+    {
+        layout("SalesReturnReceipt.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/History/SalesReturnReceipt.rdlc';
+            Caption = 'Standard Sales Return Receipt (RDLC)';
+            Summary = 'The Standard Sales Return Receipt (RDLC) provides a detailed layout.';
+        }
+        layout("SimpleSalesReturnReceipt.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/SimpleSalesReturnReceipt.docx';
+            Caption = 'Standard Sales Return Receipt (Word)';
+            Summary = 'The Standard Sales Return Receipt (Word) provides a basic layout.';
+        }
+    }
+
     labels
     {
     }
@@ -534,9 +566,6 @@ report 6646 "Sales - Return Receipt"
     var
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
         RespCenter: Record "Responsibility Center";
@@ -564,7 +593,6 @@ report 6646 "Sales - Return Receipt"
         LogInteraction: Boolean;
         OutputNo: Integer;
         TypeInt: Integer;
-        [InDataSet]
         LogInteractionEnable: Boolean;
 
         Text002: Label 'Sales - Return Receipt %1', Comment = '%1 = Document No.';
@@ -589,9 +617,14 @@ report 6646 "Sales - Return Receipt"
         BillToContactMobilePhoneNoLbl: Label 'Bill-to Contact Mobile Phone No.';
         BillToContactEmailLbl: Label 'Bill-to Contact E-Mail';
 
+    protected var
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
+
     procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Return Receipt") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Return Receipt") <> '';
     end;
 
     local procedure IsReportInPreviewMode(): Boolean

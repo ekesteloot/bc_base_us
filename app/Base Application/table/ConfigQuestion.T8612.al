@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8612 "Config. Question"
 {
     Caption = 'Config. Question';
@@ -15,7 +19,7 @@ table 8612 "Config. Question"
         {
             Caption = 'Question Area Code';
             Editable = false;
-            TableRelation = "Config. Question Area".Code WHERE("Questionnaire Code" = FIELD("Questionnaire Code"));
+            TableRelation = "Config. Question Area".Code where("Questionnaire Code" = field("Questionnaire Code"));
         }
         field(3; "No."; Integer)
         {
@@ -89,8 +93,8 @@ table 8612 "Config. Question"
         }
         field(11; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table ID"),
-                                                        "No." = FIELD("Field ID")));
+            CalcFormula = Lookup(Field.FieldName where(TableNo = field("Table ID"),
+                                                        "No." = field("Field ID")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -102,8 +106,8 @@ table 8612 "Config. Question"
         }
         field(12; "Field Caption"; Text[250])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table ID"),
-                                                              "No." = FIELD("Field ID")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table ID"),
+                                                              "No." = field("Field ID")));
             Caption = 'Field Caption';
             Editable = false;
             FieldClass = FlowField;

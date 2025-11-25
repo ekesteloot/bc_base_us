@@ -8,8 +8,8 @@ page 10029 "Sales Order Invoice Subform"
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Sales Line";
-    SourceTableView = WHERE("Document Type" = FILTER(Order),
-                            "Qty. Shipped Not Invoiced" = FILTER(<> 0));
+    SourceTableView = where("Document Type" = filter(Order),
+                            "Qty. Shipped Not Invoiced" = filter(<> 0));
 
     layout
     {
@@ -32,7 +32,7 @@ page 10029 "Sales Order Invoice Subform"
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         NoOnAfterValidate();
                     end;
                 }
@@ -57,7 +57,7 @@ page 10029 "Sales Order Invoice Subform"
                     ToolTip = 'Specifies the purchasing code for the item.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -70,14 +70,14 @@ page 10029 "Sales Order Invoice Subform"
                     Editable = false;
                     ToolTip = 'Specifies a description of the invoice line.';
                 }
-                field(Control26; "Drop Shipment")
+                field(Control26; Rec."Drop Shipment")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     ToolTip = 'Specifies whether to ship the items on the line directly to your customer.';
                     Visible = false;
                 }
-                field(Control106; "Special Order")
+                field(Control106; Rec."Special Order")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -214,7 +214,7 @@ page 10029 "Sales Order Invoice Subform"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        ShowItemChargeAssgnt();
+                        Rec.ShowItemChargeAssgnt();
                         UpdateForm(false);
                     end;
                 }
@@ -228,7 +228,7 @@ page 10029 "Sales Order Invoice Subform"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        ShowItemChargeAssgnt();
+                        Rec.ShowItemChargeAssgnt();
                         CurrPage.Update(false);
                     end;
                 }
@@ -260,84 +260,84 @@ page 10029 "Sales Order Invoice Subform"
                 {
                     ApplicationArea = Basic, Suite;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Basic, Suite;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Basic, Suite;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Basic, Suite;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Basic, Suite;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Basic, Suite;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
             }
@@ -401,7 +401,7 @@ page 10029 "Sales Order Invoice Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item Charge &Assignment")
@@ -409,7 +409,7 @@ page 10029 "Sales Order Invoice Subform"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item Charge &Assignment';
                     Ellipsis = true;
-                    Enabled = Type = Type::"Charge (Item)";
+                    Enabled = Rec.Type = Rec.Type::"Charge (Item)";
                     ToolTip = 'Record additional direct costs, for example for freight. This action is available only for Charge (Item) line types.';
 
                     trigger OnAction()
@@ -422,12 +422,12 @@ page 10029 "Sales Order Invoice Subform"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
-                    Enabled = Type = Type::Item;
+                    Enabled = Rec.Type = Rec.Type::Item;
                     ToolTip = 'View or edit serial and lot numbers for the selected item. This action is available only for lines that contain an item.';
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }
@@ -436,12 +436,12 @@ page 10029 "Sales Order Invoice Subform"
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Type := xRec.Type;
+        Rec.Type := xRec.Type;
         Clear(ShortcutDimCode);
     end;
 
@@ -471,7 +471,7 @@ page 10029 "Sales Order Invoice Subform"
         PurchHeader: Record "Purchase Header";
         PurchOrder: Page "Purchase Order";
     begin
-        PurchHeader.SetRange("No.", "Purchase Order No.");
+        PurchHeader.SetRange("No.", Rec."Purchase Order No.");
         PurchOrder.SetTableView(PurchHeader);
         PurchOrder.Editable := false;
         PurchOrder.Run();
@@ -489,8 +489,8 @@ page 10029 "Sales Order Invoice Subform"
 
     procedure ShowLineReservation()
     begin
-        Find();
-        ShowReservation();
+        Rec.Find();
+        Rec.ShowReservation();
     end;
 
     procedure ItemAvailability(AvailabilityType: Option Date,Variant,Location,Bin)
@@ -500,12 +500,12 @@ page 10029 "Sales Order Invoice Subform"
 
     procedure ShowReservationEntries()
     begin
-        ShowReservationEntries(true);
+        Rec.ShowReservationEntries(true);
     end;
 
     procedure ShowNonstockItems()
     begin
-        ShowNonstock();
+        Rec.ShowNonstock();
     end;
 
     procedure ShowTracking()
@@ -518,7 +518,7 @@ page 10029 "Sales Order Invoice Subform"
 
     procedure ItemChargeAssgnt()
     begin
-        ShowItemChargeAssgnt();
+        Rec.ShowItemChargeAssgnt();
     end;
 
     procedure UpdateForm(SetSaveRecord: Boolean)
@@ -529,7 +529,7 @@ page 10029 "Sales Order Invoice Subform"
     local procedure NoOnAfterValidate()
     begin
         InsertExtendedText(false);
-        if (Type = Type::"Charge (Item)") and ("No." <> xRec."No.") and
+        if (Rec.Type = Rec.Type::"Charge (Item)") and (Rec."No." <> xRec."No.") and
            (xRec."No." <> '')
         then
             CurrPage.SaveRecord();
@@ -537,18 +537,18 @@ page 10029 "Sales Order Invoice Subform"
 
     local procedure QuantityOnAfterValidate()
     begin
-        if Reserve = Reserve::Always then begin
+        if Rec.Reserve = Rec.Reserve::Always then begin
             CurrPage.SaveRecord();
-            AutoReserve();
+            Rec.AutoReserve();
             CurrPage.Update(false);
         end;
     end;
 
     local procedure UnitofMeasureCodeOnAfterValidate()
     begin
-        if Reserve = Reserve::Always then begin
+        if Rec.Reserve = Rec.Reserve::Always then begin
             CurrPage.SaveRecord();
-            AutoReserve();
+            Rec.AutoReserve();
             CurrPage.Update(false);
         end;
     end;

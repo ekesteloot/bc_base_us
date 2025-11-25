@@ -11,11 +11,11 @@ table 780 "Certificate of Supply"
         field(2; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = IF ("Document Type" = FILTER("Sales Shipment")) "Sales Shipment Header"."No."
-            ELSE
-            IF ("Document Type" = FILTER("Service Shipment")) "Service Shipment Header"."No."
-            ELSE
-            IF ("Document Type" = FILTER("Return Shipment")) "Return Shipment Header"."No.";
+            TableRelation = if ("Document Type" = filter("Sales Shipment")) "Sales Shipment Header"."No."
+            else
+            if ("Document Type" = filter("Service Shipment")) "Service Shipment Header"."No."
+            else
+            if ("Document Type" = filter("Return Shipment")) "Return Shipment Header"."No.";
         }
         field(3; Status; Option)
         {

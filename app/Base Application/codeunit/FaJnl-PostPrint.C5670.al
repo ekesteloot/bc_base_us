@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+
 codeunit 5670 "FA. Jnl.-Post+Print"
 {
     TableNo = "FA Journal Line";
@@ -6,7 +12,7 @@ codeunit 5670 "FA. Jnl.-Post+Print"
     begin
         FAJnlLine.Copy(Rec);
         Code();
-        Copy(FAJnlLine);
+        Rec.Copy(FAJnlLine);
     end;
 
     var

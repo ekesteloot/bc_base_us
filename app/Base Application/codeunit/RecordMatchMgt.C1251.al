@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 codeunit 1251 "Record Match Mgt."
 {
     trigger OnRun()

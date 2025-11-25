@@ -1,3 +1,10 @@
+namespace Microsoft.BankMgt.Statement;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.Reconciliation;
+
 codeunit 1340 "Undo Bank Statement (Yes/No)"
 {
     Permissions = TableData "Bank Account Ledger Entry" = rm,

@@ -1,3 +1,13 @@
+﻿namespace System.Environment.Configuration;
+
+using System.Automation;
+using System.Email;
+using System.IO;
+using System.Reflection;
+using System.Security.User;
+using System.Threading;
+using System.Utilities;
+
 codeunit 1509 "Notification Entry Dispatcher"
 {
     Permissions = TableData "User Setup" = r,
@@ -8,10 +18,10 @@ codeunit 1509 "Notification Entry Dispatcher"
 
     trigger OnRun()
     begin
-        if "Parameter String" = '' then
+        if Rec."Parameter String" = '' then
             DispatchInstantNotifications()
         else
-            DispatchNotificationTypeForUser("Parameter String");
+            DispatchNotificationTypeForUser(Rec."Parameter String");
     end;
 
     var

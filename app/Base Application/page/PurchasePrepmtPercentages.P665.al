@@ -1,3 +1,13 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Vendor;
+using System.Text;
+
 page 665 "Purchase Prepmt. Percentages"
 {
     Caption = 'Purchase Prepmt. Percentages';
@@ -143,29 +153,29 @@ page 665 "Purchase Prepmt. Percentages"
 
     local procedure GetRecFilters()
     begin
-        if HasFilter then begin
-            VendNoFilter := GetFilter("Vendor No.");
-            ItemNoFilter := GetFilter("Item No.");
-            Evaluate(StartingDateFilter, GetFilter("Starting Date"));
+        if Rec.HasFilter then begin
+            VendNoFilter := Rec.GetFilter("Vendor No.");
+            ItemNoFilter := Rec.GetFilter("Item No.");
+            Evaluate(StartingDateFilter, Rec.GetFilter("Starting Date"));
         end;
     end;
 
     procedure SetRecFilters()
     begin
         if VendNoFilter <> '' then
-            SetFilter("Vendor No.", VendNoFilter)
+            Rec.SetFilter("Vendor No.", VendNoFilter)
         else
-            SetRange("Vendor No.");
+            Rec.SetRange("Vendor No.");
 
         if StartingDateFilter <> '' then
-            SetFilter("Starting Date", StartingDateFilter)
+            Rec.SetFilter("Starting Date", StartingDateFilter)
         else
-            SetRange("Starting Date");
+            Rec.SetRange("Starting Date");
 
         if ItemNoFilter <> '' then
-            SetFilter("Item No.", ItemNoFilter)
+            Rec.SetFilter("Item No.", ItemNoFilter)
         else
-            SetRange("Item No.");
+            Rec.SetRange("Item No.");
 
         CurrPage.Update(false);
     end;

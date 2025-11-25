@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 codeunit 1547 "Workflow Webhook Sub Delete"
 {
     // // Intended to be called by Task Scheduler as part of cleaning up when
@@ -10,19 +12,19 @@ codeunit 1547 "Workflow Webhook Sub Delete"
         WorkflowWebhookSubBuffer: Record "Workflow Webhook Sub Buffer";
     begin
         // disable corresponding WorkflowWebhookSubBuffer entry
-        WorkflowWebhookSubBuffer.SetRange("WF Definition Id", Code);
+        WorkflowWebhookSubBuffer.SetRange("WF Definition Id", Rec.Code);
         if WorkflowWebhookSubBuffer.FindFirst() then
             WorkflowWebhookSubBuffer.Delete();
 
         // disable workflow
-        if Enabled then begin
-            Validate(Enabled, false);
-            Modify();
+        if Rec.Enabled then begin
+            Rec.Validate(Enabled, false);
+            Rec.Modify();
         end;
 
         // delete workflow
-        if CanDelete(false) then
-            Delete(true);
+        if Rec.CanDelete(false) then
+            Rec.Delete(true);
     end;
 }
 

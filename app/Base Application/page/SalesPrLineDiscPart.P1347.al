@@ -1,4 +1,9 @@
 #if not CLEAN21
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Sales.Customer;
+
 page 1347 "Sales Pr. & Line Disc. Part"
 {
     Caption = 'Sales Prices';
@@ -38,7 +43,7 @@ page 1347 "Sales Pr. & Line Disc. Part"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the discount is valid for an item or for an item discount group.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     Enabled = CodeIsVisible;
@@ -58,13 +63,13 @@ page 1347 "Sales Pr. & Line Disc. Part"
                 field("Line Discount %"; Rec."Line Discount %")
                 {
                     ApplicationArea = Basic, Suite;
-                    Enabled = "Line Type" = 1;
+                    Enabled = Rec."Line Type" = 1;
                     ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = Basic, Suite;
-                    Enabled = "Line Type" = 2;
+                    Enabled = Rec."Line Type" = 2;
                     ToolTip = 'Specifies the price of one unit of the item or resource. You can enter a price manually or have it entered according to the Price/Profit Calculation field on the related card.';
                 }
                 field("Starting Date"; Rec."Starting Date")
@@ -134,7 +139,7 @@ page 1347 "Sales Pr. & Line Disc. Part"
 
                 trigger OnAction()
                 begin
-                    FilterToActualRecords();
+                    Rec.FilterToActualRecords();
                 end;
             }
             action("Show All")
@@ -146,7 +151,7 @@ page 1347 "Sales Pr. & Line Disc. Part"
 
                 trigger OnAction()
                 begin
-                    Reset();
+                    Rec.Reset();
                 end;
             }
             action("Refresh Data")
@@ -163,11 +168,11 @@ page 1347 "Sales Pr. & Line Disc. Part"
                 begin
                     if GetLoadedItemNo() <> '' then
                         if Item.Get(GetLoadedItemNo()) then begin
-                            LoadDataForItem(Item);
+                            Rec.LoadDataForItem(Item);
                             exit;
                         end;
                     if Customer.Get(GetLoadedCustNo()) then
-                        LoadDataForCustomer(Customer)
+                        Rec.LoadDataForCustomer(Customer)
                 end;
             }
             action("Set Special Prices")
@@ -186,9 +191,9 @@ page 1347 "Sales Pr. & Line Disc. Part"
                     SalesPrice: Record "Sales Price";
                 begin
                     SalesPrice.SetCurrentKey("Sales Type", "Sales Code", "Item No.");
-                    SalesPrice.SetRange("Sales Type", "Sales Type");
-                    SalesPrice.SetRange("Sales Code", "Sales Code");
-                    SalesPrice.SetRange("Item No.", Code);
+                    SalesPrice.SetRange("Sales Type", Rec."Sales Type");
+                    SalesPrice.SetRange("Sales Code", Rec."Sales Code");
+                    SalesPrice.SetRange("Item No.", Rec.Code);
                     Page.Run(Page::"Sales Prices", SalesPrice);
                 end;
             }
@@ -207,10 +212,10 @@ page 1347 "Sales Pr. & Line Disc. Part"
                     SalesLineDiscount: Record "Sales Line Discount";
                 begin
                     SalesLineDiscount.SetCurrentKey("Sales Type", "Sales Code", Type, Code);
-                    SalesLineDiscount.SetRange("Sales Type", "Sales Type");
-                    SalesLineDiscount.SetRange("Sales Code", "Sales Code");
-                    SalesLineDiscount.SetRange(Type, Type);
-                    SalesLineDiscount.SetRange(Code, Code);
+                    SalesLineDiscount.SetRange("Sales Type", Rec."Sales Type");
+                    SalesLineDiscount.SetRange("Sales Code", Rec."Sales Code");
+                    SalesLineDiscount.SetRange(Type, Rec.Type);
+                    SalesLineDiscount.SetRange(Code, Rec.Code);
                     Page.Run(Page::"Sales Line Discounts", SalesLineDiscount);
                 end;
             }
@@ -220,12 +225,12 @@ page 1347 "Sales Pr. & Line Disc. Part"
     trigger OnFindRecord(Which: Text): Boolean
     begin
         RefreshOnFind();
-        exit(find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnAfterGetCurrRecord()
     begin
-        SalesPriceIsEnabled := ("Line Type" = "Line Type"::"Sales Price");
+        SalesPriceIsEnabled := (Rec."Line Type" = Rec."Line Type"::"Sales Price");
     end;
 
     local procedure RefreshOnFind()
@@ -242,15 +247,15 @@ page 1347 "Sales Pr. & Line Disc. Part"
         // Read the filter sent through SubPageLink. The filter that is expected is on 'Sales Type' and 'Sales Code'.
         // If 'Sales Type' is Customer, then the context is Customer, if it is not Customer or it is not defined, then
         // it is assumed that the context is Item. The filter is removed after reading.
-        currFilterGroup := FilterGroup;
-        FilterGroup(4);
-        if GetFilters = '' then begin
-            FilterGroup(CurrFilterGroup);
+        currFilterGroup := Rec.FilterGroup;
+        Rec.FilterGroup(4);
+        if Rec.GetFilters = '' then begin
+            Rec.FilterGroup(CurrFilterGroup);
             exit;
         end;
 
-        SalesCode := GetRangeMax("Sales Code");
-        SalesTypeAsText := GetFilter("Sales Type");
+        SalesCode := Rec.GetRangeMax("Sales Code");
+        SalesTypeAsText := Rec.GetFilter("Sales Type");
 
         if Evaluate(DummySalesPriceAndLineDiscBuff."Sales Type", SalesTypeAsText) then
             if (DummySalesPriceAndLineDiscBuff."Sales Type" = DummySalesPriceAndLineDiscBuff."Sales Type"::Customer) then
@@ -274,19 +279,19 @@ page 1347 "Sales Pr. & Line Disc. Part"
                 if Item.Get(SalesCode) then
                     LoadItem(Item);
             end;
-        Reset();
-        FilterGroup(CurrFilterGroup);
+        Rec.Reset();
+        Rec.FilterGroup(CurrFilterGroup);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        if ("Loaded Customer No." = GetLoadedCustNo()) and ("Loaded Item No." = GetLoadedItemNo()) then
+        if (Rec."Loaded Customer No." = GetLoadedCustNo()) and (Rec."Loaded Item No." = GetLoadedItemNo()) then
             exit;
 
-        "Loaded Item No." := GetLoadedItemNo();
-        "Loaded Customer No." := GetLoadedCustNo();
-        "Loaded Price Group" := GetLoadedPriceGroup();
-        "Loaded Disc. Group" := GetLoadedDiscGroup();
+        Rec."Loaded Item No." := GetLoadedItemNo();
+        Rec."Loaded Customer No." := GetLoadedCustNo();
+        Rec."Loaded Price Group" := GetLoadedPriceGroup();
+        Rec."Loaded Disc. Group" := GetLoadedDiscGroup();
     end;
 
     var
@@ -319,7 +324,7 @@ page 1347 "Sales Pr. & Line Disc. Part"
         loadedDiscGroup := Item."Item Disc. Group";
         loadedPriceGroup := '';
 
-        LoadDataForItem(Item);
+        Rec.LoadDataForItem(Item);
     end;
 
     procedure LoadCustomer(var Customer: Record Customer)
@@ -333,7 +338,7 @@ page 1347 "Sales Pr. & Line Disc. Part"
         loadedDiscGroup := Customer."Customer Disc. Group";
         if GuiAllowed then
             MaxNoOfLinesToLoad := 50; // to prevent loading of 1000's of entries.
-        NoOfLinesLoaded := LoadDataForCustomer(Customer, MaxNoOfLinesToLoad);
+        NoOfLinesLoaded := Rec.LoadDataForCustomer(Customer, MaxNoOfLinesToLoad);
         if (MaxNoOfLinesToLoad > 0) and (NoOfLinesLoaded >= MaxNoOfLinesToLoad) then begin
             MoreRowsNotification.Message := StrSubstNo(MaxRowsLoadedMsg, MaxNoOfLinesToLoad);
             MoreRowsNotification.Scope := NotificationScope::LocalScope;
@@ -352,8 +357,8 @@ page 1347 "Sales Pr. & Line Disc. Part"
         if loadedCustNo = NewCustomerNo then
             exit;
         loadedCustNo := NewCustomerNo;
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         CurrPage.Update(false);
     end;
 
@@ -377,7 +382,7 @@ page 1347 "Sales Pr. & Line Disc. Part"
         Item: Record Item;
     begin
         Item.Get(loadedItemNo);
-        UpdatePriceIncludesVatAndPrices(Item, IncludesVat);
+        Rec.UpdatePriceIncludesVatAndPrices(Item, IncludesVat);
     end;
 }
 #endif

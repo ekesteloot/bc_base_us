@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 7131 "Analysis Source Type"
 {
     Extensible = true;

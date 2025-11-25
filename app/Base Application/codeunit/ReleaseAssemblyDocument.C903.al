@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.InventoryMgt.Setup;
+
 codeunit 903 "Release Assembly Document"
 {
     Permissions = TableData "Assembly Header" = rm,
@@ -10,17 +14,17 @@ codeunit 903 "Release Assembly Document"
         InvtSetup: Record "Inventory Setup";
         WhseAssemblyRelease: Codeunit "Whse.-Assembly Release";
     begin
-        if Status = Status::Released then
+        if Rec.Status = Rec.Status::Released then
             exit;
 
         OnBeforeReleaseAssemblyDoc(Rec);
 
-        AssemblyLine.SetRange("Document Type", "Document Type");
-        AssemblyLine.SetRange("Document No.", "No.");
+        AssemblyLine.SetRange("Document Type", Rec."Document Type");
+        AssemblyLine.SetRange("Document No.", Rec."No.");
         AssemblyLine.SetFilter(Type, '<>%1', AssemblyLine.Type::" ");
         AssemblyLine.SetFilter(Quantity, '<>0');
         if not AssemblyLine.Find('-') then
-            Error(Text001, "Document Type", "No.");
+            Error(Text001, Rec."Document Type", Rec."No.");
 
         InvtSetup.Get();
         if InvtSetup."Location Mandatory" then begin
@@ -32,10 +36,10 @@ codeunit 903 "Release Assembly Document"
                 until AssemblyLine.Next() = 0;
         end;
 
-        Status := Status::Released;
-        Modify();
+        Rec.Status := Rec.Status::Released;
+        Rec.Modify();
 
-        if "Document Type" = "Document Type"::Order then
+        if Rec."Document Type" = Rec."Document Type"::Order then
             WhseAssemblyRelease.Release(Rec);
 
         OnAfterReleaseAssemblyDoc(Rec);

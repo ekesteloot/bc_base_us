@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8611 "Config. Question Area"
 {
     Caption = 'Config. Question Area';
@@ -12,7 +14,7 @@ page 8611 "Config. Question Area"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     NotBlank = true;
@@ -44,10 +46,10 @@ page 8611 "Config. Question Area"
             part(ConfigQuestionSubform; "Config. Question Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Questionnaire Code" = FIELD("Questionnaire Code"),
-                              "Question Area Code" = FIELD(Code);
-                SubPageView = SORTING("Questionnaire Code", "Question Area Code", "No.")
-                              ORDER(Ascending);
+                SubPageLink = "Questionnaire Code" = field("Questionnaire Code"),
+                              "Question Area Code" = field(Code);
+                SubPageView = sorting("Questionnaire Code", "Question Area Code", "No.")
+                              order(Ascending);
             }
         }
         area(factboxes)

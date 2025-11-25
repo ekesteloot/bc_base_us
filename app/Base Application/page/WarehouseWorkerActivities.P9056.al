@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.RoleCenters;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Worksheet;
+
 page 9056 "Warehouse Worker Activities"
 {
     Caption = 'Activities';

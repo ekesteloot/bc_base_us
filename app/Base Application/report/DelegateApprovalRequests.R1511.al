@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 report 1511 "Delegate Approval Requests"
 {
     Caption = 'Delegate Approval Requests';

@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Calculation;
+
+using Microsoft.Pricing.PriceList;
+
 page 7008 "Dtld. Price Calculation Setup"
 {
     Caption = 'Exceptions for';
@@ -117,15 +125,10 @@ page 7008 "Dtld. Price Calculation Setup"
     var
         CurrPriceCalculationSetup: Record "Price Calculation Setup";
         PriceUXManagement: Codeunit "Price UX Management";
-        [InDataSet]
         AssetVisible: Boolean;
-        [InDataSet]
         ProductVisible: Boolean;
-        [InDataSet]
         IsSetupCodeVisible: Boolean;
-        [InDataSet]
         IsAssetNoEditable: Boolean;
-        [InDataSet]
         UseCustomLookup: Boolean;
         Heading: text;
 

@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Ledger;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+
 query 268 "Job Ledger Entries"
 {
     Caption = 'Job Ledger Entries';

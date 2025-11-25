@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using System.Reflection;
+using System.Text;
+
 page 1217 "Data Exch Field Mapping Part"
 {
     Caption = 'Data Exchange Field Mapping';
@@ -18,7 +23,7 @@ page 1217 "Data Exch Field Mapping Part"
 
                     trigger OnValidate()
                     begin
-                        ColumnCaptionText := GetColumnCaption();
+                        ColumnCaptionText := Rec.GetColumnCaption();
                     end;
                 }
                 field(ColumnCaptionText; ColumnCaptionText)
@@ -40,19 +45,19 @@ page 1217 "Data Exch Field Mapping Part"
                         TableFilter: Record "Table Filter";
                         FieldSelection: Codeunit "Field Selection";
                     begin
-                        Field.SetRange(TableNo, "Table ID");
+                        Field.SetRange(TableNo, Rec."Table ID");
                         if FieldSelection.Open(Field) then begin
-                            if Field."No." = "Field ID" then
+                            if Field."No." = Rec."Field ID" then
                                 exit;
                             TableFilter.CheckDuplicateField(Field);
-                            FillSourceRecord(Field);
-                            FieldCaptionText := GetFieldCaption();
+                            Rec.FillSourceRecord(Field);
+                            FieldCaptionText := Rec.GetFieldCaption();
                         end;
                     end;
 
                     trigger OnValidate()
                     begin
-                        FieldCaptionText := GetFieldCaption();
+                        FieldCaptionText := Rec.GetFieldCaption();
                     end;
                 }
                 field(FieldCaptionText; FieldCaptionText)
@@ -62,12 +67,12 @@ page 1217 "Data Exch Field Mapping Part"
                     Editable = false;
                     ToolTip = 'Specifies the caption of the field in the external file that is mapped to the field in the Target Table ID field, when you are using an intermediate table for data import.';
                 }
-                field(Optional; Optional)
+                field(Optional; Rec.Optional)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the map will be skipped if the field is empty. If you do not select this check box, then an export error will occur if the field is empty. When the Use as Intermediate Table check box is selected, the Validate Only check box specifies that the element-to-field map is not used to convert data, but only to validate data.';
                 }
-                field(Multiplier; Multiplier)
+                field(Multiplier; Rec.Multiplier)
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
@@ -82,7 +87,7 @@ page 1217 "Data Exch Field Mapping Part"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the current value will be overwritten by a new value.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the order that the field mappings must be processed. The field mapping with the highest number will be processed first.';
@@ -97,8 +102,8 @@ page 1217 "Data Exch Field Mapping Part"
 
     trigger OnAfterGetRecord()
     begin
-        ColumnCaptionText := GetColumnCaption();
-        FieldCaptionText := GetFieldCaption();
+        ColumnCaptionText := Rec.GetColumnCaption();
+        FieldCaptionText := Rec.GetFieldCaption();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -108,9 +113,7 @@ page 1217 "Data Exch Field Mapping Part"
     end;
 
     var
-        [InDataSet]
         ColumnCaptionText: Text;
-        [InDataSet]
         FieldCaptionText: Text;
 }
 

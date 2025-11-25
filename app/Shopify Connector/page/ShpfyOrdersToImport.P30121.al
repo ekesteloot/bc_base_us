@@ -185,10 +185,10 @@ page 30121 "Shpfy Orders to Import"
                 trigger OnAction()
                 var
                     SelectedRec: Record "Shpfy Orders to Import";
-                    Background: Codeunit "Shpfy Background Syncs";
+                    BackgroundSyncs: Codeunit "Shpfy Background Syncs";
                 begin
                     CurrPage.SetSelectionFilter(SelectedRec);
-                    Background.OrderSync(SelectedRec);
+                    BackgroundSyncs.OrderSync(SelectedRec);
                 end;
             }
         }

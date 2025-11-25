@@ -1,7 +1,21 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Company;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Reflection;
+
 report 10019 "G/L Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/GLRegister.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/GLRegister.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'G/L Register';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +25,7 @@ report 10019 "G/L Register"
     {
         dataitem("G/L Register"; "G/L Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Source Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -88,7 +102,7 @@ report 10019 "G/L Register"
             }
             dataitem("G/L Entry"; "G/L Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 RequestFilterFields = "Posting Date", "Document Type";
                 column(G_L_Entry__Posting_Date_; Format("Posting Date"))
                 {
@@ -152,8 +166,8 @@ report 10019 "G/L Register"
                 }
                 dataitem("Dimension Set Entry"; "Dimension Set Entry")
                 {
-                    DataItemLink = "Dimension Set ID" = FIELD("Dimension Set ID");
-                    DataItemTableView = SORTING("Dimension Set ID", "Dimension Code");
+                    DataItemLink = "Dimension Set ID" = field("Dimension Set ID");
+                    DataItemTableView = sorting("Dimension Set ID", "Dimension Code");
                     column(Dimension_Set_Entry__Dimension_Code_; "Dimension Code")
                     {
                     }

@@ -1,3 +1,11 @@
+namespace Microsoft.CRM.Analysis;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
+
 table 5102 "RM Matrix Management"
 {
     Caption = 'RM Matrix Management';
@@ -23,21 +31,21 @@ table 5102 "RM Matrix Management"
         }
         field(5; "No. of Opportunities"; Integer)
         {
-            CalcFormula = Count("Opportunity Entry" WHERE(Active = CONST(true),
-                                                           "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                           "Campaign No." = FIELD("Campaign Filter"),
-                                                           "Contact No." = FIELD("Contact Filter"),
-                                                           "Contact Company No." = FIELD("Contact Company Filter"),
-                                                           "Estimated Close Date" = FIELD("Date Filter"),
-                                                           "Action Taken" = FIELD("Action Taken Filter"),
-                                                           "Sales Cycle Code" = FIELD("Sales Cycle Filter"),
-                                                           "Sales Cycle Stage" = FIELD("Sales Cycle Stage Filter"),
-                                                           "Probability %" = FIELD("Probability % Filter"),
-                                                           "Completed %" = FIELD("Completed % Filter"),
-                                                           "Chances of Success %" = FIELD("Chances of Success % Filter"),
-                                                           "Close Opportunity Code" = FIELD("Close Opportunity Filter"),
-                                                           "Estimated Value (LCY)" = FIELD("Estimated Value Filter"),
-                                                           "Calcd. Current Value (LCY)" = FIELD("Calcd. Current Value Filter")));
+            CalcFormula = count("Opportunity Entry" where(Active = const(true),
+                                                           "Salesperson Code" = field("Salesperson Filter"),
+                                                           "Campaign No." = field("Campaign Filter"),
+                                                           "Contact No." = field("Contact Filter"),
+                                                           "Contact Company No." = field("Contact Company Filter"),
+                                                           "Estimated Close Date" = field("Date Filter"),
+                                                           "Action Taken" = field("Action Taken Filter"),
+                                                           "Sales Cycle Code" = field("Sales Cycle Filter"),
+                                                           "Sales Cycle Stage" = field("Sales Cycle Stage Filter"),
+                                                           "Probability %" = field("Probability % Filter"),
+                                                           "Completed %" = field("Completed % Filter"),
+                                                           "Chances of Success %" = field("Chances of Success % Filter"),
+                                                           "Close Opportunity Code" = field("Close Opportunity Filter"),
+                                                           "Estimated Value (LCY)" = field("Estimated Value Filter"),
+                                                           "Calcd. Current Value (LCY)" = field("Calcd. Current Value Filter")));
             Caption = 'No. of Opportunities';
             Editable = false;
             FieldClass = FlowField;
@@ -45,21 +53,21 @@ table 5102 "RM Matrix Management"
         field(6; "Estimated Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Opportunity Entry"."Estimated Value (LCY)" WHERE(Active = CONST(true),
-                                                                                 "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                                                 "Campaign No." = FIELD("Campaign Filter"),
-                                                                                 "Contact No." = FIELD("Contact Filter"),
-                                                                                 "Contact Company No." = FIELD("Contact Company Filter"),
-                                                                                 "Estimated Close Date" = FIELD("Date Filter"),
-                                                                                 "Action Taken" = FIELD("Action Taken Filter"),
-                                                                                 "Sales Cycle Code" = FIELD("Sales Cycle Filter"),
-                                                                                 "Sales Cycle Stage" = FIELD("Sales Cycle Stage Filter"),
-                                                                                 "Probability %" = FIELD("Probability % Filter"),
-                                                                                 "Completed %" = FIELD("Completed % Filter"),
-                                                                                 "Chances of Success %" = FIELD("Chances of Success % Filter"),
-                                                                                 "Close Opportunity Code" = FIELD("Close Opportunity Filter"),
-                                                                                 "Estimated Value (LCY)" = FIELD("Estimated Value Filter"),
-                                                                                 "Calcd. Current Value (LCY)" = FIELD("Calcd. Current Value Filter")));
+            CalcFormula = sum("Opportunity Entry"."Estimated Value (LCY)" where(Active = const(true),
+                                                                                 "Salesperson Code" = field("Salesperson Filter"),
+                                                                                 "Campaign No." = field("Campaign Filter"),
+                                                                                 "Contact No." = field("Contact Filter"),
+                                                                                 "Contact Company No." = field("Contact Company Filter"),
+                                                                                 "Estimated Close Date" = field("Date Filter"),
+                                                                                 "Action Taken" = field("Action Taken Filter"),
+                                                                                 "Sales Cycle Code" = field("Sales Cycle Filter"),
+                                                                                 "Sales Cycle Stage" = field("Sales Cycle Stage Filter"),
+                                                                                 "Probability %" = field("Probability % Filter"),
+                                                                                 "Completed %" = field("Completed % Filter"),
+                                                                                 "Chances of Success %" = field("Chances of Success % Filter"),
+                                                                                 "Close Opportunity Code" = field("Close Opportunity Filter"),
+                                                                                 "Estimated Value (LCY)" = field("Estimated Value Filter"),
+                                                                                 "Calcd. Current Value (LCY)" = field("Calcd. Current Value Filter")));
             Caption = 'Estimated Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -67,21 +75,21 @@ table 5102 "RM Matrix Management"
         field(7; "Calcd. Current Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Opportunity Entry"."Calcd. Current Value (LCY)" WHERE(Active = CONST(true),
-                                                                                      "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                                                      "Campaign No." = FIELD("Campaign Filter"),
-                                                                                      "Contact No." = FIELD("Contact Filter"),
-                                                                                      "Contact Company No." = FIELD("Contact Company Filter"),
-                                                                                      "Estimated Close Date" = FIELD("Date Filter"),
-                                                                                      "Action Taken" = FIELD("Action Taken Filter"),
-                                                                                      "Sales Cycle Code" = FIELD("Sales Cycle Filter"),
-                                                                                      "Sales Cycle Stage" = FIELD("Sales Cycle Stage Filter"),
-                                                                                      "Probability %" = FIELD("Probability % Filter"),
-                                                                                      "Completed %" = FIELD("Completed % Filter"),
-                                                                                      "Chances of Success %" = FIELD("Chances of Success % Filter"),
-                                                                                      "Close Opportunity Code" = FIELD("Close Opportunity Filter"),
-                                                                                      "Estimated Value (LCY)" = FIELD("Estimated Value Filter"),
-                                                                                      "Calcd. Current Value (LCY)" = FIELD("Calcd. Current Value Filter")));
+            CalcFormula = sum("Opportunity Entry"."Calcd. Current Value (LCY)" where(Active = const(true),
+                                                                                      "Salesperson Code" = field("Salesperson Filter"),
+                                                                                      "Campaign No." = field("Campaign Filter"),
+                                                                                      "Contact No." = field("Contact Filter"),
+                                                                                      "Contact Company No." = field("Contact Company Filter"),
+                                                                                      "Estimated Close Date" = field("Date Filter"),
+                                                                                      "Action Taken" = field("Action Taken Filter"),
+                                                                                      "Sales Cycle Code" = field("Sales Cycle Filter"),
+                                                                                      "Sales Cycle Stage" = field("Sales Cycle Stage Filter"),
+                                                                                      "Probability %" = field("Probability % Filter"),
+                                                                                      "Completed %" = field("Completed % Filter"),
+                                                                                      "Chances of Success %" = field("Chances of Success % Filter"),
+                                                                                      "Close Opportunity Code" = field("Close Opportunity Filter"),
+                                                                                      "Estimated Value (LCY)" = field("Estimated Value Filter"),
+                                                                                      "Calcd. Current Value (LCY)" = field("Calcd. Current Value Filter")));
             Caption = 'Calcd. Current Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -89,21 +97,21 @@ table 5102 "RM Matrix Management"
         field(8; "Avg. Estimated Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Average("Opportunity Entry"."Estimated Value (LCY)" WHERE(Active = CONST(true),
-                                                                                     "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                                                     "Campaign No." = FIELD("Campaign Filter"),
-                                                                                     "Contact No." = FIELD("Contact Filter"),
-                                                                                     "Contact Company No." = FIELD("Contact Company Filter"),
-                                                                                     "Estimated Close Date" = FIELD("Date Filter"),
-                                                                                     "Action Taken" = FIELD("Action Taken Filter"),
-                                                                                     "Sales Cycle Code" = FIELD("Sales Cycle Filter"),
-                                                                                     "Sales Cycle Stage" = FIELD("Sales Cycle Stage Filter"),
-                                                                                     "Probability %" = FIELD("Probability % Filter"),
-                                                                                     "Completed %" = FIELD("Completed % Filter"),
-                                                                                     "Chances of Success %" = FIELD("Chances of Success % Filter"),
-                                                                                     "Close Opportunity Code" = FIELD("Close Opportunity Filter"),
-                                                                                     "Estimated Value (LCY)" = FIELD("Estimated Value Filter"),
-                                                                                     "Calcd. Current Value (LCY)" = FIELD("Calcd. Current Value Filter")));
+            CalcFormula = Average("Opportunity Entry"."Estimated Value (LCY)" where(Active = const(true),
+                                                                                     "Salesperson Code" = field("Salesperson Filter"),
+                                                                                     "Campaign No." = field("Campaign Filter"),
+                                                                                     "Contact No." = field("Contact Filter"),
+                                                                                     "Contact Company No." = field("Contact Company Filter"),
+                                                                                     "Estimated Close Date" = field("Date Filter"),
+                                                                                     "Action Taken" = field("Action Taken Filter"),
+                                                                                     "Sales Cycle Code" = field("Sales Cycle Filter"),
+                                                                                     "Sales Cycle Stage" = field("Sales Cycle Stage Filter"),
+                                                                                     "Probability %" = field("Probability % Filter"),
+                                                                                     "Completed %" = field("Completed % Filter"),
+                                                                                     "Chances of Success %" = field("Chances of Success % Filter"),
+                                                                                     "Close Opportunity Code" = field("Close Opportunity Filter"),
+                                                                                     "Estimated Value (LCY)" = field("Estimated Value Filter"),
+                                                                                     "Calcd. Current Value (LCY)" = field("Calcd. Current Value Filter")));
             Caption = 'Avg. Estimated Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -111,21 +119,21 @@ table 5102 "RM Matrix Management"
         field(9; "Avg.Calcd. Current Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Average("Opportunity Entry"."Calcd. Current Value (LCY)" WHERE(Active = CONST(true),
-                                                                                          "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                                                          "Campaign No." = FIELD("Campaign Filter"),
-                                                                                          "Contact No." = FIELD("Contact Filter"),
-                                                                                          "Contact Company No." = FIELD("Contact Company Filter"),
-                                                                                          "Estimated Close Date" = FIELD("Date Filter"),
-                                                                                          "Action Taken" = FIELD("Action Taken Filter"),
-                                                                                          "Sales Cycle Code" = FIELD("Sales Cycle Filter"),
-                                                                                          "Sales Cycle Stage" = FIELD("Sales Cycle Stage Filter"),
-                                                                                          "Probability %" = FIELD("Probability % Filter"),
-                                                                                          "Completed %" = FIELD("Completed % Filter"),
-                                                                                          "Close Opportunity Code" = FIELD("Close Opportunity Filter"),
-                                                                                          "Chances of Success %" = FIELD("Chances of Success % Filter"),
-                                                                                          "Estimated Value (LCY)" = FIELD("Estimated Value Filter"),
-                                                                                          "Calcd. Current Value (LCY)" = FIELD("Calcd. Current Value Filter")));
+            CalcFormula = Average("Opportunity Entry"."Calcd. Current Value (LCY)" where(Active = const(true),
+                                                                                          "Salesperson Code" = field("Salesperson Filter"),
+                                                                                          "Campaign No." = field("Campaign Filter"),
+                                                                                          "Contact No." = field("Contact Filter"),
+                                                                                          "Contact Company No." = field("Contact Company Filter"),
+                                                                                          "Estimated Close Date" = field("Date Filter"),
+                                                                                          "Action Taken" = field("Action Taken Filter"),
+                                                                                          "Sales Cycle Code" = field("Sales Cycle Filter"),
+                                                                                          "Sales Cycle Stage" = field("Sales Cycle Stage Filter"),
+                                                                                          "Probability %" = field("Probability % Filter"),
+                                                                                          "Completed %" = field("Completed % Filter"),
+                                                                                          "Close Opportunity Code" = field("Close Opportunity Filter"),
+                                                                                          "Chances of Success %" = field("Chances of Success % Filter"),
+                                                                                          "Estimated Value (LCY)" = field("Estimated Value Filter"),
+                                                                                          "Calcd. Current Value (LCY)" = field("Calcd. Current Value Filter")));
             Caption = 'Avg.Calcd. Current Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -170,7 +178,7 @@ table 5102 "RM Matrix Management"
         {
             Caption = 'Sales Cycle Stage Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Sales Cycle Stage".Stage WHERE("Sales Cycle Code" = FIELD("Sales Cycle Filter"));
+            TableRelation = "Sales Cycle Stage".Stage where("Sales Cycle Code" = field("Sales Cycle Filter"));
         }
         field(17; "Probability % Filter"; Decimal)
         {
@@ -191,13 +199,13 @@ table 5102 "RM Matrix Management"
         field(19; "Company No."; Code[20])
         {
             Caption = 'Company No.';
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(20; "Contact Company Filter"; Code[20])
         {
             Caption = 'Contact Company Filter';
             FieldClass = FlowFilter;
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(21; "Task Status Filter"; Enum "Task Status")
         {
@@ -224,16 +232,16 @@ table 5102 "RM Matrix Management"
         }
         field(25; "No. of Tasks"; Integer)
         {
-            CalcFormula = Count("To-do" WHERE(Date = FIELD("Date Filter"),
-                                               "Salesperson Code" = FIELD("Salesperson Filter"),
-                                               "Team Code" = FIELD("Team Filter"),
-                                               "Campaign No." = FIELD("Campaign Filter"),
-                                               "Contact No." = FIELD("Contact Filter"),
-                                               "Contact Company No." = FIELD("Contact Company Filter"),
-                                               Status = FIELD("Task Status Filter"),
-                                               Closed = FIELD("Task Closed Filter"),
-                                               Priority = FIELD("Priority Filter"),
-                                               "System To-do Type" = FIELD("System Task Type Filter")));
+            CalcFormula = count("To-do" where(Date = field("Date Filter"),
+                                               "Salesperson Code" = field("Salesperson Filter"),
+                                               "Team Code" = field("Team Filter"),
+                                               "Campaign No." = field("Campaign Filter"),
+                                               "Contact No." = field("Contact Filter"),
+                                               "Contact Company No." = field("Contact Company Filter"),
+                                               Status = field("Task Status Filter"),
+                                               Closed = field("Task Closed Filter"),
+                                               Priority = field("Priority Filter"),
+                                               "System To-do Type" = field("System Task Type Filter")));
             Caption = 'No. of Tasks';
             Editable = false;
             FieldClass = FlowField;

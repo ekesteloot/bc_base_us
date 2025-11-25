@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 table 350 "Dimension Combination"
 {
     Caption = 'Dimension Combination';

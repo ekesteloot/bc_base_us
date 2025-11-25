@@ -1862,8 +1862,14 @@ codeunit 139164 "Library - CRM Integration"
     [Scope('OnPrem')]
     procedure DisableTaskOnBeforeJobQueueScheduleTask()
     begin
-        Clear(LibraryJobQueue);
+        UnbindLibraryJobQueue();
         BindSubscription(LibraryJobQueue);
+    end;
+
+    [Scope('OnPrem')]
+    procedure UnbindLibraryJobQueue()
+    begin
+        Clear(LibraryJobQueue);
     end;
 
     [Scope('OnPrem')]

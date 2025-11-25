@@ -1,7 +1,9 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
+
+namespace System.Globalization;
 
 /// <summary>This page shows the target language and the translation for data in a table field.</summary>
 page 3712 Translation
@@ -23,20 +25,20 @@ page 3712 Translation
                 {
                     ApplicationArea = All;
                     Caption = 'Target Language';
-                    ToolTip = 'The language to which the source text was translated.';
+                    ToolTip = 'Specifies the language to which the source text was translated.';
 
                     trigger OnAssistEdit()
                     var
                         Language: Codeunit Language;
                     begin
-                        Language.LookupWindowsLanguageId("Language ID");
+                        Language.LookupWindowsLanguageId(Rec."Language ID");
                         CalculateLanguageFromID();
                     end;
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'The translated text.';
+                    ToolTip = 'Specifies the translated text.';
                 }
             }
         }
@@ -57,10 +59,10 @@ page 3712 Translation
     var
         Language: Codeunit Language;
     begin
-        CalcFields("Language Name");
-        LanguageNameValue := "Language Name";
+        Rec.CalcFields("Language Name");
+        LanguageNameValue := Rec."Language Name";
         if LanguageNameValue = '' then
-            LanguageNameValue := Language.GetWindowsLanguageName("Language ID");
+            LanguageNameValue := Language.GetWindowsLanguageName(Rec."Language ID");
     end;
 
     var
@@ -83,4 +85,5 @@ page 3712 Translation
         CaptionTxt := CaptionText;
     end;
 }
+
 

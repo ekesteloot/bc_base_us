@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 page 5991 "Troubleshooting List"
 {
     ApplicationArea = Service;
@@ -61,7 +63,7 @@ page 5991 "Troubleshooting List"
                     begin
                         TblshtgSetup.Reset();
                         TblshtgSetup.SetCurrentKey("Troubleshooting No.");
-                        TblshtgSetup.SetRange("Troubleshooting No.", "No.");
+                        TblshtgSetup.SetRange("Troubleshooting No.", Rec."No.");
                         PAGE.RunModal(PAGE::"Troubleshooting Setup", TblshtgSetup)
                     end;
                 }

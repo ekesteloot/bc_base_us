@@ -1,8 +1,13 @@
+namespace Microsoft.AssemblyMgt.Comment;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.History;
+
 table 906 "Assembly Comment Line"
 {
     Caption = 'Assembly Comment Line';
-    DrillDownPageID = "Prod. Order Comment List";
-    LookupPageID = "Prod. Order Comment List";
+    DrillDownPageID = "Assembly Comment Sheet";
+    LookupPageID = "Assembly Comment Sheet";
 
     fields
     {
@@ -14,9 +19,9 @@ table 906 "Assembly Comment Line"
         {
             Caption = 'Document No.';
             NotBlank = true;
-            TableRelation = IF ("Document Type" = FILTER("Posted Assembly")) "Posted Assembly Header"."No."
-            ELSE
-            "Assembly Header"."No." WHERE("Document Type" = FIELD("Document Type"));
+            TableRelation = if ("Document Type" = filter("Posted Assembly")) "Posted Assembly Header"."No."
+            else
+            "Assembly Header"."No." where("Document Type" = field("Document Type"));
         }
         field(3; "Document Line No."; Integer)
         {

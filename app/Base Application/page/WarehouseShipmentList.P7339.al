@@ -1,3 +1,11 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+
 page 7339 "Warehouse Shipment List"
 {
     ApplicationArea = Warehouse;
@@ -126,9 +134,9 @@ page 7339 "Warehouse Shipment List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Whse. Shipment"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Whse. Shipment"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Pick Lines")
@@ -137,10 +145,10 @@ page 7339 "Warehouse Shipment List"
                     Caption = 'Pick Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Whse. Document Type" = CONST(Shipment),
-                                  "Whse. Document No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Document No.", "Whse. Document Type", "Activity Type")
-                                  WHERE("Activity Type" = CONST(Pick));
+                    RunPageLink = "Whse. Document Type" = const(Shipment),
+                                  "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document No.", "Whse. Document Type", "Activity Type")
+                                  where("Activity Type" = const(Pick));
                     ToolTip = 'View the related picks.';
                 }
                 action("Registered P&ick Lines")
@@ -149,9 +157,9 @@ page 7339 "Warehouse Shipment List"
                     Caption = 'Registered P&ick Lines';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Act.-Lines";
-                    RunPageLink = "Whse. Document No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Document Type", "Whse. Document No.", "Whse. Document Line No.")
-                                  WHERE("Whse. Document Type" = CONST(Shipment));
+                    RunPageLink = "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document Type", "Whse. Document No.", "Whse. Document Line No.")
+                                  where("Whse. Document Type" = const(Shipment));
                     ToolTip = 'View the list of warehouse picks that have been made for the order.';
                 }
                 action("Posted &Warehouse Shipments")
@@ -160,8 +168,8 @@ page 7339 "Warehouse Shipment List"
                     Caption = 'Posted &Warehouse Shipments';
                     Image = PostedReceipt;
                     RunObject = Page "Posted Whse. Shipment List";
-                    RunPageLink = "Whse. Shipment No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Shipment No.");
+                    RunPageLink = "Whse. Shipment No." = field("No.");
+                    RunPageView = sorting("Whse. Shipment No.");
                     ToolTip = 'View the quantity that has been posted as shipped.';
                 }
             }
@@ -185,7 +193,7 @@ page 7339 "Warehouse Shipment List"
                         ReleaseWhseShptDoc: Codeunit "Whse.-Shipment Release";
                     begin
                         CurrPage.Update(true);
-                        if Status = Status::Open then
+                        if Rec.Status = Rec.Status::Open then
                             ReleaseWhseShptDoc.Release(Rec);
                     end;
                 }
@@ -314,10 +322,10 @@ page 7339 "Warehouse Shipment List"
     var
         WMSManagement: Codeunit "WMS Management";
     begin
-        ErrorIfUserIsNotWhseEmployee();
-        FilterGroup(2); // set group of filters user cannot change
-        SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
-        FilterGroup(0); // set filter group back to standard
+        Rec.ErrorIfUserIsNotWhseEmployee();
+        Rec.FilterGroup(2); // set group of filters user cannot change
+        Rec.SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
+        Rec.FilterGroup(0); // set filter group back to standard
     end;
 
     local procedure PostShipmentYesNo()

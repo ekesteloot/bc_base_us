@@ -1,3 +1,19 @@
+﻿namespace Microsoft.CRM.Campaign;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.PriceList;
+using Microsoft.Sales.Customer;
+#if not CLEAN21
+using Microsoft.Sales.Pricing;
+#endif
+using System.Utilities;
+
 codeunit 7030 "Campaign Target Group Mgt"
 {
 

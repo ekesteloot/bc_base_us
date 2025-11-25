@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Setup;
+
 table 99000756 "Work Center Group"
 {
     Caption = 'Work Center Group';
@@ -30,10 +36,10 @@ table 99000756 "Work Center Group"
         }
         field(22; "Capacity (Total)"; Decimal)
         {
-            CalcFormula = Sum ("Calendar Entry"."Capacity (Total)" WHERE("Capacity Type" = CONST("Work Center"),
-                                                                         "Work Center Group Code" = FIELD(Code),
-                                                                         "Work Shift Code" = FIELD("Work Shift Filter"),
-                                                                         Date = FIELD("Date Filter")));
+            CalcFormula = Sum("Calendar Entry"."Capacity (Total)" where("Capacity Type" = const("Work Center"),
+                                                                         "Work Center Group Code" = field(Code),
+                                                                         "Work Shift Code" = field("Work Shift Filter"),
+                                                                         Date = field("Date Filter")));
             Caption = 'Capacity (Total)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -41,10 +47,10 @@ table 99000756 "Work Center Group"
         }
         field(23; "Capacity (Effective)"; Decimal)
         {
-            CalcFormula = Sum ("Calendar Entry"."Capacity (Effective)" WHERE("Capacity Type" = CONST("Work Center"),
-                                                                             "Work Center Group Code" = FIELD(Code),
-                                                                             "Work Shift Code" = FIELD("Work Shift Filter"),
-                                                                             Date = FIELD("Date Filter")));
+            CalcFormula = Sum("Calendar Entry"."Capacity (Effective)" where("Capacity Type" = const("Work Center"),
+                                                                             "Work Center Group Code" = field(Code),
+                                                                             "Work Shift Code" = field("Work Shift Filter"),
+                                                                             Date = field("Date Filter")));
             Caption = 'Capacity (Effective)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -52,10 +58,10 @@ table 99000756 "Work Center Group"
         }
         field(24; "Prod. Order Need (Qty.)"; Decimal)
         {
-            CalcFormula = Sum ("Prod. Order Capacity Need"."Allocated Time" WHERE(Status = FIELD("Prod. Order Status Filter"),
-                                                                                  "Work Center Group Code" = FIELD(Code),
-                                                                                  Date = FIELD("Date Filter"),
-                                                                                  "Requested Only" = CONST(false)));
+            CalcFormula = Sum("Prod. Order Capacity Need"."Allocated Time" where(Status = field("Prod. Order Status Filter"),
+                                                                                  "Work Center Group Code" = field(Code),
+                                                                                  Date = field("Date Filter"),
+                                                                                  "Requested Only" = const(false)));
             Caption = 'Prod. Order Need (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;

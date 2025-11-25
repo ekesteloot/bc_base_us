@@ -1,3 +1,22 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.Ledger;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.WarehouseMgt.Structure;
+using System.Security.AccessControl;
+
 table 169 "Job Ledger Entry"
 {
     Caption = 'Job Ledger Entry';
@@ -30,11 +49,11 @@ table 169 "Job Ledger Entry"
         field(7; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account";
+            TableRelation = if (Type = const(Resource)) Resource
+            else
+            if (Type = const(Item)) Item
+            else
+            if (Type = const("G/L Account")) "G/L Account";
         }
         field(8; Description; Text[100])
         {
@@ -64,7 +83,7 @@ table 169 "Job Ledger Entry"
         }
         field(14; "Unit Price (LCY)"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price (LCY)';
             Editable = false;
@@ -84,14 +103,14 @@ table 169 "Job Ledger Entry"
         field(17; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
-            IF (Type = CONST(Resource)) "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
+            if (Type = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("No."));
         }
         field(20; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(29; "Job Posting Group"; Code[20])
         {
@@ -102,13 +121,13 @@ table 169 "Job Ledger Entry"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(31; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(32; "Work Type Code"; Code[10])
         {
@@ -125,8 +144,6 @@ table 169 "Job Ledger Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(38; "Source Code"; Code[10])
         {
@@ -237,7 +254,7 @@ table 169 "Job Ledger Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])
@@ -297,7 +314,7 @@ table 169 "Job Ledger Entry"
         field(1000; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(1001; "Line Amount (LCY)"; Decimal)
         {
@@ -307,37 +324,37 @@ table 169 "Job Ledger Entry"
         }
         field(1002; "Unit Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Cost';
         }
         field(1003; "Total Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Cost';
         }
         field(1004; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
         }
         field(1005; "Total Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Price';
         }
         field(1006; "Line Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Amount';
         }
         field(1007; "Line Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Discount Amount';
         }
@@ -368,11 +385,11 @@ table 169 "Job Ledger Entry"
         {
             BlankZero = true;
             Caption = 'Ledger Entry No.';
-            TableRelation = IF ("Ledger Entry Type" = CONST(Resource)) "Res. Ledger Entry"
-            ELSE
-            IF ("Ledger Entry Type" = CONST(Item)) "Item Ledger Entry"
-            ELSE
-            IF ("Ledger Entry Type" = CONST("G/L Account")) "G/L Entry";
+            TableRelation = if ("Ledger Entry Type" = const(Resource)) "Res. Ledger Entry"
+            else
+            if ("Ledger Entry Type" = const(Item)) "Item Ledger Entry"
+            else
+            if ("Ledger Entry Type" = const("G/L Account")) "G/L Entry";
         }
         field(1019; "Serial No."; Code[50])
         {
@@ -405,19 +422,19 @@ table 169 "Job Ledger Entry"
         }
         field(1025; "Original Unit Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Original Unit Cost';
         }
         field(1026; "Original Total Cost"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Original Total Cost';
         }
         field(1027; "Original Total Cost (ACY)"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Original Total Cost (ACY)';
         }
@@ -432,12 +449,12 @@ table 169 "Job Ledger Entry"
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
@@ -496,6 +513,12 @@ table 169 "Job Ledger Entry"
         {
             MaintainSQLIndex = false;
             SumIndexFields = "Total Cost (LCY)", "Line Amount (LCY)", "Total Cost", "Line Amount";
+        }
+        key(Key10; "Ledger Entry Type", "Ledger Entry No.")
+        {
+        }
+        key(Key11; Type, "No.")
+        {
         }
     }
 

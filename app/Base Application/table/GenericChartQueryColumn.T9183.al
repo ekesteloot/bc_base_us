@@ -1,3 +1,7 @@
+namespace System.Visualization;
+
+using System.Reflection;
+
 table 9183 "Generic Chart Query Column"
 {
     Caption = 'Generic Chart Query Column';

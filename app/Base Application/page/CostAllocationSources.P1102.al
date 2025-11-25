@@ -1,3 +1,7 @@
+namespace Microsoft.CostAccounting.Allocation;
+
+using Microsoft.CostAccounting.Account;
+
 page 1102 "Cost Allocation Sources"
 {
     ApplicationArea = CostAccounting;
@@ -6,7 +10,7 @@ page 1102 "Cost Allocation Sources"
     Editable = false;
     PageType = List;
     SourceTable = "Cost Allocation Source";
-    SourceTableView = SORTING(Level, "Valid From", "Valid To", "Cost Type Range");
+    SourceTableView = sorting(Level, "Valid From", "Valid To", "Cost Type Range");
     UsageCategory = Lists;
 
     layout
@@ -16,17 +20,17 @@ page 1102 "Cost Allocation Sources"
             repeater(Control8)
             {
                 ShowCaption = false;
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the user ID that applies to the cost allocation.';
                 }
-                field(Level; Level)
+                field(Level; Rec.Level)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies by which level the cost allocation posting is done. For example, this makes sure that costs are allocated at level 1 from the ADM cost center to the WORKSHOP and PROD cost centers, before they are allocated at level 2 from the PROD cost center to the FURNITURE, CHAIRS, and PAINT cost objects.';
                 }
-                field(Variant; Variant)
+                field(Variant; Rec.Variant)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the variant of the cost allocation sources.';
@@ -68,7 +72,7 @@ page 1102 "Cost Allocation Sources"
                     ToolTip = 'Specifies the sum of the shares of the cost allocation targets.';
                     Visible = false;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -80,7 +84,7 @@ page 1102 "Cost Allocation Sources"
                     ToolTip = 'Specifies if the allocation comes from both budgeted and actual costs, only budgeted costs, or only actual costs.';
                     Visible = false;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies a comment that applies to the cost allocation.';
@@ -103,7 +107,7 @@ page 1102 "Cost Allocation Sources"
                     Caption = '&Allocation Target';
                     Image = Setup;
                     RunObject = Page "Cost Allocation Target List";
-                    RunPageLink = ID = FIELD(ID);
+                    RunPageLink = ID = field(ID);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'Specifies the cost allocation target entries.';
                 }
@@ -113,7 +117,7 @@ page 1102 "Cost Allocation Sources"
                     Caption = '&Corresponding Cost Types';
                     Image = CompareCost;
                     RunObject = Page "Chart of Cost Types";
-                    RunPageLink = "No." = FIELD(FILTER("Cost Type Range"));
+                    RunPageLink = "No." = field(FILTER("Cost Type Range"));
                     ToolTip = 'View the related G/L accounts in the Chart of Cost Types window.';
                 }
             }

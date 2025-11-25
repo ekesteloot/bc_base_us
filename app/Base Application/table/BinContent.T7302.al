@@ -1,3 +1,15 @@
+﻿namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Tracking;
+using System.Telemetry;
+
 table 7302 "Bin Content"
 {
     Caption = 'Bin Content';
@@ -407,6 +419,7 @@ table 7302 "Bin Content"
         }
         key(Key2; "Bin Type Code")
         {
+            IncludedFields = Dedicated, "Block Movement";
         }
         key(Key3; "Location Code", "Item No.", "Variant Code", "Cross-Dock Bin", "Qty. per Unit of Measure", "Bin Ranking")
         {
@@ -504,7 +517,6 @@ table 7302 "Bin Content"
         Text006: Label 'available must not be less than %1';
         Text007: Label 'You cannot modify the %1, because the %2 contains items.';
         Text008: Label 'You cannot modify the %1, because warehouse document lines have items allocated to this %2.';
-        Text009: Label 'You must first set up user %1 as a warehouse employee.';
         Text010: Label 'There is already a default bin content for location code %1, item no. %2 and variant code %3.';
 
     procedure SetUpNewLine()
@@ -867,14 +879,15 @@ table 7302 "Bin Content"
             if Location."Bin Capacity Policy" in
                [Location."Bin Capacity Policy"::"Allow More Than Max. Capacity",
                 Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap."]
-            then
+            then begin
                 if "Max. Qty." <> 0 then begin
                     QtyAvailToPutAwayBase := CalcQtyAvailToPutAway(DeductQtyBase);
                     WMSMgt.CheckPutAwayAvailability(
                       "Bin Code", WhseActivLine.FieldCaption("Qty. (Base)"), TableCaption(), QtyBase, QtyAvailToPutAwayBase,
                       (Location."Bin Capacity Policy" =
                        Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap.") and CalledbyPosting);
-                end else begin
+                end;
+                if Location."Bin Capacity Policy" in [Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap.", Location."Bin Capacity Policy"::"Allow More Than Max. Capacity"] then begin
                     GetBin("Location Code", "Bin Code");
                     if (Bin."Maximum Cubage" <> 0) or (Bin."Maximum Weight" <> 0) then begin
                         Bin.CalcCubageAndWeight(AvailableCubage, AvailableWeight, CalledbyPosting);
@@ -896,6 +909,7 @@ table 7302 "Bin Content"
                                Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap.") and CalledbyPosting);
                     end;
                 end;
+            end;
         exit(true);
     end;
 
@@ -993,11 +1007,8 @@ table 7302 "Bin Content"
         if UserId <> '' then begin
             IsHandled := false;
             OnBeforeGetWhseLocation(CurrentLocationCode, CurrentZoneCode, IsHandled);
-            if not IsHandled then begin
-                WhseEmployee.SetRange("User ID", UserId);
-                if WhseEmployee.IsEmpty() then
-                    Error(Text009, UserId);
-            end;
+            if not IsHandled then
+                WMSManagement.CheckUserIsWhseEmployee();
             if CurrentLocationCode <> '' then begin
                 if not Location.Get(CurrentLocationCode) then begin
                     CurrentLocationCode := '';

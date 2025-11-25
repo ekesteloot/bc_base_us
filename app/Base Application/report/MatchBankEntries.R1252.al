@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 report 1252 "Match Bank Entries"
 {
     Caption = 'Match Bank Entries';
@@ -7,7 +9,7 @@ report 1252 "Match Bank Entries"
     {
         dataitem("Bank Acc. Reconciliation"; "Bank Acc. Reconciliation")
         {
-            DataItemTableView = SORTING("Bank Account No.", "Statement No.");
+            DataItemTableView = sorting("Bank Account No.", "Statement No.");
 
             trigger OnAfterGetRecord()
             begin

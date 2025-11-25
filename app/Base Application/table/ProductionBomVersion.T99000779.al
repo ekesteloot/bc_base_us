@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Planning;
+
 table 99000779 "Production BOM Version"
 {
     Caption = 'Production BOM Version';

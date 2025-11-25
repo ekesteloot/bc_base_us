@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FixedAssets.FixedAsset;
+
 codeunit 5656 InsuranceJnlManagement
 {
     Permissions = TableData "Insurance Journal Template" = rimd,

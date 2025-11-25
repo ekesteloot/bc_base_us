@@ -1,7 +1,13 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+
 report 5625 "Insurance - Tot. Value Insured"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/InsuranceTotValueInsured.rdlc';
+    RDLCLayout = './FixedAssets/Insurance/InsuranceTotValueInsured.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset Total Value Insured';
     UsageCategory = ReportsAndAnalysis;
@@ -47,7 +53,7 @@ report 5625 "Insurance - Tot. Value Insured"
             }
             dataitem("Ins. Coverage Ledger Entry"; "Ins. Coverage Ledger Entry")
             {
-                DataItemTableView = SORTING("FA No.", "Insurance No.", "Disposed FA");
+                DataItemTableView = sorting("FA No.", "Insurance No.", "Disposed FA");
                 column(Ins__Coverage_Ledger_Entry__Insurance_No__; "Insurance No.")
                 {
                 }

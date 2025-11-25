@@ -1,3 +1,15 @@
+﻿namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.Reflection;
+using System.Text;
+using System.Utilities;
+
 page 408 "G/L Balance by Dimension"
 {
     Caption = 'G/L Balance by Dimension';
@@ -80,7 +92,7 @@ page 408 "G/L Balance by Dimension"
             group(Filters)
             {
                 Caption = 'Filters';
-                field(DateFilter; "Date Filter")
+                field(DateFilter; Rec."Date Filter")
                 {
                     ApplicationArea = Dimensions;
                     Caption = 'Date Filter';
@@ -92,16 +104,16 @@ page 408 "G/L Balance by Dimension"
                         FilterTokens: Codeunit "Filter Tokens";
                         DateFilter: Text;
                     begin
-                        DateFilter := "Date Filter";
+                        DateFilter := Rec."Date Filter";
                         FilterTokens.MakeDateFilter(DateFilter);
                         GLAccount.SetFilter("Date Filter", DateFilter);
                         DateFilter := GLAccount.GetFilter("Date Filter");
-                        "Date Filter" := CopyStr(DateFilter, 1, MaxStrLen("Date Filter"));
+                        Rec."Date Filter" := CopyStr(DateFilter, 1, MaxStrLen(Rec."Date Filter"));
                         InternalDateFilter := DateFilter;
                         DateFilterOnAfterValidate();
                     end;
                 }
-                field(GLAccFilter; "Account Filter")
+                field(GLAccFilter; Rec."Account Filter")
                 {
                     ApplicationArea = Dimensions;
                     Caption = 'G/L Account Filter';
@@ -124,7 +136,7 @@ page 408 "G/L Balance by Dimension"
                         GLAccFilterOnAfterValidate();
                     end;
                 }
-                field(BudgetFilter; "Budget Filter")
+                field(BudgetFilter; Rec."Budget Filter")
                 {
                     ApplicationArea = Dimensions;
                     Caption = 'Budget Filter';
@@ -132,7 +144,7 @@ page 408 "G/L Balance by Dimension"
                     TableRelation = "G/L Budget Name".Name;
                     ToolTip = 'Specifies the budget that information in the matrix is shown for.';
                 }
-                field(BusUnitFilter; "Bus. Unit Filter")
+                field(BusUnitFilter; Rec."Bus. Unit Filter")
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '3,' + BusUnitFilterCaption;
@@ -153,7 +165,7 @@ page 408 "G/L Balance by Dimension"
                         BusUnitFilterOnAfterValidate();
                     end;
                 }
-                field(Dim1Filter; "Dimension 1 Filter")
+                field(Dim1Filter; Rec."Dimension 1 Filter")
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,3,1';
@@ -171,7 +183,7 @@ page 408 "G/L Balance by Dimension"
                         GlobalDim1FilterOnAfterValidat();
                     end;
                 }
-                field(Dim2Filter; "Dimension 2 Filter")
+                field(Dim2Filter; Rec."Dimension 2 Filter")
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,3,2';
@@ -193,17 +205,17 @@ page 408 "G/L Balance by Dimension"
             group(Options)
             {
                 Caption = 'Options';
-                field(ShowActualBudg; "Show Actual/Budgets")
+                field(ShowActualBudg; Rec."Show Actual/Budgets")
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies if the selected value is shown in the window.';
                 }
-                field(AmountField; "Show Amount Field")
+                field(AmountField; Rec."Show Amount Field")
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies the type of entries that will be included in the matrix window. The Amount options means that amounts that are the sum of debit and credit amounts are shown.';
                 }
-                field(ClosingEntryFilter; "Closing Entries")
+                field(ClosingEntryFilter; Rec."Closing Entries")
                 {
                     ApplicationArea = Dimensions;
                     Caption = 'Closing Entries';
@@ -215,20 +227,20 @@ page 408 "G/L Balance by Dimension"
                         FindPeriod('=');
                     end;
                 }
-                field(RoundingFactor; "Rounding Factor")
+                field(RoundingFactor; Rec."Rounding Factor")
                 {
                     ApplicationArea = Dimensions;
                     Caption = 'Rounding Factor';
                     ToolTip = 'Specifies the factor that is used to round the amounts.';
                 }
-                field(ShowInAddCurr; "Show In Add. Currency")
+                field(ShowInAddCurr; Rec."Show In Add. Currency")
                 {
                     ApplicationArea = Dimensions;
                     Caption = 'Show Amounts in Add. Reporting Currency';
                     MultiLine = true;
                     ToolTip = 'Specifies whether to show the reported amounts in the additional reporting currency.';
                 }
-                field(ShowColumnName; "Show Column Name")
+                field(ShowColumnName; Rec."Show Column Name")
                 {
                     ApplicationArea = Dimensions;
                     Caption = 'Show Column Name';
@@ -243,7 +255,7 @@ page 408 "G/L Balance by Dimension"
             group("Matrix Options")
             {
                 Caption = 'Matrix Options';
-                field(PeriodType; "Period Type")
+                field(PeriodType; Rec."Period Type")
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies by which period amounts are displayed.';
@@ -254,7 +266,7 @@ page 408 "G/L Balance by Dimension"
                         PeriodTypeOnAfterValidate();
                     end;
                 }
-                field(AmountType; "Amount Type")
+                field(AmountType; Rec."Amount Type")
                 {
                     ApplicationArea = Dimensions;
                     Caption = 'View as';
@@ -266,7 +278,7 @@ page 408 "G/L Balance by Dimension"
                         AmountTypeOnAfterValidate();
                     end;
                 }
-                field(MATRIX_ColumnSet; "Column Set")
+                field(MATRIX_ColumnSet; Rec."Column Set")
                 {
                     ApplicationArea = Dimensions;
                     Editable = false;
@@ -391,13 +403,13 @@ page 408 "G/L Balance by Dimension"
         GlAccGlobalDim2Filter: Text;
     begin
         AnalysisByDimUserParam.Load(Rec, Page::"G/L Balance by Dimension");
-        OnBeforeGLAccFilter(GLAcc, "Account Filter", LineDimOption, ColumnDimOption);
+        OnBeforeGLAccFilter(GLAcc, Rec."Account Filter", LineDimOption, ColumnDimOption);
         GLAccGlobalDim1Filter := GLAcc.GetFilter("Global Dimension 1 Filter");
         if (GLAccGlobalDim1Filter <> '') then
-            "Dimension 1 Filter" := GLAccGlobalDim1Filter;
+            Rec."Dimension 1 Filter" := GLAccGlobalDim1Filter;
         GLAccGlobalDim2Filter := GLAcc.GetFilter("Global Dimension 2 Filter");
         if (GLAccGlobalDim2Filter <> '') then
-            "Dimension 2 Filter" := GLAccGlobalDim2Filter;
+            Rec."Dimension 2 Filter" := GLAccGlobalDim2Filter;
 
         GLSetup.Get();
         Dim1FilterEnable :=
@@ -408,7 +420,7 @@ page 408 "G/L Balance by Dimension"
           (GLAcc.GetFilter("Global Dimension 2 Filter") = '');
 
         if GLSetup."Additional Reporting Currency" = '' then
-            "Show In Add. Currency" := false;
+            Rec."Show In Add. Currency" := false;
 
         if (LineDimCode = '') and (ColumnDimCode = '') then begin
             LineDimCode := GLAcc.TableCaption();
@@ -422,7 +434,7 @@ page 408 "G/L Balance by Dimension"
         FindPeriod('');
 
         MATRIX_NoOfColumns := 32;
-        SetDateFilter("Date Filter");
+        SetDateFilter(Rec."Date Filter");
 
         GenerateColumnCaptions("Matrix Page Step Type"::Initial);
     end;
@@ -449,9 +461,7 @@ page 408 "G/L Balance by Dimension"
         MATRIX_NoOfColumns: Integer;
         MATRIX_PrimaryKeyFirstColInSet: Text[1024];
         MATRIX_CurrSetLength: Integer;
-        [InDataSet]
         Dim1FilterEnable: Boolean;
-        [InDataSet]
         Dim2FilterEnable: Boolean;
 
     protected var
@@ -503,12 +513,12 @@ page 408 "G/L Balance by Dimension"
             Init();
             Code := Format(ThePeriod."Period Start");
             "Period Start" := ThePeriod."Period Start";
-            if "Closing Entries" = "Closing Entries"::Include then
+            if Rec."Closing Entries" = Rec."Closing Entries"::Include then
                 "Period End" := ClosingDate(ThePeriod."Period End")
             else
                 "Period End" := ThePeriod."Period End";
-            if "Date Filter" <> '' then begin
-                Period2.SetFilter("Period End", "Date Filter");
+            if Rec."Date Filter" <> '' then begin
+                Period2.SetFilter("Period End", Rec."Date Filter");
                 if Period2.GetRangeMax("Period End") < "Period End" then
                     "Period End" := Period2.GetRangeMax("Period End");
             end;
@@ -543,16 +553,16 @@ page 408 "G/L Balance by Dimension"
         Period: Record Date;
         PeriodPageMgt: Codeunit PeriodPageManagement;
     begin
-        if "Date Filter" <> '' then begin
-            Period.SetFilter("Period Start", "Date Filter");
-            if not PeriodPageMgt.FindDate('+', Period, "Period Type") then
-                PeriodPageMgt.FindDate('+', Period, "Period Type"::Day);
+        if Rec."Date Filter" <> '' then begin
+            Period.SetFilter("Period Start", Rec."Date Filter");
+            if not PeriodPageMgt.FindDate('+', Period, Rec."Period Type") then
+                PeriodPageMgt.FindDate('+', Period, Rec."Period Type"::Day);
             Period.SetRange("Period Start");
         end;
-        if PeriodPageMgt.FindDate(SearchText, Period, "Period Type") then
-            if "Closing Entries" = "Closing Entries"::Include then
+        if PeriodPageMgt.FindDate(SearchText, Period, Rec."Period Type") then
+            if Rec."Closing Entries" = Rec."Closing Entries"::Include then
                 Period."Period End" := ClosingDate(Period."Period End");
-        if "Amount Type" = "Amount Type"::"Net Change" then begin
+        if Rec."Amount Type" = Rec."Amount Type"::"Net Change" then begin
             GLAcc.SetRange("Date Filter", Period."Period Start", Period."Period End");
             if GLAcc.GetRangeMin("Date Filter") = GLAcc.GetRangeMax("Date Filter") then
                 GLAcc.SetRange("Date Filter", GLAcc.GetRangeMin("Date Filter"));
@@ -561,7 +571,7 @@ page 408 "G/L Balance by Dimension"
 
         InternalDateFilter := GLAcc.GetFilter("Date Filter");
         if (LineDimOption <> LineDimOption::Period) and (ColumnDimOption <> ColumnDimOption::Period) then
-            "Date Filter" := InternalDateFilter;
+            Rec."Date Filter" := InternalDateFilter;
     end;
 
     local procedure GetDimSelection(OldDimSelCode: Text[30]): Text[30]
@@ -594,9 +604,9 @@ page 408 "G/L Balance by Dimension"
         LineDimOption := DimCodeToOption(LineDimCode);
         InternalDateFilter := GLAcc.GetFilter("Date Filter");
         if (LineDimOption <> LineDimOption::Period) and (ColumnDimOption <> ColumnDimOption::Period) then begin
-            "Date Filter" := InternalDateFilter;
-            if StrPos("Date Filter", '&') > 1 then
-                "Date Filter" := CopyStr("Date Filter", 1, StrPos("Date Filter", '&') - 1);
+            Rec."Date Filter" := InternalDateFilter;
+            if StrPos(Rec."Date Filter", '&') > 1 then
+                Rec."Date Filter" := CopyStr(Rec."Date Filter", 1, StrPos(Rec."Date Filter", '&') - 1);
         end else
             PeriodInitialized := false;
     end;
@@ -610,9 +620,9 @@ page 408 "G/L Balance by Dimension"
         ColumnDimOption := DimCodeToOption(ColumnDimCode);
         InternalDateFilter := GLAcc.GetFilter("Date Filter");
         if (LineDimOption <> LineDimOption::Period) and (ColumnDimOption <> ColumnDimOption::Period) then begin
-            "Date Filter" := InternalDateFilter;
-            if StrPos("Date Filter", '&') > 1 then
-                "Date Filter" := CopyStr("Date Filter", 1, StrPos("Date Filter", '&') - 1);
+            Rec."Date Filter" := InternalDateFilter;
+            if StrPos(Rec."Date Filter", '&') > 1 then
+                Rec."Date Filter" := CopyStr(Rec."Date Filter", 1, StrPos(Rec."Date Filter", '&') - 1);
         end else
             PeriodInitialized := false;
     end;
@@ -643,8 +653,8 @@ page 408 "G/L Balance by Dimension"
             DimOption::"G/L Account":
                 begin
                     GLAcc."No." := DimCodeBuf.Code;
-                    if "Account Filter" <> '' then
-                        GLAcc.SetFilter("No.", "Account Filter");
+                    if Rec."Account Filter" <> '' then
+                        GLAcc.SetFilter("No.", Rec."Account Filter");
                     Found := GLAcc.Find(Which);
                     if Found then
                         CopyGLAccToBuf(GLAcc, DimCodeBuf);
@@ -652,31 +662,31 @@ page 408 "G/L Balance by Dimension"
             DimOption::Period:
                 begin
                     if not PeriodInitialized then
-                        "Date Filter" := '';
+                        Rec."Date Filter" := '';
                     PeriodInitialized := true;
                     Evaluate(Period."Period Start", DimCodeBuf.Code);
-                    if "Date Filter" <> '' then
-                        Period.SetFilter("Period Start", "Date Filter")
+                    if Rec."Date Filter" <> '' then
+                        Period.SetFilter("Period Start", Rec."Date Filter")
                     else
                         if not PeriodInitialized and (InternalDateFilter <> '') then
                             Period.SetFilter("Period Start", InternalDateFilter);
-                    Found := PeriodPageMgt.FindDate(Which, Period, "Period Type");
+                    Found := PeriodPageMgt.FindDate(Which, Period, Rec."Period Type");
                     if Found then
                         CopyPeriodToBuf(Period, DimCodeBuf);
                 end;
             DimOption::"Business Unit":
                 begin
                     BusUnit.Code := DimCodeBuf.Code;
-                    if "Bus. Unit Filter" <> '' then
-                        BusUnit.SetFilter(Code, "Bus. Unit Filter");
+                    if Rec."Bus. Unit Filter" <> '' then
+                        BusUnit.SetFilter(Code, Rec."Bus. Unit Filter");
                     Found := BusUnit.Find(Which);
                     if Found then
                         CopyBusUnitToBuf(BusUnit, DimCodeBuf);
                 end;
             DimOption::"Dimension 1":
                 begin
-                    if "Dimension 1 Filter" <> '' then
-                        DimVal.SetFilter(Code, "Dimension 1 Filter");
+                    if Rec."Dimension 1 Filter" <> '' then
+                        DimVal.SetFilter(Code, Rec."Dimension 1 Filter");
                     DimVal."Dimension Code" := GLSetup."Global Dimension 1 Code";
                     DimVal.SetRange("Dimension Code", DimVal."Dimension Code");
                     DimVal.Code := DimCodeBuf.Code;
@@ -686,8 +696,8 @@ page 408 "G/L Balance by Dimension"
                 end;
             DimOption::"Dimension 2":
                 begin
-                    if "Dimension 2 Filter" <> '' then
-                        DimVal.SetFilter(Code, "Dimension 2 Filter");
+                    if Rec."Dimension 2 Filter" <> '' then
+                        DimVal.SetFilter(Code, Rec."Dimension 2 Filter");
                     DimVal."Dimension Code" := GLSetup."Global Dimension 2 Code";
                     DimVal.SetRange("Dimension Code", DimVal."Dimension Code");
                     DimVal.Code := DimCodeBuf.Code;
@@ -715,34 +725,34 @@ page 408 "G/L Balance by Dimension"
             DimOption::"G/L Account":
                 begin
                     GLAcc."No." := DimCodeBuf.Code;
-                    if "Account Filter" <> '' then
-                        GLAcc.SetFilter("No.", "Account Filter");
+                    if Rec."Account Filter" <> '' then
+                        GLAcc.SetFilter("No.", Rec."Account Filter");
                     ResultSteps := GLAcc.Next(Steps);
                     if ResultSteps <> 0 then
                         CopyGLAccToBuf(GLAcc, DimCodeBuf);
                 end;
             DimOption::Period:
                 begin
-                    if "Date Filter" <> '' then
-                        Period.SetFilter("Period Start", "Date Filter");
+                    if Rec."Date Filter" <> '' then
+                        Period.SetFilter("Period Start", Rec."Date Filter");
                     Evaluate(Period."Period Start", DimCodeBuf.Code);
-                    ResultSteps := PeriodPageMgt.NextDate(Steps, Period, "Period Type");
+                    ResultSteps := PeriodPageMgt.NextDate(Steps, Period, Rec."Period Type");
                     if ResultSteps <> 0 then
                         CopyPeriodToBuf(Period, DimCodeBuf);
                 end;
             DimOption::"Business Unit":
                 begin
                     BusUnit.Code := DimCodeBuf.Code;
-                    if "Bus. Unit Filter" <> '' then
-                        BusUnit.SetFilter(Code, "Bus. Unit Filter");
+                    if Rec."Bus. Unit Filter" <> '' then
+                        BusUnit.SetFilter(Code, Rec."Bus. Unit Filter");
                     ResultSteps := BusUnit.Next(Steps);
                     if ResultSteps <> 0 then
                         CopyBusUnitToBuf(BusUnit, DimCodeBuf);
                 end;
             DimOption::"Dimension 1":
                 begin
-                    if "Dimension 1 Filter" <> '' then
-                        DimVal.SetFilter(Code, "Dimension 1 Filter");
+                    if Rec."Dimension 1 Filter" <> '' then
+                        DimVal.SetFilter(Code, Rec."Dimension 1 Filter");
                     DimVal."Dimension Code" := GLSetup."Global Dimension 1 Code";
                     DimVal.SetRange("Dimension Code", DimVal."Dimension Code");
                     DimVal.Code := DimCodeBuf.Code;
@@ -752,8 +762,8 @@ page 408 "G/L Balance by Dimension"
                 end;
             DimOption::"Dimension 2":
                 begin
-                    if "Dimension 2 Filter" <> '' then
-                        DimVal.SetFilter(Code, "Dimension 2 Filter");
+                    if Rec."Dimension 2 Filter" <> '' then
+                        DimVal.SetFilter(Code, Rec."Dimension 2 Filter");
                     DimVal."Dimension Code" := GLSetup."Global Dimension 2 Code";
                     DimVal.SetRange("Dimension Code", DimVal."Dimension Code");
                     DimVal.Code := DimCodeBuf.Code;
@@ -775,13 +785,13 @@ page 408 "G/L Balance by Dimension"
     begin
         MATRIX_CurrSetLength := 0;
         Clear(MATRIX_ColumnCaptions);
-        "Column Set" := '';
+        Rec."Column Set" := '';
 
         case StepType of
             "Matrix Page Step Type"::Initial:
                 begin
-                    if (ColumnDimOption = ColumnDimOption::Period) and ("Period Type" <> "Period Type"::"Accounting Period")
-                       and ("Date Filter" = '')
+                    if (ColumnDimOption = ColumnDimOption::Period) and (Rec."Period Type" <> Rec."Period Type"::"Accounting Period")
+                       and (Rec."Date Filter" = '')
                     then begin
                         Evaluate(CurrentColumn.Code, Format(WorkDate()));
                         Which := '=><';
@@ -816,16 +826,16 @@ page 408 "G/L Balance by Dimension"
         if Found then begin
             repeat
                 MATRIX_CurrSetLength := MATRIX_CurrSetLength + 1;
-                if "Show Column Name" then
+                if Rec."Show Column Name" then
                     MATRIX_ColumnCaptions[MATRIX_CurrSetLength] := CurrentColumn.Name
                 else
                     MATRIX_ColumnCaptions[MATRIX_CurrSetLength] := CurrentColumn.Code;
             until (MATRIX_CurrSetLength = MATRIX_NoOfColumns) or (NextRec(ColumnDimOption, CurrentColumn, 1) <> 1);
 
             if MATRIX_CurrSetLength = 1 then
-                "Column Set" := MATRIX_ColumnCaptions[1]
+                Rec."Column Set" := MATRIX_ColumnCaptions[1]
             else
-                "Column Set" := MATRIX_ColumnCaptions[1] + '..' + MATRIX_ColumnCaptions[MATRIX_CurrSetLength];
+                Rec."Column Set" := MATRIX_ColumnCaptions[1] + '..' + MATRIX_ColumnCaptions[MATRIX_CurrSetLength];
         end;
     end;
 

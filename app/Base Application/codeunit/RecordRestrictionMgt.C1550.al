@@ -1,3 +1,16 @@
+﻿namespace System.Automation;
+
+using Microsoft.BankMgt.Check;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using System.Threading;
+
 codeunit 1550 "Record Restriction Mgt."
 {
     Permissions = TableData "Restricted Record" = rimd;

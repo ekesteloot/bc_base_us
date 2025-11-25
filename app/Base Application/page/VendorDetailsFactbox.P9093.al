@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Foundation.Comment;
+
 page 9093 "Vendor Details FactBox"
 {
     Caption = 'Vendor Details';
@@ -40,7 +44,7 @@ page 9093 "Vendor Details FactBox"
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies the vendor''s fax number.';
             }
-            field(Contact; Contact)
+            field(Contact; Rec.Contact)
             {
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies the name of the person you regularly contact when you do business with this vendor.';
@@ -62,8 +66,8 @@ page 9093 "Vendor Details FactBox"
                     Caption = 'Comments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Vendor),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Vendor),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

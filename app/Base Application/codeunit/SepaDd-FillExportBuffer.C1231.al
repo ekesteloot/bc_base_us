@@ -1,3 +1,11 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Customer;
+
 codeunit 1231 "SEPA DD-Fill Export Buffer"
 {
     Permissions = TableData "Payment Export Data" = rimd;

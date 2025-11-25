@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 enum 9238 "Item Budget Dimension Type"
 {
     AssignmentCompatibility = true;

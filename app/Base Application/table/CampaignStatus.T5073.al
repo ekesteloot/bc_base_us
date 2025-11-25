@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Campaign;
+
 table 5073 "Campaign Status"
 {
     Caption = 'Campaign Status';

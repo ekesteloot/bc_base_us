@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.History;
+
+using Microsoft.InventoryMgt.Comment;
+
 page 6572 "Posted Invt. Shipments"
 {
     ApplicationArea = Basic, Suite;
@@ -81,8 +85,8 @@ page 6572 "Posted Invt. Shipments"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Inventory Shipment"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Inventory Shipment"),
+                                  "No." = field("No.");
                     ToolTip = 'View comments for the record.';
                 }
             }

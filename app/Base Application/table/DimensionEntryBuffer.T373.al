@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 table 373 "Dimension Entry Buffer"
 {
     Caption = 'Dimension Entry Buffer';

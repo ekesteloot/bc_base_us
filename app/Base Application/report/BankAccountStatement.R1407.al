@@ -1,14 +1,20 @@
+namespace Microsoft.BankMgt.Reports;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.Statement;
+
 report 1407 "Bank Account Statement"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/BankAccountStatement.rdlc';
+    RDLCLayout = './BankMgt/Reports/BankAccountStatement.rdlc';
     Caption = 'Bank Account Statement';
 
     dataset
     {
         dataitem("Bank Account Statement"; "Bank Account Statement")
         {
-            DataItemTableView = SORTING("Bank Account No.", "Statement No.");
+            DataItemTableView = sorting("Bank Account No.", "Statement No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Bank Account No.", "Statement No.";
             column(ComanyName; COMPANYPROPERTY.DisplayName())
@@ -119,8 +125,8 @@ report 1407 "Bank Account Statement"
             }
             dataitem("Bank Account Statement Line"; "Bank Account Statement Line")
             {
-                DataItemLink = "Bank Account No." = FIELD("Bank Account No."), "Statement No." = FIELD("Statement No.");
-                DataItemTableView = SORTING("Bank Account No.", "Statement No.", "Statement Line No.");
+                DataItemLink = "Bank Account No." = field("Bank Account No."), "Statement No." = field("Statement No.");
+                DataItemTableView = sorting("Bank Account No.", "Statement No.", "Statement Line No.");
                 column(TrnsctnDte_BnkAcStmtLin; Format("Transaction Date"))
                 {
                 }

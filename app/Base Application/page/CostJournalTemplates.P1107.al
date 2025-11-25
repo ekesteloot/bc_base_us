@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Journal;
+
 page 1107 "Cost Journal Templates"
 {
     ApplicationArea = CostAccounting;
@@ -51,7 +53,7 @@ page 1107 "Cost Journal Templates"
                     Caption = 'Batches';
                     Image = Description;
                     RunObject = Page "Cost Journal Batches";
-                    RunPageLink = "Journal Template Name" = FIELD(Name);
+                    RunPageLink = "Journal Template Name" = field(Name);
                     ToolTip = 'Open the list of journal batches for the journal template. ';
                     Scope = Repeater;
                 }

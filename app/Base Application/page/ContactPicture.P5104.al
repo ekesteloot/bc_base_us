@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Contact;
+
+using System.Device;
+using System.IO;
+
 page 5104 "Contact Picture"
 {
     Caption = 'Contact Picture';
@@ -11,7 +16,7 @@ page 5104 "Contact Picture"
     {
         area(content)
         {
-            field(Image; Image)
+            field(Image; Rec.Image)
             {
                 ApplicationArea = Basic, Suite;
                 ShowCaption = false;
@@ -53,10 +58,10 @@ page 5104 "Contact Picture"
                     FileName: Text;
                     ClientFileName: Text;
                 begin
-                    TestField("No.");
-                    TestField(Name);
+                    Rec.TestField("No.");
+                    Rec.TestField(Name);
 
-                    if Image.HasValue() then
+                    if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -66,9 +71,9 @@ page 5104 "Contact Picture"
 
                     OnImportPictureOnBeforeStoreFile(Rec, FileName);
 
-                    Clear(Image);
-                    Image.ImportFile(FileName, ClientFileName);
-                    Modify(true);
+                    Clear(Rec.Image);
+                    Rec.Image.ImportFile(FileName, ClientFileName);
+                    Rec.Modify(true);
 
                     if FileManagement.DeleteServerFile(FileName) then;
                 end;
@@ -87,12 +92,12 @@ page 5104 "Contact Picture"
                     ToFile: Text;
                     ExportPath: Text;
                 begin
-                    TestField("No.");
-                    TestField(Name);
+                    Rec.TestField("No.");
+                    Rec.TestField(Name);
 
-                    ToFile := StrSubstNo('%1 %2.jpg', "No.", Name);
-                    ExportPath := TemporaryPath + "No." + Format(Image.MediaId);
-                    Image.ExportFile(ExportPath);
+                    ToFile := StrSubstNo('%1 %2.jpg', Rec."No.", Rec.Name);
+                    ExportPath := TemporaryPath + Rec."No." + Format(Rec.Image.MediaId);
+                    Rec.Image.ExportFile(ExportPath);
 
                     FileManagement.ExportImage(ExportPath, ToFile);
                 end;
@@ -107,13 +112,13 @@ page 5104 "Contact Picture"
 
                 trigger OnAction()
                 begin
-                    TestField("No.");
+                    Rec.TestField("No.");
 
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    Clear(Image);
-                    Modify(true);
+                    Clear(Rec.Image);
+                    Rec.Modify(true);
                 end;
             }
         }
@@ -131,7 +136,6 @@ page 5104 "Contact Picture"
 
     var
         Camera: Codeunit Camera;
-        [InDataSet]
         CameraAvailable: Boolean;
         OverrideImageQst: Label 'The existing picture will be replaced. Do you want to continue?';
         DeleteImageQst: Label 'Are you sure you want to delete the picture?';
@@ -161,7 +165,7 @@ page 5104 "Contact Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Image.HasValue;
+        DeleteExportEnabled := Rec.Image.HasValue;
     end;
 
     [IntegrationEvent(false, false)]

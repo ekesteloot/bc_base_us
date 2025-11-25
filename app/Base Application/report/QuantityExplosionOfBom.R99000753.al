@@ -1,7 +1,13 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.ProductionBOM;
+using System.Utilities;
+
 report 99000753 "Quantity Explosion of BOM"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/QuantityExplosionofBOM.rdlc';
+    RDLCLayout = './Manufacturing/Reports/QuantityExplosionofBOM.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Quantity Explosion of BOM';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 99000753 "Quantity Explosion of BOM"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Search Description", "Inventory Posting Group";
             column(AsOfCalcDate; Text000 + Format(CalculateDate))
             {
@@ -59,10 +65,10 @@ report 99000753 "Quantity Explosion of BOM"
             }
             dataitem(BOMLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem("Integer"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     column(BomCompLevelNo; BomComponent[Level]."No.")
                     {

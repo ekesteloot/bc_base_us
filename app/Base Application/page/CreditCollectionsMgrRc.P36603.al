@@ -89,30 +89,30 @@ page 36603 "Credit & Collections Mgr. RC"
                 Caption = 'Balance';
                 Image = Balance;
                 RunObject = Page "Customer List - Collections";
-                RunPageView = WHERE("Balance on Date (LCY)" = FILTER(> 0));
+                RunPageView = where("Balance on Date (LCY)" = filter(> 0));
                 ToolTip = 'View a detailed balance for selected customers. The report can, for example, be used at the close of an accounting period or fiscal year.';
             }
             action("Unlimited Credit")
             {
                 Caption = 'Unlimited Credit';
                 RunObject = Page "Customer List - Collections";
-                RunPageView = WHERE("Credit Limit (LCY)" = CONST(0));
+                RunPageView = where("Credit Limit (LCY)" = const(0));
                 ToolTip = 'View a customer''s available credit and how it is calculated. If the available credit is 0 and the customer''s credit limit is also 0, then the customer has unlimited credit because no credit limit has been defined.';
             }
             action("Limited Credit")
             {
                 Caption = 'Limited Credit';
                 RunObject = Page "Customer List - Collections";
-                RunPageView = WHERE("Credit Limit (LCY)" = FILTER(<> 0));
+                RunPageView = where("Credit Limit (LCY)" = filter(<> 0));
                 ToolTip = 'View customers'' remaining amount available to use for payments. It is calculated as follows: Credit Limit = Balance - Min. Balance - Total Amount on Payments';
             }
             action("Invoices by Due Date")
             {
                 Caption = 'Invoices by Due Date';
                 RunObject = Page "Customer Ledger Entries";
-                RunPageView = SORTING(Open, "Due Date")
-                              WHERE(Open = CONST(true),
-                                    "Document Type" = FILTER(Invoice | "Credit Memo"));
+                RunPageView = sorting(Open, "Due Date")
+                              where(Open = const(true),
+                                    "Document Type" = filter(Invoice | "Credit Memo"));
                 ToolTip = 'View the list of outstanding invoices by their payment due date.';
             }
             action("Sales Orders")
@@ -125,7 +125,7 @@ page 36603 "Credit & Collections Mgr. RC"
             {
                 Caption = 'Sales Return Orders';
                 RunObject = Page "Customer Order Header Status";
-                RunPageView = WHERE("Document Type" = CONST("Return Order"));
+                RunPageView = where("Document Type" = const("Return Order"));
                 ToolTip = 'View the list of ongoing sales return orders.';
             }
             action("Sales Invoices")

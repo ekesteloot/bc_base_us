@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Deposit;
+
 enum 500 "Deposits Page Setup Key"
 {
     value(0; DepositsPage)

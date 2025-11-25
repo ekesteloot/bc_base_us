@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.InventoryMgt.Comment;
+
 page 6781 "Posted Direct Transfer"
 {
     Caption = 'Posted Direct Transfer';
@@ -66,7 +70,7 @@ page 6781 "Posted Direct Transfer"
             part(TransferMovementLines; "Posted Direct Transfer Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group("Transfer-from")
             {
@@ -190,7 +194,7 @@ page 6781 "Posted Direct Transfer"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Direct Transfer Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -199,8 +203,8 @@ page 6781 "Posted Direct Transfer"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Direct Transfer"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Direct Transfer"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)

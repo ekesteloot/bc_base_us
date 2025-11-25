@@ -5,8 +5,8 @@ page 832 Approvals
     PageType = List;
     SourceTable = "Workflows Entries Buffer";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Record ID", "Last Date-Time Modified")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Record ID", "Last Date-Time Modified")
+                      order(Ascending);
 
     layout
     {
@@ -35,11 +35,11 @@ page 832 Approvals
                         ApprovalEntry: Record "Approval Entry";
                         WorkflowWebhookEntries: Page "Workflow Webhook Entries";
                     begin
-                        if "Created by Application" = "Created by Application"::"Microsoft Flow" then begin
-                            WorkflowWebhookEntries.Setfilters("Record ID");
+                        if Rec."Created by Application" = Rec."Created by Application"::"Microsoft Flow" then begin
+                            WorkflowWebhookEntries.Setfilters(Rec."Record ID");
                             WorkflowWebhookEntries.Run();
                         end else begin
-                            ApprovalEntry.SetRange("Record ID to Approve", "Record ID");
+                            ApprovalEntry.SetRange("Record ID to Approve", Rec."Record ID");
                             PAGE.Run(PAGE::"Approval Entries", ApprovalEntry);
                         end;
                     end;
@@ -64,7 +64,7 @@ page 832 Approvals
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the status of the approval on the line.';
                 }
-                field(Response; Response)
+                field(Response; Rec.Response)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the related workflow response.';
@@ -79,7 +79,7 @@ page 832 Approvals
 
     trigger OnAfterGetRecord()
     begin
-        RecordIDText := Format("Record ID", 0, 1);
+        RecordIDText := Format(Rec."Record ID", 0, 1);
     end;
 
     trigger OnOpenPage()
@@ -93,13 +93,13 @@ page 832 Approvals
         // get all records from Workflow Webhook Entry table
         if WorkflowWebhookEntry.Find('-') then
             repeat
-                AddWorkflowWebhookEntry(WorkflowWebhookEntry, WorkflowsCounter);
+                Rec.AddWorkflowWebhookEntry(WorkflowWebhookEntry, WorkflowsCounter);
             until WorkflowWebhookEntry.Next() = 0;
 
         // add all records from Approval Entry table
         if ApprovalEntry.Find('-') then
             repeat
-                AddApprovalEntry(ApprovalEntry, WorkflowsCounter);
+                Rec.AddApprovalEntry(ApprovalEntry, WorkflowsCounter);
             until ApprovalEntry.Next() = 0;
     end;
 
@@ -108,7 +108,7 @@ page 832 Approvals
 
     procedure Setfilters(RecordIDValue: RecordID)
     begin
-        SetRange("Record ID", RecordIDValue);
+        Rec.SetRange("Record ID", RecordIDValue);
     end;
 }
 

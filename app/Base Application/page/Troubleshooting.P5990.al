@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 page 5990 Troubleshooting
 {
     Caption = 'Troubleshooting';
@@ -18,7 +20,7 @@ page 5990 Troubleshooting
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -31,7 +33,7 @@ page 5990 Troubleshooting
             part(Control7; "Troubleshooting Subform")
             {
                 ApplicationArea = Service;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
         }
         area(factboxes)
@@ -68,7 +70,7 @@ page 5990 Troubleshooting
                     begin
                         TblshtgSetup.Reset();
                         TblshtgSetup.SetCurrentKey("Troubleshooting No.");
-                        TblshtgSetup.SetRange("Troubleshooting No.", "No.");
+                        TblshtgSetup.SetRange("Troubleshooting No.", Rec."No.");
                         PAGE.RunModal(PAGE::"Troubleshooting Setup", TblshtgSetup)
                     end;
                 }

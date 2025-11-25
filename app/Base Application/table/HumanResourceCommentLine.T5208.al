@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Comment;
+
+using Microsoft.HumanResources.Employee;
+
 table 5208 "Human Resource Comment Line"
 {
     Caption = 'Human Resource Comment Line';
@@ -14,19 +18,19 @@ table 5208 "Human Resource Comment Line"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF ("Table Name" = CONST(Employee)) Employee."No."
-            ELSE
-            IF ("Table Name" = CONST("Alternative Address")) "Alternative Address"."Employee No."
-            ELSE
-            IF ("Table Name" = CONST("Employee Qualification")) "Employee Qualification"."Employee No."
-            ELSE
-            IF ("Table Name" = CONST("Misc. Article Information")) "Misc. Article Information"."Employee No."
-            ELSE
-            IF ("Table Name" = CONST("Confidential Information")) "Confidential Information"."Employee No."
-            ELSE
-            IF ("Table Name" = CONST("Employee Absence")) "Employee Absence"."Employee No."
-            ELSE
-            IF ("Table Name" = CONST("Employee Relative")) "Employee Relative"."Employee No.";
+            TableRelation = if ("Table Name" = const(Employee)) Employee."No."
+            else
+            if ("Table Name" = const("Alternative Address")) "Alternative Address"."Employee No."
+            else
+            if ("Table Name" = const("Employee Qualification")) "Employee Qualification"."Employee No."
+            else
+            if ("Table Name" = const("Misc. Article Information")) "Misc. Article Information"."Employee No."
+            else
+            if ("Table Name" = const("Confidential Information")) "Confidential Information"."Employee No."
+            else
+            if ("Table Name" = const("Employee Absence")) "Employee Absence"."Employee No."
+            else
+            if ("Table Name" = const("Employee Relative")) "Employee Relative"."Employee No.";
         }
         field(3; "Table Line No."; Integer)
         {
@@ -35,7 +39,7 @@ table 5208 "Human Resource Comment Line"
         field(4; "Alternative Address Code"; Code[10])
         {
             Caption = 'Alternative Address Code';
-            TableRelation = IF ("Table Name" = CONST("Alternative Address")) "Alternative Address".Code WHERE("Employee No." = FIELD("No."));
+            TableRelation = if ("Table Name" = const("Alternative Address")) "Alternative Address".Code where("Employee No." = field("No."));
         }
         field(6; "Line No."; Integer)
         {

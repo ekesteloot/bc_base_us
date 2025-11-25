@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Contact;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 5049 "Contact Information Buffer"
 {
     Caption = 'Contact Information Buffer';

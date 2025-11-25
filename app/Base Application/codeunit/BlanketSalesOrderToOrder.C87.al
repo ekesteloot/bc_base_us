@@ -1,3 +1,13 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using System.Utilities;
+
 codeunit 87 "Blanket Sales Order to Order"
 {
     TableNo = "Sales Header";
@@ -18,19 +28,19 @@ codeunit 87 "Blanket Sales Order to Order"
         IsHandled: Boolean;
         SuppressCommit: Boolean;
     begin
-        OnBeforeRun(Rec, HideValidationDialog, SuppressCommit);
+        OnBeforeRun(Rec, HideValidationDialog);
 
-        TestField("Document Type", "Document Type"::"Blanket Order");
+        Rec.TestField("Document Type", Rec."Document Type"::"Blanket Order");
         ShouldRedistributeInvoiceAmount := SalesCalcDiscountByType.ShouldRedistributeInvoiceDiscountAmount(Rec);
 
-        Cust.Get("Sell-to Customer No.");
+        Cust.Get(Rec."Sell-to Customer No.");
         CheckBlockedCustomer(Rec, Cust);
 
-        ValidateSalesPersonOnSalesHeader(Rec, true, false);
+        Rec.ValidateSalesPersonOnSalesHeader(Rec, true, false);
 
-        CheckForBlockedLines();
+        Rec.CheckForBlockedLines();
 
-        if QtyToShipIsZero() then
+        if Rec.QtyToShipIsZero() then
             Error(Text002);
 
         SalesSetup.Get();
@@ -42,8 +52,8 @@ codeunit 87 "Blanket Sales Order to Order"
         CreditLimitExceeded := CreateSalesHeader(Rec, Cust."Prepayment %");
 
         BlanketOrderSalesLine.Reset();
-        BlanketOrderSalesLine.SetRange("Document Type", "Document Type");
-        BlanketOrderSalesLine.SetRange("Document No.", "No.");
+        BlanketOrderSalesLine.SetRange("Document Type", Rec."Document Type");
+        BlanketOrderSalesLine.SetRange("Document No.", Rec."No.");
         OnRunOnAfterBlanketOrderSalesLineSetFilters(BlanketOrderSalesLine);
         if BlanketOrderSalesLine.FindSet() then begin
             TempSalesLine.DeleteAll();
@@ -77,7 +87,7 @@ codeunit 87 "Blanket Sales Order to Order"
                     ResetQuantityFields(SalesOrderLine);
                     SalesOrderLine."Document Type" := SalesOrderHeader."Document Type";
                     SalesOrderLine."Document No." := SalesOrderHeader."No.";
-                    SalesOrderLine."Blanket Order No." := "No.";
+                    SalesOrderLine."Blanket Order No." := Rec."No.";
                     SalesOrderLine."Blanket Order Line No." := BlanketOrderSalesLine."Line No.";
                     if (SalesOrderLine."No." <> '') and (SalesOrderLine.Type <> SalesOrderLine.Type::" ") then begin
                         SalesOrderLine.Amount := 0;
@@ -142,7 +152,7 @@ codeunit 87 "Blanket Sales Order to Order"
 
         if SalesSetup."Copy Comments Blanket to Order" then begin
             SalesCommentLine.CopyComments(
-              SalesCommentLine."Document Type"::"Blanket Order".AsInteger(), SalesOrderHeader."Document Type".AsInteger(), "No.", SalesOrderHeader."No.");
+              SalesCommentLine."Document Type"::"Blanket Order".AsInteger(), SalesOrderHeader."Document Type".AsInteger(), Rec."No.", SalesOrderHeader."No.");
             RecordLinkManagement.CopyLinks(Rec, SalesOrderHeader);
         end;
 
@@ -163,7 +173,7 @@ codeunit 87 "Blanket Sales Order to Order"
                         Clear(Reservation);
                         Reservation.SetReservSource(TempSalesLine);
                         Reservation.RunModal();
-                        Find();
+                        Rec.Find();
                     until TempSalesLine.Next() = 0;
 
         Clear(CustCheckCreditLimit);
@@ -247,6 +257,8 @@ codeunit 87 "Blanket Sales Order to Order"
         OnBeforeCreateSalesHeader(SalesHeader);
 
         with SalesHeader do begin
+            if SalesSetup."Copy Comments Blanket to Order" then
+                CalcFields("Work Description");
             SalesOrderHeader := SalesHeader;
             SalesOrderHeader."Document Type" := SalesOrderHeader."Document Type"::Order;
             if not HideValidationDialog then
@@ -421,7 +433,7 @@ codeunit 87 "Blanket Sales Order to Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeRun(var SalesHeader: Record "Sales Header"; var HideValidationDialog: Boolean; var SuppressCommit: Boolean)
+    local procedure OnBeforeRun(var SalesHeader: Record "Sales Header"; var HideValidationDialog: Boolean)
     begin
     end;
 

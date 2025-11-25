@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.Setup;
+
+using Microsoft.InventoryMgt.BOM;
+
 page 905 "Assembly Setup"
 {
     AccessByPermission = TableData "BOM Component" = R;
@@ -80,10 +84,10 @@ page 905 "Assembly Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

@@ -1,3 +1,5 @@
+namespace System.IO;
+
 table 1213 "Data Exchange Type"
 {
     Caption = 'Data Exchange Type';

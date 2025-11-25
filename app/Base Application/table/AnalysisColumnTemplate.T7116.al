@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 table 7116 "Analysis Column Template"
 {
     Caption = 'Analysis Column Template';

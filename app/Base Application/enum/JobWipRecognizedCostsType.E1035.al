@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
 enum 1035 "Job WIP Recognized Costs Type"
 {
     Extensible = true;

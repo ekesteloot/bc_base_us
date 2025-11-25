@@ -1,3 +1,8 @@
+namespace System.Diagnostics;
+
+using System.Reflection;
+using System.Utilities;
+
 page 593 "Change Log Setup (Table) List"
 {
     Caption = 'Change Log Setup (Table) List';
@@ -50,7 +55,7 @@ page 593 "Change Log Setup (Table) List"
                         ConfirmManagement: Codeunit "Confirm Management";
                         NewValue: Option;
                     begin
-                        if ChangeLogSetupTable."Table No." <> "Object ID" then begin
+                        if ChangeLogSetupTable."Table No." <> Rec."Object ID" then begin
                             NewValue := ChangeLogSetupTable."Log Insertion";
                             GetRec();
                             ChangeLogSetupTable."Log Insertion" := NewValue;
@@ -89,7 +94,7 @@ page 593 "Change Log Setup (Table) List"
                         ConfirmManagement: Codeunit "Confirm Management";
                         NewValue: Option;
                     begin
-                        if ChangeLogSetupTable."Table No." <> "Object ID" then begin
+                        if ChangeLogSetupTable."Table No." <> Rec."Object ID" then begin
                             NewValue := ChangeLogSetupTable."Log Modification";
                             GetRec();
                             ChangeLogSetupTable."Log Modification" := NewValue;
@@ -127,7 +132,7 @@ page 593 "Change Log Setup (Table) List"
                         ConfirmManagement: Codeunit "Confirm Management";
                         NewValue: Option;
                     begin
-                        if ChangeLogSetupTable."Table No." <> "Object ID" then begin
+                        if ChangeLogSetupTable."Table No." <> Rec."Object ID" then begin
                             NewValue := ChangeLogSetupTable."Log Deletion";
                             GetRec();
                             ChangeLogSetupTable."Log Deletion" := NewValue;
@@ -164,11 +169,11 @@ page 593 "Change Log Setup (Table) List"
 
     trigger OnOpenPage()
     begin
-        FilterGroup(2);
-        SetRange("Object Type", "Object Type"::Table);
-        SetRange("Object ID", 0, 2000000000);
+        Rec.FilterGroup(2);
+        Rec.SetRange("Object Type", Rec."Object Type"::Table);
+        Rec.SetRange("Object ID", 0, 2000000000);
         MonitorSensitiveField.ExcludeMonitorTablesFromChangeLog(Rec);
-        FilterGroup(0);
+        Rec.FilterGroup(0);
     end;
 
     var
@@ -186,7 +191,7 @@ page 593 "Change Log Setup (Table) List"
         ChangeLogSetupFieldList: Page "Change Log Setup (Field) List";
     begin
         Field.FilterGroup(2);
-        Field.SetRange(TableNo, "Object ID");
+        Field.SetRange(TableNo, Rec."Object ID");
         Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
         Field.FilterGroup(0);
         with ChangeLogSetupTable do
@@ -226,9 +231,9 @@ page 593 "Change Log Setup (Table) List"
 
     local procedure GetRec()
     begin
-        if not ChangeLogSetupTable.Get("Object ID") then begin
+        if not ChangeLogSetupTable.Get(Rec."Object ID") then begin
             ChangeLogSetupTable.Init();
-            ChangeLogSetupTable."Table No." := "Object ID";
+            ChangeLogSetupTable."Table No." := Rec."Object ID";
         end;
         OnAfterGetRec(ChangeLogSetupTable);
     end;
@@ -237,16 +242,16 @@ page 593 "Change Log Setup (Table) List"
     var
         AllObjWithCaption: Record AllObjWithCaption;
     begin
-        DeleteAll();
+        Rec.DeleteAll();
 
         AllObjWithCaption.SetCurrentKey("Object Type", "Object ID");
-        AllObjWithCaption.SetRange("Object Type", "Object Type"::Table);
+        AllObjWithCaption.SetRange("Object Type", Rec."Object Type"::Table);
         AllObjWithCaption.SetRange("Object ID", 0, 2000000006);
 
         if AllObjWithCaption.Find('-') then
             repeat
                 Rec := AllObjWithCaption;
-                Insert();
+                Rec.Insert();
             until AllObjWithCaption.Next() = 0;
     end;
 

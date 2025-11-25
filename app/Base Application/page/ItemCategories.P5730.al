@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.InventoryMgt.Item.Attribute;
+using System.Text;
+
 page 5730 "Item Categories"
 {
     ApplicationArea = Basic, Suite;
@@ -8,7 +13,7 @@ page 5730 "Item Categories"
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "Item Category";
-    SourceTableView = SORTING("Presentation Order");
+    SourceTableView = sorting("Presentation Order");
     UsageCategory = Administration;
 
     layout
@@ -17,11 +22,11 @@ page 5730 "Item Categories"
         {
             repeater(Control1)
             {
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 IndentationControls = "Code";
                 ShowAsTree = true;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     StyleExpr = StyleTxt;
@@ -31,7 +36,7 @@ page 5730 "Item Categories"
                     trigger OnValidate()
                     begin
                         CurrPage.Update(false);
-                        CurrPage.ItemAttributesFactbox.PAGE.LoadCategoryAttributesData(Code);
+                        CurrPage.ItemAttributesFactbox.PAGE.LoadCategoryAttributesData(Rec.Code);
                     end;
                 }
                 field(Description; Rec.Description)
@@ -83,23 +88,23 @@ page 5730 "Item Categories"
 
     trigger OnAfterGetCurrRecord()
     begin
-        StyleTxt := GetStyleText();
-        CurrPage.ItemAttributesFactbox.PAGE.LoadCategoryAttributesData(Code);
+        StyleTxt := Rec.GetStyleText();
+        CurrPage.ItemAttributesFactbox.PAGE.LoadCategoryAttributesData(Rec.Code);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        StyleTxt := GetStyleText();
+        StyleTxt := Rec.GetStyleText();
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
-        StyleTxt := GetStyleText();
+        StyleTxt := Rec.GetStyleText();
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        StyleTxt := GetStyleText();
+        StyleTxt := Rec.GetStyleText();
     end;
 
     trigger OnOpenPage()

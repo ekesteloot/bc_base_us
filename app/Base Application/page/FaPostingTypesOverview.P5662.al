@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Posting;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 5662 "FA Posting Types Overview"
 {
     Caption = 'FA Posting Types Overview';
@@ -73,7 +79,7 @@ page 5662 "FA Posting Types Overview"
                 begin
                     Clear(MatrixForm);
                     MatrixForm.LoadMatrix(
-                      MATRIX_CaptionSet, MatrixRecords, NoOfColumns, GetFilter("FA Posting Date Filter"), RoundingFactor);
+                      MATRIX_CaptionSet, MatrixRecords, NoOfColumns, Rec.GetFilter("FA Posting Date Filter"), RoundingFactor);
                     MatrixForm.RunModal();
                 end;
             }
@@ -144,26 +150,28 @@ page 5662 "FA Posting Types Overview"
         MATRIX_CurrentNoOfColumns: Integer;
         PeriodType: Enum "Analysis Period Type";
         RoundingFactor: Enum "Analysis Rounding Factor";
-        AmountType: Enum "Analysis Amount Type";
         NoOfColumns: Integer;
+
+    protected var
+        AmountType: Enum "Analysis Amount Type";
 
     procedure SetStartFilter(SearchString: Code[10])
     var
         PeriodPageMgt: Codeunit PeriodPageManagement;
     begin
-        if GetFilter("FA Posting Date Filter") <> '' then begin
-            Calendar.SetFilter("Period Start", GetFilter("FA Posting Date Filter"));
+        if Rec.GetFilter("FA Posting Date Filter") <> '' then begin
+            Calendar.SetFilter("Period Start", Rec.GetFilter("FA Posting Date Filter"));
             if not PeriodPageMgt.FindDate('+', Calendar, PeriodType) then
                 PeriodPageMgt.FindDate('+', Calendar, PeriodType::Day);
             Calendar.SetRange("Period Start");
         end;
         PeriodPageMgt.FindDate(SearchString, Calendar, PeriodType);
         if AmountType = AmountType::"Net Change" then begin
-            SetRange("FA Posting Date Filter", Calendar."Period Start", Calendar."Period End");
-            if GetRangeMin("FA Posting Date Filter") = GetRangeMax("FA Posting Date Filter") then
-                SetRange("FA Posting Date Filter", GetRangeMin("FA Posting Date Filter"));
+            Rec.SetRange("FA Posting Date Filter", Calendar."Period Start", Calendar."Period End");
+            if Rec.GetRangeMin("FA Posting Date Filter") = Rec.GetRangeMax("FA Posting Date Filter") then
+                Rec.SetRange("FA Posting Date Filter", Rec.GetRangeMin("FA Posting Date Filter"));
         end else
-            SetRange("FA Posting Date Filter", 0D, Calendar."Period End");
+            Rec.SetRange("FA Posting Date Filter", 0D, Calendar."Period End");
     end;
 
     local procedure GenerateColumnCaptions(StepType: Enum "Matrix Page Step Type")

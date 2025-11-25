@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using System.Telemetry;
+
 page 395 "General Posting Setup Card"
 {
     Caption = 'General Posting Setup Card';
@@ -28,7 +32,7 @@ page 395 "General Posting Setup Card"
                             PurchLineDiscVisible := true;
                             PurchInvDiscVisible := true;
                         end else
-                            SetAccountsVisibility(
+                            Rec.SetAccountsVisibility(
                               PmtToleranceVisible, PmtDiscountVisible, SalesInvDiscVisible, SalesLineDiscVisible, PurchInvDiscVisible, PurchLineDiscVisible);
 
                         CurrPage.Update();
@@ -270,7 +274,7 @@ page 395 "General Posting Setup Card"
 
                 trigger OnAction()
                 begin
-                    SuggestSetupAccounts();
+                    Rec.SuggestSetupAccounts();
                 end;
             }
             action(Copy)
@@ -309,11 +313,10 @@ page 395 "General Posting Setup Card"
 
     trigger OnOpenPage()
     var
-       FeatureTelemetry: Codeunit "Feature Telemetry";
+        FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
-        SetAccountsVisibility(
+        Rec.SetAccountsVisibility(
           PmtToleranceVisible, PmtDiscountVisible, SalesInvDiscVisible, SalesLineDiscVisible, PurchInvDiscVisible, PurchLineDiscVisible);
-
         FeatureTelemetry.LogUptake('0000KQF', 'Prepayment Sales', Enum::"Feature Uptake Status"::Discovered);
         FeatureTelemetry.LogUptake('0000KQG', 'Prepayment Sales', Enum::"Feature Uptake Status"::"Set up");
         FeatureTelemetry.LogUptake('0000KQH', 'Prepayment Purchase', Enum::"Feature Uptake Status"::Discovered);

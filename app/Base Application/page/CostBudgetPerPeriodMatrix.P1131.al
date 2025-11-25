@@ -1,3 +1,10 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 1131 "Cost Budget per Period Matrix"
 {
     Caption = 'Cost Budget per Period Matrix';
@@ -292,11 +299,11 @@ page 1131 "Cost Budget per Period Matrix"
                     Caption = '&Card';
                     Image = EditLines;
                     RunObject = Page "Cost Type Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Cost Center Filter" = FIELD("Cost Center Filter"),
-                                  "Cost Object Filter" = FIELD("Cost Object Filter"),
-                                  "Budget Filter" = FIELD("Budget Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Cost Center Filter" = field("Cost Center Filter"),
+                                  "Cost Object Filter" = field("Cost Object Filter"),
+                                  "Budget Filter" = field("Budget Filter");
                     RunPageOnRec = true;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information for the cost type.';
@@ -307,8 +314,8 @@ page 1131 "Cost Budget per Period Matrix"
                     Caption = 'E&ntries';
                     Image = Entries;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Cost Type No." = FIELD("No.");
-                    RunPageView = SORTING("Cost Type No.", "Posting Date");
+                    RunPageLink = "Cost Type No." = field("No.");
+                    RunPageView = sorting("Cost Type No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the entries for the cost budget per period.';
                 }
@@ -399,9 +406,7 @@ page 1131 "Cost Budget per Period Matrix"
         RoundingFactor: Enum "Analysis Rounding Factor";
         CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[32] of Decimal;
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
         Text000: Label 'Set View As to Net Change before you edit entries.';
         Text001: Label '%1 or %2 must not be blank.';
@@ -454,9 +459,9 @@ page 1131 "Cost Budget per Period Matrix"
         SetDateFilter(ColumnID);
         CostBudgetEntry.SetCurrentKey("Budget Name", "Cost Type No.", "Cost Center Code", "Cost Object Code", Date);
         if Rec.Type in [Rec.Type::Total, Rec.Type::"End-Total"] then
-            CostBudgetEntry.SetFilter("Cost Type No.", Totaling)
+            CostBudgetEntry.SetFilter("Cost Type No.", Rec.Totaling)
         else
-            CostBudgetEntry.SetRange("Cost Type No.", "No.");
+            CostBudgetEntry.SetRange("Cost Type No.", Rec."No.");
         CostBudgetEntry.SetFilter("Cost Center Code", CostCenterFilter);
         CostBudgetEntry.SetFilter("Cost Object Code", CostObjectFilter);
         CostBudgetEntry.SetFilter("Budget Name", BudgetFilter);

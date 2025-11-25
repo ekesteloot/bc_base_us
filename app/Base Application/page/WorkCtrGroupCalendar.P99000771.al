@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Setup;
+using System.Utilities;
+
 page 99000771 "Work Ctr. Group Calendar"
 {
     Caption = 'Work Ctr. Group Calendar';
@@ -24,7 +31,7 @@ page 99000771 "Work Ctr. Group Calendar"
 
                     trigger OnValidate()
                     begin
-                        GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+                        GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
                     end;
                 }
                 field(CapacityUoM; CapacityUoM)
@@ -75,7 +82,7 @@ page 99000771 "Work Ctr. Group Calendar"
 
                 trigger OnAction()
                 begin
-                    GenerateColumnCaptions("Matrix Page Step Type"::Previous);
+                    GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Previous);
                 end;
             }
             action("Next Set")
@@ -87,7 +94,7 @@ page 99000771 "Work Ctr. Group Calendar"
 
                 trigger OnAction()
                 begin
-                    GenerateColumnCaptions("Matrix Page Step Type"::Next);
+                    GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Next);
                 end;
             }
         }
@@ -112,7 +119,7 @@ page 99000771 "Work Ctr. Group Calendar"
 
     trigger OnOpenPage()
     begin
-        GenerateColumnCaptions("Matrix Page Step Type"::Initial);
+        GenerateColumnCaptions(Enum::"Matrix Page Step Type"::Initial);
         MATRIX_UseNameForCaption := false;
         MATRIX_CurrentSetLenght := ArrayLen(MATRIX_CaptionSet);
         MfgSetup.Get();

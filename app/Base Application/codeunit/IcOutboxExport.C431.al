@@ -1,3 +1,18 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Foundation.Company;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Intercompany.Setup;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using System.Email;
+using System.Environment;
+using System.IO;
+using System.Telemetry;
+using System.Utilities;
+
 codeunit 431 "IC Outbox Export"
 {
     TableNo = "IC Outbox Transaction";
@@ -282,7 +297,6 @@ codeunit 431 "IC Outbox Export"
 
     procedure SendToInternalPartner(var ICOutboxTrans: Record "IC Outbox Transaction")
     var
-        Company: Record Company;
         ICPartner: Record "IC Partner";
         MoveICTransToPartnerCompany: Report "Move IC Trans. to Partner Comp";
         IsHandled: Boolean;
@@ -293,7 +307,6 @@ codeunit 431 "IC Outbox Export"
                 ICPartner.TestField(Blocked, false);
                 if ICPartner."Inbox Type" = ICPartner."Inbox Type"::Database then begin
                     ICPartner.TestField("Inbox Details");
-                    Company.Get(ICPartner."Inbox Details");
                     ICOutboxTrans.SetRange("Transaction No.", ICOutboxTrans."Transaction No.");
                     IsHandled := false;
                     OnSendToInternalPartnerOnBeforeMoveICTransToPartnerCompany(ICOutboxTrans, IsHandled);

@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 page 9851 "Permission Set List"
 {
     Caption = 'Permission Set List';
@@ -18,7 +20,7 @@ page 9851 "Permission Set List"
             repeater(Group)
             {
                 Caption = 'Permission Set';
-                field(PermissionSet; "Role ID")
+                field(PermissionSet; Rec."Role ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Permission Set';
@@ -54,19 +56,19 @@ page 9851 "Permission Set List"
 
     trigger OnOpenPage()
     begin
-        FillRecordBuffer();
+        Rec.FillRecordBuffer();
     end;
 
     procedure GetSelectionFilter(var AggregatePermissionSet: Record "Aggregate Permission Set")
     begin
         AggregatePermissionSet.Reset();
         CurrPage.SetSelectionFilter(Rec);
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
-                if AggregatePermissionSet.Get(Scope, "App ID", "Role ID") then
+                if AggregatePermissionSet.Get(Rec.Scope, Rec."App ID", Rec."Role ID") then
                     AggregatePermissionSet.Mark(true);
-            until Next() = 0;
-        Reset();
+            until Rec.Next() = 0;
+        Rec.Reset();
         AggregatePermissionSet.MarkedOnly(true);
     end;
 }

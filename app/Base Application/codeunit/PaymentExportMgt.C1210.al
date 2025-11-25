@@ -1,3 +1,11 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.IO;
+using System.Text;
+
 codeunit 1210 "Payment Export Mgt"
 {
     Permissions = TableData "Gen. Journal Line" = rm,

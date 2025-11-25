@@ -1,9 +1,16 @@
+namespace System.Integration.PowerBI;
+
+using System.Environment;
+using System.Telemetry;
+using System.Utilities;
+
 page 6325 "Power BI Embedded Report Part"
 {
     Caption = 'Power BI Report';
     PageType = CardPart;
     SourceTable = "Power BI Report Configuration";
     Editable = false;
+    RefreshOnActivate = true;
 
     layout
     {
@@ -20,27 +27,27 @@ page 6325 "Power BI Embedded Report Part"
                     Editable = false;
                     ShowCaption = false;
                     Style = StrongAccent;
-                    StyleExpr = TRUE;
-                    ToolTipML = ENU = 'Specifies whether the Power BI functionality is enabled.';
+                    StyleExpr = true;
+                    ToolTip = 'Specifies whether the Power BI functionality is enabled.';
 
                     trigger OnDrillDown()
                     var
                         PowerBIUserConfiguration: Record "Power BI User Configuration";
                         PowerBIEmbedSetupWizard: Page "Power BI Embed Setup Wizard";
                     begin
-                        Session.LogMessage('0000GJP', PowerBiOptInTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
+                        FeatureTelemetry.LogUptake('0000GJP', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), Enum::"Feature Uptake Status"::Discovered);
 
                         PowerBIUserConfiguration.CreateOrReadForCurrentUser(PageContext);
                         Commit();
 
                         PowerBIEmbedSetupWizard.SetContext(PageContext);
                         if PowerBIEmbedSetupWizard.RunModal() <> Action::Cancel then
-                            ReloadPageState();
+                            ReloadPageState(true);
                     end;
                 }
                 field(OptInImageField; MediaResources."Media Reference")
                 {
-                    CaptionML = ENU = '';
+                    Caption = '';
                     ApplicationArea = All;
                     Editable = false;
                 }
@@ -56,16 +63,22 @@ page 6325 "Power BI Embedded Report Part"
                     Editable = false;
                     ShowCaption = false;
                     Style = StrongAccent;
-                    StyleExpr = TRUE;
-                    ToolTipML = ENU = 'Specifies that the user can upload one or more demo reports for this page.';
+                    StyleExpr = true;
+                    ToolTip = 'Specifies that the user can upload one or more demo reports for this page.';
 
                     trigger OnDrillDown()
                     begin
                         StartAutoDeployment();
                         Message(ReportsDeployingMsg);
 
-                        CurrPage.Update();
+                        CurrPage.Update(false);
                     end;
+                }
+                field(OptInImageField2; MediaResources."Media Reference")
+                {
+                    Caption = '';
+                    ApplicationArea = All;
+                    Editable = false;
                 }
             }
             group(ReportGroup)
@@ -76,137 +89,186 @@ page 6325 "Power BI Embedded Report Part"
                 usercontrol(WebReportViewer; "Microsoft.Dynamics.Nav.Client.WebPageViewer")
                 {
                     ApplicationArea = All;
+                    Visible = false;
+                }
 
-                    trigger ControlAddInReady(callbackUrl: Text)
+                usercontrol(PowerBIAddin; "Microsoft.Dynamics.Nav.Client.PowerBIManagement")
+                {
+                    ApplicationArea = All;
+
+                    trigger AddInReady()
                     begin
                         AddInReady := true;
+                        if not (ClientTypeManagement.GetCurrentClientType() in [ClientType::Phone, ClientType::Windows]) then begin
+                            if ReportFrameRatio = '' then
+                                ReportFrameRatio := PowerBiServiceMgt.GetMainPageRatio();
+                            CurrPage.PowerBIAddin.InitializeFrame(false, ReportFrameRatio);
+                        end;
+
                         if not Rec.IsEmpty() then
                             SetReport();
                     end;
 
-                    trigger DocumentReady()
+                    trigger ReportLoaded(ReportFilters: Text; ActivePageName: Text; ActivePageFilters: Text; CorrelationId: Text)
                     begin
-                        InitializeAddIn();
+                        LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::Report);
+                        AvailableReportLevelFilters := ReportFilters;
+                        PushFiltersToAddin();
                     end;
 
-                    trigger Callback(data: Text)
+                    trigger DashboardLoaded(CorrelationId: Text)
                     begin
-                        HandleAddinCallback(data);
+                        LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::Dashboard);
                     end;
 
-                    trigger Refresh(callbackUrl: Text)
+                    trigger DashboardTileLoaded(CorrelationId: Text)
                     begin
-                        if AddInReady and not Rec.IsEmpty() then
-                            SetReport();
+                        LogVisualLoaded(CorrelationId, Enum::"Power BI Element Type"::"Dashboard Tile");
+                    end;
+
+                    trigger ErrorOccurred(Operation: Text; ErrorText: Text)
+                    begin
+                        LogEmbedError(Operation);
+                        ShowError(ErrorText);
+                    end;
+
+                    trigger ReportPageChanged(newPage: Text; newPageFilters: Text)
+                    begin
+                        Rec."Report Page" := CopyStr(newPage, 1, MaxStrLen(Rec."Report Page"));
+                        Rec.Modify();
                     end;
                 }
             }
+#if not CLEAN23
             grid(MessagesGridGroup)
             {
                 GridLayout = Columns;
                 ShowCaption = false;
-
+                Visible = false;
+                ObsoleteTag = '23.0';
+                ObsoleteReason = 'The content of this group has been moved to the main page';
+                ObsoleteState = Pending;
                 group(MessagesInnerGroup)
                 {
                     ShowCaption = false;
+                    ObsoleteTag = '23.0';
+                    ObsoleteReason = 'The content of this group has been moved to the main page';
+                    ObsoleteState = Pending;
+                }
+            }
+#endif
+            group(ErrorGroup)
+            {
+                ShowCaption = false;
+                Visible = PageState = PageState::ErrorVisible;
 
-                    group(ErrorGroup)
-                    {
-                        ShowCaption = false;
-                        Visible = PageState = PageState::ErrorVisible;
+                label(Spacer)
+                {
+                    ApplicationArea = All;
+                    Caption = ' ';
+                }
+                field(ErrorMessageText; ErrorMessageText)
+                {
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    Editable = false;
+                    ShowCaption = false;
+                    ToolTip = 'Specifies the error message from Power BI.';
+                }
+            }
+            group(NoReportGroup)
+            {
+                ShowCaption = false;
+                Visible = PageState = PageState::NoReport;
 
-                        field(ErrorMessageText; ErrorMessageText)
-                        {
-                            ApplicationArea = All;
-                            MultiLine = true;
-                            Editable = false;
-                            ShowCaption = false;
-                            ToolTip = 'Specifies the error message from Power BI.';
-                        }
-                    }
-                    group(NoReportGroup)
-                    {
-                        ShowCaption = false;
-                        Visible = PageState = PageState::NoReport;
+                label(Spacer1)
+                {
+                    ApplicationArea = All;
+                    Caption = ' ';
+                }
+                label(EmptyMessage)
+                {
+                    ApplicationArea = All;
+                    Caption = 'There are no enabled reports.';
+                    Editable = false;
+                    ShowCaption = false;
+                }
+                field(SelectReportsLink; SelectReportsTxt)
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    ShowCaption = false;
+                    Style = StrongAccent;
+                    StyleExpr = true;
+                    ToolTip = 'Specifies that the user can select the reports to show from here.';
+                    Visible = not LockedToFirstVisual;
 
-                        label(EmptyMessage)
-                        {
-                            ApplicationArea = All;
-                            Caption = 'There are no enabled reports.';
-                            Editable = false;
-                            ShowCaption = false;
-                        }
-                        field(SelectReportsLink; SelectReportsTxt)
-                        {
-                            ApplicationArea = All;
-                            Editable = false;
-                            ShowCaption = false;
-                            Style = StrongAccent;
-                            StyleExpr = TRUE;
-                            ToolTip = 'Specifies that the user can select the reports to show from here.';
+                    trigger OnDrillDown()
+                    begin
+                        SelectReports();
+                    end;
+                }
+            }
+            group(DeployingReportsGroup)
+            {
+                ShowCaption = false;
+                Visible = PageState = PageState::NoReportButDeploying;
 
-                            trigger OnDrillDown()
-                            begin
-                                SelectReports();
-                            end;
-                        }
-                    }
-                    group(DeployingReportsGroup)
-                    {
-                        ShowCaption = false;
-                        Visible = PageState = PageState::NoReportButDeploying;
+                label(Spacer2)
+                {
+                    ApplicationArea = All;
+                    Caption = ' ';
+                }
+                label(EmptyMessage2)
+                {
+                    ApplicationArea = All;
+                    Caption = 'There are no enabled reports.';
+                    Editable = false;
+                    ShowCaption = false;
+                }
+                label(NoReportsMessage)
+                {
+                    ApplicationArea = All;
+                    Caption = 'If you just started the upload of new reports from Business Central, choose Refresh to see if they''ve completed.';
+                    Editable = false;
+                    ShowCaption = false;
+                }
+                field(SelectReportsLink2; SelectReportsTxt)
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    ShowCaption = false;
+                    Style = StrongAccent;
+                    StyleExpr = true;
+                    ToolTip = 'Specifies that the user can select the reports to show from here.';
+                    Visible = not LockedToFirstVisual;
 
-                        label(EmptyMessage2)
-                        {
-                            ApplicationArea = All;
-                            Caption = 'There are no enabled reports.';
-                            Editable = false;
-                            ShowCaption = false;
-                        }
-                        label(NoReportsMessage)
-                        {
-                            ApplicationArea = All;
-                            Caption = 'If you just started the upload of new reports from Business Central, choose Refresh to see if they''ve completed.';
-                            Editable = false;
-                            ShowCaption = false;
-                        }
-                        field(SelectReportsLink2; SelectReportsTxt)
-                        {
-                            ApplicationArea = All;
-                            Editable = false;
-                            ShowCaption = false;
-                            Style = StrongAccent;
-                            StyleExpr = TRUE;
-                            ToolTip = 'Specifies that the user can select the reports to show from here.';
+                    trigger OnDrillDown()
+                    begin
+                        SelectReports();
+                    end;
+                }
+                field(RefreshPartLink; RefreshPartTxt)
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    ShowCaption = false;
+                    Style = StrongAccent;
+                    StyleExpr = true;
+                    ToolTip = 'Specifies that the user can refresh the page part. If reports have been deployed in the background, refreshing the page part will make them visible.';
 
-                            trigger OnDrillDown()
-                            begin
-                                SelectReports();
-                            end;
-                        }
-                        field(RefreshPartLink; RefreshPartTxt)
-                        {
-                            ApplicationArea = All;
-                            Editable = false;
-                            ShowCaption = false;
-                            Style = StrongAccent;
-                            StyleExpr = TRUE;
-                            ToolTip = 'Specifies that the user can refresh the page part. If reports have been deployed in the background, refreshing the page part will make them visible.';
+                    trigger OnDrillDown()
+                    var
+                        PreviousPageState: Option;
+                    begin
+                        PreviousPageState := PageState;
+                        ReloadPageState(true);
 
-                            trigger OnDrillDown()
-                            var
-                                PreviousPageState: Option;
-                            begin
-                                PreviousPageState := PageState;
-                                ReloadPageState();
+                        CurrPage.Update(false);
 
-                                CurrPage.Update(false);
-
-                                if (PageState = PageState::NoReportButDeploying) and (PreviousPageState = PageState::NoReportButDeploying) then
-                                    Message(StillDeployingMsg);
-                            end;
-                        }
-                    }
+                        if (PageState = PageState::NoReportButDeploying) and (PreviousPageState = PageState::NoReportButDeploying) then
+                            Message(StillDeployingMsg);
+                    end;
                 }
             }
         }
@@ -220,15 +282,18 @@ page 6325 "Power BI Embedded Report Part"
             {
                 ApplicationArea = All;
                 Caption = 'Select Report';
-                Enabled = (PageState = PageState::ReportVisible) or (PageState = PageState::NoReport) or (PageState = PageState::NoReportButDeploying) or (PageState = PageState::ShouldDeploy);
+                Enabled = PageState <> PageState::GetStarted;
+                Visible = not LockedToFirstVisual;
                 Image = SelectChart;
                 ToolTip = 'Select the report.';
 
                 trigger OnAction()
                 begin
                     SelectReports();
+                    FeatureTelemetry.LogUsage('0000L04', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), 'Power BI reports selected');
                 end;
             }
+#if not CLEAN23
             action("Expand Report")
             {
                 ApplicationArea = All;
@@ -236,22 +301,27 @@ page 6325 "Power BI Embedded Report Part"
                 Enabled = PageState = PageState::ReportVisible;
                 Image = View;
                 ToolTip = 'View all information in the report.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Use the action ExpandReport instead';
+                ObsoleteTag = '23.0';
+                Visible = false;
 
                 trigger OnAction()
                 var
                     PowerBiReportDialog: Page "Power BI Report Dialog";
                 begin
-                    PowerBiReportDialog.SetReportUrl(GetEmbedUrl(true, true));
+                    PowerBiReportDialog.SetReportUrl(Rec.ReportEmbedUrl);
                     PowerBiReportDialog.Caption(StrSubstNo(ReportCaptionTxt, Rec.ReportName, Rec."Workspace Name"));
-                    PowerBiReportDialog.SetFilterValue(CurrentListSelection, CurrentReportFirstPage);
                     PowerBiReportDialog.Run();
                 end;
             }
+#endif
             action("Previous Report")
             {
                 ApplicationArea = All;
                 Caption = 'Previous Report';
                 Enabled = PageState = PageState::ReportVisible;
+                Visible = not LockedToFirstVisual;
                 Image = PreviousSet;
                 ToolTip = 'Go to the previous report.';
 
@@ -261,7 +331,9 @@ page 6325 "Power BI Embedded Report Part"
                         Rec.FindLast();
 
                     if AddInReady then
-                        CurrPage.WebReportViewer.Navigate(GetEmbedUrl(false, false));
+                        SetReport();
+
+                    FeatureTelemetry.LogUsage('0000L05', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), 'Power BI report changed');
                 end;
             }
             action("Next Report")
@@ -269,6 +341,7 @@ page 6325 "Power BI Embedded Report Part"
                 ApplicationArea = All;
                 Caption = 'Next Report';
                 Enabled = PageState = PageState::ReportVisible;
+                Visible = not LockedToFirstVisual;
                 Image = NextSet;
                 ToolTip = 'Go to the next report.';
 
@@ -278,9 +351,11 @@ page 6325 "Power BI Embedded Report Part"
                         Rec.FindFirst();
 
                     if AddInReady then
-                        CurrPage.WebReportViewer.Navigate(GetEmbedUrl(false, false));
+                        SetReport();
+                    FeatureTelemetry.LogUsage('0000L08', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), 'Power BI report changed');
                 end;
             }
+#if not CLEAN23
             action("Manage Report")
             {
                 ApplicationArea = All;
@@ -288,30 +363,53 @@ page 6325 "Power BI Embedded Report Part"
                 Enabled = PageState = PageState::ReportVisible;
                 Image = PowerBI;
                 ToolTip = 'Opens current selected report for edits.';
-                Visible = IsSaaSUser;
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Use the action ExpandReport instead';
+                ObsoleteTag = '23.0';
+                Visible = false;
 
                 trigger OnAction()
                 var
                     PowerBIManagement: Page "Power BI Management";
                 begin
-                    PowerBIManagement.SetTargetReport(Rec."Report ID", GetEmbedUrl(false, false));
+                    PowerBIManagement.SetTargetReport(Rec."Report ID", Rec.ReportEmbedUrl);
                     PowerBIManagement.LookupMode(true);
                     PowerBIManagement.Run();
 
-                    ReloadPageState();
+                    ReloadPageState(false);
+                end;
+            }
+#endif
+            action(ExpandReport)
+            {
+                ApplicationArea = All;
+                Caption = 'Expand Report';
+                Enabled = PageState = PageState::ReportVisible;
+                Image = PowerBI;
+                ToolTip = 'Opens the currently selected report in a larger page.';
+
+                trigger OnAction()
+                var
+                    PowerBIReportCard: Page "Power BI Report Card";
+                begin
+                    PowerBIReportCard.SetRecord(Rec);
+                    PowerBIReportCard.Run();
+
+                    ReloadPageState(false);
+                    FeatureTelemetry.LogUsage('0000L09', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), 'Power BI report expanded');
                 end;
             }
             action(Refresh)
             {
                 ApplicationArea = All;
-                Caption = 'Refresh Page';
+                Caption = 'Reload';
                 Enabled = PageState <> PageState::GetStarted;
                 Image = Refresh;
-                ToolTip = 'Refresh the visible content.';
+                ToolTip = 'Reloads the Power BI subpage.';
 
                 trigger OnAction()
                 begin
-                    ReloadPageState();
+                    ReloadPageState(true);
                 end;
             }
             action("Upload Report")
@@ -326,7 +424,7 @@ page 6325 "Power BI Embedded Report Part"
                 trigger OnAction()
                 begin
                     Page.RunModal(Page::"Upload Power BI Report");
-                    ReloadPageState();
+                    ReloadPageState(false);
                 end;
             }
             action("Reset All Reports")
@@ -346,7 +444,9 @@ page 6325 "Power BI Embedded Report Part"
 #endif
                     PowerBIUserConfiguration: Record "Power BI User Configuration";
                     PowerBICustomerReports: Record "Power BI Customer Reports";
+#if not CLEAN23
                     PowerBIUserStatus: Record "Power BI User Status";
+#endif
                     ChosenOption: Integer;
                 begin
                     ChosenOption := StrMenu(ResetReportsOptionsTxt, 1, ResetReportsQst);
@@ -355,7 +455,9 @@ page 6325 "Power BI Embedded Report Part"
 
                     if ChosenOption in [1, 2] then begin // Delete reports only or delete all
                         PowerBIReportConfiguration.DeleteAll();
+#if not CLEAN23
                         PowerBIUserStatus.DeleteAll();
+#endif
 #if not CLEAN22
                         PowerBIServiceStatusSetup.DeleteAll();
 #endif
@@ -367,7 +469,9 @@ page 6325 "Power BI Embedded Report Part"
                         end;
 
                         Commit();
-                        ReloadPageState();
+                        ReloadPageState(true);
+
+                        FeatureTelemetry.LogUptake('0000L03', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), Enum::"Feature Uptake Status"::Undiscovered);
                     end;
                 end;
             }
@@ -376,10 +480,10 @@ page 6325 "Power BI Embedded Report Part"
 
     trigger OnInit()
     var
-        EnvironmentInfo: Codeunit "Environment Information";
+        EnvironmentInformation: Codeunit "Environment Information";
     begin
         IsPBIAdmin := PowerBiServiceMgt.IsUserAdminForPowerBI(UserSecurityId());
-        IsSaaSUser := EnvironmentInfo.IsSaaS();
+        IsSaaSUser := EnvironmentInformation.IsSaaS();
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -389,17 +493,18 @@ page 6325 "Power BI Embedded Report Part"
         Rec.SetRange("User Security ID", UserSecurityId());
 
         PreviousFilterGroup := Rec.FilterGroup();
-        Rec.FilterGroup(4); // Filter set with SubPageView
+        Rec.FilterGroup(4);
+
         if PageContext = '' then
-            PageContext := CopyStr(Rec.GetFilter(Context), 1, MaxStrLen(PageContext))
-        else
-            Rec.SetRange(Context, PageContext);
-        Rec.FilterGroup(PreviousFilterGroup);
+            PageContext := CopyStr(Rec.GetFilter(Context), 1, MaxStrLen(PageContext));
 
         if PageContext = '' then
             PageContext := PowerBiServiceMgt.GetEnglishContext();
 
-        ReloadPageState();
+        Rec.SetRange(Context, PageContext);
+        Rec.FilterGroup(PreviousFilterGroup);
+
+        ReloadPageState(false);
 
         if Rec.IsEmpty() then
             exit(true);
@@ -418,8 +523,9 @@ page 6325 "Power BI Embedded Report Part"
     var
         MediaResources: Record "Media Resources";
         PowerBiServiceMgt: Codeunit "Power BI Service Mgt.";
+        PowerBiFilterHelper: Codeunit "Power BI Filter Helper";
         ClientTypeManagement: Codeunit "Client Type Management";
-        PowerBiEmbedHelper: Codeunit "Power BI Embed Helper";
+        FeatureTelemetry: Codeunit "Feature Telemetry";
         ResetReportsQst: Label 'This action will clear some or all of of the Power BI report setup for all users in the company you''re currently working with. Note: This action doesn''t delete reports in Power BI workspaces.';
         ResetReportsOptionsTxt: Label 'Clear Power BI report selections for all pages and users,Reset the entire Power BI report setup', Comment = 'A comma-separated list of options';
         PowerBiOptInImageNameLbl: Label 'PowerBi-OptIn-480px.png', Locked = true;
@@ -429,32 +535,38 @@ page 6325 "Power BI Embedded Report Part"
         StillDeployingMsg: Label 'We are still uploading your demo report. Once the upload finishes, choose Refresh again to see it in this page.\\If you have already reports in your Power BI workspace, you can choose Select Reports instead.';
         RefreshPartTxt: Label 'Refresh';
         SelectReportsTxt: Label 'Select reports';
+#if not CLEAN23
         ReportCaptionTxt: Label '%1 (Workspace: %2)', Comment = '%1: a report name, for example "Top customers by sales"; %2: a Power BI workspace name, for example "Contoso"';
+#endif
         PageState: Option GetStarted,ShouldDeploy,NoReport,NoReportButDeploying,ReportVisible,ErrorVisible;
         ReportFrameRatio: Text;
+        AvailableReportLevelFilters: Text;
+        FilterValuesJsonArray: JsonArray;
         PageContext: Text[30];
         AddInReady: Boolean;
         ErrorMessageText: Text;
-        CurrentListSelection: Text;
-        LatestReceivedFilterInfo: Text;
-        CurrentReportFirstPage: Text;
         IsSaaSUser: Boolean;
         IsPBIAdmin: Boolean;
+        LockedToFirstVisual: Boolean;
         // Telemetry labels
-        InvalidEmbedUriErr: Label 'Invalid embed URI with length: %1', Locked = true;
+        EmbedCorrelationTelemetryTxt: Label 'Embed element started with type: %1, and correlation: %2', Locked = true;
+        EmbedErrorOccurredTelemetryTxt: Label 'Embed error occurred with category: %1', Locked = true;
         NoOptInImageTxt: Label 'There is no Power BI Opt-in image in the Database with ID: %1', Locked = true;
-        PowerBiOptInTxt: Label 'User has opted in to enable Power BI services', Locked = true;
-        PowerBIReportLoadTelemetryMsg: Label 'Loading Power BI report for user', Locked = true;
         ReportsResetTelemetryMsg: Label 'User has reset Power BI setup, option chosen: %1', Locked = true;
-        UnsupportedFilterTypeTelemetryMsg: Label 'Cannot filter Power BI report: the filter type is not supported.', Locked = true;
 
 
-    local procedure ReloadPageState()
+    local procedure ReloadPageState(ClearError: Boolean)
     var
         PowerBIUserConfiguration: Record "Power BI User Configuration";
         PowerBIReportSynchronizer: Codeunit "Power BI Report Synchronizer";
         NullGuid: Guid;
     begin
+        if PageState = PageState::ErrorVisible then
+            if ClearError then
+                Clear(PageState)
+            else
+                exit;
+
         PowerBIUserConfiguration.SetRange("User Security ID", UserSecurityId());
         if PowerBIUserConfiguration.IsEmpty() then begin
             LoadOptInImage();
@@ -463,6 +575,7 @@ page 6325 "Power BI Embedded Report Part"
         end;
 
         PowerBIUserConfiguration.CreateOrReadForCurrentUser(PageContext);
+        LockedToFirstVisual := PowerBIUserConfiguration."Lock to first visual";
 
         if not Rec.Get(UserSecurityId(), PowerBIUserConfiguration."Selected Report ID", PageContext) then
             if Rec.FindFirst() then
@@ -495,58 +608,32 @@ page 6325 "Power BI Embedded Report Part"
     local procedure StartAutoDeployment()
     var
         DummyPowerBIUserConfiguration: Record "Power BI User Configuration";
-        PowerBIReportSynchronizer: Codeunit "Power BI Report Synchronizer";
     begin
         // Ensure user config for context before deployment
         if PageContext = '' then
             exit;
 
         DummyPowerBIUserConfiguration.CreateOrReadForCurrentUser(PageContext);
-        PowerBIReportSynchronizer.SelectDefaultReports();
-        PowerBiServiceMgt.SynchronizeReportsInBackground();
+        PowerBiServiceMgt.SynchronizeReportsInBackground(PageContext);
     end;
 
-    local procedure GetEmbedUrl(EnableFilterPane: Boolean; EnableNavigationContentPane: Boolean): Text
-    var
-        UriBuilder: Codeunit "Uri Builder";
-        Uri: Codeunit Uri;
-    begin
-        SaveReportIdInConfiguration(Rec."Report ID");
-
-        Session.LogMessage('0000GJR', PowerBIReportLoadTelemetryMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
-
-        if not Uri.IsValidUri(Rec.ReportEmbedUrl) then begin
-            Session.LogMessage('0000GJS', StrSubstNo(InvalidEmbedUriErr, StrLen(Rec.ReportEmbedUrl)), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
-            exit(Rec.ReportEmbedUrl);
-        end;
-
-        // Hides both filters and tabs for embedding in small spaces where navigation is unnecessary.
-        UriBuilder.Init(Rec.ReportEmbedUrl);
-        UriBuilder.AddQueryParameter('filterPaneEnabled', Format(EnableFilterPane, 0, 9));
-        UriBuilder.AddQueryParameter('disableBroswerDeprecationDialog', 'true');
-        UriBuilder.AddQueryParameter('navContentPaneEnabled', Format(EnableNavigationContentPane, 0, 9));
-
-        UriBuilder.GetUri(Uri);
-        exit(Uri.GetAbsoluteUri());
-    end;
-
+    [NonDebuggable]
     local procedure SetReport()
     var
-        JsonArray: DotNet Array;
-        DotNetString: DotNet String;
+        AccessToken: Text;
     begin
-        if not (ClientTypeManagement.GetCurrentClientType() in [ClientType::Phone, ClientType::Windows]) then begin
-            if ReportFrameRatio = '' then
-                ReportFrameRatio := PowerBiServiceMgt.GetMainPageRatio();
-            CurrPage.WebReportViewer.InitializeIFrame(ReportFrameRatio);
+        FeatureTelemetry.LogUptake('0000GJR', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), Enum::"Feature Uptake Status"::Used);
+
+        AccessToken := PowerBiServiceMgt.GetEmbedAccessToken();
+
+        if AccessToken = '' then begin
+            ShowError(GetLastErrorText());
+            exit;
         end;
 
-        // subscribe to events
-        CurrPage.WebReportViewer.SubscribeToEvent('message', GetEmbedUrl(false, false));
-        CurrPage.WebReportViewer.Navigate(GetEmbedUrl(false, false));
-        JsonArray := JsonArray.CreateInstance(GetDotNetType(DotNetString), 1);
-        JsonArray.SetValue('{"statusCode":202,"headers":{}}', 0);
-        CurrPage.WebReportViewer.SetCallbacksFromSubscribedEventToIgnore('message', JsonArray);
+        SaveReportIdInConfiguration(Rec."Report ID");
+
+        CurrPage.PowerBIAddin.EmbedReportWithOptions(Rec.ReportEmbedUrl, Rec."Report ID", AccessToken, Rec."Report Page", Rec."Show Panes");
     end;
 
     local procedure SaveReportIdInConfiguration(LastOpenedReportIDInputValue: Guid)
@@ -574,22 +661,14 @@ page 6325 "Power BI Embedded Report Part"
             SaveReportIdInConfiguration(TempPowerBISelectionElement.ID);
         end;
 
-        ReloadPageState();
-    end;
-
-    local procedure HandleAddinCallback(CallbackMessage: Text)
-    var
-        MessageForWebPage: Text;
-    begin
-        PowerBiEmbedHelper.HandleAddInCallback(CallbackMessage, CurrentListSelection, CurrentReportFirstPage, LatestReceivedFilterInfo, MessageForWebPage);
-        if MessageForWebPage <> '' then
-            CurrPage.WebReportViewer.PostMessage(MessageForWebPage, PowerBiEmbedHelper.TargetOrigin(), true);
+        ReloadPageState(true);
     end;
 
     local procedure ShowError(NewErrorMessageText: Text)
     begin
         PageState := PageState::ErrorVisible;
         ErrorMessageText := NewErrorMessageText;
+        CurrPage.Update(false);
     end;
 
     local procedure LoadOptInImage()
@@ -618,30 +697,31 @@ page 6325 "Power BI Embedded Report Part"
         PageContext := CopyStr(InputContext, 1, MaxStrLen(PageContext));
     end;
 
-    procedure SetCurrentListSelection(InputSelection: variant)
+    procedure SetFilterToMultipleValues(FilteringRecordRef: RecordRef; FieldNumber: Integer)
     begin
-        case true of
-            InputSelection.IsText,
-            InputSelection.IsCode,
-            InputSelection.IsChar,
-            InputSelection.IsDate,
-            InputSelection.IsTime,
-            InputSelection.IsDateTime:
-                CurrentListSelection := '"' + PowerBiServiceMgt.FormatSpecialChars(Format(InputSelection, 0, 9)) + '"';
-            InputSelection.IsInteger,
-            InputSelection.IsBoolean,
-            InputSelection.IsDecimal,
-            InputSelection.IsGuid:
-                CurrentListSelection := Format(InputSelection, 0, 9);
-            else begin
-                Session.LogMessage('0000GJU', UnsupportedFilterTypeTelemetryMsg, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
-                CurrentListSelection := '';
-            end;
-        end;
+        FilterValuesJsonArray := PowerBiFilterHelper.RecordRefToFilter(FilteringRecordRef, FieldNumber);
+        PushFiltersToAddin();
+    end;
 
-        // Selection changed: send the latest message to the Addin again with the updated selection, if we have the filter info already
-        if LatestReceivedFilterInfo <> '' then
-            HandleAddinCallback(LatestReceivedFilterInfo);
+    procedure SetCurrentListSelection(InputSelectionVariant: Variant)
+    begin
+        FilterValuesJsonArray := PowerBiFilterHelper.VariantToFilter(InputSelectionVariant);
+        PushFiltersToAddin();
+    end;
+
+    local procedure PushFiltersToAddin()
+    var
+        ReportFiltersToSet: Text;
+    begin
+        if AvailableReportLevelFilters = '' then
+            exit;
+
+        ReportFiltersToSet := PowerBiFilterHelper.MergeValuesIntoFirstFilter(AvailableReportLevelFilters, FilterValuesJsonArray);
+
+        if ReportFiltersToSet = AvailableReportLevelFilters then
+            exit;
+
+        CurrPage.PowerBIAddin.UpdateReportFilters(ReportFiltersToSet);
     end;
 
     [Scope('OnPrem')]
@@ -650,16 +730,18 @@ page 6325 "Power BI Embedded Report Part"
         exit(PowerBiOptInImageNameLbl);
     end;
 
-    [NonDebuggable]
-    local procedure InitializeAddIn()
-    var
-        LoadReportMessage: Text;
+    local procedure LogVisualLoaded(CorrelationId: Text; EmbedType: Enum "Power BI Element Type")
     begin
-        if not Rec.IsEmpty() then
-            if PowerBiEmbedHelper.TryGetLoadReportMessage(LoadReportMessage) then
-                CurrPage.WebReportViewer.PostMessage(LoadReportMessage, PowerBiEmbedHelper.TargetOrigin(), false)
-            else
-                ShowError(GetLastErrorText());
+        Session.LogMessage('0000KAD', StrSubstNo(EmbedCorrelationTelemetryTxt, EmbedType, CorrelationId),
+            Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
+    end;
+
+    local procedure LogEmbedError(ErrorCategory: Text)
+    begin
+        FeatureTelemetry.LogError('0000L02', PowerBIServiceMgt.GetPowerBiFeatureTelemetryName(), ErrorCategory, 'Error loading Power BI visual');
+
+        Session.LogMessage('0000KAE', StrSubstNo(EmbedErrorOccurredTelemetryTxt, ErrorCategory),
+            Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiServiceMgt.GetPowerBiTelemetryCategory());
     end;
 
     #endregion

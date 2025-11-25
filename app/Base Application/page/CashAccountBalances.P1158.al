@@ -24,7 +24,7 @@ page 1158 "Cash Account Balances"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the name of the cash account.';
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the balance of the cash account.';
@@ -39,10 +39,10 @@ page 1158 "Cash Account Balances"
                         if Company."Evaluation Company" then
                             HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 20) +
                               '&' + ConfPersonalizationMgt.GetProfileUrlParameterForEvaluationCompany() +
-                              StrSubstNo(FilterForBalanceDrillDwnTxt, "No.")
+                              StrSubstNo(FilterForBalanceDrillDwnTxt, Rec."No.")
 
                         else
-                            HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 20) + StrSubstNo(FilterForBalanceDrillDwnTxt, "No.");
+                            HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 20) + StrSubstNo(FilterForBalanceDrillDwnTxt, Rec."No.");
                         HyperLink(HyperLinkUrl);
                     end;
                 }
@@ -59,9 +59,9 @@ page 1158 "Cash Account Balances"
 
     trigger OnOpenPage()
     begin
-        SetRange("Account Category", "Account Category"::Assets);
-        SetRange("Account Type", "Account Type"::Posting);
-        SetRange("Account Subcategory Entry No.", 3);
+        Rec.SetRange("Account Category", Rec."Account Category"::Assets);
+        Rec.SetRange("Account Type", Rec."Account Type"::Posting);
+        Rec.SetRange("Account Subcategory Entry No.", 3);
     end;
 
     var

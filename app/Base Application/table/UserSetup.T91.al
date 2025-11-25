@@ -1,3 +1,11 @@
+﻿namespace System.Security.User;
+
+using System;
+using System.Email;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Security.AccessControl;
+
 table 91 "User Setup"
 {
     Caption = 'User Setup';
@@ -241,11 +249,11 @@ table 91 "User Setup"
         }
         field(31; "License Type"; Option)
         {
-            CalcFormula = Lookup(User."License Type" WHERE("User Name" = FIELD("User ID")));
+            CalcFormula = lookup(User."License Type" where("User Name" = field("User ID")));
             Caption = 'License Type';
             FieldClass = FlowField;
-            OptionCaption = 'Full User,Limited User,Device Only User,Windows Group,External User,External Administrator,External Accountant,Application,AAD Group';
             OptionMembers = "Full User","Limited User","Device Only User","Windows Group","External User","External Administrator","External Accountant","Application","AAD Group";
+            OptionCaption = 'Full User,Limited User,Device Only User,Windows Group,External User,External Administrator,External Accountant,Application,Microsoft Entra group';
         }
         field(80; "Sales Invoice Posting Policy"; Enum "Invoice Posting Policy")
         {

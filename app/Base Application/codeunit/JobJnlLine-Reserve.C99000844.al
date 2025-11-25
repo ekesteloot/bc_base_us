@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Tracking;
+
 codeunit 99000844 "Job Jnl. Line-Reserve"
 {
     Permissions = TableData "Reservation Entry" = rimd;
@@ -185,7 +190,7 @@ codeunit 99000844 "Job Jnl. Line-Reserve"
     begin
         TrackingSpecification.InitFromJobJnlLine(JobJnlLine);
         if IsReclass then
-            ItemTrackingLines.SetRunMode("Item Tracking Run Mode"::Reclass);
+            ItemTrackingLines.SetRunMode(Enum::"Item Tracking Run Mode"::Reclass);
         ItemTrackingLines.SetSourceSpec(TrackingSpecification, JobJnlLine."Posting Date");
         ItemTrackingLines.SetInbound(JobJnlLine.IsInbound());
         ItemTrackingLines.RunModal();

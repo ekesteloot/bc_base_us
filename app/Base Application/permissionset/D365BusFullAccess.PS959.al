@@ -46,7 +46,9 @@
                   tabledata "Permission Set" = imd,
                   tabledata "Profile Configuration Symbols" = imd,
                   tabledata "Published Application" = Rimd,
+#pragma warning disable AL0432
                   tabledata "Tenant Profile" = imd,
+#pragma warning restore AL0432
                   tabledata "Tenant Profile Extension" = imd,
                   tabledata "Tenant Profile Setting" = imd,
                   tabledata "Tenant Web Service" = R,
@@ -66,6 +68,7 @@
                   tabledata "Administration Cue" = RIMD,
                   tabledata "Aged Report Entity" = RIMD,
                   tabledata "Aging Band Buffer" = RIMD,
+                  tabledata "Allocation Policy" = RIMD,
                   tabledata "Alternative Address" = IM,
                   tabledata "Analysis by Dim. Parameters" = RIMD,
                   tabledata "Analysis by Dim. User Param." = RIMD,
@@ -107,6 +110,7 @@
                   tabledata "Booking Staff" = RIMD,
                   tabledata "Booking Sync" = RIMD,
                   tabledata "Budget Buffer" = RIMD,
+                  tabledata "Bus. Unit In Cons. Process" = RIM,
                   tabledata "Business Chart Buffer" = RIMD,
                   tabledata "Business Chart Map" = RIMD,
                   tabledata "Business Chart User Setup" = RIMD,
@@ -143,6 +147,8 @@
                   tabledata "Confidential Information" = IM,
                   tabledata "Config. Media Buffer" = RIMD,
                   tabledata "Consolidation Account" = RIM,
+                  tabledata "Consolidation Process" = RIM,
+                  tabledata "Consolidation Setup" = RIM,
                   tabledata "Contact Alt. Addr. Date Range" = RIMD,
                   tabledata "Contact Alt. Address" = RIMD,
                   tabledata "Contact Dupl. Details Buffer" = RIMD,
@@ -171,9 +177,6 @@
                   tabledata "Customer Amount" = RIMD,
                   tabledata "Customer Sales Buffer" = RIMD,
                   tabledata "Customer Templ." = RIMD,
-#if not CLEAN20
-                  tabledata "Customer Template" = RIMD,
-#endif
                   tabledata "Customized Calendar Change" = RIMD,
                   tabledata "Customized Calendar Entry" = RIMD,
                   tabledata "CV Ledger Entry Buffer" = RIMD,
@@ -299,10 +302,6 @@
 #if not CLEAN21
                   tabledata "Graph Mail Setup" = RIMD,
 #endif
-#if not CLEAN20
-                  tabledata "Graph Subscription" = RIMD,
-                  tabledata "Graph Business Setting" = RIMD,
-#endif
                   tabledata "Grounds for Termination" = RIMD,
                   tabledata "HR Confidential Comment Line" = RIMD,
                   tabledata "Human Resource Comment Line" = IM,
@@ -334,7 +333,7 @@
                   tabledata "Inventory Profile Track Buffer" = RIM,
                   tabledata "Inventory Report Entry" = RIM,
                   tabledata "Inventory Report Header" = RIM,
-#if not CLEAN20
+#if not CLEAN23
                   tabledata "Invoice Post. Buffer" = RIMD,
 #endif
                   tabledata "Invoice Posting Buffer" = RIMD,
@@ -423,12 +422,6 @@
                   tabledata "My Vendor" = RIMD,
                   tabledata "Name/Value Buffer" = RIMD,
                   tabledata "Named Forward Link" = RIMD,
-#if not CLEAN20
-                  tabledata "Native - API Tax Setup" = RIMD,
-                  tabledata "Native - Export Invoices" = RIMD,
-                  tabledata "Native - Gen. Settings Buffer" = RIMD,
-                  tabledata "Native - Payment" = RIMD,
-#endif
                   tabledata "No. Series Tenant" = RIMD,
                   tabledata "Notification Context" = RIMD,
                   tabledata "Notification Schedule" = RIMD,
@@ -511,9 +504,6 @@
                   tabledata "Permission Set Link" = rimd,
                   tabledata "Phys. Inventory Ledger Entry" = i,
                   tabledata "Picture Entity" = RIMD,
-#if not CLEAN20
-                  tabledata "Plan Permission Set" = Rim,
-#endif
                   tabledata "Planning Assignment" = IM,
                   tabledata "Planning Buffer" = RIMD,
                   tabledata "Planning Component" = M,
@@ -544,7 +534,9 @@
 #if not CLEAN21
                   tabledata "Power BI User License" = RIMD,
 #endif
+#if not CLEAN23
                   tabledata "Power BI User Status" = RIMD,
+#endif
                   tabledata "Prepayment Inv. Line Buffer" = RIMD,
                   tabledata "Price Asset" = RIMD,
                   tabledata "Price Calculation Buffer" = RIMD,
@@ -614,6 +606,9 @@
                   tabledata "Res. Ledger Entry" = Rimd,
                   tabledata "Reservation Entry" = IM,
                   tabledata "Reservation Entry Buffer" = RIMD,
+                  tabledata "Reservation Wksh. Batch" = RIMD,
+                  tabledata "Reservation Wksh. Line" = RIMD,
+                  tabledata "Reservation Worksheet Log" = RIMD,
                   tabledata "Resolution Code" = RIMD,
                   tabledata Resource = RIMD,
 #if not CLEAN21

@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 report 9001 "Copy User Group"
 {
     Caption = 'Copy User Group';
@@ -12,7 +14,7 @@ report 9001 "Copy User Group"
     {
         dataitem("User Group"; "User Group")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
 
             trigger OnAfterGetRecord()
             var

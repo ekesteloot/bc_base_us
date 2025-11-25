@@ -17,7 +17,7 @@ table 7600 "Base Calendar"
         }
         field(3; "Customized Changes Exist"; Boolean)
         {
-            CalcFormula = Exist ("Customized Calendar Change" WHERE("Base Calendar Code" = FIELD(Code)));
+            CalcFormula = Exist ("Customized Calendar Change" where("Base Calendar Code" = field(Code)));
             Caption = 'Customized Changes Exist';
             Editable = false;
             FieldClass = FlowField;

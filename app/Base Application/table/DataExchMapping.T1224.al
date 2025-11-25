@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using Microsoft.BankMgt.PositivePay;
+using System.Reflection;
+
 table 1224 "Data Exch. Mapping"
 {
     Caption = 'Data Exch. Mapping';

@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 6069 "Contract Gain/Loss (Resp.Ctr)"
 {
     ApplicationArea = Basic, Suite;

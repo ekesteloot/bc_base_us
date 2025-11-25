@@ -1,3 +1,9 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+
 page 9303 "Blanket Sales Orders"
 {
     ApplicationArea = Suite;
@@ -9,7 +15,7 @@ page 9303 "Blanket Sales Orders"
     QueryCategory = 'Blanket Sales Orders';
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = CONST("Blanket Order"));
+    SourceTableView = where("Document Type" = const("Blanket Order"));
     UsageCategory = Lists;
 
     layout
@@ -170,21 +176,21 @@ page 9303 "Blanket Sales Orders"
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
-                SubPageLink = "Table ID" = CONST(Database::"Sales Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Sales Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             part(Control1900316107; "Customer Details FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             systempart(Control1900383207; Links)
             {
@@ -217,7 +223,7 @@ page 9303 "Blanket Sales Orders"
                     trigger OnAction()
                     begin
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        OpenSalesOrderStatistics();
+                        Rec.OpenSalesOrderStatistics();
                     end;
                 }
                 action("Co&mments")
@@ -226,9 +232,9 @@ page 9303 "Blanket Sales Orders"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Blanket Order"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const("Blanket Order"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -242,7 +248,7 @@ page 9303 "Blanket Sales Orders"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Approvals)
@@ -281,7 +287,7 @@ page 9303 "Blanket Sales Orders"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualRelease(SalesHeader);
+                        Rec.PerformManualRelease(SalesHeader);
                     end;
                 }
                 action("Re&open")
@@ -296,7 +302,7 @@ page 9303 "Blanket Sales Orders"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualReopen(SalesHeader);
+                        Rec.PerformManualReopen(SalesHeader);
                     end;
                 }
                 action("Delete Invoiced Blanket")
@@ -462,25 +468,24 @@ page 9303 "Blanket Sales Orders"
 
     trigger OnOpenPage()
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
-        CopySellToCustomerFilter();
+        Rec.CopySellToCustomerFilter();
     end;
 
     var
         DocPrint: Codeunit "Document-Print";
         OpenApprovalEntriesExist: Boolean;
         CanCancelApprovalForRecord: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
 
     local procedure SetControlAppearance()
     var
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
     end;
 
     [IntegrationEvent(false, false)]

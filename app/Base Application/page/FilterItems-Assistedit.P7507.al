@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
 page 7507 "Filter Items - AssistEdit"
 {
     Caption = 'Specify Filter Value';
@@ -98,8 +100,8 @@ page 7507 "Filter Items - AssistEdit"
 
     local procedure UpdateGroupVisiblity()
     begin
-        TextGroupVisible := Type = Type::Text;
-        NumericGroupVisible := Type in [Type::Decimal, Type::Integer];
+        TextGroupVisible := Rec.Type = Rec.Type::Text;
+        NumericGroupVisible := Rec.Type in [Rec.Type::Decimal, Rec.Type::Integer];
         NumericGroupMaxValueVisible := NumericGroupVisible and (NumericConditions = NumericConditions::"..  - Range");
 
         OnAfterUpdateGroupVisiblity(Rec, TextGroupVisible, NumericGroupMaxValueVisible, NumericGroupVisible, NumericConditions);
@@ -110,10 +112,10 @@ page 7507 "Filter Items - AssistEdit"
         ValidDecimal: Decimal;
         ValidInteger: Integer;
     begin
-        if Type = Type::Decimal then
+        if Rec.Type = Rec.Type::Decimal then
             Evaluate(ValidDecimal, TextValue);
 
-        if Type = Type::Integer then
+        if Rec.Type = Rec.Type::Integer then
             Evaluate(ValidInteger, TextValue);
 
         OnAfterValidateValueIsNumeric(Rec, TextValue);
@@ -126,7 +128,7 @@ page 7507 "Filter Items - AssistEdit"
         SelectItemAttributeValue: Page "Select Item Attribute Value";
         OptionFilter: Text;
     begin
-        ItemAttributeValue.SetRange("Attribute ID", ID);
+        ItemAttributeValue.SetRange("Attribute ID", Rec.ID);
         SelectItemAttributeValue.SetTableView(ItemAttributeValue);
         // SelectItemAttributeValue.LOOKUPMODE(TRUE);
         SelectItemAttributeValue.Editable(false);
@@ -149,8 +151,8 @@ page 7507 "Filter Items - AssistEdit"
 
     procedure GenerateFilter() FilterText: Text
     begin
-        case Type of
-            Type::Decimal, Type::Integer:
+        case Rec.Type of
+            Rec.Type::Decimal, Rec.Type::Integer:
                 begin
                     if NumericValue = '' then
                         exit('');
@@ -160,7 +162,7 @@ page 7507 "Filter Items - AssistEdit"
                     else
                         FilterText := StrSubstNo('%1%2', DelChr(CopyStr(Format(NumericConditions), 1, 2), '=', ' '), NumericValue);
                 end;
-            Type::Text:
+            Rec.Type::Text:
                 begin
                     if TextValue = '' then
                         exit('');

@@ -43,7 +43,7 @@ page 634 "Chart of Accounts Overview"
                     BlankZero = true;
                     ToolTip = 'Specifies the net change in the account balance during the time period in the Date Filter field.';
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -82,7 +82,7 @@ page 634 "Chart of Accounts Overview"
                     ToolTip = 'Specifies whether you will be able to post directly or only indirectly to this general ledger account.';
                     Visible = false;
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -259,9 +259,7 @@ page 634 "Chart of Accounts Overview"
     end;
 
     var
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     local procedure ExpandAll()
@@ -273,9 +271,9 @@ page 634 "Chart of Accounts Overview"
     var
         GLAcc: Record "G/L Account";
     begin
-        Reset();
-        DeleteAll();
-        SetCurrentKey("No.");
+        Rec.Reset();
+        Rec.DeleteAll();
+        Rec.SetCurrentKey("No.");
 
         if OnlyRoot then
             GLAcc.SetRange(Indentation, 0);
@@ -284,11 +282,11 @@ page 634 "Chart of Accounts Overview"
             repeat
                 Rec := GLAcc;
                 if GLAcc."Account Type" = GLAcc."Account Type"::"Begin-Total" then
-                    Totaling := GetEndTotal(GLAcc);
-                Insert();
+                    Rec.Totaling := GetEndTotal(GLAcc);
+                Rec.Insert();
             until GLAcc.Next() = 0;
 
-        if FindFirst() then;
+        if Rec.FindFirst() then;
     end;
 
     local procedure GetEndTotal(var GLAcc: Record "G/L Account"): Text[250]
@@ -306,7 +304,7 @@ page 634 "Chart of Accounts Overview"
 
     local procedure FormatLine()
     begin
-        NameIndent := Indentation;
-        Emphasize := "Account Type" <> "Account Type"::Posting;
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
     end;
 }

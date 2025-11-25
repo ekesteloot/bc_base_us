@@ -1,7 +1,11 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.HumanResources.Employee;
+
 report 5209 "Employee - Birthdays"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeBirthdays.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeBirthdays.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee Birthdays';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5209 "Employee - Birthdays"
     {
         dataitem(Employee; Employee)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Global Dimension 1 Code", "Global Dimension 2 Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

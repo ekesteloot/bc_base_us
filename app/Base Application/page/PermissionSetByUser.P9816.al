@@ -1,3 +1,8 @@
+namespace System.Security.AccessControl;
+
+using System.Environment;
+using System.Security.User;
+
 page 9816 "Permission Set by User"
 {
     Caption = 'Permission Set by User';
@@ -203,7 +208,7 @@ page 9816 "Permission Set by User"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Permissions';
                 Editable = false;
-                SubPageLink = "Role ID" = FIELD("Role ID");
+                SubPageLink = "Role ID" = field("Role ID");
                 Visible = false;
             }
             part("Tenant Permissions"; "Tenant Permissions FactBox")
@@ -222,8 +227,8 @@ page 9816 "Permission Set by User"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Permissions';
                 Editable = false;
-                SubPageLink = "Role ID" = FIELD("Role ID"),
-                              "App ID" = FIELD("App ID");
+                SubPageLink = "Role ID" = field("Role ID"),
+                              "App ID" = field("App ID");
             }
         }
     }
@@ -261,9 +266,9 @@ page 9816 "Permission Set by User"
                 var
                     AggregatePermissionSet: Record "Aggregate Permission Set";
                 begin
-                    AggregatePermissionSet.SetRange(Scope, Scope);
-                    AggregatePermissionSet.SetRange("App ID", "App ID");
-                    AggregatePermissionSet.SetRange("Role ID", "Role ID");
+                    AggregatePermissionSet.SetRange(Scope, Rec.Scope);
+                    AggregatePermissionSet.SetRange("App ID", Rec."App ID");
+                    AggregatePermissionSet.SetRange("Role ID", Rec."Role ID");
 
                     REPORT.RunModal(REPORT::"Copy Permission Set", true, true, AggregatePermissionSet);
                 end;
@@ -380,17 +385,41 @@ page 9816 "Permission Set by User"
         PermissionPagesMgt.Init(NoOfRecords, ArrayLen(UserNameCode));
     end;
 
+    protected var
+        AllUsersHavePermission: Boolean;
+
     var
         Company: Record Company;
         PermissionPagesMgt: Codeunit "Permission Pages Mgt.";
         UserSelection: Codeunit "User Selection";
         UserSecurityIDArr: array[10] of Guid;
-        AllUsersHavePermission: Boolean;
         NoOfRecords: Integer;
         SelectedCompany: Text[30];
         ShowDomainName: Boolean;
         UserNameCode: array[10] of Code[50];
         UserHasPermissionSet: array[10] of Boolean;
+
+    protected procedure SetUserPermission(UserSecurityID: Guid; UserHasPermission: Boolean)
+    var
+        AccessControl: Record "Access Control";
+    begin
+        if AccessControl.Get(UserSecurityID, Rec."Role ID", '', Rec.Scope, Rec."App ID") or
+           AccessControl.Get(UserSecurityID, Rec."Role ID", Company.Name, Rec.Scope, Rec."App ID")
+        then begin
+            if not UserHasPermission then
+                AccessControl.Delete(true);
+            exit;
+        end;
+        if not UserHasPermission then
+            exit;
+        AccessControl.Init();
+        AccessControl."User Security ID" := UserSecurityID;
+        AccessControl."Role ID" := Rec."Role ID";
+        AccessControl."Company Name" := Company.Name;
+        AccessControl.Scope := Rec.Scope;
+        AccessControl."App ID" := Rec."App ID";
+        AccessControl.Insert();
+    end;
 
     local procedure FindUsers()
     var
@@ -449,28 +478,6 @@ page 9816 "Permission Set by User"
                     SetUserPermission(User."User Security ID", UserHasPermission);
                 until User.Next() = 0;
         end;
-    end;
-
-    local procedure SetUserPermission(UserSecurityID: Guid; UserHasPermission: Boolean)
-    var
-        AccessControl: Record "Access Control";
-    begin
-        if AccessControl.Get(UserSecurityID, "Role ID", '', Scope, "App ID") or
-           AccessControl.Get(UserSecurityID, "Role ID", Company.Name, Scope, "App ID")
-        then begin
-            if not UserHasPermission then
-                AccessControl.Delete(true);
-            exit;
-        end;
-        if not UserHasPermission then
-            exit;
-        AccessControl.Init();
-        AccessControl."User Security ID" := UserSecurityID;
-        AccessControl."Role ID" := "Role ID";
-        AccessControl."Company Name" := Company.Name;
-        AccessControl.Scope := Scope;
-        AccessControl."App ID" := "App ID";
-        AccessControl.Insert();
     end;
 
     local procedure UpdateCompany()

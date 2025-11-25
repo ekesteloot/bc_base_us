@@ -1,3 +1,13 @@
+namespace Microsoft.Manufacturing.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.WarehouseMgt.Structure;
+
 page 99000827 "Recurring Output Journal"
 {
     ApplicationArea = Manufacturing;
@@ -83,6 +93,28 @@ page 99000827 "Recurring Output Journal"
                     begin
                         Rec.LookupItemNo();
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
+                    end;
+
+                    trigger OnValidate()
+                    begin
+                        ItemNoOnAfterValidate();
+                    end;
+                }
+                field("Item Reference No."; Rec."Item Reference No.")
+                {
+                    AccessByPermission = tabledata "Item Reference" = R;
+                    ApplicationArea = Manufacturing, ItemReferences;
+                    QuickEntry = false;
+                    ToolTip = 'Specifies a reference to the item number as defined by the item''s barcode.';
+                    Visible = false;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        ItemReferenceManagement: Codeunit "Item Reference Management";
+                    begin
+                        ItemReferenceManagement.ItemJournalReferenceNoLookup(Rec);
+                        ItemNoOnAfterValidate();
+                        OnReferenceNoOnAfterLookup(Rec);
                     end;
 
                     trigger OnValidate()
@@ -256,9 +288,9 @@ page 99000827 "Recurring Output Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
@@ -270,9 +302,9 @@ page 99000827 "Recurring Output Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
@@ -284,9 +316,9 @@ page 99000827 "Recurring Output Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
@@ -298,9 +330,9 @@ page 99000827 "Recurring Output Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
@@ -312,9 +344,9 @@ page 99000827 "Recurring Output Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
@@ -326,9 +358,9 @@ page 99000827 "Recurring Output Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
@@ -410,7 +442,7 @@ page 99000827 "Recurring Output Journal"
                     ApplicationArea = ItemTracking;
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
-                    ShortCutKey = 'Ctrl+Alt+I'; 
+                    ShortCutKey = 'Ctrl+Alt+I';
                     ToolTip = 'View or edit serial numbers and lot numbers that are assigned to the item on the document or journal line.';
 
                     trigger OnAction()
@@ -424,10 +456,10 @@ page 99000827 "Recurring Output Journal"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Bin Code", "Item No.", "Variant Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Bin Code", "Item No.", "Variant Code");
                     ToolTip = 'View items in the bin if the selected line contains a bin code.';
                 }
             }
@@ -441,9 +473,9 @@ page 99000827 "Recurring Output Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Released Production Order";
-                    RunPageLink = "No." = FIELD("Order No.");
-                    RunPageView = SORTING(Status, "No.")
-                                  WHERE(Status = CONST(Released));
+                    RunPageLink = "No." = field("Order No.");
+                    RunPageView = sorting(Status, "No.")
+                                  where(Status = const(Released));
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -457,9 +489,9 @@ page 99000827 "Recurring Output Journal"
                         Caption = 'Item Ledger E&ntries';
                         Image = ItemLedger;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("Order No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("Order No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ShortCutKey = 'Ctrl+F7';
                         ToolTip = 'View the item ledger entries of the item on the document or journal line.';
                     }
@@ -469,9 +501,9 @@ page 99000827 "Recurring Output Journal"
                         Caption = 'Capacity Ledger Entries';
                         Image = CapacityLedger;
                         RunObject = Page "Capacity Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("Order No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("Order No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                     }
                     action("Value Entries")
@@ -480,9 +512,9 @@ page 99000827 "Recurring Output Journal"
                         Caption = 'Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("Order No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("Order No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the value entries of the item on the document or journal line.';
                     }
                 }
@@ -564,9 +596,7 @@ page 99000827 "Recurring Output Journal"
                     ItemJnlLine: Record "Item Journal Line";
                 begin
                     ItemJnlLine.Copy(Rec);
-                    ItemJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
-                    ItemJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
-                    REPORT.RunModal(REPORT::"Inventory Movement", true, true, ItemJnlLine);
+                    ItemJnlLine.PrintInventoryMovement();
                 end;
             }
         }
@@ -700,6 +730,11 @@ page 99000827 "Recurring Output Journal"
           DimVisible1, DimVisible2, DimVisible3, DimVisible4, DimVisible5, DimVisible6, DimVisible7, DimVisible8);
 
         Clear(DimMgt);
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReferenceNoOnAfterLookup(var ItemJournalLine: Record "Item Journal Line")
+    begin
     end;
 }
 

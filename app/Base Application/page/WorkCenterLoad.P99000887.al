@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Foundation.Enums;
+
 page 99000887 "Work Center Load"
 {
     Caption = 'Work Center Load';
@@ -74,7 +78,7 @@ page 99000887 "Work Center Load"
     begin
         PeriodTypeInt := PeriodType.AsInteger();
         OnBeforeOpenPage(PeriodTypeInt, AmountType);
-        PeriodType := "Analysis Period Type".FromInteger(PeriodTypeInt);
+        PeriodType := Enum::"Analysis Period Type".FromInteger(PeriodTypeInt);
     end;
 
     protected var

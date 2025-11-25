@@ -1,7 +1,12 @@
+namespace Microsoft.AssemblyMgt.Reports;
+
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+
 report 811 "Assembly BOM - Subassemblies"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Assembly/AssemblyBOMSubassemblies.rdlc';
+    RDLCLayout = './AssemblyMgt/Reports/AssemblyBOMSubassemblies.rdlc';
     AdditionalSearchTerms = 'bill of material sub-assemblies';
     ApplicationArea = Assembly;
     Caption = 'BOM - Sub-Assemblies';
@@ -11,7 +16,7 @@ report 811 "Assembly BOM - Subassemblies"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE("Assembly BOM" = CONST(true));
+            DataItemTableView = where("Assembly BOM" = const(true));
             RequestFilterFields = "No.", "Base Unit of Measure", "Shelf No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

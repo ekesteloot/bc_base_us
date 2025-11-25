@@ -1,4 +1,9 @@
-#if not CLEAN22
+﻿#if not CLEAN22
+namespace System.Security.AccessControl;
+
+using System.Environment.Configuration;
+using System.Reflection;
+
 page 9830 "User Groups"
 {
     ApplicationArea = Basic, Suite;
@@ -19,7 +24,7 @@ page 9830 "User Groups"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code of the record.';
@@ -68,12 +73,12 @@ page 9830 "User Groups"
             part(Control12; "User Group Permissions FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "User Group Code" = FIELD(Code);
+                SubPageLink = "User Group Code" = field(Code);
             }
             part(Control11; "User Group Members FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "User Group Code" = FIELD(Code);
+                SubPageLink = "User Group Code" = field(Code);
             }
             systempart(Control6; Notes)
             {
@@ -100,7 +105,7 @@ page 9830 "User Groups"
                 Caption = 'Members';
                 Image = Users;
                 RunObject = Page "User Group Members";
-                RunPageLink = "User Group Code" = FIELD(Code);
+                RunPageLink = "User Group Code" = field(Code);
                 Scope = Repeater;
                 ToolTip = 'View or edit the members of the user group.';
                 AboutTitle = 'Members of the group';
@@ -112,7 +117,7 @@ page 9830 "User Groups"
                 Caption = 'Permissions';
                 Image = Permission;
                 RunObject = Page "User Group Permission Sets";
-                RunPageLink = "User Group Code" = FIELD(Code);
+                RunPageLink = "User Group Code" = field(Code);
                 Scope = Repeater;
                 ToolTip = 'View or edit the permission sets that are assigned to the user group.';
                 AboutTitle = 'Define permissions for the group';
@@ -149,7 +154,7 @@ page 9830 "User Groups"
                 var
                     UserGroup: Record "User Group";
                 begin
-                    UserGroup.SetRange(Code, Code);
+                    UserGroup.SetRange(Code, Rec.Code);
                     REPORT.RunModal(REPORT::"Copy User Group", true, false, UserGroup);
                 end;
             }
@@ -162,7 +167,7 @@ page 9830 "User Groups"
 
                 trigger OnAction()
                 begin
-                    ExportUserGroups('');
+                    Rec.ExportUserGroups('');
                 end;
             }
             action(ImportUserGroups)
@@ -174,7 +179,7 @@ page 9830 "User Groups"
 
                 trigger OnAction()
                 begin
-                    ImportUserGroups('');
+                    Rec.ImportUserGroups('');
                 end;
             }
         }
@@ -200,19 +205,19 @@ page 9830 "User Groups"
     begin
         LegacyUserGroups.SendUserGroupsNotification();
         if PermissionManager.IsIntelligentCloud() then
-            SetRange(Code, IntelligentCloudTok);
+            Rec.SetRange(Code, IntelligentCloudTok);
     end;
 
     local procedure UpdateProfile(AllProfileTable: Record "All Profile")
     var
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
     begin
-        "Default Profile ID" := AllProfileTable."Profile ID";
-        "Default Profile App ID" := AllProfileTable."App ID";
-        "Default Profile Scope" := AllProfileTable.Scope;
-        if ("Default Profile ID" <> xRec."Default Profile ID") or
-           ("Default Profile App ID" <> xRec."Default Profile App ID") or
-           ("Default Profile Scope" <> xRec."Default Profile Scope")
+        Rec."Default Profile ID" := AllProfileTable."Profile ID";
+        Rec."Default Profile App ID" := AllProfileTable."App ID";
+        Rec."Default Profile Scope" := AllProfileTable.Scope;
+        if (Rec."Default Profile ID" <> xRec."Default Profile ID") or
+           (Rec."Default Profile App ID" <> xRec."Default Profile App ID") or
+           (Rec."Default Profile Scope" <> xRec."Default Profile Scope")
         then
             ConfPersonalizationMgt.ChangePersonalizationForUserGroupMembers(xRec, Rec);
         CurrPage.Update();

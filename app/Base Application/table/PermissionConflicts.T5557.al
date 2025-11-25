@@ -1,3 +1,7 @@
+namespace System.Security.AccessControl;
+
+using System.Reflection;
+
 table 5557 "Permission Conflicts"
 {
     Access = Internal;
@@ -20,8 +24,8 @@ table 5557 "Permission Conflicts"
         }
         field(5; "Object Name"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Name" WHERE("Object Type" = FIELD("Object Type"),
-                                                                           "Object ID" = FIELD("Object ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Name" where("Object Type" = field("Object Type"),
+                                                                           "Object ID" = field("Object ID")));
             Caption = 'Object Name';
             FieldClass = FlowField;
         }

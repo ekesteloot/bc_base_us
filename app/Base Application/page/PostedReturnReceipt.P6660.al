@@ -1,3 +1,11 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Sales.Comment;
+using System.Automation;
+
 page 6660 "Posted Return Receipt"
 {
     Caption = 'Posted Return Receipt';
@@ -180,7 +188,7 @@ page 6660 "Posted Return Receipt"
             part(ReturnRcptLines; "Posted Return Receipt Subform")
             {
                 ApplicationArea = SalesReturnOrder;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group(Invoicing)
             {
@@ -200,7 +208,7 @@ page 6660 "Posted Return Receipt"
                 }
                 group("Bill-to")
                 {
-                    Caption = 'Bill-to';                    
+                    Caption = 'Bill-to';
                     field("Bill-to Name"; Rec."Bill-to Name")
                     {
                         ApplicationArea = SalesReturnOrder;
@@ -444,7 +452,7 @@ page 6660 "Posted Return Receipt"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Return Receipt Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -454,9 +462,9 @@ page 6660 "Posted Return Receipt"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Return Receipt"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const("Posted Return Receipt"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -470,7 +478,7 @@ page 6660 "Posted Return Receipt"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(Approvals)
@@ -485,7 +493,7 @@ page 6660 "Posted Return Receipt"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ShowPostedApprovalEntries(RecordId);
+                        ApprovalsMgmt.ShowPostedApprovalEntries(Rec.RecordId);
                     end;
                 }
             }
@@ -522,7 +530,7 @@ page 6660 "Posted Return Receipt"
 
                     trigger OnAction()
                     begin
-                        StartTrackingSite();
+                        Rec.StartTrackingSite();
                     end;
                 }
             }
@@ -552,7 +560,7 @@ page 6660 "Posted Return Receipt"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action("Update Document")
@@ -621,15 +629,15 @@ page 6660 "Posted Return Receipt"
 
     trigger OnOpenPage()
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
         ActivateFields();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        SellToContact.GetOrClear("Sell-to Contact No.");
-        BillToContact.GetOrClear("Bill-to Contact No.");
+        SellToContact.GetOrClear(Rec."Sell-to Contact No.");
+        BillToContact.GetOrClear(Rec."Bill-to Contact No.");
     end;
 
     var
@@ -643,9 +651,9 @@ page 6660 "Posted Return Receipt"
 
     local procedure ActivateFields()
     begin
-        IsSellToCountyVisible := FormatAddress.UseCounty("Sell-to Country/Region Code");
-        IsShipToCountyVisible := FormatAddress.UseCounty("Ship-to Country/Region Code");
-        IsBillToCountyVisible := FormatAddress.UseCounty("Bill-to Country/Region Code");
+        IsSellToCountyVisible := FormatAddress.UseCounty(Rec."Sell-to Country/Region Code");
+        IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
+        IsBillToCountyVisible := FormatAddress.UseCounty(Rec."Bill-to Country/Region Code");
     end;
 
     [IntegrationEvent(false, false)]

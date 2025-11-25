@@ -1,7 +1,9 @@
+namespace System.Diagnostics;
+
 report 508 "Change Log Setup List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './OtherCapabilities/ChangeLog/ChangeLogSetupList.rdlc';
+    RDLCLayout = './System/ChangeLog/ChangeLogSetupList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Change Log Setup List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +12,7 @@ report 508 "Change Log Setup List"
     {
         dataitem("Change Log Setup (Table)"; "Change Log Setup (Table)")
         {
-            DataItemTableView = SORTING("Table No.");
+            DataItemTableView = sorting("Table No.");
             RequestFilterFields = "Table No.";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {
@@ -65,8 +67,8 @@ report 508 "Change Log Setup List"
             }
             dataitem("Change Log Setup (Field)"; "Change Log Setup (Field)")
             {
-                DataItemLink = "Table No." = FIELD("Table No.");
-                DataItemTableView = SORTING("Table No.", "Field No.");
+                DataItemLink = "Table No." = field("Table No.");
+                DataItemTableView = sorting("Table No.", "Field No.");
                 column(Number; Number)
                 {
                 }

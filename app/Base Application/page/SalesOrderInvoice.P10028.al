@@ -6,7 +6,7 @@ page 10028 "Sales Order Invoice"
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = FILTER(Order));
+    SourceTableView = where("Document Type" = filter(Order));
 
     layout
     {
@@ -23,7 +23,7 @@ page 10028 "Sales Order Invoice"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -77,9 +77,9 @@ page 10028 "Sales Order Invoice"
 
                     trigger OnAssistEdit()
                     begin
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", "Posting Date");
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", Rec."Posting Date");
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
                             CurrPage.Update();
                         end;
                         Clear(ChangeExchangeRate);
@@ -94,7 +94,7 @@ page 10028 "Sales Order Invoice"
             part(SalesLines; "Sales Order Invoice Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group(Invoicing)
             {
@@ -239,7 +239,7 @@ page 10028 "Sales Order Invoice"
                             Commit()
                         end;
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        if "Tax Area Code" = '' then
+                        if Rec."Tax Area Code" = '' then
                             PAGE.RunModal(PAGE::"Sales Order Statistics", Rec)
                         else
                             PAGE.RunModal(PAGE::"Sales Order Stats.", Rec)
@@ -251,7 +251,7 @@ page 10028 "Sales Order Invoice"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No.");
+                    RunPageLink = "No." = field("Sell-to Customer No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the card for the customer.';
                 }
@@ -261,8 +261,8 @@ page 10028 "Sales Order Invoice"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No.");
                     ToolTip = 'View comments that apply.';
                 }
                 action("S&hipments")
@@ -271,8 +271,8 @@ page 10028 "Sales Order Invoice"
                     Caption = 'S&hipments';
                     Image = Shipment;
                     RunObject = Page "Posted Sales Shipments";
-                    RunPageLink = "Order No." = FIELD("No.");
-                    RunPageView = SORTING("Order No.");
+                    RunPageLink = "Order No." = field("No.");
+                    RunPageView = sorting("Order No.");
                     ToolTip = 'View posted sales shipments for the customer.';
                 }
                 action(Invoices)
@@ -281,8 +281,8 @@ page 10028 "Sales Order Invoice"
                     Caption = 'Invoices';
                     Image = Invoice;
                     RunObject = Page "Posted Sales Invoices";
-                    RunPageLink = "Order No." = FIELD("No.");
-                    RunPageView = SORTING("Order No.");
+                    RunPageLink = "Order No." = field("No.");
+                    RunPageView = sorting("Order No.");
                     ToolTip = 'View the history of posted sales invoices that have been posted for the document.';
                 }
                 action(Dimensions)
@@ -294,7 +294,7 @@ page 10028 "Sales Order Invoice"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -367,10 +367,10 @@ page 10028 "Sales Order Invoice"
                     begin
                         if ApprovalsMgmt.PrePostApprovalCheckSales(Rec) then begin
                             if PrepaymentMgt.TestSalesPrepayment(Rec) then
-                                Error(Text001, "Document Type", "No.");
+                                Error(Text001, Rec."Document Type", Rec."No.");
 
                             if PrepaymentMgt.TestSalesPayment(Rec) then
-                                Error(Text002, "Document Type", "No.");
+                                Error(Text002, Rec."Document Type", Rec."No.");
 
                             CODEUNIT.Run(CODEUNIT::"Invoice-Post (Yes/No)", Rec);
                         end;
@@ -392,10 +392,10 @@ page 10028 "Sales Order Invoice"
                     begin
                         if ApprovalsMgmt.PrePostApprovalCheckSales(Rec) then begin
                             if PrepaymentMgt.TestSalesPrepayment(Rec) then
-                                Error(Text001, "Document Type", "No.");
+                                Error(Text001, Rec."Document Type", Rec."No.");
 
                             if PrepaymentMgt.TestSalesPayment(Rec) then
-                                Error(Text002, "Document Type", "No.");
+                                Error(Text002, Rec."Document Type", Rec."No.");
 
                             CODEUNIT.Run(CODEUNIT::"Invoice-Post + Print", Rec);
                         end;
@@ -425,23 +425,23 @@ page 10028 "Sales Order Invoice"
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SaveRecord();
-        exit(ConfirmDeletion());
+        exit(Rec.ConfirmDeletion());
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Responsibility Center" := UserMgt.GetSalesFilter();
+        Rec."Responsibility Center" := UserMgt.GetSalesFilter();
     end;
 
     trigger OnOpenPage()
     begin
         if UserMgt.GetSalesFilter() <> '' then begin
-            FilterGroup(2);
-            SetRange("Responsibility Center", UserMgt.GetSalesFilter());
-            FilterGroup(0);
+            Rec.FilterGroup(2);
+            Rec.SetRange("Responsibility Center", UserMgt.GetSalesFilter());
+            Rec.FilterGroup(0);
         end;
 
-        SetRange("Date Filter", 0D, WorkDate() - 1);
+        Rec.SetRange("Date Filter", 0D, WorkDate() - 1);
     end;
 
     var

@@ -105,7 +105,6 @@ page 10810 "Generate EFT Files"
                     GenerateEFT: Codeunit "Generate EFT";
                 begin
                     CurrPage.GenerateEFTFileLines.PAGE.GetColumns(EFTExportWorkset);
-
                     if EFTExportWorkset.FindFirst() then
                         GenerateEFT.ProcessAndGenerateEFTFile(BankAccountNo, SettlementDate, EFTExportWorkset, EFTValues);
                     UpdateSubForm();

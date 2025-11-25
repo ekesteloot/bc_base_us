@@ -1,7 +1,7 @@
 report 99000766 "Prod. Order - Picking List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrder/ProdOrderPickingList.rdlc';
+    RDLCLayout = './Manufacturing/Document/ProdOrderPickingList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Picking List';
     UsageCategory = ReportsAndAnalysis;
@@ -51,8 +51,8 @@ report 99000766 "Prod. Order - Picking List"
             }
             dataitem("Prod. Order Component"; "Prod. Order Component")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Location Code" = FIELD("Location Filter"), "Bin Code" = FIELD("Bin Filter");
-                DataItemTableView = SORTING("Item No.", "Variant Code", "Location Code", Status, "Due Date");
+                DataItemLink = "Item No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter"), "Bin Code" = field("Bin Filter");
+                DataItemTableView = sorting("Item No.", "Variant Code", "Location Code", Status, "Due Date");
                 RequestFilterFields = Status, "Due Date";
                 column(ProdOrdNo_ProdOrderComp; "Prod. Order No.")
                 {

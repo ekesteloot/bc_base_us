@@ -1,3 +1,7 @@
+namespace System.TestTools.TestRunner;
+
+using System.Utilities;
+
 page 130404 "CAL Test Missing Codeunits"
 {
     Caption = 'Missing Codeunits List';
@@ -18,7 +22,7 @@ page 130404 "CAL Test Missing Codeunits"
             repeater("<Codeunit List>")
             {
                 Caption = 'Codeunit List';
-                field(Number; Number)
+                field(Number; Rec.Number)
                 {
                     ApplicationArea = All;
                     Caption = 'Codeunit ID';
@@ -39,7 +43,7 @@ page 130404 "CAL Test Missing Codeunits"
 
                 trigger OnAction()
                 begin
-                    if FindFirst() then
+                    if Rec.FindFirst() then
                         CALTestMgt.AddMissingTestCodeunits(Rec, CurrentTestSuite);
                 end;
             }
@@ -65,7 +69,7 @@ page 130404 "CAL Test Missing Codeunits"
     procedure Initialize(var CUIds: Record "Integer" temporary; TestSuiteName: Code[10])
     begin
         CurrentTestSuite := TestSuiteName;
-        Copy(CUIds, true);
+        Rec.Copy(CUIds, true);
     end;
 }
 

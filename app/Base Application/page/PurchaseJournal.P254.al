@@ -1,3 +1,17 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Setup;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Threading;
+
 page 254 "Purchase Journal"
 {
     // // This page has two view modes based on global variable 'IsSimplePage' as :-
@@ -11,7 +25,7 @@ page 254 "Purchase Journal"
     ApplicationArea = Basic, Suite;
     AutoSplitKey = true;
     Caption = 'Purchase Journals';
-    DataCaptionExpression = DataCaption();
+    DataCaptionExpression = Rec.DataCaption();
     DelayedInsert = true;
     PageType = Worksheet;
     SaveValues = true;
@@ -241,7 +255,7 @@ page 254 "Purchase Journal"
 
                     trigger OnValidate()
                     begin
-                        DocumentAmount := Abs(Amount);
+                        DocumentAmount := Abs(Rec.Amount);
                     end;
                 }
                 field("Amount (LCY)"; Rec."Amount (LCY)")
@@ -339,7 +353,7 @@ page 254 "Purchase Journal"
                     trigger OnValidate()
                     begin
                         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field("Bal. Gen. Posting Type"; Rec."Bal. Gen. Posting Type")
@@ -492,9 +506,9 @@ page 254 "Purchase Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
@@ -508,9 +522,9 @@ page 254 "Purchase Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
@@ -524,9 +538,9 @@ page 254 "Purchase Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
@@ -540,9 +554,9 @@ page 254 "Purchase Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
@@ -556,9 +570,9 @@ page 254 "Purchase Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
@@ -572,9 +586,9 @@ page 254 "Purchase Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
@@ -812,7 +826,7 @@ page 254 "Purchase Journal"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            Rec.Validate("Incoming Document Entry No.", IncomingDocument.SelectIncomingDocument("Incoming Document Entry No.", RecordId));
+                            Rec.Validate("Incoming Document Entry No.", IncomingDocument.SelectIncomingDocument(Rec."Incoming Document Entry No.", Rec.RecordId));
                         end;
                     }
                     action(IncomingDocAttachFile)
@@ -1194,7 +1208,7 @@ page 254 "Purchase Journal"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(RecordId);
+        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(Rec.RecordId);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1205,8 +1219,8 @@ page 254 "Purchase Journal"
         Clear(DocumentAmount);
         // Setting account type to Vendor and doc type to invoice on new line when in simple page mode
         if IsSimplePage then begin
-            Rec.Validate("Account Type", "Account Type"::Vendor);
-            Rec.Validate("Document Type", "Document Type"::Invoice);
+            Rec.Validate("Account Type", Rec."Account Type"::Vendor);
+            Rec.Validate("Document Type", Rec."Document Type"::Invoice);
         end;
         Clear(ShortcutDimCode);
     end;
@@ -1257,23 +1271,18 @@ page 254 "Purchase Journal"
         ShowTotalBalance: Boolean;
         HasIncomingDocument: Boolean;
         ApplyEntriesActionEnabled: Boolean;
-        [InDataSet]
         BalanceVisible: Boolean;
-        [InDataSet]
         TotalBalanceVisible: Boolean;
-        [InDataSet]
         IsPostingGroupEditable: Boolean;
         AmountVisible: Boolean;
         DebitCreditVisible: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
-        IsSimplePage: Boolean;
         DocumentAmount: Decimal;
         NegativeDocAmountErr: Label 'You must specify a positive amount as the document amount. If the journal line is for a document type that has a negative amount, the amount will be tracked correctly.';
         JobQueuesUsed: Boolean;
         JobQueueVisible: Boolean;
         BackgroundErrorCheck: Boolean;
         ShowAllLinesEnabled: Boolean;
-        [InDataSet]
         VATDateEnabled: Boolean;
 
     protected var
@@ -1286,6 +1295,7 @@ page 254 "Purchase Journal"
         DimVisible6: Boolean;
         DimVisible7: Boolean;
         DimVisible8: Boolean;
+        IsSimplePage: Boolean;
 
     local procedure UpdateBalance()
     begin
@@ -1294,7 +1304,7 @@ page 254 "Purchase Journal"
         BalanceVisible := ShowBalance;
         TotalBalanceVisible := ShowTotalBalance;
         if ShowTotalBalance then
-            NumberOfRecords := Count();
+            NumberOfRecords := Rec.Count();
     end;
 
     local procedure EnableApplyEntriesAction()
@@ -1406,7 +1416,7 @@ page 254 "Purchase Journal"
         if IsHandled then
             exit;
 
-        GenJnlManagement.TemplateSelection(PAGE::"Purchase Journal", "Gen. Journal Template Type"::Purchases, false, Rec, JnlSelected);
+        GenJnlManagement.TemplateSelection(PAGE::"Purchase Journal", Enum::"Gen. Journal Template Type"::Purchases, false, Rec, JnlSelected);
         if not JnlSelected then
             Error('');
     end;

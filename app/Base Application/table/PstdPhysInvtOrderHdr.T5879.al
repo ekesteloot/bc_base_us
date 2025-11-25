@@ -1,3 +1,14 @@
+﻿namespace Microsoft.InventoryMgt.Counting.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Employee;
+using Microsoft.InventoryMgt.Counting.Comment;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5879 "Pstd. Phys. Invt. Order Hdr"
 {
     Caption = 'Pstd. Phys. Invt. Order Hdr';
@@ -31,9 +42,9 @@ table 5879 "Pstd. Phys. Invt. Order Hdr"
         }
         field(30; Comment; Boolean)
         {
-            CalcFormula = Exist ("Phys. Invt. Comment Line" WHERE("Document Type" = CONST("Posted Order"),
-                                                                  "Order No." = FIELD("No."),
-                                                                  "Recording No." = CONST(0)));
+            CalcFormula = exist("Phys. Invt. Comment Line" where("Document Type" = const("Posted Order"),
+                                                                  "Order No." = field("No."),
+                                                                  "Recording No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -42,8 +53,6 @@ table 5879 "Pstd. Phys. Invt. Order Hdr"
         {
             Caption = 'Person Responsible';
             TableRelation = Employee;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(40; "Reason Code"; Code[10])
@@ -60,13 +69,13 @@ table 5879 "Pstd. Phys. Invt. Order Hdr"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(51; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(60; "Pre-Assigned No. Series"; Code[20])
         {
@@ -95,8 +104,8 @@ table 5879 "Pstd. Phys. Invt. Order Hdr"
         }
         field(71; "No. Finished Recordings"; Integer)
         {
-            CalcFormula = Count ("Pstd. Phys. Invt. Record Hdr" WHERE("Order No." = FIELD("No."),
-                                                                   Status = CONST(Finished)));
+            CalcFormula = count("Pstd. Phys. Invt. Record Hdr" where("Order No." = field("No."),
+                                                                   Status = const(Finished)));
             Caption = 'No. Finished Recordings';
             Editable = false;
             FieldClass = FlowField;
@@ -109,7 +118,7 @@ table 5879 "Pstd. Phys. Invt. Order Hdr"
         field(111; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -119,7 +128,7 @@ table 5879 "Pstd. Phys. Invt. Order Hdr"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
     }

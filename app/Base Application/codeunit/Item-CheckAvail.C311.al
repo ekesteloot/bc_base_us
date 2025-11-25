@@ -1,3 +1,17 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Document;
+using System.Environment.Configuration;
+
 codeunit 311 "Item-Check Avail."
 {
     Permissions = TableData "My Notifications" = rimd;

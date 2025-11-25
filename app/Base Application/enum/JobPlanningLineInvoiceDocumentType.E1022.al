@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
 enum 1022 "Job Planning Line Invoice Document Type"
 {
     Extensible = true;

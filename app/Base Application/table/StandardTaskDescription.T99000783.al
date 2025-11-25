@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 table 99000783 "Standard Task Description"
 {
     Caption = 'Standard Task Description';

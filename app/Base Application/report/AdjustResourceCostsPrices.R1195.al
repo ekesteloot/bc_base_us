@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
 report 1195 "Adjust Resource Costs/Prices"
 {
     ApplicationArea = Basic, Suite;
@@ -9,7 +11,7 @@ report 1195 "Adjust Resource Costs/Prices"
     {
         dataitem(Resource; Resource)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Resource Group No.";
 
             trigger OnAfterGetRecord()

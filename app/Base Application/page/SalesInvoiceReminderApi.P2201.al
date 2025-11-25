@@ -14,11 +14,11 @@ page 2201 "Sales Invoice Reminder API"
     {
         area(content)
         {
-            field(InvoiceId; InvoiceId)
+            field(InvoiceId; Rec.InvoiceId)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
             }
-            field(Message; Message)
+            field(Message; Rec.Message)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
             }
@@ -33,10 +33,10 @@ page 2201 "Sales Invoice Reminder API"
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
     begin
-        if IsNullGuid(InvoiceId) then
+        if IsNullGuid(Rec.InvoiceId) then
             Error('');
 
-        SalesInvoiceHeader.GetBySystemId(InvoiceId);
+        SalesInvoiceHeader.GetBySystemId(Rec.InvoiceId);
 
         SalesInvoiceHeader.EmailRecords(false);
 

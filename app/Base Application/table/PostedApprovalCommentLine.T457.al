@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Security.AccessControl;
+
 table 457 "Posted Approval Comment Line"
 {
     Caption = 'Posted Approval Comment Line';
@@ -23,8 +27,6 @@ table 457 "Posted Approval Comment Line"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(6; "Date and Time"; DateTime)
         {

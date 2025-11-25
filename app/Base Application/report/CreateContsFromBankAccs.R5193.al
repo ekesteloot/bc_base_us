@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Contact;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Setup;
+
 report 5193 "Create Conts. from Bank Accs."
 {
     ApplicationArea = RelationshipMgmt;

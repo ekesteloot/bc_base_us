@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000835 "Routing Tools"
 {
     AutoSplitKey = true;

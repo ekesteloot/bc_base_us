@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using System.Reflection;
+
 page 5631 "FA Journal Template List"
 {
     Caption = 'FA Journal Template List';

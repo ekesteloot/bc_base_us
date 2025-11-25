@@ -1,7 +1,18 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using System.Text;
+using System.Utilities;
+
 report 7150 "Item Dimensions - Detail"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemDimensionsDetail.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemDimensionsDetail.rdlc';
     ApplicationArea = Dimensions;
     Caption = 'Item Dimensions - Detail';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +21,7 @@ report 7150 "Item Dimensions - Detail"
     {
         dataitem("Item Analysis View"; "Item Analysis View")
         {
-            DataItemTableView = SORTING("Analysis Area", Code);
+            DataItemTableView = sorting("Analysis Area", Code);
             column(ViewLastUpdatedText; ViewLastUpdatedText)
             {
             }
@@ -73,7 +84,7 @@ report 7150 "Item Dimensions - Detail"
             }
             dataitem(Level1; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(DimValCode1; DimValCode[1])
                 {
                 }
@@ -85,7 +96,7 @@ report 7150 "Item Dimensions - Detail"
                 }
                 dataitem(Level2; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(DimValCode2; DimValCode[2])
                     {
                     }
@@ -119,7 +130,7 @@ report 7150 "Item Dimensions - Detail"
                     }
                     dataitem(Level3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DimValCode3; DimValCode[3])
                         {
                         }
@@ -131,7 +142,7 @@ report 7150 "Item Dimensions - Detail"
                         }
                         dataitem(Level4; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(DimValCode4; DimValCode[4])
                             {
                             }
@@ -162,7 +173,7 @@ report 7150 "Item Dimensions - Detail"
                         }
                         dataitem(Level3e; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                            DataItemTableView = sorting(Number) where(Number = const(1));
                             column(SalesAmtTotal3; SalesAmtTotal[3])
                             {
                                 AutoFormatType = 1;
@@ -205,7 +216,7 @@ report 7150 "Item Dimensions - Detail"
                     }
                     dataitem(Level2e; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(SalesAmtTotal2; SalesAmtTotal[2])
                         {
                             AutoFormatType = 1;
@@ -248,7 +259,7 @@ report 7150 "Item Dimensions - Detail"
                 }
                 dataitem(Level1e; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CostAmtTotal1; CostAmtTotal[1])
                     {
                         AutoFormatType = 1;
@@ -727,19 +738,19 @@ report 7150 "Item Dimensions - Detail"
                     end;
                 end;
             else begin
-                    TempDimVal.Reset();
-                    TempDimVal.SetRange("Dimension Code", IterationDimCode);
-                    TempDimVal.SetFilter(Code, IterationFilter);
-                    if FindFirstRec then
-                        SearchResult := TempDimVal.Find('-')
-                    else
-                        if TempDimVal.Get(IterationDimCode, IterationDimValCode) then
-                            SearchResult := TempDimVal.Next() <> 0;
-                    if SearchResult then begin
-                        IterationDimValCode := TempDimVal.Code;
-                        IterationDimValName := TempDimVal.Name;
-                    end;
+                TempDimVal.Reset();
+                TempDimVal.SetRange("Dimension Code", IterationDimCode);
+                TempDimVal.SetFilter(Code, IterationFilter);
+                if FindFirstRec then
+                    SearchResult := TempDimVal.Find('-')
+                else
+                    if TempDimVal.Get(IterationDimCode, IterationDimValCode) then
+                        SearchResult := TempDimVal.Next() <> 0;
+                if SearchResult then begin
+                    IterationDimValCode := TempDimVal.Code;
+                    IterationDimValName := TempDimVal.Name;
                 end;
+            end;
         end;
         if not SearchResult then begin
             IterationDimValCode := '';

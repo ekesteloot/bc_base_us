@@ -1,3 +1,10 @@
+namespace System.IO;
+
+using Microsoft.InventoryMgt.Item;
+using System;
+using System.Reflection;
+using System.Security.AccessControl;
+
 codeunit 8617 "Config. Validate Management"
 {
 
@@ -470,7 +477,7 @@ codeunit 8617 "Config. Validate Management"
 
         IF Validate THEN
             FieldRef.VALIDATE(RecordID)
-        ELSE
+        else
             FieldRef.VALUE := RecordID;
     end;
 
@@ -784,7 +791,7 @@ codeunit 8617 "Config. Validate Management"
                 RecordIDVar1 := FieldRef.VALUE();
                 IF RecordIDVar1 <> RecordIDVar THEN
                     FieldRef.VALIDATE(RecordIDVar);
-            END ELSE
+            END else
                 FieldRef.VALUE := RecordIDVar;
             EXIT(TRUE);
         END;

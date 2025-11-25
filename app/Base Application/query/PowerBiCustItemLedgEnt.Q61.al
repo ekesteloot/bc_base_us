@@ -12,7 +12,7 @@ query 61 "Power BI Cust. Item Ledg. Ent."
             dataitem(Item_Ledger_Entry; "Item Ledger Entry")
             {
                 DataItemLink = "Source No." = Customer."No.";
-                DataItemTableFilter = "Source Type" = CONST(Customer);
+                DataItemTableFilter = "Source Type" = const(Customer);
                 column(Item_No; "Item No.")
                 {
                 }

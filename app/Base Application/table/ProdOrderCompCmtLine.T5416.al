@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Manufacturing.ProductionBOM;
+
 table 5416 "Prod. Order Comp. Cmt Line"
 {
     Caption = 'Prod. Order Comp. Cmt Line';
@@ -10,9 +14,9 @@ table 5416 "Prod. Order Comp. Cmt Line"
         {
             Caption = 'Prod. Order BOM Line No.';
             NotBlank = true;
-            TableRelation = "Prod. Order Component"."Line No." WHERE(Status = FIELD(Status),
-                                                                      "Prod. Order No." = FIELD("Prod. Order No."),
-                                                                      "Prod. Order Line No." = FIELD("Prod. Order Line No."));
+            TableRelation = "Prod. Order Component"."Line No." where(Status = field(Status),
+                                                                      "Prod. Order No." = field("Prod. Order No."),
+                                                                      "Prod. Order Line No." = field("Prod. Order Line No."));
         }
         field(3; "Line No."; Integer)
         {
@@ -38,14 +42,14 @@ table 5416 "Prod. Order Comp. Cmt Line"
         {
             Caption = 'Prod. Order No.';
             NotBlank = true;
-            TableRelation = "Production Order"."No." WHERE(Status = FIELD(Status));
+            TableRelation = "Production Order"."No." where(Status = field(Status));
         }
         field(24; "Prod. Order Line No."; Integer)
         {
             Caption = 'Prod. Order Line No.';
             NotBlank = true;
-            TableRelation = "Prod. Order Line"."Line No." WHERE(Status = FIELD(Status),
-                                                                 "Prod. Order No." = FIELD("Prod. Order No."));
+            TableRelation = "Prod. Order Line"."Line No." where(Status = field(Status),
+                                                                 "Prod. Order No." = field("Prod. Order No."));
         }
     }
 

@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using System.Utilities;
+
 codeunit 9078 "Check Item Jnl. Line. Backgr."
 {
     trigger OnRun()

@@ -1,3 +1,17 @@
+﻿namespace Microsoft.CRM.Campaign;
+
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Reports;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Task;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Sales.Pricing;
+using System.Text;
+
 page 5087 "Campaign List"
 {
     ApplicationArea = RelationshipMgmt;
@@ -76,8 +90,8 @@ page 5087 "Campaign List"
                     Caption = 'E&ntries';
                     Image = Entries;
                     RunObject = Page "Campaign Entries";
-                    RunPageLink = "Campaign No." = FIELD("No.");
-                    RunPageView = SORTING("Campaign No.");
+                    RunPageLink = "Campaign No." = field("No.");
+                    RunPageView = sorting("Campaign No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View all the entries linked to the campaign. In this window, you cannot manually create new campaign entries.';
                 }
@@ -87,9 +101,9 @@ page 5087 "Campaign List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Rlshp. Mgt. Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Campaign),
-                                  "No." = FIELD("No."),
-                                  "Sub No." = CONST(0);
+                    RunPageLink = "Table Name" = const(Campaign),
+                                  "No." = field("No."),
+                                  "Sub No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Statistics)
@@ -98,7 +112,7 @@ page 5087 "Campaign List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Campaign Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View key figures concerning your campaign.';
                 }
@@ -112,8 +126,8 @@ page 5087 "Campaign List"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(5071),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(5071),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -131,7 +145,7 @@ page 5087 "Campaign List"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(Campaign);
-                            DefaultDimMultiple.SetMultiRecord(Campaign, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(Campaign, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -142,9 +156,9 @@ page 5087 "Campaign List"
                     Caption = 'T&asks';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    RunPageLink = "Campaign No." = FIELD("No."),
-                                  "System To-do Type" = FILTER(Organizer);
-                    RunPageView = SORTING("Campaign No.");
+                    RunPageLink = "Campaign No." = field("No."),
+                                  "System To-do Type" = filter(Organizer);
+                    RunPageView = sorting("Campaign No.");
                     ToolTip = 'View tasks for the campaign.';
                 }
                 action("S&egments")
@@ -153,8 +167,8 @@ page 5087 "Campaign List"
                     Caption = 'S&egments';
                     Image = Segment;
                     RunObject = Page "Segment List";
-                    RunPageLink = "Campaign No." = FIELD("No.");
-                    RunPageView = SORTING("Campaign No.");
+                    RunPageLink = "Campaign No." = field("No.");
+                    RunPageView = sorting("Campaign No.");
                     ToolTip = 'View a list of all the open segments. Open segments are those for which the interaction has not been logged yet.';
                 }
                 action("Oppo&rtunities")
@@ -163,8 +177,8 @@ page 5087 "Campaign List"
                     Caption = 'Oppo&rtunities';
                     Image = OpportunitiesList;
                     RunObject = Page "Opportunity List";
-                    RunPageLink = "Campaign No." = FIELD("No.");
-                    RunPageView = SORTING("Campaign No.");
+                    RunPageLink = "Campaign No." = field("No.");
+                    RunPageView = sorting("Campaign No.");
                     ToolTip = 'View sales opportunities handled by salespeople.';
                 }
 #if not CLEAN21
@@ -185,7 +199,7 @@ page 5087 "Campaign List"
                     begin
                         SalesPrice.SetCurrentKey("Sales Type", "Sales Code");
                         SalesPrice.SetRange("Sales Type", SalesPrice."Sales Type"::Campaign);
-                        SalesPrice.SetRange("Sales Code", "No.");
+                        SalesPrice.SetRange("Sales Code", Rec."No.");
                         Page.Run(Page::"Sales Prices", SalesPrice);
                     end;
                 }
@@ -206,7 +220,7 @@ page 5087 "Campaign List"
                     begin
                         SalesLineDiscount.SetCurrentKey("Sales Type", "Sales Code");
                         SalesLineDiscount.SetRange("Sales Type", SalesLineDiscount."Sales Type"::Campaign);
-                        SalesLineDiscount.SetRange("Sales Code", "No.");
+                        SalesLineDiscount.SetRange("Sales Code", Rec."No.");
                         Page.Run(Page::"Sales Line Discounts", SalesLineDiscount);
                     end;
                 }
@@ -223,7 +237,7 @@ page 5087 "Campaign List"
                     var
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
-                        PriceUXManagement.ShowPriceLists(Rec, "Price Type"::Sale, "Price Amount Type"::Any);
+                        PriceUXManagement.ShowPriceLists(Rec, Enum::"Price Type"::Sale, Enum::"Price Amount Type"::Any);
                     end;
                 }
                 action(PriceLines)
@@ -241,7 +255,7 @@ page 5087 "Campaign List"
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Price);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Price);
                     end;
                 }
                 action(DiscountLines)
@@ -259,7 +273,7 @@ page 5087 "Campaign List"
                         PriceUXManagement: Codeunit "Price UX Management";
                     begin
                         Rec.ToPriceSource(PriceSource);
-                        PriceUXManagement.ShowPriceListLines(PriceSource, "Price Amount Type"::Discount);
+                        PriceUXManagement.ShowPriceListLines(PriceSource, Enum::"Price Amount Type"::Discount);
                     end;
                 }
 #if not CLEAN21
@@ -374,7 +388,7 @@ page 5087 "Campaign List"
             {
                 Caption = 'Prices & Discounts', Comment = 'Generated from the PromotedActionCategories property index 4.';
 
-#if not CLEAN19
+#if not CLEAN21
                 actionref("Sales &Prices_Promoted"; "Sales &Prices")
                 {
                     ObsoleteState = Pending;
@@ -388,7 +402,7 @@ page 5087 "Campaign List"
                 actionref(PriceLines_Promoted; PriceLines)
                 {
                 }
-#if not CLEAN19
+#if not CLEAN21
                 actionref("Sales &Line Discounts_Promoted"; "Sales &Line Discounts")
                 {
                     ObsoleteState = Pending;

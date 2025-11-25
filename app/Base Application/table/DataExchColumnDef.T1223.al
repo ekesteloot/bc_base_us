@@ -1,3 +1,5 @@
+namespace System.IO;
+
 table 1223 "Data Exch. Column Def"
 {
     Caption = 'Data Exch. Column Def';
@@ -46,7 +48,7 @@ table 1223 "Data Exch. Column Def"
         {
             Caption = 'Data Exch. Line Def Code';
             NotBlank = true;
-            TableRelation = "Data Exch. Line Def".Code WHERE("Data Exch. Def Code" = FIELD("Data Exch. Def Code"));
+            TableRelation = "Data Exch. Line Def".Code where("Data Exch. Def Code" = field("Data Exch. Def Code"));
         }
         field(11; Length; Integer)
         {

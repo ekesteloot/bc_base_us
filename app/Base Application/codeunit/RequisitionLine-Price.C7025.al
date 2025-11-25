@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+
 codeunit 7025 "Requisition Line - Price" implements "Line With Price"
 {
     var

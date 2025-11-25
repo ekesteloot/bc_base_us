@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+
 page 1872 "Item Availability Check"
 {
     AutoSplitKey = false;
@@ -44,7 +50,7 @@ page 1872 "Item Availability Check"
                     Editable = false;
                     ToolTip = 'Specifies the total quantity of the item that is currently in inventory. The Total Quantity field is used to calculate the Available Inventory field as follows: Available Inventory = Total Quantity - Reserved Quantity.';
                 }
-                field("All locations"; Inventory)
+                field("All locations"; Rec.Inventory)
                 {
                     ApplicationArea = Location;
                     Caption = 'All locations';
@@ -61,7 +67,7 @@ page 1872 "Item Availability Check"
             {
                 ApplicationArea = Basic, Suite;
                 Editable = false;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
         }
     }
@@ -79,10 +85,10 @@ page 1872 "Item Availability Check"
                     Caption = 'Item';
                     Image = Item;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     RunPageMode = View;
                     ToolTip = 'View and edit detailed information for the item.';
                 }
@@ -188,8 +194,8 @@ page 1872 "Item Availability Check"
         CurrentReservedQty: Decimal;
         EarliestAvailDate: Date;
     begin
-        Get(AvailabilityCheckNotification.GetData('ItemNo'));
-        SetRange("No.", AvailabilityCheckNotification.GetData('ItemNo'));
+        Rec.Get(AvailabilityCheckNotification.GetData('ItemNo'));
+        Rec.SetRange("No.", AvailabilityCheckNotification.GetData('ItemNo'));
         Evaluate(TotalQuantity, AvailabilityCheckNotification.GetData('TotalQuantity'));
         Evaluate(InventoryQty, AvailabilityCheckNotification.GetData('InventoryQty'));
         Evaluate(LocationCode, AvailabilityCheckNotification.GetData('LocationCode'));
@@ -298,16 +304,16 @@ page 1872 "Item Availability Check"
         PurchaseLine: Record "Purchase Line";
         Vendor: Record Vendor;
     begin
-        if "Vendor No." = '' then begin
+        if Rec."Vendor No." = '' then begin
             if not SelectVendor(Vendor) then
                 exit(false);
 
-            "Vendor No." := Vendor."No."
+            Rec."Vendor No." := Vendor."No."
         end;
         PurchaseHeader.Init();
         PurchaseHeader.Validate("Document Type", DocumentType);
         PurchaseHeader.Insert(true);
-        PurchaseHeader.Validate("Buy-from Vendor No.", "Vendor No.");
+        PurchaseHeader.Validate("Buy-from Vendor No.", Rec."Vendor No.");
         PurchaseHeader.Modify(true);
 
         PurchaseLine.Init();
@@ -317,7 +323,7 @@ page 1872 "Item Availability Check"
         PurchaseLine.Insert(true);
 
         PurchaseLine.Validate(Type, PurchaseLine.Type::Item);
-        PurchaseLine.Validate("No.", "No.");
+        PurchaseLine.Validate("No.", Rec."No.");
         PurchaseLine.Validate("Variant Code", VariantCode);
         PurchaseLine.Validate("Unit of Measure Code", UnitOfMeasureCode);
         PurchaseLine.Validate(Quantity, -TotalQuantity);

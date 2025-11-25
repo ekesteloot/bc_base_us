@@ -1,7 +1,13 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.WorkCenter;
+using System.Utilities;
+
 report 99000762 "Prod. Order - Job Card"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrder/ProdOrderJobCard.rdlc';
+    RDLCLayout = './Manufacturing/Document/ProdOrderJobCard.rdlc';
     AdditionalSearchTerms = 'production order - job card,work order job card';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Job Card';
@@ -11,7 +17,7 @@ report 99000762 "Prod. Order - Job Card"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             RequestFilterFields = Status, "No.", "Source Type", "Source No.";
             column(Status_ProdOrder; Status)
             {
@@ -21,7 +27,7 @@ report 99000762 "Prod. Order - Job Card"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(TodayFormatted; Format(Today, 0, 4))
                 {
                 }
@@ -43,8 +49,8 @@ report 99000762 "Prod. Order - Job Card"
             }
             dataitem("Prod. Order Routing Line"; "Prod. Order Routing Line")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
                 column(RtngNo_ProdOrderRtngLine; "Routing No.")
                 {
                     IncludeCaption = true;
@@ -123,8 +129,8 @@ report 99000762 "Prod. Order - Job Card"
                 }
                 dataitem("Prod. Order Component"; "Prod. Order Component")
                 {
-                    DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("Prod. Order No."), "Routing Link Code" = FIELD("Routing Link Code");
-                    DataItemTableView = SORTING(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
+                    DataItemLink = Status = field(Status), "Prod. Order No." = field("Prod. Order No."), "Routing Link Code" = field("Routing Link Code");
+                    DataItemTableView = sorting(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
                     column(Position_ProdOrderComp; Position)
                     {
                         IncludeCaption = true;

@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Sales.Receivables;
+
 codeunit 401 "Sales Header Apply"
 {
     TableNo = "Sales Header";

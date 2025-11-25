@@ -1,3 +1,11 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 #pragma warning disable AS0109
 table 1248 "Ledger Entry Matching Buffer"
 #pragma warning restore AS0109

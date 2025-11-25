@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.BankAccount;
+
+using System.Globalization;
+
 table 466 "Payment Method Translation"
 {
     Caption = 'Payment Method Translation';

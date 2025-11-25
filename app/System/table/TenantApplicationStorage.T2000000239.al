@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Apps;
+
 /// <summary>
 /// This table contains Tenant applications.
 /// </summary>
@@ -7,7 +13,7 @@ table 2000000239 "Tenant Application Storage"
     DataPerCompany = false;
     Scope = OnPrem;
     ReplicateData = false;
-    
+
     fields
     {
         /// <summary>
@@ -17,7 +23,7 @@ table 2000000239 "Tenant Application Storage"
         field(1; "ID"; Guid)
         {
             Caption = 'ID';
-        }       
+        }
 
         /// <summary>
         /// Specifies the release that this PTE is staged for.
@@ -27,7 +33,7 @@ table 2000000239 "Tenant Application Storage"
             Caption = 'Target Release';
 
         }
-        
+
         /// <summary>
         /// The package identifier. Belongs to the input package and is uniquely generated upon compiling.
         /// </summary>
@@ -43,7 +49,7 @@ table 2000000239 "Tenant Application Storage"
         {
             Caption = 'Name';
         }
-		
+
         /// <summary>
         /// The app publisher. A human-readable publisher for the application. 
         /// The publisher represents the individual or organization who created or 
@@ -53,7 +59,7 @@ table 2000000239 "Tenant Application Storage"
         {
             Caption = 'Publisher';
         }
-		
+
         /// <summary>
         /// The app version.
         /// </summary>
@@ -61,7 +67,7 @@ table 2000000239 "Tenant Application Storage"
         {
             Caption = 'Version';
         }
-		
+
         /// <summary>
         /// Application version mentioned in the manifes of the app
         /// </summary>
@@ -69,7 +75,7 @@ table 2000000239 "Tenant Application Storage"
         {
             Caption = 'Application Version';
         }
-		
+
         /// <summary>
         /// A list of dircet dependencies of the app in json format 
         /// </summary>

@@ -14,9 +14,9 @@ table 551 "VAT Rate Change Conversion"
         {
             Caption = 'From Code';
             NotBlank = true;
-            TableRelation = IF (Type = CONST("VAT Prod. Posting Group")) "VAT Product Posting Group"
-            ELSE
-            IF (Type = CONST("Gen. Prod. Posting Group")) "Gen. Product Posting Group";
+            TableRelation = if (Type = const("VAT Prod. Posting Group")) "VAT Product Posting Group"
+            else
+            if (Type = const("Gen. Prod. Posting Group")) "Gen. Product Posting Group";
 
             trigger OnValidate()
             begin
@@ -27,9 +27,9 @@ table 551 "VAT Rate Change Conversion"
         {
             Caption = 'To Code';
             NotBlank = true;
-            TableRelation = IF (Type = CONST("VAT Prod. Posting Group")) "VAT Product Posting Group"
-            ELSE
-            IF (Type = CONST("Gen. Prod. Posting Group")) "Gen. Product Posting Group";
+            TableRelation = if (Type = const("VAT Prod. Posting Group")) "VAT Product Posting Group"
+            else
+            if (Type = const("Gen. Prod. Posting Group")) "Gen. Product Posting Group";
 
             trigger OnValidate()
             begin

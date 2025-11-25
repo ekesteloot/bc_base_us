@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.History;
+using System.Utilities;
+
 page 5805 "Item Charge Assignment (Purch)"
 {
     AutoSplitKey = true;
@@ -57,9 +65,9 @@ page 5805 "Item Charge Assignment (Purch)"
 
                     trigger OnValidate()
                     begin
-                        if PurchLine2.Quantity * "Qty. to Assign" < 0 then
+                        if PurchLine2.Quantity * Rec."Qty. to Assign" < 0 then
                             Error(Text000,
-                              FieldCaption("Qty. to Assign"), PurchLine2.FieldCaption(Quantity));
+                              Rec.FieldCaption("Qty. to Assign"), PurchLine2.FieldCaption(Quantity));
                         QtytoAssignOnAfterValidate();
                     end;
                 }
@@ -386,9 +394,9 @@ page 5805 "Item Charge Assignment (Purch)"
                     var
                         ItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)";
                     begin
-                        ItemChargeAssgntPurch.SetRange("Document Type", "Document Type");
-                        ItemChargeAssgntPurch.SetRange("Document No.", "Document No.");
-                        ItemChargeAssgntPurch.SetRange("Document Line No.", "Document Line No.");
+                        ItemChargeAssgntPurch.SetRange("Document Type", Rec."Document Type");
+                        ItemChargeAssgntPurch.SetRange("Document No.", Rec."Document No.");
+                        ItemChargeAssgntPurch.SetRange("Document Line No.", Rec."Document Line No.");
                         OnGetReturnReceiptLinesOnActionOnAfterItemChargeAssgntPurchSetFilters(Rec, ReturnRcptLine, PurchLine);
 
                         OpenReturnReceiptLines(ItemChargeAssgntPurch);
@@ -546,7 +554,7 @@ page 5805 "Item Charge Assignment (Purch)"
     local procedure UpdateQty()
     begin
         case Rec."Applies-to Doc. Type" of
-            "Purchase Applies-to Document Type"::Order, "Purchase Applies-to Document Type"::Invoice:
+            Rec."Applies-to Doc. Type"::Order, Rec."Applies-to Doc. Type"::Invoice:
                 begin
                     PurchLine.Get(Rec."Applies-to Doc. Type", Rec."Applies-to Doc. No.", Rec."Applies-to Doc. Line No.");
                     QtyToReceiveBase := PurchLine."Qty. to Receive (Base)";
@@ -556,7 +564,7 @@ page 5805 "Item Charge Assignment (Purch)"
                     GrossWeight := PurchLine."Gross Weight";
                     UnitVolume := PurchLine."Unit Volume";
                 end;
-            "Purchase Applies-to Document Type"::"Return Order", "Purchase Applies-to Document Type"::"Credit Memo":
+            Rec."Applies-to Doc. Type"::"Return Order", Rec."Applies-to Doc. Type"::"Credit Memo":
                 begin
                     PurchLine.Get(Rec."Applies-to Doc. Type", Rec."Applies-to Doc. No.", Rec."Applies-to Doc. Line No.");
                     QtyToReceiveBase := 0;
@@ -566,7 +574,7 @@ page 5805 "Item Charge Assignment (Purch)"
                     GrossWeight := PurchLine."Gross Weight";
                     UnitVolume := PurchLine."Unit Volume";
                 end;
-            "Purchase Applies-to Document Type"::Receipt:
+            Rec."Applies-to Doc. Type"::Receipt:
                 begin
                     PurchRcptLine.Get(Rec."Applies-to Doc. No.", Rec."Applies-to Doc. Line No.");
                     QtyToReceiveBase := 0;
@@ -576,7 +584,7 @@ page 5805 "Item Charge Assignment (Purch)"
                     GrossWeight := PurchRcptLine."Gross Weight";
                     UnitVolume := PurchRcptLine."Unit Volume";
                 end;
-            "Purchase Applies-to Document Type"::"Return Shipment":
+            Rec."Applies-to Doc. Type"::"Return Shipment":
                 begin
                     ReturnShptLine.Get(Rec."Applies-to Doc. No.", Rec."Applies-to Doc. Line No.");
                     QtyToReceiveBase := 0;
@@ -586,7 +594,7 @@ page 5805 "Item Charge Assignment (Purch)"
                     GrossWeight := ReturnShptLine."Gross Weight";
                     UnitVolume := ReturnShptLine."Unit Volume";
                 end;
-            "Purchase Applies-to Document Type"::"Transfer Receipt":
+            Rec."Applies-to Doc. Type"::"Transfer Receipt":
                 begin
                     TransferRcptLine.Get(Rec."Applies-to Doc. No.", Rec."Applies-to Doc. Line No.");
                     QtyToReceiveBase := 0;
@@ -596,7 +604,7 @@ page 5805 "Item Charge Assignment (Purch)"
                     GrossWeight := TransferRcptLine."Gross Weight";
                     UnitVolume := TransferRcptLine."Unit Volume";
                 end;
-            "Purchase Applies-to Document Type"::"Sales Shipment":
+            Rec."Applies-to Doc. Type"::"Sales Shipment":
                 begin
                     SalesShptLine.Get(Rec."Applies-to Doc. No.", Rec."Applies-to Doc. Line No.");
                     QtyToReceiveBase := 0;
@@ -606,7 +614,7 @@ page 5805 "Item Charge Assignment (Purch)"
                     GrossWeight := SalesShptLine."Gross Weight";
                     UnitVolume := SalesShptLine."Unit Volume";
                 end;
-            "Purchase Applies-to Document Type"::"Return Receipt":
+            Rec."Applies-to Doc. Type"::"Return Receipt":
                 begin
                     ReturnRcptLine.Get(Rec."Applies-to Doc. No.", Rec."Applies-to Doc. Line No.");
                     QtyToReceiveBase := 0;

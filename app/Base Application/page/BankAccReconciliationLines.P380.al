@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Statement;
+
 page 380 "Bank Acc. Reconciliation Lines"
 {
     AutoSplitKey = true;
@@ -6,7 +10,7 @@ page 380 "Bank Acc. Reconciliation Lines"
     LinksAllowed = false;
     PageType = ListPart;
     SourceTable = "Bank Acc. Reconciliation Line";
-    SourceTableView = WHERE("Statement Type" = CONST("Bank Reconciliation"));
+    SourceTableView = where("Statement Type" = const("Bank Reconciliation"));
 
     layout
     {
@@ -78,10 +82,10 @@ page 380 "Bank Acc. Reconciliation Lines"
 
                     trigger OnDrillDown()
                     begin
-                        DisplayApplication();
+                        Rec.DisplayApplication();
                     end;
                 }
-                field(Difference; Difference)
+                field(Difference; Rec.Difference)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the difference between the amount in the Statement Amount field and the amount in the Applied Amount field.';
@@ -114,30 +118,30 @@ page 380 "Bank Acc. Reconciliation Lines"
                     ShowCaption = false;
                     Caption = ' ';
                 }
-                field(Balance; Balance + "Statement Amount")
+                field(Balance; Balance + Rec."Statement Amount")
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = GetCurrencyCode();
+                    AutoFormatExpression = Rec.GetCurrencyCode();
                     AutoFormatType = 1;
                     Caption = 'Balance';
                     Editable = false;
                     Enabled = BalanceEnable;
                     ToolTip = 'Specifies a balance, consisting of the Balance Last Statement field, plus the balance that has accumulated in the Statement Amount field.';
                 }
-                field(TotalBalance; TotalBalance + "Statement Amount")
+                field(TotalBalance; TotalBalance + Rec."Statement Amount")
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = GetCurrencyCode();
+                    AutoFormatExpression = Rec.GetCurrencyCode();
                     AutoFormatType = 1;
                     Caption = 'Total Balance';
                     Editable = false;
                     Enabled = TotalBalanceEnable;
                     ToolTip = 'Specifies the accumulated balance of the bank reconciliation, which consists of the Balance Last Statement field, plus the balance in the Statement Amount field.';
                 }
-                field(TotalDiff; TotalDiff + Difference)
+                field(TotalDiff; TotalDiff + Rec.Difference)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = GetCurrencyCode();
+                    AutoFormatExpression = Rec.GetCurrencyCode();
                     AutoFormatType = 1;
                     Caption = 'Total Difference';
                     Editable = false;
@@ -157,8 +161,8 @@ page 380 "Bank Acc. Reconciliation Lines"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Details';
                 RunObject = Page "Bank Statement Line Details";
-                RunPageLink = "Data Exch. No." = FIELD("Data Exch. Entry No."),
-                              "Line No." = FIELD("Data Exch. Line No.");
+                RunPageLink = "Data Exch. No." = field("Data Exch. Entry No."),
+                              "Line No." = field("Data Exch. Line No.");
                 ToolTip = 'View additional information about the document on the selected line and link to the related card.';
             }
 #if not CLEAN22
@@ -186,8 +190,8 @@ page 380 "Bank Acc. Reconciliation Lines"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if "Statement Line No." <> 0 then
-            CalcBalance("Statement Line No.");
+        if Rec."Statement Line No." <> 0 then
+            CalcBalance(Rec."Statement Line No.");
         SetUserInteractions();
     end;
 
@@ -222,34 +226,31 @@ page 380 "Bank Acc. Reconciliation Lines"
         TotalDiff: Decimal;
         Balance: Decimal;
         TotalBalance: Decimal;
-        [InDataSet]
         TotalDiffEnable: Boolean;
-        [InDataSet]
         TotalBalanceEnable: Boolean;
-        [InDataSet]
         BalanceEnable: Boolean;
 
     local procedure CalcBalance(BankAccReconLineNo: Integer)
     var
         CopyBankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
     begin
-        if BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.") then;
+        if BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.") then;
 
         CopyBankAccReconciliationLine.Copy(Rec);
 
-        TotalDiff := -Difference;
+        TotalDiff := -Rec.Difference;
         if CopyBankAccReconciliationLine.CalcSums(Difference) then begin
             TotalDiff := TotalDiff + CopyBankAccReconciliationLine.Difference;
             TotalDiffEnable := true;
         end;
 
-        TotalBalance := BankAccReconciliation."Balance Last Statement" - "Statement Amount";
+        TotalBalance := BankAccReconciliation."Balance Last Statement" - Rec."Statement Amount";
         if CopyBankAccReconciliationLine.CalcSums("Statement Amount") then begin
             TotalBalance := TotalBalance + CopyBankAccReconciliationLine."Statement Amount";
             TotalBalanceEnable := true;
         end;
 
-        Balance := BankAccReconciliation."Balance Last Statement" - "Statement Amount";
+        Balance := BankAccReconciliation."Balance Last Statement" - Rec."Statement Amount";
         CopyBankAccReconciliationLine.SetRange("Statement Line No.", 0, BankAccReconLineNo);
         if CopyBankAccReconciliationLine.CalcSums("Statement Amount") then begin
             Balance := Balance + CopyBankAccReconciliationLine."Statement Amount";
@@ -262,7 +263,7 @@ page 380 "Bank Acc. Reconciliation Lines"
     var
         BankAccReconApplyEntries: Codeunit "Bank Acc. Recon. Apply Entries";
     begin
-        "Ready for Application" := true;
+        Rec."Ready for Application" := true;
         CurrPage.SaveRecord();
         Commit();
         BankAccReconApplyEntries.ApplyEntries(Rec);
@@ -283,7 +284,7 @@ page 380 "Bank Acc. Reconciliation Lines"
 
     local procedure SetUserInteractions()
     begin
-        StyleTxt := GetStyle();
+        StyleTxt := Rec.GetStyle();
     end;
 
     procedure ToggleMatchedFilter(SetFilterOn: Boolean)

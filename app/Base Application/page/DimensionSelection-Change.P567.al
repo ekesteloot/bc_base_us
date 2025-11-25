@@ -14,12 +14,12 @@ page 567 "Dimension Selection-Change"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Selected; Selected)
+                field(Selected; Rec.Selected)
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies that this dimension will be included.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Dimensions;
                     Editable = false;
@@ -52,11 +52,11 @@ page 567 "Dimension Selection-Change"
     procedure GetDimSelBuf(var TheDimSelectionBuf: Record "Dimension Selection Buffer")
     begin
         TheDimSelectionBuf.DeleteAll();
-        if Find('-') then
+        if Rec.Find('-') then
             repeat
                 TheDimSelectionBuf := Rec;
                 TheDimSelectionBuf.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     procedure InsertDimSelBuf(NewSelected: Boolean; NewCode: Text[30]; NewDescription: Text[30]; NewNewDimValueCode: Code[20]; NewDimValueFilter: Text[250])
@@ -69,21 +69,21 @@ page 567 "Dimension Selection-Change"
             if Dim.Get(NewCode) then
                 NewDescription := Dim.Name;
 
-        Init();
-        Selected := NewSelected;
-        Code := NewCode;
-        Description := NewDescription;
+        Rec.Init();
+        Rec.Selected := NewSelected;
+        Rec.Code := NewCode;
+        Rec.Description := NewDescription;
         if NewSelected then begin
-            "New Dimension Value Code" := NewNewDimValueCode;
-            "Dimension Value Filter" := NewDimValueFilter;
+            Rec."New Dimension Value Code" := NewNewDimValueCode;
+            Rec."Dimension Value Filter" := NewDimValueFilter;
         end;
-        case Code of
+        case Rec.Code of
             GLAcc.TableCaption:
-                "Filter Lookup Table No." := DATABASE::"G/L Account";
+                Rec."Filter Lookup Table No." := Enum::TableID::"G/L Account".AsInteger();
             BusinessUnit.TableCaption:
-                "Filter Lookup Table No." := DATABASE::"Business Unit";
+                Rec."Filter Lookup Table No." := Enum::TableID::"Business Unit".AsInteger();
         end;
-        Insert();
+        Rec.Insert();
     end;
 }
 

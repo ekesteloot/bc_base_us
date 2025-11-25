@@ -1,3 +1,10 @@
+namespace Microsoft.ProjectMgt.Jobs.Job;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Jobs.Planning;
+
 report 1095 "Update Job Item Cost"
 {
     ApplicationArea = Jobs;
@@ -11,21 +18,21 @@ report 1095 "Update Job Item Cost"
     {
         dataitem(Job; Job)
         {
-            DataItemTableView = SORTING("No.") WHERE(Status = FILTER(Planning | Quote | Open));
+            DataItemTableView = sorting("No.") where(Status = filter(Planning | Quote | Open));
             RequestFilterFields = "No.";
             dataitem("Job Ledger Entry"; "Job Ledger Entry")
             {
-                DataItemLink = "Job No." = FIELD("No.");
-                DataItemTableView = SORTING(Type, "Entry Type", "Country/Region Code", "Source Code", "Posting Date") WHERE(Type = FILTER(= Item), "Entry Type" = FILTER(= Usage));
+                DataItemLink = "Job No." = field("No.");
+                DataItemTableView = sorting(Type, "Entry Type", "Country/Region Code", "Source Code", "Posting Date") where(Type = filter(= Item), "Entry Type" = filter(= Usage));
                 RequestFilterFields = "Posting Date";
                 dataitem("Item Ledger Entry"; "Item Ledger Entry")
                 {
-                    DataItemLink = "Entry No." = FIELD("Ledger Entry No.");
-                    DataItemTableView = SORTING("Entry No.");
+                    DataItemLink = "Entry No." = field("Ledger Entry No.");
+                    DataItemTableView = sorting("Entry No.");
                     dataitem("Job Planning Line"; "Job Planning Line")
                     {
-                        DataItemLink = "Job No." = FIELD("Job No."), "Job Task No." = FIELD("Job Task No."), "Ledger Entry No." = FIELD("Entry No.");
-                        DataItemTableView = SORTING("Job No.", "Job Task No.", "Line No.");
+                        DataItemLink = "Job No." = field("Job No."), "Job Task No." = field("Job Task No."), "Ledger Entry No." = field("Entry No.");
+                        DataItemTableView = sorting("Job No.", "Job Task No.", "Line No.");
 
                         trigger OnAfterGetRecord()
                         begin

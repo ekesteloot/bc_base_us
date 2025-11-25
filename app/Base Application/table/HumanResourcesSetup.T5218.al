@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Setup;
+
+using Microsoft.Foundation.NoSeries;
+
 table 5218 "Human Resources Setup"
 {
     Caption = 'Human Resources Setup';

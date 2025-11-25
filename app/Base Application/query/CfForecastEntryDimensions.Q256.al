@@ -1,3 +1,5 @@
+namespace Microsoft.CashFlow.Forecast;
+
 query 256 "CF Forecast Entry Dimensions"
 {
     Caption = 'CF Forecast Entry Dimensions';

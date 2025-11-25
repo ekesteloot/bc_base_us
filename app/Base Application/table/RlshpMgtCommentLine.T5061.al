@@ -1,3 +1,11 @@
+﻿namespace Microsoft.CRM.Comment;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Setup;
+using Microsoft.CRM.Task;
+
 table 5061 "Rlshp. Mgt. Comment Line"
 {
     Caption = 'Rlshp. Mgt. Comment Line';
@@ -13,24 +21,24 @@ table 5061 "Rlshp. Mgt. Comment Line"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF ("Table Name" = CONST(Contact)) Contact
-            ELSE
-            IF ("Table Name" = CONST(Campaign)) Campaign
-            ELSE
-            IF ("Table Name" = CONST("To-do")) "To-do"
-            ELSE
-            IF ("Table Name" = CONST("Web Source")) "Web Source"
-            ELSE
-            IF ("Table Name" = CONST("Sales Cycle")) "Sales Cycle"
-            ELSE
-            IF ("Table Name" = CONST("Sales Cycle Stage")) "Sales Cycle Stage"
-            ELSE
-            IF ("Table Name" = CONST(Opportunity)) Opportunity;
+            TableRelation = if ("Table Name" = const(Contact)) Contact
+            else
+            if ("Table Name" = const(Campaign)) Campaign
+            else
+            if ("Table Name" = const("To-do")) "To-do"
+            else
+            if ("Table Name" = const("Web Source")) "Web Source"
+            else
+            if ("Table Name" = const("Sales Cycle")) "Sales Cycle"
+            else
+            if ("Table Name" = const("Sales Cycle Stage")) "Sales Cycle Stage"
+            else
+            if ("Table Name" = const(Opportunity)) Opportunity;
         }
         field(3; "Sub No."; Integer)
         {
             Caption = 'Sub No.';
-            TableRelation = IF ("Table Name" = CONST("Sales Cycle Stage")) "Sales Cycle Stage".Stage WHERE("Sales Cycle Code" = FIELD("No."));
+            TableRelation = if ("Table Name" = const("Sales Cycle Stage")) "Sales Cycle Stage".Stage where("Sales Cycle Code" = field("No."));
         }
         field(4; "Line No."; Integer)
         {

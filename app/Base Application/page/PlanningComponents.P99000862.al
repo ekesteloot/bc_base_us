@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Planning;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Location;
+
 page 99000862 "Planning Components"
 {
     AutoSplitKey = true;
@@ -54,25 +60,25 @@ page 99000862 "Planning Components"
                     ToolTip = 'Specifies how to calculate the Quantity field.';
                     Visible = false;
                 }
-                field(Length; Length)
+                field(Length; Rec.Length)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the length of one item unit when measured in the specified unit of measure.';
                     Visible = false;
                 }
-                field(Width; Width)
+                field(Width; Rec.Width)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the width of one item unit when measured in the specified unit of measure.';
                     Visible = false;
                 }
-                field(Depth; Depth)
+                field(Depth; Rec.Depth)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the depth of one item unit when measured in the specified unit of measure.';
                     Visible = false;
                 }
-                field(Weight; Weight)
+                field(Weight; Rec.Weight)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the weight of one item unit when measured in the specified unit of measure.';
@@ -101,7 +107,7 @@ page 99000862 "Planning Components"
 
                     trigger OnDrillDown()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
@@ -139,7 +145,7 @@ page 99000862 "Planning Components"
                     ToolTip = 'Specifies the total cost for this planning component line.';
                     Visible = false;
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the position of the component on the bill of material.';
@@ -281,7 +287,7 @@ page 99000862 "Planning Components"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -295,7 +301,7 @@ page 99000862 "Planning Components"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }
@@ -316,7 +322,7 @@ page 99000862 "Planning Components"
                     trigger OnAction()
                     begin
                         CurrPage.SaveRecord();
-                        ShowReservation();
+                        Rec.ShowReservation();
                     end;
                 }
                 action(OrderTracking)

@@ -1,3 +1,5 @@
+namespace System.AI;
+
 table 2001 "Time Series Forecast"
 {
     Caption = 'Time Series Forecast';

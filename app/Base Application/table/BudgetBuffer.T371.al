@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 371 "Budget Buffer"
 {
     Caption = 'Budget Buffer';

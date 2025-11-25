@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Outlook;
+
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using System;
+
 codeunit 1638 "Office Jobs Handler"
 {
     TableNo = "Office Add-in Context";

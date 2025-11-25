@@ -1,3 +1,11 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+
 page 5666 "FA Depreciation Books Subform"
 {
     Caption = 'Lines';
@@ -30,9 +38,9 @@ page 5666 "FA Depreciation Books Subform"
 
                     trigger OnAssistEdit()
                     begin
-                        ChangeExchangeRate.SetParameterFA("FA Add.-Currency Factor", GetACYCode(), WorkDate());
+                        ChangeExchangeRate.SetParameterFA(Rec."FA Add.-Currency Factor", GetACYCode(), WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then
-                            "FA Add.-Currency Factor" := ChangeExchangeRate.GetParameter();
+                            Rec."FA Add.-Currency Factor" := ChangeExchangeRate.GetParameter();
 
                         Clear(ChangeExchangeRate);
                     end;
@@ -107,7 +115,7 @@ page 5666 "FA Depreciation Books Subform"
 
                     trigger OnDrillDown()
                     begin
-                        DrillDownOnBookValue();
+                        Rec.DrillDownOnBookValue();
                     end;
                 }
                 field("Depreciation Table Code"; Rec."Depreciation Table Code")
@@ -337,7 +345,7 @@ page 5666 "FA Depreciation Books Subform"
 
     local procedure ShowFALedgEntries()
     begin
-        DepreciationCalc.SetFAFilter(FALedgEntry, "FA No.", "Depreciation Book Code", false);
+        DepreciationCalc.SetFAFilter(FALedgEntry, Rec."FA No.", Rec."Depreciation Book Code", false);
         PAGE.Run(PAGE::"FA Ledger Entries", FALedgEntry);
     end;
 
@@ -345,39 +353,39 @@ page 5666 "FA Depreciation Books Subform"
     begin
         FALedgEntry.Reset();
         FALedgEntry.SetCurrentKey("Canceled from FA No.");
-        FALedgEntry.SetRange("Canceled from FA No.", "FA No.");
-        FALedgEntry.SetRange("Depreciation Book Code", "Depreciation Book Code");
+        FALedgEntry.SetRange("Canceled from FA No.", Rec."FA No.");
+        FALedgEntry.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
         PAGE.Run(PAGE::"FA Error Ledger Entries", FALedgEntry);
     end;
 
     local procedure ShowMaintenanceLedgEntries()
     begin
         MaintenanceLedgEntry.SetCurrentKey("FA No.", "Depreciation Book Code");
-        MaintenanceLedgEntry.SetRange("FA No.", "FA No.");
-        MaintenanceLedgEntry.SetRange("Depreciation Book Code", "Depreciation Book Code");
+        MaintenanceLedgEntry.SetRange("FA No.", Rec."FA No.");
+        MaintenanceLedgEntry.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
         PAGE.Run(PAGE::"Maintenance Ledger Entries", MaintenanceLedgEntry);
     end;
 
     local procedure ShowStatistics()
     begin
-        FADeprBook.SetRange("FA No.", "FA No.");
-        FADeprBook.SetRange("Depreciation Book Code", "Depreciation Book Code");
+        FADeprBook.SetRange("FA No.", Rec."FA No.");
+        FADeprBook.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
         PAGE.Run(PAGE::"Fixed Asset Statistics", FADeprBook);
     end;
 
     local procedure ShowMainAssetStatistics()
     begin
-        FADeprBook.SetRange("FA No.", "FA No.");
-        FADeprBook.SetRange("Depreciation Book Code", "Depreciation Book Code");
+        FADeprBook.SetRange("FA No.", Rec."FA No.");
+        FADeprBook.SetRange("Depreciation Book Code", Rec."Depreciation Book Code");
         PAGE.Run(PAGE::"Main Asset Statistics", FADeprBook);
     end;
 
     local procedure GetBookValue(): Decimal
     begin
-        if "Disposal Date" > 0D then
+        if Rec."Disposal Date" > 0D then
             exit(0);
-        CalcFields("Book Value");
-        exit("Book Value");
+        Rec.CalcFields("Book Value");
+        exit(Rec."Book Value");
     end;
 }
 

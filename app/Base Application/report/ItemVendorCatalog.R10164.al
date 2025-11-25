@@ -1,7 +1,16 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Purchases.Vendor;
+
 report 10164 "Item/Vendor Catalog"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/ItemVendorCatalog.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemVendorCatalog.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item/Vendor Catalog';
     UsageCategory = ReportsAndAnalysis;
@@ -275,11 +284,11 @@ report 10164 "Item/Vendor Catalog"
         StartingDate := 0D;
         DirectUnitCost := 0.0;
         if ExtendedPriceEnabled then begin
-            PriceListLine.SetRange(Status, "Price Status"::Active);
-            PriceListLine.SetRange("Price Type", "Price Type"::Purchase);
-            PriceListLine.SetRange("Asset Type", "Price Asset Type"::Item);
+            PriceListLine.SetRange(Status, PriceListLine.Status::Active);
+            PriceListLine.SetRange("Price Type", PriceListLine."Price Type"::Purchase);
+            PriceListLine.SetRange("Asset Type", PriceListLine."Asset Type"::Item);
             PriceListLine.SetRange("Asset No.", "Item Vendor"."Item No.");
-            PriceListLine.SetRange("Source Type", "Price Source Type"::Vendor);
+            PriceListLine.SetRange("Source Type", PriceListLine."Source Type"::Vendor);
             PriceListLine.SetRange("Source No.", "Item Vendor"."Vendor No.");
             PriceListLine.SetFilter("Starting Date", '%1..%2', 0D, WorkDate());
             if PriceListLine.FindLast() then begin

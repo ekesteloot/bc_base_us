@@ -28,15 +28,15 @@ page 749 "Date Lookup"
     var
         YearFilter: Integer;
     begin
-        CopyFilter("Period Type", Date."Period Type");
+        Rec.CopyFilter("Period Type", Date."Period Type");
         YearFilter := Date2DMY(Today, 3);
         Date.SetRange("Period Start", DMY2Date(1, 1, YearFilter), DMY2Date(30, 12, YearFilter));
         Date.FindSet();
         repeat
-            TransferFields(Date);
-            Insert();
+            Rec.TransferFields(Date);
+            Rec.Insert();
         until Date.Next() = 0;
-        FindFirst();
+        Rec.FindFirst();
     end;
 
     var

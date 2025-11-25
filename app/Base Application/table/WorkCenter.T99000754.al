@@ -1,3 +1,21 @@
+﻿namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Comment;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.StandardCost;
+using Microsoft.Purchases.Vendor;
+using Microsoft.WarehouseMgt.Structure;
+
 table 99000754 "Work Center"
 {
     Caption = 'Work Center';
@@ -40,11 +58,9 @@ table 99000754 "Work Center"
         field(8; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -65,11 +81,9 @@ table 99000754 "Work Center"
         field(9; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -186,24 +200,24 @@ table 99000754 "Work Center"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(17; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(18; "Subcontractor No."; Code[20])
@@ -270,8 +284,8 @@ table 99000754 "Work Center"
         }
         field(27; Comment; Boolean)
         {
-            CalcFormula = Exist("Manufacturing Comment Line" WHERE("Table Name" = CONST("Work Center"),
-                                                                    "No." = FIELD("No.")));
+            CalcFormula = exist("Manufacturing Comment Line" where("Table Name" = const("Work Center"),
+                                                                    "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -383,10 +397,10 @@ table 99000754 "Work Center"
         }
         field(41; "Capacity (Total)"; Decimal)
         {
-            CalcFormula = Sum("Calendar Entry"."Capacity (Total)" WHERE("Capacity Type" = CONST("Work Center"),
-                                                                         "No." = FIELD("No."),
-                                                                         "Work Shift Code" = FIELD("Work Shift Filter"),
-                                                                         Date = FIELD("Date Filter")));
+            CalcFormula = sum("Calendar Entry"."Capacity (Total)" where("Capacity Type" = const("Work Center"),
+                                                                         "No." = field("No."),
+                                                                         "Work Shift Code" = field("Work Shift Filter"),
+                                                                         Date = field("Date Filter")));
             Caption = 'Capacity (Total)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -394,10 +408,10 @@ table 99000754 "Work Center"
         }
         field(42; "Capacity (Effective)"; Decimal)
         {
-            CalcFormula = Sum("Calendar Entry"."Capacity (Effective)" WHERE("Capacity Type" = CONST("Work Center"),
-                                                                             "No." = FIELD("No."),
-                                                                             "Work Shift Code" = FIELD("Work Shift Filter"),
-                                                                             Date = FIELD("Date Filter")));
+            CalcFormula = sum("Calendar Entry"."Capacity (Effective)" where("Capacity Type" = const("Work Center"),
+                                                                             "No." = field("No."),
+                                                                             "Work Shift Code" = field("Work Shift Filter"),
+                                                                             Date = field("Date Filter")));
             Caption = 'Capacity (Effective)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -405,10 +419,10 @@ table 99000754 "Work Center"
         }
         field(44; "Prod. Order Need (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Capacity Need"."Allocated Time" WHERE("Work Center No." = FIELD("No."),
-                                                                                  Status = FIELD("Prod. Order Status Filter"),
-                                                                                  Date = FIELD("Date Filter"),
-                                                                                  "Requested Only" = CONST(false)));
+            CalcFormula = sum("Prod. Order Capacity Need"."Allocated Time" where("Work Center No." = field("No."),
+                                                                                  Status = field("Prod. Order Status Filter"),
+                                                                                  Date = field("Date Filter"),
+                                                                                  "Requested Only" = const(false)));
             Caption = 'Prod. Order Need (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -417,8 +431,8 @@ table 99000754 "Work Center"
         field(45; "Prod. Order Need Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Prod. Order Routing Line"."Expected Operation Cost Amt." WHERE("Work Center No." = FIELD("No."),
-                                                                                               Status = FIELD("Prod. Order Status Filter")));
+            CalcFormula = sum("Prod. Order Routing Line"."Expected Operation Cost Amt." where("Work Center No." = field("No."),
+                                                                                               Status = field("Prod. Order Status Filter")));
             Caption = 'Prod. Order Need Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -428,11 +442,9 @@ table 99000754 "Work Center"
             Caption = 'Prod. Order Status Filter';
             FieldClass = FlowFilter;
         }
-        field(50; "Unit Cost Calculation"; Option)
+        field(50; "Unit Cost Calculation"; Enum "Unit Cost Calculation Type")
         {
             Caption = 'Unit Cost Calculation';
-            OptionCaption = 'Time,Units';
-            OptionMembers = Time,Units;
         }
         field(51; "Specific Unit Cost"; Boolean)
         {
@@ -485,8 +497,8 @@ table 99000754 "Work Center"
         field(7300; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location.Code WHERE("Use As In-Transit" = CONST(false),
-                                                 "Bin Mandatory" = CONST(true));
+            TableRelation = Location.Code where("Use As In-Transit" = const(false),
+                                                 "Bin Mandatory" = const(true));
 
             trigger OnValidate()
             var
@@ -498,7 +510,7 @@ table 99000754 "Work Center"
                 if "Location Code" <> xRec."Location Code" then begin
                     if "Location Code" <> '' then begin
                         Location.Get("Location Code");
-                        WhseIntegrationMgt.CheckLocationCode(Location, DATABASE::"Work Center", "No.");
+                        WhseIntegrationMgt.CheckLocationCode(Location, Enum::TableID::"Work Center".AsInteger(), "No.");
                     end;
 
                     if "Open Shop Floor Bin Code" <> '' then
@@ -544,7 +556,7 @@ table 99000754 "Work Center"
         field(7301; "Open Shop Floor Bin Code"; Code[20])
         {
             Caption = 'Open Shop Floor Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             var
@@ -553,13 +565,13 @@ table 99000754 "Work Center"
                 WhseIntegrationMgt.CheckBinCode("Location Code",
                   "Open Shop Floor Bin Code",
                   FieldCaption("Open Shop Floor Bin Code"),
-                  DATABASE::"Work Center", "No.");
+                  Enum::TableID::"Work Center".AsInteger(), "No.");
             end;
         }
         field(7302; "To-Production Bin Code"; Code[20])
         {
             Caption = 'To-Production Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             var
@@ -568,13 +580,13 @@ table 99000754 "Work Center"
                 WhseIntegrationMgt.CheckBinCode("Location Code",
                   "To-Production Bin Code",
                   FieldCaption("To-Production Bin Code"),
-                  DATABASE::"Work Center", "No.");
+                  Enum::TableID::"Work Center".AsInteger(), "No.");
             end;
         }
         field(7303; "From-Production Bin Code"; Code[20])
         {
             Caption = 'From-Production Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             var
@@ -583,7 +595,7 @@ table 99000754 "Work Center"
                 WhseIntegrationMgt.CheckBinCode("Location Code",
                   "From-Production Bin Code",
                   FieldCaption("From-Production Bin Code"),
-                  DATABASE::"Work Center", "No.");
+                  Enum::TableID::"Work Center".AsInteger(), "No.");
             end;
         }
     }
@@ -651,7 +663,7 @@ table 99000754 "Work Center"
         if not ProdOrderRtngLine.IsEmpty() then
             Error(Text000);
 
-        DimMgt.DeleteDefaultDim(DATABASE::"Work Center", "No.");
+        DimMgt.DeleteDefaultDim(Enum::TableID::"Work Center".AsInteger(), "No.");
 
         Validate("Location Code", ''); // to clean up the default bins
     end;
@@ -664,7 +676,7 @@ table 99000754 "Work Center"
             NoSeriesMgt.InitSeries(MfgSetup."Work Center Nos.", xRec."No. Series", 0D, "No.", "No. Series");
         end;
         DimMgt.UpdateDefaultDim(
-          DATABASE::"Work Center", "No.",
+          Enum::TableID::"Work Center".AsInteger(), "No.",
           "Global Dimension 1 Code", "Global Dimension 2 Code");
     end;
 
@@ -675,7 +687,7 @@ table 99000754 "Work Center"
 
     trigger OnRename()
     begin
-        DimMgt.RenameDefaultDim(DATABASE::"Work Center", xRec."No.", "No.");
+        DimMgt.RenameDefaultDim(Enum::TableID::"Work Center".AsInteger(), xRec."No.", "No.");
         "Last Date Modified" := Today;
     end;
 
@@ -734,7 +746,7 @@ table 99000754 "Work Center"
 
         DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
         if not IsTemporary then begin
-            DimMgt.SaveDefaultDim(DATABASE::"Work Center", "No.", FieldNumber, ShortcutDimCode);
+            DimMgt.SaveDefaultDim(Enum::TableID::"Work Center".AsInteger(), "No.", FieldNumber, ShortcutDimCode);
             Modify();
         end;
 

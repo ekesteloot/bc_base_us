@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 1238 "Data Exch. Field Grouping"
 {
     fields

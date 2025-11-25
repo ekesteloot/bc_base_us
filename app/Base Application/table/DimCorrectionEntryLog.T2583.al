@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
 table 2583 "Dim Correction Entry Log"
 {
     DataClassification = CustomerContent;

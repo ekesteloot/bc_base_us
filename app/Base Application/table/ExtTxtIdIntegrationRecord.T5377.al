@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.SyncEngine;
+
 table 5377 "Ext Txt ID Integration Record"
 {
     Caption = 'Ext Txt ID Integration Record';
@@ -26,7 +32,7 @@ table 5377 "Ext Txt ID Integration Record"
         }
         field(6; "Table ID"; Integer)
         {
-            CalcFormula = Lookup("Integration Record"."Table ID" WHERE("Integration ID" = FIELD("Integration ID")));
+            CalcFormula = Lookup("Integration Record"."Table ID" where("Integration ID" = field("Integration ID")));
             Caption = 'Table ID';
             FieldClass = FlowField;
         }

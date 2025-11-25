@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Document;
+
 page 5955 "Standard Service Code Card"
 {
     Caption = 'Standard Service Code Card';
@@ -11,7 +13,7 @@ page 5955 "Standard Service Code Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies a standard service code.';
@@ -30,7 +32,7 @@ page 5955 "Standard Service Code Card"
             part(StdServLines; "Standard Service Code Subform")
             {
                 ApplicationArea = Service;
-                SubPageLink = "Standard Service Code" = FIELD(Code);
+                SubPageLink = "Standard Service Code" = field(Code);
             }
         }
         area(factboxes)

@@ -1,3 +1,15 @@
+namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Payables;
+using Microsoft.Shared.Navigate;
+
 page 234 "Apply Employee Entries"
 {
     Caption = 'Apply Employee Entries';
@@ -88,6 +100,11 @@ page 234 "Apply Employee Entries"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the ID of entries that will be applied to when you choose the Apply Entries action.';
                     Visible = AppliesToIDVisible;
+                    trigger OnValidate()
+                    begin
+                        if Rec."Applies-to ID" <> '' then
+                            UpdateCustomAppliesToIDForGenJournal(Rec."Applies-to ID");
+                    end;
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
@@ -346,8 +363,8 @@ page 234 "Apply Employee Entries"
                     Caption = 'Detailed &Ledger Entries';
                     Image = View;
                     RunObject = Page "Detailed Empl. Ledger Entries";
-                    RunPageLink = "Employee Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Employee Ledger Entry No.", "Posting Date");
+                    RunPageLink = "Employee Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Employee Ledger Entry No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a summary of all the posted entries and adjustments related to a specific employee ledger entry.';
                 }
@@ -564,6 +581,8 @@ page 234 "Apply Employee Entries"
         GenJnlLineApply: Boolean;
         EmplEntryApplID: Code[50];
         AppliesToID: Code[50];
+        CustomAppliesToID: Code[50];
+        TimesSetCustomAppliesToID: Integer;
         ValidExchRate: Boolean;
         MustSelectEntryErr: Label 'You must select an applying entry before you can post the application.';
         PostingInWrongContextErr: Label 'You must post the application from the window where you entered the applying entry.';
@@ -572,7 +591,6 @@ page 234 "Apply Employee Entries"
         OK: Boolean;
         EarlierPostingDateErr: Label 'You cannot apply and post an entry to an entry with an earlier posting date.\\Instead, post the document of type %1 with the number %2 and then apply it to the document of type %3 with the number %4.', Comment = '%1 - document type, %2 - document number,%3 - document type,%4 - document number';
         PostingDone: Boolean;
-        [InDataSet]
         AppliesToIDVisible: Boolean;
         ActionPerformed: Boolean;
         ApplicationPostedMsg: Label 'The application was successfully posted.';
@@ -698,7 +716,7 @@ page 234 "Apply Employee Entries"
 
         if TempApplyingEmplLedgEntry."Entry No." <> 0 then
             GenJnlApply.CheckAgainstApplnCurrency(
-              ApplnCurrencyCode, "Currency Code", GenJnlLine."Account Type"::Employee, true);
+              ApplnCurrencyCode, Rec."Currency Code", GenJnlLine."Account Type"::Employee, true);
         OnSetCustApplIdAfterCheckAgainstApplnCurrency(Rec, CalcType.AsInteger(), GenJnlLine);
 
         EmplLedgEntry.Copy(Rec);
@@ -743,7 +761,7 @@ page 234 "Apply Employee Entries"
                     EmplLedgEntry := TempApplyingEmplLedgEntry;
 
                     AppliedEmplLedgEntry.SetCurrentKey("Employee No.", Open, Positive);
-                    AppliedEmplLedgEntry.SetRange("Employee No.", "Employee No.");
+                    AppliedEmplLedgEntry.SetRange("Employee No.", Rec."Employee No.");
                     AppliedEmplLedgEntry.SetRange(Open, true);
                     if AppliesToID = '' then
                         AppliedEmplLedgEntry.SetRange("Applies-to ID", EmplEntryApplID)
@@ -803,6 +821,35 @@ page 234 "Apply Employee Entries"
         end;
 
         OnAfterCalcApplnAmount(Rec, AppliedAmount, ApplyingAmount);
+    end;
+
+    internal procedure GetCustomAppliesToID(): Code[50]
+    begin
+        if TimesSetCustomAppliesToID <> 1 then
+            exit('');
+        exit(CustomAppliesToID);
+    end;
+
+    local procedure UpdateCustomAppliesToIDForGenJournal(NewAppliesToID: Code[50])
+    begin
+        if (not GenJnlLineApply) or (ApplnType <> ApplnType::"Applies-to ID") then
+            exit;
+        if JournalHasDocumentNo(NewAppliesToID) then
+            exit;
+        if (CustomAppliesToID = '') or ((CustomAppliesToID <> '') and (CustomAppliesToID <> NewAppliesToID)) then
+            TimesSetCustomAppliesToID += 1;
+
+        CustomAppliesToID := NewAppliesToID;
+    end;
+
+    local procedure JournalHasDocumentNo(AppliesToIDCode: Code[50]): Boolean
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+    begin
+        GenJournalLine.SetRange("Journal Template Name", GenJnlLine."Journal Template Name");
+        GenJournalLine.SetRange("Journal Batch Name", GenJnlLine."Journal Batch Name");
+        GenJournalLine.SetRange("Document No.", CopyStr(AppliesToIDCode, 1, MaxStrLen(GenJournalLine."Document No.")));
+        exit(not GenJournalLine.IsEmpty());
     end;
 
     local procedure CalcApplnRemainingAmount(Amt: Decimal) ApplnRemainingAmount: Decimal

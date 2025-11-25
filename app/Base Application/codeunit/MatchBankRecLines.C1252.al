@@ -1,3 +1,11 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.Telemetry;
+using System.Utilities;
+
 codeunit 1252 "Match Bank Rec. Lines"
 {
 
@@ -526,7 +534,7 @@ codeunit 1252 "Match Bank Rec. Lines"
 
         TempMatchingDetailsBankStatementMatchingBuffer."Line No." := BankAccReconciliationLine."Statement Line No.";
         TempMatchingDetailsBankStatementMatchingBuffer."Entry No." := TempBankAccLedgerEntryMatchingBuffer."Entry No.";
-        TempMatchingDetailsBankStatementMatchingBuffer."Account Type" := "Gen. Journal Account Type"::"G/L Account";
+        TempMatchingDetailsBankStatementMatchingBuffer."Account Type" := Enum::"Gen. Journal Account Type"::"G/L Account";
         TempMatchingDetailsBankStatementMatchingBuffer."Account No." := '';
 
         AmountMatched := (TempMatchingDetailsBankStatementMatchingBuffer."Amount Difference" = 0);

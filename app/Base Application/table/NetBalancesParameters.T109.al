@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 table 109 "Net Balances Parameters"
 {
     Caption = 'Net Balances Parameters';
@@ -43,7 +47,7 @@ table 109 "Net Balances Parameters"
         field(8; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
         }
     }
 

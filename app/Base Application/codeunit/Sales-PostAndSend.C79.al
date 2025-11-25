@@ -1,10 +1,16 @@
+namespace Microsoft.Sales.Posting;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+
 codeunit 79 "Sales-Post and Send"
 {
     TableNo = "Sales Header";
 
     trigger OnRun()
     begin
-        if not Find() then
+        if not Rec.Find() then
             Error(DocumentErrorsMgt.GetNothingToPostErrorMsg());
 
         SalesHeader.Copy(Rec);

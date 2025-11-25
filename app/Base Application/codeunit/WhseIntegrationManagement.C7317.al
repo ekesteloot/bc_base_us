@@ -1,3 +1,12 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.ServiceMgt.Document;
+
 codeunit 7317 "Whse. Integration Management"
 {
 
@@ -47,20 +56,20 @@ codeunit 7317 "Whse. Integration Management"
         Bin.TestField("Bin Type Code");
         BinType.Get(Bin."Bin Type Code");
         case SourceTable of
-            DATABASE::"Warehouse Shipment Header",
-            DATABASE::"Warehouse Shipment Line":
+            Enum::TableID::"Warehouse Shipment Header".AsInteger(),
+            Enum::TableID::"Warehouse Shipment Line".AsInteger():
                 BinType.TestField(Ship, true);
-            DATABASE::"Warehouse Receipt Header",
-            DATABASE::"Warehouse Receipt Line":
+            Enum::TableID::"Warehouse Receipt Header".AsInteger(),
+            Enum::TableID::"Warehouse Receipt Line".AsInteger():
                 BinType.TestField(Receive, true);
-            DATABASE::"Production Order",
-            DATABASE::"Prod. Order Line",
-            DATABASE::"Assembly Header":
+            Enum::TableID::"Production Order".AsInteger(),
+            Enum::TableID::"Prod. Order Line".AsInteger(),
+            Enum::TableID::"Assembly Header".AsInteger():
                 AllowPutawayPickOrQCBinsOnly(BinType);
-            DATABASE::"Prod. Order Component",
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Prod. Order Component".AsInteger(),
+            Enum::TableID::"Assembly Line".AsInteger():
                 AllowPutawayOrQCBinsOnly(BinType);
-            DATABASE::"Machine Center":
+            Enum::TableID::"Machine Center".AsInteger():
                 case BinCodeFieldCaption of
                     MachineCenter.FieldCaption("Open Shop Floor Bin Code"),
                     MachineCenter.FieldCaption("To-Production Bin Code"):
@@ -68,7 +77,7 @@ codeunit 7317 "Whse. Integration Management"
                     MachineCenter.FieldCaption("From-Production Bin Code"):
                         AllowPutawayPickOrQCBinsOnly(BinType);
                 end;
-            DATABASE::"Work Center":
+            Enum::TableID::"Work Center".AsInteger():
                 case BinCodeFieldCaption of
                     WorkCenter.FieldCaption("Open Shop Floor Bin Code"),
                     WorkCenter.FieldCaption("To-Production Bin Code"):
@@ -76,7 +85,7 @@ codeunit 7317 "Whse. Integration Management"
                     WorkCenter.FieldCaption("From-Production Bin Code"):
                         AllowPutawayPickOrQCBinsOnly(BinType);
                 end;
-            DATABASE::Location:
+            Enum::TableID::Location.AsInteger():
                 case BinCodeFieldCaption of
                     Location.FieldCaption("Open Shop Floor Bin Code"),
                     Location.FieldCaption("To-Production Bin Code"),
@@ -86,14 +95,14 @@ codeunit 7317 "Whse. Integration Management"
                     Location.FieldCaption("From-Assembly Bin Code"):
                         AllowPutawayPickOrQCBinsOnly(BinType);
                 end;
-            DATABASE::"Item Journal Line":
+            Enum::TableID::"Item Journal Line".AsInteger():
                 case AdditionalIdentifier of
                     ItemJournalLine."Entry Type"::Output.AsInteger():
                         AllowPutawayPickOrQCBinsOnly(BinType);
                     ItemJournalLine."Entry Type"::Consumption.AsInteger():
                         AllowPutawayOrQCBinsOnly(BinType);
                 end;
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 if AdditionalIdentifier = ServiceLine."Document Type"::Invoice.AsInteger() then
                     BinType.TestField(Pick, true);
             else
@@ -165,14 +174,14 @@ codeunit 7317 "Whse. Integration Management"
     var
         WorkCenter: Record "Work Center";
         MachineCenter: Record "Machine Center";
-        CaptionText: Text[30];
+        CaptionText: Text;
     begin
         case SourceTable of
-            DATABASE::"Work Center":
+            Enum::TableID::"Work Center".AsInteger():
                 CaptionText := WorkCenter.TableCaption();
-            DATABASE::"Machine Center":
+            Enum::TableID::"Machine Center".AsInteger():
                 CaptionText := MachineCenter.TableCaption();
-            DATABASE::Location:
+            Enum::TableID::Location.AsInteger():
                 CaptionText := Location.TableCaption();
         end;
         if not Location."Bin Mandatory" then
@@ -212,7 +221,7 @@ codeunit 7317 "Whse. Integration Management"
         WorkCenter.SetRange("Location Code", Location.Code);
         if WorkCenter.FindSet(false) then
             repeat
-                CheckLocationCode(Location, DATABASE::"Work Center", WorkCenter."No.");
+                CheckLocationCode(Location, Enum::TableID::"Work Center".AsInteger(), WorkCenter."No.");
             until WorkCenter.Next() = 0;
     end;
 

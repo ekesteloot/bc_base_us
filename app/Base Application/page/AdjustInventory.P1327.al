@@ -23,7 +23,7 @@ page 1327 "Adjust Inventory"
                     Editable = false;
                     ToolTip = 'Specifies the unit in which the item is held in inventory. The base unit of measure also serves as the conversion basis for alternate units of measure.';
                 }
-                field(CurrentInventoryNoLocation; Item.Inventory)
+                field(CurrentInventoryNoLocation; TempItemJournalLine."Qty. (Calculated)")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Current Inventory';
@@ -39,15 +39,25 @@ page 1327 "Adjust Inventory"
 
                     trigger OnValidate()
                     begin
+                        GetStyle();
                         TempItemJournalLine.Modify();
                     end;
+                }
+                field(QtyToAdjustNoLocation; TempItemJournalLine.Quantity - TempItemJournalLine."Qty. (Calculated)")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Qty. to Adjust';
+                    DecimalPlaces = 0 : 5;
+                    Editable = false;
+                    StyleExpr = ColumnStyle;
+                    ToolTip = 'Specifies the quantity that will be added to or subtracted from the current inventory quantity when you choose the OK button.';
                 }
             }
             repeater(Control5)
             {
                 ShowCaption = false;
                 Visible = LocationCount > 1;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Location;
                     Editable = false;
@@ -57,19 +67,35 @@ page 1327 "Adjust Inventory"
                     ApplicationArea = Location;
                     Editable = false;
                 }
+                field(CurrentInventory; TempItemJournalLine."Qty. (Calculated)")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Current Inventory';
+                    DecimalPlaces = 0 : 5;
+                    Editable = false;
+                    ToolTip = 'Specifies the quantity on hand for the item at location.';
+                }
                 field(NewInventory; TempItemJournalLine.Quantity)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'New Inventory';
                     DecimalPlaces = 0 : 5;
-                    Style = Strong;
-                    StyleExpr = TRUE;
                     ToolTip = 'Specifies the inventory quantity that will be recorded for the item when you choose the OK button.';
 
                     trigger OnValidate()
                     begin
+                        GetStyle();
                         TempItemJournalLine.Modify();
                     end;
+                }
+                field(QtyToAdjust; TempItemJournalLine.Quantity - TempItemJournalLine."Qty. (Calculated)")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Qty. to Adjust';
+                    DecimalPlaces = 0 : 5;
+                    Editable = false;
+                    StyleExpr = ColumnStyle;
+                    ToolTip = 'Specifies the quantity that will be added to or subtracted from the current inventory quantity when you choose the OK button.';
                 }
                 field(BaseUnitofMeasure; Item."Base Unit of Measure")
                 {
@@ -88,10 +114,9 @@ page 1327 "Adjust Inventory"
 
     trigger OnAfterGetRecord()
     begin
-        Item.SetFilter("Location Filter", '%1', Code);
-        Item.CalcFields(Inventory);
-        TempItemJournalLine.SetRange("Location Code", Code);
+        TempItemJournalLine.SetRange("Location Code", Rec.Code);
         TempItemJournalLine.FindFirst();
+        GetStyle();
     end;
 
     trigger OnOpenPage()
@@ -99,25 +124,26 @@ page 1327 "Adjust Inventory"
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
         LineNo: Integer;
     begin
-        GetLocationsIncludingUnspecifiedLocation(not ApplicationAreaMgmtFacade.IsLocationEnabled(), true);
-        SetRange("Bin Mandatory", false);
-        LocationCount := Count;
+        Rec.GetLocationsIncludingUnspecifiedLocation(not ApplicationAreaMgmtFacade.IsLocationEnabled(), true);
+        Rec.SetRange("Bin Mandatory", false);
+        LocationCount := Rec.Count;
 
         LineNo := 0;
-        FindSet();
+        Rec.FindSet();
         repeat
             TempItemJournalLine.Init();
-            Item.SetFilter("Location Filter", '%1', Code);
+            Item.SetFilter("Location Filter", '%1', Rec.Code);
             Item.CalcFields(Inventory);
             TempItemJournalLine."Line No." := LineNo;
             TempItemJournalLine.Quantity := Item.Inventory;
+            TempItemJournalLine."Qty. (Calculated)" := Item.Inventory;
             TempItemJournalLine."Item No." := Item."No.";
-            TempItemJournalLine."Location Code" := Code;
+            TempItemJournalLine."Location Code" := Rec.Code;
             TempItemJournalLine.Insert();
             LineNo := LineNo + 1;
-        until Next() = 0;
+        until Rec.Next() = 0;
 
-        FindFirst();
+        Rec.FindFirst();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -137,10 +163,19 @@ page 1327 "Adjust Inventory"
         Item: Record Item;
         TempItemJournalLine: Record "Item Journal Line" temporary;
         LocationCount: Integer;
+        ColumnStyle: Text;
 
     procedure SetItem(ItemNo: Code[20])
     begin
         Item.Get(ItemNo);
+    end;
+
+    local procedure GetStyle()
+    begin
+        if TempItemJournalLine.Quantity - TempItemJournalLine."Qty. (Calculated)" >= 0 then
+            ColumnStyle := 'Strong'
+        else
+            ColumnStyle := 'Unfavorable';
     end;
 }
 

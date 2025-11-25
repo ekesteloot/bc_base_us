@@ -1,7 +1,12 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Purchases.Vendor;
+
 report 329 "Vendor - Trial Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/VendorTrialBalance.rdlc';
+    RDLCLayout = './Purchases/Reports/VendorTrialBalance.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor - Trial Balance';
     PreviewMode = PrintLayout;
@@ -11,7 +16,7 @@ report 329 "Vendor - Trial Balance"
     {
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("Vendor Posting Group");
+            DataItemTableView = sorting("Vendor Posting Group");
             RequestFilterFields = "No.", "Date Filter", "Vendor Posting Group";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

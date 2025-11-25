@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+
 page 9201 "Inventory Analysis Matrix"
 {
     Caption = 'Inventory Analysis Matrix';
@@ -524,7 +528,7 @@ page 9201 "Inventory Analysis Matrix"
         if AnalysisColumn.Find('-') then
             repeat
                 if i <= ArrayLen(MatrixData) then begin
-                    if Range = '' then
+                    if Rec.Range = '' then
                         CellValue := 0
                     else
                         CellValue := AnalysisReportMgt.CalcCell(Rec, AnalysisColumn, false);
@@ -535,7 +539,7 @@ page 9201 "Inventory Analysis Matrix"
                 SetStyle(i);
                 i := i + 1;
             until AnalysisColumn.Next() = 0;
-        Emphasize := Bold;
+        Emphasize := Rec.Bold;
     end;
 
     trigger OnInit()
@@ -576,7 +580,7 @@ page 9201 "Inventory Analysis Matrix"
 
     trigger OnOpenPage()
     begin
-        SetFilter(Show, '<>%1', Show::No);
+        Rec.SetFilter(Show, '<>%1', Rec.Show::No);
         AnalysisColumn.SetRange("Analysis Area", AnalysisColumn."Analysis Area"::Inventory);
         AnalysisColumn.SetRange("Analysis Column Template", AnalysisColumn."Analysis Column Template");
         AnalysisColumn.SetRange("Line No.", FirstLineNo, LastLineNo);
@@ -597,134 +601,70 @@ page 9201 "Inventory Analysis Matrix"
         FirstLineNo: Integer;
         LastLineNo: Integer;
         CachedContainsError: array[32] of Boolean;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
         Emphasize: Boolean;
-        [InDataSet]
         Field1Style: Text;
-        [InDataSet]
         Field2Style: Text;
-        [InDataSet]
         Field3Style: Text;
-        [InDataSet]
         Field4Style: Text;
-        [InDataSet]
         Field5Style: Text;
-        [InDataSet]
         Field6Style: Text;
-        [InDataSet]
         Field7Style: Text;
-        [InDataSet]
         Field8Style: Text;
-        [InDataSet]
         Field9Style: Text;
-        [InDataSet]
         Field10Style: Text;
-        [InDataSet]
         Field11Style: Text;
-        [InDataSet]
         Field12Style: Text;
-        [InDataSet]
         Field13Style: Text;
-        [InDataSet]
         Field14Style: Text;
-        [InDataSet]
         Field15Style: Text;
-        [InDataSet]
         Field16Style: Text;
-        [InDataSet]
         Field17Style: Text;
-        [InDataSet]
         Field18Style: Text;
-        [InDataSet]
         Field19Style: Text;
-        [InDataSet]
         Field20Style: Text;
-        [InDataSet]
         Field21Style: Text;
-        [InDataSet]
         Field22Style: Text;
-        [InDataSet]
         Field23Style: Text;
-        [InDataSet]
         Field24Style: Text;
-        [InDataSet]
         Field25Style: Text;
-        [InDataSet]
         Field26Style: Text;
-        [InDataSet]
         Field27Style: Text;
-        [InDataSet]
         Field28Style: Text;
-        [InDataSet]
         Field29Style: Text;
-        [InDataSet]
         Field30Style: Text;
-        [InDataSet]
         Field31Style: Text;
-        [InDataSet]
         Field32Style: Text;
 
     procedure Load(AnalysisColumn1: Record "Analysis Column"; MatrixColumnCaptions1: array[32] of Text[1024]; FirstLineNo1: Integer; LastLineNo1: Integer)

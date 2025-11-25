@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
 page 5526 "Make Supply Orders"
 {
     Caption = 'Make Supply Orders';
@@ -38,9 +40,9 @@ page 5526 "Make Supply Orders"
                     trigger OnValidate()
                     begin
                         PurchaseReqWkshTemplateEnable :=
-                          "Create Purchase Order" = "Create Purchase Order"::"Copy to Req. Wksh";
+                          Rec."Create Purchase Order" = Rec."Create Purchase Order"::"Copy to Req. Wksh";
                         PurchaseWkshNameEnable :=
-                          "Create Purchase Order" = "Create Purchase Order"::"Copy to Req. Wksh";
+                          Rec."Create Purchase Order" = Rec."Create Purchase Order"::"Copy to Req. Wksh";
                         CreatePurchaseOrderOnAfterVali();
                     end;
                 }
@@ -74,9 +76,9 @@ page 5526 "Make Supply Orders"
                     trigger OnValidate()
                     begin
                         ProdReqWkshTemplateEnable :=
-                          "Create Production Order" = "Create Production Order"::"Copy to Req. Wksh";
+                          Rec."Create Production Order" = Rec."Create Production Order"::"Copy to Req. Wksh";
                         ProdWkshNameEnable :=
-                          "Create Production Order" = "Create Production Order"::"Copy to Req. Wksh";
+                          Rec."Create Production Order" = Rec."Create Production Order"::"Copy to Req. Wksh";
                         CreateProductionOrderOnAfterVa();
                     end;
                 }
@@ -110,9 +112,9 @@ page 5526 "Make Supply Orders"
                     trigger OnValidate()
                     begin
                         TransferReqWkshTemplateEnable :=
-                          "Create Transfer Order" = "Create Transfer Order"::"Copy to Req. Wksh";
+                          Rec."Create Transfer Order" = Rec."Create Transfer Order"::"Copy to Req. Wksh";
                         TransferWkshNameEnable :=
-                          "Create Transfer Order" = "Create Transfer Order"::"Copy to Req. Wksh";
+                          Rec."Create Transfer Order" = Rec."Create Transfer Order"::"Copy to Req. Wksh";
                         CreateTransferOrderOnAfterVali();
                     end;
                 }
@@ -154,19 +156,19 @@ page 5526 "Make Supply Orders"
     trigger OnAfterGetRecord()
     begin
         PurchaseReqWkshTemplateEnable :=
-          "Create Purchase Order" = "Create Purchase Order"::"Copy to Req. Wksh";
+          Rec."Create Purchase Order" = Rec."Create Purchase Order"::"Copy to Req. Wksh";
         PurchaseWkshNameEnable :=
-          "Create Purchase Order" = "Create Purchase Order"::"Copy to Req. Wksh";
+          Rec."Create Purchase Order" = Rec."Create Purchase Order"::"Copy to Req. Wksh";
 
         ProdReqWkshTemplateEnable :=
-          "Create Production Order" = "Create Production Order"::"Copy to Req. Wksh";
+          Rec."Create Production Order" = Rec."Create Production Order"::"Copy to Req. Wksh";
         ProdWkshNameEnable :=
-          "Create Production Order" = "Create Production Order"::"Copy to Req. Wksh";
+          Rec."Create Production Order" = Rec."Create Production Order"::"Copy to Req. Wksh";
 
         TransferReqWkshTemplateEnable :=
-          "Create Transfer Order" = "Create Transfer Order"::"Copy to Req. Wksh";
+          Rec."Create Transfer Order" = Rec."Create Transfer Order"::"Copy to Req. Wksh";
         TransferWkshNameEnable :=
-          "Create Transfer Order" = "Create Transfer Order"::"Copy to Req. Wksh";
+          Rec."Create Transfer Order" = Rec."Create Transfer Order"::"Copy to Req. Wksh";
     end;
 
     trigger OnInit()
@@ -180,65 +182,59 @@ page 5526 "Make Supply Orders"
     end;
 
     var
-        [InDataSet]
         PurchaseReqWkshTemplateEnable: Boolean;
-        [InDataSet]
         PurchaseWkshNameEnable: Boolean;
-        [InDataSet]
         ProdReqWkshTemplateEnable: Boolean;
-        [InDataSet]
         ProdWkshNameEnable: Boolean;
-        [InDataSet]
         TransferReqWkshTemplateEnable: Boolean;
-        [InDataSet]
         TransferWkshNameEnable: Boolean;
 
     local procedure CreatePurchaseOrderOnAfterVali()
     begin
-        Modify(true);
+        Rec.Modify(true);
     end;
 
     local procedure CreateProductionOrderOnAfterVa()
     begin
-        Modify(true);
+        Rec.Modify(true);
     end;
 
     local procedure CreateTransferOrderOnAfterVali()
     begin
-        Modify(true);
+        Rec.Modify(true);
     end;
 
     local procedure PurchaseReqWkshTemplateOnAfter()
     begin
-        "Purchase Wksh. Name" := '';
-        Modify(true);
+        Rec."Purchase Wksh. Name" := '';
+        Rec.Modify(true);
     end;
 
     local procedure PurchaseWkshNameOnAfterValidat()
     begin
-        Modify(true);
+        Rec.Modify(true);
     end;
 
     local procedure ProdReqWkshTemplateOnAfterVali()
     begin
-        "Prod. Wksh. Name" := '';
-        Modify(true);
+        Rec."Prod. Wksh. Name" := '';
+        Rec.Modify(true);
     end;
 
     local procedure ProdWkshNameOnAfterValidate()
     begin
-        Modify(true);
+        Rec.Modify(true);
     end;
 
     local procedure TransferReqWkshTemplateOnAfter()
     begin
-        "Transfer Wksh. Name" := '';
-        Modify(true);
+        Rec."Transfer Wksh. Name" := '';
+        Rec.Modify(true);
     end;
 
     local procedure TransferWkshNameOnAfterValidat()
     begin
-        Modify(true);
+        Rec.Modify(true);
     end;
 }
 

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
 page 99 "G/L Account Where-Used List"
 {
     Caption = 'G/L Account Where-Used List';
@@ -24,7 +26,7 @@ page 99 "G/L Account Where-Used List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the Table Name of the setup table where the G/L account is used.';
                 }
-                field(Line; Line)
+                field(Line; Rec.Line)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a reference to Line in the setup table, where the G/L account is used. For example, the reference could be a posting group code.';

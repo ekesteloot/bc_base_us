@@ -1,3 +1,13 @@
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Setup;
+
 page 343 "Check Credit Limit"
 {
     Caption = 'Check Credit Limit';
@@ -33,7 +43,7 @@ page 343 "Check Credit Limit"
             part(CreditLimitDetails; "Credit Limit Details")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 UpdatePropagation = Both;
             }
         }
@@ -53,10 +63,10 @@ page 343 "Check Credit Limit"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View details for the selected record.';
                 }
@@ -68,10 +78,10 @@ page 343 "Check Credit Limit"
                     Promoted = true;
                     PromotedCategory = Process;
                     RunObject = Page "Customer Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistics for credit limit entries.';
                 }
@@ -89,14 +99,10 @@ page 343 "Check Credit Limit"
 
     trigger OnOpenPage()
     begin
-        Copy(Cust2);
+        Rec.Copy(Cust2);
     end;
 
     var
-#if not CLEAN20
-        ExtensionAmounts: List of [Decimal];
-#endif
-
         Text000: Label '%1 Do you still want to record the amount?';
 
     protected var
@@ -450,8 +456,8 @@ page 343 "Check Credit Limit"
         CustNo := NewCustNo;
         NewOrderAmountLCY := NewOrderAmountLCY2;
         OldOrderAmountLCY := OldOrderAmountLCY2;
-        Get(CustNo);
-        SetRange("No.", "No.");
+        Rec.Get(CustNo);
+        Rec.SetRange("No.", Rec."No.");
         Cust2.Copy(Rec);
 
         if (SalesSetup."Credit Warnings" in
@@ -460,7 +466,7 @@ page 343 "Check Credit Limit"
            CustCheckCrLimit.IsCreditLimitNotificationEnabled(Rec)
         then begin
             CalcCreditLimitLCY();
-            if (CustCreditAmountLCY > "Credit Limit (LCY)") and ("Credit Limit (LCY)" <> 0) then
+            if (CustCreditAmountLCY > Rec."Credit Limit (LCY)") and (Rec."Credit Limit (LCY)" <> 0) then
                 ExitValue := 1;
             OnShowWarningOnAfterCalcCreditLimitLCYExitValue(Rec, CustCreditAmountLCY, ExitValue);
         end;
@@ -471,7 +477,7 @@ page 343 "Check Credit Limit"
            CustCheckCrLimit.IsOverdueBalanceNotificationEnabled(Rec)
         then begin
             CalcOverdueBalanceLCY();
-            if "Balance Due (LCY)" > 0 then
+            if Rec."Balance Due (LCY)" > 0 then
                 ExitValue := ExitValue + 2;
             OnShowWarningOnAfterCalcDueBalanceExitValue(Rec, ExitValue);
         end;
@@ -513,35 +519,32 @@ page 343 "Check Credit Limit"
             Cust2, OutstandingRetOrdersLCY, RcdNotInvdRetOrdersLCY, NewOrderAmountLCY, OrderAmountTotalLCY, OrderAmountThisOrderLCY,
             ShippedRetRcdNotIndLCY, CustCreditAmountLCY, CustNo, ExtensionAmountsDic, IsHandled, DeltaAmount);
         if not IsHandled then begin
-            if GetFilter("Date Filter") = '' then
-                SetFilter("Date Filter", '..%1', WorkDate());
-            CalcFields("Balance (LCY)", "Shipped Not Invoiced (LCY)", "Serv Shipped Not Invoiced(LCY)");
+            if Rec.GetFilter("Date Filter") = '' then
+                Rec.SetFilter("Date Filter", '..%1', WorkDate());
+            Rec.CalcFields("Balance (LCY)", "Shipped Not Invoiced (LCY)", "Serv Shipped Not Invoiced(LCY)");
             CalcReturnAmounts(OutstandingRetOrdersLCY, RcdNotInvdRetOrdersLCY);
 
             OrderAmountTotalLCY := CalcTotalOutstandingAmt() - OutstandingRetOrdersLCY + DeltaAmount;
-            ShippedRetRcdNotIndLCY := "Shipped Not Invoiced (LCY)" + "Serv Shipped Not Invoiced(LCY)" - RcdNotInvdRetOrdersLCY;
-            if "No." = CustNo then
+            ShippedRetRcdNotIndLCY := Rec."Shipped Not Invoiced (LCY)" + Rec."Serv Shipped Not Invoiced(LCY)" - RcdNotInvdRetOrdersLCY;
+            if Rec."No." = CustNo then
                 OrderAmountThisOrderLCY := NewOrderAmountLCY
             else
                 OrderAmountThisOrderLCY := 0;
 
             CustCreditAmountLCY :=
-              "Balance (LCY)" + "Shipped Not Invoiced (LCY)" + "Serv Shipped Not Invoiced(LCY)" - RcdNotInvdRetOrdersLCY +
-              OrderAmountTotalLCY - GetInvoicedPrepmtAmountLCY();
+              Rec."Balance (LCY)" + Rec."Shipped Not Invoiced (LCY)" + Rec."Serv Shipped Not Invoiced(LCY)" - RcdNotInvdRetOrdersLCY +
+              OrderAmountTotalLCY - Rec.GetInvoicedPrepmtAmountLCY();
         end;
 
-#if not CLEAN20
-        OnAfterCalcCreditLimitLCY(Rec, CustCreditAmountLCY, ExtensionAmounts);
-#endif
         OnAfterCalcCreditLimitLCYProcedure(Rec, CustCreditAmountLCY, ExtensionAmountsDic);
     end;
 
     local procedure CalcOverdueBalanceLCY()
     begin
-        if GetFilter("Date Filter") = '' then
-            SetFilter("Date Filter", '..%1', WorkDate());
+        if Rec.GetFilter("Date Filter") = '' then
+            Rec.SetFilter("Date Filter", '..%1', WorkDate());
         OnCalcOverdueBalanceLCYAfterSetFilter(Rec);
-        CalcFields("Balance Due (LCY)");
+        Rec.CalcFields("Balance Due (LCY)");
         OnAfterCalcOverdueBalanceLCY(Rec);
     end;
 
@@ -550,7 +553,7 @@ page 343 "Check Credit Limit"
         SalesLine.Reset();
         SalesLine.SetCurrentKey("Document Type", "Bill-to Customer No.", "Currency Code");
         SalesLine.SetRange("Document Type", SalesLine."Document Type"::"Return Order");
-        SalesLine.SetRange("Bill-to Customer No.", "No.");
+        SalesLine.SetRange("Bill-to Customer No.", Rec."No.");
         SalesLine.CalcSums("Outstanding Amount (LCY)", "Return Rcd. Not Invd. (LCY)");
         OutstandingRetOrdersLCY2 := SalesLine."Outstanding Amount (LCY)";
         RcdNotInvdRetOrdersLCY2 := SalesLine."Return Rcd. Not Invd. (LCY)";
@@ -568,14 +571,14 @@ page 343 "Check Credit Limit"
         if IsHandled then
             exit(Result);
 
-        CalcFields(
+        Rec.CalcFields(
           "Outstanding Invoices (LCY)", "Outstanding Orders (LCY)", "Outstanding Serv.Invoices(LCY)", "Outstanding Serv. Orders (LCY)");
-        SalesOutstandingAmountFromShipment := SalesLine.OutstandingInvoiceAmountFromShipment("No.");
-        ServOutstandingAmountFromShipment := ServLine.OutstandingInvoiceAmountFromShipment("No.");
+        SalesOutstandingAmountFromShipment := SalesLine.OutstandingInvoiceAmountFromShipment(Rec."No.");
+        ServOutstandingAmountFromShipment := ServLine.OutstandingInvoiceAmountFromShipment(Rec."No.");
 
         exit(
-          "Outstanding Orders (LCY)" + "Outstanding Invoices (LCY)" + "Outstanding Serv. Orders (LCY)" +
-          "Outstanding Serv.Invoices(LCY)" - SalesOutstandingAmountFromShipment - ServOutstandingAmountFromShipment);
+          Rec."Outstanding Orders (LCY)" + Rec."Outstanding Invoices (LCY)" + Rec."Outstanding Serv. Orders (LCY)" +
+          Rec."Outstanding Serv.Invoices(LCY)" - SalesOutstandingAmountFromShipment - ServOutstandingAmountFromShipment);
     end;
 
     procedure SetHideMessageVisible(HideMsgVisible: Boolean)
@@ -610,7 +613,7 @@ page 343 "Check Credit Limit"
 
     procedure PopulateDataOnNotification(CreditLimitNotification: Notification)
     begin
-        CurrPage.CreditLimitDetails.PAGE.SetCustomerNumber("No.");
+        CurrPage.CreditLimitDetails.PAGE.SetCustomerNumber(Rec."No.");
         SetParametersOnDetails();
         CurrPage.CreditLimitDetails.PAGE.PopulateDataOnNotification(CreditLimitNotification);
     end;
@@ -621,19 +624,8 @@ page 343 "Check Credit Limit"
         CurrPage.CreditLimitDetails.PAGE.SetShippedRetRcdNotIndLCY(ShippedRetRcdNotIndLCY);
         CurrPage.CreditLimitDetails.PAGE.SetOrderAmountThisOrderLCY(OrderAmountThisOrderLCY);
         CurrPage.CreditLimitDetails.PAGE.SetCustCreditAmountLCY(CustCreditAmountLCY);
-#if not CLEAN20
-        CurrPage.CreditLimitDetails.Page.SetExtensionAmounts(ExtensionAmounts);
-#endif
         CurrPage.CreditLimitDetails.Page.SetExtensionAmounts(ExtensionAmountsDic);
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by OnAfterCalcCreditLimitLCYProcedure()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCalcCreditLimitLCY(var Customer: Record Customer; var CustCreditAmountLCY: Decimal; var ExtensionAmounts: List of [Decimal])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcTotalOutstandingAmt(var Customer: Record Customer; var IsHandled: Boolean; var Result: Decimal)
@@ -661,7 +653,7 @@ page 343 "Check Credit Limit"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeSalesHeaderShowWarning(var SalesHeader: Record "Sales Header"; var Result: Boolean; var IsHandled: Boolean; var Customer: Record Customer;  var DeltaAmount: Decimal);
+    local procedure OnBeforeSalesHeaderShowWarning(var SalesHeader: Record "Sales Header"; var Result: Boolean; var IsHandled: Boolean; var Customer: Record Customer; var DeltaAmount: Decimal);
     begin
     end;
 

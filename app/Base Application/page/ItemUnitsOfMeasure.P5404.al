@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.Integration.Dataverse;
+
 page 5404 "Item Units of Measure"
 {
     Caption = 'Item Units of Measure';
@@ -19,7 +23,7 @@ page 5404 "Item Units of Measure"
                     ToolTip = 'Specifies the number of the item card from which you opened the Item Units of Measure window.';
                     Visible = false;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     StyleExpr = StyleName;
@@ -31,31 +35,31 @@ page 5404 "Item Units of Measure"
                     StyleExpr = StyleName;
                     ToolTip = 'Specifies how many of the base unit of measure are contained in one unit of the item.';
                 }
-                field(Height; Height)
+                field(Height; Rec.Height)
                 {
                     ApplicationArea = Basic, Suite;
                     StyleExpr = StyleName;
                     ToolTip = 'Specifies the height of one item unit when measured in the unit of measure in the Code field.';
                 }
-                field(Width; Width)
+                field(Width; Rec.Width)
                 {
                     ApplicationArea = Basic, Suite;
                     StyleExpr = StyleName;
                     ToolTip = 'Specifies the width of one item unit when measured in the specified unit of measure.';
                 }
-                field(Length; Length)
+                field(Length; Rec.Length)
                 {
                     ApplicationArea = Basic, Suite;
                     StyleExpr = StyleName;
                     ToolTip = 'Specifies the length of one item unit when measured in the specified unit of measure.';
                 }
-                field(Cubage; Cubage)
+                field(Cubage; Rec.Cubage)
                 {
                     ApplicationArea = Basic, Suite;
                     StyleExpr = StyleName;
                     ToolTip = 'Specifies the volume (cubage) of one item unit in the unit of measure in the Code field.';
                 }
-                field(Weight; Weight)
+                field(Weight; Rec.Weight)
                 {
                     ApplicationArea = Basic, Suite;
                     StyleExpr = StyleName;
@@ -271,8 +275,8 @@ page 5404 "Item Units of Measure"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        if "Item No." = '' then
-            "Item No." := Item."No.";
+        if Rec."Item No." = '' then
+            Rec."Item No." := Item."No.";
         SetStyle();
     end;
 
@@ -280,8 +284,8 @@ page 5404 "Item Units of Measure"
     var
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
     begin
-        if GetFilter("Item No.") <> '' then begin
-            CopyFilter("Item No.", Item."No.");
+        if Rec.GetFilter("Item No.") <> '' then begin
+            Rec.CopyFilter("Item No.", Item."No.");
             if Item.FindFirst() then begin
                 ItemBaseUOM := Item."Base Unit of Measure";
                 if ItemBaseUnitOfMeasure.Get(Item."No.", ItemBaseUOM) then

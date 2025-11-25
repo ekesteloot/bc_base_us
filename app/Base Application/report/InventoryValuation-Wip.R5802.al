@@ -1,7 +1,13 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Document;
+
 report 5802 "Inventory Valuation - WIP"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InventoryValuationWIP.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InventoryValuationWIP.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Production Order - WIP';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 5802 "Inventory Valuation - WIP"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = WHERE(Status = FILTER(Released ..));
+            DataItemTableView = where(Status = filter(Released ..));
             PrintOnlyIfDetail = true;
             RequestFilterFields = Status, "No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
@@ -81,7 +87,7 @@ report 5802 "Inventory Valuation - WIP"
             }
             dataitem("Value Entry"; "Value Entry")
             {
-                DataItemTableView = SORTING("Order Type", "Order No.");
+                DataItemTableView = sorting("Order Type", "Order No.");
                 column(ValueEntryCostPostedtoGL; TotalValueOfCostPstdToGL)
                 {
                     AutoFormatType = 1;

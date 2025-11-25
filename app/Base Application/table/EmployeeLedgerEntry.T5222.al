@@ -1,3 +1,19 @@
+namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Security.AccessControl;
+using System.Utilities;
+
 table 5222 "Employee Ledger Entry"
 {
     Caption = 'Employee Ledger Entry';
@@ -36,21 +52,21 @@ table 5222 "Employee Ledger Entry"
         }
         field(13; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Employee Ledger Entry".Amount WHERE("Ledger Entry Amount" = CONST(true),
-                                                                             "Employee Ledger Entry No." = FIELD("Entry No."),
-                                                                             "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Employee Ledger Entry".Amount where("Ledger Entry Amount" = const(true),
+                                                                             "Employee Ledger Entry No." = field("Entry No."),
+                                                                             "Posting Date" = field("Date Filter")));
             Caption = 'Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(14; "Remaining Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Employee Ledger Entry".Amount WHERE("Employee Ledger Entry No." = FIELD("Entry No."),
-                                                                             "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Employee Ledger Entry".Amount where("Employee Ledger Entry No." = field("Entry No."),
+                                                                             "Posting Date" = field("Date Filter")));
             Caption = 'Remaining Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -58,9 +74,9 @@ table 5222 "Employee Ledger Entry"
         field(15; "Original Amt. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Employee Ledger Entry"."Amount (LCY)" WHERE("Employee Ledger Entry No." = FIELD("Entry No."),
-                                                                                     "Entry Type" = FILTER("Initial Entry"),
-                                                                                     "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Employee Ledger Entry"."Amount (LCY)" where("Employee Ledger Entry No." = field("Entry No."),
+                                                                                     "Entry Type" = filter("Initial Entry"),
+                                                                                     "Posting Date" = field("Date Filter")));
             Caption = 'Original Amt. (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -68,8 +84,8 @@ table 5222 "Employee Ledger Entry"
         field(16; "Remaining Amt. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Employee Ledger Entry"."Amount (LCY)" WHERE("Employee Ledger Entry No." = FIELD("Entry No."),
-                                                                                     "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Employee Ledger Entry"."Amount (LCY)" where("Employee Ledger Entry No." = field("Entry No."),
+                                                                                     "Posting Date" = field("Date Filter")));
             Caption = 'Remaining Amt. (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -77,9 +93,9 @@ table 5222 "Employee Ledger Entry"
         field(17; "Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Employee Ledger Entry"."Amount (LCY)" WHERE("Ledger Entry Amount" = CONST(true),
-                                                                                     "Employee Ledger Entry No." = FIELD("Entry No."),
-                                                                                     "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Employee Ledger Entry"."Amount (LCY)" where("Ledger Entry Amount" = const(true),
+                                                                                     "Employee Ledger Entry No." = field("Entry No."),
+                                                                                     "Posting Date" = field("Date Filter")));
             Caption = 'Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -93,13 +109,13 @@ table 5222 "Employee Ledger Entry"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(24; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(25; "Salespers./Purch. Code"; Code[20])
         {
@@ -111,8 +127,6 @@ table 5222 "Employee Ledger Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(28; "Source Code"; Code[10])
         {
@@ -146,7 +160,7 @@ table 5222 "Employee Ledger Entry"
         }
         field(46; "Closed by Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Closed by Amount';
         }
@@ -167,8 +181,6 @@ table 5222 "Employee Ledger Entry"
         field(49; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(50; "Reason Code"; Code[10])
         {
@@ -182,15 +194,15 @@ table 5222 "Employee Ledger Entry"
         field(52; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Bal. Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Fixed Asset")) "Fixed Asset";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const(Customer)) Customer
+            else
+            if ("Bal. Account Type" = const(Vendor)) Vendor
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset";
         }
         field(53; "Transaction No."; Integer)
         {
@@ -203,24 +215,24 @@ table 5222 "Employee Ledger Entry"
         }
         field(58; "Debit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Employee Ledger Entry"."Debit Amount" WHERE("Ledger Entry Amount" = CONST(true),
-                                                                                     "Employee Ledger Entry No." = FIELD("Entry No."),
-                                                                                     "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Employee Ledger Entry"."Debit Amount" where("Ledger Entry Amount" = const(true),
+                                                                                     "Employee Ledger Entry No." = field("Entry No."),
+                                                                                     "Posting Date" = field("Date Filter")));
             Caption = 'Debit Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(59; "Credit Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Employee Ledger Entry"."Credit Amount" WHERE("Ledger Entry Amount" = CONST(true),
-                                                                                      "Employee Ledger Entry No." = FIELD("Entry No."),
-                                                                                      "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Employee Ledger Entry"."Credit Amount" where("Ledger Entry Amount" = const(true),
+                                                                                      "Employee Ledger Entry No." = field("Entry No."),
+                                                                                      "Posting Date" = field("Date Filter")));
             Caption = 'Credit Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -229,9 +241,9 @@ table 5222 "Employee Ledger Entry"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Employee Ledger Entry"."Debit Amount (LCY)" WHERE("Ledger Entry Amount" = CONST(true),
-                                                                                           "Employee Ledger Entry No." = FIELD("Entry No."),
-                                                                                           "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Employee Ledger Entry"."Debit Amount (LCY)" where("Ledger Entry Amount" = const(true),
+                                                                                           "Employee Ledger Entry No." = field("Entry No."),
+                                                                                           "Posting Date" = field("Date Filter")));
             Caption = 'Debit Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -240,9 +252,9 @@ table 5222 "Employee Ledger Entry"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Detailed Employee Ledger Entry"."Credit Amount (LCY)" WHERE("Ledger Entry Amount" = CONST(true),
-                                                                                            "Employee Ledger Entry No." = FIELD("Entry No."),
-                                                                                            "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Employee Ledger Entry"."Credit Amount (LCY)" where("Ledger Entry Amount" = const(true),
+                                                                                            "Employee Ledger Entry No." = field("Entry No."),
+                                                                                            "Posting Date" = field("Date Filter")));
             Caption = 'Credit Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -254,11 +266,11 @@ table 5222 "Employee Ledger Entry"
         }
         field(75; "Original Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Employee Ledger Entry".Amount WHERE("Employee Ledger Entry No." = FIELD("Entry No."),
-                                                                             "Entry Type" = FILTER("Initial Entry"),
-                                                                             "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Detailed Employee Ledger Entry".Amount where("Employee Ledger Entry No." = field("Entry No."),
+                                                                             "Entry Type" = filter("Initial Entry"),
+                                                                             "Posting Date" = field("Date Filter")));
             Caption = 'Original Amount';
             Editable = false;
             FieldClass = FlowField;
@@ -270,7 +282,7 @@ table 5222 "Employee Ledger Entry"
         }
         field(84; "Amount to Apply"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount to Apply';
 
@@ -356,7 +368,7 @@ table 5222 "Employee Ledger Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])

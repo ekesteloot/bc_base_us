@@ -1,3 +1,18 @@
+﻿namespace Microsoft.AssemblyMgt.History;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Request;
+using System.Security.AccessControl;
+
 table 910 "Posted Assembly Header"
 {
     Caption = 'Posted Assembly Header';
@@ -33,8 +48,8 @@ table 910 "Posted Assembly Header"
         field(12; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."),
-                                                       Code = FIELD("Variant Code"));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."),
+                                                       Code = field("Variant Code"));
         }
         field(15; "Inventory Posting Group"; Code[20])
         {
@@ -48,8 +63,8 @@ table 910 "Posted Assembly Header"
         }
         field(19; Comment; Boolean)
         {
-            CalcFormula = Exist("Assembly Comment Line" WHERE("Document Type" = CONST("Posted Assembly"),
-                                                               "Document No." = FIELD("No.")));
+            CalcFormula = exist("Assembly Comment Line" where("Document Type" = const("Posted Assembly"),
+                                                               "Document No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -57,19 +72,19 @@ table 910 "Posted Assembly Header"
         field(20; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(21; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(22; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(23; "Posting Date"; Date)
         {
@@ -109,8 +124,8 @@ table 910 "Posted Assembly Header"
         }
         field(54; "Assemble to Order"; Boolean)
         {
-            CalcFormula = Exist("Posted Assemble-to-Order Link" WHERE("Assembly Document Type" = CONST(Assembly),
-                                                                       "Assembly Document No." = FIELD("No.")));
+            CalcFormula = exist("Posted Assemble-to-Order Link" where("Assembly Document Type" = const(Assembly),
+                                                                       "Assembly Document No." = field("No.")));
             Caption = 'Assemble to Order';
             Editable = false;
             FieldClass = FlowField;
@@ -139,7 +154,7 @@ table 910 "Posted Assembly Header"
         field(80; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(81; "Qty. per Unit of Measure"; Decimal)
         {
@@ -174,7 +189,7 @@ table 910 "Posted Assembly Header"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(9010; "User ID"; Code[50])
@@ -182,8 +197,6 @@ table 910 "Posted Assembly Header"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(9020; "Source Code"; Code[10])
         {

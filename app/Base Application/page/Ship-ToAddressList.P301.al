@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Customer;
+
 page 301 "Ship-to Address List"
 {
     Caption = 'Ship-to Address List';
@@ -14,7 +16,7 @@ page 301 "Ship-to Address List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a ship-to address code.';
@@ -24,7 +26,7 @@ page 301 "Ship-to Address List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name associated with the ship-to address.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the ship-to address.';
@@ -42,7 +44,7 @@ page 301 "Ship-to Address List"
                     ToolTip = 'Specifies the postal code.';
                     Visible = false;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city the items are being shipped to.';
@@ -65,13 +67,13 @@ page 301 "Ship-to Address List"
                     ToolTip = 'Specifies the recipient''s fax number.';
                     Visible = false;
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the person you contact about orders shipped to this address.';
                     Visible = false;
                 }
-                field(GLN; GLN)
+                field(GLN; Rec.GLN)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the recipient''s GLN code.';
@@ -116,7 +118,7 @@ page 301 "Ship-to Address List"
 
                     trigger OnAction()
                     begin
-                        DisplayMap();
+                        Rec.DisplayMap();
                     end;
                 }
             }

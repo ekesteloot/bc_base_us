@@ -22,6 +22,10 @@ permissionset 191 "D365 SETUP"
                   tabledata "Acc. Schedule Line" = RIMD,
                   tabledata "Acc. Schedule Line Entity" = RIMD,
                   tabledata "Acc. Schedule Name" = RIMD,
+                  tabledata "Alloc. Acc. Manual Override" = RIMD,
+                  tabledata "Alloc. Account Distribution" = RIMD,
+                  tabledata "Allocation Account" = RIMD,
+                  tabledata "Allocation Line" = RIMD,
                   tabledata "Financial Report" = RIMD,
                   tabledata "Financial Report User Filters" = RIMD,
                   tabledata "Accounting Period" = IMD,
@@ -70,6 +74,7 @@ permissionset 191 "D365 SETUP"
                   tabledata Bin = IMD,
                   tabledata "Bin Content" = IMD,
                   tabledata "BOM Component" = RIMD,
+                  tabledata "Bus. Unit In Cons. Process" = D,
                   tabledata "Business Relation" = D,
                   tabledata "Business Unit" = D,
                   tabledata "Business Unit Information" = D,
@@ -109,6 +114,8 @@ permissionset 191 "D365 SETUP"
                   tabledata "Config. Template Line" = RIMD,
                   tabledata "Config. Tmpl. Selection Rules" = RIMD,
                   tabledata "Consolidation Account" = D,
+                  tabledata "Consolidation Process" = D,
+                  tabledata "Consolidation Setup" = D,
                   tabledata "Contact Duplicate" = D,
                   tabledata "Contact Industry Group" = D,
                   tabledata "Contact Job Responsibility" = D,
@@ -141,9 +148,6 @@ permissionset 191 "D365 SETUP"
                   tabledata "Customer Posting Group" = RIMD,
                   tabledata "Customer Price Group" = RIMD,
                   tabledata "Customer Templ." = RIMD,
-#if not CLEAN20
-                  tabledata "Customer Template" = RIMD,
-#endif
                   tabledata "Customized Calendar Change" = RIMD,
                   tabledata "Customized Calendar Entry" = RIMD,
                   tabledata "Data Exch." = RIMD,
@@ -288,9 +292,6 @@ permissionset 191 "D365 SETUP"
                   tabledata "Phys. Invt. Record Header" = RIMD,
                   tabledata "Phys. Invt. Record Line" = RIMD,
                   tabledata "Phys. Invt. Tracking" = RIMD,
-#if not CLEAN20
-                  tabledata "Plan Permission Set" = d,
-#endif
                   tabledata "Planning Assignment" = D,
                   tabledata "Planning Component" = D,
                   tabledata "Positive Pay Entry" = D,

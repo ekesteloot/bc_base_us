@@ -1,3 +1,12 @@
+namespace Microsoft.ServiceMgt.Contract;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Setup;
+using System.Utilities;
+
 codeunit 5944 SignServContractDoc
 {
     Permissions = TableData "Filed Service Contract Header" = rimd;

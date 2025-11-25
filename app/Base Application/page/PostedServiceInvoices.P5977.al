@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ServiceMgt.Comment;
+
 page 5977 "Posted Service Invoices"
 {
     ApplicationArea = Service;
@@ -6,8 +11,8 @@ page 5977 "Posted Service Invoices"
     Editable = false;
     PageType = List;
     SourceTable = "Service Invoice Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -242,10 +247,10 @@ page 5977 "Posted Service Invoices"
                     trigger OnAction()
                     begin
                         OnBeforeCalculateSalesTaxStatistics(Rec);
-                        if "Tax Area Code" = '' then
-                            PAGE.RunModal(PAGE::"Service Invoice Statistics", Rec, "No.")
+                        if Rec."Tax Area Code" = '' then
+                            PAGE.RunModal(PAGE::"Service Invoice Statistics", Rec, Rec."No.")
                         else
-                            PAGE.RunModal(PAGE::"Service Invoice Stats.", Rec, "No.");
+                            PAGE.RunModal(PAGE::"Service Invoice Stats.", Rec, Rec."No.");
                     end;
                 }
                 action("Co&mments")
@@ -254,9 +259,9 @@ page 5977 "Posted Service Invoices"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Service Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Service Invoice Header"),
-                                  "No." = FIELD("No."),
-                                  Type = CONST(General);
+                    RunPageLink = "Table Name" = const("Service Invoice Header"),
+                                  "No." = field("No."),
+                                  Type = const(General);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -270,7 +275,7 @@ page 5977 "Posted Service Invoices"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -312,7 +317,7 @@ page 5977 "Posted Service Invoices"
 
                     trigger OnAction()
                     begin
-                        ExportEDocument();
+                        Rec.ExportEDocument();
                     end;
                 }
                 action(ExportEDocumentPDF)
@@ -323,7 +328,7 @@ page 5977 "Posted Service Invoices"
 
                     trigger OnAction()
                     begin
-                        ExportEDocumentPDF();
+                        Rec.ExportEDocumentPDF();
                     end;
                 }
                 action("&Cancel")
@@ -354,9 +359,9 @@ page 5977 "Posted Service Invoices"
                     Caption = 'CFDI Relation Documents';
                     Image = Allocations;
                     RunObject = Page "CFDI Relation Documents";
-                    RunPageLink = "Document Table ID" = CONST(5992),
-                                  "Document No." = FIELD("No."),
-                                  "Customer No." = FIELD("Bill-to Customer No.");
+                    RunPageLink = "Document Table ID" = const(5992),
+                                  "Document No." = field("No."),
+                                  "Customer No." = field("Bill-to Customer No.");
                     RunPageMode = View;
                     ToolTip = 'View or add CFDI relation documents for the record.';
                 }
@@ -400,7 +405,7 @@ page 5977 "Posted Service Invoices"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action(ActivityLog)
@@ -412,7 +417,7 @@ page 5977 "Posted Service Invoices"
 
                 trigger OnAction()
                 begin
-                    ShowActivityLog();
+                    Rec.ShowActivityLog();
                 end;
             }
             action("Update Document")
@@ -459,22 +464,22 @@ page 5977 "Posted Service Invoices"
 
     trigger OnAfterGetCurrRecord()
     begin
-        DocExchStatusStyle := GetDocExchStatusStyle();
+        DocExchStatusStyle := Rec.GetDocExchStatusStyle();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        DocExchStatusStyle := GetDocExchStatusStyle();
+        DocExchStatusStyle := Rec.GetDocExchStatusStyle();
     end;
 
     trigger OnOpenPage()
     var
         ServiceInvoiceHeader: Record "Service Invoice Header";
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
         ServiceInvoiceHeader.CopyFilters(Rec);
-        ServiceInvoiceHeader.SetFilter("Document Exchange Status", '<>%1', "Document Exchange Status"::"Not Sent");
+        ServiceInvoiceHeader.SetFilter("Document Exchange Status", '<>%1', Rec."Document Exchange Status"::"Not Sent");
         DocExchStatusVisible := not ServiceInvoiceHeader.IsEmpty();
     end;
 

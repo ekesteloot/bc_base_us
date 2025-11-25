@@ -8,7 +8,7 @@ report 10069 "Sales Blanket Order"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Blanket Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Blanket Order"));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
             RequestFilterHeading = 'Blanket Sales Order';
@@ -17,12 +17,12 @@ report 10069 "Sales Blanket Order"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE("Document Type" = CONST("Blanket Order"));
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where("Document Type" = const("Blanket Order"));
                 dataitem(SalesLineComments; "Sales Comment Line")
                 {
-                    DataItemLink = "No." = FIELD("Document No."), "Document Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Blanket Order"), "Print On Order Confirmation" = CONST(true));
+                    DataItemLink = "No." = field("Document No."), "Document Line No." = field("Line No.");
+                    DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Blanket Order"), "Print On Order Confirmation" = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -91,8 +91,8 @@ report 10069 "Sales Blanket Order"
             }
             dataitem("Sales Comment Line"; "Sales Comment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("Document Type", "No.", "Document Line No.", "Line No.") WHERE("Document Type" = CONST("Blanket Order"), "Print On Order Confirmation" = CONST(true), "Document Line No." = CONST(0));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("Document Type", "No.", "Document Line No.", "Line No.") where("Document Type" = const("Blanket Order"), "Print On Order Confirmation" = const(true), "Document Line No." = const(0));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -113,10 +113,10 @@ report 10069 "Sales Blanket Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -284,7 +284,7 @@ report 10069 "Sales Blanket Order"
                     }
                     dataitem(SalesLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(PrintFooter; PrintFooter)
                         {
                         }
@@ -470,6 +470,7 @@ report 10069 "Sales Blanket Order"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if PrintCompany then
                     if RespCenter.Get("Responsibility Center") then begin
@@ -599,9 +600,6 @@ report 10069 "Sales Blanket Order"
         PaymentTerms: Record "Payment Terms";
         SalesPurchPerson: Record "Salesperson/Purchaser";
         SalesSetup: Record "Sales & Receivables Setup";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         CompanyInfo: Record "Company Information";
         TempSalesTaxAmtLine: Record "Sales Tax Amount Line" temporary;
         TaxArea: Record "Tax Area";
@@ -647,7 +645,6 @@ report 10069 "Sales Blanket Order"
         AmountExclInvDisc: Decimal;
         UseDate: Date;
         UseExternalTaxEngine: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         PONumberCaptionLbl: Label 'P.O. Number';
         SalesPersonCaptionLbl: Label 'SalesPerson';
@@ -675,6 +672,11 @@ report 10069 "Sales Blanket Order"
         InvoiceDiscountCaptionLbl: Label 'Invoice Discount:';
         SubtotalCaptionLbl: Label 'Subtotal:';
         TotalCaptionLbl: Label 'Total:';
+
+    protected var
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     local procedure FormatDocumentFields(SalesHeader: Record "Sales Header")
     begin

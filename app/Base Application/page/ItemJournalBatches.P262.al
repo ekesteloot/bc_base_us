@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.InventoryMgt.Posting;
+
 page 262 "Item Journal Batches"
 {
     Caption = 'Item Journal Batches';
@@ -37,7 +41,7 @@ page 262 "Item Journal Batches"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                 }
-                field("Item Tracking on Lines"; "Item Tracking on Lines")
+                field("Item Tracking on Lines"; Rec."Item Tracking on Lines")
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies if item tracking can be selected directly on the item journal lines.';
@@ -134,12 +138,12 @@ page 262 "Item Journal Batches"
 
     trigger OnInit()
     begin
-        SetRange("Journal Template Name");
+        Rec.SetRange("Journal Template Name");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetupNewBatch();
+        Rec.SetupNewBatch();
     end;
 
     trigger OnOpenPage()
@@ -163,9 +167,9 @@ page 262 "Item Journal Batches"
         ItemJnlTemplate: Record "Item Journal Template";
     begin
         if not CurrPage.LookupMode then
-            if GetFilter("Journal Template Name") <> '' then
-                if GetRangeMin("Journal Template Name") = GetRangeMax("Journal Template Name") then
-                    if ItemJnlTemplate.Get(GetRangeMin("Journal Template Name")) then
+            if Rec.GetFilter("Journal Template Name") <> '' then
+                if Rec.GetRangeMin("Journal Template Name") = Rec.GetRangeMax("Journal Template Name") then
+                    if ItemJnlTemplate.Get(Rec.GetRangeMin("Journal Template Name")) then
                         exit(ItemJnlTemplate.Name + ' ' + ItemJnlTemplate.Description);
     end;
 

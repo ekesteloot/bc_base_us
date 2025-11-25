@@ -1,3 +1,8 @@
+namespace System.Security.AccessControl;
+
+using System;
+using System.Visualization;
+
 page 9858 "Security Group Members Chart"
 {
     Caption = 'Users in Security Groups';

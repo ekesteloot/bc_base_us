@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.History;
+
 page 5898 "Posted Phys. Invt. Order Stat."
 {
     Caption = 'Posted Phys. Invt. Order Stat.';
@@ -34,7 +36,7 @@ page 5898 "Posted Phys. Invt. Order Stat."
                             begin
                                 PstdPhysInvtOrderLine2.Reset();
                                 PstdPhysInvtOrderLine2.SetCurrentKey("Document No.", "Entry Type", "Without Difference");
-                                PstdPhysInvtOrderLine2.SetRange("Document No.", "No.");
+                                PstdPhysInvtOrderLine2.SetRange("Document No.", Rec."No.");
                                 PstdPhysInvtOrderLine2.SetRange("Entry Type", PstdPhysInvtOrderLine2."Entry Type"::"Positive Adjmt.");
                                 PstdPhysInvtOrderLine2.SetRange("Without Difference", true);
                                 PAGE.RunModal(0, PstdPhysInvtOrderLine2);
@@ -50,7 +52,7 @@ page 5898 "Posted Phys. Invt. Order Stat."
                             begin
                                 PstdPhysInvtOrderLine2.Reset();
                                 PstdPhysInvtOrderLine2.SetCurrentKey("Document No.", "Entry Type", "Without Difference");
-                                PstdPhysInvtOrderLine2.SetRange("Document No.", "No.");
+                                PstdPhysInvtOrderLine2.SetRange("Document No.", Rec."No.");
                                 PstdPhysInvtOrderLine2.SetRange("Entry Type", PstdPhysInvtOrderLine2."Entry Type"::"Positive Adjmt.");
                                 PstdPhysInvtOrderLine2.SetRange("Without Difference", false);
                                 PAGE.RunModal(0, PstdPhysInvtOrderLine2);
@@ -66,7 +68,7 @@ page 5898 "Posted Phys. Invt. Order Stat."
                             begin
                                 PstdPhysInvtOrderLine2.Reset();
                                 PstdPhysInvtOrderLine2.SetCurrentKey("Document No.", "Entry Type", "Without Difference");
-                                PstdPhysInvtOrderLine2.SetRange("Document No.", "No.");
+                                PstdPhysInvtOrderLine2.SetRange("Document No.", Rec."No.");
                                 PstdPhysInvtOrderLine2.SetRange("Entry Type", PstdPhysInvtOrderLine2."Entry Type"::"Negative Adjmt.");
                                 PAGE.RunModal(0, PstdPhysInvtOrderLine2);
                             end;
@@ -155,12 +157,12 @@ page 5898 "Posted Phys. Invt. Order Stat."
 
     trigger OnAfterGetRecord()
     begin
-        TestField(Status, Status::Finished);
+        Rec.TestField(Status, Rec.Status::Finished);
 
         ClearAll();
 
         PstdPhysInvtOrderLine.Reset();
-        PstdPhysInvtOrderLine.SetRange("Document No.", "No.");
+        PstdPhysInvtOrderLine.SetRange("Document No.", Rec."No.");
         if PstdPhysInvtOrderLine.Find('-') then
             repeat
                 if not PstdPhysInvtOrderLine.EmptyLine() then begin

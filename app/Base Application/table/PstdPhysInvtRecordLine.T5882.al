@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Counting.History;
+
+using Microsoft.HumanResources.Employee;
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5882 "Pstd. Phys. Invt. Record Line"
 {
     Caption = 'Pstd. Phys. Invt. Record Line';
@@ -14,7 +22,7 @@ table 5882 "Pstd. Phys. Invt. Record Line"
         field(2; "Recording No."; Integer)
         {
             Caption = 'Recording No.';
-            TableRelation = "Pstd. Phys. Invt. Record Hdr"."Recording No." WHERE("Order No." = FIELD("Order No."));
+            TableRelation = "Pstd. Phys. Invt. Record Hdr"."Recording No." where("Order No." = field("Order No."));
         }
         field(3; "Line No."; Integer)
         {
@@ -24,7 +32,7 @@ table 5882 "Pstd. Phys. Invt. Record Line"
         {
             Caption = 'Order Line No.';
             Editable = false;
-            TableRelation = "Phys. Invt. Order Line"."Line No." WHERE("Document No." = FIELD("Order No."));
+            TableRelation = "Phys. Invt. Order Line"."Line No." where("Document No." = field("Order No."));
         }
         field(17; "Recorded without Order"; Boolean)
         {
@@ -39,7 +47,7 @@ table 5882 "Pstd. Phys. Invt. Record Line"
         field(21; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(22; "Location Code"; Code[10])
         {
@@ -49,7 +57,7 @@ table 5882 "Pstd. Phys. Invt. Record Line"
         field(23; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(30; Description; Text[100])
         {
@@ -66,7 +74,7 @@ table 5882 "Pstd. Phys. Invt. Record Line"
         field(40; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(41; Quantity; Decimal)
         {
@@ -110,8 +118,6 @@ table 5882 "Pstd. Phys. Invt. Record Line"
         {
             Caption = 'Person Recorded';
             TableRelation = Employee;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(130; "Serial No."; Code[50])

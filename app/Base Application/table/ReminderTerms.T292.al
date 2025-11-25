@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 table 292 "Reminder Terms"
 {
     Caption = 'Reminder Terms';

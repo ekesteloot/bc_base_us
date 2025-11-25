@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Setup;
+
 page 1061 "Select Payment Service"
 {
     Caption = 'Select Payment Service';
@@ -14,14 +16,14 @@ page 1061 "Select Payment Service"
             repeater(Control3)
             {
                 ShowCaption = false;
-                field(Available; Available)
+                field(Available; Rec.Available)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the icon and link to the payment service will be inserted on the outgoing sales document.';
 
                     trigger OnValidate()
                     begin
-                        if not Available then
+                        if not Rec.Available then
                             DeselectedValue := true;
                     end;
                 }

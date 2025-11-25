@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Document;
+
 query 9063 "Count Purchase Orders"
 {
     Caption = 'Count Purchase Orders';
@@ -6,7 +8,7 @@ query 9063 "Count Purchase Orders"
     {
         dataitem(Purchase_Header; "Purchase Header")
         {
-            DataItemTableFilter = "Document Type" = CONST(Order);
+            DataItemTableFilter = "Document Type" = const(Order);
             filter(Completely_Received; "Completely Received")
             {
             }

@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.RoleCenters;
+
 profile "SERVICES"
 {
     Enabled = true;

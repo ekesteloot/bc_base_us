@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Substitution;
+
 page 5717 "Condition Entry"
 {
     AutoSplitKey = true;
@@ -12,7 +14,7 @@ page 5717 "Condition Entry"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Condition; Condition)
+                field(Condition; Rec.Condition)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the condition for item substitution.';

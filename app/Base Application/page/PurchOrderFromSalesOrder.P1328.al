@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Purchases.Vendor;
+
 page 1328 "Purch. Order From Sales Order"
 {
     Caption = 'Create Purchase Orders';
@@ -17,7 +24,7 @@ page 1328 "Purch. Order From Sales Order"
                     ApplicationArea = Suite;
                     Editable = false;
                     Style = Subordinate;
-                    StyleExpr = Quantity = 0;
+                    StyleExpr = Rec.Quantity = 0;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
                 field(Description; Rec.Description)
@@ -25,7 +32,7 @@ page 1328 "Purch. Order From Sales Order"
                     ApplicationArea = Suite;
                     Editable = false;
                     Style = Subordinate;
-                    StyleExpr = Quantity = 0;
+                    StyleExpr = Rec.Quantity = 0;
                     ToolTip = 'Specifies a description of the purchase order.';
                 }
                 field("Demand Quantity"; Rec."Demand Quantity")
@@ -33,7 +40,7 @@ page 1328 "Purch. Order From Sales Order"
                     ApplicationArea = Suite;
                     Caption = 'Sales Order Quantity';
                     Style = Subordinate;
-                    StyleExpr = Quantity = 0;
+                    StyleExpr = Rec.Quantity = 0;
                     ToolTip = 'Specifies the sales order quantity relating to the purchase order line item.';
                 }
                 field(Vendor; VendorName)
@@ -42,19 +49,19 @@ page 1328 "Purch. Order From Sales Order"
                     Caption = 'Vendor';
                     ShowMandatory = true;
                     Style = Subordinate;
-                    StyleExpr = Quantity = 0;
+                    StyleExpr = Rec.Quantity = 0;
                     ToolTip = 'Specifies the vendor who will ship the items in the purchase order.';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Vendor: Record Vendor;
                     begin
-                        TestField("Replenishment System", "Replenishment System"::Purchase);
-                        if not LookupVendor(Vendor, false) then
+                        Rec.TestField("Replenishment System", Rec."Replenishment System"::Purchase);
+                        if not Rec.LookupVendor(Vendor, false) then
                             exit;
 
-                        SetCurrFieldNo(FieldNo("Supply From"));
-                        Validate("Supply From", Vendor."No.");
+                        Rec.SetCurrFieldNo(Rec.FieldNo("Supply From"));
+                        Rec.Validate(Rec."Supply From", Vendor."No.");
                         VendorName := Vendor.Name;
                     end;
 
@@ -62,14 +69,14 @@ page 1328 "Purch. Order From Sales Order"
                     var
                         Vendor: Record Vendor;
                     begin
-                        TestField("Replenishment System", "Replenishment System"::Purchase);
+                        Rec.TestField("Replenishment System", Rec."Replenishment System"::Purchase);
 
-                        SetCurrFieldNo(FieldNo("Supply From"));
-                        Validate("Supply From", Vendor.GetVendorNo(VendorName));
-                        if Vendor.Get("Supply From") then
+                        Rec.SetCurrFieldNo(Rec.FieldNo("Supply From"));
+                        Rec.Validate(Rec."Supply From", Vendor.GetVendorNo(VendorName));
+                        if Vendor.Get(Rec."Supply From") then
                             VendorName := Vendor.Name
                         else
-                            VendorName := "Supply From";
+                            VendorName := Rec."Supply From";
                     end;
                 }
                 field(Quantity; Rec.Quantity)
@@ -124,7 +131,7 @@ page 1328 "Purch. Order From Sales Order"
             {
                 Caption = 'Item Availability by';
                 Image = ItemAvailability;
-                Enabled = Type = Type::Item;
+                Enabled = Rec.Type = Rec.Type::Item;
                 action("Event")
                 {
                     ApplicationArea = Suite;
@@ -217,7 +224,7 @@ page 1328 "Purch. Order From Sales Order"
 
                     trigger OnAction()
                     begin
-                        ShowTimeline(Rec);
+                        Rec.ShowTimeline(Rec);
                     end;
                 }
 #endif
@@ -275,7 +282,7 @@ page 1328 "Purch. Order From Sales Order"
     var
         Vendor: Record Vendor;
     begin
-        if Vendor.Get("Supply From") then
+        if Vendor.Get(Rec."Supply From") then
             VendorName := Vendor.Name
         else
             VendorName := '';
@@ -312,29 +319,29 @@ page 1328 "Purch. Order From Sales Order"
     begin
         OrderPlanningMgt.PlanSpecificSalesOrder(Rec, OrderNo);
 
-        SetRange(Level, 1);
+        Rec.SetRange(Level, 1);
 
-        SetRange("Replenishment System", "Replenishment System"::Purchase);
-        SetFilter(Quantity, '>%1', 0);
+        Rec.SetRange("Replenishment System", Rec."Replenishment System"::Purchase);
+        Rec.SetFilter(Quantity, '>%1', 0);
         if OrderNo <> '' then
-            SetFilter("Demand Order No.", OrderNo);
+            Rec.SetFilter("Demand Order No.", OrderNo);
 
-        if IsEmpty() then begin
+        if Rec.IsEmpty() then begin
             AllItemsAreAvailableNotification.Message := EntireOrderIsAvailableTxt;
             AllItemsAreAvailableNotification.Scope := NOTIFICATIONSCOPE::LocalScope;
             AllItemsAreAvailableNotification.Send();
         end;
-        SetRange(Quantity);
+        Rec.SetRange(Quantity);
     end;
 
     local procedure SetProcessedDocumentsVisibility(ShowAll: Boolean)
     begin
-        FilterGroup(0);
+        Rec.FilterGroup(0);
         if ShowAll then begin
-            SetRange("Needed Quantity");
+            Rec.SetRange("Needed Quantity");
             ShowAllDocsIsEnable := false;
         end else begin
-            SetFilter("Needed Quantity", '>%1', 0);
+            Rec.SetFilter("Needed Quantity", '>%1', 0);
             ShowAllDocsIsEnable := true;
         end;
     end;
@@ -343,11 +350,11 @@ page 1328 "Purch. Order From Sales Order"
     var
         RecordsWithoutSupplyFromVendor: Boolean;
     begin
-        SetRange("Supply From", '');
-        SetFilter(Quantity, '>%1', 0);
-        RecordsWithoutSupplyFromVendor := not IsEmpty();
-        SetRange("Supply From");
-        SetRange(Quantity);
+        Rec.SetRange("Supply From", '');
+        Rec.SetFilter(Quantity, '>%1', 0);
+        RecordsWithoutSupplyFromVendor := not Rec.IsEmpty();
+        Rec.SetRange("Supply From");
+        Rec.SetRange(Quantity);
         if RecordsWithoutSupplyFromVendor then
             Error(CannotCreatePurchaseOrderWithoutVendorErr);
     end;

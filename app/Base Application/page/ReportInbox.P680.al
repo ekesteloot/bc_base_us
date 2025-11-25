@@ -7,8 +7,8 @@ page 680 "Report Inbox"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Report Inbox";
-    SourceTableView = SORTING("User ID", "Created Date-Time")
-                      ORDER(Descending);
+    SourceTableView = sorting("User ID", "Created Date-Time")
+                      order(Descending);
     UsageCategory = Lists;
 
     layout
@@ -24,7 +24,7 @@ page 680 "Report Inbox"
 
                     trigger OnDrillDown()
                     begin
-                        ShowReport();
+                        Rec.ShowReport();
                         CurrPage.Update(false);
                     end;
                 }
@@ -89,7 +89,7 @@ page 680 "Report Inbox"
 
                 trigger OnAction()
                 begin
-                    ShowReport();
+                    Rec.ShowReport();
                     CurrPage.Update();
                 end;
             }
@@ -118,8 +118,8 @@ page 680 "Report Inbox"
     var
         DocumentSharing: Codeunit "Document Sharing";
     begin
-        ShareOptionsEnabled := (not ("Report Name" = '')) and (DocumentSharing.ShareEnabled());
-        DownloadEnabled := (not ("Report Name" = ''));
+        ShareOptionsEnabled := (not (Rec."Report Name" = '')) and (DocumentSharing.ShareEnabled());
+        DownloadEnabled := (not (Rec."Report Name" = ''));
     end;
 
     var

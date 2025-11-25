@@ -1,3 +1,15 @@
+﻿namespace Microsoft.Intercompany.Inbox;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Intercompany.Dimension;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Intercompany.Setup;
+using System.Telemetry;
+
 report 511 "Complete IC Inbox Action"
 {
     Caption = 'Complete IC Inbox Action';
@@ -7,12 +19,12 @@ report 511 "Complete IC Inbox Action"
     {
         dataitem("IC Inbox Transaction"; "IC Inbox Transaction")
         {
-            DataItemTableView = SORTING("Transaction No.", "IC Partner Code", "Transaction Source", "Document Type");
+            DataItemTableView = sorting("Transaction No.", "IC Partner Code", "Transaction Source", "Document Type");
             RequestFilterFields = "IC Partner Code", "Transaction Source", "Line Action";
             dataitem("IC Inbox Jnl. Line"; "IC Inbox Jnl. Line")
             {
-                DataItemLink = "Transaction No." = FIELD("Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
-                DataItemTableView = SORTING("Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
+                DataItemLink = "Transaction No." = field("Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
+                DataItemTableView = sorting("Transaction No.", "IC Partner Code", "Transaction Source", "Line No.");
 
                 trigger OnAfterGetRecord()
                 var
@@ -48,8 +60,8 @@ report 511 "Complete IC Inbox Action"
             }
             dataitem("IC Inbox Sales Header"; "IC Inbox Sales Header")
             {
-                DataItemLink = "IC Transaction No." = FIELD("Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
-                DataItemTableView = SORTING("IC Transaction No.", "IC Partner Code", "Transaction Source");
+                DataItemLink = "IC Transaction No." = field("Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
+                DataItemTableView = sorting("IC Transaction No.", "IC Partner Code", "Transaction Source");
 
                 trigger OnAfterGetRecord()
                 var
@@ -98,8 +110,8 @@ report 511 "Complete IC Inbox Action"
             }
             dataitem("IC Inbox Purchase Header"; "IC Inbox Purchase Header")
             {
-                DataItemLink = "IC Transaction No." = FIELD("Transaction No."), "IC Partner Code" = FIELD("IC Partner Code"), "Transaction Source" = FIELD("Transaction Source");
-                DataItemTableView = SORTING("IC Transaction No.", "IC Partner Code", "Transaction Source");
+                DataItemLink = "IC Transaction No." = field("Transaction No."), "IC Partner Code" = field("IC Partner Code"), "Transaction Source" = field("Transaction Source");
+                DataItemTableView = sorting("IC Transaction No.", "IC Partner Code", "Transaction Source");
 
                 trigger OnAfterGetRecord()
                 var
@@ -386,9 +398,7 @@ report 511 "Complete IC Inbox Action"
         GLSetupFound: Boolean;
         Forward: Boolean;
         Text001: Label '%1 %2 from IC Partner %3 already exists in the %4 window. You have to delete %1 %2 in the %4 window before you complete the line action.';
-        [InDataSet]
         DocPostingDateEditable: Boolean;
-        [InDataSet]
         PostingDateEditable: Boolean;
 
     protected var
@@ -435,14 +445,7 @@ report 511 "Complete IC Inbox Action"
     local procedure GetDefaultJnlTemplateAndBatch()
     var
         ICSetup: Record "IC Setup";
-#if not CLEAN20
-        ICAutoAcceptFeatureMgt: Codeunit "IC Auto Accept Feature Mgt.";
-#endif
     begin
-#if not CLEAN20
-        if not ICAutoAcceptFeatureMgt.IsICAutoAcceptTransactionEnabled() then
-            exit;
-#endif
         if TempGenJnlLine."Journal Template Name" <> '' then
             exit;
 

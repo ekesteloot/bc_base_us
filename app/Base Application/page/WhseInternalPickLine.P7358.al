@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7358 "Whse. Internal Pick Line"
 {
     Caption = 'Lines';
@@ -171,7 +176,7 @@ page 7358 "Whse. Internal Pick Line"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }
@@ -180,7 +185,7 @@ page 7358 "Whse. Internal Pick Line"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
     end;
 
     var
@@ -190,7 +195,7 @@ page 7358 "Whse. Internal Pick Line"
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", '');
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", '');
     end;
 
     procedure PickCreate()
@@ -203,14 +208,14 @@ page 7358 "Whse. Internal Pick Line"
         WhseInternalPickHeader.Get(WhseInternalPickLine."No.");
         if WhseInternalPickHeader.Status = WhseInternalPickHeader.Status::Open then
             ReleaseWhseInternalPick.Release(WhseInternalPickHeader);
-        CreatePickDoc(WhseInternalPickLine, WhseInternalPickHeader);
+        Rec.CreatePickDoc(WhseInternalPickLine, WhseInternalPickHeader);
     end;
 
     local procedure GetActualSortMethod(): Enum "Warehouse Internal Sorting Method"
     var
         WhseInternalPickHeader: Record "Whse. Internal Pick Header";
     begin
-        if WhseInternalPickHeader.Get("No.") then
+        if WhseInternalPickHeader.Get(Rec."No.") then
             exit(WhseInternalPickHeader."Sorting Method");
 
         exit(WhseInternalPickHeader."Sorting Method"::None);

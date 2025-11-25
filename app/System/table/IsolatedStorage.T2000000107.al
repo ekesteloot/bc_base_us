@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Security;
+
+using System.Environment;
+using System.Security.AccessControl;
+
 table 2000000107 "Isolated Storage"
 {
     Caption = 'Isolated Storage';

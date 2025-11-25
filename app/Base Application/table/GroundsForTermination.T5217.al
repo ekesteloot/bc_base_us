@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 table 5217 "Grounds for Termination"
 {
     Caption = 'Grounds for Termination';

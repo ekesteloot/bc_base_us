@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using System.Utilities;
+
 page 6503 "Avail. - Item Tracking Lines"
 {
     Caption = 'Avail. - Item Tracking Lines';
@@ -201,11 +207,8 @@ page 6503 "Avail. - Item Tracking Lines"
         QtyToReserve: Decimal;
         CaptionText: Text;
         EnableReservations: Boolean;
-        [InDataSet]
         FunctionButton1Visible: Boolean;
-        [InDataSet]
         FunctionButton2Visible: Boolean;
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
         CancelReservationQst: Label 'Cancel reservation?';

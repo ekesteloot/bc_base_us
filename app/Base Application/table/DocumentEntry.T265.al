@@ -10,7 +10,7 @@ table 265 "Document Entry"
         field(1; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(2; "No. of Records"; Integer)
         {

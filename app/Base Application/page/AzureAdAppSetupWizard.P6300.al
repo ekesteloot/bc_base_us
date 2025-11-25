@@ -1,6 +1,12 @@
+namespace System.Azure.Identity;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Utilities;
+
 page 6300 "Azure AD App Setup Wizard"
 {
-    Caption = 'Set Up Azure Active Directory';
+    Caption = 'Set Up Microsoft Entra ID';
     PageType = NavigatePage;
 
     layout
@@ -23,7 +29,7 @@ page 6300 "Azure AD App Setup Wizard"
             {
                 Editable = false;
                 ShowCaption = false;
-                Visible = TopBannerVisible AND DoneVisible;
+                Visible = TopBannerVisible and DoneVisible;
                 field("<MediaRepositoryDone>"; MediaResourcesDone."Media Reference")
                 {
                     ApplicationArea = Basic, Suite;
@@ -37,7 +43,7 @@ page 6300 "Azure AD App Setup Wizard"
                 Visible = IntroVisible;
                 group("Para1.1")
                 {
-                    Caption = 'Welcome to Azure Active Directory (Azure AD) Setup';
+                    Caption = 'Welcome to Microsoft Entra Setup';
                     label("Para1.1.1")
                     {
                         ApplicationArea = Basic, Suite;
@@ -66,7 +72,7 @@ page 6300 "Azure AD App Setup Wizard"
                         ObsoleteReason = 'This label is no longer required and will be removed, extensions should extend from another property.';
                         ObsoleteTag = '17.0';
                         ApplicationArea = Basic, Suite;
-                        Visible = False;
+                        Visible = false;
                     }
                 }
                 group("Para1.2")
@@ -122,7 +128,7 @@ page 6300 "Azure AD App Setup Wizard"
                     group("Para3.1.1")
                     {
                         Caption = '';
-                        InstructionalText = 'To begin using the Azure Active Directory services, choose Finish.';
+                        InstructionalText = 'To begin using the Microsoft Entra services, choose Finish.';
                     }
                 }
             }

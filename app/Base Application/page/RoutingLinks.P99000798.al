@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Routing;
+
+using Microsoft.Manufacturing.Reports;
+
 page 99000798 "Routing Links"
 {
     AdditionalSearchTerms = 'just-in-time flushing,jit';
@@ -14,7 +18,7 @@ page 99000798 "Routing Links"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies a routing link code.';

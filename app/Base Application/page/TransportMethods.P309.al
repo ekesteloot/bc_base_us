@@ -13,7 +13,7 @@ page 309 "Transport Methods"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies a code for the transport method.';

@@ -1,3 +1,10 @@
+namespace Microsoft.Manufacturing.Capacity;
+
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+
 table 99000866 "Capacity Constrained Resource"
 {
     Caption = 'Capacity Constrained Resource';
@@ -8,9 +15,9 @@ table 99000866 "Capacity Constrained Resource"
         field(1; "Capacity No."; Code[20])
         {
             Caption = 'Capacity No.';
-            TableRelation = IF ("Capacity Type" = CONST("Work Center")) "Work Center"
-            ELSE
-            IF ("Capacity Type" = CONST("Machine Center")) "Machine Center";
+            TableRelation = if ("Capacity Type" = const("Work Center")) "Work Center"
+            else
+            if ("Capacity Type" = const("Machine Center")) "Machine Center";
 
             trigger OnValidate()
             begin
@@ -99,10 +106,10 @@ table 99000866 "Capacity Constrained Resource"
         }
         field(42; "Capacity (Effective)"; Decimal)
         {
-            CalcFormula = Sum ("Calendar Entry"."Capacity (Effective)" WHERE("Capacity Type" = FIELD("Capacity Type"),
-                                                                             "No." = FIELD("Capacity No."),
-                                                                             "Work Shift Code" = FIELD("Work Shift Filter"),
-                                                                             Date = FIELD("Date Filter")));
+            CalcFormula = Sum("Calendar Entry"."Capacity (Effective)" where("Capacity Type" = field("Capacity Type"),
+                                                                             "No." = field("Capacity No."),
+                                                                             "Work Shift Code" = field("Work Shift Filter"),
+                                                                             Date = field("Date Filter")));
             Caption = 'Capacity (Effective)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -110,9 +117,9 @@ table 99000866 "Capacity Constrained Resource"
         }
         field(44; "Prod. Order Need Qty."; Decimal)
         {
-            CalcFormula = Sum ("Prod. Order Capacity Need"."Allocated Time" WHERE(Type = FIELD("Capacity Type"),
-                                                                                  "No." = FIELD("Capacity No."),
-                                                                                  Date = FIELD("Date Filter")));
+            CalcFormula = Sum("Prod. Order Capacity Need"."Allocated Time" where(Type = field("Capacity Type"),
+                                                                                  "No." = field("Capacity No."),
+                                                                                  Date = field("Date Filter")));
             Caption = 'Prod. Order Need Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -120,8 +127,8 @@ table 99000866 "Capacity Constrained Resource"
         }
         field(46; "Work Center Load Qty."; Decimal)
         {
-            CalcFormula = Sum ("Prod. Order Capacity Need"."Allocated Time" WHERE("Work Center No." = FIELD("Work Center No."),
-                                                                                  Date = FIELD("Date Filter")));
+            CalcFormula = Sum("Prod. Order Capacity Need"."Allocated Time" where("Work Center No." = field("Work Center No."),
+                                                                                  Date = field("Date Filter")));
             Caption = 'Work Center Load Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -129,10 +136,10 @@ table 99000866 "Capacity Constrained Resource"
         }
         field(48; "Prod. Order Need Qty. for Plan"; Decimal)
         {
-            CalcFormula = Sum ("Prod. Order Capacity Need"."Allocated Time" WHERE(Type = FIELD("Capacity Type"),
-                                                                                  "No." = FIELD("Capacity No."),
-                                                                                  Date = FIELD("Date Filter"),
-                                                                                  Active = CONST(true)));
+            CalcFormula = Sum("Prod. Order Capacity Need"."Allocated Time" where(Type = field("Capacity Type"),
+                                                                                  "No." = field("Capacity No."),
+                                                                                  Date = field("Date Filter"),
+                                                                                  Active = const(true)));
             Caption = 'Prod. Order Need Qty. for Plan';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -140,9 +147,9 @@ table 99000866 "Capacity Constrained Resource"
         }
         field(49; "Work Center Load Qty. for Plan"; Decimal)
         {
-            CalcFormula = Sum ("Prod. Order Capacity Need"."Allocated Time" WHERE("Work Center No." = FIELD("Work Center No."),
-                                                                                  Date = FIELD("Date Filter"),
-                                                                                  Active = CONST(true)));
+            CalcFormula = Sum("Prod. Order Capacity Need"."Allocated Time" where("Work Center No." = field("Work Center No."),
+                                                                                  Date = field("Date Filter"),
+                                                                                  Active = const(true)));
             Caption = 'Work Center Load Qty. for Plan';
             DecimalPlaces = 0 : 5;
             Editable = false;

@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Purchases.Vendor;
+
 page 9090 "Item Replenishment FactBox"
 {
     Caption = 'Item Details - Replenishment';
@@ -37,7 +43,7 @@ page 9090 "Item Replenishment FactBox"
                     var
                         Vendor: Record Vendor;
                     begin
-                        Vendor.SetFilter("No.", "Vendor No.");
+                        Vendor.SetFilter("No.", Rec."Vendor No.");
 
                         PAGE.Run(PAGE::"Vendor Card", Vendor);
                     end;
@@ -67,7 +73,7 @@ page 9090 "Item Replenishment FactBox"
                     var
                         RoutingHeader: Record "Routing Header";
                     begin
-                        RoutingHeader.SetFilter("No.", "Routing No.");
+                        RoutingHeader.SetFilter("No.", Rec."Routing No.");
 
                         PAGE.Run(PAGE::Routing, RoutingHeader);
                     end;
@@ -82,7 +88,7 @@ page 9090 "Item Replenishment FactBox"
                     var
                         ProdBomHeader: Record "Production BOM Header";
                     begin
-                        ProdBomHeader.SetFilter("No.", "Production BOM No.");
+                        ProdBomHeader.SetFilter("No.", Rec."Production BOM No.");
 
                         PAGE.Run(PAGE::"Production BOM", ProdBomHeader);
                     end;

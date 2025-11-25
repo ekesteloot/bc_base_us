@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using System.Utilities;
+
 codeunit 9076 "Res. Journal Errors Mgt."
 {
     SingleInstance = true;

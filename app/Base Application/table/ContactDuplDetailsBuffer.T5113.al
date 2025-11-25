@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Duplicates;
+
+using Microsoft.CRM.Contact;
+
 table 5113 "Contact Dupl. Details Buffer"
 {
     Caption = 'Contact Dupl. Details Buffer';

@@ -1,3 +1,10 @@
+﻿namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.IO;
+using System.Utilities;
+
 codeunit 1230 "SEPA DD-Export File"
 {
     TableNo = "Direct Debit Collection Entry";

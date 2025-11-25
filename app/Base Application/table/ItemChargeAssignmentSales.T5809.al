@@ -11,13 +11,13 @@ table 5809 "Item Charge Assignment (Sales)"
         field(2; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Sales Header"."No." WHERE("Document Type" = FIELD("Document Type"));
+            TableRelation = "Sales Header"."No." where("Document Type" = field("Document Type"));
         }
         field(3; "Document Line No."; Integer)
         {
             Caption = 'Document Line No.';
-            TableRelation = "Sales Line"."Line No." WHERE("Document Type" = FIELD("Document Type"),
-                                                           "Document No." = FIELD("Document No."));
+            TableRelation = "Sales Line"."Line No." where("Document Type" = field("Document Type"),
+                                                           "Document No." = field("Document No."));
         }
         field(4; "Line No."; Integer)
         {
@@ -94,36 +94,36 @@ table 5809 "Item Charge Assignment (Sales)"
         field(13; "Applies-to Doc. No."; Code[20])
         {
             Caption = 'Applies-to Doc. No.';
-            TableRelation = IF ("Applies-to Doc. Type" = CONST(Order)) "Sales Header"."No." WHERE("Document Type" = CONST(Order))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST(Invoice)) "Sales Header"."No." WHERE("Document Type" = CONST(Invoice))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Return Order")) "Sales Header"."No." WHERE("Document Type" = CONST("Return Order"))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Credit Memo")) "Sales Header"."No." WHERE("Document Type" = CONST("Credit Memo"))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST(Shipment)) "Sales Shipment Header"."No."
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Return Receipt")) "Return Receipt Header"."No.";
+            TableRelation = if ("Applies-to Doc. Type" = const(Order)) "Sales Header"."No." where("Document Type" = const(Order))
+            else
+            if ("Applies-to Doc. Type" = const(Invoice)) "Sales Header"."No." where("Document Type" = const(Invoice))
+            else
+            if ("Applies-to Doc. Type" = const("Return Order")) "Sales Header"."No." where("Document Type" = const("Return Order"))
+            else
+            if ("Applies-to Doc. Type" = const("Credit Memo")) "Sales Header"."No." where("Document Type" = const("Credit Memo"))
+            else
+            if ("Applies-to Doc. Type" = const(Shipment)) "Sales Shipment Header"."No."
+            else
+            if ("Applies-to Doc. Type" = const("Return Receipt")) "Return Receipt Header"."No.";
         }
         field(14; "Applies-to Doc. Line No."; Integer)
         {
             Caption = 'Applies-to Doc. Line No.';
-            TableRelation = IF ("Applies-to Doc. Type" = CONST(Order)) "Sales Line"."Line No." WHERE("Document Type" = CONST(Order),
-                                                                                                    "Document No." = FIELD("Applies-to Doc. No."))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST(Invoice)) "Sales Line"."Line No." WHERE("Document Type" = CONST(Invoice),
-                                                                                                                                                                                   "Document No." = FIELD("Applies-to Doc. No."))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Return Order")) "Sales Line"."Line No." WHERE("Document Type" = CONST("Return Order"),
-                                                                                                                                                                                                                                                                         "Document No." = FIELD("Applies-to Doc. No."))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Credit Memo")) "Sales Line"."Line No." WHERE("Document Type" = CONST("Credit Memo"),
-                                                                                                                                                                                                                                                                                                                                                              "Document No." = FIELD("Applies-to Doc. No."))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST(Shipment)) "Sales Shipment Line"."Line No." WHERE("Document No." = FIELD("Applies-to Doc. No."))
-            ELSE
-            IF ("Applies-to Doc. Type" = CONST("Return Receipt")) "Return Receipt Line"."Line No." WHERE("Document No." = FIELD("Applies-to Doc. No."));
+            TableRelation = if ("Applies-to Doc. Type" = const(Order)) "Sales Line"."Line No." where("Document Type" = const(Order),
+                                                                                                    "Document No." = field("Applies-to Doc. No."))
+            else
+            if ("Applies-to Doc. Type" = const(Invoice)) "Sales Line"."Line No." where("Document Type" = const(Invoice),
+                                                                                                                                                                                   "Document No." = field("Applies-to Doc. No."))
+            else
+            if ("Applies-to Doc. Type" = const("Return Order")) "Sales Line"."Line No." where("Document Type" = const("Return Order"),
+                                                                                                                                                                                                                                                                         "Document No." = field("Applies-to Doc. No."))
+            else
+            if ("Applies-to Doc. Type" = const("Credit Memo")) "Sales Line"."Line No." where("Document Type" = const("Credit Memo"),
+                                                                                                                                                                                                                                                                                                                                                              "Document No." = field("Applies-to Doc. No."))
+            else
+            if ("Applies-to Doc. Type" = const(Shipment)) "Sales Shipment Line"."Line No." where("Document No." = field("Applies-to Doc. No."))
+            else
+            if ("Applies-to Doc. Type" = const("Return Receipt")) "Return Receipt Line"."Line No." where("Document No." = field("Applies-to Doc. No."));
         }
         field(15; "Applies-to Doc. Line Amount"; Decimal)
         {

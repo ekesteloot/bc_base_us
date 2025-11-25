@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 page 6039 "Service Cr. Memo Lines Subform"
 {
     Caption = 'Lines';
@@ -50,7 +52,7 @@ page 6039 "Service Cr. Memo Lines Subform"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that the item on the credit memo line is a catalog item.';
@@ -80,7 +82,7 @@ page 6039 "Service Cr. Memo Lines Subform"
                     ToolTip = 'Specifies the VAT specification of the involved item or resource to link transactions made for this record with the appropriate general ledger account according to the VAT posting setup.';
                     Visible = false;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the name of an item, resource, cost, general ledger account, or some descriptive text on the service credit memo line.';
@@ -214,9 +216,7 @@ page 6039 "Service Cr. Memo Lines Subform"
 
     var
         TempServCrMemoLine: Record "Service Cr.Memo Line" temporary;
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     local procedure IsFirstDocLine(): Boolean
@@ -225,16 +225,16 @@ page 6039 "Service Cr. Memo Lines Subform"
     begin
         TempServCrMemoLine.Reset();
         TempServCrMemoLine.CopyFilters(Rec);
-        TempServCrMemoLine.SetRange("Document No.", "Document No.");
+        TempServCrMemoLine.SetRange("Document No.", Rec."Document No.");
         if not TempServCrMemoLine.FindFirst() then begin
             ServCrMemoLine.CopyFilters(Rec);
-            ServCrMemoLine.SetRange("Document No.", "Document No.");
+            ServCrMemoLine.SetRange("Document No.", Rec."Document No.");
             if not ServCrMemoLine.FindFirst() then
                 exit(false);
             TempServCrMemoLine := ServCrMemoLine;
             TempServCrMemoLine.Insert();
         end;
-        exit("Line No." = TempServCrMemoLine."Line No.");
+        exit(Rec."Line No." = TempServCrMemoLine."Line No.");
     end;
 }
 

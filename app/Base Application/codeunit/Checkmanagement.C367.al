@@ -1,3 +1,19 @@
+namespace Microsoft.BankMgt.Check;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 codeunit 367 CheckManagement
 {
     Permissions = TableData "Cust. Ledger Entry" = rm,
@@ -752,11 +768,11 @@ codeunit 367 CheckManagement
     local procedure ClearApplnLedgerEntries(GenJournalLine: Record "Gen. Journal Line")
     begin
         case GenJournalLine."Account Type" of
-            "Gen. Journal Account Type"::Customer:
+            GenJournalLine."Account Type"::Customer:
                 ClearApplnCustLedgerEntries(GenJournalLine);
-            "Gen. Journal Account Type"::Vendor:
+            GenJournalLine."Account Type"::Vendor:
                 ClearApplnVendorLedgerEntries(GenJournalLine);
-            "Gen. Journal Account Type"::Employee:
+            GenJournalLine."Account Type"::Employee:
                 ClearApplnEmployeeLedgerEntries(GenJournalLine);
         end
     end;

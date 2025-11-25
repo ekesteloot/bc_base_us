@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Document;
+
 page 53 "Purchase List"
 {
     Caption = 'Purchase List';
@@ -255,7 +257,7 @@ page 53 "Purchase List"
 
     trigger OnOpenPage()
     begin
-        CopyBuyFromVendorFilter();
+        Rec.CopyBuyFromVendorFilter();
     end;
 }
 

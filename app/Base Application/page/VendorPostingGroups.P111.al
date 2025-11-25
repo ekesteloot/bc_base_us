@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Purchases.Setup;
+
 page 111 "Vendor Posting Groups"
 {
     ApplicationArea = Basic, Suite;
@@ -28,7 +32,7 @@ page 111 "Vendor Posting Groups"
                             InvRoundingVisible := true;
                             ApplnRoundingVisible := true;
                         end else
-                            SetAccountVisibility(PmtToleranceVisible, PmtDiscountVisible, InvRoundingVisible, ApplnRoundingVisible);
+                            Rec.SetAccountVisibility(PmtToleranceVisible, PmtDiscountVisible, InvRoundingVisible, ApplnRoundingVisible);
 
                         CurrPage.Update();
                     end;
@@ -37,7 +41,7 @@ page 111 "Vendor Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an identifier for the vendor posting group.';
@@ -145,7 +149,7 @@ page 111 "Vendor Posting Groups"
                     Caption = 'Alternative Groups';
                     Image = Relationship;
                     RunObject = Page "Alt. Vendor Posting Groups";
-                    RunPageLink = "Vendor Posting Group" = FIELD(Code);
+                    RunPageLink = "Vendor Posting Group" = field(Code);
                     ToolTip = 'Specifies alternative vendor posting groups.';
                     Visible = AltPostingGroupsVisible;
                 }

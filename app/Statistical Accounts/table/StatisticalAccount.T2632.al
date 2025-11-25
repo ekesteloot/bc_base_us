@@ -3,6 +3,7 @@ table 2632 "Statistical Account"
     DataClassification = CustomerContent;
     DrillDownPageId = "Statistical Account List";
     LookupPageId = "Statistical Account List";
+    Caption = 'Statistical Account';
 
     fields
     {

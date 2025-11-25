@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using System.Security.User;
+
 page 5807 "Value Entries Preview"
 {
     Caption = 'Value Entries Preview';
@@ -40,7 +45,7 @@ page 5807 "Value Entries Preview"
                     ToolTip = 'Specifies the type of variance described in this entry.';
                     Visible = false;
                 }
-                field(Adjustment; Adjustment)
+                field(Adjustment; Rec.Adjustment)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if this entry has been cost adjusted.';
@@ -208,7 +213,7 @@ page 5807 "Value Entries Preview"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Posting Group"; Rec."Source Posting Group")
@@ -366,7 +371,7 @@ page 5807 "Value Entries Preview"
 
                 trigger OnAction()
                 begin
-                    SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                    Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                 end;
             }
         }
@@ -402,7 +407,7 @@ page 5807 "Value Entries Preview"
         if TempValueEntry.Find('-') then
             repeat
                 Rec := TempValueEntry;
-                Insert();
+                Rec.Insert();
             until TempValueEntry.Next() = 0;
     end;
 }

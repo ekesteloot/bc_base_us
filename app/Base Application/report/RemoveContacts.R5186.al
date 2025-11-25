@@ -1,3 +1,12 @@
+﻿namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Profiling;
+using Microsoft.InventoryMgt.Ledger;
+using System.Utilities;
+
 report 5186 "Remove Contacts"
 {
     Caption = 'Remove Contacts';
@@ -8,18 +17,18 @@ report 5186 "Remove Contacts"
     {
         dataitem("Segment Header"; "Segment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             dataitem("Segment Line"; "Segment Line")
             {
-                DataItemLink = "Segment No." = FIELD("No.");
-                DataItemTableView = SORTING("Segment No.", "Line No.");
+                DataItemLink = "Segment No." = field("No.");
+                DataItemTableView = sorting("Segment No.", "Line No.");
                 dataitem(Contact; Contact)
                 {
-                    DataItemTableView = SORTING("No.");
+                    DataItemTableView = sorting("No.");
                     RequestFilterFields = "No.", "Search Name", Type, "Salesperson Code", "Post Code", "Country/Region Code", "Territory Code";
                     dataitem("Contact Profile Answer"; "Contact Profile Answer")
                     {
-                        DataItemLink = "Contact No." = FIELD("No.");
+                        DataItemLink = "Contact No." = field("No.");
                         RequestFilterHeading = 'Profile';
 
                         trigger OnAfterGetRecord()
@@ -38,8 +47,8 @@ report 5186 "Remove Contacts"
                     }
                     dataitem("Contact Mailing Group"; "Contact Mailing Group")
                     {
-                        DataItemLink = "Contact No." = FIELD("No.");
-                        DataItemTableView = SORTING("Contact No.", "Mailing Group Code");
+                        DataItemLink = "Contact No." = field("No.");
+                        DataItemTableView = sorting("Contact No.", "Mailing Group Code");
                         RequestFilterFields = "Mailing Group Code";
                         RequestFilterHeading = 'Mailing Group';
 
@@ -59,8 +68,8 @@ report 5186 "Remove Contacts"
                     }
                     dataitem("Interaction Log Entry"; "Interaction Log Entry")
                     {
-                        DataItemLink = "Contact Company No." = FIELD("Company No."), "Contact No." = FIELD("No.");
-                        DataItemTableView = SORTING("Contact Company No.", "Contact No.", Date);
+                        DataItemLink = "Contact Company No." = field("Company No."), "Contact No." = field("No.");
+                        DataItemTableView = sorting("Contact Company No.", "Contact No.", Date);
                         RequestFilterFields = Date, "Segment No.", "Campaign No.", Evaluation, "Interaction Template Code", "Salesperson Code";
 
                         trigger OnAfterGetRecord()
@@ -79,8 +88,8 @@ report 5186 "Remove Contacts"
                     }
                     dataitem("Contact Job Responsibility"; "Contact Job Responsibility")
                     {
-                        DataItemLink = "Contact No." = FIELD("No.");
-                        DataItemTableView = SORTING("Contact No.", "Job Responsibility Code");
+                        DataItemLink = "Contact No." = field("No.");
+                        DataItemTableView = sorting("Contact No.", "Job Responsibility Code");
                         RequestFilterFields = "Job Responsibility Code";
                         RequestFilterHeading = 'Job Responsibility';
 
@@ -100,8 +109,8 @@ report 5186 "Remove Contacts"
                     }
                     dataitem("Contact Industry Group"; "Contact Industry Group")
                     {
-                        DataItemLink = "Contact No." = FIELD("Company No.");
-                        DataItemTableView = SORTING("Contact No.", "Industry Group Code");
+                        DataItemLink = "Contact No." = field("Company No.");
+                        DataItemTableView = sorting("Contact No.", "Industry Group Code");
                         RequestFilterFields = "Industry Group Code";
                         RequestFilterHeading = 'Industry Group';
 
@@ -121,13 +130,13 @@ report 5186 "Remove Contacts"
                     }
                     dataitem("Contact Business Relation"; "Contact Business Relation")
                     {
-                        DataItemLink = "Contact No." = FIELD("Company No.");
-                        DataItemTableView = SORTING("Contact No.", "Business Relation Code");
+                        DataItemLink = "Contact No." = field("Company No.");
+                        DataItemTableView = sorting("Contact No.", "Business Relation Code");
                         RequestFilterFields = "Business Relation Code";
                         RequestFilterHeading = 'Business Relation';
                         dataitem("Value Entry"; "Value Entry")
                         {
-                            DataItemTableView = SORTING("Source Type", "Source No.", "Item No.", "Posting Date");
+                            DataItemTableView = sorting("Source Type", "Source No.", "Item No.", "Posting Date");
                             RequestFilterFields = "Item No.", "Variant Code", "Posting Date", "Inventory Posting Group";
 
                             trigger OnAfterGetRecord()
@@ -178,7 +187,7 @@ report 5186 "Remove Contacts"
                     }
                     dataitem("Integer"; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
 
                         trigger OnAfterGetRecord()
                         begin

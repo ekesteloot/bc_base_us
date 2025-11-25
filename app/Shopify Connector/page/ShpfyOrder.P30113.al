@@ -11,6 +11,7 @@ page 30113 "Shpfy Order"
     RefreshOnActivate = true;
     SourceTable = "Shpfy Order Header";
     UsageCategory = None;
+
     layout
     {
         area(content)
@@ -41,7 +42,6 @@ page 30113 "Shpfy Order"
                     ApplicationArea = All;
                     Caption = 'Customer Template Code';
                     Lookup = true;
-                    ShowMandatory = true;
                     TableRelation = "Config. Template Header".Code where("Table Id" = const(18));
                     ToolTip = 'Specifies the code for the template to create a new customer.';
                     ObsoleteReason = 'Replaced by Customer Templ. Code';
@@ -55,7 +55,6 @@ page 30113 "Shpfy Order"
                     ApplicationArea = All;
                     Caption = 'Customer Template Code';
                     Lookup = true;
-                    ShowMandatory = true;
                     TableRelation = "Customer Templ.".Code;
                     ToolTip = 'Specifies the code for the template to create a new customer.';
 #if not CLEAN22
@@ -81,7 +80,7 @@ page 30113 "Shpfy Order"
                 field(Closed; Rec.Closed)
                 {
                     ApplicationArea = All;
-                    ToolTip = 'Specified if the Shopify order is archived by D365BC.';
+                    ToolTip = 'Specifies if the Shopify order is archived by D365BC.';
                 }
                 group(SellTo)
                 {
@@ -226,6 +225,13 @@ page 30113 "Shpfy Order"
                     ApplicationArea = All;
                     Editable = false;
                     ToolTip = 'Specifies the order''s status in terms of fulfilled line items. Valid values are: fulfilled, in progress, open, pending fulfillment, restocked, unfulfilled, partially fulfilled.';
+                }
+                field(ReturnStatus; Rec."Return Status")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    Visible = false;
+                    ToolTip = 'Specifies the status or returns assocuated with the order. Valid values are: inspection complete, in progress, no return, returned, return failed, return requested.';
                 }
                 field(SalesOrderNo; Rec."Sales Order No.")
                 {
@@ -639,6 +645,20 @@ page 30113 "Shpfy Order"
                 RunPageLink = "Shopify Order Id" = field("Shopify Order Id");
                 RunPageMode = View;
                 ToolTip = 'View an array of fulfillments associated with the Shopify Order.';
+            }
+            action(FulfillmentOrders)
+            {
+                ApplicationArea = All;
+                Caption = 'Fulfillment Orders';
+                Image = ShipmentLines;
+                Promoted = true;
+                PromotedCategory = Category4;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                RunObject = Page "Shpfy Fulfillment Orders";
+                RunPageLink = "Shopify Order Id" = field("Shopify Order Id");
+                RunPageMode = View;
+                ToolTip = 'View an array of fulfillment orders associated with the Shopify Order.';
             }
             action(SalesOrder)
             {

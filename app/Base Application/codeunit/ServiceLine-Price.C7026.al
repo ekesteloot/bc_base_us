@@ -1,3 +1,14 @@
+namespace Microsoft.ServiceMgt.Pricing;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Document;
+
 codeunit 7026 "Service Line - Price" implements "Line With Price"
 {
     var
@@ -9,7 +20,7 @@ codeunit 7026 "Service Line - Price" implements "Line With Price"
 
     procedure GetTableNo(): Integer
     begin
-        exit(Database::"Service Line")
+        exit(Enum::TableID::"Service Line".AsInteger());
     end;
 
     procedure SetLine(PriceType: Enum "Price Type"; Line: Variant)

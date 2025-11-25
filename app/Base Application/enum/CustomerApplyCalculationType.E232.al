@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Receivables;
+
 enum 232 "Customer Apply Calculation Type"
 {
     Extensible = true;

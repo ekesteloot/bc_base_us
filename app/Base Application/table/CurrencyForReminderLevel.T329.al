@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.FinancialMgt.Currency;
+
 table 329 "Currency for Reminder Level"
 {
     Caption = 'Currency for Reminder Level';
@@ -27,7 +31,7 @@ table 329 "Currency for Reminder Level"
         }
         field(4; "Additional Fee"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Additional Fee';
             MinValue = 0;

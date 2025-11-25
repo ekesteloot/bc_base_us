@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.Currency;
+
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Integration.Dataverse;
+using System.Text;
+
 page 5 Currencies
 {
     AdditionalSearchTerms = 'multiple foreign currency';
@@ -15,7 +22,7 @@ page 5 Currencies
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a currency code that you can select. The code must comply with ISO 4217.';
@@ -35,7 +42,7 @@ page 5 Currencies
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a three-digit code number defined in ISO 4217.';
                 }
-                field(Symbol; Symbol)
+                field(Symbol; Rec.Symbol)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the symbol for this currency that you wish to appear on checks, $ for USD, CAD or MXP for example.';
@@ -202,7 +209,7 @@ page 5 Currencies
                     var
                         CurrencyExchangeRate: Record "Currency Exchange Rate";
                     begin
-                        CurrencyExchangeRate.SetCurrentCurrencyFactor(Code, CurrencyFactor);
+                        CurrencyExchangeRate.SetCurrentCurrencyFactor(Rec.Code, CurrencyFactor);
                     end;
                 }
 #if not CLEAN23
@@ -271,7 +278,7 @@ page 5 Currencies
 
                     trigger OnAction()
                     begin
-                        SuggestSetupAccounts();
+                        Rec.SuggestSetupAccounts();
                     end;
                 }
             }
@@ -281,7 +288,7 @@ page 5 Currencies
                 Caption = 'Exch. &Rates';
                 Image = CurrencyExchangeRates;
                 RunObject = Page "Currency Exchange Rates";
-                RunPageLink = "Currency Code" = FIELD(Code);
+                RunPageLink = "Currency Code" = field(Code);
                 ToolTip = 'View updated exchange rates for the currencies that you use.';
             }
             action("Adjust Exchange Rate")
@@ -298,7 +305,7 @@ page 5 Currencies
                 Caption = 'Exchange Rate Adjust. Register';
                 Image = ExchangeRateAdjustRegister;
                 RunObject = Page "Exchange Rate Adjmt. Register";
-                RunPageLink = "Currency Code" = FIELD(Code);
+                RunPageLink = "Currency Code" = field(Code);
                 ToolTip = 'View the results of running the Adjust Exchange Rates batch job. One line is created for each currency or each combination of currency and posting group that is included in the adjustment.';
             }
             action("Exchange Rate Services")
@@ -349,7 +356,7 @@ page 5 Currencies
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -394,7 +401,7 @@ page 5 Currencies
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(MatchBasedCoupling)
@@ -448,7 +455,7 @@ page 5 Currencies
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -528,15 +535,15 @@ page 5 Currencies
     begin
         CRMIsCoupledToRecord := CRMIntegrationEnabled or CDSIntegrationEnabled;
         if CRMIsCoupledToRecord then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
     end;
 
     trigger OnAfterGetRecord()
     var
         CurrencyExchangeRate: Record "Currency Exchange Rate";
     begin
-        CurrencyFactor := CurrencyExchangeRate.GetCurrentCurrencyFactor(Code);
-        CurrencyExchangeRate.GetLastestExchangeRate(Code, ExchangeRateDate, ExchangeRateAmt);
+        CurrencyFactor := CurrencyExchangeRate.GetCurrentCurrencyFactor(Rec.Code);
+        CurrencyExchangeRate.GetLastestExchangeRate(Rec.Code, ExchangeRateDate, ExchangeRateAmt);
     end;
 
     trigger OnOpenPage()
@@ -566,14 +573,14 @@ page 5 Currencies
 
     procedure GetCurrency(var CurrencyCode: Code[10])
     begin
-        CurrencyCode := Code;
+        CurrencyCode := Rec.Code;
     end;
 
     local procedure DrillDownActionOnPage()
     var
         CurrExchRate: Record "Currency Exchange Rate";
     begin
-        CurrExchRate.SetRange("Currency Code", Code);
+        CurrExchRate.SetRange("Currency Code", Rec.Code);
         PAGE.RunModal(0, CurrExchRate);
         CurrPage.Update(false);
     end;

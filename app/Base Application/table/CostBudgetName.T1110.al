@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Budget;
+
 table 1110 "Cost Budget Name"
 {
     Caption = 'Cost Budget Name';

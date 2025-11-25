@@ -1,3 +1,21 @@
+namespace Microsoft.WarehouseMgt.Availability;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.WarehouseMgt.Worksheet;
+using System.Reflection;
+
 codeunit 7314 "Warehouse Availability Mgt."
 {
 
@@ -23,15 +41,15 @@ codeunit 7314 "Warehouse Availability Mgt."
     begin
         // Returns the reserved quantity against ILE for the demand line
         case SourceType of
-            Database::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component".AsInteger():
                 begin
                     ReservEntry.SetSourceFilter(SourceType, SourceSubType, SourceNo, SourceSubLineNo, true);
                     ReservEntry.SetSourceFilter('', SourceLineNo);
                 end;
-            Database::Job:
+            Enum::TableID::Job.AsInteger():
                 begin
                     ReservEntry.SetSourceFilter(
-                      Database::"Job Planning Line", "Job Planning Line Status"::Order.AsInteger(), SourceNo, SourceLineNo, true);
+                      Enum::TableID::"Job Planning Line".AsInteger(), "Job Planning Line Status"::Order.AsInteger(), SourceNo, SourceLineNo, true);
                     ReservEntry.SetSourceFilter('', 0);
                 end;
             else
@@ -42,7 +60,7 @@ codeunit 7314 "Warehouse Availability Mgt."
             repeat
                 ReservEntry2.SetRange("Entry No.", ReservEntry."Entry No.");
                 ReservEntry2.SetRange(Positive, true);
-                ReservEntry2.SetRange("Source Type", DATABASE::"Item Ledger Entry");
+                ReservEntry2.SetRange("Source Type", Enum::TableID::"Item Ledger Entry");
                 ReservEntry2.SetRange("Reservation Status", ReservEntry2."Reservation Status"::Reservation);
                 ReservEntry2.SetTrackingFilterFromItemTrackingSetupIfNotBlank(WhseItemTrackingSetup);
                 if ReservEntry2.Find('-') then
@@ -92,7 +110,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         CalcRsvQtyOnPicksShipsWithIT.SetRange(Positive, false);
 
         CalcRsvQtyOnPicksShipsWithIT.SetRange(Positive_2, true);
-        CalcRsvQtyOnPicksShipsWithIT.SetRange(Source_Type_2, DATABASE::"Item Ledger Entry");
+        CalcRsvQtyOnPicksShipsWithIT.SetRange(Source_Type_2, Enum::TableID::"Item Ledger Entry");
 
         if TrackingSpecification."Serial No." <> '' then
             CalcRsvQtyOnPicksShipsWithIT.SetRange(Serial_No_, TrackingSpecification."Serial No.");
@@ -142,7 +160,7 @@ codeunit 7314 "Warehouse Availability Mgt."
     begin
         // Returns the reserved part of the sum of outstanding quantity on pick lines and
         // quantity on shipment lines picked but not yet shipped for a given demand line
-        if SourceType = DATABASE::"Prod. Order Component" then
+        if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then
             PickedNotYetShippedQty := CalcQtyPickedOnProdOrderComponentLine(SourceSubType, SourceID, SourceProdOrderLine, SourceRefNo)
         else
             PickedNotYetShippedQty := CalcQtyPickedOnWhseShipmentLine(SourceType, SourceSubType, SourceID, SourceRefNo);
@@ -305,7 +323,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         WarehouseActivityLine.SetRange("Location Code", WhseWorksheetLine."Location Code");
         WarehouseActivityLine.SetRange("Activity Type", "Warehouse Activity Type"::Movement);
         WarehouseActivityLine.SetRange("Variant Code", WhseWorksheetLine."Variant Code");
-        WarehouseActivityLine.SetRange("Action Type", "Warehouse Action Type"::Take);
+        WarehouseActivityLine.SetRange("Action Type", WarehouseActivityLine."Action Type"::Take);
         WarehouseActivityLine.SetRange("Bin Code", WhseWorksheetLine."From Bin Code");
         WarehouseActivityLine.SetTrackingFilterFromWhseItemTrackingLineIfNotBlank(WhseItemTrackingLine);
         WarehouseActivityLine.CalcSums("Qty. Outstanding (Base)");
@@ -771,13 +789,13 @@ codeunit 7314 "Warehouse Availability Mgt."
     var
         Location: Record Location;
     begin
-        if SourceType = DATABASE::"Prod. Order Component" then
+        if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then
             exit(CalcQtyPickedOnProdOrderComponentLine(SourceSubType, SourceID, SourceProdOrderLine, SourceRefNo));
 
-        if SourceType = DATABASE::"Assembly Line" then
+        if SourceType = Enum::TableID::"Assembly Line".AsInteger() then
             exit(CalcQtyPickedOnAssemblyLine(SourceSubType, SourceID, SourceRefNo));
 
-        if SourceType = Database::"Job Planning Line" then
+        if SourceType = Enum::TableID::"Job Planning Line".AsInteger() then
             exit(CalcQtyPickedOnJobPlanningLine(SourceSubType, SourceID, SourceRefNo));
 
         if Location.RequireShipment(LocationCode) then begin
@@ -801,7 +819,7 @@ codeunit 7314 "Warehouse Availability Mgt."
     var
         WhseActivityLine: Record "Warehouse Activity Line";
     begin
-        if SourceType = DATABASE::"Prod. Order Component" then
+        if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then
             WhseActivityLine.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceProdOrderLine, SourceRefNo, true)
         else
             WhseActivityLine.SetSourceFilter(SourceType, SourceSubType, SourceID, SourceRefNo, -1, true);

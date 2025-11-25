@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Reflection;
+
 table 1524 "Workflow Rule"
 {
     Caption = 'Workflow Rule';
@@ -13,12 +17,12 @@ table 1524 "Workflow Rule"
         field(2; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = FILTER(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = filter(Table));
         }
         field(3; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table ID"));
+            TableRelation = Field."No." where(TableNo = field("Table ID"));
         }
         field(4; Operator; Option)
         {
@@ -35,12 +39,12 @@ table 1524 "Workflow Rule"
         field(9; "Workflow Step ID"; Integer)
         {
             Caption = 'Workflow Step ID';
-            TableRelation = "Workflow Step".ID WHERE("Workflow Code" = FIELD("Workflow Code"));
+            TableRelation = "Workflow Step".ID where("Workflow Code" = field("Workflow Code"));
         }
         field(10; "Field Caption"; Text[250])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table ID"),
-                                                              "No." = FIELD("Field No.")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table ID"),
+                                                              "No." = field("Field No.")));
             Caption = 'Field Caption';
             FieldClass = FlowField;
         }

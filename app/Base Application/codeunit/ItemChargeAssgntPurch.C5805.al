@@ -1,4 +1,11 @@
-﻿codeunit 5805 "Item Charge Assgnt. (Purch.)"
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.History;
+
+codeunit 5805 "Item Charge Assgnt. (Purch.)"
 {
     Permissions = TableData "Purchase Header" = r,
                   TableData "Purchase Line" = r,
@@ -680,7 +687,7 @@
         TempItemChargeAssgntPurch.DeleteAll();
     end;
 
-    local procedure AssignPurchItemCharge(var ItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)"; ItemChargeAssgntPurch2: Record "Item Charge Assignment (Purch)"; Currency: Record Currency; var QtyRemainder: Decimal; var AmountRemainder: Decimal)
+    procedure AssignPurchItemCharge(var ItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)"; ItemChargeAssgntPurch2: Record "Item Charge Assignment (Purch)"; Currency: Record Currency; var QtyRemainder: Decimal; var AmountRemainder: Decimal)
     begin
         ItemChargeAssgntPurch.Get(
           ItemChargeAssgntPurch2."Document Type",

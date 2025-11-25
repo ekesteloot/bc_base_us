@@ -4,12 +4,13 @@ report 88 "VAT- VIES Declaration Disk"
     Permissions = TableData "VAT Entry" = rimd;
     ProcessingOnly = true;
     UsageCategory = ReportsAndAnalysis;
+    AllowScheduling = false;
 
     dataset
     {
         dataitem("VAT Entry"; "VAT Entry")
         {
-            DataItemTableView = SORTING(Type, "Country/Region Code", "VAT Registration No.", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT Reporting Date") WHERE(Type = CONST(Sale));
+            DataItemTableView = sorting(Type, "Country/Region Code", "VAT Registration No.", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT Reporting Date") where(Type = const(Sale));
             RequestFilterFields = "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT Reporting Date";
 
             trigger OnAfterGetRecord()

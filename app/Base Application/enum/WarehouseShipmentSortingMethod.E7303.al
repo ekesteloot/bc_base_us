@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Document;
+
 enum 7303 "Warehouse Shipment Sorting Method"
 {
     Extensible = true;

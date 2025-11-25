@@ -7,7 +7,7 @@ report 10030 "Budget Amount by Period"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             MaxIteration = 1;
             RequestFilterFields = "No.", "Global Dimension 1 Filter", "Global Dimension 2 Filter", "Budget Filter";
 
@@ -23,7 +23,7 @@ report 10030 "Budget Amount by Period"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
 
             trigger OnAfterGetRecord()
             var

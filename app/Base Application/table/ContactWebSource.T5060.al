@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Contact;
+
+using Microsoft.CRM.Setup;
+
 table 5060 "Contact Web Source"
 {
     Caption = 'Contact Web Source';
@@ -9,7 +13,7 @@ table 5060 "Contact Web Source"
         {
             Caption = 'Contact No.';
             NotBlank = true;
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(2; "Web Source Code"; Code[10])
         {
@@ -23,14 +27,14 @@ table 5060 "Contact Web Source"
         }
         field(4; "Web Source Description"; Text[100])
         {
-            CalcFormula = Lookup ("Web Source".Description WHERE(Code = FIELD("Web Source Code")));
+            CalcFormula = Lookup("Web Source".Description where(Code = field("Web Source Code")));
             Caption = 'Web Source Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; "Contact Name"; Text[100])
         {
-            CalcFormula = Lookup (Contact.Name WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact No.")));
             Caption = 'Contact Name';
             Editable = false;
             FieldClass = FlowField;

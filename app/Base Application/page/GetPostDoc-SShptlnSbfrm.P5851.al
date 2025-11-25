@@ -60,7 +60,7 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = SalesReturnOrder;
                     ToolTip = 'Specifies that the item on the sales line is a catalog item, which means it is not normally kept in inventory.';
@@ -222,7 +222,7 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(ItemTrackingLines)
@@ -293,7 +293,7 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
 
         SalesShptLine := Rec;
         repeat
-            NextSteps := Next(Steps / Abs(Steps));
+            NextSteps := Rec.Next(Steps / Abs(Steps));
             ShowRec := IsShowRec(Rec);
             if ShowRec then begin
                 RealSteps := RealSteps + NextSteps;
@@ -301,7 +301,7 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
             end;
         until (NextSteps = 0) or (RealSteps = Steps);
         Rec := SalesShptLine;
-        Find();
+        Rec.Find();
         exit(RealSteps);
     end;
 
@@ -318,7 +318,6 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
         FillExactCostReverse: Boolean;
         Visible: Boolean;
         ShowRec: Boolean;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     local procedure IsFirstDocLine(): Boolean
@@ -329,12 +328,12 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
     begin
         TempSalesShptLine.Reset();
         TempSalesShptLine.CopyFilters(Rec);
-        TempSalesShptLine.SetRange("Document No.", "Document No.");
+        TempSalesShptLine.SetRange("Document No.", Rec."Document No.");
         if not TempSalesShptLine.FindFirst() then begin
             QtyNotReturned2 := QtyNotReturned;
             RevUnitCostLCY2 := RevUnitCostLCY;
             SalesShptLine2.CopyFilters(Rec);
-            SalesShptLine2.SetRange("Document No.", "Document No.");
+            SalesShptLine2.SetRange("Document No.", Rec."Document No.");
             if not SalesShptLine2.FindSet() then
                 exit(false);
             repeat
@@ -348,7 +347,7 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
             RevUnitCostLCY := RevUnitCostLCY2;
         end;
 
-        exit("Line No." = TempSalesShptLine."Line No.");
+        exit(Rec."Line No." = TempSalesShptLine."Line No.");
     end;
 
     local procedure IsShowRec(SalesShptLine2: Record "Sales Shipment Line"): Boolean
@@ -376,8 +375,8 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
 
     local procedure GetQtyReturned(): Decimal
     begin
-        if (Type = Type::Item) and (Quantity - QtyNotReturned > 0) then
-            exit(Quantity - QtyNotReturned);
+        if (Rec.Type = Rec.Type::Item) and (Rec.Quantity - QtyNotReturned > 0) then
+            exit(Rec.Quantity - QtyNotReturned);
         exit(0);
     end;
 
@@ -403,7 +402,7 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
     var
         SalesShptHeader: Record "Sales Shipment Header";
     begin
-        if not SalesShptHeader.Get("Document No.") then
+        if not SalesShptHeader.Get(Rec."Document No.") then
             exit;
         PAGE.Run(PAGE::"Posted Sales Shipment", SalesShptHeader);
     end;

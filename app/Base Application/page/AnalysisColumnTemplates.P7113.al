@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 7113 "Analysis Column Templates"
 {
     Caption = 'Analysis Column Templates';
@@ -56,9 +58,9 @@ page 7113 "Analysis Column Templates"
                     AnalysisReportMgt: Codeunit "Analysis Report Management";
                 begin
                     AnalysisLine.FilterGroup := 2;
-                    AnalysisLine.SetRange("Analysis Area", GetRangeMax("Analysis Area"));
+                    AnalysisLine.SetRange("Analysis Area", Rec.GetRangeMax("Analysis Area"));
                     AnalysisLine.FilterGroup := 0;
-                    AnalysisReportMgt.OpenAnalysisColumnsForm(AnalysisLine, Name);
+                    AnalysisReportMgt.OpenAnalysisColumnsForm(AnalysisLine, Rec.Name);
                 end;
             }
         }

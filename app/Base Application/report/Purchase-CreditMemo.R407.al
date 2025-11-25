@@ -1,7 +1,23 @@
+﻿namespace Microsoft.Purchases.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Vendor;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 407 "Purchase - Credit Memo"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/PurchaseCreditMemo.rdlc';
+    RDLCLayout = './Purchases/History/PurchaseCreditMemo.rdlc';
     Caption = 'Purchase - Credit Memo';
     PreviewMode = PrintLayout;
 
@@ -9,7 +25,7 @@ report 407 "Purchase - Credit Memo"
     {
         dataitem("Purch. Cr. Memo Hdr."; "Purch. Cr. Memo Hdr.")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Posted Purchase Cr. Memo';
             column(No_PurchCrMemoHeader; "No.")
@@ -65,10 +81,10 @@ report 407 "Purchase - Credit Memo"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(DocCaptCopyTxt; StrSubstNo(DocumentCaption(), CopyText))
                     {
                     }
@@ -228,7 +244,7 @@ report 407 "Purchase - Credit Memo"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purch. Cr. Memo Hdr.";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimTxt; DimText)
                         {
                         }
@@ -273,9 +289,9 @@ report 407 "Purchase - Credit Memo"
                     }
                     dataitem("Purch. Cr. Memo Line"; "Purch. Cr. Memo Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Purch. Cr. Memo Hdr.";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(ShowIntInfo_PurchCrMemoLine; ShowInternalInfo)
                         {
                         }
@@ -430,7 +446,7 @@ report 407 "Purchase - Credit Memo"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimTxtLoop2; DimText)
                             {
                             }
@@ -535,7 +551,7 @@ report 407 "Purchase - Credit Memo"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATBase_PurchCrMemoLine; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Purch. Cr. Memo Hdr."."Currency Code";
@@ -605,7 +621,7 @@ report 407 "Purchase - Credit Memo"
                     }
                     dataitem(VATCounterLCY; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VALExchRate; VALExchRate)
                         {
                         }
@@ -664,7 +680,7 @@ report 407 "Purchase - Credit Memo"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
 
                         trigger OnPreDataItem()
                         begin
@@ -674,7 +690,7 @@ report 407 "Purchase - Credit Memo"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(ShipToAddr1; ShipToAddr[1])
                         {
                         }
@@ -745,6 +761,7 @@ report 407 "Purchase - Credit Memo"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Purch. Cr. Memo Hdr.");
@@ -848,7 +865,7 @@ report 407 "Purchase - Credit Memo"
 
     var
         Text003: Label '(Applies to %1 %2)';
-        Text005: Label 'Purchase - Credit Memo%1', Comment = '%1 = Document No.';
+        Text005: Label 'Purchase - Credit Memo %1', Comment = '%1 = Document No.';
         GLSetup: Record "General Ledger Setup";
         CompanyInfo: Record "Company Information";
         SalesPurchPerson: Record "Salesperson/Purchaser";
@@ -899,7 +916,6 @@ report 407 "Purchase - Credit Memo"
         Text011: Label 'Purchase - Prepmt. Credit Memo %1';
         Text012: Label '%1% VAT';
         Text013: Label 'VAT Amount';
-        [InDataSet]
         LogInteractionEnable: Boolean;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -945,7 +961,7 @@ report 407 "Purchase - Credit Memo"
 
     procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Purch. Cr. Memo") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch. Cr. Memo") <> '';
     end;
 
     local procedure DocumentCaption(): Text[250]

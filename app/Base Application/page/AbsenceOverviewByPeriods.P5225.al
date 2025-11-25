@@ -121,8 +121,8 @@ page 5225 "Absence Overview by Periods"
     trigger OnOpenPage()
     begin
         SetMatrixColumns("Matrix Page Step Type"::Initial);
-        if HasFilter then
-            CauseOfAbsenceFilter := GetFilter("Cause of Absence Filter");
+        if Rec.HasFilter then
+            CauseOfAbsenceFilter := Rec.GetFilter("Cause of Absence Filter");
     end;
 
     var

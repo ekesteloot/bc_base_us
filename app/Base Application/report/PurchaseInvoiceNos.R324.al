@@ -1,7 +1,13 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.History;
+using System.Utilities;
+
 report 324 "Purchase Invoice Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/PurchaseInvoiceNos.rdlc';
+    RDLCLayout = './Purchases/Reports/PurchaseInvoiceNos.rdlc';
     Caption = 'Purchase Invoice Nos.';
     ObsoleteState = Pending;
     ObsoleteReason = 'Infrequently used report.';
@@ -11,7 +17,7 @@ report 324 "Purchase Invoice Nos."
     {
         dataitem("Purch. Inv. Header"; "Purch. Inv. Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Posted Purchase Invoice';
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
@@ -58,7 +64,7 @@ report 324 "Purchase Invoice Nos."
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorText_Number_; ErrorText[Number])
                 {
                 }
@@ -84,8 +90,8 @@ report 324 "Purchase Invoice Nos."
             }
             dataitem(PurchInvHeader; "Purch. Inv. Header")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("No.");
                 column(PurchInvHeader__User_ID_; "User ID")
                 {
                 }

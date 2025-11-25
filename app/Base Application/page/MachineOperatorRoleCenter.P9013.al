@@ -1,3 +1,19 @@
+﻿namespace Microsoft.Manufacturing.RoleCenters;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Journal;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Reports;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Activity;
+using System.Security.User;
+using System.Threading;
+
 page 9013 "Machine Operator Role Center"
 {
     Caption = 'Machine Operator - Manufacturing Comprehensive';
@@ -94,7 +110,7 @@ page 9013 "Machine Operator Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = 'Produced';
                 RunObject = Page "Item List";
-                RunPageView = WHERE("Replenishment System" = CONST("Prod. Order"));
+                RunPageView = where("Replenishment System" = const("Prod. Order"));
                 ToolTip = 'View the list of production items.';
             }
             action(ItemsRawMaterials)
@@ -102,9 +118,9 @@ page 9013 "Machine Operator Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = 'Raw Materials';
                 RunObject = Page "Item List";
-                RunPageView = WHERE("Low-Level Code" = FILTER(> 0),
-                                    "Replenishment System" = CONST(Purchase),
-                                    "Production BOM No." = FILTER(= ''));
+                RunPageView = where("Low-Level Code" = filter(> 0),
+                                    "Replenishment System" = const(Purchase),
+                                    "Production BOM No." = filter(= ''));
                 ToolTip = 'View the list of items that are not bills of material.';
             }
             action("Stockkeeping Units")
@@ -142,8 +158,8 @@ page 9013 "Machine Operator Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = 'Consumption Journals';
                 RunObject = Page "Item Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Consumption),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Consumption),
+                                    Recurring = const(false));
                 ToolTip = 'Post the consumption of material as operations are performed.';
             }
             action(OutputJournals)
@@ -151,8 +167,8 @@ page 9013 "Machine Operator Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = 'Output Journals';
                 RunObject = Page "Item Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Output),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Output),
+                                    Recurring = const(false));
                 ToolTip = 'Post finished end items and time spent in production. ';
             }
             action(CapacityJournals)
@@ -160,8 +176,8 @@ page 9013 "Machine Operator Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = 'Capacity Journals';
                 RunObject = Page "Item Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Capacity),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Capacity),
+                                    Recurring = const(false));
                 ToolTip = 'Post consumed capacities that are not assigned to the production order. For example, maintenance work must be assigned to capacity, but not to a production order.';
             }
             action(RecurringCapacityJournals)
@@ -169,8 +185,8 @@ page 9013 "Machine Operator Role Center"
                 ApplicationArea = Manufacturing;
                 Caption = 'Recurring Capacity Journals';
                 RunObject = Page "Item Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Capacity),
-                                    Recurring = CONST(true));
+                RunPageView = where("Template Type" = const(Capacity),
+                                    Recurring = const(true));
                 ToolTip = 'Post consumed capacities that are not posted as part of production order output, such as maintenance work.';
             }
             action("Navi&gate")
@@ -193,9 +209,6 @@ page 9013 "Machine Operator Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Inventory P&ick';
                 Image = CreateInventoryPickup;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Inventory Pick";
                 RunPageMode = Create;
                 ToolTip = 'Create a pick according to a basic warehouse configuration, for example to pick components for a production order. ';
@@ -205,9 +218,6 @@ page 9013 "Machine Operator Role Center"
                 ApplicationArea = Warehouse;
                 Caption = 'Inventory Put-&away';
                 Image = CreatePutAway;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Inventory Put-away";
                 RunPageMode = Create;
                 ToolTip = 'View ongoing put-aways of items to bins according to a basic warehouse configuration. ';

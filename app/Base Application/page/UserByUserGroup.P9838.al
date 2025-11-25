@@ -1,4 +1,8 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
+using System.Environment;
+
 page 9838 "User by User Group"
 {
     Caption = 'User by User Group';
@@ -189,7 +193,7 @@ page 9838 "User by User Group"
             part(Control6; "Permission Sets FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "User Security ID" = FIELD("User Security ID");
+                SubPageLink = "User Security ID" = field("User Security ID");
             }
         }
     }
@@ -351,10 +355,10 @@ page 9838 "User by User Group"
         if not EnvironmentInfo.IsSaaS() then
             exit;
 
-        OriginalFilterGroup := FilterGroup;
-        FilterGroup := 2;
-        SetFilter("License Type", '<>%1&<>%2', "License Type"::"External User", "License Type"::"AAD Group");
-        FilterGroup := OriginalFilterGroup;
+        OriginalFilterGroup := Rec.FilterGroup;
+        Rec.FilterGroup := 2;
+        Rec.SetFilter("License Type", '<>%1&<>%2', Rec."License Type"::"External User", Rec."License Type"::"AAD Group");
+        Rec.FilterGroup := OriginalFilterGroup;
     end;
 }
 

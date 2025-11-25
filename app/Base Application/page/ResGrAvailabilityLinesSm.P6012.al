@@ -1,3 +1,11 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Resources.Analysis;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Document;
+using System.Utilities;
+
 page 6012 "Res.Gr Availability Lines (SM)"
 {
     Caption = 'Lines';
@@ -29,7 +37,7 @@ page 6012 "Res.Gr Availability Lines (SM)"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period shown in the line.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Capacity';
@@ -42,7 +50,7 @@ page 6012 "Res.Gr Availability Lines (SM)"
                         IsHandled: Boolean;
                     begin
                         ResCapacityEntry.SetRange("Resource Group No.", ResGr."No.");
-                        ResCapacityEntry.SetRange(Date, "Period Start", "Period End");
+                        ResCapacityEntry.SetRange(Date, Rec."Period Start", Rec."Period End");
                         IsHandled := false;
                         OnAfterCapacityOnDrillDown(ResCapacityEntry, IsHandled);
                         if IsHandled then
@@ -63,13 +71,13 @@ page 6012 "Res.Gr Availability Lines (SM)"
                         ServOrderAlloc: Record "Service Order Allocation";
                     begin
                         ServOrderAlloc.SetRange("Resource Group No.", ResGr."No.");
-                        ServOrderAlloc.SetRange("Allocation Date", "Period Start", "Period End");
+                        ServOrderAlloc.SetRange("Allocation Date", Rec."Period Start", Rec."Period End");
                         ServOrderAlloc.SetFilter(Status, '%1|%2', ServOrderAlloc.Status::Active, ServOrderAlloc.Status::Finished);
                         ServOrderAlloc.SetRange(Posted, false);
                         PAGE.RunModal(0, ServOrderAlloc);
                     end;
                 }
-                field(NetAvailability; "Net Availability")
+                field(NetAvailability; Rec."Net Availability")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Net Availability';
@@ -86,7 +94,7 @@ page 6012 "Res.Gr Availability Lines (SM)"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcLine();
     end;
 
@@ -110,7 +118,7 @@ page 6012 "Res.Gr Availability Lines (SM)"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -134,9 +142,9 @@ page 6012 "Res.Gr Availability Lines (SM)"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            ResGr.SetRange("Date Filter", "Period Start", "Period End")
+            ResGr.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            ResGr.SetRange("Date Filter", 0D, "Period End");
+            ResGr.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     local procedure CalcLine()
@@ -144,9 +152,9 @@ page 6012 "Res.Gr Availability Lines (SM)"
         SetDateFilter();
         ResGr.CalcFields(Capacity, "Qty. on Service Order");
 
-        Capacity := ResGr.Capacity;
-        "Qty. on Service Order" := ResGr."Qty. on Service Order";
-        "Net Availability" := Capacity - "Qty. on Service Order";
+        Rec.Capacity := ResGr.Capacity;
+        Rec."Qty. on Service Order" := ResGr."Qty. on Service Order";
+        Rec."Net Availability" := Rec.Capacity - Rec."Qty. on Service Order";
 
         OnAfterCalcLine(ResGr, Rec);
     end;

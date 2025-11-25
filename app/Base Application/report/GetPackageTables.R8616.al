@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Environment;
+
 report 8616 "Get Package Tables"
 {
     Caption = 'Get Package Tables';

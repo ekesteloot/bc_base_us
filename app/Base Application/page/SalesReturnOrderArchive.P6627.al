@@ -1,3 +1,11 @@
+namespace Microsoft.Sales.Archive;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Sales.Customer;
+using Microsoft.Shared.Archive;
+using System.Security.User;
+
 page 6627 "Sales Return Order Archive"
 {
     Caption = 'Sales Return Order Archive';
@@ -5,7 +13,7 @@ page 6627 "Sales Return Order Archive"
     Editable = false;
     PageType = Document;
     SourceTable = "Sales Header Archive";
-    SourceTableView = WHERE("Document Type" = CONST("Return Order"));
+    SourceTableView = where("Document Type" = const("Return Order"));
 
     layout
     {
@@ -166,9 +174,9 @@ page 6627 "Sales Return Order Archive"
             part(SalesLinesArchive; "Sales Return Order Arc Subform")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Document No." = FIELD("No."),
-                              "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                              "Version No." = FIELD("Version No.");
+                SubPageLink = "Document No." = field("No."),
+                              "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                              "Version No." = field("Version No.");
             }
             group("Invoice Details")
             {
@@ -405,7 +413,7 @@ page 6627 "Sales Return Order Archive"
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the point of exit through which you ship the items out of your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the country or region of origin for the purpose of Intrastat reporting.';
@@ -428,7 +436,7 @@ page 6627 "Sales Return Order Archive"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Archived By");
+                        UserMgt.DisplayUserInformation(Rec."Archived By");
                     end;
                 }
                 field("Date Archived"; Rec."Date Archived")
@@ -476,7 +484,7 @@ page 6627 "Sales Return Order Archive"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No.");
+                    RunPageLink = "No." = field("Sell-to Customer No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer on the sales document.';
                 }
@@ -491,7 +499,7 @@ page 6627 "Sales Return Order Archive"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Co&mments")
@@ -500,11 +508,11 @@ page 6627 "Sales Return Order Archive"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Archive Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0),
-                                  "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                  "Version No." = FIELD("Version No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0),
+                                  "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                  "Version No." = field("Version No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Print)
@@ -565,8 +573,8 @@ page 6627 "Sales Return Order Archive"
 
     trigger OnAfterGetRecord()
     begin
-        SellToContact.GetOrClear("Sell-to Contact No.");
-        BillToContact.GetOrClear("Bill-to Contact No.");
+        SellToContact.GetOrClear(Rec."Sell-to Contact No.");
+        BillToContact.GetOrClear(Rec."Bill-to Contact No.");
     end;
 
     var

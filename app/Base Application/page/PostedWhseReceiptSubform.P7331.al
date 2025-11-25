@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.History;
+
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7331 "Posted Whse. Receipt Subform"
 {
     AutoSplitKey = true;
@@ -192,19 +197,19 @@ page 7331 "Posted Whse. Receipt Subform"
 
     local procedure ShowPostedSourceDoc()
     begin
-        WMSMgt.ShowPostedSourceDocument("Posted Source Document", "Posted Source No.");
+        WMSMgt.ShowPostedSourceDocument(Rec."Posted Source Document", Rec."Posted Source No.");
     end;
 
     local procedure ShowBinContents()
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", "Bin Code");
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", Rec."Bin Code");
     end;
 
     local procedure ShowWhseLine()
     begin
-        WMSMgt.ShowPostedWhseRcptLine("Whse. Receipt No.", "Whse Receipt Line No.");
+        WMSMgt.ShowPostedWhseRcptLine(Rec."Whse. Receipt No.", Rec."Whse Receipt Line No.");
     end;
 
     procedure PutAwayCreate()
@@ -212,9 +217,9 @@ page 7331 "Posted Whse. Receipt Subform"
         PostedWhseRcptHdr: Record "Posted Whse. Receipt Header";
         PostedWhseRcptLine: Record "Posted Whse. Receipt Line";
     begin
-        PostedWhseRcptHdr.Get("No.");
+        PostedWhseRcptHdr.Get(Rec."No.");
         PostedWhseRcptLine.Copy(Rec);
-        CreatePutAwayDoc(PostedWhseRcptLine, PostedWhseRcptHdr."Assigned User ID");
+        Rec.CreatePutAwayDoc(PostedWhseRcptLine, PostedWhseRcptHdr."Assigned User ID");
     end;
 }
 

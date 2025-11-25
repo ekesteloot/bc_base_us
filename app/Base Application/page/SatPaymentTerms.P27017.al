@@ -12,7 +12,7 @@ page 27017 "SAT Payment Terms"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for this entry according to the SAT payment term definition.';

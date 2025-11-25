@@ -1,3 +1,10 @@
+namespace Microsoft.ProjectMgt.Resources.Setup;
+
+using Microsoft.Foundation.NoSeries;
+#if not CLEAN22
+using System.Telemetry;
+#endif
+
 table 314 "Resources Setup"
 {
     Caption = 'Resources Setup';

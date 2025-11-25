@@ -38,11 +38,17 @@ codeunit 1535 "Approvals Mgmt."
         NoWorkflowEnabledErr: Label 'No approval workflow for this record type is enabled.';
         ApprovalReqCanceledForSelectedLinesMsg: Label 'The approval request for the selected record has been canceled.';
         PendingJournalBatchApprovalExistsErr: Label 'An approval request already exists.', Comment = '%1 is the Document No. of the journal line';
+        ApprovedJournalBatchApprovalExistsMsg: Label 'An approval request for this batch has already been sent and approved. Do you want to send another approval request?';
         ApporvalChainIsUnsupportedMsg: Label 'Only Direct Approver is supported as Approver Limit Type option for %1. The approval request will be approved automatically.', Comment = 'Only Direct Approver is supported as Approver Limit Type option for Gen. Journal Batch DEFAULT, CASH. The approval request will be approved automatically.';
         RecHasBeenApprovedMsg: Label '%1 has been approved.', Comment = '%1 = Record Id';
         NoPermissionToDelegateErr: Label 'You do not have permission to delegate one or more of the selected approval requests.';
         NothingToApproveErr: Label 'There is nothing to approve.';
         ApproverChainErr: Label 'No sufficient approver was found in the approver chain.';
+        PreventModifyRecordWithOpenApprovalEntryMsg: Label 'You can''t modify a record pending approval. Add a comment or reject the approval to modify the record.';
+        PreventInsertRecordWithOpenApprovalEntryForCurrUserMsg: Label 'You can''t insert a record for active batch approval request. To insert a record, you can Reject approval and document requested changes in approval comment lines.';
+        PreventInsertRecordWithOpenApprovalEntryMsg: Label 'You can''t insert a record that has active approval request. Do you want to cancel the batch approval request first?';
+        PreventDeleteRecordWithOpenApprovalEntryMsg: Label 'You can''t delete a record that has open approval entries. Do you want to cancel the approval request first?';
+        PreventDeleteRecordWithOpenApprovalEntryForCurrUserMsg: Label 'You can''t delete a record that has open approval entries. To delete a record, you can Reject approval and document requested changes in approval comment lines.';
 
     [IntegrationEvent(false, false)]
     procedure OnSendPurchaseDocForApproval(var PurchaseHeader: Record "Purchase Header")
@@ -411,6 +417,13 @@ codeunit 1535 "Approvals Mgmt."
         ApprovalEntry.SetRange("Approver ID", UserId);
 
         exit(ApprovalEntry.FindFirst());
+    end;
+
+    procedure FindApprovalEntryByRecordId(var ApprovalEntry: Record "Approval Entry"; RecordID: RecordID): Boolean
+    begin
+        ApprovalEntry.SetRange("Table ID", RecordID.TableNo);
+        ApprovalEntry.SetRange("Record ID to Approve", RecordID);
+        exit(ApprovalEntry.FindLast());
     end;
 
     local procedure ShowPurchApprovalStatus(PurchaseHeader: Record "Purchase Header")
@@ -895,7 +908,7 @@ codeunit 1535 "Approvals Mgmt."
         MakeApprovalEntry(ApprovalEntryArgument, SequenceNo, UserId, WorkflowStepArgument);
     end;
 
-    local procedure CreateApprovalRequestForSpecificUser(WorkflowStepArgument: Record "Workflow Step Argument"; ApprovalEntryArgument: Record "Approval Entry")
+    procedure CreateApprovalRequestForSpecificUser(WorkflowStepArgument: Record "Workflow Step Argument"; ApprovalEntryArgument: Record "Approval Entry")
     var
         UserSetup: Record "User Setup";
         UsrId: Code[50];
@@ -1100,7 +1113,7 @@ codeunit 1535 "Approvals Mgmt."
                     OnPopulateApprovalEntryArgument(RecRef, ApprovalEntryArgument, WorkflowStepInstance);
             end;
         end;
-
+        
         OnAfterPopulateApprovalEntryArgument(WorkflowStepInstance, ApprovalEntryArgument, IsHandled, RecRef);
     end;
 
@@ -1540,9 +1553,15 @@ codeunit 1535 "Approvals Mgmt."
 
     [EventSubscriber(ObjectType::Table, Database::"Gen. Journal Batch", 'OnAfterDeleteEvent', '', false, false)]
     procedure DeleteApprovalEntriesAfterDeleteGenJournalBatch(var Rec: Record "Gen. Journal Batch"; RunTrigger: Boolean)
+    var
+        GenJnlTemplate: Record "Gen. Journal Template";
     begin
-        if not Rec.IsTemporary then
-            DeleteApprovalEntries(Rec.RecordId);
+        if Rec.IsTemporary then
+            exit;
+
+        if GenJnlTemplate.Get(Rec."Journal Template Name") then
+            if not GenJnlTemplate."Increment Batch Name" then
+                DeleteApprovalEntries(Rec.RecordId);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnAfterDeleteEvent', '', false, false)]
@@ -1848,6 +1867,20 @@ codeunit 1535 "Approvals Mgmt."
         exit(not ApprovalEntry.IsEmpty);
     end;
 
+    procedure HasApprovedApprovalEntries(RecordID: RecordID): Boolean
+    var
+        ApprovalEntry: Record "Approval Entry";
+    begin
+        ApprovalEntry.SetRange("Table ID", RecordID.TableNo);
+        ApprovalEntry.SetRange("Record ID to Approve", RecordID);
+        ApprovalEntry.SetRange(Status, ApprovalEntry.Status::Approved);
+        if ApprovalEntry.IsEmpty() then
+            exit(false);
+        ApprovalEntry.SetRange("Related to Change", false);
+        exit(not ApprovalEntry.IsEmpty);
+    end;
+
+
     procedure HasApprovalEntries(RecordID: RecordID): Boolean
     var
         ApprovalEntry: Record "Approval Entry";
@@ -1923,6 +1956,9 @@ codeunit 1535 "Approvals Mgmt."
            HasAnyOpenJournalLineApprovalEntries(GenJournalBatch."Journal Template Name", GenJournalBatch.Name)
         then
             Error(PendingJournalBatchApprovalExistsErr);
+        if HasApprovedApprovalEntries(GenJournalBatch.RecordId) then
+            if not Confirm(ApprovedJournalBatchApprovalExistsMsg) then
+                exit;
         OnSendGeneralJournalBatchForApproval(GenJournalBatch);
     end;
 
@@ -2166,6 +2202,17 @@ codeunit 1535 "Approvals Mgmt."
         OnAfterCanCancelApprovalForRecord(RecID, Result, ApprovalEntry, UserSetup);
     end;
 
+    procedure HasApprovalEntriesSentByCurrentUser(RecordId: RecordId): Boolean
+    var
+        ApprovalEntry: Record "Approval Entry";
+    begin
+        ApprovalEntry.SetRange("Table ID", RecordID.TableNo);
+        ApprovalEntry.SetRange("Record ID to Approve", RecordID);
+        ApprovalEntry.SetFilter(Status, '<>%1', ApprovalEntry.Status::Canceled);
+        ApprovalEntry.SetRange("Sender ID", UserId());
+        exit(not ApprovalEntry.IsEmpty());
+    end;
+
     local procedure FindUserSetupBySalesPurchCode(var UserSetup: Record "User Setup"; ApprovalEntryArgument: Record "Approval Entry")
     var
         IsHandled: Boolean;
@@ -2239,6 +2286,124 @@ codeunit 1535 "Approvals Mgmt."
         ClientTypeManagement: Codeunit "Client Type Management";
     begin
         exit(ClientTypeManagement.GetCurrentClientType() in [ClientType::Background]);
+    end;
+
+    procedure PreventDeletingRecordWithOpenApprovalEntry(Variant: Variant)
+    var
+        GenJournalBatch: Record "Gen. Journal Batch";
+        GenJournalLine: Record "Gen. Journal Line";
+        ConfirmManagement: Codeunit "Confirm Management";
+        WorkflowWebhookMgt: Codeunit "Workflow Webhook Management";
+        RecRef: RecordRef;
+    begin
+        RecRef.GetTable(Variant);
+        if HasOpenApprovalEntriesForCurrentUser(RecRef.RecordId) and (not CanCancelApprovalForRecord(RecRef.RecordId)) then
+            Error(PreventDeleteRecordWithOpenApprovalEntryForCurrUserMsg);
+
+        if (HasOpenApprovalEntries(RecRef.RecordId) and CanCancelApprovalForRecord(RecRef.RecordId))
+         or WorkflowWebhookMgt.HasPendingWorkflowWebhookEntryByRecordId(RecRef.RecordId) then
+            if ConfirmManagement.GetResponseOrDefault(PreventDeleteRecordWithOpenApprovalEntryMsg, true) then
+                case RecRef.Number of
+                    Database::"Gen. Journal Batch":
+                        begin
+                            RecRef.SetTable(GenJournalBatch);
+                            OnCancelGeneralJournalBatchApprovalRequest(GenJournalBatch);
+                        end;
+                    Database::"Gen. Journal Line":
+                        begin
+                            RecRef.SetTable(GenJournalLine);
+                            OnCancelGeneralJournalLineApprovalRequest(GenJournalLine);
+                        end;
+                end
+            else
+                Error('');
+    end;
+
+    procedure PreventInsertRecIfOpenApprovalEntryExist(Variant: Variant)
+    var
+        GenJournalBatch: Record "Gen. Journal Batch";
+        WorkflowWebhookMgt: Codeunit "Workflow Webhook Management";
+        ConfirmManagement: Codeunit "Confirm Management";
+        RecRef: RecordRef;
+    begin
+        RecRef.GetTable(Variant);
+        case RecRef.Number of
+            Database::"Gen. Journal Batch":
+                begin
+                    if HasOpenApprovalEntriesForCurrentUser(RecRef.RecordId) and (not CanCancelApprovalForRecord(RecRef.RecordId)) then
+                        Error(PreventInsertRecordWithOpenApprovalEntryForCurrUserMsg);
+
+                    if (HasOpenApprovalEntries(RecRef.RecordId) and CanCancelApprovalForRecord(RecRef.RecordId))
+                      or WorkflowWebhookMgt.HasPendingWorkflowWebhookEntryByRecordId(RecRef.RecordId) then
+                        if ConfirmManagement.GetResponseOrDefault(PreventInsertRecordWithOpenApprovalEntryMsg, true) then begin
+                            RecRef.SetTable(GenJournalBatch);
+                            OnCancelGeneralJournalBatchApprovalRequest(GenJournalBatch);
+                        end else
+                            Error('');
+                end;
+        end;
+    end;
+
+    procedure PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(Variant: Variant)
+    var
+        WorkflowWebhookMgt: Codeunit "Workflow Webhook Management";
+        RecRef: RecordRef;
+        ErrInfo: ErrorInfo;
+        RejectApprovalRequestLbl: Label 'Reject approval';
+        ShowCommentsLbl: Label 'Show comments';
+        RejectApprovalRequestToolTipLbl: Label 'Reject approval request';
+        ShowCommentsToolTipLbl: Label 'Show approval comments';
+    begin
+        RecRef.GetTable(Variant);
+        if HasOpenApprovalEntriesForCurrentUser(RecRef.RecordId) or WorkflowWebhookMgt.HasPendingWorkflowWebhookEntryByRecordId(RecRef.RecordId) then begin
+            ErrInfo.ErrorType(ErrorType::Client);
+            ErrInfo.Verbosity(Verbosity::Error);
+            ErrInfo.Message(PreventModifyRecordWithOpenApprovalEntryMsg);
+            ErrInfo.TableId(RecRef.Number);
+            ErrInfo.RecordId(RecRef.RecordId);
+            ErrInfo.AddAction(RejectApprovalRequestLbl, Codeunit::"Approvals Mgmt.", 'RejectApprovalRequest', RejectApprovalRequestToolTipLbl);
+            ErrInfo.AddAction(ShowCommentsLbl, Codeunit::"Approvals Mgmt.", 'ShowApprovalCommentLinesForJournal', ShowCommentsToolTipLbl);
+            Error(ErrInfo);
+        end;
+    end;
+
+    procedure ShowApprovalCommentLinesForJournal(ErrInfo: ErrorInfo)
+    var
+        ApprovalCommentLine: Record "Approval Comment Line";
+        ApprovalComments: Page "Approval Comments";
+    begin
+        ApprovalCommentLine.SetRange("Table ID", ErrInfo.TableId());
+        ApprovalCommentLine.SetRange("Record ID to Approve", ErrInfo.RecordId());
+        ApprovalComments.SetTableView(ApprovalCommentLine);
+        ApprovalComments.RunModal();
+    end;
+
+    procedure RejectApprovalRequest(ErrInfo: ErrorInfo)
+    begin
+        RejectRecordApprovalRequest(ErrInfo.RecordId());
+    end;
+
+    procedure SendJournalLinesApprovalRequests(var GenJournalLine: Record "Gen. Journal Line")
+    var
+        BatchProcessingMgt: Codeunit "Batch Processing Mgt.";
+        NoOfSelected: Integer;
+        NoOfSkipped: Integer;
+    begin
+        NoOfSelected := GenJournalLine.Count();
+
+        if NoOfSelected = 1 then begin
+            TrySendJournalLineApprovalRequests(GenJournalLine);
+            exit;
+        end;
+
+        repeat
+            if not HasOpenApprovalEntries(GenJournalLine.RecordId) then
+                GenJournalLine.Mark(true);
+        until GenJournalLine.Next() = 0;
+        GenJournalLine.MarkedOnly(true);
+        if GenJournalLine.Find('-') then;
+        NoOfSkipped := NoOfSelected - GenJournalLine.Count();
+        BatchProcessingMgt.BatchProcess(GenJournalLine, Codeunit::"Approvals Journal Line Request", Enum::"Error Handling Options"::"Show Error", NoOfSelected, NoOfSkipped);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnBeforeScheduleTask', '', true, true)]

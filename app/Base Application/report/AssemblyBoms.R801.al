@@ -1,7 +1,12 @@
+namespace Microsoft.AssemblyMgt.Reports;
+
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+
 report 801 "Assembly BOMs"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Assembly/AssemblyBOMs.rdlc';
+    RDLCLayout = './AssemblyMgt/Reports/AssemblyBOMs.rdlc';
     AdditionalSearchTerms = 'bill of material';
     ApplicationArea = Assembly;
     Caption = 'BOMs';
@@ -40,8 +45,8 @@ report 801 "Assembly BOMs"
             dataitem("BOM Component"; "BOM Component")
             {
                 CalcFields = "Assembly BOM";
-                DataItemLink = "Parent Item No." = FIELD("No.");
-                DataItemTableView = SORTING("Parent Item No.", "Line No.");
+                DataItemLink = "Parent Item No." = field("No.");
+                DataItemTableView = sorting("Parent Item No.", "Line No.");
                 column(Position_BOMComp; Position)
                 {
                     IncludeCaption = true;

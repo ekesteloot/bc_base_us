@@ -1,3 +1,12 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+
 report 7390 "Whse. Calculate Inventory"
 {
     Caption = 'Whse. Calculate Inventory';
@@ -7,7 +16,7 @@ report 7390 "Whse. Calculate Inventory"
     {
         dataitem("Bin Content"; "Bin Content")
         {
-            DataItemTableView = SORTING("Location Code", "Bin Code", "Item No.", "Variant Code", "Unit of Measure Code");
+            DataItemTableView = sorting("Location Code", "Bin Code", "Item No.", "Variant Code", "Unit of Measure Code");
             RequestFilterFields = "Zone Code", "Bin Code", "Item No.", "Variant Code", "Unit of Measure Code", "Bin Type Code", "Warehouse Class Code";
 
             trigger OnAfterGetRecord()

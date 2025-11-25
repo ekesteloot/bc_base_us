@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
 enum 7345 "Warehouse Pick Document Type"
 {
     Extensible = true;

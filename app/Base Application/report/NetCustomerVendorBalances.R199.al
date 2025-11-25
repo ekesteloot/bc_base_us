@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Vendor;
+
 report 199 "Net Customer/Vendor Balances"
 {
     Caption = 'Net Customer/Vendor Balances';

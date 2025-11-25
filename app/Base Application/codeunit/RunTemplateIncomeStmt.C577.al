@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using System.Environment;
+using System.Integration;
+
 codeunit 577 "Run Template Income Stmt."
 {
 

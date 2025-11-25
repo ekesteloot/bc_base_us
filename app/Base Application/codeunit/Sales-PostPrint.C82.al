@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.Posting;
+
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+
 codeunit 82 "Sales-Post + Print"
 {
     TableNo = "Sales Header";

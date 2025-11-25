@@ -1,11 +1,15 @@
+namespace System.TestTools.TestRunner;
+
+using System.Reflection;
+
 page 130402 "CAL Test Codeunits"
 {
     Caption = 'CAL Test Codeunits';
     Editable = false;
     PageType = List;
     SourceTable = AllObjWithCaption;
-    SourceTableView = WHERE("Object Type" = CONST(Codeunit),
-                            "Object Subtype" = CONST('Test'));
+    SourceTableView = where("Object Type" = const(Codeunit),
+                            "Object Subtype" = const('Test'));
 
     layout
     {

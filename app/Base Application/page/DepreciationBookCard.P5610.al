@@ -1,3 +1,10 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Posting;
+
 page 5610 "Depreciation Book Card"
 {
     Caption = 'Depreciation Book Card';
@@ -12,7 +19,7 @@ page 5610 "Depreciation Book Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies a code that identifies the depreciation book.';
@@ -259,7 +266,7 @@ page 5610 "Depreciation Book Card"
                     Ellipsis = false;
                     Image = Setup;
                     RunObject = Page "FA Posting Type Setup";
-                    RunPageLink = "Depreciation Book Code" = FIELD(Code);
+                    RunPageLink = "Depreciation Book Code" = field(Code);
                     ToolTip = 'Set up how to handle the write-down, appreciation, custom 1, and custom 2 posting types that you use when posting to fixed assets.';
                 }
                 action("FA &Journal Setup")
@@ -268,7 +275,7 @@ page 5610 "Depreciation Book Card"
                     Caption = 'FA &Journal Setup';
                     Image = JournalSetup;
                     RunObject = Page "FA Journal Setup";
-                    RunPageLink = "Depreciation Book Code" = FIELD(Code);
+                    RunPageLink = "Depreciation Book Code" = field(Code);
                     ToolTip = 'Set up the FA general ledger journal, the FA journal, and the insurance journal templates and batches to use when duplicating depreciation entries and acquisition-cost entries and when calculating depreciation or indexing fixed assets.';
                 }
             }

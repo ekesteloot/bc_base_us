@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5111 "Profile Questionnaire List"
 {
     Caption = 'Profile Questionnaire List';
@@ -12,7 +14,7 @@ page 5111 "Profile Questionnaire List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code of the profile questionnaire.';

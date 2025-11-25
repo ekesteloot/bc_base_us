@@ -1,3 +1,15 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Planning;
+#if not CLEAN21
+using Microsoft.ProjectMgt.Resources.Pricing;
+#endif
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Document;
+using System.Utilities;
+
 page 9217 "ResGrp. All. per Serv.  Matrix"
 {
     Caption = 'Resource Group Allocated per Service Order Matrix';
@@ -447,7 +459,7 @@ page 9217 "ResGrp. All. per Serv.  Matrix"
 
                     trigger OnAction()
                     begin
-                        if "Document Type" = "Document Type"::Quote then
+                        if Rec."Document Type" = Rec."Document Type"::Quote then
                             PAGE.Run(PAGE::"Service Quote", Rec)
                         else
                             PAGE.Run(PAGE::"Service Order", Rec);
@@ -466,8 +478,8 @@ page 9217 "ResGrp. All. per Serv.  Matrix"
                     Image = ResourceCosts;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Resource Costs";
-                    RunPageLink = Type = CONST("Group(Resource)"),
-                                  Code = FIELD("Resource Group Filter");
+                    RunPageLink = Type = const("Group(Resource)"),
+                                  Code = field("Resource Group Filter");
                     ToolTip = 'View or change detailed information about costs for the resource.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -480,8 +492,8 @@ page 9217 "ResGrp. All. per Serv.  Matrix"
                     Image = Price;
                     Visible = not ExtendedPriceEnabled;
                     RunObject = Page "Resource Prices";
-                    RunPageLink = Type = CONST("Group(Resource)"),
-                                  Code = FIELD("Resource Group Filter");
+                    RunPageLink = Type = const("Group(Resource)"),
+                                  Code = field("Resource Group Filter");
                     ToolTip = 'View or edit prices for the resource.';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
@@ -535,7 +547,7 @@ page 9217 "ResGrp. All. per Serv.  Matrix"
                     Caption = 'Resource Gr. A&vailability';
                     Image = Calendar;
                     RunObject = Page "Res.Gr.Availability - Overview";
-                    RunPageLink = "No." = FIELD("Resource Group Filter");
+                    RunPageLink = "No." = field("Resource Group Filter");
                     ToolTip = 'View a summary of resource group capacities, the quantity of resource hours allocated to jobs on order, the quantity allocated to service orders, the capacity assigned to jobs on quote, and the resource availability.';
                 }
             }
@@ -608,76 +620,44 @@ page 9217 "ResGrp. All. per Serv.  Matrix"
         MatrixCellData: array[32] of Text[100];
         MatrixCellQuantity: Decimal;
         Itterations: Integer;
-        [InDataSet]
         Col1Visible: Boolean;
-        [InDataSet]
         Col2Visible: Boolean;
-        [InDataSet]
         Col3Visible: Boolean;
-        [InDataSet]
         Col4Visible: Boolean;
-        [InDataSet]
         Col5Visible: Boolean;
-        [InDataSet]
         Col6Visible: Boolean;
-        [InDataSet]
         Col7Visible: Boolean;
-        [InDataSet]
         Col8Visible: Boolean;
-        [InDataSet]
         Col9Visible: Boolean;
-        [InDataSet]
         Col10Visible: Boolean;
-        [InDataSet]
         Col11Visible: Boolean;
-        [InDataSet]
         Col12Visible: Boolean;
-        [InDataSet]
         Col13Visible: Boolean;
-        [InDataSet]
         Col14Visible: Boolean;
-        [InDataSet]
         Col15Visible: Boolean;
-        [InDataSet]
         Col16Visible: Boolean;
-        [InDataSet]
         Col17Visible: Boolean;
-        [InDataSet]
         Col18Visible: Boolean;
-        [InDataSet]
         Col19Visible: Boolean;
-        [InDataSet]
         Col20Visible: Boolean;
-        [InDataSet]
         Col21Visible: Boolean;
-        [InDataSet]
         Col22Visible: Boolean;
-        [InDataSet]
         Col23Visible: Boolean;
-        [InDataSet]
         Col24Visible: Boolean;
-        [InDataSet]
         Col25Visible: Boolean;
-        [InDataSet]
         Col26Visible: Boolean;
-        [InDataSet]
         Col27Visible: Boolean;
-        [InDataSet]
         Col28Visible: Boolean;
-        [InDataSet]
         Col29Visible: Boolean;
-        [InDataSet]
         Col30Visible: Boolean;
-        [InDataSet]
         Col31Visible: Boolean;
-        [InDataSet]
         Col32Visible: Boolean;
         ExtendedPriceEnabled: Boolean;
 
     procedure Load(var NewVerticalRec: Record "Service Header"; var NewHorizontalRec: Record "Service Order Allocation"; NewMatrixColumnCaptions: array[32] of Text[10]; var NewMatrixDateFilters: array[32] of Record Date; Periods: Integer)
     begin
         Itterations := Periods;
-        Copy(NewVerticalRec);
+        Rec.Copy(NewVerticalRec);
         MatrixRec.Copy(NewHorizontalRec);
         CopyArray(MatrixColumnCaptions, NewMatrixColumnCaptions, 1);
         CopyArray(MatrixColumnDateFilters, NewMatrixDateFilters, 1);
@@ -688,12 +668,12 @@ page 9217 "ResGrp. All. per Serv.  Matrix"
         I: Integer;
     begin
         MatrixRec.Reset();
-        MatrixRec.SetRange("Document No.", "No.");
+        MatrixRec.SetRange("Document No.", Rec."No.");
         MatrixRec.SetRange("Document Type", MatrixRec."Document Type"::Order);
         MatrixRec.SetFilter(Status, '%1|%2', MatrixRec.Status::Active, MatrixRec.Status::Finished);
-        if GetFilter("Resource Group Filter") <> '' then
-            MatrixRec.SetFilter("Resource Group No.", GetRangeMin("Resource Group Filter"),
-              GetRangeMax("Resource Group Filter"));
+        if Rec.GetFilter("Resource Group Filter") <> '' then
+            MatrixRec.SetFilter("Resource Group No.", Rec.GetRangeMin("Resource Group Filter"),
+              Rec.GetRangeMax("Resource Group Filter"));
         for I := 1 to Itterations do begin
             MatrixCellQuantity := 0;
             MatrixRec.SetRange("Allocation Date", MatrixColumnDateFilters[I]."Period Start",
@@ -716,14 +696,14 @@ page 9217 "ResGrp. All. per Serv.  Matrix"
     var
         PlanningLine: Record "Service Order Allocation";
     begin
-        if GetFilter("Resource Group Filter") <> '' then
-            PlanningLine.SetFilter("Resource Group No.", GetRangeMin("Resource Group Filter"),
-              GetRangeMax("Resource Group Filter"));
+        if Rec.GetFilter("Resource Group Filter") <> '' then
+            PlanningLine.SetFilter("Resource Group No.", Rec.GetRangeMin("Resource Group Filter"),
+              Rec.GetRangeMax("Resource Group Filter"));
         PlanningLine.SetRange("Allocation Date", MatrixColumnDateFilters[Column]."Period Start",
           MatrixColumnDateFilters[Column]."Period End");
-        PlanningLine.SetRange("Document Type", "Document Type");
+        PlanningLine.SetRange("Document Type", Rec."Document Type");
         PlanningLine.SetFilter(Status, '%1|%2', PlanningLine.Status::Active, PlanningLine.Status::Finished);
-        PlanningLine.SetRange("Document No.", "No.");
+        PlanningLine.SetRange("Document No.", Rec."No.");
 
         PAGE.RunModal(PAGE::"Service Order Allocations", PlanningLine);
     end;

@@ -1,4 +1,27 @@
-﻿table 336 "Tracking Specification"
+﻿namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+
+table 336 "Tracking Specification"
 {
     Caption = 'Tracking Specification';
 
@@ -339,12 +362,12 @@
         field(5401; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(5402; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(5811; "Appl.-from Item Entry"; Integer)
         {
@@ -535,13 +558,14 @@
     begin
         Init();
         SetItemData(
-          AsmHeader."Item No.", AsmHeader.Description, AsmHeader."Location Code", AsmHeader."Variant Code", AsmHeader."Bin Code",
-          AsmHeader."Qty. per Unit of Measure", AsmHeader."Qty. Rounding Precision (Base)");
-        SetSource(DATABASE::"Assembly Header", AsmHeader."Document Type".AsInteger(), AsmHeader."No.", 0, '', 0);
+            AsmHeader."Item No.", AsmHeader.Description, AsmHeader."Location Code", AsmHeader."Variant Code", AsmHeader."Bin Code",
+            AsmHeader."Qty. per Unit of Measure", AsmHeader."Qty. Rounding Precision (Base)");
+        SetSource(
+            Enum::TableID::"Assembly Header".AsInteger(), AsmHeader."Document Type".AsInteger(), AsmHeader."No.", 0, '', 0);
         SetQuantities(
-          AsmHeader."Quantity (Base)", AsmHeader."Quantity to Assemble", AsmHeader."Quantity to Assemble (Base)",
-          AsmHeader."Quantity to Assemble", AsmHeader."Quantity to Assemble (Base)",
-          AsmHeader."Assembled Quantity (Base)", AsmHeader."Assembled Quantity (Base)");
+            AsmHeader."Quantity (Base)", AsmHeader."Quantity to Assemble", AsmHeader."Quantity to Assemble (Base)",
+            AsmHeader."Quantity to Assemble", AsmHeader."Quantity to Assemble (Base)",
+            AsmHeader."Assembled Quantity (Base)", AsmHeader."Assembled Quantity (Base)");
 
         OnAfterInitFromAsmHeader(Rec, AsmHeader);
     end;
@@ -550,14 +574,14 @@
     begin
         Init();
         SetItemData(
-          AsmLine."No.", AsmLine.Description, AsmLine."Location Code", AsmLine."Variant Code", AsmLine."Bin Code",
-          AsmLine."Qty. per Unit of Measure", AsmLine."Qty. Rounding Precision (Base)");
+            AsmLine."No.", AsmLine.Description, AsmLine."Location Code", AsmLine."Variant Code", AsmLine."Bin Code",
+            AsmLine."Qty. per Unit of Measure", AsmLine."Qty. Rounding Precision (Base)");
         SetSource(
-          DATABASE::"Assembly Line", AsmLine."Document Type".AsInteger(), AsmLine."Document No.", AsmLine."Line No.", '', 0);
+            Enum::TableID::"Assembly Line".AsInteger(), AsmLine."Document Type".AsInteger(), AsmLine."Document No.", AsmLine."Line No.", '', 0);
         SetQuantities(
-          AsmLine."Quantity (Base)", AsmLine."Quantity to Consume", AsmLine."Quantity to Consume (Base)",
-          AsmLine."Quantity to Consume", AsmLine."Quantity to Consume (Base)",
-          AsmLine."Consumed Quantity (Base)", AsmLine."Consumed Quantity (Base)");
+            AsmLine."Quantity (Base)", AsmLine."Quantity to Consume", AsmLine."Quantity to Consume (Base)",
+            AsmLine."Quantity to Consume", AsmLine."Quantity to Consume (Base)",
+            AsmLine."Consumed Quantity (Base)", AsmLine."Consumed Quantity (Base)");
 
         OnAfterInitFromAsmLine(Rec, AsmLine);
     end;
@@ -566,43 +590,50 @@
     begin
         Init();
         SetItemData(
-          ItemJnlLine."Item No.", ItemJnlLine.Description, ItemJnlLine."Location Code", ItemJnlLine."Variant Code",
-          ItemJnlLine."Bin Code", ItemJnlLine."Qty. per Unit of Measure", ItemJnlLine."Qty. Rounding Precision (Base)");
+            ItemJnlLine."Item No.", ItemJnlLine.Description, ItemJnlLine."Location Code", ItemJnlLine."Variant Code",
+            ItemJnlLine."Bin Code", ItemJnlLine."Qty. per Unit of Measure", ItemJnlLine."Qty. Rounding Precision (Base)");
         SetSource(
-          DATABASE::"Item Journal Line", ItemJnlLine."Entry Type".AsInteger(), ItemJnlLine."Journal Template Name", ItemJnlLine."Line No.",
-          ItemJnlLine."Journal Batch Name", 0);
+            Enum::TableID::"Item Journal Line".AsInteger(), ItemJnlLine."Entry Type".AsInteger(), ItemJnlLine."Journal Template Name", ItemJnlLine."Line No.",
+            ItemJnlLine."Journal Batch Name", 0);
         SetQuantities(
-          ItemJnlLine."Quantity (Base)", ItemJnlLine.Quantity, ItemJnlLine."Quantity (Base)", ItemJnlLine.Quantity,
-          ItemJnlLine."Quantity (Base)", 0, 0);
+            ItemJnlLine."Quantity (Base)", ItemJnlLine.Quantity, ItemJnlLine."Quantity (Base)", ItemJnlLine.Quantity,
+            ItemJnlLine."Quantity (Base)", 0, 0);
 
         OnAfterInitFromItemJnlLine(Rec, ItemJnlLine);
     end;
 
     procedure InitFromInvtDocLine(var InvtDocLine: Record "Invt. Document Line")
+    var
+        QtySignFactor: Integer;
     begin
         Init();
         SetItemData(
-          InvtDocLine."Item No.", InvtDocLine.Description, InvtDocLine."Location Code", InvtDocLine."Variant Code",
-          InvtDocLine."Bin Code", InvtDocLine."Qty. per Unit of Measure", InvtDocLine."Qty. Rounding Precision (Base)");
+            InvtDocLine."Item No.", InvtDocLine.Description, InvtDocLine."Location Code", InvtDocLine."Variant Code",
+            InvtDocLine."Bin Code", InvtDocLine."Qty. per Unit of Measure", InvtDocLine."Qty. Rounding Precision (Base)");
         SetSource(
-          DATABASE::"Invt. Document Line", InvtDocLine."Document Type".AsInteger(), InvtDocLine."Document No.", InvtDocLine."Line No.", '', 0);
+            Enum::TableID::"Invt. Document Line".AsInteger(), InvtDocLine."Document Type".AsInteger(), InvtDocLine."Document No.", InvtDocLine."Line No.", '', 0);
+
+        QtySignFactor := 1;
+        if InvtDocLine.IsCorrection() then
+            QtySignFactor := -1;
+
         SetQuantities(
-          InvtDocLine."Quantity (Base)", InvtDocLine.Quantity, InvtDocLine."Quantity (Base)", InvtDocLine.Quantity,
-          InvtDocLine."Quantity (Base)", 0, 0);
+          InvtDocLine."Quantity (Base)" * QtySignFactor, InvtDocLine.Quantity * QtySignFactor, InvtDocLine."Quantity (Base)" * QtySignFactor,
+          InvtDocLine.Quantity * QtySignFactor, InvtDocLine."Quantity (Base)" * QtySignFactor, 0, 0);
     end;
 
     procedure InitFromJobJnlLine(var JobJnlLine: Record "Job Journal Line")
     begin
         Init();
         SetItemData(
-          JobJnlLine."No.", JobJnlLine.Description, JobJnlLine."Location Code", JobJnlLine."Variant Code", JobJnlLine."Bin Code",
-          JobJnlLine."Qty. per Unit of Measure", JobJnlLine."Qty. Rounding Precision (Base)");
+            JobJnlLine."No.", JobJnlLine.Description, JobJnlLine."Location Code", JobJnlLine."Variant Code", JobJnlLine."Bin Code",
+            JobJnlLine."Qty. per Unit of Measure", JobJnlLine."Qty. Rounding Precision (Base)");
         SetSource(
-          DATABASE::"Job Journal Line", JobJnlLine."Entry Type".AsInteger(), JobJnlLine."Journal Template Name", JobJnlLine."Line No.",
-          JobJnlLine."Journal Batch Name", 0);
+            Enum::TableID::"Job Journal Line".AsInteger(), JobJnlLine."Entry Type".AsInteger(), JobJnlLine."Journal Template Name", JobJnlLine."Line No.",
+            JobJnlLine."Journal Batch Name", 0);
         SetQuantities(
-          JobJnlLine."Quantity (Base)", JobJnlLine.Quantity, JobJnlLine."Quantity (Base)", JobJnlLine.Quantity,
-          JobJnlLine."Quantity (Base)", 0, 0);
+            JobJnlLine."Quantity (Base)", JobJnlLine.Quantity, JobJnlLine."Quantity (Base)", JobJnlLine.Quantity,
+            JobJnlLine."Quantity (Base)", 0, 0);
 
         OnAfterInitFromJobJnlLine(Rec, JobJnlLine);
     end;
@@ -614,7 +645,7 @@
             JobPlanningLine."No.", JobPlanningLine.Description, JobPlanningLine."Location Code", JobPlanningLine."Variant Code",
             JobPlanningLine."Bin Code", JobPlanningLine."Qty. per Unit of Measure", JobPlanningLine."Qty. Rounding Precision (Base)");
         SetSource(
-            DATABASE::"Job Planning Line", JobPlanningLine.Status.AsInteger(), JobPlanningLine."Job No.", JobPlanningLine."Job Contract Entry No.", '', 0);
+            Enum::TableID::"Job Planning Line", JobPlanningLine.Status.AsInteger(), JobPlanningLine."Job No.", JobPlanningLine."Job Contract Entry No.", '', 0);
         SetQuantities(
             JobPlanningLine."Remaining Qty. (Base)", JobPlanningLine."Remaining Qty.", JobPlanningLine."Remaining Qty. (Base)",
             JobPlanningLine."Remaining Qty.", JobPlanningLine."Remaining Qty. (Base)",
@@ -631,7 +662,7 @@
           PurchLine."No.", PurchLine.Description, PurchLine."Location Code", PurchLine."Variant Code", PurchLine."Bin Code",
           PurchLine."Qty. per Unit of Measure", PurchLine."Qty. Rounding Precision (Base)");
         SetSource(
-          DATABASE::"Purchase Line", PurchLine."Document Type".AsInteger(), PurchLine."Document No.", PurchLine."Line No.", '', 0);
+          Enum::TableID::"Purchase Line", PurchLine."Document Type".AsInteger(), PurchLine."Document No.", PurchLine."Line No.", '', 0);
         if PurchLine.IsCreditDocType() then
             SetQuantities(
               PurchLine."Quantity (Base)", PurchLine."Return Qty. to Ship", PurchLine."Return Qty. to Ship (Base)",
@@ -653,7 +684,7 @@
             ProdOrderLine."Item No.", ProdOrderLine.Description, ProdOrderLine."Location Code", ProdOrderLine."Variant Code", '',
             ProdOrderLine."Qty. per Unit of Measure", ProdOrderLine."Qty. Rounding Precision (Base)");
         SetSource(
-            DATABASE::"Prod. Order Line", ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", 0, '', ProdOrderLine."Line No.");
+            Enum::TableID::"Prod. Order Line", ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", 0, '', ProdOrderLine."Line No.");
         SetQuantities(
             ProdOrderLine."Quantity (Base)", ProdOrderLine."Remaining Quantity", ProdOrderLine."Remaining Qty. (Base)",
             ProdOrderLine."Remaining Quantity", ProdOrderLine."Remaining Qty. (Base)", ProdOrderLine."Finished Qty. (Base)",
@@ -669,7 +700,7 @@
             ProdOrderComp."Item No.", ProdOrderComp.Description, ProdOrderComp."Location Code", ProdOrderComp."Variant Code",
             ProdOrderComp."Bin Code", ProdOrderComp."Qty. per Unit of Measure", ProdOrderComp."Qty. Rounding Precision (Base)");
         SetSource(
-            DATABASE::"Prod. Order Component", ProdOrderComp.Status.AsInteger(), ProdOrderComp."Prod. Order No.", ProdOrderComp."Line No.", '',
+            Enum::TableID::"Prod. Order Component", ProdOrderComp.Status.AsInteger(), ProdOrderComp."Prod. Order No.", ProdOrderComp."Line No.", '',
             ProdOrderComp."Prod. Order Line No.");
         SetQuantities(
             ProdOrderComp."Remaining Qty. (Base)", ProdOrderComp."Remaining Quantity", ProdOrderComp."Remaining Qty. (Base)",
@@ -688,7 +719,7 @@
         SetItemData(
           PlanningComponent."Item No.", PlanningComponent.Description, PlanningComponent."Location Code",
           PlanningComponent."Variant Code", '', PlanningComponent."Qty. per Unit of Measure", PlanningComponent."Qty. Rounding Precision (Base)");
-        SetSource(DATABASE::"Planning Component", 0, PlanningComponent."Worksheet Template Name", PlanningComponent."Line No.",
+        SetSource(Enum::TableID::"Planning Component", 0, PlanningComponent."Worksheet Template Name", PlanningComponent."Line No.",
           PlanningComponent."Worksheet Batch Name", PlanningComponent."Worksheet Line No.");
         NetQuantity :=
           Round(PlanningComponent."Net Quantity (Base)" / PlanningComponent."Qty. per Unit of Measure", UOMMgt.QtyRndPrecision());
@@ -705,7 +736,7 @@
         SetItemData(
           ReqLine."No.", ReqLine.Description, ReqLine."Location Code", ReqLine."Variant Code", '', ReqLine."Qty. per Unit of Measure", ReqLine."Qty. Rounding Precision (Base)");
         SetSource(
-          DATABASE::"Requisition Line", 0, ReqLine."Worksheet Template Name", ReqLine."Line No.", ReqLine."Journal Batch Name", 0);
+          Enum::TableID::"Requisition Line", 0, ReqLine."Worksheet Template Name", ReqLine."Line No.", ReqLine."Journal Batch Name", 0);
         SetQuantities(
           ReqLine."Quantity (Base)", ReqLine.Quantity, ReqLine."Quantity (Base)", ReqLine.Quantity, ReqLine."Quantity (Base)", 0, 0);
 
@@ -719,7 +750,7 @@
           SalesLine."No.", SalesLine.Description, SalesLine."Location Code", SalesLine."Variant Code", SalesLine."Bin Code",
           SalesLine."Qty. per Unit of Measure", SalesLine."Qty. Rounding Precision (Base)");
         SetSource(
-          DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", '', 0);
+          Enum::TableID::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", '', 0);
         if SalesLine.IsCreditDocType() then
             SetQuantities(
               SalesLine."Quantity (Base)", SalesLine."Return Qty. to Receive", SalesLine."Return Qty. to Receive (Base)",
@@ -740,7 +771,7 @@
           ServiceLine."No.", ServiceLine.Description, ServiceLine."Location Code", ServiceLine."Variant Code", ServiceLine."Bin Code",
           ServiceLine."Qty. per Unit of Measure", ServiceLine."Qty. Rounding Precision (Base)");
         SetSource(
-          DATABASE::"Service Line", ServiceLine."Document Type".AsInteger(), ServiceLine."Document No.", ServiceLine."Line No.", '', 0);
+          Enum::TableID::"Service Line", ServiceLine."Document Type".AsInteger(), ServiceLine."Document No.", ServiceLine."Line No.", '', 0);
 
         "Quantity (Base)" := ServiceLine."Quantity (Base)";
         if Consume then begin
@@ -776,7 +807,7 @@
                       TransLine."Item No.", TransLine.Description, TransLine."Transfer-from Code", TransLine."Variant Code",
                       TransLine."Transfer-from Bin Code", TransLine."Qty. per Unit of Measure", TransLine."Qty. Rounding Precision (Base)");
                     SetSource(
-                      DATABASE::"Transfer Line", Direction.AsInteger(), TransLine."Document No.", TransLine."Line No.", '',
+                      Enum::TableID::"Transfer Line", Direction.AsInteger(), TransLine."Document No.", TransLine."Line No.", '',
                       TransLine."Derived From Line No.");
                     SetQuantities(
                       TransLine."Quantity (Base)", TransLine."Qty. to Ship", TransLine."Qty. to Ship (Base)", TransLine.Quantity,
@@ -790,7 +821,7 @@
                       TransLine."Item No.", TransLine.Description, TransLine."Transfer-to Code", TransLine."Variant Code",
                       TransLine."Transfer-To Bin Code", TransLine."Qty. per Unit of Measure", TransLine."Qty. Rounding Precision (Base)");
                     SetSource(
-                      DATABASE::"Transfer Line", Direction.AsInteger(), TransLine."Document No.", TransLine."Line No.", '',
+                      Enum::TableID::"Transfer Line", Direction.AsInteger(), TransLine."Document No.", TransLine."Line No.", '',
                       TransLine."Derived From Line No.");
                     SetQuantities(
                       TransLine."Quantity (Base)", TransLine."Qty. to Receive", TransLine."Qty. to Receive (Base)", TransLine.Quantity,
@@ -812,24 +843,24 @@
             exit;
 
         case "Source Type" of
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line":
                 if (("Source Subtype" in [3, 5]) and ("Quantity (Base)" < 0)) or
                     (("Source Subtype" in [1, 2]) and ("Quantity (Base)" > 0)) // sale
                 then
                     FieldError("Quantity (Base)");
-            DATABASE::"Item Journal Line":
+            Enum::TableID::"Item Journal Line":
                 if (("Source Subtype" in [0, 2, 6]) and ("Quantity (Base)" < 0)) or
                     (("Source Subtype" in [1, 3, 4, 5]) and ("Quantity (Base)" > 0))
                 then
                     FieldError("Quantity (Base)");
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line":
                 if (("Source Subtype" in [3]) and ("Quantity (Base)" < 0)) or
                     (("Source Subtype" in [1, 2]) and ("Quantity (Base)" > 0))
                 then
                     FieldError("Quantity (Base)");
-            DATABASE::"Invt. Document Line":
-                if (("Source Subtype" in [1, 3, 4, 5]) and ("Quantity (Base)" < 0)) or
-                    (("Source Subtype" in [0, 2, 6]) and ("Quantity (Base)" > 0))
+            Enum::TableID::"Invt. Document Line":
+                if (("Source Subtype" in [1, 3, 4, 5]) and ("Quantity (Base)" > 0)) or
+                    (("Source Subtype" in [0, 2, 6]) and ("Quantity (Base)" < 0))
                 then
                     FieldError("Quantity (Base)");
             else begin
@@ -966,7 +997,7 @@
 
     procedure IsReclass() Reclass: Boolean
     begin
-        Reclass := ("Source Type" = DATABASE::"Item Journal Line") and ("Source Subtype" = 4);
+        Reclass := ("Source Type" = Enum::TableID::"Item Journal Line") and ("Source Subtype" = 4);
 
         OnAfterIsReclass(Rec, Reclass);
     end;
@@ -985,7 +1016,7 @@
         ItemLedgEntry.TestField(Positive, true);
         ItemLedgEntry.TestField("Variant Code", "Variant Code");
         ItemLedgEntry.TestTrackingEqualToTrackingSpec(Rec);
-        if "Source Type" = DATABASE::"Item Journal Line" then begin
+        if "Source Type" = Enum::TableID::"Item Journal Line" then begin
             ItemJnlLine.SetRange("Journal Template Name", "Source ID");
             ItemJnlLine.SetRange("Journal Batch Name", "Source Batch Name");
             ItemJnlLine.SetRange("Line No.", "Source Ref. No.");
@@ -1066,7 +1097,7 @@
 
     procedure SetSourceFromPurchLine(PurchLine: Record "Purchase Line")
     begin
-        "Source Type" := DATABASE::"Purchase Line";
+        "Source Type" := Enum::TableID::"Purchase Line";
         "Source Subtype" := PurchLine."Document Type".AsInteger();
         "Source ID" := PurchLine."Document No.";
         "Source Batch Name" := '';
@@ -1078,7 +1109,7 @@
 
     procedure SetSourceFromSalesLine(SalesLine: Record "Sales Line")
     begin
-        "Source Type" := DATABASE::"Sales Line";
+        "Source Type" := Enum::TableID::"Sales Line";
         "Source Subtype" := SalesLine."Document Type".AsInteger();
         "Source ID" := SalesLine."Document No.";
         "Source Batch Name" := '';
@@ -1451,10 +1482,10 @@
         PurchaseLine: Record "Purchase Line";
     begin
         case "Source Type" of
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line":
                 if SalesLine.Get("Source Subtype", "Source ID", "Source Ref. No.") then
                     exit("Quantity (Base)" <= SalesLine."Qty. to Invoice (Base)");
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line":
                 if PurchaseLine.Get("Source Subtype", "Source ID", "Source Ref. No.") then
                     exit("Quantity (Base)" <= PurchaseLine."Qty. to Invoice (Base)");
         end;
@@ -1562,14 +1593,6 @@
     local procedure OnAfterInitFromItemJnlLine(var TrackingSpecification: Record "Tracking Specification"; ItemJournalLine: Record "Item Journal Line")
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Event is never raised.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInitFromItemLedgEntry(var TrackingSpecification: Record "Tracking Specification"; ItemLedgerEntry: Record "Item Ledger Entry")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitFromJobJnlLine(var TrackingSpecification: Record "Tracking Specification"; JobJournalLine: Record "Job Journal Line")

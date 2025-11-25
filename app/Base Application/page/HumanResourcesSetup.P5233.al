@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 page 5233 "Human Resources Setup"
 {
     AdditionalSearchTerms = 'personnel people employee staff hr setup';
@@ -200,10 +202,10 @@ page 5233 "Human Resources Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

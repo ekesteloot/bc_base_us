@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Item;
+
 table 6506 "Item Tracking Comment"
 {
     Caption = 'Item Tracking Comment';
@@ -17,7 +21,7 @@ table 6506 "Item Tracking Comment"
         field(3; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(4; "Serial/Lot No."; Code[50])
         {

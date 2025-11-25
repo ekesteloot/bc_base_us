@@ -1,3 +1,7 @@
+namespace System.Integration;
+
+using Microsoft.CRM.Outlook;
+
 codeunit 5324 "Exchange Service Setup"
 {
 

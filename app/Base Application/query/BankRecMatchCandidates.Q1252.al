@@ -1,4 +1,8 @@
 #if not CLEAN21
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Ledger;
+
 query 1252 "Bank Rec. Match Candidates"
 {
     Caption = 'Bank Rec. Match Candidates';
@@ -10,7 +14,7 @@ query 1252 "Bank Rec. Match Candidates"
     {
         dataitem(Bank_Acc_Reconciliation_Line; "Bank Acc. Reconciliation Line")
         {
-            DataItemTableFilter = Difference = FILTER(<> 0), Type = FILTER(= "Bank Account Ledger Entry");
+            DataItemTableFilter = Difference = filter(<> 0), Type = filter(= "Bank Account Ledger Entry");
             column(Rec_Line_Bank_Account_No; "Bank Account No.")
             {
             }
@@ -50,7 +54,7 @@ query 1252 "Bank Rec. Match Candidates"
             dataitem(Bank_Account_Ledger_Entry; "Bank Account Ledger Entry")
             {
                 DataItemLink = "Bank Account No." = Bank_Acc_Reconciliation_Line."Bank Account No.";
-                DataItemTableFilter = "Remaining Amount" = FILTER(<> 0), Open = CONST(true), "Statement Status" = FILTER(Open), Reversed = CONST(false);
+                DataItemTableFilter = "Remaining Amount" = filter(<> 0), Open = const(true), "Statement Status" = filter(Open), Reversed = const(false);
                 column(Entry_No; "Entry No.")
                 {
                 }

@@ -1,10 +1,17 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.Reports;
+
 page 99000813 "Planned Production Order"
 {
     Caption = 'Planned Production Order';
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Production Order";
-    SourceTableView = WHERE(Status = CONST(Planned));
+    SourceTableView = where(Status = const(Planned));
 
     layout
     {
@@ -22,7 +29,7 @@ page 99000813 "Planned Production Order"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -44,8 +51,8 @@ page 99000813 "Planned Production Order"
 
                     trigger OnValidate()
                     begin
-                        if xRec."Source Type" <> "Source Type" then
-                            "Source No." := '';
+                        if xRec."Source Type" <> Rec."Source Type" then
+                            Rec."Source No." := '';
                     end;
                 }
                 field("Source No."; Rec."Source No.")
@@ -57,8 +64,8 @@ page 99000813 "Planned Production Order"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory("Source Type" = "Source Type"::Item, "Source No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec."Source Type" = Rec."Source Type"::Item, Rec."Source No.");
                     end;
                 }
                 field("Variant Code"; Rec."Variant Code")
@@ -72,8 +79,8 @@ page 99000813 "Planned Production Order"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory("Source Type" = "Source Type"::Item, "Source No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec."Source Type" = Rec."Source Type"::Item, Rec."Source No.");
                     end;
                 }
                 field("Search Description"; Rec."Search Description")
@@ -111,7 +118,7 @@ page 99000813 "Planned Production Order"
             part(ProdOrderLines; "Planned Prod. Order Lines")
             {
                 ApplicationArea = Manufacturing;
-                SubPageLink = "Prod. Order No." = FIELD("No.");
+                SubPageLink = "Prod. Order No." = field("No.");
                 UpdatePropagation = Both;
             }
             group(Schedule)
@@ -131,7 +138,7 @@ page 99000813 "Planned Production Order"
 
                     trigger OnValidate()
                     begin
-                        Validate("Starting Time", StartingTime);
+                        Rec.Validate("Starting Time", StartingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -148,7 +155,7 @@ page 99000813 "Planned Production Order"
 
                     trigger OnValidate()
                     begin
-                        Validate("Starting Date", StartingDate);
+                        Rec.Validate("Starting Date", StartingDate);
                         CurrPage.Update(true);
                     end;
                 }
@@ -165,7 +172,7 @@ page 99000813 "Planned Production Order"
 
                     trigger OnValidate()
                     begin
-                        Validate("Ending Time", EndingTime);
+                        Rec.Validate("Ending Time", EndingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -182,7 +189,7 @@ page 99000813 "Planned Production Order"
 
                     trigger OnValidate()
                     begin
-                        Validate("Ending Date", EndingDate);
+                        Rec.Validate("Ending Date", EndingDate);
                         CurrPage.Update(true);
                     end;
                 }
@@ -292,8 +299,8 @@ page 99000813 "Planned Production Order"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Prod. Order Comment Sheet";
-                    RunPageLink = Status = FIELD(Status),
-                                  "Prod. Order No." = FIELD("No.");
+                    RunPageLink = Status = field(Status),
+                                  "Prod. Order No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -307,7 +314,7 @@ page 99000813 "Planned Production Order"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -317,9 +324,9 @@ page 99000813 "Planned Production Order"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Production Order Statistics";
-                    RunPageLink = Status = FIELD(Status),
-                                  "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = Status = field(Status),
+                                  "No." = field("No."),
+                                  "Date Filter" = field("Date Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -358,8 +365,8 @@ page 99000813 "Planned Production Order"
                     var
                         ProdOrder: Record "Production Order";
                     begin
-                        ProdOrder.SetRange(Status, Status);
-                        ProdOrder.SetRange("No.", "No.");
+                        ProdOrder.SetRange(Status, Rec.Status);
+                        ProdOrder.SetRange("No.", Rec."No.");
                         REPORT.RunModal(REPORT::"Refresh Production Order", true, true, ProdOrder);
                     end;
                 }
@@ -375,8 +382,8 @@ page 99000813 "Planned Production Order"
                     var
                         ProdOrder: Record "Production Order";
                     begin
-                        ProdOrder.SetRange(Status, Status);
-                        ProdOrder.SetRange("No.", "No.");
+                        ProdOrder.SetRange(Status, Rec.Status);
+                        ProdOrder.SetRange("No.", Rec."No.");
                         REPORT.RunModal(REPORT::"Replan Production Order", true, true, ProdOrder);
                     end;
                 }
@@ -406,8 +413,8 @@ page 99000813 "Planned Production Order"
                     var
                         ProdOrder: Record "Production Order";
                     begin
-                        ProdOrder.SetRange(Status, Status);
-                        ProdOrder.SetRange("No.", "No.");
+                        ProdOrder.SetRange(Status, Rec.Status);
+                        ProdOrder.SetRange("No.", Rec."No.");
 
                         REPORT.RunModal(REPORT::"Update Unit Cost", true, true, ProdOrder);
                     end;
@@ -497,10 +504,10 @@ page 99000813 "Planned Production Order"
         Item: Record Item;
     begin
 #if not CLEAN17
-        GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
+        Rec.GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
 #endif
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory("Source Type" = "Source Type"::Item, "Source No.");
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec."Source Type" = Rec."Source Type"::Item, Rec."Source No.");
     end;
 
 #if not CLEAN17

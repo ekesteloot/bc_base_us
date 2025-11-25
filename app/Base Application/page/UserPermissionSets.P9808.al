@@ -1,3 +1,7 @@
+namespace System.Security.User;
+
+using System.Security.AccessControl;
+
 page 9808 "User Permission Sets"
 {
     Caption = 'User Permission Sets';
@@ -12,7 +16,7 @@ page 9808 "User Permission Sets"
             repeater(Group)
             {
                 Caption = 'User Permissions';
-                field(UserSecurityID; "User Security ID")
+                field(UserSecurityID; Rec."User Security ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'User Security ID';
@@ -20,13 +24,13 @@ page 9808 "User Permission Sets"
                     ToolTip = 'Specifies the Windows security identification (SID) of each Windows login that has been created in the current database.';
                     Visible = false;
                 }
-                field(PermissionSet; "Role ID")
+                field(PermissionSet; Rec."Role ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Permission Set';
                     ToolTip = 'Specifies the ID of a security role that has been assigned to this Windows login in the current database.';
                 }
-                field(Description; "Role Name")
+                field(Description; Rec."Role Name")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Description';
@@ -34,7 +38,7 @@ page 9808 "User Permission Sets"
                     Editable = false;
                     ToolTip = 'Specifies the name of the security role that has been given to this Windows login in the current database.';
                 }
-                field(Company; "Company Name")
+                field(Company; Rec."Company Name")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Company';
@@ -57,7 +61,7 @@ page 9808 "User Permission Sets"
                     Caption = 'Permissions';
                     Image = Permission;
                     RunObject = Page "Expanded Permissions";
-                    RunPageLink = "Role ID" = FIELD("Role ID");
+                    RunPageLink = "Role ID" = field("Role ID");
                     ToolTip = 'View or edit a general listing of database objects and their access representing permissions that can be organized in permission sets to be assigned to users. NOTE: To view or edit the actual permissions that this user has through assigned permission sets, choose the Effective Permissions action.';
                 }
             }

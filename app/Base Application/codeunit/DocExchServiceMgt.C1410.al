@@ -635,65 +635,6 @@ codeunit 1410 "Doc. Exch. Service Mgt."
         exit(DocIdentifier);
     end;
 
-#if not CLEAN20
-    [Scope('OnPrem')]
-    [Obsolete('Replaced by SendUBLDocument with TempBlob parameter.', '20.0')]
-    procedure SendUBLDocument(DocVariant: Variant; FileName: Text): Text
-    var
-        FileManagement: codeunit "File Management";
-        TempBlob: Codeunit "Temp Blob";
-        DocRecRef: RecordRef;
-    begin
-        CheckServiceEnabled();
-
-        DocRecRef.GetTable(DocVariant);
-
-        CheckDocumentStatus(DocRecRef);
-
-        FileManagement.BLOBImportFromServerFile(TempBlob, FileName);
-        if not ExecuteWebServicePostRequest(GetPostSalesURL(DocRecRef), TempBlob) then
-            LogActivityFailedAndError(DocRecRef.RecordId, SendDocTxt, '');
-
-        LogActivitySucceeded(DocRecRef.RecordId, SendDocTxt, DocSendSuccessMsg);
-
-        DocExchLinks.UpdateDocumentRecord(DocRecRef, GLBLastUsedGUID, '');
-
-        LogTelemetryDocumentSent();
-
-        if GuiAllowed then
-            Message(DocSendSuccessMsg);
-
-        exit(GLBLastUsedGUID);
-    end;
-
-    [Scope('OnPrem')]
-    [Obsolete('Replaced by SendDocument with TempBlob parameter.', '20.0')]
-    procedure SendDocument(DocVariant: Variant; FileName: Text): Text
-    var
-        FileManagement: codeunit "File Management";
-        TempBlob: Codeunit "Temp Blob";
-        DocRecRef: RecordRef;
-        DocIdentifier: Text;
-    begin
-        CheckServiceEnabled();
-
-        DocIdentifier := GetGUID();
-        DocRecRef.GetTable(DocVariant);
-
-        CheckDocumentStatus(DocRecRef);
-
-        FileManagement.BLOBImportFromServerFile(TempBlob, FileName);
-        PutDocument(TempBlob, DocIdentifier, DocRecRef);
-        DispatchDocument(DocIdentifier, DocRecRef);
-
-        LogTelemetryDocumentSent();
-
-        if GuiAllowed() then
-            Message(DocSendSuccessMsg);
-
-        exit(DocIdentifier);
-    end;
-#endif
     [Scope('OnPrem')]
     [NonDebuggable]
     procedure HasPredefinedOAuth2Params(): Boolean

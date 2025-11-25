@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+
 page 912 "Component - Resource Details"
 {
     Caption = 'Component - Resource Details';

@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.DataAdministration;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Company;
+using System.Environment;
+using System.Utilities;
+
 /// <summary>
 /// Manage the size of your database. The guide will suggest ways to clean up expired records.
 /// </summary>

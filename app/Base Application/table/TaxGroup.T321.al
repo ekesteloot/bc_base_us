@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.SalesTax;
+
 table 321 "Tax Group"
 {
     Caption = 'Tax Group';

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
 page 7508 "Select Item Attribute Value"
 {
     Caption = 'Select Item Attribute Value';
@@ -12,7 +14,7 @@ page 7508 "Select Item Attribute Value"
             repeater(Control2)
             {
                 ShowCaption = false;
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the value of the option.';

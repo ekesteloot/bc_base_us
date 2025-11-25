@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Setup;
+
 table 7304 "Warehouse Class"
 {
     Caption = 'Warehouse Class';

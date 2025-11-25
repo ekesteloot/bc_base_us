@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 7151 "Item Analysis View List"
 {
     Caption = 'Analysis View List';
@@ -13,7 +15,7 @@ page 7151 "Item Analysis View List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = SalesAnalysis, PurchaseAnalysis, InventoryAnalysis;
                     ToolTip = 'Specifies a code for the analysis view.';
@@ -95,8 +97,8 @@ page 7151 "Item Analysis View List"
                     Caption = 'Filter';
                     Image = "Filter";
                     RunObject = Page "Item Analysis View Filter";
-                    RunPageLink = "Analysis Area" = FIELD("Analysis Area"),
-                                  "Analysis View Code" = FIELD(Code);
+                    RunPageLink = "Analysis Area" = field("Analysis Area"),
+                                  "Analysis View Code" = field(Code);
                     ToolTip = 'Apply the filter.';
                 }
             }

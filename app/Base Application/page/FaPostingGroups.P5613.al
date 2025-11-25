@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
 page 5613 "FA Posting Groups"
 {
     AdditionalSearchTerms = 'fixed asset posting groups';
@@ -15,7 +17,7 @@ page 5613 "FA Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies the code for the G/L account that fixed asset expenses and costs are posted to when the fixed asset card contains this code.';
@@ -280,8 +282,8 @@ page 5613 "FA Posting Groups"
                         Caption = '&Depreciation';
                         Image = Allocate;
                         RunObject = Page "FA Allocations";
-                        RunPageLink = Code = FIELD(Code),
-                                      "Allocation Type" = CONST(Depreciation);
+                        RunPageLink = Code = field(Code),
+                                      "Allocation Type" = const(Depreciation);
                         ToolTip = 'View or edit the FA allocation that apply to depreciations.';
                     }
                     action(WriteDown)
@@ -290,8 +292,8 @@ page 5613 "FA Posting Groups"
                         Caption = '&Write-Down';
                         Image = Allocate;
                         RunObject = Page "FA Allocations";
-                        RunPageLink = Code = FIELD(Code),
-                                      "Allocation Type" = CONST("Write-Down");
+                        RunPageLink = Code = field(Code),
+                                      "Allocation Type" = const("Write-Down");
                         ToolTip = 'View or edit the FA allocation that apply to write-downs.';
                     }
                     action(Appreciation)
@@ -300,8 +302,8 @@ page 5613 "FA Posting Groups"
                         Caption = 'Appr&eciation';
                         Image = Allocate;
                         RunObject = Page "FA Allocations";
-                        RunPageLink = Code = FIELD(Code),
-                                      "Allocation Type" = CONST(Appreciation);
+                        RunPageLink = Code = field(Code),
+                                      "Allocation Type" = const(Appreciation);
                         ToolTip = 'View or edit the FA allocations that apply to appreciations.';
                     }
                     action(Custom1)
@@ -310,8 +312,8 @@ page 5613 "FA Posting Groups"
                         Caption = '&Custom 1';
                         Image = Allocate;
                         RunObject = Page "FA Allocations";
-                        RunPageLink = Code = FIELD(Code),
-                                      "Allocation Type" = CONST("Custom 1");
+                        RunPageLink = Code = field(Code),
+                                      "Allocation Type" = const("Custom 1");
                         ToolTip = 'View or edit the FA allocation that apply to custom values.';
                     }
                     action(Custom2)
@@ -320,8 +322,8 @@ page 5613 "FA Posting Groups"
                         Caption = 'C&ustom 2';
                         Image = Allocate;
                         RunObject = Page "FA Allocations";
-                        RunPageLink = Code = FIELD(Code),
-                                      "Allocation Type" = CONST("Custom 2");
+                        RunPageLink = Code = field(Code),
+                                      "Allocation Type" = const("Custom 2");
                         ToolTip = 'View or edit the FA allocation that apply to custom values.';
                     }
                     action(Maintenance)
@@ -330,8 +332,8 @@ page 5613 "FA Posting Groups"
                         Caption = 'Maintenance';
                         Image = Allocate;
                         RunObject = Page "FA Allocations";
-                        RunPageLink = Code = FIELD(Code),
-                                      "Allocation Type" = CONST(Maintenance);
+                        RunPageLink = Code = field(Code),
+                                      "Allocation Type" = const(Maintenance);
                         ToolTip = 'View or edit the FA allocations that apply to maintenance.';
                     }
                     action(Gain)
@@ -340,8 +342,8 @@ page 5613 "FA Posting Groups"
                         Caption = 'Gain';
                         Image = Allocate;
                         RunObject = Page "FA Allocations";
-                        RunPageLink = Code = FIELD(Code),
-                                      "Allocation Type" = CONST(Gain);
+                        RunPageLink = Code = field(Code),
+                                      "Allocation Type" = const(Gain);
                         ToolTip = 'View or edit the FA allocations that apply to gains.';
                     }
                     action(Loss)
@@ -350,8 +352,8 @@ page 5613 "FA Posting Groups"
                         Caption = 'Loss';
                         Image = Allocate;
                         RunObject = Page "FA Allocations";
-                        RunPageLink = Code = FIELD(Code),
-                                      "Allocation Type" = CONST(Loss);
+                        RunPageLink = Code = field(Code),
+                                      "Allocation Type" = const(Loss);
                         ToolTip = 'View or edit the FA allocations that apply to losses.';
                     }
                 }

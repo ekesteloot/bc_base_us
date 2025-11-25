@@ -1,4 +1,8 @@
 #if not CLEAN21
+namespace Microsoft.ProjectMgt.Resources.Pricing;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+
 codeunit 221 "Resource-Find Price"
 {
     TableNo = "Resource Price";

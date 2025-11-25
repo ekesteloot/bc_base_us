@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 xmlport 130406 "CAL Test Coverage Map"
 {
     Caption = 'CAL Test Coverage Map';

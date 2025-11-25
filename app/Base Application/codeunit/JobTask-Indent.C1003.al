@@ -6,7 +6,7 @@ codeunit 1003 "Job Task-Indent"
     var
         IsHandled: Boolean;
     begin
-        TestField("Job No.");
+        Rec.TestField("Job No.");
 
         IsHandled := false;
         OnRunOnBeforeConfirm(Rec, IsHandled);
@@ -21,7 +21,7 @@ codeunit 1003 "Job Task-Indent"
                 exit;
 
         JobTask := Rec;
-        Indent("Job No.");
+        Indent(Rec."Job No.");
     end;
 
     var

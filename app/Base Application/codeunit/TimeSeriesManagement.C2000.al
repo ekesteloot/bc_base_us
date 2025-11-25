@@ -1,3 +1,10 @@
+﻿namespace System.AI;
+
+using Microsoft.CashFlow.Setup;
+using System;
+using System.Reflection;
+using System.Utilities;
+
 codeunit 2000 "Time Series Management"
 {
 

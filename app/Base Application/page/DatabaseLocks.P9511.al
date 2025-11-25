@@ -1,3 +1,7 @@
+namespace System.DataAdministration;
+
+using System.Diagnostics;
+
 page 9511 "Database Locks"
 {
     Caption = 'Database Locks';

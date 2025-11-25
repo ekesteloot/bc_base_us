@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.WarehouseMgt.Setup;
+
 table 1301 "Item Template"
 {
     Caption = 'Item Template';

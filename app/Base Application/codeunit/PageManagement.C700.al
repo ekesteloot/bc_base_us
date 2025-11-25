@@ -331,8 +331,10 @@ codeunit 700 "Page Management"
                 exit(PAGE::"Cash Receipt Journal");
             GenJournalTemplate.Type::Payments:
                 exit(PAGE::"Payment Journal");
+#if not CLEAN21                
             GenJournalTemplate.Type::Assets:
                 exit(PAGE::"Fixed Asset G/L Journal");
+#endif
             GenJournalTemplate.Type::Intercompany:
                 exit(PAGE::"IC General Journal");
             GenJournalTemplate.Type::Jobs:
@@ -545,6 +547,6 @@ codeunit 700 "Page Management"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeVerifyPageID(TableID: Integer; PageID: Integer; var Result: Boolean; var IsHandled: Boolean)
     begin
-    end;    
+    end;
 }
 

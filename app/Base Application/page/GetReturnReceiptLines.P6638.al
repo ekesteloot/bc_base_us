@@ -175,7 +175,7 @@ page 6638 "Get Return Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ReturnRcptHeader.Get("Document No.");
+                        ReturnRcptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Return Receipt", ReturnRcptHeader);
                     end;
                 }
@@ -190,7 +190,7 @@ page 6638 "Get Return Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Entries")
@@ -202,7 +202,7 @@ page 6638 "Get Return Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }
@@ -243,7 +243,6 @@ page 6638 "Get Return Receipt Lines"
         SalesHeader: Record "Sales Header";
         TempReturnRcptLine: Record "Return Receipt Line" temporary;
         SalesGetReturnReceipts: Codeunit "Sales-Get Return Receipts";
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     procedure SetSalesHeader(var SalesHeader2: Record "Sales Header")
@@ -258,16 +257,16 @@ page 6638 "Get Return Receipt Lines"
     begin
         TempReturnRcptLine.Reset();
         TempReturnRcptLine.CopyFilters(Rec);
-        TempReturnRcptLine.SetRange("Document No.", "Document No.");
+        TempReturnRcptLine.SetRange("Document No.", Rec."Document No.");
         if not TempReturnRcptLine.FindFirst() then begin
             ReturnRcptLine.CopyFilters(Rec);
-            ReturnRcptLine.SetRange("Document No.", "Document No.");
+            ReturnRcptLine.SetRange("Document No.", Rec."Document No.");
             if not ReturnRcptLine.FindFirst() then
                 exit(false);
             TempReturnRcptLine := ReturnRcptLine;
             TempReturnRcptLine.Insert();
         end;
-        if "Line No." = TempReturnRcptLine."Line No." then
+        if Rec."Line No." = TempReturnRcptLine."Line No." then
             exit(true);
     end;
 

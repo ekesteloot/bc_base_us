@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Statement;
+
 page 389 "Bank Account Statement List"
 {
     ApplicationArea = Basic, Suite;
@@ -20,7 +22,7 @@ page 389 "Bank Account Statement List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the bank account that has been reconciled with this Bank Account Statement.';
                 }
-                field("Bank Account Name"; "Bank Account Name")
+                field("Bank Account Name"; Rec."Bank Account Name")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank account that has been reconciled.';

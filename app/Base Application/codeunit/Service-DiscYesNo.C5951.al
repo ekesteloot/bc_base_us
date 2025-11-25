@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using System.Utilities;
+
 codeunit 5951 "Service-Disc. (Yes/No)"
 {
     TableNo = "Service Line";

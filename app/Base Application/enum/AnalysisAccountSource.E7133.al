@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 enum 7133 "Analysis Account Source"
 {
     Extensible = true;

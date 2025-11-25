@@ -1,10 +1,15 @@
+namespace Microsoft.Purchases.Archive;
+
+using Microsoft.Purchases.Vendor;
+using System.Security.User;
+
 page 6623 "Blanket Purchase Order Archive"
 {
     Caption = 'Blanket Purchase Order Archive';
     Editable = false;
     PageType = Document;
     SourceTable = "Purchase Header Archive";
-    SourceTableView = WHERE("Document Type" = CONST("Blanket Order"));
+    SourceTableView = where("Document Type" = const("Blanket Order"));
 
     layout
     {
@@ -111,9 +116,9 @@ page 6623 "Blanket Purchase Order Archive"
             part(PurchLinesArchive; "Blanket Purch. Order Arch.Sub.")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Document No." = FIELD("No."),
-                              "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                              "Version No." = FIELD("Version No.");
+                SubPageLink = "Document No." = field("No."),
+                              "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                              "Version No." = field("Version No.");
             }
             group(Invoicing)
             {
@@ -307,7 +312,7 @@ page 6623 "Blanket Purchase Order Archive"
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the code of the port of entry where the items pass into your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the area in which your company has to pay sales tax.';
@@ -331,7 +336,7 @@ page 6623 "Blanket Purchase Order Archive"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Archived By");
+                        UserMgt.DisplayUserInformation(Rec."Archived By");
                     end;
                 }
                 field("Date Archived"; Rec."Date Archived")
@@ -380,7 +385,7 @@ page 6623 "Blanket Purchase Order Archive"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Vendor Card";
-                    RunPageLink = "No." = FIELD("Buy-from Vendor No.");
+                    RunPageLink = "No." = field("Buy-from Vendor No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
                 }
@@ -393,7 +398,7 @@ page 6623 "Blanket Purchase Order Archive"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Co&mments")
@@ -402,11 +407,11 @@ page 6623 "Blanket Purchase Order Archive"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Archive Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0),
-                                  "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                  "Version No." = FIELD("Version No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0),
+                                  "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                  "Version No." = field("Version No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Print)

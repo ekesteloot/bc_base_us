@@ -1,3 +1,11 @@
+﻿namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+
 codeunit 5615 "Budget Depreciation"
 {
 

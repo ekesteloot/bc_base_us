@@ -1,8 +1,16 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using System.Utilities;
+
 page 7133 "Item Budget Entries"
 {
     ApplicationArea = ItemBudget;
     Caption = 'Item Budget Entries';
-    DataCaptionExpression = GetCaption();
+    DataCaptionExpression = Rec.GetCaption();
     DelayedInsert = true;
     PageType = List;
     SourceTable = "Item Budget Entry";
@@ -21,7 +29,7 @@ page 7133 "Item Budget Entries"
                     Editable = false;
                     ToolTip = 'Specifies the name of the item budget that the entry belongs to.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = ItemBudget;
                     ToolTip = 'Specifies the date of this item budget entry.';
@@ -150,7 +158,7 @@ page 7133 "Item Budget Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -164,7 +172,7 @@ page 7133 "Item Budget Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -173,9 +181,9 @@ page 7133 "Item Budget Entries"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if "Entry No." <> 0 then
-            if "Dimension Set ID" <> xRec."Dimension Set ID" then
-                LowestModifiedEntryNo := "Entry No.";
+        if Rec."Entry No." <> 0 then
+            if Rec."Dimension Set ID" <> xRec."Dimension Set ID" then
+                LowestModifiedEntryNo := Rec."Entry No.";
     end;
 
     trigger OnClosePage()
@@ -188,8 +196,8 @@ page 7133 "Item Budget Entries"
 
     trigger OnDeleteRecord(): Boolean
     begin
-        if "Entry No." < LowestModifiedEntryNo then
-            LowestModifiedEntryNo := "Entry No.";
+        if Rec."Entry No." < LowestModifiedEntryNo then
+            LowestModifiedEntryNo := Rec."Entry No.";
         exit(true);
     end;
 
@@ -210,53 +218,53 @@ page 7133 "Item Budget Entries"
 
     trigger OnModifyRecord(): Boolean
     begin
-        if "Entry No." < LowestModifiedEntryNo then
-            LowestModifiedEntryNo := "Entry No.";
+        if Rec."Entry No." < LowestModifiedEntryNo then
+            LowestModifiedEntryNo := Rec."Entry No.";
         exit(true);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Budget Name" := GetRangeMin("Budget Name");
-        "Analysis Area" := GetRangeMin("Analysis Area");
-        if (ItemBudgetName.Name <> "Budget Name") or (ItemBudgetName."Analysis Area" <> "Analysis Area") then
-            ItemBudgetName.Get("Analysis Area", "Budget Name");
-        if GetFilter("Item No.") <> '' then
-            "Item No." := GetFirstItem(GetFilter("Item No."));
-        Date := GetFirstDate(GetFilter(Date));
-        "User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
+        Rec."Budget Name" := Rec.GetRangeMin("Budget Name");
+        Rec."Analysis Area" := Rec.GetRangeMin("Analysis Area");
+        if (ItemBudgetName.Name <> Rec."Budget Name") or (ItemBudgetName."Analysis Area" <> Rec."Analysis Area") then
+            ItemBudgetName.Get(Rec."Analysis Area", Rec."Budget Name");
+        if Rec.GetFilter("Item No.") <> '' then
+            Rec."Item No." := GetFirstItem(Rec.GetFilter("Item No."));
+        Rec.Date := GetFirstDate(Rec.GetFilter(Date));
+        Rec."User ID" := CopyStr(UserId(), 1, MaxStrLen(Rec."User ID"));
 
-        if GetFilter("Global Dimension 1 Code") <> '' then
-            "Global Dimension 1 Code" :=
-              GetFirstDimValue(GLSetup."Global Dimension 1 Code", GetFilter("Global Dimension 1 Code"));
+        if Rec.GetFilter("Global Dimension 1 Code") <> '' then
+            Rec."Global Dimension 1 Code" :=
+              GetFirstDimValue(GLSetup."Global Dimension 1 Code", Rec.GetFilter("Global Dimension 1 Code"));
 
-        if GetFilter("Global Dimension 2 Code") <> '' then
-            "Global Dimension 2 Code" :=
-              GetFirstDimValue(GLSetup."Global Dimension 2 Code", GetFilter("Global Dimension 2 Code"));
+        if Rec.GetFilter("Global Dimension 2 Code") <> '' then
+            Rec."Global Dimension 2 Code" :=
+              GetFirstDimValue(GLSetup."Global Dimension 2 Code", Rec.GetFilter("Global Dimension 2 Code"));
 
-        if GetFilter("Budget Dimension 1 Code") <> '' then
-            "Budget Dimension 1 Code" :=
-              GetFirstDimValue(ItemBudgetName."Budget Dimension 1 Code", GetFilter("Budget Dimension 1 Code"));
+        if Rec.GetFilter("Budget Dimension 1 Code") <> '' then
+            Rec."Budget Dimension 1 Code" :=
+              GetFirstDimValue(ItemBudgetName."Budget Dimension 1 Code", Rec.GetFilter("Budget Dimension 1 Code"));
 
-        if GetFilter("Budget Dimension 2 Code") <> '' then
-            "Budget Dimension 2 Code" :=
-              GetFirstDimValue(ItemBudgetName."Budget Dimension 2 Code", GetFilter("Budget Dimension 2 Code"));
+        if Rec.GetFilter("Budget Dimension 2 Code") <> '' then
+            Rec."Budget Dimension 2 Code" :=
+              GetFirstDimValue(ItemBudgetName."Budget Dimension 2 Code", Rec.GetFilter("Budget Dimension 2 Code"));
 
-        if GetFilter("Budget Dimension 3 Code") <> '' then
-            "Budget Dimension 3 Code" :=
-              GetFirstDimValue(ItemBudgetName."Budget Dimension 3 Code", GetFilter("Budget Dimension 3 Code"));
+        if Rec.GetFilter("Budget Dimension 3 Code") <> '' then
+            Rec."Budget Dimension 3 Code" :=
+              GetFirstDimValue(ItemBudgetName."Budget Dimension 3 Code", Rec.GetFilter("Budget Dimension 3 Code"));
 
-        if GetFilter("Location Code") <> '' then
-            "Location Code" := GetFirstLocationCode(GetFilter("Location Code"));
+        if Rec.GetFilter("Location Code") <> '' then
+            Rec."Location Code" := GetFirstLocationCode(Rec.GetFilter("Location Code"));
     end;
 
     trigger OnOpenPage()
     begin
-        if GetFilter("Budget Name") = '' then
+        if Rec.GetFilter("Budget Name") = '' then
             ItemBudgetName.Init()
         else begin
-            CopyFilter("Analysis Area", ItemBudgetName."Analysis Area");
-            CopyFilter("Budget Name", ItemBudgetName.Name);
+            Rec.CopyFilter("Analysis Area", ItemBudgetName."Analysis Area");
+            Rec.CopyFilter("Budget Name", ItemBudgetName.Name);
             ItemBudgetName.FindFirst();
         end;
         CurrPage.Editable := not ItemBudgetName.Blocked;
@@ -278,25 +286,15 @@ page 7133 "Item Budget Entries"
         ItemBudgetName: Record "Item Budget Name";
         DimensionSetIDFilter: Page "Dimension Set ID Filter";
         LowestModifiedEntryNo: Integer;
-        [InDataSet]
         GlobalDimension1CodeVisible: Boolean;
-        [InDataSet]
         GlobalDimension2CodeVisible: Boolean;
-        [InDataSet]
         BudgetDimension1CodeVisible: Boolean;
-        [InDataSet]
         BudgetDimension2CodeVisible: Boolean;
-        [InDataSet]
         BudgetDimension3CodeVisible: Boolean;
-        [InDataSet]
         GlobalDimension1CodeEnable: Boolean;
-        [InDataSet]
         GlobalDimension2CodeEnable: Boolean;
-        [InDataSet]
         BudgetDimension1CodeEnable: Boolean;
-        [InDataSet]
         BudgetDimension2CodeEnable: Boolean;
-        [InDataSet]
         BudgetDimension3CodeEnable: Boolean;
 
     local procedure GetFirstItem(ItemFilter: Text[250]): Code[20]

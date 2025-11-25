@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 table 7360 "Reservation Entry Buffer"
 {
     Caption = 'Reservation Entry Buffer';

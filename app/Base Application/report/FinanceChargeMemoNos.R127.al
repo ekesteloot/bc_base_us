@@ -1,7 +1,12 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.Foundation.NoSeries;
+using System.Utilities;
+
 report 127 "Finance Charge Memo Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/FinanceCharge/FinanceChargeMemoNos.rdlc';
+    RDLCLayout = './Sales/FinanceCharge/FinanceChargeMemoNos.rdlc';
     Caption = 'Finance Charge Memo Nos.';
     ObsoleteState = Pending;
     ObsoleteReason = 'Infrequently used report.';
@@ -11,7 +16,7 @@ report 127 "Finance Charge Memo Nos."
     {
         dataitem("Issued Fin. Charge Memo Header"; "Issued Fin. Charge Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Issued Finance Charge Memo';
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -55,7 +60,7 @@ report 127 "Finance Charge Memo Nos."
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorText_Number_; ErrorText[Number])
                 {
                 }
@@ -81,8 +86,8 @@ report 127 "Finance Charge Memo Nos."
             }
             dataitem(IssuedFinChrgMemoHeader; "Issued Fin. Charge Memo Header")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("No.");
                 column(IssuedFinChrgMemoHeader__User_ID_; "User ID")
                 {
                 }

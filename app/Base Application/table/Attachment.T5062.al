@@ -1,3 +1,12 @@
+﻿namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using System;
+using System.Environment;
+using System.IO;
+using System.Utilities;
+
 table 5062 Attachment
 {
     Caption = 'Attachment';
@@ -127,17 +136,10 @@ table 5062 Attachment
         AttachmentImportQst: Label 'Do you want to import attachment?';
         AttachmentExportQst: Label 'Do you want to export attachment to view or edit it externaly?';
 
-    [Scope('OnPrem')]
     procedure OpenAttachment(Caption: Text[260]; IsTemporary: Boolean; LanguageCode: Code[10])
     var
         SegmentLine: Record "Segment Line";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeOpenAttachment(Rec, Caption, IsTemporary, LanguageCode, IsHandled);
-        if IsHandled then
-            exit;
-
         if IsHTML() then begin
             SegmentLine.Init();
             SegmentLine."Language Code" := LanguageCode;
@@ -290,6 +292,7 @@ table 5062 Attachment
             "Storage Type" := "Storage Type"::Embedded;
             "Storage Pointer" := '';
             "File Extension" := CopyStr(UpperCase(FileManagement.GetExtension(FileName)), 1, 250);
+            Modify();
             exit(true);
         end;
 
@@ -632,10 +635,20 @@ table 5062 Attachment
 
     procedure ReadHTMLCustomLayoutAttachment(var ContentBodyText: Text; var CustomLayoutCode: Code[20]): Boolean
     var
+        ReportLayoutName: Text[250];
+    begin
+        exit(ReadHTMLCustomLayoutAttachment(ContentBodyText, CustomLayoutCode, ReportLayoutName));
+    end;
+
+    procedure ReadHTMLCustomLayoutAttachment(var ContentBodyText: Text; var CustomLayoutCode: Code[20]; var ReportLayoutName: Text[250]): Boolean
+    var
         DataText: Text;
     begin
         DataText := Read();
-        exit(ParseHTMLCustomLayoutAttachment(DataText, ContentBodyText, CustomLayoutCode));
+        if (DataText[1] = '<') and (StrPos(DataText, '>') > 1) then
+            exit(ParseHTMLCustomLayoutAttachment(DataText, ContentBodyText, ReportLayoutName))
+        else
+            exit(ParseHTMLCustomLayoutAttachment(DataText, ContentBodyText, CustomLayoutCode));
     end;
 
     procedure WriteHTMLCustomLayoutAttachment(ContentBodyText: Text; CustomLayoutCode: Code[20])
@@ -645,6 +658,12 @@ table 5062 Attachment
         DataText := PadStr('', GetCustomLayoutCodeLength() - StrLen(CustomLayoutCode), '0') + CustomLayoutCode;
         DataText += ContentBodyText;
         Write(DataText);
+        Modify();
+    end;
+
+    procedure WriteHTMLCustomLayoutAttachment(ContentBodyText: Text; ReportLayoutName: Text[250])
+    begin
+        Write('<' + ReportLayoutName + '>' + ContentBodyText);
         Modify();
     end;
 
@@ -670,6 +689,26 @@ table 5062 Attachment
         else
             ContentBodyText := CopyStr(DataText, LayoutIDLength + 1, TotalLength - LayoutIDLength);
 
+        exit(true);
+    end;
+
+    local procedure ParseHTMLCustomLayoutAttachment(DataText: Text; var ContentBodyText: Text; var LayoutName: Text[250]): Boolean
+    var
+        i: Integer;
+    begin
+
+        if DataText = '' then
+            exit(false);
+        if DataText[1] <> '<' then
+            exit(false);
+        i := StrPos(DataText, '>');
+        if i < 2 then
+            exit(false);
+        LayoutName := CopyStr(CopyStr(DataText, 2, i - 2), 1, MaxStrLen(LayoutName));
+        if StrLen(DataText) < i + 1 then
+            ContentBodyText := ''
+        else
+            ContentBodyText := CopyStr(DataText, i + 1);
         exit(true);
     end;
 
@@ -711,8 +750,15 @@ table 5062 Attachment
             exit(false);
 
         DataText := Read();
+        if DataText = '' then
+            exit(false);
         DataLength := StrLen(DataText);
 
+        // Is it a built-in layout name?
+        if (DataLength > 6) and (DataText[1] = '<') and (DataText[DataLength] = '>') then
+            exit(true);
+
+        // Is it a custom layout code?
         if DataLength < CustomLayoutIDLength then
             exit(false);
 
@@ -764,14 +810,6 @@ table 5062 Attachment
         CopyStream(OutStream, InStream);
     end;
 
-#if not CLEAN20
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced with event OnBeforeShowAttachment.', '20.0')]
-    local procedure OnBeforeRunAttachment(var SegLine: Record "Segment Line"; WordCaption: Text[260]; IsTemporary: Boolean; IsVisible: Boolean; Handler: Boolean; var iSHandled: Boolean)
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyAttachmentAsFile(var FromAttachment: Record Attachment; var ToAttachment: Record Attachment)
     begin
@@ -794,19 +832,6 @@ table 5062 Attachment
 
     [IntegrationEvent(false, false)]
     local procedure OnShowAttachmentOnAfterCalcAttachmentFile(var Attachment: Record Attachment)
-    begin
-    end;
-
-#if not CLEAN20
-    [Obsolete('The event is no longer referenced as the code path calls .Net that is not supported on non-Windows client types. If needed, request a new event in ShowAttachment procedure.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnRunAttachmentOnBeforeWordManagementRunMergedDocument(var Attachment: Record Attachment; var Handler: Boolean)
-    begin
-    end;
-#endif
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenAttachment(var Attachment: Record Attachment; var Caption: Text[260]; IsTemporary: Boolean; LanguageCode: Code[10]; var IsHandled: Boolean)
     begin
     end;
 }

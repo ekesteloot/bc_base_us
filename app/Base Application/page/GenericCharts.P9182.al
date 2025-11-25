@@ -1,3 +1,9 @@
+﻿namespace System.Visualization;
+
+using System.IO;
+using System.Reflection;
+using System.Utilities;
+
 page 9182 "Generic Charts"
 {
     ApplicationArea = Basic, Suite;
@@ -5,7 +11,7 @@ page 9182 "Generic Charts"
     CardPageID = "Generic Chart Setup";
     PageType = List;
     SourceTable = Chart;
-    SourceTableView = SORTING(ID);
+    SourceTableView = sorting(ID);
     UsageCategory = Lists;
 
     layout
@@ -15,7 +21,7 @@ page 9182 "Generic Charts"
             repeater(Control7)
             {
                 ShowCaption = false;
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'ID';
@@ -27,7 +33,7 @@ page 9182 "Generic Charts"
                     Caption = 'Name';
                     ToolTip = 'Specifies the name of the record.';
                 }
-                field("BLOB.HASVALUE"; BLOB.HasValue)
+                field("BLOB.HASVALUE"; Rec.BLOB.HasValue)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Data';
@@ -80,16 +86,16 @@ page 9182 "Generic Charts"
                         RecordRef: RecordRef;
                         ChartExists: Boolean;
                     begin
-                        ChartExists := BLOB.HasValue;
+                        ChartExists := Rec.BLOB.HasValue;
                         if FileMgt.BLOBImport(TempBlob, '*.xml') = '' then
                             exit;
 
                         if ChartExists then
-                            if not Confirm(Text001, false, TableCaption(), ID) then
+                            if not Confirm(Text001, false, Rec.TableCaption(), Rec.ID) then
                                 exit;
 
                         RecordRef.GetTable(Rec);
-                        TempBlob.ToRecordRef(RecordRef, FieldNo(BLOB));
+                        TempBlob.ToRecordRef(RecordRef, Rec.FieldNo(BLOB));
                         RecordRef.SetTable(Rec);
                         CurrPage.SaveRecord();
                     end;
@@ -107,9 +113,9 @@ page 9182 "Generic Charts"
                         TempBlob: Codeunit "Temp Blob";
                         FileMgt: Codeunit "File Management";
                     begin
-                        CalcFields(BLOB);
-                        if BLOB.HasValue() then begin
-                            TempBlob.FromRecord(Rec, FieldNo(BLOB));
+                        Rec.CalcFields(BLOB);
+                        if Rec.BLOB.HasValue() then begin
+                            TempBlob.FromRecord(Rec, Rec.FieldNo(BLOB));
                             FileMgt.BLOBExport(TempBlob, '*.xml', true);
                         end;
                     end;
@@ -126,8 +132,8 @@ page 9182 "Generic Charts"
                     var
                         CopyGenericChart: Page "Copy Generic Chart";
                     begin
-                        if BLOB.HasValue() then
-                            CalcFields(BLOB);
+                        if Rec.BLOB.HasValue() then
+                            Rec.CalcFields(BLOB);
                         CopyGenericChart.SetSourceChart(Rec);
                         CopyGenericChart.RunModal();
                     end;
@@ -141,10 +147,10 @@ page 9182 "Generic Charts"
 
                     trigger OnAction()
                     begin
-                        if BLOB.HasValue() then
-                            if Confirm(Text002, false, TableCaption(), ID) then begin
-                                CalcFields(BLOB);
-                                Clear(BLOB);
+                        if Rec.BLOB.HasValue() then
+                            if Confirm(Text002, false, Rec.TableCaption(), Rec.ID) then begin
+                                Rec.CalcFields(BLOB);
+                                Clear(Rec.BLOB);
                                 CurrPage.SaveRecord();
                             end;
                     end;

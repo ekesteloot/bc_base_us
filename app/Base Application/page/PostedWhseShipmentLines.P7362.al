@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.History;
+
 page 7362 "Posted Whse. Shipment Lines"
 {
     Caption = 'Posted Whse. Shipment Lines';
@@ -168,7 +170,7 @@ page 7362 "Posted Whse. Shipment Lines"
                     var
                         PostedWhseShptHeader: Record "Posted Whse. Shipment Header";
                     begin
-                        PostedWhseShptHeader.Get("No.");
+                        PostedWhseShptHeader.Get(Rec."No.");
                         PAGE.Run(PAGE::"Posted Whse. Shipment", PostedWhseShptHeader);
                     end;
                 }

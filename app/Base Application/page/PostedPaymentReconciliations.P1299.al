@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
 page 1299 "Posted Payment Reconciliations"
 {
     ApplicationArea = Basic, Suite;

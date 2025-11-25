@@ -4,8 +4,8 @@ page 36641 "Order Lines Status Factbox"
     Editable = false;
     PageType = ListPart;
     SourceTable = "Sales Line";
-    SourceTableView = SORTING("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date")
-                      WHERE("Document Type" = FILTER(Order | "Return Order"));
+    SourceTableView = sorting("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date")
+                      where("Document Type" = filter(Order | "Return Order"));
 
     layout
     {
@@ -44,11 +44,11 @@ page 36641 "Order Lines Status Factbox"
                     trigger OnDrillDown()
                     begin
                         GetOrder();
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 if PAGE.RunModal(PAGE::"Sales Order", SalesHeader) = ACTION::LookupOK then
                                     ;
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 if PAGE.RunModal(PAGE::"Sales Return Order", SalesHeader) = ACTION::LookupOK then
                                     ;
                         end;
@@ -129,13 +129,13 @@ page 36641 "Order Lines Status Factbox"
 
                     trigger OnDrillDown()
                     begin
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 begin
                                     GetLastShipment();
                                     if PAGE.RunModal(PAGE::"Posted Sales Shipments", SalesShipmentHeader) = ACTION::LookupOK then;
                                 end;
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 begin
                                     GetLastRetReceipt();
                                     if PAGE.RunModal(PAGE::"Posted Return Receipts", RetReceiptHeader) = ACTION::LookupOK then;
@@ -156,13 +156,13 @@ page 36641 "Order Lines Status Factbox"
 
                     trigger OnDrillDown()
                     begin
-                        case "Document Type" of
-                            "Document Type"::Order:
+                        case Rec."Document Type" of
+                            Rec."Document Type"::Order:
                                 begin
                                     GetLastInvoice();
                                     if PAGE.RunModal(PAGE::"Posted Sales Invoices", SalesInvoiceHeader) = ACTION::LookupOK then;
                                 end;
-                            "Document Type"::"Return Order":
+                            Rec."Document Type"::"Return Order":
                                 begin
                                     GetLastCrMemo();
                                     if PAGE.RunModal(PAGE::"Posted Sales Credit Memos", RetCreditMemoHeader) = ACTION::LookupOK then;
@@ -209,14 +209,14 @@ page 36641 "Order Lines Status Factbox"
     procedure DefaultFromSalesHeader()
     begin
         GetOrder();
-        if "Shipment Date" = 0D then
-            "Shipment Date" := SalesHeader."Shipment Date";
-        if "Requested Delivery Date" = 0D then
-            "Requested Delivery Date" := SalesHeader."Requested Delivery Date";
-        if "Promised Delivery Date" = 0D then
-            "Promised Delivery Date" := SalesHeader."Promised Delivery Date";
-        if CalcDate("Shipping Time", WorkDate()) = WorkDate() then
-            "Shipping Time" := SalesHeader."Shipping Time";
+        if Rec."Shipment Date" = 0D then
+            Rec."Shipment Date" := SalesHeader."Shipment Date";
+        if Rec."Requested Delivery Date" = 0D then
+            Rec."Requested Delivery Date" := SalesHeader."Requested Delivery Date";
+        if Rec."Promised Delivery Date" = 0D then
+            Rec."Promised Delivery Date" := SalesHeader."Promised Delivery Date";
+        if CalcDate(Rec."Shipping Time", WorkDate()) = WorkDate() then
+            Rec."Shipping Time" := SalesHeader."Shipping Time";
     end;
 
     procedure GetLastShipmentInvoice()
@@ -225,8 +225,8 @@ page 36641 "Order Lines Status Factbox"
         // Get order first
         GetOrder();
         // Get shipment and Invoice if they exist
-        case "Document Type" of
-            "Document Type"::Order:
+        case Rec."Document Type" of
+            Rec."Document Type"::Order:
                 begin
                     if GetLastShipment() then
                         LastShipmentDate := SalesShipmentHeader."Shipment Date"
@@ -237,7 +237,7 @@ page 36641 "Order Lines Status Factbox"
                     else
                         LastInvoiceDate := 0D;
                 end;
-            "Document Type"::"Return Order":
+            Rec."Document Type"::"Return Order":
                 begin
                     if GetLastRetReceipt() then
                         LastShipmentDate := RetReceiptHeader."Posting Date"
@@ -249,23 +249,23 @@ page 36641 "Order Lines Status Factbox"
                         LastInvoiceDate := 0D;
                 end;
             else begin
-                    LastShipmentDate := 0D;
-                    LastInvoiceDate := 0D;
-                end;
+                LastShipmentDate := 0D;
+                LastInvoiceDate := 0D;
+            end;
         end;
     end;
 
     procedure GetOrder()
     begin
-        if (SalesHeader."Document Type" <> "Document Type") or (SalesHeader."No." <> "Document No.") then
-            if not SalesHeader.Get("Document Type", "Document No.") then
-                Message(Text000, "Document Type", "Document No.");
+        if (SalesHeader."Document Type" <> Rec."Document Type") or (SalesHeader."No." <> Rec."Document No.") then
+            if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+                Message(Text000, Rec."Document Type", Rec."Document No.");
     end;
 
     procedure GetLastShipment(): Boolean
     begin
         SalesShipmentHeader.SetCurrentKey("Order No."/*, "Shipment Date"*/); // may want to create this key
-        SalesShipmentHeader.SetRange("Order No.", "Document No.");
+        SalesShipmentHeader.SetRange("Order No.", Rec."Document No.");
         exit(SalesShipmentHeader.FindLast());
 
     end;
@@ -273,7 +273,7 @@ page 36641 "Order Lines Status Factbox"
     procedure GetLastInvoice(): Boolean
     begin
         SalesInvoiceHeader.SetCurrentKey("Order No."/*, "Shipment Date"*/); // may want to create this key
-        SalesInvoiceHeader.SetRange("Order No.", "Document No.");
+        SalesInvoiceHeader.SetRange("Order No.", Rec."Document No.");
         exit(SalesInvoiceHeader.FindLast());
 
     end;
@@ -281,7 +281,7 @@ page 36641 "Order Lines Status Factbox"
     procedure GetLastRetReceipt(): Boolean
     begin
         RetReceiptHeader.SetCurrentKey("Return Order No."/*, "Shipment Date"*/); // may want to create this key
-        RetReceiptHeader.SetRange("Return Order No.", "Document No.");
+        RetReceiptHeader.SetRange("Return Order No.", Rec."Document No.");
         exit(RetReceiptHeader.FindLast());
 
     end;
@@ -289,7 +289,7 @@ page 36641 "Order Lines Status Factbox"
     procedure GetLastCrMemo(): Boolean
     begin
         RetCreditMemoHeader.SetCurrentKey("Return Order No."/*, "Shipment Date"*/); // may want to create this key
-        RetCreditMemoHeader.SetRange("Return Order No.", "Document No.");
+        RetCreditMemoHeader.SetRange("Return Order No.", Rec."Document No.");
         exit(RetCreditMemoHeader.FindLast());
 
     end;

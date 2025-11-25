@@ -37,7 +37,7 @@ page 1052 "Reminder Terms Translation"
 
     trigger OnOpenPage()
     begin
-        PageCaption := "Reminder Terms Code";
+        PageCaption := Rec."Reminder Terms Code";
     end;
 
     var

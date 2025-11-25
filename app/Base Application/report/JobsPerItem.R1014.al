@@ -1,7 +1,7 @@
 report 1014 "Jobs per Item"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/JobsperItem.rdlc';
+    RDLCLayout = './ProjectMgt/Jobs/Reports/JobsperItem.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Jobs per Item';
     UsageCategory = ReportsAndAnalysis;
@@ -74,7 +74,7 @@ report 1014 "Jobs per Item"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(AccountNo1_JobBuffer; TempJobBuffer."Account No. 1")
                 {
                 }

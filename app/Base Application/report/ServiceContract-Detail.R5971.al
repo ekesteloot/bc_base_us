@@ -1,7 +1,15 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Contract;
+using System.Utilities;
+
 report 5971 "Service Contract-Detail"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ServiceContractDetail.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceContractDetail.rdlc';
     Caption = 'Service Contract-Detail';
 
     dataset
@@ -9,7 +17,7 @@ report 5971 "Service Contract-Detail"
         dataitem("Service Contract Header"; "Service Contract Header")
         {
             CalcFields = "Bill-to Name";
-            DataItemTableView = SORTING("Contract Type", "Contract No.") WHERE("Contract Type" = CONST(Contract));
+            DataItemTableView = sorting("Contract Type", "Contract No.") where("Contract Type" = const(Contract));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Contract No.", "Customer No.";
             column(ContrType_ServeContrHdr; "Contract Type")
@@ -21,7 +29,7 @@ report 5971 "Service Contract-Detail"
             }
             dataitem(PageLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) ORDER(Descending) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) ORDER(Descending) where(Number = const(1));
                 column(CustAddr6; CustAddr[6])
                 {
                 }
@@ -132,9 +140,9 @@ report 5971 "Service Contract-Detail"
                 }
                 dataitem("Contract/Service Discount"; "Contract/Service Discount")
                 {
-                    DataItemLink = "Contract Type" = FIELD("Contract Type"), "Contract No." = FIELD("Contract No.");
+                    DataItemLink = "Contract Type" = field("Contract Type"), "Contract No." = field("Contract No.");
                     DataItemLinkReference = "Service Contract Header";
-                    DataItemTableView = SORTING("Contract Type", "Contract No.", Type, "No.", "Starting Date");
+                    DataItemTableView = sorting("Contract Type", "Contract No.", Type, "No.", "Starting Date");
                     column(Type_ContrServeDiscount; Type)
                     {
                         IncludeCaption = true;
@@ -156,9 +164,9 @@ report 5971 "Service Contract-Detail"
                 }
                 dataitem("Service Contract Line"; "Service Contract Line")
                 {
-                    DataItemLink = "Contract Type" = FIELD("Contract Type"), "Contract No." = FIELD("Contract No.");
+                    DataItemLink = "Contract Type" = field("Contract Type"), "Contract No." = field("Contract No.");
                     DataItemLinkReference = "Service Contract Header";
-                    DataItemTableView = SORTING("Contract Type", "Contract No.", "Line No.");
+                    DataItemTableView = sorting("Contract Type", "Contract No.", "Line No.");
                     column(ServeItmNo_ServeContrLine; "Service Item No.")
                     {
                     }
@@ -212,8 +220,8 @@ report 5971 "Service Contract-Detail"
                     }
                     dataitem("Service Comment Line"; "Service Comment Line")
                     {
-                        DataItemLink = "Table Subtype" = FIELD("Contract Type"), "Table Line No." = FIELD("Line No."), "No." = FIELD("Contract No.");
-                        DataItemTableView = SORTING("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") ORDER(Ascending) WHERE("Table Name" = FILTER("Service Contract"));
+                        DataItemLink = "Table Subtype" = field("Contract Type"), "Table Line No." = field("Line No."), "No." = field("Contract No.");
+                        DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") ORDER(Ascending) where("Table Name" = filter("Service Contract"));
                         column(Date_ServeCmntLine; Format(Date))
                         {
                         }
@@ -236,7 +244,7 @@ report 5971 "Service Contract-Detail"
             dataitem(Shipto; "Integer")
             {
                 DataItemLinkReference = "Service Contract Header";
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(ShipToAddr6; ShipToAddr[6])
                 {
                 }
@@ -267,8 +275,8 @@ report 5971 "Service Contract-Detail"
             }
             dataitem(ServcommentLine2; "Service Comment Line")
             {
-                DataItemLink = "Table Subtype" = FIELD("Contract Type"), "No." = FIELD("Contract No.");
-                DataItemTableView = SORTING("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") ORDER(Ascending) WHERE("Table Name" = FILTER("Service Contract"), "Table Line No." = FILTER(0));
+                DataItemLink = "Table Subtype" = field("Contract Type"), "No." = field("Contract No.");
+                DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") ORDER(Ascending) where("Table Name" = filter("Service Contract"), "Table Line No." = filter(0));
                 column(Date_ServcmntLine2; Format(Date))
                 {
                 }

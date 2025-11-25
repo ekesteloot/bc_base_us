@@ -1,14 +1,21 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Ledger;
+using System.Utilities;
+
 report 5984 "Contract Invoicing"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ContractInvoicing.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ContractInvoicing.rdlc';
     Caption = 'Contract Invoicing - Test';
 
     dataset
     {
         dataitem("Service Contract Header"; "Service Contract Header")
         {
-            DataItemTableView = SORTING("Bill-to Customer No.", "Contract Type", "Combine Invoices", "Next Invoice Date") WHERE("Contract Type" = CONST(Contract), Status = CONST(Signed));
+            DataItemTableView = sorting("Bill-to Customer No.", "Contract Type", "Combine Invoices", "Next Invoice Date") where("Contract Type" = const(Contract), Status = const(Signed));
             RequestFilterFields = "Bill-to Customer No.", "Contract No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -66,7 +73,7 @@ report 5984 "Contract Invoicing"
             }
             dataitem(ContrHeader; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(CustNo_ServContract; "Service Contract Header"."Customer No.")
                 {
                 }
@@ -98,7 +105,7 @@ report 5984 "Contract Invoicing"
             }
             dataitem(InvPeriod; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ContractInvPeriod; TempServiceLedgerEntry."Contract Invoice Period")
                 {
                 }
@@ -123,7 +130,7 @@ report 5984 "Contract Invoicing"
             }
             dataitem(ContrSum; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(InvSum; InvoiceSum)
                 {
                 }

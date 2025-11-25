@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 page 7302 Bins
 {
     Caption = 'Bins';
@@ -19,7 +21,7 @@ page 7302 Bins
                     ToolTip = 'Specifies the location from which you opened the Bins window.';
                     Visible = false;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a code that uniquely describes the bin.';
@@ -31,7 +33,7 @@ page 7302 Bins
                     ToolTip = 'Specifies the code of the zone in which the bin is located.';
                     Visible = false;
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a description of the bin.';
@@ -56,7 +58,7 @@ page 7302 Bins
 
                     trigger OnValidate()
                     begin
-                        if "Block Movement" <> xRec."Block Movement" then
+                        if Rec."Block Movement" <> xRec."Block Movement" then
                             if not Confirm(Text004, false) then
                                 Error('');
                     end;
@@ -71,7 +73,6 @@ page 7302 Bins
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the ranking of the bin. Items in the highest-ranking bins (with the highest number in the field) will be picked first.';
-                    Visible = false;
                 }
                 field("Maximum Cubage"; Rec."Maximum Cubage")
                 {
@@ -85,7 +86,7 @@ page 7302 Bins
                     ToolTip = 'Specifies the maximum weight that this bin can hold.';
                     Visible = false;
                 }
-                field(Empty; Empty)
+                field(Empty; Rec.Empty)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies that the bin Specifies no items.';
@@ -96,7 +97,7 @@ page 7302 Bins
                     ToolTip = 'Specifies if the bin is considered a cross-dock bin.';
                     Visible = false;
                 }
-                field(Dedicated; Dedicated)
+                field(Dedicated; Rec.Dedicated)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies that quantities in the bin are protected from being picked for other demands.';
@@ -150,9 +151,9 @@ page 7302 Bins
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        if GetFilter("Zone Code") <> '' then
-            "Zone Code" := GetFilter("Zone Code");
-        SetUpNewLine();
+        if Rec.GetFilter("Zone Code") <> '' then
+            Rec."Zone Code" := Rec.GetFilter("Zone Code");
+        Rec.SetUpNewLine();
     end;
 
     var
@@ -165,7 +166,7 @@ page 7302 Bins
         SourceTableName: Text[30];
     begin
         SourceTableName := ObjTransl.TranslateObject(ObjTransl."Object Type"::Table, 14);
-        FormCaption := StrSubstNo('%1 %2', SourceTableName, "Location Code");
+        FormCaption := StrSubstNo('%1 %2', SourceTableName, Rec."Location Code");
         exit(FormCaption);
     end;
 }

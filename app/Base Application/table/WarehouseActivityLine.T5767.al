@@ -1,4 +1,36 @@
-﻿table 5767 "Warehouse Activity Line"
+﻿namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Family;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Availability;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.WarehouseMgt.Worksheet;
+using System.Utilities;
+
+table 5767 "Warehouse Activity Line"
 {
     Caption = 'Warehouse Activity Line';
     DrillDownPageID = "Warehouse Activity Lines";
@@ -101,7 +133,7 @@
         {
             Caption = 'Variant Code';
             Editable = false;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             var
@@ -113,7 +145,7 @@
                 if IsHandled then
                     exit;
 
-                if "Variant Code" = '' then
+                if Rec."Variant Code" = '' then
                     Validate("Item No.")
                 else begin
                     ItemVariant.Get("Item No.", "Variant Code");
@@ -130,7 +162,7 @@
         {
             Caption = 'Unit of Measure Code';
             Editable = false;
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             begin
@@ -356,17 +388,17 @@
         {
             Caption = 'Destination No.';
             Editable = false;
-            TableRelation = IF ("Destination Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Destination Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Destination Type" = CONST(Location)) Location
-            ELSE
-            IF ("Destination Type" = CONST(Item)) Item
-            ELSE
-            IF ("Destination Type" = CONST(Family)) Family
-            ELSE
-            IF ("Destination Type" = CONST("Sales Order")) "Sales Header"."No." WHERE("Document Type" = CONST(Order));
+            TableRelation = if ("Destination Type" = const(Vendor)) Vendor
+            else
+            if ("Destination Type" = const(Customer)) Customer
+            else
+            if ("Destination Type" = const(Location)) Location
+            else
+            if ("Destination Type" = const(Item)) Item
+            else
+            if ("Destination Type" = const(Family)) Family
+            else
+            if ("Destination Type" = const("Sales Order")) "Sales Header"."No." where("Document Type" = const(Order));
         }
         field(42; "Shipping Agent Code"; Code[10])
         {
@@ -376,7 +408,7 @@
         field(43; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(44; "Shipment Method Code"; Code[10])
         {
@@ -419,6 +451,7 @@
         field(6500; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
+            ExtendedDatatype = Barcode;
 
             trigger OnLookup()
             begin
@@ -458,6 +491,7 @@
         field(6501; "Lot No."; Code[50])
         {
             Caption = 'Lot No.';
+            ExtendedDatatype = Barcode;
 
             trigger OnLookup()
             begin
@@ -513,18 +547,18 @@
         }
         field(6504; "Serial No. Blocked"; Boolean)
         {
-            CalcFormula = Lookup("Serial No. Information".Blocked WHERE("Item No." = FIELD("Item No."),
-                                                                         "Variant Code" = FIELD("Variant Code"),
-                                                                         "Serial No." = FIELD("Serial No.")));
+            CalcFormula = Lookup("Serial No. Information".Blocked where("Item No." = field("Item No."),
+                                                                         "Variant Code" = field("Variant Code"),
+                                                                         "Serial No." = field("Serial No.")));
             Caption = 'Serial No. Blocked';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6505; "Lot No. Blocked"; Boolean)
         {
-            CalcFormula = Lookup("Lot No. Information".Blocked WHERE("Item No." = FIELD("Item No."),
-                                                                      "Variant Code" = FIELD("Variant Code"),
-                                                                      "Lot No." = FIELD("Lot No.")));
+            CalcFormula = Lookup("Lot No. Information".Blocked where("Item No." = field("Item No."),
+                                                                      "Variant Code" = field("Variant Code"),
+                                                                      "Lot No." = field("Lot No.")));
             Caption = 'Lot No. Blocked';
             Editable = false;
             FieldClass = FlowField;
@@ -533,10 +567,11 @@
         {
             Caption = 'Package No.';
             CaptionClass = '6,1';
+            ExtendedDatatype = Barcode;
 
             trigger OnLookup()
             begin
-                LookUpTrackingSummary(Rec, ShouldLookUpBinContent(), -1, "Item Tracking Type"::"Package No.");
+                LookUpTrackingSummary(Rec, ShouldLookUpBinContent(), -1, Enum::"Item Tracking Type"::"Package No.");
             end;
 
             trigger OnValidate()
@@ -545,7 +580,7 @@
                     ItemTrackingMgt.CheckWhseItemTrkgSetup("Item No.");
 
                     if "Activity Type" in ["Activity Type"::Pick, "Activity Type"::"Invt. Pick"] then
-                        CheckReservedItemTrkg("Item Tracking Type"::"Package No.", "Package No.");
+                        CheckReservedItemTrkg(Enum::"Item Tracking Type"::"Package No.", "Package No.");
                 end;
 
                 if CurrFieldNo = FieldNo("Package No.") then
@@ -556,10 +591,10 @@
         {
             AccessByPermission = TableData "Warehouse Source Filter" = R;
             Caption = 'Bin Code';
-            TableRelation = IF ("Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                               "Zone Code" = FIELD("Zone Code"));
+            TableRelation = if ("Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                               "Zone Code" = field("Zone Code"));
 
             trigger OnLookup()
             var
@@ -642,7 +677,7 @@
                             end else begin
                                 if "Qty. to Handle" > 0 then
                                     CheckIncreaseCapacity(false);
-                                xRec.DeleteBinContent("Warehouse Action Type"::Place.AsInteger());
+                                xRec.DeleteBinContent(Enum::"Warehouse Action Type"::Place.AsInteger());
                             end;
                         end;
 
@@ -672,7 +707,7 @@
         field(7301; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -699,42 +734,42 @@
         {
             Caption = 'Whse. Document No.';
             Editable = false;
-            TableRelation = IF ("Whse. Document Type" = CONST(Receipt)) "Posted Whse. Receipt Header"."No." WHERE("No." = FIELD("Whse. Document No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Shipment)) "Warehouse Shipment Header"."No." WHERE("No." = FIELD("Whse. Document No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST("Internal Put-away")) "Whse. Internal Put-away Header"."No." WHERE("No." = FIELD("Whse. Document No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST("Internal Pick")) "Whse. Internal Pick Header"."No." WHERE("No." = FIELD("Whse. Document No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Production)) "Production Order"."No." WHERE("No." = FIELD("Whse. Document No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Assembly)) "Assembly Header"."No." WHERE("Document Type" = CONST(Order),
-                                                                                                           "No." = FIELD("Whse. Document No."));
+            TableRelation = if ("Whse. Document Type" = const(Receipt)) "Posted Whse. Receipt Header"."No." where("No." = field("Whse. Document No."))
+            else
+            if ("Whse. Document Type" = const(Shipment)) "Warehouse Shipment Header"."No." where("No." = field("Whse. Document No."))
+            else
+            if ("Whse. Document Type" = const("Internal Put-away")) "Whse. Internal Put-away Header"."No." where("No." = field("Whse. Document No."))
+            else
+            if ("Whse. Document Type" = const("Internal Pick")) "Whse. Internal Pick Header"."No." where("No." = field("Whse. Document No."))
+            else
+            if ("Whse. Document Type" = const(Production)) "Production Order"."No." where("No." = field("Whse. Document No."))
+            else
+            if ("Whse. Document Type" = const(Assembly)) "Assembly Header"."No." where("Document Type" = const(Order),
+                                                                                                           "No." = field("Whse. Document No."));
         }
         field(7308; "Whse. Document Line No."; Integer)
         {
             BlankZero = true;
             Caption = 'Whse. Document Line No.';
             Editable = false;
-            TableRelation = IF ("Whse. Document Type" = CONST(Receipt)) "Posted Whse. Receipt Line"."Line No." WHERE("No." = FIELD("Whse. Document No."),
-                                                                                                                    "Line No." = FIELD("Whse. Document Line No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Shipment)) "Warehouse Shipment Line"."Line No." WHERE("No." = FIELD("Whse. Document No."),
-                                                                                                                                                                                                                "Line No." = FIELD("Whse. Document Line No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST("Internal Put-away")) "Whse. Internal Put-away Line"."Line No." WHERE("No." = FIELD("Whse. Document No."),
-                                                                                                                                                                                                                                                                                                                            "Line No." = FIELD("Whse. Document Line No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST("Internal Pick")) "Whse. Internal Pick Line"."Line No." WHERE("No." = FIELD("Whse. Document No."),
-                                                                                                                                                                                                                                                                                                                                                                                                                                "Line No." = FIELD("Whse. Document Line No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Production)) "Prod. Order Line"."Line No." WHERE("Prod. Order No." = FIELD("No."),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       "Line No." = FIELD("Line No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Assembly)) "Assembly Line"."Line No." WHERE("Document Type" = CONST(Order),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "Document No." = FIELD("Whse. Document No."),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "Line No." = FIELD("Whse. Document Line No."));
+            TableRelation = if ("Whse. Document Type" = const(Receipt)) "Posted Whse. Receipt Line"."Line No." where("No." = field("Whse. Document No."),
+                                                                                                                    "Line No." = field("Whse. Document Line No."))
+            else
+            if ("Whse. Document Type" = const(Shipment)) "Warehouse Shipment Line"."Line No." where("No." = field("Whse. Document No."),
+                                                                                                                                                                                                                "Line No." = field("Whse. Document Line No."))
+            else
+            if ("Whse. Document Type" = const("Internal Put-away")) "Whse. Internal Put-away Line"."Line No." where("No." = field("Whse. Document No."),
+                                                                                                                                                                                                                                                                                                                            "Line No." = field("Whse. Document Line No."))
+            else
+            if ("Whse. Document Type" = const("Internal Pick")) "Whse. Internal Pick Line"."Line No." where("No." = field("Whse. Document No."),
+                                                                                                                                                                                                                                                                                                                                                                                                                                "Line No." = field("Whse. Document Line No."))
+            else
+            if ("Whse. Document Type" = const(Production)) "Prod. Order Line"."Line No." where("Prod. Order No." = field("No."),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       "Line No." = field("Line No."))
+            else
+            if ("Whse. Document Type" = const(Assembly)) "Assembly Line"."Line No." where("Document Type" = const(Order),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "Document No." = field("Whse. Document No."),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "Line No." = field("Whse. Document Line No."));
         }
         field(7309; "Bin Ranking"; Integer)
         {
@@ -784,6 +819,53 @@
         {
             Caption = 'Dedicated';
             Editable = false;
+        }
+        field(7319; "Over-Receipt Quantity"; Decimal)
+        {
+            Caption = 'Over-Receipt Quantity';
+            DecimalPlaces = 0 : 5;
+            BlankZero = false;
+            MinValue = 0;
+
+            trigger OnValidate()
+            var
+                PurchaseLine: Record "Purchase Line";
+                OverReceiptMgt: Codeunit "Over-Receipt Mgt.";
+            begin
+                if not OverReceiptMgt.IsOverReceiptAllowed() then begin
+                    "Over-Receipt Quantity" := 0;
+                    exit;
+                end;
+
+                TestField("Source Document", "Source Document"::"Purchase Order");
+
+                if xRec."Over-Receipt Quantity" = "Over-Receipt Quantity" then
+                    exit;
+
+                if "Over-Receipt Quantity" <> 0 then begin
+                    if "Over-Receipt Code" = '' then begin
+                        PurchaseLine.Get("Source Subtype", "Source No.", "Source Line No.");
+                        "Over-Receipt Code" := OverReceiptMgt.GetDefaultOverReceiptCode(PurchaseLine);
+                    end;
+                    TestField("Over-Receipt Code");
+                end;
+
+                Validate(Quantity, Quantity - xRec."Over-Receipt Quantity" + "Over-Receipt Quantity");
+                Modify();
+
+                OverReceiptMgt.UpdatePurchaseLineOverReceiptQuantityFromWarehouseActivityLine(Rec);
+            end;
+        }
+        field(7320; "Over-Receipt Code"; Code[20])
+        {
+            Caption = 'Over-Receipt Code';
+            TableRelation = "Over-Receipt Code";
+
+            trigger OnValidate()
+            begin
+                if ((Rec."Over-Receipt Code" = '') and (xRec."Over-Receipt Code" <> '')) then
+                    Validate("Over-Receipt Quantity", 0);
+            end;
         }
     }
     keys
@@ -932,27 +1014,25 @@
     begin
         IsHandled := false;
         OnBeforeAutofillQtyToHandle(WarehouseActivityLine, IsHandled);
-        if IsHandled then
-            exit;
+        if not IsHandled then
+            with WarehouseActivityLine do begin
+                NotEnough := false;
+                if Find('-') then
+                    repeat
+                        Validate("Qty. to Handle", "Qty. Outstanding");
+                        if "Qty. to Handle (Base)" <> "Qty. Outstanding (Base)" then
+                            Validate("Qty. to Handle (Base)", "Qty. Outstanding (Base)");
+                        Modify();
+                        OnAfterAutofillQtyToHandleLine(WarehouseActivityLine);
 
-        with WarehouseActivityLine do begin
-            NotEnough := false;
-            if Find('-') then
-                repeat
-                    Validate("Qty. to Handle", "Qty. Outstanding");
-                    if "Qty. to Handle (Base)" <> "Qty. Outstanding (Base)" then
-                        Validate("Qty. to Handle (Base)", "Qty. Outstanding (Base)");
-                    Modify();
-                    OnAfterAutofillQtyToHandleLine(WarehouseActivityLine);
+                        if not NotEnough then
+                            if "Qty. to Handle" < "Qty. Outstanding" then
+                                NotEnough := true;
+                    until Next() = 0;
 
-                    if not NotEnough then
-                        if "Qty. to Handle" < "Qty. Outstanding" then
-                            NotEnough := true;
-                until Next() = 0;
-
-            if GuiAllowed() and NotEnough then
-                Message(Text008);
-        end;
+                if GuiAllowed() and NotEnough then
+                    Message(Text008);
+            end;
 
         OnAfterAutofillQtyToHandle(WarehouseActivityLine);
     end;
@@ -1028,7 +1108,7 @@
                 repeat
                     OnDeleteRelatedWhseActivLinesOnBeforeDeleteWhseActivLine2(WarehouseActivityLine, WarehouseActivityLine2, CalledFromHeader);
                     DeleteWarehouseActivityLine2(WarehouseActivityLine2, CalledFromHeader);
-                    WarehouseActivityLine2.DeleteBinContent("Warehouse Action Type"::Place.AsInteger());
+                    WarehouseActivityLine2.DeleteBinContent(Enum::"Warehouse Action Type"::Place.AsInteger());
                     UpdateRelatedItemTrkg(WarehouseActivityLine2);
                     OnDeleteRelatedWhseActivLinesOnAfterUpdateRelatedItemTrkg(WarehouseActivityLine, WarehouseActivityLine2, CalledFromHeader);
                 until WarehouseActivityLine2.Next() = 0;
@@ -1142,21 +1222,21 @@
             exit;
 
         case "Source Type" of
-            DATABASE::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component".AsInteger():
                 begin
                     ProdOrderComponentLine.Get(
                       "Source Subtype", "Source No.",
                       "Source Line No.", "Source Subline No.");
                     TestField("Bin Code", ProdOrderComponentLine."Bin Code");
                 end;
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line".AsInteger():
                 begin
                     AssemblyLine.Get(
                       "Source Subtype", "Source No.",
                       "Source Line No.");
                     TestField("Bin Code", AssemblyLine."Bin Code");
                 end;
-            DATABASE::Job:
+            Enum::TableID::Job.AsInteger():
                 begin
                     JobPlanningLine.SetRange("Job Contract Entry No.", "Source Line No.");
                     JobPlanningLine.SetLoadFields("Bin Code");
@@ -1681,13 +1761,13 @@
                     SetWhseItemTrkgLineFiltersWhseShipment(WhseItemTrackingLine, WarehouseActivityLine);
                 WarehouseActivityLine."Whse. Document Type"::"Internal Pick":
                     begin
-                        WhseItemTrackingLine.SetRange("Source Type", DATABASE::"Whse. Internal Pick Line");
+                        WhseItemTrackingLine.SetRange("Source Type", Enum::TableID::"Whse. Internal Pick Line");
                         WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Whse. Document No.");
                         WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Whse. Document Line No.");
                     end;
                 WarehouseActivityLine."Whse. Document Type"::"Internal Put-away":
                     begin
-                        WhseItemTrackingLine.SetRange("Source Type", DATABASE::"Whse. Internal Put-away Line");
+                        WhseItemTrackingLine.SetRange("Source Type", Enum::TableID::"Whse. Internal Put-away Line");
                         WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Whse. Document No.");
                         WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Whse. Document Line No.");
                     end;
@@ -1708,24 +1788,24 @@
                     end;
                 WarehouseActivityLine."Whse. Document Type"::Job:
                     begin
-                        WhseItemTrackingLine.SetFilter("Source Type", '%1|%2', WarehouseActivityLine."Source Type", Database::"Job Planning Line");
+                        WhseItemTrackingLine.SetFilter("Source Type", '%1|%2', WarehouseActivityLine."Source Type", Enum::TableID::"Job Planning Line");
                         WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Source No.");
                         WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Source Line No.");
                     end;
             end;
             if WarehouseActivityLine."Activity Type" = WarehouseActivityLine."Activity Type"::"Invt. Movement" then
                 case WarehouseActivityLine."Source Type" of
-                    DATABASE::"Prod. Order Component":
+                    Enum::TableID::"Prod. Order Component".AsInteger():
                         begin
-                            WhseItemTrackingLine.SetRange("Source Type", DATABASE::"Prod. Order Component");
+                            WhseItemTrackingLine.SetRange("Source Type", Enum::TableID::"Prod. Order Component");
                             WhseItemTrackingLine.SetRange("Source Subtype", WarehouseActivityLine."Source Subtype");
                             WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Source No.");
                             WhseItemTrackingLine.SetRange("Source Prod. Order Line", WarehouseActivityLine."Source Line No.");
                             WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Source Subline No.");
                         end;
-                    DATABASE::"Assembly Line":
+                    Enum::TableID::"Assembly Line".AsInteger():
                         begin
-                            WhseItemTrackingLine.SetRange("Source Type", DATABASE::"Assembly Line");
+                            WhseItemTrackingLine.SetRange("Source Type", Enum::TableID::"Assembly Line");
                             WhseItemTrackingLine.SetRange("Source Subtype", WarehouseActivityLine."Source Subtype");
                             WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Source No.");
                             WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Source Line No.");
@@ -1765,7 +1845,7 @@
         if IsHandled then
             exit;
 
-        WhseItemTrackingLine.SetRange("Source Type", DATABASE::"Warehouse Shipment Line");
+        WhseItemTrackingLine.SetRange("Source Type", Enum::TableID::"Warehouse Shipment Line");
         WhseItemTrackingLine.SetRange("Source ID", WarehouseActivityLine."Whse. Document No.");
         WhseItemTrackingLine.SetRange("Source Ref. No.", WarehouseActivityLine."Whse. Document Line No.");
     end;
@@ -1878,10 +1958,10 @@
             (ReservEntry."Source Subtype" <> "Source Subtype") or
             (ReservEntry."Source ID" <> "Source No.") or
             (((ReservEntry."Source Ref. No." <> "Source Line No.") and
-                (ReservEntry."Source Type" <> DATABASE::"Prod. Order Component")) or
+                (ReservEntry."Source Type" <> Enum::TableID::"Prod. Order Component".AsInteger())) or
                 (((ReservEntry."Source Prod. Order Line" <> "Source Line No.") or
                 (ReservEntry."Source Ref. No." <> "Source Subline No.")) and
-                (ReservEntry."Source Type" = DATABASE::"Prod. Order Component"))))
+                (ReservEntry."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger()))))
         then
             Error(Text014, FieldCaption("Serial No."), ItemTrkgCode);
     end;
@@ -1921,10 +2001,10 @@
                     (ReservEntry2."Source Subtype" <> "Source Subtype") or
                     (ReservEntry2."Source ID" <> "Source No.") or
                     (((ReservEntry2."Source Ref. No." <> "Source Line No.") and
-                        (ReservEntry2."Source Type" <> DATABASE::"Prod. Order Component")) or
+                        (ReservEntry2."Source Type" <> Enum::TableID::"Prod. Order Component".AsInteger())) or
                         (((ReservEntry2."Source Prod. Order Line" <> "Source Line No.") or
                         (ReservEntry2."Source Ref. No." <> "Source Subline No.")) and
-                        (ReservEntry2."Source Type" = DATABASE::"Prod. Order Component")))) and
+                        (ReservEntry2."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger())))) and
                     (ReservEntry2."Lot No." = '')
                 then
                     AvailQtyFromOtherResvLines := AvailQtyFromOtherResvLines + Abs(ReservEntry2."Quantity (Base)");
@@ -2083,7 +2163,7 @@
         "Description 2" := WhseInternalPickLine."Description 2";
         "Due Date" := WhseInternalPickLine."Due Date";
         "Starting Date" := WorkDate();
-        "Source Type" := DATABASE::"Whse. Internal Pick Line";
+        "Source Type" := Enum::TableID::"Whse. Internal Pick Line".AsInteger();
         "Source No." := WhseInternalPickLine."No.";
         "Source Line No." := WhseInternalPickLine."Line No.";
         "Whse. Document Type" := "Whse. Document Type"::"Internal Pick";
@@ -2096,7 +2176,7 @@
     procedure TransferFromCompLine(ProdOrderCompLine: Record "Prod. Order Component")
     begin
         "Activity Type" := "Activity Type"::Pick;
-        "Source Type" := DATABASE::"Prod. Order Component";
+        "Source Type" := Enum::TableID::"Prod. Order Component".AsInteger();
         "Source Subtype" := ProdOrderCompLine.Status.AsInteger();
         "Source No." := ProdOrderCompLine."Prod. Order No.";
         "Source Line No." := ProdOrderCompLine."Prod. Order Line No.";
@@ -2127,7 +2207,7 @@
         Job: Record Job;
     begin
         "Activity Type" := "Activity Type"::Pick;
-        "Source Type" := DATABASE::Job;
+        "Source Type" := Enum::TableID::Job.AsInteger();
         "Source Subtype" := 0;
         "Source No." := JobPlanningLine."Job No.";
         "Source Line No." := JobPlanningLine."Job Contract Entry No.";
@@ -2174,7 +2254,7 @@
         AsmHeader: Record "Assembly Header";
     begin
         "Activity Type" := "Activity Type"::Pick;
-        "Source Type" := DATABASE::"Assembly Line";
+        "Source Type" := Enum::TableID::"Assembly Line".AsInteger();
         "Source Subtype" := AssemblyLine."Document Type".AsInteger();
         "Source No." := AssemblyLine."Document No.";
         "Source Line No." := AssemblyLine."Line No.";
@@ -2224,7 +2304,7 @@
     begin
         with WarehouseActivityLine do begin
             TrackingSpecification.Init();
-            if "Source Type" = DATABASE::"Prod. Order Component" then
+            if "Source Type" = Enum::TableID::"Prod. Order Component".AsInteger() then
                 TrackingSpecification.SetSource(
                   "Source Type", "Source Subtype", "Source No.", "Source Subline No.", '', "Source Line No.")
             else
@@ -2450,6 +2530,7 @@
     local procedure ConfirmWhseActivLinesDeletionOutOfBalance(WarehouseActivityLine: Record "Warehouse Activity Line"; var WarehouseActivityLine2: Record "Warehouse Activity Line"; var DeleteLineConfirmed: Boolean)
     var
         WarehouseActivityLine3: Record "Warehouse Activity Line";
+        ConfirmManagement: Codeunit "Confirm Management";
         IsHandled: Boolean;
     begin
         with WarehouseActivityLine2 do begin
@@ -2471,7 +2552,7 @@
                     OnBeforeConfirmWhseActivLinesDeletionOutOfBalance(WarehouseActivityLine2, IsHandled);
                     if not IsHandled then
                         if not DeleteLineConfirmed then
-                            if not Confirm(
+                            if not ConfirmManagement.GetResponseOrDefault(
                                  StrSubstNo(
                                    Text004,
                                    WarehouseActivityLine.FieldCaption("Activity Type"), WarehouseActivityLine."Activity Type", FieldCaption("No."), "No.",
@@ -2514,7 +2595,7 @@
     procedure SetSourceFilter(SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer; SourceSubLineNo: Integer; SetKey: Boolean)
     begin
         if SetKey then
-            SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+            SetCurrentKey(Rec."Source Type", Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.", Rec."Source Subline No.");
         SetRange("Source Type", SourceType);
         if SourceSubType >= 0 then
             SetRange("Source Subtype", SourceSubType);
@@ -2614,17 +2695,6 @@
 
         OnAfterSetTrackingFilterIfNotEmpty(Rec);
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by SetTrackingFilterFrom procedures.', '17.0')]
-    procedure SetTrackingFilter(SerialNo: Code[50]; LotNo: Code[50])
-    begin
-        SetRange("Serial No.", SerialNo);
-        SetRange("Lot No.", LotNo);
-
-        OnAfterSetTrackingFilter(Rec);
-    end;
-#endif
 
     procedure SetTrackingFilterFromBinContent(var BinContent: Record "Bin Content")
     begin
@@ -3050,14 +3120,6 @@
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by events OnAfterSetTrackingFilterFrom', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetTrackingFilter(var WarehouseActivityLine: Record "Warehouse Activity Line")
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetTrackingFilterIfNotEmpty(var WarehouseActivityLine: Record "Warehouse Activity Line")
     begin
@@ -3319,7 +3381,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowDeletedMessage(WarehouseActivityLine: Record "Warehouse Activity Line"; var IsHandled: Boolean)
+    local procedure OnBeforeShowDeletedMessage(var WarehouseActivityLine: Record "Warehouse Activity Line"; var IsHandled: Boolean)
     begin
     end;
 

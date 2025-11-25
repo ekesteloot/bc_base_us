@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 page 5127 "Opportunity Statistics"
 {
     Caption = 'Opportunity Statistics';

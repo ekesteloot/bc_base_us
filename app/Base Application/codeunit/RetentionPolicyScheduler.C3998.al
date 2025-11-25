@@ -1,3 +1,7 @@
+namespace System.DataAdministration;
+
+using System.Threading;
+
 Codeunit 3998 "Retention Policy Scheduler"
 {
     Access = Internal;
@@ -89,7 +93,7 @@ Codeunit 3998 "Retention Policy Scheduler"
                 JobQueueCategoryTok,
                 0, // no rerun attempts
                 NextRunDateFormula,
-                020000T, // 2am
+                220000T, // 10pm
                 JobTimeout());
             RetentionPolicyLog.LogInfo(RetentionPolicyLogCategory::"Retention Policy - Schedule", JobQueueActivatedNotificationTxt);
         end;
@@ -97,7 +101,7 @@ Codeunit 3998 "Retention Policy Scheduler"
 
     local procedure JobTimeout(): Duration
     begin
-        exit(6 * 60 * 60 * 1000) // 6hr timeout
+        exit(10 * 60 * 60 * 1000) // 10hr timeout
     end;
 
     local procedure UnScheduleRecurringRetentionPolicy()

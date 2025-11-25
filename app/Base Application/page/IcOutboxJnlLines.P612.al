@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Outbox;
+
 page 612 "IC Outbox Jnl. Lines"
 {
     Caption = 'IC Outbox Jnl. Lines';
@@ -106,11 +108,11 @@ page 612 "IC Outbox Jnl. Lines"
                     Caption = '&Dimensions';
                     Image = Dimensions;
                     RunObject = Page "IC Inbox/Outbox Jnl. Line Dim.";
-                    RunPageLink = "Table ID" = CONST(415),
-                                  "Transaction No." = FIELD("Transaction No."),
-                                  "IC Partner Code" = FIELD("IC Partner Code"),
-                                  "Transaction Source" = FIELD("Transaction Source"),
-                                  "Line No." = FIELD("Line No.");
+                    RunPageLink = "Table ID" = const(415),
+                                  "Transaction No." = field("Transaction No."),
+                                  "IC Partner Code" = field("IC Partner Code"),
+                                  "Transaction Source" = field("Transaction Source"),
+                                  "Line No." = field("Line No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to journal lines to distribute costs and analyze transaction history.';
                 }

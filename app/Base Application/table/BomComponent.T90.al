@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.BOM;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 table 90 "BOM Component"
 {
     Caption = 'BOM Component';
@@ -10,7 +16,7 @@ table 90 "BOM Component"
         {
             Caption = 'Parent Item No.';
             NotBlank = true;
-            TableRelation = Item WHERE(Type = CONST(Inventory));
+            TableRelation = Item where(Type = const(Inventory));
         }
         field(2; "Line No."; Integer)
         {
@@ -29,9 +35,9 @@ table 90 "BOM Component"
         field(4; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(Item)) Item WHERE(Type = FILTER(Inventory | "Non-Inventory"))
-            ELSE
-            IF (Type = CONST(Resource)) Resource;
+            TableRelation = if (Type = const(Item)) Item where(Type = filter(Inventory | "Non-Inventory"))
+            else
+            if (Type = const(Resource)) Resource;
 
             trigger OnValidate()
             begin
@@ -50,7 +56,7 @@ table 90 "BOM Component"
         }
         field(5; "Assembly BOM"; Boolean)
         {
-            CalcFormula = Exist("BOM Component" WHERE("Parent Item No." = FIELD("No.")));
+            CalcFormula = exist("BOM Component" where("Parent Item No." = field("No.")));
             Caption = 'Assembly BOM';
             Editable = false;
             FieldClass = FlowField;
@@ -62,9 +68,9 @@ table 90 "BOM Component"
         field(7; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
-            IF (Type = CONST(Resource)) "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
+            if (Type = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("No."));
         }
         field(8; "Quantity per"; Decimal)
         {
@@ -100,7 +106,7 @@ table 90 "BOM Component"
         }
         field(14; "BOM Description"; Text[100])
         {
-            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Parent Item No.")));
+            CalcFormula = Lookup(Item.Description where("No." = field("Parent Item No.")));
             Caption = 'BOM Description';
             Editable = false;
             FieldClass = FlowField;
@@ -122,11 +128,11 @@ table 90 "BOM Component"
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
 
             trigger OnValidate()
             begin
-                if "Variant Code" = '' then
+                if Rec."Variant Code" = '' then
                     exit;
                 TestField(Type, Type::Item);
                 TestField("No.");
@@ -173,7 +179,7 @@ table 90 "BOM Component"
         field(5901; "Installed in Item No."; Code[20])
         {
             Caption = 'Installed in Item No.';
-            TableRelation = IF (Type = CONST(Item)) Item;
+            TableRelation = if (Type = const(Item)) Item;
 
             trigger OnLookup()
             begin

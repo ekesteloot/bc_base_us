@@ -1,3 +1,24 @@
+﻿namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+#if not CLEAN21
+using Microsoft.BankMgt.Check;
+#endif
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Environment.Configuration;
+using System.Telemetry;
+
 #pragma warning disable AA0198
 codeunit 1255 "Match Bank Payments"
 {
@@ -123,7 +144,7 @@ codeunit 1255 "Match Bank Payments"
         IsAutoMatch: Boolean;
         MatchingRuleFound: Boolean;
     begin
-        IsAutoMatch := BankPmtApplRule.IsMatchedAutomatically(BankAccReconciliaitonLine."Match Confidence", BankAccReconciliaitonLine."Applied Entries");
+        IsAutoMatch := BankPmtApplRule.IsMatchedAutomatically(BankAccReconciliaitonLine."Match Confidence".AsInteger(), BankAccReconciliaitonLine."Applied Entries");
         if IsAutoMatch or (BankAccReconciliaitonLine."Match Confidence" = BankAccReconciliaitonLine."Match Confidence"::Accepted) then begin
             BankPmtApplRule.SetRange(Score, BankAccReconciliaitonLine."Match Quality");
             MatchingRuleFound := BankPmtApplRule.FindFirst();
@@ -1148,7 +1169,7 @@ codeunit 1255 "Match Bank Payments"
                         Score := TempBankPmtApplRule.GetTextMapperScore();
                     end else begin
                         EntryNo := -TextToAccMapping."Line No."; // mark negative to identify text-mapper
-                        AccountType := "Gen. Journal Account Type".FromInteger(TextToAccMapping."Bal. Source Type");
+                        AccountType := Enum::"Gen. Journal Account Type".FromInteger(TextToAccMapping."Bal. Source Type");
                         Score := TempBankPmtApplRule.GetTextMapperScore();
                     end;
 

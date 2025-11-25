@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5173 "Answer Points List"
 {
     Caption = 'Answer Points List';
@@ -31,7 +33,7 @@ page 5173 "Answer Points List"
                     Editable = false;
                     ToolTip = 'Specifies answers to the questions in the profile questionnaire.';
                 }
-                field(Points; Points)
+                field(Points; Rec.Points)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the number of points you have assigned to this answer.';
@@ -59,13 +61,13 @@ page 5173 "Answer Points List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if not ProfileQuestionnaireLine.Get("Rating Profile Quest. Code", "Rating Profile Quest. Line No.") then
+        if not ProfileQuestionnaireLine.Get(Rec."Rating Profile Quest. Code", Rec."Rating Profile Quest. Line No.") then
             Clear(ProfileQuestionnaireLine);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        if ProfileQuestionnaireLine.Get("Rating Profile Quest. Code", "Rating Profile Quest. Line No.") then;
+        if ProfileQuestionnaireLine.Get(Rec."Rating Profile Quest. Code", Rec."Rating Profile Quest. Line No.") then;
     end;
 
     var

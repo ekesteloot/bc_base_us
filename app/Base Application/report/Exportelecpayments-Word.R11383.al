@@ -1,15 +1,13 @@
 report 11383 "ExportElecPayments - Word"
 {
-    RDLCLayout = './Local/ExportElecPaymentsWord.rdlc';
-    WordLayout = './ExportElecPaymentsWord.docx';
     Caption = 'Export Electronic Payments';
-    DefaultLayout = Word;
+    DefaultRenderingLayout = "ExportElecPaymentsWord.docx";
 
     dataset
     {
         dataitem("Gen. Journal Line"; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.") WHERE("Bank Payment Type" = FILTER("Electronic Payment" | "Electronic Payment-IAT"), "Document Type" = FILTER(Payment | Refund));
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.") where("Bank Payment Type" = filter("Electronic Payment" | "Electronic Payment-IAT"), "Document Type" = filter(Payment | Refund));
             RequestFilterFields = "Journal Template Name", "Journal Batch Name";
             column(Gen__Journal_Line_Journal_Template_Name; "Journal Template Name")
             {
@@ -25,7 +23,7 @@ report 11383 "ExportElecPayments - Word"
             }
             dataitem(LetterText; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(GreetingText; GreetingLbl)
                 {
                 }
@@ -59,16 +57,16 @@ report 11383 "ExportElecPayments - Word"
                 column(CompanyAddress_8; CompanyAddress[8])
                 {
                 }
-                column(CompanyLegalOffice; CompanyInfo.GetLegalOffice())
+                column(CompanyLegalOffice; '')
                 {
                 }
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CopyTxt; CopyTxt)
                     {
                     }
@@ -218,7 +216,7 @@ report 11383 "ExportElecPayments - Word"
                     }
                     dataitem(PrintCompanyAddress; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(CompanyPicture; CompanyInfo.Picture)
                         {
                         }
@@ -264,9 +262,9 @@ report 11383 "ExportElecPayments - Word"
                     }
                     dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
                     {
-                        DataItemLink = "Applies-to ID" = FIELD("Applies-to ID");
+                        DataItemLink = "Applies-to ID" = field("Applies-to ID");
                         DataItemLinkReference = "Gen. Journal Line";
-                        DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) WHERE(Open = CONST(true));
+                        DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) where(Open = const(true));
                         column(Cust__Ledger_Entry__Document_Type_; "Document Type")
                         {
                         }
@@ -332,9 +330,9 @@ report 11383 "ExportElecPayments - Word"
                     }
                     dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
                     {
-                        DataItemLink = "Applies-to ID" = FIELD("Applies-to ID");
+                        DataItemLink = "Applies-to ID" = field("Applies-to ID");
                         DataItemLinkReference = "Gen. Journal Line";
-                        DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) WHERE(Open = CONST(true));
+                        DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date", "Currency Code") ORDER(Descending) where(Open = const(true));
                         column(Vendor_Ledger_Entry__Document_Type_; "Document Type")
                         {
                         }
@@ -399,7 +397,7 @@ report 11383 "ExportElecPayments - Word"
                     }
                     dataitem(CustomerInfo; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = const(1));
                         column(AmountPaid_Customer; AmountPaid)
                         {
                         }
@@ -427,7 +425,7 @@ report 11383 "ExportElecPayments - Word"
                     }
                     dataitem(VendorInfo; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = const(1));
                         column(Vend_Remaining_Amt_LCY; -VendLedgEntry."Remaining Amt. (LCY)")
                         {
                         }
@@ -455,7 +453,7 @@ report 11383 "ExportElecPayments - Word"
                     }
                     dataitem(Unapplied; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Text004; Text004Lbl)
                         {
                         }
@@ -643,6 +641,28 @@ report 11383 "ExportElecPayments - Word"
         end;
     }
 
+    rendering
+    {
+        layout("ExportElecPaymentsWord.rdlc")
+        {
+            Type = RDLC;
+            Caption = 'RDLC layout for the Export Electronic Payments';
+            LayoutFile = './Local/ExportElecPaymentsWord.rdlc';
+        }
+        layout("ExportElecPaymentsWord.docx")
+        {
+            Type = Word;
+            Caption = 'Word layout for the Export Electronic Payments';
+            LayoutFile = './Local/ExportElecPaymentsWord.docx';
+        }
+        layout("ExportElecPaymentsWordEmail.docx")
+        {
+            Type = Word;
+            Caption = 'Email body for the Export Electronic Payments';
+            LayoutFile = './Local/ExportElecPaymentsWordEmail.docx';
+        }
+    }
+
     labels
     {
     }
@@ -706,7 +726,6 @@ report 11383 "ExportElecPayments - Word"
         VendBankAccount: Record "Vendor Bank Account";
         VendLedgEntry: Record "Vendor Ledger Entry";
         Vendor: Record Vendor;
-        CompanyInfo: Record "Company Information";
         FormatAddress: Codeunit "Format Address";
         ExportAmount: Decimal;
         BankAccountIs: Option Acnt,BalAcnt;
@@ -725,16 +744,16 @@ report 11383 "ExportElecPayments - Word"
         myType: Integer;
         SaveAmountPaid: Decimal;
         SupportedOutputMethod: Option Print,Preview,PDF,Email,Word,XML;
-        [InDataSet]
         ChosenOutputMethod: Integer;
-        [InDataSet]
         PrintIfEmailIsMissing: Boolean;
-        [InDataSet]
         ShowPrintIfEmailIsMissing: Boolean;
         IsSummary: Boolean;
         GreetingLbl: Label 'Hello';
         ClosingLbl: Label 'Sincerely';
         BodyLbl: Label 'Thank you for your business. Your remittance is attached to this message.';
+
+    protected var
+        CompanyInfo: Record "Company Information";
 
     local procedure MapOutputMethod()
     var

@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Resources;
+
 page 6021 "Resource Service Zones"
 {
     ApplicationArea = Service;

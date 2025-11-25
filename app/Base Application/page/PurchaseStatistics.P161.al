@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+
 page 161 "Purchase Statistics"
 {
     Caption = 'Purchase Statistics';
@@ -145,7 +153,7 @@ page 161 "Purchase Statistics"
 
     trigger OnAfterGetRecord()
     begin
-        CurrPage.Caption(StrSubstNo(Text000, "Document Type"));
+        CurrPage.Caption(StrSubstNo(Text000, Rec."Document Type"));
         if PrevNo = Rec."No." then begin
             GetVATSpecification();
             exit;
@@ -166,7 +174,7 @@ page 161 "Purchase Statistics"
           not (PurchSetup."Calc. Inv. Discount" and VendInvDiscRecExists(Rec."Invoice Disc. Code"));
         AllowVATDifference :=
           PurchSetup."Allow VAT Difference" and
-          not (Rec."Document Type" in ["Purchase Document Type"::Quote, "Purchase Document Type"::"Blanket Order"]);
+          not (Rec."Document Type" in [Rec."Document Type"::Quote, Rec."Document Type"::"Blanket Order"]);
         OnOpenPageOnBeforeSetEditable(AllowInvDisc, AllowVATDifference, Rec, PurchSetup);
         CurrPage.Editable := AllowVATDifference or AllowInvDisc;
         SetVATSpecification();
@@ -224,7 +232,7 @@ page 161 "Purchase Statistics"
         else
             TotalPurchLineLCY.Amount := TotalAmount1;
         if Rec."Currency Code" <> '' then begin
-            if (Rec."Document Type" in ["Purchase Document Type"::"Blanket Order", "Purchase Document Type"::Quote]) and
+            if (Rec."Document Type" in [Rec."Document Type"::"Blanket Order", Rec."Document Type"::Quote]) and
                (Rec."Posting Date" = 0D)
             then
                 UseDate := WorkDate()
@@ -274,7 +282,7 @@ page 161 "Purchase Statistics"
         InvDiscBaseAmount: Decimal;
     begin
         CheckAllowInvDisc();
-        InvDiscBaseAmount := TempVATAmountLine.GetTotalInvDiscBaseAmount(false, "Currency Code");
+        InvDiscBaseAmount := TempVATAmountLine.GetTotalInvDiscBaseAmount(false, Rec."Currency Code");
         if InvDiscBaseAmount = 0 then
             Error(Text003, TempVATAmountLine.FieldCaption("Inv. Disc. Base Amount"));
 

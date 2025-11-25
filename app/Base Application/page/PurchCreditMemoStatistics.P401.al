@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+
+
 page 401 "Purch. Credit Memo Statistics"
 {
     Caption = 'Purch. Credit Memo Statistics';
@@ -16,7 +24,7 @@ page 401 "Purch. Credit Memo Statistics"
                 field("VendAmount + InvDiscAmount"; VendAmount + InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Amount';
                     ToolTip = 'Specifies the net amount of all the lines in the purchase document.';
@@ -24,7 +32,7 @@ page 401 "Purch. Credit Memo Statistics"
                 field(InvDiscAmount; InvDiscAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     ToolTip = 'Specifies the invoice discount amount for the purchase document.';
@@ -32,7 +40,7 @@ page 401 "Purch. Credit Memo Statistics"
                 field(VendAmount; VendAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total amount, less any invoice discount amount, and excluding VAT for the purchase document.';
@@ -40,7 +48,7 @@ page 401 "Purch. Credit Memo Statistics"
                 field(VATAmount; VATAmount)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = '3,' + Format(VATAmountText);
                     Caption = 'VAT Amount';
@@ -49,7 +57,7 @@ page 401 "Purch. Credit Memo Statistics"
                 field(AmountInclVAT; AmountInclVAT)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total Incl. VAT';
                     ToolTip = 'Specifies the total amount, including VAT, that will be posted to the vendor''s account for all the lines in the purchase document.';
@@ -126,7 +134,7 @@ page 401 "Purch. Credit Memo Statistics"
     begin
         ClearAll();
 
-        Currency.Initialize("Currency Code");
+        Currency.Initialize(Rec."Currency Code");
 
         CalculateTotals();
 
@@ -138,27 +146,27 @@ page 401 "Purch. Credit Memo Statistics"
         else
             VATAmountText := StrSubstNo(Text001, VATPercentage);
 
-        if "Currency Code" = '' then
+        if Rec."Currency Code" = '' then
             AmountLCY := VendAmount
         else
             AmountLCY :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                WorkDate(), "Currency Code", VendAmount, "Currency Factor");
+                WorkDate(), Rec."Currency Code", VendAmount, Rec."Currency Factor");
 
         VendLedgEntry.SetCurrentKey("Document No.");
-        VendLedgEntry.SetRange("Document No.", "No.");
+        VendLedgEntry.SetRange("Document No.", Rec."No.");
         VendLedgEntry.SetRange("Document Type", VendLedgEntry."Document Type"::"Credit Memo");
-        VendLedgEntry.SetRange("Vendor No.", "Pay-to Vendor No.");
+        VendLedgEntry.SetRange("Vendor No.", Rec."Pay-to Vendor No.");
         if VendLedgEntry.FindFirst() then
             AmountLCY := VendLedgEntry."Purchase (LCY)";
 
-        if not Vend.Get("Pay-to Vendor No.") then
+        if not Vend.Get(Rec."Pay-to Vendor No.") then
             Clear(Vend);
         Vend.CalcFields("Balance (LCY)");
 
         PurchCrMemoLine.CalcVATAmountLines(Rec, TempVATAmountLine);
         CurrPage.SubForm.PAGE.SetTempVATAmountLine(TempVATAmountLine);
-        CurrPage.SubForm.PAGE.InitGlobals("Currency Code", false, false, false, false, "VAT Base Discount %");
+        CurrPage.SubForm.PAGE.InitGlobals(Rec."Currency Code", false, false, false, false, Rec."VAT Base Discount %");
     end;
 
     var
@@ -193,12 +201,12 @@ page 401 "Purch. Credit Memo Statistics"
         if IsHandled then
             exit;
 
-        PurchCrMemoLine.SetRange("Document No.", "No.");
+        PurchCrMemoLine.SetRange("Document No.", Rec."No.");
         if PurchCrMemoLine.Find('-') then
             repeat
                 VendAmount += PurchCrMemoLine.Amount;
                 AmountInclVAT += PurchCrMemoLine."Amount Including VAT";
-                if "Prices Including VAT" then
+                if Rec."Prices Including VAT" then
                     InvDiscAmount += PurchCrMemoLine."Inv. Discount Amount" / (1 + PurchCrMemoLine."VAT %" / 100)
                 else
                     InvDiscAmount += PurchCrMemoLine."Inv. Discount Amount";

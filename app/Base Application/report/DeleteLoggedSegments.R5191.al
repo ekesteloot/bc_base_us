@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Interaction;
+
 report 5191 "Delete Logged Segments"
 {
     Caption = 'Delete Logged Segments';
@@ -8,7 +13,7 @@ report 5191 "Delete Logged Segments"
     {
         dataitem("Logged Segment"; "Logged Segment")
         {
-            DataItemTableView = SORTING("Entry No.") WHERE(Canceled = CONST(true));
+            DataItemTableView = sorting("Entry No.") where(Canceled = const(true));
             RequestFilterFields = "Entry No.", "Segment No.";
 
             trigger OnAfterGetRecord()

@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 table 924 "Vendor Purchase Buffer"
 {
     DataClassification = SystemMetadata;

@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.GLAccount;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 page 626 "IC Mapping Chart of Account"
 {
     PageType = ListPlus;

@@ -70,6 +70,23 @@ page 9994 "API Data Upgrade List"
                     CurrPage.Update();
                 end;
             }
+            action("Disable API Data Upgrades")
+            {
+                ApplicationArea = All;
+                Image = Setup;
+                ToolTip = 'Disables API data upgrades for the next update.';
+
+                trigger OnAction();
+                var
+                    UpgradeTag: Codeunit "Upgrade Tag";
+                    APIDataUpgrade: Codeunit "API Data Upgrade";
+                begin
+                    if UpgradeTag.HasUpgradeTag(APIDataUpgrade.GetDisableAPIDataUpgradesTag()) then
+                        exit
+                    else
+                        UpgradeTag.SetUpgradeTag(APIDataUpgrade.GetDisableAPIDataUpgradesTag());
+                end;
+            }
         }
         area(Promoted)
         {

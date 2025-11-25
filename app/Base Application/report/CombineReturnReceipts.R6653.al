@@ -1,3 +1,13 @@
+namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using System.Globalization;
+
 report 6653 "Combine Return Receipts"
 {
     ApplicationArea = SalesReturnOrder, PurchReturnOrder;
@@ -9,19 +19,19 @@ report 6653 "Combine Return Receipts"
     {
         dataitem(SalesOrderHeader; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "Combine Shipments", "Bill-to Customer No.") WHERE("Document Type" = CONST("Return Order"), "Combine Shipments" = CONST(true));
+            DataItemTableView = sorting("Document Type", "Combine Shipments", "Bill-to Customer No.") where("Document Type" = const("Return Order"), "Combine Shipments" = const(true));
             RequestFilterFields = "Sell-to Customer No.", "Bill-to Customer No.";
             RequestFilterHeading = 'Sales Return Order';
             dataitem("Return Receipt Header"; "Return Receipt Header")
             {
-                DataItemLink = "Return Order No." = FIELD("No.");
-                DataItemTableView = SORTING("Return Order No.");
+                DataItemLink = "Return Order No." = field("No.");
+                DataItemTableView = sorting("Return Order No.");
                 RequestFilterFields = "Posting Date";
                 RequestFilterHeading = 'Posted Return Receipts';
                 dataitem("Return Receipt Line"; "Return Receipt Line")
                 {
-                    DataItemLink = "Document No." = FIELD("No.");
-                    DataItemTableView = SORTING("Document No.", "Line No.") WHERE("Return Qty. Rcd. Not Invd." = FILTER(<> 0));
+                    DataItemLink = "Document No." = field("No.");
+                    DataItemTableView = sorting("Document No.", "Line No.") where("Return Qty. Rcd. Not Invd." = filter(<> 0));
 
                     trigger OnAfterGetRecord()
                     var
@@ -65,6 +75,7 @@ report 6653 "Combine Return Receipts"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 Window.Update(1, "Bill-to Customer No.");
                 Window.Update(2, "No.");

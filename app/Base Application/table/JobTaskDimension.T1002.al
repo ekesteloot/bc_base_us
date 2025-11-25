@@ -15,7 +15,7 @@ table 1002 "Job Task Dimension"
         {
             Caption = 'Job Task No.';
             NotBlank = true;
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(3; "Dimension Code"; Code[20])
         {
@@ -32,7 +32,7 @@ table 1002 "Job Task Dimension"
         field(4; "Dimension Value Code"; Code[20])
         {
             Caption = 'Dimension Value Code';
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"), Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"), Blocked = const(false));
 
             trigger OnValidate()
             begin

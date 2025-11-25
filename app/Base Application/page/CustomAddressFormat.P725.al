@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Address;
+
 page 725 "Custom Address Format"
 {
     Caption = 'Custom Address Format';
@@ -5,7 +7,7 @@ page 725 "Custom Address Format"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "Custom Address Format";
-    SourceTableView = SORTING("Country/Region Code", "Line Position");
+    SourceTableView = sorting("Country/Region Code", "Line Position");
 
     layout
     {
@@ -20,7 +22,7 @@ page 725 "Custom Address Format"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupField();
+                        Rec.LookupField();
                     end;
                 }
                 field("Line Format"; Rec."Line Format")
@@ -32,7 +34,7 @@ page 725 "Custom Address Format"
 
                     trigger OnAssistEdit()
                     begin
-                        ShowCustomAddressFormatLines();
+                        Rec.ShowCustomAddressFormatLines();
                     end;
                 }
             }
@@ -52,7 +54,7 @@ page 725 "Custom Address Format"
 
                 trigger OnAction()
                 begin
-                    MoveLine(-1);
+                    Rec.MoveLine(-1);
                 end;
             }
             action("Move Down")
@@ -64,7 +66,7 @@ page 725 "Custom Address Format"
 
                 trigger OnAction()
                 begin
-                    MoveLine(1);
+                    Rec.MoveLine(1);
                 end;
             }
         }

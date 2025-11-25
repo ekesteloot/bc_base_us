@@ -1,3 +1,13 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Comment;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Shared.Navigate;
+
 table 5746 "Transfer Receipt Header"
 {
     Caption = 'Transfer Receipt Header';
@@ -13,7 +23,7 @@ table 5746 "Transfer Receipt Header"
         field(2; "Transfer-from Code"; Code[10])
         {
             Caption = 'Transfer-from Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(3; "Transfer-from Name"; Text[100])
         {
@@ -35,16 +45,12 @@ table 5746 "Transfer Receipt Header"
         {
             Caption = 'Transfer-from Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(8; "Transfer-from City"; Text[30])
         {
             Caption = 'Transfer-from City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(9; "Transfer-from County"; Text[30])
@@ -60,7 +66,7 @@ table 5746 "Transfer Receipt Header"
         field(11; "Transfer-to Code"; Code[10])
         {
             Caption = 'Transfer-to Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(12; "Transfer-to Name"; Text[100])
         {
@@ -82,16 +88,12 @@ table 5746 "Transfer Receipt Header"
         {
             Caption = 'Transfer-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(17; "Transfer-to City"; Text[30])
         {
             Caption = 'Transfer-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(18; "Transfer-to County"; Text[30])
@@ -114,8 +116,8 @@ table 5746 "Transfer Receipt Header"
         }
         field(22; Comment; Boolean)
         {
-            CalcFormula = Exist("Inventory Comment Line" WHERE("Document Type" = CONST("Posted Transfer Receipt"),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = exist("Inventory Comment Line" where("Document Type" = const("Posted Transfer Receipt"),
+                                                                "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -124,20 +126,18 @@ table 5746 "Transfer Receipt Header"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(24; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(25; "Transfer Order No."; Code[20])
         {
             Caption = 'Transfer Order No.';
             TableRelation = "Transfer Header";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(26; "No. Series"; Code[20])
@@ -156,7 +156,7 @@ table 5746 "Transfer Receipt Header"
         field(29; "In-Transit Code"; Code[10])
         {
             Caption = 'In-Transit Code';
-            TableRelation = Location.Code WHERE("Use As In-Transit" = CONST(true));
+            TableRelation = Location.Code where("Use As In-Transit" = const(true));
         }
         field(30; "Transfer-from Contact"; Text[100])
         {
@@ -179,7 +179,7 @@ table 5746 "Transfer Receipt Header"
         field(34; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(35; "Shipment Method Code"; Code[10])
         {
@@ -227,7 +227,7 @@ table 5746 "Transfer Receipt Header"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
     }

@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using System.Reflection;
+
 page 5630 "FA Journal Templates"
 {
     AdditionalSearchTerms = 'fixed asset journal templates';
@@ -150,7 +154,7 @@ page 5630 "FA Journal Templates"
                     Caption = 'Batches';
                     Image = Description;
                     RunObject = Page "FA Journal Batches";
-                    RunPageLink = "Journal Template Name" = FIELD(Name);
+                    RunPageLink = "Journal Template Name" = field(Name);
                     ToolTip = 'View or edit multiple journals for a specific template. You can use batches when you need multiple journals of a certain type.';
                     Scope = Repeater;
                 }

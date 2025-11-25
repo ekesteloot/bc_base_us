@@ -1,3 +1,19 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Counting.Recording;
+using Microsoft.InventoryMgt.Counting.Tracking;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5876 "Phys. Invt. Order Line"
 {
     Caption = 'Phys. Invt. Order Line';
@@ -76,11 +92,12 @@ table 5876 "Phys. Invt. Order Line"
         field(21; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             begin
                 TestStatusOpen();
+                TestItemVariantNotBlocked();
                 TestField("On Recording Lines", false);
 
                 if "Variant Code" <> xRec."Variant Code" then begin
@@ -88,7 +105,7 @@ table 5876 "Phys. Invt. Order Line"
                     GetShelfNo();
                 end;
 
-                if "Variant Code" = '' then
+                if Rec."Variant Code" = '' then
                     exit;
 
                 TestField("Item No.");
@@ -118,7 +135,7 @@ table 5876 "Phys. Invt. Order Line"
         field(23; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             var
@@ -175,8 +192,8 @@ table 5876 "Phys. Invt. Order Line"
         }
         field(52; "Qty. Exp. Item Tracking (Base)"; Decimal)
         {
-            CalcFormula = Sum("Exp. Phys. Invt. Tracking"."Quantity (Base)" WHERE("Order No" = FIELD("Document No."),
-                                                                                   "Order Line No." = FIELD("Line No.")));
+            CalcFormula = sum("Exp. Phys. Invt. Tracking"."Quantity (Base)" where("Order No" = field("Document No."),
+                                                                                   "Order Line No." = field("Line No.")));
             Caption = 'Qty. Exp. Item Tracking (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -199,8 +216,6 @@ table 5876 "Phys. Invt. Order Line"
             Caption = 'Last Item Ledger Entry No.';
             Editable = false;
             TableRelation = "Item Ledger Entry";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(60; "Unit Amount"; Decimal)
         {
@@ -262,12 +277,12 @@ table 5876 "Phys. Invt. Order Line"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
                 Modify();
             end;
         }
@@ -275,12 +290,12 @@ table 5876 "Phys. Invt. Order Line"
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
                 Modify();
             end;
         }
@@ -311,7 +326,7 @@ table 5876 "Phys. Invt. Order Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -330,6 +345,7 @@ table 5876 "Phys. Invt. Order Line"
         {
             AccessByPermission = TableData "Item Reference" = R;
             Caption = 'Item Reference No.';
+            ExtendedDatatype = Barcode;
 
             trigger OnLookup()
             begin
@@ -463,6 +479,23 @@ table 5876 "Phys. Invt. Order Line"
             exit;
 
         Item.TestField(Blocked, false);
+    end;
+
+    local procedure TestItemVariantNotBlocked()
+    var
+        ItemVariant1: Record "Item Variant";
+        IsHandled: Boolean;
+    begin
+        if Rec."Variant Code" = '' then
+            exit;
+        ItemVariant1.Get(Rec."Item No.", Rec."Variant Code");
+
+        IsHandled := false;
+        OnBeforeTestItemVariantNotBlocked(Rec, ItemVariant1, IsHandled);
+        if IsHandled then
+            exit;
+
+        ItemVariant1.TestField(Blocked, false);
     end;
 
     procedure TestStatusOpen()
@@ -745,24 +778,33 @@ table 5876 "Phys. Invt. Order Line"
 
     procedure PrepareLineArgs(WhseEntry: Record "Warehouse Entry")
     var
-        BlankItemLedgEntry: Record "Item Ledger Entry";
+        BlankItemLedgerEntry: Record "Item Ledger Entry";
     begin
-        PrepareLineArgs(WhseEntry, BlankItemLedgEntry);
+        PrepareLineArgs(WhseEntry, BlankItemLedgerEntry);
+    end;
+
+    procedure PrepareLineArgs(ItemLedgEntry: Record "Item Ledger Entry")
+    var
+        BlankWarehouseEntry: Record "Warehouse Entry";
+    begin
+        PrepareLineArgs(BlankWarehouseEntry, ItemLedgEntry);
     end;
 
     procedure PrepareLineArgs(WhseEntry: Record "Warehouse Entry"; ItemLedgEntry: Record "Item Ledger Entry")
     begin
-        if ItemLedgEntry."Entry No." = 0 then begin
-            "Item No." := WhseEntry."Item No.";
-            "Variant Code" := WhseEntry."Variant Code";
-            "Location Code" := WhseEntry."Location Code";
-        end else begin
-            "Item No." := ItemLedgEntry."Item No.";
-            "Variant Code" := ItemLedgEntry."Variant Code";
-            "Location Code" := ItemLedgEntry."Location Code";
-        end;
+        if ItemLedgEntry."Entry No." = 0 then
+            PrepareLineArgs(WhseEntry."Item No.", WhseEntry."Variant Code", WhseEntry."Location Code")
+        else
+            PrepareLineArgs(ItemLedgEntry."Item No.", ItemLedgEntry."Variant Code", ItemLedgEntry."Location Code");
         "Bin Code" := WhseEntry."Bin Code";
         OnAfterPrepareLineArgs(Rec, ItemLedgEntry, WhseEntry);
+    end;
+
+    local procedure PrepareLineArgs(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10])
+    begin
+        "Item No." := ItemNo;
+        "Variant Code" := VariantCode;
+        "Location Code" := LocationCode;
     end;
 
     procedure PrepareLine(DocNo: Code[20]; LineNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10]; BinCode: Code[20]; PeriodCode: Code[10]; PeriodType: Option)
@@ -801,39 +843,11 @@ table 5876 "Phys. Invt. Order Line"
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
-    begin
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        GetPhysInvtOrderHeader();
-        "Dimension Set ID" :=
-          DimManagement.GetDefaultDimID(DefaultDimSource, SourceCodeSetup."Phys. Invt. Orders", "Shortcut Dimension 1 Code",
-            "Shortcut Dimension 2 Code", PhysInvtOrderHeader."Dimension Set ID", 0);
-        DimManagement.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
     begin
         SourceCodeSetup.Get();
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -1030,60 +1044,19 @@ table 5876 "Phys. Invt. Order Line"
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
+    procedure GetDateForCalculations() CalculationDate: Date;
     begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Phys. Invt. Order Line", DefaultDimSource, TableID, No);
+        Rec.GetPhysInvtOrderHeader();
+        CalculationDate := PhysInvtOrderHeader."Posting Date";
+        if CalculationDate = 0D then
+            CalculationDate := WorkDate();
     end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Phys. Invt. Order Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeRunEventOnAfterCreateDimTableIDs(Rec, DefaultDimSource, IsHandled);
-        if IsHandled then
-            exit;
-
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Phys. Invt. Order Line") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRunEventOnAfterCreateDimTableIDs(var PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var PhysInvtOrderLine: Record "Phys. Invt. Order Line"; CurrentFieldID: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetFieldsFromSKU(var PhysInvtOrderLine: Record "Phys. Invt. Order Line")
     begin
@@ -1126,6 +1099,11 @@ table 5876 "Phys. Invt. Order Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTestItemNotBlocked(var PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var Item: Record Item; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestItemVariantNotBlocked(var PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var ItemVariant: Record "Item Variant"; var IsHandled: Boolean)
     begin
     end;
 

@@ -62,7 +62,7 @@ page 107 "Date Compr. Registers"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the number of entries that were deleted during the date compression.';
                 }
-                field("Filter"; Filter)
+                field("Filter"; Rec.Filter)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the filters that were placed on the date compression.';
@@ -92,7 +92,7 @@ page 107 "Date Compr. Registers"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")

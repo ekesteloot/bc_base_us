@@ -1,7 +1,15 @@
+namespace Microsoft.AssemblyMgt.Reports;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.ledger;
+using System.Utilities;
+
 report 915 "Assemble to Order - Sales"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Assembly/AssembletoOrderSales.rdlc';
+    RDLCLayout = './AssemblyMgt/Reports/AssembletoOrderSales.rdlc';
     AdditionalSearchTerms = 'kit to order,kit sale';
     ApplicationArea = Assembly;
     Caption = 'Assemble to Order - Sales';
@@ -14,8 +22,8 @@ report 915 "Assemble to Order - Sales"
             RequestFilterFields = "No.", "Inventory Posting Group", "Date Filter";
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No.");
-                DataItemTableView = SORTING("Item No.", "Entry Type") WHERE("Entry Type" = CONST(Sale));
+                DataItemLink = "Item No." = field("No.");
+                DataItemTableView = sorting("Item No.", "Entry Type") where("Entry Type" = const(Sale));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -36,7 +44,7 @@ report 915 "Assemble to Order - Sales"
         }
         dataitem(ATOConsumptionLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
 
             trigger OnAfterGetRecord()
             begin
@@ -65,7 +73,7 @@ report 915 "Assemble to Order - Sales"
         }
         dataitem(Item2; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
             }
@@ -95,7 +103,7 @@ report 915 "Assemble to Order - Sales"
             }
             dataitem(ATOSalesBuffer; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(ParentItemNo; TempATOSalesBuffer."Parent Item No.")
                 {
                 }

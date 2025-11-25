@@ -1,7 +1,13 @@
+namespace Microsoft.BankMgt.Reports;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Ledger;
+using System.Utilities;
+
 report 1404 "Bank Acc. - Detail Trial Bal."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './BankMgt/BankAccDetailTrialBal.rdlc';
+    RDLCLayout = './BankMgt/Reports/BankAccDetailTrialBal.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Bank Accounts - Detail Trial Balance';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 1404 "Bank Acc. - Detail Trial Bal."
     {
         dataitem("Bank Account"; "Bank Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Search Name", "Bank Acc. Posting Group", "Date Filter";
             column(FilterPeriod_BankAccLedg; StrSubstNo(Text000, DateFilter_BankAccount))
@@ -79,8 +85,8 @@ report 1404 "Bank Acc. - Detail Trial Bal."
             }
             dataitem("Bank Account Ledger Entry"; "Bank Account Ledger Entry")
             {
-                DataItemLink = "Bank Account No." = FIELD("No."), "Posting Date" = FIELD("Date Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter");
-                DataItemTableView = SORTING("Bank Account No.", "Posting Date");
+                DataItemLink = "Bank Account No." = field("No."), "Posting Date" = field("Date Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter");
+                DataItemTableView = sorting("Bank Account No.", "Posting Date");
                 column(PostingDate_BankAccLedg; Format("Posting Date"))
                 {
                 }
@@ -148,7 +154,7 @@ report 1404 "Bank Acc. - Detail Trial Bal."
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
 
                 trigger OnAfterGetRecord()
                 begin

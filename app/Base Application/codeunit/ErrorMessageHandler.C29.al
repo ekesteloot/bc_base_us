@@ -1,3 +1,7 @@
+namespace System.Utilities;
+
+using System.Environment.Configuration;
+
 codeunit 29 "Error Message Handler"
 {
     EventSubscriberInstance = Manual;
@@ -72,9 +76,9 @@ codeunit 29 "Error Message Handler"
     procedure InformAboutErrors(ErrorHandlingOptions: Enum "Error Handling Options")
     begin
         case ErrorHandlingOptions of
-            "Error Handling Options"::"Show Notification":
+            Enum::"Error Handling Options"::"Show Notification":
                 NotifyAboutErrors();
-            "Error Handling Options"::"Show Error":
+            Enum::"Error Handling Options"::"Show Error":
                 ShowErrors();
         end;
     end;

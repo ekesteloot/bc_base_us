@@ -1,3 +1,10 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Setup;
+using Microsoft.CashFlow.Worksheet;
+using System.Security.User;
+using System.Threading;
+
 codeunit 842 "Cash Flow Forecast Update"
 {
 

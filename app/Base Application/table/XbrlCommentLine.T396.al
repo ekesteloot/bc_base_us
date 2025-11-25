@@ -2,13 +2,8 @@ table 396 "XBRL Comment Line"
 {
     Caption = 'XBRL Comment Line';
     ObsoleteReason = 'XBRL feature will be discontinued';
-#if not CLEAN20
-    ObsoleteState = Pending;
-    ObsoleteTag = '20.0';
-#else
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
-#endif
     ReplicateData = false;
     
     fields
@@ -21,7 +16,7 @@ table 396 "XBRL Comment Line"
         field(2; "XBRL Taxonomy Line No."; Integer)
         {
             Caption = 'XBRL Taxonomy Line No.';
-            TableRelation = "XBRL Taxonomy Line"."Line No." WHERE("XBRL Taxonomy Name" = FIELD("XBRL Taxonomy Name"));
+            TableRelation = "XBRL Taxonomy Line"."Line No." where("XBRL Taxonomy Name" = field("XBRL Taxonomy Name"));
         }
         field(3; "Comment Type"; Option)
         {

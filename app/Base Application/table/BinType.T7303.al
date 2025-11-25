@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 table 7303 "Bin Type"
 {
     Caption = 'Bin Type';

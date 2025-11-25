@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Resources.Analysis;
+
 table 928 "Res. Availability Buffer"
 {
     DataClassification = SystemMetadata;

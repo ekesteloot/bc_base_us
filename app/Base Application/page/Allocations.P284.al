@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 page 284 Allocations
 {
     AutoSplitKey = true;
@@ -20,7 +26,7 @@ page 284 Allocations
 
                     trigger OnValidate()
                     begin
-                        ShowShortcutDimCode(ShortcutDimCode);
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                     end;
                 }
                 field("Account Name"; Rec."Account Name")
@@ -45,84 +51,84 @@ page 284 Allocations
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
                     end;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
                     end;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
                     end;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
                     end;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
                     end;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
                     end;
                 }
                 field("Gen. Posting Type"; Rec."Gen. Posting Type")
@@ -192,10 +198,10 @@ page 284 Allocations
                     group(Control1903867001)
                     {
                         Caption = 'Amount';
-                        field("AllocationAmount + Amount - xRec.Amount"; AllocationAmount + Amount - xRec.Amount)
+                        field("AllocationAmount + Amount - xRec.Amount"; AllocationAmount + Rec.Amount - xRec.Amount)
                         {
                             ApplicationArea = All;
-                            AutoFormatExpression = GetCurrencyCode();
+                            AutoFormatExpression = Rec.GetCurrencyCode();
                             AutoFormatType = 1;
                             Caption = 'AllocationAmount';
                             Editable = false;
@@ -206,10 +212,10 @@ page 284 Allocations
                     group("Total Amount")
                     {
                         Caption = 'Total Amount';
-                        field(TotalAllocationAmount; TotalAllocationAmount + Amount - xRec.Amount)
+                        field(TotalAllocationAmount; TotalAllocationAmount + Rec.Amount - xRec.Amount)
                         {
                             ApplicationArea = All;
-                            AutoFormatExpression = GetCurrencyCode();
+                            AutoFormatExpression = Rec.GetCurrencyCode();
                             AutoFormatType = 1;
                             Caption = 'Total Amount';
                             Editable = false;
@@ -254,7 +260,7 @@ page 284 Allocations
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -269,7 +275,7 @@ page 284 Allocations
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "G/L Account Card";
-                    RunPageLink = "No." = FIELD("Account No.");
+                    RunPageLink = "No." = field("Account No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the allocation.';
                 }
@@ -279,8 +285,8 @@ page 284 Allocations
                     Caption = 'Ledger E&ntries';
                     Image = GLRegisters;
                     RunObject = Page "General Ledger Entries";
-                    RunPageLink = "G/L Account No." = FIELD("Account No.");
-                    RunPageView = SORTING("G/L Account No.");
+                    RunPageLink = "G/L Account No." = field("Account No.");
+                    RunPageView = sorting("G/L Account No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -337,7 +343,7 @@ page 284 Allocations
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnInit()
@@ -357,9 +363,7 @@ page 284 Allocations
         TotalAllocationAmount: Decimal;
         ShowAllocationAmount: Boolean;
         ShowTotalAllocationAmount: Boolean;
-        [InDataSet]
         AllocationAmountVisible: Boolean;
-        [InDataSet]
         TotalAllocationAmountVisible: Boolean;
 
     protected var
@@ -373,12 +377,12 @@ page 284 Allocations
         ShowTotalAllocationAmount := TempGenJnlAlloc.CalcSums(Amount);
         if ShowTotalAllocationAmount then begin
             TotalAllocationAmount := TempGenJnlAlloc.Amount;
-            if "Line No." = 0 then
+            if Rec."Line No." = 0 then
                 TotalAllocationAmount := TotalAllocationAmount + xRec.Amount;
         end;
 
-        if "Line No." <> 0 then begin
-            TempGenJnlAlloc.SetRange("Line No.", 0, "Line No.");
+        if Rec."Line No." <> 0 then begin
+            TempGenJnlAlloc.SetRange("Line No.", 0, Rec."Line No.");
             ShowAllocationAmount := TempGenJnlAlloc.CalcSums(Amount);
             if ShowAllocationAmount then
                 AllocationAmount := TempGenJnlAlloc.Amount;

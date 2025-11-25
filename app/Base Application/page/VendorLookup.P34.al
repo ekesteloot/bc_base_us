@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Vendor;
+
 page 34 "Vendor Lookup"
 {
     Caption = 'Vendors';
@@ -31,11 +33,11 @@ page 34 "Vendor Lookup"
                     ApplicationArea = Location;
                     ToolTip = 'Specifies the warehouse location where items from the vendor must be received by default.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = All;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = All;
                 }
@@ -55,7 +57,7 @@ page 34 "Vendor Lookup"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the phone number.';
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                 }
@@ -124,7 +126,7 @@ page 34 "Vendor Lookup"
                     ToolTip = 'Specifies an alternate name that you can use to search for the record in question when you cannot remember the value in the Name field.';
                     Visible = false;
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies which transactions with the vendor that cannot be processed, for example a vendor that is declared insolvent.';

@@ -1,3 +1,12 @@
+namespace Microsoft.CostAccounting.Journal;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Posting;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 codeunit 1105 "Transfer GL Entries to CA"
 {
     Permissions = TableData "G/L Entry" = rm;

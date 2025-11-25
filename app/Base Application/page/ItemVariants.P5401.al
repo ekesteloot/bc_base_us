@@ -1,8 +1,14 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.InventoryMgt.Item.Catalog;
+using System.Text;
+
 page 5401 "Item Variants"
 {
     Caption = 'Item Variants';
     DataCaptionFields = "Item No.";
     PageType = List;
+    CardPageId = "Item Variant Card";
     SourceTable = "Item Variant";
 
     layout
@@ -18,7 +24,7 @@ page 5401 "Item Variants"
                     ToolTip = 'Specifies the number of the item card from which you opened the Item Variant Translations window.';
                     Visible = false;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies a code to identify the variant.';
@@ -33,6 +39,21 @@ page 5401 "Item Variants"
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the item variant in more detail than the Description field.';
                     Visible = false;
+                }
+                field(Blocked; Rec.Blocked)
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example an item variant that is placed in quarantine.';
+                }
+                field("Sales Blocked"; Rec."Sales Blocked")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies that the item variant cannot be entered on sales documents, except return orders and credit memos, and journals.';
+                }
+                field("Purchasing Blocked"; Rec."Purchasing Blocked")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies that the item variant cannot be entered on purchase documents, except return orders and credit memos, and journals.';
                 }
             }
         }
@@ -79,8 +100,8 @@ page 5401 "Item Variants"
                     Caption = 'Translations';
                     Image = Translations;
                     RunObject = Page "Item Translations";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD(Code);
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field(Code);
                     ToolTip = 'View or edit translated item descriptions. Translated item descriptions are automatically inserted on documents according to the language code.';
                 }
                 action("Item Refe&rences")
@@ -90,8 +111,8 @@ page 5401 "Item Variants"
                     Caption = 'Item References';
                     Image = Change;
                     RunObject = Page "Item Reference Entries";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD(Code);
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field(Code);
                     Scope = Repeater;
                     ToolTip = 'Set up a customer''s or vendor''s own identification of the selected item variant.';
                 }

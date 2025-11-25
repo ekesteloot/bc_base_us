@@ -17,10 +17,10 @@ page 9249 "Analysis by Dimensions Matrix"
         {
             repeater(Control1)
             {
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Dimensions;
                     Style = Strong;
@@ -29,7 +29,7 @@ page 9249 "Analysis by Dimensions Matrix"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupDimCode(AnalysisByDimParameters."Line Dim Option", LineDimCode, Code);
+                        LookupDimCode(AnalysisByDimParameters."Line Dim Option", LineDimCode, Rec.Code);
                     end;
                 }
                 field(Name; Rec.Name)
@@ -39,7 +39,7 @@ page 9249 "Analysis by Dimensions Matrix"
                     StyleExpr = Emphasize;
                     ToolTip = 'Specifies the name of the record.';
                 }
-                field(TotalAmount; +Amount)
+                field(TotalAmount; Rec.Amount)
                 {
                     ApplicationArea = Dimensions;
                     AutoFormatExpression = FormatStr();
@@ -624,7 +624,8 @@ page 9249 "Analysis by Dimensions Matrix"
                         AnalysisViewToExcel: Codeunit "Export Analysis View";
                     begin
                         SetCommonFilters(AnalysisViewEntry);
-                        AnalysisViewEntry.Find('-');
+                        if (not AnalysisViewEntry.Find('-')) and (AnalysisByDimParameters."Show Actual/Budgets" = AnalysisByDimParameters."Show Actual/Budgets"::"Actual Amounts") then
+                            Error(NoEntriesToExportToExcelErr);
                         AnalysisViewToExcel.ExportData(AnalysisViewEntry, AnalysisByDimParameters);
                     end;
                 }
@@ -648,7 +649,7 @@ page 9249 "Analysis by Dimensions Matrix"
         MATRIX_CurrentColumnOrdinal: Integer;
         MATRIX_Steps: Integer;
     begin
-        Amount := MatrixMgt.RoundAmount(CalcAmount(false), AnalysisByDimParameters."Rounding Factor");
+        Rec.Amount := MatrixMgt.RoundAmount(CalcAmount(false), AnalysisByDimParameters."Rounding Factor");
 
         MATRIX_CurrentColumnOrdinal := 0;
         if MATRIX_PrimKeyFirstCol <> '' then
@@ -744,7 +745,7 @@ page 9249 "Analysis by Dimensions Matrix"
 
         SetVisible();
         if AnalysisByDimParameters."Line Dim Option" = AnalysisByDimParameters."Line Dim Option"::Period then
-            Code := '';
+            Rec.Code := '';
     end;
 
     var
@@ -772,71 +773,40 @@ page 9249 "Analysis by Dimensions Matrix"
         MATRIX_NoOfMatrixColumns: Integer;
         ColumnCaptions: array[32] of Text[250];
         RoundingFactorFormatString: Text;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
         Text003: Label 'Unsupported Account Source %1.';
+        NoEntriesToExportToExcelErr: Label 'There are no entries to export to Excel.';
         Emphasize: Boolean;
 
     protected var
@@ -910,14 +880,11 @@ page 9249 "Analysis by Dimensions Matrix"
             else
                 RunOnInitRecordOnCaseElse(DimOption, DimCodeBuf, AnalysisView, AnalysisByDimParameters);
         end;
-        if FindFirst() then;
+        if Rec.FindFirst() then;
     end;
 
     local procedure RunOnInitRecordOnCaseElse(DimOption: Enum "Analysis Dimension Option"; var DimCodeBuf: Record "Dimension Code Buffer"; var AnalysisView: Record "Analysis View"; var AnalysisByDimParameters: Record "Analysis by Dim. Parameters")
     begin
-#if not CLEAN20
-        OnInitRecOnCaseElse("Analysis Dimension Option".FromInteger(DimOption), DimCodeBuf, AnalysisView);
-#endif
         OnInitRecordOnCaseElse(DimOption, DimCodeBuf, AnalysisView, AnalysisByDimParameters);
     end;
 
@@ -1112,9 +1079,6 @@ page 9249 "Analysis by Dimensions Matrix"
 
     local procedure RunOnLookupDimCodeOnCaseElse(DimOption: Enum "Analysis Dimension Option"; var "Code": Text[30])
     begin
-#if not CLEAN20
-        OnLookUpCodeOnCaseElse(DimOption, Code);
-#endif
         OnLookupDimCodeOnCaseElse(DimOption, Code);
     end;
 
@@ -1219,9 +1183,6 @@ page 9249 "Analysis by Dimensions Matrix"
                     TheAnalysisViewEntry.SetFilter("Dimension 4 Value Code", DimCodeBuf.Totaling);
         end;
 
-#if not CLEAN20
-        OnAfterSetDimFilters(TheAnalysisViewEntry, AnalysisView, DimOption.AsInteger(), DimCodeBuf);
-#endif
         OnAfterSetDimFiltersProcedure(TheAnalysisViewEntry, AnalysisView, DimOption, DimCodeBuf);
     end;
 
@@ -1299,9 +1260,6 @@ page 9249 "Analysis by Dimensions Matrix"
                     TheAnalysisViewBudgetEntry.SetFilter("Dimension 4 Value Code", DimCodeBuf.Totaling);
         end;
 
-#if not CLEAN20
-        OnAfterSetDimBudgetFilters(TheAnalysisViewBudgetEntry, AnalysisView, DimOption.AsInteger(), DimCodeBuf);
-#endif
         OnAfterSetDimBudgetFiltersProcedure(TheAnalysisViewBudgetEntry, AnalysisView, DimOption, DimCodeBuf);
     end;
 
@@ -1351,7 +1309,7 @@ page 9249 "Analysis by Dimensions Matrix"
             ColumnCode := TempDimensionCodeBuffer.Code
         else
             ColumnCode := '';
-        if TempDimensionCodeAmountBuffer.Get(Code, ColumnCode) then
+        if TempDimensionCodeAmountBuffer.Get(Rec.Code, ColumnCode) then
             exit(TempDimensionCodeAmountBuffer.Amount);
         case AnalysisByDimParameters."Show Actual/Budgets" of
             AnalysisByDimParameters."Show Actual/Budgets"::"Actual Amounts":
@@ -1375,7 +1333,7 @@ page 9249 "Analysis by Dimensions Matrix"
         end;
         if AnalysisByDimParameters."Show Opposite Sign" then
             Amount := -Amount;
-        TempDimensionCodeAmountBuffer."Line Code" := Code;
+        TempDimensionCodeAmountBuffer."Line Code" := Rec.Code;
         TempDimensionCodeAmountBuffer."Column Code" := ColumnCode;
         TempDimensionCodeAmountBuffer.Amount := Amount;
         TempDimensionCodeAmountBuffer.Insert();
@@ -1548,7 +1506,7 @@ page 9249 "Analysis by Dimensions Matrix"
 
     local procedure FormatLine()
     begin
-        Emphasize := "Show in Bold";
+        Emphasize := Rec."Show in Bold";
     end;
 
     local procedure FindPeriod(var DimCodeBuf: Record "Dimension Code Buffer"; Which: Text[3]) Found: Boolean
@@ -1634,19 +1592,6 @@ page 9249 "Analysis by Dimensions Matrix"
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by OnAfterSetDimFiltersProcedure()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetDimFilters(var TheAnalysisViewEntry: Record "Analysis View Entry"; AnalysisView: Record "Analysis View"; DimOption: Option "G/L Account",Period,"Business Unit","Dimension 1","Dimension 2","Dimension 3","Dimension 4","Cash Flow Account","Cash Flow Forecast",Fund,DimAttrib1,DimAttrib2,DimAttrib3,DimAttrib4; var DimCodeBuf: Record "Dimension Code Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by OnAfterSetDimBudgetFiltersProcedure()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetDimBudgetFilters(var TheAnalysisViewBudgetEntry: Record "Analysis View Budget Entry"; AnalysisView: Record "Analysis View"; DimOption: Option "G/L Account",Period,"Business Unit","Dimension 1","Dimension 2","Dimension 3","Dimension 4","Cash Flow Account",CashFlow,Fund,DimAttrib1,DimAttrib2,DimAttrib3,DimAttrib4; var DimCodeBuf: Record "Dimension Code Buffer")
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetDimFiltersProcedure(var TheAnalysisViewEntry: Record "Analysis View Entry"; AnalysisView: Record "Analysis View"; DimOption: Enum "Analysis Dimension Option"; var DimCodeBuf: Record "Dimension Code Buffer")
     begin
@@ -1672,26 +1617,10 @@ page 9249 "Analysis by Dimensions Matrix"
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by OnInitRecordOnCaseElse()', '20.0')]
-    [IntegrationEvent(true, false)]
-    local procedure OnInitRecOnCaseElse(DimOption: Option "G/L Account",Period,"Business Unit","Dimension 1","Dimension 2","Dimension 3","Dimension 4","Cash Flow Account","Cash Flow Forecast",Fund,DimAttrib1,DimAttrib2,DimAttrib3,DimAttrib4; var TheDimCodeBuf: Record "Dimension Code Buffer"; var AnalysisView: Record "Analysis View")
-    begin
-    end;
-#endif
-
     [IntegrationEvent(true, false)]
     local procedure OnInitRecordOnCaseElse(DimOption: Enum "Analysis Dimension Option"; var TheDimCodeBuf: Record "Dimension Code Buffer"; var AnalysisView: Record "Analysis View"; var AnalysisByDimParameters: Record "Analysis by Dim. Parameters")
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by OnLookupDimCodeOnCaseElse()', '20.0')]
-    [IntegrationEvent(true, false)]
-    local procedure OnLookUpCodeOnCaseElse(DimOption: Option "G/L Account",Period,"Business Unit","Dimension 1","Dimension 2","Dimension 3","Dimension 4","Cash Flow Account","Cash Flow Forecast",Fund,DimAttrib1,DimAttrib2,DimAttrib3,DimAttrib4; var "Code": Text[30])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(true, false)]
     local procedure OnLookupDimCodeOnCaseElse(DimOption: Enum "Analysis Dimension Option"; var "Code": Text[30])

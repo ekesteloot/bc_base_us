@@ -1,4 +1,17 @@
-﻿report 790 "Calculate Inventory"
+﻿namespace Microsoft.InventoryMgt.Counting.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using System.Utilities;
+
+report 790 "Calculate Inventory"
 {
     Caption = 'Calculate Inventory';
     ProcessingOnly = true;
@@ -7,12 +20,12 @@
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.") WHERE(Type = CONST(Inventory), Blocked = CONST(false));
-            RequestFilterFields = "No.", "Location Filter", "Bin Filter";
+            DataItemTableView = sorting("No.") where(Type = const(Inventory), Blocked = const(false));
+            RequestFilterFields = "No.", "Location Filter", "Bin Filter", "Variant Filter";
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Location Code" = FIELD("Location Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
+                DataItemLink = "Item No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
 
                 trigger OnAfterGetRecord()
                 var
@@ -27,6 +40,12 @@
 
                     if ("Location Code" <> '') and Location."Use As In-Transit" then
                         CurrReport.Skip();
+
+                    if "Item Ledger Entry"."Variant Code" <> '' then begin
+                        ItemVariant.SetLoadFields(Blocked);
+                        if ItemVariant.Get("Item Ledger Entry"."Item No.", "Item Ledger Entry"."Variant Code") and ItemVariant.Blocked then
+                            CurrReport.Skip();
+                    end;
 
                     if ColumnDim <> '' then
                         TransferDim("Dimension Set ID");
@@ -111,12 +130,20 @@
             }
             dataitem("Warehouse Entry"; "Warehouse Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Location Code" = FIELD("Location Filter");
+                DataItemLink = "Item No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter");
 
                 trigger OnAfterGetRecord()
+                var
+                    ItemVariant: Record "Item Variant";
                 begin
                     if not "Item Ledger Entry".IsEmpty() then
                         CurrReport.Skip();   // Skip if item has any record in Item Ledger Entry.
+
+                    if "Warehouse Entry"."Variant Code" = '' then begin
+                        ItemVariant.SetLoadFields(Blocked);
+                        if ItemVariant.Get("Item No.", "Variant Code") and ItemVariant.Blocked then
+                            CurrReport.Skip();
+                    end;
 
                     Clear(TempQuantityOnHandBuffer);
                     TempQuantityOnHandBuffer."Item No." := "Item No.";
@@ -134,7 +161,7 @@
             }
             dataitem(ItemWithNoTransaction; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -144,14 +171,8 @@
             }
 
             trigger OnAfterGetRecord()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeItemOnAfterGetRecord(Item, IsHandled);
-                if IsHandled then
-                    CurrReport.Skip();
-
+                OnBeforeItemOnAfterGetRecord(Item);
                 if not HideValidationDialog then
                     Window.Update();
                 TempSKU.DeleteAll();
@@ -218,6 +239,7 @@
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Posting Date';
+                        ShowMandatory = true;
                         ToolTip = 'Specifies the date for the posting of this batch job. By default, the working date is entered, but you can change it.';
 
                         trigger OnValidate()
@@ -229,6 +251,7 @@
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Document No.';
+                        ShowMandatory = DocumentNoInputMandatory;
                         ToolTip = 'Specifies the number of the document that is processed by the report or batch job.';
                     }
                     field(ItemsNotOnInventory; ZeroQty)
@@ -318,6 +341,7 @@
         NextLineNo: Integer;
         ZeroQtySave: Boolean;
         AdjustPosQty: Boolean;
+        DocumentNoInputMandatory: Boolean;
         PosQty: Decimal;
         NegQty: Decimal;
         ItemNotOnInventoryErr: Label 'Items Not on Inventory.';
@@ -354,9 +378,11 @@
         if not ItemJnlBatch.Get(ItemJnlLine."Journal Template Name", ItemJnlLine."Journal Batch Name") then
             exit;
 
-        if ItemJnlBatch."No. Series" = '' then
+        if ItemJnlBatch."No. Series" = '' then begin
+            DocumentNoInputMandatory := true;
             NextDocNo := ''
-        else begin
+        end else begin
+            DocumentNoInputMandatory := false;
             NextDocNo := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series", PostingDate, false);
             Clear(NoSeriesMgt);
         end;
@@ -653,6 +679,7 @@
                 if WhseEntry.Find('-') then
                     repeat
                         WhseEntry.SetRange("Lot No.", WhseEntry."Lot No.");
+                        WhseEntry.SetRange("Package No.", WhseEntry."Package No.");
                         OnCalcWhseQtyOnAfterLotRequiredWhseEntrySetFilters(WhseEntry);
                         WhseEntry.CalcSums("Qty. (Base)");
                         if WhseEntry."Qty. (Base)" <> 0 then
@@ -662,6 +689,7 @@
                                 PosQuantity := PosQuantity + WhseEntry."Qty. (Base)";
                         WhseEntry.Find('+');
                         WhseEntry.SetRange("Lot No.");
+                        WhseEntry.SetRange("Package No.");
                         OnCalcWhseQtyOnAfterLotRequiredWhseEntryClearFilters(WhseEntry);
                     until WhseEntry.Next() = 0;
                 if PosQuantity <> WhseQuantity then
@@ -981,7 +1009,7 @@
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeItemOnAfterGetRecord(var Item: Record Item; var IsHandled: Boolean)
+    local procedure OnBeforeItemOnAfterGetRecord(var Item: Record Item)
     begin
     end;
 

@@ -1,4 +1,18 @@
-﻿table 80 "Gen. Journal Template"
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Reports;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Intercompany.Journal;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Reflection;
+
+table 80 "Gen. Journal Template"
 {
     Caption = 'Gen. Journal Template';
     LookupPageID = "General Journal Template List";
@@ -18,12 +32,12 @@
         field(5; "Test Report ID"; Integer)
         {
             Caption = 'Test Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(6; "Page ID"; Integer)
         {
             Caption = 'Page ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Page));
 
             trigger OnValidate()
             begin
@@ -34,7 +48,7 @@
         field(7; "Posting Report ID"; Integer)
         {
             Caption = 'Posting Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(8; "Force Posting Report"; Boolean)
         {
@@ -94,16 +108,6 @@
                     Type::"Payroll Accrual":
                         begin
                         end;
-#if not CLEAN21
-                    Type::Deposits:
-                        begin
-                            "Source Code" := SourceCodeSetup.Deposits;
-                            "Page ID" := PAGE::Deposit;
-                            "Test Report ID" := REPORT::"Deposit Test Report";
-                            "Posting Report ID" := REPORT::Deposit;
-                            "Bal. Account Type" := "Bal. Account Type"::"Bank Account";
-                        end;
-#endif
                     Type::"Sales Tax":
                         begin
                             "Page ID" := PAGE::"Sales Tax Journal";
@@ -146,24 +150,24 @@
         }
         field(15; "Test Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Test Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Test Report ID")));
             Caption = 'Test Report Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(16; "Page Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
-                                                                           "Object ID" = FIELD("Page ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Page),
+                                                                           "Object ID" = field("Page ID")));
             Caption = 'Page Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(17; "Posting Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Posting Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Posting Report ID")));
             Caption = 'Posting Report Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -179,28 +183,21 @@
 
             trigger OnValidate()
             begin
-#if not CLEAN20
-                if Type = Type::Deposits then
-                    if "Bal. Account Type" <> "Bal. Account Type"::"Bank Account" then begin
-                        "Bal. Account Type" := "Bal. Account Type"::"Bank Account";
-                        Error(USText000, FieldCaption(Type), Type, FieldCaption("Bal. Account Type"), "Bal. Account Type");
-                    end;
-#endif
                 "Bal. Account No." := '';
             end;
         }
         field(20; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Bal. Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Fixed Asset")) "Fixed Asset";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const(Customer)) Customer
+            else
+            if ("Bal. Account Type" = const(Vendor)) Vendor
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset";
 
             trigger OnValidate()
             begin
@@ -272,13 +269,13 @@
         {
             AccessByPermission = TableData Customer = R;
             Caption = 'Cust. Receipt Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(26; "Cust. Receipt Report Caption"; Text[250])
         {
             AccessByPermission = TableData Customer = R;
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Cust. Receipt Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Cust. Receipt Report ID")));
             Caption = 'Cust. Receipt Report Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -287,13 +284,13 @@
         {
             AccessByPermission = TableData Vendor = R;
             Caption = 'Vendor Receipt Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(28; "Vendor Receipt Report Caption"; Text[250])
         {
             AccessByPermission = TableData Vendor = R;
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Vendor Receipt Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Vendor Receipt Report ID")));
             Caption = 'Vendor Receipt Report Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -317,11 +314,11 @@
         }
         field(32; "Allow Posting Date From"; Date)
         {
-            Caption = 'Allow Posting From';
+            Caption = 'Allow Posting Date From';
         }
         field(33; "Allow Posting Date To"; Date)
         {
-            Caption = 'Allow Posting To';
+            Caption = 'Allow Posting Date To';
         }
     }
 
@@ -348,11 +345,6 @@
         GenJnlLine.DeleteAll(true);
         GenJnlBatch.SetRange("Journal Template Name", Name);
         GenJnlBatch.DeleteAll();
-#if not CLEAN21
-        DepositHeader.SetCurrentKey("Journal Template Name", "Journal Batch Name");
-        DepositHeader.SetRange("Journal Template Name", Name);
-        DepositHeader.DeleteAll(true);
-#endif
     end;
 
     trigger OnInsert()
@@ -365,10 +357,6 @@
         GenJnlLine: Record "Gen. Journal Line";
         GenJnlAlloc: Record "Gen. Jnl. Allocation";
         SourceCodeSetup: Record "Source Code Setup";
-#if not CLEAN21
-        DepositHeader: Record "Deposit Header";
-        USText000: Label 'If the %1 is %2, then the %3 must be %4.';
-#endif
 
         Text000: Label 'Only the %1 field can be filled in on recurring journals.';
         Text001: Label 'must not be %1';

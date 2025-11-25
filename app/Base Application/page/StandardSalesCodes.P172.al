@@ -17,7 +17,7 @@ page 172 "Standard Sales Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a code which identifies this standard sales code.';

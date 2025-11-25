@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 enum 99000764 "Routing Status"
 {
     Extensible = true;

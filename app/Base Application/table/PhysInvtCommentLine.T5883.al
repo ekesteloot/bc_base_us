@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Counting.Comment;
+
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Counting.History;
+using Microsoft.InventoryMgt.Counting.Recording;
+
 table 5883 "Phys. Invt. Comment Line"
 {
     Caption = 'Phys. Invt. Comment Line';
@@ -15,20 +21,20 @@ table 5883 "Phys. Invt. Comment Line"
         field(2; "Order No."; Code[20])
         {
             Caption = 'Order No.';
-            TableRelation = IF ("Document Type" = CONST(Order)) "Phys. Invt. Order Header"
-            ELSE
-            IF ("Document Type" = CONST(Recording)) "Phys. Invt. Record Header"."Order No."
-            ELSE
-            IF ("Document Type" = CONST("Posted Order")) "Pstd. Phys. Invt. Order Hdr"
-            ELSE
-            IF ("Document Type" = CONST("Posted Recording")) "Pstd. Phys. Invt. Record Hdr"."Order No.";
+            TableRelation = if ("Document Type" = const(Order)) "Phys. Invt. Order Header"
+            else
+            if ("Document Type" = const(Recording)) "Phys. Invt. Record Header"."Order No."
+            else
+            if ("Document Type" = const("Posted Order")) "Pstd. Phys. Invt. Order Hdr"
+            else
+            if ("Document Type" = const("Posted Recording")) "Pstd. Phys. Invt. Record Hdr"."Order No.";
         }
         field(3; "Recording No."; Integer)
         {
             Caption = 'Recording No.';
-            TableRelation = IF ("Document Type" = CONST(Recording)) "Phys. Invt. Record Header"."Recording No." WHERE("Order No." = FIELD("Order No."))
-            ELSE
-            IF ("Document Type" = CONST("Posted Recording")) "Pstd. Phys. Invt. Record Hdr"."Recording No." WHERE("Order No." = FIELD("Order No."));
+            TableRelation = if ("Document Type" = const(Recording)) "Phys. Invt. Record Header"."Recording No." where("Order No." = field("Order No."))
+            else
+            if ("Document Type" = const("Posted Recording")) "Pstd. Phys. Invt. Record Hdr"."Recording No." where("Order No." = field("Order No."));
         }
         field(4; "Line No."; Integer)
         {

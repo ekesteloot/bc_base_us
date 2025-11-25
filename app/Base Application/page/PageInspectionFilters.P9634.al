@@ -1,3 +1,5 @@
+namespace System.Tooling;
+
 page 9634 "Page Inspection Filters"
 {
     Caption = 'Page Inspection Filters';
@@ -43,10 +45,10 @@ page 9634 "Page Inspection Filters"
     procedure UpdatePage(FormServerHandleId: Text; FormServerBookmark: Text)
     begin
         // that performs actual data retrival
-        Reset();
-        SetFilter("Current Form ID", '%1', FormServerHandleId);
-        SetFilter("Current Form Bookmark", '%1', FormServerBookmark);
-        SetFilter("Field Filter Expression", '<>%1', '');
+        Rec.Reset();
+        Rec.SetFilter("Current Form ID", '%1', FormServerHandleId);
+        Rec.SetFilter("Current Form Bookmark", '%1', FormServerBookmark);
+        Rec.SetFilter("Field Filter Expression", '<>%1', '');
 
         // this will actually update the content of the page
         CurrPage.Update(false);

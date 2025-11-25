@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using System.Reflection;
+
 table 5622 "FA Reclass. Journal Template"
 {
     Caption = 'FA Reclass. Journal Template';
@@ -18,7 +22,7 @@ table 5622 "FA Reclass. Journal Template"
         field(6; "Page ID"; Integer)
         {
             Caption = 'Page ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Page));
 
             trigger OnValidate()
             begin
@@ -28,8 +32,8 @@ table 5622 "FA Reclass. Journal Template"
         }
         field(16; "Page Caption"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
-                                                                           "Object ID" = FIELD("Page ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Page),
+                                                                           "Object ID" = field("Page ID")));
             Caption = 'Page Caption';
             Editable = false;
             FieldClass = FlowField;

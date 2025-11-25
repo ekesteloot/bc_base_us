@@ -11,7 +11,7 @@ page 10007 "Customer Credit Information"
     {
         area(content)
         {
-            field(Contact; Contact)
+            field(Contact; Rec.Contact)
             {
                 ApplicationArea = Basic, Suite;
                 Editable = ContactEditable;
@@ -29,7 +29,7 @@ page 10007 "Customer Credit Information"
                 Editable = "Collection MethodEditable";
                 ToolTip = 'Specifies the method you normally use to collect payment from this customer, such as bank transfer or check.';
             }
-            field(Blocked; Blocked)
+            field(Blocked; Rec.Blocked)
             {
                 ApplicationArea = Basic, Suite;
                 Editable = BlockedEditable;
@@ -50,7 +50,7 @@ page 10007 "Customer Credit Information"
                     Editable = false;
                     ToolTip = 'Specifies the payment amount that the customer owes for completed sales. This value is also known as the customer''s balance.';
                 }
-                field("""Credit Limit (LCY)"" - ""Balance (LCY)"""; Rec."Credit Limit (LCY)" - "Balance (LCY)")
+                field("""Credit Limit (LCY)"" - ""Balance (LCY)"""; Rec."Credit Limit (LCY)" - Rec."Balance (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Difference';
@@ -208,19 +208,12 @@ page 10007 "Customer Credit Information"
         Text002: Label 'Not Yet Due';
         Text003: Label 'Over %1 Days';
         Text004: Label '%1-%2 Days';
-        [InDataSet]
         ContactEditable: Boolean;
-        [InDataSet]
         "Phone No.Editable": Boolean;
-        [InDataSet]
         BlockedEditable: Boolean;
-        [InDataSet]
         "Credit Limit (LCY)Editable": Boolean;
-        [InDataSet]
         "Payment Terms CodeEditable": Boolean;
-        [InDataSet]
         "Collection MethodEditable": Boolean;
-        [InDataSet]
         "Payment Method CodeEditable": Boolean;
 
     protected var
@@ -288,9 +281,9 @@ page 10007 "Customer Credit Information"
                         PeriodStart := 0D;
                     end;
                 else begin
-                        PeriodEnd := PeriodStart - 1;
-                        PeriodStart := CalcDate('-' + Format(AgingPeriod), PeriodStart);
-                    end;
+                    PeriodEnd := PeriodStart - 1;
+                    PeriodStart := CalcDate('-' + Format(AgingPeriod), PeriodStart);
+                end;
             end;
             CalculateAgingForPeriod(PeriodStart, PeriodEnd, I);
         end;
@@ -308,9 +301,9 @@ page 10007 "Customer Credit Information"
     procedure ChangeCustomer()
     begin
         // Change the Customer Filters
-        LatestCustLedgerEntry.SetRange("Customer No.", "No.");
+        LatestCustLedgerEntry.SetRange("Customer No.", Rec."No.");
         for I := 1 to ArrayLen(CustLedgerEntry) do
-            CustLedgerEntry[I].SetRange("Customer No.", "No.");
+            CustLedgerEntry[I].SetRange("Customer No.", Rec."No.");
     end;
 
     procedure DrillDown(Index: Integer)

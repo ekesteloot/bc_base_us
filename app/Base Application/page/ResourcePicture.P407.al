@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using System.Device;
+using System.IO;
+
 page 407 "Resource Picture"
 {
     Caption = 'Resource Picture';
@@ -11,7 +16,7 @@ page 407 "Resource Picture"
     {
         area(content)
         {
-            field(Image; Image)
+            field(Image; Rec.Image)
             {
                 ApplicationArea = Jobs;
                 ShowCaption = false;
@@ -53,10 +58,10 @@ page 407 "Resource Picture"
                     FileName: Text;
                     ClientFileName: Text;
                 begin
-                    TestField("No.");
-                    TestField(Name);
+                    Rec.TestField("No.");
+                    Rec.TestField(Name);
 
-                    if Image.HasValue() then
+                    if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -65,9 +70,9 @@ page 407 "Resource Picture"
                         exit;
 
                     OnImportPictureBeforeImportFile(Rec, FileName);
-                    Clear(Image);
-                    Image.ImportFile(FileName, ClientFileName);
-                    Modify(true);
+                    Clear(Rec.Image);
+                    Rec.Image.ImportFile(FileName, ClientFileName);
+                    Rec.Modify(true);
 
                     if FileManagement.DeleteServerFile(FileName) then;
                 end;
@@ -86,12 +91,12 @@ page 407 "Resource Picture"
                     ToFile: Text;
                     ExportPath: Text;
                 begin
-                    TestField("No.");
-                    TestField(Name);
+                    Rec.TestField("No.");
+                    Rec.TestField(Name);
 
-                    ToFile := StrSubstNo('%1 %2.jpg', "No.", Name);
-                    ExportPath := TemporaryPath + "No." + Format(Image.MediaId);
-                    Image.ExportFile(ExportPath);
+                    ToFile := StrSubstNo('%1 %2.jpg', Rec."No.", Rec.Name);
+                    ExportPath := TemporaryPath + Rec."No." + Format(Rec.Image.MediaId);
+                    Rec.Image.ExportFile(ExportPath);
 
                     FileManagement.ExportImage(ExportPath, ToFile);
                 end;
@@ -106,13 +111,13 @@ page 407 "Resource Picture"
 
                 trigger OnAction()
                 begin
-                    TestField("No.");
+                    Rec.TestField("No.");
 
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    Clear(Image);
-                    Modify(true);
+                    Clear(Rec.Image);
+                    Rec.Modify(true);
                 end;
             }
         }
@@ -130,7 +135,6 @@ page 407 "Resource Picture"
 
     var
         Camera: Codeunit Camera;
-        [InDataSet]
         CameraAvailable: Boolean;
         OverrideImageQst: Label 'The existing picture will be replaced. Do you want to continue?';
         DeleteImageQst: Label 'Are you sure you want to delete the picture?';
@@ -160,7 +164,7 @@ page 407 "Resource Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Image.HasValue;
+        DeleteExportEnabled := Rec.Image.HasValue;
     end;
 
     [IntegrationEvent(false, false)]

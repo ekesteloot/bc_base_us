@@ -7,7 +7,7 @@ page 744 "VAT Report List"
     Editable = false;
     PageType = List;
     SourceTable = "VAT Report Header";
-    SourceTableView = WHERE("VAT Report Config. Code" = CONST("VAT Return"));
+    SourceTableView = where("VAT Report Config. Code" = const("VAT Return"));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -56,7 +56,7 @@ page 744 "VAT Report List"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"VAT Report Header"), "No." = FIELD("No."), "VAT Report Config. Code" = FIELD("VAT Report Config. Code");
+                SubPageLink = "Table ID" = const(Database::"VAT Report Header"), "No." = field("No."), "VAT Report Config. Code" = field("VAT Report Config. Code");
             }
         }
     }
@@ -150,12 +150,12 @@ page 744 "VAT Report List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        ReturnPeriodEnabled := "Return Period No." <> '';
+        ReturnPeriodEnabled := Rec."Return Period No." <> '';
     end;
 
     trigger OnAfterGetRecord()
     begin
-        ReturnPeriodEnabled := "Return Period No." <> '';
+        ReturnPeriodEnabled := Rec."Return Period No." <> '';
     end;
 
     var

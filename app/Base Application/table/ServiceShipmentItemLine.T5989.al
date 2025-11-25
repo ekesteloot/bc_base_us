@@ -1,3 +1,19 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Loaner;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Pricing;
+using Microsoft.ServiceMgt.Setup;
+
 table 5989 "Service Shipment Item Line"
 {
     Caption = 'Service Shipment Item Line';
@@ -121,11 +137,11 @@ table 5989 "Service Shipment Item Line"
         {
             Caption = 'Contract No.';
             Editable = false;
-            TableRelation = "Service Contract Header"."Contract No." WHERE("Contract Type" = CONST(Contract));
+            TableRelation = "Service Contract Header"."Contract No." where("Contract Type" = const(Contract));
         }
         field(27; "Location of Service Item"; Text[30])
         {
-            CalcFormula = Lookup("Service Item"."Location of Service Item" WHERE("No." = FIELD("Service Item No.")));
+            CalcFormula = Lookup("Service Item"."Location of Service Item" where("No." = field("Service Item No.")));
             Caption = 'Location of Service Item';
             Editable = false;
             FieldClass = FlowField;
@@ -167,8 +183,8 @@ table 5989 "Service Shipment Item Line"
         field(35; "Fault Code"; Code[10])
         {
             Caption = 'Fault Code';
-            TableRelation = "Fault Code".Code WHERE("Fault Area Code" = FIELD("Fault Area Code"),
-                                                     "Symptom Code" = FIELD("Symptom Code"));
+            TableRelation = "Fault Code".Code where("Fault Area Code" = field("Fault Area Code"),
+                                                     "Symptom Code" = field("Symptom Code"));
         }
         field(36; "Resolution Code"; Code[10])
         {
@@ -177,33 +193,33 @@ table 5989 "Service Shipment Item Line"
         }
         field(37; "Fault Comment"; Boolean)
         {
-            CalcFormula = Exist("Service Comment Line" WHERE("Table Name" = CONST("Service Shipment Header"),
-                                                              "Table Subtype" = CONST("0"),
-                                                              "No." = FIELD("No."),
-                                                              Type = CONST(Fault),
-                                                              "Table Line No." = FIELD("Line No.")));
+            CalcFormula = exist("Service Comment Line" where("Table Name" = const("Service Shipment Header"),
+                                                              "Table Subtype" = const("0"),
+                                                              "No." = field("No."),
+                                                              Type = const(Fault),
+                                                              "Table Line No." = field("Line No.")));
             Caption = 'Fault Comment';
             Editable = false;
             FieldClass = FlowField;
         }
         field(38; "Resolution Comment"; Boolean)
         {
-            CalcFormula = Exist("Service Comment Line" WHERE("Table Name" = CONST("Service Shipment Header"),
-                                                              "Table Subtype" = CONST("0"),
-                                                              "No." = FIELD("No."),
-                                                              Type = CONST(Resolution),
-                                                              "Table Line No." = FIELD("Line No.")));
+            CalcFormula = exist("Service Comment Line" where("Table Name" = const("Service Shipment Header"),
+                                                              "Table Subtype" = const("0"),
+                                                              "No." = field("No."),
+                                                              Type = const(Resolution),
+                                                              "Table Line No." = field("Line No.")));
             Caption = 'Resolution Comment';
             Editable = false;
             FieldClass = FlowField;
         }
         field(39; "Accessory Comment"; Boolean)
         {
-            CalcFormula = Exist("Service Comment Line" WHERE("Table Name" = CONST("Service Shipment Header"),
-                                                              "Table Subtype" = CONST("0"),
-                                                              "No." = FIELD("No."),
-                                                              Type = CONST(Accessory),
-                                                              "Table Line No." = FIELD("Line No.")));
+            CalcFormula = exist("Service Comment Line" where("Table Name" = const("Service Shipment Header"),
+                                                              "Table Subtype" = const("0"),
+                                                              "No." = field("No."),
+                                                              Type = const(Accessory),
+                                                              "Table Line No." = field("Line No.")));
             Caption = 'Accessory Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -211,7 +227,7 @@ table 5989 "Service Shipment Item Line"
         field(40; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(42; "Actual Response Time (Hours)"; Decimal)
         {
@@ -238,12 +254,12 @@ table 5989 "Service Shipment Item Line"
         }
         field(60; "No. of Active/Finished Allocs"; Integer)
         {
-            CalcFormula = Count("Service Order Allocation" WHERE("Document Type" = CONST(Order),
-                                                                  "Document No." = FIELD("No."),
-                                                                  "Service Item Line No." = FIELD("Line No."),
-                                                                  "Resource No." = FIELD("Resource Filter"),
-                                                                  "Allocation Date" = FIELD("Allocation Date Filter"),
-                                                                  Status = FILTER(Active | Finished)));
+            CalcFormula = count("Service Order Allocation" where("Document Type" = const(Order),
+                                                                  "Document No." = field("No."),
+                                                                  "Service Item Line No." = field("Line No."),
+                                                                  "Resource No." = field("Resource Filter"),
+                                                                  "Allocation Date" = field("Allocation Date Filter"),
+                                                                  Status = filter(Active | Finished)));
             Caption = 'No. of Active/Finished Allocs';
             Editable = false;
             FieldClass = FlowField;
@@ -296,7 +312,7 @@ table 5989 "Service Shipment Item Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
     }

@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Pricing;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ServiceMgt.Maintenance;
+
 table 6081 "Serv. Price Group Setup"
 {
     Caption = 'Serv. Price Group Setup';

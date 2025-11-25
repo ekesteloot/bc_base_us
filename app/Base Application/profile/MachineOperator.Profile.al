@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.RoleCenters;
+
 profile "MACHINE OPERATOR"
 {
     Caption = 'Machine Operator - Manufacturing Comprehensive';

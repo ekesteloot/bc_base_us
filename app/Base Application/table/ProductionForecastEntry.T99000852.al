@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.Forecast;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+
 table 99000852 "Production Forecast Entry"
 {
     Caption = 'Demand Forecast Entry';
@@ -44,7 +50,7 @@ table 99000852 "Production Forecast Entry"
         field(6; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             begin
@@ -83,7 +89,7 @@ table 99000852 "Production Forecast Entry"
         field(11; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(12; "Component Forecast"; Boolean)
         {

@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using System.Reflection;
+
 page 7368 "Bin Creation Wksh. Templ. List"
 {
     Caption = 'Bin Creation Wksh. Templ. List';
@@ -13,12 +17,12 @@ page 7368 "Bin Creation Wksh. Templ. List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the name of the bin creation worksheet template you are creating.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a description of the warehouse worksheet template you are creating.';

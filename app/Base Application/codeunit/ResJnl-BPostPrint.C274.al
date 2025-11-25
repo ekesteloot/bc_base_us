@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using Microsoft.ProjectMgt.Resources.Ledger;
+
 codeunit 274 "Res. Jnl.-B.Post+Print"
 {
     TableNo = "Res. Journal Batch";

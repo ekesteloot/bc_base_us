@@ -1,9 +1,14 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 page 7150 "Invt. Analysis View Card"
 {
     Caption = 'Invt. Analysis View Card';
     PageType = Card;
     SourceTable = "Item Analysis View";
-    SourceTableView = WHERE("Analysis Area" = CONST(Inventory));
+    SourceTableView = where("Analysis Area" = const(Inventory));
 
     layout
     {
@@ -12,7 +17,7 @@ page 7150 "Invt. Analysis View Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the analysis view.';
@@ -84,7 +89,7 @@ page 7150 "Invt. Analysis View Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the analysis view is updated every time that you post an item ledger entry, for example from a sales invoice.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -139,8 +144,8 @@ page 7150 "Invt. Analysis View Card"
                     Caption = 'Filter';
                     Image = "Filter";
                     RunObject = Page "Item Analysis View Filter";
-                    RunPageLink = "Analysis Area" = FIELD("Analysis Area"),
-                                  "Analysis View Code" = FIELD(Code);
+                    RunPageLink = "Analysis Area" = field("Analysis Area"),
+                                  "Analysis View Code" = field(Code);
                     ToolTip = 'Apply the filter.';
                 }
             }
@@ -164,7 +169,7 @@ page 7150 "Invt. Analysis View Card"
 
                 trigger OnAction()
                 begin
-                    SetUpdateOnPosting(true);
+                    Rec.SetUpdateOnPosting(true);
                 end;
             }
             action("Disable Update on Posting")
@@ -176,7 +181,7 @@ page 7150 "Invt. Analysis View Card"
 
                 trigger OnAction()
                 begin
-                    SetUpdateOnPosting(false);
+                    Rec.SetUpdateOnPosting(false);
                 end;
             }
         }

@@ -1,4 +1,14 @@
-﻿page 1190 "Create Payment"
+﻿namespace Microsoft.Purchases.Payables;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Vendor;
+
+page 1190 "Create Payment"
 {
     Caption = 'Create Payment';
     PageType = StandardDialog;
@@ -16,7 +26,7 @@
                     ApplicationArea = Basic, Suite;
                     Caption = 'Template Name';
                     ShowMandatory = true;
-                    TableRelation = "Gen. Journal Template".Name WHERE(Type = CONST(Payments));
+                    TableRelation = "Gen. Journal Template".Name where(Type = const(Payments));
                     ToolTip = 'Specifies the name of the journal template.';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -49,8 +59,8 @@
                     ApplicationArea = Basic, Suite;
                     Caption = 'Batch Name';
                     ShowMandatory = true;
-                    TableRelation = "Gen. Journal Batch".Name WHERE("Template Type" = CONST(Payments),
-                                                                     Recurring = CONST(false));
+                    TableRelation = "Gen. Journal Batch".Name where("Template Type" = const(Payments),
+                                                                     Recurring = const(false));
                     ToolTip = 'Specifies the name of the journal batch.';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -251,7 +261,7 @@
                     TempVendorPaymentBuffer."Remit-to Code" := VendorLedgerEntry."Remit-to Code";
 
                     if CheckCalcPmtDiscGenJnlVend(VendorLedgerEntry."Remaining Amount", VendorLedgerEntry, 0, false) then
-                        PaymentAmt := -(VendorLedgerEntry."Remaining Amount" - VendorLedgerEntry."Remaining Pmt. Disc. Possible")
+                        PaymentAmt := -(VendorLedgerEntry."Remaining Amount" - VendorLedgerEntry.GetRemainingPmtDiscPossible(PostingDate))
                     else
                         PaymentAmt := -VendorLedgerEntry."Remaining Amount";
 

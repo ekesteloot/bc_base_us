@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Document;
+
 page 5958 "Standard Service Codes"
 {
     ApplicationArea = Service;
@@ -15,7 +17,7 @@ page 5958 "Standard Service Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies a standard service code.';

@@ -1,3 +1,12 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Reports;
+
 page 446 "Finance Charge Memo"
 {
     Caption = 'Finance Charge Memo';
@@ -134,7 +143,7 @@ page 446 "Finance Charge Memo"
             part(FinChrgMemoLines; "Finance Charge Memo Lines")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Finance Charge Memo No." = FIELD("No.");
+                SubPageLink = "Finance Charge Memo No." = field("No.");
             }
             group(Posting)
             {
@@ -240,8 +249,8 @@ page 446 "Finance Charge Memo"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Fin. Charge Comment Sheet";
-                    RunPageLink = Type = CONST("Finance Charge Memo"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = Type = const("Finance Charge Memo"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("C&ustomer")
@@ -250,7 +259,7 @@ page 446 "Finance Charge Memo"
                     Caption = 'C&ustomer';
                     Image = Customer;
                     RunObject = Page "Customer List";
-                    RunPageLink = "No." = FIELD("Customer No.");
+                    RunPageLink = "No." = field("Customer No.");
                     ToolTip = 'Open the card of the customer that the reminder or finance charge applies to. ';
                 }
                 action(Dimensions)
@@ -278,7 +287,7 @@ page 446 "Finance Charge Memo"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Finance Charge Memo Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -492,7 +501,6 @@ page 446 "Finance Charge Memo"
         FinanceChargeMemoHeader: Record "Finance Charge Memo Header";
         DocNoVisible: Boolean;
         IsPostingGroupEditable: Boolean;
-        [InDataSet]
         VATDateEnabled: Boolean;
 
     local procedure SetDocNoVisible()

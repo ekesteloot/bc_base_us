@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Contract;
+
 page 6058 "Contract/Service Discounts"
 {
     Caption = 'Contract/Service Discounts';

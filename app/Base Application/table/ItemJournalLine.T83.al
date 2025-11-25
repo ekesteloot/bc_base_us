@@ -1,4 +1,50 @@
-﻿table 83 "Item Journal Line"
+﻿namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.History;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using System.Security.User;
+using System.Utilities;
+
+table 83 "Item Journal Line"
 {
     Caption = 'Item Journal Line';
     DrillDownPageID = "Item Journal Lines";
@@ -258,11 +304,11 @@
         {
             Caption = 'Source No.';
             Editable = false;
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type" = CONST(Item)) Item;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor
+            else
+            if ("Source Type" = const(Item)) Item;
         }
         field(7; "Document No."; Code[20])
         {
@@ -333,11 +379,11 @@
         {
             Caption = 'Source Posting Group';
             Editable = false;
-            TableRelation = IF ("Source Type" = CONST(Customer)) "Customer Posting Group"
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) "Vendor Posting Group"
-            ELSE
-            IF ("Source Type" = CONST(Item)) "Inventory Posting Group";
+            TableRelation = if ("Source Type" = const(Customer)) "Customer Posting Group"
+            else
+            if ("Source Type" = const(Vendor)) "Vendor Posting Group"
+            else
+            if ("Source Type" = const(Item)) "Inventory Posting Group";
         }
         field(13; Quantity; Decimal)
         {
@@ -644,23 +690,23 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(35; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(37; "Indirect Cost %"; Decimal)
@@ -705,7 +751,7 @@
         field(41; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Item Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Item Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
         }
         field(42; "Reason Code"; Code[10])
         {
@@ -780,8 +826,8 @@
         {
             CaptionClass = '1,2,1,' + Text007;
             Caption = 'New Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
@@ -793,8 +839,8 @@
         {
             CaptionClass = '1,2,2,' + Text007;
             Caption = 'New Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
@@ -847,8 +893,6 @@
             Caption = 'Last Item Ledger Entry No.';
             Editable = false;
             TableRelation = "Item Ledger Entry";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(56; "Phys. Inventory"; Boolean)
         {
@@ -896,15 +940,15 @@
         field(68; "Reserved Quantity"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("Journal Template Name"),
-                                                                  "Source Ref. No." = FIELD("Line No."),
-                                                                  "Source Type" = CONST(83),
+            CalcFormula = sum("Reservation Entry".Quantity where("Source ID" = field("Journal Template Name"),
+                                                                  "Source Ref. No." = field("Line No."),
+                                                                  "Source Type" = const(83),
 #pragma warning disable AL0603
-                                                                  "Source Subtype" = FIELD("Entry Type"),
+                                                                  "Source Subtype" = field("Entry Type"),
 #pragma warning restore
-                                                                  "Source Batch Name" = FIELD("Journal Batch Name"),
-                                                                  "Source Prod. Order Line" = CONST(0),
-                                                                  "Reservation Status" = CONST(Reservation)));
+                                                                  "Source Batch Name" = field("Journal Batch Name"),
+                                                                  "Source Prod. Order Line" = const(0),
+                                                                  "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -951,7 +995,7 @@
         field(91; "Order No."; Code[20])
         {
             Caption = 'Order No.';
-            TableRelation = IF ("Order Type" = CONST(Production)) "Production Order"."No." WHERE(Status = CONST(Released));
+            TableRelation = if ("Order Type" = const(Production)) "Production Order"."No." where(Status = const(Released));
 
             trigger OnValidate()
             var
@@ -1032,8 +1076,8 @@
         field(92; "Order Line No."; Integer)
         {
             Caption = 'Order Line No.';
-            TableRelation = IF ("Order Type" = CONST(Production)) "Prod. Order Line"."Line No." WHERE(Status = CONST(Released),
-                                                                                                     "Prod. Order No." = FIELD("Order No."));
+            TableRelation = if ("Order Type" = const(Production)) "Prod. Order Line"."Line No." where(Status = const(Released),
+                                                                                                     "Prod. Order No." = field("Order No."));
 
             trigger OnValidate()
             var
@@ -1083,7 +1127,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -1099,7 +1143,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(904; "Assemble to Order"; Boolean)
@@ -1127,11 +1171,14 @@
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             begin
                 GetItem();
+                GetItemVariant();
+                DisplayErrorIfItemVariantIsBlocked(ItemVariant);
+
                 if ("Entry Type" in ["Entry Type"::Consumption, "Entry Type"::Output]) and Item.IsInventoriableType() then
                     WhseValidateSourceLine.ItemLineVerifyChange(Rec, xRec);
 
@@ -1157,37 +1204,34 @@
                     ItemJnlLineReserve.VerifyChange(Rec, xRec);
                 end;
 
-                if "Variant Code" <> '' then begin
-                    ItemVariant.Get("Item No.", "Variant Code");
-                    Description := ItemVariant.Description;
-                end else begin
-                    GetItem();
+                if "Variant Code" <> '' then
+                    Description := ItemVariant.Description
+                else
                     Description := Item.Description;
-                end;
             end;
         }
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Entry Type" = FILTER(Purchase | "Positive Adjmt." | Output),
-                                Quantity = FILTER(>= 0)) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                      "Item Filter" = FIELD("Item No."),
-                                                                      "Variant Filter" = FIELD("Variant Code"))
-            ELSE
-            IF ("Entry Type" = FILTER(Purchase | "Positive Adjmt." | Output),
-                                                                               Quantity = FILTER(< 0)) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                                                    "Item No." = FIELD("Item No."),
-                                                                                                                                    "Variant Code" = FIELD("Variant Code"))
-            ELSE
-            IF ("Entry Type" = FILTER(Sale | "Negative Adjmt." | Transfer | Consumption),
-                                                                                                                                             Quantity = FILTER(> 0)) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                                                                                                                  "Item No." = FIELD("Item No."),
-                                                                                                                                                                                                  "Variant Code" = FIELD("Variant Code"))
-            ELSE
-            IF ("Entry Type" = FILTER(Sale | "Negative Adjmt." | Transfer | Consumption),
-                                                                                                                                                                                                           Quantity = FILTER(<= 0)) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                                                                                                                                                                 "Item Filter" = FIELD("Item No."),
-                                                                                                                                                                                                                                                 "Variant Filter" = FIELD("Variant Code"));
+            TableRelation = if ("Entry Type" = filter(Purchase | "Positive Adjmt." | Output),
+                                Quantity = filter(>= 0)) Bin.Code where("Location Code" = field("Location Code"),
+                                                                      "Item Filter" = field("Item No."),
+                                                                      "Variant Filter" = field("Variant Code"))
+            else
+            if ("Entry Type" = filter(Purchase | "Positive Adjmt." | Output),
+                                                                               Quantity = filter(< 0)) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
+                                                                                                                                    "Item No." = field("Item No."),
+                                                                                                                                    "Variant Code" = field("Variant Code"))
+            else
+            if ("Entry Type" = filter(Sale | "Negative Adjmt." | Transfer | Consumption),
+                                                                                                                                             Quantity = filter(> 0)) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
+                                                                                                                                                                                                  "Item No." = field("Item No."),
+                                                                                                                                                                                                  "Variant Code" = field("Variant Code"))
+            else
+            if ("Entry Type" = filter(Sale | "Negative Adjmt." | Transfer | Consumption),
+                                                                                                                                                                                                           Quantity = filter(<= 0)) Bin.Code where("Location Code" = field("Location Code"),
+                                                                                                                                                                                                                                                 "Item Filter" = field("Item No."),
+                                                                                                                                                                                                                                                 "Variant Filter" = field("Variant Code"));
 
             trigger OnValidate()
             var
@@ -1208,11 +1252,8 @@
                         if CurrFieldNo <> 0 then
                             WMSManagement.CheckItemJnlLineFieldChange(Rec, xRec, FieldCaption("Bin Code"));
                         TestField("Location Code", Bin."Location Code");
-                        WhseIntegrationMgt.CheckBinTypeCode(DATABASE::"Item Journal Line",
-                          FieldCaption("Bin Code"),
-                          "Location Code",
-                          "Bin Code",
-                          "Entry Type".AsInteger());
+                        WhseIntegrationMgt.CheckBinTypeCode(
+                            Enum::TableID::"Item Journal Line".AsInteger(), FieldCaption("Bin Code"), "Location Code", "Bin Code", "Entry Type".AsInteger());
                     end;
                     SetNewBinCodeForSameLocationTransfer();
 
@@ -1241,9 +1282,9 @@
         field(5406; "New Bin Code"; Code[20])
         {
             Caption = 'New Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("New Location Code"),
-                                            "Item Filter" = FIELD("Item No."),
-                                            "Variant Filter" = FIELD("Variant Code"));
+            TableRelation = Bin.Code where("Location Code" = field("New Location Code"),
+                                            "Item Filter" = field("Item No."),
+                                            "Variant Filter" = field("Variant Code"));
 
             trigger OnValidate()
             var
@@ -1261,11 +1302,8 @@
                         if CurrFieldNo <> 0 then
                             WMSManagement.CheckItemJnlLineFieldChange(Rec, xRec, FieldCaption("New Bin Code"));
                         TestField("New Location Code", Bin."Location Code");
-                        WhseIntegrationMgt.CheckBinTypeCode(DATABASE::"Item Journal Line",
-                          FieldCaption("New Bin Code"),
-                          "New Location Code",
-                          "New Bin Code",
-                          "Entry Type".AsInteger());
+                        WhseIntegrationMgt.CheckBinTypeCode(
+                            Enum::TableID::"Item Journal Line".AsInteger(), FieldCaption("New Bin Code"), "New Location Code", "New Bin Code", "Entry Type".AsInteger());
                     end;
                 end;
 
@@ -1275,7 +1313,7 @@
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             var
@@ -1378,15 +1416,15 @@
         field(5468; "Reserved Qty. (Base)"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("Journal Template Name"),
-                                                                           "Source Ref. No." = FIELD("Line No."),
-                                                                           "Source Type" = CONST(83),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Journal Template Name"),
+                                                                           "Source Ref. No." = field("Line No."),
+                                                                           "Source Type" = const(83),
 #pragma warning disable AL0603
-                                                                           "Source Subtype" = FIELD("Entry Type"),
+                                                                           "Source Subtype" = field("Entry Type"),
 #pragma warning restore
-                                                                           "Source Batch Name" = FIELD("Journal Batch Name"),
-                                                                           "Source Prod. Order Line" = CONST(0),
-                                                                           "Reservation Status" = CONST(Reservation)));
+                                                                           "Source Batch Name" = field("Journal Batch Name"),
+                                                                           "Source Prod. Order Line" = const(0),
+                                                                           "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1424,7 +1462,7 @@
         {
             AccessByPermission = TableData "Item Substitution" = R;
             Caption = 'Originally Ordered Var. Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Originally Ordered No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Originally Ordered No."));
         }
         field(5703; "Out-of-Stock Substitution"; Boolean)
         {
@@ -1456,6 +1494,7 @@
         {
             AccessByPermission = TableData "Item Reference" = R;
             Caption = 'Item Reference No.';
+            ExtendedDatatype = Barcode;
 
             trigger OnLookup()
             begin
@@ -1656,9 +1695,9 @@
         field(5820; "Invoice-to Source No."; Code[20])
         {
             Caption = 'Invoice-to Source No.';
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor;
         }
         field(5830; Type; Enum "Capacity Type Journal")
         {
@@ -1677,11 +1716,11 @@
         field(5831; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST("Machine Center")) "Machine Center"
-            ELSE
-            IF (Type = CONST("Work Center")) "Work Center"
-            ELSE
-            IF (Type = CONST(Resource)) Resource;
+            TableRelation = if (Type = const("Machine Center")) "Machine Center"
+            else
+            if (Type = const("Work Center")) "Work Center"
+            else
+            if (Type = const(Resource)) Resource;
 
             trigger OnValidate()
             var
@@ -1727,8 +1766,8 @@
 
                 if Type in [Type::"Work Center", Type::"Machine Center"] then begin
                     "Work Center No." := WorkCenter."No.";
-                    ErrorIfSubcontractingWorkCenterUsed();
                     "Work Center Group Code" := WorkCenter."Work Center Group Code";
+                    ErrorIfSubcontractingWorkCenterUsed();
                     Validate("Cap. Unit of Measure Code", WorkCenter."Unit of Measure Code");
                 end;
 
@@ -1739,10 +1778,10 @@
         field(5838; "Operation No."; Code[10])
         {
             Caption = 'Operation No.';
-            TableRelation = IF ("Order Type" = CONST(Production)) "Prod. Order Routing Line"."Operation No." WHERE(Status = CONST(Released),
-                                                                                                                  "Prod. Order No." = FIELD("Order No."),
-                                                                                                                  "Routing No." = FIELD("Routing No."),
-                                                                                                                  "Routing Reference No." = FIELD("Routing Reference No."));
+            TableRelation = if ("Order Type" = const(Production)) "Prod. Order Routing Line"."Operation No." where(Status = const(Released),
+                                                                                                                  "Prod. Order No." = field("Order No."),
+                                                                                                                  "Routing No." = field("Routing No."),
+                                                                                                                  "Routing Reference No." = field("Routing Reference No."));
 
             trigger OnValidate()
             var
@@ -1958,8 +1997,8 @@
         field(5858; "Cap. Unit of Measure Code"; Code[10])
         {
             Caption = 'Cap. Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Resource)) "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("No."))
-            ELSE
+            TableRelation = if (Type = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("No."))
+            else
             "Capacity Unit of Measure";
 
             trigger OnValidate()
@@ -1987,7 +2026,7 @@
                                 "Unit Cost" := ProdOrderRtngLine."Unit Cost per";
                                 OnValidateCapUnitofMeasureCodeOnBeforeRoutingCostPerUnit(Rec, ProdOrderRtngLine, IsHandled);
                                 if not IsHandled then
-                                    CostCalcMgt.RoutingCostPerUnit(
+                                    CostCalcMgt.CalcRoutingCostPerUnit(
                                       Type, "No.", "Unit Amount", "Indirect Cost %", "Overhead Rate", "Unit Cost", "Unit Cost Calculation");
                             end;
                         "Order Type"::Assembly:
@@ -2045,9 +2084,9 @@
         field(5884; "Prod. Order Comp. Line No."; Integer)
         {
             Caption = 'Prod. Order Comp. Line No.';
-            TableRelation = IF ("Order Type" = CONST(Production)) "Prod. Order Component"."Line No." WHERE(Status = CONST(Released),
-                                                                                                          "Prod. Order No." = FIELD("Order No."),
-                                                                                                          "Prod. Order Line No." = FIELD("Order Line No."));
+            TableRelation = if ("Order Type" = const(Production)) "Prod. Order Component"."Line No." where(Status = const(Released),
+                                                                                                          "Prod. Order No." = field("Order No."),
+                                                                                                          "Prod. Order Line No." = field("Order Line No."));
 
             trigger OnValidate()
             var
@@ -2070,11 +2109,9 @@
             AccessByPermission = TableData "Machine Center" = R;
             Caption = 'Finished';
         }
-        field(5887; "Unit Cost Calculation"; Option)
+        field(5887; "Unit Cost Calculation"; Enum "Unit Cost Calculation Type")
         {
             Caption = 'Unit Cost Calculation';
-            OptionCaption = 'Time,Units';
-            OptionMembers = Time,Units;
         }
         field(5888; Subcontracting; Boolean)
         {
@@ -2318,8 +2355,8 @@
         ItemJnlTemplate.Get("Journal Template Name");
         ItemJnlBatch.Get("Journal Template Name", "Journal Batch Name");
 
-        ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
-        ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+        Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+        Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
         ValidateNewShortcutDimCode(1, "New Shortcut Dimension 1 Code");
         ValidateNewShortcutDimCode(2, "New Shortcut Dimension 2 Code");
 
@@ -2376,9 +2413,9 @@
         RevaluationPerEntryNotAllowedErr: Label 'This item has already been revalued with the Calculate Inventory Value function, so you cannot use the Applies-to Entry field as that may change the valuation.';
         SubcontractedErr: Label '%1 must be zero in line number %2 because it is linked to the subcontracted work center.', Comment = '%1 - Field Caption, %2 - Line No.';
         FinishedOutputQst: Label 'The operation has been finished. Do you want to post output for the finished operation?';
-        SalesBlockedErr: Label 'You cannot sell this item because the Sales Blocked check box is selected on the item card.';
-        PurchasingBlockedErr: Label 'You cannot purchase this item because the Purchasing Blocked check box is selected on the item card.';
-        BlockedErr: Label 'You cannot choose item number %1 because the Blocked check box is selected on its item card.', Comment = '%1 - Item No.';
+        SalesBlockedErr: Label 'You cannot sell this %1 because the %2 check box is selected on the %1 card.', Comment = '%1 - Table Caption (item/variant), %2 - Field Caption';
+        PurchasingBlockedErr: Label 'You cannot purchase this %1 because the %2 check box is selected on the %1 card.', Comment = '%1 - Table Caption (item/variant), %2 - Field Caption';
+        BlockedErr: Label 'You cannot choose %2 %1 because the %3 check box is selected on its %2 card.', Comment = '%1 - Item No., %2 - Table Caption (item/variant), %3 - Field Caption';
         SerialNoRequiredErr: Label 'You must assign a serial number for item %1.', Comment = '%1 - Item No.';
         LotNoRequiredErr: Label 'You must assign a lot number for item %1.', Comment = '%1 - Item No.';
         DocNoFilterErr: Label 'The document numbers cannot be renumbered while there is an active filter on the Document No. field.';
@@ -2405,6 +2442,19 @@
         exit(
           (("Entry Type" = "Entry Type"::Output) or ("Value Entry Type" = "Value Entry Type"::Rounding)) and
           ("Item No." = '') and ("Item Charge No." = '') and ("Invoiced Qty. (Base)" <> 0));
+    end;
+
+    internal procedure CalcReservedQuantity()
+    var
+        ReservationEntry: Record "Reservation Entry";
+    begin
+        if IsSourceSales() then begin
+            SetReservEntrySourceFilters(ReservationEntry, false);
+            ReservationEntry.SetRange("Reservation Status", ReservationEntry."Reservation Status"::Reservation);
+            ReservationEntry.CalcSums("Quantity (Base)");
+            "Reserved Qty. (Base)" := ReservationEntry."Quantity (Base)"
+        end else
+            CalcFields("Reserved Qty. (Base)");
     end;
 
     local procedure CalcBaseTime(Qty: Decimal): Decimal
@@ -2544,6 +2594,19 @@
             Item.Get("Item No.");
 
         OnAfterGetItemChange(Item, Rec);
+    end;
+
+    local procedure GetItemVariant()
+    begin
+        if Rec."Variant Code" = '' then begin
+            Clear(ItemVariant);
+            exit;
+        end;
+
+        if (ItemVariant."Item No." <> Rec."Item No.") or (ItemVariant.Code <> Rec."Variant Code") then
+            ItemVariant.Get(Rec."Item No.", Rec."Variant Code");
+
+        OnAfterGetItemVariantChange(ItemVariant, Rec);
     end;
 
     procedure SetUpNewLine(LastItemJnlLine: Record "Item Journal Line")
@@ -2747,67 +2810,6 @@
         ItemJnlLineReserve.CallItemTracking(Rec, IsReclass);
     end;
 
-#if not CLEAN20
-    local procedure PickDimension(TableArray: array[10] of Integer; CodeArray: array[10] of Code[20]; InheritFromDimSetID: Integer; InheritFromTableNo: Integer)
-    var
-        ItemJournalTemplate: Record "Item Journal Template";
-        SourceCode: Code[10];
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforePickDimension(Rec, IsHandled, CurrFieldNo, TableArray, CodeArray, InheritFromDimSetID, InheritFromTableNo);
-        if IsHandled then
-            exit;
-
-        SourceCode := "Source Code";
-        if SourceCode = '' then
-            if ItemJournalTemplate.Get("Journal Template Name") then
-                SourceCode := ItemJournalTemplate."Source Code";
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, TableArray, CodeArray, SourceCode,
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", InheritFromDimSetID, InheritFromTableNo);
-        DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-
-        if "Entry Type" = "Entry Type"::Transfer then begin
-            "New Dimension Set ID" := "Dimension Set ID";
-            "New Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
-            "New Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
-        end;
-    end;
-
-    local procedure CreateCodeArray(var CodeArray: array[10] of Code[20]; No1: Code[20]; No2: Code[20]; No3: Code[20])
-    begin
-        Clear(CodeArray);
-        CodeArray[1] := No1;
-        CodeArray[2] := No2;
-        CodeArray[3] := No3;
-    end;
-
-    local procedure CreateTableArray(var TableID: array[10] of Integer; Type1: Integer; Type2: Integer; Type3: Integer)
-    begin
-        Clear(TableID);
-        TableID[1] := Type1;
-        TableID[2] := Type2;
-        TableID[3] := Type3;
-    end;
-
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20]; Type3: Integer; No3: Code[20])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        CreateTableArray(TableID, Type1, Type2, Type3);
-        CreateCodeArray(No, No1, No2, No3);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        PickDimension(TableID, No, 0, 0);
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
         CreateDim(DefaultDimSource, 0, 0);
@@ -2823,10 +2825,6 @@
         OnBeforeCreateDim(Rec, IsHandled, CurrFieldNo, DefaultDimSource, InheritFromDimSetID, InheritFromTableNo);
         if IsHandled then
             exit;
-#if not CLEAN20
-        if RunEventOnAfterCreateDimTableIDs(DefaultDimSource, InheritFromDimSetID, InheritFromTableNo) then
-            exit;
-#endif
 
         SourceCode := "Source Code";
         if SourceCode = '' then
@@ -2951,10 +2949,10 @@
             if ProdOrderLine.Get(ProdOrderLine.Status::Released, "Order No.", "Order Line No.") then
                 InheritFromDimSetID := ProdOrderLine."Dimension Set ID";
 
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", Rec."Work Center No.");
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Salespers./Purch. Code");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), Rec."Work Center No.");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Salesperson/Purchaser".AsInteger(), Rec."Salespers./Purch. Code");
         OnCreateDimWithProdOrderLineOnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, Rec.FieldNo("No."));
-        CreateDim(DefaultDimSource, InheritFromDimSetID, Database::Item);
+        CreateDim(DefaultDimSource, InheritFromDimSetID, Enum::TableID::Item.AsInteger());
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -3006,7 +3004,7 @@
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure ValidateNewShortcutDimCode(FieldNumber: Integer; var NewShortcutDimCode: Code[20])
@@ -3604,7 +3602,7 @@
         ItemTrackingMgt: Codeunit "Item Tracking Management";
     begin
         exit(
-          ItemTrackingMgt.ComposeRowID(DATABASE::"Item Journal Line", "Entry Type".AsInteger(),
+          ItemTrackingMgt.ComposeRowID(Enum::TableID::"Item Journal Line".AsInteger(), "Entry Type".AsInteger(),
             "Journal Template Name", "Journal Batch Name", 0, "Line No."));
     end;
 
@@ -3635,7 +3633,7 @@
 
     procedure SetReservationEntry(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSource(DATABASE::"Item Journal Line", "Entry Type".AsInteger(), "Journal Template Name", "Line No.", "Journal Batch Name", 0);
+        ReservEntry.SetSource(Enum::TableID::"Item Journal Line".AsInteger(), "Entry Type".AsInteger(), "Journal Template Name", "Line No.", "Journal Batch Name", 0);
         ReservEntry.SetItemData("Item No.", Description, "Location Code", "Variant Code", "Qty. per Unit of Measure");
         ReservEntry."Expected Receipt Date" := "Posting Date";
         ReservEntry."Shipment Date" := "Posting Date";
@@ -3645,12 +3643,30 @@
 
     procedure SetReservationFilters(var ReservEntry: Record "Reservation Entry")
     begin
-        ReservEntry.SetSourceFilter(
-          DATABASE::"Item Journal Line", "Entry Type".AsInteger(), "Journal Template Name", "Line No.", false);
-        ReservEntry.SetSourceFilter("Journal Batch Name", 0);
+        SetReservEntrySourceFilters(ReservEntry, false);
         ReservEntry.SetTrackingFilterFromItemJnlLine(Rec);
 
         OnAfterSetReservationFilters(ReservEntry, Rec);
+    end;
+
+    internal procedure SetReservEntrySourceFilters(var ReservEntry: Record "Reservation Entry"; SourceKey: Boolean)
+    begin
+        if IsSourceSales() then
+            ReservEntry.SetSourceFilter(Enum::TableID::"Item Journal Line".AsInteger(), "Entry Type".AsInteger(), "Document No.", "Document Line No.", SourceKey)
+        else
+            ReservEntry.SetSourceFilter(Enum::TableID::"Item Journal Line".AsInteger(), "Entry Type".AsInteger(), "Journal Template Name", "Line No.", SourceKey);
+        ReservEntry.SetSourceFilter("Journal Batch Name", 0);
+    end;
+
+    internal procedure IsSourceSales(): Boolean
+    var
+        SourceCodeSetup: Record "Source Code Setup";
+    begin
+        if ("Entry Type" = Rec."Entry Type"::"Sale") then begin
+            SourceCodeSetup.SetLoadFields(Sales);
+            SourceCodeSetup.Get();
+            exit("Source Code" = SourceCodeSetup.Sales);
+        end;
     end;
 
     procedure ReservEntryExist(): Boolean
@@ -4114,7 +4130,7 @@
             exit;
 
         if Item.Blocked then
-            Error(BlockedErr, Item."No.");
+            Error(BlockedErr, Item."No.", Item.TableCaption(), Item.FieldCaption(Blocked));
 
         if "Item Charge No." <> '' then
             exit;
@@ -4125,15 +4141,39 @@
                    not ("Document Type" in ["Document Type"::"Purchase Return Shipment", "Document Type"::"Purchase Credit Memo"])
                    and ("Value Entry Type" <> "Value Entry Type"::Revaluation)
                 then
-                    Error(PurchasingBlockedErr);
+                    Error(PurchasingBlockedErr, Item.TableCaption(), Item.FieldCaption("Purchasing Blocked"));
             "Entry Type"::Sale:
                 if Item."Sales Blocked" and
                    not ("Document Type" in ["Document Type"::"Sales Return Receipt", "Document Type"::"Sales Credit Memo"])
                 then
-                    Error(SalesBlockedErr);
+                    Error(SalesBlockedErr, Item.TableCaption(), Item.FieldCaption("Sales Blocked"));
         end;
 
         OnAfterDisplayErrorIfItemIsBlocked(Item, Rec);
+    end;
+
+    procedure DisplayErrorIfItemVariantIsBlocked(ItemVariant: Record "Item Variant")
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeDisplayErrorIfItemVariantIsBlocked(ItemVariant, Rec, IsHandled);
+        if IsHandled then
+            exit;
+
+        if ItemVariant.Blocked then
+            Error(BlockedErr, ItemVariant.Code, ItemVariant.TableCaption(), ItemVariant.FieldCaption(Blocked));
+
+        case Rec."Entry Type" of
+            Rec."Entry Type"::Purchase:
+                if ItemVariant."Purchasing Blocked" and not (Rec."Document Type" in [Rec."Document Type"::"Purchase Return Shipment", Rec."Document Type"::"Purchase Credit Memo"]) then
+                    Error(PurchasingBlockedErr, ItemVariant.TableCaption(), ItemVariant.FieldCaption("Purchasing Blocked"));
+            "Entry Type"::Sale:
+                if ItemVariant."Sales Blocked" and not (Rec."Document Type" in [Rec."Document Type"::"Sales Return Receipt", Rec."Document Type"::"Sales Credit Memo"]) then
+                    Error(SalesBlockedErr, ItemVariant.TableCaption(), ItemVariant.FieldCaption("Sales Blocked"));
+        end;
+
+        OnAfterDisplayErrorIfItemVariantIsBlocked(ItemVariant, Rec);
     end;
 
     procedure IsPurchaseReturn(): Boolean
@@ -4279,6 +4319,13 @@
                not Adjustment));
     end;
 
+    procedure PrintInventoryMovement()
+    begin
+        Rec.SetRange("Journal Template Name", Rec."Journal Template Name");
+        Rec.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+        Report.RunModal(Enum::ReportID::"Inventory Movement".AsInteger(), true, true, Rec);
+    end;
+
     local procedure IsDefaultBin() Result: Boolean
     begin
         Result := Location."Bin Mandatory" and not Location."Directed Put-away and Pick";
@@ -4359,15 +4406,15 @@
     begin
         case true of
             FieldNo = Rec.FieldNo("Item No."):
-                TableValuePair.Add(Database::Item, Rec."Item No.");
+                TableValuePair.Add(Enum::TableID::Item.AsInteger(), Rec."Item No.");
             FieldNo = Rec.FieldNo("Salespers./Purch. Code"):
-                TableValuePair.Add(Database::"Salesperson/Purchaser", Rec."Salespers./Purch. Code");
+                TableValuePair.Add(Enum::TableID::"Salesperson/Purchaser", Rec."Salespers./Purch. Code");
             FieldNo = Rec.FieldNo("Work Center No."):
-                TableValuePair.Add(Database::"Work Center", Rec."Work Center No.");
+                TableValuePair.Add(Enum::TableID::"Work Center".AsInteger(), Rec."Work Center No.");
             FieldNo = Rec.FieldNo("Location Code"):
-                TableValuePair.Add(Database::Location, Rec."Location Code");
+                TableValuePair.Add(Enum::TableID::Location.AsInteger(), Rec."Location Code");
             FieldNo = Rec.FieldNo("New Location Code"):
-                TableValuePair.Add(Database::Location, Rec."New Location Code");
+                TableValuePair.Add(Enum::TableID::Location.AsInteger(), Rec."New Location Code");
         end;
 
         OnAfterInitTableValuePair(Rec, TableValuePair, FieldNo);
@@ -4375,11 +4422,11 @@
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
-        DimMgt.AddDimSource(DefaultDimSource, Database::Item, Rec."Item No.", FieldNo = Rec.FieldNo("Item No."));
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Salespers./Purch. Code", FieldNo = Rec.FieldNo("Salespers./Purch. Code"));
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", Rec."Work Center No.", FieldNo = Rec.FieldNo("Work Center No."));
-        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
-        DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."New Location Code", FieldNo = Rec.FieldNo("New Location Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Item.AsInteger(), Rec."Item No.", FieldNo = Rec.FieldNo("Item No."));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Salesperson/Purchaser".AsInteger(), Rec."Salespers./Purch. Code", FieldNo = Rec.FieldNo("Salespers./Purch. Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), Rec."Work Center No.", FieldNo = Rec.FieldNo("Work Center No."));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Location.AsInteger(), Rec."New Location Code", FieldNo = Rec.FieldNo("New Location Code"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
     end;
@@ -4539,7 +4586,7 @@
     var
         ItemJournalBatch: Record "Item Journal Batch";
     begin
-        if ItemJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
+        if ItemJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
             exit(ItemJournalBatch."Item Tracking on Lines");
 
         exit(false);
@@ -4654,37 +4701,13 @@
         if not ("Quantity (Base)" in [-1, 0, 1]) then
             Error(IncorrectQtyForSNErr);
     end;
-
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
+    procedure GetDateForCalculations() CalculationDate: Date;
     begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Item Journal Line", DefaultDimSource, TableID, No);
+        CalculationDate := Rec."Posting Date";
+        if CalculationDate = 0D then
+            CalculationDate := WorkDate();
     end;
 
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Item Journal Line", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; InheritFromDimSetID: Integer; InheritFromTableNo: Integer) IsHandled: Boolean
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Item Journal Line") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        OnBeforePickDimension(Rec, IsHandled, CurrFieldNo, TableID, No, InheritFromDimSetID, InheritFromTableNo);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var ItemJournalLine: Record "Item Journal Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
@@ -4852,7 +4875,18 @@
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnAfterDisplayErrorIfItemVariantIsBlocked(var ItemVariant: Record "Item Variant"; var ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterGetItemChange(var Item: Record Item; var ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetItemVariantChange(var ItemVariant: Record "Item Variant"; var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
@@ -4881,13 +4915,6 @@
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by OnAfterInitDefaultDimensionSources()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var ItemJournalLine: Record "Item Journal Line"; CallingFieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterReadGLSetup(var GeneralLedgerSetup: Record "General Ledger Setup")
     begin
@@ -4955,6 +4982,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDisplayErrorIfItemIsBlocked(var Item: Record Item; var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeDisplayErrorIfItemVariantIsBlocked(var ItemVariant: Record "Item Variant"; var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -5309,13 +5341,6 @@
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePickDimension(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean; CurrentFieldNo: Integer; TableArray: array[10] of Integer; CodeArray: array[10] of Code[20]; InheritFromDimSetID: Integer; InheritFromTableNo: Integer)
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnRecalculateUnitAmountOnAfterCalcQtyPerUnitOfMeasure(var ItemJournalLine: Record "Item Journal Line"; xItemJournalLine: Record "Item Journal Line")
     begin

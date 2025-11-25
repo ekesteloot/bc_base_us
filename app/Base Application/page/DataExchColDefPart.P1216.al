@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1216 "Data Exch Col Def Part"
 {
     Caption = 'Column Definitions';
@@ -29,8 +31,8 @@ page 1216 "Data Exch Col Def Part"
 
                     trigger OnValidate()
                     begin
-                        DataFormatRequired := IsDataFormatRequired();
-                        DataFormattingCultureRequired := IsDataFormattingCultureRequired();
+                        DataFormatRequired := Rec.IsDataFormatRequired();
+                        DataFormattingCultureRequired := Rec.IsDataFormattingCultureRequired();
                     end;
                 }
                 field("Data Format"; Rec."Data Format")
@@ -45,7 +47,7 @@ page 1216 "Data Exch Col Def Part"
                     ShowMandatory = DataFormattingCultureRequired;
                     ToolTip = 'Specifies the culture of the data format, if any. For example, en-US if the data type is Decimal to ensure that comma is used as the .000 separator, according to the US format. This field is only relevant for import.';
                 }
-                field(Length; Length)
+                field(Length; Rec.Length)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the length of the fixed-width line that holds the column if the file is of type Fixed Text.';
@@ -55,7 +57,7 @@ page 1216 "Data Exch Col Def Part"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a description of the column, for informational purposes.';
                 }
-                field(Path; Path)
+                field(Path; Rec.Path)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the position of the element in the related XML schema.';
@@ -65,12 +67,12 @@ page 1216 "Data Exch Col Def Part"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the value that is used in the data file to identify negative amounts, in data files that cannot contain negative signs. This identifier is then used to reverse the identified amounts to negative signs during import.';
                 }
-                field(Constant; Constant)
+                field(Constant; Rec.Constant)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies any data that you want to export in this column, such as extra information about the payment type.';
                 }
-                field(Show; Show)
+                field(Show; Rec.Show)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the element is shown in the data exchange definition.';
@@ -86,7 +88,7 @@ page 1216 "Data Exch Col Def Part"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that text padding.';
                 }
-                field(Justification; Justification)
+                field(Justification; Rec.Justification)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the column justification is left or right.';
@@ -139,7 +141,7 @@ page 1216 "Data Exch Col Def Part"
         DataExchLineDef: Record "Data Exch. Line Def";
         GetFileStructure: Report "Get File Structure";
     begin
-        DataExchLineDef.Get("Data Exch. Def Code", "Data Exch. Line Def Code");
+        DataExchLineDef.Get(Rec."Data Exch. Def Code", Rec."Data Exch. Line Def Code");
         GetFileStructure.Initialize(DataExchLineDef);
         GetFileStructure.RunModal();
     end;

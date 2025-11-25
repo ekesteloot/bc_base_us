@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Posting;
+
+using Microsoft.FixedAssets.Depreciation;
+
 table 5647 "FA Matrix Posting Type"
 {
     Caption = 'FA Matrix Posting Type';
@@ -29,83 +33,82 @@ table 5647 "FA Matrix Posting Type"
 
     procedure CreateTypes()
     var
-        FADeprBook: Record "FA Depreciation Book";
+        FADepreciationBook: Record "FA Depreciation Book";
     begin
         if not FindSet() then begin
-            ;
-            InsertRec(1, FADeprBook.FieldCaption("Book Value"));
-            InsertRec(2, FADeprBook.FieldCaption("Acquisition Cost"));
-            InsertRec(3, FADeprBook.FieldCaption(Depreciation));
-            InsertRec(4, FADeprBook.FieldCaption("Write-Down"));
-            InsertRec(5, FADeprBook.FieldCaption(Appreciation));
-            InsertRec(6, FADeprBook.FieldCaption("Custom 1"));
-            InsertRec(7, FADeprBook.FieldCaption("Custom 2"));
-            InsertRec(8, FADeprBook.FieldCaption("Proceeds on Disposal"));
-            InsertRec(9, FADeprBook.FieldCaption("Gain/Loss"));
-            InsertRec(10, FADeprBook.FieldCaption("Depreciable Basis"));
-            InsertRec(11, FADeprBook.FieldCaption("Salvage Value"));
+            InsertRec(1, FADepreciationBook.FieldCaption("Book Value"));
+            InsertRec(2, FADepreciationBook.FieldCaption("Acquisition Cost"));
+            InsertRec(3, FADepreciationBook.FieldCaption(Depreciation));
+            InsertRec(4, FADepreciationBook.FieldCaption("Write-Down"));
+            InsertRec(5, FADepreciationBook.FieldCaption(Appreciation));
+            InsertRec(6, FADepreciationBook.FieldCaption("Custom 1"));
+            InsertRec(7, FADepreciationBook.FieldCaption("Custom 2"));
+            InsertRec(8, FADepreciationBook.FieldCaption("Proceeds on Disposal"));
+            InsertRec(9, FADepreciationBook.FieldCaption("Gain/Loss"));
+            InsertRec(10, FADepreciationBook.FieldCaption("Depreciable Basis"));
+            InsertRec(11, FADepreciationBook.FieldCaption("Salvage Value"));
         end else
             repeat
                 if "Entry No." = 1 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption("Book Value") then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption("Book Value") then begin
                         Delete();
-                        InsertRec(1, FADeprBook.FieldCaption("Book Value"));
+                        InsertRec(1, FADepreciationBook.FieldCaption("Book Value"));
                     end;
                 if "Entry No." = 2 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption("Acquisition Cost") then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption("Acquisition Cost") then begin
                         Delete();
-                        InsertRec(2, FADeprBook.FieldCaption("Acquisition Cost"));
+                        InsertRec(2, FADepreciationBook.FieldCaption("Acquisition Cost"));
                     end;
                 if "Entry No." = 3 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption(Depreciation) then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption(Depreciation) then begin
                         Delete();
-                        InsertRec(3, FADeprBook.FieldCaption(Depreciation));
+                        InsertRec(3, FADepreciationBook.FieldCaption(Depreciation));
                     end;
                 if "Entry No." = 4 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption("Write-Down") then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption("Write-Down") then begin
                         Delete();
-                        InsertRec(4, FADeprBook.FieldCaption("Write-Down"));
+                        InsertRec(4, FADepreciationBook.FieldCaption("Write-Down"));
                     end;
                 if "Entry No." = 5 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption(Appreciation) then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption(Appreciation) then begin
                         Delete();
-                        InsertRec(5, FADeprBook.FieldCaption(Appreciation));
+                        InsertRec(5, FADepreciationBook.FieldCaption(Appreciation));
                     end;
                 if "Entry No." = 6 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption("Custom 1") then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption("Custom 1") then begin
                         Delete();
-                        InsertRec(6, FADeprBook.FieldCaption("Custom 1"));
+                        InsertRec(6, FADepreciationBook.FieldCaption("Custom 1"));
                     end;
                 if "Entry No." = 7 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption("Custom 2") then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption("Custom 2") then begin
                         Delete();
-                        InsertRec(7, FADeprBook.FieldCaption("Custom 2"));
+                        InsertRec(7, FADepreciationBook.FieldCaption("Custom 2"));
                     end;
                 if "Entry No." = 8 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption("Proceeds on Disposal") then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption("Proceeds on Disposal") then begin
                         Delete();
-                        InsertRec(8, FADeprBook.FieldCaption("Proceeds on Disposal"));
+                        InsertRec(8, FADepreciationBook.FieldCaption("Proceeds on Disposal"));
                     end;
                 if "Entry No." = 9 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption("Gain/Loss") then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption("Gain/Loss") then begin
                         Delete();
-                        InsertRec(9, FADeprBook.FieldCaption("Gain/Loss"));
+                        InsertRec(9, FADepreciationBook.FieldCaption("Gain/Loss"));
                     end;
                 if "Entry No." = 10 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption("Depreciable Basis") then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption("Depreciable Basis") then begin
                         Delete();
-                        InsertRec(10, FADeprBook.FieldCaption("Depreciable Basis"));
+                        InsertRec(10, FADepreciationBook.FieldCaption("Depreciable Basis"));
                     end;
                 if "Entry No." = 11 then
-                    if "FA Posting Type Name" <> FADeprBook.FieldCaption("Salvage Value") then begin
+                    if "FA Posting Type Name" <> FADepreciationBook.FieldCaption("Salvage Value") then begin
                         Delete();
-                        InsertRec(11, FADeprBook.FieldCaption("Salvage Value"));
+                        InsertRec(11, FADepreciationBook.FieldCaption("Salvage Value"));
                     end;
             until Next() = 0;
         OnAfterCreateTypes(Rec);
     end;
 
-    local procedure InsertRec(EntryNo: Integer; FAPostingTypeName: Text[80])
+    procedure InsertRec(EntryNo: Integer; FAPostingTypeName: Text)
     begin
         "Entry No." := EntryNo;
         "FA Posting Type Name" := CopyStr(FAPostingTypeName, 1, MaxStrLen("FA Posting Type Name"));

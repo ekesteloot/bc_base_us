@@ -77,7 +77,7 @@ page 1051 "Additional Fee Chart"
 
     trigger OnAfterGetRecord()
     begin
-        Update(CurrPage.BusinessChart);
+        Rec.Update(CurrPage.BusinessChart);
     end;
 
     var
@@ -104,7 +104,7 @@ page 1051 "Additional Fee Chart"
             exit;
 
         TempSortingTable.UpdateData(Rec, ReminderLevel, ChargePerLine, Currency, RemAmountTxt, MaxRemAmount);
-        Update(CurrPage.BusinessChart);
+        Rec.Update(CurrPage.BusinessChart);
     end;
 }
 

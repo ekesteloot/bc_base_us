@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Peppol;
+
+using Microsoft.ServiceMgt.Document;
+
 codeunit 1621 "PEPPOL Service Validation"
 {
     TableNo = "Service Header";

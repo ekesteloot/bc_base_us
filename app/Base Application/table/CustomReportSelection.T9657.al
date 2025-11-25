@@ -11,9 +11,9 @@ table 9657 "Custom Report Selection"
         field(2; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(18)) Customer."No."
-            ELSE
-            IF ("Source Type" = CONST(23)) Vendor."No.";
+            TableRelation = if ("Source Type" = const(18)) Customer."No."
+            else
+            if ("Source Type" = const(23)) Vendor."No.";
         }
         field(3; Usage; Enum "Report Selection Usage")
         {
@@ -27,12 +27,15 @@ table 9657 "Custom Report Selection"
         field(5; "Report ID"; Integer)
         {
             Caption = 'Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = "Report Metadata"."ID";
 
             trigger OnValidate()
+            var
+                PlatformSelectionEnabled: Boolean;
             begin
+                PlatformSelectionEnabled := FeatureManagement.IsEnabled(PlatformSelectionEnabledLbl);
                 CalcFields("Report Caption");
-                if ("Report ID" = 0) or ("Report ID" <> xRec."Report ID") then begin
+                if (("Report ID" = 0) or ("Report ID" <> xRec."Report ID")) and not PlatformSelectionEnabled then begin
                     Validate("Custom Report Layout Code", '');
                     Validate("Email Body Layout Code", '');
                 end;
@@ -40,8 +43,7 @@ table 9657 "Custom Report Selection"
         }
         field(6; "Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Report ID")));
+            CalcFormula = Lookup("Report Metadata".Caption WHERE("ID" = FIELD("Report ID")));
             Caption = 'Report Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -49,7 +51,7 @@ table 9657 "Custom Report Selection"
         field(7; "Custom Report Layout Code"; Code[20])
         {
             Caption = 'Custom Report Layout Code';
-            TableRelation = "Custom Report Layout" WHERE(Code = FIELD("Custom Report Layout Code"));
+            TableRelation = "Custom Report Layout" where(Code = field("Custom Report Layout Code"));
 
             trigger OnValidate()
             begin
@@ -58,7 +60,7 @@ table 9657 "Custom Report Selection"
         }
         field(8; "Custom Report Description"; Text[250])
         {
-            CalcFormula = Lookup("Custom Report Layout".Description WHERE(Code = FIELD("Custom Report Layout Code")));
+            CalcFormula = Lookup("Custom Report Layout".Description where(Code = field("Custom Report Layout Code")));
             Caption = 'Custom Report Description';
             FieldClass = FlowField;
         }
@@ -85,25 +87,30 @@ table 9657 "Custom Report Selection"
 
             trigger OnValidate()
             begin
-                if not "Use for Email Body" then
+                if not "Use for Email Body" then begin
                     Validate("Email Body Layout Code", '');
+                    Validate("Email Body Layout AppID", EmptyGuid);
+                    Validate("Email Body Layout Name", '');
+                end;
             end;
         }
         field(20; "Use for Email Body"; Boolean)
         {
             Caption = 'Use for Email Body';
-
             trigger OnValidate()
             begin
-                if not "Use for Email Body" then
+                if not "Use for Email Body" then begin
                     Validate("Email Body Layout Code", '');
+                    Validate("Email Body Layout AppID", EmptyGuid);
+                    Validate("Email Body Layout Name", '');
+                end;
             end;
         }
         field(21; "Email Body Layout Code"; Code[20])
         {
             Caption = 'Email Body Layout Code';
-            TableRelation = "Custom Report Layout" WHERE(Code = FIELD("Email Body Layout Code"),
-                                                          "Report ID" = FIELD("Report ID"));
+            TableRelation = "Custom Report Layout" where(Code = field("Email Body Layout Code"),
+                                                          "Report ID" = field("Report ID"));
 
             trigger OnValidate()
             begin
@@ -114,7 +121,7 @@ table 9657 "Custom Report Selection"
         }
         field(22; "Email Body Layout Description"; Text[250])
         {
-            CalcFormula = Lookup("Custom Report Layout".Description WHERE(Code = FIELD("Email Body Layout Code")));
+            CalcFormula = Lookup("Custom Report Layout".Description where(Code = field("Email Body Layout Code")));
             Caption = 'Email Body Layout Description';
             Editable = false;
             FieldClass = FlowField;
@@ -126,6 +133,26 @@ table 9657 "Custom Report Selection"
         field(24; "Selected Contacts Filter"; Blob)
         {
             Caption = 'Selected Contacts Filter';
+        }
+        field(25; "Email Attachment Layout Name"; Text[250])
+        {
+            Caption = 'Email attachment layout name';
+            Editable = false;
+        }
+        field(26; "Email Attachment Layout AppID"; Guid)
+        {
+            Caption = 'Email attachment layout App ID';
+            Editable = false;
+        }
+        field(27; "Email Body Layout Name"; Text[250])
+        {
+            Caption = 'Email body layout name';
+            Editable = false;
+        }
+        field(28; "Email Body Layout AppID"; Guid)
+        {
+            Caption = 'Email body layout App ID';
+            Editable = false;
         }
     }
 
@@ -145,24 +172,35 @@ table 9657 "Custom Report Selection"
     }
 
     trigger OnInsert()
+    var
+        PlatformSelectionEnabled: Boolean;
     begin
         TestField("Report ID");
-        CheckEmailBodyUsage();
+        PlatformSelectionEnabled := FeatureManagement.IsEnabled(PlatformSelectionEnabledLbl);
+        if not PlatformSelectionEnabled then
+            CheckEmailBodyUsage();
     end;
 
     trigger OnModify()
+    var
+        PlatformSelectionEnabled: Boolean;
     begin
         TestField("Report ID");
-        CheckEmailBodyUsage();
+        PlatformSelectionEnabled := FeatureManagement.IsEnabled(PlatformSelectionEnabledLbl);
+        if not PlatformSelectionEnabled then
+            CheckEmailBodyUsage();
     end;
 
     var
+        PlatformSelectionEnabledLbl: Label 'EnablePlatformBasedReportSelection', Locked = true;
         EmailBodyIsAlreadyDefinedErr: Label 'An email body is already defined for %1.', Comment = '%1 = Usage, for example Sales Invoice';
         CannotBeUsedAsAnEmailBodyErr: Label 'Report %1 uses the %2, which cannot be used as an email body.', Comment = '%1 = Report ID,%2 = Type';
         TargetEmailAddressErr: Label 'The target email address has not been specified on the document layout for %1, %2. //Choose the Document Layouts action on the customer or vendor card to specify the email address.', Comment = '%1 - Source Data RecordID, %2 - Usage';
         ExceededContactsNotificationTxt: Label 'Too many contacts were selected. Only %1 of %2 contact emails were processed. You can revise contact selection.', Comment = '%1 = number of contacts, %2 = number of contacts';
         UseEmailFromContactErr: Label 'You already use emails from contacts and cannot enter email addresses manually. Delete the value in the Send to Email field, and then enter another email address.';
         StartUseEmailFromContactTxt: Label 'Choose the Select Email from Contacts action if you want to view the list of contacts that will be used to send emails.';
+        FeatureManagement: Codeunit "Feature Management Facade";
+        EmptyGuid: Guid;
 
     procedure InitUsage()
     begin
@@ -266,9 +304,15 @@ table 9657 "Custom Report Selection"
                     Validate("Report ID", ReportSelections."Report ID");
                     Validate("Use for Email Body", ReportSelections."Use for Email Body");
                     Validate("Use for Email Attachment", ReportSelections."Use for Email Attachment");
-                    Validate("Custom Report Layout Code", ReportSelections."Custom Report Layout Code");
-                    if ReportSelections."Email Body Layout Type" = ReportSelections."Email Body Layout Type"::"Custom Report Layout" then
-                        Validate("Email Body Layout Code", ReportSelections."Email Body Layout Code");
+
+                    if not FeatureManagement.IsEnabled(PlatformSelectionEnabledLbl) then begin
+                        Validate("Custom Report Layout Code", ReportSelections."Custom Report Layout Code");
+                        if ReportSelections."Email Body Layout Type" = ReportSelections."Email Body Layout Type"::"Custom Report Layout" then
+                            Validate("Email Body Layout Code", ReportSelections."Email Body Layout Code");
+                    end else begin
+                        Validate("Email Body Layout Name", ReportSelections."Email Body Layout Name");
+                        Validate("Email Body Layout AppID", ReportSelections."Email Body Layout AppID");
+                    end;
                     OnCopyFromReportSelectionsOnBeforeInsert(Rec, ReportSelections);
                     Insert();
                     SequenceNo += 1;
@@ -522,4 +566,3 @@ table 9657 "Custom Report Selection"
     begin
     end;
 }
-

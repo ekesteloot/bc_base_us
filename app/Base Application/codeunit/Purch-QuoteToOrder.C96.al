@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Shared.Archive;
+using System.Utilities;
+
 codeunit 96 "Purch.-Quote to Order"
 {
     TableNo = "Purchase Header";
@@ -14,17 +22,17 @@ codeunit 96 "Purch.-Quote to Order"
     begin
         OnBeforeRun(Rec);
 
-        TestField("Document Type", "Document Type"::Quote);
+        Rec.TestField("Document Type", Rec."Document Type"::Quote);
         ShouldRedistributeInvoiceAmount := PurchCalcDiscByType.ShouldRedistributeInvoiceDiscountAmount(Rec);
 
-        CheckPurchasePostRestrictions();
+        Rec.CheckPurchasePostRestrictions();
 
-        Vend.Get("Buy-from Vendor No.");
+        Vend.Get(Rec."Buy-from Vendor No.");
         Vend.CheckBlockedVendOnDocs(Vend, false);
 
-        ValidatePurchaserOnPurchHeader(Rec, true, false);
+        Rec.ValidatePurchaserOnPurchHeader(Rec, true, false);
 
-        CheckForBlockedLines();
+        Rec.CheckForBlockedLines();
 
         CreatePurchHeader(Rec, Vend."Prepayment %");
 
@@ -39,23 +47,23 @@ codeunit 96 "Purch.-Quote to Order"
             PurchOrderHeader.Modify();
         end;
 
-        PurchCommentLine.CopyComments("Document Type".AsInteger(), PurchOrderHeader."Document Type".AsInteger(), "No.", PurchOrderHeader."No.");
+        PurchCommentLine.CopyComments(Rec."Document Type".AsInteger(), PurchOrderHeader."Document Type".AsInteger(), Rec."No.", PurchOrderHeader."No.");
         RecordLinkManagement.CopyLinks(Rec, PurchOrderHeader);
 
-        AssignItemCharges("Document Type", "No.", PurchOrderHeader."Document Type", PurchOrderHeader."No.");
+        AssignItemCharges(Rec."Document Type", Rec."No.", PurchOrderHeader."Document Type", PurchOrderHeader."No.");
 
-        ApprovalsMgmt.CopyApprovalEntryQuoteToOrder(RecordId, PurchOrderHeader."No.", PurchOrderHeader.RecordId);
+        ApprovalsMgmt.CopyApprovalEntryQuoteToOrder(Rec.RecordId, PurchOrderHeader."No.", PurchOrderHeader.RecordId);
 
         IsHandled := false;
         OnBeforeDeletePurchQuote(Rec, PurchOrderHeader, IsHandled);
         if not IsHandled then begin
-            ApprovalsMgmt.DeleteApprovalEntries(RecordId);
-            PurchCommentLine.DeleteComments("Document Type".AsInteger(), "No.");
+            ApprovalsMgmt.DeleteApprovalEntries(Rec.RecordId);
+            PurchCommentLine.DeleteComments(Rec."Document Type".AsInteger(), Rec."No.");
             IsHandled := false;
             OnBeforeDeleteLinks(Rec, IsHandled);
             if not IsHandled then
-                DeleteLinks();
-            Delete();
+                Rec.DeleteLinks();
+            Rec.Delete();
             PurchQuoteLine.DeleteAll();
         end;
 

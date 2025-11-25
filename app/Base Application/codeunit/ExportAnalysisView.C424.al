@@ -1,3 +1,14 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.IO;
+
 codeunit 424 "Export Analysis View"
 {
 
@@ -59,7 +70,7 @@ codeunit 424 "Export Analysis View"
         BusUnitFilter: Text;
         CashFlowFilter: Text;
     begin
-        GLAccountSource := AnalysisViewEntry."Account Source" = AnalysisViewEntry."Account Source"::"G/L Account";
+        GLAccountSource := AnalysisByDimParameters."Analysis Account Source" = AnalysisByDimParameters."Analysis Account Source"::"G/L Account";
 
         CheckCombination(AnalysisByDimParameters."Show Actual/Budgets", AnalysisByDimParameters."Show Amount Field");
 
@@ -106,7 +117,7 @@ codeunit 424 "Export Analysis View"
         TempExcelBuffer.DeleteAll();
 
         AnalysisViewEntry2.Copy(AnalysisViewEntry);
-        AnalysisView.Get(AnalysisViewEntry2."Analysis View Code");
+        AnalysisView.Get(AnalysisByDimParameters."Analysis View Code");
         PopulateTempAccountTable(AnalysisByDimParameters."Account Filter");
 
         FindDimLevel(AnalysisView."Dimension 1 Code", AnalysisByDimParameters."Dimension 1 Filter", 1);
@@ -145,9 +156,6 @@ codeunit 424 "Export Analysis View"
                     if TempCFAccount2.Find('-') then
                         ProcessMarkedTempCFAccountRec(AnalysisByDimParameters."Show Column Name");
                 end;
-        // NIKOLAK - FIX
-        // else
-        //    OnCreateDataSheet(AnalysisViewEntry);
         end;
 
         NoOfLeadingColumns := MaxLevel + 1;
@@ -429,7 +437,7 @@ codeunit 424 "Export Analysis View"
             FillCell(2, 2, FieldCaption("Analysis View Code"));
             FillCell(2, 3, "Analysis View Code");
             FillCell(3, 2, Text023);
-            AnalysisView.Get("Analysis View Code");
+            AnalysisView.Get(AnalysisByDimParameters."Analysis View Code");
             FillCell(3, 3, AnalysisView.Name);
             RowNoCount := 3;
             if AnalysisView."Account Filter" <> '' then begin

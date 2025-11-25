@@ -1,3 +1,17 @@
+﻿namespace Microsoft.Manufacturing.Capacity;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 table 5832 "Capacity Ledger Entry"
 {
     Caption = 'Capacity Ledger Entry';
@@ -13,11 +27,11 @@ table 5832 "Capacity Ledger Entry"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST("Machine Center")) "Machine Center"
-            ELSE
-            IF (Type = CONST("Work Center")) "Work Center"
-            ELSE
-            IF (Type = CONST(Resource)) Resource;
+            TableRelation = if (Type = const("Machine Center")) "Machine Center"
+            else
+            if (Type = const("Work Center")) "Work Center"
+            else
+            if (Type = const(Resource)) Resource;
         }
         field(3; "Posting Date"; Date)
         {
@@ -97,13 +111,13 @@ table 5832 "Capacity Ledger Entry"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(34; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(39; "Last Output Line"; Boolean)
         {
@@ -138,12 +152,12 @@ table 5832 "Capacity Ledger Entry"
         field(57; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(58; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(59; "Qty. per Unit of Measure"; Decimal)
         {
@@ -181,8 +195,8 @@ table 5832 "Capacity Ledger Entry"
         field(71; "Direct Cost"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Actual)" WHERE("Capacity Ledger Entry No." = FIELD("Entry No."),
-                                                                          "Entry Type" = CONST("Direct Cost")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Actual)" where("Capacity Ledger Entry No." = field("Entry No."),
+                                                                          "Entry Type" = const("Direct Cost")));
             Caption = 'Direct Cost';
             Editable = false;
             FieldClass = FlowField;
@@ -190,8 +204,8 @@ table 5832 "Capacity Ledger Entry"
         field(72; "Overhead Cost"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Actual)" WHERE("Capacity Ledger Entry No." = FIELD("Entry No."),
-                                                                          "Entry Type" = CONST("Indirect Cost")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Actual)" where("Capacity Ledger Entry No." = field("Entry No."),
+                                                                          "Entry Type" = const("Indirect Cost")));
             Caption = 'Overhead Cost';
             Editable = false;
             FieldClass = FlowField;
@@ -200,8 +214,8 @@ table 5832 "Capacity Ledger Entry"
         {
             AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Actual) (ACY)" WHERE("Capacity Ledger Entry No." = FIELD("Entry No."),
-                                                                                "Entry Type" = CONST("Direct Cost")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Actual) (ACY)" where("Capacity Ledger Entry No." = field("Entry No."),
+                                                                                "Entry Type" = const("Direct Cost")));
             Caption = 'Direct Cost (ACY)';
             Editable = false;
             FieldClass = FlowField;
@@ -210,8 +224,8 @@ table 5832 "Capacity Ledger Entry"
         {
             AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Actual) (ACY)" WHERE("Capacity Ledger Entry No." = FIELD("Entry No."),
-                                                                                "Entry Type" = CONST("Indirect Cost")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Actual) (ACY)" where("Capacity Ledger Entry No." = field("Entry No."),
+                                                                                "Entry Type" = const("Indirect Cost")));
             Caption = 'Overhead Cost (ACY)';
             Editable = false;
             FieldClass = FlowField;
@@ -229,14 +243,14 @@ table 5832 "Capacity Ledger Entry"
         {
             Caption = 'Order No.';
             Editable = false;
-            TableRelation = IF ("Order Type" = CONST(Production)) "Production Order"."No." WHERE(Status = FILTER(Released ..));
+            TableRelation = if ("Order Type" = const(Production)) "Production Order"."No." where(Status = filter(Released ..));
         }
         field(92; "Order Line No."; Integer)
         {
             Caption = 'Order Line No.';
             Editable = false;
-            TableRelation = IF ("Order Type" = CONST(Production)) "Prod. Order Line"."Line No." WHERE(Status = FILTER(Released ..),
-                                                                                                     "Prod. Order No." = FIELD("Order No."));
+            TableRelation = if ("Order Type" = const(Production)) "Prod. Order Line"."Line No." where(Status = filter(Released ..),
+                                                                                                     "Prod. Order No." = field("Order No."));
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -246,7 +260,7 @@ table 5832 "Capacity Ledger Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])

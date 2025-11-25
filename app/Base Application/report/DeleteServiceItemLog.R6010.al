@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Item;
+
+using System.Utilities;
+
 report 6010 "Delete Service Item Log"
 {
     Caption = 'Delete Service Item Log';
@@ -7,7 +11,7 @@ report 6010 "Delete Service Item Log"
     {
         dataitem("Service Item Log"; "Service Item Log")
         {
-            DataItemTableView = SORTING("Change Date");
+            DataItemTableView = sorting("Change Date");
             RequestFilterFields = "Change Date", "Service Item No.";
 
             trigger OnPostDataItem()

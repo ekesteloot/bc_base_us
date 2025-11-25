@@ -1,3 +1,11 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7383 "Invt. Movement Subform"
 {
     Caption = 'Lines';
@@ -7,7 +15,7 @@ page 7383 "Invt. Movement Subform"
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Warehouse Activity Line";
-    SourceTableView = WHERE("Activity Type" = CONST("Invt. Movement"));
+    SourceTableView = where("Activity Type" = const("Invt. Movement"));
 
     layout
     {
@@ -359,7 +367,7 @@ page 7383 "Invt. Movement Subform"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Activity Type" := xRec."Activity Type";
+        Rec."Activity Type" := xRec."Activity Type";
     end;
 
     var
@@ -369,14 +377,14 @@ page 7383 "Invt. Movement Subform"
     local procedure ShowSourceLine()
     begin
         WMSMgt.ShowSourceDocLine(
-          "Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+          Rec."Source Type", Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.", Rec."Source Subline No.");
     end;
 
     local procedure ShowBinContents()
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", '')
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", '')
     end;
 
     local procedure ItemAvailability(AvailabilityType: Option Date,Variant,Location,Bin,"Event",BOM)
@@ -389,7 +397,7 @@ page 7383 "Invt. Movement Subform"
         WhseActivLine: Record "Warehouse Activity Line";
     begin
         WhseActivLine.Copy(Rec);
-        AutofillQtyToHandle(WhseActivLine);
+        Rec.AutofillQtyToHandle(WhseActivLine);
     end;
 
     procedure DeleteQtyToHandle()
@@ -397,7 +405,7 @@ page 7383 "Invt. Movement Subform"
         WhseActivLine: Record "Warehouse Activity Line";
     begin
         WhseActivLine.Copy(Rec);
-        DeleteQtyToHandle(WhseActivLine);
+        Rec.DeleteQtyToHandle(WhseActivLine);
     end;
 
     local procedure SplitLines()
@@ -405,8 +413,8 @@ page 7383 "Invt. Movement Subform"
         WhseActivLine: Record "Warehouse Activity Line";
     begin
         WhseActivLine.Copy(Rec);
-        SplitLine(WhseActivLine);
-        Copy(WhseActivLine);
+        Rec.SplitLine(WhseActivLine);
+        Rec.Copy(WhseActivLine);
         CurrPage.Update(false);
     end;
 
@@ -424,14 +432,14 @@ page 7383 "Invt. Movement Subform"
         WhseActivLine.SetRange(Breakbulk);
         WhseActivLine.FilterGroup(0);
         CODEUNIT.Run(CODEUNIT::"Whse.-Act.-Register (Yes/No)", WhseActivLine);
-        Reset();
-        SetCurrentKey("Activity Type", "No.", "Sorting Sequence No.");
-        FilterGroup(4);
-        SetRange("Activity Type", "Activity Type");
-        SetRange("No.", "No.");
-        FilterGroup(3);
-        SetRange(Breakbulk, false);
-        FilterGroup(0);
+        Rec.Reset();
+        Rec.SetCurrentKey("Activity Type", "No.", "Sorting Sequence No.");
+        Rec.FilterGroup(4);
+        Rec.SetRange("Activity Type", Rec."Activity Type");
+        Rec.SetRange("No.", Rec."No.");
+        Rec.FilterGroup(3);
+        Rec.SetRange(Breakbulk, false);
+        Rec.FilterGroup(0);
         CurrPage.Update(false);
     end;
 

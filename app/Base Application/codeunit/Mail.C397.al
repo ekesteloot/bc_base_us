@@ -67,10 +67,7 @@ codeunit 397 Mail
         OutlookMessageHelper.BodyFormat := 2;
         OutlookMessageHelper.ShowNewMailDialogOnSend := ShowNewMailDialogOnSend;
         OutlookMessageHelper.NewMailDialogIsModal := RunModal;
-        IsHandled := false;
-        OnCreateMessageOnBeforeClearAttachmentFileNames(IsHandled);
-        if not IsHandled then
-            OutlookMessageHelper.AttachmentFileNames.Clear();
+        OutlookMessageHelper.AttachmentFileNames.Clear();
         AddBodyline(Body);
     end;
 
@@ -351,11 +348,6 @@ codeunit 397 Mail
 
     [IntegrationEvent(true, false)]
     local procedure OnCreateAndSendMessageOnAfterAttachFile()
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCreateMessageOnBeforeClearAttachmentFileNames(var IsHandled: Boolean);
     begin
     end;
 }

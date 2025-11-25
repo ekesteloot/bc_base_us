@@ -70,7 +70,7 @@ codeunit 8800 "Custom Layout Reporting"
         EscapeTok: Label '''%1''', Locked = true;
         ErrorForDataOccuredErr: Label 'The error, %1, occurred when running report %2 for %3.', Comment = '%1 - Error text, %2 - Report ID, %3 - Record ID.';
         TableFilterForReportID: Integer;
-        TableFilterTok: Label '<?xml version="1.0" standalone="yes"?><ReportParameters id="@%1"><DataItems><DataItem name="Customer">VERSION(1) SORTING(Field1) WHERE(Field1 =1(%2))</DataItem></DataItems></ReportParameters>', Locked = true;
+        TableFilterTok: Label '<?xml version="1.0" standalone="yes"?><ReportParameters id="@%1"><DataItems><DataItem name="Customer">VERSION(1) SORTING(Field1) where(Field1 =1(%2))</DataItem></DataItems></ReportParameters>', Locked = true;
         TableFilterTxt: Text;
         ForTok: Label ' for %1', Comment = '%1: customer name, Sample: Statement for Stan as of 21/02/2020';
         AsOfTok: Label ' as of %1', Comment = '%1: date, Sample: Statement for Stan as of 21/02/2020';
@@ -445,8 +445,12 @@ codeunit 8800 "Custom Layout Reporting"
         end;
 
         // Set the custom report layout
-        CustomReportLayoutCode := ResolveCustomReportLayoutCode(CustomReportSelection);
-        ReportLayoutSelection.SetTempLayoutSelected(CustomReportLayoutCode);
+        if CustomReportSelection."Email Attachment Layout Name" <> '' then
+            ReportLayoutSelection.SetTempLayoutSelectedName(CustomReportSelection."Email Attachment Layout Name")
+        else begin
+            CustomReportLayoutCode := ResolveCustomReportLayoutCode(CustomReportSelection);
+            ReportLayoutSelection.SetTempLayoutSelected(CustomReportLayoutCode);
+        end;
 
         case OutputType of
             OutputType::Email:
@@ -478,7 +482,7 @@ codeunit 8800 "Custom Layout Reporting"
                 SaveAsReport(DataRecRef, ReportID, REPORTFORMAT::Xml);
         end;
         if CustomReportLayoutCode <> '' then
-            ReportLayoutSelection.SetTempLayoutSelected('');
+            ReportLayoutSelection.ClearTempLayoutSelected();
 
         CustomReportSelection.Validate("Report ID", ReportID);
         LogAndClearLastError(CustomReportSelection."Report Caption", DataRecRef.RecordId);
@@ -580,6 +584,7 @@ codeunit 8800 "Custom Layout Reporting"
         PdfFileName: Text[250];
         TempReportLayoutCode: Code[20];
         EmailBodyLayoutCode: Code[20];
+        TempReportLayoutName: Text[250];
     begin
         TempPdfFilePath := CreateReportWithExtension(DataRecRef, ReportID, REPORTFORMAT::Pdf, FileName);
         if TempPdfFilePath = '' then
@@ -598,16 +603,23 @@ codeunit 8800 "Custom Layout Reporting"
         end;
 
         EmailBodyLayoutCode := ResolveEmailBodyLayoutCode(CustomReportSelection, ReportSelections);
-        if EmailBodyLayoutCode <> '' then begin
+        if (EmailBodyLayoutCode <> '') or (CustomReportSelection."Email Body Layout Name" <> '') then begin
             TempReportLayoutCode := ReportLayoutSelection.GetTempLayoutSelected();
-            ReportLayoutSelection.SetTempLayoutSelected(EmailBodyLayoutCode);
+            TempReportLayoutName := ReportLayoutSelection.GetTempSelectedLayoutName();
+            if CustomReportSelection."Email Body Layout Name" <> '' then
+                ReportLayoutSelection.SetTempLayoutSelectedName(CustomReportSelection."Email Body Layout Name")
+            else
+                ReportLayoutSelection.SetTempLayoutSelected(EmailBodyLayoutCode);
             ReportRecordVariant := DataRecRef;
             BindSubscription(MailManagement);
             TempEmailBodyFilePath := CreateReportWithExtension(ReportRecordVariant, ReportID, REPORTFORMAT::Html, FileName);
             UnbindSubscription(MailManagement);
             if TempEmailBodyFilePath = '' then
                 exit;
-            ReportLayoutSelection.SetTempLayoutSelected(TempReportLayoutCode);
+            if TempReportLayoutName <> '' then
+                ReportLayoutSelection.SetTempLayoutSelectedName(TempReportLayoutName)
+            else
+                ReportLayoutSelection.SetTempLayoutSelected(TempReportLayoutCode);
         end;
 
         if SupressOutput or RemoveEmptyFile(TempPdfFilePath) then
@@ -1477,32 +1489,6 @@ codeunit 8800 "Custom Layout Reporting"
             Insert();
         end;
     end;
-
-#if not CLEAN20
-#pragma warning disable AL0432
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Document Report Mgt.", 'OnBeforeMergeDocument', '', false, false)]
-    [Obsolete('The rendering of Word documents will be handled on the Platform. To override the behavior, subscribe on the report event CustomDocumentMerger.', '20.0')]
-    local procedure VerifyXmlContainsDatasetOnBeforeMergeDocument(ReportID: Integer; ReportAction: Option SaveAsPdf,SaveAsWord,SaveAsExcel,Preview,Print,SaveAsHtml; InStrXmlData: InStream; PrinterName: Text; OutStream: OutStream; var Handled: Boolean; IsFileNameBlank: Boolean)
-    var
-        DocumentReportMgt: Codeunit "Document Report Mgt.";
-        CancelVerification: Boolean;
-    begin
-        OnBeforeVerifyXmlContainsDataset(CancelVerification);
-        if CancelVerification then
-            exit;
-
-        WordOutputXmlHasData := DocumentReportMgt.IsStreamHasDataset(InStrXmlData);
-
-        WordOutputXmlHasDataVerified := true;
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('The rendering of Word documents will be handled on the Platform. To override the behavior, subscribe on the report event CustomDocumentMerger.', '20.0')]
-    local procedure OnBeforeVerifyXmlContainsDataset(var CancelVerification: Boolean)
-    begin
-    end;
-#pragma warning restore AL0432
-#endif
 
     procedure CheckForCustomLayoutReportingJob()
     var

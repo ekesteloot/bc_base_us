@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.GLAccount;
+
+using System.Telemetry;
+
 xmlport 10 "IC G/L Account Import/Export"
 {
     Caption = 'IC G/L Account Import/Export';

@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
+using System;
+using System.Globalization;
+using System.Reflection;
+
 table 7504 "Item Attribute Value Selection"
 {
     Caption = 'Item Attribute Value Selection';

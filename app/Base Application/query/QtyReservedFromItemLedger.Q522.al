@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Ledger;
+
 query 522 "Qty. Reserved From Item Ledger"
 {
     QueryType = Normal;
@@ -46,7 +50,8 @@ query 522 "Qty. Reserved From Item Ledger"
         if ReservationEntry."Source Ref. No." <> 0 then
             SetRange(Source_Ref__No_, ReservationEntry."Source Ref. No.");
         SetRange(Source_Batch_Name, ReservationEntry."Source Batch Name");
-        SetRange(Source_Prod__Order_Line, ReservationEntry."Source Prod. Order Line");
+        if ReservationEntry."Source Prod. Order Line" <> 0 then
+            SetRange(Source_Prod__Order_Line, ReservationEntry."Source Prod. Order Line");
     end;
 
     internal procedure SetSKUFilters(ItemNo: Code[20]; VariantCode: Code[10]; LocationCode: Code[10])

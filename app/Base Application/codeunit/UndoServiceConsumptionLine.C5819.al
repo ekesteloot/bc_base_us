@@ -1,3 +1,20 @@
+﻿
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Ledger;
+using Microsoft.ServiceMgt.Posting;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using System.Utilities;
+
 codeunit 5819 "Undo Service Consumption Line"
 {
     Permissions = TableData "Item Ledger Entry" = rm,
@@ -19,14 +36,14 @@ codeunit 5819 "Undo Service Consumption Line"
         if IsHandled then
             exit;
 
-        if not Find('-') then
+        if not Rec.Find('-') then
             exit;
 
         if not HideDialog then
             if not ConfirmManagement.GetResponseOrDefault(Text000, true) then
                 exit;
 
-        LockTable();
+        Rec.LockTable();
         ServShptLine.Copy(Rec);
         Code();
         Rec := ServShptLine;

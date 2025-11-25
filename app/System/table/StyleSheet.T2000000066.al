@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment.Configuration;
+
 table 2000000066 "Style Sheet"
 {
     Caption = 'Style Sheet';
@@ -19,7 +25,7 @@ table 2000000066 "Style Sheet"
         field(3; "Object ID"; Integer)
         {
             Caption = 'Object ID';
-            TableRelation = Object.ID WHERE(Type = FIELD("Object Type"));
+            TableRelation = System.Reflection.Object.ID WHERE(Type = FIELD("Object Type"));
         }
         field(4; "Program ID"; Guid)
         {

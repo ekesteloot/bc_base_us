@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.Foundation.Address;
+
 query 19 "VAT Entries Base Amt. Sum"
 {
     Caption = 'VAT Entries Base Amt. Sum';
@@ -7,7 +11,7 @@ query 19 "VAT Entries Base Amt. Sum"
     {
         dataitem(VAT_Entry; "VAT Entry")
         {
-            DataItemTableFilter = Type = CONST(Sale);
+            DataItemTableFilter = Type = const(Sale);
             filter(Posting_Date; "Posting Date")
             {
             }
@@ -45,7 +49,7 @@ query 19 "VAT Entries Base Amt. Sum"
                 DataItemLink = Code = VAT_Entry."Country/Region Code";
                 column(EU_Country_Region_Code; "EU Country/Region Code")
                 {
-                    ColumnFilter = EU_Country_Region_Code = FILTER(<> '');
+                    ColumnFilter = EU_Country_Region_Code = filter(<> '');
                 }
             }
         }

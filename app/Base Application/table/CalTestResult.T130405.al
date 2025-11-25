@@ -1,3 +1,8 @@
+﻿namespace System.TestTools.TestRunner;
+
+using System.Reflection;
+using System.Security.AccessControl;
+
 table 130405 "CAL Test Result"
 {
     Caption = 'CAL Test Result';
@@ -74,8 +79,6 @@ table 130405 "CAL Test Result"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(16; "Start Time"; DateTime)
         {

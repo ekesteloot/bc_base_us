@@ -1,4 +1,6 @@
 #if not CLEAN21
+namespace System.Integration.PowerBI;
+
 codeunit 6317 "Power BI Session Manager"
 {
     // // This is singleton class to maintain information about Power BI for a user session.

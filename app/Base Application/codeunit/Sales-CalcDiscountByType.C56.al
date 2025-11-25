@@ -9,10 +9,10 @@ codeunit 56 "Sales - Calc Discount By Type"
     begin
         SalesLine.Copy(Rec);
 
-        if SalesHeader.Get("Document Type", "Document No.") then begin
+        if SalesHeader.Get(Rec."Document Type", Rec."Document No.") then begin
             ApplyDefaultInvoiceDiscount(SalesHeader."Invoice Discount Value", SalesHeader);
             // on new order might be no line
-            if Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.") then;
+            if Rec.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.") then;
         end;
     end;
 

@@ -12,7 +12,7 @@ page 6315 "PBI Top 5 Opportunities"
         {
             repeater(Group)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = All;
                     Caption = 'ID';
@@ -24,7 +24,7 @@ page 6315 "PBI Top 5 Opportunities"
                     Caption = 'Opportunity No.';
                     ToolTip = 'Specifies the opportunity.';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     Caption = 'Value';

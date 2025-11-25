@@ -1,11 +1,41 @@
-﻿table 49 "Invoice Post. Buffer"
+﻿namespace Microsoft.FinancialMgt.ReceivablesPayables;
+
+#if not CLEAN23
+using Microsoft.FinancialMgt.Currency;
+#endif
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+#if not CLEAN23
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+#endif
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Jobs.Job;
+#if not CLEAN23
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Setup;
+#endif
+
+table 49 "Invoice Post. Buffer"
 {
     Caption = 'Invoice Post. Buffer';
     ReplicateData = false;
 #pragma warning disable AS0074
     TableType = Temporary;
     ObsoleteReason = 'This table will be replaced by table Invoice Posting Buffer in new Invoice Posting implementation.';
-#if CLEAN20
+#if CLEAN23
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
 #else
@@ -32,14 +62,14 @@
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(5; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(6; "Job No."; Code[20])
         {
@@ -306,7 +336,7 @@
     {
     }
 
-#if not CLEAN20
+#if not CLEAN23
     var
         TempInvoicePostBufferRounding: Record "Invoice Post. Buffer" temporary;
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
@@ -580,7 +610,7 @@
     end;
 #endif
 
-#if not CLEAN20
+#if not CLEAN23
     [Obsolete('Replaced by procedure in table Invoice Posting Buffer', '20.0')]
     procedure PreparePrepmtAdjBuffer(InvoicePostBuffer: Record "Invoice Post. Buffer"; GLAccountNo: Code[20]; AdjAmount: Decimal; RoundingEntry: Boolean)
     var
@@ -751,7 +781,7 @@
 
     local procedure ApplyRoundingValueForFinalPosting(var Rounding: Decimal; var Value: Decimal)
     begin
-        IF (Rounding <> 0) and (Value <> 0) then begin
+        if (Rounding <> 0) and (Value <> 0) then begin
             Value += Rounding;
             Rounding := 0;
         end;

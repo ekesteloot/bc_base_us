@@ -1,3 +1,8 @@
+﻿namespace System.Automation;
+
+using System.Reflection;
+using System.Security.AccessControl;
+
 table 1531 "Workflow Step Argument Archive"
 {
     Caption = 'Workflow Step Argument Archive';
@@ -30,7 +35,7 @@ table 1531 "Workflow Step Argument Archive"
         }
         field(6; "Notification User License Type"; Option)
         {
-            CalcFormula = Lookup(User."License Type" WHERE("User Name" = FIELD("Notification User ID")));
+            CalcFormula = Lookup(User."License Type" where("User Name" = field("Notification User ID")));
             Caption = 'Notification User License Type';
             FieldClass = FlowField;
             OptionCaption = 'Full User,Limited User,Device Only User,Windows Group,External User';
@@ -93,8 +98,8 @@ table 1531 "Workflow Step Argument Archive"
         }
         field(21; "Field Caption"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No."),
-                                                              "No." = FIELD("Field No.")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table No."),
+                                                              "No." = field("Field No.")));
             Caption = 'Field Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -117,7 +122,7 @@ table 1531 "Workflow Step Argument Archive"
         }
         field(100; "Response Option Group"; Code[20])
         {
-            CalcFormula = Lookup("Workflow Response"."Response Option Group" WHERE("Function Name" = FIELD("Response Function Name")));
+            CalcFormula = Lookup("Workflow Response"."Response Option Group" where("Function Name" = field("Response Function Name")));
             Caption = 'Response Option Group';
             Editable = false;
             FieldClass = FlowField;

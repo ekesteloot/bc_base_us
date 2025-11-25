@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.Manufacturing.Routing;
+
 codeunit 99000756 VersionManagement
 {
     Permissions = TableData "Production BOM Header" = r;

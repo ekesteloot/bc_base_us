@@ -1,3 +1,13 @@
+namespace Microsoft.Sales.Archive;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Sales.Customer;
+using Microsoft.Shared.Archive;
+using System.Security.User;
+
 page 5159 "Sales Order Archive"
 {
     Caption = 'Sales Order Archive';
@@ -5,7 +15,7 @@ page 5159 "Sales Order Archive"
     Editable = false;
     PageType = Document;
     SourceTable = "Sales Header Archive";
-    SourceTableView = WHERE("Document Type" = CONST(Order));
+    SourceTableView = where("Document Type" = const(Order));
 
     layout
     {
@@ -174,9 +184,9 @@ page 5159 "Sales Order Archive"
             part(SalesLinesArchive; "Sales Order Archive Subform")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Document No." = FIELD("No."),
-                              "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                              "Version No." = FIELD("Version No.");
+                SubPageLink = "Document No." = field("No."),
+                              "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                              "Version No." = field("Version No.");
             }
             group(Invoicing)
             {
@@ -480,7 +490,7 @@ page 5159 "Sales Order Archive"
                     ApplicationArea = BasicEU;
                     ToolTip = 'Specifies the point of exit through which you ship the items out of your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU;
                     ToolTip = 'Specifies the country or region of origin for the purpose of Intrastat reporting.';
@@ -503,7 +513,7 @@ page 5159 "Sales Order Archive"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Archived By");
+                        UserMgt.DisplayUserInformation(Rec."Archived By");
                     end;
                 }
                 field("Date Archived"; Rec."Date Archived")
@@ -552,7 +562,7 @@ page 5159 "Sales Order Archive"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No.");
+                    RunPageLink = "No." = field("Sell-to Customer No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -567,7 +577,7 @@ page 5159 "Sales Order Archive"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -577,11 +587,11 @@ page 5159 "Sales Order Archive"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Archive Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0),
-                                  "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                  "Version No." = FIELD("Version No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0),
+                                  "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                  "Version No." = field("Version No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Print)
@@ -644,16 +654,16 @@ page 5159 "Sales Order Archive"
     var
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
     begin
-        IsSellToCountyVisible := FormatAddress.UseCounty("Sell-to Country/Region Code");
-        IsShipToCountyVisible := FormatAddress.UseCounty("Ship-to Country/Region Code");
-        IsBillToCountyVisible := FormatAddress.UseCounty("Bill-to Country/Region Code");
+        IsSellToCountyVisible := FormatAddress.UseCounty(Rec."Sell-to Country/Region Code");
+        IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
+        IsBillToCountyVisible := FormatAddress.UseCounty(Rec."Bill-to Country/Region Code");
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        SellToContact.GetOrClear("Sell-to Contact No.");
-        BillToContact.GetOrClear("Bill-to Contact No.");
+        SellToContact.GetOrClear(Rec."Sell-to Contact No.");
+        BillToContact.GetOrClear(Rec."Bill-to Contact No.");
     end;
 
     var
@@ -664,7 +674,6 @@ page 5159 "Sales Order Archive"
         IsSellToCountyVisible: Boolean;
         IsBillToCountyVisible: Boolean;
         IsShipToCountyVisible: Boolean;
-        [InDataSet]
         VATDateEnabled: Boolean;
 }
 

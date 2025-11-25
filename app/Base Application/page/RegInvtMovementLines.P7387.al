@@ -1,3 +1,11 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.InventoryDocument;
+
+using Microsoft.WarehouseMgt.Journal;
+
 page 7387 "Reg. Invt. Movement Lines"
 {
     Caption = 'Reg. Invt. Movement Lines';
@@ -160,8 +168,8 @@ page 7387 "Reg. Invt. Movement Lines"
                     Caption = 'Show Registered Document';
                     Image = ViewRegisteredOrder;
                     RunObject = Page "Registered Invt. Movement";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = SORTING("No.");
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = sorting("No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View the related completed warehouse document.';
                 }
@@ -176,7 +184,7 @@ page 7387 "Reg. Invt. Movement Lines"
                     var
                         WMSMgt: Codeunit "WMS Management";
                     begin
-                        WMSMgt.ShowSourceDocCard("Source Type", "Source Subtype", "Source No.");
+                        WMSMgt.ShowSourceDocCard(Rec."Source Type", Rec."Source Subtype", Rec."Source No.");
                     end;
                 }
             }

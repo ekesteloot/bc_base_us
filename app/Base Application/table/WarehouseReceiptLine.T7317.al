@@ -1,3 +1,17 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.CrossDock;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+
 table 7317 "Warehouse Receipt Line"
 {
     Caption = 'Warehouse Receipt Line';
@@ -56,10 +70,10 @@ table 7317 "Warehouse Receipt Line"
         field(12; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                               "Zone Code" = FIELD("Zone Code"));
+            TableRelation = if ("Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                               "Zone Code" = field("Zone Code"));
 
             trigger OnValidate()
             var
@@ -69,10 +83,8 @@ table 7317 "Warehouse Receipt Line"
                 if "Bin Code" <> '' then begin
                     if xRec."Bin Code" <> "Bin Code" then begin
                         GetLocation("Location Code");
-                        WhseIntegrationMgt.CheckBinTypeCode(DATABASE::"Warehouse Receipt Line",
-                          FieldCaption("Bin Code"),
-                          "Location Code",
-                          "Bin Code", 0);
+                        WhseIntegrationMgt.CheckBinTypeCode(
+                            Enum::TableID::"Warehouse Receipt Line".AsInteger(), FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
                     end;
                     Bin.Get("Location Code", "Bin Code");
                     "Zone Code" := Bin."Zone Code";
@@ -83,7 +95,7 @@ table 7317 "Warehouse Receipt Line"
         field(13; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -222,7 +234,7 @@ table 7317 "Warehouse Receipt Line"
         {
             Caption = 'Unit of Measure Code';
             Editable = false;
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(30; "Qty. per Unit of Measure"; Decimal)
         {
@@ -235,7 +247,7 @@ table 7317 "Warehouse Receipt Line"
         {
             Caption = 'Variant Code';
             Editable = false;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(32; Description; Text[100])
         {
@@ -321,18 +333,18 @@ table 7317 "Warehouse Receipt Line"
         field(52; "Cross-Dock Zone Code"; Code[10])
         {
             Caption = 'Cross-Dock Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"),
-                                             "Cross-Dock Bin Zone" = CONST(true));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"),
+                                             "Cross-Dock Bin Zone" = const(true));
         }
         field(53; "Cross-Dock Bin Code"; Code[20])
         {
             Caption = 'Cross-Dock Bin Code';
-            TableRelation = IF ("Cross-Dock Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                                   "Cross-Dock Bin" = CONST(true))
-            ELSE
-            IF ("Cross-Dock Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                                                                 "Zone Code" = FIELD("Cross-Dock Zone Code"),
-                                                                                                                                                 "Cross-Dock Bin" = CONST(true));
+            TableRelation = if ("Cross-Dock Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                                   "Cross-Dock Bin" = const(true))
+            else
+            if ("Cross-Dock Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                                                                                                 "Zone Code" = field("Cross-Dock Zone Code"),
+                                                                                                                                                 "Cross-Dock Bin" = const(true));
         }
         field(55; "Qty. Rounding Precision"; Decimal)
         {
@@ -655,18 +667,18 @@ table 7317 "Warehouse Receipt Line"
         GetItem();
         Item.TestField("Item Tracking Code");
 
-        SecondSourceQtyArray[1] := DATABASE::"Warehouse Receipt Line";
+        SecondSourceQtyArray[1] := Enum::TableID::"Warehouse Receipt Line".AsInteger();
         SecondSourceQtyArray[2] := "Qty. to Receive (Base)";
         SecondSourceQtyArray[3] := 0;
 
         case "Source Type" of
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 if PurchaseLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     PurchLineReserve.CallItemTracking(PurchaseLine, SecondSourceQtyArray);
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 if SalesLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     SalesLineReserve.CallItemTracking(SalesLine, SecondSourceQtyArray);
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line".AsInteger():
                 begin
                     Direction := Direction::Inbound;
                     if TransferLine.Get("Source No.", "Source Line No.") then

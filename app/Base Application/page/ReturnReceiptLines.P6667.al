@@ -145,7 +145,7 @@ page 6667 "Return Receipt Lines"
                     var
                         ReturnRcptHeader: Record "Return Receipt Header";
                     begin
-                        ReturnRcptHeader.Get("Document No.");
+                        ReturnRcptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Return Receipt", ReturnRcptHeader);
                     end;
                 }
@@ -160,7 +160,7 @@ page 6667 "Return Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -176,13 +176,13 @@ page 6667 "Return Receipt Lines"
     trigger OnOpenPage()
     begin
         if AssignmentType = AssignmentType::Sale then
-            SetRange("Sell-to Customer No.", SellToCustomerNo);
-        FilterGroup(2);
-        SetRange(Type, Type::Item);
-        SetFilter(Quantity, '<>0');
-        SetRange(Correction, false);
-        SetRange("Job No.", '');
-        FilterGroup(0);
+            Rec.SetRange("Sell-to Customer No.", SellToCustomerNo);
+        Rec.FilterGroup(2);
+        Rec.SetRange(Type, Rec.Type::Item);
+        Rec.SetFilter(Quantity, '<>0');
+        Rec.SetRange(Correction, false);
+        Rec.SetRange("Job No.", '');
+        Rec.FilterGroup(0);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -201,7 +201,6 @@ page 6667 "Return Receipt Lines"
         SellToCustomerNo: Code[20];
         UnitCost: Decimal;
         AssignmentType: Option Sale,Purchase;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     procedure InitializeSales(NewItemChargeAssgnt: Record "Item Charge Assignment (Sales)"; NewSellToCustomerNo: Code[20]; NewUnitCost: Decimal)
@@ -255,7 +254,7 @@ page 6667 "Return Receipt Lines"
 
     local procedure DocumentNoOnFormat()
     begin
-        if not IsFirstLine("Document No.", "Line No.") then
+        if not IsFirstLine(Rec."Document No.", Rec."Line No.") then
             DocumentNoHideValue := true;
     end;
 }

@@ -1,10 +1,14 @@
+namespace Microsoft.Purchases.Analysis;
+
+using Microsoft.InventoryMgt.Analysis;
+
 page 9375 "Analysis Report Purchase"
 {
     ApplicationArea = PurchaseAnalysis;
     Caption = 'Purchase Analysis Reports';
     PageType = List;
     SourceTable = "Analysis Report Name";
-    SourceTableView = WHERE("Analysis Area" = CONST(Purchase));
+    SourceTableView = where("Analysis Area" = const(Purchase));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -67,7 +71,7 @@ page 9375 "Analysis Report Purchase"
                 var
                     PurchaseAnalysisReport: Page "Purchase Analysis Report";
                 begin
-                    PurchaseAnalysisReport.SetReportName(Name);
+                    PurchaseAnalysisReport.SetReportName(Rec.Name);
                     PurchaseAnalysisReport.Run();
                 end;
             }

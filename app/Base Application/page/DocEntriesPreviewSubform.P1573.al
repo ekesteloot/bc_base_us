@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Preview;
+
+using Microsoft.Foundation.Enums;
+
 page 1573 "Doc. Entries Preview Subform"
 {
     PageType = ListPart;
@@ -40,7 +44,7 @@ page 1573 "Doc. Entries Preview Subform"
 
                     trigger OnDrillDown()
                     begin
-                        PostingPreviewEventHandler.ShowEntries("Table ID");
+                        PostingPreviewEventHandler.ShowEntries(Rec."Table ID");
                     end;
                 }
             }
@@ -53,11 +57,11 @@ page 1573 "Doc. Entries Preview Subform"
     procedure Set(var TempDocumentEntry: Record "Document Entry" temporary; NewPostingPreviewEventHandler: Codeunit "Posting Preview Event Handler")
     begin
         PostingPreviewEventHandler := NewPostingPreviewEventHandler;
-        TempDocumentEntry.SetFilter("Table ID", '<>%1&<>%2', Database::"G/L Entry", Database::"VAT Entry");
+        TempDocumentEntry.SetFilter("Table ID", '<>%1&<>%2', Enum::TableID::"G/L Entry", Enum::TableID::"VAT Entry");
         if TempDocumentEntry.FindSet() then
             repeat
                 Rec := TempDocumentEntry;
-                Insert();
+                Rec.Insert();
             until TempDocumentEntry.Next() = 0;
     end;
 }

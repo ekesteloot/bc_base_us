@@ -10,7 +10,7 @@ report 19 "VAT- VIES Declaration Tax Auth"
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = filter(1 ..));
             column(CompanyAddr1; CompanyAddr[1])
             {
             }

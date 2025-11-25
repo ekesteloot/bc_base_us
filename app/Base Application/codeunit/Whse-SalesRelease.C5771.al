@@ -54,6 +54,7 @@ codeunit 5771 "Whse.-Sales Release"
                         WhseType := WhseType::Inbound;
 
                     OnReleaseOnBeforeCreateWhseRequest(SalesLine, OldWhseType, WhseType, First);
+
                     if First or (SalesLine."Location Code" <> OldLocationCode) or (WhseType <> OldWhseType) then
                         CreateWarehouseRequest(SalesHeader, SalesLine, WhseType, WarehouseRequest);
 

@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.InventoryMgt.Setup;
+
 codeunit 5708 "Release Transfer Document"
 {
     TableNo = "Transfer Header";

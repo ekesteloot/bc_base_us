@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 page 5216 "Employee Statistics Groups"
 {
     ApplicationArea = BasicHR;
@@ -14,7 +16,7 @@ page 5216 "Employee Statistics Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies a code for the employee statistics group.';

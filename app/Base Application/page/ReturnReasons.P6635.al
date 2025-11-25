@@ -13,7 +13,7 @@ page 6635 "Return Reasons"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = SalesReturnOrder;
                     ToolTip = 'Specifies the code of the record.';

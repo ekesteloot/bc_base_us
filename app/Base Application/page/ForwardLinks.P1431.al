@@ -21,7 +21,7 @@ page 1431 "Forward Links"
                 {
                     ApplicationArea = Basic, Suite;
                 }
-                field(Link; Link)
+                field(Link; Rec.Link)
                 {
                     ApplicationArea = Basic, Suite;
                 }
@@ -42,7 +42,7 @@ page 1431 "Forward Links"
 
                 trigger OnAction()
                 begin
-                    Load();
+                    Rec.Load();
                 end;
             }
         }

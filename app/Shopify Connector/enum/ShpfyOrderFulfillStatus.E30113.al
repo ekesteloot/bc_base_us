@@ -14,18 +14,22 @@ enum 30113 "Shpfy Order Fulfill. Status"
     {
         Caption = 'Fulfilled';
     }
-    value(3; In_Progress)
+#pragma warning disable AS0082
+    value(3; "In Progress")
     {
         Caption = 'In Progress';
     }
+#pragma warning restore AS0082
     value(4; Open)
     {
         Caption = 'Open';
     }
-    value(5; Pending_Fulfillment)
+#pragma warning disable AS0082
+    value(5; "Pending Fulfillment")
     {
         Caption = 'Pending Fulfillment';
     }
+#pragma warning restore AS0082
     value(6; Restocked)
     {
         Caption = 'Restocked';

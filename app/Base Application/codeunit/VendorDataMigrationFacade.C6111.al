@@ -1,3 +1,10 @@
+﻿namespace System.Integration;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Purchases.Vendor;
+
 codeunit 6111 "Vendor Data Migration Facade"
 {
     TableNo = "Data Migration Parameters";
@@ -8,17 +15,17 @@ codeunit 6111 "Vendor Data Migration Facade"
         ChartOfAccountsMigrated: Boolean;
     begin
         ChartOfAccountsMigrated := DataMigrationStatusFacade.HasMigratedChartOfAccounts(Rec);
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
-                OnMigrateVendor("Staging Table RecId To Process");
-                OnMigrateVendorDimensions("Staging Table RecId To Process");
+                OnMigrateVendor(Rec."Staging Table RecId To Process");
+                OnMigrateVendorDimensions(Rec."Staging Table RecId To Process");
 
                 // migrate transactions for this vendor
-                OnMigrateVendorPostingGroups("Staging Table RecId To Process", ChartOfAccountsMigrated);
-                OnMigrateVendorTransactions("Staging Table RecId To Process", ChartOfAccountsMigrated);
+                OnMigrateVendorPostingGroups(Rec."Staging Table RecId To Process", ChartOfAccountsMigrated);
+                OnMigrateVendorTransactions(Rec."Staging Table RecId To Process", ChartOfAccountsMigrated);
                 GenJournalLineIsSet := false;
                 VendorIsSet := false;
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     var

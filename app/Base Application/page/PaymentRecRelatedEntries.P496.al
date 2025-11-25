@@ -1,3 +1,9 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 page 496 "Payment Rec. Related Entries"
 {
     PageType = NavigatePage;

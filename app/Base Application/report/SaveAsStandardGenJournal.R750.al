@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using System.Utilities;
+
 report 750 "Save as Standard Gen. Journal"
 {
     Caption = 'Save as Standard Gen. Journal';

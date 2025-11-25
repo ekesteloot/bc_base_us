@@ -12,9 +12,6 @@ codeunit 10150 "O365 Tax Settings Management"
         DiscardWithNoNameInstructionTxt: Label 'City or state name must be filled in.';
         UpdateOtherAreasOptionQst: Label 'Continue,Undo';
         UpdateOtherAreasInstructionTxt: Label 'Updating a city or state tax rate will affect all customers using the rate.';
-#if not CLEAN20        
-        CannotSetPSTRateErr: Label 'It is not possible to set the PST Rate on the %1 tax area.', Comment = '%1 - Code of tax area in Canada. E.g. NB,AB...';
-#endif
         DefaultTxt: Label 'DEFAULT', Comment = 'Please translate all caps with max length 20 chars.';
         TemplateTaxAreaDoesNotExistMsg: Label 'Customer template tax area %1 does not exist.', Locked = true;
         TemplateInvoicingCategoryTxt: Label 'AL Inv template', Locked = true;
@@ -288,106 +285,12 @@ codeunit 10150 "O365 Tax Settings Management"
         exit(true);
     end;
 
-#if not CLEAN20    
-    local procedure StoreTaxSettingsForCA(var TempSalesTaxSetupWizard: Record "Sales Tax Setup Wizard" temporary; var TempNativeAPITaxSetup: Record "Native - API Tax Setup" temporary)
-    var
-        TaxArea: Record "Tax Area";
-        TaxAreaLine: Record "Tax Area Line";
-    begin
-        if TempSalesTaxSetupWizard."Tax Area Code" = '' then
-            exit;
-
-        TempSalesTaxSetupWizard.SetTaxArea(TaxArea);
-        TaxAreaLine.SetRange("Tax Area", TempSalesTaxSetupWizard."Tax Area Code");
-        if not TaxAreaLine.IsEmpty() then
-            TaxAreaLine.DeleteAll();
-
-        if TempNativeAPITaxSetup."GST or HST Code" <> '' then begin
-            TempSalesTaxSetupWizard.SetTaxJurisdiction(
-              TempNativeAPITaxSetup."GST or HST Code", TempNativeAPITaxSetup."GST or HST Description", GetCARegionCode());
-            TempSalesTaxSetupWizard.SetTaxAreaLine(TaxArea, TempNativeAPITaxSetup."GST or HST Code");
-            TempSalesTaxSetupWizard.SetTaxDetail(
-              TempNativeAPITaxSetup."GST or HST Code", TaxableCodeTxt, TempNativeAPITaxSetup."GST or HST Rate");
-        end;
-        if TempNativeAPITaxSetup."PST Code" <> '' then begin
-            TempSalesTaxSetupWizard.SetTaxJurisdiction(
-              TempNativeAPITaxSetup."PST Code", TempNativeAPITaxSetup."PST Description", TempNativeAPITaxSetup."PST Code");
-            TempSalesTaxSetupWizard.SetTaxAreaLine(TaxArea, TempNativeAPITaxSetup."PST Code");
-            TempSalesTaxSetupWizard.SetTaxDetail(TempNativeAPITaxSetup."PST Code", TaxableCodeTxt, TempNativeAPITaxSetup."PST Rate");
-        end else
-            if TempNativeAPITaxSetup."PST Rate" <> 0 then
-                Error(CannotSetPSTRateErr, TempNativeAPITaxSetup.Code);
-    end;
-#endif
-
     [Scope('OnPrem')]
     procedure UpdateTaxAreaNameUS(var SalesTaxSetupWizard: Record "Sales Tax Setup Wizard")
     begin
         if SalesTaxSetupWizard."Tax Area Code" = '' then
             SalesTaxSetupWizard."Tax Area Code" := SalesTaxSetupWizard.GenerateTaxAreaCode();
     end;
-
-#if not CLEAN20
-    [EventSubscriber(ObjectType::Table, Database::"Native - API Tax Setup", 'OnLoadSalesTaxSettings', '', false, false)]
-    local procedure HandleOnLoadSalesTaxSettings(var NativeAPITaxSetup: Record "Native - API Tax Setup"; var TempTaxAreaBuffer: Record "Tax Area Buffer" temporary)
-    var
-        CompanyInformation: Record "Company Information";
-        IsCanada: Boolean;
-    begin
-        if not TempTaxAreaBuffer.FindFirst() then
-            exit;
-
-        IsCanada := CompanyInformation.IsCanada();
-
-        repeat
-            NativeAPITaxSetup.Init();
-            NativeAPITaxSetup.TransferFields(TempTaxAreaBuffer, true);
-            LoadSalesTaxSettingsFromTaxArea(NativeAPITaxSetup, IsCanada);
-            NativeAPITaxSetup.Insert(true);
-        until TempTaxAreaBuffer.Next() = 0;
-    end;
-
-    local procedure LoadSalesTaxSettingsFromTaxArea(var NativeAPITaxSetup: Record "Native - API Tax Setup"; IsCanada: Boolean)
-    var
-        O365TaxSettingsManagement: Codeunit "O365 Tax Settings Management";
-    begin
-        NativeAPITaxSetup.Default := O365TaxSettingsManagement.IsDefaultTaxAreaAPI(NativeAPITaxSetup.Code);
-
-        if IsCanada then
-            LoadCanadianTaxSettings(NativeAPITaxSetup)
-        else
-            LoadUsTaxSettings(NativeAPITaxSetup);
-    end;
-
-    local procedure LoadCanadianTaxSettings(var NativeAPITaxSetup: Record "Native - API Tax Setup")
-    var
-        TempSalesTaxSetupWizard: Record "Sales Tax Setup Wizard" temporary;
-    begin
-        NativeAPITaxSetup."Country/Region" := NativeAPITaxSetup."Country/Region"::CA;
-        TempSalesTaxSetupWizard.Initialize();
-        TempSalesTaxSetupWizard."Tax Area Code" := DelChr(NativeAPITaxSetup.Code, '<>', ' ');
-        InitializeTaxSetupFromTaxAreaLinesForCA(TempSalesTaxSetupWizard, NativeAPITaxSetup);
-        NativeAPITaxSetup."Total Tax Percentage" := NativeAPITaxSetup."PST Rate" + NativeAPITaxSetup."GST or HST Rate";
-    end;
-
-    local procedure LoadUsTaxSettings(var NativeAPITaxSetup: Record "Native - API Tax Setup")
-    var
-        TempSalesTaxSetupWizard: Record "Sales Tax Setup Wizard" temporary;
-    begin
-        NativeAPITaxSetup."Country/Region" := NativeAPITaxSetup."Country/Region"::US;
-
-        TempSalesTaxSetupWizard.Initialize();
-        TempSalesTaxSetupWizard."Tax Area Code" := DelChr(NativeAPITaxSetup.Code, '<>', ' ');
-        InitializeTaxSetupFromTaxAreaLinesForUS(TempSalesTaxSetupWizard);
-        NativeAPITaxSetup.City := TempSalesTaxSetupWizard.City;
-        NativeAPITaxSetup."City Rate" := TempSalesTaxSetupWizard."City Rate";
-        NativeAPITaxSetup.State := TempSalesTaxSetupWizard.State;
-        NativeAPITaxSetup."State Rate" := TempSalesTaxSetupWizard."State Rate";
-        NativeAPITaxSetup."Total Tax Percentage" := NativeAPITaxSetup."State Rate" + NativeAPITaxSetup."City Rate";
-        NativeAPITaxSetup.Description :=
-          GenerateTaxAreaDescription(NativeAPITaxSetup."Total Tax Percentage", NativeAPITaxSetup.City, NativeAPITaxSetup.State)
-    end;
-#endif
 
     [Scope('OnPrem')]
     procedure AssignDefaultTaxArea(NewTaxAreaCode: Code[20])
@@ -407,76 +310,6 @@ codeunit 10150 "O365 Tax Settings Management"
             end;
     end;
 
-#if not CLEAN20
-    local procedure InitializeTaxSetupFromTaxAreaLinesForCA(var TempSalesTaxSetupWizard: Record "Sales Tax Setup Wizard" temporary; var NativeAPITaxSetup: Record "Native - API Tax Setup")
-    var
-        TaxAreaLine: Record "Tax Area Line";
-        TaxJurisdiction: Record "Tax Jurisdiction";
-    begin
-        TaxAreaLine.SetRange("Tax Area", TempSalesTaxSetupWizard."Tax Area Code");
-        if TaxAreaLine.FindSet() then
-            repeat
-                TaxJurisdiction.SetRange(Code, TaxAreaLine."Tax Jurisdiction Code");
-                if TaxJurisdiction.FindFirst() then
-                    if TaxJurisdiction."Report-to Jurisdiction" = GetCARegionCode() then begin
-                        NativeAPITaxSetup."GST or HST Code" := TaxJurisdiction.Code;
-                        NativeAPITaxSetup."GST or HST Description" := CopyStr(GetProvinceFullLength(NativeAPITaxSetup."GST or HST Code"), 1, 50);
-                        NativeAPITaxSetup."GST or HST Rate" := GetTaxRate(NativeAPITaxSetup."GST or HST Code")
-                    end else begin
-                        NativeAPITaxSetup."PST Code" := TaxJurisdiction.Code;
-                        NativeAPITaxSetup."PST Description" := CopyStr(GetProvinceFullLength(NativeAPITaxSetup."PST Code"), 1, 50);
-                        NativeAPITaxSetup."PST Rate" := GetTaxRate(NativeAPITaxSetup."PST Code")
-                    end;
-            until TaxAreaLine.Next() = 0;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"Native - API Tax Setup", 'OnSaveSalesTaxSettings', '', false, false)]
-    local procedure HandleOnSaveSalesTaxSettings(var NewNativeAPITaxSetup: Record "Native - API Tax Setup")
-    var
-        CompanyInformation: Record "Company Information";
-        TempSalesTaxSetupWizard: Record "Sales Tax Setup Wizard" temporary;
-        TaxArea: Record "Tax Area";
-        IsCanada: Boolean;
-    begin
-        TempSalesTaxSetupWizard.Initialize();
-        TempSalesTaxSetupWizard."Tax Area Code" := DelChr(NewNativeAPITaxSetup.Code, '<>', ' ');
-
-        IsCanada := CompanyInformation.IsCanada();
-
-        if IsCanada then
-            StoreTaxSettingsForCA(TempSalesTaxSetupWizard, NewNativeAPITaxSetup)
-        else begin
-            TempSalesTaxSetupWizard.City := NewNativeAPITaxSetup.City;
-            TempSalesTaxSetupWizard."City Rate" := NewNativeAPITaxSetup."City Rate";
-            TempSalesTaxSetupWizard.State := NewNativeAPITaxSetup.State;
-            TempSalesTaxSetupWizard."State Rate" := NewNativeAPITaxSetup."State Rate";
-            NewNativeAPITaxSetup.Description :=
-              GenerateTaxAreaDescription(NewNativeAPITaxSetup."Total Tax Percentage", NewNativeAPITaxSetup.City, NewNativeAPITaxSetup.State);
-            UpdateSalesTaxSetupWizard(TempSalesTaxSetupWizard);
-            StoreTaxSettingsForUS(TempSalesTaxSetupWizard, NewNativeAPITaxSetup.Description);
-        end;
-
-        if NewNativeAPITaxSetup.Default then
-            AssignDefaultTaxArea(TempSalesTaxSetupWizard."Tax Area Code");
-
-        if not IsNullGuid(NewNativeAPITaxSetup.Id) then
-            exit;
-
-        TaxArea.Get(TempSalesTaxSetupWizard."Tax Area Code");
-        NewNativeAPITaxSetup.Id := TaxArea.SystemId;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"Native - API Tax Setup", 'OnCanDeleteTaxSetup', '', false, false)]
-    local procedure HandleOnCanDeleteTaxSetup(var PreventDeletion: Boolean; var NativeAPITaxSetup: Record "Native - API Tax Setup")
-    begin
-        if PreventDeletion then
-            exit;
-
-        if NativeAPITaxSetup."Country/Region" <> NativeAPITaxSetup."Country/Region"::US then
-            PreventDeletion := true;
-    end;
-#endif
-
     procedure GetTotalTaxRate(TaxAreaCode: Code[20]) TaxRate: Decimal
     var
         TaxAreaLine: Record "Tax Area Line";
@@ -491,12 +324,6 @@ codeunit 10150 "O365 Tax Settings Management"
             until TaxAreaLine.Next() = 0;
     end;
 
-#if not CLEAN20
-    local procedure GetCARegionCode(): Code[10]
-    begin
-        exit('CA');
-    end;
-#endif
     [Scope('OnPrem')]
     procedure IsTaxSet(TaxAreaCode: Code[20]): Boolean
     begin

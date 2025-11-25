@@ -1,3 +1,7 @@
+namespace System.Text;
+
+using System;
+
 codeunit 707 "RegEx Split Wrapper"
 {
 

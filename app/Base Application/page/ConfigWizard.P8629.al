@@ -1,3 +1,9 @@
+namespace System.IO;
+
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Security.User;
+
 page 8629 "Config. Wizard"
 {
     Caption = 'Welcome to RapidStart Services for Business Central';
@@ -24,7 +30,7 @@ page 8629 "Config. Wizard"
                         Caption = 'Name (Required)';
                         ToolTip = 'Specifies the name of your company that you are configuring.';
                     }
-                    field(Address; Address)
+                    field(Address; Rec.Address)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies an address for the company that you are configuring.';
@@ -39,7 +45,7 @@ page 8629 "Config. Wizard"
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the postal code.';
                     }
-                    field(City; City)
+                    field(City; Rec.City)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the city where the company that you are configuring is located.';
@@ -60,7 +66,7 @@ page 8629 "Config. Wizard"
                         ToolTip = 'Specifies the type of industry that the company that you are configuring is.';
                     }
                 }
-                field(Picture; Picture)
+                field(Picture; Rec.Picture)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the picture that has been set up for the company, for example, a company logo.';
@@ -124,7 +130,7 @@ page 8629 "Config. Wizard"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the SWIFT code (international bank identifier code) of the primary bank of the company that you are configuring.';
                 }
-                field(IBAN; IBAN)
+                field(IBAN; Rec.IBAN)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the international bank account number of the primary bank account of the company that you are configuring.';
@@ -150,19 +156,19 @@ page 8629 "Config. Wizard"
                             if ConfigVisible then
                                 Error(PackageIsAlreadyAppliedErr);
 
-                            "Package File Name" := CopyStr(FileManagement.UploadFile(Text004, ''), 1, MaxStrLen("Package File Name"));
+                            Rec."Package File Name" := CopyStr(FileManagement.UploadFile(Text004, ''), 1, MaxStrLen(Rec."Package File Name"));
 
-                            if "Package File Name" <> '' then begin
-                                Validate("Package File Name");
+                            if Rec."Package File Name" <> '' then begin
+                                Rec.Validate("Package File Name");
                                 ApplyVisible := true;
                             end else
                                 ApplyVisible := false;
-                            PackageFileName := FileManagement.GetFileName("Package File Name");
+                            PackageFileName := FileManagement.GetFileName(Rec."Package File Name");
                         end;
 
                         trigger OnValidate()
                         begin
-                            if "Package File Name" = '' then
+                            if Rec."Package File Name" = '' then
                                 ApplyVisible := false;
 
                             CurrPage.Update();
@@ -226,9 +232,9 @@ page 8629 "Config. Wizard"
                                 if Roles.RunModal() = Action::LookupOK then begin
                                     Roles.GetRecord(AllProfileTable);
                                     YourProfileCode := AllProfileTable."Profile ID";
-                                    "Your Profile Code" := AllProfileTable."Profile ID";
-                                    "Your Profile App ID" := AllProfileTable."App ID";
-                                    "Your Profile Scope" := AllProfileTable.Scope;
+                                    Rec."Your Profile Code" := AllProfileTable."Profile ID";
+                                    Rec."Your Profile App ID" := AllProfileTable."App ID";
+                                    Rec."Your Profile Scope" := AllProfileTable.Scope;
                                 end;
                             end;
                         }
@@ -263,7 +269,7 @@ page 8629 "Config. Wizard"
 
                     trigger OnAction()
                     begin
-                        if CompleteWizard() then
+                        if Rec.CompleteWizard() then
                             ConfigVisible := true
                         else
                             Error(Text003);
@@ -333,22 +339,22 @@ page 8629 "Config. Wizard"
 
     trigger OnClosePage()
     begin
-        SelectDefaultRoleCenter("Your Profile Code", "Your Profile App ID", "Your Profile Scope");
+        Rec.SelectDefaultRoleCenter(Rec."Your Profile Code", Rec."Your Profile App ID", Rec."Your Profile Scope");
     end;
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end else begin
-            "Package File Name" := '';
-            "Package Name" := '';
-            "Package Code" := '';
-            Modify();
+            Rec."Package File Name" := '';
+            Rec."Package Name" := '';
+            Rec."Package Code" := '';
+            Rec.Modify();
         end;
-        YourProfileCode := "Your Profile Code";
+        YourProfileCode := Rec."Your Profile Code";
     end;
 
     var

@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
+using Microsoft.Foundation.Comment;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Reports;
+
 page 5726 "Catalog Item List"
 {
     AdditionalSearchTerms = 'non-inventoriable item';
@@ -8,8 +14,8 @@ page 5726 "Catalog Item List"
     MultipleNewLines = false;
     PageType = List;
     SourceTable = "Nonstock Item";
-    SourceTableView = SORTING("Vendor Item No.", "Manufacturer Code")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Vendor Item No.", "Manufacturer Code")
+                      order(Ascending);
     UsageCategory = Lists;
 
     layout
@@ -121,8 +127,8 @@ page 5726 "Catalog Item List"
                     Caption = 'Substituti&ons';
                     Image = ItemSubstitution;
                     RunObject = Page "Item Substitution Entry";
-                    RunPageLink = Type = CONST("Nonstock Item"),
-                                  "No." = FIELD("Entry No.");
+                    RunPageLink = Type = const("Nonstock Item"),
+                                  "No." = field("Entry No.");
                     ToolTip = 'View substitute items that are set up to be sold instead of the item.';
                 }
                 action("Co&mments")
@@ -131,8 +137,8 @@ page 5726 "Catalog Item List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Nonstock Item"),
-                                  "No." = FIELD("Entry No.");
+                    RunPageLink = "Table Name" = const("Nonstock Item"),
+                                  "No." = field("Entry No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

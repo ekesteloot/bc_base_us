@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
 page 6782 "Posted Direct Transfer Subform"
 {
     Caption = 'Lines';

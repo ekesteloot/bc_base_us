@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Structure;
+
 table 307 "Inventory Buffer"
 {
     Caption = 'Inventory Buffer';
@@ -32,13 +38,13 @@ table 307 "Inventory Buffer"
         {
             Caption = 'Variant Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(5401; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
             DataClassification = SystemMetadata;
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(6500; "Serial No."; Code[50])
         {

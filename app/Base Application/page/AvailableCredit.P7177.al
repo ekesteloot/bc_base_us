@@ -22,10 +22,10 @@ page 7177 "Available Credit"
                         DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
                         CustLedgEntry: Record "Cust. Ledger Entry";
                     begin
-                        DtldCustLedgEntry.SetRange("Customer No.", "No.");
-                        CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
-                        CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
-                        CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
+                        DtldCustLedgEntry.SetRange("Customer No.", Rec."No.");
+                        Rec.CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                        Rec.CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                        Rec.CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
                         CustLedgEntry.DrillDownOnEntries(DtldCustLedgEntry);
                     end;
                 }
@@ -40,7 +40,7 @@ page 7177 "Available Credit"
                     Caption = 'Shipped Not Invd. (LCY)';
                     ToolTip = 'Specifies your expected sales income from the customer in LCY based on ongoing sales orders where items have been shipped.';
                 }
-                field(GetReturnRcdNotInvAmountLCY; GetReturnRcdNotInvAmountLCY())
+                field(GetReturnRcdNotInvAmountLCY; Rec.GetReturnRcdNotInvAmountLCY())
                 {
                     ApplicationArea = Suite;
                     Caption = 'Ret. Rcd. Not Inv. (LCY)';
@@ -67,7 +67,7 @@ page 7177 "Available Credit"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies your expected service income from the customer in LCY based on unpaid service invoices.';
                 }
-                field(GetTotalAmountLCYUI; GetTotalAmountLCYUI())
+                field(GetTotalAmountLCYUI; Rec.GetTotalAmountLCYUI())
                 {
                     ApplicationArea = Suite;
                     AutoFormatType = 1;
@@ -80,13 +80,13 @@ page 7177 "Available Credit"
                     StyleExpr = StyleTxt;
                     ToolTip = 'Specifies the maximum amount you allow the customer to exceed the payment balance before warnings are issued.';
                 }
-                field(CalcAvailableCreditUI; CalcAvailableCreditUI())
+                field(CalcAvailableCreditUI; Rec.CalcAvailableCreditUI())
                 {
                     ApplicationArea = Suite;
                     Caption = 'Available Credit (LCY)';
                     ToolTip = 'Specifies a customer''s available credit. If the available credit is 0 and the customer''s credit limit is also 0, then the customer has unlimited credit because no credit limit has been defined.';
                 }
-                field("Balance Due (LCY)"; CalcOverdueBalance())
+                field("Balance Due (LCY)"; Rec.CalcOverdueBalance())
                 {
                     ApplicationArea = Suite;
                     CaptionClass = Format(StrSubstNo(Text000, Format(WorkDate())));
@@ -96,14 +96,14 @@ page 7177 "Available Credit"
                         DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
                         CustLedgEntry: Record "Cust. Ledger Entry";
                     begin
-                        DtldCustLedgEntry.SetFilter("Customer No.", "No.");
-                        CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
-                        CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
-                        CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
+                        DtldCustLedgEntry.SetFilter("Customer No.", Rec."No.");
+                        Rec.CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                        Rec.CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                        Rec.CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
                         CustLedgEntry.DrillDownOnOverdueEntries(DtldCustLedgEntry);
                     end;
                 }
-                field(GetInvoicedPrepmtAmountLCY; GetInvoicedPrepmtAmountLCY())
+                field(GetInvoicedPrepmtAmountLCY; Rec.GetInvoicedPrepmtAmountLCY())
                 {
                     ApplicationArea = Prepayments;
                     Caption = 'Invoiced Prepayment Amount (LCY)';
@@ -132,8 +132,8 @@ page 7177 "Available Credit"
 
     trigger OnAfterGetRecord()
     begin
-        SetRange("Date Filter", 0D, WorkDate());
-        StyleTxt := SetStyle();
+        Rec.SetRange("Date Filter", 0D, WorkDate());
+        StyleTxt := Rec.SetStyle();
     end;
 
     var

@@ -10,9 +10,9 @@ codeunit 10461 "Transfer Shpt. Header - Edit"
         TransferShipmentHeader := Rec;
         TransferShipmentHeader.LockTable();
         TransferShipmentHeader.Find();
-        TransferShipmentHeader."CFDI Cancellation Reason Code" := "CFDI Cancellation Reason Code";
-        TransferShipmentHeader."Substitution Document No." := "Substitution Document No.";
-        TransferShipmentHeader.TestField("No.", "No.");
+        TransferShipmentHeader."CFDI Cancellation Reason Code" := Rec."CFDI Cancellation Reason Code";
+        TransferShipmentHeader."Substitution Document No." := Rec."Substitution Document No.";
+        TransferShipmentHeader.TestField("No.", Rec."No.");
         TransferShipmentHeader.Modify();
         Rec := TransferShipmentHeader;
     end;

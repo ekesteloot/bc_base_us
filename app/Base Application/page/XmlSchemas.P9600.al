@@ -1,3 +1,5 @@
+namespace System.Xml;
+
 page 9600 "XML Schemas"
 {
     ApplicationArea = Basic, Suite;
@@ -12,9 +14,9 @@ page 9600 "XML Schemas"
         {
             repeater(Group)
             {
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 IndentationControls = "Code";
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the XML schema.';
@@ -29,7 +31,7 @@ page 9600 "XML Schemas"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the namespace of the XML schema file that has been loaded for the line.';
                 }
-                field("XSD.HASVALUE"; XSD.HasValue)
+                field("XSD.HASVALUE"; Rec.XSD.HasValue)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Schema is Loaded';
@@ -63,7 +65,7 @@ page 9600 "XML Schemas"
 
                 trigger OnAction()
                 begin
-                    LoadSchema();
+                    Rec.LoadSchema();
                 end;
             }
             action("Export Schema")
@@ -75,7 +77,7 @@ page 9600 "XML Schemas"
 
                 trigger OnAction()
                 begin
-                    ExportSchema(true);
+                    Rec.ExportSchema(true);
                 end;
             }
             action("Open Schema Viewer")
@@ -89,7 +91,7 @@ page 9600 "XML Schemas"
                 var
                     XMLSchemaViewer: Page "XML Schema Viewer";
                 begin
-                    XMLSchemaViewer.SetXMLSchemaCode(Code);
+                    XMLSchemaViewer.SetXMLSchemaCode(Rec.Code);
                     XMLSchemaViewer.Run();
                 end;
             }
@@ -102,7 +104,7 @@ page 9600 "XML Schemas"
 
                 trigger OnAction()
                 begin
-                    SetRange(Indentation);
+                    Rec.SetRange(Indentation);
                 end;
             }
             action("Collapse All")
@@ -114,7 +116,7 @@ page 9600 "XML Schemas"
 
                 trigger OnAction()
                 begin
-                    SetRange(Indentation, 0);
+                    Rec.SetRange(Indentation, 0);
                 end;
             }
         }
@@ -154,7 +156,7 @@ page 9600 "XML Schemas"
 
     trigger OnOpenPage()
     begin
-        SetRange(Indentation, 0);
+        Rec.SetRange(Indentation, 0);
     end;
 }
 

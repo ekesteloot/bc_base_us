@@ -1,3 +1,9 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Vendor;
+
 page 9306 "Purchase Quotes"
 {
     AdditionalSearchTerms = 'rfq,request for quote,purchase requisition';
@@ -10,7 +16,7 @@ page 9306 "Purchase Quotes"
     QueryCategory = 'Purchase Quotes';
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";
-    SourceTableView = WHERE("Document Type" = CONST(Quote));
+    SourceTableView = where("Document Type" = const(Quote));
     UsageCategory = Lists;
 
     layout
@@ -197,9 +203,9 @@ page 9306 "Purchase Quotes"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Purchase Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Purchase Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -210,8 +216,8 @@ page 9306 "Purchase Quotes"
             part(Control1901138007; "Vendor Details FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Buy-from Vendor No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Buy-from Vendor No."),
+                              "Date Filter" = field("Date Filter");
             }
             systempart(Control1900383207; Links)
             {
@@ -243,7 +249,7 @@ page 9306 "Purchase Quotes"
 
                     trigger OnAction()
                     begin
-                        OpenDocumentStatistics();
+                        Rec.OpenDocumentStatistics();
                     end;
                 }
                 action("Co&mments")
@@ -252,9 +258,9 @@ page 9306 "Purchase Quotes"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -268,7 +274,7 @@ page 9306 "Purchase Quotes"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Approvals)
@@ -530,25 +536,24 @@ page 9306 "Purchase Quotes"
 
     trigger OnOpenPage()
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
-        CopyBuyFromVendorFilter();
+        Rec.CopyBuyFromVendorFilter();
     end;
 
     var
         DocPrint: Codeunit "Document-Print";
         OpenApprovalEntriesExist: Boolean;
         CanCancelApprovalForRecord: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
 
     local procedure SetControlAppearance()
     var
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
     end;
 }
 

@@ -27,7 +27,7 @@ page 27043 "SAT Units Of Measure"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a description for this entry according to the SAT unit of measure definition.';
                 }
-                field(Symbol; Symbol)
+                field(Symbol; Rec.Symbol)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a symbol for this entry according to the SAT unit of measure definition.';

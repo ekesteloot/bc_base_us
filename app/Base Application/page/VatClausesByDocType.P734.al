@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 page 734 "VAT Clauses by Doc. Type"
 {
     Caption = 'VAT Clauses by Document Type';
@@ -50,8 +52,8 @@ page 734 "VAT Clauses by Doc. Type"
                 Caption = 'T&ranslation';
                 Image = Translation;
                 RunObject = Page "VAT Clause by Doc. Type Trans.";
-                RunPageLink = "VAT Clause Code" = FIELD("VAT Clause Code"),
-                              "Document Type" = FIELD("Document Type");
+                RunPageLink = "VAT Clause Code" = field("VAT Clause Code"),
+                              "Document Type" = field("Document Type");
                 ToolTip = 'View or edit translations for each VAT clause description in different languages.';
             }
         }

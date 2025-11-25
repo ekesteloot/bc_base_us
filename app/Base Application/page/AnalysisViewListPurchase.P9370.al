@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Analysis;
+
+using Microsoft.InventoryMgt.Analysis;
+
 page 9370 "Analysis View List Purchase"
 {
     ApplicationArea = Dimensions, PurchaseAnalysis;
@@ -7,7 +11,7 @@ page 9370 "Analysis View List Purchase"
     Editable = false;
     PageType = List;
     SourceTable = "Item Analysis View";
-    SourceTableView = WHERE("Analysis Area" = CONST(Purchase));
+    SourceTableView = where("Analysis Area" = const(Purchase));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -17,7 +21,7 @@ page 9370 "Analysis View List Purchase"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies a code for the analysis view.';
@@ -84,8 +88,8 @@ page 9370 "Analysis View List Purchase"
                     Caption = 'Filter';
                     Image = "Filter";
                     RunObject = Page "Item Analysis View Filter";
-                    RunPageLink = "Analysis Area" = FIELD("Analysis Area"),
-                                  "Analysis View Code" = FIELD(Code);
+                    RunPageLink = "Analysis Area" = field("Analysis Area"),
+                                  "Analysis View Code" = field(Code);
                     ToolTip = 'Apply the filter.';
                 }
             }
@@ -103,7 +107,7 @@ page 9370 "Analysis View List Purchase"
                 var
                     PurchAnalysisbyDim: Page "Purch. Analysis by Dimensions";
                 begin
-                    PurchAnalysisbyDim.SetCurrentAnalysisViewCode(Code);
+                    PurchAnalysisbyDim.SetCurrentAnalysisViewCode(Rec.Code);
                     PurchAnalysisbyDim.Run();
                 end;
             }

@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Intercompany.GLAccount;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Intercompany.Setup;
+using System.IO;
+using System.Telemetry;
+
 page 605 "IC Chart of Accounts"
 {
     ApplicationArea = Intercompany;
@@ -41,7 +48,7 @@ page 605 "IC Chart of Accounts"
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies the purpose of the account. Total: Used to total a series of balances on accounts from many different account groupings. To use Total, leave this field blank. Begin-Total: A marker for the beginning of a series of accounts to be totaled that ends with an End-Total account. End-Total: A total of a series of accounts that starts with the preceding Begin-Total account. The total is defined in the Totaling field.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Intercompany;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -281,9 +288,7 @@ page 605 "IC Chart of Accounts"
     end;
 
     var
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
         EnableSynchronization: Boolean;
         SelectFileToImportLbl: Label 'Select file to import into the chart of accounts of intercompany';
@@ -292,7 +297,7 @@ page 605 "IC Chart of Accounts"
         RequestUserForFileNameLbl: Label 'Enter the file name.';
         SupportedFileTypesLbl: Label 'XML Files (*.xml)|*.xml|All Files (*.*)|*.*';
         CleanICAccountsBeforeCopyingChartOfAccountsQst: Label 'This will clear the existing IC Chart of Accounts before copying. Do you want to continue?';
-        SplitMessageTxt: Label '%1\%2', Comment = '%1 = First part of the message, %2 = Second part of the message.';
+        SplitMessageTxt: Label '%1\%2', Comment = '%1 = First part of the message, %2 = Second part of the message.', Locked = true;
         SynchronizeIntercompanyQst: Label 'Partner %1 has been set for the synchronization of intercompany. Do you want to synchronize instead of switching to another partner?', Comment = '%1 = IC Partner code';
         OnlyAvailableForICUsingDatabaseLbl: Label 'Synchronization is only available for companies using a database for intercompany transactions. Select this option in the setup if you want to use this action.';
 
@@ -408,8 +413,8 @@ page 605 "IC Chart of Accounts"
 
     local procedure FormatLine()
     begin
-        NameIndent := Indentation;
-        Emphasize := "Account Type" <> "Account Type"::Posting;
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
     end;
 
     [IntegrationEvent(false, false)]

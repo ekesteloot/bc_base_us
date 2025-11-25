@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 table 572 "Finance Charge Interest Rate"
 {
     Caption = 'Fin. Charge Interest Rate';

@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 page 9874 "Permission Set By Sec. Group"
 {
     Caption = 'Permission Set by Security Group';
@@ -186,8 +188,8 @@ page 9874 "Permission Set By Sec. Group"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Permissions';
                 Editable = false;
-                SubPageLink = "Role ID" = FIELD("Role ID"),
-                              "App ID" = FIELD("App ID");
+                SubPageLink = "Role ID" = field("Role ID"),
+                              "App ID" = field("App ID");
             }
         }
     }
@@ -226,9 +228,9 @@ page 9874 "Permission Set By Sec. Group"
                 var
                     AggregatePermissionSet: Record "Aggregate Permission Set";
                 begin
-                    AggregatePermissionSet.SetRange(Scope, Scope);
-                    AggregatePermissionSet.SetRange("App ID", "App ID");
-                    AggregatePermissionSet.SetRange("Role ID", "Role ID");
+                    AggregatePermissionSet.SetRange(Scope, Rec.Scope);
+                    AggregatePermissionSet.SetRange("App ID", Rec."App ID");
+                    AggregatePermissionSet.SetRange("Role ID", Rec."Role ID");
 
                     Report.RunModal(Report::"Copy Permission Set", true, true, AggregatePermissionSet);
                 end;

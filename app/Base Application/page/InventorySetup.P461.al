@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Tracking;
+
 page 461 "Inventory Setup"
 {
     ApplicationArea = Basic, Suite;
@@ -98,6 +106,11 @@ page 461 "Inventory Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if you want to allow reservation for inventory receipts and shipments.';
                     Visible = false;
+                }
+                field("Allow Inventory Adjustment"; Rec."Allow Inventory Adjustment")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies if you want to allow manual adjustment of the inventory in the item card.';
                 }
             }
             group(Location)
@@ -435,10 +448,8 @@ page 461 "Inventory Setup"
         GLSetup: Record "General Ledger Setup";
         PackageMgt: Codeunit "Package Management";
         SchedulingManager: Codeunit "Cost Adj. Scheduling Manager";
-        [InDataSet]
         PackageVisible: Boolean;
         AdjustCostWizardVisible: Boolean;
-        [InDataSet]
         IsJournalTemplatesVisible: Boolean;
 
     local procedure SetPackageVisibility()

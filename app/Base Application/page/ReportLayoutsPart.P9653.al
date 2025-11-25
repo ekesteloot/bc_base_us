@@ -4,7 +4,7 @@ page 9653 "Report Layouts Part"
     Editable = false;
     PageType = ListPart;
     SourceTable = "Custom Report Layout";
-    SourceTableView = SORTING("Report ID", "Company Name", Type);
+    SourceTableView = sorting("Report ID", "Company Name", Type);
 
     layout
     {

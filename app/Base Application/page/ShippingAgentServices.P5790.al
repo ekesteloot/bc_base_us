@@ -12,7 +12,7 @@ page 5790 "Shipping Agent Services"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the shipping agent.';
@@ -42,7 +42,7 @@ page 5790 "Shipping Agent Services"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        TestField("Base Calendar Code");
+                        Rec.TestField("Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(Rec);
                     end;
                 }

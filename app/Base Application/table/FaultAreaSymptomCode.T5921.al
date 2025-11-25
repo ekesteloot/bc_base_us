@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 table 5921 "Fault Area/Symptom Code"
 {
     Caption = 'Fault Area/Symptom Code';

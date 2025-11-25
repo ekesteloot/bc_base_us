@@ -1,3 +1,15 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
+using System.Text;
+using System.Utilities;
+
 page 414 "G/L Balance"
 {
     Caption = 'G/L Balance';
@@ -84,8 +96,8 @@ page 414 "G/L Balance"
                         FilterTokens: Codeunit "Filter Tokens";
                     begin
                         FilterTokens.MakeDateFilter(DateFilter);
-                        SetFilter("Date Filter", DateFilter);
-                        DateFilter := GetFilter("Date Filter");
+                        Rec.SetFilter("Date Filter", DateFilter);
+                        DateFilter := Rec.GetFilter("Date Filter");
                         CurrPage.Update();
                     end;
                 }
@@ -172,12 +184,12 @@ page 414 "G/L Balance"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "G/L Account Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Budget Filter" = FIELD("Budget Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Budget Filter" = field("Budget Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View information about general ledger accounts, such as the account number, account name, and whether the account is part of the income statement or balance sheet.';
                 }
@@ -187,8 +199,8 @@ page 414 "G/L Balance"
                     Caption = 'Ledger E&ntries';
                     Image = GLRegisters;
                     RunObject = Page "General Ledger Entries";
-                    RunPageLink = "G/L Account No." = FIELD("No.");
-                    RunPageView = SORTING("G/L Account No.");
+                    RunPageLink = "G/L Account No." = field("No.");
+                    RunPageView = sorting("G/L Account No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -198,8 +210,8 @@ page 414 "G/L Balance"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -208,8 +220,8 @@ page 414 "G/L Balance"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(15),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(15),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -219,9 +231,9 @@ page 414 "G/L Balance"
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     ToolTip = 'View additional information about a general ledger account, this supplements the Description field.';
                 }
                 action("Receivables-Payables")
@@ -281,15 +293,15 @@ page 414 "G/L Balance"
     begin
         NameIndent := 0;
         if DebitCreditTotals then
-            CalcFields("Net Change", "Debit Amount", "Credit Amount")
+            Rec.CalcFields("Net Change", "Debit Amount", "Credit Amount")
         else begin
-            CalcFields("Net Change");
-            if "Net Change" > 0 then begin
-                "Debit Amount" := "Net Change";
-                "Credit Amount" := 0
+            Rec.CalcFields("Net Change");
+            if Rec."Net Change" > 0 then begin
+                Rec."Debit Amount" := Rec."Net Change";
+                Rec."Credit Amount" := 0
             end else begin
-                "Debit Amount" := 0;
-                "Credit Amount" := -"Net Change"
+                Rec."Debit Amount" := 0;
+                Rec."Credit Amount" := -Rec."Net Change"
             end
         end;
         FormatLine();
@@ -297,7 +309,7 @@ page 414 "G/L Balance"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetupNewGLAcc(xRec, BelowxRec);
+        Rec.SetupNewGLAcc(xRec, BelowxRec);
     end;
 
     trigger OnOpenPage()
@@ -310,9 +322,7 @@ page 414 "G/L Balance"
         AmountType: Enum "Analysis Amount Type";
         ClosingEntryFilter: Option Include,Exclude;
         DebitCreditTotals: Boolean;
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
         DateFilter: Text;
 
@@ -322,8 +332,8 @@ page 414 "G/L Balance"
         AccountingPeriod: Record "Accounting Period";
         PeriodPageMgt: Codeunit PeriodPageManagement;
     begin
-        if GetFilter("Date Filter") <> '' then begin
-            Calendar.SetFilter("Period Start", GetFilter("Date Filter"));
+        if Rec.GetFilter("Date Filter") <> '' then begin
+            Calendar.SetFilter("Period Start", Rec.GetFilter("Date Filter"));
             if not PeriodPageMgt.FindDate('+', Calendar, PeriodType) then
                 PeriodPageMgt.FindDate('+', Calendar, PeriodType::Day);
             Calendar.SetRange("Period Start");
@@ -331,38 +341,38 @@ page 414 "G/L Balance"
         PeriodPageMgt.FindDate(SearchText, Calendar, PeriodType);
         if AmountType = AmountType::"Net Change" then
             if Calendar."Period Start" = Calendar."Period End" then
-                SetRange("Date Filter", Calendar."Period Start")
+                Rec.SetRange("Date Filter", Calendar."Period Start")
             else
-                SetRange("Date Filter", Calendar."Period Start", Calendar."Period End")
+                Rec.SetRange("Date Filter", Calendar."Period Start", Calendar."Period End")
         else
-            SetRange("Date Filter", 0D, Calendar."Period End");
+            Rec.SetRange("Date Filter", 0D, Calendar."Period End");
         if ClosingEntryFilter = ClosingEntryFilter::Exclude then begin
             AccountingPeriod.SetCurrentKey("New Fiscal Year");
             AccountingPeriod.SetRange("New Fiscal Year", true);
-            if GetRangeMin("Date Filter") = 0D then
-                AccountingPeriod.SetRange("Starting Date", 0D, GetRangeMax("Date Filter"))
+            if Rec.GetRangeMin("Date Filter") = 0D then
+                AccountingPeriod.SetRange("Starting Date", 0D, Rec.GetRangeMax("Date Filter"))
             else
-                if not (GetRangeMin("Date Filter") = NormalDate(GetRangeMin("Date Filter"))) then
+                if not (Rec.GetRangeMin("Date Filter") = NormalDate(Rec.GetRangeMin("Date Filter"))) then
                     AccountingPeriod.SetRange(
                       "Starting Date",
-                      GetRangeMin("Date Filter") + 1,
-                      GetRangeMax("Date Filter"))
+                      Rec.GetRangeMin("Date Filter") + 1,
+                      Rec.GetRangeMax("Date Filter"))
                 else
                     AccountingPeriod.SetRange(
                       "Starting Date", 0D,
-                      GetRangeMin("Date Filter") + 1);
+                      Rec.GetRangeMin("Date Filter") + 1);
             if AccountingPeriod.Find('-') then
                 repeat
-                    SetFilter(
-                      "Date Filter", GetFilter("Date Filter") + '&<>%1',
+                    Rec.SetFilter(
+                      "Date Filter", Rec.GetFilter("Date Filter") + '&<>%1',
                       ClosingDate(AccountingPeriod."Starting Date" - 1));
                 until AccountingPeriod.Next() = 0;
         end else
-            SetRange(
+            Rec.SetRange(
               "Date Filter",
-              GetRangeMin("Date Filter"),
-              ClosingDate(GetRangeMax("Date Filter")));
-        DateFilter := GetFilter("Date Filter");
+              Rec.GetRangeMin("Date Filter"),
+              ClosingDate(Rec.GetRangeMax("Date Filter")));
+        DateFilter := Rec.GetFilter("Date Filter");
     end;
 
     local procedure ClosingEntryFilterOnAfterValid()
@@ -417,8 +427,8 @@ page 414 "G/L Balance"
 
     local procedure FormatLine()
     begin
-        NameIndent := Indentation;
-        Emphasize := "Account Type" <> "Account Type"::Posting;
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
     end;
 
     local procedure DayPeriodTypeOnValidate()

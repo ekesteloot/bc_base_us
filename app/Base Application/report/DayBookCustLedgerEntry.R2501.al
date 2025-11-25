@@ -1,7 +1,17 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 2501 "Day Book Cust. Ledger Entry"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/DayBookCustLedgerEntry.rdlc';
+    RDLCLayout = './Sales/Reports/DayBookCustLedgerEntry.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Day Book Customer Ledger Entry';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +20,7 @@ report 2501 "Day Book Cust. Ledger Entry"
     {
         dataitem(ReqCustLedgEntry; "Cust. Ledger Entry")
         {
-            DataItemTableView = SORTING("Document Type", "Customer No.", "Posting Date", "Currency Code");
+            DataItemTableView = sorting("Document Type", "Customer No.", "Posting Date", "Currency Code");
             RequestFilterFields = "Document Type", "Customer No.", "Posting Date", "Currency Code";
 
             trigger OnPreDataItem()
@@ -20,7 +30,7 @@ report 2501 "Day Book Cust. Ledger Entry"
         }
         dataitem(Date; Date)
         {
-            DataItemTableView = SORTING("Period Type", "Period Start") WHERE("Period Type" = CONST(Date));
+            DataItemTableView = sorting("Period Type", "Period Start") where("Period Type" = const(Date));
             column(USERID; UserId)
             {
             }
@@ -141,7 +151,7 @@ report 2501 "Day Book Cust. Ledger Entry"
             }
             dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
             {
-                DataItemTableView = SORTING("Document Type", "Customer No.", "Posting Date");
+                DataItemTableView = sorting("Document Type", "Customer No.", "Posting Date");
                 column(Cust__Ledger_Entry__FIELDNAME__Posting_Date__________FORMAT_Date__Period_Start__0_4_; FieldCaption("Posting Date") + ' ' + Format(Date."Period Start", 0, 4))
                 {
                 }
@@ -231,7 +241,7 @@ report 2501 "Day Book Cust. Ledger Entry"
                 }
                 dataitem("G/L Entry"; "G/L Entry")
                 {
-                    DataItemTableView = SORTING("Transaction No.");
+                    DataItemTableView = sorting("Transaction No.");
                     column(G_L_Entry__G_L_Account_No__; "G/L Account No.")
                     {
                     }

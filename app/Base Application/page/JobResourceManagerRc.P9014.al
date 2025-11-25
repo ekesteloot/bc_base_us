@@ -1,3 +1,20 @@
+﻿namespace Microsoft.ProjectMgt.RoleCenters;
+
+#if CLEAN21
+using Microsoft.Pricing.Worksheet;
+#endif
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Journal;
+using Microsoft.ProjectMgt.Resources.Resource;
+#if CLEAN21
+using Microsoft.Purchases.Pricing;
+#endif
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Resources;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+using System.Threading;
+
 page 9014 "Job Resource Manager RC"
 {
     Caption = 'Resource Manager';
@@ -117,7 +134,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Jobs;
                 Caption = 'People';
                 RunObject = Page "Resource List";
-                RunPageView = WHERE(Type = FILTER(Person));
+                RunPageView = where(Type = filter(Person));
                 ToolTip = 'View the list of people that can be assigned to jobs.';
             }
             action(ResourcesMachines)
@@ -125,7 +142,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Manufacturing;
                 Caption = 'Machines';
                 RunObject = Page "Resource List";
-                RunPageView = WHERE(Type = FILTER(Machine));
+                RunPageView = where(Type = filter(Machine));
                 ToolTip = 'View the list of machines that can be assigned to jobs.';
             }
             action("Resource Groups")
@@ -140,7 +157,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Jobs;
                 Caption = 'Resource Journals';
                 RunObject = Page "Resource Jnl. Batches";
-                RunPageView = WHERE(Recurring = CONST(false));
+                RunPageView = where(Recurring = const(false));
                 ToolTip = 'View all resource journals.';
             }
             action(RecurringResourceJournals)
@@ -148,7 +165,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Jobs;
                 Caption = 'Recurring Resource Journals';
                 RunObject = Page "Resource Jnl. Batches";
-                RunPageView = WHERE(Recurring = CONST(true));
+                RunPageView = where(Recurring = const(true));
                 ToolTip = 'View all recurring resource journals.';
             }
             action(Jobs)
@@ -171,7 +188,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Suite;
                 Caption = 'Open';
                 RunObject = Page "Time Sheet List";
-                RunPageView = WHERE("Open Exists" = CONST(true));
+                RunPageView = where("Open Exists" = const(true));
                 ToolTip = 'Open the card for the selected record.';
             }
             action("Page Time Sheet List Submitted")
@@ -179,7 +196,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Suite;
                 Caption = 'Submitted';
                 RunObject = Page "Time Sheet List";
-                RunPageView = WHERE("Submitted Exists" = CONST(true));
+                RunPageView = where("Submitted Exists" = const(true));
                 ToolTip = 'View submitted time sheets.';
             }
             action("Page Time Sheet List Rejected")
@@ -187,7 +204,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Suite;
                 Caption = 'Rejected';
                 RunObject = Page "Time Sheet List";
-                RunPageView = WHERE("Rejected Exists" = CONST(true));
+                RunPageView = where("Rejected Exists" = const(true));
                 ToolTip = 'View rejected time sheets.';
             }
             action("Page Time Sheet List Approved")
@@ -195,7 +212,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Suite;
                 Caption = 'Approved';
                 RunObject = Page "Time Sheet List";
-                RunPageView = WHERE("Approved Exists" = CONST(true));
+                RunPageView = where("Approved Exists" = const(true));
                 ToolTip = 'View approved time sheets.';
             }
             action("Manager Time Sheets")
@@ -217,7 +234,7 @@ page 9014 "Job Resource Manager RC"
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Resource Costs';
-                    RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(203)); // "Resource Costs";
+                    RunPageView = where("Object Type" = const(Page), "Object ID" = const(203)); // "Resource Costs";
                     RunObject = Page "Role Center Page Dispatcher";
                     ToolTip = 'View or edit alternate costs for resources. Resource costs can apply to all resources, to resource groups or to individual resources. They can also be filtered so that they apply only to a specific work type code. For example, if an employee has a different hourly rate for overtime work, you can set up a resource cost for this work type.';
                     ObsoleteState = Pending;
@@ -228,7 +245,7 @@ page 9014 "Job Resource Manager RC"
                 {
                     ApplicationArea = Jobs;
                     Caption = 'Resource Prices';
-                    RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(204)); // "Resource Prices";
+                    RunPageView = where("Object Type" = const(Page), "Object ID" = const(204)); // "Resource Prices";
                     RunObject = Page "Role Center Page Dispatcher";
                     ToolTip = 'View the prices of resources.';
                     ObsoleteState = Pending;
@@ -308,7 +325,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Jobs;
                 Caption = 'Resource P&rice Changes';
                 Image = ResourcePrice;
-                RunPageView = WHERE("Object Type" = CONST(Page), "Object ID" = CONST(493)); // "Resource Price Changes";
+                RunPageView = where("Object Type" = const(Page), "Object ID" = const(493)); // "Resource Price Changes";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'Edit or update alternate resource prices, by running either the Suggest Res. Price Chg. (Res.) batch job or the Suggest Res. Price Chg. (Price) batch job.';
                 ObsoleteState = Pending;
@@ -320,7 +337,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Jobs;
                 Caption = 'Resource Pr&ice Chg from Resource';
                 Image = "Report";
-                RunPageView = WHERE("Object Type" = CONST(Report), "Object ID" = CONST(1191)); // "Suggest Res. Price Chg. (Res.)";
+                RunPageView = where("Object Type" = const(Report), "Object ID" = const(1191)); // "Suggest Res. Price Chg. (Res.)";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'Update the alternate prices in the Resource Prices window with the ones in the Resource Price Change s window.';
                 ObsoleteState = Pending;
@@ -332,7 +349,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Jobs;
                 Caption = 'Resource Pri&ce Chg from Prices';
                 Image = "Report";
-                RunPageView = WHERE("Object Type" = CONST(Report), "Object ID" = CONST(1192)); // "Suggest Res. Price Chg.(Price)";
+                RunPageView = where("Object Type" = const(Report), "Object ID" = const(1192)); // "Suggest Res. Price Chg.(Price)";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'Update the alternate prices in the Resource Prices window with the ones in the Resource Price Change s window.';
                 ObsoleteState = Pending;
@@ -344,7 +361,7 @@ page 9014 "Job Resource Manager RC"
                 ApplicationArea = Jobs;
                 Caption = 'I&mplement Resource Price Changes';
                 Image = ImplementPriceChange;
-                RunPageView = WHERE("Object Type" = CONST(Report), "Object ID" = CONST(1193)); // "Implement Res. Price Change";
+                RunPageView = where("Object Type" = const(Report), "Object ID" = const(1193)); // "Implement Res. Price Change";
                 RunObject = Page "Role Center Page Dispatcher";
                 ToolTip = 'Update the alternate prices in the Resource Prices window with the ones in the Resource Price Changes window. Price change suggestions can be created with the Suggest Res. Price Chg.(Price) or the Suggest Res. Price Chg. (Res.) batch job. You can also modify the price change suggestions in the Resource Price Changes window before you implement them.';
 

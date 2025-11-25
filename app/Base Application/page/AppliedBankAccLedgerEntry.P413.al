@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Ledger;
+
 page 413 "Applied Bank Acc. Ledger Entry"
 {
     Caption = 'Applied Bank Account Ledger Entry';
@@ -55,7 +57,7 @@ page 413 "Applied Bank Acc. Ledger Entry"
                     Editable = false;
                     ToolTip = 'Specifies the amount that remains to be applied to. The amount is denominated in the applicable foreign currency.';
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;

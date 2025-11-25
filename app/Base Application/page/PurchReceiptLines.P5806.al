@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Document;
+
 page 5806 "Purch. Receipt Lines"
 {
     Caption = 'Purch. Receipt Lines';
@@ -182,7 +187,7 @@ page 5806 "Purch. Receipt Lines"
                     var
                         PurchRcptHeader: Record "Purch. Rcpt. Header";
                     begin
-                        PurchRcptHeader.Get("Document No.");
+                        PurchRcptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Purchase Receipt", PurchRcptHeader);
                     end;
                 }
@@ -197,7 +202,7 @@ page 5806 "Purch. Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -206,12 +211,12 @@ page 5806 "Purch. Receipt Lines"
                     ApplicationArea = ItemTracking;
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
-                    ShortCutKey = 'Ctrl+Alt+I'; 
+                    ShortCutKey = 'Ctrl+Alt+I';
                     ToolTip = 'View or edit serial numbers and lot numbers that are assigned to the item on the document or journal line.';
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }
@@ -256,11 +261,11 @@ page 5806 "Purch. Receipt Lines"
 
     trigger OnOpenPage()
     begin
-        FilterGroup(2);
-        SetRange(Type, Type::Item);
-        SetFilter(Quantity, '<>0');
-        SetRange(Correction, false);
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetRange(Type, Rec.Type::Item);
+        Rec.SetFilter(Quantity, '<>0');
+        Rec.SetRange(Correction, false);
+        Rec.FilterGroup(0);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -276,7 +281,6 @@ page 5806 "Purch. Receipt Lines"
         ItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)";
         AssignItemChargePurch: Codeunit "Item Charge Assgnt. (Purch.)";
         UnitCost: Decimal;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     procedure Initialize(NewItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)"; NewUnitCost: Decimal)
@@ -292,18 +296,18 @@ page 5806 "Purch. Receipt Lines"
     begin
         TempPurchRcptLine.Reset();
         TempPurchRcptLine.CopyFilters(Rec);
-        TempPurchRcptLine.SetRange("Document No.", "Document No.");
+        TempPurchRcptLine.SetRange("Document No.", Rec."Document No.");
         if not TempPurchRcptLine.FindFirst() then begin
-            FilterGroup(2);
+            Rec.FilterGroup(2);
             PurchRcptLine.CopyFilters(Rec);
-            FilterGroup(0);
-            PurchRcptLine.SetRange("Document No.", "Document No.");
+            Rec.FilterGroup(0);
+            PurchRcptLine.SetRange("Document No.", Rec."Document No.");
             if not PurchRcptLine.FindFirst() then
                 exit(false);
             TempPurchRcptLine := PurchRcptLine;
             TempPurchRcptLine.Insert();
         end;
-        if "Line No." = TempPurchRcptLine."Line No." then
+        if Rec."Line No." = TempPurchRcptLine."Line No." then
             exit(true);
     end;
 

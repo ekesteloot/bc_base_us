@@ -1,14 +1,31 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 412 "Purchase Prepmt. Doc. - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/PurchasePrepmtDocTest.rdlc';
+    RDLCLayout = './Purchases/Reports/PurchasePrepmtDocTest.rdlc';
     Caption = 'Purchase Prepmt. Doc. - Test';
 
     dataset
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = WHERE("Document Type" = CONST(Order));
+            DataItemTableView = where("Document Type" = const(Order));
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Purchase Prepayment Document';
             column(Purchase_Header_Document_Type; "Document Type")
@@ -19,7 +36,7 @@ report 412 "Purchase Prepmt. Doc. - Test"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
                 {
                 }
@@ -301,7 +318,7 @@ report 412 "Purchase Prepmt. Doc. - Test"
                 }
                 dataitem(HeaderDimLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -338,7 +355,7 @@ report 412 "Purchase Prepmt. Doc. - Test"
                 }
                 dataitem(HeaderErrorCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -358,12 +375,12 @@ report 412 "Purchase Prepmt. Doc. - Test"
                 }
                 dataitem(CopyLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     dataitem("Purchase Line"; "Purchase Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -372,7 +389,7 @@ report 412 "Purchase Prepmt. Doc. - Test"
                     }
                     dataitem(PurchLineLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(Purchase_Line___Prepmt__Amt__Inv__; "Purchase Line"."Prepmt. Amt. Inv.")
                         {
                         }
@@ -426,7 +443,7 @@ report 412 "Purchase Prepmt. Doc. - Test"
                         }
                         dataitem(LineErrorCounter; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(ErrorText_Number__Control104; ErrorText[Number])
                             {
                             }
@@ -532,11 +549,11 @@ report 412 "Purchase Prepmt. Doc. - Test"
                 }
                 dataitem(Blank; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                 }
                 dataitem(PrepmtLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(Prepayment_Inv__Line_Buffer___VAT_Identifier_; "Prepayment Inv. Line Buffer"."VAT Identifier")
                     {
                     }
@@ -622,7 +639,7 @@ report 412 "Purchase Prepmt. Doc. - Test"
                     }
                     dataitem("Prepayment Inv. Line Buffer"; "Prepayment Inv. Line Buffer")
                     {
-                        DataItemTableView = SORTING("G/L Account No.", "Dimension Set ID", "Job No.", "Tax Area Code", "Tax Liable", "Tax Group Code", "Invoice Rounding", Adjustment, "Line No.");
+                        DataItemTableView = sorting("G/L Account No.", "Dimension Set ID", "Job No.", "Tax Area Code", "Tax Liable", "Tax Group Code", "Invoice Rounding", Adjustment, "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -631,7 +648,7 @@ report 412 "Purchase Prepmt. Doc. - Test"
                     }
                     dataitem(LineDimLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText_Control118; DimText)
                         {
                         }
@@ -671,7 +688,7 @@ report 412 "Purchase Prepmt. Doc. - Test"
                     }
                     dataitem(PrepmtErrorCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number__Control121; ErrorText[Number])
                         {
                         }
@@ -710,7 +727,7 @@ report 412 "Purchase Prepmt. Doc. - Test"
                             AddError(DimMgt.GetDimCombErr());
                         TableID[1] := DimMgt.PurchLineTypeToTableID("Purchase Line".Type::"G/L Account");
                         No[1] := "Prepayment Inv. Line Buffer"."G/L Account No.";
-                        TableID[2] := DATABASE::Job;
+                        TableID[2] := Enum::TableID::Job.AsInteger();
                         No[2] := "Prepayment Inv. Line Buffer"."Job No.";
                         if not DimMgt.CheckDimValuePosting(TableID, No, TempPrepmtInvLineBuf."Dimension Set ID") then
                             AddError(DimMgt.GetDimValuePostingErr());
@@ -731,7 +748,7 @@ report 412 "Purchase Prepmt. Doc. - Test"
                 }
                 dataitem(VATCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(VATAmountLine__VAT_Amount_; TempVATAmountLine."VAT Amount")
                     {
                         AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -898,15 +915,15 @@ report 412 "Purchase Prepmt. Doc. - Test"
                 if not DimMgt.CheckDimIDComb("Dimension Set ID") then
                     AddError(DimMgt.GetDimCombErr());
 
-                TableID[1] := DATABASE::Vendor;
+                TableID[1] := Enum::TableID::Vendor.AsInteger();
                 No[1] := "Pay-to Vendor No.";
-                TableID[2] := DATABASE::Job;
+                TableID[2] := Enum::TableID::Job.AsInteger();
                 // No[2] := "Job No.";
-                TableID[3] := DATABASE::"Salesperson/Purchaser";
+                TableID[3] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
                 No[3] := "Purchaser Code";
-                TableID[4] := DATABASE::Campaign;
+                TableID[4] := Enum::TableID::Campaign.AsInteger();
                 No[4] := "Campaign No.";
-                TableID[5] := DATABASE::"Responsibility Center";
+                TableID[5] := Enum::TableID::"Responsibility Center".AsInteger();
                 No[5] := "Responsibility Center";
                 CheckDimValuePosting(TableID, No, "Purchase Header");
             end;

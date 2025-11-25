@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7355 "Internal Put-away Subform"
 {
     Caption = 'Lines';
@@ -166,12 +171,12 @@ page 7355 "Internal Put-away Subform"
                     ApplicationArea = ItemTracking;
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
-                    ShortCutKey = 'Ctrl+Alt+I'; 
+                    ShortCutKey = 'Ctrl+Alt+I';
                     ToolTip = 'View or edit serial numbers and lot numbers that are assigned to the item on the document or journal line.';
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }
@@ -180,7 +185,7 @@ page 7355 "Internal Put-away Subform"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(xRec);
+        Rec.SetUpNewLine(xRec);
     end;
 
     var
@@ -190,7 +195,7 @@ page 7355 "Internal Put-away Subform"
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", "From Bin Code");
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", Rec."From Bin Code");
     end;
 
     procedure PutAwayCreate()
@@ -200,17 +205,17 @@ page 7355 "Internal Put-away Subform"
         ReleaseWhseInternalPutAway: Codeunit "Whse. Int. Put-away Release";
     begin
         WhseInternalPutAwayLine.Copy(Rec);
-        WhseInternalPutAwayHeader.Get("No.");
+        WhseInternalPutAwayHeader.Get(Rec."No.");
         if WhseInternalPutAwayHeader.Status = WhseInternalPutAwayHeader.Status::Open then
             ReleaseWhseInternalPutAway.Release(WhseInternalPutAwayHeader);
-        CreatePutAwayDoc(WhseInternalPutAwayLine);
+        Rec.CreatePutAwayDoc(WhseInternalPutAwayLine);
     end;
 
     local procedure GetActualSortMethod(): Enum "Warehouse Internal Sorting Method"
     var
         WhseInternalPutAwayHeader: Record "Whse. Internal Put-away Header";
     begin
-        if WhseInternalPutAwayHeader.Get("No.") then
+        if WhseInternalPutAwayHeader.Get(Rec."No.") then
             exit(WhseInternalPutAwayHeader."Sorting Method");
 
         exit("Warehouse Internal Sorting Method"::None);

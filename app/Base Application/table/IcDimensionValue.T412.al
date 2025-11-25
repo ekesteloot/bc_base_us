@@ -1,3 +1,9 @@
+namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Intercompany.GLAccount;
+using System.Telemetry;
+
 table 412 "IC Dimension Value"
 {
     Caption = 'IC Dimension Value';
@@ -50,7 +56,7 @@ table 412 "IC Dimension Value"
         field(7; "Map-to Dimension Value Code"; Code[20])
         {
             Caption = 'Map-to Dimension Value Code';
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Map-to Dimension Code"), Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Map-to Dimension Code"), Blocked = const(false));
         }
         field(8; Indentation; Integer)
         {

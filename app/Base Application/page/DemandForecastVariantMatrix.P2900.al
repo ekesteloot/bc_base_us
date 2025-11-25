@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Manufacturing.Forecast;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Setup;
+using System.Text;
+using System.Utilities;
+
 page 2900 "Demand Forecast Variant Matrix"
 {
     Caption = 'Demand Forecast Matrix';
@@ -668,7 +676,7 @@ page 2900 "Demand Forecast Variant Matrix"
             MATRIX_OnAfterGetRecord(MATRIX_CurrentColumnOrdinal);
         end;
         if (MATRIX_CurrentColumnOrdinal > 0) and (QtyType = QtyType::"Net Change") then
-            SetRange("Date Filter", MatrixRecords[1]."Period Start", MatrixRecords[MATRIX_CurrentColumnOrdinal]."Period End");
+            Rec.SetRange("Date Filter", MatrixRecords[1]."Period Start", MatrixRecords[MATRIX_CurrentColumnOrdinal]."Period End");
     end;
 
     trigger OnInit()
@@ -709,69 +717,37 @@ page 2900 "Demand Forecast Variant Matrix"
     end;
 
     var
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
 
         MaxNumberOfRowsReachedMsg: Label 'Maximum number of rows to be loaded in the matrix has been set to %1 and hence only top %1 number of rows are loaded. Consider using %2 to load relevant rows.', Comment = '%1 is the default row limit set in MaxRowsToLoad(), %2 is Item Filter Field Caption';
@@ -971,7 +947,7 @@ page 2900 "Demand Forecast Variant Matrix"
         SetDateFilter(ColumnID);
         ProductionForecastEntry.SetCurrentKey(
           "Production Forecast Name", "Item No.", "Location Code", "Forecast Date", "Component Forecast");
-        ProductionForecastEntry.SetRange("Item No.", "No.");
+        ProductionForecastEntry.SetRange("Item No.", Rec."No.");
         if QtyType = QtyType::"Net Change" then
             ProductionForecastEntry.SetRange("Forecast Date", MatrixRecords[ColumnID]."Period Start", MatrixRecords[ColumnID]."Period End")
         else
@@ -990,7 +966,7 @@ page 2900 "Demand Forecast Variant Matrix"
         else
             ProductionForecastEntry.SetRange("Variant Code");
 
-        ProductionForecastEntry.SetFilter("Component Forecast", GetFilter("Component Forecast"));
+        ProductionForecastEntry.SetFilter("Component Forecast", Rec.GetFilter("Component Forecast"));
         OnMatrixOnDrillDownOnBeforePageRun(Rec, ProductionForecastEntry);
         PAGE.Run(0, ProductionForecastEntry);
     end;
@@ -1129,14 +1105,14 @@ page 2900 "Demand Forecast Variant Matrix"
             Error(Text000Err);
 
         ProdForecastEntry.SetCurrentKey("Production Forecast Name", "Item No.", "Location Code", "Forecast Date", "Component Forecast");
-        ProdForecastEntry.SetRange("Production Forecast Name", GetFilter("Production Forecast Name"));
-        ProdForecastEntry.SetRange("Item No.", "No.");
-        ProdForecastEntry.SetFilter("Location Code", GetFilter("Location Filter"));
+        ProdForecastEntry.SetRange("Production Forecast Name", Rec.GetFilter("Production Forecast Name"));
+        ProdForecastEntry.SetRange("Item No.", Rec."No.");
+        ProdForecastEntry.SetFilter("Location Code", Rec.GetFilter("Location Filter"));
         ProdForecastEntry.SetRange(
           "Forecast Date",
           MatrixRecords[ColumnID]."Period Start",
           MatrixRecords[ColumnID]."Period End");
-        ProdForecastEntry.SetFilter("Component Forecast", GetFilter("Component Forecast"));
+        ProdForecastEntry.SetFilter("Component Forecast", Rec.GetFilter("Component Forecast"));
         if ProdForecastEntry.FindLast() then begin
             ShouldConfirmMovingForecasts := ProdForecastEntry."Forecast Date" > MatrixRecords[ColumnID]."Period Start";
             OnProdForecastQtyBase_OnValidateOnAfterCalcShouldConfirmMovingForecasts(ProdForecastEntry, ColumnID, MatrixRecords, ShouldConfirmMovingForecasts);

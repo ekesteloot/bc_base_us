@@ -1,7 +1,13 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using System.Utilities;
+
 report 1006 "Job - Planning Lines"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/JobPlanningLines.rdlc';
+    RDLCLayout = './ProjectMgt/Jobs/Reports/JobPlanningLines.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Job - Planning Lines';
     UsageCategory = ReportsAndAnalysis;
@@ -10,14 +16,14 @@ report 1006 "Job - Planning Lines"
     {
         dataitem(Job; Job)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             column(No_Job; StrSubstNo('%1 %2 %3 %4', TableCaption(), FieldCaption("No."), "No.", Description))
             {
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(CompanyName; COMPANYPROPERTY.DisplayName())
                 {
                 }
@@ -57,8 +63,8 @@ report 1006 "Job - Planning Lines"
             }
             dataitem("Job Task"; "Job Task")
             {
-                DataItemLink = "Job No." = FIELD("No.");
-                DataItemTableView = SORTING("Job No.", "Job Task No.");
+                DataItemLink = "Job No." = field("No.");
+                DataItemTableView = sorting("Job No.", "Job Task No.");
                 PrintOnlyIfDetail = true;
                 RequestFilterFields = "Job No.", "Job Task No.";
                 column(JobTaskNo_JobTask; "Job Task No.")
@@ -102,9 +108,9 @@ report 1006 "Job - Planning Lines"
                 }
                 dataitem("Job Planning Line"; "Job Planning Line")
                 {
-                    DataItemLink = "Job No." = FIELD("Job No."), "Job Task No." = FIELD("Job Task No."), "Planning Date" = FIELD("Planning Date Filter");
+                    DataItemLink = "Job No." = field("Job No."), "Job Task No." = field("Job Task No."), "Planning Date" = field("Planning Date Filter");
                     DataItemLinkReference = "Job Task";
-                    DataItemTableView = SORTING("Job No.", "Job Task No.", "Line No.");
+                    DataItemTableView = sorting("Job No.", "Job Task No.", "Line No.");
                     column(TotCostLCY_JobPlanningLine; "Total Cost (LCY)")
                     {
                     }

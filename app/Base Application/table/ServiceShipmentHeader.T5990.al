@@ -1,3 +1,33 @@
+﻿namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Calculation;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Setup;
+using Microsoft.Shared.Navigate;
+using System.Email;
+using System.Globalization;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 5990 "Service Shipment Header"
 {
     Caption = 'Service Shipment Header';
@@ -43,8 +73,6 @@ table 5990 "Service Shipment Header"
         {
             Caption = 'Bill-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(10; "Bill-to Contact"; Text[100])
@@ -58,7 +86,7 @@ table 5990 "Service Shipment Header"
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Customer No."));
         }
         field(13; "Ship-to Name"; Text[100])
         {
@@ -80,8 +108,6 @@ table 5990 "Service Shipment Header"
         {
             Caption = 'Ship-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
@@ -129,19 +155,19 @@ table 5990 "Service Shipment Header"
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(31; "Customer Posting Group"; Code[20])
         {
@@ -184,6 +210,11 @@ table 5990 "Service Shipment Header"
             Caption = 'Language Code';
             TableRelation = Language;
         }
+        field(42; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(43; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
@@ -195,9 +226,9 @@ table 5990 "Service Shipment Header"
         }
         field(46; Comment; Boolean)
         {
-            CalcFormula = Exist("Service Comment Line" WHERE("Table Name" = CONST("Service Shipment Header"),
-                                                              "No." = FIELD("No."),
-                                                              Type = CONST(General)));
+            CalcFormula = exist("Service Comment Line" where("Table Name" = const("Service Shipment Header"),
+                                                              "No." = field("No."),
+                                                              Type = const(General)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -226,9 +257,9 @@ table 5990 "Service Shipment Header"
         field(55; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
         }
         field(70; "VAT Registration No."; Text[20])
         {
@@ -283,8 +314,6 @@ table 5990 "Service Shipment Header"
         {
             Caption = 'City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(84; "Contact Name"; Text[100])
@@ -295,8 +324,6 @@ table 5990 "Service Shipment Header"
         {
             Caption = 'Bill-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(86; "Bill-to County"; Text[30])
@@ -313,8 +340,6 @@ table 5990 "Service Shipment Header"
         {
             Caption = 'Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(89; County; Text[30])
@@ -331,8 +356,6 @@ table 5990 "Service Shipment Header"
         {
             Caption = 'Ship-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(92; "Ship-to County"; Text[30])
@@ -398,8 +421,6 @@ table 5990 "Service Shipment Header"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(113; "Source Code"; Code[10])
         {
@@ -430,7 +451,7 @@ table 5990 "Service Shipment Header"
         field(129; "Company Bank Account Code"; Code[20])
         {
             Caption = 'Company Bank Account Code';
-            TableRelation = "Bank Account" where("Currency Code" = FIELD("Currency Code"));
+            TableRelation = "Bank Account" where("Currency Code" = field("Currency Code"));
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -440,7 +461,7 @@ table 5990 "Service Shipment Header"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(5052; "Contact No."; Code[20])
@@ -461,7 +482,7 @@ table 5990 "Service Shipment Header"
         field(5794; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(5796; "Date Filter"; Date)
         {
@@ -490,11 +511,11 @@ table 5990 "Service Shipment Header"
         }
         field(5911; "Allocated Hours"; Decimal)
         {
-            CalcFormula = Sum("Service Order Allocation"."Allocated Hours" WHERE("Document Type" = CONST(Order),
-                                                                                  "Document No." = FIELD("Order No."),
-                                                                                  "Resource No." = FIELD("Resource Filter"),
-                                                                                  "Resource Group No." = FIELD("Resource Group Filter"),
-                                                                                  Status = FILTER(Active | Finished)));
+            CalcFormula = sum("Service Order Allocation"."Allocated Hours" where("Document Type" = const(Order),
+                                                                                  "Document No." = field("Order No."),
+                                                                                  "Resource No." = field("Resource Filter"),
+                                                                                  "Resource Group No." = field("Resource Group Filter"),
+                                                                                  Status = filter(Active | Finished)));
             Caption = 'Allocated Hours';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -528,9 +549,9 @@ table 5990 "Service Shipment Header"
         }
         field(5921; "No. of Unallocated Items"; Integer)
         {
-            CalcFormula = Count("Service Item Line" WHERE("Document Type" = CONST(Order),
-                                                           "Document No." = FIELD("No."),
-                                                           "No. of Active/Finished Allocs" = CONST(0)));
+            CalcFormula = count("Service Item Line" where("Document Type" = const(Order),
+                                                           "Document No." = field("No."),
+                                                           "No. of Active/Finished Allocs" = const(0)));
             Caption = 'No. of Unallocated Items';
             Editable = false;
             FieldClass = FlowField;
@@ -586,18 +607,18 @@ table 5990 "Service Shipment Header"
         }
         field(5933; "Contract Serv. Hours Exist"; Boolean)
         {
-            CalcFormula = Exist("Service Hour" WHERE("Service Contract No." = FIELD("Contract No.")));
+            CalcFormula = exist("Service Hour" where("Service Contract No." = field("Contract No.")));
             Caption = 'Contract Serv. Hours Exist';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5934; "Reallocation Needed"; Boolean)
         {
-            CalcFormula = Exist("Service Order Allocation" WHERE(Status = CONST("Reallocation Needed"),
-                                                                  "Resource No." = FIELD("Resource Filter"),
-                                                                  "Document Type" = CONST(Order),
-                                                                  "Document No." = FIELD("No."),
-                                                                  "Resource Group No." = FIELD("Resource Group Filter")));
+            CalcFormula = exist("Service Order Allocation" where(Status = const("Reallocation Needed"),
+                                                                  "Resource No." = field("Resource Filter"),
+                                                                  "Document Type" = const(Order),
+                                                                  "Document No." = field("No."),
+                                                                  "Resource Group No." = field("Resource Group Filter")));
             Caption = 'Reallocation Needed';
             Editable = false;
             FieldClass = FlowField;
@@ -610,7 +631,7 @@ table 5990 "Service Shipment Header"
         }
         field(5937; "Max. Labor Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             BlankZero = true;
             Caption = 'Max. Labor Unit Price';
@@ -623,11 +644,11 @@ table 5990 "Service Shipment Header"
         }
         field(5939; "No. of Allocations"; Integer)
         {
-            CalcFormula = Count("Service Order Allocation" WHERE("Document Type" = CONST(Order),
-                                                                  "Document No." = FIELD("No."),
-                                                                  "Resource No." = FIELD("Resource Filter"),
-                                                                  "Resource Group No." = FIELD("Resource Group Filter"),
-                                                                  Status = FILTER(Active | Finished)));
+            CalcFormula = count("Service Order Allocation" where("Document Type" = const(Order),
+                                                                  "Document No." = field("No."),
+                                                                  "Resource No." = field("Resource Filter"),
+                                                                  "Resource Group No." = field("Resource Group Filter"),
+                                                                  Status = filter(Active | Finished)));
             Caption = 'No. of Allocations';
             Editable = false;
             FieldClass = FlowField;
@@ -635,10 +656,10 @@ table 5990 "Service Shipment Header"
         field(5940; "Contract No."; Code[20])
         {
             Caption = 'Contract No.';
-            TableRelation = "Service Contract Header"."Contract No." WHERE("Contract Type" = CONST(Contract),
-                                                                            "Customer No." = FIELD("Customer No."),
-                                                                            "Ship-to Code" = FIELD("Ship-to Code"),
-                                                                            "Bill-to Customer No." = FIELD("Bill-to Customer No."));
+            TableRelation = "Service Contract Header"."Contract No." where("Contract Type" = const(Contract),
+                                                                            "Customer No." = field("Customer No."),
+                                                                            "Ship-to Code" = field("Ship-to Code"),
+                                                                            "Bill-to Customer No." = field("Bill-to Customer No."));
         }
         field(5951; "Type Filter"; Option)
         {
@@ -663,7 +684,7 @@ table 5990 "Service Shipment Header"
         {
             Caption = 'Contract Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Service Contract Header"."Contract No." WHERE("Contract Type" = CONST(Contract));
+            TableRelation = "Service Contract Header"."Contract No." where("Contract Type" = const(Contract));
         }
         field(5955; "Ship-to Fax No."; Text[30])
         {

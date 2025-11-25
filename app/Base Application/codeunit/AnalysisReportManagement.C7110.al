@@ -1,10 +1,28 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Purchases.Analysis;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Analysis;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+
 codeunit 7110 "Analysis Report Management"
 {
     TableNo = "Analysis Line";
 
     trigger OnRun()
     begin
-        SetFilter("Row Ref. No.", TryExpression);
+        Rec.SetFilter("Row Ref. No.", TryExpression);
     end;
 
     var
@@ -134,13 +152,7 @@ codeunit 7110 "Analysis Report Management"
         AnalysisLines: Page "Inventory Analysis Lines";
         AnalysisLinesForSale: Page "Sales Analysis Lines";
         AnalysisLinesForPurchase: Page "Purchase Analysis Lines";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeOpenAnalysisLinesForm(AnalysisLine2, CurrentAnalysisLineTempl, IsHandled);
-        if IsHandled then
-            exit;
-
         Commit();
         AnalysisLine.Copy(AnalysisLine2);
         case AnalysisLine.GetRangeMax("Analysis Area") of
@@ -167,13 +179,7 @@ codeunit 7110 "Analysis Report Management"
     var
         AnalysisColumn: Record "Analysis Column";
         AnalysisColumns: Page "Analysis Columns";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeOpenAnalysisColumnsForm(AnalysisLine, CurrentColumnTempl, IsHandled);
-        if IsHandled then
-            exit;
-
         Commit();
         AnalysisColumn.FilterGroup := 2;
         AnalysisColumn.SetRange(
@@ -191,8 +197,6 @@ codeunit 7110 "Analysis Report Management"
         AnalysisColumn.SetRange("Analysis Area", AnalysisLine.GetRangeMax("Analysis Area"));
         AnalysisColumn.SetRange("Analysis Column Template", CurrentColumnTempl);
         AnalysisColumn.FilterGroup := 0;
-
-        OnAfterOpenColumns(CurrentColumnTempl, AnalysisLine, AnalysisColumn);
     end;
 
     procedure OpenColumns(var CurrentColumnTempl: Code[10]; var AnalysisColumn: Record "Analysis Column")
@@ -246,7 +250,6 @@ codeunit 7110 "Analysis Report Management"
         AnalysisColumn.SetRange(
           "Analysis Area", AnalysisLine.GetRangeMax("Analysis Area"));
         AnalysisColumn.SetRange("Analysis Column Template", ColumnName);
-        OnCopyColumnsToTempOnBeforeAnalysisColumnFindset(AnalysisColumn, ColumnName);
         if AnalysisColumn.FindSet() then begin
             repeat
                 TempAnalysisColumn := AnalysisColumn;
@@ -1690,16 +1693,16 @@ codeunit 7110 "Analysis Report Management"
                 DATABASE::"Analysis Column":
                     case FieldNumber of
                         AnalysisColumn.FieldNo("Item Ledger Entry Type Filter"):
-                            OptionName := Format("Item Ledger Entry Type".FromInteger(OptionNo));
+                            OptionName := Format(Enum::"Item Ledger Entry Type".FromInteger(OptionNo));
                         AnalysisColumn.FieldNo("Value Entry Type Filter"):
-                            OptionName := Format("Cost Entry Type".FromInteger(OptionNo));
+                            OptionName := Format(Enum::"Cost Entry Type".FromInteger(OptionNo));
                     end;
                 DATABASE::"Analysis Type":
                     case FieldNumber of
                         AnalysisType.FieldNo("Item Ledger Entry Type Filter"):
-                            OptionName := Format("Item Ledger Entry Type".FromInteger(OptionNo));
+                            OptionName := Format(Enum::"Item Ledger Entry Type".FromInteger(OptionNo));
                         AnalysisType.FieldNo("Value Entry Type Filter"):
-                            OptionName := Format("Cost Entry Type".FromInteger(OptionNo));
+                            OptionName := Format(Enum::"Cost Entry Type".FromInteger(OptionNo));
                     end;
             end;
 
@@ -1822,26 +1825,6 @@ codeunit 7110 "Analysis Report Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcUnitPriceOnBeforeReturnUnitPrice(var TempPriceListLine: Record "Price List Line"; Item: Record Item)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenAnalysisLinesForm(var AnalysisLine2: Record "Analysis Line"; CurrentAnalysisLineTempl: Code[10]; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOpenAnalysisColumnsForm(var AnalysisLine: Record "Analysis Line"; CurrentColumnTempl: Code[10]; var IsHandled: Boolean);
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterOpenColumns(var CurrentColumnTempl: Code[10]; var AnalysisLine: Record "Analysis Line"; var AnalysisColumn: Record "Analysis Column");
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyColumnsToTempOnBeforeAnalysisColumnFindset(var AnalysisColumn: Record "Analysis Column"; ColumnName: Code[10]);
     begin
     end;
 }

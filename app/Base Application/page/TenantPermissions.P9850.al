@@ -1,4 +1,10 @@
 #if not CLEAN21
+namespace System.Security.AccessControl;
+
+using System.Reflection;
+using System.Security.User;
+using System.Text;
+
 page 9850 "Tenant Permissions"
 {
     Caption = 'Permissions';
@@ -91,7 +97,7 @@ page 9850 "Tenant Permissions"
             {
                 Caption = 'AllPermission';
                 Editable = ControlsAreEditable;
-                field(PermissionSet; "Role ID")
+                field(PermissionSet; Rec."Role ID")
                 {
                     ApplicationArea = Advanced;
                     Caption = 'Permission Set';
@@ -128,7 +134,7 @@ page 9850 "Tenant Permissions"
                     var
                         AllObjectswithCaption: Page "All Objects with Caption";
                     begin
-                        exit(AllObjectswithCaption.OnLookupObjectId("Object Type", Text));
+                        exit(AllObjectswithCaption.OnLookupObjectId(Rec."Object Type", Text));
                     end;
 
                     trigger OnValidate()
@@ -166,7 +172,7 @@ page 9850 "Tenant Permissions"
                     StyleExpr = ZeroObjStyleExpr;
                     ToolTip = 'Specifies the caption of the object that the permissions apply to.';
                 }
-                field(Control8; "Read Permission")
+                field(Control8; Rec."Read Permission")
                 {
                     ApplicationArea = Basic, Suite;
                     Enabled = IsTableData and SingleFilterSelected;
@@ -174,7 +180,7 @@ page 9850 "Tenant Permissions"
                     StyleExpr = ZeroObjStyleExpr;
                     ToolTip = 'Specifies if the permission set has read permission to this object. The values for the field are blank, Yes, and Indirect. Indirect means permission only through another object. If the field is empty, the permission set does not have read permission.';
                 }
-                field(Control7; "Insert Permission")
+                field(Control7; Rec."Insert Permission")
                 {
                     ApplicationArea = Basic, Suite;
                     Enabled = IsTableData and SingleFilterSelected;
@@ -182,7 +188,7 @@ page 9850 "Tenant Permissions"
                     StyleExpr = ZeroObjStyleExpr;
                     ToolTip = 'Specifies if the permission set has insert permission to this object. The values for the field are blank, Yes, and Indirect. Indirect means permission only through another object. If the field is empty, the permission set does not have insert permission.';
                 }
-                field(Control6; "Modify Permission")
+                field(Control6; Rec."Modify Permission")
                 {
                     ApplicationArea = Basic, Suite;
                     Enabled = IsTableData and SingleFilterSelected;
@@ -190,7 +196,7 @@ page 9850 "Tenant Permissions"
                     StyleExpr = ZeroObjStyleExpr;
                     ToolTip = 'Specifies if the permission set has modify permission to this object. The values for the field are blank, Yes, and Indirect. Indirect means permission only through another object. If the field is empty, the permission set does not have modify permission.';
                 }
-                field(Control5; "Delete Permission")
+                field(Control5; Rec."Delete Permission")
                 {
                     ApplicationArea = Basic, Suite;
                     Enabled = IsTableData and SingleFilterSelected;
@@ -198,7 +204,7 @@ page 9850 "Tenant Permissions"
                     StyleExpr = ZeroObjStyleExpr;
                     ToolTip = 'Specifies if the permission set has delete permission to this object. The values for the field are blank, Yes, and Indirect. Indirect means permission only through another object. If the field is empty, the permission set does not have delete permission.';
                 }
-                field(Control4; "Execute Permission")
+                field(Control4; Rec."Execute Permission")
                 {
                     ApplicationArea = Basic, Suite;
                     Enabled = NOT IsTableData and SingleFilterSelected;
@@ -221,11 +227,11 @@ page 9850 "Tenant Permissions"
                     begin
                         // User cannot edit Security filter field for Extensions but can edit for user created types.
                         // Since this field is empty and GUID exists for Extensions it can be used as a flag for them.
-                        if (Format("Security Filter") = '') and (not IsNullGuid(CurrentAppID)) then
+                        if (Format(Rec."Security Filter") = '') and (not IsNullGuid(CurrentAppID)) then
                             exit;
 
                         if PermissionPagesMgt.ShowSecurityFilterForTenantPermission(OutputSecurityFilter, Rec, ControlsAreEditable) then
-                            Evaluate("Security Filter", OutputSecurityFilter);
+                            Evaluate(Rec."Security Filter", OutputSecurityFilter);
                     end;
                 }
             }
@@ -234,22 +240,6 @@ page 9850 "Tenant Permissions"
 
     actions
     {
-#if not CLEAN20
-        area(navigation)
-        {
-            group(DQPermissions)
-            {
-                Caption = 'SmartList Permissions';
-                Image = Permission;
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'The SmartList Designer is no longer available in Business Central.';
-                ObsoleteTag = '20.0';
-
-            }
-        }
-#endif
-
         area(processing)
         {
             group("Read Permission")
@@ -259,7 +249,7 @@ page 9850 "Tenant Permissions"
                 group("Allow Read")
                 {
                     Caption = 'Allow Read';
-                    Enabled = IsEditable AND ("Object Type" = "Object Type"::"Table Data");
+                    Enabled = IsEditable and (Rec."Object Type" = Rec."Object Type"::"Table Data");
                     Image = Confirm;
                     action(AllowReadYes)
                     {
@@ -271,7 +261,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('R', "Read Permission"::Yes);
+                            UpdateSelected('R', Rec."Read Permission"::Yes);
                         end;
                     }
                     action(AllowReadNo)
@@ -284,7 +274,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('R', "Read Permission"::" ");
+                            UpdateSelected('R', Rec."Read Permission"::" ");
                         end;
                     }
                     action(AllowReadIndirect)
@@ -297,7 +287,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('R', "Read Permission"::Indirect);
+                            UpdateSelected('R', Rec."Read Permission"::Indirect);
                         end;
                     }
                 }
@@ -309,7 +299,7 @@ page 9850 "Tenant Permissions"
                 group("Allow Insertion")
                 {
                     Caption = 'Allow Insertion';
-                    Enabled = IsEditable AND ("Object Type" = "Object Type"::"Table Data");
+                    Enabled = IsEditable and (Rec."Object Type" = Rec."Object Type"::"Table Data");
                     Image = Confirm;
                     action(AllowInsertYes)
                     {
@@ -321,7 +311,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('I', "Insert Permission"::Yes);
+                            UpdateSelected('I', Rec."Insert Permission"::Yes);
                         end;
                     }
                     action(AllowInsertNo)
@@ -334,7 +324,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('I', "Insert Permission"::" ");
+                            UpdateSelected('I', Rec."Insert Permission"::" ");
                         end;
                     }
                     action(AllowInsertIndirect)
@@ -347,7 +337,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('I', "Insert Permission"::Indirect);
+                            UpdateSelected('I', Rec."Insert Permission"::Indirect);
                         end;
                     }
                 }
@@ -359,7 +349,7 @@ page 9850 "Tenant Permissions"
                 group("Allow Modification")
                 {
                     Caption = 'Allow Modification';
-                    Enabled = IsEditable AND ("Object Type" = "Object Type"::"Table Data");
+                    Enabled = IsEditable and (Rec."Object Type" = Rec."Object Type"::"Table Data");
                     Image = Confirm;
                     action(AllowModifyYes)
                     {
@@ -371,7 +361,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('M', "Modify Permission"::Yes);
+                            UpdateSelected('M', Rec."Modify Permission"::Yes);
                         end;
                     }
                     action(AllowModifyNo)
@@ -384,7 +374,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('M', "Modify Permission"::" ");
+                            UpdateSelected('M', Rec."Modify Permission"::" ");
                         end;
                     }
                     action(AllowModifyIndirect)
@@ -397,7 +387,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('M', "Modify Permission"::Indirect);
+                            UpdateSelected('M', Rec."Modify Permission"::Indirect);
                         end;
                     }
                 }
@@ -409,7 +399,7 @@ page 9850 "Tenant Permissions"
                 group("Allow Deletion")
                 {
                     Caption = 'Allow Deletion';
-                    Enabled = IsEditable AND ("Object Type" = "Object Type"::"Table Data");
+                    Enabled = IsEditable and (Rec."Object Type" = Rec."Object Type"::"Table Data");
                     Image = Confirm;
                     action(AllowDeleteYes)
                     {
@@ -421,7 +411,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('D', "Delete Permission"::Yes);
+                            UpdateSelected('D', Rec."Delete Permission"::Yes);
                         end;
                     }
                     action(AllowDeleteNo)
@@ -434,7 +424,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('D', "Delete Permission"::" ");
+                            UpdateSelected('D', Rec."Delete Permission"::" ");
                         end;
                     }
                     action(AllowDeleteIndirect)
@@ -447,7 +437,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('D', "Delete Permission"::Indirect);
+                            UpdateSelected('D', Rec."Delete Permission"::Indirect);
                         end;
                     }
                 }
@@ -459,7 +449,7 @@ page 9850 "Tenant Permissions"
                 group("Allow Execution")
                 {
                     Caption = 'Allow Execution';
-                    Enabled = IsEditable AND ("Object Type" <> "Object Type"::"Table Data");
+                    Enabled = IsEditable AND (Rec."Object Type" <> Rec."Object Type"::"Table Data");
                     Image = Confirm;
                     action(AllowExecuteYes)
                     {
@@ -471,7 +461,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('X', "Execute Permission"::Yes);
+                            UpdateSelected('X', Rec."Execute Permission"::Yes);
                         end;
                     }
                     action(AllowExecuteNo)
@@ -484,7 +474,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('X', "Execute Permission"::" ");
+                            UpdateSelected('X', Rec."Execute Permission"::" ");
                         end;
                     }
                     action(AllowExecuteIndirect)
@@ -497,7 +487,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('X', "Execute Permission"::Indirect);
+                            UpdateSelected('X', Rec."Execute Permission"::Indirect);
                         end;
                     }
                 }
@@ -521,7 +511,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('*', "Read Permission"::Yes);
+                            UpdateSelected('*', Rec."Read Permission"::Yes);
                         end;
                     }
                     action(AllowAllNo)
@@ -535,7 +525,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('*', "Read Permission"::" ");
+                            UpdateSelected('*', Rec."Read Permission"::" ");
                         end;
                     }
                     action(AllowAllIndirect)
@@ -549,7 +539,7 @@ page 9850 "Tenant Permissions"
 
                         trigger OnAction()
                         begin
-                            UpdateSelected('*', "Read Permission"::Indirect);
+                            UpdateSelected('*', Rec."Read Permission"::Indirect);
                         end;
                     }
                 }
@@ -585,7 +575,7 @@ page 9850 "Tenant Permissions"
                         AggregatePermissionSet: Record "Aggregate Permission Set";
                         AddSubtractPermissionSet: Report "Add/Subtract Permission Set";
                     begin
-                        AggregatePermissionSet.Get(AggregatePermissionSet.Scope::Tenant, "App ID", "Role ID");
+                        AggregatePermissionSet.Get(AggregatePermissionSet.Scope::Tenant, Rec."App ID", Rec."Role ID");
                         AddSubtractPermissionSet.SetDestination(AggregatePermissionSet);
                         AddSubtractPermissionSet.RunModal();
                         FillTempPermissions();
@@ -631,7 +621,7 @@ page 9850 "Tenant Permissions"
                             exit;
                         AddLoggedPermissions(TempTablePermissionBuffer);
                         FillTempPermissions();
-                        if FindFirst() then;
+                        if Rec.FindFirst() then;
                     end;
                 }
             }
@@ -693,18 +683,18 @@ page 9850 "Tenant Permissions"
             PermissionRecExists := TenantPermission.Find();
         end else
             PermissionRecExists := false;
-        SingleFilterSelected := GetRangeMin("Role ID") = GetRangeMax("Role ID");
+        SingleFilterSelected := Rec.GetRangeMin("Role ID") = Rec.GetRangeMax("Role ID");
         AllowChangePrimaryKey := not PermissionRecExists and (Show = Show::"Only In Permission Set") and SingleFilterSelected;
-        ZeroObjStyleExpr := PermissionRecExists and ("Object ID" = 0);
+        ZeroObjStyleExpr := PermissionRecExists and (Rec."Object ID" = 0);
     end;
 
     trigger OnAfterGetRecord()
     begin
         SetObjectZeroName(Rec);
-        ZeroObjStyleExpr := "Object ID" = 0;
+        ZeroObjStyleExpr := Rec."Object ID" = 0;
         IsValidatedObjectID := false;
         IsNewRecord := false;
-        CurrPage.Editable := IsNullGuid("App ID");
+        CurrPage.Editable := IsNullGuid(Rec."App ID");
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -712,7 +702,7 @@ page 9850 "Tenant Permissions"
         TenantPermission: Record "Tenant Permission";
         PermissionPagesMgt: Codeunit "Permission Pages Mgt.";
     begin
-        if (Show = Show::All) and ("Object ID" <> 0) then
+        if (Show = Show::All) and (Rec."Object ID" <> 0) then
             exit(false);
 
         if not IsNullGuid(CurrentAppID) then
@@ -735,7 +725,7 @@ page 9850 "Tenant Permissions"
         TenantPermission: Record "Tenant Permission";
         PermissionPagesMgt: Codeunit "Permission Pages Mgt.";
     begin
-        if ("Object ID" = 0) and ((Show = Show::All) or IsValidatedObjectID) then
+        if (Rec."Object ID" = 0) and ((Show = Show::All) or IsValidatedObjectID) then
             exit(false);
 
         if not IsNullGuid(CurrentAppID) then
@@ -743,21 +733,21 @@ page 9850 "Tenant Permissions"
 
         PermissionPagesMgt.DisallowEditingPermissionSetsForNonAdminUsers();
 
-        if ("Execute Permission" = "Execute Permission"::" ") and
-           ("Read Permission" = "Read Permission"::" ") and
-           ("Insert Permission" = "Insert Permission"::" ") and
-           ("Modify Permission" = "Modify Permission"::" ") and
-           ("Delete Permission" = "Delete Permission"::" ")
+        if (Rec."Execute Permission" = Rec."Execute Permission"::" ") and
+           (Rec."Read Permission" = Rec."Read Permission"::" ") and
+           (Rec."Insert Permission" = Rec."Insert Permission"::" ") and
+           (Rec."Modify Permission" = Rec."Modify Permission"::" ") and
+           (Rec."Delete Permission" = Rec."Delete Permission"::" ")
         then
             exit(false);
 
-        if "Object Type" = "Object Type"::"Table Data" then
-            "Execute Permission" := "Execute Permission"::" "
+        if Rec."Object Type" = Rec."Object Type"::"Table Data" then
+            Rec."Execute Permission" := Rec."Execute Permission"::" "
         else begin
-            "Read Permission" := "Read Permission"::" ";
-            "Insert Permission" := "Insert Permission"::" ";
-            "Modify Permission" := "Modify Permission"::" ";
-            "Delete Permission" := "Delete Permission"::" ";
+            Rec."Read Permission" := Rec."Read Permission"::" ";
+            Rec."Insert Permission" := Rec."Insert Permission"::" ";
+            Rec."Modify Permission" := Rec."Modify Permission"::" ";
+            Rec."Delete Permission" := Rec."Delete Permission"::" ";
         end;
         TenantPermission := Rec;
         TenantPermission.Insert();
@@ -767,7 +757,7 @@ page 9850 "Tenant Permissions"
         SetObjectZeroName(Rec);
         PermissionRecExists := true;
         IsNewRecord := false;
-        ZeroObjStyleExpr := "Object ID" = 0;
+        ZeroObjStyleExpr := Rec."Object ID" = 0;
         exit(true);
     end;
 
@@ -783,7 +773,7 @@ page 9850 "Tenant Permissions"
         ModifyRecord(Rec);
         PermissionRecExists := true;
         IsNewRecord := false;
-        exit(Modify());
+        exit(Rec.Modify());
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -802,8 +792,8 @@ page 9850 "Tenant Permissions"
         PermissionPagesMgt: Codeunit "Permission Pages Mgt.";
         UserPermissions: Codeunit "User Permissions";
     begin
-        if GetFilter("App ID") <> '' then
-            CurrentAppID := GetFilter("App ID")
+        if Rec.GetFilter("App ID") <> '' then
+            CurrentAppID := Rec.GetFilter("App ID")
         else
             if TenantPermissionSet.FindFirst() then
                 CurrentAppID := TenantPermissionSet."App ID";
@@ -812,15 +802,15 @@ page 9850 "Tenant Permissions"
             PermissionPagesMgt.RaiseNotificationThatSecurityFilterNotEditableForSystemAndExtension();
 
         if CurrentRoleID = '' then
-            if GetFilter("Role ID") <> '' then
-                CurrentRoleID := GetFilter("Role ID")
+            if Rec.GetFilter("Role ID") <> '' then
+                CurrentRoleID := Rec.GetFilter("Role ID")
             else
                 if TenantPermissionSet.FindFirst() then
                     CurrentRoleID := TenantPermissionSet."Role ID";
-        Reset();
+        Rec.Reset();
         FillTempPermissions();
         IsEditable := CurrPage.Editable;
-        SingleFilterSelected := GetRangeMin("Role ID") = GetRangeMax("Role ID");
+        SingleFilterSelected := Rec.GetRangeMin("Role ID") = Rec.GetRangeMax("Role ID");
         if SingleFilterSelected then
             CopiedFromSystemRoleId := PermissionSetLink.GetSourceForLinkedPermissionSet(CurrentRoleID);
 
@@ -835,7 +825,6 @@ page 9850 "Tenant Permissions"
         CopiedFromSystemRoleId: Code[20];
         Show: Option "Only In Permission Set",All;
         AddRelatedTables: Boolean;
-        [InDataSet]
         IsTableData: Boolean;
         IsNewRecord: Boolean;
         IsValidatedObjectID: Boolean;
@@ -863,11 +852,11 @@ page 9850 "Tenant Permissions"
         TempTenantPermission.Copy(Rec, true);
         TempTenantPermission.Reset();
         TempTenantPermission.DeleteAll();
-        FilterGroup(2);
-        SetFilter("Role ID", CurrentRoleID);
+        Rec.FilterGroup(2);
+        Rec.SetFilter("Role ID", CurrentRoleID);
         TenantPermission.SetFilter("Role ID", CurrentRoleID);
         TenantPermission.SetFilter("App ID", CurrentAppID);
-        FilterGroup(0);
+        Rec.FilterGroup(0);
 
         if TenantPermission.FindSet() then
             repeat
@@ -878,7 +867,7 @@ page 9850 "Tenant Permissions"
         if Show = Show::All then
             FillTempPermissionsForAllObjects(TempTenantPermission);
         IsNewRecord := false;
-        if Find('=<>') then;
+        if Rec.Find('=<>') then;
         CurrPage.Update(false);
     end;
 
@@ -903,11 +892,11 @@ page 9850 "Tenant Permissions"
             repeat
                 TempTenantPermission."Object Type" := AllObj."Object Type";
                 TempTenantPermission."Object ID" := AllObj."Object ID";
-                TempTenantPermission."Read Permission" := "Read Permission"::" ";
-                TempTenantPermission."Insert Permission" := "Insert Permission"::" ";
-                TempTenantPermission."Modify Permission" := "Modify Permission"::" ";
-                TempTenantPermission."Delete Permission" := "Delete Permission"::" ";
-                TempTenantPermission."Execute Permission" := "Execute Permission"::" ";
+                TempTenantPermission."Read Permission" := Rec."Read Permission"::" ";
+                TempTenantPermission."Insert Permission" := Rec."Insert Permission"::" ";
+                TempTenantPermission."Modify Permission" := Rec."Modify Permission"::" ";
+                TempTenantPermission."Delete Permission" := Rec."Delete Permission"::" ";
+                TempTenantPermission."Execute Permission" := Rec."Execute Permission"::" ";
                 SetObjectZeroName(TempTenantPermission);
                 if TempTenantPermission.Insert() then;
             until AllObj.Next() = 0;
@@ -924,14 +913,14 @@ page 9850 "Tenant Permissions"
             PermissionSetList.GetSelectionFilter(AggregatePermissionSet);
             AggregatePermissionSet.SetRange(Scope, AggregatePermissionSet.Scope::Tenant);
             CurrentRoleID := SelectionFilterManagement.GetSelectionFilterForAggregatePermissionSetRoleId(AggregatePermissionSet);
-            Reset();
+            Rec.Reset();
             FillTempPermissions();
         end;
     end;
 
     local procedure ActivateControls()
     begin
-        IsTableData := "Object Type" = "Object Type"::"Table Data"
+        IsTableData := Rec."Object Type" = Rec."Object Type"::"Table Data"
     end;
 
     local procedure ModifyRecord(var ModifiedTenantPermission: Record "Tenant Permission")
@@ -991,42 +980,40 @@ page 9850 "Tenant Permissions"
             repeat
                 case RIMDX of
                     'R':
-                        if TempTenantPermission."Object Type" = "Object Type"::"Table Data" then
+                        if TempTenantPermission."Object Type" = Rec."Object Type"::"Table Data" then
                             TempTenantPermission."Read Permission" := PermissionOption;
                     'I':
-                        if TempTenantPermission."Object Type" = "Object Type"::"Table Data" then
+                        if TempTenantPermission."Object Type" = Rec."Object Type"::"Table Data" then
                             TempTenantPermission."Insert Permission" := PermissionOption;
                     'M':
-                        if TempTenantPermission."Object Type" = "Object Type"::"Table Data" then
+                        if TempTenantPermission."Object Type" = Rec."Object Type"::"Table Data" then
                             TempTenantPermission."Modify Permission" := PermissionOption;
                     'D':
-                        if TempTenantPermission."Object Type" = "Object Type"::"Table Data" then
+                        if TempTenantPermission."Object Type" = Rec."Object Type"::"Table Data" then
                             TempTenantPermission."Delete Permission" := PermissionOption;
                     'X':
-                        if TempTenantPermission."Object Type" <> "Object Type"::"Table Data" then
+                        if TempTenantPermission."Object Type" <> Rec."Object Type"::"Table Data" then
                             TempTenantPermission."Execute Permission" := PermissionOption;
                     '*':
-                        begin
-                            if TempTenantPermission."Object Type" = "Object Type"::"Table Data" then begin
-                                TempTenantPermission."Read Permission" := PermissionOption;
-                                TempTenantPermission."Insert Permission" := PermissionOption;
-                                TempTenantPermission."Modify Permission" := PermissionOption;
-                                TempTenantPermission."Delete Permission" := PermissionOption;
-                            end else
-                                TempTenantPermission."Execute Permission" := PermissionOption;
-                        end;
+                        if TempTenantPermission."Object Type" = Rec."Object Type"::"Table Data" then begin
+                            TempTenantPermission."Read Permission" := PermissionOption;
+                            TempTenantPermission."Insert Permission" := PermissionOption;
+                            TempTenantPermission."Modify Permission" := PermissionOption;
+                            TempTenantPermission."Delete Permission" := PermissionOption;
+                        end else
+                            TempTenantPermission."Execute Permission" := PermissionOption;
                 end;
                 ModifyRecord(TempTenantPermission);
-                if Get(TempTenantPermission."App ID", TempTenantPermission."Role ID",
+                if Rec.Get(TempTenantPermission."App ID", TempTenantPermission."Role ID",
                      TempTenantPermission."Object Type", TempTenantPermission."Object ID")
                 then begin
                     Rec := TempTenantPermission;
-                    Modify();
+                    Rec.Modify();
                 end;
             until TempTenantPermission.Next() = 0;
 
         Rec := OriginalTenantPermission;
-        if Find() then;
+        if Rec.Find() then;
     end;
 
     local procedure AddRelatedTablesToSelected()
@@ -1039,7 +1026,7 @@ page 9850 "Tenant Permissions"
             repeat
                 DoAddRelatedTables(TempTenantPermission);
             until TempTenantPermission.Next() = 0;
-        if Find() then;
+        if Rec.Find() then;
     end;
 
     local procedure AddLoggedPermissions(var TablePermissionBuffer: Record "Table Permission Buffer")
@@ -1073,8 +1060,8 @@ page 9850 "Tenant Permissions"
         if TableRelationsMetadata.FindSet() then
             repeat
                 AddPermission(
-                  CurrentAppID, CurrentRoleID, "Object Type"::"Table Data", TableRelationsMetadata."Related Table ID", "Read Permission"::Yes,
-                  "Insert Permission"::" ", "Modify Permission"::" ", "Delete Permission"::" ", "Execute Permission"::" ");
+                  CurrentAppID, CurrentRoleID, Rec."Object Type"::"Table Data", TableRelationsMetadata."Related Table ID", Rec."Read Permission"::Yes,
+                  Rec."Insert Permission"::" ", Rec."Modify Permission"::" ", Rec."Delete Permission"::" ", Rec."Execute Permission"::" ");
             until TableRelationsMetadata.Next() = 0;
     end;
 
@@ -1083,30 +1070,30 @@ page 9850 "Tenant Permissions"
         TenantPermission: Record "Tenant Permission";
         LogTablePermissions: Codeunit "Log Table Permissions";
     begin
-        if not Get(AppID, RoleID, ObjectType, ObjectID) then begin
-            Init();
-            "App ID" := AppID;
-            "Role ID" := RoleID;
-            "Object Type" := ObjectType;
-            "Object ID" := ObjectID;
-            "Read Permission" := "Read Permission"::" ";
-            "Insert Permission" := "Insert Permission"::" ";
-            "Modify Permission" := "Modify Permission"::" ";
-            "Delete Permission" := "Delete Permission"::" ";
-            "Execute Permission" := "Execute Permission"::" ";
-            Insert();
+        if not Rec.Get(AppID, RoleID, ObjectType, ObjectID) then begin
+            Rec.Init();
+            Rec."App ID" := AppID;
+            Rec."Role ID" := RoleID;
+            Rec."Object Type" := ObjectType;
+            Rec."Object ID" := ObjectID;
+            Rec."Read Permission" := Rec."Read Permission"::" ";
+            Rec."Insert Permission" := Rec."Insert Permission"::" ";
+            Rec."Modify Permission" := Rec."Modify Permission"::" ";
+            Rec."Delete Permission" := Rec."Delete Permission"::" ";
+            Rec."Execute Permission" := Rec."Execute Permission"::" ";
+            Rec.Insert();
             TenantPermission.TransferFields(Rec, true);
             TenantPermission.Insert();
         end;
 
-        "Read Permission" := LogTablePermissions.GetMaxPermission("Read Permission", AddRead);
-        "Insert Permission" := LogTablePermissions.GetMaxPermission("Insert Permission", AddInsert);
-        "Modify Permission" := LogTablePermissions.GetMaxPermission("Modify Permission", AddModify);
-        "Delete Permission" := LogTablePermissions.GetMaxPermission("Delete Permission", AddDelete);
-        "Execute Permission" := LogTablePermissions.GetMaxPermission("Execute Permission", AddExecute);
+        Rec."Read Permission" := LogTablePermissions.GetMaxPermission(Rec."Read Permission", AddRead);
+        Rec."Insert Permission" := LogTablePermissions.GetMaxPermission(Rec."Insert Permission", AddInsert);
+        Rec."Modify Permission" := LogTablePermissions.GetMaxPermission(Rec."Modify Permission", AddModify);
+        Rec."Delete Permission" := LogTablePermissions.GetMaxPermission(Rec."Delete Permission", AddDelete);
+        Rec."Execute Permission" := LogTablePermissions.GetMaxPermission(Rec."Execute Permission", AddExecute);
 
         SetObjectZeroName(Rec);
-        Modify();
+        Rec.Modify();
         TenantPermission.LockTable();
         if not TenantPermission.Get(AppID, RoleID, ObjectType, ObjectID) then begin
             TenantPermission.TransferFields(Rec, true);
@@ -1146,25 +1133,25 @@ page 9850 "Tenant Permissions"
 
     local procedure EmptyIrrelevantPermissionFields()
     begin
-        if "Object Type" = "Object Type"::"Table Data" then
-            "Execute Permission" := "Execute Permission"::" "
+        if Rec."Object Type" = Rec."Object Type"::"Table Data" then
+            Rec."Execute Permission" := Rec."Execute Permission"::" "
         else begin
-            "Read Permission" := "Read Permission"::" ";
-            "Insert Permission" := "Insert Permission"::" ";
-            "Modify Permission" := "Modify Permission"::" ";
-            "Delete Permission" := "Delete Permission"::" ";
+            Rec."Read Permission" := Rec."Read Permission"::" ";
+            Rec."Insert Permission" := Rec."Insert Permission"::" ";
+            Rec."Modify Permission" := Rec."Modify Permission"::" ";
+            Rec."Delete Permission" := Rec."Delete Permission"::" ";
         end;
     end;
 
     local procedure SetRelevantPermissionFieldsToYes()
     begin
-        if "Object Type" = "Object Type"::"Table Data" then begin
-            "Read Permission" := "Read Permission"::Yes;
-            "Insert Permission" := "Insert Permission"::Yes;
-            "Modify Permission" := "Modify Permission"::Yes;
-            "Delete Permission" := "Delete Permission"::Yes;
+        if Rec."Object Type" = Rec."Object Type"::"Table Data" then begin
+            Rec."Read Permission" := Rec."Read Permission"::Yes;
+            Rec."Insert Permission" := Rec."Insert Permission"::Yes;
+            Rec."Modify Permission" := Rec."Modify Permission"::Yes;
+            Rec."Delete Permission" := Rec."Delete Permission"::Yes;
         end else
-            "Execute Permission" := "Execute Permission"::Yes;
+            Rec."Execute Permission" := Rec."Execute Permission"::Yes;
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.Intercompany.DataExchange;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Intercompany.Setup;
+
 page 678 "IC Dimensions Setup"
 {
     ApplicationArea = Intercompany;
@@ -29,8 +36,9 @@ page 678 "IC Dimensions Setup"
     var
         ICDimensions: Record "IC Dimension";
         ICPartner: Record "IC Partner";
-        ICPartnerDimensions: Record "IC Dimension";
+        TempICPartnerDimension: Record "IC Dimension" temporary;
         ICMapping: Codeunit "IC Mapping";
+        ICDataExchange: Interface "IC Data Exchange";
         MessageText: Text;
     begin
         if Rec."Partner Code for Acc. Syn." = '' then
@@ -39,13 +47,10 @@ page 678 "IC Dimensions Setup"
         if not ICPartner.Get(Rec."Partner Code for Acc. Syn.") then
             exit;
 
-        if not ICPartnerDimensions.ChangeCompany(ICPartner."Inbox Details") then
-            Error(FailedToChangeCompanyErr, ICPartner.Name);
+        ICDataExchange := ICPartner."Data Exchange Type";
+        ICDataExchange.GetICPartnerICDimension(ICPartner, TempICPartnerDimension);
 
-        if not ICPartnerDimensions.ReadPermission() then
-            Error(MissingPermissionToReadTableErr, ICPartner.Name);
-
-        if ICPartnerDimensions.IsEmpty() then
+        if TempICPartnerDimension.IsEmpty() then
             exit;
 
         if GuiAllowed() then begin
@@ -61,10 +66,8 @@ page 678 "IC Dimensions Setup"
     end;
 
     var
-        SplitMessageTxt: Label '%1\%2', Comment = '%1 = First part of the message, %2 = Second part of the message.';
+        SplitMessageTxt: Label '%1\%2', Comment = '%1 = First part of the message, %2 = Second part of the message.', Locked = true;
         SyncronizeDimensionsQst: Label 'Partner %1 has intercompany dimensions that can be synchronized now.', Comment = '%1 = IC Partner code';
         CleanExistingICDimensionsMsg: Label 'Before synchronizing with a new partner it is necessary to delete existing intercompany dimensions.';
         ContinueQst: Label 'Do you want to continue?';
-        FailedToChangeCompanyErr: Label 'It was not possible to find the intercompany dimensions of partner %1.', Comment = '%1 = Partner Code';
-        MissingPermissionToReadTableErr: Label 'You do not have the necessary permissions to access the intercompany dimensions of partner %1.', Comment = '%1 = Partner Code';
 }

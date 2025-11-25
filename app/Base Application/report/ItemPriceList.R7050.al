@@ -1,7 +1,28 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Reports;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Campaign;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Pricing;
+using System.Utilities;
+
 report 7050 "Item Price List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Pricing/ItemPriceList.rdlc';
+    RDLCLayout = './Pricing/Reports/ItemPriceList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Price List';
     PreviewMode = PrintLayout;
@@ -117,7 +138,7 @@ report 7050 "Item Price List"
             }
             dataitem(SalesPrices; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(VATText_SalesPrices; VATText)
                 {
                 }
@@ -151,7 +172,7 @@ report 7050 "Item Price List"
             }
             dataitem(SalesLineDiscs; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(LineDisc_SalesLineDisc; TempSalesLineDisc."Line Discount %")
                 {
                     AutoFormatExpression = Currency.Code;
@@ -182,11 +203,11 @@ report 7050 "Item Price List"
             }
             dataitem("Item Variant"; "Item Variant")
             {
-                DataItemLink = "Item No." = FIELD("No.");
+                DataItemLink = "Item No." = field("No.");
                 RequestFilterFields = Code;
                 dataitem(VariantSalesPrices; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(ItemNo_Variant_SalesPrices; ItemNo)
                     {
                     }
@@ -218,7 +239,7 @@ report 7050 "Item Price List"
                 }
                 dataitem(VariantSalesLineDiscs; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(ItemNo_Variant_SalesLineDescs; ItemNo)
                     {
                     }
@@ -460,10 +481,8 @@ report 7050 "Item Price List"
         FormatAddr: Codeunit "Format Address";
         PriceCalcMethod: Enum "Price Calculation Method";
         PriceCalculationHandler: Enum "Price Calculation Handler";
-        [InDataSet]
         SalesSourceType: Enum "Sales Price Source Type";
         LookupIsComplete: Boolean;
-        [InDataSet]
         SalesSourceNo: Code[20];
         VATText: Text[20];
         DateReq: Date;
@@ -482,7 +501,6 @@ report 7050 "Item Price List"
         IsFirstSalesLineDisc: Boolean;
         PricesInCurrency: Boolean;
         CurrencyFactor: Decimal;
-        [InDataSet]
         SourceNoCtrlEnable: Boolean;
         InclTok: Label 'Incl.';
         ExclTok: Label 'Excl.';
@@ -517,7 +535,7 @@ report 7050 "Item Price List"
         SalesLine."Posting Date" := DateReq;
         SetCurrencyFactorInHeader(SalesHeader);
         SalesLine.GetLineWithPrice(LineWithPrice);
-        LineWithPrice.SetLine("Price Type"::Sale, SalesHeader, SalesLine);
+        LineWithPrice.SetLine(Enum::"Price Type"::Sale, SalesHeader, SalesLine);
         LineWithPrice.SetSources(PriceSourceList);
         PriceCalculationMgt.GetHandler(LineWithPrice, PriceCalculation);
         PriceCalculation.FindPrice(TempSalesPrice, false);
@@ -526,7 +544,7 @@ report 7050 "Item Price List"
 
     local procedure GetPriceHandler(Method: Enum "Price Calculation Method"): Enum "Price Calculation Handler";
     var
-        PriceCalculationSetup: record "Price Calculation Setup";
+        PriceCalculationSetup: Record "Price Calculation Setup";
     begin
         if PriceCalculationSetup.FindDefault(Method, PriceCalculationSetup.Type::Sale) then
             exit(PriceCalculationSetup.Implementation);

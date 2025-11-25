@@ -34,4 +34,8 @@ enumextension 2611 "Feature To Update - BaseApp" extends "Feature To Update"
         ObsoleteTag = '22.0';
     }
 #endif
+    value(5409; EnablePlatformBasedReportSelection)
+    {
+        Implementation = "Feature Data Update" = "Feature - Report Selection";
+    }
 }

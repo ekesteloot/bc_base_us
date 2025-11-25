@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Interaction;
+
+using System.Integration.Word;
+
 table 5074 "Delivery Sorter"
 {
     Caption = 'Delivery Sorter';

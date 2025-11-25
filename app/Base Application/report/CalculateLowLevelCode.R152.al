@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.BOM.Tree;
+
 report 152 "Calculate Low Level Code"
 {
     ApplicationArea = Planning;
@@ -27,14 +31,8 @@ report 152 "Calculate Low Level Code"
     }
 
     trigger OnInitReport()
-    var
-        ManfacturingSetup: Record "Manufacturing Setup";
     begin
-        ManfacturingSetup.Get();
-        if ManfacturingSetup."Optimize low-level code calc." then
-            Codeunit.Run(Codeunit::"Low-Level Code Calculator")
-        else
-            CODEUNIT.Run(CODEUNIT::"Calc. Low-level code");
+        Codeunit.Run(Codeunit::"Low-Level Code Calculator");
     end;
 }
 

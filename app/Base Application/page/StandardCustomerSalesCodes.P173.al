@@ -18,7 +18,7 @@ page 173 "Standard Customer Sales Codes"
                     ToolTip = 'Specifies the customer number of the customer to which the standard sales code is assigned.';
                     Visible = false;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a standard sales code from the Standard Sales Code table.';
@@ -53,7 +53,7 @@ page 173 "Standard Customer Sales Codes"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the ID of the direct-debit mandate that this standard customer sales code uses to create sales invoices for direct debit collection.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -109,7 +109,7 @@ page 173 "Standard Customer Sales Codes"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Standard Sales Code Card";
-                    RunPageLink = Code = FIELD(Code);
+                    RunPageLink = Code = field(Code);
                     Scope = Repeater;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';

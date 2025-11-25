@@ -1,3 +1,9 @@
+namespace Microsoft.Intercompany.Dimension;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Intercompany.Partner;
+using System.Reflection;
+
 table 442 "IC Document Dimension"
 {
     Caption = 'IC Document Dimension';
@@ -8,7 +14,7 @@ table 442 "IC Document Dimension"
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(2; "Transaction No."; Integer)
         {
@@ -46,7 +52,7 @@ table 442 "IC Document Dimension"
         {
             Caption = 'Dimension Value Code';
             NotBlank = true;
-            TableRelation = "IC Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
+            TableRelation = "IC Dimension Value".Code where("Dimension Code" = field("Dimension Code"));
 
             trigger OnValidate()
             begin

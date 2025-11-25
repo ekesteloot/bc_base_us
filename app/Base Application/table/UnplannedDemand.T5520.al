@@ -1,3 +1,13 @@
+namespace Microsoft.InventoryMgt.Planning;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5520 "Unplanned Demand"
 {
     Caption = 'Unplanned Demand';
@@ -127,9 +137,9 @@ table 5520 "Unplanned Demand"
         field(18; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                            "Item Filter" = FIELD("Item No."),
-                                            "Variant Filter" = FIELD("Variant Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"),
+                                            "Item Filter" = field("Item No."),
+                                            "Variant Filter" = field("Variant Code"));
         }
         field(19; "Qty. per Unit of Measure"; Decimal)
         {
@@ -141,7 +151,7 @@ table 5520 "Unplanned Demand"
         field(20; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(21; Reserve; Boolean)
         {

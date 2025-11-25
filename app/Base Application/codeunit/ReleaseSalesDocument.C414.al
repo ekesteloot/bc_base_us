@@ -1,4 +1,12 @@
-﻿codeunit 414 "Release Sales Document"
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Sales.Setup;
+
+codeunit 414 "Release Sales Document"
 {
     TableNo = "Sales Header";
     Permissions = TableData "Sales Header" = rm,
@@ -365,7 +373,7 @@
         SkipCheckReleaseRestrictions := true;
     end;
 
-    internal procedure SetSkipWhseRequestOperations(NewSkipWhseRequestOperations: Boolean)
+    procedure SetSkipWhseRequestOperations(NewSkipWhseRequestOperations: Boolean)
     begin
         SkipWhseRequestOperations := NewSkipWhseRequestOperations;
     end;

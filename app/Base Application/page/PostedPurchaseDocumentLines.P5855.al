@@ -1,3 +1,8 @@
+﻿namespace Microsoft.Purchases.History;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+
 page 5855 "Posted Purchase Document Lines"
 {
     Caption = 'Posted Purchase Document Lines';
@@ -71,28 +76,28 @@ page 5855 "Posted Purchase Document Lines"
                                 ChangeSubMenu(0);
                         end;
                     }
-                    field("STRSUBSTNO('(%1)',""No. of Pstd. Receipts"")"; StrSubstNo('(%1)', "No. of Pstd. Receipts"))
+                    field("STRSUBSTNO('(%1)',""No. of Pstd. Receipts"")"; StrSubstNo('(%1)', Rec."No. of Pstd. Receipts"))
                     {
                         ApplicationArea = Suite;
                         Caption = '&Posted Receipts';
                         Editable = false;
                         ToolTip = 'Specifies the lines that represent posted receipts.';
                     }
-                    field(NoOfPostedInvoices; StrSubstNo('(%1)', "No. of Pstd. Invoices" - NoOfPostedPrepmtInvoices()))
+                    field(NoOfPostedInvoices; StrSubstNo('(%1)', Rec."No. of Pstd. Invoices" - NoOfPostedPrepmtInvoices()))
                     {
                         ApplicationArea = Suite;
                         Caption = 'Posted I&nvoices';
                         Editable = false;
                         ToolTip = 'Specifies the lines that represent posted invoices.';
                     }
-                    field("STRSUBSTNO('(%1)',""No. of Pstd. Return Shipments"")"; StrSubstNo('(%1)', "No. of Pstd. Return Shipments"))
+                    field("STRSUBSTNO('(%1)',""No. of Pstd. Return Shipments"")"; StrSubstNo('(%1)', Rec."No. of Pstd. Return Shipments"))
                     {
                         ApplicationArea = Suite;
                         Caption = 'Posted Ret&urn Shipments';
                         Editable = false;
                         ToolTip = 'Specifies the lines that represent posted return shipments.';
                     }
-                    field(NoOfPostedCrMemos; StrSubstNo('(%1)', "No. of Pstd. Credit Memos" - NoOfPostedPrepmtCrMemos()))
+                    field(NoOfPostedCrMemos; StrSubstNo('(%1)', Rec."No. of Pstd. Credit Memos" - NoOfPostedPrepmtCrMemos()))
                     {
                         ApplicationArea = Suite;
                         Caption = 'Posted Cr. &Memos';
@@ -112,29 +117,29 @@ page 5855 "Posted Purchase Document Lines"
                 part(PostedInvoices; "Get Post.Doc - P.InvLn Subform")
                 {
                     ApplicationArea = All;
-                    SubPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    SubPageView = SORTING("Buy-from Vendor No.");
+                    SubPageLink = "Buy-from Vendor No." = field("No.");
+                    SubPageView = sorting("Buy-from Vendor No.");
                     Visible = PostedInvoicesVisible;
                 }
                 part(PostedRcpts; "Get Post.Doc - P.RcptLn Sbfrm")
                 {
                     ApplicationArea = All;
-                    SubPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    SubPageView = SORTING("Buy-from Vendor No.");
+                    SubPageLink = "Buy-from Vendor No." = field("No.");
+                    SubPageView = sorting("Buy-from Vendor No.");
                     Visible = PostedRcptsVisible;
                 }
                 part(PostedCrMemos; "Get Post.Doc-P.Cr.MemoLn Sbfrm")
                 {
                     ApplicationArea = All;
-                    SubPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    SubPageView = SORTING("Buy-from Vendor No.");
+                    SubPageLink = "Buy-from Vendor No." = field("No.");
+                    SubPageView = sorting("Buy-from Vendor No.");
                     Visible = PostedCrMemosVisible;
                 }
                 part(PostedReturnShpts; "Get Pst.Doc-RtrnShptLn Subform")
                 {
                     ApplicationArea = All;
-                    SubPageLink = "Buy-from Vendor No." = FIELD("No.");
-                    SubPageView = SORTING("Buy-from Vendor No.");
+                    SubPageLink = "Buy-from Vendor No." = field("No.");
+                    SubPageView = sorting("Buy-from Vendor No.");
                     Visible = PostedReturnShptsVisible;
                 }
             }
@@ -147,7 +152,7 @@ page 5855 "Posted Purchase Document Lines"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields(
+        Rec.CalcFields(
           "No. of Pstd. Receipts", "No. of Pstd. Invoices",
           "No. of Pstd. Return Shipments", "No. of Pstd. Credit Memos");
         CurrentMenuTypeOpt := CurrentMenuType;
@@ -163,7 +168,7 @@ page 5855 "Posted Purchase Document Lines"
         CurrentMenuType := 1;
         ChangeSubMenu(CurrentMenuType);
 
-        SetRange("No.", "No.");
+        Rec.SetRange("No.", Rec."No.");
 
         OriginalQuantity := false;
     end;
@@ -178,19 +183,14 @@ page 5855 "Posted Purchase Document Lines"
         Text000: Label 'The document lines that have a G/L account that does not allow direct posting have not been copied to the new document.';
         OriginalQuantity: Boolean;
         Text002: Label 'Document Type Filter';
-        [InDataSet]
         PostedRcptsVisible: Boolean;
-        [InDataSet]
         PostedInvoicesVisible: Boolean;
-        [InDataSet]
         PostedReturnShptsVisible: Boolean;
-        [InDataSet]
         PostedCrMemosVisible: Boolean;
         CurrentMenuTypeOpt: Option x0,x1,x2,x3;
 
     protected var
         ToPurchHeader: Record "Purchase Header";
-        [InDataSet]
         ShowRevLineEnable: Boolean;
 
     [Scope('OnPrem')]
@@ -210,7 +210,7 @@ page 5855 "Posted Purchase Document Lines"
                     CurrPage.PostedRcpts.PAGE.GetSelectedLine(FromPurchRcptLine);
                     CopyDocMgt.SetProperties(false, false, false, false, true, true, OriginalQuantity);
                     CopyDocMgt.CopyPurchaseLinesToDoc(
-                      "Purchase Document Type From"::"Posted Receipt".AsInteger(), ToPurchHeader,
+                      Enum::"Purchase Document Type From"::"Posted Receipt".AsInteger(), ToPurchHeader,
                       FromPurchRcptLine, FromPurchInvLine, FromReturnShptLine, FromPurchCrMemoLine, LinesNotCopied, MissingExCostRevLink);
                 end;
             1:
@@ -218,7 +218,7 @@ page 5855 "Posted Purchase Document Lines"
                     CurrPage.PostedInvoices.PAGE.GetSelectedLine(FromPurchInvLine);
                     CopyDocMgt.SetProperties(false, false, false, false, true, true, OriginalQuantity);
                     CopyDocMgt.CopyPurchaseLinesToDoc(
-                      "Purchase Document Type From"::"Posted Invoice".AsInteger(), ToPurchHeader,
+                      Enum::"Purchase Document Type From"::"Posted Invoice".AsInteger(), ToPurchHeader,
                       FromPurchRcptLine, FromPurchInvLine, FromReturnShptLine, FromPurchCrMemoLine, LinesNotCopied, MissingExCostRevLink);
                 end;
             2:
@@ -226,7 +226,7 @@ page 5855 "Posted Purchase Document Lines"
                     CurrPage.PostedReturnShpts.PAGE.GetSelectedLine(FromReturnShptLine);
                     CopyDocMgt.SetProperties(false, false, false, false, true, true, OriginalQuantity);
                     CopyDocMgt.CopyPurchaseLinesToDoc(
-                      "Purchase Document Type From"::"Posted Return Shipment".AsInteger(), ToPurchHeader,
+                      Enum::"Purchase Document Type From"::"Posted Return Shipment".AsInteger(), ToPurchHeader,
                       FromPurchRcptLine, FromPurchInvLine, FromReturnShptLine, FromPurchCrMemoLine, LinesNotCopied, MissingExCostRevLink);
                 end;
             3:
@@ -234,7 +234,7 @@ page 5855 "Posted Purchase Document Lines"
                     CurrPage.PostedCrMemos.PAGE.GetSelectedLine(FromPurchCrMemoLine);
                     CopyDocMgt.SetProperties(false, false, false, false, true, true, OriginalQuantity);
                     CopyDocMgt.CopyPurchaseLinesToDoc(
-                      "Purchase Document Type From"::"Posted Credit Memo".AsInteger(), ToPurchHeader,
+                      Enum::"Purchase Document Type From"::"Posted Credit Memo".AsInteger(), ToPurchHeader,
                       FromPurchRcptLine, FromPurchInvLine, FromReturnShptLine, FromPurchCrMemoLine, LinesNotCopied, MissingExCostRevLink);
                 end;
         end;
@@ -304,7 +304,7 @@ page 5855 "Posted Purchase Document Lines"
     var
         PurchInvHeader: Record "Purch. Inv. Header";
     begin
-        PurchInvHeader.SetRange("Buy-from Vendor No.", "No.");
+        PurchInvHeader.SetRange("Buy-from Vendor No.", Rec."No.");
         PurchInvHeader.SetRange("Prepayment Invoice", true);
         exit(PurchInvHeader.Count);
     end;
@@ -313,7 +313,7 @@ page 5855 "Posted Purchase Document Lines"
     var
         PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
     begin
-        PurchCrMemoHdr.SetRange("Buy-from Vendor No.", "No.");
+        PurchCrMemoHdr.SetRange("Buy-from Vendor No.", Rec."No.");
         PurchCrMemoHdr.SetRange("Prepayment Credit Memo", true);
         exit(PurchCrMemoHdr.Count);
     end;

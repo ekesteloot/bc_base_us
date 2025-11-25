@@ -137,8 +137,8 @@ report 10093 "Open Vendor Entries"
             }
             dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
             {
-                DataItemLink = "Vendor No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Currency Code" = FIELD("Currency Filter"), "Posting Date" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date") WHERE(Open = CONST(true));
+                DataItemLink = "Vendor No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Currency Code" = field("Currency Filter"), "Posting Date" = field("Date Filter");
+                DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date") where(Open = const(true));
                 RequestFilterFields = "Document Type", "On Hold";
                 column(Vendor_Ledger_Entry__Posting_Date_; "Posting Date")
                 {

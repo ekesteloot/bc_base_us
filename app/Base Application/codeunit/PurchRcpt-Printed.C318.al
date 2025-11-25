@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.History;
+
 codeunit 318 "Purch.Rcpt.-Printed"
 {
     Permissions = TableData "Purch. Rcpt. Header" = rimd;
@@ -6,10 +8,10 @@ codeunit 318 "Purch.Rcpt.-Printed"
     trigger OnRun()
     begin
         OnBeforeOnRun(Rec, SuppressCommit);
-        Find();
-        "No. Printed" := "No. Printed" + 1;
+        Rec.Find();
+        Rec."No. Printed" := Rec."No. Printed" + 1;
         OnBeforeModify(Rec);
-        Modify();
+        Rec.Modify();
         if not SuppressCommit then
             Commit();
     end;

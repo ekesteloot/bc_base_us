@@ -1,10 +1,39 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.BankMgt.PositivePay;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Foundation.Company;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Reports;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Automation;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Telemetry;
+using System.Integration;
+using System.Privacy;
+using System.Threading;
+using System.Utilities;
+
 page 256 "Payment Journal"
 {
     AdditionalSearchTerms = 'print check,payment file export,electronic payment';
     ApplicationArea = Basic, Suite;
     AutoSplitKey = true;
     Caption = 'Payment Journals';
-    DataCaptionExpression = DataCaption();
+    DataCaptionExpression = Rec.DataCaption();
     DelayedInsert = true;
     PageType = Worksheet;
     SaveValues = true;
@@ -326,7 +355,7 @@ page 256 "Payment Journal"
                     ToolTip = 'Specifies the code of the VAT product posting group that will be used when you post the entry on the journal line.';
                     Visible = false;
                 }
-                field("Applied (Yes/No)"; IsApplied())
+                field("Applied (Yes/No)"; Rec.IsApplied())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Applied (Yes/No)';
@@ -337,7 +366,7 @@ page 256 "Payment Journal"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of the posted document that this document or journal line will be applied to when you post, for example to register payment.';
                 }
-                field(AppliesToDocNo; "Applies-to Doc. No.")
+                field(AppliesToDocNo; Rec."Applies-to Doc. No.")
                 {
                     ApplicationArea = Basic, Suite;
                     StyleExpr = StyleTxt;
@@ -350,7 +379,7 @@ page 256 "Payment Journal"
                     ToolTip = 'Specifies the ID of entries that will be applied to when you choose the Apply Entries action.';
                     Visible = false;
                 }
-                field(GetAppliesToDocDueDate; GetAppliesToDocDueDate())
+                field(GetAppliesToDocDueDate; Rec.GetAppliesToDocDueDate())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Applies-to Doc. Due Date';
@@ -517,9 +546,9 @@ page 256 "Payment Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
@@ -533,9 +562,9 @@ page 256 "Payment Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
@@ -549,9 +578,9 @@ page 256 "Payment Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
@@ -565,9 +594,9 @@ page 256 "Payment Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
@@ -581,9 +610,9 @@ page 256 "Payment Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
@@ -597,9 +626,9 @@ page 256 "Payment Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
@@ -614,7 +643,7 @@ page 256 "Payment Journal"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the address for the remit-to code.';
                     Visible = true;
-                    TableRelation = "Remit Address".Code WHERE("Vendor No." = FIELD("Account No."));
+                    TableRelation = "Remit Address".Code where("Vendor No." = field("Account No."));
                 }
             }
             group(Control24)
@@ -694,16 +723,16 @@ page 256 "Payment Journal"
             {
                 ApplicationArea = Basic, Suite;
                 Visible = BackgroundErrorCheck;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             part(JournalLineDetails; "Journal Line Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -714,14 +743,14 @@ page 256 "Payment Journal"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Payment File Errors';
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Journal Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Journal Line No." = field("Line No.");
             }
             part(Control1900919607; "Dimension Set Entries FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Dimension Set ID" = FIELD("Dimension Set ID");
+                SubPageLink = "Dimension Set ID" = field("Dimension Set ID");
                 Visible = false;
             }
             part(WorkflowStatusBatch; "Workflow Status FactBox")
@@ -774,7 +803,7 @@ page 256 "Payment Journal"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -862,9 +891,9 @@ page 256 "Payment Journal"
                     Caption = 'P&review Check';
                     Image = ViewCheck;
                     RunObject = Page "Check Preview";
-                    RunPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                                  "Journal Batch Name" = FIELD("Journal Batch Name"),
-                                  "Line No." = FIELD("Line No.");
+                    RunPageLink = "Journal Template Name" = field("Journal Template Name"),
+                                  "Journal Batch Name" = field("Journal Batch Name"),
+                                  "Line No." = field("Line No.");
                     ToolTip = 'Preview the check before printing it.';
                 }
                 action(PrintCheck)
@@ -915,7 +944,7 @@ page 256 "Payment Journal"
                             FeatureTelemetry.LogUptake('0000H8H', ElectronicPaymentTok, Enum::"Feature Uptake Status"::Discovered);
                             Rec.CheckIfPrivacyBlocked();
 
-                            GenJournalBatch.Get("Journal Template Name", CurrentJnlBatchName);
+                            GenJournalBatch.Get(Rec."Journal Template Name", CurrentJnlBatchName);
                             GenJournalBatch.TestField("Posting No. Series", '');
                             BankAccount.Get(GenJournalBatch."Bal. Account No.");
 
@@ -930,8 +959,8 @@ page 256 "Payment Journal"
                                 CompanyInformation.TestField("Federal ID No.");
                                 GenJournalLine.Reset();
                                 GenJournalLine.Copy(Rec);
-                                GenJournalLine.SetRange("Journal Template Name", "Journal Template Name");
-                                GenJournalLine.SetRange("Journal Batch Name", "Journal Batch Name");
+                                GenJournalLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+                                GenJournalLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
                                 if GenJournalLine.FindSet() then begin
                                     // Clear all erorrs in the batch, all lines will be re-checked in the loop below
                                     GenJournalLine.DeletePaymentFileBatchErrors();
@@ -949,10 +978,10 @@ page 256 "Payment Journal"
                                     Error(HasErrorsErr);
                                 end;
 
-                                if "Bank Payment Type" = "Bank Payment Type"::"Electronic Payment" then
+                                if Rec."Bank Payment Type" = Rec."Bank Payment Type"::"Electronic Payment" then
                                     BankExportImportSetup.Get(BankAccount."Payment Export Format")
                                 else
-                                    if "Bank Payment Type" = "Bank Payment Type"::"Electronic Payment-IAT" then
+                                    if Rec."Bank Payment Type" = Rec."Bank Payment Type"::"Electronic Payment-IAT" then
                                         BankExportImportSetup.Get(BankAccount."EFT Export Code");
 
                                 if GenJournalLine.FindFirst() then begin
@@ -984,10 +1013,10 @@ page 256 "Payment Journal"
                             GenJournalLine: Record "Gen. Journal Line";
                             VoidTransmitElecPayments: Report "Void/Transmit Elec. Payments";
                         begin
-                            if "Account Type" = "Account Type"::"Bank Account" then
-                                BankAccount.Get("Account No.");
-                            if "Bal. Account Type" = "Bal. Account Type"::"Bank Account" then
-                                BankAccount.Get("Bal. Account No.");
+                            if Rec."Account Type" = Rec."Account Type"::"Bank Account" then
+                                BankAccount.Get(Rec."Account No.");
+                            if Rec."Bal. Account Type" = Rec."Bal. Account Type"::"Bank Account" then
+                                BankAccount.Get(Rec."Bal. Account No.");
                             if (BankAccount."Export Format" = 0) or (BankAccount."Export Format" = BankAccount."Export Format"::Other) then begin
                                 GenJournalLine.CopyFilters(Rec);
                                 if not EntriesToVoid(GenJournalLine, true) then
@@ -997,18 +1026,18 @@ page 256 "Payment Journal"
                             end else begin
                                 GenJournalLine.Reset();
                                 GenJournalLine := Rec;
-                                GenJournalLine.SetRange("Journal Template Name", "Journal Template Name");
-                                GenJournalLine.SetRange("Journal Batch Name", "Journal Batch Name");
+                                GenJournalLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+                                GenJournalLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
                                 if not EntriesToVoid(GenJournalLine, false) then
                                     Error(NoEntriesToVoidErr);
                                 Clear(VoidTransmitElecPayments);
                                 VoidTransmitElecPayments.SetUsageType(1);   // Void
                                 VoidTransmitElecPayments.SetTableView(GenJournalLine);
-                                if "Account Type" = "Account Type"::"Bank Account" then
-                                    VoidTransmitElecPayments.SetBankAccountNo("Account No.")
+                                if Rec."Account Type" = Rec."Account Type"::"Bank Account" then
+                                    VoidTransmitElecPayments.SetBankAccountNo(Rec."Account No.")
                                 else
-                                    if "Bal. Account Type" = "Bal. Account Type"::"Bank Account" then
-                                        VoidTransmitElecPayments.SetBankAccountNo("Bal. Account No.");
+                                    if Rec."Bal. Account Type" = Rec."Bal. Account Type"::"Bank Account" then
+                                        VoidTransmitElecPayments.SetBankAccountNo(Rec."Bal. Account No.");
                                 VoidTransmitElecPayments.RunModal();
                             end;
                         end;
@@ -1027,10 +1056,10 @@ page 256 "Payment Journal"
                             BankAccount: Record "Bank Account";
                             GenJournalLine: Record "Gen. Journal Line";
                         begin
-                            if "Account Type" = "Account Type"::"Bank Account" then
-                                BankAccount.Get("Account No.");
-                            if "Bal. Account Type" = "Bal. Account Type"::"Bank Account" then
-                                BankAccount.Get("Bal. Account No.");
+                            if Rec."Account Type" = Rec."Account Type"::"Bank Account" then
+                                BankAccount.Get(Rec."Account No.");
+                            if Rec."Bal. Account Type" = Rec."Bal. Account Type"::"Bank Account" then
+                                BankAccount.Get(Rec."Bal. Account No.");
                             if (BankAccount."Export Format" = 0) or (BankAccount."Export Format" = BankAccount."Export Format"::Other) then begin
                                 GenJournalLine.CopyFilters(Rec);
                                 if GenJournalLine.FindFirst() then
@@ -1196,7 +1225,7 @@ page 256 "Payment Journal"
                         GenJnlBatch: Record "Gen. Journal Batch";
                         BankAcc: Record "Bank Account";
                     begin
-                        GenJnlBatch.Get("Journal Template Name", CurrentJnlBatchName);
+                        GenJnlBatch.Get(Rec."Journal Template Name", CurrentJnlBatchName);
                         if GenJnlBatch."Bal. Account Type" = GenJnlBatch."Bal. Account Type"::"Bank Account" then begin
                             BankAcc."No." := GenJnlBatch."Bal. Account No.";
                             PAGE.Run(PAGE::"Positive Pay Export", BankAcc);
@@ -1217,7 +1246,7 @@ page 256 "Payment Journal"
                         GenerateEFTFiles: Page "Generate EFT Files";
                     begin
                         FeatureTelemetry.LogUptake('0000H8I', ElectronicPaymentTok, Enum::"Feature Uptake Status"::"Used");
-                        GenJournalBatch.Get("Journal Template Name", CurrentJnlBatchName);
+                        GenJournalBatch.Get(Rec."Journal Template Name", CurrentJnlBatchName);
                         GenerateEFTFiles.SetBalanceAccount(GenJournalBatch."Bal. Account No.");
                         GenerateEFTFiles.Run();
                         FeatureTelemetry.LogUsage('0000H8J', ElectronicPaymentTok, 'EFT generated');
@@ -1459,9 +1488,9 @@ page 256 "Payment Journal"
                     Caption = 'Create a Power Automate approval flow';
                     ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
-                    Visible = IsSaaS and PowerAutomateTemplatesEnabled;
+                    Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
 #else
-                    Visible = IsSaaS;
+                    Visible = IsSaaS and IsPowerAutomatePrivacyNoticeApproved;
 #endif
                     CustomActionType = FlowTemplateGallery;
                     FlowTemplateCategoryName = 'd365bc_approval_generalJournal';
@@ -1473,7 +1502,7 @@ page 256 "Payment Journal"
                     Caption = 'Create a Power Automate approval flow';
                     Image = Flow;
                     ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
-                    Visible = IsSaaS and not PowerAutomateTemplatesEnabled;
+                    Visible = IsSaaS and not PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
                     ObsoleteReason = 'This action will be handled by platform as part of the CreateFlowFromTemplate customaction';
                     ObsoleteState = Pending;
                     ObsoleteTag = '22.0';
@@ -1519,8 +1548,8 @@ page 256 "Payment Journal"
                     var
                         TempApprovalWorkflowWizard: Record "Approval Workflow Wizard" temporary;
                     begin
-                        TempApprovalWorkflowWizard."Journal Batch Name" := "Journal Batch Name";
-                        TempApprovalWorkflowWizard."Journal Template Name" := "Journal Template Name";
+                        TempApprovalWorkflowWizard."Journal Batch Name" := Rec."Journal Batch Name";
+                        TempApprovalWorkflowWizard."Journal Template Name" := Rec."Journal Template Name";
                         TempApprovalWorkflowWizard."For All Batches" := false;
                         TempApprovalWorkflowWizard.Insert();
 
@@ -1608,7 +1637,7 @@ page 256 "Payment Journal"
                             ApprovalsMgmt.GetApprovalComment(Rec)
                         else
                             if OpenApprovalEntriesOnJnlBatchExist then
-                                if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
+                                if GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
                                     ApprovalsMgmt.GetApprovalComment(GenJournalBatch);
                     end;
                 }
@@ -1629,7 +1658,7 @@ page 256 "Payment Journal"
                     var
                         ODataUtility: Codeunit ODataUtility;
                     begin
-                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption(), CurrPage.ObjectId(false), "Journal Batch Name", "Journal Template Name");
+                        ODataUtility.EditJournalWorksheetInExcel(CurrPage.Caption(), CurrPage.ObjectId(false), Rec."Journal Batch Name", Rec."Journal Template Name");
                     end;
                 }
             }
@@ -1850,18 +1879,18 @@ page 256 "Payment Journal"
         WorkflowEventHandling: Codeunit "Workflow Event Handling";
         WorkflowManagement: Codeunit "Workflow Management";
     begin
-        StyleTxt := GetOverdueDateInteractions(OverdueWarningText);
+        StyleTxt := Rec.GetOverdueDateInteractions(OverdueWarningText);
         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
         UpdateBalance();
         EnableApplyEntriesAction();
         SetControlAppearance();
         CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
 
-        if GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then begin
+        if GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then begin
             ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.PAGE.SetFilterOnWorkflowRecord(GenJournalBatch.RecordId);
             IsAllowPaymentExport := GenJournalBatch."Allow Payment Export";
         end;
-        ShowWorkflowStatusOnLine := CurrPage.WorkflowStatusLine.PAGE.SetFilterOnWorkflowRecord(RecordId);
+        ShowWorkflowStatusOnLine := CurrPage.WorkflowStatusLine.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
 
         EventFilter := WorkflowEventHandling.RunWorkflowOnSendGeneralJournalLineForApprovalCode();
         EnabledApprovalWorkflowsExist := WorkflowManagement.EnabledWorkflowExist(DATABASE::"Gen. Journal Line", EventFilter);
@@ -1872,22 +1901,27 @@ page 256 "Payment Journal"
 
     trigger OnAfterGetRecord()
     begin
-        StyleTxt := GetOverdueDateInteractions(OverdueWarningText);
+        StyleTxt := Rec.GetOverdueDateInteractions(OverdueWarningText);
         GenJnlManagement.GetAccounts(Rec, AccName, BalAccName);
-        ShowShortcutDimCode(ShortcutDimCode);
-        HasPmtFileErr := HasPaymentFileErrors();
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
+        HasPmtFileErr := Rec.HasPaymentFileErrors();
         RecipientBankAccountMandatory := IsAllowPaymentExport and
-          (("Bal. Account Type" = "Bal. Account Type"::Vendor) or ("Bal. Account Type" = "Bal. Account Type"::Customer));
+          ((Rec."Bal. Account Type" = Rec."Bal. Account Type"::Vendor) or (Rec."Bal. Account Type" = Rec."Bal. Account Type"::Customer));
         SetAMCAppearance();
-        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(RecordId);
+        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(Rec.RecordId);
     end;
 
     trigger OnInit()
+    var
+        PrivacyNotice: Codeunit "Privacy Notice";
+        PrivacyNoticeRegistrations: Codeunit "Privacy Notice Registrations";
     begin
         TotalBalanceVisible := true;
         BalanceVisible := true;
         AmountVisible := true;
         GeneralLedgerSetup.Get();
+        IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
+
         SetJobQueueVisibility();
 
 #if not CLEAN22
@@ -1897,7 +1931,7 @@ page 256 "Payment Journal"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(RecordId);
+        CurrPage.IncomingDocAttachFactBox.PAGE.SetCurrentRecordID(Rec.RecordId);
     end;
 
     trigger OnModifyRecord(): Boolean
@@ -1912,10 +1946,10 @@ page 256 "Payment Journal"
         HasPmtFileErr := false;
         UpdateBalance();
         EnableApplyEntriesAction();
-        SetUpNewLine(xRec, Balance, BelowxRec);
+        Rec.SetUpNewLine(xRec, Balance, BelowxRec);
         Clear(ShortcutDimCode);
         if not VoidWarningDisplayed then begin
-            GenJnlTemplate.Get("Journal Template Name");
+            GenJnlTemplate.Get(Rec."Journal Template Name");
             if not GenJnlTemplate."Force Doc. Balance" then
                 Message(CheckCannotVoidMsg);
             VoidWarningDisplayed := true;
@@ -1944,7 +1978,7 @@ page 256 "Payment Journal"
         SetDimensionsVisibility();
 
         if Rec.IsOpenedFromBatch() then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             GenJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
             SetControlAppearanceFromBatch();
             exit;
@@ -1977,15 +2011,13 @@ page 256 "Payment Journal"
         ShowBalance: Boolean;
         ShowTotalBalance: Boolean;
         HasPmtFileErr: Boolean;
-        [InDataSet]
         BalanceVisible: Boolean;
-        [InDataSet]
         TotalBalanceVisible: Boolean;
-        [InDataSet]
         IsPostingGroupEditable: Boolean;
         StyleTxt: Text;
         OverdueWarningText: Text;
         EventFilter: Text;
+        IsPowerAutomatePrivacyNoticeApproved: Boolean;
         OpenApprovalEntriesExistForCurrUser: Boolean;
         OpenApprovalEntriesExistForCurrUserBatch: Boolean;
         OpenApprovalEntriesOnJnlBatchExist: Boolean;
@@ -2061,7 +2093,7 @@ page 256 "Payment Journal"
         BalanceVisible := ShowBalance;
         TotalBalanceVisible := ShowTotalBalance;
         if ShowTotalBalance then
-            NumberOfRecords := Count();
+            NumberOfRecords := Rec.Count();
 
         OnAfterUpdateBalance(TotalBalanceVisible);
     end;
@@ -2122,7 +2154,7 @@ page 256 "Payment Journal"
 
         OpenApprovalEntriesOnBatchOrAnyJnlLineExist :=
           OpenApprovalEntriesOnJnlBatchExist or
-          ApprovalsMgmt.HasAnyOpenJournalLineApprovalEntries("Journal Template Name", "Journal Batch Name");
+          ApprovalsMgmt.HasAnyOpenJournalLineApprovalEntries(Rec."Journal Template Name", Rec."Journal Batch Name");
     end;
 
     local procedure SetControlAppearance()
@@ -2132,14 +2164,14 @@ page 256 "Payment Journal"
         CanRequestFlowApprovalForLine: Boolean;
     begin
         OpenApprovalEntriesExistForCurrUser :=
-          OpenApprovalEntriesExistForCurrUserBatch or ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
+          OpenApprovalEntriesExistForCurrUserBatch or ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(Rec.RecordId);
 
-        OpenApprovalEntriesOnJnlLineExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesOnJnlLineExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
         OpenApprovalEntriesOnBatchOrCurrJnlLineExist := OpenApprovalEntriesOnJnlBatchExist or OpenApprovalEntriesOnJnlLineExist;
 
-        CanCancelApprovalForJnlLine := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForJnlLine := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestFlowApprovalForLine, CanCancelFlowApprovalForLine);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestFlowApprovalForLine, CanCancelFlowApprovalForLine);
         CanRequestFlowApprovalForBatchAndCurrentLine := CanRequestFlowApprovalForBatch and CanRequestFlowApprovalForLine;
     end;
 
@@ -2184,8 +2216,8 @@ page 256 "Payment Journal"
            ((GenJnlLine."Bank Payment Type" <> GenJnlLine."Bank Payment Type"::"Electronic Payment") and
             (GenJnlLine."Bank Payment Type" <> GenJnlLine."Bank Payment Type"::"Electronic Payment-IAT"))
         then
-            GenJnlLine.InsertPaymentFileError(StrSubstNo(WrongBankPaymentTypeErr, FieldCaption("Bank Payment Type"),
-                "Bank Payment Type"::"Electronic Payment", "Bank Payment Type"::"Electronic Payment-IAT"));
+            GenJnlLine.InsertPaymentFileError(StrSubstNo(WrongBankPaymentTypeErr, Rec.FieldCaption("Bank Payment Type"),
+                Rec."Bank Payment Type"::"Electronic Payment", Rec."Bank Payment Type"::"Electronic Payment-IAT"));
         if not GenJournalBatch."Allow Payment Export" then
             PaymentExportGenJnlCheck.AddBatchEmptyError(GenJnlLine, GenJournalBatch.FieldCaption("Allow Payment Export"), '');
         if GenJnlLine.Amount < 0 then
@@ -2205,7 +2237,7 @@ page 256 "Payment Journal"
         GenJournalBatch: Record "Gen. Journal Batch";
     begin
         AMCFormat := false;
-        if GenJournalBatch.Get("Journal Template Name", CurrentJnlBatchName) then
+        if GenJournalBatch.Get(Rec."Journal Template Name", CurrentJnlBatchName) then
             if BankAccount.Get(GenJournalBatch."Bal. Account No.") then
                 if GenJournalBatch."Bal. Account Type" = GenJournalBatch."Bal. Account Type"::"Bank Account" then
                     if (BankAccount."Export Format" = 0) or (BankAccount."Export Format" = BankAccount."Export Format"::Other) then

@@ -1,3 +1,7 @@
+namespace System.Text;
+
+using System.Utilities;
+
 codeunit 47 StringConversionManagement
 {
 

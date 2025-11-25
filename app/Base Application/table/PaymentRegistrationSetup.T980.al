@@ -1,3 +1,9 @@
+namespace Microsoft.BankMgt.PaymentRegistration;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 table 980 "Payment Registration Setup"
 {
     Caption = 'Payment Registration Setup';
@@ -22,13 +28,13 @@ table 980 "Payment Registration Setup"
         field(3; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
 
             trigger OnValidate()
             var
                 GenJournalBatch: Record "Gen. Journal Batch";
             begin
-                if not GenJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
+                if not GenJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
                     exit;
 
                 case GenJournalBatch."Bal. Account Type" of
@@ -58,9 +64,9 @@ table 980 "Payment Registration Setup"
         field(5; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
         }
         field(6; "Use this Account as Def."; Boolean)
         {
@@ -132,7 +138,7 @@ table 980 "Payment Registration Setup"
         if "Bal. Account No." = '' then
             exit(false);
 
-        if not GenJnlBatch.Get("Journal Template Name", "Journal Batch Name") then
+        if not GenJnlBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
             exit(false);
 
         if GenJnlBatch."No. Series" = '' then

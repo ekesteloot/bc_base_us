@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Integration;
+
 table 2000000243 "Ext. Business Event Definition"
 {
     Caption = 'External Business Event Catalog';
@@ -41,6 +47,10 @@ table 2000000243 "Ext. Business Event Definition"
         field(9; "App Version"; Text[43])
         {
             Caption = 'App Version';
+        }
+        field(10; "Event Version"; Text[43])
+        {
+            Caption = 'Event Version';
         }
     }
 

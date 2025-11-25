@@ -1,7 +1,12 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Contract;
+
 report 5980 "Maintenance Visit - Planning"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Maintenance/MaintenanceVisitPlanning.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/MaintenanceVisitPlanning.rdlc';
     ApplicationArea = Service;
     Caption = 'Maintenance Visit - Planning';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5980 "Maintenance Visit - Planning"
     {
         dataitem("Service Contract Header"; "Service Contract Header")
         {
-            DataItemTableView = SORTING("Responsibility Center", "Service Zone Code", Status, "Contract Group Code") WHERE("Contract Type" = CONST(Contract), Status = CONST(Signed));
+            DataItemTableView = sorting("Responsibility Center", "Service Zone Code", Status, "Contract Group Code") where("Contract Type" = const(Contract), Status = const(Signed));
             RequestFilterFields = "Responsibility Center", "Service Zone Code", "Contract Group Code", "Contract No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -66,8 +71,8 @@ report 5980 "Maintenance Visit - Planning"
             }
             dataitem("Service Contract Line"; "Service Contract Line")
             {
-                DataItemLink = "Contract Type" = FIELD("Contract Type"), "Contract No." = FIELD("Contract No.");
-                DataItemTableView = SORTING("Contract Type", "Contract No.", "Line No.");
+                DataItemLink = "Contract Type" = field("Contract Type"), "Contract No." = field("Contract No.");
+                DataItemTableView = sorting("Contract Type", "Contract No.", "Line No.");
                 RequestFilterFields = "Next Planned Service Date";
                 column(ServZnCd_ServContractHdr; "Service Contract Header"."Service Zone Code")
                 {

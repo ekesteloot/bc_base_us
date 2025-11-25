@@ -10,6 +10,10 @@ permissionset 4423 "General Ledger - Admin"
                   tabledata "Acc. Sched. KPI Web Srv. Setup" = RIMD,
                   tabledata "Accounting Period" = RI,
                   tabledata "Activity Log" = RIMD,
+                  tabledata "Alloc. Account Distribution" = R,
+                  tabledata "Allocation Account" = R,
+                  tabledata "Allocation Line" = RIMD,
+                  tabledata "Alloc. Acc. Manual Override" = RIMD,
                   tabledata "Analysis View" = RIMD,
                   tabledata "Analysis View Filter" = RIMD,
                   tabledata "Attachment Entity Buffer" = RIMD,
@@ -68,9 +72,6 @@ permissionset 4423 "General Ledger - Admin"
                   tabledata "Incoming Document Attachment" = RIMD,
                   tabledata "Incoming Documents Setup" = RIMD,
                   tabledata "Intermediate Data Import" = Rimd,
-#if not CLEAN20
-                  tabledata "Native - Payment" = MD,
-#endif
                   tabledata "No. Series" = RIMD,
                   tabledata "No. Series Line" = RIMD,
                   tabledata "No. Series Relationship" = RIMD,
@@ -126,16 +127,6 @@ permissionset 4423 "General Ledger - Admin"
                   tabledata "Workflow Table Relation Value" = Rimd,
                   tabledata "Workflow User Group" = RIMD,
                   tabledata "Workflow User Group Member" = RIMD,
-#if not CLEAN20
-                  tabledata "XBRL Comment Line" = RIMD,
-                  tabledata "XBRL G/L Map Line" = RIMD,
-                  tabledata "XBRL Linkbase" = RIMD,
-                  tabledata "XBRL Rollup Line" = RIMD,
-                  tabledata "XBRL Schema" = RIMD,
-                  tabledata "XBRL Taxonomy" = RIMD,
-                  tabledata "XBRL Taxonomy Label" = RIMD,
-                  tabledata "XBRL Taxonomy Line" = RIMD,
-#endif
                   tabledata "XML Buffer" = R,
                   tabledata "XML Schema" = RIMD,
                   tabledata "XML Schema Element" = RIMD,

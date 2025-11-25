@@ -1,3 +1,8 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+
 page 917 "Component - Item FactBox"
 {
     Caption = 'Component - Item';
@@ -153,6 +158,12 @@ page 917 "Component - Item FactBox"
                     Caption = 'Vendor No.';
                     ToolTip = 'Specifies the number of the vendor for the item.';
                 }
+                field("Reserved from Stock"; AssemblyInfoPaneManagement.GetQtyReservedFromStockState(Rec))
+                {
+                    ApplicationArea = Reservation;
+                    Caption = 'Reserved from stock';
+                    Tooltip = 'Specifies what part of the quantity is reserved from inventory.';
+                }
             }
         }
     }
@@ -164,7 +175,7 @@ page 917 "Component - Item FactBox"
     trigger OnAfterGetRecord()
     begin
         Clear(Item);
-        if (Type = Type::Item) and Item.Get("No.") then
+        if (Rec.Type = Rec.Type::Item) and Item.Get(Rec."No.") then
             Item.CalcFields("No. of Substitutes");
     end;
 
@@ -175,59 +186,59 @@ page 917 "Component - Item FactBox"
 
     local procedure ShowNo(): Code[20]
     begin
-        if Type <> Type::Item then
+        if Rec.Type <> Rec.Type::Item then
             exit('');
         exit(Item."No.");
     end;
 
     local procedure ShowBaseUoM(): Code[10]
     begin
-        if Type <> Type::Item then
+        if Rec.Type <> Rec.Type::Item then
             exit('');
         exit(Item."Base Unit of Measure");
     end;
 
     local procedure ShowUoM(): Code[10]
     begin
-        if Type <> Type::Item then
+        if Rec.Type <> Rec.Type::Item then
             exit('');
-        exit("Unit of Measure Code");
+        exit(Rec."Unit of Measure Code");
     end;
 
     local procedure ShowQtyPerUoM(): Decimal
     begin
-        if Type <> Type::Item then
+        if Rec.Type <> Rec.Type::Item then
             exit(0);
-        exit("Qty. per Unit of Measure");
+        exit(Rec."Qty. per Unit of Measure");
     end;
 
     local procedure ShowReplenishmentSystem(): Text[50]
     begin
-        if Type <> Type::Item then
+        if Rec.Type <> Rec.Type::Item then
             exit('');
         exit(Format(Item."Replenishment System"));
     end;
 
     local procedure ShowVendorNo(): Code[20]
     begin
-        if Type <> Type::Item then
+        if Rec.Type <> Rec.Type::Item then
             exit('');
         exit(Item."Vendor No.");
     end;
 
     local procedure ShowRequiredQty(): Decimal
     begin
-        if Type <> Type::Item then
+        if Rec.Type <> Rec.Type::Item then
             exit(0);
-        CalcFields("Reserved Quantity");
-        exit(Quantity - "Reserved Quantity");
+        Rec.CalcFields("Reserved Quantity");
+        exit(Rec.Quantity - Rec."Reserved Quantity");
     end;
 
     local procedure ShowDueDate(): Text
     begin
-        if Type <> Type::Item then
+        if Rec.Type <> Rec.Type::Item then
             exit('');
-        exit(Format("Due Date"));
+        exit(Format(Rec."Due Date"));
     end;
 }
 

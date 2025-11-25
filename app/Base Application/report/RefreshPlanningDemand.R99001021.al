@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
+using Microsoft.InventoryMgt.Planning;
+
 report 99001021 "Refresh Planning Demand"
 {
     Caption = 'Refresh Planning Demand';
@@ -7,7 +11,7 @@ report 99001021 "Refresh Planning Demand"
     {
         dataitem("Requisition Line"; "Requisition Line")
         {
-            DataItemTableView = SORTING("Worksheet Template Name", "Journal Batch Name", "Line No.") WHERE("Planning Level" = CONST(0));
+            DataItemTableView = sorting("Worksheet Template Name", "Journal Batch Name", "Line No.") where("Planning Level" = const(0));
             RequestFilterFields = "Worksheet Template Name", "Journal Batch Name", "Line No.";
 
             trigger OnAfterGetRecord()

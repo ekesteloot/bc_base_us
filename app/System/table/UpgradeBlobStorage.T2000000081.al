@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Upgrade;
+
 table 2000000081 "Upgrade Blob Storage"
 {
     Caption = 'Upgrade Blob Storage';

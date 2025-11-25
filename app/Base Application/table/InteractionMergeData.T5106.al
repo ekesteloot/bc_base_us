@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Contact;
+
 table 5106 "Interaction Merge Data"
 {
     fields

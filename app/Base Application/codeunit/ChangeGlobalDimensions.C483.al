@@ -88,7 +88,7 @@ codeunit 483 "Change Global Dimensions"
         if RunTask(Rec) then begin
             DeleteEntry(Rec);
             if ChangeGlobalDimLogMgt.IsBufferClear() then
-                ResetState;
+                ResetState();
         end;
     end;
 
@@ -190,13 +190,13 @@ codeunit 483 "Change Global Dimensions"
     begin
         ChangeGlobalDimLogEntry.LockTable();
         ChangeGlobalDimLogEntry.UpdateStatus();
-        if ChangeGlobalDimLogMgt.FillBuffer then
+        if ChangeGlobalDimLogMgt.FillBuffer() then
             RerunEntry(ChangeGlobalDimLogEntry);
     end;
 
     local procedure RunTask(var ChangeGlobalDimLogEntry: Record "Change Global Dim. Log Entry") Completed: Boolean
     begin
-        ChangeGlobalDimLogEntry.SetSessionInProgress;
+        ChangeGlobalDimLogEntry.SetSessionInProgress();
         if ChangeGlobalDimHeader."Parallel Processing" then
             Commit();
         Completed := ChangeDimsOnTable(ChangeGlobalDimLogEntry);
@@ -205,11 +205,11 @@ codeunit 483 "Change Global Dimensions"
     procedure Start()
     begin
         ChangeGlobalDimHeader.Get();
-        if IsStartEnabled then begin
+        if IsStartEnabled() then begin
             SendTraceTagOn(StartTraceTagMsg);
-            CompleteEmptyTables;
+            CompleteEmptyTables();
             UpdateGLSetup();
-            ScheduleJobs(GetDelayInScheduling);
+            ScheduleJobs(GetDelayInScheduling());
             RefreshHeader();
         end;
     end;
@@ -218,16 +218,16 @@ codeunit 483 "Change Global Dimensions"
     begin
         ChangeGlobalDimHeader.Get();
         if IsPrepareEnabled(ChangeGlobalDimHeader) and not ChangeGlobalDimHeader."Parallel Processing" then begin
-            WindowOpen;
-            if PrepareTableList then begin
+            WindowOpen();
+            if PrepareTableList() then begin
                 SendTraceTagOn(SequentialStartTraceTagMsg);
-                CompleteEmptyTables;
+                CompleteEmptyTables();
                 UpdateGLSetup();
-                ProcessTableList;
+                ProcessTableList();
                 RefreshHeader();
                 SendTraceTagOn(FinishTraceTagMsg);
             end;
-            WindowClose;
+            WindowClose();
         end;
     end;
 
@@ -308,8 +308,8 @@ codeunit 483 "Change Global Dimensions"
     local procedure CalcRecordsWithinCommit(TotalRecords: Integer) RecordsWithinCommit: Integer
     begin
         RecordsWithinCommit := Round(TotalRecords / 100, 1, '>');
-        if RecordsWithinCommit < GetMinCommitSize then
-            RecordsWithinCommit := GetMinCommitSize;
+        if RecordsWithinCommit < GetMinCommitSize() then
+            RecordsWithinCommit := GetMinCommitSize();
     end;
 
     local procedure ChangeDimsOnTable(var ChangeGlobalDimLogEntry: Record "Change Global Dim. Log Entry") Completed: Boolean
@@ -337,7 +337,7 @@ codeunit 483 "Change Global Dimensions"
                 if HasDependentTable then
                     repeat
                         DependentChangeGlobalDimLogEntry."Earliest Start Date/Time" := CurrentDateTime;
-                        DependentChangeGlobalDimLogEntry.SetSessionInProgress;
+                        DependentChangeGlobalDimLogEntry.SetSessionInProgress();
                     until DependentChangeGlobalDimLogEntry.Next() = 0;
                 if ChangeGlobalDimLogEntry."Completed Records" > 0 then
                     RecRef.Next(ChangeGlobalDimLogEntry."Completed Records");
@@ -489,7 +489,7 @@ codeunit 483 "Change Global Dimensions"
     begin
         with ChangeGlobalDimLogEntry do
             if Status in [Status::" ", Status::Incomplete, Status::Scheduled] then begin
-                SendTraceTagOnRerun;
+                SendTraceTagOnRerun();
                 if "Parent Table ID" <> 0 then
                     RescheduleParentTable("Parent Table ID")
                 else
@@ -530,7 +530,7 @@ codeunit 483 "Change Global Dimensions"
             if DoNotScheduleTask then
                 "Task ID" := TaskID
             else begin
-                CancelTask;
+                CancelTask();
                 "Task ID" :=
                   TASKSCHEDULER.CreateTask(
                     CODEUNIT::"Change Global Dimensions", CODEUNIT::"Change Global Dim Err. Handler",
@@ -542,7 +542,7 @@ codeunit 483 "Change Global Dimensions"
                 Status := Status::Scheduled;
             "Earliest Start Date/Time" := StartNotBefore;
             Modify();
-            SendTraceTagOnScheduling;
+            SendTraceTagOnScheduling();
         end;
         if ChangeGlobalDimLogEntry."Is Parent Table" then
             ScheduleDependentTables(ChangeGlobalDimLogEntry);
@@ -576,14 +576,14 @@ codeunit 483 "Change Global Dimensions"
           "Client Type", '<>%1&<>%2&<>%3&<>%4',
           ActiveSession."Client Type"::"Web Service", ActiveSession."Client Type"::"Client Service",
           ActiveSession."Client Type"::NAS, ActiveSession."Client Type"::"Management Client");
-        ActiveSession.SetFilter("Session ID", '<>%1', SessionId);
-        ActiveSession.SetRange("Server Instance ID", ServiceInstanceId);
+        ActiveSession.SetFilter("Session ID", '<>%1', SessionId());
+        ActiveSession.SetRange("Server Instance ID", ServiceInstanceId());
         exit(ActiveSession.IsEmpty);
     end;
 
     procedure IsDimCodeEnabled(): Boolean
     begin
-        exit(ChangeGlobalDimLogMgt.IsBufferClear);
+        exit(ChangeGlobalDimLogMgt.IsBufferClear());
     end;
 
     procedure IsPrepareEnabled(var ChangeGlobalDimHeader: Record "Change Global Dim. Header"): Boolean
@@ -591,23 +591,23 @@ codeunit 483 "Change Global Dimensions"
         with ChangeGlobalDimHeader do
             exit(
               (("Change Type 1" <> "Change Type 1"::None) or ("Change Type 2" <> "Change Type 2"::None)) and
-              ChangeGlobalDimLogMgt.IsBufferClear);
+              ChangeGlobalDimLogMgt.IsBufferClear());
     end;
 
     procedure IsStartEnabled(): Boolean
     begin
         if ChangeGlobalDimLogMgt.IsBufferClear() then
             exit(false);
-        exit(not ChangeGlobalDimLogMgt.IsStarted);
+        exit(not ChangeGlobalDimLogMgt.IsStarted());
     end;
 
     procedure RefreshHeader()
     begin
         if ChangeGlobalDimHeader.Get() then begin
-            ChangeGlobalDimHeader.Refresh;
+            ChangeGlobalDimHeader.Refresh();
             ChangeGlobalDimHeader.Modify();
         end else begin
-            ChangeGlobalDimHeader.Refresh;
+            ChangeGlobalDimHeader.Refresh();
             ChangeGlobalDimHeader.Insert();
         end
     end;
@@ -707,7 +707,7 @@ codeunit 483 "Change Global Dimensions"
         GeneralLedgerSetup.Validate("Global Dimension 2 Code", ChangeGlobalDimHeader."Global Dimension 2 Code");
         GeneralLedgerSetup.Modify(true);
 
-        UpdateDimValues;
+        UpdateDimValues();
         if ChangeGlobalDimHeader."Parallel Processing" then
             Commit();
     end;

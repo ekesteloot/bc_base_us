@@ -1,7 +1,11 @@
+namespace Microsoft.Manufacturing.Document;
+
+using System.Utilities;
+
 report 99000768 "Prod. Order - Detailed Calc."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/ProductionOrder/ProdOrderDetailedCalc.rdlc';
+    RDLCLayout = './Manufacturing/Document/ProdOrderDetailedCalc.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Prod. Order - Detailed Calc.';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 99000768 "Prod. Order - Detailed Calc."
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.");
+            DataItemTableView = sorting(Status, "No.");
             RequestFilterFields = Status, "No.", "Source Type", "Source No.";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -46,15 +50,15 @@ report 99000768 "Prod. Order - Detailed Calc."
             }
             dataitem("Prod. Order Line"; "Prod. Order Line")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Line No.") WHERE("Planning Level Code" = CONST(0));
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Line No.") where("Planning Level Code" = const(0));
                 column(LineNo_ProdOrderLine; "Line No.")
                 {
                 }
                 dataitem("Prod. Order Routing Line"; "Prod. Order Routing Line")
                 {
-                    DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("Prod. Order No."), "Routing Reference No." = FIELD("Line No.");
-                    DataItemTableView = SORTING(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
+                    DataItemLink = Status = field(Status), "Prod. Order No." = field("Prod. Order No."), "Routing Reference No." = field("Line No.");
+                    DataItemTableView = sorting(Status, "Prod. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
                     column(OPNo_ProdOrderRtngLine; "Operation No.")
                     {
                         IncludeCaption = false;
@@ -88,8 +92,8 @@ report 99000768 "Prod. Order - Detailed Calc."
                 }
                 dataitem("Prod. Order Component"; "Prod. Order Component")
                 {
-                    DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("Prod. Order No."), "Prod. Order Line No." = FIELD("Line No.");
-                    DataItemTableView = SORTING(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
+                    DataItemLink = Status = field(Status), "Prod. Order No." = field("Prod. Order No."), "Prod. Order Line No." = field("Line No.");
+                    DataItemTableView = sorting(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.");
                     column(ItemNo_ProdOrderComp; "Item No.")
                     {
                         IncludeCaption = false;
@@ -123,7 +127,7 @@ report 99000768 "Prod. Order - Detailed Calc."
                 }
                 dataitem("Integer"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     column(ProdOrderCompOPCostAmt; "Prod. Order Component"."Cost Amount" + "Prod. Order Routing Line"."Expected Operation Cost Amt.")
                     {

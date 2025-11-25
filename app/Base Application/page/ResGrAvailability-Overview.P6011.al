@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 page 6011 "Res.Gr.Availability - Overview"
 {
     Caption = 'Res.Gr.Availability - Overview';

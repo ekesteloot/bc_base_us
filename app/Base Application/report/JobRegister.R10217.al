@@ -1,7 +1,12 @@
+namespace Microsoft.ProjectMgt.Jobs.Ledger;
+
+using Microsoft.Foundation.Company;
+using Microsoft.ProjectMgt.Jobs.Job;
+
 report 10217 "Job Register"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/JobRegister.rdlc';
+    RDLCLayout = './ProjectMgt/Jobs/Reports/JobRegister.rdlc';
     ApplicationArea = Jobs;
     Caption = 'Job Register';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 10217 "Job Register"
     {
         dataitem("Job Register"; "Job Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Creation Date", "Source Code", "Journal Batch Name";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -93,7 +98,7 @@ report 10217 "Job Register"
             }
             dataitem("Job Ledger Entry"; "Job Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 RequestFilterFields = "Job No.", "Posting Date", "Document No.";
                 column(Job_Ledger_Entry__Job_No__; "Job No.")
                 {

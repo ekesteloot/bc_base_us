@@ -68,9 +68,11 @@
         MoveLastUpdateInvoiceEntryNoValue();
         CopyIncomingDocumentURLsIntoOneFiled();
         UpgradePowerBiEmbedUrl();
+        UpgradePowerBiReportUploads();
         UpgradeSearchEmail();
         UpgradeIntegrationTableMapping();
         UpgradeIntegrationFieldMapping();
+        UpgradeAddExtraIntegrationFieldMappings();
         UpgradeWorkflowStepArgumentEventFilters();
         SetReviewRequiredOnBankPmtApplRules();
 
@@ -115,11 +117,16 @@
         UpgradeHandledICOutboxTransactionAccountNo();
         UpdateCheckWhseClassOnLocation();
         UpdateDeferralSourceCode();
+        UpdateServiceLineOrderNo();
         UpgradeMapCurrencySymbol();
         UpgradeOptionMapping();
         UpdateProductionSourceCode();
         UpgradeICGLAccountNoInPostedGenJournalLine();
         UpgradeICGLAccountNoInStandardGeneralJournalLine();
+        UpgradePurchasesPayablesAndSalesReceivablesSetups();
+        UpgradeLocationBinPolicySetups();
+        UpgradeInventorySetupAllowInvtAdjmt();
+        UpgradeGranularWarehouseHandlingSetup();
         UpgradeVATSetup();
 #if not CLEAN22
         UpgradeTimesheetExperience();
@@ -131,7 +138,7 @@
         BinContentBuffer: Record "Bin Content Buffer";
         DocumentEntry: Record "Document Entry";
         EntrySummary: Record "Entry Summary";
-#if not CLEAN20
+#if not CLEAN23
         InvoicePostBuffer: Record "Invoice Post. Buffer";
 #endif
         ItemTrackingSetup: Record "Item Tracking Setup";
@@ -152,7 +159,7 @@
         EntrySummary.Reset();
         EntrySummary.DeleteAll();
 
-#if not CLEAN20
+#if not CLEAN23
         InvoicePostBuffer.Reset();
         InvoicePostBuffer.DeleteAll();
 #endif
@@ -220,16 +227,79 @@
     local procedure UpdateDefaultDimensionsReferencedIds()
     var
         DefaultDimension: Record "Default Dimension";
+        Dimension: Record Dimension;
+        DimensionValue: Record "Dimension Value";
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        DefaultDimensionDataTransfer: DataTransfer;
+        BlankGuid: Guid;
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetDefaultDimensionAPIUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetDefaultDimensionAPIUpgradeTag()) then
+            exit;
 
-        IF DefaultDimension.FindSet() then
-            REPEAT
-                DefaultDimension.UpdateReferencedIds();
-            UNTIL DefaultDimension.Next() = 0;
+        DefaultDimensionDataTransfer.SetTables(Database::"Default Dimension", Database::"Default Dimension");
+        DefaultDimensionDataTransfer.AddSourceFilter(DefaultDimension.FieldNo("Table ID"), '=%1', Database::Item);
+        DefaultDimensionDataTransfer.AddConstantValue("Default Dimension Parent Type"::Item, DefaultDimension.FieldNo("Parent Type"));
+        DefaultDimensionDataTransfer.UpdateAuditFields := false;
+        DefaultDimensionDataTransfer.CopyFields();
+        Clear(DefaultDimensionDataTransfer);
+
+        DefaultDimensionDataTransfer.SetTables(Database::"Default Dimension", Database::"Default Dimension");
+        DefaultDimensionDataTransfer.AddSourceFilter(DefaultDimension.FieldNo("Table ID"), '=%1', Database::Customer);
+        DefaultDimensionDataTransfer.AddConstantValue("Default Dimension Parent Type"::Customer, DefaultDimension.FieldNo("Parent Type"));
+        DefaultDimensionDataTransfer.UpdateAuditFields := false;
+        DefaultDimensionDataTransfer.CopyFields();
+        Clear(DefaultDimensionDataTransfer);
+
+        DefaultDimensionDataTransfer.SetTables(Database::"Default Dimension", Database::"Default Dimension");
+        DefaultDimensionDataTransfer.AddSourceFilter(DefaultDimension.FieldNo("Table ID"), '=%1', Database::Vendor);
+        DefaultDimensionDataTransfer.AddConstantValue("Default Dimension Parent Type"::Vendor, DefaultDimension.FieldNo("Parent Type"));
+        DefaultDimensionDataTransfer.UpdateAuditFields := false;
+        DefaultDimensionDataTransfer.CopyFields();
+        Clear(DefaultDimensionDataTransfer);
+
+        DefaultDimensionDataTransfer.SetTables(Database::"Default Dimension", Database::"Default Dimension");
+        DefaultDimensionDataTransfer.AddSourceFilter(DefaultDimension.FieldNo("Table ID"), '=%1', Database::Employee);
+        DefaultDimensionDataTransfer.AddConstantValue("Default Dimension Parent Type"::Employee, DefaultDimension.FieldNo("Parent Type"));
+        DefaultDimensionDataTransfer.UpdateAuditFields := false;
+        DefaultDimensionDataTransfer.CopyFields();
+        Clear(DefaultDimensionDataTransfer);
+
+        DefaultDimensionDataTransfer.SetTables(Database::"Default Dimension", Database::"Default Dimension");
+        DefaultDimensionDataTransfer.AddSourceFilter(DefaultDimension.FieldNo("Table ID"), '<>%1&<>%2&<>%3&<>%4', Database::Item, Database::Customer, Database::Vendor, Database::Employee);
+        DefaultDimensionDataTransfer.AddConstantValue("Default Dimension Parent Type"::" ", DefaultDimension.FieldNo("Parent Type"));
+        DefaultDimensionDataTransfer.UpdateAuditFields := false;
+        DefaultDimensionDataTransfer.CopyFields();
+        Clear(DefaultDimensionDataTransfer);
+
+        DefaultDimension.SetFilter(DimensionId, '%1', BlankGuid);
+        if not DefaultDimension.IsEmpty() then begin
+            DefaultDimensionDataTransfer.SetTables(Database::Dimension, Database::"Default Dimension");
+            DefaultDimensionDataTransfer.AddFieldValue(Dimension.FieldNo(SystemId), DefaultDimension.FieldNo(DimensionId));
+            DefaultDimensionDataTransfer.AddJoin(Dimension.FieldNo(Code), DefaultDimension.FieldNo("Dimension Code"));
+            DefaultDimensionDataTransfer.UpdateAuditFields := false;
+            DefaultDimensionDataTransfer.CopyFields();
+            Clear(DefaultDimensionDataTransfer);
+        end;
+
+        Clear(DefaultDimension);
+        DefaultDimension.SetFilter(DimensionValueId, '%1', BlankGuid);
+        if not DefaultDimension.IsEmpty() then begin
+            DefaultDimensionDataTransfer.SetTables(Database::"Dimension Value", Database::"Default Dimension");
+            DefaultDimensionDataTransfer.AddFieldValue(DimensionValue.FieldNo(SystemId), DefaultDimension.FieldNo(DimensionValueId));
+            DefaultDimensionDataTransfer.AddJoin(DimensionValue.FieldNo("Dimension Code"), DefaultDimension.FieldNo("Dimension Code"));
+            DefaultDimensionDataTransfer.AddJoin(DimensionValue.FieldNo(Code), DefaultDimension.FieldNo("Dimension Value Code"));
+            DefaultDimensionDataTransfer.UpdateAuditFields := false;
+            DefaultDimensionDataTransfer.CopyFields();
+        end;
+
+        Clear(DefaultDimension);
+        DefaultDimension.SetFilter(ParentId, '%1', BlankGuid);
+        if DefaultDimension.FindSet() then
+            repeat
+                if DefaultDimension.UpdateParentId() then
+                    DefaultDimension.Modify();
+            until DefaultDimension.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetDefaultDimensionAPIUpgradeTag());
     end;
@@ -240,14 +310,14 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetBalAccountNoOnJournalAPIUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetBalAccountNoOnJournalAPIUpgradeTag()) then
+            exit;
 
-        IF GenJournalBatch.FindSet() then
-            REPEAT
+        if GenJournalBatch.FindSet() then
+            repeat
                 GenJournalBatch.UpdateBalAccountId();
-                IF GenJournalBatch.MODIFY() THEN;
-            UNTIL GenJournalBatch.Next() = 0;
+                if GenJournalBatch.Modify() then;
+            until GenJournalBatch.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetBalAccountNoOnJournalAPIUpgradeTag());
     end;
@@ -258,14 +328,14 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetAddingIDToJobsUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetAddingIDToJobsUpgradeTag()) then
+            exit;
 
-        IF Job.FINDSET(TRUE, FALSE) THEN
-            REPEAT
-                IF ISNULLGUID(Job.SystemId) THEN
+        if Job.FindSet(true, false) then
+            repeat
+                if ISNULLGUID(Job.SystemId) then
                     Job.UpdateReferencedIds();
-            UNTIL Job.Next() = 0;
+            until Job.Next() = 0;
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetAddingIDToJobsUpgradeTag());
     end;
 
@@ -396,39 +466,39 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetWorkflowWebhookWebServicesUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetWorkflowWebhookWebServicesUpgradeTag()) then
+            exit;
 
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Sales Document Entity", 'salesDocuments', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Sales Document Entity", 'salesDocuments', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Sales Document Line Entity", 'salesDocumentLines', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Sales Document Line Entity", 'salesDocumentLines', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Purchase Document Entity", 'purchaseDocuments', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Purchase Document Entity", 'purchaseDocuments', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Purchase Document Line Entity", 'purchaseDocumentLines', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Purchase Document Line Entity", 'purchaseDocumentLines', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Sales Document Entity", 'workflowSalesDocuments', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Sales Document Entity", 'workflowSalesDocuments', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Sales Document Line Entity", 'workflowSalesDocumentLines', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Sales Document Line Entity", 'workflowSalesDocumentLines', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Purchase Document Entity", 'workflowPurchaseDocuments', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Purchase Document Entity", 'workflowPurchaseDocuments', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Purchase Document Line Entity", 'workflowPurchaseDocumentLines', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Purchase Document Line Entity", 'workflowPurchaseDocumentLines', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Gen. Journal Batch Entity", 'workflowGenJournalBatches', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Gen. Journal Batch Entity", 'workflowGenJournalBatches', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Gen. Journal Line Entity", 'workflowGenJournalLines', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Gen. Journal Line Entity", 'workflowGenJournalLines', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Workflow - Customer Entity", 'workflowCustomers', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Workflow - Customer Entity", 'workflowCustomers', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Workflow - Item Entity", 'workflowItems', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Workflow - Item Entity", 'workflowItems', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Workflow - Vendor Entity", 'workflowVendors', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Workflow - Vendor Entity", 'workflowVendors', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Page, PAGE::"Workflow Webhook Subscriptions", 'workflowWebhookSubscriptions', TRUE);
+          TenantWebService."Object Type"::Page, PAGE::"Workflow Webhook Subscriptions", 'workflowWebhookSubscriptions', true);
         WebServiceManagement.CreateTenantWebService(
-          TenantWebService."Object Type"::Codeunit, CODEUNIT::"Workflow Webhook Subscription", 'WorkflowActionResponse', TRUE);
+          TenantWebService."Object Type"::Codeunit, CODEUNIT::"Workflow Webhook Subscription", 'WorkflowActionResponse', true);
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetWorkflowWebhookWebServicesUpgradeTag());
     end;
@@ -438,8 +508,8 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetExcelTemplateWebServicesUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetExcelTemplateWebServicesUpgradeTag()) then
+            exit;
 
         CreateExcelTemplateWebService(ExcelTemplateIncomeStatementTxt, PAGE::"Income Statement Entity");
         CreateExcelTemplateWebService(ExcelTemplateBalanceSheetTxt, PAGE::"Balance Sheet Entity");
@@ -460,15 +530,15 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetLastUpdateInvoiceEntryNoUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetLastUpdateInvoiceEntryNoUpgradeTag()) then
+            exit;
 
-        IF CRMConnectionSetup.Get() then
+        if CRMConnectionSetup.Get() then
             CRMSynchStatus."Last Update Invoice Entry No." := CRMConnectionSetup."Last Update Invoice Entry No."
-        ELSE
+        else
             CRMSynchStatus."Last Update Invoice Entry No." := 0;
 
-        IF CRMSynchStatus.Insert() then;
+        if CRMSynchStatus.Insert() then;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetLastUpdateInvoiceEntryNoUpgradeTag());
     end;
@@ -479,14 +549,14 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetIncomingDocumentURLUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetIncomingDocumentURLUpgradeTag()) then
+            exit;
 
-        IF IncomingDocument.FindSet() then
-            REPEAT
+        if IncomingDocument.FindSet() then
+            repeat
                 IncomingDocument.URL := IncomingDocument.URL1 + IncomingDocument.URL2 + IncomingDocument.URL3 + IncomingDocument.URL4;
                 IncomingDocument.Modify();
-            UNTIL IncomingDocument.Next() = 0;
+            until IncomingDocument.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetIncomingDocumentURLUpgradeTag());
     end;
@@ -517,11 +587,17 @@
         WebServiceManagement: Codeunit "Web Service Management";
     begin
         CLEAR(TenantWebService);
-        WebServiceManagement.CreateTenantWebService(TenantWebService."Object Type"::Page, PageID, ObjectName, TRUE);
+        WebServiceManagement.CreateTenantWebService(TenantWebService."Object Type"::Page, PageID, ObjectName, true);
     end;
 
     local procedure UpgradeAPIs()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+        APIDataUpgrade: Codeunit "API Data Upgrade";
     begin
+        if UpgradeTag.HasUpgradeTag(APIDataUpgrade.GetDisableAPIDataUpgradesTag()) then
+            exit;
+
         UpgradeSalesInvoiceEntityAggregate();
         UpgradePurchInvEntityAggregate();
         UpgradeSalesOrderEntityBuffer();
@@ -551,7 +627,7 @@
     procedure UpgradeItemPostingGroups()
     var
         Item: Record "Item";
-        GenProdPostingGroup: Record "Gen. Product Posting Group";
+        GenProductPostingGroup: Record "Gen. Product Posting Group";
         InventoryPostingGroup: Record "Inventory Posting Group";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
         UpgradeTag: Codeunit "Upgrade Tag";
@@ -566,8 +642,8 @@
         Item.SetFilter("Gen. Prod. Posting Group Id", '<>%1', BlankGuid);
         if Item.IsEmpty() then begin
             GenProdPostingGroupDataTransfer.SetTables(Database::"Gen. Product Posting Group", Database::Item);
-            GenProdPostingGroupDataTransfer.AddFieldValue(GenProdPostingGroup.FieldNo("SystemId"), Item.FieldNo("Gen. Prod. Posting Group Id"));
-            GenProdPostingGroupDataTransfer.AddJoin(GenProdPostingGroup.FieldNo(Code), Item.FieldNo("Gen. Prod. Posting Group"));
+            GenProdPostingGroupDataTransfer.AddFieldValue(GenProductPostingGroup.FieldNo("SystemId"), Item.FieldNo("Gen. Prod. Posting Group Id"));
+            GenProdPostingGroupDataTransfer.AddJoin(GenProductPostingGroup.FieldNo(Code), Item.FieldNo("Gen. Prod. Posting Group"));
             GenProdPostingGroupDataTransfer.UpdateAuditFields := false;
             GenProdPostingGroupDataTransfer.CopyFields();
         end;
@@ -608,28 +684,28 @@
         SourceRecordRef: RecordRef;
         TargetRecordRef: RecordRef;
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesInvoiceEntityAggregateUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesInvoiceEntityAggregateUpgradeTag()) then
+            exit;
 
-        IF SalesInvoiceEntityAggregate.FINDSET(TRUE, FALSE) THEN
-            REPEAT
-                IF SalesInvoiceEntityAggregate.Posted THEN BEGIN
-                    SalesInvoiceHeader.SETRANGE(SystemId, SalesInvoiceEntityAggregate.Id);
-                    IF SalesInvoiceHeader.FindFirst() then BEGIN
+        if SalesInvoiceEntityAggregate.FINDSET(true, false) then
+            repeat
+                if SalesInvoiceEntityAggregate.Posted then begin
+                    SalesInvoiceHeader.SetRange(SystemId, SalesInvoiceEntityAggregate.Id);
+                    if SalesInvoiceHeader.FindFirst() then begin
                         SourceRecordRef.GETTABLE(SalesInvoiceHeader);
                         TargetRecordRef.GETTABLE(SalesInvoiceEntityAggregate);
-                        UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, TRUE, TRUE, TRUE);
-                    END;
-                END ELSE BEGIN
-                    SalesHeader.SETRANGE("Document Type", SalesHeader."Document Type"::Invoice);
-                    SalesHeader.SETRANGE(SystemId, SalesInvoiceEntityAggregate.Id);
-                    IF SalesHeader.FindFirst() then BEGIN
+                        UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, true, true, true);
+                    end;
+                end else begin
+                    SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Invoice);
+                    SalesHeader.SetRange(SystemId, SalesInvoiceEntityAggregate.Id);
+                    if SalesHeader.FindFirst() then begin
                         SourceRecordRef.GETTABLE(SalesHeader);
                         TargetRecordRef.GETTABLE(SalesInvoiceEntityAggregate);
-                        UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, TRUE, TRUE, TRUE);
-                    END;
-                END;
-            UNTIL SalesInvoiceEntityAggregate.Next() = 0;
+                        UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, true, true, true);
+                    end;
+                end;
+            until SalesInvoiceEntityAggregate.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetNewSalesInvoiceEntityAggregateUpgradeTag());
     end;
@@ -666,28 +742,28 @@
         SourceRecordRef: RecordRef;
         TargetRecordRef: RecordRef;
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewPurchInvEntityAggregateUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewPurchInvEntityAggregateUpgradeTag()) then
+            exit;
 
-        IF PurchInvEntityAggregate.FINDSET(TRUE, FALSE) THEN
-            REPEAT
-                IF PurchInvEntityAggregate.Posted THEN BEGIN
-                    PurchInvHeader.SETRANGE(SystemId, PurchInvEntityAggregate.Id);
-                    IF PurchInvHeader.FindFirst() then BEGIN
+        if PurchInvEntityAggregate.FINDSET(true, false) then
+            repeat
+                if PurchInvEntityAggregate.Posted then begin
+                    PurchInvHeader.SetRange(SystemId, PurchInvEntityAggregate.Id);
+                    if PurchInvHeader.FindFirst() then begin
                         SourceRecordRef.GETTABLE(PurchInvHeader);
                         TargetRecordRef.GETTABLE(PurchInvEntityAggregate);
-                        UpdatePurchaseDocumentFields(SourceRecordRef, TargetRecordRef, TRUE, TRUE);
-                    END;
-                END ELSE BEGIN
-                    PurchaseHeader.SETRANGE("Document Type", PurchaseHeader."Document Type"::Invoice);
-                    PurchaseHeader.SETRANGE(SystemId, PurchInvEntityAggregate.Id);
-                    IF PurchaseHeader.FindFirst() then BEGIN
+                        UpdatePurchaseDocumentFields(SourceRecordRef, TargetRecordRef, true, true);
+                    end;
+                end else begin
+                    PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Invoice);
+                    PurchaseHeader.SetRange(SystemId, PurchInvEntityAggregate.Id);
+                    if PurchaseHeader.FindFirst() then begin
                         SourceRecordRef.GETTABLE(PurchaseHeader);
                         TargetRecordRef.GETTABLE(PurchInvEntityAggregate);
-                        UpdatePurchaseDocumentFields(SourceRecordRef, TargetRecordRef, TRUE, TRUE);
-                    END;
-                END;
-            UNTIL PurchInvEntityAggregate.Next() = 0;
+                        UpdatePurchaseDocumentFields(SourceRecordRef, TargetRecordRef, true, true);
+                    end;
+                end;
+            until PurchInvEntityAggregate.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetNewPurchInvEntityAggregateUpgradeTag());
     end;
@@ -701,19 +777,19 @@
         SourceRecordRef: RecordRef;
         TargetRecordRef: RecordRef;
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesOrderEntityBufferUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesOrderEntityBufferUpgradeTag()) then
+            exit;
 
-        IF SalesOrderEntityBuffer.FINDSET(TRUE, FALSE) THEN
-            REPEAT
-                SalesHeader.SETRANGE("Document Type", SalesHeader."Document Type"::Order);
-                SalesHeader.SETRANGE(SystemId, SalesOrderEntityBuffer.Id);
-                IF SalesHeader.FindFirst() then BEGIN
+        if SalesOrderEntityBuffer.FINDSET(true, false) then
+            repeat
+                SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+                SalesHeader.SetRange(SystemId, SalesOrderEntityBuffer.Id);
+                if SalesHeader.FindFirst() then begin
                     SourceRecordRef.GETTABLE(SalesHeader);
                     TargetRecordRef.GETTABLE(SalesOrderEntityBuffer);
-                    UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, TRUE, TRUE, TRUE);
-                END;
-            UNTIL SalesOrderEntityBuffer.Next() = 0;
+                    UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, true, true, true);
+                end;
+            until SalesOrderEntityBuffer.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetNewSalesOrderEntityBufferUpgradeTag());
     end;
@@ -727,19 +803,19 @@
         SourceRecordRef: RecordRef;
         TargetRecordRef: RecordRef;
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesQuoteEntityBufferUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesQuoteEntityBufferUpgradeTag()) then
+            exit;
 
-        IF SalesQuoteEntityBuffer.FINDSET(TRUE, FALSE) THEN
-            REPEAT
-                SalesHeader.SETRANGE("Document Type", SalesHeader."Document Type"::Quote);
-                SalesHeader.SETRANGE(SystemId, SalesQuoteEntityBuffer.Id);
-                IF SalesHeader.FindFirst() then BEGIN
+        if SalesQuoteEntityBuffer.FINDSET(true, false) then
+            repeat
+                SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Quote);
+                SalesHeader.SetRange(SystemId, SalesQuoteEntityBuffer.Id);
+                if SalesHeader.FindFirst() then begin
                     SourceRecordRef.GETTABLE(SalesHeader);
                     TargetRecordRef.GETTABLE(SalesQuoteEntityBuffer);
-                    UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, TRUE, TRUE, TRUE);
-                END;
-            UNTIL SalesQuoteEntityBuffer.Next() = 0;
+                    UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, true, true, true);
+                end;
+            until SalesQuoteEntityBuffer.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetNewSalesQuoteEntityBufferUpgradeTag());
     end;
@@ -754,28 +830,28 @@
         SourceRecordRef: RecordRef;
         TargetRecordRef: RecordRef;
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesCrMemoEntityBufferUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewSalesCrMemoEntityBufferUpgradeTag()) then
+            exit;
 
-        IF SalesCrMemoEntityBuffer.FINDSET(TRUE, FALSE) THEN
-            REPEAT
-                IF SalesCrMemoEntityBuffer.Posted THEN BEGIN
+        if SalesCrMemoEntityBuffer.FINDSET(true, false) then
+            repeat
+                if SalesCrMemoEntityBuffer.Posted then begin
                     SalesCrMemoHeader.SetRange(SystemId, SalesCrMemoEntityBuffer.Id);
-                    IF SalesCrMemoHeader.FindFirst() then BEGIN
+                    if SalesCrMemoHeader.FindFirst() then begin
                         SourceRecordRef.GETTABLE(SalesCrMemoHeader);
                         TargetRecordRef.GETTABLE(SalesCrMemoEntityBuffer);
-                        UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, TRUE, TRUE, FALSE);
-                    END;
-                END ELSE BEGIN
+                        UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, true, true, false);
+                    end;
+                end else begin
                     SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::"Credit Memo");
                     SalesHeader.SetRange(SystemId, SalesCrMemoEntityBuffer.Id);
-                    IF SalesHeader.FindFirst() then BEGIN
+                    if SalesHeader.FindFirst() then begin
                         SourceRecordRef.GETTABLE(SalesHeader);
                         TargetRecordRef.GETTABLE(SalesCrMemoEntityBuffer);
-                        UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, TRUE, TRUE, FALSE);
-                    END;
-                END;
-            UNTIL SalesCrMemoEntityBuffer.Next() = 0;
+                        UpdateSalesDocumentFields(SourceRecordRef, TargetRecordRef, true, true, false);
+                    end;
+                end;
+            until SalesCrMemoEntityBuffer.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetNewSalesCrMemoEntityBufferUpgradeTag());
     end;
@@ -792,13 +868,13 @@
         NewId: Guid;
         Changed: Boolean;
     begin
-        IF SellTo THEN BEGIN
+        if SellTo then begin
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, SalesHeader.FIELDNO("Sell-to Phone No.")) then
                 Changed := true;
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, SalesHeader.FIELDNO("Sell-to E-Mail")) then
                 Changed := true;
-        END;
-        IF BillTo THEN BEGIN
+        end;
+        if BillTo then begin
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, SalesHeader.FIELDNO("Bill-to Customer No.")) then
                 Changed := true;
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, SalesHeader.FIELDNO("Bill-to Name")) then
@@ -817,19 +893,19 @@
                 Changed := true;
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, SalesHeader.FIELDNO("Bill-to Country/Region Code")) then
                 Changed := true;
-            CodeFieldRef := TargetRecordRef.FIELD(SalesOrderEntityBuffer.FIELDNO("Bill-to Customer No."));
-            IdFieldRef := TargetRecordRef.FIELD(SalesOrderEntityBuffer.FIELDNO("Bill-to Customer Id"));
+            CodeFieldRef := TargetRecordRef.Field(SalesOrderEntityBuffer.FIELDNO("Bill-to Customer No."));
+            IdFieldRef := TargetRecordRef.Field(SalesOrderEntityBuffer.FIELDNO("Bill-to Customer Id"));
             OldId := IdFieldRef.Value;
-            IF Customer.GET(CodeFieldRef.VALUE) THEN
+            if Customer.Get(Format(CodeFieldRef.Value)) then
                 NewId := Customer.SystemId
-            ELSE
+            else
                 NewId := EmptyGuid;
             if OldId <> NewId then begin
                 IdFieldRef.Value := NewId;
                 Changed := true;
             end;
-        END;
-        IF ShipTo THEN BEGIN
+        end;
+        if ShipTo then begin
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, SalesHeader.FIELDNO("Ship-to Code")) then
                 Changed := true;
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, SalesHeader.FIELDNO("Ship-to Name")) then
@@ -848,7 +924,7 @@
                 Changed := true;
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, SalesHeader.FIELDNO("Ship-to Country/Region Code")) then
                 Changed := true;
-        END;
+        end;
         if Changed then
             TargetRecordRef.Modify();
     end;
@@ -866,7 +942,7 @@
         NewId: Guid;
         Changed: Boolean;
     begin
-        IF PayTo THEN BEGIN
+        if PayTo then begin
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, PurchaseHeader.FIELDNO("Pay-to Vendor No.")) then
                 Changed := true;
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, PurchaseHeader.FIELDNO("Pay-to Name")) then
@@ -885,30 +961,30 @@
                 Changed := true;
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, PurchaseHeader.FIELDNO("Pay-to Country/Region Code")) then
                 Changed := true;
-            CodeFieldRef := TargetRecordRef.FIELD(PurchInvEntityAggregate.FIELDNO("Pay-to Vendor No."));
-            IdFieldRef := TargetRecordRef.FIELD(PurchInvEntityAggregate.FIELDNO("Pay-to Vendor Id"));
+            CodeFieldRef := TargetRecordRef.Field(PurchInvEntityAggregate.FIELDNO("Pay-to Vendor No."));
+            IdFieldRef := TargetRecordRef.Field(PurchInvEntityAggregate.FIELDNO("Pay-to Vendor Id"));
             OldId := IdFieldRef.Value;
-            IF Vendor.GET(CodeFieldRef.VALUE) THEN
+            if Vendor.Get(Format(CodeFieldRef.Value)) then
                 NewId := Vendor.SystemId
-            ELSE
+            else
                 NewId := EmptyGuid;
             if OldId <> NewId then begin
                 IdFieldRef.Value := NewId;
                 Changed := true;
             end;
-            CodeFieldRef := TargetRecordRef.FIELD(PurchInvEntityAggregate.FIELDNO("Currency Code"));
-            IdFieldRef := TargetRecordRef.FIELD(PurchInvEntityAggregate.FIELDNO("Currency Id"));
+            CodeFieldRef := TargetRecordRef.Field(PurchInvEntityAggregate.FIELDNO("Currency Code"));
+            IdFieldRef := TargetRecordRef.Field(PurchInvEntityAggregate.FIELDNO("Currency Id"));
             OldId := IdFieldRef.Value;
-            IF Currency.GET(CodeFieldRef.VALUE) THEN
+            if Currency.Get(Format(CodeFieldRef.Value)) then
                 NewId := Currency.SystemId
-            ELSE
+            else
                 NewId := EmptyGuid;
             if OldId <> NewId then begin
                 IdFieldRef.Value := NewId;
                 Changed := true;
             end;
-        END;
-        IF ShipTo THEN BEGIN
+        end;
+        if ShipTo then begin
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, PurchaseHeader.FIELDNO("Ship-to Code")) then
                 Changed := true;
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, PurchaseHeader.FIELDNO("Ship-to Name")) then
@@ -927,7 +1003,7 @@
                 Changed := true;
             if CopyFieldValue(SourceRecordRef, TargetRecordRef, PurchaseHeader.FIELDNO("Ship-to Country/Region Code")) then
                 Changed := true;
-        END;
+        end;
         if Changed then
             TargetRecordRef.Modify();
     end;
@@ -939,10 +1015,10 @@
     begin
         SourceFieldRef := SourceRecordRef.FIELD(FieldNo);
         TargetFieldRef := TargetRecordRef.FIELD(FieldNo);
-        IF TargetFieldRef.VALUE <> SourceFieldRef.VALUE THEN BEGIN
+        if TargetFieldRef.VALUE <> SourceFieldRef.VALUE then begin
             TargetFieldRef.VALUE := SourceFieldRef.VALUE;
             exit(true);
-        END;
+        end;
         exit(false);
     end;
 
@@ -952,13 +1028,13 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetItemTrackingCodeUseExpirationDatesTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetItemTrackingCodeUseExpirationDatesTag()) then
+            exit;
 
-        ItemTrackingCode.SETRANGE("Use Expiration Dates", FALSE);
-        IF NOT ItemTrackingCode.ISEMPTY THEN
+        ItemTrackingCode.SetRange("Use Expiration Dates", false);
+        if not ItemTrackingCode.IsEmpty() then
             // until now, expiration date was always ON, so let's reflect this
-            ItemTrackingCode.MODIFYALL("Use Expiration Dates", TRUE);
+            ItemTrackingCode.MODIFYALL("Use Expiration Dates", true);
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetItemTrackingCodeUseExpirationDatesTag());
     end;
@@ -1056,30 +1132,30 @@
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
         OldErrorMsg: Text;
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetJobQueueEntryMergeErrorMessageFieldsUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetJobQueueEntryMergeErrorMessageFieldsUpgradeTag()) then
+            exit;
 
         JobQueueEntry.SETFILTER("Error Message 2", '<>%1', '');
-        IF JobQueueEntry.FINDSET(TRUE) THEN
-            REPEAT
+        if JobQueueEntry.FINDSET(true) then
+            repeat
                 JobQueueEntry."Error Message" := JobQueueEntry."Error Message" + JobQueueEntry."Error Message 2" +
                     JobQueueEntry."Error Message 3" + JobQueueEntry."Error Message 4";
                 JobQueueEntry."Error Message 2" := '';
                 JobQueueEntry."Error Message 3" := '';
                 JobQueueEntry."Error Message 4" := '';
                 JobQueueEntry.Modify();
-            UNTIL JobQueueEntry.Next() = 0;
+            until JobQueueEntry.Next() = 0;
 
         JobQueueLogEntry.SETFILTER("Error Message 2", '<>%1', '');
-        IF JobQueueLogEntry.FINDSET(TRUE) THEN
-            REPEAT
+        if JobQueueLogEntry.FINDSET(true) then
+            repeat
                 OldErrorMsg := JobQueueLogEntry."Error Message" + JobQueueLogEntry."Error Message 2" +
                   JobQueueLogEntry."Error Message 3" + JobQueueLogEntry."Error Message 4";
                 JobQueueLogEntry."Error Message 2" := '';
                 JobQueueLogEntry."Error Message 3" := '';
                 JobQueueLogEntry."Error Message 4" := '';
                 JobQueueLogEntry.Modify();
-            UNTIL JobQueueLogEntry.Next() = 0;
+            until JobQueueLogEntry.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetJobQueueEntryMergeErrorMessageFieldsUpgradeTag());
     end;
@@ -1116,21 +1192,21 @@
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
         DateFormulaText: Text;
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetVATRepSetupPeriodRemCalcUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetVATRepSetupPeriodRemCalcUpgradeTag()) then
+            exit;
 
-        WITH VATReportSetup DO BEGIN
-            IF NOT GET() THEN
-                EXIT;
-            IF IsPeriodReminderCalculation() OR ("Period Reminder Time" = 0) THEN
-                EXIT;
+        WITH VATReportSetup DO begin
+            if not GET() then
+                exit;
+            if IsPeriodReminderCalculation() OR ("Period Reminder Time" = 0) then
+                exit;
 
-            DateFormulaText := STRSUBSTNO('<%1D>', "Period Reminder Time");
+            DateFormulaText := StrSubstNo('<%1D>', "Period Reminder Time");
             EVALUATE("Period Reminder Calculation", DateFormulaText);
             "Period Reminder Time" := 0;
 
             if Modify() then;
-        END;
+        end;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetVATRepSetupPeriodRemCalcUpgradeTag());
     end;
@@ -1142,15 +1218,15 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetStandardSalesCodeUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetStandardSalesCodeUpgradeTag()) then
+            exit;
 
-        IF StandardSalesCode.FindSet() then
-            REPEAT
-                StandardCustomerSalesCode.SETRANGE(Code, StandardSalesCode.Code);
+        if StandardSalesCode.FindSet() then
+            repeat
+                StandardCustomerSalesCode.SetRange(Code, StandardSalesCode.Code);
                 StandardCustomerSalesCode.SetFilter("Currency Code", '<>%1', StandardSalesCode."Currency Code");
                 StandardCustomerSalesCode.MODIFYALL("Currency Code", StandardSalesCode."Currency Code");
-            UNTIL StandardSalesCode.Next() = 0;
+            until StandardSalesCode.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetStandardSalesCodeUpgradeTag());
     end;
@@ -1162,15 +1238,15 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetStandardPurchaseCodeUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetStandardPurchaseCodeUpgradeTag()) then
+            exit;
 
-        IF StandardPurchaseCode.FindSet() then
-            REPEAT
-                StandardVendorPurchaseCode.SETRANGE(Code, StandardPurchaseCode.Code);
+        if StandardPurchaseCode.FindSet() then
+            repeat
+                StandardVendorPurchaseCode.SetRange(Code, StandardPurchaseCode.Code);
                 StandardVendorPurchaseCode.SetFilter("Currency Code", '<>%1', StandardPurchaseCode."Currency Code");
                 StandardVendorPurchaseCode.MODIFYALL("Currency Code", StandardPurchaseCode."Currency Code");
-            UNTIL StandardPurchaseCode.Next() = 0;
+            until StandardPurchaseCode.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetStandardPurchaseCodeUpgradeTag());
     end;
@@ -1237,6 +1313,38 @@
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetPowerBiEmbedUrlTooShortUpgradeTag());
     end;
 
+    local procedure UpgradePowerBiReportUploads()
+    var
+        PowerBIReportUploads: Record "Power BI Report Uploads";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        EmptyGuid: Guid;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetPowerBIUploadsStatusUpgradeTag()) then
+            exit;
+
+        PowerBIReportUploads.SetRange("Report Upload Status", PowerBIReportUploads."Report Upload Status"::NotStarted);
+        if PowerBIReportUploads.FindSet(true) then
+            repeat
+                case true of
+                    PowerBIReportUploads."Needs Deletion":
+                        PowerBIReportUploads."Report Upload Status" := PowerBIReportUploads."Report Upload Status"::PendingDeletion;
+                    PowerBIReportUploads."Is Selection Done":
+                        PowerBIReportUploads."Report Upload Status" := PowerBIReportUploads."Report Upload Status"::Completed;
+                    PowerBIReportUploads."Report Embed Url" <> '':
+                        PowerBIReportUploads."Report Upload Status" := PowerBIReportUploads."Report Upload Status"::DataRefreshed;
+                    (PowerBIReportUploads."Import ID" <> EmptyGuid) and (not PowerBIReportUploads."Should Retry"):
+                        PowerBIReportUploads."Report Upload Status" := PowerBIReportUploads."Report Upload Status"::Failed;
+                // Else the status remains NotStarted
+                end;
+
+                if PowerBIReportUploads."Report Upload Status" <> PowerBIReportUploads."Report Upload Status"::NotStarted then
+                    PowerBIReportUploads.Modify();
+            until PowerBIReportUploads.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetPowerBIUploadsStatusUpgradeTag());
+    end;
+
     local procedure UpgradeSearchEmail()
     var
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -1250,7 +1358,7 @@
 
         SalespersonPurchaser.SetCurrentKey("Search E-Mail");
         SalespersonPurchaser.SetRange("Search E-Mail", '');
-        if SalespersonPurchaser.FindSet(true, false) then
+        if SalespersonPurchaser.FindFirst() then
             repeat
                 if SalespersonPurchaser."E-Mail" <> '' then begin
                     SalespersonPurchaser."Search E-Mail" := SalespersonPurchaser."E-Mail";
@@ -1260,7 +1368,7 @@
 
         Contact.SetCurrentKey("Search E-Mail");
         Contact.SetRange("Search E-Mail", '');
-        if Contact.FindSet(true, false) then
+        if Contact.FindFirst() then
             repeat
                 if Contact."E-Mail" <> '' then begin
                     Contact."Search E-Mail" := Contact."E-Mail";
@@ -1270,7 +1378,7 @@
 
         ContactAltAddress.SetCurrentKey("Search E-Mail");
         ContactAltAddress.SetRange("Search E-Mail", '');
-        if ContactAltAddress.FindSet(true, false) then
+        if ContactAltAddress.FindFirst() then
             repeat
                 if ContactAltAddress."E-Mail" <> '' then begin
                     ContactAltAddress."Search E-Mail" := ContactAltAddress."E-Mail";
@@ -1290,6 +1398,7 @@
         ItemVariantDataTransfer: DataTransfer;
         BlankGuid: Guid;
     begin
+
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetItemVariantItemIdUpgradeTag()) then
             exit;
 
@@ -1434,93 +1543,30 @@
 
     local procedure UpgradeSalesOrderShipmentMethod()
     var
-        SalesOrderEntityBuffer: Record "Sales Order Entity Buffer";
-        SalesHeader: Record "Sales Header";
+        APIDataUpgrade: Codeunit "API Data Upgrade";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
         UpgradeTag: Codeunit "Upgrade Tag";
-        SourceRecordRef: RecordRef;
-        TargetRecordRef: RecordRef;
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetSalesOrderShipmentMethodUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetSalesOrderShipmentMethodUpgradeTag()) then
+            exit;
 
-        IF SalesOrderEntityBuffer.FINDSET(TRUE, FALSE) THEN
-            REPEAT
-                SalesHeader.SETRANGE("Document Type", SalesHeader."Document Type"::Order);
-                SalesHeader.SETRANGE(SystemId, SalesOrderEntityBuffer.Id);
-                IF SalesHeader.FindFirst() then BEGIN
-                    SourceRecordRef.GETTABLE(SalesHeader);
-                    TargetRecordRef.GETTABLE(SalesOrderEntityBuffer);
-                    UpdateSalesDocumentShipmentMethodFields(SourceRecordRef, TargetRecordRef);
-                END;
-            UNTIL SalesOrderEntityBuffer.Next() = 0;
+        APIDataUpgrade.UpgradeSalesOrderShipmentMethod();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetSalesOrderShipmentMethodUpgradeTag());
     end;
 
     local procedure UpgradeSalesCrMemoShipmentMethod()
     var
-        SalesCrMemoEntityBuffer: Record "Sales Cr. Memo Entity Buffer";
-        SalesHeader: Record "Sales Header";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        APIDataUpgrade: Codeunit "API Data Upgrade";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
         UpgradeTag: Codeunit "Upgrade Tag";
-        SourceRecordRef: RecordRef;
-        TargetRecordRef: RecordRef;
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetSalesCrMemoShipmentMethodUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetSalesCrMemoShipmentMethodUpgradeTag()) then
+            exit;
 
-        IF SalesCrMemoEntityBuffer.FINDSET(TRUE, FALSE) THEN
-            REPEAT
-                IF SalesCrMemoEntityBuffer.Posted THEN BEGIN
-                    SalesCrMemoHeader.SETRANGE(SystemId, SalesCrMemoEntityBuffer.Id);
-                    IF SalesCrMemoHeader.FindFirst() then BEGIN
-                        SourceRecordRef.GETTABLE(SalesCrMemoHeader);
-                        TargetRecordRef.GETTABLE(SalesCrMemoEntityBuffer);
-                        UpdateSalesDocumentShipmentMethodFields(SourceRecordRef, TargetRecordRef);
-                    END;
-                END ELSE BEGIN
-                    SalesHeader.SETRANGE("Document Type", SalesHeader."Document Type"::"Credit Memo");
-                    SalesHeader.SETRANGE(SystemId, SalesCrMemoEntityBuffer.Id);
-                    IF SalesHeader.FindFirst() then BEGIN
-                        SourceRecordRef.GETTABLE(SalesHeader);
-                        TargetRecordRef.GETTABLE(SalesCrMemoEntityBuffer);
-                        UpdateSalesDocumentShipmentMethodFields(SourceRecordRef, TargetRecordRef);
-                    END;
-                END;
-            UNTIL SalesCrMemoEntityBuffer.Next() = 0;
+        APIDataUpgrade.UpgradeSalesCrMemoShipmentMethod();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetSalesCrMemoShipmentMethodUpgradeTag());
-    end;
-
-    local procedure UpdateSalesDocumentShipmentMethodFields(var SourceRecordRef: RecordRef; var TargetRecordRef: RecordRef)
-    var
-        SalesHeader: Record "Sales Header";
-        SalesOrderEntityBuffer: Record "Sales Order Entity Buffer";
-        ShipmentMethod: Record "Shipment Method";
-        CodeFieldRef: FieldRef;
-        IdFieldRef: FieldRef;
-        EmptyGuid: Guid;
-        OldId: Guid;
-        NewId: Guid;
-        Changed: Boolean;
-    begin
-        if CopyFieldValue(SourceRecordRef, TargetRecordRef, SalesHeader.FIELDNO("Shipment Method Code")) then
-            Changed := true;
-        CodeFieldRef := TargetRecordRef.FIELD(SalesOrderEntityBuffer.FIELDNO("Shipment Method Code"));
-        IdFieldRef := TargetRecordRef.FIELD(SalesOrderEntityBuffer.FIELDNO("Shipment Method Id"));
-        OldId := IdFieldRef.Value;
-        IF ShipmentMethod.GET(CodeFieldRef.VALUE) THEN
-            NewId := ShipmentMethod.SystemId
-        ELSE
-            NewId := EmptyGuid;
-        if OldId <> NewId then begin
-            IdFieldRef.Value := NewId;
-            Changed := true;
-        end;
-        if Changed then
-            TargetRecordRef.Modify();
     end;
 
     local procedure UpgradeSharePointConnection()
@@ -1546,6 +1592,7 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
     begin
+#if not CLEAN23
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCreateDefaultAADApplicationTag()) then begin
             if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetDefaultAADApplicationDescriptionTag()) then
                 exit;
@@ -1556,6 +1603,12 @@
             UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCreateDefaultAADApplicationTag());
             UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetDefaultAADApplicationDescriptionTag());
         end;
+#else
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCreateDefaultAADApplicationTag()) then 
+            exit;
+        AADApplicationSetup.CreateDynamics365BusinessCentralforVirtualEntitiesAAdApplication();
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetCreateDefaultAADApplicationTag());
+#endif
     end;
 
     local procedure UpgradeIntegrationTableMapping()
@@ -1563,6 +1616,33 @@
         UpgradeIntegrationTableMappingUncoupleCodeunitId();
         UpgradeIntegrationTableMappingCouplingCodeunitId();
         UpgradeIntegrationTableMappingFilterForOpportunities();
+    end;
+
+    local procedure UpgradeAddExtraIntegrationFieldMappings()
+    var
+        CDSConnectionSetup: Record "CDS Connection Setup";
+        CRMConnectionSetup: Record "CRM Connection Setup";
+        CDSSetupDefaults: Codeunit "CDS Setup Defaults";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        RunUpgradeLogic: Boolean;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetAddExtraIntegrationFieldMappingsUpgradeTag()) then
+            exit;
+
+        if CDSConnectionSetup.Get() then
+            if CDSConnectionSetup."Is Enabled" then
+                RunUpgradeLogic := true;
+
+        if not RunUpgradeLogic then
+            if CRMConnectionSetup.Get() then
+                if CRMConnectionSetup."Is Enabled" then
+                    RunUpgradeLogic := true;
+
+        if RunUpgradeLogic then
+            CDSSetupDefaults.AddExtraIntegrationFieldMappings();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetAddExtraIntegrationFieldMappingsUpgradeTag());
     end;
 
     local procedure UpgradeIntegrationTableMappingUncoupleCodeunitId()
@@ -1784,8 +1864,8 @@
     var
         InTempBlob, OutTempBlob : Codeunit "Temp Blob";
         RecordRef: RecordRef;
-        InStr: InStream;
-        OutStr: OutStream;
+        InStream: InStream;
+        OutStream: OutStream;
         Value: Text;
     begin
         RecordRef.Open(TableNo);
@@ -1799,12 +1879,12 @@
 
                 if InTempBlob.HasValue() then begin
                     // Read the value using the given encoding
-                    InTempBlob.CreateInStream(InStr, FromEncoding);
-                    InStr.Read(Value);
+                    InTempBlob.CreateInStream(InStream, FromEncoding);
+                    InStream.Read(Value);
 
                     // Write the value in UTF8
-                    OutTempBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
-                    OutStr.Write(Value);
+                    OutTempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
+                    OutStream.Write(Value);
 
                     OutTempBlob.ToRecordRef(RecordRef, FieldNo);
                     RecordRef.Modify();
@@ -2168,7 +2248,7 @@
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
         UpgradeTag: Codeunit "Upgrade Tag";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetIntrastatJnlLinePartnerIDUpgradeTag()) THEN
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetIntrastatJnlLinePartnerIDUpgradeTag()) then
             exit;
 
         IntrastatJnlLine.SetRange(Type, IntrastatJnlLine.Type::Shipment);
@@ -2191,7 +2271,7 @@
         UpgradeTag: Codeunit "Upgrade Tag";
         DimensionSetEntryDataTransfer: DataTransfer;
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetDimSetEntryGlobalDimNoUpgradeTag()) THEN
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetDimSetEntryGlobalDimNoUpgradeTag()) then
             exit;
 
         if GeneralLedgerSetup.Get() then begin
@@ -2271,11 +2351,11 @@
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
         UpgradeTag: Codeunit "Upgrade Tag";
     begin
-        IF UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewPurchaseOrderEntityBufferUpgradeTag()) THEN
-            EXIT;
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetNewPurchaseOrderEntityBufferUpgradeTag()) then
+            exit;
 
-        PurchaseHeader.SETRANGE("Document Type", PurchaseHeader."Document Type"::Order);
-        IF PurchaseHeader.FindSet() THEN
+        PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Order);
+        if PurchaseHeader.FindSet() then
             repeat
                 GraphMgtPurchOrderBuffer.InsertOrModifyFromPurchaseHeader(PurchaseHeader);
             until PurchaseHeader.Next() = 0;
@@ -2390,7 +2470,7 @@
         TargetClientType: ClientType;
         ImageName: Text[250];
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetUpgradePowerBIOptinImageUpgradeTag()) THEN
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetUpgradePowerBIOptinImageUpgradeTag()) then
             exit;
 
         ImageName := PowerBIEmbeddedReportPart.GetOptinImageName();
@@ -2398,13 +2478,13 @@
         TargetClientType := ClientType::Phone;
         if not MediaRepository.Get(ImageName, TargetClientType) then
             if not UpdatePowerBIOptinFromExistingImage(TargetClientType) then
-                Session.LogMessage('0000EH1', STRSUBSTNO(FailedToUpdatePowerBIImageTxt, TargetClientType), Verbosity::Warning, DataClassification::SystemMetadata,
+                Session.LogMessage('0000EH1', StrSubstNo(FailedToUpdatePowerBIImageTxt, TargetClientType), Verbosity::Warning, DataClassification::SystemMetadata,
                 TelemetryScope::ExtensionPublisher, 'Category', 'AL SaaS Upgrade');
 
         TargetClientType := ClientType::Tablet;
         if not MediaRepository.Get(ImageName, TargetClientType) then
             if not UpdatePowerBIOptinFromExistingImage(TargetClientType) then
-                Session.LogMessage('0000EH2', STRSUBSTNO(FailedToUpdatePowerBIImageTxt, TargetClientType), Verbosity::Warning, DataClassification::SystemMetadata,
+                Session.LogMessage('0000EH2', StrSubstNo(FailedToUpdatePowerBIImageTxt, TargetClientType), Verbosity::Warning, DataClassification::SystemMetadata,
                 TelemetryScope::ExtensionPublisher, 'Category', 'AL SaaS Upgrade');
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetUpgradePowerBIOptinImageUpgradeTag());
@@ -2417,7 +2497,7 @@
         PowerBIEmbeddedReportPart: Page "Power BI Embedded Report Part";
         ImageName: Text[250];
     begin
-        Session.LogMessage('0000EH4', STRSUBSTNO(AttemptingPowerBIUpdateTxt, targetClientType), Verbosity::Normal, DataClassification::SystemMetadata,
+        Session.LogMessage('0000EH4', StrSubstNo(AttemptingPowerBIUpdateTxt, targetClientType), Verbosity::Normal, DataClassification::SystemMetadata,
             TelemetryScope::ExtensionPublisher, 'Category', 'AL SaaS Upgrade');
 
         // Insert the same image we use on web
@@ -2437,7 +2517,7 @@
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
         UpgradeTag: Codeunit "Upgrade Tag";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetRemoveSmartListManualSetupEntryUpgradeTag()) THEN
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetRemoveSmartListManualSetupEntryUpgradeTag()) then
             exit;
 
         // Page 889 is Page::"SmartList Designer Setup"
@@ -2453,7 +2533,7 @@
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
         UpgradeTag: Codeunit "Upgrade Tag";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetUserTaskDescriptionToUTF8UpgradeTag()) THEN
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetUserTaskDescriptionToUTF8UpgradeTag()) then
             exit;
 
         ChangeEncodingToUTF8(Database::"User Task", UserTask.FieldNo(Description), TextEncoding::Windows);
@@ -2473,7 +2553,7 @@
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
         UpgradeTag: Codeunit "Upgrade Tag";
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCreditTransferIBANUpgradeTag()) THEN
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetCreditTransferIBANUpgradeTag()) then
             exit;
 
         CreditTransferEntry.SetFilter("Account No.", '<>%1', '');
@@ -2600,7 +2680,7 @@
 
     local procedure UpgradeICSetup()
     var
-        CompanyInfo: Record "Company Information";
+        CompanyInformation: Record "Company Information";
         ICSetup: Record "IC Setup";
         UpgradeTag: Codeunit "Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
@@ -2608,7 +2688,7 @@
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetICSetupUpgradeTag()) then
             exit;
 
-        if not CompanyInfo.Get() then
+        if not CompanyInformation.Get() then
             exit;
 
         if not ICSetup.Get() then begin
@@ -2616,10 +2696,10 @@
             ICSetup.Insert();
         end;
 
-        ICSetup."IC Partner Code" := CompanyInfo."IC Partner Code";
-        ICSetup."IC Inbox Type" := CompanyInfo."IC Inbox Type";
-        ICSetup."IC Inbox Details" := CompanyInfo."IC Inbox Details";
-        ICSetup."Auto. Send Transactions" := CompanyInfo."Auto. Send Transactions";
+        ICSetup."IC Partner Code" := CompanyInformation."IC Partner Code";
+        ICSetup."IC Inbox Type" := CompanyInformation."IC Inbox Type";
+        ICSetup."IC Inbox Details" := CompanyInformation."IC Inbox Details";
+        ICSetup."Auto. Send Transactions" := CompanyInformation."Auto. Send Transactions";
         ICSetup.Modify();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetICSetupUpgradeTag());
@@ -3113,6 +3193,32 @@
         if SourceCode.Insert() then;
     end;
 
+    local procedure UpdateServiceLineOrderNo()
+    var
+        ServiceLine: Record "Service Line";
+        ServiceShipmentLine: Record "Service Shipment Line";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetServiceLineOrderNoUpgradeTag()) then
+            exit;
+
+        ServiceLine.SetLoadFields("Shipment No.", "Shipment Line No.");
+        ServiceLine.SetRange("Document Type", ServiceLine."Document Type"::Invoice);
+        ServiceLine.SetFilter("Shipment No.", '<>%1', '');
+        ServiceLine.SetFilter("Shipment Line No.", '<>%1', 0);
+        if ServiceLine.FindSet(true) then
+            repeat
+                ServiceShipmentLine.SetLoadFields("Order No.");
+                if ServiceShipmentLine.Get(ServiceLine."Shipment No.", ServiceLine."Shipment Line No.") then begin
+                    ServiceLine."Order No." := ServiceShipmentLine."Order No.";
+                    ServiceLine.Modify();
+                end;
+            until ServiceLine.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetServiceLineOrderNoUpgradeTag());
+    end;
+
     local procedure UpgradeMapCurrencySymbol()
     var
         IntegrationTableMapping: Record "Integration Table Mapping";
@@ -3264,6 +3370,164 @@
         Clear(StandardGeneralJournalLineDataTransfer);
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetICPartnerGLAccountNoUpgradeTag());
+    end;
+
+    local procedure UpgradePurchasesPayablesAndSalesReceivablesSetups()
+    var
+        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
+        SalesReceivablesSetup: Record "Sales & Receivables Setup";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetPurchasesPayablesAndSalesReceivablesSetupsUpgradeTag()) then
+            exit;
+
+        if PurchasesPayablesSetup.Get() then begin
+            PurchasesPayablesSetup.Validate("Link Doc. Date to Posting Date", true);
+            PurchasesPayablesSetup.Modify();
+        end;
+        if SalesReceivablesSetup.Get() then begin
+            SalesReceivablesSetup.Validate("Link Doc. Date to Posting Date", true);
+            SalesReceivablesSetup.Modify();
+        end;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetPurchasesPayablesAndSalesReceivablesSetupsUpgradeTag());
+    end;
+
+    local procedure UpgradeLocationBinPolicySetups()
+    var
+        Location: Record Location;
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        LocationDataTransfer: DataTransfer;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetLocationBinPolicySetupsUpgradeTag()) then
+            exit;
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Directed Put-away and Pick"), '=%1', true);
+        LocationDataTransfer.AddConstantValue("Pick Bin Policy"::"Bin Ranking", Location.FieldNo("Pick Bin Policy"));
+        LocationDataTransfer.AddConstantValue("Put-away Bin Policy"::"Put-away Template", Location.FieldNo("Put-away Bin Policy"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Directed Put-away and Pick"), '=%1', false);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Bin Mandatory"), '=%1', true);
+        LocationDataTransfer.AddConstantValue("Pick Bin Policy"::"Default Bin", Location.FieldNo("Pick Bin Policy"));
+        LocationDataTransfer.AddConstantValue("Put-away Bin Policy"::"Default Bin", Location.FieldNo("Put-away Bin Policy"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Directed Put-away and Pick"), '=%1', false);
+        LocationDataTransfer.AddConstantValue(false, Location.FieldNo("Always Create Pick Line"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Directed Put-away and Pick"), '=%1', false);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Put-away"), '=%1', true);
+        LocationDataTransfer.AddConstantValue(true, Location.FieldNo("Always Create Put-away Line"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetLocationBinPolicySetupsUpgradeTag());
+    end;
+
+    local procedure UpgradeInventorySetupAllowInvtAdjmt()
+    var
+        InventorySetup: Record "Inventory Setup";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetAllowInventoryAdjmtUpgradeTag()) then
+            exit;
+
+        if InventorySetup.Get() then begin
+            InventorySetup."Allow Inventory Adjustment" := ApplicationAreaMgmtFacade.IsFoundationEnabled();
+            InventorySetup.Modify();
+        end;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetAllowInventoryAdjmtUpgradeTag());
+    end;
+
+    local procedure UpgradeGranularWarehouseHandlingSetup()
+    var
+        Location: Record Location;
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        LocationDataTransfer: DataTransfer;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetLocationGranularWarehouseHandlingSetupsUpgradeTag()) then
+            exit;
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Pick"), '=%1', false);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Shipment"), '=%1', false);
+        LocationDataTransfer.AddConstantValue("Prod. Consump. Whse. Handling"::"Warehouse Pick (optional)", Location.FieldNo("Prod. Consump. Whse. Handling"));
+        LocationDataTransfer.AddConstantValue("Asm. Consump. Whse. Handling"::"Warehouse Pick (optional)", Location.FieldNo("Asm. Consump. Whse. Handling"));
+        LocationDataTransfer.AddConstantValue("Job Consump. Whse. Handling"::"Warehouse Pick (optional)", Location.FieldNo("Job Consump. Whse. Handling"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Pick"), '=%1', false);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Shipment"), '=%1', true);
+        LocationDataTransfer.AddConstantValue("Prod. Consump. Whse. Handling"::"Warehouse Pick (optional)", Location.FieldNo("Prod. Consump. Whse. Handling"));
+        LocationDataTransfer.AddConstantValue("Asm. Consump. Whse. Handling"::"Warehouse Pick (optional)", Location.FieldNo("Asm. Consump. Whse. Handling"));
+        LocationDataTransfer.AddConstantValue("Job Consump. Whse. Handling"::"Warehouse Pick (optional)", Location.FieldNo("Job Consump. Whse. Handling"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Pick"), '=%1', true);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Shipment"), '=%1', false);
+        LocationDataTransfer.AddConstantValue("Prod. Consump. Whse. Handling"::"Inventory Pick/Movement", Location.FieldNo("Prod. Consump. Whse. Handling"));
+        LocationDataTransfer.AddConstantValue("Asm. Consump. Whse. Handling"::"Inventory Movement", Location.FieldNo("Asm. Consump. Whse. Handling"));
+        LocationDataTransfer.AddConstantValue("Job Consump. Whse. Handling"::"Inventory Pick", Location.FieldNo("Job Consump. Whse. Handling"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Pick"), '=%1', true);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Shipment"), '=%1', true);
+        LocationDataTransfer.AddConstantValue("Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)", Location.FieldNo("Prod. Consump. Whse. Handling"));
+        LocationDataTransfer.AddConstantValue("Asm. Consump. Whse. Handling"::"Warehouse Pick (mandatory)", Location.FieldNo("Asm. Consump. Whse. Handling"));
+        LocationDataTransfer.AddConstantValue("Job Consump. Whse. Handling"::"Warehouse Pick (mandatory)", Location.FieldNo("Job Consump. Whse. Handling"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Put-away"), '=%1', false);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Receive"), '=%1', false);
+        LocationDataTransfer.AddConstantValue("Prod. Output Whse. Handling"::"No Warehouse Handling", Location.FieldNo("Prod. Output Whse. Handling"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Put-away"), '=%1', false);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Receive"), '=%1', true);
+        LocationDataTransfer.AddConstantValue("Prod. Output Whse. Handling"::"No Warehouse Handling", Location.FieldNo("Prod. Output Whse. Handling"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Put-away"), '=%1', true);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Receive"), '=%1', true);
+        LocationDataTransfer.AddConstantValue("Prod. Output Whse. Handling"::"No Warehouse Handling", Location.FieldNo("Prod. Output Whse. Handling"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        LocationDataTransfer.SetTables(Database::Location, Database::Location);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Put-away"), '=%1', true);
+        LocationDataTransfer.AddSourceFilter(Location.FieldNo("Require Receive"), '=%1', false);
+        LocationDataTransfer.AddConstantValue("Prod. Output Whse. Handling"::"Inventory Put-away", Location.FieldNo("Prod. Output Whse. Handling"));
+        LocationDataTransfer.CopyFields();
+        Clear(LocationDataTransfer);
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetLocationGranularWarehouseHandlingSetupsUpgradeTag());
     end;
 
     local procedure UpgradeVATSetup()

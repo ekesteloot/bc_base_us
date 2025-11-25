@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+
 page 9314 "Warehouse Movements"
 {
     ApplicationArea = Warehouse;
@@ -6,7 +12,7 @@ page 9314 "Warehouse Movements"
     Editable = false;
     PageType = List;
     SourceTable = "Warehouse Activity Header";
-    SourceTableView = WHERE(Type = CONST(Movement));
+    SourceTableView = where(Type = const(Movement));
     UsageCategory = Lists;
 
     layout
@@ -110,9 +116,9 @@ page 9314 "Warehouse Movements"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Whse. Activity Header"),
-                                  Type = FIELD(Type),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Whse. Activity Header"),
+                                  Type = field(Type),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Registered Movements")
@@ -121,9 +127,9 @@ page 9314 "Warehouse Movements"
                     Caption = 'Registered Movements';
                     Image = RegisteredDocs;
                     RunObject = Page "Registered Whse. Activity List";
-                    RunPageLink = Type = FIELD(Type),
-                                  "Whse. Activity No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Activity No.");
+                    RunPageLink = Type = field(Type),
+                                  "Whse. Activity No." = field("No.");
+                    RunPageView = sorting("Whse. Activity No.");
                     ToolTip = 'View any quantities that have already been moved.';
                 }
             }
@@ -179,10 +185,10 @@ page 9314 "Warehouse Movements"
     var
         WMSManagement: Codeunit "WMS Management";
     begin
-        ErrorIfUserIsNotWhseEmployee();
-        FilterGroup(2); // set group of filters user cannot change
-        SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
-        FilterGroup(0); // set filter group back to standard
+        Rec.ErrorIfUserIsNotWhseEmployee();
+        Rec.FilterGroup(2); // set group of filters user cannot change
+        Rec.SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
+        Rec.FilterGroup(0); // set filter group back to standard
     end;
 
     local procedure RegisterActivityYesNo()

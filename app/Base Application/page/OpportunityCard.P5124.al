@@ -1,3 +1,14 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Reports;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Task;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Sales.Document;
+
 page 5124 "Opportunity Card"
 {
     Caption = 'Opportunity Card';
@@ -33,8 +44,8 @@ page 5124 "Opportunity Card"
                     var
                         Contact: Record Contact;
                     begin
-                        if "Contact No." <> '' then
-                            if Contact.Get("Contact No.") then
+                        if Rec."Contact No." <> '' then
+                            if Contact.Get(Rec."Contact No.") then
                                 Contact.CheckIfPrivacyBlockedGeneric();
                         ContactNoOnAfterValidate();
                     end;
@@ -109,7 +120,7 @@ page 5124 "Opportunity Card"
                     Importance = Additional;
                     ToolTip = 'Specifies the number of the campaign to which this opportunity is linked.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Editable = PriorityEditable;
@@ -127,7 +138,7 @@ page 5124 "Opportunity Card"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the status of the opportunity. There are four options:';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Importance = Additional;
@@ -156,7 +167,7 @@ page 5124 "Opportunity Card"
             part(Control25; "Opportunity Subform")
             {
                 ApplicationArea = RelationshipMgmt;
-                SubPageLink = "Opportunity No." = FIELD("No.");
+                SubPageLink = "Opportunity No." = field("No.");
             }
         }
         area(factboxes)
@@ -165,7 +176,7 @@ page 5124 "Opportunity Card"
             {
                 ApplicationArea = RelationshipMgmt;
                 Caption = 'Statistics';
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -194,7 +205,7 @@ page 5124 "Opportunity Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Opportunity Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -204,8 +215,8 @@ page 5124 "Opportunity Card"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Opportunity No." = FIELD("No.");
-                    RunPageView = SORTING("Opportunity No.", Date);
+                    RunPageLink = "Opportunity No." = field("No.");
+                    RunPageView = sorting("Opportunity No.", Date);
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
@@ -215,8 +226,8 @@ page 5124 "Opportunity Card"
                     Caption = 'Postponed &Interactions';
                     Image = PostponedInteractions;
                     RunObject = Page "Postponed Interactions";
-                    RunPageLink = "Opportunity No." = FIELD("No.");
-                    RunPageView = SORTING("Opportunity No.", Date);
+                    RunPageLink = "Opportunity No." = field("No.");
+                    RunPageView = sorting("Opportunity No.", Date);
                     ToolTip = 'View postponed interactions for opportunities.';
                 }
                 action("T&asks")
@@ -225,9 +236,9 @@ page 5124 "Opportunity Card"
                     Caption = 'T&asks';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    RunPageLink = "Opportunity No." = FIELD("No."),
-                                  "System To-do Type" = FILTER(Organizer);
-                    RunPageView = SORTING("Opportunity No.");
+                    RunPageLink = "Opportunity No." = field("No."),
+                                  "System To-do Type" = filter(Organizer);
+                    RunPageView = sorting("Opportunity No.");
                     ToolTip = 'View all marketing tasks that involve the opportunity.';
                 }
                 action("Co&mments")
@@ -236,8 +247,8 @@ page 5124 "Opportunity Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Rlshp. Mgt. Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Opportunity),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Opportunity),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Show Sales Quote")
@@ -251,15 +262,15 @@ page 5124 "Opportunity Card"
                     var
                         SalesHeader: Record "Sales Header";
                     begin
-                        if ("Sales Document Type" <> "Sales Document Type"::Quote) or
-                           ("Sales Document No." = '')
+                        if (Rec."Sales Document Type" <> Rec."Sales Document Type"::Quote) or
+                           (Rec."Sales Document No." = '')
                         then
                             Error(Text001);
 
-                        if SalesHeader.Get(SalesHeader."Document Type"::Quote, "Sales Document No.") then
+                        if SalesHeader.Get(SalesHeader."Document Type"::Quote, Rec."Sales Document No.") then
                             PAGE.Run(PAGE::"Sales Quote", SalesHeader)
                         else
-                            Error(Text002, "Sales Document No.");
+                            Error(Text002, Rec."Sales Document No.");
                     end;
                 }
             }
@@ -278,7 +289,7 @@ page 5124 "Opportunity Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(RecordId);
+                        CRMIntegrationManagement.ShowCRMEntityFromRecordID(Rec.RecordId);
                     end;
                 }
                 action(CRMSynchronizeNow)
@@ -323,7 +334,7 @@ page 5124 "Opportunity Card"
                         var
                             CRMIntegrationManagement: Codeunit "CRM Integration Management";
                         begin
-                            CRMIntegrationManagement.DefineCoupling(RecordId);
+                            CRMIntegrationManagement.DefineCoupling(Rec.RecordId);
                         end;
                     }
                     action(DeleteCRMCoupling)
@@ -339,7 +350,7 @@ page 5124 "Opportunity Card"
                         var
                             CRMCouplingManagement: Codeunit "CRM Coupling Management";
                         begin
-                            CRMCouplingManagement.RemoveCoupling(RecordId);
+                            CRMCouplingManagement.RemoveCoupling(Rec.RecordId);
                         end;
                     }
                 }
@@ -354,7 +365,7 @@ page 5124 "Opportunity Card"
                     var
                         CRMIntegrationManagement: Codeunit "CRM Integration Management";
                     begin
-                        CRMIntegrationManagement.ShowLog(RecordId);
+                        CRMIntegrationManagement.ShowLog(Rec.RecordId);
                     end;
                 }
             }
@@ -375,7 +386,7 @@ page 5124 "Opportunity Card"
 
                     trigger OnAction()
                     begin
-                        StartActivateFirstStage();
+                        Rec.StartActivateFirstStage();
                         CurrPage.Update(true);
                     end;
                 }
@@ -389,7 +400,7 @@ page 5124 "Opportunity Card"
 
                     trigger OnAction()
                     begin
-                        UpdateOpportunity();
+                        Rec.UpdateOpportunity();
                     end;
                 }
                 action(CloseOpportunity)
@@ -402,7 +413,7 @@ page 5124 "Opportunity Card"
 
                     trigger OnAction()
                     begin
-                        CloseOpportunity();
+                        Rec.CloseOpportunity();
                     end;
                 }
                 action(CreateSalesQuote)
@@ -415,7 +426,7 @@ page 5124 "Opportunity Card"
 
                     trigger OnAction()
                     begin
-                        CreateQuote();
+                        Rec.CreateQuote();
                     end;
                 }
                 action("Print Details")
@@ -533,15 +544,15 @@ page 5124 "Opportunity Card"
     var
         Contact: Record Contact;
     begin
-        if "Contact No." <> '' then
-            if Contact.Get("Contact No.") then
+        if Rec."Contact No." <> '' then
+            if Contact.Get(Rec."Contact No.") then
                 Contact.CheckIfPrivacyBlockedGeneric();
-        if "Contact Company No." <> '' then
-            if Contact.Get("Contact Company No.") then
+        if Rec."Contact Company No." <> '' then
+            if Contact.Get(Rec."Contact Company No.") then
                 Contact.CheckIfPrivacyBlockedGeneric();
         UpdateEditable();
-        OppInProgress := Status = Status::"In Progress";
-        OppNo := "No.";
+        OppInProgress := Rec.Status = Rec.Status::"In Progress";
+        OppNo := Rec."No.";
     end;
 
     trigger OnAfterGetRecord()
@@ -549,9 +560,9 @@ page 5124 "Opportunity Card"
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
     begin
         if CRMIntegrationEnabled then
-            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(RecordId);
+            CRMIsCoupledToRecord := CRMCouplingManagement.IsRecordCoupledToCRM(Rec.RecordId);
 
-        GlobalContact.GetOrClear("Contact No.");
+        GlobalContact.GetOrClear(Rec."Contact No.");
     end;
 
     trigger OnInit()
@@ -568,29 +579,29 @@ page 5124 "Opportunity Card"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Creation Date" := WorkDate();
-        if "Segment No." = '' then
-            SetSegmentFromFilter();
-        if "Contact No." = '' then
-            SetContactFromFilter();
-        if "Campaign No." = '' then
-            SetCampaignFromFilter();
-        SetDefaultSalesCycle();
+        Rec."Creation Date" := WorkDate();
+        if Rec."Segment No." = '' then
+            Rec.SetSegmentFromFilter();
+        if Rec."Contact No." = '' then
+            Rec.SetContactFromFilter();
+        if Rec."Campaign No." = '' then
+            Rec.SetCampaignFromFilter();
+        Rec.SetDefaultSalesCycle();
     end;
 
     trigger OnOpenPage()
     var
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
     begin
-        OppNo := "No.";
+        OppNo := Rec."No.";
         CRMIntegrationEnabled := CRMIntegrationManagement.IsCRMIntegrationEnabled();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if Get("No.") then
-            if ("No." <> OppNo) and (Status = Status::"Not Started") then
-                StartActivateFirstStage();
+        if Rec.Get(Rec."No.") then
+            if (Rec."No." <> OppNo) and (Rec.Status = Rec.Status::"Not Started") then
+                Rec.StartActivateFirstStage();
     end;
 
     var
@@ -598,19 +609,12 @@ page 5124 "Opportunity Card"
         Text001: Label 'There is no sales quote assigned to this opportunity.';
         Text002: Label 'Sales quote %1 doesn''t exist.';
         OppNo: Code[20];
-        [InDataSet]
         SalesCycleCodeEditable: Boolean;
-        [InDataSet]
         SalesDocumentNoEditable: Boolean;
-        [InDataSet]
         SalesDocumentTypeEditable: Boolean;
-        [InDataSet]
         SalespersonCodeEditable: Boolean;
-        [InDataSet]
         CampaignNoEditable: Boolean;
-        [InDataSet]
         PriorityEditable: Boolean;
-        [InDataSet]
         ContactNoEditable: Boolean;
         Started: Boolean;
         OppInProgress: Boolean;
@@ -636,7 +640,7 @@ page 5124 "Opportunity Card"
 
     local procedure ContactNoOnAfterValidate()
     begin
-        CalcFields("Contact Name", "Contact Company Name");
+        Rec.CalcFields("Contact Name", "Contact Company Name");
     end;
 }
 

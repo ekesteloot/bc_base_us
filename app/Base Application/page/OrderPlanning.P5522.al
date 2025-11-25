@@ -1,3 +1,18 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
 page 5522 "Order Planning"
 {
     AdditionalSearchTerms = 'supply planning,mrp,material requirements planning,mps,master production schedule';
@@ -44,14 +59,14 @@ page 5522 "Order Planning"
                 field(StatusText; StatusText)
                 {
                     ApplicationArea = Planning;
-                    CaptionClass = FieldCaption(Status);
+                    CaptionClass = Rec.FieldCaption(Status);
                     Editable = false;
                     HideValue = StatusHideValue;
                 }
                 field(DemandTypeText; DemandTypeText)
                 {
                     ApplicationArea = Planning;
-                    CaptionClass = FieldCaption("Demand Type");
+                    CaptionClass = Rec.FieldCaption("Demand Type");
                     Editable = false;
                     HideValue = DemandTypeHideValue;
                     Lookup = false;
@@ -61,7 +76,7 @@ page 5522 "Order Planning"
                 field(DemandSubtypeText; DemandSubtypeText)
                 {
                     ApplicationArea = Planning;
-                    CaptionClass = FieldCaption("Demand Subtype");
+                    CaptionClass = Rec.FieldCaption("Demand Subtype");
                     Editable = false;
                     Visible = false;
                 }
@@ -152,7 +167,7 @@ page 5522 "Order Planning"
                     Editable = SupplyFromEditable;
                     ToolTip = 'Specifies a value, according to the selected replenishment system, before a supply order can be created for the line.';
                 }
-                field(Reserve; Reserve)
+                field(Reserve; Rec.Reserve)
                 {
                     ApplicationArea = Reservation;
                     Editable = ReserveEditable;
@@ -316,9 +331,9 @@ page 5522 "Order Planning"
                     Caption = 'Components';
                     Image = Components;
                     RunObject = Page "Planning Components";
-                    RunPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                  "Worksheet Batch Name" = FIELD("Journal Batch Name"),
-                                  "Worksheet Line No." = FIELD("Line No.");
+                    RunPageLink = "Worksheet Template Name" = field("Worksheet Template Name"),
+                                  "Worksheet Batch Name" = field("Journal Batch Name"),
+                                  "Worksheet Line No." = field("Line No.");
                     ToolTip = 'View or edit the production order components of the parent item on the line.';
                     ShortCutKey = 'Ctrl+Alt+C';
                 }
@@ -328,9 +343,9 @@ page 5522 "Order Planning"
                     Caption = 'Ro&uting';
                     Image = Route;
                     RunObject = Page "Planning Routing";
-                    RunPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                  "Worksheet Batch Name" = FIELD("Journal Batch Name"),
-                                  "Worksheet Line No." = FIELD("Line No.");
+                    RunPageLink = "Worksheet Template Name" = field("Worksheet Template Name"),
+                                  "Worksheet Batch Name" = field("Journal Batch Name"),
+                                  "Worksheet Line No." = field("Line No.");
                     ToolTip = 'View or edit the operations list of the parent item on the line.';
                     ShortCutKey = 'Ctrl+Alt+R';
                 }
@@ -345,7 +360,7 @@ page 5522 "Order Planning"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -366,9 +381,9 @@ page 5522 "Order Planning"
                     var
                         Item: Record Item;
                     begin
-                        TestField(Type, Type::Item);
-                        TestField("No.");
-                        Item."No." := "No.";
+                        Rec.TestField(Type, Rec.Type::Item);
+                        Rec.TestField("No.");
+                        Item."No." := Rec."No.";
                         PAGE.RunModal(PAGE::"Item Card", Item);
                     end;
                 }
@@ -483,7 +498,7 @@ page 5522 "Order Planning"
                     trigger OnAction()
                     begin
                         CurrPage.SaveRecord();
-                        ShowReservation();
+                        Rec.ShowReservation();
                     end;
                 }
                 action(OrderTracking)
@@ -513,9 +528,9 @@ page 5522 "Order Planning"
                     var
                         ReqLine2: Record "Requisition Line";
                     begin
-                        ReqLine2.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        ReqLine2.SetRange("Journal Batch Name", "Journal Batch Name");
-                        ReqLine2.SetRange("Line No.", "Line No.");
+                        ReqLine2.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        ReqLine2.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+                        ReqLine2.SetRange("Line No.", Rec."Line No.");
 
                         REPORT.RunModal(REPORT::"Refresh Planning Demand", true, false, ReqLine2);
                     end;
@@ -552,28 +567,28 @@ page 5522 "Order Planning"
                         ReqLine3 := Rec;
                         OrderPlanningMgt.InsertAltSupplySubstitution(ReqLine3);
                         Rec := ReqLine3;
-                        Modify();
+                        Rec.Modify();
 
                         if OrderPlanningMgt.DeleteLine() then begin
                             xReqLine := Rec;
                             ReqLine2.SetCurrentKey("User ID", "Demand Type", "Demand Subtype", "Demand Order No.");
                             ReqLine2.SetRange("User ID", UserId);
-                            ReqLine2.SetRange("Demand Type", "Demand Type");
-                            ReqLine2.SetRange("Demand Subtype", "Demand Subtype");
-                            ReqLine2.SetRange("Demand Order No.", "Demand Order No.");
-                            ReqLine2.SetRange(Level, Level, Level + 1);
-                            ReqLine2.SetFilter("Line No.", '<>%1', "Line No.");
+                            ReqLine2.SetRange("Demand Type", Rec."Demand Type");
+                            ReqLine2.SetRange("Demand Subtype", Rec."Demand Subtype");
+                            ReqLine2.SetRange("Demand Order No.", Rec."Demand Order No.");
+                            ReqLine2.SetRange(Level, Rec.Level, Rec.Level + 1);
+                            ReqLine2.SetFilter("Line No.", '<>%1', Rec."Line No.");
                             if not ReqLine2.FindFirst() then begin // No other children
                                 ReqLine2.SetRange("Line No.");
                                 ReqLine2.SetRange(Level, 0);
                                 if ReqLine2.FindFirst() then begin // Find and delete parent
                                     Rec := ReqLine2;
-                                    Delete();
+                                    Rec.Delete();
                                 end;
                             end;
 
                             Rec := xReqLine;
-                            Delete();
+                            Rec.Delete();
                             CurrPage.Update(false);
                         end else
                             CurrPage.Update(true);
@@ -678,13 +693,13 @@ page 5522 "Order Planning"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if ReqLine.Get("Worksheet Template Name", "Journal Batch Name", "Line No.") then begin
+        if ReqLine.Get(Rec."Worksheet Template Name", Rec."Journal Batch Name", Rec."Line No.") then begin
             Rec := ReqLine;
-            Modify();
+            Rec.Modify();
             OnUpdateReqLineOnAfterGetCurrRecord(Rec);
         end else
-            if Get("Worksheet Template Name", "Journal Batch Name", "Line No.") then
-                Delete();
+            if Rec.Get(Rec."Worksheet Template Name", Rec."Journal Batch Name", Rec."Line No.") then
+                Rec.Delete();
 
         UpdateSupplyFrom();
         CalcItemAvail();
@@ -693,11 +708,11 @@ page 5522 "Order Planning"
     trigger OnAfterGetRecord()
     begin
         DescriptionIndent := 0;
-        StatusText := Format(Status);
+        StatusText := Format(Rec.Status);
         StatusTextOnFormat(StatusText);
-        DemandTypeText := Format("Demand Type");
+        DemandTypeText := Format(Rec."Demand Type");
         DemandTypeTextOnFormat(DemandTypeText);
-        DemandSubtypeText := Format("Demand Subtype");
+        DemandSubtypeText := Format(Rec."Demand Subtype");
         DemandSubtypeTextOnFormat(DemandSubtypeText);
         DemandOrderNoOnFormat();
         DescriptionOnFormat();
@@ -713,11 +728,11 @@ page 5522 "Order Planning"
         xReqLine: Record "Requisition Line";
     begin
         xReqLine := Rec;
-        while (Next() <> 0) and (Level > xReqLine.Level) do
-            Delete(true);
+        while (Rec.Next() <> 0) and (Rec.Level > xReqLine.Level) do
+            Rec.Delete(true);
         Rec := xReqLine;
         xReqLine.Delete(true);
-        Delete();
+        Rec.Delete();
         exit(false);
     end;
 
@@ -732,7 +747,7 @@ page 5522 "Order Planning"
     var
         ReqLine: Record "Requisition Line";
     begin
-        ReqLine.Get("Worksheet Template Name", "Journal Batch Name", "Line No.");
+        ReqLine.Get(Rec."Worksheet Template Name", Rec."Journal Batch Name", Rec."Line No.");
         ReqLine.TransferFields(Rec, false);
         ReqLine.Modify(true);
     end;
@@ -741,7 +756,7 @@ page 5522 "Order Planning"
     begin
         if not MfgUserTempl.Get(UserId) then begin
             MfgUserTempl.Init();
-            MfgUserTempl."User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
+            MfgUserTempl."User ID" := CopyStr(UserId(), 1, MaxStrLen(Rec."User ID"));
             MfgUserTempl."Make Orders" := MfgUserTempl."Make Orders"::"The Active Order";
             MfgUserTempl."Create Purchase Order" := MfgUserTempl."Create Purchase Order"::"Make Purch. Orders";
             MfgUserTempl."Create Production Order" := MfgUserTempl."Create Production Order"::"Firm Planned";
@@ -769,31 +784,18 @@ page 5522 "Order Planning"
         Text002: Label 'Production';
         Text003: Label 'Service';
         Text004: Label 'Jobs';
-        [InDataSet]
         StatusHideValue: Boolean;
-        [InDataSet]
         StatusText: Text[1024];
-        [InDataSet]
         DemandTypeHideValue: Boolean;
-        [InDataSet]
         DemandTypeEmphasize: Boolean;
-        [InDataSet]
         DemandTypeText: Text[1024];
-        [InDataSet]
         DemandSubtypeText: Text[1024];
-        [InDataSet]
         DemandOrderNoHideValue: Boolean;
-        [InDataSet]
         DemandOrderNoEmphasize: Boolean;
-        [InDataSet]
         DescriptionEmphasize: Boolean;
-        [InDataSet]
         DescriptionIndent: Integer;
-        [InDataSet]
         SupplyFromEditable: Boolean;
-        [InDataSet]
         ReserveEditable: Boolean;
-        [InDataSet]
         DemandOrderFilterCtrlEnable: Boolean;
         Text005: Label 'Assembly';
         QtyOnOtherLocations: Decimal;
@@ -802,13 +804,9 @@ page 5522 "Order Planning"
         EarliestShptDateAvailable: Date;
 
     protected var
-        [InDataSet]
         DemandQuantityHideValue: Boolean;
-        [InDataSet]
         DemandQtyAvailableHideValue: Boolean;
-        [InDataSet]
         ReplenishmentSystemHideValue: Boolean;
-        [InDataSet]
         QuantityHideValue: Boolean;
 
     procedure SetSalesOrder(SalesHeader2: Record "Sales Header")
@@ -851,7 +849,7 @@ page 5522 "Order Planning"
         ReqLine: Record "Requisition Line";
         ReqLineWithCursor: Record "Requisition Line";
     begin
-        DeleteAll();
+        Rec.DeleteAll();
 
         ReqLine.Reset();
         ReqLine.CopyFilters(Rec);
@@ -860,12 +858,12 @@ page 5522 "Order Planning"
         if ReqLine.FindSet() then
             repeat
                 Rec := ReqLine;
-                Insert();
+                Rec.Insert();
                 if ReqLine.Level = 0 then
                     FindReqLineForCursor(ReqLineWithCursor, ReqLine);
             until ReqLine.Next() = 0;
 
-        if FindFirst() then
+        if Rec.FindFirst() then
             if ReqLineWithCursor."Line No." > 0 then
                 Rec := ReqLineWithCursor;
 
@@ -877,7 +875,7 @@ page 5522 "Order Planning"
         if ProdOrder."No." = '' then
             exit;
 
-        if (ActualReqLine."Demand Type" = DATABASE::"Prod. Order Component") and
+        if (ActualReqLine."Demand Type" = Enum::TableID::"Prod. Order Component".AsInteger()) and
            (ActualReqLine."Demand Subtype" = ProdOrder.Status.AsInteger()) and
            (ActualReqLine."Demand Order No." = ProdOrder."No.")
         then
@@ -891,65 +889,65 @@ page 5522 "Order Planning"
     begin
         TempReqLine2.Copy(Rec);
 
-        Reset();
-        if Find('-') then
+        Rec.Reset();
+        if Rec.Find('-') then
             repeat
                 ReqLine := Rec;
                 if not ReqLine.Find() or
-                   ((Level = 0) and ((ReqLine.Next() = 0) or (ReqLine.Level = 0)))
+                   ((Rec.Level = 0) and ((ReqLine.Next() = 0) or (ReqLine.Level = 0)))
                 then begin
-                    if Level = 0 then begin
+                    if Rec.Level = 0 then begin
                         ReqLine := Rec;
                         ReqLine.Find();
                         ReqLine.Delete(true);
                     end;
-                    Delete();
+                    Rec.Delete();
                 end;
-            until Next() = 0;
+            until Rec.Next() = 0;
 
-        Copy(TempReqLine2);
+        Rec.Copy(TempReqLine2);
     end;
 
     procedure SetRecFilters()
     begin
-        Reset();
-        FilterGroup(2);
-        SetRange("User ID", UserId);
-        SetRange("Worksheet Template Name", '');
+        Rec.Reset();
+        Rec.FilterGroup(2);
+        Rec.SetRange("User ID", UserId);
+        Rec.SetRange("Worksheet Template Name", '');
 
         case DemandOrderFilter of
             DemandOrderFilter::"All Demands":
                 begin
-                    SetRange("Demand Type");
-                    SetCurrentKey("User ID", "Worksheet Template Name", "Journal Batch Name", "Line No.");
+                    Rec.SetRange("Demand Type");
+                    Rec.SetCurrentKey("User ID", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
             DemandOrderFilter::"Sales Demand":
                 begin
-                    SetRange("Demand Type", DATABASE::"Sales Line");
-                    SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
+                    Rec.SetRange("Demand Type", Enum::TableID::"Sales Line".AsInteger());
+                    Rec.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
             DemandOrderFilter::"Production Demand":
                 begin
-                    SetRange("Demand Type", DATABASE::"Prod. Order Component");
-                    SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
+                    Rec.SetRange("Demand Type", Enum::TableID::"Prod. Order Component".AsInteger());
+                    Rec.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
             DemandOrderFilter::"Assembly Demand":
                 begin
-                    SetRange("Demand Type", DATABASE::"Assembly Line");
-                    SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
+                    Rec.SetRange("Demand Type", Enum::TableID::"Assembly Line".AsInteger());
+                    Rec.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
             DemandOrderFilter::"Service Demand":
                 begin
-                    SetRange("Demand Type", DATABASE::"Service Line");
-                    SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
+                    Rec.SetRange("Demand Type", Enum::TableID::"Service Line".AsInteger());
+                    Rec.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
             DemandOrderFilter::"Job Demand":
                 begin
-                    SetRange("Demand Type", DATABASE::"Job Planning Line");
-                    SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
+                    Rec.SetRange("Demand Type", Enum::TableID::"Job Planning Line".AsInteger());
+                    Rec.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
                 end;
         end;
-        FilterGroup(0);
+        Rec.FilterGroup(0);
 
         CurrPage.Update(false);
     end;
@@ -967,9 +965,9 @@ page 5522 "Order Planning"
         OnBeforeShowDemandOrder(Rec, IsHandled);
         if not IsHandled then
             case Rec."Demand Type" of
-                DATABASE::"Sales Line":
+                Enum::TableID::"Sales Line".AsInteger():
                     begin
-                        SalesHeader.Get("Demand Subtype", "Demand Order No.");
+                        SalesHeader.Get(Rec."Demand Subtype", Rec."Demand Order No.");
                         case SalesHeader."Document Type" of
                             SalesHeader."Document Type"::Order:
                                 PAGE.Run(PAGE::"Sales Order", SalesHeader);
@@ -977,9 +975,9 @@ page 5522 "Order Planning"
                                 PAGE.Run(PAGE::"Sales Return Order", SalesHeader);
                         end;
                     end;
-                DATABASE::"Prod. Order Component":
+                Enum::TableID::"Prod. Order Component".AsInteger():
                     begin
-                        ProdOrder.Get("Demand Subtype", "Demand Order No.");
+                        ProdOrder.Get(Rec."Demand Subtype", Rec."Demand Order No.");
                         case ProdOrder.Status of
                             ProdOrder.Status::Planned:
                                 PAGE.Run(PAGE::"Planned Production Order", ProdOrder);
@@ -989,25 +987,25 @@ page 5522 "Order Planning"
                                 PAGE.Run(PAGE::"Released Production Order", ProdOrder);
                         end;
                     end;
-                DATABASE::"Assembly Line":
+                Enum::TableID::"Assembly Line".AsInteger():
                     begin
-                        AsmHeader.Get("Demand Subtype", "Demand Order No.");
+                        AsmHeader.Get(Rec."Demand Subtype", Rec."Demand Order No.");
                         case AsmHeader."Document Type" of
                             AsmHeader."Document Type"::Order:
                                 PAGE.Run(PAGE::"Assembly Order", AsmHeader);
                         end;
                     end;
-                DATABASE::"Service Line":
+                Enum::TableID::"Service Line".AsInteger():
                     begin
-                        ServHeader.Get("Demand Subtype", "Demand Order No.");
+                        ServHeader.Get(Rec."Demand Subtype", Rec."Demand Order No.");
                         case ServHeader."Document Type" of
                             ServHeader."Document Type"::Order:
                                 PAGE.Run(PAGE::"Service Order", ServHeader);
                         end;
                     end;
-                DATABASE::"Job Planning Line":
+                Enum::TableID::"Job Planning Line".AsInteger():
                     begin
-                        Job.Get("Demand Order No.");
+                        Job.Get(Rec."Demand Order No.");
                         case Job.Status of
                             Job.Status::Open:
                                 PAGE.Run(PAGE::"Job Card", Job);
@@ -1030,13 +1028,13 @@ page 5522 "Order Planning"
     var
         QtyOnOtherLocation: Decimal;
     begin
-        if "No." = '' then
+        if Rec."No." = '' then
             exit;
 
         QtyOnOtherLocation := OrderPlanningMgt.AvailQtyOnOtherLocations(Rec); // Base Unit
-        if "Qty. per Unit of Measure" = 0 then
-            "Qty. per Unit of Measure" := 1;
-        QtyOnOtherLocation := Round(QtyOnOtherLocation / "Qty. per Unit of Measure", UOMMgt.QtyRndPrecision());
+        if Rec."Qty. per Unit of Measure" = 0 then
+            Rec."Qty. per Unit of Measure" := 1;
+        QtyOnOtherLocation := Round(QtyOnOtherLocation / Rec."Qty. per Unit of Measure", UOMMgt.QtyRndPrecision());
 
         exit(QtyOnOtherLocation);
     end;
@@ -1045,13 +1043,13 @@ page 5522 "Order Planning"
     var
         QtyATP: Decimal;
     begin
-        if "No." = '' then
+        if Rec."No." = '' then
             exit;
 
-        QtyATP := OrderPlanningMgt.CalcATPQty("No.", "Variant Code", "Location Code", "Demand Date"); // Base Unit
-        if "Qty. per Unit of Measure" = 0 then
-            "Qty. per Unit of Measure" := 1;
-        QtyATP := Round(QtyATP / "Qty. per Unit of Measure", UOMMgt.QtyRndPrecision());
+        QtyATP := OrderPlanningMgt.CalcATPQty(Rec."No.", Rec."Variant Code", Rec."Location Code", Rec."Demand Date"); // Base Unit
+        if Rec."Qty. per Unit of Measure" = 0 then
+            Rec."Qty. per Unit of Measure" := 1;
+        QtyATP := Round(QtyATP / Rec."Qty. per Unit of Measure", UOMMgt.QtyRndPrecision());
 
         exit(QtyATP);
     end;
@@ -1060,19 +1058,19 @@ page 5522 "Order Planning"
     var
         Item: Record Item;
     begin
-        if "No." = '' then
+        if Rec."No." = '' then
             exit;
 
-        Item.Get("No.");
+        Item.Get(Rec."No.");
         if Item."Order Tracking Policy" = Item."Order Tracking Policy"::"Tracking & Action Msg." then
             exit;
 
-        exit(OrderPlanningMgt.CalcATPEarliestDate("No.", "Variant Code", "Location Code", "Demand Date", "Quantity (Base)"));
+        exit(OrderPlanningMgt.CalcATPEarliestDate(Rec."No.", Rec."Variant Code", Rec."Location Code", Rec."Demand Date", Rec."Quantity (Base)"));
     end;
 
     local procedure CalcSubstitionAvailable(): Boolean
     begin
-        if "No." = '' then
+        if Rec."No." = '' then
             exit;
 
         exit(OrderPlanningMgt.SubstitutionPossible(Rec));
@@ -1082,8 +1080,8 @@ page 5522 "Order Planning"
     var
         ReqLine: Record "Requisition Line";
     begin
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
 
         Clear(OrderPlanningMgt);
         case DemandOrderFilter of
@@ -1106,8 +1104,8 @@ page 5522 "Order Planning"
 
     local procedure UpdateSupplyFrom()
     begin
-        SupplyFromEditable := not ("Replenishment System" in ["Replenishment System"::"Prod. Order",
-                                                              "Replenishment System"::Assembly]);
+        SupplyFromEditable := not (Rec."Replenishment System" in [Enum::"Replenishment System"::"Prod. Order",
+                                                                  Enum::"Replenishment System"::Assembly]);
     end;
 
     local procedure DemandOrderFilterOnAfterValida()
@@ -1123,101 +1121,101 @@ page 5522 "Order Planning"
 
     local procedure StatusTextOnFormat(var Text: Text[1024])
     begin
-        if "Demand Line No." = 0 then
-            case "Demand Type" of
-                DATABASE::"Prod. Order Component":
-                    Text := Format("Production Order Status".FromInteger(Status));
-                DATABASE::"Sales Line":
-                    Text := Format("Sales Document Status".FromInteger(Status));
-                DATABASE::"Service Line":
-                    Text := Format("Service Document Status".FromInteger(Status));
-                DATABASE::"Job Planning Line":
-                    Text := Format("Job Status".FromInteger(Status));
-                DATABASE::"Assembly Line":
+        if Rec."Demand Line No." = 0 then
+            case Rec."Demand Type" of
+                Enum::TableID::"Prod. Order Component".AsInteger():
+                    Text := Format(Enum::"Production Order Status".FromInteger(Rec.Status));
+                Enum::TableID::"Sales Line".AsInteger():
+                    Text := Format(Enum::"Sales Document Status".FromInteger(Rec.Status));
+                Enum::TableID::"Service Line".AsInteger():
+                    Text := Format(Enum::"Service Document Status".FromInteger(Rec.Status));
+                Enum::TableID::"Job Planning Line".AsInteger():
+                    Text := Format("Job Status".FromInteger(Rec.Status));
+                Enum::TableID::"Assembly Line".AsInteger():
                     begin
-                        AsmHeader.Status := Status;
+                        AsmHeader.Status := Rec.Status;
                         Text := Format(AsmHeader.Status);
                     end;
             end;
 
         OnAfterStatusTextOnFormat(Rec, Text);
 
-        StatusHideValue := "Demand Line No." <> 0;
+        StatusHideValue := Rec."Demand Line No." <> 0;
     end;
 
     local procedure DemandTypeTextOnFormat(var Text: Text[1024])
     begin
-        if "Demand Line No." = 0 then
-            case "Demand Type" of
-                DATABASE::"Sales Line":
+        if Rec."Demand Line No." = 0 then
+            case Rec."Demand Type" of
+                Enum::TableID::"Sales Line".AsInteger():
                     Text := Text001;
-                DATABASE::"Prod. Order Component":
+                Enum::TableID::"Prod. Order Component".AsInteger():
                     Text := Text002;
-                DATABASE::"Service Line":
+                Enum::TableID::"Service Line".AsInteger():
                     Text := Text003;
-                DATABASE::"Job Planning Line":
+                Enum::TableID::"Job Planning Line".AsInteger():
                     Text := Text004;
-                DATABASE::"Assembly Line":
+                Enum::TableID::"Assembly Line".AsInteger():
                     Text := Text005;
             end;
 
         OnAfterDemandTypeTextOnFormat(Rec, Text);
 
-        DemandTypeHideValue := "Demand Line No." <> 0;
-        DemandTypeEmphasize := Level = 0;
+        DemandTypeHideValue := Rec."Demand Line No." <> 0;
+        DemandTypeEmphasize := Rec.Level = 0;
     end;
 
     local procedure DemandSubtypeTextOnFormat(var Text: Text[1024])
     begin
-        case "Demand Type" of
-            DATABASE::"Prod. Order Component":
-                Text := Format("Production Order Status".FromInteger(Status));
-            DATABASE::"Sales Line":
-                Text := Format("Sales Document Type".FromInteger("Demand Subtype"));
-            DATABASE::"Service Line":
-                Text := Format("Service Document Type".FromInteger("Demand Subtype"));
-            DATABASE::"Job Planning Line":
-                Text := Format("Job Status".FromInteger(Status));
-            DATABASE::"Assembly Line":
-                Text := Format("Assembly Document Type".FromInteger("Demand Subtype"));
+        case Rec."Demand Type" of
+            Enum::TableID::"Prod. Order Component".AsInteger():
+                Text := Format(Enum::"Production Order Status".FromInteger(Rec.Status));
+            Enum::TableID::"Sales Line".AsInteger():
+                Text := Format(Enum::"Sales Document Type".FromInteger(Rec."Demand Subtype"));
+            Enum::TableID::"Service Line".AsInteger():
+                Text := Format(Enum::"Service Document Type".FromInteger(Rec."Demand Subtype"));
+            Enum::TableID::"Job Planning Line".AsInteger():
+                Text := Format("Job Status".FromInteger(Rec.Status));
+            Enum::TableID::"Assembly Line".AsInteger():
+                Text := Format(Enum::"Assembly Document Type".FromInteger(Rec."Demand Subtype"));
         end
     end;
 
     local procedure DemandOrderNoOnFormat()
     begin
-        DemandOrderNoHideValue := "Demand Line No." <> 0;
-        DemandOrderNoEmphasize := Level = 0;
+        DemandOrderNoHideValue := Rec."Demand Line No." <> 0;
+        DemandOrderNoEmphasize := Rec.Level = 0;
     end;
 
     local procedure DescriptionOnFormat()
     begin
-        DescriptionIndent := Level + "Planning Level";
-        DescriptionEmphasize := Level = 0;
+        DescriptionIndent := Rec.Level + Rec."Planning Level";
+        DescriptionEmphasize := Rec.Level = 0;
     end;
 
     local procedure DemandQuantityOnFormat()
     begin
-        DemandQuantityHideValue := Level = 0;
+        DemandQuantityHideValue := Rec.Level = 0;
     end;
 
     local procedure DemandQtyAvailableOnFormat()
     begin
-        DemandQtyAvailableHideValue := Level = 0;
+        DemandQtyAvailableHideValue := Rec.Level = 0;
     end;
 
     local procedure ReplenishmentSystemOnFormat()
     begin
-        ReplenishmentSystemHideValue := "Replenishment System" = "Replenishment System"::" ";
+        ReplenishmentSystemHideValue := Rec."Replenishment System" = Rec."Replenishment System"::" ";
     end;
 
     local procedure QuantityOnFormat()
     begin
-        QuantityHideValue := Level = 0;
+        QuantityHideValue := Rec.Level = 0;
     end;
 
     local procedure ReserveOnFormat()
     begin
-        ReserveEditable := Level <> 0;
+        ReserveEditable := Rec.Level <> 0;
     end;
 
     local procedure MakeSupplyOrders() ActionMsgCarriedOut: Boolean

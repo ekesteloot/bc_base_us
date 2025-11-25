@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 529 "Posted Purchase Invoice Lines"
 {
     ApplicationArea = Basic, Suite;
@@ -141,6 +145,12 @@ page 529 "Posted Purchase Invoice Lines"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the item ledger entry that the document or journal line is applied to.';
                 }
+                field("Order No."; Rec."Order No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the order number this line is associated with.';
+                    Visible = false;
+                }
                 field("Job No."; Rec."Job No.")
                 {
                     ApplicationArea = Jobs;
@@ -201,7 +211,7 @@ page 529 "Posted Purchase Invoice Lines"
 
                     trigger OnAction()
                     begin
-                        PurchInvHeader.Get("Document No.");
+                        PurchInvHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Purchase Invoice", PurchInvHeader);
                     end;
                 }
@@ -216,7 +226,7 @@ page 529 "Posted Purchase Invoice Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Lines")
@@ -229,7 +239,7 @@ page 529 "Posted Purchase Invoice Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }

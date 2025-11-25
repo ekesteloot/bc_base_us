@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.CashFlow.Forecast;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 codeunit 413 AnalysisViewEntryToGLEntries
 {
 

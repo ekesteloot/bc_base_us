@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using System.Security.AccessControl;
+
 table 5636 "Insurance Register"
 {
     Caption = 'Insurance Register';
@@ -33,8 +37,6 @@ table 5636 "Insurance Register"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(7; "Journal Batch Name"; Code[10])
         {

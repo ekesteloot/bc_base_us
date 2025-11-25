@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System;
+
 table 1227 "Data Exch. Line Def"
 {
     Caption = 'Data Exch. Line Def';
@@ -34,7 +38,7 @@ table 1227 "Data Exch. Line Def"
         field(10; "Parent Code"; Code[20])
         {
             Caption = 'Parent Code';
-            TableRelation = "Data Exch. Line Def".Code WHERE("Data Exch. Def Code" = FIELD("Data Exch. Def Code"));
+            TableRelation = "Data Exch. Line Def".Code where("Data Exch. Def Code" = field("Data Exch. Def Code"));
 
             trigger OnValidate()
             begin

@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+
 page 9099 "Job WIP/Recognition FactBox"
 {
     Caption = 'Job Details - WIP/Recognition';
@@ -56,26 +60,26 @@ page 9099 "Job WIP/Recognition FactBox"
                 ApplicationArea = Jobs;
                 ToolTip = 'Specifies the recognized sales amount that was last calculated for the job, which is the sum of the Recognized Sales Job WIP Entries.';
             }
-            field("Recog. Profit Amount"; CalcRecognizedProfitAmount())
+            field("Recog. Profit Amount"; Rec.CalcRecognizedProfitAmount())
             {
                 ApplicationArea = Jobs;
                 Caption = 'Recog. Profit Amount';
                 ToolTip = 'Specifies the recognized profit amount for the job.';
             }
-            field("Recog. Profit %"; CalcRecognizedProfitPercentage())
+            field("Recog. Profit %"; Rec.CalcRecognizedProfitPercentage())
             {
                 ApplicationArea = Jobs;
                 Caption = 'Recog. Profit %';
                 ToolTip = 'Specifies the recognized profit percentage for the job.';
             }
-            field("Acc. WIP Costs Amount"; CalcAccWIPCostsAmount())
+            field("Acc. WIP Costs Amount"; Rec.CalcAccWIPCostsAmount())
             {
                 ApplicationArea = Jobs;
                 Caption = 'Acc. WIP Costs Amount';
                 ToolTip = 'Specifies the total WIP costs for the job.';
                 Visible = false;
             }
-            field("Acc. WIP Sales Amount"; CalcAccWIPSalesAmount())
+            field("Acc. WIP Sales Amount"; Rec.CalcAccWIPSalesAmount())
             {
                 ApplicationArea = Jobs;
                 Caption = 'Acc. WIP Sales Amount';

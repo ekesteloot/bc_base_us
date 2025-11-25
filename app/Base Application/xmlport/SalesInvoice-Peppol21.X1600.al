@@ -1,3 +1,11 @@
+namespace Microsoft.Sales.Peppol;
+
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.History;
+using System.Utilities;
+
 xmlport 1600 "Sales Invoice - PEPPOL 2.1"
 {
     Caption = 'Sales Invoice - PEPPOL 2.1';
@@ -11,7 +19,7 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
         {
             MaxOccurs = Once;
             XmlName = 'Invoice';
-            SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            SourceTableView = sorting(Number) where(Number = filter(1 ..));
             textelement(UBLVersionID)
             {
                 NamespacePrefix = 'cbc';
@@ -152,7 +160,7 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
             {
                 NamespacePrefix = 'cac';
                 XmlName = 'AdditionalDocumentReference';
-                SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                SourceTableView = sorting(Number) where(Number = filter(1 ..));
                 textelement(additionaldocumentreferenceid)
                 {
                     NamespacePrefix = 'cbc';
@@ -203,7 +211,8 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
                         AdditionalDocRefDocumentType,
                         URI,
                         mimeCode,
-                        EmbeddedDocumentBinaryObject);
+                        EmbeddedDocumentBinaryObject,
+                        ProcessedDocType);
 
                     if AdditionalDocumentReferenceID = '' then
                         currXMLport.Skip();
@@ -1101,7 +1110,7 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
             {
                 NamespacePrefix = 'cac';
                 XmlName = 'PaymentTerms';
-                SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                SourceTableView = sorting(Number) where(Number = filter(1 ..));
                 textelement(paymenttermsnote)
                 {
                     NamespacePrefix = 'cbc';
@@ -1124,7 +1133,7 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
             {
                 NamespacePrefix = 'cac';
                 XmlName = 'AllowanceCharge';
-                SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                SourceTableView = sorting(Number) where(Number = filter(1 ..));
                 textelement(ChargeIndicator)
                 {
                     NamespacePrefix = 'cbc';
@@ -1262,7 +1271,7 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
                 {
                     NamespacePrefix = 'cac';
                     XmlName = 'TaxSubtotal';
-                    SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    SourceTableView = sorting(Number) where(Number = filter(1 ..));
                     textelement(TaxableAmount)
                     {
                         NamespacePrefix = 'cbc';
@@ -1471,7 +1480,7 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
             {
                 NamespacePrefix = 'cac';
                 XmlName = 'InvoiceLine';
-                SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                SourceTableView = sorting(Number) where(Number = filter(1 ..));
                 textelement(invoicelineid)
                 {
                     NamespacePrefix = 'cbc';
@@ -1646,7 +1655,7 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
                 {
                     NamespacePrefix = 'cac';
                     XmlName = 'AllowanceCharge';
-                    SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    SourceTableView = sorting(Number) where(Number = filter(1 ..));
                     textelement(invlnallowancechargeindicator)
                     {
                         NamespacePrefix = 'cbc';
@@ -1782,7 +1791,7 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
                     {
                         NamespacePrefix = 'cac';
                         XmlName = 'CommodityClassification';
-                        SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        SourceTableView = sorting(Number) where(Number = filter(1 ..));
                         textelement(CommodityCode)
                         {
                             NamespacePrefix = 'cbc';
@@ -1871,7 +1880,7 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
                     {
                         NamespacePrefix = 'cac';
                         XmlName = 'AdditionalItemProperty';
-                        SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        SourceTableView = sorting(Number) where(Number = filter(1 ..));
                         textelement(additionalitempropertyname)
                         {
                             NamespacePrefix = 'cbc';
@@ -1947,7 +1956,7 @@ xmlport 1600 "Sales Invoice - PEPPOL 2.1"
                     {
                         NamespacePrefix = 'cac';
                         XmlName = 'AllowanceCharge';
-                        SourceTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        SourceTableView = sorting(Number) where(Number = filter(1 ..));
                         textelement(pricechargeindicator)
                         {
                             NamespacePrefix = 'cbc';

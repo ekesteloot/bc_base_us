@@ -3,6 +3,18 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Security.AccessControl;
+
+using System.Feedback;
+using System.Security.User;
+using System.Reflection;
+using System.Tooling;
+using System.Environment.Configuration;
+using System.Integration;
+using System.IO;
+using System.Environment;
+using System.Security.Authentication;
+
 permissionset 66 "System Tables - Basic"
 {
     Access = Internal;
@@ -50,6 +62,8 @@ permissionset 66 "System Tables - Basic"
                   tabledata "Signup Context" = R,
                   tabledata "Style Sheet" = RIMD,
                   tabledata "System Object" = Rimd,
+#pragma warning disable AL0432
                   tabledata "Tenant Profile Page Metadata" = Rimd,
+#pragma warning restore AL0432
                   tabledata "Token Cache" = Rimd;
 }

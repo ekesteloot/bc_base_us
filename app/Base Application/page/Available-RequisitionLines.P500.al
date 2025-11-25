@@ -10,7 +10,7 @@ page 500 "Available - Requisition Lines"
     PageType = List;
     Permissions = TableData "Requisition Line" = rm;
     SourceTable = "Requisition Line";
-    SourceTableView = SORTING(Type, "No.", "Variant Code", "Location Code", "Sales Order No.", "Planning Line Origin", "Due Date");
+    SourceTableView = sorting(Type, "No.", "Variant Code", "Location Code", "Sales Order No.", "Planning Line Origin", "Due Date");
 
     layout
     {

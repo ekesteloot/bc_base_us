@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.Vendor;
+using System.Reflection;
+
 codeunit 346 "Purch. Line CaptionClass Mgmt"
 {
     SingleInstance = true;
@@ -29,10 +34,10 @@ codeunit 346 "Purch. Line CaptionClass Mgmt"
             PurchaseLine.FieldNo("No."):
                 exit(StrSubstNo('3,%1', GetFieldCaption(DATABASE::"Purchase Line", FieldNumber)));
             else begin
-                    if GlobalPurchaseHeader."Prices Including VAT" then
-                        exit('2,1,' + GetFieldCaption(DATABASE::"Purchase Line", FieldNumber));
-                    exit('2,0,' + GetFieldCaption(DATABASE::"Purchase Line", FieldNumber));
-                end;
+                if GlobalPurchaseHeader."Prices Including VAT" then
+                    exit('2,1,' + GetFieldCaption(DATABASE::"Purchase Line", FieldNumber));
+                exit('2,0,' + GetFieldCaption(DATABASE::"Purchase Line", FieldNumber));
+            end;
         end;
     end;
 

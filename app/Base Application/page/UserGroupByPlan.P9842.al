@@ -1,4 +1,9 @@
-#if not CLEAN22
+﻿#if not CLEAN22
+namespace System.Security.AccessControl;
+
+using System.Azure.Identity;
+using System.Environment;
+
 page 9842 "User Group by Plan"
 {
     Caption = 'User Group by Plan';
@@ -39,7 +44,7 @@ page 9842 "User Group by Plan"
             repeater(Group)
             {
                 Caption = 'Permission Set';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'User Group Code';
@@ -191,7 +196,7 @@ page 9842 "User Group by Plan"
                 if PermissionPagesMgt.IsInColumnsRange(columnNumber) then begin
                     PlanIDArray[columnNumber - PermissionPagesMgt.GetOffset()] := Plan.Plan_ID;
                     PlanNameArray[columnNumber - PermissionPagesMgt.GetOffset()] := StrSubstNo('%1 %2', 'Plan', Plan.Plan_Name);
-                    IsMemberOfPlan[columnNumber - PermissionPagesMgt.GetOffset()] := IsUserGroupInPlan(Code, Plan.Plan_ID);
+                    IsMemberOfPlan[columnNumber - PermissionPagesMgt.GetOffset()] := IsUserGroupInPlan(Rec.Code, Plan.Plan_ID);
                 end;
             end;
     end;

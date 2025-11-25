@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Planning;
+
 enum 5525 "Planning Create Purchase Order"
 {
     Extensible = true;

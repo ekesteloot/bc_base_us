@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 page 6032 "Service Shipment Statistics"
 {
     Caption = 'Service Shipment Statistics';
@@ -67,7 +69,7 @@ page 6032 "Service Shipment Statistics"
         if IsHandled then
             exit;
 
-        ServShptLine.SetRange("Document No.", "No.");
+        ServShptLine.SetRange("Document No.", Rec."No.");
 
         if ServShptLine.Find('-') then
             repeat

@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using Microsoft.FinancialMgt.Analysis;
+using System.Threading;
+
 codeunit 2584 "Dim Corr Analysis View"
 {
     TableNo = "Job Queue Entry";

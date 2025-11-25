@@ -1,3 +1,8 @@
+﻿namespace System.IO;
+
+using System.Reflection;
+using System.Utilities;
+
 table 1235 "XML Buffer"
 {
     Caption = 'XML Buffer';

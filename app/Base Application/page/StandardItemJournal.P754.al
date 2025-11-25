@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Journal;
+
 page 754 "Standard Item Journal"
 {
     Caption = 'Standard Item Journal';
@@ -11,7 +13,7 @@ page 754 "Standard Item Journal"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the code of the record.';
@@ -25,8 +27,8 @@ page 754 "Standard Item Journal"
             part(StdItemJnlLines; "Standard Item Journal Subform")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Standard Journal Code" = FIELD(Code);
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Standard Journal Code" = field(Code);
             }
         }
         area(factboxes)
@@ -51,7 +53,7 @@ page 754 "Standard Item Journal"
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         if xRec.Code = '' then
-            SetRange(Code, Code);
+            Rec.SetRange(Code, Rec.Code);
     end;
 }
 

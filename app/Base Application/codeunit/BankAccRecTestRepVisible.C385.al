@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Reports;
+
 codeunit 385 "Bank Acc.Rec.Test Rep. Visible"
 {
     EventSubscriberInstance = Manual;

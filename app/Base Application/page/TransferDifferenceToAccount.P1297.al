@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 page 1297 "Transfer Difference to Account"
 {
     Caption = 'Transfer Difference to Account';
@@ -45,14 +49,14 @@ page 1297 "Transfer Difference to Account"
 
     trigger OnOpenPage()
     begin
-        DescriptionTxt := Description;
+        DescriptionTxt := Rec.Description;
         CurrPage.Editable := true;
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
         if CloseAction = ACTION::LookupOK then
-            Validate(Description, DescriptionTxt)
+            Rec.Validate(Description, DescriptionTxt)
     end;
 
     var

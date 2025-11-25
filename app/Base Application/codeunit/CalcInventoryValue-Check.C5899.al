@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Setup;
+
 codeunit 5899 "Calc. Inventory Value-Check"
 {
     Permissions = TableData "Avg. Cost Adjmt. Entry Point" = r;

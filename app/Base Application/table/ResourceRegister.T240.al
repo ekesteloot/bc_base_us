@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Ledger;
+
+using System.Security.AccessControl;
+
 table 240 "Resource Register"
 {
     Caption = 'Resource Register';
@@ -34,8 +38,6 @@ table 240 "Resource Register"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(7; "Journal Batch Name"; Code[10])
         {

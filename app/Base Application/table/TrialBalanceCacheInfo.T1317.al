@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
 table 1317 "Trial Balance Cache Info"
 {
     Caption = 'Trial Balance Cache Info';

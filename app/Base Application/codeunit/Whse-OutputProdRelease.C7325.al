@@ -1,6 +1,11 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Request;
+
 codeunit 7325 "Whse.-Output Prod. Release"
 {
-
     trigger OnRun()
     begin
     end;
@@ -40,8 +45,9 @@ codeunit 7325 "Whse.-Output Prod. Release"
         ProdOrderLine2: Record "Prod. Order Line";
     begin
         GetLocation(ProdOrderLine."Location Code");
-        if not Location."Require Put-away" or Location."Directed Put-away and Pick" then
-            exit;
+        if Location.Code <> '' then
+            if Location."Prod. Output Whse. Handling" <> Location."Prod. Output Whse. Handling"::"Inventory Put-away" then
+                exit;
 
         ProdOrderLine2.Copy(ProdOrderLine);
         ProdOrderLine2.SetRange("Location Code", ProdOrderLine."Location Code");
@@ -52,7 +58,7 @@ codeunit 7325 "Whse.-Output Prod. Release"
         WhseRqst.Init();
         WhseRqst.Type := WhseRqst.Type::Inbound;
         WhseRqst."Location Code" := ProdOrderLine."Location Code";
-        WhseRqst."Source Type" := DATABASE::"Prod. Order Line";
+        WhseRqst."Source Type" := Enum::TableID::"Prod. Order Line".AsInteger();
         WhseRqst."Source No." := ProdOrderLine."Prod. Order No.";
         WhseRqst."Source Subtype" := ProdOrderLine.Status.AsInteger();
         WhseRqst."Source Document" := WhseRqst."Source Document"::"Prod. Output";
@@ -76,7 +82,7 @@ codeunit 7325 "Whse.-Output Prod. Release"
         with ProdOrderLine do begin
             KeepWhseRqst := false;
             GetLocation(ProdOrderLine2."Location Code");
-            if Location."Require Put-away" and (not Location."Directed Put-away and Pick") then begin
+            if (Location."Prod. Output Whse. Handling" = Location."Prod. Output Whse. Handling"::"Inventory Put-away") and (not Location."Directed Put-away and Pick") then begin
                 ProdOrderLine2.Reset();
                 ProdOrderLine2.SetRange(Status, Status);
                 ProdOrderLine2.SetRange("Prod. Order No.", "Prod. Order No.");
@@ -105,7 +111,7 @@ codeunit 7325 "Whse.-Output Prod. Release"
     begin
         with ProdOrderLine do begin
             WarehouseRequest.SetRange(Type, WarehouseRequest.Type::Inbound);
-            WarehouseRequest.SetRange("Source Type", DATABASE::"Prod. Order Line");
+            WarehouseRequest.SetRange("Source Type", Enum::TableID::"Prod. Order Line".AsInteger());
             WarehouseRequest.SetRange("Source No.", "Prod. Order No.");
             if not DeleteAllWhseRqst then begin
                 WarehouseRequest.SetRange("Source Subtype", Status);
@@ -146,29 +152,30 @@ codeunit 7325 "Whse.-Output Prod. Release"
                 Location.Get(LocationCode);
     end;
 
-    procedure CheckWhseRqst(ProdHeader: Record "Production Order"): Boolean
+    procedure CheckWhseRqst(ProductionOrder: Record "Production Order"): Boolean
     var
         ProdOrderLine2: Record "Prod. Order Line";
     begin
         WhseRqstCreated := true;
-        with ProdHeader do begin
+        with ProductionOrder do begin
             ProdOrderLine2.SetCurrentKey(Status, "Prod. Order No.");
             ProdOrderLine2.SetRange(Status, Status);
             ProdOrderLine2.SetRange("Prod. Order No.", "No.");
             if ProdOrderLine2.Find('-') then
                 repeat
                     GetLocation(ProdOrderLine2."Location Code");
-                    if not Location."Require Put-away" or Location."Directed Put-away and Pick" then
-                        WhseRqstCreated := false;
-                    if Location."Require Put-away" then
-                        if not WhseRqst.Get(
-                             WhseRqst.Type::Inbound,
-                             ProdOrderLine2."Location Code",
-                             DATABASE::"Prod. Order Line",
-                             ProdOrderLine2.Status,
-                             ProdOrderLine2."Prod. Order No.")
-                        then
-                            WhseRqstCreated := false;
+                    if Location.Code <> '' then
+                        if Location."Prod. Output Whse. Handling" <> Location."Prod. Output Whse. Handling"::"Inventory Put-away" then
+                            WhseRqstCreated := false
+                        else
+                            if not WhseRqst.Get(
+                                 WhseRqst.Type::Inbound,
+                                 ProdOrderLine2."Location Code",
+                                 Enum::TableID::"Prod. Order Line".AsInteger(),
+                                 ProdOrderLine2.Status,
+                                 ProdOrderLine2."Prod. Order No.")
+                            then
+                                WhseRqstCreated := false;
                     OnAfterCheckWhseRqstProdOrderLine(ProdOrderLine2, WhseRqst, WhseRqstCreated);
                 until (ProdOrderLine2.Next() = 0) or not WhseRqstCreated;
         end;

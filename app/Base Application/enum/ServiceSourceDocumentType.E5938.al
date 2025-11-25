@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Document;
+
 enum 5938 "Service Source Document Type"
 {
     Extensible = true;

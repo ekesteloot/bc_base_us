@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 report 99003801 "Implement Registered Absence"
 {
     ApplicationArea = Manufacturing;
@@ -9,7 +11,7 @@ report 99003801 "Implement Registered Absence"
     {
         dataitem("Registered Absence"; "Registered Absence")
         {
-            DataItemTableView = SORTING("Capacity Type", "No.", Date, "Starting Time", "Ending Time");
+            DataItemTableView = sorting("Capacity Type", "No.", Date, "Starting Time", "Ending Time");
 
             trigger OnAfterGetRecord()
             begin

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Task;
+
 page 5103 "Activity List"
 {
     AdditionalSearchTerms = 'marketing activities';
@@ -16,7 +18,7 @@ page 5103 "Activity List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the activity.';

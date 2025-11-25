@@ -1,4 +1,6 @@
-﻿enum 5077 "Segment Line Wizard Step"
+﻿namespace Microsoft.CRM.Segment;
+
+enum 5077 "Segment Line Wizard Step"
 {
     Extensible = true;
     AssignmentCompatibility = true;

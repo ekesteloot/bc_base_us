@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
 page 1228 "Payment Journal Errors Part"
 {
     Caption = 'Payment Journal Errors Part';

@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 page 99000772 "Capacity Absence"
 {
     Caption = 'Capacity Absence';
@@ -13,7 +15,7 @@ page 99000772 "Capacity Absence"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the date associated with this absence entry.';
@@ -45,12 +47,12 @@ page 99000772 "Capacity Absence"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the description for the absence entry, for example, holiday or vacation"';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the capacity of the absence entry, which was planned for this work center or machine center.';
                 }
-                field(Updated; Updated)
+                field(Updated; Rec.Updated)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the calendar has been updated with this absence entry.';

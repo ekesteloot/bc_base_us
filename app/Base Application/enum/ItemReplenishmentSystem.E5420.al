@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 enum 5420 "Item Replenishment System"
 {
     Extensible = true;

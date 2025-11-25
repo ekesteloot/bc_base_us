@@ -126,10 +126,10 @@ page 9200 "Personalized Pages"
 
                 trigger OnAction()
                 begin
-                    ClearMarks();
-                    MarkedOnly(false);
+                    Rec.ClearMarks();
+                    Rec.MarkedOnly(false);
                     ShowingOnlyErrors := false;
-                    if FindFirst() then;
+                    if Rec.FindFirst() then;
                     UpdateUserDiagnosticsListPart();
                 end;
             }
@@ -157,7 +157,7 @@ page 9200 "Personalized Pages"
     var
         PageMetadata: Record "Page Metadata";
     begin
-        if PageMetadata.Get("Page ID") then
+        if PageMetadata.Get(Rec."Page ID") then
             PageName := PageMetadata.Caption
         else
             PageName := '';
@@ -285,7 +285,7 @@ page 9200 "Personalized Pages"
     begin
         HealthStatusStyleExpr := 'Favorable';
 
-        if not UserSidToOperationId.Get(Format("User SID") + Format("Page ID"), OperationId) then
+        if not UserSidToOperationId.Get(Format(Rec."User SID") + Format(Rec."Page ID"), OperationId) then
             exit;
 
         TempDesignerDiagnostics.Reset();
@@ -326,7 +326,7 @@ page 9200 "Personalized Pages"
     var
         OperationId: Guid;
     begin
-        if UserSidToOperationId.Get(Format("User SID") + Format("Page ID"), OperationId) then;
+        if UserSidToOperationId.Get(Format(Rec."User SID") + Format(Rec."Page ID"), OperationId) then;
         TempDesignerDiagnostics.Reset();
         TempDesignerDiagnostics.SetRange("Operation ID", OperationId);
         CurrPage.UserDiagnosticsListPart.Page.SetRecords(TempDesignerDiagnostics);

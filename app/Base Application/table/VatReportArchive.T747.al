@@ -19,8 +19,6 @@ table 747 "VAT Report Archive"
             Caption = 'Submitted By';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(5; "Submission Message BLOB"; BLOB)
         {

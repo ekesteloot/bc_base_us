@@ -1,3 +1,6 @@
+namespace System.TestTools.CodeCoverage;
+using System.Tooling;
+
 xmlport 9990 "Code Coverage Summary"
 {
     Caption = 'Code Coverage Summary';
@@ -11,7 +14,7 @@ xmlport 9990 "Code Coverage Summary"
             tableelement("Code Coverage"; "Code Coverage")
             {
                 XmlName = 'CodeCoverageObjects';
-                SourceTableView = SORTING("Object Type", "Object ID", "Line No.") ORDER(Ascending);
+                SourceTableView = sorting("Object Type", "Object ID", "Line No.") order(Ascending);
                 fieldelement(LineType; "Code Coverage"."Line Type")
                 {
                 }

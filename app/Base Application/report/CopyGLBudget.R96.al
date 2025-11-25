@@ -1,3 +1,12 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Budget;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Text;
+using System.Utilities;
+
 report 96 "Copy G/L Budget"
 {
     Caption = 'Copy G/L Budget';

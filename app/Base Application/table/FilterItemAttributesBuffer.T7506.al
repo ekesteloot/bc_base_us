@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
 table 7506 "Filter Item Attributes Buffer"
 {
     Caption = 'Filter Item Attributes Buffer';

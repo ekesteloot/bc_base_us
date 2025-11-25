@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.History;
+
 page 7363 "Posted Whse. Receipt Lines"
 {
     Caption = 'Posted Whse. Receipt Lines';
@@ -156,7 +158,7 @@ page 7363 "Posted Whse. Receipt Lines"
                     var
                         PostedWhseRcptHeader: Record "Posted Whse. Receipt Header";
                     begin
-                        PostedWhseRcptHeader.Get("No.");
+                        PostedWhseRcptHeader.Get(Rec."No.");
                         PAGE.Run(PAGE::"Posted Whse. Receipt", PostedWhseRcptHeader);
                     end;
                 }

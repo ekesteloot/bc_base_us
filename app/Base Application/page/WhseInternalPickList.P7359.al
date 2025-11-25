@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+
 page 7359 "Whse. Internal Pick List"
 {
     ApplicationArea = Warehouse;
@@ -102,9 +108,9 @@ page 7359 "Whse. Internal Pick List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Internal Pick"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Internal Pick"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Pick Lines")
@@ -113,10 +119,10 @@ page 7359 "Whse. Internal Pick List"
                     Caption = 'Pick Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Whse. Document Type" = CONST("Internal Pick"),
-                                  "Whse. Document No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Document No.", "Whse. Document Type", "Activity Type")
-                                  WHERE("Activity Type" = CONST(Pick));
+                    RunPageLink = "Whse. Document Type" = const("Internal Pick"),
+                                  "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document No.", "Whse. Document Type", "Activity Type")
+                                  where("Activity Type" = const(Pick));
                     ToolTip = 'View the related picks.';
                 }
             }
@@ -140,7 +146,7 @@ page 7359 "Whse. Internal Pick List"
                         ReleaseWhseInternalPick: Codeunit "Whse. Internal Pick Release";
                     begin
                         CurrPage.Update(true);
-                        if Status = Status::Open then
+                        if Rec.Status = Rec.Status::Open then
                             ReleaseWhseInternalPick.Release(Rec);
                     end;
                 }

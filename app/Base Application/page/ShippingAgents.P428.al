@@ -14,7 +14,7 @@ page 428 "Shipping Agents"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a shipping agent code.';
@@ -86,7 +86,7 @@ page 428 "Shipping Agents"
                     Caption = 'Shipping A&gent Services';
                     Image = CheckList;
                     RunObject = Page "Shipping Agent Services";
-                    RunPageLink = "Shipping Agent Code" = FIELD(Code);
+                    RunPageLink = "Shipping Agent Code" = field(Code);
                     ToolTip = 'View the types of services that your shipping agent can offer you and their shipping time.';
                 }
             }

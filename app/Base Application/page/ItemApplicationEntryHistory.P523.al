@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
 page 523 "Item Application Entry History"
 {
     Caption = 'Item Application Entry History';

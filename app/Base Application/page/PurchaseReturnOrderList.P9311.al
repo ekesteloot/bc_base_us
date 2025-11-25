@@ -1,3 +1,23 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Request;
+using System.Text;
+using System.Threading;
+
 page 9311 "Purchase Return Order List"
 {
     ApplicationArea = PurchReturnOrder;
@@ -9,7 +29,7 @@ page 9311 "Purchase Return Order List"
     QueryCategory = 'Purchase Return Orders';
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";
-    SourceTableView = WHERE("Document Type" = CONST("Return Order"));
+    SourceTableView = where("Document Type" = const("Return Order"));
     UsageCategory = Lists;
 
     layout
@@ -227,7 +247,7 @@ page 9311 "Purchase Return Order List"
                 {
                     ApplicationArea = PurchReturnOrder;
                     Style = Unfavorable;
-                    StyleExpr = "Job Queue Status" = "Job Queue Status"::ERROR;
+                    StyleExpr = Rec."Job Queue Status" = Rec."Job Queue Status"::ERROR;
                     ToolTip = 'Specifies the status of a job queue entry that handles the posting of purchase return orders.';
                     Visible = JobQueueActive;
 
@@ -235,9 +255,9 @@ page 9311 "Purchase Return Order List"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
                 field(Amount; Rec.Amount)
@@ -265,14 +285,14 @@ page 9311 "Purchase Return Order List"
             part(Control1901138007; "Vendor Details FactBox")
             {
                 ApplicationArea = PurchReturnOrder;
-                SubPageLink = "No." = FIELD("Buy-from Vendor No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Buy-from Vendor No."),
+                              "Date Filter" = field("Date Filter");
             }
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Purchase Header"), "No." = FIELD("No."), "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Purchase Header"), "No." = field("No."), "Document Type" = field("Document Type");
             }
             systempart(Control1900383207; Links)
             {
@@ -305,7 +325,7 @@ page 9311 "Purchase Return Order List"
 
                     trigger OnAction()
                     begin
-                        OpenPurchaseOrderStatistics();
+                        Rec.OpenPurchaseOrderStatistics();
                     end;
                 }
                 action(Dimensions)
@@ -319,7 +339,7 @@ page 9311 "Purchase Return Order List"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Approvals)
@@ -347,9 +367,9 @@ page 9311 "Purchase Return Order List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -363,8 +383,8 @@ page 9311 "Purchase Return Order List"
                     Caption = 'Return Shipments';
                     Image = Shipment;
                     RunObject = Page "Posted Return Shipments";
-                    RunPageLink = "Return Order No." = FIELD("No.");
-                    RunPageView = SORTING("Return Order No.");
+                    RunPageLink = "Return Order No." = field("No.");
+                    RunPageView = sorting("Return Order No.");
                     ToolTip = 'Open the posted return shipments related to this order.';
                 }
                 action("Cred&it Memos")
@@ -372,10 +392,16 @@ page 9311 "Purchase Return Order List"
                     ApplicationArea = PurchReturnOrder;
                     Caption = 'Cred&it Memos';
                     Image = CreditMemo;
-                    RunObject = Page "Posted Purchase Credit Memos";
-                    RunPageLink = "Return Order No." = FIELD("No.");
-                    RunPageView = SORTING("Return Order No.");
                     ToolTip = 'View a list of ongoing credit memos for the order.';
+
+                    trigger OnAction()
+                    var
+                        TempPurchCrMemoHdr: Record "Purch. Cr. Memo Hdr." temporary;
+                        PurchGetReturnShipment: Codeunit "Purch.-Get Return Shipments";
+                    begin
+                        PurchGetReturnShipment.GetPurchRetOrderCrMemos(TempPurchCrMemoHdr, Rec."No.");
+                        Page.Run(Page::"Posted Purchase Credit Memos", TempPurchCrMemoHdr);
+                    end;
                 }
                 separator(Action1102601034)
                 {
@@ -391,9 +417,9 @@ page 9311 "Purchase Return Order List"
                     Caption = 'In&vt. Put-away/Pick Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity List";
-                    RunPageLink = "Source Document" = CONST("Purchase Return Order"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Document", "Source No.", "Location Code");
+                    RunPageLink = "Source Document" = const("Purchase Return Order"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Document", "Source No.", "Location Code");
                     ToolTip = 'View items that are inbound or outbound on inventory put-away or inventory pick documents for the purchase return order.';
                 }
                 action("Warehouse Shipment Lines")
@@ -402,12 +428,12 @@ page 9311 "Purchase Return Order List"
                     Caption = 'Warehouse Shipment Lines';
                     Image = ShipmentLines;
                     RunObject = Page "Whse. Shipment Lines";
-                    RunPageLink = "Source Type" = CONST(39),
+                    RunPageLink = "Source Type" = const(39),
 #pragma warning disable AL0603
-                                  "Source Subtype" = FIELD("Document Type"),
+                                  "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.");
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.");
                     ToolTip = 'View ongoing warehouse shipments for the document, in advanced warehouse configurations.';
                 }
                 action("Whse. Pick Lines")
@@ -507,7 +533,7 @@ page 9311 "Purchase Return Order List"
 
                     trigger OnAction()
                     begin
-                        GetPstdDocLinesToReverse();
+                        Rec.GetPstdDocLinesToReverse();
                     end;
                 }
                 separator(Action1102601020)
@@ -558,7 +584,7 @@ page 9311 "Purchase Return Order List"
                     trigger OnAction()
                     begin
                         Rec.PerformManualRelease();
-                        CreateInvtPutAwayPick();
+                        Rec.CreateInvtPutAwayPick();
                     end;
                 }
                 action("Create &Warehouse Shipment")
@@ -609,7 +635,7 @@ page 9311 "Purchase Return Order List"
 
                     trigger OnAction()
                     begin
-                        SendToPosting(CODEUNIT::"Purch.-Post (Yes/No)");
+                        Rec.SendToPosting(Codeunit::"Purch.-Post (Yes/No)");
                     end;
                 }
                 action(PostSelected)
@@ -631,7 +657,7 @@ page 9311 "Purchase Return Order List"
                         BatchProcessingMgt.SetParametersForPageID(Page::"Purchase Return Order List");
 
                         PurchaseBatchPostMgt.SetBatchProcessor(BatchProcessingMgt);
-                        PurchaseBatchPostMgt.RunWithUI(PurchaseHeader, Count, ReadyToPostQst);
+                        PurchaseBatchPostMgt.RunWithUI(PurchaseHeader, Rec.Count, ReadyToPostQst);
                     end;
                 }
                 action(Preview)
@@ -660,7 +686,7 @@ page 9311 "Purchase Return Order List"
 
                     trigger OnAction()
                     begin
-                        SendToPosting(CODEUNIT::"Purch.-Post + Print");
+                        Rec.SendToPosting(Codeunit::"Purch.-Post + Print");
                     end;
                 }
                 action(PostBatch)
@@ -692,7 +718,7 @@ page 9311 "Purchase Return Order List"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                     end;
                 }
             }
@@ -868,31 +894,29 @@ page 9311 "Purchase Return Order List"
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
         JobQueueActive := PurchasesPayablesSetup.JobQueueActive();
 
-        CopyBuyFromVendorFilter();
+        Rec.CopyBuyFromVendorFilter();
     end;
 
     var
         DocPrint: Codeunit "Document-Print";
         ReportPrint: Codeunit "Test Report-Print";
-        [InDataSet]
         JobQueueActive: Boolean;
         OpenApprovalEntriesExist: Boolean;
         CanCancelApprovalForRecord: Boolean;
         ReadyToPostQst: Label 'The number of return orders that will be posted is %1. \Do you want to continue?', Comment = '%1 - selected count';
-        [InDataSet]
         StatusStyleTxt: Text;
 
     local procedure SetControlAppearance()
     var
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
     end;
 }
 

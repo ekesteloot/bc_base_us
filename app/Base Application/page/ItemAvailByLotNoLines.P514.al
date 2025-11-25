@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Tracking;
+
 page 514 "Item Avail. by Lot No. Lines"
 {
     Caption = 'Lines';
@@ -153,11 +160,8 @@ page 514 "Item Avail. by Lot No. Lines"
 
     var
         Item: Record Item;
-        [InDataSet]
         GrossRequirement: Decimal;
-        [InDataSet]
         PlannedOrderRcpt: Decimal;
-        [InDataSet]
         ScheduledRcpt: Decimal;
 
     procedure SetItem(var NewItem: Record Item; NewAmountType: Enum "Analysis Amount Type")
@@ -167,6 +171,7 @@ page 514 "Item Avail. by Lot No. Lines"
         IsHandled := false;
         OnBeforeSetItem(Rec, NewItem, NewAmountType, IsHandled);
         if not IsHandled then begin
+
             Item.Copy(NewItem);
             GenerateLines();
             if Item.GetFilter("Location Filter") <> '' then
@@ -198,7 +203,7 @@ page 514 "Item Avail. by Lot No. Lines"
     var
         IsHandled: Boolean;
     begin
-        Rec.SetRange("Lot No. Filter", "Lot No.");
+        Rec.SetRange("Lot No. Filter", Rec."Lot No.");
         OnBeforeCalcAvailQuantities(Rec, Item, IsHandled);
 
         if not IsHandled then

@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.HumanResources.Comment;
+
 page 5219 "Misc. Article Information"
 {
     Caption = 'Misc. Article Information';
@@ -48,7 +52,7 @@ page 5219 "Misc. Article Information"
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies that the miscellaneous article is in use.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies if a comment is associated with this entry.';
@@ -84,10 +88,10 @@ page 5219 "Misc. Article Information"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Human Resource Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Misc. Article Information"),
-                                  "No." = FIELD("Employee No."),
-                                  "Alternative Address Code" = FIELD("Misc. Article Code"),
-                                  "Table Line No." = FIELD("Line No.");
+                    RunPageLink = "Table Name" = const("Misc. Article Information"),
+                                  "No." = field("Employee No."),
+                                  "Alternative Address Code" = field("Misc. Article Code"),
+                                  "Table Line No." = field("Line No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

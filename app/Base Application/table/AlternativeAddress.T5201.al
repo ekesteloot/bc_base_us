@@ -1,3 +1,9 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.Foundation.Address;
+using Microsoft.HumanResources.Comment;
+using System.Email;
+
 table 5201 "Alternative Address"
 {
     Caption = 'Alternative Address';
@@ -43,11 +49,9 @@ table 5201 "Alternative Address"
         field(7; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -68,11 +72,9 @@ table 5201 "Alternative Address"
         field(8; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -118,9 +120,9 @@ table 5201 "Alternative Address"
         }
         field(13; Comment; Boolean)
         {
-            CalcFormula = Exist("Human Resource Comment Line" WHERE("Table Name" = CONST("Alternative Address"),
-                                                                     "No." = FIELD("Employee No."),
-                                                                     "Alternative Address Code" = FIELD(Code)));
+            CalcFormula = exist("Human Resource Comment Line" where("Table Name" = const("Alternative Address"),
+                                                                     "No." = field("Employee No."),
+                                                                     "Alternative Address Code" = field(Code)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;

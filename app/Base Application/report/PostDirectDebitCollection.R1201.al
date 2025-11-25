@@ -1,3 +1,11 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Receivables;
+
 report 1201 "Post Direct Debit Collection"
 {
     Caption = 'Post Direct Debit Collection';
@@ -7,7 +15,7 @@ report 1201 "Post Direct Debit Collection"
     {
         dataitem("Direct Debit Collection Entry"; "Direct Debit Collection Entry")
         {
-            DataItemTableView = SORTING("Direct Debit Collection No.", "Entry No.");
+            DataItemTableView = sorting("Direct Debit Collection No.", "Entry No.");
 
             trigger OnAfterGetRecord()
             begin

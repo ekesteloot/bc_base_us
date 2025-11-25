@@ -1,3 +1,5 @@
+﻿namespace Microsoft.FinancialMgt.VAT;
+
 enum 12 "VAT Statement Report Selection"
 {
     Extensible = true;

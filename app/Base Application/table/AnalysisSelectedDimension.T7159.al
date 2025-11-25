@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using System.Security.AccessControl;
+
 table 7159 "Analysis Selected Dimension"
 {
     Caption = 'Analysis Selected Dimension';
@@ -9,8 +13,6 @@ table 7159 "Analysis Selected Dimension"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(2; "Object Type"; Integer)
         {
@@ -41,7 +43,7 @@ table 7159 "Analysis Selected Dimension"
         field(8; "Analysis View Code"; Code[10])
         {
             Caption = 'Analysis View Code';
-            TableRelation = "Item Analysis View".Code WHERE("Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Item Analysis View".Code where("Analysis Area" = field("Analysis Area"));
         }
         field(9; "Analysis Area"; Enum "Analysis Area Type")
         {

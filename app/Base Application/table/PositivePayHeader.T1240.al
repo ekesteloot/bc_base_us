@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.PositivePay;
+
+using System.IO;
+
 table 1240 "Positive Pay Header"
 {
     Caption = 'Positive Pay Header';

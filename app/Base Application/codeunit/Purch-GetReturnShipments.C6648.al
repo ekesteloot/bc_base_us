@@ -1,4 +1,8 @@
-﻿codeunit 6648 "Purch.-Get Return Shipments"
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.History;
+
+codeunit 6648 "Purch.-Get Return Shipments"
 {
     TableNo = "Purchase Line";
 
@@ -211,6 +215,25 @@
                         end;
                     end;
                 until ItemChargeAssgntPurch.Next() = 0;
+        end;
+    end;
+
+    procedure GetPurchRetOrderCrMemos(var TempPurchCrMemoHdr: Record "Purch. Cr. Memo Hdr." temporary; ReturnOrderNo: Code[20])
+    var
+        PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
+        PurchCrMemosByRetOrder: Query "Purch. Cr. Memos By Ret. Order";
+    begin
+        TempPurchCrMemoHdr.Reset();
+        TempPurchCrMemoHdr.DeleteAll();
+
+        PurchCrMemosByRetOrder.SetRange(Order_No_, ReturnOrderNo);
+        PurchCrMemosByRetOrder.SetFilter(Quantity, '<>0');
+        PurchCrMemosByRetOrder.Open();
+
+        while PurchCrMemosByRetOrder.Read() do begin
+            PurchCrMemoHdr.Get(PurchCrMemosByRetOrder.Document_No_);
+            TempPurchCrMemoHdr := PurchCrMemoHdr;
+            TempPurchCrMemoHdr.Insert();
         end;
     end;
 

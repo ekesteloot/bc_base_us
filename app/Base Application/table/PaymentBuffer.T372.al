@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Vendor;
+
 #pragma warning disable AS0109
 table 372 "Payment Buffer"
 #pragma warning restore AS0109
@@ -45,14 +53,14 @@ table 372 "Payment Buffer"
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(6; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(7; "Document No."; Code[20])
         {
@@ -79,20 +87,20 @@ table 372 "Payment Buffer"
         {
             Caption = 'Creditor No.';
             DataClassification = SystemMetadata;
-            TableRelation = "Vendor Ledger Entry"."Creditor No." WHERE("Entry No." = FIELD("Vendor Ledg. Entry No."));
+            TableRelation = "Vendor Ledger Entry"."Creditor No." where("Entry No." = field("Vendor Ledg. Entry No."));
         }
         field(171; "Payment Reference"; Code[50])
         {
             Caption = 'Payment Reference';
             DataClassification = SystemMetadata;
             Numeric = true;
-            TableRelation = "Vendor Ledger Entry"."Payment Reference" WHERE("Entry No." = FIELD("Vendor Ledg. Entry No."));
+            TableRelation = "Vendor Ledger Entry"."Payment Reference" where("Entry No." = field("Vendor Ledg. Entry No."));
         }
         field(172; "Payment Method Code"; Code[10])
         {
             Caption = 'Payment Method Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Vendor Ledger Entry"."Payment Method Code" WHERE("Vendor No." = FIELD("Vendor No."));
+            TableRelation = "Vendor Ledger Entry"."Payment Method Code" where("Vendor No." = field("Vendor No."));
         }
         field(173; "Applies-to Ext. Doc. No."; Code[35])
         {
@@ -116,7 +124,7 @@ table 372 "Payment Buffer"
         {
             Caption = 'Remit-to Code';
             DataClassification = SystemMetadata;
-            TableRelation = "Remit Address".Code WHERE("Vendor No." = FIELD("Vendor No."));
+            TableRelation = "Remit Address".Code where("Vendor No." = field("Vendor No."));
         }
     }
 

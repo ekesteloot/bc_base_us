@@ -1,3 +1,5 @@
+namespace System.IO;
+
 enum 1238 "Extract From Date Type"
 {
     Extensible = true;

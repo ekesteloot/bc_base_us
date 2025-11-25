@@ -1,3 +1,5 @@
+namespace System.Diagnostics;
+
 # if not CLEAN22
 codeunit 510 "Change Log Entry - Delete"
 {

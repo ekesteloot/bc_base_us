@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 page 99000884 "Create Order From Sales"
 {
     Caption = 'Create Order From Sales';

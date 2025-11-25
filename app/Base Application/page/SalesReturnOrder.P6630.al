@@ -1,10 +1,33 @@
-﻿page 6630 "Sales Return Order"
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Archive;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Request;
+using System.Automation;
+using System.Security.User;
+
+page 6630 "Sales Return Order"
 {
     Caption = 'Sales Return Order';
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = FILTER("Return Order"));
+    SourceTableView = where("Document Type" = filter("Return Order"));
 
     AboutTitle = 'About sales return order details';
     AboutText = 'When you receive items back from the customer, you post the quantity received and the quantity you choose to credit the customer. Posting issues a related sales credit memo and return-related documents.';
@@ -24,7 +47,7 @@
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -39,7 +62,7 @@
                     trigger OnValidate()
                     begin
                         IsSalesLinesEditable := Rec.SalesLinesEditable();
-                        SelltoCustomerNoOnAfterValidate(Rec, xRec);
+                        Rec.SelltoCustomerNoOnAfterValidate(Rec, xRec);
                         CurrPage.Update();
                     end;
                 }
@@ -56,7 +79,7 @@
 
                     trigger OnValidate()
                     begin
-                        SelltoCustomerNoOnAfterValidate(Rec, xRec);
+                        Rec.SelltoCustomerNoOnAfterValidate(Rec, xRec);
                         CurrPage.Update();
                     end;
 
@@ -124,7 +147,7 @@
 
                         trigger OnValidate()
                         begin
-                            IsSellToCountyVisible := FormatAddress.UseCounty("Sell-to Country/Region Code");
+                            IsSellToCountyVisible := FormatAddress.UseCounty(Rec."Sell-to Country/Region Code");
                         end;
                     }
                     field("Sell-to Contact No."; Rec."Sell-to Contact No.")
@@ -136,7 +159,7 @@
 
                         trigger OnLookup(var Text: Text): Boolean
                         begin
-                            if not SelltoContactLookup() then
+                            if not Rec.SelltoContactLookup() then
                                 exit(false);
                             Text := Rec."Sell-to Contact No.";
                             CurrPage.Update();
@@ -145,10 +168,10 @@
 
                         trigger OnValidate()
                         begin
-                            if GetFilter("Sell-to Contact No.") = xRec."Sell-to Contact No." then
-                                if "Sell-to Contact No." <> xRec."Sell-to Contact No." then
-                                    SetRange("Sell-to Contact No.");
-                            if "Sell-to Contact No." <> xRec."Sell-to Contact No." then
+                            if Rec.GetFilter("Sell-to Contact No.") = xRec."Sell-to Contact No." then
+                                if Rec."Sell-to Contact No." <> xRec."Sell-to Contact No." then
+                                    Rec.SetRange("Sell-to Contact No.");
+                            if Rec."Sell-to Contact No." <> xRec."Sell-to Contact No." then
                                 CurrPage.Update();
                         end;
                     }
@@ -184,7 +207,7 @@
                 {
                     ApplicationArea = SalesReturnOrder;
                     Caption = 'Contact';
-                    Editable = "Sell-to Customer No." <> '';
+                    Editable = Rec."Sell-to Customer No." <> '';
                     ToolTip = 'Specifies the name of the contact person at the customer.';
                 }
                 field("Document Date"; Rec."Document Date")
@@ -278,6 +301,18 @@
                     QuickEntry = false;
                     ToolTip = 'Specifies whether the document is open, waiting to be approved, has been invoiced for prepayment, or has been released to the next stage of processing.';
                 }
+                field("Language Code"; Rec."Language Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the language to be used on printouts for this document.';
+                    Visible = false;
+                }
+                field("Format Region"; Rec."Format Region")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the format to be used on printouts for this document.';
+                    Visible = false;
+                }
                 field("CFDI Purpose"; Rec."CFDI Purpose")
                 {
                     ApplicationArea = BasicMX;
@@ -296,7 +331,7 @@
                 ApplicationArea = SalesReturnOrder;
                 Editable = IsSalesLinesEditable;
                 Enabled = IsSalesLinesEditable;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
                 UpdatePropagation = Both;
             }
             group("Invoice Details")
@@ -310,12 +345,12 @@
 
                     trigger OnAssistEdit()
                     begin
-                        if "Posting Date" <> 0D then
-                            ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", "Posting Date")
+                        if Rec."Posting Date" <> 0D then
+                            ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", Rec."Posting Date")
                         else
-                            ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", WorkDate());
+                            ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
                             SaveInvoiceDiscountAmount();
                         end;
                         Clear(ChangeExchangeRate);
@@ -533,7 +568,7 @@
 
                         trigger OnValidate()
                         begin
-                            IsShipToCountyVisible := FormatAddress.UseCounty("Ship-to Country/Region Code");
+                            IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
                         end;
                     }
                     field("Ship-to Contact"; Rec."Ship-to Contact")
@@ -555,9 +590,9 @@
 
                         trigger OnValidate()
                         begin
-                            if GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
-                                if "Bill-to Customer No." <> xRec."Bill-to Customer No." then
-                                    SetRange("Bill-to Customer No.");
+                            if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
+                                if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
+                                    Rec.SetRange("Bill-to Customer No.");
 
                             CurrPage.Update();
                         end;
@@ -566,8 +601,8 @@
                     {
                         ApplicationArea = SalesReturnOrder;
                         Caption = 'Address';
-                        Editable = "Bill-to Customer No." <> "Sell-to Customer No.";
-                        Enabled = "Bill-to Customer No." <> "Sell-to Customer No.";
+                        Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
+                        Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                         Importance = Additional;
                         ToolTip = 'Specifies the address of the customer that you will send the invoice to.';
                     }
@@ -575,8 +610,8 @@
                     {
                         ApplicationArea = SalesReturnOrder;
                         Caption = 'Address 2';
-                        Editable = "Bill-to Customer No." <> "Sell-to Customer No.";
-                        Enabled = "Bill-to Customer No." <> "Sell-to Customer No.";
+                        Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
+                        Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                         Importance = Additional;
                         ToolTip = 'Specifies an additional part of the billing address.';
                     }
@@ -588,8 +623,8 @@
                         {
                             ApplicationArea = SalesReturnOrder;
                             Caption = 'County';
-                            Editable = "Bill-to Customer No." <> "Sell-to Customer No.";
-                            Enabled = "Bill-to Customer No." <> "Sell-to Customer No.";
+                            Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
+                            Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                             Importance = Additional;
                             ToolTip = 'Specifies the county of the address.';
                         }
@@ -598,8 +633,8 @@
                     {
                         ApplicationArea = SalesReturnOrder;
                         Caption = 'City';
-                        Editable = "Bill-to Customer No." <> "Sell-to Customer No.";
-                        Enabled = "Bill-to Customer No." <> "Sell-to Customer No.";
+                        Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
+                        Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                         Importance = Additional;
                         ToolTip = 'Specifies the city of the billing address.';
                     }
@@ -607,8 +642,8 @@
                     {
                         ApplicationArea = SalesReturnOrder;
                         Caption = 'Post Code';
-                        Editable = "Bill-to Customer No." <> "Sell-to Customer No.";
-                        Enabled = "Bill-to Customer No." <> "Sell-to Customer No.";
+                        Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
+                        Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                         Importance = Additional;
                         ToolTip = 'Specifies the postal code of the billing address.';
                     }
@@ -616,22 +651,22 @@
                     {
                         ApplicationArea = SalesReturnOrder;
                         Caption = 'Country/Region';
-                        Editable = "Bill-to Customer No." <> "Sell-to Customer No.";
-                        Enabled = "Bill-to Customer No." <> "Sell-to Customer No.";
+                        Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
+                        Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                         Importance = Additional;
                         ToolTip = 'Specifies the country or region of the address.';
 
                         trigger OnValidate()
                         begin
-                            IsBillToCountyVisible := FormatAddress.UseCounty("Bill-to Country/Region Code");
+                            IsBillToCountyVisible := FormatAddress.UseCounty(Rec."Bill-to Country/Region Code");
                         end;
                     }
                     field("Bill-to Contact No."; Rec."Bill-to Contact No.")
                     {
                         ApplicationArea = SalesReturnOrder;
                         Caption = 'Contact No.';
-                        Editable = "Bill-to Customer No." <> "Sell-to Customer No.";
-                        Enabled = "Bill-to Customer No." <> "Sell-to Customer No.";
+                        Editable = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
+                        Enabled = Rec."Bill-to Customer No." <> Rec."Sell-to Customer No.";
                         Importance = Additional;
                         ToolTip = 'Specifies the number of the contact person at the billing address.';
                     }
@@ -693,7 +728,7 @@
                     ApplicationArea = BasicEU;
                     ToolTip = 'Specifies the point of exit through which you ship the items out of your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU;
                     ToolTip = 'Specifies the country or region of origin for the purpose of Intrastat reporting.';
@@ -712,59 +747,59 @@
                 ApplicationArea = All;
                 Caption = 'Document Check';
                 Visible = SalesDocCheckFactboxVisible;
-                SubPageLink = "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Sales Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Sales Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(Control19; "Pending Approval FactBox")
             {
                 ApplicationArea = SalesReturnOrder;
-                SubPageLink = "Table ID" = CONST(36),
-                              "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No."),
+                SubPageLink = "Table ID" = const(36),
+                              "Document Type" = field("Document Type"),
+                              "Document No." = field("No."),
                               Status = const(Open);
                 Visible = OpenApprovalEntriesExistForCurrUser;
             }
             part(Control1903720907; "Sales Hist. Sell-to FactBox")
             {
                 ApplicationArea = SalesReturnOrder;
-                SubPageLink = "No." = FIELD("Sell-to Customer No."),
+                SubPageLink = "No." = field("Sell-to Customer No."),
                               "Date Filter" = field("Date Filter");
             }
             part(Control1907234507; "Sales Hist. Bill-to FactBox")
             {
                 ApplicationArea = SalesReturnOrder;
-                SubPageLink = "No." = FIELD("Sell-to Customer No."),
+                SubPageLink = "No." = field("Sell-to Customer No."),
                               "Date Filter" = field("Date Filter");
                 Visible = false;
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = SalesReturnOrder;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
+                SubPageLink = "No." = field("Bill-to Customer No."),
                               "Date Filter" = field("Date Filter");
                 Visible = false;
             }
             part(Control1900316107; "Customer Details FactBox")
             {
                 ApplicationArea = SalesReturnOrder;
-                SubPageLink = "No." = FIELD("Sell-to Customer No."),
+                SubPageLink = "No." = field("Sell-to Customer No."),
                               "Date Filter" = field("Date Filter");
             }
             part(Control1906127307; "Sales Line FactBox")
             {
                 ApplicationArea = SalesReturnOrder;
                 Provider = SalesLines;
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("Document No."),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("Document No."),
+                              "Line No." = field("Line No.");
                 Visible = false;
             }
             part(ApprovalFactBox; "Approval FactBox")
@@ -776,7 +811,7 @@
             {
                 ApplicationArea = SalesReturnOrder;
                 Provider = SalesLines;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = false;
             }
             part(WorkflowStatus; "Workflow Status FactBox")
@@ -824,9 +859,9 @@
                         if Handled then
                             exit;
 
-                        PrepareOpeningDocumentStatistics();
+                        Rec.PrepareOpeningDocumentStatistics();
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        ShowDocumentStatisticsPage();
+                        Rec.ShowDocumentStatisticsPage();
                     end;
                 }
                 action(Customer)
@@ -836,7 +871,7 @@
                     Enabled = IsCustomerOrContactNotEmpty;
                     Image = EditLines;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No.");
+                    RunPageLink = "No." = field("Sell-to Customer No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer on the sales document.';
                 }
@@ -845,14 +880,14 @@
                     AccessByPermission = TableData Dimension = R;
                     ApplicationArea = Dimensions;
                     Caption = 'Dimensions';
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = Dimensions;
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -877,9 +912,9 @@
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Return Order"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const("Return Order"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -893,8 +928,8 @@
                     Caption = 'Return Receipts';
                     Image = ReturnReceipt;
                     RunObject = Page "Posted Return Receipts";
-                    RunPageLink = "Return Order No." = FIELD("No.");
-                    RunPageView = SORTING("Return Order No.");
+                    RunPageLink = "Return Order No." = field("No.");
+                    RunPageView = sorting("Return Order No.");
                     ToolTip = 'View a list of posted return receipts for the order.';
                 }
                 action("Cred&it Memos")
@@ -902,10 +937,16 @@
                     ApplicationArea = SalesReturnOrder;
                     Caption = 'Cred&it Memos';
                     Image = CreditMemo;
-                    RunObject = Page "Posted Sales Credit Memos";
-                    RunPageLink = "Return Order No." = FIELD("No.");
-                    RunPageView = SORTING("Return Order No.");
                     ToolTip = 'View a list of ongoing credit memos for the order.';
+
+                    trigger OnAction()
+                    var
+                        TempSalesCrMemoHeader: Record "Sales Cr.Memo Header" temporary;
+                        SalesGetReturnReceipts: Codeunit "Sales-Get Return Receipts";
+                    begin
+                        SalesGetReturnReceipts.GetSalesRetOrderCrMemos(TempSalesCrMemoHeader, Rec."No.");
+                        Page.Run(Page::"Posted Sales Credit Memos", TempSalesCrMemoHeader);
+                    end;
                 }
                 separator(Action131)
                 {
@@ -921,9 +962,9 @@
                     Caption = 'In&vt. Put-away/Pick Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity List";
-                    RunPageLink = "Source Document" = CONST("Sales Return Order"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Document", "Source No.", "Location Code");
+                    RunPageLink = "Source Document" = const("Sales Return Order"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Document", "Source No.", "Location Code");
                     ToolTip = 'View items that are inbound or outbound on inventory put-away or inventory pick documents for the sales return order.';
                 }
                 action("Whse. Receipt Lines")
@@ -932,12 +973,12 @@
                     Caption = 'Whse. Receipt Lines';
                     Image = ReceiptLines;
                     RunObject = Page "Whse. Receipt Lines";
-                    RunPageLink = "Source Type" = CONST(37),
+                    RunPageLink = "Source Type" = const(37),
 #pragma warning disable AL0603
-                                  "Source Subtype" = FIELD("Document Type"),
+                                  "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.");
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.");
                     ToolTip = 'View ongoing warehouse receipts for the document, in advanced warehouse configurations.';
                 }
                 action("Whse. Put-away Lines")
@@ -969,7 +1010,7 @@
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ApproveRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.ApproveRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Reject)
@@ -984,7 +1025,7 @@
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.RejectRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.RejectRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Delegate)
@@ -999,7 +1040,7 @@
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.DelegateRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.DelegateRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Comment)
@@ -1069,7 +1110,7 @@
                 {
                     ApplicationArea = SalesReturnOrder;
                     Caption = 'Re&open';
-                    Enabled = Status <> Status::Open;
+                    Enabled = Rec.Status <> Rec.Status::Open;
                     Image = ReOpen;
                     ToolTip = 'Reopen the document to change it after it has been approved. Approved documents have the Released status and must be opened before they can be changed';
 
@@ -1144,14 +1185,14 @@
                     ApplicationArea = Suite;
                     Caption = 'Copy Document';
                     Ellipsis = true;
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = CopyDocument;
                     ToolTip = 'Copy document lines and header information from another sales document to this document. You can copy a posted sales invoice into a new sales invoice to quickly create a similar document.';
 
                     trigger OnAction()
                     begin
-                        CopyDocument();
-                        if Get("Document Type", "No.") then;
+                        Rec.CopyDocument();
+                        if Rec.Get(Rec."Document Type", Rec."No.") then;
                         CurrPage.SalesLines.Page.ForceTotalsCalculation();
                         CurrPage.Update();
                     end;
@@ -1199,7 +1240,7 @@
 
                     trigger OnAction()
                     begin
-                        GetPstdDocLinesToReverse();
+                        Rec.GetPstdDocLinesToReverse();
                         CurrPage.SalesLines.Page.SalesDocTotalsNotUpToDate();
                         CurrPage.SalesLines.Page.Update(false);
                     end;
@@ -1324,7 +1365,7 @@
                         Rec.PerformManualRelease();
                         CurrPage.SalesLines.PAGE.ClearTotalSalesHeader();
 
-                        CreateInvtPutAwayPick();
+                        Rec.CreateInvtPutAwayPick();
                     end;
                 }
                 separator(Action30)
@@ -1374,7 +1415,7 @@
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                     end;
                 }
             }
@@ -1642,11 +1683,8 @@
         SalesCalcDiscByType: Codeunit "Sales - Calc Discount By Type";
         FormatAddress: Codeunit "Format Address";
         ChangeExchangeRate: Page "Change Exchange Rate";
-        [InDataSet]
         JobQueueVisible: Boolean;
-        [InDataSet]
         JobQueueUsed: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
         DocNoVisible: Boolean;
         OpenApprovalEntriesExistForCurrUser: Boolean;
@@ -1660,15 +1698,10 @@
         IsSellToCountyVisible: Boolean;
         IsShipToCountyVisible: Boolean;
         SalesDocCheckFactboxVisible: Boolean;
-        [InDataSet]
         IsJournalTemplNameVisible: Boolean;
-        [InDataSet]
         IsPaymentMethodCodeVisible: Boolean;
-        [InDataSet]
         IsPostingGroupEditable: Boolean;
-        [InDataSet]
         IsSalesLinesEditable: Boolean;
-        [InDataSet]
         VATDateEnabled: Boolean;
 
     local procedure ActivateFields()
@@ -1755,7 +1788,7 @@
         DocumentNoVisibility: Codeunit DocumentNoVisibility;
         DocType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order",Reminder,FinChMemo;
     begin
-        DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::"Return Order", "No.");
+        DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::"Return Order", Rec."No.");
     end;
 
     procedure SetPostingGroupEditable()
@@ -1808,7 +1841,7 @@
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         InstructionMgt: Codeunit "Instruction Mgt.";
     begin
-        if not ReturnOrderSalesHeader.Get(Rec."Document Type", "No.") then begin
+        if not ReturnOrderSalesHeader.Get(Rec."Document Type", Rec."No.") then begin
             SalesCrMemoHeader.SetRange("No.", Rec."Last Posting No.");
             if SalesCrMemoHeader.FindFirst() then
                 if InstructionMgt.ShowConfirm(StrSubstNo(OpenPostedSalesReturnOrderQst, SalesCrMemoHeader."No."),

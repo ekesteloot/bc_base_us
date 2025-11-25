@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Setup;
+using System.Text;
+
 codeunit 6512 "Item Tracking CaptionClass Mgt"
 {
     SingleInstance = true;

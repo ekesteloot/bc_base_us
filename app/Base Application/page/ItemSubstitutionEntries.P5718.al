@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Substitution;
+
 page 5718 "Item Substitution Entries"
 {
     Caption = 'Item Substitution Entries';
@@ -44,7 +46,7 @@ page 5718 "Item Substitution Entries"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the description of the substitute item.';
                 }
-                field(Inventory; Inventory)
+                field(Inventory; Rec.Inventory)
                 {
                     ApplicationArea = Suite;
                     DecimalPlaces = 0 : 5;
@@ -55,7 +57,7 @@ page 5718 "Item Substitution Entries"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the substitute item quantity available on the shipment date.';
                 }
-                field(Condition; Condition)
+                field(Condition; Rec.Condition)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that a condition exists for this substitution.';
@@ -87,12 +89,12 @@ page 5718 "Item Substitution Entries"
                 Caption = '&Condition';
                 Image = ViewComments;
                 RunObject = Page "Sub. Conditions";
-                RunPageLink = Type = FIELD(Type),
-                              "No." = FIELD("No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Substitute Type" = FIELD("Substitute Type"),
-                              "Substitute No." = FIELD("Substitute No."),
-                              "Substitute Variant Code" = FIELD("Substitute Variant Code");
+                RunPageLink = Type = field(Type),
+                              "No." = field("No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Substitute Type" = field("Substitute Type"),
+                              "Substitute No." = field("Substitute No."),
+                              "Substitute Variant Code" = field("Substitute Variant Code");
                 ToolTip = 'Specify a condition for the item substitution, which is for information only and does not affect the item substitution.';
             }
         }

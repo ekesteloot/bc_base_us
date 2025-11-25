@@ -1,7 +1,15 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 120 "Aged Accounts Receivable"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/AgedAccountsReceivable.rdlc';
+    RDLCLayout = './Sales/Reports/AgedAccountsReceivable.rdlc';
     Caption = 'Aged Accounts Receivable';
     PreviewMode = PrintLayout;
     DataAccessIntent = ReadOnly;
@@ -10,7 +18,7 @@ report 120 "Aged Accounts Receivable"
     {
         dataitem(Header; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(CompanyName; CompanyDisplayName)
             {
             }
@@ -178,8 +186,8 @@ report 120 "Aged Accounts Receivable"
                 }
                 dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
                 {
-                    DataItemLink = "Customer No." = FIELD("No.");
-                    DataItemTableView = SORTING("Customer No.", "Posting Date", "Currency Code");
+                    DataItemLink = "Customer No." = field("No.");
+                    DataItemTableView = sorting("Customer No.", "Posting Date", "Currency Code");
 
                     trigger OnAfterGetRecord()
                     var
@@ -217,8 +225,8 @@ report 120 "Aged Accounts Receivable"
                 }
                 dataitem(OpenCustLedgEntry; "Cust. Ledger Entry")
                 {
-                    DataItemLink = "Customer No." = FIELD("No.");
-                    DataItemTableView = SORTING("Customer No.", Open, Positive, "Due Date", "Currency Code");
+                    DataItemLink = "Customer No." = field("No.");
+                    DataItemTableView = sorting("Customer No.", Open, Positive, "Due Date", "Currency Code");
 
                     trigger OnAfterGetRecord()
                     begin
@@ -240,11 +248,11 @@ report 120 "Aged Accounts Receivable"
                 }
                 dataitem(CurrencyLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     PrintOnlyIfDetail = true;
                     dataitem(TempCustLedgEntryLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(Name1_Cust; Customer.Name)
                         {
                             IncludeCaption = true;
@@ -551,6 +559,12 @@ report 120 "Aged Accounts Receivable"
 
                 trigger OnAfterGetRecord()
                 begin
+                    if SkipZeroBalanceCustomers then begin
+                        Customer.SetRange("Date Filter", 0D, EndingDate);
+                        Customer.CalcFields("Net Change");
+                        if Customer."Net Change" = 0 then
+                            CurrReport.Skip();
+                    end;
                     if NewPagePercustomer then
                         PageGroupNo += 1;
                     TempCurrency.Reset();
@@ -562,7 +576,7 @@ report 120 "Aged Accounts Receivable"
             }
             dataitem(CurrencyTotals; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(CurrNo; Number = 1)
                 {
                 }
@@ -684,6 +698,12 @@ report 120 "Aged Accounts Receivable"
                         Caption = 'New Page per Customer';
                         ToolTip = 'Specifies if each customer''s information is printed on a new page if you have chosen two or more customers to be included in the report.';
                     }
+                    field("Skip Zero Balance Customers"; SkipZeroBalanceCustomers)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Skip Customers with Zero Balance';
+                        ToolTip = 'Specifies if you want to skip customers with a zero balance in the report.';
+                    }
                 }
             }
         }
@@ -743,6 +763,7 @@ report 120 "Aged Accounts Receivable"
         DetailedCustomerLedgerEntry: Record "Detailed Cust. Ledg. Entry";
         PeriodLength: DateFormula;
         PrintAmountInLCY: Boolean;
+        SkipZeroBalanceCustomers: Boolean;
         EndingDate: Date;
         AgingBy: Option "Due Date","Posting Date","Document Date";
         HeadingType: Option "Date Interval","Number of Days";

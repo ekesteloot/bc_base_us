@@ -1,4 +1,67 @@
-﻿table 27 Item
+﻿namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.Setup;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.Graph;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Item.Attribute;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Item.Substitution;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Forecast;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.StandardCost;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Resources;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.ADCS;
+using Microsoft.WarehouseMgt.Setup;
+using System.Azure.AI;
+using System.Reflection;
+using System.Utilities;
+using Microsoft.Foundation.NoSeries;
+using System.Date;
+
+table 27 Item
 {
     Caption = 'Item';
     DataCaptionFields = "No.", Description;
@@ -66,7 +129,7 @@
         }
         field(6; "Assembly BOM"; Boolean)
         {
-            CalcFormula = Exist("BOM Component" WHERE("Parent Item No." = FIELD("No.")));
+            CalcFormula = exist("BOM Component" where("Parent Item No." = field("No.")));
             Caption = 'Assembly BOM';
             Editable = false;
             FieldClass = FlowField;
@@ -510,8 +573,8 @@
         }
         field(53; Comment; Boolean)
         {
-            CalcFormula = Exist("Comment Line" WHERE("Table Name" = CONST(Item),
-                                                      "No." = FIELD("No.")));
+            CalcFormula = exist("Comment Line" where("Table Name" = const(Item),
+                                                      "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -528,7 +591,7 @@
         }
         field(55; "Cost is Posted to G/L"; Boolean)
         {
-            CalcFormula = - Exist("Post Value Entry to G/L" WHERE("Item No." = FIELD("No.")));
+            CalcFormula = - Exist("Post Value Entry to G/L" where("Item No." = field("No.")));
             Caption = 'Cost is Posted to G/L';
             Editable = false;
             FieldClass = FlowField;
@@ -568,14 +631,14 @@
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(66; "Global Dimension 2 Filter"; Code[20])
         {
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(67; "Location Filter"; Code[10])
         {
@@ -585,16 +648,16 @@
         }
         field(68; Inventory; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("No."),
-                                                                  "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                  "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                  "Location Code" = FIELD("Location Filter"),
-                                                                  "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                  "Variant Code" = FIELD("Variant Filter"),
-                                                                  "Lot No." = FIELD("Lot No. Filter"),
-                                                                  "Serial No." = FIELD("Serial No. Filter"),
-                                                                  "Unit of Measure Code" = FIELD("Unit of Measure Filter"),
-                                                                  "Package No." = FIELD("Package No. Filter")));
+            CalcFormula = sum("Item Ledger Entry".Quantity where("Item No." = field("No."),
+                                                                  "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                  "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                  "Location Code" = field("Location Filter"),
+                                                                  "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                  "Variant Code" = field("Variant Filter"),
+                                                                  "Lot No." = field("Lot No. Filter"),
+                                                                  "Serial No." = field("Serial No. Filter"),
+                                                                  "Unit of Measure Code" = field("Unit of Measure Filter"),
+                                                                  "Package No." = field("Package No. Filter")));
             Caption = 'Inventory';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -602,15 +665,15 @@
         }
         field(69; "Net Invoiced Qty."; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry"."Invoiced Quantity" WHERE("Item No." = FIELD("No."),
-                                                                             "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                             "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                             "Location Code" = FIELD("Location Filter"),
-                                                                             "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                             "Variant Code" = FIELD("Variant Filter"),
-                                                                             "Lot No." = FIELD("Lot No. Filter"),
-                                                                             "Serial No." = FIELD("Serial No. Filter"),
-                                                                             "Package No." = FIELD("Package No. Filter")));
+            CalcFormula = sum("Item Ledger Entry"."Invoiced Quantity" where("Item No." = field("No."),
+                                                                             "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                             "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                             "Location Code" = field("Location Filter"),
+                                                                             "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                             "Variant Code" = field("Variant Filter"),
+                                                                             "Lot No." = field("Lot No. Filter"),
+                                                                             "Serial No." = field("Serial No. Filter"),
+                                                                             "Package No." = field("Package No. Filter")));
             Caption = 'Net Invoiced Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -618,17 +681,17 @@
         }
         field(70; "Net Change"; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry".Quantity WHERE("Item No." = FIELD("No."),
-                                                                  "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                  "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                  "Location Code" = FIELD("Location Filter"),
-                                                                  "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                  "Posting Date" = FIELD("Date Filter"),
-                                                                  "Variant Code" = FIELD("Variant Filter"),
-                                                                  "Lot No." = FIELD("Lot No. Filter"),
-                                                                  "Serial No." = FIELD("Serial No. Filter"),
-                                                                  "Unit of Measure Code" = FIELD("Unit of Measure Filter"),
-                                                                  "Package No." = FIELD("Package No. Filter")));
+            CalcFormula = sum("Item Ledger Entry".Quantity where("Item No." = field("No."),
+                                                                  "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                  "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                  "Location Code" = field("Location Filter"),
+                                                                  "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                  "Posting Date" = field("Date Filter"),
+                                                                  "Variant Code" = field("Variant Filter"),
+                                                                  "Lot No." = field("Lot No. Filter"),
+                                                                  "Serial No." = field("Serial No. Filter"),
+                                                                  "Unit of Measure Code" = field("Unit of Measure Filter"),
+                                                                  "Package No." = field("Package No. Filter")));
             Caption = 'Net Change';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -636,17 +699,17 @@
         }
         field(71; "Purchases (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry"."Invoiced Quantity" WHERE("Entry Type" = CONST(Purchase),
-                                                                             "Item No." = FIELD("No."),
-                                                                             "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                             "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                             "Location Code" = FIELD("Location Filter"),
-                                                                             "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                             "Variant Code" = FIELD("Variant Filter"),
-                                                                             "Posting Date" = FIELD("Date Filter"),
-                                                                             "Lot No." = FIELD("Lot No. Filter"),
-                                                                             "Serial No." = FIELD("Serial No. Filter"),
-                                                                             "Package No." = FIELD("Package No. Filter")));
+            CalcFormula = sum("Item Ledger Entry"."Invoiced Quantity" where("Entry Type" = const(Purchase),
+                                                                             "Item No." = field("No."),
+                                                                             "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                             "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                             "Location Code" = field("Location Filter"),
+                                                                             "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                             "Variant Code" = field("Variant Filter"),
+                                                                             "Posting Date" = field("Date Filter"),
+                                                                             "Lot No." = field("Lot No. Filter"),
+                                                                             "Serial No." = field("Serial No. Filter"),
+                                                                             "Package No." = field("Package No. Filter")));
             Caption = 'Purchases (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -654,14 +717,14 @@
         }
         field(72; "Sales (Qty.)"; Decimal)
         {
-            CalcFormula = - Sum("Value Entry"."Invoiced Quantity" WHERE("Item Ledger Entry Type" = CONST(Sale),
-                                                                        "Item No." = FIELD("No."),
-                                                                        "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                        "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                        "Location Code" = FIELD("Location Filter"),
-                                                                        "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                        "Variant Code" = FIELD("Variant Filter"),
-                                                                        "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Value Entry"."Invoiced Quantity" where("Item Ledger Entry Type" = const(Sale),
+                                                                        "Item No." = field("No."),
+                                                                        "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                        "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                        "Location Code" = field("Location Filter"),
+                                                                        "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                        "Variant Code" = field("Variant Filter"),
+                                                                        "Posting Date" = field("Date Filter")));
             Caption = 'Sales (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -669,17 +732,17 @@
         }
         field(73; "Positive Adjmt. (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry"."Invoiced Quantity" WHERE("Entry Type" = CONST("Positive Adjmt."),
-                                                                             "Item No." = FIELD("No."),
-                                                                             "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                             "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                             "Location Code" = FIELD("Location Filter"),
-                                                                             "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                             "Variant Code" = FIELD("Variant Filter"),
-                                                                             "Posting Date" = FIELD("Date Filter"),
-                                                                             "Lot No." = FIELD("Lot No. Filter"),
-                                                                             "Serial No." = FIELD("Serial No. Filter"),
-                                                                             "Package No." = FIELD("Package No. Filter")));
+            CalcFormula = sum("Item Ledger Entry"."Invoiced Quantity" where("Entry Type" = const("Positive Adjmt."),
+                                                                             "Item No." = field("No."),
+                                                                             "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                             "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                             "Location Code" = field("Location Filter"),
+                                                                             "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                             "Variant Code" = field("Variant Filter"),
+                                                                             "Posting Date" = field("Date Filter"),
+                                                                             "Lot No." = field("Lot No. Filter"),
+                                                                             "Serial No." = field("Serial No. Filter"),
+                                                                             "Package No." = field("Package No. Filter")));
             Caption = 'Positive Adjmt. (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -687,17 +750,17 @@
         }
         field(74; "Negative Adjmt. (Qty.)"; Decimal)
         {
-            CalcFormula = - Sum("Item Ledger Entry"."Invoiced Quantity" WHERE("Entry Type" = CONST("Negative Adjmt."),
-                                                                              "Item No." = FIELD("No."),
-                                                                              "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                              "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                              "Location Code" = FIELD("Location Filter"),
-                                                                              "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                              "Variant Code" = FIELD("Variant Filter"),
-                                                                              "Posting Date" = FIELD("Date Filter"),
-                                                                              "Lot No." = FIELD("Lot No. Filter"),
-                                                                              "Serial No." = FIELD("Serial No. Filter"),
-                                                                              "Package No." = FIELD("Package No. Filter")));
+            CalcFormula = - sum("Item Ledger Entry"."Invoiced Quantity" where("Entry Type" = const("Negative Adjmt."),
+                                                                              "Item No." = field("No."),
+                                                                              "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                              "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                              "Location Code" = field("Location Filter"),
+                                                                              "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                              "Variant Code" = field("Variant Filter"),
+                                                                              "Posting Date" = field("Date Filter"),
+                                                                              "Lot No." = field("Lot No. Filter"),
+                                                                              "Serial No." = field("Serial No. Filter"),
+                                                                              "Package No." = field("Package No. Filter")));
             Caption = 'Negative Adjmt. (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -706,14 +769,14 @@
         field(77; "Purchases (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Purchase Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Purchase),
-                                                                              "Item No." = FIELD("No."),
-                                                                              "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                              "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                              "Location Code" = FIELD("Location Filter"),
-                                                                              "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                              "Variant Code" = FIELD("Variant Filter"),
-                                                                              "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Value Entry"."Purchase Amount (Actual)" where("Item Ledger Entry Type" = const(Purchase),
+                                                                              "Item No." = field("No."),
+                                                                              "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                              "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                              "Location Code" = field("Location Filter"),
+                                                                              "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                              "Variant Code" = field("Variant Filter"),
+                                                                              "Posting Date" = field("Date Filter")));
             Caption = 'Purchases (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -721,14 +784,14 @@
         field(78; "Sales (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Sale),
-                                                                           "Item No." = FIELD("No."),
-                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                           "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Value Entry"."Sales Amount (Actual)" where("Item Ledger Entry Type" = const(Sale),
+                                                                           "Item No." = field("No."),
+                                                                           "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                           "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Posting Date" = field("Date Filter")));
             Caption = 'Sales (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -736,14 +799,14 @@
         field(79; "Positive Adjmt. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST("Positive Adjmt."),
-                                                                          "Item No." = FIELD("No."),
-                                                                          "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                          "Location Code" = FIELD("Location Filter"),
-                                                                          "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                          "Variant Code" = FIELD("Variant Filter"),
-                                                                          "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Actual)" where("Item Ledger Entry Type" = const("Positive Adjmt."),
+                                                                          "Item No." = field("No."),
+                                                                          "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                          "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                          "Location Code" = field("Location Filter"),
+                                                                          "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                          "Variant Code" = field("Variant Filter"),
+                                                                          "Posting Date" = field("Date Filter")));
             Caption = 'Positive Adjmt. (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -751,14 +814,14 @@
         field(80; "Negative Adjmt. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Cost Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST("Negative Adjmt."),
-                                                                          "Item No." = FIELD("No."),
-                                                                          "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                          "Location Code" = FIELD("Location Filter"),
-                                                                          "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                          "Variant Code" = FIELD("Variant Filter"),
-                                                                          "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Value Entry"."Cost Amount (Actual)" where("Item Ledger Entry Type" = const("Negative Adjmt."),
+                                                                          "Item No." = field("No."),
+                                                                          "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                          "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                          "Location Code" = field("Location Filter"),
+                                                                          "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                          "Variant Code" = field("Variant Filter"),
+                                                                          "Posting Date" = field("Date Filter")));
             Caption = 'Negative Adjmt. (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -766,14 +829,14 @@
         field(83; "COGS (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Value Entry"."Cost Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Sale),
-                                                                           "Item No." = FIELD("No."),
-                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                           "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Value Entry"."Cost Amount (Actual)" where("Item Ledger Entry Type" = const(Sale),
+                                                                           "Item No." = field("No."),
+                                                                           "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                           "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Posting Date" = field("Date Filter")));
             Caption = 'COGS (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -781,16 +844,16 @@
         field(84; "Qty. on Purch. Order"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Sum("Purchase Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
-                                                                               Type = CONST(Item),
-                                                                               "No." = FIELD("No."),
-                                                                               "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                               "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                               "Location Code" = FIELD("Location Filter"),
-                                                                               "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                               "Variant Code" = FIELD("Variant Filter"),
-                                                                               "Expected Receipt Date" = FIELD("Date Filter"),
-                                                                               "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Purchase Line"."Outstanding Qty. (Base)" where("Document Type" = const(Order),
+                                                                               Type = const(Item),
+                                                                               "No." = field("No."),
+                                                                               "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                               "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                               "Location Code" = field("Location Filter"),
+                                                                               "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                               "Variant Code" = field("Variant Filter"),
+                                                                               "Expected Receipt Date" = field("Date Filter"),
+                                                                               "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. on Purch. Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -799,16 +862,16 @@
         field(85; "Qty. on Sales Order"; Decimal)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Sum("Sales Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
-                                                                            Type = CONST(Item),
-                                                                            "No." = FIELD("No."),
-                                                                            "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                            "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                            "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                            "Variant Code" = FIELD("Variant Filter"),
-                                                                            "Shipment Date" = FIELD("Date Filter"),
-                                                                            "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Sales Line"."Outstanding Qty. (Base)" where("Document Type" = const(Order),
+                                                                            Type = const(Item),
+                                                                            "No." = field("No."),
+                                                                            "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                            "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Shipment Date" = field("Date Filter"),
+                                                                            "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. on Sales Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -891,17 +954,17 @@
         }
         field(93; "Transferred (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry"."Invoiced Quantity" WHERE("Entry Type" = CONST(Transfer),
-                                                                             "Item No." = FIELD("No."),
-                                                                             "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                             "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                             "Location Code" = FIELD("Location Filter"),
-                                                                             "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                             "Variant Code" = FIELD("Variant Filter"),
-                                                                             "Posting Date" = FIELD("Date Filter"),
-                                                                             "Lot No." = FIELD("Lot No. Filter"),
-                                                                             "Serial No." = FIELD("Serial No. Filter"),
-                                                                             "Package No." = FIELD("Package No. Filter")));
+            CalcFormula = sum("Item Ledger Entry"."Invoiced Quantity" where("Entry Type" = const(Transfer),
+                                                                             "Item No." = field("No."),
+                                                                             "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                             "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                             "Location Code" = field("Location Filter"),
+                                                                             "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                             "Variant Code" = field("Variant Filter"),
+                                                                             "Posting Date" = field("Date Filter"),
+                                                                             "Lot No." = field("Lot No. Filter"),
+                                                                             "Serial No." = field("Serial No. Filter"),
+                                                                             "Package No." = field("Package No. Filter")));
             Caption = 'Transferred (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -910,14 +973,14 @@
         field(94; "Transferred (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Value Entry"."Sales Amount (Actual)" WHERE("Item Ledger Entry Type" = CONST(Transfer),
-                                                                           "Item No." = FIELD("No."),
-                                                                           "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                           "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Value Entry"."Sales Amount (Actual)" where("Item Ledger Entry Type" = const(Transfer),
+                                                                           "Item No." = field("No."),
+                                                                           "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                           "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Posting Date" = field("Date Filter")));
             Caption = 'Transferred (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -972,15 +1035,15 @@
         field(101; "Reserved Qty. on Inventory"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                           "Source Type" = CONST(32),
-                                                                           "Source Subtype" = CONST("0"),
-                                                                           "Reservation Status" = CONST(Reservation),
-                                                                           "Serial No." = FIELD("Serial No. Filter"),
-                                                                           "Lot No." = FIELD("Lot No. Filter"),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Package No." = FIELD("Package No. Filter")));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                           "Source Type" = const(32),
+                                                                           "Source Subtype" = const("0"),
+                                                                           "Reservation Status" = const(Reservation),
+                                                                           "Serial No." = field("Serial No. Filter"),
+                                                                           "Lot No." = field("Lot No. Filter"),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Package No." = field("Package No. Filter")));
             Caption = 'Reserved Qty. on Inventory';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -989,13 +1052,13 @@
         field(102; "Reserved Qty. on Purch. Orders"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                           "Source Type" = CONST(39),
-                                                                           "Source Subtype" = CONST("1"),
-                                                                           "Reservation Status" = CONST(Reservation),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Expected Receipt Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                           "Source Type" = const(39),
+                                                                           "Source Subtype" = const("1"),
+                                                                           "Reservation Status" = const(Reservation),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Expected Receipt Date" = field("Date Filter")));
             Caption = 'Reserved Qty. on Purch. Orders';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1004,13 +1067,13 @@
         field(103; "Reserved Qty. on Sales Orders"; Decimal)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                            "Source Type" = CONST(37),
-                                                                            "Source Subtype" = CONST("1"),
-                                                                            "Reservation Status" = CONST(Reservation),
-                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                            "Variant Code" = FIELD("Variant Filter"),
-                                                                            "Shipment Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                            "Source Type" = const(37),
+                                                                            "Source Subtype" = const("1"),
+                                                                            "Reservation Status" = const(Reservation),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Shipment Date" = field("Date Filter")));
             Caption = 'Reserved Qty. on Sales Orders';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1020,36 +1083,36 @@
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(106; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(107; "Res. Qty. on Outbound Transfer"; Decimal)
         {
             AccessByPermission = TableData "Transfer Header" = R;
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                            "Source Type" = CONST(5741),
-                                                                            "Source Subtype" = CONST("0"),
-                                                                            "Reservation Status" = CONST(Reservation),
-                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                            "Variant Code" = FIELD("Variant Filter"),
-                                                                            "Shipment Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                            "Source Type" = const(5741),
+                                                                            "Source Subtype" = const("0"),
+                                                                            "Reservation Status" = const(Reservation),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Shipment Date" = field("Date Filter")));
             Caption = 'Res. Qty. on Outbound Transfer';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1058,13 +1121,13 @@
         field(108; "Res. Qty. on Inbound Transfer"; Decimal)
         {
             AccessByPermission = TableData "Transfer Header" = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                           "Source Type" = CONST(5741),
-                                                                           "Source Subtype" = CONST("1"),
-                                                                           "Reservation Status" = CONST(Reservation),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Expected Receipt Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                           "Source Type" = const(5741),
+                                                                           "Source Subtype" = const("1"),
+                                                                           "Reservation Status" = const(Reservation),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Expected Receipt Date" = field("Date Filter")));
             Caption = 'Res. Qty. on Inbound Transfer';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1073,13 +1136,13 @@
         field(109; "Res. Qty. on Sales Returns"; Decimal)
         {
             AccessByPermission = TableData "Return Receipt Header" = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                           "Source Type" = CONST(37),
-                                                                           "Source Subtype" = CONST("5"),
-                                                                           "Reservation Status" = CONST(Reservation),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Shipment Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                           "Source Type" = const(37),
+                                                                           "Source Subtype" = const("5"),
+                                                                           "Reservation Status" = const(Reservation),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Shipment Date" = field("Date Filter")));
             Caption = 'Res. Qty. on Sales Returns';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1088,13 +1151,13 @@
         field(110; "Res. Qty. on Purch. Returns"; Decimal)
         {
             AccessByPermission = TableData "Return Shipment Header" = R;
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                            "Source Type" = CONST(39),
-                                                                            "Source Subtype" = CONST("5"),
-                                                                            "Reservation Status" = CONST(Reservation),
-                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                            "Variant Code" = FIELD("Variant Filter"),
-                                                                            "Expected Receipt Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                            "Source Type" = const(39),
+                                                                            "Source Subtype" = const("5"),
+                                                                            "Reservation Status" = const(Reservation),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Expected Receipt Date" = field("Date Filter")));
             Caption = 'Res. Qty. on Purch. Returns';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1120,8 +1183,8 @@
         }
         field(200; "Cost of Open Production Orders"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Line"."Cost Amount" WHERE(Status = FILTER(Planned | "Firm Planned" | Released),
-                                                                      "Item No." = FIELD("No.")));
+            CalcFormula = sum("Prod. Order Line"."Cost Amount" where(Status = filter(Planned | "Firm Planned" | Released),
+                                                                      "Item No." = field("No.")));
             Caption = 'Cost of Open Production Orders';
             FieldClass = FlowField;
         }
@@ -1166,13 +1229,13 @@
         field(929; "Res. Qty. on Assembly Order"; Decimal)
         {
             AccessByPermission = TableData "BOM Component" = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                           "Source Type" = CONST(900),
-                                                                           "Source Subtype" = CONST("1"),
-                                                                           "Reservation Status" = CONST(Reservation),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Expected Receipt Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                           "Source Type" = const(900),
+                                                                           "Source Subtype" = const("1"),
+                                                                           "Reservation Status" = const(Reservation),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Expected Receipt Date" = field("Date Filter")));
             Caption = 'Res. Qty. on Assembly Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1181,13 +1244,13 @@
         field(930; "Res. Qty. on  Asm. Comp."; Decimal)
         {
             AccessByPermission = TableData "BOM Component" = R;
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                            "Source Type" = CONST(901),
-                                                                            "Source Subtype" = CONST("1"),
-                                                                            "Reservation Status" = CONST(Reservation),
-                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                            "Variant Code" = FIELD("Variant Filter"),
-                                                                            "Shipment Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                            "Source Type" = const(901),
+                                                                            "Source Subtype" = const("1"),
+                                                                            "Reservation Status" = const(Reservation),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Shipment Date" = field("Date Filter")));
             Caption = 'Res. Qty. on  Asm. Comp.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1195,14 +1258,14 @@
         }
         field(977; "Qty. on Assembly Order"; Decimal)
         {
-            CalcFormula = Sum("Assembly Header"."Remaining Quantity (Base)" WHERE("Document Type" = CONST(Order),
-                                                                                   "Item No." = FIELD("No."),
-                                                                                   "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                   "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                   "Location Code" = FIELD("Location Filter"),
-                                                                                   "Variant Code" = FIELD("Variant Filter"),
-                                                                                   "Due Date" = FIELD("Date Filter"),
-                                                                                   "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Assembly Header"."Remaining Quantity (Base)" where("Document Type" = const(Order),
+                                                                                   "Item No." = field("No."),
+                                                                                   "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                   "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                   "Location Code" = field("Location Filter"),
+                                                                                   "Variant Code" = field("Variant Filter"),
+                                                                                   "Due Date" = field("Date Filter"),
+                                                                                   "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. on Assembly Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1210,15 +1273,15 @@
         }
         field(978; "Qty. on Asm. Component"; Decimal)
         {
-            CalcFormula = Sum("Assembly Line"."Remaining Quantity (Base)" WHERE("Document Type" = CONST(Order),
-                                                                                 Type = CONST(Item),
-                                                                                 "No." = FIELD("No."),
-                                                                                 "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                 "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                 "Location Code" = FIELD("Location Filter"),
-                                                                                 "Variant Code" = FIELD("Variant Filter"),
-                                                                                 "Due Date" = FIELD("Date Filter"),
-                                                                                 "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Assembly Line"."Remaining Quantity (Base)" where("Document Type" = const(Order),
+                                                                                 Type = const(Item),
+                                                                                 "No." = field("No."),
+                                                                                 "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                 "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                 "Location Code" = field("Location Filter"),
+                                                                                 "Variant Code" = field("Variant Filter"),
+                                                                                 "Due Date" = field("Date Filter"),
+                                                                                 "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. on Asm. Component';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1226,13 +1289,13 @@
         }
         field(1001; "Qty. on Job Order"; Decimal)
         {
-            CalcFormula = Sum("Job Planning Line"."Remaining Qty. (Base)" WHERE(Status = CONST(Order),
-                                                                                 Type = CONST(Item),
-                                                                                 "No." = FIELD("No."),
-                                                                                 "Location Code" = FIELD("Location Filter"),
-                                                                                 "Variant Code" = FIELD("Variant Filter"),
-                                                                                 "Planning Date" = FIELD("Date Filter"),
-                                                                                 "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Job Planning Line"."Remaining Qty. (Base)" where(Status = const(Order),
+                                                                                 Type = const(Item),
+                                                                                 "No." = field("No."),
+                                                                                 "Location Code" = field("Location Filter"),
+                                                                                 "Variant Code" = field("Variant Filter"),
+                                                                                 "Planning Date" = field("Date Filter"),
+                                                                                 "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. on Job Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1241,13 +1304,13 @@
         field(1002; "Res. Qty. on Job Order"; Decimal)
         {
             AccessByPermission = TableData Job = R;
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                            "Source Type" = CONST(1003),
-                                                                            "Source Subtype" = CONST("2"),
-                                                                            "Reservation Status" = CONST(Reservation),
-                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                            "Variant Code" = FIELD("Variant Filter"),
-                                                                            "Shipment Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                            "Source Type" = const(1003),
+                                                                            "Source Subtype" = const("2"),
+                                                                            "Reservation Status" = const(Reservation),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Shipment Date" = field("Date Filter")));
             Caption = 'Res. Qty. on Job Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1257,6 +1320,7 @@
         {
             Caption = 'GTIN';
             Numeric = true;
+            ExtendedDatatype = Barcode;
         }
         field(1700; "Default Deferral Template Code"; Code[10])
         {
@@ -1403,14 +1467,14 @@
         }
         field(5420; "Scheduled Receipt (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Line"."Remaining Qty. (Base)" WHERE(Status = FILTER("Firm Planned" | Released),
-                                                                                "Item No." = FIELD("No."),
-                                                                                "Variant Code" = FIELD("Variant Filter"),
-                                                                                "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Location Code" = FIELD("Location Filter"),
-                                                                                "Due Date" = FIELD("Date Filter"),
-                                                                                "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Prod. Order Line"."Remaining Qty. (Base)" where(Status = filter("Firm Planned" | Released),
+                                                                                "Item No." = field("No."),
+                                                                                "Variant Code" = field("Variant Filter"),
+                                                                                "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Location Code" = field("Location Filter"),
+                                                                                "Due Date" = field("Date Filter"),
+                                                                                "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Scheduled Receipt (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1421,14 +1485,14 @@
             ObsoleteState = Pending;
             ObsoleteReason = 'Use the field ''Qty. on Component Lines'' instead';
             ObsoleteTag = '18.0';
-            CalcFormula = Sum("Prod. Order Component"."Remaining Qty. (Base)" WHERE(Status = FILTER(Planned .. Released),
-                                                                                     "Item No." = FIELD("No."),
-                                                                                     "Variant Code" = FIELD("Variant Filter"),
-                                                                                     "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                     "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                     "Location Code" = FIELD("Location Filter"),
-                                                                                     "Due Date" = FIELD("Date Filter"),
-                                                                                     "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Prod. Order Component"."Remaining Qty. (Base)" where(Status = filter(Planned .. Released),
+                                                                                     "Item No." = field("No."),
+                                                                                     "Variant Code" = field("Variant Filter"),
+                                                                                     "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                     "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                     "Location Code" = field("Location Filter"),
+                                                                                     "Due Date" = field("Date Filter"),
+                                                                                     "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Scheduled Need (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1451,23 +1515,23 @@
         {
             Caption = 'Bin Filter';
             FieldClass = FlowFilter;
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Filter"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Filter"));
         }
         field(5424; "Variant Filter"; Code[10])
         {
             Caption = 'Variant Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("No."));
         }
         field(5425; "Sales Unit of Measure"; Code[10])
         {
             Caption = 'Sales Unit of Measure';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("No."));
         }
         field(5426; "Purch. Unit of Measure"; Code[10])
         {
             Caption = 'Purch. Unit of Measure';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("No."));
         }
         field(5427; "Unit of Measure Filter"; Code[10])
         {
@@ -1488,13 +1552,13 @@
         field(5429; "Reserved Qty. on Prod. Order"; Decimal)
         {
             AccessByPermission = TableData "Production Order" = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                           "Source Type" = CONST(5406),
-                                                                           "Source Subtype" = FILTER("1" .. "3"),
-                                                                           "Reservation Status" = CONST(Reservation),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Expected Receipt Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                           "Source Type" = const(5406),
+                                                                           "Source Subtype" = filter("1" .. "3"),
+                                                                           "Reservation Status" = const(Reservation),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Expected Receipt Date" = field("Date Filter")));
             Caption = 'Reserved Qty. on Prod. Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1503,13 +1567,13 @@
         field(5430; "Res. Qty. on Prod. Order Comp."; Decimal)
         {
             AccessByPermission = TableData "Production Order" = R;
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                            "Source Type" = CONST(5407),
-                                                                            "Source Subtype" = FILTER("1" .. "3"),
-                                                                            "Reservation Status" = CONST(Reservation),
-                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                            "Variant Code" = FIELD("Variant Filter"),
-                                                                            "Shipment Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                            "Source Type" = const(5407),
+                                                                            "Source Subtype" = filter("1" .. "3"),
+                                                                            "Reservation Status" = const(Reservation),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Shipment Date" = field("Date Filter")));
             Caption = 'Res. Qty. on Prod. Order Comp.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1518,13 +1582,13 @@
         field(5431; "Res. Qty. on Req. Line"; Decimal)
         {
             AccessByPermission = TableData "Req. Wksh. Template" = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                           "Source Type" = CONST(246),
-                                                                           "Source Subtype" = FILTER("0"),
-                                                                           "Reservation Status" = CONST(Reservation),
-                                                                           "Location Code" = FIELD("Location Filter"),
-                                                                           "Variant Code" = FIELD("Variant Filter"),
-                                                                           "Expected Receipt Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                           "Source Type" = const(246),
+                                                                           "Source Subtype" = filter("0"),
+                                                                           "Reservation Status" = const(Reservation),
+                                                                           "Location Code" = field("Location Filter"),
+                                                                           "Variant Code" = field("Variant Filter"),
+                                                                           "Expected Receipt Date" = field("Date Filter")));
             Caption = 'Res. Qty. on Req. Line';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1602,35 +1666,35 @@
         }
         field(5449; "Planning Transfer Ship. (Qty)."; Decimal)
         {
-            CalcFormula = Sum("Requisition Line"."Quantity (Base)" WHERE("Worksheet Template Name" = FILTER(<> ''),
-                                                                          "Journal Batch Name" = FILTER(<> ''),
-                                                                          "Replenishment System" = CONST(Transfer),
-                                                                          Type = CONST(Item),
-                                                                          "No." = FIELD("No."),
-                                                                          "Variant Code" = FIELD("Variant Filter"),
-                                                                          "Transfer-from Code" = FIELD("Location Filter"),
-                                                                          "Transfer Shipment Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Requisition Line"."Quantity (Base)" where("Worksheet Template Name" = filter(<> ''),
+                                                                          "Journal Batch Name" = filter(<> ''),
+                                                                          "Replenishment System" = const(Transfer),
+                                                                          Type = const(Item),
+                                                                          "No." = field("No."),
+                                                                          "Variant Code" = field("Variant Filter"),
+                                                                          "Transfer-from Code" = field("Location Filter"),
+                                                                          "Transfer Shipment Date" = field("Date Filter")));
             Caption = 'Planning Transfer Ship. (Qty).';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5450; "Planning Worksheet (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Requisition Line"."Quantity (Base)" WHERE("Planning Line Origin" = CONST(Planning),
-                                                                          Type = CONST(Item),
-                                                                          "No." = FIELD("No."),
-                                                                          "Location Code" = FIELD("Location Filter"),
-                                                                          "Variant Code" = FIELD("Variant Filter"),
-                                                                          "Due Date" = FIELD("Date Filter"),
-                                                                          "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter")));
+            CalcFormula = sum("Requisition Line"."Quantity (Base)" where("Planning Line Origin" = const(Planning),
+                                                                          Type = const(Item),
+                                                                          "No." = field("No."),
+                                                                          "Location Code" = field("Location Filter"),
+                                                                          "Variant Code" = field("Variant Filter"),
+                                                                          "Due Date" = field("Date Filter"),
+                                                                          "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                          "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter")));
             Caption = 'Planning Worksheet (Qty.)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5700; "Stockkeeping Unit Exists"; Boolean)
         {
-            CalcFormula = Exist("Stockkeeping Unit" WHERE("Item No." = FIELD("No.")));
+            CalcFormula = exist("Stockkeeping Unit" where("Item No." = field("No.")));
             Caption = 'Stockkeeping Unit Exists';
             Editable = false;
             FieldClass = FlowField;
@@ -1671,22 +1735,22 @@
         }
         field(5706; "Substitutes Exist"; Boolean)
         {
-            CalcFormula = Exist("Item Substitution" WHERE(Type = CONST(Item),
-                                                           "No." = FIELD("No.")));
+            CalcFormula = exist("Item Substitution" where(Type = const(Item),
+                                                           "No." = field("No.")));
             Caption = 'Substitutes Exist';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5707; "Qty. in Transit"; Decimal)
         {
-            CalcFormula = Sum("Transfer Line"."Qty. in Transit (Base)" WHERE("Derived From Line No." = CONST(0),
-                                                                              "Item No." = FIELD("No."),
-                                                                              "Transfer-to Code" = FIELD("Location Filter"),
-                                                                              "Variant Code" = FIELD("Variant Filter"),
-                                                                              "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                              "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                              "Receipt Date" = FIELD("Date Filter"),
-                                                                              "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Transfer Line"."Qty. in Transit (Base)" where("Derived From Line No." = const(0),
+                                                                              "Item No." = field("No."),
+                                                                              "Transfer-to Code" = field("Location Filter"),
+                                                                              "Variant Code" = field("Variant Filter"),
+                                                                              "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                              "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                              "Receipt Date" = field("Date Filter"),
+                                                                              "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. in Transit';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1694,14 +1758,14 @@
         }
         field(5708; "Trans. Ord. Receipt (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Transfer Line"."Outstanding Qty. (Base)" WHERE("Derived From Line No." = CONST(0),
-                                                                               "Item No." = FIELD("No."),
-                                                                               "Transfer-to Code" = FIELD("Location Filter"),
-                                                                               "Variant Code" = FIELD("Variant Filter"),
-                                                                               "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                               "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                               "Receipt Date" = FIELD("Date Filter"),
-                                                                               "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Transfer Line"."Outstanding Qty. (Base)" where("Derived From Line No." = const(0),
+                                                                               "Item No." = field("No."),
+                                                                               "Transfer-to Code" = field("Location Filter"),
+                                                                               "Variant Code" = field("Variant Filter"),
+                                                                               "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                               "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                               "Receipt Date" = field("Date Filter"),
+                                                                               "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Trans. Ord. Receipt (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1709,14 +1773,14 @@
         }
         field(5709; "Trans. Ord. Shipment (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Transfer Line"."Outstanding Qty. (Base)" WHERE("Derived From Line No." = CONST(0),
-                                                                               "Item No." = FIELD("No."),
-                                                                               "Transfer-from Code" = FIELD("Location Filter"),
-                                                                               "Variant Code" = FIELD("Variant Filter"),
-                                                                               "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                               "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                               "Shipment Date" = FIELD("Date Filter"),
-                                                                               "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Transfer Line"."Outstanding Qty. (Base)" where("Derived From Line No." = const(0),
+                                                                               "Item No." = field("No."),
+                                                                               "Transfer-from Code" = field("Location Filter"),
+                                                                               "Variant Code" = field("Variant Filter"),
+                                                                               "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                               "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                               "Shipment Date" = field("Date Filter"),
+                                                                               "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Trans. Ord. Shipment (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1729,10 +1793,10 @@
         }
         field(5776; "Qty. Assigned to ship"; Decimal)
         {
-            CalcFormula = Sum("Warehouse Shipment Line"."Qty. Outstanding (Base)" WHERE("Item No." = FIELD("No."),
-                                                                                         "Location Code" = FIELD("Location Filter"),
-                                                                                         "Variant Code" = FIELD("Variant Filter"),
-                                                                                         "Due Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Warehouse Shipment Line"."Qty. Outstanding (Base)" where("Item No." = field("No."),
+                                                                                         "Location Code" = field("Location Filter"),
+                                                                                         "Variant Code" = field("Variant Filter"),
+                                                                                         "Due Date" = field("Date Filter")));
             Caption = 'Qty. Assigned to ship';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1740,10 +1804,10 @@
         }
         field(5777; "Qty. Picked"; Decimal)
         {
-            CalcFormula = Sum("Warehouse Shipment Line"."Qty. Picked (Base)" WHERE("Item No." = FIELD("No."),
-                                                                                    "Location Code" = FIELD("Location Filter"),
-                                                                                    "Variant Code" = FIELD("Variant Filter"),
-                                                                                    "Due Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Warehouse Shipment Line"."Qty. Picked (Base)" where("Item No." = field("No."),
+                                                                                    "Location Code" = field("Location Filter"),
+                                                                                    "Variant Code" = field("Variant Filter"),
+                                                                                    "Due Date" = field("Date Filter")));
             Caption = 'Qty. Picked';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1777,15 +1841,15 @@
         }
         field(5901; "Qty. on Service Order"; Decimal)
         {
-            CalcFormula = Sum("Service Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST(Order),
-                                                                              Type = CONST(Item),
-                                                                              "No." = FIELD("No."),
-                                                                              "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                              "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                              "Location Code" = FIELD("Location Filter"),
-                                                                              "Variant Code" = FIELD("Variant Filter"),
-                                                                              "Needed by Date" = FIELD("Date Filter"),
-                                                                              "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Service Line"."Outstanding Qty. (Base)" where("Document Type" = const(Order),
+                                                                              Type = const(Item),
+                                                                              "No." = field("No."),
+                                                                              "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                              "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                              "Location Code" = field("Location Filter"),
+                                                                              "Variant Code" = field("Variant Filter"),
+                                                                              "Needed by Date" = field("Date Filter"),
+                                                                              "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. on Service Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1794,13 +1858,13 @@
         field(5902; "Res. Qty. on Service Orders"; Decimal)
         {
             AccessByPermission = TableData "Service Header" = R;
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                            "Source Type" = CONST(5902),
-                                                                            "Source Subtype" = CONST("1"),
-                                                                            "Reservation Status" = CONST(Reservation),
-                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                            "Variant Code" = FIELD("Variant Filter"),
-                                                                            "Shipment Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("No."),
+                                                                            "Source Type" = const(5902),
+                                                                            "Source Subtype" = const("1"),
+                                                                            "Reservation Status" = const(Reservation),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Shipment Date" = field("Date Filter")));
             Caption = 'Res. Qty. on Service Orders';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1894,16 +1958,16 @@
         field(6650; "Qty. on Purch. Return"; Decimal)
         {
             AccessByPermission = TableData "Return Receipt Header" = R;
-            CalcFormula = Sum("Purchase Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST("Return Order"),
-                                                                               Type = CONST(Item),
-                                                                               "No." = FIELD("No."),
-                                                                               "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                               "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                               "Location Code" = FIELD("Location Filter"),
-                                                                               "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                               "Variant Code" = FIELD("Variant Filter"),
-                                                                               "Expected Receipt Date" = FIELD("Date Filter"),
-                                                                               "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Purchase Line"."Outstanding Qty. (Base)" where("Document Type" = const("Return Order"),
+                                                                               Type = const(Item),
+                                                                               "No." = field("No."),
+                                                                               "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                               "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                               "Location Code" = field("Location Filter"),
+                                                                               "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                               "Variant Code" = field("Variant Filter"),
+                                                                               "Expected Receipt Date" = field("Date Filter"),
+                                                                               "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. on Purch. Return';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1912,16 +1976,16 @@
         field(6660; "Qty. on Sales Return"; Decimal)
         {
             AccessByPermission = TableData "Return Shipment Header" = R;
-            CalcFormula = Sum("Sales Line"."Outstanding Qty. (Base)" WHERE("Document Type" = CONST("Return Order"),
-                                                                            Type = CONST(Item),
-                                                                            "No." = FIELD("No."),
-                                                                            "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                            "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                            "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                            "Variant Code" = FIELD("Variant Filter"),
-                                                                            "Shipment Date" = FIELD("Date Filter"),
-                                                                            "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Sales Line"."Outstanding Qty. (Base)" where("Document Type" = const("Return Order"),
+                                                                            Type = const(Item),
+                                                                            "No." = field("No."),
+                                                                            "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                            "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                            "Location Code" = field("Location Filter"),
+                                                                            "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                            "Variant Code" = field("Variant Filter"),
+                                                                            "Shipment Date" = field("Date Filter"),
+                                                                            "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. on Sales Return';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1929,8 +1993,8 @@
         }
         field(7171; "No. of Substitutes"; Integer)
         {
-            CalcFormula = Count("Item Substitution" WHERE(Type = CONST(Item),
-                                                           "No." = FIELD("No.")));
+            CalcFormula = count("Item Substitution" where(Type = const(Item),
+                                                           "No." = field("No.")));
             Caption = 'No. of Substitutes';
             Editable = false;
             FieldClass = FlowField;
@@ -1954,8 +2018,8 @@
         {
             AccessByPermission = TableData "Posted Invt. Put-away Header" = R;
             Caption = 'Put-away Unit of Measure Code';
-            TableRelation = IF ("No." = FILTER(<> '')) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
+            TableRelation = if ("No." = filter(<> '')) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
             "Unit of Measure";
         }
         field(7380; "Phys Invt Counting Period Code"; Code[10])
@@ -2011,8 +2075,8 @@
         }
         field(7383; "Last Phys. Invt. Date"; Date)
         {
-            CalcFormula = Max("Phys. Inventory Ledger Entry"."Posting Date" WHERE("Item No." = FIELD("No."),
-                                                                                   "Phys Invt Counting Period Type" = FILTER(" " | Item)));
+            CalcFormula = max("Phys. Inventory Ledger Entry"."Posting Date" where("Item No." = field("No."),
+                                                                                   "Phys Invt Counting Period Type" = filter(" " | Item)));
             Caption = 'Last Phys. Invt. Date';
             Editable = false;
             FieldClass = FlowField;
@@ -2049,7 +2113,7 @@
 #endif
         field(7700; "Identifier Code"; Code[20])
         {
-            CalcFormula = Lookup("Item Identifier".Code WHERE("Item No." = FIELD("No.")));
+            CalcFormula = Lookup("Item Identifier".Code where("Item No." = field("No.")));
             Caption = 'Identifier Code';
             Editable = false;
             FieldClass = FlowField;
@@ -2150,14 +2214,14 @@
         }
         field(10011; "Consumptions (Qty.)"; Decimal)
         {
-            CalcFormula = - Sum("Item Ledger Entry"."Invoiced Quantity" WHERE("Entry Type" = CONST(Consumption),
-                                                                              "Item No." = FIELD("No."),
-                                                                              "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                              "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                              "Location Code" = FIELD("Location Filter"),
-                                                                              "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                              "Variant Code" = FIELD("Variant Filter"),
-                                                                              "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = - sum("Item Ledger Entry"."Invoiced Quantity" where("Entry Type" = const(Consumption),
+                                                                              "Item No." = field("No."),
+                                                                              "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                              "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                              "Location Code" = field("Location Filter"),
+                                                                              "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                              "Variant Code" = field("Variant Filter"),
+                                                                              "Posting Date" = field("Date Filter")));
             Caption = 'Consumptions (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2165,14 +2229,14 @@
         }
         field(10012; "Outputs (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry"."Invoiced Quantity" WHERE("Entry Type" = CONST(Output),
-                                                                             "Item No." = FIELD("No."),
-                                                                             "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                             "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                             "Location Code" = FIELD("Location Filter"),
-                                                                             "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                             "Variant Code" = FIELD("Variant Filter"),
-                                                                             "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Item Ledger Entry"."Invoiced Quantity" where("Entry Type" = const(Output),
+                                                                             "Item No." = field("No."),
+                                                                             "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                             "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                             "Location Code" = field("Location Filter"),
+                                                                             "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                             "Variant Code" = field("Variant Filter"),
+                                                                             "Posting Date" = field("Date Filter")));
             Caption = 'Outputs (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2180,14 +2244,14 @@
         }
         field(10013; "Rel. Scheduled Receipt (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Line"."Remaining Qty. (Base)" WHERE(Status = CONST(Released),
-                                                                                "Item No." = FIELD("No."),
-                                                                                "Variant Code" = FIELD("Variant Filter"),
-                                                                                "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Location Code" = FIELD("Location Filter"),
-                                                                                "Bin Code" = FIELD("Bin Filter"),
-                                                                                "Due Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Prod. Order Line"."Remaining Qty. (Base)" where(Status = const(Released),
+                                                                                "Item No." = field("No."),
+                                                                                "Variant Code" = field("Variant Filter"),
+                                                                                "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Location Code" = field("Location Filter"),
+                                                                                "Bin Code" = field("Bin Filter"),
+                                                                                "Due Date" = field("Date Filter")));
             Caption = 'Rel. Scheduled Receipt (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2195,14 +2259,14 @@
         }
         field(10014; "Rel. Scheduled Need (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Component"."Remaining Qty. (Base)" WHERE(Status = FILTER(Released),
-                                                                                     "Item No." = FIELD("No."),
-                                                                                     "Variant Code" = FIELD("Variant Filter"),
-                                                                                     "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                     "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                     "Location Code" = FIELD("Location Filter"),
-                                                                                     "Bin Code" = FIELD("Bin Filter"),
-                                                                                     "Due Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Prod. Order Component"."Remaining Qty. (Base)" where(Status = filter(Released),
+                                                                                     "Item No." = field("No."),
+                                                                                     "Variant Code" = field("Variant Filter"),
+                                                                                     "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                     "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                     "Location Code" = field("Location Filter"),
+                                                                                     "Bin Code" = field("Bin Filter"),
+                                                                                     "Due Date" = field("Date Filter")));
             Caption = 'Rel. Scheduled Need (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2339,14 +2403,14 @@
         }
         field(99000761; "Planning Issues (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Planning Component"."Expected Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                                     "Due Date" = FIELD("Date Filter"),
-                                                                                     "Location Code" = FIELD("Location Filter"),
-                                                                                     "Variant Code" = FIELD("Variant Filter"),
-                                                                                     "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                     "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                     "Planning Line Origin" = CONST(" "),
-                                                                                     "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Planning Component"."Expected Quantity (Base)" where("Item No." = field("No."),
+                                                                                     "Due Date" = field("Date Filter"),
+                                                                                     "Location Code" = field("Location Filter"),
+                                                                                     "Variant Code" = field("Variant Filter"),
+                                                                                     "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                     "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                     "Planning Line Origin" = const(" "),
+                                                                                     "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Planning Issues (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2354,14 +2418,14 @@
         }
         field(99000762; "Planning Receipt (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Requisition Line"."Quantity (Base)" WHERE(Type = CONST(Item),
-                                                                          "No." = FIELD("No."),
-                                                                          "Due Date" = FIELD("Date Filter"),
-                                                                          "Location Code" = FIELD("Location Filter"),
-                                                                          "Variant Code" = FIELD("Variant Filter"),
-                                                                          "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                          "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Requisition Line"."Quantity (Base)" where(Type = const(Item),
+                                                                          "No." = field("No."),
+                                                                          "Due Date" = field("Date Filter"),
+                                                                          "Location Code" = field("Location Filter"),
+                                                                          "Variant Code" = field("Variant Filter"),
+                                                                          "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                          "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                          "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Planning Receipt (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2369,14 +2433,14 @@
         }
         field(99000765; "Planned Order Receipt (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Line"."Remaining Qty. (Base)" WHERE(Status = CONST(Planned),
-                                                                                "Item No." = FIELD("No."),
-                                                                                "Variant Code" = FIELD("Variant Filter"),
-                                                                                "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Location Code" = FIELD("Location Filter"),
-                                                                                "Due Date" = FIELD("Date Filter"),
-                                                                                "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Prod. Order Line"."Remaining Qty. (Base)" where(Status = const(Planned),
+                                                                                "Item No." = field("No."),
+                                                                                "Variant Code" = field("Variant Filter"),
+                                                                                "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Location Code" = field("Location Filter"),
+                                                                                "Due Date" = field("Date Filter"),
+                                                                                "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Planned Order Receipt (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2384,14 +2448,14 @@
         }
         field(99000766; "FP Order Receipt (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Line"."Remaining Qty. (Base)" WHERE(Status = CONST("Firm Planned"),
-                                                                                "Item No." = FIELD("No."),
-                                                                                "Variant Code" = FIELD("Variant Filter"),
-                                                                                "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Location Code" = FIELD("Location Filter"),
-                                                                                "Due Date" = FIELD("Date Filter"),
-                                                                                "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Prod. Order Line"."Remaining Qty. (Base)" where(Status = const("Firm Planned"),
+                                                                                "Item No." = field("No."),
+                                                                                "Variant Code" = field("Variant Filter"),
+                                                                                "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Location Code" = field("Location Filter"),
+                                                                                "Due Date" = field("Date Filter"),
+                                                                                "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'FP Order Receipt (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2399,14 +2463,14 @@
         }
         field(99000767; "Rel. Order Receipt (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Line"."Remaining Qty. (Base)" WHERE(Status = CONST(Released),
-                                                                                "Item No." = FIELD("No."),
-                                                                                "Variant Code" = FIELD("Variant Filter"),
-                                                                                "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Location Code" = FIELD("Location Filter"),
-                                                                                "Due Date" = FIELD("Date Filter"),
-                                                                                "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Prod. Order Line"."Remaining Qty. (Base)" where(Status = const(Released),
+                                                                                "Item No." = field("No."),
+                                                                                "Variant Code" = field("Variant Filter"),
+                                                                                "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Location Code" = field("Location Filter"),
+                                                                                "Due Date" = field("Date Filter"),
+                                                                                "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Rel. Order Receipt (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2414,14 +2478,14 @@
         }
         field(99000768; "Planning Release (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Requisition Line"."Quantity (Base)" WHERE(Type = CONST(Item),
-                                                                          "No." = FIELD("No."),
-                                                                          "Starting Date" = FIELD("Date Filter"),
-                                                                          "Location Code" = FIELD("Location Filter"),
-                                                                          "Variant Code" = FIELD("Variant Filter"),
-                                                                          "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                          "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Requisition Line"."Quantity (Base)" where(Type = const(Item),
+                                                                          "No." = field("No."),
+                                                                          "Starting Date" = field("Date Filter"),
+                                                                          "Location Code" = field("Location Filter"),
+                                                                          "Variant Code" = field("Variant Filter"),
+                                                                          "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                          "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                          "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Planning Release (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2429,14 +2493,14 @@
         }
         field(99000769; "Planned Order Release (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Line"."Remaining Qty. (Base)" WHERE(Status = CONST(Planned),
-                                                                                "Item No." = FIELD("No."),
-                                                                                "Variant Code" = FIELD("Variant Filter"),
-                                                                                "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Location Code" = FIELD("Location Filter"),
-                                                                                "Starting Date" = FIELD("Date Filter"),
-                                                                                "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Prod. Order Line"."Remaining Qty. (Base)" where(Status = const(Planned),
+                                                                                "Item No." = field("No."),
+                                                                                "Variant Code" = field("Variant Filter"),
+                                                                                "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Location Code" = field("Location Filter"),
+                                                                                "Starting Date" = field("Date Filter"),
+                                                                                "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Planned Order Release (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2444,16 +2508,16 @@
         }
         field(99000770; "Purch. Req. Receipt (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Requisition Line"."Quantity (Base)" WHERE(Type = CONST(Item),
-                                                                          "No." = FIELD("No."),
-                                                                          "Variant Code" = FIELD("Variant Filter"),
-                                                                          "Location Code" = FIELD("Location Filter"),
-                                                                          "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                          "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                          "Due Date" = FIELD("Date Filter"),
-                                                                          "Planning Line Origin" = CONST(" "),
-                                                                          "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Requisition Line"."Quantity (Base)" where(Type = const(Item),
+                                                                          "No." = field("No."),
+                                                                          "Variant Code" = field("Variant Filter"),
+                                                                          "Location Code" = field("Location Filter"),
+                                                                          "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                          "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                          "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                          "Due Date" = field("Date Filter"),
+                                                                          "Planning Line Origin" = const(" "),
+                                                                          "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Purch. Req. Receipt (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2461,15 +2525,15 @@
         }
         field(99000771; "Purch. Req. Release (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Requisition Line"."Quantity (Base)" WHERE(Type = CONST(Item),
-                                                                          "No." = FIELD("No."),
-                                                                          "Location Code" = FIELD("Location Filter"),
-                                                                          "Variant Code" = FIELD("Variant Filter"),
-                                                                          "Drop Shipment" = FIELD("Drop Shipment Filter"),
-                                                                          "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                          "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                          "Order Date" = FIELD("Date Filter"),
-                                                                          "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Requisition Line"."Quantity (Base)" where(Type = const(Item),
+                                                                          "No." = field("No."),
+                                                                          "Location Code" = field("Location Filter"),
+                                                                          "Variant Code" = field("Variant Filter"),
+                                                                          "Drop Shipment" = field("Drop Shipment Filter"),
+                                                                          "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                          "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                          "Order Date" = field("Date Filter"),
+                                                                          "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Purch. Req. Release (Qty.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2523,12 +2587,12 @@
         }
         field(99000774; "Prod. Forecast Quantity (Base)"; Decimal)
         {
-            CalcFormula = Sum("Production Forecast Entry"."Forecast Quantity (Base)" WHERE("Item No." = FIELD("No."),
-                                                                                            "Production Forecast Name" = FIELD("Production Forecast Name"),
-                                                                                            "Forecast Date" = FIELD("Date Filter"),
-                                                                                            "Location Code" = FIELD("Location Filter"),
-                                                                                            "Component Forecast" = FIELD("Component Forecast"),
-                                                                                            "Variant Code" = FIELD("Variant Filter")));
+            CalcFormula = sum("Production Forecast Entry"."Forecast Quantity (Base)" where("Item No." = field("No."),
+                                                                                            "Production Forecast Name" = field("Production Forecast Name"),
+                                                                                            "Forecast Date" = field("Date Filter"),
+                                                                                            "Location Code" = field("Location Filter"),
+                                                                                            "Component Forecast" = field("Component Forecast"),
+                                                                                            "Variant Code" = field("Variant Filter")));
             Caption = 'Prod. Forecast Quantity (Base)';
             DecimalPlaces = 0 : 5;
             FieldClass = FlowField;
@@ -2546,14 +2610,14 @@
         }
         field(99000777; "Qty. on Prod. Order"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Line"."Remaining Qty. (Base)" WHERE(Status = FILTER(Planned .. Released),
-                                                                                "Item No." = FIELD("No."),
-                                                                                "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                "Location Code" = FIELD("Location Filter"),
-                                                                                "Variant Code" = FIELD("Variant Filter"),
-                                                                                "Due Date" = FIELD("Date Filter"),
-                                                                                "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Prod. Order Line"."Remaining Qty. (Base)" where(Status = filter(Planned .. Released),
+                                                                                "Item No." = field("No."),
+                                                                                "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                "Location Code" = field("Location Filter"),
+                                                                                "Variant Code" = field("Variant Filter"),
+                                                                                "Due Date" = field("Date Filter"),
+                                                                                "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. on Prod. Order';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2561,14 +2625,14 @@
         }
         field(99000778; "Qty. on Component Lines"; Decimal)
         {
-            CalcFormula = Sum("Prod. Order Component"."Remaining Qty. (Base)" WHERE(Status = FILTER(Planned .. Released),
-                                                                                     "Item No." = FIELD("No."),
-                                                                                     "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                                                     "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                                                     "Location Code" = FIELD("Location Filter"),
-                                                                                     "Variant Code" = FIELD("Variant Filter"),
-                                                                                     "Due Date" = FIELD("Date Filter"),
-                                                                                     "Unit of Measure Code" = FIELD("Unit of Measure Filter")));
+            CalcFormula = sum("Prod. Order Component"."Remaining Qty. (Base)" where(Status = filter(Planned .. Released),
+                                                                                     "Item No." = field("No."),
+                                                                                     "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                                                     "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                                                     "Location Code" = field("Location Filter"),
+                                                                                     "Variant Code" = field("Variant Filter"),
+                                                                                     "Due Date" = field("Date Filter"),
+                                                                                     "Unit of Measure Code" = field("Unit of Measure Filter")));
             Caption = 'Qty. on Component Lines';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2687,7 +2751,7 @@
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeOnInsert(Rec, IsHandled, xRec);
+        OnBeforeOnInsert(Rec, IsHandled);
         if not IsHandled then begin
             if "No." = '' then begin
                 GetInvtSetup();
@@ -2964,7 +3028,13 @@
     procedure FindItemVend(var ItemVend: Record "Item Vendor"; LocationCode: Code[10])
     var
         GetPlanningParameters: Codeunit "Planning-Get Parameters";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeFindItemVend(Rec, ItemVend, LocationCode, IsHandled);
+        if IsHandled then
+            exit;
+
         TestField("No.");
         ItemVend.Reset();
         ItemVend.SetRange("Item No.", "No.");
@@ -4030,7 +4100,7 @@
         exit(not IsNonInventoriableType());
     end;
 
-    internal procedure IsVariantMandatory(IsTypeItem: Boolean; ItemNo: Code[20]): Boolean
+    procedure IsVariantMandatory(IsTypeItem: Boolean; ItemNo: Code[20]): Boolean
     begin
         if IsTypeItem and (ItemNo <> '') then
             exit(IsVariantMandatory(ItemNo));
@@ -4207,7 +4277,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnInsert(var Item: Record Item; var IsHandled: Boolean; xRecItem: Record Item)
+    local procedure OnBeforeOnInsert(var Item: Record Item; var IsHandled: Boolean)
     begin
     end;
 
@@ -4448,6 +4518,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateProductionBOMNoOnAfterProcessStatusCertified(ProductionBOMHeader: Record "Production BOM Header"; var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindItemVend(var Item: Record Item; var ItemVendor: Record "Item Vendor"; LocationCode: Code[10]; var IsHandled: Boolean)
     begin
     end;
 

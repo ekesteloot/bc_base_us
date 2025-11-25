@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Item;
+
 enum 5943 "Replaced Service Item Component Type"
 {
     Extensible = true;

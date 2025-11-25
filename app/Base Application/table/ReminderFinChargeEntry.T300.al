@@ -1,3 +1,12 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.Shared.Navigate;
+using System.Security.AccessControl;
+
 table 300 "Reminder/Fin. Charge Entry"
 {
     Caption = 'Reminder/Fin. Charge Entry';
@@ -20,9 +29,9 @@ table 300 "Reminder/Fin. Charge Entry"
         field(3; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(Reminder)) "Issued Reminder Header"
-            ELSE
-            IF (Type = CONST("Finance Charge Memo")) "Issued Fin. Charge Memo Header";
+            TableRelation = if (Type = const(Reminder)) "Issued Reminder Header"
+            else
+            if (Type = const("Finance Charge Memo")) "Issued Fin. Charge Memo Header";
         }
         field(4; "Reminder Level"; Integer)
         {
@@ -75,8 +84,6 @@ table 300 "Reminder/Fin. Charge Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(15; "Due Date"; Date)
         {

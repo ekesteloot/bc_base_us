@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.RoleCenters;
+
 profile "PURCHASING AGENT"
 {
     Caption = 'Purchasing Agent';

@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Security.User;
+
 page 659 "Posted Approval Entries"
 {
     ApplicationArea = Suite;
@@ -51,7 +55,7 @@ page 659 "Posted Approval Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Sender ID");
+                        UserMgt.DisplayUserInformation(Rec."Sender ID");
                     end;
                 }
                 field("Salespers./Purch. Code"; Rec."Salespers./Purch. Code")
@@ -68,7 +72,7 @@ page 659 "Posted Approval Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Sender ID");
+                        UserMgt.DisplayUserInformation(Rec."Sender ID");
                     end;
                 }
                 field(Status; Rec.Status)
@@ -95,10 +99,10 @@ page 659 "Posted Approval Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Last Modified By ID");
+                        UserMgt.DisplayUserInformation(Rec."Last Modified By ID");
                     end;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies whether there are comments related to the approval of the document. If you want to read the comments, click the field to open the Comment Sheet window.';
@@ -160,7 +164,7 @@ page 659 "Posted Approval Entries"
                         PostedApprovalCommentLine: Record "Posted Approval Comment Line";
                     begin
                         PostedApprovalCommentLine.FilterGroup(2);
-                        PostedApprovalCommentLine.SetRange("Posted Record ID", "Posted Record ID");
+                        PostedApprovalCommentLine.SetRange("Posted Record ID", Rec."Posted Record ID");
                         PostedApprovalCommentLine.FilterGroup(0);
                         PAGE.Run(PAGE::"Posted Approval Comments", PostedApprovalCommentLine);
                     end;
@@ -174,7 +178,7 @@ page 659 "Posted Approval Entries"
 
                     trigger OnAction()
                     begin
-                        ShowRecord();
+                        Rec.ShowRecord();
                     end;
                 }
             }
@@ -197,12 +201,12 @@ page 659 "Posted Approval Entries"
 
     trigger OnAfterGetCurrRecord()
     begin
-        PostedRecordID := Format("Posted Record ID", 0, 1);
+        PostedRecordID := Format(Rec."Posted Record ID", 0, 1);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        PostedRecordID := Format("Posted Record ID", 0, 1);
+        PostedRecordID := Format(Rec."Posted Record ID", 0, 1);
     end;
 
     var

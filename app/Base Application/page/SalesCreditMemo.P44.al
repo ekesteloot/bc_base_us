@@ -1,10 +1,31 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using System.Automation;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Privacy;
+using System.Security.User;
+
 page 44 "Sales Credit Memo"
 {
     Caption = 'Sales Credit Memo';
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = FILTER("Credit Memo"));
+    SourceTableView = where("Document Type" = filter("Credit Memo"));
 
     layout
     {
@@ -22,7 +43,7 @@ page 44 "Sales Credit Memo"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -36,7 +57,7 @@ page 44 "Sales Credit Memo"
 
                     trigger OnValidate()
                     begin
-                        SelltoCustomerNoOnAfterValidate(Rec, xRec);
+                        Rec.SelltoCustomerNoOnAfterValidate(Rec, xRec);
                         CurrPage.Update();
                     end;
                 }
@@ -50,10 +71,10 @@ page 44 "Sales Credit Memo"
 
                     trigger OnValidate()
                     begin
-                        if "No." = '' then
-                            InitRecord();
+                        if Rec."No." = '' then
+                            Rec.InitRecord();
 
-                        SelltoCustomerNoOnAfterValidate(Rec, xRec);
+                        Rec.SelltoCustomerNoOnAfterValidate(Rec, xRec);
                         CurrPage.Update();
                     end;
 
@@ -134,7 +155,7 @@ page 44 "Sales Credit Memo"
 
                         trigger OnValidate()
                         begin
-                            IsSellToCountyVisible := FormatAddress.UseCounty("Sell-to Country/Region Code");
+                            IsSellToCountyVisible := FormatAddress.UseCounty(Rec."Sell-to Country/Region Code");
                         end;
                     }
                     field("Sell-to Contact No."; Rec."Sell-to Contact No.")
@@ -146,7 +167,7 @@ page 44 "Sales Credit Memo"
 
                         trigger OnLookup(var Text: Text): Boolean
                         begin
-                            if not SelltoContactLookup() then
+                            if not Rec.SelltoContactLookup() then
                                 exit(false);
                             Text := Rec."Sell-to Contact No.";
                             CurrPage.Update();
@@ -155,10 +176,10 @@ page 44 "Sales Credit Memo"
 
                         trigger OnValidate()
                         begin
-                            if GetFilter("Sell-to Contact No.") = xRec."Sell-to Contact No." then
-                                if "Sell-to Contact No." <> xRec."Sell-to Contact No." then
-                                    SetRange("Sell-to Contact No.");
-                            if "Sell-to Contact No." <> xRec."Sell-to Contact No." then
+                            if Rec.GetFilter("Sell-to Contact No.") = xRec."Sell-to Contact No." then
+                                if Rec."Sell-to Contact No." <> xRec."Sell-to Contact No." then
+                                    Rec.SetRange("Sell-to Contact No.");
+                            if Rec."Sell-to Contact No." <> xRec."Sell-to Contact No." then
                                 CurrPage.Update();
                         end;
                     }
@@ -194,7 +215,7 @@ page 44 "Sales Credit Memo"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Contact';
-                    Editable = "Sell-to Customer No." <> '';
+                    Editable = Rec."Sell-to Customer No." <> '';
                     ToolTip = 'Specifies the name of the person to contact at the customer.';
                 }
                 field("Your Reference"; Rec."Your Reference")
@@ -371,9 +392,21 @@ page 44 "Sales Credit Memo"
 
                         trigger OnValidate()
                         begin
-                            SetWorkDescription(WorkDescription);
+                            Rec.SetWorkDescription(WorkDescription);
                         end;
                     }
+                }
+                field("Language Code"; Rec."Language Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the language to be used on printouts for this document.';
+                    Visible = false;
+                }
+                field("Format Region"; Rec."Format Region")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the format to be used on printouts for this document.';
+                    Visible = false;
                 }
             }
             part(SalesLines; "Sales Cr. Memo Subform")
@@ -381,7 +414,7 @@ page 44 "Sales Credit Memo"
                 ApplicationArea = Basic, Suite;
                 Editable = IsSalesLinesEditable;
                 Enabled = IsSalesLinesEditable;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
                 UpdatePropagation = Both;
             }
             group("Credit Memo Details")
@@ -396,12 +429,12 @@ page 44 "Sales Credit Memo"
                     trigger OnAssistEdit()
                     begin
                         Clear(ChangeExchangeRate);
-                        if "Posting Date" <> 0D then
-                            ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", "Posting Date")
+                        if Rec."Posting Date" <> 0D then
+                            ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", Rec."Posting Date")
                         else
-                            ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", WorkDate());
+                            ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
                             SaveInvoiceDiscountAmount();
                         end;
                         Clear(ChangeExchangeRate);
@@ -476,7 +509,7 @@ page 44 "Sales Credit Memo"
                     var
                         SalesHeader: Record "Sales Header";
                     begin
-                        if SalesHeader.Get("Document Type", "No.") then
+                        if SalesHeader.Get(Rec."Document Type", Rec."No.") then
                             SaveInvoiceDiscountAmount();
                     end;
                 }
@@ -560,9 +593,9 @@ page 44 "Sales Credit Memo"
 
                         trigger OnValidate()
                         begin
-                            if GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
-                                if "Bill-to Customer No." <> xRec."Bill-to Customer No." then
-                                    SetRange("Bill-to Customer No.");
+                            if Rec.GetFilter("Bill-to Customer No.") = xRec."Bill-to Customer No." then
+                                if Rec."Bill-to Customer No." <> xRec."Bill-to Customer No." then
+                                    Rec.SetRange("Bill-to Customer No.");
 
                             CurrPage.Update();
                         end;
@@ -622,7 +655,7 @@ page 44 "Sales Credit Memo"
 
                         trigger OnValidate()
                         begin
-                            IsBillToCountyVisible := FormatAddress.UseCounty("Bill-to Country/Region Code");
+                            IsBillToCountyVisible := FormatAddress.UseCounty(Rec."Bill-to Country/Region Code");
                         end;
                     }
                     field("Bill-to Contact No."; Rec."Bill-to Contact No.")
@@ -690,7 +723,7 @@ page 44 "Sales Credit Memo"
                     ApplicationArea = BasicEU;
                     ToolTip = 'Specifies the point of exit through which you ship the items out of your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU;
                     ToolTip = 'Specifies the country or region of origin for the purpose of Intrastat reporting.';
@@ -709,59 +742,59 @@ page 44 "Sales Credit Memo"
                 ApplicationArea = All;
                 Caption = 'Document Check';
                 Visible = SalesDocCheckFactboxVisible;
-                SubPageLink = "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part("Attached Documents"; "Document Attachment Factbox")
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Sales Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Sales Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(Control19; "Pending Approval FactBox")
             {
                 ApplicationArea = All;
-                SubPageLink = "Table ID" = CONST(36),
-                              "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No."),
+                SubPageLink = "Table ID" = const(36),
+                              "Document Type" = field("Document Type"),
+                              "Document No." = field("No."),
                               Status = const(Open);
                 Visible = OpenApprovalEntriesExistForCurrUser;
             }
             part(Control1903720907; "Sales Hist. Sell-to FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Sell-to Customer No."),
+                SubPageLink = "No." = field("Sell-to Customer No."),
                               "Date Filter" = field("Date Filter");
                 Visible = false;
             }
             part(Control1907234507; "Sales Hist. Bill-to FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Sell-to Customer No."),
+                SubPageLink = "No." = field("Sell-to Customer No."),
                               "Date Filter" = field("Date Filter");
                 Visible = false;
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
+                SubPageLink = "No." = field("Bill-to Customer No."),
                               "Date Filter" = field("Date Filter");
             }
             part(Control1900316107; "Customer Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Sell-to Customer No."),
+                SubPageLink = "No." = field("Sell-to Customer No."),
                               "Date Filter" = field("Date Filter");
             }
             part(Control1906127307; "Sales Line FactBox")
             {
                 ApplicationArea = Basic, Suite;
                 Provider = SalesLines;
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("Document No."),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("Document No."),
+                              "Line No." = field("Line No.");
                 Visible = false;
             }
             part(ApprovalFactBox; "Approval FactBox")
@@ -779,7 +812,7 @@ page 44 "Sales Credit Memo"
             {
                 ApplicationArea = Basic, Suite;
                 Provider = SalesLines;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = false;
             }
             part(WorkflowStatus; "Workflow Status FactBox")
@@ -814,7 +847,7 @@ page 44 "Sales Credit Memo"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Statistics';
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = Statistics;
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
@@ -828,9 +861,9 @@ page 44 "Sales Credit Memo"
                         if Handled then
                             exit;
 
-                        PrepareOpeningDocumentStatistics();
+                        Rec.PrepareOpeningDocumentStatistics();
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        ShowDocumentStatisticsPage();
+                        Rec.ShowDocumentStatisticsPage();
                         CurrPage.SalesLines.Page.ForceTotalsCalculation();
                     end;
                 }
@@ -841,8 +874,8 @@ page 44 "Sales Credit Memo"
                     Enabled = IsCustomerOrContactNotEmpty;
                     Image = EditLines;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer on the sales document.';
                 }
@@ -852,9 +885,9 @@ page 44 "Sales Credit Memo"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Approvals)
@@ -895,10 +928,10 @@ page 44 "Sales Credit Memo"
                     Caption = 'CFDI Relation Documents';
                     Image = Allocations;
                     RunObject = Page "CFDI Relation Documents";
-                    RunPageLink = "Document Table ID" = CONST(36),
-                                  "Document Type" = FIELD("Document Type"),
-                                  "Document No." = FIELD("No."),
-                                  "Customer No." = FIELD("Bill-to Customer No.");
+                    RunPageLink = "Document Table ID" = const(36),
+                                  "Document Type" = field("Document Type"),
+                                  "Document No." = field("No."),
+                                  "Customer No." = field("Bill-to Customer No.");
                     ToolTip = 'View or add CFDI relation documents for the record.';
                 }
             }
@@ -916,8 +949,8 @@ page 44 "Sales Credit Memo"
                     Enabled = IsCustomerOrContactNotEmpty;
                     Image = Customer;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer.';
                 }
@@ -932,7 +965,7 @@ page 44 "Sales Credit Memo"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -952,7 +985,7 @@ page 44 "Sales Credit Memo"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ApproveRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.ApproveRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Reject)
@@ -967,7 +1000,7 @@ page 44 "Sales Credit Memo"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.RejectRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.RejectRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Delegate)
@@ -982,7 +1015,7 @@ page 44 "Sales Credit Memo"
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.DelegateRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.DelegateRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Comment)
@@ -1026,7 +1059,7 @@ page 44 "Sales Credit Memo"
                 {
                     ApplicationArea = Suite;
                     Caption = 'Re&open';
-                    Enabled = Status <> Status::Open;
+                    Enabled = Rec.Status <> Rec.Status::Open;
                     Image = ReOpen;
                     ToolTip = 'Reopen the document to change it after it has been approved. Approved documents have the Released status and must be opened before they can be changed.';
 
@@ -1053,7 +1086,7 @@ page 44 "Sales Credit Memo"
 
                     trigger OnAction()
                     begin
-                        GetPstdDocLinesToReverse();
+                        Rec.GetPstdDocLinesToReverse();
                     end;
                 }
                 action(CalculateInvoiceDiscount)
@@ -1076,7 +1109,7 @@ page 44 "Sales Credit Memo"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Apply Entries';
                     Ellipsis = true;
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = ApplyEntries;
                     ShortCutKey = 'Shift+F11';
                     ToolTip = 'Select one or more ledger entries that you want to apply this record to so that the related posted documents are closed as paid or refunded.';
@@ -1107,14 +1140,14 @@ page 44 "Sales Credit Memo"
                     ApplicationArea = Suite;
                     Caption = 'Copy Document';
                     Ellipsis = true;
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = CopyDocument;
                     ToolTip = 'Copy document lines and header information from another sales document to this document. You can copy a posted sales invoice into a new sales invoice to quickly create a similar document.';
 
                     trigger OnAction()
                     begin
-                        CopyDocument();
-                        if Get("Document Type", "No.") then;
+                        Rec.CopyDocument();
+                        if Rec.Get(Rec."Document Type", Rec."No.") then;
                         CurrPage.SalesLines.Page.ForceTotalsCalculation();
                         CurrPage.Update();
                     end;
@@ -1151,7 +1184,7 @@ page 44 "Sales Credit Memo"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            IncomingDocument.ShowCardFromEntryNo("Incoming Document Entry No.");
+                            IncomingDocument.ShowCardFromEntryNo(Rec."Incoming Document Entry No.");
                         end;
                     }
                     action(SelectIncomingDoc)
@@ -1166,7 +1199,7 @@ page 44 "Sales Credit Memo"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            Validate("Incoming Document Entry No.", IncomingDocument.SelectIncomingDocument("Incoming Document Entry No.", RecordId));
+                            Rec.Validate("Incoming Document Entry No.", IncomingDocument.SelectIncomingDocument(Rec."Incoming Document Entry No.", Rec.RecordId));
                         end;
                     }
                     action(IncomingDocAttachFile)
@@ -1197,10 +1230,10 @@ page 44 "Sales Credit Memo"
                         var
                             IncomingDocument: Record "Incoming Document";
                         begin
-                            if IncomingDocument.Get("Incoming Document Entry No.") then
+                            if IncomingDocument.Get(Rec."Incoming Document Entry No.") then
                                 IncomingDocument.RemoveLinkToRelatedRecord();
-                            "Incoming Document Entry No." := 0;
-                            Modify(true);
+                            Rec."Incoming Document Entry No." := 0;
+                            Rec.Modify(true);
                         end;
                     }
                 }
@@ -1239,7 +1272,7 @@ page 44 "Sales Credit Memo"
                         WorkflowWebhookMgt: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelSalesApprovalRequest(Rec);
-                        WorkflowWebhookMgt.FindAndCancel(RecordId);
+                        WorkflowWebhookMgt.FindAndCancel(Rec.RecordId);
                     end;
                 }
                 group(Flow)
@@ -1253,9 +1286,9 @@ page 44 "Sales Credit Memo"
                         Caption = 'Create a Power Automate approval flow';
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
 #if not CLEAN22
-                        Visible = IsSaaS and PowerAutomateTemplatesEnabled;
+                        Visible = IsSaaS and PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
 #else
-                        Visible = IsSaaS;
+                        Visible = IsSaaS and IsPowerAutomatePrivacyNoticeApproved;
 #endif
                         CustomActionType = FlowTemplateGallery;
                         FlowTemplateCategoryName = 'd365bc_approval_salesCreditMemo';
@@ -1267,7 +1300,7 @@ page 44 "Sales Credit Memo"
                         Caption = 'Create a Power Automate approval flow';
                         Image = Flow;
                         ToolTip = 'Create a new flow in Power Automate from a list of relevant flow templates.';
-                        Visible = IsSaaS and not PowerAutomateTemplatesEnabled;
+                        Visible = IsSaaS and not PowerAutomateTemplatesEnabled and IsPowerAutomatePrivacyNoticeApproved;
                         ObsoleteReason = 'This action will be handled by platform as part of the CreateFlowFromTemplate customaction';
                         ObsoleteState = Pending;
                         ObsoleteTag = '22.0';
@@ -1321,7 +1354,7 @@ page 44 "Sales Credit Memo"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Test Report';
                     Ellipsis = true;
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = TestReport;
                     ToolTip = 'View a test report so that you can find and correct any errors before you perform the actual posting of the journal or document.';
 
@@ -1353,7 +1386,7 @@ page 44 "Sales Credit Memo"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                     end;
                 }
                 action("Preview Posting")
@@ -1534,17 +1567,17 @@ page 44 "Sales Credit Memo"
     begin
         SetControlAppearance();
         CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
-        CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(RecordId);
-        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(RecordId);
-        StatusStyleTxt := GetStatusStyleText();
+        CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(Rec.RecordId);
+        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
+        StatusStyleTxt := Rec.GetStatusStyleText();
         SetControlAppearance();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        WorkDescription := GetWorkDescription();
-        SellToContact.GetOrClear("Sell-to Contact No.");
-        BillToContact.GetOrClear("Bill-to Contact No.");
+        WorkDescription := Rec.GetWorkDescription();
+        SellToContact.GetOrClear(Rec."Sell-to Contact No.");
+        BillToContact.GetOrClear(Rec."Bill-to Contact No.");
 
         OnAfterOnAfterGetRecord(Rec);
     end;
@@ -1552,13 +1585,14 @@ page 44 "Sales Credit Memo"
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SaveRecord();
-        exit(ConfirmDeletion());
+        exit(Rec.ConfirmDeletion());
     end;
 
     trigger OnInit()
     begin
         JobQueueUsed := SalesSetup.JobQueueActive();
         SetExtDocNoMandatoryCondition();
+        IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(PrivacyNoticeRegistrations.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
 #if not CLEAN22
         InitPowerAutomateTemplateVisibility();
 #endif
@@ -1567,17 +1601,17 @@ page 44 "Sales Credit Memo"
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         if DocNoVisible then
-            CheckCreditMaxBeforeInsert();
+            Rec.CheckCreditMaxBeforeInsert();
 
-        if ("Sell-to Customer No." = '') and (GetFilter("Sell-to Customer No.") <> '') then
+        if (Rec."Sell-to Customer No." = '') and (Rec.GetFilter("Sell-to Customer No.") <> '') then
             CurrPage.Update(false);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Responsibility Center" := UserMgt.GetSalesFilter();
-        if (not DocNoVisible) and ("No." = '') then
-            SetSellToCustomerFromFilter();
+        Rec."Responsibility Center" := UserMgt.GetSalesFilter();
+        if (not DocNoVisible) and (Rec."No." = '') then
+            Rec.SetSellToCustomerFromFilter();
         SetControlAppearance();
     end;
 
@@ -1588,32 +1622,24 @@ page 44 "Sales Credit Memo"
     begin
         Rec.SetSecurityFilterOnRespCenter();
 
-        SetRange("Date Filter", 0D, WorkDate());
+        Rec.SetRange("Date Filter", 0D, WorkDate());
 
         ActivateFields();
 
         IsSaaS := EnvironmentInfo.IsSaaS();
         SetDocNoVisible();
         SetControlAppearance();
-        if ("No." <> '') and ("Sell-to Customer No." = '') then
-            DocumentIsPosted := (not Get("Document Type", "No."));
+        if (Rec."No." <> '') and (Rec."Sell-to Customer No." = '') then
+            DocumentIsPosted := (not Rec.Get(Rec."Document Type", Rec."No."));
 
         CheckShowBackgrValidationNotification();
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
-    var
-        Result: Boolean;
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeOnQueryClosePage(Rec, DocumentIsPosted, CloseAction, Result, IsHandled);
-        if IsHandled then
-            exit(Result);
-
         if not DocumentIsPosted then
-            exit(ConfirmCloseUnposted());
+            exit(Rec.ConfirmCloseUnposted());
     end;
 
     var
@@ -1627,18 +1653,18 @@ page 44 "Sales Credit Memo"
         SalesCalcDiscByType: Codeunit "Sales - Calc Discount By Type";
         LinesInstructionMgt: Codeunit "Lines Instruction Mgt.";
         FormatAddress: Codeunit "Format Address";
+        PrivacyNotice: Codeunit "Privacy Notice";
+        PrivacyNoticeRegistrations: Codeunit "Privacy Notice Registrations";
         ChangeExchangeRate: Page "Change Exchange Rate";
         WorkDescription: Text;
-        [InDataSet]
         StatusStyleTxt: Text;
-        [InDataSet]
         JobQueueVisible: Boolean;
-        [InDataSet]
         JobQueueUsed: Boolean;
         HasIncomingDocument: Boolean;
         DocNoVisible: Boolean;
         ExternalDocNoMandatory: Boolean;
         OpenApprovalEntriesExistForCurrUser: Boolean;
+        IsPowerAutomatePrivacyNoticeApproved: Boolean;
         OpenApprovalEntriesExist: Boolean;
         ShowWorkflowStatus: Boolean;
         OpenPostedSalesCrMemoQst: Label 'The credit memo is posted as number %1 and moved to the Posted Sales Credit Memos window.\\Do you want to open the posted credit memo?', Comment = '%1 = posted document number';
@@ -1652,19 +1678,15 @@ page 44 "Sales Credit Memo"
         IsBillToCountyVisible: Boolean;
         IsSellToCountyVisible: Boolean;
         SalesDocCheckFactboxVisible: Boolean;
-        [InDataSet]
         IsJournalTemplNameVisible: Boolean;
-        [InDataSet]
         IsPaymentMethodCodeVisible: Boolean;
-        [InDataSet]
         IsSalesLinesEditable: Boolean;
-        [InDataSet]
         VATDateEnabled: Boolean;
 
     local procedure ActivateFields()
     begin
-        IsBillToCountyVisible := FormatAddress.UseCounty("Bill-to Country/Region Code");
-        IsSellToCountyVisible := FormatAddress.UseCounty("Sell-to Country/Region Code");
+        IsBillToCountyVisible := FormatAddress.UseCounty(Rec."Bill-to Country/Region Code");
+        IsSellToCountyVisible := FormatAddress.UseCounty(Rec."Sell-to Country/Region Code");
         GLSetup.Get();
         IsJournalTemplNameVisible := GLSetup."Journal Templ. Name Mandatory";
         IsPaymentMethodCodeVisible := not GLSetup."Hide Payment Method Code";
@@ -1692,10 +1714,10 @@ page 44 "Sales Credit Memo"
         PreAssignedNo := Rec."No.";
         xLastPostingNo := Rec."Last Posting No.";
 
-        SendToPosting(PostingCodeunitID);
+        Rec.SendToPosting(PostingCodeunitID);
 
-        IsScheduledPosting := "Job Queue Status" = "Job Queue Status"::"Scheduled for Posting";
-        DocumentIsPosted := (not SalesHeader.Get("Document Type", "No.")) or IsScheduledPosting;
+        IsScheduledPosting := Rec."Job Queue Status" = Rec."Job Queue Status"::"Scheduled for Posting";
+        DocumentIsPosted := (not SalesHeader.Get(Rec."Document Type", Rec."No.")) or IsScheduledPosting;
         OnPostOnAfterSetDocumentIsPosted(SalesHeader, IsScheduledPosting, DocumentIsPosted);
 
         if IsScheduledPosting then
@@ -1767,7 +1789,7 @@ page 44 "Sales Credit Memo"
         DocumentNoVisibility: Codeunit DocumentNoVisibility;
         DocType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order",Reminder,FinChMemo;
     begin
-        DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::"Credit Memo", "No.");
+        DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::"Credit Memo", Rec."No.");
     end;
 
     local procedure SetExtDocNoMandatoryCondition()
@@ -1906,11 +1928,6 @@ page 44 "Sales Credit Memo"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostDocumentOnBeforeOpenPage(SalesCrMemoHeader: Record "Sales Cr.Memo Header"; var IsHandled: boolean)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeOnQueryClosePage(var SalesHeader: Record "Sales Header"; DocumentIsPosted: Boolean; CloseAction: Action; var Result: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

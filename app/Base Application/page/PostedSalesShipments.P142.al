@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Sales.Comment;
+
 page 142 "Posted Sales Shipments"
 {
     ApplicationArea = Basic, Suite;
@@ -6,8 +12,8 @@ page 142 "Posted Sales Shipments"
     Editable = false;
     PageType = List;
     SourceTable = "Sales Shipment Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -228,7 +234,7 @@ page 142 "Posted Sales Shipments"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Sales Shipment Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -238,8 +244,8 @@ page 142 "Posted Sales Shipments"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = CONST(Shipment),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const(Shipment),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -253,7 +259,7 @@ page 142 "Posted Sales Shipments"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(CertificateOfSupplyDetails)
@@ -262,8 +268,8 @@ page 142 "Posted Sales Shipments"
                     Caption = 'Certificate of Supply Details';
                     Image = Certificate;
                     RunObject = Page "Certificates of Supply";
-                    RunPageLink = "Document Type" = FILTER("Sales Shipment"),
-                                  "Document No." = FIELD("No.");
+                    RunPageLink = "Document Type" = filter("Sales Shipment"),
+                                  "Document No." = field("No.");
                     ToolTip = 'View the certificate of supply that you must send to your customer for signature as confirmation of receipt. You must print a certificate of supply if the shipment uses a combination of VAT business posting group and VAT product posting group that have been marked to require a certificate of supply in the VAT Posting Setup window.';
                 }
                 action(PrintCertificateofSupply)
@@ -278,7 +284,7 @@ page 142 "Posted Sales Shipments"
                         CertificateOfSupply: Record "Certificate of Supply";
                     begin
                         CertificateOfSupply.SetRange("Document Type", CertificateOfSupply."Document Type"::"Sales Shipment");
-                        CertificateOfSupply.SetRange("Document No.", "No.");
+                        CertificateOfSupply.SetRange("Document No.", Rec."No.");
                         CertificateOfSupply.Print();
                     end;
                 }
@@ -299,7 +305,7 @@ page 142 "Posted Sales Shipments"
 
                     trigger OnAction()
                     begin
-                        StartTrackingSite();
+                        Rec.StartTrackingSite();
                     end;
                 }
             }
@@ -333,7 +339,7 @@ page 142 "Posted Sales Shipments"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action("Update Document")
@@ -443,10 +449,10 @@ page 142 "Posted Sales Shipments"
         OfficeMgt: Codeunit "Office Management";
         HasFilters: Boolean;
     begin
-        HasFilters := GetFilters <> '';
-        SetSecurityFilterOnRespCenter();
-        if HasFilters and not Find() then
-            if FindFirst() then;
+        HasFilters := Rec.GetFilters() <> '';
+        Rec.SetSecurityFilterOnRespCenter();
+        if HasFilters and not Rec.Find() then
+            if Rec.FindFirst() then;
         IsOfficeAddin := OfficeMgt.IsAvailable();
     end;
 

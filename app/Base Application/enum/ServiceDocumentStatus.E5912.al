@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Document;
+
 enum 5912 "Service Document Status"
 {
     Extensible = true;

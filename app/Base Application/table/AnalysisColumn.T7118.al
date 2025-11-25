@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.Foundation.Enums;
+
 table 7118 "Analysis Column"
 {
     Caption = 'Analysis Column';
@@ -13,7 +17,7 @@ table 7118 "Analysis Column"
         field(2; "Analysis Column Template"; Code[10])
         {
             Caption = 'Analysis Column Template';
-            TableRelation = "Analysis Column Template".Name WHERE("Analysis Area" = FIELD("Analysis Area"));
+            TableRelation = "Analysis Column Template".Name where("Analysis Area" = field("Analysis Area"));
         }
         field(3; "Line No."; Integer)
         {

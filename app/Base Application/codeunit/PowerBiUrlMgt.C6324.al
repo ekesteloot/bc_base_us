@@ -1,3 +1,7 @@
+namespace System.Integration.PowerBI;
+
+using System.Utilities;
+
 codeunit 6324 "Power BI Url Mgt"
 {
     SingleInstance = true;

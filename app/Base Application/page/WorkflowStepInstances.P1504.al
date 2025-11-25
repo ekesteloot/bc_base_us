@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1504 "Workflow Step Instances"
 {
     ApplicationArea = Suite;
@@ -15,7 +17,7 @@ page 1504 "Workflow Step Instances"
         {
             repeater(Group)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the ID of the workflow step instance.';
@@ -58,7 +60,7 @@ page 1504 "Workflow Step Instances"
                     Editable = false;
                     ToolTip = 'Specifies the name of the function that is used by the workflow step instance.';
                 }
-                field(Argument; Argument)
+                field(Argument; Rec.Argument)
                 {
                     ApplicationArea = Suite;
                     Editable = false;
@@ -110,13 +112,13 @@ page 1504 "Workflow Step Instances"
 
     trigger OnAfterGetRecord()
     begin
-        RecordIDText := Format("Record ID", 0, 1);
+        RecordIDText := Format(Rec."Record ID", 0, 1);
     end;
 
     trigger OnOpenPage()
     begin
         if Workflow.Code <> '' then
-            SetRange("Workflow Code", Workflow.Code);
+            Rec.SetRange("Workflow Code", Workflow.Code);
     end;
 
     var

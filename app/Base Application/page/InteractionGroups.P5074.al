@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 page 5074 "Interaction Groups"
 {
     ApplicationArea = RelationshipMgmt;
@@ -13,7 +15,7 @@ page 5074 "Interaction Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the interaction group.';
@@ -54,8 +56,8 @@ page 5074 "Interaction Groups"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "Interaction Group Code" = FIELD(Code);
-                    RunPageView = SORTING("Interaction Group Code");
+                    RunPageLink = "Interaction Group Code" = field(Code);
+                    RunPageView = sorting("Interaction Group Code");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View a list of the interactions that you have logged, for example, when you create an interaction, print a cover sheet, a sales order, and so on.';
                 }
@@ -65,7 +67,7 @@ page 5074 "Interaction Groups"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Interaction Group Statistics";
-                    RunPageLink = Code = FIELD(Code);
+                    RunPageLink = Code = field(Code);
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -75,8 +77,8 @@ page 5074 "Interaction Groups"
                     Caption = 'Interaction &Templates';
                     Image = InteractionTemplate;
                     RunObject = Page "Interaction Templates";
-                    RunPageLink = "Interaction Group Code" = FIELD(Code);
-                    RunPageView = SORTING("Interaction Group Code");
+                    RunPageLink = "Interaction Group Code" = field(Code);
+                    RunPageView = sorting("Interaction Group Code");
                     ToolTip = 'View the different templates that you can use when creating interactions.';
                 }
             }

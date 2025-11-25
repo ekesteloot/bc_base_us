@@ -1,7 +1,16 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Ledger;
+using System.Utilities;
+
 report 722 "Phys. Inventory List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/PhysInventoryList.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/PhysInventoryList.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Physical Inventory List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +19,7 @@ report 722 "Phys. Inventory List"
     {
         dataitem(PageLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
             }
@@ -70,8 +79,8 @@ report 722 "Phys. Inventory List"
                 }
                 dataitem("Item Journal Line"; "Item Journal Line")
                 {
-                    DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
-                    DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+                    DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
+                    DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
                     RequestFilterFields = "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Location Code", "Bin Code";
                     column(PostingDt_ItemJournalLine; Format("Posting Date"))
                     {
@@ -117,7 +126,7 @@ report 722 "Phys. Inventory List"
                     }
                     dataitem(ItemTrackingSpecification; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(PackageNoCaption; GetPackageNoCaption)
                         {
                         }

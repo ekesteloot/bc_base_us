@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Activity.History;
+
+using Microsoft.WarehouseMgt.Structure;
+
 page 7350 "Registered Movement Subform"
 {
     AutoSplitKey = true;
@@ -81,13 +85,13 @@ page 7350 "Registered Movement Subform"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
                 }
-                field(Cubage; Cubage)
+                field(Cubage; Rec.Cubage)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the total cubage of items on the line, calculated based on the Quantity field.';
                     Visible = false;
                 }
-                field(Weight; Weight)
+                field(Weight; Rec.Weight)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the weight of one item unit when measured in the specified unit of measure.';
@@ -148,15 +152,15 @@ page 7350 "Registered Movement Subform"
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", "Bin Code");
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", Rec."Bin Code");
     end;
 
     local procedure ShowWhseEnt()
     var
         RegisteredWhseActivityHdr: Record "Registered Whse. Activity Hdr.";
     begin
-        RegisteredWhseActivityHdr.Get("Activity Type", "No.");
-        ShowWhseEntries(RegisteredWhseActivityHdr."Registering Date");
+        RegisteredWhseActivityHdr.Get(Rec."Activity Type", Rec."No.");
+        Rec.ShowWhseEntries(RegisteredWhseActivityHdr."Registering Date");
     end;
 }
 

@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 page 130405 "CAL Test Results"
 {
     Caption = 'CAL Test Results';
@@ -36,17 +38,17 @@ page 130405 "CAL Test Results"
                 {
                     ApplicationArea = All;
                 }
-                field(Platform; Platform)
+                field(Platform; Rec.Platform)
                 {
                     ApplicationArea = All;
                     Visible = false;
                 }
-                field(Result; Result)
+                field(Result; Rec.Result)
                 {
                     ApplicationArea = All;
                     StyleExpr = Style;
                 }
-                field(Restore; Restore)
+                field(Restore; Rec.Restore)
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -70,7 +72,7 @@ page 130405 "CAL Test Results"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the ID of the user who posted the entry, to be used, for example, in the change log.';
                 }
-                field(File; File)
+                field(File; Rec.File)
                 {
                     ApplicationArea = All;
                     Visible = false;
@@ -94,9 +96,9 @@ page 130405 "CAL Test Results"
                     InStr: InStream;
                     CallStack: Text;
                 begin
-                    if "Call Stack".HasValue() then begin
-                        CalcFields("Call Stack");
-                        "Call Stack".CreateInStream(InStr);
+                    if Rec."Call Stack".HasValue() then begin
+                        Rec.CalcFields("Call Stack");
+                        Rec."Call Stack".CreateInStream(InStr);
                         InStr.ReadText(CallStack);
                         Message(CallStack)
                     end;
@@ -152,12 +154,12 @@ page 130405 "CAL Test Results"
 
     local procedure GetStyle(): Text
     begin
-        case Result of
-            Result::Passed:
+        case Rec.Result of
+            Rec.Result::Passed:
                 exit('Favorable');
-            Result::Failed:
+            Rec.Result::Failed:
                 exit('Unfavorable');
-            Result::Inconclusive:
+            Rec.Result::Inconclusive:
                 exit('Ambiguous');
             else
                 exit('Standard');

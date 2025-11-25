@@ -1,14 +1,24 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 400 "Remittance Advice - Entries"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/RemittanceAdviceEntries.rdlc';
+    RDLCLayout = './Purchases/Reports/RemittanceAdviceEntries.rdlc';
     Caption = 'Remittance Advice - Entries';
 
     dataset
     {
         dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
         {
-            DataItemTableView = SORTING("Vendor No.") WHERE("Document Type" = CONST(Payment));
+            DataItemTableView = sorting("Vendor No.") where("Document Type" = const(Payment));
             RequestFilterFields = "Vendor No.", "Posting Date", "Currency Code", "Entry No.";
             column(CompanyAddr1; CompanyAddr[1])
             {
@@ -135,7 +145,7 @@ report 400 "Remittance Advice - Entries"
             }
             dataitem(VendLedgEntry2; "Vendor Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(LineAmtLineDiscCurr; -LineAmount - LineDiscount)
                 {
                     AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
@@ -176,8 +186,8 @@ report 400 "Remittance Advice - Entries"
                 }
                 dataitem("Detailed Vendor Ledg. Entry"; "Detailed Vendor Ledg. Entry")
                 {
-                    DataItemLink = "Vendor Ledger Entry No." = FIELD("Entry No."), "Initial Document Type" = FIELD("Document Type");
-                    DataItemTableView = SORTING("Vendor Ledger Entry No.", "Entry Type", "Posting Date") WHERE("Entry Type" = CONST(Application), "Document Type" = CONST("Credit Memo"));
+                    DataItemLink = "Vendor Ledger Entry No." = field("Entry No."), "Initial Document Type" = field("Document Type");
+                    DataItemTableView = sorting("Vendor Ledger Entry No.", "Entry Type", "Posting Date") where("Entry Type" = const(Application), "Document Type" = const("Credit Memo"));
                     column(LineDisc_DtldVendLedgEntry; -LineDiscount)
                     {
                         AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";
@@ -282,7 +292,7 @@ report 400 "Remittance Advice - Entries"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(Amount_VendLedgEntry; "Vendor Ledger Entry".Amount)
                 {
                     AutoFormatExpression = "Vendor Ledger Entry"."Currency Code";

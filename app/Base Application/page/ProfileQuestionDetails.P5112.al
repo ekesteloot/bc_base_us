@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5112 "Profile Question Details"
 {
     Caption = 'Profile Question Details';
@@ -188,69 +190,57 @@ page 5112 "Profile Question Details"
 
     trigger OnOpenPage()
     begin
-        SetRange(Type, Type::Question);
+        Rec.SetRange(Type, Rec.Type::Question);
     end;
 
     var
-        [InDataSet]
         NoOfDecimalsHideValue: Boolean;
-        [InDataSet]
         NoOfDecimalsEditable: Boolean;
-        [InDataSet]
         MinPctQuestionsAnsweredHideValue: Boolean;
-        [InDataSet]
         CustomerClassFieldEditable: Boolean;
-        [InDataSet]
         VendorClassFieldEditable: Boolean;
-        [InDataSet]
         ContactClassFieldEditable: Boolean;
-        [InDataSet]
         MinPctQuestionsAnsweredEditable: Boolean;
-        [InDataSet]
         StartingDateFormulaEditable: Boolean;
-        [InDataSet]
         ClassificationMethodEditable: Boolean;
-        [InDataSet]
         EndingDateFormulaEditable: Boolean;
-        [InDataSet]
         SortingMethodEditable: Boolean;
-        [InDataSet]
         AnswerValuesEnable: Boolean;
 
     procedure SetEditable()
     begin
         CustomerClassFieldEditable :=
-          "Auto Contact Classification" and ("Vendor Class. Field" = "Vendor Class. Field"::" ") and ("Contact Class. Field" =
-                                                                                                      "Contact Class. Field"::" ");
+          Rec."Auto Contact Classification" and (Rec."Vendor Class. Field" = Rec."Vendor Class. Field"::" ") and (Rec."Contact Class. Field" =
+                                                                                                      Rec."Contact Class. Field"::" ");
         VendorClassFieldEditable :=
-          "Auto Contact Classification" and ("Customer Class. Field" = "Customer Class. Field"::" ") and ("Contact Class. Field" =
-                                                                                                          "Contact Class. Field"::" ");
+          Rec."Auto Contact Classification" and (Rec."Customer Class. Field" = Rec."Customer Class. Field"::" ") and (Rec."Contact Class. Field" =
+                                                                                                          Rec."Contact Class. Field"::" ");
         ContactClassFieldEditable :=
-          "Auto Contact Classification" and ("Customer Class. Field" = "Customer Class. Field"::" ") and ("Vendor Class. Field" =
-                                                                                                          "Vendor Class. Field"::" ");
+          Rec."Auto Contact Classification" and (Rec."Customer Class. Field" = Rec."Customer Class. Field"::" ") and (Rec."Vendor Class. Field" =
+                                                                                                          Rec."Vendor Class. Field"::" ");
 
-        MinPctQuestionsAnsweredEditable := "Contact Class. Field" = "Contact Class. Field"::Rating;
+        MinPctQuestionsAnsweredEditable := Rec."Contact Class. Field" = Rec."Contact Class. Field"::Rating;
 
         StartingDateFormulaEditable :=
-          ("Customer Class. Field" <> "Customer Class. Field"::" ") or
-          ("Vendor Class. Field" <> "Vendor Class. Field"::" ") or
-          (("Contact Class. Field" <> "Contact Class. Field"::" ") and ("Contact Class. Field" <> "Contact Class. Field"::Rating));
+          (Rec."Customer Class. Field" <> Rec."Customer Class. Field"::" ") or
+          (Rec."Vendor Class. Field" <> Rec."Vendor Class. Field"::" ") or
+          ((Rec."Contact Class. Field" <> Rec."Contact Class. Field"::" ") and (Rec."Contact Class. Field" <> Rec."Contact Class. Field"::Rating));
 
         EndingDateFormulaEditable := StartingDateFormulaEditable;
 
         ClassificationMethodEditable :=
-          ("Customer Class. Field" <> "Customer Class. Field"::" ") or
-          ("Vendor Class. Field" <> "Vendor Class. Field"::" ") or
-          (("Contact Class. Field" <> "Contact Class. Field"::" ") and ("Contact Class. Field" <> "Contact Class. Field"::Rating));
+          (Rec."Customer Class. Field" <> Rec."Customer Class. Field"::" ") or
+          (Rec."Vendor Class. Field" <> Rec."Vendor Class. Field"::" ") or
+          ((Rec."Contact Class. Field" <> Rec."Contact Class. Field"::" ") and (Rec."Contact Class. Field" <> Rec."Contact Class. Field"::Rating));
 
         SortingMethodEditable :=
-          ("Classification Method" = "Classification Method"::"Percentage of Value") or
-          ("Classification Method" = "Classification Method"
+          (Rec."Classification Method" = Rec."Classification Method"::"Percentage of Value") or
+          (Rec."Classification Method" = Rec."Classification Method"
            ::"Percentage of Contacts");
 
         NoOfDecimalsEditable := ClassificationMethodEditable;
 
-        AnswerValuesEnable := ("Contact Class. Field" = "Contact Class. Field"::Rating);
+        AnswerValuesEnable := (Rec."Contact Class. Field" = Rec."Contact Class. Field"::Rating);
     end;
 
     local procedure AutoContactClassificationOnAft()
@@ -286,7 +276,7 @@ page 5112 "Profile Question Details"
 
     local procedure Min37QuestionsAnsweredOnFormat()
     begin
-        if "Contact Class. Field" <> "Contact Class. Field"::Rating then
+        if Rec."Contact Class. Field" <> Rec."Contact Class. Field"::Rating then
             MinPctQuestionsAnsweredHideValue := true;
     end;
 }

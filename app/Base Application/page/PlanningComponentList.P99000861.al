@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Planning;
+
 page 99000861 "Planning Component List"
 {
     Caption = 'Planning Component List';
@@ -46,22 +48,22 @@ page 99000861 "Planning Component List"
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies how to calculate the Quantity field.';
                 }
-                field(Length; Length)
+                field(Length; Rec.Length)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the length of one item unit when measured in the specified unit of measure.';
                 }
-                field(Width; Width)
+                field(Width; Rec.Width)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the width of one item unit when measured in the specified unit of measure.';
                 }
-                field(Weight; Weight)
+                field(Weight; Rec.Weight)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the weight of one item unit when measured in the specified unit of measure.';
                 }
-                field(Depth; Depth)
+                field(Depth; Rec.Depth)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the depth of one item unit when measured in the specified unit of measure.';
@@ -122,7 +124,7 @@ page 99000861 "Planning Component List"
                     ToolTip = 'Specifies the total cost for this planning component line.';
                     Visible = false;
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the position of the component on the bill of material.';
@@ -181,7 +183,7 @@ page 99000861 "Planning Component List"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }

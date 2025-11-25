@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 page 6502 "Item Tracking Codes"
 {
     AdditionalSearchTerms = 'serial number codes,lot number  codes,defect  codes';

@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Utilities;
+
 codeunit 8620 "Config. Package - Import"
 {
 

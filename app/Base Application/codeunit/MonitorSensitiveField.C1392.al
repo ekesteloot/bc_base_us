@@ -1,3 +1,15 @@
+﻿namespace System.Diagnostics;
+
+using System.Email;
+using System.Environment.Configuration;
+using System.Globalization;
+using System.Media;
+using System.Privacy;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Security.User;
+using System.Telemetry;
+
 codeunit 1392 "Monitor Sensitive Field"
 {
     Permissions = tabledata "Field Monitoring Setup" = im;
@@ -266,18 +278,6 @@ codeunit 1392 "Monitor Sensitive Field"
         PromoteMonitorSensitiveFieldNotification.Send();
     end;
 
-#if not CLEAN20
-    [Obsolete('The email enhancements are permenantly enabled, "Notification Email Account" is a required field to complete the setup, so no need to show a notification.', '20.0')]
-    procedure ShowEmailFeatureEnabledNotification()
-    begin
-    end;
-
-    [Obsolete('The email enhancements are permenantly enabled, "Notification Email Account" is a required field to complete the setup, so no need to show a notification.', '20.0')]
-    procedure ShowEmailFeatureEnabledInSetupPageNotification()
-    begin
-    end;
-#endif
-
     procedure OpenFieldMonitoringSetupWizard(notification: Notification)
     begin
         Page.Run(Page::"Monitor Field Setup Wizard");
@@ -451,14 +451,6 @@ codeunit 1392 "Monitor Sensitive Field"
     begin
         exit(ChangeLogHiddenTablesNotificationIdTxt);
     end;
-
-#if not CLEAN20
-    [Obsolete('The email enhancements are permenantly enabled, "Notification Email Account" is a required field to complete the setup, so no need to show a notification.', '20.0')]
-    procedure GetEmailFeatureEnabledNotificationId(): Guid
-    begin
-        exit(EmailFeatureEnabledNotificationIdTxt);
-    end;
-#endif
 
     local procedure CheckPermission(User: Record User; TableNo: Integer; ReadPermission: Option " ",Yes,Indirect; InsertPermission: Option " ",Yes,Indirect; ModifyPermission: Option " ",Yes,Indirect; DeletePermission: Option " ",Yes,Indirect): Boolean
     var
@@ -656,9 +648,6 @@ codeunit 1392 "Monitor Sensitive Field"
         PromoteMonitorFeatureNotificationDescTok: Label 'Notify users about monitoring sensitive data.';
         ChangeLogHiddenTablesNotificationIdTxt: Label '2e7fe3ad-6382-4cbd-93f8-79bad5b53854', Locked = true;
         PromoteMonitorFeatureNotificationIdTxt: Label '6a2fe3ad-6382-4acd-34f8-7dbad5b51245', Locked = true;
-#if not CLEAN20
-        EmailFeatureEnabledNotificationIdTxt: Label '3a51e3ad-6382-4a2d-37f8-7d2a35451ad5', Locked = true;
-#endif
         ChangeLogStatusTxt: Label 'Change Log Setup', Locked = true;
         ChangeLogSetupValuesTxt: Label 'Change Log Setup status was changed to %1', Locked = true;
         MonitorSetupLbl: Label 'Sensitive Field Monitor Setup', Locked = true;

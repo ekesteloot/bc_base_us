@@ -1,3 +1,17 @@
+namespace Microsoft.Sales.Peppol;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using System.Utilities;
+
 codeunit 1620 "PEPPOL Validation"
 {
     TableNo = "Sales Header";

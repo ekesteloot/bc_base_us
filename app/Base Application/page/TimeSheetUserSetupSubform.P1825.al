@@ -38,7 +38,7 @@ page 1825 "Time Sheet User Setup Subform"
 
     trigger OnOpenPage()
     begin
-        HideExternalUsers();
+        Rec.HideExternalUsers();
     end;
 }
 

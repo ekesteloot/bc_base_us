@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 163 "Warranty Ledg. Entries Preview"
 {
     Caption = 'Warranty Ledger Entries Preview';
@@ -131,7 +135,7 @@ page 163 "Warranty Ledg. Entries Preview"
                     ToolTip = 'Specifies the code for the global dimension that is linked to the record or entry for analysis purposes. Two global dimensions, typically for the company''s most important activities, are available on all cards, documents, reports, and lists.';
                     Visible = Dim2Visible;
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that the warranty ledger entry is open.';
@@ -217,7 +221,7 @@ page 163 "Warranty Ledg. Entries Preview"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -230,7 +234,7 @@ page 163 "Warranty Ledg. Entries Preview"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }

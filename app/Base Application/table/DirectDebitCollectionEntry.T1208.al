@@ -1,3 +1,10 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
 table 1208 "Direct Debit Collection Entry"
 {
     Caption = 'Direct Debit Collection Entry';
@@ -30,9 +37,9 @@ table 1208 "Direct Debit Collection Entry"
         field(4; "Applies-to Entry No."; Integer)
         {
             Caption = 'Applies-to Entry No.';
-            TableRelation = "Cust. Ledger Entry" WHERE("Customer No." = FIELD("Customer No."),
-                                                        "Document Type" = FILTER(Invoice | "Finance Charge Memo" | Reminder),
-                                                        Open = CONST(true));
+            TableRelation = "Cust. Ledger Entry" where("Customer No." = field("Customer No."),
+                                                        "Document Type" = filter(Invoice | "Finance Charge Memo" | Reminder),
+                                                        Open = const(true));
 
             trigger OnValidate()
             var
@@ -124,7 +131,7 @@ table 1208 "Direct Debit Collection Entry"
         field(11; "Mandate ID"; Code[35])
         {
             Caption = 'Mandate ID';
-            TableRelation = "SEPA Direct Debit Mandate".ID WHERE("Customer No." = FIELD("Customer No."));
+            TableRelation = "SEPA Direct Debit Mandate".ID where("Customer No." = field("Customer No."));
 
             trigger OnValidate()
             var
@@ -138,7 +145,7 @@ table 1208 "Direct Debit Collection Entry"
         }
         field(12; "Mandate Type of Payment"; Option)
         {
-            CalcFormula = Lookup("SEPA Direct Debit Mandate"."Type of Payment" WHERE(ID = FIELD("Mandate ID")));
+            CalcFormula = Lookup("SEPA Direct Debit Mandate"."Type of Payment" where(ID = field("Mandate ID")));
             Caption = 'Mandate Type of Payment';
             Editable = false;
             FieldClass = FlowField;
@@ -147,35 +154,35 @@ table 1208 "Direct Debit Collection Entry"
         }
         field(13; "Customer Name"; Text[100])
         {
-            CalcFormula = Lookup(Customer.Name WHERE("No." = FIELD("Customer No.")));
+            CalcFormula = Lookup(Customer.Name where("No." = field("Customer No.")));
             Caption = 'Customer Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(14; "Applies-to Entry Document No."; Code[20])
         {
-            CalcFormula = Lookup("Cust. Ledger Entry"."Document No." WHERE("Entry No." = FIELD("Applies-to Entry No.")));
+            CalcFormula = Lookup("Cust. Ledger Entry"."Document No." where("Entry No." = field("Applies-to Entry No.")));
             Caption = 'Applies-to Entry Document No.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(15; "Applies-to Entry Description"; Text[100])
         {
-            CalcFormula = Lookup("Cust. Ledger Entry".Description WHERE("Entry No." = FIELD("Applies-to Entry No.")));
+            CalcFormula = Lookup("Cust. Ledger Entry".Description where("Entry No." = field("Applies-to Entry No.")));
             Caption = 'Applies-to Entry Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(16; "Applies-to Entry Posting Date"; Date)
         {
-            CalcFormula = Lookup("Cust. Ledger Entry"."Posting Date" WHERE("Entry No." = FIELD("Applies-to Entry No.")));
+            CalcFormula = Lookup("Cust. Ledger Entry"."Posting Date" where("Entry No." = field("Applies-to Entry No.")));
             Caption = 'Applies-to Entry Posting Date';
             Editable = false;
             FieldClass = FlowField;
         }
         field(17; "Applies-to Entry Currency Code"; Code[10])
         {
-            CalcFormula = Lookup("Cust. Ledger Entry"."Currency Code" WHERE("Entry No." = FIELD("Applies-to Entry No.")));
+            CalcFormula = Lookup("Cust. Ledger Entry"."Currency Code" where("Entry No." = field("Applies-to Entry No.")));
             Caption = 'Applies-to Entry Currency Code';
             Editable = false;
             FieldClass = FlowField;
@@ -183,33 +190,33 @@ table 1208 "Direct Debit Collection Entry"
         }
         field(18; "Applies-to Entry Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Cust. Ledger Entry No." = FIELD("Applies-to Entry No."),
-                                                                         "Entry Type" = FILTER("Initial Entry" | "Unrealized Loss" | "Unrealized Gain" | "Realized Loss" | "Realized Gain" | "Payment Discount" | "Payment Discount (VAT Excl.)" | "Payment Discount (VAT Adjustment)" | "Payment Tolerance" | "Payment Discount Tolerance" | "Payment Tolerance (VAT Excl.)" | "Payment Tolerance (VAT Adjustment)" | "Payment Discount Tolerance (VAT Excl.)" | "Payment Discount Tolerance (VAT Adjustment)")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Cust. Ledger Entry No." = field("Applies-to Entry No."),
+                                                                         "Entry Type" = filter("Initial Entry" | "Unrealized Loss" | "Unrealized Gain" | "Realized Loss" | "Realized Gain" | "Payment Discount" | "Payment Discount (VAT Excl.)" | "Payment Discount (VAT Adjustment)" | "Payment Tolerance" | "Payment Discount Tolerance" | "Payment Tolerance (VAT Excl.)" | "Payment Tolerance (VAT Adjustment)" | "Payment Discount Tolerance (VAT Excl.)" | "Payment Discount Tolerance (VAT Adjustment)")));
             Caption = 'Applies-to Entry Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(19; "Applies-to Entry Rem. Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            CalcFormula = Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Cust. Ledger Entry No." = FIELD("Applies-to Entry No.")));
+            CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Cust. Ledger Entry No." = field("Applies-to Entry No.")));
             Caption = 'Applies-to Entry Rem. Amount';
             Editable = false;
             FieldClass = FlowField;
         }
         field(20; "Applies-to Entry Open"; Boolean)
         {
-            CalcFormula = Lookup("Cust. Ledger Entry".Open WHERE("Entry No." = FIELD("Applies-to Entry No.")));
+            CalcFormula = Lookup("Cust. Ledger Entry".Open where("Entry No." = field("Applies-to Entry No.")));
             Caption = 'Applies-to Entry Open';
             Editable = false;
             FieldClass = FlowField;
         }
         field(21; "Direct Debit Collection Status"; Option)
         {
-            CalcFormula = Lookup("Direct Debit Collection".Status WHERE("No." = FIELD("Direct Debit Collection No.")));
+            CalcFormula = Lookup("Direct Debit Collection".Status where("No." = field("Direct Debit Collection No.")));
             Caption = 'Direct Debit Collection Status';
             FieldClass = FlowField;
             OptionCaption = 'New,Canceled,File Created,Posted,Closed';
@@ -217,7 +224,7 @@ table 1208 "Direct Debit Collection Entry"
         }
         field(22; "Payment Reference"; Code[50])
         {
-            CalcFormula = Lookup("Cust. Ledger Entry"."Payment Reference" WHERE("Entry No." = FIELD("Applies-to Entry No.")));
+            CalcFormula = Lookup("Cust. Ledger Entry"."Payment Reference" where("Entry No." = field("Applies-to Entry No.")));
             Caption = 'Payment Reference';
             Editable = false;
             FieldClass = FlowField;

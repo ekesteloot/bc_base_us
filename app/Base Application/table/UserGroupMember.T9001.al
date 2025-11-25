@@ -1,3 +1,10 @@
+﻿namespace System.Security.AccessControl;
+
+using System.Environment;
+using System.Environment.Configuration;
+using System.Reflection;
+using System.Security.User;
+
 table 9001 "User Group Member"
 {
     Caption = 'User Group Member';
@@ -35,21 +42,21 @@ table 9001 "User Group Member"
         }
         field(4; "User Name"; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("User Security ID")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("User Security ID")));
             Caption = 'User Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; "User Full Name"; Text[80])
         {
-            CalcFormula = Lookup(User."Full Name" WHERE("User Security ID" = FIELD("User Security ID")));
+            CalcFormula = Lookup(User."Full Name" where("User Security ID" = field("User Security ID")));
             Caption = 'User Full Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "User Group Name"; Text[50])
         {
-            CalcFormula = Lookup("User Group".Name WHERE(Code = FIELD("User Group Code")));
+            CalcFormula = Lookup("User Group".Name where(Code = field("User Group Code")));
             Caption = 'User Group Name';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Substitution;
+
 page 5720 "Item Substitutions"
 {
     AutoSplitKey = false;
@@ -24,12 +26,12 @@ page 5720 "Item Substitutions"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the description of the substitute item.';
                 }
-                field(Interchangeable; Interchangeable)
+                field(Interchangeable; Rec.Interchangeable)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies that the item and the substitute item are interchangeable.';
                 }
-                field(Condition; Condition)
+                field(Condition; Rec.Condition)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that a condition exists for this substitution.';
@@ -61,10 +63,10 @@ page 5720 "Item Substitutions"
                 Caption = '&Condition';
                 Image = ViewComments;
                 RunObject = Page "Sub. Conditions";
-                RunPageLink = Type = FIELD(Type),
-                              "No." = FIELD("No."),
-                              "Substitute Type" = FIELD("Substitute Type"),
-                              "Substitute No." = FIELD("Substitute No.");
+                RunPageLink = Type = field(Type),
+                              "No." = field("No."),
+                              "Substitute Type" = field("Substitute Type"),
+                              "Substitute No." = field("Substitute No.");
                 ToolTip = 'Specify a condition for the item substitution, which is for information only and does not affect the item substitution.';
             }
         }

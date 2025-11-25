@@ -1,7 +1,12 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+
 report 5807 "Item Age Composition - Qty."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemAgeCompositionQty.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemAgeCompositionQty.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Age Composition - Quantity';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5807 "Item Age Composition - Qty."
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.") WHERE(Type = CONST(Inventory));
+            DataItemTableView = sorting("No.") where(Type = const(Inventory));
             RequestFilterFields = "No.", "Inventory Posting Group", "Statistics Group", "Location Filter";
             column(TodayFormatted; Format(Today, 0, 4))
             {

@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Integration;
+
+using System.Security.AccessControl;
+
 table 2000000241 "External Event Log Entry"
 {
     Caption = 'External Event Log Entry';
@@ -46,6 +54,19 @@ table 2000000241 "External Event Log Entry"
         field(9; "Processed"; Boolean)
         {
             Caption = 'Processed';
+        }
+        field(10; "Company Id"; Guid)
+        {
+            DataClassification = OrganizationIdentifiableInformation;
+            Caption = 'Company Id';
+        }
+
+        /// <summary>
+        /// The evnet version set in the event decleration.
+        /// </summary>
+        field(11; "Event Version"; Text[43])
+        {
+            Caption = 'Event Version';
         }
     }
 

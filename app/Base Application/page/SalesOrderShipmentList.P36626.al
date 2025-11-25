@@ -9,7 +9,7 @@ page 36626 "Sales Order Shipment List"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = CONST(Order));
+    SourceTableView = where("Document Type" = const(Order));
     UsageCategory = Lists;
 
     layout

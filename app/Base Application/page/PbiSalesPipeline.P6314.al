@@ -12,7 +12,7 @@ page 6314 "PBI Sales Pipeline"
         {
             repeater(Group)
             {
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = All;
                     Caption = 'ID';
@@ -24,7 +24,7 @@ page 6314 "PBI Sales Pipeline"
                     Caption = 'Stage';
                     ToolTip = 'Specifies the stage of the sales pipeline that this entry is at.';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     Caption = 'Value';

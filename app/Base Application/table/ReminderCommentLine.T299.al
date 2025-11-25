@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 table 299 "Reminder Comment Line"
 {
     Caption = 'Reminder Comment Line';
@@ -14,9 +16,9 @@ table 299 "Reminder Comment Line"
         {
             Caption = 'No.';
             NotBlank = true;
-            TableRelation = IF (Type = CONST(Reminder)) "Reminder Header"
-            ELSE
-            IF (Type = CONST("Issued Reminder")) "Issued Reminder Header";
+            TableRelation = if (Type = const(Reminder)) "Reminder Header"
+            else
+            if (Type = const("Issued Reminder")) "Issued Reminder Header";
         }
         field(3; "Line No."; Integer)
         {
@@ -76,7 +78,7 @@ table 299 "Reminder Comment Line"
         if ReminderCommentLine.FindSet() then
             repeat
                 ReminderCommentLine2 := ReminderCommentLine;
-                ReminderCommentLine2.Type := "Reminder Comment Line Type".FromInteger(ToType);
+                ReminderCommentLine2.Type := Enum::"Reminder Comment Line Type".FromInteger(ToType);
                 ReminderCommentLine2."No." := ToNumber;
                 ReminderCommentLine2.Insert();
             until ReminderCommentLine.Next() = 0;

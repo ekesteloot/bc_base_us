@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.MachineCenter;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Comment;
+
 page 99000760 "Machine Center Card"
 {
     Caption = 'Machine Center Card';
@@ -19,7 +25,7 @@ page 99000760 "Machine Center Card"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -45,7 +51,7 @@ page 99000760 "Machine Center Card"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies an alternate name that you can use to search for the record in question when you cannot remember the value in the Name field.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -96,13 +102,13 @@ page 99000760 "Machine Center Card"
             group(Scheduling)
             {
                 Caption = 'Scheduling';
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     Importance = Promoted;
                     ToolTip = 'Specifies the capacity of the machine center.';
                 }
-                field(Efficiency; Efficiency)
+                field(Efficiency; Rec.Efficiency)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the efficiency factor as a percentage of the machine center.';
@@ -232,10 +238,10 @@ page 99000760 "Machine Center Card"
                     Caption = 'Capacity Ledger E&ntries';
                     Image = CapacityLedger;
                     RunObject = Page "Capacity Ledger Entries";
-                    RunPageLink = Type = CONST("Machine Center"),
-                                  "No." = FIELD("No."),
-                                  "Posting Date" = FIELD("Date Filter");
-                    RunPageView = SORTING(Type, "No.", "Work Shift Code", "Item No.", "Posting Date");
+                    RunPageLink = Type = const("Machine Center"),
+                                  "No." = field("No."),
+                                  "Posting Date" = field("Date Filter");
+                    RunPageView = sorting(Type, "No.", "Work Shift Code", "Item No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                 }
@@ -245,8 +251,8 @@ page 99000760 "Machine Center Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Manufacturing Comment Sheet";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = WHERE("Table Name" = CONST("Machine Center"));
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = where("Table Name" = const("Machine Center"));
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Lo&ad")
@@ -255,8 +261,8 @@ page 99000760 "Machine Center Card"
                     Caption = 'Lo&ad';
                     Image = WorkCenterLoad;
                     RunObject = Page "Machine Center Load";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Work Shift Filter" = FIELD("Work Shift Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Work Shift Filter" = field("Work Shift Filter");
                     ToolTip = 'View the availability of the machine or work center, including its capacity, the allocated quantity, availability after orders, and the load in percent of its total capacity.';
                 }
                 action(Statistics)
@@ -265,9 +271,9 @@ page 99000760 "Machine Center Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Machine Center Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Work Shift Filter" = FIELD("Work Shift Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Work Shift Filter" = field("Work Shift Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -290,9 +296,9 @@ page 99000760 "Machine Center Card"
                     Caption = 'A&bsence';
                     Image = WorkCenterAbsence;
                     RunObject = Page "Capacity Absence";
-                    RunPageLink = "Capacity Type" = CONST("Machine Center"),
-                                  "No." = FIELD("No."),
-                                  Date = FIELD("Date Filter");
+                    RunPageLink = "Capacity Type" = const("Machine Center"),
+                                  "No." = field("No."),
+                                  Date = field("Date Filter");
                     ToolTip = 'View which working days are not available. ';
                 }
                 action("Ta&sk List")
@@ -301,11 +307,11 @@ page 99000760 "Machine Center Card"
                     Caption = 'Ta&sk List';
                     Image = TaskList;
                     RunObject = Page "Machine Center Task List";
-                    RunPageLink = "No." = FIELD("No.");
-                    RunPageView = SORTING(Type, "No.")
-                                  WHERE(Type = CONST("Machine Center"),
-                                        Status = FILTER(.. Released),
-                                        "Routing Status" = FILTER(<> Finished));
+                    RunPageLink = "No." = field("No.");
+                    RunPageView = sorting(Type, "No.")
+                                  where(Type = const("Machine Center"),
+                                        Status = filter(.. Released),
+                                        "Routing Status" = filter(<> Finished));
                     ToolTip = 'View the list of operations that are scheduled for the machine center.';
                 }
             }
@@ -362,11 +368,8 @@ page 99000760 "Machine Center Card"
     end;
 
     var
-        [InDataSet]
         OpenShopFloorBinCodeEnable: Boolean;
-        [InDataSet]
         ToProductionBinCodeEnable: Boolean;
-        [InDataSet]
         FromProductionBinCodeEnable: Boolean;
 
     local procedure UpdateEnabled()
@@ -374,10 +377,10 @@ page 99000760 "Machine Center Card"
         Location: Record Location;
         EditEnabled: Boolean;
     begin
-        if "Location Code" <> '' then
-            Location.Get("Location Code");
+        if Rec."Location Code" <> '' then
+            Location.Get(Rec."Location Code");
 
-        EditEnabled := ("Location Code" <> '') and Location."Bin Mandatory";
+        EditEnabled := (Rec."Location Code" <> '') and Location."Bin Mandatory";
         OpenShopFloorBinCodeEnable := EditEnabled;
         ToProductionBinCodeEnable := EditEnabled;
         FromProductionBinCodeEnable := EditEnabled;

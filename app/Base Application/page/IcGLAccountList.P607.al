@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.GLAccount;
+
 page 607 "IC G/L Account List"
 {
     Caption = 'Intercompany G/L Account List';
@@ -72,15 +74,13 @@ page 607 "IC G/L Account List"
     end;
 
     var
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     local procedure FormatLine()
     begin
-        NameIndent := Indentation;
-        Emphasize := "Account Type" <> "Account Type"::Posting;
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
     end;
 }
 

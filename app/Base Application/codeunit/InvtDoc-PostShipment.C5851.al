@@ -1,3 +1,22 @@
+﻿namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Comment;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.History;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Journal;
+
 codeunit 5851 "Invt. Doc.-Post Shipment"
 {
     Permissions = TableData "Item Entry Relation" = ri,
@@ -9,6 +28,7 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
     trigger OnRun()
     var
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         SourceCodeSetup: Record "Source Code Setup";
         InvtSetup: Record "Inventory Setup";
         InventoryPostingSetup: Record "Inventory Posting Setup";
@@ -23,7 +43,7 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
     begin
         OnBeforeOnRun(Rec, SuppressCommit, HideProgressWindow);
 
-        Rec.TestField("Document Type", "Document Type"::Shipment);
+        Rec.TestField("Document Type", Rec."Document Type"::Shipment);
 
         InvtDocHeader := Rec;
         InvtDocHeader.SetHideValidationDialog(HideValidationDialog);
@@ -104,8 +124,8 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
 
             if InvtSetup."Copy Comments to Invt. Doc." then
                 CopyCommentLines(
-                    "Inventory Comment Document Type"::"Inventory Shipment",
-                    "Inventory Comment Document Type"::"Posted Inventory Shipment",
+                    Enum::"Inventory Comment Document Type"::"Inventory Shipment",
+                    Enum::"Inventory Comment Document Type"::"Posted Inventory Shipment",
                     "No.", InvtShptHeader."No.");
 
             // Insert shipment lines
@@ -122,6 +142,12 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
                     if InvtDocLine."Item No." <> '' then begin
                         Item.Get(InvtDocLine."Item No.");
                         Item.TestField(Blocked, false);
+
+                        if InvtDocLine."Variant Code" <> '' then begin
+                            ItemVariant.SetLoadFields(Blocked);
+                            ItemVariant.Get(InvtDocLine."Item No.", InvtDocLine."Variant Code");
+                            ItemVariant.TestField(Blocked, false);
+                        end;
                     end;
 
                     InvtShptLine.Init();
@@ -162,6 +188,10 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
                     InvtShptLine."Applies-to Entry" := InvtDocLine."Applies-to Entry";
                     InvtShptLine."Applies-from Entry" := InvtDocLine."Applies-from Entry";
                     InvtShptLine."Reason Code" := InvtDocLine."Reason Code";
+                    InvtShptLine."Item Reference No." := InvtDocLine."Item Reference No.";
+                    InvtShptLine."Item Reference Unit of Measure" := InvtDocLine."Item Reference Unit of Measure";
+                    InvtShptLine."Item Reference Type" := InvtDocLine."Item Reference Type";
+                    InvtShptLine."Item Reference Type No." := InvtDocLine."Item Reference Type No.";
                     InvtShptLine."Dimension Set ID" := InvtDocLine."Dimension Set ID";
                     OnRunOnBeforeInvtShptLineInsert(InvtShptLine, InvtDocLine, InvtShptHeader, InvtDocHeader);
                     InvtShptLine.Insert();
@@ -178,7 +208,9 @@ codeunit 5851 "Invt. Doc.-Post Shipment"
                 InvtAdjmtHandler.MakeInventoryAdjustment(true, InvtSetup."Automatic Cost Posting");
 
             LockTable();
-            Delete(true);
+
+            if not PreviewMode then
+                Delete(true);
 
             InsertValueEntryRelation();
             OnRunOnBeforeCommitPostInvtShptDoc(InvtDocHeader, InvtDocLine, InvtShptHeader, InvtShptLine, ItemJnlLine, SuppressCommit);

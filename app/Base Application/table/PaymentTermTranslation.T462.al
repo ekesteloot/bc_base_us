@@ -1,3 +1,7 @@
+namespace Microsoft.Foundation.PaymentTerms;
+
+using System.Globalization;
+
 table 462 "Payment Term Translation"
 {
     Caption = 'Payment Term Translation';

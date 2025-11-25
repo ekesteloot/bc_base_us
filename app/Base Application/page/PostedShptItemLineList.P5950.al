@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 page 5950 "Posted Shpt. Item Line List"
 {
     Caption = 'Posted Service Shpt. Item Line List';
@@ -50,7 +52,7 @@ page 5950 "Posted Shpt. Item Line List"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the number of the loaner that has been lent to the customer to replace this service item.';
                 }
-                field(Warranty; Warranty)
+                field(Warranty; Rec.Warranty)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that there is a warranty on either parts or labor for this service item.';

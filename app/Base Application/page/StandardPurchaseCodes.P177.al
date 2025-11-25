@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Document;
+
 page 177 "Standard Purchase Codes"
 {
     AdditionalSearchTerms = 'recurring purchase,reorder,repeat purchases';
@@ -17,7 +19,7 @@ page 177 "Standard Purchase Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a code which identifies this standard purchase code.';

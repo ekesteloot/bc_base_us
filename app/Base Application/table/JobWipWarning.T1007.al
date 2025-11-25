@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.WIP;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+
 table 1007 "Job WIP Warning"
 {
     Caption = 'Job WIP Warning';

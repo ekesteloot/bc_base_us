@@ -6,11 +6,11 @@ codeunit 8625 "Setup Item Costing Method"
     var
         InventorySetup: Record "Inventory Setup";
     begin
-        "Costing Method" := InventorySetup."Default Costing Method"::FIFO;
-        if Type = Type::Inventory then
+        Rec."Costing Method" := InventorySetup."Default Costing Method"::FIFO;
+        if Rec.Type = Rec.Type::Inventory then
             if InventorySetup.Get() then
-                "Costing Method" := InventorySetup."Default Costing Method";
-        Modify();
+                Rec."Costing Method" := InventorySetup."Default Costing Method";
+        Rec.Modify();
     end;
 }
 

@@ -1,14 +1,18 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using System.Telemetry;
+
 page 1291 "Pmt. Recon. Journal Overview"
 {
     Caption = 'Payment Reconciliation Journal Overview';
-    DataCaptionExpression = "Bank Account No.";
+    DataCaptionExpression = Rec."Bank Account No.";
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Bank Acc. Reconciliation Line";
-    SourceTableView = WHERE("Statement Type" = CONST("Payment Application"));
+    SourceTableView = where("Statement Type" = const("Payment Application"));
 
     layout
     {
@@ -42,7 +46,7 @@ page 1291 "Pmt. Recon. Journal Overview"
                     Caption = 'Transaction Amount';
                     ToolTip = 'Specifies the amount of the transaction on the bank''s statement shown on this reconciliation line.';
                 }
-                field(AccountName; GetAppliedToName())
+                field(AccountName; Rec.GetAppliedToName())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Applied to Account';
@@ -51,7 +55,7 @@ page 1291 "Pmt. Recon. Journal Overview"
 
                     trigger OnDrillDown()
                     begin
-                        AppliedToDrillDown();
+                        Rec.AppliedToDrillDown();
                     end;
                 }
                 field("Applied Amount"; Rec."Applied Amount")
@@ -59,7 +63,7 @@ page 1291 "Pmt. Recon. Journal Overview"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the amount of the transaction on the reconciliation line that has been applied to a bank account or check ledger entry.';
                 }
-                field(Difference; Difference)
+                field(Difference; Rec.Difference)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -117,7 +121,7 @@ page 1291 "Pmt. Recon. Journal Overview"
 
                     trigger OnAction()
                     begin
-                        SetFilter(Difference, '<>0');
+                        Rec.SetFilter(Difference, '<>0');
                         CurrPage.Update();
                     end;
                 }
@@ -130,7 +134,7 @@ page 1291 "Pmt. Recon. Journal Overview"
 
                     trigger OnAction()
                     begin
-                        SetRange(Difference);
+                        Rec.SetRange(Difference);
                         CurrPage.Update();
                     end;
                 }
@@ -167,7 +171,7 @@ page 1291 "Pmt. Recon. Journal Overview"
     trigger OnAfterGetCurrRecord()
     begin
         if not IsBankAccReconInitialized then begin
-            BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.");
+            BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.");
             IsBankAccReconInitialized := true;
         end;
 
@@ -176,7 +180,7 @@ page 1291 "Pmt. Recon. Journal Overview"
 
     trigger OnAfterGetRecord()
     begin
-        GetAppliedPmtData(AppliedPmtEntry, RemainingAmountAfterPosting, StatementToRemAmtDifference, PmtAppliedToTxt);
+        Rec.GetAppliedPmtData(AppliedPmtEntry, RemainingAmountAfterPosting, StatementToRemAmtDifference, PmtAppliedToTxt);
     end;
 
     trigger OnOpenPage()

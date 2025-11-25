@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 enum 99000885 "Create Production Order Status"
 {
     AssignmentCompatibility = true;

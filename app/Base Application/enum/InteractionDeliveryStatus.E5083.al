@@ -1,4 +1,6 @@
-﻿enum 5083 "Interaction Delivery Status"
+﻿namespace Microsoft.CRM.Interaction;
+
+enum 5083 "Interaction Delivery Status"
 {
     Extensible = true;
     AssignmentCompatibility = true;

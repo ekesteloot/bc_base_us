@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 5400 "Transfer Direction"
 {
     Extensible = false;

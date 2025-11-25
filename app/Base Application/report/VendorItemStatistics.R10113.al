@@ -110,8 +110,8 @@ report 10113 "Vendor/Item Statistics"
             }
             dataitem("Value Entry"; "Value Entry")
             {
-                DataItemLink = "Source No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Source Type", "Source No.", "Item Ledger Entry Type", "Item No.", "Posting Date") WHERE("Source Type" = CONST(Vendor), "Item Ledger Entry Type" = CONST(Purchase));
+                DataItemLink = "Source No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Source Type", "Source No.", "Item Ledger Entry Type", "Item No.", "Posting Date") where("Source Type" = const(Vendor), "Item Ledger Entry Type" = const(Purchase));
                 RequestFilterFields = "Item No.", "Inventory Posting Group", "Posting Date";
                 column(Value_Entry__Item_No__; "Item No.")
                 {

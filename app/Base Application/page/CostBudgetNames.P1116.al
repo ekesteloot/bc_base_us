@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using System.Text;
+
 page 1116 "Cost Budget Names"
 {
     ApplicationArea = CostAccounting;
@@ -37,7 +42,7 @@ page 1116 "Cost Budget Names"
                 Caption = 'Cost Budget per Period';
                 Image = LedgerBudget;
                 RunObject = Page "Cost Budget per Period";
-                RunPageLink = "Budget Filter" = FIELD(Name);
+                RunPageLink = "Budget Filter" = field(Name);
                 ShortCutKey = 'Return';
                 ToolTip = 'View a summary of the amount budgeted for each cost type in different time periods.';
             }
@@ -47,7 +52,7 @@ page 1116 "Cost Budget Names"
                 Caption = 'Cost Budget by Cost Center';
                 Image = LedgerBudget;
                 RunObject = Page "Cost Budget by Cost Center";
-                RunPageLink = "Budget Filter" = FIELD(Name);
+                RunPageLink = "Budget Filter" = field(Name);
                 ToolTip = 'View a summary of the amount budgeted for each cost center in different time periods.';
             }
             action("Cost Budget by Cost Object")
@@ -56,7 +61,7 @@ page 1116 "Cost Budget Names"
                 Caption = 'Cost Budget by Cost Object';
                 Image = LedgerBudget;
                 RunObject = Page "Cost Budget by Cost Object";
-                RunPageLink = "Budget Filter" = FIELD(Name);
+                RunPageLink = "Budget Filter" = field(Name);
                 ToolTip = 'View a summary of the amount budgeted for each cost object in different time periods.';
             }
             action("Cost Budget/Movement")
@@ -65,7 +70,7 @@ page 1116 "Cost Budget Names"
                 Caption = 'Cost Budget/Movement';
                 Image = LedgerBudget;
                 RunObject = Page "Cost Type Balance/Budget";
-                RunPageLink = "Budget Filter" = FIELD(Name);
+                RunPageLink = "Budget Filter" = field(Name);
                 ToolTip = 'View a summary of the net changes and the budgeted amounts for different time periods for the cost type that you select in the chart of cost types.';
             }
             group(Functions)

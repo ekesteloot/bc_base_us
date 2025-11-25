@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using Microsoft.Foundation.Enums;
+
 page 1340 "Config Templates"
 {
     ApplicationArea = Basic, Suite;
@@ -15,16 +19,16 @@ page 1340 "Config Templates"
         {
             repeater("Repeater")
             {
-                field("Template Name"; Description)
+                field("Template Name"; Rec.Description)
                 {
                     ApplicationArea = Invoicing, Basic, Suite;
                     ToolTip = 'Specifies a description of the template.';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = Invoicing, Basic, Suite;
                     ToolTip = 'Specifies if the template is ready to be used';
-                    Visible = NOT NewMode;
+                    Visible = not NewMode;
                 }
             }
         }
@@ -55,8 +59,8 @@ page 1340 "Config Templates"
 
                 trigger OnAction()
                 begin
-                    if Confirm(StrSubstNo(DeleteQst, Code)) then
-                        Delete(true);
+                    if Confirm(StrSubstNo(DeleteQst, Rec.Code)) then
+                        Rec.Delete(true);
                 end;
             }
         }
@@ -86,10 +90,10 @@ page 1340 "Config Templates"
 
     trigger OnDeleteRecord(): Boolean
     begin
-        case "Table ID" of
-            DATABASE::Customer,
-          DATABASE::Item:
-                ConfigTemplateManagement.DeleteRelatedTemplates(Code, DATABASE::"Default Dimension");
+        case Rec."Table ID" of
+            Enum::TableID::Customer.AsInteger(),
+            Enum::TableID::Item.AsInteger():
+                ConfigTemplateManagement.DeleteRelatedTemplates(Rec.Code, Enum::TableID::"Default Dimension".AsInteger());
         end;
     end;
 
@@ -97,7 +101,7 @@ page 1340 "Config Templates"
     var
         FilterValue: Text;
     begin
-        FilterValue := GetFilter("Table ID");
+        FilterValue := Rec.GetFilter("Table ID");
 
         if not Evaluate(FilteredTableId, FilterValue) then
             FilteredTableId := 0;
@@ -136,22 +140,22 @@ page 1340 "Config Templates"
     begin
         if not NewMode then
             case FilteredTableId of
-                DATABASE::Customer:
+                Enum::TableID::Customer.AsInteger():
                     PageCaption := CustomerTemplatesCap;
-                DATABASE::Vendor:
+                Enum::TableID::Vendor.AsInteger():
                     PageCaption := VendorTemplatesCap;
-                DATABASE::Item:
+                Enum::TableID::Item.AsInteger():
                     PageCaption := ItemTemplatesCap;
                 else
                     PageCaption := ConfigurationTemplatesCap;
             end
         else
             case FilteredTableId of
-                DATABASE::Customer:
+                Enum::TableID::Customer.AsInteger():
                     PageCaption := SelectCustomerTemplatesCap;
-                DATABASE::Vendor:
+                Enum::TableID::Vendor.AsInteger():
                     PageCaption := SelectVendorTemplatesCap;
-                DATABASE::Item:
+                Enum::TableID::Item.AsInteger():
                     PageCaption := SelectItemTemplatesCap;
                 else
                     PageCaption := SelectConfigurationTemplatesCap;
@@ -167,17 +171,17 @@ page 1340 "Config Templates"
         TemplateCode: Code[10];
     begin
         case FilteredTableId of
-            DATABASE::Customer:
+            Enum::TableID::Customer.AsInteger():
                 TemplateSelectionMgt.GetLastCustTemplateSelection(TemplateCode);
-            DATABASE::Vendor:
+            Enum::TableID::Vendor.AsInteger():
                 TemplateSelectionMgt.GetLastVendorTemplateSelection(TemplateCode);
-            DATABASE::Item:
+            Enum::TableID::Item.AsInteger():
                 TemplateSelectionMgt.GetLastItemTemplateSelection(TemplateCode);
         end;
 
         if not (TemplateCode = '') then
             if ConfigTemplateHeader.Get(TemplateCode) then
-                SetPosition(ConfigTemplateHeader.GetPosition());
+                Rec.SetPosition(ConfigTemplateHeader.GetPosition());
     end;
 
     local procedure SaveSelection()
@@ -185,12 +189,12 @@ page 1340 "Config Templates"
         TemplateSelectionMgt: Codeunit "Template Selection Mgt.";
     begin
         case FilteredTableId of
-            DATABASE::Customer:
-                TemplateSelectionMgt.SaveCustTemplateSelectionForCurrentUser(Code);
-            DATABASE::Vendor:
-                TemplateSelectionMgt.SaveVendorTemplateSelectionForCurrentUser(Code);
-            DATABASE::Item:
-                TemplateSelectionMgt.SaveItemTemplateSelectionForCurrentUser(Code);
+            Enum::TableID::Customer.AsInteger():
+                TemplateSelectionMgt.SaveCustTemplateSelectionForCurrentUser(Rec.Code);
+            Enum::TableID::Vendor.AsInteger():
+                TemplateSelectionMgt.SaveVendorTemplateSelectionForCurrentUser(Rec.Code);
+            Enum::TableID::Item.AsInteger():
+                TemplateSelectionMgt.SaveItemTemplateSelectionForCurrentUser(Rec.Code);
         end;
     end;
 

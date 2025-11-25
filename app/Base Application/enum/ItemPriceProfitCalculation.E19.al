@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 enum 19 "Item Price Profit Calculation"
 {
     Extensible = true;

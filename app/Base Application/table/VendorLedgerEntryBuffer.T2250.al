@@ -1,3 +1,8 @@
+﻿namespace Microsoft.Purchases.Payables;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Vendor;
+
 table 2250 "Vendor Ledger Entry Buffer"
 {
     Caption = 'Vendor Ledger Entry Buffer';

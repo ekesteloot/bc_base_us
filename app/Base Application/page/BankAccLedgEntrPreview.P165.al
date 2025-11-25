@@ -1,3 +1,9 @@
+namespace Microsoft.BankMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using System.Security.User;
+
 page 165 "Bank Acc. Ledg. Entr. Preview"
 {
     Caption = 'Bank Acc. Ledg. Entr. Preview';
@@ -116,7 +122,7 @@ page 165 "Bank Acc. Ledg. Entr. Preview"
                     ToolTip = 'Specifies the number of the general ledger, customer, vendor, or bank account that the balancing entry is posted to, such as a cash account for cash purchases.';
                     Visible = false;
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the amount on the bank account entry has been fully applied to or if there is still a remaining amount that must be applied to.';
@@ -131,7 +137,7 @@ page 165 "Bank Acc. Ledg. Entr. Preview"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -146,7 +152,7 @@ page 165 "Bank Acc. Ledg. Entr. Preview"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry has been part of a reverse transaction.';
@@ -238,7 +244,7 @@ page 165 "Bank Acc. Ledg. Entr. Preview"
                     var
                         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
                     begin
-                        GenJnlPostPreview.ShowDimensions(DATABASE::"Bank Account Ledger Entry", "Entry No.", "Dimension Set ID");
+                        GenJnlPostPreview.ShowDimensions(DATABASE::"Bank Account Ledger Entry", Rec."Entry No.", Rec."Dimension Set ID");
                     end;
                 }
                 action(SetDimensionFilter)
@@ -251,7 +257,7 @@ page 165 "Bank Acc. Ledg. Entr. Preview"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }

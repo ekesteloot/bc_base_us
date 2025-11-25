@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.History;
+
 page 1354 "Pstd. Sales Cr. Memo - Update"
 {
     Caption = 'Posted Sales Cr. Memo - Update';
@@ -60,6 +62,16 @@ page 1354 "Pstd. Sales Cr. Memo - Update"
                     ToolTip = 'Specifies the shipping agent''s package number.';
                 }
             }
+            group("Cr. Memo Details")
+            {
+                Caption = 'Cr. Memo Details';
+                field("Posting Description"; Rec."Posting Description")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Editable = true;
+                    ToolTip = 'Specifies any text that is entered to accompany the posting, for example for information to auditors.';
+                }
+            }
             group(Payment)
             {
                 Caption = 'Payment';
@@ -108,12 +120,13 @@ page 1354 "Pstd. Sales Cr. Memo - Update"
     local procedure RecordChanged() IsChanged: Boolean
     begin
         IsChanged :=
-          ("Shipping Agent Code" <> xSalesCrMemoHeader."Shipping Agent Code") or
-          ("Shipping Agent Service Code" <> xSalesCrMemoHeader."Shipping Agent Service Code") or
-          ("Package Tracking No." <> xSalesCrMemoHeader."Package Tracking No.") or
-          ("Company Bank Account Code" <> xSalesCrMemoHeader."Company Bank Account Code") or
-          ("CFDI Cancellation Reason Code" <> xSalesCrMemoHeader."CFDI Cancellation Reason Code") or
-          ("Substitution Document No." <> xSalesCrMemoHeader."Substitution Document No.");
+          (Rec."Shipping Agent Code" <> xSalesCrMemoHeader."Shipping Agent Code") or
+          (Rec."Shipping Agent Service Code" <> xSalesCrMemoHeader."Shipping Agent Service Code") or
+          (Rec."Package Tracking No." <> xSalesCrMemoHeader."Package Tracking No.") or
+          (Rec."Company Bank Account Code" <> xSalesCrMemoHeader."Company Bank Account Code") or
+          (Rec."CFDI Cancellation Reason Code" <> xSalesCrMemoHeader."CFDI Cancellation Reason Code") or
+          (Rec."Substitution Document No." <> xSalesCrMemoHeader."Substitution Document No.") or
+          (Rec."Posting Description" <> xSalesCrMemoHeader."Posting Description");
 
         OnAfterRecordChanged(Rec, xSalesCrMemoHeader, IsChanged);
     end;

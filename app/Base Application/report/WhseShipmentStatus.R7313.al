@@ -1,7 +1,15 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.InventoryMgt.Location;
+
 report 7313 "Whse. Shipment Status"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Shipment/WhseShipmentStatus.rdlc';
+    RDLCLayout = './WarehouseMgt/Document/WhseShipmentStatus.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Shipment Status';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +18,7 @@ report 7313 "Whse. Shipment Status"
     {
         dataitem("Warehouse Shipment Header"; "Warehouse Shipment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Document Status", "Location Code";
             column(TodayFormatted; Format(Today, 0, 4))
@@ -36,8 +44,8 @@ report 7313 "Whse. Shipment Status"
             }
             dataitem("Warehouse Shipment Line"; "Warehouse Shipment Line")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("No.", "Line No.");
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("No.", "Line No.");
                 RequestFilterFields = Status;
                 column(LocCode_WhseShipmentLine; "Location Code")
                 {
@@ -142,6 +150,7 @@ report 7313 "Whse. Shipment Status"
         WhseShipmentLine: Text;
         WarehouseShipmentStatusCaptionLbl: Label 'Warehouse Shipment Status';
         CurrReportPAGENOCaptionLbl: Label 'Page';
+
 
     local procedure GetLocation(LocationCode: Code[10])
     begin

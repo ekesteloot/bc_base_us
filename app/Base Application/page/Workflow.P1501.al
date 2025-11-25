@@ -1,3 +1,10 @@
+﻿namespace System.Automation;
+
+using System.Environment.Configuration;
+using System.IO;
+using System.Telemetry;
+using System.Utilities;
+
 page 1501 Workflow
 {
     Caption = 'Workflow';
@@ -8,7 +15,7 @@ page 1501 Workflow
     {
         area(content)
         {
-            field("Code"; Code)
+            field("Code"; Rec.Code)
             {
                 ApplicationArea = Basic, Suite;
                 Editable = IsNotTemplate;
@@ -17,9 +24,9 @@ page 1501 Workflow
                 trigger OnValidate()
                 begin
                     if OpenNew then begin
-                        if Insert() then;
+                        if Rec.Insert() then;
                         CurrPage.Update(false);
-                        Get(Code);
+                        Rec.Get(Rec.Code);
                         OpenNew := false;
                     end;
                 end;
@@ -30,13 +37,13 @@ page 1501 Workflow
                 Editable = IsNotTemplate;
                 ToolTip = 'Specifies the workflow.';
             }
-            field(Category; Category)
+            field(Category; Rec.Category)
             {
                 ApplicationArea = Basic, Suite;
                 Editable = IsNotTemplate;
                 ToolTip = 'Specifies the category that the workflow belongs to.';
             }
-            field(Enabled; Enabled)
+            field(Enabled; Rec.Enabled)
             {
                 ApplicationArea = Basic, Suite;
                 Editable = IsNotTemplate;
@@ -52,7 +59,7 @@ page 1501 Workflow
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Workflow Steps';
-                SubPageLink = "Workflow Code" = FIELD(Code);
+                SubPageLink = "Workflow Code" = field(Code);
                 UpdatePropagation = Both;
             }
         }
@@ -63,8 +70,8 @@ page 1501 Workflow
                 ApplicationArea = Suite;
                 Caption = 'Workflow Responses';
                 Provider = WorkflowSubpage;
-                SubPageLink = "Parent Event Step ID" = FIELD("Event Step ID"),
-                              "Workflow Code" = FIELD("Workflow Code");
+                SubPageLink = "Parent Event Step ID" = field("Event Step ID"),
+                              "Workflow Code" = field("Workflow Code");
             }
             systempart(Control11; Notes)
             {
@@ -87,7 +94,7 @@ page 1501 Workflow
             {
                 ApplicationArea = Suite;
                 Caption = 'Import from File';
-                Enabled = Code <> '';
+                Enabled = Rec.Code <> '';
                 Image = Import;
                 ToolTip = 'Import an existing workflow from an XML file.';
                 Visible = IsNotTemplate;
@@ -109,7 +116,7 @@ page 1501 Workflow
             {
                 ApplicationArea = Suite;
                 Caption = 'Export to File';
-                Enabled = Code <> '';
+                Enabled = Rec.Code <> '';
                 Image = Export;
                 ToolTip = 'Export the workflow to a file that can be imported in another Dynamics 365 database.';
                 Visible = IsNotTemplate;
@@ -120,8 +127,8 @@ page 1501 Workflow
                     TempBlob: Codeunit "Temp Blob";
                     FileManagement: Codeunit "File Management";
                 begin
-                    Workflow.Get(Code);
-                    Workflow.SetRange(Code, Code);
+                    Workflow.Get(Rec.Code);
+                    Workflow.SetRange(Code, Rec.Code);
                     Workflow.ExportToBlob(TempBlob);
                     FileManagement.BLOBExport(TempBlob, '*.xml', true);
                 end;
@@ -179,7 +186,7 @@ page 1501 Workflow
                 var
                     ArchivedWFStepInstances: Page "Archived WF Step Instances";
                 begin
-                    ArchivedWFStepInstances.SetWorkflowCode(Code);
+                    ArchivedWFStepInstances.SetWorkflowCode(Rec.Code);
                     ArchivedWFStepInstances.RunModal();
                 end;
             }
@@ -227,7 +234,7 @@ page 1501 Workflow
 
         if not TemplateValueSet then begin
             TemplateValueSet := True;
-            SetRange(Template, Template);
+            Rec.SetRange(Template, Rec.Template);
         end;
     end;
 
@@ -236,12 +243,12 @@ page 1501 Workflow
         WorkflowStepInstance: Record "Workflow Step Instance";
         WorkflowStepInstanceArchive: Record "Workflow Step Instance Archive";
     begin
-        IsNotTemplate := not Template;
+        IsNotTemplate := not Rec.Template;
 
-        WorkflowStepInstance.SetRange("Workflow Code", Code);
+        WorkflowStepInstance.SetRange("Workflow Code", Rec.Code);
         InstancesExist := not WorkflowStepInstance.IsEmpty();
 
-        WorkflowStepInstanceArchive.SetRange("Workflow Code", Code);
+        WorkflowStepInstanceArchive.SetRange("Workflow Code", Rec.Code);
         ArchiveExists := not WorkflowStepInstanceArchive.IsEmpty();
     end;
 
@@ -259,7 +266,7 @@ page 1501 Workflow
         FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
         FeatureTelemetry.LogUptake('0000GDO', 'Workflows', Enum::"Feature Uptake Status"::Discovered);
-        IsNotTemplate := not Template;
+        IsNotTemplate := not Rec.Template;
         InstancesExist := false;
         ArchiveExists := false;
 
@@ -268,7 +275,7 @@ page 1501 Workflow
 
         // Load webhook subscription link when page opens
         WorkflowWebhookSubscription.SetRange(Enabled, true);
-        WorkflowWebhookSubscription.SetRange("WF Definition Id", Code);
+        WorkflowWebhookSubscription.SetRange("WF Definition Id", Rec.Code);
         HasWebhookClientLink := WorkflowWebhookSubscription.FindFirst();
     end;
 

@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using Microsoft.InventoryMgt.Item;
+
 page 6409 "Workflow - Item Entity"
 {
     Caption = 'workflowItems', Locked = true;
@@ -17,627 +21,627 @@ page 6409 "Workflow - Item Entity"
                     ApplicationArea = All;
                     Caption = 'Id', Locked = true;
                 }
-                field(number; "No.")
+                field(number; Rec."No.")
                 {
                     ApplicationArea = All;
                     Caption = 'No.', Locked = true;
                 }
-                field(number2; "No. 2")
+                field(number2; Rec."No. 2")
                 {
                     ApplicationArea = All;
                     Caption = 'No. 2', Locked = true;
                 }
-                field(description; Description)
+                field(description; Rec.Description)
                 {
                     ApplicationArea = All;
                     Caption = 'Description', Locked = true;
                 }
-                field(searchDescription; "Search Description")
+                field(searchDescription; Rec."Search Description")
                 {
                     ApplicationArea = All;
                     Caption = 'Search Description', Locked = true;
                 }
-                field(description2; "Description 2")
+                field(description2; Rec."Description 2")
                 {
                     ApplicationArea = All;
                     Caption = 'Description 2', Locked = true;
                 }
-                field(assemblyBom; "Assembly BOM")
+                field(assemblyBom; Rec."Assembly BOM")
                 {
                     ApplicationArea = All;
                     Caption = 'Assembly BOM', Locked = true;
                 }
-                field(baseUnitOfMeasure; "Base Unit of Measure")
+                field(baseUnitOfMeasure; Rec."Base Unit of Measure")
                 {
                     ApplicationArea = All;
                     Caption = 'Base Unit of Measure', Locked = true;
                 }
-                field(priceUnitConversion; "Price Unit Conversion")
+                field(priceUnitConversion; Rec."Price Unit Conversion")
                 {
                     ApplicationArea = All;
                     Caption = 'Price Unit Conversion', Locked = true;
                 }
-                field(type; Type)
+                field(type; Rec.Type)
                 {
                     ApplicationArea = All;
                     Caption = 'Type', Locked = true;
                 }
-                field(inventoryPostingGroup; "Inventory Posting Group")
+                field(inventoryPostingGroup; Rec."Inventory Posting Group")
                 {
                     ApplicationArea = All;
                     Caption = 'Inventory Posting Group', Locked = true;
                 }
-                field(shelfNumber; "Shelf No.")
+                field(shelfNumber; Rec."Shelf No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Shelf No.', Locked = true;
                 }
-                field(itemDiscGroup; "Item Disc. Group")
+                field(itemDiscGroup; Rec."Item Disc. Group")
                 {
                     ApplicationArea = All;
                     Caption = 'Item Disc. Group', Locked = true;
                 }
-                field(allowInvoiceDisc; "Allow Invoice Disc.")
+                field(allowInvoiceDisc; Rec."Allow Invoice Disc.")
                 {
                     ApplicationArea = All;
                     Caption = 'Allow Invoice Disc.', Locked = true;
                 }
-                field(statisticsGroup; "Statistics Group")
+                field(statisticsGroup; Rec."Statistics Group")
                 {
                     ApplicationArea = All;
                     Caption = 'Statistics Group', Locked = true;
                 }
-                field(commissionGroup; "Commission Group")
+                field(commissionGroup; Rec."Commission Group")
                 {
                     ApplicationArea = All;
                     Caption = 'Commission Group', Locked = true;
                 }
-                field(unitPrice; "Unit Price")
+                field(unitPrice; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     Caption = 'Unit Price', Locked = true;
                 }
-                field(priceProfitCalculation; "Price/Profit Calculation")
+                field(priceProfitCalculation; Rec."Price/Profit Calculation")
                 {
                     ApplicationArea = All;
                     Caption = 'Price/Profit Calculation', Locked = true;
                 }
-                field(profitPercent; "Profit %")
+                field(profitPercent; Rec."Profit %")
                 {
                     ApplicationArea = All;
                     Caption = 'Profit %', Locked = true;
                 }
-                field(costingMethod; "Costing Method")
+                field(costingMethod; Rec."Costing Method")
                 {
                     ApplicationArea = All;
                     Caption = 'Costing Method', Locked = true;
                 }
-                field(unitCost; "Unit Cost")
+                field(unitCost; Rec."Unit Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Unit Cost', Locked = true;
                 }
-                field(standardCost; "Standard Cost")
+                field(standardCost; Rec."Standard Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Standard Cost', Locked = true;
                 }
-                field(lastDirectCost; "Last Direct Cost")
+                field(lastDirectCost; Rec."Last Direct Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Last Direct Cost', Locked = true;
                 }
-                field(indirectCostPercent; "Indirect Cost %")
+                field(indirectCostPercent; Rec."Indirect Cost %")
                 {
                     ApplicationArea = All;
                     Caption = 'Indirect Cost %', Locked = true;
                 }
-                field(costIsAdjusted; "Cost is Adjusted")
+                field(costIsAdjusted; Rec."Cost is Adjusted")
                 {
                     ApplicationArea = All;
                     Caption = 'Cost is Adjusted', Locked = true;
                 }
-                field(allowOnlineAdjustment; "Allow Online Adjustment")
+                field(allowOnlineAdjustment; Rec."Allow Online Adjustment")
                 {
                     ApplicationArea = All;
                     Caption = 'Allow Online Adjustment', Locked = true;
                 }
-                field(vendorNumber; "Vendor No.")
+                field(vendorNumber; Rec."Vendor No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Vendor No.', Locked = true;
                 }
-                field(vendorItemNumber; "Vendor Item No.")
+                field(vendorItemNumber; Rec."Vendor Item No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Vendor Item No.', Locked = true;
                 }
-                field(leadTimeCalculation; "Lead Time Calculation")
+                field(leadTimeCalculation; Rec."Lead Time Calculation")
                 {
                     ApplicationArea = All;
                     Caption = 'Lead Time Calculation', Locked = true;
                 }
-                field(reorderPoint; "Reorder Point")
+                field(reorderPoint; Rec."Reorder Point")
                 {
                     ApplicationArea = All;
                     Caption = 'Reorder Point', Locked = true;
                 }
-                field(maximumInventory; "Maximum Inventory")
+                field(maximumInventory; Rec."Maximum Inventory")
                 {
                     ApplicationArea = All;
                     Caption = 'Maximum Inventory', Locked = true;
                 }
-                field(reorderQuantity; "Reorder Quantity")
+                field(reorderQuantity; Rec."Reorder Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Reorder Quantity', Locked = true;
                 }
-                field(alternativeItemNumber; "Alternative Item No.")
+                field(alternativeItemNumber; Rec."Alternative Item No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Alternative Item No.', Locked = true;
                 }
-                field(unitListPrice; "Unit List Price")
+                field(unitListPrice; Rec."Unit List Price")
                 {
                     ApplicationArea = All;
                     Caption = 'Unit List Price', Locked = true;
                 }
-                field(dutyDuePercent; "Duty Due %")
+                field(dutyDuePercent; Rec."Duty Due %")
                 {
                     ApplicationArea = All;
                     Caption = 'Duty Due %', Locked = true;
                 }
-                field(dutyCode; "Duty Code")
+                field(dutyCode; Rec."Duty Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Duty Code', Locked = true;
                 }
-                field(grossWeight; "Gross Weight")
+                field(grossWeight; Rec."Gross Weight")
                 {
                     ApplicationArea = All;
                     Caption = 'Gross Weight', Locked = true;
                 }
-                field(netWeight; "Net Weight")
+                field(netWeight; Rec."Net Weight")
                 {
                     ApplicationArea = All;
                     Caption = 'Net Weight', Locked = true;
                 }
-                field(unitsPerParcel; "Units per Parcel")
+                field(unitsPerParcel; Rec."Units per Parcel")
                 {
                     ApplicationArea = All;
                     Caption = 'Units per Parcel', Locked = true;
                 }
-                field(unitVolume; "Unit Volume")
+                field(unitVolume; Rec."Unit Volume")
                 {
                     ApplicationArea = All;
                     Caption = 'Unit Volume', Locked = true;
                 }
-                field(durability; Durability)
+                field(durability; Rec.Durability)
                 {
                     ApplicationArea = All;
                     Caption = 'Durability', Locked = true;
                 }
-                field(freightType; "Freight Type")
+                field(freightType; Rec."Freight Type")
                 {
                     ApplicationArea = All;
                     Caption = 'Freight Type', Locked = true;
                 }
-                field(tariffNumber; "Tariff No.")
+                field(tariffNumber; Rec."Tariff No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Tariff No.', Locked = true;
                 }
-                field(dutyUnitConversion; "Duty Unit Conversion")
+                field(dutyUnitConversion; Rec."Duty Unit Conversion")
                 {
                     ApplicationArea = All;
                     Caption = 'Duty Unit Conversion', Locked = true;
                 }
-                field(countryRegionPurchasedCode; "Country/Region Purchased Code")
+                field(countryRegionPurchasedCode; Rec."Country/Region Purchased Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Country/Region Purchased Code', Locked = true;
                 }
-                field(budgetQuantity; "Budget Quantity")
+                field(budgetQuantity; Rec."Budget Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Budget Quantity', Locked = true;
                 }
-                field(budgetedAmount; "Budgeted Amount")
+                field(budgetedAmount; Rec."Budgeted Amount")
                 {
                     ApplicationArea = All;
                     Caption = 'Budgeted Amount', Locked = true;
                 }
-                field(budgetProfit; "Budget Profit")
+                field(budgetProfit; Rec."Budget Profit")
                 {
                     ApplicationArea = All;
                     Caption = 'Budget Profit', Locked = true;
                 }
-                field(comment; Comment)
+                field(comment; Rec.Comment)
                 {
                     ApplicationArea = All;
                     Caption = 'Comment', Locked = true;
                 }
-                field(blocked; Blocked)
+                field(blocked; Rec.Blocked)
                 {
                     ApplicationArea = All;
                     Caption = 'Blocked', Locked = true;
                 }
-                field(costIsPostedToGL; "Cost is Posted to G/L")
+                field(costIsPostedToGL; Rec."Cost is Posted to G/L")
                 {
                     ApplicationArea = All;
                     Caption = 'Cost is Posted to G/L', Locked = true;
                 }
-                field(blockReason; "Block Reason")
+                field(blockReason; Rec."Block Reason")
                 {
                     ApplicationArea = All;
                     Caption = 'Block Reason', Locked = true;
                 }
-                field(lastDatetimeModified; "Last DateTime Modified")
+                field(lastDatetimeModified; Rec."Last DateTime Modified")
                 {
                     ApplicationArea = All;
                     Caption = 'Last DateTime Modified', Locked = true;
                 }
-                field(lastDateModified; "Last Date Modified")
+                field(lastDateModified; Rec."Last Date Modified")
                 {
                     ApplicationArea = All;
                     Caption = 'Last Date Modified', Locked = true;
                 }
-                field(lastTimeModified; "Last Time Modified")
+                field(lastTimeModified; Rec."Last Time Modified")
                 {
                     ApplicationArea = All;
                     Caption = 'Last Time Modified', Locked = true;
                 }
-                field(dateFilter; "Date Filter")
+                field(dateFilter; Rec."Date Filter")
                 {
                     ApplicationArea = All;
                     Caption = 'Date Filter', Locked = true;
                 }
-                field(globalDimension1Filter; "Global Dimension 1 Filter")
+                field(globalDimension1Filter; Rec."Global Dimension 1 Filter")
                 {
                     ApplicationArea = All;
                     Caption = 'Global Dimension 1 Filter', Locked = true;
                 }
-                field(globalDimension2Filter; "Global Dimension 2 Filter")
+                field(globalDimension2Filter; Rec."Global Dimension 2 Filter")
                 {
                     ApplicationArea = All;
                     Caption = 'Global Dimension 2 Filter', Locked = true;
                 }
-                field(locationFilter; "Location Filter")
+                field(locationFilter; Rec."Location Filter")
                 {
                     ApplicationArea = All;
                     Caption = 'Location Filter', Locked = true;
                 }
-                field(inventory; Inventory)
+                field(inventory; Rec.Inventory)
                 {
                     ApplicationArea = All;
                     Caption = 'Inventory', Locked = true;
                 }
-                field(netInvoicedQty; "Net Invoiced Qty.")
+                field(netInvoicedQty; Rec."Net Invoiced Qty.")
                 {
                     ApplicationArea = All;
                     Caption = 'Net Invoiced Qty.', Locked = true;
                 }
-                field(netChange; "Net Change")
+                field(netChange; Rec."Net Change")
                 {
                     ApplicationArea = All;
                     Caption = 'Net Change', Locked = true;
                 }
-                field(purchasesQty; "Purchases (Qty.)")
+                field(purchasesQty; Rec."Purchases (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Purchases (Qty.)', Locked = true;
                 }
-                field(salesQty; "Sales (Qty.)")
+                field(salesQty; Rec."Sales (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Sales (Qty.)', Locked = true;
                 }
-                field(positiveAdjmtQty; "Positive Adjmt. (Qty.)")
+                field(positiveAdjmtQty; Rec."Positive Adjmt. (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Positive Adjmt. (Qty.)', Locked = true;
                 }
-                field(negativeAdjmtQty; "Negative Adjmt. (Qty.)")
+                field(negativeAdjmtQty; Rec."Negative Adjmt. (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Negative Adjmt. (Qty.)', Locked = true;
                 }
-                field(purchasesLcy; "Purchases (LCY)")
+                field(purchasesLcy; Rec."Purchases (LCY)")
                 {
                     ApplicationArea = All;
                     Caption = 'Purchases (LCY)', Locked = true;
                 }
-                field(salesLcy; "Sales (LCY)")
+                field(salesLcy; Rec."Sales (LCY)")
                 {
                     ApplicationArea = All;
                     Caption = 'Sales (LCY)', Locked = true;
                 }
-                field(positiveAdjmtLcy; "Positive Adjmt. (LCY)")
+                field(positiveAdjmtLcy; Rec."Positive Adjmt. (LCY)")
                 {
                     ApplicationArea = All;
                     Caption = 'Positive Adjmt. (LCY)', Locked = true;
                 }
-                field(negativeAdjmtLcy; "Negative Adjmt. (LCY)")
+                field(negativeAdjmtLcy; Rec."Negative Adjmt. (LCY)")
                 {
                     ApplicationArea = All;
                     Caption = 'Negative Adjmt. (LCY)', Locked = true;
                 }
-                field(cogsLcy; "COGS (LCY)")
+                field(cogsLcy; Rec."COGS (LCY)")
                 {
                     ApplicationArea = All;
                     Caption = 'COGS (LCY)', Locked = true;
                 }
-                field(qtyOnPurchOrder; "Qty. on Purch. Order")
+                field(qtyOnPurchOrder; Rec."Qty. on Purch. Order")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. on Purch. Order', Locked = true;
                 }
-                field(qtyOnSalesOrder; "Qty. on Sales Order")
+                field(qtyOnSalesOrder; Rec."Qty. on Sales Order")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. on Sales Order', Locked = true;
                 }
-                field(priceIncludesVat; "Price Includes VAT")
+                field(priceIncludesVat; Rec."Price Includes VAT")
                 {
                     ApplicationArea = All;
                     Caption = 'Price Includes VAT', Locked = true;
                 }
-                field(dropShipmentFilter; "Drop Shipment Filter")
+                field(dropShipmentFilter; Rec."Drop Shipment Filter")
                 {
                     ApplicationArea = All;
                     Caption = 'Drop Shipment Filter', Locked = true;
                 }
-                field(vatBusPostingGrPrice; "VAT Bus. Posting Gr. (Price)")
+                field(vatBusPostingGrPrice; Rec."VAT Bus. Posting Gr. (Price)")
                 {
                     ApplicationArea = All;
                     Caption = 'VAT Bus. Posting Gr. (Price)', Locked = true;
                 }
-                field(genProdPostingGroup; "Gen. Prod. Posting Group")
+                field(genProdPostingGroup; Rec."Gen. Prod. Posting Group")
                 {
                     ApplicationArea = All;
                     Caption = 'Gen. Prod. Posting Group', Locked = true;
                 }
-                field(picture; Picture)
+                field(picture; Rec.Picture)
                 {
                     ApplicationArea = All;
                     Caption = 'Picture', Locked = true;
                 }
-                field(transferredQty; "Transferred (Qty.)")
+                field(transferredQty; Rec."Transferred (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Transferred (Qty.)', Locked = true;
                 }
-                field(transferredLcy; "Transferred (LCY)")
+                field(transferredLcy; Rec."Transferred (LCY)")
                 {
                     ApplicationArea = All;
                     Caption = 'Transferred (LCY)', Locked = true;
                 }
-                field(countryRegionOfOriginCode; "Country/Region of Origin Code")
+                field(countryRegionOfOriginCode; Rec."Country/Region of Origin Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Country/Region of Origin Code', Locked = true;
                 }
-                field(automaticExtTexts; "Automatic Ext. Texts")
+                field(automaticExtTexts; Rec."Automatic Ext. Texts")
                 {
                     ApplicationArea = All;
                     Caption = 'Automatic Ext. Texts', Locked = true;
                 }
-                field(numberSeries; "No. Series")
+                field(numberSeries; Rec."No. Series")
                 {
                     ApplicationArea = All;
                     Caption = 'No. Series', Locked = true;
                 }
-                field(taxGroupCode; "Tax Group Code")
+                field(taxGroupCode; Rec."Tax Group Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Tax Group Code', Locked = true;
                 }
-                field(vatProdPostingGroup; "VAT Prod. Posting Group")
+                field(vatProdPostingGroup; Rec."VAT Prod. Posting Group")
                 {
                     ApplicationArea = All;
                     Caption = 'VAT Prod. Posting Group', Locked = true;
                 }
-                field(reserve; Reserve)
+                field(reserve; Rec.Reserve)
                 {
                     ApplicationArea = All;
                     Caption = 'Reserve', Locked = true;
                 }
-                field(reservedQtyOnInventory; "Reserved Qty. on Inventory")
+                field(reservedQtyOnInventory; Rec."Reserved Qty. on Inventory")
                 {
                     ApplicationArea = All;
                     Caption = 'Reserved Qty. on Inventory', Locked = true;
                 }
-                field(reservedQtyOnPurchOrders; "Reserved Qty. on Purch. Orders")
+                field(reservedQtyOnPurchOrders; Rec."Reserved Qty. on Purch. Orders")
                 {
                     ApplicationArea = All;
                     Caption = 'Reserved Qty. on Purch. Orders', Locked = true;
                 }
-                field(reservedQtyOnSalesOrders; "Reserved Qty. on Sales Orders")
+                field(reservedQtyOnSalesOrders; Rec."Reserved Qty. on Sales Orders")
                 {
                     ApplicationArea = All;
                     Caption = 'Reserved Qty. on Sales Orders', Locked = true;
                 }
-                field(globalDimension1Code; "Global Dimension 1 Code")
+                field(globalDimension1Code; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Global Dimension 1 Code', Locked = true;
                 }
-                field(globalDimension2Code; "Global Dimension 2 Code")
+                field(globalDimension2Code; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Global Dimension 2 Code', Locked = true;
                 }
-                field(resQtyOnOutboundTransfer; "Res. Qty. on Outbound Transfer")
+                field(resQtyOnOutboundTransfer; Rec."Res. Qty. on Outbound Transfer")
                 {
                     ApplicationArea = All;
                     Caption = 'Res. Qty. on Outbound Transfer', Locked = true;
                 }
-                field(resQtyOnInboundTransfer; "Res. Qty. on Inbound Transfer")
+                field(resQtyOnInboundTransfer; Rec."Res. Qty. on Inbound Transfer")
                 {
                     ApplicationArea = All;
                     Caption = 'Res. Qty. on Inbound Transfer', Locked = true;
                 }
-                field(resQtyOnSalesReturns; "Res. Qty. on Sales Returns")
+                field(resQtyOnSalesReturns; Rec."Res. Qty. on Sales Returns")
                 {
                     ApplicationArea = All;
                     Caption = 'Res. Qty. on Sales Returns', Locked = true;
                 }
-                field(resQtyOnPurchReturns; "Res. Qty. on Purch. Returns")
+                field(resQtyOnPurchReturns; Rec."Res. Qty. on Purch. Returns")
                 {
                     ApplicationArea = All;
                     Caption = 'Res. Qty. on Purch. Returns', Locked = true;
                 }
-                field(stockoutWarning; "Stockout Warning")
+                field(stockoutWarning; Rec."Stockout Warning")
                 {
                     ApplicationArea = All;
                     Caption = 'Stockout Warning', Locked = true;
                 }
-                field(preventNegativeInventory; "Prevent Negative Inventory")
+                field(preventNegativeInventory; Rec."Prevent Negative Inventory")
                 {
                     ApplicationArea = All;
                     Caption = 'Prevent Negative Inventory', Locked = true;
                 }
-                field(costOfOpenProductionOrders; "Cost of Open Production Orders")
+                field(costOfOpenProductionOrders; Rec."Cost of Open Production Orders")
                 {
                     ApplicationArea = All;
                     Caption = 'Cost of Open Production Orders', Locked = true;
                 }
-                field(applicationWkshUserId; "Application Wksh. User ID")
+                field(applicationWkshUserId; Rec."Application Wksh. User ID")
                 {
                     ApplicationArea = All;
                     Caption = 'Application Wksh. User ID', Locked = true;
                 }
-                field(assemblyPolicy; "Assembly Policy")
+                field(assemblyPolicy; Rec."Assembly Policy")
                 {
                     ApplicationArea = All;
                     Caption = 'Assembly Policy', Locked = true;
                 }
-                field(resQtyOnAssemblyOrder; "Res. Qty. on Assembly Order")
+                field(resQtyOnAssemblyOrder; Rec."Res. Qty. on Assembly Order")
                 {
                     ApplicationArea = All;
                     Caption = 'Res. Qty. on Assembly Order', Locked = true;
                 }
-                field(resQtyOnAsmComp; "Res. Qty. on  Asm. Comp.")
+                field(resQtyOnAsmComp; Rec."Res. Qty. on  Asm. Comp.")
                 {
                     ApplicationArea = All;
                     Caption = 'Res. Qty. on  Asm. Comp.', Locked = true;
                 }
-                field(qtyOnAssemblyOrder; "Qty. on Assembly Order")
+                field(qtyOnAssemblyOrder; Rec."Qty. on Assembly Order")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. on Assembly Order', Locked = true;
                 }
-                field(qtyOnAsmComponent; "Qty. on Asm. Component")
+                field(qtyOnAsmComponent; Rec."Qty. on Asm. Component")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. on Asm. Component', Locked = true;
                 }
-                field(qtyOnJobOrder; "Qty. on Job Order")
+                field(qtyOnJobOrder; Rec."Qty. on Job Order")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. on Job Order', Locked = true;
                 }
-                field(resQtyOnJobOrder; "Res. Qty. on Job Order")
+                field(resQtyOnJobOrder; Rec."Res. Qty. on Job Order")
                 {
                     ApplicationArea = All;
                     Caption = 'Res. Qty. on Job Order', Locked = true;
                 }
-                field(gtin; GTIN)
+                field(gtin; Rec.GTIN)
                 {
                     ApplicationArea = All;
                     Caption = 'GTIN', Locked = true;
                 }
-                field(defaultDeferralTemplateCode; "Default Deferral Template Code")
+                field(defaultDeferralTemplateCode; Rec."Default Deferral Template Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Default Deferral Template Code', Locked = true;
                 }
-                field(lowLevelCode; "Low-Level Code")
+                field(lowLevelCode; Rec."Low-Level Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Low-Level Code', Locked = true;
                 }
-                field(lotSize; "Lot Size")
+                field(lotSize; Rec."Lot Size")
                 {
                     ApplicationArea = All;
                     Caption = 'Lot Size', Locked = true;
                 }
-                field(serialNos; "Serial Nos.")
+                field(serialNos; Rec."Serial Nos.")
                 {
                     ApplicationArea = All;
                     Caption = 'Serial Nos.', Locked = true;
                 }
-                field(lastUnitCostCalcDate; "Last Unit Cost Calc. Date")
+                field(lastUnitCostCalcDate; Rec."Last Unit Cost Calc. Date")
                 {
                     ApplicationArea = All;
                     Caption = 'Last Unit Cost Calc. Date', Locked = true;
                 }
-                field(rolledUpMaterialCost; "Rolled-up Material Cost")
+                field(rolledUpMaterialCost; Rec."Rolled-up Material Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Rolled-up Material Cost', Locked = true;
                 }
-                field(rolledUpCapacityCost; "Rolled-up Capacity Cost")
+                field(rolledUpCapacityCost; Rec."Rolled-up Capacity Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Rolled-up Capacity Cost', Locked = true;
                 }
-                field(scrapPercent; "Scrap %")
+                field(scrapPercent; Rec."Scrap %")
                 {
                     ApplicationArea = All;
                     Caption = 'Scrap %', Locked = true;
                 }
-                field(inventoryValueZero; "Inventory Value Zero")
+                field(inventoryValueZero; Rec."Inventory Value Zero")
                 {
                     ApplicationArea = All;
                     Caption = 'Inventory Value Zero', Locked = true;
                 }
-                field(discreteOrderQuantity; "Discrete Order Quantity")
+                field(discreteOrderQuantity; Rec."Discrete Order Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Discrete Order Quantity', Locked = true;
                 }
-                field(minimumOrderQuantity; "Minimum Order Quantity")
+                field(minimumOrderQuantity; Rec."Minimum Order Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Minimum Order Quantity', Locked = true;
                 }
-                field(maximumOrderQuantity; "Maximum Order Quantity")
+                field(maximumOrderQuantity; Rec."Maximum Order Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Maximum Order Quantity', Locked = true;
                 }
-                field(safetyStockQuantity; "Safety Stock Quantity")
+                field(safetyStockQuantity; Rec."Safety Stock Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Safety Stock Quantity', Locked = true;
                 }
-                field(orderMultiple; "Order Multiple")
+                field(orderMultiple; Rec."Order Multiple")
                 {
                     ApplicationArea = All;
                     Caption = 'Order Multiple', Locked = true;
                 }
-                field(safetyLeadTime; "Safety Lead Time")
+                field(safetyLeadTime; Rec."Safety Lead Time")
                 {
                     ApplicationArea = All;
                     Caption = 'Safety Lead Time', Locked = true;
                 }
-                field(flushingMethod; "Flushing Method")
+                field(flushingMethod; Rec."Flushing Method")
                 {
                     ApplicationArea = All;
                     Caption = 'Flushing Method', Locked = true;
                 }
-                field(replenishmentSystem; "Replenishment System")
+                field(replenishmentSystem; Rec."Replenishment System")
                 {
                     ApplicationArea = All;
                     Caption = 'Replenishment System', Locked = true;
                 }
-                field(scheduledReceiptQty; "Scheduled Receipt (Qty.)")
+                field(scheduledReceiptQty; Rec."Scheduled Receipt (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Scheduled Receipt (Qty.)', Locked = true;
                 }
-                field(scheduledNeedQty; "Scheduled Need (Qty.)")
+                field(scheduledNeedQty; Rec."Scheduled Need (Qty.)")
                 {
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Use the field ''qtyOnComponentLines'' instead';
@@ -645,407 +649,407 @@ page 6409 "Workflow - Item Entity"
                     ApplicationArea = All;
                     Caption = 'Scheduled Need (Qty.)', Locked = true;
                 }
-                field(roundingPrecision; "Rounding Precision")
+                field(roundingPrecision; Rec."Rounding Precision")
                 {
                     ApplicationArea = All;
                     Caption = 'Rounding Precision', Locked = true;
                 }
-                field(binFilter; "Bin Filter")
+                field(binFilter; Rec."Bin Filter")
                 {
                     ApplicationArea = All;
                     Caption = 'Bin Filter', Locked = true;
                 }
-                field(variantFilter; "Variant Filter")
+                field(variantFilter; Rec."Variant Filter")
                 {
                     ApplicationArea = All;
                     Caption = 'Variant Filter', Locked = true;
                 }
-                field(salesUnitOfMeasure; "Sales Unit of Measure")
+                field(salesUnitOfMeasure; Rec."Sales Unit of Measure")
                 {
                     ApplicationArea = All;
                     Caption = 'Sales Unit of Measure', Locked = true;
                 }
-                field(purchUnitOfMeasure; "Purch. Unit of Measure")
+                field(purchUnitOfMeasure; Rec."Purch. Unit of Measure")
                 {
                     ApplicationArea = All;
                     Caption = 'Purch. Unit of Measure', Locked = true;
                 }
-                field(timeBucket; "Time Bucket")
+                field(timeBucket; Rec."Time Bucket")
                 {
                     ApplicationArea = All;
                     Caption = 'Time Bucket', Locked = true;
                 }
-                field(reservedQtyOnProdOrder; "Reserved Qty. on Prod. Order")
+                field(reservedQtyOnProdOrder; Rec."Reserved Qty. on Prod. Order")
                 {
                     ApplicationArea = All;
                     Caption = 'Reserved Qty. on Prod. Order', Locked = true;
                 }
-                field(resQtyOnProdOrderComp; "Res. Qty. on Prod. Order Comp.")
+                field(resQtyOnProdOrderComp; Rec."Res. Qty. on Prod. Order Comp.")
                 {
                     ApplicationArea = All;
                     Caption = 'Res. Qty. on Prod. Order Comp.', Locked = true;
                 }
-                field(resQtyOnReqLine; "Res. Qty. on Req. Line")
+                field(resQtyOnReqLine; Rec."Res. Qty. on Req. Line")
                 {
                     ApplicationArea = All;
                     Caption = 'Res. Qty. on Req. Line', Locked = true;
                 }
-                field(reorderingPolicy; "Reordering Policy")
+                field(reorderingPolicy; Rec."Reordering Policy")
                 {
                     ApplicationArea = All;
                     Caption = 'Reordering Policy', Locked = true;
                 }
-                field(includeInventory; "Include Inventory")
+                field(includeInventory; Rec."Include Inventory")
                 {
                     ApplicationArea = All;
                     Caption = 'Include Inventory', Locked = true;
                 }
-                field(manufacturingPolicy; "Manufacturing Policy")
+                field(manufacturingPolicy; Rec."Manufacturing Policy")
                 {
                     ApplicationArea = All;
                     Caption = 'Manufacturing Policy', Locked = true;
                 }
-                field(reschedulingPeriod; "Rescheduling Period")
+                field(reschedulingPeriod; Rec."Rescheduling Period")
                 {
                     ApplicationArea = All;
                     Caption = 'Rescheduling Period', Locked = true;
                 }
-                field(lotAccumulationPeriod; "Lot Accumulation Period")
+                field(lotAccumulationPeriod; Rec."Lot Accumulation Period")
                 {
                     ApplicationArea = All;
                     Caption = 'Lot Accumulation Period', Locked = true;
                 }
-                field(dampenerPeriod; "Dampener Period")
+                field(dampenerPeriod; Rec."Dampener Period")
                 {
                     ApplicationArea = All;
                     Caption = 'Dampener Period', Locked = true;
                 }
-                field(dampenerQuantity; "Dampener Quantity")
+                field(dampenerQuantity; Rec."Dampener Quantity")
                 {
                     ApplicationArea = All;
                     Caption = 'Dampener Quantity', Locked = true;
                 }
-                field(overflowLevel; "Overflow Level")
+                field(overflowLevel; Rec."Overflow Level")
                 {
                     ApplicationArea = All;
                     Caption = 'Overflow Level', Locked = true;
                 }
-                field(planningTransferShipQty; "Planning Transfer Ship. (Qty).")
+                field(planningTransferShipQty; Rec."Planning Transfer Ship. (Qty).")
                 {
                     ApplicationArea = All;
                     Caption = 'Planning Transfer Ship. (Qty).', Locked = true;
                 }
-                field(planningWorksheetQty; "Planning Worksheet (Qty.)")
+                field(planningWorksheetQty; Rec."Planning Worksheet (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Planning Worksheet (Qty.)', Locked = true;
                 }
-                field(stockkeepingUnitExists; "Stockkeeping Unit Exists")
+                field(stockkeepingUnitExists; Rec."Stockkeeping Unit Exists")
                 {
                     ApplicationArea = All;
                     Caption = 'Stockkeeping Unit Exists', Locked = true;
                 }
-                field(manufacturerCode; "Manufacturer Code")
+                field(manufacturerCode; Rec."Manufacturer Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Manufacturer Code', Locked = true;
                 }
-                field(itemCategoryCode; "Item Category Code")
+                field(itemCategoryCode; Rec."Item Category Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Item Category Code', Locked = true;
                 }
-                field(createdFromNonstockItem; "Created From Nonstock Item")
+                field(createdFromNonstockItem; Rec."Created From Nonstock Item")
                 {
                     ApplicationArea = All;
                     Caption = 'Created From Catalog Item', Locked = true;
                 }
-                field(substitutesExist; "Substitutes Exist")
+                field(substitutesExist; Rec."Substitutes Exist")
                 {
                     ApplicationArea = All;
                     Caption = 'Substitutes Exist', Locked = true;
                 }
-                field(qtyInTransit; "Qty. in Transit")
+                field(qtyInTransit; Rec."Qty. in Transit")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. in Transit', Locked = true;
                 }
-                field(transOrdReceiptQty; "Trans. Ord. Receipt (Qty.)")
+                field(transOrdReceiptQty; Rec."Trans. Ord. Receipt (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Trans. Ord. Receipt (Qty.)', Locked = true;
                 }
-                field(transOrdShipmentQty; "Trans. Ord. Shipment (Qty.)")
+                field(transOrdShipmentQty; Rec."Trans. Ord. Shipment (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Trans. Ord. Shipment (Qty.)', Locked = true;
                 }
-                field(qtyAssignedToShip; "Qty. Assigned to ship")
+                field(qtyAssignedToShip; Rec."Qty. Assigned to ship")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. Assigned to ship', Locked = true;
                 }
-                field(qtyPicked; "Qty. Picked")
+                field(qtyPicked; Rec."Qty. Picked")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. Picked', Locked = true;
                 }
-                field(serviceItemGroup; "Service Item Group")
+                field(serviceItemGroup; Rec."Service Item Group")
                 {
                     ApplicationArea = All;
                     Caption = 'Service Item Group', Locked = true;
                 }
-                field(qtyOnServiceOrder; "Qty. on Service Order")
+                field(qtyOnServiceOrder; Rec."Qty. on Service Order")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. on Service Order', Locked = true;
                 }
-                field(resQtyOnServiceOrders; "Res. Qty. on Service Orders")
+                field(resQtyOnServiceOrders; Rec."Res. Qty. on Service Orders")
                 {
                     ApplicationArea = All;
                     Caption = 'Res. Qty. on Service Orders', Locked = true;
                 }
-                field(itemTrackingCode; "Item Tracking Code")
+                field(itemTrackingCode; Rec."Item Tracking Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Item Tracking Code', Locked = true;
                 }
-                field(lotNos; "Lot Nos.")
+                field(lotNos; Rec."Lot Nos.")
                 {
                     ApplicationArea = All;
                     Caption = 'Lot Nos.', Locked = true;
                 }
-                field(expirationCalculation; "Expiration Calculation")
+                field(expirationCalculation; Rec."Expiration Calculation")
                 {
                     ApplicationArea = All;
                     Caption = 'Expiration Calculation', Locked = true;
                 }
-                field(lotNumberFilter; "Lot No. Filter")
+                field(lotNumberFilter; Rec."Lot No. Filter")
                 {
                     ApplicationArea = All;
                     Caption = 'Lot No. Filter', Locked = true;
                 }
-                field(serialNumberFilter; "Serial No. Filter")
+                field(serialNumberFilter; Rec."Serial No. Filter")
                 {
                     ApplicationArea = All;
                     Caption = 'Serial No. Filter', Locked = true;
                 }
-                field(qtyOnPurchReturn; "Qty. on Purch. Return")
+                field(qtyOnPurchReturn; Rec."Qty. on Purch. Return")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. on Purch. Return', Locked = true;
                 }
-                field(qtyOnSalesReturn; "Qty. on Sales Return")
+                field(qtyOnSalesReturn; Rec."Qty. on Sales Return")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. on Sales Return', Locked = true;
                 }
-                field(numberOfSubstitutes; "No. of Substitutes")
+                field(numberOfSubstitutes; Rec."No. of Substitutes")
                 {
                     ApplicationArea = All;
                     Caption = 'No. of Substitutes', Locked = true;
                 }
-                field(warehouseClassCode; "Warehouse Class Code")
+                field(warehouseClassCode; Rec."Warehouse Class Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Warehouse Class Code', Locked = true;
                 }
-                field(specialEquipmentCode; "Special Equipment Code")
+                field(specialEquipmentCode; Rec."Special Equipment Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Special Equipment Code', Locked = true;
                 }
-                field(putAwayTemplateCode; "Put-away Template Code")
+                field(putAwayTemplateCode; Rec."Put-away Template Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Put-away Template Code', Locked = true;
                 }
-                field(putAwayUnitOfMeasureCode; "Put-away Unit of Measure Code")
+                field(putAwayUnitOfMeasureCode; Rec."Put-away Unit of Measure Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Put-away Unit of Measure Code', Locked = true;
                 }
-                field(physInvtCountingPeriodCode; "Phys Invt Counting Period Code")
+                field(physInvtCountingPeriodCode; Rec."Phys Invt Counting Period Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Phys Invt Counting Period Code', Locked = true;
                 }
-                field(lastCountingPeriodUpdate; "Last Counting Period Update")
+                field(lastCountingPeriodUpdate; Rec."Last Counting Period Update")
                 {
                     ApplicationArea = All;
                     Caption = 'Last Counting Period Update', Locked = true;
                 }
-                field(lastPhysInvtDate; "Last Phys. Invt. Date")
+                field(lastPhysInvtDate; Rec."Last Phys. Invt. Date")
                 {
                     ApplicationArea = All;
                     Caption = 'Last Phys. Invt. Date', Locked = true;
                 }
-                field(useCrossDocking; "Use Cross-Docking")
+                field(useCrossDocking; Rec."Use Cross-Docking")
                 {
                     ApplicationArea = All;
                     Caption = 'Use Cross-Docking', Locked = true;
                 }
-                field(nextCountingStartDate; "Next Counting Start Date")
+                field(nextCountingStartDate; Rec."Next Counting Start Date")
                 {
                     ApplicationArea = All;
                     Caption = 'Next Counting Start Date', Locked = true;
                 }
-                field(nextCountingEndDate; "Next Counting End Date")
+                field(nextCountingEndDate; Rec."Next Counting End Date")
                 {
                     ApplicationArea = All;
                     Caption = 'Next Counting End Date', Locked = true;
                 }
-                field(identifierCode; "Identifier Code")
+                field(identifierCode; Rec."Identifier Code")
                 {
                     ApplicationArea = All;
                     Caption = 'Identifier Code', Locked = true;
                 }
-                field(unitOfMeasureId; "Unit of Measure Id")
+                field(unitOfMeasureId; Rec."Unit of Measure Id")
                 {
                     ApplicationArea = All;
                     Caption = 'Unit of Measure Id', Locked = true;
                 }
-                field(taxGroupId; "Tax Group Id")
+                field(taxGroupId; Rec."Tax Group Id")
                 {
                     ApplicationArea = All;
                     Caption = 'Tax Group Id', Locked = true;
                 }
-                field(routingNumber; "Routing No.")
+                field(routingNumber; Rec."Routing No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Routing No.', Locked = true;
                 }
-                field(productionBomNumber; "Production BOM No.")
+                field(productionBomNumber; Rec."Production BOM No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Production BOM No.', Locked = true;
                 }
-                field(singleLevelMaterialCost; "Single-Level Material Cost")
+                field(singleLevelMaterialCost; Rec."Single-Level Material Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Single-Level Material Cost', Locked = true;
                 }
-                field(singleLevelCapacityCost; "Single-Level Capacity Cost")
+                field(singleLevelCapacityCost; Rec."Single-Level Capacity Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Single-Level Capacity Cost', Locked = true;
                 }
-                field(singleLevelSubcontrdCost; "Single-Level Subcontrd. Cost")
+                field(singleLevelSubcontrdCost; Rec."Single-Level Subcontrd. Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Single-Level Subcontrd. Cost', Locked = true;
                 }
-                field(singleLevelCapOvhdCost; "Single-Level Cap. Ovhd Cost")
+                field(singleLevelCapOvhdCost; Rec."Single-Level Cap. Ovhd Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Single-Level Cap. Ovhd Cost', Locked = true;
                 }
-                field(singleLevelMfgOvhdCost; "Single-Level Mfg. Ovhd Cost")
+                field(singleLevelMfgOvhdCost; Rec."Single-Level Mfg. Ovhd Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Single-Level Mfg. Ovhd Cost', Locked = true;
                 }
-                field(overheadRate; "Overhead Rate")
+                field(overheadRate; Rec."Overhead Rate")
                 {
                     ApplicationArea = All;
                     Caption = 'Overhead Rate', Locked = true;
                 }
-                field(rolledUpSubcontractedCost; "Rolled-up Subcontracted Cost")
+                field(rolledUpSubcontractedCost; Rec."Rolled-up Subcontracted Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Rolled-up Subcontracted Cost', Locked = true;
                 }
-                field(rolledUpMfgOvhdCost; "Rolled-up Mfg. Ovhd Cost")
+                field(rolledUpMfgOvhdCost; Rec."Rolled-up Mfg. Ovhd Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Rolled-up Mfg. Ovhd Cost', Locked = true;
                 }
-                field(rolledUpCapOverheadCost; "Rolled-up Cap. Overhead Cost")
+                field(rolledUpCapOverheadCost; Rec."Rolled-up Cap. Overhead Cost")
                 {
                     ApplicationArea = All;
                     Caption = 'Rolled-up Cap. Overhead Cost', Locked = true;
                 }
-                field(planningIssuesQty; "Planning Issues (Qty.)")
+                field(planningIssuesQty; Rec."Planning Issues (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Planning Issues (Qty.)', Locked = true;
                 }
-                field(planningReceiptQty; "Planning Receipt (Qty.)")
+                field(planningReceiptQty; Rec."Planning Receipt (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Planning Receipt (Qty.)', Locked = true;
                 }
-                field(plannedOrderReceiptQty; "Planned Order Receipt (Qty.)")
+                field(plannedOrderReceiptQty; Rec."Planned Order Receipt (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Planned Order Receipt (Qty.)', Locked = true;
                 }
-                field(fpOrderReceiptQty; "FP Order Receipt (Qty.)")
+                field(fpOrderReceiptQty; Rec."FP Order Receipt (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'FP Order Receipt (Qty.)', Locked = true;
                 }
-                field(relOrderReceiptQty; "Rel. Order Receipt (Qty.)")
+                field(relOrderReceiptQty; Rec."Rel. Order Receipt (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Rel. Order Receipt (Qty.)', Locked = true;
                 }
-                field(planningReleaseQty; "Planning Release (Qty.)")
+                field(planningReleaseQty; Rec."Planning Release (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Planning Release (Qty.)', Locked = true;
                 }
-                field(plannedOrderReleaseQty; "Planned Order Release (Qty.)")
+                field(plannedOrderReleaseQty; Rec."Planned Order Release (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Planned Order Release (Qty.)', Locked = true;
                 }
-                field(purchReqReceiptQty; "Purch. Req. Receipt (Qty.)")
+                field(purchReqReceiptQty; Rec."Purch. Req. Receipt (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Purch. Req. Receipt (Qty.)', Locked = true;
                 }
-                field(purchReqReleaseQty; "Purch. Req. Release (Qty.)")
+                field(purchReqReleaseQty; Rec."Purch. Req. Release (Qty.)")
                 {
                     ApplicationArea = All;
                     Caption = 'Purch. Req. Release (Qty.)', Locked = true;
                 }
-                field(orderTrackingPolicy; "Order Tracking Policy")
+                field(orderTrackingPolicy; Rec."Order Tracking Policy")
                 {
                     ApplicationArea = All;
                     Caption = 'Order Tracking Policy', Locked = true;
                 }
-                field(prodForecastQuantityBase; "Prod. Forecast Quantity (Base)")
+                field(prodForecastQuantityBase; Rec."Prod. Forecast Quantity (Base)")
                 {
                     ApplicationArea = All;
                     Caption = 'Prod. Forecast Quantity (Base)', Locked = true;
                 }
-                field(productionForecastName; "Production Forecast Name")
+                field(productionForecastName; Rec."Production Forecast Name")
                 {
                     ApplicationArea = All;
                     Caption = 'Demand Forecast Name', Locked = true;
                 }
-                field(componentForecast; "Component Forecast")
+                field(componentForecast; Rec."Component Forecast")
                 {
                     ApplicationArea = All;
                     Caption = 'Component Forecast', Locked = true;
                 }
-                field(qtyOnProdOrder; "Qty. on Prod. Order")
+                field(qtyOnProdOrder; Rec."Qty. on Prod. Order")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. on Prod. Order', Locked = true;
                 }
-                field(qtyOnComponentLines; "Qty. on Component Lines")
+                field(qtyOnComponentLines; Rec."Qty. on Component Lines")
                 {
                     ApplicationArea = All;
                     Caption = 'Qty. on Component Lines', Locked = true;
                 }
-                field(critical; Critical)
+                field(critical; Rec.Critical)
                 {
                     ApplicationArea = All;
                     Caption = 'Critical', Locked = true;
                 }
-                field(commonItemNumber; "Common Item No.")
+                field(commonItemNumber; Rec."Common Item No.")
                 {
                     ApplicationArea = All;
                     Caption = 'Common Item No.', Locked = true;

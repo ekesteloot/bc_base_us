@@ -31,7 +31,7 @@ page 975 "Time Sheet Archive Card"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the number of the resource for the time sheet.';
                 }
-                field(ApproverUserID; "Approver User ID")
+                field(ApproverUserID; Rec."Approver User ID")
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the ID of the time sheet approver.';
@@ -45,7 +45,7 @@ page 975 "Time Sheet Archive Card"
             part(TimeSheetLines; "Time Sheet Archive Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Time Sheet No." = FIELD("No.");
+                SubPageLink = "Time Sheet No." = field("No.");
                 UpdatePropagation = Both;
             }
         }
@@ -69,8 +69,8 @@ page 975 "Time Sheet Archive Card"
                 Caption = 'Comments';
                 Image = ViewComments;
                 RunObject = Page "Time Sheet Arc. Comment Sheet";
-                RunPageLink = "No." = FIELD("No."),
-                                  "Time Sheet Line No." = CONST(0);
+                RunPageLink = "No." = field("No."),
+                                  "Time Sheet Line No." = const(0);
                 ToolTip = 'View comments about the time sheet.';
             }
         }
@@ -101,7 +101,7 @@ page 975 "Time Sheet Archive Card"
 
     local procedure UpdateControls()
     begin
-        CurrPage.TimeSheetLines.Page.SetColumns("No.");
+        CurrPage.TimeSheetLines.Page.SetColumns(Rec."No.");
         CurrPage.PeriodSummaryArcFactBox.PAGE.UpdateData(Rec);
     end;
 
@@ -112,10 +112,10 @@ page 975 "Time Sheet Archive Card"
     begin
         if UserSetup.Get(UserId) then;
         if not UserSetup."Time Sheet Admin." then begin
-            FilterGroup(2);
-            if (GetFilter("Owner User ID") = '') and (GetFilter("Approver User ID") = '') then
-                TimeSheetMgt.FilterTimeSheetsArchive(Rec, FieldNo("Owner User ID"));
-            FilterGroup(0);
+            Rec.FilterGroup(2);
+            if (Rec.GetFilter("Owner User ID") = '') and (Rec.GetFilter("Approver User ID") = '') then
+                TimeSheetMgt.FilterTimeSheetsArchive(Rec, Rec.FieldNo("Owner User ID"));
+            Rec.FilterGroup(0);
         end;
     end;
 

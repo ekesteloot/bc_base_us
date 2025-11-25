@@ -1,3 +1,25 @@
+namespace Microsoft.ServiceMgt.RoleCenters;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Integration.D365Sales;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Analysis;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Email;
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Ledger;
+using Microsoft.ServiceMgt.Loaner;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Pricing;
+using Microsoft.ServiceMgt.Reports;
+using Microsoft.ServiceMgt.Resources;
+using Microsoft.ServiceMgt.Setup;
+using Microsoft.Shared.Navigate;
+
 page 8908 "Service Manager Role Center"
 {
     Caption = 'Service Manager Role Center';

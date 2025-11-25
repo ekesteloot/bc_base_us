@@ -1,7 +1,12 @@
+namespace Microsoft.HumanResources.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.HumanResources.Employee;
+
 report 5200 "Employee - Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './HR/EmployeeLabels.rdlc';
+    RDLCLayout = './HumanResources/Reports/EmployeeLabels.rdlc';
     ApplicationArea = BasicHR;
     Caption = 'Employee Labels';
     UsageCategory = ReportsAndAnalysis;

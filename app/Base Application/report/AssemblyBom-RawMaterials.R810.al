@@ -1,7 +1,11 @@
+namespace Microsoft.AssemblyMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+
 report 810 "Assembly BOM - Raw Materials"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Assembly/AssemblyBOMRawMaterials.rdlc';
+    RDLCLayout = './AssemblyMgt/Reports/AssemblyBOMRawMaterials.rdlc';
     AdditionalSearchTerms = 'bill of material raw';
     ApplicationArea = Assembly;
     Caption = 'BOM - Raw Materials';
@@ -11,7 +15,7 @@ report 810 "Assembly BOM - Raw Materials"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE("Assembly BOM" = CONST(false));
+            DataItemTableView = where("Assembly BOM" = const(false));
             RequestFilterFields = "No.", "Base Unit of Measure", "Shelf No.";
             column(CompanyName_Item; COMPANYPROPERTY.DisplayName())
             {

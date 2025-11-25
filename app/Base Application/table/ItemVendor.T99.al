@@ -1,3 +1,13 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Purchases.Vendor;
+
 table 99 "Item Vendor"
 {
     Caption = 'Item Vendor';
@@ -39,7 +49,7 @@ table 99 "Item Vendor"
         field(5700; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
     }
 
@@ -148,7 +158,7 @@ table 99 "Item Vendor"
     local procedure ToPriceSource(var PriceSource: Record "Price Source")
     begin
         PriceSource.Init();
-        PriceSource."Price Type" := "Price Type"::Purchase;
+        PriceSource."Price Type" := PriceSource."Price Type"::Purchase;
         PriceSource.Validate("Source Type", PriceSource."Source Type"::Vendor);
         PriceSource."Source No." := Rec."Vendor No.";
     end;

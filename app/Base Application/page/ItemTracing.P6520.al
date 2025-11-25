@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 6520 "Item Tracing"
 {
     AdditionalSearchTerms = 'serial number,lot number,expiration,fefo,item tracking,fda,defect';
@@ -23,6 +31,7 @@ page 6520 "Item Tracing"
                     ApplicationArea = ItemTracking;
                     Caption = 'Serial No. Filter';
                     ToolTip = 'Specifies the serial number or a filter on the serial numbers that you would like to trace.';
+                    ExtendedDatatype = Barcode;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -42,6 +51,7 @@ page 6520 "Item Tracing"
                     ApplicationArea = ItemTracking;
                     Caption = 'Lot No. Filter';
                     ToolTip = 'Specifies the lot number or a filter on the lot numbers that you would like to trace.';
+                    ExtendedDatatype = Barcode;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -63,6 +73,7 @@ page 6520 "Item Tracing"
                     CaptionClass = '6,3';
                     ToolTip = 'Specifies the package number or a filter on the package numbers that you would like to trace.';
                     Visible = PackageTrackingVisible;
+                    ExtendedDatatype = Barcode;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -264,7 +275,7 @@ page 6520 "Item Tracing"
                         ItemLedgerEntry: Record "Item Ledger Entry";
                     begin
                         ItemLedgerEntry.Reset();
-                        ItemLedgerEntry.SetRange("Entry No.", "Item Ledger Entry No.");
+                        ItemLedgerEntry.SetRange("Entry No.", Rec."Item Ledger Entry No.");
                         PAGE.RunModal(0, ItemLedgerEntry);
                     end;
                 }
@@ -284,7 +295,7 @@ page 6520 "Item Tracing"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Created by");
+                        UserMgt.DisplayUserInformation(Rec."Created by");
                     end;
                 }
                 field("Created on"; Rec."Created on")
@@ -346,7 +357,7 @@ page 6520 "Item Tracing"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -356,8 +367,8 @@ page 6520 "Item Tracing"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Item No." = FIELD("Item No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("Item No.");
+                    RunPageView = sorting("Item No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -584,15 +595,10 @@ page 6520 "Item Tracing"
         Text003: Label 'Filters are too large to show.';
         Text004: Label 'Origin->Usage,Usage->Origin';
         Text005: Label 'No,Item-tracked Only,All';
-        [InDataSet]
         DescriptionIndent: Integer;
-        [InDataSet]
         FunctionsEnable: Boolean;
-        [InDataSet]
         PrintEnable: Boolean;
-        [InDataSet]
         NavigateEnable: Boolean;
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     protected var

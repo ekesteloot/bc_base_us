@@ -1,9 +1,13 @@
+namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.InventoryMgt.Comment;
+
 page 6561 "Invt. Receipt"
 {
     Caption = 'Invt. Receipt';
     PageType = Document;
     SourceTable = "Invt. Document Header";
-    SourceTableView = WHERE("Document Type" = CONST(Receipt));
+    SourceTableView = where("Document Type" = const(Receipt));
 
     layout
     {
@@ -63,7 +67,7 @@ page 6561 "Invt. Receipt"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the employee purchaser code or salesperson code associated with this document.';
                 }
-                field(Correction; Correction)
+                field(Correction; Rec.Correction)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the entry as a corrective entry. You can use the field if you need to post a corrective entry to an account.';
@@ -78,8 +82,8 @@ page 6561 "Invt. Receipt"
             part(ReceiptLines; "Invt. Receipt Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("No.");
             }
             group(Control1900309501)
             {
@@ -134,8 +138,8 @@ page 6561 "Invt. Receipt"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Invt. Document Statistics";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -145,8 +149,8 @@ page 6561 "Invt. Receipt"
                     Image = ViewComments;
                     ToolTip = 'View or edit comments.';
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Inventory Receipt"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Inventory Receipt"),
+                                  "No." = field("No.");
                 }
                 action(Dimensions)
                 {

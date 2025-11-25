@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Statement;
+
 page 1300 "Pmt. Rec. Undo Statement"
 {
     Caption = 'Reverse Payment Reconciliation Journal';

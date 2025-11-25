@@ -1,3 +1,9 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.InventoryMgt.Requisition;
+
 codeunit 1209 "Export Payment File (Yes/No)"
 {
     TableNo = "Gen. Journal Line";
@@ -13,17 +19,17 @@ codeunit 1209 "Export Payment File (Yes/No)"
         if IsHandled then
             exit;
 
-        if not FindSet() then
+        if not Rec.FindSet() then
             Error(NothingToExportErr);
-        SetRange("Journal Template Name", "Journal Template Name");
-        SetRange("Journal Batch Name", "Journal Batch Name");
+        Rec.SetRange("Journal Template Name", Rec."Journal Template Name");
+        Rec.SetRange("Journal Batch Name", Rec."Journal Batch Name");
 
-        GenJnlBatch.Get("Journal Template Name", "Journal Batch Name");
+        GenJnlBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name");
         GenJnlBatch.TestField("Bal. Account Type", GenJnlBatch."Bal. Account Type"::"Bank Account");
         GenJnlBatch.TestField("Bal. Account No.");
 
-        CheckDocNoOnLines();
-        if IsExportedToPaymentFile() then
+        Rec.CheckDocNoOnLines();
+        if Rec.IsExportedToPaymentFile() then
             if not Confirm(ExportAgainQst) then
                 exit;
         BankAcc.Get(GenJnlBatch."Bal. Account No.");

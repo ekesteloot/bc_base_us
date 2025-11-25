@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.History;
+
 page 5890 "Posted Phys. Invt. Rec. Lines"
 {
     Caption = 'Posted Phys. Invt. Rec. Lines';
@@ -129,9 +131,9 @@ page 5890 "Posted Phys. Invt. Rec. Lines"
                     Caption = 'Show Document';
                     Image = View;
                     RunObject = Page "Posted Phys. Invt. Recording";
-                    RunPageLink = "Order No." = FIELD("Order No."),
-                                  "Recording No." = FIELD("Recording No.");
-                    RunPageView = SORTING("Order No.", "Recording No.");
+                    RunPageLink = "Order No." = field("Order No."),
+                                  "Recording No." = field("Recording No.");
+                    RunPageView = sorting("Order No.", "Recording No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Show posted inventory count order recording.';
                 }

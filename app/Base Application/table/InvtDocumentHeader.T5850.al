@@ -1,3 +1,15 @@
+﻿namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Comment;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Structure;
+using System.Globalization;
+
 table 5850 "Invt. Document Header"
 {
     Caption = 'Item Document Header';
@@ -47,7 +59,7 @@ table 5850 "Invt. Document Header"
         field(7; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location.Code WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location.Code where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             begin
@@ -62,24 +74,24 @@ table 5850 "Invt. Document Header"
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(9; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(10; "Language Code"; Code[10])
@@ -99,16 +111,16 @@ table 5850 "Invt. Document Header"
         }
         field(12; "Receipt Comment"; Boolean)
         {
-            CalcFormula = Exist("Inventory Comment Line" WHERE("Document Type" = CONST("Inventory Receipt"),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = exist("Inventory Comment Line" where("Document Type" = const("Inventory Receipt"),
+                                                                "No." = field("No.")));
             Caption = 'Receipt Comment';
             Editable = false;
             FieldClass = FlowField;
         }
         field(13; "Shipment Comment"; Boolean)
         {
-            CalcFormula = Exist("Inventory Comment Line" WHERE("Document Type" = CONST("Inventory Shipment"),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = exist("Inventory Comment Line" where("Document Type" = const("Inventory Shipment"),
+                                                                "No." = field("No.")));
             Caption = 'Shipment Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -152,7 +164,7 @@ table 5850 "Invt. Document Header"
         field(17; "Whse. Adj. Bin Code"; Code[20])
         {
             Caption = 'Whse. Adj. Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(20; "Posting No."; Code[20])
         {
@@ -182,6 +194,17 @@ table 5850 "Invt. Document Header"
         field(30; Correction; Boolean)
         {
             Caption = 'Correction';
+
+            trigger OnValidate()
+            begin
+                if Rec.Correction <> xRec.Correction then
+                    CheckChangeCorrectionAllowed();
+            end;
+        }
+        field(31; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
         }
         field(480; "Dimension Set ID"; Integer)
         {
@@ -191,7 +214,7 @@ table 5850 "Invt. Document Header"
 
             trigger OnLookup()
             begin
-                ShowDocDim();
+                Rec.ShowDocDim();
             end;
 
             trigger OnValidate()
@@ -214,14 +237,19 @@ table 5850 "Invt. Document Header"
     }
 
     trigger OnDelete()
+    var
+        ReservationManagement: Codeunit "Reservation Management";
     begin
         InvtDocLine.SetRange("Document Type", "Document Type");
         InvtDocLine.SetRange("Document No.", "No.");
-        if InvtDocLine.Find('-') then
+        if InvtDocLine.Find('-') then begin
+            ReservationManagement.DeleteDocumentReservation(
+                DATABASE::"Invt. Document Line", Rec."Document Type".AsInteger(), "No.", GetHideValidationDialog());
             repeat
                 InvtDocLine.SuspendStatusCheck(true);
                 InvtDocLine.Delete(true);
             until InvtDocLine.Next() = 0;
+        end;
     end;
 
     trigger OnInsert()
@@ -333,6 +361,11 @@ table 5850 "Invt. Document Header"
         HideValidationDialog := NewHideValidationDialog;
     end;
 
+    procedure GetHideValidationDialog(): Boolean
+    begin
+        exit(HideValidationDialog);
+    end;
+
     procedure DocLinesExist(): Boolean
     begin
         InvtDocLine.Reset();
@@ -340,39 +373,6 @@ table 5850 "Invt. Document Header"
         InvtDocLine.SetRange("Document No.", "No.");
         exit(not InvtDocLine.IsEmpty());
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        OldDimSetID: Integer;
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        OldDimSetID := "Dimension Set ID";
-        case "Document Type" of
-            "Document Type"::Receipt:
-                "Dimension Set ID" :=
-                  DimMgt.GetDefaultDimID(
-                    TableID, No, SourceCodeSetup."Invt. Receipt", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-            "Document Type"::Shipment:
-                "Dimension Set ID" :=
-                  DimMgt.GetDefaultDimID(
-                    TableID, No, SourceCodeSetup."Invt. Shipment", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
-        end;
-
-        if (OldDimSetID <> "Dimension Set ID") and DocLinesExist() then begin
-            Modify();
-            UpdateAllLineDim("Dimension Set ID", OldDimSetID);
-        end;
-    end;
-#endif
 
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
@@ -500,6 +500,22 @@ table 5850 "Invt. Document Header"
         DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code");
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource);
+    end;
+
+    local procedure CheckChangeCorrectionAllowed()
+    var
+        ReservationEntry: Record "Reservation Entry";
+        NotAllowedMsg: Label 'Item tracking is defined for some item(s) in the %1 %2.\You must delete the existing item tracking before modifying value of field %3', Comment = '%1 - Document Type, %2 - Document No., %3 - Field caption';
+    begin
+        if CurrFieldNo <> Rec.FieldNo(Correction) then
+            exit;
+
+        ReservationEntry.SetCurrentKey("Source ID", "Source Ref. No.", "Source Type", "Source Subtype", "Source Batch Name", "Source Prod. Order Line", "Reservation Status", "Shipment Date", "Expected Receipt Date");
+        ReservationEntry.SetRange("Source ID", Rec."No.");
+        ReservationEntry.SetRange("Source Type", Database::"Invt. Document Line");
+        ReservationEntry.SetRange("Source Subtype", Rec."Document Type");
+        if not ReservationEntry.IsEmpty then
+            Error(NotAllowedMsg, format(Rec."Document Type"), Rec."No.", Rec.FieldCaption(Correction));
     end;
 
     [IntegrationEvent(false, false)]

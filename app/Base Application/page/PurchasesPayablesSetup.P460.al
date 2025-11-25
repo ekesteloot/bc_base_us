@@ -1,4 +1,10 @@
-﻿page 460 "Purchases & Payables Setup"
+﻿namespace Microsoft.Purchases.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Purchases.Vendor;
+
+page 460 "Purchases & Payables Setup"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Purchases & Payables Setup';
@@ -155,14 +161,12 @@
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies if multiple posting groups can be used for the same vendor in purchase documents.';
-                    Visible = MultiplePostingGroupsVisible;
                 }
                 field("Check Multiple Posting Groups"; Rec."Check Multiple Posting Groups")
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies implementation method of checking which posting groups can be used for the vendor.';
-                    Visible = MultiplePostingGroupsVisible;
                 }
                 field("Ignore Updated Addresses"; Rec."Ignore Updated Addresses")
                 {
@@ -181,19 +185,6 @@
                     ToolTip = 'Specifies if the value of the Vendor Invoice No. field must be copied to the Payment Reference field during posting unless the Payment Reference field is not blank.';
                     Importance = Additional;
                 }
-#if not CLEAN20
-                field("Invoice Posting Setup"; Rec."Invoice Posting Setup")
-                {
-                    ApplicationArea = Advanced;
-                    Editable = false;
-                    Importance = Additional;
-                    ToolTip = 'Specifies invoice posting implementation codeunit which is used for posting of purchase invoices.';
-                    Visible = false;
-                    ObsoleteReason = 'Replaced by direct selection of posting interface in codeunits.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '20.0';
-                }
-#endif
                 field("Document Default Line Type"; Rec."Document Default Line Type")
                 {
                     ApplicationArea = Basic, Suite;
@@ -204,6 +195,12 @@
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                     ToolTip = 'Specifies that you can change the names of vendors on open purchase documents. The change applies only to the documents.';
+                }
+                field("Update Document Date When Posting Date Is Modified"; Rec."Link Doc. Date To Posting Date")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies whether the document date changes when the posting date is modified.';
+                    Importance = Additional;
                 }
             }
             group(Prices)
@@ -474,7 +471,6 @@
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
-        FeatureKeyManagement: Codeunit "Feature Key Management";
     begin
         Rec.Reset();
         if not Rec.Get() then begin
@@ -484,12 +480,10 @@
         ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
         GeneralLedgerSetup.Get();
         JnlTemplateNameVisible := GeneralLedgerSetup."Journal Templ. Name Mandatory";
-        MultiplePostingGroupsVisible := FeatureKeyManagement.IsAllowMultipleCustVendPostingGroupsEnabled();
     end;
 
     var
         ExtendedPriceEnabled: Boolean;
         JnlTemplateNameVisible: Boolean;
-        MultiplePostingGroupsVisible: Boolean;
 }
 

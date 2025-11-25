@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using System.IO;
+
 codeunit 1261 "Imp. SEPA CAMT Bank Rec. Lines"
 {
     TableNo = "Bank Acc. Reconciliation Line";
@@ -8,7 +12,7 @@ codeunit 1261 "Imp. SEPA CAMT Bank Rec. Lines"
         ProcessDataExch: Codeunit "Process Data Exch.";
         RecRef: RecordRef;
     begin
-        DataExch.Get("Data Exch. Entry No.");
+        DataExch.Get(Rec."Data Exch. Entry No.");
         RecRef.GetTable(Rec);
         RunPreProcess(Rec);
         ProcessDataExch.ProcessAllLinesColumnMapping(DataExch, RecRef);

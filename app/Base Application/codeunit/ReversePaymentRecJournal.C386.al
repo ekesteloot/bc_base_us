@@ -1,6 +1,19 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.BankMgt.Statement;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+
 codeunit 386 "Reverse Payment Rec. Journal"
 {
-    Access = Internal;
     EventSubscriberInstance = Manual;
 
     var
@@ -876,7 +889,7 @@ codeunit 386 "Reverse Payment Rec. Journal"
         );
     end;
 
-    local procedure ErrorIfEntryIsNotReversable(Reversed: Boolean; TableCaption: Text; EntryNo: Integer; TransactionNo: Integer; JournalBatchName: Code[10]; DocumentType: Enum "Gen. Journal Document Type"; AmountToApply: Decimal; AppliesToDocNo: Code[20]; AppliesToID: Code[50]; SourceCode: Code[10])
+    procedure ErrorIfEntryIsNotReversable(Reversed: Boolean; TableCaption: Text; EntryNo: Integer; TransactionNo: Integer; JournalBatchName: Code[10]; DocumentType: Enum "Gen. Journal Document Type"; AmountToApply: Decimal; AppliesToDocNo: Code[20]; AppliesToID: Code[50]; SourceCode: Code[10])
     var
         ReversalEntry: Record "Reversal Entry";
         IsHandled: Boolean;
@@ -891,11 +904,12 @@ codeunit 386 "Reverse Payment Rec. Journal"
         if TransactionNo = 0 then
             Error(EmptyTransactionNoErr, EntryNo);
     end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterReverseEntry()
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeReverseEntry(var PaymentRecRelatedEntry: Record "Payment Rec. Related Entry")
     begin
@@ -904,7 +918,7 @@ codeunit 386 "Reverse Payment Rec. Journal"
     [IntegrationEvent(false, false)]
     local procedure OnErrorIfEntryIsNotReversableOnBeforeEntryIsReversable(var IsHandled: Boolean)
     begin
-    end;     
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnCopyPaymentRecJournalFromPostedPaymentReconLinesOnAfterInsertBankAccReconciliationLine(var PostedPaymentReconLine: Record "Posted Payment Recon. Line"; var BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line")

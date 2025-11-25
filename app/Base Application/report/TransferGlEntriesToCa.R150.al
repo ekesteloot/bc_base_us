@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Journal;
+
 report 150 "Transfer GL Entries to CA"
 {
     ApplicationArea = CostAccounting;

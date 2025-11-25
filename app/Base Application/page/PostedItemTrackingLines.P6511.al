@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Ledger;
+
 page 6511 "Posted Item Tracking Lines"
 {
     Caption = 'Posted Item Tracking Lines';
@@ -86,7 +90,6 @@ page 6511 "Posted Item Tracking Lines"
 
     var
         Text001: Label '%1 - %2', Locked = true;
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     local procedure SetPackageTrackingVisibility()

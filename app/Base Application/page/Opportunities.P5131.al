@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Analysis;
+
+using Microsoft.CRM.Opportunity;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 page 5131 Opportunities
 {
     ApplicationArea = RelationshipMgmt;

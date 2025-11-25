@@ -9,7 +9,7 @@ report 10144 "Item Register"
     {
         dataitem("Item Register"; "Item Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Source Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -89,7 +89,7 @@ report 10144 "Item Register"
             }
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 RequestFilterFields = "Item No.", "Entry Type", "Location Code", "Posting Date";
                 column(Item_Ledger_Entry__Posting_Date_; "Posting Date")
                 {

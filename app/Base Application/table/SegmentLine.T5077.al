@@ -1,3 +1,22 @@
+﻿namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Setup;
+using Microsoft.CRM.Task;
+using Microsoft.Sales.Customer;
+using System.Environment;
+using System.Globalization;
+using System.Integration;
+using System.Integration.Word;
+using System.IO;
+using System.Security.AccessControl;
+using System.Security.User;
+using System.Telemetry;
+using System.Utilities;
+
 table 5077 "Segment Line"
 {
     Caption = 'Segment Line';
@@ -179,13 +198,10 @@ table 5077 "Segment Line"
                         if Rec."Interaction Template Code" <> SegmentHeaderGlobal."Interaction Template Code" then begin
                             SegmentHeaderGlobal.CreateSegInteractions(Rec."Interaction Template Code", Rec."Segment No.", Rec."Line No.");
                             Rec."Language Code" := FindLanguage(Rec."Interaction Template Code", ContactGlobal."Language Code");
-                            IsHandled := false;
-                            OnValidateInteractionTemplateCodeOnBeforeGetSegInteractTemplLanguage(Rec, IsHandled);
-                            if not IsHandled then
-                                if SegInteractLanguage.Get(Rec."Segment No.", Rec."Line No.", Rec."Language Code") then begin
-                                    Rec."Attachment No." := SegInteractLanguage."Attachment No.";
-                                    Rec."Word Template Code" := SegInteractLanguage."Word Template Code";
-                                end;
+                            if SegInteractLanguage.Get(Rec."Segment No.", Rec."Line No.", Rec."Language Code") then begin
+                                Rec."Attachment No." := SegInteractLanguage."Attachment No.";
+                                Rec."Word Template Code" := SegInteractLanguage."Word Template Code";
+                            end;
                         end else begin
                             Rec."Language Code" := FindLanguage(Rec."Interaction Template Code", ContactGlobal."Language Code");
                             if SegInteractLanguage.Get(Rec."Segment No.", 0, Rec."Language Code") then begin
@@ -253,8 +269,8 @@ table 5077 "Segment Line"
         }
         field(12; "Contact Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact.Name WHERE("No." = FIELD("Contact No."),
-                                                     Type = CONST(Person)));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact No."),
+                                                     Type = const(Person)));
             Caption = 'Contact Name';
             Editable = false;
             FieldClass = FlowField;
@@ -276,7 +292,7 @@ table 5077 "Segment Line"
         field(15; "Contact Alt. Address Code"; Code[10])
         {
             Caption = 'Contact Alt. Address Code';
-            TableRelation = "Contact Alt. Address".Code WHERE("Contact No." = FIELD("Contact No."));
+            TableRelation = "Contact Alt. Address".Code where("Contact No." = field("Contact No."));
         }
         field(16; Evaluation; Enum "Interaction Evaluation")
         {
@@ -294,8 +310,8 @@ table 5077 "Segment Line"
         }
         field(18; "Contact Company Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact.Name WHERE("No." = FIELD("Contact Company No."),
-                                                     Type = CONST(Company)));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact Company No."),
+                                                     Type = const(Company)));
             Caption = 'Contact Company Name';
             Editable = false;
             FieldClass = FlowField;
@@ -314,16 +330,10 @@ table 5077 "Segment Line"
             var
                 SegInteractLanguage: Record "Segment Interaction Language";
                 InteractTemplLanguage: Record "Interaction Tmpl. Language";
-                IsHandled: Boolean;
             begin
                 Rec.TestField("Interaction Template Code");
 
                 if Rec."Language Code" = xRec."Language Code" then
-                    exit;
-
-                IsHandled := false;
-                OnValidateLanguageCodeOnBeforeGetSegmentHeaderGlobal(Rec, IsHandled);
-                if IsHandled then
                     exit;
 
                 if SegmentHeaderGlobal.Get(Rec."Segment No.") then begin
@@ -383,7 +393,7 @@ table 5077 "Segment Line"
         field(27; "Contact Company No."; Code[20])
         {
             Caption = 'Contact Company No.';
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
         }
         field(28; "Campaign Entry No."; Integer)
         {
@@ -403,8 +413,6 @@ table 5077 "Segment Line"
         field(32; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(33; "Send Word Doc. As Attmt."; Boolean)
         {
@@ -433,7 +441,7 @@ table 5077 "Segment Line"
         }
         field(50; "Contact Phone No."; Text[30])
         {
-            CalcFormula = Lookup(Contact."Phone No." WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact."Phone No." where("No." = field("Contact No.")));
             Caption = 'Contact Phone No.';
             Editable = false;
             FieldClass = FlowField;
@@ -442,7 +450,7 @@ table 5077 "Segment Line"
         }
         field(51; "Contact Mobile Phone No."; Text[30])
         {
-            CalcFormula = Lookup(Contact."Mobile Phone No." WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact."Mobile Phone No." where("No." = field("Contact No.")));
             Caption = 'Contact Mobile Phone No.';
             Editable = false;
             FieldClass = FlowField;
@@ -451,7 +459,7 @@ table 5077 "Segment Line"
         }
         field(52; "Contact Email"; Text[80])
         {
-            CalcFormula = Lookup(Contact."E-Mail" WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact."E-Mail" where("No." = field("Contact No.")));
             Caption = 'Contact Email';
             Editable = false;
             FieldClass = FlowField;
@@ -570,7 +578,6 @@ table 5077 "Segment Line"
         GlobalInteractionTemplate: Record "Interaction Template";
         GlobalAttachment: Record Attachment;
         InterLogEntryCommentLine: Record "Inter. Log Entry Comment Line";
-        TempInterLogEntryCommentLine: Record "Inter. Log Entry Comment Line" temporary;
         AttachmentManagement: Codeunit AttachmentManagement;
         ClientTypeManagement: Codeunit "Client Type Management";
         CampaignTargetGroupMgt: Codeunit "Campaign Target Group Mgt";
@@ -601,6 +608,7 @@ table 5077 "Segment Line"
 
     protected var
         TempAttachment: Record Attachment temporary;
+        TempInterLogEntryCommentLine: Record "Inter. Log Entry Comment Line" temporary;
 
     procedure InitLine()
     var
@@ -835,13 +843,7 @@ table 5077 "Segment Line"
         SegmentInteractionLanguage: Record "Segment Interaction Language";
         InteractionTmplLanguage: Record "Interaction Tmpl. Language";
         InteractionTemplateLocal: Record "Interaction Template";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeFindLanguage(Rec, InteractTmplCode, ContactLanguageCode, Language, IsHandled);
-        if IsHandled then
-            exit;
-
         if SegmentHeaderGlobal.Get("Segment No.") then begin
             if not UniqueAttachmentExists() and
                ("Interaction Template Code" = SegmentHeaderGlobal."Interaction Template Code")
@@ -903,13 +905,7 @@ table 5077 "Segment Line"
     var
         Attachment: Record Attachment;
         InteractionTemplLanguage: Record "Interaction Tmpl. Language";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeSetInteractionAttachment(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         if InteractionTemplLanguage.Get("Interaction Template Code", "Language Code") then
             if Attachment.Get(InteractionTemplLanguage."Attachment No.") then
                 "Attachment No." := InteractionTemplLanguage."Attachment No."
@@ -1237,6 +1233,7 @@ table 5077 "Segment Line"
         HTMLAttachment: Boolean;
         HTMLContentBodyText: Text;
         CustomLayoutCode: Code[20];
+        ReportLayoutName: Text[250];
         ShouldAssignStep: Boolean;
         IsHandled: Boolean;
     begin
@@ -1259,7 +1256,7 @@ table 5077 "Segment Line"
             Send := (IsFinish and ("Correspondence Type" <> "Correspondence Type"::" "));
             OnFinishWizardOnAfterSetSend(Rec, Send);
             if Send and HTMLAttachment then begin
-                TempAttachment.ReadHTMLCustomLayoutAttachment(HTMLContentBodyText, CustomLayoutCode);
+                TempAttachment.ReadHTMLCustomLayoutAttachment(HTMLContentBodyText, CustomLayoutCode, ReportLayoutName);
                 AttachmentManagement.GenerateHTMLContent(TempAttachment, Rec);
             end;
             IsHandled := false;
@@ -1271,7 +1268,10 @@ table 5077 "Segment Line"
                 if HTMLAttachment then begin
                     Clear(TempAttachment);
                     LoadTempAttachment(false);
-                    TempAttachment.WriteHTMLCustomLayoutAttachment(HTMLContentBodyText, CustomLayoutCode);
+                    if CustomLayoutCode <> '' then
+                        TempAttachment.WriteHTMLCustomLayoutAttachment(HTMLContentBodyText, CustomLayoutCode)
+                    else
+                        TempAttachment.WriteHTMLCustomLayoutAttachment(HTMLContentBodyText, ReportLayoutName);
                     Commit();
                 end;
                 if not (ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::Web, CLIENTTYPE::Tablet, CLIENTTYPE::Phone]) then
@@ -1490,10 +1490,14 @@ table 5077 "Segment Line"
     var
         OldContentBodyText: Text;
         CustomLayoutCode: Code[20];
+        ReportLayoutName: Text[250];
     begin
         TempAttachment.Find();
-        TempAttachment.ReadHTMLCustomLayoutAttachment(OldContentBodyText, CustomLayoutCode);
-        TempAttachment.WriteHTMLCustomLayoutAttachment(NewContentBodyText, CustomLayoutCode);
+        TempAttachment.ReadHTMLCustomLayoutAttachment(OldContentBodyText, CustomLayoutCode, ReportLayoutName);
+        if CustomLayoutCode <> '' then
+            TempAttachment.WriteHTMLCustomLayoutAttachment(NewContentBodyText, CustomLayoutCode)
+        else
+            TempAttachment.WriteHTMLCustomLayoutAttachment(NewContentBodyText, ReportLayoutName);
     end;
 
     procedure ProcessPostponedAttachment()
@@ -1909,26 +1913,6 @@ table 5077 "Segment Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnFinishSegLineWizardBeforeLogInteraction(var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateInteractionTemplateCodeOnBeforeGetSegInteractTemplLanguage(var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateLanguageCodeOnBeforeGetSegmentHeaderGlobal(var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindLanguage(var SegmentLine: Record "Segment Line"; InteractTmplCode: Code[10]; ContactLanguageCode: Code[10]; var Language: Code[10]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetInteractionAttachment(var SegmentLine: Record "Segment Line"; var IsHandled: Boolean)
     begin
     end;
 }

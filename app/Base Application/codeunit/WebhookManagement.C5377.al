@@ -1,3 +1,11 @@
+﻿namespace System.Integration;
+
+using Microsoft.Foundation.Company;
+using System;
+using System.Environment;
+using System.Security.AccessControl;
+using System.Utilities;
+
 codeunit 5377 "Webhook Management"
 {
 

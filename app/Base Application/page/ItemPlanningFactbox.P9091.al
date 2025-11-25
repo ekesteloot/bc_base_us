@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 page 9091 "Item Planning FactBox"
 {
     Caption = 'Item Details - Planning';

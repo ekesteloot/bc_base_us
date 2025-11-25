@@ -9,7 +9,7 @@ report 10162 "Top __ Inventory Items"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Inventory Posting Group", "Date Filter", "Location Filter", "Base Unit of Measure";
             column(MainTitle; MainTitle)
             {
@@ -169,7 +169,7 @@ report 10162 "Top __ Inventory Items"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             MaxIteration = 99;
             column(Integer_Number; Number)
             {

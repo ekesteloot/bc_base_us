@@ -1,7 +1,18 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 33 "Reconcile Cust. and Vend. Accs"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/ReconcileCustandVendAccs.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/ReconcileCustandVendAccs.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Reconcile Customer and Vendor Accounts';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +21,7 @@ report 33 "Reconcile Cust. and Vend. Accs"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Date Filter";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
@@ -60,7 +71,7 @@ report 33 "Reconcile Cust. and Vend. Accs"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(ReconCustVendBufferCurrcode; ReconCustVendBuffer."Currency code")
                 {
                 }

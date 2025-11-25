@@ -1,7 +1,7 @@
 report 1010 "Job WIP To G/L"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Jobs/JobWIPToGL.rdlc';
+    RDLCLayout = './ProjectMgt/Jobs/Reports/JobWIPToGL.rdlc';
     AdditionalSearchTerms = 'work in process to general ledger,work in progress to general ledger';
     ApplicationArea = Jobs;
     Caption = 'Job WIP To G/L';
@@ -11,7 +11,7 @@ report 1010 "Job WIP To G/L"
     {
         dataitem(Job; Job)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Posting Date Filter";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -60,7 +60,7 @@ report 1010 "Job WIP To G/L"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(GLAcc__No__; GLAcc."No.")
             {
             }

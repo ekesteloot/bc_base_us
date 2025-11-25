@@ -1,14 +1,24 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.StandardCost;
+using System.Utilities;
+
 report 5811 "Calc. Inventory Value - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/CalcInventoryValueTest.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/CalcInventoryValueTest.rdlc';
     Caption = 'Calc. Inventory Value - Test';
 
     dataset
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -54,7 +64,7 @@ report 5811 "Calc. Inventory Value - Test"
         }
         dataitem(ItemLedgEntryErrBufLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(ItemLedgEntryErrBuf__Document_Date_; Format(ItemLedgEntryErrBuf."Document Date"))
             {
             }
@@ -120,7 +130,7 @@ report 5811 "Calc. Inventory Value - Test"
         }
         dataitem(ProdBOMVersionErrBufLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(Text002; Text002Lbl)
             {
             }
@@ -182,7 +192,7 @@ report 5811 "Calc. Inventory Value - Test"
         }
         dataitem(RtngVersionErrBufLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(Text003; Text003Lbl)
             {
             }
@@ -351,11 +361,8 @@ report 5811 "Calc. Inventory Value - Test"
         ItemFilter: Text;
         Text000: Label 'Posting Date of %1';
         OK: Boolean;
-        [InDataSet]
         ByLocationEnable: Boolean;
-        [InDataSet]
         ByVariantEnable: Boolean;
-        [InDataSet]
         CalcBaseEnable: Boolean;
         Text005: Label 'You cannot enter a %1.';
         Text006: Label 'You must enter a posting date.';

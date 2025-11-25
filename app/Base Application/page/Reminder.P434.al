@@ -1,3 +1,14 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reports;
+
 page 434 Reminder
 {
     Caption = 'Reminder';
@@ -20,7 +31,7 @@ page 434 Reminder
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -33,7 +44,7 @@ page 434 Reminder
 
                     trigger OnValidate()
                     begin
-                        ContactCustomer.GetPrimaryContact("Customer No.", PrimaryContact);
+                        ContactCustomer.GetPrimaryContact(Rec."Customer No.", PrimaryContact);
                     end;
                 }
                 field(Name; Rec.Name)
@@ -42,7 +53,7 @@ page 434 Reminder
                     Importance = Promoted;
                     ToolTip = 'Specifies the name of the customer the reminder is for.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     QuickEntry = false;
@@ -54,13 +65,13 @@ page 434 Reminder
                     QuickEntry = false;
                     ToolTip = 'Specifies additional address information.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     QuickEntry = false;
                     ToolTip = 'Specifies the city name of the customer the reminder is for.';
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     Caption = 'State / ZIP Code';
                     ToolTip = 'Specifies the customer''s state and postal code on the reminder.';
@@ -71,7 +82,7 @@ page 434 Reminder
                     QuickEntry = false;
                     ToolTip = 'Specifies the postal code.';
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the person you regularly contact when you communicate with the customer the reminder is for.';
@@ -141,7 +152,7 @@ page 434 Reminder
             part(ReminderLines; "Reminder Lines")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Reminder No." = FIELD("No.");
+                SubPageLink = "Reminder No." = field("No.");
             }
             group(Posting)
             {
@@ -173,11 +184,11 @@ page 434 Reminder
 
                     trigger OnAssistEdit()
                     begin
-                        TestField("Posting Date");
+                        Rec.TestField("Posting Date");
                         ChangeExchangeRate.SetParameter(
-                          "Currency Code",
-                          CurrExchRate.ExchangeRate("Posting Date", "Currency Code"),
-                          "Posting Date");
+                          Rec."Currency Code",
+                          CurrExchRate.ExchangeRate(Rec."Posting Date", Rec."Currency Code"),
+                          Rec."Posting Date");
                         ChangeExchangeRate.Editable(false);
                         if ChangeExchangeRate.RunModal() = ACTION::OK then;
                         Clear(ChangeExchangeRate);
@@ -212,7 +223,7 @@ page 434 Reminder
             {
                 ApplicationArea = Basic, Suite;
                 Provider = ReminderLines;
-                SubPageLink = "Entry No." = FIELD("Entry No.");
+                SubPageLink = "Entry No." = field("Entry No.");
             }
             systempart(Control1905767507; Notes)
             {
@@ -250,8 +261,8 @@ page 434 Reminder
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Reminder Comment Sheet";
-                    RunPageLink = Type = CONST(Reminder),
-                                  "No." = FIELD("No.");
+                    RunPageLink = Type = const(Reminder),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("C&ustomer")
@@ -260,7 +271,7 @@ page 434 Reminder
                     Caption = 'C&ustomer';
                     Image = Customer;
                     RunObject = Page "Customer List";
-                    RunPageLink = "No." = FIELD("Customer No.");
+                    RunPageLink = "No." = field("Customer No.");
                     ToolTip = 'Open the card of the customer that the reminder or finance charge applies to. ';
                 }
                 action(Dimensions)
@@ -268,14 +279,14 @@ page 434 Reminder
                     AccessByPermission = TableData Dimension = R;
                     ApplicationArea = Dimensions;
                     Caption = 'Dimensions';
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = Dimensions;
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -288,7 +299,7 @@ page 434 Reminder
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Reminder Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -498,15 +509,15 @@ page 434 Reminder
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SaveRecord();
-        exit(ConfirmDeletion());
+        exit(Rec.ConfirmDeletion());
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        if (not DocNoVisible) and ("No." = '') then begin
-            SetCustomerFromFilter();
-            if "Customer No." <> '' then
-                SetReminderNo();
+        if (not DocNoVisible) and (Rec."No." = '') then begin
+            Rec.SetCustomerFromFilter();
+            if Rec."Customer No." <> '' then
+                Rec.SetReminderNo();
         end;
     end;
 
@@ -522,7 +533,7 @@ page 434 Reminder
 
     trigger OnAfterGetRecord()
     begin
-        ContactCustomer.GetPrimaryContact("Customer No.", PrimaryContact);
+        ContactCustomer.GetPrimaryContact(Rec."Customer No.", PrimaryContact);
     end;
 
     var
@@ -533,7 +544,6 @@ page 434 Reminder
         ChangeExchangeRate: Page "Change Exchange Rate";
         DocNoVisible: Boolean;
         IsOfficeAddin: Boolean;
-        [InDataSet]
         VATDateEnabled: Boolean;
 
     local procedure SetDocNoVisible()
@@ -541,7 +551,7 @@ page 434 Reminder
         DocumentNoVisibility: Codeunit DocumentNoVisibility;
         DocType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order",Reminder,FinChMemo;
     begin
-        DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::Reminder, "No.");
+        DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::Reminder, Rec."No.");
     end;
 }
 

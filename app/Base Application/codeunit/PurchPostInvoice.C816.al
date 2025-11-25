@@ -1,4 +1,20 @@
-﻿codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
+﻿namespace Microsoft.Purchases.Posting;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.ProjectMgt.Jobs.Posting;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Setup;
+
+codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
 {
     Permissions = TableData "Invoice Posting Buffer" = rimd;
 
@@ -474,15 +490,15 @@
                 PurchHeader.GetUseDate(), PurchHeader."Currency Code", TotalPurchLine."Pmt. Discount Amount", PurchHeader."Currency Factor");
 
         if InvoicePostingBuffer.Type <> InvoicePostingBuffer.Type::"Prepmt. Exch. Rate Difference" then
-            GenJnlLine."Gen. Posting Type" := "General Posting Type"::Purchase;
+            GenJnlLine."Gen. Posting Type" := GenJnlLine."Gen. Posting Type"::Purchase;
         if InvoicePostingBuffer.Type = InvoicePostingBuffer.Type::"Fixed Asset" then begin
             case InvoicePostingBuffer."FA Posting Type" of
                 InvoicePostingBuffer."FA Posting Type"::"Acquisition Cost":
-                    GenJnlLine."FA Posting Type" := "Gen. Journal Line FA Posting Type"::"Acquisition Cost";
+                    GenJnlLine."FA Posting Type" := GenJnlLine."FA Posting Type"::"Acquisition Cost";
                 InvoicePostingBuffer."FA Posting Type"::Maintenance:
-                    GenJnlLine."FA Posting Type" := "Gen. Journal Line FA Posting Type"::Maintenance;
+                    GenJnlLine."FA Posting Type" := GenJnlLine."FA Posting Type"::Maintenance;
                 InvoicePostingBuffer."FA Posting Type"::Appreciation:
-                    GenJnlLine."FA Posting Type" := "Gen. Journal Line FA Posting Type"::Appreciation;
+                    GenJnlLine."FA Posting Type" := GenJnlLine."FA Posting Type"::Appreciation;
             end;
             InvoicePostingBuffer.CopyToGenJnlLineFA(GenJnlLine);
         end;
@@ -582,7 +598,7 @@
             InvoicePostingParameters."Document Type", InvoicePostingParameters."Document No.",
             InvoicePostingParameters."External Document No.", InvoicePostingParameters."Source Code", '');
 
-        GenJnlLine."Account Type" := "Gen. Journal Account Type"::Vendor;
+        GenJnlLine."Account Type" := GenJnlLine."Account Type"::Vendor;
         GenJnlLine."Account No." := PurchHeader."Pay-to Vendor No.";
         GenJnlLine.CopyFromPurchHeader(PurchHeader);
         GenJnlLine.SetCurrencyFactor(PurchHeader."Currency Code", PurchHeader."Currency Factor");
@@ -655,18 +671,18 @@
         PurchPostInvoiceEvents.RunOnPostBalancingEntryOnAfterInitNewLine(GenJnlLine, PurchHeader);
 
         GenJnlLine.CopyDocumentFields(
-            "Gen. Journal Document Type"::" ", InvoicePostingParameters."Document No.",
+            GenJnlLine."Document Type"::" ", InvoicePostingParameters."Document No.",
             InvoicePostingParameters."External Document No.", InvoicePostingParameters."Source Code", '');
 
-        GenJnlLine."Account Type" := "Gen. Journal Account Type"::Vendor;
+        GenJnlLine."Account Type" := GenJnlLine."Account Type"::Vendor;
         GenJnlLine."Account No." := PurchHeader."Pay-to Vendor No.";
         GenJnlLine.CopyFromPurchHeader(PurchHeader);
         GenJnlLine.SetCurrencyFactor(PurchHeader."Currency Code", PurchHeader."Currency Factor");
 
         if PurchHeader.IsCreditDocType() then
-            GenJnlLine."Document Type" := "Gen. Journal Document Type"::Refund
+            GenJnlLine."Document Type" := GenJnlLine."Document Type"::Refund
         else
-            GenJnlLine."Document Type" := "Gen. Journal Document Type"::Payment;
+            GenJnlLine."Document Type" := GenJnlLine."Document Type"::Payment;
 
         SetApplyToDocNo(PurchHeader, GenJnlLine);
 
@@ -708,7 +724,7 @@
     local procedure SetApplyToDocNo(PurchHeader: Record "Purchase Header"; var GenJnlLine: Record "Gen. Journal Line")
     begin
         if PurchHeader."Bal. Account Type" = PurchHeader."Bal. Account Type"::"Bank Account" then
-            GenJnlLine."Bal. Account Type" := "Gen. Journal Account Type"::"Bank Account";
+            GenJnlLine."Bal. Account Type" := GenJnlLine."Bal. Account Type"::"Bank Account";
         GenJnlLine."Bal. Account No." := PurchHeader."Bal. Account No.";
         GenJnlLine."Applies-to Doc. Type" := InvoicePostingParameters."Document Type";
         GenJnlLine."Applies-to Doc. No." := InvoicePostingParameters."Document No.";
@@ -792,6 +808,7 @@
                             VATAmount := VATBaseAmount * VATPostingSetup."VAT %" / 100;
                             VATAmountACY := VATBaseAmountACY * VATPostingSetup."VAT %" / 100;
 
+                            PurchPostInvoiceEvents.RunOnCalculateVATAmountInBufferOnBeforeTempInvoicePostingBufferAssign(VATAmount, VATAmountACY, TempInvoicePostingBuffer);
                             TempInvoicePostingBufferReverseCharge := InvoicePostingBuffer;
                             if TempInvoicePostingBufferReverseCharge.Find() then begin
                                 VATAmountRemainder += VATAmount;
@@ -1023,276 +1040,4 @@
                 else
                     GenPostingSetup.Get(PurchLine."Gen. Bus. Posting Group", PurchLine."Gen. Prod. Posting Group");
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCalcInvoiceDiscountPosting(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; PurchLineACY: Record "Purchase Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCalcLineDiscountPosting(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; PurchLineACY: Record "Purchase Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreatePostedDeferralSchedule(PurchLine: Record "Purchase Line"; var PostedDeferralHeader: Record "Posted Deferral Header")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterGetPurchAccount(PurchLine: Record "Purchase Line"; GenPostingSetup: Record "General Posting Setup"; var SalesAccountNo: Code[20])
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterInitTotalAmounts(PurchLine: Record "Purchase Line"; PurchLineACY: Record "Purchase Line"; var TotalVAT: Decimal; var TotalVATACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; var TotalVATBase: Decimal; var TotalVATBaseACY: Decimal)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPrepareGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; PurchHeader: Record "Purchase Header"; InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetJobLineFilters(var JobPurchLine: Record "Purchase Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetApplyToDocNo(var GenJournalLine: Record "Gen. Journal Line"; PurchaseHeader: Record "Purchase Header")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcInvoiceDiscountPosting(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; PurchLineACY: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcLineDiscountPosting(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; PurchLineACY: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalculateVATAmounts(PurchHeader: Record "Purchase Header"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; PurchHeader: Record "Purchase Header"; InvoicePostingBuffer: Record "Invoice Posting Buffer"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInitGenJnlLineAmountFieldsFromTotalPurchLine(var GenJnlLine: Record "Gen. Journal Line"; var PurchHeader: Record "Purchase Header"; var TotalPurchLine: Record "Purchase Line"; var TotalPurchLineLCY: Record "Purchase Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostLines(PurchHeader: Record "Purchase Header"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostBalancingEntryOnAfterGenJnlPostLine(var GenJnlLine: Record "Gen. Journal Line"; var PurchHeader: Record "Purchase Header"; var TotalPurchLine: Record "Purchase Line"; var TotalPurchLineLCY: Record "Purchase Line"; PreviewMode: Boolean; CommitIsSupressed: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostLedgerEntryOnAfterGenJnlPostLine(var GenJnlLine: Record "Gen. Journal Line"; var PurchHeader: Record "Purchase Header"; var TotalPurchLine: Record "Purchase Line"; var TotalPurchLineLCY: Record "Purchase Line"; PreviewMode: Boolean; CommitIsSupressed: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostBalancingEntryOnBeforeGenJnlPostLine(var GenJnlLine: Record "Gen. Journal Line"; var PurchHeader: Record "Purchase Header"; var TotalPurchLine: Record "Purchase Line"; var TotalPurchLineLCY: Record "Purchase Line"; PreviewMode: Boolean; CommitIsSupressed: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostLedgerEntryOnBeforeGenJnlPostLine(var GenJnlLine: Record "Gen. Journal Line"; var PurchHeader: Record "Purchase Header"; var TotalPurchLine: Record "Purchase Line"; var TotalPurchLineLCY: Record "Purchase Line"; PreviewMode: Boolean; CommitIsSupressed: Boolean; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePrepareLine(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; PurchLineACY: Record "Purchase Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePrepareLineFADiscount(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; GenPostingSetup: Record "General Posting Setup"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforePostLedgerEntry(var PurchHeader: Record "Purchase Header"; TotalPurchLine: Record "Purchase Line"; TotalPurchLineLCY: Record "Purchase Line"; InvoicePostingParameters: Record "Invoice Posting Parameters"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTempDeferralLineInsert(var TempDeferralLine: Record "Deferral Line" temporary; DeferralLine: Record "Deferral Line"; PurchLine: Record "Purchase Line"; var DeferralCount: Integer; var TotalDeferralCount: Integer)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnCalculateVATAmountsOnAfterGetReverseChargeVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterAssignAmounts(PurchLine: Record "Purchase Line"; PurchLineACY: Record "Purchase Line"; var TotalAmount: Decimal; var TotalAmountACY: Decimal)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterSetAmounts(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; PurchLine: Record "Purchase Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterFillInvoicePostingBuffer(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; PurchLine: Record "Purchase Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeAdjustTotalAmounts(PurchLine: Record "Purchase Line"; var TotalAmount: Decimal; var TotalAmountACY: Decimal; UseDate: Date)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeSetAccount(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; var SalesAccount: Code[20])
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeSetAmounts(PurchLine: Record "Purchase Line"; PurchLineACY: Record "Purchase Line"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TotalVAT: Decimal; var TotalVATACY: Decimal; var TotalAmount: Decimal; var TotalAmountACY: Decimal; var TotalVATBase: Decimal; var TotalVATBaseACY: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterSetInvoiceDiscAccount(PurchLine: Record "Purchase Line"; GenPostingSetup: Record "General Posting Setup"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterSetLineDiscAccount(PurchLine: Record "Purchase Line"; GenPostingSetup: Record "General Posting Setup"; var InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeCalcInvoiceDiscountPosting(var TempInvoicePostingBuffer: Record "Invoice Posting Buffer"; var nvoicePostingBuffer: Record "Invoice Posting Buffer"; PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; TotalVAT: Decimal; TotalVATACY: Decimal; TotalAmount: Decimal; TotalAmountACY: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeCalcLineDiscountPosting(var TempInvoicePostingBuffer: Record "Invoice Posting Buffer"; var nvoicePostingBuffer: Record "Invoice Posting Buffer"; PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; TotalVAT: Decimal; TotalVATACY: Decimal; TotalAmount: Decimal; TotalAmountACY: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostLinesOnAfterGenJnlLinePost(var GenJnlLine: Record "Gen. Journal Line"; PurchHeader: Record "Purchase Header"; TempInvoicePostingBuffer: Record "Invoice Posting Buffer"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PreviewMode: Boolean; SuppressCommit: Boolean; GLEntryNo: Integer)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPostLinesOnBeforeGenJnlLinePost(var GenJnlLine: Record "Gen. Journal Line"; PurchHeader: Record "Purchase Header"; TempInvoicePostingBuffer: Record "Invoice Posting Buffer"; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; PreviewMode: Boolean; SuppressCommit: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareGenJnlLineOnAfterCopyToGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; PurchHeader: Record "Purchase Header"; InvoicePostingBuffer: Record "Invoice Posting Buffer")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterSetInvoiceDiscountPosting(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; var InvoiceDiscountPosting: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterSetLineDiscountPosting(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; var LineDiscountPosting: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterPrepareDeferralLine(PurchLine: Record "Purchase Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer"; UseDate: Date; InvDefLineNo: Integer; DeferralLineNo: Integer; SuppressCommit: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnAfterUpdateInvoicePostingBuffer(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer"; var TempInvoicePostingBuffer: Record "Invoice Posting Buffer" temporary)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforePrepareDeferralLine(PurchLine: Record "Purchase Line"; InvoicePostingBuffer: Record "Invoice Posting Buffer"; UseDate: Date; InvDefLineNo: Integer; DeferralLineNo: Integer; SuppressCommit: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforePreparePurchase(PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line")
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeSetInvoiceDiscAccount(PurchLine: Record "Purchase Line"; GenPostingSetup: Record "General Posting Setup"; var InvDiscAccount: Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareLineOnBeforeSetLineDiscAccount(PurchLine: Record "Purchase Line"; GenPostingSetup: Record "General Posting Setup"; var InvDiscAccount: Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-
-    [Obsolete('Replaced by run event procedure in codeunit Purch. Post Invoice Events', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnPrepareDeferralLineOnBeforeDeferralPostingBufferPrepareInitialAmounts(var DeferralPostBuffer: Record "Deferral Posting Buffer"; PurchHeader: Record "Purchase Header"; PurchLine: Record "Purchase Line"; AmountLCY: Decimal; AmountACY: Decimal; RemainAmtToDefer: Decimal; RemainAmtToDeferACY: Decimal; DeferralAccount: Code[20]; PurchAccount: Code[20])
-    begin
-    end;
-#endif
 }

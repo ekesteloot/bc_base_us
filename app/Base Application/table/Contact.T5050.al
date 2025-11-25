@@ -1,4 +1,38 @@
-﻿table 5050 Contact
+﻿namespace Microsoft.CRM.Contact;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Duplicates;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Outlook;
+using Microsoft.CRM.Profiling;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Setup;
+using Microsoft.CRM.Task;
+using Microsoft.CRM.Team;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Integration.Dataverse;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Pricing.Source;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using System;
+using System.Date;
+using System.Email;
+using System.Environment;
+using System.Globalization;
+using System.Reflection;
+using System.Security.User;
+using System.Utilities;
+
+table 5050 Contact
 {
     Caption = 'Contact';
     DataCaptionFields = "No.", Name;
@@ -22,7 +56,9 @@
                   tabledata "Salesperson/Purchaser" = R,
                   tabledata "Marketing Setup" = r,
                   tabledata Salutation = r,
-                  tabledata "Salutation Formula" = r;
+                  tabledata "Salutation Formula" = r,
+                  tabledata Language = r,
+                  tabledata "Language Selection" = r;
 
     fields
     {
@@ -75,11 +111,9 @@
         field(7; City; Text[30])
         {
             Caption = 'City';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -136,6 +170,11 @@
         {
             Caption = 'Language Code';
             TableRelation = Language;
+
+            trigger OnValidate()
+            begin
+                UpdateFormatRegion();
+            end;
         }
         field(25; "Registration Number"; Text[50])
         {
@@ -178,12 +217,17 @@
         }
         field(38; Comment; Boolean)
         {
-            CalcFormula = Exist("Rlshp. Mgt. Comment Line" WHERE("Table Name" = CONST(Contact),
-                                                                  "No." = FIELD("No."),
-                                                                  "Sub No." = CONST(0)));
+            CalcFormula = exist("Rlshp. Mgt. Comment Line" where("Table Name" = const(Contact),
+                                                                  "No." = field("No."),
+                                                                  "Sub No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(48; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
         }
         field(54; "Last Date Modified"; Date)
         {
@@ -227,11 +271,9 @@
         field(91; "Post Code"; Code[20])
         {
             Caption = 'Post Code';
-            TableRelation = IF ("Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Country/Region Code"));
             ValidateTableRelation = false;
 
             trigger OnLookup()
@@ -364,7 +406,7 @@
         field(5051; "Company No."; Code[20])
         {
             Caption = 'Company No.';
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
 
             trigger OnValidate()
             var
@@ -389,7 +431,7 @@
         field(5052; "Company Name"; Text[100])
         {
             Caption = 'Company Name';
-            TableRelation = Contact.Name WHERE(Type = CONST(Company));
+            TableRelation = Contact.Name where(Type = const(Company));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -485,58 +527,58 @@
         }
         field(5066; "Next Task Date"; Date)
         {
-            CalcFormula = Min("To-do".Date WHERE("Contact Company No." = FIELD("Company No."),
-                                                  "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                                  Closed = CONST(false),
-                                                  "System To-do Type" = CONST("Contact Attendee")));
+            CalcFormula = min("To-do".Date where("Contact Company No." = field("Company No."),
+                                                  "Contact No." = field(FILTER("Lookup Contact No.")),
+                                                  Closed = const(false),
+                                                  "System To-do Type" = const("Contact Attendee")));
             Caption = 'Next Task Date';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5067; "Last Date Attempted"; Date)
         {
-            CalcFormula = Max("Interaction Log Entry".Date WHERE("Contact Company No." = FIELD("Company No."),
-                                                                  "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                                                  "Initiated By" = CONST(Us),
-                                                                  Postponed = CONST(false)));
+            CalcFormula = max("Interaction Log Entry".Date where("Contact Company No." = field("Company No."),
+                                                                  "Contact No." = field(FILTER("Lookup Contact No.")),
+                                                                  "Initiated By" = const(Us),
+                                                                  Postponed = const(false)));
             Caption = 'Last Date Attempted';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5068; "Date of Last Interaction"; Date)
         {
-            CalcFormula = Max("Interaction Log Entry".Date WHERE("Contact Company No." = FIELD("Company No."),
-                                                                  "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                                                  "Attempt Failed" = CONST(false),
-                                                                  Postponed = CONST(false)));
+            CalcFormula = max("Interaction Log Entry".Date where("Contact Company No." = field("Company No."),
+                                                                  "Contact No." = field(FILTER("Lookup Contact No.")),
+                                                                  "Attempt Failed" = const(false),
+                                                                  Postponed = const(false)));
             Caption = 'Date of Last Interaction';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5069; "No. of Job Responsibilities"; Integer)
         {
-            CalcFormula = Count("Contact Job Responsibility" WHERE("Contact No." = FIELD("No.")));
+            CalcFormula = count("Contact Job Responsibility" where("Contact No." = field("No.")));
             Caption = 'No. of Job Responsibilities';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5070; "No. of Industry Groups"; Integer)
         {
-            CalcFormula = Count("Contact Industry Group" WHERE("Contact No." = FIELD("Company No.")));
+            CalcFormula = count("Contact Industry Group" where("Contact No." = field("Company No.")));
             Caption = 'No. of Industry Groups';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5071; "No. of Business Relations"; Integer)
         {
-            CalcFormula = Count("Contact Business Relation" WHERE("Contact No." = FIELD("Company No.")));
+            CalcFormula = count("Contact Business Relation" where("Contact No." = field("Company No.")));
             Caption = 'No. of Business Relations';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5072; "No. of Mailing Groups"; Integer)
         {
-            CalcFormula = Count("Contact Mailing Group" WHERE("Contact No." = FIELD("No.")));
+            CalcFormula = count("Contact Mailing Group" where("Contact No." = field("No.")));
             Caption = 'No. of Mailing Groups';
             Editable = false;
             FieldClass = FlowField;
@@ -547,11 +589,11 @@
         }
         field(5074; "No. of Interactions"; Integer)
         {
-            CalcFormula = Count("Interaction Log Entry" WHERE("Contact Company No." = FIELD(FILTER("Company No.")),
-                                                               Canceled = CONST(false),
-                                                               "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                                               Date = FIELD("Date Filter"),
-                                                               Postponed = CONST(false)));
+            CalcFormula = count("Interaction Log Entry" where("Contact Company No." = field(FILTER("Company No.")),
+                                                               Canceled = const(false),
+                                                               "Contact No." = field(FILTER("Lookup Contact No.")),
+                                                               Date = field("Date Filter"),
+                                                               Postponed = const(false)));
             Caption = 'No. of Interactions';
             Editable = false;
             FieldClass = FlowField;
@@ -567,22 +609,22 @@
         field(5076; "Cost (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Interaction Log Entry"."Cost (LCY)" WHERE("Contact Company No." = FIELD("Company No."),
-                                                                          Canceled = CONST(false),
-                                                                          "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                                                          Date = FIELD("Date Filter"),
-                                                                          Postponed = CONST(false)));
+            CalcFormula = sum("Interaction Log Entry"."Cost (LCY)" where("Contact Company No." = field("Company No."),
+                                                                          Canceled = const(false),
+                                                                          "Contact No." = field(FILTER("Lookup Contact No.")),
+                                                                          Date = field("Date Filter"),
+                                                                          Postponed = const(false)));
             Caption = 'Cost (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5077; "Duration (Min.)"; Decimal)
         {
-            CalcFormula = Sum("Interaction Log Entry"."Duration (Min.)" WHERE("Contact Company No." = FIELD("Company No."),
-                                                                               Canceled = CONST(false),
-                                                                               "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                                                               Date = FIELD("Date Filter"),
-                                                                               Postponed = CONST(false)));
+            CalcFormula = sum("Interaction Log Entry"."Duration (Min.)" where("Contact Company No." = field("Company No."),
+                                                                               Canceled = const(false),
+                                                                               "Contact No." = field(FILTER("Lookup Contact No.")),
+                                                                               Date = field("Date Filter"),
+                                                                               Postponed = const(false)));
             Caption = 'Duration (Min.)';
             DecimalPlaces = 0 : 0;
             Editable = false;
@@ -590,11 +632,11 @@
         }
         field(5078; "No. of Opportunities"; Integer)
         {
-            CalcFormula = Count("Opportunity Entry" WHERE(Active = CONST(true),
-                                                           "Contact Company No." = FIELD("Company No."),
-                                                           "Estimated Close Date" = FIELD("Date Filter"),
-                                                           "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                                           "Action Taken" = FIELD("Action Taken Filter")));
+            CalcFormula = count("Opportunity Entry" where(Active = const(true),
+                                                           "Contact Company No." = field("Company No."),
+                                                           "Estimated Close Date" = field("Date Filter"),
+                                                           "Contact No." = field(FILTER("Lookup Contact No.")),
+                                                           "Action Taken" = field("Action Taken Filter")));
             Caption = 'No. of Opportunities';
             Editable = false;
             FieldClass = FlowField;
@@ -602,11 +644,11 @@
         field(5079; "Estimated Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Opportunity Entry"."Estimated Value (LCY)" WHERE(Active = CONST(true),
-                                                                                 "Contact Company No." = FIELD("Company No."),
-                                                                                 "Estimated Close Date" = FIELD("Date Filter"),
-                                                                                 "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                                                                 "Action Taken" = FIELD("Action Taken Filter")));
+            CalcFormula = sum("Opportunity Entry"."Estimated Value (LCY)" where(Active = const(true),
+                                                                                 "Contact Company No." = field("Company No."),
+                                                                                 "Estimated Close Date" = field("Date Filter"),
+                                                                                 "Contact No." = field(FILTER("Lookup Contact No.")),
+                                                                                 "Action Taken" = field("Action Taken Filter")));
             Caption = 'Estimated Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -614,47 +656,47 @@
         field(5080; "Calcd. Current Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Opportunity Entry"."Calcd. Current Value (LCY)" WHERE(Active = CONST(true),
-                                                                                      "Contact Company No." = FIELD("Company No."),
-                                                                                      "Estimated Close Date" = FIELD("Date Filter"),
-                                                                                      "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                                                                      "Action Taken" = FIELD("Action Taken Filter")));
+            CalcFormula = sum("Opportunity Entry"."Calcd. Current Value (LCY)" where(Active = const(true),
+                                                                                      "Contact Company No." = field("Company No."),
+                                                                                      "Estimated Close Date" = field("Date Filter"),
+                                                                                      "Contact No." = field(FILTER("Lookup Contact No.")),
+                                                                                      "Action Taken" = field("Action Taken Filter")));
             Caption = 'Calcd. Current Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5082; "Opportunity Entry Exists"; Boolean)
         {
-            CalcFormula = Exist("Opportunity Entry" WHERE(Active = CONST(true),
-                                                           "Contact Company No." = FIELD("Company No."),
-                                                           "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                                           "Sales Cycle Code" = FIELD("Sales Cycle Filter"),
-                                                           "Sales Cycle Stage" = FIELD("Sales Cycle Stage Filter"),
-                                                           "Salesperson Code" = FIELD("Salesperson Filter"),
-                                                           "Campaign No." = FIELD("Campaign Filter"),
-                                                           "Action Taken" = FIELD("Action Taken Filter"),
-                                                           "Estimated Value (LCY)" = FIELD("Estimated Value Filter"),
-                                                           "Calcd. Current Value (LCY)" = FIELD("Calcd. Current Value Filter"),
-                                                           "Completed %" = FIELD("Completed % Filter"),
-                                                           "Chances of Success %" = FIELD("Chances of Success % Filter"),
-                                                           "Probability %" = FIELD("Probability % Filter"),
-                                                           "Estimated Close Date" = FIELD("Date Filter"),
-                                                           "Close Opportunity Code" = FIELD("Close Opportunity Filter")));
+            CalcFormula = exist("Opportunity Entry" where(Active = const(true),
+                                                           "Contact Company No." = field("Company No."),
+                                                           "Contact No." = field(FILTER("Lookup Contact No.")),
+                                                           "Sales Cycle Code" = field("Sales Cycle Filter"),
+                                                           "Sales Cycle Stage" = field("Sales Cycle Stage Filter"),
+                                                           "Salesperson Code" = field("Salesperson Filter"),
+                                                           "Campaign No." = field("Campaign Filter"),
+                                                           "Action Taken" = field("Action Taken Filter"),
+                                                           "Estimated Value (LCY)" = field("Estimated Value Filter"),
+                                                           "Calcd. Current Value (LCY)" = field("Calcd. Current Value Filter"),
+                                                           "Completed %" = field("Completed % Filter"),
+                                                           "Chances of Success %" = field("Chances of Success % Filter"),
+                                                           "Probability %" = field("Probability % Filter"),
+                                                           "Estimated Close Date" = field("Date Filter"),
+                                                           "Close Opportunity Code" = field("Close Opportunity Filter")));
             Caption = 'Opportunity Entry Exists';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5083; "Task Entry Exists"; Boolean)
         {
-            CalcFormula = Exist("To-do" WHERE("Contact Company No." = FIELD("Company No."),
-                                               "Contact No." = FIELD(FILTER("Lookup Contact No.")),
-                                               "Team Code" = FIELD("Team Filter"),
-                                               "Salesperson Code" = FIELD("Salesperson Filter"),
-                                               "Campaign No." = FIELD("Campaign Filter"),
-                                               Date = FIELD("Date Filter"),
-                                               Status = FIELD("Task Status Filter"),
-                                               Priority = FIELD("Priority Filter"),
-                                               Closed = FIELD("Task Closed Filter")));
+            CalcFormula = exist("To-do" where("Contact Company No." = field("Company No."),
+                                               "Contact No." = field(FILTER("Lookup Contact No.")),
+                                               "Team Code" = field("Team Filter"),
+                                               "Salesperson Code" = field("Salesperson Filter"),
+                                               "Campaign No." = field("Campaign Filter"),
+                                               Date = field("Date Filter"),
+                                               Status = field("Task Status Filter"),
+                                               Priority = field("Priority Filter"),
+                                               Closed = field("Task Closed Filter")));
             Caption = 'Task Entry Exists';
             Editable = false;
             FieldClass = FlowField;
@@ -693,7 +735,7 @@
         {
             Caption = 'Sales Cycle Stage Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Sales Cycle Stage".Stage WHERE("Sales Cycle Code" = FIELD("Sales Cycle Filter"));
+            TableRelation = "Sales Cycle Stage".Stage where("Sales Cycle Code" = field("Sales Cycle Filter"));
         }
         field(5090; "Probability % Filter"; Decimal)
         {
@@ -1061,6 +1103,8 @@
                 "Country/Region Code" := RMSetup."Default Country/Region Code";
             if "Language Code" = '' then
                 "Language Code" := RMSetup."Default Language Code";
+            if "Format Region" = '' then
+                "Format Region" := RMSetup."Default Format Region";
             if "Correspondence Type" = "Correspondence Type"::" " then
                 "Correspondence Type" := RMSetup."Default Correspondence Type";
             if "Salutation Code" = '' then
@@ -1141,7 +1185,6 @@
         OldCont: Record Contact;
         Cont: Record Contact;
         IsDuplicateCheckNeeded: Boolean;
-        IsHandled: Boolean;
     begin
         OnBeforeOnModify(Rec, ContactBeforeModify);
 
@@ -1194,76 +1237,75 @@
                         Cont."Language Code" := "Language Code";
                         ContChanged := true;
                     end;
-
-                    IsHandled := false;
-                    OnModifyOnBeforeInheritAddressDetails(Rec, xRec, RMSetup, Cont, ContChanged, IsHandled);
-                    if not IsHandled then
-                        if RMSetup."Inherit Address Details" then
-                            if ContactBeforeModify.IdenticalAddress(Cont) then begin
-                                if ContactBeforeModify.Address <> Address then begin
-                                    Cont.Address := Address;
-                                    ContChanged := true;
-                                end;
-                                if ContactBeforeModify."Address 2" <> "Address 2" then begin
-                                    Cont."Address 2" := "Address 2";
-                                    ContChanged := true;
-                                end;
-                                if ContactBeforeModify."Post Code" <> "Post Code" then begin
-                                    Cont."Post Code" := "Post Code";
-                                    ContChanged := true;
-                                end;
-                                if ContactBeforeModify.City <> City then begin
-                                    Cont.City := City;
-                                    ContChanged := true;
-                                end;
-                                if ContactBeforeModify.County <> County then begin
-                                    Cont.County := County;
-                                    ContChanged := true;
-                                end;
-                                OnAfterSyncAddress(Cont, Rec, ContChanged, ContactBeforeModify);
-                            end;
-
-                    IsHandled := false;
-                    OnModifyOnBeforeInheritCommunicationDetails(Rec, xRec, RMSetup, Cont, ContChanged, IsHandled);
-                    if not IsHandled then
-                        if RMSetup."Inherit Communication Details" then begin
-                            if (ContactBeforeModify."Phone No." <> "Phone No.") and (ContactBeforeModify."Phone No." = Cont."Phone No.") then begin
-                                Cont."Phone No." := "Phone No.";
+                    if RMSetup."Inherit Format Region" and
+                       (ContactBeforeModify."Format Region" <> "Format Region") and
+                       (ContactBeforeModify."Format Region" = Cont."Format Region")
+                    then begin
+                        Cont."Format Region" := "Format Region";
+                        ContChanged := true;
+                    end;
+                    if RMSetup."Inherit Address Details" then
+                        if ContactBeforeModify.IdenticalAddress(Cont) then begin
+                            if ContactBeforeModify.Address <> Address then begin
+                                Cont.Address := Address;
                                 ContChanged := true;
                             end;
-                            if (ContactBeforeModify."Telex No." <> "Telex No.") and (ContactBeforeModify."Telex No." = Cont."Telex No.") then begin
-                                Cont."Telex No." := "Telex No.";
+                            if ContactBeforeModify."Address 2" <> "Address 2" then begin
+                                Cont."Address 2" := "Address 2";
                                 ContChanged := true;
                             end;
-                            if (ContactBeforeModify."Fax No." <> "Fax No.") and (ContactBeforeModify."Fax No." = Cont."Fax No.") then begin
-                                Cont."Fax No." := "Fax No.";
+                            if ContactBeforeModify."Post Code" <> "Post Code" then begin
+                                Cont."Post Code" := "Post Code";
                                 ContChanged := true;
                             end;
-                            if (ContactBeforeModify."Telex Answer Back" <> "Telex Answer Back") and (ContactBeforeModify."Telex Answer Back" = Cont."Telex Answer Back") then begin
-                                Cont."Telex Answer Back" := "Telex Answer Back";
+                            if ContactBeforeModify.City <> City then begin
+                                Cont.City := City;
                                 ContChanged := true;
                             end;
-                            if (ContactBeforeModify."E-Mail" <> "E-Mail") and (ContactBeforeModify."E-Mail" = Cont."E-Mail") then begin
-                                Cont.Validate("E-Mail", "E-Mail");
+                            if ContactBeforeModify.County <> County then begin
+                                Cont.County := County;
                                 ContChanged := true;
                             end;
-                            if (ContactBeforeModify."Home Page" <> "Home Page") and (ContactBeforeModify."Home Page" = Cont."Home Page") then begin
-                                Cont."Home Page" := "Home Page";
-                                ContChanged := true;
-                            end;
-                            if (ContactBeforeModify."Extension No." <> "Extension No.") and (ContactBeforeModify."Extension No." = Cont."Extension No.") then begin
-                                Cont."Extension No." := "Extension No.";
-                                ContChanged := true;
-                            end;
-                            if (ContactBeforeModify."Mobile Phone No." <> "Mobile Phone No.") and (ContactBeforeModify."Mobile Phone No." = Cont."Mobile Phone No.") then begin
-                                Cont."Mobile Phone No." := "Mobile Phone No.";
-                                ContChanged := true;
-                            end;
-                            if (ContactBeforeModify.Pager <> Pager) and (ContactBeforeModify.Pager = Cont.Pager) then begin
-                                Cont.Pager := Pager;
-                                ContChanged := true;
-                            end;
+                            OnAfterSyncAddress(Cont, Rec, ContChanged, ContactBeforeModify);
                         end;
+                    if RMSetup."Inherit Communication Details" then begin
+                        if (ContactBeforeModify."Phone No." <> "Phone No.") and (ContactBeforeModify."Phone No." = Cont."Phone No.") then begin
+                            Cont."Phone No." := "Phone No.";
+                            ContChanged := true;
+                        end;
+                        if (ContactBeforeModify."Telex No." <> "Telex No.") and (ContactBeforeModify."Telex No." = Cont."Telex No.") then begin
+                            Cont."Telex No." := "Telex No.";
+                            ContChanged := true;
+                        end;
+                        if (ContactBeforeModify."Fax No." <> "Fax No.") and (ContactBeforeModify."Fax No." = Cont."Fax No.") then begin
+                            Cont."Fax No." := "Fax No.";
+                            ContChanged := true;
+                        end;
+                        if (ContactBeforeModify."Telex Answer Back" <> "Telex Answer Back") and (ContactBeforeModify."Telex Answer Back" = Cont."Telex Answer Back") then begin
+                            Cont."Telex Answer Back" := "Telex Answer Back";
+                            ContChanged := true;
+                        end;
+                        if (ContactBeforeModify."E-Mail" <> "E-Mail") and (ContactBeforeModify."E-Mail" = Cont."E-Mail") then begin
+                            Cont.Validate("E-Mail", "E-Mail");
+                            ContChanged := true;
+                        end;
+                        if (ContactBeforeModify."Home Page" <> "Home Page") and (ContactBeforeModify."Home Page" = Cont."Home Page") then begin
+                            Cont."Home Page" := "Home Page";
+                            ContChanged := true;
+                        end;
+                        if (ContactBeforeModify."Extension No." <> "Extension No.") and (ContactBeforeModify."Extension No." = Cont."Extension No.") then begin
+                            Cont."Extension No." := "Extension No.";
+                            ContChanged := true;
+                        end;
+                        if (ContactBeforeModify."Mobile Phone No." <> "Mobile Phone No.") and (ContactBeforeModify."Mobile Phone No." = Cont."Mobile Phone No.") then begin
+                            Cont."Mobile Phone No." := "Mobile Phone No.";
+                            ContChanged := true;
+                        end;
+                        if (ContactBeforeModify.Pager <> Pager) and (ContactBeforeModify.Pager = Cont.Pager) then begin
+                            Cont.Pager := Pager;
+                            ContChanged := true;
+                        end;
+                    end;
 
                     OnBeforeApplyCompanyChangeToPerson(Cont, Rec, ContactBeforeModify, ContChanged, OldCont);
                     if ContChanged then begin
@@ -1483,10 +1525,9 @@
             CustomerTemplMgt.ApplyCustomerTemplate(Cust, CustTemplate);
         OnCreateCustomerFromTemplateOnAfterApplyCustomerTemplate(Cust, CustTemplate, Rec);
 
-        IsHandled := false;
-        OnCreateCustomerOnBeforeUpdateQuotes(Cust, Rec, IsHandled);
-        if not IsHandled then
-            UpdateQuotesFromTemplate(Cust, CustomerTemplateCode);
+        OnCreateCustomerOnBeforeUpdateQuotes(Cust, Rec);
+
+        UpdateQuotesFromTemplate(Cust, CustomerTemplateCode);
         CampaignMgt.ConverttoCustomer(Rec, Cust);
 
         ShowResultForCustomer(Cust);
@@ -1837,7 +1878,7 @@
         ContBusRel: Record "Contact Business Relation";
         AllCount: Integer;
     begin
-        FilterBusinessRelations(ContBusRel, "Contact Business Relation Link To Table"::" ", true);
+        FilterBusinessRelations(ContBusRel, Enum::"Contact Business Relation Link To Table"::" ", true);
         if ContBusRel.IsEmpty() then
             exit(ContactBusinessRelation::None);
         AllCount := ContBusRel.Count();
@@ -1907,16 +1948,16 @@
         MarketingSetup.Get();
         RelatedCustomerEnabled :=
             Contact.HasBusinessRelation(
-                "Contact Business Relation Link To Table"::Customer, MarketingSetup."Bus. Rel. Code for Customers");
+                Enum::"Contact Business Relation Link To Table"::Customer, MarketingSetup."Bus. Rel. Code for Customers");
         RelatedVendorEnabled :=
             Contact.HasBusinessRelation(
-                "Contact Business Relation Link To Table"::Vendor, MarketingSetup."Bus. Rel. Code for Vendors");
+                Enum::"Contact Business Relation Link To Table"::Vendor, MarketingSetup."Bus. Rel. Code for Vendors");
         RelatedBankEnabled :=
             Contact.HasBusinessRelation(
-                "Contact Business Relation Link To Table"::"Bank Account", MarketingSetup."Bus. Rel. Code for Bank Accs.");
+                Enum::"Contact Business Relation Link To Table"::"Bank Account", MarketingSetup."Bus. Rel. Code for Bank Accs.");
         RelatedEmployeeEnabled :=
             Contact.HasBusinessRelation(
-                "Contact Business Relation Link To Table"::Employee, MarketingSetup."Bus. Rel. Code for Employees");
+                Enum::"Contact Business Relation Link To Table"::Employee, MarketingSetup."Bus. Rel. Code for Employees");
     end;
 
     local procedure FilterBusinessRelations(var ContBusRel: Record "Contact Business Relation"; LinkToTable: Enum "Contact Business Relation Link To Table"; All: Boolean)
@@ -2487,6 +2528,8 @@
             "Country/Region Code" := NewCompanyContact."Country/Region Code";
         if RMSetup."Inherit Language Code" then
             "Language Code" := NewCompanyContact."Language Code";
+        if RMSetup."Inherit Format Region" then
+            "Format Region" := NewCompanyContact."Format Region";
         if RMSetup."Inherit Address Details" and StaleAddress() then begin
             Address := NewCompanyContact.Address;
             "Address 2" := NewCompanyContact."Address 2";
@@ -2716,7 +2759,7 @@
     procedure ToPriceSource(var PriceSource: Record "Price Source")
     begin
         PriceSource.Init();
-        PriceSource."Price Type" := "Price Type"::Sale;
+        PriceSource."Price Type" := PriceSource."Price Type"::Sale;
         PriceSource.Validate("Source Type", PriceSource."Source Type"::Contact);
         PriceSource.Validate("Source No.", "No.");
     end;
@@ -3063,6 +3106,7 @@
           ("Territory Code" <> ContactBeforeModify."Territory Code") or
           ("Currency Code" <> ContactBeforeModify."Currency Code") or
           ("Language Code" <> ContactBeforeModify."Language Code") or
+          ("Format Region" <> ContactBeforeModify."Format Region") or
           ("Salesperson Code" <> ContactBeforeModify."Salesperson Code") or
           ("Country/Region Code" <> ContactBeforeModify."Country/Region Code") or
           ("Fax No." <> ContactBeforeModify."Fax No.") or
@@ -3180,6 +3224,21 @@
             "Lookup Contact No." := ''
         else
             "Lookup Contact No." := "No.";
+    end;
+
+    local procedure UpdateFormatRegion();
+    var
+        Language: Record Language;
+        LanguageSelection: Record "Language Selection";
+    begin
+        if (Rec."Format Region" <> '') then
+            exit;
+        if not Language.Get("Language Code") then
+            exit;
+
+        LanguageSelection.SetRange("Language ID", Language."Windows Language ID");
+        if LanguageSelection.FindFirst() then
+            Rec.Validate("Format Region", LanguageSelection."Language Tag");
     end;
 
     [IntegrationEvent(false, false)]
@@ -3568,7 +3627,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateCustomerOnBeforeUpdateQuotes(var Customer: Record Customer; Contact: Record Contact; var IsHandled: Boolean)
+    local procedure OnCreateCustomerOnBeforeUpdateQuotes(var Customer: Record Customer; Contact: Record Contact)
     begin
     end;
 
@@ -3709,16 +3768,6 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateSalesQuoteFromContactOnAfterRunPage(Contact: Record Contact; SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnModifyOnBeforeInheritAddressDetails(var RecContact: Record Contact; var xRecContact: Record Contact; MarketingSetup: Record "Marketing Setup"; Contact: Record Contact; var ContChanged: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnModifyOnBeforeInheritCommunicationDetails(var RecContact: Record Contact; var xRecContact: Record Contact; MarketingSetup: Record "Marketing Setup"; Contact: Record Contact; var ContChanged: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

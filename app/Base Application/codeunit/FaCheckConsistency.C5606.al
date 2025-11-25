@@ -1,3 +1,13 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
+using Microsoft.FixedAssets.Setup;
+
 codeunit 5606 "FA Check Consistency"
 {
     Permissions = TableData "FA Ledger Entry" = r,
@@ -16,9 +26,9 @@ codeunit 5606 "FA Check Consistency"
         if IsHandled then
             exit;
 
-        if ("FA Posting Category" <> "FA Posting Category"::" ") or
-           ("FA Posting Type" = "FA Posting Type"::"Gain/Loss") or
-           ("FA Posting Type" = "FA Posting Type"::"Book Value on Disposal")
+        if (Rec."FA Posting Category" <> Rec."FA Posting Category"::" ") or
+           (Rec."FA Posting Type" = Rec."FA Posting Type"::"Gain/Loss") or
+           (Rec."FA Posting Type" = Rec."FA Posting Type"::"Book Value on Disposal")
         then
             exit;
         ClearAll();

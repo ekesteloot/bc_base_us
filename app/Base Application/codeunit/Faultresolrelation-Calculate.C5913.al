@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Setup;
+
 codeunit 5913 "FaultResolRelation-Calculate"
 {
 

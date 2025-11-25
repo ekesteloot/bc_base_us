@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 page 5130 "Opportunity Entries"
 {
     ApplicationArea = RelationshipMgmt;
@@ -25,7 +27,7 @@ page 5130 "Opportunity Entries"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the action that was taken when the entry was last updated. There are six options:';
                 }
-                field(Active; Active)
+                field(Active; Rec.Active)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies that the opportunity entry is active.';
@@ -119,7 +121,7 @@ page 5130 "Opportunity Entries"
                 Caption = 'Show Opportunity Card';
                 Image = Opportunity;
                 RunObject = Page "Opportunity Card";
-                RunPageLink = "No." = FIELD("Opportunity No.");
+                RunPageLink = "No." = field("Opportunity No.");
                 RunPageMode = View;
                 Scope = Repeater;
                 ToolTip = 'Open the card for the opportunity.';

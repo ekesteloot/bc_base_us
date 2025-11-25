@@ -97,9 +97,9 @@ page 474 "VAT Statement Preview"
             part(VATStatementLineSubForm; "VAT Statement Preview Line")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Statement Template Name" = FIELD("Statement Template Name"),
-                              "Statement Name" = FIELD(Name);
-                SubPageView = SORTING("Statement Template Name", "Statement Name", "Line No.");
+                SubPageLink = "Statement Template Name" = field("Statement Template Name"),
+                              "Statement Name" = field(Name);
+                SubPageView = sorting("Statement Template Name", "Statement Name", "Line No.");
             }
         }
         area(factboxes)

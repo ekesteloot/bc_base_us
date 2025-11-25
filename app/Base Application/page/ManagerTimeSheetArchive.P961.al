@@ -102,7 +102,7 @@ page 961 "Manager Time Sheet Archive"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the codes that you can use to describe the type of absence from work.';
                 }
-                field(Chargeable; Chargeable)
+                field(Chargeable; Rec.Chargeable)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies whether the time associated with an archived time sheet is chargeable.';
@@ -242,7 +242,7 @@ page 961 "Manager Time Sheet Archive"
 
                     trigger OnAction()
                     begin
-                        TimeSheetMgt.ShowPostingEntries("Time Sheet No.", "Line No.");
+                        TimeSheetMgt.ShowPostingEntries(Rec."Time Sheet No.", Rec."Line No.");
                     end;
                 }
             }
@@ -256,8 +256,8 @@ page 961 "Manager Time Sheet Archive"
                     Caption = '&Time Sheet Comments';
                     Image = ViewComments;
                     RunObject = Page "Time Sheet Arc. Comment Sheet";
-                    RunPageLink = "No." = FIELD("Time Sheet No."),
-                                  "Time Sheet Line No." = CONST(0);
+                    RunPageLink = "No." = field("Time Sheet No."),
+                                  "Time Sheet Line No." = const(0);
                     ToolTip = 'View comments about the time sheet.';
                 }
                 action(LineComments)
@@ -266,8 +266,8 @@ page 961 "Manager Time Sheet Archive"
                     Caption = '&Line Comments';
                     Image = ViewComments;
                     RunObject = Page "Time Sheet Arc. Comment Sheet";
-                    RunPageLink = "No." = FIELD("Time Sheet No."),
-                                  "Time Sheet Line No." = FIELD("Line No.");
+                    RunPageLink = "No." = field("Time Sheet No."),
+                                  "Time Sheet Line No." = field("Line No.");
                     ToolTip = 'View or create comments.';
                 }
             }
@@ -318,8 +318,8 @@ page 961 "Manager Time Sheet Archive"
 
     trigger OnOpenPage()
     begin
-        if "Time Sheet No." <> '' then
-            CurrTimeSheetNo := "Time Sheet No."
+        if Rec."Time Sheet No." <> '' then
+            CurrTimeSheetNo := Rec."Time Sheet No."
         else
             CurrTimeSheetNo :=
               TimeSheetHeaderArchive.FindLastTimeSheetArchiveNo(
@@ -367,9 +367,9 @@ page 961 "Manager Time Sheet Archive"
         i := 0;
         while i < NoOfColumns do begin
             i := i + 1;
-            if ("Line No." <> 0) and TimeSheetDetailArchive.Get(
-                 "Time Sheet No.",
-                 "Line No.",
+            if (Rec."Line No." <> 0) and TimeSheetDetailArchive.Get(
+                 Rec."Time Sheet No.",
+                 Rec."Line No.",
                  ColumnRecords[i]."Period Start")
             then
                 CellData[i] := TimeSheetDetailArchive.Quantity

@@ -7,8 +7,8 @@ page 10126 "Posted Bank Rec. Chk Lines Sub"
     ModifyAllowed = false;
     PageType = ListPart;
     SourceTable = "Posted Bank Rec. Line";
-    SourceTableView = SORTING("Bank Account No.", "Statement No.", "Record Type", "Line No.")
-                      WHERE("Record Type" = CONST(Check));
+    SourceTableView = sorting("Bank Account No.", "Statement No.", "Record Type", "Line No.")
+                      where("Record Type" = const(Check));
 
     layout
     {
@@ -86,7 +86,7 @@ page 10126 "Posted Bank Rec. Chk Lines Sub"
                     Editable = false;
                     ToolTip = 'Specifies the amount of the item, such as a check, that was deposited.';
                 }
-                field(Cleared; Cleared)
+                field(Cleared; Rec.Cleared)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the check on the line has been cleared, as indicated on the bank statement.';
@@ -106,7 +106,7 @@ page 10126 "Posted Bank Rec. Chk Lines Sub"
                         ClearedAmountOnAfterValidate();
                     end;
                 }
-                field("""Cleared Amount"" - Amount"; Rec."Cleared Amount" - Amount)
+                field("""Cleared Amount"" - Amount"; Rec."Cleared Amount" - Rec.Amount)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Difference';
@@ -191,13 +191,13 @@ page 10126 "Posted Bank Rec. Chk Lines Sub"
 
     procedure SetupTotals()
     begin
-        if PostedBankRecHdr.Get("Bank Account No.", "Statement No.") then
+        if PostedBankRecHdr.Get(Rec."Bank Account No.", Rec."Statement No.") then
             PostedBankRecHdr.CalcFields("Total Cleared Checks");
     end;
 
     procedure LookupLineDimensions()
     begin
-        ShowDimensions();
+        Rec.ShowDimensions();
     end;
 
     procedure GetTableID(): Integer
@@ -205,7 +205,7 @@ page 10126 "Posted Bank Rec. Chk Lines Sub"
         AllObj: Record AllObj;
     begin
         AllObj.SetRange("Object Type", AllObj."Object Type"::Table);
-        AllObj.SetRange("Object Name", TableName);
+        AllObj.SetRange("Object Name", Rec.TableName);
         AllObj.FindFirst();
         exit(AllObj."Object ID");
     end;

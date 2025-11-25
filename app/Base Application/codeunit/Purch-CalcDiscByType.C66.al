@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using System.Environment.Configuration;
+
 codeunit 66 "Purch - Calc Disc. By Type"
 {
     TableNo = "Purchase Line";
@@ -9,10 +16,10 @@ codeunit 66 "Purch - Calc Disc. By Type"
     begin
         PurchLine.Copy(Rec);
 
-        if PurchHeader.Get("Document Type", "Document No.") then begin
+        if PurchHeader.Get(Rec."Document Type", Rec."Document No.") then begin
             ApplyDefaultInvoiceDiscount(PurchHeader."Invoice Discount Value", PurchHeader);
             // on new order might be no line
-            if Get(PurchLine."Document Type", PurchLine."Document No.", PurchLine."Line No.") then;
+            if Rec.Get(PurchLine."Document Type", PurchLine."Document No.", PurchLine."Line No.") then;
         end;
     end;
 

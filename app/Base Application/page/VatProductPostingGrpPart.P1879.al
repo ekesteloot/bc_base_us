@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 page 1879 "VAT Product Posting Grp Part"
 {
     Caption = 'VAT Product Posting Grp Part';
@@ -10,7 +12,7 @@ page 1879 "VAT Product Posting Grp Part"
         {
             repeater(Group)
             {
-                field(Selected; Selected)
+                field(Selected; Rec.Selected)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether to include the VAT product posting group on the line.';
@@ -18,10 +20,10 @@ page 1879 "VAT Product Posting Grp Part"
 
                     trigger OnValidate()
                     begin
-                        if Selected then
+                        if Rec.Selected then
                             exit;
 
-                        if CheckExistingItemAndServiceWithVAT(xRec."VAT Prod. Posting Group", xRec."Application Type" = "Application Type"::Services) then begin
+                        if Rec.CheckExistingItemAndServiceWithVAT(xRec."VAT Prod. Posting Group", xRec."Application Type" = Rec."Application Type"::Services) then begin
                             TrigerNotification(VATDeleteIsNotallowedErr);
                             Error('');
                         end;
@@ -34,7 +36,7 @@ page 1879 "VAT Product Posting Grp Part"
 
                     trigger OnValidate()
                     begin
-                        if CheckExistingItemAndServiceWithVAT(xRec."VAT Prod. Posting Group", xRec."Application Type" = "Application Type"::Services) then begin
+                        if Rec.CheckExistingItemAndServiceWithVAT(xRec."VAT Prod. Posting Group", xRec."Application Type" = Rec."Application Type"::Services) then begin
                             TrigerNotification(VATDeleteIsNotallowedErr);
                             Error('');
                         end;
@@ -48,7 +50,7 @@ page 1879 "VAT Product Posting Grp Part"
 
                     trigger OnValidate()
                     begin
-                        if CheckExistingItemAndServiceWithVAT(xRec."VAT Prod. Posting Group", xRec."Application Type" = "Application Type"::Services) then begin
+                        if Rec.CheckExistingItemAndServiceWithVAT(xRec."VAT Prod. Posting Group", xRec."Application Type" = Rec."Application Type"::Services) then begin
                             TrigerNotification(VATDeleteIsNotallowedErr);
                             Error('');
                         end;
@@ -104,13 +106,13 @@ page 1879 "VAT Product Posting Grp Part"
 
     trigger OnDeleteRecord(): Boolean
     begin
-        if CheckExistingItemAndServiceWithVAT("VAT Prod. Posting Group", "Application Type" = "Application Type"::Services) then begin
+        if Rec.CheckExistingItemAndServiceWithVAT(Rec."VAT Prod. Posting Group", Rec."Application Type" = Rec."Application Type"::Services) then begin
             TrigerNotification(VATDeleteIsNotallowedErr);
             exit(false);
         end;
         if VATAccountsGroup or VATClausesGroup then begin
-            SetRange(Selected, true);
-            if Count = 1 then begin
+            Rec.SetRange(Selected, true);
+            if Rec.Count = 1 then begin
                 TrigerNotification(VATEmptyErrorMsg);
                 exit(false);
             end;
@@ -125,17 +127,17 @@ page 1879 "VAT Product Posting Grp Part"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Validate(Selected, true);
-        Validate(Default, false);
-        Validate("Application Type", "Application Type"::Items);
+        Rec.Validate(Selected, true);
+        Rec.Validate(Default, false);
+        Rec.Validate("Application Type", Rec."Application Type"::Items);
     end;
 
     trigger OnOpenPage()
     begin
         VATNotification.Id := Format(CreateGuid());
-        PopulateVATProdGroups();
+        Rec.PopulateVATProdGroups();
         ShowVATRates();
-        SetRange(Default, false);
+        Rec.SetRange(Default, false);
     end;
 
     var
@@ -151,8 +153,8 @@ page 1879 "VAT Product Posting Grp Part"
     begin
         ResetView();
         VATRatesGroup := true;
-        Reset();
-        SetRange(Default, false);
+        Rec.Reset();
+        Rec.SetRange(Default, false);
         CurrPage.Update();
     end;
 
@@ -180,7 +182,7 @@ page 1879 "VAT Product Posting Grp Part"
 
     local procedure ShowOnlySelectedSrvItem()
     begin
-        SetRange(Selected, true);
+        Rec.SetRange(Selected, true);
         CurrPage.Update();
     end;
 

@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 page 345 Reconciliation
 {
     Caption = 'Reconciliation';
@@ -57,7 +62,7 @@ page 345 Reconciliation
     begin
         GenJnlLine.Copy(NewGenJnlLine);
         Heading := GenJnlLine."Journal Batch Name";
-        DeleteAll();
+        Rec.DeleteAll();
         GLAcc.SetCurrentKey("Reconciliation Account");
         GLAcc.SetRange("Reconciliation Account", true);
         if GLAcc.Find('-') then
@@ -76,7 +81,7 @@ page 345 Reconciliation
             until GenJnlLine.Next() = 0;
 
         OnAfterSetGenJnlLine(Rec, GenJnlLine);
-        if Find('-') then;
+        if Rec.Find('-') then;
     end;
 
     local procedure SaveNetChange(AccType: Enum "Gen. Journal Account Type"; AccNo: Code[20]; NetChange: Decimal)
@@ -92,7 +97,7 @@ page 345 Reconciliation
             exit;
         case AccType of
             GenJnlLine."Account Type"::"G/L Account":
-                if not Get(AccNo) then
+                if not Rec.Get(AccNo) then
                     exit;
             GenJnlLine."Account Type"::"Bank Account":
                 begin
@@ -103,7 +108,7 @@ page 345 Reconciliation
                         BankAccPostingGr.TestField("G/L Account No.");
                     end;
                     AccNo := BankAccPostingGr."G/L Account No.";
-                    if not Get(AccNo) then begin
+                    if not Rec.Get(AccNo) then begin
                         GLAcc.Get(AccNo);
                         InsertGLAccNetChange();
                     end;
@@ -112,21 +117,21 @@ page 345 Reconciliation
                 exit;
         end;
 
-        "Net Change in Jnl." := "Net Change in Jnl." + NetChange;
-        "Balance after Posting" := "Balance after Posting" + NetChange;
+        Rec."Net Change in Jnl." := Rec."Net Change in Jnl." + NetChange;
+        Rec."Balance after Posting" := Rec."Balance after Posting" + NetChange;
         OnSaveNetChangeOnBeforeModify(Rec, GenJnlLine, AccType, AccNo, NetChange);
-        Modify();
+        Rec.Modify();
     end;
 
     procedure InsertGLAccNetChange()
     begin
         GLAcc.CalcFields("Balance at Date");
-        Init();
-        "No." := GLAcc."No.";
-        Name := GLAcc.Name;
-        "Balance after Posting" := GLAcc."Balance at Date";
+        Rec.Init();
+        Rec."No." := GLAcc."No.";
+        Rec.Name := GLAcc.Name;
+        Rec."Balance after Posting" := GLAcc."Balance at Date";
         OnBeforeGLAccountNetChange(Rec, GLAcc);
-        Insert();
+        Rec.Insert();
 
         OnAfterInsertGLAccNetChange(Rec, GLAcc);
     end;
@@ -136,12 +141,12 @@ page 345 Reconciliation
         OldGLAccountNetChange: Record "G/L Account Net Change";
     begin
         OldGLAccountNetChange := Rec;
-        FindSet();
+        Rec.FindSet();
         repeat
             GLAccountNetChange.Init();
             GLAccountNetChange := Rec;
             GLAccountNetChange.Insert();
-        until Next() = 0;
+        until Rec.Next() = 0;
 
         Rec := OldGLAccountNetChange;
     end;

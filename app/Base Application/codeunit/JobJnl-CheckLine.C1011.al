@@ -1,3 +1,15 @@
+namespace Microsoft.ProjectMgt.Jobs.Posting;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Journal;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.WarehouseMgt.Request;
+using System.Security.User;
+
 codeunit 1011 "Job Jnl.-Check Line"
 {
     TableNo = "Job Journal Line";

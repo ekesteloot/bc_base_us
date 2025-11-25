@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+
 page 99000811 "Prod. BOM Where-Used"
 {
     Caption = 'Prod. BOM Where-Used';
@@ -110,7 +114,6 @@ page 99000811 "Prod. BOM Where-Used"
         ProdBOMHeader: Record "Production BOM Header";
         WhereUsedMgt: Codeunit "Where-Used Management";
         CalculateDate: Date;
-        [InDataSet]
         DescriptionIndent: Integer;
 
     protected var
@@ -168,7 +171,7 @@ page 99000811 "Prod. BOM Where-Used"
 
     local procedure DescriptionOnFormat()
     begin
-        DescriptionIndent := "Level Code" - 1;
+        DescriptionIndent := Rec."Level Code" - 1;
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,3 +1,13 @@
+namespace Microsoft.FixedAssets.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+
 codeunit 5632 "FA Jnl.-Post Line"
 {
     Permissions = TableData "FA Ledger Entry" = r,
@@ -100,7 +110,7 @@ codeunit 5632 "FA Jnl.-Post Line"
                 FANo := "Account No.";
                 BudgetNo := "Budgeted FA No.";
                 DeprBookCode := "Depreciation Book Code";
-                FAPostingType := "FA Journal Line FA Posting Type".FromInteger("FA Posting Type".AsInteger() - 1);
+                FAPostingType := Enum::"FA Journal Line FA Posting Type".FromInteger("FA Posting Type".AsInteger() - 1);
                 FAPostingDate := "FA Posting Date";
                 Amount2 := FAAmount;
                 SalvageValue := ConvertAmtFCYToLCYForSourceCurrency("Salvage Value");
@@ -318,7 +328,6 @@ codeunit 5632 "FA Jnl.-Post Line"
                         PostAllocation(FALedgEntry);
                     end;
             end;
-            OnPostDisposalEntryOnAfterPostDisposalType(FAInsertLedgEntry, FALedgEntry, DisposalType, EntryAmounts);
             FAInsertLedgEntry.CorrectEntries();
             FAInsertLedgEntry.SetNetdisposal(false);
         end;
@@ -708,11 +717,6 @@ codeunit 5632 "FA Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostFixedAssetOnBeforeFixedAssetTestField(FALedgerEntry: Record "FA Ledger Entry"; Amount2: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnPostDisposalEntryOnAfterPostDisposalType(var FAInsertLedgerEntry: Codeunit "FA Insert Ledger Entry"; var FALedgerEntry: Record "FA Ledger Entry"; DisposalType: Option; EntryAmounts: array[14] of Decimal)
     begin
     end;
 }

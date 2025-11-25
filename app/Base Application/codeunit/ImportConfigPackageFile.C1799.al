@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using System.Environment.Configuration;
+using System.Threading;
+
 codeunit 1799 "Import Config. Package File"
 {
     TableNo = "Configuration Package File";
@@ -11,7 +16,7 @@ codeunit 1799 "Import Config. Package File"
         // give time to update AssistedCompanySetupStatus with "Session ID" and "Task ID"
         Sleep(500);
 
-        SetRecFilter();
+        Rec.SetRecFilter();
         if not CODEUNIT.Run(CODEUNIT::"Import Config. Package Files", Rec) then begin
             AssistedCompanySetupStatus.Get(CompanyName);
             with JobQueueEntry do begin

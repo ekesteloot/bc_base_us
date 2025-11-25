@@ -1,7 +1,13 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Item.Substitution;
+
 report 5701 "Item Substitutions"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemSubstitutions.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemSubstitutions.rdlc';
     ApplicationArea = Suite;
     Caption = 'Item Substitutions';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 5701 "Item Substitutions"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(Text000; Text000Lbl)
@@ -72,8 +78,8 @@ report 5701 "Item Substitutions"
             }
             dataitem("Item Substitution"; "Item Substitution")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING(Type, "No.", "Variant Code", "Substitute Type", "Substitute No.", "Substitute Variant Code") WHERE(Type = CONST(Item));
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting(Type, "No.", "Variant Code", "Substitute Type", "Substitute No.", "Substitute Variant Code") where(Type = const(Item));
                 PrintOnlyIfDetail = false;
                 column(Item_Substitution__Substitute_No__; "Substitute No.")
                 {

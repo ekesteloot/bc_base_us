@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Security.User;
+
 page 654 "Requests to Approve"
 {
     ApplicationArea = Suite;
@@ -6,8 +10,8 @@ page 654 "Requests to Approve"
     PageType = List;
     RefreshOnActivate = true;
     SourceTable = "Approval Entry";
-    SourceTableView = SORTING("Approver ID", Status, "Due Date", "Date-Time Sent for Approval")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Approver ID", Status, "Due Date", "Date-Time Sent for Approval")
+                      order(Ascending);
     UsageCategory = Lists;
 
     layout
@@ -17,24 +21,24 @@ page 654 "Requests to Approve"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(ToApprove; RecordCaption())
+                field(ToApprove; Rec.RecordCaption())
                 {
                     ApplicationArea = Suite;
                     Caption = 'To Approve';
                     ToolTip = 'Specifies the record that you are requested to approve. On the Home tab, in the Process group, choose Record to view the record on a new page where you can also act on the approval request.';
                     Width = 30;
                 }
-                field(Details; RecordDetails())
+                field(Details; Rec.RecordDetails())
                 {
                     ApplicationArea = Suite;
                     Caption = 'Details';
                     ToolTip = 'Specifies details about the approval request, such as what and who the request is about.';
                     Width = 50;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Suite;
-                    HideValue = NOT Comment;
+                    HideValue = NOT Rec.Comment;
                     ToolTip = 'Specifies whether there are comments relating to the approval of the record. If you want to read the comments, choose the field to open the Approval Comment Sheet window.';
                 }
                 field("Sender ID"; Rec."Sender ID")
@@ -46,7 +50,7 @@ page 654 "Requests to Approve"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Sender ID");
+                        UserMgt.DisplayUserInformation(Rec."Sender ID");
                     end;
                 }
                 field("Due Date"; Rec."Due Date")
@@ -126,7 +130,7 @@ page 654 "Requests to Approve"
 
                     trigger OnAction()
                     begin
-                        ShowRecord();
+                        Rec.ShowRecord();
                     end;
                 }
                 action(Comments)
@@ -143,9 +147,9 @@ page 654 "Requests to Approve"
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                         RecRef: RecordRef;
                     begin
-                        RecRef.Get("Record ID to Approve");
+                        RecRef.Get(Rec."Record ID to Approve");
                         Clear(ApprovalsMgmt);
-                        ApprovalsMgmt.GetApprovalCommentForWorkflowStepInstanceID(RecRef, "Workflow Step Instance ID");
+                        ApprovalsMgmt.GetApprovalCommentForWorkflowStepInstanceID(RecRef, Rec."Workflow Step Instance ID");
                     end;
                 }
             }
@@ -215,7 +219,7 @@ page 654 "Requests to Approve"
 
                     trigger OnAction()
                     begin
-                        SetRange(Status, Status::Open);
+                        Rec.SetRange(Status, Rec.Status::Open);
                         ShowAllEntries := false;
                     end;
                 }
@@ -228,7 +232,7 @@ page 654 "Requests to Approve"
 
                     trigger OnAction()
                     begin
-                        SetRange(Status);
+                        Rec.SetRange(Status);
                         ShowAllEntries := true;
                     end;
                 }
@@ -276,7 +280,7 @@ page 654 "Requests to Approve"
     begin
         ShowChangeFactBox := CurrPage.Change.PAGE.SetFilterFromApprovalEntry(Rec);
         ShowCommentFactbox := CurrPage.CommentsFactBox.PAGE.SetFilterFromApprovalEntry(Rec);
-        ShowRecCommentsEnabled := RecRef.Get("Record ID to Approve");
+        ShowRecCommentsEnabled := RecRef.Get(Rec."Record ID to Approve");
     end;
 
     trigger OnAfterGetRecord()
@@ -286,11 +290,11 @@ page 654 "Requests to Approve"
 
     trigger OnOpenPage()
     begin
-        FilterGroup(2);
-        SetRange("Approver ID", UserId);
+        Rec.FilterGroup(2);
+        Rec.SetRange("Approver ID", UserId);
         OnOpenPageOnAfterSetUserIdFilter(Rec);
-        FilterGroup(0);
-        SetRange(Status, Status::Open);
+        Rec.FilterGroup(0);
+        Rec.SetRange(Status, Rec.Status::Open);
     end;
 
     var
@@ -303,7 +307,7 @@ page 654 "Requests to Approve"
     local procedure SetDateStyle()
     begin
         DateStyle := '';
-        if IsOverdue() then
+        if Rec.IsOverdue() then
             DateStyle := 'Attention';
     end;
 

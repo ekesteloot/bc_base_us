@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.MachineCenter;
+
+using Microsoft.Manufacturing.Capacity;
+
 report 99001045 "Calc. Machine Center Calendar"
 {
     Caption = 'Calc. Machine Center Calendar';
@@ -7,7 +11,7 @@ report 99001045 "Calc. Machine Center Calendar"
     {
         dataitem("Machine Center"; "Machine Center")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
 
             trigger OnAfterGetRecord()

@@ -1,3 +1,9 @@
+namespace System.IO;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 codeunit 1270 "Exp. Launcher Gen. Jnl."
 {
     Permissions = TableData "Data Exch." = rimd;

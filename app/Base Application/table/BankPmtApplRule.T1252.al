@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using System.Text;
+
 table 1252 "Bank Pmt. Appl. Rule"
 {
     Caption = 'Bank Pmt. Appl. Rule';
@@ -154,12 +158,6 @@ table 1252 "Bank Pmt. Appl. Rule"
         exit(MatchConfidence in ["Match Confidence"::None, "Match Confidence"::Low, "Match Confidence"::Medium, "Match Confidence"::High]);
     end;
 
-    [Obsolete('Replaced by BankAccReconciliationLine.GetMatchedAutomaticallyFilter()', '18.0')]
-    procedure GetMatchedAutomaticallyFilter(): Text
-    begin
-        exit(StrSubstNo('=%1|%2|%3|%4', "Match Confidence"::None, "Match Confidence"::Low, "Match Confidence"::Medium, "Match Confidence"::High));
-    end;
-
     procedure GetTextMapperScore(): Integer
     var
         MediumConfidenceHighestScore: Integer;
@@ -200,18 +198,18 @@ table 1252 "Bank Pmt. Appl. Rule"
         OptionNo: Integer;
     begin
         if MatchQuality = GetTextMapperScore() then
-            exit(BankAccReconciliationLine."Match Confidence"::"High - Text-to-Account Mapping");
+            exit(BankAccReconciliationLine."Match Confidence"::"High - Text-to-Account Mapping".AsInteger());
 
         OptionNo := MatchQuality div GetConfidenceScoreRange();
         case OptionNo of
             "Match Confidence"::None:
-                exit(BankAccReconciliationLine."Match Confidence"::None);
+                exit(BankAccReconciliationLine."Match Confidence"::None.AsInteger());
             "Match Confidence"::Low:
-                exit(BankAccReconciliationLine."Match Confidence"::Low);
+                exit(BankAccReconciliationLine."Match Confidence"::Low.AsInteger());
             "Match Confidence"::Medium:
-                exit(BankAccReconciliationLine."Match Confidence"::Medium);
+                exit(BankAccReconciliationLine."Match Confidence"::Medium.AsInteger());
             "Match Confidence"::High:
-                exit(BankAccReconciliationLine."Match Confidence"::High);
+                exit(BankAccReconciliationLine."Match Confidence"::High.AsInteger());
         end;
     end;
 

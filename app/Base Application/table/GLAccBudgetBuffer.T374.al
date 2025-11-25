@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+
 table 374 "G/L Acc. Budget Buffer"
 {
     Caption = 'G/L Acc. Budget Buffer';
@@ -38,14 +45,14 @@ table 374 "G/L Acc. Budget Buffer"
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(7; "Global Dimension 2 Filter"; Code[20])
         {
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(8; "Budget Dimension 1 Filter"; Code[20])
         {
@@ -80,16 +87,16 @@ table 374 "G/L Acc. Budget Buffer"
         field(13; "Budgeted Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("G/L Budget Entry".Amount WHERE("Budget Name" = FIELD("Budget Filter"),
-                                                               "G/L Account No." = FIELD("G/L Account Filter"),
-                                                               "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                               "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"),
-                                                               "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"),
-                                                               "Budget Dimension 1 Code" = FIELD("Budget Dimension 1 Filter"),
-                                                               "Budget Dimension 2 Code" = FIELD("Budget Dimension 2 Filter"),
-                                                               "Budget Dimension 3 Code" = FIELD("Budget Dimension 3 Filter"),
-                                                               "Budget Dimension 4 Code" = FIELD("Budget Dimension 4 Filter"),
-                                                               Date = FIELD("Date Filter")));
+            CalcFormula = sum("G/L Budget Entry".Amount where("Budget Name" = field("Budget Filter"),
+                                                               "G/L Account No." = field("G/L Account Filter"),
+                                                               "Business Unit Code" = field("Business Unit Filter"),
+                                                               "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
+                                                               "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
+                                                               "Budget Dimension 1 Code" = field("Budget Dimension 1 Filter"),
+                                                               "Budget Dimension 2 Code" = field("Budget Dimension 2 Filter"),
+                                                               "Budget Dimension 3 Code" = field("Budget Dimension 3 Filter"),
+                                                               "Budget Dimension 4 Code" = field("Budget Dimension 4 Filter"),
+                                                               Date = field("Date Filter")));
             Caption = 'Budgeted Amount';
             FieldClass = FlowField;
         }

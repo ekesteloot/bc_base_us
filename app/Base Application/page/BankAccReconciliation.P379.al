@@ -1,10 +1,17 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Telemetry;
+
 page 379 "Bank Acc. Reconciliation"
 {
     Caption = 'Bank Acc. Reconciliation';
     PageType = ListPlus;
     SaveValues = false;
     SourceTable = "Bank Acc. Reconciliation";
-    SourceTableView = WHERE("Statement Type" = CONST("Bank Reconciliation"));
+    SourceTableView = where("Statement Type" = const("Bank Reconciliation"));
     RefreshOnActivate = true;
 
     layout
@@ -14,7 +21,7 @@ page 379 "Bank Acc. Reconciliation"
             group(General)
             {
                 Caption = 'General';
-                field(BankAccountNo; "Bank Account No.")
+                field(BankAccountNo; Rec."Bank Account No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Bank Account No.';
@@ -25,7 +32,7 @@ page 379 "Bank Acc. Reconciliation"
                     var
                         BankAccReconciliationLine: record "Bank Acc. Reconciliation Line";
                     begin
-                        if BankAccReconciliationLine.BankStatementLinesListIsEmpty("Statement No.", "Statement Type", "Bank Account No.") then
+                        if BankAccReconciliationLine.BankStatementLinesListIsEmpty(Rec."Statement No.", Rec."Statement Type".AsInteger(), Rec."Bank Account No.") then
                             CreateEmptyListNotification();
 
                         if not WarnIfOngoingBankReconciliations(Rec."Bank Account No.") then
@@ -36,13 +43,13 @@ page 379 "Bank Acc. Reconciliation"
                         CurrPage.Update(false);
                     end;
                 }
-                field(StatementNo; "Statement No.")
+                field(StatementNo; Rec."Statement No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Statement No.';
                     ToolTip = 'Specifies the number of the bank account statement.';
                 }
-                field(StatementDate; "Statement Date")
+                field(StatementDate; Rec."Statement Date")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Statement Date';
@@ -52,13 +59,13 @@ page 379 "Bank Acc. Reconciliation"
                         CurrPage.ApplyBankLedgerEntries.Page.SetBankRecDateFilter(Rec.MatchCandidateFilterDate());
                     end;
                 }
-                field(BalanceLastStatement; "Balance Last Statement")
+                field(BalanceLastStatement; Rec."Balance Last Statement")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Balance Last Statement';
                     ToolTip = 'Specifies the ending balance shown on the last bank statement, which was used in the last posted bank reconciliation for this bank account.';
                 }
-                field(StatementEndingBalance; "Statement Ending Balance")
+                field(StatementEndingBalance; Rec."Statement Ending Balance")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Statement Ending Balance';
@@ -72,16 +79,16 @@ page 379 "Bank Acc. Reconciliation"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Bank Statement Lines';
-                    SubPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                                  "Statement No." = FIELD("Statement No.");
+                    SubPageLink = "Bank Account No." = field("Bank Account No."),
+                                  "Statement No." = field("Statement No.");
                 }
                 part(ApplyBankLedgerEntries; "Apply Bank Acc. Ledger Entries")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Bank Account Ledger Entries';
-                    SubPageLink = "Bank Account No." = FIELD("Bank Account No."),
-                                  Open = CONST(true),
-                                  "Statement Status" = FILTER(Open | "Bank Acc. Entry Applied" | "Check Entry Applied");
+                    SubPageLink = "Bank Account No." = field("Bank Account No."),
+                                  Open = const(true),
+                                  "Statement Status" = filter(Open | "Bank Acc. Entry Applied" | "Check Entry Applied");
                 }
             }
         }
@@ -114,7 +121,7 @@ page 379 "Bank Acc. Reconciliation"
                     Caption = '&Bank Account Card';
                     Image = EditLines;
                     RunObject = Page "Bank Account Card";
-                    RunPageLink = "No." = FIELD("Bank Account No.");
+                    RunPageLink = "No." = field("Bank Account No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record that is being processed on the journal line.';
                 }
@@ -213,7 +220,7 @@ page 379 "Bank Acc. Reconciliation"
                     trigger OnAction()
                     begin
                         CurrPage.Update();
-                        ImportBankStatement();
+                        Rec.ImportBankStatement();
                         CheckStatementDate();
                         RecallEmptyListNotification();
                     end;
@@ -231,9 +238,9 @@ page 379 "Bank Acc. Reconciliation"
 
                     trigger OnAction()
                     begin
-                        SetRange("Statement Type", "Statement Type");
-                        SetRange("Bank Account No.", "Bank Account No.");
-                        SetRange("Statement No.", "Statement No.");
+                        Rec.SetRange("Statement Type", Rec."Statement Type");
+                        Rec.SetRange("Bank Account No.", Rec."Bank Account No.");
+                        Rec.SetRange("Statement No.", Rec."Statement No.");
                         REPORT.Run(REPORT::"Match Bank Entries", true, true, Rec);
                     end;
                 }
@@ -461,7 +468,7 @@ page 379 "Bank Acc. Reconciliation"
 
     trigger OnModifyRecord(): Boolean
     begin
-        Modify(true);
+        Rec.Modify(true);
         RefreshSharedTempTable();
     end;
 
@@ -540,7 +547,7 @@ page 379 "Bank Acc. Reconciliation"
     begin
         ImportBankStatementNotification.Id := GetImportBankStatementNotificatoinId();
         if ImportBankStatementNotification.Recall() then;
-        if not BankAccReconciliationLine.BankStatementLinesListIsEmpty("Statement No.", "Statement Type", "Bank Account No.") then
+        if not BankAccReconciliationLine.BankStatementLinesListIsEmpty(Rec."Statement No.", Rec."Statement Type".AsInteger(), Rec."Bank Account No.") then
             exit;
 
         ImportBankStatementNotification.Message := ListEmptyMsg;

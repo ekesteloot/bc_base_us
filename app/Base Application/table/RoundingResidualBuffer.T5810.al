@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Costing;
+
 table 5810 "Rounding Residual Buffer"
 {
     Caption = 'Rounding Residual Buffer';

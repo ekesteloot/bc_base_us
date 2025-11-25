@@ -1,3 +1,19 @@
+﻿namespace System.Integration;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Globalization;
+
 codeunit 1797 "Data Migration Facade Helper"
 {
     SingleInstance = true;

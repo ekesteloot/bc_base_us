@@ -1,7 +1,16 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using System.Email;
+
 report 5055 "Contact - Cover Sheet"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/ContactCoverSheet.rdlc';
+    RDLCLayout = './CRM/Reports/ContactCoverSheet.rdlc';
     ApplicationArea = RelationshipMgmt;
     Caption = 'Contact - Cover Sheet';
     UsageCategory = Documents;
@@ -10,7 +19,7 @@ report 5055 "Contact - Cover Sheet"
     {
         dataitem(Contact; Contact)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", Name, "Salesperson Code";
             column(Addr_1_; Addr[1])
             {
@@ -197,30 +206,35 @@ report 5055 "Contact - Cover Sheet"
                         {
                             ApplicationArea = RelationshipMgmt;
                             ShowCaption = false;
+                            ToolTip = 'Specifies a placeholder for information on the contact cover sheet.';
                         }
                         field("Text[2]"; Text[2])
                         {
                             ApplicationArea = RelationshipMgmt;
                             Importance = Additional;
                             ShowCaption = false;
+                            ToolTip = 'Specifies a placeholder for information on the contact cover sheet.';
                         }
                         field("Text[3]"; Text[3])
                         {
                             ApplicationArea = RelationshipMgmt;
                             Importance = Additional;
                             ShowCaption = false;
+                            ToolTip = 'Specifies a placeholder for information on the contact cover sheet.';
                         }
                         field("Text[4]"; Text[4])
                         {
                             ApplicationArea = RelationshipMgmt;
                             Importance = Additional;
                             ShowCaption = false;
+                            ToolTip = 'Specifies a placeholder for information on the contact cover sheet.';
                         }
                         field("Text[5]"; Text[5])
                         {
                             ApplicationArea = RelationshipMgmt;
                             Importance = Additional;
                             ShowCaption = false;
+                            ToolTip = 'Specifies a placeholder for information on the contact cover sheet.';
                         }
                     }
                     group(Remarks)
@@ -335,7 +349,7 @@ report 5055 "Contact - Cover Sheet"
 
         trigger OnOpenPage()
         begin
-            LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Cover Sheet") <> '';
+            LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Cover Sheet") <> '';
             LogInteractionEnable := LogInteraction;
         end;
     }
@@ -363,7 +377,6 @@ report 5055 "Contact - Cover Sheet"
         Marks: array[7] of Boolean;
         MarksTxt: array[7] of Text[1];
         LogInteraction: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
 
         MarkTxt: Label 'x', Locked = true;

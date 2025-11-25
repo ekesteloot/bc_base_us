@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.History;
+using Microsoft.Shared.Archive;
+using Microsoft.WarehouseMgt.Request;
+
 report 499 "Delete Invoiced Purch. Orders"
 {
     AccessByPermission = TableData "Purchase Header" = RD;
@@ -10,7 +17,7 @@ report 499 "Delete Invoiced Purch. Orders"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "Pay-to Vendor No.";
             RequestFilterHeading = 'Purchase Order';
 

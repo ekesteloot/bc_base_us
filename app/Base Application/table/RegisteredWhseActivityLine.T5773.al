@@ -1,3 +1,24 @@
+﻿namespace Microsoft.WarehouseMgt.Activity.History;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Family;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+
 table 5773 "Registered Whse. Activity Line"
 {
     Caption = 'Registered Whse. Activity Line';
@@ -68,12 +89,12 @@ table 5773 "Registered Whse. Activity Line"
         field(15; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(16; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(17; "Qty. per Unit of Measure"; Decimal)
         {
@@ -114,17 +135,17 @@ table 5773 "Registered Whse. Activity Line"
         field(40; "Destination No."; Code[20])
         {
             Caption = 'Destination No.';
-            TableRelation = IF ("Destination Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Destination Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Destination Type" = CONST(Location)) Location
-            ELSE
-            IF ("Destination Type" = CONST(Item)) Item
-            ELSE
-            IF ("Destination Type" = CONST(Family)) Family
-            ELSE
-            IF ("Destination Type" = CONST("Sales Order")) "Sales Header"."No." WHERE("Document Type" = CONST(Order));
+            TableRelation = if ("Destination Type" = const(Vendor)) Vendor
+            else
+            if ("Destination Type" = const(Customer)) Customer
+            else
+            if ("Destination Type" = const(Location)) Location
+            else
+            if ("Destination Type" = const(Item)) Item
+            else
+            if ("Destination Type" = const(Family)) Family
+            else
+            if ("Destination Type" = const("Sales Order")) "Sales Header"."No." where("Document Type" = const(Order));
         }
         field(41; "Whse. Activity No."; Code[20])
         {
@@ -138,7 +159,7 @@ table 5773 "Registered Whse. Activity Line"
         field(43; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(44; "Shipment Method Code"; Code[10])
         {
@@ -188,22 +209,22 @@ table 5773 "Registered Whse. Activity Line"
         field(7300; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Action Type" = FILTER(<> Take)) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                              "Zone Code" = FIELD("Zone Code"))
-            ELSE
-            IF ("Action Type" = FILTER(<> Take),
-                                                                                       "Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Action Type" = CONST(Take)) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                                                                           "Zone Code" = FIELD("Zone Code"))
-            ELSE
-            IF ("Action Type" = CONST(Take),
-                                                                                                                                                                    "Zone Code" = FILTER('')) "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = if ("Action Type" = filter(<> Take)) Bin.Code where("Location Code" = field("Location Code"),
+                                                                              "Zone Code" = field("Zone Code"))
+            else
+            if ("Action Type" = filter(<> Take),
+                                                                                       "Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Action Type" = const(Take)) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
+                                                                                                                                                           "Zone Code" = field("Zone Code"))
+            else
+            if ("Action Type" = const(Take),
+                                                                                                                                                                    "Zone Code" = filter('')) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"));
         }
         field(7301; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
         }
         field(7305; "Action Type"; Enum "Warehouse Action Type")
         {
@@ -219,46 +240,42 @@ table 5773 "Registered Whse. Activity Line"
         {
             Caption = 'Whse. Document No.';
             Editable = false;
-            TableRelation = IF ("Whse. Document Type" = CONST(Receipt)) "Posted Whse. Receipt Header"."No." WHERE("No." = FIELD("Whse. Document No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Shipment)) "Warehouse Shipment Header"."No." WHERE("No." = FIELD("Whse. Document No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST("Internal Put-away")) "Whse. Internal Put-away Header"."No." WHERE("No." = FIELD("Whse. Document No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST("Internal Pick")) "Whse. Internal Pick Header"."No." WHERE("No." = FIELD("Whse. Document No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Production)) "Production Order"."No." WHERE("No." = FIELD("Whse. Document No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Assembly)) "Assembly Header"."No." WHERE("Document Type" = CONST(Order),
-                                                                                                           "No." = FIELD("Whse. Document No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Whse. Document Type" = const(Receipt)) "Posted Whse. Receipt Header"."No." where("No." = field("Whse. Document No."))
+            else
+            if ("Whse. Document Type" = const(Shipment)) "Warehouse Shipment Header"."No." where("No." = field("Whse. Document No."))
+            else
+            if ("Whse. Document Type" = const("Internal Put-away")) "Whse. Internal Put-away Header"."No." where("No." = field("Whse. Document No."))
+            else
+            if ("Whse. Document Type" = const("Internal Pick")) "Whse. Internal Pick Header"."No." where("No." = field("Whse. Document No."))
+            else
+            if ("Whse. Document Type" = const(Production)) "Production Order"."No." where("No." = field("Whse. Document No."))
+            else
+            if ("Whse. Document Type" = const(Assembly)) "Assembly Header"."No." where("Document Type" = const(Order),
+                                                                                                           "No." = field("Whse. Document No."));
         }
         field(7308; "Whse. Document Line No."; Integer)
         {
             BlankZero = true;
             Caption = 'Whse. Document Line No.';
             Editable = false;
-            TableRelation = IF ("Whse. Document Type" = CONST(Receipt)) "Posted Whse. Receipt Line"."Line No." WHERE("No." = FIELD("Whse. Document No."),
-                                                                                                                    "Line No." = FIELD("Whse. Document Line No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Shipment)) "Warehouse Shipment Line"."Line No." WHERE("No." = FIELD("Whse. Document No."),
-                                                                                                                                                                                                                "Line No." = FIELD("Whse. Document Line No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST("Internal Put-away")) "Whse. Internal Put-away Line"."Line No." WHERE("No." = FIELD("Whse. Document No."),
-                                                                                                                                                                                                                                                                                                                            "Line No." = FIELD("Whse. Document Line No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST("Internal Pick")) "Whse. Internal Pick Line"."Line No." WHERE("No." = FIELD("Whse. Document No."),
-                                                                                                                                                                                                                                                                                                                                                                                                                                "Line No." = FIELD("Whse. Document Line No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Production)) "Prod. Order Line"."Line No." WHERE("Prod. Order No." = FIELD("No."),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       "Line No." = FIELD("Line No."))
-            ELSE
-            IF ("Whse. Document Type" = CONST(Assembly)) "Assembly Line"."Line No." WHERE("Document Type" = CONST(Order),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "Document No." = FIELD("Whse. Document No."),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "Line No." = FIELD("Whse. Document Line No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Whse. Document Type" = const(Receipt)) "Posted Whse. Receipt Line"."Line No." where("No." = field("Whse. Document No."),
+                                                                                                                    "Line No." = field("Whse. Document Line No."))
+            else
+            if ("Whse. Document Type" = const(Shipment)) "Warehouse Shipment Line"."Line No." where("No." = field("Whse. Document No."),
+                                                                                                                                                                                                                "Line No." = field("Whse. Document Line No."))
+            else
+            if ("Whse. Document Type" = const("Internal Put-away")) "Whse. Internal Put-away Line"."Line No." where("No." = field("Whse. Document No."),
+                                                                                                                                                                                                                                                                                                                            "Line No." = field("Whse. Document Line No."))
+            else
+            if ("Whse. Document Type" = const("Internal Pick")) "Whse. Internal Pick Line"."Line No." where("No." = field("Whse. Document No."),
+                                                                                                                                                                                                                                                                                                                                                                                                                                "Line No." = field("Whse. Document Line No."))
+            else
+            if ("Whse. Document Type" = const(Production)) "Prod. Order Line"."Line No." where("Prod. Order No." = field("No."),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       "Line No." = field("Line No."))
+            else
+            if ("Whse. Document Type" = const(Assembly)) "Assembly Line"."Line No." where("Document Type" = const(Order),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "Document No." = field("Whse. Document No."),
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "Line No." = field("Whse. Document Line No."));
         }
         field(7310; Cubage; Decimal)
         {
@@ -414,11 +431,11 @@ table 5773 "Registered Whse. Activity Line"
         WarehouseEntry.SetRange("Registering Date", RegisterDate);
         case "Activity Type" of
             "Activity Type"::"Put-away":
-                WarehouseEntry.SetRange("Reference Document", "Whse. Reference Document Type"::"Put-away");
+                WarehouseEntry.SetRange("Reference Document", WarehouseEntry."Reference Document"::"Put-away");
             "Activity Type"::Pick:
-                WarehouseEntry.SetRange("Reference Document", "Whse. Reference Document Type"::Pick);
+                WarehouseEntry.SetRange("Reference Document", WarehouseEntry."Reference Document"::Pick);
             "Activity Type"::Movement:
-                WarehouseEntry.SetRange("Reference Document", "Whse. Reference Document Type"::Movement);
+                WarehouseEntry.SetRange("Reference Document", WarehouseEntry."Reference Document"::Movement);
         end;
         WarehouseEntries.SetTableView(WarehouseEntry);
         WarehouseEntries.RunModal();
@@ -427,7 +444,7 @@ table 5773 "Registered Whse. Activity Line"
     procedure SetSourceFilter(SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer; SourceSubLineNo: Integer; SetKey: Boolean)
     begin
         if SetKey then
-            SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+            SetCurrentKey(Rec."Source Type", Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.", Rec."Source Subline No.");
         SetRange("Source Type", SourceType);
         if SourceSubType >= 0 then
             SetRange("Source Subtype", SourceSubType);

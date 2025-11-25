@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Setup;
+
 enum 5070 "Salutation Formula Salutation Type"
 {
     Extensible = true;

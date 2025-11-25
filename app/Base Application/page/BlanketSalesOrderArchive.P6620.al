@@ -1,10 +1,17 @@
+namespace Microsoft.Sales.Archive;
+
+using Microsoft.CRM.Contact;
+using Microsoft.Sales.Customer;
+using Microsoft.Shared.Archive;
+using System.Security.User;
+
 page 6620 "Blanket Sales Order Archive"
 {
     Caption = 'Blanket Sales Order Archive';
     Editable = false;
     PageType = Document;
     SourceTable = "Sales Header Archive";
-    SourceTableView = WHERE("Document Type" = CONST("Blanket Order"));
+    SourceTableView = where("Document Type" = const("Blanket Order"));
 
     layout
     {
@@ -149,9 +156,9 @@ page 6620 "Blanket Sales Order Archive"
             part(SalesLinesArchive; "Blanket Sales Order Arch. Sub.")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Document No." = FIELD("No."),
-                              "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                              "Version No." = FIELD("Version No.");
+                SubPageLink = "Document No." = field("No."),
+                              "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                              "Version No." = field("Version No.");
             }
             group(Invoicing)
             {
@@ -394,7 +401,7 @@ page 6620 "Blanket Sales Order Archive"
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the point of exit through which you ship the items out of your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the area in which your company has to pay sales tax.';
@@ -418,7 +425,7 @@ page 6620 "Blanket Sales Order Archive"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Archived By");
+                        UserMgt.DisplayUserInformation(Rec."Archived By");
                     end;
                 }
                 field("Date Archived"; Rec."Date Archived")
@@ -467,7 +474,7 @@ page 6620 "Blanket Sales Order Archive"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No.");
+                    RunPageLink = "No." = field("Sell-to Customer No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer on the sales document.';
                 }
@@ -480,7 +487,7 @@ page 6620 "Blanket Sales Order Archive"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Co&mments")
@@ -489,11 +496,11 @@ page 6620 "Blanket Sales Order Archive"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Archive Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0),
-                                  "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                  "Version No." = FIELD("Version No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0),
+                                  "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                  "Version No." = field("Version No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Print)
@@ -560,8 +567,8 @@ page 6620 "Blanket Sales Order Archive"
 
     trigger OnAfterGetRecord()
     begin
-        SellToContact.GetOrClear("Sell-to Contact No.");
-        BillToContact.GetOrClear("Bill-to Contact No.");
+        SellToContact.GetOrClear(Rec."Sell-to Contact No.");
+        BillToContact.GetOrClear(Rec."Bill-to Contact No.");
     end;
 
     var

@@ -1,7 +1,7 @@
 report 5702 "Inventory - Inbound Transfer"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InventoryInboundTransfer.rdlc';
+    RDLCLayout = './InventoryMgt/Transfer/InventoryInboundTransfer.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory - Inbound Transfer';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +10,7 @@ report 5702 "Inventory - Inbound Transfer"
     {
         dataitem("Transfer Line"; "Transfer Line")
         {
-            DataItemTableView = SORTING("Transfer-to Code", Status, "Derived From Line No.", "Item No.", "Variant Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Receipt Date", "In-Transit Code") WHERE(Status = CONST(Released), "Derived From Line No." = CONST(0));
+            DataItemTableView = sorting("Transfer-to Code", Status, "Derived From Line No.", "Item No.", "Variant Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Receipt Date", "In-Transit Code") where(Status = const(Released), "Derived From Line No." = const(0));
             RequestFilterFields = "Transfer-to Code", "Item No.", "Receipt Date";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

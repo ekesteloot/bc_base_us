@@ -10,7 +10,7 @@ report 10101 "Reconcile AP to GL"
     {
         dataitem("Purchase Line"; "Purchase Line")
         {
-            DataItemTableView = WHERE("Document Type" = CONST(Order));
+            DataItemTableView = where("Document Type" = const(Order));
             RequestFilterFields = "Document No.", "Buy-from Vendor No.", Type, "No.", "Location Code", "Posting Group", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code";
             RequestFilterHeading = 'Purchase Order Line';
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -153,7 +153,7 @@ report 10101 "Reconcile AP to GL"
         }
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             column(FORMAT_TODAY_0_4__Control31; Format(Today, 0, 4))
             {
             }

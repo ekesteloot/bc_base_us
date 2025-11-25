@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1508 "Workflow Categories"
 {
     ApplicationArea = Suite;
@@ -12,7 +14,7 @@ page 1508 "Workflow Categories"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the code for the workflow category.';

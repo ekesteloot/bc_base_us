@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Activity.History;
+
+using Microsoft.WarehouseMgt.Comment;
+
 page 7349 "Registered Movement"
 {
     Caption = 'Registered Movement';
@@ -5,7 +9,7 @@ page 7349 "Registered Movement"
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Registered Whse. Activity Hdr.";
-    SourceTableView = WHERE(Type = CONST(Movement));
+    SourceTableView = where(Type = const(Movement));
 
     layout
     {
@@ -72,9 +76,9 @@ page 7349 "Registered Movement"
             part(WhseActivityLines; "Registered Movement Subform")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "Activity Type" = FIELD(Type),
-                              "No." = FIELD("No.");
-                SubPageView = SORTING("Activity Type", "No.", "Sorting Sequence No.");
+                SubPageLink = "Activity Type" = field(Type),
+                              "No." = field("No.");
+                SubPageView = sorting("Activity Type", "No.", "Sorting Sequence No.");
             }
         }
         area(factboxes)
@@ -109,7 +113,7 @@ page 7349 "Registered Movement"
 
                     trigger OnAction()
                     begin
-                        LookupRegisteredActivityHeader("Location Code", Rec);
+                        Rec.LookupRegisteredActivityHeader(Rec."Location Code", Rec);
                     end;
                 }
                 action("Co&mments")
@@ -118,9 +122,9 @@ page 7349 "Registered Movement"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Rgstrd. Whse. Activity Header"),
-                                  Type = FIELD(Type),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Rgstrd. Whse. Activity Header"),
+                                  Type = field(Type),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -129,7 +133,7 @@ page 7349 "Registered Movement"
 
     trigger OnOpenPage()
     begin
-        SetWhseLocationFilter();
+        Rec.SetWhseLocationFilter();
     end;
 }
 

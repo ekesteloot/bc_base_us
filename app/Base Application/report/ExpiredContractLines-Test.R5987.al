@@ -1,14 +1,19 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Setup;
+
 report 5987 "Expired Contract Lines - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ExpiredContractLinesTest.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ExpiredContractLinesTest.rdlc';
     Caption = 'Expired Contract Lines - Test';
 
     dataset
     {
         dataitem("Service Contract Line"; "Service Contract Line")
         {
-            DataItemTableView = SORTING("Contract Type", "Contract No.", "Line No.") WHERE("Contract Type" = CONST(Contract), "Contract Status" = CONST(Signed));
+            DataItemTableView = sorting("Contract Type", "Contract No.", "Line No.") where("Contract Type" = const(Contract), "Contract Status" = const(Signed));
             RequestFilterFields = "Contract No.", "Service Item No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

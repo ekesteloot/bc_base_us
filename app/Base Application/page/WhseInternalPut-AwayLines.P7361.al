@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
 page 7361 "Whse. Internal Put-away Lines"
 {
     Caption = 'Whse. Internal Put-away Lines';
@@ -140,7 +142,7 @@ page 7361 "Whse. Internal Put-away Lines"
                     var
                         WhseInternalPutawayHeader: Record "Whse. Internal Put-away Header";
                     begin
-                        WhseInternalPutawayHeader.Get("No.");
+                        WhseInternalPutawayHeader.Get(Rec."No.");
                         PAGE.Run(PAGE::"Whse. Internal Put-away", WhseInternalPutawayHeader);
                     end;
                 }

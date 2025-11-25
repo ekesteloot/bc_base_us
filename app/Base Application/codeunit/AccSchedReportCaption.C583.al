@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.FinancialReports;
+
+using System;
+using System.Xml;
+
 codeunit 583 "Acc. Sched. Report Caption"
 {
 

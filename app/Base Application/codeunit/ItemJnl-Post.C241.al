@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.InventoryMgt.Journal;
+
 codeunit 241 "Item Jnl.-Post"
 {
     EventSubscriberInstance = Manual;
@@ -7,7 +13,7 @@ codeunit 241 "Item Jnl.-Post"
     begin
         ItemJnlLine.Copy(Rec);
         Code();
-        Copy(ItemJnlLine);
+        Rec.Copy(ItemJnlLine);
     end;
 
     var

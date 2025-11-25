@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.Pricing.Asset;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+
 page 7010 "Get Price Line"
 {
     Caption = 'Get Price Line';
@@ -137,17 +147,11 @@ page 7010 "Get Price Line"
 
     protected var
         AmountType: Enum "Price Amount Type";
-        [InDataSet]
         DiscountVisible: Boolean;
-        [InDataSet]
         HideProductControls: Boolean;
-        [InDataSet]
         ItemVariantVisible: Boolean;
-        [InDataSet]
         WorkTypeCodeVisible: Boolean;
-        [InDataSet]
         PriceVisible: Boolean;
-        [InDataSet]
         IsSalesPrice: Boolean;
 
     procedure SetDataCaptionExpr(PriceAssetList: Codeunit "Price Asset List")

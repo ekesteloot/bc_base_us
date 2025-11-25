@@ -9,7 +9,7 @@ report 10307 "Country/Region List"
     {
         dataitem("Country/Region"; "Country/Region")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code", "Address Format";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

@@ -1,3 +1,8 @@
+namespace System.Environment.Configuration;
+
+using System;
+using System.Tooling;
+
 codeunit 9173 "Profile Helper"
 {
     var
@@ -92,7 +97,7 @@ codeunit 9173 "Profile Helper"
         NotificationLifecycleMgt.SendNotification(NewDiagnosticsNotification, DesignerDiagnostic.RecordId());
 
         DesignerDiagnostic.SetRange("Operation ID", ImportID);
-        DesignerDiagnostic.SetFilter(Severity, '<>%1', Severity::Hidden);
+        DesignerDiagnostic.SetFilter(Severity, '<>%1', Enum::Severity::Hidden);
         Page.Run(Page::"Profile Import Diagnostics", DesignerDiagnostic);
     end;
 
@@ -118,15 +123,15 @@ codeunit 9173 "Profile Helper"
     begin
         case NavDesignerDiagnosticSeverity of
             NavDesignerDiagnosticSeverity.Error:
-                exit(Severity::Error);
+                exit(Enum::Severity::Error);
             NavDesignerDiagnosticSeverity.Warning:
-                exit(Severity::Warning);
+                exit(Enum::Severity::Warning);
             NavDesignerDiagnosticSeverity.Info:
-                exit(Severity::Information);
+                exit(Enum::Severity::Information);
             NavDesignerDiagnosticSeverity.Hidden:
-                exit(Severity::Hidden);
+                exit(Enum::Severity::Hidden);
         end;
-        exit(Severity::Information); // Unknown
+        exit(Enum::Severity::Information); // Unknown
     end;
 
     local procedure PopulateProfileDesignerDiagnostic(NavDesignerALProfileImportResponse: DotNet NavDesignerALProfileImportResponse; ImportID: Guid)
@@ -137,7 +142,7 @@ codeunit 9173 "Profile Helper"
         ProfileDesignerDiagnostic."Import ID" := ImportID;
         ProfileDesignerDiagnostic."Profile App ID" := NavDesignerALProfileImportResponse.ProfileKey().AppId();
         ProfileDesignerDiagnostic."Profile ID" := NavDesignerALProfileImportResponse.ProfileKey().ProfileId();
-        ProfileDesignerDiagnostic.Severity := Severity::Hidden; // Make sure at least one Record exist for each profile, in case it was imported with no diagnostics
+        ProfileDesignerDiagnostic.Severity := Enum::Severity::Hidden; // Make sure at least one Record exist for each profile, in case it was imported with no diagnostics
         ProfileDesignerDiagnostic.Insert(true);
         foreach NavDesignerDiagnostic in NavDesignerALProfileImportResponse.Diagnostics() do begin
             ProfileDesignerDiagnostic."Diagnostics ID" += 1;
@@ -147,7 +152,7 @@ codeunit 9173 "Profile Helper"
         end;
         if NavDesignerALProfileImportResponse.Success() then begin
             ProfileDesignerDiagnostic."Diagnostics ID" += 1;
-            ProfileDesignerDiagnostic.Severity := Severity::Verbose;
+            ProfileDesignerDiagnostic.Severity := Enum::Severity::Verbose;
             ProfileDesignerDiagnostic.Message := ImportSuccessTxt;
             ProfileDesignerDiagnostic.Insert(true);
         end;

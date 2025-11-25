@@ -1,3 +1,9 @@
+namespace Microsoft.HumanResources.RoleCenters;
+
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Reports;
+using Microsoft.HumanResources.Setup;
+
 page 8902 "Human Resources Manager RC"
 {
     Caption = 'Human Resources Manager RC';
@@ -175,6 +181,6 @@ page 8902 "Human Resources Manager RC"
                     RunObject = page "Employee Statistics Groups";
                 }
             }
-       }
+        }
     }
 }

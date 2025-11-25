@@ -1,3 +1,10 @@
+namespace Microsoft.FinancialMgt.RoleCenters;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+
 page 9032 "Acc. Payables Activities"
 {
     Caption = 'Activities';

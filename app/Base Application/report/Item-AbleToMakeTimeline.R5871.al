@@ -1,7 +1,17 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.BOM.Tree;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Document;
+using System.Utilities;
+
 report 5871 "Item - Able to Make (Timeline)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemAbletoMakeTimeline.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemAbletoMakeTimeline.rdlc';
     AdditionalSearchTerms = 'assembly availability';
     ApplicationArea = Planning;
     Caption = 'Item - Able to Make (Timeline)';
@@ -12,7 +22,7 @@ report 5871 "Item - Able to Make (Timeline)"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Location Filter", "Variant Filter";
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
             {
@@ -27,7 +37,7 @@ report 5871 "Item - Able to Make (Timeline)"
             }
             dataitem(BOMBufferLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(TotalQty; TotalQty)
                 {
                     DecimalPlaces = 0 : 5;

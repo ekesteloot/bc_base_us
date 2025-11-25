@@ -1,3 +1,5 @@
+namespace Microsoft.CashFlow.Setup;
+
 enum 842 "Cash Flow Table Name"
 {
     Extensible = true;

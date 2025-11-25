@@ -1,3 +1,7 @@
+namespace System.Security.User;
+
+using System.Environment.Configuration;
+
 pageextension 9206 "User Personalization" extends "User Personalization"
 {
     actions

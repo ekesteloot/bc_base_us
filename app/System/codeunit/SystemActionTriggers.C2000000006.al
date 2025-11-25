@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment;
+
+using System.Reflection;
+
 codeunit 2000000006 "System Action Triggers"
 {
     SingleInstance = true;
@@ -136,6 +144,16 @@ codeunit 2000000006 "System Action Triggers"
 
     [BusinessEvent(false)]
     procedure GetFindEntriesPageId(var PageId: Integer)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    procedure GetDataSearchPageId(var PageId: Integer)
+    begin
+    end;
+
+    [BusinessEvent(false)]
+    procedure OpenDataSearchPage(SearchValue: Text)
     begin
     end;
 }

@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Utilities;
+
 codeunit 1216 "Incoming Doc. with Data. Exch."
 {
     Permissions = TableData "Data Exch." = im;

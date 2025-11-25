@@ -1,3 +1,13 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
+using Microsoft.BankMgt.Ledger;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 99 "Delete Empty G/L Registers"
 {
     Caption = 'Delete Empty G/L Registers';
@@ -8,7 +18,7 @@ report 99 "Delete Empty G/L Registers"
     {
         dataitem("G/L Register"; "G/L Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "Creation Date";
 
             trigger OnAfterGetRecord()

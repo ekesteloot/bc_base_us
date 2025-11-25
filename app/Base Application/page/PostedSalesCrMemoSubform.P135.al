@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item.Catalog;
+using System.Environment.Configuration;
+
 page 135 "Posted Sales Cr. Memo Subform"
 {
     AutoSplitKey = true;
@@ -19,7 +25,7 @@ page 135 "Posted Sales Cr. Memo Subform"
                     ApplicationArea = Advanced;
                     ToolTip = 'Specifies the line type.';
                 }
-                field(FilteredTypeField; FormatType())
+                field(FilteredTypeField; Rec.FormatType())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Type';
@@ -213,54 +219,54 @@ page 135 "Posted Sales Cr. Memo Subform"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
                 }
                 field("Gross Weight"; Rec."Gross Weight")
@@ -361,7 +367,7 @@ page 135 "Posted Sales Cr. Memo Subform"
 
                 trigger OnAction()
                 begin
-                    ShowDeferrals();
+                    Rec.ShowDeferrals();
                 end;
             }
             group("&Line")
@@ -379,7 +385,7 @@ page 135 "Posted Sales Cr. Memo Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(Comments)
@@ -391,7 +397,7 @@ page 135 "Posted Sales Cr. Memo Subform"
 
                     trigger OnAction()
                     begin
-                        ShowLineComments();
+                        Rec.ShowLineComments();
                     end;
                 }
                 action(ItemTrackingEntries)
@@ -403,12 +409,12 @@ page 135 "Posted Sales Cr. Memo Subform"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
                 action(ItemReturnReceiptLines)
                 {
-                    AccessByPermission = TableData "Return Shipment Header" = R;
+                    AccessByPermission = TableData "Return Receipt Header" = R;
                     ApplicationArea = SalesReturnOrder, PurchReturnOrder;
                     Caption = 'Item Return Receipt &Lines';
                     Image = ReceiptLines;
@@ -459,7 +465,7 @@ page 135 "Posted Sales Cr. Memo Subform"
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnInit()
@@ -493,9 +499,9 @@ page 135 "Posted Sales Cr. Memo Subform"
 
     local procedure PageShowItemReturnRcptLines()
     begin
-        if not (Type in [Type::Item, Type::"Charge (Item)"]) then
-            TestField(Type);
-        ShowItemReturnRcptLines();
+        if not (Rec.Type in [Rec.Type::Item, Rec.Type::"Charge (Item)"]) then
+            Rec.TestField(Type);
+        Rec.ShowItemReturnRcptLines();
     end;
 
     procedure ShowDocumentLineTracking()
@@ -504,7 +510,7 @@ page 135 "Posted Sales Cr. Memo Subform"
     begin
         Clear(DocumentLineTracking);
         DocumentLineTracking.SetDoc(
-          10, "Document No.", "Line No.", "Blanket Order No.", "Blanket Order Line No.", "Order No.", "Order Line No.");
+          10, Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", Rec."Order No.", Rec."Order Line No.");
         DocumentLineTracking.RunModal();
     end;
 

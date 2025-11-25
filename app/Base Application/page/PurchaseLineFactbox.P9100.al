@@ -1,3 +1,12 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+
 page 9100 "Purchase Line FactBox"
 {
     Caption = 'Purchase Line Details';
@@ -45,7 +54,7 @@ page 9100 "Purchase Line FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    PickPrice();
+                    Rec.PickPrice();
                     CurrPage.Update();
                 end;
             }
@@ -59,7 +68,7 @@ page 9100 "Purchase Line FactBox"
 
                 trigger OnDrillDown()
                 begin
-                    PickDiscount();
+                    Rec.PickDiscount();
                     CurrPage.Update();
                 end;
             }
@@ -99,7 +108,7 @@ page 9100 "Purchase Line FactBox"
         PurchInfoPaneMgt: Codeunit "Purchases Info-Pane Management";
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
 
-    local procedure ShowDetails()
+    protected procedure ShowDetails()
     var
         Item: Record Item;
     begin

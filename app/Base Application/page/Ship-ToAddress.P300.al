@@ -1,4 +1,8 @@
-﻿page 300 "Ship-to Address"
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Foundation.Address;
+
+page 300 "Ship-to Address"
 {
     Caption = 'Ship-to Address';
     DataCaptionExpression = Caption();
@@ -15,7 +19,7 @@
                 group(Control3)
                 {
                     ShowCaption = false;
-                    field("Code"; Code)
+                    field("Code"; Rec.Code)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies a ship-to address code.';
@@ -25,12 +29,12 @@
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the name associated with the ship-to address.';
                     }
-                    field(GLN; GLN)
+                    field(GLN; Rec.GLN)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the recipient''s GLN code.';
                     }
-                    field(Address; Address)
+                    field(Address; Rec.Address)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the ship-to address.';
@@ -40,7 +44,7 @@
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies additional address information.';
                     }
-                    field(City; City)
+                    field(City; Rec.City)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the city the items are being shipped to.';
@@ -49,7 +53,7 @@
                     {
                         ShowCaption = false;
                         Visible = IsCountyVisible;
-                        field(County; County)
+                        field(County; Rec.County)
                         {
                             ApplicationArea = Basic, Suite;
                             ToolTip = 'Specifies the state, province, or county as a part of the address.';
@@ -67,7 +71,7 @@
 
                         trigger OnValidate()
                         begin
-                            IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                            IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                         end;
                     }
                     field(ShowMap; ShowMapLbl)
@@ -82,7 +86,7 @@
                         trigger OnDrillDown()
                         begin
                             CurrPage.Update(true);
-                            DisplayMap();
+                            Rec.DisplayMap();
                         end;
                     }
                 }
@@ -92,7 +96,7 @@
                     Importance = Additional;
                     ToolTip = 'Specifies the recipient''s telephone number.';
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the person you contact about orders shipped to this address.';
@@ -203,12 +207,12 @@
 
     trigger OnAfterGetCurrRecord()
     begin
-        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
     end;
 
     trigger OnAfterGetRecord()
     begin
-        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -216,7 +220,7 @@
         Customer: Record Customer;
         IsHandled: Boolean;
     begin
-        if not Customer.Get(GetFilterCustNo()) then
+        if not Customer.Get(Rec.GetFilterCustNo()) then
             exit;
 
         IsHandled := false;
@@ -224,21 +228,21 @@
         if IsHandled then
             exit;
 
-        Validate(Name, Customer.Name);
-        Validate(Address, Customer.Address);
-        Validate("Address 2", Customer."Address 2");
-        "Country/Region Code" := Customer."Country/Region Code";
-        City := Customer.City;
-        County := Customer.County;
-        "Post Code" := Customer."Post Code";
-        Validate(Contact, Customer.Contact);
+        Rec.Validate(Name, Customer.Name);
+        Rec.Validate(Address, Customer.Address);
+        Rec.Validate("Address 2", Customer."Address 2");
+        Rec."Country/Region Code" := Customer."Country/Region Code";
+        Rec.City := Customer.City;
+        Rec.County := Customer.County;
+        Rec."Post Code" := Customer."Post Code";
+        Rec.Validate(Contact, Customer.Contact);
 
         OnAfterOnNewRecord(Customer, Rec);
     end;
 
     trigger OnOpenPage()
     begin
-        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
     end;
 
     var

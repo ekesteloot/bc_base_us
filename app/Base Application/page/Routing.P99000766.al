@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.Routing;
+
+using Microsoft.Manufacturing.Comment;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Reports;
+
 page 99000766 Routing
 {
     Caption = 'Routing';
@@ -18,7 +24,7 @@ page 99000766 Routing
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -58,10 +64,10 @@ page 99000766 Routing
                     var
                         RtngVersion: Record "Routing Version";
                     begin
-                        RtngVersion.SetRange("Routing No.", "No.");
+                        RtngVersion.SetRange("Routing No.", Rec."No.");
                         RtngVersion.SetRange("Version Code", ActiveVersionCode);
                         PAGE.RunModal(PAGE::"Routing Version", RtngVersion);
-                        ActiveVersionCode := VersionMgt.GetRtngVersion("No.", WorkDate(), true);
+                        ActiveVersionCode := VersionMgt.GetRtngVersion(Rec."No.", WorkDate(), true);
                     end;
                 }
                 field("Last Date Modified"; Rec."Last Date Modified")
@@ -78,8 +84,8 @@ page 99000766 Routing
             part(RoutingLine; "Routing Lines")
             {
                 ApplicationArea = Manufacturing;
-                SubPageLink = "Routing No." = FIELD("No."),
-                              "Version Code" = CONST('');
+                SubPageLink = "Routing No." = field("No."),
+                              "Version Code" = const('');
             }
         }
         area(factboxes)
@@ -111,8 +117,8 @@ page 99000766 Routing
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Manufacturing Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Routing Header"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Routing Header"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("&Versions")
@@ -121,7 +127,7 @@ page 99000766 Routing
                     Caption = '&Versions';
                     Image = RoutingVersions;
                     RunObject = Page "Routing Version List";
-                    RunPageLink = "Routing No." = FIELD("No.");
+                    RunPageLink = "Routing No." = field("No.");
                     ToolTip = 'View or edit other versions of the routing, typically with other operations data. ';
                 }
                 action("Where-used")
@@ -130,8 +136,8 @@ page 99000766 Routing
                     Caption = 'Where-used';
                     Image = "Where-Used";
                     RunObject = Page "Where-Used Item List";
-                    RunPageLink = "Routing No." = FIELD("No.");
-                    RunPageView = SORTING("Routing No.");
+                    RunPageLink = "Routing No." = field("No.");
+                    RunPageView = sorting("Routing No.");
                     ToolTip = 'View a list of BOMs in which the item is used.';
                 }
             }
@@ -154,7 +160,7 @@ page 99000766 Routing
                     var
                         FromRtngHeader: Record "Routing Header";
                     begin
-                        TestField("No.");
+                        Rec.TestField("No.");
                         if PAGE.RunModal(0, FromRtngHeader) = ACTION::LookupOK then
                             CopyRouting.CopyRouting(FromRtngHeader."No.", '', Rec, '');
                     end;
@@ -196,7 +202,7 @@ page 99000766 Routing
     trigger OnAfterGetRecord()
     begin
         ActiveVersionCode :=
-          VersionMgt.GetRtngVersion("No.", WorkDate(), true);
+          VersionMgt.GetRtngVersion(Rec."No.", WorkDate(), true);
     end;
 
     var

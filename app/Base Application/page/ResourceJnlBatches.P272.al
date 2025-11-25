@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
 page 272 "Resource Jnl. Batches"
 {
     Caption = 'Resource Jnl. Batches';
@@ -135,12 +137,12 @@ page 272 "Resource Jnl. Batches"
 
     trigger OnInit()
     begin
-        SetRange("Journal Template Name");
+        Rec.SetRange("Journal Template Name");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetupNewBatch();
+        Rec.SetupNewBatch();
     end;
 
     trigger OnOpenPage()
@@ -157,9 +159,9 @@ page 272 "Resource Jnl. Batches"
         ResJnlTemplate: Record "Res. Journal Template";
     begin
         if not CurrPage.LookupMode then
-            if GetFilter("Journal Template Name") <> '' then
-                if GetRangeMin("Journal Template Name") = GetRangeMax("Journal Template Name") then
-                    if ResJnlTemplate.Get(GetRangeMin("Journal Template Name")) then
+            if Rec.GetFilter("Journal Template Name") <> '' then
+                if Rec.GetRangeMin("Journal Template Name") = Rec.GetRangeMax("Journal Template Name") then
+                    if ResJnlTemplate.Get(Rec.GetRangeMin("Journal Template Name")) then
                         exit(ResJnlTemplate.Name + ' ' + ResJnlTemplate.Description);
     end;
 }

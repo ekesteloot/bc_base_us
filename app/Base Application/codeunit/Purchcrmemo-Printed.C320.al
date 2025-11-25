@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.History;
+
 codeunit 320 "PurchCrMemo-Printed"
 {
     Permissions = TableData "Purch. Cr. Memo Hdr." = rimd;
@@ -6,10 +8,10 @@ codeunit 320 "PurchCrMemo-Printed"
     trigger OnRun()
     begin
         OnBeforeOnRun(Rec, SuppressCommit);
-        Find();
-        "No. Printed" := "No. Printed" + 1;
+        Rec.Find();
+        Rec."No. Printed" := Rec."No. Printed" + 1;
         OnBeforeModify(Rec);
-        Modify();
+        Rec.Modify();
         if not SuppressCommit then
             Commit();
     end;

@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.Inbox;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 645 "IC Inbox Sales Lines"
 {
     Caption = 'Lines';
@@ -116,7 +120,7 @@ page 645 "IC Inbox Sales Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }

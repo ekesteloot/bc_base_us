@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System;
+
 codeunit 704 "MemoryStream Wrapper"
 {
 

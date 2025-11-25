@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Request;
+
 enum 5771 "Warehouse Request Type"
 {
     Extensible = true;

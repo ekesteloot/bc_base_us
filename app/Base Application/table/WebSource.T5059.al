@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Comment;
+
 table 5059 "Web Source"
 {
     Caption = 'Web Source';
@@ -21,9 +25,9 @@ table 5059 "Web Source"
         }
         field(4; Comment; Boolean)
         {
-            CalcFormula = Exist ("Rlshp. Mgt. Comment Line" WHERE("Table Name" = CONST("Web Source"),
-                                                                  "No." = FIELD(Code),
-                                                                  "Sub No." = CONST(0)));
+            CalcFormula = Exist("Rlshp. Mgt. Comment Line" where("Table Name" = const("Web Source"),
+                                                                  "No." = field(Code),
+                                                                  "Sub No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;

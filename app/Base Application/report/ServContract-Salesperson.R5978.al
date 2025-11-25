@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Contract;
+
 report 5978 "Serv. Contract - Salesperson"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ServContractSalesperson.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServContractSalesperson.rdlc';
     ApplicationArea = Service;
     Caption = 'Serv. Contract - Salesperson';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5978 "Serv. Contract - Salesperson"
     {
         dataitem("Service Contract Header"; "Service Contract Header")
         {
-            DataItemTableView = SORTING("Salesperson Code", Status) WHERE("Contract Type" = CONST(Contract));
+            DataItemTableView = sorting("Salesperson Code", Status) where("Contract Type" = const(Contract));
             RequestFilterFields = "Salesperson Code", Status, "Contract No.", "Starting Date";
             column(TodayFormatted; Format(Today, 0, 4))
             {

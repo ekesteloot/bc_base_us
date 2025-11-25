@@ -11,7 +11,7 @@ codeunit 64 "Sales-Get Shipment"
         if IsHandled then
             exit;
 
-        SalesHeader.Get("Document Type", "Document No.");
+        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
         SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Invoice);
         SalesHeader.TestField(Status, SalesHeader.Status::Open);
 
@@ -366,6 +366,25 @@ codeunit 64 "Sales-Get Shipment"
             exit;
 
         SalesShptLine.TestField("VAT Bus. Posting Group", SalesHeader."VAT Bus. Posting Group");
+    end;
+
+    procedure GetSalesOrderInvoices(var TempSalesInvoiceHeader: Record "Sales Invoice Header" temporary; OrderNo: Code[20])
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesInvoicesByOrder: Query "Sales Invoices By Order";
+    begin
+        TempSalesInvoiceHeader.Reset();
+        TempSalesInvoiceHeader.DeleteAll();
+
+        SalesInvoicesByOrder.SetRange(Order_No_, OrderNo);
+        SalesInvoicesByOrder.SetFilter(Quantity, '<>0');
+        SalesInvoicesByOrder.Open();
+
+        while SalesInvoicesByOrder.Read() do begin
+            SalesInvoiceHeader.Get(SalesInvoicesByOrder.Document_No_);
+            TempSalesInvoiceHeader := SalesInvoiceHeader;
+            TempSalesInvoiceHeader.Insert();
+        end;
     end;
 
     local procedure CopyDocumentAttachments(var SalesShipmentLine: Record "Sales Shipment Line"; var SalesLine2: Record "Sales Line")

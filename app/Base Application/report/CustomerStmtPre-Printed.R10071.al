@@ -8,7 +8,7 @@ report 10071 "Customer Stmt. (Pre-Printed)"
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Print Statements", "Date Filter";
             column(No_Customer; "No.")
             {
@@ -21,7 +21,7 @@ report 10071 "Customer Stmt. (Pre-Printed)"
             }
             dataitem(HeaderFooter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) WHERE(Number = const(1));
                 column(CompanyAddress1; CompanyAddress[1])
                 {
                 }
@@ -147,9 +147,9 @@ report 10071 "Customer Stmt. (Pre-Printed)"
                 }
                 dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
                 {
-                    DataItemLink = "Customer No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
+                    DataItemLink = "Customer No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
                     DataItemLinkReference = Customer;
-                    DataItemTableView = SORTING("Customer No.", Open) WHERE(Open = CONST(true));
+                    DataItemTableView = sorting("Customer No.", Open) WHERE(Open = const(true));
 
                     trigger OnAfterGetRecord()
                     begin
@@ -170,9 +170,9 @@ report 10071 "Customer Stmt. (Pre-Printed)"
                 }
                 dataitem(AfterStmntDateEntry; "Cust. Ledger Entry")
                 {
-                    DataItemLink = "Customer No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
+                    DataItemLink = "Customer No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
                     DataItemLinkReference = Customer;
-                    DataItemTableView = SORTING("Customer No.", "Posting Date");
+                    DataItemTableView = sorting("Customer No.", "Posting Date");
 
                     trigger OnAfterGetRecord()
                     begin
@@ -196,7 +196,7 @@ report 10071 "Customer Stmt. (Pre-Printed)"
                 }
                 dataitem("Balance Forward"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) WHERE(Number = const(1));
                     column(FromDate1; FromDate - 1)
                     {
                     }
@@ -220,7 +220,7 @@ report 10071 "Customer Stmt. (Pre-Printed)"
                 }
                 dataitem(OpenItem; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(TempCustLedgEntryDocNo; TempCustLedgEntry."Document No.")
                     {
                     }
@@ -304,9 +304,9 @@ report 10071 "Customer Stmt. (Pre-Printed)"
                 }
                 dataitem(CustLedgerEntry4; "Cust. Ledger Entry")
                 {
-                    DataItemLink = "Customer No." = FIELD("No.");
+                    DataItemLink = "Customer No." = field("No.");
                     DataItemLinkReference = Customer;
-                    DataItemTableView = SORTING("Customer No.", "Posting Date");
+                    DataItemTableView = sorting("Customer No.", "Posting Date");
                     column(DocumentNo_CustLedgerEntry4; "Document No.")
                     {
                     }
@@ -366,7 +366,7 @@ report 10071 "Customer Stmt. (Pre-Printed)"
                 }
                 dataitem(EndOfCustomer; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) WHERE(Number = const(1));
                     column(StatementComplete; StatementComplete)
                     {
                     }
@@ -390,6 +390,7 @@ report 10071 "Customer Stmt. (Pre-Printed)"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 DebitBalance := 0;
                 CreditBalance := 0;
@@ -667,7 +668,6 @@ report 10071 "Customer Stmt. (Pre-Printed)"
         TempAmountDue: array[4] of Decimal;
         StatementStyle_Int: Integer;
         AgingMethod_Int: Integer;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         Text014: Label 'You must enter a Length of Aging Periods if you select aging.';
         StatementBalanceCaptionLbl: Label 'Statement Balance';

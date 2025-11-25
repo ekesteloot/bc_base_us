@@ -1,3 +1,8 @@
+﻿namespace Microsoft.CRM.Profiling;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+
 codeunit 5059 ProfileManagement
 {
 

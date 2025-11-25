@@ -10,11 +10,11 @@
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.") WHERE("Account Type" = CONST(Posting), "Income/Balance" = CONST("Income Statement"));
+            DataItemTableView = sorting("No.") where("Account Type" = const(Posting), "Income/Balance" = const("Income Statement"));
             dataitem("G/L Entry"; "G/L Entry")
             {
-                DataItemLink = "G/L Account No." = FIELD("No.");
-                DataItemTableView = SORTING("G/L Account No.", "Posting Date");
+                DataItemLink = "G/L Account No." = field("No.");
+                DataItemTableView = sorting("G/L Account No.", "Posting Date");
 
                 trigger OnAfterGetRecord()
                 var
@@ -281,9 +281,9 @@
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Retained Earnings Acc.';
-                        TableRelation = "G/L Account" WHERE("Account Type" = CONST(Posting),
-                                                             "Account Category" = FILTER(" " | Equity),
-                                                             "Income/Balance" = CONST("Balance Sheet"));
+                        TableRelation = "G/L Account" where("Account Type" = const(Posting),
+                                                             "Account Category" = filter(" " | Equity),
+                                                             "Income/Balance" = const("Balance Sheet"));
                         ToolTip = 'Specifies the retained earnings account that the batch job posts to. This account should be the same as the account that is used by the Close Income Statement batch job.';
 
                         trigger OnValidate()
@@ -418,7 +418,7 @@
         if not IsHandled then begin
             s := CheckDimPostingRules(TempSelectedDim);
             if s <> '' then
-                if not Confirm(s + Text007, false) then
+                if not Confirm(s + Confirm04Tok, false) then
                     Error('');
         end;
 
@@ -429,11 +429,13 @@
             if RetainedEarningsGLAcc."No." = '' then
                 Error(Text002);
             if not Confirm(
-                 Text003 +
-                 Text005 +
-                 Text007, false)
+                 Confirm01Tok +
+                 Confirm02Tok +
+                 Confirm03Tok +
+                 Confirm04Tok, false)
             then
                 Error('');
+            PostToRetainedEarningsAcc := PostToRetainedEarningsAcc::Details;
         end;
 
         Window.Open(Text008 + Text009 + Text019 + Text010 + Text011);
@@ -500,9 +502,10 @@
         Text000: Label 'Enter the ending date for the fiscal year.';
         Text001: Label 'Enter a Document No.';
         Text002: Label 'Enter Retained Earnings Account No.';
-        Text003: Label 'By using an additional reporting currency, this batch job will post closing entries directly to the general ledger.  ';
-        Text005: Label 'These closing entries will not be transferred to a general journal before the program posts them to the general ledger.\\ ';
-        Text007: Label '\Do you want to continue?';
+        Confirm01Tok: Label 'By using an additional reporting currency, this batch job will post closing entries directly to the general ledger.  ';
+        Confirm02Tok: Label 'These closing entries will not be transferred to a general journal before the program posts them to the general ledger.\ ';
+        Confirm03Tok: Label 'Post to Retained Earnings Acc. will be set to Details.\\';
+        Confirm04Tok: Label '\Do you want to continue?';
         Text008: Label 'Creating general journal lines...\\';
         Text009: Label 'Account No.         #1##################\';
         Text010: Label 'Now performing      #2##################\';

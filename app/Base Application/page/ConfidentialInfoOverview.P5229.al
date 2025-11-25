@@ -1,3 +1,9 @@
+namespace Microsoft.HumanResources.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Setup;
+
 page 5229 "Confidential Info. Overview"
 {
     Caption = 'Confidential Info. Overview';

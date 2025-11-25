@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.RoleCenters;
+
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using System.Visualization;
+
 page 9057 "Service Dispatcher Activities"
 {
     Caption = 'Activities';

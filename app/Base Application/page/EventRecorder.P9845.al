@@ -7,8 +7,8 @@ page 9845 "Event Recorder"
     PopulateAllFields = true;
     SourceTable = "Recorded Event Buffer";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Call Order")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Call Order")
+                      order(Ascending);
     UsageCategory = Lists;
 
     layout
@@ -215,7 +215,6 @@ page 9845 "Event Recorder"
         NoEventsRecordedMsg: Label 'No events have been recorded.';
         GetAlSnippetLbl: Label 'Get AL Snippet.';
         EventLoggingRunning: Boolean;
-        [InDataSet]
         EventTypeStyleExpr: Text;
 
     local procedure DisplaySnippet() Snippet: Text

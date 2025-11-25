@@ -1,4 +1,25 @@
-﻿table 312 "Purchases & Payables Setup"
+﻿namespace Microsoft.Purchases.Setup;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Vendor;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment;
+#if not CLEAN23
+using System.Telemetry;
+#endif
+using System.Threading;
+
+table 312 "Purchases & Payables Setup"
 {
     Caption = 'Purchases & Payables Setup';
     DrillDownPageID = "Purchases & Payables Setup";
@@ -341,13 +362,19 @@
             Caption = 'Allow Multiple Posting Groups';
             DataClassification = SystemMetadata;
 
-#if not CLEAN20
             trigger OnValidate()
-            begin
-                if "Allow Multiple Posting Groups" then
-                    CheckMultiplePostingGroupsNotAllowed();
-            end;
+#if not CLEAN23
+            var
+                FeatureTelemetry: Codeunit "Feature Telemetry";
+                FeatureKeyManagement: Codeunit "Feature Key Management";
 #endif
+            begin
+#if not CLEAN23
+                if "Allow Multiple Posting Groups" then
+                    FeatureTelemetry.LogUptake(
+                        '0000JRB', FeatureKeyManagement.GetAllowMultipleCustVendPostingGroupsFeatureKey(), Enum::"Feature Uptake Status"::Discovered);
+#endif
+            end;
         }
         field(176; "Check Multiple Posting Groups"; enum "Posting Group Change Method")
         {
@@ -357,32 +384,32 @@
         field(200; "P. Invoice Template Name"; Code[10])
         {
             Caption = 'Purch. Invoice Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Purchases));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Purchases));
         }
         field(201; "P. Cr. Memo Template Name"; Code[10])
         {
             Caption = 'Purch. Cr. Memo Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Purchases));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Purchases));
         }
         field(202; "P. Prep. Inv. Template Name"; Code[10])
         {
             Caption = 'P. Prep. Invoice Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Purchases));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Purchases));
         }
         field(203; "P. Prep. Cr.Memo Template Name"; Code[10])
         {
             Caption = 'Purch. Prep. Cr. Memo Template Name';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Purchases));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Purchases));
         }
         field(204; "IC Purch. Invoice Templ. Name"; Code[10])
         {
             Caption = 'IC Jnl. Templ. Purch. Invoice';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Intercompany));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Intercompany));
         }
         field(205; "IC Purch. Cr. Memo Templ. Name"; Code[10])
         {
             Caption = 'IC Jnl. Templ. Purch. Cr. Memo';
-            TableRelation = "Gen. Journal Template" WHERE(Type = FILTER(Intercompany));
+            TableRelation = "Gen. Journal Template" where(Type = filter(Intercompany));
         }
         field(210; "Copy Line Descr. to G/L Entry"; Boolean)
         {
@@ -393,43 +420,22 @@
         {
             Caption = 'Invoice Posting Setup';
             ObsoleteReason = 'Replaced by direct selection of posting interface in codeunits.';
-#if CLEAN20
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-
-            trigger OnValidate()
-            var
-                AllObjWithCaption: Record AllObjWithCaption;
-                EnvironmentInfo: Codeunit "Environment Information";
-                InvoicePostingInterface: Interface "Invoice Posting";
-            begin
-                if "Invoice Posting Setup" <> "Purchase Invoice Posting"::"Invoice Posting (Default)" then begin
-                    if EnvironmentInfo.IsProduction() then
-                        error(InvoicePostingNotAllowedErr);
-
-                    AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Codeunit, "Invoice Posting Setup".AsInteger());
-                    InvoicePostingInterface := "Invoice Posting Setup";
-                    InvoicePostingInterface.Check(Database::"Purchase Header");
-                end;
-            end;
-#endif
         }
         field(1217; "Debit Acc. for Non-Item Lines"; Code[20])
         {
             Caption = 'Debit Acc. for Non-Item Lines';
-            TableRelation = "G/L Account" WHERE("Direct Posting" = CONST(true),
-                                                 "Account Type" = CONST(Posting),
-                                                 Blocked = CONST(false));
+            TableRelation = "G/L Account" where("Direct Posting" = const(true),
+                                                 "Account Type" = const(Posting),
+                                                 Blocked = const(false));
         }
         field(1218; "Credit Acc. for Non-Item Lines"; Code[20])
         {
             Caption = 'Credit Acc. for Non-Item Lines';
-            TableRelation = "G/L Account" WHERE("Direct Posting" = CONST(true),
-                                                 "Account Type" = CONST(Posting),
-                                                 Blocked = CONST(false));
+            TableRelation = "G/L Account" where("Direct Posting" = const(true),
+                                                 "Account Type" = const(Posting),
+                                                 Blocked = const(false));
         }
         field(5775; "Auto Post Non-Invt. via Whse."; Enum "Non-Invt. Item Whse. Policy")
         {
@@ -501,11 +507,16 @@
             var
                 PriceListHeader: Record "Price List Header";
             begin
-                if Page.RunModal(Page::"Purchase Price Lists", PriceListHeader) = Action::LookupOK then begin
+                if Page.RunModal(Enum::PageID::"Purchase Price Lists".AsInteger(), PriceListHeader) = Action::LookupOK then begin
                     PriceListHeader.TestField("Allow Updating Defaults");
                     Validate("Default Price List Code", PriceListHeader.Code);
                 end;
             end;
+        }
+        field(7004; "Link Doc. Date To Posting Date"; Boolean)
+        {
+            Caption = 'Link Doc. Date to Posting Date';
+            DataClassification = SystemMetadata;
         }
         field(10000; "Combine Special Orders Default"; Option)
         {
@@ -541,10 +552,6 @@
 
     var
         Text001: Label 'Job Queue Priority must be zero or positive.';
-#if not CLEAN20
-        InvoicePostingNotAllowedErr: Label 'Use of alternative invoice posting interfaces in production environment is currently not allowed.';
-        MultiplePostingGroupsNotAllowedErr: Label 'Use of multiple posting groups in production environment is currently not allowed.';
-#endif
         RecordHasBeenRead: Boolean;
 
     procedure GetRecordOnce()
@@ -560,15 +567,5 @@
         Get();
         exit("Post with Job Queue" or "Post & Print with Job Queue");
     end;
-
-#if not CLEAN20
-    internal procedure CheckMultiplePostingGroupsNotAllowed(): Text
-    var
-        EnvironmentInformation: Codeunit "Environment Information";
-    begin
-        if EnvironmentInformation.IsSaas() and EnvironmentInformation.IsProduction() then
-            error(MultiplePostingGroupsNotAllowedErr);
-    end;
-#endif
 }
 

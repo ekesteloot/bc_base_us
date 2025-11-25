@@ -1,3 +1,14 @@
+﻿namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
 table 365 "Analysis View Entry"
 {
     Caption = 'Analysis View Entry';
@@ -10,7 +21,7 @@ table 365 "Analysis View Entry"
         {
             Caption = 'Analysis View Code';
             NotBlank = true;
-            TableRelation = "Analysis View" WHERE("Account Source" = FIELD("Account Source"));
+            TableRelation = "Analysis View" where("Account Source" = field("Account Source"));
         }
         field(2; "Business Unit Code"; Code[20])
         {
@@ -20,9 +31,9 @@ table 365 "Analysis View Entry"
         field(3; "Account No."; Code[20])
         {
             Caption = 'Account No.';
-            TableRelation = IF ("Account Source" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Account Source" = CONST("Cash Flow Account")) "Cash Flow Account";
+            TableRelation = if ("Account Source" = const("G/L Account")) "G/L Account"
+            else
+            if ("Account Source" = const("Cash Flow Account")) "Cash Flow Account";
             ValidateTableRelation = false;
 
             trigger OnLookup()

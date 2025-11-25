@@ -1,3 +1,22 @@
+namespace Microsoft.ServiceMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Pricing;
+using Microsoft.ServiceMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+using System.Security.AccessControl;
+
 table 5907 "Service Ledger Entry"
 {
     Caption = 'Service Ledger Entry';
@@ -13,7 +32,7 @@ table 5907 "Service Ledger Entry"
         field(2; "Service Contract No."; Code[20])
         {
             Caption = 'Service Contract No.';
-            TableRelation = "Service Contract Header"."Contract No." WHERE("Contract Type" = CONST(Contract));
+            TableRelation = "Service Contract Header"."Contract No." where("Contract Type" = const(Contract));
         }
         field(3; "Document Type"; Enum "Service Ledger Entry Document Type")
         {
@@ -53,7 +72,7 @@ table 5907 "Service Ledger Entry"
         field(13; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Customer No."));
         }
         field(14; "Item No. (Serviced)"; Code[20])
         {
@@ -69,8 +88,6 @@ table 5907 "Service Ledger Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(17; "Contract Invoice Period"; Text[30])
         {
@@ -80,13 +97,13 @@ table 5907 "Service Ledger Entry"
         {
             CaptionClass = '1,2,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(19; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(20; "Service Item No. (Serviced)"; Code[20])
         {
@@ -96,7 +113,7 @@ table 5907 "Service Ledger Entry"
         field(21; "Variant Code (Serviced)"; Code[10])
         {
             Caption = 'Variant Code (Serviced)';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No. (Serviced)"));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No. (Serviced)"));
         }
         field(22; "Contract Group Code"; Code[10])
         {
@@ -110,17 +127,17 @@ table 5907 "Service Ledger Entry"
         field(24; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST("Service Contract")) "Service Contract Header"."Contract No." WHERE("Contract Type" = CONST(Contract))
-            ELSE
-            IF (Type = CONST(" ")) "Standard Text"
-            ELSE
-            IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST("Service Cost")) "Service Cost"
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account";
+            TableRelation = if (Type = const("Service Contract")) "Service Contract Header"."Contract No." where("Contract Type" = const(Contract))
+            else
+            if (Type = const(" ")) "Standard Text"
+            else
+            if (Type = const(Item)) Item
+            else
+            if (Type = const(Resource)) Resource
+            else
+            if (Type = const("Service Cost")) "Service Cost"
+            else
+            if (Type = const("G/L Account")) "G/L Account";
         }
         field(25; "Cost Amount"; Decimal)
         {
@@ -194,7 +211,7 @@ table 5907 "Service Ledger Entry"
         field(40; "Job No."; Code[20])
         {
             Caption = 'Job No.';
-            TableRelation = Job."No." WHERE("Bill-to Customer No." = FIELD("Bill-to Customer No."));
+            TableRelation = Job."No." where("Bill-to Customer No." = field("Bill-to Customer No."));
         }
         field(41; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -224,7 +241,7 @@ table 5907 "Service Ledger Entry"
         field(46; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(47; "Responsibility Center"; Code[10])
         {
@@ -234,7 +251,7 @@ table 5907 "Service Ledger Entry"
         field(48; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(50; "Entry Type"; Enum "Service Ledger Entry Entry Type")
         {
@@ -275,7 +292,7 @@ table 5907 "Service Ledger Entry"
         field(58; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(59; "Job Line Type"; Enum "Job Line Type")
         {
@@ -294,7 +311,7 @@ table 5907 "Service Ledger Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])

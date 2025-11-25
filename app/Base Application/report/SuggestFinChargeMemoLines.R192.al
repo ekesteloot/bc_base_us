@@ -1,3 +1,8 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 report 192 "Suggest Fin. Charge Memo Lines"
 {
     Caption = 'Suggest Fin. Charge Memo Lines';
@@ -7,7 +12,7 @@ report 192 "Suggest Fin. Charge Memo Lines"
     {
         dataitem("Finance Charge Memo Header"; "Finance Charge Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Finance Charge Memo';
 
@@ -58,7 +63,7 @@ report 192 "Suggest Fin. Charge Memo Lines"
         }
         dataitem(CustLedgEntry2; "Cust. Ledger Entry")
         {
-            DataItemTableView = SORTING("Customer No.");
+            DataItemTableView = sorting("Customer No.");
             RequestFilterFields = "Document Type";
 
             trigger OnPreDataItem()

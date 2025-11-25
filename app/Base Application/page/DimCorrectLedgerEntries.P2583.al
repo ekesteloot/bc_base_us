@@ -1,3 +1,11 @@
+﻿namespace Microsoft.FinancialMgt.Dimension.Correction;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.Enums;
+using System.Security.User;
+using System.Utilities;
+
 page 2583 "Dim. Correct Ledger Entries"
 {
     PageType = ListPart;
@@ -246,7 +254,7 @@ page 2583 "Dim. Correct Ledger Entries"
                     GLEntryRecordRef: RecordRef;
                 begin
                     VerifyCanChangePart();
-                    if "Transaction No." = 0 then
+                    if Rec."Transaction No." = 0 then
                         Error(NoRelatedEntriesErr);
 
                     GLEntry.SetRange("Transaction No.", Rec."Transaction No.");
@@ -288,13 +296,13 @@ page 2583 "Dim. Correct Ledger Entries"
                     RequestPageView: Text;
                 begin
                     VerifyCanChangePart();
-                    RequestPageParametersHelper.BuildDynamicRequestPage(RequestFilterPageBuilder, SelectLedgerEntriesToCorrectLbl, Database::"G/L Entry");
+                    RequestPageParametersHelper.BuildDynamicRequestPage(RequestFilterPageBuilder, SelectLedgerEntriesToCorrectLbl, Enum::TableID::"G/L Entry".AsInteger());
 
                     if not RequestFilterPageBuilder.RunModal() then
                         exit;
 
-                    RequestPageView := RequestPageParametersHelper.GetViewFromDynamicRequestPage(RequestFilterPageBuilder, SelectLedgerEntriesToCorrectLbl, Database::"G/L Entry");
-                    GLEntryRecordRef.Open(Database::"G/L Entry");
+                    RequestPageView := RequestPageParametersHelper.GetViewFromDynamicRequestPage(RequestFilterPageBuilder, SelectLedgerEntriesToCorrectLbl, Enum::TableID::"G/L Entry");
+                    GLEntryRecordRef.Open(Enum::TableID::"G/L Entry".AsInteger());
 
                     TempBlob.CreateOutStream(TempBlobOutStream);
                     TempBlobOutStream.WriteText(RequestPageView);
@@ -379,7 +387,7 @@ page 2583 "Dim. Correct Ledger Entries"
                         exit;
 
                     FindbyDimension.GetRecords(TempDimensionSetEntry);
-                    GLEntryRecordRef.Open(Database::"G/L Entry");
+                    GLEntryRecordRef.Open(Enum::TableID::"G/L Entry".AsInteger());
                     DimensionSetIDFieldRef := GLEntryRecordRef.Field(GLEntry.FieldNo("Dimension Set ID"));
                     SelectionFilterText := DimensionCorrectionMgt.GetSelectedDimensionSetIDsFilter(TempDimensionSetEntry);
                     if SelectionFilterText = '' then

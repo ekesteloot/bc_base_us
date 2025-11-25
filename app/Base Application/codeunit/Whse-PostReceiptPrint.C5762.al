@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Setup;
+
 codeunit 5762 "Whse.-Post Receipt + Print"
 {
     TableNo = "Warehouse Receipt Line";
@@ -38,7 +43,7 @@ codeunit 5762 "Whse.-Post Receipt + Print"
             repeat
                 WhseActivHeader.SetRecFilter();
                 OnBeforePrintReport(WhseActivHeader);
-                ReportSelectionWarehouse.PrintWhseActivityHeader(WhseActivHeader, "Report Selection Warehouse Usage"::"Put-away", true);
+                ReportSelectionWarehouse.PrintWhseActivityHeader(WhseActivHeader, Enum::"Report Selection Warehouse Usage"::"Put-away", true);
                 OnAfterPrintReport(WhseActivHeader);
                 PrintedDocuments := PrintedDocuments + 1;
             until not WhsePostReceipt.GetNextPutAwayDocument(WhseActivHeader);

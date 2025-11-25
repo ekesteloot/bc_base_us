@@ -1,10 +1,12 @@
+namespace System.IO;
+
 page 8628 "Config. Selection"
 {
     Caption = 'Config. Selection';
     PageType = List;
     SourceTable = "Config. Selection";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Vertical Sorting");
+    SourceTableView = sorting("Vertical Sorting");
 
     layout
     {
@@ -14,7 +16,7 @@ page 8628 "Config. Selection"
             {
                 IndentationColumn = NameIndent;
                 IndentationControls = Name;
-                field(Selected; Selected)
+                field(Selected; Rec.Selected)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the configuration package has been selected.';
@@ -53,7 +55,7 @@ page 8628 "Config. Selection"
 
                 trigger OnAction()
                 begin
-                    ModifyAll(Selected, true);
+                    Rec.ModifyAll(Selected, true);
                 end;
             }
         }
@@ -73,10 +75,10 @@ page 8628 "Config. Selection"
     trigger OnAfterGetRecord()
     begin
         NameIndent := 0;
-        case "Line Type" of
-            "Line Type"::Group:
+        case Rec."Line Type" of
+            Rec."Line Type"::Group:
                 NameIndent := 1;
-            "Line Type"::Table:
+            Rec."Line Type"::Table:
                 NameIndent := 2;
         end;
 
@@ -91,15 +93,15 @@ page 8628 "Config. Selection"
     begin
         if TempConfigSelection.FindSet() then
             repeat
-                Init();
-                "Line No." := TempConfigSelection."Line No.";
-                "Table ID" := TempConfigSelection."Table ID";
-                Name := TempConfigSelection.Name;
-                "Line Type" := TempConfigSelection."Line Type";
-                "Parent Line No." := TempConfigSelection."Parent Line No.";
-                "Vertical Sorting" := TempConfigSelection."Vertical Sorting";
-                Selected := TempConfigSelection.Selected;
-                Insert();
+                Rec.Init();
+                Rec."Line No." := TempConfigSelection."Line No.";
+                Rec."Table ID" := TempConfigSelection."Table ID";
+                Rec.Name := TempConfigSelection.Name;
+                Rec."Line Type" := TempConfigSelection."Line Type";
+                Rec."Parent Line No." := TempConfigSelection."Parent Line No.";
+                Rec."Vertical Sorting" := TempConfigSelection."Vertical Sorting";
+                Rec.Selected := TempConfigSelection.Selected;
+                Rec.Insert();
             until TempConfigSelection.Next() = 0;
     end;
 
@@ -109,20 +111,20 @@ page 8628 "Config. Selection"
     begin
         Counter := 0;
         TempConfigSelection.DeleteAll();
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
                 TempConfigSelection.Init();
-                TempConfigSelection."Line No." := "Line No.";
-                TempConfigSelection."Table ID" := "Table ID";
-                TempConfigSelection.Name := Name;
-                TempConfigSelection."Line Type" := "Line Type";
-                TempConfigSelection."Parent Line No." := "Parent Line No.";
-                TempConfigSelection."Vertical Sorting" := "Vertical Sorting";
-                TempConfigSelection.Selected := Selected;
-                if Selected then
+                TempConfigSelection."Line No." := Rec."Line No.";
+                TempConfigSelection."Table ID" := Rec."Table ID";
+                TempConfigSelection.Name := Rec.Name;
+                TempConfigSelection."Line Type" := Rec."Line Type";
+                TempConfigSelection."Parent Line No." := Rec."Parent Line No.";
+                TempConfigSelection."Vertical Sorting" := Rec."Vertical Sorting";
+                TempConfigSelection.Selected := Rec.Selected;
+                if Rec.Selected then
                     Counter += 1;
                 TempConfigSelection.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
 
         exit(Counter);
     end;

@@ -1,3 +1,14 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Utilities;
+
 page 9233 "G/L Balance by Dim. Matrix"
 {
     Caption = 'G/L Balance by Dim. Matrix';
@@ -15,10 +26,10 @@ page 9233 "G/L Balance by Dim. Matrix"
             repeater(Control1)
             {
                 Editable = false;
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 IndentationControls = Name;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     Style = Strong;
@@ -27,7 +38,7 @@ page 9233 "G/L Balance by Dim. Matrix"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookUpCode(AnalysisByDimParameters."Line Dim Option", LineDimCode, Code);
+                        LookUpCode(AnalysisByDimParameters."Line Dim Option", LineDimCode, Rec.Code);
                     end;
                 }
                 field(Name; Rec.Name)
@@ -37,7 +48,7 @@ page 9233 "G/L Balance by Dim. Matrix"
                     StyleExpr = Emphasize;
                     ToolTip = 'Specifies the name of the record.';
                 }
-                field(TotalAmount; +Amount)
+                field(TotalAmount; Rec.Amount)
                 {
                     ApplicationArea = Suite;
                     AutoFormatExpression = FormatStr();
@@ -611,7 +622,7 @@ page 9233 "G/L Balance by Dim. Matrix"
         MATRIX_Steps: Integer;
     begin
         // IF CurrForm.TotalAmount.VISIBLE THEN
-        Amount := MatrixMgt.RoundAmount(CalcAmount(false), AnalysisByDimParameters."Rounding Factor");
+        Rec.Amount := MatrixMgt.RoundAmount(CalcAmount(false), AnalysisByDimParameters."Rounding Factor");
 
         MATRIX_CurrentColumnOrdinal := 0;
         MatrixRecord.SetPosition(MATRIX_PrimKeyFirstCol);
@@ -679,7 +690,7 @@ page 9233 "G/L Balance by Dim. Matrix"
 
     trigger OnOpenPage()
     begin
-        Code := '';
+        Rec.Code := '';
 
         GLSetup.Get();
 
@@ -724,69 +735,37 @@ page 9233 "G/L Balance by Dim. Matrix"
         MATRIX_PrimKeyFirstCol: Text[1024];
         RoundingFactorFormatString: Text;
         MATRIX_CurrSetLength: Integer;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
         Emphasize: Boolean;
 
@@ -1257,7 +1236,7 @@ page 9233 "G/L Balance by Dim. Matrix"
             ColumnCode := MatrixRecord.Code
         else
             ColumnCode := '';
-        if TempDimensionCodeAmountBuffer.Get(Code, ColumnCode) then
+        if TempDimensionCodeAmountBuffer.Get(Rec.Code, ColumnCode) then
             exit(TempDimensionCodeAmountBuffer.Amount);
         GLAcc.Reset();
         SetCommonFilters(GLAcc);
@@ -1286,7 +1265,7 @@ page 9233 "G/L Balance by Dim. Matrix"
                 end;
         end;
         OnCalcAmountOnAfterAssignAmount(AnalysisByDimParameters, GLAcc, Amount);
-        TempDimensionCodeAmountBuffer."Line Code" := Code;
+        TempDimensionCodeAmountBuffer."Line Code" := Rec.Code;
         TempDimensionCodeAmountBuffer."Column Code" := ColumnCode;
         TempDimensionCodeAmountBuffer.Amount := Amount;
         TempDimensionCodeAmountBuffer.Insert();
@@ -1458,7 +1437,7 @@ page 9233 "G/L Balance by Dim. Matrix"
 
     local procedure FormatLine()
     begin
-        Emphasize := "Show in Bold";
+        Emphasize := Rec."Show in Bold";
     end;
 
     local procedure LoadDefault()

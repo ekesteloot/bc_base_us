@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using System.Security.AccessControl;
+
 table 281 "Phys. Inventory Ledger Entry"
 {
     Caption = 'Phys. Inventory Ledger Entry';
@@ -71,8 +80,6 @@ table 281 "Phys. Inventory Ledger Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(25; "Source Code"; Code[10])
         {
@@ -83,13 +90,13 @@ table 281 "Phys. Inventory Ledger Entry"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(34; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(45; "Journal Batch Name"; Code[10])
         {
@@ -114,8 +121,6 @@ table 281 "Phys. Inventory Ledger Entry"
         {
             Caption = 'Last Item Ledger Entry No.';
             TableRelation = "Item Ledger Entry";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(60; "Document Date"; Date)
         {
@@ -138,7 +143,7 @@ table 281 "Phys. Inventory Ledger Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])
@@ -198,14 +203,12 @@ table 281 "Phys. Inventory Ledger Entry"
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(7380; "Phys Invt Counting Period Code"; Code[10])
         {

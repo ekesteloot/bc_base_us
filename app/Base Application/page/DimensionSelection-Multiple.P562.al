@@ -14,12 +14,12 @@ page 562 "Dimension Selection-Multiple"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Selected; Selected)
+                field(Selected; Rec.Selected)
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies that this dimension will be included.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Dimensions;
                     Editable = false;
@@ -39,37 +39,37 @@ page 562 "Dimension Selection-Multiple"
     {
     }
 
-    procedure GetDimSelBuf(var TheDimSelectionBuf: Record "Dimension Selection Buffer")
+    procedure GetDimSelBuf(var DimensionSelectionBuffer: Record "Dimension Selection Buffer")
     begin
-        TheDimSelectionBuf.DeleteAll();
-        if Find('-') then
+        DimensionSelectionBuffer.DeleteAll();
+        if Rec.Find('-') then
             repeat
-                TheDimSelectionBuf := Rec;
-                TheDimSelectionBuf.Insert();
-            until Next() = 0;
+                DimensionSelectionBuffer := Rec;
+                DimensionSelectionBuffer.Insert();
+            until Rec.Next() = 0;
     end;
 
     procedure InsertDimSelBuf(NewSelected: Boolean; NewCode: Text[30]; NewDescription: Text[30])
     var
-        Dim: Record Dimension;
-        GLAcc: Record "G/L Account";
+        Dimension: Record Dimension;
+        GLAccount: Record "G/L Account";
         BusinessUnit: Record "Business Unit";
     begin
         if NewDescription = '' then
-            if Dim.Get(NewCode) then
-                NewDescription := Dim.GetMLName(GlobalLanguage);
+            if Dimension.Get(NewCode) then
+                NewDescription := Dimension.GetMLName(GlobalLanguage);
 
-        Init();
-        Selected := NewSelected;
-        Code := NewCode;
-        Description := NewDescription;
-        case Code of
-            GLAcc.TableCaption:
-                "Filter Lookup Table No." := DATABASE::"G/L Account";
+        Rec.Init();
+        Rec.Selected := NewSelected;
+        Rec.Code := NewCode;
+        Rec.Description := NewDescription;
+        case Rec.Code of
+            GLAccount.TableCaption:
+                Rec."Filter Lookup Table No." := Enum::TableID::"G/L Account".AsInteger();
             BusinessUnit.TableCaption:
-                "Filter Lookup Table No." := DATABASE::"Business Unit";
+                Rec."Filter Lookup Table No." := Enum::TableID::"Business Unit".AsInteger();
         end;
-        Insert();
+        Rec.Insert();
     end;
 }
 

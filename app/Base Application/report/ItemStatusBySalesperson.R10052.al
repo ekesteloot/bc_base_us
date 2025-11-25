@@ -9,7 +9,7 @@ report 10052 "Item Status by Salesperson"
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Code", Name;
             RequestFilterHeading = 'Salesperson';
@@ -94,8 +94,8 @@ report 10052 "Item Status by Salesperson"
             }
             dataitem("Value Entry"; "Value Entry")
             {
-                DataItemLink = "Salespers./Purch. Code" = FIELD(Code);
-                DataItemTableView = SORTING("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code") WHERE("Source Type" = CONST(Customer), "Item Ledger Entry Type" = CONST(Sale), "Expected Cost" = CONST(false));
+                DataItemLink = "Salespers./Purch. Code" = field(Code);
+                DataItemTableView = sorting("Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code") where("Source Type" = const(Customer), "Item Ledger Entry Type" = const(Sale), "Expected Cost" = const(false));
                 RequestFilterFields = "Item No.", "Posting Date";
                 column(Value_Entry__Item_No__; "Item No.")
                 {

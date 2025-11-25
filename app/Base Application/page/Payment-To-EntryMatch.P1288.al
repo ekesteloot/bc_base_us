@@ -1,4 +1,9 @@
-﻿page 1288 "Payment-to-Entry Match"
+﻿namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.Reflection;
+
+page 1288 "Payment-to-Entry Match"
 {
     Caption = 'Payment-to-Entry Match';
     PageType = CardPart;
@@ -37,7 +42,7 @@
                     Caption = 'Amount Incl. Tolerance Matched:';
                     ToolTip = 'Specifies how many entries must match the amount, including payment tolerance, before a payment is automatically applied to the open entry.';
                 }
-                field("BankAccReconciliationLine.GetAppliedEntryAccountName(""Applies-to Entry No."")"; BankAccReconciliationLine.GetAppliedEntryAccountName("Applies-to Entry No."))
+                field("BankAccReconciliationLine.GetAppliedEntryAccountName(""Applies-to Entry No."")"; BankAccReconciliationLine.GetAppliedEntryAccountName(Rec."Applies-to Entry No."))
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'No. of Open Entries for';
@@ -45,7 +50,7 @@
 
                     trigger OnDrillDown()
                     begin
-                        BankAccReconciliationLine.AppliedEntryAccountDrillDown("Applies-to Entry No.");
+                        BankAccReconciliationLine.AppliedEntryAccountDrillDown(Rec."Applies-to Entry No.");
                     end;
                 }
                 field(NoOfLedgerEntriesWithinAmount; NoOfLedgerEntriesWithinAmountTolerance)
@@ -109,19 +114,19 @@
         StatementLineNo: Integer;
         Quality: Decimal;
     begin
-        FilterGroup(4);
-        Evaluate(AppliesToEntryNo, GetFilter("Applies-to Entry No."));
+        Rec.FilterGroup(4);
+        Evaluate(AppliesToEntryNo, Rec.GetFilter("Applies-to Entry No."));
         RecRef.GetTable(Rec);
-        AccountTypeFieldRef := RecRef.Field(FieldNo("Account Type"));
+        AccountTypeFieldRef := RecRef.Field(Rec.FieldNo("Account Type"));
         AccountType :=
-            "Gen. Journal Account Type".FromInteger(
-                TypeHelper.GetOptionNo(GetFilter("Account Type"), AccountTypeFieldRef.OptionCaption));
-        StatementTypeFieldRef := RecRef.Field(FieldNo("Statement Type"));
-        StatementType := TypeHelper.GetOptionNo(GetFilter("Statement Type"), StatementTypeFieldRef.OptionCaption);
+            Enum::"Gen. Journal Account Type".FromInteger(
+                TypeHelper.GetOptionNo(Rec.GetFilter("Account Type"), AccountTypeFieldRef.OptionCaption));
+        StatementTypeFieldRef := RecRef.Field(Rec.FieldNo("Statement Type"));
+        StatementType := TypeHelper.GetOptionNo(Rec.GetFilter("Statement Type"), StatementTypeFieldRef.OptionCaption);
 
-        BankAccountNo := GetFilter("Bank Account No.");
-        StatementNo := GetFilter("Statement No.");
-        Evaluate(StatementLineNo, GetFilter("Statement Line No."));
+        BankAccountNo := Rec.GetFilter("Bank Account No.");
+        StatementNo := Rec.GetFilter("Statement No.");
+        Evaluate(StatementLineNo, Rec.GetFilter("Statement Line No."));
 
         GetBankAccReconciliationLine(StatementType, BankAccountNo, StatementNo, StatementLineNo, AccountType);
 
@@ -131,19 +136,19 @@
             NoOfLedgerEntriesOutsideAmountTolerance := 0;
         end else begin
             case AccountType of
-                "Account Type"::Customer:
+                Rec."Account Type"::Customer:
                     MatchBankPayments.MatchSingleLineCustomer(
                       BankPmtApplRule, BankAccReconciliationLine, AppliesToEntryNo,
                       NoOfLedgerEntriesWithinAmountTolerance, NoOfLedgerEntriesOutsideAmountTolerance);
-                "Account Type"::Vendor:
+                Rec."Account Type"::Vendor:
                     MatchBankPayments.MatchSingleLineVendor(
                       BankPmtApplRule, BankAccReconciliationLine, AppliesToEntryNo,
                       NoOfLedgerEntriesWithinAmountTolerance, NoOfLedgerEntriesOutsideAmountTolerance);
-                "Account Type"::Employee:
+                Rec."Account Type"::Employee:
                     MatchBankPayments.MatchSingleLineEmployee(
                       BankPmtApplRule, BankAccReconciliationLine, AppliesToEntryNo,
                       NoOfLedgerEntriesWithinAmountTolerance, NoOfLedgerEntriesOutsideAmountTolerance);
-                "Account Type"::"Bank Account":
+                Rec."Account Type"::"Bank Account":
                     MatchBankPayments.MatchSingleLineBankAccountLedgerEntry(
                       BankPmtApplRule, BankAccReconciliationLine, AppliesToEntryNo,
                       NoOfLedgerEntriesWithinAmountTolerance, NoOfLedgerEntriesOutsideAmountTolerance);
@@ -151,7 +156,7 @@
                     Error(AccTypeErr);
             end;
 
-            Evaluate(Quality, GetFilter(Quality));
+            Evaluate(Quality, Rec.GetFilter(Quality));
             BankPmtApplRule.SetRange(Score, Quality);
             if not BankPmtApplRule.FindFirst() then
                 BankPmtApplRule."Match Confidence" := BankPmtApplRule."Match Confidence"::None;
@@ -159,8 +164,8 @@
 
         RecRef.GetTable(BankAccReconciliationLine);
         MatchConfidenceFieldRef := RecRef.Field(BankAccReconciliationLine.FieldNo("Match Confidence"));
-        BankAccReconciliationLine."Match Confidence" := TypeHelper.GetOptionNo(
-            GetFilter("Match Confidence"), MatchConfidenceFieldRef.OptionCaption);
+        BankAccReconciliationLine."Match Confidence" :=
+            Enum::"Bank Rec. Match Confidence".FromInteger(TypeHelper.GetOptionNo(Rec.GetFilter("Match Confidence"), MatchConfidenceFieldRef.OptionCaption()));
 
         AmountMatchText := Format(BankPmtApplRule."Amount Incl. Tolerance Matched");
     end;
@@ -169,7 +174,7 @@
     begin
         BankAccReconciliationLine.Get(StatementType, BankAccountNo, StatementNo, StatementLineNo);
         BankAccReconciliationLine."Account Type" := AccountType;
-        BankAccReconciliationLine."Account No." := CopyStr(GetFilter("Account No."), 1);
+        BankAccReconciliationLine."Account No." := CopyStr(Rec.GetFilter("Account No."), 1);
     end;
 }
 

@@ -1,3 +1,7 @@
+namespace System.DataAdministration;
+
+using System.Diagnostics;
+
 page 9521 "Database Missing Indexes"
 {
     Caption = 'Database Missing Indexes';

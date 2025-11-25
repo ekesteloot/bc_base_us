@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1509 "Workflow - Table Relations"
 {
     ApplicationArea = Suite;

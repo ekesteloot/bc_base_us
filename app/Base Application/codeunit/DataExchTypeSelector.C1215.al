@@ -1,3 +1,5 @@
+namespace System.IO;
+
 codeunit 1215 "Data Exch. Type Selector"
 {
     Permissions = TableData "Data Exch." = rimd;
@@ -7,14 +9,14 @@ codeunit 1215 "Data Exch. Type Selector"
     var
         BestDataExchCode: Code[20];
     begin
-        if Type <> Type::XML then
+        if Rec.Type <> Rec.Type::XML then
             Error(InvalidTypeErr);
 
         CheckContentHasValue(Rec);
 
         BestDataExchCode := FindDataExchType(Rec);
 
-        SetResult("Incoming Document Entry No.", BestDataExchCode);
+        SetResult(Rec."Incoming Document Entry No.", BestDataExchCode);
     end;
 
     var

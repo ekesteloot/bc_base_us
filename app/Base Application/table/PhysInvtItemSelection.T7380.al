@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 table 7380 "Phys. Invt. Item Selection"
 {
     Caption = 'Phys. Invt. Item Selection';
@@ -15,17 +20,17 @@ table 7380 "Phys. Invt. Item Selection"
         {
             Caption = 'Variant Code';
             Editable = false;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(3; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
             Editable = false;
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(4; Description; Text[100])
         {
-            CalcFormula = Lookup (Item.Description WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item.Description where("No." = field("Item No.")));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;

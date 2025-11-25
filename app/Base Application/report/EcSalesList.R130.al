@@ -1,7 +1,7 @@
 report 130 "EC Sales List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/ECSalesList.rdlc';
+    RDLCLayout = './FinancialMgt/VAT/ECSL/ECSalesList.rdlc';
     ApplicationArea = BasicEU;
     Caption = 'EC Sales List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +10,7 @@ report 130 "EC Sales List"
     {
         dataitem("Country/Region"; "Country/Region")
         {
-            DataItemTableView = SORTING("EU Country/Region Code") WHERE("EU Country/Region Code" = FILTER(<> ''));
+            DataItemTableView = sorting("EU Country/Region Code") where("EU Country/Region Code" = filter(<> ''));
             column(CompanyAddr1; CompanyAddr[1])
             {
             }
@@ -115,8 +115,8 @@ report 130 "EC Sales List"
             }
             dataitem("VAT Entry"; "VAT Entry")
             {
-                DataItemLink = "Country/Region Code" = FIELD(Code);
-                DataItemTableView = SORTING(Type, "Country/Region Code", "VAT Registration No.", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT Reporting Date") WHERE(Type = CONST(Sale), "Country/Region Code" = FILTER(<> ''));
+                DataItemLink = "Country/Region Code" = field(Code);
+                DataItemTableView = sorting(Type, "Country/Region Code", "VAT Registration No.", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT Reporting Date") where(Type = const(Sale), "Country/Region Code" = filter(<> ''));
                 RequestFilterFields = "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT Reporting Date";
                 column(VATRegNo_VATEntry; "VAT Registration No.")
                 {

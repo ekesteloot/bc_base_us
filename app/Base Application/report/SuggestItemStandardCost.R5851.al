@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.StandardCost;
+
+using Microsoft.InventoryMgt.Item;
+
 report 5851 "Suggest Item Standard Cost"
 {
     Caption = 'Suggest Item Standard Cost';
@@ -7,7 +11,7 @@ report 5851 "Suggest Item Standard Cost"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Vendor No.", "Replenishment System", "Costing Method";
 
             trigger OnAfterGetRecord()

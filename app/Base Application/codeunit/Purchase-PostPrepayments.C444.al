@@ -1,8 +1,32 @@
-﻿codeunit 444 "Purchase-Post Prepayments"
+﻿namespace Microsoft.Purchases.Posting;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
+codeunit 444 "Purchase-Post Prepayments"
 {
     Permissions = TableData "Purchase Line" = rimd,
                   TableData "G/L Register" = rimd,
-#if not CLEAN20
+#if not CLEAN23
                   TableData "Invoice Post. Buffer" = rimd,
 #endif
                   TableData "Vendor Posting Group" = rimd,
@@ -156,7 +180,7 @@
                             TestField("Vendor Invoice No.");
                         InsertPurchInvHeader(PurchInvHeader, PurchHeader, PostingDescription, GenJnlLineDocNo, SrcCode, PostingNoSeriesCode);
                         GenJnlLineDocType := GenJnlLine."Document Type"::Invoice;
-                        PostedDocTabNo := DATABASE::"Purch. Inv. Header";
+                        PostedDocTabNo := Enum::TableID::"Purch. Inv. Header".AsInteger();
                         GenJnlLineExtDocNo := PurchInvHeader."Vendor Invoice No.";
                         Window.Update(1, StrSubstNo(Text003, "Document Type", "No.", PurchInvHeader."No."));
                     end;
@@ -169,7 +193,7 @@
                           PurchCrMemoHeader, PurchHeader, PostingDescription, GenJnlLineDocNo, SrcCode, PostingNoSeriesCode,
                           CalcPmtDiscOnCrMemos);
                         GenJnlLineDocType := GenJnlLine."Document Type"::"Credit Memo";
-                        PostedDocTabNo := DATABASE::"Purch. Cr. Memo Hdr.";
+                        PostedDocTabNo := Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger();
                         GenJnlLineExtDocNo := PurchCrMemoHeader."Vendor Cr. Memo No.";
                         Window.Update(1, StrSubstNo(Text011, "Document Type", "No.", PurchCrMemoHeader."No."));
                     end;
@@ -202,9 +226,9 @@
             if "Compress Prepayment" then
                 case DocumentType of
                     DocumentType::Invoice:
-                        CopyLineCommentLinesCompressedPrepayment("No.", DATABASE::"Purch. Inv. Header", PurchInvHeader."No.");
+                        CopyLineCommentLinesCompressedPrepayment("No.", Enum::TableID::"Purch. Inv. Header".AsInteger(), PurchInvHeader."No.");
                     DocumentType::"Credit Memo":
-                        CopyLineCommentLinesCompressedPrepayment("No.", DATABASE::"Purch. Cr. Memo Hdr.", PurchCrMemoHeader."No.");
+                        CopyLineCommentLinesCompressedPrepayment("No.", Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger(), PurchCrMemoHeader."No.");
                 end;
 
             OnAfterCreateLinesOnBeforeGLPosting(PurchHeader, PurchInvHeader, PurchCrMemoHeader, TempPrepmtInvLineBuffer, DocumentType, LineNo);
@@ -321,12 +345,12 @@
                     DocumentType::Invoice:
                         begin
                             InsertPurchInvLine(PurchInvHeader, LineNo, TempPrepmtInvLineBuffer, PurchHeader);
-                            PostedDocTabNo := DATABASE::"Purch. Inv. Line";
+                            PostedDocTabNo := Enum::TableID::"Purch. Inv. Line".AsInteger();
                         end;
                     DocumentType::"Credit Memo":
                         begin
                             InsertPurchCrMemoLine(PurchCrMemoHeader, LineNo, TempPrepmtInvLineBuffer, PurchHeader);
-                            PostedDocTabNo := DATABASE::"Purch. Cr. Memo Line";
+                            PostedDocTabNo := Enum::TableID::"Purch. Cr. Memo Line".AsInteger();
                         end;
                 end;
                 PrevLineNo := LineNo;
@@ -346,7 +370,7 @@
             exit;
 
         if PurchHeader.TestStatusIsNotPendingPrepayment() then
-            PurchHeader.Status := "Purchase Document Status"::"Pending Prepayment";
+            PurchHeader.Status := PurchHeader.Status::"Pending Prepayment";
     end;
 
     procedure CheckPrepmtDoc(PurchHeader: Record "Purchase Header"; DocumentType: Option Invoice,"Credit Memo")
@@ -460,7 +484,6 @@
             PurchHeader."Prepayment No." := NoSeriesMgt.GetNextNo(PurchHeader."Prepayment No. Series", PurchHeader."Posting Date", true);
             ModifyHeader := true;
         end
-
     end;
 
     local procedure UpdateCrMemoDocNos(var PurchHeader: Record "Purchase Header"; var ModifyHeader: Boolean)
@@ -1151,7 +1174,7 @@
                 DocumentType::Invoice:
                     PrepmtAmt := "Prepmt. Line Amount" - "Prepmt. Amt. Inv.";
                 else
-		            PrepmtAmt := "Prepmt. Amt. Inv." - "Prepmt Amt Deducted";
+                    PrepmtAmt := "Prepmt. Amt. Inv." - "Prepmt Amt Deducted";
             end;
             if IncludeTax then
                 PrepmtAmt := CalcAmountIncludingTax(PrepmtAmt);
@@ -1168,10 +1191,10 @@
 
         with PurchCommentLine do
             case ToDocType of
-                DATABASE::"Purch. Inv. Header":
+                Enum::TableID::"Purch. Inv. Header".AsInteger():
                     CopyHeaderComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Invoice".AsInteger(), FromNumber, ToNumber);
-                DATABASE::"Purch. Cr. Memo Hdr.":
+                Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
                     CopyHeaderComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Credit Memo".AsInteger(), FromNumber, ToNumber);
             end;
@@ -1186,10 +1209,10 @@
 
         with PurchCommentLine do
             case ToDocType of
-                DATABASE::"Purch. Inv. Header":
+                Enum::TableID::"Purch. Inv. Header".AsInteger():
                     CopyLineComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Invoice".AsInteger(), FromNumber, ToNumber, FromLineNo, ToLineNo);
-                DATABASE::"Purch. Cr. Memo Hdr.":
+                Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
                     CopyLineComments(
                         "Document Type"::Order.AsInteger(), "Document Type"::"Posted Credit Memo".AsInteger(), FromNumber, ToNumber, FromLineNo, ToLineNo);
             end;
@@ -1204,10 +1227,10 @@
 
         with PurchCommentLine do
             case ToDocType of
-                DATABASE::"Purch. Inv. Header":
+                Enum::TableID::"Purch. Inv. Header".AsInteger():
                     CopyLineCommentsFromPurchaseLines(
                       "Document Type"::Order.AsInteger(), "Document Type"::"Posted Invoice".AsInteger(), FromNumber, ToNumber, TempPurchaseLine);
-                DATABASE::"Purch. Cr. Memo Hdr.":
+                Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger():
                     CopyLineCommentsFromPurchaseLines(
                       "Document Type"::Order.AsInteger(), "Document Type"::"Posted Credit Memo".AsInteger(), FromNumber, ToNumber, TempPurchaseLine);
             end;
@@ -1232,7 +1255,7 @@
             NextLineNo := PrevLineNo + 10000;
             repeat
                 case TabNo of
-                    DATABASE::"Purch. Inv. Line":
+                    Enum::TableID::"Purch. Inv. Line".AsInteger():
                         begin
                             PurchInvLine.Init();
                             PurchInvLine."Document No." := DocNo;
@@ -1240,7 +1263,7 @@
                             PurchInvLine.Description := TempExtTextLine.Text;
                             PurchInvLine.Insert();
                         end;
-                    DATABASE::"Purch. Cr. Memo Line":
+                    Enum::TableID::"Purch. Cr. Memo Line".AsInteger():
                         begin
                             PurchCrMemoLine.Init();
                             PurchCrMemoLine."Document No." := DocNo;
@@ -1439,20 +1462,17 @@
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
         SourceCodeSetup.Get();
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Work Center", PurchLine."Work Center No.");
-        DimMgt.AddDimSource(DefaultDimSource, Database::"G/L Account", PurchLine."No.");
-        DimMgt.AddDimSource(DefaultDimSource, Database::Job, PurchLine."Job No.");
-        DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", PurchLine."Responsibility Center");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Work Center".AsInteger(), PurchLine."Work Center No.");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"G/L Account".AsInteger(), PurchLine."No.");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Job.AsInteger(), PurchLine."Job No.");
+        DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center".AsInteger(), PurchLine."Responsibility Center");
         PurchLine."Shortcut Dimension 1 Code" := '';
         PurchLine."Shortcut Dimension 2 Code" := '';
         PurchLine."Dimension Set ID" :=
           DimMgt.GetRecDefaultDimID(
             PurchLine, 0, DefaultDimSource, SourceCodeSetup.Purchases,
-            PurchLine."Shortcut Dimension 1 Code", PurchLine."Shortcut Dimension 2 Code", PurchLine."Dimension Set ID", DATABASE::Vendor);
+            PurchLine."Shortcut Dimension 1 Code", PurchLine."Shortcut Dimension 2 Code", PurchLine."Dimension Set ID", Enum::TableID::Vendor);
 
-#if not CLEAN20
-        RunEventOnAfterCreateDimensions(PurchLine, DefaultDimSource);
-#endif
         OnAfterCreateDimensionsProcedure(PurchLine, DefaultDimSource);
     end;
 
@@ -1463,11 +1483,10 @@
         ApplyFilter(PurchHeader, 1, PurchLine);
         if PurchLine.FindSet() then
             repeat
-                if (PrepmtAmount(PurchLine, 0) <> 0) and (PrepmtAmount(PurchLine, 1) <> 0) then
-                    if not PurchLines.Get(PurchLine.RecordId) then begin
-                        PurchLines := PurchLine;
-                        PurchLines.Insert();
-                    end;
+                if (PrepmtAmount(PurchLine, 0) <> 0) and (PrepmtAmount(PurchLine, 1) <> 0) then begin
+                    PurchLines := PurchLine;
+                    PurchLines.Insert();
+                end;
             until PurchLine.Next() = 0;
     end;
 
@@ -1607,7 +1626,7 @@
             PurchInvHeader."Tax Area Code" := '';
             OnBeforePurchInvHeaderInsert(PurchInvHeader, PurchHeader, SuppressCommit);
             PurchInvHeader.Insert();
-            CopyHeaderCommentLines("No.", DATABASE::"Purch. Inv. Header", GenJnlLineDocNo);
+            CopyHeaderCommentLines("No.", Enum::TableID::"Purch. Inv. Header".AsInteger(), GenJnlLineDocNo);
             OnAfterPurchInvHeaderInsert(PurchInvHeader, PurchHeader, SuppressCommit);
         end;
     end;
@@ -1639,7 +1658,7 @@
             PurchCrMemoHdr."Tax Area Code" := '';
             OnBeforePurchCrMemoHeaderInsert(PurchCrMemoHdr, PurchHeader, SuppressCommit);
             PurchCrMemoHdr.Insert();
-            CopyHeaderCommentLines("No.", DATABASE::"Purch. Cr. Memo Hdr.", GenJnlLineDocNo);
+            CopyHeaderCommentLines("No.", Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger(), GenJnlLineDocNo);
             OnAfterPurchCrMemoHeaderInsert(PurchCrMemoHdr, PurchHeader, SuppressCommit);
         end;
     end;
@@ -1697,7 +1716,7 @@
             PurchInvLine.Insert();
             if not PurchaseHeader."Compress Prepayment" then
                 CopyLineCommentLines(
-                  PurchaseHeader."No.", DATABASE::"Purch. Inv. Header", PurchInvHeader."No.", "Line No.", LineNo);
+                  PurchaseHeader."No.", Enum::TableID::"Purch. Inv. Header".AsInteger(), PurchInvHeader."No.", "Line No.", LineNo);
             OnAfterPurchInvLineInsert(PurchInvLine, PurchInvHeader, PrepmtInvLineBuffer, SuppressCommit);
         end;
     end;
@@ -1745,7 +1764,7 @@
             PurchCrMemoLine.Insert();
             if not PurchaseHeader."Compress Prepayment" then
                 CopyLineCommentLines(
-                  PurchaseHeader."No.", DATABASE::"Purch. Cr. Memo Hdr.", PurchCrMemoHdr."No.", "Line No.", LineNo);
+                  PurchaseHeader."No.", Enum::TableID::"Purch. Cr. Memo Hdr.".AsInteger(), PurchCrMemoHdr."No.", "Line No.", LineNo);
             OnAfterPurchCrMemoLineInsert(PurchCrMemoLine, PurchCrMemoHdr, PrepmtInvLineBuffer, SuppressCommit);
         end;
     end;
@@ -1769,25 +1788,6 @@
     begin
         PreviewMode := NewPreviewMode;
     end;
-
-#if not CLEAN20
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        PurchaseLine: Record "Purchase Line";
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(PurchaseLine, DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterCreateDimensions(var PurchaseLine: Record "Purchase Line"; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimensions(PurchaseLine, TableID, No);
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateDimensionsProcedure(var PurchaseLine: Record "Purchase Line"; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
@@ -1814,13 +1814,6 @@
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Temporary event for compatibility', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimensions(var PurchLine: Record "Purchase Line"; TableID: array[10] of Integer; No: array[10] of Code[20])
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterFillInvLineBuffer(var PrepmtInvLineBuf: Record "Prepayment Inv. Line Buffer"; PurchLine: Record "Purchase Line"; CommitIsSuppressed: Boolean; PurchaseHeader: Record "Purchase Header")
     begin
@@ -1835,14 +1828,6 @@
     local procedure OnAfterPostPrepayments(var PurchHeader: Record "Purchase Header"; DocumentType: Option Invoice,"Credit Memo"; CommitIsSuppressed: Boolean; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.")
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Event is never raised.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterPostPrepaymentsOnBeforeThrowPreviewModeError(var PurchaseHeader: Record "Purchase Header"; var PurchInvHeader: Record "Purch. Inv. Header"; var PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr."; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterPostBalancingEntry(var GenJnlLine: Record "Gen. Journal Line"; VendLedgEntry: Record "Vendor Ledger Entry"; TotalPrepmtInvLineBuffer: Record "Prepayment Inv. Line Buffer"; TotalPrepmtInvLineBufferLCY: Record "Prepayment Inv. Line Buffer"; CommitIsSupressed: Boolean)

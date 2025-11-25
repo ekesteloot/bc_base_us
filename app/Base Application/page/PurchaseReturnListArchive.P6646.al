@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Archive;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 6646 "Purchase Return List Archive"
 {
     ApplicationArea = Basic, Suite;
@@ -7,7 +11,7 @@ page 6646 "Purchase Return List Archive"
     Editable = false;
     PageType = List;
     SourceTable = "Purchase Header Archive";
-    SourceTableView = WHERE("Document Type" = CONST("Return Order"));
+    SourceTableView = where("Document Type" = const("Return Order"));
     UsageCategory = History;
 
     layout
@@ -198,7 +202,7 @@ page 6646 "Purchase Return List Archive"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("<Page Sales Archive Comment Sheet>")
@@ -207,11 +211,11 @@ page 6646 "Purchase Return List Archive"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Archive Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0),
-                                  "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"),
-                                  "Version No." = FIELD("Version No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0),
+                                  "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                  "Version No." = field("Version No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }

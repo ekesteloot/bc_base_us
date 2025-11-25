@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Ledger;
+
+using System.Diagnostics;
+
 codeunit 115 "G/L Entry-Edit"
 {
     EventSubscriberInstance = Manual;
@@ -12,9 +16,9 @@ codeunit 115 "G/L Entry-Edit"
         GLEntry := Rec;
         GLEntry.LockTable();
         GLEntry.Find();
-        GLEntry.Description := Description;
+        GLEntry.Description := Rec.Description;
         OnBeforeGLLedgEntryModify(GLEntry, Rec);
-        GLEntry.TestField("Entry No.", "Entry No.");
+        GLEntry.TestField("Entry No.", Rec."Entry No.");
         GLEntry.Modify(true);
         Rec := GLEntry;
     end;

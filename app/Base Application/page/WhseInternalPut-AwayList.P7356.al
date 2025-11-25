@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+
 page 7356 "Whse. Internal Put-away List"
 {
     ApplicationArea = Warehouse;
@@ -103,9 +109,9 @@ page 7356 "Whse. Internal Put-away List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Internal Put-away"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Internal Put-away"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Put-away Lines")
@@ -114,10 +120,10 @@ page 7356 "Whse. Internal Put-away List"
                     Caption = 'Put-away Lines';
                     Image = PutawayLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Whse. Document Type" = CONST("Internal Put-away"),
-                                  "Whse. Document No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Document No.", "Whse. Document Type", "Activity Type")
-                                  WHERE("Activity Type" = CONST("Put-away"));
+                    RunPageLink = "Whse. Document Type" = const("Internal Put-away"),
+                                  "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document No.", "Whse. Document Type", "Activity Type")
+                                  where("Activity Type" = const("Put-away"));
                     ToolTip = ' View the related put-aways.';
                 }
             }
@@ -140,7 +146,7 @@ page 7356 "Whse. Internal Put-away List"
                     var
                         ReleaseWhseInternalPutAway: Codeunit "Whse. Int. Put-away Release";
                     begin
-                        if Status = Status::Open then
+                        if Rec.Status = Rec.Status::Open then
                             ReleaseWhseInternalPutAway.Release(Rec);
                     end;
                 }

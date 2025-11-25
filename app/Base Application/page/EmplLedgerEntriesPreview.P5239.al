@@ -1,3 +1,8 @@
+namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 page 5239 "Empl. Ledger Entries Preview"
 {
     Caption = 'Employee Entries Preview';
@@ -138,7 +143,7 @@ page 5239 "Empl. Ledger Entries Preview"
                     ToolTip = 'Specifies the number of the balancing account that is used for the entry.';
                     Visible = false;
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies whether the amount on the entry has been fully paid or there is still a remaining amount that must be applied to.';
@@ -227,7 +232,7 @@ page 5239 "Empl. Ledger Entries Preview"
                     var
                         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
                     begin
-                        GenJnlPostPreview.ShowDimensions(DATABASE::"Employee Ledger Entry", "Entry No.", "Dimension Set ID");
+                        GenJnlPostPreview.ShowDimensions(DATABASE::"Employee Ledger Entry", Rec."Entry No.", Rec."Dimension Set ID");
                     end;
                 }
                 action(SetDimensionFilter)
@@ -240,7 +245,7 @@ page 5239 "Empl. Ledger Entries Preview"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -300,7 +305,7 @@ page 5239 "Empl. Ledger Entries Preview"
         if TempEmplLedgerEntry.FindSet() then
             repeat
                 Rec := TempEmplLedgerEntry;
-                Insert();
+                Rec.Insert();
             until TempEmplLedgerEntry.Next() = 0;
 
         if TempDetailedEmplLedgEntry2.FindSet() then
@@ -319,7 +324,7 @@ page 5239 "Empl. Ledger Entries Preview"
         OriginalAmountLCY := 0;
         OriginalAmountFCY := 0;
 
-        TempDetailedEmplLedgEntry.SetRange("Employee Ledger Entry No.", "Entry No.");
+        TempDetailedEmplLedgEntry.SetRange("Employee Ledger Entry No.", Rec."Entry No.");
         if TempDetailedEmplLedgEntry.FindSet() then
             repeat
                 if TempDetailedEmplLedgEntry."Entry Type" = TempDetailedEmplLedgEntry."Entry Type"::"Initial Entry" then begin

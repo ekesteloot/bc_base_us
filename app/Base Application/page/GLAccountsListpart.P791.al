@@ -1,10 +1,12 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
 page 791 "G/L Accounts ListPart"
 {
     Caption = 'G/L Accounts ListPart';
     Editable = false;
     PageType = ListPart;
     SourceTable = "G/L Account";
-    SourceTableView = WHERE("Account Type" = CONST(Posting));
+    SourceTableView = where("Account Type" = const(Posting));
 
     layout
     {

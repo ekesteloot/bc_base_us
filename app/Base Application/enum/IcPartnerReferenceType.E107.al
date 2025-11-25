@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Partner;
+
 enum 107 "IC Partner Reference Type"
 {
     Extensible = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 page 185 "Posted General Journal Batch"
 {
     Caption = 'Posted General Journal Batch';

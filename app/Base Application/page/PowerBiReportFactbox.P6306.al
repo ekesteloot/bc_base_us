@@ -1,4 +1,10 @@
-#if not CLEAN21
+﻿#if not CLEAN21
+namespace System.Integration.PowerBI;
+
+using System;
+using System.Environment;
+using System.Utilities;
+
 page 6306 "Power BI Report FactBox"
 {
     Caption = 'Power BI Report (Obsolete)';
@@ -23,7 +29,7 @@ page 6306 "Power BI Report FactBox"
                     ShowCaption = false;
                     Style = StrongAccent;
                     StyleExpr = TRUE;
-                    ToolTipML = ENU = 'Specifies whether the Power BI functionality is enabled.';
+                    ToolTip = 'Specifies whether the Power BI functionality is enabled.';
 
                     trigger OnDrillDown()
                     var
@@ -48,7 +54,7 @@ page 6306 "Power BI Report FactBox"
                 }
                 field(OptInImageField1; MediaResources."Media Reference")
                 {
-                    CaptionML = ENU = '';
+                    Caption = '';
                     ApplicationArea = All;
                     Editable = false;
                 }
@@ -65,7 +71,7 @@ page 6306 "Power BI Report FactBox"
                     ShowCaption = false;
                     Style = StrongAccent;
                     StyleExpr = TRUE;
-                    ToolTipML = ENU = 'Specifies that the user can upload one or more demo reports for this page.';
+                    ToolTip = 'Specifies that the user can upload one or more demo reports for this page.';
 
                     trigger OnDrillDown()
                     begin

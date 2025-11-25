@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.FinancialMgt.Currency;
+
 page 486 "Cust. Stats. by Curr. Lines"
 {
     Caption = 'Lines';
@@ -14,7 +18,7 @@ page 486 "Cust. Stats. by Curr. Lines"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a currency code that you can select. The code must comply with ISO 4217.';
@@ -27,7 +31,7 @@ page 486 "Cust. Stats. by Curr. Lines"
                 field("Customer Balance"; Rec."Customer Balance")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = Code;
+                    AutoFormatExpression = Rec.Code;
                     AutoFormatType = 1;
                     Caption = 'Balance';
                     ToolTip = 'Specifies the payment amount that the customer owes for completed sales.';
@@ -35,7 +39,7 @@ page 486 "Cust. Stats. by Curr. Lines"
                 field("Customer Outstanding Orders"; Rec."Customer Outstanding Orders")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = Code;
+                    AutoFormatExpression = Rec.Code;
                     AutoFormatType = 1;
                     Caption = 'Outstanding Orders';
                     ToolTip = 'Specifies the number of orders for which payment has not been made.';
@@ -43,7 +47,7 @@ page 486 "Cust. Stats. by Curr. Lines"
                 field("Customer Shipped Not Invoiced"; Rec."Customer Shipped Not Invoiced")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = Code;
+                    AutoFormatExpression = Rec.Code;
                     AutoFormatType = 1;
                     Caption = 'Shipped Not Invoiced';
                     ToolTip = 'Specifies the number of orders that are shipped but not invoiced.';
@@ -51,7 +55,7 @@ page 486 "Cust. Stats. by Curr. Lines"
                 field(TotalAmount; TotalAmount)
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = Code;
+                    AutoFormatExpression = Rec.Code;
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total amount less any invoice discount amount and excluding VAT for the sales document.';
@@ -59,7 +63,7 @@ page 486 "Cust. Stats. by Curr. Lines"
                 field("Customer Balance Due"; Rec."Customer Balance Due")
                 {
                     ApplicationArea = Suite;
-                    AutoFormatExpression = Code;
+                    AutoFormatExpression = Rec.Code;
                     AutoFormatType = 1;
                     Caption = 'Balance Due';
                     ToolTip = 'Specifies the payment amount that the customer owes you for completed sales where the payment date is exceeded.';
@@ -74,23 +78,23 @@ page 486 "Cust. Stats. by Curr. Lines"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields(
+        Rec.CalcFields(
           "Customer Balance", "Customer Balance Due",
           "Customer Outstanding Orders", "Customer Shipped Not Invoiced");
-        TotalAmount := "Customer Balance" + "Customer Outstanding Orders" + "Customer Shipped Not Invoiced";
+        TotalAmount := Rec."Customer Balance" + Rec."Customer Outstanding Orders" + Rec."Customer Shipped Not Invoiced";
     end;
 
     trigger OnOpenPage()
     begin
-        Code := '';
-        Insert();
+        Rec.Code := '';
+        Rec.Insert();
         if Currency.FindSet() then
             repeat
                 Rec := Currency;
-                Insert();
+                Rec.Insert();
             until Currency.Next() = 0;
 
-        SetRange("Cust. Ledg. Entries in Filter", true);
+        Rec.SetRange("Cust. Ledg. Entries in Filter", true);
     end;
 
     var

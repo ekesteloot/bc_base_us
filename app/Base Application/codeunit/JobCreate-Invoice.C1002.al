@@ -1,3 +1,18 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.Address;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Resources.Ledger;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+
 codeunit 1002 "Job Create-Invoice"
 {
 
@@ -37,6 +52,7 @@ codeunit 1002 "Job Create-Invoice"
         Done: Boolean;
         NewInvoice: Boolean;
         PostingDate: Date;
+        DocumentDate: Date;
         InvoiceNo: Code[20];
         IsHandled: Boolean;
     begin
@@ -49,14 +65,14 @@ codeunit 1002 "Job Create-Invoice"
                 IsHandled := false;
                 OnBeforeGetInvoiceNo(JobPlanningLine, Done, NewInvoice, PostingDate, InvoiceNo, IsHandled);
                 if not IsHandled then
-                    GetSalesInvoiceNo.GetInvoiceNo(Done, NewInvoice, PostingDate, InvoiceNo);
+                    GetSalesInvoiceNo.GetInvoiceNo(Done, NewInvoice, PostingDate, DocumentDate, InvoiceNo);
             end else begin
                 GetSalesCrMemoNo.SetCustomer(JobPlanningLine."Job No.");
                 GetSalesCrMemoNo.RunModal();
                 IsHandled := false;
                 OnBeforeGetCrMemoNo(JobPlanningLine, Done, NewInvoice, PostingDate, InvoiceNo, IsHandled);
                 if not IsHandled then
-                    GetSalesCrMemoNo.GetCreditMemoNo(Done, NewInvoice, PostingDate, InvoiceNo);
+                    GetSalesCrMemoNo.GetCreditMemoNo(Done, NewInvoice, PostingDate, DocumentDate, InvoiceNo);
             end;
 
         if Done then begin
@@ -68,7 +84,7 @@ codeunit 1002 "Job Create-Invoice"
                 Error(Text004);
             end;
             CreateSalesInvoiceLines(
-              JobPlanningLine."Job No.", JobPlanningLine, InvoiceNo, NewInvoice, PostingDate, CrMemo);
+              JobPlanningLine."Job No.", JobPlanningLine, InvoiceNo, NewInvoice, PostingDate, DocumentDate, CrMemo);
 
             Commit();
 
@@ -90,8 +106,14 @@ codeunit 1002 "Job Create-Invoice"
         else
             Message(Text000);
     end;
-
+#if not CLEAN23
+    [Obsolete('Replaced by CreateSalesInvoiceLines(JobNo: Code[20]; var JobPlanningLineSource: Record "Job Planning Line"; InvoiceNo: Code[20]; NewInvoice: Boolean; PostingDate: Date; DocumentDate: Date; CreditMemo: Boolean)', '23.0')]
     procedure CreateSalesInvoiceLines(JobNo: Code[20]; var JobPlanningLineSource: Record "Job Planning Line"; InvoiceNo: Code[20]; NewInvoice: Boolean; PostingDate: Date; CreditMemo: Boolean)
+    begin
+        CreateSalesInvoiceLines(JobNo, JobPlanningLineSource, InvoiceNo, NewInvoice, PostingDate, 0D, CreditMemo);
+    end;
+#endif
+    procedure CreateSalesInvoiceLines(JobNo: Code[20]; var JobPlanningLineSource: Record "Job Planning Line"; InvoiceNo: Code[20]; NewInvoice: Boolean; PostingDate: Date; DocumentDate: Date; CreditMemo: Boolean)
     var
         Job: Record Job;
         JobPlanningLine: Record "Job Planning Line";
@@ -148,7 +170,7 @@ codeunit 1002 "Job Create-Invoice"
               JobPlanningLine.FieldCaption("Qty. to Transfer to Invoice"));
 
         if NewInvoice then
-            CreateSalesHeader(Job, PostingDate, JobPlanningLine)
+            CreateSalesHeader(Job, PostingDate, DocumentDate, JobPlanningLine)
         else
             TestSalesHeader(SalesHeader, Job, JobPlanningLine);
         if JobPlanningLine.Find('-') then
@@ -213,8 +235,14 @@ codeunit 1002 "Job Create-Invoice"
         ClearAll();
         TempJobPlanningLine.DeleteAll();
     end;
-
+#if not CLEAN23
+    [Obsolete('Replaced by CreateSalesInvoiceJobTask(var JobTask2: Record "Job Task"; PostingDate: Date; DocumentDate: Date; InvoicePerTask: Boolean; var NoOfInvoices: Integer; var OldJobNo: Code[20]; var OldJobTaskNo: Code[20]; LastJobTask: Boolean)', '23.0')]
     procedure CreateSalesInvoiceJobTask(var JobTask2: Record "Job Task"; PostingDate: Date; InvoicePerTask: Boolean; var NoOfInvoices: Integer; var OldJobNo: Code[20]; var OldJobTaskNo: Code[20]; LastJobTask: Boolean)
+    begin
+        CreateSalesInvoiceJobTask(JobTask2, PostingDate, 0D, InvoicePerTask, NoOfInvoices, OldJobNo, OldJobTaskNo, LastJobTask);
+    end;
+#endif
+    procedure CreateSalesInvoiceJobTask(var JobTask2: Record "Job Task"; PostingDate: Date; DocumentDate: Date; InvoicePerTask: Boolean; var NoOfInvoices: Integer; var OldJobNo: Code[20]; var OldJobTaskNo: Code[20]; LastJobTask: Boolean)
     var
         Cust: Record Customer;
         Job: Record Job;
@@ -261,7 +289,7 @@ codeunit 1002 "Job Create-Invoice"
             Cust.Get(Job."Bill-to Customer No.");
             NoOfInvoices := NoOfInvoices + 1;
             SalesHeader2."Document Type" := SalesHeader2."Document Type"::Invoice;
-            CreateSalesHeader(Job, PostingDate, TempJobPlanningLine);
+            CreateSalesHeader(Job, PostingDate, DocumentDate, TempJobPlanningLine);
             OnCreateSalesInvoiceJobTaskOnBeforeTempJobPlanningLineFind(JobTask, SalesHeader, InvoicePerTask, TempJobPlanningLine);
             if TempJobPlanningLine.Find('-') then
                 repeat
@@ -350,7 +378,7 @@ codeunit 1002 "Job Create-Invoice"
         exit(NewInvoice);
     end;
 
-    local procedure CreateSalesHeader(Job: Record Job; PostingDate: Date; JobPlanningLine: Record "Job Planning Line")
+    local procedure CreateSalesHeader(Job: Record Job; PostingDate: Date; DocumentDate: Date; JobPlanningLine: Record "Job Planning Line")
     var
         SalesSetup: Record "Sales & Receivables Setup";
         IsHandled: Boolean;
@@ -365,6 +393,7 @@ codeunit 1002 "Job Create-Invoice"
         if SalesHeader."Document Type" = SalesHeader."Document Type"::"Credit Memo" then
             SalesSetup.TestField("Credit Memo Nos.");
         SalesHeader."Posting Date" := PostingDate;
+        SalesHeader."Document Date" := DocumentDate;
         OnBeforeInsertSalesHeader(SalesHeader, Job, JobPlanningLine);
         SalesHeader.Insert(true);
 
@@ -388,6 +417,8 @@ codeunit 1002 "Job Create-Invoice"
             SalesHeader.Validate("Currency Code", Job."Invoice Currency Code");
         if PostingDate <> 0D then
             SalesHeader.Validate("Posting Date", PostingDate);
+        if DocumentDate <> 0D then
+            SalesHeader.Validate("Document Date", DocumentDate);
 
         if Job."External Document No." <> '' then
             SalesHeader.Validate("External Document No.", Job."External Document No.");
@@ -465,7 +496,7 @@ codeunit 1002 "Job Create-Invoice"
                 if not IsHandled then begin
                     Currency.Get(SalesLine."Currency Code");
                     SalesLine.Validate("Unit Price",
-                      Round(JobPlanningLine."Unit Price" * SalesHeader."Currency Factor",
+                    Round(JobPlanningLine."Unit Price" * SalesHeader."Currency Factor",
                         Currency."Unit-Amount Rounding Precision"));
                 end;
             end else
@@ -721,8 +752,6 @@ codeunit 1002 "Job Create-Invoice"
     var
         JobPlanningLineInvoice: Record "Job Planning Line Invoice";
     begin
-        OnBeforeGetJobPlanningLineInvoices(JobPlanningLine);
-
         ClearAll();
         with JobPlanningLine do begin
             if "Line No." = 0 then
@@ -1219,11 +1248,6 @@ codeunit 1002 "Job Create-Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateSalesInvoiceLinesOnAfterSetSalesDocumentType(var SalesHeader: Record "Sales Header")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    procedure OnBeforeGetJobPlanningLineInvoices(JobPlanningLine: Record "Job Planning Line")
     begin
     end;
 }

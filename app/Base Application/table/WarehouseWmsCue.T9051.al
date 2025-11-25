@@ -1,3 +1,17 @@
+namespace Microsoft.WarehouseMgt.RoleCenters;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Activity.History;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Setup;
+using System.Text;
+
 table 9051 "Warehouse WMS Cue"
 {
     Caption = 'Warehouse WMS Cue';
@@ -11,26 +25,26 @@ table 9051 "Warehouse WMS Cue"
         field(2; "Released Sales Orders - Today"; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = FILTER(Order),
-                                                      Status = FILTER(Released),
-                                                      "Shipment Date" = FIELD("Date Filter"),
-                                                      "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Sales Header" where("Document Type" = filter(Order),
+                                                      Status = filter(Released),
+                                                      "Shipment Date" = field("Date Filter"),
+                                                      "Location Code" = field("Location Filter")));
             Caption = 'Released Sales Orders - Today';
             Editable = false;
             FieldClass = FlowField;
         }
         field(3; "Shipments - Today"; Integer)
         {
-            CalcFormula = Count("Warehouse Shipment Header" WHERE("Shipment Date" = FIELD("Date Filter"),
-                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Warehouse Shipment Header" where("Shipment Date" = field("Date Filter"),
+                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Shipments - Today';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Posted Shipments - Today"; Integer)
         {
-            CalcFormula = Count("Posted Whse. Shipment Header" WHERE("Posting Date" = FIELD("Date Filter2"),
-                                                                      "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Posted Whse. Shipment Header" where("Posting Date" = field("Date Filter2"),
+                                                                      "Location Code" = field("Location Filter")));
             Caption = 'Posted Shipments - Today';
             Editable = false;
             FieldClass = FlowField;
@@ -38,67 +52,67 @@ table 9051 "Warehouse WMS Cue"
         field(5; "Expected Purchase Orders"; Integer)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = FILTER(Order),
-                                                         Status = FILTER(Released),
-                                                         "Expected Receipt Date" = FIELD("Date Filter"),
-                                                         "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Purchase Header" where("Document Type" = filter(Order),
+                                                         Status = filter(Released),
+                                                         "Expected Receipt Date" = field("Date Filter"),
+                                                         "Location Code" = field("Location Filter")));
             Caption = 'Expected Purchase Orders';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; Arrivals; Integer)
         {
-            CalcFormula = Count("Warehouse Receipt Header" WHERE("Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Warehouse Receipt Header" where("Location Code" = field("Location Filter")));
             Caption = 'Arrivals';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; "Posted Receipts - Today"; Integer)
         {
-            CalcFormula = Count("Posted Whse. Receipt Header" WHERE("Posting Date" = FIELD("Date Filter2"),
-                                                                     "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Posted Whse. Receipt Header" where("Posting Date" = field("Date Filter2"),
+                                                                     "Location Code" = field("Location Filter")));
             Caption = 'Posted Receipts - Today';
             Editable = false;
             FieldClass = FlowField;
         }
         field(8; "Picked Shipments - Today"; Integer)
         {
-            CalcFormula = Count("Warehouse Shipment Header" WHERE("Shipment Date" = FIELD("Date Filter"),
-                                                                   "Location Code" = FIELD("Location Filter"),
-                                                                   "Document Status" = FILTER("Partially Picked" | "Completely Picked")));
+            CalcFormula = count("Warehouse Shipment Header" where("Shipment Date" = field("Date Filter"),
+                                                                   "Location Code" = field("Location Filter"),
+                                                                   "Document Status" = filter("Partially Picked" | "Completely Picked")));
             Caption = 'Picked Shipments - Today';
             Editable = false;
             FieldClass = FlowField;
         }
         field(9; "Picks - All"; Integer)
         {
-            CalcFormula = Count("Warehouse Activity Header" WHERE(Type = FILTER(Pick),
-                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Warehouse Activity Header" where(Type = filter(Pick),
+                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Picks - All';
             Editable = false;
             FieldClass = FlowField;
         }
         field(11; "Put-aways - All"; Integer)
         {
-            CalcFormula = Count("Warehouse Activity Header" WHERE(Type = FILTER("Put-away"),
-                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Warehouse Activity Header" where(Type = filter("Put-away"),
+                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Put-aways - All';
             Editable = false;
             FieldClass = FlowField;
         }
         field(13; "Movements - All"; Integer)
         {
-            CalcFormula = Count("Warehouse Activity Header" WHERE(Type = FILTER(Movement),
-                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Warehouse Activity Header" where(Type = filter(Movement),
+                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Movements - All';
             Editable = false;
             FieldClass = FlowField;
         }
         field(14; "Registered Picks - Today"; Integer)
         {
-            CalcFormula = Count("Registered Whse. Activity Hdr." WHERE(Type = FILTER(Pick),
-                                                                        "Registering Date" = FIELD("Date Filter2"),
-                                                                        "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Registered Whse. Activity Hdr." where(Type = filter(Pick),
+                                                                        "Registering Date" = field("Date Filter2"),
+                                                                        "Location Code" = field("Location Filter")));
             Caption = 'Registered Picks - Today';
             Editable = false;
             FieldClass = FlowField;
@@ -127,9 +141,9 @@ table 9051 "Warehouse WMS Cue"
         }
         field(24; "Unassigned Put-aways"; Integer)
         {
-            CalcFormula = Count("Warehouse Activity Header" WHERE(Type = FILTER("Put-away"),
-                                                                   "Assigned User ID" = FILTER(''),
-                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Warehouse Activity Header" where(Type = filter("Put-away"),
+                                                                   "Assigned User ID" = filter(''),
+                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Unassigned Put-aways';
             Editable = false;
             FieldClass = FlowField;
@@ -137,9 +151,9 @@ table 9051 "Warehouse WMS Cue"
 
         field(25; "Unassigned Movements"; Integer)
         {
-            CalcFormula = Count("Warehouse Activity Header" WHERE(Type = FILTER(Movement),
-                                                                   "Assigned User ID" = FILTER(''),
-                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Warehouse Activity Header" where(Type = filter(Movement),
+                                                                   "Assigned User ID" = filter(''),
+                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Unassigned Movements';
             Editable = false;
             FieldClass = FlowField;
@@ -147,9 +161,9 @@ table 9051 "Warehouse WMS Cue"
 
         field(26; "Unassigned Picks"; Integer)
         {
-            CalcFormula = Count("Warehouse Activity Header" WHERE(Type = FILTER(Pick),
-                                                                   "Assigned User ID" = FILTER(''),
-                                                                   "Location Code" = FIELD("Location Filter")));
+            CalcFormula = count("Warehouse Activity Header" where(Type = filter(Pick),
+                                                                   "Assigned User ID" = filter(''),
+                                                                   "Location Code" = field("Location Filter")));
             Caption = 'Unassigned Picks';
             Editable = false;
             FieldClass = FlowField;

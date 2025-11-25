@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 384 "Reconcile CV Acc Buffer"
 {
     Caption = 'Reconcile CV Acc Buffer';

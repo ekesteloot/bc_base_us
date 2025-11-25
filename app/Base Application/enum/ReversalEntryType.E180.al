@@ -1,4 +1,6 @@
-﻿enum 180 "Reversal Entry Type"
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Reversal;
+
+enum 180 "Reversal Entry Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;

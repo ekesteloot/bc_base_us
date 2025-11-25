@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.History;
+
 page 6665 "Return Receipt Statistics"
 {
     Caption = 'Return Receipt Statistics';

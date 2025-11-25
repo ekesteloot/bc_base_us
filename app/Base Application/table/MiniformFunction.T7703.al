@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.ADCS;
+
 table 7703 "Miniform Function"
 {
     Caption = 'Miniform Function';

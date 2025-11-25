@@ -1,3 +1,12 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Sales.Document;
+
 page 914 "Assemble-to-Order Lines"
 {
     AutoSplitKey = true;
@@ -23,7 +32,7 @@ page 914 "Assemble-to-Order Lines"
 
                     trigger OnDrillDown()
                     begin
-                        ShowAvailabilityWarningPage();
+                        Rec.ShowAvailabilityWarningPage();
                     end;
                 }
                 field(Type; Rec.Type)
@@ -40,8 +49,8 @@ page 914 "Assemble-to-Order Lines"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field(Description; Rec.Description)
@@ -66,8 +75,8 @@ page 914 "Assemble-to-Order Lines"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field("Location Code"; Rec."Location Code")
@@ -202,7 +211,7 @@ page 914 "Assemble-to-Order Lines"
 
                 trigger OnAction()
                 begin
-                    ShowReservation();
+                    Rec.ShowReservation();
                 end;
             }
             action("Select Item Substitution")
@@ -214,7 +223,7 @@ page 914 "Assemble-to-Order Lines"
 
                 trigger OnAction()
                 begin
-                    ShowItemSub();
+                    Rec.ShowItemSub();
                     CurrPage.Update();
                 end;
             }
@@ -227,7 +236,7 @@ page 914 "Assemble-to-Order Lines"
 
                 trigger OnAction()
                 begin
-                    ExplodeAssemblyList();
+                    Rec.ExplodeAssemblyList();
                     CurrPage.Update();
                 end;
             }
@@ -240,7 +249,7 @@ page 914 "Assemble-to-Order Lines"
 
                 trigger OnAction()
                 begin
-                    ShowAssemblyList();
+                    Rec.ShowAssemblyList();
                 end;
             }
             action("Create Inventor&y Movement")
@@ -257,7 +266,7 @@ page 914 "Assemble-to-Order Lines"
                     ATOMovementsCreated: Integer;
                     TotalATOMovementsToBeCreated: Integer;
                 begin
-                    AssemblyHeader.Get("Document Type", "Document No.");
+                    AssemblyHeader.Get(Rec."Document Type", Rec."Document No.");
                     AssemblyHeader.CreateInvtMovement(false, false, false, ATOMovementsCreated, TotalATOMovementsToBeCreated);
                 end;
             }
@@ -282,7 +291,7 @@ page 914 "Assemble-to-Order Lines"
                     if IsHandled then
                         exit;
 
-                    ATOLink.Get("Document Type", "Document No.");
+                    ATOLink.Get(Rec."Document Type", Rec."Document No.");
                     SalesLine.Get(ATOLink."Document Type", ATOLink."Document No.", ATOLink."Document Line No.");
                     ATOLink.ShowAsm(SalesLine);
                 end;
@@ -298,7 +307,7 @@ page 914 "Assemble-to-Order Lines"
 
                 trigger OnAction()
                 begin
-                    ShowDimensions();
+                    Rec.ShowDimensions();
                 end;
             }
             action("Item &Tracking Lines")
@@ -311,7 +320,7 @@ page 914 "Assemble-to-Order Lines"
 
                 trigger OnAction()
                 begin
-                    OpenItemTrackingLines();
+                    Rec.OpenItemTrackingLines();
                 end;
             }
             group("Item Availability by")
@@ -397,9 +406,9 @@ page 914 "Assemble-to-Order Lines"
                 Caption = 'Comments';
                 Image = ViewComments;
                 RunObject = Page "Assembly Comment Sheet";
-                RunPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("Document No."),
-                              "Document Line No." = FIELD("Line No.");
+                RunPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("Document No."),
+                              "Document Line No." = field("Line No.");
                 ToolTip = 'View or add comments for the record.';
             }
             action(ShowWarning)
@@ -411,7 +420,7 @@ page 914 "Assemble-to-Order Lines"
 
                 trigger OnAction()
                 begin
-                    ShowAvailabilityWarning();
+                    Rec.ShowAvailabilityWarning();
                 end;
             }
         }
@@ -462,16 +471,16 @@ page 914 "Assemble-to-Order Lines"
     var
         Item: Record "Item";
     begin
-        UpdateAvailWarning();
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+        Rec.UpdateAvailWarning();
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
     end;
 
     trigger OnDeleteRecord(): Boolean
     var
         AssemblyLineReserve: Codeunit "Assembly Line-Reserve";
     begin
-        if (Quantity <> 0) and ItemExists("No.") then begin
+        if (Rec.Quantity <> 0) and Rec.ItemExists(Rec."No.") then begin
             Commit();
             if not AssemblyLineReserve.DeleteLineConfirm(Rec) then
                 exit(false);
@@ -493,7 +502,7 @@ page 914 "Assemble-to-Order Lines"
     begin
         Description := '';
 
-        if AsmHeader.Get("Document Type", "Document No.") then begin
+        if AsmHeader.Get(Rec."Document Type", Rec."Document No.") then begin
             SourceTableName := ObjTransln.TranslateObject(ObjTransln."Object Type"::Table, 27);
             SourceFilter := AsmHeader."Item No.";
             Description := AsmHeader.Description;
@@ -504,6 +513,6 @@ page 914 "Assemble-to-Order Lines"
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowDocument(var AssemblyLine: Record "Assembly Line"; var IsHandled: boolean)
     begin
-    end;    
+    end;
 }
 

@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.RoleCenters;
+
 profile "PRODUCTION PLANNER"
 {
     Caption = 'Manufacturing Manager';

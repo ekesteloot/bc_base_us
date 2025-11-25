@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.History;
+
 page 6655 "Return Shipment Statistics"
 {
     Caption = 'Return Shipment Statistics';
@@ -80,7 +82,7 @@ page 6655 "Return Shipment Statistics"
         if IsHandled then
             exit;
 
-        ReturnShptLine.SetRange("Document No.", "No.");
+        ReturnShptLine.SetRange("Document No.", Rec."No.");
         if ReturnShptLine.Find('-') then
             repeat
                 LineQty += ReturnShptLine.Quantity;

@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Setup;
+
 enum 347 "Report Selection Usage Purchase"
 {
     Extensible = true;

@@ -1,3 +1,11 @@
+namespace Microsoft.ProjectMgt.Resources.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using System.Security.User;
+
 codeunit 211 "Res. Jnl.-Check Line"
 {
     TableNo = "Res. Journal Line";

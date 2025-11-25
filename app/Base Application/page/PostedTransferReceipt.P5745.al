@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.InventoryMgt.Comment;
+
 page 5745 "Posted Transfer Receipt"
 {
     Caption = 'Posted Transfer Receipt';
@@ -82,7 +88,7 @@ page 5745 "Posted Transfer Receipt"
             part(TransferReceiptLines; "Posted Transfer Rcpt. Subform")
             {
                 ApplicationArea = Location;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group(Shipment)
             {
@@ -297,7 +303,7 @@ page 5745 "Posted Transfer Receipt"
                     Importance = Promoted;
                     ToolTip = 'Specifies the transport method, for the purpose of reporting to INTRASTAT.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     Editable = false;
@@ -345,7 +351,7 @@ page 5745 "Posted Transfer Receipt"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Transfer Receipt Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information about the transfer order, such as the quantity and total weight transferred.';
                 }
@@ -355,8 +361,8 @@ page 5745 "Posted Transfer Receipt"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Transfer Receipt"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Transfer Receipt"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -370,7 +376,7 @@ page 5745 "Posted Transfer Receipt"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -403,7 +409,7 @@ page 5745 "Posted Transfer Receipt"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }
@@ -443,8 +449,8 @@ page 5745 "Posted Transfer Receipt"
 
     trigger OnOpenPage()
     begin
-        IsFromCountyVisible := FormatAddress.UseCounty("Trsf.-from Country/Region Code");
-        IsToCountyVisible := FormatAddress.UseCounty("Trsf.-to Country/Region Code");
+        IsFromCountyVisible := FormatAddress.UseCounty(Rec."Trsf.-from Country/Region Code");
+        IsToCountyVisible := FormatAddress.UseCounty(Rec."Trsf.-to Country/Region Code");
     end;
 
     var

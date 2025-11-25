@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
 page 5659 "Depreciation Table Card"
 {
     Caption = 'Depreciation Table Card';
@@ -11,7 +13,7 @@ page 5659 "Depreciation Table Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies a code for the depreciation table.';
@@ -35,7 +37,7 @@ page 5659 "Depreciation Table Card"
             part(Control9; "Depreciation Table Lines")
             {
                 ApplicationArea = FixedAssets;
-                SubPageLink = "Depreciation Table Code" = FIELD(Code);
+                SubPageLink = "Depreciation Table Code" = field(Code);
             }
         }
         area(factboxes)
@@ -72,9 +74,9 @@ page 5659 "Depreciation Table Card"
                     var
                         CreateSumOfDigitsTable: Report "Create Sum of Digits Table";
                     begin
-                        TestField(Code);
+                        Rec.TestField(Code);
                         Clear(CreateSumOfDigitsTable);
-                        CreateSumOfDigitsTable.SetTableCode(Code);
+                        CreateSumOfDigitsTable.SetTableCode(Rec.Code);
                         CreateSumOfDigitsTable.RunModal();
                         Clear(CreateSumOfDigitsTable);
                     end;

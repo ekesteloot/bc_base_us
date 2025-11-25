@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Comment;
+
+using Microsoft.Sales.Document;
+
 table 44 "Sales Comment Line"
 {
     Caption = 'Sales Comment Line';
@@ -112,7 +116,7 @@ table 44 "Sales Comment Line"
         if SalesCommentLine.FindSet() then
             repeat
                 SalesCommentLine2 := SalesCommentLine;
-                SalesCommentLine2."Document Type" := "Sales Comment Document Type".FromInteger(ToDocumentType);
+                SalesCommentLine2."Document Type" := Enum::"Sales Comment Document Type".FromInteger(ToDocumentType);
                 SalesCommentLine2."No." := ToNumber;
                 OnBeforeCopyCommentsOnBeforeInsert(SalesCommentLine2, SalesCommentLine);
                 SalesCommentLine2.Insert();
@@ -137,7 +141,7 @@ table 44 "Sales Comment Line"
         if SalesCommentLineSource.FindSet() then
             repeat
                 SalesCommentLineTarget := SalesCommentLineSource;
-                SalesCommentLineTarget."Document Type" := "Sales Comment Document Type".FromInteger(ToDocumentType);
+                SalesCommentLineTarget."Document Type" := Enum::"Sales Comment Document Type".FromInteger(ToDocumentType);
                 SalesCommentLineTarget."No." := ToNumber;
                 SalesCommentLineTarget."Document Line No." := ToDocumentLineNo;
                 SalesCommentLineTarget.Insert();
@@ -172,7 +176,7 @@ table 44 "Sales Comment Line"
                 if SalesCommentLineSource.FindSet() then
                     repeat
                         SalesCommentLineTarget := SalesCommentLineSource;
-                        SalesCommentLineTarget."Document Type" := "Sales Comment Document Type".FromInteger(ToDocumentType);
+                        SalesCommentLineTarget."Document Type" := Enum::"Sales Comment Document Type".FromInteger(ToDocumentType);
                         SalesCommentLineTarget."No." := ToNumber;
                         SalesCommentLineTarget."Document Line No." := 0;
                         SalesCommentLineTarget."Line No." := NextLineNo;
@@ -199,7 +203,7 @@ table 44 "Sales Comment Line"
         if SalesCommentLineSource.FindSet() then
             repeat
                 SalesCommentLineTarget := SalesCommentLineSource;
-                SalesCommentLineTarget."Document Type" := "Sales Comment Document Type".FromInteger(ToDocumentType);
+                SalesCommentLineTarget."Document Type" := Enum::"Sales Comment Document Type".FromInteger(ToDocumentType);
                 SalesCommentLineTarget."No." := ToNumber;
                 SalesCommentLineTarget.Insert();
             until SalesCommentLineSource.Next() = 0;

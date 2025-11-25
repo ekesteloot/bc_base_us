@@ -11,7 +11,7 @@ report 10004 "Account Balances by GIFI Code"
         dataitem("G/L Account"; "G/L Account")
         {
             CalcFields = "Balance at Date", "Add.-Currency Balance at Date";
-            DataItemTableView = SORTING("GIFI Code") WHERE("GIFI Code" = FILTER(<> ''));
+            DataItemTableView = sorting("GIFI Code") where("GIFI Code" = filter(<> ''));
             RequestFilterFields = "GIFI Code";
             column(Subtitle; Subtitle)
             {

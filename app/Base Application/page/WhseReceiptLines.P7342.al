@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.WarehouseMgt.Journal;
+
 page 7342 "Whse. Receipt Lines"
 {
     Caption = 'Whse. Receipt Lines';
@@ -170,7 +174,7 @@ page 7342 "Whse. Receipt Lines"
                     var
                         WhseRcptHeader: Record "Warehouse Receipt Header";
                     begin
-                        WhseRcptHeader.Get("No.");
+                        WhseRcptHeader.Get(Rec."No.");
                         PAGE.Run(PAGE::"Warehouse Receipt", WhseRcptHeader);
                     end;
                 }
@@ -186,7 +190,7 @@ page 7342 "Whse. Receipt Lines"
                     var
                         WhseRcptHeader: Record "Warehouse Receipt Header";
                     begin
-                        WhseRcptHeader.Get("No.");
+                        WhseRcptHeader.Get(Rec."No.");
                         PAGE.Run(PAGE::"Warehouse Receipt", WhseRcptHeader);
                     end;
                 }
@@ -202,7 +206,7 @@ page 7342 "Whse. Receipt Lines"
                         WMSMgt: Codeunit "WMS Management";
                     begin
                         WMSMgt.ShowSourceDocLine(
-                          "Source Type", "Source Subtype", "Source No.", "Source Line No.", 0)
+                          Rec."Source Type", Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.", 0)
                     end;
                 }
             }

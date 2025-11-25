@@ -1,7 +1,12 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+
 report 706 Status
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/Status.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/Status.rdlc';
     ApplicationArea = Basic, Suite, Advanced;
     Caption = 'Status';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 706 Status
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.") WHERE(Type = CONST(Inventory));
+            DataItemTableView = sorting("No.") where(Type = const(Inventory));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Inventory Posting Group", "Statistics Group", "Location Filter";
             column(AsofStatusDate; StrSubstNo(Text000, Format(StatusDate)))
@@ -87,8 +92,8 @@ report 706 Status
             }
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
+                DataItemLink = "Item No." = field("No."), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
                 column(PostingDate_ItemLedgerEntry; Format("Posting Date"))
                 {
                 }

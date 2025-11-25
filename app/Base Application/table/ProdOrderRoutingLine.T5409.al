@@ -1,4 +1,17 @@
-﻿table 5409 "Prod. Order Routing Line"
+﻿namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Purchases.Document;
+using Microsoft.WarehouseMgt.Request;
+using System.Utilities;
+
+table 5409 "Prod. Order Routing Line"
 {
     Caption = 'Prod. Order Routing Line';
     DrillDownPageID = "Prod. Order Routing";
@@ -77,9 +90,9 @@
         field(8; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST("Work Center")) "Work Center"
-            ELSE
-            IF (Type = CONST("Machine Center")) "Machine Center";
+            TableRelation = if (Type = const("Work Center")) "Work Center"
+            else
+            if (Type = const("Machine Center")) "Machine Center";
 
             trigger OnValidate()
             begin
@@ -507,13 +520,11 @@
             Caption = 'Prod. Order No.';
             Editable = false;
             NotBlank = true;
-            TableRelation = "Production Order"."No." WHERE(Status = FIELD(Status));
+            TableRelation = "Production Order"."No." where(Status = field(Status));
         }
-        field(76; "Unit Cost Calculation"; Option)
+        field(76; "Unit Cost Calculation"; Enum "Unit Cost Calculation Type")
         {
             Caption = 'Unit Cost Calculation';
-            OptionCaption = 'Time,Units';
-            OptionMembers = Time,Units;
         }
         field(77; "Input Quantity"; Decimal)
         {

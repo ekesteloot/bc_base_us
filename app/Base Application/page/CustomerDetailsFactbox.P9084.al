@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Foundation.Comment;
+
 page 9084 "Customer Details FactBox"
 {
     Caption = 'Customer Details';
@@ -46,7 +50,7 @@ page 9084 "Customer Details FactBox"
                 StyleExpr = StyleTxt;
                 ToolTip = 'Specifies the maximum amount you allow the customer to exceed the payment balance before warnings are issued.';
             }
-            field(AvailableCreditLCY; CalcAvailableCreditUI())
+            field(AvailableCreditLCY; Rec.CalcAvailableCreditUI())
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Available Credit (LCY)';
@@ -62,7 +66,7 @@ page 9084 "Customer Details FactBox"
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies a formula that calculates the payment due date, payment discount date, and payment discount amount.';
             }
-            field(Contact; Contact)
+            field(Contact; Rec.Contact)
             {
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies the name of the person you regularly contact when you do business with this customer.';
@@ -83,7 +87,7 @@ page 9084 "Customer Details FactBox"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Ship-to Address';
                     RunObject = Page "Ship-to Address List";
-                    RunPageLink = "Customer No." = FIELD("No.");
+                    RunPageLink = "Customer No." = field("No.");
                     ToolTip = 'View the ship-to address that is specified for the customer.';
                 }
                 action(Comments)
@@ -92,8 +96,8 @@ page 9084 "Customer Details FactBox"
                     Caption = 'Comments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Customer),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Customer),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -102,7 +106,7 @@ page 9084 "Customer Details FactBox"
 
     trigger OnAfterGetRecord()
     begin
-        StyleTxt := SetStyle();
+        StyleTxt := Rec.SetStyle();
     end;
 
     var

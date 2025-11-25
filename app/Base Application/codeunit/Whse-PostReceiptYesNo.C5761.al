@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 codeunit 5761 "Whse.-Post Receipt (Yes/No)"
 {
     TableNo = "Warehouse Receipt Line";

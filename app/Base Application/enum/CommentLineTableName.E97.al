@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Comment;
+
 enum 97 "Comment Line Table Name"
 {
     Extensible = true;

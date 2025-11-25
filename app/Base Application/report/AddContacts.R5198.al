@@ -1,3 +1,14 @@
+﻿namespace Microsoft.CRM.Contact;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Profiling;
+using Microsoft.CRM.Segment;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Purchases.History;
+using Microsoft.Sales.History;
+using System.Utilities;
+
 report 5198 "Add Contacts"
 {
     Caption = 'Add Contacts';
@@ -7,16 +18,16 @@ report 5198 "Add Contacts"
     {
         dataitem("Segment Header"; "Segment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
         }
         dataitem(Contact; Contact)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Search Name", Type, "Salesperson Code", "Post Code", "Country/Region Code", "Territory Code";
             dataitem("Contact Profile Answer"; "Contact Profile Answer")
             {
-                DataItemLink = "Contact No." = FIELD("No.");
-                DataItemTableView = SORTING("Contact No.", "Profile Questionnaire Code", "Line No.");
+                DataItemLink = "Contact No." = field("No.");
+                DataItemTableView = sorting("Contact No.", "Profile Questionnaire Code", "Line No.");
                 RequestFilterFields = "Profile Questionnaire Code", "Line No.";
 
                 trigger OnAfterGetRecord()
@@ -35,8 +46,8 @@ report 5198 "Add Contacts"
             }
             dataitem("Contact Mailing Group"; "Contact Mailing Group")
             {
-                DataItemLink = "Contact No." = FIELD("No.");
-                DataItemTableView = SORTING("Contact No.", "Mailing Group Code");
+                DataItemLink = "Contact No." = field("No.");
+                DataItemTableView = sorting("Contact No.", "Mailing Group Code");
                 RequestFilterFields = "Mailing Group Code";
 
                 trigger OnAfterGetRecord()
@@ -55,8 +66,8 @@ report 5198 "Add Contacts"
             }
             dataitem("Interaction Log Entry"; "Interaction Log Entry")
             {
-                DataItemLink = "Contact Company No." = FIELD("Company No."), "Contact No." = FIELD("No.");
-                DataItemTableView = SORTING("Contact Company No.", "Contact No.", Date);
+                DataItemLink = "Contact Company No." = field("Company No."), "Contact No." = field("No.");
+                DataItemTableView = sorting("Contact Company No.", "Contact No.", Date);
                 RequestFilterFields = Date, "Segment No.", "Campaign No.", Evaluation, "Interaction Template Code", "Salesperson Code";
 
                 trigger OnAfterGetRecord()
@@ -75,8 +86,8 @@ report 5198 "Add Contacts"
             }
             dataitem("Contact Job Responsibility"; "Contact Job Responsibility")
             {
-                DataItemLink = "Contact No." = FIELD("No.");
-                DataItemTableView = SORTING("Contact No.", "Job Responsibility Code");
+                DataItemLink = "Contact No." = field("No.");
+                DataItemTableView = sorting("Contact No.", "Job Responsibility Code");
                 RequestFilterFields = "Job Responsibility Code";
 
                 trigger OnAfterGetRecord()
@@ -95,8 +106,8 @@ report 5198 "Add Contacts"
             }
             dataitem("Contact Industry Group"; "Contact Industry Group")
             {
-                DataItemLink = "Contact No." = FIELD("Company No.");
-                DataItemTableView = SORTING("Contact No.", "Industry Group Code");
+                DataItemLink = "Contact No." = field("Company No.");
+                DataItemTableView = sorting("Contact No.", "Industry Group Code");
                 RequestFilterFields = "Industry Group Code";
 
                 trigger OnAfterGetRecord()
@@ -115,12 +126,12 @@ report 5198 "Add Contacts"
             }
             dataitem("Contact Business Relation"; "Contact Business Relation")
             {
-                DataItemLink = "Contact No." = FIELD("Company No.");
-                DataItemTableView = SORTING("Contact No.", "Business Relation Code");
+                DataItemLink = "Contact No." = field("Company No.");
+                DataItemTableView = sorting("Contact No.", "Business Relation Code");
                 RequestFilterFields = "Business Relation Code";
                 dataitem("Value Entry"; "Value Entry")
                 {
-                    DataItemTableView = SORTING("Source Type", "Source No.", "Item No.", "Posting Date");
+                    DataItemTableView = sorting("Source Type", "Source No.", "Item No.", "Posting Date");
                     RequestFilterFields = "Item No.", "Variant Code", "Posting Date", "Inventory Posting Group";
 
                     trigger OnAfterGetRecord()
@@ -176,7 +187,7 @@ report 5198 "Add Contacts"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -448,7 +459,7 @@ report 5198 "Add Contacts"
             until TempCont.Next() = 0;
     end;
 
-    local procedure FindContInPostDocuments(ContactNo: Code[20]; ValueEntry: Record "Value Entry"): Boolean
+    procedure FindContInPostDocuments(ContactNo: Code[20]; ValueEntry: Record "Value Entry"): Boolean
     var
         SalesShptHeader: Record "Sales Shipment Header";
         SalesInvHeader: Record "Sales Invoice Header";

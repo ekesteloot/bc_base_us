@@ -1,7 +1,9 @@
+namespace Microsoft.FixedAssets.Insurance;
+
 report 5621 "Insurance - List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/InsuranceList.rdlc';
+    RDLCLayout = './FixedAssets/Insurance/InsuranceList.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset Insurance List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +12,7 @@ report 5621 "Insurance - List"
     {
         dataitem(Insurance; Insurance)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

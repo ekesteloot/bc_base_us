@@ -1,3 +1,5 @@
+namespace System.IO;
+
 codeunit 5370 "Excel Buffer Dialog Management"
 {
 

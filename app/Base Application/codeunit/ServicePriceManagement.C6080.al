@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.Pricing;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Document;
+using System.Utilities;
+
 codeunit 6080 "Service Price Management"
 {
 

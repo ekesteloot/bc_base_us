@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.Pricing;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 table 6083 "Serv. Price Adjustment Detail"
 {
     Caption = 'Serv. Price Adjustment Detail';
@@ -19,15 +26,15 @@ table 6083 "Serv. Price Adjustment Detail"
         field(3; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST("Resource Group")) "Resource Group"
-            ELSE
-            IF (Type = CONST("Service Cost")) "Service Cost"
-            ELSE
-            IF (Type = CONST("G/L Account")) "G/L Account";
+            TableRelation = if (Type = const(Item)) Item
+            else
+            if (Type = const(Resource)) Resource
+            else
+            if (Type = const("Resource Group")) "Resource Group"
+            else
+            if (Type = const("Service Cost")) "Service Cost"
+            else
+            if (Type = const("G/L Account")) "G/L Account";
 
             trigger OnValidate()
             var

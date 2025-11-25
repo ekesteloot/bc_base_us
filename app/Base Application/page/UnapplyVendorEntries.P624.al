@@ -1,3 +1,10 @@
+namespace Microsoft.Purchases.Payables;
+
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Purchases.Vendor;
+using System.Security.User;
+using System.Utilities;
+
 page 624 "Unapply Vendor Entries"
 {
     Caption = 'Unapply Vendor Entries';
@@ -266,7 +273,7 @@ page 624 "Unapply Vendor Entries"
             DtldVendLedgEntry.SetRange("Transaction No.", DtldVendLedgEntry2."Transaction No.");
         end;
         DtldVendLedgEntry.SetRange("Vendor No.", DtldVendLedgEntry2."Vendor No.");
-        DeleteAll();
+        Rec.DeleteAll();
         if DtldVendLedgEntry.Find('-') then
             repeat
                 if (DtldVendLedgEntry."Entry Type" <> DtldVendLedgEntry."Entry Type"::"Initial Entry") and
@@ -274,7 +281,7 @@ page 624 "Unapply Vendor Entries"
                 then begin
                     Rec := DtldVendLedgEntry;
                     OnBeforeRecInsert(Rec, DtldVendLedgEntry, DtldVendLedgEntry2);
-                    Insert();
+                    Rec.Insert();
                 end;
             until DtldVendLedgEntry.Next() = 0;
     end;
@@ -283,7 +290,7 @@ page 624 "Unapply Vendor Entries"
     var
         VendLedgEntry: Record "Vendor Ledger Entry";
     begin
-        if VendLedgEntry.Get("Vendor Ledger Entry No.") then;
+        if VendLedgEntry.Get(Rec."Vendor Ledger Entry No.") then;
         exit(VendLedgEntry."Document No.");
     end;
 

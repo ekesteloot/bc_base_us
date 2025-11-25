@@ -1,3 +1,5 @@
+namespace System.Tooling;
+
 codeunit 9621 DesignerPageId
 {
     SingleInstance = true;

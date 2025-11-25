@@ -1,3 +1,7 @@
+namespace System.Text;
+
+using System.Reflection;
+
 table 9805 "Table Filter"
 {
     Caption = 'Table Filter';
@@ -19,7 +23,7 @@ table 9805 "Table Filter"
         field(5; "Field Number"; Integer)
         {
             Caption = 'Field Number';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table Number"));
+            TableRelation = Field."No." where(TableNo = field("Table Number"));
 
             trigger OnValidate()
             var

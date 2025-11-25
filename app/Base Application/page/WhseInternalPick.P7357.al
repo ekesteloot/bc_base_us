@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7357 "Whse. Internal Pick"
 {
     Caption = 'Whse. Internal Pick';
@@ -20,7 +26,7 @@ page 7357 "Whse. Internal Pick"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -32,7 +38,7 @@ page 7357 "Whse. Internal Pick"
                     trigger OnLookup(var Text: Text): Boolean
                     begin
                         CurrPage.SaveRecord();
-                        LookupLocation(Rec);
+                        Rec.LookupLocation(Rec);
                         CurrPage.Update(true);
                     end;
                 }
@@ -92,8 +98,8 @@ page 7357 "Whse. Internal Pick"
             part(WhseInternalPickLines; "Whse. Internal Pick Line")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "No." = FIELD("No.");
-                SubPageView = SORTING("No.", "Sorting Sequence No.");
+                SubPageLink = "No." = field("No.");
+                SubPageView = sorting("No.", "Sorting Sequence No.");
             }
         }
         area(factboxes)
@@ -102,9 +108,9 @@ page 7357 "Whse. Internal Pick"
             {
                 ApplicationArea = ItemTracking;
                 Provider = WhseInternalPickLines;
-                SubPageLink = "Item No." = FIELD("Item No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Location Code" = FIELD("Location Code");
+                SubPageLink = "Item No." = field("Item No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Location Code" = field("Location Code");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -134,9 +140,9 @@ page 7357 "Whse. Internal Pick"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Internal Pick"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Internal Pick"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Pick Lines")
@@ -145,10 +151,10 @@ page 7357 "Whse. Internal Pick"
                     Caption = 'Pick Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity Lines";
-                    RunPageLink = "Whse. Document Type" = CONST("Internal Pick"),
-                                  "Whse. Document No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Document No.", "Whse. Document Type", "Activity Type")
-                                  WHERE("Activity Type" = CONST(Pick));
+                    RunPageLink = "Whse. Document Type" = const("Internal Pick"),
+                                  "Whse. Document No." = field("No.");
+                    RunPageView = sorting("Whse. Document No.", "Whse. Document Type", "Activity Type")
+                                  where("Activity Type" = const(Pick));
                     ToolTip = 'View the related picks.';
                 }
             }
@@ -172,7 +178,7 @@ page 7357 "Whse. Internal Pick"
                         ReleaseWhseInternalPick: Codeunit "Whse. Internal Pick Release";
                     begin
                         CurrPage.Update(true);
-                        if Status = Status::Open then
+                        if Rec.Status = Rec.Status::Open then
                             ReleaseWhseInternalPick.Release(Rec);
                     end;
                 }
@@ -253,7 +259,7 @@ page 7357 "Whse. Internal Pick"
 
     trigger OnOpenPage()
     begin
-        SetWhseLocationFilter();
+        Rec.SetWhseLocationFilter();
     end;
 
     local procedure SortingMethodOnAfterValidate()

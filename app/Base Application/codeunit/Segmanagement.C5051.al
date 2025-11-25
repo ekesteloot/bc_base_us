@@ -1,4 +1,15 @@
-﻿codeunit 5051 SegManagement
+﻿namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Sales.History;
+using System.IO;
+
+codeunit 5051 SegManagement
 {
     Permissions = TableData "Interaction Log Entry" = rimd,
                   tabledata "Interaction Template" = r;
@@ -17,7 +28,6 @@
         InteractionTemplateAssignedLanguageErr: Label 'Interaction Template %1 has assigned Interaction Template Language %2.\It is not allowed to have languages assigned to templates used for system document logging.', Comment = '%1 - Interaction Template Code, %2 - Interaction Template Language Code';
         InteractionsLbl: Label 'Interactions';
 
-    [Scope('OnPrem')]
     procedure LogSegment(SegmentHeader: Record "Segment Header"; Deliver: Boolean; Followup: Boolean)
     var
         SegmentLine: Record "Segment Line";
@@ -83,7 +93,7 @@
                 if InteractionTemplate.Get(SegmentLine."Interaction Template Code") then;
                 CheckSegmentLine(SegmentLine, Deliver);
                 InteractionLogEntry.Init();
-                InteractionLogEntry."Entry No." := SequenceNoMgt.GetNextSeqNo(DATABASE::"Interaction Log Entry");
+                InteractionLogEntry."Entry No." := SequenceNoMgt.GetNextSeqNo(Enum::TableID::"Interaction Log Entry".AsInteger());
                 InteractionLogEntry."Logged Segment Entry No." := LoggedSegment."Entry No.";
 
                 InteractionLogEntry.CopyFromSegment(SegmentLine);
@@ -152,12 +162,6 @@
         OnAfterLogSegment(TempDeliverySorter, LoggedSegment, SegmentHeader, SegmentNo, InteractionLogEntry."Entry No.");
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::Attachment, 'OnAfterDeleteEvent', '', false, false)]
-    local procedure OnAfterDeleteAttachment(var Rec: Record Attachment)
-    begin
-        Rec."No." := Rec."No.";
-    end;
-
     procedure LogInteraction(SegmentLine: Record "Segment Line"; var AttachmentTemp: Record Attachment; var TempInterLogEntryCommentLine: Record "Inter. Log Entry Comment Line"; Deliver: Boolean; Postponed: Boolean) NextInteractLogEntryNo: Integer
     var
         InteractionTemplate: Record "Interaction Template";
@@ -212,7 +216,7 @@
             WizardAction := InteractionTemplate."Wizard Action";
 
         if SegmentLine."Line No." = 0 then begin
-            NextInteractLogEntryNo := SequenceNoMgt.GetNextSeqNo(DATABASE::"Interaction Log Entry");
+            NextInteractLogEntryNo := SequenceNoMgt.GetNextSeqNo(Enum::TableID::"Interaction Log Entry".AsInteger());
 
             InteractionLogEntry.Init();
             InteractionLogEntry."Entry No." := NextInteractLogEntryNo;
@@ -299,19 +303,19 @@
             Description := InteractionTemplate.Description;
 
         case AccountTableNo of
-            DATABASE::Customer:
+            Enum::TableID::Customer.AsInteger():
                 begin
                     ContNo := FindContactFromContBusRelation(ContactBusinessRelation."Link to Table"::Customer, AccountNo);
                     if ContNo = '' then
                         exit;
                 end;
-            DATABASE::Vendor:
+            Enum::TableID::Vendor.AsInteger():
                 begin
                     ContNo := FindContactFromContBusRelation(ContactBusinessRelation."Link to Table"::Vendor, AccountNo);
                     if ContNo = '' then
                         exit;
                 end;
-            DATABASE::Contact:
+            Enum::TableID::Contact.AsInteger():
                 begin
                     if not Contact.Get(AccountNo) then
                         exit;
@@ -398,57 +402,57 @@
             exit('');
         if InteractionTemplateSetup.Get() then
             case DocumentType of
-                "Interaction Log Entry Document Type"::"Sales Qte.":
+                Enum::"Interaction Log Entry Document Type"::"Sales Qte.":
                     InteractTmplCode := InteractionTemplateSetup."Sales Quotes";
-                "Interaction Log Entry Document Type"::"Sales Blnkt. Ord":
+                Enum::"Interaction Log Entry Document Type"::"Sales Blnkt. Ord":
                     InteractTmplCode := InteractionTemplateSetup."Sales Blnkt. Ord";
-                "Interaction Log Entry Document Type"::"Sales Ord. Cnfrmn.":
+                Enum::"Interaction Log Entry Document Type"::"Sales Ord. Cnfrmn.":
                     InteractTmplCode := InteractionTemplateSetup."Sales Ord. Cnfrmn.";
-                "Interaction Log Entry Document Type"::"Sales Inv.":
+                Enum::"Interaction Log Entry Document Type"::"Sales Inv.":
                     InteractTmplCode := InteractionTemplateSetup."Sales Invoices";
-                "Interaction Log Entry Document Type"::"Sales Shpt. Note":
+                Enum::"Interaction Log Entry Document Type"::"Sales Shpt. Note":
                     InteractTmplCode := InteractionTemplateSetup."Sales Shpt. Note";
-                "Interaction Log Entry Document Type"::"Sales Cr. Memo":
+                Enum::"Interaction Log Entry Document Type"::"Sales Cr. Memo":
                     InteractTmplCode := InteractionTemplateSetup."Sales Cr. Memo";
-                "Interaction Log Entry Document Type"::"Sales Stmnt.":
+                Enum::"Interaction Log Entry Document Type"::"Sales Stmnt.":
                     InteractTmplCode := InteractionTemplateSetup."Sales Statement";
-                "Interaction Log Entry Document Type"::"Sales Rmdr.":
+                Enum::"Interaction Log Entry Document Type"::"Sales Rmdr.":
                     InteractTmplCode := InteractionTemplateSetup."Sales Rmdr.";
-                "Interaction Log Entry Document Type"::"Serv. Ord. Create":
+                Enum::"Interaction Log Entry Document Type"::"Serv. Ord. Create":
                     InteractTmplCode := InteractionTemplateSetup."Serv Ord Create";
-                "Interaction Log Entry Document Type"::"Serv. Ord. Post":
+                Enum::"Interaction Log Entry Document Type"::"Serv. Ord. Post":
                     InteractTmplCode := InteractionTemplateSetup."Serv Ord Post";
-                "Interaction Log Entry Document Type"::"Purch.Qte.":
+                Enum::"Interaction Log Entry Document Type"::"Purch.Qte.":
                     InteractTmplCode := InteractionTemplateSetup."Purch. Quotes";
-                "Interaction Log Entry Document Type"::"Purch. Blnkt. Ord.":
+                Enum::"Interaction Log Entry Document Type"::"Purch. Blnkt. Ord.":
                     InteractTmplCode := InteractionTemplateSetup."Purch Blnkt Ord";
-                "Interaction Log Entry Document Type"::"Purch. Ord.":
+                Enum::"Interaction Log Entry Document Type"::"Purch. Ord.":
                     InteractTmplCode := InteractionTemplateSetup."Purch. Orders";
-                "Interaction Log Entry Document Type"::"Purch. Inv.":
+                Enum::"Interaction Log Entry Document Type"::"Purch. Inv.":
                     InteractTmplCode := InteractionTemplateSetup."Purch Invoices";
-                "Interaction Log Entry Document Type"::"Purch. Rcpt.":
+                Enum::"Interaction Log Entry Document Type"::"Purch. Rcpt.":
                     InteractTmplCode := InteractionTemplateSetup."Purch. Rcpt.";
-                "Interaction Log Entry Document Type"::"Purch. Cr. Memo":
+                Enum::"Interaction Log Entry Document Type"::"Purch. Cr. Memo":
                     InteractTmplCode := InteractionTemplateSetup."Purch Cr Memos";
-                "Interaction Log Entry Document Type"::"Cover Sheet":
+                Enum::"Interaction Log Entry Document Type"::"Cover Sheet":
                     InteractTmplCode := InteractionTemplateSetup."Cover Sheets";
-                "Interaction Log Entry Document Type"::"Sales Return Order":
+                Enum::"Interaction Log Entry Document Type"::"Sales Return Order":
                     InteractTmplCode := InteractionTemplateSetup."Sales Return Order";
-                "Interaction Log Entry Document Type"::"Sales Finance Charge Memo":
+                Enum::"Interaction Log Entry Document Type"::"Sales Finance Charge Memo":
                     InteractTmplCode := InteractionTemplateSetup."Sales Finance Charge Memo";
-                "Interaction Log Entry Document Type"::"Sales Return Receipt":
+                Enum::"Interaction Log Entry Document Type"::"Sales Return Receipt":
                     InteractTmplCode := InteractionTemplateSetup."Sales Return Receipt";
-                "Interaction Log Entry Document Type"::"Purch. Return Shipment":
+                Enum::"Interaction Log Entry Document Type"::"Purch. Return Shipment":
                     InteractTmplCode := InteractionTemplateSetup."Purch. Return Shipment";
-                "Interaction Log Entry Document Type"::"Purch. Return Ord. Cnfrmn.":
+                Enum::"Interaction Log Entry Document Type"::"Purch. Return Ord. Cnfrmn.":
                     InteractTmplCode := InteractionTemplateSetup."Purch. Return Ord. Cnfrmn.";
-                "Interaction Log Entry Document Type"::"Service Contract":
+                Enum::"Interaction Log Entry Document Type"::"Service Contract":
                     InteractTmplCode := InteractionTemplateSetup."Service Contract";
-                "Interaction Log Entry Document Type"::"Service Contract Quote":
+                Enum::"Interaction Log Entry Document Type"::"Service Contract Quote":
                     InteractTmplCode := InteractionTemplateSetup."Service Contract Quote";
-                "Interaction Log Entry Document Type"::"Service Quote":
+                Enum::"Interaction Log Entry Document Type"::"Service Quote":
                     InteractTmplCode := InteractionTemplateSetup."Service Quote";
-                "Interaction Log Entry Document Type"::"Sales Draft Invoice":
+                Enum::"Interaction Log Entry Document Type"::"Sales Draft Invoice":
                     InteractTmplCode := InteractionTemplateSetup."Sales Draft Invoices";
             end;
 
@@ -662,7 +666,7 @@
 
             LogDocument(
               "Interaction Log Entry Document Type"::"Sales Inv.".AsInteger(),
-              "No.", 0, 0, DATABASE::Contact, "Bill-to Contact No.", "Salesperson Code",
+              "No.", 0, 0, Enum::TableID::Contact.AsInteger(), "Bill-to Contact No.", "Salesperson Code",
               CampaignTargetGroup."Campaign No.", "Posting Description", '');
         end;
     end;
@@ -724,7 +728,7 @@
         exit(CampaignEntry."Entry No.");
     end;
 
-#if not CLEAN21
+#if not CLEAN22
     [Obsolete('Replaed by event OnAfterFindInteractTemplateCode with enum parameter.', '22.0')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterFindInteractTmplCode(DocumentType: Integer; InteractionTemplateSetup: Record "Interaction Template Setup"; var InteractionTemplateCode: Code[10])

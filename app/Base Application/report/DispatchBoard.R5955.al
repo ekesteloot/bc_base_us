@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Document;
+
 report 5955 "Dispatch Board"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/DispatchBoard.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/DispatchBoard.rdlc';
     AdditionalSearchTerms = 'service schedule';
     ApplicationArea = Service;
     Caption = 'Dispatch Board';
@@ -11,7 +15,7 @@ report 5955 "Dispatch Board"
     {
         dataitem("Service Header"; "Service Header")
         {
-            DataItemTableView = SORTING(Status, "Response Date", "Response Time", Priority);
+            DataItemTableView = sorting(Status, "Response Date", "Response Time", Priority);
             RequestFilterFields = "Document Type", "No.", Status, "Response Date", "Customer No.", "Service Zone Code", "Contract No.";
             column(TodayFormatted; Format(Today, 0, 4))
             {

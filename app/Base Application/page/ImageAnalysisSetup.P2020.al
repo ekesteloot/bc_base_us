@@ -1,3 +1,5 @@
+namespace System.AI;
+
 page 2020 "Image Analysis Setup"
 {
     ApplicationArea = Basic, Suite;
@@ -26,7 +28,7 @@ page 2020 "Image Analysis Setup"
 
                     trigger OnValidate()
                     begin
-                        if ("Api Uri" <> '') and (ApiKey <> '') then
+                        if (Rec."Api Uri" <> '') and (ApiKey <> '') then
                             SetInfiniteAccess();
                     end;
                 }
@@ -39,9 +41,9 @@ page 2020 "Image Analysis Setup"
 
                     trigger OnValidate()
                     begin
-                        SetApiKey(ApiKey);
+                        Rec.SetApiKey(ApiKey);
 
-                        if ("Api Uri" <> '') and (ApiKey <> '') then
+                        if (Rec."Api Uri" <> '') and (ApiKey <> '') then
                             SetInfiniteAccess();
                     end;
                 }
@@ -111,10 +113,10 @@ page 2020 "Image Analysis Setup"
         AzureAIUsage: Codeunit "Azure AI Usage";
         AzureAIService: Enum "Azure AI Service";
     begin
-        GetSingleInstance();
-        if GetApiKey() <> '' then
+        Rec.GetSingleInstance();
+        if Rec.GetApiKey() <> '' then
             ApiKey := '***';
-        if ("Api Uri" <> '') and (ApiKey <> '') then
+        if (Rec."Api Uri" <> '') and (ApiKey <> '') then
             AzureAIUsage.SetImageAnalysisIsSetup(true)
         else
             AzureAIUsage.SetImageAnalysisIsSetup(false);

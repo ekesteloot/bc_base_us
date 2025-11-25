@@ -1,3 +1,13 @@
+namespace Microsoft.CostAccounting.Account;
+
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.CostAccounting.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 1112 "Cost Center"
 {
     Caption = 'Cost Center';
@@ -9,8 +19,6 @@ table 1112 "Cost Center"
         {
             Caption = 'Code';
             NotBlank = true;
-            //This property is currently not supported
-            //TestTableRelation = false;
             //The property 'ValidateTableRelation' can only be set if the property 'TableRelation' is set
             //ValidateTableRelation = false;
 
@@ -45,10 +53,10 @@ table 1112 "Cost Center"
         field(6; "Net Change"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum ("Cost Entry".Amount WHERE("Cost Center Code" = FIELD(Code),
-                                                         "Cost Center Code" = FIELD(FILTER(Totaling)),
-                                                         "Cost Type No." = FIELD("Cost Type Filter"),
-                                                         "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Cost Entry".Amount where("Cost Center Code" = field(Code),
+                                                         "Cost Center Code" = field(FILTER(Totaling)),
+                                                         "Cost Type No." = field("Cost Type Filter"),
+                                                         "Posting Date" = field("Date Filter")));
             Caption = 'Net Change';
             Editable = false;
             FieldClass = FlowField;
@@ -56,10 +64,10 @@ table 1112 "Cost Center"
         field(7; "Balance at Date"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum ("Cost Entry".Amount WHERE("Cost Center Code" = FIELD(Code),
-                                                         "Cost Center Code" = FIELD(FILTER(Totaling)),
-                                                         "Cost Type No." = FIELD("Cost Type Filter"),
-                                                         "Posting Date" = FIELD(UPPERLIMIT("Date Filter"))));
+            CalcFormula = sum("Cost Entry".Amount where("Cost Center Code" = field(Code),
+                                                         "Cost Center Code" = field(FILTER(Totaling)),
+                                                         "Cost Type No." = field("Cost Type Filter"),
+                                                         "Posting Date" = field(UPPERLIMIT("Date Filter"))));
             Caption = 'Balance at Date';
             Editable = false;
             FieldClass = FlowField;
@@ -67,11 +75,11 @@ table 1112 "Cost Center"
         field(8; "Balance to Allocate"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum ("Cost Entry".Amount WHERE("Cost Center Code" = FIELD(Code),
-                                                         "Cost Center Code" = FIELD(FILTER(Totaling)),
-                                                         "Cost Type No." = FIELD("Cost Type Filter"),
-                                                         "Posting Date" = FIELD("Date Filter"),
-                                                         Allocated = CONST(false)));
+            CalcFormula = sum("Cost Entry".Amount where("Cost Center Code" = field(Code),
+                                                         "Cost Center Code" = field(FILTER(Totaling)),
+                                                         "Cost Type No." = field("Cost Type Filter"),
+                                                         "Posting Date" = field("Date Filter"),
+                                                         Allocated = const(false)));
             Caption = 'Balance to Allocate';
             Editable = false;
             FieldClass = FlowField;
@@ -80,8 +88,6 @@ table 1112 "Cost Center"
         {
             Caption = 'Responsible Person';
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()

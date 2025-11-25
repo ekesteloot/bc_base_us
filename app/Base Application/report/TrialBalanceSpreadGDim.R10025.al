@@ -10,7 +10,7 @@ report 10025 "Trial Balance, Spread G. Dim."
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Account Type", "Date Filter", "Global Dimension 1 Filter", "Global Dimension 2 Filter", "Budget Filter";
             column(Dimension_Name_________Text011; Dimension.Name + ' ' + Text011)
@@ -216,7 +216,7 @@ report 10025 "Trial Balance, Spread G. Dim."
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
 
                 trigger OnPreDataItem()
                 begin
@@ -225,7 +225,7 @@ report 10025 "Trial Balance, Spread G. Dim."
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(DescriptionLine1; DescriptionLine1)
                 {
                 }

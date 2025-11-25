@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Security.User;
+
 page 666 "Overdue Approval Entries"
 {
     ApplicationArea = Suite;
@@ -29,7 +33,7 @@ page 666 "Overdue Approval Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Approver ID");
+                        UserMgt.DisplayUserInformation(Rec."Approver ID");
                     end;
                 }
                 field("Sent to ID"; Rec."Sent to ID")
@@ -41,7 +45,7 @@ page 666 "Overdue Approval Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Sent to ID");
+                        UserMgt.DisplayUserInformation(Rec."Sent to ID");
                     end;
                 }
                 field("Sent Date"; Rec."Sent Date")
@@ -114,7 +118,7 @@ page 666 "Overdue Approval Entries"
 
                     trigger OnAction()
                     begin
-                        ShowRecord();
+                        Rec.ShowRecord();
                     end;
                 }
                 action("&App. Entry")
@@ -174,16 +178,16 @@ page 666 "Overdue Approval Entries"
     begin
         if UserSetup.Get(UserId) then
             if not UserSetup."Approval Administrator" then begin
-                FilterGroup(2);
-                Filterstring := GetFilters();
-                FilterGroup(0);
+                Rec.FilterGroup(2);
+                Filterstring := Rec.GetFilters();
+                Rec.FilterGroup(0);
                 if StrLen(Filterstring) = 0 then begin
-                    FilterGroup(2);
-                    SetCurrentKey("Approver ID");
-                    SetRange("Approver ID", UserSetup."User ID");
-                    FilterGroup(0);
+                    Rec.FilterGroup(2);
+                    Rec.SetCurrentKey("Approver ID");
+                    Rec.SetRange("Approver ID", UserSetup."User ID");
+                    Rec.FilterGroup(0);
                 end else
-                    SetCurrentKey("Table ID", "Document Type", "Document No.");
+                    Rec.SetCurrentKey("Table ID", "Document Type", "Document No.");
             end;
     end;
 

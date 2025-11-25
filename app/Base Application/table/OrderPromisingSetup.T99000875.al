@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Requisition;
+
 table 99000875 "Order Promising Setup"
 {
     Caption = 'Order Promising Setup';
@@ -26,7 +31,7 @@ table 99000875 "Order Promising Setup"
         field(10; "Order Promising Worksheet"; Code[10])
         {
             Caption = 'Order Promising Worksheet';
-            TableRelation = "Requisition Wksh. Name".Name WHERE("Worksheet Template Name" = FIELD("Order Promising Template"));
+            TableRelation = "Requisition Wksh. Name".Name where("Worksheet Template Name" = field("Order Promising Template"));
         }
     }
 

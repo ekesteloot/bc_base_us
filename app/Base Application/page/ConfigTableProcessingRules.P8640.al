@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8640 "Config. Table Processing Rules"
 {
     AutoSplitKey = true;
@@ -15,17 +17,17 @@ page 8640 "Config. Table Processing Rules"
         {
             repeater(Group)
             {
-                field("Action"; Action)
+                field("Action"; Rec.Action)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an action that is related to the custom processing rule.';
 
                     trigger OnValidate()
                     begin
-                        CustomCodeunitIdEditable := Action = Action::Custom;
+                        CustomCodeunitIdEditable := Rec.Action = Rec.Action::Custom;
                     end;
                 }
-                field(FilterInfo; GetFilterInfo())
+                field(FilterInfo; Rec.GetFilterInfo())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Filter';
@@ -59,7 +61,7 @@ page 8640 "Config. Table Processing Rules"
 
                     trigger OnAction()
                     begin
-                        ShowFilters();
+                        Rec.ShowFilters();
                     end;
                 }
             }
@@ -79,7 +81,7 @@ page 8640 "Config. Table Processing Rules"
 
     trigger OnAfterGetRecord()
     begin
-        CustomCodeunitIdEditable := Action = Action::Custom;
+        CustomCodeunitIdEditable := Rec.Action = Rec.Action::Custom;
     end;
 
     var

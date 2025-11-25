@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.VAT;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+
 page 1575 "VAT Entries Preview Flat Subf."
 {
     PageType = ListPart;
@@ -60,7 +64,7 @@ page 1575 "VAT Entries Preview Flat Subf."
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of the VAT entry.';
                 }
-                field(Base; Base)
+                field(Base; Rec.Base)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the amount that the VAT amount (the amount shown in the Amount field) is calculated from.';
@@ -126,7 +130,7 @@ page 1575 "VAT Entries Preview Flat Subf."
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies if the transaction is related to trade with a third party within the EU.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the VAT entry has been closed by the Calc. and Post VAT Settlement batch job.';
@@ -141,7 +145,7 @@ page 1575 "VAT Entries Preview Flat Subf."
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the internal reference number for the line.';
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry has been part of a reverse transaction.';
@@ -173,8 +177,8 @@ page 1575 "VAT Entries Preview Flat Subf."
     var
         RecRef: RecordRef;
     begin
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
 
         PostingPreviewEventHandler.GetEntries(DATABASE::"VAT Entry", RecRef);
         if RecRef.FindSet() then

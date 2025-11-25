@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Family;
+
+using Microsoft.InventoryMgt.Item;
+
 table 99000774 "Family Line"
 {
     Caption = 'Family Line';
@@ -46,7 +50,7 @@ table 99000774 "Family Line"
         field(12; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(20; Quantity; Decimal)
         {

@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 page 904 "Assembly List"
 {
     Caption = 'Assembly List';
@@ -28,6 +32,12 @@ page 904 "Assembly List"
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the description of the assembly item.';
+                }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Assembly;
+                    ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
                 }
                 field("Due Date"; Rec."Due Date")
                 {
@@ -110,12 +120,12 @@ page 904 "Assembly List"
 
                 trigger OnAction()
                 begin
-                    case "Document Type" of
-                        "Document Type"::Quote:
+                    case Rec."Document Type" of
+                        Rec."Document Type"::Quote:
                             PAGE.Run(PAGE::"Assembly Quote", Rec);
-                        "Document Type"::Order:
+                        Rec."Document Type"::Order:
                             PAGE.Run(PAGE::"Assembly Order", Rec);
-                        "Document Type"::"Blanket Order":
+                        Rec."Document Type"::"Blanket Order":
                             PAGE.Run(PAGE::"Blanket Assembly Order", Rec);
                     end;
                 end;
@@ -130,7 +140,7 @@ page 904 "Assembly List"
 
                 trigger OnAction()
                 begin
-                    ShowReservationEntries(true);
+                    Rec.ShowReservationEntries(true);
                 end;
             }
             action("Item Tracking Lines")
@@ -138,12 +148,12 @@ page 904 "Assembly List"
                 ApplicationArea = ItemTracking;
                 Caption = 'Item &Tracking Lines';
                 Image = ItemTrackingLines;
-                ShortCutKey = 'Ctrl+Alt+I'; 
+                ShortCutKey = 'Ctrl+Alt+I';
                 ToolTip = 'View or edit serial numbers and lot numbers that are assigned to the item on the document or journal line.';
 
                 trigger OnAction()
                 begin
-                    OpenItemTrackingLines();
+                    Rec.OpenItemTrackingLines();
                 end;
             }
         }

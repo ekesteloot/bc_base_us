@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Costing;
+
 enum 106 "Cost Variance Type"
 {
     Extensible = true;

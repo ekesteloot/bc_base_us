@@ -1,3 +1,12 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Resources;
+using Microsoft.ServiceMgt.Setup;
+using System.Utilities;
+
 table 5950 "Service Order Allocation"
 {
     Caption = 'Service Order Allocation';
@@ -91,7 +100,7 @@ table 5950 "Service Order Allocation"
 
                     if ServmgtSetup."Service Zones Option" = ServmgtSetup."Service Zones Option"::"Warning Displayed"
                     then begin
-                        ServHeader.Get("Document Type", "Document No.");
+                        ServHeader.Get(Rec."Document Type", Rec."Document No.");
                         Res."Service Zone Filter" := ServHeader."Service Zone Code";
                         Res.CalcFields("In Customer Zone");
 
@@ -133,8 +142,8 @@ table 5950 "Service Order Allocation"
         field(7; "Service Item Line No."; Integer)
         {
             Caption = 'Service Item Line No.';
-            TableRelation = "Service Item Line"."Line No." WHERE("Document Type" = FIELD("Document Type"),
-                                                                  "Document No." = FIELD("Document No."));
+            TableRelation = "Service Item Line"."Line No." where("Document Type" = field("Document Type"),
+                                                                  "Document No." = field("Document No."));
 
             trigger OnValidate()
             begin
@@ -225,9 +234,9 @@ table 5950 "Service Order Allocation"
         }
         field(15; "Service Item Description"; Text[100])
         {
-            CalcFormula = Lookup("Service Item Line".Description WHERE("Document Type" = FIELD("Document Type"),
-                                                                        "Document No." = FIELD("Document No."),
-                                                                        "Line No." = FIELD("Service Item Line No.")));
+            CalcFormula = Lookup("Service Item Line".Description where("Document Type" = field("Document Type"),
+                                                                        "Document No." = field("Document No."),
+                                                                        "Line No." = field("Service Item Line No.")));
             Caption = 'Service Item Description';
             Editable = false;
             FieldClass = FlowField;
@@ -260,9 +269,9 @@ table 5950 "Service Order Allocation"
         }
         field(17; "Repair Status"; Code[20])
         {
-            CalcFormula = Lookup("Service Item Line"."Repair Status Code" WHERE("Document Type" = FIELD("Document Type"),
-                                                                                 "Document No." = FIELD("Document No."),
-                                                                                 "Line No." = FIELD("Service Item Line No.")));
+            CalcFormula = Lookup("Service Item Line"."Repair Status Code" where("Document Type" = field("Document Type"),
+                                                                                 "Document No." = field("Document No."),
+                                                                                 "Line No." = field("Service Item Line No.")));
             Caption = 'Repair Status';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,8 @@
+﻿namespace System.Threading;
+
+using System.Azure.Identity;
+using System.Environment;
+
 page 3845 "Scheduled Tasks"
 {
     PageType = List;
@@ -89,7 +94,7 @@ page 3845 "Scheduled Tasks"
                 ApplicationArea = All;
                 Caption = 'Job Queue';
                 Editable = false;
-                SubPageLink = "System Task ID" = FIELD(ID);
+                SubPageLink = "System Task ID" = field(ID);
             }
         }
     }

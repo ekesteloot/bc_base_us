@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.WorkCenter;
+
 page 99000817 "Prod. Order Routing"
 {
     Caption = 'Prod. Order Routing';
@@ -82,7 +87,7 @@ page 99000817 "Prod. Order Routing"
 
                     trigger OnValidate()
                     begin
-                        Validate("Starting Time", StartingTime);
+                        Rec.Validate("Starting Time", StartingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -95,7 +100,7 @@ page 99000817 "Prod. Order Routing"
 
                     trigger OnValidate()
                     begin
-                        Validate("Starting Date", StartingDate);
+                        Rec.Validate("Starting Date", StartingDate);
                         CurrPage.Update(true);
                     end;
                 }
@@ -118,7 +123,7 @@ page 99000817 "Prod. Order Routing"
 
                     trigger OnValidate()
                     begin
-                        Validate("Ending Time", EndingTime);
+                        Rec.Validate("Ending Time", EndingTime);
                         CurrPage.Update(true);
                     end;
                 }
@@ -131,7 +136,7 @@ page 99000817 "Prod. Order Routing"
 
                     trigger OnValidate()
                     begin
-                        Validate("Ending Date", EndingDate);
+                        Rec.Validate("Ending Date", EndingDate);
                         CurrPage.Update(true);
                     end;
                 }
@@ -323,11 +328,11 @@ page 99000817 "Prod. Order Routing"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Prod. Order Rtng. Cmt. Sh.";
-                    RunPageLink = Status = FIELD(Status),
-                                  "Prod. Order No." = FIELD("Prod. Order No."),
-                                  "Routing Reference No." = FIELD("Routing Reference No."),
-                                  "Routing No." = FIELD("Routing No."),
-                                  "Operation No." = FIELD("Operation No.");
+                    RunPageLink = Status = field(Status),
+                                  "Prod. Order No." = field("Prod. Order No."),
+                                  "Routing Reference No." = field("Routing Reference No."),
+                                  "Routing No." = field("Routing No."),
+                                  "Operation No." = field("Operation No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Tools)
@@ -336,11 +341,11 @@ page 99000817 "Prod. Order Routing"
                     Caption = 'Tools';
                     Image = Tools;
                     RunObject = Page "Prod. Order Routing Tools";
-                    RunPageLink = Status = FIELD(Status),
-                                  "Prod. Order No." = FIELD("Prod. Order No."),
-                                  "Routing Reference No." = FIELD("Routing Reference No."),
-                                  "Routing No." = FIELD("Routing No."),
-                                  "Operation No." = FIELD("Operation No.");
+                    RunPageLink = Status = field(Status),
+                                  "Prod. Order No." = field("Prod. Order No."),
+                                  "Routing Reference No." = field("Routing Reference No."),
+                                  "Routing No." = field("Routing No."),
+                                  "Operation No." = field("Operation No.");
                     ToolTip = 'View or edit information about tools that apply to operations that represent the standard task.';
                 }
                 action(Personnel)
@@ -349,11 +354,11 @@ page 99000817 "Prod. Order Routing"
                     Caption = 'Personnel';
                     Image = User;
                     RunObject = Page "Prod. Order Routing Personnel";
-                    RunPageLink = Status = FIELD(Status),
-                                  "Prod. Order No." = FIELD("Prod. Order No."),
-                                  "Routing Reference No." = FIELD("Routing Reference No."),
-                                  "Routing No." = FIELD("Routing No."),
-                                  "Operation No." = FIELD("Operation No.");
+                    RunPageLink = Status = field(Status),
+                                  "Prod. Order No." = field("Prod. Order No."),
+                                  "Routing Reference No." = field("Routing Reference No."),
+                                  "Routing No." = field("Routing No."),
+                                  "Operation No." = field("Operation No.");
                     ToolTip = 'View or edit information about personnel that applies to operations that represent the standard task.';
                 }
                 action("Quality Measures")
@@ -362,11 +367,11 @@ page 99000817 "Prod. Order Routing"
                     Caption = 'Quality Measures';
                     Image = TaskQualityMeasure;
                     RunObject = Page "Prod. Order Rtng Qlty Meas.";
-                    RunPageLink = Status = FIELD(Status),
-                                  "Prod. Order No." = FIELD("Prod. Order No."),
-                                  "Routing Reference No." = FIELD("Routing Reference No."),
-                                  "Routing No." = FIELD("Routing No."),
-                                  "Operation No." = FIELD("Operation No.");
+                    RunPageLink = Status = field(Status),
+                                  "Prod. Order No." = field("Prod. Order No."),
+                                  "Routing Reference No." = field("Routing Reference No."),
+                                  "Routing No." = field("Routing No."),
+                                  "Operation No." = field("Operation No.");
                     ToolTip = 'View or edit information about quality measures that apply to operations that represent the standard task.';
                 }
                 action("Allocated Capacity")
@@ -380,16 +385,16 @@ page 99000817 "Prod. Order Routing"
                     var
                         ProdOrderCapNeed: Record "Prod. Order Capacity Need";
                     begin
-                        if Status = Status::Finished then
+                        if Rec.Status = Rec.Status::Finished then
                             exit;
                         ProdOrderCapNeed.SetCurrentKey(Type, "No.", "Starting Date-Time");
-                        ProdOrderCapNeed.SetRange(Type, Type);
-                        ProdOrderCapNeed.SetRange("No.", "No.");
-                        ProdOrderCapNeed.SetRange(Date, "Starting Date", "Ending Date");
-                        ProdOrderCapNeed.SetRange("Prod. Order No.", "Prod. Order No.");
-                        ProdOrderCapNeed.SetRange(Status, Status);
-                        ProdOrderCapNeed.SetRange("Routing Reference No.", "Routing Reference No.");
-                        ProdOrderCapNeed.SetRange("Operation No.", "Operation No.");
+                        ProdOrderCapNeed.SetRange(Type, Rec.Type);
+                        ProdOrderCapNeed.SetRange("No.", Rec."No.");
+                        ProdOrderCapNeed.SetRange(Date, Rec."Starting Date", Rec."Ending Date");
+                        ProdOrderCapNeed.SetRange("Prod. Order No.", Rec."Prod. Order No.");
+                        ProdOrderCapNeed.SetRange(Status, Rec.Status);
+                        ProdOrderCapNeed.SetRange("Routing Reference No.", Rec."Routing Reference No.");
+                        ProdOrderCapNeed.SetRange("Operation No.", Rec."Operation No.");
 
                         PAGE.RunModal(0, ProdOrderCapNeed);
                     end;
@@ -414,9 +419,9 @@ page 99000817 "Prod. Order Routing"
                         ProdOrderLine: Record "Prod. Order Line";
                         TrackingForm: Page "Order Tracking";
                     begin
-                        ProdOrderLine.SetRange(Status, Status);
-                        ProdOrderLine.SetRange("Prod. Order No.", "Prod. Order No.");
-                        ProdOrderLine.SetRange("Routing No.", "Routing No.");
+                        ProdOrderLine.SetRange(Status, Rec.Status);
+                        ProdOrderLine.SetRange("Prod. Order No.", Rec."Prod. Order No.");
+                        ProdOrderLine.SetRange("Routing No.", Rec."Routing No.");
                         if ProdOrderLine.FindFirst() then begin
                             TrackingForm.SetProdOrderLine(ProdOrderLine);
                             TrackingForm.RunModal();
@@ -464,18 +469,18 @@ page 99000817 "Prod. Order Routing"
 
     trigger OnAfterGetRecord()
     begin
-        NextOperationNoEditable := not IsSerial();
-        GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
+        NextOperationNoEditable := not Rec.IsSerial();
+        Rec.GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
     end;
 
     trigger OnAfterGetCurrRecord()
     begin
-        UnitCostPerEditable := Rec.Type = "Capacity Type"::"Work Center";
+        UnitCostPerEditable := Rec.Type = Rec.Type::"Work Center";
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
-        CheckPreviousAndNext();
+        Rec.CheckPreviousAndNext();
     end;
 
     trigger OnInit()
@@ -488,13 +493,12 @@ page 99000817 "Prod. Order Routing"
     trigger OnOpenPage()
     begin
         ProdOrderNoVisible := true;
-        if GetFilter("Prod. Order No.") <> '' then
-            ProdOrderNoVisible := GetRangeMin("Prod. Order No.") <> GetRangeMax("Prod. Order No.");
+        if Rec.GetFilter("Prod. Order No.") <> '' then
+            ProdOrderNoVisible := Rec.GetRangeMin("Prod. Order No.") <> Rec.GetRangeMax("Prod. Order No.");
         DateAndTimeFieldVisible := false;
     end;
 
     var
-        [InDataSet]
         ProdOrderNoVisible: Boolean;
         NextOperationNoEditable: Boolean;
         UnitCostPerEditable: Boolean;
@@ -509,9 +513,9 @@ page 99000817 "Prod. Order Routing"
         WorkCenter: Record "Work Center";
         CalendarMgt: Codeunit "Shop Calendar Management";
     begin
-        if "Work Center No." = '' then
+        if Rec."Work Center No." = '' then
             exit(1);
-        WorkCenter.Get("Work Center No.");
+        WorkCenter.Get(Rec."Work Center No.");
         exit(CalendarMgt.TimeFactor(WorkCenter."Unit of Measure Code"));
     end;
 

@@ -10,7 +10,7 @@ page 36642 "Customer Credit FactBox"
     {
         area(content)
         {
-            field(Contact; Contact)
+            field(Contact; Rec.Contact)
             {
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies the contact person for the customer record.';
@@ -25,7 +25,7 @@ page 36642 "Customer Credit FactBox"
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies the method you normally use to collect payment from this customer, such as bank transfer or check.';
             }
-            field(Blocked; Blocked)
+            field(Blocked; Rec.Blocked)
             {
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies if the customer is blocked from posting.';
@@ -72,7 +72,7 @@ page 36642 "Customer Credit FactBox"
                 ApplicationArea = Basic, Suite;
                 ToolTip = 'Specifies the payment amount that the customer owes for completed sales. This value is also known as the customer''s balance.';
             }
-            field("""Credit Limit (LCY)"" - ""Balance (LCY)"""; Rec."Credit Limit (LCY)" - "Balance (LCY)")
+            field("""Credit Limit (LCY)"" - ""Balance (LCY)"""; Rec."Credit Limit (LCY)" - Rec."Balance (LCY)")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Difference';
@@ -243,9 +243,9 @@ page 36642 "Customer Credit FactBox"
     procedure ChangeCustomer()
     begin
         // Change the Customer Filters
-        LatestCustLedgerEntry.SetRange("Customer No.", "No.");
+        LatestCustLedgerEntry.SetRange("Customer No.", Rec."No.");
         for I := 1 to ArrayLen(CustLedgerEntry) do
-            CustLedgerEntry[I].SetRange("Customer No.", "No.");
+            CustLedgerEntry[I].SetRange("Customer No.", Rec."No.");
     end;
 
     procedure DrillDown(Index: Integer)

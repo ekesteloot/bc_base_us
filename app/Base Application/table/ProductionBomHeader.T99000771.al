@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.Manufacturing.Comment;
+using Microsoft.Manufacturing.Setup;
+
 table 99000771 "Production BOM Header"
 {
     Caption = 'Production BOM Header';
@@ -55,8 +63,8 @@ table 99000771 "Production BOM Header"
         }
         field(25; Comment; Boolean)
         {
-            CalcFormula = Exist("Manufacturing Comment Line" WHERE("Table Name" = CONST("Production BOM Header"),
-                                                                    "No." = FIELD("No.")));
+            CalcFormula = exist("Manufacturing Comment Line" where("Table Name" = const("Production BOM Header"),
+                                                                    "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;

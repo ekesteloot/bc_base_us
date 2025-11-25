@@ -14,7 +14,7 @@
             repeater(Control1020001)
             {
                 ShowCaption = false;
-                field(GetDescriptionInCurrentLanguage; GetDescriptionInCurrentLanguageFullLength())
+                field(GetDescriptionInCurrentLanguage; Rec.GetDescriptionInCurrentLanguageFullLength())
                 {
                     ApplicationArea = Invoicing, Basic, Suite;
                     Editable = false;
@@ -48,7 +48,7 @@
     trigger OnAfterGetRecord()
     begin
         DefaultCode := O365TaxSettingsManagement.GetDefaultTaxArea();
-        if Code = DefaultCode then
+        if Rec.Code = DefaultCode then
             StyleExpr := 'Strong'
         else
             StyleExpr := 'Standard';

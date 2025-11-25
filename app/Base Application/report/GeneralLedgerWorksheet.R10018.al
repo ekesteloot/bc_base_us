@@ -10,7 +10,7 @@ report 10018 "General Ledger Worksheet"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.") WHERE("Account Type" = CONST(Posting));
+            DataItemTableView = sorting("No.") where("Account Type" = const(Posting));
             RequestFilterFields = "No.", "Date Filter";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

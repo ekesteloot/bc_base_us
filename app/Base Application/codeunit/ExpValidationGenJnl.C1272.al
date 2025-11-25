@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 codeunit 1272 "Exp. Validation Gen. Jnl."
 {
     TableNo = "Gen. Journal Line";
@@ -6,8 +11,8 @@ codeunit 1272 "Exp. Validation Gen. Jnl."
     var
         GenJnlLine: Record "Gen. Journal Line";
     begin
-        DeletePaymentFileBatchErrors();
-        DeletePaymentFileErrors();
+        Rec.DeletePaymentFileBatchErrors();
+        Rec.DeletePaymentFileErrors();
 
         GenJnlLine.CopyFilters(Rec);
         if GenJnlLine.FindSet() then

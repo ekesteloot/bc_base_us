@@ -1,10 +1,22 @@
-﻿page 509 "Blanket Purchase Order"
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Purchases.Comment;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Shared.Archive;
+using System.Automation;
+using System.Security.User;
+
+page 509 "Blanket Purchase Order"
 {
     Caption = 'Blanket Purchase Order';
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";
-    SourceTableView = WHERE("Document Type" = FILTER("Blanket Order"));
+    SourceTableView = where("Document Type" = filter("Blanket Order"));
 
     layout
     {
@@ -21,7 +33,7 @@
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -36,7 +48,7 @@
                     trigger OnValidate()
                     begin
                         IsPurchaseLinesEditable := Rec.PurchaseLinesEditable;
-                        OnAfterValidateBuyFromVendorNo(Rec, xRec);
+                        Rec.OnAfterValidateBuyFromVendorNo(Rec, xRec);
                         CurrPage.Update();
                     end;
                 }
@@ -49,7 +61,7 @@
 
                     trigger OnValidate()
                     begin
-                        OnAfterValidateBuyFromVendorNo(Rec, xRec);
+                        Rec.OnAfterValidateBuyFromVendorNo(Rec, xRec);
 
                         CurrPage.Update();
                     end;
@@ -112,7 +124,7 @@
 
                         trigger OnLookup(var Text: Text): Boolean
                         begin
-                            if not BuyfromContactLookup() then
+                            if not Rec.BuyfromContactLookup() then
                                 exit(false);
                             Text := Rec."Buy-from Contact No.";
                             CurrPage.Update();
@@ -157,7 +169,7 @@
                 {
                     ApplicationArea = Suite;
                     Caption = 'Contact';
-                    Editable = "Buy-from Vendor No." <> '';
+                    Editable = Rec."Buy-from Vendor No." <> '';
                     ToolTip = 'Specifies the name of the person to contact about shipment of the item from this vendor.';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -234,13 +246,25 @@
                     StyleExpr = StatusStyleTxt;
                     ToolTip = 'Specifies whether the record is open, waiting to be approved, invoiced for prepayment, or released to the next stage of processing.';
                 }
+                field("Language Code"; Rec."Language Code")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the language to be used on printouts for this document.';
+                    Visible = false;
+                }
+                field("Format Region"; Rec."Format Region")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the format to be used on printouts for this document.';
+                    Visible = false;
+                }
             }
             part(PurchLines; "Blanket Purchase Order Subform")
             {
                 ApplicationArea = Suite;
                 Editable = IsPurchaseLinesEditable;
                 Enabled = IsPurchaseLinesEditable;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
                 UpdatePropagation = Both;
             }
             group("Invoice Details")
@@ -254,9 +278,9 @@
                     trigger OnAssistEdit()
                     begin
                         Clear(ChangeExchangeRate);
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", WorkDate());
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then begin
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
                             SaveInvoiceDiscountAmount();
                         end;
                         Clear(ChangeExchangeRate);
@@ -458,9 +482,9 @@
 
                         trigger OnValidate()
                         begin
-                            if GetFilter("Pay-to Vendor No.") = xRec."Pay-to Vendor No." then
-                                if "Pay-to Vendor No." <> xRec."Pay-to Vendor No." then
-                                    SetRange("Pay-to Vendor No.");
+                            if Rec.GetFilter("Pay-to Vendor No.") = xRec."Pay-to Vendor No." then
+                                if Rec."Pay-to Vendor No." <> xRec."Pay-to Vendor No." then
+                                    Rec.SetRange("Pay-to Vendor No.");
 
                             CurrPage.Update();
                         end;
@@ -469,8 +493,8 @@
                     {
                         ApplicationArea = Suite;
                         Caption = 'Address';
-                        Editable = "Buy-from Vendor No." <> "Pay-to Vendor No.";
-                        Enabled = "Buy-from Vendor No." <> "Pay-to Vendor No.";
+                        Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
+                        Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the address of the vendor sending the invoice.';
@@ -479,8 +503,8 @@
                     {
                         ApplicationArea = Suite;
                         Caption = 'Address 2';
-                        Editable = "Buy-from Vendor No." <> "Pay-to Vendor No.";
-                        Enabled = "Buy-from Vendor No." <> "Pay-to Vendor No.";
+                        Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
+                        Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies additional address information.';
@@ -489,8 +513,8 @@
                     {
                         ApplicationArea = Suite;
                         Caption = 'City';
-                        Editable = "Buy-from Vendor No." <> "Pay-to Vendor No.";
-                        Enabled = "Buy-from Vendor No." <> "Pay-to Vendor No.";
+                        Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
+                        Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the city of the vendor sending the invoice.';
@@ -499,8 +523,8 @@
                     {
                         ApplicationArea = Suite;
                         Caption = 'State';
-                        Editable = "Buy-from Vendor No." <> "Pay-to Vendor No.";
-                        Enabled = "Buy-from Vendor No." <> "Pay-to Vendor No.";
+                        Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
+                        Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the state where the vendor sending the invoice is located.';
@@ -509,8 +533,8 @@
                     {
                         ApplicationArea = Suite;
                         Caption = 'Post Code';
-                        Editable = "Buy-from Vendor No." <> "Pay-to Vendor No.";
-                        Enabled = "Buy-from Vendor No." <> "Pay-to Vendor No.";
+                        Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
+                        Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Importance = Additional;
                         QuickEntry = false;
                         ToolTip = 'Specifies the postal code.';
@@ -519,8 +543,8 @@
                     {
                         ApplicationArea = Suite;
                         Caption = 'Contact No.';
-                        Editable = "Buy-from Vendor No." <> "Pay-to Vendor No.";
-                        Enabled = "Buy-from Vendor No." <> "Pay-to Vendor No.";
+                        Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
+                        Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Importance = Additional;
                         ToolTip = 'Specifies the number of the contact who sends the invoice.';
                     }
@@ -528,8 +552,8 @@
                     {
                         ApplicationArea = Suite;
                         Caption = 'Contact';
-                        Editable = "Buy-from Vendor No." <> "Pay-to Vendor No.";
-                        Enabled = "Buy-from Vendor No." <> "Pay-to Vendor No.";
+                        Editable = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
+                        Enabled = Rec."Buy-from Vendor No." <> Rec."Pay-to Vendor No.";
                         Importance = Additional;
                         ToolTip = 'Specifies the name of the person to contact about an invoice from this vendor.';
                     }
@@ -580,7 +604,7 @@
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the code of the port of entry where the items pass into your country/region, for reporting to Intrastat.';
                 }
-                field("Area"; Area)
+                field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU, BasicNO;
                     ToolTip = 'Specifies the destination country or region for the purpose of Intrastat reporting.';
@@ -593,16 +617,16 @@
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Purchase Header"),
-                              "No." = FIELD("No."),
-                              "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Purchase Header"),
+                              "No." = field("No."),
+                              "Document Type" = field("Document Type");
             }
             part(Control5; "Pending Approval FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Table ID" = CONST(38),
-                              "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No."),
+                SubPageLink = "Table ID" = const(38),
+                              "Document Type" = field("Document Type"),
+                              "Document No." = field("No."),
                               Status = const(Open);
                 Visible = OpenApprovalEntriesExistForCurrUser;
             }
@@ -614,22 +638,22 @@
             part(Control1901138007; "Vendor Details FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Buy-from Vendor No."),
+                SubPageLink = "No." = field("Buy-from Vendor No."),
                               "Date Filter" = field("Date Filter");
             }
             part(Control1904651607; "Vendor Statistics FactBox")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "No." = FIELD("Pay-to Vendor No."),
+                SubPageLink = "No." = field("Pay-to Vendor No."),
                               "Date Filter" = field("Date Filter");
             }
             part(Control3; "Purchase Line FactBox")
             {
                 ApplicationArea = Suite;
                 Provider = PurchLines;
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("Document No."),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("Document No."),
+                              "Line No." = field("Line No.");
                 Visible = false;
             }
             part(WorkflowStatus; "Workflow Status FactBox")
@@ -670,7 +694,7 @@
 
                     trigger OnAction()
                     begin
-                        OpenPurchaseOrderStatistics();
+                        Rec.OpenPurchaseOrderStatistics();
                     end;
                 }
                 action(Card)
@@ -679,7 +703,7 @@
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Vendor Card";
-                    RunPageLink = "No." = FIELD("Buy-from Vendor No.");
+                    RunPageLink = "No." = field("Buy-from Vendor No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
                 }
@@ -689,9 +713,9 @@
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Blanket Order"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const("Blanket Order"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -699,14 +723,14 @@
                     AccessByPermission = TableData Dimension = R;
                     ApplicationArea = Dimensions;
                     Caption = 'Dimensions';
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = Dimensions;
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Approvals)
@@ -760,7 +784,7 @@
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ApproveRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.ApproveRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Reject)
@@ -775,7 +799,7 @@
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.RejectRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.RejectRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Delegate)
@@ -790,7 +814,7 @@
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.DelegateRecordApprovalRequest(RecordId);
+                        ApprovalsMgmt.DelegateRecordApprovalRequest(Rec.RecordId);
                     end;
                 }
                 action(Comment)
@@ -835,13 +859,13 @@
                     ApplicationArea = Suite;
                     Caption = 'Copy Document';
                     Ellipsis = true;
-                    Enabled = "No." <> '';
+                    Enabled = Rec."No." <> '';
                     Image = CopyDocument;
                     ToolTip = 'Copy document lines and header information from another sales document to this document. You can copy a posted sales invoice into a new sales invoice to quickly create a similar document.';
 
                     trigger OnAction()
                     begin
-                        CopyDocument();
+                        Rec.CopyDocument();
                     end;
                 }
                 action("Archi&ve Document")
@@ -877,7 +901,7 @@
                 {
                     ApplicationArea = Suite;
                     Caption = 'Re&open';
-                    Enabled = Status <> Status::Open;
+                    Enabled = Rec.Status <> Rec.Status::Open;
                     Image = ReOpen;
                     ToolTip = 'Reopen the document to change it after it has been approved. Approved documents have the Released status and must be opened before they can be changed';
 
@@ -1085,29 +1109,29 @@
     trigger OnAfterGetCurrRecord()
     begin
         SetControlAppearance();
-        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(RecordId);
-        CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(RecordId);
-        StatusStyleTxt := GetStatusStyleText();
+        ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
+        CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(Rec.RecordId);
+        StatusStyleTxt := Rec.GetStatusStyleText();
     end;
 
     trigger OnAfterGetRecord()
     begin
-        BuyFromContact.GetOrClear("Buy-from Contact No.");
-        PayToContact.GetOrClear("Pay-to Contact No.");
+        BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
+        PayToContact.GetOrClear(Rec."Pay-to Contact No.");
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
         CurrPage.SaveRecord();
-        exit(ConfirmDeletion());
+        exit(Rec.ConfirmDeletion());
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Responsibility Center" := UserMgt.GetPurchasesFilter();
+        Rec."Responsibility Center" := UserMgt.GetPurchasesFilter();
 
-        if (not DocNoVisible) and ("No." = '') then
-            SetBuyFromVendorFromFilter();
+        if (not DocNoVisible) and (Rec."No." = '') then
+            Rec.SetBuyFromVendorFromFilter();
     end;
 
     trigger OnOpenPage()
@@ -1133,13 +1157,9 @@
         OpenApprovalEntriesExistForCurrUser: Boolean;
         ShowWorkflowStatus: Boolean;
         CanCancelApprovalForRecord: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
-        [InDataSet]
         IsJournalTemplNameVisible: Boolean;
-        [InDataSet]
         IsPaymentMethodCodeVisible: Boolean;
-        [InDataSet]
         IsPurchaseLinesEditable: Boolean;
 
     local procedure ActivateFields()
@@ -1190,16 +1210,16 @@
         DocumentNoVisibility: Codeunit DocumentNoVisibility;
         DocType: Option Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order",Reminder,FinChMemo;
     begin
-        DocNoVisible := DocumentNoVisibility.PurchaseDocumentNoIsVisible(DocType::"Blanket Order", "No.");
+        DocNoVisible := DocumentNoVisibility.PurchaseDocumentNoIsVisible(DocType::"Blanket Order", Rec."No.");
     end;
 
     local procedure SetControlAppearance()
     var
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
     begin
-        OpenApprovalEntriesExistForCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(RecordId);
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        OpenApprovalEntriesExistForCurrUser := ApprovalsMgmt.HasOpenApprovalEntriesForCurrentUser(Rec.RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
         IsPurchaseLinesEditable := Rec.PurchaseLinesEditable();
     end;
 }

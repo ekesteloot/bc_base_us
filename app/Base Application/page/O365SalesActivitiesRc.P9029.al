@@ -35,8 +35,6 @@ page 9029 "O365 Sales Activities RC"
             {
                 ApplicationArea = Invoicing, Basic, Suite;
                 Caption = 'Invoices';
-                Promoted = true;
-                PromotedCategory = Process;
                 RunObject = Page "BC O365 Invoice List";
                 ToolTip = 'Register your sales, and make it easy for your customer to pay you according to the payment terms by sending them a sales invoice document.';
             }
@@ -44,32 +42,26 @@ page 9029 "O365 Sales Activities RC"
             {
                 ApplicationArea = Invoicing, Basic, Suite;
                 Caption = 'Draft';
-                Promoted = true;
-                PromotedCategory = Process;
                 RunObject = Page "BC O365 Invoice List";
-                RunPageView = WHERE(Posted = CONST(false));
+                RunPageView = where(Posted = const(false));
                 ToolTip = 'Register your sales, and make it easy for your customer to pay you according to the payment terms by sending them a sales invoice document.';
             }
             action(InvoicesHomeItemSent)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
                 Caption = 'Sent';
-                Promoted = true;
-                PromotedCategory = Process;
                 RunObject = Page "BC O365 Invoice List";
-                RunPageView = WHERE(Posted = CONST(true),
-                                    "Outstanding Amount" = FILTER(> 0));
+                RunPageView = where(Posted = const(true),
+                                    "Outstanding Amount" = filter(> 0));
                 ToolTip = 'Register your sales, and make it easy for your customer to pay you according to the payment terms by sending them a sales invoice document.';
             }
             action(InvoicesHomeItemOverdue)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
                 Caption = 'Overdue';
-                Promoted = true;
-                PromotedCategory = Process;
                 RunObject = Page "BC O365 Invoice List";
-                RunPageView = WHERE(Canceled = CONST(false),
-                                    "Outstanding Amount" = FILTER(> 0));
+                RunPageView = where(Canceled = const(false),
+                                    "Outstanding Amount" = filter(> 0));
                 ToolTip = 'Register your sales, and make it easy for your customer to pay you according to the payment terms by sending them a sales invoice document.';
                 Visible = false;
             }
@@ -77,31 +69,25 @@ page 9029 "O365 Sales Activities RC"
             {
                 ApplicationArea = Invoicing, Basic, Suite;
                 Caption = 'Paid';
-                Promoted = true;
-                PromotedCategory = Process;
                 RunObject = Page "BC O365 Invoice List";
-                RunPageView = WHERE(Posted = CONST(true),
-                                    "Outstanding Amount" = FILTER(= 0),
-                                    Canceled = CONST(false));
+                RunPageView = where(Posted = const(true),
+                                    "Outstanding Amount" = filter(= 0),
+                                    Canceled = const(false));
                 ToolTip = 'Register your sales, and make it easy for your customer to pay you according to the payment terms by sending them a sales invoice document.';
             }
             action(InvoicesHomeItemCanceled)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
                 Caption = 'Canceled';
-                Promoted = true;
-                PromotedCategory = Process;
                 RunObject = Page "BC O365 Invoice List";
-                RunPageView = WHERE(Canceled = CONST(true),
-                                    Posted = CONST(true));
+                RunPageView = where(Canceled = const(true),
+                                    Posted = const(true));
                 ToolTip = 'Register your sales, and make it easy for your customer to pay you according to the payment terms by sending them a sales invoice document.';
             }
             action(EstimatesHomeItem)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
                 Caption = 'Estimates';
-                Promoted = true;
-                PromotedCategory = Process;
                 RunObject = Page "BC O365 Estimate List";
                 ToolTip = 'Send your customers offers on products. When the customer accepts the offer, you can convert the estimate to a sales invoice.';
             }
@@ -109,20 +95,16 @@ page 9029 "O365 Sales Activities RC"
             {
                 ApplicationArea = Invoicing, Basic, Suite;
                 Caption = 'Accepted';
-                Promoted = true;
-                PromotedCategory = Process;
                 RunObject = Page "BC O365 Estimate List";
-                RunPageView = WHERE("Quote Accepted" = CONST(true));
+                RunPageView = where("Quote Accepted" = const(true));
                 ToolTip = 'Send your customers offers on products. When the customer accepts the offer, you can convert the estimate to a sales invoice.';
             }
             action(EstimatesHomeItemExpired)
             {
                 ApplicationArea = Invoicing, Basic, Suite;
                 Caption = 'Expired';
-                Promoted = true;
-                PromotedCategory = Process;
                 RunObject = Page "BC O365 Invoice List";
-                RunPageView = WHERE("Quote Accepted" = CONST(true));
+                RunPageView = where("Quote Accepted" = const(true));
                 ToolTip = 'Send your customers offers on products. When the customer accepts the offer, you can convert the estimate to a sales invoice.';
                 Visible = false;
             }

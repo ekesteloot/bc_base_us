@@ -1,3 +1,8 @@
+﻿namespace System.Utilities;
+
+using Microsoft.FinancialMgt.Dimension;
+using System.Reflection;
+
 table 700 "Error Message"
 {
     Caption = 'Error Message';
@@ -45,10 +50,11 @@ table 700 "Error Message"
 #if not CLEAN22
             // Description and Message fields are sync'd with database events in "Error Message Management"
             ObsoleteState = Pending;
+            ObsoleteTag = '22.0';
 #else
             ObsoleteState = Removed;
+            ObsoleteTag = '25.0';
 #endif
-            ObsoleteTag = '22.0';
             ObsoleteReason = 'Replaced by "Message" which has an increase in field length.';
         }
         field(6; "Additional Information"; Text[250])
@@ -77,15 +83,15 @@ table 700 "Error Message"
         }
         field(11; "Field Name"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table Number"),
-                                                              "No." = FIELD("Field Number")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table Number"),
+                                                              "No." = field("Field Number")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(12; "Table Name"; Text[80])
         {
-            CalcFormula = Lookup("Table Metadata".Caption WHERE(ID = FIELD("Table Number")));
+            CalcFormula = Lookup("Table Metadata".Caption where(ID = field("Table Number")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
@@ -108,8 +114,8 @@ table 700 "Error Message"
         }
         field(15; "Context Field Name"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Context Table Number"),
-                                                              "No." = FIELD("Context Field Number")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Context Table Number"),
+                                                              "No." = field("Context Field Number")));
             Caption = 'Context Field Name';
             Editable = false;
             FieldClass = FlowField;

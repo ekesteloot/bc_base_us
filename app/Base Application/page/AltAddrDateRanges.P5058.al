@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5058 "Alt. Addr. Date Ranges"
 {
     Caption = 'Alt. Addr. Date Ranges';

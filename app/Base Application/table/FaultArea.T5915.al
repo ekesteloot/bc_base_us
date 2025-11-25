@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 table 5915 "Fault Area"
 {
     Caption = 'Fault Area';

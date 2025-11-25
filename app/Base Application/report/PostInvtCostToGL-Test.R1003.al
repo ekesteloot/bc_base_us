@@ -1,7 +1,19 @@
+﻿namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Ledger;
+using System.Security.User;
+using System.Utilities;
+
 report 1003 "Post Invt. Cost to G/L - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/PostInvtCosttoGLTest.rdlc';
+    RDLCLayout = './InventoryMgt/Costing/PostInvtCosttoGLTest.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Post Invt. Cost to G/L - Test';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +22,7 @@ report 1003 "Post Invt. Cost to G/L - Test"
     {
         dataitem("Integer"; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             PrintOnlyIfDetail = true;
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -77,7 +89,7 @@ report 1003 "Post Invt. Cost to G/L - Test"
             }
             dataitem(PostValueEntryToGL; "Post Value Entry to G/L")
             {
-                DataItemTableView = SORTING("Item No.", "Posting Date");
+                DataItemTableView = sorting("Item No.", "Posting Date");
                 RequestFilterFields = "Item No.", "Posting Date";
 
                 trigger OnAfterGetRecord()
@@ -122,7 +134,7 @@ report 1003 "Post Invt. Cost to G/L - Test"
             }
             dataitem(InvtPostToGLTestBuf; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(TempInvtPostToGLTestBuf_Amount; TempInvtPostToGLTestBuf.Amount)
                 {
                 }
@@ -161,7 +173,7 @@ report 1003 "Post Invt. Cost to G/L - Test"
                 }
                 dataitem(DimensionLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -209,7 +221,7 @@ report 1003 "Post Invt. Cost to G/L - Test"
                 }
                 dataitem(ErrorLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -275,11 +287,11 @@ report 1003 "Post Invt. Cost to G/L - Test"
                             No[1] := "Account No.";
                             TableID[2] := DimMgt.TypeToTableID1(0);
                             No[2] := '';
-                            TableID[3] := DATABASE::Job;
+                            TableID[3] := Enum::TableID::Job.AsInteger();
                             No[3] := '';
-                            TableID[4] := DATABASE::"Salesperson/Purchaser";
+                            TableID[4] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
                             No[4] := '';
-                            TableID[5] := DATABASE::Campaign;
+                            TableID[5] := Enum::TableID::Campaign.AsInteger();
                             No[5] := '';
                             if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
                                 AddError(DimMgt.GetDimValuePostingErr());
@@ -462,7 +474,6 @@ report 1003 "Post Invt. Cost to G/L - Test"
         Continue: Boolean;
         ShowOnlyWarnings: Boolean;
         ErrorCounter: Integer;
-        [InDataSet]
         IsJournalTemplNameVisible: Boolean;
         SetupBlockedErr: Label 'Setup is blocked in %1 for %2 %3 and %4 %5.', Comment = '%1 - General/Inventory Posting Setup, %2 %3 %4 %5 - posting groups.';
         Text011: Label '%1 is missing for %2 %3 and %4 %5.';
@@ -715,13 +726,6 @@ report 1003 "Post Invt. Cost to G/L - Test"
     begin
     end;
 
-#if not CLEAN20
-    [IntegrationEvent(false, false)]
-    [Obsolete('Event is never raised.', '20.0')]
-    local procedure OnAfterOnPreDataItem(var PostValueEntryToGL: Record "Post Value Entry to G/L"; CompanyName: Text)
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnAfterPostValueEntryToGLOnPreDataItem(var PostValueEntryToGL: Record "Post Value Entry to G/L"; CompanyName: Text)
     begin

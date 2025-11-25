@@ -1,4 +1,22 @@
-﻿table 5741 "Transfer Line"
+﻿namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Purchases.Document;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using System.Utilities;
+
+table 5741 "Transfer Line"
 {
     Caption = 'Transfer Line';
     DrillDownPageID = "Transfer Lines";
@@ -17,8 +35,8 @@
         field(3; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            TableRelation = Item WHERE(Type = CONST(Inventory),
-                                        Blocked = CONST(false));
+            TableRelation = Item where(Type = const(Inventory),
+                                        Blocked = const(false));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -219,31 +237,31 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(12; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(13; Description; Text[100])
         {
             Caption = 'Description';
-            TableRelation = Item WHERE(Type = CONST(Inventory),
-                                        Blocked = CONST(false));
+            TableRelation = Item where(Type = const(Inventory),
+                                        Blocked = const(false));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -399,7 +417,7 @@
         field(23; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             var
@@ -474,7 +492,7 @@
         field(30; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."), Blocked = const(false));
 
             trigger OnValidate()
             var
@@ -486,11 +504,13 @@
                 WhseValidateSourceLine.TransLineVerifyChange(Rec, xRec);
 
                 OnValidateVariantCodeOnBeforeCheckEmptyVariantCode(Rec, xRec, CurrFieldNo);
-                if "Variant Code" = '' then
+                if Rec."Variant Code" = '' then
                     exit;
 
                 GetDefaultBin("Transfer-from Code", "Transfer-to Code");
+                ItemVariant.SetLoadFields(Description, "Description 2", Blocked);
                 ItemVariant.Get("Item No.", "Variant Code");
+                ItemVariant.TestField(Blocked, false);
                 Description := ItemVariant.Description;
                 "Description 2" := ItemVariant."Description 2";
 
@@ -510,7 +530,7 @@
         {
             Caption = 'In-Transit Code';
             Editable = false;
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(true));
+            TableRelation = Location where("Use As In-Transit" = const(true));
 
             trigger OnValidate()
             begin
@@ -559,14 +579,7 @@
             TableRelation = Location;
 
             trigger OnValidate()
-            var
-                IsHandled: Boolean;
             begin
-                IsHandled := false;
-                OnBeforeValidateTransferToCode(Rec, xRec, CurrFieldNo, StatusCheckSuspended, IsHandled);
-                if IsHandled then
-                    exit;
-
                 TestField("Quantity Shipped", 0);
                 if CurrFieldNo <> 0 then
                     TestStatusOpen();
@@ -628,7 +641,7 @@
         field(40; "Derived From Line No."; Integer)
         {
             Caption = 'Derived From Line No.';
-            TableRelation = "Transfer Line"."Line No." WHERE("Document No." = FIELD("Document No."));
+            TableRelation = "Transfer Line"."Line No." where("Document No." = field("Document No."));
         }
         field(41; "Shipping Agent Code"; Code[10])
         {
@@ -647,7 +660,7 @@
         field(42; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
 
             trigger OnValidate()
             begin
@@ -694,12 +707,12 @@
         }
         field(50; "Reserved Quantity Inbnd."; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("Document No."),
-                                                                  "Source Ref. No." = FIELD("Line No."),
-                                                                  "Source Type" = CONST(5741),
-                                                                  "Source Subtype" = CONST("1"),
-                                                                  "Source Prod. Order Line" = FIELD("Derived From Line No."),
-                                                                  "Reservation Status" = CONST(Reservation)));
+            CalcFormula = sum("Reservation Entry".Quantity where("Source ID" = field("Document No."),
+                                                                  "Source Ref. No." = field("Line No."),
+                                                                  "Source Type" = const(5741),
+                                                                  "Source Subtype" = const("1"),
+                                                                  "Source Prod. Order Line" = field("Derived From Line No."),
+                                                                  "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity Inbnd.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -707,12 +720,12 @@
         }
         field(51; "Reserved Quantity Outbnd."; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("Document No."),
-                                                                   "Source Ref. No." = FIELD("Line No."),
-                                                                   "Source Type" = CONST(5741),
-                                                                   "Source Subtype" = CONST("0"),
-                                                                   "Source Prod. Order Line" = FIELD("Derived From Line No."),
-                                                                   "Reservation Status" = CONST(Reservation)));
+            CalcFormula = - sum("Reservation Entry".Quantity where("Source ID" = field("Document No."),
+                                                                   "Source Ref. No." = field("Line No."),
+                                                                   "Source Type" = const(5741),
+                                                                   "Source Subtype" = const("0"),
+                                                                   "Source Prod. Order Line" = field("Derived From Line No."),
+                                                                   "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity Outbnd.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -720,12 +733,12 @@
         }
         field(52; "Reserved Qty. Inbnd. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("Document No."),
-                                                                           "Source Ref. No." = FIELD("Line No."),
-                                                                           "Source Type" = CONST(5741),
-                                                                           "Source Subtype" = CONST("1"),
-                                                                           "Source Prod. Order Line" = FIELD("Derived From Line No."),
-                                                                           "Reservation Status" = CONST(Reservation)));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Document No."),
+                                                                           "Source Ref. No." = field("Line No."),
+                                                                           "Source Type" = const(5741),
+                                                                           "Source Subtype" = const("1"),
+                                                                           "Source Prod. Order Line" = field("Derived From Line No."),
+                                                                           "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. Inbnd. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -733,12 +746,12 @@
         }
         field(53; "Reserved Qty. Outbnd. (Base)"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("Document No."),
-                                                                            "Source Ref. No." = FIELD("Line No."),
-                                                                            "Source Type" = CONST(5741),
-                                                                            "Source Subtype" = CONST("0"),
-                                                                            "Source Prod. Order Line" = FIELD("Derived From Line No."),
-                                                                            "Reservation Status" = CONST(Reservation)));
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Document No."),
+                                                                            "Source Ref. No." = field("Line No."),
+                                                                            "Source Type" = const(5741),
+                                                                            "Source Subtype" = const("0"),
+                                                                            "Source Prod. Order Line" = field("Derived From Line No."),
+                                                                            "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. Outbnd. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -759,12 +772,12 @@
         }
         field(55; "Reserved Quantity Shipped"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("Document No."),
-                                                                  "Source Ref. No." = FILTER(<> 0),
-                                                                  "Source Type" = CONST(5741),
-                                                                  "Source Subtype" = CONST("1"),
-                                                                  "Source Prod. Order Line" = FIELD("Line No."),
-                                                                  "Reservation Status" = CONST(Reservation)));
+            CalcFormula = sum("Reservation Entry".Quantity where("Source ID" = field("Document No."),
+                                                                  "Source Ref. No." = filter(<> 0),
+                                                                  "Source Type" = const(5741),
+                                                                  "Source Subtype" = const("1"),
+                                                                  "Source Prod. Order Line" = field("Line No."),
+                                                                  "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity Shipped';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -772,12 +785,12 @@
         }
         field(56; "Reserved Qty. Shipped (Base)"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("Document No."),
-                                                                           "Source Ref. No." = FILTER(<> 0),
-                                                                           "Source Type" = CONST(5741),
-                                                                           "Source Subtype" = CONST("1"),
-                                                                           "Source Prod. Order Line" = FIELD("Line No."),
-                                                                           "Reservation Status" = CONST(Reservation)));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Document No."),
+                                                                           "Source Ref. No." = filter(<> 0),
+                                                                           "Source Type" = const(5741),
+                                                                           "Source Subtype" = const("1"),
+                                                                           "Source Prod. Order Line" = field("Line No."),
+                                                                           "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. Shipped (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -795,7 +808,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -818,10 +831,10 @@
         field(5750; "Whse. Inbnd. Otsdg. Qty (Base)"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum("Warehouse Receipt Line"."Qty. Outstanding (Base)" WHERE("Source Type" = CONST(5741),
-                                                                                        "Source Subtype" = CONST("1"),
-                                                                                        "Source No." = FIELD("Document No."),
-                                                                                        "Source Line No." = FIELD("Line No.")));
+            CalcFormula = sum("Warehouse Receipt Line"."Qty. Outstanding (Base)" where("Source Type" = const(5741),
+                                                                                        "Source Subtype" = const("1"),
+                                                                                        "Source No." = field("Document No."),
+                                                                                        "Source Line No." = field("Line No.")));
             Caption = 'Whse. Inbnd. Otsdg. Qty (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -830,10 +843,10 @@
         field(5751; "Whse Outbnd. Otsdg. Qty (Base)"; Decimal)
         {
             BlankZero = true;
-            CalcFormula = Sum("Warehouse Shipment Line"."Qty. Outstanding (Base)" WHERE("Source Type" = CONST(5741),
-                                                                                         "Source Subtype" = CONST("0"),
-                                                                                         "Source No." = FIELD("Document No."),
-                                                                                         "Source Line No." = FIELD("Line No.")));
+            CalcFormula = sum("Warehouse Shipment Line"."Qty. Outstanding (Base)" where("Source Type" = const(5741),
+                                                                                         "Source Subtype" = const("0"),
+                                                                                         "Source No." = field("Document No."),
+                                                                                         "Source Line No." = field("Line No.")));
             Caption = 'Whse Outbnd. Otsdg. Qty (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -876,9 +889,9 @@
         field(7300; "Transfer-from Bin Code"; Code[20])
         {
             Caption = 'Transfer-from Bin Code';
-            TableRelation = "Bin Content"."Bin Code" WHERE("Location Code" = FIELD("Transfer-from Code"),
-                                                            "Item No." = FIELD("Item No."),
-                                                            "Variant Code" = FIELD("Variant Code"));
+            TableRelation = "Bin Content"."Bin Code" where("Location Code" = field("Transfer-from Code"),
+                                                            "Item No." = field("Item No."),
+                                                            "Variant Code" = field("Variant Code"));
 
             trigger OnValidate()
             begin
@@ -898,7 +911,7 @@
         field(7301; "Transfer-To Bin Code"; Code[20])
         {
             Caption = 'Transfer-To Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Transfer-to Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Transfer-to Code"));
 
             trigger OnValidate()
             begin
@@ -1035,7 +1048,6 @@
         ConfirmManagement: Codeunit "Confirm Management";
         UOMMgt: Codeunit "Unit of Measure Management";
         Reservation: Page Reservation;
-        TrackingBlocked: Boolean;
 
         Text001: Label 'You cannot rename a %1.';
         Text002: Label 'must not be less than %1';
@@ -1055,7 +1067,7 @@
         AnotherItemWithSameDescrQst: Label 'We found an item with the description "%2" (No. %1).\Did you mean to change the current item to %1?', Comment = '%1=Item no., %2=item description';
 
     protected var
-        StatusCheckSuspended: Boolean;
+        StatusCheckSuspended, TrackingBlocked : Boolean;
 
     procedure InitOutstandingQty()
     begin
@@ -1216,36 +1228,11 @@
         OnAfterShowDimensions(Rec, xRec);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        "Dimension Set ID" :=
-          DimMgt.GetRecDefaultDimID(
-            Rec, CurrFieldNo, TableID, No, SourceCodeSetup.Transfer,
-            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", TransHeader."Dimension Set ID", DATABASE::Item);
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
     begin
         SourceCodeSetup.Get();
-#if not CLEAN20
-        RunEventOnAfterCreateDimTableIDs(DefaultDimSource);
-#endif
 
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -1295,12 +1282,12 @@
     procedure LookupShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
-        ValidateShortcutDimCode(FieldNumber, ShortcutDimCode);
+        Rec.ValidateShortcutDimCode(FieldNumber, ShortcutDimCode);
     end;
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     procedure SelectMultipleItems()
@@ -1479,7 +1466,7 @@
         Clear(Reservation);
         OptionNumber := StrMenu(Text011);
         if OptionNumber > 0 then begin
-            Reservation.SetReservSource(Rec, "Transfer Direction".FromInteger(OptionNumber - 1));
+            Reservation.SetReservSource(Rec, Enum::"Transfer Direction".FromInteger(OptionNumber - 1));
             Reservation.RunModal();
         end;
 
@@ -1708,7 +1695,7 @@
         ReservEntry: Record "Reservation Entry";
     begin
         ReservEntry.InitSortingAndFilters(false);
-        SetReservationFilters(ReservEntry, "Transfer Direction"::Outbound);
+        SetReservationFilters(ReservEntry, Enum::"Transfer Direction"::Outbound);
         ReservEntry.SetRange("Source Subtype"); // Ignore direction
         exit(not ReservEntry.IsEmpty);
     end;
@@ -1869,13 +1856,6 @@
             CheckDateConflict.TransferLineCheck(Rec);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by OnAfterInitDefaultDimensionSources()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDimTableIDs(var TransferLine: Record "Transfer Line"; FieldNo: Integer; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    begin
-    end;
-#endif
     local procedure ItemExists(ItemNo: Code[20]): Boolean
     var
         IEItem: Record Item;
@@ -1936,35 +1916,43 @@
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, CurrFieldNo);
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
+    procedure CheckIfTransferLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock") Result: Boolean
     var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
+        QtyReservedFromStock: Decimal;
     begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Transfer Line", DefaultDimSource, TableID, No);
+        Result := true;
+
+        if ReservedFromStock = ReservedFromStock::" " then
+            exit(true);
+
+        QtyReservedFromStock := TransferLineReserve.GetReservedQtyFromInventory(Rec);
+
+        case ReservedFromStock of
+            ReservedFromStock::Full:
+                if QtyToPost <> QtyReservedFromStock then
+                    Result := false;
+            ReservedFromStock::"Full and Partial":
+                if QtyReservedFromStock = 0 then
+                    Result := false;
+            else
+                OnCheckIfTransferLineMeetsReservedFromStockSetting(QtyToPost, ReservedFromStock, Result);
+        end;
+
+        exit(Result);
     end;
 
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
+    procedure ShowReservationEntries(Modal: Boolean; Direction: Enum "Transfer Direction")
     var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
+        ReservationEntry: Record "Reservation Entry";
     begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Transfer Line", DefaultDimSource, TableID, No);
+        TestField("Item No.");
+        ReservationEntry.InitSortingAndFilters(true);
+        SetReservationFilters(ReservationEntry, Direction);
+        if Modal then
+            PAGE.RunModal(PAGE::"Reservation Entries", ReservationEntry)
+        else
+            PAGE.Run(PAGE::"Reservation Entries", ReservationEntry);
     end;
-
-    local procedure RunEventOnAfterCreateDimTableIDs(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Transfer Line") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID, No);
-        OnAfterCreateDimTableIDs(Rec, CurrFieldNo, TableID, No);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID, No);
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitDefaultDimensionSources(var TransferLine: Record "Transfer Line"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CurrentFieldNo: Integer)
@@ -2277,7 +2265,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateTransferToCode(var TransferLine: Record "Transfer Line"; xTransferLine: Record "Transfer Line"; CurrFieldNo: Integer; StatusCheckSuspended: Boolean; var IsHandled: Boolean)
+    local procedure OnCheckIfTransferLineMeetsReservedFromStockSetting(QtyToPost: Decimal; ReservedFromStock: Enum "Reservation From Stock"; var Result: Boolean)
     begin
     end;
 }

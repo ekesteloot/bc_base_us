@@ -1,3 +1,20 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+
 page 392 "Phys. Inventory Journal"
 {
     AdditionalSearchTerms = 'physical count journal,inventory cycle journal';
@@ -157,11 +174,6 @@ page 392 "Phys. Inventory Journal"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the quantity on hand of the item as determined from a physical count.';
-
-                    trigger OnValidate()
-                    begin
-                        CurrPage.Update(true);
-                    end;
                 }
                 field(Quantity; Rec.Quantity)
                 {
@@ -223,9 +235,9 @@ page 392 "Phys. Inventory Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
@@ -239,9 +251,9 @@ page 392 "Phys. Inventory Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
@@ -255,9 +267,9 @@ page 392 "Phys. Inventory Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
@@ -271,9 +283,9 @@ page 392 "Phys. Inventory Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
@@ -287,9 +299,9 @@ page 392 "Phys. Inventory Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
@@ -303,9 +315,9 @@ page 392 "Phys. Inventory Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
@@ -343,9 +355,9 @@ page 392 "Phys. Inventory Journal"
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
                 Visible = BackgroundErrorCheck;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -402,10 +414,10 @@ page 392 "Phys. Inventory Journal"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Item No.", "Variant Code");
                     ToolTip = 'View items in the bin if the selected line contains a bin code.';
                 }
             }
@@ -419,7 +431,7 @@ page 392 "Phys. Inventory Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -429,8 +441,8 @@ page 392 "Phys. Inventory Journal"
                     Caption = 'Ledger E&ntries';
                     Image = CustomerLedger;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Item No." = FIELD("Item No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("Item No.");
+                    RunPageView = sorting("Item No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -440,8 +452,8 @@ page 392 "Phys. Inventory Journal"
                     Caption = 'Phys. In&ventory Ledger Entries';
                     Image = PhysicalInventoryLedger;
                     RunObject = Page "Phys. Inventory Ledger Entries";
-                    RunPageLink = "Item No." = FIELD("Item No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("Item No.");
+                    RunPageView = sorting("Item No.");
                     ToolTip = 'Show the ledger entries for the current journal line.';
                 }
                 group("Item Availability by")
@@ -562,6 +574,26 @@ page 392 "Phys. Inventory Journal"
                     end;
                 }
             }
+            group("Page")
+            {
+                Caption = 'Page';
+                action(EditInExcel)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Edit in Excel';
+                    Image = Excel;
+                    ToolTip = 'Send the data in the journal to an Excel file for analysis or editing.';
+                    Visible = IsSaaSExcelAddinEnabled;
+                    AccessByPermission = System "Allow Action Export To Excel" = X;
+
+                    trigger OnAction()
+                    var
+                        ODataUtility: Codeunit ODataUtility;
+                    begin
+                        ODataUtility.EditJournalWorksheetInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), CurrPage.ObjectId(false), Rec."Journal Batch Name", Rec."Journal Template Name");
+                    end;
+                }
+            }
             action(Print)
             {
                 ApplicationArea = Basic, Suite;
@@ -657,7 +689,7 @@ page 392 "Phys. Inventory Journal"
 
                     trigger OnAction()
                     begin
-                        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                     end;
                 }
                 action(ShowAllLines)
@@ -671,7 +703,7 @@ page 392 "Phys. Inventory Journal"
 
                     trigger OnAction()
                     begin
-                        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                     end;
                 }
             }
@@ -803,8 +835,6 @@ page 392 "Phys. Inventory Journal"
     var
         ItemJnlLineReserve: Codeunit "Item Jnl. Line-Reserve";
     begin
-        OnBeforeDeleteRecord(Rec);
-
         Commit();
         if not ItemJnlLineReserve.DeleteLineConfirm(Rec) then
             exit(false);
@@ -824,10 +854,15 @@ page 392 "Phys. Inventory Journal"
 
     trigger OnOpenPage()
     var
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ServerSetting: Codeunit "Server Setting";
         JnlSelected: Boolean;
     begin
+        IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        // if called from API (such as edit-in-excel), do not filter 
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
         SetDimensionsVisibility();
-
         if Rec.IsOpenedFromBatch() then begin
             CurrentJnlBatchName := Rec."Journal Batch Name";
             ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
@@ -850,6 +885,7 @@ page 392 "Phys. Inventory Journal"
         ItemDescription: Text[100];
         BackgroundErrorCheck: Boolean;
         ShowAllLinesEnabled: Boolean;
+        IsSaaSExcelAddinEnabled: Boolean;
         EntryTypeErr: Label 'You cannot use entry type %1 in this journal.', Comment = '%1 - Entry Type';
 
     protected var
@@ -900,8 +936,8 @@ page 392 "Phys. Inventory Journal"
 
     local procedure CheckEntryType()
     begin
-        if "Entry Type".AsInteger() > "Entry Type"::"Negative Adjmt.".AsInteger() then
-            Error(EntryTypeErr, "Entry Type");
+        if Rec."Entry Type".AsInteger() > Rec."Entry Type"::"Negative Adjmt.".AsInteger() then
+            Error(EntryTypeErr, Rec."Entry Type");
     end;
 
     local procedure SetControlAppearanceFromBatch()
@@ -909,12 +945,12 @@ page 392 "Phys. Inventory Journal"
         ItemJournalBatch: Record "Item Journal Batch";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
     begin
-        if not ItemJournalBatch.Get(GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
+        if not ItemJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
 
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
-        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
         ItemJournalErrorsMgt.SetFullBatchCheck(true);
 
         OnAfterSetControlAppearanceFromBatch(ItemJournalBatch);
@@ -939,11 +975,6 @@ page 392 "Phys. Inventory Journal"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterSetControlAppearanceFromBatch(ItemJournalBatch: Record "Item Journal Batch")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeDeleteRecord(var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 }

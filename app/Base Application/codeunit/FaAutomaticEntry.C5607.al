@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Maintenance;
+
 codeunit 5607 "FA Automatic Entry"
 {
 

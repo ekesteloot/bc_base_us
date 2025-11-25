@@ -1,4 +1,36 @@
-﻿table 110 "Sales Shipment Header"
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using Microsoft.Shared.Navigate;
+using System.Globalization;
+using System.Reflection;
+using System.Security.AccessControl;
+using System.Utilities;
+using System.Security.User;
+using System.IO;
+
+table 110 "Sales Shipment Header"
 {
     Caption = 'Sales Shipment Header';
     DataCaptionFields = "No.", "Sell-to Customer Name";
@@ -43,8 +75,6 @@
         {
             Caption = 'Bill-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(10; "Bill-to Contact"; Text[100])
@@ -58,7 +88,7 @@
         field(12; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            TableRelation = "Ship-to Address".Code WHERE("Customer No." = FIELD("Sell-to Customer No."));
+            TableRelation = "Ship-to Address".Code where("Customer No." = field("Sell-to Customer No."));
         }
         field(13; "Ship-to Name"; Text[100])
         {
@@ -80,8 +110,6 @@
         {
             Caption = 'Ship-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
@@ -132,19 +160,19 @@
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(31; "Customer Posting Group"; Code[20])
         {
@@ -187,6 +215,11 @@
             Caption = 'Language Code';
             TableRelation = Language;
         }
+        field(42; "Format Region"; Text[80])
+        {
+            Caption = 'Format Region';
+            TableRelation = "Language Selection"."Language Tag";
+        }
         field(43; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';
@@ -198,9 +231,9 @@
         }
         field(46; Comment; Boolean)
         {
-            CalcFormula = Exist("Sales Comment Line" WHERE("Document Type" = CONST(Shipment),
-                                                            "No." = FIELD("No."),
-                                                            "Document Line No." = CONST(0)));
+            CalcFormula = exist("Sales Comment Line" where("Document Type" = const(Shipment),
+                                                            "No." = field("No."),
+                                                            "Document Line No." = const(0)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -236,9 +269,9 @@
         field(55; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account";
         }
         field(70; "VAT Registration No."; Text[20])
         {
@@ -293,8 +326,6 @@
         {
             Caption = 'Sell-to City';
             TableRelation = "Post Code".City;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(84; "Sell-to Contact"; Text[100])
@@ -305,8 +336,6 @@
         {
             Caption = 'Bill-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(86; "Bill-to County"; Text[30])
@@ -323,8 +352,6 @@
         {
             Caption = 'Sell-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(89; "Sell-to County"; Text[30])
@@ -341,8 +368,6 @@
         {
             Caption = 'Ship-to Post Code';
             TableRelation = "Post Code";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(92; "Ship-to County"; Text[30])
@@ -423,8 +448,6 @@
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(113; "Source Code"; Code[10])
         {
@@ -460,7 +483,7 @@
         field(163; "Company Bank Account Code"; Code[20])
         {
             Caption = 'Company Bank Account Code';
-            TableRelation = "Bank Account" where("Currency Code" = FIELD("Currency Code"));
+            TableRelation = "Bank Account" where("Currency Code" = field("Currency Code"));
         }
         field(171; "Sell-to Phone No."; Text[30])
         {
@@ -485,7 +508,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(5050; "Campaign No."; Code[20])
@@ -534,7 +557,7 @@
         field(5794; "Shipping Agent Service Code"; Code[10])
         {
             Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code WHERE("Shipping Agent Code" = FIELD("Shipping Agent Code"));
+            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
         }
         field(7000; "Price Calculation Method"; Enum "Price Calculation Method")
         {
@@ -632,8 +655,8 @@
         field(10044; "Transport Operators"; Integer)
         {
             Caption = 'Transport Operators';
-            CalcFormula = Count("CFDI Transport Operator" WHERE("Document Table ID" = CONST(110),
-                                                                 "Document No." = FIELD("No.")));
+            CalcFormula = count("CFDI Transport Operator" where("Document Table ID" = const(110),
+                                                                 "Document No." = field("No.")));
             FieldClass = FlowField;
         }
         field(10045; "Transit-from Date/Time"; DateTime)
@@ -668,17 +691,17 @@
         field(10052; "Trailer 1"; Code[20])
         {
             Caption = 'Trailer 1';
-            TableRelation = "Fixed Asset" WHERE("SAT Trailer Type" = FILTER(<> ''));
+            TableRelation = "Fixed Asset" where("SAT Trailer Type" = filter(<> ''));
         }
         field(10053; "Trailer 2"; Code[20])
         {
             Caption = 'Trailer 2';
-            TableRelation = "Fixed Asset" WHERE("SAT Trailer Type" = FILTER(<> ''));
+            TableRelation = "Fixed Asset" where("SAT Trailer Type" = filter(<> ''));
         }
         field(10055; "Transit-to Location"; Code[10])
         {
             Caption = 'Transit-to Location';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
             ObsoleteReason = 'Replaced with SAT Address ID.';
 #if not CLEAN23
             ObsoleteState = Pending;
@@ -709,7 +732,7 @@
         field(27003; "Substitution Document No."; Code[20])
         {
             Caption = 'Substitution Document No.';
-            TableRelation = "Sales Shipment Header" WHERE("Electronic Document Status" = FILTER("Stamp Received"));
+            TableRelation = "Sales Shipment Header" where("Electronic Document Status" = filter("Stamp Received"));
         }
         field(27004; "CFDI Export Code"; Code[10])
         {

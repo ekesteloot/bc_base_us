@@ -1,3 +1,14 @@
+namespace Microsoft.BankMgt.Ledger;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Check;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 372 "Bank Account Ledger Entries"
 {
     ApplicationArea = Basic, Suite;
@@ -8,8 +19,8 @@ page 372 "Bank Account Ledger Entries"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "Bank Account Ledger Entry";
-    SourceTableView = SORTING("Bank Account No.", "Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Bank Account No.", "Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -152,7 +163,7 @@ page 372 "Bank Account Ledger Entries"
                     ToolTip = 'Specifies the number of the general ledger, customer, vendor, or bank account that the balancing entry is posted to, such as a cash account for cash purchases.';
                     Visible = false;
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -169,7 +180,7 @@ page 372 "Bank Account Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -186,7 +197,7 @@ page 372 "Bank Account Ledger Entries"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry has been part of a reverse transaction.';
@@ -296,8 +307,8 @@ page 372 "Bank Account Ledger Entries"
                     Caption = 'Check Ledger E&ntries';
                     Image = CheckLedger;
                     RunObject = Page "Check Ledger Entries";
-                    RunPageLink = "Bank Account Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Bank Account Ledger Entry No.");
+                    RunPageLink = "Bank Account Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Bank Account Ledger Entry No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View check ledger entries that result from posting transactions in a payment journal for the relevant bank account.';
                 }
@@ -312,7 +323,7 @@ page 372 "Bank Account Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Deposit Lines")
@@ -321,8 +332,8 @@ page 372 "Bank Account Ledger Entries"
                     Caption = 'Deposit Lines';
                     Image = DepositLines;
                     RunObject = Page "Posted Deposit Lines";
-                    RunPageLink = "Bank Account Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Bank Account Ledger Entry No.");
+                    RunPageLink = "Bank Account Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Bank Account Ledger Entry No.");
                     ToolTip = 'View the underlying deposit lines.';
                 }
                 action(SetDimensionFilter)
@@ -335,7 +346,7 @@ page 372 "Bank Account Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -360,13 +371,13 @@ page 372 "Bank Account Ledger Entries"
                         LocalCalcRunningAccBalance: Codeunit "Calc. Running Acc. Balance";
                     begin
                         Clear(ReversalEntry);
-                        if Reversed then
-                            ReversalEntry.AlreadyReversedEntry(TableCaption, "Entry No.");
-                        if "Journal Batch Name" = '' then
+                        if Rec.Reversed then
+                            ReversalEntry.AlreadyReversedEntry(Rec.TableCaption, Rec."Entry No.");
+                        if Rec."Journal Batch Name" = '' then
                             ReversalEntry.TestFieldError();
-                        TestField("Transaction No.");
-                        ReversalEntry.ReverseTransaction("Transaction No.");
-                        LocalCalcRunningAccBalance.FlushDayTotalsForNewestEntries("Bank Account No.");
+                        Rec.TestField("Transaction No.");
+                        ReversalEntry.ReverseTransaction(Rec."Transaction No.");
+                        LocalCalcRunningAccBalance.FlushDayTotalsForNewestEntries(Rec."Bank Account No.");
                         CurrPage.Update(false);
                     end;
                 }
@@ -381,7 +392,7 @@ page 372 "Bank Account Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

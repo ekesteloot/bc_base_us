@@ -1,4 +1,11 @@
-#if not CLEAN22
+﻿#if not CLEAN22
+namespace System.Automation;
+
+using System.Azure.Identity;
+using System.Environment;
+using System.Integration.PowerBI;
+using System.Utilities;
+
 page 6401 "Flow Selector"
 {
     ApplicationArea = Suite;

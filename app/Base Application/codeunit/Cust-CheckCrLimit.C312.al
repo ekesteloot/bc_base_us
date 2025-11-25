@@ -1,4 +1,12 @@
-﻿codeunit 312 "Cust-Check Cr. Limit"
+﻿namespace Microsoft.Sales.Customer;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using System.Environment.Configuration;
+
+codeunit 312 "Cust-Check Cr. Limit"
 {
     Permissions = TableData "My Notifications" = rimd;
 

@@ -1,3 +1,5 @@
+namespace System.Utilities;
+
 codeunit 31 "Last Error Context Element"
 {
     SingleInstance = true;

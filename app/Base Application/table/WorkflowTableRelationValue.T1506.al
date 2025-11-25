@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Reflection;
+
 table 1506 "Workflow Table Relation Value"
 {
     Caption = 'Workflow Table Relation Value';
@@ -22,22 +26,22 @@ table 1506 "Workflow Table Relation Value"
         field(4; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(5; "Field ID"; Integer)
         {
             Caption = 'Field ID';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table ID"));
+            TableRelation = Field."No." where(TableNo = field("Table ID"));
         }
         field(6; "Related Table ID"; Integer)
         {
             Caption = 'Related Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(7; "Related Field ID"; Integer)
         {
             Caption = 'Related Field ID';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Related Table ID"));
+            TableRelation = Field."No." where(TableNo = field("Related Table ID"));
         }
         field(8; Value; Text[250])
         {

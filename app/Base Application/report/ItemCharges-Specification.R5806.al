@@ -1,7 +1,12 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+
 report 5806 "Item Charges - Specification"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemCharge/ItemChargesSpecification.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemChargesSpecification.rdlc';
     AdditionalSearchTerms = 'fee transportation freight handling landed cost specification';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Charges - Specification';
@@ -11,7 +16,7 @@ report 5806 "Item Charges - Specification"
     {
         dataitem("Value Entry"; "Value Entry")
         {
-            DataItemTableView = SORTING("Item Charge No.", "Inventory Posting Group", "Item No.") WHERE("Item Charge No." = FILTER(<> ''));
+            DataItemTableView = sorting("Item Charge No.", "Inventory Posting Group", "Item No.") where("Item Charge No." = filter(<> ''));
             RequestFilterFields = "Item No.", "Posting Date", "Inventory Posting Group";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Ledger;
+
 enum 1026 "Job Ledger Entry Type"
 {
     Extensible = true;

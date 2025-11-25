@@ -1,4 +1,11 @@
-﻿report 1200 "Create Direct Debit Collection"
+﻿namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+
+report 1200 "Create Direct Debit Collection"
 {
     Caption = 'Create Direct Debit Collection';
     ProcessingOnly = true;
@@ -11,8 +18,8 @@
             RequestFilterFields = "Currency Code", "Country/Region Code";
             dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
             {
-                DataItemLink = "Customer No." = FIELD("No."), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Currency Code" = FIELD("Currency Filter"), "Date Filter" = FIELD("Date Filter");
-                DataItemTableView = SORTING(Open, "Due Date") WHERE(Open = CONST(true), "Document Type" = CONST(Invoice));
+                DataItemLink = "Customer No." = field("No."), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Currency Code" = field("Currency Filter"), "Date Filter" = field("Date Filter");
+                DataItemTableView = sorting(Open, "Due Date") where(Open = const(true), "Document Type" = const(Invoice));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -108,7 +115,7 @@
                             exit;
                         BankAccount.Get(BankAccount."No.");
                         if BankAccount."Direct Debit Msg. Nos." = '' then
-                            Error(StrSubstNo(DirectDebitMsgNosErr, BankAccount."No."))
+                            Error(DirectDebitMsgNosErr, BankAccount."No.")
                     end;
                 }
                 field(BankAccName; BankAccount.Name)

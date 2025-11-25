@@ -1,18 +1,27 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Utilities;
+
 report 6521 "Item Tracking Appendix"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemTracking/ItemTrackingAppendix.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemTrackingAppendix.rdlc';
     Caption = 'Item Tracking Appendix';
 
     dataset
     {
         dataitem(MainRecord; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             PrintOnlyIfDetail = false;
             dataitem(PageLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(Addr1; Addr[1])
                 {
                 }
@@ -87,7 +96,7 @@ report 6521 "Item Tracking Appendix"
                 }
                 dataitem(ItemTrackingLine; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     PrintOnlyIfDetail = false;
                     column(SerialNo_ItemTrackingLine; TempTrackingSpecBuffer."Serial No.")
                     {
@@ -124,7 +133,7 @@ report 6521 "Item Tracking Appendix"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(TotalQuantity; TotalQty)
                         {
                         }

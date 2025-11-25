@@ -1,3 +1,5 @@
+namespace System.Threading;
+
 table 479 "Job Queue Entry Buffer"
 {
     Caption = 'Job Queue Entry Buffer';

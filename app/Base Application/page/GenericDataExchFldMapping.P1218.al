@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1218 "Generic Data Exch Fld Mapping"
 {
     Caption = 'Data Exchange Field Mapping';
@@ -18,7 +20,7 @@ page 1218 "Generic Data Exch Fld Mapping"
 
                     trigger OnValidate()
                     begin
-                        ColumnCaptionText := GetColumnCaption();
+                        ColumnCaptionText := Rec.GetColumnCaption();
                     end;
                 }
                 field(ColumnCaptionText; ColumnCaptionText)
@@ -52,7 +54,7 @@ page 1218 "Generic Data Exch Fld Mapping"
                     Editable = false;
                     ToolTip = 'Specifies the name of the field in the target table that the value in the Column Caption field is mapped to, when you are using an intermediate table for data import.';
                 }
-                field(ValidateOnly; Optional)
+                field(ValidateOnly; Rec.Optional)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Validate Only';
@@ -63,7 +65,7 @@ page 1218 "Generic Data Exch Fld Mapping"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the rule that transforms imported text to a supported value before it can be mapped to a specified field in Microsoft Dynamics 365. When you choose a value in this field, the same value is entered in the Transformation Rule field in the Data Exch. Field Mapping Buf. table and vice versa.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the order that the field mappings must be processed. The field mapping with the highest number will be processed first.';
@@ -78,12 +80,12 @@ page 1218 "Generic Data Exch Fld Mapping"
 
     trigger OnAfterGetRecord()
     begin
-        ColumnCaptionText := GetColumnCaption();
+        ColumnCaptionText := Rec.GetColumnCaption();
     end;
 
     trigger OnInit()
     begin
-        SetAutoCalcFields("Target Table Caption", "Target Table Field Caption")
+        Rec.SetAutoCalcFields("Target Table Caption", "Target Table Field Caption")
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -92,7 +94,6 @@ page 1218 "Generic Data Exch Fld Mapping"
     end;
 
     var
-        [InDataSet]
         ColumnCaptionText: Text;
 }
 

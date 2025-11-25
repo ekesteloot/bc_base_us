@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Comment;
+
 page 6652 "Posted Return Shipments"
 {
     ApplicationArea = PurchReturnOrder;
@@ -6,8 +11,8 @@ page 6652 "Posted Return Shipments"
     Editable = false;
     PageType = List;
     SourceTable = "Return Shipment Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -200,7 +205,7 @@ page 6652 "Posted Return Shipments"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Return Shipment Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -210,8 +215,8 @@ page 6652 "Posted Return Shipments"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Purch. Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Return Shipment"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Return Shipment"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -225,7 +230,7 @@ page 6652 "Posted Return Shipments"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(CertificateOfSupplyDetails)
@@ -234,8 +239,8 @@ page 6652 "Posted Return Shipments"
                     Caption = 'Certificate of Supply Details';
                     Image = Certificate;
                     RunObject = Page "Certificates of Supply";
-                    RunPageLink = "Document Type" = FILTER("Return Shipment"),
-                                  "Document No." = FIELD("No.");
+                    RunPageLink = "Document Type" = filter("Return Shipment"),
+                                  "Document No." = field("No.");
                     ToolTip = 'View the certificate of supply that you must send to your customer for signature as confirmation of receipt. You must print a certificate of supply if the shipment uses a combination of VAT business posting group and VAT product posting group that have been marked to require a certificate of supply in the VAT Posting Setup window.';
                 }
                 action(PrintCertificateofSupply)
@@ -250,7 +255,7 @@ page 6652 "Posted Return Shipments"
                         CertificateOfSupply: Record "Certificate of Supply";
                     begin
                         CertificateOfSupply.SetRange("Document Type", CertificateOfSupply."Document Type"::"Return Shipment");
-                        CertificateOfSupply.SetRange("Document No.", "No.");
+                        CertificateOfSupply.SetRange("Document No.", Rec."No.");
                         CertificateOfSupply.Print();
                     end;
                 }
@@ -284,7 +289,7 @@ page 6652 "Posted Return Shipments"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action("Update Document")
@@ -339,7 +344,7 @@ page 6652 "Posted Return Shipments"
 
     trigger OnOpenPage()
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
     end;
 
     var

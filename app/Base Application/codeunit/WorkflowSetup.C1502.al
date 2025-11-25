@@ -1,3 +1,16 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using System.Telemetry;
+using System.Threading;
+using System.Xml;
+
 codeunit 1502 "Workflow Setup"
 {
 
@@ -679,9 +692,9 @@ codeunit 1502 "Workflow Setup"
             WorkflowStepArgument."Approver Limit Type"::"Direct Approver", 0, '', BlankDateFormula, true);
 
         InsertDocApprovalWorkflowSteps(Workflow,
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::Invoice, "Sales Document Status"::Open),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::Invoice, Enum::"Sales Document Status"::Open),
             WorkflowEventHandling.RunWorkflowOnSendSalesDocForApprovalCode(),
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::Invoice, "Sales Document Status"::"Pending Approval"),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::Invoice, Enum::"Sales Document Status"::"Pending Approval"),
             WorkflowEventHandling.RunWorkflowOnCancelSalesApprovalRequestCode(),
             WorkflowStepArgument, true);
     end;
@@ -705,9 +718,9 @@ codeunit 1502 "Workflow Setup"
 
         InsertDocApprovalWorkflowSteps(
             Workflow,
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::"Blanket Order", "Sales Document Status"::Open),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::"Blanket Order", Enum::"Sales Document Status"::Open),
             WorkflowEventHandling.RunWorkflowOnSendSalesDocForApprovalCode(),
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::"Blanket Order", "Sales Document Status"::"Pending Approval"),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::"Blanket Order", Enum::"Sales Document Status"::"Pending Approval"),
             WorkflowEventHandling.RunWorkflowOnCancelSalesApprovalRequestCode(),
             WorkflowStepArgument, true);
     end;
@@ -731,9 +744,9 @@ codeunit 1502 "Workflow Setup"
 
         InsertDocApprovalWorkflowSteps(
             Workflow,
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::"Credit Memo", "Sales Document Status"::Open),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::"Credit Memo", Enum::"Sales Document Status"::Open),
             WorkflowEventHandling.RunWorkflowOnSendSalesDocForApprovalCode(),
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::"Credit Memo", "Sales Document Status"::"Pending Approval"),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::"Credit Memo", Enum::"Sales Document Status"::"Pending Approval"),
             WorkflowEventHandling.RunWorkflowOnCancelSalesApprovalRequestCode(),
             WorkflowStepArgument, true);
     end;
@@ -764,9 +777,9 @@ codeunit 1502 "Workflow Setup"
 
         InsertDocApprovalWorkflowSteps(
             Workflow,
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::Order, "Sales Document Status"::Open),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::Order, Enum::"Sales Document Status"::Open),
             WorkflowEventHandling.RunWorkflowOnSendSalesDocForApprovalCode(),
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::Order, "Sales Document Status"::"Pending Approval"),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::Order, Enum::"Sales Document Status"::"Pending Approval"),
             WorkflowEventHandling.RunWorkflowOnCancelSalesApprovalRequestCode(),
             WorkflowStepArgument, true);
     end;
@@ -790,9 +803,9 @@ codeunit 1502 "Workflow Setup"
 
         InsertDocApprovalWorkflowSteps(
             Workflow,
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::Quote, "Sales Document Status"::Open),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::Quote, Enum::"Sales Document Status"::Open),
             WorkflowEventHandling.RunWorkflowOnSendSalesDocForApprovalCode(),
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::Quote, "Sales Document Status"::"Pending Approval"),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::Quote, Enum::"Sales Document Status"::"Pending Approval"),
             WorkflowEventHandling.RunWorkflowOnCancelSalesApprovalRequestCode(),
             WorkflowStepArgument, true);
     end;
@@ -816,9 +829,9 @@ codeunit 1502 "Workflow Setup"
 
         InsertDocApprovalWorkflowSteps(
             Workflow,
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::"Return Order", "Sales Document Status"::Open),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::"Return Order", Enum::"Sales Document Status"::Open),
             WorkflowEventHandling.RunWorkflowOnSendSalesDocForApprovalCode(),
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::"Return Order", "Sales Document Status"::"Pending Approval"),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::"Return Order", Enum::"Sales Document Status"::"Pending Approval"),
             WorkflowEventHandling.RunWorkflowOnCancelSalesApprovalRequestCode(),
             WorkflowStepArgument, true);
     end;
@@ -843,8 +856,8 @@ codeunit 1502 "Workflow Setup"
 
         InsertSalesDocWithCreditLimitApprovalWorkflowSteps(
             Workflow,
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::Invoice, "Sales Document Status"::Open),
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::Invoice, "Sales Document Status"::"Pending Approval"),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::Invoice, Enum::"Sales Document Status"::Open),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::Invoice, Enum::"Sales Document Status"::"Pending Approval"),
             WorkflowStepArgument, true);
     end;
 
@@ -868,8 +881,8 @@ codeunit 1502 "Workflow Setup"
 
         InsertSalesDocWithCreditLimitApprovalWorkflowSteps(
             Workflow,
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::Order, "Sales Document Status"::Open),
-            BuildSalesHeaderTypeConditionsText("Sales Document Type"::Order, "Sales Document Status"::"Pending Approval"),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::Order, Enum::"Sales Document Status"::Open),
+            BuildSalesHeaderTypeConditionsText(Enum::"Sales Document Type"::Order, Enum::"Sales Document Status"::"Pending Approval"),
             WorkflowStepArgument, true);
     end;
 
@@ -1744,27 +1757,27 @@ codeunit 1502 "Workflow Setup"
         WorkflowStepArgument: Record "Workflow Step Argument";
     begin
         case DocumentType of
-            "Sales Document Type"::Order:
+            Enum::"Sales Document Type"::Order:
                 InsertWorkflow(
                     Workflow, GetWorkflowCode(SalesOrderApprWorkflowCodeTxt),
                     SalesOrderApprWorkflowDescTxt, SalesDocCategoryTxt);
-            "Sales Document Type"::Invoice:
+            Enum::"Sales Document Type"::Invoice:
                 InsertWorkflow(
                     Workflow, GetWorkflowCode(SalesInvoiceApprWorkflowCodeTxt),
                     SalesInvoiceApprWorkflowDescTxt, SalesDocCategoryTxt);
-            "Sales Document Type"::"Return Order":
+            Enum::"Sales Document Type"::"Return Order":
                 InsertWorkflow(
                     Workflow, GetWorkflowCode(SalesReturnOrderApprWorkflowCodeTxt),
                     SalesReturnOrderApprWorkflowDescTxt, SalesDocCategoryTxt);
-            "Sales Document Type"::"Credit Memo":
+            Enum::"Sales Document Type"::"Credit Memo":
                 InsertWorkflow(
                     Workflow, GetWorkflowCode(SalesCreditMemoApprWorkflowCodeTxt),
                     SalesCreditMemoApprWorkflowDescTxt, SalesDocCategoryTxt);
-            "Sales Document Type"::Quote:
+            Enum::"Sales Document Type"::Quote:
                 InsertWorkflow(
                     Workflow, GetWorkflowCode(SalesQuoteApprWorkflowCodeTxt),
                     SalesQuoteApprWorkflowDescTxt, SalesDocCategoryTxt);
-            "Sales Document Type"::"Blanket Order":
+            Enum::"Sales Document Type"::"Blanket Order":
                 InsertWorkflow(
                     Workflow, GetWorkflowCode(SalesBlanketOrderApprWorkflowCodeTxt),
                     SalesBlanketOrderApprWorkflowDescTxt, SalesDocCategoryTxt);
@@ -1774,9 +1787,9 @@ codeunit 1502 "Workflow Setup"
 
         InsertDocApprovalWorkflowSteps(
             Workflow,
-            BuildSalesHeaderTypeConditionsText(DocumentType, "Sales Document Status"::Open),
+            BuildSalesHeaderTypeConditionsText(DocumentType, Enum::"Sales Document Status"::Open),
             WorkflowEventHandling.RunWorkflowOnSendSalesDocForApprovalCode(),
-            BuildSalesHeaderTypeConditionsText(DocumentType, "Sales Document Status"::"Pending Approval"),
+            BuildSalesHeaderTypeConditionsText(DocumentType, Enum::"Sales Document Status"::"Pending Approval"),
             WorkflowEventHandling.RunWorkflowOnCancelSalesApprovalRequestCode(),
             WorkflowStepArgument, true);
     end;
@@ -1787,22 +1800,22 @@ codeunit 1502 "Workflow Setup"
         WorkflowStepArgument: Record "Workflow Step Argument";
     begin
         case DocumentType of
-            "Sales Document Type"::Order:
+            Enum::"Sales Document Type"::Order:
                 InsertWorkflow(Workflow, GetWorkflowCode(SalesOrderCreditLimitApprWorkflowCodeTxt),
                   SalesOrderCreditLimitApprWorkflowDescTxt, SalesDocCategoryTxt);
-            "Sales Document Type"::Invoice:
+            Enum::"Sales Document Type"::Invoice:
                 InsertWorkflow(Workflow, GetWorkflowCode(SalesInvoiceCreditLimitApprWorkflowCodeTxt),
                   SalesInvoiceCreditLimitApprWorkflowDescTxt, SalesDocCategoryTxt);
-            "Sales Document Type"::"Return Order":
+            Enum::"Sales Document Type"::"Return Order":
                 InsertWorkflow(Workflow, GetWorkflowCode(SalesRetOrderCrLimitApprWorkflowCodeTxt),
                   SalesRetOrderCrLimitApprWorkflowDescTxt, SalesDocCategoryTxt);
-            "Sales Document Type"::"Credit Memo":
+            Enum::"Sales Document Type"::"Credit Memo":
                 InsertWorkflow(Workflow, GetWorkflowCode(SalesCrMemoCrLimitApprWorkflowCodeTxt),
                   SalesCrMemoCrLimitApprWorkflowDescTxt, SalesDocCategoryTxt);
-            "Sales Document Type"::Quote:
+            Enum::"Sales Document Type"::Quote:
                 InsertWorkflow(Workflow, GetWorkflowCode(SalesQuoteCrLimitApprWorkflowCodeTxt),
                   SalesQuoteCrLimitApprWorkflowDescTxt, SalesDocCategoryTxt);
-            "Sales Document Type"::"Blanket Order":
+            Enum::"Sales Document Type"::"Blanket Order":
                 InsertWorkflow(Workflow, GetWorkflowCode(SalesBlanketOrderCrLimitApprWorkflowCodeTxt),
                   SalesBlanketOrderCrLimitApprWorkflowDescTxt, SalesDocCategoryTxt);
         end;
@@ -1810,8 +1823,8 @@ codeunit 1502 "Workflow Setup"
         InitWorkflowStepArgument(WorkflowStepArgument, ApproverType, LimitType, 0, WorkflowUserGroupCode, DueDateFormula, true);
 
         InsertSalesDocWithCreditLimitApprovalWorkflowSteps(Workflow,
-          BuildSalesHeaderTypeConditionsText(DocumentType, "Sales Document Status"::Open),
-          BuildSalesHeaderTypeConditionsText(DocumentType, "Sales Document Status"::"Pending Approval"), WorkflowStepArgument, true);
+          BuildSalesHeaderTypeConditionsText(DocumentType, Enum::"Sales Document Status"::Open),
+          BuildSalesHeaderTypeConditionsText(DocumentType, Enum::"Sales Document Status"::"Pending Approval"), WorkflowStepArgument, true);
     end;
 
     local procedure InsertJobQueueEntryApprovalWorkflowDetails(var Workflow: Record Workflow)

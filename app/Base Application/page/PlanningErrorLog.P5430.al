@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Planning;
+
 page 5430 "Planning Error Log"
 {
     Caption = 'Planning Error Log';
@@ -53,7 +55,7 @@ page 5430 "Planning Error Log"
 
                 trigger OnAction()
                 begin
-                    ShowError();
+                    Rec.ShowError();
                 end;
             }
         }

@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 page 9833 "User Groups User SubPage"
 {
     Caption = 'User Groups';
@@ -15,7 +17,7 @@ page 9833 "User Groups User SubPage"
         {
             repeater(Group)
             {
-                field(UserGroupCode; "User Group Code")
+                field(UserGroupCode; Rec."User Group Code")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Code';
@@ -57,7 +59,7 @@ page 9833 "User Groups User SubPage"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Company Name" := CompanyName;
+        Rec."Company Name" := CompanyName;
     end;
 }
 

@@ -677,7 +677,7 @@ codeunit 10090 "Export Payments (ACH)"
     begin
         if CheckTheCheckDigit and (VendorBankAccount."Country/Region Code" = 'US') then
             if not ExportPaymentsACH.CheckDigit(VendorBankAccount."Transit No.") then
-                Error(StrSubstNo(VendorTransitNumNotValidErr, VendorBankAccount."Transit No.", VendorNo));
+                Error(VendorTransitNumNotValidErr, VendorBankAccount."Transit No.", VendorNo);
     end;
 
     [IntegrationEvent(false, false)]

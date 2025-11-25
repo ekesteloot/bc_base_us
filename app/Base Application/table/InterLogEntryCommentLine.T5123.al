@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 table 5123 "Inter. Log Entry Comment Line"
 {
     Caption = 'Inter. Log Entry Comment Line';

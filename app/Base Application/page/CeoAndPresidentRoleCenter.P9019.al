@@ -172,7 +172,7 @@ page 9019 "CEO and President Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales Analysis Report';
                 RunObject = Page "Analysis Report Sale";
-                RunPageView = WHERE("Analysis Area" = FILTER(Sales));
+                RunPageView = where("Analysis Area" = filter(Sales));
                 ToolTip = 'Analyze the dynamics of your sales according to key sales performance indicators that you select, for example, sales turnover in both amounts and quantities, contribution margin, or progress of actual sales against the budget. You can also use the report to analyze your average sales prices and evaluate the sales performance of your sales force.';
             }
             action(Budgets)
@@ -187,7 +187,7 @@ page 9019 "CEO and President Role Center"
                 ApplicationArea = SalesBudget;
                 Caption = 'Sales Budgets';
                 RunObject = Page "Item Budget Names";
-                RunPageView = WHERE("Analysis Area" = FILTER(Sales));
+                RunPageView = where("Analysis Area" = filter(Sales));
                 ToolTip = 'Enter item sales values of type amount, quantity, or cost for expected item sales in different time periods. You can create sales budgets by items, customers, customer groups, or other dimensions in your business. The resulting sales budgets can be reviewed here or they can be used in comparisons with actual sales data in sales analysis reports.';
             }
             action("Sales Quotes")

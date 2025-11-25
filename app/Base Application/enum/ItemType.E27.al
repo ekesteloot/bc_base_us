@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 enum 27 "Item Type"
 {
     Extensible = true;

@@ -1,3 +1,5 @@
+namespace System.Diagnostics;
+
 enum 405 "Change Log Entry Type"
 {
     Extensible = true;

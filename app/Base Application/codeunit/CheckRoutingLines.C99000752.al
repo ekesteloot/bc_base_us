@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.Routing;
+
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+
 codeunit 99000752 "Check Routing Lines"
 {
 

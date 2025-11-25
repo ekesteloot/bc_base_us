@@ -44,7 +44,7 @@
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the number of customer ledger entries with remaining amount that was adjusted.';
-#if not CLEAN20
+#if not CLEAN23
                     Visible = IsNewExchRateAdjmtVisible;
 #else
                     Visible = false;
@@ -54,7 +54,7 @@
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the number of vendor ledger entries with remaining amount that was adjusted.';
-#if not CLEAN20
+#if not CLEAN23
                     Visible = IsNewExchRateAdjmtVisible;
 #else
                     Visible = false;
@@ -79,7 +79,7 @@
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the total adjustment amount of exchange rate adjustment ledger entries.';
-#if not CLEAN20
+#if not CLEAN23
                     Visible = IsNewExchRateAdjmtVisible;
 #else
                     Visible = false;
@@ -128,10 +128,10 @@
                     Caption = 'Show Ledger Entries';
                     Image = LedgerEntries;
                     RunObject = Page "Exch.Rate Adjmt. Ledg.Entries";
-                    RunPageLink = "Register No." = FIELD("No.");
+                    RunPageLink = "Register No." = field("No.");
                     Scope = Repeater;
                     ToolTip = 'View adjusted customer or vendor ledger entries for this register.';
-#if not CLEAN20
+#if not CLEAN23
                     Visible = IsNewExchRateAdjmtVisible;
 #endif
                 }
@@ -150,7 +150,7 @@
         }
     }
 
-#if not CLEAN20
+#if not CLEAN23
     trigger OnOpenPage()
     begin
         IsNewExchRateAdjmtVisible := FeatureKeyManagement.IsExtensibleExchangeRateAdjustmentEnabled();

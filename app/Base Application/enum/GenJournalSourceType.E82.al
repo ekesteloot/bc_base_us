@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 enum 82 "Gen. Journal Source Type"
 {
     Extensible = true;

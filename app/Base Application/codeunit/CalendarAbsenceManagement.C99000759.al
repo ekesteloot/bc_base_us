@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 codeunit 99000759 "Calendar Absence Management"
 {
 

@@ -29,12 +29,12 @@ page 348 "Import Item Pictures"
                     trigger OnAssistEdit()
                     begin
                         if ZipFileName <> '' then begin
-                            DeleteAll();
+                            Rec.DeleteAll();
                             ZipFileName := '';
                         end;
-                        ZipFileName := LoadZIPFile('', TotalCount, ReplaceMode);
+                        ZipFileName := Rec.LoadZIPFile('', TotalCount, ReplaceMode);
                         ReplaceModeEditable := ZipFileName <> '';
-                        FindFirst();
+                        Rec.FindFirst();
 
                         UpdateCounters();
                     end;
@@ -51,13 +51,13 @@ page 348 "Import Item Pictures"
                         if ZipFileName = '' then
                             Error(SelectZIPFilenameErr);
 
-                        Reset();
-                        SetRange("Picture Already Exists", true);
+                        Rec.Reset();
+                        Rec.SetRange("Picture Already Exists", true);
                         if ReplaceMode then
-                            ModifyAll("Import Status", "Import Status"::Pending)
+                            Rec.ModifyAll("Import Status", Rec."Import Status"::Pending)
                         else
-                            ModifyAll("Import Status", "Import Status"::Skip);
-                        SetRange("Picture Already Exists");
+                            Rec.ModifyAll("Import Status", Rec."Import Status"::Skip);
+                        Rec.SetRange("Picture Already Exists");
 
                         UpdateCounters();
                         CurrPage.Update();
@@ -176,9 +176,9 @@ page 348 "Import Item Pictures"
 
                     trigger OnAction()
                     begin
-                        ImportPictures(ReplaceMode);
-                        AddedCount := GetAddedCount();
-                        ReplacedCount := GetReplacedCount();
+                        Rec.ImportPictures(ReplaceMode);
+                        AddedCount := Rec.GetAddedCount();
+                        ReplacedCount := Rec.GetReplacedCount();
                     end;
                 }
                 action(ShowItemCard)
@@ -186,7 +186,7 @@ page 348 "Import Item Pictures"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Show Item Card';
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ToolTip = 'Open the item card that contains the picture.';
                 }
             }
@@ -209,10 +209,10 @@ page 348 "Import Item Pictures"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        SetRange("Import Status", "Import Status"::Pending);
-        if not IsEmpty() then
+        Rec.SetRange("Import Status", Rec."Import Status"::Pending);
+        if not Rec.IsEmpty() then
             if not Confirm(ImportIncompleteQst, false) then begin
-                SetRange("Import Status");
+                Rec.SetRange("Import Status");
                 exit(false);
             end;
 
@@ -233,10 +233,10 @@ page 348 "Import Item Pictures"
 
     local procedure UpdateCounters()
     begin
-        AddCount := GetAddCount();
-        ReplaceCount := GetReplaceCount();
-        AddedCount := GetAddedCount();
-        ReplacedCount := GetReplacedCount();
+        AddCount := Rec.GetAddCount();
+        ReplaceCount := Rec.GetReplaceCount();
+        AddedCount := Rec.GetAddedCount();
+        ReplacedCount := Rec.GetReplacedCount();
     end;
 }
 

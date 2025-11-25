@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
 table 160 "Res. Capacity Entry"
 {
     Caption = 'Res. Capacity Entry';

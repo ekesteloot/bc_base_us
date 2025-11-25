@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 query 773 "Users in User Groups"
 {
     Caption = 'Users in User Groups';

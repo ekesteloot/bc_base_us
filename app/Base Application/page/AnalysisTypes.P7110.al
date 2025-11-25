@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 7110 "Analysis Types"
 {
     ApplicationArea = SalesAnalysis, PurchaseAnalysis, InventoryAnalysis;
@@ -14,7 +16,7 @@ page 7110 "Analysis Types"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = SalesAnalysis, PurchaseAnalysis;
                     ToolTip = 'Specifies the code of the analysis type.';
@@ -69,7 +71,7 @@ page 7110 "Analysis Types"
 
                 trigger OnAction()
                 begin
-                    ResetDefaultAnalysisTypes(true);
+                    Rec.ResetDefaultAnalysisTypes(true);
                 end;
             }
         }
@@ -88,8 +90,8 @@ page 7110 "Analysis Types"
 
     trigger OnAfterGetRecord()
     begin
-        ItemLedgerEntryTypeFilterOnFor(Format("Item Ledger Entry Type Filter"));
-        ValueEntryTypeFilterOnFormat(Format("Value Entry Type Filter"));
+        ItemLedgerEntryTypeFilterOnFor(Format(Rec."Item Ledger Entry Type Filter"));
+        ValueEntryTypeFilterOnFormat(Format(Rec."Value Entry Type Filter"));
     end;
 
     var
@@ -97,14 +99,14 @@ page 7110 "Analysis Types"
 
     local procedure ItemLedgerEntryTypeFilterOnFor(Text: Text[250])
     begin
-        AnalysisRepMgmt.ValidateFilter(Text, DATABASE::"Analysis Type", FieldNo("Item Ledger Entry Type Filter"), false);
-        "Item Ledger Entry Type Filter" := Text;
+        AnalysisRepMgmt.ValidateFilter(Text, DATABASE::"Analysis Type", Rec.FieldNo("Item Ledger Entry Type Filter"), false);
+        Rec."Item Ledger Entry Type Filter" := Text;
     end;
 
     local procedure ValueEntryTypeFilterOnFormat(Text: Text[250])
     begin
-        AnalysisRepMgmt.ValidateFilter(Text, DATABASE::"Analysis Type", FieldNo("Value Entry Type Filter"), false);
-        "Value Entry Type Filter" := Text;
+        AnalysisRepMgmt.ValidateFilter(Text, DATABASE::"Analysis Type", Rec.FieldNo("Value Entry Type Filter"), false);
+        Rec."Value Entry Type Filter" := Text;
     end;
 }
 

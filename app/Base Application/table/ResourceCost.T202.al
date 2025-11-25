@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Pricing;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+
 table 202 "Resource Cost"
 {
     Caption = 'Resource Cost';
@@ -6,7 +10,7 @@ table 202 "Resource Cost"
     ObsoleteTag = '16.0';
 #else
     ObsoleteState = Removed;
-    ObsoleteTag = '22.0';
+    ObsoleteTag = '24.0';
 #endif    
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
 
@@ -21,9 +25,9 @@ table 202 "Resource Cost"
         field(2; "Code"; Code[20])
         {
             Caption = 'Code';
-            TableRelation = IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST("Group(Resource)")) "Resource Group";
+            TableRelation = if (Type = const(Resource)) Resource
+            else
+            if (Type = const("Group(Resource)")) "Resource Group";
 
             trigger OnValidate()
             begin

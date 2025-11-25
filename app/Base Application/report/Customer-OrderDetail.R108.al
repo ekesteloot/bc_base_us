@@ -1,7 +1,14 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using System.Utilities;
+
 report 108 "Customer - Order Detail"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/CustomerOrderDetail.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerOrderDetail.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Customer - Order Detail';
     PreviewMode = PrintLayout;
@@ -64,8 +71,8 @@ report 108 "Customer - Order Detail"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "Bill-to Customer No." = FIELD("No."), "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Document Type", "Bill-to Customer No.", "Currency Code") WHERE("Document Type" = CONST(Order), "Outstanding Quantity" = FILTER(<> 0));
+                DataItemLink = "Bill-to Customer No." = field("No."), "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Document Type", "Bill-to Customer No.", "Currency Code") where("Document Type" = const(Order), "Outstanding Quantity" = filter(<> 0));
                 RequestFilterFields = "Shipment Date";
                 RequestFilterHeading = 'Sales Order Line';
                 column(SalesHeaderNo; SalesHeader."No.")
@@ -186,7 +193,7 @@ report 108 "Customer - Order Detail"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(TotalAmt_CurrTotalBuff; TempCurrencyTotalBuffer."Total Amount")
                 {
                     AutoFormatExpression = TempCurrencyTotalBuffer."Currency Code";
@@ -232,7 +239,7 @@ report 108 "Customer - Order Detail"
         }
         dataitem(Integer2; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(TotalAmt_CurrTotalBuff2; TempCurrencyTotalBuffer2."Total Amount")
             {
                 AutoFormatExpression = TempCurrencyTotalBuffer2."Currency Code";

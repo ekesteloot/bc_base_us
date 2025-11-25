@@ -106,7 +106,7 @@ page 5826 "Inventory Posting Setup"
 
                 trigger OnAction()
                 begin
-                    SuggestSetupAccounts();
+                    Rec.SuggestSetupAccounts();
                 end;
             }
         }

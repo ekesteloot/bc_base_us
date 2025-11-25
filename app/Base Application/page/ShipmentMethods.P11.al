@@ -13,7 +13,7 @@ page 11 "Shipment Methods"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the shipment method.';
@@ -69,7 +69,7 @@ page 11 "Shipment Methods"
                 Caption = 'T&ranslation';
                 Image = Translation;
                 RunObject = Page "Shipment Method Translations";
-                RunPageLink = "Shipment Method" = FIELD(Code);
+                RunPageLink = "Shipment Method" = field(Code);
                 ToolTip = 'Describe the shipment method in different languages. The translated descriptions appear on quotes, orders, invoices, and credit memos, based on the shipment method code and the language code on the document.';
             }
             group(ActionGroupCRM)

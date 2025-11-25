@@ -1,3 +1,8 @@
+namespace Microsoft.CashFlow.Worksheet;
+
+using Microsoft.FinancialMgt.Analysis;
+using System.Security.AccessControl;
+
 codeunit 844 "Cash Flow Wksh.-Register Batch"
 {
     TableNo = "Cash Flow Worksheet Line";

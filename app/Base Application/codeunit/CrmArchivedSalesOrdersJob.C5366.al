@@ -4,7 +4,7 @@ codeunit 5366 "CRM Archived Sales Orders Job"
 
     trigger OnRun()
     begin
-        UpdateOrders(GetLastLogEntryNo());
+        UpdateOrders(Rec.GetLastLogEntryNo());
     end;
 
     var

@@ -118,7 +118,7 @@ pageextension 1758 "Data Classification Wiz. Ext." extends "Data Classification 
         DataClassificationMgt: Codeunit "Data Classification Mgt.";
     begin
         DataClassificationMgt.SetDefaultDataSensitivity(Rec);
-        SetRange(Include, true);
+        Rec.SetRange(Include, true);
 
         NextStep(false);
     end;

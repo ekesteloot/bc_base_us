@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
+using System.Globalization;
+
 table 7503 "Item Attr. Value Translation"
 {
     Caption = 'Item Attr. Value Translation';

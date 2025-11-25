@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment;
+
 codeunit 2000000003 "Company Triggers"
 {
     SingleInstance = true;
@@ -6,11 +12,7 @@ codeunit 2000000003 "Company Triggers"
     begin
     end;
 
-#if NOT CLEAN20
-    [Obsolete('Replaced by OnCompanyOpenCompleted to avoid errors in login.', '20.0')]
-#else
     [Scope('OnPrem')]
-#endif
     [BusinessEvent(false)]
     procedure OnCompanyOpen()
     begin

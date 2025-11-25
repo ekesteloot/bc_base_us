@@ -1,3 +1,7 @@
+namespace System.Automation;
+
+using System.Utilities;
+
 table 1502 "Workflow Step"
 {
     Caption = 'Workflow Step';
@@ -32,7 +36,7 @@ table 1502 "Workflow Step"
         field(11; "Previous Workflow Step ID"; Integer)
         {
             Caption = 'Previous Workflow Step ID';
-            TableRelation = "Workflow Step".ID WHERE("Workflow Code" = FIELD("Workflow Code"));
+            TableRelation = "Workflow Step".ID where("Workflow Code" = field("Workflow Code"));
 
             trigger OnLookup()
             begin
@@ -49,7 +53,7 @@ table 1502 "Workflow Step"
         field(12; "Next Workflow Step ID"; Integer)
         {
             Caption = 'Next Workflow Step ID';
-            TableRelation = "Workflow Step".ID WHERE("Workflow Code" = FIELD("Workflow Code"));
+            TableRelation = "Workflow Step".ID where("Workflow Code" = field("Workflow Code"));
 
             trigger OnLookup()
             begin
@@ -77,11 +81,11 @@ table 1502 "Workflow Step"
         field(14; "Function Name"; Code[128])
         {
             Caption = 'Function Name';
-            TableRelation = IF (Type = CONST(Event)) "Workflow Event"
-            ELSE
-            IF (Type = CONST(Response)) "Workflow Response"
-            ELSE
-            IF (Type = CONST("Sub-Workflow")) Workflow;
+            TableRelation = if (Type = const(Event)) "Workflow Event"
+            else
+            if (Type = const(Response)) "Workflow Response"
+            else
+            if (Type = const("Sub-Workflow")) Workflow;
 
             trigger OnLookup()
             var
@@ -137,7 +141,7 @@ table 1502 "Workflow Step"
         field(15; Argument; Guid)
         {
             Caption = 'Argument';
-            TableRelation = "Workflow Step Argument" WHERE(Type = FIELD(Type));
+            TableRelation = "Workflow Step Argument" where(Type = field(Type));
 
             trigger OnValidate()
             var
@@ -250,7 +254,6 @@ table 1502 "Workflow Step"
         InstantiateStepRules(WorkflowStepInstance.ID);
     end;
 
-    [Scope('OnPrem')]
     procedure ConvertEventConditionsToFilters(RecRef: RecordRef)
     var
         WorkflowStepArgument: Record "Workflow Step Argument";

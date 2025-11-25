@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+
 codeunit 364 "PostPurch-Delete"
 {
     Permissions = TableData "Purch. Rcpt. Header" = ri,
@@ -113,7 +119,7 @@ codeunit 364 "PostPurch-Delete"
             until PurchRcptLine.Next() = 0;
 
         ItemChargeAssignmentPurch.CheckAssignment(
-            "Purchase Applies-to Document Type"::Receipt, PurchRcptLine."Document No.", PurchRcptLine."Line No.");
+            Enum::"Purchase Applies-to Document Type"::Receipt, PurchRcptLine."Document No.", PurchRcptLine."Line No.");
 
         ItemTrackingMgt.DeleteItemEntryRelation(
             DATABASE::"Purch. Rcpt. Line", 0, PurchRcptHeader."No.", '', 0, 0, true);
@@ -166,7 +172,7 @@ codeunit 364 "PostPurch-Delete"
             until ReturnShipmentLine.Next() = 0;
 
         ItemChargeAssignmentPurch.CheckAssignment(
-            "Purchase Applies-to Document Type"::"Return Shipment", ReturnShipmentLine."Document No.", ReturnShipmentLine."Line No.");
+            Enum::"Purchase Applies-to Document Type"::"Return Shipment", ReturnShipmentLine."Document No.", ReturnShipmentLine."Line No.");
 
         ItemTrackingMgt.DeleteItemEntryRelation(
           DATABASE::"Return Shipment Line", 0, ReturnShptHeader."No.", '', 0, 0, true);

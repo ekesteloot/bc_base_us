@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.History;
+
+using Microsoft.Manufacturing.StandardCost;
+
 page 923 "Posted Asm. Order Statistics"
 {
     Caption = 'Posted Asm. Order Statistics';

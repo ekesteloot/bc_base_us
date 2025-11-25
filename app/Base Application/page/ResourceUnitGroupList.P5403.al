@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.Integration.Dataverse;
+
 page 5403 "Resource Unit Group List"
 {
     Caption = 'Resource Unit Group List';

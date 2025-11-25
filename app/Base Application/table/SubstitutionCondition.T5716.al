@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Substitution;
+
 table 5716 "Substitution Condition"
 {
     Caption = 'Substitution Condition';
@@ -7,28 +9,28 @@ table 5716 "Substitution Condition"
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = "Item Substitution"."No." WHERE("No." = FIELD("No."));
+            TableRelation = "Item Substitution"."No." where("No." = field("No."));
         }
         field(2; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Substitution"."Variant Code" WHERE("No." = FIELD("No."),
-                                                                      "Variant Code" = FIELD("Variant Code"));
+            TableRelation = "Item Substitution"."Variant Code" where("No." = field("No."),
+                                                                      "Variant Code" = field("Variant Code"));
         }
         field(3; "Substitute No."; Code[20])
         {
             Caption = 'Substitute No.';
-            TableRelation = "Item Substitution"."Substitute No." WHERE("No." = FIELD("No."),
-                                                                        "Variant Code" = FIELD("Variant Code"),
-                                                                        "Substitute No." = FIELD("Substitute No."));
+            TableRelation = "Item Substitution"."Substitute No." where("No." = field("No."),
+                                                                        "Variant Code" = field("Variant Code"),
+                                                                        "Substitute No." = field("Substitute No."));
         }
         field(4; "Substitute Variant Code"; Code[10])
         {
             Caption = 'Substitute Variant Code';
-            TableRelation = "Item Substitution"."Substitute Variant Code" WHERE("No." = FIELD("No."),
-                                                                                 "Variant Code" = FIELD("Variant Code"),
-                                                                                 "Substitute No." = FIELD("Substitute No."),
-                                                                                 "Substitute Variant Code" = FIELD("Substitute Variant Code"));
+            TableRelation = "Item Substitution"."Substitute Variant Code" where("No." = field("No."),
+                                                                                 "Variant Code" = field("Variant Code"),
+                                                                                 "Substitute No." = field("Substitute No."),
+                                                                                 "Substitute Variant Code" = field("Substitute Variant Code"));
         }
         field(5; "Line No."; Integer)
         {

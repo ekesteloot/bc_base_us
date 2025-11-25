@@ -1,4 +1,6 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
 page 9836 "User Group Memberships FactBox"
 {
     Caption = 'User Group Memberships';

@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
 table 5393 "CDS Company"
 {
     // Dynamics CRM Version: 9.1.0.10123
@@ -82,9 +88,9 @@ table 5393 "CDS Company"
             Description = 'Owner Id';
             ExternalName = 'ownerid';
             ExternalType = 'Owner';
-            TableRelation = IF (OwnerIdType = CONST(systemuser)) "CRM Systemuser".SystemUserId
-            ELSE
-            IF (OwnerIdType = CONST(team)) "CRM Team".TeamId;
+            TableRelation = if (OwnerIdType = const(systemuser)) "CRM Systemuser".SystemUserId
+            else
+            if (OwnerIdType = const(team)) "CRM Team".TeamId;
             DataClassification = EndUserPseudonymousIdentifiers;
         }
         field(9; OwnerIdType; Option)
@@ -222,7 +228,7 @@ table 5393 "CDS Company"
         }
         field(23; DefaultOwningTeamName; Text[160])
         {
-            CalcFormula = Lookup ("CRM Team".Name WHERE(TeamId = FIELD(DefaultOwningTeam)));
+            CalcFormula = Lookup("CRM Team".Name where(TeamId = field(DefaultOwningTeam)));
             Caption = 'Default owning team name';
             ExternalAccess = Read;
             ExternalName = 'bcbi_defaultowningteamname';
@@ -231,7 +237,7 @@ table 5393 "CDS Company"
         }
         field(24; CreatedByName; Text[200])
         {
-            CalcFormula = Lookup ("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(CreatedBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(CreatedBy)));
             Caption = 'CreatedByName';
             ExternalAccess = Read;
             ExternalName = 'createdbyname';
@@ -240,7 +246,7 @@ table 5393 "CDS Company"
         }
         field(25; ModifiedByName; Text[200])
         {
-            CalcFormula = Lookup ("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(ModifiedBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(ModifiedBy)));
             Caption = 'ModifiedByName';
             ExternalAccess = Read;
             ExternalName = 'modifiedbyname';
@@ -249,7 +255,7 @@ table 5393 "CDS Company"
         }
         field(26; CreatedOnBehalfByName; Text[200])
         {
-            CalcFormula = Lookup ("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(CreatedOnBehalfBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(CreatedOnBehalfBy)));
             Caption = 'CreatedOnBehalfByName';
             ExternalAccess = Read;
             ExternalName = 'createdonbehalfbyname';
@@ -258,7 +264,7 @@ table 5393 "CDS Company"
         }
         field(27; ModifiedOnBehalfByName; Text[200])
         {
-            CalcFormula = Lookup ("CRM Systemuser".FullName WHERE(SystemUserId = FIELD(ModifiedOnBehalfBy)));
+            CalcFormula = Lookup("CRM Systemuser".FullName where(SystemUserId = field(ModifiedOnBehalfBy)));
             Caption = 'ModifiedOnBehalfByName';
             ExternalAccess = Read;
             ExternalName = 'modifiedonbehalfbyname';

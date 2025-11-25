@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FixedAssets.Depreciation;
+
 table 5640 "Main Asset Component"
 {
     Caption = 'Main Asset Component';

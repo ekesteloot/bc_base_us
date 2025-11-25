@@ -1,3 +1,10 @@
+namespace Microsoft.ServiceMgt.Pricing;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ServiceMgt.Setup;
+
 table 5905 "Service Cost"
 {
     Caption = 'Service Cost';

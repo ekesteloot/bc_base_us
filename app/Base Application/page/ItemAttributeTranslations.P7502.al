@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Item.Attribute;
+
+using System.Globalization;
+
 page 7502 "Item Attribute Translations"
 {
     Caption = 'Item Attribute Translations';

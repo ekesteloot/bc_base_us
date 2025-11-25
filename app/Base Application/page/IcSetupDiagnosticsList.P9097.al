@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Setup;
+
 page 9097 "IC Setup Diagnostics List"
 {
     PageType = List;

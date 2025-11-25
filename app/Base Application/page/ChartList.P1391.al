@@ -1,3 +1,7 @@
+namespace System.Visualization;
+
+using Microsoft.FinancialMgt.FinancialReports;
+
 page 1391 "Chart List"
 {
     Caption = 'Key Performance Indicators';
@@ -19,7 +23,7 @@ page 1391 "Chart List"
                     Editable = false;
                     ToolTip = 'Specifies the name of the chart.';
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the chart is enabled.';
@@ -46,11 +50,11 @@ page 1391 "Chart List"
                     AccountSchedulesChartSetup: Record "Account Schedules Chart Setup";
                     ChartManagement: Codeunit "Chart Management";
                 begin
-                    if not AccountSchedulesChartSetup.get('', "Chart Name") then begin
+                    if not AccountSchedulesChartSetup.get('', Rec."Chart Name") then begin
                         AccountSchedulesChartSetup.Init();
                         AccountSchedulesChartSetup."User ID" := '';
-                        AccountSchedulesChartSetup.Name := copystr("Chart Name", 1, MaxStrLen(AccountSchedulesChartSetup.Name));
-                        AccountSchedulesChartSetup.Description := "Chart Name";
+                        AccountSchedulesChartSetup.Name := copystr(Rec."Chart Name", 1, MaxStrLen(AccountSchedulesChartSetup.Name));
+                        AccountSchedulesChartSetup.Description := Rec."Chart Name";
                         AccountSchedulesChartSetup."Start Date" := Today;
                         AccountSchedulesChartSetup."Period Length" := AccountSchedulesChartSetup."Period Length"::Month;
                         AccountSchedulesChartSetup.Insert(true);
@@ -58,8 +62,8 @@ page 1391 "Chart List"
                     end;
                     if Page.RunModal(Page::"Account Schedules Chart Setup", AccountSchedulesChartSetup) = ACTION::LookupOK THEN begin
                         ChartManagement.EnableChart(rec);
-                        if Enabled then
-                            modify();
+                        if Rec.Enabled then
+                            Rec.Modify();
                     end;
 
 
@@ -81,12 +85,12 @@ page 1391 "Chart List"
 
     trigger OnAfterGetCurrRecord()
     begin
-        SetupActive := SupportSetup();
+        SetupActive := Rec.SupportSetup();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if (CloseAction = ACTION::LookupOK) and not Enabled then
+        if (CloseAction = ACTION::LookupOK) and not Rec.Enabled then
             DIALOG.Error(DisabledChartSelectedErr);
     end;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 table 99000751 "Shop Calendar"
 {
     Caption = 'Shop Calendar';

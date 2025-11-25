@@ -1,3 +1,13 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Setup;
+using System.Email;
+
 table 1384 "Employee Templ."
 {
     Caption = 'Employee Template';
@@ -101,8 +111,8 @@ table 1384 "Employee Templ."
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
@@ -113,8 +123,8 @@ table 1384 "Employee Templ."
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin

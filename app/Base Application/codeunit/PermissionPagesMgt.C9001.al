@@ -1,3 +1,9 @@
+﻿namespace System.Security.AccessControl;
+
+using System.Environment.Configuration;
+using System.Security.User;
+using System.Text;
+
 codeunit 9001 "Permission Pages Mgt."
 {
 

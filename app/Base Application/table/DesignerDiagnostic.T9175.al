@@ -1,3 +1,7 @@
+namespace System.Tooling;
+
+using System;
+
 table 9175 "Designer Diagnostic"
 {
     DataClassification = CustomerContent;

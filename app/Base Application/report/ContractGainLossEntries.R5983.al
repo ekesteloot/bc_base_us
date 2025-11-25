@@ -1,7 +1,12 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Contract;
+
 report 5983 "Contract Gain/Loss Entries"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ContractGainLossEntries.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ContractGainLossEntries.rdlc';
     ApplicationArea = Service;
     Caption = 'Contract Gain/Loss Entries';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5983 "Contract Gain/Loss Entries"
     {
         dataitem("Contract Gain/Loss Entry"; "Contract Gain/Loss Entry")
         {
-            DataItemTableView = SORTING("Contract No.", "Change Date", "Reason Code");
+            DataItemTableView = sorting("Contract No.", "Change Date", "Reason Code");
             RequestFilterFields = "Contract No.", "Change Date", "Reason Code";
             column(TodayFormatted; Format(Today, 0, 4))
             {

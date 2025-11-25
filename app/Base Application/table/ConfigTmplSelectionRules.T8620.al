@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using System.Reflection;
+using System.Utilities;
+
 table 8620 "Config. Tmpl. Selection Rules"
 {
     Caption = 'Config. Tmpl. Selection Rules';
@@ -8,13 +13,13 @@ table 8620 "Config. Tmpl. Selection Rules"
         field(1; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(2; "Template Code"; Code[10])
         {
             Caption = 'Template Code';
             NotBlank = true;
-            TableRelation = "Config. Template Header".Code WHERE("Table ID" = FIELD("Table ID"));
+            TableRelation = "Config. Template Header".Code where("Table ID" = field("Table ID"));
         }
         field(5; "Selection Criteria"; BLOB)
         {
@@ -22,8 +27,8 @@ table 8620 "Config. Tmpl. Selection Rules"
         }
         field(6; Description; Text[250])
         {
-            CalcFormula = Lookup ("Config. Template Header".Description WHERE(Code = FIELD("Template Code"),
-                                                                              "Table ID" = FIELD("Table ID")));
+            CalcFormula = Lookup("Config. Template Header".Description where(Code = field("Template Code"),
+                                                                              "Table ID" = field("Table ID")));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;

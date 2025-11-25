@@ -1,3 +1,5 @@
+namespace System.Utilities;
+
 page 701 "Error Messages Part"
 {
     Caption = 'Error Messages';
@@ -9,8 +11,8 @@ page 701 "Error Messages Part"
     PageType = ListPart;
     SourceTable = "Error Message";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Message Type", ID)
-                      ORDER(Ascending);
+    SourceTableView = sorting("Message Type", ID)
+                      order(Ascending);
 
     layout
     {
@@ -46,7 +48,7 @@ page 701 "Error Messages Part"
                     trigger OnDrillDown()
                     begin
                         if not DisableOpenRelatedEntity then
-                            PageManagement.PageRun("Record ID");
+                            PageManagement.PageRun(Rec."Record ID");
                     end;
                 }
             }
@@ -67,7 +69,7 @@ page 701 "Error Messages Part"
 
                 trigger OnAction()
                 begin
-                    PageManagement.PageRun("Record ID");
+                    PageManagement.PageRun(Rec."Record ID");
                 end;
             }
             action(ViewDetails)
@@ -98,19 +100,18 @@ page 701 "Error Messages Part"
     var
         PageManagement: Codeunit "Page Management";
         RecordIDToHighlight: RecordID;
-        [InDataSet]
         StyleText: Text[20];
         EnableOpenRelatedEntity: Boolean;
         DisableOpenRelatedEntity: Boolean;
 
     procedure SetRecords(var TempErrorMessage: Record "Error Message" temporary)
     begin
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
 
         TempErrorMessage.Reset();
         if TempErrorMessage.FindFirst() then
-            Copy(TempErrorMessage, true);
+            Rec.Copy(TempErrorMessage, true);
     end;
 
     procedure SetRecordID(recordID: RecordID)
@@ -118,7 +119,7 @@ page 701 "Error Messages Part"
         ErrorMessage: Record "Error Message";
         TempErrorMessage: Record "Error Message" temporary;
     begin
-        ErrorMessage.SetRange("Record ID", recordID);
+        ErrorMessage.SetRange("Record ID", Rec.RecordId);
         ErrorMessage.CopyToTemp(TempErrorMessage);
         SetRecords(TempErrorMessage);
         CurrPage.Update();
@@ -134,7 +135,7 @@ page 701 "Error Messages Part"
         RecordRef.GetTable(RecordVariant);
         RecordIDToHighlight := RecordRef.RecordId;
 
-        if HasErrorMessagesRelatedTo(RecordVariant) then
+        if Rec.HasErrorMessagesRelatedTo(RecordVariant) then
             StyleExpression := 'Attention'
         else
             StyleExpression := 'None';
@@ -144,16 +145,16 @@ page 701 "Error Messages Part"
     var
         RecID: RecordID;
     begin
-        RecID := "Record ID";
+        RecID := Rec."Record ID";
 
-        case "Message Type" of
-            "Message Type"::Error:
+        case Rec."Message Type" of
+            Rec."Message Type"::Error:
                 if RecID = RecordIDToHighlight then
                     StyleText := 'Unfavorable'
                 else
                     StyleText := 'Attention';
-            "Message Type"::Warning,
-          "Message Type"::Information:
+            Rec."Message Type"::Warning,
+          Rec."Message Type"::Information:
                 if RecID = RecordIDToHighlight then
                     StyleText := 'Strong'
                 else
@@ -165,7 +166,7 @@ page 701 "Error Messages Part"
     var
         RecID: RecordID;
     begin
-        RecID := "Record ID";
+        RecID := Rec."Record ID";
         if DisableOpenRelatedEntity then
             EnableOpenRelatedEntity := false
         else

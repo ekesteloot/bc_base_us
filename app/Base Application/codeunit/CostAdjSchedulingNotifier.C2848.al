@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.InventoryMgt.Setup;
+
 codeunit 2848 "Cost Adj. Scheduling Notifier"
 {
     SingleInstance = true;

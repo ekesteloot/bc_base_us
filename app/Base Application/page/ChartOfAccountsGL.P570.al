@@ -1,3 +1,12 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.ExtendedText;
+
 page 570 "Chart of Accounts (G/L)"
 {
     Caption = 'Chart of Accounts (G/L)';
@@ -45,7 +54,7 @@ page 570 "Chart of Accounts (G/L)"
                     ToolTip = 'Specifies whether you will be able to post directly or only indirectly to this general ledger account.';
                     Visible = false;
                 }
-                field(Totaling; Totaling)
+                field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
@@ -90,7 +99,7 @@ page 570 "Chart of Accounts (G/L)"
                     ToolTip = 'Specifies the G/L account balance on the last date included in the Date Filter field.';
                     Visible = false;
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = Basic, Suite;
                     BlankZero = true;
@@ -118,7 +127,7 @@ page 570 "Chart of Accounts (G/L)"
                     ToolTip = 'Specifies the balance on this account, in the additional reporting currency.';
                     Visible = false;
                 }
-                field(BudgetedAmount; "Budgeted Amount")
+                field(BudgetedAmount; Rec."Budgeted Amount")
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies either the G/L account''s total budget or, if you have specified a name in the Budget Name field, a specific budget.';
@@ -166,8 +175,8 @@ page 570 "Chart of Accounts (G/L)"
                     Caption = 'Ledger E&ntries';
                     Image = GLRegisters;
                     RunObject = Page "General Ledger Entries";
-                    RunPageLink = "G/L Account No." = FIELD("No.");
-                    RunPageView = SORTING("G/L Account No.");
+                    RunPageLink = "G/L Account No." = field("No.");
+                    RunPageView = sorting("G/L Account No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -177,8 +186,8 @@ page 570 "Chart of Accounts (G/L)"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 group(Dimensions)
@@ -191,8 +200,8 @@ page 570 "Chart of Accounts (G/L)"
                         Caption = 'Dimensions-Single';
                         Image = Dimensions;
                         RunObject = Page "Default Dimensions";
-                        RunPageLink = "Table ID" = CONST(15),
-                                      "No." = FIELD("No.");
+                        RunPageLink = "Table ID" = const(15),
+                                      "No." = field("No.");
                         ShortCutKey = 'Alt+D';
                         ToolTip = 'View or edit the single set of dimensions that are set up for the selected record.';
                     }
@@ -210,7 +219,7 @@ page 570 "Chart of Accounts (G/L)"
                             DefaultDimMultiple: Page "Default Dimensions-Multiple";
                         begin
                             CurrPage.SetSelectionFilter(GLAcc);
-                            DefaultDimMultiple.SetMultiRecord(GLAcc, FieldNo("No."));
+                            DefaultDimMultiple.SetMultiRecord(GLAcc, Rec.FieldNo("No."));
                             DefaultDimMultiple.RunModal();
                         end;
                     }
@@ -221,9 +230,9 @@ page 570 "Chart of Accounts (G/L)"
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST("G/L Account"),
-                                  "No." = FIELD("No.");
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const("G/L Account"),
+                                  "No." = field("No.");
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     ToolTip = 'View the extended description that is set up.';
                 }
                 action("Receivables-Payables")
@@ -244,8 +253,8 @@ page 570 "Chart of Accounts (G/L)"
                     Caption = 'Net Change';
                     Image = LedgerEntries;
                     RunObject = Page "General Ledger Entries";
-                    RunPageLink = "G/L Account No." = FIELD(FILTER(Totaling)),
-                                  "Posting Date" = FIELD("Date Filter");
+                    RunPageLink = "G/L Account No." = field(FILTER(Totaling)),
+                                  "Posting Date" = field("Date Filter");
                     ToolTip = 'View the general ledger entries that make up the sum in the Net Change field.';
                 }
                 action("Budgeted Amount")
@@ -254,8 +263,8 @@ page 570 "Chart of Accounts (G/L)"
                     Caption = 'Budgeted Amount';
                     Image = GLRegisters;
                     RunObject = Page "G/L Budget Entries";
-                    RunPageLink = "G/L Account No." = FIELD(FILTER(Totaling)),
-                                  Date = FIELD("Date Filter");
+                    RunPageLink = "G/L Account No." = field(FILTER(Totaling)),
+                                  Date = field("Date Filter");
                     ToolTip = 'View the budget entries that make up the sum in the Budgeted Amount field.';
                 }
             }
@@ -269,10 +278,10 @@ page 570 "Chart of Accounts (G/L)"
                     Caption = 'G/L &Account Balance';
                     Image = GLAccountBalance;
                     RunObject = Page "G/L Account Balance";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Business Unit Filter" = FIELD("Business Unit Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Business Unit Filter" = field("Business Unit Filter");
                     ToolTip = 'View a summary of the debit and credit balances for different time periods, for the account that you select in the chart of accounts.';
                 }
                 action("G/L &Balance")
@@ -368,15 +377,13 @@ page 570 "Chart of Accounts (G/L)"
     end;
 
     var
-        [InDataSet]
         Emphasize: Boolean;
-        [InDataSet]
         NameIndent: Integer;
 
     local procedure FormatLine()
     begin
-        NameIndent := Indentation;
-        Emphasize := "Account Type" <> "Account Type"::Posting;
+        NameIndent := Rec.Indentation;
+        Emphasize := Rec."Account Type" <> Rec."Account Type"::Posting;
     end;
 }
 

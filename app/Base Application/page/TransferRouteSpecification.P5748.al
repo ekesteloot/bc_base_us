@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
 page 5748 "Transfer Route Specification"
 {
     Caption = 'Trans. Route Spec.';
@@ -54,12 +56,12 @@ page 5748 "Transfer Route Specification"
         CanBeDeleted := true;
         OnBeforeClosePage(Rec, CanBeDeleted);
         if CanBeDeleted then
-            if Get("Transfer-from Code", "Transfer-to Code") then
-                if ("Shipping Agent Code" = '') and
-                   ("Shipping Agent Service Code" = '') and
-                   ("In-Transit Code" = '')
+            if Rec.Get(Rec."Transfer-from Code", Rec."Transfer-to Code") then
+                if (Rec."Shipping Agent Code" = '') and
+                   (Rec."Shipping Agent Service Code" = '') and
+                   (Rec."In-Transit Code" = '')
                 then
-                    Delete();
+                    Rec.Delete();
     end;
 
     trigger OnInit()

@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using System.Reflection;
+
 page 7370 "Bin Creation Wksh. Templates"
 {
     AccessByPermission = TableData Bin = R;
@@ -14,17 +18,17 @@ page 7370 "Bin Creation Wksh. Templates"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Name; Name)
+                field(Name; Rec.Name)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the name of the bin creation worksheet template you are creating.';
                 }
-                field(Description; Description)
+                field(Description; Rec.Description)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies a description of the warehouse worksheet template you are creating.';
                 }
-                field(Type; Type)
+                field(Type; Rec.Type)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies which type of bin creation will be used with this warehouse worksheet template.';
@@ -77,6 +81,13 @@ page 7370 "Bin Creation Wksh. Templates"
                     RunPageLink = "Worksheet Template Name" = FIELD(Name);
                     ToolTip = 'View the list of available template names.';
                 }
+            }
+        }
+        area(Promoted)
+        {
+            actionref(Names_Promoted; Names)
+            {
+
             }
         }
     }

@@ -27,7 +27,7 @@ page 179 "Reverse Entries"
                 field(EntryTypeText; GetEntryTypeText())
                 {
                     ApplicationArea = Basic, Suite;
-                    CaptionClass = FieldCaption("Entry Type");
+                    CaptionClass = Rec.FieldCaption("Entry Type");
                     Editable = false;
                     ShowCaption = false;
                 }
@@ -348,7 +348,7 @@ page 179 "Reverse Entries"
 
     trigger OnAfterGetCurrRecord()
     begin
-        DescriptionEditable := "Entry Type" <> "Entry Type"::VAT;
+        DescriptionEditable := Rec."Entry Type" <> Rec."Entry Type"::VAT;
     end;
 
     trigger OnInit()
@@ -363,7 +363,6 @@ page 179 "Reverse Entries"
 
     var
         ReversalEntry: Record "Reversal Entry";
-        [InDataSet]
         DescriptionEditable: Boolean;
 
         Text000: Label 'Reverse Transaction Entries';
@@ -396,38 +395,38 @@ page 179 "Reverse Entries"
         if IsHandled then
             exit(EntryTypeText);
 
-        case "Entry Type" of
-            "Entry Type"::"G/L Account":
+        case Rec."Entry Type" of
+            Rec."Entry Type"::"G/L Account":
                 exit(GLEntry.TableCaption());
-            "Entry Type"::Customer:
+            Rec."Entry Type"::Customer:
                 exit(CustLedgEntry.TableCaption());
-            "Entry Type"::Vendor:
+            Rec."Entry Type"::Vendor:
                 exit(VendLedgEntry.TableCaption());
-            "Entry Type"::Employee:
+            Rec."Entry Type"::Employee:
                 exit(EmployeeLedgerEntry.TableCaption());
-            "Entry Type"::"Bank Account":
+            Rec."Entry Type"::"Bank Account":
                 exit(BankAccLedgEntry.TableCaption());
-            "Entry Type"::"Fixed Asset":
+            Rec."Entry Type"::"Fixed Asset":
                 exit(FALedgEntry.TableCaption());
-            "Entry Type"::Maintenance:
+            Rec."Entry Type"::Maintenance:
                 exit(MaintenanceLedgEntry.TableCaption());
-            "Entry Type"::VAT:
+            Rec."Entry Type"::VAT:
                 exit(VATEntry.TableCaption());
             else
-                exit(Format("Entry Type"));
+                exit(Format(Rec."Entry Type"));
         end;
     end;
 
     local procedure InitializeFilter()
     begin
-        FindFirst();
+        Rec.FindFirst();
         ReversalEntry := Rec;
-        if "Reversal Type" = "Reversal Type"::Transaction then begin
+        if Rec."Reversal Type" = Rec."Reversal Type"::Transaction then begin
             CurrPage.Caption := Text000;
-            ReversalEntry.SetReverseFilter("Transaction No.", "Reversal Type");
+            ReversalEntry.SetReverseFilter(Rec."Transaction No.", Rec."Reversal Type");
         end else begin
             CurrPage.Caption := Text001;
-            ReversalEntry.SetReverseFilter("G/L Register No.", "Reversal Type");
+            ReversalEntry.SetReverseFilter(Rec."G/L Register No.", Rec."Reversal Type");
         end;
     end;
 

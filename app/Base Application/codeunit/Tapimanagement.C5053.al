@@ -1,3 +1,11 @@
+﻿namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.BusinessRelation;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Segment;
+using Microsoft.CRM.Task;
+using Microsoft.Foundation.Enums;
+
 codeunit 5053 TAPIManagement
 {
 
@@ -29,33 +37,33 @@ codeunit 5053 TAPIManagement
             exit;
 
         case TableNo of
-            DATABASE::Contact:
+            Enum::TableID::Contact.AsInteger():
                 Contact.Get(No);
-            DATABASE::"To-do":
+            Enum::TableID::"To-do".AsInteger():
                 begin
                     Task.Get(No);
                     Task.TestField("Contact No.");
                     Contact.Get(Task."Contact No.");
                 end;
             else begin
-                    ContBusRel.Reset();
-                    ContBusRel.SetCurrentKey("Link to Table", "No.");
-                    case TableNo of
-                        DATABASE::Customer:
-                            ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
-                        DATABASE::Vendor:
-                            ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Vendor);
-                        DATABASE::"Bank Account":
-                            ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::"Bank Account");
-                        else
-                            OnDialContCustVendBankCaseElse(ContBusRel, TableNo);
-                    end;
-                    ContBusRel.SetRange("No.", No);
-                    if ContBusRel.FindFirst() then
-                        Contact.Get(ContBusRel."Contact No.")
+                ContBusRel.Reset();
+                ContBusRel.SetCurrentKey("Link to Table", "No.");
+                case TableNo of
+                    Enum::TableID::Customer.AsInteger():
+                        ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
+                    Enum::TableID::Vendor.AsInteger():
+                        ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Vendor);
+                    Enum::TableID::"Bank Account".AsInteger():
+                        ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::"Bank Account");
                     else
-                        Error(Text001);
+                        OnDialContCustVendBankCaseElse(ContBusRel, TableNo);
                 end;
+                ContBusRel.SetRange("No.", No);
+                if ContBusRel.FindFirst() then
+                    Contact.Get(ContBusRel."Contact No.")
+                else
+                    Error(Text001);
+            end;
         end;
 
         OnDialContCustVendBankOnBeforemakePhoneCall(Contact);

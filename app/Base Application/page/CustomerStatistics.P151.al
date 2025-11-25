@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Customer;
+
+using Microsoft.Sales.Receivables;
+
 page 151 "Customer Statistics"
 {
     Caption = 'Customer Statistics';
@@ -23,10 +27,10 @@ page 151 "Customer Statistics"
                         DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
                         CustLedgEntry: Record "Cust. Ledger Entry";
                     begin
-                        DtldCustLedgEntry.SetRange("Customer No.", "No.");
-                        CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
-                        CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
-                        CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
+                        DtldCustLedgEntry.SetRange("Customer No.", Rec."No.");
+                        Rec.CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                        Rec.CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                        Rec.CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
                         CustLedgEntry.DrillDownOnEntries(DtldCustLedgEntry);
                     end;
                 }
@@ -68,7 +72,7 @@ page 151 "Customer Statistics"
                         ToolTip = 'Specifies your expected service income from the customer in LCY based on unpaid service invoices.';
                     }
                 }
-                field(GetTotalAmountLCY; GetTotalAmountLCY())
+                field(GetTotalAmountLCY; Rec.GetTotalAmountLCY())
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
@@ -83,7 +87,7 @@ page 151 "Customer Statistics"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the maximum amount you allow the customer to exceed the payment balance before warnings are issued.';
                 }
-                field("Balance Due (LCY)"; CalcOverdueBalance())
+                field("Balance Due (LCY)"; Rec.CalcOverdueBalance())
                 {
                     ApplicationArea = Basic, Suite;
                     CaptionClass = Format(StrSubstNo(Text000, Format(CurrentDate)));
@@ -93,14 +97,14 @@ page 151 "Customer Statistics"
                         DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
                         CustLedgEntry: Record "Cust. Ledger Entry";
                     begin
-                        DtldCustLedgEntry.SetFilter("Customer No.", "No.");
-                        CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
-                        CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
-                        CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
+                        DtldCustLedgEntry.SetFilter("Customer No.", Rec."No.");
+                        Rec.CopyFilter("Global Dimension 1 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 1");
+                        Rec.CopyFilter("Global Dimension 2 Filter", DtldCustLedgEntry."Initial Entry Global Dim. 2");
+                        Rec.CopyFilter("Currency Filter", DtldCustLedgEntry."Currency Code");
                         CustLedgEntry.DrillDownOnOverdueEntries(DtldCustLedgEntry);
                     end;
                 }
-                field(GetInvoicedPrepmtAmountLCY; GetInvoicedPrepmtAmountLCY())
+                field(GetInvoicedPrepmtAmountLCY; Rec.GetInvoicedPrepmtAmountLCY())
                 {
                     ApplicationArea = Prepayments;
                     Caption = 'Invoiced Prepayment Amount (LCY)';
@@ -706,39 +710,39 @@ page 151 "Customer Statistics"
         SetDateFilter();
 
         for i := 1 to 4 do begin
-            SetFilter("Date Filter", CustDateFilter[i]);
-            CalcFields(
+            Rec.SetFilter("Date Filter", CustDateFilter[i]);
+            Rec.CalcFields(
               "Sales (LCY)", "Profit (LCY)", "Inv. Discounts (LCY)", "Inv. Amounts (LCY)", "Pmt. Discounts (LCY)",
               "Pmt. Disc. Tolerance (LCY)", "Pmt. Tolerance (LCY)",
               "Fin. Charge Memo Amounts (LCY)", "Cr. Memo Amounts (LCY)", "Payments (LCY)",
               "Reminder Amounts (LCY)", "Refunds (LCY)", "Other Amounts (LCY)");
-            CustSalesLCY[i] := "Sales (LCY)";
-            CustProfit[i] := "Profit (LCY)";
+            CustSalesLCY[i] := Rec."Sales (LCY)";
+            CustProfit[i] := Rec."Profit (LCY)";
             AdjmtCostLCY[i] :=
               CustSalesLCY[i] - CustProfit[i] + CostCalcMgt.CalcCustActualCostLCY(Rec) + CostCalcMgt.NonInvtblCostAmt(Rec);
             AdjCustProfit[i] := CustProfit[i] + AdjmtCostLCY[i];
 
-            if "Sales (LCY)" <> 0 then begin
-                ProfitPct[i] := Round(100 * CustProfit[i] / "Sales (LCY)", 0.1);
-                AdjProfitPct[i] := Round(100 * AdjCustProfit[i] / "Sales (LCY)", 0.1);
+            if Rec."Sales (LCY)" <> 0 then begin
+                ProfitPct[i] := Round(100 * CustProfit[i] / Rec."Sales (LCY)", 0.1);
+                AdjProfitPct[i] := Round(100 * AdjCustProfit[i] / Rec."Sales (LCY)", 0.1);
             end else begin
                 ProfitPct[i] := 0;
                 AdjProfitPct[i] := 0;
             end;
 
-            InvAmountsLCY[i] := "Inv. Amounts (LCY)";
-            CustInvDiscAmountLCY[i] := "Inv. Discounts (LCY)";
-            CustPaymentDiscLCY[i] := "Pmt. Discounts (LCY)";
-            CustPaymentDiscTolLCY[i] := "Pmt. Disc. Tolerance (LCY)";
-            CustPaymentTolLCY[i] := "Pmt. Tolerance (LCY)";
-            CustReminderChargeAmtLCY[i] := "Reminder Amounts (LCY)";
-            CustFinChargeAmtLCY[i] := "Fin. Charge Memo Amounts (LCY)";
-            CustCrMemoAmountsLCY[i] := "Cr. Memo Amounts (LCY)";
-            CustPaymentsLCY[i] := "Payments (LCY)";
-            CustRefundsLCY[i] := "Refunds (LCY)";
-            CustOtherAmountsLCY[i] := "Other Amounts (LCY)";
+            InvAmountsLCY[i] := Rec."Inv. Amounts (LCY)";
+            CustInvDiscAmountLCY[i] := Rec."Inv. Discounts (LCY)";
+            CustPaymentDiscLCY[i] := Rec."Pmt. Discounts (LCY)";
+            CustPaymentDiscTolLCY[i] := Rec."Pmt. Disc. Tolerance (LCY)";
+            CustPaymentTolLCY[i] := Rec."Pmt. Tolerance (LCY)";
+            CustReminderChargeAmtLCY[i] := Rec."Reminder Amounts (LCY)";
+            CustFinChargeAmtLCY[i] := Rec."Fin. Charge Memo Amounts (LCY)";
+            CustCrMemoAmountsLCY[i] := Rec."Cr. Memo Amounts (LCY)";
+            CustPaymentsLCY[i] := Rec."Payments (LCY)";
+            CustRefundsLCY[i] := Rec."Refunds (LCY)";
+            CustOtherAmountsLCY[i] := Rec."Other Amounts (LCY)";
         end;
-        SetRange("Date Filter", 0D, CurrentDate);
+        Rec.SetRange("Date Filter", 0D, CurrentDate);
     end;
 
     var
@@ -772,7 +776,7 @@ page 151 "Customer Statistics"
 
     local procedure SetDateFilter()
     begin
-        SetRange("Date Filter", 0D, CurrentDate);
+        Rec.SetRange("Date Filter", 0D, CurrentDate);
 
         OnAfterSetDateFilter(Rec);
     end;

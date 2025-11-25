@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.BankAccount;
+
 page 1283 "Payment Bank Account Card"
 {
     Caption = 'Payment Bank Account Card';
@@ -27,7 +29,7 @@ page 1283 "Payment Bank Account Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number used by the bank for the bank account.';
                 }
-                field(IBAN; IBAN)
+                field(IBAN; Rec.IBAN)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the bank account''s international bank account number.';
@@ -84,7 +86,7 @@ page 1283 "Payment Bank Account Card"
                     ExtendedDatatype = EMail;
                     ToolTip = 'Specifies the email address associated with the bank account.';
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the name of the bank employee regularly contacted in connection with this bank account.';
@@ -107,7 +109,7 @@ page 1283 "Payment Bank Account Card"
                     Caption = 'Detailed Information';
                     Image = ViewDetails;
                     RunObject = Page "Bank Account Card";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ToolTip = 'View or edit additional information about the bank account, such as the account. You can also check the balance on the account.';
                 }
             }

@@ -1,7 +1,11 @@
+﻿namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Item;
+
 page 497 "Reservation Entries"
 {
     Caption = 'Reservation Entries';
-    DataCaptionExpression = TextCaption();
+    DataCaptionExpression = Rec.TextCaption();
     DeleteAllowed = false;
     InsertAllowed = false;
     PageType = List;
@@ -105,7 +109,7 @@ page 497 "Reservation Entries"
 
                     trigger OnValidate()
                     begin
-                        ReservEngineMgt.ModifyReservEntry(xRec, "Quantity (Base)", Description, false);
+                        ReservEngineMgt.ModifyReservEntry(xRec, Rec."Quantity (Base)", Rec.Description, false);
                         QuantityBaseOnAfterValidate();
                     end;
                 }
@@ -272,7 +276,7 @@ page 497 "Reservation Entries"
         if IsHandled then
             exit(Result);
 
-        ReservEngineMgt.ModifyReservEntry(xRec, "Quantity (Base)", Description, true);
+        ReservEngineMgt.ModifyReservEntry(xRec, Rec."Quantity (Base)", Rec.Description, true);
         exit(false);
     end;
 
@@ -282,158 +286,33 @@ page 497 "Reservation Entries"
     end;
 
     var
-        [InDataSet]
         PackageTrackingVisible: Boolean;
-        CancelReservationQst: Label 'Cancel reservation of %1 of item number %2, reserved for %3 from %4?';
+        CancelReservationQst: Label 'Cancel reservation of %1 of item number %2, reserved for %3 from %4?', Comment = '%1 - quantity, %2 - item number, %3 - from table name, %4 - to table name';
 
     protected var
         ReservEngineMgt: Codeunit "Reservation Engine Mgt.";
 
     local procedure LookupReservedFor()
     var
-        ReservEntry: Record "Reservation Entry";
+        ReservationEntry: Record "Reservation Entry";
     begin
-        ReservEntry.Get(Rec."Entry No.", false);
-        LookupReserved(ReservEntry);
+        ReservationEntry.Get(Rec."Entry No.", false);
+        LookupReserved(ReservationEntry);
     end;
 
     local procedure LookupReservedFrom()
     var
-        ReservEntry: Record "Reservation Entry";
+        ReservationEntry: Record "Reservation Entry";
     begin
-        ReservEntry.Get(Rec."Entry No.", true);
-        LookupReserved(ReservEntry);
+        ReservationEntry.Get(Rec."Entry No.", true);
+        LookupReserved(ReservationEntry);
     end;
 
-    procedure LookupReserved(ReservEntry: Record "Reservation Entry")
-    var
-        SalesLine: Record "Sales Line";
-        ReqLine: Record "Requisition Line";
-        PurchLine: Record "Purchase Line";
-        ItemJnlLine: Record "Item Journal Line";
-        ItemLedgEntry: Record "Item Ledger Entry";
-        ProdOrderLine: Record "Prod. Order Line";
-        ProdOrderComp: Record "Prod. Order Component";
-        PlanningComponent: Record "Planning Component";
-        ServLine: Record "Service Line";
-        JobPlanningLine: Record "Job Planning Line";
-        TransLine: Record "Transfer Line";
-        AssemblyHeader: Record "Assembly Header";
-        AssemblyLine: Record "Assembly Line";
-        InvtDocLine: Record "Invt. Document Line";
+    procedure LookupReserved(ReservationEntry: Record "Reservation Entry")
     begin
-        with ReservEntry do
-            case "Source Type" of
-                DATABASE::"Sales Line":
-                    begin
-                        SalesLine.Reset();
-                        SalesLine.SetRange("Document Type", "Source Subtype");
-                        SalesLine.SetRange("Document No.", "Source ID");
-                        SalesLine.SetRange("Line No.", "Source Ref. No.");
-                        PAGE.RunModal(PAGE::"Sales Lines", SalesLine);
-                    end;
-                DATABASE::"Requisition Line":
-                    begin
-                        ReqLine.Reset();
-                        ReqLine.SetRange("Worksheet Template Name", "Source ID");
-                        ReqLine.SetRange("Journal Batch Name", "Source Batch Name");
-                        ReqLine.SetRange("Line No.", "Source Ref. No.");
-                        PAGE.RunModal(PAGE::"Requisition Lines", ReqLine);
-                    end;
-                DATABASE::"Purchase Line":
-                    begin
-                        PurchLine.Reset();
-                        PurchLine.SetRange("Document Type", "Source Subtype");
-                        PurchLine.SetRange("Document No.", "Source ID");
-                        PurchLine.SetRange("Line No.", "Source Ref. No.");
-                        PAGE.RunModal(PAGE::"Purchase Lines", PurchLine);
-                    end;
-                DATABASE::"Item Journal Line":
-                    begin
-                        ItemJnlLine.Reset();
-                        ItemJnlLine.SetRange("Journal Template Name", "Source ID");
-                        ItemJnlLine.SetRange("Journal Batch Name", "Source Batch Name");
-                        ItemJnlLine.SetRange("Line No.", "Source Ref. No.");
-                        ItemJnlLine.SetRange("Entry Type", "Source Subtype");
-                        PAGE.RunModal(PAGE::"Item Journal Lines", ItemJnlLine);
-                    end;
-                DATABASE::"Item Ledger Entry":
-                    begin
-                        ItemLedgEntry.Reset();
-                        ItemLedgEntry.SetRange("Entry No.", "Source Ref. No.");
-                        PAGE.RunModal(0, ItemLedgEntry);
-                    end;
-                DATABASE::"Prod. Order Line":
-                    begin
-                        ProdOrderLine.Reset();
-                        ProdOrderLine.SetRange(Status, "Source Subtype");
-                        ProdOrderLine.SetRange("Prod. Order No.", "Source ID");
-                        ProdOrderLine.SetRange("Line No.", "Source Prod. Order Line");
-                        PAGE.RunModal(0, ProdOrderLine);
-                    end;
-                DATABASE::"Prod. Order Component":
-                    begin
-                        ProdOrderComp.Reset();
-                        ProdOrderComp.SetRange(Status, "Source Subtype");
-                        ProdOrderComp.SetRange("Prod. Order No.", "Source ID");
-                        ProdOrderComp.SetRange("Prod. Order Line No.", "Source Prod. Order Line");
-                        ProdOrderComp.SetRange("Line No.", "Source Ref. No.");
-                        PAGE.RunModal(0, ProdOrderComp);
-                    end;
-                DATABASE::"Planning Component":
-                    begin
-                        PlanningComponent.Reset();
-                        PlanningComponent.SetRange("Worksheet Template Name", "Source ID");
-                        PlanningComponent.SetRange("Worksheet Batch Name", "Source Batch Name");
-                        PlanningComponent.SetRange("Worksheet Line No.", "Source Prod. Order Line");
-                        PlanningComponent.SetRange("Line No.", "Source Ref. No.");
-                        PAGE.RunModal(0, PlanningComponent);
-                    end;
-                DATABASE::"Transfer Line":
-                    begin
-                        TransLine.Reset();
-                        TransLine.SetRange("Document No.", "Source ID");
-                        TransLine.SetRange("Line No.", "Source Ref. No.");
-                        TransLine.SetRange("Derived From Line No.", "Source Prod. Order Line");
-                        PAGE.RunModal(0, TransLine);
-                    end;
-                DATABASE::"Service Line":
-                    begin
-                        ServLine.SetRange("Document Type", "Source Subtype");
-                        ServLine.SetRange("Document No.", "Source ID");
-                        ServLine.SetRange("Line No.", "Source Ref. No.");
-                        PAGE.RunModal(0, ServLine);
-                    end;
-                DATABASE::"Job Planning Line":
-                    begin
-                        JobPlanningLine.SetRange(Status, "Source Subtype");
-                        JobPlanningLine.SetRange("Job No.", "Source ID");
-                        JobPlanningLine.SetRange("Job Contract Entry No.", "Source Ref. No.");
-                        PAGE.RunModal(0, JobPlanningLine);
-                    end;
-                DATABASE::"Assembly Header":
-                    begin
-                        AssemblyHeader.SetRange("Document Type", "Source Subtype");
-                        AssemblyHeader.SetRange("No.", "Source ID");
-                        PAGE.RunModal(0, AssemblyHeader);
-                    end;
-                DATABASE::"Assembly Line":
-                    begin
-                        AssemblyLine.SetRange("Document Type", "Source Subtype");
-                        AssemblyLine.SetRange("Document No.", "Source ID");
-                        AssemblyLine.SetRange("Line No.", "Source Ref. No.");
-                        PAGE.RunModal(0, AssemblyLine);
-                    end;
-                DATABASE::"Invt. Document Line":
-                    begin
-                        InvtDocLine.SetRange("Document Type", "Source Subtype");
-                        InvtDocLine.SetRange("Document No.", "Source ID");
-                        InvtDocLine.SetRange("Line No.", "Source Ref. No.");
-                        PAGE.RunModal(0, InvtDocLine);
-                    end;
-            end;
+        OnLookupReserved(ReservationEntry);
 
-        OnAfterLookupReserved(ReservEntry);
+        OnAfterLookupReserved(ReservationEntry);
     end;
 
     protected procedure QuantityBaseOnAfterValidate()
@@ -443,13 +322,18 @@ page 497 "Reservation Entries"
 
     local procedure SetPackageTrackingVisibility()
     var
-        PackageMgt: Codeunit "Package Management";
+        PackageManagement: Codeunit "Package Management";
     begin
-        PackageTrackingVisible := PackageMgt.IsEnabled();
+        PackageTrackingVisible := PackageManagement.IsEnabled();
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterLookupReserved(var ReservEntry: Record "Reservation Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnLookupReserved(var ReservationEntry: Record "Reservation Entry")
     begin
     end;
 

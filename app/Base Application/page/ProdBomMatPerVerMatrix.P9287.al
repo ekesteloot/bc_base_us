@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+
 page 9287 "Prod. BOM Mat. per Ver. Matrix"
 {
     Caption = 'Prod. BOM Matrix per Version Matrix';
@@ -308,8 +312,8 @@ page 9287 "Prod. BOM Mat. per Ver. Matrix"
                     Caption = '&Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
-                    RunPageView = SORTING("No.");
+                    RunPageLink = "No." = field("Item No.");
+                    RunPageView = sorting("No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information for the production BOM.';
                 }
@@ -326,7 +330,7 @@ page 9287 "Prod. BOM Mat. per Ver. Matrix"
                         ProdBOMHeader: Record "Production BOM Header";
                         BOMMatrixForm: Page "Prod. BOM Matrix per Version";
                     begin
-                        Item.Get("Item No.");
+                        Item.Get(Rec."Item No.");
                         if Item."Production BOM No." = '' then
                             exit;
 
@@ -348,7 +352,7 @@ page 9287 "Prod. BOM Mat. per Ver. Matrix"
                         Item: Record Item;
                         ProdBOMWhereUsed: Page "Prod. BOM Where-Used";
                     begin
-                        Item.Get("Item No.");
+                        Item.Get(Rec."Item No.");
                         ProdBOMWhereUsed.SetItem(Item, WorkDate());
                         ProdBOMWhereUsed.Run();
                     end;
@@ -429,69 +433,37 @@ page 9287 "Prod. BOM Mat. per Ver. Matrix"
         MATRIX_CurrentNoOfMatrixColumn: Integer;
         MATRIX_CellData: array[32] of Decimal;
         MATRIX_CaptionSet: array[32] of Text[80];
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
 
     procedure Load(NewMatrixColumns: array[32] of Text[1024]; var NewMatrixRecords: array[32] of Record "Production BOM Version"; CurrentNoOfMatrixColumns: Integer; NewProdBOM: Record "Production BOM Header"; NewShowLevel: Option Single,Multi)
@@ -512,7 +484,7 @@ page 9287 "Prod. BOM Mat. per Ver. Matrix"
         if IsHandled then
             exit;
 
-        ComponentNeed := BOMMatrixMgt.GetComponentNeed("Item No.", "Variant Code", MatrixRecords[MATRIX_ColumnOrdinal]."Version Code");
+        ComponentNeed := BOMMatrixMgt.GetComponentNeed(Rec."Item No.", Rec."Variant Code", MatrixRecords[MATRIX_ColumnOrdinal]."Version Code");
         MATRIX_CellData[MATRIX_ColumnOrdinal] := ComponentNeed;
     end;
 

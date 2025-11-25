@@ -1,3 +1,5 @@
+namespace System.Security.User;
+
 report 1170 "User Task Utility"
 {
     Caption = 'User Task Utility';

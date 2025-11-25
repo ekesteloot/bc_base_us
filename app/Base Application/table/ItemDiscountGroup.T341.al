@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+
 table 341 "Item Discount Group"
 {
     Caption = 'Item Discount Group';

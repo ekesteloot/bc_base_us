@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.CRM.Contact;
+
 page 5061 "Contact Business Relations"
 {
     Caption = 'Contact Business Relations';

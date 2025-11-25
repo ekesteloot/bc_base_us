@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.MachineCenter;
+
+using Microsoft.Foundation.Enums;
+
 page 99000889 "Machine Center Load"
 {
     Caption = 'Machine Center Load';
@@ -74,7 +78,7 @@ page 99000889 "Machine Center Load"
     begin
         PeriodTypeOption := PeriodType.AsInteger();
         OnBeforeOpenPage(PeriodTypeOption, AmountType);
-        PeriodType := "Analysis Period Type".FromInteger(PeriodTypeOption);
+        PeriodType := Enum::"Analysis Period Type".FromInteger(PeriodTypeOption);
     end;
 
     protected var

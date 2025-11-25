@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 page 498 Reservation
 {
     Caption = 'Reservation';
@@ -70,7 +76,7 @@ page 498 Reservation
                     Editable = false;
                     ToolTip = 'Specifies which type of line or entry is summarized in the entry summary.';
                 }
-                field("Total Quantity"; ReservMgt.FormatQty("Total Quantity"))
+                field("Total Quantity"; ReservMgt.FormatQty(Rec."Total Quantity"))
                 {
                     ApplicationArea = Reservation;
                     BlankZero = true;
@@ -84,7 +90,7 @@ page 498 Reservation
                         DrillDownTotalQuantity();
                     end;
                 }
-                field(TotalReservedQuantity; ReservMgt.FormatQty("Total Reserved Quantity"))
+                field(TotalReservedQuantity; ReservMgt.FormatQty(Rec."Total Reserved Quantity"))
                 {
                     ApplicationArea = Reservation;
                     BlankZero = true;
@@ -98,7 +104,7 @@ page 498 Reservation
                         DrillDownReservedQuantity();
                     end;
                 }
-                field(QtyAllocatedInWarehouse; ReservMgt.FormatQty("Qty. Alloc. in Warehouse"))
+                field(QtyAllocatedInWarehouse; ReservMgt.FormatQty(Rec."Qty. Alloc. in Warehouse"))
                 {
                     ApplicationArea = Warehouse;
                     BlankZero = true;
@@ -107,7 +113,7 @@ page 498 Reservation
                     Editable = false;
                     ToolTip = 'Specifies the quantity of the item that is allocated to activities in the warehouse.';
                 }
-                field("ReservMgt.FormatQty(""Res. Qty. on Picks & Shipmts."")"; ReservMgt.FormatQty("Res. Qty. on Picks & Shipmts."))
+                field("ReservMgt.FormatQty(""Res. Qty. on Picks & Shipmts."")"; ReservMgt.FormatQty(Rec."Res. Qty. on Picks & Shipmts."))
                 {
                     ApplicationArea = Warehouse;
                     BlankZero = true;
@@ -117,7 +123,7 @@ page 498 Reservation
                     ToolTip = 'Specifies the sum of the overlap quantities.';
                     Visible = false;
                 }
-                field(TotalAvailableQuantity; ReservMgt.FormatQty("Total Available Quantity"))
+                field(TotalAvailableQuantity; ReservMgt.FormatQty(Rec."Total Available Quantity"))
                 {
                     ApplicationArea = Reservation;
                     BlankZero = true;
@@ -150,7 +156,7 @@ page 498 Reservation
             label(NoteText)
             {
                 ApplicationArea = Reservation;
-                CaptionClass = Format(StrSubstNo(Text009, NonSpecificQty, FieldCaption("Total Reserved Quantity")));
+                CaptionClass = Format(StrSubstNo(Text009, NonSpecificQty, Rec.FieldCaption("Total Reserved Quantity")));
                 Editable = false;
                 MultiLine = true;
                 Visible = NoteTextVisible;
@@ -273,7 +279,7 @@ page 498 Reservation
                             ReservMgt.SetItemTrackingHandling(2);
                         RemainingQtyToReserve := QtyToReserve - QtyReserved;
                         ReservMgt.AutoReserveOneLine(
-                          "Entry No.", RemainingQtyToReserve, RemainingQtyToReserveBase, ReservEntry.Description,
+                          Rec."Entry No.", RemainingQtyToReserve, RemainingQtyToReserveBase, ReservEntry.Description,
                           ReservEntry."Shipment Date");
                         UpdateReservFrom();
                         if QtyReservedBefore = QtyReservedBase then
@@ -295,7 +301,7 @@ page 498 Reservation
                         ReservEntry3: Record "Reservation Entry";
                         RecordsFound: Boolean;
                     begin
-                        if not Confirm(Text003, false, "Summary Type") then
+                        if not Confirm(Text003, false, Rec."Summary Type") then
                             exit;
                         Clear(ReservEntry2);
                         ReservEntry2 := ReservEntry;
@@ -379,7 +385,6 @@ page 498 Reservation
         FullAutoReservation: Boolean;
         FormIsOpen: Boolean;
         HandleItemTracking: Boolean;
-        [InDataSet]
         NoteTextVisible: Boolean;
 
         Text000: Label 'Fully reserved.';
@@ -394,7 +399,7 @@ page 498 Reservation
     procedure SetReservSource(CurrentRecordVar: Variant)
     begin
         SourceRecRef.GetTable(CurrentRecordVar);
-        SetReservSource(SourceRecRef, "Transfer Direction"::Outbound);
+        SetReservSource(SourceRecRef, Enum::"Transfer Direction"::Outbound);
     end;
 
     procedure SetReservSource(CurrentRecordVar: Variant; Direction: Enum "Transfer Direction")
@@ -413,29 +418,29 @@ page 498 Reservation
 
         // Invoke events for compatibility with 15.X, to be removed after obsoleting events below
         case SourceRecRef.Number of
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line":
                 OnAfterSetSalesLine(Rec, ReservEntry);
-            DATABASE::"Requisition Line":
+            Enum::TableID::"Requisition Line":
                 OnAfterSetReqLine(Rec, ReservEntry);
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line":
                 OnAfterSetPurchLine(Rec, ReservEntry);
-            DATABASE::"Item Journal Line":
+            Enum::TableID::"Item Journal Line":
                 OnAfterSetItemJnlLine(Rec, ReservEntry);
-            DATABASE::"Prod. Order Line":
+            Enum::TableID::"Prod. Order Line":
                 OnAfterSetProdOrderLine(Rec, ReservEntry);
-            DATABASE::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component":
                 OnAfterSetProdOrderComponent(Rec, ReservEntry);
-            DATABASE::"Assembly Header":
+            Enum::TableID::"Assembly Header":
                 OnAfterSetAssemblyHeader(Rec, ReservEntry);
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line":
                 OnAfterSetAssemblyLine(Rec, ReservEntry);
-            DATABASE::"Planning Component":
+            Enum::TableID::"Planning Component":
                 OnAfterSetPlanningComponent(Rec, ReservEntry);
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line":
                 OnAfterSetServiceLine(Rec, ReservEntry);
-            DATABASE::"Job Planning Line":
+            Enum::TableID::"Job Planning Line":
                 OnAfterSetJobPlanningLine(Rec, ReservEntry);
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line":
                 OnAfterSetTransLine(Rec, ReservEntry);
         end;
     end;
@@ -491,10 +496,10 @@ page 498 Reservation
         if HandleItemTracking then begin
             EntrySummary := Rec;
             QtyReservedBase := 0;
-            if FindSet() then
+            if Rec.FindSet() then
                 repeat
                     QtyReservedBase += ReservedThisLine(Rec);
-                until Next() = 0;
+                until Rec.Next() = 0;
             QtyReservedIT := Round(QtyReservedBase / QtyPerUOM, UOMMgt.QtyRndPrecision());
             if Abs(QtyReserved - QtyReservedIT) > UOMMgt.QtyRndPrecision() then
                 QtyReserved := QtyReservedIT;
@@ -515,7 +520,7 @@ page 498 Reservation
     local procedure UpdateReservMgt()
     begin
         Clear(ReservMgt);
-        ReservMgt.SetReservSource(SourceRecRef, "Transfer Direction".FromInteger(ReservEntry."Source Subtype"));
+        ReservMgt.SetReservSource(SourceRecRef, Enum::"Transfer Direction".FromInteger(ReservEntry."Source Subtype"));
         OnUpdateReservMgt(ReservEntry, ReservMgt);
         ReservMgt.SetTrackingFromReservEntry(ReservEntry);
     end;
@@ -525,10 +530,10 @@ page 498 Reservation
         Location: Record Location;
         AvailableItemTrackingLines: Page "Avail. - Item Tracking Lines";
     begin
-        if HandleItemTracking and ("Entry No." <> 1) then begin
+        if HandleItemTracking and (Rec."Entry No." <> 1) then begin
             Clear(AvailableItemTrackingLines);
             AvailableItemTrackingLines.SetItemTrackingLine(
-                "Table ID", "Source Subtype", ReservEntry, ReservMgt.IsPositive(), ReservEntry."Shipment Date");
+                Rec."Table ID", Rec."Source Subtype", ReservEntry, ReservMgt.IsPositive(), ReservEntry."Shipment Date");
             AvailableItemTrackingLines.RunModal();
             exit;
         end;
@@ -670,10 +675,10 @@ page 498 Reservation
 
     local procedure UpdateNonSpecific()
     begin
-        SetFilter("Non-specific Reserved Qty.", '>%1', 0);
-        NoteTextVisible := not IsEmpty();
-        NonSpecificQty := "Non-specific Reserved Qty.";
-        SetRange("Non-specific Reserved Qty.");
+        Rec.SetFilter("Non-specific Reserved Qty.", '>%1', 0);
+        NoteTextVisible := not Rec.IsEmpty();
+        NonSpecificQty := Rec."Non-specific Reserved Qty.";
+        Rec.SetRange("Non-specific Reserved Qty.");
     end;
 
     procedure AutoReserve()

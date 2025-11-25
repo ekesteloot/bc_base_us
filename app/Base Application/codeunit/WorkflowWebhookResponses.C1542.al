@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 codeunit 1542 "Workflow Webhook Responses"
 {
 

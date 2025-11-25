@@ -1,7 +1,13 @@
+namespace Microsoft.CostAccounting.Reports;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Journal;
+using System.Utilities;
+
 report 1128 "Cost Acctg. Journal"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/CostAccounting/CostAcctgJournal.rdlc';
+    RDLCLayout = './CostAccounting/Reports/CostAcctgJournal.rdlc';
     ApplicationArea = CostAccounting;
     Caption = 'Cost Acctg. Journal';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 1128 "Cost Acctg. Journal"
     {
         dataitem("Cost Journal Line"; "Cost Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
             RequestFilterFields = "Journal Template Name", "Journal Batch Name", "Posting Date", "Line No.", "Cost Center Code", "Cost Object Code";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -88,7 +94,7 @@ report 1128 "Cost Acctg. Journal"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorlineNumber; Errorline[Number])
                 {
                 }

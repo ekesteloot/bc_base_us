@@ -1,19 +1,43 @@
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.AssemblyMgt.History;
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Setup;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Globalization;
+using System.Reflection;
+using System.Text;
+using System.Utilities;
+
 report 1306 "Standard Sales - Invoice"
 {
-    RDLCLayout = './SalesReceivables/Document/StandardSalesInvoice.rdlc';
-    WordLayout = './StandardSalesInvoice.docx';
     Caption = 'Sales - Invoice';
-    DefaultLayout = Word;
     EnableHyperlinks = true;
     Permissions = TableData "Sales Shipment Buffer" = rimd;
     PreviewMode = PrintLayout;
     WordMergeDataItem = Header;
+    DefaultRenderingLayout = "StandardSalesInvoice.rdlc";
 
     dataset
     {
         dataitem(Header; "Sales Invoice Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Sell-to Customer No.", "No. Printed";
             RequestFilterHeading = 'Posted Sales Invoice';
             column(CompanyAddress1; CompanyAddr[1])
@@ -112,19 +136,19 @@ report 1306 "Standard Sales - Invoice"
             column(CompanyVATRegistrationNo_Lbl; CompanyInfo.GetVATRegistrationNumberLbl())
             {
             }
-            column(CompanyLegalOffice; CompanyInfo.GetLegalOffice())
+            column(CompanyLegalOffice; LegalOfficeTxt)
             {
             }
-            column(CompanyLegalOffice_Lbl; CompanyInfo.GetLegalOfficeLbl())
+            column(CompanyLegalOffice_Lbl; LegalOfficeLbl)
             {
             }
-            column(CompanyCustomGiro; CompanyInfo.GetCustomGiro())
+            column(CompanyCustomGiro; CustomGiroTxt)
             {
             }
-            column(CompanyCustomGiro_Lbl; CompanyInfo.GetCustomGiroLbl())
+            column(CompanyCustomGiro_Lbl; CustomGiroLbl)
             {
             }
-            column(CompanyLegalStatement; GetLegalStatement())
+            column(CompanyLegalStatement; LegalStatementLbl)
             {
             }
             column(DisplayAdditionalFeeNote; DisplayAdditionalFeeNote)
@@ -468,9 +492,9 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(Line; "Sales Invoice Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
+                DataItemLink = "Document No." = field("No.");
                 DataItemLinkReference = Header;
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
                 column(LineNo_Line; "Line No.")
                 {
                 }
@@ -611,7 +635,7 @@ report 1306 "Standard Sales - Invoice"
                 }
                 dataitem(ShipmentLine; "Sales Shipment Buffer")
                 {
-                    DataItemTableView = SORTING("Document No.", "Line No.", "Entry No.");
+                    DataItemTableView = sorting("Document No.", "Line No.", "Entry No.");
                     UseTemporary = true;
                     column(DocumentNo_ShipmentLine; "Document No.")
                     {
@@ -637,7 +661,7 @@ report 1306 "Standard Sales - Invoice"
                 }
                 dataitem(AssemblyLine; "Posted Assembly Line")
                 {
-                    DataItemTableView = SORTING("Document No.", "Line No.");
+                    DataItemTableView = sorting("Document No.", "Line No.");
                     UseTemporary = true;
                     column(LineNo_AssemblyLine; "No.")
                     {
@@ -740,7 +764,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(WorkDescriptionLines; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 .. 99999));
+                DataItemTableView = sorting(Number) where(Number = filter(1 .. 99999));
                 column(WorkDescriptionLineNumber; Number)
                 {
                 }
@@ -771,7 +795,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(VATAmountLine; "VAT Amount Line")
             {
-                DataItemTableView = SORTING("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
+                DataItemTableView = sorting("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
                 UseTemporary = true;
                 column(InvoiceDiscountAmount_VATAmountLine; "Invoice Discount Amount")
                 {
@@ -873,7 +897,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(VATClauseLine; "VAT Amount Line")
             {
-                DataItemTableView = SORTING("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
+                DataItemTableView = sorting("VAT Identifier", "VAT Calculation Type", "Tax Group Code", "Use Tax", Positive);
                 UseTemporary = true;
                 column(VATIdentifier_VATClauseLine; "VAT Identifier")
                 {
@@ -910,7 +934,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(ReportTotalsLine; "Report Totals Buffer")
             {
-                DataItemTableView = SORTING("Line No.");
+                DataItemTableView = sorting("Line No.");
                 UseTemporary = true;
                 column(Description_ReportTotalsLine; Description)
                 {
@@ -939,7 +963,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(USReportTotalsLine; "Report Totals Buffer")
             {
-                DataItemTableView = SORTING("Line No.");
+                DataItemTableView = sorting("Line No.");
                 UseTemporary = true;
                 column(Description_USReportTotalsLine; Description)
                 {
@@ -964,7 +988,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(LineFee; "Integer")
             {
-                DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = filter(1 ..));
                 column(LineFeeCaptionText; TempLineFeeNoteOnReportHist.ReportText)
                 {
                 }
@@ -984,7 +1008,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(PaymentReportingArgument; "Payment Reporting Argument")
             {
-                DataItemTableView = SORTING(Key);
+                DataItemTableView = sorting(Key);
                 UseTemporary = true;
                 column(PaymentServiceLogo; Logo)
                 {
@@ -1004,7 +1028,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(LeftHeader; "Name/Value Buffer")
             {
-                DataItemTableView = SORTING(ID);
+                DataItemTableView = sorting(ID);
                 UseTemporary = true;
                 column(LeftHeaderName; Name)
                 {
@@ -1015,7 +1039,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(RightHeader; "Name/Value Buffer")
             {
-                DataItemTableView = SORTING(ID);
+                DataItemTableView = sorting(ID);
                 UseTemporary = true;
                 column(RightHeaderName; Name)
                 {
@@ -1026,7 +1050,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(LetterText; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(GreetingText; GreetingLbl)
                 {
                 }
@@ -1049,7 +1073,7 @@ report 1306 "Standard Sales - Invoice"
             }
             dataitem(Totals; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(TotalNetAmount; Format(TotalAmount, 0, AutoFormat.ResolveAutoFormat("Auto Format"::AmountFormat, Header."Currency Code")))
                 {
                 }
@@ -1134,6 +1158,7 @@ report 1306 "Standard Sales - Invoice"
                 GeneralLedgerSetup: Record "General Ledger Setup";
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 if not IsReportInPreviewMode() then
@@ -1263,17 +1288,73 @@ report 1306 "Standard Sales - Invoice"
         end;
     }
 
+    rendering
+    {
+        layout("StandardSalesInvoice.rdlc")
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/History/StandardSalesInvoice.rdlc';
+            Caption = 'Standard Sales Invoice (RDLC)';
+            Summary = 'The Standard Sales Invoice (RDLC) is the most detailed layout and provides most flexible layout options.';
+        }
+        layout("StandardSalesInvoice.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesInvoice.docx';
+            Caption = 'Standard Sales Invoice (Word)';
+            Summary = 'The Standard Sales Invoice (Word) provides a simple layout that is also relatively easy for an end-user to modify.';
+        }
+        layout("StandardSalesInvoiceBlueSimple.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesInvoiceBlueSimple.docx';
+            Caption = 'Standard Sales Invoice - Blue (Word)';
+            Summary = 'The Standard Sales Invoice - Blue (Word) provides a simple layout with a blue theme.';
+        }
+        layout("StandardSalesInvoiceVatSpec.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesInvoiceVatSpec.docx';
+            Caption = 'Standard Sales Invoice - VAT Spec (Word)';
+            Summary = 'The Standard Sales Invoice - VAT Spec (Word) provides a layout with VAT Specification.';
+        }
+        layout("StandardSalesInvoiceDefEmail.docx")
+        {
+            Type = Word;
+            LayoutFile = './Sales/History/StandardSalesInvoiceDefEmail.docx';
+            Caption = 'Standard Sales Invoice Email (Word)';
+            Summary = 'The Standard Sales Invoice Email (Word) provides the default email body layout.';
+        }
+    }
+
     labels
     {
     }
 
     trigger OnInitReport()
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        IsHandled: Boolean;
     begin
         GLSetup.Get();
         CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
         SalesSetup.Get();
         CompanyInfo.VerifyAndSetPaymentInfo();
+
+        if SalesInvoiceHeader.GetLegalStatement() <> '' then
+            LegalStatementLbl := SalesInvoiceHeader.GetLegalStatement();
+
+        IsHandled := false;
+        OnInitReportForGlobalVariable(IsHandled, LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl, LegalStatementLbl);
+#if not CLEAN23
+        if not IsHandled then begin
+            LegalOfficeTxt := CompanyInfo.GetLegalOffice();
+            LegalOfficeLbl := CompanyInfo.GetLegalOfficeLbl();
+            CustomGiroTxt := CompanyInfo.GetCustomGiro();
+            CustomGiroLbl := CompanyInfo.GetCustomGiroLbl();
+        end;
+#endif
     end;
 
     trigger OnPostReport()
@@ -1305,7 +1386,6 @@ report 1306 "Standard Sales - Invoice"
 
     var
         GLSetup: Record "General Ledger Setup";
-        CompanyInfo: Record "Company Information";
         DummyCompanyInfo: Record "Company Information";
         Cust: Record Customer;
         RespCenter: Record "Responsibility Center";
@@ -1330,14 +1410,12 @@ report 1306 "Standard Sales - Invoice"
         MoreLines: Boolean;
         ShowWorkDescription: Boolean;
         TransHeaderAmount: Decimal;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         CompanyLogoPosition: Integer;
         CalculatedExchRate: Decimal;
         PaymentInstructionsTxt: Text;
         ExchangeRateText: Text;
         PrevLineAmount: Decimal;
-
         SalespersonLbl: Label 'Salesperson';
         CompanyInfoBankAccNoLbl: Label 'Account No.';
         CompanyInfoBankNameLbl: Label 'Bank';
@@ -1403,8 +1481,10 @@ report 1306 "Standard Sales - Invoice"
         CustomerPONumberLbl: Label 'Customer PO No.';
         UnitPriceLbl: Label 'Unit Price';
         LineAmountLbl: Label 'Line Amount';
+        LegalOfficeTxt, LegalOfficeLbl, CustomGiroTxt, CustomGiroLbl, LegalStatementLbl : Text;
 
     protected var
+        CompanyInfo: Record "Company Information";
         CompanyBankAccount: Record "Bank Account";
         PaymentMethod: Record "Payment Method";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -1431,7 +1511,6 @@ report 1306 "Standard Sales - Invoice"
         DisplayAdditionalFeeNote: Boolean;
         FirstLineHasBeenOutput: Boolean;
         ShowShippingAddr: Boolean;
-
         TotalText: Text[50];
         LogInteraction: Boolean;
         TotalAmount: Decimal;
@@ -1445,14 +1524,13 @@ report 1306 "Standard Sales - Invoice"
         TotalVATAmountLCY: Decimal;
         CurrCode: Text[10];
         CurrSymbol: Text[10];
-
         PaymentTermsDescLbl: Label 'Payment Terms';
         ShptMethodDescLbl: Label 'Shipment Method';
         ShiptoAddrLbl: Label 'Ship-to Address';
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Inv.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Inv.") <> '';
     end;
 
     local procedure InitializeShipmentLine()
@@ -1503,11 +1581,11 @@ report 1306 "Standard Sales - Invoice"
         DisplayAssemblyInformation := DisplayAsmInfo;
     end;
 
-    local procedure IsReportInPreviewMode(): Boolean
+    protected procedure IsReportInPreviewMode(): Boolean
     var
         MailManagement: Codeunit "Mail Management";
     begin
-        exit(CurrReport.Preview or MailManagement.IsHandlingGetEmailBody());
+        exit(CurrReport.Preview() or MailManagement.IsHandlingGetEmailBody());
     end;
 
     local procedure GetUOMText(UOMCode: Code[10]): Text[50]
@@ -1537,14 +1615,14 @@ report 1306 "Standard Sales - Invoice"
         end;
 
         if (TotalInvDiscAmount <> 0) or (TotalAmountVAT <> 0) then
-            ReportTotalsLine.Add(SubtotalLbl, TotalSubTotal, true, false, false);
+            ReportTotalsLine.Add(SubtotalLbl, TotalSubTotal, true, false, false, Header."Currency Code");
         if TotalInvDiscAmount <> 0 then begin
-            ReportTotalsLine.Add(InvDiscountAmtLbl, TotalInvDiscAmount, false, false, false);
+            ReportTotalsLine.Add(InvDiscountAmtLbl, TotalInvDiscAmount, false, false, false, Header."Currency Code");
             if TotalAmountVAT <> 0 then
                 if Header."Prices Including VAT" then
-                    ReportTotalsLine.Add(TotalInclVATText, TotalAmountInclVAT, true, false, false)
+                    ReportTotalsLine.Add(TotalInclVATText, TotalAmountInclVAT, true, false, false, Header."Currency Code")
                 else
-                    ReportTotalsLine.Add(TotalExclVATText, TotalAmount, true, false, false);
+                    ReportTotalsLine.Add(TotalExclVATText, TotalAmount, true, false, false, Header."Currency Code");
         end;
 
         if TotalAmountVAT <> 0 then begin
@@ -1553,7 +1631,7 @@ report 1306 "Standard Sales - Invoice"
             TempSalesTaxAmountLine.Ascending(true);
             if TempSalesTaxAmountLine.FindSet() then
                 repeat
-                    ReportTotalsLine.Add(TempSalesTaxAmountLine."Print Description", TempSalesTaxAmountLine."Tax Amount", false, true, false);
+                    ReportTotalsLine.Add(TempSalesTaxAmountLine."Print Description", TempSalesTaxAmountLine."Tax Amount", false, true, false, Header."Currency Code");
                 until TempSalesTaxAmountLine.Next() = 0;
         end;
     end;
@@ -1563,7 +1641,7 @@ report 1306 "Standard Sales - Invoice"
         ReportTotalsLine.DeleteAll();
         ReportTotalsLine.Add(SubtotalLbl, TotalSubTotal, true, false, false);
         if TotalInvDiscAmount <> 0 then
-            ReportTotalsLine.Add(InvDiscountAmtLbl, TotalInvDiscAmount, false, false, false);
+            ReportTotalsLine.Add(InvDiscountAmtLbl, TotalInvDiscAmount, false, false, false, Header."Currency Code");
         ReportTotalsLine.Add(StrSubstNo('%1 %2', TotalLbl, TaxLbl), TotalAmountVAT, false, true, false);
     end;
 
@@ -1817,6 +1895,11 @@ report 1306 "Standard Sales - Invoice"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetUOMText(UOMCode: Code[10]; var UOMDescription: Text[50])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitReportForGlobalVariable(var IsHandled: Boolean; var LegalOfficeTxt: Text; var LegalOfficeLbl: Text; var CustomGiroTxt: Text; var CustomGiroLbl: Text; var LegalStatementLbl: Text)
     begin
     end;
 

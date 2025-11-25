@@ -7,8 +7,8 @@ page 249 "VAT Registration Log"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "VAT Registration Log";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Entry No.")
+                      order(Descending);
 
     layout
     {
@@ -99,7 +99,7 @@ page 249 "VAT Registration Log"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Request Identifier"; Rec."Request Identifier")
@@ -161,7 +161,7 @@ page 249 "VAT Registration Log"
 
     trigger OnOpenPage()
     begin
-        if FindFirst() then;
+        if Rec.FindFirst() then;
     end;
 
     trigger OnAfterGetCurrRecord()

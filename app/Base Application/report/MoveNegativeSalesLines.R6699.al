@@ -119,9 +119,7 @@ report 6699 "Move Negative Sales Lines"
         ToDocType: Option ,,"Order",Invoice,"Return Order","Credit Memo";
         FromDocType: Option Quote,"Blanket Order","Order",Invoice,"Return Order","Credit Memo";
         Text001: Label '%1 %2 has been created. Do you want to view the created document?';
-        [InDataSet]
         DropDownForRetOrderAndCrMemoEd: Boolean;
-        [InDataSet]
         DropDownForOrderAndInvoiceEdit: Boolean;
         Text19037468: Label 'When you move a negative sales line to your selected document type, the quantity of the line on the selected document becomes positive.';
 

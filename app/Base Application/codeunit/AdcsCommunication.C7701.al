@@ -1,3 +1,10 @@
+namespace Microsoft.WarehouseMgt.ADCS;
+
+using Microsoft.WarehouseMgt.Setup;
+using System;
+using System.Reflection;
+using System.Xml;
+
 codeunit 7701 "ADCS Communication"
 {
 
@@ -437,9 +444,9 @@ codeunit 7701 "ADCS Communication"
                     Field.FieldError(Type);
                 end;
             else begin
-                    Field.Get(FldRef.Record().Number, FldRef.Number);
-                    Field.FieldError(Type);
-                end;
+                Field.Get(FldRef.Record().Number, FldRef.Number);
+                Field.FieldError(Type);
+            end;
         end;
     end;
 

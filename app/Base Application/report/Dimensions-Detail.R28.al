@@ -1,3 +1,13 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Text;
+using System.Utilities;
+
 report 28 "Dimensions - Detail"
 {
     DefaultLayout = RDLC;
@@ -10,7 +20,7 @@ report 28 "Dimensions - Detail"
     {
         dataitem("Analysis View"; "Analysis View")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             column(ViewLastUpdatedText; ViewLastUpdatedText)
             {
             }
@@ -70,7 +80,7 @@ report 28 "Dimensions - Detail"
             }
             dataitem(Level1; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(DimValCode_1_; DimValCode[1])
                 {
                 }
@@ -94,7 +104,7 @@ report 28 "Dimensions - Detail"
                 }
                 dataitem(Level2; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(DimValCode_2_; DimValCode[2])
                     {
                     }
@@ -127,7 +137,7 @@ report 28 "Dimensions - Detail"
                     }
                     dataitem(Level3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(DimValCode_3_; DimValCode[3])
                         {
                         }
@@ -148,7 +158,7 @@ report 28 "Dimensions - Detail"
                         }
                         dataitem(Level4; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(DimValCode_4_; DimValCode[4])
                             {
                             }
@@ -169,7 +179,7 @@ report 28 "Dimensions - Detail"
                             }
                             dataitem(Level5; "Integer")
                             {
-                                DataItemTableView = SORTING(Number);
+                                DataItemTableView = sorting(Number);
                                 column(TempGLEntry__Credit_Amount__Control52; TempGLEntry."Credit Amount")
                                 {
                                 }
@@ -195,7 +205,7 @@ report 28 "Dimensions - Detail"
                             }
                             dataitem(Level4e; "Integer")
                             {
-                                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                                DataItemTableView = sorting(Number) where(Number = const(1));
                                 column(DebitTotal_4_; DebitTotal[4])
                                 {
                                     AutoFormatType = 1;
@@ -232,7 +242,7 @@ report 28 "Dimensions - Detail"
                         }
                         dataitem(Level3e; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                            DataItemTableView = sorting(Number) where(Number = const(1));
                             column(DebitTotal_3_; DebitTotal[3])
                             {
                                 AutoFormatType = 1;
@@ -269,7 +279,7 @@ report 28 "Dimensions - Detail"
                     }
                     dataitem(Level2e; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(DebitTotal_2_; DebitTotal[2])
                         {
                             AutoFormatType = 1;
@@ -306,7 +316,7 @@ report 28 "Dimensions - Detail"
                 }
                 dataitem(Level1e; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CreditTotal_1_; CreditTotal[1])
                     {
                         AutoFormatType = 1;
@@ -773,19 +783,19 @@ report 28 "Dimensions - Detail"
                     end;
                 end;
             else begin
-                    TempDimVal.Reset();
-                    TempDimVal.SetRange("Dimension Code", IterationDimCode);
-                    TempDimVal.SetFilter(Code, IterationFilter);
-                    if FindFirstRec then
-                        SearchResult := TempDimVal.Find('-')
-                    else
-                        if TempDimVal.Get(IterationDimCode, IterationDimValCode) then
-                            SearchResult := (TempDimVal.Next() <> 0);
-                    if SearchResult then begin
-                        IterationDimValCode := TempDimVal.Code;
-                        IterationDimValName := TempDimVal.Name;
-                    end;
+                TempDimVal.Reset();
+                TempDimVal.SetRange("Dimension Code", IterationDimCode);
+                TempDimVal.SetFilter(Code, IterationFilter);
+                if FindFirstRec then
+                    SearchResult := TempDimVal.Find('-')
+                else
+                    if TempDimVal.Get(IterationDimCode, IterationDimValCode) then
+                        SearchResult := (TempDimVal.Next() <> 0);
+                if SearchResult then begin
+                    IterationDimValCode := TempDimVal.Code;
+                    IterationDimValName := TempDimVal.Name;
                 end;
+            end;
         end;
         if not SearchResult then begin
             IterationDimValCode := '';

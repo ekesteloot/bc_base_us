@@ -1,3 +1,11 @@
+﻿namespace System.AI;
+
+using System;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Utilities;
+
 codeunit 2003 "ML Prediction Management"
 {
 

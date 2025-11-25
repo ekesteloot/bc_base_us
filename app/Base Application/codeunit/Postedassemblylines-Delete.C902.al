@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.History;
+
+using Microsoft.InventoryMgt.Tracking;
+
 codeunit 902 "PostedAssemblyLines-Delete"
 {
     Permissions = TableData "Posted Assembly Line" = d;

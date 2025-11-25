@@ -9,8 +9,8 @@ codeunit 140 "EC Sales List Suggest Lines"
         ErrorMessage.SetContext(Rec);
         ErrorMessage.ClearLog();
 
-        if not IsPeriodValid() then begin
-            ErrorMessage.LogMessage(Rec, FieldNo("No."), ErrorMessage."Message Type"::Error, InvalidPeriodErr);
+        if not Rec.IsPeriodValid() then begin
+            ErrorMessage.LogMessage(Rec, Rec.FieldNo("No."), ErrorMessage."Message Type"::Error, InvalidPeriodErr);
             exit;
         end;
 

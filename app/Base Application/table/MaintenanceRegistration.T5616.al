@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Maintenance;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Purchases.Vendor;
+
 table 5616 "Maintenance Registration"
 {
     Caption = 'Maintenance Registration';

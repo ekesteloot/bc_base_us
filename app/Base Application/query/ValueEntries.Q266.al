@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.InventoryMgt.Item;
+
 query 266 "Value Entries"
 {
     Caption = 'Value Entries';

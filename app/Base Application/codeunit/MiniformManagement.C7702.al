@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.ADCS;
+
+using System;
+using System.Xml;
+
 codeunit 7702 "Miniform Management"
 {
 

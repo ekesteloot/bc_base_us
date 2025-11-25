@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Segment;
+
 page 5155 "Segment Interaction Languages"
 {
     Caption = 'Segment Interaction Languages';
@@ -22,12 +24,12 @@ page 5155 "Segment Interaction Languages"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the description of the Segment Interaction Language. This field will not be displayed in the Word attachment.';
                 }
-                field(Subject; Subject)
+                field(Subject; Rec.Subject)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the subject text. The text in the field is used as the subject in e-mails and Word documents.';
                 }
-                field(AttachmentText; AttachmentText())
+                field(AttachmentText; Rec.AttachmentText())
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Attachment';
@@ -35,10 +37,10 @@ page 5155 "Segment Interaction Languages"
 
                     trigger OnAssistEdit()
                     begin
-                        if "Attachment No." = 0 then
-                            CreateAttachment()
+                        if Rec."Attachment No." = 0 then
+                            Rec.CreateAttachment()
                         else
-                            OpenAttachment();
+                            Rec.OpenAttachment();
 
                         CurrPage.Update();
                     end;
@@ -78,7 +80,7 @@ page 5155 "Segment Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        OpenAttachment();
+                        Rec.OpenAttachment();
                     end;
                 }
                 action(Create)
@@ -91,7 +93,7 @@ page 5155 "Segment Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        CreateAttachment();
+                        Rec.CreateAttachment();
                     end;
                 }
                 action("Copy &From")
@@ -104,7 +106,7 @@ page 5155 "Segment Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        CopyFromAttachment();
+                        Rec.CopyFromAttachment();
                     end;
                 }
                 action(Import)
@@ -117,7 +119,7 @@ page 5155 "Segment Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        ImportAttachment();
+                        Rec.ImportAttachment();
                     end;
                 }
                 action("E&xport")
@@ -130,7 +132,7 @@ page 5155 "Segment Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        ExportAttachment();
+                        Rec.ExportAttachment();
                     end;
                 }
                 action(Remove)
@@ -143,7 +145,7 @@ page 5155 "Segment Interaction Languages"
 
                     trigger OnAction()
                     begin
-                        RemoveAttachment(true);
+                        Rec.RemoveAttachment(true);
                     end;
                 }
             }

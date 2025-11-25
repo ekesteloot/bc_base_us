@@ -1,3 +1,8 @@
+namespace Microsoft.Sales.Receivables;
+
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Sales.FinanceCharge;
+
 page 9106 "Customer Ledger Entry FactBox"
 {
     Caption = 'Customer Ledger Entry Details';
@@ -19,10 +24,10 @@ page 9106 "Customer Ledger Entry FactBox"
                 var
                     GLEntry: Record "G/L Entry";
                 begin
-                    if not ShowDoc() then begin
+                    if not Rec.ShowDoc() then begin
                         GLEntry.SetCurrentKey("Document No.", "Posting Date");
-                        GLEntry.SetRange("Document No.", "Document No.");
-                        GLEntry.SetRange("Posting Date", "Posting Date");
+                        GLEntry.SetRange("Document No.", Rec."Document No.");
+                        GLEntry.SetRange("Posting Date", Rec."Posting Date");
 
                         PAGE.Run(PAGE::"General Ledger Entries", GLEntry);
                     end;
@@ -49,7 +54,7 @@ page 9106 "Customer Ledger Entry FactBox"
                 var
                     ReminderFinEntry: Record "Reminder/Fin. Charge Entry";
                 begin
-                    ReminderFinEntry.SetRange("Customer Entry No.", "Entry No.");
+                    ReminderFinEntry.SetRange("Customer Entry No.", Rec."Entry No.");
 
                     PAGE.Run(PAGE::"Reminder/Fin. Charge Entries", ReminderFinEntry);
                 end;
@@ -65,7 +70,7 @@ page 9106 "Customer Ledger Entry FactBox"
                 var
                     AppliedCustomerEntriesList: Page "Applied Customer Entries";
                 begin
-                    AppliedCustomerEntriesList.SetTempCustLedgEntry("Entry No.");
+                    AppliedCustomerEntriesList.SetTempCustLedgEntry(Rec."Entry No.");
                     AppliedCustomerEntriesList.Run();
                 end;
             }
@@ -80,8 +85,8 @@ page 9106 "Customer Ledger Entry FactBox"
                 var
                     DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
                 begin
-                    DetailedCustLedgEntry.SetRange("Cust. Ledger Entry No.", "Entry No.");
-                    DetailedCustLedgEntry.SetRange("Customer No.", "Customer No.");
+                    DetailedCustLedgEntry.SetRange("Cust. Ledger Entry No.", Rec."Entry No.");
+                    DetailedCustLedgEntry.SetRange("Customer No.", Rec."Customer No.");
                     PAGE.Run(PAGE::"Detailed Cust. Ledg. Entries", DetailedCustLedgEntry);
                 end;
             }
@@ -104,7 +109,7 @@ page 9106 "Customer Ledger Entry FactBox"
         NoOfAppliedEntries := 0;
         DocumentHeading := '';
 
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnOpenPage()
@@ -126,16 +131,16 @@ page 9106 "Customer Ledger Entry FactBox"
         DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
     begin
         ReminderFinChargeEntry.Reset();
-        ReminderFinChargeEntry.SetRange("Customer Entry No.", "Entry No.");
+        ReminderFinChargeEntry.SetRange("Customer Entry No.", Rec."Entry No.");
         NoOfReminderFinEntries := ReminderFinChargeEntry.Count();
 
         NoOfAppliedEntries := 0;
-        if "Entry No." <> 0 then
+        if Rec."Entry No." <> 0 then
             NoOfAppliedEntries := GetNoOfAppliedEntries(Rec);
 
         DetailedCustLedgEntry.Reset();
-        DetailedCustLedgEntry.SetRange("Cust. Ledger Entry No.", "Entry No.");
-        DetailedCustLedgEntry.SetRange("Customer No.", "Customer No.");
+        DetailedCustLedgEntry.SetRange("Cust. Ledger Entry No.", Rec."Entry No.");
+        DetailedCustLedgEntry.SetRange("Customer No.", Rec."Customer No.");
         NoOfDetailedCustomerEntries := DetailedCustLedgEntry.Count();
     end;
 

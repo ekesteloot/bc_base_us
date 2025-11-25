@@ -10,8 +10,9 @@ report 11 "G/L - VAT Reconciliation"
     {
         dataitem("VAT Statement Name"; "VAT Statement Name")
         {
-            DataItemTableView = SORTING("Statement Template Name", Name);
+            DataItemTableView = sorting("Statement Template Name", Name);
             RequestFilterFields = Name;
+
             column(VAT_Statement_Name_Statement_Template_Name; "Statement Template Name")
             {
             }
@@ -20,9 +21,10 @@ report 11 "G/L - VAT Reconciliation"
             }
             dataitem("VAT Statement Line"; "VAT Statement Line")
             {
-                DataItemLink = "Statement Template Name" = FIELD("Statement Template Name"), "Statement Name" = FIELD(Name);
-                DataItemTableView = SORTING("Statement Template Name", "Statement Name", "Line No.") WHERE(Type = FILTER("Account Totaling" | "VAT Entry Totaling"));
+                DataItemLink = "Statement Template Name" = field("Statement Template Name"), "Statement Name" = field(Name);
+                DataItemTableView = sorting("Statement Template Name", "Statement Name", "Line No.") where(Type = filter("Account Totaling" | "VAT Entry Totaling"));
                 PrintOnlyIfDetail = true;
+
                 column(VAT_Statement_Name__Name; "VAT Statement Name".Name)
                 {
                 }
@@ -149,6 +151,7 @@ report 11 "G/L - VAT Reconciliation"
                 dataitem("G/L Account"; "G/L Account")
                 {
                     DataItemTableView = sorting("No.") where("No." = filter(<> ''));
+
                     column(VAT_Statement_Line___Amount_Type_; Format("VAT Statement Line"."Amount Type"))
                     {
                     }
@@ -243,8 +246,7 @@ report 11 "G/L - VAT Reconciliation"
                                     end;
                                 "VAT Statement Line"."Amount Type"::"Unrealized Amount", "VAT Statement Line"."Amount Type"::"Unrealized Base":
                                     begin
-                                        VATEntry.CalcSums(
-                                          "Unrealized Base", "Add.-Currency Unrealized Base", "Unrealized Amount", "Add.-Currency Unrealized Amt.");
+                                        VATEntry.CalcSums("Unrealized Base", "Add.-Currency Unrealized Base", "Unrealized Amount", "Add.-Currency Unrealized Amt.");
                                         Amount1 := ConditionalAdd(VATEntry."Unrealized Base", VATEntry."Add.-Currency Unrealized Base");
                                         VAT := ConditionalAdd(VATEntry."Unrealized Amount", VATEntry."Add.-Currency Unrealized Amt.");
                                     end;
@@ -270,27 +272,31 @@ report 11 "G/L - VAT Reconciliation"
                         if "VAT Statement Line".Type = "VAT Statement Line".Type::"Account Totaling" then begin
                             SetFilter("No.", "VAT Statement Line"."Account Totaling");
                             SetRange("Date Filter", StartDate, EndDate);
-                            Number := Count;
+                            Number := count();
                         end else begin
                             Number := 2;
-                            VATEntry.SetCurrentKey(
-                              "Posting Date", Type, Closed, "VAT Bus. Posting Group", "VAT Prod. Posting Group", Reversed, "G/L Acc. No.");
+                            VATEntry.SetCurrentKey("Posting Date", Type, Closed, "VAT Bus. Posting Group", "VAT Prod. Posting Group", Reversed, "G/L Acc. No.");
                             VATEntry.SetRange(Type, "VAT Statement Line"."Gen. Posting Type");
+
                             case Selection of
                                 Selection::Open:
                                     VATEntry.SetRange(Closed, false);
                                 Selection::Closed:
                                     VATEntry.SetRange(Closed, true);
                             end;
+
                             VATEntry.SetRange("VAT Bus. Posting Group", "VAT Statement Line"."VAT Bus. Posting Group");
                             VATEntry.SetRange("VAT Prod. Posting Group", "VAT Statement Line"."VAT Prod. Posting Group");
+
                             if (EndDateReq <> 0D) or (StartDate <> 0D) then
                                 if PeriodSelection = PeriodSelection::"Before and Within Period" then
                                     VATEntry.SetRange("VAT Reporting Date", 0D, EndDate)
                                 else
                                     VATEntry.SetRange("VAT Reporting Date", StartDate, EndDate);
+
                             VATEntry.SetRange(Reversed, false);
                         end;
+
                         VATEntryCopy.Copy(VATEntry);
                         VATEntryCopy.SetCurrentKey("Entry No.");
                         VATEntryCopy.SetGLAccountNoWithResponse(true, AdjustVATEntryConfirm, AdjustVATEntry);
@@ -305,6 +311,7 @@ report 11 "G/L - VAT Reconciliation"
                 begin
                     if (Type = Type::"Account Totaling") and ("Account Totaling" = '') then
                         CurrReport.Skip();
+
                     VATStmtLine2.Get("Statement Template Name", "Statement Name", "Line No.");
                     VATStmtLine2.SetRange("Row No.", "Row No.");
                     VATStmtLine2.SetRange("Gen. Posting Type", "Gen. Posting Type");
@@ -312,6 +319,7 @@ report 11 "G/L - VAT Reconciliation"
                     VATStmtLine2.SetRange("VAT Prod. Posting Group", "VAT Prod. Posting Group");
                     if VATStmtLine2.Find('<') then
                         CurrReport.Skip();
+
                     TotalAmount := 0;
                     TotalVAT := 0;
                     CountTotals := 0;
@@ -400,22 +408,27 @@ report 11 "G/L - VAT Reconciliation"
     begin
         AdjustVATEntry := false;
         AdjustVATEntryConfirm := true;
+
         if EndDateReq = 0D then
             EndDate := 99991231D
         else
             EndDate := EndDateReq;
+
         "VAT Statement Line".SetRange("Date Filter", StartDate, EndDate);
         VATStmtLineFilter := "VAT Statement Line".GetFilters();
+
         if PeriodSelection = PeriodSelection::"Before and Within Period" then
             Header := BeforeAndWithinPeriodLbl
         else
             Header := PeriodLbl + "VAT Statement Line".GetFilter("Date Filter");
+
         case Selection of
             Selection::Closed:
                 Header2 := OnlyClosedVATEntriesLbl;
             Selection::"Open and Closed":
                 Header2 := AllVATEntriesLbl;
         end;
+
         GLSetup.Get();
         if UseAmtsInAddCurr then begin
             GLSetup.TestField("Additional Reporting Currency");
@@ -451,7 +464,6 @@ report 11 "G/L - VAT Reconciliation"
         Identifier: Integer;
         AdjustVATEntry: Boolean;
         AdjustVATEntryConfirm: Boolean;
-
         NoGLAccNoOnVATEntriesErr: Label 'There is one or more VAT Entries with no G/L Account defined in the selected period. Please exclude these VAT entries or ask your partner to help you fix this data issue.';
         BeforeAndWithinPeriodLbl: Label 'VAT entries before and within the period';
         PeriodLbl: Label 'Period: ';
@@ -483,11 +495,7 @@ report 11 "G/L - VAT Reconciliation"
         if not UseAmtsInAddCurr then
             exit(Amount);
 
-        exit(
-          Round(
-            CurrencyExchRate.ExchangeAmtLCYToFCY(
-              WorkDate(), GLSetup."Additional Reporting Currency", Amount, CurrencyFactor),
-            Currency."Amount Rounding Precision"));
+        exit(Round(CurrencyExchRate.ExchangeAmtLCYToFCY(WorkDate(), GLSetup."Additional Reporting Currency", Amount, CurrencyFactor), Currency."Amount Rounding Precision"));
     end;
 
     local procedure CheckGLAccountNoFilled(var VATEntry2: Record "VAT Entry")
@@ -496,6 +504,7 @@ report 11 "G/L - VAT Reconciliation"
     begin
         VATEntryLocal.Copy(VATEntry2);
         VATEntryLocal.SetRange("G/L Acc. No.", '');
+
         if not VATEntryLocal.IsEmpty() then
             Error(NoGLAccNoOnVATEntriesErr);
     end;

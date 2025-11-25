@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5169 "Profile Questn. Line Subform"
 {
     Caption = 'Lines';
@@ -23,15 +25,15 @@ page 5169 "Profile Questn. Line Subform"
 
                     trigger OnValidate()
                     begin
-                        TestField(Type, Type::Answer);
+                        Rec.TestField(Type, Rec.Type::Answer);
 
                         if Set then begin
                             TempProfileQuestionnaireLine.Init();
-                            TempProfileQuestionnaireLine.Validate("Profile Questionnaire Code", "Profile Questionnaire Code");
-                            TempProfileQuestionnaireLine.Validate("Line No.", "Line No.");
+                            TempProfileQuestionnaireLine.Validate("Profile Questionnaire Code", Rec."Profile Questionnaire Code");
+                            TempProfileQuestionnaireLine.Validate("Line No.", Rec."Line No.");
                             TempProfileQuestionnaireLine.Insert();
                         end else begin
-                            TempProfileQuestionnaireLine.Get("Profile Questionnaire Code", "Line No.");
+                            TempProfileQuestionnaireLine.Get(Rec."Profile Questionnaire Code", Rec."Line No.");
                             TempProfileQuestionnaireLine.Delete();
                         end;
                     end;
@@ -54,14 +56,13 @@ page 5169 "Profile Questn. Line Subform"
 
     trigger OnAfterGetRecord()
     begin
-        Set := TempProfileQuestionnaireLine.Get("Profile Questionnaire Code", "Line No.");
-        StyleIsStrong := Type = Type::Question;
+        Set := TempProfileQuestionnaireLine.Get(Rec."Profile Questionnaire Code", Rec."Line No.");
+        StyleIsStrong := Rec.Type = Rec.Type::Question;
     end;
 
     var
         TempProfileQuestionnaireLine: Record "Profile Questionnaire Line" temporary;
         Set: Boolean;
-        [InDataSet]
         StyleIsStrong: Boolean;
 
     procedure SetProfileQnLine(var FromProfileQuestionnaireLine: Record "Profile Questionnaire Line")

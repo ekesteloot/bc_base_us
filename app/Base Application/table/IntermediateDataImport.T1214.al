@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 1214 "Intermediate Data Import"
 {
     Caption = 'Intermediate Data Import';
@@ -19,7 +23,7 @@ table 1214 "Intermediate Data Import"
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(4; "Record No."; Integer)
         {
@@ -28,7 +32,7 @@ table 1214 "Intermediate Data Import"
         field(5; "Field ID"; Integer)
         {
             Caption = 'Field ID';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table ID"));
+            TableRelation = Field."No." where(TableNo = field("Table ID"));
         }
         field(6; Value; Text[250])
         {

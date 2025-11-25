@@ -1,3 +1,17 @@
+namespace Microsoft.InventoryMgt.BOM;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 table 5870 "BOM Buffer"
 {
     Caption = 'BOM Buffer';
@@ -22,13 +36,13 @@ table 5870 "BOM Buffer"
         {
             Caption = 'No.';
             DataClassification = SystemMetadata;
-            TableRelation = IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST("Machine Center")) "Machine Center"
-            ELSE
-            IF (Type = CONST("Work Center")) "Work Center"
-            ELSE
-            IF (Type = CONST(Resource)) Resource;
+            TableRelation = if (Type = const(Item)) Item
+            else
+            if (Type = const("Machine Center")) "Machine Center"
+            else
+            if (Type = const("Work Center")) "Work Center"
+            else
+            if (Type = const(Resource)) Resource;
         }
         field(5; Description; Text[100])
         {
@@ -39,15 +53,15 @@ table 5870 "BOM Buffer"
         {
             Caption = 'Unit of Measure Code';
             DataClassification = SystemMetadata;
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
-            IF (Type = CONST(Resource)) "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
+            if (Type = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("No."));
         }
         field(7; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             DataClassification = SystemMetadata;
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
         }
         field(8; "Location Code"; Code[10])
         {
@@ -333,9 +347,9 @@ table 5870 "BOM Buffer"
         {
             Caption = 'BOM Unit of Measure Code';
             DataClassification = SystemMetadata;
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("No."))
-            ELSE
-            IF (Type = CONST(Resource)) "Resource Unit of Measure".Code WHERE("Resource No." = FIELD("No."));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
+            else
+            if (Type = const(Resource)) "Resource Unit of Measure".Code where("Resource No." = field("No."));
         }
         field(83; "Qty. per BOM Line"; Decimal)
         {

@@ -1,3 +1,17 @@
+﻿namespace Microsoft.FinancialMgt.Analysis;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Comment;
+
 table 376 "G/L Account (Analysis View)"
 {
     Caption = 'G/L Account (Analysis View)';
@@ -9,9 +23,9 @@ table 376 "G/L Account (Analysis View)"
         {
             Caption = 'No.';
             NotBlank = true;
-            TableRelation = IF ("Account Source" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Account Source" = CONST("Cash Flow Account")) "Cash Flow Account";
+            TableRelation = if ("Account Source" = const("G/L Account")) "G/L Account"
+            else
+            if ("Account Source" = const("Cash Flow Account")) "Cash Flow Account";
         }
         field(2; Name; Text[100])
         {
@@ -33,13 +47,13 @@ table 376 "G/L Account (Analysis View)"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(7; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(9; "Income/Balance"; Option)
         {
@@ -59,8 +73,8 @@ table 376 "G/L Account (Analysis View)"
         }
         field(12; Comment; Boolean)
         {
-            CalcFormula = Exist ("Comment Line" WHERE("Table Name" = CONST("G/L Account"),
-                                                      "No." = FIELD("No.")));
+            CalcFormula = exist("Comment Line" where("Table Name" = const("G/L Account"),
+                                                      "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -113,29 +127,29 @@ table 376 "G/L Account (Analysis View)"
             CaptionClass = '1,3,1';
             Caption = 'Global Dimension 1 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(30; "Global Dimension 2 Filter"; Code[20])
         {
             CaptionClass = '1,3,2';
             Caption = 'Global Dimension 2 Filter';
             FieldClass = FlowFilter;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(31; "Balance at Date"; Decimal)
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Entry".Amount WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                  "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                  "Account No." = FIELD("No."),
-                                                                  "Account Source" = FIELD("Account Source"),
-                                                                  "Account No." = FIELD(FILTER(Totaling)),
-                                                                  "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                  "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                  "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                  "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                  "Posting Date" = FIELD(UPPERLIMIT("Date Filter")),
+            CalcFormula = sum("Analysis View Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
+                                                                  "Business Unit Code" = field("Business Unit Filter"),
+                                                                  "Account No." = field("No."),
+                                                                  "Account Source" = field("Account Source"),
+                                                                  "Account No." = field(FILTER(Totaling)),
+                                                                  "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                  "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                  "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                  "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                  "Posting Date" = field(UPPERLIMIT("Date Filter")),
                                                                   "Cash Flow Forecast No." = field("Cash Flow Forecast Filter")));
             Caption = 'Balance at Date';
             Editable = false;
@@ -145,16 +159,16 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Entry".Amount WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                  "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                  "Account No." = FIELD("No."),
-                                                                  "Account Source" = FIELD("Account Source"),
-                                                                  "Account No." = FIELD(FILTER(Totaling)),
-                                                                  "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                  "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                  "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                  "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                  "Posting Date" = FIELD("Date Filter"),
+            CalcFormula = sum("Analysis View Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
+                                                                  "Business Unit Code" = field("Business Unit Filter"),
+                                                                  "Account No." = field("No."),
+                                                                  "Account Source" = field("Account Source"),
+                                                                  "Account No." = field(FILTER(Totaling)),
+                                                                  "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                  "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                  "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                  "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                  "Posting Date" = field("Date Filter"),
                                                                    "Cash Flow Forecast No." = field("Cash Flow Forecast Filter")));
             Caption = 'Net Change';
             Editable = false;
@@ -164,27 +178,25 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Budget Entry".Amount WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                         "Budget Name" = FIELD("Budget Filter"),
-                                                                         "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                         "G/L Account No." = FIELD("No."),
-                                                                         "G/L Account No." = FIELD(FILTER(Totaling)),
-                                                                         "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                         "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                         "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                         "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                         "Posting Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Analysis View Budget Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
+                                                                         "Budget Name" = field("Budget Filter"),
+                                                                         "Business Unit Code" = field("Business Unit Filter"),
+                                                                         "G/L Account No." = field("No."),
+                                                                         "G/L Account No." = field(FILTER(Totaling)),
+                                                                         "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                         "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                         "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                         "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                         "Posting Date" = field("Date Filter")));
             Caption = 'Budgeted Amount';
             FieldClass = FlowField;
         }
         field(34; Totaling; Text[250])
         {
             Caption = 'Totaling';
-            TableRelation = IF ("Account Source" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Account Source" = CONST("Cash Flow Account")) "Cash Flow Account";
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Account Source" = const("G/L Account")) "G/L Account"
+            else
+            if ("Account Source" = const("Cash Flow Account")) "Cash Flow Account";
             ValidateTableRelation = false;
         }
         field(35; "Budget Filter"; Code[10])
@@ -197,16 +209,16 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Entry".Amount WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                  "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                  "Account No." = FIELD("No."),
-                                                                  "Account Source" = FIELD("Account Source"),
-                                                                  "Account No." = FIELD(FILTER(Totaling)),
-                                                                  "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                  "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                  "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                  "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                  "Posting Date" = FIELD("Date Filter"),
+            CalcFormula = sum("Analysis View Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
+                                                                  "Business Unit Code" = field("Business Unit Filter"),
+                                                                  "Account No." = field("No."),
+                                                                  "Account Source" = field("Account Source"),
+                                                                  "Account No." = field(FILTER(Totaling)),
+                                                                  "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                  "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                  "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                  "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                  "Posting Date" = field("Date Filter"),
                                                                    "Cash Flow Forecast No." = field("Cash Flow Forecast Filter")));
             Caption = 'Balance';
             Editable = false;
@@ -216,16 +228,16 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Budget Entry".Amount WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                         "Budget Name" = FIELD("Budget Filter"),
-                                                                         "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                         "G/L Account No." = FIELD("No."),
-                                                                         "G/L Account No." = FIELD(FILTER(Totaling)),
-                                                                         "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                         "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                         "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                         "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                         "Posting Date" = FIELD(UPPERLIMIT("Date Filter"))));
+            CalcFormula = sum("Analysis View Budget Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
+                                                                         "Budget Name" = field("Budget Filter"),
+                                                                         "Business Unit Code" = field("Business Unit Filter"),
+                                                                         "G/L Account No." = field("No."),
+                                                                         "G/L Account No." = field(FILTER(Totaling)),
+                                                                         "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                         "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                         "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                         "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                         "Posting Date" = field(UPPERLIMIT("Date Filter"))));
             Caption = 'Budgeted at Date';
             FieldClass = FlowField;
         }
@@ -265,16 +277,16 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Entry"."Debit Amount" WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                          "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                          "Account No." = FIELD("No."),
-                                                                          "Account Source" = FIELD("Account Source"),
-                                                                          "Account No." = FIELD(Totaling),
-                                                                          "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                          "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                          "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                          "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                          "Posting Date" = FIELD("Date Filter"),
+            CalcFormula = sum("Analysis View Entry"."Debit Amount" where("Analysis View Code" = field("Analysis View Filter"),
+                                                                          "Business Unit Code" = field("Business Unit Filter"),
+                                                                          "Account No." = field("No."),
+                                                                          "Account Source" = field("Account Source"),
+                                                                          "Account No." = field(Totaling),
+                                                                          "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                          "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                          "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                          "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                          "Posting Date" = field("Date Filter"),
                                                                            "Cash Flow Forecast No." = field("Cash Flow Forecast Filter")));
             Caption = 'Debit Amount';
             Editable = false;
@@ -284,16 +296,16 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Entry"."Credit Amount" WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                           "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                           "Account No." = FIELD("No."),
-                                                                           "Account Source" = FIELD("Account Source"),
-                                                                           "Account No." = FIELD(Totaling),
-                                                                           "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                           "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                           "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                           "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                           "Posting Date" = FIELD("Date Filter"),
+            CalcFormula = sum("Analysis View Entry"."Credit Amount" where("Analysis View Code" = field("Analysis View Filter"),
+                                                                           "Business Unit Code" = field("Business Unit Filter"),
+                                                                           "Account No." = field("No."),
+                                                                           "Account Source" = field("Account Source"),
+                                                                           "Account No." = field(Totaling),
+                                                                           "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                           "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                           "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                           "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                           "Posting Date" = field("Date Filter"),
                                                                            "Cash Flow Forecast No." = field("Cash Flow Forecast Filter")));
             Caption = 'Credit Amount';
             Editable = false;
@@ -308,17 +320,17 @@ table 376 "G/L Account (Analysis View)"
             AutoFormatType = 1;
             BlankNumbers = BlankNegAndZero;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Budget Entry".Amount WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                         "Budget Name" = FIELD("Budget Filter"),
-                                                                         "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                         "G/L Account No." = FIELD("No."),
-                                                                         "G/L Account No." = FIELD(FILTER(Totaling)),
-                                                                         "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                         "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                         "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                         "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                         "Posting Date" = FIELD("Date Filter"),
-                                                                         Amount = FILTER(> 0)));
+            CalcFormula = sum("Analysis View Budget Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
+                                                                         "Budget Name" = field("Budget Filter"),
+                                                                         "Business Unit Code" = field("Business Unit Filter"),
+                                                                         "G/L Account No." = field("No."),
+                                                                         "G/L Account No." = field(FILTER(Totaling)),
+                                                                         "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                         "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                         "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                         "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                         "Posting Date" = field("Date Filter"),
+                                                                         Amount = filter(> 0)));
             Caption = 'Budgeted Debit Amount';
             FieldClass = FlowField;
         }
@@ -327,17 +339,17 @@ table 376 "G/L Account (Analysis View)"
             AutoFormatType = 1;
             BlankNumbers = BlankZeroAndPos;
             BlankZero = true;
-            CalcFormula = - Sum ("Analysis View Budget Entry".Amount WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                          "Budget Name" = FIELD("Budget Filter"),
-                                                                          "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                          "G/L Account No." = FIELD("No."),
-                                                                          "G/L Account No." = FIELD(FILTER(Totaling)),
-                                                                          "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                          "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                          "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                          "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                          "Posting Date" = FIELD("Date Filter"),
-                                                                          Amount = FILTER(< 0)));
+            CalcFormula = - sum("Analysis View Budget Entry".Amount where("Analysis View Code" = field("Analysis View Filter"),
+                                                                          "Budget Name" = field("Budget Filter"),
+                                                                          "Business Unit Code" = field("Business Unit Filter"),
+                                                                          "G/L Account No." = field("No."),
+                                                                          "G/L Account No." = field(FILTER(Totaling)),
+                                                                          "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                          "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                          "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                          "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                          "Posting Date" = field("Date Filter"),
+                                                                          Amount = filter(< 0)));
             Caption = 'Budgeted Credit Amount';
             FieldClass = FlowField;
         }
@@ -369,16 +381,16 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Entry"."Add.-Curr. Amount" WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                               "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                               "Account No." = FIELD("No."),
-                                                                               "Account Source" = FIELD("Account Source"),
-                                                                               "Account No." = FIELD(FILTER(Totaling)),
-                                                                               "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                               "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                               "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                               "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                               "Posting Date" = FIELD("Date Filter"),
+            CalcFormula = sum("Analysis View Entry"."Add.-Curr. Amount" where("Analysis View Code" = field("Analysis View Filter"),
+                                                                               "Business Unit Code" = field("Business Unit Filter"),
+                                                                               "Account No." = field("No."),
+                                                                               "Account Source" = field("Account Source"),
+                                                                               "Account No." = field(FILTER(Totaling)),
+                                                                               "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                               "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                               "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                               "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                               "Posting Date" = field("Date Filter"),
                                                                                "Cash Flow Forecast No." = field("Cash Flow Forecast Filter")));
             Caption = 'Additional-Currency Net Change';
             Editable = false;
@@ -388,16 +400,16 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Entry"."Add.-Curr. Amount" WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                               "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                               "Account No." = FIELD("No."),
-                                                                               "Account Source" = FIELD("Account Source"),
-                                                                               "Account No." = FIELD(FILTER(Totaling)),
-                                                                               "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                               "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                               "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                               "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                               "Posting Date" = FIELD(UPPERLIMIT("Date Filter")),
+            CalcFormula = sum("Analysis View Entry"."Add.-Curr. Amount" where("Analysis View Code" = field("Analysis View Filter"),
+                                                                               "Business Unit Code" = field("Business Unit Filter"),
+                                                                               "Account No." = field("No."),
+                                                                               "Account Source" = field("Account Source"),
+                                                                               "Account No." = field(FILTER(Totaling)),
+                                                                               "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                               "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                               "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                               "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                               "Posting Date" = field(UPPERLIMIT("Date Filter")),
                                                                                "Cash Flow Forecast No." = field("Cash Flow Forecast Filter")));
             Caption = 'Add.-Currency Balance at Date';
             Editable = false;
@@ -407,16 +419,16 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Entry"."Add.-Curr. Amount" WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                               "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                               "Account No." = FIELD("No."),
-                                                                               "Account Source" = FIELD("Account Source"),
-                                                                               "Account No." = FIELD(FILTER(Totaling)),
-                                                                               "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                               "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                               "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                               "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                               "Posting Date" = FIELD("Date Filter"),
+            CalcFormula = sum("Analysis View Entry"."Add.-Curr. Amount" where("Analysis View Code" = field("Analysis View Filter"),
+                                                                               "Business Unit Code" = field("Business Unit Filter"),
+                                                                               "Account No." = field("No."),
+                                                                               "Account Source" = field("Account Source"),
+                                                                               "Account No." = field(FILTER(Totaling)),
+                                                                               "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                               "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                               "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                               "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                               "Posting Date" = field("Date Filter"),
                                                                                "Cash Flow Forecast No." = field("Cash Flow Forecast Filter")));
             Caption = 'Additional-Currency Balance';
             Editable = false;
@@ -432,16 +444,16 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Entry"."Add.-Curr. Debit Amount" WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                                     "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                                     "Account No." = FIELD("No."),
-                                                                                     "Account Source" = FIELD("Account Source"),
-                                                                                     "Account No." = FIELD(FILTER(Totaling)),
-                                                                                     "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                                     "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                                     "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                                     "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                                     "Posting Date" = FIELD("Date Filter"),
+            CalcFormula = sum("Analysis View Entry"."Add.-Curr. Debit Amount" where("Analysis View Code" = field("Analysis View Filter"),
+                                                                                     "Business Unit Code" = field("Business Unit Filter"),
+                                                                                     "Account No." = field("No."),
+                                                                                     "Account Source" = field("Account Source"),
+                                                                                     "Account No." = field(FILTER(Totaling)),
+                                                                                     "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                                     "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                                     "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                                     "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                                     "Posting Date" = field("Date Filter"),
                                                                                      "Cash Flow Forecast No." = field("Cash Flow Forecast Filter")));
             Caption = 'Add.-Currency Debit Amount';
             Editable = false;
@@ -451,16 +463,16 @@ table 376 "G/L Account (Analysis View)"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum ("Analysis View Entry"."Add.-Curr. Credit Amount" WHERE("Analysis View Code" = FIELD("Analysis View Filter"),
-                                                                                      "Business Unit Code" = FIELD("Business Unit Filter"),
-                                                                                      "Account No." = FIELD("No."),
-                                                                                      "Account Source" = FIELD("Account Source"),
-                                                                                      "Account No." = FIELD(FILTER(Totaling)),
-                                                                                      "Dimension 1 Value Code" = FIELD("Dimension 1 Filter"),
-                                                                                      "Dimension 2 Value Code" = FIELD("Dimension 2 Filter"),
-                                                                                      "Dimension 3 Value Code" = FIELD("Dimension 3 Filter"),
-                                                                                      "Dimension 4 Value Code" = FIELD("Dimension 4 Filter"),
-                                                                                      "Posting Date" = FIELD("Date Filter"),
+            CalcFormula = sum("Analysis View Entry"."Add.-Curr. Credit Amount" where("Analysis View Code" = field("Analysis View Filter"),
+                                                                                      "Business Unit Code" = field("Business Unit Filter"),
+                                                                                      "Account No." = field("No."),
+                                                                                      "Account Source" = field("Account Source"),
+                                                                                      "Account No." = field(FILTER(Totaling)),
+                                                                                      "Dimension 1 Value Code" = field("Dimension 1 Filter"),
+                                                                                      "Dimension 2 Value Code" = field("Dimension 2 Filter"),
+                                                                                      "Dimension 3 Value Code" = field("Dimension 3 Filter"),
+                                                                                      "Dimension 4 Value Code" = field("Dimension 4 Filter"),
+                                                                                      "Posting Date" = field("Date Filter"),
                                                                                       "Cash Flow Forecast No." = field("Cash Flow Forecast Filter")));
             Caption = 'Add.-Currency Credit Amount';
             Editable = false;

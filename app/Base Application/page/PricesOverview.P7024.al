@@ -1,3 +1,21 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Foundation.Enums;
+using Microsoft.Pricing.Asset;
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.Source;
+using Microsoft.Pricing.Worksheet;
+using Microsoft.Sales.Customer;
+using System.Text;
+
 page 7024 "Prices Overview"
 {
     Caption = 'Prices Overview';
@@ -580,20 +598,14 @@ page 7024 "Prices Overview"
         PriceUXManagement: Codeunit "Price UX Management";
         FilterRecordRef: RecordRef;
         AmountTypeFilter: Enum "Price Amount Type";
-        [InDataSet]
         ParentSourceNoEditable: Boolean;
-        [InDataSet]
         SourceTypeEditable: Boolean;
-        [InDataSet]
         SourceNoEditable: Boolean;
         ParentSourceNoFilter: Text;
-        [InDataSet]
         ParentSourceNoFilterEditable: Boolean;
         SourceNoFilter: Text;
-        [InDataSet]
         SourceNoFilterEditable: Boolean;
         AssetNoFilter: Text;
-        [InDataSet]
         AssetNoFilterEditable: Boolean;
         CurrencyCodeFilter: Text;
         StartingDateFilter: Text;
@@ -602,77 +614,41 @@ page 7024 "Prices Overview"
         Description3Lbl: Label '%1 %2 %3', Locked = true;
         Description5Lbl: Label '%1 %2 %3 %4 %5', Locked = true;
         WithinFilterLbl: Label 'No %1 within the filter %2.', Comment = '%1 - the unique entity id, %2 - the filter string ';
-        [InDataSet]
         AssignToNoEditable: Boolean;
-        [InDataSet]
         AssignToParentNoEditable: Boolean;
-        [InDataSet]
         PriceTypeVisible: Boolean;
-        [InDataSet]
         AmountTypeIsEditable: Boolean;
-        [InDataSet]
         AmountTypeIsVisible: Boolean;
-        [InDataSet]
         PriceVisible: Boolean;
-        [InDataSet]
         DiscountVisible: Boolean;
-        [InDataSet]
         DiscountOnlyVisible: Boolean;
-        [InDataSet]
         SalesVisible: Boolean;
-        [InDataSet]
         PurchVisible: Boolean;
-        [InDataSet]
         ItemAssetVisible: Boolean;
-        [InDataSet]
         ResourceAssetVisible: Boolean;
-        [InDataSet]
         ItemAsset: Boolean;
-        [InDataSet]
         ResourceAsset: Boolean;
-        [InDataSet]
         PriceLineEditable: Boolean;
-        [InDataSet]
         AssetTypeEditable: Boolean;
-        [InDataSet]
         DiscountEditable: Boolean;
-        [InDataSet]
         PriceEditable: Boolean;
-        [InDataSet]
         LineToVerify: Boolean;
-        [InDataSet]
         SalesPriceLine: Boolean;
-        [InDataSet]
         SalesPriceVisible: Boolean;
-        [InDataSet]
         PurchPriceLine: Boolean;
-        [InDataSet]
         PurchPriceVisible: Boolean;
-        [InDataSet]
         AllowDiscVisible: Boolean;
-        [InDataSet]
         AllowUpdatingDefaults: Boolean;
-        [InDataSet]
         DateEditable: Boolean;
-        [InDataSet]
         VariantCodeEditable: Boolean;
-        [InDataSet]
         UnitPriceEditable: Boolean;
-        [InDataSet]
         LineDiscPctEditable: Boolean;
-        [InDataSet]
         LineExists: Boolean;
-        [InDataSet]
         UseCustomLookup: Boolean;
-        [InDataSet]
         VariantCodeVisible: Boolean;
-        [InDataSet]
         VariantCodeLookupVisible: Boolean;
-        [InDataSet]
         UoMVisible: Boolean;
-        [InDataSet]
         UoMLookupVisible: Boolean;
-        [InDataSet]
         WorkTypeCodeEditable: Boolean;
 
     procedure SetRecFilters()
@@ -715,17 +691,17 @@ page 7024 "Prices Overview"
     begin
         case PriceSource."Source Type" of
             PriceSource."Source Type"::Customer:
-                CheckFilters(DATABASE::Customer, SourceNoFilter);
+                CheckFilters(Enum::TableID::Customer, SourceNoFilter);
             PriceSource."Source Type"::"Customer Price Group":
-                CheckFilters(DATABASE::"Customer Price Group", SourceNoFilter);
+                CheckFilters(Enum::TableID::"Customer Price Group", SourceNoFilter);
             PriceSource."Source Type"::Campaign:
-                CheckFilters(DATABASE::Campaign, SourceNoFilter);
+                CheckFilters(Enum::TableID::Campaign, SourceNoFilter);
             PriceSource."Source Type"::Contact:
-                CheckFilters(DATABASE::Contact, SourceNoFilter);
+                CheckFilters(Enum::TableID::Contact, SourceNoFilter);
         end;
 
         CheckFilters(PriceAsset."Table Id", AssetNoFilter);
-        CheckFilters(DATABASE::Currency, CurrencyCodeFilter);
+        CheckFilters(Enum::TableID::Currency, CurrencyCodeFilter);
     end;
 
     local procedure GetFilterDescription(): Text
@@ -864,7 +840,7 @@ page 7024 "Prices Overview"
         else
             Rec.SetRange("Source No.");
 
-        if PriceAsset."Asset Type" <> "Price Asset Type"::" " then
+        if PriceAsset."Asset Type" <> PriceAsset."Asset Type"::" " then
             Rec.SetRange("Asset Type", PriceAsset."Asset Type")
         else
             Rec.SetRange("Asset Type");
@@ -911,8 +887,8 @@ page 7024 "Prices Overview"
         PurchVisible := PriceSource."Price Type" in [PriceSource."Price Type"::Any, PriceSource."Price Type"::Purchase];
 
         PriceListLine."Asset Type" := PriceAsset."Asset Type";
-        ItemAssetVisible := (PriceAsset."Asset Type" = "Price Asset Type"::" ") or PriceListLine.IsAssetItem();
-        ResourceAssetVisible := (PriceAsset."Asset Type" = "Price Asset Type"::" ") or PriceListLine.IsAssetResource();
+        ItemAssetVisible := (PriceAsset."Asset Type" = PriceAsset."Asset Type"::" ") or PriceListLine.IsAssetItem();
+        ResourceAssetVisible := (PriceAsset."Asset Type" = PriceAsset."Asset Type"::" ") or PriceListLine.IsAssetResource();
         SalesPriceVisible := PriceVisible and SalesVisible and not DiscountOnlyVisible;
         PurchPriceVisible := PriceVisible and PurchVisible and not DiscountOnlyVisible;
         AllowDiscVisible := PriceVisible and not DiscountOnlyVisible;
@@ -933,7 +909,6 @@ page 7024 "Prices Overview"
         AssetNoFilter := Rec.GetFilter("Asset No.");
         CurrencyCodeFilter := Rec.GetFilter("Currency Code");
     end;
-
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetFilters(var PriceListLine: record "Price List Line")

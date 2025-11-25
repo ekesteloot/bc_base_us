@@ -12,7 +12,7 @@
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for this entry according to the CFDI export definition.';
@@ -22,7 +22,7 @@
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a description for this entry according to the CFDI export definition.';
                 }
-                field("Foreign Trade"; "Foreign Trade")
+                field("Foreign Trade"; Rec."Foreign Trade")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the entry indicates foreing trade according to the SAT export definition.';

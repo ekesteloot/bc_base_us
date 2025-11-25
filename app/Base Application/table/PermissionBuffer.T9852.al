@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 #pragma warning disable AS0109
 table 9852 "Permission Buffer"
 #pragma warning restore AS0109

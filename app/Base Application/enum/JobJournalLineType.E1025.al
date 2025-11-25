@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
 enum 1025 "Job Journal Line Type"
 {
     Extensible = true;

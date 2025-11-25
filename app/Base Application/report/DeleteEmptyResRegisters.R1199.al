@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Ledger;
+
+using System.Utilities;
+
 report 1199 "Delete Empty Res. Registers"
 {
     Caption = 'Delete Empty Res. Registers';
@@ -8,7 +12,7 @@ report 1199 "Delete Empty Res. Registers"
     {
         dataitem("Resource Register"; "Resource Register")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "Creation Date";
 
             trigger OnAfterGetRecord()

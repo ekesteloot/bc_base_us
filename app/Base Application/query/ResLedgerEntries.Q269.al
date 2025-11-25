@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Ledger;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+
 query 269 "Res. Ledger Entries"
 {
     Caption = 'Res. Ledger Entries';

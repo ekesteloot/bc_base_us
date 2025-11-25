@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 table 268 "Item Amount"
 {
     Caption = 'Item Amount';

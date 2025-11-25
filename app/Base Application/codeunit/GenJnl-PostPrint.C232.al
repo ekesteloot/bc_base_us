@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Utilities;
+
 codeunit 232 "Gen. Jnl.-Post+Print"
 {
     TableNo = "Gen. Journal Line";
@@ -6,7 +12,7 @@ codeunit 232 "Gen. Jnl.-Post+Print"
     begin
         GenJnlLine.Copy(Rec);
         Code();
-        Copy(GenJnlLine);
+        Rec.Copy(GenJnlLine);
     end;
 
     var
@@ -115,14 +121,6 @@ codeunit 232 "Gen. Jnl.-Post+Print"
     local procedure OnAfterConfirmPostJournalBatch(var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Event is not raised anywhere', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeGLRegPostingReportPrint(var ReportID: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; var GLRegister: Record "G/L Register"; var Handled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostJournalBatch(var GenJournalLine: Record "Gen. Journal Line"; var HideDialog: Boolean)

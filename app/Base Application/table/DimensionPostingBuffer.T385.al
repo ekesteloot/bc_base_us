@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 table 385 "Dimension Posting Buffer"
 {
     Caption = 'Dimension Posting Buffer';

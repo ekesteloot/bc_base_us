@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.InventoryMgt.Comment;
+
 page 6783 "Posted Direct Transfers"
 {
     AdditionalSearchTerms = 'direct transfer';
@@ -75,7 +79,7 @@ page 6783 "Posted Direct Transfers"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Transfer Shipment Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -84,8 +88,8 @@ page 6783 "Posted Direct Transfers"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Inventory Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Transfer Shipment"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const("Posted Transfer Shipment"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)

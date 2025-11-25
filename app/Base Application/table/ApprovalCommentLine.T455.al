@@ -32,8 +32,6 @@ table 455 "Approval Comment Line"
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(6; "Date and Time"; DateTime)
         {

@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 table 5213 "Misc. Article"
 {
     Caption = 'Misc. Article';

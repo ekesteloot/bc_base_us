@@ -1,3 +1,7 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+
 codeunit 5200 "Employee/Resource Update"
 {
     Permissions = TableData Resource = rimd;

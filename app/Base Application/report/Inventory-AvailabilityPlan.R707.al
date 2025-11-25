@@ -1,7 +1,15 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Vendor;
+
 report 707 "Inventory - Availability Plan"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InventoryAvailabilityPlan.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InventoryAvailabilityPlan.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory - Availability Plan';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +19,7 @@ report 707 "Inventory - Availability Plan"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE(Type = CONST(Inventory));
+            DataItemTableView = where(Type = const(Inventory));
             RequestFilterFields = "No.", "Location Filter", "Variant Filter", "Search Description", "Assembly BOM", "Inventory Posting Group", "Vendor No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -293,8 +301,8 @@ report 707 "Inventory - Availability Plan"
             }
             dataitem("Stockkeeping Unit"; "Stockkeeping Unit")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter");
-                DataItemTableView = SORTING("Item No.", "Location Code", "Variant Code");
+                DataItemLink = "Item No." = field("No."), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter");
+                DataItemTableView = sorting("Item No.", "Location Code", "Variant Code");
                 column(Description1_Item; Item.Description)
                 {
                 }
@@ -442,7 +450,7 @@ report 707 "Inventory - Availability Plan"
                     {
                         ApplicationArea = Warehouse;
                         Caption = 'Use Stockkeeping Unit';
-                        ToolTip = 'Specifies if you want to only include items that are set up as SKUs. This adds SKU-related fields, such as the Location Code, Variant Code, and Qty. in Transit fields, to the report.';
+                        ToolTip = 'Specifies if you want the report to list the availability of items by stockkeeping unit.';
                     }
                 }
             }

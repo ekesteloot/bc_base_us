@@ -24,7 +24,7 @@ page 6311 "PBI Job Profitability"
                     Caption = 'Measure Name';
                     ToolTip = 'Specifies the name.';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = All;
                     Caption = 'Value';

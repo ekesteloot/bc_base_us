@@ -10,7 +10,7 @@ report 10007 "Consolidated Trial Balance"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -83,7 +83,7 @@ report 10007 "Consolidated Trial Balance"
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
 
                 trigger OnPreDataItem()
                 begin
@@ -92,7 +92,7 @@ report 10007 "Consolidated Trial Balance"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(G_L_Account___No__; "G/L Account"."No.")
                 {
                 }
@@ -105,7 +105,7 @@ report 10007 "Consolidated Trial Balance"
             }
             dataitem("Business Unit"; "Business Unit")
             {
-                DataItemTableView = SORTING(Code) WHERE(Consolidate = CONST(true));
+                DataItemTableView = sorting(Code) where(Consolidate = const(true));
                 column(PADSTR_____G_L_Account__Indentation___2___2__Code; PadStr('', "G/L Account".Indentation * 2 + 2) + Code)
                 {
                 }
@@ -162,7 +162,7 @@ report 10007 "Consolidated Trial Balance"
             }
             dataitem(ConsolidCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(PADSTR_____G_L_Account__Indentation___2___G_L_Account__Name_Control26; PadStr('', "G/L Account".Indentation * 2) + "G/L Account".Name)
                 {
                 }

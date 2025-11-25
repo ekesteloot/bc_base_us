@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
+using Microsoft.Intercompany.GLAccount;
+using System.Utilities;
+
 codeunit 3 "G/L Account-Indent"
 {
 

@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.InventoryMgt.Setup;
+using System.Utilities;
+
 report 93 "Create Fiscal Year"
 {
     Caption = 'Create Fiscal Year';

@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.ProjectMgt.Resources.Resource;
+
 table 1034 "Job Planning Line - Calendar"
 {
     Caption = 'Job Planning Line - Calendar';

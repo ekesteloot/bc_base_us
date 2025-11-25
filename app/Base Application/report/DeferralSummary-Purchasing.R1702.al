@@ -1,3 +1,9 @@
+﻿namespace Microsoft.FinancialMgt.Deferral;
+
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+
 report 1702 "Deferral Summary - Purchasing"
 {
     DefaultLayout = RDLC;
@@ -10,7 +16,7 @@ report 1702 "Deferral Summary - Purchasing"
     {
         dataitem("Posted Deferral Header"; "Posted Deferral Header")
         {
-            DataItemTableView = SORTING("Deferral Doc. Type", CustVendorNo, "Posting Date", "Gen. Jnl. Document No.", "Account No.", "Document Type", "Document No.", "Line No.") ORDER(Ascending) WHERE("Deferral Doc. Type" = CONST(Purchase), CustVendorNo = FILTER(<> ''));
+            DataItemTableView = sorting("Deferral Doc. Type", CustVendorNo, "Posting Date", "Gen. Jnl. Document No.", "Account No.", "Document Type", "Document No.", "Line No.") ORDER(Ascending) where("Deferral Doc. Type" = const(Purchase), CustVendorNo = filter(<> ''));
             RequestFilterFields = CustVendorNo, "Document No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

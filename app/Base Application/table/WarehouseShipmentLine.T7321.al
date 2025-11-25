@@ -1,4 +1,25 @@
-﻿table 7321 "Warehouse Shipment Line"
+﻿namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Worksheet;
+
+table 7321 "Warehouse Shipment Line"
 {
     Caption = 'Warehouse Shipment Line';
     DrillDownPageID = "Whse. Shipment Lines";
@@ -56,10 +77,10 @@
         field(12; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                               "Zone Code" = FIELD("Zone Code"));
+            TableRelation = if ("Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                               "Zone Code" = field("Zone Code"));
 
             trigger OnValidate()
             var
@@ -70,10 +91,8 @@
                 if xRec."Bin Code" <> "Bin Code" then
                     if "Bin Code" <> '' then begin
                         GetLocation("Location Code");
-                        WhseIntegrationMgt.CheckBinTypeCode(DATABASE::"Warehouse Shipment Line",
-                          FieldCaption("Bin Code"),
-                          "Location Code",
-                          "Bin Code", 0);
+                        WhseIntegrationMgt.CheckBinTypeCode(
+                            Enum::TableID::"Warehouse Shipment Line".AsInteger(), FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
                         Bin.Get("Location Code", "Bin Code");
                         "Zone Code" := Bin."Zone Code";
                         CheckBin(0, 0);
@@ -83,7 +102,7 @@
         field(13; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -290,15 +309,15 @@
         }
         field(27; "Pick Qty."; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding" WHERE("Activity Type" = CONST(Pick),
-                                                                                  "Whse. Document Type" = CONST(Shipment),
-                                                                                  "Whse. Document No." = FIELD("No."),
-                                                                                  "Whse. Document Line No." = FIELD("Line No."),
-                                                                                  "Unit of Measure Code" = FIELD("Unit of Measure Code"),
-                                                                                  "Action Type" = FILTER(" " | Place),
-                                                                                  "Original Breakbulk" = CONST(false),
-                                                                                  "Breakbulk No." = CONST(0),
-                                                                                  "Assemble to Order" = CONST(false)));
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding" where("Activity Type" = const(Pick),
+                                                                                  "Whse. Document Type" = const(Shipment),
+                                                                                  "Whse. Document No." = field("No."),
+                                                                                  "Whse. Document Line No." = field("Line No."),
+                                                                                  "Unit of Measure Code" = field("Unit of Measure Code"),
+                                                                                  "Action Type" = filter(" " | Place),
+                                                                                  "Original Breakbulk" = const(false),
+                                                                                  "Breakbulk No." = const(0),
+                                                                                  "Assemble to Order" = const(false)));
             Caption = 'Pick Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -306,14 +325,14 @@
         }
         field(28; "Pick Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding (Base)" WHERE("Activity Type" = CONST(Pick),
-                                                                                         "Whse. Document Type" = CONST(Shipment),
-                                                                                         "Whse. Document No." = FIELD("No."),
-                                                                                         "Whse. Document Line No." = FIELD("Line No."),
-                                                                                         "Action Type" = FILTER(" " | Place),
-                                                                                         "Original Breakbulk" = CONST(false),
-                                                                                         "Breakbulk No." = CONST(0),
-                                                                                         "Assemble to Order" = CONST(false)));
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding (Base)" where("Activity Type" = const(Pick),
+                                                                                         "Whse. Document Type" = const(Shipment),
+                                                                                         "Whse. Document No." = field("No."),
+                                                                                         "Whse. Document Line No." = field("Line No."),
+                                                                                         "Action Type" = filter(" " | Place),
+                                                                                         "Original Breakbulk" = const(false),
+                                                                                         "Breakbulk No." = const(0),
+                                                                                         "Assemble to Order" = const(false)));
             Caption = 'Pick Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -323,7 +342,7 @@
         {
             Caption = 'Unit of Measure Code';
             Editable = false;
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(30; "Qty. per Unit of Measure"; Decimal)
         {
@@ -336,7 +355,7 @@
         {
             Caption = 'Variant Code';
             Editable = false;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(32; Description; Text[100])
         {
@@ -373,11 +392,11 @@
         {
             Caption = 'Destination No.';
             Editable = false;
-            TableRelation = IF ("Destination Type" = CONST(Customer)) Customer."No."
-            ELSE
-            IF ("Destination Type" = CONST(Vendor)) Vendor."No."
-            ELSE
-            IF ("Destination Type" = CONST(Location)) Location.Code;
+            TableRelation = if ("Destination Type" = const(Customer)) Customer."No."
+            else
+            if ("Destination Type" = const(Vendor)) Vendor."No."
+            else
+            if ("Destination Type" = const(Location)) Location.Code;
         }
         field(41; Cubage; Decimal)
         {
@@ -518,7 +537,7 @@
 
         ItemTrackingMgt.SetDeleteReservationEntries(true);
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          DATABASE::"Warehouse Shipment Line", 0, "No.", '', 0, "Line No.", "Location Code", true);
+          Enum::TableID::"Warehouse Shipment Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true);
 
         UpdateDocumentStatus();
     end;
@@ -570,7 +589,7 @@
         exit(UOMMgt.RoundQty(QtyBase / "Qty. per Unit of Measure", "Qty. Rounding Precision"));
     end;
 
-    local procedure CalcBaseQty(Qty: Decimal; FromFieldName: Text; ToFieldName: Text): Decimal
+    procedure CalcBaseQty(Qty: Decimal; FromFieldName: Text; ToFieldName: Text): Decimal
     begin
         OnBeforeCalcBaseQty(Rec, Qty, FromFieldName, ToFieldName);
 
@@ -706,28 +725,28 @@
             until WhseShptLine.Next() = 0;
 
         case "Source Type" of
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 begin
                     SalesLine.Get("Source Subtype", "Source No.", "Source Line No.");
                     if Abs(SalesLine."Outstanding Qty. (Base)") < WhseQtyOutstandingBase + QuantityBase then
                         FieldError(Quantity, StrSubstNo(Text002, CalcQty(SalesLine."Outstanding Qty. (Base)" - WhseQtyOutstandingBase)));
                     QtyOutstandingBase := Abs(SalesLine."Outstanding Qty. (Base)");
                 end;
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 begin
                     PurchaseLine.Get("Source Subtype", "Source No.", "Source Line No.");
                     if Abs(PurchaseLine."Outstanding Qty. (Base)") < WhseQtyOutstandingBase + QuantityBase then
                         FieldError(Quantity, StrSubstNo(Text002, CalcQty(Abs(PurchaseLine."Outstanding Qty. (Base)") - WhseQtyOutstandingBase)));
                     QtyOutstandingBase := Abs(PurchaseLine."Outstanding Qty. (Base)");
                 end;
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line".AsInteger():
                 begin
                     TransferLine.Get("Source No.", "Source Line No.");
                     if TransferLine."Outstanding Qty. (Base)" < WhseQtyOutstandingBase + QuantityBase then
                         FieldError(Quantity, StrSubstNo(Text002, CalcQty(TransferLine."Outstanding Qty. (Base)" - WhseQtyOutstandingBase)));
                     QtyOutstandingBase := TransferLine."Outstanding Qty. (Base)";
                 end;
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 begin
                     ServiceLine.Get("Source Subtype", "Source No.", "Source Line No.");
                     if Abs(ServiceLine."Outstanding Qty. (Base)") < WhseQtyOutstandingBase + QuantityBase then
@@ -900,21 +919,21 @@
         GetItem();
         Item.TestField("Item Tracking Code");
 
-        SecondSourceQtyArray[1] := DATABASE::"Warehouse Shipment Line";
+        SecondSourceQtyArray[1] := Enum::TableID::"Warehouse Shipment Line".AsInteger();
         SecondSourceQtyArray[2] := "Qty. to Ship (Base)";
         SecondSourceQtyArray[3] := 0;
 
         case "Source Type" of
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 if SalesLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     SalesLineReserve.CallItemTrackingSecondSource(SalesLine, SecondSourceQtyArray, "Assemble to Order");
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 if ServiceLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     ServiceLineReserve.CallItemTracking(ServiceLine);
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line".AsInteger():
                 if PurchaseLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     PurchLineReserve.CallItemTracking(PurchaseLine, SecondSourceQtyArray);
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line".AsInteger():
                 begin
                     Direction := Direction::Outbound;
                     if TransferLine.Get("Source No.", "Source Line No.") then
@@ -1018,14 +1037,14 @@
         OnBeforeCreateWhseItemTrackingLines(Rec, IsHandled);
         if not IsHandled then
             if "Assemble to Order" then begin
-                TestField("Source Type", DATABASE::"Sales Line");
+                TestField("Source Type", Enum::TableID::"Sales Line");
                 ATOSalesLine.Get("Source Subtype", "Source No.", "Source Line No.");
                 ATOSalesLine.AsmToOrderExists(AsmHeader);
                 AsmLineMgt.CreateWhseItemTrkgForAsmLines(AsmHeader);
             end else
                 if ItemTrackingMgt.GetWhseItemTrkgSetup("Item No.") then
                     ItemTrackingMgt.InitItemTrackingForTempWhseWorksheetLine(
-                      "Warehouse Worksheet Document Type"::Shipment, "No.", "Line No.",
+                      Enum::"Warehouse Worksheet Document Type"::Shipment, "No.", "Line No.",
                       "Source Type", "Source Subtype", "Source No.", "Source Line No.", 0);
 
         OnAfterCreateWhseItemTrackingLines(Rec);
@@ -1036,7 +1055,7 @@
         ItemTrackingMgt: Codeunit "Item Tracking Management";
     begin
         ItemTrackingMgt.DeleteWhseItemTrkgLinesWithRunDeleteTrigger(
-          DATABASE::"Warehouse Shipment Line", 0, "No.", '', 0, "Line No.", "Location Code", true, true);
+          Enum::TableID::"Warehouse Shipment Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true, true);
     end;
 
     procedure SetItemData(ItemNo: Code[20]; ItemDescription: Text[100]; ItemDescription2: Text[50]; LocationCode: Code[10]; VariantCode: Code[10]; UoMCode: Code[10]; QtyPerUoM: Decimal)
@@ -1132,7 +1151,7 @@
         InventorySetup: Record "Inventory Setup";
         TransferHeader: Record "Transfer Header";
     begin
-        if "Source Type" <> Database::"Transfer Line" then
+        if "Source Type" <> Enum::TableID::"Transfer Line".AsInteger() then
             exit(false);
 
         InventorySetup.Get();

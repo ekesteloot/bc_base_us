@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
 table 5888 "Phys. Invt. Count Buffer"
 {
     Caption = 'Phys. Invt. Count Buffer';

@@ -60,7 +60,7 @@ page 5853 "Get Pst.Doc-RtrnRcptLn Subform"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = SalesReturnOrder;
                     ToolTip = 'Specifies that this item is a catalog item.';
@@ -208,7 +208,7 @@ page 5853 "Get Pst.Doc-RtrnRcptLn Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Lines")
@@ -254,17 +254,16 @@ page 5853 "Get Pst.Doc-RtrnRcptLn Subform"
     var
         ReturnRcptLine: Record "Return Receipt Line";
         TempReturnRcptLine: Record "Return Receipt Line" temporary;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     local procedure IsFirstDocLine(): Boolean
     begin
         TempReturnRcptLine.Reset();
         TempReturnRcptLine.CopyFilters(Rec);
-        TempReturnRcptLine.SetRange("Document No.", "Document No.");
+        TempReturnRcptLine.SetRange("Document No.", Rec."Document No.");
         if not TempReturnRcptLine.FindFirst() then begin
             ReturnRcptLine.CopyFilters(Rec);
-            ReturnRcptLine.SetRange("Document No.", "Document No.");
+            ReturnRcptLine.SetRange("Document No.", Rec."Document No.");
             if not ReturnRcptLine.FindFirst() then
                 exit(false);
             TempReturnRcptLine := ReturnRcptLine;

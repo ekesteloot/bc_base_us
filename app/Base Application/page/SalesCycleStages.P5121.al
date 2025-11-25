@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Comment;
+
 page 5121 "Sales Cycle Stages"
 {
     Caption = 'Sales Cycle Stages';
@@ -12,7 +16,7 @@ page 5121 "Sales Cycle Stages"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Stage; Stage)
+                field(Stage; Rec.Stage)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the number of the stage within the sales cycle.';
@@ -53,7 +57,7 @@ page 5121 "Sales Cycle Stages"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies how dates for planned activities are calculated when you run the Opportunity - Details report.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies that comments exist for this sales cycle stage.';
@@ -89,8 +93,8 @@ page 5121 "Sales Cycle Stages"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Sales Cycle Stage Statistics";
-                    RunPageLink = "Sales Cycle Code" = FIELD("Sales Cycle Code"),
-                                  Stage = FIELD(Stage);
+                    RunPageLink = "Sales Cycle Code" = field("Sales Cycle Code"),
+                                  Stage = field(Stage);
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -100,9 +104,9 @@ page 5121 "Sales Cycle Stages"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Rlshp. Mgt. Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Sales Cycle Stage"),
-                                  "No." = FIELD("Sales Cycle Code"),
-                                  "Sub No." = FIELD(Stage);
+                    RunPageLink = "Table Name" = const("Sales Cycle Stage"),
+                                  "No." = field("Sales Cycle Code"),
+                                  "Sub No." = field(Stage);
                     ToolTip = 'View or add comments for the record.';
                 }
             }

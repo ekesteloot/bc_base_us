@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8621 "Config. Template Selection"
 {
     Caption = 'Config. Template Selection';
@@ -12,7 +14,7 @@ page 8621 "Config. Template Selection"
             {
                 Editable = false;
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code of the data template.';

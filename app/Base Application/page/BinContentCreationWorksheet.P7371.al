@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+
 page 7371 "Bin Content Creation Worksheet"
 {
     AccessByPermission = TableData Bin = R;
@@ -93,8 +98,8 @@ page 7371 "Bin Content Creation Worksheet"
 
                     trigger OnValidate()
                     begin
-                        BinCreateLine.GetItemDescr("Item No.", "Variant Code", ItemDescription);
-                        BinCreateLine.GetUnitOfMeasureDescr("Unit of Measure Code", UOMDescription);
+                        BinCreateLine.GetItemDescr(Rec."Item No.", Rec."Variant Code", ItemDescription);
+                        BinCreateLine.GetUnitOfMeasureDescr(Rec."Unit of Measure Code", UOMDescription);
                     end;
                 }
                 field("Variant Code"; Rec."Variant Code")
@@ -116,7 +121,7 @@ page 7371 "Bin Content Creation Worksheet"
 
                     trigger OnValidate()
                     begin
-                        BinCreateLine.GetUnitOfMeasureDescr("Unit of Measure Code", UOMDescription);
+                        BinCreateLine.GetUnitOfMeasureDescr(Rec."Unit of Measure Code", UOMDescription);
                     end;
                 }
                 field("Min. Qty."; Rec."Min. Qty.")
@@ -137,12 +142,12 @@ page 7371 "Bin Content Creation Worksheet"
                     ToolTip = 'Specifies how the movement of a particular item, or bin content, into or out of this bin, is blocked.';
                     Visible = false;
                 }
-                field("Fixed"; Fixed)
+                field("Fixed"; Rec.Fixed)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies whether the bin content that is to be created will be fixed for the item.';
                 }
-                field(Default; Default)
+                field(Default; Rec.Default)
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies if the bin is to be the default bin for the item on the bin worksheet line.';
@@ -232,12 +237,12 @@ page 7371 "Bin Content Creation Worksheet"
                         BinCreateLine.Copy(Rec);
                         CODEUNIT.Run(CODEUNIT::"Bin Content Create", Rec);
                         BinCreateLine.Reset();
-                        Copy(BinCreateLine);
-                        FilterGroup(2);
-                        SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        SetRange(Name, Name);
-                        SetRange("Location Code", CurrentLocationCode);
-                        FilterGroup(0);
+                        Rec.Copy(BinCreateLine);
+                        Rec.FilterGroup(2);
+                        Rec.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        Rec.SetRange(Name, Rec.Name);
+                        Rec.SetRange("Location Code", CurrentLocationCode);
+                        Rec.FilterGroup(0);
                         CurrPage.Update(false);
                     end;
                 }
@@ -252,11 +257,11 @@ page 7371 "Bin Content Creation Worksheet"
 
                 trigger OnAction()
                 begin
-                    BinCreateLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                    BinCreateLine.SetRange(Name, Name);
-                    BinCreateLine.SetRange("Location Code", "Location Code");
+                    BinCreateLine.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                    BinCreateLine.SetRange(Name, Rec.Name);
+                    BinCreateLine.SetRange("Location Code", Rec."Location Code");
                     BinCreateLine.SetRange(Type, BinCreateLine.Type::"Bin Content");
-                    REPORT.Run(REPORT::"Bin Content Create Wksh Report", true, false, BinCreateLine);
+                    REPORT.Run(Enum::ReportID::"Bin Content Create Wksh Report".AsInteger(), true, false, BinCreateLine);
                 end;
             }
         }
@@ -278,24 +283,24 @@ page 7371 "Bin Content Creation Worksheet"
 
     trigger OnAfterGetCurrRecord()
     begin
-        BinCreateLine.GetItemDescr("Item No.", "Variant Code", ItemDescription);
-        BinCreateLine.GetUnitOfMeasureDescr("Unit of Measure Code", UOMDescription);
-        BinCode := "Bin Code";
+        BinCreateLine.GetItemDescr(Rec."Item No.", Rec."Variant Code", ItemDescription);
+        BinCreateLine.GetUnitOfMeasureDescr(Rec."Unit of Measure Code", UOMDescription);
+        BinCode := Rec."Bin Code";
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(GetRangeMax("Worksheet Template Name"));
+        Rec.SetUpNewLine(Rec.GetRangeMax("Worksheet Template Name"));
     end;
 
     trigger OnOpenPage()
     var
         WkshSelected: Boolean;
     begin
-        OpenedFromBatch := (Name <> '') and ("Worksheet Template Name" = '');
+        OpenedFromBatch := (Rec.Name <> '') and (Rec."Worksheet Template Name" = '');
         if OpenedFromBatch then begin
-            CurrentJnlBatchName := Name;
-            CurrentLocationCode := "Location Code";
+            CurrentJnlBatchName := Rec.Name;
+            CurrentLocationCode := Rec."Location Code";
             BinCreateLine.OpenWksh(CurrentJnlBatchName, CurrentLocationCode, Rec);
             exit;
         end;
@@ -316,14 +321,14 @@ page 7371 "Bin Content Creation Worksheet"
 
     local procedure BinCodeOnAfterValidate()
     begin
-        BinCreateLine.GetItemDescr("Item No.", "Variant Code", ItemDescription);
-        BinCreateLine.GetUnitOfMeasureDescr("Unit of Measure Code", UOMDescription);
-        BinCode := "Bin Code";
+        BinCreateLine.GetItemDescr(Rec."Item No.", Rec."Variant Code", ItemDescription);
+        BinCreateLine.GetUnitOfMeasureDescr(Rec."Unit of Measure Code", UOMDescription);
+        BinCode := Rec."Bin Code";
     end;
 
     local procedure VariantCodeOnAfterValidate()
     begin
-        BinCreateLine.GetItemDescr("Item No.", "Variant Code", ItemDescription);
+        BinCreateLine.GetItemDescr(Rec."Item No.", Rec."Variant Code", ItemDescription);
     end;
 
     local procedure CurrentJnlBatchNameOnAfterVali()

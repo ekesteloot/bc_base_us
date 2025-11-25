@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Ledger;
+
 page 412 "Bank Rec. Line Match Details"
 {
     Caption = 'Match Details';
@@ -44,10 +48,10 @@ page 412 "Bank Rec. Line Match Details"
     var
         PaymentMatchingDetails: Record "Payment Matching Details";
     begin
-        PaymentMatchingDetails.SetRange("Statement Type", "Statement Type");
-        PaymentMatchingDetails.SetRange("Statement No.", "Statement No.");
-        PaymentMatchingDetails.SetRange("Statement Line No.", "Statement Line No.");
-        PaymentMatchingDetails.SetRange("Bank Account No.", "Bank Account No.");
+        PaymentMatchingDetails.SetRange("Statement Type", Rec."Statement Type");
+        PaymentMatchingDetails.SetRange("Statement No.", Rec."Statement No.");
+        PaymentMatchingDetails.SetRange("Statement Line No.", Rec."Statement Line No.");
+        PaymentMatchingDetails.SetRange("Bank Account No.", Rec."Bank Account No.");
         PaymentMatchingDetails.SetFilter(Message, '<>''''');
         if PaymentMatchingDetails.FindLast() then
             MatchDetails := PaymentMatchingDetails.Message;
@@ -63,12 +67,13 @@ page 412 "Bank Rec. Line Match Details"
         BankAccRecMatchBuffer: Record "Bank Acc. Rec. Match Buffer";
         BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
     begin
-        FilterManyToOneMatches(BankAccRecMatchBuffer);
+        Rec.FilterManyToOneMatches(BankAccRecMatchBuffer);
         if BankAccRecMatchBuffer.FindFirst() then
             BankAccountLedgerEntry.SetRange("Entry No.", BankAccRecMatchBuffer."Ledger Entry No.")
         else begin
             BankAccountLedgerEntry.SetRange("Statement No.", Rec."Statement No.");
             BankAccountLedgerEntry.SetRange("Statement Line No.", Rec."Statement Line No.");
+            BankAccountLedgerEntry.SetRange("Bank Account No.", Rec."Bank Account No.");
         end;
 
         CurrPage.ApplyBankLedgerEntries.Page.SetTableView(BankAccountLedgerEntry);

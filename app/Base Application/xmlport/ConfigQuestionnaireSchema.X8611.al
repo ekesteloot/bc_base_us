@@ -1,3 +1,5 @@
+namespace System.IO;
+
 xmlport 8611 "Config. Questionnaire Schema"
 {
     Caption = 'Config. Questionnaire Schema';
@@ -63,7 +65,7 @@ xmlport 8611 "Config. Questionnaire Schema"
                         }
                         tableelement("Config. Question Area"; "Config. Question Area")
                         {
-                            LinkFields = "Questionnaire Code" = FIELD(Code);
+                            LinkFields = "Questionnaire Code" = field(Code);
                             LinkTable = "Config. Questionnaire";
                             MinOccurs = Zero;
                             XmlName = 'xsd:element';
@@ -127,7 +129,7 @@ xmlport 8611 "Config. Questionnaire Schema"
                                     }
                                     tableelement("Config. Question"; "Config. Question")
                                     {
-                                        LinkFields = "Questionnaire Code" = FIELD("Questionnaire Code"), "Question Area Code" = FIELD(Code);
+                                        LinkFields = "Questionnaire Code" = field("Questionnaire Code"), "Question Area Code" = field(Code);
                                         LinkTable = "Config. Question Area";
                                         MaxOccurs = Once;
                                         MinOccurs = Zero;

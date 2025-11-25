@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.ServiceMgt.Document;
+using System.Utilities;
+
 codeunit 5981 "Service-Post (Yes/No)"
 {
     EventSubscriberInstance = Manual;

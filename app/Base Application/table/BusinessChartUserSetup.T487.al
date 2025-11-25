@@ -1,3 +1,9 @@
+﻿namespace System.Visualization;
+
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Sales.Analysis;
+using System.Reflection;
+
 table 487 "Business Chart User Setup"
 {
     Caption = 'Business Chart User Setup';
@@ -19,7 +25,7 @@ table 487 "Business Chart User Setup"
         field(3; "Object ID"; Integer)
         {
             Caption = 'Object ID';
-            TableRelation = IF ("Object Type" = FILTER(> " ")) AllObj."Object ID" WHERE("Object Type" = FIELD("Object Type"));
+            TableRelation = if ("Object Type" = filter(> " ")) AllObj."Object ID" where("Object Type" = field("Object Type"));
         }
         field(4; "Period Length"; Option)
         {

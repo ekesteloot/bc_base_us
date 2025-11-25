@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Setup;
+
+using System.Reflection;
+
 page 307 "Report Selection - Job"
 {
     Caption = 'Report Selection - Job';
@@ -53,6 +57,17 @@ page 307 "Report Selection - Job"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the related document will be attached to the email.';
                 }
+                field(EmailBodyName; Rec."Email Body Layout Name")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the name of the email body layout that is used.';
+                }
+                field(EmailBodyPublisher; Rec."Email Body Layout Publisher")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the publisher of the email body layout that is used.';
+                    Visible = false;
+                }
                 field("Email Body Layout Code"; Rec."Email Body Layout Code")
                 {
                     ApplicationArea = Basic, Suite;
@@ -62,7 +77,8 @@ page 307 "Report Selection - Job"
                 field("Email Body Layout Description"; Rec."Email Body Layout Description")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies a description of the email body layout that is used.';
+                    ToolTip = 'Specifies a description of the email body custom layout that is used.';
+                    Visible = CustomLayoutsExist;
 
                     trigger OnDrillDown()
                     var
@@ -102,10 +118,12 @@ page 307 "Report Selection - Job"
     begin
         InitUsageFilter();
         SetUsageFilter(false);
+        CustomLayoutsExist := Rec.DoesAnyCustomLayotExist();
     end;
 
     var
         ReportUsage2: Enum "Report Selection Usage Job";
+        CustomLayoutsExist: Boolean;
 
     local procedure SetUsageFilter(ModifyRec: Boolean)
     begin
@@ -113,8 +131,8 @@ page 307 "Report Selection - Job"
             if Rec.Modify() then;
         Rec.FilterGroup(2);
         case ReportUsage2 of
-            "Report Selection Usage Job"::Quote:
-                Rec.SetRange(Usage, "Report Selection Usage"::JQ);
+            ReportUsage2::Quote:
+                Rec.SetRange(Usage, Rec.Usage::JQ);
         end;
         OnSetUsageFilterOnAfterSetFiltersByReportUsage(Rec, ReportUsage2);
         Rec.FilterGroup(0);
@@ -128,8 +146,8 @@ page 307 "Report Selection - Job"
         if Rec.GetFilter(Usage) <> '' then begin
             if Evaluate(ReportUsage, Rec.GetFilter(Usage)) then
                 case ReportUsage of
-                    "Report Selection Usage"::JQ:
-                        ReportUsage2 := "Report Selection Usage Job"::Quote;
+                    ReportUsage::JQ:
+                        ReportUsage2 := ReportUsage2::Quote;
                     else
                         OnInitUsageFilterOnElseCase(ReportUsage, ReportUsage2);
                 end;

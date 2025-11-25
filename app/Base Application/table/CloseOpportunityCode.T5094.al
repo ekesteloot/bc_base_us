@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 table 5094 "Close Opportunity Code"
 {
     Caption = 'Close Opportunity Code';
@@ -17,7 +19,7 @@ table 5094 "Close Opportunity Code"
         }
         field(3; "No. of Opportunities"; Integer)
         {
-            CalcFormula = Count ("Opportunity Entry" WHERE("Close Opportunity Code" = FIELD(Code)));
+            CalcFormula = Count ("Opportunity Entry" where("Close Opportunity Code" = field(Code)));
             Caption = 'No. of Opportunities';
             Editable = false;
             FieldClass = FlowField;

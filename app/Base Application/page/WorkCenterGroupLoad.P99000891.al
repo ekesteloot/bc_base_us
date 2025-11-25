@@ -1,3 +1,9 @@
+﻿namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Setup;
+
 page 99000891 "Work Center Group Load"
 {
     Caption = 'Work Center Group Load';

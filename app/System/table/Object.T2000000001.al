@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Reflection;
+
 table 2000000001 Object
 {
     Scope = OnPrem;
@@ -10,7 +16,7 @@ table 2000000001 Object
         }
         field(2; "Company Name"; Text[30]) //OEMText[30]
         {
-            TableRelation = Company.Name;
+            TableRelation = System.Environment.Company.Name;
         }
         field(3; ID; Integer)
         {

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 page 5133 "Close Opportunity Codes"
 {
     ApplicationArea = RelationshipMgmt;
@@ -15,7 +17,7 @@ page 5133 "Close Opportunity Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for closing the opportunity.';
@@ -58,7 +60,7 @@ page 5133 "Close Opportunity Codes"
 
     trigger OnOpenPage()
     begin
-        if GetFilters <> '' then
+        if Rec.GetFilters() <> '' then
             CurrPage.Editable(false);
     end;
 }

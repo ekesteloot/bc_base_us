@@ -1,3 +1,5 @@
+namespace System.Security.AccessControl;
+
 table 9802 "Permission Set Link"
 {
     Caption = 'Permission Set Link';
@@ -46,13 +48,13 @@ table 9802 "Permission Set Link"
 
     procedure UpdateSourceHashesOnAllLinks()
     var
-        PermissionSet: Record "Permission Set";
+        MetadataPermissionSet: Record "Metadata Permission Set";
         PermissionManager: Codeunit "Permission Manager";
     begin
         if FindSet() then
             repeat
-                if PermissionSet.Get("Permission Set ID") then begin
-                    "Source Hash" := PermissionManager.GenerateHashForPermissionSet(PermissionSet."Role ID");
+                if MetadataPermissionSet.Get("Permission Set ID") then begin
+                    "Source Hash" := PermissionManager.GenerateHashForPermissionSet(MetadataPermissionSet."Role ID");
                     Modify();
                 end else
                     Delete();
@@ -61,15 +63,15 @@ table 9802 "Permission Set Link"
 
     procedure MarkWithChangedSource()
     var
-        PermissionSet: Record "Permission Set";
+        MetadataPermissionSet: Record "Metadata Permission Set";
         PermissionManager: Codeunit "Permission Manager";
         SourceChanged: Boolean;
     begin
         if FindSet() then
             repeat
                 SourceChanged := false;
-                if PermissionSet.Get("Permission Set ID") then
-                    SourceChanged := "Source Hash" <> PermissionManager.GenerateHashForPermissionSet(PermissionSet."Role ID")
+                if MetadataPermissionSet.Get("Permission Set ID") then
+                    SourceChanged := "Source Hash" <> PermissionManager.GenerateHashForPermissionSet(MetadataPermissionSet."Role ID")
                 else
                     SourceChanged := true;
                 if SourceChanged then

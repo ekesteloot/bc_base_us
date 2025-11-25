@@ -12,7 +12,7 @@ page 10456 "PAC Web Service Details"
             repeater(Control1020000)
             {
                 ShowCaption = false;
-                field(Environment; Environment)
+                field(Environment; Rec.Environment)
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies if the web service is for a test environment or a production environment.';
@@ -27,7 +27,7 @@ page 10456 "PAC Web Service Details"
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the web method that will be used for this request type. Contact your authorized service provider, PAC, for this information.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = BasicMX;
                     ToolTip = 'Specifies the web method URL used for this type of request. Contact your authorized service provider, PAC, for this information.';

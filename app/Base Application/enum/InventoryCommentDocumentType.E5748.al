@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Comment;
+
 enum 5748 "Inventory Comment Document Type"
 {
     Extensible = true;

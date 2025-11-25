@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Shared.Navigate;
+using System.Text;
+
 page 6516 "Package No. Information List"
 {
     Caption = 'Package No. Information List';
@@ -90,9 +96,9 @@ page 6516 "Package No. Information List"
                     Caption = 'Comment';
                     Image = ViewComments;
                     RunObject = Page "Item Tracking Comments";
-                    RunPageLink = "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code"),
-                                  "Serial/Lot No." = FIELD("Package No.");
+                    RunPageLink = "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code"),
+                                  "Serial/Lot No." = field("Package No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("&Item Tracing")
@@ -108,9 +114,9 @@ page 6516 "Package No. Information List"
                         ItemTracing: Page "Item Tracing";
                     begin
                         Clear(ItemTracing);
-                        ItemTracingBuffer.SetRange("Item No.", "Item No.");
-                        ItemTracingBuffer.SetRange("Variant Code", "Variant Code");
-                        ItemTracingBuffer.SetRange("Package No.", "Package No.");
+                        ItemTracingBuffer.SetRange("Item No.", Rec."Item No.");
+                        ItemTracingBuffer.SetRange("Variant Code", Rec."Variant Code");
+                        ItemTracingBuffer.SetRange("Package No.", Rec."Package No.");
                         ItemTracing.InitFilters(ItemTracingBuffer);
                         ItemTracing.FindRecords();
                         ItemTracing.RunModal();

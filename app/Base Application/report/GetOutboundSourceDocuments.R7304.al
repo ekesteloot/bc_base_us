@@ -1,3 +1,16 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Sales.Customer;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Worksheet;
+
 report 7304 "Get Outbound Source Documents"
 {
     Caption = 'Get Outbound Source Documents';
@@ -7,16 +20,16 @@ report 7304 "Get Outbound Source Documents"
     {
         dataitem("Whse. Pick Request"; "Whse. Pick Request")
         {
-            DataItemTableView = SORTING("Document Type", "Document Subtype", "Document No.", "Location Code") WHERE(Status = CONST(Released), "Completely Picked" = CONST(false));
+            DataItemTableView = sorting("Document Type", "Document Subtype", "Document No.", "Location Code") where(Status = const(Released), "Completely Picked" = const(false));
             RequestFilterFields = "Document Type", "Document No.";
             dataitem("Warehouse Shipment Header"; "Warehouse Shipment Header")
             {
-                DataItemLink = "No." = FIELD("Document No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("Document No.");
+                DataItemTableView = sorting("No.");
                 dataitem("Warehouse Shipment Line"; "Warehouse Shipment Line")
                 {
-                    DataItemLink = "No." = FIELD("No.");
-                    DataItemTableView = SORTING("No.", "Line No.");
+                    DataItemLink = "No." = field("No.");
+                    DataItemTableView = sorting("No.", "Line No.");
 
                     trigger OnAfterGetRecord()
                     var
@@ -74,12 +87,12 @@ report 7304 "Get Outbound Source Documents"
             }
             dataitem("Whse. Internal Pick Header"; "Whse. Internal Pick Header")
             {
-                DataItemLink = "No." = FIELD("Document No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("Document No.");
+                DataItemTableView = sorting("No.");
                 dataitem("Whse. Internal Pick Line"; "Whse. Internal Pick Line")
                 {
-                    DataItemLink = "No." = FIELD("No.");
-                    DataItemTableView = SORTING("No.", "Line No.");
+                    DataItemLink = "No." = field("No.");
+                    DataItemTableView = sorting("No.", "Line No.");
 
                     trigger OnAfterGetRecord()
                     begin
@@ -105,12 +118,12 @@ report 7304 "Get Outbound Source Documents"
             }
             dataitem("Production Order"; "Production Order")
             {
-                DataItemLink = Status = FIELD("Document Subtype"), "No." = FIELD("Document No.");
-                DataItemTableView = SORTING(Status, "No.") WHERE(Status = CONST(Released));
+                DataItemLink = Status = field("Document Subtype"), "No." = field("Document No.");
+                DataItemTableView = sorting(Status, "No.") where(Status = const(Released));
                 dataitem("Prod. Order Component"; "Prod. Order Component")
                 {
-                    DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                    DataItemTableView = SORTING(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.") WHERE("Flushing Method" = FILTER(Manual | "Pick + Forward" | "Pick + Backward"), "Planning Level Code" = CONST(0));
+                    DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                    DataItemTableView = sorting(Status, "Prod. Order No.", "Prod. Order Line No.", "Line No.") where("Flushing Method" = filter(Manual | "Pick + Forward" | "Pick + Backward"), "Planning Level Code" = const(0));
 
                     trigger OnAfterGetRecord()
                     var
@@ -145,12 +158,12 @@ report 7304 "Get Outbound Source Documents"
             }
             dataitem("Assembly Header"; "Assembly Header")
             {
-                DataItemLink = "Document Type" = FIELD("Document Subtype"), "No." = FIELD("Document No.");
-                DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST(Order));
+                DataItemLink = "Document Type" = field("Document Subtype"), "No." = field("Document No.");
+                DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Order));
                 dataitem("Assembly Line"; "Assembly Line")
                 {
-                    DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
-                    DataItemTableView = SORTING("Document Type", "Document No.", Type, "Location Code") WHERE(Type = CONST(Item));
+                    DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
+                    DataItemTableView = sorting("Document Type", "Document No.", Type, "Location Code") where(Type = const(Item));
 
                     trigger OnAfterGetRecord()
                     begin

@@ -1,4 +1,14 @@
-﻿codeunit 825 "Sales Post Invoice Events"
+﻿namespace Microsoft.Sales.Posting;
+
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Receivables;
+
+codeunit 825 "Sales Post Invoice Events"
 {
     // OnAfter events
 
@@ -43,12 +53,20 @@
     end;
 
     procedure RunOnAfterGetSalesAccount(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var SalesAccountNo: Code[20])
+    var
+        SalesHeader: Record "Sales Header";
     begin
-        OnAfterGetSalesAccount(SalesLine, GenPostingSetup, SalesAccountNo);
+        if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") then;
+        OnAfterGetSalesAccount(SalesLine, GenPostingSetup, SalesAccountNo, SalesHeader);
+    end;
+
+    procedure RunOnAfterGetSalesAccount(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var SalesAccountNo: Code[20]; SalesHeader: Record "Sales Header")
+    begin
+        OnAfterGetSalesAccount(SalesLine, GenPostingSetup, SalesAccountNo, SalesHeader);
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGetSalesAccount(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var SalesAccountNo: Code[20])
+    local procedure OnAfterGetSalesAccount(SalesLine: Record "Sales Line"; GenPostingSetup: Record "General Posting Setup"; var SalesAccountNo: Code[20]; SalesHeader: Record "Sales Header")
     begin
     end;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 table 5944 "Troubleshooting Line"
 {
     Caption = 'Troubleshooting Line';

@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FixedAssets.Maintenance;
+using System.Security.User;
+
 page 5627 "FA Registers"
 {
     AdditionalSearchTerms = 'fixed asset registers';
@@ -49,7 +54,7 @@ page 5627 "FA Registers"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")

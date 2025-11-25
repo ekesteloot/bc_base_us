@@ -1,3 +1,17 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using System.Security.AccessControl;
+
 codeunit 5703 "Catalog Item Management"
 {
 
@@ -111,12 +125,6 @@ codeunit 5703 "Catalog Item Management"
         ItemReference: Record "Item Reference";
         IsHandled: Boolean;
     begin
-#if not CLEAN20
-        IsHandled := false;
-        OnBeforeNonstockItemCrossRef(NonStock2, IsHandled);
-        if IsHandled then
-            exit;
-#endif
         IsHandled := false;
         OnBeforeNonstockItemReference(NonStock2, IsHandled);
         if IsHandled then
@@ -214,10 +222,10 @@ codeunit 5703 "Catalog Item Management"
 
         if GuiAllowed() then begin
             ProgWindow.Open(Text003 +
-              Text004 +
-              Text005 +
-              Text006 +
-              Text007);
+            Text004 +
+            Text005 +
+            Text006 +
+            Text007);
             ProgWindow.Update(1, NonStock."Manufacturer Code");
             ProgWindow.Update(2, NonStock."Vendor No.");
             ProgWindow.Update(3, NonStock."Vendor Item No.");
@@ -607,10 +615,12 @@ codeunit 5703 "Catalog Item Management"
         ItemTemplMgt: Codeunit "Item Templ. Mgt.";
     begin
         Item.Init();
+        Item."No." := NonstockItem."Item No.";
+        OnCreateNewItemOnBeforeItemInsert(Item, NonstockItem);
+        Item.Insert();
 
         InitItemFromTemplate(Item, NonstockItem);
 
-        Item."No." := NonstockItem."Item No.";
         Item."No. Series" := NonstockItem."Item No. Series";
         Item.Description := NonstockItem.Description;
         Item.Validate(Description, Item.Description);
@@ -627,8 +637,8 @@ codeunit 5703 "Catalog Item Management"
         Item."Gross Weight" := NonstockItem."Gross Weight";
         Item."Manufacturer Code" := NonstockItem."Manufacturer Code";
         Item."Created From Nonstock Item" := true;
-        OnCreateNewItemOnBeforeItemInsert(Item, NonstockItem);
-        Item.Insert();
+        Item.Modify();
+
         ItemTemplMgt.InsertDimensions(Item."No.", NonstockItem."Item Templ. Code", Database::Item, Database::"Item Templ.");
         Item.Get(NonstockItem."Item No.");
 
@@ -638,69 +648,14 @@ codeunit 5703 "Catalog Item Management"
     local procedure InitItemFromTemplate(var Item: Record Item; NonstockItem: Record "Nonstock Item")
     var
         ItemTempl: Record "Item Templ.";
+        ItemTemplMgt: Codeunit "Item Templ. Mgt.";
         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeInitItemFromTemplate(Item, NonstockItem, IsHandled);
         if not IsHandled then begin
             ItemTempl.Get(NonstockItem."Item Templ. Code");
-            Item.Type := ItemTempl.Type;
-            Item."Inventory Posting Group" := ItemTempl."Inventory Posting Group";
-            Item."Costing Method" := ItemTempl."Costing Method";
-            Item."Gen. Prod. Posting Group" := ItemTempl."Gen. Prod. Posting Group";
-            Item."Tax Group Code" := ItemTempl."Tax Group Code";
-            Item."VAT Prod. Posting Group" := ItemTempl."VAT Prod. Posting Group";
-            Item."Item Disc. Group" := ItemTempl."Item Disc. Group";
-            Item."Item Category Code" := ItemTempl."Item Category Code";
-            Item."Reordering Policy" := ItemTempl."Reordering Policy";
-            Item."Tariff No." := ItemTempl."Tariff No.";
-            Item."Country/Region of Origin Code" := ItemTempl."Country/Region of Origin Code";
-            Item."Safety Lead Time" := ItemTempl."Safety Lead Time";
-            Item."Flushing Method" := ItemTempl."Flushing Method";
-            Item."Reorder Point" := ItemTempl."Reorder Point";
-            Item."Reorder Quantity" := ItemTempl."Reorder Quantity";
-            Item."Maximum Inventory" := ItemTempl."Maximum Inventory";
-            Item."Order Tracking Policy" := ItemTempl."Order Tracking Policy";
-            Item."Order Multiple" := ItemTempl."Order Multiple";
-            Item."Time Bucket" := ItemTempl."Time Bucket";
-            Item.Reserve := ItemTempl.Reserve;
-            Item."Minimum Order Quantity" := ItemTempl."Minimum Order Quantity";
-            Item."Maximum Order Quantity" := ItemTempl."Maximum Order Quantity";
-            Item."Scrap %" := ItemTempl."Scrap %";
-            Item."Lot Size" := ItemTempl."Lot Size";
-            Item."Item Tracking Code" := ItemTempl."Item Tracking Code";
-            Item."Serial Nos." := ItemTempl."Serial Nos.";
-            Item."Lot Nos." := ItemTempl."Lot Nos.";
-            Item."Warehouse Class Code" := ItemTempl."Warehouse Class Code";
-            Item."Put-away Template Code" := ItemTempl."Put-away Template Code";
-            Item."Special Equipment Code" := ItemTempl."Special Equipment Code";
-            Item."Expiration Calculation" := ItemTempl."Expiration Calculation";
-            Item.Blocked := ItemTempl.Blocked;
-            Item."Block Reason" := ItemTempl."Block Reason";
-            Item."Sales Blocked" := ItemTempl."Sales Blocked";
-            Item."Purchasing Blocked" := ItemTempl."Purchasing Blocked";
-            Item."Purchasing Code" := ItemTempl."Purchasing Code";
-            Item."Country/Region Purchased Code" := ItemTempl."Country/Region Purchased Code";
-            Item."Variant Mandatory if Exists" := ItemTempl."Variant Mandatory if Exists";
-            Item."Over-Receipt Code" := ItemTempl."Over-Receipt Code";
-            Item."Overhead Rate" := ItemTempl."Overhead Rate";
-            Item."Overflow Level" := ItemTempl."Overflow Level";
-            Item."Dampener Period" := ItemTempl."Dampener Period";
-            Item."Dampener Quantity" := ItemTempl."Dampener Quantity";
-            Item."Common Item No." := ItemTempl."Common Item No.";
-            Item.GTIN := ItemTempl.GTIN;
-            Item."Unit Volume" := ItemTempl."Unit Volume";
-            Item."Service Item Group" := ItemTempl."Service Item Group";
-            Item."Shelf No." := ItemTempl."Shelf No.";
-            Item."Freight Type" := ItemTempl."Freight Type";
-            Item."Replenishment System" := ItemTempl."Replenishment System";
-            Item."Lead Time Calculation" := ItemTempl."Lead Time Calculation";
-            Item."Manufacturing Policy" := ItemTempl."Manufacturing Policy";
-            Item."Assembly Policy" := ItemTempl."Assembly Policy";
-            Item."Routing No." := ItemTempl."Routing No.";
-            Item."Production BOM No." := ItemTempl."Production BOM No.";
-            Item."Rounding Precision" := ItemTempl."Rounding Precision";
-
+            ItemTemplMgt.InitFromTemplate(Item, ItemTempl, true);
             OnAfterInitItemFromTemplate(Item, ItemTempl, NonstockItem);
         end;
     end;
@@ -828,14 +783,6 @@ codeunit 5703 "Catalog Item Management"
     local procedure OnBeforeNonstockAutoItem(var NonStock2: Record "Nonstock Item")
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by event OnBeforeNonstockItemReference', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeNonstockItemCrossRef(var NonstockItem: Record "Nonstock Item"; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeNonstockItemReference(var NonstockItem: Record "Nonstock Item"; var IsHandled: Boolean)

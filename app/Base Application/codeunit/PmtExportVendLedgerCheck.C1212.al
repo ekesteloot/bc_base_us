@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.Purchases.Payables;
+
 codeunit 1212 "Pmt. Export Vend. Ledger Check"
 {
     TableNo = "Vendor Ledger Entry";

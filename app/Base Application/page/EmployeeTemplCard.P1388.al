@@ -1,3 +1,8 @@
+namespace Microsoft.HumanResources.Employee;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+
 page 1388 "Employee Templ. Card"
 {
     Caption = 'Employee Template';
@@ -30,7 +35,7 @@ page 1388 "Employee Templ. Card"
             group(General)
             {
                 Caption = 'General';
-                field(Gender; Gender)
+                field(Gender; Rec.Gender)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the employee''s gender.';
@@ -42,7 +47,7 @@ page 1388 "Employee Templ. Card"
                 group(Control13)
                 {
                     ShowCaption = false;
-                    field(City; City)
+                    field(City; Rec.City)
                     {
                         ApplicationArea = BasicHR;
                         ToolTip = 'Specifies the city of the address.';
@@ -51,7 +56,7 @@ page 1388 "Employee Templ. Card"
                     {
                         ShowCaption = false;
                         Visible = IsCountyVisible;
-                        field(County; County)
+                        field(County; Rec.County)
                         {
                             ApplicationArea = BasicHR;
                             ToolTip = 'Specifies the county of the employee.';
@@ -69,7 +74,7 @@ page 1388 "Employee Templ. Card"
 
                         trigger OnValidate()
                         begin
-                            IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                            IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                         end;
                     }
                 }
@@ -127,13 +132,13 @@ page 1388 "Employee Templ. Card"
                     EmployeeTempl: Record "Employee Templ.";
                     EmployeeTemplList: Page "Employee Templ. List";
                 begin
-                    TestField(Code);
-                    EmployeeTempl.SetFilter(Code, '<>%1', Code);
+                    Rec.TestField(Code);
+                    EmployeeTempl.SetFilter(Code, '<>%1', Rec.Code);
                     EmployeeTemplList.LookupMode(true);
                     EmployeeTemplList.SetTableView(EmployeeTempl);
                     if EmployeeTemplList.RunModal() = Action::LookupOK then begin
                         EmployeeTemplList.GetRecord(EmployeeTempl);
-                        CopyFromTemplate(EmployeeTempl);
+                        Rec.CopyFromTemplate(EmployeeTempl);
                     end;
                 end;
             }
@@ -156,7 +161,7 @@ page 1388 "Employee Templ. Card"
 
     trigger OnOpenPage()
     begin
-        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
     end;
 
     var

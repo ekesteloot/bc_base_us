@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Ledger;
+
+using Microsoft.BankMgt.BankAccount;
+
 query 264 "Bank Account Ledger Entries"
 {
     Caption = 'Bank Account Ledger Entries';

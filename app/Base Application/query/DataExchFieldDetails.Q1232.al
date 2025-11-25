@@ -1,3 +1,5 @@
+namespace System.IO;
+
 query 1232 "Data Exch. Field Details"
 {
     Caption = 'Data Exch. Field Details';

@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Analysis;
+
+using Microsoft.InventoryMgt.Analysis;
+
 report 7114 "Run Sales Analysis Line Templ."
 {
     ApplicationArea = SalesAnalysis;

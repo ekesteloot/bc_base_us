@@ -16,7 +16,7 @@ page 10043 "Purchase Stats."
                 field("TotalPurchLine.""Line Amount"""; TotalPurchLine."Line Amount")
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, false);
                     Caption = 'Amount';
@@ -26,7 +26,7 @@ page 10043 "Purchase Stats."
                 field("TotalPurchLine.""Inv. Discount Amount"""; TotalPurchLine."Inv. Discount Amount")
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     Editable = false;
@@ -40,7 +40,7 @@ page 10043 "Purchase Stats."
                 field(TotalAmount1; TotalAmount1)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text002, false);
                     Caption = 'Total';
@@ -55,7 +55,7 @@ page 10043 "Purchase Stats."
                 field(TaxAmount; TaxAmount)
                 {
                     ApplicationArea = SalesTax;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Tax Amount';
                     Editable = false;
@@ -64,7 +64,7 @@ page 10043 "Purchase Stats."
                 field(TotalAmount2; TotalAmount2)
                 {
                     ApplicationArea = SalesTax;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text002, true);
                     Caption = 'Total Incl. Tax';
@@ -183,13 +183,13 @@ page 10043 "Purchase Stats."
         TempPurchLine: Record "Purchase Line" temporary;
         TempSalesTaxAmtLine: Record "Sales Tax Amount Line" temporary;
     begin
-        CurrPage.Caption(StrSubstNo(Text000, "Document Type"));
-        if PrevNo = "No." then
+        CurrPage.Caption(StrSubstNo(Text000, Rec."Document Type"));
+        if PrevNo = Rec."No." then
             exit;
-        PrevNo := "No.";
-        FilterGroup(2);
-        SetRange("No.", PrevNo);
-        FilterGroup(0);
+        PrevNo := Rec."No.";
+        Rec.FilterGroup(2);
+        Rec.SetRange("No.", PrevNo);
+        Rec.FilterGroup(0);
         Clear(PurchLine);
         Clear(TotalPurchLine);
         Clear(TotalPurchLineLCY);
@@ -199,8 +199,8 @@ page 10043 "Purchase Stats."
         SalesTaxCalculate.StartSalesTaxCalculation();
         OnAfterStartSalesTaxCalculation();
 
-        PurchLine.SetRange("Document Type", "Document Type");
-        PurchLine.SetRange("Document No.", "No.");
+        PurchLine.SetRange("Document Type", Rec."Document Type");
+        PurchLine.SetRange("Document No.", Rec."No.");
         PurchLine.SetFilter(Type, '>0');
         PurchLine.SetFilter(Quantity, '<>0');
         if PurchLine.Find('-') then
@@ -214,14 +214,14 @@ page 10043 "Purchase Stats."
         if TaxArea."Use External Tax Engine" then
             SalesTaxCalculate.CallExternalTaxEngineForPurch(Rec, true)
         else
-            SalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
+            SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
         SalesTaxCalculate.GetSalesTaxAmountLineTable(TempSalesTaxLine);
 
         SalesTaxCalculate.DistTaxOverPurchLines(TempPurchLine);
         PurchPost.SumPurchLinesTemp(
           Rec, TempPurchLine, 0, TotalPurchLine, TotalPurchLineLCY, TaxAmount, TaxAmountText);
 
-        if "Prices Including VAT" then begin
+        if Rec."Prices Including VAT" then begin
             TotalAmount2 := TotalPurchLine.Amount;
             TotalAmount1 := TotalPurchLine."Line Amount" - TotalPurchLine."Inv. Discount Amount";
         end else begin
@@ -232,7 +232,7 @@ page 10043 "Purchase Stats."
         SalesTaxCalculate.GetSummarizedSalesTaxTable(TempSalesTaxAmtLine);
         UpdateTaxBreakdown(TempSalesTaxAmtLine, true);
 
-        if Vend.Get("Pay-to Vendor No.") then
+        if Vend.Get(Rec."Pay-to Vendor No.") then
             Vend.CalcFields("Balance (LCY)")
         else
             Clear(Vend);
@@ -249,12 +249,12 @@ page 10043 "Purchase Stats."
     begin
         PurchSetup.Get();
         AllowInvDisc :=
-          not (PurchSetup."Calc. Inv. Discount" and VendInvDiscRecExists("Invoice Disc. Code"));
+          not (PurchSetup."Calc. Inv. Discount" and VendInvDiscRecExists(Rec."Invoice Disc. Code"));
         AllowVATDifference :=
           PurchSetup."Allow VAT Difference" and
-          not ("Document Type" in ["Document Type"::Quote, "Document Type"::"Blanket Order"]);
+          not (Rec."Document Type" in [Rec."Document Type"::Quote, Rec."Document Type"::"Blanket Order"]);
         CurrPage.Editable := AllowVATDifference or AllowInvDisc;
-        TaxArea.Get("Tax Area Code");
+        TaxArea.Get(Rec."Tax Area Code");
         SetVATSpecification();
 
         OnAfterOnOpenPage(AllowVATDifference);
@@ -313,23 +313,23 @@ page 10043 "Purchase Stats."
         TotalAmount1 :=
           TotalPurchLine."Line Amount" - TotalPurchLine."Inv. Discount Amount";
         TaxAmount := TempSalesTaxLine.GetTotalTaxAmountFCY();
-        if "Prices Including VAT" then
+        if Rec."Prices Including VAT" then
             TotalAmount2 := TotalPurchLine.Amount
         else
             TotalAmount2 := TotalAmount1 + TaxAmount;
 
-        if "Prices Including VAT" then
+        if Rec."Prices Including VAT" then
             TotalPurchLineLCY.Amount := TotalAmount2
         else
             TotalPurchLineLCY.Amount := TotalAmount1;
-        if "Currency Code" <> '' then begin
-            if "Document Type" = "Document Type"::Quote then
+        if Rec."Currency Code" <> '' then begin
+            if Rec."Document Type" = Rec."Document Type"::Quote then
                 UseDate := WorkDate()
             else
-                UseDate := "Posting Date";
+                UseDate := Rec."Posting Date";
             TotalPurchLineLCY.Amount :=
               CurrExchRate.ExchangeAmtFCYToLCY(
-                UseDate, "Currency Code", TotalPurchLineLCY.Amount, "Currency Factor");
+                UseDate, Rec."Currency Code", TotalPurchLineLCY.Amount, Rec."Currency Factor");
         end;
     end;
 
@@ -343,8 +343,8 @@ page 10043 "Purchase Stats."
     begin
         CurrPage.SubForm.PAGE.SetTempTaxAmountLine(TempSalesTaxLine);
         CurrPage.SubForm.PAGE.InitGlobals(
-          "Currency Code", AllowVATDifference, AllowVATDifference,
-          "Prices Including VAT", AllowInvDisc, "VAT Base Discount %");
+          Rec."Currency Code", AllowVATDifference, AllowVATDifference,
+          Rec."Prices Including VAT", AllowInvDisc, Rec."VAT Base Discount %");
     end;
 
     local procedure UpdateTotalAmount()
@@ -360,7 +360,7 @@ page 10043 "Purchase Stats."
         InvDiscBaseAmount: Decimal;
     begin
         CheckAllowInvDisc();
-        InvDiscBaseAmount := TempSalesTaxLine.GetTotalInvDiscBaseAmount(false, "Currency Code");
+        InvDiscBaseAmount := TempSalesTaxLine.GetTotalInvDiscBaseAmount(false, Rec."Currency Code");
         if InvDiscBaseAmount = 0 then
             Error(Text003, TempSalesTaxLine.FieldCaption("Inv. Disc. Base Amount"));
 
@@ -371,19 +371,19 @@ page 10043 "Purchase Stats."
               TempSalesTaxLine.FieldCaption("Inv. Disc. Base Amount"));
 
         TempSalesTaxLine.SetInvoiceDiscountAmount(
-          TotalPurchLine."Inv. Discount Amount", "Currency Code", "Prices Including VAT", "VAT Base Discount %");
+          TotalPurchLine."Inv. Discount Amount", Rec."Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %");
         CurrPage.SubForm.PAGE.SetTempTaxAmountLine(TempSalesTaxLine);
         UpdateHeaderInfo();
 
-        "Invoice Discount Calculation" := "Invoice Discount Calculation"::Amount;
-        "Invoice Discount Value" := TotalPurchLine."Inv. Discount Amount";
-        Modify();
+        Rec."Invoice Discount Calculation" := Rec."Invoice Discount Calculation"::Amount;
+        Rec."Invoice Discount Value" := TotalPurchLine."Inv. Discount Amount";
+        Rec.Modify();
         UpdateVATOnPurchLines();
     end;
 
     local procedure GetCaptionClass(FieldCaption: Text[100]; ReverseCaption: Boolean): Text[80]
     begin
-        if "Prices Including VAT" xor ReverseCaption then
+        if Rec."Prices Including VAT" xor ReverseCaption then
             exit('2,1,' + FieldCaption);
 
         exit('2,0,' + FieldCaption);
@@ -396,8 +396,8 @@ page 10043 "Purchase Stats."
         GetVATSpecification();
 
         PurchLine.Reset();
-        PurchLine.SetRange("Document Type", "Document Type");
-        PurchLine.SetRange("Document No.", "No.");
+        PurchLine.SetRange("Document Type", Rec."Document Type");
+        PurchLine.SetRange("Document No.", Rec."No.");
         PurchLine.FindFirst();
 
         if TempSalesTaxLine.GetAnyLineModified() then begin
@@ -405,7 +405,7 @@ page 10043 "Purchase Stats."
             SalesTaxCalculate.PutSalesTaxAmountLineTable(
               TempSalesTaxLine,
               "Sales Tax Document Area"::Purchase.AsInteger(),
-              "Document Type".AsInteger(), "No.");
+              Rec."Document Type".AsInteger(), Rec."No.");
             OnBeforeDistTaxOverPurchLines(PurchLine);
             SalesTaxCalculate.DistTaxOverPurchLines(PurchLine);
             SalesTaxCalculate.SaveTaxDifferences();
@@ -428,7 +428,7 @@ page 10043 "Purchase Stats."
         if not AllowInvDisc then
             Error(
               Text005,
-              VendInvDisc.TableCaption(), FieldCaption("Invoice Disc. Code"), "Invoice Disc. Code");
+              VendInvDisc.TableCaption(), Rec.FieldCaption("Invoice Disc. Code"), Rec."Invoice Disc. Code");
     end;
 
     local procedure UpdateTaxBreakdown(var TempSalesTaxAmtLine: Record "Sales Tax Amount Line" temporary; UpdateTaxAmount: Boolean)

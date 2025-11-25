@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Structure;
+using System.Reflection;
+
 table 82 "Item Journal Template"
 {
     Caption = 'Item Journal Template';
@@ -18,12 +27,12 @@ table 82 "Item Journal Template"
         field(5; "Test Report ID"; Integer)
         {
             Caption = 'Test Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(6; "Page ID"; Integer)
         {
             Caption = 'Page ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Page));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Page));
 
             trigger OnValidate()
             begin
@@ -34,7 +43,7 @@ table 82 "Item Journal Template"
         field(7; "Posting Report ID"; Integer)
         {
             Caption = 'Posting Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(8; "Force Posting Report"; Boolean)
         {
@@ -48,62 +57,62 @@ table 82 "Item Journal Template"
             begin
                 "Test Report ID" := REPORT::"Inventory Posting - Test";
                 "Posting Report ID" := REPORT::"Item Register";
-                "Whse. Register Report ID" := REPORT::"Warehouse Register - Quantity";
+                "Whse. Register Report ID" := Enum::ReportID::"Warehouse Register - Quantity";
                 SourceCodeSetup.Get();
                 case Type of
                     Type::Item:
                         begin
                             "Source Code" := SourceCodeSetup."Item Journal";
-                            "Page ID" := PAGE::"Item Journal";
+                            "Page ID" := Enum::PageID::"Item Journal".AsInteger();
                         end;
                     Type::Transfer:
                         begin
                             "Source Code" := SourceCodeSetup."Item Reclass. Journal";
-                            "Page ID" := PAGE::"Item Reclass. Journal";
+                            "Page ID" := Enum::PageID::"Item Reclass. Journal".AsInteger();
                         end;
                     Type::"Phys. Inventory":
                         begin
                             "Source Code" := SourceCodeSetup."Phys. Inventory Journal";
-                            "Page ID" := PAGE::"Phys. Inventory Journal";
+                            "Page ID" := Enum::PageID::"Phys. Inventory Journal".AsInteger();
                         end;
                     Type::Revaluation:
                         begin
                             "Source Code" := SourceCodeSetup."Revaluation Journal";
-                            "Page ID" := PAGE::"Revaluation Journal";
+                            "Page ID" := Enum::PageID::"Revaluation Journal".AsInteger();
                             "Test Report ID" := REPORT::"Revaluation Posting - Test";
                             "Posting Report ID" := REPORT::"Item Register - Value";
                         end;
                     Type::Consumption:
                         begin
                             "Source Code" := SourceCodeSetup."Consumption Journal";
-                            "Page ID" := PAGE::"Consumption Journal";
+                            "Page ID" := Enum::PageID::"Consumption Journal".AsInteger();
                         end;
                     Type::Output:
                         begin
                             "Source Code" := SourceCodeSetup."Output Journal";
-                            "Page ID" := PAGE::"Output Journal";
+                            "Page ID" := Enum::PageID::"Output Journal".AsInteger();
                         end;
                     Type::Capacity:
                         begin
                             "Source Code" := SourceCodeSetup."Capacity Journal";
-                            "Page ID" := PAGE::"Capacity Journal";
+                            "Page ID" := Enum::PageID::"Capacity Journal".AsInteger();
                         end;
                     Type::"Prod. Order":
                         begin
                             "Source Code" := SourceCodeSetup."Production Journal";
-                            "Page ID" := PAGE::"Production Journal";
+                            "Page ID" := Enum::PageID::"Production Journal".AsInteger();
                         end;
                 end;
                 if Recurring then
                     case Type of
                         Type::Item:
-                            "Page ID" := PAGE::"Recurring Item Jnl.";
+                            "Page ID" := Enum::PageID::"Recurring Item Jnl.".AsInteger();
                         Type::Consumption:
-                            "Page ID" := PAGE::"Recurring Consumption Journal";
+                            "Page ID" := Enum::PageID::"Recurring Consumption Journal".AsInteger();
                         Type::Output:
-                            "Page ID" := PAGE::"Recurring Output Journal";
+                            "Page ID" := Enum::PageID::"Recurring Output Journal".AsInteger();
                         Type::Capacity:
-                            "Page ID" := PAGE::"Recurring Capacity Journal";
+                            "Page ID" := Enum::PageID::"Recurring Capacity Journal".AsInteger();
                     end;
 
                 OnAfterValidateType(Rec, SourceCodeSetup);
@@ -139,24 +148,24 @@ table 82 "Item Journal Template"
         }
         field(15; "Test Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Test Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Test Report ID")));
             Caption = 'Test Report Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(16; "Page Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
-                                                                           "Object ID" = FIELD("Page ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Page),
+                                                                           "Object ID" = field("Page ID")));
             Caption = 'Page Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(17; "Posting Report Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Posting Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Posting Report ID")));
             Caption = 'Posting Report Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -193,13 +202,13 @@ table 82 "Item Journal Template"
         {
             AccessByPermission = TableData "Bin Content" = R;
             Caption = 'Whse. Register Report ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Report));
         }
         field(22; "Whse. Register Report Caption"; Text[250])
         {
             AccessByPermission = TableData "Bin Content" = R;
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("Whse. Register Report ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("Whse. Register Report ID")));
             Caption = 'Whse. Register Report Caption';
             Editable = false;
             FieldClass = FlowField;

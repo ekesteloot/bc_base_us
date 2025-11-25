@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Reports;
+using System.Text;
+
 page 436 "Reminder List"
 {
     ApplicationArea = Suite;
@@ -48,7 +54,7 @@ page 436 "Reminder List"
                     ToolTip = 'Specifies the postal code.';
                     Visible = false;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the city name of the customer the reminder is for.';
@@ -104,8 +110,8 @@ page 436 "Reminder List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Reminder Comment Sheet";
-                    RunPageLink = Type = CONST(Reminder),
-                                  "No." = FIELD("No.");
+                    RunPageLink = Type = const(Reminder),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("C&ustomer")
@@ -114,7 +120,7 @@ page 436 "Reminder List"
                     Caption = 'C&ustomer';
                     Image = Customer;
                     RunObject = Page "Customer List";
-                    RunPageLink = "No." = FIELD("Customer No.");
+                    RunPageLink = "No." = field("Customer No.");
                     ToolTip = 'Open the card of the customer that the reminder or finance charge applies to. ';
                 }
                 separator(Action8)
@@ -126,7 +132,7 @@ page 436 "Reminder List"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Reminder Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -323,7 +329,7 @@ page 436 "Reminder List"
 
     trigger OnDeleteRecord(): Boolean
     begin
-        exit(ConfirmDeletion());
+        exit(Rec.ConfirmDeletion());
     end;
 
     var

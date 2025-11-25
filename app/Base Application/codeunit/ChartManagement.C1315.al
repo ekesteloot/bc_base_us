@@ -1,3 +1,8 @@
+namespace System.Visualization;
+
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+
 codeunit 1315 "Chart Management"
 {
 
@@ -218,6 +223,18 @@ codeunit 1315 "Chart Management"
             else
                 BusChartBuf."Period Length" := PeriodLength;
         end;
+    end;
+
+    procedure UpdateChartSafe(var ChartDefinition: Record "Chart Definition"; var BusinessChartBuffer: Record "Business Chart Buffer"; Period: Option; var ErrorMessage: Text): Boolean
+    begin
+        ClearLastError();
+        OnUpdateChartSafe(ChartDefinition, BusinessChartBuffer, Period);
+        ErrorMessage := GetLastErrorText();
+        if ErrorMessage = '' then
+            exit(true);
+
+        ClearLastError();
+        exit(false);
     end;
 
     procedure UpdateChart(var ChartDefinition: Record "Chart Definition"; var BusinessChartBuffer: Record "Business Chart Buffer"; Period: Option)
@@ -463,6 +480,11 @@ codeunit 1315 "Chart Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateStatusText(ChartDefinition: Record "Chart Definition"; BusinessChartBuffer: Record "Business Chart Buffer"; var StatusText: Text; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false, true)]
+    local procedure OnUpdateChartSafe(var ChartDefinition: Record "Chart Definition"; var BusinessChartBuffer: Record "Business Chart Buffer"; Period: Option)
     begin
     end;
 }

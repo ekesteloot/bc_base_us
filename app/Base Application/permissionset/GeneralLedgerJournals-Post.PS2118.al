@@ -7,6 +7,10 @@ permissionset 2118 "General Ledger Journals - Post"
     Permissions = tabledata "Acc. Sched. KPI Web Srv. Line" = RIMD,
                   tabledata "Acc. Sched. KPI Web Srv. Setup" = RIMD,
                   tabledata "Accounting Period" = r,
+                  tabledata "Alloc. Acc. Manual Override" = RIMD,
+                  tabledata "Alloc. Account Distribution" = R,
+                  tabledata "Allocation Account" = R,
+                  tabledata "Allocation Line" = RIMD,
                   tabledata "Analysis View" = rimd,
                   tabledata "Analysis View Entry" = rim,
                   tabledata "Analysis View Filter" = r,
@@ -40,9 +44,6 @@ permissionset 2118 "General Ledger Journals - Post"
                   tabledata "Incoming Document Approver" = RIMD,
                   tabledata "Incoming Document Attachment" = RIMD,
                   tabledata "Incoming Documents Setup" = RIMD,
-#if not CLEAN20
-                  tabledata "Native - Payment" = RIMD,
-#endif
                   tabledata "Notification Entry" = Rimd,
                   tabledata "Posted Docs. With No Inc. Buf." = RIMD,
                   tabledata "Restricted Record" = Rimd,

@@ -1,6 +1,10 @@
+namespace System.Azure.Identity;
+
+using System.Environment;
+
 page 6302 "Azure AD Access Dialog"
 {
-    Caption = 'Azure Active Directory service permissions';
+    Caption = 'Microsoft Entra service permissions';
     PageType = NavigatePage;
 
     layout
@@ -10,7 +14,7 @@ page 6302 "Azure AD Access Dialog"
             label(Para0)
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'The functionality you have selected to use requires services from Azure Active Directory to access your system.';
+                Caption = 'The functionality you have selected to use requires services from Microsoft Entra to access your system.';
             }
             label(Para1)
             {
@@ -64,9 +68,9 @@ page 6302 "Azure AD Access Dialog"
             label(Para3)
             {
                 ApplicationArea = Basic, Suite;
-                Caption = 'Azure Active Directory Services:';
+                Caption = 'Microsoft Entra Services:';
                 Style = Strong;
-                StyleExpr = TRUE;
+                StyleExpr = true;
             }
             field(Para4; ResourceFriendlyName)
             {
@@ -87,7 +91,7 @@ page 6302 "Azure AD Access Dialog"
         ClientTypeManagement: Codeunit "Client Type Management";
         AuthCode: Text;
         ResourceUrl: Text;
-        AuthorizationTxt: Label 'Error occurred while trying to authorize with Azure Active Directory. Please try again or contact your system administrator if error persist.';
+        AuthorizationTxt: Label 'Error occurred while trying to authorize with Microsoft Entra ID. Please try again or contact your system administrator if error persist.';
         ResourceFriendlyName: Text;
         CloseWindowMsg: Label 'Authorization sucessful. Close the window to proceed.';
         LinkNameTxt: Label 'Authorize Azure Services';

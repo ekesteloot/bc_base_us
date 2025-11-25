@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Insurance;
+
 page 5653 "Insurance Jnl. Template List"
 {
     Caption = 'Insurance Jnl. Template List';

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 enum 5096 "Opportunity Document Type"
 {
     Extensible = true;

@@ -11,7 +11,7 @@ page 99000806 "Quality Measures"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the quality measure code.';

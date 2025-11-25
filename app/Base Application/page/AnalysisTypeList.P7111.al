@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 7111 "Analysis Type List"
 {
     Caption = 'Analysis Type List';
@@ -12,7 +14,7 @@ page 7111 "Analysis Type List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = SalesAnalysis, PurchaseAnalysis;
                     ToolTip = 'Specifies the code of the analysis type.';

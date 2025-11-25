@@ -12,10 +12,10 @@ report 594 "Get Item Ledger Entries"
     {
         dataitem("Country/Region"; "Country/Region")
         {
-            DataItemTableView = SORTING("Intrastat Code") WHERE("Intrastat Code" = FILTER(<> ''));
+            DataItemTableView = sorting("Intrastat Code") where("Intrastat Code" = filter(<> ''));
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemTableView = SORTING("Country/Region Code", "Entry Type", "Posting Date") WHERE("Entry Type" = FILTER(Purchase | Sale | Transfer), Correction = CONST(false));
+                DataItemTableView = sorting("Country/Region Code", "Entry Type", "Posting Date") where("Entry Type" = filter(Purchase | Sale | Transfer), Correction = const(false));
 
                 trigger OnAfterGetRecord()
                 var
@@ -83,8 +83,8 @@ report 594 "Get Item Ledger Entries"
             }
             dataitem("Job Ledger Entry"; "Job Ledger Entry")
             {
-                DataItemLink = "Country/Region Code" = FIELD(Code);
-                DataItemTableView = SORTING(Type, "Entry Type", "Country/Region Code", "Source Code", "Posting Date") WHERE(Type = CONST(Item), "Source Code" = FILTER(<> ''), "Entry Type" = CONST(Usage));
+                DataItemLink = "Country/Region Code" = field(Code);
+                DataItemTableView = sorting(Type, "Entry Type", "Country/Region Code", "Source Code", "Posting Date") where(Type = const(Item), "Source Code" = filter(<> ''), "Entry Type" = const(Usage));
 
                 trigger OnAfterGetRecord()
                 begin
@@ -108,7 +108,7 @@ report 594 "Get Item Ledger Entries"
         }
         dataitem("Value Entry"; "Value Entry")
         {
-            DataItemTableView = SORTING("Entry No.");
+            DataItemTableView = sorting("Entry No.");
 
             trigger OnAfterGetRecord()
             begin

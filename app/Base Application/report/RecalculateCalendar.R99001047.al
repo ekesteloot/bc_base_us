@@ -7,7 +7,7 @@ report 99001047 "Recalculate Calendar"
     {
         dataitem("Calendar Entry"; "Calendar Entry")
         {
-            DataItemTableView = SORTING("Capacity Type", "No.", Date, "Starting Time", "Ending Time", "Work Shift Code");
+            DataItemTableView = sorting("Capacity Type", "No.", Date, "Starting Time", "Ending Time", "Work Shift Code");
             RequestFilterFields = "Capacity Type", "No.", Date;
 
             trigger OnAfterGetRecord()

@@ -1,7 +1,16 @@
+﻿namespace System.Integration.PowerBI;
+
+using System;
+using System.Azure.Identity;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Reflection;
+using System.Security.User;
+using System.Threading;
+
 codeunit 6301 "Power BI Service Mgt."
 {
-    // // Manages access to the Power BI service API's (aka powerbi.com)
-
     var
         AzureAdMgt: Codeunit "Azure AD Mgt.";
         ConfPersonalizationMgt: Codeunit "Conf./Personalization Mgt.";
@@ -9,19 +18,23 @@ codeunit 6301 "Power BI Service Mgt."
         PowerBiResourceNameTxt: Label 'Power BI Services';
         MainPageRatioTxt: Label '16:9', Locked = true;
         FactboxRatioTxt: Label '4:3', Locked = true;
+        FailedAuthErr: Label 'We failed to authenticate with Power BI. Try to sign out and in again. This problem typically happens if you no longer have a license for Power BI or if you just changed your email or password.';
         UnauthorizedErr: Label 'You do not have a Power BI account. If you have just activated a license, it might take several minutes for the changes to be effective in Power BI.';
-        DataNotFoundErr: Label 'The report(s) you are trying to load do not exist.';
         NavAppSourceUrlTxt: Label 'https://go.microsoft.com/fwlink/?linkid=862351', Locked = true;
         Dyn365AppSourceUrlTxt: Label 'https://go.microsoft.com/fwlink/?linkid=862352', Locked = true;
         PowerBIMyOrgUrlTxt: Label 'https://go.microsoft.com/fwlink/?linkid=862353', Locked = true;
         JobQueueCategoryCodeTxt: Label 'PBI EMBED', Locked = true;
         JobQueueCategoryDescriptionTxt: Label 'Synchronize Power BI reports', MaxLength = 30;
         // Telemetry constants
-        PowerBiLicenseCheckErrorTelemetryMsg: Label 'Power BI license check finished with status code: %1. Error: %2', Locked = true;
-        PowerBiLicenseCheckStatusCodeTelemetryMsg: Label 'Power BI license check returned status code: %1.', Locked = true;
+        PowerBiEmbedFeatureTelemetryTok: Label 'Power BI Embed', Locked = true;
+        PowerBiLicenseCheckErrorTelemetryMsg: Label 'Power BI license check finished with error.', Locked = true;
+        PowerBiLicenseCheckSuccessTelemetryMsg: Label 'Power BI license check returned success.', Locked = true;
         PowerBiTelemetryCategoryLbl: Label 'AL Power BI Embedded', Locked = true;
+#if not CLEAN23
         OngoingDeploymentTelemetryMsg: Label 'Setting Power BI Ongoing Deployment record for user. Field: %1; Value: %2.', Locked = true;
         ErrorWebResponseTelemetryMsg: Label 'GetData failed with an error. The status code is: %1.', Locked = true;
+        DataNotFoundErr: Label 'The report(s) you are trying to load do not exist.';
+#endif
 #if not CLEAN22
         RetryAfterNotSatisfiedTelemetryMsg: Label 'PowerBI service not ready. Will retry after: %1.', Locked = true;
 #endif
@@ -74,35 +87,31 @@ codeunit 6301 "Power BI Service Mgt."
     [Scope('OnPrem')]
     procedure CheckForPowerBILicenseInForeground(): Boolean
     var
-        DummyResponseText: Text;
-        ExceptionMessage: Text;
-        ExceptionDetails: Text;
-        ErrorStatusCode: Integer;
+        PowerBIServiceProvider: Interface "Power BI Service Provider";
+        OperationResult: DotNet OperationResult;
     begin
-        DummyResponseText := GetDataCatchErrors(ExceptionMessage, ExceptionDetails, ErrorStatusCode, GetReportsUrl());
+        CreateServiceProvider(PowerBIServiceProvider);
 
-        if ExceptionMessage <> '' then
-            Session.LogMessage('0000B6Y', StrSubstNo(PowerBiLicenseCheckErrorTelemetryMsg, ErrorStatusCode, GetLastErrorText(true)), Verbosity::Warning, DataClassification::OrganizationIdentifiableInformation, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
+        PowerBIServiceProvider.CheckUserLicense(OperationResult);
 
-        Session.LogMessage('0000C0H', StrSubstNo(PowerBiLicenseCheckStatusCodeTelemetryMsg, ErrorStatusCode), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
+        if OperationResult.Successful then
+            Session.LogMessage('0000C0H', PowerBiLicenseCheckSuccessTelemetryMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl)
+        else
+            Session.LogMessage('0000B6Y', PowerBiLicenseCheckErrorTelemetryMsg, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
 
-        // REMARK: 404 means the Power BI user workspace has not been provisioned yet. It could be that the user just activated a license and we can actually
-        // start autodeployment already, or that the user does not have a license at all and autodeployment would fail. We do not have a way to distinguish
-        // these cases. So, we take the conservative approach and consider it a missing license scenario (if the license has just been assigned, it usually takes
-        // 10-15 minutes to propagate and provision, so not too bad; the user can force this by uploading a report from the Power BI home page).
-        if (ErrorStatusCode = 0) and (ExceptionMessage = '') then
-            exit(true);
-
-        exit(false);
+        exit(OperationResult.Successful);
     end;
 
+#if not CLEAN23
     [Scope('OnPrem')]
+    [Obsolete('A report is enabled for a context if there is a mathcing entry in table "Power BI Report Configuration". Substitute calls to IsReportEnabled(ReportId, Context) with PowerBIReportConfiguration.Get(UserSecurityId(), ReportId, Context).', '23.0')]
     procedure IsReportEnabled(ReportId: Guid; EnglishContext: Text): Boolean
     var
         PowerBIReportConfiguration: Record "Power BI Report Configuration";
     begin
         exit(PowerBIReportConfiguration.Get(UserSecurityId(), ReportId, EnglishContext));
     end;
+#endif
 
     [NonDebuggable]
     [Scope('OnPrem')]
@@ -131,14 +140,6 @@ codeunit 6301 "Power BI Service Mgt."
         exit(GenericErr);
     end;
 
-#if not CLEAN20
-    [Obsolete('Use GetFactboxRatio or GetMainPageRatio instead.', '20.0')]
-    procedure GetReportPageSize(): Text
-    begin
-        exit('16:9');
-    end;
-#endif
-
     procedure GetFactboxRatio(): Text
     begin
         exit(FactboxRatioTxt);
@@ -149,17 +150,20 @@ codeunit 6301 "Power BI Service Mgt."
         exit(MainPageRatioTxt);
     end;
 
+#if not CLEAN23
+    [Obsolete('Error texts should be defined per extension. In other words, define your own text constants.', '23.0')]
     procedure GetUnauthorizedErrorText(): Text
     begin
         exit(UnauthorizedErr);
     end;
+#endif
 
     procedure GetContentPacksServicesUrl(): Text
     var
-        EnvironmentInfo: Codeunit "Environment Information";
+        EnvironmentInformation: Codeunit "Environment Information";
     begin
         // Gets the URL for AppSource's list of content packs, like Power BI's Services button, filtered to Dynamics reports.
-        if EnvironmentInfo.IsSaaS() then
+        if EnvironmentInformation.IsSaaS() then
             exit(Dyn365AppSourceUrlTxt);
 
         exit(NavAppSourceUrlTxt);
@@ -173,6 +177,7 @@ codeunit 6301 "Power BI Service Mgt."
 
 #if not CLEAN22
     [Scope('OnPrem')]
+    [Obsolete('This function requires now a context parameter.', '23.0')]
     procedure SynchronizeReportsInBackground()
     var
         JobQueueEntry: Record "Job Queue Entry";
@@ -187,8 +192,9 @@ codeunit 6301 "Power BI Service Mgt."
         Session.LogMessage('0000FB2', StrSubstNo(ScheduleSyncTelemetryMsg, Format(ScheduledDateTime, 50, 9)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
         JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"Power BI Report Synchronizer", ScheduledDateTime, GetJobQueueCategoryCode(), '')
     end;
-#else
+#elif not CLEAN23
     [Scope('OnPrem')]
+    [Obsolete('This function requires now a context parameter.', '23.0')]
     procedure SynchronizeReportsInBackground()
     var
         JobQueueEntry: Record "Job Queue Entry";
@@ -202,19 +208,35 @@ codeunit 6301 "Power BI Service Mgt."
 #endif
 
     [Scope('OnPrem')]
+    procedure SynchronizeReportsInBackground(Context: Text[50])
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        ScheduledDateTime: DateTime;
+    begin
+        ScheduledDateTime := CurrentDateTime();
+
+        Session.LogMessage('0000FB2', StrSubstNo(ScheduleSyncTelemetryMsg, Format(ScheduledDateTime, 50, 9)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
+        JobQueueEntry.ScheduleJobQueueEntryForLater(Codeunit::"Power BI Report Synchronizer", ScheduledDateTime, GetJobQueueCategoryCode(), Context)
+    end;
+
+    [Scope('OnPrem')]
     procedure IsUserSynchronizingReports(): Boolean
     var
+#if not CLEAN23
         PowerBIUserStatus: Record "Power BI User Status";
+#endif
         JobQueueEntry: Record "Job Queue Entry";
     begin
+#if not CLEAN23
         if PowerBIUserStatus.Get(UserSecurityId()) then
             if PowerBIUserStatus."Is Synchronizing" then
                 exit(true);
+#endif
 
         JobQueueEntry.SetRange("User ID", UserId());
         JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
         JobQueueEntry.SetRange("Object ID to Run", Codeunit::"Power BI Report Synchronizer");
-        JobQueueEntry.SetFilter(Status, '%1|%2', JobQueueEntry.Status::Ready, JobQueueEntry.Status::"In Process");
+        JobQueueEntry.SetFilter(Status, '%1|%2|%3|%4', JobQueueEntry.Status::Ready, JobQueueEntry.Status::"In Process", JobQueueEntry.Status::"On Hold", JobQueueEntry.Status::"On Hold with Inactivity Timeout");
 
         if not JobQueueEntry.IsEmpty() then
             exit(true);
@@ -222,7 +244,9 @@ codeunit 6301 "Power BI Service Mgt."
         exit(false);
     end;
 
+#if not CLEAN23
     [Scope('OnPrem')]
+    [Obsolete('Information on whether the user is synchronizing reports is no longer kept in a dedicated table. Instead, a user is synchronizing if they have a pending job queue entry for codeunit Power BI Report Synchronizer. If you want to stop synchronization for a user, create a new Job Queue Entry for codeunit Power BI Report Synchronizer and set it to On Hold. If you want to restart synchronization, make sure there is a ready job queue entry for codeunit Power BI Report Synchronizer.', '23.0')]
     procedure SetIsSynchronizing(IsSynchronizing: Boolean)
     var
         PowerBIUserStatus: Record "Power BI User Status";
@@ -245,6 +269,7 @@ codeunit 6301 "Power BI Service Mgt."
     begin
         Session.LogMessage('0000AYR', StrSubstNo(OngoingDeploymentTelemetryMsg, FieldChanged, NewValue), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
     end;
+#endif
 
 #if not CLEAN22
     [Scope('OnPrem')]
@@ -320,6 +345,8 @@ codeunit 6301 "Power BI Service Mgt."
     end;
 #endif
 
+#if not CLEAN23
+    [Obsolete('Check "Power BI Report Uploads" table directly', '23.0')]
     [Scope('OnPrem')]
     procedure HasUploads(): Boolean
     var
@@ -329,6 +356,7 @@ codeunit 6301 "Power BI Service Mgt."
     end;
 
     [Scope('OnPrem')]
+    [Obsolete('Use interface "Power BI Service Provider" and its implementations instead.', '23.0')]
     procedure GetData(var ExceptionMessage: Text; var ExceptionDetails: Text; Url: Text) ResponseText: Text
     var
         HttpStatusCode: Integer;
@@ -351,6 +379,7 @@ codeunit 6301 "Power BI Service Mgt."
 
     [Scope('OnPrem')]
     [NonDebuggable]
+    [Obsolete('Use interface "Power BI Service Provider" and its implementations instead.', '23.0')]
     procedure GetDataCatchErrors(var ExceptionMessage: Text; var ExceptionDetails: Text; var ErrorStatusCode: Integer; Url: Text): Text
     var
         DotNetExceptionHandler: Codeunit "DotNet Exception Handler";
@@ -393,6 +422,7 @@ codeunit 6301 "Power BI Service Mgt."
 
         exit(ResponseText);
     end;
+#endif
 
     [Scope('OnPrem')]
     procedure GetReportsUrl(): Text
@@ -419,7 +449,9 @@ codeunit 6301 "Power BI Service Mgt."
         exit(UserPermissions.IsSuper(UserSecurityId));
     end;
 
+#if not CLEAN23
     [Scope('OnPrem')]
+    [Obsolete('Use platform capabilities to escape text in JSON strings instead. For example, text is escaped by platform when calling JsonArray.Add(Text).', '23.0')]
     procedure FormatSpecialChars(Selection: Text): Text
     var
         i: Integer;
@@ -436,6 +468,7 @@ codeunit 6301 "Power BI Service Mgt."
             end;
         exit(Selection);
     end;
+#endif
 
     procedure CheckPowerBITablePermissions(): Boolean
     var
@@ -475,5 +508,53 @@ codeunit 6301 "Power BI Service Mgt."
             CopyStr(JobQueueCategoryDescriptionTxt, 1, MaxStrLen(JobQueueCategory.Description)));
 
         exit(JobQueueCategory.Code);
+    end;
+
+    internal procedure GetPowerBiFeatureTelemetryName(): Text
+    begin
+        exit(PowerBiEmbedFeatureTelemetryTok);
+    end;
+
+    [NonDebuggable]
+    internal procedure GetEmbedAccessToken() AccessToken: Text
+    var
+        HttpUtility: DotNet HttpUtility;
+    begin
+        AccessToken := HttpUtility.JavaScriptStringEncode(
+            AzureAdMgt.GetAccessToken(GetPowerBIResourceUrl(), GetPowerBiResourceName(), false)
+            );
+
+        if AccessToken = '' then begin
+            Session.LogMessage('0000KQL', EmptyAccessTokenTelemetryMsg, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
+            Error(FailedAuthErr);
+        end;
+    end;
+
+    internal procedure CreateServiceProvider(var PowerBIServiceProvider: Interface "Power BI Service Provider")
+    var
+        PowerBIUrlMgt: Codeunit "Power BI Url Mgt";
+        PowerBIRestServiceProvider: Codeunit "Power BI Rest Service Provider";
+        AzureAccessToken: Text;
+        Handled: Boolean;
+    begin
+        OnServiceProviderCreate(PowerBIServiceProvider, Handled);
+
+        if Handled then
+            exit;
+
+        AzureAccessToken := AzureAdMgt.GetAccessToken(GetPowerBIResourceUrl(), GetPowerBiResourceName(), false);
+
+        if AzureAccessToken = '' then begin
+            Session.LogMessage('0000B62', EmptyAccessTokenTelemetryMsg, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PowerBiTelemetryCategoryLbl);
+            Error(UnauthorizedErr);
+        end;
+
+        PowerBIRestServiceProvider.Initialize(AzureAccessToken, PowerBIUrlMgt.GetPowerBIApiUrl());
+        PowerBIServiceProvider := PowerBIRestServiceProvider;
+    end;
+
+    [InternalEvent(false)]
+    local procedure OnServiceProviderCreate(var PowerBIServiceProvider: Interface "Power BI Service Provider"; var Handled: Boolean)
+    begin
     end;
 }

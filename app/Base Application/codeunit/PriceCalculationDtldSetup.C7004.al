@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Calculation;
+
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+
 codeunit 7004 "Price Calculation Dtld. Setup"
 {
     procedure FindSetup(var DtldPriceCalcSetup: Record "Dtld. Price Calculation Setup") Result: Boolean;

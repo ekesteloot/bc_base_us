@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Counting.Document;
+
+using Microsoft.InventoryMgt.Counting.History;
+
 report 5882 "Copy Phys. Invt. Order"
 {
     Caption = 'Copy Phys. Invt. Order';

@@ -1,3 +1,5 @@
+namespace System.AI;
+
 table 2004 "Azure AI Usage"
 {
     // // This table is used for Azure Machine Learning related features to control that amount of time used by all

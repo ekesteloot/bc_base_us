@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.Consolidation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+
 table 1828 "Business Unit Information"
 {
     Caption = 'Business Unit Information';

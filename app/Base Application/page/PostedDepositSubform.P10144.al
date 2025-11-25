@@ -114,7 +114,7 @@ page 10144 "Posted Deposit Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -123,7 +123,7 @@ page 10144 "Posted Deposit Subform"
 
     procedure ShowDimensions()
     begin
-        ShowDimensions();
+        Rec.ShowDimensions();
     end;
 
     procedure ShowAccountCard()

@@ -13,7 +13,7 @@ page 429 Territories
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies a territory code.';

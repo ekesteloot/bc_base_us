@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 codeunit 8612 "Config. Template Management"
 {
 

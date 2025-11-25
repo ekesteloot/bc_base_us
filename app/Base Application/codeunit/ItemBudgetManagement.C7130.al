@@ -1,3 +1,14 @@
+﻿namespace Microsoft.InventoryMgt.Analysis;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using System.Utilities;
+
 codeunit 7130 "Item Budget Management"
 {
 
@@ -361,29 +372,29 @@ codeunit 7130 "Item Budget Management"
         GetGLSetup();
         case DimCode of
             '':
-                exit("Item Budget Dimension Type"::Undefined);
+                exit(Enum::"Item Budget Dimension Type"::Undefined);
             UpperCase(Item.TableCaption()):
-                exit("Item Budget Dimension Type"::Item);
+                exit(Enum::"Item Budget Dimension Type"::Item);
             UpperCase(Cust.TableCaption()):
-                exit("Item Budget Dimension Type"::Customer);
+                exit(Enum::"Item Budget Dimension Type"::Customer);
             UpperCase(Vend.TableCaption()):
-                exit("Item Budget Dimension Type"::Vendor);
+                exit(Enum::"Item Budget Dimension Type"::Vendor);
             UpperCase(Text003):
-                exit("Item Budget Dimension Type"::Period);
+                exit(Enum::"Item Budget Dimension Type"::Period);
             UpperCase(Location.TableCaption()):
-                exit("Item Budget Dimension Type"::Location);
+                exit(Enum::"Item Budget Dimension Type"::Location);
             GLSetup."Global Dimension 1 Code":
-                exit("Item Budget Dimension Type"::"Global Dimension 1");
+                exit(Enum::"Item Budget Dimension Type"::"Global Dimension 1");
             GLSetup."Global Dimension 2 Code":
-                exit("Item Budget Dimension Type"::"Global Dimension 2");
+                exit(Enum::"Item Budget Dimension Type"::"Global Dimension 2");
             ItemBudgetName."Budget Dimension 1 Code":
-                exit("Item Budget Dimension Type"::"Budget Dimension 1");
+                exit(Enum::"Item Budget Dimension Type"::"Budget Dimension 1");
             ItemBudgetName."Budget Dimension 2 Code":
-                exit("Item Budget Dimension Type"::"Budget Dimension 2");
+                exit(Enum::"Item Budget Dimension Type"::"Budget Dimension 2");
             ItemBudgetName."Budget Dimension 3 Code":
-                exit("Item Budget Dimension Type"::"Budget Dimension 3");
+                exit(Enum::"Item Budget Dimension Type"::"Budget Dimension 3");
             else
-                exit("Item Budget Dimension Type"::Undefined);
+                exit(Enum::"Item Budget Dimension Type"::Undefined);
         end;
     end;
 

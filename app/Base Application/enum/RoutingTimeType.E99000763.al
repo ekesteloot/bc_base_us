@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 enum 99000763 "Routing Time Type"
 {
     AssignmentCompatibility = true;

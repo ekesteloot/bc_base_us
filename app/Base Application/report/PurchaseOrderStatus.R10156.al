@@ -98,8 +98,8 @@ report 10156 "Purchase Order Status"
             }
             dataitem("Purchase Line"; "Purchase Line")
             {
-                DataItemLink = "No." = FIELD("No."), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter"), "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Expected Receipt Date") WHERE(Type = CONST(Item), "Document Type" = CONST(Order), "Outstanding Quantity" = FILTER(<> 0));
+                DataItemLink = "No." = field("No."), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter"), "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Expected Receipt Date") where(Type = const(Item), "Document Type" = const(Order), "Outstanding Quantity" = filter(<> 0));
                 RequestFilterFields = "Expected Receipt Date";
                 RequestFilterHeading = 'Purchase Order Line';
                 column(Purchase_Line__Document_No__; "Document No.")

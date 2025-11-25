@@ -1,3 +1,12 @@
+﻿namespace System.Security.AccessControl;
+
+using System.Azure.Identity;
+using System.Environment;
+using System.Environment.Configuration;
+using System.IO;
+using System.Reflection;
+using System.Security.User;
+
 codeunit 9852 "Effective Permissions Mgt."
 {
 
@@ -56,7 +65,9 @@ codeunit 9852 "Effective Permissions Mgt."
             Enum::Licenses::HelpDesk:
                 exit(PlanIds.GetHelpDeskPlanId());
             Enum::Licenses::"Internal Admin":
-                exit(PlanIds.GetInternalAdminPlanId());
+                exit(PlanIds.GetGlobalAdminPlanId());
+            Enum::Licenses::"D365 Admin":
+                exit(PlanIds.GetD365AdminPlanId());
             Enum::Licenses::Premium:
                 exit(PlanIds.GetPremiumPlanId());
             Enum::Licenses::"Team Member":
@@ -150,7 +161,7 @@ codeunit 9852 "Effective Permissions Mgt."
 
     internal procedure PopulatePermissionConflictsOverviewTable(var PermissionConflictsOverview: Record "Permission Conflicts Overview" temporary; PlansExist: Dictionary of [Guid, Boolean])
     var
-        PermissionSet: Record "Permission Set";
+        MetadataPermissionSet: Record "Metadata Permission Set";
         TenantPermissionSet: Record "Tenant Permission Set";
         ProgressBar: Codeunit "Config. Progress Bar";
         PlanIds: Codeunit "Plan Ids";
@@ -160,40 +171,42 @@ codeunit 9852 "Effective Permissions Mgt."
         ProgressBarTitleLbl: Label 'Loading permission sets';
         ProgressLbl: Label '#1#### of #2####', Comment = '#1 - Current permission set, #2 - Total number of permission sets';
     begin
-        TotalPermissionSets := PermissionSet.Count() + TenantPermissionSet.Count();
+        TotalPermissionSets := MetadataPermissionSet.Count() + TenantPermissionSet.Count();
 
         ProgressBar.Init(TotalPermissionSets, 1, ProgressBarTitleLbl);
         PermissionConflictsOverview.Reset();
         PermissionConflictsOverview.DeleteAll();
 
-        if PermissionSet.FindSet() then
+        if MetadataPermissionSet.FindSet() then
             repeat
                 CurrentPermissionSet += 1;
                 ProgressBar.Update(StrSubstNo(ProgressLbl, CurrentPermissionSet, TotalPermissionSets));
-                PermissionConflictsOverview.PermissionSetID := PermissionSet."Role ID";
+                PermissionConflictsOverview.PermissionSetID := MetadataPermissionSet."Role ID";
                 PermissionConflictsOverview.Type := PermissionConflictsOverview.Type::System;
                 if PlansExist.ContainsKey(PlanIds.GetBasicPlanId()) then
-                    PermissionConflictsOverview.Basic := IsPermissionSetCoveredByLicense(PlanOrRole::Basic, PermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                    PermissionConflictsOverview.Basic := IsPermissionSetCoveredByLicense(PlanOrRole::Basic, MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
                 if PlansExist.ContainsKey(PlanIds.GetTeamMemberPlanId()) then
-                    PermissionConflictsOverview."Team Member" := IsPermissionSetCoveredByLicense(PlanOrRole::"Team Member", PermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                    PermissionConflictsOverview."Team Member" := IsPermissionSetCoveredByLicense(PlanOrRole::"Team Member", MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
                 if PlansExist.ContainsKey(PlanIds.GetEssentialPlanId()) then
-                    PermissionConflictsOverview.Essential := IsPermissionSetCoveredByLicense(PlanOrRole::Essential, PermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                    PermissionConflictsOverview.Essential := IsPermissionSetCoveredByLicense(PlanOrRole::Essential, MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
                 if PlansExist.ContainsKey(PlanIds.GetPremiumPlanId()) then
-                    PermissionConflictsOverview.Premium := IsPermissionSetCoveredByLicense(PlanOrRole::Premium, PermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                    PermissionConflictsOverview.Premium := IsPermissionSetCoveredByLicense(PlanOrRole::Premium, MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
                 if PlansExist.ContainsKey(PlanIds.GetDevicePlanId()) then
-                    PermissionConflictsOverview.Device := IsPermissionSetCoveredByLicense(PlanOrRole::Device, PermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                    PermissionConflictsOverview.Device := IsPermissionSetCoveredByLicense(PlanOrRole::Device, MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
                 if PlansExist.ContainsKey(PlanIds.GetExternalAccountantPlanId()) then
-                    PermissionConflictsOverview."External Accountant" := IsPermissionSetCoveredByLicense(PlanOrRole::"External Accountant", PermissionSet."Role ID", PermissionConflictsOverview.Type::System);
-                if PlansExist.ContainsKey(PlanIds.GetInternalAdminPlanId()) then
-                    PermissionConflictsOverview."Internal Admin" := IsPermissionSetCoveredByLicense(PlanOrRole::"Internal Admin", PermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                    PermissionConflictsOverview."External Accountant" := IsPermissionSetCoveredByLicense(PlanOrRole::"External Accountant", MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                if PlansExist.ContainsKey(PlanIds.GetGlobalAdminPlanId()) then
+                    PermissionConflictsOverview."Internal Admin" := IsPermissionSetCoveredByLicense(PlanOrRole::"Internal Admin", MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                if PlansExist.ContainsKey(PlanIds.GetD365AdminPlanId()) then
+                    PermissionConflictsOverview."D365 Admin" := IsPermissionSetCoveredByLicense(PlanOrRole::"D365 Admin", MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
                 if PlansExist.ContainsKey(PlanIds.GetDelegatedAdminPlanId()) then
-                    PermissionConflictsOverview."Delegated Admin" := IsPermissionSetCoveredByLicense(PlanOrRole::"Delegated Admin", PermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                    PermissionConflictsOverview."Delegated Admin" := IsPermissionSetCoveredByLicense(PlanOrRole::"Delegated Admin", MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
                 if PlansExist.ContainsKey(PlanIds.GetHelpDeskPlanId()) then
-                    PermissionConflictsOverview.HelpDesk := IsPermissionSetCoveredByLicense(PlanOrRole::HelpDesk, PermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                    PermissionConflictsOverview.HelpDesk := IsPermissionSetCoveredByLicense(PlanOrRole::HelpDesk, MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
                 if PlansExist.ContainsKey(PlanIds.GetViralSignupPlanId()) then
-                    PermissionConflictsOverview.Viral := IsPermissionSetCoveredByLicense(PlanOrRole::Viral, PermissionSet."Role ID", PermissionConflictsOverview.Type::System);
+                    PermissionConflictsOverview.Viral := IsPermissionSetCoveredByLicense(PlanOrRole::Viral, MetadataPermissionSet."Role ID", PermissionConflictsOverview.Type::System);
                 PermissionConflictsOverview.Insert();
-            until PermissionSet.Next() = 0;
+            until MetadataPermissionSet.Next() = 0;
 
         if TenantPermissionSet.FindSet() then
             repeat
@@ -213,8 +226,10 @@ codeunit 9852 "Effective Permissions Mgt."
                     PermissionConflictsOverview.Device := IsPermissionSetCoveredByLicense(PlanOrRole::Device, TenantPermissionSet."Role ID", PermissionConflictsOverview.Type::User);
                 if PlansExist.ContainsKey(PlanIds.GetExternalAccountantPlanId()) then
                     PermissionConflictsOverview."External Accountant" := IsPermissionSetCoveredByLicense(PlanOrRole::"External Accountant", TenantPermissionSet."Role ID", PermissionConflictsOverview.Type::User);
-                if PlansExist.ContainsKey(PlanIds.GetInternalAdminPlanId()) then
+                if PlansExist.ContainsKey(PlanIds.GetGlobalAdminPlanId()) then
                     PermissionConflictsOverview."Internal Admin" := IsPermissionSetCoveredByLicense(PlanOrRole::"Internal Admin", TenantPermissionSet."Role ID", PermissionConflictsOverview.Type::User);
+                if PlansExist.ContainsKey(PlanIds.GetD365AdminPlanId()) then
+                    PermissionConflictsOverview."D365 Admin" := IsPermissionSetCoveredByLicense(PlanOrRole::"D365 Admin", TenantPermissionSet."Role ID", PermissionConflictsOverview.Type::User);
                 if PlansExist.ContainsKey(PlanIds.GetDelegatedAdminPlanId()) then
                     PermissionConflictsOverview."Delegated Admin" := IsPermissionSetCoveredByLicense(PlanOrRole::"Delegated Admin", TenantPermissionSet."Role ID", PermissionConflictsOverview.Type::User);
                 if PlansExist.ContainsKey(PlanIds.GetHelpDeskPlanId()) then
@@ -226,7 +241,7 @@ codeunit 9852 "Effective Permissions Mgt."
         ProgressBar.Close();
     end;
 
-    local procedure IsPermissionSetCoveredByLicense(PlanOrRole: Enum Licenses; PermissionSetID: Code[20]; PermissionType: Option): Boolean
+    local procedure IsPermissionSetCoveredByLicense(PlanOrRole: Enum Licenses; PermissionSetID: Code[30]; PermissionType: Option): Boolean
     var
         ExpandedPermission: Record "Expanded Permission";
         PermissionConflictsOverview: Record "Permission Conflicts Overview";
@@ -800,7 +815,7 @@ codeunit 9852 "Effective Permissions Mgt."
     /// <returns>True if user has direct read, insert and modify permissions on table.</returns>
     internal procedure HasDirectRIMPermissionsOnTableData(TableId: Integer): Boolean
     var
-        Permission: Record "Permission";
+        MetadataPermission: Record "Metadata Permission";
         EntitlementPermissionsCommaStr: Text;
         Read: Integer;
         Insert: Integer;
@@ -808,12 +823,12 @@ codeunit 9852 "Effective Permissions Mgt."
         Delete: Integer;
         Execute: Integer;
     begin
-        EntitlementPermissionsCommaStr := UserAccountHelper.GetEntitlementPermissionForObject(UserSecurityId(), Permission."Object Type"::"Table Data", TableId);
+        EntitlementPermissionsCommaStr := UserAccountHelper.GetEntitlementPermissionForObject(UserSecurityId(), MetadataPermission."Object Type"::"Table Data", TableId);
         ExtractPermissionsFromText(EntitlementPermissionsCommaStr, Read, Insert, Modify, Delete, Execute);
 
-        if ((Read = Permission."Read Permission"::Yes) and
-            (Insert = Permission."Insert Permission"::Yes) and
-            (Modify = Permission."Modify Permission"::Yes)) then
+        if ((Read = MetadataPermission."Read Permission"::Yes) and
+            (Insert = MetadataPermission."Insert Permission"::Yes) and
+            (Modify = MetadataPermission."Modify Permission"::Yes)) then
             exit(true);
 
         exit(false);

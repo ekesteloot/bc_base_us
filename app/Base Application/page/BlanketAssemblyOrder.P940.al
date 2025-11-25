@@ -1,3 +1,9 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+
 page 940 "Blanket Assembly Order"
 {
     Caption = 'Blanket Assembly Order';
@@ -5,9 +11,9 @@ page 940 "Blanket Assembly Order"
     InsertAllowed = false;
     PageType = Document;
     SourceTable = "Assembly Header";
-    SourceTableView = SORTING("Document Type", "No.")
-                      ORDER(Ascending)
-                      WHERE("Document Type" = CONST("Blanket Order"));
+    SourceTableView = sorting("Document Type", "No.")
+                      order(ascending)
+                      where("Document Type" = const("Blanket Order"));
 
     layout
     {
@@ -24,7 +30,7 @@ page 940 "Blanket Assembly Order"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -33,21 +39,27 @@ page 940 "Blanket Assembly Order"
                     ApplicationArea = Basic, Suite;
                     Editable = IsAsmToOrderEditable;
                     Importance = Promoted;
-                    TableRelation = Item."No." WHERE("Assembly BOM" = CONST(true));
+                    TableRelation = Item."No." where("Assembly BOM" = const(true));
                     ToolTip = 'Specifies the number of the item that is being assembled with the assembly order.';
 
                     trigger OnValidate()
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(true, "Item No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(true, Rec."Item No.");
                     end;
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies the description of the assembly item.';
+                }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Assembly;
+                    ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
                 }
                 group(Control33)
                 {
@@ -96,7 +108,7 @@ page 940 "Blanket Assembly Order"
 
                     trigger OnDrillDown()
                     begin
-                        ShowAsmToOrder();
+                        Rec.ShowAsmToOrder();
                     end;
                 }
                 field(Status; Rec.Status)
@@ -109,8 +121,8 @@ page 940 "Blanket Assembly Order"
             {
                 ApplicationArea = Assembly;
                 Caption = 'Lines';
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("No.");
             }
             group(Posting)
             {
@@ -127,8 +139,8 @@ page 940 "Blanket Assembly Order"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(true, "Item No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(true, Rec."Item No.");
                     end;
                 }
                 field("Location Code"; Rec."Location Code")
@@ -179,19 +191,19 @@ page 940 "Blanket Assembly Order"
             part(Control11; "Assembly Item - Details")
             {
                 ApplicationArea = Assembly;
-                SubPageLink = "No." = FIELD("Item No.");
+                SubPageLink = "No." = field("Item No.");
             }
             part(Control44; "Component - Item Details")
             {
                 ApplicationArea = Assembly;
                 Provider = Lines;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             part(Control43; "Component - Resource Details")
             {
                 ApplicationArea = Assembly;
                 Provider = Lines;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             systempart(Control8; Links)
             {
@@ -219,7 +231,7 @@ page 940 "Blanket Assembly Order"
 
                 trigger OnAction()
                 begin
-                    ShowStatistics();
+                    Rec.ShowStatistics();
                 end;
             }
             action(Dimensions)
@@ -227,14 +239,14 @@ page 940 "Blanket Assembly Order"
                 AccessByPermission = TableData Dimension = R;
                 ApplicationArea = Dimensions;
                 Caption = 'Dimensions';
-                Enabled = "No." <> '';
+                Enabled = Rec."No." <> '';
                 Image = Dimensions;
                 ShortCutKey = 'Alt+D';
                 ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
 
                 trigger OnAction()
                 begin
-                    ShowDimensions();
+                    Rec.ShowDimensions();
                 end;
             }
             action("Assembly BOM")
@@ -246,7 +258,7 @@ page 940 "Blanket Assembly Order"
 
                 trigger OnAction()
                 begin
-                    ShowAssemblyList();
+                    Rec.ShowAssemblyList();
                 end;
             }
             action(Comments)
@@ -255,9 +267,9 @@ page 940 "Blanket Assembly Order"
                 Caption = 'Comments';
                 Image = ViewComments;
                 RunObject = Page "Assembly Comment Sheet";
-                RunPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("No."),
-                              "Document Line No." = CONST(0);
+                RunPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("No."),
+                              "Document Line No." = const(0);
                 ToolTip = 'View or add comments for the record.';
             }
         }
@@ -277,7 +289,7 @@ page 940 "Blanket Assembly Order"
 
                     trigger OnAction()
                     begin
-                        UpdateUnitCost();
+                        Rec.UpdateUnitCost();
                     end;
                 }
                 action("Refresh Lines")
@@ -289,7 +301,7 @@ page 940 "Blanket Assembly Order"
 
                     trigger OnAction()
                     begin
-                        RefreshBOM();
+                        Rec.RefreshBOM();
                         CurrPage.Update();
                     end;
                 }
@@ -302,7 +314,7 @@ page 940 "Blanket Assembly Order"
 
                     trigger OnAction()
                     begin
-                        ShowAvailability();
+                        Rec.ShowAvailability();
                     end;
                 }
                 action("Refresh availability warnings")
@@ -313,7 +325,7 @@ page 940 "Blanket Assembly Order"
                     ToolTip = 'Check items availability and refresh warnings';
                     trigger OnAction()
                     begin
-                        UpdateWarningOnLines()
+                        Rec.UpdateWarningOnLines();
                     end;
                 }
             }
@@ -324,10 +336,10 @@ page 940 "Blanket Assembly Order"
     var
         Item: Record Item;
     begin
-        IsUnitCostEditable := not IsStandardCostItem();
-        IsAsmToOrderEditable := not IsAsmToOrder();
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(true, "Item No.");
+        IsUnitCostEditable := not Rec.IsStandardCostItem();
+        IsAsmToOrderEditable := not Rec.IsAsmToOrder();
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(true, Rec."Item No.");
     end;
 
     trigger OnOpenPage()
@@ -335,16 +347,14 @@ page 940 "Blanket Assembly Order"
         IsUnitCostEditable := true;
         IsAsmToOrderEditable := true;
 
-        UpdateWarningOnLines();
+        Rec.UpdateWarningOnLines();
     end;
 
     var
         VariantCodeMandatory: Boolean;
 
     protected var
-        [InDataSet]
         IsUnitCostEditable: Boolean;
-        [InDataSet]
         IsAsmToOrderEditable: Boolean;
 }
 

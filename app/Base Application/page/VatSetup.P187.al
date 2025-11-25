@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 page 187 "VAT Setup"
 {
     ApplicationArea = Basic, Suite;
@@ -19,13 +21,13 @@ page 187 "VAT Setup"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the Non-Deductible VAT feature is enabled.';
-                    Editable = not "Non-Deductible VAT Is Enabled";
+                    Editable = not Rec."Non-Deductible VAT Is Enabled";
                 }
             }
             group(NonDeductibleVAT)
             {
                 Caption = 'Non-Deductible VAT';
-                Visible = "Enable Non-Deductible VAT";
+                Visible = Rec."Enable Non-Deductible VAT";
 
                 field(UseForItemCost; Rec."Use For Item Cost")
                 {

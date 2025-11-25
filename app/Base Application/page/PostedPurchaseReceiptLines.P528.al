@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 528 "Posted Purchase Receipt Lines"
 {
     ApplicationArea = Basic, Suite;
@@ -92,6 +96,12 @@ page 528 "Posted Purchase Receipt Lines"
                     ToolTip = 'Specifies the number of the item ledger entry that the document or journal line is applied to.';
                     Visible = false;
                 }
+                field("Order No."; Rec."Order No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the order number this line is associated with.';
+                    Visible = false;
+                }
                 field("Job No."; Rec."Job No.")
                 {
                     ApplicationArea = Jobs;
@@ -149,7 +159,7 @@ page 528 "Posted Purchase Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        PurchRcptHeader.Get("Document No.");
+                        PurchRcptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Purchase Receipt", PurchRcptHeader);
                     end;
                 }
@@ -164,7 +174,7 @@ page 528 "Posted Purchase Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Lines")
@@ -177,7 +187,7 @@ page 528 "Posted Purchase Receipt Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }

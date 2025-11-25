@@ -4,11 +4,11 @@ codeunit 143 "ECSL Report Validate"
 
     trigger OnRun()
     begin
-        ErrorMessage.SetContext(RecordId);
+        ErrorMessage.SetContext(Rec.RecordId);
         ErrorMessage.ClearLog();
 
-        if not IsPeriodValid() then begin
-            ErrorMessage.LogMessage(Rec, FieldNo("No."), ErrorMessage."Message Type"::Error, InvalidPeriodErr);
+        if not Rec.IsPeriodValid() then begin
+            ErrorMessage.LogMessage(Rec, Rec.FieldNo("No."), ErrorMessage."Message Type"::Error, InvalidPeriodErr);
             exit;
         end;
 

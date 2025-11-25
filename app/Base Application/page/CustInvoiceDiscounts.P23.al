@@ -12,7 +12,7 @@ page 23 "Cust. Invoice Discounts"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the contents of the Invoice Disc. Code field on the customer card.';

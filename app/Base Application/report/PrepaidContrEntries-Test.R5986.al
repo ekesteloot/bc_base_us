@@ -1,14 +1,20 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Ledger;
+using System.Utilities;
+
 report 5986 "Prepaid Contr. Entries - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/PrepaidContrEntriesTest.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/PrepaidContrEntriesTest.rdlc';
     Caption = 'Prepaid Contr. Entries - Test';
 
     dataset
     {
         dataitem("Service Ledger Entry"; "Service Ledger Entry")
         {
-            DataItemTableView = SORTING("Service Contract No.", "Entry No.", "Entry Type", Type, "Moved from Prepaid Acc.", "Posting Date", Open, Prepaid) WHERE(Type = CONST("Service Contract"), "Moved from Prepaid Acc." = CONST(false), Open = CONST(false));
+            DataItemTableView = sorting("Service Contract No.", "Entry No.", "Entry Type", Type, "Moved from Prepaid Acc.", "Posting Date", Open, Prepaid) where(Type = const("Service Contract"), "Moved from Prepaid Acc." = const(false), Open = const(false));
             RequestFilterFields = "Service Contract No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -84,7 +90,7 @@ report 5986 "Prepaid Contr. Entries - Test"
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) ORDER(Ascending);
+                DataItemTableView = sorting(Number) order(Ascending);
                 column(ErrorText; ErrorText)
                 {
                 }

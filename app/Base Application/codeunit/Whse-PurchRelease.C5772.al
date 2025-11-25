@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Request;
+
 codeunit 5772 "Whse.-Purch. Release"
 {
     Permissions = TableData "Warehouse Request" = rimd;
@@ -40,8 +45,8 @@ codeunit 5772 "Whse.-Purch. Release"
             First := true;
             repeat
                 if PurchaseLine.IsInventoriableItem() then begin
-                    if ((PurchaseHeader."Document Type" = "Purchase Document Type"::Order) and (PurchaseLine.Quantity >= 0)) or
-                        ((PurchaseHeader."Document Type" = "Purchase Document Type"::"Return Order") and (PurchaseLine.Quantity < 0))
+                    if ((PurchaseHeader."Document Type" = PurchaseHeader."Document Type"::Order) and (PurchaseLine.Quantity >= 0)) or
+                        ((PurchaseHeader."Document Type" = PurchaseHeader."Document Type"::"Return Order") and (PurchaseLine.Quantity < 0))
                     then
                         WhseType := WhseType::Inbound
                     else

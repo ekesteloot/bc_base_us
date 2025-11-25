@@ -1,3 +1,20 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Worksheet;
+
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Pricing;
+using Microsoft.Purchases.Pricing;
+using Microsoft.Sales.Pricing;
+using System.Environment.Configuration;
+using System.Integration.Excel;
+
 page 7022 "Price Worksheet"
 {
     Caption = 'Price Worksheet';
@@ -562,10 +579,8 @@ page 7022 "Price Worksheet"
         Defaults: Text;
         DefinePriceListCodeErr: Label 'Define the default price list.';
         DefinePriceListCodeLbl: Label 'Define the price list...';
-        [InDataSet]
         UpdateMultiplePriceLists: Boolean;
         DefaultsLbl: Label '%1 = %2; ', Locked = true;
-        [InDataSet]
         CopyLinesEnabled: Boolean;
 
     protected var
@@ -575,95 +590,50 @@ page 7022 "Price Worksheet"
         PriceType: Enum "Price Type";
         SourceGroup: Enum "Price Source Group";
         AllowEditingActivePrice: Boolean;
-        [InDataSet]
         JobSourceGroup: Boolean;
-        [InDataSet]
         AllowUpdatingDefaults: Boolean;
-        [InDataSet]
         AmountTypeIsEditable: Boolean;
-        [InDataSet]
         AmountTypeIsVisible: Boolean;
-        [InDataSet]
         AssetTypeEditable: Boolean;
-        [InDataSet]
         DiscountEditable: Boolean;
-        [InDataSet]
         DiscountVisible: Boolean;
-        [InDataSet]
         ItemAsset: Boolean;
-        [InDataSet]
         ItemAssetVisible: Boolean;
-        [InDataSet]
         VariantCodeEditable: Boolean;
-        [InDataSet]
         LineExists: Boolean;
-        [InDataSet]
         ModifiedLine: Boolean;
-        [InDataSet]
         ModifiedUnitPrice: Boolean;
-        [InDataSet]
         ModifiedUnitCost: Boolean;
-        [InDataSet]
         ModifiedDirectUnitCost: Boolean;
-        [InDataSet]
         ParentSourceNoEditable: Boolean;
-        [InDataSet]
         ParentSourceEditable: Boolean;
-        [InDataSet]
         SourceEditable: Boolean;
-        [InDataSet]
         PriceEditable: Boolean;
-        [InDataSet]
         PriceLineEditable: Boolean;
-        [InDataSet]
         UnitPriceEditable: Boolean;
-        [InDataSet]
         ProductTypeEditable: Boolean;
-        [InDataSet]
         DateEditable: Boolean;
-        [InDataSet]
         LineDiscountEditable: Boolean;
-        [InDataSet]
         PriceVisible: Boolean;
-        [InDataSet]
         PurchPriceLine: Boolean;
-        [InDataSet]
         PurchVisible: Boolean;
-        [InDataSet]
         ResourceAsset: Boolean;
-        [InDataSet]
         ResourceAssetVisible: Boolean;
-        [InDataSet]
         SalesPriceLine: Boolean;
-        [InDataSet]
         SalesVisible: Boolean;
-        [InDataSet]
         SalesPriceVisible: Boolean;
-        [InDataSet]
         PurchPriceVisible: Boolean;
-        [InDataSet]
         SourceNoEditable: Boolean;
-        [InDataSet]
         SourceTypeEditable: Boolean;
-        [InDataSet]
         WorkTypeCodeEditable: Boolean;
-        [InDataSet]
         CustomerSourceTypeVisible: Boolean;
-        [InDataSet]
         VendorSourceTypeVisible: Boolean;
-        [InDataSet]
         AssignToParentNoVisible: Boolean;
-        [InDataSet]
         ParentSourceNoVisible: Boolean;
-        [InDataSet]
         VariantCodeVisible: Boolean;
-        [InDataSet]
         VariantCodeLookupVisible: Boolean;
-        [InDataSet]
         UoMLookupVisible: Boolean;
-        [InDataSet]
         UoMVisible: Boolean;
-        [InDataSet]
         UseCustomLookup: Boolean;
 
     procedure SetPriceType(NewPriceType: Enum "Price Type")

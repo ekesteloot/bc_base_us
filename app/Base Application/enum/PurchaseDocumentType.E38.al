@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Document;
+
 enum 38 "Purchase Document Type"
 {
     Extensible = true;

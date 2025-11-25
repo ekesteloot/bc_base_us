@@ -3,6 +3,10 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Environment.Configuration;
+
+using System.DateTime;
+
 permissionset 2609 "Feature Key - Objects"
 {
     Access = Internal;
@@ -15,6 +19,11 @@ permissionset 2609 "Feature Key - Objects"
                   Codeunit "Update Feature Data" = X,
                   Page "Feature Management" = X,
                   Page "Schedule Feature Data Update" = X,
+#if not CLEAN23
+#pragma warning disable AL0432
+
                   Page "Upcoming Changes Factbox" = X,
+#pragma warning restore AL0432
+#endif
                   Table "Feature Data Update Status" = X;
 }

@@ -1,4 +1,12 @@
-﻿codeunit 1220 "SEPA CT-Export File"
+﻿namespace Microsoft.BankMgt.DirectDebit;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentExport;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System.IO;
+using System.Utilities;
+
+codeunit 1220 "SEPA CT-Export File"
 {
     Permissions = TableData "Data Exch. Field" = rimd;
     TableNo = "Gen. Journal Line";
@@ -8,8 +16,8 @@
         BankAccount: Record "Bank Account";
         ExpUserFeedbackGenJnl: Codeunit "Exp. User Feedback Gen. Jnl.";
     begin
-        LockTable();
-        BankAccount.Get("Bal. Account No.");
+        Rec.LockTable();
+        BankAccount.Get(Rec."Bal. Account No.");
         if Export(Rec, BankAccount.GetPaymentExportXMLPortID()) then
             ExpUserFeedbackGenJnl.SetExportFlagOnGenJnlLine(Rec);
     end;

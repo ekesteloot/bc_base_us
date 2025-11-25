@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Ledger;
+
+using System.Security.User;
+
 page 274 "Resource Registers"
 {
     ApplicationArea = Jobs;
@@ -38,7 +42,7 @@ page 274 "Resource Registers"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")

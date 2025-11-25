@@ -1,3 +1,12 @@
+namespace Microsoft.WarehouseMgt.Activity.History;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Setup;
+
 table 5772 "Registered Whse. Activity Hdr."
 {
     Caption = 'Registered Whse. Activity Hdr.';
@@ -24,7 +33,7 @@ table 5772 "Registered Whse. Activity Hdr."
         {
             Caption = 'Assigned User ID';
             DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "Warehouse Employee" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = "Warehouse Employee" where("Location Code" = field("Location Code"));
         }
         field(5; "Assignment Date"; Date)
         {
@@ -50,9 +59,9 @@ table 5772 "Registered Whse. Activity Hdr."
         }
         field(10; Comment; Boolean)
         {
-            CalcFormula = Exist("Warehouse Comment Line" WHERE("Table Name" = CONST("Rgstrd. Whse. Activity Header"),
-                                                                Type = FIELD(Type),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = exist("Warehouse Comment Line" where("Table Name" = const("Rgstrd. Whse. Activity Header"),
+                                                                Type = field(Type),
+                                                                "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,8 @@
+﻿namespace System.Environment.Configuration;
+
+using System.IO;
+using System.Tooling;
+
 page 9199 "Profile Import Wizard"
 {
     Caption = 'Import profiles';
@@ -60,7 +65,7 @@ page 9199 "Profile Import Wizard"
 
                 repeater(Control1)
                 {
-                    field(Selected; Selected)
+                    field(Selected; Rec.Selected)
                     {
                         ApplicationArea = All;
                         ToolTip = 'Specifies that the profile from the package will be imported.';
@@ -133,7 +138,7 @@ page 9199 "Profile Import Wizard"
 
                 trigger OnAction();
                 begin
-                    DeleteAll(); // Make sure to clean up current profiles
+                    Rec.DeleteAll(); // Make sure to clean up current profiles
                     ServerFileName := FileManagement.UploadFileWithFilter(SelectProfileToImportTxt, ProfilesZipFileNameTxt, 'Zip file (*.zip)|*.zip', '*.zip');
                     if ServerFileName = '' then
                         Error(''); // User cancelled upload
@@ -181,9 +186,9 @@ page 9199 "Profile Import Wizard"
 
     trigger OnOpenPage();
     begin
-        Init();
+        Rec.Init();
 
-        Insert();
+        Rec.Insert();
 
         Step := Step::Start;
         EnableControls();
@@ -191,7 +196,7 @@ page 9199 "Profile Import Wizard"
 
     trigger OnAfterGetRecord()
     begin
-        if Exists then begin
+        if Rec.Exists then begin
             Action := Action::Replace;
             ActionStyleExpr := 'Attention';
         end else begin
@@ -199,25 +204,25 @@ page 9199 "Profile Import Wizard"
             ActionStyleExpr := '';
         end;
 
-        if IsNullGuid("App ID") and (Action = Action::Add) then
+        if IsNullGuid(Rec."App ID") and (Action = Action::Add) then
             Clear(ApplicationName)
         else
-            ApplicationName := ExtensionManagement.GetAppName("App ID");
+            ApplicationName := ExtensionManagement.GetAppName(Rec."App ID");
     end;
 
     local procedure CreatePackageUploadDiagnosticsMessage(var DesignerDiagnostic: Record "Designer Diagnostic"): Text
     begin
-        DesignerDiagnostic.SetRange(Severity, Severity::Warning);
+        DesignerDiagnostic.SetRange(Severity, Enum::Severity::Warning);
         if not DesignerDiagnostic.IsEmpty() then
             exit(DiagnosticsWarningsReportedTxt);
-        DesignerDiagnostic.SetRange(Severity, Severity::Information);
+        DesignerDiagnostic.SetRange(Severity, Enum::Severity::Information);
         if not DesignerDiagnostic.IsEmpty() then
             exit(DiagnosticsInformationalMessagesReportedTxt);
     end;
 
     procedure SetRecords(var TempProfileImport: Record "Profile Import" temporary)
     begin
-        Copy(TempProfileImport, true);
+        Rec.Copy(TempProfileImport, true);
     end;
 
     local procedure EnableControls();
@@ -253,23 +258,23 @@ page 9199 "Profile Import Wizard"
 
     local procedure BackupPreviousProfileImportSelections(var PreviousProfileImport: Record "Profile Import" temporary)
     begin
-        Reset();
-        if FindSet() then
+        Rec.Reset();
+        if Rec.FindSet() then
             repeat
                 PreviousProfileImport := Rec;
                 PreviousProfileImport.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     local procedure RestorePreviousProfileImportSelections(var PreviousProfileImport: Record "Profile Import" temporary)
     begin
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
-                if PreviousProfileImport.Get("App ID", "Profile ID") then begin
-                    Selected := PreviousProfileImport.Selected;
-                    Modify();
+                if PreviousProfileImport.Get(Rec."App ID", Rec."Profile ID") then begin
+                    Rec.Selected := PreviousProfileImport.Selected;
+                    Rec.Modify();
                 end;
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     local procedure OnInitializeStep()
@@ -297,14 +302,14 @@ page 9199 "Profile Import Wizard"
         if not SuccessfullyReadProfilePackage then begin
             // Something went wrong, show diagnostics screen immediately
             DesignerDiagnostic.SetRange("Operation ID", ImportID);
-            DesignerDiagnostic.SetFilter(Severity, '<>%1', Severity::Hidden);
+            DesignerDiagnostic.SetFilter(Severity, '<>%1', Enum::Severity::Hidden);
             Page.Run(Page::"Profile Import Diagnostics", DesignerDiagnostic);
             NextStep(true); // Move back to upload package step (something went wrong with upload)
             exit;
         end;
 
         DesignerDiagnostic.SetRange("Operation ID", ImportID);
-        DesignerDiagnostic.SetFilter(Severity, '<>%1', Severity::Hidden);
+        DesignerDiagnostic.SetFilter(Severity, '<>%1', Enum::Severity::Hidden);
         if not DesignerDiagnostic.IsEmpty() then begin
             DiagnosticsNotification.Id := DiagnosticsNotificationIDTxt;
             DiagnosticsNotification.Message := CreatePackageUploadDiagnosticsMessage(DesignerDiagnostic);
@@ -313,7 +318,7 @@ page 9199 "Profile Import Wizard"
             NotificationLifecycleMgt.SendNotification(DiagnosticsNotification, TempProfileImport.RecordId());
         end;
 
-        if IsEmpty() then begin
+        if Rec.IsEmpty() then begin
             Message(PackageDoesNotContainAnyProfilesMsg);
             NextStep(true); // Move back to upload package step (no profiles were in the package)
         end;

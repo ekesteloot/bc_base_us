@@ -37,10 +37,6 @@ codeunit 40 LogInManagement
     begin
         OnShowTermsAndConditions();
 
-#if not CLEAN20
-        OnBeforeCompanyOpen();
-#endif
-
         if GuiAllowed and (ClientTypeManagement.GetCurrentClientType() <> ClientType::Background) then
             LogInStart();
 
@@ -49,10 +45,6 @@ codeunit 40 LogInManagement
                 WorkDate := CurrentDate;
 
         AzureADPlan.CheckMixedPlans();
-
-#if not CLEAN20
-        OnAfterCompanyOpen();
-#endif
     end;
 
     procedure CompanyClose()
@@ -100,10 +92,6 @@ codeunit 40 LogInManagement
             User.SetRange("User Security ID");
         end;
 
-#if not CLEAN20
-        OnBeforeLogInStart();
-#endif
-
         UpdateUserPersonalization();
 
         LogInDate := Today;
@@ -113,10 +101,6 @@ codeunit 40 LogInManagement
         WorkDate := GetDefaultWorkDate();
 
         ApplicationAreaMgmtFacade.SetupApplicationArea();
-
-#if not CLEAN20
-        OnAfterLogInStart();
-#endif
     end;
 
     local procedure LogInEnd()
@@ -167,20 +151,7 @@ codeunit 40 LogInManagement
                 end;
             end;
         end;
-
-#if not CLEAN20
-        OnAfterLogInEnd();
-#endif
     end;
-
-#if not CLEAN20
-    [Obsolete('No longer used, Company-Initialize runs on System Initialize''s event OnAfterLogin', '20.0')]
-    procedure InitializeCompany()
-    begin
-        if not GLSetup.Get() then
-            CODEUNIT.Run(CODEUNIT::"Company-Initialize");
-    end;
-#endif
 
     local procedure GetGLSetup(): Boolean
     begin
@@ -211,6 +182,7 @@ codeunit 40 LogInManagement
     var
         CompanyInformation: Record "Company Information";
     begin
+        CompanyInformation.SetLoadFields("System Indicator", "System Indicator Style", "Custom System Indicator Text");
         if CompanyInformation.Get() then;
         CompanyInformation.GetSystemIndicator(Text, Style);
     end;
@@ -275,38 +247,6 @@ codeunit 40 LogInManagement
     begin
         CompanyClose();
     end;
-
-#if not CLEAN20
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced with OnAfterLogin in codeunit "System Initialization"', '20.0')]
-    local procedure OnAfterLogInStart()
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced with OnAfterLogin in codeunit "System Initialization"', '20.0')]
-    local procedure OnAfterLogInEnd()
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced with OnAfterLogin in codeunit "System Initialization"', '20.0')]
-    local procedure OnBeforeLogInStart()
-    begin
-    end;
-
-    [Obsolete('Replaced with OnAfterLogin in codeunit "System Initialization"', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCompanyOpen()
-    begin
-    end;
-
-    [Obsolete('Replaced with OnAfterLogin in codeunit "System Initialization"', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCompanyOpen()
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCompanyClose()

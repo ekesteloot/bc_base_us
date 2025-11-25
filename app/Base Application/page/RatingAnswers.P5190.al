@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 page 5190 "Rating Answers"
 {
     AutoSplitKey = true;
@@ -40,7 +42,7 @@ page 5190 "Rating Answers"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        Type := Type::Answer;
+        Rec.Type := Rec.Type::Answer;
     end;
 }
 

@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Opportunity;
+
 page 5147 "Make Phone Call"
 {
     Caption = 'Make Phone Call';
@@ -42,7 +49,7 @@ page 5147 "Make Phone Call"
                         begin
                             Clear(TAPIManagement);
                             Rec."Contact Via" :=
-                              CopyStr(TAPIManagement.ShowNumbers("Contact No.", "Contact Alt. Address Code"), 1, MaxStrLen("Contact Via"));
+                              CopyStr(TAPIManagement.ShowNumbers(Rec."Contact No.", Rec."Contact Alt. Address Code"), 1, MaxStrLen(Rec."Contact Via"));
                         end;
                     }
                     field(Description; Rec.Description)
@@ -341,33 +348,19 @@ page 5147 "Make Phone Call"
         ShowLessLbl: Label 'Show less';
         UntitledTxt: Label 'untitled';
         WizardStep: Integer;
-        [InDataSet]
         ShowLessStep1: Boolean;
-        [InDataSet]
         ShowLessStep2: Boolean;
-        [InDataSet]
         Step1Visible: Boolean;
-        [InDataSet]
         Step2Visible: Boolean;
-        [InDataSet]
         Step3Visible: Boolean;
-        [InDataSet]
         NextEnable: Boolean;
-        [InDataSet]
         BackEnable: Boolean;
-        [InDataSet]
         CallEnable: Boolean;
-        [InDataSet]
         FinishEnable: Boolean;
-        [InDataSet]
         CampaignDescriptionEditable: Boolean;
-        [InDataSet]
         OpportunityDescriptionEditable: Boolean;
-        [InDataSet]
         WizardContactNameEditable: Boolean;
-        [InDataSet]
         CampaignResponseEditable: Boolean;
-        [InDataSet]
         CampaignTargetEditable: Boolean;
         CreateOpportunityQst: Label 'Do you want to create an opportunity?';
 

@@ -1,3 +1,12 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Email;
+using Microsoft.ServiceMgt.Ledger;
+
 page 5974 "Posted Service Shipments"
 {
     ApplicationArea = Service;
@@ -6,8 +15,8 @@ page 5974 "Posted Service Shipments"
     Editable = false;
     PageType = List;
     SourceTable = "Service Shipment Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -169,7 +178,7 @@ page 5974 "Posted Service Shipments"
                     ToolTip = 'Specifies the approximate date when work on the service order started.';
                     Visible = false;
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the priority of the posted service order.';
@@ -254,7 +263,7 @@ page 5974 "Posted Service Shipments"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Service Shipment Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -264,9 +273,9 @@ page 5974 "Posted Service Shipments"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Service Comment Sheet";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Table Name" = CONST("Service Shipment Header"),
-                                  Type = CONST(General);
+                    RunPageLink = "No." = field("No."),
+                                  "Table Name" = const("Service Shipment Header"),
+                                  Type = const(General);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Service Ledger E&ntries")
@@ -275,8 +284,8 @@ page 5974 "Posted Service Shipments"
                     Caption = 'Service Ledger E&ntries';
                     Image = ServiceLedger;
                     RunObject = Page "Service Ledger Entries";
-                    RunPageLink = "Document Type" = CONST(Shipment),
-                                  "Document No." = FIELD("No.");
+                    RunPageLink = "Document Type" = const(Shipment),
+                                  "Document No." = field("No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View all the ledger entries for the service item or service order that result from posting transactions in service documents.';
                 }
@@ -286,8 +295,8 @@ page 5974 "Posted Service Shipments"
                     Caption = '&Warranty Ledger Entries';
                     Image = WarrantyLedger;
                     RunObject = Page "Warranty Ledger Entries";
-                    RunPageLink = "Document No." = FIELD("No.");
-                    RunPageView = SORTING("Document No.", "Posting Date");
+                    RunPageLink = "Document No." = field("No.");
+                    RunPageView = sorting("Document No.", "Posting Date");
                     ToolTip = 'View all the ledger entries for the service item or service order that result from posting transactions in service documents that contain warranty agreements.';
                 }
                 action("&Job Ledger Entries")
@@ -296,7 +305,7 @@ page 5974 "Posted Service Shipments"
                     Caption = '&Job Ledger Entries';
                     Image = JobLedger;
                     RunObject = Page "Job Ledger Entries";
-                    RunPageLink = "Document No." = FIELD("No.");
+                    RunPageLink = "Document No." = field("No.");
                     ToolTip = 'View all the job ledger entries that result from posting transactions in the service document that involve a job.';
                 }
                 action("&Allocations")
@@ -305,9 +314,9 @@ page 5974 "Posted Service Shipments"
                     Caption = '&Allocations';
                     Image = Allocations;
                     RunObject = Page "Service Order Allocations";
-                    RunPageLink = "Document Type" = CONST(Order),
-                                  "Document No." = FIELD("Order No.");
-                    RunPageView = SORTING(Status, "Document Type", "Document No.", "Service Item Line No.", "Allocation Date", "Starting Time", Posted);
+                    RunPageLink = "Document Type" = const(Order),
+                                  "Document No." = field("Order No.");
+                    RunPageView = sorting(Status, "Document Type", "Document No.", "Service Item Line No.", "Allocation Date", "Starting Time", Posted);
                     ToolTip = 'View allocation of resources, such as technicians, to service items in service orders.';
                 }
                 action(Dimensions)
@@ -321,7 +330,7 @@ page 5974 "Posted Service Shipments"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -331,9 +340,9 @@ page 5974 "Posted Service Shipments"
                     Caption = 'Service Email &Queue';
                     Image = Email;
                     RunObject = Page "Service Email Queue";
-                    RunPageLink = "Document Type" = CONST("Service Order"),
-                                  "Document No." = FIELD("Order No.");
-                    RunPageView = SORTING("Document Type", "Document No.");
+                    RunPageLink = "Document Type" = const("Service Order"),
+                                  "Document No." = field("Order No.");
+                    RunPageView = sorting("Document Type", "Document No.");
                     ToolTip = 'View the emails that are waiting to be sent to notify customers that their service item is ready.';
                 }
                 action(CertificateOfSupplyDetails)
@@ -342,8 +351,8 @@ page 5974 "Posted Service Shipments"
                     Caption = 'Certificate of Supply Details';
                     Image = Certificate;
                     RunObject = Page "Certificates of Supply";
-                    RunPageLink = "Document Type" = FILTER("Service Shipment"),
-                                  "Document No." = FIELD("No.");
+                    RunPageLink = "Document Type" = filter("Service Shipment"),
+                                  "Document No." = field("No.");
                     ToolTip = 'View the certificate of supply that you must send to your customer for signature as confirmation of receipt. You must print a certificate of supply if the shipment uses a combination of VAT business posting group and VAT product posting group that have been marked to require a certificate of supply in the VAT Posting Setup window.';
                 }
                 action(PrintCertificateofSupply)
@@ -358,7 +367,7 @@ page 5974 "Posted Service Shipments"
                         CertificateOfSupply: Record "Certificate of Supply";
                     begin
                         CertificateOfSupply.SetRange("Document Type", CertificateOfSupply."Document Type"::"Service Shipment");
-                        CertificateOfSupply.SetRange("Document No.", "No.");
+                        CertificateOfSupply.SetRange("Document No.", Rec."No.");
                         CertificateOfSupply.Print();
                     end;
                 }
@@ -390,7 +399,7 @@ page 5974 "Posted Service Shipments"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }
@@ -426,7 +435,7 @@ page 5974 "Posted Service Shipments"
 
     trigger OnOpenPage()
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
     end;
 
     var

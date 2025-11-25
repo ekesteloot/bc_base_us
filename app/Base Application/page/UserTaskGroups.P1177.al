@@ -14,7 +14,7 @@ page 1177 "User Task Groups"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the unique ID for the group.';
@@ -38,7 +38,7 @@ page 1177 "User Task Groups"
                 Caption = 'User Task Group Members';
                 Image = Users;
                 RunObject = Page "User Task Group Members";
-                RunPageLink = "User Task Group Code" = FIELD(Code);
+                RunPageLink = "User Task Group Code" = field(Code);
                 Scope = Repeater;
                 ToolTip = 'View or edit the members of the user task group.';
             }

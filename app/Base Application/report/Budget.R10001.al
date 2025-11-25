@@ -1,7 +1,15 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
 report 10001 Budget
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/Budget.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/Budget.rdlc';
     ApplicationArea = Suite;
     Caption = 'Budget';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +18,7 @@ report 10001 Budget
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Account Type", "Budget Filter", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(MainTitle; MainTitle)
             {
@@ -155,7 +163,7 @@ report 10001 Budget
             }
             dataitem(BlankLineCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(BlankLineCounter_Number; Number)
                 {
                 }
@@ -167,7 +175,7 @@ report 10001 Budget
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(G_L_Account___No__; "G/L Account"."No.")
                 {
                 }

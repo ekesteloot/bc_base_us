@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.BusinessRelation;
+
 interface "Contact Business Relation Link"
 {
     /// <summary>

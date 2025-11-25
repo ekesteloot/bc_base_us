@@ -1,3 +1,8 @@
+﻿namespace System.Security.Authentication;
+
+using System.Environment;
+using System.Security.Encryption;
+
 page 1140 "OAuth 2.0 Setup"
 {
     Caption = 'OAuth 2.0 Setup';
@@ -31,7 +36,7 @@ page 1140 "OAuth 2.0 Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the redirect URL.';
                 }
-                field(Scope; Scope)
+                field(Scope; Rec.Scope)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the scope.';
@@ -61,7 +66,7 @@ page 1140 "OAuth 2.0 Setup"
             group("Request Authorization Code")
             {
                 Caption = 'Request Authorization Code';
-                Visible = RequestAuthorizationCodeInvoked OR (Status = Status::Disabled) OR (Status = Status::Error);
+                Visible = RequestAuthorizationCodeInvoked OR (Rec.Status = Rec.Status::Disabled) OR (Rec.Status = Rec.Status::Error);
                 field("Enter Authorization Code"; ReceivedAuthorizationCode)
                 {
                     ApplicationArea = Basic, Suite;
@@ -90,7 +95,7 @@ page 1140 "OAuth 2.0 Setup"
 
                 trigger OnAction()
                 begin
-                    RequestAuthorizationCode();
+                    Rec.RequestAuthorizationCode();
                     RequestAuthorizationCodeInvoked := true;
                 end;
             }
@@ -105,7 +110,7 @@ page 1140 "OAuth 2.0 Setup"
                 var
                     MessageText: Text;
                 begin
-                    if not RefreshAccessToken(MessageText) then begin
+                    if not Rec.RefreshAccessToken(MessageText) then begin
                         Commit(); // save new "Status" value
                         Error(MessageText);
                     end;
@@ -178,7 +183,7 @@ page 1140 "OAuth 2.0 Setup"
         if ReceivedAuthorizationCode = '' then
             exit;
 
-        if not RequestAccessToken(MessageText, ReceivedAuthorizationCode) then
+        if not Rec.RequestAccessToken(MessageText, ReceivedAuthorizationCode) then
             Error(MessageText);
 
         ReceivedAuthorizationCode := '';

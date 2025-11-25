@@ -1,3 +1,20 @@
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+
 codeunit 1339 "Cancel Posted Sales Cr. Memo"
 {
     Permissions = TableData "Sales Invoice Header" = rm,
@@ -22,6 +39,7 @@ codeunit 1339 "Cancel Posted Sales Cr. Memo"
         NotCorrectiveDocErr: Label 'You cannot cancel this posted sales credit memo because it is not a corrective document.';
         CustomerIsBlockedCancelErr: Label 'You cannot cancel this posted sales credit memo because customer %1 is blocked.', Comment = '%1 = Customer name';
         ItemIsBlockedCancelErr: Label 'You cannot cancel this posted sales credit memo because item %1 %2 is blocked.', Comment = '%1 = Item No. %2 = Item Description';
+        ItemVariantIsBlockedCancelErr: Label 'You cannot cancel this posted sales credit memo because item variant %1 for item %2 %3 is blocked.', Comment = '%1 - Item Variant Code, %2 = Item No. %3 = Item Description';
         AccountIsBlockedCancelErr: Label 'You cannot cancel this posted sales credit memo because %1 %2 is blocked.', Comment = '%1 = Table Caption %2 = Account number.';
         NoFreeInvoiceNoSeriesCancelErr: Label 'You cannot cancel this posted sales credit memo because no unused invoice numbers are available. \\You must extend the range of the number series for sales invoices.';
         NoFreePostInvSeriesCancelErr: Label 'You cannot cancel this posted sales credit memo because no unused posted invoice numbers are available. \\You must extend the range of the number series for posted invoices.';
@@ -34,7 +52,7 @@ codeunit 1339 "Cancel Posted Sales Cr. Memo"
         PostingCreditMemoFailedOpenPostedInvQst: Label 'Canceling the credit memo failed because of the following error: \\%1\\An invoice is posted. Do you want to open the posted invoice?', Comment = '%1 = error text';
         PostingCreditMemoFailedOpenInvQst: Label 'Canceling the credit memo failed because of the following error: \\%1\\An invoice is created but not posted. Do you want to open the invoice?', Comment = '%1 = error text';
         CreatingInvFailedNothingCreatedErr: Label 'Canceling the credit memo failed because of the following error: \\%1.', Comment = '%1 = error text';
-        ErrorType: Option CustomerBlocked,ItemBlocked,AccountBlocked,IsAppliedIncorrectly,IsUnapplied,IsCanceled,IsCorrected,SerieNumInv,SerieNumPostInv,FromOrder,PostingNotAllowed,DimErr,DimCombErr,DimCombHeaderErr,ExtDocErr,InventoryPostClosed;
+        ErrorType: Option CustomerBlocked,ItemBlocked,AccountBlocked,IsAppliedIncorrectly,IsUnapplied,IsCanceled,IsCorrected,SerieNumInv,SerieNumPostInv,FromOrder,PostingNotAllowed,DimErr,DimCombErr,DimCombHeaderErr,ExtDocErr,InventoryPostClosed,ItemVariantBlocked;
         UnappliedErr: Label 'You cannot cancel this posted sales credit memo because it is fully or partially applied.\\To reverse an applied sales credit memo, you must manually unapply all applied entries.';
         NotAppliedCorrectlyErr: Label 'You cannot cancel this posted sales credit memo because it is not fully applied to an invoice.';
 
@@ -178,6 +196,7 @@ codeunit 1339 "Cancel Posted Sales Cr. Memo"
     var
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         DimensionManagement: Codeunit DimensionManagement;
         TableID: array[10] of Integer;
         No: array[10] of Code[20];
@@ -191,6 +210,11 @@ codeunit 1339 "Cancel Posted Sales Cr. Memo"
 
                         if Item.Blocked then
                             ErrorHelperLine(ErrorType::ItemBlocked, SalesCrMemoLine);
+                        if SalesCrMemoLine."Variant Code" <> '' then begin
+                            ItemVariant.SetLoadFields(Blocked);
+                            if ItemVariant.Get(SalesCrMemoLine."No.", SalesCrMemoLine."Variant Code") and ItemVariant.Blocked then
+                                ErrorHelperLine(ErrorType::ItemVariantBlocked, SalesCrMemoLine);
+                        end;
 
                         TableID[1] := DATABASE::Item;
                         No[1] := SalesCrMemoLine."No.";
@@ -468,6 +492,12 @@ codeunit 1339 "Cancel Posted Sales Cr. Memo"
                 begin
                     Item.Get(SalesCrMemoLine."No.");
                     Error(ItemIsBlockedCancelErr, Item."No.", Item.Description);
+                end;
+            ErrorType::ItemVariantBlocked:
+                begin
+                    Item.SetLoadFields(Description);
+                    Item.Get(SalesCrMemoLine."No.");
+                    Error(ItemVariantIsBlockedCancelErr, SalesCrMemoLine."Variant Code", Item."No.", Item.Description);
                 end;
             ErrorType::DimCombErr:
                 Error(InvalidDimCombinationCancelErr, SalesCrMemoLine."No.", SalesCrMemoLine.Description);

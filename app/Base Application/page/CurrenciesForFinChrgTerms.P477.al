@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 page 477 "Currencies for Fin. Chrg Terms"
 {
     Caption = 'Currencies for Fin. Chrg Terms';

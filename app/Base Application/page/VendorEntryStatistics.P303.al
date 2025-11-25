@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Purchases.Payables;
+
 page 303 "Vendor Entry Statistics"
 {
     Caption = 'Vendor Entry Statistics';
@@ -502,14 +506,14 @@ page 303 "Vendor Entry Statistics"
         for j := 1 to 6 do begin
             VendLedgEntry[j].SetCurrentKey("Document Type", "Vendor No.", "Posting Date");
             VendLedgEntry[j].SetRange("Document Type", j); // Payment,Invoice,Credit Memo,Finance Charge Memo,Reminder,Refund
-            VendLedgEntry[j].SetRange("Vendor No.", "No.");
+            VendLedgEntry[j].SetRange("Vendor No.", Rec."No.");
             OnAfterGetRecordOnAfterVendLedgEntrySetFiltersCalcAmount(VendLedgEntry[j]);
             if VendLedgEntry[j].FindLast() then
                 VendLedgEntry[j].CalcFields(Amount, "Remaining Amount");
         end;
 
         VendLedgEntry2.SetCurrentKey("Vendor No.", Open);
-        VendLedgEntry2.SetRange("Vendor No.", "No.");
+        VendLedgEntry2.SetRange("Vendor No.", Rec."No.");
         VendLedgEntry2.SetRange(Open, true);
         OnAfterGetRecordOnAfterVendLedgEntrySetFiltersCalcRemainingAmountLCY(VendLedgEntry2);
         if VendLedgEntry2.Find('+') then
@@ -528,7 +532,7 @@ page 303 "Vendor Entry Statistics"
 
         for i := 1 to 3 do begin // Period,This Year,Last Year
             VendLedgEntry2.SetCurrentKey("Vendor No.", "Posting Date");
-            VendLedgEntry2.SetRange("Vendor No.", "No.");
+            VendLedgEntry2.SetRange("Vendor No.", Rec."No.");
             VendLedgEntry2.SetFilter("Posting Date", VendDateFilter[i]);
             OnAfterGetRecordOnAfterVendLedgEntrySetFiltersCalcPaymentDiscMissedLCY(VendLedgEntry2);
             if VendLedgEntry2.Find('+') then

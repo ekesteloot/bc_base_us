@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.History;
+
+using Microsoft.InventoryMgt.Location;
+using System.Utilities;
+
 report 7309 "Whse. - Posted Shipment"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Shipment/WhsePostedShipment.rdlc';
+    RDLCLayout = './WarehouseMgt/History/WhsePostedShipment.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Posted Shipment';
     UsageCategory = Documents;
@@ -10,11 +19,11 @@ report 7309 "Whse. - Posted Shipment"
     {
         dataitem("Posted Whse. Shipment Header"; "Posted Whse. Shipment Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(CompanyName; COMPANYPROPERTY.DisplayName())
                 {
                 }
@@ -83,9 +92,9 @@ report 7309 "Whse. - Posted Shipment"
                 }
                 dataitem("Posted Whse. Shipment Line"; "Posted Whse. Shipment Line")
                 {
-                    DataItemLink = "No." = FIELD("No.");
+                    DataItemLink = "No." = field("No.");
                     DataItemLinkReference = "Posted Whse. Shipment Header";
-                    DataItemTableView = SORTING("No.", "Line No.");
+                    DataItemTableView = sorting("No.", "Line No.");
                     column(ShelfNo_PostedWhseShptLine; "Shelf No.")
                     {
                     }

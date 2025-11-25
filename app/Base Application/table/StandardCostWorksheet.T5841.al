@@ -1,3 +1,10 @@
+namespace Microsoft.Manufacturing.StandardCost;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 table 5841 "Standard Cost Worksheet"
 {
     Caption = 'Standard Cost Worksheet';
@@ -25,13 +32,13 @@ table 5841 "Standard Cost Worksheet"
         {
             Caption = 'No.';
             NotBlank = true;
-            TableRelation = IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST("Machine Center")) "Machine Center"
-            ELSE
-            IF (Type = CONST("Work Center")) "Work Center"
-            ELSE
-            IF (Type = CONST(Resource)) Resource;
+            TableRelation = if (Type = const(Item)) Item
+            else
+            if (Type = const("Machine Center")) "Machine Center"
+            else
+            if (Type = const("Work Center")) "Work Center"
+            else
+            if (Type = const(Resource)) Resource;
 
             trigger OnValidate()
             var

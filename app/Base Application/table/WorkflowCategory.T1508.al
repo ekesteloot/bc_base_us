@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 1508 "Workflow Category"
 {
     Caption = 'Workflow Category';

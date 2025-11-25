@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Purchases.Document;
+
 page 6648 "Get Return Shipment Lines"
 {
     Caption = 'Get Return Shipment Lines';
@@ -162,7 +167,7 @@ page 6648 "Get Return Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ReturnShptHeader.Get("Document No.");
+                        ReturnShptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Return Shipment", ReturnShptHeader);
                     end;
                 }
@@ -177,7 +182,7 @@ page 6648 "Get Return Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Entries")
@@ -189,7 +194,7 @@ page 6648 "Get Return Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }
@@ -230,7 +235,6 @@ page 6648 "Get Return Shipment Lines"
         ReturnShptHeader: Record "Return Shipment Header";
         TempReturnShptLine: Record "Return Shipment Line" temporary;
         GetReturnShipments: Codeunit "Purch.-Get Return Shipments";
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     procedure SetPurchHeader(var PurchHeader2: Record "Purchase Header")
@@ -243,20 +247,18 @@ page 6648 "Get Return Shipment Lines"
     var
         ReturnShptLine: Record "Return Shipment Line";
     begin
-        OnBeforeIsFirstDocLine(Rec, TempReturnShptLine);
-
         TempReturnShptLine.Reset();
         TempReturnShptLine.CopyFilters(Rec);
-        TempReturnShptLine.SetRange("Document No.", "Document No.");
+        TempReturnShptLine.SetRange("Document No.", Rec."Document No.");
         if not TempReturnShptLine.FindFirst() then begin
             ReturnShptLine.CopyFilters(Rec);
-            ReturnShptLine.SetRange("Document No.", "Document No.");
+            ReturnShptLine.SetRange("Document No.", Rec."Document No.");
             if not ReturnShptLine.FindFirst() then
                 exit(false);
             TempReturnShptLine := ReturnShptLine;
             TempReturnShptLine.Insert();
         end;
-        if "Line No." = TempReturnShptLine."Line No." then
+        if Rec."Line No." = TempReturnShptLine."Line No." then
             exit(true);
     end;
 
@@ -271,11 +273,6 @@ page 6648 "Get Return Shipment Lines"
     begin
         if not IsFirstDocLine() then
             DocumentNoHideValue := true;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeIsFirstDocLine(var ReturnShipmentLine: Record "Return Shipment Line"; var TempReturnShipmentLine: Record "Return Shipment Line" temporary);
-    begin
     end;
 }
 

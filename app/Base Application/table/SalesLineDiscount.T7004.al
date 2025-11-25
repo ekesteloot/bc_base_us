@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Sales.Pricing;
+
+using Microsoft.CRM.Campaign;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Sales.Customer;
+
 table 7004 "Sales Line Discount"
 {
     Caption = 'Sales Line Discount';
@@ -7,7 +14,7 @@ table 7004 "Sales Line Discount"
     ObsoleteTag = '16.0';
 #else
     ObsoleteState = Removed;
-    ObsoleteTag = '22.0';
+    ObsoleteTag = '24.0';
 #endif    
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
 
@@ -17,9 +24,9 @@ table 7004 "Sales Line Discount"
         {
             Caption = 'Code';
             NotBlank = true;
-            TableRelation = IF (Type = CONST(Item)) Item
-            ELSE
-            IF (Type = CONST("Item Disc. Group")) "Item Discount Group";
+            TableRelation = if (Type = const(Item)) Item
+            else
+            if (Type = const("Item Disc. Group")) "Item Discount Group";
 
             trigger OnValidate()
             var
@@ -38,11 +45,11 @@ table 7004 "Sales Line Discount"
         field(2; "Sales Code"; Code[20])
         {
             Caption = 'Sales Code';
-            TableRelation = IF ("Sales Type" = CONST("Customer Disc. Group")) "Customer Discount Group"
-            ELSE
-            IF ("Sales Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Sales Type" = CONST(Campaign)) Campaign;
+            TableRelation = if ("Sales Type" = const("Customer Disc. Group")) "Customer Discount Group"
+            else
+            if ("Sales Type" = const(Customer)) Customer
+            else
+            if ("Sales Type" = const(Campaign)) Campaign;
 
             trigger OnValidate()
             begin
@@ -130,7 +137,7 @@ table 7004 "Sales Line Discount"
         field(5400; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD(Code));
+            TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field(Code));
 
 #if not CLEAN21
             trigger OnValidate()
@@ -149,7 +156,7 @@ table 7004 "Sales Line Discount"
         field(5700; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = IF (Type = CONST(Item)) "Item Variant".Code WHERE("Item No." = FIELD(Code));
+            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field(Code));
 
             trigger OnValidate()
             begin

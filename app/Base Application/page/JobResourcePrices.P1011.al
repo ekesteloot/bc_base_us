@@ -1,4 +1,11 @@
 #if not CLEAN21
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.ProjectMgt.Jobs.Pricing;
+
+using Microsoft.Pricing.Calculation;
 page 1011 "Job Resource Prices"
 {
     Caption = 'Job Resource Prices';
@@ -30,7 +37,7 @@ page 1011 "Job Resource Prices"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies whether the price that you are setting up for the job should apply to a resource, to a resource group, or to all resources and resource groups.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the resource or resource group that this price applies to. The No. must correspond to your selection in the Type field.';

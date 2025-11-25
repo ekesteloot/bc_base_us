@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 page 557 "Analysis View Filter"
 {
     Caption = 'Analysis View Filter';

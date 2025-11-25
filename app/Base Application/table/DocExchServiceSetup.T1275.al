@@ -50,42 +50,67 @@ table 1275 "Doc. Exch. Service Setup"
         field(7; "Consumer Key"; Guid)
         {
             Caption = 'Consumer Key';
-            ObsoleteState = Pending;
             ObsoleteReason = 'Authentication with OAuth 1.0 is deprecated.';
+#if CLEAN23
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
+#else
+            ObsoleteState = Pending;
             ObsoleteTag = '19.0';
+#endif
         }
         field(8; "Consumer Secret"; Guid)
         {
             Caption = 'Consumer Secret';
             Editable = false;
-            ObsoleteState = Pending;
             ObsoleteReason = 'Authentication with OAuth 1.0 is deprecated.';
+#if CLEAN23
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
+#else
+            ObsoleteState = Pending;
             ObsoleteTag = '19.0';
+#endif
         }
         field(9; Token; Guid)
         {
             Caption = 'Token';
             Editable = false;
-            ObsoleteState = Pending;
             ObsoleteReason = 'Authentication with OAuth 1.0 is deprecated.';
+#if CLEAN23
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
+#else
+            ObsoleteState = Pending;
             ObsoleteTag = '19.0';
+#endif
         }
         field(10; "Token Secret"; Guid)
         {
             Caption = 'Token Secret';
             Editable = false;
-            ObsoleteState = Pending;
             ObsoleteReason = 'Authentication with OAuth 1.0 is deprecated.';
+#if CLEAN23
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
+#else
+            ObsoleteState = Pending;
             ObsoleteTag = '19.0';
+#endif
         }
         field(11; "Doc. Exch. Tenant ID"; Guid)
         {
             Caption = 'Doc. Exch. Tenant ID';
             DataClassification = OrganizationIdentifiableInformation;
             Editable = false;
-            ObsoleteState = Pending;
             ObsoleteReason = 'Authentication with OAuth 1.0 is deprecated.';
+#if CLEAN23
+            ObsoleteState = Removed;
+            ObsoleteTag = '26.0';
+#else
+            ObsoleteState = Pending;
             ObsoleteTag = '19.0';
+#endif
         }
         field(12; "User Agent"; Text[30])
         {

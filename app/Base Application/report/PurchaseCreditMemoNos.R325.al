@@ -1,7 +1,17 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.History;
+using System.Utilities;
+
 report 325 "Purchase Credit Memo Nos."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/PurchaseCreditMemoNos.rdlc';
+    RDLCLayout = './Purchases/Reports/PurchaseCreditMemoNos.rdlc';
     Caption = 'Purchase Credit Memo Nos.';
     ObsoleteState = Pending;
     ObsoleteReason = 'Infrequently used report.';
@@ -11,7 +21,7 @@ report 325 "Purchase Credit Memo Nos."
     {
         dataitem("Purch. Cr. Memo Hdr."; "Purch. Cr. Memo Hdr.")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Posted Purchase Credit Memo';
             column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
@@ -58,7 +68,7 @@ report 325 "Purchase Credit Memo Nos."
             }
             dataitem(ErrorLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(ErrorText_Number_; ErrorText[Number])
                 {
                 }
@@ -84,8 +94,8 @@ report 325 "Purchase Credit Memo Nos."
             }
             dataitem(PurchCrMemoHeader; "Purch. Cr. Memo Hdr.")
             {
-                DataItemLink = "No." = FIELD("No.");
-                DataItemTableView = SORTING("No.");
+                DataItemLink = "No." = field("No.");
+                DataItemTableView = sorting("No.");
                 column(PurchCrMemoHeader__User_ID_; "User ID")
                 {
                 }

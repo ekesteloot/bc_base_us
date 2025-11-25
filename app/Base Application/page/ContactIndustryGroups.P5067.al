@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5067 "Contact Industry Groups"
 {
     Caption = 'Contact Industry Groups';

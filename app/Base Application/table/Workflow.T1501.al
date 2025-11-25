@@ -1,3 +1,8 @@
+namespace System.Automation;
+
+using System;
+using System.Utilities;
+
 table 1501 Workflow
 {
     Caption = 'Workflow';

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Campaign;
+
 page 5090 "Campaign Status"
 {
     ApplicationArea = Basic, Suite, RelationshipMgmt;
@@ -13,7 +15,7 @@ page 5090 "Campaign Status"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the code for the campaign status.';

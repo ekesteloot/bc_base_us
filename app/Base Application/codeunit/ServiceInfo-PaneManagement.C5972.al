@@ -1,3 +1,13 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Maintenance;
+using Microsoft.ServiceMgt.Resources;
+
 codeunit 5972 "Service Info-Pane Management"
 {
 
@@ -140,7 +150,7 @@ codeunit 5972 "Service Info-Pane Management"
             Res.Reset();
             if Res.Find('-') then
                 repeat
-                    if ServOrderAllocMgt.ResourceQualified(Res."No.", "Resource Skill Type"::"Service Item", ServItem."No.") then
+                    if ServOrderAllocMgt.ResourceQualified(Res."No.", Enum::"Resource Skill Type"::"Service Item", ServItem."No.") then
                         NoOfSkilledResources += 1;
                 until Res.Next() = 0;
             exit(NoOfSkilledResources);

@@ -1,3 +1,29 @@
+﻿namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Worksheet;
+using System.Utilities;
+
 codeunit 5760 "Whse.-Post Receipt"
 {
     Permissions = TableData "Whse. Item Entry Relation" = ri,
@@ -178,17 +204,17 @@ codeunit 5760 "Whse.-Post Receipt"
     begin
         with WhseRcptLine do
             case "Source Type" of
-                DATABASE::"Purchase Line":
+                Enum::TableID::"Purchase Line".AsInteger():
                     begin
                         PurchHeader.Get("Source Subtype", "Source No.");
                         SourceHeader := PurchHeader;
                     end;
-                DATABASE::"Sales Line": // Return Order
+                Enum::TableID::"Sales Line".AsInteger(): // Return Order
                     begin
                         SalesHeader.Get("Source Subtype", "Source No.");
                         SourceHeader := SalesHeader;
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     begin
                         TransHeader.Get("Source No.");
                         SourceHeader := TransHeader;
@@ -219,7 +245,7 @@ codeunit 5760 "Whse.-Post Receipt"
         OnBeforeInitSourceDocumentHeader(WhseRcptLine);
         with WhseRcptLine do
             case "Source Type" of
-                DATABASE::"Purchase Line":
+                Enum::TableID::"Purchase Line".AsInteger():
                     begin
                         OnInitSourceDocumentOnBeforePurchHeaderInit(PurchHeader, WhseRcptHeader, WhseRcptLine, ModifyHeader);
                         if (PurchHeader."Posting Date" = 0D) or
@@ -244,7 +270,7 @@ codeunit 5760 "Whse.-Post Receipt"
                             PurchHeader.Modify();
                         OnInitSourceDocumentHeaderOnAfterPurchHeaderModify(PurchHeader, WhseRcptLine, ModifyHeader);
                     end;
-                DATABASE::"Sales Line": // Return Order
+                Enum::TableID::"Sales Line".AsInteger(): // Return Order
                     begin
                         OnInitSourceDocumentOnBeforeSalesHeaderInit(SalesHeader, WhseRcptHeader, WhseRcptLine, ModifyHeader);
                         if (SalesHeader."Posting Date" = 0D) or
@@ -264,7 +290,7 @@ codeunit 5760 "Whse.-Post Receipt"
                             SalesHeader.Modify();
                         OnInitSourceDocumentHeaderOnAfterSalesHeaderModify(SalesHeader, WhseRcptLine, ModifyHeader);
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     begin
                         OnInitSourceDocumentOnBeforeTransferHeaderInit(TransHeader, WhseRcptHeader, WhseRcptLine, ModifyHeader);
                         if (TransHeader."Posting Date" = 0D) or
@@ -306,7 +332,7 @@ codeunit 5760 "Whse.-Post Receipt"
         WhseRcptLine2.Copy(WhseRcptLine);
         with WhseRcptLine2 do begin
             case "Source Type" of
-                DATABASE::"Purchase Line":
+                Enum::TableID::"Purchase Line".AsInteger():
                     begin
                         PurchLine.SetRange("Document Type", "Source Subtype");
                         PurchLine.SetRange("Document No.", "Source No.");
@@ -344,7 +370,7 @@ codeunit 5760 "Whse.-Post Receipt"
                             until PurchLine.Next() = 0;
                         OnInitSourceDocumentLinesOnAfterModifyPurchLines(PurchHeader);
                     end;
-                DATABASE::"Sales Line": // Return Order
+                Enum::TableID::"Sales Line".AsInteger(): // Return Order
                     begin
                         SalesLine.SetRange("Document Type", "Source Subtype");
                         SalesLine.SetRange("Document No.", "Source No.");
@@ -379,7 +405,7 @@ codeunit 5760 "Whse.-Post Receipt"
                             until SalesLine.Next() = 0;
                         OnInitSourceDocumentLinesOnAfterModifySalesLines(SalesHeader);
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     begin
                         TransLine.SetRange("Document No.", "Source No.");
                         TransLine.SetRange("Derived From Line No.", 0);
@@ -669,7 +695,7 @@ codeunit 5760 "Whse.-Post Receipt"
 
             OnPostSourceDocumentOnAfterGetWhseRcptHeader(WhseRcptLine, WhseRcptHeader, WhseSetup, SuppressCommit);
             case "Source Type" of
-                DATABASE::"Purchase Line":
+                Enum::TableID::"Purchase Line".AsInteger():
                     begin
                         if "Source Document" = "Source Document"::"Purchase Order" then
                             PurchHeader.Receive := true
@@ -696,7 +722,7 @@ codeunit 5760 "Whse.-Post Receipt"
                         OnPostSourceDocumentOnAfterPostPurchaseHeader(PurchHeader);
                         Clear(PurchPost);
                     end;
-                DATABASE::"Sales Line": // Return Order
+                Enum::TableID::"Sales Line".AsInteger(): // Return Order
                     begin
                         if "Source Document" = "Source Document"::"Sales Order" then
                             SalesHeader.Ship := true
@@ -723,7 +749,7 @@ codeunit 5760 "Whse.-Post Receipt"
                         OnPostSourceDocumentOnAfterPostSalesHeader(SalesHeader);
                         Clear(SalesPost);
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     begin
                         IsHandled := false;
                         OnPostSourceDocumentOnBeforePostTransferHeader(TransHeader, WhseRcptHeader, SuppressCommit, CounterSourceDocOK, IsHandled);
@@ -1082,7 +1108,7 @@ codeunit 5760 "Whse.-Post Receipt"
                 repeat
                     WhseItemEntryRelation := TempWhseItemEntryRelation;
                     WhseItemEntryRelation.SetSource(
-                      DATABASE::"Posted Whse. Receipt Line", 0, PostedWhseRcptHeader."No.", PostedWhseRcptLine."Line No.");
+                      Enum::TableID::"Posted Whse. Receipt Line".AsInteger(), 0, PostedWhseRcptHeader."No.", PostedWhseRcptLine."Line No.");
                     IsHandled := false;
                     OnInsertWhseItemEntryRelationOnBeforeInsertFromTempWhseItemEntryRelation(WhseItemEntryRelation, IsHandled);
                     if not IsHandled then
@@ -1097,7 +1123,7 @@ codeunit 5760 "Whse.-Post Receipt"
             repeat
                 WhseItemEntryRelation.InitFromTrackingSpec(TempWhseSplitSpecification);
                 WhseItemEntryRelation.SetSource(
-                  DATABASE::"Posted Whse. Receipt Line", 0, PostedWhseRcptHeader."No.", PostedWhseRcptLine."Line No.");
+                  Enum::TableID::"Posted Whse. Receipt Line".AsInteger(), 0, PostedWhseRcptHeader."No.", PostedWhseRcptLine."Line No.");
                 IsHandled := false;
                 OnInsertWhseItemEntryRelationOnBeforeInsertFromTempWhseSplitSpecification(WhseItemEntryRelation, TempWhseSplitSpecification, IsHandled);
                 if not IsHandled then
@@ -1256,13 +1282,13 @@ codeunit 5760 "Whse.-Post Receipt"
             IsHandled := false;
             OnBeforeCreatePutAwayDoc(WhseRcptHeader, PostedWhseRcptLine, IsHandled);
             if not IsHandled then begin
-                CreatePutAway.SetValues('', "Whse. Activity Sorting Method"::None, false, false);
+                CreatePutAway.SetValues('', Enum::"Whse. Activity Sorting Method"::None, false, false);
                 CreatePutAway.SetCrossDockValues(true);
 
                 OnCreatePutAwayDocOnBeforeItemTrackingMgtGetWhseItemTrkgSetup(ItemTrackingMgt);
                 if ItemTrackingMgt.GetWhseItemTrkgSetup(PostedWhseRcptLine."Item No.") then
                     ItemTrackingMgt.InitItemTrackingForTempWhseWorksheetLine(
-                          "Warehouse Worksheet Document Type"::Receipt,
+                          Enum::"Warehouse Worksheet Document Type"::Receipt,
                           PostedWhseRcptLine."No.", PostedWhseRcptLine."Line No.",
                           PostedWhseRcptLine."Source Type", PostedWhseRcptLine."Source Subtype",
                           PostedWhseRcptLine."Source No.", PostedWhseRcptLine."Source Line No.", 0);
@@ -1274,7 +1300,7 @@ codeunit 5760 "Whse.-Post Receipt"
                     repeat
                         TempPostedWhseRcptLine2 := TempPostedWhseRcptLine;
                         TempPostedWhseRcptLine2."Line No." := PostedWhseRcptLine."Line No.";
-                        WhseSourceCreateDocument.SetQuantity(TempPostedWhseRcptLine2, DATABASE::"Posted Whse. Receipt Line", RemQtyToHandleBase);
+                        WhseSourceCreateDocument.SetQuantity(TempPostedWhseRcptLine2, Enum::TableID::"Posted Whse. Receipt Line".AsInteger(), RemQtyToHandleBase);
                         OnCreatePutAwayDocOnBeforeCreatePutAwayRun(TempPostedWhseRcptLine2, CreatePutAway, WhseRcptHeader);
                         CreatePutAway.Run(TempPostedWhseRcptLine2);
                     until TempPostedWhseRcptLine.Next() = 0;
@@ -1319,7 +1345,7 @@ codeunit 5760 "Whse.-Post Receipt"
                 TempWhseItemEntryRelation.Init();
                 TempWhseItemEntryRelation.TransferFields(ItemEntryRelation);
                 TempWhseItemEntryRelation.SetSource(
-                  DATABASE::"Posted Whse. Receipt Line", 0, PostedWhseRcptHeader."No.", PostedWhseRcptLine."Line No.");
+                  Enum::TableID::"Posted Whse. Receipt Line".AsInteger(), 0, PostedWhseRcptHeader."No.", PostedWhseRcptLine."Line No.");
                 TempWhseItemEntryRelation.Insert();
             until ItemEntryRelation.Next() = 0;
             ItemEntryRelationCreated := true;

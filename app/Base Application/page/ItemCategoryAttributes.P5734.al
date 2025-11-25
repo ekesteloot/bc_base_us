@@ -6,8 +6,8 @@ page 5734 "Item Category Attributes"
     RefreshOnActivate = true;
     SourceTable = "Item Attribute Value Selection";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Inheritance Level", "Attribute Name")
-                      ORDER(Ascending);
+    SourceTableView = sorting("Inheritance Level", "Attribute Name")
+                      order(Ascending);
 
     layout
     {
@@ -23,7 +23,7 @@ page 5734 "Item Category Attributes"
                     AssistEdit = false;
                     Caption = 'Attribute';
                     StyleExpr = StyleTxt;
-                    TableRelation = "Item Attribute".Name WHERE(Blocked = CONST(false));
+                    TableRelation = "Item Attribute".Name where(Blocked = const(false));
                     ToolTip = 'Specifies the item attribute.';
 
                     trigger OnValidate()
@@ -31,13 +31,13 @@ page 5734 "Item Category Attributes"
                         PersistInheritanceData();
                     end;
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Default Value';
                     StyleExpr = StyleTxt;
-                    TableRelation = IF ("Attribute Type" = CONST(Option)) "Item Attribute Value".Value WHERE("Attribute ID" = FIELD("Attribute ID"),
-                                                                                                            Blocked = CONST(false));
+                    TableRelation = if ("Attribute Type" = const(Option)) "Item Attribute Value".Value where("Attribute ID" = field("Attribute ID"),
+                                                                                                            Blocked = const(false));
                     ToolTip = 'Specifies the value of the item attribute.';
 
                     trigger OnValidate()
@@ -90,21 +90,21 @@ page 5734 "Item Category Attributes"
         ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
         ItemAttributeManagement: Codeunit "Item Attribute Management";
     begin
-        if "Inherited-From Key Value" <> '' then
+        if Rec."Inherited-From Key Value" <> '' then
             Error(DeleteInheritedAttribErr);
 
         ItemAttributeValueMapping.SetRange("Table ID", DATABASE::"Item Category");
         ItemAttributeValueMapping.SetRange("No.", ItemCategoryCode);
-        ItemAttributeValueMapping.SetRange("Item Attribute ID", "Attribute ID");
+        ItemAttributeValueMapping.SetRange("Item Attribute ID", Rec."Attribute ID");
         ItemAttributeValueMapping.FindFirst();
-        if ItemAttributeManagement.SearchCategoryItemsForAttribute(ItemCategoryCode, "Attribute ID") then
+        if ItemAttributeManagement.SearchCategoryItemsForAttribute(ItemCategoryCode, Rec."Attribute ID") then
             if Confirm(StrSubstNo(DeleteItemInheritedParentCategoryAttributesQst, ItemCategoryCode, ItemCategoryCode)) then begin
-                ItemAttributeValue.SetRange("Attribute ID", "Attribute ID");
+                ItemAttributeValue.SetRange("Attribute ID", Rec."Attribute ID");
                 ItemAttributeValue.SetRange(ID, ItemAttributeValueMapping."Item Attribute Value ID");
                 ItemAttributeValue.FindFirst();
                 TempItemAttributeValueToDelete.TransferFields(ItemAttributeValue);
                 TempItemAttributeValueToDelete.Insert();
-                DeleteRecentlyItemAttributeValueMapping("Attribute ID");
+                DeleteRecentlyItemAttributeValueMapping(Rec."Attribute ID");
                 ItemAttributeManagement.DeleteCategoryItemsAttributeValueMapping(TempItemAttributeValueToDelete, ItemCategoryCode);
             end;
         ItemAttributeValueMapping.Delete();
@@ -119,8 +119,8 @@ page 5734 "Item Category Attributes"
         if ItemCategoryCode <> '' then begin
             ItemAttributeValueMapping."Table ID" := DATABASE::"Item Category";
             ItemAttributeValueMapping."No." := ItemCategoryCode;
-            ItemAttributeValueMapping."Item Attribute ID" := "Attribute ID";
-            ItemAttributeValueMapping."Item Attribute Value ID" := GetAttributeValueID(TempItemAttributeValueToInsert);
+            ItemAttributeValueMapping."Item Attribute ID" := Rec."Attribute ID";
+            ItemAttributeValueMapping."Item Attribute Value ID" := Rec.GetAttributeValueID(TempItemAttributeValueToInsert);
             OnInsertRecordOnBeforeItemAttributeValueMappingInsert(ItemAttributeValueMapping, TempItemAttributeValueToInsert, Rec);
             ItemAttributeValueMapping.Insert();
             ItemAttributeManagement.InsertCategoryItemsBufferedAttributeValueMapping(
@@ -148,8 +148,8 @@ page 5734 "Item Category Attributes"
         ItemCategory: Record "Item Category";
         CurrentCategoryCode: Code[20];
     begin
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         if CategoryCode = '' then
             exit;
         SortByInheritance();
@@ -170,11 +170,11 @@ page 5734 "Item Category Attributes"
                             if TempItemAttributeValue.Insert() then
                                 if not AttributeExists(TempItemAttributeValue."Attribute ID") then begin
                                     if CurrentCategoryCode = ItemCategoryCode then
-                                        InsertRecord(TempItemAttributeValue, DATABASE::"Item Category", '')
+                                        Rec.InsertRecord(TempItemAttributeValue, DATABASE::"Item Category", '')
                                     else
-                                        InsertRecord(TempItemAttributeValue, DATABASE::"Item Category", CurrentCategoryCode);
-                                    "Inheritance Level" := ItemCategory.Indentation;
-                                    Modify();
+                                        Rec.InsertRecord(TempItemAttributeValue, DATABASE::"Item Category", CurrentCategoryCode);
+                                    Rec."Inheritance Level" := ItemCategory.Indentation;
+                                    Rec.Modify();
                                 end;
                         end
                     until ItemAttributeValueMapping.Next() = 0;
@@ -182,7 +182,7 @@ page 5734 "Item Category Attributes"
             end else
                 CurrentCategoryCode := '';
         until CurrentCategoryCode = '';
-        Reset();
+        Rec.Reset();
         CurrPage.Update(false);
         SortByInheritance();
     end;
@@ -200,9 +200,9 @@ page 5734 "Item Category Attributes"
             exit;
         TempOldCategItemAttributeValue.LoadCategoryAttributesFactBoxData(CategoryCode);
 
-        SetRange("Inherited-From Table ID", DATABASE::"Item Category");
-        SetRange("Inherited-From Key Value", '');
-        PopulateItemAttributeValue(TempNewItemAttributeValue);
+        Rec.SetRange("Inherited-From Table ID", DATABASE::"Item Category");
+        Rec.SetRange("Inherited-From Key Value", '');
+        Rec.PopulateItemAttributeValue(TempNewItemAttributeValue);
         ItemAttributeValueMapping.SetRange("Table ID", DATABASE::"Item Category");
         ItemAttributeValueMapping.SetRange("No.", CategoryCode);
         ItemAttributeValueMapping.DeleteAll();
@@ -226,7 +226,7 @@ page 5734 "Item Category Attributes"
 
     local procedure PersistInheritanceData()
     begin
-        "Inherited-From Table ID" := DATABASE::"Item Category";
+        Rec."Inherited-From Table ID" := DATABASE::"Item Category";
         CurrPage.SaveRecord();
     end;
 
@@ -240,12 +240,12 @@ page 5734 "Item Category Attributes"
 
     procedure SortByInheritance()
     begin
-        SetCurrentKey("Inheritance Level", "Attribute Name");
+        Rec.SetCurrentKey("Inheritance Level", "Attribute Name");
     end;
 
     local procedure UpdateProperties()
     begin
-        RowEditable := "Inherited-From Key Value" = '';
+        RowEditable := Rec."Inherited-From Key Value" = '';
         if RowEditable then
             StyleTxt := 'Standard'
         else
@@ -254,9 +254,9 @@ page 5734 "Item Category Attributes"
 
     local procedure AttributeExists(AttributeID: Integer) AttribExist: Boolean
     begin
-        SetRange("Attribute ID", AttributeID);
-        AttribExist := not IsEmpty();
-        Reset();
+        Rec.SetRange("Attribute ID", AttributeID);
+        AttribExist := not Rec.IsEmpty();
+        Rec.Reset();
     end;
 
     local procedure ChangeDefaultValue()
@@ -267,16 +267,16 @@ page 5734 "Item Category Attributes"
     begin
         ItemAttributeValueMapping.SetRange("Table ID", DATABASE::"Item Category");
         ItemAttributeValueMapping.SetRange("No.", ItemCategoryCode);
-        ItemAttributeValueMapping.SetRange("Item Attribute ID", "Attribute ID");
+        ItemAttributeValueMapping.SetRange("Item Attribute ID", Rec."Attribute ID");
         if ItemAttributeValueMapping.FindFirst() then begin
-            ItemAttributeValueMapping."Item Attribute Value ID" := GetAttributeValueID(TempItemAttributeValueToInsert);
+            ItemAttributeValueMapping."Item Attribute Value ID" := Rec.GetAttributeValueID(TempItemAttributeValueToInsert);
             ItemAttributeValueMapping.Modify();
         end;
 
-        if IsRecentlyAddedCategoryAttribute("Attribute ID") then
+        if IsRecentlyAddedCategoryAttribute(Rec."Attribute ID") then
             UpdateRecentlyItemAttributeValueMapping(TempItemAttributeValueToInsert)
         else
-            if ItemAttributeManagement.SearchCategoryItemsForAttribute(ItemCategoryCode, "Attribute ID") then
+            if ItemAttributeManagement.SearchCategoryItemsForAttribute(ItemCategoryCode, Rec."Attribute ID") then
                 Message(StrSubstNo(ChangingDefaultValueMsg, ItemCategoryCode));
     end;
 

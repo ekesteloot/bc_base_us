@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.Calculation;
+
 page 7026 "Price Calculation Method Card"
 {
     Caption = 'Price Calculation Method';
@@ -19,14 +25,14 @@ page 7026 "Price Calculation Method Card"
                 Caption = 'Sale Price Calculation';
                 ShowFilter = false;
                 ApplicationArea = Basic, Suite;
-                SubPageView = WHERE(Type = CONST(Sale));
+                SubPageView = where(Type = const(Sale));
             }
             part(PurchaseSetup; "Price Calculation Setup Lines")
             {
                 Caption = 'Purchase Price Calculation';
                 ShowFilter = false;
                 ApplicationArea = Basic, Suite;
-                SubPageView = WHERE(Type = CONST(Purchase));
+                SubPageView = where(Type = const(Purchase));
             }
         }
     }

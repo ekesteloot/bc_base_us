@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using System.Environment;
+
 codeunit 9179 "Application Area Mgmt. Facade"
 {
     SingleInstance = true;

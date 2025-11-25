@@ -13,7 +13,7 @@ page 8 "Standard Text Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code to identify the standard text.';
@@ -54,9 +54,9 @@ page 8 "Standard Text Codes"
                     Caption = 'E&xtended Texts';
                     Image = Text;
                     RunObject = Page "Extended Text List";
-                    RunPageLink = "Table Name" = CONST("Standard Text"),
-                                  "No." = FIELD(Code);
-                    RunPageView = SORTING("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
+                    RunPageLink = "Table Name" = const("Standard Text"),
+                                  "No." = field(Code);
+                    RunPageView = sorting("Table Name", "No.", "Language Code", "All Language Codes", "Starting Date", "Ending Date");
                     ToolTip = 'Select or set up additional text. Extended text can be inserted under the Description field on document lines for the item.';
                 }
             }

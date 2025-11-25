@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Setup;
+
+using Microsoft.FixedAssets.FixedAsset;
+
 table 5608 "FA Subclass"
 {
     Caption = 'FA Subclass';

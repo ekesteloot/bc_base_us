@@ -1,4 +1,6 @@
-﻿codeunit 1232 "SEPA DD-Prepare Source"
+﻿namespace Microsoft.BankMgt.DirectDebit;
+
+codeunit 1232 "SEPA DD-Prepare Source"
 {
     TableNo = "Direct Debit Collection Entry";
 

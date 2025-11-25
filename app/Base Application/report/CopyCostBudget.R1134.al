@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Budget;
+
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Setup;
+
 report 1134 "Copy Cost Budget"
 {
     Caption = 'Copy Cost Budget';
@@ -7,7 +12,7 @@ report 1134 "Copy Cost Budget"
     {
         dataitem("Cost Budget Entry"; "Cost Budget Entry")
         {
-            DataItemTableView = SORTING("Budget Name", "Cost Type No.", Date);
+            DataItemTableView = sorting("Budget Name", "Cost Type No.", Date);
             RequestFilterFields = "Budget Name", "Cost Type No.", "Cost Center Code", "Cost Object Code", Date;
 
             trigger OnAfterGetRecord()

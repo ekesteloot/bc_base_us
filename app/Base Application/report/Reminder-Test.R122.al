@@ -1,14 +1,27 @@
+﻿namespace Microsoft.Sales.Reminder;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Sales.Customer;
+using System.Security.User;
+using System.Utilities;
+
 report 122 "Reminder - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/ReminderTest.rdlc';
+    RDLCLayout = './Sales/Reminder/ReminderTest.rdlc';
     Caption = 'Reminder - Test';
 
     dataset
     {
         dataitem("Reminder Header"; "Reminder Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Reminder';
             column(Reminder_Header_No_; "No.")
@@ -37,7 +50,7 @@ report 122 "Reminder - Test"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(COMPANYNAME; COMPANYPROPERTY.DisplayName())
                 {
                 }
@@ -160,7 +173,7 @@ report 122 "Reminder - Test"
                 }
                 dataitem(DimensionLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -202,7 +215,7 @@ report 122 "Reminder - Test"
                 }
                 dataitem(HeaderErrorCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -222,9 +235,9 @@ report 122 "Reminder - Test"
                 }
                 dataitem("Reminder Line"; "Reminder Line")
                 {
-                    DataItemLink = "Reminder No." = FIELD("No.");
+                    DataItemLink = "Reminder No." = field("No.");
                     DataItemLinkReference = "Reminder Header";
-                    DataItemTableView = SORTING("Reminder No.", "Line No.") WHERE("Line Type" = FILTER(<> "Not Due"));
+                    DataItemTableView = sorting("Reminder No.", "Line No.") where("Line Type" = filter(<> "Not Due"));
                     column(Reminder_Line_Description; Description)
                     {
                     }
@@ -336,7 +349,7 @@ report 122 "Reminder - Test"
                     }
                     dataitem(LineErrorCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(ErrorText_Number__Control97; ErrorText[Number])
                         {
                         }
@@ -413,9 +426,9 @@ report 122 "Reminder - Test"
                 }
                 dataitem("Not Due"; "Reminder Line")
                 {
-                    DataItemLink = "Reminder No." = FIELD("No.");
+                    DataItemLink = "Reminder No." = field("No.");
                     DataItemLinkReference = "Reminder Header";
-                    DataItemTableView = SORTING("Reminder No.", "Line No.") WHERE("Line Type" = CONST("Not Due"));
+                    DataItemTableView = sorting("Reminder No.", "Line No.") where("Line Type" = const("Not Due"));
                     column(Not_Due__Document_Date_; Format("Document Date"))
                     {
                     }
@@ -463,7 +476,7 @@ report 122 "Reminder - Test"
                 }
                 dataitem(VATCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(VALVATAmount; VALVATAmount)
                     {
                         AutoFormatExpression = "Reminder Line".GetCurrencyCodeFromHeader();
@@ -549,7 +562,7 @@ report 122 "Reminder - Test"
                 }
                 dataitem(VATCounterLCY; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(VALExchRate; VALExchRate)
                     {
                     }

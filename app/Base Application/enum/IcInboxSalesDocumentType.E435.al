@@ -1,3 +1,5 @@
+namespace Microsoft.Intercompany.Inbox;
+
 enum 435 "IC Inbox Sales Document Type"
 {
     Extensible = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.HumanResources.Setup;
+
 page 5236 "Human Res. Units of Measure"
 {
     ApplicationArea = BasicHR;
@@ -13,7 +15,7 @@ page 5236 "Human Res. Units of Measure"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies one of the unit of measure codes.';

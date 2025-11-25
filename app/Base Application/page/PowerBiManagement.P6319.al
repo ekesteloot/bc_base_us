@@ -1,3 +1,9 @@
+#if not CLEAN23
+namespace System.Integration.PowerBI;
+
+using System.Azure.Identity;
+using System.Environment;
+
 page 6319 "Power BI Management"
 {
     Caption = 'Power BI Management';
@@ -7,6 +13,9 @@ page 6319 "Power BI Management"
     ModifyAllowed = false;
     PageType = Card;
     RefreshOnActivate = false;
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This page has been replaced by page 6323 "Power BI Report Card"';
+    ObsoleteTag = '23.0';
 
     layout
     {
@@ -137,4 +146,4 @@ page 6319 "Power BI Management"
         end;
     end;
 }
-
+#endif

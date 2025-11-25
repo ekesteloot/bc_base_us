@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Journal;
+using System.Utilities;
+
 codeunit 5617 "FA Date Calculation"
 {
 

@@ -1,3 +1,5 @@
+namespace System.Security.User;
+
 table 1306 "User Preference"
 {
     Caption = 'User Preference';

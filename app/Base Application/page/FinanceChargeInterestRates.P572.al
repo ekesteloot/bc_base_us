@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.FinanceCharge;
+
 page 572 "Finance Charge Interest Rates"
 {
     Caption = 'Finance Charge Interest Rates';

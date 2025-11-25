@@ -1,11 +1,18 @@
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Environment;
+using System.Environment.Configuration;
+
 page 1159 "Purchase Documents"
 {
     Caption = 'Purchase Documents';
     DataCaptionFields = "Vendor No.";
     PageType = ListPart;
     SourceTable = "Vendor Ledger Entry";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Entry No.")
+                      order(Descending);
 
     layout
     {
@@ -52,9 +59,9 @@ page 1159 "Purchase Documents"
                         if Company."Evaluation Company" then
                             HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 574) +
                               '&' + ConfPersonalizationMgt.GetProfileUrlParameterForEvaluationCompany()
-                              + StrSubstNo(FilterForRemAmtDrillDwnTxt, "Entry No.")
+                              + StrSubstNo(FilterForRemAmtDrillDwnTxt, Rec."Entry No.")
                         else
-                            HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 574) + StrSubstNo(FilterForRemAmtDrillDwnTxt, "Entry No.");
+                            HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 574) + StrSubstNo(FilterForRemAmtDrillDwnTxt, Rec."Entry No.");
                         HyperLink(HyperLinkUrl);
                     end;
                 }
@@ -73,8 +80,8 @@ page 1159 "Purchase Documents"
     var
         Vendor: Record Vendor;
     begin
-        StyleTxt := SetStyle();
-        Vendor.Get("Vendor No.");
+        StyleTxt := Rec.SetStyle();
+        Vendor.Get(Rec."Vendor No.");
         VendorName := Vendor.Name;
     end;
 
@@ -86,10 +93,10 @@ page 1159 "Purchase Documents"
 
     trigger OnOpenPage()
     begin
-        SetFilter("Due Date", '<%1', WorkDate());
-        SetRange("Document Type", "Document Type"::Invoice);
-        SetFilter("Remaining Amt. (LCY)", '<>0');
-        Ascending := true;
+        Rec.SetFilter("Due Date", '<%1', WorkDate());
+        Rec.SetRange("Document Type", Rec."Document Type"::Invoice);
+        Rec.SetFilter("Remaining Amt. (LCY)", '<>0');
+        Rec.Ascending := true;
     end;
 
     var
@@ -99,31 +106,31 @@ page 1159 "Purchase Documents"
 
     procedure SetFilterForOverduePurInvoiceAmount()
     begin
-        Reset();
-        SetFilter("Due Date", '<%1', WorkDate());
-        SetRange("Document Type", "Document Type"::Invoice);
-        SetFilter("Remaining Amt. (LCY)", '<>0');
-        Ascending := true;
+        Rec.Reset();
+        Rec.SetFilter("Due Date", '<%1', WorkDate());
+        Rec.SetRange("Document Type", Rec."Document Type"::Invoice);
+        Rec.SetFilter("Remaining Amt. (LCY)", '<>0');
+        Rec.Ascending := true;
         CurrPage.Update();
     end;
 
     procedure SetFilterForPurchDocsDueToday()
     begin
-        Reset();
-        SetRange(Open, true);
-        SetFilter("Document Type", 'Invoice|Credit Memo');
-        SetFilter("Due Date", '<=%1', WorkDate());
-        Ascending := true;
+        Rec.Reset();
+        Rec.SetRange(Open, true);
+        Rec.SetFilter("Document Type", 'Invoice|Credit Memo');
+        Rec.SetFilter("Due Date", '<=%1', WorkDate());
+        Rec.Ascending := true;
         CurrPage.Update();
     end;
 
     procedure SetFilterForPurchInvoicesDueNextWeek()
     begin
-        Reset();
-        SetRange(Open, true);
-        SetFilter("Document Type", 'Invoice|Credit Memo');
-        SetFilter("Due Date", '%1..%2', CalcDate('<1D>', WorkDate()), CalcDate('<1W>', WorkDate()));
-        Ascending := true;
+        Rec.Reset();
+        Rec.SetRange(Open, true);
+        Rec.SetFilter("Document Type", 'Invoice|Credit Memo');
+        Rec.SetFilter("Due Date", '%1..%2', CalcDate('<1D>', WorkDate()), CalcDate('<1W>', WorkDate()));
+        Rec.Ascending := true;
         CurrPage.Update();
     end;
 }

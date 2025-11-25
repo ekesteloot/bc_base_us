@@ -28,14 +28,14 @@ page 761 "Trailing Sales Orders Setup"
 
     trigger OnOpenPage()
     begin
-        if not Get(UserId) then begin
-            "User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
-            "Use Work Date as Base" := true;
-            Insert();
+        if not Rec.Get(UserId) then begin
+            Rec."User ID" := CopyStr(UserId(), 1, MaxStrLen(Rec."User ID"));
+            Rec."Use Work Date as Base" := true;
+            Rec.Insert();
         end;
-        FilterGroup(2);
-        SetRange("User ID", UserId);
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetRange("User ID", UserId);
+        Rec.FilterGroup(0);
     end;
 }
 

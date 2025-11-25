@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8615 "Config. Package Data"
 {
     Caption = 'Config. Package Data';
@@ -15,19 +19,19 @@ table 8615 "Config. Package Data"
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(3; "No."; Integer)
         {
             Caption = 'No.';
-            TableRelation = "Config. Package Record"."No." WHERE("Package Code" = FIELD("Package Code"),
-                                                                 "Table ID" = FIELD("Table ID"));
+            TableRelation = "Config. Package Record"."No." where("Package Code" = field("Package Code"),
+                                                                 "Table ID" = field("Table ID"));
         }
         field(4; "Field ID"; Integer)
         {
             Caption = 'Field ID';
-            TableRelation = "Config. Package Field"."Field ID" WHERE("Package Code" = FIELD("Package Code"),
-                                                                     "Table ID" = FIELD("Table ID"));
+            TableRelation = "Config. Package Field"."Field ID" where("Package Code" = field("Package Code"),
+                                                                     "Table ID" = field("Table ID"));
         }
 #pragma warning disable AS0086
         field(5; Value; Text[2048])

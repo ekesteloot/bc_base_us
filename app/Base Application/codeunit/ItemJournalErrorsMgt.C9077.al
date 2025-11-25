@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Journal;
+using System.Utilities;
+
 codeunit 9077 "Item Journal Errors Mgt."
 {
     SingleInstance = true;

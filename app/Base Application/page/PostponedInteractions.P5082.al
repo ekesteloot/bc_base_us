@@ -1,10 +1,17 @@
+namespace Microsoft.CRM.Interaction;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Task;
+using System.Security.User;
+
 page 5082 "Postponed Interactions"
 {
     Caption = 'Postponed Interactions';
     Editable = false;
     PageType = List;
     SourceTable = "Interaction Log Entry";
-    SourceTableView = WHERE(Postponed = CONST(true));
+    SourceTableView = where(Postponed = const(true));
 
     layout
     {
@@ -37,7 +44,7 @@ page 5082 "Postponed Interactions"
                     ToolTip = 'Specifies the status of the delivery of the attachment. There are three options:';
                     Visible = false;
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the date that you have entered in the Date field in the Create Interaction wizard or the Segment window when you created the interaction. The field is not editable.';
@@ -79,8 +86,8 @@ page 5082 "Postponed Interactions"
 
                     trigger OnAssistEdit()
                     begin
-                        if "Attachment No." <> 0 then
-                            OpenAttachment();
+                        if Rec."Attachment No." <> 0 then
+                            Rec.OpenAttachment();
                     end;
                 }
                 field("Information Flow"; Rec."Information Flow")
@@ -106,7 +113,7 @@ page 5082 "Postponed Interactions"
                     ToolTip = 'Specifies the number of the contact company.';
                     Visible = false;
                 }
-                field(Evaluation; Evaluation)
+                field(Evaluation; Rec.Evaluation)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the evaluation of the interaction. There are five options: Very Positive, Positive, Neutral, Negative, and Very Negative.';
@@ -136,7 +143,7 @@ page 5082 "Postponed Interactions"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Segment No."; Rec."Segment No.")
@@ -185,7 +192,7 @@ page 5082 "Postponed Interactions"
                     ToolTip = 'Specifies the language code for the interaction for the interaction log. The code is copied from the language code of the interaction template, if one is specified.';
                     Visible = false;
                 }
-                field(Subject; Subject)
+                field(Subject; Rec.Subject)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the subject text that will be used for this interaction.';
@@ -202,7 +209,7 @@ page 5082 "Postponed Interactions"
                     ApplicationArea = All;
                     ToolTip = 'Specifies the number of the entry, as assigned from the specified number series when the entry was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies that a comment exists for this interaction log entry.';
@@ -260,16 +267,16 @@ page 5082 "Postponed Interactions"
                     var
                         FilterPageBuilder: FilterPageBuilder;
                     begin
-                        FilterPageBuilder.AddTable(TableName, DATABASE::"Interaction Log Entry");
-                        FilterPageBuilder.SetView(TableName, GetView());
+                        FilterPageBuilder.AddTable(Rec.TableName, DATABASE::"Interaction Log Entry");
+                        FilterPageBuilder.SetView(Rec.TableName, Rec.GetView());
 
-                        if GetFilter("Contact No.") = '' then
-                            FilterPageBuilder.AddFieldNo(TableName, FieldNo("Contact No."));
-                        if GetFilter("Contact Company No.") = '' then
-                            FilterPageBuilder.AddFieldNo(TableName, FieldNo("Contact Company No."));
+                        if Rec.GetFilter("Contact No.") = '' then
+                            FilterPageBuilder.AddFieldNo(Rec.TableName, Rec.FieldNo("Contact No."));
+                        if Rec.GetFilter("Contact Company No.") = '' then
+                            FilterPageBuilder.AddFieldNo(Rec.TableName, Rec.FieldNo("Contact Company No."));
 
                         if FilterPageBuilder.RunModal() then
-                            SetView(FilterPageBuilder.GetView(TableName));
+                            Rec.SetView(FilterPageBuilder.GetView(Rec.TableName));
                     end;
                 }
                 action(ClearFilter)
@@ -281,10 +288,10 @@ page 5082 "Postponed Interactions"
 
                     trigger OnAction()
                     begin
-                        Reset();
-                        FilterGroup(2);
-                        SetRange(Postponed, true);
-                        FilterGroup(0);
+                        Rec.Reset();
+                        Rec.FilterGroup(2);
+                        Rec.SetRange(Postponed, true);
+                        Rec.FilterGroup(0);
                     end;
                 }
                 action("&Delete")
@@ -301,7 +308,7 @@ page 5082 "Postponed Interactions"
                             if not InteractionLogEntry.IsEmpty() then
                                 InteractionLogEntry.DeleteAll(true)
                             else
-                                Delete(true);
+                                Rec.Delete(true);
                         end;
                     end;
                 }
@@ -316,10 +323,10 @@ page 5082 "Postponed Interactions"
 
                 trigger OnAction()
                 begin
-                    if "Attachment No." <> 0 then
-                        OpenAttachment()
+                    if Rec."Attachment No." <> 0 then
+                        Rec.OpenAttachment()
                     else
-                        ShowDocument();
+                        Rec.ShowDocument();
                 end;
             }
             action(Resume)
@@ -332,10 +339,10 @@ page 5082 "Postponed Interactions"
 
                 trigger OnAction()
                 begin
-                    if IsEmpty() then
+                    if Rec.IsEmpty() then
                         exit;
 
-                    ResumeInteraction();
+                    Rec.ResumeInteraction();
                 end;
             }
         }
@@ -363,7 +370,7 @@ page 5082 "Postponed Interactions"
 
     trigger OnAfterGetCurrRecord()
     begin
-        CalcFields("Contact Name", "Contact Company Name");
+        Rec.CalcFields("Contact Name", "Contact Company Name");
     end;
 
     trigger OnOpenPage()
@@ -382,27 +389,27 @@ page 5082 "Postponed Interactions"
         Task: Record "To-do";
         Opportunity: Record Opportunity;
     begin
-        if Contact.Get("Contact Company No.") then
+        if Contact.Get(Rec."Contact Company No.") then
             CurrPage.Caption(CurrPage.Caption + ' - ' + Contact."Company No." + ' . ' + Contact."Company Name");
-        if Contact.Get("Contact No.") then begin
+        if Contact.Get(Rec."Contact No.") then begin
             CurrPage.Caption(CurrPage.Caption + ' - ' + Contact."No." + ' . ' + Contact.Name);
             exit;
         end;
-        if "Contact Company No." <> '' then
+        if Rec."Contact Company No." <> '' then
             exit;
-        if Salesperson.Get("Salesperson Code") then begin
-            CurrPage.Caption(CurrPage.Caption + ' - ' + "Salesperson Code" + ' . ' + Salesperson.Name);
-            exit;
-        end;
-        if "Interaction Template Code" <> '' then begin
-            CurrPage.Caption(CurrPage.Caption + ' - ' + "Interaction Template Code");
+        if Salesperson.Get(Rec."Salesperson Code") then begin
+            CurrPage.Caption(CurrPage.Caption + ' - ' + Rec."Salesperson Code" + ' . ' + Salesperson.Name);
             exit;
         end;
-        if Task.Get("To-do No.") then begin
+        if Rec."Interaction Template Code" <> '' then begin
+            CurrPage.Caption(CurrPage.Caption + ' - ' + Rec."Interaction Template Code");
+            exit;
+        end;
+        if Task.Get(Rec."To-do No.") then begin
             CurrPage.Caption(CurrPage.Caption + ' - ' + Task."No." + ' . ' + Task.Description);
             exit;
         end;
-        if Opportunity.Get("Opportunity No.") then
+        if Opportunity.Get(Rec."Opportunity No.") then
             CurrPage.Caption(CurrPage.Caption + ' - ' + Opportunity."No." + ' . ' + Opportunity.Description);
     end;
 }

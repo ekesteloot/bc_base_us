@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1503 "Workflow Steps"
 {
     Caption = 'Workflow Steps';
@@ -13,7 +15,7 @@ page 1503 "Workflow Steps"
         {
             repeater(Group)
             {
-                IndentationColumn = Indent;
+                IndentationColumn = Rec.Indent;
                 IndentationControls = "Event Description";
                 field("Event Description"; Rec."Event Description")
                 {
@@ -39,10 +41,10 @@ page 1503 "Workflow Steps"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        SetCurrentKey(Order);
-        Ascending(true);
+        Rec.SetCurrentKey(Order);
+        Rec.Ascending(true);
 
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 }
 

@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using System.Utilities;
+
 page 312 "Gen. Business Posting Groups"
 {
     AdditionalSearchTerms = 'posting setup,general business posting group';
@@ -14,7 +18,7 @@ page 312 "Gen. Business Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the business group.';
@@ -33,9 +37,9 @@ page 312 "Gen. Business Posting Groups"
                     var
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        if "Def. VAT Bus. Posting Group" <> xRec."Def. VAT Bus. Posting Group" then
+                        if Rec."Def. VAT Bus. Posting Group" <> xRec."Def. VAT Bus. Posting Group" then
                             if not ConfirmManagement.GetResponseOrDefault(
-                                 StrSubstNo(Text000, Code, xRec."Def. VAT Bus. Posting Group"), true)
+                                 StrSubstNo(Text000, Rec.Code, xRec."Def. VAT Bus. Posting Group"), true)
                             then
                                 Error('');
                     end;
@@ -72,7 +76,7 @@ page 312 "Gen. Business Posting Groups"
                 Caption = '&Setup';
                 Image = Setup;
                 RunObject = Page "General Posting Setup";
-                RunPageLink = "Gen. Bus. Posting Group" = FIELD(Code);
+                RunPageLink = "Gen. Bus. Posting Group" = field(Code);
                 ToolTip = 'View or edit how you want to set up combinations of general business and general product posting groups.';
             }
         }

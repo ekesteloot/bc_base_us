@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 page 903 "Assembly Lines"
 {
     AutoSplitKey = true;
@@ -150,7 +154,7 @@ page 903 "Assembly Lines"
                     var
                         AssemblyHeader: Record "Assembly Header";
                     begin
-                        AssemblyHeader.Get("Document Type", "Document No.");
+                        AssemblyHeader.Get(Rec."Document Type", Rec."Document No.");
                         PAGE.Run(PAGE::"Assembly Order", AssemblyHeader);
                     end;
                 }
@@ -164,7 +168,7 @@ page 903 "Assembly Lines"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
                 action("Item &Tracking Lines")
@@ -172,12 +176,12 @@ page 903 "Assembly Lines"
                     ApplicationArea = ItemTracking;
                     Caption = 'Item &Tracking Lines';
                     Image = ItemTrackingLines;
-                    ShortCutKey = 'Ctrl+Alt+I'; 
+                    ShortCutKey = 'Ctrl+Alt+I';
                     ToolTip = 'View or edit serial numbers and lot numbers that are assigned to the item on the document or journal line.';
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }

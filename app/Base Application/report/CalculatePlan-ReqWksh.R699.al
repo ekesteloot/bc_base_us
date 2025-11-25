@@ -7,7 +7,7 @@
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("Low-Level Code") WHERE(Type = CONST(Inventory), Blocked = CONST(false));
+            DataItemTableView = sorting("Low-Level Code") where(Type = const(Inventory), Blocked = const(false));
             RequestFilterFields = "No.", "Search Description", "Location Filter";
 
             trigger OnAfterGetRecord()

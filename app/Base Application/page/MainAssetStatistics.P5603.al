@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Journal;
+
 page 5603 "Main Asset Statistics"
 {
     Caption = 'Main Asset Statistics';
@@ -214,7 +219,7 @@ page 5603 "Main Asset Statistics"
         DispDateVisible := false;
 
         ClearAll();
-        if "Main Asset/Component" <> "Main Asset/Component"::"Main Asset" then
+        if Rec."Main Asset/Component" <> Rec."Main Asset/Component"::"Main Asset" then
             exit;
         with FADeprBook do begin
             SetCurrentKey("Depreciation Book Code", "Component of Main Asset");
@@ -238,14 +243,14 @@ page 5603 "Main Asset Statistics"
                             GLAcqDate := GetMinDate(GLAcqDate, "G/L Acquisition Date");
                             FAAcqDate := GetMinDate(FAAcqDate, "Acquisition Date");
                         end;
-                        CalcAmount(LastAcqCost, AcquisitionCost, "Last Acquisition Cost Date", "FA Journal Line FA Posting Type"::"Acquisition Cost");
-                        CalcAmount(LastDepreciation, Depreciation2, "Last Depreciation Date", "FA Journal Line FA Posting Type"::Depreciation);
-                        CalcAmount(LastWriteDown, WriteDown, "Last Write-Down Date", "FA Journal Line FA Posting Type"::"Write-Down");
-                        CalcAmount(LastAppreciation, Appreciation2, "Last Appreciation Date", "FA Journal Line FA Posting Type"::Appreciation);
-                        CalcAmount(LastCustom1, Custom1, "Last Custom 1 Date", "FA Journal Line FA Posting Type"::"Custom 1");
-                        CalcAmount(LastCustom2, Custom2, "Last Custom 2 Date", "FA Journal Line FA Posting Type"::"Custom 2");
-                        CalcAmount(LastMaintenance, Maintenance2, "Last Maintenance Date", "FA Journal Line FA Posting Type"::Maintenance);
-                        CalcAmount(LastSalvageValue, SalvageValue, "Last Salvage Value Date", "FA Journal Line FA Posting Type"::"Salvage Value");
+                        CalcAmount(LastAcqCost, AcquisitionCost, "Last Acquisition Cost Date", Enum::"FA Journal Line FA Posting Type"::"Acquisition Cost");
+                        CalcAmount(LastDepreciation, Depreciation2, "Last Depreciation Date", Enum::"FA Journal Line FA Posting Type"::Depreciation);
+                        CalcAmount(LastWriteDown, WriteDown, "Last Write-Down Date", Enum::"FA Journal Line FA Posting Type"::"Write-Down");
+                        CalcAmount(LastAppreciation, Appreciation2, "Last Appreciation Date", Enum::"FA Journal Line FA Posting Type"::Appreciation);
+                        CalcAmount(LastCustom1, Custom1, "Last Custom 1 Date", Enum::"FA Journal Line FA Posting Type"::"Custom 1");
+                        CalcAmount(LastCustom2, Custom2, "Last Custom 2 Date", Enum::"FA Journal Line FA Posting Type"::"Custom 2");
+                        CalcAmount(LastMaintenance, Maintenance2, "Last Maintenance Date", Enum::"FA Journal Line FA Posting Type"::Maintenance);
+                        CalcAmount(LastSalvageValue, SalvageValue, "Last Salvage Value Date", Enum::"FA Journal Line FA Posting Type"::"Salvage Value");
                     end;
                 until Next() = 0;
         end;
@@ -263,6 +268,8 @@ page 5603 "Main Asset Statistics"
 
     var
         FADeprBook: Record "FA Depreciation Book";
+
+    protected var
         AcquisitionCost: Decimal;
         Depreciation2: Decimal;
         WriteDown: Decimal;
@@ -288,11 +295,8 @@ page 5603 "Main Asset Statistics"
         DisposalDate: Date;
         NoOfComponents: Integer;
         NoOfSoldComponents: Integer;
-        [InDataSet]
         DispPriceVisible: Boolean;
-        [InDataSet]
         GLPriceVisible: Boolean;
-        [InDataSet]
         DispDateVisible: Boolean;
 
     local procedure CalcAmount(var FADate: Date; var Amount: Decimal; FADate2: Date; FAPostingType: Enum "FA Journal Line FA Posting Type")

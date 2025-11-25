@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
 codeunit 5801 "Show Applied Entries"
 {
     Permissions = TableData "Item Ledger Entry" = rim,

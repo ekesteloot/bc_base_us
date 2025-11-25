@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 codeunit 1511 "Notification Lifecycle Mgt."
 {
     SingleInstance = true;

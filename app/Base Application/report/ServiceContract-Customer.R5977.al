@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Contract;
+
 report 5977 "Service Contract - Customer"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ServiceContractCustomer.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceContractCustomer.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Contract - Customer';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +15,7 @@ report 5977 "Service Contract - Customer"
         dataitem("Service Contract Header"; "Service Contract Header")
         {
             CalcFields = Name;
-            DataItemTableView = SORTING("Customer No.", "Ship-to Code") WHERE("Contract Type" = CONST(Contract));
+            DataItemTableView = sorting("Customer No.", "Ship-to Code") where("Contract Type" = const(Contract));
             RequestFilterFields = "Customer No.", "Ship-to Code", "Contract No.";
             column(TodayFormatted; Format(Today, 0, 4))
             {

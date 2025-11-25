@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Jobs.Journal;
+
+using Microsoft.ProjectMgt.Jobs.Posting;
+using System.Utilities;
+
 codeunit 9073 "Check Job Jnl. Line. Backgr."
 {
     trigger OnRun()

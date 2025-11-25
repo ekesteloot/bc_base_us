@@ -1,3 +1,8 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.Intercompany.Inbox;
+using Microsoft.Intercompany.Partner;
+
 page 611 "IC Outbox Transactions"
 {
     ApplicationArea = Intercompany;
@@ -46,12 +51,12 @@ page 611 "IC Outbox Transactions"
 
                     trigger OnValidate()
                     begin
-                        SetRange("Transaction Source");
+                        Rec.SetRange("Transaction Source");
                         case ShowLines of
                             ShowLines::"Rejected by Current Company":
-                                SetRange("Transaction Source", "Transaction Source"::"Rejected by Current Company");
+                                Rec.SetRange("Transaction Source", Rec."Transaction Source"::"Rejected by Current Company");
                             ShowLines::"Created by Current Company":
-                                SetRange("Transaction Source", "Transaction Source"::"Created by Current Company");
+                                Rec.SetRange("Transaction Source", Rec."Transaction Source"::"Created by Current Company");
                         end;
                         ShowLinesOnAfterValidate();
                     end;
@@ -65,16 +70,16 @@ page 611 "IC Outbox Transactions"
 
                     trigger OnValidate()
                     begin
-                        SetRange("Line Action");
+                        Rec.SetRange("Line Action");
                         case ShowAction of
                             ShowAction::"No Action":
-                                SetRange("Line Action", "Line Action"::"No Action");
+                                Rec.SetRange("Line Action", Rec."Line Action"::"No Action");
                             ShowAction::"Send to IC Partner":
-                                SetRange("Line Action", "Line Action"::"Send to IC Partner");
+                                Rec.SetRange("Line Action", Rec."Line Action"::"Send to IC Partner");
                             ShowAction::"Return to Inbox":
-                                SetRange("Line Action", "Line Action"::"Return to Inbox");
+                                Rec.SetRange("Line Action", Rec."Line Action"::"Return to Inbox");
                             ShowAction::Cancel:
-                                SetRange("Line Action", "Line Action"::Cancel);
+                                Rec.SetRange("Line Action", Rec."Line Action"::Cancel);
                         end;
                         ShowActionOnAfterValidate();
                     end;
@@ -202,7 +207,7 @@ page 611 "IC Outbox Transactions"
 
                     trigger OnAction()
                     begin
-                        ShowDetails();
+                        Rec.ShowDetails();
                     end;
                 }
                 action(Comments)
@@ -211,10 +216,10 @@ page 611 "IC Outbox Transactions"
                     Caption = 'Comments';
                     Image = ViewComments;
                     RunObject = Page "IC Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("IC Outbox Transaction"),
-                                  "Transaction No." = FIELD("Transaction No."),
-                                  "IC Partner Code" = FIELD("IC Partner Code"),
-                                  "Transaction Source" = FIELD("Transaction Source");
+                    RunPageLink = "Table Name" = const("IC Outbox Transaction"),
+                                  "Transaction No." = field("Transaction No."),
+                                  "IC Partner Code" = field("IC Partner Code"),
+                                  "Transaction Source" = field("Transaction Source");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -310,7 +315,7 @@ page 611 "IC Outbox Transactions"
                         CurrPage.SetSelectionFilter(ICOutboxTransaction);
                         if ICOutboxTransaction.FindSet() then
                             repeat
-                                TestField("Transaction Source", ICOutboxTransaction."Transaction Source"::"Rejected by Current Company");
+                                Rec.TestField("Transaction Source", ICOutboxTransaction."Transaction Source"::"Rejected by Current Company");
                                 ICOutboxTransaction."Line Action" := ICOutboxTransaction."Line Action"::"Return to Inbox";
                                 ICOutboxTransaction.Modify();
                             until ICOutboxTransaction.Next() = 0;
@@ -425,7 +430,7 @@ page 611 "IC Outbox Transactions"
 
     local procedure PartnerFilterOnAfterValidate()
     begin
-        SetFilter("IC Partner Code", PartnerFilter);
+        Rec.SetFilter("IC Partner Code", PartnerFilter);
         CurrPage.Update(false);
     end;
 }

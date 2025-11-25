@@ -1,3 +1,5 @@
+namespace System.Integration;
+
 page 1810 "Data Migration Entities"
 {
     Caption = 'Data Migration Entities';
@@ -28,7 +30,7 @@ page 1810 "Data Migration Entities"
             }
             repeater(Group)
             {
-                field(Selected; Selected)
+                field(Selected; Rec.Selected)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the table will be migrated. If the check box is selected, then the table will be migrated.';
@@ -44,7 +46,7 @@ page 1810 "Data Migration Entities"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of records in the table to be migrated.';
                 }
-                field(Balance; Balance)
+                field(Balance; Rec.Balance)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -73,13 +75,13 @@ page 1810 "Data Migration Entities"
 
     procedure CopyToSourceTable(var TempDataMigrationEntity: Record "Data Migration Entity" temporary)
     begin
-        DeleteAll();
+        Rec.DeleteAll();
 
         if TempDataMigrationEntity.FindSet() then
             repeat
-                Init();
-                TransferFields(TempDataMigrationEntity);
-                Insert();
+                Rec.Init();
+                Rec.TransferFields(TempDataMigrationEntity);
+                Rec.Insert();
             until TempDataMigrationEntity.Next() = 0;
     end;
 
@@ -88,12 +90,12 @@ page 1810 "Data Migration Entities"
         TempDataMigrationEntity.Reset();
         TempDataMigrationEntity.DeleteAll();
 
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
                 TempDataMigrationEntity.Init();
                 TempDataMigrationEntity.TransferFields(Rec);
                 TempDataMigrationEntity.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     procedure SetShowBalance(ShowBalances: Boolean)

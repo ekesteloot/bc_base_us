@@ -5,11 +5,12 @@ table 30136 "Shpfy Registered Store"
 {
 #if not CLEAN21
     ObsoleteState = Pending;
+    ObsoleteTag = '21.0';
 #else
     ObsoleteState = removed;
+    ObsoleteTag = '24.0';
 #endif
     ObsoleteReason = 'Use table 30138 "Shpfy Registered Store New" instead';
-    ObsoleteTag = '21.0';
 
     Access = Internal;
     Caption = 'Shopify Registered Store';

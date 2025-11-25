@@ -1,3 +1,19 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+
 page 393 "Item Reclass. Journal"
 {
     AdditionalSearchTerms = 'change location,change bin,change dimension,change lot number,change serial number';
@@ -60,6 +76,28 @@ page 393 "Item Reclass. Journal"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the item on the journal line.';
+
+                    trigger OnValidate()
+                    begin
+                        ItemNoOnAfterValidate();
+                    end;
+                }
+                field("Item Reference No."; Rec."Item Reference No.")
+                {
+                    AccessByPermission = tabledata "Item Reference" = R;
+                    ApplicationArea = Suite, ItemReferences;
+                    QuickEntry = false;
+                    ToolTip = 'Specifies a reference to the item number as defined by the item''s barcode.';
+                    Visible = false;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        ItemReferenceManagement: Codeunit "Item Reference Management";
+                    begin
+                        ItemReferenceManagement.ItemJournalReferenceNoLookup(Rec);
+                        ItemNoOnAfterValidate();
+                        OnReferenceNoOnAfterLookup(Rec);
+                    end;
 
                     trigger OnValidate()
                     begin
@@ -204,9 +242,9 @@ page 393 "Item Reclass. Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
@@ -229,7 +267,7 @@ page 393 "Item Reclass. Journal"
 
                     trigger OnValidate()
                     begin
-                        Rec.TestField("Entry Type", "Entry Type"::Transfer);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
                         Rec.ValidateNewShortcutDimCode(3, NewShortcutDimCode[3]);
 
                         OnAfterValidateNewShortcutDimCode(Rec, NewShortcutDimCode, 3);
@@ -239,9 +277,9 @@ page 393 "Item Reclass. Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
@@ -274,9 +312,9 @@ page 393 "Item Reclass. Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
@@ -294,12 +332,12 @@ page 393 "Item Reclass. Journal"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupNewShortcutDimCode(5, NewShortcutDimCode[5]);
+                        Rec.LookupNewShortcutDimCode(5, NewShortcutDimCode[5]);
                     end;
 
                     trigger OnValidate()
                     begin
-                        Rec.TestField("Entry Type", "Entry Type"::Transfer);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
                         Rec.ValidateNewShortcutDimCode(5, NewShortcutDimCode[5]);
 
                         OnAfterValidateNewShortcutDimCode(Rec, NewShortcutDimCode, 5);
@@ -309,9 +347,9 @@ page 393 "Item Reclass. Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
@@ -334,7 +372,7 @@ page 393 "Item Reclass. Journal"
 
                     trigger OnValidate()
                     begin
-                        Rec.TestField("Entry Type", "Entry Type"::Transfer);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
                         Rec.ValidateNewShortcutDimCode(6, NewShortcutDimCode[6]);
 
                         OnAfterValidateNewShortcutDimCode(Rec, NewShortcutDimCode, 6);
@@ -344,9 +382,9 @@ page 393 "Item Reclass. Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
@@ -369,7 +407,7 @@ page 393 "Item Reclass. Journal"
 
                     trigger OnValidate()
                     begin
-                        Rec.TestField("Entry Type", "Entry Type"::Transfer);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
                         Rec.ValidateNewShortcutDimCode(7, NewShortcutDimCode[7]);
 
                         OnAfterValidateNewShortcutDimCode(Rec, NewShortcutDimCode, 7);
@@ -379,9 +417,9 @@ page 393 "Item Reclass. Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
@@ -404,7 +442,7 @@ page 393 "Item Reclass. Journal"
 
                     trigger OnValidate()
                     begin
-                        Rec.TestField("Entry Type", "Entry Type"::Transfer);
+                        Rec.TestField("Entry Type", Rec."Entry Type"::Transfer);
                         Rec.ValidateNewShortcutDimCode(8, NewShortcutDimCode[8]);
 
                         OnAfterValidateNewShortcutDimCode(Rec, NewShortcutDimCode, 8);
@@ -437,9 +475,9 @@ page 393 "Item Reclass. Journal"
                 ApplicationArea = Basic, Suite;
                 ShowFilter = false;
                 Visible = BackgroundErrorCheck;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Journal Batch Name" = FIELD("Journal Batch Name"),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Journal Batch Name" = field("Journal Batch Name"),
+                              "Line No." = field("Line No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -496,10 +534,10 @@ page 393 "Item Reclass. Journal"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Item No.", "Variant Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Item No.", "Variant Code");
                     ToolTip = 'View items in the bin if the selected line contains a bin code.';
                 }
             }
@@ -513,7 +551,7 @@ page 393 "Item Reclass. Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Item Card";
-                    RunPageLink = "No." = FIELD("Item No.");
+                    RunPageLink = "No." = field("Item No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -523,8 +561,8 @@ page 393 "Item Reclass. Journal"
                     Caption = 'Ledger E&ntries';
                     Image = ItemLedger;
                     RunObject = Page "Item Ledger Entries";
-                    RunPageLink = "Item No." = FIELD("Item No.");
-                    RunPageView = SORTING("Item No.");
+                    RunPageLink = "Item No." = field("Item No.");
+                    RunPageView = sorting("Item No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -633,14 +671,14 @@ page 393 "Item Reclass. Journal"
                     Caption = 'Get Bin Content';
                     Ellipsis = true;
                     Image = GetBinContent;
-                    ToolTip = 'Use a function to create transfer lines with items to put away or pick based on the actual content in the specified bin.';
+                    ToolTip = 'Use a function to create journal lines based on the actual content in the specified bin.';
 
                     trigger OnAction()
                     var
                         BinContent: Record "Bin Content";
                         GetBinContent: Report "Whse. Get Bin Content";
                     begin
-                        BinContent.SetRange("Location Code", "Location Code");
+                        BinContent.SetRange("Location Code", Rec."Location Code");
                         OnActionGetBinContentOnAfterSetFilters(Rec, BinContent);
                         GetBinContent.SetTableView(BinContent);
                         GetBinContent.InitializeItemJournalLine(Rec);
@@ -711,6 +749,26 @@ page 393 "Item Reclass. Journal"
                     end;
                 }
             }
+            group("Page")
+            {
+                Caption = 'Page';
+                action(EditInExcel)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Edit in Excel';
+                    Image = Excel;
+                    ToolTip = 'Send the data in the journal to an Excel file for analysis or editing.';
+                    Visible = IsSaaSExcelAddinEnabled;
+                    AccessByPermission = System "Allow Action Export To Excel" = X;
+
+                    trigger OnAction()
+                    var
+                        ODataUtility: Codeunit ODataUtility;
+                    begin
+                        ODataUtility.EditJournalWorksheetInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), CurrPage.ObjectId(false), Rec."Journal Batch Name", Rec."Journal Template Name");
+                    end;
+                }
+            }
             action("&Print")
             {
                 ApplicationArea = Basic, Suite;
@@ -724,9 +782,7 @@ page 393 "Item Reclass. Journal"
                     ItemJnlLine: Record "Item Journal Line";
                 begin
                     ItemJnlLine.Copy(Rec);
-                    ItemJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
-                    ItemJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
-                    REPORT.RunModal(REPORT::"Inventory Movement", true, true, ItemJnlLine);
+                    ItemJnlLine.PrintInventoryMovement();
                 end;
             }
             group(Errors)
@@ -745,7 +801,7 @@ page 393 "Item Reclass. Journal"
 
                     trigger OnAction()
                     begin
-                        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                     end;
                 }
                 action(ShowAllLines)
@@ -759,7 +815,7 @@ page 393 "Item Reclass. Journal"
 
                     trigger OnAction()
                     begin
-                        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+                        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
                     end;
                 }
             }
@@ -855,7 +911,7 @@ page 393 "Item Reclass. Journal"
 
     trigger OnAfterGetCurrRecord()
     begin
-        ItemJnlMgt.GetItem("Item No.", ItemDescription);
+        ItemJnlMgt.GetItem(Rec."Item No.", ItemDescription);
     end;
 
     trigger OnAfterGetRecord()
@@ -884,10 +940,14 @@ page 393 "Item Reclass. Journal"
 
     trigger OnOpenPage()
     var
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ServerSetting: Codeunit "Server Setting";
         JnlSelected: Boolean;
     begin
+        IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
         SetDimensionsVisibility();
-
         if Rec.IsOpenedFromBatch() then begin
             CurrentJnlBatchName := Rec."Journal Batch Name";
             ItemJnlMgt.OpenJnl(CurrentJnlBatchName, Rec);
@@ -910,6 +970,7 @@ page 393 "Item Reclass. Journal"
         ItemDescription: Text[100];
         BackgroundErrorCheck: Boolean;
         ShowAllLinesEnabled: Boolean;
+        IsSaaSExcelAddinEnabled: Boolean;
 
         Text000: Label '1,2,3,New ';
         Text001: Label '1,2,4,New ';
@@ -950,12 +1011,12 @@ page 393 "Item Reclass. Journal"
         ItemJournalBatch: Record "Item Journal Batch";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
     begin
-        if not ItemJournalBatch.Get(GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
+        if not ItemJournalBatch.Get(Rec.GetRangeMax("Journal Template Name"), CurrentJnlBatchName) then
             exit;
 
         BackgroundErrorCheck := BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled();
         ShowAllLinesEnabled := true;
-        SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
+        Rec.SwitchLinesWithErrorsFilter(ShowAllLinesEnabled);
         ItemJournalErrorsMgt.SetFullBatchCheck(true);
     end;
 
@@ -997,6 +1058,11 @@ page 393 "Item Reclass. Journal"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateNewShortcutDimCode(var ItemJournalLine: Record "Item Journal Line"; var ShortcutDimCode: array[8] of Code[20]; DimIndex: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnReferenceNoOnAfterLookup(var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 }

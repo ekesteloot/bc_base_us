@@ -1,3 +1,7 @@
+namespace System.Integration;
+
+using System.IO;
+
 page 1807 "Data Migration Settings"
 {
     AccessByPermission = TableData "Data Migration Setup" = R;
@@ -45,10 +49,10 @@ page 1807 "Data Migration Settings"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

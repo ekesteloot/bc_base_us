@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.History;
+
 page 5949 "Posted Serv. Shpt. Line List"
 {
     Caption = 'Posted Serv. Shpt. Line List';
@@ -126,7 +128,7 @@ page 5949 "Posted Serv. Shpt. Line List"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that the warranty discount is excluded on this service shipment line.';
                 }
-                field(Warranty; Warranty)
+                field(Warranty; Rec.Warranty)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that a warranty discount is available on this service shipment line of type Item or Resource.';
@@ -188,7 +190,7 @@ page 5949 "Posted Serv. Shpt. Line List"
                     Caption = '&Show Document';
                     Image = View;
                     RunObject = Page "Posted Service Shipment";
-                    RunPageLink = "No." = FIELD("Document No.");
+                    RunPageLink = "No." = field("Document No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the document that the information on the line comes from.';
                 }

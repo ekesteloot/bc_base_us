@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Manufacturing.Routing;
+
 table 5415 "Prod. Order Rtng Comment Line"
 {
     Caption = 'Prod. Order Rtng Comment Line';
@@ -16,9 +20,9 @@ table 5415 "Prod. Order Rtng Comment Line"
         {
             Caption = 'Operation No.';
             NotBlank = true;
-            TableRelation = "Prod. Order Routing Line"."Operation No." WHERE(Status = FIELD(Status),
-                                                                              "Prod. Order No." = FIELD("Prod. Order No."),
-                                                                              "Routing No." = FIELD("Routing No."));
+            TableRelation = "Prod. Order Routing Line"."Operation No." where(Status = field(Status),
+                                                                              "Prod. Order No." = field("Prod. Order No."),
+                                                                              "Routing No." = field("Routing No."));
         }
         field(3; "Line No."; Integer)
         {
@@ -44,17 +48,15 @@ table 5415 "Prod. Order Rtng Comment Line"
         {
             Caption = 'Prod. Order No.';
             NotBlank = true;
-            TableRelation = "Production Order"."No." WHERE(Status = FIELD(Status));
+            TableRelation = "Production Order"."No." where(Status = field(Status));
         }
         field(24; "Routing Reference No."; Integer)
         {
             Caption = 'Routing Reference No.';
-            TableRelation = "Prod. Order Routing Line"."Routing Reference No." WHERE("Routing No." = FIELD("Routing No."),
-                                                                                      "Operation No." = FIELD("Operation No."),
-                                                                                      "Prod. Order No." = FIELD("Prod. Order No."),
-                                                                                      Status = FIELD(Status));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Prod. Order Routing Line"."Routing Reference No." where("Routing No." = field("Routing No."),
+                                                                                      "Operation No." = field("Operation No."),
+                                                                                      "Prod. Order No." = field("Prod. Order No."),
+                                                                                      Status = field(Status));
             ValidateTableRelation = false;
         }
     }

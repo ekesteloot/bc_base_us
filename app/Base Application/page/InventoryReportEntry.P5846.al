@@ -27,7 +27,7 @@ page 5846 "Inventory Report Entry"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a value that depends on the type of the inventory report entry.';
                 }
-                field(Inventory; Inventory)
+                field(Inventory; Rec.Inventory)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a value that depends on the type of the inventory period entry.';
@@ -107,7 +107,7 @@ page 5846 "Inventory Report Entry"
                         GetInvtReport.DrillDownInvtAccrualInterim(Rec);
                     end;
                 }
-                field(COGS; COGS)
+                field(COGS; Rec.COGS)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a value that depends on the type of the inventory period entry.';

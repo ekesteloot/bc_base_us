@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 enum 9211 "Item Analysis Show Type"
 {
     AssignmentCompatibility = true;

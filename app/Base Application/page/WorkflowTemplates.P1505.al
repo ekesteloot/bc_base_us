@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 page 1505 "Workflow Templates"
 {
     ApplicationArea = Suite;
@@ -17,7 +19,7 @@ page 1505 "Workflow Templates"
         {
             repeater(Group)
             {
-                IndentationColumn = Indentation;
+                IndentationColumn = Rec.Indentation;
                 IndentationControls = Description;
                 ShowAsTree = true;
                 field(Description; Rec.Description)
@@ -60,7 +62,7 @@ page 1505 "Workflow Templates"
                 var
                     Workflow: Record Workflow;
                 begin
-                    Workflow.Get("Workflow Code");
+                    Workflow.Get(Rec."Workflow Code");
                     PAGE.Run(PAGE::Workflow, Workflow);
                 end;
             }
@@ -74,7 +76,7 @@ page 1505 "Workflow Templates"
 
                 trigger OnAction()
                 begin
-                    CopyWorkflow(Rec)
+                    Rec.CopyWorkflow(Rec)
                 end;
             }
             action("Reset Templates")
@@ -121,7 +123,7 @@ page 1505 "Workflow Templates"
 
     trigger OnAfterGetRecord()
     begin
-        if "Workflow Code" = '' then
+        if Rec."Workflow Code" = '' then
             DescriptionStyle := 'Strong'
         else
             DescriptionStyle := 'Standard';
@@ -134,7 +136,7 @@ page 1505 "Workflow Templates"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if CurrPage.LookupMode and (CloseAction = ACTION::LookupOK) and ("Workflow Code" = '') then
+        if CurrPage.LookupMode and (CloseAction = ACTION::LookupOK) and (Rec."Workflow Code" = '') then
             Error(QueryClosePageLookupErr);
     end;
 

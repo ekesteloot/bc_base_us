@@ -1,3 +1,10 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Worksheet;
+
 codeunit 7316 "Whse. Int. Put-away Release"
 {
 

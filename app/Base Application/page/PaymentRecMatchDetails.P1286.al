@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using System.Reflection;
+
 page 1286 "Payment Rec Match Details"
 {
     Caption = 'Match Details';
@@ -92,7 +96,7 @@ page 1286 "Payment Rec Match Details"
 
                         trigger OnDrillDown()
                         begin
-                            AppliedToDrillDown();
+                            Rec.AppliedToDrillDown();
                         end;
                     }
                 }
@@ -114,7 +118,7 @@ page 1286 "Payment Rec Match Details"
                         end;
                     }
 
-                    field(DocExtDocNumber; GetAppliedToDocumentNo())
+                    field(DocExtDocNumber; Rec.GetAppliedToDocumentNo())
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Document Number';
@@ -123,7 +127,7 @@ page 1286 "Payment Rec Match Details"
 
                         trigger OnDrillDown()
                         begin
-                            ShowAppliedToEntries();
+                            Rec.ShowAppliedToEntries();
                         end;
                     }
                 }
@@ -159,7 +163,7 @@ page 1286 "Payment Rec Match Details"
 
                         trigger OnDrillDown()
                         begin
-                            OpenAccountPage("Account Type".AsInteger(), "Account No.");
+                            Rec.OpenAccountPage(Rec."Account Type".AsInteger(), Rec."Account No.");
                         end;
                     }
 
@@ -172,7 +176,7 @@ page 1286 "Payment Rec Match Details"
 
                         trigger OnDrillDown()
                         begin
-                            DrillDownOnNoOfLedgerEntriesWithinAmountTolerance();
+                            Rec.DrillDownOnNoOfLedgerEntriesWithinAmountTolerance();
                         end;
                     }
 
@@ -185,7 +189,7 @@ page 1286 "Payment Rec Match Details"
 
                         trigger OnDrillDown()
                         begin
-                            DrillDownOnNoOfLedgerEntriesOutsideOfAmountTolerance();
+                            Rec.DrillDownOnNoOfLedgerEntriesOutsideOfAmountTolerance();
                         end;
                     }
                 }
@@ -275,21 +279,21 @@ page 1286 "Payment Rec Match Details"
         StatementNo: Text;
         StatementLineNo: Integer;
     begin
-        FilterGroup(4);
+        Rec.FilterGroup(4);
 
         RecRef.Open(Database::"Bank Acc. Reconciliation Line", true);
-        StatementTypeFieldRef := RecRef.Field(FieldNo("Statement Type"));
-        StatementType := TypeHelper.GetOptionNo(GetFilter("Statement Type"), StatementTypeFieldRef.OptionCaption);
+        StatementTypeFieldRef := RecRef.Field(Rec.FieldNo("Statement Type"));
+        StatementType := TypeHelper.GetOptionNo(Rec.GetFilter("Statement Type"), StatementTypeFieldRef.OptionCaption);
 
-        BankAccountNo := GetFilter("Bank Account No.");
-        StatementNo := GetFilter("Statement No.");
-        Evaluate(StatementLineNo, GetFilter("Statement Line No."));
+        BankAccountNo := Rec.GetFilter("Bank Account No.");
+        StatementNo := Rec.GetFilter("Statement No.");
+        Evaluate(StatementLineNo, Rec.GetFilter("Statement Line No."));
 
-        SetAutoCalcFields("Match Quality", "Match Confidence");
-        if not Get(StatementType, BankAccountNo, StatementNo, StatementLineNo) then
+        Rec.SetAutoCalcFields("Match Quality", "Match Confidence");
+        if not Rec.Get(StatementType, BankAccountNo, StatementNo, StatementLineNo) then
             exit;
 
-        StatusText := GetStatusText();
+        StatusText := Rec.GetStatusText();
 
         IsMapToTextAccount := MatchBankPayments.IsTextToAccountMappig(Rec, TempTextToAccMapping);
         if IsMapToTextAccount then begin
@@ -299,7 +303,7 @@ page 1286 "Payment Rec Match Details"
 
         IsMatchedAutomatically := MatchBankPayments.IsMatchedAutomatically(Rec, BankPmtApplRule);
         MatchBankPayments.GetMatchPaymentDetailsInfo(Rec, BankPmtApplRule, IsMatchedAutomatically, RelatedPartyMatchedText, AmountMatchText, DocumentMatchedText, DirectDebitMatchedText, DirectDebitMatched, NoOfLedgerEntriesWithinAmountTolerance, NoOfLedgerEntriesOutsideAmountTolerance, RelatedPartyMatchInfoText, DocumentMatchInfoText);
-        AppliedToName := GetAppliedToName();
+        AppliedToName := Rec.GetAppliedToName();
         RelatedPartyMatchInfoEnabled := RelatedPartyMatchInfoText <> '';
         DocumentMatchInfoEnabled := DocumentMatchInfoText <> '';
     end;

@@ -15,7 +15,7 @@ page 7601 "Base Calendar List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Code';
@@ -69,7 +69,7 @@ page 7601 "Base Calendar List"
                         CalendarMgmt: Codeunit "Calendar Management";
                         WhereUsedList: Page "Where-Used Base Calendar";
                     begin
-                        CalendarMgmt.CreateWhereUsedEntries(Code);
+                        CalendarMgmt.CreateWhereUsedEntries(Rec.Code);
                         WhereUsedList.RunModal();
                         Clear(WhereUsedList);
                     end;
@@ -84,7 +84,7 @@ page 7601 "Base Calendar List"
                     Caption = '&Base Calendar Changes';
                     Image = Change;
                     RunObject = Page "Base Calendar Change List";
-                    RunPageLink = "Base Calendar Code" = FIELD(Code);
+                    RunPageLink = "Base Calendar Code" = field(Code);
                     ToolTip = 'View changes to a base calendar entry. You would typically enter any nonworking days that you want to apply to a base calendar that you are setting up, to change their status from working to nonworking. You can also use this window to edit a base calendar that has already been set up.';
                 }
             }

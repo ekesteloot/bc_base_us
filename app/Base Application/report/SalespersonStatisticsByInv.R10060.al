@@ -10,7 +10,7 @@ report 10060 "Salesperson Statistics by Inv."
     {
         dataitem("Salesperson/Purchaser"; "Salesperson/Purchaser")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             PrintOnlyIfDetail = true;
             RequestFilterFields = "Code", "Date Filter";
             RequestFilterHeading = 'Salesperson';
@@ -149,8 +149,8 @@ report 10060 "Salesperson Statistics by Inv."
             }
             dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
             {
-                DataItemLink = "Salesperson Code" = FIELD(Code), "Posting Date" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Salesperson Code", "Posting Date");
+                DataItemLink = "Salesperson Code" = field(Code), "Posting Date" = field("Date Filter");
+                DataItemTableView = sorting("Salesperson Code", "Posting Date");
                 column(Cust__Ledger_Entry__Posting_Date_; "Posting Date")
                 {
                 }

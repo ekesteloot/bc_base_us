@@ -1,3 +1,12 @@
+namespace Microsoft.Purchases.Pricing;
+
+using Microsoft.Pricing.Asset;
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+
 page 7017 "Purchase Price Lists"
 {
     Caption = 'Purchase Price Lists';
@@ -7,7 +16,7 @@ page 7017 "Purchase Price Lists"
     QueryCategory = 'Purchase Price Lists';
     RefreshOnActivate = true;
     SourceTable = "Price List Header";
-    SourceTableView = WHERE("Source Group" = CONST(Vendor), "Price Type" = CONST(Purchase));
+    SourceTableView = where("Source Group" = const(Vendor), "Price Type" = const(Purchase));
     ApplicationArea = Basic, Suite;
     UsageCategory = Lists;
 
@@ -109,7 +118,7 @@ page 7017 "Purchase Price Lists"
                 Caption = 'Report', Comment = 'Generated from the PromotedActionCategories property index 2.';
             }
         }
-}
+    }
 
 #if not CLEAN21
     trigger OnInit()

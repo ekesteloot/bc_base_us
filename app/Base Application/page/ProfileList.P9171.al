@@ -1,3 +1,9 @@
+﻿namespace System.Environment.Configuration;
+
+using System.Environment;
+using System.Reflection;
+using System.Security.User;
+
 page 9171 "Profile List"
 {
     AdditionalSearchTerms = 'users,roles,role centers,personalization,customization';
@@ -20,25 +26,25 @@ page 9171 "Profile List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(ProfileIdField; "Profile ID")
+                field(ProfileIdField; Rec."Profile ID")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Profile ID';
                     ToolTip = 'Specifies an ID that is used to identify the profile (role). There can be more than one profile with the same ID if they come from different extensions. Avoid using spaces in the profile ID to make it easier to create URLs linking to a specific profile.';
                 }
-                field(CaptionField; Caption)
+                field(CaptionField; Rec.Caption)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Display Name';
                     ToolTip = 'Specifies the name of the organizational role as displayed in the user interface.';
                 }
-                field(AppNameField; "App Name")
+                field(AppNameField; Rec."App Name")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Source';
                     ToolTip = 'Specifies the origin of this profile, which can be either an extension, shown by its name, or a custom profile created by a user.';
                 }
-                field(RoleCenterIdField; "Role Center ID")
+                field(RoleCenterIdField; Rec."Role Center ID")
                 {
                     ApplicationArea = Basic, Suite;
                     BlankZero = true;
@@ -46,19 +52,19 @@ page 9171 "Profile List"
                     Lookup = false;
                     ToolTip = 'Specifies the ID of the Role Center associated with the profile.';
                 }
-                field(EnabledField; Enabled)
+                field(EnabledField; Rec.Enabled)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Enabled';
                     ToolTip = 'Specifies whether the profile is available in the list of roles that users can select from. Note: Users that are assigned this profile can continue to sign in even when the profile is not enabled.';
                 }
-                field(DefaultRoleCenterField; "Default Role Center")
+                field(DefaultRoleCenterField; Rec."Default Role Center")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Use as default profile';
                     ToolTip = 'Specifies if this profile is used for all users that are not assigned a role. Only one profile can be set as the default.';
                 }
-                field(PromotedField; Promoted)
+                field(PromotedField; Rec.Promoted)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Show in Role Explorer';
@@ -125,15 +131,15 @@ page 9171 "Profile List"
                     Image = Default;
                     Scope = "Repeater";
                     ToolTip = 'Set the selected profile as the one that is used for all users that are not assigned a role. Only one profile can be set as the default.​';
-                    Enabled = Enabled;
+                    Enabled = Rec.Enabled;
                     AccessByPermission = tabledata "Tenant Profile Setting" = M;
 
                     trigger OnAction()
                     begin
-                        TestField("Profile ID");
-                        TestField("Role Center ID");
-                        Validate("Default Role Center", true);
-                        Modify();
+                        Rec.TestField("Profile ID");
+                        Rec.TestField("Role Center ID");
+                        Rec.Validate("Default Role Center", true);
+                        Rec.Modify();
                         ConfPersonalizationMgt.ChangeDefaultRoleCenter(Rec);
                     end;
                 }
@@ -145,14 +151,14 @@ page 9171 "Profile List"
                     Image = Copy;
                     Scope = "Repeater";
                     ToolTip = 'Create a copy of this profile including any page customizations made by users for this profile.';
-                    AccessByPermission = tabledata "Tenant Profile" = I;
+                    AccessByPermission = tabledata "All Profile" = I;
 
                     trigger OnAction()
                     var
                         AllProfile: Record "All Profile";
                     begin
                         ConfPersonalizationMgt.CopyProfileWithUserInput(Rec, AllProfile);
-                        if Get(AllProfile.Scope, AllProfile."App ID", AllProfile."Profile ID") then;
+                        if Rec.Get(AllProfile.Scope, AllProfile."App ID", AllProfile."Profile ID") then;
                     end;
                 }
                 action(CustomizeRoleAction)
@@ -163,7 +169,7 @@ page 9171 "Profile List"
                     Scope = "Repeater";
                     Visible = IsWebClient;
                     ToolTip = 'Change the user interface for this profile to fit the unique needs of the role (opens in a new tab). The changes that you make only apply to users that are assigned this profile.';
-                    AccessByPermission = tabledata "Tenant Profile" = M;
+                    AccessByPermission = tabledata "All Profile" = M;
 
                     trigger OnAction()
                     begin
@@ -228,7 +234,7 @@ page 9171 "Profile List"
         view(OnlyEnabled)
         {
             Caption = 'Enabled';
-            Filters = where(Enabled = Const(true));
+            Filters = where(Enabled = const(true));
         }
         view(OnlyPromotedAndEnabled)
         {
@@ -245,8 +251,8 @@ page 9171 "Profile List"
     trigger OnAfterGetRecord()
     begin
         // Solves the case where the profile is user-created; not using a local variable allows to keep the sorting capabilities
-        if "App Name" = '' then
-            "App Name" := ExtensionManagement.GetAppName("App ID");
+        if Rec."App Name" = '' then
+            Rec."App Name" := CopyStr(ExtensionManagement.GetAppName(Rec."App ID"), 1, MaxStrLen(Rec."App Name"));
     end;
 
     trigger OnNextRecord(Steps: Integer): Integer
@@ -254,9 +260,9 @@ page 9171 "Profile List"
         EmptyGuid: Guid;
     begin
         // Since this value is set in OnAfterGetRecord, sorting by this field causes confusion in server that looks for the next record with a wrong string 
-        if "App ID" = EmptyGuid then
-            "App Name" := '';
-        exit(Next(Steps));
+        if Rec."App ID" = EmptyGuid then
+            Rec."App Name" := '';
+        exit(Rec.Next(Steps));
     end;
 
     var

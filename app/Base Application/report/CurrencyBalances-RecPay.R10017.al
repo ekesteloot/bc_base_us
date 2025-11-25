@@ -9,7 +9,7 @@ report 10017 "Currency Balances - Rec./Pay."
     {
         dataitem(Currency; Currency)
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code";
             column(TodayFormatted; Format(Today, 0, 4))
             {

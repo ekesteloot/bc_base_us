@@ -1,4 +1,12 @@
-﻿page 131 "Posted Sales Shpt. Subform"
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Ledger;
+using System.Environment.Configuration;
+
+page 131 "Posted Sales Shpt. Subform"
 {
     AutoSplitKey = true;
     Caption = 'Lines';
@@ -21,7 +29,7 @@
                     ApplicationArea = Advanced;
                     ToolTip = 'Specifies the line type.';
                 }
-                field(FilteredTypeField; FormatType())
+                field(FilteredTypeField; Rec.FormatType())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Type';
@@ -177,7 +185,7 @@
                     ToolTip = 'Specifies the number of the item ledger entry that the document or journal line is applied to.';
                     Visible = false;
                 }
-                field(Correction; Correction)
+                field(Correction; Rec.Correction)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -200,54 +208,54 @@
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
                 }
                 field("ShortcutDimCode[4]"; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
                 }
                 field("ShortcutDimCode[5]"; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
                 }
                 field("ShortcutDimCode[6]"; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
                 }
                 field("ShortcutDimCode[7]"; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
                 }
                 field("ShortcutDimCode[8]"; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
                 }
                 field("Gross Weight"; Rec."Gross Weight")
@@ -301,7 +309,7 @@
 
                     trigger OnAction()
                     begin
-                        StartTrackingSite();
+                        Rec.StartTrackingSite();
                     end;
                 }
                 action("Order Tra&cking")
@@ -344,7 +352,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(Comments)
@@ -356,7 +364,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowLineComments();
+                        Rec.ShowLineComments();
                     end;
                 }
                 action(ItemTrackingEntries)
@@ -368,7 +376,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
                 action("Assemble-to-Order")
@@ -380,7 +388,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowAsmToOrder();
+                        Rec.ShowAsmToOrder();
                     end;
                 }
                 action(ItemInvoiceLines)
@@ -413,7 +421,7 @@
 
     trigger OnAfterGetRecord()
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
     end;
 
     trigger OnInit()
@@ -454,13 +462,13 @@
         TempItemLedgEntry: Record "Item Ledger Entry" temporary;
         TrackingForm: Page "Order Tracking";
     begin
-        TestField(Type, Type::Item);
-        if "Item Shpt. Entry No." <> 0 then begin
-            ItemLedgEntry.Get("Item Shpt. Entry No.");
+        Rec.TestField(Type, Rec.Type::Item);
+        if Rec."Item Shpt. Entry No." <> 0 then begin
+            ItemLedgEntry.Get(Rec."Item Shpt. Entry No.");
             TrackingForm.SetItemLedgEntry(ItemLedgEntry);
         end else
             TrackingForm.SetMultipleItemLedgEntries(TempItemLedgEntry,
-              DATABASE::"Sales Shipment Line", 0, "Document No.", '', 0, "Line No.");
+              DATABASE::"Sales Shipment Line", 0, Rec."Document No.", '', 0, Rec."Line No.");
 
         TrackingForm.RunModal();
     end;
@@ -479,8 +487,8 @@
 
     local procedure PageShowItemSalesInvLines()
     begin
-        TestField(Type, Type::Item);
-        ShowItemSalesInvLines();
+        Rec.TestField(Type, Rec.Type::Item);
+        Rec.ShowItemSalesInvLines();
     end;
 
     procedure ShowDocumentLineTracking()
@@ -489,7 +497,7 @@
     begin
         Clear(DocumentLineTracking);
         DocumentLineTracking.SetDoc(
-          4, "Document No.", "Line No.", "Blanket Order No.", "Blanket Order Line No.", "Order No.", "Order Line No.");
+          4, Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", Rec."Order No.", Rec."Order Line No.");
         DocumentLineTracking.RunModal();
     end;
 

@@ -69,12 +69,12 @@ page 36740 "Sales Tax Lines Subform Dyn"
                     trigger OnValidate()
                     begin
                         if AllowVATDifference and not AllowVATDifferenceOnThisTab then
-                            Error(Text000, FieldCaption("Tax Amount"));
-                        "Amount Including Tax" := "Tax Amount" + "Tax Base Amount";
+                            Error(Text000, Rec.FieldCaption("Tax Amount"));
+                        Rec."Amount Including Tax" := Rec."Tax Amount" + Rec."Tax Base Amount";
 
                         FormCheckVATDifference();
-                        Modified := true;
-                        Modify();
+                        Rec.Modified := true;
+                        Rec.Modify();
                     end;
                 }
                 field("Tax Difference"; Rec."Tax Difference")
@@ -117,7 +117,7 @@ page 36740 "Sales Tax Lines Subform Dyn"
 
     trigger OnOpenPage()
     begin
-        if FindFirst() then;
+        if Rec.FindFirst() then;
     end;
 
     var
@@ -130,15 +130,14 @@ page 36740 "Sales Tax Lines Subform Dyn"
         PricesIncludingVAT: Boolean;
         AllowInvDisc: Boolean;
         VATBaseDiscPct: Decimal;
-        [InDataSet]
         "Tax AmountEditable": Boolean;
 
     procedure SetTempTaxAmountLine(var NewSalesTaxLine: Record "Sales Tax Amount Line" temporary)
     begin
         if NewSalesTaxLine.FindFirst() then
             repeat
-                Copy(NewSalesTaxLine);
-                Insert();
+                Rec.Copy(NewSalesTaxLine);
+                Rec.Insert();
             until NewSalesTaxLine.Next() = 0;
         CurrPage.Update();
     end;
@@ -146,11 +145,11 @@ page 36740 "Sales Tax Lines Subform Dyn"
     procedure GetTempTaxAmountLine(var NewSalesTaxLine: Record "Sales Tax Amount Line" temporary)
     begin
         NewSalesTaxLine.DeleteAll();
-        if FindFirst() then
+        if Rec.FindFirst() then
             repeat
                 NewSalesTaxLine.Copy(Rec);
                 NewSalesTaxLine.Insert();
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     procedure InitGlobals(NewCurrencyCode: Code[10]; NewAllowVATDifference: Boolean; NewAllowVATDifferenceOnThisTab: Boolean; NewPricesIncludingVAT: Boolean; NewAllowInvDisc: Boolean; NewVATBaseDiscPct: Decimal)
@@ -173,17 +172,17 @@ page 36740 "Sales Tax Lines Subform Dyn"
         TaxAmountLine2: Record "Sales Tax Amount Line";
         TotalVATDifference: Decimal;
     begin
-        CheckTaxDifference(CurrencyCode, AllowVATDifference, PricesIncludingVAT);
+        Rec.CheckTaxDifference(CurrencyCode, AllowVATDifference, PricesIncludingVAT);
         TaxAmountLine2 := Rec;
-        TotalVATDifference := Abs("Tax Difference") - Abs(xRec."Tax Difference");
-        if Find('-') then
+        TotalVATDifference := Abs(Rec."Tax Difference") - Abs(xRec."Tax Difference");
+        if Rec.Find('-') then
             repeat
-                TotalVATDifference := TotalVATDifference + Abs("Tax Difference");
-            until Next() = 0;
+                TotalVATDifference := TotalVATDifference + Abs(Rec."Tax Difference");
+            until Rec.Next() = 0;
         Rec := TaxAmountLine2;
         if TotalVATDifference > Currency."Max. VAT Difference Allowed" then
             Error(
-              Text001, FieldCaption("Tax Difference"),
+              Text001, Rec.FieldCaption("Tax Difference"),
               Currency.FieldCaption("Max. VAT Difference Allowed"), Currency."Max. VAT Difference Allowed");
     end;
 

@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using System.Device;
+using System.IO;
+
 page 5620 "Fixed Asset Picture"
 {
     Caption = 'Fixed Asset Picture';
@@ -11,7 +16,7 @@ page 5620 "Fixed Asset Picture"
     {
         area(content)
         {
-            field(Image; Image)
+            field(Image; Rec.Image)
             {
                 ApplicationArea = FixedAssets;
                 ShowCaption = false;
@@ -53,10 +58,10 @@ page 5620 "Fixed Asset Picture"
                     FileName: Text;
                     ClientFileName: Text;
                 begin
-                    TestField("No.");
-                    TestField(Description);
+                    Rec.TestField("No.");
+                    Rec.TestField(Description);
 
-                    if Image.HasValue() then
+                    if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -64,9 +69,9 @@ page 5620 "Fixed Asset Picture"
                     if FileName = '' then
                         exit;
 
-                    Clear(Image);
-                    Image.ImportFile(FileName, ClientFileName);
-                    Modify(true);
+                    Clear(Rec.Image);
+                    Rec.Image.ImportFile(FileName, ClientFileName);
+                    Rec.Modify(true);
 
                     if FileManagement.DeleteServerFile(FileName) then;
                 end;
@@ -85,13 +90,13 @@ page 5620 "Fixed Asset Picture"
                     ToFile: Text;
                     ExportPath: Text;
                 begin
-                    TestField("No.");
-                    TestField(Description);
+                    Rec.TestField("No.");
+                    Rec.TestField(Description);
 
-                    ToFile := StrSubstNo('%1 %2.jpg', "No.", Description);
-                    ExportPath := TemporaryPath + "No." + Format(Image.MediaId);
+                    ToFile := StrSubstNo('%1 %2.jpg', Rec."No.", Rec.Description);
+                    ExportPath := TemporaryPath + Rec."No." + Format(Rec.Image.MediaId);
                     OnExportFileActionOnAfterExportPath(Rec, ToFile, ExportPath);
-                    Image.ExportFile(ExportPath);
+                    Rec.Image.ExportFile(ExportPath);
 
                     FileManagement.ExportImage(ExportPath, ToFile);
                 end;
@@ -106,13 +111,13 @@ page 5620 "Fixed Asset Picture"
 
                 trigger OnAction()
                 begin
-                    TestField("No.");
+                    Rec.TestField("No.");
 
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    Clear(Image);
-                    Modify(true);
+                    Clear(Rec.Image);
+                    Rec.Modify(true);
                 end;
             }
         }
@@ -130,7 +135,6 @@ page 5620 "Fixed Asset Picture"
 
     var
         Camera: Codeunit Camera;
-        [InDataSet]
         CameraAvailable: Boolean;
         OverrideImageQst: Label 'The existing picture will be replaced. Do you want to continue?';
         DeleteImageQst: Label 'Are you sure you want to delete the picture?';
@@ -159,7 +163,7 @@ page 5620 "Fixed Asset Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Image.HasValue;
+        DeleteExportEnabled := Rec.Image.HasValue;
     end;
 
     [IntegrationEvent(false, false)]

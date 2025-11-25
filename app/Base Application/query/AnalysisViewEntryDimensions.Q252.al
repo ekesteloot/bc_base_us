@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Analysis;
+
 query 252 "Analysis View Entry Dimensions"
 {
     Caption = 'Analysis View Entry Dimensions';

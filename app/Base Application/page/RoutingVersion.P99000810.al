@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000810 "Routing Version"
 {
     Caption = 'Routing Version';
@@ -19,7 +21,7 @@ page 99000810 "Routing Version"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -47,8 +49,8 @@ page 99000810 "Routing Version"
             part(RoutingLine; "Routing Version Lines")
             {
                 ApplicationArea = Manufacturing;
-                SubPageLink = "Routing No." = FIELD("Routing No."),
-                              "Version Code" = FIELD("Version Code");
+                SubPageLink = "Routing No." = field("Routing No."),
+                              "Version Code" = field("Version Code");
             }
         }
         area(factboxes)
@@ -86,8 +88,8 @@ page 99000810 "Routing Version"
                         if not Confirm(Text000, false) then
                             exit;
 
-                        RtngHeader.Get("Routing No.");
-                        CopyRouting.CopyRouting("Routing No.", '', RtngHeader, "Version Code");
+                        RtngHeader.Get(Rec."Routing No.");
+                        CopyRouting.CopyRouting(Rec."Routing No.", '', RtngHeader, Rec."Version Code");
                     end;
                 }
                 action("Copy Routing &Version")

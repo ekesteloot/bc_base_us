@@ -1,7 +1,15 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 322 "Aged Accounts Payable"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/AgedAccountsPayable.rdlc';
+    RDLCLayout = './Purchases/Reports/AgedAccountsPayable.rdlc';
     Caption = 'Aged Accounts Payable';
     DataAccessIntent = ReadOnly;
 
@@ -139,8 +147,8 @@ report 322 "Aged Accounts Payable"
             }
             dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
             {
-                DataItemLink = "Vendor No." = FIELD("No.");
-                DataItemTableView = SORTING("Vendor No.", "Posting Date", "Currency Code");
+                DataItemLink = "Vendor No." = field("No.");
+                DataItemTableView = sorting("Vendor No.", "Posting Date", "Currency Code");
                 PrintOnlyIfDetail = true;
 
                 trigger OnAfterGetRecord()
@@ -184,8 +192,8 @@ report 322 "Aged Accounts Payable"
             }
             dataitem(OpenVendorLedgEntry; "Vendor Ledger Entry")
             {
-                DataItemLink = "Vendor No." = FIELD("No.");
-                DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date", "Currency Code");
+                DataItemLink = "Vendor No." = field("No.");
+                DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date", "Currency Code");
                 PrintOnlyIfDetail = true;
 
                 trigger OnAfterGetRecord()
@@ -211,11 +219,11 @@ report 322 "Aged Accounts Payable"
             }
             dataitem(CurrencyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 PrintOnlyIfDetail = true;
                 dataitem(TempVendortLedgEntryLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(VendorName; Vendor.Name)
                     {
                     }
@@ -471,7 +479,7 @@ report 322 "Aged Accounts Payable"
         }
         dataitem(CurrencyTotals; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(Number_CurrencyTotals; Number)
             {
             }

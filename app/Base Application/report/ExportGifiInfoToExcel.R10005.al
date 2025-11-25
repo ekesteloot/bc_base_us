@@ -9,7 +9,7 @@ report 10005 "Export GIFI Info. to Excel"
     {
         dataitem(GIFICode; "GIFI Code")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code";
 
             trigger OnAfterGetRecord()

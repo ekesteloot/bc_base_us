@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.BOM;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.WorkCenter;
+using System.Reflection;
+
 table 5874 "BOM Warning Log"
 {
     Caption = 'BOM Warning Log';
@@ -16,7 +25,7 @@ table 5874 "BOM Warning Log"
         field(6; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(7; "Table Position"; Text[250])
         {

@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Receivables;
+
+using System.Security.User;
+
 page 127 "Det. Cust. Ledg. Entr. Preview"
 {
     Caption = 'Detailed Customer Ledger Entries Preview';
@@ -105,7 +109,7 @@ page 127 "Det. Cust. Ledg. Entr. Preview"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -120,7 +124,7 @@ page 127 "Det. Cust. Ledg. Entr. Preview"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Unapplied; Unapplied)
+                field(Unapplied; Rec.Unapplied)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the entry has been unapplied (undone) from the Unapply Customer Entries window by the entry no. shown in the Unapplied by Entry No. field.';
@@ -151,7 +155,7 @@ page 127 "Det. Cust. Ledg. Entr. Preview"
         if TempDtldCustLedgEntry.FindSet() then
             repeat
                 Rec := TempDtldCustLedgEntry;
-                Insert();
+                Rec.Insert();
             until TempDtldCustLedgEntry.Next() = 0;
     end;
 }

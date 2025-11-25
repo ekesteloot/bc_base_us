@@ -3,6 +3,14 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Text;
+
+using System;
+using System.Utilities;
+using System.Azure.KeyVault;
+using System.Environment.Configuration;
+using System.Azure.AI;
+
 /// <summary>
 /// Implements functionality to handle text suggestions.
 /// </summary>

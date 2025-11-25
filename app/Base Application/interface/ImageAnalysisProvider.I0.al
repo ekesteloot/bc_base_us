@@ -1,3 +1,5 @@
+namespace System.AI;
+
 interface "Image Analysis Provider"
 {
     Access = Internal;

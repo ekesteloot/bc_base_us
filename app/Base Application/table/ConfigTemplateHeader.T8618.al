@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using Microsoft.Foundation.NoSeries;
+using System.Reflection;
+
 table 8618 "Config. Template Header"
 {
     Caption = 'Config. Template Header';
@@ -34,24 +39,24 @@ table 8618 "Config. Template Header"
         }
         field(4; "Table Name"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Name" WHERE("Object Type" = CONST(Table),
-                                                                        "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Name" where("Object Type" = const(Table),
+                                                                        "Object ID" = field("Table ID")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; "Table Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Used In Hierarchy"; Boolean)
         {
-            CalcFormula = Exist("Config. Template Line" WHERE("Data Template Code" = FIELD(Code),
-                                                               Type = CONST(Template)));
+            CalcFormula = exist("Config. Template Line" where("Data Template Code" = field(Code),
+                                                               Type = const(Template)));
             Caption = 'Used In Hierarchy';
             Editable = false;
             FieldClass = FlowField;

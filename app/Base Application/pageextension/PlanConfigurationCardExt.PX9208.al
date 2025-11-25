@@ -1,3 +1,7 @@
+namespace System.Azure.Identity;
+
+using System.Security.User;
+
 pageextension 9208 "Plan Configuration Card Ext." extends "Plan Configuration Card"
 {
     actions

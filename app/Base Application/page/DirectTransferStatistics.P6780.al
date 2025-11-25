@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
 page 6780 "Direct Transfer Statistics"
 {
     Caption = 'Direct Transfer Statistics';

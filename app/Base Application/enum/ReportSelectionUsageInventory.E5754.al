@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Setup;
+
 enum 5754 "Report Selection Usage Inventory"
 {
     Extensible = true;

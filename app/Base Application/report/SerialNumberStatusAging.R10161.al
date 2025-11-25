@@ -9,7 +9,7 @@ report 10161 "Serial Number Status/Aging"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE("Item Tracking Code" = FILTER(<> ''));
+            DataItemTableView = where("Item Tracking Code" = filter(<> ''));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Inventory Posting Group", "Vendor No.", "Location Filter", "Variant Filter";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -92,8 +92,8 @@ report 10161 "Serial Number Status/Aging"
             }
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Posting Date" = FIELD("Date Filter"), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date", "Expiration Date", "Lot No.", "Serial No.") WHERE(Open = CONST(true));
+                DataItemLink = "Item No." = field("No."), "Posting Date" = field("Date Filter"), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date", "Expiration Date", "Lot No.", "Serial No.") where(Open = const(true));
                 column(Item_Ledger_Entry__Location_Code_; "Location Code")
                 {
                 }

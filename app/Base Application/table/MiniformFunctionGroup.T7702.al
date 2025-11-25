@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.ADCS;
+
 table 7702 "Miniform Function Group"
 {
     Caption = 'Miniform Function Group';

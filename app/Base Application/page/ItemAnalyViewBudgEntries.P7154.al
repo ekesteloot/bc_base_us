@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 7154 "Item Analy. View Budg. Entries"
 {
     Caption = 'Analysis View Budget Entries';
@@ -101,14 +103,14 @@ page 7154 "Item Analy. View Budg. Entries"
 
     trigger OnAfterGetCurrRecord()
     begin
-        if "Analysis View Code" <> xRec."Analysis View Code" then;
+        if Rec."Analysis View Code" <> xRec."Analysis View Code" then;
     end;
 
     local procedure DrillDown()
     var
         ItemBudgetEntry: Record "Item Budget Entry";
     begin
-        ItemBudgetEntry.SetRange("Entry No.", "Entry No.");
+        ItemBudgetEntry.SetRange("Entry No.", Rec."Entry No.");
         PAGE.RunModal(0, ItemBudgetEntry);
     end;
 }

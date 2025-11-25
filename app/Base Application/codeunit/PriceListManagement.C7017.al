@@ -1,3 +1,20 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Source;
+using Microsoft.Pricing.Worksheet;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Setup;
+using System.Environment.Configuration;
+using System.Threading;
+using System.Upgrade;
+
 codeunit 7017 "Price List Management"
 {
     var
@@ -264,7 +281,7 @@ codeunit 7017 "Price List Management"
         exit(FindDuplicatePrices(PriceListHeader, PriceListLine, SearchInside, DuplicatePriceLine));
     end;
 
-    local procedure FindDuplicatePrices(PriceListHeader: Record "Price List Header"; var PriceListLine: Record "Price List Line"; SearchInside: Boolean; var DuplicatePriceLine: Record "Duplicate Price Line") Found: Boolean;
+    procedure FindDuplicatePrices(PriceListHeader: Record "Price List Header"; var PriceListLine: Record "Price List Line"; SearchInside: Boolean; var DuplicatePriceLine: Record "Duplicate Price Line") Found: Boolean;
     var
         DuplicatePriceListLine: Record "Price List Line";
         LineNo: Integer;

@@ -1,5 +1,15 @@
+namespace Microsoft.InventoryMgt.Location;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.ServiceMgt.Resources;
+using Microsoft.WarehouseMgt.Structure;
+using System.Text;
+
 page 15 "Location List"
 {
+    AdditionalSearchTerms = 'warehouse setup,inventory setup';
     ApplicationArea = Location;
     Caption = 'Locations';
     CardPageID = "Location Card";
@@ -15,7 +25,7 @@ page 15 "Location List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Location;
                     ToolTip = 'Specifies a location code for the warehouse or distribution center where your items are handled and stored before being sold.';
@@ -56,7 +66,7 @@ page 15 "Location List"
                     Caption = '&Resource Locations';
                     Image = Resource;
                     RunObject = Page "Resource Locations";
-                    RunPageLink = "Location Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field(Code);
                     ToolTip = 'View or edit information about where resources are located. In this window, you can assign resources to locations.';
                 }
                 action("&Zones")
@@ -65,7 +75,7 @@ page 15 "Location List"
                     Caption = '&Zones';
                     Image = Zones;
                     RunObject = Page Zones;
-                    RunPageLink = "Location Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field(Code);
                     ToolTip = 'View or edit information about zones that you use in your warehouse to structure your bins under zones.';
                 }
                 action("&Bins")
@@ -74,7 +84,7 @@ page 15 "Location List"
                     Caption = '&Bins';
                     Image = Bins;
                     RunObject = Page Bins;
-                    RunPageLink = "Location Code" = FIELD(Code);
+                    RunPageLink = "Location Code" = field(Code);
                     ToolTip = 'View or edit information about zones that you use in your warehouse to hold items.';
                 }
             }
@@ -107,7 +117,7 @@ page 15 "Location List"
                         DefaultDimMultiple: Page "Default Dimensions-Multiple";
                     begin
                         CurrPage.SetSelectionFilter(Location);
-                        DefaultDimMultiple.SetMultiRecord(Location, FieldNo(Code));
+                        DefaultDimMultiple.SetMultiRecord(Location, Rec.FieldNo(Code));
                         DefaultDimMultiple.RunModal();
                     end;
                 }
@@ -194,7 +204,7 @@ page 15 "Location List"
                 var
                     ItemsWithNegativeInventory: Report "Items with Negative Inventory";
                 begin
-                    ItemsWithNegativeInventory.InitializeRequest(Code);
+                    ItemsWithNegativeInventory.InitializeRequest(Rec.Code);
                     ItemsWithNegativeInventory.Run();
                 end;
             }

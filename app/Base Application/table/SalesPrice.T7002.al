@@ -1,3 +1,16 @@
+﻿namespace Microsoft.Sales.Pricing;
+
+#if not CLEAN21
+using Microsoft.CRM.Campaign;
+#endif
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Integration.Dataverse;
+using Microsoft.InventoryMgt.Item;
+#if not CLEAN21
+using Microsoft.Sales.Customer;
+#endif
+
 table 7002 "Sales Price"
 {
     Caption = 'Sales Price';
@@ -7,7 +20,7 @@ table 7002 "Sales Price"
     ObsoleteTag = '16.0';
 #else
     ObsoleteState = Removed;
-    ObsoleteTag = '22.0';
+    ObsoleteTag = '24.0';
 #endif    
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price List Line';
 
@@ -49,11 +62,11 @@ table 7002 "Sales Price"
         {
             Caption = 'Sales Code';
 #if not CLEAN21
-            TableRelation = IF ("Sales Type" = CONST("Customer Price Group")) "Customer Price Group"
-            ELSE
-            IF ("Sales Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Sales Type" = CONST(Campaign)) Campaign;
+            TableRelation = if ("Sales Type" = const("Customer Price Group")) "Customer Price Group"
+            else
+            if ("Sales Type" = const(Customer)) Customer
+            else
+            if ("Sales Type" = const(Campaign)) Campaign;
 
             trigger OnValidate()
             begin
@@ -112,7 +125,7 @@ table 7002 "Sales Price"
         }
         field(5; "Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Unit Price';
             MinValue = 0;
@@ -190,12 +203,12 @@ table 7002 "Sales Price"
         field(5400; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(5700; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(7001; "Allow Line Disc."; Boolean)
         {

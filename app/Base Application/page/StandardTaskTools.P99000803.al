@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000803 "Standard Task Tools"
 {
     AutoSplitKey = true;

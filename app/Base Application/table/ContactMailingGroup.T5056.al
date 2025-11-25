@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Contact;
+
+using Microsoft.CRM.Setup;
+
 table 5056 "Contact Mailing Group"
 {
     Caption = 'Contact Mailing Group';
@@ -19,21 +23,21 @@ table 5056 "Contact Mailing Group"
         }
         field(3; "Contact Name"; Text[100])
         {
-            CalcFormula = Lookup (Contact.Name WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact No.")));
             Caption = 'Contact Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Contact Company Name"; Text[100])
         {
-            CalcFormula = Lookup (Contact."Company Name" WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact."Company Name" where("No." = field("Contact No.")));
             Caption = 'Contact Company Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; "Mailing Group Description"; Text[100])
         {
-            CalcFormula = Lookup ("Mailing Group".Description WHERE(Code = FIELD("Mailing Group Code")));
+            CalcFormula = Lookup("Mailing Group".Description where(Code = field("Mailing Group Code")));
             Caption = 'Mailing Group Description';
             Editable = false;
             FieldClass = FlowField;

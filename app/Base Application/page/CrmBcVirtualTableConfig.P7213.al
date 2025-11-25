@@ -1,13 +1,19 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
+using Microsoft.Integration.Dataverse;
+using System.Utilities;
+
 page 7213 "CRM BC Virtual Table Config."
 {
-    AccessByPermission = TableData "CRM BC Virtual Table Config." = R;
-    ApplicationArea = Suite;
     Editable = false;
     Caption = 'Virtual Table Configuration - Dataverse';
     DataCaptionExpression = Rec.msdyn_name;
     SourceTable = "CRM BC Virtual Table Config.";
     SourceTableTemporary = true;
-    UsageCategory = Administration;
 
     layout
     {
@@ -43,7 +49,7 @@ page 7213 "CRM BC Virtual Table Config."
             field("AAD User ID"; Rec.msdyn_aadUserId)
             {
                 ApplicationArea = Suite;
-                Caption = 'AAD User ID';
+                Caption = 'Microsoft Entra user ID';
                 ToolTip = 'Specifies data from a corresponding field in a Dataverse entity. For more information about Dataverse, see Dataverse Help Center.';
                 Visible = IsPPE;
             }

@@ -1,3 +1,8 @@
+namespace Microsoft.FixedAssets.Insurance;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Comment;
+
 page 5644 "Insurance Card"
 {
     Caption = 'Insurance Card';
@@ -20,7 +25,7 @@ page 5644 "Insurance Card"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -72,7 +77,7 @@ page 5644 "Insurance Card"
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies the amount of coverage provided by this insurance policy.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -135,8 +140,8 @@ page 5644 "Insurance Card"
                     Caption = 'Coverage Ledger E&ntries';
                     Image = GeneralLedger;
                     RunObject = Page "Ins. Coverage Ledger Entries";
-                    RunPageLink = "Insurance No." = FIELD("No.");
-                    RunPageView = SORTING("Insurance No.", "Disposed FA", "Posting Date");
+                    RunPageLink = "Insurance No." = field("No.");
+                    RunPageView = sorting("Insurance No.", "Disposed FA", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View insurance ledger entries that were created when you post to an insurance account from a purchase invoice, credit memo or journal line.';
                 }
@@ -146,8 +151,8 @@ page 5644 "Insurance Card"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Comment Sheet";
-                    RunPageLink = "Table Name" = CONST(Insurance),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const(Insurance),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -156,8 +161,8 @@ page 5644 "Insurance Card"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(5628),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(5628),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -170,7 +175,7 @@ page 5644 "Insurance Card"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Insurance Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View detailed historical information about the fixed asset.';
                 }

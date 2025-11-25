@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 1219 "Data Exch Mapping Part"
 {
     Caption = 'Data Exchange Mapping';

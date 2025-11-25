@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using System.Utilities;
+
 page 9122 "Item Journal Errors Factbox"
 {
     PageType = ListPart;
@@ -115,8 +119,8 @@ page 9122 "Item Journal Errors Factbox"
     var
         ItemJnlLine: Record "Item Journal Line";
     begin
-        ItemJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-        ItemJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
+        ItemJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+        ItemJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
         exit(ItemJnlLine.Count());
     end;
 

@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+
 table 520 "Availability Info. Buffer"
 {
     Caption = 'Availability Information Buffer';
@@ -52,7 +61,7 @@ table 520 "Availability Info. Buffer"
         }
         field(20; Inventory; Decimal)
         {
-            CalcFormula = Sum("Item Ledger Entry"."Remaining Quantity" where("Item No." = field("Item No."),
+            CalcFormula = sum("Item Ledger Entry"."Remaining Quantity" where("Item No." = field("Item No."),
                                                                              Open = const(true),
                                                                              "Lot No." = field("Lot No. Filter"),
                                                                              "Location Code" = field("Location Code Filter"),
@@ -106,7 +115,7 @@ table 520 "Availability Info. Buffer"
         }
         field(503; "Qty. on Sales Order"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                             "Source Type" = const(37),
                                                                             "Source Subtype" = const("1"),
                                                                             "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -121,7 +130,7 @@ table 520 "Availability Info. Buffer"
         }
         field(504; "Qty. on Service Order"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                             "Source Type" = const(5902),
                                                                             "Source Subtype" = const("1"),
                                                                             "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -136,7 +145,7 @@ table 520 "Availability Info. Buffer"
         }
         field(505; "Qty. on Job Order"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                             "Source Type" = const(1003),
                                                                             "Source Subtype" = const("2"),
                                                                             "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -151,7 +160,7 @@ table 520 "Availability Info. Buffer"
         }
         field(506; "Qty. on Component Lines"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                             "Source Type" = const(5407),
                                                                             "Source Subtype" = filter("1" .. "3"),
                                                                             "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -167,7 +176,7 @@ table 520 "Availability Info. Buffer"
         field(507; "Qty. on Trans. Order Shipment"; Decimal)
         {
             AccessByPermission = TableData "Transfer Header" = R;
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                             "Source Type" = const(5741),
                                                                             "Source Subtype" = const("0"),
                                                                             "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -182,7 +191,7 @@ table 520 "Availability Info. Buffer"
         }
         field(509; "Qty. on Asm. Component"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                             "Source Type" = const(901),
                                                                             "Source Subtype" = const("1"),
                                                                             "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -197,7 +206,7 @@ table 520 "Availability Info. Buffer"
         }
         field(510; "Qty. on Purch. Return"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                             "Source Type" = const(39),
                                                                             "Source Subtype" = const("5"),
                                                                             "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -212,7 +221,7 @@ table 520 "Availability Info. Buffer"
         }
         field(511; "Qty. on Purch. Order"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                           "Source Type" = const(39),
                                                                           "Source Subtype" = const("1"),
                                                                           "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -227,7 +236,7 @@ table 520 "Availability Info. Buffer"
         }
         field(512; "Planned Order Receipt (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                           "Source Type" = const(5406),
                                                                           "Source Subtype" = const("1"),
                                                                           "Reservation Status" = const(Prospect),
@@ -242,7 +251,7 @@ table 520 "Availability Info. Buffer"
         }
         field(513; "Purch. Req. Receipt (Qty.)"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                           "Source Type" = const(246),
                                                                           "Source Subtype" = const("0"),
                                                                           "Reservation Status" = const(Prospect),
@@ -257,7 +266,7 @@ table 520 "Availability Info. Buffer"
         }
         field(514; "Qty. on Prod. Receipt"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                           "Source Type" = const(5406),
                                                                           "Source Subtype" = filter("2" .. "3"),
                                                                           "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -273,7 +282,7 @@ table 520 "Availability Info. Buffer"
         field(516; "Qty. on Trans. Order Receipt"; Decimal)
         {
             AccessByPermission = TableData "Transfer Header" = R;
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                           "Source Type" = const(5741),
                                                                           "Source Subtype" = const("1"),
                                                                           "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -288,7 +297,7 @@ table 520 "Availability Info. Buffer"
         }
         field(517; "Qty. on Assembly Order"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                           "Source Type" = const(900),
                                                                           "Source Subtype" = const("1"),
                                                                           "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -303,7 +312,7 @@ table 520 "Availability Info. Buffer"
         }
         field(518; "Qty. on Sales Return"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                           "Source Type" = const(37),
                                                                           "Source Subtype" = const("5"),
                                                                           "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -318,7 +327,7 @@ table 520 "Availability Info. Buffer"
         }
         field(99000777; "Qty. on Prod. Order"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Item No." = field("Item No."),
                                                                           "Source Type" = const(5406),
                                                                           "Source Subtype" = filter("1" .. "3"),
                                                                           "Reservation Status" = filter(Reservation | Tracking | Surplus),
@@ -408,7 +417,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Sales Line",
+            Enum::TableID::"Sales Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -425,7 +434,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Service Line",
+            Enum::TableID::"Service Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -442,7 +451,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Job Planning Line",
+            Enum::TableID::"Job Planning Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"2"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -459,7 +468,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Prod. Order Component",
+            Enum::TableID::"Prod. Order Component".AsInteger(),
             GetRangeFilter(ReservationEntry."Source Subtype"::"1", ReservationEntry."Source Subtype"::"3"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -476,7 +485,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Transfer Line",
+            Enum::TableID::"Transfer Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"0"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -493,7 +502,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Assembly Line",
+            Enum::TableID::"Assembly Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -510,7 +519,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Purchase Line",
+            Enum::TableID::"Purchase Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"5"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -527,7 +536,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Prod. Order Line",
+            Enum::TableID::"Prod. Order Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"1"),
             Format(ReservationEntry."Reservation Status"::Prospect),
             ReservationDateFilterOption::"Expected Recipt Date"
@@ -540,7 +549,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Requisition Line",
+            Enum::TableID::"Requisition Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"0"),
             Format(ReservationEntry."Reservation Status"::Prospect),
             ReservationDateFilterOption::"Expected Recipt Date"
@@ -553,7 +562,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Prod. Order Line",
+            Enum::TableID::"Prod. Order Line".AsInteger(),
             GetRangeFilter(ReservationEntry."Source Subtype"::"2", ReservationEntry."Source Subtype"::"3"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -570,7 +579,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Purchase Line",
+            Enum::TableID::"Purchase Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -587,7 +596,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Transfer Line",
+            Enum::TableID::"Transfer Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -604,7 +613,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Assembly Header",
+            Enum::TableID::"Assembly Header".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"1"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -621,7 +630,7 @@ table 520 "Availability Info. Buffer"
     begin
         AddEntriesForLookUp(
             TempReservationEntry,
-            Database::"Sales Line",
+            Enum::TableID::"Sales Line".AsInteger(),
             Format(ReservationEntry."Source Subtype"::"5"),
             GetOptionFilter(
                 ReservationEntry."Reservation Status"::Reservation,
@@ -667,14 +676,14 @@ table 520 "Availability Info. Buffer"
 
     local procedure GetRangeFilter(FromVariant: Variant; ToVariant: Variant): Text
     var
-        FilterTxt: Label '%1..%2', Comment = '%1, %2';
+        FilterTxt: Label '%1..%2', Comment = '%1, %2', Locked = true;
     begin
         exit(StrSubstNo(FilterTxt, FromVariant, ToVariant))
     end;
 
     local procedure GetOptionFilter(Option1Variant: Variant; Option2Variant: Variant; Option3Variant: Variant): Text
     var
-        FilterTxt: Label '%1|%2|%3', Comment = '%1, %2, %3';
+        FilterTxt: Label '%1|%2|%3', Comment = '%1, %2, %3', Locked = true;
     begin
         exit(StrSubstNo(FilterTxt, Option1Variant, Option2Variant, Option3Variant));
     end;

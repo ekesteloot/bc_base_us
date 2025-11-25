@@ -1,3 +1,6 @@
+namespace System.IO;
+using System.Security.User;
+
 page 9021 "RapidStart Services RC"
 {
     Caption = 'RapidStart Services Implementer';
@@ -23,7 +26,7 @@ page 9021 "RapidStart Services RC"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Configuration Areas';
-                    SubPageView = SORTING("Vertical Sorting");
+                    SubPageView = sorting("Vertical Sorting");
                 }
             }
             group(Control5)
@@ -91,9 +94,6 @@ page 9021 "RapidStart Services RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'RapidStart Services Wizard';
                     Image = Questionaire;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
                     RunObject = Page "Config. Wizard";
                     ToolTip = 'Open the assisted setup guide for initializing a new solution based on legacy data and the customers requirements.';
                 }
@@ -103,9 +103,6 @@ page 9021 "RapidStart Services RC"
                     Caption = 'Configuration Worksheet';
                     Ellipsis = true;
                     Image = SetupLines;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
                     RunObject = Page "Config. Worksheet";
                     ToolTip = 'Plan and configure how to initialize a new solution based on legacy data and the customers requirements.';
                 }
@@ -114,9 +111,6 @@ page 9021 "RapidStart Services RC"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Complete Setup';
                     Image = Completed;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
                     RunObject = Page "Configuration Completion";
                     ToolTip = 'Open the Rapid Start setup wizard.';
                 }

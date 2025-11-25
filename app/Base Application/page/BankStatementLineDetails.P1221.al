@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.Statement;
+
+using System.IO;
+
 page 1221 "Bank Statement Line Details"
 {
     Caption = 'Bank Statement Line Details';
@@ -15,13 +19,13 @@ page 1221 "Bank Statement Line Details"
         {
             repeater(Group)
             {
-                field(Name; GetFieldName())
+                field(Name; Rec.GetFieldName())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Name';
                     ToolTip = 'Specifies the name of a column in the imported bank statement file.';
                 }
-                field(Value; Value)
+                field(Value; Rec.Value)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the value in a column in the imported bank statement file, such as account number, posting date, and amount.';

@@ -1,3 +1,16 @@
+namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Utilities;
+
 codeunit 395 "FinChrgMemo-Issue"
 {
     Permissions = TableData "Cust. Ledger Entry" = rm,
@@ -429,14 +442,12 @@ codeunit 395 "FinChrgMemo-Issue"
                 DefaultDimension.SetRange("Table ID", Database::"G/L Account");
                 DefaultDimension.SetRange("No.", "Account No.");
                 if not DefaultDimension.IsEmpty() then
-                    "Dimension Set ID" := DimMgt.GetDefaultDimID(
-                        DefaultDimSource, SrcCode, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID", 0);
+                    "Dimension Set ID" :=
+                        DimMgt.GetRecDefaultDimID(
+                            GenJnlLine, 0, DefaultDimSource, SrcCode, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "Dimension Set ID", 0);
             end;
         end;
 
-#if not CLEAN20
-        RunEventOnAfterSetDimensions(GenJnlLine, FinanceChargeMemoHeader, DefaultDimSource, SrcCode);
-#endif
         OnAfterSetDimensionsProcedure(GenJnlLine, FinanceChargeMemoHeader, DefaultDimSource, SrcCode);
     end;
 
@@ -488,36 +499,6 @@ codeunit 395 "FinChrgMemo-Issue"
               ForwardLinkMgt.GetHelpCodeForAllowedPostingDate());
     end;
 
-#if not CLEAN20
-    local procedure CreateDefaultDimSourcesFromDimArray(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; TableID: array[10] of Integer; No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDefaultDimSourcesFromDimArray(Database::"Finance Charge Memo Header", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure CreateDimTableIDs(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var TableID: array[10] of Integer; var No: array[10] of Code[20])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-    begin
-        DimArrayConversionHelper.CreateDimTableIDs(Database::"Finance Charge Memo Header", DefaultDimSource, TableID, No);
-    end;
-
-    local procedure RunEventOnAfterSetDimensions(var GenJnlLine: Record "Gen. Journal Line"; var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var SrcCode: Code[10])
-    var
-        DimArrayConversionHelper: Codeunit "Dim. Array Conversion Helper";
-        TableID2: array[10] of Integer;
-        No2: array[10] of Code[20];
-    begin
-        if not DimArrayConversionHelper.IsSubscriberExist(Database::"Finance Charge Memo Header") then
-            exit;
-
-        CreateDimTableIDs(DefaultDimSource, TableID2, No2);
-        OnAfterSetDimensions(GenJnlLine, FinanceChargeMemoHeader, TableID2, No2, SrcCode);
-        CreateDefaultDimSourcesFromDimArray(DefaultDimSource, TableID2, No2);
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitGenJnlLine(var GenJnlLine: Record "Gen. Journal Line"; FinChargeMemoHeader: Record "Finance Charge Memo Header"; var SrcCode: Code[10])
     begin
@@ -527,14 +508,6 @@ codeunit 395 "FinChrgMemo-Issue"
     local procedure OnAfterIssueFinChargeMemo(var FinChargeMemoHeader: Record "Finance Charge Memo Header"; IssuedFinChargeMemoNo: Code[20])
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by OnAfterSetDimensionsProcedure()', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetDimensions(var GenJnlLine: Record "Gen. Journal Line"; var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; var TableID: array[10] of Integer; var No: array[10] of Code[20]; var SrcCode: Code[10])
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetDimensionsProcedure(var GenJnlLine: Record "Gen. Journal Line"; var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; var SrcCode: Code[10])

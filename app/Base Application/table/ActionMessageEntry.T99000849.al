@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Document;
+using Microsoft.WarehouseMgt.Structure;
+
 table 99000849 "Action Message Entry"
 {
     Caption = 'Action Message Entry';
@@ -70,12 +78,12 @@ table 99000849 "Action Message Entry"
         field(17; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(18; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(19; "Item No."; Code[20])
         {
@@ -168,14 +176,14 @@ table 99000849 "Action Message Entry"
             ActionMessageEntry := ActionMessageEntry2;
 
             ComponentBinding := false;
-            if ActionMessageEntry."Source Type" = DATABASE::"Prod. Order Line" then begin
+            if ActionMessageEntry."Source Type" = Enum::TableID::"Prod. Order Line".AsInteger() then begin
                 FirstDate := DMY2Date(31, 12, 9999);
                 ActionMessageEntry.FilterToReservEntry(ReservEntry);
                 ReservEntry.SetRange(Binding, ReservEntry.Binding::"Order-to-Order");
                 if ReservEntry.FindSet() then
                     repeat
                         if ReservEntry2.Get(ReservEntry."Entry No.", false) then
-                            if (ReservEntry2."Source Type" = DATABASE::"Prod. Order Component") and
+                            if (ReservEntry2."Source Type" = Enum::TableID::"Prod. Order Component".AsInteger()) and
                                (ReservEntry2."Source Subtype" = ReservEntry."Source Subtype") and
                                (ReservEntry2."Source ID" = ReservEntry."Source ID")
                             then

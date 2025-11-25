@@ -1,3 +1,16 @@
+﻿namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Posting;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Setup;
+
 codeunit 5802 "Inventory Posting To G/L"
 {
     Permissions = TableData "G/L Account" = r,
@@ -17,14 +30,14 @@ codeunit 5802 "Inventory Posting To G/L"
             exit;
 
         if GlobalPostPerPostGroup then
-            PostInvtPostBuf(Rec, "Document No.", '', '', true)
+            PostInvtPostBuf(Rec, Rec."Document No.", '', '', true)
         else
             PostInvtPostBuf(
               Rec,
-              "Document No.",
-              "External Document No.",
+              Rec."Document No.",
+              Rec."External Document No.",
               CopyStr(
-                StrSubstNo(Text000, "Entry Type", "Source No.", "Posting Date"),
+                StrSubstNo(Text000, Rec."Entry Type", Rec."Source No.", Rec."Posting Date"),
                 1, MaxStrLen(GenJnlLine.Description)),
               false);
 

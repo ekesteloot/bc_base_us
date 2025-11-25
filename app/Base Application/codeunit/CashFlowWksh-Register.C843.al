@@ -1,3 +1,5 @@
+namespace Microsoft.CashFlow.Worksheet;
+
 codeunit 843 "Cash Flow Wksh. - Register"
 {
     TableNo = "Cash Flow Worksheet Line";
@@ -6,7 +8,7 @@ codeunit 843 "Cash Flow Wksh. - Register"
     begin
         CFWkshLine.Copy(Rec);
         Code();
-        Copy(CFWkshLine);
+        Rec.Copy(CFWkshLine);
     end;
 
     var

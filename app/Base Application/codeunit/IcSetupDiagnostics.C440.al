@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Intercompany.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.Intercompany.DataExchange;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+
 codeunit 440 "IC Setup Diagnostics"
 {
     var
@@ -8,13 +15,12 @@ codeunit 440 "IC Setup Diagnostics"
         PartnerSetupVendorNoPayablesErr: Label 'IC Partner %1 has configured a vendor without a Payables account.', Comment = '%1 - Intercompany Partner Code';
         PartnerSetupCustomerNoReceivablesErr: Label 'IC Partner %1 has configured a customer without a Receivables account.', Comment = '%1 - Intercompany Partner Code';
         PartnerSetupPartnerNoCompanyErr: Label 'IC Partner %1 has not configured a company.', Comment = '%1 - Intercompany Partner Code';
-        PartnerSetupPartnerCompanyNotFoundErr: Label 'Company configured for the IC Partner %1 cannot be found', Comment = '%1 - Intercompany Partner Code';
         PartnerSetupPartnerNoICErr: Label 'IC Partner company %1 has not configured intercompany.', Comment = '%1 - Intercompany Partner Code';
         PartnerSetupMissmatchCodesErr: Label 'IC Partner %1 has a different code than the one you configured.', Comment = '%1 - Intercompany Partner Code';
 
         MappingSetupIdTok: Label 'MAPPINGSETUP', Locked = true;
         MappingSetupDescriptionTxt: Label 'IC Mappings';
-        MappingSetupICCoAEmptyErr: Label  'IC Chart of Accounts is empty';
+        MappingSetupICCoAEmptyErr: Label 'IC Chart of Accounts is empty';
         MappingSetupNoGLAccountWithICErr: Label 'No G/L Account has configured an IC G/L Account';
 
 
@@ -48,7 +54,8 @@ codeunit 440 "IC Setup Diagnostics"
 
     procedure InsertICPartnerPartnerSetupDiagnostics(ICPartner: Record "IC Partner"; var TempChildrenSetupDiagnostic: Record "Intercompany Setup Diagnostic" temporary; var Status: Option)
     var
-        ICSetup: Record "IC Setup";
+        TempICSetup: Record "IC Setup" temporary;
+        ICDataExchange: Interface "IC Data Exchange";
     begin
         if (ICPartner."Vendor No." = '') and (ICPartner."Customer No." = '') then begin
             UpdateStatus(Status, TempChildrenSetupDiagnostic.Status::Warning);
@@ -67,19 +74,14 @@ codeunit 440 "IC Setup Diagnostics"
             InsertPartnerSetupDiagnostic(TempChildrenSetupDiagnostic, StrSubstNo(PartnerSetupPartnerNoCompanyErr, ICPartner.Code), TempChildrenSetupDiagnostic.Status::Error);
             exit;
         end;
-        if not ICSetup.ChangeCompany(ICPartner."Inbox Details") then begin
-            UpdateStatus(Status, TempChildrenSetupDiagnostic.Status::Error);
-            InsertPartnerSetupDiagnostic(TempChildrenSetupDiagnostic, StrSubstNo(PartnerSetupPartnerCompanyNotFoundErr, ICPartner.Code), TempChildrenSetupDiagnostic.Status::Error);
-            exit;
-        end;
-        if not ICSetup.Get() then begin
+        ICDataExchange := ICPartner."Data Exchange Type";
+        ICDataExchange.GetICPartnerICSetup(ICPartner, TempICSetup);
+        if not TempICSetup.Get() then begin
             UpdateStatus(Status, TempChildrenSetupDiagnostic.Status::Warning);
             InsertPartnerSetupDiagnostic(TempChildrenSetupDiagnostic, StrSubstNo(PartnerSetupPartnerNoICErr, ICPartner.Code), TempChildrenSetupDiagnostic.Status::Warning);
             exit;
         end;
-        if not ICSetup.ReadPermission() then
-            exit;
-        if ICSetup."IC Partner Code" = ICPartner.Code then
+        if TempICSetup."IC Partner Code" = ICPartner.Code then
             exit;
         UpdateStatus(Status, TempChildrenSetupDiagnostic.Status::Warning);
         InsertPartnerSetupDiagnostic(TempChildrenSetupDiagnostic, StrSubstNo(PartnerSetupMissmatchCodesErr, ICPartner.Code), TempChildrenSetupDiagnostic.Status::Warning);
@@ -143,7 +145,7 @@ codeunit 440 "IC Setup Diagnostics"
     var
         IntercompanySetupDiagnostic: Record "Intercompany Setup Diagnostic";
     begin
-        if NewStatus = IntercompanySetupDiagnostic.Status::Ok then  
+        if NewStatus = IntercompanySetupDiagnostic.Status::Ok then
             exit;
         if OldStatus = IntercompanySetupDiagnostic.Status::Error then
             exit;

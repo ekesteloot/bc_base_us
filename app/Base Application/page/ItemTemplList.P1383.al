@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 page 1383 "Item Templ. List"
 {
     Caption = 'Item Templates';

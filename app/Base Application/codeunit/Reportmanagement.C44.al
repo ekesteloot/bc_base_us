@@ -85,57 +85,6 @@ codeunit 44 ReportManagement
         OnAfterHasCustomLayout(ObjectType, ObjectID, LayoutType);
     end;
 
-#if not CLEAN20
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reporting Triggers", 'MergeDocument', '', false, false)]
-    [Obsolete('Replaced by CustomDocumentMergerEx for support of AL driver report renders.', '20.0')]
-    local procedure MergeDocument(ObjectType: Option "Report","Page"; ObjectID: Integer; ReportAction: Option SaveAsPdf,SaveAsWord,SaveAsExcel,Preview,Print,SaveAsHtml; XmlData: InStream; FileName: Text; var DocumentStream: OutStream)
-    var
-        DocumentReportMgt: Codeunit "Document Report Mgt.";
-        IsHandled: Boolean;
-    begin
-        // IMPORTANT: This codepath is only reachable if the platform feature switch EnableReportLegacyWordRender is active. The default is to render Word driven reports in the platform.
-        if ObjectType <> ObjectType::Report then
-            Error(NotSupportedErr);
-
-        IsHandled := false;
-        OnMergeDocumentReport(ObjectType, ObjectID, ReportAction, XmlData, FileName, DocumentStream, IsHandled);
-        if (IsHandled) then
-            exit;
-
-        DocumentReportMgt.MergeWordLayout(ObjectID, ReportAction, XmlData, FileName, DocumentStream);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reporting Triggers", 'CustomDocumentMerger', '', false, false)]
-    [Obsolete('Replaced by CustomDocumentMergerEx for support of AL driver report renders.', '20.0')]
-    local procedure CustomDocumentMerger(ObjectID: Integer; ReportAction: Option SaveAsPdf,SaveAsWord,SaveAsExcel,Preview,Print,SaveAsHtml; XmlData: InStream; LayoutData: InStream; var DocumentStream: OutStream)
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnCustomDocumentMerger(ObjectID, ReportAction, XmlData, LayoutData, DocumentStream, IsHandled);
-        if (IsHandled) then
-            exit;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reporting Triggers", 'ReportGetCustomRdlc', '', false, false)]
-    [Obsolete('This procedure will be replaced with platform functionality. Subscribe to the event FetchReportLayoutByCode instead to retrieve a layout.', '20.0')]
-    local procedure ReportGetCustomRdlc(ReportId: Integer; var RdlcText: Text)
-    var
-        CustomReportLayout: Record "Custom Report Layout";
-    begin
-        RdlcText := CustomReportLayout.GetCustomRdlc(ReportId);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reporting Triggers", 'ReportGetCustomWord', '', false, false)]
-    [Obsolete('This procedure will be replaced with platform functionality. Subscribe to the event FetchReportLayoutByCode instead to retrieve a layout.', '20.0')]
-    local procedure ReportGetCustomWord(ReportId: Integer; var LayoutStream: OutStream; var Success: Boolean)
-    var
-        DocumentReportManagement: Codeunit "Document Report Mgt.";
-    begin
-        DocumentReportManagement.GetWordLayoutStream(ReportId, LayoutStream, Success);
-    end;
-#endif
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Reporting Triggers", 'CustomDocumentMergerEx', '', false, false)]
     local procedure CustomDocumentMergerEx(ObjectID: Integer; ReportAction: Option SaveAsPdf,SaveAsWord,SaveAsExcel,Preview,Print,SaveAsHtml; ObjectPayload: JsonObject; XmlData: InStream; LayoutData: InStream; var DocumentStream: OutStream; var Success: Boolean)
     begin
@@ -364,30 +313,6 @@ codeunit 44 ReportManagement
     local procedure OnAfterDocumentDownload(ObjectId: Integer; ObjectPayload: JsonObject; DocumentStream: InStream; var Success: Boolean)
     begin
     end;
-
-#if not CLEAN20
-    /// <summary>
-    /// Invoke the MergeDocument trigger.
-    /// </summary>
-    /// <param name="ObjectType">The object type for which the document will be rendered (Report).</param>
-    /// <param name="ObjectId">The object id.</param>
-    /// <param name="ReportAction">The report action, which can be one of SaveAsPdf, SaveAsWord, SaveAsExcel, Preview, Print or SaveAsHtml.</param>
-    /// <param name="XmlData">The xml data set in an input stream</param>
-    /// <param name="FileName">The file path where the output is to be stored. This parameter will contain the printer name if the print action is chosen.</param>
-    /// <param name="printDocumentStream">Output stream that will contain printed documents for cloud printers</param>
-    /// <param name="IsHandled">Will be set to true if the procedure call handled the merge.</param>
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced by the report event OnCustomDocumentMergerEx. Subscribe to it to change the merging behavior.', '20.0')]
-    local procedure OnMergeDocumentReport(ObjectType: Option "Report","Page"; ObjectID: Integer; ReportAction: Option SaveAsPdf,SaveAsWord,SaveAsExcel,Preview,Print,SaveAsHtml; XmlData: InStream; FileName: Text; var printDocumentStream: OutStream; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced by OnCustomDocumentMergerEx.', '21.0')]
-    local procedure OnCustomDocumentMerger(ObjectID: Integer; ReportAction: Option SaveAsPdf,SaveAsWord,SaveAsExcel,Preview,Print,SaveAsHtml; XmlData: InStream; LayoutData: InStream; var printDocumentStream: OutStream; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     /// <summary>
     /// Invoke the OnCustomDocumentMergeEx trigger, which handled user defiend report renders given a dataset and a layout. The Render must be implemented in AL and return the output stream as defined by the format given in ReportAction.

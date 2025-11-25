@@ -3,7 +3,32 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
-PermissionSet 219 "System Application - Objects"
+namespace System.Security.AccessControl;
+
+using System.Environment.Configuration;
+using System.Azure.Identity;
+using System.Azure.Storage;
+using System.Device;
+using System.Security.Encryption;
+using System.Visualization;
+using System.Feedback;
+using System.Privacy;
+using System.DateTime;
+using System.Integration;
+using System.Integration.Excel;
+using System.Email;
+using System.Text;
+using System.Reflection;
+using System.Globalization;
+using System.Tooling;
+using System.Utilities;
+using System.DataAdministration;
+using System.Integration.Sharepoint;
+using System.Security.User;
+using System.Media;
+using System.Integration.Word;
+
+permissionset 219 "System Application - Objects"
 {
     Access = Internal;
     Assignable = false;

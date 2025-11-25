@@ -1,3 +1,19 @@
+﻿namespace System.Integration;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Asset;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Pricing;
+
 codeunit 6113 "Item Data Migration Facade"
 {
     TableNo = "Data Migration Parameters";
@@ -8,26 +24,26 @@ codeunit 6113 "Item Data Migration Facade"
         ChartOfAccountsMigrated: Boolean;
     begin
         ChartOfAccountsMigrated := DataMigrationStatusFacade.HasMigratedChartOfAccounts(Rec);
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
-                OnMigrateItem("Staging Table RecId To Process");
-                OnMigrateItemTrackingCode("Staging Table RecId To Process");
-                OnMigrateCostingMethod("Staging Table RecId To Process"); // needs to be set after item tracking code because of onvalidate trigger check
-                OnMigrateItemUnitOfMeasure("Staging Table RecId To Process");
-                OnMigrateItemDiscountGroup("Staging Table RecId To Process");
-                OnMigrateItemSalesLineDiscount("Staging Table RecId To Process");
-                OnMigrateItemPrice("Staging Table RecId To Process");
-                OnMigrateItemTariffNo("Staging Table RecId To Process");
-                OnMigrateItemDimensions("Staging Table RecId To Process");
+                OnMigrateItem(Rec."Staging Table RecId To Process");
+                OnMigrateItemTrackingCode(Rec."Staging Table RecId To Process");
+                OnMigrateCostingMethod(Rec."Staging Table RecId To Process"); // needs to be set after item tracking code because of onvalidate trigger check
+                OnMigrateItemUnitOfMeasure(Rec."Staging Table RecId To Process");
+                OnMigrateItemDiscountGroup(Rec."Staging Table RecId To Process");
+                OnMigrateItemSalesLineDiscount(Rec."Staging Table RecId To Process");
+                OnMigrateItemPrice(Rec."Staging Table RecId To Process");
+                OnMigrateItemTariffNo(Rec."Staging Table RecId To Process");
+                OnMigrateItemDimensions(Rec."Staging Table RecId To Process");
 
                 // migrate transactions for this item as long as it is an inventory item
                 if GlobalItem.Type = GlobalItem.Type::Inventory then begin
-                    OnMigrateItemPostingGroups("Staging Table RecId To Process", ChartOfAccountsMigrated);
-                    OnMigrateInventoryTransactions("Staging Table RecId To Process", ChartOfAccountsMigrated);
+                    OnMigrateItemPostingGroups(Rec."Staging Table RecId To Process", ChartOfAccountsMigrated);
+                    OnMigrateInventoryTransactions(Rec."Staging Table RecId To Process", ChartOfAccountsMigrated);
                     ItemJournalLineIsSet := false;
                 end;
                 ItemIsSet := false;
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     var
@@ -134,9 +150,9 @@ codeunit 6113 "Item Data Migration Facade"
     begin
         case DiscType of
             DiscType::Item:
-                exit("Price Asset Type"::Item);
+                exit(Enum::"Price Asset Type"::Item);
             DiscType::"Item Disc. Group":
-                exit("Price Asset Type"::"Item Discount Group");
+                exit(Enum::"Price Asset Type"::"Item Discount Group");
         end;
     end;
 #endif
@@ -147,7 +163,7 @@ codeunit 6113 "Item Data Migration Facade"
     begin
         InitSalesPriceListLine(
             PriceListLine, SourceType, SourceNo, '', 0D, AssetType, AssetNo, '', '', MinimumQuantity);
-        PriceListLine."Amount Type" := "Price Amount Type"::Discount;
+        PriceListLine."Amount Type" := Enum::"Price Amount Type"::Discount;
         PriceListLine."Line Discount %" := LineDiscountPercent;
         if FindPriceListLine(PriceListLine) then
             exit(false);
@@ -220,13 +236,13 @@ codeunit 6113 "Item Data Migration Facade"
     begin
         case SalesType of
             SalesType::Customer:
-                exit("Price Source Type"::Customer);
+                exit(Enum::"Price Source Type"::Customer);
             SalesType::"Customer Price Group":
-                exit("Price Source Type"::"Customer Price Group");
+                exit(Enum::"Price Source Type"::"Customer Price Group");
             SalesType::"All Customers":
-                exit("Price Source Type"::"All Customers");
+                exit(Enum::"Price Source Type"::"All Customers");
             SalesType::Campaign:
-                exit("Price Source Type"::Campaign);
+                exit(Enum::"Price Source Type"::Campaign);
         end;
     end;
 
@@ -234,13 +250,13 @@ codeunit 6113 "Item Data Migration Facade"
     begin
         case SalesType of
             SalesType::Customer:
-                exit("Price Source Type"::Customer);
+                exit(Enum::"Price Source Type"::Customer);
             SalesType::"Customer Disc. Group":
-                exit("Price Source Type"::"Customer Disc. Group");
+                exit(Enum::"Price Source Type"::"Customer Disc. Group");
             SalesType::"All Customers":
-                exit("Price Source Type"::"All Customers");
+                exit(Enum::"Price Source Type"::"All Customers");
             SalesType::Campaign:
-                exit("Price Source Type"::Campaign);
+                exit(Enum::"Price Source Type"::Campaign);
         end;
     end;
 #endif
@@ -251,8 +267,8 @@ codeunit 6113 "Item Data Migration Facade"
     begin
         InitSalesPriceListLine(
             PriceListLine, SourceType, SourceNo, CurrencyCode, StartingDate,
-            "Price Asset Type"::Item, AssetNo, VariantCode, UnitOfMeasure, MinimumQuantity);
-        PriceListLine."Amount Type" := "Price Amount Type"::Price;
+            Enum::"Price Asset Type"::Item, AssetNo, VariantCode, UnitOfMeasure, MinimumQuantity);
+        PriceListLine."Amount Type" := Enum::"Price Amount Type"::Price;
         PriceListLine."Unit Price" := UnitPrice;
         if FindPriceListLine(PriceListLine) then
             exit(false);
@@ -263,7 +279,7 @@ codeunit 6113 "Item Data Migration Facade"
     local procedure InitSalesPriceListLine(var PriceListLine: Record "Price List Line"; SourceType: Enum "Price Source Type"; SourceNo: Code[20]; CurrencyCode: Code[10]; StartingDate: Date; AssetType: Enum "Price Asset Type"; AssetNo: Code[20]; VariantCode: Code[10]; UnitOfMeasure: Code[10]; MinimumQuantity: Decimal)
     begin
         PriceListLine.Init();
-        PriceListLine.Validate("Price Type", "Price Type"::Sale);
+        PriceListLine.Validate("Price Type", Enum::"Price Type"::Sale);
         PriceListLine.Validate("Source Type", SourceType);
         PriceListLine.Validate("Source No.", SourceNo);
         PriceListLine.Validate("Currency Code", DataMigrationFacadeHelper.FixIfLcyCode(CurrencyCode));

@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+
 page 1386 "Vendor Templ. Card"
 {
     Caption = 'Vendor Template';
@@ -26,7 +31,7 @@ page 1386 "Vendor Templ. Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of contact that will be used to create a vendor with the template.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies which transactions with the vendor that cannot be processed, for example a vendor that is declared insolvent.';
@@ -68,7 +73,7 @@ page 1386 "Vendor Templ. Card"
             group(AddressAndContact)
             {
                 Caption = 'Address & Contact';
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the vendor''s address.';
@@ -87,10 +92,10 @@ page 1386 "Vendor Templ. Card"
 
                     trigger OnValidate()
                     begin
-                        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                     end;
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the vendor''s city.';
@@ -104,7 +109,7 @@ page 1386 "Vendor Templ. Card"
                 {
                     ShowCaption = false;
                     Visible = IsCountyVisible;
-                    field(County; County)
+                    field(County; Rec.County)
                     {
                         ApplicationArea = Basic, Suite;
                         ToolTip = 'Specifies the state, province or county as a part of the address.';
@@ -116,7 +121,7 @@ page 1386 "Vendor Templ. Card"
                     ToolTip = 'Specifies the vendor''s telephone number.';
                     Visible = false;
                 }
-                field(MobilePhoneNo; "Mobile Phone No.")
+                field(MobilePhoneNo; Rec."Mobile Phone No.")
                 {
                     Caption = 'Mobile Phone No.';
                     ApplicationArea = Basic, Suite;
@@ -181,7 +186,7 @@ page 1386 "Vendor Templ. Card"
                     ToolTip = 'Specifies the Economic Operators Registration and Identification number that is used when you exchange information with the customs authorities due to trade into or out of the European Union.';
                     Visible = false;
                 }
-                field(GLN; GLN)
+                field(GLN; Rec.GLN)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
@@ -298,7 +303,7 @@ page 1386 "Vendor Templ. Card"
                     Importance = Additional;
                     ToolTip = 'Specifies how to make payments, such as with bank transfers or by cash or check.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the importance of the vendor when suggesting payments using the Suggest Vendor Payments function.';
@@ -450,13 +455,13 @@ page 1386 "Vendor Templ. Card"
                     VendorTempl: Record "Vendor Templ.";
                     VendorTemplList: Page "Vendor Templ. List";
                 begin
-                    TestField(Code);
-                    VendorTempl.SetFilter(Code, '<>%1', Code);
+                    Rec.TestField(Code);
+                    VendorTempl.SetFilter(Code, '<>%1', Rec.Code);
                     VendorTemplList.LookupMode(true);
                     VendorTemplList.SetTableView(VendorTempl);
                     if VendorTemplList.RunModal() = Action::LookupOK then begin
                         VendorTemplList.GetRecord(VendorTempl);
-                        CopyFromTemplate(VendorTempl);
+                        Rec.CopyFromTemplate(VendorTempl);
                     end;
                 end;
             }
@@ -479,7 +484,7 @@ page 1386 "Vendor Templ. Card"
 
     trigger OnOpenPage()
     begin
-        IsCountyVisible := FormatAddress.UseCounty("Country/Region Code");
+        IsCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
     end;
 
     var

@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Document;
+
+using Microsoft.Sales.Reports;
+
 page 45 "Sales List"
 {
     Caption = 'Sales List';
@@ -260,7 +264,7 @@ page 45 "Sales List"
 
     trigger OnOpenPage()
     begin
-        CopySellToCustomerFilter();
+        Rec.CopySellToCustomerFilter();
     end;
 }
 

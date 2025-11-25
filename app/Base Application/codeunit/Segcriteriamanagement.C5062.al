@@ -1,3 +1,10 @@
+namespace Microsoft.CRM.Segment;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Profiling;
+using Microsoft.Foundation.Enums;
+
 codeunit 5062 SegCriteriaManagement
 {
 
@@ -12,7 +19,7 @@ codeunit 5062 SegCriteriaManagement
         Cont.SetRange("No.", ContactNo);
 
         InsertCriteriaAction(SegmentNo, REPORT::"Add Contacts", false, false, false, false, false);
-        InsertCriteriaFilters(SegmentNo, DATABASE::Contact, Cont.GetFilters, Cont.GetView(false));
+        InsertCriteriaFilters(SegmentNo, Enum::TableID::Contact, Cont.GetFilters, Cont.GetView(false));
     end;
 
     procedure DeleteContact(SegmentNo: Code[20]; ContactNo: Code[20])
@@ -22,7 +29,7 @@ codeunit 5062 SegCriteriaManagement
         Cont.SetRange("No.", ContactNo);
 
         InsertCriteriaAction(SegmentNo, REPORT::"Remove Contacts - Reduce", false, false, false, false, false);
-        InsertCriteriaFilters(SegmentNo, DATABASE::Contact, Cont.GetFilters, Cont.GetView(false));
+        InsertCriteriaFilters(SegmentNo, Enum::TableID::Contact, Cont.GetFilters, Cont.GetView(false));
     end;
 
     procedure InsertReuseLogged(SegmentNo: Code[20]; LoggedSegmentEntryNo: Integer)
@@ -34,7 +41,7 @@ codeunit 5062 SegCriteriaManagement
 
         InsertCriteriaAction(SegmentNo, REPORT::"Add Contacts", true, false, false, false, false);
         InsertCriteriaFilters(
-          SegmentNo, DATABASE::"Interaction Log Entry", InteractLogEntry.GetFilters, InteractLogEntry.GetView(false));
+          SegmentNo, Enum::TableID::"Interaction Log Entry", InteractLogEntry.GetFilters, InteractLogEntry.GetView(false));
     end;
 
     procedure InsertCriteriaAction(SegmentNo: Code[20]; CalledFromReportNo: Integer; AllowExistingContacts: Boolean; ExpandContact: Boolean; AllowCompanyWithPersons: Boolean; IgnoreExclusion: Boolean; EntireCompanies: Boolean)
@@ -138,19 +145,19 @@ codeunit 5062 SegCriteriaManagement
         TableFilters: Text;
     begin
         case TableNo of
-            DATABASE::Contact,
-            DATABASE::"Contact Mailing Group",
-            DATABASE::"Interaction Log Entry",
-            DATABASE::"Contact Job Responsibility",
-            DATABASE::"Contact Industry Group",
-            DATABASE::"Contact Business Relation",
-            DATABASE::"Value Entry":
+            Enum::TableID::Contact.AsInteger(),
+            Enum::TableID::"Contact Mailing Group".AsInteger(),
+            Enum::TableID::"Interaction Log Entry".AsInteger(),
+            Enum::TableID::"Contact Job Responsibility".AsInteger(),
+            Enum::TableID::"Contact Industry Group".AsInteger(),
+            Enum::TableID::"Contact Business Relation".AsInteger(),
+            Enum::TableID::"Value Entry".AsInteger():
                 begin
                     RecRef.Open(TableNo);
                     RecRef.SetView(TableView);
                     exit(RecRef.GetFilters());
                 end;
-            DATABASE::"Contact Profile Answer":
+            Enum::TableID::"Contact Profile Answer".AsInteger():
                 begin
                     ContProfileAnswer.SetView(TableView);
                     ContProfileAnswer.CopyFilter(

@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Comment;
+
 page 124 "Comment Sheet"
 {
     AutoSplitKey = true;
@@ -16,17 +18,17 @@ page 124 "Comment Sheet"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the date the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the comment itself.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies a code for the comment.';
@@ -42,7 +44,7 @@ page 124 "Comment Sheet"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine();
+        Rec.SetUpNewLine();
     end;
 }
 

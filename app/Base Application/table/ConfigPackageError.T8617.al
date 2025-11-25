@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 table 8617 "Config. Package Error"
 {
     Caption = 'Config. Package Error';
@@ -18,15 +22,15 @@ table 8617 "Config. Package Error"
             Caption = 'Table ID';
             Editable = false;
             NotBlank = true;
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(3; "Record No."; Integer)
         {
             Caption = 'Record No.';
             Editable = false;
             NotBlank = true;
-            TableRelation = "Config. Package Record"."No." WHERE("Package Code" = FIELD("Package Code"),
-                                                                 "Table ID" = FIELD("Table ID"));
+            TableRelation = "Config. Package Record"."No." where("Package Code" = field("Package Code"),
+                                                                 "Table ID" = field("Table ID"));
         }
         field(4; "Field ID"; Integer)
         {
@@ -36,8 +40,8 @@ table 8617 "Config. Package Error"
         }
         field(5; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table ID"),
-                                                        "No." = FIELD("Field ID")));
+            CalcFormula = Lookup(Field.FieldName where(TableNo = field("Table ID"),
+                                                        "No." = field("Field ID")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -49,8 +53,8 @@ table 8617 "Config. Package Error"
         }
         field(7; "Field Caption"; Text[250])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table ID"),
-                                                              "No." = FIELD("Field ID")));
+            CalcFormula = Lookup(Field."Field Caption" where(TableNo = field("Table ID"),
+                                                              "No." = field("Field ID")));
             Caption = 'Field Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -68,8 +72,8 @@ table 8617 "Config. Package Error"
         }
         field(10; "Table Caption"; Text[250])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;

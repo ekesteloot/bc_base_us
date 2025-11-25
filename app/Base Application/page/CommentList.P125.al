@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Comment;
+
 page 125 "Comment List"
 {
     Caption = 'Comment List';
@@ -19,17 +21,17 @@ page 125 "Comment List"
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the date the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the comment itself.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies a code for the comment.';

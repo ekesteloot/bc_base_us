@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 99000868 "Finished Prod. Order Lines"
 {
     Caption = 'Lines';
@@ -5,7 +9,7 @@ page 99000868 "Finished Prod. Order Lines"
     LinksAllowed = false;
     PageType = ListPart;
     SourceTable = "Prod. Order Line";
-    SourceTableView = WHERE(Status = CONST(Finished));
+    SourceTableView = where(Status = const(Finished));
 
     layout
     {
@@ -183,7 +187,7 @@ page 99000868 "Finished Prod. Order Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Ro&uting")
@@ -196,7 +200,7 @@ page 99000868 "Finished Prod. Order Lines"
 
                     trigger OnAction()
                     begin
-                        ShowRouting();
+                        Rec.ShowRouting();
                     end;
                 }
                 action(Components)
@@ -222,7 +226,7 @@ page 99000868 "Finished Prod. Order Lines"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }
@@ -233,7 +237,7 @@ page 99000868 "Finished Prod. Order Lines"
     begin
         DescriptionIndent := 0;
         DescriptionOnFormat();
-        GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
+        Rec.GetStartingEndingDateAndTime(StartingTime, StartingDate, EndingTime, EndingDate);
     end;
 
     trigger OnInit()
@@ -247,7 +251,6 @@ page 99000868 "Finished Prod. Order Lines"
     end;
 
     var
-        [InDataSet]
         DescriptionIndent: Integer;
         StartingTime: Time;
         EndingTime: Time;
@@ -259,16 +262,16 @@ page 99000868 "Finished Prod. Order Lines"
     var
         ProdOrderComp: Record "Prod. Order Component";
     begin
-        ProdOrderComp.SetRange(Status, Status);
-        ProdOrderComp.SetRange("Prod. Order No.", "Prod. Order No.");
-        ProdOrderComp.SetRange("Prod. Order Line No.", "Line No.");
+        ProdOrderComp.SetRange(Status, Rec.Status);
+        ProdOrderComp.SetRange("Prod. Order No.", Rec."Prod. Order No.");
+        ProdOrderComp.SetRange("Prod. Order Line No.", Rec."Line No.");
 
         PAGE.Run(PAGE::"Prod. Order Components", ProdOrderComp);
     end;
 
     local procedure DescriptionOnFormat()
     begin
-        DescriptionIndent := "Planning Level Code";
+        DescriptionIndent := Rec."Planning Level Code";
     end;
 }
 

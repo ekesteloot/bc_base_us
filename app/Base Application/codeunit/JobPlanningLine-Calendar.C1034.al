@@ -1,3 +1,15 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Outlook;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Sales.Customer;
+using System;
+using System.Email;
+using System.Security.AccessControl;
+using System.Utilities;
+
 codeunit 1034 "Job Planning Line - Calendar"
 {
     TableNo = "Job Planning Line";
@@ -6,10 +18,10 @@ codeunit 1034 "Job Planning Line - Calendar"
     var
         LocalJobPlanningLine: Record "Job Planning Line";
     begin
-        LocalJobPlanningLine.SetRange("Job No.", "Job No.");
-        LocalJobPlanningLine.SetRange("Job Task No.", "Job Task No.");
-        LocalJobPlanningLine.SetFilter("Line Type", '%1|%2', "Line Type"::Budget, "Line Type"::"Both Budget and Billable");
-        LocalJobPlanningLine.SetRange(Type, Type::Resource);
+        LocalJobPlanningLine.SetRange("Job No.", Rec."Job No.");
+        LocalJobPlanningLine.SetRange("Job Task No.", Rec."Job Task No.");
+        LocalJobPlanningLine.SetFilter("Line Type", '%1|%2', Rec."Line Type"::Budget, Rec."Line Type"::"Both Budget and Billable");
+        LocalJobPlanningLine.SetRange(Type, Rec.Type::Resource);
         LocalJobPlanningLine.SetFilter("No.", '<>''''');
         if LocalJobPlanningLine.FindSet() then
             repeat

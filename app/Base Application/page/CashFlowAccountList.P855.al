@@ -1,3 +1,9 @@
+namespace Microsoft.CashFlow.Account;
+
+using Microsoft.CashFlow.Comment;
+using Microsoft.CashFlow.Forecast;
+using System.Text;
+
 page 855 "Cash Flow Account List"
 {
     Caption = 'Cash Flow Account List';
@@ -30,12 +36,12 @@ page 855 "Cash Flow Account List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the purpose of the cash flow account. Newly created cash flow accounts are automatically assigned the Entry account type, but you can change this.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the comment for the record.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -89,8 +95,8 @@ page 855 "Cash Flow Account List"
                     Caption = 'Entries';
                     Image = Entries;
                     RunObject = Page "Cash Flow Forecast Entries";
-                    RunPageLink = "Cash Flow Account No." = FIELD("No.");
-                    RunPageView = SORTING("Cash Flow Account No.");
+                    RunPageLink = "Cash Flow Account No." = field("No.");
+                    RunPageView = sorting("Cash Flow Account No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the entries that exist for the cash flow account. ';
                 }
@@ -100,8 +106,8 @@ page 855 "Cash Flow Account List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Cash Flow Comment";
-                    RunPageLink = "Table Name" = CONST("Cash Flow Account"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Cash Flow Account"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -115,7 +121,6 @@ page 855 "Cash Flow Account List"
     end;
 
     var
-        [InDataSet]
         NameIndent: Integer;
 
     procedure SetSelection(var CFAccount: Record "Cash Flow Account")
@@ -134,7 +139,7 @@ page 855 "Cash Flow Account List"
 
     local procedure NameOnFormat()
     begin
-        NameIndent := Indentation;
+        NameIndent := Rec.Indentation;
     end;
 }
 

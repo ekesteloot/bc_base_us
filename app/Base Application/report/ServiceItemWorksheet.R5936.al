@@ -1,7 +1,16 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Comment;
+using Microsoft.ServiceMgt.Document;
+using System.Utilities;
+
 report 5936 "Service Item Worksheet"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceItemWorksheet.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceItemWorksheet.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Item Worksheet';
     UsageCategory = Documents;
@@ -10,7 +19,7 @@ report 5936 "Service Item Worksheet"
     {
         dataitem("Service Item Line"; "Service Item Line")
         {
-            DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+            DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
             RequestFilterFields = "Document Type", "Document No.", "Line No.";
             column(CompanyAddr6; CompanyAddr[6])
             {
@@ -126,8 +135,8 @@ report 5936 "Service Item Worksheet"
             }
             dataitem("Fault Comment"; "Service Comment Line")
             {
-                DataItemLink = "Table Subtype" = FIELD("Document Type"), "No." = FIELD("Document No."), "Table Line No." = FIELD("Line No.");
-                DataItemTableView = SORTING("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") WHERE("Table Name" = CONST("Service Header"), Type = CONST(Fault));
+                DataItemLink = "Table Subtype" = field("Document Type"), "No." = field("Document No."), "Table Line No." = field("Line No.");
+                DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") where("Table Name" = const("Service Header"), Type = const(Fault));
                 column(Comment_ServCommentLine; Comment)
                 {
                 }
@@ -149,8 +158,8 @@ report 5936 "Service Item Worksheet"
             }
             dataitem("Resolution Comment"; "Service Comment Line")
             {
-                DataItemLink = "Table Subtype" = FIELD("Document Type"), "No." = FIELD("Document No."), "Table Line No." = FIELD("Line No.");
-                DataItemTableView = SORTING("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") WHERE("Table Name" = CONST("Service Header"), Type = CONST(Resolution));
+                DataItemLink = "Table Subtype" = field("Document Type"), "No." = field("Document No."), "Table Line No." = field("Line No.");
+                DataItemTableView = sorting("Table Name", "Table Subtype", "No.", Type, "Table Line No.", "Line No.") where("Table Name" = const("Service Header"), Type = const(Resolution));
                 column(Comment1_ServCommentLine; Comment)
                 {
                 }
@@ -172,8 +181,8 @@ report 5936 "Service Item Worksheet"
             }
             dataitem("Service Line"; "Service Line")
             {
-                DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("Document No."), "Service Item Line No." = FIELD("Line No.");
-                DataItemTableView = SORTING("Document Type", "Document No.", "Service Item Line No.", Type, "No.");
+                DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("Document No."), "Service Item Line No." = field("Line No.");
+                DataItemTableView = sorting("Document Type", "Document No.", "Service Item Line No.", Type, "No.");
                 column(SerialNo1_ServLine; "Service Item Serial No.")
                 {
                     IncludeCaption = true;
@@ -272,7 +281,7 @@ report 5936 "Service Item Worksheet"
         }
         dataitem(Shipto; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(ShipToAddr6; ShipToAddr[6])
             {
             }

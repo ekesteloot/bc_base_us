@@ -1,4 +1,12 @@
-﻿page 130 "Posted Sales Shipment"
+﻿namespace Microsoft.Sales.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Sales.Comment;
+using System.Automation;
+
+page 130 "Posted Sales Shipment"
 {
     Caption = 'Posted Sales Shipment';
     InsertAllowed = false;
@@ -195,7 +203,7 @@
                 group("Work Description")
                 {
                     Caption = 'Work Description';
-                    field(GetWorkDescription; GetWorkDescription())
+                    field(GetWorkDescription; Rec.GetWorkDescription())
                     {
                         ApplicationArea = Basic, Suite;
                         Editable = false;
@@ -209,7 +217,7 @@
             part(SalesShipmLines; "Posted Sales Shpt. Subform")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Document No." = FIELD("No.");
+                SubPageLink = "Document No." = field("No.");
             }
             group(Shipping)
             {
@@ -643,7 +651,7 @@
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Sales Shipment Statistics";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -653,9 +661,9 @@
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = CONST(Shipment),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const(Shipment),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -669,7 +677,7 @@
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(Approvals)
@@ -684,7 +692,7 @@
                     var
                         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
                     begin
-                        ApprovalsMgmt.ShowPostedApprovalEntries(RecordId);
+                        ApprovalsMgmt.ShowPostedApprovalEntries(Rec.RecordId);
                     end;
                 }
                 action(CertificateOfSupplyDetails)
@@ -693,8 +701,8 @@
                     Caption = 'Certificate of Supply Details';
                     Image = Certificate;
                     RunObject = Page "Certificates of Supply";
-                    RunPageLink = "Document Type" = FILTER("Sales Shipment"),
-                                  "Document No." = FIELD("No.");
+                    RunPageLink = "Document Type" = filter("Sales Shipment"),
+                                  "Document No." = field("No.");
                     ToolTip = 'View the certificate of supply that you must send to your customer for signature as confirmation of receipt. You must print a certificate of supply if the shipment uses a combination of VAT business posting group and VAT product posting group that have been marked to require a certificate of supply in the VAT Posting Setup window.';
                 }
                 action(PrintCertificateofSupply)
@@ -709,7 +717,7 @@
                         CertificateOfSupply: Record "Certificate of Supply";
                     begin
                         CertificateOfSupply.SetRange("Document Type", CertificateOfSupply."Document Type"::"Sales Shipment");
-                        CertificateOfSupply.SetRange("Document No.", "No.");
+                        CertificateOfSupply.SetRange("Document No.", Rec."No.");
                         CertificateOfSupply.Print();
                     end;
                 }
@@ -730,7 +738,7 @@
 
                     trigger OnAction()
                     begin
-                        StartTrackingSite();
+                        Rec.StartTrackingSite();
                     end;
                 }
             }
@@ -747,7 +755,7 @@
 
                     trigger OnAction()
                     begin
-                        RequestStampEDocument();
+                        Rec.RequestStampEDocument();
                     end;
                 }
                 action("Export E-Document as &XML")
@@ -759,7 +767,7 @@
 
                     trigger OnAction()
                     begin
-                        ExportEDocument();
+                        Rec.ExportEDocument();
                     end;
                 }
                 action("&Cancel")
@@ -771,7 +779,7 @@
 
                     trigger OnAction()
                     begin
-                        CancelEDocument();
+                        Rec.CancelEDocument();
                     end;
                 }
                 action("Print Carta Porte Document")
@@ -816,7 +824,7 @@
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
             action("Update Document")
@@ -924,16 +932,16 @@
 
     trigger OnOpenPage()
     begin
-        SetSecurityFilterOnRespCenter();
-        IsBillToCountyVisible := FormatAddress.UseCounty("Bill-to Country/Region Code");
-        IsShipToCountyVisible := FormatAddress.UseCounty("Ship-to Country/Region Code");
-        IsSellToCountyVisible := FormatAddress.UseCounty("Sell-to Country/Region Code");
+        Rec.SetSecurityFilterOnRespCenter();
+        IsBillToCountyVisible := FormatAddress.UseCounty(Rec."Bill-to Country/Region Code");
+        IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
+        IsSellToCountyVisible := FormatAddress.UseCounty(Rec."Sell-to Country/Region Code");
     end;
 
     trigger OnAfterGetRecord()
     begin
-        SellToContact.GetOrClear("Sell-to Contact No.");
-        BillToContact.GetOrClear("Bill-to Contact No.");
+        SellToContact.GetOrClear(Rec."Sell-to Contact No.");
+        BillToContact.GetOrClear(Rec."Bill-to Contact No.");
     end;
 
     var

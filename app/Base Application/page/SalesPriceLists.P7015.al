@@ -1,3 +1,14 @@
+namespace Microsoft.Sales.Pricing;
+
+using Microsoft.Integration.Dataverse;
+using Microsoft.Integration.SyncEngine;
+using Microsoft.Pricing.Asset;
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+
 page 7015 "Sales Price Lists"
 {
     Caption = 'Sales Price Lists';
@@ -7,7 +18,7 @@ page 7015 "Sales Price Lists"
     QueryCategory = 'Sales Price Lists';
     RefreshOnActivate = true;
     SourceTable = "Price List Header";
-    SourceTableView = WHERE("Source Group" = CONST(Customer), "Price Type" = CONST(Sale));
+    SourceTableView = where("Source Group" = const(Customer), "Price Type" = const(Sale));
     ApplicationArea = Basic, Suite;
     UsageCategory = Lists;
 
@@ -271,11 +282,8 @@ page 7015 "Sales Price Lists"
         CurrRec: Record "Price List Header";
         CRMCouplingManagement: Codeunit "CRM Coupling Management";
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
-        [InDataSet]
         CRMIntegrationAllowed: Boolean;
-        [InDataSet]
         CRMIntegrationEnabled: Boolean;
-        [InDataSet]
         CRMIsCoupledToRecord: Boolean;
         StatusActiveFilterApplied: Boolean;
         AllowUpdatingDefaultsFilterApplied: Boolean;

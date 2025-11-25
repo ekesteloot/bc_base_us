@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using Microsoft.InventoryMgt.Setup;
+
 page 8645 "Costing Method Configuration"
 {
     Caption = 'Costing Method Configuration';

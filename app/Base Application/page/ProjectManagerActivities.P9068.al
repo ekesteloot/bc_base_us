@@ -1,3 +1,13 @@
+namespace Microsoft.ProjectMgt.RoleCenters;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.ProjectMgt.Jobs.WIP;
+using System;
+using System.Environment;
+using System.Visualization;
+
 page 9068 "Project Manager Activities"
 {
     Caption = 'Activities';

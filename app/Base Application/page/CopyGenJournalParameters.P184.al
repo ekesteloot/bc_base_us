@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 page 184 "Copy Gen. Journal Parameters"
 {
     Caption = 'Copy Gen. Journal Parameters';
@@ -89,7 +91,7 @@ page 184 "Copy Gen. Journal Parameters"
         InsertRecord();
 
         Rec := CopyGenJournalParameters;
-        Modify(true);
+        Rec.Modify(true);
 
         SourceJnlTemplateName := TempGenJournalBatch."Journal Template Name";
         SourceJnlBatchName := TempGenJournalBatch.Name;
@@ -97,9 +99,9 @@ page 184 "Copy Gen. Journal Parameters"
 
     local procedure InsertRecord()
     begin
-        if not Get() then begin
-            Init();
-            Insert();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

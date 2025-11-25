@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Journal;
+
 codeunit 5644 "FA Reclass. Jnl.-Transfer"
 {
     TableNo = "FA Reclass. Journal Line";
@@ -6,7 +8,7 @@ codeunit 5644 "FA Reclass. Jnl.-Transfer"
     begin
         FAReclassJnlLine.Copy(Rec);
         Code();
-        Copy(FAReclassJnlLine);
+        Rec.Copy(FAReclassJnlLine);
     end;
 
     var

@@ -1,3 +1,9 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Purchases.Payables;
+using System.Utilities;
+
 page 352 "Vendor Purchase Lines"
 {
     Caption = 'Lines';
@@ -27,7 +33,7 @@ page 352 "Vendor Purchase Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period that you want to view.';
                 }
-                field(BalanceDueLCY; "Balance Due (LCY)")
+                field(BalanceDueLCY; Rec."Balance Due (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
@@ -63,7 +69,7 @@ page 352 "Vendor Purchase Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcLine();
     end;
 
@@ -87,7 +93,7 @@ page 352 "Vendor Purchase Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
     end;
 
     var
@@ -142,8 +148,8 @@ page 352 "Vendor Purchase Lines"
     begin
         SetDateFilter();
         Vend.CalcFields("Balance Due (LCY)", "Purchases (LCY)");
-        "Balance Due (LCY)" := Vend."Balance Due (LCY)";
-        "Purchases (LCY)" := Vend."Purchases (LCY)";
+        Rec."Balance Due (LCY)" := Vend."Balance Due (LCY)";
+        Rec."Purchases (LCY)" := Vend."Purchases (LCY)";
 
         OnAfterCalcLine(Vend, Rec);
     end;
@@ -151,9 +157,9 @@ page 352 "Vendor Purchase Lines"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            Vend.SetRange("Date Filter", "Period Start", "Period End")
+            Vend.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            Vend.SetRange("Date Filter", 0D, "Period End");
+            Vend.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     [IntegrationEvent(false, false)]

@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.Reminder;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+
 page 441 "Issued Reminder Statistics"
 {
     Caption = 'Issued Reminder Statistics';
@@ -48,7 +54,7 @@ page 441 "Issued Reminder Statistics"
                 field(ReminderTotal; ReminderTotal)
                 {
                     ApplicationArea = Basic, Suite;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Total';
                     ToolTip = 'Specifies the total amount due on the issued reminder, including interest, VAT, and additional fee.';
@@ -94,29 +100,29 @@ page 441 "Issued Reminder Statistics"
         ReminderLevel: Record "Reminder Level";
         VATInterest: Decimal;
     begin
-        CalcFields("Interest Amount", "VAT Amount", "Add. Fee per Line");
-        ReminderTotal := "Remaining Amount" + "Additional Fee" + "Interest Amount" + "VAT Amount" + "Add. Fee per Line";
-        VatAmount := "VAT Amount";
-        CustPostingGr.Get("Customer Posting Group");
-        if ReminderLevel.Get("Reminder Terms Code", "Reminder Level") then
-            if ReminderLevel."Calculate Interest" and ("VAT Amount" <> 0) then begin
+        Rec.CalcFields("Interest Amount", "VAT Amount", "Add. Fee per Line");
+        ReminderTotal := Rec."Remaining Amount" + Rec."Additional Fee" + Rec."Interest Amount" + Rec."VAT Amount" + Rec."Add. Fee per Line";
+        VatAmount := Rec."VAT Amount";
+        CustPostingGr.Get(Rec."Customer Posting Group");
+        if ReminderLevel.Get(Rec."Reminder Terms Code", Rec."Reminder Level") then
+            if ReminderLevel."Calculate Interest" and (Rec."VAT Amount" <> 0) then begin
                 GLAcc.Get(CustPostingGr."Interest Account");
-                VATPostingSetup.Get("VAT Bus. Posting Group", GLAcc."VAT Prod. Posting Group");
+                VATPostingSetup.Get(Rec."VAT Bus. Posting Group", GLAcc."VAT Prod. Posting Group");
                 OnAfterGetVATPostingSetup(VATPostingSetup);
                 VATInterest := VATPostingSetup."VAT %";
                 if GLAcc.Get(CustPostingGr."Additional Fee Account") then begin
-                    VATPostingSetup.Get("VAT Bus. Posting Group", GLAcc."VAT Prod. Posting Group");
+                    VATPostingSetup.Get(Rec."VAT Bus. Posting Group", GLAcc."VAT Prod. Posting Group");
                     OnAfterGetVATPostingSetup(VATPostingSetup);
                 end;
                 Interest :=
                   (ReminderTotal -
-                   "Remaining Amount" - ("Additional Fee" + "Add. Fee per Line") * (VATPostingSetup."VAT %" / 100 + 1)) /
+                   Rec."Remaining Amount" - (Rec."Additional Fee" + Rec."Add. Fee per Line") * (VATPostingSetup."VAT %" / 100 + 1)) /
                   (VATInterest / 100 + 1);
-                VatAmount := Interest * VATInterest / 100 + "Additional Fee" * VATPostingSetup."VAT %" / 100 + CalculateLineFeeVATAmount();
+                VatAmount := Interest * VATInterest / 100 + Rec."Additional Fee" * VATPostingSetup."VAT %" / 100 + Rec.CalculateLineFeeVATAmount();
             end else
-                Interest := "Interest Amount";
+                Interest := Rec."Interest Amount";
 
-        if Cust.Get("Customer No.") then
+        if Cust.Get(Rec."Customer No.") then
             Cust.CalcFields("Balance (LCY)")
         else
             Clear(Cust);

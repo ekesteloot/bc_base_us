@@ -16,7 +16,7 @@ page 7604 "Base Calendar Entries Subform"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(CurrentCalendarCode; "Base Calendar Code")
+                field(CurrentCalendarCode; Rec."Base Calendar Code")
                 {
                     ApplicationArea = Suite;
                     Caption = 'Base Calendar Code';
@@ -24,21 +24,21 @@ page 7604 "Base Calendar Entries Subform"
                     ToolTip = 'Specifies which base calendar was used as the basis.';
                     Visible = false;
                 }
-                field("Period Start"; Date)
+                field("Period Start"; Rec.Date)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Date';
                     Editable = false;
                     ToolTip = 'Specifies the date.';
                 }
-                field("Period Name"; Day)
+                field("Period Name"; Rec.Day)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Day';
                     Editable = false;
                     ToolTip = 'Specifies the day of the week.';
                 }
-                field(WeekNo; Date2DWY(Date, 2))
+                field(WeekNo; Date2DWY(Rec.Date, 2))
                 {
                     ApplicationArea = Suite;
                     Caption = 'Week No.';
@@ -46,7 +46,7 @@ page 7604 "Base Calendar Entries Subform"
                     ToolTip = 'Specifies the week number for the calendar entries.';
                     Visible = false;
                 }
-                field(Nonworking; Nonworking)
+                field(Nonworking; Rec.Nonworking)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Nonworking';
@@ -79,7 +79,7 @@ page 7604 "Base Calendar Entries Subform"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get(DateRec."Period Type"::Date, Date) then;
+        if DateRec.Get(DateRec."Period Type"::Date, Rec.Date) then;
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -123,10 +123,10 @@ page 7604 "Base Calendar Entries Subform"
 
     local procedure FindLine(TargetDate: Date) FoundLine: Boolean;
     begin
-        Reset();
-        SetRange(Date, TargetDate);
-        FoundLine := FindFirst();
-        Reset();
+        Rec.Reset();
+        Rec.SetRange(Date, TargetDate);
+        FoundLine := Rec.FindFirst();
+        Rec.Reset();
     end;
 
     local procedure InsertLine(): Boolean;
@@ -134,10 +134,10 @@ page 7604 "Base Calendar Entries Subform"
         if CurrCalendarChange.IsBlankSource() then
             exit;
         Rec := CurrCalendarChange;
-        Date := DateRec."Period Start";
-        Day := DateRec."Period No.";
+        Rec.Date := DateRec."Period Start";
+        Rec.Day := DateRec."Period No.";
         CalendarMgmt.CheckDateStatus(Rec);
-        exit(Insert());
+        exit(Rec.Insert());
     end;
 
     procedure SetCalendarSource(BaseCalendar: Record "Base Calendar")
@@ -152,16 +152,16 @@ page 7604 "Base Calendar Entries Subform"
         BaseCalendarChange: Record "Base Calendar Change";
     begin
         BaseCalendarChange.Reset();
-        BaseCalendarChange.SetRange("Base Calendar Code", "Base Calendar Code");
-        BaseCalendarChange.SetRange(Date, Date);
+        BaseCalendarChange.SetRange("Base Calendar Code", Rec."Base Calendar Code");
+        BaseCalendarChange.SetRange(Date, Rec.Date);
         if BaseCalendarChange.FindFirst() then
             BaseCalendarChange.Delete();
         BaseCalendarChange.Init();
-        BaseCalendarChange."Base Calendar Code" := "Base Calendar Code";
-        BaseCalendarChange.Date := Date;
-        BaseCalendarChange.Description := Description;
-        BaseCalendarChange.Nonworking := Nonworking;
-        BaseCalendarChange.Day := Day;
+        BaseCalendarChange."Base Calendar Code" := Rec."Base Calendar Code";
+        BaseCalendarChange.Date := Rec.Date;
+        BaseCalendarChange.Description := Rec.Description;
+        BaseCalendarChange.Nonworking := Rec.Nonworking;
+        BaseCalendarChange.Day := Rec.Day;
         OnUpdateBaseCalendarChanges(BaseCalendarChange, Rec);
         BaseCalendarChange.Insert();
     end;

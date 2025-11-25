@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item;
+
 page 5733 "Item Category Card"
 {
     Caption = 'Item Category Card';
@@ -13,7 +15,7 @@ page 5733 "Item Category Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     NotBlank = true;
@@ -21,8 +23,8 @@ page 5733 "Item Category Card"
 
                     trigger OnValidate()
                     begin
-                        if (xRec.Code <> '') and (xRec.Code <> Code) then
-                            CurrPage.Attributes.PAGE.SaveAttributes(Code);
+                        if (xRec.Code <> '') and (xRec.Code <> Rec.Code) then
+                            CurrPage.Attributes.PAGE.SaveAttributes(Rec.Code);
                     end;
                 }
                 field(Description; Rec.Description)
@@ -37,7 +39,7 @@ page 5733 "Item Category Card"
 
                     trigger OnValidate()
                     begin
-                        if (Code <> '') and ("Parent Category" <> xRec."Parent Category") then
+                        if (Rec.Code <> '') and (Rec."Parent Category" <> xRec."Parent Category") then
                             PersistCategoryAttributes();
                     end;
                 }
@@ -65,8 +67,8 @@ page 5733 "Item Category Card"
 
                 trigger OnAction()
                 begin
-                    if Confirm(StrSubstNo(DeleteQst, Code)) then
-                        Delete(true);
+                    if Confirm(StrSubstNo(DeleteQst, Rec.Code)) then
+                        Rec.Delete(true);
                 end;
             }
         }
@@ -85,27 +87,27 @@ page 5733 "Item Category Card"
 
     trigger OnAfterGetRecord()
     begin
-        if Code <> '' then
-            CurrPage.Attributes.PAGE.LoadAttributes(Code);
+        if Rec.Code <> '' then
+            CurrPage.Attributes.PAGE.LoadAttributes(Rec.Code);
 
-        CanDelete := not HasChildren();
+        CanDelete := not Rec.HasChildren();
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        CurrPage.Attributes.PAGE.SetItemCategoryCode(Code);
+        CurrPage.Attributes.PAGE.SetItemCategoryCode(Rec.Code);
     end;
 
     trigger OnOpenPage()
     begin
-        if Code <> '' then
-            CurrPage.Attributes.PAGE.LoadAttributes(Code);
+        if Rec.Code <> '' then
+            CurrPage.Attributes.PAGE.LoadAttributes(Rec.Code);
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if Code <> '' then
-            CurrPage.Attributes.PAGE.SaveAttributes(Code);
+        if Rec.Code <> '' then
+            CurrPage.Attributes.PAGE.SaveAttributes(Rec.Code);
 
         ItemCategoryManagement.CheckPresentationOrder();
     end;
@@ -117,8 +119,8 @@ page 5733 "Item Category Card"
 
     local procedure PersistCategoryAttributes()
     begin
-        CurrPage.Attributes.PAGE.SaveAttributes(Code);
-        CurrPage.Attributes.PAGE.LoadAttributes(Code);
+        CurrPage.Attributes.PAGE.SaveAttributes(Rec.Code);
+        CurrPage.Attributes.PAGE.LoadAttributes(Rec.Code);
         CurrPage.Update(true);
     end;
 }

@@ -1,4 +1,11 @@
-﻿codeunit 415 "Release Purchase Document"
+﻿namespace Microsoft.Purchases.Document;
+
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Purchases.Setup;
+
+codeunit 415 "Release Purchase Document"
 {
     TableNo = "Purchase Header";
     Permissions = TableData "Purchase Header" = rm,
@@ -142,7 +149,7 @@
             exit;
 
         InvtSetup.Get();
-        PurchaseLine.SetRange(Type, "Purchase Line Type"::Item);
+        PurchaseLine.SetRange(Type, PurchaseLine.Type::Item);
         if PurchaseLine.FindSet() then
             repeat
                 if InvtSetup."Location Mandatory" then

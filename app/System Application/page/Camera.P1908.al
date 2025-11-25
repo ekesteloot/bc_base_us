@@ -3,6 +3,10 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Device;
+
+using System.Utilities;
+
 /// <summary>
 /// Provides an interface for accessing the camera on the client device.
 /// </summary>
@@ -38,7 +42,7 @@ page 1908 Camera
             {
                 Caption = 'Could not connect to camera';
                 InstructionalText = 'Could not access the camera on the device. Make sure that you are using the app for Windows, Android, or iOS.';
-                Visible = NOT CameraAvailable;
+                Visible = not CameraAvailable;
             }
         }
     }
@@ -48,7 +52,6 @@ page 1908 Camera
         [RunOnClient]
         [WithEvents]
         CameraProvider: DotNet CameraProvider;
-        [InDataSet]
         CameraAvailable: Boolean;
 
 

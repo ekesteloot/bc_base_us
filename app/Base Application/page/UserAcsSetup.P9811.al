@@ -1,7 +1,13 @@
+﻿namespace System.Security.User;
+
+using System;
+using System.Environment;
+using System.Security.AccessControl;
+
 page 9811 "User ACS Setup"
 {
     Caption = 'User ACS Setup';
-    DataCaptionExpression = "Full Name";
+    DataCaptionExpression = Rec."Full Name";
     DeleteAllowed = false;
     InsertAllowed = false;
     ModifyAllowed = true;
@@ -68,8 +74,8 @@ page 9811 "User ACS Setup"
 
                     AuthenticationID := Convert.ToBase64String(UTF8Encoding.GetBytes(CreatedGuid));
 
-                    IdentityManagement.SetAuthenticationKey("User Security ID", AuthenticationID);
-                    ACSStatus := IdentityManagement.GetACSStatus("User Security ID");
+                    IdentityManagement.SetAuthenticationKey(Rec."User Security ID", AuthenticationID);
+                    ACSStatus := IdentityManagement.GetACSStatus(Rec."User Security ID");
 
                     CurrPage.Update();
                 end;
@@ -93,28 +99,26 @@ page 9811 "User ACS Setup"
         UserPermissions: Codeunit "User Permissions";
         EnvironmentInfo: Codeunit "Environment Information";
     begin
-        if ("User Security ID" <> UserSecurityId()) and EnvironmentInfo.IsSaaS() then
+        if (Rec."User Security ID" <> UserSecurityId()) and EnvironmentInfo.IsSaaS() then
             if not UserPermissions.CanManageUsersOnTenant(UserSecurityID()) then
                 error(CannotEditForOtherUsersErr);
     end;
 
     trigger OnAfterGetRecord()
     begin
-        NameID := IdentityManagement.GetNameIdentifier("User Security ID");
-        ACSStatus := IdentityManagement.GetACSStatus("User Security ID");
-        AuthenticationID := IdentityManagement.GetAuthenticationKey("User Security ID");
+        NameID := IdentityManagement.GetNameIdentifier(Rec."User Security ID");
+        ACSStatus := IdentityManagement.GetACSStatus(Rec."User Security ID");
+        AuthenticationID := IdentityManagement.GetAuthenticationKey(Rec."User Security ID");
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        IdentityManagement.SetAuthenticationKey("User Security ID", AuthenticationID);
+        IdentityManagement.SetAuthenticationKey(Rec."User Security ID", AuthenticationID);
     end;
 
     var
         IdentityManagement: Codeunit "Identity Management";
-        [InDataSet]
         NameID: Text[250];
-        [InDataSet]
         AuthenticationID: Text[80];
         ACSStatus: Option Disabled,Pending,Registered,Unknown;
         CannotEditForOtherUsersErr: Label 'You can only change your own ACS setup.';

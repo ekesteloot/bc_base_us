@@ -1,3 +1,8 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Setup;
+
 page 729 "Copy Item"
 {
     Caption = 'Copy Item';
@@ -14,7 +19,7 @@ page 729 "Copy Item"
             group(Options)
             {
                 Caption = 'Options';
-                field(SourceItemNo; "Source Item No.")
+                field(SourceItemNo; Rec."Source Item No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Source Item No.';
@@ -23,7 +28,7 @@ page 729 "Copy Item"
                     TableRelation = Item;
                     ToolTip = 'Specifies the number of the item that you want to copy the data from.';
                 }
-                field(TargetItemNo; "Target Item No.")
+                field(TargetItemNo; Rec."Target Item No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Target Item No.';
@@ -31,11 +36,11 @@ page 729 "Copy Item"
 
                     trigger OnValidate()
                     begin
-                        if "Target Item No." <> '' then
-                            "Target No. Series" := '';
+                        if Rec."Target Item No." <> '' then
+                            Rec."Target No. Series" := '';
                     end;
                 }
-                field(TargetNoSeries; "Target No. Series")
+                field(TargetNoSeries; Rec."Target No. Series")
                 {
                     ApplicationArea = Basic, Suite;
                     AssistEdit = true;
@@ -47,11 +52,11 @@ page 729 "Copy Item"
                     begin
                         InventorySetup.Get();
                         InventorySetup.TestField("Item Nos.");
-                        NoSeriesMgt.SelectSeries(InventorySetup."Item Nos.", SourceItem."No. Series", "Target No. Series");
-                        "Target Item No." := '';
+                        NoSeriesMgt.SelectSeries(InventorySetup."Item Nos.", SourceItem."No. Series", Rec."Target No. Series");
+                        Rec."Target Item No." := '';
                     end;
                 }
-                field(NumberOfCopies; "Number of Copies")
+                field(NumberOfCopies; Rec."Number of Copies")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Number of Copies';
@@ -62,32 +67,32 @@ page 729 "Copy Item"
             group(General)
             {
                 Caption = 'General';
-                field(GeneralItemInformation; "General Item Information")
+                field(GeneralItemInformation; Rec."General Item Information")
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     Caption = 'General Item Information';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(UnitsOfMeasure; "Units of Measure")
+                field(UnitsOfMeasure; Rec."Units of Measure")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Units of measure';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(Dimensions; Dimensions)
+                field(Dimensions; Rec.Dimensions)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Dimensions';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(Picture; Picture)
+                field(Picture; Rec.Picture)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Picture';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(Comments; Comments)
+                field(Comments; Rec.Comments)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Comments';
@@ -97,13 +102,13 @@ page 729 "Copy Item"
             group(Sale)
             {
                 Caption = 'Sale';
-                field(SalesPrices; "Sales Prices")
+                field(SalesPrices; Rec."Sales Prices")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Prices';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(SalesLineDisc; "Sales Line Discounts")
+                field(SalesLineDisc; Rec."Sales Line Discounts")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Line Disc.';
@@ -113,13 +118,13 @@ page 729 "Copy Item"
             group(Purchase)
             {
                 Caption = 'Purchase';
-                field(PurchasePrices; "Purchase Prices")
+                field(PurchasePrices; Rec."Purchase Prices")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Purchase Prices';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(PurchaseLineDisc; "Purchase Line Discounts")
+                field(PurchaseLineDisc; Rec."Purchase Line Discounts")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Purchase Line Disc.';
@@ -129,13 +134,13 @@ page 729 "Copy Item"
             group(Service)
             {
                 Caption = 'Service';
-                field(Troubleshooting; Troubleshooting)
+                field(Troubleshooting; Rec.Troubleshooting)
                 {
                     ApplicationArea = Service;
                     Caption = 'Troubleshooting';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(ResourceSkills; "Resource Skills")
+                field(ResourceSkills; Rec."Resource Skills")
                 {
                     ApplicationArea = Service;
                     Caption = 'Resource Skills';
@@ -145,55 +150,43 @@ page 729 "Copy Item"
             group(Extended)
             {
                 Caption = 'Extended';
-                field(ItemVariants; "Item Variants")
+                field(ItemVariants; Rec."Item Variants")
                 {
                     ApplicationArea = Planning;
                     Caption = 'Item Variants';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(Translations; Translations)
+                field(Translations; Rec.Translations)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Translations';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(ExtendedTexts; "Extended Texts")
+                field(ExtendedTexts; Rec."Extended Texts")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Extended Texts';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(BOMComponents; "BOM Components")
+                field(BOMComponents; Rec."BOM Components")
                 {
                     ApplicationArea = Assembly, Manufacturing;
                     Caption = 'Assembly BOM Components';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(ItemVendors; "Item Vendors")
+                field(ItemVendors; Rec."Item Vendors")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item Vendors';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-                field(Attributes; Attributes)
+                field(Attributes; Rec.Attributes)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Attributes';
                     ToolTip = 'Specifies if the selected data type if also copied to the new item.';
                 }
-#if not CLEAN20
-                field(ItemCrossReferences; "Item Cross References")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Visible = false;
-                    Caption = 'Item Cross References';
-                    ToolTip = 'Specifies if the selected data type if also copied to the new item.';
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Replaced with parameter Item References';
-                    ObsoleteTag = '20.0';
-                }
-#endif                
-                field(ItemReferences; "Item References")
+                field(ItemReferences; Rec."Item References")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item References';
@@ -235,17 +228,17 @@ page 729 "Copy Item"
 
     local procedure InitCopyItemBuffer()
     begin
-        Init();
+        Rec.Init();
         if CopyItemParameters.Get(UserId()) then
-            TransferFields(CopyItemParameters)
+            Rec.TransferFields(CopyItemParameters)
         else begin
-            "Number of Copies" := 1;
+            Rec."Number of Copies" := 1;
             InventorySetup.Get();
-            "Target No. Series" := InventorySetup."Item Nos.";
+            Rec."Target No. Series" := InventorySetup."Item Nos.";
         end;
-        "Source Item No." := TempItem."No.";
+        Rec."Source Item No." := TempItem."No.";
         Rec."General Item Information" := true;
-        Insert();
+        Rec.Insert();
 
         OnAfterInitCopyItemBuffer(Rec);
     end;
@@ -256,7 +249,7 @@ page 729 "Copy Item"
     begin
         CheckTargetItemNo();
 
-        if ("Target Item No." = '') and ("Target No. Series" = '') then
+        if (Rec."Target Item No." = '') and (Rec."Target No. Series" = '') then
             Error(SpecifyTargetItemNoErr);
 
         CurrUserId := CopyStr(UserId(), 1, MaxStrLen(CopyItemParameters."User ID"));
@@ -280,9 +273,9 @@ page 729 "Copy Item"
 
     local procedure CheckTargetItemNo()
     begin
-        if ("Number of Copies" > 1) and ("Target Item No." <> '') then
-            if INCSTR("Target Item No.") = '' then
-                Error(StrSubstNo(UnincrementableStringErr, TargetItemNoTxt));
+        if (Rec."Number of Copies" > 1) and (Rec."Target Item No." <> '') then
+            if INCSTR(Rec."Target Item No.") = '' then
+                Error(UnincrementableStringErr, TargetItemNoTxt);
     end;
 
     [IntegrationEvent(false, false)]

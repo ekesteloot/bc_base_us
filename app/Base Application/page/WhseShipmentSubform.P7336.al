@@ -1,3 +1,13 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.Sales.Document;
+using Microsoft.WarehouseMgt.CrossDock;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7336 "Whse. Shipment Subform"
 {
     AutoSplitKey = true;
@@ -196,7 +206,7 @@ page 7336 "Whse. Shipment Subform"
 
                     trigger OnDrillDown()
                     begin
-                        CrossDockMgt.ShowBinContentsCrossDocked("Item No.", "Variant Code", "Unit of Measure Code", "Location Code", true);
+                        CrossDockMgt.ShowBinContentsCrossDocked(Rec."Item No.", Rec."Variant Code", Rec."Unit of Measure Code", Rec."Location Code", true);
                     end;
                 }
                 field(QtyCrossDockedUOMBase; QtyCrossDockedUOMBase)
@@ -210,7 +220,7 @@ page 7336 "Whse. Shipment Subform"
 
                     trigger OnDrillDown()
                     begin
-                        CrossDockMgt.ShowBinContentsCrossDocked("Item No.", "Variant Code", "Unit of Measure Code", "Location Code", true);
+                        CrossDockMgt.ShowBinContentsCrossDocked(Rec."Item No.", Rec."Variant Code", Rec."Unit of Measure Code", Rec."Location Code", true);
                     end;
                 }
                 field(QtyCrossDockedAllUOMBase; QtyCrossDockedAllUOMBase)
@@ -224,10 +234,10 @@ page 7336 "Whse. Shipment Subform"
 
                     trigger OnDrillDown()
                     begin
-                        CrossDockMgt.ShowBinContentsCrossDocked("Item No.", "Variant Code", "Unit of Measure Code", "Location Code", false);
+                        CrossDockMgt.ShowBinContentsCrossDocked(Rec."Item No.", Rec."Variant Code", Rec."Unit of Measure Code", Rec."Location Code", false);
                     end;
                 }
-                field(Control3; "Assemble to Order")
+                field(Control3; Rec."Assemble to Order")
                 {
                     ApplicationArea = Assembly;
                     ToolTip = 'Specifies if the warehouse shipment line is for items that are assembled to a sales order before it is shipped.';
@@ -292,7 +302,7 @@ page 7336 "Whse. Shipment Subform"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
                 action("Assemble to Order")
@@ -314,9 +324,9 @@ page 7336 "Whse. Shipment Subform"
                         if IsHandled then
                             exit;
 
-                        TestField("Assemble to Order", true);
-                        TestField("Source Type", DATABASE::"Sales Line");
-                        ATOSalesLine.Get("Source Subtype", "Source No.", "Source Line No.");
+                        Rec.TestField("Assemble to Order", true);
+                        Rec.TestField("Source Type", Enum::TableID::"Sales Line");
+                        ATOSalesLine.Get(Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.");
                         ATOLink.ShowAsm(ATOSalesLine);
                     end;
                 }
@@ -326,12 +336,12 @@ page 7336 "Whse. Shipment Subform"
 
     trigger OnAfterGetRecord()
     begin
-        CrossDockMgt.CalcCrossDockedItems("Item No.", "Variant Code", "Unit of Measure Code", "Location Code",
+        CrossDockMgt.CalcCrossDockedItems(Rec."Item No.", Rec."Variant Code", Rec."Unit of Measure Code", Rec."Location Code",
           QtyCrossDockedUOMBase,
           QtyCrossDockedAllUOMBase);
         QtyCrossDockedUOM := 0;
-        if "Qty. per Unit of Measure" <> 0 then
-            QtyCrossDockedUOM := Round(QtyCrossDockedUOMBase / "Qty. per Unit of Measure", UOMMgt.QtyRndPrecision());
+        if Rec."Qty. per Unit of Measure" <> 0 then
+            QtyCrossDockedUOM := Round(QtyCrossDockedUOMBase / Rec."Qty. per Unit of Measure", UOMMgt.QtyRndPrecision());
     end;
 
     trigger OnDeleteRecord(): Boolean
@@ -346,12 +356,11 @@ page 7336 "Whse. Shipment Subform"
         QtyCrossDockedUOM: Decimal;
         QtyCrossDockedAllUOMBase: Decimal;
         QtyCrossDockedUOMBase: Decimal;
-        [InDataSet]
         HideBinFields: Boolean;
 
     local procedure ShowSourceLine()
     begin
-        WMSMgt.ShowSourceDocLine("Source Type", "Source Subtype", "Source No.", "Source Line No.", 0);
+        WMSMgt.ShowSourceDocLine(Rec."Source Type", Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.", 0);
     end;
 
     local procedure ShowSourceAttachedLines()
@@ -371,8 +380,8 @@ page 7336 "Whse. Shipment Subform"
     begin
         WhseShptLine.Copy(Rec);
         CODEUNIT.Run(CODEUNIT::"Whse.-Post Shipment (Yes/No)", WhseShptLine);
-        Reset();
-        SetCurrentKey("No.", "Sorting Sequence No.");
+        Rec.Reset();
+        Rec.SetCurrentKey("No.", "Sorting Sequence No.");
         CurrPage.Update(false);
     end;
 
@@ -392,8 +401,8 @@ page 7336 "Whse. Shipment Subform"
     begin
         WhseShptLine.Copy(Rec);
         CODEUNIT.Run(CODEUNIT::"Whse.-Post Shipment + Print", WhseShptLine);
-        Reset();
-        SetCurrentKey("No.", "Sorting Sequence No.");
+        Rec.Reset();
+        Rec.SetCurrentKey("No.", "Sorting Sequence No.");
         CurrPage.Update(false);
     end;
 
@@ -402,8 +411,8 @@ page 7336 "Whse. Shipment Subform"
         WhseShptLine: Record "Warehouse Shipment Line";
     begin
         WhseShptLine.Copy(Rec);
-        WhseShptLine.SetRange("No.", "No.");
-        AutofillQtyToHandle(WhseShptLine);
+        WhseShptLine.SetRange("No.", Rec."No.");
+        Rec.AutofillQtyToHandle(WhseShptLine);
     end;
 
     procedure DeleteQtyToHandle()
@@ -411,15 +420,15 @@ page 7336 "Whse. Shipment Subform"
         WhseShptLine: Record "Warehouse Shipment Line";
     begin
         WhseShptLine.Copy(Rec);
-        WhseShptLine.SetRange("No.", "No.");
-        DeleteQtyToHandle(WhseShptLine);
+        WhseShptLine.SetRange("No.", Rec."No.");
+        Rec.DeleteQtyToHandle(WhseShptLine);
     end;
 
     local procedure ShowBinContents()
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", "Bin Code");
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", Rec."Bin Code");
     end;
 
     procedure PickCreate()
@@ -434,7 +443,7 @@ page 7336 "Whse. Shipment Subform"
         WhseShptHeader.Get(WhseShptLine."No.");
         if WhseShptHeader.Status = WhseShptHeader.Status::Open then
             ReleaseWhseShipment.Release(WhseShptHeader);
-        CreatePickDoc(WhseShptLine, WhseShptHeader);
+        Rec.CreatePickDoc(WhseShptLine, WhseShptHeader);
 
         OnAfterPickCreate(WhseShptLine);
     end;

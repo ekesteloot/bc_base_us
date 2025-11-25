@@ -1,4 +1,16 @@
-﻿report 394 "Suggest Employee Payments"
+﻿namespace Microsoft.HumanResources.Payables;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Employee;
+
+report 394 "Suggest Employee Payments"
 {
     Caption = 'Suggest Employee Payments';
     ProcessingOnly = true;
@@ -7,7 +19,7 @@
     {
         dataitem(Employee; Employee)
         {
-            DataItemTableView = SORTING("No.") WHERE("Privacy Blocked" = CONST(false));
+            DataItemTableView = sorting("No.") where("Privacy Blocked" = const(false));
             RequestFilterFields = "No.";
 
             trigger OnAfterGetRecord()
@@ -336,7 +348,6 @@
         BalAccNo: Code[20];
         MessageText: Text;
         GenJnlLineInserted: Boolean;
-        [InDataSet]
         SummarizePerDimTextEnable: Boolean;
         ShowPostingDateWarning: Boolean;
         EmployeeBalance: Decimal;

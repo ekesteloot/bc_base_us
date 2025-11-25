@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Interaction;
+
 page 5084 "Content Preview"
 {
     Caption = 'Content Preview';

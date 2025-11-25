@@ -1,14 +1,14 @@
 report 1102 "Resource Journal - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ProjectMgt/Resources/ResourceJournalTest.rdlc';
+    RDLCLayout = './ProjectMgt/Resources/Reports/ResourceJournalTest.rdlc';
     Caption = 'Resource Journal - Test';
 
     dataset
     {
         dataitem("Res. Journal Batch"; "Res. Journal Batch")
         {
-            DataItemTableView = SORTING("Journal Template Name", Name);
+            DataItemTableView = sorting("Journal Template Name", Name);
             RequestFilterFields = "Journal Template Name", Name;
             column(JnlTemplateName_ResJnlBatch; "Journal Template Name")
             {
@@ -18,8 +18,8 @@ report 1102 "Resource Journal - Test"
             }
             dataitem("Res. Journal Line"; "Res. Journal Line")
             {
-                DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name);
-                DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+                DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name);
+                DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
                 RequestFilterFields = "Posting Date";
                 column(CompName; COMPANYPROPERTY.DisplayName())
                 {
@@ -122,7 +122,7 @@ report 1102 "Resource Journal - Test"
                 }
                 dataitem(DimensionLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -169,7 +169,7 @@ report 1102 "Resource Journal - Test"
                 }
                 dataitem(ErrorLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorTextNumber; ErrorText[Number])
                     {
                     }

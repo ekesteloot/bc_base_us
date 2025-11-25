@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.FixedAssets.FixedAsset;
+
 codeunit 5638 FAJnlManagement
 {
     Permissions = TableData "FA Journal Template" = rimd,

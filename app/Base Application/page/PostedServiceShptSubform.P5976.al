@@ -1,3 +1,9 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Loaner;
+
 page 5976 "Posted Service Shpt. Subform"
 {
     AutoSplitKey = true;
@@ -75,7 +81,7 @@ page 5976 "Posted Service Shpt. Subform"
 
                     trigger OnDrillDown()
                     begin
-                        ShowComments(1);
+                        Rec.ShowComments(1);
                     end;
                 }
                 field("Resolution Comment"; Rec."Resolution Comment")
@@ -86,7 +92,7 @@ page 5976 "Posted Service Shpt. Subform"
 
                     trigger OnDrillDown()
                     begin
-                        ShowComments(2);
+                        Rec.ShowComments(2);
                     end;
                 }
                 field("Service Shelf No."; Rec."Service Shelf No.")
@@ -95,7 +101,7 @@ page 5976 "Posted Service Shpt. Subform"
                     ToolTip = 'Specifies the number of the service shelf where the service item is stored while it is in the repair shop.';
                     Visible = false;
                 }
-                field(Warranty; Warranty)
+                field(Warranty; Rec.Warranty)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that there is a warranty on either parts or labor for this service item.';
@@ -177,7 +183,7 @@ page 5976 "Posted Service Shpt. Subform"
                     ToolTip = 'Specifies the resolution code assigned to this item.';
                     Visible = false;
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the service priority for this posted service item.';
@@ -261,7 +267,7 @@ page 5976 "Posted Service Shpt. Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 group("Co&mments")
@@ -277,7 +283,7 @@ page 5976 "Posted Service Shpt. Subform"
 
                         trigger OnAction()
                         begin
-                            ShowComments(1);
+                            Rec.ShowComments(1);
                         end;
                     }
                     action(Resolutions)
@@ -289,7 +295,7 @@ page 5976 "Posted Service Shpt. Subform"
 
                         trigger OnAction()
                         begin
-                            ShowComments(2);
+                            Rec.ShowComments(2);
                         end;
                     }
                     action(Internal)
@@ -301,7 +307,7 @@ page 5976 "Posted Service Shpt. Subform"
 
                         trigger OnAction()
                         begin
-                            ShowComments(4);
+                            Rec.ShowComments(4);
                         end;
                     }
                     action(Accessories)
@@ -313,7 +319,7 @@ page 5976 "Posted Service Shpt. Subform"
 
                         trigger OnAction()
                         begin
-                            ShowComments(3);
+                            Rec.ShowComments(3);
                         end;
                     }
                     action("Lent Loaners")
@@ -324,7 +330,7 @@ page 5976 "Posted Service Shpt. Subform"
 
                         trigger OnAction()
                         begin
-                            ShowComments(5);
+                            Rec.ShowComments(5);
                         end;
                     }
                 }
@@ -388,12 +394,12 @@ page 5976 "Posted Service Shpt. Subform"
         ServShipmentLine: Record "Service Shipment Line";
         ServShipmentLines: Page "Posted Service Shipment Lines";
     begin
-        TestField("No.");
+        Rec.TestField("No.");
         Clear(ServShipmentLine);
-        ServShipmentLine.SetRange("Document No.", "No.");
+        ServShipmentLine.SetRange("Document No.", Rec."No.");
         ServShipmentLine.FilterGroup(2);
         Clear(ServShipmentLines);
-        ServShipmentLines.Initialize("Line No.");
+        ServShipmentLines.Initialize(Rec."Line No.");
         ServShipmentLines.SetTableView(ServShipmentLine);
         ServShipmentLines.RunModal();
         ServShipmentLine.FilterGroup(0);
@@ -408,10 +414,10 @@ page 5976 "Posted Service Shpt. Subform"
     var
         ServItemLog: Record "Service Item Log";
     begin
-        if "Service Item No." = '' then
+        if Rec."Service Item No." = '' then
             Error(Text000);
         Clear(ServItemLog);
-        ServItemLog.SetRange("Service Item No.", "Service Item No.");
+        ServItemLog.SetRange("Service Item No.", Rec."Service Item No.");
         PAGE.RunModal(PAGE::"Service Item Log", ServItemLog);
     end;
 }

@@ -17,7 +17,7 @@ page 10052 "Service Order Stats."
                 field("TotalServLine[1].""Line Amount"""; TotalServLine[1]."Line Amount")
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text002, false);
                     Editable = false;
@@ -25,7 +25,7 @@ page 10052 "Service Order Stats."
                 field("TotalServLine[1].""Inv. Discount Amount"""; TotalServLine[1]."Inv. Discount Amount")
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     Editable = false;
@@ -39,7 +39,7 @@ page 10052 "Service Order Stats."
                 field("TotalAmount1[1]"; TotalAmount1[1])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, false);
                     Editable = false;
@@ -52,7 +52,7 @@ page 10052 "Service Order Stats."
                 field(TaxAmount; VATAmount[1])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Tax Amount';
                     Editable = false;
@@ -61,7 +61,7 @@ page 10052 "Service Order Stats."
                 field("TotalAmount2[1]"; TotalAmount2[1])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, true);
                     Editable = false;
@@ -220,7 +220,7 @@ page 10052 "Service Order Stats."
                 field("TotalServLine[2].""Line Amount"""; TotalServLine[2]."Line Amount")
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text002, false);
                     Editable = false;
@@ -229,7 +229,7 @@ page 10052 "Service Order Stats."
                 field("TotalServLine[2].""Inv. Discount Amount"""; TotalServLine[2]."Inv. Discount Amount")
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     Editable = false;
@@ -243,7 +243,7 @@ page 10052 "Service Order Stats."
                 field("TotalAmount1[2]"; TotalAmount1[2])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, false);
                     Editable = false;
@@ -257,7 +257,7 @@ page 10052 "Service Order Stats."
                 field("VATAmount[2]"; VATAmount[2])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = Format(VATAmountText[2]);
                     Editable = false;
@@ -266,7 +266,7 @@ page 10052 "Service Order Stats."
                 field("TotalAmount2[2]"; TotalAmount2[2])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, true);
                     Editable = false;
@@ -338,7 +338,7 @@ page 10052 "Service Order Stats."
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupAdjmtValueEntries(1);
+                        Rec.LookupAdjmtValueEntries(1);
                     end;
                 }
                 label(Control1480102)
@@ -357,7 +357,7 @@ page 10052 "Service Order Stats."
                 field(Control1480100; TotalServLine[2]."Line Amount")
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text002, false);
                     Editable = false;
@@ -366,7 +366,7 @@ page 10052 "Service Order Stats."
                 field("Inv. Discount Amount"; TotalServLine[2]."Inv. Discount Amount")
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     Editable = false;
@@ -380,7 +380,7 @@ page 10052 "Service Order Stats."
                 field(Control1480098; TotalAmount1[2])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, false);
                     Editable = false;
@@ -394,7 +394,7 @@ page 10052 "Service Order Stats."
                 field(Control1480097; VATAmount[2])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = Format(VATAmountText[2]);
                     Editable = false;
@@ -403,7 +403,7 @@ page 10052 "Service Order Stats."
                 field(Control1480096; TotalAmount2[2])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, true);
                     Editable = false;
@@ -427,7 +427,7 @@ page 10052 "Service Order Stats."
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupAdjmtValueEntries(1);
+                        Rec.LookupAdjmtValueEntries(1);
                     end;
                 }
                 field("ProfitLCY[2] + ProfitLCY[4]"; ProfitLCY[2] + ProfitLCY[4])
@@ -528,7 +528,7 @@ page 10052 "Service Order Stats."
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupAdjmtValueEntries(1);
+                        Rec.LookupAdjmtValueEntries(1);
                     end;
                 }
                 field("Cost (LCY)"; (TotalAdjCostLCY[2] - TotalServLineLCY[2]."Unit Cost (LCY)") + (TotalAdjCostLCY[4] - TotalServLineLCY[4]."Unit Cost (LCY)"))
@@ -546,7 +546,7 @@ page 10052 "Service Order Stats."
                 field("TotalServLine[3].""Line Amount"""; TotalServLine[3]."Line Amount")
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text002, false);
                     Editable = false;
@@ -554,7 +554,7 @@ page 10052 "Service Order Stats."
                 field("TotalServLine[3].""Inv. Discount Amount"""; TotalServLine[3]."Inv. Discount Amount")
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     Editable = false;
@@ -563,7 +563,7 @@ page 10052 "Service Order Stats."
                 field("TotalAmount1[3]"; TotalAmount1[3])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, false);
                     Editable = false;
@@ -571,7 +571,7 @@ page 10052 "Service Order Stats."
                 field("VATAmount[3]"; VATAmount[3])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Tax Amount';
                     Editable = false;
@@ -580,7 +580,7 @@ page 10052 "Service Order Stats."
                 field("TotalAmount2[3]"; TotalAmount2[3])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, true);
                     Editable = false;
@@ -749,14 +749,14 @@ page 10052 "Service Order Stats."
         PrevPrintOrder: Integer;
         PrevTaxPercent: Decimal;
     begin
-        CurrPage.Caption(StrSubstNo(Text000, "Document Type"));
+        CurrPage.Caption(StrSubstNo(Text000, Rec."Document Type"));
 
-        if PrevNo = "No." then
+        if PrevNo = Rec."No." then
             exit;
-        PrevNo := "No.";
-        FilterGroup(2);
-        SetRange("No.", PrevNo);
-        FilterGroup(0);
+        PrevNo := Rec."No.";
+        Rec.FilterGroup(2);
+        Rec.SetRange("No.", PrevNo);
+        Rec.FilterGroup(0);
 
         Clear(ServLine);
         Clear(TotalServLine);
@@ -856,7 +856,7 @@ page 10052 "Service Order Stats."
         TempServLine.DeleteAll();
         Clear(TempServLine);
 
-        if Cust.Get("Bill-to Customer No.") then
+        if Cust.Get(Rec."Bill-to Customer No.") then
             Cust.CalcFields("Balance (LCY)")
         else
             Clear(Cust);
@@ -883,13 +883,13 @@ page 10052 "Service Order Stats."
     begin
         SalesSetup.Get();
         NullTab := -1;
-        AllowInvDisc := not (SalesSetup."Calc. Inv. Discount" and CustInvDiscRecExists("Invoice Disc. Code"));
+        AllowInvDisc := not (SalesSetup."Calc. Inv. Discount" and CustInvDiscRecExists(Rec."Invoice Disc. Code"));
         AllowVATDifference :=
           SalesSetup."Allow VAT Difference" and
-          ("Document Type" <> "Document Type"::Quote);
+          (Rec."Document Type" <> Rec."Document Type"::Quote);
         VATLinesFormIsEditable := AllowVATDifference or AllowInvDisc;
         CurrPage.Editable := VATLinesFormIsEditable;
-        TaxArea.Get("Tax Area Code");
+        TaxArea.Get(Rec."Tax Area Code");
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -957,27 +957,27 @@ page 10052 "Service Order Stats."
         TotalAmount1[IndexNo] :=
           TotalServLine[IndexNo]."Line Amount" - TotalServLine[IndexNo]."Inv. Discount Amount";
         VATAmount[IndexNo] := SalesTaxAmountLine.GetTotalTaxAmountFCY();
-        if "Prices Including VAT" then begin
+        if Rec."Prices Including VAT" then begin
             TotalServLine[IndexNo]."Line Amount" :=
               TotalAmount1[IndexNo] + TotalServLine[IndexNo]."Inv. Discount Amount";
         end else
             TotalAmount2[IndexNo] := TotalAmount1[IndexNo] + VATAmount[IndexNo];
 
-        if "Prices Including VAT" then
+        if Rec."Prices Including VAT" then
             TotalServLineLCY[IndexNo].Amount := TotalAmount2[IndexNo]
         else
             TotalServLineLCY[IndexNo].Amount := TotalAmount1[IndexNo];
-        if "Currency Code" <> '' then
-            if ("Document Type" = "Document Type"::Quote) and
-               ("Posting Date" = 0D)
+        if Rec."Currency Code" <> '' then
+            if (Rec."Document Type" = Rec."Document Type"::Quote) and
+               (Rec."Posting Date" = 0D)
             then
                 UseDate := WorkDate
             else
-                UseDate := "Posting Date";
+                UseDate := Rec."Posting Date";
 
         TotalServLineLCY[IndexNo].Amount :=
           CurrExchRate.ExchangeAmtFCYToLCY(
-            UseDate, "Currency Code", TotalServLineLCY[IndexNo].Amount, "Currency Factor");
+            UseDate, Rec."Currency Code", TotalServLineLCY[IndexNo].Amount, Rec."Currency Factor");
 
         ProfitLCY[IndexNo] := TotalServLineLCY[IndexNo].Amount - TotalServLineLCY[IndexNo]."Unit Cost (LCY)";
         if TotalServLineLCY[IndexNo].Amount = 0 then
@@ -1015,7 +1015,7 @@ page 10052 "Service Order Stats."
         SaveTotalAmount: Decimal;
     begin
         CheckAllowInvDisc();
-        if "Prices Including VAT" then begin
+        if Rec."Prices Including VAT" then begin
             SaveTotalAmount := TotalAmount1[IndexNo];
             UpdateInvDiscAmount(IndexNo);
             TotalAmount1[IndexNo] := SaveTotalAmount;
@@ -1039,9 +1039,9 @@ page 10052 "Service Order Stats."
             exit;
 
         if ModifiedIndexNo = 1 then
-            InvDiscBaseAmount := TempSalesTaxLine1.GetTotalInvDiscBaseAmount(false, "Currency Code")
+            InvDiscBaseAmount := TempSalesTaxLine1.GetTotalInvDiscBaseAmount(false, Rec."Currency Code")
         else
-            InvDiscBaseAmount := TempSalesTaxLine2.GetTotalInvDiscBaseAmount(false, "Currency Code");
+            InvDiscBaseAmount := TempSalesTaxLine2.GetTotalInvDiscBaseAmount(false, Rec."Currency Code");
 
         if InvDiscBaseAmount = 0 then
             Error(Text003, TempSalesTaxLine2.FieldCaption("Inv. Disc. Base Amount"));
@@ -1072,30 +1072,30 @@ page 10052 "Service Order Stats."
                 if (i = 1) or not PartialInvoicing then
                     if IndexNo[i] = 1 then begin
                         TempSalesTaxLine1.SetInvoiceDiscountAmount(
-                          "Inv. Discount Amount", "Currency Code", "Prices Including VAT", "VAT Base Discount %");
+                          "Inv. Discount Amount", "Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %");
                     end else
                         TempSalesTaxLine2.SetInvoiceDiscountAmount(
-                          "Inv. Discount Amount", "Currency Code", "Prices Including VAT", "VAT Base Discount %");
+                          "Inv. Discount Amount", "Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %");
 
                 if (i = 2) and PartialInvoicing then
                     if IndexNo[i] = 1 then begin
                         InvDiscBaseAmount := TempSalesTaxLine2.GetTotalInvDiscBaseAmount(false, "Currency Code");
                         if InvDiscBaseAmount = 0 then
                             TempSalesTaxLine1.SetInvoiceDiscountPercent(
-                              0, "Currency Code", "Prices Including VAT", false, "VAT Base Discount %")
+                              0, "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %")
                         else
                             TempSalesTaxLine1.SetInvoiceDiscountPercent(
                               100 * TempSalesTaxLine2.GetTotalInvDiscAmount() / InvDiscBaseAmount,
-                              "Currency Code", "Prices Including VAT", false, "VAT Base Discount %");
+                              "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %");
                     end else begin
                         InvDiscBaseAmount := TempSalesTaxLine1.GetTotalInvDiscBaseAmount(false, "Currency Code");
                         if InvDiscBaseAmount = 0 then
                             TempSalesTaxLine2.SetInvoiceDiscountPercent(
-                              0, "Currency Code", "Prices Including VAT", false, "VAT Base Discount %")
+                              0, "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %")
                         else
                             TempSalesTaxLine2.SetInvoiceDiscountPercent(
                               100 * TempSalesTaxLine1.GetTotalInvDiscAmount() / InvDiscBaseAmount,
-                              "Currency Code", "Prices Including VAT", false, "VAT Base Discount %");
+                              "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %");
                     end;
             end;
 
@@ -1107,16 +1107,16 @@ page 10052 "Service Order Stats."
         else
             VATLinesForm.SetTempTaxAmountLine(TempSalesTaxLine2);
 
-        "Invoice Discount Calculation" := "Invoice Discount Calculation"::Amount;
-        "Invoice Discount Value" := TotalServLine[1]."Inv. Discount Amount";
-        Modify();
+        Rec."Invoice Discount Calculation" := Rec."Invoice Discount Calculation"::Amount;
+        Rec."Invoice Discount Value" := TotalServLine[1]."Inv. Discount Amount";
+        Rec.Modify();
 
         UpdateTaxonServLines;
     end;
 
     local procedure GetCaptionClass(FieldCaption: Text[100]; ReverseCaption: Boolean): Text[80]
     begin
-        if "Prices Including VAT" xor ReverseCaption then
+        if Rec."Prices Including VAT" xor ReverseCaption then
             exit('2,1,' + FieldCaption);
         exit('2,0,' + FieldCaption);
     end;
@@ -1128,8 +1128,8 @@ page 10052 "Service Order Stats."
         GetVATSpecification(ActiveTab);
 
         ServLine.Reset();
-        ServLine.SetRange("Document Type", "Document Type");
-        ServLine.SetRange("Document No.", "No.");
+        ServLine.SetRange("Document Type", Rec."Document Type");
+        ServLine.SetRange("Document No.", Rec."No.");
         ServLine.SetFilter(Type, '>0');
         ServLine.FindFirst();
 
@@ -1138,7 +1138,7 @@ page 10052 "Service Order Stats."
             SalesTaxCalculate.PutSalesTaxAmountLineTable(
               TempSalesTaxLine1,
               SalesTaxDifference."Document Product Area"::Service,
-              "Document Type".AsInteger(), "No.");
+              Rec."Document Type".AsInteger(), Rec."No.");
             SalesTaxCalculate.DistTaxOverServLines(ServLine);
             SalesTaxCalculate.SaveTaxDifferences();
         end;
@@ -1147,7 +1147,7 @@ page 10052 "Service Order Stats."
             SalesTaxCalculate.PutSalesTaxAmountLineTable(
               TempSalesTaxLine2,
               SalesTaxDifference."Document Product Area"::Service,
-              "Document Type".AsInteger(), "No.");
+              Rec."Document Type".AsInteger(), Rec."No.");
             SalesTaxCalculate.DistTaxOverServLines(ServLine);
             SalesTaxCalculate.SaveTaxDifferences();
         end;
@@ -1170,7 +1170,7 @@ page 10052 "Service Order Stats."
         if not AllowInvDisc then
             Error(
               Text005,
-              CustInvDisc.TableCaption(), FieldCaption("Invoice Disc. Code"), "Invoice Disc. Code");
+              CustInvDisc.TableCaption(), Rec.FieldCaption("Invoice Disc. Code"), Rec."Invoice Disc. Code");
     end;
 
     procedure VATLinesDrillDown(var VATLinesToDrillDown: Record "Sales Tax Amount Line"; ThisTabAllowsVATEditing: Boolean)
@@ -1178,8 +1178,8 @@ page 10052 "Service Order Stats."
         Clear(VATLinesForm);
         VATLinesForm.SetTempTaxAmountLine(VATLinesToDrillDown);
         VATLinesForm.InitGlobals(
-          "Currency Code", AllowVATDifference, AllowVATDifference and ThisTabAllowsVATEditing,
-          "Prices Including VAT", AllowInvDisc, "VAT Base Discount %");
+          Rec."Currency Code", AllowVATDifference, AllowVATDifference and ThisTabAllowsVATEditing,
+          Rec."Prices Including VAT", AllowInvDisc, Rec."VAT Base Discount %");
         VATLinesForm.RunModal();
         VATLinesForm.GetTempTaxAmountLine(VATLinesToDrillDown);
     end;
@@ -1223,7 +1223,7 @@ page 10052 "Service Order Stats."
                 if TotalServLineLCY[i].Amount <> 0 then
                     AdjProfitPct[i] := Round(100 * AdjProfitLCY[i] / TotalServLineLCY[i].Amount, 0.1);
 
-                if "Prices Including VAT" then begin
+                if Rec."Prices Including VAT" then begin
                     TotalAmount2[i] := TotalServLine[i].Amount;
                     TotalAmount1[i] := TotalAmount2[i] + VATAmount[i];
                     TotalServLine[i]."Line Amount" := TotalAmount1[i] + TotalServLine[i]."Inv. Discount Amount";
@@ -1237,7 +1237,7 @@ page 10052 "Service Order Stats."
     local procedure TotalAmount21OnAfterValidate()
     begin
         with TotalServLine[1] do begin
-            if "Prices Including VAT" then
+            if Rec."Prices Including VAT" then
                 "Inv. Discount Amount" := "Line Amount" - "Amount Including VAT"
             else
                 "Inv. Discount Amount" := "Line Amount" - Amount;
@@ -1250,7 +1250,7 @@ page 10052 "Service Order Stats."
         if TaxArea."Use External Tax Engine" then
             SalesTaxCalculate.CallExternalTaxEngineForServ(Rec, true)
         else
-            SalesTaxCalculate.EndSalesTaxCalculation("Posting Date");
+            SalesTaxCalculate.EndSalesTaxCalculation(Rec."Posting Date");
     end;
 
     [IntegrationEvent(false, false)]

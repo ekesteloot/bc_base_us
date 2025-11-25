@@ -1,3 +1,8 @@
+﻿namespace System.Diagnostics;
+
+using System.Email;
+using System.Security.AccessControl;
+
 table 1366 "Field Monitoring Setup"
 {
     LookupPageId = "Field Monitoring Setup";

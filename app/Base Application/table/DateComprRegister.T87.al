@@ -16,8 +16,8 @@ table 87 "Date Compr. Register"
         }
         field(3; "Table Caption"; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -46,8 +46,6 @@ table 87 "Date Compr. Register"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(9; "Filter"; Text[250])
         {
@@ -61,32 +59,32 @@ table 87 "Date Compr. Register"
         field(11; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
         }
         field(12; "Register No."; Integer)
         {
             Caption = 'Register No.';
-            TableRelation = IF ("Table ID" = CONST(17)) "G/L Register"
-            ELSE
-            IF ("Table ID" = CONST(21)) "G/L Register"
-            ELSE
-            IF ("Table ID" = CONST(25)) "G/L Register"
-            ELSE
-            IF ("Table ID" = CONST(254)) "G/L Register"
-            ELSE
-            IF ("Table ID" = CONST(32)) "Item Register"
-            ELSE
-            IF ("Table ID" = CONST(203)) "Resource Register"
-            ELSE
-            IF ("Table ID" = CONST(169)) "Job Register"
-            ELSE
-            IF ("Table ID" = CONST(5601)) "FA Register"
-            ELSE
-            IF ("Table ID" = CONST(5629)) "Insurance Register"
-            ELSE
-            IF ("Table ID" = CONST(5625)) "FA Register"
-            ELSE
-            IF ("Table ID" = CONST(7312)) "Warehouse Register";
+            TableRelation = if ("Table ID" = const(17)) "G/L Register"
+            else
+            if ("Table ID" = const(21)) "G/L Register"
+            else
+            if ("Table ID" = const(25)) "G/L Register"
+            else
+            if ("Table ID" = const(254)) "G/L Register"
+            else
+            if ("Table ID" = const(32)) "Item Register"
+            else
+            if ("Table ID" = const(203)) "Resource Register"
+            else
+            if ("Table ID" = const(169)) "Job Register"
+            else
+            if ("Table ID" = const(5601)) "FA Register"
+            else
+            if ("Table ID" = const(5629)) "Insurance Register"
+            else
+            if ("Table ID" = const(5625)) "FA Register"
+            else
+            if ("Table ID" = const(7312)) "Warehouse Register";
         }
         field(13; "Source Code"; Code[10])
         {

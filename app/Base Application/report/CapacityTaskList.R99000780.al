@@ -1,7 +1,11 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Manufacturing.Document;
+
 report 99000780 "Capacity Task List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/CapacityTaskList.rdlc';
+    RDLCLayout = './Manufacturing/Reports/CapacityTaskList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Capacity Task List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 99000780 "Capacity Task List"
     {
         dataitem("Prod. Order Routing Line"; "Prod. Order Routing Line")
         {
-            DataItemTableView = SORTING(Type, "No.");
+            DataItemTableView = sorting(Type, "No.");
             RequestFilterFields = Type, "No.", Status, "Starting Date";
             column(TodayFormatted; Format(Today, 0, 4))
             {

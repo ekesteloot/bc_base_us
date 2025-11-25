@@ -10,7 +10,7 @@ report 10220 "Job Cost Transaction Detail"
     {
         dataitem(Job; Job)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", Status, "Posting Date Filter";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
@@ -84,8 +84,8 @@ report 10220 "Job Cost Transaction Detail"
             }
             dataitem("Job Ledger Entry"; "Job Ledger Entry")
             {
-                DataItemLink = "Job No." = FIELD("No."), "Posting Date" = FIELD("Posting Date Filter");
-                DataItemTableView = SORTING("Job No.", "Posting Date");
+                DataItemLink = "Job No." = field("No."), "Posting Date" = field("Posting Date Filter");
+                DataItemTableView = sorting("Job No.", "Posting Date");
                 column(Job_Ledger_Entry__Posting_Date_; "Posting Date")
                 {
                 }

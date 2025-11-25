@@ -1,3 +1,10 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
 page 99000959 "Order Promising Lines"
 {
     Caption = 'Order Promising Lines';
@@ -7,7 +14,7 @@ page 99000959 "Order Promising Lines"
     RefreshOnActivate = true;
     SourceTable = "Order Promising Line";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Requested Shipment Date");
+    SourceTableView = sorting("Requested Shipment Date");
 
     layout
     {
@@ -79,7 +86,7 @@ page 99000959 "Order Promising Lines"
                     Editable = false;
                     ToolTip = 'Specifies the quantity required for order promising lines.';
                 }
-                field(CalcAvailability; CalcAvailability())
+                field(CalcAvailability; Rec.CalcAvailability())
                 {
                     ApplicationArea = OrderPromising;
                     Caption = 'Availability';
@@ -223,25 +230,25 @@ page 99000959 "Order Promising Lines"
     begin
         OrderPromisingCalculationDone := false;
         Accepted := false;
-        if GetFilter("Source ID") <> '' then
+        if Rec.GetFilter("Source ID") <> '' then
             case CrntSourceType of
-                "Source Type"::"Service Order":
+                Rec."Source Type"::"Service Order":
                     begin
                         ServHeader."Document Type" := ServHeader."Document Type"::Order;
-                        ServHeader."No." := GetRangeMin("Source ID");
+                        ServHeader."No." := Rec.GetRangeMin("Source ID");
                         ServHeader.Find();
                         SetServHeader(ServHeader);
                     end;
-                "Source Type"::Job:
+                Rec."Source Type"::Job:
                     begin
                         Job.Status := Job.Status::Open;
-                        Job."No." := GetRangeMin("Source ID");
+                        Job."No." := Rec.GetRangeMin("Source ID");
                         Job.Find();
                         SetJob(Job);
                     end;
                 else
                     SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
-                    SalesHeader."No." := GetRangeMin("Source ID");
+                    SalesHeader."No." := Rec.GetRangeMin("Source ID");
                     SalesHeader.Find();
                     SetSalesHeader(SalesHeader);
                     AcceptButtonEnable := SalesHeader.Status = SalesHeader.Status::Open;
@@ -253,7 +260,6 @@ page 99000959 "Order Promising Lines"
         Accepted: Boolean;
         CrntSourceID: Code[20];
         CrntSourceType: Enum "Order Promising Line Source Type";
-        [InDataSet]
         AcceptButtonEnable: Boolean;
         OrderPromisingCalculationDone: Boolean;
         Text000: Label 'The order promising lines are already calculated. You must close and open the window again to perform a new calculation.';

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Opportunity;
+
 enum 5093 "Opportunity Priority"
 {
     Extensible = true;

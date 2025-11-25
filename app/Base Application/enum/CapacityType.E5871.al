@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 enum 5871 "Capacity Type"
 {
     Extensible = true;

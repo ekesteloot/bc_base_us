@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 enum 100 "Reserve Method"
 {
     Extensible = true;

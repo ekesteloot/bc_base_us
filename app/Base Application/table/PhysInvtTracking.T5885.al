@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Tracking;
+
 table 5885 "Phys. Invt. Tracking"
 {
     Caption = 'Phys. Invt. Tracking';

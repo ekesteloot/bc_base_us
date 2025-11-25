@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.FinancialMgt.Currency;
+
 table 24 "Vendor Invoice Disc."
 {
     Caption = 'Vendor Invoice Disc.';
@@ -12,7 +16,7 @@ table 24 "Vendor Invoice Disc."
         }
         field(2; "Minimum Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Minimum Amount';
             MinValue = 0;
@@ -26,7 +30,7 @@ table 24 "Vendor Invoice Disc."
         }
         field(4; "Service Charge"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Service Charge';
             MinValue = 0;

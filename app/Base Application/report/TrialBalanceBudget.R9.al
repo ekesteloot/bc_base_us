@@ -1,7 +1,13 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Utilities;
+
 report 9 "Trial Balance/Budget"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/TrialBalanceBudget.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/TrialBalanceBudget.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Trial Balance/Budget';
     PreviewMode = PrintLayout;
@@ -11,7 +17,7 @@ report 9 "Trial Balance/Budget"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Account Type", "Date Filter", "Budget Filter", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -96,7 +102,7 @@ report 9 "Trial Balance/Budget"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(G_L_Account___No__; "G/L Account"."No.")
                 {
                 }

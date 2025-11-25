@@ -1,3 +1,11 @@
+namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.FixedAsset;
+using System.DataAdministration;
+using System.Utilities;
+
 report 5696 "Date Compress FA Ledger"
 {
     Caption = 'Date Compress FA Ledger';
@@ -11,7 +19,7 @@ report 5696 "Date Compress FA Ledger"
     {
         dataitem("FA Ledger Entry"; "FA Ledger Entry")
         {
-            DataItemTableView = SORTING("FA No.", "Depreciation Book Code", "FA Posting Date");
+            DataItemTableView = sorting("FA No.", "Depreciation Book Code", "FA Posting Date");
             RequestFilterFields = "FA No.", "Depreciation Book Code";
 
             trigger OnAfterGetRecord()
@@ -352,7 +360,6 @@ report 5696 "Date Compress FA Ledger"
         i: Integer;
         RetainDimText: Text[250];
         UseDataArchive: Boolean;
-        [InDataSet]
         DataArchiveProviderExists: Boolean;
         EqualDim: Boolean;
 

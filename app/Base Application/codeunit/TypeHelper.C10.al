@@ -1,3 +1,13 @@
+﻿namespace System.Reflection;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System;
+using System.Date;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Utilities;
+using System.Xml;
+
 codeunit 10 "Type Helper"
 {
 

@@ -2,13 +2,8 @@ table 2822 "Native - Export Invoices"
 {
     Caption = 'Native - Export Invoices';
     ReplicateData = false;
-#if not CLEAN20
-    ObsoleteState = Pending;
-    ObsoleteTag = '17.0';
-#else
     ObsoleteState = Removed;
     ObsoleteTag = '23.0';
-#endif
     ObsoleteReason = 'These objects will be removed';
 
     fields

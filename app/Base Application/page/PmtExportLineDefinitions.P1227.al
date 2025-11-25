@@ -1,3 +1,7 @@
+namespace Microsoft.BankMgt.PaymentExport;
+
+using System.IO;
+
 page 1227 "Pmt. Export Line Definitions"
 {
     Caption = 'Pmt. Export Line Definitions';
@@ -14,7 +18,7 @@ page 1227 "Pmt. Export Line Definitions"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the line in the file.';

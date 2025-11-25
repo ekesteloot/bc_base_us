@@ -26,8 +26,8 @@ table 134 "Posted Docs. With No Inc. Buf."
         }
         field(5; "Incoming Document No."; Integer)
         {
-            CalcFormula = Lookup("Incoming Document"."Entry No." WHERE("Document No." = FIELD("Document No."),
-                                                                        "Posting Date" = FIELD("Posting Date")));
+            CalcFormula = Lookup("Incoming Document"."Entry No." where("Document No." = field("Document No."),
+                                                                        "Posting Date" = field("Posting Date")));
             Caption = 'Incoming Document No.';
             FieldClass = FlowField;
         }

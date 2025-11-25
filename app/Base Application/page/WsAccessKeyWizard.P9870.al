@@ -1,3 +1,9 @@
+namespace System.Security.Authentication;
+
+using System.Environment;
+using System.Security.User;
+using System.Utilities;
+
 page 9870 "WS Access Key Wizard"
 {
     Caption = 'Web Service Access Key';

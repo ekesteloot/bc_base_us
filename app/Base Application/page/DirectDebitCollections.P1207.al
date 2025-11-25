@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.DirectDebit;
+
 page 1207 "Direct Debit Collections"
 {
     AdditionalSearchTerms = 'collect customer payment';
@@ -20,12 +22,12 @@ page 1207 "Direct Debit Collections"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Identifier; Identifier)
+                field(Identifier; Rec.Identifier)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies, together with the number series, which direct debit collection a direct-debit collection entry is related to.';
                 }
-                field("FORMAT(""Created Date-Time"")"; Format("Created Date-Time"))
+                field("FORMAT(""Created Date-Time"")"; Format(Rec."Created Date-Time"))
                 {
                     ApplicationArea = Suite;
                     Caption = 'Created Date-Time';
@@ -95,7 +97,7 @@ page 1207 "Direct Debit Collections"
 
                 trigger OnAction()
                 begin
-                    Export();
+                    Rec.Export();
                 end;
             }
             action(Close)
@@ -107,7 +109,7 @@ page 1207 "Direct Debit Collections"
 
                 trigger OnAction()
                 begin
-                    CloseCollection();
+                    Rec.CloseCollection();
                 end;
             }
             action(Post)
@@ -122,8 +124,8 @@ page 1207 "Direct Debit Collections"
                 var
                     PostDirectDebitCollection: Report "Post Direct Debit Collection";
                 begin
-                    TestField(Status, Status::"File Created");
-                    PostDirectDebitCollection.SetCollectionEntry("No.");
+                    Rec.TestField(Status, Rec.Status::"File Created");
+                    PostDirectDebitCollection.SetCollectionEntry(Rec."No.");
                     PostDirectDebitCollection.Run();
                 end;
             }
@@ -136,7 +138,7 @@ page 1207 "Direct Debit Collections"
                 Caption = 'Direct Debit Collect. Entries';
                 Image = EditLines;
                 RunObject = Page "Direct Debit Collect. Entries";
-                RunPageLink = "Direct Debit Collection No." = FIELD("No.");
+                RunPageLink = "Direct Debit Collection No." = field("No.");
                 ShortCutKey = 'Return';
                 ToolTip = 'View and edit entries that are generated for the direct-debit collection.';
             }

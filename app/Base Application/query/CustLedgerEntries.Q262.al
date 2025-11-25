@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Receivables;
+
+using Microsoft.Sales.Customer;
+
 query 262 "Cust. Ledger Entries"
 {
     Caption = 'Cust. Ledger Entries';

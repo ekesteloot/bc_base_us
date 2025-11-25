@@ -1,3 +1,5 @@
+namespace System.Visualization;
+
 page 9186 "Generic Chart Query Columns"
 {
     Caption = 'Generic Chart Query Columns';

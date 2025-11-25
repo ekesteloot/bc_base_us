@@ -245,7 +245,6 @@ page 5845 "Inventory - G/L Reconciliation"
         Text004: Label 'Income Statement';
         Text005: Label 'Balance Sheet';
         ShowWarning: Boolean;
-        [InDataSet]
         ShowEditable: Boolean;
 
     local procedure DimCodeToOption(DimCode: Text[30]): Integer

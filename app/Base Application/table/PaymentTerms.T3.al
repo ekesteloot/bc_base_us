@@ -1,3 +1,8 @@
+namespace Microsoft.Foundation.PaymentTerms;
+
+using Microsoft.Integration.Dataverse;
+using System.Globalization;
+
 table 3 "Payment Terms"
 {
     Caption = 'Payment Terms';

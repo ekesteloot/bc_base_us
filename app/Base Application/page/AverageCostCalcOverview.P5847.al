@@ -8,7 +8,7 @@ page 5847 "Average Cost Calc. Overview"
     PageType = List;
     SourceTable = "Average Cost Calc. Overview";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Attached to Valuation Date", "Attached to Entry No.", Type);
+    SourceTableView = sorting("Attached to Valuation Date", "Attached to Entry No.", Type);
 
     layout
     {
@@ -54,7 +54,7 @@ page 5847 "Average Cost Calc. Overview"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(AverageCostCntrl; CalculateAverageCost())
+                field(AverageCostCntrl; Rec.CalculateAverageCost())
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 2;
@@ -157,7 +157,7 @@ page 5847 "Average Cost Calc. Overview"
 
                     trigger OnAction()
                     begin
-                        if ItemLedgEntry.Get("Entry No.") then
+                        if ItemLedgEntry.Get(Rec."Entry No.") then
                             ItemLedgEntry.ShowDimensions();
                     end;
                 }
@@ -167,9 +167,9 @@ page 5847 "Average Cost Calc. Overview"
                     Caption = '&Value Entries';
                     Image = ValueLedger;
                     RunObject = Page "Value Entries";
-                    RunPageLink = "Item Ledger Entry No." = FIELD("Item Ledger Entry No."),
-                                  "Valuation Date" = FIELD("Valuation Date");
-                    RunPageView = SORTING("Item Ledger Entry No.");
+                    RunPageLink = "Item Ledger Entry No." = field("Item Ledger Entry No."),
+                                  "Valuation Date" = field("Valuation Date");
+                    RunPageView = sorting("Item Ledger Entry No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of posted amounts that affect the value of the item. Value entries are created for every transaction with the item.';
                 }
@@ -189,7 +189,7 @@ page 5847 "Average Cost Calc. Overview"
                     var
                         ItemLedgEntry: Record "Item Ledger Entry";
                     begin
-                        if ItemLedgEntry.Get("Item Ledger Entry No.") then
+                        if ItemLedgEntry.Get(Rec."Item Ledger Entry No.") then
                             CODEUNIT.Run(CODEUNIT::"Show Applied Entries", ItemLedgEntry);
                     end;
                 }
@@ -205,7 +205,7 @@ page 5847 "Average Cost Calc. Overview"
                     var
                         ItemLedgEntry: Record "Item Ledger Entry";
                     begin
-                        ItemLedgEntry.Get("Item Ledger Entry No.");
+                        ItemLedgEntry.Get(Rec."Item Ledger Entry No.");
                         ItemLedgEntry.ShowReservationEntries(true);
                     end;
                 }
@@ -223,7 +223,7 @@ page 5847 "Average Cost Calc. Overview"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -270,10 +270,10 @@ page 5847 "Average Cost Calc. Overview"
         ItemLedgerEntryNoHideValue := false;
         TypeIndent := 0;
         SetExpansionStatus();
-        if Type = Type::"Closing Entry" then begin
-            Quantity := CalculateRemainingQty();
-            "Cost Amount (Expected)" := CalculateCostAmt(false);
-            "Cost Amount (Actual)" := CalculateCostAmt(true);
+        if Rec.Type = Rec.Type::"Closing Entry" then begin
+            Rec.Quantity := Rec.CalculateRemainingQty();
+            Rec."Cost Amount (Expected)" := Rec.CalculateCostAmt(false);
+            Rec."Cost Amount (Actual)" := Rec.CalculateCostAmt(true);
         end;
         TypeOnFormat();
         ItemLedgerEntryNoOnFormat();
@@ -300,13 +300,9 @@ page 5847 "Average Cost Calc. Overview"
         Navigate: Page Navigate;
         ActualExpansionStatus: Integer;
         ItemName: Text[250];
-        [InDataSet]
         TypeIndent: Integer;
-        [InDataSet]
         ItemLedgerEntryNoHideValue: Boolean;
-        [InDataSet]
         EntryTypeHideValue: Boolean;
-        [InDataSet]
         DocumentLineNoHideValue: Boolean;
 
     procedure SetExpansionStatus()
@@ -334,16 +330,16 @@ page 5847 "Average Cost Calc. Overview"
         GetAvgCostCalcOverview.Run(TempAvgCostCalcOverview);
         TempAvgCostCalcOverview.Reset();
         AvgCostCalcOverviewFilters.CopyFilters(Rec);
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         if TempAvgCostCalcOverview.Find('-') then
             repeat
                 if TempAvgCostCalcOverview.Level = 0 then begin
                     Rec := TempAvgCostCalcOverview;
-                    Insert();
+                    Rec.Insert();
                 end;
             until TempAvgCostCalcOverview.Next() = 0;
-        CopyFilters(AvgCostCalcOverviewFilters);
+        Rec.CopyFilters(AvgCostCalcOverviewFilters);
     end;
 
     local procedure ExpandAll(var AvgCostCalcOverview: Record "Average Cost Calc. Overview")
@@ -358,8 +354,8 @@ page 5847 "Average Cost Calc. Overview"
 
         GetAvgCostCalcOverview.Run(AvgCostCalcOverview);
         AvgCostCalcOverviewFilters.CopyFilters(Rec);
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
 
         if TempAvgCostCalcOverview.Find('+') then
             repeat
@@ -372,10 +368,10 @@ page 5847 "Average Cost Calc. Overview"
         if TempAvgCostCalcOverview.Find('+') then
             repeat
                 Rec := AvgCostCalcOverview;
-                Insert();
+                Rec.Insert();
             until TempAvgCostCalcOverview.Next(-1) = 0;
 
-        CopyFilters(AvgCostCalcOverviewFilters);
+        Rec.CopyFilters(AvgCostCalcOverviewFilters);
     end;
 
     local procedure IsExpanded(ActualAvgCostCalcOverview: Record "Average Cost Calc. Overview"): Boolean
@@ -384,11 +380,11 @@ page 5847 "Average Cost Calc. Overview"
         Found: Boolean;
     begin
         AvgCostCalcOverview := Rec;
-        SetCurrentKey("Attached to Valuation Date", "Attached to Entry No.", Type);
+        Rec.SetCurrentKey("Attached to Valuation Date", "Attached to Entry No.", Type);
         Rec := ActualAvgCostCalcOverview;
-        Found := (Next(GetDirection()) <> 0);
+        Found := (Rec.Next(GetDirection()) <> 0);
         if Found then
-            Found := (Level > ActualAvgCostCalcOverview.Level);
+            Found := (Rec.Level > ActualAvgCostCalcOverview.Level);
         Rec := AvgCostCalcOverview;
         exit(Found);
     end;
@@ -396,22 +392,22 @@ page 5847 "Average Cost Calc. Overview"
     local procedure HasChildren(var ActualAvgCostCalcOverview: Record "Average Cost Calc. Overview"): Boolean
     begin
         TempAvgCostCalcOverview := ActualAvgCostCalcOverview;
-        if Type = Type::"Closing Entry" then
+        if Rec.Type = Rec.Type::"Closing Entry" then
             exit(GetAvgCostCalcOverview.EntriesExist(TempAvgCostCalcOverview));
         exit(false);
     end;
 
     local procedure GetDirection(): Integer
     begin
-        if Ascending then
+        if Rec.Ascending then
             exit(1);
         exit(-1);
     end;
 
     procedure SetRecFilters()
     begin
-        Reset();
-        SetCurrentKey("Attached to Valuation Date", "Attached to Entry No.", Type);
+        Rec.Reset();
+        Rec.SetCurrentKey("Attached to Valuation Date", "Attached to Entry No.", Type);
         CurrPage.Update(false);
     end;
 
@@ -422,25 +418,25 @@ page 5847 "Average Cost Calc. Overview"
 
     local procedure TypeOnFormat()
     begin
-        if Type <> Type::"Closing Entry" then
+        if Rec.Type <> Rec.Type::"Closing Entry" then
             TypeIndent := 1;
     end;
 
     local procedure ItemLedgerEntryNoOnFormat()
     begin
-        if Type = Type::"Closing Entry" then
+        if Rec.Type = Rec.Type::"Closing Entry" then
             ItemLedgerEntryNoHideValue := true;
     end;
 
     local procedure EntryTypeOnFormat()
     begin
-        if Type = Type::"Closing Entry" then
+        if Rec.Type = Rec.Type::"Closing Entry" then
             EntryTypeHideValue := true;
     end;
 
     local procedure DocumentLineNoOnFormat()
     begin
-        if Type = Type::"Closing Entry" then
+        if Rec.Type = Rec.Type::"Closing Entry" then
             DocumentLineNoHideValue := true;
     end;
 

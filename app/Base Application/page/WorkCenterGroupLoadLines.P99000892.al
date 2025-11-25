@@ -1,3 +1,11 @@
+﻿namespace Microsoft.Manufacturing.WorkCenter;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Setup;
+using System.Utilities;
+
 page 99000892 "Work Center Group Load Lines"
 {
     Caption = 'Lines';
@@ -29,7 +37,7 @@ page 99000892 "Work Center Group Load Lines"
                     Caption = 'Period Name';
                     ToolTip = 'Specifies the name of the period shown in the line.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Capacity';
@@ -64,14 +72,14 @@ page 99000892 "Work Center Group Load Lines"
                         PAGE.Run(0, ProdOrderCapNeed);
                     end;
                 }
-                field(CapacityAvailable; "Availability After Orders")
+                field(CapacityAvailable; Rec."Availability After Orders")
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Availability After Orders';
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the available capacity of this work center group that is not used in the planning of a given time period.';
                 }
-                field(CapacityEfficiency; Load)
+                field(CapacityEfficiency; Rec.Load)
                 {
                     ApplicationArea = Manufacturing;
                     Caption = 'Load';
@@ -88,7 +96,7 @@ page 99000892 "Work Center Group Load Lines"
 
     trigger OnAfterGetRecord()
     begin
-        if DateRec.Get("Period Type", "Period Start") then;
+        if DateRec.Get(Rec."Period Type", Rec."Period Start") then;
         CalcLine();
     end;
 
@@ -112,7 +120,7 @@ page 99000892 "Work Center Group Load Lines"
 
     trigger OnOpenPage()
     begin
-        Reset();
+        Rec.Reset();
         MfgSetup.Get();
         MfgSetup.TestField("Show Capacity In");
     end;
@@ -141,9 +149,9 @@ page 99000892 "Work Center Group Load Lines"
     local procedure SetDateFilter()
     begin
         if AmountType = AmountType::"Net Change" then
-            WorkCenterGroup.SetRange("Date Filter", "Period Start", "Period End")
+            WorkCenterGroup.SetRange("Date Filter", Rec."Period Start", Rec."Period End")
         else
-            WorkCenterGroup.SetRange("Date Filter", 0D, "Period End");
+            WorkCenterGroup.SetRange("Date Filter", 0D, Rec."Period End");
     end;
 
     local procedure CalculateCapacity(var WorkCenterGroup: Record "Work Center Group")
@@ -182,13 +190,13 @@ page 99000892 "Work Center Group Load Lines"
     begin
         SetDateFilter();
         CalculateCapacity(WorkCenterGroup);
-        Capacity := WorkCenterGroup."Capacity (Effective)";
-        "Allocated Qty." := WorkCenterGroup."Prod. Order Need (Qty.)";
-        "Availability After Orders" := WorkCenterGroup."Capacity (Effective)" - WorkCenterGroup."Prod. Order Need (Qty.)";
+        Rec.Capacity := WorkCenterGroup."Capacity (Effective)";
+        Rec."Allocated Qty." := WorkCenterGroup."Prod. Order Need (Qty.)";
+        Rec."Availability After Orders" := WorkCenterGroup."Capacity (Effective)" - WorkCenterGroup."Prod. Order Need (Qty.)";
         if WorkCenterGroup."Capacity (Effective)" <> 0 then
-            Load := Round(WorkCenterGroup."Prod. Order Need (Qty.)" / WorkCenterGroup."Capacity (Effective)" * 100, 0.1)
+            Rec.Load := Round(WorkCenterGroup."Prod. Order Need (Qty.)" / WorkCenterGroup."Capacity (Effective)" * 100, 0.1)
         else
-            Load := 0;
+            Rec.Load := 0;
 
         OnAfterCalcLine(WorkCenterGroup, Rec, CapacityUoM);
     end;

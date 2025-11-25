@@ -1,7 +1,15 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using System.Utilities;
+
 report 99000787 "Routing Sheet"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/RoutingSheet.rdlc';
+    RDLCLayout = './Manufacturing/Reports/RoutingSheet.rdlc';
     AdditionalSearchTerms = 'operations sheet,process structure sheet';
     ApplicationArea = Manufacturing;
     Caption = 'Routing Sheet';
@@ -11,7 +19,7 @@ report 99000787 "Routing Sheet"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.";
             column(No_Item; "No.")
@@ -31,10 +39,10 @@ report 99000787 "Routing Sheet"
             }
             dataitem(Counter1; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(Counter2; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     PrintOnlyIfDetail = true;
                     column(CompanyName; COMPANYPROPERTY.DisplayName())
                     {
@@ -84,12 +92,12 @@ report 99000787 "Routing Sheet"
                     }
                     dataitem("Routing Header"; "Routing Header")
                     {
-                        DataItemTableView = SORTING("No.");
+                        DataItemTableView = sorting("No.");
                         PrintOnlyIfDetail = true;
                         dataitem("Routing Line"; "Routing Line")
                         {
-                            DataItemLink = "Routing No." = FIELD("No.");
-                            DataItemTableView = SORTING("Routing No.", "Version Code", "Operation No.");
+                            DataItemLink = "Routing No." = field("No.");
+                            DataItemTableView = sorting("Routing No.", "Version Code", "Operation No.");
                             column(OperationNo_RtngLine; "Operation No.")
                             {
                                 IncludeCaption = true;
@@ -141,8 +149,8 @@ report 99000787 "Routing Sheet"
                             }
                             dataitem("Routing Comment Line"; "Routing Comment Line")
                             {
-                                DataItemLink = "Routing No." = FIELD("Routing No."), "Version Code" = FIELD("Version Code"), "Operation No." = FIELD("Operation No.");
-                                DataItemTableView = SORTING("Routing No.", "Version Code", "Operation No.", "Line No.");
+                                DataItemLink = "Routing No." = field("Routing No."), "Version Code" = field("Version Code"), "Operation No." = field("Operation No.");
+                                DataItemTableView = sorting("Routing No.", "Version Code", "Operation No.", "Line No.");
                                 column(LineComment_RtngComment; Comment)
                                 {
                                 }
@@ -157,8 +165,8 @@ report 99000787 "Routing Sheet"
                             }
                             dataitem("Routing Tool"; "Routing Tool")
                             {
-                                DataItemLink = "Routing No." = FIELD("Routing No."), "Version Code" = FIELD("Version Code"), "Operation No." = FIELD("Operation No.");
-                                DataItemTableView = SORTING("Routing No.", "Version Code", "Operation No.", "Line No.");
+                                DataItemLink = "Routing No." = field("Routing No."), "Version Code" = field("Version Code"), "Operation No." = field("Operation No.");
+                                DataItemTableView = sorting("Routing No.", "Version Code", "Operation No.", "Line No.");
                                 column(Desc_RtngTool; Description)
                                 {
                                 }
@@ -174,8 +182,8 @@ report 99000787 "Routing Sheet"
                             }
                             dataitem("Routing Personnel"; "Routing Personnel")
                             {
-                                DataItemLink = "Routing No." = FIELD("Routing No."), "Version Code" = FIELD("Version Code"), "Operation No." = FIELD("Operation No.");
-                                DataItemTableView = SORTING("Routing No.", "Version Code", "Operation No.", "Line No.");
+                                DataItemLink = "Routing No." = field("Routing No."), "Version Code" = field("Version Code"), "Operation No." = field("Operation No.");
+                                DataItemTableView = sorting("Routing No.", "Version Code", "Operation No.", "Line No.");
                                 column(Desc_RtngPersonnel; Description)
                                 {
                                 }
@@ -191,8 +199,8 @@ report 99000787 "Routing Sheet"
                             }
                             dataitem("Routing Quality Measure"; "Routing Quality Measure")
                             {
-                                DataItemLink = "Routing No." = FIELD("Routing No."), "Version Code" = FIELD("Version Code"), "Operation No." = FIELD("Operation No.");
-                                DataItemTableView = SORTING("Routing No.", "Version Code", "Operation No.", "Line No.");
+                                DataItemLink = "Routing No." = field("Routing No."), "Version Code" = field("Version Code"), "Operation No." = field("Operation No.");
+                                DataItemTableView = sorting("Routing No.", "Version Code", "Operation No.", "Line No.");
                                 column(Desc_RtngQualityMeasure; Description)
                                 {
                                 }

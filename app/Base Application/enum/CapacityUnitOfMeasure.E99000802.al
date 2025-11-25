@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 enum 99000802 "Capacity Unit of Measure"
 {
     Extensible = true;

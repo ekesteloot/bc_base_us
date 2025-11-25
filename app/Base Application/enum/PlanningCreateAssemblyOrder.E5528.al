@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
 enum 5528 "Planning Create Assembly Order"
 {
     Extensible = true;

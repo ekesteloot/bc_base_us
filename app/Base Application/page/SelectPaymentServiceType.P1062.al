@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Setup;
+
 page 1062 "Select Payment Service Type"
 {
     Caption = 'Select Payment Service Type';
@@ -37,7 +39,7 @@ page 1062 "Select Payment Service Type"
 
     trigger OnOpenPage()
     begin
-        OnRegisterPaymentServiceProviders(Rec);
+        Rec.OnRegisterPaymentServiceProviders(Rec);
     end;
 }
 

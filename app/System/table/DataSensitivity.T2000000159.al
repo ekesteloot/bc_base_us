@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Privacy;
+
+using System.Environment;
+using System.Reflection;
+
 table 2000000159 "Data Sensitivity"
 {
     Caption = 'Data Sensitivity';
@@ -22,21 +31,21 @@ table 2000000159 "Data Sensitivity"
         }
         field(4; "Table Caption"; Text[80])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST("Table"),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST("Table"),
                                                                            "Object ID" = FIELD("Table No")));
             Caption = 'Table Caption';
             FieldClass = FlowField;
         }
         field(5; "Field Caption"; Text[80])
         {
-            CalcFormula = Lookup (Field."Field Caption" WHERE(TableNo = FIELD("Table No"),
+            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = FIELD("Table No"),
                                                               "No." = FIELD("Field No")));
             Caption = 'Field Caption';
             FieldClass = FlowField;
         }
         field(6; "Field Type"; Option)
         {
-            CalcFormula = Lookup (Field.Type WHERE(TableNo = FIELD("Table No"),
+            CalcFormula = Lookup(Field.Type WHERE(TableNo = FIELD("Table No"),
                                                    "No." = FIELD("Field No")));
             Caption = 'Field Type';
             FieldClass = FlowField;
@@ -59,7 +68,7 @@ table 2000000159 "Data Sensitivity"
         }
         field(10; "Data Classification"; Option)
         {
-            CalcFormula = Lookup (Field.DataClassification WHERE(TableNo = FIELD("Table No"),
+            CalcFormula = Lookup(Field.DataClassification WHERE(TableNo = FIELD("Table No"),
                                                                  "No." = FIELD("Field No")));
             Caption = 'Data Classification';
             FieldClass = FlowField;

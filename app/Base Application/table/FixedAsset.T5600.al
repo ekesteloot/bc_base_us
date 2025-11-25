@@ -1,4 +1,22 @@
-﻿table 5600 "Fixed Asset"
+﻿namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Employee;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+using System.Environment.Configuration;
+using System.Telemetry;
+
+table 5600 "Fixed Asset"
 {
     Caption = 'Fixed Asset';
     DataCaptionFields = "No.", Description;
@@ -104,30 +122,30 @@
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(8; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(9; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
         }
         field(10; "FA Location Code"; Code[10])
         {
@@ -139,12 +157,10 @@
             Caption = 'Vendor No.';
             TableRelation = Vendor;
         }
-        field(12; "Main Asset/Component"; Option)
+        field(12; "Main Asset/Component"; Enum "FA Component Type")
         {
             Caption = 'Main Asset/Component';
             Editable = false;
-            OptionCaption = ' ,Main Asset,Component';
-            OptionMembers = " ","Main Asset",Component;
         }
         field(13; "Component of Main Asset"; Code[20])
         {
@@ -181,16 +197,16 @@
         }
         field(19; Insured; Boolean)
         {
-            CalcFormula = Exist("Ins. Coverage Ledger Entry" WHERE("FA No." = FIELD("No."),
-                                                                    "Disposed FA" = CONST(false)));
+            CalcFormula = exist("Ins. Coverage Ledger Entry" where("FA No." = field("No."),
+                                                                    "Disposed FA" = const(false)));
             Caption = 'Insured';
             Editable = false;
             FieldClass = FlowField;
         }
         field(20; Comment; Boolean)
         {
-            CalcFormula = Exist("Comment Line" WHERE("Table Name" = CONST("Fixed Asset"),
-                                                      "No." = FIELD("No.")));
+            CalcFormula = exist("Comment Line" where("Table Name" = const("Fixed Asset"),
+                                                      "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -259,8 +275,8 @@
         }
         field(30; Acquired; Boolean)
         {
-            CalcFormula = Exist("FA Depreciation Book" WHERE("FA No." = FIELD("No."),
-                                                              "Acquisition Date" = FILTER(<> 0D)));
+            CalcFormula = exist("FA Depreciation Book" where("FA No." = field("No."),
+                                                              "Acquisition Date" = filter(<> 0D)));
             Caption = 'Acquired';
             FieldClass = FlowField;
         }

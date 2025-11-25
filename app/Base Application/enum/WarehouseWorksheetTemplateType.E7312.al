@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Worksheet;
+
 enum 7312 "Warehouse Worksheet Template Type"
 {
     Extensible = true;

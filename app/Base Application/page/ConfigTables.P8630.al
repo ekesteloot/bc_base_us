@@ -1,11 +1,15 @@
+namespace System.IO;
+
+using System.Security.User;
+
 page 8630 "Config. Tables"
 {
     Caption = 'Config. Tables';
     Editable = false;
     PageType = List;
     SourceTable = "Config. Line";
-    SourceTableView = SORTING("Line Type", "Parent Line No.")
-                      WHERE("Line Type" = CONST(Table));
+    SourceTableView = sorting("Line Type", "Parent Line No.")
+                      where("Line Type" = const(Table));
 
     layout
     {
@@ -39,17 +43,17 @@ page 8630 "Config. Tables"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("Responsible ID");
+                        UserMgt.DisplayUserInformation(Rec."Responsible ID");
                     end;
                 }
-                field(NoOfRecords; GetNoOfRecords())
+                field(NoOfRecords; Rec.GetNoOfRecords())
                 {
                     ApplicationArea = Basic, Suite;
                     BlankZero = true;
                     Caption = 'No. of Records';
                     ToolTip = 'Specifies how many records are created in connection with migration.';
                 }
-                field(Reference; Reference)
+                field(Reference; Rec.Reference)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a url address. Use this field to provide a url address to a location that Specifies information about the table. For example, you could provide the address of a page that Specifies information about setup considerations that the solution implementer should consider.';
@@ -79,7 +83,7 @@ page 8630 "Config. Tables"
 
                     trigger OnAction()
                     begin
-                        ShowTableData();
+                        Rec.ShowTableData();
                     end;
                 }
                 action("Copy Data")
@@ -105,18 +109,17 @@ page 8630 "Config. Tables"
 
     trigger OnOpenPage()
     begin
-        FilterGroup(2);
-        SetRange("Company Filter", CompanyName);
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetRange("Company Filter", CompanyName);
+        Rec.FilterGroup(0);
     end;
 
     var
-        [InDataSet]
         NameEmphasize: Boolean;
 
     local procedure NameOnFormat()
     begin
-        NameEmphasize := "Line Type" <> "Line Type"::Table;
+        NameEmphasize := Rec."Line Type" <> Rec."Line Type"::Table;
     end;
 }
 

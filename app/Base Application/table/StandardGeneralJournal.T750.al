@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.Foundation.NoSeries;
+
 table 750 "Standard General Journal"
 {
     Caption = 'Standard General Journal';
@@ -204,10 +208,10 @@ table 750 "Standard General Journal"
     local procedure OnCopyGenJnlFromStdJnlOnBeforeGenJnlLineTransferFields(var GenJournalLine: Record "Gen. Journal Line"; var StdGenJournalLine: Record "Standard General Journal Line")
     begin
     end;
-    
-    [IntegrationEvent(false, false)] 
+
+    [IntegrationEvent(false, false)]
     local procedure OnCopyGenJnlFromStdJnlOnAfterInsertGenJnlLineFrmStandard(var GenJournalLine: Record "Gen. Journal Line"; StdGenJournalLine: Record "Standard General Journal Line")
     begin
-    end;    
+    end;
 }
 

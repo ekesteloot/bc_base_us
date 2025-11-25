@@ -1,4 +1,21 @@
-﻿codeunit 8 AccSchedManagement
+﻿namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Ledger;
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using System.Utilities;
+
+codeunit 8 AccSchedManagement
 {
     TableNo = "Acc. Schedule Line";
 
@@ -2566,6 +2583,16 @@
         if GLSetup."Additional Reporting Currency" <> '' then
             exit(Round(ExchangeAmtAddCurrToLCY(ColValue), AddRepCurrency."Amount Rounding Precision"));
         exit(0);
+    end;
+
+    procedure SetFiscalStartDate(NewFiscalStartDate: Date)
+    begin
+        FiscalStartDate := NewFiscalStartDate;
+    end;
+
+    procedure GetFiscalStartDate(): Date
+    begin
+        exit(FiscalStartDate);
     end;
 
     local procedure SetCFEntryFiltersForBudgetEntries(var CFAccount: Record "Cash Flow Account"; var CFForecastEntry: Record "Cash Flow Forecast Entry"; var AccSchedLine: Record "Acc. Schedule Line"; var ColumnLayout: Record "Column Layout")

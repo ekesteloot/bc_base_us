@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 report 7116 "Run Invt. Analysis Line Temp."
 {
     ApplicationArea = InventoryAnalysis;

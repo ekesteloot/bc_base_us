@@ -1,4 +1,8 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
+using System.Azure.Identity;
+
 Codeunit 9019 "User Groups"
 {
     Permissions = TableData "User Group Member" = d;

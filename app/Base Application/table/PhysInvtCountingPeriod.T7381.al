@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
 table 7381 "Phys. Invt. Counting Period"
 {
     Caption = 'Phys. Invt. Counting Period';

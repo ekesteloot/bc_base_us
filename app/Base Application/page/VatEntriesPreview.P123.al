@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 page 123 "VAT Entries Preview"
 {
     Caption = 'VAT Entries Preview';
@@ -61,7 +63,7 @@ page 123 "VAT Entries Preview"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the type of the VAT entry.';
                 }
-                field(Base; Base)
+                field(Base; Rec.Base)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the amount that the VAT amount (the amount shown in the Amount field) is calculated from.';
@@ -117,7 +119,7 @@ page 123 "VAT Entries Preview"
                     ToolTip = 'Specifies the amount of the transaction for which VAT is not applied, due to the type of goods or services purchased. The amount is in the additional reporting currency.';
                     Visible = false;
                 }
-                field(NonDedVATDiff; "Non-Deductible VAT Diff.")
+                field(NonDedVATDiff; Rec."Non-Deductible VAT Diff.")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the difference between the calculated Non-Deductible VAT amount and a Non-Deductible VAT amount that you have entered manually.';
@@ -155,7 +157,7 @@ page 123 "VAT Entries Preview"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies if the transaction is related to trade with a third party within the EU.';
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the VAT entry has been closed by the Calc. and Post VAT Settlement batch job.';
@@ -170,7 +172,7 @@ page 123 "VAT Entries Preview"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the internal reference number for the line.';
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the entry has been part of a reverse transaction.';
@@ -207,7 +209,7 @@ page 123 "VAT Entries Preview"
         if TempVATEntry.FindSet() then
             repeat
                 Rec := TempVATEntry;
-                Insert();
+                Rec.Insert();
             until TempVATEntry.Next() = 0;
     end;
 }

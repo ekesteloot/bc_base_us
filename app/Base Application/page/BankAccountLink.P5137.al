@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+
 page 5137 "Bank Account Link"
 {
     Caption = 'Bank Account Link';
@@ -37,8 +42,8 @@ page 5137 "Bank Account Link"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin
-        if ("No." <> '') and (CloseAction = ACTION::LookupOK) then begin
-            TestField("No.");
+        if (Rec."No." <> '') and (CloseAction = ACTION::LookupOK) then begin
+            Rec.TestField("No.");
             ContBusRel := Rec;
             ContBusRel.Insert(true);
             OnQueryClosePageOnAfterContBusRelInsert(CurrMasterFields, ContBusRel);

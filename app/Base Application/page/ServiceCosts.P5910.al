@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Pricing;
+
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+
 page 5910 "Service Costs"
 {
     ApplicationArea = Service;
@@ -13,7 +18,7 @@ page 5910 "Service Costs"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies a code for the service cost.';

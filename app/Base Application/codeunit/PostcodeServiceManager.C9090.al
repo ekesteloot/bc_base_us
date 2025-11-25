@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Address;
+
 codeunit 9090 "Postcode Service Manager"
 {
 

@@ -1,4 +1,35 @@
-﻿codeunit 5763 "Whse.-Post Shipment"
+﻿namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Posting;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Tracking;
+using System.Utilities;
+
+codeunit 5763 "Whse.-Post Shipment"
 {
     Permissions = TableData "Whse. Item Tracking Line" = r,
                   TableData "Posted Whse. Shipment Header" = rim,
@@ -182,22 +213,22 @@
     begin
         with WhseShptLine do
             case "Source Type" of
-                DATABASE::"Sales Line":
+                Enum::TableID::"Sales Line".AsInteger():
                     begin
                         SalesHeader.Get("Source Subtype", "Source No.");
                         SourceHeader := SalesHeader;
                     end;
-                DATABASE::"Purchase Line": // Return Order
+                Enum::TableID::"Purchase Line".AsInteger(): // Return Order
                     begin
                         PurchHeader.Get("Source Subtype", "Source No.");
                         SourceHeader := PurchHeader;
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     begin
                         TransHeader.Get("Source No.");
                         SourceHeader := TransHeader;
                     end;
-                DATABASE::"Service Line":
+                Enum::TableID::"Service Line".AsInteger():
                     begin
                         ServiceHeader.Get("Source Subtype", "Source No.");
                         SourceHeader := ServiceHeader;
@@ -232,7 +263,7 @@
 
         with WhseShptLine do
             case "Source Type" of
-                DATABASE::"Sales Line":
+                Enum::TableID::"Sales Line".AsInteger():
                     begin
                         IsHandled := false;
                         OnInitSourceDocumentHeaderOnBeforeValidatePostingDate(SalesHeader, WhseShptLine, ValidatePostingDate, IsHandled, ModifyHeader, WhseShptHeader);
@@ -289,7 +320,7 @@
                         if ModifyHeader then
                             SalesHeader.Modify();
                     end;
-                DATABASE::"Purchase Line": // Return Order
+                Enum::TableID::"Purchase Line".AsInteger(): // Return Order
                     begin
                         IsHandled := false;
                         OnInitSourceDocumentHeaderOnBeforePurchaseHeaderUpdatePostingDate(PurchHeader, WhseShptHeader, WhseShptLine, ValidatePostingDate, ModifyHeader, IsHandled);
@@ -327,7 +358,7 @@
                         if ModifyHeader then
                             PurchHeader.Modify();
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     begin
                         IsHandled := false;
                         OnInitSourceDocumentHeaderOnBeforeTransferHeaderUpdatePostingDate(TransHeader, WhseShptHeader, WhseShptLine, ValidatePostingDate, ModifyHeader, IsHandled);
@@ -374,7 +405,7 @@
                         if ModifyHeader then
                             TransHeader.Modify();
                     end;
-                DATABASE::"Service Line":
+                Enum::TableID::"Service Line".AsInteger():
                     begin
                         IsHandled := false;
                         OnInitSourceDocumentHeaderOnBeforeServiceHeaderUpdatePostingDate(ServiceHeader, WhseShptHeader, WhseShptLine, ValidatePostingDate, ModifyHeader, IsHandled);
@@ -423,13 +454,13 @@
     begin
         WhseShptLine2.Copy(WhseShptLine);
         case WhseShptLine2."Source Type" of
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line".AsInteger():
                 HandleSalesLine(WhseShptLine2);
-            DATABASE::"Purchase Line": // Return Order
+            Enum::TableID::"Purchase Line".AsInteger(): // Return Order
                 HandlePurchaseLine(WhseShptLine2);
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line".AsInteger():
                 HandleTransferLine(WhseShptLine2);
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line".AsInteger():
                 HandleServiceLine(WhseShptLine2);
             else
                 OnAfterInitSourceDocumentLines(WhseShptLine2);
@@ -452,7 +483,7 @@
             WhseShptHeader.Get("No.");
             OnPostSourceDocumentAfterGetWhseShptHeader(WhseShptLine, WhseShptHeader);
             case "Source Type" of
-                DATABASE::"Sales Line":
+                Enum::TableID::"Sales Line".AsInteger():
                     begin
                         if "Source Document" = "Source Document"::"Sales Order" then
                             SalesHeader.Ship := true
@@ -500,7 +531,7 @@
                         OnAfterSalesPost(WhseShptLine, SalesHeader, Invoice);
                         Clear(SalesPost);
                     end;
-                DATABASE::"Purchase Line": // Return Order
+                Enum::TableID::"Purchase Line".AsInteger(): // Return Order
                     begin
                         if "Source Document" = "Source Document"::"Purchase Order" then
                             PurchHeader.Receive := true
@@ -546,7 +577,7 @@
                         OnAfterPurchPost(WhseShptLine, PurchHeader, Invoice, WhseShptHeader);
                         Clear(PurchPost);
                     end;
-                DATABASE::"Transfer Line":
+                Enum::TableID::"Transfer Line".AsInteger():
                     begin
                         OnPostSourceDocumentOnBeforeCaseTransferLine(TransHeader, WhseShptLine);
                         if PreviewMode then
@@ -571,7 +602,7 @@
 
                         OnAfterTransferPostShipment(WhseShptLine, TransHeader);
                     end;
-                DATABASE::"Service Line":
+                Enum::TableID::"Service Line".AsInteger():
                     begin
                         ServicePost.SetPostingOptions(true, false, InvoiceService);
                         ServicePost.SetSuppressCommit(SuppressCommit);
@@ -845,7 +876,7 @@
                     if DeleteWhseShptLine then begin
                         ItemTrackingMgt.SetDeleteReservationEntries(true);
                         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-                          DATABASE::"Warehouse Shipment Line", 0, "No.", '', 0, "Line No.", "Location Code", true);
+                          Enum::TableID::"Warehouse Shipment Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true);
                         WhseShptLine2.Delete();
                         OnPostUpdateWhseDocumentsOnAfterWhseShptLine2Delete(WhseShptLine2);
                     end else
@@ -1175,7 +1206,7 @@
                     QtyPickedBase := 0;
                     WhseItemTrkgLine.SetTrackingKey();
                     WhseItemTrkgLine.SetTrackingFilterFromReservEntry(ReservationEntry);
-                    WhseItemTrkgLine.SetSourceFilter(DATABASE::"Warehouse Shipment Line", -1, WhseShptLine."No.", WhseShptLine."Line No.", false);
+                    WhseItemTrkgLine.SetSourceFilter(Enum::TableID::"Warehouse Shipment Line".AsInteger(), -1, WhseShptLine."No.", WhseShptLine."Line No.", false);
                     if WhseItemTrkgLine.Find('-') then
                         repeat
                             QtyPickedBase := QtyPickedBase + WhseItemTrkgLine."Qty. Registered (Base)";

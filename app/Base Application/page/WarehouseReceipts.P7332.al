@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+
 page 7332 "Warehouse Receipts"
 {
     ApplicationArea = Warehouse;
@@ -97,9 +103,9 @@ page 7332 "Warehouse Receipts"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Whse. Receipt"),
-                                  Type = CONST(" "),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Whse. Receipt"),
+                                  Type = const(" "),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Posted &Whse. Receipts")
@@ -108,8 +114,8 @@ page 7332 "Warehouse Receipts"
                     Caption = 'Posted &Whse. Receipts';
                     Image = PostedReceipts;
                     RunObject = Page "Posted Whse. Receipt List";
-                    RunPageLink = "Whse. Receipt No." = FIELD("No.");
-                    RunPageView = SORTING("Whse. Receipt No.");
+                    RunPageLink = "Whse. Receipt No." = field("No.");
+                    RunPageView = sorting("Whse. Receipt No.");
                     ToolTip = 'View the quantity that has been posted as received.';
                 }
             }
@@ -205,10 +211,10 @@ page 7332 "Warehouse Receipts"
     var
         WMSManagement: Codeunit "WMS Management";
     begin
-        ErrorIfUserIsNotWhseEmployee();
-        FilterGroup(2); // set group of filters user cannot change
-        SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
-        FilterGroup(0); // set filter group back to standard
+        Rec.ErrorIfUserIsNotWhseEmployee();
+        Rec.FilterGroup(2); // set group of filters user cannot change
+        Rec.SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
+        Rec.FilterGroup(0); // set filter group back to standard
     end;
 
     local procedure WhsePostRcptYesNo()

@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Setup;
+
+using Microsoft.CRM.Contact;
+using System.Globalization;
+
 table 5069 "Salutation Formula"
 {
     Caption = 'Salutation Formula';

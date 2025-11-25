@@ -8,7 +8,7 @@ report 10126 "Return Order Confirm"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Return Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Return Order"));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Buy-from Vendor No.", "Pay-to Vendor No.", "No. Printed";
             RequestFilterHeading = 'Return Order';
@@ -17,10 +17,10 @@ report 10126 "Return Order Confirm"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyAddress1; CompanyAddress[1])
                     {
                     }
@@ -167,9 +167,9 @@ report 10126 "Return Order Confirm"
                     }
                     dataitem("Purchase Line"; "Purchase Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.") WHERE("Document Type" = CONST("Return Order"));
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.") where("Document Type" = const("Return Order"));
                         column(ItemNoTo_PrintPurchLine; ItemNumberToPrint)
                         {
                         }
@@ -263,6 +263,7 @@ report 10126 "Return Order Confirm"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
 
                 if "Purchaser Code" = '' then
                     Clear(SalesPurchPerson)
@@ -413,9 +414,7 @@ report 10126 "Return Order Confirm"
         ArchiveDocument: Boolean;
         LogInteraction: Boolean;
         Text000: Label 'COPY';
-        [InDataSet]
         ArchiveDocumentEnable: Boolean;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         ToCaptionLbl: Label 'To:';
         ReceiveByCaptionLbl: Label 'Receive By';

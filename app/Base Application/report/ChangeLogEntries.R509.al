@@ -1,7 +1,9 @@
+namespace System.Diagnostics;
+
 report 509 "Change Log Entries"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './OtherCapabilities/ChangeLog/ChangeLogEntries.rdlc';
+    RDLCLayout = './System/ChangeLog/ChangeLogEntries.rdlc';
     Caption = 'Change Log Entries';
 
     dataset

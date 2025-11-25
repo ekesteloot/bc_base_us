@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Forecast;
+
+using Microsoft.InventoryMgt.Item;
+
 query 2900 "Item With Variants"
 {
     QueryType = Normal;

@@ -1,7 +1,7 @@
 page 7606 "Customized Calendar Entries"
 {
     Caption = 'Customized Calendar Entries';
-    DataCaptionExpression = GetCaption();
+    DataCaptionExpression = Rec.GetCaption();
     PageType = ListPlus;
     SourceTable = "Customized Calendar Entry";
 
@@ -61,10 +61,10 @@ page 7606 "Customized Calendar Entries"
                     Caption = '&Maintain Customized Calendar Changes';
                     Image = Edit;
                     RunObject = Page "Customized Calendar Changes";
-                    RunPageLink = "Source Type" = FIELD("Source Type"),
-                                  "Source Code" = FIELD(FILTER("Source Code")),
-                                  "Additional Source Code" = FIELD("Additional Source Code"),
-                                  "Base Calendar Code" = FIELD("Base Calendar Code");
+                    RunPageLink = "Source Type" = field("Source Type"),
+                                  "Source Code" = field(FILTER("Source Code")),
+                                  "Additional Source Code" = field("Additional Source Code"),
+                                  "Base Calendar Code" = field("Base Calendar Code");
                     ToolTip = 'View or edit a customized calendar. You would typically enter any nonworking days that you want to apply to a calendar that you are setting up, to change their status from working to nonworking. You can also use this window to edit a base calendar that has already been set up.';
                 }
             }

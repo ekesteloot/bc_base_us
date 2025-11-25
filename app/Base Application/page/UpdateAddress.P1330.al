@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Address;
+
 page 1330 "Update Address"
 {
     Caption = 'Do you want to update the address?';

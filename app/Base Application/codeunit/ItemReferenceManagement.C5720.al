@@ -1,4 +1,15 @@
-﻿codeunit 5720 "Item Reference Management"
+﻿namespace Microsoft.InventoryMgt.Item.Catalog;
+
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Counting.Recording;
+using Microsoft.InventoryMgt.Document;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+
+codeunit 5720 "Item Reference Management"
 {
 
     trigger OnRun()
@@ -61,6 +72,7 @@
 
     local procedure FindItemReferenceForSalesLine(SalesLine: Record "Sales Line")
     var
+        ToDate: Date;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -72,6 +84,11 @@
         ItemReference.SetRange("Item No.", SalesLine."No.");
         ItemReference.SetRange("Variant Code", SalesLine."Variant Code");
         ItemReference.SetRange("Unit of Measure", SalesLine."Unit of Measure Code");
+        ToDate := SalesLine.GetDateForCalculations();
+        if ToDate <> 0D then begin
+            ItemReference.SetFilter("Starting Date", '<=%1', ToDate);
+            ItemReference.SetFilter("Ending Date", '>=%1|%2', ToDate, 0D);
+        end;
         ItemReference.SetRange("Reference Type", SalesLine."Item Reference Type"::Customer);
         ItemReference.SetRange("Reference Type No.", SalesLine."Sell-to Customer No.");
         ItemReference.SetRange("Reference No.", SalesLine."Item Reference No.");
@@ -96,11 +113,12 @@
         if SalesLine.Type = SalesLine.Type::Item then
             FindOrSelectFromItemReferenceList(
                 ReturnedItemReference, ShowDialog, SalesLine."No.", SalesLine."Item Reference No.", SalesLine."Sell-to Customer No.",
-                ReturnedItemReference."Reference Type"::Customer);
+                ReturnedItemReference."Reference Type"::Customer, SalesLine.GetDateForCalculations());
     end;
 
     procedure EnterPurchaseItemReference(var PurchLine2: Record "Purchase Line")
     var
+        ToDate: Date;
         ShouldAssignDescription: Boolean;
         IsHandled: Boolean;
     begin
@@ -115,6 +133,11 @@
                 ItemReference.SetRange("Item No.", "No.");
                 ItemReference.SetRange("Variant Code", "Variant Code");
                 ItemReference.SetRange("Unit of Measure", "Unit of Measure Code");
+                ToDate := PurchLine2.GetDateForCalculations();
+                if ToDate <> 0D then begin
+                    ItemReference.SetFilter("Starting Date", '<=%1', ToDate);
+                    ItemReference.SetFilter("Ending Date", '>=%1|%2', ToDate, 0D);
+                end;
                 ItemReference.SetRange("Reference Type", "Item Reference Type"::Vendor);
                 ItemReference.SetRange("Reference Type No.", "Buy-from Vendor No.");
                 ItemReference.SetRange("Reference No.", "Item Reference No.");
@@ -181,7 +204,7 @@
         if PurchLine.Type = PurchLine.Type::Item then
             FindOrSelectFromItemReferenceList(
                 ReturnedItemReference, ShowDialog, PurchLine."No.", PurchLine."Item Reference No.", PurchLine."Buy-from Vendor No.",
-                ReturnedItemReference."Reference Type"::Vendor);
+                ReturnedItemReference."Reference Type"::Vendor, PurchLine.GetDateForCalculations());
     end;
 
     local procedure FilterItemReferenceByItemVendor(var ItemReference: Record "Item Reference"; ItemVendor: Record "Item Vendor")
@@ -218,13 +241,7 @@
     local procedure CreateItemReference(ItemVend: Record "Item Vendor")
     var
         ItemReference2: Record "Item Reference";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCreateItemReference(ItemVend, IsHandled);
-        if IsHandled then
-            exit;
-
         FillItemReferenceFromItemVendor(ItemReference2, ItemVend);
 
         OnCreateItemReferenceOnBeforeInsert(ItemReference2, ItemVend);
@@ -258,13 +275,18 @@
     end;
 
     procedure FindOrSelectFromItemReferenceList(var ItemReferenceToReturn: Record "Item Reference"; ShowDialog: Boolean; ItemNo: Code[20]; ItemRefNo: Code[50]; ItemRefTypeNo: Code[30]; ItemRefType: Enum "Item Reference Type")
+    begin
+        FindOrSelectFromItemReferenceList(ItemReferenceToReturn, ShowDialog, ItemNo, ItemRefNo, ItemRefTypeNo, ItemRefType, 0D);
+    end;
+
+    procedure FindOrSelectFromItemReferenceList(var ItemReferenceToReturn: Record "Item Reference"; ShowDialog: Boolean; ItemNo: Code[20]; ItemRefNo: Code[50]; ItemRefTypeNo: Code[30]; ItemRefType: Enum "Item Reference Type"; ToDate: Date)
     var
         TempRecRequired: Boolean;
         MultipleItemsToChoose: Boolean;
         QtyCustOrVendCR: Integer;
         QtyBarCodeAndBlankCR: Integer;
     begin
-        InitItemReferenceFilters(ItemReference, ItemNo, ItemRefNo, ItemRefType);
+        InitItemReferenceFilters(ItemReference, ItemNo, ItemRefNo, ItemRefType, ToDate);
         CountItemReference(ItemReference, QtyCustOrVendCR, QtyBarCodeAndBlankCR, ItemRefType, ItemRefTypeNo);
         MultipleItemsToChoose := true;
 
@@ -319,12 +341,16 @@
                 FindFirstBarCodeOrBlankTypeItemReference(ItemReference);
     end;
 
-    local procedure InitItemReferenceFilters(var ItemReference: Record "Item Reference"; ItemNo: Code[20]; ItemRefNo: Code[50]; ItemRefType: Enum "Item Reference Type")
+    local procedure InitItemReferenceFilters(var ItemReference: Record "Item Reference"; ItemNo: Code[20]; ItemRefNo: Code[50]; ItemRefType: Enum "Item Reference Type"; ToDate: Date)
     begin
         ItemReference.Reset();
         ItemReference.SetCurrentKey("Reference No.", "Reference Type", "Reference Type No.");
         ItemReference.SetRange("Reference No.", ItemRefNo);
         ItemReference.SetRange("Item No.", ItemNo);
+        if ToDate <> 0D then begin
+            ItemReference.SetFilter("Starting Date", '<=%1', ToDate);
+            ItemReference.SetFilter("Ending Date", '>=%1|%2', ToDate, 0D);
+        end;
         ExcludeOtherReferenceTypes(ItemReference, ItemRefType);
         OnInitItemReferenceFiltersOnBeforeCheckIsEmpty(ItemReference, ItemRefType);
         if ItemReference.IsEmpty() then
@@ -474,6 +500,7 @@
     var
         ItemReference2: Record "Item Reference";
         ICGLAcc: Record "IC G/L Account";
+        ToDate: Date;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -485,10 +512,14 @@
                 Type::Item:
                     begin
                         GetSalesHeader();
-                        ItemReference2.Reset();
                         ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
                         ItemReference2.SetFilter("Reference Type", '%1|%2', ItemReference2."Reference Type"::Customer, ItemReference2."Reference Type"::" ");
                         ItemReference2.SetFilter("Reference Type No.", '%1|%2', SalesHeader."Sell-to Customer No.", '');
+                        ToDate := SalesLine.GetDateForCalculations();
+                        if ToDate <> 0D then begin
+                            ItemReference2.SetFilter("Starting Date", '<=%1', ToDate);
+                            ItemReference2.SetFilter("Ending Date", '>=%1|%2', ToDate, 0D);
+                        end;
                         OnSalesReferenceNoLookupOnAfterSetFilters(ItemReference2, SalesLine, SalesHeader);
                         if PAGE.RunModal(PAGE::"Item Reference List", ItemReference2) = ACTION::LookupOK then begin
                             SalesLine."Item Reference No." := ItemReference2."Reference No.";
@@ -574,6 +605,7 @@
     procedure PurchaseReferenceNoLookup(var PurchaseLine: Record "Purchase Line"; PurchHeader: Record "Purchase Header")
     var
         ItemReference2: Record "Item Reference";
+        ToDate: Date;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -582,10 +614,14 @@
             exit;
 
         if PurchaseLine.Type = PurchaseLine.Type::Item then begin
-            ItemReference2.Reset();
             ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
             ItemReference2.SetFilter("Reference Type", '%1|%2', ItemReference2."Reference Type"::Vendor, ItemReference2."Reference Type"::" ");
             ItemReference2.SetFilter("Reference Type No.", '%1|%2', PurchHeader."Buy-from Vendor No.", '');
+            ToDate := PurchaseLine.GetDateForCalculations();
+            if ToDate <> 0D then begin
+                ItemReference2.SetFilter("Starting Date", '<=%1', ToDate);
+                ItemReference2.SetFilter("Ending Date", '>=%1|%2', ToDate, 0D);
+            end;
             OnPurchaseReferenceNoLookUpOnAfterSetFilters(ItemReference2, PurchaseLine);
             if PAGE.RunModal(PAGE::"Item Reference List", ItemReference2) = ACTION::LookupOK then begin
                 PurchaseLine."Item Reference No." := ItemReference2."Reference No.";
@@ -644,11 +680,16 @@
     procedure PhysicalInventoryOrderReferenceNoLookup(var PhysInvtOrderLine: Record "Phys. Invt. Order Line")
     var
         ItemReference2: Record "Item Reference";
+        ToDate: Date;
     begin
-        ItemReference2.Reset();
         ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
         ItemReference2.SetRange("Reference Type", ItemReference2."Reference Type"::" ");
         ItemReference2.SetRange("Reference Type No.", '');
+        ToDate := PhysInvtOrderLine.GetDateForCalculations();
+        if ToDate <> 0D then begin
+            ItemReference2.SetFilter("Starting Date", '<=%1', ToDate);
+            ItemReference2.SetFilter("Ending Date", '>=%1|%2', ToDate, 0D);
+        end;
         OnPhysicalInventoryOrderReferenceNoLookupOnAfterSetFilters(ItemReference2, PhysInvtOrderLine);
         if Page.RunModal(Page::"Item Reference List", ItemReference2) = Action::LookupOK then begin
             PhysInvtOrderLine."Item Reference No." := ItemReference2."Reference No.";
@@ -689,26 +730,91 @@
 
     procedure ReferenceLookupPhysicalInventoryOrderItem(var PhysInvtOrderLine: Record "Phys. Invt. Order Line"; var ReturnedItemReference: Record "Item Reference"; ShowDialog: Boolean)
     var
-        PhysInvtOrderLine2: Record "Phys. Invt. Order Line";
         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeReferenceLookupPhysicalInventoryOrderItem(PhysInvtOrderLine, ReturnedItemReference, ShowDialog, IsHandled);
         if IsHandled then
             exit;
-
-        PhysInvtOrderLine2.Copy(PhysInvtOrderLine);
-        FindOrSelectFromItemReferenceList(ReturnedItemReference, ShowDialog, PhysInvtOrderLine2."Item No.", PhysInvtOrderLine2."Item Reference No.", '', ReturnedItemReference."Reference Type"::" ");
+        FindOrSelectFromItemReferenceList(ReturnedItemReference, ShowDialog, PhysInvtOrderLine."Item No.", PhysInvtOrderLine."Item Reference No.", '', ReturnedItemReference."Reference Type"::" ", PhysInvtOrderLine.GetDateForCalculations());
     end;
 
-    procedure ItemJournalReferenceNoLookup(var ItemJournalLine: Record "Item Journal Line")
+    procedure PhysicalInventoryRecordReferenceNoLookup(var PhysInvtRecordLine: Record "Phys. Invt. Record Line")
     var
         ItemReference2: Record "Item Reference";
+        ToDate: Date;
     begin
         ItemReference2.Reset();
         ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
         ItemReference2.SetRange("Reference Type", ItemReference2."Reference Type"::" ");
         ItemReference2.SetRange("Reference Type No.", '');
+        ToDate := PhysInvtRecordLine.GetDateForCalculations();
+        if ToDate <> 0D then begin
+            ItemReference2.SetFilter("Starting Date", '<=%1', ToDate);
+            ItemReference2.SetFilter("Ending Date", '>=%1|%2', ToDate, 0D);
+        end;
+        OnPhysicalInventoryRecordReferenceNoLookupOnAfterSetFilters(ItemReference2, PhysInvtRecordLine);
+        if Page.RunModal(Page::"Item Reference List", ItemReference2) = Action::LookupOK then begin
+            PhysInvtRecordLine."Item Reference No." := ItemReference2."Reference No.";
+            ValidatePhysicalInventoryRecordReferenceNo(PhysInvtRecordLine, ItemReference2, false, 0);
+        end;
+    end;
+
+    procedure ValidatePhysicalInventoryRecordReferenceNo(var PhysInvtRecordLine: Record "Phys. Invt. Record Line"; ItemReference: Record "Item Reference"; SearchItem: Boolean; CurrentFieldNo: Integer)
+    var
+        ReturnedItemReference: Record "Item Reference";
+    begin
+        ReturnedItemReference.Init();
+        if PhysInvtRecordLine."Item Reference No." <> '' then begin
+            if SearchItem then
+                ReferenceLookupPhysicalInventoryRecordItem(PhysInvtRecordLine, ReturnedItemReference, CurrentFieldNo <> 0)
+            else
+                ReturnedItemReference := ItemReference;
+
+            OnValidatePhysicalInventoryRecordReferenceNoOnBeforeAssignNo(PhysInvtRecordLine, ReturnedItemReference);
+
+            TestEmptyOrBaseItemUnitOfMeasure(ReturnedItemReference);
+            PhysInvtRecordLine.Validate("Item No.", ReturnedItemReference."Item No.");
+            if ReturnedItemReference."Variant Code" <> '' then
+                PhysInvtRecordLine.Validate("Variant Code", ReturnedItemReference."Variant Code");
+        end;
+
+        PhysInvtRecordLine."Item Reference Unit of Measure" := ReturnedItemReference."Unit of Measure";
+        PhysInvtRecordLine."Item Reference Type" := ReturnedItemReference."Reference Type";
+        PhysInvtRecordLine."Item Reference Type No." := ReturnedItemReference."Reference Type No.";
+        PhysInvtRecordLine."Item Reference No." := ReturnedItemReference."Reference No.";
+
+        if (ReturnedItemReference.Description <> '') or (ReturnedItemReference."Description 2" <> '') then begin
+            PhysInvtRecordLine.Description := ReturnedItemReference.Description;
+            PhysInvtRecordLine."Description 2" := ReturnedItemReference."Description 2";
+        end;
+        OnAfterValidatePhysicalInventoryRecordReferenceNo(PhysInvtRecordLine, ItemReference, ReturnedItemReference);
+    end;
+
+    procedure ReferenceLookupPhysicalInventoryRecordItem(var PhysInvtRecordLine: Record "Phys. Invt. Record Line"; var ReturnedItemReference: Record "Item Reference"; ShowDialog: Boolean)
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeReferenceLookupPhysicalInventoryRecordItem(PhysInvtRecordLine, ReturnedItemReference, ShowDialog, IsHandled);
+        if IsHandled then
+            exit;
+        FindOrSelectFromItemReferenceList(ReturnedItemReference, ShowDialog, PhysInvtRecordLine."Item No.", PhysInvtRecordLine."Item Reference No.", '', ReturnedItemReference."Reference Type"::" ", PhysInvtRecordLine.GetDateForCalculations());
+    end;
+
+    procedure ItemJournalReferenceNoLookup(var ItemJournalLine: Record "Item Journal Line")
+    var
+        ItemReference2: Record "Item Reference";
+        ToDate: Date;
+    begin
+        ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
+        ItemReference2.SetRange("Reference Type", ItemReference2."Reference Type"::" ");
+        ItemReference2.SetRange("Reference Type No.", '');
+        ToDate := ItemJournalLine.GetDateForCalculations();
+        if ToDate <> 0D then begin
+            ItemReference2.SetFilter("Starting Date", '<=%1', ToDate);
+            ItemReference2.SetFilter("Ending Date", '>=%1|%2', ToDate, 0D);
+        end;
         OnItemJournalReferenceNoLookupOnAfterSetFilters(ItemReference2, ItemJournalLine);
         if Page.RunModal(Page::"Item Reference List", ItemReference2) = Action::LookupOK then begin
             ItemJournalLine."Item Reference No." := ItemReference2."Reference No.";
@@ -747,16 +853,68 @@
 
     procedure ReferenceLookupItemJournalItem(var ItemJournalLine: Record "Item Journal Line"; var ReturnedItemReference: Record "Item Reference"; ShowDialog: Boolean)
     var
-        ItemJournalLine2: Record "Item Journal Line";
         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeReferenceLookupItemJournalItem(ItemJournalLine, ReturnedItemReference, ShowDialog, IsHandled);
         if IsHandled then
             exit;
+        FindOrSelectFromItemReferenceList(ReturnedItemReference, ShowDialog, ItemJournalLine."Item No.", ItemJournalLine."Item Reference No.", '', ReturnedItemReference."Reference Type"::" ", ItemJournalLine.GetDateForCalculations());
+    end;
 
-        ItemJournalLine2.Copy(ItemJournalLine);
-        FindOrSelectFromItemReferenceList(ReturnedItemReference, ShowDialog, ItemJournalLine2."Item No.", ItemJournalLine2."Item Reference No.", '', ReturnedItemReference."Reference Type"::" ");
+    procedure ValidateInvtDocumentReferenceNo(var InvtDocumentLine: Record "Invt. Document Line"; ItemReference: Record "Item Reference"; SearchItem: Boolean; CurrentFieldNo: Integer)
+    var
+        ReturnedItemReference: Record "Item Reference";
+    begin
+        ReturnedItemReference.Init();
+        if InvtDocumentLine."Item Reference No." <> '' then begin
+            if SearchItem then
+                ReferenceLookupInvtDocumentItem(InvtDocumentLine, ReturnedItemReference, CurrentFieldNo <> 0)
+            else
+                ReturnedItemReference := ItemReference;
+
+            OnValidateInvtDocumentReferenceNoOnBeforeAssignNo(InvtDocumentLine, ReturnedItemReference);
+
+            TestEmptyOrBaseItemUnitOfMeasure(ReturnedItemReference);
+            InvtDocumentLine.Validate("Item No.", ReturnedItemReference."Item No.");
+            if ReturnedItemReference."Variant Code" <> '' then
+                InvtDocumentLine.Validate("Variant Code", ReturnedItemReference."Variant Code");
+        end;
+
+        InvtDocumentLine."Item Reference Unit of Measure" := ReturnedItemReference."Unit of Measure";
+        InvtDocumentLine."Item Reference Type" := ReturnedItemReference."Reference Type";
+        InvtDocumentLine."Item Reference Type No." := ReturnedItemReference."Reference Type No.";
+        InvtDocumentLine."Item Reference No." := ReturnedItemReference."Reference No.";
+
+        if ReturnedItemReference.Description <> '' then
+            InvtDocumentLine.Description := ReturnedItemReference.Description;
+
+        OnAfterValidateInvtDocumentReferenceNo(InvtDocumentLine, ItemReference, ReturnedItemReference);
+    end;
+
+    procedure ReferenceLookupInvtDocumentItem(var InvtDocumentLine: Record "Invt. Document Line"; var ReturnedItemReference: Record "Item Reference"; ShowDialog: Boolean)
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeReferenceLookupInvtDocumentItem(InvtDocumentLine, ReturnedItemReference, ShowDialog, IsHandled);
+        if IsHandled then
+            exit;
+        FindOrSelectFromItemReferenceList(ReturnedItemReference, ShowDialog, InvtDocumentLine."Item No.", InvtDocumentLine."Item Reference No.", '', ReturnedItemReference."Reference Type"::" ");
+    end;
+
+    procedure InvtDocumentReferenceNoLookup(var InvtDocumentLine: Record "Invt. Document Line")
+    var
+        ItemReference2: Record "Item Reference";
+    begin
+        ItemReference2.SetCurrentKey("Reference Type", "Reference Type No.");
+        ItemReference2.SetRange("Reference Type", ItemReference2."Reference Type"::" ");
+        ItemReference2.SetRange("Reference Type No.", '');
+        OnInvtDocumentReferenceNoLookupOnAfterSetFilters(ItemReference2, InvtDocumentLine);
+        if Page.RunModal(Page::"Item Reference List", ItemReference2) = Action::LookupOK then begin
+            InvtDocumentLine."Item Reference No." := ItemReference2."Reference No.";
+            ValidateInvtDocumentReferenceNo(InvtDocumentLine, ItemReference2, false, 0);
+        end;
     end;
 
     local procedure TestEmptyOrBaseItemUnitOfMeasure(ItemReference: Record "Item Reference")
@@ -943,6 +1101,26 @@
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnPhysicalInventoryRecordReferenceNoLookupOnAfterSetFilters(var ItemReference: Record "Item Reference"; PhysInvtRecordLine: Record "Phys. Invt. Record Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeReferenceLookupPhysicalInventoryRecordItem(var PhysInvtRecordLine: Record "Phys. Invt. Record Line"; var ItemReference: Record "Item Reference"; ShowDialog: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidatePhysicalInventoryRecordReferenceNoOnBeforeAssignNo(var PhysInvtRecordLine: Record "Phys. Invt. Record Line"; ReturnedItemReference: Record "Item Reference")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidatePhysicalInventoryRecordReferenceNo(var PhysInvtRecordLine: Record "Phys. Invt. Record Line"; ItemReference: Record "Item Reference"; ReturnedItemReference: Record "Item Reference")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnItemJournalReferenceNoLookupOnAfterSetFilters(var ItemReference: Record "Item Reference"; ItemJournalLine: Record "Item Journal Line")
     begin
     end;
@@ -963,17 +1141,32 @@
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnValidateInvtDocumentReferenceNoOnBeforeAssignNo(var InvtDocumentLine: Record "Invt. Document Line"; ReturnedItemReference: Record "Item Reference")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidateInvtDocumentReferenceNo(var InvtDocumentLine: Record "Invt. Document Line"; ItemReference: Record "Item Reference"; ReturnedItemReference: Record "Item Reference")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeReferenceLookupInvtDocumentItem(var InvtDocumentLine: Record "Invt. Document Line"; var ItemReference: Record "Item Reference"; ShowDialog: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInvtDocumentReferenceNoLookupOnAfterSetFilters(var ItemReference: Record "Item Reference"; InvtDocumentLine: Record "Invt. Document Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnEnterSalesItemReferenceOnAfterFillDescriptionFromItem(var SalesLine: Record "Sales Line"; var Item: Record Item);
     begin
     end;
 
     [IntegrationEvent(false, false)]
     local procedure OnEnterSalesItemReferenceOnAfterFillDescriptionFromItemVariant(var SalesLine: Record "Sales Line"; var ItemVariant: Record "Item Variant");
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateItemReference(ItemVendor: Record "Item Vendor"; var IsHandled: Boolean);
     begin
     end;
 }

@@ -1,7 +1,13 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Sales.Document;
+
 report 708 "Inventory Order Details"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InventoryOrderDetails.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InventoryOrderDetails.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory Order Details';
     UsageCategory = ReportsAndAnalysis;
@@ -80,8 +86,8 @@ report 708 "Inventory Order Details"
             }
             dataitem("Sales Line"; "Sales Line")
             {
-                DataItemLink = "No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Location Code" = FIELD("Location Filter"), "Shortcut Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Bin Code" = FIELD("Bin Filter");
-                DataItemTableView = SORTING("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date") WHERE("Document Type" = CONST(Order), Type = CONST(Item), "Outstanding Quantity" = FILTER(<> 0));
+                DataItemLink = "No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter"), "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"), "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"), "Bin Code" = field("Bin Filter");
+                DataItemTableView = sorting("Document Type", Type, "No.", "Variant Code", "Drop Shipment", "Location Code", "Shipment Date") where("Document Type" = const(Order), Type = const(Item), "Outstanding Quantity" = filter(<> 0));
                 RequestFilterFields = "Shipment Date";
                 RequestFilterHeading = 'Sales Order Line';
                 column(SalesLineDocumentNo; "Document No.")

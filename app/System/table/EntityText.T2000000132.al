@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Azure.AI;
+
 table 2000000132 "Entity Text"
 {
     ReplicateData = false;
@@ -7,7 +13,7 @@ table 2000000132 "Entity Text"
         field(1; Company; Text[30])
         {
             DataClassification = SystemMetadata;
-            TableRelation = Company.Name;
+            TableRelation = System.Environment.Company.Name;
         }
 
         field(2; "Source Table Id"; Integer)

@@ -1,3 +1,11 @@
+namespace Microsoft.FixedAssets.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Reversal;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.Shared.Navigate;
+using System.Security.User;
+
 page 5604 "FA Ledger Entries"
 {
     AdditionalSearchTerms = 'fixed asset ledger entries';
@@ -7,7 +15,7 @@ page 5604 "FA Ledger Entries"
     Editable = false;
     PageType = List;
     SourceTable = "FA Ledger Entry";
-    SourceTableView = SORTING("Entry No.");
+    SourceTableView = sorting("Entry No.");
     UsageCategory = History;
 
     layout
@@ -124,7 +132,7 @@ page 5604 "FA Ledger Entries"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -139,7 +147,7 @@ page 5604 "FA Ledger Entries"
                     ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
-                field(Reversed; Reversed)
+                field(Reversed; Rec.Reversed)
                 {
                     ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies whether the entry has been part of a reverse transaction (correction) made by the Reverse function.';
@@ -256,7 +264,7 @@ page 5604 "FA Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -269,7 +277,7 @@ page 5604 "FA Ledger Entries"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }
@@ -315,17 +323,17 @@ page 5604 "FA Ledger Entries"
                         FADeprBook: Record "FA Depreciation Book";
                     begin
                         Clear(ReversalEntry);
-                        if Reversed then
-                            ReversalEntry.AlreadyReversedEntry(TableCaption, "Entry No.");
-                        if "Journal Batch Name" = '' then
+                        if Rec.Reversed then
+                            ReversalEntry.AlreadyReversedEntry(Rec.TableCaption(), Rec."Entry No.");
+                        if Rec."Journal Batch Name" = '' then
                             ReversalEntry.TestFieldError();
-                        FADeprBook.Get("FA No.", "Depreciation Book Code");
+                        FADeprBook.Get(Rec."FA No.", Rec."Depreciation Book Code");
                         if FADeprBook."Disposal Date" > 0D then
                             Error(Text001);
-                        if "Transaction No." = 0 then
-                            Error(CannotUndoErr, "Entry No.", "Depreciation Book Code");
-                        TestField("G/L Entry No.");
-                        ReversalEntry.ReverseTransaction("Transaction No.");
+                        if Rec."Transaction No." = 0 then
+                            Error(CannotUndoErr, Rec."Entry No.", Rec."Depreciation Book Code");
+                        Rec.TestField("G/L Entry No.");
+                        ReversalEntry.ReverseTransaction(Rec."Transaction No.");
                     end;
                 }
             }
@@ -339,7 +347,7 @@ page 5604 "FA Ledger Entries"
 
                 trigger OnAction()
                 begin
-                    Navigate.SetDoc("Posting Date", "Document No.");
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }

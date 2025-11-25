@@ -1,3 +1,5 @@
+namespace System.IO;
+
 page 8617 "Config. Package Import Preview"
 {
     Caption = 'Config. Package Import Preview';
@@ -56,7 +58,7 @@ page 8617 "Config. Package Import Preview"
                     StyleExpr = TableStyleExpr;
                     ToolTip = 'Specifies the table name.';
                 }
-                field("New Table"; Validated)
+                field("New Table"; Rec.Validated)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the package does not include data for this table.';
@@ -99,13 +101,13 @@ page 8617 "Config. Package Import Preview"
 
     trigger OnAfterGetRecord()
     begin
-        PackageStyleExpr := GetStyle("Delayed Insert");
-        TableStyleExpr := GetStyle(Validated);
+        PackageStyleExpr := GetStyle(Rec."Delayed Insert");
+        TableStyleExpr := GetStyle(Rec.Validated);
     end;
 
     trigger OnOpenPage()
     begin
-        IsImportEnabled := not IsEmpty();
+        IsImportEnabled := not Rec.IsEmpty();
     end;
 
     var
@@ -126,7 +128,7 @@ page 8617 "Config. Package Import Preview"
     procedure SetData(NewSelectedPackageCode: Code[20]; var TempConfigPackageTable: Record "Config. Package Table" temporary)
     begin
         SelectedPackageCode := NewSelectedPackageCode;
-        Copy(TempConfigPackageTable, true);
+        Rec.Copy(TempConfigPackageTable, true);
     end;
 
     procedure IsImportConfirmed(): Boolean

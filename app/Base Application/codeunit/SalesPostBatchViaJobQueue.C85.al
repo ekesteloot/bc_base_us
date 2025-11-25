@@ -1,3 +1,11 @@
+namespace Microsoft.Sales.Posting;
+
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Setup;
+using System.Threading;
+using System.Utilities;
+
 codeunit 85 "Sales Post Batch via Job Queue"
 {
     TableNo = "Job Queue Entry";
@@ -132,7 +140,7 @@ codeunit 85 "Sales Post Batch via Job Queue"
         SalesShipmentHeader."No." := SalesHeader."Last Shipping No.";
         SalesShipmentHeader.SetRecFilter();
         RecRef.GetTable(SalesShipmentHeader);
-        Result := PrintDocument("Report Selection Usage"::"S.Shipment", RecRef, SalesHeader, JobQueueEntry);
+        Result := PrintDocument(Enum::"Report Selection Usage"::"S.Shipment", RecRef, SalesHeader, JobQueueEntry);
     end;
 
     local procedure PrintInvoiceDocument(SalesHeader: Record "Sales Header"; JobQueueEntry: Record "Job Queue Entry") Result: Boolean
@@ -146,7 +154,7 @@ codeunit 85 "Sales Post Batch via Job Queue"
             SalesInvoiceHeader."No." := SalesHeader."Last Posting No.";
         SalesInvoiceHeader.SetRecFilter();
         RecRef.GetTable(SalesInvoiceHeader);
-        Result := PrintDocument("Report Selection Usage"::"S.Invoice", RecRef, SalesHeader, JobQueueEntry);
+        Result := PrintDocument(Enum::"Report Selection Usage"::"S.Invoice", RecRef, SalesHeader, JobQueueEntry);
     end;
 
     local procedure PrintCrMemoDocument(SalesHeader: Record "Sales Header"; JobQueueEntry: Record "Job Queue Entry") Result: Boolean
@@ -160,7 +168,7 @@ codeunit 85 "Sales Post Batch via Job Queue"
             SalesCrMemoHeader."No." := SalesHeader."Last Posting No.";
         SalesCrMemoHeader.SetRecFilter();
         RecRef.GetTable(SalesCrMemoHeader);
-        Result := PrintDocument("Report Selection Usage"::"S.Cr.Memo", RecRef, SalesHeader, JobQueueEntry);
+        Result := PrintDocument(Enum::"Report Selection Usage"::"S.Cr.Memo", RecRef, SalesHeader, JobQueueEntry);
     end;
 
     local procedure PrintDocument(ReportUsage: Enum "Report Selection Usage"; RecRef: RecordRef; SalesHeader: Record "Sales Header"; JobQueueEntry: Record "Job Queue Entry") Result: Boolean

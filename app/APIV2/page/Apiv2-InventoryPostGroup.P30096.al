@@ -20,18 +20,22 @@ page 30096 "APIV2 - Inventory Post. Group"
         {
             repeater(Group)
             {
-                field(id; SystemId)
+                field(id; Rec.SystemId)
                 {
                     Caption = 'Id';
                 }
-                field(code; "code")
+                field(code; Rec."code")
                 {
                     Caption = 'Code';
                 }
 
-                field(description; "Description")
+                field(description; Rec."Description")
                 {
                     Caption = 'Description';
+                }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
                 }
             }
         }

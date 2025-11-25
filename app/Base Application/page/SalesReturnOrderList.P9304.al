@@ -9,7 +9,7 @@ page 9304 "Sales Return Order List"
     QueryCategory = 'Sales Return Order List';
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = CONST("Return Order"));
+    SourceTableView = where("Document Type" = const("Return Order"));
     UsageCategory = Lists;
 
     AboutTitle = 'About sales return orders';
@@ -230,7 +230,7 @@ page 9304 "Sales Return Order List"
                 {
                     ApplicationArea = SalesReturnOrder;
                     Style = Unfavorable;
-                    StyleExpr = "Job Queue Status" = "Job Queue Status"::ERROR;
+                    StyleExpr = Rec."Job Queue Status" = Rec."Job Queue Status"::ERROR;
                     ToolTip = 'Specifies the status of a job queue entry or task that handles the posting of sales return orders.';
                     Visible = JobQueueActive;
 
@@ -238,9 +238,9 @@ page 9304 "Sales Return Order List"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
                 field("Campaign No."; Rec."Campaign No.")
@@ -279,19 +279,19 @@ page 9304 "Sales Return Order List"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"Sales Header"), "No." = FIELD("No."), "Document Type" = FIELD("Document Type");
+                SubPageLink = "Table ID" = const(Database::"Sales Header"), "No." = field("No."), "Document Type" = field("Document Type");
             }
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = SalesReturnOrder;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             part(Control1900316107; "Customer Details FactBox")
             {
                 ApplicationArea = SalesReturnOrder;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             systempart(Control1900383207; Links)
             {
@@ -325,7 +325,7 @@ page 9304 "Sales Return Order List"
                     trigger OnAction()
                     begin
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        OpenSalesOrderStatistics();
+                        Rec.OpenSalesOrderStatistics();
                     end;
                 }
                 action(Dimensions)
@@ -339,7 +339,7 @@ page 9304 "Sales Return Order List"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Approvals)
@@ -363,9 +363,9 @@ page 9304 "Sales Return Order List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Return Order"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const("Return Order"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -379,8 +379,8 @@ page 9304 "Sales Return Order List"
                     Caption = 'Return Receipts';
                     Image = ReturnReceipt;
                     RunObject = Page "Posted Return Receipts";
-                    RunPageLink = "Return Order No." = FIELD("No.");
-                    RunPageView = SORTING("Return Order No.");
+                    RunPageLink = "Return Order No." = field("No.");
+                    RunPageView = sorting("Return Order No.");
                     ToolTip = 'View a list of posted return receipts for the order.';
                 }
                 action("Cred&it Memos")
@@ -388,10 +388,16 @@ page 9304 "Sales Return Order List"
                     ApplicationArea = SalesReturnOrder;
                     Caption = 'Cred&it Memos';
                     Image = CreditMemo;
-                    RunObject = Page "Posted Sales Credit Memos";
-                    RunPageLink = "Return Order No." = FIELD("No.");
-                    RunPageView = SORTING("Return Order No.");
                     ToolTip = 'View a list of ongoing credit memos for the order.';
+
+                    trigger OnAction()
+                    var
+                        TempSalesCrMemoHeader: Record "Sales Cr.Memo Header" temporary;
+                        SalesGetReturnReceipts: Codeunit "Sales-Get Return Receipts";
+                    begin
+                        SalesGetReturnReceipts.GetSalesRetOrderCrMemos(TempSalesCrMemoHeader, Rec."No.");
+                        Page.Run(Page::"Posted Sales Credit Memos", TempSalesCrMemoHeader);
+                    end;
                 }
             }
             group(Warehouse)
@@ -404,9 +410,9 @@ page 9304 "Sales Return Order List"
                     Caption = 'In&vt. Put-away/Pick Lines';
                     Image = PickLines;
                     RunObject = Page "Warehouse Activity List";
-                    RunPageLink = "Source Document" = CONST("Sales Return Order"),
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Document", "Source No.", "Location Code");
+                    RunPageLink = "Source Document" = const("Sales Return Order"),
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Document", "Source No.", "Location Code");
                     ToolTip = 'View items that are inbound or outbound on inventory put-away or inventory pick documents for the sales return order.';
                 }
                 action("Whse. Receipt Lines")
@@ -415,12 +421,12 @@ page 9304 "Sales Return Order List"
                     Caption = 'Whse. Receipt Lines';
                     Image = ReceiptLines;
                     RunObject = Page "Whse. Receipt Lines";
-                    RunPageLink = "Source Type" = CONST(37),
+                    RunPageLink = "Source Type" = const(37),
 #pragma warning disable AL0603
-                                  "Source Subtype" = FIELD("Document Type"),
+                                  "Source Subtype" = field("Document Type"),
 #pragma warning restore
-                                  "Source No." = FIELD("No.");
-                    RunPageView = SORTING("Source Type", "Source Subtype", "Source No.", "Source Line No.");
+                                  "Source No." = field("No.");
+                    RunPageView = sorting("Source Type", "Source Subtype", "Source No.", "Source Line No.");
                     ToolTip = 'View ongoing warehouse receipts for the document, in advanced warehouse configurations.';
                 }
                 action("Whse. Put-away Lines")
@@ -484,7 +490,7 @@ page 9304 "Sales Return Order List"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualRelease(SalesHeader);
+                        Rec.PerformManualRelease(SalesHeader);
                     end;
                 }
                 action(Reopen)
@@ -499,7 +505,7 @@ page 9304 "Sales Return Order List"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualReopen(SalesHeader);
+                        Rec.PerformManualReopen(SalesHeader);
                     end;
                 }
             }
@@ -517,7 +523,7 @@ page 9304 "Sales Return Order List"
 
                     trigger OnAction()
                     begin
-                        GetPstdDocLinesToReverse();
+                        Rec.GetPstdDocLinesToReverse();
                     end;
                 }
                 separator(Action1102601021)
@@ -600,7 +606,7 @@ page 9304 "Sales Return Order List"
                     trigger OnAction()
                     begin
                         Rec.PerformManualRelease();
-                        CreateInvtPutAwayPick();
+                        Rec.CreateInvtPutAwayPick();
                     end;
                 }
                 action("Create &Whse. Receipt")
@@ -657,9 +663,9 @@ page 9304 "Sales Return Order List"
                             BatchProcessingMgt.SetParametersForPageID(Page::"Sales Return Order List");
 
                             SalesBatchPostMgt.SetBatchProcessor(BatchProcessingMgt);
-                            SalesBatchPostMgt.RunWithUI(SalesHeader, Count, ReadyToPostQst);
+                            SalesBatchPostMgt.RunWithUI(SalesHeader, Rec.Count, ReadyToPostQst);
                         end else
-                            SendToPosting(CODEUNIT::"Sales-Post (Yes/No)");
+                            Rec.SendToPosting(Codeunit::"Sales-Post (Yes/No)");
                     end;
                 }
                 action("Preview Posting")
@@ -689,7 +695,7 @@ page 9304 "Sales Return Order List"
                     trigger OnAction()
                     begin
                         AssertSalesOrderNotEmpty();
-                        SendToPosting(CODEUNIT::"Sales-Post + Print");
+                        Rec.SendToPosting(Codeunit::"Sales-Post + Print");
                     end;
                 }
                 action("Post and Email")
@@ -737,7 +743,7 @@ page 9304 "Sales Return Order List"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                     end;
                 }
             }
@@ -831,39 +837,37 @@ page 9304 "Sales Return Order List"
 
     trigger OnAfterGetRecord()
     begin
-        StatusStyleTxt := GetStatusStyleText();
+        StatusStyleTxt := Rec.GetStatusStyleText();
     end;
 
     trigger OnOpenPage()
     var
         SalesSetup: Record "Sales & Receivables Setup";
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
 
         JobQueueActive := SalesSetup.JobQueueActive();
 
-        CopySellToCustomerFilter();
+        Rec.CopySellToCustomerFilter();
     end;
 
     var
         ReportPrint: Codeunit "Test Report-Print";
         DocPrint: Codeunit "Document-Print";
-        [InDataSet]
         JobQueueActive: Boolean;
         OpenApprovalEntriesExist: Boolean;
         CanCancelApprovalForRecord: Boolean;
         ReadyToPostQst: Label 'The number of return orders that will be posted is %1. \Do you want to continue?', Comment = '%1 - selected count';
         NoSalesOrderErr: Label 'You must select a sales return order before you can perform this action.';
-        [InDataSet]
         StatusStyleTxt: Text;
 
     local procedure SetControlAppearance()
     var
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
     end;
 
     [IntegrationEvent(false, false)]
@@ -873,7 +877,7 @@ page 9304 "Sales Return Order List"
 
     local procedure AssertSalesOrderNotEmpty()
     begin
-        if not Find() then
+        if not Rec.Find() then
             Error(NoSalesOrderErr);
     end;
 }

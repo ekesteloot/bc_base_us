@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.Capacity;
+
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+
 page 99000920 "Registered Absences"
 {
     ApplicationArea = Manufacturing;
@@ -24,7 +29,7 @@ page 99000920 "Registered Absences"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the date of the absence. If the absence covers several days, there will be an entry line for each day.';
@@ -56,7 +61,7 @@ page 99000920 "Registered Absences"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the ending time of day of the absence, such as the time the employee normally leaves, or the time the machine stops operating.';
                 }
-                field(Capacity; Capacity)
+                field(Capacity; Rec.Capacity)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the amount of capacity, which cannot be used during the absence period.';

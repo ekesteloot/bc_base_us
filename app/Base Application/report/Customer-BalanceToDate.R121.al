@@ -1,7 +1,14 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using System.Text;
+using System.Utilities;
+
 report 121 "Customer - Balance to Date"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/CustomerBalancetoDate.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerBalancetoDate.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Customer Balance to Date';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +18,7 @@ report 121 "Customer - Balance to Date"
     {
         dataitem(Customer; Customer)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Date Filter", Blocked;
             column(TodayFormatted; Format(Today, 0, 4))
@@ -62,7 +69,7 @@ report 121 "Customer - Balance to Date"
             }
             dataitem(CustLedgEntry3; "Cust. Ledger Entry")
             {
-                DataItemTableView = SORTING("Entry No.");
+                DataItemTableView = sorting("Entry No.");
                 column(PostingDt_CustLedgEntry; Format("Posting Date"))
                 {
                     IncludeCaption = false;
@@ -79,7 +86,7 @@ report 121 "Customer - Balance to Date"
                 {
                     IncludeCaption = true;
                 }
-                column(OriginalAmt; Format(OriginalAmt, 0, AutoFormat.ResolveAutoFormat("Auto Format"::AmountFormat, CurrencyCode)))
+                column(OriginalAmt; Format(OriginalAmt, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format"::AmountFormat, CurrencyCode)))
                 {
                 }
                 column(EntryNo_CustLedgEntry; "Entry No.")
@@ -91,8 +98,8 @@ report 121 "Customer - Balance to Date"
                 }
                 dataitem("Detailed Cust. Ledg. Entry"; "Detailed Cust. Ledg. Entry")
                 {
-                    DataItemLink = "Cust. Ledger Entry No." = FIELD("Entry No."), "Posting Date" = FIELD("Date Filter");
-                    DataItemTableView = SORTING("Cust. Ledger Entry No.", "Posting Date") WHERE("Entry Type" = FILTER(<> "Initial Entry"));
+                    DataItemLink = "Cust. Ledger Entry No." = field("Entry No."), "Posting Date" = field("Date Filter");
+                    DataItemTableView = sorting("Cust. Ledger Entry No.", "Posting Date") where("Entry Type" = filter(<> "Initial Entry"));
                     column(EntType_DtldCustLedgEnt; "Entry Type")
                     {
                     }
@@ -105,7 +112,7 @@ report 121 "Customer - Balance to Date"
                     column(DocNo_DtldCustLedgEntry; "Document No.")
                     {
                     }
-                    column(Amt; Format(Amt, 0, AutoFormat.ResolveAutoFormat("Auto Format"::AmountFormat, CurrencyCode)))
+                    column(Amt; Format(Amt, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format"::AmountFormat, CurrencyCode)))
                     {
                     }
                     column(CurrencyCodeDtldCustLedgEntry; CurrencyCode)
@@ -114,7 +121,7 @@ report 121 "Customer - Balance to Date"
                     column(EntNo_DtldCustLedgEntry; DtldCustLedgEntryNum)
                     {
                     }
-                    column(RemainingAmt; Format(RemainingAmt, 0, AutoFormat.ResolveAutoFormat("Auto Format"::AmountFormat, CurrencyCode)))
+                    column(RemainingAmt; Format(RemainingAmt, 0, AutoFormat.ResolveAutoFormat(Enum::"Auto Format"::AmountFormat, CurrencyCode)))
                     {
                     }
 
@@ -192,7 +199,7 @@ report 121 "Customer - Balance to Date"
             }
             dataitem(Integer2; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(CustName; Customer.Name)
                 {
                 }
@@ -255,7 +262,7 @@ report 121 "Customer - Balance to Date"
         }
         dataitem(Integer3; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
             column(CurryCode_CurrencyTtBuff2; TempCurrencyTotalBuffer2."Currency Code")
             {
             }

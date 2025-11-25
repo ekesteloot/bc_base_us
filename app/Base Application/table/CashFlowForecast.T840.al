@@ -1,3 +1,10 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Comment;
+using Microsoft.CashFlow.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.Foundation.NoSeries;
+
 table 840 "Cash Flow Forecast"
 {
     Caption = 'Cash Flow Forecast';
@@ -55,8 +62,8 @@ table 840 "Cash Flow Forecast"
         }
         field(9; Comment; Boolean)
         {
-            CalcFormula = Exist("Cash Flow Account Comment" WHERE("Table Name" = CONST("Cash Flow Forecast"),
-                                                                   "No." = FIELD("No.")));
+            CalcFormula = exist("Cash Flow Account Comment" where("Table Name" = const("Cash Flow Forecast"),
+                                                                   "No." = field("No.")));
             Caption = 'Comment';
             FieldClass = FlowField;
         }
@@ -109,11 +116,11 @@ table 840 "Cash Flow Forecast"
         }
         field(20; "Amount (LCY)"; Decimal)
         {
-            CalcFormula = Sum("Cash Flow Forecast Entry"."Amount (LCY)" WHERE("Cash Flow Forecast No." = FIELD("No."),
-                                                                               "Cash Flow Date" = FIELD("Cash Flow Date Filter"),
-                                                                               "Source Type" = FIELD("Source Type Filter"),
-                                                                               "Cash Flow Account No." = FIELD("Account No. Filter"),
-                                                                               Positive = FIELD("Positive Filter")));
+            CalcFormula = sum("Cash Flow Forecast Entry"."Amount (LCY)" where("Cash Flow Forecast No." = field("No."),
+                                                                               "Cash Flow Date" = field("Cash Flow Date Filter"),
+                                                                               "Source Type" = field("Source Type Filter"),
+                                                                               "Cash Flow Account No." = field("Account No. Filter"),
+                                                                               Positive = field("Positive Filter")));
             Caption = 'Amount (LCY)';
             FieldClass = FlowField;
         }

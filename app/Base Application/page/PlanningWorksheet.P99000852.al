@@ -1,3 +1,19 @@
+﻿namespace Microsoft.InventoryMgt.Requisition;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Purchases.Document;
+using Microsoft.WarehouseMgt.Setup;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+using System.Integration.Excel;
+
 page 99000852 "Planning Worksheet"
 {
     AdditionalSearchTerms = 'supply planning,mrp,mps';
@@ -71,8 +87,8 @@ page 99000852 "Planning Worksheet"
                         Item: Record "Item";
                     begin
                         PlanningWkshManagement.GetDescriptionAndRcptName(Rec, ItemDescription, RoutingDescription);
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
                 field("Variant Code"; Rec."Variant Code")
@@ -86,11 +102,11 @@ page 99000852 "Planning Worksheet"
                     var
                         Item: Record "Item";
                     begin
-                        if "Variant Code" = '' then
-                            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
                     end;
                 }
-                field("Planning Level"; "Planning Level")
+                field("Planning Level"; Rec."Planning Level")
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Indicates the planning level of the item in multi-level production orders. The planning level is calculated only for items that have Make-to-Order specified in the Manufacturing Policy field.';
@@ -230,9 +246,9 @@ page 99000852 "Planning Worksheet"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 3.';
                     Visible = false;
 
@@ -245,9 +261,9 @@ page 99000852 "Planning Worksheet"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 4.';
                     Visible = false;
 
@@ -260,9 +276,9 @@ page 99000852 "Planning Worksheet"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 5.';
                     Visible = false;
 
@@ -275,9 +291,9 @@ page 99000852 "Planning Worksheet"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 6.';
                     Visible = false;
 
@@ -290,9 +306,9 @@ page 99000852 "Planning Worksheet"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 7.';
                     Visible = false;
 
@@ -305,9 +321,9 @@ page 99000852 "Planning Worksheet"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     ToolTip = 'Specifies the code for Shortcut Dimension 8.';
                     Visible = false;
 
@@ -403,7 +419,7 @@ page 99000852 "Planning Worksheet"
 
                     trigger OnDrillDown()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
                 field("Gen. Prod. Posting Group"; Rec."Gen. Prod. Posting Group")
@@ -472,25 +488,25 @@ page 99000852 "Planning Worksheet"
             part(Control9; "Item Replenishment FactBox")
             {
                 ApplicationArea = Planning;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = false;
             }
             part(Control11; "Item Planning FactBox")
             {
                 ApplicationArea = Planning;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
             part(Control15; "Untracked Plng. Elements Part")
             {
                 ApplicationArea = Planning;
-                SubPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                              "Worksheet Batch Name" = FIELD("Journal Batch Name"),
-                              "Worksheet Line No." = FIELD("Line No.");
+                SubPageLink = "Worksheet Template Name" = field("Worksheet Template Name"),
+                              "Worksheet Batch Name" = field("Journal Batch Name"),
+                              "Worksheet Line No." = field("Line No.");
             }
             part(Control13; "Item Warehouse FactBox")
             {
                 ApplicationArea = Planning;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
                 Visible = false;
             }
             systempart(Control1900383207; Links)
@@ -525,7 +541,7 @@ page 99000852 "Planning Worksheet"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -539,7 +555,7 @@ page 99000852 "Planning Worksheet"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }
@@ -553,9 +569,9 @@ page 99000852 "Planning Worksheet"
                     Caption = 'Components';
                     Image = Components;
                     RunObject = Page "Planning Components";
-                    RunPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                  "Worksheet Batch Name" = FIELD("Journal Batch Name"),
-                                  "Worksheet Line No." = FIELD("Line No.");
+                    RunPageLink = "Worksheet Template Name" = field("Worksheet Template Name"),
+                                  "Worksheet Batch Name" = field("Journal Batch Name"),
+                                  "Worksheet Line No." = field("Line No.");
                     ToolTip = 'View or edit the production order components of the parent item on the line.';
                     ShortCutKey = 'Ctrl+Alt+C';
                 }
@@ -565,9 +581,9 @@ page 99000852 "Planning Worksheet"
                     Caption = 'Ro&uting';
                     Image = Route;
                     RunObject = Page "Planning Routing";
-                    RunPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                  "Worksheet Batch Name" = FIELD("Journal Batch Name"),
-                                  "Worksheet Line No." = FIELD("Line No.");
+                    RunPageLink = "Worksheet Template Name" = field("Worksheet Template Name"),
+                                  "Worksheet Batch Name" = field("Journal Batch Name"),
+                                  "Worksheet Line No." = field("Line No.");
                     ToolTip = 'View or edit the operations list of the parent item on the line.';
                     ShortCutKey = 'Ctrl+Alt+R';
                 }
@@ -661,7 +677,7 @@ page 99000852 "Planning Worksheet"
 
                         trigger OnAction()
                         begin
-                            ShowTimeline(Rec);
+                            Rec.ShowTimeline(Rec);
                         end;
                     }
 #endif
@@ -702,11 +718,11 @@ page 99000852 "Planning Worksheet"
                     var
                         CalcPlan: Report "Calculate Plan - Plan. Wksh.";
                     begin
-                        CalcPlan.SetTemplAndWorksheet("Worksheet Template Name", "Journal Batch Name", false);
+                        CalcPlan.SetTemplAndWorksheet(Rec."Worksheet Template Name", Rec."Journal Batch Name", false);
                         CalcPlan.RunModal();
 
-                        if not Find('-') then
-                            SetUpNewLine(Rec);
+                        if not Rec.Find('-') then
+                            Rec.SetUpNewLine(Rec);
 
                         Clear(CalcPlan);
                     end;
@@ -723,11 +739,11 @@ page 99000852 "Planning Worksheet"
                     var
                         CalcPlan: Report "Calculate Plan - Plan. Wksh.";
                     begin
-                        CalcPlan.SetTemplAndWorksheet("Worksheet Template Name", "Journal Batch Name", true);
+                        CalcPlan.SetTemplAndWorksheet(Rec."Worksheet Template Name", Rec."Journal Batch Name", true);
                         CalcPlan.RunModal();
 
-                        if not Find('-') then
-                            SetUpNewLine(Rec);
+                        if not Rec.Find('-') then
+                            Rec.SetUpNewLine(Rec);
 
                         Clear(CalcPlan);
                     end;
@@ -742,10 +758,10 @@ page 99000852 "Planning Worksheet"
 
                     trigger OnAction()
                     begin
-                        GetActionMessages();
+                        Rec.GetActionMessages();
 
-                        if not Find('-') then
-                            SetUpNewLine(Rec);
+                        if not Rec.Find('-') then
+                            Rec.SetUpNewLine(Rec);
                     end;
                 }
                 separator(Action32)
@@ -763,9 +779,9 @@ page 99000852 "Planning Worksheet"
                     var
                         ReqLine: Record "Requisition Line";
                     begin
-                        ReqLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        ReqLine.SetRange("Journal Batch Name", "Journal Batch Name");
-                        ReqLine.SetRange("Line No.", "Line No.");
+                        ReqLine.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        ReqLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
+                        ReqLine.SetRange("Line No.", Rec."Line No.");
 
                         REPORT.RunModal(REPORT::"Refresh Planning Demand", true, false, ReqLine);
                     end;
@@ -779,8 +795,8 @@ page 99000852 "Planning Worksheet"
                     Caption = '&Get Error Log';
                     Image = ErrorLog;
                     RunObject = Page "Planning Error Log";
-                    RunPageLink = "Worksheet Template Name" = FIELD("Worksheet Template Name"),
-                                  "Journal Batch Name" = FIELD("Journal Batch Name");
+                    RunPageLink = "Worksheet Template Name" = field("Worksheet Template Name"),
+                                  "Journal Batch Name" = field("Journal Batch Name");
                     ToolTip = 'View detailed information for planning lines with a value in the Warning field.';
                 }
                 separator(Action113)
@@ -813,7 +829,7 @@ page 99000852 "Planning Worksheet"
                     trigger OnAction()
                     begin
                         CurrPage.SaveRecord();
-                        ShowReservation();
+                        Rec.ShowReservation();
                     end;
                 }
                 action(OrderTracking)
@@ -829,6 +845,34 @@ page 99000852 "Planning Worksheet"
                     begin
                         TrackingForm.SetReqLine(Rec);
                         TrackingForm.RunModal();
+                    end;
+                }
+            }
+            group("Page")
+            {
+                Caption = 'Page';
+                action(EditInExcel)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Edit in Excel';
+                    Image = Excel;
+                    ToolTip = 'Send the data in the worksheet to an Excel file for analysis or editing.';
+                    Visible = IsSaaSExcelAddinEnabled;
+                    AccessByPermission = System "Allow Action Export To Excel" = X;
+
+                    trigger OnAction()
+                    var
+                        EditinExcel: Codeunit "Edit in Excel";
+                        EditinExcelFilters: Codeunit "Edit in Excel Filters";
+                        ODataUtility: Codeunit "ODataUtility";
+                    begin
+                        // The parameter of ODataUtility.ExternalizeName() should be the field name of page, because ODataUnitility generates ODataFieldName based on the field name of page.
+                        // If we use the field name from table, it is possible to return a wrong name when the name of page field is different from the name of table field.
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Journal Batch Name")), Enum::"Edit in Excel Filter Type"::Equal, CurrentWkshBatchName, Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        // But here the "Worksheet Template Name" is not a part of the page, so we have to get the ODataFieldName from the record.
+                        // The reason why the "Worksheet Template Name" is still a part of the web service although not being a field on this page, is that it is a key in the underlying record.
+                        EditinExcelFilters.AddField(ODataUtility.ExternalizeName(Rec.FieldName(Rec."Worksheet Template Name")), Enum::"Edit in Excel Filter Type"::Equal, Rec."Worksheet Template Name", Enum::"Edit in Excel Edm Type"::"Edm.String");
+                        EditinExcel.EditPageInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), Page::"Planning Worksheet", EditInExcelFilters, StrSubstNo(ExcelFileNameTxt, CurrentWkshBatchName, Rec."Worksheet Template Name"));
                     end;
                 }
             }
@@ -931,35 +975,41 @@ page 99000852 "Planning Worksheet"
     var
         Item: Record "Item";
     begin
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
         StartingDateTimeOnFormat();
         StartingDateOnFormat();
         RefOrderNoOnFormat();
         PlanningWarningLevel1OnFormat();
-        if "Variant Code" = '' then
-            VariantCodeMandatory := Item.IsVariantMandatory(Type = Type::Item, "No.");
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec.Type = Rec.Type::Item, Rec."No.");
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
-        "Accept Action Message" := false;
-        DeleteMultiLevel();
+        Rec."Accept Action Message" := false;
+        Rec.DeleteMultiLevel();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetUpNewLine(Rec);
-        Type := Type::Item;
+        Rec.SetUpNewLine(Rec);
+        Rec.Type := Rec.Type::Item;
         Clear(ShortcutDimCode);
     end;
 
     trigger OnOpenPage()
     var
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ServerSetting: Codeunit "Server Setting";
         JnlSelected: Boolean;
     begin
-        OpenedFromBatch := ("Journal Batch Name" <> '') and ("Worksheet Template Name" = '');
+        IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        // if called from API (such as edit-in-excel), do not filter 
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
+        OpenedFromBatch := (Rec."Journal Batch Name" <> '') and (Rec."Worksheet Template Name" = '');
         if OpenedFromBatch then begin
-            CurrentWkshBatchName := "Journal Batch Name";
+            CurrentWkshBatchName := Rec."Journal Batch Name";
             ReqJnlManagement.OpenJnl(CurrentWkshBatchName, Rec);
             exit;
         end;
@@ -976,9 +1026,10 @@ page 99000852 "Planning Worksheet"
         PlanningWkshManagement: Codeunit PlanningWkshManagement;
         ItemAvailFormsMgt: Codeunit "Item Availability Forms Mgt";
         CurrentWkshBatchName: Code[10];
+        ExcelFileNameTxt: Label 'Planning Worksheet - JournalBatchName %1 - WorksheetTemplateName %2', Comment = '%1 = Journal Batch Name; %2 = Worksheet Template Name';
         OpenedFromBatch: Boolean;
         VariantCodeMandatory: Boolean;
-        [InDataSet]
+        IsSaaSExcelAddinEnabled: Boolean;
         Warning: Option " ",Emergency,Exception,Attention;
 
     protected var
@@ -1002,15 +1053,15 @@ page 99000852 "Planning Worksheet"
 
     local procedure StartingDateTimeOnFormat()
     begin
-        if ("Starting Date" < WorkDate()) and
-           ("Action Message" in ["Action Message"::New, "Action Message"::Reschedule, "Action Message"::"Resched. & Chg. Qty."])
+        if (Rec."Starting Date" < WorkDate()) and
+           (Rec."Action Message" in [Rec."Action Message"::New, Rec."Action Message"::Reschedule, Rec."Action Message"::"Resched. & Chg. Qty."])
         then
             ;
     end;
 
     local procedure StartingDateOnFormat()
     begin
-        if "Starting Date" < WorkDate() then;
+        if Rec."Starting Date" < WorkDate() then;
     end;
 
     local procedure RefOrderNoOnFormat()
@@ -1024,16 +1075,16 @@ page 99000852 "Planning Worksheet"
         if IsHandled then
             exit;
 
-        case "Ref. Order Type" of
-            "Ref. Order Type"::Purchase:
-                if PurchHeader.Get(PurchHeader."Document Type"::Order, "Ref. Order No.") and
+        case Rec."Ref. Order Type" of
+            Rec."Ref. Order Type"::Purchase:
+                if PurchHeader.Get(PurchHeader."Document Type"::Order, Rec."Ref. Order No.") and
                    (PurchHeader.Status = PurchHeader.Status::Released)
                 then
                     ;
-            "Ref. Order Type"::"Prod. Order":
+            Rec."Ref. Order Type"::"Prod. Order":
                 ;
-            "Ref. Order Type"::Transfer:
-                if TransfHeader.Get("Ref. Order No.") and
+            Rec."Ref. Order Type"::Transfer:
+                if TransfHeader.Get(Rec."Ref. Order No.") and
                    (TransfHeader.Status = TransfHeader.Status::Released)
                 then
                     ;

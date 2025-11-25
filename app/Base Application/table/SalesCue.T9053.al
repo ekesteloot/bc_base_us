@@ -1,3 +1,9 @@
+namespace Microsoft.Sales.RoleCenters;
+
+using Microsoft.Sales.Document;
+using Microsoft.Sales.History;
+using System.Security.User;
+
 table 9053 "Sales Cue"
 {
     Caption = 'Sales Cue';
@@ -10,9 +16,9 @@ table 9053 "Sales Cue"
         }
         field(2; "Sales Quotes - Open"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = const(Quote),
+            CalcFormula = count("Sales Header" where("Document Type" = const(Quote),
                                                       Status = const(Open),
-                                                      "Responsibility Center" = FIELD("Responsibility Center Filter")));
+                                                      "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Sales Quotes - Open';
             Editable = false;
             FieldClass = FlowField;
@@ -20,9 +26,9 @@ table 9053 "Sales Cue"
         field(3; "Sales Orders - Open"; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = const(Order),
+            CalcFormula = count("Sales Header" where("Document Type" = const(Order),
                                                       Status = const(Open),
-                                                      "Responsibility Center" = FIELD("Responsibility Center Filter")));
+                                                      "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Sales Orders - Open';
             Editable = false;
             FieldClass = FlowField;
@@ -30,11 +36,11 @@ table 9053 "Sales Cue"
         field(4; "Ready to Ship"; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = const(Order),
+            CalcFormula = count("Sales Header" where("Document Type" = const(Order),
                                                       Status = const(Released),
-                                                      "Completely Shipped" = CONST(false),
-                                                      "Shipment Date" = FIELD("Date Filter2"),
-                                                      "Responsibility Center" = FIELD("Responsibility Center Filter")));
+                                                      "Completely Shipped" = const(false),
+                                                      "Shipment Date" = field("Date Filter2"),
+                                                      "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Ready to Ship';
             Editable = false;
             FieldClass = FlowField;
@@ -42,11 +48,11 @@ table 9053 "Sales Cue"
         field(5; Delayed; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = const(Order),
+            CalcFormula = count("Sales Header" where("Document Type" = const(Order),
                                                       Status = const(Released),
-                                                      "Completely Shipped" = CONST(false),
-                                                      "Shipment Date" = FIELD("Date Filter"),
-                                                      "Responsibility Center" = FIELD("Responsibility Center Filter"),
+                                                      "Completely Shipped" = const(false),
+                                                      "Shipment Date" = field("Date Filter"),
+                                                      "Responsibility Center" = field("Responsibility Center Filter"),
                                                       "Late Order Shipping" = const(true)));
             Caption = 'Delayed';
             Editable = false;
@@ -55,18 +61,18 @@ table 9053 "Sales Cue"
         field(6; "Sales Return Orders - Open"; Integer)
         {
             AccessByPermission = TableData "Return Receipt Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = const("Return Order"),
+            CalcFormula = count("Sales Header" where("Document Type" = const("Return Order"),
                                                       Status = const(Open),
-                                                      "Responsibility Center" = FIELD("Responsibility Center Filter")));
+                                                      "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Sales Return Orders - Open';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; "Sales Credit Memos - Open"; Integer)
         {
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = const("Credit Memo"),
+            CalcFormula = count("Sales Header" where("Document Type" = const("Credit Memo"),
                                                       Status = const(Open),
-                                                      "Responsibility Center" = FIELD("Responsibility Center Filter")));
+                                                      "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Sales Credit Memos - Open';
             Editable = false;
             FieldClass = FlowField;
@@ -74,12 +80,12 @@ table 9053 "Sales Cue"
         field(8; "Partially Shipped"; Integer)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
-            CalcFormula = Count("Sales Header" WHERE("Document Type" = const(Order),
+            CalcFormula = count("Sales Header" where("Document Type" = const(Order),
                                                       Status = const(Released),
                                                       Shipped = const(true),
                                                       "Completely Shipped" = const(false),
-                                                      "Shipment Date" = FIELD("Date Filter2"),
-                                                      "Responsibility Center" = FIELD("Responsibility Center Filter")));
+                                                      "Shipment Date" = field("Date Filter2"),
+                                                      "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Partially Shipped';
             Editable = false;
             FieldClass = FlowField;
@@ -93,14 +99,14 @@ table 9053 "Sales Cue"
         }
         field(10; "Sales Inv. - Pending Doc.Exch."; Integer)
         {
-            CalcFormula = Count("Sales Invoice Header" WHERE("Document Exchange Status" = FILTER("Sent to Document Exchange Service" | "Delivery Failed")));
+            CalcFormula = count("Sales Invoice Header" where("Document Exchange Status" = filter("Sent to Document Exchange Service" | "Delivery Failed")));
             Caption = 'Sales Invoices - Pending Document Exchange';
             Editable = false;
             FieldClass = FlowField;
         }
         field(12; "Sales CrM. - Pending Doc.Exch."; Integer)
         {
-            CalcFormula = Count("Sales Cr.Memo Header" WHERE("Document Exchange Status" = FILTER("Sent to Document Exchange Service" | "Delivery Failed")));
+            CalcFormula = count("Sales Cr.Memo Header" where("Document Exchange Status" = filter("Sent to Document Exchange Service" | "Delivery Failed")));
             Caption = 'Sales Credit Memos - Pending Document Exchange';
             Editable = false;
             FieldClass = FlowField;

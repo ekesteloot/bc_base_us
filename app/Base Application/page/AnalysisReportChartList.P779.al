@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 779 "Analysis Report Chart List"
 {
     Caption = 'Analysis Report Chart List';
@@ -84,7 +86,7 @@ page 779 "Analysis Report Chart List"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Start Date" := WorkDate();
+        Rec."Start Date" := WorkDate();
     end;
 }
 

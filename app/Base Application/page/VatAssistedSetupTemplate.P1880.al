@@ -40,7 +40,7 @@ page 1880 "VAT Assisted Setup Template"
 
     trigger OnOpenPage()
     begin
-        PopulateRecFromTemplates();
+        Rec.PopulateRecFromTemplates();
         ShowCustomerTemplate();
     end;
 
@@ -52,7 +52,7 @@ page 1880 "VAT Assisted Setup Template"
     begin
         ResetVisibility();
         VATBusPostingVisible := true;
-        SetRange("Table ID", DATABASE::Customer);
+        Rec.SetRange("Table ID", DATABASE::Customer);
         CurrPage.Update();
     end;
 
@@ -60,7 +60,7 @@ page 1880 "VAT Assisted Setup Template"
     begin
         ResetVisibility();
         VATBusPostingVisible := true;
-        SetRange("Table ID", DATABASE::Vendor);
+        Rec.SetRange("Table ID", DATABASE::Vendor);
         CurrPage.Update();
     end;
 
@@ -68,7 +68,7 @@ page 1880 "VAT Assisted Setup Template"
     begin
         ResetVisibility();
         VATProdPostingVisible := true;
-        SetRange("Table ID", DATABASE::Item);
+        Rec.SetRange("Table ID", DATABASE::Item);
         CurrPage.Update();
     end;
 

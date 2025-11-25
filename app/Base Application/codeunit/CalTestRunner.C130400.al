@@ -1,3 +1,7 @@
+namespace System.TestTools.TestRunner;
+
+using System.TestTools.CodeCoverage;
+
 codeunit 130400 "CAL Test Runner"
 {
     Subtype = TestRunner;
@@ -6,9 +10,9 @@ codeunit 130400 "CAL Test Runner"
 
     trigger OnRun()
     begin
-        if CALTestSuite.Get("Test Suite") then begin
+        if CALTestSuite.Get(Rec."Test Suite") then begin
             CALTestLine.Copy(Rec);
-            CALTestLine.SetRange("Test Suite", "Test Suite");
+            CALTestLine.SetRange("Test Suite", Rec."Test Suite");
             RunTests();
         end;
     end;

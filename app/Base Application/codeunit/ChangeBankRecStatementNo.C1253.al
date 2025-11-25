@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.Check;
+using Microsoft.BankMgt.Ledger;
+
 codeunit 1253 "Change Bank Rec. Statement No."
 {
     Permissions = TableData "Bank Acc. Reconciliation" = rimd,

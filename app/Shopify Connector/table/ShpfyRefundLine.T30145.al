@@ -115,4 +115,15 @@ table 30145 "Shpfy Refund Line"
             Clustered = true;
         }
     }
+
+    trigger OnDelete()
+    var
+        DataCapture: Record "Shpfy Data Capture";
+    begin
+        DataCapture.SetCurrentKey("Linked To Table", "Linked To Id");
+        DataCapture.SetRange("Linked To Table", Database::"Shpfy Refund Line");
+        DataCapture.SetRange("Linked To Id", Rec.SystemId);
+        if not DataCapture.IsEmpty then
+            DataCapture.DeleteAll(false);
+    end;
 }

@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
 enum 14 "Location Default Bin Selection"
 {
     Extensible = true;

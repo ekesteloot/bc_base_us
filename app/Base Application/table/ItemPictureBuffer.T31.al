@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Item.Picture;
+
+using Microsoft.InventoryMgt.Item;
+using System.IO;
+using System.Utilities;
+
 table 31 "Item Picture Buffer"
 {
     Caption = 'Item Picture Buffer';
@@ -20,7 +26,7 @@ table 31 "Item Picture Buffer"
         }
         field(4; "Item Description"; Text[100])
         {
-            CalcFormula = Lookup(Item.Description WHERE("No." = FIELD("Item No.")));
+            CalcFormula = Lookup(Item.Description where("No." = field("Item No.")));
             Caption = 'Item Description';
             FieldClass = FlowField;
         }
@@ -109,7 +115,7 @@ table 31 "Item Picture Buffer"
             "File Extension" :=
                 CopyStr(FileMgt.GetExtension(EntryListKey), 1, MaxStrLen("File Extension"));
             TempBlob.CreateOutStream(EntryOutStream);
-            DataCompression.ExtractEntry(EntryListKey, EntryOutStream, Length);
+            Length := DataCompression.ExtractEntry(EntryListKey, EntryOutStream);
             TempBlob.CreateInStream(EntryInStream);
 
             if not IsNullGuid(Picture.ImportStream(EntryInStream, FileMgt.GetFileName(EntryListKey))) then begin

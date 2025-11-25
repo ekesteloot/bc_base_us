@@ -1,4 +1,9 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
+using System.Environment;
+using System.Security.User;
+
 page 9831 "User Group Members"
 {
     Caption = 'User Group Members';
@@ -50,15 +55,15 @@ page 9831 "User Group Members"
                         UserSelection: Codeunit "User Selection";
                     begin
                         if UserSelection.Open(User) then begin
-                            if User."User Security ID" = "User Security ID" then
+                            if User."User Security ID" = Rec."User Security ID" then
                                 exit;
-                            if Get("User Group Code", "User Security ID", SelectedCompany) then
-                                Delete(true);
-                            Init();
-                            Validate("User Security ID", User."User Security ID");
-                            Validate("Company Name", SelectedCompany);
-                            CalcFields("User Name");
-                            Insert(true);
+                            if Rec.Get(Rec."User Group Code", Rec."User Security ID", SelectedCompany) then
+                                Rec.Delete(true);
+                            Rec.Init();
+                            Rec.Validate("User Security ID", User."User Security ID");
+                            Rec.Validate("Company Name", SelectedCompany);
+                            Rec.CalcFields("User Name");
+                            Rec.Insert(true);
                             CurrPage.Update(false);
                         end;
                     end;
@@ -71,11 +76,11 @@ page 9831 "User Group Members"
                             exit;
                         User.SetRange("User Name", UserName);
                         User.FindFirst();
-                        Init();
-                        Validate("User Security ID", User."User Security ID");
-                        Validate("Company Name", SelectedCompany);
-                        CalcFields("User Name");
-                        Insert(true);
+                        Rec.Init();
+                        Rec.Validate("User Security ID", User."User Security ID");
+                        Rec.Validate("Company Name", SelectedCompany);
+                        Rec.CalcFields("User Name");
+                        Rec.Insert(true);
                         CurrPage.Update(false);
                     end;
                 }
@@ -114,7 +119,7 @@ page 9831 "User Group Members"
 
                 trigger OnAction()
                 begin
-                    AddUsers(Company.Name);
+                    Rec.AddUsers(Company.Name);
                 end;
             }
         }
@@ -133,18 +138,18 @@ page 9831 "User Group Members"
 
     trigger OnAfterGetRecord()
     begin
-        CalcFields("User Name");
-        UserName := "User Name";
+        Rec.CalcFields("User Name");
+        UserName := Rec."User Name";
     end;
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
-        exit(not IsNullGuid("User Security ID"));
+        exit(not IsNullGuid(Rec."User Security ID"));
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        TestField("User Name");
+        Rec.TestField("User Name");
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -170,7 +175,7 @@ page 9831 "User Group Members"
             Company.Find('=<>');
             SelectedCompany := Company.Name;
         end;
-        SetRange("Company Name", Company.Name);
+        Rec.SetRange("Company Name", Company.Name);
         CurrPage.Update(false);
     end;
 }

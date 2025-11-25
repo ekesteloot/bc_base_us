@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Pricing;
+
 enum 7007 "Purchase Price Source Type"
 {
     Extensible = true;

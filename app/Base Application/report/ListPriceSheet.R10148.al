@@ -107,8 +107,8 @@ report 10148 "List Price Sheet"
             }
             dataitem("Sales Price"; "Sales Price")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter");
-                DataItemTableView = SORTING("Item No.", "Sales Type", "Sales Code", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity");
+                DataItemLink = "Item No." = field("No."), "Variant Code" = field("Variant Filter");
+                DataItemTableView = sorting("Item No.", "Sales Type", "Sales Code", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity");
                 column(Sales_Price__Unit_of_Measure_Code_; "Unit of Measure Code")
                 {
                 }
@@ -171,7 +171,7 @@ report 10148 "List Price Sheet"
             }
             dataitem(NoSalesPrice; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(Sales_Price___Unit_Price_; "Sales Price"."Unit Price")
                 {
                 }
@@ -382,7 +382,6 @@ report 10148 "List Price Sheet"
         CampNo: Code[20];
         AnySalesPriceFound: Boolean;
         ShowSalesType: Integer;
-        [InDataSet]
         SalesCodeCtrlEnable: Boolean;
         CurrReport_PAGENOCaptionLbl: Label 'Page';
 }

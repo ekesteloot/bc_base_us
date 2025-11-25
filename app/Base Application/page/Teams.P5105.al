@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Team;
+
+using Microsoft.CRM.Reports;
+using Microsoft.CRM.Task;
+
 page 5105 Teams
 {
     ApplicationArea = Basic, Suite;
@@ -13,7 +18,7 @@ page 5105 Teams
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code for the team.';
@@ -33,7 +38,7 @@ page 5105 Teams
                         Task: Record "To-do";
                     begin
                         Task.SetCurrentKey("Team Code", Date, Closed);
-                        Task.SetRange("Team Code", Code);
+                        Task.SetRange("Team Code", Rec.Code);
                         Task.SetRange(Closed, false);
                         Task.SetRange("System To-do Type", Task."System To-do Type"::Team);
                         if Task.FindFirst() then
@@ -71,9 +76,9 @@ page 5105 Teams
                     Caption = 'Tasks';
                     Image = TaskList;
                     RunObject = Page "Task List";
-                    RunPageLink = "Team Code" = FIELD(Code),
-                                  "System To-do Type" = FILTER(Team);
-                    RunPageView = SORTING("Team Code");
+                    RunPageLink = "Team Code" = field(Code),
+                                  "System To-do Type" = filter(Team);
+                    RunPageView = sorting("Team Code");
                     ToolTip = 'View the list of marketing tasks that exist.';
                 }
                 action(Salespeople)
@@ -82,7 +87,7 @@ page 5105 Teams
                     Caption = 'Salespeople';
                     Image = ExportSalesPerson;
                     RunObject = Page "Team Salespeople";
-                    RunPageLink = "Team Code" = FIELD(Code);
+                    RunPageLink = "Team Code" = field(Code);
                     ToolTip = 'View a list of salespeople within the team.';
                 }
             }

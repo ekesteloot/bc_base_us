@@ -1,100 +1,84 @@
+namespace Microsoft.WarehouseMgt.Request;
+
+#if not CLEAN23
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+#endif
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Worksheet;
+
 codeunit 5781 "Whse. Validate Source Header"
 {
+#if not CLEAN23
+    var
+        SalesWarehouseMgt: Codeunit "Sales Warehouse Mgt.";
+        ServiceWarehouseMgt: Codeunit "Service Warehouse Mgt.";
+        TransferWarehouseMgt: Codeunit "Transfer Warehouse Mgt.";
+#endif
 
     trigger OnRun()
     begin
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Sales Warehouse Mgt.', '23.0')]
     procedure SalesHeaderVerifyChange(var NewSalesHeader: Record "Sales Header"; var OldSalesHeader: Record "Sales Header")
-    var
-        SalesLine: Record "Sales Line";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeSalesHeaderVerifyChange(NewSalesHeader, OldSalesHeader, IsHandled);
-        if IsHandled then
-            exit;
-
-        with NewSalesHeader do begin
-            if "Shipping Advice" = OldSalesHeader."Shipping Advice" then
-                exit;
-
-            SalesLine.Reset();
-            SalesLine.SetRange("Document Type", OldSalesHeader."Document Type");
-            SalesLine.SetRange("Document No.", OldSalesHeader."No.");
-            if SalesLine.FindSet() then
-                repeat
-                    ChangeWhseLines(
-                        DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", 0,
-                        "Shipping Advice");
-                until SalesLine.Next() = 0;
-        end;
+        SalesWarehouseMgt.SalesHeaderVerifyChange(NewSalesHeader, OldSalesHeader);
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Service Warehouse Mgt.', '23.0')]
     procedure ServiceHeaderVerifyChange(var NewServiceHeader: Record "Service Header"; var OldServiceHeader: Record "Service Header")
-    var
-        ServiceLine: Record "Service Line";
     begin
-        with NewServiceHeader do begin
-            if "Shipping Advice" = OldServiceHeader."Shipping Advice" then
-                exit;
+        ServiceWarehouseMgt.ServiceHeaderVerifyChange(NewServiceHeader, OldServiceHeader);
+    end;
+#endif
 
-            ServiceLine.Reset();
-            ServiceLine.SetRange("Document Type", OldServiceHeader."Document Type");
-            ServiceLine.SetRange("Document No.", OldServiceHeader."No.");
-            if ServiceLine.Find('-') then
-                repeat
-                    ChangeWhseLines(
-                        DATABASE::"Service Line", ServiceLine."Document Type".AsInteger(), ServiceLine."Document No.", ServiceLine."Line No.", 0,
-                        "Shipping Advice");
-                until ServiceLine.Next() = 0;
-        end;
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit Service Warehouse Mgt.', '23.0')]
+    procedure TransHeaderVerifyChange(var NewTransferHeader: Record "Transfer Header"; var OldTransferHeader: Record "Transfer Header")
+    begin
+        TransferWarehouseMgt.TransHeaderVerifyChange(NewTransferHeader, OldTransferHeader);
+    end;
+#endif
+
+    internal procedure ChangeWarehouseLines(SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer; SourceSublineNo: Integer; ShipAdvice: Enum "Sales Header Shipping Advice")
+    var
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        WarehouseShipmentLine: Record "Warehouse Shipment Line";
+        WhseWorksheetLine: Record "Whse. Worksheet Line";
+    begin
+        WarehouseShipmentLine.Reset();
+        WarehouseShipmentLine.SetSourceFilter(SourceType, SourceSubType, SourceNo, SourceLineNo, false);
+        if not WarehouseShipmentLine.IsEmpty() then
+            WarehouseShipmentLine.ModifyAll("Shipping Advice", ShipAdvice);
+
+        WarehouseActivityLine.Reset();
+        WarehouseActivityLine.SetSourceFilter(SourceType, SourceSubType, SourceNo, SourceLineNo, SourceSublineNo, false);
+        if not WarehouseActivityLine.IsEmpty() then
+            WarehouseActivityLine.ModifyAll("Shipping Advice", ShipAdvice);
+
+        WhseWorksheetLine.Reset();
+        WhseWorksheetLine.SetSourceFilter(SourceType, SourceSubType, SourceNo, SourceLineNo, false);
+        if not WhseWorksheetLine.IsEmpty() then
+            WhseWorksheetLine.ModifyAll("Shipping Advice", ShipAdvice);
     end;
 
-    procedure TransHeaderVerifyChange(var NewTransHeader: Record "Transfer Header"; var OldTransHeader: Record "Transfer Header")
-    var
-        TransLine: Record "Transfer Line";
+#if not CLEAN23
+    internal procedure RunOnBeforeSalesHeaderVerifyChange(var NewSalesHeader: Record "Sales Header"; var OldSalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
-        with NewTransHeader do begin
-            if "Shipping Advice" = OldTransHeader."Shipping Advice" then
-                exit;
-
-            TransLine.Reset();
-            TransLine.SetRange("Document No.", OldTransHeader."No.");
-            if TransLine.Find('-') then
-                repeat
-                    ChangeWhseLines(
-                        DATABASE::"Transfer Line", 0,// Outbound Transfer
-                        TransLine."Document No.", TransLine."Line No.", 0, "Shipping Advice");
-                until TransLine.Next() = 0;
-        end;
-    end;
-
-    local procedure ChangeWhseLines(SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer; SourceSublineNo: Integer; ShipAdvice: Enum "Sales Header Shipping Advice")
-    var
-        WhseActivLine: Record "Warehouse Activity Line";
-        WhseShptLine: Record "Warehouse Shipment Line";
-        WhseWkshLine: Record "Whse. Worksheet Line";
-    begin
-        WhseShptLine.Reset();
-        WhseShptLine.SetSourceFilter(SourceType, SourceSubType, SourceNo, SourceLineNo, false);
-        if not WhseShptLine.IsEmpty() then
-            WhseShptLine.ModifyAll("Shipping Advice", ShipAdvice);
-
-        WhseActivLine.Reset();
-        WhseActivLine.SetSourceFilter(SourceType, SourceSubType, SourceNo, SourceLineNo, SourceSublineNo, false);
-        if not WhseActivLine.IsEmpty() then
-            WhseActivLine.ModifyAll("Shipping Advice", ShipAdvice);
-
-        WhseWkshLine.Reset();
-        WhseWkshLine.SetSourceFilter(SourceType, SourceSubType, SourceNo, SourceLineNo, false);
-        if not WhseWkshLine.IsEmpty() then
-            WhseWkshLine.ModifyAll("Shipping Advice", ShipAdvice);
+        OnBeforeSalesHeaderVerifyChange(NewSalesHeader, OldSalesHeader, IsHandled);
     end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit Sales Warehouse Mgt.', '23.0')]
     local procedure OnBeforeSalesHeaderVerifyChange(var NewSalesHeader: Record "Sales Header"; var OldSalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
+#endif
 }
 

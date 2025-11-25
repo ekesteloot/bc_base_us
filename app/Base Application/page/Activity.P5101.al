@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Task;
+
 page 5101 Activity
 {
     Caption = 'Activity';
@@ -11,7 +13,7 @@ page 5101 Activity
             group(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the code for the activity.';
@@ -25,7 +27,7 @@ page 5101 Activity
             part(Control9; "Activity Step Subform")
             {
                 ApplicationArea = RelationshipMgmt;
-                SubPageLink = "Activity Code" = FIELD(Code);
+                SubPageLink = "Activity Code" = field(Code);
             }
         }
         area(factboxes)

@@ -1,3 +1,13 @@
+namespace System.Integration;
+
+using Microsoft.CRM.Duplicates;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Setup;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Utilities;
+
 page 1808 "Data Migration Wizard"
 {
     AdditionalSearchTerms = 'implementation,data setup,rapid start,quickbooks';
@@ -72,9 +82,9 @@ page 1808 "Data Migration Wizard"
                         trigger OnLookup(var Text: Text): Boolean
                         begin
                             if PAGE.RunModal(PAGE::"Data Migrators", Rec) = ACTION::LookupOK then begin
-                                Text := Description;
+                                Text := Rec.Description;
                                 Clear(DataMigrationSettingsVisible);
-                                OnHasSettings(DataMigrationSettingsVisible);
+                                Rec.OnHasSettings(DataMigrationSettingsVisible);
                                 exit;
                             end;
                         end;
@@ -385,7 +395,7 @@ page 1808 "Data Migration Wizard"
                 var
                     Handled: Boolean;
                 begin
-                    OnDownloadTemplate(Handled);
+                    Rec.OnDownloadTemplate(Handled);
                     if not Handled then
                         Error('');
                 end;
@@ -402,7 +412,7 @@ page 1808 "Data Migration Wizard"
                 var
                     Handled: Boolean;
                 begin
-                    OnOpenSettings(Handled);
+                    Rec.OnOpenSettings(Handled);
                     if not Handled then
                         Error('');
                 end;
@@ -419,7 +429,7 @@ page 1808 "Data Migration Wizard"
                 var
                     Handled: Boolean;
                 begin
-                    OnOpenAdvancedApply(TempDataMigrationEntity, Handled);
+                    Rec.OnOpenAdvancedApply(TempDataMigrationEntity, Handled);
                     CurrPage.DataMigrationEntities.PAGE.CopyToSourceTable(TempDataMigrationEntity);
                     if not Handled then
                         Error('');
@@ -437,7 +447,7 @@ page 1808 "Data Migration Wizard"
                 var
                     Handled: Boolean;
                 begin
-                    OnShowErrors(Handled);
+                    Rec.OnShowErrors(Handled);
                     if not Handled then
                         Error('');
                 end;
@@ -520,8 +530,8 @@ page 1808 "Data Migration Wizard"
     var
         DataMigrationMgt: Codeunit "Data Migration Mgt.";
     begin
-        OnRegisterDataMigrator();
-        if FindFirst() then;
+        Rec.OnRegisterDataMigrator();
+        if Rec.FindFirst() then;
         ResetWizardControls();
         ShowIntroStep();
         DataMigrationMgt.CheckMigrationInProgress(false);
@@ -606,21 +616,21 @@ page 1808 "Data Migration Wizard"
         case Step of
             Step::ChooseSource:
                 begin
-                    OnGetInstructions(Instructions, Handled);
+                    Rec.OnGetInstructions(Instructions, Handled);
                     if not Handled then
                         Error('');
                 end;
             Step::Import:
                 begin
-                    OnShowBalance(ShowBalance);
-                    OnHideSelected(HideSelected);
+                    Rec.OnShowBalance(ShowBalance);
+                    Rec.OnHideSelected(HideSelected);
                     CurrPage.DataMigrationEntities.PAGE.SetShowBalance(ShowBalance);
                     CurrPage.DataMigrationEntities.PAGE.SetHideSelected(HideSelected);
-                    OnValidateSettings();
-                    OnDataImport(Handled);
+                    Rec.OnValidateSettings();
+                    Rec.OnDataImport(Handled);
                     if not Handled then
                         Error('');
-                    OnSelectDataToApply(TempDataMigrationEntity, Handled);
+                    Rec.OnSelectDataToApply(TempDataMigrationEntity, Handled);
                     CurrPage.DataMigrationEntities.PAGE.CopyToSourceTable(TempDataMigrationEntity);
                     TotalNoOfMigrationRecords := GetTotalNoOfMigrationRecords(TempDataMigrationEntity);
                     if not Handled then
@@ -632,7 +642,7 @@ page 1808 "Data Migration Wizard"
                         if BallancesPostingOption = BallancesPostingOption::" " then
                             Error(BallancesPostingErr);
                     CurrPage.DataMigrationEntities.PAGE.CopyFromSourceTable(TempDataMigrationEntity);
-                    OnApplySelectedData(TempDataMigrationEntity, Handled);
+                    Rec.OnApplySelectedData(TempDataMigrationEntity, Handled);
                     if not Handled then
                         Error('');
                 end;
@@ -649,7 +659,7 @@ page 1808 "Data Migration Wizard"
                     ListOfAccounts[9] := COGSAccount;
                     ListOfAccounts[10] := InventoryAdjmtAccount;
                     ListOfAccounts[11] := InventoryAccount;
-                    OnGLPostingSetup(ListOfAccounts);
+                    Rec.OnGLPostingSetup(ListOfAccounts);
                 end;
             Step::AccountSetup2:
                 begin
@@ -657,7 +667,7 @@ page 1808 "Data Migration Wizard"
                     ListOfAccounts[2] := ServiceChargeAccount;
                     ListOfAccounts[3] := PayablesAccount;
                     ListOfAccounts[4] := PurchServiceChargeAccount;
-                    OnCustomerVendorPostingSetup(ListOfAccounts);
+                    Rec.OnCustomerVendorPostingSetup(ListOfAccounts);
                 end;
         end;
         NextStep(false);
@@ -710,8 +720,8 @@ page 1808 "Data Migration Wizard"
     local procedure ShowImportStep()
     begin
         ImportVisible := true;
-        OnHasTemplate(DownloadTemplateVisible);
-        OnHasSettings(DataMigrationSettingsVisible);
+        Rec.OnHasTemplate(DownloadTemplateVisible);
+        Rec.OnHasSettings(DataMigrationSettingsVisible);
     end;
 
     local procedure ShowApplyStep()
@@ -721,8 +731,8 @@ page 1808 "Data Migration Wizard"
         NextEnabled := false;
         ApplyButtonVisible := true;
         ApplyButtonEnabled := TotalNoOfMigrationRecords > 0;
-        OnHasAdvancedApply(OpenAdvancedApplyVisible);
-        OnShowPostingOptions(ShowPostingOptions);
+        Rec.OnHasAdvancedApply(OpenAdvancedApplyVisible);
+        Rec.OnShowPostingOptions(ShowPostingOptions);
         if ShowPostingOptions then begin
             PostingDate := WorkDate();
             CurrPage.DataMigrationEntities.PAGE.SetPostingInfromation(
@@ -736,7 +746,7 @@ page 1808 "Data Migration Wizard"
         NextEnabled := false;
         FinishEnabled := true;
         BackEnabled := false;
-        OnPostingGroupSetup(AccountSetupVisible);
+        Rec.OnPostingGroupSetup(AccountSetupVisible);
         if AccountSetupVisible then begin
             TempDataMigrationEntity.Reset();
             TempDataMigrationEntity.SetRange("Table ID", 15);
@@ -748,11 +758,11 @@ page 1808 "Data Migration Wizard"
                 NextStep(false);
             end;
         end;
-        OnHasErrors(ShowErrorsVisible);
-        OnShowDuplicateContactsText(ShowDuplicateContactsText);
-        OnShowThatsItMessage(ThatsItText);
+        Rec.OnHasErrors(ShowErrorsVisible);
+        Rec.OnShowDuplicateContactsText(ShowDuplicateContactsText);
+        Rec.OnShowThatsItMessage(ThatsItText);
 
-        OnEnableTogglingDataMigrationOverviewPage(EnableTogglingOverviewPage);
+        Rec.OnEnableTogglingDataMigrationOverviewPage(EnableTogglingOverviewPage);
         if EnableTogglingOverviewPage then
             ShowOverviewPage := true;
     end;
@@ -838,7 +848,7 @@ page 1808 "Data Migration Wizard"
         DoneVisible := true;
         BackEnabled := false;
         NextEnabled := false;
-        OnHasErrors(ShowErrorsVisible);
+        Rec.OnHasErrors(ShowErrorsVisible);
         FinishEnabled := true;
     end;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 enum 9210 "Item Analysis Value Type"
 {
     AssignmentCompatibility = true;

@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
 enum 16 "G/L Account Type"
 {
     AssignmentCompatibility = true;

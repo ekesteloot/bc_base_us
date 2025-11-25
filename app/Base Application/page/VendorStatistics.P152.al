@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Purchases.Payables;
+
 page 152 "Vendor Statistics"
 {
     Caption = 'Vendor Statistics';
@@ -23,10 +27,10 @@ page 152 "Vendor Statistics"
                         VendLedgEntry: Record "Vendor Ledger Entry";
                         DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
                     begin
-                        DtldVendLedgEntry.SetRange("Vendor No.", "No.");
-                        CopyFilter("Global Dimension 1 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 1");
-                        CopyFilter("Global Dimension 2 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 2");
-                        CopyFilter("Currency Filter", DtldVendLedgEntry."Currency Code");
+                        DtldVendLedgEntry.SetRange("Vendor No.", Rec."No.");
+                        Rec.CopyFilter("Global Dimension 1 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 1");
+                        Rec.CopyFilter("Global Dimension 2 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 2");
+                        Rec.CopyFilter("Currency Filter", DtldVendLedgEntry."Currency Code");
                         VendLedgEntry.DrillDownOnEntries(DtldVendLedgEntry);
                     end;
                 }
@@ -46,14 +50,14 @@ page 152 "Vendor Statistics"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the sum of the vendor''s outstanding purchase invoices in LCY.';
                 }
-                field(GetTotalAmountLCY; GetTotalAmountLCY())
+                field(GetTotalAmountLCY; Rec.GetTotalAmountLCY())
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
                     Caption = 'Total (LCY)';
                     ToolTip = 'Specifies the payment amount that you owe the vendor for completed purchases plus purchases that are still ongoing.';
                 }
-                field("Balance Due (LCY)"; CalcOverDueBalance())
+                field("Balance Due (LCY)"; Rec.CalcOverDueBalance())
                 {
                     ApplicationArea = Basic, Suite;
                     CaptionClass = Format(StrSubstNo(Text000, Format(CurrentDate)));
@@ -63,14 +67,14 @@ page 152 "Vendor Statistics"
                         VendLedgEntry: Record "Vendor Ledger Entry";
                         DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
                     begin
-                        DtldVendLedgEntry.SetFilter("Vendor No.", "No.");
-                        CopyFilter("Global Dimension 1 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 1");
-                        CopyFilter("Global Dimension 2 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 2");
-                        CopyFilter("Currency Filter", DtldVendLedgEntry."Currency Code");
+                        DtldVendLedgEntry.SetFilter("Vendor No.", Rec."No.");
+                        Rec.CopyFilter("Global Dimension 1 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 1");
+                        Rec.CopyFilter("Global Dimension 2 Filter", DtldVendLedgEntry."Initial Entry Global Dim. 2");
+                        Rec.CopyFilter("Currency Filter", DtldVendLedgEntry."Currency Code");
                         VendLedgEntry.DrillDownOnOverdueEntries(DtldVendLedgEntry);
                     end;
                 }
-                field(GetInvoicedPrepmtAmountLCY; GetInvoicedPrepmtAmountLCY())
+                field(GetInvoicedPrepmtAmountLCY; Rec.GetInvoicedPrepmtAmountLCY())
                 {
                     ApplicationArea = Prepayments;
                     Caption = 'Invoiced Prepayment Amount (LCY)';
@@ -479,26 +483,26 @@ page 152 "Vendor Statistics"
         SetDateFilter();
 
         for i := 1 to 4 do begin
-            SetFilter("Date Filter", VendDateFilter[i]);
-            CalcFields(
+            Rec.SetFilter("Date Filter", VendDateFilter[i]);
+            Rec.CalcFields(
               "Purchases (LCY)", "Inv. Discounts (LCY)", "Inv. Amounts (LCY)", "Pmt. Discounts (LCY)",
               "Pmt. Disc. Tolerance (LCY)", "Pmt. Tolerance (LCY)",
               "Fin. Charge Memo Amounts (LCY)", "Cr. Memo Amounts (LCY)", "Payments (LCY)",
               "Reminder Amounts (LCY)", "Refunds (LCY)", "Other Amounts (LCY)");
-            VendPurchLCY[i] := "Purchases (LCY)";
-            VendInvDiscAmountLCY[i] := "Inv. Discounts (LCY)";
-            InvAmountsLCY[i] := "Inv. Amounts (LCY)";
-            VendPaymentDiscLCY[i] := "Pmt. Discounts (LCY)";
-            VendPaymentDiscTolLCY[i] := "Pmt. Disc. Tolerance (LCY)";
-            VendPaymentTolLCY[i] := "Pmt. Tolerance (LCY)";
-            VendReminderChargeAmtLCY[i] := "Reminder Amounts (LCY)";
-            VendFinChargeAmtLCY[i] := "Fin. Charge Memo Amounts (LCY)";
-            VendCrMemoAmountsLCY[i] := "Cr. Memo Amounts (LCY)";
-            VendPaymentsLCY[i] := "Payments (LCY)";
-            VendRefundsLCY[i] := "Refunds (LCY)";
-            VendOtherAmountsLCY[i] := "Other Amounts (LCY)";
+            VendPurchLCY[i] := Rec."Purchases (LCY)";
+            VendInvDiscAmountLCY[i] := Rec."Inv. Discounts (LCY)";
+            InvAmountsLCY[i] := Rec."Inv. Amounts (LCY)";
+            VendPaymentDiscLCY[i] := Rec."Pmt. Discounts (LCY)";
+            VendPaymentDiscTolLCY[i] := Rec."Pmt. Disc. Tolerance (LCY)";
+            VendPaymentTolLCY[i] := Rec."Pmt. Tolerance (LCY)";
+            VendReminderChargeAmtLCY[i] := Rec."Reminder Amounts (LCY)";
+            VendFinChargeAmtLCY[i] := Rec."Fin. Charge Memo Amounts (LCY)";
+            VendCrMemoAmountsLCY[i] := Rec."Cr. Memo Amounts (LCY)";
+            VendPaymentsLCY[i] := Rec."Payments (LCY)";
+            VendRefundsLCY[i] := Rec."Refunds (LCY)";
+            VendOtherAmountsLCY[i] := Rec."Other Amounts (LCY)";
         end;
-        SetRange("Date Filter", 0D, CurrentDate);
+        Rec.SetRange("Date Filter", 0D, CurrentDate);
     end;
 
     var
@@ -527,7 +531,7 @@ page 152 "Vendor Statistics"
 
     local procedure SetDateFilter()
     begin
-        SetRange("Date Filter", 0D, CurrentDate);
+        Rec.SetRange("Date Filter", 0D, CurrentDate);
 
         OnAfterSetDateFilter(Rec);
     end;

@@ -1,3 +1,16 @@
+﻿namespace Microsoft.WarehouseMgt.History;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+
 table 7319 "Posted Whse. Receipt Line"
 {
     Caption = 'Posted Whse. Receipt Line';
@@ -55,15 +68,15 @@ table 7319 "Posted Whse. Receipt Line"
         field(12; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                               "Zone Code" = FIELD("Zone Code"));
+            TableRelation = if ("Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                               "Zone Code" = field("Zone Code"));
         }
         field(13; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
         }
         field(14; "Item No."; Code[20])
         {
@@ -97,13 +110,13 @@ table 7319 "Posted Whse. Receipt Line"
         }
         field(27; "Put-away Qty."; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding" WHERE("Activity Type" = CONST("Put-away"),
-                                                                                  "Whse. Document Type" = CONST(Receipt),
-                                                                                  "Whse. Document No." = FIELD("No."),
-                                                                                  "Whse. Document Line No." = FIELD("Line No."),
-                                                                                  "Unit of Measure Code" = FIELD("Unit of Measure Code"),
-                                                                                  "Action Type" = FILTER(" " | Take),
-                                                                                  "Original Breakbulk" = CONST(false)));
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding" where("Activity Type" = const("Put-away"),
+                                                                                  "Whse. Document Type" = const(Receipt),
+                                                                                  "Whse. Document No." = field("No."),
+                                                                                  "Whse. Document Line No." = field("Line No."),
+                                                                                  "Unit of Measure Code" = field("Unit of Measure Code"),
+                                                                                  "Action Type" = filter(" " | Take),
+                                                                                  "Original Breakbulk" = const(false)));
             Caption = 'Put-away Qty.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -111,12 +124,12 @@ table 7319 "Posted Whse. Receipt Line"
         }
         field(28; "Put-away Qty. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Warehouse Activity Line"."Qty. Outstanding (Base)" WHERE("Activity Type" = CONST("Put-away"),
-                                                                                         "Whse. Document Type" = CONST(Receipt),
-                                                                                         "Whse. Document No." = FIELD("No."),
-                                                                                         "Whse. Document Line No." = FIELD("Line No."),
-                                                                                         "Action Type" = FILTER(" " | Take),
-                                                                                         "Original Breakbulk" = CONST(false)));
+            CalcFormula = sum("Warehouse Activity Line"."Qty. Outstanding (Base)" where("Activity Type" = const("Put-away"),
+                                                                                         "Whse. Document Type" = const(Receipt),
+                                                                                         "Whse. Document No." = field("No."),
+                                                                                         "Whse. Document Line No." = field("Line No."),
+                                                                                         "Action Type" = filter(" " | Take),
+                                                                                         "Original Breakbulk" = const(false)));
             Caption = 'Put-away Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -126,7 +139,7 @@ table 7319 "Posted Whse. Receipt Line"
         {
             Caption = 'Unit of Measure Code';
             Editable = false;
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(30; "Qty. per Unit of Measure"; Decimal)
         {
@@ -139,7 +152,7 @@ table 7319 "Posted Whse. Receipt Line"
         {
             Caption = 'Variant Code';
             Editable = false;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(32; Description; Text[100])
         {
@@ -173,12 +186,12 @@ table 7319 "Posted Whse. Receipt Line"
         field(52; "Cross-Dock Zone Code"; Code[10])
         {
             Caption = 'Cross-Dock Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
         }
         field(53; "Cross-Dock Bin Code"; Code[20])
         {
             Caption = 'Cross-Dock Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(55; "Qty. Rounding Precision"; Decimal)
         {

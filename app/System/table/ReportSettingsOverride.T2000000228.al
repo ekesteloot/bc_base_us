@@ -1,3 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment.Configuration;
+
+using System.Environment;
+using System.Globalization;
+using System.Reflection;
+
 table 2000000228 "Report Settings Override"
 {
     Caption = 'Report Settings Override';
@@ -33,12 +43,12 @@ table 2000000228 "Report Settings Override"
         {
             Caption = 'Maximum documents';
         }
-        field(6; "Format Language Tag";Text[80]) // Length to match VT Windows Language field size
+        field(6; "Format Language Tag"; Text[80]) // Length to match VT Windows Language field size
         {
             Caption = 'Format Language Tag';
             TableRelation = "Windows Language"."Language Tag";
         }
-        field(7; "Language ID"; Integer) 
+        field(7; "Language ID"; Integer)
         {
             Caption = 'Application Language';
             TableRelation = "Windows Language"."Language ID";

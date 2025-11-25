@@ -1,3 +1,8 @@
+namespace Microsoft.CRM.Opportunity;
+
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Task;
+
 table 5091 "Sales Cycle Stage"
 {
     Caption = 'Sales Cycle Stage';
@@ -45,19 +50,19 @@ table 5091 "Sales Cycle Stage"
         }
         field(8; Comment; Boolean)
         {
-            CalcFormula = Exist("Rlshp. Mgt. Comment Line" WHERE("Table Name" = CONST("Sales Cycle Stage"),
-                                                                  "No." = FIELD("Sales Cycle Code"),
-                                                                  "Sub No." = FIELD(Stage)));
+            CalcFormula = exist("Rlshp. Mgt. Comment Line" where("Table Name" = const("Sales Cycle Stage"),
+                                                                  "No." = field("Sales Cycle Code"),
+                                                                  "Sub No." = field(Stage)));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
         }
         field(9; "No. of Opportunities"; Integer)
         {
-            CalcFormula = Count("Opportunity Entry" WHERE(Active = CONST(true),
-                                                           "Sales Cycle Code" = FIELD("Sales Cycle Code"),
-                                                           "Sales Cycle Stage" = FIELD(Stage),
-                                                           "Estimated Close Date" = FIELD("Date Filter")));
+            CalcFormula = count("Opportunity Entry" where(Active = const(true),
+                                                           "Sales Cycle Code" = field("Sales Cycle Code"),
+                                                           "Sales Cycle Stage" = field(Stage),
+                                                           "Estimated Close Date" = field("Date Filter")));
             Caption = 'No. of Opportunities';
             Editable = false;
             FieldClass = FlowField;
@@ -65,10 +70,10 @@ table 5091 "Sales Cycle Stage"
         field(10; "Estimated Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Opportunity Entry"."Estimated Value (LCY)" WHERE(Active = CONST(true),
-                                                                                 "Sales Cycle Code" = FIELD("Sales Cycle Code"),
-                                                                                 "Sales Cycle Stage" = FIELD(Stage),
-                                                                                 "Estimated Close Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Opportunity Entry"."Estimated Value (LCY)" where(Active = const(true),
+                                                                                 "Sales Cycle Code" = field("Sales Cycle Code"),
+                                                                                 "Sales Cycle Stage" = field(Stage),
+                                                                                 "Estimated Close Date" = field("Date Filter")));
             Caption = 'Estimated Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -76,20 +81,20 @@ table 5091 "Sales Cycle Stage"
         field(11; "Calcd. Current Value (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum("Opportunity Entry"."Calcd. Current Value (LCY)" WHERE(Active = CONST(true),
-                                                                                      "Sales Cycle Code" = FIELD("Sales Cycle Code"),
-                                                                                      "Sales Cycle Stage" = FIELD(Stage),
-                                                                                      "Estimated Close Date" = FIELD("Date Filter")));
+            CalcFormula = sum("Opportunity Entry"."Calcd. Current Value (LCY)" where(Active = const(true),
+                                                                                      "Sales Cycle Code" = field("Sales Cycle Code"),
+                                                                                      "Sales Cycle Stage" = field(Stage),
+                                                                                      "Estimated Close Date" = field("Date Filter")));
             Caption = 'Calcd. Current Value (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(12; "Average No. of Days"; Decimal)
         {
-            CalcFormula = Average("Opportunity Entry"."Days Open" WHERE(Active = CONST(false),
-                                                                         "Sales Cycle Code" = FIELD("Sales Cycle Code"),
-                                                                         "Sales Cycle Stage" = FIELD(Stage),
-                                                                         "Estimated Close Date" = FIELD("Date Filter")));
+            CalcFormula = Average("Opportunity Entry"."Days Open" where(Active = const(false),
+                                                                         "Sales Cycle Code" = field("Sales Cycle Code"),
+                                                                         "Sales Cycle Stage" = field(Stage),
+                                                                         "Estimated Close Date" = field("Date Filter")));
             Caption = 'Average No. of Days';
             DecimalPlaces = 0 : 2;
             Editable = false;

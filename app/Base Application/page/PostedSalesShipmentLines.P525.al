@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.History;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 525 "Posted Sales Shipment Lines"
 {
     ApplicationArea = Basic, Suite;
@@ -149,7 +153,7 @@ page 525 "Posted Sales Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        SalesShptHeader.Get("Document No.");
+                        SalesShptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Sales Shipment", SalesShptHeader);
                     end;
                 }
@@ -164,7 +168,7 @@ page 525 "Posted Sales Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action("Item &Tracking Lines")
@@ -177,7 +181,7 @@ page 525 "Posted Sales Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
             }

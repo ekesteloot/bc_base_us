@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.RoleCenters;
+
 profile "ACCOUNTANT"
 {
     Caption = 'Accountant';

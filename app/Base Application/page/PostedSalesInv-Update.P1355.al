@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.History;
+
 page 1355 "Posted Sales Inv. - Update"
 {
     DeleteAllowed = false;
@@ -36,6 +38,16 @@ page 1355 "Posted Sales Inv. - Update"
                     Editable = false;
                     Caption = 'Posting Date';
                     ToolTip = 'Specifies the posting date for the document.';
+                }
+            }
+            group("Invoice Details")
+            {
+                Caption = 'Invoice Details';
+                field("Posting Description"; Rec."Posting Description")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Editable = true;
+                    ToolTip = 'Specifies any text that is entered to accompany the posting, for example for information to auditors.';
                 }
             }
             group(Payment)
@@ -98,11 +110,12 @@ page 1355 "Posted Sales Inv. - Update"
 
     local procedure RecordChanged() IsChanged: Boolean
     begin
-        IsChanged := ("Payment Method Code" <> xSalesInvoiceHeader."Payment Method Code") or
-          ("Payment Reference" <> xSalesInvoiceHeader."Payment Reference") or
-          ("Company Bank Account Code" <> xSalesInvoiceHeader."Company Bank Account Code") or
-          ("CFDI Cancellation Reason Code" <> xSalesInvoiceHeader."CFDI Cancellation Reason Code") or
-          ("Substitution Document No." <> xSalesInvoiceHeader."Substitution Document No.");
+        IsChanged := (Rec."Payment Method Code" <> xSalesInvoiceHeader."Payment Method Code") or
+          (Rec."Payment Reference" <> xSalesInvoiceHeader."Payment Reference") or
+          (Rec."Company Bank Account Code" <> xSalesInvoiceHeader."Company Bank Account Code") or
+          (Rec."CFDI Cancellation Reason Code" <> xSalesInvoiceHeader."CFDI Cancellation Reason Code") or
+          (Rec."Substitution Document No." <> xSalesInvoiceHeader."Substitution Document No.") or
+          (Rec."Posting Description" <> xSalesInvoiceHeader."Posting Description");
 
         OnAfterRecordChanged(Rec, xSalesInvoiceHeader, IsChanged);
     end;
@@ -110,7 +123,7 @@ page 1355 "Posted Sales Inv. - Update"
     procedure SetRec(SalesInvoiceHeader: Record "Sales Invoice Header")
     begin
         Rec := SalesInvoiceHeader;
-        Insert();
+        Rec.Insert();
     end;
 
     [IntegrationEvent(false, false)]

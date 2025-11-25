@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Pricing.PriceList;
+
+using Microsoft.Purchases.Pricing;
+
 page 7003 "Duplicate Price Lines"
 {
     InsertAllowed = false;
@@ -27,7 +35,7 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Price List Code';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the unique identifier of the price list.';
 
@@ -43,7 +51,7 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Price List Line No.';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the number of the price list line.';
                 }
@@ -52,7 +60,7 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Assign-to Type';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the type of entity to which the price list is assigned. The options are relevant to the entity you are currently viewing.';
                 }
@@ -61,7 +69,7 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Assign-to';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the entity to which the prices are assigned. The options depend on the selection in the Assign-to Type field. If you choose an entity, the price list will be used only for that entity.';
                 }
@@ -70,7 +78,7 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Product Type';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the type of the product.';
                 }
@@ -79,7 +87,7 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Product No.';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the number of the product.';
                 }
@@ -88,7 +96,7 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Description';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the description of the product.';
                 }
@@ -97,15 +105,16 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Variant Code';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the item variant.';
                 }
                 field("Work Type Code"; CurrPriceListLine."Work Type Code")
                 {
+                    Caption = 'Work Type Code';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the work type code for the resource.';
                 }
@@ -114,7 +123,7 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Unit of Measure Code';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the unit of measure for the product.';
                 }
@@ -123,16 +132,17 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Minimum Quantity';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the minimum quantity of the product.';
                 }
                 field("Amount Type"; CurrPriceListLine."Amount Type")
                 {
+                    Caption = 'Defines';
                     ApplicationArea = All;
                     Importance = Standard;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the data that is defined in the price list line. It can be either price or discount, or both';
                 }
@@ -141,34 +151,37 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Currency Code';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the currency code of the price list.';
                 }
                 field("Unit Price"; CurrPriceListLine."Unit Price")
                 {
+                    Caption = 'Unit Price';
                     ApplicationArea = All;
                     Editable = false;
                     Visible = PriceVisible and IsSalesPrice;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the unit price of the product.';
                 }
                 field("Cost Factor"; CurrPriceListLine."Cost Factor")
                 {
+                    Caption = 'Cost Factor';
                     ApplicationArea = All;
                     Editable = false;
                     Visible = PriceVisible and IsSalesPrice;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the unit cost factor for job-related prices, if you have agreed with your customer that he should pay certain item usage by cost value plus a certain percent value to cover your overhead expenses.';
                 }
                 field("Unit Cost"; CurrPriceListLine."Unit Cost")
                 {
+                    Caption = 'Unit Cost';
                     ApplicationArea = All;
                     Editable = false;
                     Visible = PriceVisible and not IsSalesPrice;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the unit cost of the product.';
                 }
@@ -178,7 +191,7 @@ page 7003 "Duplicate Price Lines"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = PriceVisible and not IsSalesPrice;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the direct unit cost of the product.';
                 }
@@ -197,17 +210,18 @@ page 7003 "Duplicate Price Lines"
                     ApplicationArea = All;
                     Visible = DiscountVisible and IsSalesPrice;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the line discount percentage for the product.';
                 }
                 field(PurchLineDiscountPct; CurrPriceListLine."Line Discount %")
                 {
+                    Caption = 'Line Discount %';
                     AccessByPermission = tabledata "Purchase Discount Access" = R;
                     ApplicationArea = All;
                     Visible = DiscountVisible and not IsSalesPrice;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the line discount percentage for the product.';
                 }
@@ -224,7 +238,7 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Starting Date';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the date from which the price is valid.';
                 }
@@ -233,7 +247,7 @@ page 7003 "Duplicate Price Lines"
                     Caption = 'Ending Date';
                     ApplicationArea = All;
                     Editable = false;
-                    StyleExpr = Not Remove;
+                    StyleExpr = not Rec.Remove;
                     Style = Strong;
                     ToolTip = 'Specifies the date when the price agreement ends.';
                 }
@@ -248,11 +262,8 @@ page 7003 "Duplicate Price Lines"
 
     protected var
         CurrPriceListLine: Record "Price List Line";
-        [InDataSet]
         DiscountVisible: Boolean;
-        [InDataSet]
         PriceVisible: Boolean;
-        [InDataSet]
         IsSalesPrice: Boolean;
 
     procedure Set(PriceType: Enum "Price Type"; AmountType: Enum "Price Amount Type"; var DuplicatePriceLine: Record "Duplicate Price Line")

@@ -1,3 +1,8 @@
+namespace Microsoft.ProjectMgt.Resources.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using System.Security.User;
+
 page 162 "Resource Ledg. Entries Preview"
 {
     Caption = 'Resource Ledg. Entries Preview';
@@ -106,7 +111,7 @@ page 162 "Resource Ledg. Entries Preview"
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the total price of the posted entry.';
                 }
-                field(Chargeable; Chargeable)
+                field(Chargeable; Rec.Chargeable)
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies if a resource transaction is chargeable.';
@@ -121,7 +126,7 @@ page 162 "Resource Ledg. Entries Preview"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Source Code"; Rec."Source Code")
@@ -207,7 +212,7 @@ page 162 "Resource Ledg. Entries Preview"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(SetDimensionFilter)
@@ -220,7 +225,7 @@ page 162 "Resource Ledg. Entries Preview"
 
                     trigger OnAction()
                     begin
-                        SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
+                        Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
             }

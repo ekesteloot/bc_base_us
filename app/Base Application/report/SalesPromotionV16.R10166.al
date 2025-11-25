@@ -73,8 +73,8 @@ report 10166 "Sales Promotion V16"
             }
             dataitem("Price List Line"; "Price List Line")
             {
-                DataItemLink = "Asset No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter");
-                DataItemTableView = SORTING("Asset Type", "Asset No.", "Source Type", "Source No.", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity") WHERE("Price Type" = CONST(Sale), "Asset Type" = CONST(Item), Status = CONST(Active));
+                DataItemLink = "Asset No." = field("No."), "Variant Code" = field("Variant Filter");
+                DataItemTableView = sorting("Asset Type", "Asset No.", "Source Type", "Source No.", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity") where("Price Type" = const(Sale), "Asset Type" = const(Item), Status = const(Active));
                 RequestFilterFields = "Source Type", "Starting Date";
                 column(Item__No__; Item."No.")
                 {

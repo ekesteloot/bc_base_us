@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 enum 7130 "Analysis Area Type"
 {
     Extensible = true;

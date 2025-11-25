@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Document;
+
 report 5901 "Service Item Line Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceItemLineLabels.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceItemLineLabels.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Item Line Labels';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5901 "Service Item Line Labels"
     {
         dataitem("Service Item Line"; "Service Item Line")
         {
-            DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+            DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
             RequestFilterFields = "Document Type", "Document No.", "Line No.";
             column(Addr11; Addr[1] [1])
             {

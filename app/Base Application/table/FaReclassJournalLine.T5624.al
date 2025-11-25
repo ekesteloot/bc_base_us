@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Setup;
+
 table 5624 "FA Reclass. Journal Line"
 {
     Caption = 'FA Reclass. Journal Line';
@@ -12,7 +18,7 @@ table 5624 "FA Reclass. Journal Line"
         field(2; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            TableRelation = "FA Reclass. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Journal Template Name"));
+            TableRelation = "FA Reclass. Journal Batch".Name where("Journal Template Name" = field("Journal Template Name"));
         }
         field(3; "Line No."; Integer)
         {

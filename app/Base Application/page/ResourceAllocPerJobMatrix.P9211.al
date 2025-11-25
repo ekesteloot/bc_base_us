@@ -1,3 +1,10 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using System.Utilities;
+
 page 9211 "Resource Alloc. per Job Matrix"
 {
     Caption = 'Resource Allocated per Job Matrix';
@@ -481,69 +488,37 @@ page 9211 "Resource Alloc. per Job Matrix"
         MatrixCellData: array[32] of Text[100];
         MatrixCellQuantity: Decimal;
         AmountType: Enum "Analysis Amount Type";
-        [InDataSet]
         Col1Visible: Boolean;
-        [InDataSet]
         Col2Visible: Boolean;
-        [InDataSet]
         Col3Visible: Boolean;
-        [InDataSet]
         Col4Visible: Boolean;
-        [InDataSet]
         Col5Visible: Boolean;
-        [InDataSet]
         Col6Visible: Boolean;
-        [InDataSet]
         Col7Visible: Boolean;
-        [InDataSet]
         Col8Visible: Boolean;
-        [InDataSet]
         Col9Visible: Boolean;
-        [InDataSet]
         Col10Visible: Boolean;
-        [InDataSet]
         Col11Visible: Boolean;
-        [InDataSet]
         Col12Visible: Boolean;
-        [InDataSet]
         Col13Visible: Boolean;
-        [InDataSet]
         Col14Visible: Boolean;
-        [InDataSet]
         Col15Visible: Boolean;
-        [InDataSet]
         Col16Visible: Boolean;
-        [InDataSet]
         Col17Visible: Boolean;
-        [InDataSet]
         Col18Visible: Boolean;
-        [InDataSet]
         Col19Visible: Boolean;
-        [InDataSet]
         Col20Visible: Boolean;
-        [InDataSet]
         Col21Visible: Boolean;
-        [InDataSet]
         Col22Visible: Boolean;
-        [InDataSet]
         Col23Visible: Boolean;
-        [InDataSet]
         Col24Visible: Boolean;
-        [InDataSet]
         Col25Visible: Boolean;
-        [InDataSet]
         Col26Visible: Boolean;
-        [InDataSet]
         Col27Visible: Boolean;
-        [InDataSet]
         Col28Visible: Boolean;
-        [InDataSet]
         Col29Visible: Boolean;
-        [InDataSet]
         Col30Visible: Boolean;
-        [InDataSet]
         Col31Visible: Boolean;
-        [InDataSet]
         Col32Visible: Boolean;
 
     procedure LoadMatrix(var NewVerticalRec: Record Job; var NewHorizontalRec: Record "Job Planning Line"; NewMatrixColumnCaptions: array[32] of Text[100]; var NewMatrixDateFilters: array[32] of Record Date; AmountType2: Enum "Analysis Amount Type")
@@ -560,11 +535,11 @@ page 9211 "Resource Alloc. per Job Matrix"
         I: Integer;
     begin
         MatrixRec.Reset();
-        MatrixRec.SetRange("Job No.", "No.");
+        MatrixRec.SetRange("Job No.", Rec."No.");
         MatrixRec.SetRange(Type, MatrixRec.Type::Resource);
         MatrixRec.SetRange("Schedule Line", true);
-        if GetFilter("Resource Filter") <> '' then
-            MatrixRec.SetFilter("No.", GetRangeMin("Resource Filter"), GetRangeMax("Resource Filter"));
+        if Rec.GetFilter("Resource Filter") <> '' then
+            MatrixRec.SetFilter("No.", Rec.GetRangeMin("Resource Filter"), Rec.GetRangeMax("Resource Filter"));
         for I := 1 to ArrayLen(MatrixColumnDateFilters) do begin
             MatrixCellQuantity := 0;
             MatrixRec.SetRange(
@@ -589,11 +564,11 @@ page 9211 "Resource Alloc. per Job Matrix"
         JobPlanningLine: Record "Job Planning Line";
         IsHandled: Boolean;
     begin
-        JobPlanningLine.SetFilter("No.", GetRangeMin("Resource Filter"), GetRangeMax("Resource Filter"));
+        JobPlanningLine.SetFilter("No.", Rec.GetRangeMin("Resource Filter"), Rec.GetRangeMax("Resource Filter"));
         JobPlanningLine.SetRange(
           "Planning Date", GetStartDate(MatrixColumnDateFilters[Column]."Period Start"),
           MatrixColumnDateFilters[Column]."Period End");
-        JobPlanningLine.SetRange("Job No.", "No.");
+        JobPlanningLine.SetRange("Job No.", Rec."No.");
         JobPlanningLine.SetRange(Type, JobPlanningLine.Type::Resource);
         JobPlanningLine.SetRange("Schedule Line", true);
         IsHandled := false;

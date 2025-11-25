@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Team;
+
 page 5117 "Salesperson Statistics"
 {
     Caption = 'Salesperson Statistics';
@@ -81,12 +83,12 @@ page 5117 "Salesperson Statistics"
 
     trigger OnAfterGetRecord()
     begin
-        if "No. of Interactions" = 0 then begin
+        if Rec."No. of Interactions" = 0 then begin
             AvgCostPerResp := 0;
             AvgDurationPerResp := 0;
         end else begin
-            AvgCostPerResp := Round("Cost (LCY)" / "No. of Interactions");
-            AvgDurationPerResp := Round("Duration (Min.)" / "No. of Interactions", 0.01);
+            AvgCostPerResp := Round(Rec."Cost (LCY)" / Rec."No. of Interactions");
+            AvgDurationPerResp := Round(Rec."Duration (Min.)" / Rec."No. of Interactions", 0.01);
         end;
     end;
 

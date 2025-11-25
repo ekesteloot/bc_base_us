@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Outlook;
+
 codeunit 1634 "Setup Office Host Provider"
 {
 

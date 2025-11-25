@@ -1,3 +1,12 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Setup;
+
 report 5690 "Index Fixed Assets"
 {
     ApplicationArea = FixedAssets;
@@ -244,8 +253,6 @@ report 5690 "Index Fixed Assets"
         FAJnlSetup: Record "FA Journal Setup";
         DepreciationCalc: Codeunit "Depreciation Calculation";
         Window: Dialog;
-        FAPostingDate: Date;
-        IndexFigure: Decimal;
         IndexChoices: array[9] of Boolean;
         IndexAmount: Decimal;
         GLIntegration: array[9] of Boolean;
@@ -257,8 +264,6 @@ report 5690 "Index Fixed Assets"
         DocumentNo3: Code[20];
         NoSeries2: Code[20];
         Noseries3: Code[20];
-        PostingDescription: Text[100];
-        DeprBookCode: Code[10];
         BalAccount: Boolean;
         FAJnlNextLineNo: Integer;
         GenJnlNextLineNo: Integer;
@@ -268,6 +273,12 @@ report 5690 "Index Fixed Assets"
         Text001: Label 'FA Posting Date must not be a closing date.';
         Text002: Label '%1 and %2 must be identical. %3 must be %4 in %5 %6 = %7.';
         Text003: Label 'Indexing fixed asset   #1##########';
+
+    protected var
+        FAPostingDate: Date;
+        IndexFigure: Decimal;
+        PostingDescription: Text[100];
+        DeprBookCode: Code[10];
 
     procedure InsertGenJnlLine(FANo: Code[20]; IndexAmount: Decimal; PostingType: Enum "FA Journal Line FA Posting Type")
     var
@@ -293,7 +304,7 @@ report 5690 "Index Fixed Assets"
         GenJnlLine."Posting Date" := PostingDate;
         if GenJnlLine."Posting Date" = GenJnlLine."FA Posting Date" then
             GenJnlLine."FA Posting Date" := 0D;
-        GenJnlLine."FA Posting Type" := "Gen. Journal Line FA Posting Type".FromInteger(PostingType.AsInteger() + 1);
+        GenJnlLine."FA Posting Type" := Enum::"Gen. Journal Line FA Posting Type".FromInteger(PostingType.AsInteger() + 1);
         GenJnlLine."Account Type" := GenJnlLine."Account Type"::"Fixed Asset";
         GenJnlLine.Validate("Account No.", FANo);
         GenJnlLine."Document No." := DocumentNo2;

@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 page 5992 "Troubleshooting Subform"
 {
     AutoSplitKey = true;
@@ -13,7 +15,7 @@ page 5992 "Troubleshooting Subform"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ToolTip = 'Specifies the troubleshooting comment or guidelines.';

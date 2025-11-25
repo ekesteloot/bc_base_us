@@ -9,7 +9,7 @@ report 8610 "Create G/L Acc. Journal Lines"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Account Type", Blocked, "Direct Posting", "No. 2";
 
             trigger OnAfterGetRecord()

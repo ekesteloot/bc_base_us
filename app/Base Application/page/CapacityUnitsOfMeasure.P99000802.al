@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Capacity;
+
 page 99000802 "Capacity Units of Measure"
 {
     ApplicationArea = Manufacturing;
@@ -13,7 +15,7 @@ page 99000802 "Capacity Units of Measure"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the unit code.';

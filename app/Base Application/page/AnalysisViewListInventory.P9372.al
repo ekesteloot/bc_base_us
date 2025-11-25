@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Analysis;
+
 page 9372 "Analysis View List Inventory"
 {
     ApplicationArea = Dimensions, InventoryAnalysis;
@@ -7,7 +9,7 @@ page 9372 "Analysis View List Inventory"
     Editable = false;
     PageType = List;
     SourceTable = "Item Analysis View";
-    SourceTableView = WHERE("Analysis Area" = CONST(Inventory));
+    SourceTableView = where("Analysis Area" = const(Inventory));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -17,7 +19,7 @@ page 9372 "Analysis View List Inventory"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = InventoryAnalysis;
                     ToolTip = 'Specifies a code for the analysis view.';
@@ -84,8 +86,8 @@ page 9372 "Analysis View List Inventory"
                     Caption = 'Filter';
                     Image = "Filter";
                     RunObject = Page "Item Analysis View Filter";
-                    RunPageLink = "Analysis Area" = FIELD("Analysis Area"),
-                                  "Analysis View Code" = FIELD(Code);
+                    RunPageLink = "Analysis Area" = field("Analysis Area"),
+                                  "Analysis View Code" = field(Code);
                     ToolTip = 'Apply the filter.';
                 }
             }
@@ -103,7 +105,7 @@ page 9372 "Analysis View List Inventory"
                 var
                     InvtAnalysisbyDim: Page "Invt. Analysis by Dimensions";
                 begin
-                    InvtAnalysisbyDim.SetCurrentAnalysisViewCode(Code);
+                    InvtAnalysisbyDim.SetCurrentAnalysisViewCode(Rec.Code);
                     InvtAnalysisbyDim.Run();
                 end;
             }

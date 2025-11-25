@@ -1,3 +1,5 @@
+namespace System.IO;
+
 table 9061 "RapidStart Services Cue"
 {
     Caption = 'RapidStart Services Cue';
@@ -10,48 +12,48 @@ table 9061 "RapidStart Services Cue"
         }
         field(10; "Not Started"; Integer)
         {
-            CalcFormula = Count ("Config. Line" WHERE("Line Type" = CONST(Table),
-                                                      Status = CONST(" ")));
+            CalcFormula = Count ("Config. Line" where("Line Type" = const(Table),
+                                                      Status = const(" ")));
             Caption = 'Not Started';
             Editable = false;
             FieldClass = FlowField;
         }
         field(11; "In Progress"; Integer)
         {
-            CalcFormula = Count ("Config. Line" WHERE("Line Type" = CONST(Table),
-                                                      Status = CONST("In Progress")));
+            CalcFormula = Count ("Config. Line" where("Line Type" = const(Table),
+                                                      Status = const("In Progress")));
             Caption = 'In Progress';
             Editable = false;
             FieldClass = FlowField;
         }
         field(12; Completed; Integer)
         {
-            CalcFormula = Count ("Config. Line" WHERE("Line Type" = CONST(Table),
-                                                      Status = CONST(Completed)));
+            CalcFormula = Count ("Config. Line" where("Line Type" = const(Table),
+                                                      Status = const(Completed)));
             Caption = 'Completed';
             Editable = false;
             FieldClass = FlowField;
         }
         field(13; Ignored; Integer)
         {
-            CalcFormula = Count ("Config. Line" WHERE("Line Type" = CONST(Table),
-                                                      Status = CONST(Ignored)));
+            CalcFormula = Count ("Config. Line" where("Line Type" = const(Table),
+                                                      Status = const(Ignored)));
             Caption = 'Ignored';
             Editable = false;
             FieldClass = FlowField;
         }
         field(14; Promoted; Integer)
         {
-            CalcFormula = Count ("Config. Line" WHERE("Line Type" = CONST(Table),
-                                                      "Promoted Table" = CONST(true)));
+            CalcFormula = Count ("Config. Line" where("Line Type" = const(Table),
+                                                      "Promoted Table" = const(true)));
             Caption = 'Promoted';
             Editable = false;
             FieldClass = FlowField;
         }
         field(15; Blocked; Integer)
         {
-            CalcFormula = Count ("Config. Line" WHERE("Line Type" = CONST(Table),
-                                                      Status = CONST(Blocked)));
+            CalcFormula = Count ("Config. Line" where("Line Type" = const(Table),
+                                                      Status = const(Blocked)));
             Caption = 'Blocked';
             Editable = false;
             FieldClass = FlowField;

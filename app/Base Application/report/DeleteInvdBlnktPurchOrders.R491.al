@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.Purchases.Comment;
+using Microsoft.Shared.Archive;
+
 report 491 "Delete Invd Blnkt Purch Orders"
 {
     AccessByPermission = TableData "Purchase Header" = RD;
@@ -10,7 +15,7 @@ report 491 "Delete Invd Blnkt Purch Orders"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Blanket Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Blanket Order"));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "Pay-to Vendor No.";
             RequestFilterHeading = 'Blanket Purchase Order';
 

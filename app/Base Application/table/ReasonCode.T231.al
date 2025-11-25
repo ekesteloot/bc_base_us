@@ -22,8 +22,8 @@ table 231 "Reason Code"
         field(5901; "Contract Gain/Loss Amount"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = Sum ("Contract Gain/Loss Entry".Amount WHERE("Reason Code" = FIELD(Code),
-                                                                       "Change Date" = FIELD("Date Filter")));
+            CalcFormula = Sum ("Contract Gain/Loss Entry".Amount where("Reason Code" = field(Code),
+                                                                       "Change Date" = field("Date Filter")));
             Caption = 'Contract Gain/Loss Amount';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,9 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Reflection;
+
 table 2000000178 "All Profile"
 {
     Caption = 'All Profile';
@@ -28,21 +34,33 @@ table 2000000178 "All Profile"
         }
         field(7; "Use Comments"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Capacity related to System profiles for which support has been removed.';
         }
         field(8; "Use Notes"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Capacity related to System profiles for which support has been removed.';
         }
         field(9; "Use Record Notes"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Capacity related to System profiles for which support has been removed.';
         }
         field(10; "Record Notebook"; Text[250])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Capacity related to System profiles for which support has been removed.';
         }
         field(11; "Use Page Notes"; Boolean)
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Capacity related to System profiles for which support has been removed.';
         }
         field(12; "Page Notebook"; Text[250])
         {
+            ObsoleteState = Pending;
+            ObsoleteReason = 'Capacity related to System profiles for which support has been removed.';
         }
         field(13; "Disable Personalization"; Boolean)
         {

@@ -4,9 +4,6 @@ page 1693 "Bank Deposit Subform"
     Caption = 'Lines';
     DelayedInsert = true;
     PageType = ListPart;
-#pragma warning disable AL0729
-    PromotedActionCategories = 'New,Process,Report,Line,Functions';
-#pragma warning restore
     SourceTable = "Gen. Journal Line";
     Permissions = tabledata "Bank Deposit Header" = r;
 

@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Setup;
+
 page 6017 "Work-Hour Templates"
 {
     ApplicationArea = Jobs, Service;
@@ -13,7 +15,7 @@ page 6017 "Work-Hour Templates"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Jobs, Service;
                     ToolTip = 'Specifies a code for the work-hour template.';
@@ -23,37 +25,37 @@ page 6017 "Work-Hour Templates"
                     ApplicationArea = Jobs, Service;
                     ToolTip = 'Specifies a description of the work-hour template.';
                 }
-                field(Monday; Monday)
+                field(Monday; Rec.Monday)
                 {
                     ApplicationArea = Jobs, Service;
                     ToolTip = 'Specifies the number of work-hours on Monday.';
                 }
-                field(Tuesday; Tuesday)
+                field(Tuesday; Rec.Tuesday)
                 {
                     ApplicationArea = Jobs, Service;
                     ToolTip = 'Specifies the number of work-hours on Tuesday.';
                 }
-                field(Wednesday; Wednesday)
+                field(Wednesday; Rec.Wednesday)
                 {
                     ApplicationArea = Jobs, Service;
                     ToolTip = 'Specifies the number of work-hours on Wednesday.';
                 }
-                field(Thursday; Thursday)
+                field(Thursday; Rec.Thursday)
                 {
                     ApplicationArea = Jobs, Service;
                     ToolTip = 'Specifies the number of work-hours on Thursday.';
                 }
-                field(Friday; Friday)
+                field(Friday; Rec.Friday)
                 {
                     ApplicationArea = Jobs, Service;
                     ToolTip = 'Specifies the number of work-hours on Friday.';
                 }
-                field(Saturday; Saturday)
+                field(Saturday; Rec.Saturday)
                 {
                     ApplicationArea = Jobs, Service;
                     ToolTip = 'Specifies the number of work-hours on Saturday.';
                 }
-                field(Sunday; Sunday)
+                field(Sunday; Rec.Sunday)
                 {
                     ApplicationArea = Jobs, Service;
                     ToolTip = 'Specifies the number of work-hours on Sunday.';

@@ -1,3 +1,19 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.Entity;
+
+using Microsoft.CRM.Contact;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+
 table 5477 "Purch. Inv. Entity Aggregate"
 {
     Caption = 'Purch. Inv. Entity Aggregate';
@@ -59,11 +75,9 @@ table 5477 "Purch. Inv. Entity Aggregate"
         {
             Caption = 'Pay-to City';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Pay-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Pay-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Pay-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Pay-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Pay-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Pay-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(10; "Pay-to Contact"; Text[100])
@@ -100,11 +114,9 @@ table 5477 "Purch. Inv. Entity Aggregate"
         {
             Caption = 'Ship-to City';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(18; "Ship-to Contact"; Text[100])
@@ -137,12 +149,12 @@ table 5477 "Purch. Inv. Entity Aggregate"
         field(29; "Shortcut Dimension 1 Code"; Code[20])
         {
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(30; "Shortcut Dimension 2 Code"; Code[20])
         {
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(31; "Vendor Posting Group"; Code[20])
         {
@@ -185,23 +197,23 @@ table 5477 "Purch. Inv. Entity Aggregate"
         }
         field(56; "Recalculate Invoice Disc."; Boolean)
         {
-            CalcFormula = Exist("Purchase Line" WHERE("Document Type" = FIELD("Document Type"),
-                                                       "Document No." = FIELD("No."),
-                                                       "Recalculate Invoice Disc." = CONST(true)));
+            CalcFormula = exist("Purchase Line" where("Document Type" = field("Document Type"),
+                                                       "Document No." = field("No."),
+                                                       "Recalculate Invoice Disc." = const(true)));
             Caption = 'Recalculate Invoice Disc.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(60; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
             DataClassification = CustomerContent;
         }
         field(61; "Amount Including VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
             DataClassification = CustomerContent;
@@ -232,11 +244,9 @@ table 5477 "Purch. Inv. Entity Aggregate"
         {
             Caption = 'Buy-from City';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Buy-from Country/Region Code" = CONST('')) "Post Code".City
-            ELSE
-            IF ("Buy-from Country/Region Code" = FILTER(<> '')) "Post Code".City WHERE("Country/Region Code" = FIELD("Buy-from Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Buy-from Country/Region Code" = const('')) "Post Code".City
+            else
+            if ("Buy-from Country/Region Code" = filter(<> '')) "Post Code".City where("Country/Region Code" = field("Buy-from Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(84; "Buy-from Contact"; Text[100])
@@ -248,11 +258,9 @@ table 5477 "Purch. Inv. Entity Aggregate"
         {
             Caption = 'Pay-to Post Code';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Pay-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Pay-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Pay-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Pay-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Pay-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Pay-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(86; "Pay-to County"; Text[30])
@@ -271,11 +279,9 @@ table 5477 "Purch. Inv. Entity Aggregate"
         {
             Caption = 'Buy-from Post Code';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Buy-from Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Buy-from Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Buy-from Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Buy-from Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Buy-from Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Buy-from Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(89; "Buy-from County"; Text[30])
@@ -294,11 +300,9 @@ table 5477 "Purch. Inv. Entity Aggregate"
         {
             Caption = 'Ship-to Post Code';
             DataClassification = CustomerContent;
-            TableRelation = IF ("Ship-to Country/Region Code" = CONST('')) "Post Code"
-            ELSE
-            IF ("Ship-to Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Ship-to Country/Region Code"));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = if ("Ship-to Country/Region Code" = const('')) "Post Code"
+            else
+            if ("Ship-to Country/Region Code" = filter(<> '')) "Post Code" where("Country/Region Code" = field("Ship-to Country/Region Code"));
             ValidateTableRelation = false;
         }
         field(92; "Ship-to County"; Text[30])
@@ -323,12 +327,10 @@ table 5477 "Purch. Inv. Entity Aggregate"
             Caption = 'Vendor Ledger Entry No.';
             DataClassification = CustomerContent;
             TableRelation = "Vendor Ledger Entry"."Entry No.";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(1305; "Invoice Discount Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Invoice Discount Amount';
             DataClassification = CustomerContent;
@@ -346,7 +348,7 @@ table 5477 "Purch. Inv. Entity Aggregate"
         }
         field(9600; "Total Tax Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Total Tax Amount';
             DataClassification = CustomerContent;

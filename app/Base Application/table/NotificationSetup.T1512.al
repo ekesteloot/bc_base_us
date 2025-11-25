@@ -1,3 +1,7 @@
+namespace System.Environment.Configuration;
+
+using System.Security.User;
+
 table 1512 "Notification Setup"
 {
     Caption = 'Notification Setup';
@@ -23,8 +27,8 @@ table 1512 "Notification Setup"
         }
         field(5; Schedule; Enum "Notification Schedule Type")
         {
-            CalcFormula = Lookup("Notification Schedule".Recurrence WHERE("User ID" = FIELD("User ID"),
-                                                                           "Notification Type" = FIELD("Notification Type")));
+            CalcFormula = Lookup("Notification Schedule".Recurrence where("User ID" = field("User ID"),
+                                                                           "Notification Type" = field("Notification Type")));
             Caption = 'Schedule';
             FieldClass = FlowField;
         }

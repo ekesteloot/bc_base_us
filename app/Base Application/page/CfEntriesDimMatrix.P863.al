@@ -1,3 +1,8 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.FinancialMgt.Dimension;
+
 page 863 "CF Entries Dim. Matrix"
 {
     Caption = 'CF Forcst. Entries Dim. Overv. M.';
@@ -463,7 +468,7 @@ page 863 "CF Entries Dim. Matrix"
 
                         trigger OnAction()
                         begin
-                            ShowDimensions();
+                            Rec.ShowDimensions();
                         end;
                     }
                 }
@@ -504,7 +509,7 @@ page 863 "CF Entries Dim. Matrix"
                 Rec := TempCFForecastEntry;
             exit(Found);
         end;
-        exit(Find(Which));
+        exit(Rec.Find(Which));
     end;
 
     trigger OnInit()
@@ -554,7 +559,7 @@ page 863 "CF Entries Dim. Matrix"
                 Rec := TempCFForecastEntry;
             exit(ResultSteps);
         end;
-        exit(Next(Steps));
+        exit(Rec.Next(Steps));
     end;
 
     trigger OnOpenPage()
@@ -575,75 +580,43 @@ page 863 "CF Entries Dim. Matrix"
         MATRIX_CurrentColumnOrdinal: Integer;
         MATRIX_CurrSetLength: Integer;
         RunOnTempRec: Boolean;
-        [InDataSet]
         Field1Visible: Boolean;
-        [InDataSet]
         Field2Visible: Boolean;
-        [InDataSet]
         Field3Visible: Boolean;
-        [InDataSet]
         Field4Visible: Boolean;
-        [InDataSet]
         Field5Visible: Boolean;
-        [InDataSet]
         Field6Visible: Boolean;
-        [InDataSet]
         Field7Visible: Boolean;
-        [InDataSet]
         Field8Visible: Boolean;
-        [InDataSet]
         Field9Visible: Boolean;
-        [InDataSet]
         Field10Visible: Boolean;
-        [InDataSet]
         Field11Visible: Boolean;
-        [InDataSet]
         Field12Visible: Boolean;
-        [InDataSet]
         Field13Visible: Boolean;
-        [InDataSet]
         Field14Visible: Boolean;
-        [InDataSet]
         Field15Visible: Boolean;
-        [InDataSet]
         Field16Visible: Boolean;
-        [InDataSet]
         Field17Visible: Boolean;
-        [InDataSet]
         Field18Visible: Boolean;
-        [InDataSet]
         Field19Visible: Boolean;
-        [InDataSet]
         Field20Visible: Boolean;
-        [InDataSet]
         Field21Visible: Boolean;
-        [InDataSet]
         Field22Visible: Boolean;
-        [InDataSet]
         Field23Visible: Boolean;
-        [InDataSet]
         Field24Visible: Boolean;
-        [InDataSet]
         Field25Visible: Boolean;
-        [InDataSet]
         Field26Visible: Boolean;
-        [InDataSet]
         Field27Visible: Boolean;
-        [InDataSet]
         Field28Visible: Boolean;
-        [InDataSet]
         Field29Visible: Boolean;
-        [InDataSet]
         Field30Visible: Boolean;
-        [InDataSet]
         Field31Visible: Boolean;
-        [InDataSet]
         Field32Visible: Boolean;
 
     local procedure GetCaption(): Text[250]
     begin
-        if CFAccount."No." <> "Cash Flow Account No." then
-            CFAccount.Get("Cash Flow Account No.");
+        if CFAccount."No." <> Rec."Cash Flow Account No." then
+            CFAccount.Get(Rec."Cash Flow Account No.");
         exit(StrSubstNo('%1 %2', CFAccount."No.", CFAccount.Name));
     end;
 
@@ -657,8 +630,7 @@ page 863 "CF Entries Dim. Matrix"
 
     local procedure MATRIX_OnAfterGetRecord()
     begin
-        if not DimSetEntry.Get("Dimension Set ID", DimensionMatrix.Code)
-        then begin
+        if not DimSetEntry.Get(Rec."Dimension Set ID", DimensionMatrix.Code) then begin
             DimSetEntry.Init();
             DimSetEntry."Dimension Code" := DimensionMatrix.Code;
         end;

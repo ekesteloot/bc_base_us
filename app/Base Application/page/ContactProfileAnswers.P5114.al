@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Profiling;
+
+using Microsoft.CRM.Contact;
+
 page 5114 "Contact Profile Answers"
 {
     AutoSplitKey = true;
@@ -93,10 +97,10 @@ page 5114 "Contact Profile Answers"
 
     trigger OnAfterGetRecord()
     begin
-        Set := ContProfileAnswer.Get(Cont."No.", "Profile Questionnaire Code", "Line No.");
+        Set := ContProfileAnswer.Get(Cont."No.", Rec."Profile Questionnaire Code", Rec."Line No.");
 
-        StyleIsStrong := Type = Type::Question;
-        if Type <> Type::Question then
+        StyleIsStrong := Rec.Type = Rec.Type::Question;
+        if Rec.Type <> Rec.Type::Question then
             DescriptionIndent := 1
         else
             DescriptionIndent := 0;
@@ -110,7 +114,7 @@ page 5114 "Contact Profile Answers"
             exit(false);
 
         ProfileQuestLineQuestion := ProfileQuestionnaireLine2;
-        if ProfileQuestionnaireLine2.Type = Type::Answer then
+        if ProfileQuestionnaireLine2.Type = Rec.Type::Answer then
             ProfileQuestLineQuestion.Get(ProfileQuestionnaireLine2."Profile Questionnaire Code", ProfileQuestLineQuestion.FindQuestionLine());
 
         OK := true;
@@ -123,7 +127,7 @@ page 5114 "Contact Profile Answers"
                     GoNext := ProfileQuestionnaireLine2.Next(1) <> 0;
                 if GoNext then begin
                     ProfileQuestLineQuestion := ProfileQuestionnaireLine2;
-                    if ProfileQuestionnaireLine2.Type = Type::Answer then
+                    if ProfileQuestionnaireLine2.Type = Rec.Type::Answer then
                         ProfileQuestLineQuestion.Get(
                           ProfileQuestionnaireLine2."Profile Questionnaire Code", ProfileQuestLineQuestion.FindQuestionLine());
                     OK := not ProfileQuestLineQuestion."Auto Contact Classification";
@@ -153,12 +157,12 @@ page 5114 "Contact Profile Answers"
 
         repeat
             if ProfileQuestionnaireLine2.Next(Step) <> 0 then begin
-                if ProfileQuestionnaireLine2.Type = Type::Answer then
+                if ProfileQuestionnaireLine2.Type = Rec.Type::Answer then
                     ProfileQuestLineQuestion.Get(
                       ProfileQuestionnaireLine2."Profile Questionnaire Code", ProfileQuestionnaireLine2.FindQuestionLine());
                 if ((not ProfileQuestLineQuestion."Auto Contact Classification") and
-                    (ProfileQuestionnaireLine2.Type = Type::Answer)) or
-                   ((ProfileQuestionnaireLine2.Type = Type::Question) and (not ProfileQuestionnaireLine2."Auto Contact Classification"))
+                    (ProfileQuestionnaireLine2.Type = Rec.Type::Answer)) or
+                   ((ProfileQuestionnaireLine2.Type = Rec.Type::Question) and (not ProfileQuestionnaireLine2."Auto Contact Classification"))
                 then begin
                     ActualSteps := ActualSteps + Step;
                     if Steps <> 0 then
@@ -196,9 +200,7 @@ page 5114 "Contact Profile Answers"
         OK: Boolean;
         CaptionStr: Text;
         RunFormCode: Boolean;
-        [InDataSet]
         StyleIsStrong: Boolean;
-        [InDataSet]
         DescriptionIndent: Integer;
 
     protected var
@@ -220,18 +222,18 @@ page 5114 "Contact Profile Answers"
     procedure UpdateProfileAnswer()
     begin
         if not RunFormCode and Set then
-            TestField(Type, Type::Answer);
+            Rec.TestField(Type, Rec.Type::Answer);
 
         if Set then begin
             ContProfileAnswer.Init();
             ContProfileAnswer."Contact No." := Cont."No.";
             ContProfileAnswer."Contact Company No." := Cont."Company No.";
             ContProfileAnswer.Validate("Profile Questionnaire Code", CurrentQuestionsChecklistCode);
-            ContProfileAnswer.Validate("Line No.", "Line No.");
+            ContProfileAnswer.Validate("Line No.", Rec."Line No.");
             ContProfileAnswer."Last Date Updated" := Today;
             ContProfileAnswer.Insert(true);
         end else
-            if ContProfileAnswer.Get(Cont."No.", CurrentQuestionsChecklistCode, "Line No.") then
+            if ContProfileAnswer.Get(Cont."No.", CurrentQuestionsChecklistCode, Rec."Line No.") then
                 ContProfileAnswer.Delete(true);
 
         OnAfterUpdateProfileAnswer(Rec, xRec, Cont);

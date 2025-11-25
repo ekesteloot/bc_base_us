@@ -1,7 +1,11 @@
+namespace Microsoft.Manufacturing.Reports;
+
+using Microsoft.Manufacturing.WorkCenter;
+
 report 99000759 "Work Center List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/WorkCenterList.rdlc';
+    RDLCLayout = './Manufacturing/Reports/WorkCenterList.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Work Center List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 99000759 "Work Center List"
     {
         dataitem("Work Center"; "Work Center")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Work Center Group Code", "Shop Calendar Code";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {

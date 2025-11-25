@@ -1,4 +1,9 @@
 #if not CLEAN21
+namespace System.Security.AccessControl;
+
+using System.Environment;
+using System.Environment.Configuration;
+
 xmlport 9174 "Import Tenant Permission Sets"
 {
     Caption = 'Import Permission Sets';
@@ -36,7 +41,7 @@ xmlport 9174 "Import Tenant Permission Sets"
                 tableelement(TempPermission; Permission)
                 {
                     SourceTableView = sorting("Role Id", "Object Type", "Object Id");
-                    LinkFields = "Role ID" = FIELD("Role ID");
+                    LinkFields = "Role ID" = field("Role ID");
                     LinkTable = TempAggregatePermissionSet;
                     MinOccurs = Zero;
                     XmlName = 'Permission';
@@ -95,7 +100,7 @@ xmlport 9174 "Import Tenant Permission Sets"
                 tableelement(TempTenantPermission; "Tenant Permission")
                 {
                     SourceTableView = sorting("App Id", "Role Id", "Object Type", "Object Id");
-                    LinkFields = "App ID" = FIELD("App ID"), "Role ID" = FIELD("Role ID");
+                    LinkFields = "App ID" = field("App ID"), "Role ID" = field("Role ID");
                     LinkTable = TempAggregatePermissionSet;
                     MinOccurs = Zero;
                     XmlName = 'TenantPermission';
@@ -155,7 +160,7 @@ xmlport 9174 "Import Tenant Permission Sets"
 
                 trigger OnBeforeInsertRecord()
                 var
-                    PermissionSet: Record "Permission Set";
+                    MetadataPermissionSet: Record "Metadata Permission Set";
                     TenantPermissionSet: Record "Tenant Permission Set";
                     PermissionSetExists: Boolean;
                 begin
@@ -164,7 +169,7 @@ xmlport 9174 "Import Tenant Permission Sets"
 
                     case TempAggregatePermissionSet.Scope of
                         TempAggregatePermissionSet.Scope::System:
-                            PermissionSetExists := PermissionSet.Get(TempAggregatePermissionSet."Role ID");
+                            PermissionSetExists := MetadataPermissionSet.Get(TempAggregatePermissionSet."Role ID");
                         TempAggregatePermissionSet.Scope::Tenant:
                             PermissionSetExists := TenantPermissionSet.Get(TempAggregatePermissionSet."App ID", TempAggregatePermissionSet."Role ID");
                     end;
@@ -246,15 +251,15 @@ xmlport 9174 "Import Tenant Permission Sets"
 
     local procedure InsertSystemPermissionSet(AggregatePermissionSet: Record "Aggregate Permission Set")
     var
-        PermissionSet: Record "Permission Set";
+        MetadataPermissionSet: Record "Metadata Permission Set";
     begin
-        if PermissionSet.Get(AggregatePermissionSet."Role ID") then
+        if MetadataPermissionSet.Get(AggregatePermissionSet."Role ID") then
             exit;
 
-        PermissionSet.Init();
-        PermissionSet."Role ID" := AggregatePermissionSet."Role ID";
-        PermissionSet.Name := AggregatePermissionSet.Name;
-        PermissionSet.Insert();
+        MetadataPermissionSet.Init();
+        MetadataPermissionSet."Role ID" := AggregatePermissionSet."Role ID";
+        MetadataPermissionSet.Name := AggregatePermissionSet.Name;
+        MetadataPermissionSet.Insert();
     end;
 
     local procedure InsertSystemPermission(SourcePermission: Record Permission)

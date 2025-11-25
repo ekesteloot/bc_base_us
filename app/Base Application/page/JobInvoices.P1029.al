@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+
 page 1029 "Job Invoices"
 {
     Caption = 'Job Invoices';
@@ -91,7 +95,7 @@ page 1029 "Job Invoices"
                     begin
                         JobCreateInvoice.OpenSalesInvoice(Rec);
                         JobCreateInvoice.FindInvoices(Rec, JobNo, JobTaskNo, JobPlanningLineNo, DetailLevel);
-                        if Get("Job No.", "Job Task No.", "Job Planning Line No.", "Document Type", "Document No.", "Line No.") then;
+                        if Rec.Get(Rec."Job No.", Rec."Job Task No.", Rec."Job Planning Line No.", Rec."Document Type", Rec."Document No.", Rec."Line No.") then;
                     end;
                 }
             }

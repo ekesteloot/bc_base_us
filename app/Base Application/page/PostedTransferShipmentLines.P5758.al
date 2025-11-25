@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Transfer;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 5758 "Posted Transfer Shipment Lines"
 {
     Caption = 'Posted Transfer Shipment Lines';
@@ -75,19 +79,40 @@ page 5758 "Posted Transfer Shipment Lines"
             {
                 Caption = '&Line';
                 Image = Line;
+#if not CLEAN23
                 action("Show Document")
+                {
+                    ApplicationArea = Location;
+                    Caption = 'Card';
+                    Image = View;
+                    ShortCutKey = 'Shift+F7';
+                    ToolTip = 'Open the document that the selected line exists on.';
+                    ObsoleteReason = 'Replaced by "Show Document" action';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '23.0';
+
+                    trigger OnAction()
+                    var
+                        TransShptHeader: Record "Transfer Shipment Header";
+                    begin
+                        TransShptHeader.Get(Rec."Document No.");
+                        PAGE.Run(PAGE::"Posted Transfer Shipment", TransShptHeader);
+                    end;
+                }
+#endif
+                action(ShowDocument)
                 {
                     ApplicationArea = Location;
                     Caption = 'Show Document';
                     Image = View;
-                    ShortCutKey = 'Shift+F7';
+                    ShortCutKey = 'Return';
                     ToolTip = 'Open the document that the selected line exists on.';
 
                     trigger OnAction()
                     var
                         TransShptHeader: Record "Transfer Shipment Header";
                     begin
-                        TransShptHeader.Get("Document No.");
+                        TransShptHeader.Get(Rec."Document No.");
                         PAGE.Run(PAGE::"Posted Transfer Shipment", TransShptHeader);
                     end;
                 }
@@ -102,7 +127,7 @@ page 5758 "Posted Transfer Shipment Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }
@@ -113,7 +138,7 @@ page 5758 "Posted Transfer Shipment Lines"
             {
                 Caption = 'Process';
 
-                actionref("Show Document_Promoted"; "Show Document")
+                actionref("Show Document_Promoted"; ShowDocument)
                 {
                 }
                 actionref(Dimensions_Promoted; Dimensions)
@@ -131,7 +156,6 @@ page 5758 "Posted Transfer Shipment Lines"
 
     var
         TempTransShptLine: Record "Transfer Shipment Line" temporary;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
 
     local procedure IsFirstLine(DocNo: Code[20]; LineNo: Integer): Boolean
@@ -154,7 +178,7 @@ page 5758 "Posted Transfer Shipment Lines"
 
     local procedure DocumentNoOnFormat()
     begin
-        if not IsFirstLine("Document No.", "Line No.") then
+        if not IsFirstLine(Rec."Document No.", Rec."Line No.") then
             DocumentNoHideValue := true;
     end;
 }

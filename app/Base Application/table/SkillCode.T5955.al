@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Setup;
+
 table 5955 "Skill Code"
 {
     Caption = 'Skill Code';

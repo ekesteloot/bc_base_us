@@ -1,3 +1,8 @@
+namespace Microsoft.WarehouseMgt.Activity.History;
+
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 5799 "Registered Pick Subform"
 {
     AutoSplitKey = true;
@@ -138,7 +143,7 @@ page 5799 "Registered Pick Subform"
 
                     trigger OnAction()
                     begin
-                        WMSMgt.ShowWhseActivityDocLine("Whse. Document Type", "Whse. Document No.", "Whse. Document Line No.");
+                        WMSMgt.ShowWhseActivityDocLine(Rec."Whse. Document Type", Rec."Whse. Document No.", Rec."Whse. Document Line No.");
                     end;
                 }
                 action("Posted Warehouse Shipment Line")
@@ -181,8 +186,8 @@ page 5799 "Registered Pick Subform"
                     var
                         RegisteredWhseActivityHdr: Record "Registered Whse. Activity Hdr.";
                     begin
-                        RegisteredWhseActivityHdr.Get("Activity Type", "No.");
-                        ShowWhseEntries(RegisteredWhseActivityHdr."Registering Date");
+                        RegisteredWhseActivityHdr.Get(Rec."Activity Type", Rec."No.");
+                        Rec.ShowWhseEntries(RegisteredWhseActivityHdr."Registering Date");
                     end;
                 }
             }
@@ -195,19 +200,19 @@ page 5799 "Registered Pick Subform"
     local procedure ShowSourceLine()
     begin
         WMSMgt.ShowSourceDocLine(
-          "Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
+          Rec."Source Type", Rec."Source Subtype", Rec."Source No.", Rec."Source Line No.", Rec."Source Subline No.");
     end;
 
     local procedure ShowBinContents()
     var
         BinContent: Record "Bin Content";
     begin
-        BinContent.ShowBinContents("Location Code", "Item No.", "Variant Code", "Bin Code");
+        BinContent.ShowBinContents(Rec."Location Code", Rec."Item No.", Rec."Variant Code", Rec."Bin Code");
     end;
 
     local procedure ShowPostedWhseShptLine()
     begin
-        WMSMgt.ShowPostedWhseShptLine("Whse. Document No.", "Whse. Document Line No.");
+        WMSMgt.ShowPostedWhseShptLine(Rec."Whse. Document No.", Rec."Whse. Document Line No.");
     end;
 }
 

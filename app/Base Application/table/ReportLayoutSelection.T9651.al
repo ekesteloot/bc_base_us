@@ -61,7 +61,7 @@ table 9651 "Report Layout Selection"
         field(6; "Custom Report Layout Code"; Code[20])
         {
             Caption = 'Custom Report Layout Code';
-            TableRelation = "Custom Report Layout" WHERE("Report ID" = FIELD("Report ID"));
+            TableRelation = "Custom Report Layout" where("Report ID" = field("Report ID"));
 
             trigger OnValidate()
             begin
@@ -73,13 +73,13 @@ table 9651 "Report Layout Selection"
         }
         field(7; "Report Layout Description"; Text[250])
         {
-            CalcFormula = Lookup("Custom Report Layout".Description WHERE(Code = FIELD("Custom Report Layout Code")));
+            CalcFormula = Lookup("Custom Report Layout".Description where(Code = field("Custom Report Layout Code")));
             Caption = 'Report Layout Description';
             FieldClass = FlowField;
         }
         field(8; "Report Caption"; Text[80])
         {
-            CalcFormula = Lookup("Report Metadata".Caption WHERE(ID = FIELD("Report ID")));
+            CalcFormula = Lookup("Report Metadata".Caption where(ID = field("Report ID")));
             Caption = 'Report Caption';
             Editable = false;
             FieldClass = FlowField;
@@ -239,11 +239,33 @@ table 9651 "Report Layout Selection"
         exit(DesignTimeReportSelection.GetSelectedCustomLayout());
     end;
 
+    procedure GetTempSelectedLayoutName(): Text[250]
+    var
+        DesignTimeReportSelection: Codeunit "Design-time Report Selection";
+    begin
+        exit(DesignTimeReportSelection.GetSelectedLayout());
+    end;
+
     procedure SetTempLayoutSelected(NewTempSelectedLayoutCode: Code[20])
     var
         DesignTimeReportSelection: Codeunit "Design-time Report Selection";
     begin
         DesignTimeReportSelection.SetSelectedCustomLayout(NewTempSelectedLayoutCode);
+    end;
+
+    procedure SetTempLayoutSelectedName(NewTempSelectedLayoutName: Text[250])
+    var
+        DesignTimeReportSelection: Codeunit "Design-time Report Selection";
+    begin
+        DesignTimeReportSelection.SetSelectedLayout(NewTempSelectedLayoutName);
+    end;
+
+    procedure ClearTempLayoutSelected()
+    var
+        DesignTimeReportSelection: Codeunit "Design-time Report Selection";
+    begin
+        DesignTimeReportSelection.SetSelectedCustomLayout('');
+        DesignTimeReportSelection.SetSelectedLayout('');
     end;
 
     [IntegrationEvent(false, false)]

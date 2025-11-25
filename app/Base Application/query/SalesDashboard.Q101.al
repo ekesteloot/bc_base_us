@@ -1,3 +1,10 @@
+﻿namespace Microsoft.Sales.RoleCenters;
+
+using Microsoft.Foundation.Address;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Sales.Customer;
+
 query 101 "Sales Dashboard"
 {
     Caption = 'Sales Dashboard';
@@ -6,7 +13,7 @@ query 101 "Sales Dashboard"
     {
         dataitem(Item_Ledger_Entry; "Item Ledger Entry")
         {
-            DataItemTableFilter = "Entry Type" = FILTER(Sale);
+            DataItemTableFilter = "Entry Type" = filter(Sale);
             column(Entry_No; "Entry No.")
             {
             }

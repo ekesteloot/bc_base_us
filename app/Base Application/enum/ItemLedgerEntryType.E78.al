@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
 enum 78 "Item Ledger Entry Type"
 {
     Extensible = true;

@@ -11,6 +11,7 @@ permissionset 30100 "Shpfy - Read"
     IncludedPermissionSets = "Shpfy - Objects";
 
     Permissions =
+        tabledata "Shpfy Bulk Operation" = R,
         tabledata "Shpfy Credit Card Company" = R,
         tabledata "Shpfy Cue" = R,
         tabledata "Shpfy Customer" = R,

@@ -6,11 +6,11 @@ codeunit 10144 "Posted Deposit-Delete"
 
     trigger OnRun()
     begin
-        PostedDepositLine.SetRange("Deposit No.", "No.");
+        PostedDepositLine.SetRange("Deposit No.", Rec."No.");
         PostedDepositLine.DeleteAll();
 
         OnRunOnBeforeDelete(Rec);
-        Delete();
+        Rec.Delete();
     end;
 
     var

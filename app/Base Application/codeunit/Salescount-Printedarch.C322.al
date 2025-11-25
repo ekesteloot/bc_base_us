@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Archive;
+
 codeunit 322 "SalesCount-PrintedArch"
 {
     TableNo = "Sales Header Archive";
@@ -5,10 +7,10 @@ codeunit 322 "SalesCount-PrintedArch"
     trigger OnRun()
     begin
         OnBeforeOnRun(Rec, SuppressCommit);
-        Find();
-        "No. Printed" := "No. Printed" + 1;
+        Rec.Find();
+        Rec."No. Printed" := Rec."No. Printed" + 1;
         OnBeforeModify(Rec);
-        Modify();
+        Rec.Modify();
         if not SuppressCommit then
             Commit();
     end;

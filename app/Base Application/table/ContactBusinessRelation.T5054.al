@@ -1,3 +1,12 @@
+namespace Microsoft.CRM.BusinessRelation;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Setup;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 5054 "Contact Business Relation"
 {
     Caption = 'Contact Business Relation';
@@ -9,7 +18,7 @@ table 5054 "Contact Business Relation"
         {
             Caption = 'Contact No.';
             NotBlank = true;
-            TableRelation = Contact WHERE(Type = CONST(Company));
+            TableRelation = Contact where(Type = const(Company));
 
             trigger OnValidate()
             begin
@@ -58,24 +67,24 @@ table 5054 "Contact Business Relation"
         field(4; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF ("Link to Table" = CONST(Customer)) Customer
-            ELSE
-            IF ("Link to Table" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Link to Table" = CONST("Bank Account")) "Bank Account"
+            TableRelation = if ("Link to Table" = const(Customer)) Customer
+            else
+            if ("Link to Table" = const(Vendor)) Vendor
+            else
+            if ("Link to Table" = const("Bank Account")) "Bank Account"
             else
             if ("Link to Table" = const(Employee)) Employee;
         }
         field(5; "Business Relation Description"; Text[100])
         {
-            CalcFormula = Lookup("Business Relation".Description WHERE(Code = FIELD("Business Relation Code")));
+            CalcFormula = Lookup("Business Relation".Description where(Code = field("Business Relation Code")));
             Caption = 'Business Relation Description';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Contact Name"; Text[100])
         {
-            CalcFormula = Lookup(Contact.Name WHERE("No." = FIELD("Contact No.")));
+            CalcFormula = Lookup(Contact.Name where("No." = field("Contact No.")));
             Caption = 'Contact Name';
             Editable = false;
             FieldClass = FlowField;

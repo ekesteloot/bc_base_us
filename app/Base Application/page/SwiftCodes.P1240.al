@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Setup;
+
 page 1240 "SWIFT Codes"
 {
     ApplicationArea = Basic, Suite;
@@ -12,7 +14,7 @@ page 1240 "SWIFT Codes"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the SWIFT code.';

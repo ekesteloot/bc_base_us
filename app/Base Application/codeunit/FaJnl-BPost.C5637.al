@@ -1,3 +1,7 @@
+namespace Microsoft.FixedAssets.Posting;
+
+using Microsoft.FixedAssets.Journal;
+
 codeunit 5637 "FA. Jnl.-B.Post"
 {
     TableNo = "FA Journal Batch";
@@ -6,7 +10,7 @@ codeunit 5637 "FA. Jnl.-B.Post"
     begin
         FAJnlBatch.Copy(Rec);
         Code();
-        Copy(FAJnlBatch);
+        Rec.Copy(FAJnlBatch);
     end;
 
     var

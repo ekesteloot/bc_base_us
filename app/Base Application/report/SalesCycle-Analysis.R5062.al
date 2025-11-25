@@ -1,7 +1,11 @@
+namespace Microsoft.CRM.Reports;
+
+using Microsoft.CRM.Opportunity;
+
 report 5062 "Sales Cycle - Analysis"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './CRM/SalesCycleAnalysis.rdlc';
+    RDLCLayout = './CRM/Reports/SalesCycleAnalysis.rdlc';
     ApplicationArea = RelationshipMgmt;
     Caption = 'Sales Cycle - Analysis';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 5062 "Sales Cycle - Analysis"
     {
         dataitem("Sales Cycle"; "Sales Cycle")
         {
-            DataItemTableView = SORTING(Code);
+            DataItemTableView = sorting(Code);
             RequestFilterFields = "Code", Blocked;
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -55,8 +59,8 @@ report 5062 "Sales Cycle - Analysis"
             }
             dataitem("Sales Cycle Stage"; "Sales Cycle Stage")
             {
-                DataItemLink = "Sales Cycle Code" = FIELD(Code);
-                DataItemTableView = SORTING("Sales Cycle Code", Stage);
+                DataItemLink = "Sales Cycle Code" = field(Code);
+                DataItemTableView = sorting("Sales Cycle Code", Stage);
                 column(Stage_SalesCycleStage; Stage)
                 {
                     IncludeCaption = true;

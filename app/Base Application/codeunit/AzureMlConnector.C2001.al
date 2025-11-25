@@ -1,3 +1,7 @@
+namespace System.AI;
+
+using System;
+
 codeunit 2001 "Azure ML Connector"
 {
 

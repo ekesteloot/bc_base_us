@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 page 8624 "Config. Package Fields"
 {
     Caption = 'Config. Package Fields';
@@ -6,7 +10,7 @@ page 8624 "Config. Package Fields"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "Config. Package Field";
-    SourceTableView = SORTING("Package Code", "Table ID", "Processing Order");
+    SourceTableView = sorting("Package Code", "Table ID", "Processing Order");
 
     layout
     {
@@ -22,7 +26,7 @@ page 8624 "Config. Package Fields"
                     ToolTip = 'Specifies the ID for the table that is part of the migration process.';
                     Visible = false;
                 }
-                field(Dimension; Dimension)
+                field(Dimension; Rec.Dimension)
                 {
                     ApplicationArea = Dimensions;
                     ToolTip = 'Specifies whether the field in the table is part of the dimension definition set.';
@@ -71,7 +75,7 @@ page 8624 "Config. Package Fields"
                     ToolTip = 'Specifies whether the field is part of the definition of the primary key for the table.';
                     Visible = false;
                 }
-                field(AutoIncrement; AutoIncrement)
+                field(AutoIncrement; Rec.AutoIncrement)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the field has the AutoIncrement property set to Yes, but is not part of the definition of the primary key for the table.';
@@ -197,9 +201,9 @@ page 8624 "Config. Package Fields"
                     begin
                         CurrPage.SaveRecord();
                         ConfigPackageField.SetCurrentKey("Package Code", "Table ID", "Processing Order");
-                        ConfigPackageField.SetRange("Package Code", "Package Code");
-                        ConfigPackageField.SetRange("Table ID", "Table ID");
-                        ConfigPackageField.SetFilter("Processing Order", '..%1', "Processing Order" - 1);
+                        ConfigPackageField.SetRange("Package Code", Rec."Package Code");
+                        ConfigPackageField.SetRange("Table ID", Rec."Table ID");
+                        ConfigPackageField.SetFilter("Processing Order", '..%1', Rec."Processing Order" - 1);
                         if ConfigPackageField.FindLast() then begin
                             ExchangeLines(Rec, ConfigPackageField);
                             CurrPage.Update(false);
@@ -219,9 +223,9 @@ page 8624 "Config. Package Fields"
                     begin
                         CurrPage.SaveRecord();
                         ConfigPackageField.SetCurrentKey("Package Code", "Table ID", "Processing Order");
-                        ConfigPackageField.SetRange("Package Code", "Package Code");
-                        ConfigPackageField.SetRange("Table ID", "Table ID");
-                        ConfigPackageField.SetFilter("Processing Order", '%1..', "Processing Order" + 1);
+                        ConfigPackageField.SetRange("Package Code", Rec."Package Code");
+                        ConfigPackageField.SetRange("Table ID", Rec."Table ID");
+                        ConfigPackageField.SetFilter("Processing Order", '%1..', Rec."Processing Order" + 1);
                         if ConfigPackageField.FindFirst() then begin
                             ExchangeLines(Rec, ConfigPackageField);
                             CurrPage.Update(false);
@@ -244,13 +248,13 @@ page 8624 "Config. Package Fields"
                         Clear(Objects);
                         AllObjWithCaption.FilterGroup(2);
                         AllObjWithCaption.SetRange("Object Type", AllObjWithCaption."Object Type"::Table);
-                        AllObjWithCaption.SetFilter("Object ID", GetRelationTablesID());
+                        AllObjWithCaption.SetFilter("Object ID", Rec.GetRelationTablesID());
                         AllObjWithCaption.FilterGroup(0);
                         Objects.SetTableView(AllObjWithCaption);
                         Objects.LookupMode := true;
                         if Objects.RunModal() = ACTION::LookupOK then begin
                             Objects.GetRecord(AllObjWithCaption);
-                            Validate("Relation Table ID", AllObjWithCaption."Object ID");
+                            Rec.Validate("Relation Table ID", AllObjWithCaption."Object ID");
                         end;
                     end;
                 }
@@ -288,14 +292,14 @@ page 8624 "Config. Package Fields"
     var
         ConfigPackageManagement: Codeunit "Config. Package Management";
     begin
-        ChangeTableRelationEnabled := ConfigPackageManagement.IsFieldMultiRelation("Table ID", "Field ID");
+        ChangeTableRelationEnabled := ConfigPackageManagement.IsFieldMultiRelation(Rec."Table ID", Rec."Field ID");
         if ChangeTableRelationEnabled and not CurrPage.Editable then
             ChangeTableRelationEnabled := CurrPage.Editable;
     end;
 
     trigger OnAfterGetRecord()
     begin
-        IncludedEditable := not "Primary Key";
+        IncludedEditable := not Rec."Primary Key";
     end;
 
     var
@@ -306,7 +310,7 @@ page 8624 "Config. Package Fields"
     var
         ConfigPackageTable: Record "Config. Package Table";
     begin
-        if ConfigPackageTable.Get("Package Code", "Table ID") then
+        if ConfigPackageTable.Get(Rec."Package Code", Rec."Table ID") then
             ConfigPackageTable.CalcFields("Table Caption");
 
         exit(ConfigPackageTable."Table Caption");

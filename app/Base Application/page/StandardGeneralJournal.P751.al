@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
 page 751 "Standard General Journal"
 {
     Caption = 'Standard General Journal';
@@ -11,7 +13,7 @@ page 751 "Standard General Journal"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a code to identify the standard general journal that you are about to save.';
@@ -25,8 +27,8 @@ page 751 "Standard General Journal"
             part(StdGenJnlLines; "Standard Gen. Journal Subform")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Journal Template Name" = FIELD("Journal Template Name"),
-                              "Standard Journal Code" = FIELD(Code);
+                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
+                              "Standard Journal Code" = field(Code);
             }
         }
         area(factboxes)
@@ -51,7 +53,7 @@ page 751 "Standard General Journal"
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         if xRec.Code = '' then
-            SetRange(Code, Code);
+            Rec.SetRange(Code, Rec.Code);
     end;
 }
 

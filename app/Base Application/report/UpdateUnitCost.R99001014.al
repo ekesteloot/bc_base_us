@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 report 99001014 "Update Unit Cost"
 {
     ApplicationArea = Manufacturing;
@@ -9,12 +13,12 @@ report 99001014 "Update Unit Cost"
     {
         dataitem("Production Order"; "Production Order")
         {
-            DataItemTableView = SORTING(Status, "No.") WHERE(Status = FILTER(.. Released));
+            DataItemTableView = sorting(Status, "No.") where(Status = filter(.. Released));
             RequestFilterFields = Status, "No.";
             dataitem("Prod. Order Line"; "Prod. Order Line")
             {
-                DataItemLink = Status = FIELD(Status), "Prod. Order No." = FIELD("No.");
-                DataItemTableView = SORTING(Status, "Prod. Order No.", "Planning Level Code") ORDER(Descending);
+                DataItemLink = Status = field(Status), "Prod. Order No." = field("No.");
+                DataItemTableView = sorting(Status, "Prod. Order No.", "Planning Level Code") order(Descending);
 
                 trigger OnAfterGetRecord()
                 var

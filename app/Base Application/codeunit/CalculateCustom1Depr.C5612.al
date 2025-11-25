@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Depreciation;
+
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.FixedAssets.Posting;
+
 codeunit 5612 "Calculate Custom 1 Depr."
 {
     Permissions = TableData "FA Ledger Entry" = r,

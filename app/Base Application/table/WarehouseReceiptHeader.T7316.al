@@ -1,3 +1,15 @@
+﻿namespace Microsoft.WarehouseMgt.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.CrossDock;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 table 7316 "Warehouse Receipt Header"
 {
     Caption = 'Warehouse Receipt Header';
@@ -22,7 +34,7 @@ table 7316 "Warehouse Receipt Header"
         field(2; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             var
@@ -45,7 +57,7 @@ table 7316 "Warehouse Receipt Header"
 
                 GetLocation("Location Code");
                 Location.TestField("Require Receive");
-                if Location."Directed Put-away and Pick" or Location."Bin Mandatory" then begin
+                if Location."Bin Mandatory" then begin
                     Validate("Bin Code", Location."Receipt Bin Code");
                     Validate("Cross-Dock Bin Code", Location."Cross-Dock Bin Code");
                 end;
@@ -63,7 +75,7 @@ table 7316 "Warehouse Receipt Header"
         {
             Caption = 'Assigned User ID';
             DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "Warehouse Employee" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = "Warehouse Employee" where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -104,7 +116,7 @@ table 7316 "Warehouse Receipt Header"
         field(8; "Zone Code"; Code[10])
         {
             Caption = 'Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -121,10 +133,10 @@ table 7316 "Warehouse Receipt Header"
         field(9; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = IF ("Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                               "Zone Code" = FIELD("Zone Code"));
+            TableRelation = if ("Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                               "Zone Code" = field("Zone Code"));
 
             trigger OnValidate()
             var
@@ -134,10 +146,8 @@ table 7316 "Warehouse Receipt Header"
                 if (xRec."Bin Code" <> "Bin Code") or ("Zone Code" = '') then begin
                     if "Bin Code" <> '' then begin
                         GetLocation("Location Code");
-                        WhseIntegrationMgt.CheckBinTypeCode(DATABASE::"Warehouse Receipt Header",
-                          FieldCaption("Bin Code"),
-                          "Location Code",
-                          "Bin Code", 0);
+                        WhseIntegrationMgt.CheckBinTypeCode(
+                            Enum::TableID::"Warehouse Receipt Header".AsInteger(), FieldCaption("Bin Code"), "Location Code", "Bin Code", 0);
                         Bin.Get("Location Code", "Bin Code");
                         "Zone Code" := Bin."Zone Code";
                     end;
@@ -154,9 +164,9 @@ table 7316 "Warehouse Receipt Header"
         }
         field(11; Comment; Boolean)
         {
-            CalcFormula = Exist("Warehouse Comment Line" WHERE("Table Name" = CONST("Whse. Receipt"),
-                                                                Type = CONST(" "),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = exist("Warehouse Comment Line" where("Table Name" = const("Whse. Receipt"),
+                                                                Type = const(" "),
+                                                                "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -172,8 +182,8 @@ table 7316 "Warehouse Receipt Header"
         field(16; "Cross-Dock Zone Code"; Code[10])
         {
             Caption = 'Cross-Dock Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"),
-                                             "Cross-Dock Bin Zone" = CONST(true));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"),
+                                             "Cross-Dock Bin Zone" = const(true));
 
             trigger OnValidate()
             begin
@@ -190,12 +200,12 @@ table 7316 "Warehouse Receipt Header"
         field(17; "Cross-Dock Bin Code"; Code[20])
         {
             Caption = 'Cross-Dock Bin Code';
-            TableRelation = IF ("Cross-Dock Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                                   "Cross-Dock Bin" = CONST(true))
-            ELSE
-            IF ("Cross-Dock Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                                                                                                 "Zone Code" = FIELD("Cross-Dock Zone Code"),
-                                                                                                                                                 "Cross-Dock Bin" = CONST(true));
+            TableRelation = if ("Cross-Dock Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                                   "Cross-Dock Bin" = const(true))
+            else
+            if ("Cross-Dock Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                                                                                                 "Zone Code" = field("Cross-Dock Zone Code"),
+                                                                                                                                                 "Cross-Dock Bin" = const(true));
 
             trigger OnValidate()
             var
@@ -315,7 +325,6 @@ table 7316 "Warehouse Receipt Header"
         WmsManagement: Codeunit "WMS Management";
         Text000: Label 'You cannot rename a %1.';
         Text001: Label 'You cannot change the %1, because the document has one or more lines.';
-        Text002: Label 'You must first set up user %1 as a warehouse employee.';
         Text003: Label 'You are not allowed to use location code %1.';
         Text005: Label 'must not be the %1 of the %2';
         Text006: Label 'You have changed %1 on the %2, but it has not been changed on the existing Warehouse Receipt Lines.\';
@@ -540,7 +549,6 @@ table 7316 "Warehouse Receipt Header"
 
     procedure ErrorIfUserIsNotWhseEmployee()
     var
-        WhseEmployee: Record "Warehouse Employee";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -548,11 +556,7 @@ table 7316 "Warehouse Receipt Header"
         if IsHandled then
             exit;
 
-        if UserId <> '' then begin
-            WhseEmployee.SetRange("User ID", UserId);
-            if WhseEmployee.IsEmpty() then
-                Error(Text002, UserId);
-        end;
+        WMSManagement.CheckUserIsWhseEmployee();
     end;
 
     procedure ReceiptLinesEditable() IsEditable: Boolean;

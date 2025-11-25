@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using System.Reflection;
+
 page 8623 "Config. Package Filters"
 {
     Caption = 'Config. Package Filters';
@@ -21,9 +25,9 @@ page 8623 "Config. Package Filters"
                         ConfigPackageMgt: Codeunit "Config. Package Management";
                         FieldSelection: Codeunit "Field Selection";
                     begin
-                        ConfigPackageMgt.SetFieldFilter(Field, "Table ID", 0);
+                        ConfigPackageMgt.SetFieldFilter(Field, Rec."Table ID", 0);
                         if FieldSelection.Open(Field) then begin
-                            Validate("Field ID", Field."No.");
+                            Rec.Validate("Field ID", Field."No.");
                             CurrPage.Update(true);
                         end;
                     end;

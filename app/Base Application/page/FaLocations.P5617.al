@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.Setup;
+
 page 5617 "FA Locations"
 {
     AdditionalSearchTerms = 'fixed asset locations departments sites offices';
@@ -14,7 +16,7 @@ page 5617 "FA Locations"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies a location code for the fixed asset.';

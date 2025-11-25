@@ -1,3 +1,11 @@
+namespace Microsoft.InventoryMgt.Counting.History;
+
+using Microsoft.HumanResources.Employee;
+using Microsoft.InventoryMgt.Counting.Comment;
+using Microsoft.InventoryMgt.Counting.Document;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5881 "Pstd. Phys. Invt. Record Hdr"
 {
     Caption = 'Pstd. Phys. Invt. Record Hdr';
@@ -29,9 +37,9 @@ table 5881 "Pstd. Phys. Invt. Record Hdr"
         }
         field(30; Comment; Boolean)
         {
-            CalcFormula = Exist ("Phys. Invt. Comment Line" WHERE("Document Type" = CONST("Posted Recording"),
-                                                                  "Order No." = FIELD("Order No."),
-                                                                  "Recording No." = FIELD("Recording No.")));
+            CalcFormula = exist("Phys. Invt. Comment Line" where("Document Type" = const("Posted Recording"),
+                                                                  "Order No." = field("Order No."),
+                                                                  "Recording No." = field("Recording No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -40,8 +48,6 @@ table 5881 "Pstd. Phys. Invt. Record Hdr"
         {
             Caption = 'Person Responsible';
             TableRelation = Employee;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(40; "Allow Recording Without Order"; Boolean)
@@ -60,8 +66,6 @@ table 5881 "Pstd. Phys. Invt. Record Hdr"
         {
             Caption = 'Person Recorded';
             TableRelation = Employee;
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(110; "Location Code"; Code[10])
@@ -72,7 +76,7 @@ table 5881 "Pstd. Phys. Invt. Record Hdr"
         field(111; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
     }
 

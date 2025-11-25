@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 codeunit 1531 "Workflow Change Rec Mgt."
 {
     Permissions = TableData "Workflow - Record Change" = rimd;

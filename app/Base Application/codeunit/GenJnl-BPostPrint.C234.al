@@ -1,3 +1,9 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Posting;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.Utilities;
+
 codeunit 234 "Gen. Jnl.-B.Post+Print"
 {
     TableNo = "Gen. Journal Batch";
@@ -113,13 +119,6 @@ codeunit 234 "Gen. Jnl.-B.Post+Print"
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Event is not raised from anywhere', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeGLRegPostingReportPrint(var ReportID: Integer; ReqWindow: Boolean; SystemPrinter: Boolean; var GLRegister: Record "G/L Register"; var Handled: Boolean)
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostJournalBatch(var GenJournalBatch: Record "Gen. Journal Batch"; var HideDialog: Boolean)
     begin

@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
 page 5727 "Purchasing Codes"
 {
     ApplicationArea = Suite;
@@ -13,7 +15,7 @@ page 5727 "Purchasing Codes"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a code for a purchasing activity.';

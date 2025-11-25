@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 table 130404 "CAL Test Method"
 {
     Caption = 'CAL Test Method';

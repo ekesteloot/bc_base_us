@@ -1,14 +1,33 @@
+﻿namespace Microsoft.Sales.FinanceCharge;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
+using Microsoft.Sales.Setup;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 118 "Finance Charge Memo"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/FinanceCharge/FinanceChargeMemo.rdlc';
+    RDLCLayout = './Sales/FinanceCharge/FinanceChargeMemo.rdlc';
     Caption = 'Finance Charge Memo';
 
     dataset
     {
         dataitem("Issued Fin. Charge Memo Header"; "Issued Fin. Charge Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             RequestFilterHeading = 'Finance Charge Memo';
             column(No_IssuedFinChrgMemoHdr; "No.")
@@ -52,7 +71,7 @@ report 118 "Finance Charge Memo"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(PostDate_IssFinChrgMemoHdr; Format("Issued Fin. Charge Memo Header"."Posting Date"))
                 {
                 }
@@ -212,7 +231,7 @@ report 118 "Finance Charge Memo"
                 dataitem(DimensionLoop; "Integer")
                 {
                     DataItemLinkReference = "Issued Fin. Charge Memo Header";
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -259,9 +278,9 @@ report 118 "Finance Charge Memo"
                 }
                 dataitem("Issued Fin. Charge Memo Line"; "Issued Fin. Charge Memo Line")
                 {
-                    DataItemLink = "Finance Charge Memo No." = FIELD("No.");
+                    DataItemLink = "Finance Charge Memo No." = field("No.");
                     DataItemLinkReference = "Issued Fin. Charge Memo Header";
-                    DataItemTableView = SORTING("Finance Charge Memo No.", "Line No.");
+                    DataItemTableView = sorting("Finance Charge Memo No.", "Line No.");
                     column(LineNo_IssuFinChrgMemoLine; "Line No.")
                     {
                     }
@@ -393,9 +412,9 @@ report 118 "Finance Charge Memo"
                 }
                 dataitem(IssuedFinChrgMemoLine2; "Issued Fin. Charge Memo Line")
                 {
-                    DataItemLink = "Finance Charge Memo No." = FIELD("No.");
+                    DataItemLink = "Finance Charge Memo No." = field("No.");
                     DataItemLinkReference = "Issued Fin. Charge Memo Header";
-                    DataItemTableView = SORTING("Finance Charge Memo No.", "Line No.");
+                    DataItemTableView = sorting("Finance Charge Memo No.", "Line No.");
                     column(Desc_IssFinChrgMemoLine2; Description)
                     {
                     }
@@ -410,7 +429,7 @@ report 118 "Finance Charge Memo"
                 }
                 dataitem(VATCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(VALVATBaseVALVATAmount; VALVATBase + VALVATAmount)
                     {
                         AutoFormatExpression = "Issued Fin. Charge Memo Header"."Currency Code";
@@ -455,7 +474,7 @@ report 118 "Finance Charge Memo"
                 }
                 dataitem(VATCounterLCY; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(VALExchRate; VALExchRate)
                     {
                     }
@@ -523,6 +542,7 @@ report 118 "Finance Charge Memo"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
                 DimSetEntry.SetRange("Dimension Set ID", "Dimension Set ID");
 
@@ -666,9 +686,6 @@ report 118 "Finance Charge Memo"
         GLSetup: Record "General Ledger Setup";
         CompanyBankAccount: Record "Bank Account";
         CompanyInfo: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         TempVATAmountLine: Record "VAT Amount Line" temporary;
         DimSetEntry: Record "Dimension Set Entry";
         CurrExchRate: Record "Currency Exchange Rate";
@@ -680,7 +697,6 @@ report 118 "Finance Charge Memo"
         FormatAddr: Codeunit "Format Address";
         CustAddr: array[8] of Text[100];
         CompanyAddr: array[8] of Text[100];
-        [InDataSet]
         VATNoText: Text[30];
         ReferenceText: Text[35];
         TotalText: Text[50];
@@ -698,7 +714,6 @@ report 118 "Finance Charge Memo"
         CurrFactor: Decimal;
         VALVATBase: Decimal;
         VALVATAmount: Decimal;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         TotalAmount: Decimal;
         TotalVatAmount: Decimal;
@@ -739,6 +754,9 @@ report 118 "Finance Charge Memo"
         ContactEmailLbl: Label 'Contact E-Mail';
 
     protected var
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
         LogInteraction: Boolean;
         ShowInternalInfo: Boolean;
 
@@ -751,7 +769,7 @@ report 118 "Finance Charge Memo"
 
     procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Sales Finance Charge Memo") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Sales Finance Charge Memo") <> '';
     end;
 
     procedure InitializeRequest(NewShowInternalInfo: Boolean; NewLogInteraction: Boolean)

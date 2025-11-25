@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 7113 "Analysis Value Type"
 {
     Extensible = true;

@@ -1,3 +1,14 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Structure;
+using Microsoft.WarehouseMgt.Tracking;
+using Microsoft.WarehouseMgt.Worksheet;
+
 table 7347 "Internal Movement Line"
 {
     Caption = 'Internal Movement Line';
@@ -35,7 +46,7 @@ table 7347 "Internal Movement Line"
         field(12; "From Bin Code"; Code[20])
         {
             Caption = 'From Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnLookup()
             begin
@@ -57,7 +68,7 @@ table 7347 "Internal Movement Line"
         field(13; "To Bin Code"; Code[20])
         {
             Caption = 'To Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnLookup()
             var
@@ -171,7 +182,7 @@ table 7347 "Internal Movement Line"
         field(31; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
             trigger OnLookup()
             begin
@@ -182,7 +193,7 @@ table 7347 "Internal Movement Line"
             var
                 ItemVariant: Record "Item Variant";
             begin
-                if "Variant Code" = '' then
+                if Rec."Variant Code" = '' then
                     Validate("Item No.")
                 else begin
                     ItemVariant.Get("Item No.", "Variant Code");
@@ -259,7 +270,7 @@ table 7347 "Internal Movement Line"
         ItemTrackingMgt: Codeunit "Item Tracking Management";
     begin
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          DATABASE::"Internal Movement Line", 0, "No.", '', 0, "Line No.", "Location Code", true);
+          Enum::TableID::"Internal Movement Line".AsInteger(), 0, "No.", '', 0, "Line No.", "Location Code", true);
     end;
 
     trigger OnInsert()
@@ -462,7 +473,7 @@ table 7347 "Internal Movement Line"
           "Warehouse Worksheet Document Type"::"Internal Movement", "No.", "Line No.",
           "Location Code", "Item No.", "Variant Code", "Qty. (Base)", "Qty. (Base)", "Qty. per Unit of Measure");
 
-        WhseItemTrackingLinesForm.SetSource(WhseWorksheetLine, DATABASE::"Internal Movement Line");
+        WhseItemTrackingLinesForm.SetSource(WhseWorksheetLine, Enum::TableID::"Internal Movement Line".AsInteger());
         WhseItemTrackingLinesForm.RunModal();
     end;
 
@@ -486,7 +497,7 @@ table 7347 "Internal Movement Line"
               "Location Code", "Item No.", "Variant Code", "Qty. (Base)", "Qty. (Base)", "Qty. per Unit of Measure");
             exit(
               ItemTrackingMgt.UpdateQuantities(
-                WhseWorksheetLine, TotalWhseItemTrackingLine, SourceQuantityArray, UndefinedQtyArray, DATABASE::"Internal Movement Line"));
+                WhseWorksheetLine, TotalWhseItemTrackingLine, SourceQuantityArray, UndefinedQtyArray, Enum::TableID::"Internal Movement Line".AsInteger()));
         end;
         exit(true);
     end;
@@ -644,7 +655,7 @@ table 7347 "Internal Movement Line"
 
         Clear(WhseItemTrackingLinesLines);
         OnSetItemTrackingLinesOnBeforeSetSource(Rec, WhseWorksheetLine);
-        WhseItemTrackingLinesLines.SetSource(WhseWorksheetLine, DATABASE::"Internal Movement Line");
+        WhseItemTrackingLinesLines.SetSource(WhseWorksheetLine, Enum::TableID::"Internal Movement Line".AsInteger());
         WhseItemTrackingLinesLines.InsertItemTrackingLine(WhseWorksheetLine, WhseEntry, QtyToEmpty);
     end;
 

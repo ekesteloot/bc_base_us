@@ -1,3 +1,10 @@
+﻿namespace System.Xml;
+
+using Microsoft.BankMgt.Statement;
+using System;
+using System.IO;
+using System.Utilities;
+
 codeunit 9610 "XSD Parser"
 {
 
@@ -1093,10 +1100,10 @@ codeunit 9610 "XSD Parser"
                     if StrPos(FullPath, SchemaContext) > 0 then
                         ElementName := DelStr(FullPath, StrPos(FullPath, SchemaContext), StrLen(SchemaContext));
                     DataExchColumnDef.InsertRecordForImport(
-						DataExchDef.Code, DataExchLineDef.Code,
-						ColumnNo, CopyStr(ElementName, 1, MaxStrLen(DataExchColumnDef.Name)),
-						CopyStr("Node Name", 1, MaxStrLen(DataExchColumnDef.Description)), true,
-						DataExchColumnDef."Data Type"::Text, '', '');
+                        DataExchDef.Code, DataExchLineDef.Code,
+                        ColumnNo, CopyStr(ElementName, 1, MaxStrLen(DataExchColumnDef.Name)),
+                        CopyStr("Node Name", 1, MaxStrLen(DataExchColumnDef.Description)), true,
+                        DataExchColumnDef."Data Type"::Text, '', '');
                     DataExchColumnDef.SetXMLDataFormattingValues("Simple Data Type");
                     DataExchColumnDef.Path := CopyStr(FullPath, 1, MaxStrLen(DataExchColumnDef.Path));
                     DataExchColumnDef.Modify();

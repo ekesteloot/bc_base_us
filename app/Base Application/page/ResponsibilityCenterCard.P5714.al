@@ -11,7 +11,7 @@ page 5714 "Responsibility Center Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Location;
                     ToolTip = 'Specifies the responsibility center code.';
@@ -21,7 +21,7 @@ page 5714 "Responsibility Center Card"
                     ApplicationArea = Location;
                     ToolTip = 'Specifies the name.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Location;
                     ToolTip = 'Specifies the address associated with the responsibility center.';
@@ -31,12 +31,12 @@ page 5714 "Responsibility Center Card"
                     ApplicationArea = Location;
                     ToolTip = 'Specifies additional address information.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Location;
                     ToolTip = 'Specifies the city where the responsibility center is located.';
                 }
-                field(County; County)
+                field(County; Rec.County)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'State / ZIP Code';
@@ -52,7 +52,7 @@ page 5714 "Responsibility Center Card"
                     ApplicationArea = Location;
                     ToolTip = 'Specifies the country/region of the address.';
                 }
-                field(Contact; Contact)
+                field(Contact; Rec.Contact)
                 {
                     ApplicationArea = Location;
                     ToolTip = 'Specifies the name of the person you regularly contact. ';
@@ -129,8 +129,8 @@ page 5714 "Responsibility Center Card"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(5714),
-                                  "No." = FIELD(Code);
+                    RunPageLink = "Table ID" = const(5714),
+                                  "No." = field(Code);
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }

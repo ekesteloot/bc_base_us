@@ -1,7 +1,19 @@
+﻿namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.ServiceMgt.History;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 780 "Certificate of Supply"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/CertificateofSupply.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/CertificateofSupply.rdlc';
     Caption = 'Certificate of Supply';
 
     dataset
@@ -11,7 +23,7 @@ report 780 "Certificate of Supply"
             RequestFilterFields = "Document Type", "Document No.";
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 MaxIteration = 1;
                 column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
                 {
@@ -132,7 +144,7 @@ report 780 "Certificate of Supply"
                 }
                 dataitem("<Integer2>"; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) ORDER(Ascending) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) ORDER(Ascending) where(Number = filter(1 ..));
                     column(Item_No_Caption; TempServiceShipmentLine.FieldCaption("No."))
                     {
                     }
@@ -192,6 +204,7 @@ report 780 "Certificate of Supply"
                 TempServiceShipmentLine.Reset();
                 TempServiceShipmentLine.DeleteAll();
                 CurrReport.Language := Language.GetLanguageIdOrDefault(GetLanguageCode(CertificateOfSupply));
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault(GetFormatRegionCode(CertificateOfSupply));
                 SetSource(CertificateOfSupply);
                 if PrintLineDetails then
                     GetLines(CertificateOfSupply);
@@ -511,8 +524,44 @@ report 780 "Certificate of Supply"
         end;
     end;
 
+    local procedure GetFormatRegionCode(CertificateOfSupply: Record "Certificate of Supply") Result: Text[80]
+    var
+        SalesShipmentHeader: Record "Sales Shipment Header";
+        ServiceShipmentHeader: Record "Service Shipment Header";
+        ReturnShipmentHeader: Record "Return Shipment Header";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeGetFormatRegion(CertificateOfSupply, Result, IsHandled);
+        if IsHandled then
+            exit;
+
+        case CertificateOfSupply."Document Type" of
+            CertificateOfSupply."Document Type"::"Sales Shipment":
+                begin
+                    SalesShipmentHeader.Get(CertificateOfSupply."Document No.");
+                    exit(SalesShipmentHeader."Format Region");
+                end;
+            CertificateOfSupply."Document Type"::"Service Shipment":
+                begin
+                    ServiceShipmentHeader.Get(CertificateOfSupply."Document No.");
+                    exit(ServiceShipmentHeader."Format Region");
+                end;
+            CertificateOfSupply."Document Type"::"Return Shipment":
+                begin
+                    ReturnShipmentHeader.Get(CertificateOfSupply."Document No.");
+                    exit(ReturnShipmentHeader."Format Region");
+                end;
+        end;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetLanguageCode(CertificateOfSupply: Record "Certificate of Supply"; var Result: Code[10]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetFormatRegion(CertificateOfSupply: Record "Certificate of Supply"; var Result: Text[80]; var IsHandled: Boolean)
     begin
     end;
 

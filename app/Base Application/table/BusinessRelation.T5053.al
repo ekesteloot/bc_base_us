@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.BusinessRelation;
+
 table 5053 "Business Relation"
 {
     Caption = 'Business Relation';
@@ -17,7 +19,7 @@ table 5053 "Business Relation"
         }
         field(3; "No. of Contacts"; Integer)
         {
-            CalcFormula = Count ("Contact Business Relation" WHERE("Business Relation Code" = FIELD(Code)));
+            CalcFormula = Count ("Contact Business Relation" where("Business Relation Code" = field(Code)));
             Caption = 'No. of Contacts';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,11 @@
+namespace Microsoft.Foundation.Company;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.PaymentRegistration;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.Foundation.Address;
+using System.Environment;
+
 codeunit 1306 "Company Information Mgt."
 {
 
@@ -103,6 +111,7 @@ codeunit 1306 "Company Information Mgt."
     var
         CompanyInformation: Record "Company Information";
     begin
+        Companyinformation.SetLoadFields("Demo Company");
         if CompanyInformation.Get() then;
         exit(CompanyInformation."Demo Company");
     end;

@@ -1,3 +1,20 @@
+namespace Microsoft.CashFlow.Forecast;
+
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Setup;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Receivables;
+using Microsoft.ServiceMgt.Document;
+using System.Security.AccessControl;
+using System.Security.User;
+
 table 847 "Cash Flow Forecast Entry"
 {
     Caption = 'Cash Flow Forecast Entry';
@@ -15,8 +32,6 @@ table 847 "Cash Flow Forecast Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -78,13 +93,13 @@ table 847 "Cash Flow Forecast Entry"
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(25; "Global Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(26; "Recurring Method"; Option)
         {
@@ -110,29 +125,29 @@ table 847 "Cash Flow Forecast Entry"
         field(33; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST("Liquid Funds")) "G/L Account"
-            ELSE
-            IF ("Source Type" = CONST(Receivables)) "Cust. Ledger Entry"."Document No."
-            ELSE
-            IF ("Source Type" = CONST(Payables)) "Vendor Ledger Entry"."Document No."
-            ELSE
-            IF ("Source Type" = CONST("Fixed Assets Budget")) "Fixed Asset"
-            ELSE
-            IF ("Source Type" = CONST("Fixed Assets Disposal")) "Fixed Asset"
-            ELSE
-            IF ("Source Type" = CONST("Sales Orders")) "Sales Header"."No." WHERE("Document Type" = CONST(Order))
-            ELSE
-            IF ("Source Type" = CONST("Purchase Orders")) "Purchase Header"."No." WHERE("Document Type" = CONST(Order))
-            ELSE
-            IF ("Source Type" = CONST("Service Orders")) "Service Header"."No." WHERE("Document Type" = CONST(Order))
-            ELSE
-            IF ("Source Type" = CONST("Cash Flow Manual Expense")) "Cash Flow Manual Expense"
-            ELSE
-            IF ("Source Type" = CONST("Cash Flow Manual Revenue")) "Cash Flow Manual Revenue"
-            ELSE
-            IF ("Source Type" = CONST("G/L Budget")) "G/L Account"
-            ELSE
-            IF ("Source Type" = CONST(Job)) Job."No.";
+            TableRelation = if ("Source Type" = const("Liquid Funds")) "G/L Account"
+            else
+            if ("Source Type" = const(Receivables)) "Cust. Ledger Entry"."Document No."
+            else
+            if ("Source Type" = const(Payables)) "Vendor Ledger Entry"."Document No."
+            else
+            if ("Source Type" = const("Fixed Assets Budget")) "Fixed Asset"
+            else
+            if ("Source Type" = const("Fixed Assets Disposal")) "Fixed Asset"
+            else
+            if ("Source Type" = const("Sales Orders")) "Sales Header"."No." where("Document Type" = const(Order))
+            else
+            if ("Source Type" = const("Purchase Orders")) "Purchase Header"."No." where("Document Type" = const(Order))
+            else
+            if ("Source Type" = const("Service Orders")) "Service Header"."No." where("Document Type" = const(Order))
+            else
+            if ("Source Type" = const("Cash Flow Manual Expense")) "Cash Flow Manual Expense"
+            else
+            if ("Source Type" = const("Cash Flow Manual Revenue")) "Cash Flow Manual Revenue"
+            else
+            if ("Source Type" = const("G/L Budget")) "G/L Account"
+            else
+            if ("Source Type" = const(Job)) Job."No.";
         }
         field(35; "G/L Budget Name"; Code[10])
         {
@@ -151,7 +166,7 @@ table 847 "Cash Flow Forecast Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])
@@ -266,7 +281,6 @@ table 847 "Cash Flow Forecast Entry"
         PAGE.Run(0, CFForecastEntry);
     end;
 
-    [Scope('OnPrem')]
     procedure ShowSource(ShowDocument: Boolean)
     var
         CFManagement: Codeunit "Cash Flow Management";

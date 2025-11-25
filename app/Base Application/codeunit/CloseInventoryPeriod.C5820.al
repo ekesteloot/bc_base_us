@@ -1,3 +1,9 @@
+namespace Microsoft.InventoryMgt.Setup;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Ledger;
+
 codeunit 5820 "Close Inventory Period"
 {
     Permissions = TableData "Inventory Period" = rimd,
@@ -11,24 +17,24 @@ codeunit 5820 "Close Inventory Period"
                 if not Confirm(
                      Text002,
                      false,
-                     "Ending Date")
+                     Rec."Ending Date")
                 then
                     exit
             end else
-                if not Confirm(Text006, false, TableCaption(), "Ending Date") then
+                if not Confirm(Text006, false, Rec.TableCaption(), Rec."Ending Date") then
                     exit;
 
-        TestField(Closed, ReOpen);
+        Rec.TestField(Closed, ReOpen);
 
         OnRunOnBeforeCheck(Rec, ReOpen);
 
         if not ReOpen then begin
-            TestField("Ending Date");
-            CheckCostIsAdjusted("Ending Date");
-            CheckOpenOutboundEntryExist("Ending Date");
+            Rec.TestField("Ending Date");
+            CheckCostIsAdjusted(Rec."Ending Date");
+            CheckOpenOutboundEntryExist(Rec."Ending Date");
         end else
-            if not HideDialog and AccPeriodIsClosed("Ending Date") then
-                if not Confirm(Text008, false, TableCaption(), "Ending Date") then
+            if not HideDialog and AccPeriodIsClosed(Rec."Ending Date") then
+                if not Confirm(Text008, false, Rec.TableCaption(), Rec."Ending Date") then
                     exit;
 
         UpdateInvtPeriod(Rec);
@@ -36,9 +42,9 @@ codeunit 5820 "Close Inventory Period"
 
         if not HideDialog then
             if not ReOpen then
-                Message(Text005, TableCaption(), "Ending Date")
+                Message(Text005, Rec.TableCaption(), Rec."Ending Date")
             else
-                Message(Text007, "Ending Date");
+                Message(Text007, Rec."Ending Date");
     end;
 
     var

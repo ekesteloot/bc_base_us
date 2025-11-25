@@ -11,7 +11,7 @@ page 785 "Customer Picture"
     {
         area(content)
         {
-            field(Image; Image)
+            field(Image; Rec.Image)
             {
                 ApplicationArea = All;
                 ShowCaption = false;
@@ -53,11 +53,11 @@ page 785 "Customer Picture"
                     FileName: Text;
                     ClientFileName: Text;
                 begin
-                    TestField("No.");
-                    if Name = '' then
+                    Rec.TestField("No.");
+                    if Rec.Name = '' then
                         Error(MustSpecifyNameErr);
 
-                    if Image.HasValue() then
+                    if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then
                             exit;
 
@@ -65,10 +65,10 @@ page 785 "Customer Picture"
                     if FileName = '' then
                         exit;
 
-                    Clear(Image);
-                    Image.ImportFile(FileName, ClientFileName);
-                    if not Modify(true) then
-                        Insert(true);
+                    Clear(Rec.Image);
+                    Rec.Image.ImportFile(FileName, ClientFileName);
+                    if not Rec.Modify(true) then
+                        Rec.Insert(true);
 
                     if FileManagement.DeleteServerFile(FileName) then;
                 end;
@@ -88,12 +88,12 @@ page 785 "Customer Picture"
                     ToFile: Text;
                     ExportPath: Text;
                 begin
-                    TestField("No.");
-                    TestField(Name);
+                    Rec.TestField("No.");
+                    Rec.TestField(Name);
 
                     ToFile := DummyPictureEntity.GetDefaultMediaDescription(Rec);
-                    ExportPath := TemporaryPath + "No." + Format(Image.MediaId);
-                    Image.ExportFile(ExportPath);
+                    ExportPath := TemporaryPath + Rec."No." + Format(Rec.Image.MediaId);
+                    Rec.Image.ExportFile(ExportPath);
 
                     FileManagement.ExportImage(ExportPath, ToFile);
                 end;
@@ -108,13 +108,13 @@ page 785 "Customer Picture"
 
                 trigger OnAction()
                 begin
-                    TestField("No.");
+                    Rec.TestField("No.");
 
                     if not Confirm(DeleteImageQst) then
                         exit;
 
-                    Clear(Image);
-                    Modify(true);
+                    Clear(Rec.Image);
+                    Rec.Modify(true);
                 end;
             }
         }
@@ -132,7 +132,6 @@ page 785 "Customer Picture"
 
     var
         Camera: Codeunit Camera;
-        [InDataSet]
         CameraAvailable: Boolean;
         OverrideImageQst: Label 'The existing picture will be replaced. Do you want to continue?';
         DeleteImageQst: Label 'Are you sure you want to delete the picture?';
@@ -163,7 +162,7 @@ page 785 "Customer Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Image.HasValue;
+        DeleteExportEnabled := Rec.Image.HasValue;
     end;
 
     procedure IsCameraAvailable(): Boolean

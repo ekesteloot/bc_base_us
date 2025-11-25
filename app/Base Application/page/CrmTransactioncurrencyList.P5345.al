@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.Integration.Dataverse;
+
 page 5345 "CRM TransactionCurrency List"
 {
     ApplicationArea = Suite;
@@ -6,7 +15,7 @@ page 5345 "CRM TransactionCurrency List"
     Editable = false;
     PageType = List;
     SourceTable = "CRM Transactioncurrency";
-    SourceTableView = SORTING(ISOCurrencyCode);
+    SourceTableView = sorting(ISOCurrencyCode);
     UsageCategory = Lists;
 
     layout
@@ -16,14 +25,14 @@ page 5345 "CRM TransactionCurrency List"
             repeater(Control2)
             {
                 ShowCaption = false;
-                field(ISOCurrencyCode; ISOCurrencyCode)
+                field(ISOCurrencyCode; Rec.ISOCurrencyCode)
                 {
                     ApplicationArea = Suite;
                     Caption = 'ISO Currency Code';
                     StyleExpr = FirstColumnStyle;
                     ToolTip = 'Specifies the ISO currency code, which is required in Dataverse.';
                 }
-                field(CurrencyName; CurrencyName)
+                field(CurrencyName; Rec.CurrencyName)
                 {
                     ApplicationArea = Suite;
                     Caption = 'Currency Name';
@@ -52,7 +61,7 @@ page 5345 "CRM TransactionCurrency List"
 
                 trigger OnAction()
                 begin
-                    MarkedOnly(true);
+                    Rec.MarkedOnly(true);
                 end;
             }
             action(ShowAll)
@@ -64,7 +73,7 @@ page 5345 "CRM TransactionCurrency List"
 
                 trigger OnAction()
                 begin
-                    MarkedOnly(false);
+                    Rec.MarkedOnly(false);
                 end;
             }
         }
@@ -89,20 +98,20 @@ page 5345 "CRM TransactionCurrency List"
         CRMIntegrationRecord: Record "CRM Integration Record";
         RecordID: RecordID;
     begin
-        if CRMIntegrationRecord.FindRecordIDFromID(TransactionCurrencyId, DATABASE::Currency, RecordID) then
-            if CurrentlyCoupledCRMTransactioncurrency.TransactionCurrencyId = TransactionCurrencyId then begin
+        if CRMIntegrationRecord.FindRecordIDFromID(Rec.TransactionCurrencyId, DATABASE::Currency, RecordID) then
+            if CurrentlyCoupledCRMTransactioncurrency.TransactionCurrencyId = Rec.TransactionCurrencyId then begin
                 Coupled := 'Current';
                 FirstColumnStyle := 'Strong';
-                Mark(true);
+                Rec.Mark(true);
             end else begin
                 Coupled := 'Yes';
                 FirstColumnStyle := 'Subordinate';
-                Mark(false);
+                Rec.Mark(false);
             end
         else begin
             Coupled := 'No';
             FirstColumnStyle := 'None';
-            Mark(true);
+            Rec.Mark(true);
         end;
     end;
 
@@ -115,9 +124,9 @@ page 5345 "CRM TransactionCurrency List"
     var
         LookupCRMTables: Codeunit "Lookup CRM Tables";
     begin
-        FilterGroup(4);
-        SetView(LookupCRMTables.GetIntegrationTableMappingView(DATABASE::"CRM Transactioncurrency"));
-        FilterGroup(0);
+        Rec.FilterGroup(4);
+        Rec.SetView(LookupCRMTables.GetIntegrationTableMappingView(DATABASE::"CRM Transactioncurrency"));
+        Rec.FilterGroup(0);
     end;
 
     var

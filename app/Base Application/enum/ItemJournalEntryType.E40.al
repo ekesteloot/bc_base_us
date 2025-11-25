@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Journal;
+
 enum 40 "Item Journal Entry Type"
 {
     Extensible = true;

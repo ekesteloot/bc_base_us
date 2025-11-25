@@ -10,61 +10,61 @@ table 36623 "Credit Manager Cue"
         }
         field(2; "Overdue Sales Invoices"; Integer)
         {
-            CalcFormula = Count ("Cust. Ledger Entry" WHERE("Document Type" = FILTER(Invoice | "Credit Memo"),
-                                                            "Due Date" = FIELD("Overdue Date Filter"),
-                                                            Open = CONST(true)));
+            CalcFormula = Count ("Cust. Ledger Entry" where("Document Type" = filter(Invoice | "Credit Memo"),
+                                                            "Due Date" = field("Overdue Date Filter"),
+                                                            Open = const(true)));
             Caption = 'Overdue Sales Invoices';
             FieldClass = FlowField;
         }
         field(5; "SOs Pending Approval"; Integer)
         {
-            CalcFormula = Count ("Sales Header" WHERE("Document Type" = CONST(Order),
-                                                      Status = FILTER("Pending Approval")));
+            CalcFormula = Count ("Sales Header" where("Document Type" = const(Order),
+                                                      Status = filter("Pending Approval")));
             Caption = 'SOs Pending Approval';
             FieldClass = FlowField;
         }
         field(6; "Approved Sales Orders"; Integer)
         {
-            CalcFormula = Count ("Sales Header" WHERE("Document Type" = CONST(Order),
-                                                      Status = FILTER(Released | "Pending Prepayment")));
+            CalcFormula = Count ("Sales Header" where("Document Type" = const(Order),
+                                                      Status = filter(Released | "Pending Prepayment")));
             Caption = 'Approved Sales Orders';
             FieldClass = FlowField;
         }
         field(7; "Sales Orders On Hold"; Integer)
         {
-            CalcFormula = Count ("Sales Header" WHERE("Document Type" = CONST(Order),
-                                                      "On Hold" = FILTER(<> '')));
+            CalcFormula = Count ("Sales Header" where("Document Type" = const(Order),
+                                                      "On Hold" = filter(<> '')));
             Caption = 'Sales Orders On Hold';
             FieldClass = FlowField;
         }
         field(11; "Customers - Blocked"; Integer)
         {
-            CalcFormula = Count (Customer WHERE(Blocked = FILTER(<> " ")));
+            CalcFormula = Count (Customer where(Blocked = filter(<> " ")));
             Caption = 'Customers - Blocked';
             FieldClass = FlowField;
         }
         field(12; "Customers - Overdue"; Integer)
         {
-            CalcFormula = Count (Customer WHERE("Date Filter" = FIELD("Overdue Date Filter"),
-                                                "Balance Due (LCY)" = FILTER(> 0)));
+            CalcFormula = Count (Customer where("Date Filter" = field("Overdue Date Filter"),
+                                                "Balance Due (LCY)" = filter(> 0)));
             Caption = 'Customers - Overdue';
             FieldClass = FlowField;
         }
         field(15; "Approvals - Sales Orders"; Integer)
         {
-            CalcFormula = Count ("Approval Entry" WHERE("Table ID" = CONST(36),
-                                                        "Document Type" = CONST(Order),
-                                                        "Approver ID" = FIELD("User Filter"),
-                                                        Status = CONST(Open)));
+            CalcFormula = Count ("Approval Entry" where("Table ID" = const(36),
+                                                        "Document Type" = const(Order),
+                                                        "Approver ID" = field("User Filter"),
+                                                        Status = const(Open)));
             Caption = 'Approvals - Sales Orders';
             FieldClass = FlowField;
         }
         field(16; "Approvals - Sales Invoices"; Integer)
         {
-            CalcFormula = Count ("Approval Entry" WHERE("Table ID" = CONST(36),
-                                                        "Document Type" = CONST(Invoice),
-                                                        "Approver ID" = FIELD("User Filter"),
-                                                        Status = CONST(Open)));
+            CalcFormula = Count ("Approval Entry" where("Table ID" = const(36),
+                                                        "Document Type" = const(Invoice),
+                                                        "Approver ID" = field("User Filter"),
+                                                        Status = const(Open)));
             Caption = 'Approvals - Sales Invoices';
             FieldClass = FlowField;
         }

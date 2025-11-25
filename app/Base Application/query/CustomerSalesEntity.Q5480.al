@@ -25,7 +25,7 @@ query 5480 "Customer Sales Entity"
             {
                 DataItemLink = "Customer No." = Customer."No.";
                 SqlJoinType = LeftOuterJoin;
-                DataItemTableFilter = "Document Type" = FILTER(Invoice | "Credit Memo");
+                DataItemTableFilter = "Document Type" = filter(Invoice | "Credit Memo");
                 column(totalSalesAmount; "Sales (LCY)")
                 {
                     Caption = 'TotalSalesAmount', Locked = true;

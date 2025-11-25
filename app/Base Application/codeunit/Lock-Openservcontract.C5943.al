@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Contract;
+
+using System.Utilities;
+
 codeunit 5943 "Lock-OpenServContract"
 {
 

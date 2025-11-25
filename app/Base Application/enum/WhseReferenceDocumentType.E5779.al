@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Setup;
+
 enum 5779 "Whse. Reference Document Type"
 {
     Extensible = true;

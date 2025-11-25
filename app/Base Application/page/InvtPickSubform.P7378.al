@@ -1,3 +1,11 @@
+﻿namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
 page 7378 "Invt. Pick Subform"
 {
     Caption = 'Lines';
@@ -6,7 +14,7 @@ page 7378 "Invt. Pick Subform"
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Warehouse Activity Line";
-    SourceTableView = WHERE("Activity Type" = CONST("Invt. Pick"));
+    SourceTableView = where("Activity Type" = const("Invt. Pick"));
 
     layout
     {
@@ -387,7 +395,6 @@ page 7378 "Invt. Pick Subform"
 
     var
         WMSMgt: Codeunit "WMS Management";
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     local procedure ShowSourceLine()

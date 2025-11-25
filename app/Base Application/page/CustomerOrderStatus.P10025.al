@@ -18,10 +18,10 @@ page 10025 "Customer Order Status"
                     Editable = false;
                     ToolTip = 'Specifies the customer.';
                 }
-                part(Control8; "Customer Order Lines Status")
+                part(Control8; "Customer Order Lines Part")
                 {
                     ApplicationArea = Basic, Suite;
-                    SubPageLink = "Sell-to Customer No." = FIELD("No.");
+                    SubPageLink = "Sell-to Customer No." = field("No.");
                 }
                 field(Name; Rec.Name)
                 {
@@ -40,12 +40,12 @@ page 10025 "Customer Order Status"
                     Editable = false;
                     ToolTip = 'Specifies the customer.';
                 }
-                part(Control7; "Customer Order Header Status")
+                part(Control7; "Customer Order Header Part")
                 {
                     ApplicationArea = Basic, Suite;
-                    SubPageLink = "Sell-to Customer No." = FIELD("No.");
+                    SubPageLink = "Sell-to Customer No." = field("No.");
                 }
-                field(Name2; Name)
+                field(Name2; Rec.Name)
                 {
                     ApplicationArea = Basic, Suite;
                     Editable = false;
@@ -58,7 +58,7 @@ page 10025 "Customer Order Status"
                 part(CreditSubform; "Customer Credit Information")
                 {
                     ApplicationArea = Basic, Suite;
-                    SubPageLink = "No." = FIELD("No.");
+                    SubPageLink = "No." = field("No.");
                 }
                 label(Control26)
                 {
@@ -66,10 +66,10 @@ page 10025 "Customer Order Status"
                     CaptionClass = Text19061440;
                     ShowCaption = false;
                 }
-                part(CommentSubform; "Comment Sheet")
+                part(CommentSubform; "Comment Sheet Part")
                 {
                     ApplicationArea = Basic, Suite;
-                    SubPageLink = "No." = FIELD("No.");
+                    SubPageLink = "No." = field("No.");
                 }
             }
         }
@@ -89,7 +89,7 @@ page 10025 "Customer Order Status"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the card for the customer.';
                 }
@@ -98,8 +98,8 @@ page 10025 "Customer Order Status"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Ledger E&ntries';
                     RunObject = Page "Customer Ledger Entries";
-                    RunPageLink = "Customer No." = FIELD("No.");
-                    RunPageView = SORTING("Customer No.", "Posting Date");
+                    RunPageLink = "Customer No." = field("No.");
+                    RunPageView = sorting("Customer No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
@@ -109,8 +109,8 @@ page 10025 "Customer Order Status"
                     Caption = 'Dimensions';
                     Image = Dimensions;
                     RunObject = Page "Default Dimensions";
-                    RunPageLink = "Table ID" = CONST(18),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table ID" = const(18),
+                                  "No." = field("No.");
                     ShortCutKey = 'Alt+D';
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -120,7 +120,7 @@ page 10025 "Customer Order Status"
                     Caption = 'Bank Accounts';
                     Image = BankAccount;
                     RunObject = Page "Customer Bank Account List";
-                    RunPageLink = "Customer No." = FIELD("No.");
+                    RunPageLink = "Customer No." = field("No.");
                     ToolTip = 'View or set up the customer''s bank accounts. You can set up any number of bank accounts for each customer.';
                 }
                 action("Ship-&to Addresses")
@@ -129,7 +129,7 @@ page 10025 "Customer Order Status"
                     Caption = 'Ship-&to Addresses';
                     Image = ShipAddress;
                     RunObject = Page "Ship-to Address List";
-                    RunPageLink = "Customer No." = FIELD("No.");
+                    RunPageLink = "Customer No." = field("No.");
                     ToolTip = 'View or edit the alternate address where the customer wants the item delivered if different from its regular address.';
                 }
                 action("C&ontact")
@@ -141,7 +141,7 @@ page 10025 "Customer Order Status"
 
                     trigger OnAction()
                     begin
-                        ShowContact();
+                        Rec.ShowContact();
                     end;
                 }
                 separator(Action21)
@@ -153,10 +153,10 @@ page 10025 "Customer Order Status"
                     Caption = 'Statistics';
                     Image = Statistics;
                     RunObject = Page "Customer Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ShortCutKey = 'F7';
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
@@ -166,10 +166,10 @@ page 10025 "Customer Order Status"
                     Caption = 'Statistics by C&urrencies';
                     Image = Currencies;
                     RunObject = Page "Cust. Stats. by Curr. Lines";
-                    RunPageLink = "Customer Filter" = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter"),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "Customer Filter" = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
+                                  "Date Filter" = field("Date Filter");
                     ToolTip = 'View the customer''s statistics for each currency for which there are transactions.';
                 }
                 action("Entry Statistics")
@@ -178,10 +178,10 @@ page 10025 "Customer Order Status"
                     Caption = 'Entry Statistics';
                     Image = EntryStatistics;
                     RunObject = Page "Customer Entry Statistics";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'View statistics for customer ledger entries.';
                 }
                 action("S&ales")
@@ -190,9 +190,9 @@ page 10025 "Customer Order Status"
                     Caption = 'S&ales';
                     Image = Sales;
                     RunObject = Page "Customer Sales";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     ToolTip = 'View your sales to the customer by different periods.';
                 }
             }

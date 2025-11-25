@@ -1,3 +1,11 @@
+namespace Microsoft.CRM.Task;
+
+using Microsoft.CRM.Comment;
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using System.Environment;
+
 page 5098 "Task Card"
 {
     Caption = 'Task Card';
@@ -24,7 +32,7 @@ page 5098 "Task Card"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the description of the task.';
                 }
-                field(Location; Location)
+                field(Location; Rec.Location)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Enabled = LocationEnable;
@@ -49,10 +57,10 @@ page 5098 "Task Card"
 
                     trigger OnDrillDown()
                     begin
-                        Modify();
+                        Rec.Modify();
                         Commit();
                         PAGE.RunModal(PAGE::"Attendee Scheduling", Rec);
-                        Get("No.");
+                        Rec.Get(Rec."No.");
                         CurrPage.Update();
                     end;
                 }
@@ -64,10 +72,10 @@ page 5098 "Task Card"
 
                     trigger OnDrillDown()
                     begin
-                        Modify();
+                        Rec.Modify();
                         Commit();
                         PAGE.RunModal(PAGE::"Attendee Scheduling", Rec);
-                        Get("No.");
+                        Rec.Get(Rec."No.");
                         CurrPage.Update();
                     end;
                 }
@@ -82,13 +90,13 @@ page 5098 "Task Card"
                         Task: Record "To-do";
                         Cont: Record Contact;
                     begin
-                        if Type = Type::Meeting then begin
-                            Task.SetRange("No.", "No.");
+                        if Rec.Type = Rec.Type::Meeting then begin
+                            Task.SetRange("No.", Rec."No.");
                             PAGE.RunModal(PAGE::"Attendee Scheduling", Task);
                         end else begin
-                            if Cont.Get("Contact No.") then;
+                            if Cont.Get(Rec."Contact No.") then;
                             if PAGE.RunModal(0, Cont) = ACTION::LookupOK then begin
-                                Validate("Contact No.", Cont."No.");
+                                Rec.Validate("Contact No.", Cont."No.");
                                 CurrPage.Update();
                             end;
                         end;
@@ -165,12 +173,12 @@ page 5098 "Task Card"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the status of the task. There are five options: Not Started, In Progress, Completed, Waiting and Postponed.';
                 }
-                field(Priority; Priority)
+                field(Priority; Rec.Priority)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the priority of the task.';
                 }
-                field(TypeSaaS; Type)
+                field(TypeSaaS; Rec.Type)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Type';
@@ -182,7 +190,7 @@ page 5098 "Task Card"
                         TypeOnAfterValidate();
                     end;
                 }
-                field(TypeOnPrem; Type)
+                field(TypeOnPrem; Rec.Type)
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Type';
@@ -194,7 +202,7 @@ page 5098 "Task Card"
                         TypeOnAfterValidate();
                     end;
                 }
-                field(AllDayEvent; "All Day Event")
+                field(AllDayEvent; Rec."All Day Event")
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'All Day Event';
@@ -206,38 +214,38 @@ page 5098 "Task Card"
                         AllDayEventOnAfterValidate();
                     end;
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the date when the task should be started. There are certain rules for how dates should be entered found in How to: Enter Dates and Times.';
                 }
-                field(StartTime; "Start Time")
+                field(StartTime; Rec."Start Time")
                 {
                     ApplicationArea = RelationshipMgmt;
                     Enabled = StartTimeEnable;
                     ToolTip = 'Specifies the time when the task of the Meeting type should be started.';
                 }
-                field(Duration; Duration)
+                field(Duration; Rec.Duration)
                 {
                     ApplicationArea = RelationshipMgmt;
                     BlankZero = true;
                     Enabled = DurationEnable;
                     ToolTip = 'Specifies the duration of the task of the Meeting type.';
                 }
-                field(EndingDate; "Ending Date")
+                field(EndingDate; Rec."Ending Date")
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Ending Date';
                     ToolTip = 'Specifies the date of when the task should end. There are certain rules for how dates should be entered. For more information, see How to: Enter Dates and Times.';
                 }
-                field(EndingTime; "Ending Time")
+                field(EndingTime; Rec."Ending Time")
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Ending Time';
                     Enabled = EndingTimeEnable;
                     ToolTip = 'Specifies the time of when the task of the Meeting type should end.';
                 }
-                field(Canceled; Canceled)
+                field(Canceled; Rec.Canceled)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies that the task has been canceled.';
@@ -247,7 +255,7 @@ page 5098 "Task Card"
                         SwitchCardControls();
                     end;
                 }
-                field(Closed; Closed)
+                field(Closed; Rec.Closed)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies that the task is closed.';
@@ -304,7 +312,7 @@ page 5098 "Task Card"
             {
                 Caption = 'Recurring';
                 Editable = PagePartsEditable;
-                field(Control39; Recurring)
+                field(Control39; Rec.Recurring)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies that the task occurs periodically.';
@@ -359,9 +367,9 @@ page 5098 "Task Card"
                     Caption = 'Co&mment';
                     Image = ViewComments;
                     RunObject = Page "Rlshp. Mgt. Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("To-do"),
-                                  "No." = FIELD("Organizer To-do No."),
-                                  "Sub No." = CONST(0);
+                    RunPageLink = "Table Name" = const("To-do"),
+                                  "No." = field("Organizer To-do No."),
+                                  "Sub No." = const(0);
                     ToolTip = 'View or add comments.';
                 }
                 action("Interaction Log E&ntries")
@@ -370,8 +378,8 @@ page 5098 "Task Card"
                     Caption = 'Interaction Log E&ntries';
                     Image = InteractionLog;
                     RunObject = Page "Interaction Log Entries";
-                    RunPageLink = "To-do No." = FIELD("Organizer To-do No.");
-                    RunPageView = SORTING("To-do No.");
+                    RunPageLink = "To-do No." = field("Organizer To-do No.");
+                    RunPageView = sorting("To-do No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View interaction log entries for the task.';
                 }
@@ -381,8 +389,8 @@ page 5098 "Task Card"
                     Caption = 'Postponed &Interactions';
                     Image = PostponedInteractions;
                     RunObject = Page "Postponed Interactions";
-                    RunPageLink = "To-do No." = FIELD("Organizer To-do No.");
-                    RunPageView = SORTING("To-do No.");
+                    RunPageLink = "To-do No." = field("Organizer To-do No.");
+                    RunPageView = sorting("To-do No.");
                     ToolTip = 'View postponed interactions for the task.';
                 }
                 action("A&ttendee Scheduling")
@@ -394,8 +402,8 @@ page 5098 "Task Card"
 
                     trigger OnAction()
                     begin
-                        if Type <> Type::Meeting then
-                            Error(CannotSelectAttendeesErr, Format(Type));
+                        if Rec.Type <> Rec.Type::Meeting then
+                            Error(CannotSelectAttendeesErr, Format(Rec.Type));
 
                         PAGE.RunModal(PAGE::"Attendee Scheduling", Rec);
                     end;
@@ -433,16 +441,16 @@ page 5098 "Task Card"
                     var
                         TempSegmentLine: Record "Segment Line" temporary;
                     begin
-                        if "Contact No." = '' then begin
-                            if (Type = Type::Meeting) and ("Team Code" = '') then
+                        if Rec."Contact No." = '' then begin
+                            if (Rec.Type = Rec.Type::Meeting) and (Rec."Team Code" = '') then
                                 Error(MakePhoneCallIsNotAvailableErr);
                             Error(MustAssignContactErr);
                         end;
-                        TempSegmentLine."To-do No." := "No.";
-                        TempSegmentLine."Contact No." := "Contact No.";
-                        TempSegmentLine."Contact Company No." := "Contact Company No.";
-                        TempSegmentLine."Campaign No." := "Campaign No.";
-                        TempSegmentLine."Salesperson Code" := "Salesperson Code";
+                        TempSegmentLine."To-do No." := Rec."No.";
+                        TempSegmentLine."Contact No." := Rec."Contact No.";
+                        TempSegmentLine."Contact Company No." := Rec."Contact Company No.";
+                        TempSegmentLine."Campaign No." := Rec."Campaign No.";
+                        TempSegmentLine."Salesperson Code" := Rec."Salesperson Code";
                         TempSegmentLine.CreatePhoneCall();
                     end;
                 }
@@ -478,14 +486,14 @@ page 5098 "Task Card"
     trigger OnAfterGetRecord()
     begin
         SwitchCardControls();
-        if "No." <> "Organizer To-do No." then
+        if Rec."No." <> Rec."Organizer To-do No." then
             PagePartsEditable := false
         else
             PagePartsEditable := true;
         SetRecurringEditable();
         EnableFields();
-        ContactNoOnFormat(Format("Contact No."));
-        Contact.GetOrClear("Contact No.");
+        ContactNoOnFormat(Format(Rec."Contact No."));
+        Contact.GetOrClear(Rec."Contact No.");
     end;
 
     trigger OnInit()
@@ -511,15 +519,15 @@ page 5098 "Task Card"
 
     trigger OnModifyRecord(): Boolean
     begin
-        if ("Team Code" = '') and ("Salesperson Code" = '') then
+        if (Rec."Team Code" = '') and (Rec."Salesperson Code" = '') then
             Error(
-              Text000, TableCaption(), FieldCaption("Salesperson Code"), FieldCaption("Team Code"));
+              Text000, Rec.TableCaption(), Rec.FieldCaption("Salesperson Code"), Rec.FieldCaption("Team Code"));
 
-        if (Type = Type::Meeting) and (not "All Day Event") then begin
-            if "Start Time" = 0T then
-                Error(Text002, TableCaption(), Type, FieldCaption("Start Time"));
-            if Duration = 0 then
-                Error(Text002, TableCaption(), Type, FieldCaption(Duration));
+        if (Rec.Type = Rec.Type::Meeting) and (not Rec."All Day Event") then begin
+            if Rec."Start Time" = 0T then
+                Error(Text002, Rec.TableCaption(), Rec.Type, Rec.FieldCaption("Start Time"));
+            if Rec.Duration = 0 then
+                Error(Text002, Rec.TableCaption(), Rec.Type, Rec.FieldCaption(Duration));
         end;
     end;
 
@@ -531,77 +539,62 @@ page 5098 "Task Card"
         MakePhoneCallIsNotAvailableErr: Label 'The Make Phone Call function for this task is available only in the Attendee Scheduling window.';
         MustAssignContactErr: Label 'You must assign a contact to this task before you can use the Make Phone Call function.';
         MultipleTxt: Label '(Multiple)';
-        [InDataSet]
         RecurringDateIntervalEditable: Boolean;
-        [InDataSet]
         CalcDueDateFromEditable: Boolean;
-        [InDataSet]
         CompletedByEditable: Boolean;
-        [InDataSet]
         StartTimeEnable: Boolean;
-        [InDataSet]
         EndingTimeEnable: Boolean;
-        [InDataSet]
         DurationEnable: Boolean;
-        [InDataSet]
         LocationEnable: Boolean;
-        [InDataSet]
         AllDayEventEnable: Boolean;
-        [InDataSet]
         NoOfAttendeesEnable: Boolean;
-        [InDataSet]
         AttendeesAcceptedNoEnable: Boolean;
-        [InDataSet]
         CompletedByEnable: Boolean;
-        [InDataSet]
         RecurringDateIntervalEnable: Boolean;
-        [InDataSet]
         CalcDueDateFromEnable: Boolean;
         IsSoftwareAsAService: Boolean;
-        [InDataSet]
         PagePartsEditable: Boolean;
 
     protected var
-        [InDataSet]
         ContactNoEditable: Boolean;
 
     procedure SetRecurringEditable()
     begin
-        RecurringDateIntervalEditable := Recurring;
-        CalcDueDateFromEditable := Recurring;
+        RecurringDateIntervalEditable := Rec.Recurring;
+        CalcDueDateFromEditable := Rec.Recurring;
     end;
 
     procedure EnableFields()
     begin
-        RecurringDateIntervalEnable := Recurring;
-        CalcDueDateFromEnable := Recurring;
+        RecurringDateIntervalEnable := Rec.Recurring;
+        CalcDueDateFromEnable := Rec.Recurring;
 
-        if not Recurring then begin
-            Evaluate("Recurring Date Interval", '');
-            Clear("Calc. Due Date From");
+        if not Rec.Recurring then begin
+            Evaluate(Rec."Recurring Date Interval", '');
+            Clear(Rec."Calc. Due Date From");
         end;
 
-        if Type = Type::Meeting then begin
-            StartTimeEnable := not "All Day Event";
-            EndingTimeEnable := not "All Day Event";
-            DurationEnable := not "All Day Event";
+        if Rec.Type = Rec.Type::Meeting then begin
+            StartTimeEnable := not Rec."All Day Event";
+            EndingTimeEnable := not Rec."All Day Event";
+            DurationEnable := not Rec."All Day Event";
             LocationEnable := true;
             AllDayEventEnable := true;
         end else begin
-            StartTimeEnable := Type = Type::"Phone Call";
-            EndingTimeEnable := Type = Type::"Phone Call";
-            DurationEnable := Type = Type::"Phone Call";
+            StartTimeEnable := Rec.Type = Rec.Type::"Phone Call";
+            EndingTimeEnable := Rec.Type = Rec.Type::"Phone Call";
+            DurationEnable := Rec.Type = Rec.Type::"Phone Call";
             LocationEnable := false;
             AllDayEventEnable := false;
         end;
 
         OnEnableFieldsOnBeforeGetEndDateTime(Rec, StartTimeEnable, EndingTimeEnable, DurationEnable, LocationEnable, AllDayEventEnable);
-        GetEndDateTime();
+        Rec.GetEndDateTime();
     end;
 
     local procedure SwitchCardControls()
     begin
-        if Type = Type::Meeting then begin
+        if Rec.Type = Rec.Type::Meeting then begin
             ContactNoEditable := false;
 
             NoOfAttendeesEnable := true;
@@ -612,11 +605,11 @@ page 5098 "Task Card"
             NoOfAttendeesEnable := false;
             AttendeesAcceptedNoEnable := false;
         end;
-        if "Team Code" = '' then
+        if Rec."Team Code" = '' then
             CompletedByEnable := false
         else begin
             CompletedByEnable := true;
-            CompletedByEditable := not Closed
+            CompletedByEditable := not Rec.Closed;
         end;
 
         OnAfterSwitchCardControls(ContactNoEditable, NoOfAttendeesEnable, AttendeesAcceptedNoEnable);
@@ -625,7 +618,7 @@ page 5098 "Task Card"
     local procedure TeamCodeOnAfterValidate()
     begin
         SwitchCardControls();
-        CalcFields(
+        Rec.CalcFields(
           "No. of Attendees",
           "Attendees Accepted No.",
           "Contact Name",
@@ -636,7 +629,7 @@ page 5098 "Task Card"
 
     protected procedure ContactNoOnAfterValidate()
     begin
-        CalcFields("Contact Name", "Contact Company Name");
+        Rec.CalcFields("Contact Name", "Contact Company Name");
     end;
 
     local procedure TypeOnAfterValidate()
@@ -652,7 +645,7 @@ page 5098 "Task Card"
     local procedure SalespersonCodeOnAfterValidate()
     begin
         SwitchCardControls();
-        CalcFields(
+        Rec.CalcFields(
           "No. of Attendees",
           "Attendees Accepted No.",
           "Contact Name",
@@ -663,12 +656,12 @@ page 5098 "Task Card"
 
     local procedure CampaignNoOnAfterValidate()
     begin
-        CalcFields("Campaign Description");
+        Rec.CalcFields("Campaign Description");
     end;
 
     local procedure OpportunityNoOnAfterValidate()
     begin
-        CalcFields("Opportunity Description");
+        Rec.CalcFields("Opportunity Description");
     end;
 
     local procedure RecurringOnPush()
@@ -687,7 +680,7 @@ page 5098 "Task Card"
         if isHandled then
             exit;
 
-        if Type = Type::Meeting then
+        if Rec.Type = Rec.Type::Meeting then
             Text := MultipleTxt;
     end;
 

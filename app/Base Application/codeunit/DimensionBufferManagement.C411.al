@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 codeunit 411 "Dimension Buffer Management"
 {
 

@@ -1,3 +1,5 @@
+namespace System.AI;
+
 enum 2023 "Image Analysis Provider" implements "Image Analysis Provider"
 {
     Extensible = false;

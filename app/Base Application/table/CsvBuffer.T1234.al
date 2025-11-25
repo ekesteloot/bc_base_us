@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using System;
+using System.Utilities;
+
 /// <summary>
 /// Table to store CSV (comma-separated values).
 /// </summary>

@@ -10,7 +10,7 @@ page 1271 "OCR Service Document Templates"
         {
             repeater(Group)
             {
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the OCR document template.';

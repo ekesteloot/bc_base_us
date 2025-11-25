@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
 enum 79 "Item Ledger Document Type"
 {
     Extensible = true;

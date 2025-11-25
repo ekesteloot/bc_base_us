@@ -1,4 +1,6 @@
-﻿#if not CLEAN21
+#if not CLEAN21
+namespace System.Integration.PowerBI;
+
 table 6302 "Power BI Report Buffer"
 {
     Caption = 'Power BI Report Buffer';

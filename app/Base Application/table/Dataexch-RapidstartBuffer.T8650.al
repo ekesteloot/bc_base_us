@@ -1,3 +1,5 @@
+namespace System.IO;
+
 table 8650 "DataExch-RapidStart Buffer"
 {
     Caption = 'DataExch-RapidStart Buffer';

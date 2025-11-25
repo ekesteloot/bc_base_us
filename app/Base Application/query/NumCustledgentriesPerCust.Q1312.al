@@ -1,3 +1,7 @@
+namespace Microsoft.Sales.Receivables;
+
+using Microsoft.Sales.Customer;
+
 query 1312 "Num CustLedgEntries per Cust"
 {
     Caption = 'Num CustLedgEntries per Cust';

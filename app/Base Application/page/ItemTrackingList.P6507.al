@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 page 6507 "Item Tracking List"
 {
     Caption = 'Item Tracking List';
@@ -72,7 +74,6 @@ page 6507 "Item Tracking List"
     end;
 
     var
-        [InDataSet]
         PackageTrackingVisible: Boolean;
 
     local procedure SetPackageTrackingVisibility()

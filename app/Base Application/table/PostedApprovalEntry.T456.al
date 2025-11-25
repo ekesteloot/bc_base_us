@@ -1,3 +1,8 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.Currency;
+using System.Security.AccessControl;
+
 table 456 "Posted Approval Entry"
 {
     Caption = 'Posted Approval Entry';
@@ -27,8 +32,6 @@ table 456 "Posted Approval Entry"
             Caption = 'Sender ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(7; "Salespers./Purch. Code"; Code[20])
         {
@@ -39,8 +42,6 @@ table 456 "Posted Approval Entry"
             Caption = 'Approver ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(9; Status; Enum "Approval Status")
         {
@@ -59,13 +60,12 @@ table 456 "Posted Approval Entry"
             Caption = 'Last Modified By ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(13; Comment; Boolean)
         {
-            CalcFormula = Exist("Posted Approval Comment Line" WHERE("Table ID" = FIELD("Table ID"),
-                                                                      "Document No." = FIELD("Document No.")));
+            CalcFormula = exist("Posted Approval Comment Line" where("Table ID" = field("Table ID"),
+                                                                      "Document No." = field("Document No."),
+                                                                      "Posted Record ID" = field("Posted Record ID")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -76,7 +76,7 @@ table 456 "Posted Approval Entry"
         }
         field(15; Amount; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
         }

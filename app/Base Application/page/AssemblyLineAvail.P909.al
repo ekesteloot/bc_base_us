@@ -1,3 +1,7 @@
+namespace Microsoft.AssemblyMgt.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 page 909 "Assembly Line Avail."
 {
     Caption = 'Lines';
@@ -6,11 +10,11 @@ page 909 "Assembly Line Avail."
     PageType = ListPart;
     SourceTable = "Assembly Line";
     SourceTableTemporary = true;
-    SourceTableView = SORTING("Document Type", "Document No.", Type)
+    SourceTableView = sorting("Document Type", "Document No.", Type)
                       ORDER(Ascending)
-                      WHERE("Document Type" = CONST(Order),
-                            Type = CONST(Item),
-                            "No." = FILTER(<> ''));
+                      where("Document Type" = const(Order),
+                            Type = const(Item),
+                            "No." = filter(<> ''));
 
     layout
     {
@@ -55,7 +59,7 @@ page 909 "Assembly Line Avail."
                     ToolTip = 'Specifies how many units of the assembly component are available for the current assembly order on the due date.';
                     Visible = true;
                 }
-                field(CurrentQuantity; "Remaining Quantity")
+                field(CurrentQuantity; Rec."Remaining Quantity")
                 {
                     ApplicationArea = Assembly;
                     Caption = 'Current Quantity';
@@ -141,15 +145,15 @@ page 909 "Assembly Line Avail."
 
     trigger OnInit()
     begin
-        SetItemFilter(Item);
+        Rec.SetItemFilter(Item);
     end;
 
     trigger OnOpenPage()
     begin
-        Reset();
-        SetRange(Type, Type::Item);
-        SetFilter("No.", '<>%1', '');
-        SetFilter("Quantity per", '<>%1', 0);
+        Rec.Reset();
+        Rec.SetRange(Type, Rec.Type::Item);
+        Rec.SetFilter("No.", '<>%1', '');
+        Rec.SetFilter("Quantity per", '<>%1', 0);
     end;
 
     var
@@ -164,7 +168,7 @@ page 909 "Assembly Line Avail."
 
     procedure SetLinesRecord(var AssemblyLine: Record "Assembly Line")
     begin
-        Copy(AssemblyLine, true);
+        Rec.Copy(AssemblyLine, true);
     end;
 
     procedure SetHeader(AssemblyHeader2: Record "Assembly Header")

@@ -1,3 +1,24 @@
+﻿namespace Microsoft.ServiceMgt.RoleCenters;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.ServiceMgt.Loaner;
+using Microsoft.ServiceMgt.Reports;
+using Microsoft.Shared.Navigate;
+using System.Email;
+using System.Integration.PowerBI;
+using System.Security.User;
+using System.Threading;
+
 page 9016 "Service Dispatcher Role Center"
 {
     Caption = 'Service Manager';
@@ -180,8 +201,8 @@ page 9016 "Service Dispatcher Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Item Journals';
                 RunObject = Page "Item Journal Batches";
-                RunPageView = WHERE("Template Type" = CONST(Item),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const(Item),
+                                    Recurring = const(false));
                 ToolTip = 'Post item transactions directly to the item ledger to adjust inventory in connection with purchases, sales, and positive or negative adjustments without using documents. You can save sets of item journal lines as standard journals so that you can perform recurring postings quickly. A condensed version of the item journal function exists on item cards for quick adjustment of an items inventory quantity.';
             }
             action("Requisition Worksheets")
@@ -189,8 +210,8 @@ page 9016 "Service Dispatcher Role Center"
                 ApplicationArea = Planning;
                 Caption = 'Requisition Worksheets';
                 RunObject = Page "Req. Wksh. Names";
-                RunPageView = WHERE("Template Type" = CONST("Req."),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const("Req."),
+                                    Recurring = const(false));
                 ToolTip = 'Calculate a supply plan to fulfill item demand with purchases or transfers.';
             }
         }
@@ -248,8 +269,6 @@ page 9016 "Service Dispatcher Role Center"
                     ApplicationArea = Service;
                     Caption = 'Posted Service Shipments';
                     Image = PostedShipment;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Posted Service Shipments";
                     ToolTip = 'Open the list of posted service shipments.';
                 }
@@ -258,8 +277,6 @@ page 9016 "Service Dispatcher Role Center"
                     ApplicationArea = Service;
                     Caption = 'Posted Service Invoices';
                     Image = PostedServiceOrder;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Posted Service Invoices";
                     ToolTip = 'Open the list of posted service invoices.';
                 }
@@ -267,8 +284,6 @@ page 9016 "Service Dispatcher Role Center"
                 {
                     ApplicationArea = Service;
                     Caption = 'Posted Service Credit Memos';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Posted Service Credit Memos";
                     ToolTip = 'Open the list of posted service credit memos.';
                 }
@@ -281,9 +296,6 @@ page 9016 "Service Dispatcher Role Center"
                 ApplicationArea = Service;
                 Caption = 'Service Contract &Quote';
                 Image = AgreementQuote;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Service Contract Quote";
                 RunPageMode = Create;
                 ToolTip = 'Create a new quote to perform service on a customer''s item.';
@@ -293,9 +305,6 @@ page 9016 "Service Dispatcher Role Center"
                 ApplicationArea = Service;
                 Caption = 'Service &Contract';
                 Image = Agreement;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Service Contract";
                 RunPageMode = Create;
                 ToolTip = 'Create a new service contract.';
@@ -305,9 +314,6 @@ page 9016 "Service Dispatcher Role Center"
                 ApplicationArea = Service;
                 Caption = 'Service Q&uote';
                 Image = Quote;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Service Quote";
                 RunPageMode = Create;
                 ToolTip = 'Create a new service quote.';
@@ -317,9 +323,6 @@ page 9016 "Service Dispatcher Role Center"
                 ApplicationArea = Service;
                 Caption = 'Service &Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Service Order";
                 RunPageMode = Create;
                 ToolTip = 'Create a new service order to perform service on a customer''s item.';
@@ -329,9 +332,6 @@ page 9016 "Service Dispatcher Role Center"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Sales Or&der';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Sales Order";
                 RunPageMode = Create;
                 ToolTip = 'Create a new sales order for items or services that require partial posting or order confirmation.';
@@ -341,9 +341,6 @@ page 9016 "Service Dispatcher Role Center"
                 ApplicationArea = Location;
                 Caption = 'Transfer &Order';
                 Image = Document;
-                Promoted = false;
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = Process;
                 RunObject = Page "Transfer Order";
                 RunPageMode = Create;
                 ToolTip = 'Prepare to transfer items to another location.';

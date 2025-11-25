@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Routing;
+
 page 99000796 "Routing Comment List"
 {
     AutoSplitKey = true;
@@ -15,17 +17,17 @@ page 99000796 "Routing Comment List"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the date when the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the actual comment.';
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies a code for the comments.';

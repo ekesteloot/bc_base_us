@@ -1,7 +1,14 @@
+﻿namespace Microsoft.WarehouseMgt.Reports;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Activity;
+using System.Email;
+using System.Utilities;
+
 report 7301 "Movement List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Movement/MovementList.rdlc';
+    RDLCLayout = './WarehouseMgt/Reports/MovementList.rdlc';
     AccessByPermission = TableData Location = R;
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Movement';
@@ -11,11 +18,11 @@ report 7301 "Movement List"
     {
         dataitem("Warehouse Activity Header"; "Warehouse Activity Header")
         {
-            DataItemTableView = SORTING(Type, "No.") WHERE(Type = FILTER(Movement | "Invt. Movement"));
+            DataItemTableView = sorting(Type, "No.") where(Type = filter(Movement | "Invt. Movement"));
             RequestFilterFields = "No.", "No. Printed";
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(CompanyName; COMPANYPROPERTY.DisplayName())
                 {
                 }
@@ -107,9 +114,9 @@ report 7301 "Movement List"
                 }
                 dataitem("Warehouse Activity Line"; "Warehouse Activity Line")
                 {
-                    DataItemLink = "Activity Type" = FIELD(Type), "No." = FIELD("No.");
+                    DataItemLink = "Activity Type" = field(Type), "No." = field("No.");
                     DataItemLinkReference = "Warehouse Activity Header";
-                    DataItemTableView = SORTING("Activity Type", "No.", "Sorting Sequence No.");
+                    DataItemTableView = sorting("Activity Type", "No.", "Sorting Sequence No.");
 
                     trigger OnAfterGetRecord()
                     begin
@@ -152,9 +159,9 @@ report 7301 "Movement List"
                 }
                 dataitem(WhseActivLine; "Warehouse Activity Line")
                 {
-                    DataItemLink = "Activity Type" = FIELD(Type), "No." = FIELD("No.");
+                    DataItemLink = "Activity Type" = field(Type), "No." = field("No.");
                     DataItemLinkReference = "Warehouse Activity Header";
-                    DataItemTableView = SORTING("Activity Type", "No.", "Sorting Sequence No.");
+                    DataItemTableView = sorting("Activity Type", "No.", "Sorting Sequence No.");
                     column(SourceNo_WhseActivLine; "Source No.")
                     {
                         IncludeCaption = false;
@@ -229,8 +236,8 @@ report 7301 "Movement List"
                     }
                     dataitem(WhseActivLine2; "Warehouse Activity Line")
                     {
-                        DataItemLink = "Activity Type" = FIELD("Activity Type"), "No." = FIELD("No."), "Bin Code" = FIELD("Bin Code"), "Item No." = FIELD("Item No."), "Action Type" = FIELD("Action Type"), "Variant Code" = FIELD("Variant Code"), "Unit of Measure Code" = FIELD("Unit of Measure Code"), "Due Date" = FIELD("Due Date");
-                        DataItemTableView = SORTING("Activity Type", "No.", "Bin Code", "Breakbulk No.", "Action Type");
+                        DataItemLink = "Activity Type" = field("Activity Type"), "No." = field("No."), "Bin Code" = field("Bin Code"), "Item No." = field("Item No."), "Action Type" = field("Action Type"), "Variant Code" = field("Variant Code"), "Unit of Measure Code" = field("Unit of Measure Code"), "Due Date" = field("Due Date");
+                        DataItemTableView = sorting("Activity Type", "No.", "Bin Code", "Breakbulk No.", "Action Type");
                         column(LotNo_WhseActivLine2; "Lot No.")
                         {
                             IncludeCaption = true;
@@ -362,9 +369,7 @@ report 7301 "Movement List"
         HideOptions: Boolean;
         InvtMovement: Boolean;
         Counter: Integer;
-        [InDataSet]
         BreakbulkEditable: Boolean;
-        [InDataSet]
         SumUpLinesEditable: Boolean;
         MovementListCaptionLbl: Label 'Movement List';
         DueDateCaptionLbl: Label 'Due Date';

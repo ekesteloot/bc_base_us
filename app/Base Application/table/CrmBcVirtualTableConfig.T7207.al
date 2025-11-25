@@ -1,4 +1,10 @@
-﻿table 7207 "CRM BC Virtual Table Config."
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.Integration.D365Sales;
+
+table 7207 "CRM BC Virtual Table Config."
 {
     ExternalName = 'msdyn_businesscentralvirtualentity';
     TableType = CRM;
@@ -86,7 +92,7 @@
             ExternalName = 'msdyn_aadUserId';
             ExternalType = 'String';
             Description = '';
-            Caption = 'AAD User Id';
+            Caption = 'Microsoft Entra user ID';
         }
     }
     keys

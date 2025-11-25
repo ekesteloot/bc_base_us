@@ -90,13 +90,13 @@ page 9070 "Accounting Services Activities"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
 
-        SetRange("User ID Filter", UserId);
+        Rec.SetRange("User ID Filter", UserId);
 
         HasCamera := Camera.IsAvailable();
     end;
@@ -104,7 +104,6 @@ page 9070 "Accounting Services Activities"
     var
         UserTaskManagement: Codeunit "User Task Management";
         Camera: Codeunit Camera;
-        [InDataSet]
         HasCamera: Boolean;
 }
 

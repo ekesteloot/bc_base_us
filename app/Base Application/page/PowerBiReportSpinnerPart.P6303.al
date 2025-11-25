@@ -1,4 +1,9 @@
 #if not CLEAN21
+namespace System.Integration.PowerBI;
+
+using System.Environment;
+using System.Utilities;
+
 page 6303 "Power BI Report Spinner Part"
 {
     Caption = 'Power BI Reports (Obsolete)';
@@ -23,7 +28,7 @@ page 6303 "Power BI Report Spinner Part"
                     ShowCaption = false;
                     Style = StrongAccent;
                     StyleExpr = TRUE;
-                    ToolTipML = ENU = 'Specifies whether the Power BI functionality is enabled.';
+                    ToolTip = 'Specifies whether the Power BI functionality is enabled.';
 
                     trigger OnDrillDown()
                     var
@@ -48,7 +53,7 @@ page 6303 "Power BI Report Spinner Part"
                 }
                 field(OptInImageField; MediaResources."Media Reference")
                 {
-                    CaptionML = ENU = '';
+                    Caption = '';
                     ApplicationArea = All;
                     Editable = false;
                 }
@@ -65,7 +70,7 @@ page 6303 "Power BI Report Spinner Part"
                     ShowCaption = false;
                     Style = StrongAccent;
                     StyleExpr = TRUE;
-                    ToolTipML = ENU = 'Specifies that the user can upload one or more demo reports for this page.';
+                    ToolTip = 'Specifies that the user can upload one or more demo reports for this page.';
 
                     trigger OnDrillDown()
                     begin

@@ -1,3 +1,7 @@
+namespace Microsoft.InventoryMgt.Journal;
+
+using System.Reflection;
+
 page 261 "Item Journal Template List"
 {
     Caption = 'Item Journal Template List';

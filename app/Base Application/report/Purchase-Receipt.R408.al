@@ -1,7 +1,20 @@
+﻿namespace Microsoft.Purchases.History;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Interaction;
+using Microsoft.CRM.Segment;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Vendor;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 408 "Purchase - Receipt"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/PurchaseReceipt.rdlc';
+    RDLCLayout = './Purchases/History/PurchaseReceipt.rdlc';
     Caption = 'Purchase - Receipt';
     PreviewMode = PrintLayout;
 
@@ -9,7 +22,7 @@ report 408 "Purchase - Receipt"
     {
         dataitem("Purch. Rcpt. Header"; "Purch. Rcpt. Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Posted Purchase Receipt';
             column(No_PurchRcptHeader; "No.")
@@ -74,10 +87,10 @@ report 408 "Purchase - Receipt"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(PurchRcptCopyText; StrSubstNo(Text002, CopyText))
                     {
                     }
@@ -195,7 +208,7 @@ report 408 "Purchase - Receipt"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purch. Rcpt. Header";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -239,9 +252,9 @@ report 408 "Purchase - Receipt"
                     }
                     dataitem("Purch. Rcpt. Line"; "Purch. Rcpt. Line")
                     {
-                        DataItemLink = "Document No." = FIELD("No.");
+                        DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Purch. Rcpt. Header";
-                        DataItemTableView = SORTING("Document No.", "Line No.");
+                        DataItemTableView = sorting("Document No.", "Line No.");
                         column(ShowInternalInfo; ShowInternalInfo)
                         {
                         }
@@ -275,7 +288,7 @@ report 408 "Purchase - Receipt"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText1; DimText)
                             {
                             }
@@ -338,7 +351,7 @@ report 408 "Purchase - Receipt"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(BuyfromVenNo_PurchRcptHeader; "Purch. Rcpt. Header"."Buy-from Vendor No.")
                         {
                         }
@@ -354,7 +367,7 @@ report 408 "Purchase - Receipt"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(PaytoVenNo_PurchRcptHeader; "Purch. Rcpt. Header"."Pay-to Vendor No.")
                         {
                         }
@@ -418,6 +431,7 @@ report 408 "Purchase - Receipt"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Purch. Rcpt. Header");
@@ -549,7 +563,6 @@ report 408 "Purchase - Receipt"
         LogInteraction: Boolean;
         ShowCorrectionLines: Boolean;
         OutputNo: Integer;
-        [InDataSet]
         LogInteractionEnable: Boolean;
         PhoneNoCaptionLbl: Label 'Phone No.';
         HomePageCaptionLbl: Label 'Home Page';
@@ -585,7 +598,7 @@ report 408 "Purchase - Receipt"
 
     local procedure InitLogInteraction()
     begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode("Interaction Log Entry Document Type"::"Purch. Rcpt.") <> '';
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch. Rcpt.") <> '';
     end;
 
     local procedure IsReportInPreviewMode(): Boolean

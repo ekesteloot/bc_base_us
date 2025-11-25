@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.Manufacturing.Comment;
+
 page 99000786 "Production BOM"
 {
     Caption = 'Production BOM';
@@ -18,7 +22,7 @@ page 99000786 "Production BOM"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -65,10 +69,10 @@ page 99000786 "Production BOM"
                     var
                         ProdBOMVersion: Record "Production BOM Version";
                     begin
-                        ProdBOMVersion.SetRange("Production BOM No.", "No.");
+                        ProdBOMVersion.SetRange("Production BOM No.", Rec."No.");
                         ProdBOMVersion.SetRange("Version Code", ActiveVersionCode);
                         PAGE.RunModal(PAGE::"Production BOM Version", ProdBOMVersion);
-                        ActiveVersionCode := VersionMgt.GetBOMVersion("No.", WorkDate(), true);
+                        ActiveVersionCode := VersionMgt.GetBOMVersion(Rec."No.", WorkDate(), true);
                     end;
                 }
                 field("Last Date Modified"; Rec."Last Date Modified")
@@ -80,9 +84,9 @@ page 99000786 "Production BOM"
             part(ProdBOMLine; "Production BOM Lines")
             {
                 ApplicationArea = Manufacturing;
-                SubPageLink = "Production BOM No." = FIELD("No."),
-                              "Version Code" = CONST('');
-                SubPageView = SORTING("Production BOM No.", "Version Code", "Line No.");
+                SubPageLink = "Production BOM No." = field("No."),
+                              "Version Code" = const('');
+                SubPageView = sorting("Production BOM No.", "Version Code", "Line No.");
             }
         }
         area(factboxes)
@@ -114,8 +118,8 @@ page 99000786 "Production BOM"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Manufacturing Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Production BOM Header"),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Production BOM Header"),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Versions)
@@ -124,7 +128,7 @@ page 99000786 "Production BOM"
                     Caption = 'Versions';
                     Image = BOMVersions;
                     RunObject = Page "Prod. BOM Version List";
-                    RunPageLink = "Production BOM No." = FIELD("No.");
+                    RunPageLink = "Production BOM No." = field("No.");
                     ToolTip = 'View any alternate versions of the production BOM.';
                 }
                 action("Ma&trix per Version")
@@ -176,7 +180,7 @@ page 99000786 "Production BOM"
 
                     trigger OnAction()
                     begin
-                        TestField("No.");
+                        Rec.TestField("No.");
                         OnCopyBOMOnBeforeLookup(Rec, ProdBOMHeader);
                         if PAGE.RunModal(0, ProdBOMHeader) = ACTION::LookupOK then
                             ProductionBOMCopy.CopyBOM(ProdBOMHeader."No.", '', Rec, '');
@@ -220,7 +224,7 @@ page 99000786 "Production BOM"
 
     trigger OnAfterGetRecord()
     begin
-        ActiveVersionCode := VersionMgt.GetBOMVersion("No.", WorkDate(), true);
+        ActiveVersionCode := VersionMgt.GetBOMVersion(Rec."No.", WorkDate(), true);
     end;
 
     var

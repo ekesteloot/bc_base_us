@@ -1,3 +1,5 @@
+namespace System.Security.User;
+
 page 119 "User Setup"
 {
     ApplicationArea = Basic, Suite;
@@ -79,12 +81,12 @@ page 119 "User Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if a user is a time sheet administrator. A time sheet administrator can access any time sheet and then edit, change, or delete it.';
                 }
-                field(Email; "E-Mail")
+                field(Email; Rec."E-Mail")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the user''s email address.';
                 }
-                field(PhoneNo; "Phone No.")
+                field(PhoneNo; Rec."Phone No.")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the user''s phone number.';
@@ -112,7 +114,7 @@ page 119 "User Setup"
 
     trigger OnOpenPage()
     begin
-        HideExternalUsers();
+        Rec.HideExternalUsers();
     end;
 }
 

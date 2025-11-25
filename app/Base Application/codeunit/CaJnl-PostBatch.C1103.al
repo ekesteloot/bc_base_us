@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Posting;
+
+using Microsoft.CostAccounting.Journal;
+using Microsoft.CostAccounting.Ledger;
+
 codeunit 1103 "CA Jnl.-Post Batch"
 {
     Permissions = TableData "Cost Journal Batch" = rimd;

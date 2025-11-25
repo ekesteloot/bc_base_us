@@ -1,3 +1,37 @@
+﻿namespace Microsoft.WarehouseMgt.Journal;
+
+#if not CLEAN23
+using Microsoft.AssemblyMgt.Document;
+#endif
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+#if not CLEAN23
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+#endif
+using Microsoft.Manufacturing.Family;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+#if not CLEAN23
+using Microsoft.ServiceMgt.Document;
+#endif
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.History;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+using System.Security.AccessControl;
+using System.Utilities;
+
 codeunit 7302 "WMS Management"
 {
 
@@ -6,11 +40,6 @@ codeunit 7302 "WMS Management"
     end;
 
     var
-        Text000: Label 'must not be %1';
-        Text002: Label '\Do you still want to use this %1 ?';
-        Text003: Label 'You must set-up a default location code for user %1.';
-        Text004: Label '%1 to place (%2) exceeds the available capacity (%3) on %4 %5.';
-        Text005: Label '%1 = ''%2'', %3 = ''%4'':\The total base quantity to take %5 must be equal to the total base quantity to place %6.';
         ItemUnitOfMeasure: Record "Item Unit of Measure";
         Location: Record Location;
         Bin: Record Bin;
@@ -18,11 +47,17 @@ codeunit 7302 "WMS Management"
         Item: Record Item;
         ItemTrackingCode: Record "Item Tracking Code";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
-        WhseMgt: Codeunit "Whse. Management";
+        WhseManagement: Codeunit "Whse. Management";
         UOMMgt: Codeunit "Unit of Measure Management";
         ShowError: Boolean;
         NextLineNo: Integer;
         LogErrors: Boolean;
+
+        Text000: Label 'must not be %1';
+        Text002: Label '\Do you still want to use this %1 ?';
+        Text003: Label 'You must set-up a default location code for user %1.';
+        Text004: Label '%1 to place (%2) exceeds the available capacity (%3) on %4 %5.';
+        Text005: Label '%1 = ''%2'', %3 = ''%4'':\The total base quantity to take %5 must be equal to the total base quantity to place %6.';
         Text006: Label 'You must enter a %1 in %2 %3 = %4, %5 = %6.';
         Text007: Label 'Cancelled.';
         Text008: Label 'Destination Name';
@@ -35,8 +70,9 @@ codeunit 7302 "WMS Management"
         Text015: Label 'You cannot use a %1 because %2 %3 is set up with %4.';
         Text016: Label '%1 = ''%2'', %3 = ''%4'', %5 = ''%6'', %7 = ''%8'': The total base quantity to take %9 must be equal to the total base quantity to place %10.';
         UserIsNotWhseEmployeeErr: Label 'You must first set up user %1 as a warehouse employee.';
+        OpenWarehouseEmployeesPageQst: Label 'Do you want to do that now?';
         UserIsNotWhseEmployeeAtWMSLocationErr: Label 'You must first set up user %1 as a warehouse employee at a location with the Bin Mandatory setting.', Comment = '%1: USERID';
-        DefaultLocationNotDirectedPutawayPickErr: Label 'You must set up a location with the Directed Put-away and Pick setting and assign it to user %1.', Comment = '%1: USERID';
+        DefaultLocationNotDirectedPutawayPickErr: Label 'You must set up a default location with the Directed Put-away and Pick setting and assign it to user %1.', Comment = '%1: USERID';
 
     procedure CreateWhseJnlLine(ItemJnlLine: Record "Item Journal Line"; ItemJnlTemplateType: Option; var WhseJnlLine: Record "Warehouse Journal Line"; ToTransfer: Boolean): Boolean
     var
@@ -61,12 +97,12 @@ codeunit 7302 "WMS Management"
             InitWhseJnlLine(ItemJnlLine, WhseJnlLine, "Quantity (Base)");
             SetZoneAndBins(ItemJnlLine, WhseJnlLine, ToTransfer);
             if ("Journal Template Name" <> '') and ("Journal Batch Name" <> '') then begin
-                WhseJnlLine.SetSource(DATABASE::"Item Journal Line", ItemJnlTemplateType, "Document No.", "Line No.", 0);
-                WhseJnlLine."Source Document" := WhseMgt.GetWhseJnlSourceDocument(WhseJnlLine."Source Type", WhseJnlLine."Source Subtype");
+                WhseJnlLine.SetSource(Enum::TableID::"Item Journal Line".AsInteger(), ItemJnlTemplateType, "Document No.", "Line No.", 0);
+                WhseJnlLine."Source Document" := WhseManagement.GetWhseJnlSourceDocument(WhseJnlLine."Source Type", WhseJnlLine."Source Subtype");
             end else
                 if "Job No." <> '' then begin
-                    WhseJnlLine.SetSource(DATABASE::"Job Journal Line", ItemJnlTemplateType, "Document No.", "Line No.", 0);
-                    WhseJnlLine."Source Document" := WhseMgt.GetWhseJnlSourceDocument(WhseJnlLine."Source Type", WhseJnlLine."Source Subtype");
+                    WhseJnlLine.SetSource(Enum::TableID::"Job Journal Line".AsInteger(), ItemJnlTemplateType, "Document No.", "Line No.", 0);
+                    WhseJnlLine."Source Document" := WhseManagement.GetWhseJnlSourceDocument(WhseJnlLine."Source Type", WhseJnlLine."Source Subtype");
                 end;
             WhseJnlLine."Whse. Document Type" := WhseJnlLine."Whse. Document Type"::" ";
             if "Job No." = '' then
@@ -81,55 +117,27 @@ codeunit 7302 "WMS Management"
         end;
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     procedure CreateWhseJnlLineFromOutputJnl(ItemJnlLine: Record "Item Journal Line"; var WhseJnlLine: Record "Warehouse Journal Line"): Boolean
+    var
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
-        OnBeforeCreateWhseJnlLineFromOutputJnl(ItemJnlLine);
-        with ItemJnlLine do begin
-            if Adjustment or
-               ("Value Entry Type" in ["Value Entry Type"::Rounding, "Value Entry Type"::Revaluation])
-            then
-                exit(false);
-
-            TestField("Order Type", "Order Type"::Production);
-            GetLocation("Location Code");
-            TestField("Unit of Measure Code");
-            InitWhseJnlLine(ItemJnlLine, WhseJnlLine, "Output Quantity (Base)");
-            OnCreateWhseJnlLineFromOutputJnlOnAfterInitWhseJnlLine(WhseJnlLine, ItemJnlLine);
-            SetZoneAndBinsForOutput(ItemJnlLine, WhseJnlLine);
-            WhseJnlLine.SetSource(DATABASE::"Item Journal Line", 5, "Order No.", "Order Line No.", 0); // Output Journal
-            WhseJnlLine."Source Document" := WhseMgt.GetWhseJnlSourceDocument(WhseJnlLine."Source Type", WhseJnlLine."Source Subtype");
-            WhseJnlLine.SetWhseDocument(WhseJnlLine."Whse. Document Type"::Production, "Order No.", "Order Line No.");
-            WhseJnlLine."Reference Document" := WhseJnlLine."Reference Document"::"Prod.";
-            WhseJnlLine."Reference No." := "Order No.";
-            TransferWhseItemTracking(WhseJnlLine, ItemJnlLine);
-            OnAfterCreateWhseJnlLineFromOutputJnl(WhseJnlLine, ItemJnlLine);
-        end;
+        exit(ProdOrderWarehouseMgt.CreateWhseJnlLineFromOutputJournal(ItemJnlLine, WhseJnlLine));
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     procedure CreateWhseJnlLineFromConsumJnl(ItemJnlLine: Record "Item Journal Line"; var WhseJnlLine: Record "Warehouse Journal Line"): Boolean
+    var
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
-        with ItemJnlLine do begin
-            if Adjustment or
-               ("Value Entry Type" in ["Value Entry Type"::Rounding, "Value Entry Type"::Revaluation])
-            then
-                exit(false);
-
-            TestField("Order Type", "Order Type"::Production);
-            GetLocation("Location Code");
-            TestField("Unit of Measure Code");
-            InitWhseJnlLine(ItemJnlLine, WhseJnlLine, "Quantity (Base)");
-            SetZoneAndBinsForConsumption(ItemJnlLine, WhseJnlLine);
-            WhseJnlLine.SetSource(DATABASE::"Item Journal Line", 4, "Order No.", "Order Line No.", "Prod. Order Comp. Line No."); // Consumption Journal
-            WhseJnlLine."Source Document" := WhseMgt.GetWhseJnlSourceDocument(WhseJnlLine."Source Type", WhseJnlLine."Source Subtype");
-            WhseJnlLine.SetWhseDocument(WhseJnlLine."Whse. Document Type"::Production, "Order No.", "Order Line No.");
-            WhseJnlLine."Reference Document" := WhseJnlLine."Reference Document"::"Prod.";
-            WhseJnlLine."Reference No." := "Order No.";
-            TransferWhseItemTracking(WhseJnlLine, ItemJnlLine);
-            OnAfterCreateWhseJnlLineFromConsumJnl(WhseJnlLine, ItemJnlLine);
-        end;
+        exit(ProdOrderWarehouseMgt.CreateWhseJnlLineFromConsumptionJournal(ItemJnlLine, WhseJnlLine));
     end;
+#endif
 
-    procedure CheckWhseJnlLine(var WhseJnlLine: Record "Warehouse Journal Line"; SourceJnl: Option " ",ItemJnl,OutputJnl,ConsumpJnl,WhseJnl; DecreaseQtyBase: Decimal; ToTransfer: Boolean)
+    procedure CheckWhseJnlLine(var WarehouseJournalLine: Record "Warehouse Journal Line"; SourceJnl: Option " ",ItemJnl,OutputJnl,ConsumpJnl,WhseJnl; DecreaseQtyBase: Decimal; ToTransfer: Boolean)
     var
         BinContent: Record "Bin Content";
         QtyAbsBase: Decimal;
@@ -137,24 +145,24 @@ codeunit 7302 "WMS Management"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckWhseJnlLine(WhseJnlLine, SourceJnl, DecreaseQtyBase, ToTransfer, IsHandled);
+        OnBeforeCheckWhseJnlLine(WarehouseJournalLine, SourceJnl, DecreaseQtyBase, ToTransfer, IsHandled);
         if IsHandled then
             exit;
 
-        GetItem(WhseJnlLine."Item No.");
-        with WhseJnlLine do begin
+        GetItem(WarehouseJournalLine."Item No.");
+        with WarehouseJournalLine do begin
             TestField("Location Code");
             GetLocation("Location Code");
-            OnCheckWhseJnlLineOnAfterGetLocation(WhseJnlLine, Location, Item);
+            OnCheckWhseJnlLineOnAfterGetLocation(WarehouseJournalLine, Location, Item);
 
             if SourceJnl = SourceJnl::WhseJnl then
-                CheckAdjBinCode(WhseJnlLine);
+                CheckAdjBinCode(WarehouseJournalLine);
 
-            CheckWhseJnlLineTracking(WhseJnlLine);
+            CheckWhseJnlLineTracking(WarehouseJournalLine);
 
             if "Entry Type" in ["Entry Type"::"Positive Adjmt.", "Entry Type"::Movement] then
                 if SourceJnl = SourceJnl::" " then begin
-                    CheckWhseDocumentToZoneCode(WhseJnlLine);
+                    CheckWhseDocumentToZoneCode(WarehouseJournalLine);
                     if "To Bin Code" = '' then
                         Error(
                           Text006,
@@ -163,12 +171,12 @@ codeunit 7302 "WMS Management"
                           FieldCaption("Line No."), "Whse. Document Line No.");
                 end else
                     if ("Entry Type" <> "Entry Type"::Movement) or ToTransfer then begin
-                        CheckToZoneCode(WhseJnlLine);
+                        CheckToZoneCode(WarehouseJournalLine);
                         TestField("To Bin Code");
                     end;
             if "Entry Type" in ["Entry Type"::"Negative Adjmt.", "Entry Type"::Movement] then
                 if SourceJnl = SourceJnl::" " then begin
-                    CheckWhseDocumentFromZoneCode(WhseJnlLine);
+                    CheckWhseDocumentFromZoneCode(WarehouseJournalLine);
                     if "From Bin Code" = '' then
                         Error(
                           Text006,
@@ -184,16 +192,17 @@ codeunit 7302 "WMS Management"
 
             QtyAbsBase := "Qty. (Absolute, Base)";
             IsHandled := false;
-            OnCheckWhseJnlLineOnBeforeCheckBySourceJnl(WhseJnlLine, Bin, SourceJnl, BinContent, Location, DecreaseQtyBase, IsHandled);
+            OnCheckWhseJnlLineOnBeforeCheckBySourceJnl(WarehouseJournalLine, Bin, SourceJnl, BinContent, Location, DecreaseQtyBase, IsHandled);
             if not IsHandled then begin
-                CheckDecreaseBinContent(WhseJnlLine, SourceJnl, DecreaseQtyBase);
+                CheckDecreaseBinContent(WarehouseJournalLine, SourceJnl, DecreaseQtyBase);
                 case SourceJnl of
                     SourceJnl::" ", SourceJnl::ItemJnl:
                         if ("To Bin Code" <> '') and ("To Bin Code" <> Location."Adjustment Bin Code") then
                             if Location."Bin Capacity Policy" <> Location."Bin Capacity Policy"::"Never Check Capacity" then begin
                                 if ("Reference Document" = "Reference Document"::"Posted Rcpt.") or
                                        ("Reference Document" = "Reference Document"::"Posted Rtrn. Rcpt.") or
-                                       ("Reference Document" = "Reference Document"::"Posted T. Receipt")
+                                       ("Reference Document" = "Reference Document"::"Posted T. Receipt") or
+                                       (not Location."Directed Put-away and Pick")
                                 then
                                     DeductQty := 0
                                 else
@@ -221,7 +230,7 @@ codeunit 7302 "WMS Management"
                     SourceJnl::WhseJnl:
                         if ("To Bin Code" <> '') and
                            ("To Bin Code" <> Location."Adjustment Bin Code") and
-                           Location."Directed Put-away and Pick"
+                           Location."Check Whse. Class"
                         then begin
                             GetBin("Location Code", "To Bin Code");
                             Bin.CheckWhseClass("Item No.", false);
@@ -234,7 +243,7 @@ codeunit 7302 "WMS Management"
             end;
         end;
 
-        OnAfterCheckWhseJnlLine(WhseJnlLine, SourceJnl, DecreaseQtyBase, ToTransfer, Item);
+        OnAfterCheckWhseJnlLine(WarehouseJournalLine, SourceJnl, DecreaseQtyBase, ToTransfer, Item);
     end;
 
     local procedure CheckWarehouseClass(LocationCode: Code[10]; BinCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10])
@@ -251,17 +260,18 @@ codeunit 7302 "WMS Management"
             end;
     end;
 
-    local procedure CheckDecreaseBinContent(var WhseJnlLine: Record "Warehouse Journal Line"; SourceJnl: Option " ",ItemJnl,OutputJnl,ConsumpJnl,WhseJnl; DecreaseQtyBase: Decimal)
+    local procedure CheckDecreaseBinContent(var WarehouseJournalLine: Record "Warehouse Journal Line"; SourceJnl: Option " ",ItemJnl,OutputJnl,ConsumpJnl,WhseJnl; DecreaseQtyBase: Decimal)
     var
         BinContent: Record "Bin Content";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckDecreaseBinContent(WhseJnlLine, SourceJnl, DecreaseQtyBase, IsHandled);
+        OnBeforeCheckDecreaseBinContent(WarehouseJournalLine, SourceJnl, DecreaseQtyBase, IsHandled);
         if IsHandled then
             exit;
 
-        with WhseJnlLine do
+        GetLocation(WarehouseJournalLine."Location Code");
+        with WarehouseJournalLine do
             case SourceJnl of
                 SourceJnl::" ", SourceJnl::ItemJnl:
                     if ("From Bin Code" <> '') and
@@ -286,27 +296,26 @@ codeunit 7302 "WMS Management"
                     if ("From Bin Code" <> '') and
                        ("From Bin Code" <> Location."Adjustment Bin Code") and
                        Location."Directed Put-away and Pick"
-                    then begin
+                    then
                         if not ItemTrackingMgt.GetWhseItemTrkgSetup("Item No.") then begin
                             BinContent.Get(
                               "Location Code", "From Bin Code",
                               "Item No.", "Variant Code", "Unit of Measure Code");
                             BinContent.CheckDecreaseBinContent("Qty. (Absolute)", "Qty. (Absolute, Base)", DecreaseQtyBase);
                         end;
-                    end;
             end;
     end;
 
-    local procedure CheckWhseJnlLineTracking(var WhseJnlLine: Record "Warehouse Journal Line")
+    local procedure CheckWhseJnlLineTracking(var WarehouseJournalLine: Record "Warehouse Journal Line")
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckWhseJnlLineTracking(WhseJnlLine, IsHandled);
+        OnBeforeCheckWhseJnlLineTracking(WarehouseJournalLine, IsHandled);
         if IsHandled then
             exit;
 
-        with WhseJnlLine do
+        with WarehouseJournalLine do
             if ItemTrackingCode.Get(Item."Item Tracking Code") then begin
                 if ("Serial No." <> '') and
                    ("From Bin Code" <> '') and
@@ -334,20 +343,20 @@ codeunit 7302 "WMS Management"
                       "Item No.", "Variant Code", "Location Code", "From Bin Code",
                       "Unit of Measure Code", "Lot No.", CalcReservEntryQuantity());
 
-                OnCheckWhseJnlLineOnAfterCheckTracking(WhseJnlLine, ItemTrackingCode, Location);
+                OnCheckWhseJnlLineOnAfterCheckTracking(WarehouseJournalLine, ItemTrackingCode, Location);
             end;
     end;
 
-    local procedure CheckWhseDocumentToZoneCode(WhseJnlLine: Record "Warehouse Journal Line")
+    local procedure CheckWhseDocumentToZoneCode(WarehouseJournalLine: Record "Warehouse Journal Line")
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckWhseDocumentToZoneCode(WhseJnlLine, IsHandled);
+        OnBeforeCheckWhseDocumentToZoneCode(WarehouseJournalLine, IsHandled);
         if IsHandled then
             exit;
 
-        with WhseJnlLine do
+        with WarehouseJournalLine do
             if Location."Directed Put-away and Pick" and ("To Zone Code" = '') then
                 Error(
                   Text006,
@@ -356,16 +365,16 @@ codeunit 7302 "WMS Management"
                   FieldCaption("Line No."), "Whse. Document Line No.");
     end;
 
-    local procedure CheckWhseDocumentFromZoneCode(WhseJnlLine: Record "Warehouse Journal Line")
+    local procedure CheckWhseDocumentFromZoneCode(WarehouseJournalLine: Record "Warehouse Journal Line")
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckWhseDocumentFromZoneCode(WhseJnlLine, IsHandled);
+        OnBeforeCheckWhseDocumentFromZoneCode(WarehouseJournalLine, IsHandled);
         if IsHandled then
             exit;
 
-        with WhseJnlLine do
+        with WarehouseJournalLine do
             if Location."Directed Put-away and Pick" and ("From Zone Code" = '') then
                 Error(
                   Text006,
@@ -374,25 +383,25 @@ codeunit 7302 "WMS Management"
                   FieldCaption("Line No."), "Whse. Document Line No.");
     end;
 
-    local procedure CheckToZoneCode(WhseJnlLine: Record "Warehouse Journal Line")
+    local procedure CheckToZoneCode(WarehouseJournalLine: Record "Warehouse Journal Line")
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckToZoneCode(WhseJnlLine, IsHandled);
+        OnBeforeCheckToZoneCode(WarehouseJournalLine, IsHandled);
         if IsHandled then
             exit;
 
         if Location."Directed Put-away and Pick" then
-            WhseJnlLine.TestField("To Zone Code");
+            WarehouseJournalLine.TestField("To Zone Code");
     end;
 
-    local procedure CheckAdjBinCode(WhseJnlLine: Record "Warehouse Journal Line")
+    local procedure CheckAdjBinCode(WarehouseJournalLine: Record "Warehouse Journal Line")
     var
         WarehouseJournalTemplate: Record "Warehouse Journal Template";
         FieldCapTxt: Text;
     begin
-        with WhseJnlLine do begin
+        with WarehouseJournalLine do begin
             if "Entry Type" = "Entry Type"::Movement then
                 exit;
 
@@ -425,11 +434,9 @@ codeunit 7302 "WMS Management"
 
     procedure CheckItemJnlLineFieldChange(ItemJnlLine: Record "Item Journal Line"; xItemJnlLine: Record "Item Journal Line"; CurrFieldCaption: Text[30])
     var
-        ProdOrderLine: Record "Prod. Order Line";
-        ProdOrderComponent: Record "Prod. Order Component";
         BinContent: Record "Bin Content";
-        WhseItemJnl: Page "Whse. Item Journal";
-        WhsePhysInvJnl: Page "Whse. Phys. Invt. Journal";
+        WhseItemJournal: Page "Whse. Item Journal";
+        WhsePhysInvtJournal: Page "Whse. Phys. Invt. Journal";
         BinIsEligible: Boolean;
         IsHandled: Boolean;
         Cubage: Decimal;
@@ -440,13 +447,9 @@ codeunit 7302 "WMS Management"
         if IsHandled then
             exit;
 
+        GetLocation(ItemJnlLine."Location Code");
         with ItemJnlLine do begin
-            if ("Order Type" = "Order Type"::Production) and ("Entry Type" = "Entry Type"::Output) then
-                if ProdOrderLine.Get(ProdOrderLine.Status::Released, "Order No.", "Order Line No.") then
-                    BinIsEligible := ("Location Code" = ProdOrderLine."Location Code") and ("Bin Code" = ProdOrderLine."Bin Code");
-            if ("Order Type" = "Order Type"::Production) and ("Entry Type" = "Entry Type"::Consumption) then
-                if ProdOrderComponent.Get(ProdOrderComponent.Status::Released, "Order No.", "Order Line No.", "Prod. Order Comp. Line No.") then
-                    BinIsEligible := ("Location Code" = ProdOrderComponent."Location Code") and ("Bin Code" = ProdOrderComponent."Bin Code");
+            OnCheckIfBinIsEligible(ItemJnlLine, BinIsEligible);
 
             ShowError := CheckBinCodeChange("Location Code", "Bin Code", xItemJnlLine."Bin Code") and not BinIsEligible;
             if not ShowError then
@@ -483,12 +486,12 @@ codeunit 7302 "WMS Management"
                         Error(Text010,
                           CurrFieldCaption,
                           Location.TableCaption(), Location.Code, Location.FieldCaption("Directed Put-away and Pick"),
-                          WhsePhysInvJnl.Caption);
+                          WhsePhysInvtJournal.Caption);
 
                     Error(Text010,
                       CurrFieldCaption,
                       Location.TableCaption(), Location.Code, Location.FieldCaption("Directed Put-away and Pick"),
-                      WhseItemJnl.Caption);
+                      WhseItemJournal.Caption);
                 end;
                 GetLocation("Location Code");
                 if not Location."Bin Mandatory" then
@@ -532,36 +535,36 @@ codeunit 7302 "WMS Management"
             CheckWarehouseClass(Location.Code, BinCode, ItemNo, VariantCode, ItemUnitOfMeasureCode);
     end;
 
-    procedure CheckItemJnlLineLocation(var ItemJnlLine: Record "Item Journal Line"; xItemJnlLine: Record "Item Journal Line")
+    procedure CheckItemJnlLineLocation(var ItemJournalLine: Record "Item Journal Line"; xItemJournalLine: Record "Item Journal Line")
     var
-        WhseItemJnl: Page "Whse. Item Journal";
+        WhseItemJournal: Page "Whse. Item Journal";
         TransferOrder: Page "Transfer Order";
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckItemJnlLineLocation(ItemJnlLine, xItemJnlLine, IsHandled);
+        OnBeforeCheckItemJnlLineLocation(ItemJournalLine, xItemJournalLine, IsHandled);
         if IsHandled then
             exit;
 
-        with ItemJnlLine do begin
+        with ItemJournalLine do begin
             if "Entry Type" in
                ["Entry Type"::"Negative Adjmt.", "Entry Type"::"Positive Adjmt.", "Entry Type"::Sale, "Entry Type"::Purchase]
             then
-                if "Location Code" <> xItemJnlLine."Location Code" then begin
-                    GetLocation(xItemJnlLine."Location Code");
+                if "Location Code" <> xItemJournalLine."Location Code" then begin
+                    GetLocation(xItemJournalLine."Location Code");
                     if not Location."Directed Put-away and Pick" then begin
                         GetLocation("Location Code");
                         if Location."Directed Put-away and Pick" then
                             Error(Text011,
                               LowerCase(Location.TableCaption()), Location.Code, Location.FieldCaption("Directed Put-away and Pick"),
-                              WhseItemJnl.Caption);
+                              WhseItemJournal.Caption());
                     end;
                 end;
 
             if "Entry Type" = "Entry Type"::Transfer then begin
                 if ("New Location Code" <> "Location Code") and
-                   (("Location Code" <> xItemJnlLine."Location Code") or
-                    ("New Location Code" <> xItemJnlLine."New Location Code"))
+                   (("Location Code" <> xItemJournalLine."Location Code") or
+                    ("New Location Code" <> xItemJournalLine."New Location Code"))
                 then begin
                     GetLocation("Location Code");
                     ShowError := Location."Directed Put-away and Pick";
@@ -589,7 +592,7 @@ codeunit 7302 "WMS Management"
             exit;
 
         with TrackingSpecification do
-            if ("Source Type" = DATABASE::"Item Journal Line") and
+            if ("Source Type" = Enum::TableID::"Item Journal Line".AsInteger()) and
                ("Item No." <> '') and
                ("Location Code" <> '')
             then begin
@@ -649,14 +652,14 @@ codeunit 7302 "WMS Management"
         OnAfterCheckTrackingSpecificationChangeNeeded(TrackingSpecification, xTrackingSpecification, CheckNeeded);
     end;
 
-    procedure CheckAdjmtBin(Location: Record Location; Quantity: Decimal; PosEntryType: Boolean)
+    procedure CheckAdjmtBin(Location2: Record Location; Quantity: Decimal; PosEntryType: Boolean)
     begin
-        if not Location."Directed Put-away and Pick" then
+        if not Location2."Directed Put-away and Pick" then
             exit;
 
-        Location.TestField(Code);
-        Location.TestField("Adjustment Bin Code");
-        GetBin(Location.Code, Location."Adjustment Bin Code");
+        Location2.TestField(Code);
+        Location2.TestField("Adjustment Bin Code");
+        GetBin(Location2.Code, Location2."Adjustment Bin Code");
 
         // Test whether bin movement is blocked for current Entry Type
         if (PosEntryType and (Quantity > 0)) or
@@ -672,11 +675,7 @@ codeunit 7302 "WMS Management"
                               [Bin."Block Movement"::Outbound, Bin."Block Movement"::All]);
 
         if ShowError then
-            Bin.FieldError(
-              "Block Movement",
-              StrSubstNo(
-                Text000,
-                Bin."Block Movement"));
+            Bin.FieldError("Block Movement", StrSubstNo(Text000, Bin."Block Movement"));
     end;
 
     procedure CheckInbOutbBin(LocationCode: Code[10]; BinCode: Code[20]; CheckInbound: Boolean)
@@ -696,7 +695,7 @@ codeunit 7302 "WMS Management"
 
     procedure CheckUserIsWhseEmployee()
     var
-        WhseEmployee: Record "Warehouse Employee";
+        WarehouseEmployee: Record "Warehouse Employee";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -705,10 +704,36 @@ codeunit 7302 "WMS Management"
             exit;
 
         if UserId <> '' then begin
-            WhseEmployee.SetRange("User ID", UserId);
-            if WhseEmployee.IsEmpty() then
-                Error(UserIsNotWhseEmployeeErr, UserId);
+            WarehouseEmployee.SetRange("User ID", UserId);
+            if WarehouseEmployee.IsEmpty() then
+                ConfirmOpenWarehouseEmployees(WarehouseEmployee, StrSubstNo(UserIsNotWhseEmployeeErr, UserId()));
         end;
+    end;
+
+    local procedure ConfirmOpenWarehouseEmployees(var WarehouseEmployee: Record "Warehouse Employee"; ErrorMessage: Text)
+    var
+        WarehouseEmployeeLocal: Record "Warehouse Employee";
+        ConfirmManagement: Codeunit "Confirm Management";
+        WarehouseEmployees: Page "Warehouse Employees";
+        ConfirmText: TextBuilder;
+        WarehouseEmployeeExists: Boolean;
+    begin
+        ConfirmText.AppendLine(ErrorMessage);
+        ConfirmText.AppendLine();
+        ConfirmText.AppendLine(OpenWarehouseEmployeesPageQst);
+
+        WarehouseEmployeeLocal.CopyFilters(WarehouseEmployee);
+        WarehouseEmployeeLocal.SetRange(Default);
+
+        if ConfirmManagement.GetResponseOrDefault(ConfirmText.ToText(), false) then begin
+            WarehouseEmployees.SetTableView(WarehouseEmployeeLocal);
+            WarehouseEmployees.RunModal();
+            if not WarehouseEmployee.IsEmpty() then
+                WarehouseEmployeeExists := true;
+        end;
+
+        if not WarehouseEmployeeExists then
+            Error(ErrorMessage);
     end;
 
     procedure CalcCubageAndWeight(ItemNo: Code[20]; UOMCode: Code[10]; Qty: Decimal; var Cubage: Decimal; var Weight: Decimal)
@@ -732,7 +757,7 @@ codeunit 7302 "WMS Management"
 
     procedure GetDefaultLocation(): Code[10]
     var
-        WhseEmployee: Record "Warehouse Employee";
+        WarehouseEmployee: Record "Warehouse Employee";
         LocationCode: Code[10];
         IsHandled: Boolean;
     begin
@@ -741,43 +766,50 @@ codeunit 7302 "WMS Management"
         if IsHandled then
             exit(LocationCode);
 
-        if UserId <> '' then begin
-            WhseEmployee.SetCurrentKey(Default);
-            WhseEmployee.SetRange(Default, true);
-            WhseEmployee.SetRange("User ID", UserId);
-            if not WhseEmployee.FindFirst() then
-                Error(Text003, UserId);
-            exit(WhseEmployee."Location Code");
+        if UserId() <> '' then begin
+            WarehouseEmployee.SetCurrentKey(Default);
+            WarehouseEmployee.SetRange(Default, true);
+            WarehouseEmployee.SetRange("User ID", UserId());
+            if WarehouseEmployee.IsEmpty() then
+                ConfirmOpenWarehouseEmployees(WarehouseEmployee, StrSubstNo(Text003, UserId()));
+            WarehouseEmployee.FindFirst();
+            exit(WarehouseEmployee."Location Code");
         end;
     end;
 
     procedure GetWMSLocation(var CurrentLocationCode: Code[10])
     var
-        Location: Record Location;
-        WhseEmployee: Record "Warehouse Employee";
+        Location2: Record Location;
+        WarehouseEmployee: Record "Warehouse Employee";
+        WhseEmployeesAtLocations: Query "Whse. Employees at Locations";
     begin
-        CheckUserIsWhseEmployee();
-        if WhseEmployee.Get(UserId, CurrentLocationCode) and Location.Get(CurrentLocationCode) then
-            if Location."Bin Mandatory" then
+        if WarehouseEmployee.Get(UserId, CurrentLocationCode) and Location2.Get(CurrentLocationCode) then
+            if Location2."Bin Mandatory" then
                 exit;
 
-        WhseEmployee.SetRange("User ID", UserId);
-        WhseEmployee.Find('-');
-        repeat
-            if Location.Get(WhseEmployee."Location Code") then
-                if Location."Bin Mandatory" then begin
-                    CurrentLocationCode := Location.Code;
-                    exit;
-                end;
-        until WhseEmployee.Next() = 0;
+        WhseEmployeesAtLocations.TopNumberOfRows(1);
+        WhseEmployeesAtLocations.SetRange(User_ID, UserId());
+        WhseEmployeesAtLocations.SetRange(Bin_Mandatory, true);
+        WhseEmployeesAtLocations.Open();
+        if WhseEmployeesAtLocations.Read() then begin
+            CurrentLocationCode := WhseEmployeesAtLocations.Code;
+            exit;
+        end;
 
-        Error(UserIsNotWhseEmployeeAtWMSLocationErr, UserId);
+        WarehouseEmployee.SetRange("User Id", UserId());
+        ConfirmOpenWarehouseEmployees(WarehouseEmployee, StrSubstNo(UserIsNotWhseEmployeeAtWMSLocationErr, UserId()));
+
+        WhseEmployeesAtLocations.Open();
+        if WhseEmployeesAtLocations.Read() then
+            CurrentLocationCode := WhseEmployeesAtLocations.Code
+        else
+            Error(UserIsNotWhseEmployeeAtWMSLocationErr, UserId());
     end;
 
     procedure GetDefaultDirectedPutawayAndPickLocation() LocationCode: Code[10]
     var
-        Location: Record Location;
-        WhseEmployee: Record "Warehouse Employee";
+        WarehouseEmployee: Record "Warehouse Employee";
+        WhseEmployeesAtLocations: Query "Whse. Employees at Locations";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -785,20 +817,22 @@ codeunit 7302 "WMS Management"
         if IsHandled then
             exit(LocationCode);
 
-        if Location.Get(GetDefaultLocation()) then
-            if Location."Directed Put-away and Pick" then
-                exit(Location.Code)
-            else begin
-                WhseEmployee.SetCurrentKey(Default);
-                WhseEmployee.SetRange(Default, false);
-                WhseEmployee.SetRange("User ID", UserId);
-                if (WhseEmployee.FindSet()) then
-                    repeat
-                        if Location.Get(WhseEmployee."Location Code") then
-                            if Location."Directed Put-away and Pick" then
-                                exit(Location.Code);
-                    until WhseEmployee.Next() = 0;
-            end;
+        WhseEmployeesAtLocations.TopNumberOfRows(1);
+        WhseEmployeesAtLocations.SetRange(User_ID, UserId());
+        WhseEmployeesAtLocations.SetRange(Default, true);
+        WhseEmployeesAtLocations.SetRange(Directed_Put_away_and_Pick, true);
+        WhseEmployeesAtLocations.Open();
+        if WhseEmployeesAtLocations.Read() then
+            exit(WhseEmployeesAtLocations.Code);
+
+        WarehouseEmployee.SetRange("User Id", UserId());
+        WarehouseEmployee.SetRange(Default, true);
+        ConfirmOpenWarehouseEmployees(WarehouseEmployee, StrSubstNo(DefaultLocationNotDirectedPutawayPickErr, UserId()));
+
+        WhseEmployeesAtLocations.Open();
+        if WhseEmployeesAtLocations.Read() then
+            exit(WhseEmployeesAtLocations.Code);
+
         Error(DefaultLocationNotDirectedPutawayPickErr, UserId);
     end;
 
@@ -817,6 +851,7 @@ codeunit 7302 "WMS Management"
         BinContent.SetRange("Location Code", LocationCode);
         BinContent.SetRange("Item No.", ItemNo);
         BinContent.SetRange("Variant Code", VariantCode);
+        BinContent.SetLoadFields("Bin Code");
         if BinContent.FindFirst() then begin
             BinCode := BinContent."Bin Code";
             exit(true);
@@ -836,92 +871,91 @@ codeunit 7302 "WMS Management"
         exit(not BinContent.IsEmpty);
     end;
 
-    procedure CheckBalanceQtyToHandle(var WhseActivLine2: Record "Warehouse Activity Line")
+    procedure CheckBalanceQtyToHandle(var WarehouseActivityLine2: Record "Warehouse Activity Line")
     var
-        WhseActivLine: Record "Warehouse Activity Line";
-        WhseActivLine3: Record "Warehouse Activity Line";
-        TempWhseActivLine: Record "Warehouse Activity Line" temporary;
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        WarehouseActivityLine3: Record "Warehouse Activity Line";
+        TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary;
         QtyToPick: Decimal;
         QtyToPutAway: Decimal;
         ErrorText: Text[250];
     begin
-        OnBeforeCheckBalanceQtyToHandle(WhseActivLine2);
-        WhseActivLine.Copy(WhseActivLine2);
+        OnBeforeCheckBalanceQtyToHandle(WarehouseActivityLine2);
+        WarehouseActivityLine.Copy(WarehouseActivityLine2);
 
-        WhseActivLine.SetCurrentKey("Activity Type", "No.", "Item No.", "Variant Code", "Action Type");
-        WhseActivLine.SetRange("Activity Type", WhseActivLine."Activity Type");
-        WhseActivLine.SetRange("No.", WhseActivLine."No.");
-        WhseActivLine.SetRange("Action Type");
-        if WhseActivLine.FindSet() then
+        WarehouseActivityLine.SetCurrentKey("Activity Type", "No.", "Item No.", "Variant Code", "Action Type");
+        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityLine."Activity Type");
+        WarehouseActivityLine.SetRange("No.", WarehouseActivityLine."No.");
+        WarehouseActivityLine.SetRange("Action Type");
+        if WarehouseActivityLine.FindSet() then
             repeat
-                if not TempWhseActivLine.Get(WhseActivLine."Activity Type", WhseActivLine."No.", WhseActivLine."Line No.") then begin
-                    WhseActivLine3.Copy(WhseActivLine);
+                if not TempWarehouseActivityLine.Get(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.", WarehouseActivityLine."Line No.") then begin
+                    WarehouseActivityLine3.Copy(WarehouseActivityLine);
+                    WarehouseActivityLine3.SetRange("Item No.", WarehouseActivityLine."Item No.");
+                    WarehouseActivityLine3.SetRange("Variant Code", WarehouseActivityLine."Variant Code");
+                    WarehouseActivityLine3.SetTrackingFilterFromWhseActivityLine(WarehouseActivityLine);
+                    OnCheckBalanceQtyToHandleOnAfterSetFilters(WarehouseActivityLine3, WarehouseActivityLine);
 
-                    WhseActivLine3.SetRange("Item No.", WhseActivLine."Item No.");
-                    WhseActivLine3.SetRange("Variant Code", WhseActivLine."Variant Code");
-                    WhseActivLine3.SetTrackingFilterFromWhseActivityLine(WhseActivLine);
-                    OnCheckBalanceQtyToHandleOnAfterSetFilters(WhseActivLine3, WhseActivLine);
-
-                    if (WhseActivLine2."Action Type" = WhseActivLine2."Action Type"::Take) or
-                        (WhseActivLine2.GetFilter("Action Type") = '')
+                    if (WarehouseActivityLine2."Action Type" = WarehouseActivityLine2."Action Type"::Take) or
+                        (WarehouseActivityLine2.GetFilter("Action Type") = '')
                     then begin
-                        WhseActivLine3.SetRange("Action Type", WhseActivLine3."Action Type"::Take);
-                        if WhseActivLine3.FindSet() then
+                        WarehouseActivityLine3.SetRange("Action Type", WarehouseActivityLine3."Action Type"::Take);
+                        if WarehouseActivityLine3.FindSet() then
                             repeat
-                                QtyToPick := QtyToPick + WhseActivLine3."Qty. to Handle (Base)";
-                                TempWhseActivLine := WhseActivLine3;
-                                TempWhseActivLine.Insert();
-                            until WhseActivLine3.Next() = 0;
+                                QtyToPick := QtyToPick + WarehouseActivityLine3."Qty. to Handle (Base)";
+                                TempWarehouseActivityLine := WarehouseActivityLine3;
+                                TempWarehouseActivityLine.Insert();
+                            until WarehouseActivityLine3.Next() = 0;
                     end;
 
-                    if (WhseActivLine2."Action Type" = WhseActivLine2."Action Type"::Place) or
-                        (WhseActivLine2.GetFilter("Action Type") = '')
+                    if (WarehouseActivityLine2."Action Type" = WarehouseActivityLine2."Action Type"::Place) or
+                        (WarehouseActivityLine2.GetFilter("Action Type") = '')
                     then begin
-                        WhseActivLine3.SetRange("Action Type", WhseActivLine3."Action Type"::Place);
-                        if WhseActivLine3.FindSet() then
+                        WarehouseActivityLine3.SetRange("Action Type", WarehouseActivityLine3."Action Type"::Place);
+                        if WarehouseActivityLine3.FindSet() then
                             repeat
-                                QtyToPutAway := QtyToPutAway + WhseActivLine3."Qty. to Handle (Base)";
-                                TempWhseActivLine := WhseActivLine3;
-                                TempWhseActivLine.Insert();
-                            until WhseActivLine3.Next() = 0;
+                                QtyToPutAway := QtyToPutAway + WarehouseActivityLine3."Qty. to Handle (Base)";
+                                TempWarehouseActivityLine := WarehouseActivityLine3;
+                                TempWarehouseActivityLine.Insert();
+                            until WarehouseActivityLine3.Next() = 0;
                     end;
 
                     if QtyToPick <> QtyToPutAway then begin
-                        ErrorText := GetWrongPickPutAwayQtyErrorText(WhseActivLine, WhseActivLine3, QtyToPick, QtyToPutAway);
+                        ErrorText := GetWrongPickPutAwayQtyErrorText(WarehouseActivityLine, WarehouseActivityLine3, QtyToPick, QtyToPutAway);
                         HandleError(ErrorText);
                     end;
 
                     QtyToPick := 0;
                     QtyToPutAway := 0;
                 end;
-            until WhseActivLine.Next() = 0;
+            until WarehouseActivityLine.Next() = 0;
     end;
 
-    local procedure GetWrongPickPutAwayQtyErrorText(WhseActivLine: Record "Warehouse Activity Line"; WhseActivLine3: Record "Warehouse Activity Line"; QtyToPick: Decimal; QtyToPutAway: Decimal) ErrorText: Text[250]
+    local procedure GetWrongPickPutAwayQtyErrorText(WarehouseActivityLine: Record "Warehouse Activity Line"; WarehouseActivityLine3: Record "Warehouse Activity Line"; QtyToPick: Decimal; QtyToPutAway: Decimal) ErrorText: Text[250]
     var
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeGetWrongPickPutAwayQtyErrorText(WhseActivLine3, QtyToPick, QtyToPutAway, ErrorText, IsHandled);
+        OnBeforeGetWrongPickPutAwayQtyErrorText(WarehouseActivityLine3, QtyToPick, QtyToPutAway, ErrorText, IsHandled);
         if IsHandled then
             exit(ErrorText);
 
-        with WhseActivLine do
-            if WhseActivLine3.TrackingFilterExists() then
+        with WarehouseActivityLine do
+            if WarehouseActivityLine3.TrackingFilterExists() then
                 ErrorText :=
                   StrSubstNo(
                     Text016,
-                    WhseActivLine.FieldCaption("Item No."), WhseActivLine."Item No.",
-                    WhseActivLine.FieldCaption("Variant Code"), WhseActivLine."Variant Code",
-                    WhseActivLine.FieldCaption("Lot No."), WhseActivLine."Lot No.",
-                    WhseActivLine.FieldCaption("Serial No."), WhseActivLine."Serial No.",
+                    WarehouseActivityLine.FieldCaption("Item No."), WarehouseActivityLine."Item No.",
+                    WarehouseActivityLine.FieldCaption("Variant Code"), WarehouseActivityLine."Variant Code",
+                    WarehouseActivityLine.FieldCaption("Lot No."), WarehouseActivityLine."Lot No.",
+                    WarehouseActivityLine.FieldCaption("Serial No."), WarehouseActivityLine."Serial No.",
                     QtyToPick, QtyToPutAway)
             else
                 ErrorText :=
                     StrSubstNo(
                     Text005,
-                    WhseActivLine.FieldCaption("Item No."), WhseActivLine."Item No.",
-                    WhseActivLine.FieldCaption("Variant Code"), WhseActivLine."Variant Code",
+                    WarehouseActivityLine.FieldCaption("Item No."), WarehouseActivityLine."Item No.",
+                    WarehouseActivityLine.FieldCaption("Variant Code"), WarehouseActivityLine."Variant Code",
                     QtyToPick, QtyToPutAway);
     end;
 
@@ -961,42 +995,43 @@ codeunit 7302 "WMS Management"
             Error(Text007);
     end;
 
-    local procedure InitWhseJnlLine(ItemJnlLine: Record "Item Journal Line"; var WhseJnlLine: Record "Warehouse Journal Line"; QuantityBase: Decimal)
+    internal procedure InitWhseJnlLine(ItemJournalLine: Record "Item Journal Line"; var WarehouseJournalLine: Record "Warehouse Journal Line"; QuantityBase: Decimal)
     begin
-        with WhseJnlLine do begin
+        with WarehouseJournalLine do begin
             Init();
-            "Journal Template Name" := ItemJnlLine."Journal Template Name";
-            "Journal Batch Name" := ItemJnlLine."Journal Batch Name";
-            "Location Code" := ItemJnlLine."Location Code";
-            "Item No." := ItemJnlLine."Item No.";
-            "Registering Date" := ItemJnlLine."Posting Date";
+            "Journal Template Name" := ItemJournalLine."Journal Template Name";
+            "Journal Batch Name" := ItemJournalLine."Journal Batch Name";
+            "Location Code" := ItemJournalLine."Location Code";
+            "Item No." := ItemJournalLine."Item No.";
+            "Registering Date" := ItemJournalLine."Posting Date";
             "User ID" := CopyStr(UserId(), 1, MaxStrLen("User ID"));
-            "Variant Code" := ItemJnlLine."Variant Code";
-            if ItemJnlLine."Qty. per Unit of Measure" = 0 then
-                ItemJnlLine."Qty. per Unit of Measure" := 1;
+            "Variant Code" := ItemJournalLine."Variant Code";
+            if ItemJournalLine."Qty. per Unit of Measure" = 0 then
+                ItemJournalLine."Qty. per Unit of Measure" := 1;
+            GetLocation("Location Code");
             if Location."Directed Put-away and Pick" then begin
-                Quantity := Round(QuantityBase / ItemJnlLine."Qty. per Unit of Measure", UOMMgt.QtyRndPrecision());
-                "Unit of Measure Code" := ItemJnlLine."Unit of Measure Code";
-                "Qty. per Unit of Measure" := ItemJnlLine."Qty. per Unit of Measure";
+                Quantity := Round(QuantityBase / ItemJournalLine."Qty. per Unit of Measure", UOMMgt.QtyRndPrecision());
+                "Unit of Measure Code" := ItemJournalLine."Unit of Measure Code";
+                "Qty. per Unit of Measure" := ItemJournalLine."Qty. per Unit of Measure";
             end else begin
                 Quantity := QuantityBase;
-                "Unit of Measure Code" := GetBaseUOM(ItemJnlLine."Item No.");
+                "Unit of Measure Code" := GetBaseUOM(ItemJournalLine."Item No.");
                 "Qty. per Unit of Measure" := 1;
             end;
-            OnInitWhseJnlLineOnAfterGetQuantity(ItemJnlLine, WhseJnlLine, Location);
+            OnInitWhseJnlLineOnAfterGetQuantity(ItemJournalLine, WarehouseJournalLine, Location);
 
             "Qty. (Base)" := QuantityBase;
             "Qty. (Absolute)" := Abs(Quantity);
             "Qty. (Absolute, Base)" := Abs(QuantityBase);
 
-            "Source Code" := ItemJnlLine."Source Code";
-            "Reason Code" := ItemJnlLine."Reason Code";
-            "Registering No. Series" := ItemJnlLine."Posting No. Series";
+            "Source Code" := ItemJournalLine."Source Code";
+            "Reason Code" := ItemJournalLine."Reason Code";
+            "Registering No. Series" := ItemJournalLine."Posting No. Series";
             if Location."Bin Capacity Policy" <> Location."Bin Capacity Policy"::"Never Check Capacity" then
                 CalcCubageAndWeight(
-                  ItemJnlLine."Item No.", ItemJnlLine."Unit of Measure Code", "Qty. (Absolute)", Cubage, Weight);
+                  ItemJournalLine."Item No.", ItemJournalLine."Unit of Measure Code", "Qty. (Absolute)", Cubage, Weight);
 
-            OnInitWhseJnlLineCopyFromItemJnlLine(WhseJnlLine, ItemJnlLine);
+            OnInitWhseJnlLineCopyFromItemJnlLine(WarehouseJournalLine, ItemJournalLine);
         end;
     end;
 
@@ -1040,9 +1075,9 @@ codeunit 7302 "WMS Management"
     var
         WarehouseEmployee: Record "Warehouse Employee";
         [SecurityFiltering(SecurityFilter::Filtered)]
-        Location: Record Location;
-        AssignedLocations: List of [code[20]];
+        Location2: Record Location;
         WhseEmplLocationBuffer: Codeunit WhseEmplLocationBuffer;
+        AssignedLocations: List of [code[20]];
         Filterstring: Text;
         LocationAllowed: Boolean;
         FilterTooLong: Boolean;
@@ -1068,18 +1103,18 @@ codeunit 7302 "WMS Management"
                     Filterstring += '|' + StrSubstNo('''%1''', ConvertStr(WarehouseEmployee."Location Code", '''', '*'));
             UNTIL WarehouseEmployee.Next() = 0;
         if WhseEmplLocationBuffer.NeedToCheckLocationSubscribers() then
-            if Location.FindSet() then
+            if Location2.FindSet() then
                 repeat
-                    if not AssignedLocations.Contains(Location.Code) then begin
+                    if not AssignedLocations.Contains(Location2.Code) then begin
                         LocationAllowed := false;
-                        OnBeforeLocationIsAllowed(Location.Code, LocationAllowed);
+                        OnBeforeLocationIsAllowed(Location2.Code, LocationAllowed);
                         if LocationAllowed then begin
                             Filterstring += '|' + StrSubstNo('''%1''', ConvertStr(Location.Code, '''', '*'));
                             FilterTooLong := StrLen(Filterstring) > 2000; // platform limitation on length
                             HasLocationSubscribers := true;
                         end;
                     end;
-                until (location.Next() = 0) or FilterTooLong;
+                until (location2.Next() = 0) or FilterTooLong;
         WhseEmplLocationBuffer.SetHasLocationSubscribers(HasLocationSubscribers);
         if FilterTooLong then
             Filterstring := '*';
@@ -1089,7 +1124,7 @@ codeunit 7302 "WMS Management"
 
     procedure GetAllowedLocation(LocationCode: Code[10]): Code[10]
     var
-        WhseEmployee: Record "Warehouse Employee";
+        WarehouseEmployee: Record "Warehouse Employee";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1098,17 +1133,17 @@ codeunit 7302 "WMS Management"
             exit(LocationCode);
 
         CheckUserIsWhseEmployee();
-        if WhseEmployee.Get(UserId, LocationCode) then
+        if WarehouseEmployee.Get(UserId, LocationCode) then
             exit(LocationCode);
         exit(GetDefaultLocation());
     end;
 
     procedure LocationIsAllowed(LocationCode: Code[10]): Boolean
     var
-        WhseEmployee: Record "Warehouse Employee";
+        WarehouseEmployee: Record "Warehouse Employee";
         LocationAllowed: Boolean;
     begin
-        LocationAllowed := WhseEmployee.Get(UserId, LocationCode) or (UserId = '');
+        LocationAllowed := WarehouseEmployee.Get(UserId(), LocationCode) or (UserId() = '');
         OnBeforeLocationIsAllowed(LocationCode, LocationAllowed);
         exit(LocationAllowed);
     end;
@@ -1168,67 +1203,45 @@ codeunit 7302 "WMS Management"
             Clear(ItemTrackingCode);
     end;
 
-    local procedure GetProdOrderCompLine(var ProdOrderCompLine: Record "Prod. Order Component"; Status: Enum "Production Order Status"; ProdOrderNo: Code[20];
-                                                                                                            ProdOrderLineNo: Integer;
-                                                                                                            ProdOrdCompLineNo: Integer): Boolean
-    begin
-        if (ProdOrderNo = '') or
-           (ProdOrderLineNo = 0) or
-           (ProdOrdCompLineNo = 0)
-        then
-            exit(false);
-        if (ProdOrderCompLine.Status <> Status) or
-(ProdOrderCompLine."Prod. Order No." <> ProdOrderNo) or
-(ProdOrderCompLine."Prod. Order Line No." <> ProdOrderLineNo) or
-(ProdOrderCompLine."Line No." <> ProdOrdCompLineNo)
-then begin
-            if ProdOrderCompLine.Get(Status, ProdOrderNo, ProdOrderLineNo, ProdOrdCompLineNo) then
-                exit(true);
-
-            exit(false);
-        end;
-        exit(true);
-    end;
-
     procedure ShowWhseRcptLine(WhseDocNo: Code[20]; WhseDocLineNo: Integer)
     var
-        WhseRcptLine: Record "Warehouse Receipt Line";
+        WarehouseReceiptLine: Record "Warehouse Receipt Line";
     begin
-        WhseRcptLine.Reset();
-        WhseRcptLine.SetRange("No.", WhseDocNo);
-        WhseRcptLine.SetRange("Line No.", WhseDocLineNo);
-        PAGE.RunModal(PAGE::"Whse. Receipt Lines", WhseRcptLine);
+        WarehouseReceiptLine.Reset();
+        WarehouseReceiptLine.SetRange("No.", WhseDocNo);
+        WarehouseReceiptLine.SetRange("Line No.", WhseDocLineNo);
+        PAGE.RunModal(PAGE::"Whse. Receipt Lines", WarehouseReceiptLine);
     end;
 
     procedure ShowPostedWhseRcptLine(WhseDocNo: Code[20]; WhseDocLineNo: Integer)
     var
-        PostedWhseRcptLine: Record "Posted Whse. Receipt Line";
+        PostedWhseReceiptLine: Record "Posted Whse. Receipt Line";
     begin
-        PostedWhseRcptLine.Reset();
-        PostedWhseRcptLine.SetRange("No.", WhseDocNo);
-        PostedWhseRcptLine.SetRange("Line No.", WhseDocLineNo);
-        PAGE.RunModal(PAGE::"Posted Whse. Receipt Lines", PostedWhseRcptLine);
+        PostedWhseReceiptLine.Reset();
+        PostedWhseReceiptLine.SetRange("No.", WhseDocNo);
+        PostedWhseReceiptLine.SetRange("Line No.", WhseDocLineNo);
+        PAGE.RunModal(PAGE::"Posted Whse. Receipt Lines", PostedWhseReceiptLine);
     end;
 
     procedure ShowWhseShptLine(WhseDocNo: Code[20]; WhseDocLineNo: Integer)
     var
-        WhseShptLine: Record "Warehouse Shipment Line";
+        WarehouseShipmentLine: Record "Warehouse Shipment Line";
     begin
-        WhseShptLine.Reset();
-        WhseShptLine.SetRange("No.", WhseDocNo);
-        WhseShptLine.SetRange("Line No.", WhseDocLineNo);
-        PAGE.RunModal(PAGE::"Whse. Shipment Lines", WhseShptLine);
+        WarehouseShipmentLine.Reset();
+        WarehouseShipmentLine.SetRange("No.", WhseDocNo);
+        WarehouseShipmentLine.SetRange("Line No.", WhseDocLineNo);
+        PAGE.RunModal(PAGE::"Whse. Shipment Lines", WarehouseShipmentLine);
     end;
 
     procedure ShowPostedWhseShptLine(WhseDocNo: Code[20]; WhseDocLineNo: Integer)
     var
-        PostedWhseShptLine: Record "Posted Whse. Shipment Line";
+        PostedWhseShipmentLine: Record "Posted Whse. Shipment Line";
     begin
-        PostedWhseShptLine.Reset();
-        PostedWhseShptLine.SetCurrentKey("Whse. Shipment No.", "Whse Shipment Line No.");
-        PostedWhseShptLine.SetRange("Whse. Shipment No.", WhseDocNo);
-        PostedWhseShptLine.SetRange("Whse Shipment Line No.", WhseDocLineNo);
-        PAGE.RunModal(PAGE::"Posted Whse. Shipment Lines", PostedWhseShptLine);
+        PostedWhseShipmentLine.Reset();
+        PostedWhseShipmentLine.SetCurrentKey("Whse. Shipment No.", "Whse Shipment Line No.");
+        PostedWhseShipmentLine.SetRange("Whse. Shipment No.", WhseDocNo);
+        PostedWhseShipmentLine.SetRange("Whse Shipment Line No.", WhseDocLineNo);
+        PAGE.RunModal(PAGE::"Posted Whse. Shipment Lines", PostedWhseShipmentLine);
     end;
 
     procedure ShowWhseInternalPutawayLine(WhseDocNo: Code[20]; WhseDocLineNo: Integer)
@@ -1251,37 +1264,27 @@ then begin
         PAGE.RunModal(PAGE::"Whse. Internal Pick Lines", WhseInternalPickLine);
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     procedure ShowProdOrderLine(WhseDocNo: Code[20]; WhseDocLineNo: Integer)
     var
-        ProdOrderLine: Record "Prod. Order Line";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
-        ProdOrderLine.Reset();
-        ProdOrderLine.SetRange(Status, ProdOrderLine.Status::Released);
-        ProdOrderLine.SetRange("Prod. Order No.", WhseDocNo);
-        ProdOrderLine.SetRange("Line No.", WhseDocLineNo);
-        PAGE.RunModal(PAGE::"Prod. Order Line List", ProdOrderLine);
+        ProdOrderWarehouseMgt.ShowProdOrderLine(WhseDocNo, WhseDocLineNo);
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit "Assembly Warehouse Mgt."', '23.0')]
     procedure ShowAssemblyLine(WhseDocNo: Code[20]; WhseDocLineNo: Integer)
     var
-        AssemblyLine: Record "Assembly Line";
+        AssemblyWarehouseMgt: Codeunit "Assembly Warehouse Mgt.";
     begin
-        AssemblyLine.SetRange("Document Type", AssemblyLine."Document Type"::Order);
-        AssemblyLine.SetRange("Document No.", WhseDocNo);
-        AssemblyLine.SetRange("Line No.", WhseDocLineNo);
-        PAGE.RunModal(PAGE::"Assembly Lines", AssemblyLine);
+        AssemblyWarehouseMgt.ShowAssemblyLine(WhseDocNo, WhseDocLineNo);
     end;
+#endif
 
-    local procedure ShowJobPlanningLine(WhseDocLineNo: Integer)
-    var
-        JobPlanningLine: Record "Job Planning Line";
-    begin
-        JobPlanningLine.SetRange("Job Contract Entry No.", WhseDocLineNo);
-        PAGE.RunModal(PAGE::"Job Planning Lines", JobPlanningLine);
-    end;
-
-    procedure ShowWhseActivityDocLine(WhseActivityDocType: Enum "Warehouse Activity Document Type"; WhseDocNo: Code[20];
-                                                               WhseDocLineNo: Integer)
+    procedure ShowWhseActivityDocLine(WhseActivityDocType: Enum "Warehouse Activity Document Type"; WhseDocNo: Code[20]; WhseDocLineNo: Integer)
     begin
         case WhseActivityDocType of
             WhseActivityDocType::Receipt:
@@ -1292,145 +1295,25 @@ then begin
                 ShowWhseInternalPutawayLine(WhseDocNo, WhseDocLineNo);
             WhseActivityDocType::"Internal Pick":
                 ShowWhseInternalPickLine(WhseDocNo, WhseDocLineNo);
-            WhseActivityDocType::Production:
-                ShowProdOrderLine(WhseDocNo, WhseDocLineNo);
             WhseActivityDocType::"Movement Worksheet":
                 ;
-            WhseActivityDocType::Assembly:
-                ShowAssemblyLine(WhseDocNo, WhseDocLineNo);
-            WhseActivityDocType::Job:
-                ShowJobPlanningLine(WhseDocLineNo);
+            else
+                OnShowWhseActivityDocLine(WhseActivityDocType, WhseDocNo, WhseDocLineNo);
         end;
     end;
 
     procedure ShowSourceDocLine(SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer; SourceSubLineNo: Integer)
-    var
-        SalesLine: Record "Sales Line";
-        PurchLine: Record "Purchase Line";
-        TransLine: Record "Transfer Line";
-        ProdOrderComp: Record "Prod. Order Component";
-        AssemblyLine: Record "Assembly Line";
-        ServiceLine: Record "Service Line";
-        IsHandled: Boolean;
     begin
-        case SourceType of
-            DATABASE::"Sales Line":
-                begin
-                    SalesLine.Reset();
-                    SalesLine.SetRange("Document Type", SourceSubType);
-                    SalesLine.SetRange("Document No.", SourceNo);
-                    SalesLine.SetRange("Line No.", SourceLineNo);
-                    IsHandled := false;
-                    OnShowSourceDocLineOnBeforeShowSalesLines(SalesLine, SourceSubType, SourceNo, SourceLineNo, IsHandled);
-                    if not IsHandled then
-                        PAGE.RunModal(PAGE::"Sales Lines", SalesLine);
-                end;
-            DATABASE::"Purchase Line":
-                begin
-                    PurchLine.Reset();
-                    PurchLine.SetRange("Document Type", SourceSubType);
-                    PurchLine.SetRange("Document No.", SourceNo);
-                    PurchLine.SetRange("Line No.", SourceLineNo);
-                    IsHandled := false;
-                    OnShowSourceDocLineOnBeforeShowPurchLines(PurchLine, SourceSubType, SourceNo, SourceLineNo, IsHandled);
-                    if not IsHandled then
-                        PAGE.RunModal(PAGE::"Purchase Lines", PurchLine);
-                end;
-            DATABASE::"Transfer Line":
-                begin
-                    TransLine.Reset();
-                    TransLine.SetRange("Document No.", SourceNo);
-                    TransLine.SetRange("Line No.", SourceLineNo);
-                    IsHandled := false;
-                    OnShowSourceDocLineOnBeforeShowTransLines(TransLine, SourceNo, SourceLineNo, IsHandled);
-                    if not IsHandled then
-                        PAGE.RunModal(PAGE::"Transfer Lines", TransLine);
-                end;
-            DATABASE::"Prod. Order Component":
-                begin
-                    ProdOrderComp.Reset();
-                    ProdOrderComp.SetRange(Status, SourceSubType);
-                    ProdOrderComp.SetRange("Prod. Order No.", SourceNo);
-                    ProdOrderComp.SetRange("Prod. Order Line No.", SourceLineNo);
-                    ProdOrderComp.SetRange("Line No.", SourceSubLineNo);
-                    IsHandled := false;
-                    OnShowSourceDocLineOnBeforeShowProdOrderComp(ProdOrderComp, SourceSubType, SourceNo, SourceLineNo, SourceSubLineNo, IsHandled);
-                    if not IsHandled then
-                        case SourceSubType of
-                            3: // Released
-                                PAGE.RunModal(PAGE::"Prod. Order Comp. Line List", ProdOrderComp);
-                        end;
-                end;
-            DATABASE::"Assembly Line":
-                begin
-                    AssemblyLine.SetRange("Document Type", SourceSubType);
-                    AssemblyLine.SetRange("Document No.", SourceNo);
-                    AssemblyLine.SetRange("Line No.", SourceLineNo);
-                    IsHandled := false;
-                    OnShowSourceDocLineOnBeforeShowAssemblyLines(AssemblyLine, SourceSubType, SourceNo, SourceLineNo, IsHandled);
-                    if not IsHandled then
-                        PAGE.RunModal(PAGE::"Assembly Lines", AssemblyLine);
-                end;
-            DATABASE::Job:
-                ShowJobPlanningLine(SourceLineNo);
-            DATABASE::"Service Line":
-                begin
-                    ServiceLine.SetRange("Document Type", SourceSubType);
-                    ServiceLine.SetRange("Document No.", SourceNo);
-                    ServiceLine.SetRange("Line No.", SourceLineNo);
-                    IsHandled := false;
-                    OnShowSourceDocLineOnBeforeShowServiceLines(ServiceLine, SourceSubType, SourceNo, SourceLineNo, IsHandled);
-                    if not IsHandled then
-                        PAGE.Run(PAGE::"Service Line List", ServiceLine);
-                end;
-            else
-                OnShowSourceDocLine(SourceType, SourceSubType, SourceNo, SourceLineNo, SourceSubLineNo);
-        end;
+        OnShowSourceDocLine(SourceType, SourceSubType, SourceNo, SourceLineNo, SourceSubLineNo);
     end;
 
     procedure ShowSourceDocAttachedLines(SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer)
-    var
-        SalesLine: Record "Sales Line";
-        PurchLine: Record "Purchase Line";
-        ServiceLine: Record "Service Line";
     begin
-        case SourceType of
-            DATABASE::"Sales Line":
-                begin
-                    SalesLine.Reset();
-                    SalesLine.SetRange("Document Type", SourceSubType);
-                    SalesLine.SetRange("Document No.", SourceNo);
-                    SalesLine.SetRange("Attached to Line No.", SourceLineNo);
-                    PAGE.RunModal(PAGE::"Sales Lines", SalesLine);
-                end;
-            DATABASE::"Purchase Line":
-                begin
-                    PurchLine.Reset();
-                    PurchLine.SetRange("Document Type", SourceSubType);
-                    PurchLine.SetRange("Document No.", SourceNo);
-                    PurchLine.SetRange("Attached to Line No.", SourceLineNo);
-                    PAGE.RunModal(PAGE::"Purchase Lines", PurchLine);
-                end;
-            DATABASE::"Service Line":
-                begin
-                    ServiceLine.SetRange("Document Type", SourceSubType);
-                    ServiceLine.SetRange("Document No.", SourceNo);
-                    ServiceLine.SetRange("Attached to Line No.", SourceLineNo);
-                    PAGE.Run(PAGE::"Service Line List", ServiceLine);
-                end;
-            else
-                OnShowSourceDocAttachedLines(SourceType, SourceSubType, SourceNo, SourceLineNo);
-        end;
+        OnShowSourceDocAttachedLines(SourceType, SourceSubType, SourceNo, SourceLineNo);
     end;
 
     procedure ShowPostedSourceDocument(PostedSourceDoc: Enum "Warehouse Shipment Posted Source Document"; PostedSourceNo: Code[20])
     var
-        SalesShipmentHeader: Record "Sales Shipment Header";
-        PurchRcptHeader: Record "Purch. Rcpt. Header";
-        ReturnShipmentHeader: Record "Return Shipment Header";
-        ReturnReceiptHeader: Record "Return Receipt Header";
-        TransShipmentHeader: Record "Transfer Shipment Header";
-        TransReceiptHeader: Record "Transfer Receipt Header";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1438,56 +1321,11 @@ then begin
         if IsHandled then
             exit;
 
-        case PostedSourceDoc of
-            PostedSourceDoc::"Posted Shipment":
-                begin
-                    SalesShipmentHeader.Reset();
-                    SalesShipmentHeader.SetRange("No.", PostedSourceNo);
-                    PAGE.RunModal(PAGE::"Posted Sales Shipment", SalesShipmentHeader);
-                end;
-            PostedSourceDoc::"Posted Receipt":
-                begin
-                    PurchRcptHeader.Reset();
-                    PurchRcptHeader.SetRange("No.", PostedSourceNo);
-                    PAGE.RunModal(PAGE::"Posted Purchase Receipt", PurchRcptHeader);
-                end;
-            PostedSourceDoc::"Posted Return Shipment":
-                begin
-                    ReturnShipmentHeader.Reset();
-                    ReturnShipmentHeader.SetRange("No.", PostedSourceNo);
-                    PAGE.RunModal(PAGE::"Posted Return Shipment", ReturnShipmentHeader);
-                end;
-            PostedSourceDoc::"Posted Return Receipt":
-                begin
-                    ReturnReceiptHeader.Reset();
-                    ReturnReceiptHeader.SetRange("No.", PostedSourceNo);
-                    PAGE.RunModal(PAGE::"Posted Return Receipt", ReturnReceiptHeader);
-                end;
-            PostedSourceDoc::"Posted Transfer Shipment":
-                begin
-                    TransShipmentHeader.Reset();
-                    TransShipmentHeader.SetRange("No.", PostedSourceNo);
-                    PAGE.RunModal(PAGE::"Posted Transfer Shipment", TransShipmentHeader);
-                end;
-            PostedSourceDoc::"Posted Transfer Receipt":
-                begin
-                    TransReceiptHeader.Reset();
-                    TransReceiptHeader.SetRange("No.", PostedSourceNo);
-                    PAGE.RunModal(PAGE::"Posted Transfer Receipt", TransReceiptHeader);
-                end;
-            else
-                OnShowPostedSourceDoc(PostedSourceDoc.AsInteger(), PostedSourceNo);
-        end;
+        OnShowPostedSourceDoc(PostedSourceDoc.AsInteger(), PostedSourceNo);
     end;
 
     procedure ShowSourceDocCard(SourceType: Integer; SourceSubType: Option; SourceNo: Code[20])
     var
-        SalesHeader: Record "Sales Header";
-        PurchHeader: Record "Purchase Header";
-        TransHeader: Record "Transfer Header";
-        ProdOrder: Record "Production Order";
-        AssemblyHeader: Record "Assembly Header";
-        Job: Record Job;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1495,59 +1333,18 @@ then begin
         if IsHandled then
             exit;
 
-        case SourceType of
-            DATABASE::"Sales Line":
-                begin
-                    SalesHeader.SetRange("Document Type", SourceSubType);
-                    if SalesHeader.Get(SourceSubType, SourceNo) then
-                        if SalesHeader."Document Type" = SalesHeader."Document Type"::Order then
-                            PAGE.RunModal(PAGE::"Sales Order", SalesHeader)
-                        else
-                            PAGE.RunModal(PAGE::"Sales Return Order", SalesHeader);
-                end;
-            DATABASE::"Purchase Line":
-                begin
-                    PurchHeader.SetRange("Document Type", SourceSubType);
-                    if PurchHeader.Get(SourceSubType, SourceNo) then
-                        if PurchHeader."Document Type" = PurchHeader."Document Type"::Order then
-                            PAGE.RunModal(PAGE::"Purchase Order", PurchHeader)
-                        else
-                            PAGE.RunModal(PAGE::"Purchase Return Order", PurchHeader);
-                end;
-            DATABASE::"Transfer Line":
-                begin
-                    if TransHeader.Get(SourceNo) then
-                        PAGE.RunModal(PAGE::"Transfer Order", TransHeader);
-                end;
-            DATABASE::"Prod. Order Line", DATABASE::"Prod. Order Component":
-                begin
-                    ProdOrder.SetRange(Status, SourceSubType);
-                    if ProdOrder.Get(SourceSubType, SourceNo) then
-                        PAGE.RunModal(PAGE::"Released Production Order", ProdOrder);
-                end;
-            DATABASE::"Assembly Line":
-                begin
-                    AssemblyHeader.SetRange("Document Type", SourceSubType);
-                    if AssemblyHeader.Get(SourceSubType, SourceNo) then
-                        PAGE.RunModal(PAGE::"Assembly Order", AssemblyHeader);
-                end;
-            Database::Job:
-                if Job.Get(SourceNo) then
-                    Page.RunModal(Page::"Job Card", Job);
-            else
-                OnShowSourceDocCard(SourceType, SourceSubType, SourceNo);
-        end;
+        OnShowSourceDocCard(SourceType, SourceSubType, SourceNo);
     end;
 
-    local procedure TransferWhseItemTracking(var WhseJnlLine: Record "Warehouse Journal Line"; ItemJnlLine: Record "Item Journal Line")
+    procedure TransferWhseItemTracking(var WarehouseJournalLine: Record "Warehouse Journal Line"; ItemJournalLine: Record "Item Journal Line")
     var
         WhseItemTrackingSetup: Record "Item Tracking Setup";
         IsHandled: Boolean;
     begin
-        ItemTrackingMgt.GetWhseItemTrkgSetup(ItemJnlLine."Item No.", WhseItemTrackingSetup);
+        ItemTrackingMgt.GetWhseItemTrkgSetup(ItemJournalLine."Item No.", WhseItemTrackingSetup);
 
         IsHandled := false;
-        OnBeforeTransferWhseItemTracking(WhseJnlLine, ItemJnlLine, WhseItemTrackingSetup, IsHandled);
+        OnBeforeTransferWhseItemTracking(WarehouseJournalLine, ItemJournalLine, WhseItemTrackingSetup, IsHandled);
         if IsHandled then
             exit;
 
@@ -1555,41 +1352,41 @@ then begin
             exit;
 
         if WhseItemTrackingSetup."Serial No. Required" then
-            WhseJnlLine.TestField("Qty. per Unit of Measure", 1);
+            WarehouseJournalLine.TestField("Qty. per Unit of Measure", 1);
 
-        WhseItemTrackingSetup.CopyTrackingFromItemJnlLine(ItemJnlLine);
-        WhseJnlLine.CopyTrackingFromItemTrackingSetupIfRequired(WhseItemTrackingSetup);
-        WhseJnlLine."Warranty Date" := ItemJnlLine."Warranty Date";
-        WhseJnlLine."Expiration Date" := ItemJnlLine."Item Expiration Date";
+        WhseItemTrackingSetup.CopyTrackingFromItemJnlLine(ItemJournalLine);
+        WarehouseJournalLine.CopyTrackingFromItemTrackingSetupIfRequired(WhseItemTrackingSetup);
+        WarehouseJournalLine."Warranty Date" := ItemJournalLine."Warranty Date";
+        WarehouseJournalLine."Expiration Date" := ItemJournalLine."Item Expiration Date";
 
-        OnAfterTransferWhseItemTrkg(WhseJnlLine, ItemJnlLine);
+        OnAfterTransferWhseItemTrkg(WarehouseJournalLine, ItemJournalLine);
     end;
 
-    procedure SetTransferLine(TransferLine: Record "Transfer Line"; var WhseJnlLine: Record "Warehouse Journal Line"; PostingType: Option Shipment,Receipt; PostedDocNo: Code[20])
+    procedure SetTransferLine(TransferLine: Record "Transfer Line"; var WarehouseJournalLine: Record "Warehouse Journal Line"; PostingType: Option Shipment,Receipt; PostedDocNo: Code[20])
     begin
         with TransferLine do begin
-            WhseJnlLine.SetSource(DATABASE::"Transfer Line", PostingType, "Document No.", "Line No.", 0);
-            WhseJnlLine."Source Document" := WhseMgt.GetWhseJnlSourceDocument(WhseJnlLine."Source Type", WhseJnlLine."Source Subtype");
+            WarehouseJournalLine.SetSource(Enum::TableID::"Transfer Line".AsInteger(), PostingType, "Document No.", "Line No.", 0);
+            WarehouseJournalLine."Source Document" := WhseManagement.GetWhseJnlSourceDocument(WarehouseJournalLine."Source Type", WarehouseJournalLine."Source Subtype");
             if PostingType = PostingType::Shipment then
-                WhseJnlLine."Reference Document" := WhseJnlLine."Reference Document"::"Posted T. Shipment"
+                WarehouseJournalLine."Reference Document" := WarehouseJournalLine."Reference Document"::"Posted T. Shipment"
             else
-                WhseJnlLine."Reference Document" := WhseJnlLine."Reference Document"::"Posted T. Receipt";
-            WhseJnlLine."Reference No." := PostedDocNo;
-            WhseJnlLine."Entry Type" := PostingType;
+                WarehouseJournalLine."Reference Document" := WarehouseJournalLine."Reference Document"::"Posted T. Receipt";
+            WarehouseJournalLine."Reference No." := PostedDocNo;
+            WarehouseJournalLine."Entry Type" := PostingType;
         end;
     end;
 
-    local procedure SetZoneAndBins(ItemJnlLine: Record "Item Journal Line"; var WhseJnlLine: Record "Warehouse Journal Line"; ToTransfer: Boolean)
+    local procedure SetZoneAndBins(ItemJournalLine: Record "Item Journal Line"; var WarehouseJournalLine: Record "Warehouse Journal Line"; ToTransfer: Boolean)
     var
         IsDirectedPutAwayAndPick: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSetZoneAndBins(ItemJnlLine, WhseJnlLine, ToTransfer, IsHandled);
+        OnBeforeSetZoneAndBins(ItemJournalLine, WarehouseJournalLine, ToTransfer, IsHandled);
         if IsHandled then
             exit;
 
-        with ItemJnlLine do
+        with ItemJournalLine do
             if (("Entry Type" in
                  ["Entry Type"::Purchase, "Entry Type"::"Positive Adjmt.", "Entry Type"::"Assembly Output"]) and
                 (Quantity > 0)) or
@@ -1599,23 +1396,23 @@ then begin
                ToTransfer
             then begin
                 if "Entry Type" = "Entry Type"::Transfer then
-                    WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::Movement
+                    WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::Movement
                 else
-                    WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Positive Adjmt.";
+                    WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::"Positive Adjmt.";
                 IsDirectedPutAwayAndPick := Location."Directed Put-away and Pick";
-                OnSetZoneAndBinsOnAfterCalcIsDirectedPutAwayAndPick(ItemJnlLine, Location, IsDirectedPutAwayAndPick);
+                OnSetZoneAndBinsOnAfterCalcIsDirectedPutAwayAndPick(ItemJournalLine, Location, IsDirectedPutAwayAndPick);
                 if IsDirectedPutAwayAndPick then
                     if "Entry Type" in ["Entry Type"::"Assembly Output", "Entry Type"::"Assembly Consumption"] then
-                        WhseJnlLine."To Bin Code" := "Bin Code"
+                        WarehouseJournalLine."To Bin Code" := "Bin Code"
                     else
-                        WhseJnlLine."To Bin Code" := GetWhseJnlLineBinCode("Source Code", "Bin Code", Location."Adjustment Bin Code")
+                        WarehouseJournalLine."To Bin Code" := GetWhseJnlLineBinCode("Source Code", "Bin Code", Location."Adjustment Bin Code")
                 else
                     if ToTransfer then
-                        WhseJnlLine."To Bin Code" := "New Bin Code"
+                        WarehouseJournalLine."To Bin Code" := "New Bin Code"
                     else
-                        WhseJnlLine."To Bin Code" := "Bin Code";
-                GetBin("Location Code", WhseJnlLine."To Bin Code");
-                WhseJnlLine."To Zone Code" := Bin."Zone Code";
+                        WarehouseJournalLine."To Bin Code" := "Bin Code";
+                GetBin("Location Code", WarehouseJournalLine."To Bin Code");
+                WarehouseJournalLine."To Zone Code" := Bin."Zone Code";
             end else
                 if (("Entry Type" in
                      ["Entry Type"::Purchase, "Entry Type"::"Positive Adjmt.", "Entry Type"::"Assembly Output"]) and
@@ -1626,132 +1423,42 @@ then begin
                    (("Entry Type" = "Entry Type"::Transfer) and (not ToTransfer))
                 then begin
                     if "Entry Type" = "Entry Type"::Transfer then
-                        WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::Movement
+                        WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::Movement
                     else
-                        WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Negative Adjmt.";
+                        WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::"Negative Adjmt.";
                     IsDirectedPutAwayAndPick := Location."Directed Put-away and Pick";
-                    OnSetZoneAndBinsOnAfterCalcIsDirectedPutAwayAndPick(ItemJnlLine, Location, IsDirectedPutAwayAndPick);
+                    OnSetZoneAndBinsOnAfterCalcIsDirectedPutAwayAndPick(ItemJournalLine, Location, IsDirectedPutAwayAndPick);
                     if IsDirectedPutAwayAndPick then
                         if "Entry Type" in ["Entry Type"::"Assembly Output", "Entry Type"::"Assembly Consumption"] then
-                            WhseJnlLine."From Bin Code" := "Bin Code"
+                            WarehouseJournalLine."From Bin Code" := "Bin Code"
                         else
-                            WhseJnlLine."From Bin Code" := GetWhseJnlLineBinCode("Source Code", "Bin Code", Location."Adjustment Bin Code")
+                            WarehouseJournalLine."From Bin Code" := GetWhseJnlLineBinCode("Source Code", "Bin Code", Location."Adjustment Bin Code")
                     else
-                        WhseJnlLine."From Bin Code" := "Bin Code";
+                        WarehouseJournalLine."From Bin Code" := "Bin Code";
                     if Location."Directed Put-away and Pick" then begin
-                        GetBin("Location Code", WhseJnlLine."From Bin Code");
-                        WhseJnlLine."From Zone Code" := Bin."Zone Code";
-                        WhseJnlLine."From Bin Type Code" := Bin."Bin Type Code";
+                        GetBin("Location Code", WarehouseJournalLine."From Bin Code");
+                        WarehouseJournalLine."From Zone Code" := Bin."Zone Code";
+                        WarehouseJournalLine."From Bin Type Code" := Bin."Bin Type Code";
                     end;
                 end else
                     if "Phys. Inventory" and (Quantity = 0) and ("Invoiced Quantity" = 0) then begin
-                        WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Positive Adjmt.";
+                        WarehouseJournalLine."Entry Type" := WarehouseJournalLine."Entry Type"::"Positive Adjmt.";
                         if Location."Directed Put-away and Pick" then
-                            WhseJnlLine."To Bin Code" := Location."Adjustment Bin Code"
+                            WarehouseJournalLine."To Bin Code" := Location."Adjustment Bin Code"
                         else
-                            WhseJnlLine."To Bin Code" := "Bin Code";
-                        GetBin("Location Code", WhseJnlLine."To Bin Code");
-                        WhseJnlLine."To Zone Code" := Bin."Zone Code";
+                            WarehouseJournalLine."To Bin Code" := "Bin Code";
+                        GetBin("Location Code", WarehouseJournalLine."To Bin Code");
+                        WarehouseJournalLine."To Zone Code" := Bin."Zone Code";
                     end;
 
-        OnAfterSetZoneAndBins(WhseJnlLine, ItemJnlLine, Location, Bin);
-    end;
-
-    local procedure SetZoneAndBinsForOutput(ItemJnlLine: Record "Item Journal Line"; var WhseJnlLine: Record "Warehouse Journal Line")
-    begin
-        with ItemJnlLine do
-            if "Output Quantity" >= 0 then begin
-                WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Positive Adjmt.";
-                WhseJnlLine."To Bin Code" := "Bin Code";
-                if Location."Directed Put-away and Pick" then begin
-                    GetBin("Location Code", WhseJnlLine."To Bin Code");
-                    WhseJnlLine."To Zone Code" := Bin."Zone Code";
-                end;
-            end else begin
-                WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Negative Adjmt.";
-                WhseJnlLine."From Bin Code" := "Bin Code";
-                if Location."Directed Put-away and Pick" then begin
-                    GetBin("Location Code", WhseJnlLine."From Bin Code");
-                    WhseJnlLine."From Zone Code" := Bin."Zone Code";
-                end;
-            end;
-    end;
-
-    local procedure SetZoneAndBinsForConsumption(ItemJnlLine: Record "Item Journal Line"; var WhseJnlLine: Record "Warehouse Journal Line")
-    var
-        ProdOrderCompLine: Record "Prod. Order Component";
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeSetZoneAndBinsForConsumption(ItemJnlLine, ProdOrderCompLine, WhseJnlLine, Location, IsHandled);
-        if IsHandled then
-            exit;
-
-        with ItemJnlLine do
-            if GetProdOrderCompLine(
-                 ProdOrderCompLine, ProdOrderCompLine.Status::Released, "Order No.", "Order Line No.", "Prod. Order Comp. Line No.")
-            then
-                if Quantity > 0 then begin
-                    WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Negative Adjmt.";
-                    WhseJnlLine."From Bin Code" := "Bin Code";
-                    if Location."Bin Mandatory" and Location."Require Pick" and Location."Require Shipment" then begin
-                        OnSetZoneAndBinsForConsumptionOnBeforeCheckQtyPicked(ItemJnlLine, ProdOrderCompLine);
-                        if (ProdOrderCompLine."Planning Level Code" = 0) and
-                           ((ProdOrderCompLine."Flushing Method" = ProdOrderCompLine."Flushing Method"::Manual) or
-                            (ProdOrderCompLine."Flushing Method" = ProdOrderCompLine."Flushing Method"::"Pick + Backward") or
-                            ((ProdOrderCompLine."Flushing Method" = ProdOrderCompLine."Flushing Method"::"Pick + Forward") and
-                             (ProdOrderCompLine."Routing Link Code" <> '')))
-                        then
-                            CheckProdOrderCompLineQtyPickedBase(ProdOrderCompLine, ItemJnlLine);
-                        GetBin("Location Code", WhseJnlLine."From Bin Code");
-                        WhseJnlLine."From Zone Code" := Bin."Zone Code";
-                        WhseJnlLine."From Bin Type Code" := Bin."Bin Type Code";
-                    end;
-                end else begin
-                    WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Positive Adjmt.";
-                    WhseJnlLine."To Bin Code" := "Bin Code";
-                    if Location."Directed Put-away and Pick" then begin
-                        GetBin("Location Code", WhseJnlLine."To Bin Code");
-                        WhseJnlLine."To Zone Code" := Bin."Zone Code";
-                    end;
-                end
-            else
-                if Quantity > 0 then begin
-                    WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Negative Adjmt.";
-                    WhseJnlLine."From Bin Code" := "Bin Code";
-                    if Location."Directed Put-away and Pick" then begin
-                        GetBin("Location Code", WhseJnlLine."From Bin Code");
-                        WhseJnlLine."From Zone Code" := Bin."Zone Code";
-                        WhseJnlLine."From Bin Type Code" := Bin."Bin Type Code";
-                    end;
-                end else begin
-                    WhseJnlLine."Entry Type" := WhseJnlLine."Entry Type"::"Positive Adjmt.";
-                    WhseJnlLine."To Bin Code" := "Bin Code";
-                    if Location."Directed Put-away and Pick" then begin
-                        GetBin("Location Code", WhseJnlLine."To Bin Code");
-                        WhseJnlLine."To Zone Code" := Bin."Zone Code";
-                    end;
-                end;
-    end;
-
-    local procedure CheckProdOrderCompLineQtyPickedBase(var ProdOrderCompLine: Record "Prod. Order Component"; ItemJnlLine: Record "Item Journal Line")
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCheckProdOrderCompLineQtyPickedBase(ProdOrderCompLine, ItemJnlLine, IsHandled);
-        if IsHandled then
-            exit;
-
-        if ProdOrderCompLine."Qty. Picked (Base)" < ItemJnlLine."Quantity (Base)" then
-            ProdOrderCompLine.FieldError("Qty. Picked (Base)");
+        OnAfterSetZoneAndBins(WarehouseJournalLine, ItemJournalLine, Location, Bin);
     end;
 
     procedure SerialNoOnInventory(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; SerialNo: Code[50]): Boolean
     var
-        WhseEntry: Record "Warehouse Entry";
+        WarehouseEntry: Record "Warehouse Entry";
     begin
-        with WhseEntry do begin
+        with WarehouseEntry do begin
             GetLocation(LocationCode);
             SetCurrentKey(
               "Item No.", "Bin Code", "Location Code", "Variant Code",
@@ -1798,17 +1505,17 @@ then begin
 
     procedure BinLookUp(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; ZoneCode: Code[10]): Code[20]
     var
-        Bin: Record Bin;
+        Bin2: Record Bin;
     begin
-        Bin.SetRange("Location Code", LocationCode);
-        Bin.SetRange("Item Filter", ItemNo);
-        Bin.SetRange("Variant Filter", VariantCode);
+        Bin2.SetRange("Location Code", LocationCode);
+        Bin2.SetRange("Item Filter", ItemNo);
+        Bin2.SetRange("Variant Filter", VariantCode);
         if ZoneCode <> '' then
-            Bin.SetRange("Zone Code", ZoneCode);
+            Bin2.SetRange("Zone Code", ZoneCode);
 
-        OnBinLookUpOnAfterSetFilters(Bin);
-        if PAGE.RunModal(0, Bin) = ACTION::LookupOK then
-            exit(Bin.Code);
+        OnBinLookUpOnAfterSetFilters(Bin2);
+        if PAGE.RunModal(0, Bin2) = ACTION::LookupOK then
+            exit(Bin2.Code);
     end;
 
     procedure BinContentLookUp(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; ZoneCode: Code[10]; CurrBinCode: Code[20]): Code[20]
@@ -1887,7 +1594,7 @@ then begin
         ReservEntry.SetCurrentKey(
           "Source ID", "Source Ref. No.", "Source Type", "Source Subtype",
           "Source Batch Name", "Source Prod. Order Line", "Reservation Status");
-        if SourceType = DATABASE::"Prod. Order Component" then begin
+        if SourceType = Enum::TableID::"Prod. Order Component".AsInteger() then begin
             ReservEntry.SetSourceFilter(SourceType, SourceSubType, SourceNo, SourceSubLineNo, true);
             ReservEntry.SetSourceFilter('', SourceLineNo);
         end else begin
@@ -1909,51 +1616,51 @@ then begin
         exit(
             GetCaptionClass(
                 "Warehouse Destination Type".FromInteger(DestType),
-                "Warehouse Activity Source Document".FromInteger(SourceDoc), Selection));
+                Enum::"Warehouse Activity Source Document".FromInteger(SourceDoc), Selection));
     end;
 
     procedure GetCaptionClass(DestType: Enum "Warehouse Destination Type"; SourceDoc: Enum "Warehouse Activity Source Document";
                                             Selection: Integer): Text[50]
     var
-        PurchHeader: Record "Purchase Header";
+        PurchaseHeader: Record "Purchase Header";
         Vendor: Record Vendor;
         Customer: Record Customer;
-        Location: Record Location;
-        Item: Record Item;
+        Location2: Record Location;
+        Item2: Record Item;
         Family: Record Family;
         SalesHeader: Record "Sales Header";
-        WhseActivHdr: Record "Warehouse Activity Header";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
     begin
         case Selection of
             0:
                 case DestType of
                     DestType::Vendor:
-                        exit(Vendor.TableCaption + ' ' + Vendor.FieldCaption("No."));
+                        exit(Vendor.TableCaption() + ' ' + Vendor.FieldCaption("No."));
                     DestType::Customer:
-                        exit(Customer.TableCaption + ' ' + Customer.FieldCaption("No."));
+                        exit(Customer.TableCaption() + ' ' + Customer.FieldCaption("No."));
                     DestType::Location:
-                        exit(Location.TableCaption + ' ' + Location.FieldCaption(Code));
+                        exit(Location2.TableCaption() + ' ' + Location2.FieldCaption(Code));
                     DestType::Item:
-                        exit(Item.TableCaption + ' ' + Item.FieldCaption("No."));
+                        exit(Item2.TableCaption() + ' ' + Item2.FieldCaption("No."));
                     DestType::Family:
-                        exit(Family.TableCaption + ' ' + Family.FieldCaption("No."));
+                        exit(Family.TableCaption() + ' ' + Family.FieldCaption("No."));
                     DestType::"Sales Order":
                         exit(Text009 + ' ' + SalesHeader.FieldCaption("No."));
                     else
-                        exit(WhseActivHdr.FieldCaption("Destination No."));
+                        exit(CopyStr(WarehouseActivityHeader.FieldCaption("Destination No."), 1, 50));
                 end;
             1:
                 case DestType of
                     DestType::Vendor:
-                        exit(Vendor.TableCaption + ' ' + Vendor.FieldCaption(Name));
+                        exit(Vendor.TableCaption() + ' ' + Vendor.FieldCaption(Name));
                     DestType::Customer:
-                        exit(Customer.TableCaption + ' ' + Customer.FieldCaption(Name));
+                        exit(Customer.TableCaption() + ' ' + Customer.FieldCaption(Name));
                     DestType::Location:
-                        exit(Location.TableCaption + ' ' + Location.FieldCaption(Name));
+                        exit(Location2.TableCaption() + ' ' + Location2.FieldCaption(Name));
                     DestType::Item:
-                        exit(Item.TableCaption + ' ' + Item.FieldCaption(Description));
+                        exit(Item2.TableCaption() + ' ' + Item2.FieldCaption(Description));
                     DestType::Family:
-                        exit(Family.TableCaption + ' ' + Family.FieldCaption(Description));
+                        exit(Family.TableCaption() + ' ' + Family.FieldCaption(Description));
                     DestType::"Sales Order":
                         exit(Text009 + ' ' + SalesHeader.FieldCaption("Sell-to Customer Name"));
                     else
@@ -1964,17 +1671,17 @@ then begin
                                  SourceDoc::"Purchase Order",
                                  SourceDoc::"Purchase Return Order"]
                 then
-                    exit(PurchHeader.FieldCaption("Vendor Shipment No."))
+                    exit(CopyStr(PurchaseHeader.FieldCaption("Vendor Shipment No."), 1, 50))
                 else
-                    exit(WhseActivHdr.FieldCaption("External Document No."));
+                    exit(CopyStr(WarehouseActivityHeader.FieldCaption("External Document No."), 1, 50));
             3:
                 case SourceDoc of
                     SourceDoc::"Purchase Order":
-                        exit(PurchHeader.FieldCaption("Vendor Invoice No."));
+                        exit(CopyStr(PurchaseHeader.FieldCaption("Vendor Invoice No."), 1, 50));
                     SourceDoc::"Purchase Return Order":
-                        exit(PurchHeader.FieldCaption("Vendor Cr. Memo No."));
+                        exit(CopyStr(PurchaseHeader.FieldCaption("Vendor Cr. Memo No."), 1, 50));
                     else
-                        exit(WhseActivHdr.FieldCaption("External Document No.2"));
+                        exit(CopyStr(WarehouseActivityHeader.FieldCaption("External Document No.2"), 1, 50));
                 end;
         end;
     end;
@@ -1983,8 +1690,8 @@ then begin
     var
         Vendor: Record Vendor;
         Customer: Record Customer;
-        Location: Record Location;
-        Item: Record Item;
+        Location2: Record Location;
+        Item2: Record Item;
         Family: Record Family;
         SalesHeader: Record "Sales Header";
         DestinationEntityName: Text[100];
@@ -1997,11 +1704,11 @@ then begin
                 if Vendor.Get(DestNo) then
                     exit(Vendor.Name);
             DestinationType::Location:
-                if Location.Get(DestNo) then
-                    exit(Location.Name);
+                if Location2.Get(DestNo) then
+                    exit(Location2.Name);
             DestinationType::Item:
-                if Item.Get(DestNo) then
-                    exit(Item.Description);
+                if Item2.Get(DestNo) then
+                    exit(Item2.Description);
             DestinationType::Family:
                 if Family.Get(DestNo) then
                     exit(Family.Description);
@@ -2018,17 +1725,17 @@ then begin
 
     procedure GetATOSalesLine(SourceType: Integer; SourceSubtype: Option; SourceID: Code[20]; SourceRefNo: Integer; var SalesLine: Record "Sales Line"): Boolean
     begin
-        if SourceType <> DATABASE::"Sales Line" then
+        if SourceType <> Enum::TableID::"Sales Line".AsInteger() then
             exit(false);
         if SalesLine.Get(SourceSubtype, SourceID, SourceRefNo) then
             exit(SalesLine."Qty. to Asm. to Order (Base)" <> 0);
     end;
 
-    local procedure SetFiltersOnATOInvtPick(SalesLine: Record "Sales Line"; var WhseActivityLine: Record "Warehouse Activity Line")
+    local procedure SetFiltersOnATOInvtPick(SalesLine: Record "Sales Line"; var WarehouseActivityLine: Record "Warehouse Activity Line")
     begin
-        with WhseActivityLine do begin
+        with WarehouseActivityLine do begin
             SetRange("Activity Type", "Activity Type"::"Invt. Pick");
-            SetSourceFilter(DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", 0, false);
+            SetSourceFilter(Enum::TableID::"Sales Line".AsInteger(), SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", 0, false);
             SetRange("Assemble to Order", true);
             SetTrackingFilterIfNotEmpty();
         end;
@@ -2036,22 +1743,22 @@ then begin
 
     procedure ATOInvtPickExists(SalesLine: Record "Sales Line"): Boolean
     var
-        WhseActivityLine: Record "Warehouse Activity Line";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
     begin
-        SetFiltersOnATOInvtPick(SalesLine, WhseActivityLine);
-        exit(not WhseActivityLine.IsEmpty);
+        SetFiltersOnATOInvtPick(SalesLine, WarehouseActivityLine);
+        exit(not WarehouseActivityLine.IsEmpty);
     end;
 
     procedure CalcQtyBaseOnATOInvtPick(SalesLine: Record "Sales Line"; WhseItemTrackingSetup: Record "Item Tracking Setup") QtyBase: Decimal
     var
-        WhseActivityLine: Record "Warehouse Activity Line";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
     begin
-        WhseActivityLine.CopyTrackingFromItemTrackingSetup(WhseItemTrackingSetup);
-        SetFiltersOnATOInvtPick(SalesLine, WhseActivityLine);
-        if WhseActivityLine.FindSet() then
+        WarehouseActivityLine.CopyTrackingFromItemTrackingSetup(WhseItemTrackingSetup);
+        SetFiltersOnATOInvtPick(SalesLine, WarehouseActivityLine);
+        if WarehouseActivityLine.FindSet() then
             repeat
-                QtyBase += WhseActivityLine."Qty. Outstanding (Base)";
-            until WhseActivityLine.Next() = 0;
+                QtyBase += WarehouseActivityLine."Qty. Outstanding (Base)";
+            until WarehouseActivityLine.Next() = 0;
     end;
 
     procedure CheckOutboundBlockedBin(LocationCode: Code[10]; BinCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10])
@@ -2064,20 +1771,20 @@ then begin
         CheckBlockedBin(LocationCode, BinCode, ItemNo, VariantCode, UnitOfMeasureCode, true);
     end;
 
-    local procedure SetFiltersOnATOWhseShpt(SalesLine: Record "Sales Line"; var WhseShptLine: Record "Warehouse Shipment Line")
+    local procedure SetFiltersOnATOWhseShpt(SalesLine: Record "Sales Line"; var WarehouseShipmentLine: Record "Warehouse Shipment Line")
     begin
-        with WhseShptLine do begin
-            SetSourceFilter(DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", false);
+        with WarehouseShipmentLine do begin
+            SetSourceFilter(Enum::TableID::"Sales Line".AsInteger(), SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", false);
             SetRange("Assemble to Order", true);
         end;
     end;
 
     procedure ATOWhseShptExists(SalesLine: Record "Sales Line"): Boolean
     var
-        WhseShptLine: Record "Warehouse Shipment Line";
+        WarehouseShipmentLine: Record "Warehouse Shipment Line";
     begin
-        SetFiltersOnATOWhseShpt(SalesLine, WhseShptLine);
-        exit(not WhseShptLine.IsEmpty);
+        SetFiltersOnATOWhseShpt(SalesLine, WarehouseShipmentLine);
+        exit(not WarehouseShipmentLine.IsEmpty());
     end;
 
     local procedure CheckBlockedBin(LocationCode: Code[10]; BinCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; CheckInbound: Boolean)
@@ -2122,110 +1829,65 @@ then begin
         OnAfterGetWhseJnlLineBinCode(SourceCode, BinCode, AdjBinCode, SourceCodeSetup, Result);
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     procedure GetLastOperationLocationCode(RoutingNo: Code[20]; RoutingVersionCode: Code[20]): Code[10]
     var
-        RoutingLine: Record "Routing Line";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
-        with RoutingLine do begin
-            SetRange("Routing No.", RoutingNo);
-            SetRange("Version Code", RoutingVersionCode);
-            if FindLast() then
-                exit(GetProdCenterLocationCode(Type, "No."));
-        end;
+        exit(ProdOrderWarehouseMgt.GetLastOperationLocationCode(RoutingNo, RoutingVersionCode));
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     procedure GetLastOperationFromBinCode(RoutingNo: Code[20]; RoutingVersionCode: Code[20]; LocationCode: Code[10]; UseFlushingMethod: Boolean; FlushingMethod: Option Manual,Forward,Backward,"Pick + Forward","Pick + Backward"): Code[20]
     var
-        RoutingLine: Record "Routing Line";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
-        with RoutingLine do begin
-            SetRange("Routing No.", RoutingNo);
-            SetRange("Version Code", RoutingVersionCode);
-            if FindLast() then
-                exit(GetProdCenterBinCode(Type, "No.", LocationCode, UseFlushingMethod, FlushingMethod));
-        end;
+        exit(ProdOrderWarehouseMgt.GetLastOperationFromBinCode(RoutingNo, RoutingVersionCode, LocationCode, UseFlushingMethod, FlushingMethod));
     end;
+#endif
 
-    procedure GetProdRoutingLastOperationFromBinCode(ProdOrderStatus: Enum "Production Order Status"; ProdOrderNo: Code[20];
-                                                                          RoutingRefNo: Integer;
-                                                                          RoutingNo: Code[20];
-                                                                          LocationCode: Code[10]): Code[20]
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
+    procedure GetProdRoutingLastOperationFromBinCode(ProdOrderStatus: Enum "Production Order Status"; ProdOrderNo: Code[20]; RoutingRefNo: Integer; RoutingNo: Code[20]; LocationCode: Code[10]): Code[20]
     var
-        ProdOrderRoutingLine: Record "Prod. Order Routing Line";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
-        ProdOrderRoutingLine.SetRange(Status, ProdOrderStatus);
-        ProdOrderRoutingLine.SetRange("Prod. Order No.", ProdOrderNo);
-        ProdOrderRoutingLine.SetRange("Routing Reference No.", RoutingRefNo);
-        ProdOrderRoutingLine.SetRange("Routing No.", RoutingNo);
-        if ProdOrderRoutingLine.FindLast() then
-            exit(GetProdCenterBinCode(ProdOrderRoutingLine.Type, ProdOrderRoutingLine."No.", LocationCode, false, 0));
+        ProdOrderWarehouseMgt.GetProdRoutingLastOperationFromBinCode(ProdOrderStatus, ProdOrderNo, RoutingRefNo, RoutingNo, LocationCode);
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     procedure GetPlanningRtngLastOperationFromBinCode(WkshTemplateName: Code[10]; WkshBatchName: Code[10]; WkshLineNo: Integer; LocationCode: Code[10]): Code[20]
     var
-        PlanningRoutingLine: Record "Planning Routing Line";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
-        with PlanningRoutingLine do begin
-            SetRange("Worksheet Template Name", WkshTemplateName);
-            SetRange("Worksheet Batch Name", WkshBatchName);
-            SetRange("Worksheet Line No.", WkshLineNo);
-            if FindLast() then
-                exit(GetProdCenterBinCode(Type, "No.", LocationCode, false, 0));
-        end;
+        exit(ProdOrderWarehouseMgt.GetPlanningRtngLastOperationFromBinCode(WkshTemplateName, WkshBatchName, WkshLineNo, LocationCode));
     end;
+#endif
 
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     procedure GetProdCenterLocationCode(Type: Enum "Capacity Type"; No: Code[20]): Code[10]
     var
-        WorkCenter: Record "Work Center";
-        MachineCenter: Record "Machine Center";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
-        case Type of
-            Type::"Work Center":
-                begin
-                    WorkCenter.Get(No);
-                    exit(WorkCenter."Location Code");
-                end;
-            Type::"Machine Center":
-                begin
-                    MachineCenter.Get(No);
-                    exit(MachineCenter."Location Code");
-                end;
-        end;
+        exit(ProdOrderWarehouseMgt.GetProdCenterLocationCode(Type, No));
     end;
+#endif
 
-    procedure GetProdCenterBinCode(Type: Enum "Capacity Type"; No: Code[20];
-                                             LocationCode: Code[10];
-                                             UseFlushingMethod: Boolean;
-                                             FlushingMethod: Option Manual,Forward,Backward,"Pick + Forward","Pick + Backward"): Code[20]
-    begin
-        case Type of
-            Type::"Work Center":
-                exit(GetWorkCenterBinCode(No, LocationCode, UseFlushingMethod, "Flushing Method".FromInteger(FlushingMethod)));
-            Type::"Machine Center":
-                exit(GetMachineCenterBinCode(No, LocationCode, UseFlushingMethod, "Flushing Method".FromInteger(FlushingMethod)));
-        end;
-    end;
-
-    local procedure GetMachineCenterBinCode(MachineCenterNo: Code[20]; LocationCode: Code[10]; UseFlushingMethod: Boolean; FlushingMethod: Enum "Flushing Method"): Code[20]
+#if not CLEAN23
+    [Obsolete('Replaced by same procedure in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
+    procedure GetProdCenterBinCode(Type: Enum "Capacity Type"; No: Code[20]; LocationCode: Code[10]; UseFlushingMethod: Boolean; FlushingMethod: Option Manual,Forward,Backward,"Pick + Forward","Pick + Backward"): Code[20]
     var
-        MachineCenter: Record "Machine Center";
+        ProdOrderWarehouseMgt: Codeunit "Prod. Order Warehouse Mgt.";
     begin
-        if MachineCenter.Get(MachineCenterNo) then begin
-            if MachineCenter."Location Code" = LocationCode then
-                exit(MachineCenter.GetBinCodeForFlushingMethod(UseFlushingMethod, FlushingMethod));
-
-            exit(GetWorkCenterBinCode(MachineCenter."Work Center No.", LocationCode, UseFlushingMethod, FlushingMethod));
-        end;
+        exit(ProdOrderWarehouseMgt.GetProdCenterBinCode(Type, No, LocationCode, UseFlushingMethod, FlushingMethod));
     end;
-
-    local procedure GetWorkCenterBinCode(WorkCenterNo: Code[20]; LocationCode: Code[10]; UseFlushingMethod: Boolean; FlushingMethod: Enum "Flushing Method"): Code[20]
-    var
-        WorkCenter: Record "Work Center";
-    begin
-        if WorkCenter.Get(WorkCenterNo) then
-            if WorkCenter."Location Code" = LocationCode then
-                exit(WorkCenter.GetBinCodeForFlushingMethod(UseFlushingMethod, FlushingMethod));
-    end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckBlockedBin(LocationCode: Code[10]; BinCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; CheckInbound: Boolean)
@@ -2247,15 +1909,31 @@ then begin
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateWhseJnlLineFromConsumJnl(var WhseJournalLine: Record "Warehouse Journal Line"; ItemJournalLine: Record "Item Journal Line")
+#if not CLEAN23
+    internal procedure RunOnAfterCreateWhseJnlLineFromConsumJnl(var WhseJournalLine: Record "Warehouse Journal Line"; ItemJournalLine: Record "Item Journal Line")
     begin
+        OnAfterCreateWhseJnlLineFromConsumJnl(WhseJournalLine, ItemJournalLine);
     end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnAfterCreateWhseJnlLineFromConsumptionJournal in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
+    local procedure OnAfterCreateWhseJnlLineFromConsumJnl(var WhseJournalLine: Record "Warehouse Journal Line"; ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnAfterCreateWhseJnlLineFromOutputJnl(var WhseJournalLine: Record "Warehouse Journal Line"; ItemJournalLine: Record "Item Journal Line")
+    begin
+        OnAfterCreateWhseJnlLineFromOutputJnl(WhseJournalLine, ItemJournalLine);
+    end;
+
+    [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnAfterCreateWhseJnlLineFromOutputJournal in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     local procedure OnAfterCreateWhseJnlLineFromOutputJnl(var WhseJournalLine: Record "Warehouse Journal Line"; ItemJournalLine: Record "Item Journal Line")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetWhseJnlLineBinCode(SourceCode: Code[10]; BinCode: Code[20]; AdjBinCode: Code[20]; SourceCodeSetup: Record "Source Code Setup"; var Result: Code[20])
@@ -2342,20 +2020,36 @@ then begin
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnBeforeCheckProdOrderCompLineQtyPickedBase(var ProdOrderCompLine: Record "Prod. Order Component"; ItemJnlLine: Record "Item Journal Line"; var IsHandled: Boolean)
+    begin
+        OnBeforeCheckProdOrderCompLineQtyPickedBase(ProdOrderCompLine, ItemJnlLine, IsHandled);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnBeforeCheckProdOrderComponentQtyPickedBase in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     local procedure OnBeforeCheckProdOrderCompLineQtyPickedBase(var ProdOrderCompLine: Record "Prod. Order Component"; ItemJnlLine: Record "Item Journal Line"; var IsHandled: Boolean)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeConfirmExceededCapacity(var IsHandled: Boolean; BinCode: Code[20]; CheckFieldCaption: Text[100]; CheckTableCaption: Text[100]; ValueToPutAway: Decimal; ValueAvailable: Decimal)
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnBeforeCreateWhseJnlLineFromOutputJnl(ItemJnlLine: Record "Item Journal Line")
+    begin
+        OnBeforeCreateWhseJnlLineFromOutputJnl(ItemJnlLine);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnBeforeCreateWhseJnlLineFromOutputJournal in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     local procedure OnBeforeCreateWhseJnlLineFromOutputJnl(ItemJnlLine: Record "Item Journal Line")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateWhseJnlLine(var ItemJnlLine: Record "Item Journal Line"; ItemJnlTemplateType: Option; var WhseJnlLine: Record "Warehouse Journal Line"; ToTransfer: Boolean; var IsHandled: Boolean)
@@ -2437,10 +2131,18 @@ then begin
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnCreateWhseJnlLineFromOutputJnlOnAfterInitWhseJnlLine(var WhseJnlLine: Record "Warehouse Journal Line"; var ItemJnlLine: Record "Item Journal Line")
+    begin
+        OnCreateWhseJnlLineFromOutputJnlOnAfterInitWhseJnlLine(WhseJnlLine, ItemJnlLine);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnCreateWhseJnlLineFromOutputJnlOnAfterInitWhseJnlLine in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     local procedure OnCreateWhseJnlLineFromOutputJnlOnAfterInitWhseJnlLine(var WhseJnlLine: Record "Warehouse Journal Line"; var ItemJnlLine: Record "Item Journal Line")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckWhseJnlLineTracking(var WhseJnlLine: Record "Warehouse Journal Line"; var IsHandled: Boolean)
@@ -2457,10 +2159,18 @@ then begin
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnSetZoneAndBinsForConsumptionOnBeforeCheckQtyPicked(ItemJournalLine: Record "Item Journal Line"; var ProdOrderComponent: Record "Prod. Order Component")
+    begin
+        OnSetZoneAndBinsForConsumptionOnBeforeCheckQtyPicked(ItemJournalLine, ProdOrderComponent);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by same event in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     local procedure OnSetZoneAndBinsForConsumptionOnBeforeCheckQtyPicked(ItemJournalLine: Record "Item Journal Line"; var ProdOrderComponent: Record "Prod. Order Component")
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnShowPostedSourceDoc(PostedSourceDoc: Option; PostedSourceNo: Code[20])
@@ -2472,35 +2182,83 @@ then begin
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnShowSourceDocLineOnBeforeShowSalesLines(var SalesLine: Record "Sales Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
+    begin
+        OnShowSourceDocLineOnBeforeShowSalesLines(SalesLine, SourceSubType, SourceNo, SourceLineNo, IsHandled);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnBeforeShowSalesLines() in codeunit "Service Warehouse Mgt."', '23.0')]
     local procedure OnShowSourceDocLineOnBeforeShowSalesLines(var SalesLine: Record "Sales Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnShowSourceDocLineOnBeforeShowPurchLines(var PurchLine: Record "Purchase Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
+    begin
+        OnShowSourceDocLineOnBeforeShowPurchLines(PurchLine, SourceSubType, SourceNo, SourceLineNo, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnBeforeShowPurchaseLines() in codeunit "Purchases Warehouse Mgt."', '23.0')]
     local procedure OnShowSourceDocLineOnBeforeShowPurchLines(var PurchLine: Record "Purchase Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnShowSourceDocLineOnBeforeShowServiceLines(var ServiceLine: Record "Service Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
+    begin
+        OnShowSourceDocLineOnBeforeShowServiceLines(ServiceLine, SourceSubType, SourceNo, SourceLineNo, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnBeforeShowServiceLines() in codeunit "Service Warehouse Mgt."', '23.0')]
     local procedure OnShowSourceDocLineOnBeforeShowServiceLines(var ServiceLine: Record "Service Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnShowSourceDocLineOnBeforeShowTransLines(var TransferLine: Record "Transfer Line"; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
+    begin
+        OnShowSourceDocLineOnBeforeShowTransLines(TransferLine, SourceNo, SourceLineNo, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnBeforeShowTransferLines() in codeunit "Transfer Warehouse Mgt."', '23.0')]
     local procedure OnShowSourceDocLineOnBeforeShowTransLines(var TransferLine: Record "Transfer Line"; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnShowSourceDocLineOnBeforeShowAssemblyLines(var AssemblyLine: Record "Assembly Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
+    begin
+        OnShowSourceDocLineOnBeforeShowAssemblyLines(AssemblyLine, SourceSubType, SourceNo, SourceLineNo, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnBeforeShowAssemblyLines() in codeunit "Assembly Warehouse Mgt."', '23.0')]
     local procedure OnShowSourceDocLineOnBeforeShowAssemblyLines(var AssemblyLine: Record "Assembly Line"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
+#endif
+
+#if not CLEAN23
+    internal procedure RunOnShowSourceDocLineOnBeforeShowProdOrderComp(var ProdOrderComp: Record "Prod. Order Component"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; SourceSubLineNo: Integer; var IsHandled: Boolean)
+    begin
+        OnShowSourceDocLineOnBeforeShowProdOrderComp(ProdOrderComp, SourceSubType, SourceNo, SourceLineNo, SourceSubLineNo, IsHandled);
+    end;
 
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnBeforeShowProdOrderComponents() in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     local procedure OnShowSourceDocLineOnBeforeShowProdOrderComp(var ProdOrderComp: Record "Prod. Order Component"; SourceSubType: Integer; SourceNo: Code[20]; SourceLineNo: Integer; SourceSubLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnShowSourceDocLine(SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer; SourceSubLineNo: Integer)
@@ -2517,10 +2275,18 @@ then begin
     begin
     end;
 
+#if not CLEAN23
+    internal procedure RunOnBeforeSetZoneAndBinsForConsumption(ItemJnlLine: Record "Item Journal Line"; var ProdOrderCompLine: Record "Prod. Order Component"; var WhseJnlLine: Record "Warehouse Journal Line"; Location: Record Location; var IsHandled: Boolean)
+    begin
+        OnBeforeSetZoneAndBinsForConsumption(ItemJnlLine, ProdOrderCompLine, WhseJnlLine, Location, IsHandled);
+    end;
+
     [IntegrationEvent(false, false)]
+    [Obsolete('Replaced by event OnBeforeSetZoneAndBinsForConsumption() in codeunit "Prod. Order Warehouse Mgt."', '23.0')]
     local procedure OnBeforeSetZoneAndBinsForConsumption(ItemJnlLine: Record "Item Journal Line"; var ProdOrderCompLine: Record "Prod. Order Component"; var WhseJnlLine: Record "Warehouse Journal Line"; Location: Record Location; var IsHandled: Boolean)
     begin
     end;
+#endif
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeTransferWhseItemTracking(var WarehouseJournalLine: Record "Warehouse Journal Line"; var ItemJournalLine: Record "Item Journal Line"; var ItemTrackingSetup: Record "Item Tracking Setup"; var IsHandled: Boolean)
@@ -2536,7 +2302,17 @@ then begin
     local procedure OnInitWhseJnlLineOnAfterGetQuantity(ItemJnlLine: Record "Item Journal Line"; var WhseJnlLine: Record "Warehouse Journal Line"; Location: Record Location)
     begin
     end;
-    
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowWhseActivityDocLine(WhseActivityDocType: Enum "Warehouse Activity Document Type"; WhseDocNo: Code[20]; WhseDocLineNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckIfBinIsEligible(ItemJournalLine: Record "Item Journal Line"; var BinIsEligible: Boolean)
+    begin
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcCubageAndWeight(ItemNo: Code[20]; UOMCode: Code[10]; Qty: Decimal; var Cubage: Decimal; var Weight: Decimal; var IsHandled: Boolean)
     begin

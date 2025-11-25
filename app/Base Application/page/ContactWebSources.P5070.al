@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5070 "Contact Web Sources"
 {
     Caption = 'Contact Web Sources';
@@ -62,7 +64,7 @@ page 5070 "Contact Web Sources"
 
                     trigger OnAction()
                     begin
-                        Launch();
+                        Rec.Launch();
                     end;
                 }
             }

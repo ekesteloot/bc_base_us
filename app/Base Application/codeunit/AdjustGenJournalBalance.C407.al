@@ -1,3 +1,7 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.FinancialMgt.Currency;
+
 codeunit 407 "Adjust Gen. Journal Balance"
 {
     TableNo = "Gen. Journal Line";
@@ -10,8 +14,8 @@ codeunit 407 "Adjust Gen. Journal Balance"
         TotalAmountLCY: Decimal;
     begin
         TempCurrTotalBuffer.DeleteAll();
-        GenJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-        GenJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
+        GenJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
+        GenJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
 
         with GenJnlLine do begin
             OnRunOnBeforeGenJnlLineFind(GenJnlLine);
@@ -57,7 +61,7 @@ codeunit 407 "Adjust Gen. Journal Balance"
                 if "Reason Code" <> PrevGenJnlLine."Reason Code" then
                     "Reason Code" := '';
                 if "Recurring Method" <> PrevGenJnlLine."Recurring Method" then
-                    "Recurring Method" := "Gen. Journal Recurring Method"::" ";
+                    "Recurring Method" := "Recurring Method"::" ";
                 if "Recurring Frequency" <> PrevGenJnlLine."Recurring Frequency" then
                     Evaluate("Recurring Frequency", '<>');
 

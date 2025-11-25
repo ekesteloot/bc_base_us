@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.History;
+
+using Microsoft.ServiceMgt.Document;
+
 codeunit 9086 "Calc. Service Hist Fact Box"
 {
     trigger OnRun()

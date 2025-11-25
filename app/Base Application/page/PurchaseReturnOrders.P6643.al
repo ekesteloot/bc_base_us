@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 page 6643 "Purchase Return Orders"
 {
     Caption = 'Purchase Return Orders';
@@ -5,7 +9,7 @@ page 6643 "Purchase Return Orders"
     Editable = false;
     PageType = List;
     SourceTable = "Purchase Line";
-    SourceTableView = WHERE("Document Type" = FILTER("Return Order"));
+    SourceTableView = where("Document Type" = filter("Return Order"));
 
     layout
     {
@@ -117,8 +121,8 @@ page 6643 "Purchase Return Orders"
                     Caption = 'Show Document';
                     Image = View;
                     RunObject = Page "Purchase Return Order";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("Document No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("Document No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the document that the selected line exists on.';
                 }
@@ -132,7 +136,7 @@ page 6643 "Purchase Return Orders"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
             }

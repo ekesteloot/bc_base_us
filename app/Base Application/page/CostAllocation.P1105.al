@@ -1,3 +1,8 @@
+namespace Microsoft.CostAccounting.Allocation;
+
+using Microsoft.CostAccounting.Ledger;
+using System.Security.User;
+
 page 1105 "Cost Allocation"
 {
     Caption = 'Cost Allocation';
@@ -11,12 +16,12 @@ page 1105 "Cost Allocation"
             group(General)
             {
                 Caption = 'General';
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the ID that applies to the cost allocation.';
                 }
-                field(Level; Level)
+                field(Level; Rec.Level)
                 {
                     ApplicationArea = CostAccounting;
                     Importance = Promoted;
@@ -34,7 +39,7 @@ page 1105 "Cost Allocation"
                     Importance = Promoted;
                     ToolTip = 'Specifies the date that the cost allocation ends.';
                 }
-                field(Variant; Variant)
+                field(Variant; Rec.Variant)
                 {
                     ApplicationArea = CostAccounting;
                     Importance = Promoted;
@@ -60,7 +65,7 @@ page 1105 "Cost Allocation"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the cost type to which the credit posting is posted. The costs that are allocated are credited to the source cost center. It is useful to set up a helping cost type to later identify the allocation postings in the statistics and reports.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -69,7 +74,7 @@ page 1105 "Cost Allocation"
             part(AllocTarget; "Cost Allocation Target")
             {
                 ApplicationArea = CostAccounting;
-                SubPageLink = ID = FIELD(ID);
+                SubPageLink = ID = field(ID);
             }
             group(Statistics)
             {
@@ -94,10 +99,10 @@ page 1105 "Cost Allocation"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies a comment that applies to the cost allocation.';
@@ -128,8 +133,8 @@ page 1105 "Cost Allocation"
                     Caption = 'Cost E&ntries';
                     Image = CostEntries;
                     RunObject = Page "Cost Entries";
-                    RunPageLink = "Allocation ID" = FIELD(ID);
-                    RunPageView = SORTING("Allocation ID", "Posting Date");
+                    RunPageLink = "Allocation ID" = field(ID);
+                    RunPageView = sorting("Allocation ID", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View cost entries, which can come from sources such as automatic transfer of general ledger entries to cost entries, manual posting for pure cost entries, internal charges, and manual allocations, and automatic allocation postings for actual costs.';
                 }

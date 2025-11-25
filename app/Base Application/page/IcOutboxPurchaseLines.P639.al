@@ -1,3 +1,7 @@
+namespace Microsoft.Intercompany.Outbox;
+
+using Microsoft.FinancialMgt.Dimension;
+
 page 639 "IC Outbox Purchase Lines"
 {
     Caption = 'Lines';
@@ -116,7 +120,7 @@ page 639 "IC Outbox Purchase Lines"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
             }

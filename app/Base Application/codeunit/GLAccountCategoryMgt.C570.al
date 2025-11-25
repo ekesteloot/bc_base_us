@@ -1,3 +1,8 @@
+﻿namespace Microsoft.FinancialMgt.GeneralLedger.Account;
+
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 codeunit 570 "G/L Account Category Mgt."
 {
 

@@ -1,3 +1,9 @@
+﻿namespace System.Security.User;
+
+using System.Azure.Identity;
+using System.Environment;
+using System.Security.AccessControl;
+
 page 9818 "User Security Status List"
 {
     AccessByPermission = TableData User = R;
@@ -9,7 +15,7 @@ page 9818 "User Security Status List"
     RefreshOnActivate = true;
     ShowFilter = false;
     SourceTable = "User Security Status";
-    SourceTableView = WHERE("User Security ID" = FILTER(<> '{00000000-0000-0000-0000-000000000000}'));
+    SourceTableView = where("User Security ID" = filter(<> '{00000000-0000-0000-0000-000000000000}'));
     UsageCategory = Lists;
 
     layout
@@ -23,7 +29,7 @@ page 9818 "User Security Status List"
                     ApplicationArea = All;
                     Editable = false;
                     Style = Strong;
-                    StyleExpr = NOT Reviewed;
+                    StyleExpr = NOT Rec.Reviewed;
                     ToolTip = 'Specifies the user''s name. If the user is required to present credentials when starting the client, this is the name that the user must present.';
                 }
                 field("Full Name"; Rec."Full Name")
@@ -32,7 +38,7 @@ page 9818 "User Security Status List"
                     Editable = false;
                     ToolTip = 'Specifies the full name of the user.';
                 }
-                field(Reviewed; Reviewed)
+                field(Reviewed; Rec.Reviewed)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if an administrator has reviewed this new user. When a new user is created, this field is empty to indicate that the user must be set up.';
@@ -57,7 +63,7 @@ page 9818 "User Security Status List"
                     ApplicationArea = Basic, Suite;
                     Editable = false;
                     Style = Attention;
-                    StyleExpr = NOT "Belongs to User Group";
+                    StyleExpr = NOT Rec."Belongs to User Group";
                     ToolTip = 'Specifies that the user is assigned to a user group.';
                     Visible = LegacyUserGroupsVisible;
                     ObsoleteState = Pending;
@@ -73,7 +79,7 @@ page 9818 "User Security Status List"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Plans';
-                SubPageLink = "User Security ID" = FIELD("User Security ID");
+                SubPageLink = "User Security ID" = field("User Security ID");
                 Visible = SoftwareAsAService;
             }
 #if not CLEAN22
@@ -83,7 +89,7 @@ page 9818 "User Security Status List"
                 Caption = 'User Groups';
                 Editable = false;
                 ShowFilter = false;
-                SubPageLink = "User Security ID" = FIELD("User Security ID");
+                SubPageLink = "User Security ID" = field("User Security ID");
                 Visible = LegacyUserGroupsVisible;
                 ObsoleteState = Pending;
                 ObsoleteReason = 'Replaced by the Security Groups part.';
@@ -96,7 +102,7 @@ page 9818 "User Security Status List"
                 Caption = 'Security Groups';
                 Editable = false;
                 ShowFilter = false;
-                SubPageLink = "User Security ID" = FIELD("User Security ID");
+                SubPageLink = "User Security ID" = field("User Security ID");
             }
         }
     }
@@ -235,7 +241,7 @@ page 9818 "User Security Status List"
     var
         AzureADPlan: Codeunit "Azure AD Plan";
     begin
-        BelongsToSubscriptionPlan := AzureADPlan.DoesUserHavePlans("User Security ID");
+        BelongsToSubscriptionPlan := AzureADPlan.DoesUserHavePlans(Rec."User Security ID");
     end;
 
     local procedure ToggleReviewStatus(ReviewStatus: Boolean)

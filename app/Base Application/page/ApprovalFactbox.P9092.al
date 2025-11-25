@@ -28,7 +28,7 @@ page 9092 "Approval FactBox"
                 var
                     UserMgt: Codeunit "User Management";
                 begin
-                    UserMgt.DisplayUserInformation("Approver ID");
+                    UserMgt.DisplayUserInformation(Rec."Approver ID");
                 end;
             }
             field("Date-Time Sent for Approval"; Rec."Date-Time Sent for Approval")
@@ -36,7 +36,7 @@ page 9092 "Approval FactBox"
                 ApplicationArea = Suite;
                 ToolTip = 'Specifies the date and the time that the document was sent for approval.';
             }
-            field(Comment; Comment)
+            field(Comment; Rec.Comment)
             {
                 ApplicationArea = Suite;
                 ToolTip = 'Specifies whether there are comments relating to the approval of the record. If you want to read the comments, choose the field to open the Approval Comment Sheet window.';
@@ -55,10 +55,8 @@ page 9092 "Approval FactBox"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
-        OnBeforeOnFindRecord(Rec);
-
         DocumentHeading := '';
-        exit(FindLast());
+        exit(Rec.FindLast());
     end;
 
     var
@@ -80,31 +78,15 @@ page 9092 "Approval FactBox"
     procedure UpdateApprovalEntriesFromSourceRecord(SourceRecordID: RecordID)
     var
         ApprovalEntry: Record "Approval Entry";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeUpdateApprovalEntriesFromSourceRecord(Rec, SourceRecordID, IsHandled);
-        if IsHandled then
-            exit;
-
-        FilterGroup(2);
-        SetRange("Record ID to Approve", SourceRecordID);
+        Rec.FilterGroup(2);
+        Rec.SetRange("Record ID to Approve", SourceRecordID);
         ApprovalEntry.Copy(Rec);
         if ApprovalEntry.FindFirst() then
-            SetFilter("Approver ID", '<>%1', ApprovalEntry."Sender ID");
-        FilterGroup(0);
-        if FindLast() then;
+            Rec.SetFilter("Approver ID", '<>%1', ApprovalEntry."Sender ID");
+        Rec.FilterGroup(0);
+        if Rec.FindLast() then;
         CurrPage.Update(false);
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeOnFindRecord(var ApprovalEntry: Record "Approval Entry");
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeUpdateApprovalEntriesFromSourceRecord(var ApprovalEntry: Record "Approval Entry"; SourceRecordID: RecordID; var IsHandled: Boolean);
-    begin
     end;
 }
 

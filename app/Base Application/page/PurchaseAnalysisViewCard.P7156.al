@@ -1,9 +1,15 @@
+namespace Microsoft.Purchases.Analysis;
+
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 page 7156 "Purchase Analysis View Card"
 {
     Caption = 'Purch. Analysis View Card';
     PageType = Card;
     SourceTable = "Item Analysis View";
-    SourceTableView = WHERE("Analysis Area" = CONST(Purchase));
+    SourceTableView = where("Analysis Area" = const(Purchase));
 
     layout
     {
@@ -12,7 +18,7 @@ page 7156 "Purchase Analysis View Card"
             group(General)
             {
                 Caption = 'General';
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies a code for the analysis view.';
@@ -89,7 +95,7 @@ page 7156 "Purchase Analysis View Card"
                     ApplicationArea = PurchaseBudget;
                     ToolTip = 'Specifies whether to include an update of analysis view budget entries, when updating an analysis view.';
                 }
-                field(Blocked; Blocked)
+                field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
@@ -144,8 +150,8 @@ page 7156 "Purchase Analysis View Card"
                     Caption = 'Filter';
                     Image = "Filter";
                     RunObject = Page "Item Analysis View Filter";
-                    RunPageLink = "Analysis Area" = FIELD("Analysis Area"),
-                                  "Analysis View Code" = FIELD(Code);
+                    RunPageLink = "Analysis Area" = field("Analysis Area"),
+                                  "Analysis View Code" = field(Code);
                     ToolTip = 'Apply the filter.';
                 }
             }
@@ -169,7 +175,7 @@ page 7156 "Purchase Analysis View Card"
 
                 trigger OnAction()
                 begin
-                    SetUpdateOnPosting(true);
+                    Rec.SetUpdateOnPosting(true);
                 end;
             }
             action("Disable Update on Posting")
@@ -181,7 +187,7 @@ page 7156 "Purchase Analysis View Card"
 
                 trigger OnAction()
                 begin
-                    SetUpdateOnPosting(false);
+                    Rec.SetUpdateOnPosting(false);
                 end;
             }
         }

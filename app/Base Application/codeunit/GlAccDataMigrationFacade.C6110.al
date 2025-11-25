@@ -1,18 +1,25 @@
+﻿namespace System.Integration;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+
 codeunit 6110 "GL Acc. Data Migration Facade"
 {
     TableNo = "Data Migration Parameters";
 
     trigger OnRun()
     begin
-        if FindSet() then
+        if Rec.FindSet() then
             repeat
-                OnMigrateGlAccount("Staging Table RecId To Process");
-                OnMigrateGlAccountDimensions("Staging Table RecId To Process");
-                OnCreateOpeningBalanceTrx("Staging Table RecId To Process");
-                OnMigratePostingGroups("Staging Table RecId To Process");
-                OnMigrateAccountTransactions("Staging Table RecId To Process");
+                OnMigrateGlAccount(Rec."Staging Table RecId To Process");
+                OnMigrateGlAccountDimensions(Rec."Staging Table RecId To Process");
+                OnCreateOpeningBalanceTrx(Rec."Staging Table RecId To Process");
+                OnMigratePostingGroups(Rec."Staging Table RecId To Process");
+                OnMigrateAccountTransactions(Rec."Staging Table RecId To Process");
                 GLAccountIsSet := false;
-            until Next() = 0;
+            until Rec.Next() = 0;
     end;
 
     var

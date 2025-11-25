@@ -1,7 +1,22 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using System.Utilities;
+
 report 1002 "Post Inventory Cost to G/L"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/PostInventoryCosttoGL.rdlc';
+    RDLCLayout = './InventoryMgt/Costing/PostInventoryCosttoGL.rdlc';
     AdditionalSearchTerms = 'reconcile inventory';
     ApplicationArea = Basic, Suite;
     Caption = 'Post Inventory Cost to G/L';
@@ -17,7 +32,7 @@ report 1002 "Post Inventory Cost to G/L"
     {
         dataitem(PageLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(PostedCaption; StrSubstNo(PostedPostingTypeTxt, SelectStr(PostMethod + 1, PostingTypeTxt)))
             {
             }
@@ -53,7 +68,7 @@ report 1002 "Post Inventory Cost to G/L"
             }
             dataitem(PerEntryLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 PrintOnlyIfDetail = true;
                 column(PerEntryLoopNumber; Number)
                 {
@@ -144,7 +159,7 @@ report 1002 "Post Inventory Cost to G/L"
                 }
                 dataitem(PostValueEntryToGL; "Post Value Entry to G/L")
                 {
-                    DataItemTableView = SORTING("Item No.", "Posting Date");
+                    DataItemTableView = sorting("Item No.", "Posting Date");
                     RequestFilterFields = "Item No.", "Posting Date";
                     column(ItemDescription; Item.Description)
                     {
@@ -271,7 +286,7 @@ report 1002 "Post Inventory Cost to G/L"
                 }
                 dataitem(CapValueEntryLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(OrderNo_CapValueEntryProd; CapValueEntry."Order No.")
                     {
                         IncludeCaption = true;
@@ -394,7 +409,7 @@ report 1002 "Post Inventory Cost to G/L"
             }
             dataitem(InvtPostingBufferLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                 column(InvtPostBufAccTypeFormatted; Format(TempInvtPostBuf."Account Type"))
                 {
                 }
@@ -467,7 +482,7 @@ report 1002 "Post Inventory Cost to G/L"
             }
             dataitem(SkippedValueEntry; "Value Entry")
             {
-                DataItemTableView = SORTING("Item No.");
+                DataItemTableView = sorting("Item No.");
                 column(ItemNo_SkippedValueEntry; "Item No.")
                 {
                 }
@@ -774,7 +789,6 @@ report 1002 "Post Inventory Cost to G/L"
         SkippedItemsCaptionLbl: Label 'Skipped Items';
         PrevCapValueEntryOrderNo: Code[20];
         TotalValueEntriesPostedToGL: Integer;
-        [InDataSet]
         IsJournalTemplNameMandatory: Boolean;
         StatisticsMsg: Label '%1 value entries have been posted to the general ledger.', Comment = '10 value entries have been posted to the general ledger.';
         NothingToPostMsg: Label 'There is nothing to post to the general ledger.';

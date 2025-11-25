@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.Routing;
+
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.Manufacturing.Document;
+
 page 99000863 "Planning Routing"
 {
     Caption = 'Planning Routing';
@@ -173,13 +178,13 @@ page 99000863 "Planning Routing"
                         ProdOrderCapNeed: Record "Prod. Order Capacity Need";
                     begin
                         ProdOrderCapNeed.SetCurrentKey(Type, "No.", "Starting Date-Time");
-                        ProdOrderCapNeed.SetRange(Type, Type);
-                        ProdOrderCapNeed.SetRange("No.", "No.");
-                        ProdOrderCapNeed.SetRange(Date, "Starting Date", "Ending Date");
-                        ProdOrderCapNeed.SetRange("Worksheet Template Name", "Worksheet Template Name");
-                        ProdOrderCapNeed.SetRange("Worksheet Batch Name", "Worksheet Batch Name");
-                        ProdOrderCapNeed.SetRange("Worksheet Line No.", "Worksheet Line No.");
-                        ProdOrderCapNeed.SetRange("Operation No.", "Operation No.");
+                        ProdOrderCapNeed.SetRange(Type, Rec.Type);
+                        ProdOrderCapNeed.SetRange("No.", Rec."No.");
+                        ProdOrderCapNeed.SetRange(Date, Rec."Starting Date", Rec."Ending Date");
+                        ProdOrderCapNeed.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+                        ProdOrderCapNeed.SetRange("Worksheet Batch Name", Rec."Worksheet Batch Name");
+                        ProdOrderCapNeed.SetRange("Worksheet Line No.", Rec."Worksheet Line No.");
+                        ProdOrderCapNeed.SetRange("Operation No.", Rec."Operation No.");
 
                         PAGE.RunModal(0, ProdOrderCapNeed);
                     end;
@@ -205,9 +210,9 @@ page 99000863 "Planning Routing"
                         TrackingForm: Page "Order Tracking";
                     begin
                         ReqLine.Get(
-                          "Worksheet Template Name",
-                          "Worksheet Batch Name",
-                          "Worksheet Line No.");
+                          Rec."Worksheet Template Name",
+                          Rec."Worksheet Batch Name",
+                          Rec."Worksheet Line No.");
 
                         TrackingForm.SetReqLine(ReqLine);
                         TrackingForm.RunModal();
@@ -219,13 +224,13 @@ page 99000863 "Planning Routing"
 
     trigger OnAfterGetRecord()
     begin
-        NextOperationNoEditable := not IsSerial();
+        NextOperationNoEditable := not Rec.IsSerial();
     end;
 
     trigger OnDeleteRecord(): Boolean
     begin
-        if IsSerial() then
-            SetPreviousAndNext();
+        if Rec.IsSerial() then
+            Rec.SetPreviousAndNext();
     end;
 
     trigger OnInit()

@@ -11,7 +11,7 @@ report 10155 "Purchase Advice"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE("Replenishment System" = CONST(Purchase));
+            DataItemTableView = where("Replenishment System" = const(Purchase));
             RequestFilterFields = "No.", "Search Description", "Inventory Posting Group", "Location Filter", "Vendor No.";
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
@@ -161,8 +161,8 @@ report 10155 "Purchase Advice"
             }
             dataitem("Stockkeeping Unit"; "Stockkeeping Unit")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Variant Code" = FIELD("Variant Filter"), "Location Code" = FIELD("Location Filter"), "Date Filter" = FIELD("Date Filter");
-                DataItemTableView = SORTING("Item No.", "Location Code", "Variant Code") WHERE("Replenishment System" = CONST(Purchase));
+                DataItemLink = "Item No." = field("No."), "Variant Code" = field("Variant Filter"), "Location Code" = field("Location Filter"), "Date Filter" = field("Date Filter");
+                DataItemTableView = sorting("Item No.", "Location Code", "Variant Code") where("Replenishment System" = const(Purchase));
                 column(ReorderAmount2_Control1480000; ReorderAmount2)
                 {
                     DecimalPlaces = 2 : 5;

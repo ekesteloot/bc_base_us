@@ -1,3 +1,5 @@
+namespace Microsoft.Foundation.Enums;
+
 enum 113 "Matrix Page Step Type"
 {
     Extensible = true;

@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.Vendor;
+
+using Microsoft.Purchases.Payables;
+using System.Security.AccessControl;
+
 table 9151 "My Vendor"
 {
     Caption = 'My Vendor';
@@ -9,8 +14,6 @@ table 9151 "My Vendor"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
         }
         field(2; "Vendor No."; Code[20])
@@ -37,7 +40,7 @@ table 9151 "My Vendor"
         field(5; "Balance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" WHERE("Vendor No." = FIELD("Vendor No.")));
+            CalcFormula = - sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" where("Vendor No." = field("Vendor No.")));
             Caption = 'Balance (LCY)';
             Editable = false;
             FieldClass = FlowField;

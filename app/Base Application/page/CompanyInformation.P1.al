@@ -1,4 +1,23 @@
-Page 1 "Company Information"
+﻿namespace Microsoft.Foundation.Company;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Setup;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.ProjectMgt.Jobs.Setup;
+using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Setup;
+using System.Diagnostics;
+using System.Environment.Configuration;
+using System.Globalization;
+using System.Security.AccessControl;
+using System.Security.User;
+
+page 1 "Company Information"
 {
     AdditionalSearchTerms = 'change experience,suite,user interface,company badge';
     ApplicationArea = Basic, Suite;
@@ -22,7 +41,7 @@ Page 1 "Company Information"
                     ShowMandatory = true;
                     ToolTip = 'Specifies the company''s name and corporate form. For example, Inc. or Ltd.';
                 }
-                field(Address; Address)
+                field(Address; Rec.Address)
                 {
                     ApplicationArea = Basic, Suite;
                     ShowMandatory = true;
@@ -33,7 +52,7 @@ Page 1 "Company Information"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies additional address information.';
                 }
-                field(City; City)
+                field(City; Rec.City)
                 {
                     ApplicationArea = Basic, Suite;
                     ShowMandatory = true;
@@ -43,7 +62,7 @@ Page 1 "Company Information"
                 {
                     ShowCaption = false;
                     Visible = CountyVisible;
-                    field(County; County)
+                    field(County; Rec.County)
                     {
                         ApplicationArea = Basic, Suite;
                         ShowMandatory = true;
@@ -69,7 +88,7 @@ Page 1 "Company Information"
 
                     trigger OnValidate()
                     begin
-                        CountyVisible := FormatAddress.UseCounty("Country/Region Code");
+                        CountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
                     end;
                 }
                 field("Contact Person"; Rec."Contact Person")
@@ -117,7 +136,7 @@ Page 1 "Company Information"
                     Importance = Additional;
                     ToolTip = 'Specifies the company''s registration number. You can enter a maximum of 20 characters, both numbers and letters.';
                 }
-                field(Picture; Picture)
+                field(Picture; Rec.Picture)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the picture that has been set up for the company, such as a company logo.';
@@ -153,53 +172,6 @@ Page 1 "Company Information"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies your company''s web site.';
                 }
-#if not CLEAN20
-                field("IC Partner Code"; Rec."IC Partner Code")
-                {
-                    ApplicationArea = Intercompany;
-                    Importance = Additional;
-                    ToolTip = 'Specifies your company''s intercompany partner code.';
-                    ObsoleteReason = 'Replaced by the same field from "Intercompany Setup" page.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '20.0';
-                }
-                field("IC Inbox Type"; Rec."IC Inbox Type")
-                {
-                    ApplicationArea = Intercompany;
-                    Importance = Additional;
-                    ToolTip = 'Specifies what type of intercompany inbox you have, either File Location or Database.';
-                    ObsoleteReason = 'Replaced by the same field from "Intercompany Setup" page.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '20.0';
-                }
-                field("IC Inbox Details"; Rec."IC Inbox Details")
-                {
-                    ApplicationArea = Intercompany;
-                    Importance = Additional;
-                    ToolTip = 'Specifies details about the location of your intercompany inbox, which can transfer intercompany transactions into your company.';
-                    ObsoleteReason = 'Replaced by the same field from "Intercompany Setup" page.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '20.0';
-                }
-                field(OpenNewICSetupPageTxt; OpenNewICSetupPageTxt)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Editable = false;
-                    ShowCaption = false;
-                    Style = StrongAccent;
-                    StyleExpr = true;
-                    ToolTip = 'Run new Intercompany Setup page.';
-                    ObsoleteReason = 'Temporary control';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '20.0';
-
-                    trigger OnDrillDown()
-                    begin
-                        CurrPage.Update(true);
-                        Page.Run(Page::"Intercompany Setup");
-                    end;
-                }
-#endif
             }
             group(Payments)
             {
@@ -253,7 +225,7 @@ Page 1 "Company Information"
                         SetShowMandatoryConditions();
                     end;
                 }
-                field(IBAN; IBAN)
+                field(IBAN; Rec.IBAN)
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
@@ -352,7 +324,7 @@ Page 1 "Company Information"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        TestField("Base Calendar Code");
+                        Rec.TestField("Base Calendar Code");
                         CalendarMgmt.ShowCustomizedCalendar(Rec);
                     end;
                 }
@@ -365,6 +337,12 @@ Page 1 "Company Information"
                 group(ElectronicDocument)
                 {
                     Caption = 'Electronic Document';
+                    ObsoleteReason = 'Moved to Fixed Asset page';
+                    ObsoleteState = Pending;
+#pragma warning disable AS0072
+                    ObsoleteTag = '22.0';
+#pragma warning restore AS0072
+
                     field("SCT Permission Type"; Rec."SCT Permission Type")
                     {
                         ApplicationArea = BasicMX;
@@ -450,7 +428,7 @@ Page 1 "Company Information"
                     ApplicationArea = BasicCA;
                     ToolTip = 'Specifies the software identification code for the company.';
                 }
-                field(GLN; GLN)
+                field(GLN; Rec.GLN)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies your company in connection with electronic document exchange.';
@@ -460,17 +438,6 @@ Page 1 "Company Information"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the GLN is used in electronic documents as a party identification number.';
                 }
-#if not CLEAN20
-                field("Auto. Send Transactions"; Rec."Auto. Send Transactions")
-                {
-                    ApplicationArea = Intercompany;
-                    Importance = Additional;
-                    ToolTip = 'Specifies that as soon as transactions arrive in the intercompany outbox, they will be sent to the intercompany partner.';
-                    ObsoleteReason = 'Replaced by the same field from "Intercompany Setup" page.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '20.0';
-                }
-#endif
                 field("Allow Blank Payment Info."; Rec."Allow Blank Payment Info.")
                 {
                     ApplicationArea = Basic, Suite;
@@ -527,7 +494,7 @@ Page 1 "Company Information"
 
                     trigger OnValidate()
                     begin
-                        "Custom System Indicator Text" := SystemIndicatorText;
+                        Rec."Custom System Indicator Text" := SystemIndicatorText;
                         SystemIndicatorOnAfterValidate();
                     end;
                 }
@@ -679,20 +646,6 @@ Page 1 "Company Information"
                     RunObject = Page "Permission Sets";
                     ToolTip = 'View or edit which feature objects that users need to access and set up the related permissions in permission sets that you can assign to the users of the database.';
                 }
-#if not CLEAN20
-                action("Email Account Setup")
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'The action is not being used and will be removed';
-                    ObsoleteTag = '20.0';
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Email Account Setup';
-                    Image = MailSetup;
-                    RunObject = page "Email Accounts";
-                    ToolTip = 'Set up email accounts used in the product.';
-                    Visible = false;
-                }
-#endif
             }
             separator(Action1030000)
             {
@@ -877,7 +830,6 @@ Page 1 "Company Information"
         FormatAddress: Codeunit "Format Address";
         Experience: Text;
         SystemIndicatorText: Code[6];
-        [InDataSet]
         SystemIndicatorTextEditable: Boolean;
         IBANMissing: Boolean;
         BankBranchNoOrAccountNoMissing: Boolean;
@@ -885,18 +837,15 @@ Page 1 "Company Information"
         CountyVisible: Boolean;
         SystemIndicatorChanged: Boolean;
         CompanyBadgeRefreshPageTxt: Label 'The Company Badge settings have changed. Refresh the browser (Ctrl+F5) to update the badge.';
-#if not CLEAN20
-        OpenNewICSetupPageTxt: Label 'Open new Intercompany Setup page';
-#endif
 
     local procedure UpdateSystemIndicator()
     var
         CustomSystemIndicatorText: Text[250];
         IndicatorStyle: Option;
     begin
-        GetSystemIndicator(CustomSystemIndicatorText, IndicatorStyle); // IndicatorStyle is not used
+        Rec.GetSystemIndicator(CustomSystemIndicatorText, IndicatorStyle); // IndicatorStyle is not used
         SystemIndicatorText := CopyStr(CustomSystemIndicatorText, 1, 6);
-        SystemIndicatorTextEditable := CurrPage.Editable and ("System Indicator" = "System Indicator"::"Custom");
+        SystemIndicatorTextEditable := CurrPage.Editable and (Rec."System Indicator" = Rec."System Indicator"::"Custom");
     end;
 
     local procedure SystemIndicatorOnAfterValidate()
@@ -907,8 +856,8 @@ Page 1 "Company Information"
 
     local procedure SetShowMandatoryConditions()
     begin
-        BankBranchNoOrAccountNoMissing := ("Bank Branch No." = '') or ("Bank Account No." = '');
-        IBANMissing := IBAN = ''
+        BankBranchNoOrAccountNoMissing := (Rec."Bank Branch No." = '') or (Rec."Bank Account No." = '');
+        IBANMissing := Rec.IBAN = ''
     end;
 
     local procedure RestartSession()

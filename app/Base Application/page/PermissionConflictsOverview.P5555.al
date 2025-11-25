@@ -1,3 +1,7 @@
+namespace System.Security.AccessControl;
+
+using System.Azure.Identity;
+
 page 5555 "Permission Conflicts Overview"
 {
     PageType = List;
@@ -14,7 +18,7 @@ page 5555 "Permission Conflicts Overview"
         {
             repeater(Group)
             {
-                field(PermissionSet; PermissionSetID)
+                field(PermissionSet; Rec.PermissionSetID)
                 {
                     ApplicationArea = All;
                     Editable = false;
@@ -126,6 +130,20 @@ page 5555 "Permission Conflicts Overview"
                             EffectivePermissionsMgt.OpenPermissionConflicts(Rec.PermissionSetID, PlanOrRole::"Internal Admin");
                     end;
                 }
+                field("D365 Admin"; D365AdminTxt)
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    Caption = 'Dynamics 365 Admin';
+                    ToolTip = 'Dynamics 365 Admin License.';
+                    Visible = HasD365Admin;
+
+                    trigger OnDrillDown()
+                    begin
+                        if not Rec."D365 Admin" then
+                            EffectivePermissionsMgt.OpenPermissionConflicts(Rec.PermissionSetID, PlanOrRole::"D365 Admin");
+                    end;
+                }
                 field("Delegated Admin"; DelegatedAdminTxt)
                 {
                     ApplicationArea = All;
@@ -174,26 +192,17 @@ page 5555 "Permission Conflicts Overview"
 
     var
         EffectivePermissionsMgt: Codeunit "Effective Permissions Mgt.";
-        [InDataSet]
         BasicTxt: Text[20];
-        [InDataSet]
         TeamMemberTxt: Text[20];
-        [InDataSet]
         EssentialTxt: Text[20];
-        [InDataSet]
         PremiumTxt: Text[20];
-        [InDataSet]
         DeviceTxt: Text[20];
-        [InDataSet]
         ExternalAccountantTxt: Text[20];
-        [InDataSet]
         InternalAdminTxt: Text[20];
-        [InDataSet]
         DelegatedAdminTxt: Text[20];
-        [InDataSet]
         HelpDeskTxt: Text[20];
-        [InDataSet]
         ViralTxt: Text[20];
+        D365AdminTxt: Text[20];
         HasBasic: Boolean;
         HasTeamMember: Boolean;
         HasEssential: Boolean;
@@ -204,6 +213,7 @@ page 5555 "Permission Conflicts Overview"
         HasDelegatedAdmin: Boolean;
         HasHelpDesk: Boolean;
         HasViral: Boolean;
+        HasD365Admin: Boolean;
         PlansExist: Dictionary of [Guid, Boolean];
         ConflictTxt: Label 'Conflict';
         PlanOrRole: Enum Licenses;
@@ -226,6 +236,7 @@ page 5555 "Permission Conflicts Overview"
         DelegatedAdminTxt := '';
         HelpDeskTxt := '';
         ViralTxt := '';
+        D365AdminTxt := '';
 
         if not Rec.Basic then
             BasicTxt := ConflictTxt;
@@ -247,6 +258,8 @@ page 5555 "Permission Conflicts Overview"
             HelpDeskTxt := ConflictTxt;
         if not Rec.Viral then
             ViralTxt := ConflictTxt;
+        if not Rec."D365 Admin" then
+            D365AdminTxt := ConflictTxt;
     end;
 
     local procedure CheckPlans()
@@ -272,8 +285,11 @@ page 5555 "Permission Conflicts Overview"
         if AzureADPlan.IsPlanAssigned(PlanIds.GetExternalAccountantPlanId()) then
             PlansExist.Add(PlanIds.GetExternalAccountantPlanId(), true);
 
-        if AzureADPlan.IsPlanAssigned(PlanIds.GetInternalAdminPlanId()) then
-            PlansExist.Add(PlanIds.GetInternalAdminPlanId(), true);
+        if AzureADPlan.IsPlanAssigned(PlanIds.GetGlobalAdminPlanId()) then
+            PlansExist.Add(PlanIds.GetGlobalAdminPlanId(), true);
+
+        if AzureADPlan.IsPlanAssigned(PlanIds.GetD365AdminPlanId()) then
+            PlansExist.Add(PlanIds.GetD365AdminPlanId(), true);
 
         if AzureADPlan.IsPlanAssigned(PlanIds.GetDelegatedAdminPlanId()) then
             PlansExist.Add(PlanIds.GetDelegatedAdminPlanId(), true);
@@ -290,7 +306,8 @@ page 5555 "Permission Conflicts Overview"
         HasPremium := PlansExist.ContainsKey(PlanIds.GetPremiumPlanId());
         HasDevice := PlansExist.ContainsKey(PlanIds.GetDevicePlanId());
         HasExternalAccountant := PlansExist.ContainsKey(PlanIds.GetExternalAccountantPlanId());
-        HasInternalAdmin := PlansExist.ContainsKey(PlanIds.GetInternalAdminPlanId());
+        HasInternalAdmin := PlansExist.ContainsKey(PlanIds.GetGlobalAdminPlanId());
+        HasD365Admin := PlansExist.ContainsKey(PlanIds.GetD365AdminPlanId());
         HasDelegatedAdmin := PlansExist.ContainsKey(PlanIds.GetDelegatedAdminPlanId());
         HasHelpDesk := PlansExist.ContainsKey(PlanIds.GetHelpDeskPlanId());
         HasViral := PlansExist.ContainsKey(PlanIds.GetViralSignupPlanId());

@@ -1,3 +1,13 @@
+﻿namespace Microsoft.Intercompany.Inbox;
+
+using Microsoft.Intercompany.Dimension;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Outbox;
+using Microsoft.Intercompany.Partner;
+using Microsoft.Intercompany.Setup;
+using System.IO;
+using System.Telemetry;
+
 codeunit 435 "IC Inbox Import"
 {
     TableNo = "IC Inbox Transaction";
@@ -116,7 +126,7 @@ codeunit 435 "IC Inbox Import"
                                 NewTableID := DATABASE::"IC Inbox Sales Line";
                         end;
                         ICInboxOutboxMgt.OutboxDocDimToInbox(
-                          TempICDocDim, ICInboxDocDim, NewTableID, FromICPartnerCode, "Transaction Source");
+                          TempICDocDim, ICInboxDocDim, NewTableID, FromICPartnerCode, Rec."Transaction Source");
                     until TempICDocDim.Next() = 0;
 
                 OnRunOnAfterTempICOutboxTransLoop(Rec, TempICOutboxTrans);
@@ -138,9 +148,6 @@ codeunit 435 "IC Inbox Import"
 
     local procedure ImportInboxTransaction(ICSetup: Record "IC Setup"; var TempICOutboxTransaction: Record "IC Outbox Transaction" temporary; var TempICOutboxJnlLine: Record "IC Outbox Jnl. Line" temporary; var TempICInboxOutboxJnlLineDim: Record "IC Inbox/Outbox Jnl. Line Dim." temporary; var TempICOutboxSalesHeader: Record "IC Outbox Sales Header" temporary; var TempICOutboxSalesLine: Record "IC Outbox Sales Line" temporary; var TempICOutboxPurchaseHeader: Record "IC Outbox Purchase Header" temporary; var TempICOutboxPurchaseLine: Record "IC Outbox Purchase Line" temporary; var TempICDocDim: Record "IC Document Dimension" temporary; var FromICPartnerCode: Code[20]; FileName: Text)
     var
-#if not CLEAN20
-        CompanyInfo: Record "Company Information";
-#endif
         ICPartner: Record "IC Partner";
         ICOutboxImpExpXML: XMLport "IC Outbox Imp/Exp";
         IStream: InStream;
@@ -152,13 +159,6 @@ codeunit 435 "IC Inbox Import"
         IFile.CreateInStream(IStream);
 
         IsHandled := false;
-#if not CLEAN20
-        CompanyInfo.Get();
-        OnBeforeImportInboxTransaction(
-          CompanyInfo, IStream,
-          TempICOutboxTransaction, TempICOutboxJnlLine, TempICInboxOutboxJnlLineDim, TempICOutboxSalesHeader, TempICOutboxSalesLine,
-          TempICOutboxPurchaseHeader, TempICOutboxPurchaseLine, TempICDocDim, FromICPartnerCode, IsHandled);
-#endif
         OnBeforeImportInboxTransactionProcedure(
           ICSetup, IStream,
           TempICOutboxTransaction, TempICOutboxJnlLine, TempICInboxOutboxJnlLineDim, TempICOutboxSalesHeader, TempICOutboxSalesLine,
@@ -190,14 +190,6 @@ codeunit 435 "IC Inbox Import"
         ICOutboxImpExpXML.GetICPurchDocLineDim(TempICDocDim);
         FromICPartnerCode := ICOutboxImpExpXML.GetFromICPartnerCode();
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by OnBeforeImportInboxTransactionProcedure() event.', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeImportInboxTransaction(CompanyInfo: Record "Company Information"; var IStream: InStream; var TempICOutboxTransaction: Record "IC Outbox Transaction" temporary; var TempICOutboxJnlLine: Record "IC Outbox Jnl. Line" temporary; var TempICInboxOutboxJnlLineDim: Record "IC Inbox/Outbox Jnl. Line Dim." temporary; var TempICOutboxSalesHeader: Record "IC Outbox Sales Header" temporary; var TempICOutboxSalesLine: Record "IC Outbox Sales Line" temporary; var TempICOutboxPurchaseHeader: Record "IC Outbox Purchase Header" temporary; var TempICOutboxPurchaseLine: Record "IC Outbox Purchase Line" temporary; var TempICDocDim: Record "IC Document Dimension" temporary; var FromICPartnerCode: Code[20]; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeImportInboxTransactionProcedure(ICSetup: Record "IC Setup"; var IStream: InStream; var TempICOutboxTransaction: Record "IC Outbox Transaction" temporary; var TempICOutboxJnlLine: Record "IC Outbox Jnl. Line" temporary; var TempICInboxOutboxJnlLineDim: Record "IC Inbox/Outbox Jnl. Line Dim." temporary; var TempICOutboxSalesHeader: Record "IC Outbox Sales Header" temporary; var TempICOutboxSalesLine: Record "IC Outbox Sales Line" temporary; var TempICOutboxPurchaseHeader: Record "IC Outbox Purchase Header" temporary; var TempICOutboxPurchaseLine: Record "IC Outbox Purchase Line" temporary; var TempICDocDim: Record "IC Document Dimension" temporary; var FromICPartnerCode: Code[20]; var IsHandled: Boolean)

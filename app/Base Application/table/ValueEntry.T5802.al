@@ -1,3 +1,26 @@
+﻿namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Ledger;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using System.Security.AccessControl;
+using System.Utilities;
+
 table 5802 "Value Entry"
 {
     Caption = 'Value Entry';
@@ -26,11 +49,11 @@ table 5802 "Value Entry"
         field(5; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = IF ("Source Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Source Type" = CONST(Item)) Item;
+            TableRelation = if ("Source Type" = const(Customer)) Customer
+            else
+            if ("Source Type" = const(Vendor)) Vendor
+            else
+            if ("Source Type" = const(Item)) Item;
         }
         field(6; "Document No."; Code[20])
         {
@@ -53,11 +76,11 @@ table 5802 "Value Entry"
         field(10; "Source Posting Group"; Code[20])
         {
             Caption = 'Source Posting Group';
-            TableRelation = IF ("Source Type" = CONST(Customer)) "Customer Posting Group"
-            ELSE
-            IF ("Source Type" = CONST(Vendor)) "Vendor Posting Group"
-            ELSE
-            IF ("Source Type" = CONST(Item)) "Inventory Posting Group";
+            TableRelation = if ("Source Type" = const(Customer)) "Customer Posting Group"
+            else
+            if ("Source Type" = const(Vendor)) "Vendor Posting Group"
+            else
+            if ("Source Type" = const(Item)) "Inventory Posting Group";
         }
         field(11; "Item Ledger Entry No."; Integer)
         {
@@ -104,8 +127,6 @@ table 5802 "Value Entry"
             Caption = 'User ID';
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = User."User Name";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(25; "Source Code"; Code[10])
         {
@@ -120,13 +141,13 @@ table 5802 "Value Entry"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(34; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(41; "Source Type"; Enum "Analysis Source Type")
         {
@@ -155,8 +176,6 @@ table 5802 "Value Entry"
         field(48; "Journal Batch Name"; Code[10])
         {
             Caption = 'Journal Batch Name';
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(57; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -317,7 +336,7 @@ table 5802 "Value Entry"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(481; "Shortcut Dimension 3 Code"; Code[20])
@@ -382,7 +401,7 @@ table 5802 "Value Entry"
         field(1001; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(1002; "Job Ledger Entry No."; Integer)
         {
@@ -393,7 +412,7 @@ table 5802 "Value Entry"
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(5818; Adjustment; Boolean)
         {
@@ -416,11 +435,11 @@ table 5802 "Value Entry"
         field(5834; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST("Machine Center")) "Machine Center"
-            ELSE
-            IF (Type = CONST("Work Center")) "Work Center"
-            ELSE
-            IF (Type = CONST(Resource)) Resource;
+            TableRelation = if (Type = const("Machine Center")) "Machine Center"
+            else
+            if (Type = const("Work Center")) "Work Center"
+            else
+            if (Type = const(Resource)) Resource;
         }
         field(6602; "Return Reason Code"; Code[10])
         {
@@ -435,16 +454,14 @@ table 5802 "Value Entry"
         {
             Clustered = true;
         }
+#pragma warning disable AS0038
         key(Key2; "Item Ledger Entry No.", "Entry Type")
         {
-            IncludedFields = "Invoiced Quantity", "Sales Amount (Expected)", "Sales Amount (Actual)", "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)", "Cost Amount (Non-Invtbl.)(ACY)", "Purchase Amount (Actual)", "Purchase Amount (Expected)", "Discount Amount";
+            IncludedFields = "Invoiced Quantity", "Sales Amount (Expected)", "Sales Amount (Actual)", "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)", "Cost Amount (Non-Invtbl.)(ACY)", "Purchase Amount (Actual)", "Purchase Amount (Expected)", "Discount Amount", "Item Charge No.";
         }
+#pragma warning restore AS0038
         key(Key3; "Item Ledger Entry No.", "Document No.", "Document Line No.")
         {
-        }
-        key(Key4; "Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code")
-        {
-            Enabled = false;
         }
         key(Key5; "Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code", "Global Dimension 1 Code", "Global Dimension 2 Code", "Source Type", "Source No.")
         {
@@ -471,11 +488,6 @@ table 5802 "Value Entry"
         key(Key11; "Order Type", "Order No.", "Order Line No.")
         {
         }
-        key(Key12; "Source Type", "Source No.", "Global Dimension 1 Code", "Global Dimension 2 Code", "Item No.", "Posting Date", "Entry Type", Adjustment)
-        {
-            Enabled = false;
-            SumIndexFields = "Discount Amount", "Cost Amount (Non-Invtbl.)", "Cost Amount (Actual)", "Cost Amount (Expected)", "Sales Amount (Actual)", "Sales Amount (Expected)", "Invoiced Quantity";
-        }
         key(Key13; "Job No.", "Job Task No.", "Document No.")
         {
         }
@@ -483,9 +495,9 @@ table 5802 "Value Entry"
         {
             SumIndexFields = "Invoiced Quantity", "Sales Amount (Actual)", "Purchase Amount (Actual)";
         }
-        key(Key15; "Item Ledger Entry No.", "Valuation Date")
+        key(Key15; "Item Ledger Entry No.", "Valuation Date", "Posting Date")
         {
-            IncludedFields = "Posting Date";
+            IncludedFields = "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)";
         }
         key(Key16; "Location Code", "Inventory Posting Group")
         {
@@ -495,6 +507,10 @@ table 5802 "Value Entry"
         }
         key(Key18; "Item No.", "Item Ledger Entry Type", "Order Type", "Order No.", "Order Line No.")
         {
+        }
+        key(Key19; "Document No.", "Document Line No.", "Document Type")
+        {
+            IncludedFields = "Cost Amount (Actual)", "Entry Type";
         }
     }
 

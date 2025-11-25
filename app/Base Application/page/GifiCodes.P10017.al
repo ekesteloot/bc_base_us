@@ -13,7 +13,7 @@ page 10017 "GIFI Codes"
             repeater(Control1020000)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = BasicCA;
                     ToolTip = 'Specifies a General Index of Financial Information (GIFI) code. This code can be associated with records in the G/L Account table.';

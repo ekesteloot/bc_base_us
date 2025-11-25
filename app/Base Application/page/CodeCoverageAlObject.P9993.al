@@ -1,10 +1,14 @@
+namespace System.TestTools.CodeCoverage;
+
+using System.Reflection;
+
 page 9993 "Code Coverage AL Object"
 {
     Caption = 'Objects';
     Editable = false;
     PageType = List;
     SourceTable = AllObj;
-    SourceTableView = WHERE("Object Type" = FILTER(<> TableData));
+    SourceTableView = where("Object Type" = filter(<> TableData));
 
     layout
     {
@@ -13,19 +17,19 @@ page 9993 "Code Coverage AL Object"
             repeater(Group)
             {
                 Caption = 'Group';
-                field(Type; "Object Type")
+                field(Type; Rec."Object Type")
                 {
                     ApplicationArea = All;
                     Caption = 'Type';
                     ToolTip = 'Specifies the type: for example, table, page, or query.';
                 }
-                field(ID; "Object ID")
+                field(ID; Rec."Object ID")
                 {
                     ApplicationArea = All;
                     Caption = 'ID';
                     ToolTip = 'Specifies the object ID.';
                 }
-                field(Name; "Object Name")
+                field(Name; Rec."Object Name")
                 {
                     ApplicationArea = All;
                     Caption = 'Name';

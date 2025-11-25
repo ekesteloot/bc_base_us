@@ -1,3 +1,12 @@
+namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Setup;
+using System.Utilities;
+
 page 402 "Sales Order Statistics"
 {
     Caption = 'Sales Order Statistics';
@@ -192,7 +201,7 @@ page 402 "Sales Order Statistics"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupAdjmtValueEntries(0);
+                        Rec.LookupAdjmtValueEntries(0);
                     end;
                 }
                 field(NoOfVATLines_General; TempVATAmountLine1.Count)
@@ -208,6 +217,14 @@ page 402 "Sales Order Statistics"
                         VATLinesDrillDown(TempVATAmountLine1, false);
                         UpdateHeaderInfo(1, TempVATAmountLine1);
                     end;
+                }
+                field("Reserved From Stock"; Rec.GetQtyReservedFromStockState())
+                {
+                    ApplicationArea = Reservation;
+                    Editable = false;
+                    Importance = Additional;
+                    Caption = 'Reserved from stock';
+                    ToolTip = 'Specifies what part of the sales order is reserved from inventory.';
                 }
             }
             group(Invoicing)
@@ -384,7 +401,7 @@ page 402 "Sales Order Statistics"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupAdjmtValueEntries(1);
+                        Rec.LookupAdjmtValueEntries(1);
                     end;
                 }
                 field(NoOfVATLines_Invoicing; TempVATAmountLine2.Count)
@@ -685,10 +702,10 @@ page 402 "Sales Order Statistics"
     trigger OnOpenPage()
     begin
         SalesSetup.Get();
-        AllowInvDisc := not (SalesSetup."Calc. Inv. Discount" and CustInvDiscRecExists("Invoice Disc. Code"));
+        AllowInvDisc := not (SalesSetup."Calc. Inv. Discount" and CustInvDiscRecExists(Rec."Invoice Disc. Code"));
         AllowVATDifference :=
           SalesSetup."Allow VAT Difference" and
-          not ("Document Type" in ["Document Type"::Quote, "Document Type"::"Blanket Order"]);
+          not (Rec."Document Type" in [Rec."Document Type"::Quote, Rec."Document Type"::"Blanket Order"]);
         OnOpenPageOnBeforeSetEditable(AllowInvDisc, AllowVATDifference, Rec);
         VATLinesFormIsEditable := AllowVATDifference or AllowInvDisc;
         CurrPage.Editable := VATLinesFormIsEditable;
@@ -712,9 +729,6 @@ page 402 "Sales Order Statistics"
         TempVATAmountLine4: Record "VAT Amount Line" temporary;
         SalesSetup: Record "Sales & Receivables Setup";
         VATLinesForm: Page "VAT Amount Lines";
-        PrepmtTotalAmount: Decimal;
-        PrepmtVATAmount: Decimal;
-        PrepmtTotalAmount2: Decimal;
         VATAmountText: array[3] of Text[30];
         PrepmtVATAmountText: Text[30];
         CreditLimitLCYExpendedPct: Decimal;
@@ -751,6 +765,9 @@ page 402 "Sales Order Statistics"
         AdjProfitLCY: array[3] of Decimal;
         AdjProfitPct: array[3] of Decimal;
         TotalAdjCostLCY: array[3] of Decimal;
+        PrepmtTotalAmount: Decimal;
+        PrepmtTotalAmount2: Decimal;
+        PrepmtVATAmount: Decimal;
         DynamicEditable: Boolean;
         VATLinesFormIsEditable: Boolean;
 
@@ -761,7 +778,7 @@ page 402 "Sales Order Statistics"
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
         OptionValueOutOfRange: Integer;
     begin
-        CurrPage.Caption(StrSubstNo(Text000, "Document Type"));
+        CurrPage.Caption(StrSubstNo(Text000, Rec."Document Type"));
 
         if PrevNo = Rec."No." then
             exit;
@@ -902,7 +919,7 @@ page 402 "Sales Order Statistics"
             if Rec."Posting Date" = 0D then
                 UseDate := WorkDate()
             else
-                UseDate := "Posting Date";
+                UseDate := Rec."Posting Date";
 
         TotalSalesLineLCY[IndexNo].Amount :=
           CurrExchRate.ExchangeAmtFCYToLCY(
@@ -970,14 +987,14 @@ page 402 "Sales Order Statistics"
         if not (ModifiedIndexNo in [1, 2]) then
             exit;
 
-        if InvoicedLineExists() then
+        if Rec.InvoicedLineExists() then
             if not ConfirmManagement.GetResponseOrDefault(UpdateInvDiscountQst, true) then
                 Error('');
 
         if ModifiedIndexNo = 1 then
-            InvDiscBaseAmount := TempVATAmountLine1.GetTotalInvDiscBaseAmount(false, "Currency Code")
+            InvDiscBaseAmount := TempVATAmountLine1.GetTotalInvDiscBaseAmount(false, Rec."Currency Code")
         else
-            InvDiscBaseAmount := TempVATAmountLine2.GetTotalInvDiscBaseAmount(false, "Currency Code");
+            InvDiscBaseAmount := TempVATAmountLine2.GetTotalInvDiscBaseAmount(false, Rec."Currency Code");
 
         if InvDiscBaseAmount = 0 then
             Error(Text003, TempVATAmountLine2.FieldCaption("Inv. Disc. Base Amount"));
@@ -1008,30 +1025,30 @@ page 402 "Sales Order Statistics"
                 if (i = 1) or not PartialInvoicing then
                     if IndexNo[i] = 1 then
                         TempVATAmountLine1.SetInvoiceDiscountAmount(
-                          "Inv. Discount Amount", "Currency Code", "Prices Including VAT", "VAT Base Discount %")
+                          "Inv. Discount Amount", "Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %")
                     else
                         TempVATAmountLine2.SetInvoiceDiscountAmount(
-                          "Inv. Discount Amount", "Currency Code", "Prices Including VAT", "VAT Base Discount %");
+                          "Inv. Discount Amount", "Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %");
 
                 if (i = 2) and PartialInvoicing then
                     if IndexNo[i] = 1 then begin
                         InvDiscBaseAmount := TempVATAmountLine2.GetTotalInvDiscBaseAmount(false, "Currency Code");
                         if InvDiscBaseAmount = 0 then
                             TempVATAmountLine1.SetInvoiceDiscountPercent(
-                              0, "Currency Code", "Prices Including VAT", false, "VAT Base Discount %")
+                              0, "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %")
                         else
                             TempVATAmountLine1.SetInvoiceDiscountPercent(
                               100 * TempVATAmountLine2.GetTotalInvDiscAmount() / InvDiscBaseAmount,
-                              "Currency Code", "Prices Including VAT", false, "VAT Base Discount %");
+                              "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %");
                     end else begin
                         InvDiscBaseAmount := TempVATAmountLine1.GetTotalInvDiscBaseAmount(false, "Currency Code");
                         if InvDiscBaseAmount = 0 then
                             TempVATAmountLine2.SetInvoiceDiscountPercent(
-                              0, "Currency Code", "Prices Including VAT", false, "VAT Base Discount %")
+                              0, "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %")
                         else
                             TempVATAmountLine2.SetInvoiceDiscountPercent(
                               100 * TempVATAmountLine1.GetTotalInvDiscAmount() / InvDiscBaseAmount,
-                              "Currency Code", "Prices Including VAT", false, "VAT Base Discount %");
+                              "Currency Code", Rec."Prices Including VAT", false, Rec."VAT Base Discount %");
                     end;
             end;
 
@@ -1043,9 +1060,9 @@ page 402 "Sales Order Statistics"
         else
             VATLinesForm.SetTempVATAmountLine(TempVATAmountLine2);
 
-        "Invoice Discount Calculation" := "Invoice Discount Calculation"::Amount;
-        "Invoice Discount Value" := TotalSalesLine[1]."Inv. Discount Amount";
-        Modify();
+        Rec."Invoice Discount Calculation" := Rec."Invoice Discount Calculation"::Amount;
+        Rec."Invoice Discount Value" := TotalSalesLine[1]."Inv. Discount Amount";
+        Rec.Modify();
 
         UpdateVATOnSalesLines();
     end;
@@ -1068,7 +1085,7 @@ page 402 "Sales Order Statistics"
             PrepmtTotalAmount := PrepmtTotalAmount + PrepmtVATAmount;
         end else
             PrepmtTotalAmount2 := PrepmtTotalAmount + PrepmtVATAmount;
-        Modify();
+        Rec.Modify();
     end;
 
     protected procedure GetCaptionClass(FieldCaption: Text[100]; ReverseCaption: Boolean): Text[80]
@@ -1101,7 +1118,7 @@ page 402 "Sales Order Statistics"
     local procedure CheckAllowInvDisc()
     begin
         if not AllowInvDisc then
-            Error(Text005, "Invoice Disc. Code");
+            Error(Text005, Rec."Invoice Disc. Code");
 
         OnAfterCheckAllowInvDisc(Rec);
     end;
@@ -1118,8 +1135,8 @@ page 402 "Sales Order Statistics"
         Clear(VATLinesForm);
         VATLinesForm.SetTempVATAmountLine(VATLinesToDrillDown);
         VATLinesForm.InitGlobals(
-          "Currency Code", AllowVATDifference, AllowVATDifference and ThisTabAllowsVATEditing,
-          "Prices Including VAT", AllowInvDisc, "VAT Base Discount %");
+          Rec."Currency Code", AllowVATDifference, AllowVATDifference and ThisTabAllowsVATEditing,
+          Rec."Prices Including VAT", AllowInvDisc, Rec."VAT Base Discount %");
         VATLinesForm.RunModal();
         VATLinesForm.GetTempVATAmountLine(VATLinesToDrillDown);
     end;

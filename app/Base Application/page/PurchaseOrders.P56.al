@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Item;
+
 page 56 "Purchase Orders"
 {
     Caption = 'Purchase Orders';
@@ -5,7 +9,7 @@ page 56 "Purchase Orders"
     Editable = false;
     PageType = List;
     SourceTable = "Purchase Line";
-    SourceTableView = WHERE("Document Type" = FILTER(Order));
+    SourceTableView = where("Document Type" = filter(Order));
 
     layout
     {
@@ -117,8 +121,8 @@ page 56 "Purchase Orders"
                     Caption = 'Show Document';
                     Image = View;
                     RunObject = Page "Purchase Order";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("Document No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("Document No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the document that the selected line exists on.';
                 }
@@ -132,7 +136,7 @@ page 56 "Purchase Orders"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
             }

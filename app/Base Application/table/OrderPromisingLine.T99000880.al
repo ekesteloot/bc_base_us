@@ -1,3 +1,12 @@
+﻿namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
 table 99000880 "Order Promising Line"
 {
     Caption = 'Order Promising Line';
@@ -17,7 +26,7 @@ table 99000880 "Order Promising Line"
         {
             Caption = 'Variant Code';
             Editable = false;
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(12; "Location Code"; Code[10])
         {
@@ -34,7 +43,7 @@ table 99000880 "Order Promising Line"
         {
             Caption = 'Unit of Measure Code';
             Editable = false;
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
         }
         field(15; "Qty. per Unit of Measure"; Decimal)
         {

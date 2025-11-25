@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Customer;
+
 query 9150 "My Customers"
 {
     Caption = 'My Customers';

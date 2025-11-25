@@ -1,3 +1,9 @@
+namespace System.Environment.Configuration;
+
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Reports;
+
 page 1870 "Credit Limit Notification"
 {
     Caption = 'Credit Limit Notification';
@@ -24,7 +30,7 @@ page 1870 "Credit Limit Notification"
             part(CreditLimitDetails; "Credit Limit Details")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("No.");
+                SubPageLink = "No." = field("No.");
             }
         }
     }
@@ -42,10 +48,10 @@ page 1870 "Credit Limit Notification"
                     Caption = 'Customer';
                     Image = Customer;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("No."),
-                                  "Date Filter" = FIELD("Date Filter"),
-                                  "Global Dimension 1 Filter" = FIELD("Global Dimension 1 Filter"),
-                                  "Global Dimension 2 Filter" = FIELD("Global Dimension 2 Filter");
+                    RunPageLink = "No." = field("No."),
+                                  "Date Filter" = field("Date Filter"),
+                                  "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
+                                  "Global Dimension 2 Filter" = field("Global Dimension 2 Filter");
                     RunPageMode = View;
                     ToolTip = 'View or edit detailed information about the customer.';
                 }
@@ -60,7 +66,7 @@ page 1870 "Credit Limit Notification"
                     Caption = 'Finance Charge Memo';
                     Image = FinChargeMemo;
                     RunObject = Page "Finance Charge Memo";
-                    RunPageLink = "Customer No." = FIELD("No.");
+                    RunPageLink = "Customer No." = field("No.");
                     RunPageMode = Create;
                     ToolTip = 'Create a new finance charge memo.';
                 }
@@ -79,7 +85,7 @@ page 1870 "Credit Limit Notification"
                     var
                         CustomerCard: Page "Customer Card";
                     begin
-                        CustomerCard.RunReport(REPORT::"Customer - Balance to Date", "No.");
+                        CustomerCard.RunReport(REPORT::"Customer - Balance to Date", Rec."No.");
                     end;
                 }
             }
@@ -129,11 +135,11 @@ page 1870 "Credit Limit Notification"
     var
         Customer: Record Customer;
     begin
-        Get(CreditLimitNotification.GetData(Customer.FieldName("No.")));
-        SetRange("No.", "No.");
+        Rec.Get(CreditLimitNotification.GetData(Customer.FieldName("No.")));
+        Rec.SetRange("No.", Rec."No.");
 
-        if GetFilter("Date Filter") = '' then
-            SetFilter("Date Filter", '..%1', WorkDate());
+        if Rec.GetFilter("Date Filter") = '' then
+            Rec.SetFilter("Date Filter", '..%1', WorkDate());
 
         CurrPage.CreditLimitDetails.PAGE.InitializeFromNotificationVar(CreditLimitNotification);
     end;

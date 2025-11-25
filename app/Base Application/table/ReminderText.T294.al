@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 table 294 "Reminder Text"
 {
     Caption = 'Reminder Text';
@@ -17,7 +19,7 @@ table 294 "Reminder Text"
             Caption = 'Reminder Level';
             MinValue = 1;
             NotBlank = true;
-            TableRelation = "Reminder Level"."No." WHERE("Reminder Terms Code" = FIELD("Reminder Terms Code"));
+            TableRelation = "Reminder Level"."No." where("Reminder Terms Code" = field("Reminder Terms Code"));
         }
         field(3; Position; Enum "Reminder Text Position")
         {

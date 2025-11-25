@@ -7,8 +7,8 @@ page 1160 "Sales Documents"
     ModifyAllowed = false;
     PageType = ListPart;
     SourceTable = "Cust. Ledger Entry";
-    SourceTableView = SORTING("Entry No.")
-                      ORDER(Descending);
+    SourceTableView = sorting("Entry No.")
+                      order(Descending);
 
     layout
     {
@@ -54,9 +54,9 @@ page 1160 "Sales Documents"
                         if Company."Evaluation Company" then
                             HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 573) +
                               '&' + ConfPersonalizationMgt.GetProfileUrlParameterForEvaluationCompany()
-                               + StrSubstNo(FilterForRemAmtDrillDwnTxt, "Entry No.")
+                               + StrSubstNo(FilterForRemAmtDrillDwnTxt, Rec."Entry No.")
                         else
-                            HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 573) + StrSubstNo(FilterForRemAmtDrillDwnTxt, "Entry No.");
+                            HyperLinkUrl := GetUrl(CLIENTTYPE::Web, CompanyName, OBJECTTYPE::Page, 573) + StrSubstNo(FilterForRemAmtDrillDwnTxt, Rec."Entry No.");
                         HyperLink(HyperLinkUrl);
                     end;
                 }
@@ -75,21 +75,21 @@ page 1160 "Sales Documents"
     var
         Customer: Record Customer;
     begin
-        Customer.Get("Customer No.");
+        Customer.Get(Rec."Customer No.");
         CustomerName := Customer.Name;
-        StyleTxt := SetStyle();
+        StyleTxt := Rec.SetStyle();
 
         OnAfterOnAfterGetRecord(Rec, StyleTxt);
     end;
 
     trigger OnOpenPage()
     begin
-        SetRange("Document Type", "Document Type"::Invoice);
-        SetRange(Open, true);
-        SetFilter("Due Date", '<%1', WorkDate());
-        SetFilter("Remaining Amt. (LCY)", '<>0');
-        SetCurrentKey("Remaining Amt. (LCY)");
-        Ascending := false;
+        Rec.SetRange("Document Type", Rec."Document Type"::Invoice);
+        Rec.SetRange(Open, true);
+        Rec.SetFilter("Due Date", '<%1', WorkDate());
+        Rec.SetFilter("Remaining Amt. (LCY)", '<>0');
+        Rec.SetCurrentKey("Remaining Amt. (LCY)");
+        Rec.Ascending := false;
     end;
 
     var
@@ -99,33 +99,33 @@ page 1160 "Sales Documents"
 
     procedure SetFilterForOverdueSalesInvoiceAmount()
     begin
-        Reset();
-        SetRange("Document Type", "Document Type"::Invoice);
-        SetRange(Open, true);
-        SetFilter("Due Date", '<%1', WorkDate());
-        SetFilter("Remaining Amt. (LCY)", '<>0');
-        SetCurrentKey("Remaining Amt. (LCY)");
-        Ascending := false;
+        Rec.Reset();
+        Rec.SetRange("Document Type", Rec."Document Type"::Invoice);
+        Rec.SetRange(Open, true);
+        Rec.SetFilter("Due Date", '<%1', WorkDate());
+        Rec.SetFilter("Remaining Amt. (LCY)", '<>0');
+        Rec.SetCurrentKey("Remaining Amt. (LCY)");
+        Rec.Ascending := false;
         CurrPage.Update();
     end;
 
     procedure SetFilterForSalesDocsDueToday()
     begin
-        Reset();
-        SetFilter("Document Type", 'Invoice|Credit Memo');
-        SetFilter("Due Date", '<=%1', WorkDate());
-        SetRange(Open, true);
-        Ascending := false;
+        Rec.Reset();
+        Rec.SetFilter("Document Type", 'Invoice|Credit Memo');
+        Rec.SetFilter("Due Date", '<=%1', WorkDate());
+        Rec.SetRange(Open, true);
+        Rec.Ascending := false;
         CurrPage.Update();
     end;
 
     procedure SetFilterForSalesDocsDueNextWeek()
     begin
-        Reset();
-        SetFilter("Document Type", 'Invoice|Credit Memo');
-        SetFilter("Due Date", '%1..%2', CalcDate('<1D>', WorkDate()), CalcDate('<1W>', WorkDate()));
-        SetRange(Open, true);
-        Ascending := false;
+        Rec.Reset();
+        Rec.SetFilter("Document Type", 'Invoice|Credit Memo');
+        Rec.SetFilter("Due Date", '%1..%2', CalcDate('<1D>', WorkDate()), CalcDate('<1W>', WorkDate()));
+        Rec.SetRange(Open, true);
+        Rec.Ascending := false;
         CurrPage.Update();
     end;
 

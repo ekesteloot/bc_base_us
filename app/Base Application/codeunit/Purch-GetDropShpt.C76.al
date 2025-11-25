@@ -1,3 +1,11 @@
+namespace Microsoft.Purchases.Document;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+
 codeunit 76 "Purch.-Get Drop Shpt."
 {
     Permissions = TableData "Sales Header" = rm,
@@ -193,7 +201,7 @@ codeunit 76 "Purch.-Get Drop Shpt."
         exit(
             ItemReference.FindItemDescription(
                 PurchaseLine.Description, PurchaseLine."Description 2", Item."No.", SalesLine."Variant Code",
-                SalesLine."Unit of Measure Code", "Item Reference Type"::Vendor, PurchHeader."Buy-from Vendor No."));
+                SalesLine."Unit of Measure Code", PurchaseLine.GetDateForCalculations(), Enum::"Item Reference Type"::Vendor, PurchHeader."Buy-from Vendor No."));
     end;
 
     local procedure GetDescriptionFromItemTranslation(var PurchaseLine: Record "Purchase Line"; SalesLine: Record "Sales Line"): Boolean

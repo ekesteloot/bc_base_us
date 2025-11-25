@@ -1,4 +1,8 @@
 #if not CLEAN22
+namespace System.Security.AccessControl;
+
+using System.Environment.Configuration;
+
 codeunit 9004 "User Grp. Perm. Subscribers"
 {
     ObsoleteState = Pending;

@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Contact;
+
 page 5065 "Mailing Group Contacts"
 {
     Caption = 'Mailing Group Contacts';

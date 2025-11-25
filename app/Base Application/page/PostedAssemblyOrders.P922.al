@@ -1,3 +1,8 @@
+namespace Microsoft.AssemblyMgt.History;
+
+using Microsoft.AssemblyMgt.Comment;
+using Microsoft.FinancialMgt.Dimension;
+
 page 922 "Posted Assembly Orders"
 {
     ApplicationArea = Assembly;
@@ -7,8 +12,8 @@ page 922 "Posted Assembly Orders"
     Editable = false;
     PageType = List;
     SourceTable = "Posted Assembly Header";
-    SourceTableView = SORTING("Posting Date")
-                      ORDER(Descending);
+    SourceTableView = sorting("Posting Date")
+                      order(Descending);
     UsageCategory = History;
 
     layout
@@ -97,7 +102,7 @@ page 922 "Posted Assembly Orders"
                     Caption = '&Show Document';
                     Image = View;
                     RunObject = Page "Posted Assembly Order";
-                    RunPageLink = "No." = FIELD("No.");
+                    RunPageLink = "No." = field("No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Open the document that the information on the line comes from.';
                 }
@@ -111,7 +116,7 @@ page 922 "Posted Assembly Orders"
 
                     trigger OnAction()
                     begin
-                        ShowStatistics();
+                        Rec.ShowStatistics();
                     end;
                 }
                 action(Dimensions)
@@ -125,7 +130,7 @@ page 922 "Posted Assembly Orders"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(Comments)
@@ -134,9 +139,9 @@ page 922 "Posted Assembly Orders"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Assembly Comment Sheet";
-                    RunPageLink = "Document Type" = CONST("Posted Assembly"),
-                                  "Document No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = const("Posted Assembly"),
+                                  "Document No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
             }
@@ -168,7 +173,7 @@ page 922 "Posted Assembly Orders"
 
                 trigger OnAction()
                 begin
-                    Navigate();
+                    Rec.Navigate();
                 end;
             }
         }

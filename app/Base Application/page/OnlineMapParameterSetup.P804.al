@@ -11,7 +11,7 @@ page 804 "Online Map Parameter Setup"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a descriptive code for the map that you set up, for example, BING.';
@@ -51,7 +51,7 @@ page 804 "Online Map Parameter Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the option for calculating the quickest or the shortest route.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
                     ExtendedDatatype = URL;
@@ -92,7 +92,7 @@ page 804 "Online Map Parameter Setup"
 
                 trigger OnAction()
                 begin
-                    InsertDefaults();
+                    Rec.InsertDefaults();
                 end;
             }
         }

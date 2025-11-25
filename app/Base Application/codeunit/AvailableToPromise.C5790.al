@@ -1,3 +1,18 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+using System.Utilities;
+
 codeunit 5790 "Available to Promise"
 {
     Permissions = TableData "Prod. Order Line" = r,
@@ -16,24 +31,6 @@ codeunit 5790 "Available to Promise"
         AllFieldCalculated: Boolean;
         PrevItemNo: Code[20];
         PrevItemFilters: Text;
-
-#if not CLEAN20
-    [Obsolete('Replaced by CalcQtyAvailableToPromise()', '20.0')]
-    procedure QtyAvailabletoPromise(var Item: Record Item; var GrossRequirement: Decimal; var ScheduledReceipt: Decimal; AvailabilityDate: Date; PeriodType: Option Day,Week,Month,Quarter,Year; LookaheadDateFormula: DateFormula) AvailableToPromise: Decimal
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeQtyAvailableToPromise(
-            Item, AvailabilityDate, GrossRequirement, ScheduledReceipt, PeriodType, LookaheadDateFormula, AvailableToPromise, IsHandled);
-        If not IsHandled then
-            AvailableToPromise :=
-                CalcQtyAvailableToPromise(
-                    Item, GrossRequirement, ScheduledReceipt, AvailabilityDate, "Analysis Period Type".FromInteger(PeriodType), LookaheadDateFormula);
-
-        exit(AvailableToPromise);
-    end;
-#endif
 
     procedure CalcQtyAvailableToPromise(var Item: Record Item; var GrossRequirement: Decimal; var ScheduledReceipt: Decimal; AvailabilityDate: Date; PeriodType: Enum "Analysis Period Type"; LookaheadDateFormula: DateFormula) AvailableToPromise: Decimal
     var
@@ -163,17 +160,6 @@ codeunit 5790 "Available to Promise"
         exit(ReservedReceipt);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CalcEarliestAvailabilityDate()', '20.0')]
-    procedure EarliestAvailabilityDate(var Item: Record Item; NeededQty: Decimal; StartDate: Date; ExcludeQty: Decimal; ExcludeOnDate: Date; var AvailableQty: Decimal; PeriodType: Option Day,Week,Month,Quarter,Year; LookaheadDateFormula: DateFormula): Date
-    begin
-        exit(
-            CalcEarliestAvailabilityDate(
-                Item, NeededQty, StartDate, ExcludeQty, ExcludeOnDate, AvailableQty,
-                "Analysis Period Type".FromInteger(PeriodType), LookaheadDateFormula));
-    end;
-#endif
-
     procedure CalcEarliestAvailabilityDate(var Item: Record Item; NeededQty: Decimal; StartDate: Date; ExcludeQty: Decimal; ExcludeOnDate: Date; var AvailableQty: Decimal; PeriodType: Enum "Analysis Period Type"; LookaheadDateFormula: DateFormula): Date
     var
         Date: Record Date;
@@ -199,10 +185,6 @@ codeunit 5790 "Available to Promise"
         CalculateAvailabilityByPeriod(TempAvailabilityAtDate, PeriodType);
 
         IsHandled := false;
-#if not CLEAN20
-        OnEarliestAvailabilityDateOnBeforeFilterDate(
-            Item, NeededQty, StartDate, AvailableQty, PeriodType.AsInteger(), LookaheadDateFormula, TempAvailabilityAtDate, AvailableDate, IsHandled);
-#endif
         OnCalcEarliestAvailabilityDateOnBeforeFilterDate(Item, NeededQty, StartDate, AvailableQty, PeriodType, LookaheadDateFormula, TempAvailabilityAtDate, AvailableDate, IsHandled);
         if IsHandled then
             exit(AvailableDate);
@@ -283,15 +265,6 @@ codeunit 5790 "Available to Promise"
         DummyItem.CopyFilter("Date Filter", Item."Date Filter");
         exit(AvailableDate);
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by CalculateForward', '20.0')]
-    procedure CalculateLookahead(var Item: Record Item; PeriodType: Option Day,Week,Month,Quarter,Year; StartDate: Date; EndDate: Date): Decimal
-    begin
-        exit(
-            CalculateForward(Item, "Analysis Period Type".FromInteger(PeriodType), StartDate, EndDate));
-    end;
-#endif
 
     procedure CalculateForward(var Item: Record Item; PeriodType: Enum "Analysis Period Type"; StartDate: Date; EndDate: Date): Decimal
     var
@@ -436,15 +409,6 @@ codeunit 5790 "Available to Promise"
         exit(ReqShipDate);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by GetForwardPeriodEndDate()', '20.0')]
-    procedure GetLookAheadPeriodEndDate(LookaheadDateFormula: DateFormula; PeriodType: Option; StartDate: Date): Date
-    begin
-        exit(
-            GetForwardPeriodEndDate(LookaheadDateFormula, "Analysis Period Type".FromInteger(PeriodType), StartDate));
-    end;
-#endif
-
     procedure GetForwardPeriodEndDate(LookaheadDateFormula: DateFormula; PeriodType: Enum "Analysis Period Type"; StartDate: Date): Date
     var
         CalendarManagement: Codeunit "Calendar Management";
@@ -454,15 +418,6 @@ codeunit 5790 "Available to Promise"
 
         exit(GetPeriodEndingDate(CalcDate(LookaheadDateFormula, StartDate), PeriodType));
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by GetPeriodEndingDate()', '20.0')]
-    procedure AdjustedEndingDate(PeriodEnd: Date; PeriodType: Option Day,Week,Month,Quarter,Year): Date
-    begin
-        exit(
-            GetPeriodEndingDate(PeriodEnd, "Analysis Period Type".FromInteger(PeriodType)));
-    end;
-#endif
 
     procedure GetPeriodEndingDate(PeriodEnd: Date; PeriodType: Enum "Analysis Period Type"): Date
     var
@@ -903,14 +858,6 @@ codeunit 5790 "Available to Promise"
     begin
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by OnBeforeCalcQtyAvailableToPromise event', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeQtyAvailableToPromise(var Item: Record Item; var AvailabilityDate: Date; var GrossRequirement: Decimal; var ScheduledReceipt: Decimal; PeriodType: Option Day,Week,Month,Quarter,Year; LookaheadDateFormula: DateFormula; var AvailableToPromise: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalcQtyAvailableToPromise(var Item: Record Item; var AvailabilityDate: Date; var GrossRequirement: Decimal; var ScheduledReceipt: Decimal; PeriodType: Enum "Analysis Period Type"; LookaheadDateFormula: DateFormula; var AvailableToPromise: Decimal; var IsHandled: Boolean)
     begin
@@ -935,14 +882,6 @@ codeunit 5790 "Available to Promise"
     local procedure OnCalculateAvailabilityAfterClearAvailabilityAtDate(var AvailabilityAtDate: Record "Availability at Date"; var Item: Record Item; var ReqShipDate: Date)
     begin
     end;
-
-#if not CLEAN20
-    [Obsolete('Replaced by OnCalcEarliestAvailabilityDateOnBeforeFilterDate event', '20.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnEarliestAvailabilityDateOnBeforeFilterDate(var Item: Record Item; NeededQty: Decimal; StartDate: Date; var AvailableQty: Decimal; PeriodType: Option; LookaheadDateFormula: DateFormula; var AvailabilityAtDate: Record "Availability at Date"; var AvailableDate: Date; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcEarliestAvailabilityDateOnBeforeFilterDate(var Item: Record Item; NeededQty: Decimal; StartDate: Date; var AvailableQty: Decimal; PeriodType: Enum "Analysis Period Type"; LookaheadDateFormula: DateFormula; var AvailabilityAtDate: Record "Availability at Date"; var AvailableDate: Date; var IsHandled: Boolean)

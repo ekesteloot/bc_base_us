@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.Forecast;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+
 report 99003803 "Copy Production Forecast"
 {
     Caption = 'Copy Demand Forecast Entries';
@@ -7,7 +12,7 @@ report 99003803 "Copy Production Forecast"
     {
         dataitem("Production Forecast Entry"; "Production Forecast Entry")
         {
-            DataItemTableView = SORTING("Entry No.");
+            DataItemTableView = sorting("Entry No.");
             RequestFilterFields = "Production Forecast Name", "Item No.";
 
             trigger OnAfterGetRecord()

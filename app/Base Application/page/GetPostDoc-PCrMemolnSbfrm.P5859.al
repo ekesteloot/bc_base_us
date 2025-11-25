@@ -1,3 +1,8 @@
+namespace Microsoft.Purchases.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item.Catalog;
+
 page 5859 "Get Post.Doc-P.Cr.MemoLn Sbfrm"
 {
     Caption = 'Lines';
@@ -61,7 +66,7 @@ page 5859 "Get Post.Doc-P.Cr.MemoLn Sbfrm"
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
-                field(Nonstock; Nonstock)
+                field(Nonstock; Rec.Nonstock)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that this item is a catalog item.';
@@ -314,7 +319,7 @@ page 5859 "Get Post.Doc-P.Cr.MemoLn Sbfrm"
 
         PurchCrMemoLine := Rec;
         repeat
-            NextSteps := Next(Steps / Abs(Steps));
+            NextSteps := Rec.Next(Steps / Abs(Steps));
             ShowRec := IsShowRec(Rec);
             if ShowRec then begin
                 RealSteps := RealSteps + NextSteps;
@@ -322,7 +327,7 @@ page 5859 "Get Post.Doc-P.Cr.MemoLn Sbfrm"
             end;
         until (NextSteps = 0) or (RealSteps = Steps);
         Rec := PurchCrMemoLine;
-        Find();
+        Rec.Find();
         exit(RealSteps);
     end;
 
@@ -336,7 +341,6 @@ page 5859 "Get Post.Doc-P.Cr.MemoLn Sbfrm"
         TempPurchCrMemoLine: Record "Purch. Cr. Memo Line" temporary;
         DirectUnitCost: Decimal;
         LineAmount: Decimal;
-        [InDataSet]
         DocumentNoHideValue: Boolean;
         ShowRec: Boolean;
 
@@ -344,23 +348,23 @@ page 5859 "Get Post.Doc-P.Cr.MemoLn Sbfrm"
     begin
         TempPurchCrMemoLine.Reset();
         TempPurchCrMemoLine.CopyFilters(Rec);
-        TempPurchCrMemoLine.SetRange("Document No.", "Document No.");
+        TempPurchCrMemoLine.SetRange("Document No.", Rec."Document No.");
         if not TempPurchCrMemoLine.FindFirst() then begin
             PurchCrMemoLine.CopyFilters(Rec);
-            PurchCrMemoLine.SetRange("Document No.", "Document No.");
+            PurchCrMemoLine.SetRange("Document No.", Rec."Document No.");
             if not PurchCrMemoLine.FindFirst() then
                 exit(false);
             TempPurchCrMemoLine := PurchCrMemoLine;
             TempPurchCrMemoLine.Insert();
         end;
 
-        if "Document No." <> PurchCrMemoHeader."No." then
-            PurchCrMemoHeader.Get("Document No.");
+        if Rec."Document No." <> PurchCrMemoHeader."No." then
+            PurchCrMemoHeader.Get(Rec."Document No.");
 
-        DirectUnitCost := "Direct Unit Cost";
-        LineAmount := "Line Amount";
+        DirectUnitCost := Rec."Direct Unit Cost";
+        LineAmount := Rec."Line Amount";
 
-        exit("Line No." = TempPurchCrMemoLine."Line No.");
+        exit(Rec."Line No." = TempPurchCrMemoLine."Line No.");
     end;
 
     local procedure IsShowRec(PurchCrMemoLine2: Record "Purch. Cr. Memo Line") Result: Boolean
@@ -384,7 +388,7 @@ page 5859 "Get Post.Doc-P.Cr.MemoLn Sbfrm"
 
     local procedure ShowDocument()
     begin
-        if not PurchCrMemoHeader.Get("Document No.") then
+        if not PurchCrMemoHeader.Get(Rec."Document No.") then
             exit;
         PAGE.Run(PAGE::"Posted Purchase Credit Memo", PurchCrMemoHeader);
     end;

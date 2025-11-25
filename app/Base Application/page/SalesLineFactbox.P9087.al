@@ -20,7 +20,7 @@ page 9087 "Sales Line FactBox"
                     SalesInfoPaneMgt.LookupItem(Rec);
                 end;
             }
-            field("Required Quantity"; Rec."Outstanding Quantity" - "Reserved Quantity")
+            field("Required Quantity"; Rec."Outstanding Quantity" - Rec."Reserved Quantity")
             {
                 ApplicationArea = Reservation;
                 Caption = 'Required Quantity';
@@ -105,11 +105,17 @@ page 9087 "Sales Line FactBox"
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies, for the item on the sales line, how many are reserved on demand records.';
                 }
+                field("Reserved from Stock"; SalesInfoPaneMgt.GetQtyReservedFromStockState(Rec))
+                {
+                    ApplicationArea = Reservation;
+                    Caption = 'Reserved from stock';
+                    Tooltip = 'Specifies what part of the sales line is reserved from inventory.';
+                }
             }
             group(Item)
             {
                 Caption = 'Item';
-                field(UnitofMeasureCode; "Unit of Measure Code")
+                field(UnitofMeasureCode; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Unit of Measure Code';
@@ -131,10 +137,10 @@ page 9087 "Sales Line FactBox"
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
-                        ShowItemSub();
+                        Rec.ShowItemSub();
                         CurrPage.Update(true);
-                        if (Reserve = Reserve::Always) and ("No." <> xRec."No.") then begin
-                            AutoReserve();
+                        if (Rec.Reserve = Rec.Reserve::Always) and (Rec."No." <> xRec."No.") then begin
+                            Rec.AutoReserve();
                             CurrPage.Update(false);
                         end;
                     end;
@@ -148,7 +154,7 @@ page 9087 "Sales Line FactBox"
 
                     trigger OnDrillDown()
                     begin
-                        PickPrice();
+                        Rec.PickPrice();
                         CurrPage.Update();
                     end;
                 }
@@ -161,7 +167,7 @@ page 9087 "Sales Line FactBox"
 
                     trigger OnDrillDown()
                     begin
-                        PickDiscount();
+                        Rec.PickDiscount();
                         CurrPage.Update();
                     end;
                 }

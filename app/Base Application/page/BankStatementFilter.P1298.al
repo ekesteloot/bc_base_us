@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.Statement;
+
 page 1298 "Bank Statement Filter"
 {
     Caption = 'Bank Statement Filter';

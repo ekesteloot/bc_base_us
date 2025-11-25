@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Document;
+
 page 6001 "Service Order Allocations"
 {
     Caption = 'Service Order Allocations';

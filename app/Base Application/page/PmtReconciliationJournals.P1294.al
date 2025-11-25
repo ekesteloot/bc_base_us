@@ -1,3 +1,8 @@
+namespace Microsoft.BankMgt.Reconciliation;
+
+using Microsoft.BankMgt.BankAccount;
+using System.Telemetry;
+
 page 1294 "Pmt. Reconciliation Journals"
 {
     AdditionalSearchTerms = 'payment application,payment processing,bank reconciliation';
@@ -6,7 +11,7 @@ page 1294 "Pmt. Reconciliation Journals"
     InsertAllowed = false;
     PageType = List;
     SourceTable = "Bank Acc. Reconciliation";
-    SourceTableView = WHERE("Statement Type" = CONST("Payment Application"));
+    SourceTableView = where("Statement Type" = const("Payment Application"));
     UsageCategory = Lists;
 
     layout
@@ -84,7 +89,7 @@ page 1294 "Pmt. Reconciliation Journals"
 
                     trigger OnAction()
                     begin
-                        ImportAndProcessToNewStatement();
+                        Rec.ImportAndProcessToNewStatement();
                     end;
                 }
                 action(EditJournal)
@@ -99,10 +104,10 @@ page 1294 "Pmt. Reconciliation Journals"
                     var
                         BankAccReconciliation: Record "Bank Acc. Reconciliation";
                     begin
-                        if not BankAccReconciliation.Get("Statement Type", "Bank Account No.", "Statement No.") then
+                        if not BankAccReconciliation.Get(Rec."Statement Type", Rec."Bank Account No.", Rec."Statement No.") then
                             exit;
 
-                        OpenWorksheet(Rec);
+                        Rec.OpenWorksheet(Rec);
                     end;
                 }
                 action(NewJournal)
@@ -115,7 +120,7 @@ page 1294 "Pmt. Reconciliation Journals"
 
                     trigger OnAction()
                     begin
-                        OpenNewWorksheet();
+                        Rec.OpenNewWorksheet();
                     end;
                 }
             }
@@ -128,7 +133,7 @@ page 1294 "Pmt. Reconciliation Journals"
                     Caption = 'Bank Account Card';
                     Image = BankAccount;
                     RunObject = Page "Payment Bank Account Card";
-                    RunPageLink = "No." = FIELD("Bank Account No.");
+                    RunPageLink = "No." = field("Bank Account No.");
                     ToolTip = 'View or edit information about the bank account that is related to the payment reconciliation journal.';
                 }
                 action("List of Bank Accounts")

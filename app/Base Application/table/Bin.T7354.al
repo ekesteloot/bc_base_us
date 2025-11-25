@@ -1,3 +1,16 @@
+namespace Microsoft.WarehouseMgt.Structure;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Document;
+using Microsoft.WarehouseMgt.InternalDocument;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Ledger;
+using Microsoft.WarehouseMgt.Setup;
+using System.Telemetry;
+
 table 7354 Bin
 {
     Caption = 'Bin';
@@ -226,11 +239,14 @@ table 7354 Bin
         key(Key5; "Code")
         {
         }
+        key(Key6; "Bin Ranking")
+        {
+        }
     }
 
     fieldgroups
     {
-        fieldgroup(DropDown; "Code", "Zone Code", "Bin Type Code", Empty, Default)
+        fieldgroup(DropDown; "Code", Description, "Zone Code", "Bin Type Code", Empty, Default)
         {
         }
     }

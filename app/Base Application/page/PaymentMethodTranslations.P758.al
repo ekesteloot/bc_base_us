@@ -1,3 +1,5 @@
+namespace Microsoft.BankMgt.BankAccount;
+
 page 758 "Payment Method Translations"
 {
     Caption = 'Payment Method Translations';

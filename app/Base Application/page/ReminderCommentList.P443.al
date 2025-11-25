@@ -1,3 +1,5 @@
+namespace Microsoft.Sales.Reminder;
+
 page 443 "Reminder Comment List"
 {
     AutoSplitKey = true;
@@ -26,12 +28,12 @@ page 443 "Reminder Comment List"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the date the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the comment itself.';

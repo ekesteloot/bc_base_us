@@ -1,3 +1,8 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Setup;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Setup;
+
 table 50 "Accounting Period"
 {
     Caption = 'Accounting Period';

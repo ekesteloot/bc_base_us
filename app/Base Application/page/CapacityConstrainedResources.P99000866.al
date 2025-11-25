@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.Capacity;
+
+using Microsoft.Manufacturing.Reports;
+
 page 99000866 "Capacity Constrained Resources"
 {
     AdditionalSearchTerms = 'finite loading';

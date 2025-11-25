@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.StandardCost;
+
 page 5840 "Standard Cost Worksheet Names"
 {
     Caption = 'Standard Cost Worksheet Names';
@@ -52,7 +54,7 @@ page 5840 "Standard Cost Worksheet Names"
 
                 trigger OnAction()
                 begin
-                    StdCostWksh."Standard Cost Worksheet Name" := Name;
+                    StdCostWksh."Standard Cost Worksheet Name" := Rec.Name;
                     PAGE.Run(PAGE::"Standard Cost Worksheet", StdCostWksh);
                 end;
             }

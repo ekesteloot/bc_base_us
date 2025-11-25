@@ -1,14 +1,28 @@
+﻿namespace Microsoft.Purchases.Archive;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.PaymentTerms;
+using System.Email;
+using System.Globalization;
+using System.Utilities;
+
 report 417 "Arch.Purch. Return Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/ArchPurchReturnOrder.rdlc';
+    RDLCLayout = './Purchases/Archive/ArchPurchReturnOrder.rdlc';
     Caption = 'Arch.Purch. Return Order';
 
     dataset
     {
         dataitem("Purchase Header Archive"; "Purchase Header Archive")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Return Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Return Order"));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
             RequestFilterHeading = 'Purchase Return Order';
             column(Purchase_Header_Archive_Document_Type; "Document Type")
@@ -25,10 +39,10 @@ report 417 "Arch.Purch. Return Order"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(STRSUBSTNO_Text004_CopyText_; StrSubstNo(Text004, CopyText))
                     {
                     }
@@ -179,7 +193,7 @@ report 417 "Arch.Purch. Return Order"
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purchase Header Archive";
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(DimText; DimText)
                         {
                         }
@@ -223,9 +237,9 @@ report 417 "Arch.Purch. Return Order"
                     }
                     dataitem("Purchase Line Archive"; "Purchase Line Archive")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No."), "Doc. No. Occurrence" = FIELD("Doc. No. Occurrence"), "Version No." = FIELD("Version No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No."), "Doc. No. Occurrence" = field("Doc. No. Occurrence"), "Version No." = field("Version No.");
                         DataItemLinkReference = "Purchase Header Archive";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Doc. No. Occurrence", "Version No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Doc. No. Occurrence", "Version No.", "Line No.");
 
                         trigger OnPreDataItem()
                         begin
@@ -234,7 +248,7 @@ report 417 "Arch.Purch. Return Order"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(PurchLineArch__Line_Amount_; TempPurchaseLineArchive."Line Amount")
                         {
                             AutoFormatExpression = "Purchase Line Archive"."Currency Code";
@@ -421,7 +435,7 @@ report 417 "Arch.Purch. Return Order"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_Control74; DimText)
                             {
                             }
@@ -516,7 +530,7 @@ report 417 "Arch.Purch. Return Order"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmountLine__VAT_Base_; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Purchase Header Archive"."Currency Code";
@@ -675,7 +689,7 @@ report 417 "Arch.Purch. Return Order"
                     }
                     dataitem(VATCounterLCY; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VALExchRate; VALExchRate)
                         {
                         }
@@ -782,7 +796,7 @@ report 417 "Arch.Purch. Return Order"
                     }
                     dataitem(Total; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(PaymentTerms_Description; PaymentTerms.Description)
                         {
                         }
@@ -801,7 +815,7 @@ report 417 "Arch.Purch. Return Order"
                     }
                     dataitem(Total2; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Purchase_Header_Archive___Pay_to_Vendor_No__; "Purchase Header Archive"."Pay-to Vendor No.")
                         {
                         }
@@ -847,7 +861,7 @@ report 417 "Arch.Purch. Return Order"
                     }
                     dataitem(Total3; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(Purchase_Header_Archive___Sell_to_Customer_No__; "Purchase Header Archive"."Sell-to Customer No.")
                         {
                         }
@@ -893,7 +907,7 @@ report 417 "Arch.Purch. Return Order"
                     }
                     dataitem(PrepmtLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                        DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                         column(PrepmtLineAmount; PrepmtLineAmount)
                         {
                             AutoFormatExpression = "Purchase Header Archive"."Currency Code";
@@ -985,7 +999,7 @@ report 417 "Arch.Purch. Return Order"
                         }
                         dataitem(PrepmtDimLoop; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_Control179; DimText)
                             {
                             }
@@ -1048,7 +1062,7 @@ report 417 "Arch.Purch. Return Order"
                     }
                     dataitem(PrepmtVATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(PrepmtVATAmountLine__VAT_Amount_; TempPrepmtVATAmountLine."VAT Amount")
                         {
                             AutoFormatExpression = "Purchase Header Archive"."Currency Code";
@@ -1167,7 +1181,7 @@ report 417 "Arch.Purch. Return Order"
                     }
                     dataitem(PrepmtTotal; "Integer")
                     {
-                        DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                        DataItemTableView = sorting(Number) where(Number = const(1));
                         column(PrepmtPaymentTerms_Description; PrepmtPaymentTerms.Description)
                         {
                         }
@@ -1228,6 +1242,7 @@ report 417 "Arch.Purch. Return Order"
             trigger OnAfterGetRecord()
             begin
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 FormatAddr.SetLanguageCode("Language Code");
 
                 FormatAddressFields("Purchase Header Archive");

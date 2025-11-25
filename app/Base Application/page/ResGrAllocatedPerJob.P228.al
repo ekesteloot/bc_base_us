@@ -1,3 +1,12 @@
+﻿namespace Microsoft.ProjectMgt.Jobs.Analysis;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.ProjectMgt.Resources.Resource;
+using System.Text;
+using System.Utilities;
+
 page 228 "Res. Gr. Allocated per Job"
 {
     Caption = 'Res. Gr. Allocated per Job';
@@ -37,7 +46,7 @@ page 228 "Res. Gr. Allocated per Job"
                     trigger OnValidate()
                     begin
                         DateControl();
-                        SetMatrixColumns("Matrix Page Step Type"::Initial);
+                        SetMatrixColumns(Enum::"Matrix Page Step Type"::Initial);
                         CurrPage.Update();
                     end;
                 }
@@ -50,7 +59,7 @@ page 228 "Res. Gr. Allocated per Job"
                     trigger OnValidate()
                     begin
                         DateControl();
-                        SetMatrixColumns("Matrix Page Step Type"::Initial);
+                        SetMatrixColumns(Enum::"Matrix Page Step Type"::Initial);
                         CurrPage.Update();
                     end;
                 }
@@ -104,7 +113,7 @@ page 228 "Res. Gr. Allocated per Job"
 
                 trigger OnAction()
                 begin
-                    SetMatrixColumns("Matrix Page Step Type"::Previous);
+                    SetMatrixColumns(Enum::"Matrix Page Step Type"::Previous);
                 end;
             }
             action("Next Set")
@@ -116,7 +125,7 @@ page 228 "Res. Gr. Allocated per Job"
 
                 trigger OnAction()
                 begin
-                    SetMatrixColumns("Matrix Page Step Type"::Next);
+                    SetMatrixColumns(Enum::"Matrix Page Step Type"::Next);
                 end;
             }
         }
@@ -141,9 +150,9 @@ page 228 "Res. Gr. Allocated per Job"
 
     trigger OnOpenPage()
     begin
-        SetMatrixColumns("Matrix Page Step Type"::Initial);
-        if HasFilter then
-            ResourceGrFilter := GetFilter("Resource Gr. Filter");
+        SetMatrixColumns(Enum::"Matrix Page Step Type"::Initial);
+        if Rec.HasFilter then
+            ResourceGrFilter := Rec.GetFilter("Resource Gr. Filter");
     end;
 
     var

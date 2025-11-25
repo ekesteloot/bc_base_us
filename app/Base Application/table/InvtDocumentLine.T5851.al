@@ -1,4 +1,25 @@
-﻿table 5851 "Invt. Document Line"
+﻿namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Availability;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.Purchases.Setup;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Structure;
+
+table 5851 "Invt. Document Line"
 {
     Caption = 'Item Document Line';
     DrillDownPageID = "Invt. Document Lines";
@@ -252,24 +273,24 @@
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
             end;
         }
         field(35; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
             end;
         }
         field(37; "Indirect Cost %"; Decimal)
@@ -321,8 +342,6 @@
             Caption = 'Last Item Ledger Entry No.';
             Editable = false;
             TableRelation = "Item Ledger Entry";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(57; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -353,7 +372,7 @@
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
 
             trigger OnValidate()
@@ -364,10 +383,19 @@
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
+            var
+                ItemVariant: Record "Item Variant";
             begin
+                if Rec."Variant Code" <> '' then begin
+                    ItemVariant.SetLoadFields(Description, Blocked);
+                    ItemVariant.Get("Item No.", "Variant Code");
+                    ItemVariant.TestField(Blocked, false);
+                    Description := ItemVariant.Description;
+                end;
+
                 if "Variant Code" <> xRec."Variant Code" then begin
                     "Bin Code" := '';
                     if ("Location Code" <> '') and ("Item No." <> '') then begin
@@ -380,12 +408,6 @@
                 "Unit Cost" := UnitCost;
                 Validate("Unit Amount");
                 ReserveInvtDocLine.VerifyChange(Rec, xRec);
-
-                if "Variant Code" = '' then
-                    exit;
-
-                ItemVariant.Get("Item No.", "Variant Code");
-                Description := ItemVariant.Description;
             end;
         }
         field(5403; "Bin Code"; Code[20])
@@ -458,7 +480,7 @@
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            TableRelation = "Item Unit of Measure".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
 
             trigger OnValidate()
             begin
@@ -490,11 +512,11 @@
         }
         field(5470; "Reserved Quantity Inbnd."; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("Document No."),
-                                                                  "Source Ref. No." = FIELD("Line No."),
-                                                                  "Source Type" = CONST(5851),
-                                                                  "Source Subtype" = FILTER("0" | "3"),
-                                                                  "Reservation Status" = CONST(Reservation)));
+            CalcFormula = sum("Reservation Entry".Quantity where("Source ID" = field("Document No."),
+                                                                  "Source Ref. No." = field("Line No."),
+                                                                  "Source Type" = const(5851),
+                                                                  "Source Subtype" = filter("0" | "3"),
+                                                                  "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity Inbnd.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -502,11 +524,11 @@
         }
         field(5471; "Reserved Quantity Outbnd."; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry".Quantity WHERE("Source ID" = FIELD("Document No."),
-                                                                   "Source Ref. No." = FIELD("Line No."),
-                                                                   "Source Type" = CONST(5851),
-                                                                   "Source Subtype" = FILTER("1" | "2"),
-                                                                   "Reservation Status" = CONST(Reservation)));
+            CalcFormula = - sum("Reservation Entry".Quantity where("Source ID" = field("Document No."),
+                                                                   "Source Ref. No." = field("Line No."),
+                                                                   "Source Type" = const(5851),
+                                                                   "Source Subtype" = filter("1" | "2"),
+                                                                   "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity Outbnd.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -514,11 +536,11 @@
         }
         field(5472; "Reserved Qty. Inbnd. (Base)"; Decimal)
         {
-            CalcFormula = Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("Document No."),
-                                                                           "Source Ref. No." = FIELD("Line No."),
-                                                                           "Source Type" = CONST(5851),
-                                                                           "Source Subtype" = FILTER("0" | "3"),
-                                                                           "Reservation Status" = CONST(Reservation)));
+            CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Document No."),
+                                                                           "Source Ref. No." = field("Line No."),
+                                                                           "Source Type" = const(5851),
+                                                                           "Source Subtype" = filter("0" | "3"),
+                                                                           "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. Inbnd. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -526,11 +548,11 @@
         }
         field(5473; "Reserved Qty. Outbnd. (Base)"; Decimal)
         {
-            CalcFormula = - Sum("Reservation Entry"."Quantity (Base)" WHERE("Source ID" = FIELD("Document No."),
-                                                                            "Source Ref. No." = FIELD("Line No."),
-                                                                            "Source Type" = CONST(5851),
-                                                                            "Source Subtype" = FILTER("1" | "2"),
-                                                                            "Reservation Status" = CONST(Reservation)));
+            CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Document No."),
+                                                                            "Source Ref. No." = field("Line No."),
+                                                                            "Source Type" = const(5851),
+                                                                            "Source Subtype" = filter("1" | "2"),
+                                                                            "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Qty. Outbnd. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -545,6 +567,38 @@
         {
             Caption = 'Purchasing Code';
             TableRelation = Purchasing;
+        }
+        field(5725; "Item Reference No."; Code[50])
+        {
+            AccessByPermission = TableData "Item Reference" = R;
+            Caption = 'Item Reference No.';
+            ExtendedDatatype = Barcode;
+
+            trigger OnLookup()
+            begin
+                ItemReferenceManagement.InvtDocumentReferenceNoLookup(Rec);
+            end;
+
+            trigger OnValidate()
+            var
+                ItemReference: Record "Item Reference";
+            begin
+                ItemReferenceManagement.ValidateInvtDocumentReferenceNo(Rec, ItemReference, true, CurrFieldNo);
+            end;
+        }
+        field(5726; "Item Reference Unit of Measure"; Code[10])
+        {
+            AccessByPermission = TableData "Item Reference" = R;
+            Caption = 'Item Reference Unit of Measure';
+            TableRelation = "Item Unit of Measure".Code where("Item No." = field("Item No."));
+        }
+        field(5727; "Item Reference Type"; Enum "Item Reference Type")
+        {
+            Caption = 'Item Reference Type';
+        }
+        field(5728; "Item Reference Type No."; Code[30])
+        {
+            Caption = 'Item Reference Type No.';
         }
         field(5801; "Item Charge No."; Code[20])
         {
@@ -612,12 +666,12 @@
         field(12451; "FA Entry No."; Integer)
         {
             Caption = 'FA Entry No.';
-            TableRelation = "FA Ledger Entry" WHERE("Entry No." = FIELD("FA Entry No."));
+            TableRelation = "FA Ledger Entry" where("Entry No." = field("FA Entry No."));
         }
         field(12452; "Depreciation Book Code"; Code[10])
         {
             Caption = 'Depreciation Book Code';
-            TableRelation = "FA Depreciation Book"."Depreciation Book Code" WHERE("FA No." = FIELD("FA No."));
+            TableRelation = "FA Depreciation Book"."Depreciation Book Code" where("FA No." = field("FA No."));
         }
     }
 
@@ -672,7 +726,6 @@
     var
         InvtDocHeader: Record "Invt. Document Header";
         Item: Record Item;
-        ItemVariant: Record "Item Variant";
         GLSetup: Record "General Ledger Setup";
         SKU: Record "Stockkeeping Unit";
         Location: Record Location;
@@ -683,6 +736,7 @@
         DimMgt: Codeunit DimensionManagement;
         WMSManagement: Codeunit "WMS Management";
         CheckDateConflict: Codeunit "Reservation-Check Date Confl.";
+        ItemReferenceManagement: Codeunit "Item Reference Management";
         Reservation: Page Reservation;
         GLSetupRead: Boolean;
         UnitCost: Decimal;
@@ -754,7 +808,13 @@
     begin
         TestField("Document No.");
         if ("Document Type" <> InvtDocHeader."Document Type") or ("Document No." <> InvtDocHeader."No.") then
-            InvtDocHeader.Get("Document Type", "Document No.");
+            InvtDocHeader.Get(Rec."Document Type", Rec."Document No.");
+    end;
+
+    procedure IsCorrection(): Boolean
+    begin
+        GetInvtDocHeader();
+        exit(InvtDocHeader.Correction);
     end;
 
     local procedure GetItem()
@@ -798,7 +858,7 @@
             FieldNo("Location Code"):
                 CalledByFieldNo := ItemJournalLine.FieldNo("Location Code");
         end;
-        ItemJournalLine.ApplyPrice("Price Type"::Purchase, CalledByFieldNo);
+        ItemJournalLine.ApplyPrice(Enum::"Price Type"::Purchase, CalledByFieldNo);
         exit(ItemJournalLine."Unit Amount");
     end;
 
@@ -832,30 +892,6 @@
         ReserveInvtDocLine.CallItemTracking(Rec);
     end;
 
-#if not CLEAN20
-    [Obsolete('Replaced by CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])', '20.0')]
-    procedure CreateDim(Type1: Integer; No1: Code[20]; Type2: Integer; No2: Code[20])
-    var
-        SourceCodeSetup: Record "Source Code Setup";
-        TableID: array[10] of Integer;
-        No: array[10] of Code[20];
-    begin
-        SourceCodeSetup.Get();
-        TableID[1] := Type1;
-        No[1] := No1;
-        TableID[2] := Type2;
-        No[2] := No2;
-        "Shortcut Dimension 1 Code" := '';
-        "Shortcut Dimension 2 Code" := '';
-        GetInvtDocHeader();
-        "Dimension Set ID" :=
-          DimMgt.GetDefaultDimID(
-            TableID, No, "Source Code", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code",
-            InvtDocHeader."Dimension Set ID", DATABASE::"Invt. Document Header");
-        DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
-    end;
-#endif
-
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         SourceCodeSetup: Record "Source Code Setup";
@@ -886,12 +922,12 @@
     procedure LookupShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
         DimMgt.LookupDimValueCode(FieldNumber, ShortcutDimCode);
-        ValidateShortcutDimCode(FieldNumber, ShortcutDimCode);
+        Rec.ValidateShortcutDimCode(FieldNumber, ShortcutDimCode);
     end;
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
     begin
-        DimMgt.GetShortcutDimensions("Dimension Set ID", ShortcutDimCode);
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
     local procedure ReadGLSetup()

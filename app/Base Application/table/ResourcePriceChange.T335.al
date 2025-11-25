@@ -1,3 +1,7 @@
+namespace Microsoft.ProjectMgt.Resources.Resource;
+
+using Microsoft.FinancialMgt.Currency;
+
 table 335 "Resource Price Change"
 {
     Caption = 'Resource Price Change';
@@ -8,7 +12,7 @@ table 335 "Resource Price Change"
     ObsoleteTag = '16.0';
 #else
     ObsoleteState = Removed;
-    ObsoleteTag = '22.0';
+    ObsoleteTag = '24.0';
 #endif    
     ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation: table Price Worksheet Line';
 
@@ -23,9 +27,9 @@ table 335 "Resource Price Change"
         field(3; "Code"; Code[20])
         {
             Caption = 'Code';
-            TableRelation = IF (Type = CONST(Resource)) Resource
-            ELSE
-            IF (Type = CONST("Group(Resource)")) "Resource Group";
+            TableRelation = if (Type = const(Resource)) Resource
+            else
+            if (Type = const("Group(Resource)")) "Resource Group";
 
             trigger OnValidate()
             begin
@@ -45,13 +49,13 @@ table 335 "Resource Price Change"
         }
         field(6; "Current Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'Current Unit Price';
         }
         field(7; "New Unit Price"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
             Caption = 'New Unit Price';
         }

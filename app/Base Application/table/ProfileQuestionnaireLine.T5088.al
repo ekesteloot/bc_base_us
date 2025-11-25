@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Profiling;
+
 table 5088 "Profile Questionnaire Line"
 {
     Caption = 'Profile Questionnaire Line';
@@ -224,8 +226,8 @@ table 5088 "Profile Questionnaire Line"
         field(16; "No. of Contacts"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Count("Contact Profile Answer" WHERE("Profile Questionnaire Code" = FIELD("Profile Questionnaire Code"),
-                                                                "Line No." = FIELD("Line No.")));
+            CalcFormula = count("Contact Profile Answer" where("Profile Questionnaire Code" = field("Profile Questionnaire Code"),
+                                                                "Line No." = field("Line No.")));
             Caption = 'No. of Contacts';
             Editable = false;
             FieldClass = FlowField;

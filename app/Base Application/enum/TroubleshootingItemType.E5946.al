@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 enum 5946 "Troubleshooting Item Type"
 {
     Extensible = true;

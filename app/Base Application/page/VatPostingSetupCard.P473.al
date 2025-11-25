@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 page 473 "VAT Posting Setup Card"
 {
     Caption = 'VAT Posting Setup Card';
@@ -187,7 +189,7 @@ page 473 "VAT Posting Setup Card"
 
                 trigger OnAction()
                 begin
-                    SuggestSetupAccounts();
+                    Rec.SuggestSetupAccounts();
                 end;
             }
             action(Copy)
@@ -228,7 +230,7 @@ page 473 "VAT Posting Setup Card"
     var
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
     begin
-        SetAccountsVisibility(UnrealizedVATVisible, AdjustForPmtDiscVisible);
+        Rec.SetAccountsVisibility(UnrealizedVATVisible, AdjustForPmtDiscVisible);
         NonDeductibleVATVisible := NonDeductibleVAT.IsNonDeductibleVATEnabled();
     end;
 

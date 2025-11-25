@@ -1,3 +1,5 @@
+namespace Microsoft.WarehouseMgt.Activity.History;
+
 page 7364 "Registered Whse. Act.-Lines"
 {
     Caption = 'Registered Whse. Act.-Lines';
@@ -201,7 +203,7 @@ page 7364 "Registered Whse. Act.-Lines"
 
                     trigger OnAction()
                     begin
-                        ShowRegisteredActivityDoc();
+                        Rec.ShowRegisteredActivityDoc();
                     end;
                 }
                 action("Show &Whse. Document")
@@ -213,7 +215,7 @@ page 7364 "Registered Whse. Act.-Lines"
 
                     trigger OnAction()
                     begin
-                        ShowWhseDoc();
+                        Rec.ShowWhseDoc();
                     end;
                 }
             }
@@ -247,12 +249,12 @@ page 7364 "Registered Whse. Act.-Lines"
 
     local procedure FormCaption(): Text[250]
     begin
-        case "Activity Type" of
-            "Activity Type"::"Put-away":
+        case Rec."Activity Type" of
+            Rec."Activity Type"::"Put-away":
                 exit(Text000);
-            "Activity Type"::Pick:
+            Rec."Activity Type"::Pick:
                 exit(Text001);
-            "Activity Type"::Movement:
+            Rec."Activity Type"::Movement:
                 exit(Text002);
             else
                 exit(Text003);

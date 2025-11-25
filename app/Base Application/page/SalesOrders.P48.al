@@ -5,7 +5,7 @@ page 48 "Sales Orders"
     Editable = false;
     PageType = List;
     SourceTable = "Sales Line";
-    SourceTableView = WHERE("Document Type" = FILTER(Order));
+    SourceTableView = where("Document Type" = filter(Order));
 
     layout
     {
@@ -123,8 +123,8 @@ page 48 "Sales Orders"
                     Caption = 'Show Order';
                     Image = ViewOrder;
                     RunObject = Page "Sales Order";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("Document No.");
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("Document No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View the selected sales order.';
                 }
@@ -138,7 +138,7 @@ page 48 "Sales Orders"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
             }

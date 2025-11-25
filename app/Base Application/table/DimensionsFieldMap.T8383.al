@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.Dimension;
+
 table 8383 "Dimensions Field Map"
 {
     Caption = 'Dimensions Field Map';

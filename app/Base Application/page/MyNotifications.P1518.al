@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 page 1518 "My Notifications"
 {
     ApplicationArea = All;
@@ -24,18 +26,18 @@ page 1518 "My Notifications"
 
                     trigger OnDrillDown()
                     begin
-                        Message(GetDescription());
+                        Message(Rec.GetDescription());
                     end;
                 }
-                field(Enabled; Enabled)
+                field(Enabled; Rec.Enabled)
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies that notifications are enabled.';
 
                     trigger OnValidate()
                     begin
-                        if Enabled <> xRec.Enabled then begin
-                            Filters := GetFiltersAsDisplayText();
+                        if Rec.Enabled <> xRec.Enabled then begin
+                            Filters := Rec.GetFiltersAsDisplayText();
                             CurrPage.Update();
                         end;
                     end;
@@ -49,8 +51,8 @@ page 1518 "My Notifications"
 
                     trigger OnDrillDown()
                     begin
-                        if OpenFilterSettings() then begin
-                            Filters := GetFiltersAsDisplayText();
+                        if Rec.OpenFilterSettings() then begin
+                            Filters := Rec.GetFiltersAsDisplayText();
                             CurrPage.Update();
                         end;
                     end;
@@ -65,13 +67,13 @@ page 1518 "My Notifications"
 
     trigger OnAfterGetRecord()
     begin
-        Filters := GetFiltersAsDisplayText();
+        Filters := Rec.GetFiltersAsDisplayText();
     end;
 
     trigger OnOpenPage()
     begin
         OnInitializingNotificationWithDefaultState();
-        SetRange("User Id", UserId);
+        Rec.SetRange("User Id", UserId);
     end;
 
     var

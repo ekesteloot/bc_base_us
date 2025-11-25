@@ -1,3 +1,5 @@
+namespace Microsoft.CRM.Comment;
+
 page 5118 "Rlshp. Mgt. Comment List"
 {
     Caption = 'Rlshp. Mgt. Comment List';
@@ -23,12 +25,12 @@ page 5118 "Rlshp. Mgt. Comment List"
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the number of the stage within the sales cycle.';
                 }
-                field(Date; Date)
+                field(Date; Rec.Date)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the date the comment was created.';
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = RelationshipMgmt;
                     ToolTip = 'Specifies the comment itself.';

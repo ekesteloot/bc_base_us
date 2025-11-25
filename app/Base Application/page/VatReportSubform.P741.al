@@ -39,7 +39,7 @@ page 741 "VAT Report Subform"
                     ApplicationArea = VAT;
                     ToolTip = 'Specifies the type of the VAT entry.';
                 }
-                field(Base; Base)
+                field(Base; Rec.Base)
                 {
                     ApplicationArea = VAT;
                     ToolTip = 'Specifies the amount that the VAT amount in the Amount is calculated from.';
@@ -56,7 +56,7 @@ page 741 "VAT Report Subform"
                         FilterText: Text[1024];
                         TableNo: Integer;
                     begin
-                        FilterText := VATReportLineRelation.CreateFilterForAmountMapping("VAT Report No.", "Line No.", TableNo);
+                        FilterText := VATReportLineRelation.CreateFilterForAmountMapping(Rec."VAT Report No.", Rec."Line No.", TableNo);
                         case TableNo of
                             DATABASE::"VAT Entry":
                                 begin

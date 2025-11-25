@@ -702,9 +702,6 @@ codeunit 378 "Transfer Extended Text"
                 ToServiceLine.Description := TempExtTextLine.Text;
                 ToServiceLine."Attached to Line No." := ServiceLine."Line No.";
                 ToServiceLine."Service Item No." := ServiceLine."Service Item No.";
-#if not CLEAN20            
-                OnBeforeToServiceLineInsert(ServiceLine, ToServiceLine, TempExtTextLine, NextLineNo, LineSpacing);
-#endif                
                 IsHandled := false;
                 OnInsertServExtTextOnBeforeToServiceLineInsert(ServiceLine, ToServiceLine, TempExtTextLine, NextLineNo, LineSpacing, IsHandled);
                 if not IsHandled then
@@ -748,13 +745,6 @@ codeunit 378 "Transfer Extended Text"
     begin
     end;
 
-#if not CLEAN20     
-    [IntegrationEvent(false, false)]
-    [Obsolete('Replaced with OnInsertServExtTextOnBeforeToServiceLineInsert', '20.0')]
-    local procedure OnBeforeToServiceLineInsert(var ToServLine: Record "Service Line"; ServLine: Record "Service Line"; TempExtTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer)
-    begin
-    end;
-#endif
     [IntegrationEvent(false, false)]
     local procedure OnInsertServExtTextOnBeforeToServiceLineInsert(var ServLine: Record "Service Line"; var ToServLine: Record "Service Line"; TempExtTextLine: Record "Extended Text Line" temporary; var NextLineNo: Integer; LineSpacing: Integer; var IsHandled: Boolean)
     begin

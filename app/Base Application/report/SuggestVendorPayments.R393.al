@@ -1,4 +1,19 @@
-﻿report 393 "Suggest Vendor Payments"
+﻿namespace Microsoft.Purchases.Payables;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.ReceivablesPayables;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Vendor;
+using System.Environment;
+using System.Utilities;
+
+report 393 "Suggest Vendor Payments"
 {
     Caption = 'Suggest Vendor Payments';
     ProcessingOnly = true;
@@ -7,7 +22,7 @@
     {
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING(Blocked) WHERE(Blocked = FILTER(= " "));
+            DataItemTableView = sorting(Blocked) where(Blocked = filter(= " "));
             RequestFilterFields = "No.", "Payment Method Code";
 
             trigger OnAfterGetRecord()
@@ -512,7 +527,6 @@
         SummarizePerDimText: Text[250];
         LastLineNo: Integer;
         NextEntryNo: Integer;
-        [InDataSet]
         UseDueDateAsPostingDate: Boolean;
         StopPayments: Boolean;
         DocNoPerLine: Boolean;
@@ -522,11 +536,9 @@
         MessageText: Text;
         GenJnlLineInserted: Boolean;
         SeveralCurrencies: Boolean;
-        [InDataSet]
         SummarizePerDimTextEnable: Boolean;
         ShowPostingDateWarning: Boolean;
         VendorBalance: Decimal;
-        [InDataSet]
         ServiceFieldsVisibiity: Boolean;
 
         Text000: Label 'In the Last Payment Date field, specify the last possible date that payments must be made.';
@@ -661,7 +673,7 @@
             Validate("Payment Terms Code");
             VendLedgEntry.CalcFields("Remaining Amount");
             if PaymentToleranceMgt.CheckCalcPmtDiscGenJnlVend(GenJnlLine, VendLedgEntry, 0, false) then
-                Amount := -(VendLedgEntry."Remaining Amount" - VendLedgEntry."Remaining Pmt. Disc. Possible")
+                Amount := -(VendLedgEntry."Remaining Amount" - VendLedgEntry.GetRemainingPmtDiscPossible(GenJnlLine."Posting Date"))
             else
                 Amount := -VendLedgEntry."Remaining Amount";
             Validate(Amount);
@@ -1419,5 +1431,5 @@
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetMessageToRecipient(SummarizePerVend: Boolean; TempVendorPaymentBuffer: Record "Vendor Payment Buffer" temporary; var IsHandled: Boolean; var Message: Text[140])
     begin
-    end;    
+    end;
 }

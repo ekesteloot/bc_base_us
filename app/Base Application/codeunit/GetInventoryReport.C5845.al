@@ -7,8 +7,8 @@ codeunit 5845 "Get Inventory Report"
         WindowUpdateDateTime := CurrentDateTime;
         WindowIsOpen := false;
 
-        Reset();
-        DeleteAll();
+        Rec.Reset();
+        Rec.DeleteAll();
         Calculate(Rec);
 
         if WindowIsOpen then

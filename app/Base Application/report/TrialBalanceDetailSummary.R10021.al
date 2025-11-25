@@ -11,7 +11,7 @@ report 10021 "Trial Balance Detail/Summary"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = WHERE("Account Type" = CONST(Posting));
+            DataItemTableView = where("Account Type" = const(Posting));
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Date Filter", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(MainTitle; MainTitle)
@@ -155,8 +155,8 @@ report 10021 "Trial Balance Detail/Summary"
             }
             dataitem("G/L Entry"; "G/L Entry")
             {
-                DataItemLink = "G/L Account No." = FIELD("No."), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter"), "Business Unit Code" = FIELD("Business Unit Filter");
-                DataItemTableView = SORTING("G/L Account No.", "Posting Date");
+                DataItemLink = "G/L Account No." = field("No."), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter"), "Business Unit Code" = field("Business Unit Filter");
+                DataItemTableView = sorting("G/L Account No.", "Posting Date");
                 RequestFilterFields = "Document Type", "Document No.";
                 column(Account_______G_L_Account___No__; 'Account: ' + "G/L Account"."No.")
                 {
@@ -292,7 +292,7 @@ report 10021 "Trial Balance Detail/Summary"
             }
             dataitem(Blank; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(PADSTR_____G_L_Account__Indentation_____G_L_Account__Name; PadStr('', "G/L Account".Indentation) + "G/L Account".Name)
                 {
                 }

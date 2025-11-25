@@ -1,3 +1,8 @@
+namespace Microsoft.Manufacturing.ProductionBOM;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Document;
+
 page 99000789 "Production BOM Version Lines"
 {
     AutoSplitKey = true;
@@ -42,25 +47,25 @@ page 99000789 "Production BOM Version Lines"
                     ToolTip = 'Specifies how to calculate the Quantity field.';
                     Visible = false;
                 }
-                field(Length; Length)
+                field(Length; Rec.Length)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the length of one item unit when measured in the specified unit of measure.';
                     Visible = false;
                 }
-                field(Width; Width)
+                field(Width; Rec.Width)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the width of one item unit when measured in the specified unit of measure.';
                     Visible = false;
                 }
-                field(Depth; Depth)
+                field(Depth; Rec.Depth)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the depth of one item unit when measured in the specified unit of measure.';
                     Visible = false;
                 }
-                field(Weight; Weight)
+                field(Weight; Rec.Weight)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the weight of one item unit when measured in the specified unit of measure.';
@@ -86,7 +91,7 @@ page 99000789 "Production BOM Version Lines"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the routing link code.';
                 }
-                field(Position; Position)
+                field(Position; Rec.Position)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the position of the component on the bill of material.';
@@ -166,9 +171,9 @@ page 99000789 "Production BOM Version Lines"
     var
         ProdOrderCompComment: Record "Production BOM Comment Line";
     begin
-        ProdOrderCompComment.SetRange("Production BOM No.", "Production BOM No.");
-        ProdOrderCompComment.SetRange("BOM Line No.", "Line No.");
-        ProdOrderCompComment.SetRange("Version Code", "Version Code");
+        ProdOrderCompComment.SetRange("Production BOM No.", Rec."Production BOM No.");
+        ProdOrderCompComment.SetRange("BOM Line No.", Rec."Line No.");
+        ProdOrderCompComment.SetRange("Version Code", Rec."Version Code");
 
         PAGE.Run(PAGE::"Prod. Order BOM Cmt. Sheet", ProdOrderCompComment);
     end;
@@ -180,19 +185,19 @@ page 99000789 "Production BOM Version Lines"
         ProdBOMVersion: Record "Production BOM Version";
         ProdBOMWhereUsed: Page "Prod. BOM Where-Used";
     begin
-        if Type = Type::" " then
+        if Rec.Type = Rec.Type::" " then
             exit;
 
-        ProdBOMVersion.Get("Production BOM No.", "Version Code");
-        case Type of
-            Type::Item:
+        ProdBOMVersion.Get(Rec."Production BOM No.", Rec."Version Code");
+        case Rec.Type of
+            Rec.Type::Item:
                 begin
-                    Item.Get("No.");
+                    Item.Get(Rec."No.");
                     ProdBOMWhereUsed.SetItem(Item, ProdBOMVersion."Starting Date");
                 end;
-            Type::"Production BOM":
+            Rec.Type::"Production BOM":
                 begin
-                    ProdBOMHeader.Get("No.");
+                    ProdBOMHeader.Get(Rec."No.");
                     ProdBOMWhereUsed.SetProdBOM(ProdBOMHeader, ProdBOMVersion."Starting Date");
                 end;
         end;

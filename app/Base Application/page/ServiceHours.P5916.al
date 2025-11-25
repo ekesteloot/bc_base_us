@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Contract;
+
 page 5916 "Service Hours"
 {
     Caption = 'Service Hours';
@@ -24,7 +26,7 @@ page 5916 "Service Hours"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the date when the service hours become valid.';
                 }
-                field(Day; Day)
+                field(Day; Rec.Day)
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the day when the service hours are valid.';
@@ -78,7 +80,7 @@ page 5916 "Service Hours"
 
                     trigger OnAction()
                     begin
-                        CopyDefaultServiceHours();
+                        Rec.CopyDefaultServiceHours();
                     end;
                 }
             }
@@ -96,13 +98,13 @@ page 5916 "Service Hours"
         EntryMissing := false;
 
         ServHour.Reset();
-        case "Service Contract Type" of
+        case Rec."Service Contract Type" of
             "Service Contract Type"::Quote:
                 ServHour.SetRange("Service Contract Type", "Service Contract Type"::Quote);
             "Service Contract Type"::Contract:
                 ServHour.SetRange("Service Contract Type", "Service Contract Type"::Contract);
         end;
-        ServHour.SetRange("Service Contract No.", "Service Contract No.");
+        ServHour.SetRange("Service Contract No.", Rec."Service Contract No.");
         if ServHour.Find('-') then begin
             repeat
                 Weekdays[ServHour.Day + 1] := true;

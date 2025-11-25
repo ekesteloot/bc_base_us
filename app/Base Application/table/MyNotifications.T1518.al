@@ -1,3 +1,10 @@
+﻿namespace System.Environment.Configuration;
+
+using System;
+using System.Reflection;
+using System.Utilities;
+using System.Xml;
+
 table 1518 "My Notifications"
 {
     Caption = 'My Notifications';

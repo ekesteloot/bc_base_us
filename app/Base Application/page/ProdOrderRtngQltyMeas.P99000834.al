@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Document;
+
 page 99000834 "Prod. Order Rtng Qlty Meas."
 {
     AutoSplitKey = true;

@@ -1,3 +1,7 @@
+namespace Microsoft.CostAccounting.Allocation;
+
+using System.Security.User;
+
 page 1109 "Cost Allocation Target Card"
 {
     AutoSplitKey = true;
@@ -12,7 +16,7 @@ page 1109 "Cost Allocation Target Card"
             group(General)
             {
                 Caption = 'General';
-                field(ID; ID)
+                field(ID; Rec.ID)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the ID that applies to the cost allocation.';
@@ -52,7 +56,7 @@ page 1109 "Cost Allocation Target Card"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the amount if the value in the Allocation Target Type field is Amount per Share.';
                 }
-                field(Base; Base)
+                field(Base; Rec.Base)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies whether or not the base is static.';
@@ -67,7 +71,7 @@ page 1109 "Cost Allocation Target Card"
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies whether the values in the static base are weighted.';
                 }
-                field(Share; Share)
+                field(Share; Rec.Share)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the values calculated from the Static Base and Static Weighting fields. ';
@@ -77,7 +81,7 @@ page 1109 "Cost Allocation Target Card"
                         CurrPage.Update(false);
                     end;
                 }
-                field(Percent; Percent)
+                field(Percent; Rec.Percent)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies the percentage rate calculated based on all other allocation targets.';
@@ -134,10 +138,10 @@ page 1109 "Cost Allocation Target Card"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
-                field(Comment; Comment)
+                field(Comment; Rec.Comment)
                 {
                     ApplicationArea = CostAccounting;
                     ToolTip = 'Specifies a comment that applies to the cost allocation.';

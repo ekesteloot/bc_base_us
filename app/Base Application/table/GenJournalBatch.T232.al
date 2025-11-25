@@ -1,3 +1,13 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Journal;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Setup;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+
 table 232 "Gen. Journal Batch"
 {
     Caption = 'Gen. Journal Batch';
@@ -49,15 +59,15 @@ table 232 "Gen. Journal Batch"
         field(6; "Bal. Account No."; Code[20])
         {
             Caption = 'Bal. Account No.';
-            TableRelation = IF ("Bal. Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Bal. Account Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Bal. Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Bal. Account Type" = CONST("Fixed Asset")) "Fixed Asset";
+            TableRelation = if ("Bal. Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bal. Account Type" = const(Customer)) Customer
+            else
+            if ("Bal. Account Type" = const(Vendor)) Vendor
+            else
+            if ("Bal. Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Bal. Account Type" = const("Fixed Asset")) "Fixed Asset";
 
             trigger OnValidate()
             begin
@@ -131,7 +141,7 @@ table 232 "Gen. Journal Batch"
         field(12; "Bank Statement Import Format"; Code[20])
         {
             Caption = 'Bank Statement Import Format';
-            TableRelation = "Bank Export/Import Setup".Code WHERE(Direction = CONST(Import));
+            TableRelation = "Bank Export/Import Setup".Code where(Direction = const(Import));
 
             trigger OnValidate()
             begin
@@ -141,14 +151,14 @@ table 232 "Gen. Journal Batch"
         }
         field(21; "Template Type"; Enum "Gen. Journal Template Type")
         {
-            CalcFormula = Lookup("Gen. Journal Template".Type WHERE(Name = FIELD("Journal Template Name")));
+            CalcFormula = Lookup("Gen. Journal Template".Type where(Name = field("Journal Template Name")));
             Caption = 'Template Type';
             Editable = false;
             FieldClass = FlowField;
         }
         field(22; Recurring; Boolean)
         {
-            CalcFormula = Lookup("Gen. Journal Template".Recurring WHERE(Name = FIELD("Journal Template Name")));
+            CalcFormula = Lookup("Gen. Journal Template".Recurring where(Name = field("Journal Template Name")));
             Caption = 'Recurring';
             Editable = false;
             FieldClass = FlowField;
@@ -209,13 +219,8 @@ table 232 "Gen. Journal Batch"
         {
             Caption = 'Background Error Check';
             ObsoleteReason = 'Replaced with GLSetup.Enable Data Check';
-#if CLEAN20
             ObsoleteState = Removed;
             ObsoleteTag = '23.0';
-#else
-            ObsoleteState = Pending;
-            ObsoleteTag = '20.0';
-#endif
         }
     }
 
@@ -236,7 +241,7 @@ table 232 "Gen. Journal Batch"
 
     trigger OnDelete()
     begin
-        ApprovalsMgmt.OnCancelGeneralJournalBatchApprovalRequest(Rec);
+        ApprovalsMgmt.PreventDeletingRecordWithOpenApprovalEntry(Rec);
 
         GenJnlAlloc.SetRange("Journal Template Name", "Journal Template Name");
         GenJnlAlloc.SetRange("Journal Batch Name", Name);
@@ -244,12 +249,6 @@ table 232 "Gen. Journal Batch"
         GenJnlLine.SetRange("Journal Template Name", "Journal Template Name");
         GenJnlLine.SetRange("Journal Batch Name", Name);
         GenJnlLine.DeleteAll(true);
-#if not CLEAN21
-        DepositHeader.SetCurrentKey("Journal Template Name", "Journal Batch Name");
-        DepositHeader.SetRange("Journal Template Name", "Journal Template Name");
-        DepositHeader.SetRange("Journal Batch Name", Name);
-        DepositHeader.DeleteAll(true);
-#endif
     end;
 
     trigger OnInsert()
@@ -265,6 +264,7 @@ table 232 "Gen. Journal Batch"
 
     trigger OnModify()
     begin
+        ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(Rec);
         SetLastModifiedDateTime();
     end;
 
@@ -279,9 +279,6 @@ table 232 "Gen. Journal Batch"
         GenJnlTemplate: Record "Gen. Journal Template";
         GenJnlLine: Record "Gen. Journal Line";
         GenJnlAlloc: Record "Gen. Jnl. Allocation";
-#if not CLEAN21
-        DepositHeader: Record "Deposit Header";
-#endif
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
 
         Text000: Label 'Only the %1 field can be filled in on recurring journals.';

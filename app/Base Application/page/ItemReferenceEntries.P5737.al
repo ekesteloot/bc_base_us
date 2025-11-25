@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Item.Catalog;
+
 page 5737 "Item Reference Entries"
 {
     Caption = 'Item Reference Entries';
@@ -43,6 +45,16 @@ page 5737 "Item Reference Entries"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a description of the item linked to this reference. It will override the standard description when entered on an order.';
                 }
+                field("Starting Date"; Rec."Starting Date")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the first day from when the item reference is valid.';
+                }
+                field("Ending Date"; Rec."Ending Date")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the last day from when the item reference is valid.';
+                }
                 field("Description 2"; Rec."Description 2")
                 {
                     ApplicationArea = Basic, Suite;
@@ -68,6 +80,39 @@ page 5737 "Item Reference Entries"
 
     actions
     {
+        area(Processing)
+        {
+            action(PrintLabel)
+            {
+                ApplicationArea = Basic, Suite;
+                Image = Print;
+                Caption = 'Print Label';
+                ToolTip = 'Print Label';
+
+                trigger OnAction()
+                var
+                    ItemReference: Record "Item Reference";
+                    ReferenceNoLabel: Report "Reference No Label";
+                begin
+                    ItemReference := Rec;
+                    CurrPage.SetSelectionFilter(ItemReference);
+                    ReferenceNoLabel.SetTableView(ItemReference);
+                    ReferenceNoLabel.RunModal();
+                end;
+            }
+        }
+        area(Promoted)
+        {
+            group(Category_Process)
+            {
+                Caption = 'Report';
+
+                actionref("Print Label"; PrintLabel)
+                {
+
+                }
+            }
+        }
     }
 }
 

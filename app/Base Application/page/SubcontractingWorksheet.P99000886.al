@@ -165,9 +165,9 @@ page 99000886 "Subcontracting Worksheet"
                     var
                         ChangeExchangeRate: Page "Change Exchange Rate";
                     begin
-                        ChangeExchangeRate.SetParameter("Currency Code", "Currency Factor", WorkDate());
+                        ChangeExchangeRate.SetParameter(Rec."Currency Code", Rec."Currency Factor", WorkDate());
                         if ChangeExchangeRate.RunModal() = ACTION::OK then
-                            Validate("Currency Factor", ChangeExchangeRate.GetParameter());
+                            Rec.Validate("Currency Factor", ChangeExchangeRate.GetParameter());
 
                         Clear(ChangeExchangeRate);
                     end;
@@ -201,7 +201,7 @@ page 99000886 "Subcontracting Worksheet"
                     ToolTip = 'Specifies the ID of the user who is ordering the items on the line.';
                     Visible = false;
                 }
-                field(Confirmed; Confirmed)
+                field(Confirmed; Rec.Confirmed)
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies whether the items on the line have been approved for purchase.';
@@ -281,7 +281,7 @@ page 99000886 "Subcontracting Worksheet"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
                 action(Dimensions)
@@ -295,7 +295,7 @@ page 99000886 "Subcontracting Worksheet"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -392,9 +392,9 @@ page 99000886 "Subcontracting Worksheet"
     var
         JnlSelected: Boolean;
     begin
-        OpenedFromBatch := ("Journal Batch Name" <> '') and ("Worksheet Template Name" = '');
+        OpenedFromBatch := (Rec."Journal Batch Name" <> '') and (Rec."Worksheet Template Name" = '');
         if OpenedFromBatch then begin
-            CurrentJnlBatchName := "Journal Batch Name";
+            CurrentJnlBatchName := Rec."Journal Batch Name";
             ReqJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
             exit;
         end;

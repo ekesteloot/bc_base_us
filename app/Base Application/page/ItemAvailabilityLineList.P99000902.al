@@ -1,3 +1,18 @@
+namespace Microsoft.InventoryMgt.Availability;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Planning;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Document;
+using Microsoft.ProjectMgt.Jobs.Planning;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.ServiceMgt.Document;
+
 page 99000902 "Item Availability Line List"
 {
     Caption = 'Item Availability Line List';
@@ -38,7 +53,7 @@ page 99000902 "Item Availability Line List"
 
     trigger OnOpenPage()
     begin
-        DeleteAll();
+        Rec.DeleteAll();
         MakeWhat();
     end;
 
@@ -77,42 +92,42 @@ page 99000902 "Item Availability Line List"
             AvailType::"Gross Requirement":
                 begin
                     InsertEntry(
-                      DATABASE::"Sales Line",
+                      Enum::TableID::"Sales Line",
                       Item.FieldNo("Qty. on Sales Order"),
                       SalesLine.TableCaption(),
                       Item."Qty. on Sales Order");
                     InsertEntry(
-                      DATABASE::"Service Line",
+                      Enum::TableID::"Service Line",
                       Item.FieldNo("Qty. on Service Order"),
                       ServLine.TableCaption(),
                       Item."Qty. on Service Order");
                     InsertEntry(
-                      DATABASE::"Job Planning Line",
+                      Enum::TableID::"Job Planning Line",
                       Item.FieldNo("Qty. on Job Order"),
                       JobPlanningLine.TableCaption(),
                       Item."Qty. on Job Order");
                     InsertEntry(
-                      DATABASE::"Prod. Order Component",
+                      Enum::TableID::"Prod. Order Component",
                       Item.FieldNo("Qty. on Component Lines"),
                       ProdOrderComp.TableCaption(),
                       Item."Qty. on Component Lines");
                     InsertEntry(
-                      DATABASE::"Planning Component",
+                      Enum::TableID::"Planning Component",
                       Item.FieldNo("Planning Issues (Qty.)"),
                       PlanningComponent.TableCaption(),
                       Item."Planning Issues (Qty.)");
                     InsertEntry(
-                      DATABASE::"Transfer Line",
+                      Enum::TableID::"Transfer Line",
                       Item.FieldNo("Trans. Ord. Shipment (Qty.)"),
                       Item.FieldCaption("Trans. Ord. Shipment (Qty.)"),
                       Item."Trans. Ord. Shipment (Qty.)");
                     InsertEntry(
-                      DATABASE::"Purchase Line",
+                      Enum::TableID::"Purchase Line",
                       0,
                       PurchLine.TableCaption(),
                       Item."Qty. on Purch. Return");
                     InsertEntry(
-                      DATABASE::"Assembly Line",
+                      Enum::TableID::"Assembly Line",
                       Item.FieldNo("Qty. on Asm. Component"),
                       AssemblyLine.TableCaption(),
                       Item."Qty. on Asm. Component");
@@ -120,12 +135,12 @@ page 99000902 "Item Availability Line List"
             AvailType::"Planned Order Receipt":
                 begin
                     InsertEntry(
-                      DATABASE::"Requisition Line",
+                      Enum::TableID::"Requisition Line",
                       Item.FieldNo("Purch. Req. Receipt (Qty.)"),
                       ReqLine.TableCaption(),
                       Item."Purch. Req. Receipt (Qty.)");
                     InsertEntry(
-                      DATABASE::"Prod. Order Line",
+                      Enum::TableID::"Prod. Order Line",
                       Item.FieldNo("Planned Order Receipt (Qty.)"),
                       StrSubstNo(Text000, ProdOrderLine.TableCaption()),
                       Item."Planned Order Receipt (Qty.)");
@@ -133,17 +148,17 @@ page 99000902 "Item Availability Line List"
             AvailType::"Planned Order Release":
                 begin
                     InsertEntry(
-                      DATABASE::"Requisition Line",
+                      Enum::TableID::"Requisition Line",
                       Item.FieldNo("Purch. Req. Release (Qty.)"),
                       ReqLine.TableCaption(),
                       Item."Purch. Req. Release (Qty.)");
                     InsertEntry(
-                      DATABASE::"Prod. Order Line",
+                      Enum::TableID::"Prod. Order Line",
                       Item.FieldNo("Planned Order Release (Qty.)"),
                       StrSubstNo(Text001, ProdOrderLine.TableCaption()),
                       Item."Planned Order Release (Qty.)");
                     InsertEntry(
-                      DATABASE::"Requisition Line",
+                      Enum::TableID::"Requisition Line",
                       Item.FieldNo("Planning Release (Qty.)"),
                       ReqLine.TableCaption(),
                       Item."Planning Release (Qty.)");
@@ -151,37 +166,37 @@ page 99000902 "Item Availability Line List"
             AvailType::"Scheduled Order Receipt":
                 begin
                     InsertEntry(
-                      DATABASE::"Purchase Line",
+                      Enum::TableID::"Purchase Line",
                       Item.FieldNo("Qty. on Purch. Order"),
                       PurchLine.TableCaption(),
                       Item."Qty. on Purch. Order");
                     InsertEntry(
-                      DATABASE::"Prod. Order Line",
+                      Enum::TableID::"Prod. Order Line",
                       Item.FieldNo("FP Order Receipt (Qty.)"),
                       StrSubstNo(Text002, ProdOrderLine.TableCaption()),
                       Item."FP Order Receipt (Qty.)");
                     InsertEntry(
-                      DATABASE::"Prod. Order Line",
+                      Enum::TableID::"Prod. Order Line",
                       Item.FieldNo("Rel. Order Receipt (Qty.)"),
                       StrSubstNo(Text003, ProdOrderLine.TableCaption()),
                       Item."Rel. Order Receipt (Qty.)");
                     InsertEntry(
-                      DATABASE::"Transfer Line",
+                      Enum::TableID::"Transfer Line",
                       Item.FieldNo("Qty. in Transit"),
                       Item.FieldCaption("Qty. in Transit"),
                       Item."Qty. in Transit");
                     InsertEntry(
-                      DATABASE::"Transfer Line",
+                      Enum::TableID::"Transfer Line",
                       Item.FieldNo("Trans. Ord. Receipt (Qty.)"),
                       Item.FieldCaption("Trans. Ord. Receipt (Qty.)"),
                       Item."Trans. Ord. Receipt (Qty.)");
                     InsertEntry(
-                      DATABASE::"Sales Line",
+                      Enum::TableID::"Sales Line",
                       0,
                       SalesLine.TableCaption(),
                       Item."Qty. on Sales Return");
                     InsertEntry(
-                      DATABASE::"Assembly Header",
+                      Enum::TableID::"Assembly Header",
                       Item.FieldNo("Qty. on Assembly Order"),
                       AssemblyHeader.TableCaption(),
                       Item."Qty. on Assembly Order");
@@ -226,11 +241,11 @@ page 99000902 "Item Availability Line List"
             OnItemCalcFields(Item);
 
             if Item.Inventory <> 0 then begin
-                "Table No." := DATABASE::"Item Ledger Entry";
-                QuerySource := Item.FieldNo(Inventory);
-                Name := ItemLedgerEntry.TableCaption();
-                Quantity := AdjustWithQtyByUnitOfMeasure(Item.Inventory);
-                Insert();
+                Rec."Table No." := Enum::TableID::"Item Ledger Entry";
+                Rec.QuerySource := Item.FieldNo(Inventory);
+                Rec.Name := ItemLedgerEntry.TableCaption();
+                Rec.Quantity := AdjustWithQtyByUnitOfMeasure(Item.Inventory);
+                Rec.Insert();
             end;
             AvailType := AvailType::"Gross Requirement";
             Sign := -1;
@@ -254,8 +269,8 @@ page 99000902 "Item Availability Line List"
         if IsHandled then
             exit;
 
-        case "Table No." of
-            DATABASE::"Item Ledger Entry":
+        case Rec."Table No." of
+            Enum::TableID::"Item Ledger Entry":
                 begin
                     ItemLedgerEntry.SetCurrentKey("Item No.", "Entry Type", "Variant Code", "Drop Shipment", "Location Code", "Posting Date");
                     ItemLedgerEntry.SetRange("Item No.", Item."No.");
@@ -268,29 +283,29 @@ page 99000902 "Item Availability Line List"
                     OnItemLedgerEntrySetFilter(ItemLedgerEntry);
                     PAGE.RunModal(0, ItemLedgerEntry);
                 end;
-            DATABASE::"Sales Line":
+            Enum::TableID::"Sales Line":
                 begin
-                    if QuerySource > 0 then
+                    if Rec.QuerySource > 0 then
                         SalesLine.FindLinesWithItemToPlan(Item, SalesLine."Document Type"::Order)
                     else
                         SalesLine.FindLinesWithItemToPlan(Item, SalesLine."Document Type"::"Return Order");
                     SalesLine.SetRange("Drop Shipment", false);
                     PAGE.RunModal(0, SalesLine);
                 end;
-            DATABASE::"Service Line":
+            Enum::TableID::"Service Line":
                 begin
                     ServLine.FindLinesWithItemToPlan(Item);
                     PAGE.RunModal(0, ServLine);
                 end;
-            DATABASE::"Job Planning Line":
+            Enum::TableID::"Job Planning Line":
                 begin
                     JobPlanningLine.FindLinesWithItemToPlan(Item);
                     PAGE.RunModal(0, JobPlanningLine);
                 end;
-            DATABASE::"Purchase Line":
+            Enum::TableID::"Purchase Line":
                 begin
                     PurchLine.SetCurrentKey("Document Type", Type, "No.");
-                    if QuerySource > 0 then
+                    if Rec.QuerySource > 0 then
                         PurchLine.FindLinesWithItemToPlan(Item, PurchLine."Document Type"::Order)
                     else
                         PurchLine.FindLinesWithItemToPlan(Item, PurchLine."Document Type"::"Return Order");
@@ -298,9 +313,9 @@ page 99000902 "Item Availability Line List"
                     OnLookupEntriesOnAfterPurchLineSetFilters(Item, PurchLine);
                     PAGE.RunModal(0, PurchLine);
                 end;
-            DATABASE::"Transfer Line":
+            Enum::TableID::"Transfer Line":
                 begin
-                    case QuerySource of
+                    case Rec.QuerySource of
                         Item.FieldNo("Trans. Ord. Shipment (Qty.)"):
                             TransLine.FindLinesWithItemToPlan(Item, false, false);
                         Item.FieldNo("Trans. Ord. Receipt (Qty.)"), Item.FieldNo("Qty. in Transit"):
@@ -308,20 +323,20 @@ page 99000902 "Item Availability Line List"
                     end;
                     PAGE.RunModal(0, TransLine);
                 end;
-            DATABASE::"Planning Component":
+            Enum::TableID::"Planning Component":
                 begin
                     PlanningComponent.FindLinesWithItemToPlan(Item);
                     PAGE.RunModal(0, PlanningComponent);
                 end;
-            DATABASE::"Prod. Order Component":
+            Enum::TableID::"Prod. Order Component":
                 begin
                     ProdOrderComp.FindLinesWithItemToPlan(Item, true);
                     PAGE.RunModal(0, ProdOrderComp);
                 end;
-            DATABASE::"Requisition Line":
+            Enum::TableID::"Requisition Line":
                 begin
                     ReqLine.FindLinesWithItemToPlan(Item);
-                    case QuerySource of
+                    case Rec.QuerySource of
                         Item.FieldNo("Purch. Req. Receipt (Qty.)"):
                             Item.CopyFilter("Date Filter", ReqLine."Due Date");
                         Item.FieldNo("Purch. Req. Release (Qty.)"):
@@ -333,11 +348,11 @@ page 99000902 "Item Availability Line List"
                     end;
                     PAGE.RunModal(0, ReqLine);
                 end;
-            DATABASE::"Prod. Order Line":
+            Enum::TableID::"Prod. Order Line":
                 begin
                     ProdOrderLine.Reset();
                     ProdOrderLine.SetCurrentKey(Status, "Item No.");
-                    case QuerySource of
+                    case Rec.QuerySource of
                         Item.FieldNo("Planned Order Receipt (Qty.)"):
                             begin
                                 ProdOrderLine.SetRange(Status, ProdOrderLine.Status::Planned);
@@ -367,21 +382,21 @@ page 99000902 "Item Availability Line List"
                     Item.CopyFilter("Unit of Measure Filter", ProdOrderLine."Unit of Measure Code");
                     PAGE.RunModal(0, ProdOrderLine);
                 end;
-            DATABASE::"Assembly Header":
+            Enum::TableID::"Assembly Header":
                 begin
                     AssemblyHeader.FindItemToPlanLines(Item, AssemblyHeader."Document Type"::Order);
                     PAGE.RunModal(0, AssemblyHeader);
                 end;
-            DATABASE::"Assembly Line":
+            Enum::TableID::"Assembly Line":
                 begin
                     AssemblyLine.FindItemToPlanLines(Item, AssemblyHeader."Document Type"::Order);
                     PAGE.RunModal(0, AssemblyLine);
                 end;
             else
-                OnLookupExtensionTable(Item, "Table No.", QuerySource, SalesLine);
+                OnLookupExtensionTable(Item, Rec."Table No.", Rec.QuerySource, SalesLine);
         end;
 
-        OnAfterLookupEntries(Item, "Table No.", Rec);
+        OnAfterLookupEntries(Item, Rec."Table No.", Rec);
     end;
 
     procedure InsertEntry("Table": Integer; "Field": Integer; TableName: Text[100]; Qty: Decimal)
@@ -389,11 +404,11 @@ page 99000902 "Item Availability Line List"
         if Qty = 0 then
             exit;
 
-        "Table No." := Table;
-        QuerySource := Field;
-        Name := CopyStr(TableName, 1, MaxStrLen(Name));
-        Quantity := AdjustWithQtyByUnitOfMeasure(Qty * Sign);
-        Insert();
+        Rec."Table No." := Table;
+        Rec.QuerySource := Field;
+        Rec.Name := CopyStr(TableName, 1, MaxStrLen(Rec.Name));
+        Rec.Quantity := AdjustWithQtyByUnitOfMeasure(Qty * Sign);
+        Rec.Insert();
     end;
 
     local procedure AdjustWithQtyByUnitOfMeasure(Quantity: Decimal): Decimal

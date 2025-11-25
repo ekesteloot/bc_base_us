@@ -1,14 +1,25 @@
+namespace Microsoft.Purchases.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using System.Utilities;
+
 report 399 "Remittance Advice - Journal"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/RemittanceAdviceJournal.rdlc';
+    RDLCLayout = './Purchases/Reports/RemittanceAdviceJournal.rdlc';
     Caption = 'Remittance Advice - Journal';
 
     dataset
     {
         dataitem(FindVendors; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.");
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.");
             RequestFilterFields = "Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.";
 
             trigger OnAfterGetRecord()
@@ -25,7 +36,7 @@ report 399 "Remittance Advice - Journal"
         }
         dataitem(Vendor; Vendor)
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
 
             trigger OnPreDataItem()
@@ -36,7 +47,7 @@ report 399 "Remittance Advice - Journal"
         }
         dataitem(VendLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number);
+            DataItemTableView = sorting(Number);
             column(VendAddr1; VendorAddr[1])
             {
             }
@@ -156,7 +167,7 @@ report 399 "Remittance Advice - Journal"
             }
             dataitem("Gen. Journal Line"; "Gen. Journal Line")
             {
-                DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.") WHERE("Account Type" = CONST(Vendor));
+                DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.") where("Account Type" = const(Vendor));
                 column(CheckNo; CheckNo)
                 {
                 }
@@ -185,12 +196,12 @@ report 399 "Remittance Advice - Journal"
                 }
                 dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
                 {
-                    DataItemLink = "Applies-to ID" = FIELD("Applies-to ID"), "Vendor No." = FIELD("Account No.");
-                    DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date", "Currency Code") WHERE(Open = CONST(true));
+                    DataItemLink = "Applies-to ID" = field("Applies-to ID"), "Vendor No." = field("Account No.");
+                    DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date", "Currency Code") where(Open = const(true));
                     dataitem("Detailed Vendor Ledg. Entry"; "Detailed Vendor Ledg. Entry")
                     {
-                        DataItemLink = "Vendor Ledger Entry No." = FIELD("Entry No."), "Initial Document Type" = FIELD("Document Type");
-                        DataItemTableView = SORTING("Vendor Ledger Entry No.", "Entry Type", "Posting Date") WHERE("Entry Type" = CONST(Application), "Document Type" = CONST("Credit Memo"));
+                        DataItemLink = "Vendor Ledger Entry No." = field("Entry No."), "Initial Document Type" = field("Document Type");
+                        DataItemTableView = sorting("Vendor Ledger Entry No.", "Entry Type", "Posting Date") where("Entry Type" = const(Application), "Document Type" = const("Credit Memo"));
 
                         trigger OnAfterGetRecord()
                         begin
@@ -213,12 +224,12 @@ report 399 "Remittance Advice - Journal"
                 }
                 dataitem(VendLedgEntry2; "Vendor Ledger Entry")
                 {
-                    DataItemLink = "Document No." = FIELD("Applies-to Doc. No."), "Vendor No." = FIELD("Account No."), "Document Type" = FIELD("Applies-to Doc. Type");
-                    DataItemTableView = SORTING("Vendor No.", Open, Positive, "Due Date") WHERE(Open = CONST(true));
+                    DataItemLink = "Document No." = field("Applies-to Doc. No."), "Vendor No." = field("Account No."), "Document Type" = field("Applies-to Doc. Type");
+                    DataItemTableView = sorting("Vendor No.", Open, Positive, "Due Date") where(Open = const(true));
                     dataitem(DetailVendLedgEntry2; "Detailed Vendor Ledg. Entry")
                     {
-                        DataItemLink = "Vendor Ledger Entry No." = FIELD("Entry No."), "Initial Document Type" = FIELD("Document Type");
-                        DataItemTableView = SORTING("Vendor Ledger Entry No.", "Entry Type", "Posting Date") WHERE("Entry Type" = CONST(Application), "Document Type" = CONST("Credit Memo"));
+                        DataItemLink = "Vendor Ledger Entry No." = field("Entry No."), "Initial Document Type" = field("Document Type");
+                        DataItemTableView = sorting("Vendor Ledger Entry No.", "Entry Type", "Posting Date") where("Entry Type" = const(Application), "Document Type" = const("Credit Memo"));
 
                         trigger OnAfterGetRecord()
                         begin
@@ -235,7 +246,7 @@ report 399 "Remittance Advice - Journal"
                 }
                 dataitem(PrintLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(AppliedVendLedgEntryTempDocType; Format(TempAppliedVendLedgEntry."Document Type"))
                     {
                     }
@@ -392,7 +403,7 @@ report 399 "Remittance Advice - Journal"
             }
             dataitem(PrintTotal; "Integer")
             {
-                DataItemTableView = WHERE(Number = CONST(1));
+                DataItemTableView = where(Number = const(1));
                 column(TotalAmount; VendorTotal)
                 {
                 }

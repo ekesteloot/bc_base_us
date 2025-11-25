@@ -1,7 +1,12 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.History;
+using Microsoft.ServiceMgt.Ledger;
+
 report 5909 "Service Profit (Resp. Centers)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceProfitRespCenters.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceProfitRespCenters.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Profit (Resp. Centers)';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5909 "Service Profit (Resp. Centers)"
     {
         dataitem("Service Shipment Header"; "Service Shipment Header")
         {
-            DataItemTableView = SORTING("Responsibility Center", "Posting Date");
+            DataItemTableView = sorting("Responsibility Center", "Posting Date");
             RequestFilterFields = "Responsibility Center", "Posting Date", "No.";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

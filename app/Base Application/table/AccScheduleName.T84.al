@@ -1,3 +1,10 @@
+﻿namespace Microsoft.FinancialMgt.FinancialReports;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using System.IO;
+using System.Utilities;
+
 table 84 "Acc. Schedule Name"
 {
     Caption = 'Acc. Schedule Name';

@@ -1,3 +1,7 @@
+namespace Microsoft.CRM.Profiling;
+
+using Microsoft.CRM.Contact;
+
 page 5051 "Contact Card Subform"
 {
     Caption = 'Lines';
@@ -5,9 +9,9 @@ page 5051 "Contact Card Subform"
     LinksAllowed = false;
     PageType = ListPart;
     SourceTable = "Contact Profile Answer";
-    SourceTableView = SORTING("Contact No.", "Answer Priority", "Profile Questionnaire Priority")
+    SourceTableView = sorting("Contact No.", "Answer Priority", "Profile Questionnaire Priority")
                       ORDER(Descending)
-                      WHERE("Answer Priority" = FILTER(<> "Very Low (Hidden)"));
+                      where("Answer Priority" = filter(<> "Very Low (Hidden)"));
 
     layout
     {
@@ -28,13 +32,13 @@ page 5051 "Contact Card Subform"
                     ToolTip = 'Specifies the priority of the questionnaire that the profile answer is linked to. There are five options: Very Low, Low, Normal, High, and Very High.';
                     Visible = false;
                 }
-                field(Question; Question())
+                field(Question; Rec.Question())
                 {
                     ApplicationArea = RelationshipMgmt;
                     Caption = 'Question';
                     ToolTip = 'Specifies the question in the profile questionnaire.';
                 }
-                field(Answer; Answer)
+                field(Answer; Rec.Answer)
                 {
                     ApplicationArea = RelationshipMgmt;
                     DrillDown = false;
@@ -49,16 +53,16 @@ page 5051 "Contact Card Subform"
                         Contact: Record Contact;
                         ProfileManagement: Codeunit ProfileManagement;
                     begin
-                        ProfileQuestionnaireLine.Get("Profile Questionnaire Code", "Line No.");
-                        ProfileQuestionnaireLine.Get("Profile Questionnaire Code", ProfileQuestionnaireLine.FindQuestionLine());
+                        ProfileQuestionnaireLine.Get(Rec."Profile Questionnaire Code", Rec."Line No.");
+                        ProfileQuestionnaireLine.Get(Rec."Profile Questionnaire Code", ProfileQuestionnaireLine.FindQuestionLine());
                         if ProfileQuestionnaireLine."Auto Contact Classification" then begin
                             if ProfileQuestionnaireLine."Contact Class. Field" = ProfileQuestionnaireLine."Contact Class. Field"::Rating then begin
-                                Rating.SetRange("Profile Questionnaire Code", "Profile Questionnaire Code");
+                                Rating.SetRange("Profile Questionnaire Code", Rec."Profile Questionnaire Code");
                                 Rating.SetRange("Profile Questionnaire Line No.", ProfileQuestionnaireLine."Line No.");
                                 if Rating.Find('-') then
                                     repeat
                                         if ContactProfileAnswer.Get(
-                                             "Contact No.", Rating."Rating Profile Quest. Code", Rating."Rating Profile Quest. Line No.")
+                                             Rec."Contact No.", Rating."Rating Profile Quest. Code", Rating."Rating Profile Quest. Line No.")
                                         then begin
                                             TempRating := Rating;
                                             TempRating.Insert();
@@ -70,10 +74,10 @@ page 5051 "Contact Card Subform"
                                 else
                                     Message(Text001);
                             end else
-                                Message(Text002, "Last Date Updated");
+                                Message(Text002, Rec."Last Date Updated");
                         end else begin
-                            Contact.Get("Contact No.");
-                            ProfileManagement.ShowContactQuestionnaireCard(Contact, "Profile Questionnaire Code", "Line No.");
+                            Contact.Get(Rec."Contact No.");
+                            ProfileManagement.ShowContactQuestionnaireCard(Contact, Rec."Profile Questionnaire Code", Rec."Line No.");
                             CurrPage.Update(false);
                         end;
                     end;

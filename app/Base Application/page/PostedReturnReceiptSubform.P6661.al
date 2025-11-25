@@ -186,7 +186,7 @@ page 6661 "Posted Return Receipt Subform"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                     end;
                 }
                 action(Comments)
@@ -198,7 +198,7 @@ page 6661 "Posted Return Receipt Subform"
 
                     trigger OnAction()
                     begin
-                        ShowLineComments();
+                        Rec.ShowLineComments();
                     end;
                 }
                 action(DocumentLineTracking)
@@ -222,7 +222,7 @@ page 6661 "Posted Return Receipt Subform"
 
                     trigger OnAction()
                     begin
-                        ShowItemTrackingLines();
+                        Rec.ShowItemTrackingLines();
                     end;
                 }
                 action(ItemCreditMemoLines)
@@ -256,8 +256,8 @@ page 6661 "Posted Return Receipt Subform"
 
     local procedure PageShowItemSalesCrMemoLines()
     begin
-        TestField(Type, Type::Item);
-        ShowItemSalesCrMemoLines();
+        Rec.TestField(Type, Rec.Type::Item);
+        Rec.ShowItemSalesCrMemoLines();
     end;
 
     procedure ShowDocumentLineTracking()
@@ -265,7 +265,7 @@ page 6661 "Posted Return Receipt Subform"
         DocumentLineTracking: Page "Document Line Tracking";
     begin
         Clear(DocumentLineTracking);
-        DocumentLineTracking.SetDoc(12, "Document No.", "Line No.", "Return Order No.", "Return Order Line No.", '', 0);
+        DocumentLineTracking.SetDoc(12, Rec."Document No.", Rec."Line No.", Rec."Return Order No.", Rec."Return Order Line No.", '', 0);
         DocumentLineTracking.RunModal();
     end;
 }

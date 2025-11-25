@@ -1,3 +1,11 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Setup;
+using Microsoft.ServiceMgt.Posting;
+
 page 6030 "Service Statistics"
 {
     Caption = 'Service Statistics';
@@ -17,7 +25,7 @@ page 6030 "Service Statistics"
                 field(Amount_General; TotalServLine[1]."Line Amount")
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text002, false);
                     Caption = 'Amount';
@@ -27,7 +35,7 @@ page 6030 "Service Statistics"
                 field("Inv. Discount Amount_General"; TotalServLine[1]."Inv. Discount Amount")
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     Caption = 'Inv. Discount Amount';
                     ToolTip = 'Specifies the invoice discount amount for the entire service document.';
@@ -40,7 +48,7 @@ page 6030 "Service Statistics"
                 field("TotalAmount1[1]"; TotalAmount1[1])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, false);
                     Caption = 'Total';
@@ -54,7 +62,7 @@ page 6030 "Service Statistics"
                 field("VAT Amount_General"; VATAmount[1])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = Format(VATAmountText[1]);
                     Caption = 'VAT Amount';
@@ -64,7 +72,7 @@ page 6030 "Service Statistics"
                 field("Total Incl. VAT_General"; TotalAmount2[1])
                 {
                     ApplicationArea = Service;
-                    AutoFormatExpression = "Currency Code";
+                    AutoFormatExpression = Rec."Currency Code";
                     AutoFormatType = 1;
                     CaptionClass = GetCaptionClass(Text001, true);
                     Caption = 'Total Incl. VAT';
@@ -177,7 +185,7 @@ page 6030 "Service Statistics"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        LookupAdjmtValueEntries(0);
+                        Rec.LookupAdjmtValueEntries(0);
                     end;
                 }
             }
@@ -205,7 +213,7 @@ page 6030 "Service Statistics"
                         field(Amount_Items; TotalServLine[5]."Line Amount")
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Amount';
                             Editable = false;
@@ -214,7 +222,7 @@ page 6030 "Service Statistics"
                         field("Inv. Discount Amount_Items"; TotalServLine[5]."Inv. Discount Amount")
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Inv. Discount Amount';
                             Editable = false;
@@ -223,7 +231,7 @@ page 6030 "Service Statistics"
                         field(Total; TotalAmount1[5])
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Total';
                             Editable = false;
@@ -237,7 +245,7 @@ page 6030 "Service Statistics"
                         field("VAT Amount_Items"; VATAmount[5])
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'VAT Amount';
                             Editable = false;
@@ -246,7 +254,7 @@ page 6030 "Service Statistics"
                         field("Total Incl. VAT_Items"; TotalAmount2[5])
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Total Amount';
                             Editable = false;
@@ -318,7 +326,7 @@ page 6030 "Service Statistics"
 
                             trigger OnLookup(var Text: Text): Boolean
                             begin
-                                LookupAdjmtValueEntries(1);
+                                Rec.LookupAdjmtValueEntries(1);
                             end;
                         }
                     }
@@ -336,7 +344,7 @@ page 6030 "Service Statistics"
                         field(Amount_Resources; TotalServLine[6]."Line Amount")
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             CaptionClass = GetCaptionClass(Text002, false);
                             Editable = false;
@@ -344,7 +352,7 @@ page 6030 "Service Statistics"
                         field("Inv. Discount Amount_Resources"; TotalServLine[6]."Inv. Discount Amount")
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Inv. Discount Amount';
                             Editable = false;
@@ -353,7 +361,7 @@ page 6030 "Service Statistics"
                         field("TotalAmount1[6]"; TotalAmount1[6])
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             CaptionClass = GetCaptionClass(Text001, false);
                             Editable = false;
@@ -367,7 +375,7 @@ page 6030 "Service Statistics"
                         field("VAT Amount_Resources"; VATAmount[6])
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Editable = false;
                             ShowCaption = false;
@@ -375,7 +383,7 @@ page 6030 "Service Statistics"
                         field("Total Incl. VAT_Resources"; TotalAmount2[6])
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             CaptionClass = GetCaptionClass(Text001, true);
                             Editable = false;
@@ -453,7 +461,7 @@ page 6030 "Service Statistics"
                         field(Amount_Costs; TotalServLine[7]."Line Amount")
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             CaptionClass = GetCaptionClass(Text002, false);
                             Editable = false;
@@ -461,7 +469,7 @@ page 6030 "Service Statistics"
                         field("Inv. Discount Amount_Costs"; TotalServLine[7]."Inv. Discount Amount")
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Caption = 'Inv. Discount Amount';
                             Editable = false;
@@ -470,7 +478,7 @@ page 6030 "Service Statistics"
                         field("TotalAmount1[7]"; TotalAmount1[7])
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             CaptionClass = GetCaptionClass(Text001, false);
                             Editable = false;
@@ -484,7 +492,7 @@ page 6030 "Service Statistics"
                         field("VAT Amount_Costs"; VATAmount[7])
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             Editable = false;
                             ShowCaption = false;
@@ -492,7 +500,7 @@ page 6030 "Service Statistics"
                         field("Total Incl. VAT_Costs"; TotalAmount2[7])
                         {
                             ApplicationArea = Service;
-                            AutoFormatExpression = "Currency Code";
+                            AutoFormatExpression = Rec."Currency Code";
                             AutoFormatType = 1;
                             CaptionClass = GetCaptionClass(Text001, true);
                             Editable = false;
@@ -598,16 +606,16 @@ page 6030 "Service Statistics"
         TempServLine: Record "Service Line" temporary;
         IsHandled: Boolean;
     begin
-        CurrPage.Caption(StrSubstNo(Text000, "Document Type"));
+        CurrPage.Caption(StrSubstNo(Text000, Rec."Document Type"));
 
-        if PrevNo = "No." then begin
+        if PrevNo = Rec."No." then begin
             GetVATSpecification();
             exit;
         end;
-        PrevNo := "No.";
-        FilterGroup(2);
-        SetRange("No.", PrevNo);
-        FilterGroup(0);
+        PrevNo := Rec."No.";
+        Rec.FilterGroup(2);
+        Rec.SetRange("No.", PrevNo);
+        Rec.FilterGroup(0);
 
         Clear(ServLine);
         Clear(TotalServLine);
@@ -636,7 +644,7 @@ page 6030 "Service Statistics"
                 IsHandled := false;
                 OnAfterGetRecordAfterCalcProfit(Rec, IsHandled);
                 If not IsHandled then
-                    if "Prices Including VAT" then begin
+                    if Rec."Prices Including VAT" then begin
                         TotalAmount2[i] := TotalServLine[i].Amount;
                         TotalAmount1[i] := TotalAmount2[i] + VATAmount[i];
                         TotalServLine[i]."Line Amount" := TotalAmount1[i] + TotalServLine[i]."Inv. Discount Amount";
@@ -646,7 +654,7 @@ page 6030 "Service Statistics"
                     end;
             end;
 
-        if Cust.Get("Bill-to Customer No.") then
+        if Cust.Get(Rec."Bill-to Customer No.") then
             Cust.CalcFields("Balance (LCY)")
         else
             Clear(Cust);
@@ -674,10 +682,10 @@ page 6030 "Service Statistics"
     begin
         SalesSetup.Get();
         AllowInvDisc :=
-          not (SalesSetup."Calc. Inv. Discount" and CustInvDiscRecExists("Invoice Disc. Code"));
+          not (SalesSetup."Calc. Inv. Discount" and CustInvDiscRecExists(Rec."Invoice Disc. Code"));
         AllowVATDifference :=
           SalesSetup."Allow VAT Difference" and
-          ("Document Type" <> "Document Type"::Quote);
+          (Rec."Document Type" <> Rec."Document Type"::Quote);
         CurrPage.Editable :=
           AllowVATDifference or AllowInvDisc;
         SetVATSpecification();
@@ -731,7 +739,7 @@ page 6030 "Service Statistics"
         TotalAmount1[IndexNo] :=
           TotalServLine[IndexNo]."Line Amount" - TotalServLine[IndexNo]."Inv. Discount Amount";
         VATAmount[IndexNo] := VATAmountLine.GetTotalVATAmount();
-        if "Prices Including VAT" then begin
+        if Rec."Prices Including VAT" then begin
             TotalAmount1[IndexNo] := VATAmountLine.GetTotalAmountInclVAT();
             TotalAmount2[IndexNo] := TotalAmount1[IndexNo] - VATAmount[IndexNo];
             TotalServLine[IndexNo]."Line Amount" :=
@@ -741,21 +749,21 @@ page 6030 "Service Statistics"
 
         OnUpdateHeaderInfoOnAfterCalcTotalAmount(Rec);
 
-        if "Prices Including VAT" then
+        if Rec."Prices Including VAT" then
             TotalServLineLCY[IndexNo].Amount := TotalAmount2[IndexNo]
         else
             TotalServLineLCY[IndexNo].Amount := TotalAmount1[IndexNo];
-        if "Currency Code" <> '' then
-            if ("Document Type" = "Document Type"::Quote) and
-               ("Posting Date" = 0D)
+        if Rec."Currency Code" <> '' then
+            if (Rec."Document Type" = Rec."Document Type"::Quote) and
+               (Rec."Posting Date" = 0D)
             then
                 UseDate := WorkDate()
             else
-                UseDate := "Posting Date";
+                UseDate := Rec."Posting Date";
 
         TotalServLineLCY[IndexNo].Amount :=
           CurrExchRate.ExchangeAmtFCYToLCY(
-            UseDate, "Currency Code", TotalServLineLCY[IndexNo].Amount, "Currency Factor");
+            UseDate, Rec."Currency Code", TotalServLineLCY[IndexNo].Amount, Rec."Currency Factor");
         ProfitLCY[IndexNo] := TotalServLineLCY[IndexNo].Amount - TotalServLineLCY[IndexNo]."Unit Cost (LCY)";
         if TotalServLineLCY[IndexNo].Amount = 0 then
             ProfitPct[IndexNo] := 0
@@ -782,8 +790,8 @@ page 6030 "Service Statistics"
         CurrPage.SubForm.PAGE.SetServHeader := Rec;
         CurrPage.SubForm.PAGE.SetTempVATAmountLine(TempVATAmountLine);
         CurrPage.SubForm.PAGE.InitGlobals(
-          "Currency Code", AllowVATDifference, AllowVATDifference,
-          "Prices Including VAT", AllowInvDisc, "VAT Base Discount %");
+          Rec."Currency Code", AllowVATDifference, AllowVATDifference,
+          Rec."Prices Including VAT", AllowInvDisc, Rec."VAT Base Discount %");
     end;
 
     local procedure UpdateTotalAmount(IndexNo: Integer)
@@ -791,7 +799,7 @@ page 6030 "Service Statistics"
         SaveTotalAmount: Decimal;
     begin
         CheckAllowInvDisc();
-        if "Prices Including VAT" then begin
+        if Rec."Prices Including VAT" then begin
             SaveTotalAmount := TotalAmount1[IndexNo];
             UpdateInvDiscAmount();
             TotalAmount1[IndexNo] := SaveTotalAmount;
@@ -807,7 +815,7 @@ page 6030 "Service Statistics"
         InvDiscBaseAmount: Decimal;
     begin
         CheckAllowInvDisc();
-        InvDiscBaseAmount := TempVATAmountLine.GetTotalInvDiscBaseAmount(false, "Currency Code");
+        InvDiscBaseAmount := TempVATAmountLine.GetTotalInvDiscBaseAmount(false, Rec."Currency Code");
         if InvDiscBaseAmount = 0 then
             Error(Text003, TempVATAmountLine.FieldCaption("Inv. Disc. Base Amount"));
 
@@ -818,19 +826,19 @@ page 6030 "Service Statistics"
               TempVATAmountLine.FieldCaption("Inv. Disc. Base Amount"));
 
         TempVATAmountLine.SetInvoiceDiscountAmount(
-          TotalServLine[1]."Inv. Discount Amount", "Currency Code", "Prices Including VAT", "VAT Base Discount %");
+          TotalServLine[1]."Inv. Discount Amount", Rec."Currency Code", Rec."Prices Including VAT", Rec."VAT Base Discount %");
         UpdateHeaderInfo(1, TempVATAmountLine);
         CurrPage.SubForm.PAGE.SetTempVATAmountLine(TempVATAmountLine);
 
-        "Invoice Discount Calculation" := "Invoice Discount Calculation"::Amount;
-        "Invoice Discount Value" := TotalServLine[1]."Inv. Discount Amount";
-        Modify();
+        Rec."Invoice Discount Calculation" := Rec."Invoice Discount Calculation"::Amount;
+        Rec."Invoice Discount Value" := TotalServLine[1]."Inv. Discount Amount";
+        Rec.Modify();
         UpdateVATOnServLines();
     end;
 
     local procedure GetCaptionClass(FieldCaption: Text[100]; ReverseCaption: Boolean): Text[80]
     begin
-        if "Prices Including VAT" xor ReverseCaption then
+        if Rec."Prices Including VAT" xor ReverseCaption then
             exit('2,1,' + FieldCaption);
         exit('2,0,' + FieldCaption);
     end;
@@ -862,7 +870,7 @@ page 6030 "Service Statistics"
         if not AllowInvDisc then
             Error(
               Text005,
-              CustInvDisc.TableCaption(), FieldCaption("Invoice Disc. Code"), "Invoice Disc. Code");
+              CustInvDisc.TableCaption(), Rec.FieldCaption("Invoice Disc. Code"), Rec."Invoice Disc. Code");
     end;
 
     [IntegrationEvent(true, false)]

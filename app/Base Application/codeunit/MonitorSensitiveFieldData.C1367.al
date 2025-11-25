@@ -1,3 +1,7 @@
+namespace System.Diagnostics;
+
+using System.Security.AccessControl;
+
 codeunit 1367 "Monitor Sensitive Field Data"
 {
     Permissions = tabledata "Field Monitoring Setup" = im;

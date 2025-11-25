@@ -1,6 +1,13 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.DataAdministration;
+
 /// <summary>
 /// The values in this enum represent the pages in the Data Administration Guide page
 /// </summary>
+
 enum 9041 "Data Administration Guide Page"
 {
     Extensible = true;

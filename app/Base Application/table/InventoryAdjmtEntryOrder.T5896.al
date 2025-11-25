@@ -1,3 +1,15 @@
+namespace Microsoft.InventoryMgt.Costing;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.History;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Routing;
+
 table 5896 "Inventory Adjmt. Entry (Order)"
 {
     Caption = 'Inventory Adjmt. Entry (Order)';

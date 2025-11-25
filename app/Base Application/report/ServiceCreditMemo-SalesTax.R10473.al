@@ -9,14 +9,14 @@ report 10473 "Service Credit Memo-Sales Tax"
     {
         dataitem("Service Cr.Memo Header"; "Service Cr.Memo Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Customer No.", "No. Printed";
             RequestFilterHeading = 'Service Credit Memo';
             dataitem("Service Cr.Memo Line"; "Service Cr.Memo Line")
             {
-                DataItemLink = "Document No." = FIELD("No.");
-                DataItemTableView = SORTING("Document No.", "Line No.");
+                DataItemLink = "Document No." = field("No.");
+                DataItemTableView = sorting("Document No.", "Line No.");
 
                 trigger OnAfterGetRecord()
                 begin
@@ -32,10 +32,10 @@ report 10473 "Service Credit Memo-Sales Tax"
             }
             dataitem(CopyLoop; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 dataitem(PageLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                    DataItemTableView = sorting(Number) where(Number = const(1));
                     column(CompanyInfo2Picture; CompanyInfo2.Picture)
                     {
                     }
@@ -197,7 +197,7 @@ report 10473 "Service Credit Memo-Sales Tax"
                     }
                     dataitem(ServCrMemoLine; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(Number_IntegerLine; Number)
                         {
                         }
@@ -301,7 +301,7 @@ report 10473 "Service Credit Memo-Sales Tax"
                         }
                         dataitem("Service Shipment Buffer"; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(ServiceShptBufferPostDate; ServiceShipmentBuffer."Posting Date")
                             {
                             }
@@ -415,6 +415,7 @@ report 10473 "Service Credit Memo-Sales Tax"
                         CompanyInformation."Fax No." := RespCenter."Fax No.";
                     end;
                 CurrReport.Language := Language.GetLanguageIdOrDefault("Language Code");
+                CurrReport.FormatRegion := Language.GetFormatRegionOrDefault("Format Region");
                 if "Salesperson Code" = '' then
                     Clear(SalesPurchPerson)
                 else
@@ -564,9 +565,6 @@ report 10473 "Service Credit Memo-Sales Tax"
         AmountExclInvDisc: Decimal;
         SalesPurchPerson: Record "Salesperson/Purchaser";
         CompanyInformation: Record "Company Information";
-        CompanyInfo1: Record "Company Information";
-        CompanyInfo2: Record "Company Information";
-        CompanyInfo3: Record "Company Information";
         SalesSetup: Record "Sales & Receivables Setup";
         TempServCrMemoLine: Record "Service Cr.Memo Line" temporary;
         ServiceShipmentBuffer: Record "Service Shipment Buffer" temporary;
@@ -633,6 +631,11 @@ report 10473 "Service Credit Memo-Sales Tax"
         Text032: Label 'Subtotal:';
         Text033: Label 'Total:';
         Text034: Label 'Return Receipt';
+
+    protected var
+        CompanyInfo1: Record "Company Information";
+        CompanyInfo2: Record "Company Information";
+        CompanyInfo3: Record "Company Information";
 
     procedure FindPostedShipmentDate(): Date
     var

@@ -1,3 +1,5 @@
+namespace System.Automation;
+
 table 1543 "Flow Service Configuration"
 {
     Caption = 'Power Automate Service Configuration';

@@ -1,3 +1,7 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using System.Utilities;
+
 codeunit 9084 "Check Service Doc. Backgr."
 {
     trigger OnRun()

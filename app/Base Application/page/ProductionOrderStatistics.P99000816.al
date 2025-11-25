@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Setup;
+
 page 99000816 "Production Order Statistics"
 {
     Caption = 'Production Order Statistics';
@@ -300,6 +306,18 @@ page 99000816 "Production Order Statistics"
                     }
                 }
             }
+            group(Components)
+            {
+                Caption = 'Components';
+
+                field("Reserved From Stock"; Rec.GetQtyReservedFromStockState())
+                {
+                    ApplicationArea = Reservation;
+                    Editable = false;
+                    Caption = 'Reserved from stock';
+                    ToolTip = 'Specifies what part of the component items is reserved from inventory.';
+                }
+            }
         }
     }
 
@@ -320,8 +338,8 @@ page 99000816 "Production Order Statistics"
 
         ExpCapNeed := CostCalcMgt.CalcProdOrderExpCapNeed(Rec, false) / CalendarMgt.TimeFactor(CapacityUoM);
         ActTimeUsed := CostCalcMgt.CalcProdOrderActTimeUsed(Rec, false) / CalendarMgt.TimeFactor(CapacityUoM);
-        ProdOrderLine.SetRange(Status, Status);
-        ProdOrderLine.SetRange("Prod. Order No.", "No.");
+        ProdOrderLine.SetRange(Status, Rec.Status);
+        ProdOrderLine.SetRange("Prod. Order No.", Rec."No.");
         ProdOrderLine.SetRange("Planning Level Code", 0);
         ProdOrderLine.SetFilter("Item No.", '<>%1', '');
         if ProdOrderLine.Find('-') then

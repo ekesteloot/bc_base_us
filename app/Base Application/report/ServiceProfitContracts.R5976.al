@@ -1,7 +1,12 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.Ledger;
+
 report 5976 "Service Profit (Contracts)"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ServiceProfitContracts.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceProfitContracts.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Profit (Contracts)';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +16,7 @@ report 5976 "Service Profit (Contracts)"
         dataitem("Service Contract Header"; "Service Contract Header")
         {
             CalcFields = Name;
-            DataItemTableView = SORTING("Responsibility Center", "Service Zone Code", Status, "Contract Group Code") WHERE("Contract Type" = CONST(Contract));
+            DataItemTableView = sorting("Responsibility Center", "Service Zone Code", Status, "Contract Group Code") where("Contract Type" = const(Contract));
             RequestFilterFields = "Responsibility Center", "Contract Group Code", "Contract No.", "Posted Service Order Filter", "Date Filter";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
@@ -106,8 +111,8 @@ report 5976 "Service Profit (Contracts)"
             }
             dataitem("Service Ledger Entry"; "Service Ledger Entry")
             {
-                DataItemLink = "Service Contract No." = FIELD("Contract No."), "Posting Date" = FIELD("Date Filter"), "Service Order No." = FIELD("Posted Service Order Filter");
-                DataItemTableView = SORTING("Service Contract No.") WHERE("Entry Type" = CONST(Sale), Open = CONST(false));
+                DataItemLink = "Service Contract No." = field("Contract No."), "Posting Date" = field("Date Filter"), "Service Order No." = field("Posted Service Order Filter");
+                DataItemTableView = sorting("Service Contract No.") where("Entry Type" = const(Sale), Open = const(false));
                 column(CustNoName_ServContract; "Service Contract Header"."Customer No." + ' ' + "Service Contract Header".Name)
                 {
                 }

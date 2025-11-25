@@ -1,7 +1,7 @@
 report 1129 "Cost Allocations"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/CostAccounting/CostAllocations.rdlc';
+    RDLCLayout = './CostAccounting/Reports/CostAllocations.rdlc';
     ApplicationArea = CostAccounting;
     Caption = 'Cost Allocations';
     UsageCategory = ReportsAndAnalysis;
@@ -75,8 +75,8 @@ report 1129 "Cost Allocations"
             }
             dataitem("Cost Allocation Target"; "Cost Allocation Target")
             {
-                DataItemLink = ID = FIELD(ID);
-                DataItemTableView = SORTING(ID, "Line No.");
+                DataItemLink = ID = field(ID);
+                DataItemTableView = sorting(ID, "Line No.");
                 RequestFilterFields = "Target Cost Type", "Target Cost Center", "Target Cost Object", "Allocation Target Type", "Share Updated on";
                 column(TargetCostType_CostAllocTarget; "Target Cost Type")
                 {

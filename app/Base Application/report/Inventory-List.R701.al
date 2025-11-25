@@ -1,7 +1,11 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+
 report 701 "Inventory - List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/InventoryList.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/InventoryList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Inventory - List';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +14,7 @@ report 701 "Inventory - List"
     {
         dataitem(Item; Item)
         {
-            DataItemTableView = WHERE(Type = CONST(Inventory));
+            DataItemTableView = where(Type = const(Inventory));
             RequestFilterFields = "No.", "Search Description", "Assembly BOM", "Inventory Posting Group", "Shelf No.", "Statistics Group";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

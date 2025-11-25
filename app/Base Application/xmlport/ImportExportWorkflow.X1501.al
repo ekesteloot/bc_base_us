@@ -1,3 +1,10 @@
+﻿namespace System.Automation;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using System;
+using System.Reflection;
+using System.Security.User;
+
 xmlport 1501 "Import / Export Workflow"
 {
     Caption = 'Import / Export Workflow';
@@ -39,7 +46,7 @@ xmlport 1501 "Import / Export Workflow"
                 }
                 tableelement("Workflow Step"; "Workflow Step")
                 {
-                    LinkFields = "Workflow Code" = FIELD(Code);
+                    LinkFields = "Workflow Code" = field(Code);
                     LinkTable = Workflow;
                     MinOccurs = Zero;
                     XmlName = 'WorkflowStep';
@@ -116,7 +123,7 @@ xmlport 1501 "Import / Export Workflow"
                     }
                     tableelement("Workflow Step Argument"; "Workflow Step Argument")
                     {
-                        LinkFields = ID = FIELD(Argument), Type = FIELD(Type);
+                        LinkFields = ID = field(Argument), Type = field(Type);
                         LinkTable = "Workflow Step";
                         MaxOccurs = Once;
                         MinOccurs = Zero;
@@ -412,7 +419,7 @@ xmlport 1501 "Import / Export Workflow"
                     }
                     tableelement("Workflow Rule"; "Workflow Rule")
                     {
-                        LinkFields = "Workflow Code" = FIELD("Workflow Code"), "Workflow Step ID" = FIELD(ID);
+                        LinkFields = "Workflow Code" = field("Workflow Code"), "Workflow Step ID" = field(ID);
                         LinkTable = "Workflow Step";
                         MinOccurs = Zero;
                         XmlName = 'WorkflowRule';
@@ -444,7 +451,7 @@ xmlport 1501 "Import / Export Workflow"
                 tableelement("Workflow Category"; "Workflow Category")
                 {
                     AutoSave = false;
-                    LinkFields = Code = FIELD(Category);
+                    LinkFields = Code = field(Category);
                     LinkTable = Workflow;
                     LinkTableForceInsert = false;
                     MaxOccurs = Once;

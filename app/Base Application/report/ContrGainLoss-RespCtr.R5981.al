@@ -1,7 +1,12 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Contract;
+
 report 5981 "Contr. Gain/Loss - Resp. Ctr."
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Contract/ContrGainLossRespCtr.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ContrGainLossRespCtr.rdlc';
     ApplicationArea = Service;
     Caption = 'Contr. Gain/Loss - Resp. Ctr.';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5981 "Contr. Gain/Loss - Resp. Ctr."
     {
         dataitem("Contract Gain/Loss Entry"; "Contract Gain/Loss Entry")
         {
-            DataItemTableView = SORTING("Responsibility Center", "Type of Change", "Reason Code");
+            DataItemTableView = sorting("Responsibility Center", "Type of Change", "Reason Code");
             RequestFilterFields = "Responsibility Center", "Change Date";
             column(TodayFormatted; Format(Today, 0, 4))
             {

@@ -1,3 +1,9 @@
+namespace Microsoft.FixedAssets.Journal;
+
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FixedAssets.Depreciation;
+using Microsoft.FixedAssets.Insurance;
+
 codeunit 5639 "FA Get Journal"
 {
 

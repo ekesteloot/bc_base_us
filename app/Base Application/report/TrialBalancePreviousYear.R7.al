@@ -1,7 +1,12 @@
+namespace Microsoft.FinancialMgt.GeneralLedger.Reports;
+
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using System.Utilities;
+
 report 7 "Trial Balance/Previous Year"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/GeneralLedger/TrialBalancePreviousYear.rdlc';
+    RDLCLayout = './FinancialMgt/GeneralLedger/Reports/TrialBalancePreviousYear.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Trial Balance/Previous Year';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 7 "Trial Balance/Previous Year"
     {
         dataitem("G/L Account"; "G/L Account")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.", "Account Type", "Date Filter", "Global Dimension 1 Filter", "Global Dimension 2 Filter";
             column(TodayFormatted; Format(Today, 0, 4))
             {
@@ -56,7 +61,7 @@ report 7 "Trial Balance/Previous Year"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(No_GLAccount; "G/L Account"."No.")
                 {
                     IncludeCaption = true;
@@ -110,7 +115,7 @@ report 7 "Trial Balance/Previous Year"
                 }
                 dataitem(BlankLineRepeater; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(BlankLineNo; BlankLineNo)
                     {
                     }

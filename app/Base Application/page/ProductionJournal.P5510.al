@@ -1,3 +1,16 @@
+namespace Microsoft.Manufacturing.Journal;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.WarehouseMgt.Structure;
+using System.Environment;
+using System.Environment.Configuration;
+using System.Integration;
+
 page 5510 "Production Journal"
 {
     Caption = 'Production Journal';
@@ -74,7 +87,7 @@ page 5510 "Production Journal"
 
                     trigger OnLookup(var Text: Text): Boolean
                     begin
-                        if Item.Get("Item No.") then
+                        if Item.Get(Rec."Item No.") then
                             PAGE.RunModal(PAGE::"Item List", Item);
                     end;
                 }
@@ -222,7 +235,7 @@ page 5510 "Production Journal"
                     HideValue = ScrapQuantityHideValue;
                     ToolTip = 'Specifies the number of units produced incorrectly, and therefore cannot be used.';
                 }
-                field(Finished; Finished)
+                field(Finished; Rec.Finished)
                 {
                     ApplicationArea = Manufacturing;
                     Editable = FinishedEditable;
@@ -270,14 +283,14 @@ page 5510 "Production Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,3';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(3),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible3;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(3, ShortcutDimCode[3]);
+                        Rec.ValidateShortcutDimCode(3, ShortcutDimCode[3]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 3);
                     end;
@@ -286,14 +299,14 @@ page 5510 "Production Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,4';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(4),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible4;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(4, ShortcutDimCode[4]);
+                        Rec.ValidateShortcutDimCode(4, ShortcutDimCode[4]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 4);
                     end;
@@ -302,14 +315,14 @@ page 5510 "Production Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,5';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(5),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible5;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(5, ShortcutDimCode[5]);
+                        Rec.ValidateShortcutDimCode(5, ShortcutDimCode[5]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 5);
                     end;
@@ -318,14 +331,14 @@ page 5510 "Production Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,6';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(6),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible6;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(6, ShortcutDimCode[6]);
+                        Rec.ValidateShortcutDimCode(6, ShortcutDimCode[6]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 6);
                     end;
@@ -334,14 +347,14 @@ page 5510 "Production Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,7';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(7),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible7;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(7, ShortcutDimCode[7]);
+                        Rec.ValidateShortcutDimCode(7, ShortcutDimCode[7]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 7);
                     end;
@@ -350,14 +363,14 @@ page 5510 "Production Journal"
                 {
                     ApplicationArea = Dimensions;
                     CaptionClass = '1,2,8';
-                    TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(8),
-                                                                  "Dimension Value Type" = CONST(Standard),
-                                                                  Blocked = CONST(false));
+                    TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
+                                                                  "Dimension Value Type" = const(Standard),
+                                                                  Blocked = const(false));
                     Visible = DimVisible8;
 
                     trigger OnValidate()
                     begin
-                        ValidateShortcutDimCode(8, ShortcutDimCode[8]);
+                        Rec.ValidateShortcutDimCode(8, ShortcutDimCode[8]);
 
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
@@ -470,7 +483,7 @@ page 5510 "Production Journal"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -484,7 +497,7 @@ page 5510 "Production Journal"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines(false);
+                        Rec.OpenItemTrackingLines(false);
                     end;
                 }
                 action("Bin Contents")
@@ -493,10 +506,10 @@ page 5510 "Production Journal"
                     Caption = 'Bin Contents';
                     Image = BinContent;
                     RunObject = Page "Bin Contents List";
-                    RunPageLink = "Location Code" = FIELD("Location Code"),
-                                  "Item No." = FIELD("Item No."),
-                                  "Variant Code" = FIELD("Variant Code");
-                    RunPageView = SORTING("Location Code", "Bin Code", "Item No.", "Variant Code");
+                    RunPageLink = "Location Code" = field("Location Code"),
+                                  "Item No." = field("Item No."),
+                                  "Variant Code" = field("Variant Code");
+                    RunPageView = sorting("Location Code", "Bin Code", "Item No.", "Variant Code");
                     ToolTip = 'View items in the bin if the selected line contains a bin code.';
                 }
             }
@@ -510,7 +523,7 @@ page 5510 "Production Journal"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Released Production Order";
-                    RunPageLink = "No." = FIELD("Order No.");
+                    RunPageLink = "No." = field("Order No.");
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or change detailed information about the record on the document or journal line.';
                 }
@@ -524,9 +537,9 @@ page 5510 "Production Journal"
                         Caption = 'Item Ledger E&ntries';
                         Image = ItemLedger;
                         RunObject = Page "Item Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("Order No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("Order No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ShortCutKey = 'Ctrl+F7';
                         ToolTip = 'View the item ledger entries of the item on the document or journal line.';
                     }
@@ -536,9 +549,9 @@ page 5510 "Production Journal"
                         Caption = 'Capacity Ledger Entries';
                         Image = CapacityLedger;
                         RunObject = Page "Capacity Ledger Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("Order No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("Order No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the capacity ledger entries of the involved production order. Capacity is recorded either as time (run time, stop time, or setup time) or as quantity (scrap quantity or output quantity).';
                     }
                     action("Value Entries")
@@ -547,9 +560,9 @@ page 5510 "Production Journal"
                         Caption = 'Value Entries';
                         Image = ValueLedger;
                         RunObject = Page "Value Entries";
-                        RunPageLink = "Order Type" = CONST(Production),
-                                      "Order No." = FIELD("Order No.");
-                        RunPageView = SORTING("Order Type", "Order No.");
+                        RunPageLink = "Order Type" = const(Production),
+                                      "Order No." = field("Order No.");
+                        RunPageView = sorting("Order Type", "Order No.");
                         ToolTip = 'View the value entries of the item on the document or journal line.';
                     }
                 }
@@ -557,6 +570,26 @@ page 5510 "Production Journal"
         }
         area(processing)
         {
+            group("Page")
+            {
+                Caption = 'Page';
+                action(EditInExcel)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Edit in Excel';
+                    Image = Excel;
+                    ToolTip = 'Send the data in the journal to an Excel file for analysis or editing.';
+                    Visible = IsSaaSExcelAddinEnabled;
+                    AccessByPermission = System "Allow Action Export To Excel" = X;
+
+                    trigger OnAction()
+                    var
+                        ODataUtility: Codeunit ODataUtility;
+                    begin
+                        ODataUtility.EditJournalWorksheetInExcel(Text.CopyStr(CurrPage.Caption, 1, 240), CurrPage.ObjectId(false), Rec."Journal Batch Name", Rec."Journal Template Name");
+                    end;
+                }
+            }
             group("P&osting")
             {
                 Caption = 'P&osting';
@@ -603,8 +636,13 @@ page 5510 "Production Journal"
                     ToolTip = 'Review the different types of entries that will be created when you post the document or journal.';
 
                     trigger OnAction()
+                    var
+                        ItemJnlLine: Record "Item Journal Line";
                     begin
-                        ShowPreview();
+                        MarkRelevantRec(ItemJnlLine);
+                        ItemJnlLine.PreviewPostItemJnlFromProduction();
+
+                        SetFilterGroup();
                         CurrPage.Update(false);
                     end;
                 }
@@ -642,9 +680,7 @@ page 5510 "Production Journal"
                     ItemJnlLine: Record "Item Journal Line";
                 begin
                     ItemJnlLine.Copy(Rec);
-                    ItemJnlLine.SetRange("Journal Template Name", "Journal Template Name");
-                    ItemJnlLine.SetRange("Journal Batch Name", "Journal Batch Name");
-                    REPORT.RunModal(REPORT::"Inventory Movement", true, true, ItemJnlLine);
+                    ItemJnlLine.PrintInventoryMovement();
                 end;
             }
         }
@@ -734,7 +770,7 @@ page 5510 "Production Journal"
         SetupTimeHideValue := false;
         QuantityHideValue := false;
         DescriptionIndent := 0;
-        ShowShortcutDimCode(ShortcutDimCode);
+        Rec.ShowShortcutDimCode(ShortcutDimCode);
         DescriptionOnFormat();
         QuantityOnFormat();
         SetupTimeOnFormat();
@@ -777,11 +813,18 @@ page 5510 "Production Journal"
 
     trigger OnModifyRecord(): Boolean
     begin
-        "Changed by User" := true;
+        Rec."Changed by User" := true;
     end;
 
     trigger OnOpenPage()
+    var
+        ClientTypeManagement: Codeunit "Client Type Management";
+        ServerSetting: Codeunit "Server Setting";
     begin
+        IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        // if called from API (such as edit-in-excel), do not filter 
+        if ClientTypeManagement.GetCurrentClientType() = CLIENTTYPE::ODataV4 then
+            exit;
         SetFilterGroup();
 
         if ProdOrderLineNo <> 0 then
@@ -810,58 +853,34 @@ page 5510 "Production Journal"
         ActualScrapQty: Decimal;
         ActualConsumpQty: Decimal;
         FlushingFilter: Enum "Flushing Method Filter";
+        IsSaaSExcelAddinEnabled: Boolean;
 
     protected var
         ShortcutDimCode: array[8] of Code[20];
-        [InDataSet]
         DescriptionIndent: Integer;
-        [InDataSet]
         QuantityHideValue: Boolean;
-        [InDataSet]
         SetupTimeHideValue: Boolean;
-        [InDataSet]
         RunTimeHideValue: Boolean;
-        [InDataSet]
         OutputQuantityHideValue: Boolean;
-        [InDataSet]
         ScrapQuantityHideValue: Boolean;
-        [InDataSet]
         ActualConsumpQtyHideValue: Boolean;
-        [InDataSet]
         ActualSetupTimeHideValue: Boolean;
-        [InDataSet]
         ActualRunTimeHideValue: Boolean;
-        [InDataSet]
         ActualOutputQtyHideValue: Boolean;
-        [InDataSet]
         ActualScrapQtyHideValue: Boolean;
-        [InDataSet]
         StartingTimeEditable: Boolean;
-        [InDataSet]
         EndingTimeEditable: Boolean;
-        [InDataSet]
         ConcurrentCapacityEditable: Boolean;
-        [InDataSet]
         CapUnitofMeasureCodeEditable: Boolean;
-        [InDataSet]
         SetupTimeEditable: Boolean;
-        [InDataSet]
         RunTimeEditable: Boolean;
-        [InDataSet]
         WorkShiftCodeEditable: Boolean;
-        [InDataSet]
         FinishedEditable: Boolean;
-        [InDataSet]
         ScrapCodeEditable: Boolean;
-        [InDataSet]
         ScrapQuantityEditable: Boolean;
-        [InDataSet]
         OutputQuantityEditable: Boolean;
-        [InDataSet]
         QuantityEditable: Boolean;
-        [InDataSet]
         AppliesFromEntryEditable: Boolean;
-        [InDataSet]
         DescriptionEmphasize: Text;
         DimVisible1: Boolean;
         DimVisible2: Boolean;
@@ -892,36 +911,36 @@ page 5510 "Production Journal"
         ActualScrapQty := 0;
         ActualConsumpQty := 0;
 
-        if "Qty. per Unit of Measure" = 0 then
-            "Qty. per Unit of Measure" := 1;
-        if "Qty. per Cap. Unit of Measure" = 0 then
-            "Qty. per Cap. Unit of Measure" := 1;
+        if Rec."Qty. per Unit of Measure" = 0 then
+            Rec."Qty. per Unit of Measure" := 1;
+        if Rec."Qty. per Cap. Unit of Measure" = 0 then
+            Rec."Qty. per Cap. Unit of Measure" := 1;
 
-        if Item.Get("Item No.") then
-            case "Entry Type" of
-                "Entry Type"::Consumption:
+        if Item.Get(Rec."Item No.") then
+            case Rec."Entry Type" of
+                Rec."Entry Type"::Consumption:
                     if ProdOrderComp.Get(
                          ProdOrder.Status,
-                         "Order No.",
-                         "Order Line No.",
-                         "Prod. Order Comp. Line No.")
+                         Rec."Order No.",
+                         Rec."Order Line No.",
+                         Rec."Prod. Order Comp. Line No.")
                     then
                         CalcActualConsumpQty();
-                "Entry Type"::Output:
+                Rec."Entry Type"::Output:
                     begin
                         if ProdOrderLineNo = 0 then
-                            if not ProdOrderLine.Get(ProdOrder.Status, ProdOrder."No.", "Order Line No.") then
+                            if not ProdOrderLine.Get(ProdOrder.Status, ProdOrder."No.", Rec."Order Line No.") then
                                 Clear(ProdOrderLine);
                         if ProdOrderLine."Prod. Order No." <> '' then begin
                             CostCalcMgt.CalcActTimeAndQtyBase(
-                              ProdOrderLine, "Operation No.", ActualRunTime, ActualSetupTime, ActualOutputQty, ActualScrapQty);
+                              ProdOrderLine, Rec."Operation No.", ActualRunTime, ActualSetupTime, ActualOutputQty, ActualScrapQty);
                             ActualSetupTime :=
-                              Round(ActualSetupTime / "Qty. per Cap. Unit of Measure", UOMMgt.TimeRndPrecision());
+                              Round(ActualSetupTime / Rec."Qty. per Cap. Unit of Measure", UOMMgt.TimeRndPrecision());
                             ActualRunTime :=
-                              Round(ActualRunTime / "Qty. per Cap. Unit of Measure", UOMMgt.TimeRndPrecision());
+                              Round(ActualRunTime / Rec."Qty. per Cap. Unit of Measure", UOMMgt.TimeRndPrecision());
 
-                            ActualOutputQty := ActualOutputQty / "Qty. per Unit of Measure";
-                            ActualScrapQty := ActualScrapQty / "Qty. per Unit of Measure";
+                            ActualOutputQty := ActualOutputQty / Rec."Qty. per Unit of Measure";
+                            ActualScrapQty := ActualScrapQty / Rec."Qty. per Unit of Measure";
                             if Item."Rounding Precision" > 0 then begin
                                 ActualOutputQty := UOMMgt.RoundToItemRndPrecision(ActualOutputQty, Item."Rounding Precision");
                                 ActualScrapQty := UOMMgt.RoundToItemRndPrecision(ActualScrapQty, Item."Rounding Precision");
@@ -956,7 +975,7 @@ page 5510 "Production Journal"
     var
         OperationExist: Boolean;
     begin
-        if (Rec."Entry Type" = "Item Ledger Entry Type"::Output) and
+        if (Rec."Entry Type" = Rec."Entry Type"::Output) and
            (Rec."Operation No." <> '')
         then
             OperationExist := true
@@ -971,13 +990,13 @@ page 5510 "Production Journal"
         RunTimeEditable := OperationExist;
         WorkShiftCodeEditable := OperationExist;
 
-        FinishedEditable := Rec."Entry Type" = "Item Ledger Entry Type"::Output;
-        ScrapCodeEditable := Rec."Entry Type" = "Item Ledger Entry Type"::Output;
-        ScrapQuantityEditable := Rec."Entry Type" = "Item Ledger Entry Type"::Output;
-        OutputQuantityEditable := Rec."Entry Type" = "Item Ledger Entry Type"::Output;
+        FinishedEditable := Rec."Entry Type" = Rec."Entry Type"::Output;
+        ScrapCodeEditable := Rec."Entry Type" = Rec."Entry Type"::Output;
+        ScrapQuantityEditable := Rec."Entry Type" = Rec."Entry Type"::Output;
+        OutputQuantityEditable := Rec."Entry Type" = Rec."Entry Type"::Output;
 
-        QuantityEditable := Rec."Entry Type" = "Item Ledger Entry Type"::Consumption;
-        AppliesFromEntryEditable := Rec."Entry Type" = "Item Ledger Entry Type"::Consumption;
+        QuantityEditable := Rec."Entry Type" = Rec."Entry Type"::Consumption;
+        AppliesFromEntryEditable := Rec."Entry Type" = Rec."Entry Type"::Consumption;
     end;
 
     protected procedure DeleteTempRec()
@@ -987,14 +1006,14 @@ page 5510 "Production Journal"
         if Rec.Find('-') then
             repeat
                 case Rec."Entry Type" of
-                    "Item Ledger Entry Type"::Consumption:
+                    Rec."Entry Type"::Consumption:
                         if Rec."Quantity (Base)" = 0 then begin
                             TempItemJnlLine := Rec;
                             TempItemJnlLine.Insert();
 
                             Rec.Delete();
                         end;
-                    "Item Ledger Entry Type"::Output:
+                    Rec."Entry Type"::Output:
                         if Rec.TimeIsEmpty() and
                            (Rec."Output Quantity (Base)" = 0) and (Rec."Scrap Quantity (Base)" = 0)
                         then begin
@@ -1005,6 +1024,24 @@ page 5510 "Production Journal"
                         end;
                 end;
             until Rec.Next() = 0;
+    end;
+
+    protected procedure MarkRelevantRec(var ItemJournalLine: Record "Item Journal Line")
+    begin
+        ItemJournalLine := Rec;
+        if ItemJournalLine.Find('-') then begin
+            repeat
+                case ItemJournalLine."Entry Type" of
+                    Rec."Entry Type"::Consumption:
+                        if ItemJournalLine."Quantity (Base)" <> 0 then
+                            ItemJournalLine.Mark(true);
+                    Rec."Entry Type"::Output:
+                        if not ItemJournalLine.TimeIsEmpty() or (ItemJournalLine."Output Quantity (Base)" <> 0) or (ItemJournalLine."Scrap Quantity (Base)" <> 0) then
+                            ItemJournalLine.Mark(true);
+                end;
+            until ItemJournalLine.Next() = 0;
+            ItemJournalLine.MarkedOnly(true);
+        end;
     end;
 
     protected procedure InsertTempRec()
@@ -1023,7 +1060,7 @@ page 5510 "Production Journal"
         Rec.FilterGroup(2);
         Rec.SetRange("Journal Template Name", ToTemplateName);
         Rec.SetRange("Journal Batch Name", ToBatchName);
-        Rec.SetRange("Order Type", "Order Type"::Production);
+        Rec.SetRange("Order Type", Rec."Order Type"::Production);
         Rec.SetRange("Order No.", ProdOrder."No.");
         if ProdOrderLineNo <> 0 then
             Rec.SetRange("Order Line No.", ProdOrderLineNo);
@@ -1083,7 +1120,7 @@ page 5510 "Production Journal"
     local procedure DescriptionOnFormat()
     begin
         DescriptionIndent := Rec.Level;
-        if Rec."Entry Type" = "Item Ledger Entry Type"::Output then
+        if Rec."Entry Type" = Rec."Entry Type"::Output then
             DescriptionEmphasize := 'Strong'
         else
             DescriptionEmphasize := '';
@@ -1091,13 +1128,13 @@ page 5510 "Production Journal"
 
     local procedure QuantityOnFormat()
     begin
-        if Rec."Entry Type" = "Item Ledger Entry Type"::Output then
+        if Rec."Entry Type" = Rec."Entry Type"::Output then
             QuantityHideValue := true;
     end;
 
     local procedure SetupTimeOnFormat()
     begin
-        if (Rec."Entry Type" = "Item Ledger Entry Type"::Consumption) or
+        if (Rec."Entry Type" = Rec."Entry Type"::Consumption) or
            (Rec."Operation No." = '')
         then
             SetupTimeHideValue := true;
@@ -1105,7 +1142,7 @@ page 5510 "Production Journal"
 
     local procedure RunTimeOnFormat()
     begin
-        if (Rec."Entry Type" = "Item Ledger Entry Type"::Consumption) or
+        if (Rec."Entry Type" = Rec."Entry Type"::Consumption) or
            (Rec."Operation No." = '')
         then
             RunTimeHideValue := true;
@@ -1113,25 +1150,25 @@ page 5510 "Production Journal"
 
     local procedure OutputQuantityOnFormat()
     begin
-        if Rec."Entry Type" = "Item Ledger Entry Type"::Consumption then
+        if Rec."Entry Type" = Rec."Entry Type"::Consumption then
             OutputQuantityHideValue := true;
     end;
 
     local procedure ScrapQuantityOnFormat()
     begin
-        if Rec."Entry Type" = "Item Ledger Entry Type"::Consumption then
+        if Rec."Entry Type" = Rec."Entry Type"::Consumption then
             ScrapQuantityHideValue := true;
     end;
 
     local procedure ActualConsumpQtyOnFormat()
     begin
-        if Rec."Entry Type" = "Item Ledger Entry Type"::Output then
+        if Rec."Entry Type" = Rec."Entry Type"::Output then
             ActualConsumpQtyHideValue := true;
     end;
 
     local procedure ActualSetupTimeOnFormat()
     begin
-        if (Rec."Entry Type" = "Item Ledger Entry Type"::Consumption) or
+        if (Rec."Entry Type" = Rec."Entry Type"::Consumption) or
            (Rec."Operation No." = '')
         then
             ActualSetupTimeHideValue := true;
@@ -1139,7 +1176,7 @@ page 5510 "Production Journal"
 
     local procedure ActualRunTimeOnFormat()
     begin
-        if (Rec."Entry Type" = "Item Ledger Entry Type"::Consumption) or
+        if (Rec."Entry Type" = Rec."Entry Type"::Consumption) or
            (Rec."Operation No." = '')
         then
             ActualRunTimeHideValue := true;
@@ -1147,13 +1184,13 @@ page 5510 "Production Journal"
 
     local procedure ActualOutputQtyOnFormat()
     begin
-        if Rec."Entry Type" = "Item Ledger Entry Type"::Consumption then
+        if Rec."Entry Type" = Rec."Entry Type"::Consumption then
             ActualOutputQtyHideValue := true;
     end;
 
     local procedure ActualScrapQtyOnFormat()
     begin
-        if Rec."Entry Type" = "Item Ledger Entry Type"::Consumption then
+        if Rec."Entry Type" = Rec."Entry Type"::Consumption then
             ActualScrapQtyHideValue := true;
     end;
 
@@ -1174,17 +1211,6 @@ page 5510 "Production Journal"
           DimVisible1, DimVisible2, DimVisible3, DimVisible4, DimVisible5, DimVisible6, DimVisible7, DimVisible8);
 
         Clear(DimMgt);
-    end;
-
-    local procedure ShowPreview()
-    begin
-        DeleteTempRec();
-
-        Rec.PreviewPostItemJnlFromProduction();
-        InsertTempRec();
-
-        SetFilterGroup();
-        CurrPage.Update(false);
     end;
 
     [IntegrationEvent(false, false)]

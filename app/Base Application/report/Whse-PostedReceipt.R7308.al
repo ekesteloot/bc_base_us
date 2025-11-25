@@ -1,7 +1,16 @@
+﻿// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.WarehouseMgt.History;
+
+using Microsoft.InventoryMgt.Location;
+using System.Utilities;
+
 report 7308 "Whse. - Posted Receipt"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/Receipt/WhsePostedReceipt.rdlc';
+    RDLCLayout = './WarehouseMgt/History/WhsePostedReceipt.rdlc';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Posted Receipt';
     UsageCategory = Documents;
@@ -10,11 +19,11 @@ report 7308 "Whse. - Posted Receipt"
     {
         dataitem("Posted Whse. Receipt Header"; "Posted Whse. Receipt Header")
         {
-            DataItemTableView = SORTING("No.");
+            DataItemTableView = sorting("No.");
             RequestFilterFields = "No.";
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(CompanyName; COMPANYPROPERTY.DisplayName())
                 {
                 }
@@ -47,9 +56,9 @@ report 7308 "Whse. - Posted Receipt"
                 }
                 dataitem("Posted Whse. Receipt Line"; "Posted Whse. Receipt Line")
                 {
-                    DataItemLink = "No." = FIELD("No.");
+                    DataItemLink = "No." = field("No.");
                     DataItemLinkReference = "Posted Whse. Receipt Header";
-                    DataItemTableView = SORTING("No.", "Line No.");
+                    DataItemTableView = sorting("No.", "Line No.");
                     column(ShelfNo_PostedWhseRcpLine; "Shelf No.")
                     {
                         IncludeCaption = true;

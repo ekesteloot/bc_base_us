@@ -151,7 +151,7 @@ report 10078 "Shipping Labels"
             }
             dataitem(BlankLine; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(NumOfBlanks; NumOfBlanks)
                 {
                 }

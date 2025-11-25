@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 page 130401 "CAL Test Tool"
 {
     AccessByPermission = TableData "CAL Test Line" = RIMD;
@@ -46,7 +48,7 @@ page 130401 "CAL Test Tool"
                 IndentationControls = Name;
                 ShowAsTree = true;
                 ShowCaption = false;
-                field(LineType; "Line Type")
+                field(LineType; Rec."Line Type")
                 {
                     ApplicationArea = All;
                     Caption = 'Line Type';
@@ -54,7 +56,7 @@ page 130401 "CAL Test Tool"
                     Style = Strong;
                     StyleExpr = LineTypeEmphasize;
                 }
-                field(TestCodeunit; "Test Codeunit")
+                field(TestCodeunit; Rec."Test Codeunit")
                 {
                     ApplicationArea = All;
                     BlankZero = true;
@@ -83,10 +85,10 @@ page 130401 "CAL Test Tool"
                     var
                         CALTestCoverageMap: Record "CAL Test Coverage Map";
                     begin
-                        CALTestCoverageMap.ShowHitObjects("Test Codeunit");
+                        CALTestCoverageMap.ShowHitObjects(Rec."Test Codeunit");
                     end;
                 }
-                field(RunColumn; Run)
+                field(RunColumn; Rec.Run)
                 {
                     ApplicationArea = All;
 
@@ -95,7 +97,7 @@ page 130401 "CAL Test Tool"
                         CurrPage.Update(true);
                     end;
                 }
-                field(Result; Result)
+                field(Result; Rec.Result)
                 {
                     ApplicationArea = All;
                     BlankZero = true;
@@ -113,10 +115,10 @@ page 130401 "CAL Test Tool"
 
                     trigger OnDrillDown()
                     begin
-                        ShowTestResults();
+                        Rec.ShowTestResults();
                     end;
                 }
-                field(Duration; "Finish Time" - "Start Time")
+                field(Duration; Rec."Finish Time" - Rec."Start Time")
                 {
                     ApplicationArea = All;
                     Caption = 'Duration';
@@ -177,7 +179,7 @@ page 130401 "CAL Test Tool"
                     begin
                         CurrPage.SetSelectionFilter(CALTestLine);
                         CALTestLine.DeleteAll(true);
-                        CalcTestResults(Success, Failure, Skipped, NotExecuted);
+                        Rec.CalcTestResults(Success, Failure, Skipped, NotExecuted);
                         CurrPage.Update(false);
                     end;
                 }
@@ -230,7 +232,7 @@ page 130401 "CAL Test Tool"
                         WarnNonEnglishLanguage();
 
                         CurrPage.SetSelectionFilter(SelectedCALTestLine);
-                        SelectedCALTestLine.SetRange("Test Suite", "Test Suite");
+                        SelectedCALTestLine.SetRange("Test Suite", Rec."Test Suite");
                         CALTestMgt.RunSelected(SelectedCALTestLine);
                         CurrPage.Update(false);
                     end;
@@ -371,14 +373,14 @@ page 130401 "CAL Test Tool"
 
     trigger OnAfterGetRecord()
     begin
-        CalcTestResults(Success, Failure, Skipped, NotExecuted);
-        NameIndent := "Line Type";
-        LineTypeEmphasize := "Line Type" in ["Line Type"::Group, "Line Type"::Codeunit];
-        TestCodeunitEmphasize := "Line Type" = "Line Type"::Codeunit;
-        NameEmphasize := "Line Type" = "Line Type"::Group;
-        ResultEmphasize := Result = Result::Success;
-        if "Line Type" <> "Line Type"::Codeunit then
-            "Hit Objects" := 0;
+        Rec.CalcTestResults(Success, Failure, Skipped, NotExecuted);
+        NameIndent := Rec."Line Type";
+        LineTypeEmphasize := Rec."Line Type" in [Rec."Line Type"::Group, Rec."Line Type"::Codeunit];
+        TestCodeunitEmphasize := Rec."Line Type" = Rec."Line Type"::Codeunit;
+        NameEmphasize := Rec."Line Type" = Rec."Line Type"::Group;
+        ResultEmphasize := Rec.Result = Rec.Result::Success;
+        if Rec."Line Type" <> Rec."Line Type"::Codeunit then
+            Rec."Hit Objects" := 0;
     end;
 
     trigger OnOpenPage()
@@ -391,11 +393,11 @@ page 130401 "CAL Test Tool"
                 Commit();
             end;
 
-        FilterGroup(2);
-        SetRange("Test Suite", CurrentSuiteName);
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetRange("Test Suite", CurrentSuiteName);
+        Rec.FilterGroup(0);
 
-        if Find('-') then;
+        if Rec.Find('-') then;
         CurrPage.Update(false);
 
         CALTestSuite.Get(CurrentSuiteName);
@@ -410,14 +412,10 @@ page 130401 "CAL Test Tool"
         Success: Integer;
         Failure: Integer;
         NotExecuted: Integer;
-        [InDataSet]
         NameIndent: Integer;
-        [InDataSet]
         LineTypeEmphasize: Boolean;
         NameEmphasize: Boolean;
-        [InDataSet]
         TestCodeunitEmphasize: Boolean;
-        [InDataSet]
         ResultEmphasize: Boolean;
         LanguageWarningShown: Boolean;
         LanguageWarningMsg: Label 'Warning: The current language is not set to English (US). The tests may only contain captions in English (US), which will cause the tests to fail. Resolve the issue by switching the language or introducing translations in the test.';
@@ -429,7 +427,7 @@ page 130401 "CAL Test Tool"
         if CALTestSuite.Name <> '' then
             CALTestLine.SetRange("Test Suite", CALTestSuite.Name);
 
-        CALTestLine.ModifyAll(Result, Result::" ");
+        CALTestLine.ModifyAll(Result, Rec.Result::" ");
         CALTestLine.ModifyAll("First Error", '');
         CALTestLine.ModifyAll("Start Time", 0DT);
         CALTestLine.ModifyAll("Finish Time", 0DT);
@@ -440,7 +438,7 @@ page 130401 "CAL Test Tool"
         CALTestLine: Record "CAL Test Line";
     begin
         CALTestLine.Copy(Rec);
-        CALTestLine.SetRange(Result, Result::Failure);
+        CALTestLine.SetRange(Result, Rec.Result::Failure);
         if CALTestLine.Find(Which) then
             Rec := CALTestLine;
     end;
@@ -458,9 +456,9 @@ page 130401 "CAL Test Tool"
     begin
         CurrPage.SaveRecord();
 
-        FilterGroup(2);
-        SetRange("Test Suite", CurrentSuiteName);
-        FilterGroup(0);
+        Rec.FilterGroup(2);
+        Rec.SetRange("Test Suite", CurrentSuiteName);
+        Rec.FilterGroup(0);
 
         CurrPage.Update(false);
     end;

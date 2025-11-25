@@ -1,3 +1,9 @@
+namespace Microsoft.Manufacturing.Document;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.WarehouseMgt.Request;
+
 codeunit 5774 "Whse.-Production Release"
 {
 
@@ -95,7 +101,7 @@ codeunit 5774 "Whse.-Production Release"
             else
                 WarehouseRequest.Type := WarehouseRequest.Type::Inbound;
             WarehouseRequest."Location Code" := ProdOrderComp."Location Code";
-            WarehouseRequest."Source Type" := DATABASE::"Prod. Order Component";
+            WarehouseRequest."Source Type" := Enum::TableID::"Prod. Order Component".AsInteger();
             WarehouseRequest."Source No." := ProdOrderComp."Prod. Order No.";
             WarehouseRequest."Source Subtype" := ProdOrderComp.Status.AsInteger();
             WarehouseRequest."Source Document" := WarehouseRequest."Source Document"::"Prod. Consumption";
@@ -110,21 +116,43 @@ codeunit 5774 "Whse.-Production Release"
         end;
     end;
 
-    procedure ReleaseLine(var ProdOrderComp: Record "Prod. Order Component"; var OldProdOrderComp: Record "Prod. Order Component")
+    procedure ReleaseLine(var ProdOrderComponent: Record "Prod. Order Component"; var OldProdOrderComponent: Record "Prod. Order Component")
     var
         ProdOrder: Record "Production Order";
         WarehouseRequest: Record "Warehouse Request";
         WhsePickRequest: Record "Whse. Pick Request";
         IsHandled: Boolean;
     begin
-        OnBeforeReleaseLine(ProdOrderComp, OldProdOrderComp, IsHandled);
+        OnBeforeReleaseLine(ProdOrderComponent, OldProdOrderComponent, IsHandled);
         if IsHandled then
             exit;
 
-        with ProdOrderComp do begin
+        with ProdOrderComponent do begin
             GetLocation("Location Code");
-            if Location."Require Pick" then
-                if Location."Require Shipment" then begin
+            if Location.Code <> '' then begin
+                if Location."Prod. Consump. Whse. Handling" in [Location."Prod. Consump. Whse. Handling"::"Inventory Pick/Movement",
+                                                                Location."Prod. Consump. Whse. Handling"::"Warehouse Pick (optional)"]
+                then
+                    if "Remaining Quantity" <> 0 then begin
+                        if "Remaining Quantity" > 0 then
+                            WarehouseRequest.Type := WarehouseRequest.Type::Outbound
+                        else
+                            WarehouseRequest.Type := WarehouseRequest.Type::Inbound;
+                        ProdOrder.Get(Status, "Prod. Order No.");
+                        WarehouseRequest.Init();
+                        WarehouseRequest."Location Code" := "Location Code";
+                        WarehouseRequest."Source Type" := Enum::TableID::"Prod. Order Component".AsInteger();
+                        WarehouseRequest."Source No." := "Prod. Order No.";
+                        WarehouseRequest."Source Subtype" := Status.AsInteger();
+                        WarehouseRequest."Source Document" := WarehouseRequest."Source Document"::"Prod. Consumption";
+                        WarehouseRequest."Document Status" := WarehouseRequest."Document Status"::Released;
+                        WarehouseRequest.SetDestinationType(ProdOrder);
+                        OnBeforeWarehouseRequestUpdate(WarehouseRequest, ProdOrderComponent);
+                        if not WarehouseRequest.Insert() then
+                            WarehouseRequest.Modify();
+                    end;
+
+                if Location."Prod. Consump. Whse. Handling" = Location."Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)" then
                     if "Remaining Quantity" > 0 then begin
                         WhsePickRequest.Init();
                         WhsePickRequest."Document Type" := WhsePickRequest."Document Type"::Production;
@@ -136,35 +164,53 @@ codeunit 5774 "Whse.-Production Release"
                         if WhsePickRequest."Completely Picked" and (not "Completely Picked") then
                             WhsePickRequest."Completely Picked" := false;
                         WhsePickRequest."Location Code" := "Location Code";
-                        OnBeforeCreateWhsePickRequest(WhsePickRqst, ProdOrderComp, ProdOrder);
+                        OnBeforeCreateWhsePickRequest(WhsePickRqst, ProdOrderComponent, ProdOrder);
                         if not WhsePickRequest.Insert() then
                             WhsePickRequest.Modify();
                     end;
-                end else
-                    if "Remaining Quantity" <> 0 then begin
-                        if "Remaining Quantity" > 0 then
-                            WarehouseRequest.Type := WarehouseRequest.Type::Outbound
-                        else
-                            WarehouseRequest.Type := WarehouseRequest.Type::Inbound;
-                        ProdOrder.Get(Status, "Prod. Order No.");
-                        WarehouseRequest.Init();
-                        WarehouseRequest."Location Code" := "Location Code";
-                        WarehouseRequest."Source Type" := DATABASE::"Prod. Order Component";
-                        WarehouseRequest."Source No." := "Prod. Order No.";
-                        WarehouseRequest."Source Subtype" := Status.AsInteger();
-                        WarehouseRequest."Source Document" := WarehouseRequest."Source Document"::"Prod. Consumption";
-                        WarehouseRequest."Document Status" := WarehouseRequest."Document Status"::Released;
-                        WarehouseRequest.SetDestinationType(ProdOrder);
-                        OnBeforeWarehouseRequestUpdate(WarehouseRequest, ProdOrderComp);
-                        if not WarehouseRequest.Insert() then
-                            WarehouseRequest.Modify();
-                    end;
+            end else
+                if Location."Require Pick" then
+                    if Location."Require Shipment" then begin
+                        if "Remaining Quantity" > 0 then begin
+                            WhsePickRequest.Init();
+                            WhsePickRequest."Document Type" := WhsePickRequest."Document Type"::Production;
+                            WhsePickRequest."Document Subtype" := Status.AsInteger();
+                            WhsePickRequest."Document No." := "Prod. Order No.";
+                            WhsePickRequest.Status := WhsePickRequest.Status::Released;
+                            WhsePickRequest."Completely Picked" :=
+                              ProdOrderCompletelyPicked("Location Code", "Prod. Order No.", Status, "Line No.");
+                            if WhsePickRequest."Completely Picked" and (not "Completely Picked") then
+                                WhsePickRequest."Completely Picked" := false;
+                            WhsePickRequest."Location Code" := "Location Code";
+                            OnBeforeCreateWhsePickRequest(WhsePickRqst, ProdOrderComponent, ProdOrder);
+                            if not WhsePickRequest.Insert() then
+                                WhsePickRequest.Modify();
+                        end;
+                    end else
+                        if "Remaining Quantity" <> 0 then begin
+                            if "Remaining Quantity" > 0 then
+                                WarehouseRequest.Type := WarehouseRequest.Type::Outbound
+                            else
+                                WarehouseRequest.Type := WarehouseRequest.Type::Inbound;
+                            ProdOrder.Get(Status, "Prod. Order No.");
+                            WarehouseRequest.Init();
+                            WarehouseRequest."Location Code" := "Location Code";
+                            WarehouseRequest."Source Type" := DATABASE::"Prod. Order Component";
+                            WarehouseRequest."Source No." := "Prod. Order No.";
+                            WarehouseRequest."Source Subtype" := Status.AsInteger();
+                            WarehouseRequest."Source Document" := WarehouseRequest."Source Document"::"Prod. Consumption";
+                            WarehouseRequest."Document Status" := WarehouseRequest."Document Status"::Released;
+                            WarehouseRequest.SetDestinationType(ProdOrder);
+                            OnBeforeWarehouseRequestUpdate(WarehouseRequest, ProdOrderComponent);
+                            if not WarehouseRequest.Insert() then
+                                WarehouseRequest.Modify();
+                        end;
 
-            if ("Line No." = OldProdOrderComp."Line No.") and
-               (("Location Code" <> OldProdOrderComp."Location Code") or
+            if ("Line No." = OldProdOrderComponent."Line No.") and
+               (("Location Code" <> OldProdOrderComponent."Location Code") or
                 ("Remaining Quantity" <= 0))
             then
-                DeleteLine(OldProdOrderComp);
+                DeleteLine(OldProdOrderComponent);
         end;
     end;
 
@@ -239,7 +285,7 @@ codeunit 5774 "Whse.-Production Release"
                     "Remaining Quantity" = 0:
                         exit;
                 end;
-            WarehouseRequest2.SetRange("Source Type", DATABASE::"Prod. Order Component");
+            WarehouseRequest2.SetRange("Source Type", Enum::TableID::"Prod. Order Component".AsInteger());
             WarehouseRequest2.SetRange("Source No.", "Prod. Order No.");
             if not DeleteAllWhseRqst then begin
                 WarehouseRequest2.SetRange("Source Subtype", Status);

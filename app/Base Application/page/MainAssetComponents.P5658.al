@@ -1,3 +1,5 @@
+namespace Microsoft.FixedAssets.FixedAsset;
+
 page 5658 "Main Asset Components"
 {
     AutoSplitKey = false;

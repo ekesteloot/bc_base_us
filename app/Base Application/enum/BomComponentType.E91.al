@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.BOM;
+
 enum 91 "BOM Component Type"
 {
     Extensible = true;

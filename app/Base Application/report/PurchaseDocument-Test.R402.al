@@ -1,14 +1,41 @@
+﻿namespace Microsoft.Purchases.Reports;
+
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Enums;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.ProjectMgt.Resources.Resource;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Document;
+using System.Environment.Configuration;
+using System.Security.User;
+using System.Utilities;
+
 report 402 "Purchase Document - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './PurchasesPayables/PurchaseDocumentTest.rdlc';
+    RDLCLayout = './Purchases/Reports/PurchaseDocumentTest.rdlc';
     Caption = 'Purchase Document - Test';
 
     dataset
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = WHERE("Document Type" = FILTER(<> Quote));
+            DataItemTableView = where("Document Type" = filter(<> Quote));
             RequestFilterFields = "Document Type", "No.";
             RequestFilterHeading = 'Purchase Document';
             column(USERID; UserId)
@@ -130,7 +157,7 @@ report 402 "Purchase Document - Test"
             }
             dataitem(PageCounter; "Integer")
             {
-                DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+                DataItemTableView = sorting(Number) where(Number = const(1));
                 column(FORMAT_TODAY_0_4__Control1029001; Format(Today, 0, 4))
                 {
                 }
@@ -547,7 +574,7 @@ report 402 "Purchase Document - Test"
                 }
                 dataitem(DimensionLoop1; "Integer")
                 {
-                    DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                    DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                     column(DimText; DimText)
                     {
                     }
@@ -595,7 +622,7 @@ report 402 "Purchase Document - Test"
                 }
                 dataitem(HeaderErrorCounter; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     column(ErrorText_Number_; ErrorText[Number])
                     {
                     }
@@ -618,13 +645,13 @@ report 402 "Purchase Document - Test"
                 }
                 dataitem(CopyLoop; "Integer")
                 {
-                    DataItemTableView = SORTING(Number);
+                    DataItemTableView = sorting(Number);
                     MaxIteration = 1;
                     dataitem("Purchase Line"; "Purchase Line")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
                         DataItemLinkReference = "Purchase Header";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Line No.");
+                        DataItemTableView = sorting("Document Type", "Document No.", "Line No.");
                         column(Purchase_Line_Document_Type; "Document Type")
                         {
                         }
@@ -644,7 +671,7 @@ report 402 "Purchase Document - Test"
                     }
                     dataitem(RoundLoop; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(QtyToHandleCaption; QtyToHandleCaption)
                         {
                         }
@@ -813,7 +840,7 @@ report 402 "Purchase Document - Test"
                         }
                         dataitem(DimensionLoop2; "Integer")
                         {
-                            DataItemTableView = SORTING(Number) WHERE(Number = FILTER(1 ..));
+                            DataItemTableView = sorting(Number) where(Number = filter(1 ..));
                             column(DimText_Control165; DimText)
                             {
                             }
@@ -867,7 +894,7 @@ report 402 "Purchase Document - Test"
                         }
                         dataitem(LineErrorCounter; "Integer")
                         {
-                            DataItemTableView = SORTING(Number);
+                            DataItemTableView = sorting(Number);
                             column(ErrorText_Number__Control103; ErrorText[Number])
                             {
                             }
@@ -1059,9 +1086,9 @@ report 402 "Purchase Document - Test"
 
                                     TableID[1] := DimMgt.PurchLineTypeToTableID(Type);
                                     No[1] := "No.";
-                                    TableID[2] := DATABASE::Job;
+                                    TableID[2] := Enum::TableID::Job.AsInteger();
                                     No[2] := "Job No.";
-                                    TableID[3] := DATABASE::"Work Center";
+                                    TableID[3] := Enum::TableID::"Work Center".AsInteger();
                                     No[3] := "Work Center No.";
                                     OnBeforeCheckDimValuePostingLine("Purchase Line", TableID, No);
                                     if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
@@ -1112,7 +1139,7 @@ report 402 "Purchase Document - Test"
                     }
                     dataitem(VATCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VATAmountLine__VAT_Amount_; TempVATAmountLine."VAT Amount")
                         {
                             AutoFormatExpression = "Purchase Header"."Currency Code";
@@ -1269,7 +1296,7 @@ report 402 "Purchase Document - Test"
                     }
                     dataitem(VATCounterLCY; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(VALExchRate; VALExchRate)
                         {
                         }
@@ -1376,7 +1403,7 @@ report 402 "Purchase Document - Test"
                     }
                     dataitem(SalesTaxCounter; "Integer")
                     {
-                        DataItemTableView = SORTING(Number);
+                        DataItemTableView = sorting(Number);
                         column(SalesTax_AND__SalesTaxAmountLine__Tax_Amount_____0_; SalesTax and (TempSalesTaxAmountLine."Tax Amount" <> 0))
                         {
                         }
@@ -1494,9 +1521,9 @@ report 402 "Purchase Document - Test"
                     }
                     dataitem("Item Charge Assignment (Purch)"; "Item Charge Assignment (Purch)")
                     {
-                        DataItemLink = "Document Type" = FIELD("Document Type"), "Document No." = FIELD("Document No.");
-                        DataItemLinkReference = "Purchase Line";
-                        DataItemTableView = SORTING("Document Type", "Document No.", "Document Line No.", "Line No.");
+                        DataItemLink = "Document Type" = field("Document Type"), "Document No." = field("No.");
+                        DataItemLinkReference = "Purchase Header";
+                        DataItemTableView = sorting("Document Type", "Document No.", "Document Line No.", "Line No.");
                         column(Item_Charge_Assignment__Purch___Qty__to_Assign_; "Qty. to Assign")
                         {
                         }
@@ -1847,13 +1874,13 @@ report 402 "Purchase Document - Test"
                 if not DimMgt.CheckDimIDComb("Dimension Set ID") then
                     AddError(DimMgt.GetDimCombErr());
 
-                TableID[1] := DATABASE::Vendor;
+                TableID[1] := Enum::TableID::Vendor.AsInteger();
                 No[1] := "Pay-to Vendor No.";
-                TableID[3] := DATABASE::"Salesperson/Purchaser";
+                TableID[3] := Enum::TableID::"Salesperson/Purchaser".AsInteger();
                 No[3] := "Purchaser Code";
-                TableID[4] := DATABASE::Campaign;
+                TableID[4] := Enum::TableID::Campaign.AsInteger();
                 No[4] := "Campaign No.";
-                TableID[5] := DATABASE::"Responsibility Center";
+                TableID[5] := Enum::TableID::"Responsibility Center".AsInteger();
                 No[5] := "Responsibility Center";
                 OnBeforeCheckDimValuePostingHeader("Purchase Header", TableID, No);
                 if not DimMgt.CheckDimValuePosting(TableID, No, "Dimension Set ID") then
@@ -2195,8 +2222,10 @@ report 402 "Purchase Document - Test"
 
     local procedure CheckPurchLine(PurchaseLine: Record "Purchase Line")
     var
+        ItemVariant: Record "Item Variant";
         Resource: Record Resource;
         ErrorText: Text[250];
+        ItemItemVariantLbl: Label '%1 %2', Comment = '%1 - Item No., %2 - Variant Code';
     begin
         with PurchaseLine do
             case Type of
@@ -2231,24 +2260,25 @@ report 402 "Purchase Document - Test"
                         if "No." <> '' then
                             if Item.Get("No.") then begin
                                 if Item.Blocked then
-                                    AddError(
-                                      StrSubstNo(
-                                        MustBeForErr,
-                                        Item.FieldCaption(Blocked), false, Item.TableCaption(), "No."));
+                                    AddError(StrSubstNo(MustBeForErr, Item.FieldCaption(Blocked), false, Item.TableCaption(), "No."));
+
+                                if PurchaseLine."Variant Code" <> '' then begin
+                                    ItemVariant.SetLoadFields(Blocked);
+                                    if ItemVariant.Get(PurchaseLine."No.", PurchaseLine."Variant Code") then begin
+                                        if ItemVariant.Blocked then
+                                            AddError(StrSubstNo(MustBeForErr, ItemVariant.FieldCaption(Blocked), false, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, PurchaseLine."No.", PurchaseLine."Variant Code")));
+                                    end else
+                                        AddError(StrSubstNo(Text008, ItemVariant.TableCaption(), StrSubstNo(ItemItemVariantLbl, PurchaseLine."No.", PurchaseLine."Variant Code")));
+                                end;
+
                                 if Item."Costing Method" = Item."Costing Method"::Specific then
                                     if Item.Reserve = Item.Reserve::Always then begin
                                         CalcFields("Reserved Quantity");
                                         if (Signed(Quantity) < 0) and (Abs("Reserved Quantity") < Abs("Qty. to Receive")) then
-                                            AddError(
-                                              StrSubstNo(
-                                                Text019,
-                                                FieldCaption("Reserved Quantity"), Signed("Qty. to Receive")));
+                                            AddError(StrSubstNo(Text019, FieldCaption("Reserved Quantity"), Signed("Qty. to Receive")));
                                     end;
                             end else
-                                AddError(
-                                  StrSubstNo(
-                                    Text008,
-                                    Item.TableCaption(), "No."));
+                                AddError(StrSubstNo(Text008, Item.TableCaption(), "No."));
                     end;
                 Type::"Fixed Asset":
                     begin
@@ -2320,7 +2350,7 @@ report 402 "Purchase Document - Test"
                     repeat
                         DimMgt.GetDimensionSet(TempPostedDimSetEntry, PurchRcptLine."Dimension Set ID");
                         if not DimMgt.CheckDimIDConsistency(
-                          TempDimSetEntry, TempPostedDimSetEntry, DATABASE::"Purchase Line", DATABASE::"Purch. Rcpt. Line")
+                          TempDimSetEntry, TempPostedDimSetEntry, Enum::TableID::"Purchase Line".AsInteger(), Enum::TableID::"Purch. Rcpt. Line".AsInteger())
                         then
                             AddError(DimMgt.GetDocDimConsistencyErr());
                         if PurchRcptLine."Buy-from Vendor No." <> "Buy-from Vendor No." then
@@ -2411,7 +2441,7 @@ report 402 "Purchase Document - Test"
                     repeat
                         DimMgt.GetDimensionSet(TempPostedDimSetEntry, ReturnShptLine."Dimension Set ID");
                         if not DimMgt.CheckDimIDConsistency(
-                          TempDimSetEntry, TempPostedDimSetEntry, DATABASE::"Purchase Line", DATABASE::"Return Shipment Line")
+                          TempDimSetEntry, TempPostedDimSetEntry, Enum::TableID::"Purchase Line".AsInteger(), Enum::TableID::"Return Shipment Line".AsInteger())
                         then
                             AddError(DimMgt.GetDocDimConsistencyErr());
 
@@ -2549,15 +2579,15 @@ report 402 "Purchase Document - Test"
 
         with PurchLine do begin
             DimMgt.AddDimSource(DefaultDimSource, DimMgt.PurchLineTypeToTableID(Type), "No.");
-            DimMgt.AddDimSource(DefaultDimSource, Database::Job, "Job No.");
-            DimMgt.AddDimSource(DefaultDimSource, Database::"Responsibility Center", "Responsibility Center");
+            DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::Job, "Job No.");
+            DimMgt.AddDimSource(DefaultDimSource, Enum::TableID::"Responsibility Center", "Responsibility Center");
 
             "Shortcut Dimension 1 Code" := '';
             "Shortcut Dimension 2 Code" := '';
 
             "Dimension Set ID" :=
               DimMgt.GetDefaultDimID(DefaultDimSource, SourceCodesetup.Purchases, "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code",
-                PurchLine."Dimension Set ID", DATABASE::Vendor);
+                PurchLine."Dimension Set ID", Enum::TableID::Vendor);
         end;
 
         OnAfterAddDimToTempLine(PurchLine);
@@ -2576,7 +2606,7 @@ report 402 "Purchase Document - Test"
         with PurchaseHeader do
             if "Buy-from Vendor No." = '' then
                 AddError(StrSubstNo(Text006, FieldCaption("Buy-from Vendor No.")))
-            else begin
+            else
                 if Vend.Get("Buy-from Vendor No.") then begin
                     if Vend."Privacy Blocked" then
                         AddError(Vend.GetPrivacyBlockedGenericErrorText(Vend));
@@ -2591,7 +2621,6 @@ report 402 "Purchase Document - Test"
                       StrSubstNo(
                         Text008,
                         Vend.TableCaption(), "Buy-from Vendor No."));
-            end;
     end;
 
     local procedure VerifyPayToVend(PurchaseHeader: Record "Purchase Header")
@@ -2600,7 +2629,7 @@ report 402 "Purchase Document - Test"
             if "Pay-to Vendor No." = '' then
                 AddError(StrSubstNo(Text006, FieldCaption("Pay-to Vendor No.")))
             else
-                if "Pay-to Vendor No." <> "Buy-from Vendor No." then begin
+                if "Pay-to Vendor No." <> "Buy-from Vendor No." then
                     if Vend.Get("Pay-to Vendor No.") then begin
                         if Vend."Privacy Blocked" then
                             AddError(Vend.GetPrivacyBlockedGenericErrorText(Vend));
@@ -2614,7 +2643,6 @@ report 402 "Purchase Document - Test"
                           StrSubstNo(
                             Text008,
                             Vend.TableCaption(), "Pay-to Vendor No."));
-                end;
     end;
 
     local procedure VerifyPostingDate(PurchaseHeader: Record "Purchase Header")
@@ -2662,7 +2690,7 @@ report 402 "Purchase Document - Test"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeTestJobFields(var PurchaseLine: Record "Purchase Line"; var ErrorCounter: Integer; var ErrorText: Array[50] of Text[250]; var IsHandled: Boolean);
+    local procedure OnBeforeTestJobFields(var PurchaseLine: Record "Purchase Line"; var ErrorCounter: Integer; var ErrorText: array[50] of Text[250]; var IsHandled: Boolean);
     begin
     end;
 

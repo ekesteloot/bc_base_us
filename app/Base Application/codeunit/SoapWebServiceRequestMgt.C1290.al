@@ -1,3 +1,10 @@
+﻿namespace System.Integration;
+
+using System;
+using System.Reflection;
+using System.Utilities;
+using System.Xml;
+
 codeunit 1290 "SOAP Web Service Request Mgt."
 {
 

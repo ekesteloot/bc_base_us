@@ -1,3 +1,9 @@
+namespace Microsoft.CRM.Duplicates;
+
+using Microsoft.CRM.Contact;
+using Microsoft.CRM.Setup;
+using System.Environment.Configuration;
+
 codeunit 5060 DuplicateManagement
 {
     Permissions = tabledata "Marketing Setup" = r;

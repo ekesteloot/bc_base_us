@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Tracking;
+
 enum 337 "Reservation Status"
 {
     AssignmentCompatibility = true;

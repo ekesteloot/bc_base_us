@@ -1,7 +1,12 @@
+namespace Microsoft.Sales.Reports;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Sales.Customer;
+
 report 110 "Customer - Labels"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './SalesReceivables/CustomerLabels.rdlc';
+    RDLCLayout = './Sales/Reports/CustomerLabels.rdlc';
     Caption = 'Customer - Labels';
 
     dataset

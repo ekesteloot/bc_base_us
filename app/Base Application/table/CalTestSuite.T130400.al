@@ -1,3 +1,8 @@
+﻿namespace System.TestTools.TestRunner;
+
+using System.IO;
+using System.Utilities;
+
 table 130400 "CAL Test Suite"
 {
     Caption = 'CAL Test Suite';
@@ -18,29 +23,29 @@ table 130400 "CAL Test Suite"
         }
         field(3; "Tests to Execute"; Integer)
         {
-            CalcFormula = Count("CAL Test Line" WHERE("Test Suite" = FIELD(Name),
-                                                       "Line Type" = CONST(Function),
-                                                       Run = CONST(true)));
+            CalcFormula = count("CAL Test Line" where("Test Suite" = field(Name),
+                                                       "Line Type" = const(Function),
+                                                       Run = const(true)));
             Caption = 'Tests to Execute';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Tests not Executed"; Integer)
         {
-            CalcFormula = Count("CAL Test Line" WHERE("Test Suite" = FIELD(Name),
-                                                       "Line Type" = CONST(Function),
-                                                       Run = CONST(true),
-                                                       Result = CONST(" ")));
+            CalcFormula = count("CAL Test Line" where("Test Suite" = field(Name),
+                                                       "Line Type" = const(Function),
+                                                       Run = const(true),
+                                                       Result = const(" ")));
             Caption = 'Tests not Executed';
             Editable = false;
             FieldClass = FlowField;
         }
         field(5; Failures; Integer)
         {
-            CalcFormula = Count("CAL Test Line" WHERE("Test Suite" = FIELD(Name),
-                                                       "Line Type" = CONST(Function),
-                                                       Run = CONST(true),
-                                                       Result = CONST(Failure)));
+            CalcFormula = count("CAL Test Line" where("Test Suite" = field(Name),
+                                                       "Line Type" = const(Function),
+                                                       Run = const(true),
+                                                       Result = const(Failure)));
             Caption = 'Failures';
             Editable = false;
             FieldClass = FlowField;

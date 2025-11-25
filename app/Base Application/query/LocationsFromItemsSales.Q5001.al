@@ -6,7 +6,7 @@ query 5001 "Locations from items Sales"
     {
         dataitem(Sales_Line; "Sales Line")
         {
-            DataItemTableFilter = "Document Type" = CONST(Order), Type = CONST(Item), "Location Code" = FILTER(<> ''), "No." = FILTER(<> ''), Quantity = FILTER(<> 0);
+            DataItemTableFilter = "Document Type" = const(Order), Type = const(Item), "Location Code" = filter(<> ''), "No." = filter(<> ''), Quantity = filter(<> 0);
             column(Document_No; "Document No.")
             {
             }
@@ -16,7 +16,7 @@ query 5001 "Locations from items Sales"
             dataitem(Location; Location)
             {
                 DataItemLink = Code = Sales_Line."Location Code";
-                DataItemTableFilter = "Use As In-Transit" = CONST(false);
+                DataItemTableFilter = "Use As In-Transit" = const(false);
                 column(Require_Shipment; "Require Shipment")
                 {
                 }

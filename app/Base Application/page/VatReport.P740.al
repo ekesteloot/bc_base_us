@@ -1,11 +1,11 @@
 page 740 "VAT Report"
 {
     Caption = 'VAT Return';
-    DataCaptionExpression = "No.";
+    DataCaptionExpression = Rec."No.";
     LinksAllowed = false;
     PageType = Document;
     SourceTable = "VAT Report Header";
-    SourceTableView = WHERE("VAT Report Config. Code" = CONST("VAT Return"));
+    SourceTableView = where("VAT Report Config. Code" = const("VAT Return"));
 
     layout
     {
@@ -22,7 +22,7 @@ page 740 "VAT Report"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -125,8 +125,8 @@ page 740 "VAT Report"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Report Lines';
-                SubPageLink = "VAT Report No." = FIELD("No."),
-                              "VAT Report Config. Code" = FIELD("VAT Report Config. Code");
+                SubPageLink = "VAT Report No." = field("No."),
+                              "VAT Report Config. Code" = field("VAT Report Config. Code");
             }
             part(ErrorMessagesPart; "Error Messages Part")
             {
@@ -141,9 +141,9 @@ page 740 "VAT Report"
             {
                 ApplicationArea = All;
                 Caption = 'Attachments';
-                SubPageLink = "Table ID" = CONST(Database::"VAT Report Header"),
-                              "No." = FIELD("No."),
-                              "VAT Report Config. Code" = FIELD("VAT Report Config. Code");
+                SubPageLink = "Table ID" = const(Database::"VAT Report Header"),
+                              "No." = field("No."),
+                              "VAT Report Config. Code" = field("VAT Report Config. Code");
             }
         }
     }
@@ -286,7 +286,7 @@ page 740 "VAT Report"
                     var
                         VATReportArchive: Record "VAT Report Archive";
                     begin
-                        VATReportArchive.DownloadSubmissionMessage("VAT Report Config. Code".AsInteger(), "No.");
+                        VATReportArchive.DownloadSubmissionMessage(Rec."VAT Report Config. Code".AsInteger(), Rec."No.");
                     end;
                 }
                 action("Download Response Message")
@@ -301,7 +301,7 @@ page 740 "VAT Report"
                     var
                         VATReportArchive: Record "VAT Report Archive";
                     begin
-                        VATReportArchive.DownloadResponseMessage("VAT Report Config. Code".AsInteger(), "No.");
+                        VATReportArchive.DownloadResponseMessage(Rec."VAT Report Config. Code".AsInteger(), Rec."No.");
                     end;
                 }
                 action("Calc. and Post VAT Settlement")
@@ -316,7 +316,7 @@ page 740 "VAT Report"
                     var
                         CalcAndPostVATSettlement: Report "Calc. and Post VAT Settlement";
                     begin
-                        CalcAndPostVATSettlement.InitializeRequest("Start Date", "End Date", WorkDate(), "No.", '', false, false);
+                        CalcAndPostVATSettlement.InitializeRequest(Rec."Start Date", Rec."End Date", WorkDate(), Rec."No.", '', false, false);
                         CalcAndPostVATSettlement.Run();
                     end;
                 }
@@ -435,9 +435,9 @@ page 740 "VAT Report"
 
     trigger OnOpenPage()
     begin
-        if "No." <> '' then
+        if Rec."No." <> '' then
             InitPageControllers();
-        IsEditable := Status = Status::Open;
+        IsEditable := Rec.Status = Rec.Status::Open;
     end;
 
     var
@@ -468,22 +468,22 @@ page 740 "VAT Report"
     var
         DocumentAttachment: Record "Document Attachment";
     begin
-        SuggestLinesControllerStatus := Status = Status::Open;
-        ReleaseControllerStatus := Status = Status::Open;
+        SuggestLinesControllerStatus := Rec.Status = Rec.Status::Open;
+        ReleaseControllerStatus := Rec.Status = Rec.Status::Open;
         GenerationVisible := VATReportMediator.ShowGenerate(Rec);
         SubmissionVisible := VATReportMediator.ShowExport(Rec);
-        SubmitControllerStatus := Status = Status::Released;
+        SubmitControllerStatus := Rec.Status = Rec.Status::Released;
         ReceiveVisible := VATReportMediator.ShowReceiveResponse(Rec);
-        ReceiveControllerStatus := Status = Status::Submitted;
-        MarkAsSubmitControllerStatus := Status = Status::Released;
+        ReceiveControllerStatus := Rec.Status = Rec.Status::Submitted;
+        MarkAsSubmitControllerStatus := Rec.Status = Rec.Status::Released;
         DownloadSubmissionControllerStatus := VATReportMediator.ShowSubmissionMessage(Rec);
         DownloadResponseControllerStatus :=
           DocumentAttachment.VATReturnResponseAttachmentsExist(Rec) or
-          (Status = Status::Rejected) or
-          (Status = Status::Accepted) or
-          (Status = Status::Closed);
-        CalcAndPostVATStatus := Status = Status::Accepted;
-        ReopenControllerStatus := Status = Status::Released;
+          (Rec.Status = Rec.Status::Rejected) or
+          (Rec.Status = Rec.Status::Accepted) or
+          (Rec.Status = Rec.Status::Closed);
+        CalcAndPostVATStatus := Rec.Status = Rec.Status::Accepted;
+        ReopenControllerStatus := Rec.Status = Rec.Status::Released;
         InitReturnPeriodGroup();
         OnAfterInitPageControllers(Rec, SubmitControllerStatus, MarkAsSubmitControllerStatus, CalcAndPostVATStatus);
     end;
@@ -492,7 +492,7 @@ page 740 "VAT Report"
     var
         VATReturnPeriod: Record "VAT Return Period";
     begin
-        ReturnPeriodEnabled := VATReturnPeriod.Get("Return Period No.");
+        ReturnPeriodEnabled := VATReturnPeriod.Get(Rec."Return Period No.");
         if ReturnPeriodEnabled then begin
             ReturnPeriodDueDate := VATReturnPeriod."Due Date";
             ReturnPeriodStatus := VATReturnPeriod.Status;

@@ -1,3 +1,5 @@
+namespace Microsoft.Manufacturing.Setup;
+
 page 99000768 "Manufacturing Setup"
 {
     ApplicationArea = Manufacturing, Planning;
@@ -50,15 +52,6 @@ page 99000768 "Manufacturing Setup"
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies low-level codes are dynamically assigned to each component in a product structure. Note that this may affect performance. The top final assembly level is denoted as level 0, the end item. The higher the low-level code number, the lower the item is in the hierarchy. The codes are used in the planning of component parts. When you calculate a plan, the BOM is exploded in the planning worksheet, and the gross requirements for level 0 are passed down the planning levels as gross requirements for the next planning level.';
-                }
-                field("Optimize low-level code calc."; Rec."Optimize low-level code calc.")
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'Codeunit Calc. Low-level code is obsolete. Use Codeunit Low-Level Code Calculator instead.';
-                    ObsoleteTag = '17.0';
-
-                    ApplicationArea = Planning;
-                    ToolTip = 'Specifies that you want to use the new, faster method of low-level code calculation. Note that the new calculation is done differently and using it might break extensions that rely on the existing method. The new calculation method will replace the current method in a future release.';
                 }
                 field("Cost Incl. Setup"; Rec."Cost Incl. Setup")
                 {
@@ -181,10 +174,10 @@ page 99000768 "Manufacturing Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 }

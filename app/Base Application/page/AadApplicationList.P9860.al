@@ -1,8 +1,10 @@
+namespace System.Environment.Configuration;
+
 page 9860 "AAD Application List"
 {
     ApplicationArea = Basic, Suite;
     UsageCategory = Administration;
-    Caption = 'Azure Active Directory Applications', Comment = 'Azure Active Directory Application should not be translated';
+    Caption = 'Microsoft Entra Applications';
     CardPageId = "AAD Application Card";
     PageType = List;
     PopulateAllFields = true;
@@ -29,7 +31,7 @@ page 9860 "AAD Application List"
                     Caption = 'Description';
                     ToolTip = 'Specifies a description of the app that the entry is for.';
                 }
-                field(State; State)
+                field(State; Rec.State)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'State';

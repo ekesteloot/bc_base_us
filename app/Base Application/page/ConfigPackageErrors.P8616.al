@@ -1,7 +1,9 @@
+namespace System.IO;
+
 page 8616 "Config. Package Errors"
 {
     Caption = 'Config. Package Errors';
-    DataCaptionExpression = "Table Caption";
+    DataCaptionExpression = Rec."Table Caption";
     InsertAllowed = false;
     ModifyAllowed = false;
     PageType = List;
@@ -47,13 +49,13 @@ page 8616 "Config. Package Errors"
                 field(RecordIDValue; RecordIDValue)
                 {
                     ApplicationArea = Basic, Suite;
-                    CaptionClass = FieldCaption("Record ID");
+                    CaptionClass = Rec.FieldCaption("Record ID");
                     Editable = false;
                     ToolTip = 'Specifies the record in the migration table to which the error applies.';
 
                     trigger OnDrillDown()
                     begin
-                        ShowRecord();
+                        Rec.ShowRecord();
                     end;
                 }
             }
@@ -79,7 +81,7 @@ page 8616 "Config. Package Errors"
 
     trigger OnAfterGetRecord()
     begin
-        RecordIDValue := Format("Record ID");
+        RecordIDValue := Format(Rec."Record ID");
     end;
 
     var

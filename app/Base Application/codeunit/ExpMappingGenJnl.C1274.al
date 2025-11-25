@@ -1,3 +1,7 @@
+namespace System.IO;
+
+using Microsoft.BankMgt.PaymentExport;
+
 codeunit 1274 "Exp. Mapping Gen. Jnl."
 {
     Permissions = TableData "Data Exch." = rimd;
@@ -12,7 +16,7 @@ codeunit 1274 "Exp. Mapping Gen. Jnl."
         Window: Dialog;
         LineNo: Integer;
     begin
-        PaymentExportData.SetRange("Data Exch Entry No.", "Entry No.");
+        PaymentExportData.SetRange("Data Exch Entry No.", Rec."Entry No.");
         PaymentExportData.FindSet();
 
         Window.Open(ProgressMsg);

@@ -1,7 +1,12 @@
+namespace Microsoft.WarehouseMgt.Reports;
+
+using Microsoft.WarehouseMgt.Journal;
+using System.Utilities;
+
 report 7307 "Whse. Phys. Inventory List"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './WarehouseMgt/WhsePhysInventoryList.rdlc';
+    RDLCLayout = './WarehouseMgt/Reports/WhsePhysInventoryList.rdlc';
     AdditionalSearchTerms = 'physical count';
     ApplicationArea = Warehouse;
     Caption = 'Warehouse Physical Inventory List';
@@ -11,7 +16,7 @@ report 7307 "Whse. Phys. Inventory List"
     {
         dataitem(PageLoop; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(1));
+            DataItemTableView = sorting(Number) where(Number = const(1));
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
             }
@@ -66,7 +71,7 @@ report 7307 "Whse. Phys. Inventory List"
                 RequestFilterFields = "Journal Template Name", Name, "Location Code";
                 dataitem("Warehouse Journal Line"; "Warehouse Journal Line")
                 {
-                    DataItemLink = "Journal Template Name" = FIELD("Journal Template Name"), "Journal Batch Name" = FIELD(Name), "Location Code" = FIELD("Location Code");
+                    DataItemLink = "Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name), "Location Code" = field("Location Code");
                     RequestFilterFields = "Zone Code", "Bin Code";
                     column(RegDt_WarehouseJnlLine; Format("Registering Date"))
                     {

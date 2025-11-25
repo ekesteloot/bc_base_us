@@ -1,3 +1,22 @@
+﻿namespace Microsoft.InventoryMgt.Document;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Analysis;
+using Microsoft.InventoryMgt.Comment;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.History;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Journal;
+
 codeunit 5850 "Invt. Doc.-Post Receipt"
 {
     Permissions = TableData "Item Entry Relation" = ri,
@@ -9,6 +28,7 @@ codeunit 5850 "Invt. Doc.-Post Receipt"
     trigger OnRun()
     var
         Item: Record Item;
+        ItemVariant: Record "Item Variant";
         SourceCodeSetup: Record "Source Code Setup";
         InvtSetup: Record "Inventory Setup";
         InventoryPostingSetup: Record "Inventory Posting Setup";
@@ -104,8 +124,8 @@ codeunit 5850 "Invt. Doc.-Post Receipt"
 
             if InvtSetup."Copy Comments to Invt. Doc." then
                 CopyCommentLines(
-                    "Inventory Comment Document Type"::"Inventory Receipt",
-                    "Inventory Comment Document Type"::"Posted Inventory Receipt",
+                    Enum::"Inventory Comment Document Type"::"Inventory Receipt",
+                    Enum::"Inventory Comment Document Type"::"Posted Inventory Receipt",
                     "No.", InvtRcptHeader."No.");
 
             // Insert receipt lines
@@ -122,6 +142,12 @@ codeunit 5850 "Invt. Doc.-Post Receipt"
                     if InvtDocLine."Item No." <> '' then begin
                         Item.Get(InvtDocLine."Item No.");
                         Item.TestField(Blocked, false);
+
+                        if InvtDocLine."Variant Code" <> '' then begin
+                            ItemVariant.SetLoadFields(Blocked);
+                            ItemVariant.Get(InvtDocLine."Item No.", InvtDocLine."Variant Code");
+                            ItemVariant.TestField(Blocked, false);
+                        end;
                     end;
 
                     InvtRcptLine.Init();
@@ -162,6 +188,10 @@ codeunit 5850 "Invt. Doc.-Post Receipt"
                     InvtRcptLine."Applies-from Entry" := InvtDocLine."Applies-from Entry";
                     InvtRcptLine."Dimension Set ID" := InvtDocLine."Dimension Set ID";
                     InvtRcptLine."Reason Code" := InvtDocLine."Reason Code";
+                    InvtRcptLine."Item Reference No." := InvtDocLine."Item Reference No.";
+                    InvtRcptLine."Item Reference Unit of Measure" := InvtDocLine."Item Reference Unit of Measure";
+                    InvtRcptLine."Item Reference Type" := InvtDocLine."Item Reference Type";
+                    InvtRcptLine."Item Reference Type No." := InvtDocLine."Item Reference Type No.";
                     OnRunOnBeforeInvtRcptLineInsert(InvtRcptLine, InvtDocLine);
                     InvtRcptLine.Insert();
                     OnRunOnAfterInvtRcptLineInsert(InvtRcptLine, InvtDocLine, InvtRcptHeader, InvtDocHeader);
@@ -177,7 +207,9 @@ codeunit 5850 "Invt. Doc.-Post Receipt"
                 InvtAdjmtHandler.MakeInventoryAdjustment(true, InvtSetup."Automatic Cost Posting");
 
             LockTable();
-            Delete(true);
+
+            if not PreviewMode then
+                Delete(true);
 
             InsertValueEntryRelation();
             OnRunOnBeforeCommitPostInvtRcptDoc(InvtDocHeader, InvtDocLine, InvtRcptHeader, InvtRcptLine, ItemJnlLine, SuppressCommit);

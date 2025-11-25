@@ -1,3 +1,5 @@
+namespace Microsoft.CostAccounting.Setup;
+
 page 1113 "Cost Accounting Setup"
 {
     ApplicationArea = CostAccounting;
@@ -23,9 +25,9 @@ page 1113 "Cost Accounting Setup"
 
                     trigger OnValidate()
                     begin
-                        if not Confirm(Text001, true, "Starting Date for G/L Transfer") then
+                        if not Confirm(Text001, true, Rec."Starting Date for G/L Transfer") then
                             Error(Text003);
-                        Modify();
+                        Rec.Modify();
                     end;
                 }
                 field("Align G/L Account"; Rec."Align G/L Account")
@@ -54,7 +56,7 @@ page 1113 "Cost Accounting Setup"
 
                     trigger OnValidate()
                     begin
-                        if "Auto Transfer from G/L" then
+                        if Rec."Auto Transfer from G/L" then
                             if not Confirm(Text002, true) then
                                 Error(Text003);
                     end;
@@ -127,10 +129,10 @@ page 1113 "Cost Accounting Setup"
 
     trigger OnOpenPage()
     begin
-        Reset();
-        if not Get() then begin
-            Init();
-            Insert();
+        Rec.Reset();
+        if not Rec.Get() then begin
+            Rec.Init();
+            Rec.Insert();
         end;
     end;
 

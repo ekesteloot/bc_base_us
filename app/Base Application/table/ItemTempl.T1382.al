@@ -1,3 +1,29 @@
+namespace Microsoft.InventoryMgt.Item;
+
+using Microsoft.AssemblyMgt.Setup;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.Foundation.Address;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Item.Catalog;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.ServiceMgt.Item;
+using Microsoft.WarehouseMgt.Activity;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 table 1382 "Item Templ."
 {
     Caption = 'Item Template';
@@ -515,8 +541,8 @@ table 1382 "Item Templ."
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
@@ -527,8 +553,8 @@ table 1382 "Item Templ."
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
@@ -1158,10 +1184,10 @@ table 1382 "Item Templ."
             until SourceDefaultDimension.Next() = 0;
     end;
 
-    local procedure ValidateItemField(FieldId: Integer)
+    procedure ValidateItemField(FieldId: Integer)
     var
-        ItemRecRef: RecordRef;
-        ItemTemplRecRef: RecordRef;
+        ItemRecordRef: RecordRef;
+        ItemTemplRecordRef: RecordRef;
         ItemFieldRef: FieldRef;
         ItemTemplFieldRef: FieldRef;
         IsHandled: Boolean;
@@ -1170,18 +1196,19 @@ table 1382 "Item Templ."
         OnBeforeValidateItemField(Rec, FieldId, IsHandled);
         if IsHandled then
             exit;
-        ItemTemplRecRef.GetTable(Rec);
-        ItemRecRef.Open(Database::Item, true);
-        TransferFieldValues(ItemTemplRecRef, ItemRecRef, false);
-        ItemRecRef.Insert();
 
-        ItemFieldRef := ItemRecRef.Field(FieldId);
-        ItemTemplFieldRef := ItemTemplRecRef.Field(FieldId);
+        ItemTemplRecordRef.GetTable(Rec);
+        ItemRecordRef.Open(Database::Item, true);
+        TransferFieldValues(ItemTemplRecordRef, ItemRecordRef, false);
+        ItemRecordRef.Insert();
+
+        ItemFieldRef := ItemRecordRef.Field(FieldId);
+        ItemTemplFieldRef := ItemTemplRecordRef.Field(FieldId);
         ItemFieldRef.Validate(ItemTemplFieldRef.Value);
 
-        TransferFieldValues(ItemTemplRecRef, ItemRecRef, true);
+        TransferFieldValues(ItemTemplRecordRef, ItemRecordRef, true);
 
-        ItemTemplRecRef.SetTable(Rec);
+        ItemTemplRecordRef.SetTable(Rec);
         Modify();
     end;
 

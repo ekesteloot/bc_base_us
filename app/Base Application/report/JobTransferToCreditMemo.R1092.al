@@ -1,3 +1,9 @@
+namespace Microsoft.ProjectMgt.Jobs.Planning;
+
+using Microsoft.ProjectMgt.Jobs.Job;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
+
 report 1092 "Job Transfer to Credit Memo"
 {
     Caption = 'Job Transfer to Credit Memo';
@@ -29,6 +35,8 @@ report 1092 "Job Transfer to Credit Memo"
                                 CreditMemoNo := '';
                                 if PostingDate = 0D then
                                     PostingDate := WorkDate();
+                                if DocumentDate = 0D then
+                                    DocumentDate := WorkDate();
                                 CrMemoPostingDate := 0D;
                             end;
                         end;
@@ -40,8 +48,26 @@ report 1092 "Job Transfer to Credit Memo"
                         ToolTip = 'Specifies the posting date for the document.';
 
                         trigger OnValidate()
+                        var
+                            SalesReceivablesSetup: Record "Sales & Receivables Setup";
                         begin
                             if PostingDate = 0D then
+                                NewCreditMemo := false;
+                            SalesReceivablesSetup.SetLoadFields("Link Doc. Date To Posting Date");
+                            SalesReceivablesSetup.GetRecordOnce();
+                            if SalesReceivablesSetup."Link Doc. Date To Posting Date" then
+                                DocumentDate := PostingDate;
+                        end;
+                    }
+                    field("Document Date"; DocumentDate)
+                    {
+                        ApplicationArea = Jobs;
+                        Caption = 'Document Date';
+                        ToolTip = 'Specifies the document date.';
+
+                        trigger OnValidate()
+                        begin
+                            if DocumentDate = 0D then
                                 NewCreditMemo := false;
                         end;
                     }
@@ -65,6 +91,7 @@ report 1092 "Job Transfer to Credit Memo"
                                 CrMemoPostingDate := SalesHeader."Posting Date";
                                 NewCreditMemo := false;
                                 PostingDate := 0D;
+                                DocumentDate := 0D;
                             end;
                             if CreditMemoNo = '' then
                                 InitReport();
@@ -77,6 +104,7 @@ report 1092 "Job Transfer to Credit Memo"
                                 CrMemoPostingDate := SalesHeader."Posting Date";
                                 NewCreditMemo := false;
                                 PostingDate := 0D;
+                                DocumentDate := 0D;
                             end;
                             if CreditMemoNo = '' then
                                 InitReport();
@@ -124,27 +152,38 @@ report 1092 "Job Transfer to Credit Memo"
     end;
 
     var
-        Job: Record Job;
         SalesHeader: Record "Sales Header";
         PostingDate: Date;
+        DocumentDate: Date;
         CrMemoPostingDate: Date;
         Done: Boolean;
 
     protected var
+        Job: Record Job;
         CreditMemoNo: Code[20];
         NewCreditMemo: Boolean;
-
+#if not CLEAN23
+    [Obsolete('Replaced by GetCreditMemoNo(var Done2: Boolean; var NewCreditMemo2: Boolean; var PostingDate2: Date; var DocumentDate2: Date; var CreditMemoNo2: Code[20])', '23.0')]
     procedure GetCreditMemoNo(var Done2: Boolean; var NewCreditMemo2: Boolean; var PostingDate2: Date; var CreditMemoNo2: Code[20])
+    var
+        DocumentDate2: Date;
+    begin
+        GetCreditMemoNo(Done2, NewCreditMemo2, PostingDate2, DocumentDate2, CreditMemoNo2);
+    end;
+#endif
+    procedure GetCreditMemoNo(var Done2: Boolean; var NewCreditMemo2: Boolean; var PostingDate2: Date; var DocumentDate2: Date; var CreditMemoNo2: Code[20])
     begin
         Done2 := Done;
         NewCreditMemo2 := NewCreditMemo;
         PostingDate2 := PostingDate;
         CreditMemoNo2 := CreditMemoNo;
+        DocumentDate2 := DocumentDate;
     end;
 
     procedure InitReport()
     begin
         PostingDate := WorkDate();
+        DocumentDate := WorkDate();
         NewCreditMemo := true;
         CreditMemoNo := '';
         CrMemoPostingDate := 0D;
@@ -153,6 +192,11 @@ report 1092 "Job Transfer to Credit Memo"
     procedure SetCustomer(JobNo: Code[20])
     begin
         Job.Get(JobNo);
+    end;
+
+    procedure SetPostingDate(PostingDate2: Date)
+    begin
+        PostingDate := PostingDate2;
     end;
 }
 

@@ -1,3 +1,7 @@
+namespace System.Security.AccessControl;
+
+using System.Security.User;
+
 page 9876 "Perm. Set Assignments Part"
 {
     Caption = 'User Permission Set Assignments';

@@ -1,3 +1,9 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Journal;
+
 page 9315 "Inventory Put-aways"
 {
     ApplicationArea = Warehouse;
@@ -6,7 +12,7 @@ page 9315 "Inventory Put-aways"
     Editable = false;
     PageType = List;
     SourceTable = "Warehouse Activity Header";
-    SourceTableView = WHERE(Type = CONST("Invt. Put-away"));
+    SourceTableView = where(Type = const("Invt. Put-away"));
     UsageCategory = Lists;
 
     layout
@@ -21,7 +27,7 @@ page 9315 "Inventory Put-aways"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
-                field(SourceDocument; "Source Document")
+                field(SourceDocument; Rec."Source Document")
                 {
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the type of document that the line relates to.';
@@ -112,9 +118,9 @@ page 9315 "Inventory Put-aways"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Whse. Activity Header"),
-                                  Type = FIELD(Type),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Whse. Activity Header"),
+                                  Type = field(Type),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Posted Put-aways")
@@ -123,14 +129,14 @@ page 9315 "Inventory Put-aways"
                     Caption = 'Posted Put-aways';
                     Image = PostedPutAway;
                     RunObject = Page "Posted Invt. Put-away List";
-                    RunPageLink = "Invt. Put-away No." = FIELD("No.");
-                    RunPageView = SORTING("Invt. Put-away No.");
+                    RunPageLink = "Invt. Put-away No." = field("No.");
+                    RunPageView = sorting("Invt. Put-away No.");
                     ToolTip = 'View any quantities that have already been put away.';
                 }
                 action("Source Document")
                 {
                     ApplicationArea = Warehouse;
-                    Caption = 'Source Document';
+                    Caption = 'Show Source Document';
                     Image = "Order";
                     ToolTip = 'View the source document of the warehouse activity.';
 
@@ -138,7 +144,7 @@ page 9315 "Inventory Put-aways"
                     var
                         WMSMgt: Codeunit "WMS Management";
                     begin
-                        WMSMgt.ShowSourceDocCard("Source Type", "Source Subtype", "Source No.");
+                        WMSMgt.ShowSourceDocCard(Rec."Source Type", Rec."Source Subtype", Rec."Source No.");
                     end;
                 }
             }
@@ -212,6 +218,9 @@ page 9315 "Inventory Put-aways"
                     {
                     }
                 }
+                actionref(SourceDocument_Promoted; "Source Document")
+                {
+                }
             }
         }
     }
@@ -220,10 +229,10 @@ page 9315 "Inventory Put-aways"
     var
         WMSManagement: Codeunit "WMS Management";
     begin
-        ErrorIfUserIsNotWhseEmployee();
-        FilterGroup(2); // set group of filters user cannot change
-        SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
-        FilterGroup(0); // set filter group back to standard
+        Rec.ErrorIfUserIsNotWhseEmployee();
+        Rec.FilterGroup(2); // set group of filters user cannot change
+        Rec.SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
+        Rec.FilterGroup(0); // set filter group back to standard
     end;
 
     local procedure PostPutawayYesNo()

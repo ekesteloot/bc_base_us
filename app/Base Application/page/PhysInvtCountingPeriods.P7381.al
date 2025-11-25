@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Counting.Journal;
+
 page 7381 "Phys. Invt. Counting Periods"
 {
     AdditionalSearchTerms = 'physical count periods,inventory cycle periods';
@@ -14,7 +16,7 @@ page 7381 "Phys. Invt. Counting Periods"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for physical inventory counting period.';

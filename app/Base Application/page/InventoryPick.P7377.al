@@ -1,3 +1,12 @@
+namespace Microsoft.WarehouseMgt.Activity;
+
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.InventoryDocument;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Reports;
+using Microsoft.WarehouseMgt.Structure;
+using System.Telemetry;
+
 page 7377 "Inventory Pick"
 {
     Caption = 'Inventory Pick';
@@ -5,7 +14,7 @@ page 7377 "Inventory Pick"
     RefreshOnActivate = true;
     SaveValues = true;
     SourceTable = "Warehouse Activity Header";
-    SourceTableView = WHERE(Type = CONST("Invt. Pick"));
+    SourceTableView = where(Type = const("Invt. Pick"));
 
     layout
     {
@@ -21,7 +30,7 @@ page 7377 "Inventory Pick"
 
                     trigger OnAssistEdit()
                     begin
-                        if AssistEdit(xRec) then
+                        if Rec.AssistEdit(xRec) then
                             CurrPage.Update();
                     end;
                 }
@@ -30,7 +39,7 @@ page 7377 "Inventory Pick"
                     ApplicationArea = Location;
                     ToolTip = 'Specifies the code for the location where the warehouse activity takes place.';
                 }
-                field(SourceDocument; "Source Document")
+                field(SourceDocument; Rec."Source Document")
                 {
                     ApplicationArea = Warehouse;
                     DrillDown = false;
@@ -59,14 +68,14 @@ page 7377 "Inventory Pick"
                 field("Destination No."; Rec."Destination No.")
                 {
                     ApplicationArea = Warehouse;
-                    CaptionClass = Format(WMSMgt.GetCaptionClass("Destination Type", "Source Document", 0));
+                    CaptionClass = Format(WMSMgt.GetCaptionClass(Rec."Destination Type", Rec."Source Document", 0));
                     Editable = false;
                     ToolTip = 'Specifies the number or the code of the customer or vendor that the line is linked to.';
                 }
-                field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationEntityName("Destination Type", "Destination No."))
+                field("WMSMgt.GetDestinationName(""Destination Type"",""Destination No."")"; WMSMgt.GetDestinationEntityName(Rec."Destination Type", Rec."Destination No."))
                 {
                     ApplicationArea = Warehouse;
-                    CaptionClass = Format(WMSMgt.GetCaptionClass("Destination Type", "Source Document", 1));
+                    CaptionClass = Format(WMSMgt.GetCaptionClass(Rec."Destination Type", Rec."Source Document", 1));
                     Caption = 'Name';
                     Editable = false;
                     ToolTip = 'Specifies the name of the inventory picks used for these outbound source documents: sales orders, purchase return orders, and outbound transfer orders.';
@@ -85,13 +94,13 @@ page 7377 "Inventory Pick"
                 field("External Document No."; Rec."External Document No.")
                 {
                     ApplicationArea = Warehouse;
-                    CaptionClass = Format(WMSMgt.GetCaptionClass("Destination Type", "Source Document", 2));
+                    CaptionClass = Format(WMSMgt.GetCaptionClass(Rec."Destination Type", Rec."Source Document", 2));
                     ToolTip = 'Specifies a document number that refers to the customer''s or vendor''s numbering system.';
                 }
                 field("External Document No.2"; Rec."External Document No.2")
                 {
                     ApplicationArea = Warehouse;
-                    CaptionClass = Format(WMSMgt.GetCaptionClass("Destination Type", "Source Document", 3));
+                    CaptionClass = Format(WMSMgt.GetCaptionClass(Rec."Destination Type", Rec."Source Document", 3));
                     ToolTip = 'Specifies an additional part of the document number that refers to the customer''s or vendor''s numbering system.';
                 }
                 field("Assigned User ID"; Rec."Assigned User ID")
@@ -104,10 +113,10 @@ page 7377 "Inventory Pick"
             part(WhseActivityLines; "Invt. Pick Subform")
             {
                 ApplicationArea = Warehouse;
-                SubPageLink = "Activity Type" = FIELD(Type),
-                              "No." = FIELD("No.");
-                SubPageView = SORTING("Activity Type", "No.", "Sorting Sequence No.")
-                              WHERE(Breakbulk = CONST(false));
+                SubPageLink = "Activity Type" = field(Type),
+                              "No." = field("No.");
+                SubPageView = sorting("Activity Type", "No.", "Sorting Sequence No.")
+                              where(Breakbulk = const(false));
             }
         }
         area(factboxes)
@@ -116,18 +125,18 @@ page 7377 "Inventory Pick"
             {
                 ApplicationArea = ItemTracking;
                 Provider = WhseActivityLines;
-                SubPageLink = "Item No." = FIELD("Item No."),
-                              "Variant Code" = FIELD("Variant Code"),
-                              "Location Code" = FIELD("Location Code");
+                SubPageLink = "Item No." = field("Item No."),
+                              "Variant Code" = field("Variant Code"),
+                              "Location Code" = field("Location Code");
                 Visible = false;
             }
             part(SourceDocForWhseFactbox; "Invt. Doc Ship. Detail Factbox")
             {
                 ApplicationArea = Warehouse;
                 Provider = WhseActivityLines;
-                SubPageLink = "Activity Type" = FIELD("Activity Type"),
-                              "No." = FIELD("No."),
-                              "Line No." = FIELD("Line No.");
+                SubPageLink = "Activity Type" = field("Activity Type"),
+                              "No." = field("No."),
+                              "Line No." = field("Line No.");
             }
             systempart(Control1900383207; Links)
             {
@@ -156,9 +165,9 @@ page 7377 "Inventory Pick"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Warehouse Comment Sheet";
-                    RunPageLink = "Table Name" = CONST("Whse. Activity Header"),
-                                  Type = FIELD(Type),
-                                  "No." = FIELD("No.");
+                    RunPageLink = "Table Name" = const("Whse. Activity Header"),
+                                  Type = field(Type),
+                                  "No." = field("No.");
                     ToolTip = 'View or add comments for the record.';
                 }
                 action("Posted Picks")
@@ -167,14 +176,14 @@ page 7377 "Inventory Pick"
                     Caption = 'Posted Picks';
                     Image = PostedInventoryPick;
                     RunObject = Page "Posted Invt. Pick List";
-                    RunPageLink = "Invt Pick No." = FIELD("No.");
-                    RunPageView = SORTING("Invt Pick No.");
+                    RunPageLink = "Invt Pick No." = field("No.");
+                    RunPageView = sorting("Invt Pick No.");
                     ToolTip = 'View any quantities that have already been picked.';
                 }
                 action("Source Document")
                 {
                     ApplicationArea = Warehouse;
-                    Caption = 'Source Document';
+                    Caption = 'Show Source Document';
                     Image = "Order";
                     ToolTip = 'View the source document of the warehouse activity.';
 
@@ -182,7 +191,7 @@ page 7377 "Inventory Pick"
                     var
                         WMSMgt: Codeunit "WMS Management";
                     begin
-                        WMSMgt.ShowSourceDocCard("Source Type", "Source Subtype", "Source No.");
+                        WMSMgt.ShowSourceDocCard(Rec."Source Type", Rec."Source Subtype", Rec."Source No.");
                     end;
                 }
             }
@@ -351,6 +360,9 @@ page 7377 "Inventory Pick"
                 actionref("&Get Source Document_Promoted"; "&Get Source Document")
                 {
                 }
+                actionref(SourceDocument_Promoted; "Source Document")
+                {
+                }
             }
             group(Category_Category4)
             {
@@ -371,17 +383,17 @@ page 7377 "Inventory Pick"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        "Location Code" := GetUserLocation();
+        Rec."Location Code" := Rec.GetUserLocation();
     end;
 
     trigger OnOpenPage()
     var
         WMSManagement: Codeunit "WMS Management";
     begin
-        ErrorIfUserIsNotWhseEmployee();
-        FilterGroup(2); // set group of filters user cannot change
-        SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
-        FilterGroup(0); // set filter group back to standard
+        Rec.ErrorIfUserIsNotWhseEmployee();
+        Rec.FilterGroup(2); // set group of filters user cannot change
+        Rec.SetFilter("Location Code", WMSManagement.GetWarehouseEmployeeLocationFilter(UserId));
+        Rec.FilterGroup(0); // set filter group back to standard
     end;
 
     var

@@ -12,7 +12,7 @@ table 256 "VAT Statement Line"
         field(2; "Statement Name"; Code[10])
         {
             Caption = 'Statement Name';
-            TableRelation = "VAT Statement Name".Name WHERE("Statement Template Name" = FIELD("Statement Template Name"));
+            TableRelation = "VAT Statement Name".Name where("Statement Template Name" = field("Statement Template Name"));
         }
         field(3; "Line No."; Integer)
         {
@@ -48,8 +48,6 @@ table 256 "VAT Statement Line"
         {
             Caption = 'Account Totaling';
             TableRelation = "G/L Account";
-            //This property is currently not supported
-            //TestTableRelation = false;
             ValidateTableRelation = false;
 
             trigger OnValidate()

@@ -1,3 +1,7 @@
+namespace Microsoft.Manufacturing.MachineCenter;
+
+using Microsoft.Manufacturing.Capacity;
+
 page 99000762 "Machine Center Statistics"
 {
     Caption = 'Machine Center Statistics';
@@ -504,7 +508,7 @@ page 99000762 "Machine Center Statistics"
             DateFilterCalc.CreateFiscalYearFilter(WorkCtrDateFilter[3], WorkCtrDateName[3], CurrentDate, -1);
         end;
 
-        MachineCenter2.Get("No.");
+        MachineCenter2.Get(Rec."No.");
         MachineCenter2.CopyFilters(Rec);
 
         for i := 1 to 4 do begin
@@ -523,9 +527,9 @@ page 99000762 "Machine Center Statistics"
 
             CapLedgEntry.SetCurrentKey(Type, "No.", "Work Shift Code", "Item No.", "Posting Date");
             CapLedgEntry.SetRange(Type, CapLedgEntry.Type::"Machine Center");
-            CapLedgEntry.SetRange("No.", "No.");
-            CapLedgEntry.SetFilter("Work Shift Code", "Work Shift Filter");
-            CapLedgEntry.SetFilter("Item No.", "Item Filter");
+            CapLedgEntry.SetRange("No.", Rec."No.");
+            CapLedgEntry.SetFilter("Work Shift Code", Rec."Work Shift Filter");
+            CapLedgEntry.SetFilter("Item No.", Rec."Item Filter");
             CapLedgEntry.SetFilter("Posting Date", WorkCtrDateFilter[i]);
             if CapLedgEntry.Find('-') then
                 repeat

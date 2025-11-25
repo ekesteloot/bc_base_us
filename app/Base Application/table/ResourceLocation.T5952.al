@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Resources;
+
+using Microsoft.InventoryMgt.Location;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 table 5952 "Resource Location"
 {
     Caption = 'Resource Location';
@@ -18,7 +23,7 @@ table 5952 "Resource Location"
         }
         field(2; "Location Name"; Text[100])
         {
-            CalcFormula = Lookup (Location.Name WHERE(Code = FIELD("Location Code")));
+            CalcFormula = Lookup(Location.Name where(Code = field("Location Code")));
             Caption = 'Location Name';
             Editable = false;
             FieldClass = FlowField;
@@ -35,7 +40,7 @@ table 5952 "Resource Location"
         }
         field(4; "Resource Name"; Text[100])
         {
-            CalcFormula = Lookup (Resource.Name WHERE("No." = FIELD("Resource No.")));
+            CalcFormula = Lookup(Resource.Name where("No." = field("Resource No.")));
             Caption = 'Resource Name';
             Editable = false;
             FieldClass = FlowField;

@@ -1,3 +1,15 @@
+namespace Microsoft.WarehouseMgt.InternalDocument;
+
+using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Comment;
+using Microsoft.WarehouseMgt.Journal;
+using Microsoft.WarehouseMgt.Request;
+using Microsoft.WarehouseMgt.Setup;
+using Microsoft.WarehouseMgt.Structure;
+
 table 7333 "Whse. Internal Pick Header"
 {
     Caption = 'Whse. Internal Pick Header';
@@ -23,7 +35,7 @@ table 7333 "Whse. Internal Pick Header"
         field(2; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            TableRelation = Location where("Use As In-Transit" = const(false));
 
             trigger OnValidate()
             var
@@ -57,7 +69,7 @@ table 7333 "Whse. Internal Pick Header"
         {
             Caption = 'Assigned User ID';
             DataClassification = EndUserIdentifiableInformation;
-            TableRelation = "Warehouse Employee" WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = "Warehouse Employee" where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -97,9 +109,9 @@ table 7333 "Whse. Internal Pick Header"
         }
         field(11; Comment; Boolean)
         {
-            CalcFormula = Exist("Warehouse Comment Line" WHERE("Table Name" = CONST("Internal Pick"),
-                                                                Type = CONST(" "),
-                                                                "No." = FIELD("No.")));
+            CalcFormula = exist("Warehouse Comment Line" where("Table Name" = const("Internal Pick"),
+                                                                Type = const(" "),
+                                                                "No." = field("No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -107,10 +119,10 @@ table 7333 "Whse. Internal Pick Header"
         field(12; "To Bin Code"; Code[20])
         {
             Caption = 'To Bin Code';
-            TableRelation = IF ("To Zone Code" = FILTER('')) Bin.Code WHERE("Location Code" = FIELD("Location Code"))
-            ELSE
-            IF ("To Zone Code" = FILTER(<> '')) Bin.Code WHERE("Location Code" = FIELD("Location Code"),
-                                                                                  "Zone Code" = FIELD("To Zone Code"));
+            TableRelation = if ("To Zone Code" = filter('')) Bin.Code where("Location Code" = field("Location Code"))
+            else
+            if ("To Zone Code" = filter(<> '')) Bin.Code where("Location Code" = field("Location Code"),
+                                                                                  "Zone Code" = field("To Zone Code"));
 
             trigger OnValidate()
             var
@@ -137,7 +149,7 @@ table 7333 "Whse. Internal Pick Header"
         field(13; "To Zone Code"; Code[10])
         {
             Caption = 'To Zone Code';
-            TableRelation = Zone.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Zone.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
@@ -388,7 +400,7 @@ table 7333 "Whse. Internal Pick Header"
         WhseCommentLine.DeleteAll();
 
         ItemTrackingMgt.DeleteWhseItemTrkgLines(
-          DATABASE::"Whse. Internal Pick Line", 0, "No.", '', 0, 0, '', false);
+          Enum::TableID::"Whse. Internal Pick Line".AsInteger(), 0, "No.", '', 0, 0, '', false);
     end;
 
     procedure CheckPickRequired(LocationCode: Code[10])

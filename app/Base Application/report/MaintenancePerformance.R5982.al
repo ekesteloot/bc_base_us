@@ -1,7 +1,12 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Contract;
+using Microsoft.ServiceMgt.History;
+
 report 5982 "Maintenance Performance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/Maintenance/MaintenancePerformance.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/MaintenancePerformance.rdlc';
     ApplicationArea = Service;
     Caption = 'Maintenance Performance';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +15,7 @@ report 5982 "Maintenance Performance"
     {
         dataitem("Service Contract Header"; "Service Contract Header")
         {
-            DataItemTableView = SORTING("Responsibility Center", "Service Zone Code", Status, "Contract Group Code") WHERE(Status = CONST(Signed), "Contract Type" = CONST(Contract));
+            DataItemTableView = sorting("Responsibility Center", "Service Zone Code", Status, "Contract Group Code") where(Status = const(Signed), "Contract Type" = const(Contract));
             RequestFilterFields = "Responsibility Center";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {

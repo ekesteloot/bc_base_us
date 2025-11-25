@@ -1,3 +1,5 @@
+namespace Microsoft.InventoryMgt.Requisition;
+
 page 99000860 "Planning Worksheet Line List"
 {
     Caption = 'Planning Worksheet Line List';
@@ -143,7 +145,7 @@ page 99000860 "Planning Worksheet Line List"
 
                     trigger OnAction()
                     begin
-                        OpenItemTrackingLines();
+                        Rec.OpenItemTrackingLines();
                     end;
                 }
             }

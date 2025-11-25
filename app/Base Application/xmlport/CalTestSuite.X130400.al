@@ -1,3 +1,5 @@
+namespace System.TestTools.TestRunner;
+
 xmlport 130400 "CAL Test Suite"
 {
     Caption = 'CAL Test Suite';
@@ -25,7 +27,7 @@ xmlport 130400 "CAL Test Suite"
                 {
                     tableelement("<cal test line>"; "CAL Test Line")
                     {
-                        LinkFields = "Test Suite" = FIELD(Name);
+                        LinkFields = "Test Suite" = field(Name);
                         LinkTable = "CAL Test Suite";
                         MinOccurs = Zero;
                         XmlName = 'CALTestLine';

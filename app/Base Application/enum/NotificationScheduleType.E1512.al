@@ -1,3 +1,5 @@
+namespace System.Environment.Configuration;
+
 enum 1512 "Notification Schedule Type"
 {
     Extensible = true;

@@ -1,7 +1,13 @@
+namespace Microsoft.InventoryMgt.Reports;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using System.Utilities;
+
 report 5809 "Item Expiration - Quantity"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './InventoryMgt/ItemExpirationQuantity.rdlc';
+    RDLCLayout = './InventoryMgt/Reports/ItemExpirationQuantity.rdlc';
     ApplicationArea = ItemTracking;
     Caption = 'Item Expiration - Quantity';
     UsageCategory = ReportsAndAnalysis;
@@ -10,7 +16,7 @@ report 5809 "Item Expiration - Quantity"
     {
         dataitem(Header; "Integer")
         {
-            DataItemTableView = SORTING(Number) WHERE(Number = CONST(0));
+            DataItemTableView = sorting(Number) where(Number = const(0));
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
             }
@@ -51,8 +57,8 @@ report 5809 "Item Expiration - Quantity"
             }
             dataitem("Item Ledger Entry"; "Item Ledger Entry")
             {
-                DataItemLink = "Item No." = FIELD("No."), "Location Code" = FIELD("Location Filter"), "Variant Code" = FIELD("Variant Filter"), "Global Dimension 1 Code" = FIELD("Global Dimension 1 Filter"), "Global Dimension 2 Code" = FIELD("Global Dimension 2 Filter");
-                DataItemTableView = SORTING("Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date", "Expiration Date", "Lot No.", "Serial No.") WHERE(Open = CONST(true));
+                DataItemLink = "Item No." = field("No."), "Location Code" = field("Location Filter"), "Variant Code" = field("Variant Filter"), "Global Dimension 1 Code" = field("Global Dimension 1 Filter"), "Global Dimension 2 Code" = field("Global Dimension 2 Filter");
+                DataItemTableView = sorting("Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date", "Expiration Date", "Lot No.", "Serial No.") where(Open = const(true));
                 column(InvtQty1; InvtQty[1])
                 {
                     DecimalPlaces = 0 : 2;

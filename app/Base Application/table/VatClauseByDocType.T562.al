@@ -1,3 +1,5 @@
+namespace Microsoft.FinancialMgt.VAT;
+
 table 562 "VAT Clause by Doc. Type"
 {
     Caption = 'VAT Clause by Document Type';

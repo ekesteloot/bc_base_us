@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Document;
+
 page 6003 "Cancelled Allocation Entries"
 {
     Caption = 'Canceled Allocation Entries';

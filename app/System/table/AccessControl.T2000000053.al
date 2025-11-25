@@ -1,3 +1,11 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Security.AccessControl;
+
+using System.Environment.Configuration;
+
 table 2000000053 "Access Control"
 {
     Caption = 'Access Control';
@@ -20,17 +28,17 @@ table 2000000053 "Access Control"
         field(3; "Company Name"; Text[30])
         {
             Caption = 'Company Name';
-            TableRelation = Company.Name;
+            TableRelation = System.Environment.Company.Name;
         }
         field(5; "User Name"; Code[50])
         {
-            CalcFormula = Lookup (User."User Name" WHERE("User Security ID" = FIELD("User Security ID")));
+            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("User Security ID")));
             Caption = 'User Name';
             FieldClass = FlowField;
         }
         field(7; "Role Name"; Text[30])
         {
-            CalcFormula = Lookup ("Aggregate Permission Set".Name WHERE(Scope = FIELD(Scope),
+            CalcFormula = Lookup("Aggregate Permission Set".Name WHERE(Scope = FIELD(Scope),
                                                                         "App ID" = FIELD("App ID"),
                                                                         "Role ID" = FIELD("Role ID")));
             Caption = 'Role Name';
@@ -50,7 +58,7 @@ table 2000000053 "Access Control"
         }
         field(10; "App Name"; Text[250])
         {
-            CalcFormula = Lookup ("Aggregate Permission Set"."App Name" WHERE(Scope = FIELD(Scope),
+            CalcFormula = Lookup("Aggregate Permission Set"."App Name" WHERE(Scope = FIELD(Scope),
                                                                               "App ID" = FIELD("App ID"),
                                                                               "Role ID" = FIELD("Role ID")));
             Caption = 'App Name';

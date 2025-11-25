@@ -1,3 +1,8 @@
+namespace System.IO;
+
+using System.Reflection;
+using System.Text;
+
 page 1222 "Data Exch Field Grouping Part"
 {
     Caption = 'Data Exchange Field Grouping';
@@ -60,7 +65,7 @@ page 1222 "Data Exch Field Grouping Part"
 
     trigger OnAfterGetRecord()
     begin
-        FieldCaptionText := GetFieldCaption();
+        FieldCaptionText := Rec.GetFieldCaption();
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -69,7 +74,6 @@ page 1222 "Data Exch Field Grouping Part"
     end;
 
     var
-        [InDataSet]
         FieldCaptionText: Text;
 }
 

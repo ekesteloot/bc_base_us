@@ -1,3 +1,17 @@
+﻿namespace Microsoft.Sales.Document;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Posting;
+using Microsoft.Sales.Reports;
+using Microsoft.Sales.Setup;
+using System.Automation;
+using System.Environment.Configuration;
+using System.Text;
+using System.Threading;
+
 page 9301 "Sales Invoice List"
 {
     ApplicationArea = Basic, Suite;
@@ -9,7 +23,7 @@ page 9301 "Sales Invoice List"
     QueryCategory = 'Sales Invoice List';
     RefreshOnActivate = true;
     SourceTable = "Sales Header";
-    SourceTableView = WHERE("Document Type" = CONST(Invoice));
+    SourceTableView = where("Document Type" = const(Invoice));
     UsageCategory = Lists;
 
     AboutTitle = 'About sales invoices';
@@ -236,7 +250,7 @@ page 9301 "Sales Invoice List"
                 {
                     ApplicationArea = All;
                     Style = Unfavorable;
-                    StyleExpr = "Job Queue Status" = "Job Queue Status"::ERROR;
+                    StyleExpr = Rec."Job Queue Status" = Rec."Job Queue Status"::ERROR;
                     ToolTip = 'Specifies the status of a job queue entry or task that handles the posting of sales invoices.';
                     Visible = JobQueueActive;
 
@@ -244,9 +258,9 @@ page 9301 "Sales Invoice List"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                     begin
-                        if "Job Queue Status" = "Job Queue Status"::" " then
+                        if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                             exit;
-                        JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                        JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
                     end;
                 }
                 field(Amount; Rec.Amount)
@@ -281,14 +295,14 @@ page 9301 "Sales Invoice List"
             part(Control1902018507; "Customer Statistics FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             part(Control1900316107; "Customer Details FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "No." = FIELD("Bill-to Customer No."),
-                              "Date Filter" = FIELD("Date Filter");
+                SubPageLink = "No." = field("Bill-to Customer No."),
+                              "Date Filter" = field("Date Filter");
             }
             part(IncomingDocAttachFactBox; "Incoming Doc. Attach. FactBox")
             {
@@ -326,9 +340,9 @@ page 9301 "Sales Invoice List"
 
                     trigger OnAction()
                     begin
-                        PrepareOpeningDocumentStatistics();
+                        Rec.PrepareOpeningDocumentStatistics();
                         OnBeforeCalculateSalesTaxStatistics(Rec, true);
-                        ShowDocumentStatisticsPage();
+                        Rec.ShowDocumentStatisticsPage();
                     end;
                 }
                 action("Co&mments")
@@ -337,9 +351,9 @@ page 9301 "Sales Invoice List"
                     Caption = 'Co&mments';
                     Image = ViewComments;
                     RunObject = Page "Sales Comment Sheet";
-                    RunPageLink = "Document Type" = FIELD("Document Type"),
-                                  "No." = FIELD("No."),
-                                  "Document Line No." = CONST(0);
+                    RunPageLink = "Document Type" = field("Document Type"),
+                                  "No." = field("No."),
+                                  "Document Line No." = const(0);
                     ToolTip = 'View or add comments for the record.';
                 }
                 action(Dimensions)
@@ -353,7 +367,7 @@ page 9301 "Sales Invoice List"
 
                     trigger OnAction()
                     begin
-                        ShowDocDim();
+                        Rec.ShowDocDim();
                     end;
                 }
                 action(Approvals)
@@ -378,8 +392,8 @@ page 9301 "Sales Invoice List"
                     Enabled = CustomerSelected;
                     Image = Customer;
                     RunObject = Page "Customer Card";
-                    RunPageLink = "No." = FIELD("Sell-to Customer No."),
-                                  "Date Filter" = FIELD("Date Filter");
+                    RunPageLink = "No." = field("Sell-to Customer No."),
+                                  "Date Filter" = field("Date Filter");
                     Scope = Repeater;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'View or edit detailed information about the customer.';
@@ -390,10 +404,10 @@ page 9301 "Sales Invoice List"
                     Caption = 'CFDI Relation Documents';
                     Image = Allocations;
                     RunObject = Page "CFDI Relation Documents";
-                    RunPageLink = "Document Table ID" = CONST(36),
-                                  "Document Type" = FIELD("Document Type"),
-                                  "Document No." = FIELD("No."),
-                                  "Customer No." = FIELD("Bill-to Customer No.");
+                    RunPageLink = "Document Table ID" = const(36),
+                                  "Document Type" = field("Document Type"),
+                                  "Document No." = field("No."),
+                                  "Customer No." = field("Bill-to Customer No.");
                     ToolTip = 'View or add CFDI relation documents for the record.';
                 }
             }
@@ -432,7 +446,7 @@ page 9301 "Sales Invoice List"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualRelease(SalesHeader);
+                        Rec.PerformManualRelease(SalesHeader);
                     end;
                 }
                 action("Re&open")
@@ -447,7 +461,7 @@ page 9301 "Sales Invoice List"
                         SalesHeader: Record "Sales Header";
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
-                        PerformManualReopen(SalesHeader);
+                        Rec.PerformManualReopen(SalesHeader);
                     end;
                 }
             }
@@ -485,7 +499,7 @@ page 9301 "Sales Invoice List"
                         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
                     begin
                         ApprovalsMgmt.OnCancelSalesApprovalRequest(Rec);
-                        WorkflowWebhookManagement.FindAndCancel(RecordId);
+                        WorkflowWebhookManagement.FindAndCancel(Rec.RecordId);
                     end;
                 }
             }
@@ -523,7 +537,7 @@ page 9301 "Sales Invoice List"
                     begin
                         CurrPage.SetSelectionFilter(SalesHeader);
                         if SalesHeader.Count > 1 then
-                            SalesBatchPostMgt.RunWithUI(SalesHeader, Count, ReadyToPostQst)
+                            SalesBatchPostMgt.RunWithUI(SalesHeader, Rec.Count(), ReadyToPostQst)
                         else
                             PostDocument(CODEUNIT::"Sales-Post (Yes/No)");
                     end;
@@ -573,7 +587,7 @@ page 9301 "Sales Invoice List"
 
                     trigger OnAction()
                     begin
-                        CancelBackgroundPosting();
+                        Rec.CancelBackgroundPosting();
                     end;
                 }
                 action(Preview)
@@ -762,17 +776,17 @@ page 9301 "Sales Invoice List"
 
     trigger OnAfterGetRecord()
     begin
-        StatusStyleTxt := GetStatusStyleText();
+        StatusStyleTxt := Rec.GetStatusStyleText();
     end;
 
     trigger OnOpenPage()
     var
         SalesSetup: Record "Sales & Receivables Setup";
     begin
-        SetSecurityFilterOnRespCenter();
+        Rec.SetSecurityFilterOnRespCenter();
         JobQueueActive := SalesSetup.JobQueueActive();
 
-        CopySellToCustomerFilter();
+        Rec.CopySellToCustomerFilter();
     end;
 
     var
@@ -784,14 +798,12 @@ page 9301 "Sales Invoice List"
         CanRequestApprovalForFlow: Boolean;
         CanCancelApprovalForFlow: Boolean;
         CustomerSelected: Boolean;
-        [InDataSet]
         StatusStyleTxt: Text;
 
         OpenPostedSalesInvQst: Label 'The invoice is posted as number %1 and moved to the Posted Sales Invoice window.\\Do you want to open the posted invoice?', Comment = '%1 = posted document number';
         ReadyToPostQst: Label 'The number of invoices that will be posted is %1. \Do you want to continue?', Comment = '%1 - selected count';
 
     protected var
-        [InDataSet]
         JobQueueActive: Boolean;
 
     procedure ShowPreview()
@@ -806,13 +818,13 @@ page 9301 "Sales Invoice List"
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         WorkflowWebhookManagement: Codeunit "Workflow Webhook Management";
     begin
-        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(RecordId);
+        OpenApprovalEntriesExist := ApprovalsMgmt.HasOpenApprovalEntries(Rec.RecordId);
 
-        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(RecordId);
+        CanCancelApprovalForRecord := ApprovalsMgmt.CanCancelApprovalForRecord(Rec.RecordId);
 
-        WorkflowWebhookManagement.GetCanRequestAndCanCancel(RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
+        WorkflowWebhookManagement.GetCanRequestAndCanCancel(Rec.RecordId, CanRequestApprovalForFlow, CanCancelApprovalForFlow);
 
-        CustomerSelected := "Sell-to Customer No." <> '';
+        CustomerSelected := Rec."Sell-to Customer No." <> '';
     end;
 
     local procedure PostDocument(PostingCodeunitID: Integer)
@@ -825,7 +837,7 @@ page 9301 "Sales Invoice List"
         PreAssignedNo := Rec."No.";
         xLastPostingNo := Rec."Last Posting No.";
 
-        SendToPosting(PostingCodeunitID);
+        Rec.SendToPosting(PostingCodeunitID);
 
         IsHandled := false;
         OnPostDocumentBeforeNavigateAfterPosting(Rec, PostingCodeunitID, IsHandled);

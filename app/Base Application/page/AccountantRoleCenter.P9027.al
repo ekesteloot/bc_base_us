@@ -1,3 +1,57 @@
+﻿namespace Microsoft.FinancialMgt.RoleCenters;
+
+using Microsoft.BankMgt.BankAccount;
+using Microsoft.BankMgt.Deposit;
+using Microsoft.BankMgt.DirectDebit;
+using Microsoft.BankMgt.Reconciliation;
+using Microsoft.BankMgt.Statement;
+using Microsoft.CashFlow.Account;
+using Microsoft.CashFlow.Forecast;
+using Microsoft.CashFlow.Setup;
+using Microsoft.CostAccounting.Account;
+using Microsoft.CostAccounting.Allocation;
+using Microsoft.CostAccounting.Budget;
+using Microsoft.CostAccounting.Reports;
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.Consolidation;
+using Microsoft.FinancialMgt.Currency;
+using Microsoft.FinancialMgt.Deferral;
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.FinancialReports;
+using Microsoft.FinancialMgt.GeneralLedger.Account;
+using Microsoft.FinancialMgt.GeneralLedger.Budget;
+using Microsoft.FinancialMgt.GeneralLedger.Journal;
+using Microsoft.FinancialMgt.GeneralLedger.Ledger;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FinancialMgt.SalesTax;
+using Microsoft.FinancialMgt.VAT;
+using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
+using Microsoft.HumanResources.Employee;
+using Microsoft.Integration.Entity;
+using Microsoft.Intercompany.Dimension;
+using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Partner;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.Shared.Navigate;
+#if not CLEAN22
+using System.Automation;
+#endif
+using System.Email;
+using System.Integration.PowerBI;
+using System.Security.User;
+using System.Threading;
+
 page 9027 "Accountant Role Center"
 {
     Caption = 'Accountant', Comment = 'Use same translation as ''Profile Description'' (if applicable)';
@@ -334,8 +388,8 @@ page 9027 "Accountant Role Center"
                     Caption = 'General Journals';
                     Image = Journal;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(General),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(General),
+                                        Recurring = const(false));
                     ToolTip = 'Post financial transactions directly to general ledger accounts and other accounts, such as bank, customer, vendor, and employee accounts. Posting with a general journal always creates entries on general ledger accounts. This is true even when, for example, you post a journal line to a customer account, because an entry is posted to a general ledger receivables account through a posting group.';
                 }
                 action("Recurring General Journals")
@@ -343,16 +397,14 @@ page 9027 "Accountant Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Recurring General Journals';
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(General),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(General),
+                                        Recurring = const(true));
                     ToolTip = 'Define how to post transactions that recur with few or no changes to general ledger, bank, customer, vendor, or fixed asset accounts';
                 }
                 action(Action170)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Chart of Accounts';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Chart of Accounts";
                     ToolTip = 'View or organize the general ledger accounts that store your financial data. All values from business transactions or internal adjustments end up in designated G/L accounts. Business Central includes a standard chart of accounts that is ready to support businesses in your country, but you can change the default accounts and add new ones.';
                 }
@@ -360,8 +412,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'G/L Account Categories';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "G/L Account Categories";
                     ToolTip = 'Personalize the structure of your financial statements by mapping general ledger accounts to account categories. You can create category groups by indenting subcategories under them. Each grouping shows a total balance. When you choose the Generate Account Schedules action, the account schedules for the underlying financial reports are updated. The next time you run one of these reports, such as the balance statement, new totals and subentries are added, based on your changes.';
                 }
@@ -370,8 +420,6 @@ page 9027 "Accountant Role Center"
                     ApplicationArea = Suite;
                     Caption = 'Currencies';
                     Image = Currency;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page Currencies;
                     ToolTip = 'View the different currencies that you trade in or update the exchange rates by getting the latest rates from an external service provider.';
                 }
@@ -379,8 +427,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = BasicHR;
                     Caption = 'Employees';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Employee List";
                     ToolTip = 'View or modify employees'' details and related information, such as qualifications and pictures, or register and analyze employee absence. Keeping up-to-date records about your employees simplifies personnel tasks. For example, if an employee''s address changes, you register this on the employee card.';
                 }
@@ -388,8 +434,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = VAT;
                     Caption = 'VAT Statements';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "VAT Statement Names";
                     ToolTip = 'View a statement of posted VAT amounts, calculate your VAT settlement amount for a certain period, such as a quarter, and prepare to send the settlement to the tax authorities.';
                 }
@@ -398,8 +442,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = BasicEU;
                     Caption = 'Intrastat Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Intrastat Jnl. Batches";
                     ToolTip = 'Summarize the value of your purchases and sales with business partners in the EU for statistical purposes and prepare to send it to the relevant authority.';
                     ObsoleteState = Pending;
@@ -411,8 +453,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Analysis Views';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Analysis View List";
                     ToolTip = 'Analyze amounts in your general ledger by their dimensions using analysis views that you have set up.';
                 }
@@ -420,8 +460,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Financial Reporting';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Financial Reports";
                     ToolTip = 'Get insight into the financial data stored in your chart of accounts. Financial reports analyze figures in G/L accounts, and compare general ledger entries with general ledger budget entries. For example, you can view the general ledger entries as percentages of the budget entries. Financial reports provide the data for core financial statements and views, such as the Cash Flow chart.';
                 }
@@ -437,8 +475,6 @@ page 9027 "Accountant Role Center"
                     ApplicationArea = Suite;
                     Caption = 'Dimensions';
                     Image = Dimensions;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page Dimensions;
                     ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
                 }
@@ -446,8 +482,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Intercompany;
                     Caption = 'Partners';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "IC Partner List";
                     ToolTip = 'Set up each company or department within the group of companies as an intercompany partner of type Vendor or Customer. Intercompany partners can then be inserted on regular sales and purchase documents or journal lines that are exchanged through the intercompany inbox/outbox system and posted to agreed accounts in an intercompany chart of accounts.';
                 }
@@ -455,8 +489,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Intercompany;
                     Caption = 'IC Chart of Accounts';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "IC Chart of Accounts";
                     ToolTip = 'Manage intercompany transactions within your group of companies in an aligned chart of accounts that uses the same account numbers and settings. In the setup phase, the parent company of the group can create a simplified version of their own chart of accounts and exports it to an XML file that each subsidiary can quickly implement.';
                 }
@@ -464,8 +496,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Intercompany;
                     Caption = 'Intercompany Dimensions';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "IC Dimensions";
                     ToolTip = 'Enable companies within a group to exchange transactions with dimensions and to perform financial analysis by dimensions across the group. The parent company of the group can create a simplified version of their own set of dimensions and export them to an XML file that each subsidiary can import into the intercompany Dimensions window and then map them to their own dimensions.';
                 }
@@ -543,19 +573,17 @@ page 9027 "Accountant Role Center"
                     Caption = 'General Journals';
                     Image = Journal;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(General),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(General),
+                                        Recurring = const(false));
                     ToolTip = 'Open the list of general journal, for example, to record or post a payment that has no related document.';
                 }
                 action("<Action3>")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Recurring General Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(General),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(General),
+                                        Recurring = const(true));
                     ToolTip = 'Define how to post transactions that recur with few or no changes to general ledger, bank, customer, vendor, or fixed asset accounts';
                 }
                 action(PurchaseJournals)
@@ -564,8 +592,8 @@ page 9027 "Accountant Role Center"
                     Caption = 'Purchase Journals';
                     Image = Purchasing;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Purchases),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Purchases),
+                                        Recurring = const(false));
                     ToolTip = 'Post any purchase-related transaction directly to a vendor, bank, or general ledger account instead of using dedicated documents. You can post all types of financial purchase transactions, including payments, refunds, and finance charge amounts. Note that you cannot post item quantities with a purchase journal.';
                 }
                 action(PostedGeneralJournals)
@@ -585,11 +613,9 @@ page 9027 "Accountant Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Payment Journals';
                     Image = PaymentJournal;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Payments),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Payments),
+                                        Recurring = const(false));
                     ToolTip = 'Register payments to vendors. A payment journal is a type of general journal that is used to post outgoing payment transactions to G/L, bank, customer, vendor, employee, and fixed assets accounts. The Suggest Vendor Payments functions automatically fills the journal with payments that are due. When payments are posted, you can export the payments to a bank file for upload to your bank if your system is set up for electronic banking. You can also issue computer checks from the payment journal.';
                 }
                 action(SalesJournals)
@@ -597,8 +623,8 @@ page 9027 "Accountant Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Sales Journals';
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Sales),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Sales),
+                                        Recurring = const(false));
                     ToolTip = 'View the list of sales journals where you can batch post sales transactions to G/L, bank, customer, vendor and fixed assets accounts.';
                 }
                 action(CashReceiptJournals)
@@ -607,8 +633,8 @@ page 9027 "Accountant Role Center"
                     Caption = 'Cash Receipt Journals';
                     Image = CashReceiptJournal;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST("Cash Receipts"),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const("Cash Receipts"),
+                                        Recurring = const(false));
                     ToolTip = 'Register received payments by applying them to the related customer, vendor, or bank ledger entries.';
                 }
                 action(Action164)
@@ -616,8 +642,6 @@ page 9027 "Accountant Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Bank Accounts';
                     Image = BankAccount;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Bank Account List";
                     ToolTip = 'View or set up detailed information about your bank account, such as which currency to use, the format of bank files that you import and export as electronic payments, and the numbering of checks.';
                 }
@@ -625,8 +649,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Direct Debit Collections';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Direct Debit Collections";
                     ToolTip = 'Instruct your bank to withdraw payment amounts from your customer''s bank account and transfer them to your company''s account. A direct debit collection holds information about the customer''s bank account, the affected sales invoices, and the customer''s agreement, the so-called direct-debit mandate. From the resulting direct-debit collection entry, you can then export an XML file that you send or upload to your bank for processing.';
                 }
@@ -635,8 +657,6 @@ page 9027 "Accountant Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Payment Recon. Journals';
                     Image = ApplyEntries;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Pmt. Reconciliation Journals";
                     ToolTip = 'Reconcile unpaid documents automatically with their related bank transactions by importing a bank statement feed or file. In the payment reconciliation journal, incoming or outgoing payments on your bank are automatically, or semi-automatically, applied to their related open customer or vendor ledger entries. Any open bank account ledger entries related to the applied customer or vendor ledger entries will be closed when you choose the Post Payments and Reconcile Bank Account action. This means that the bank account is automatically reconciled for payments that you post with the journal.';
                 }
@@ -645,8 +665,6 @@ page 9027 "Accountant Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Payment Terms';
                     Image = Payment;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Payment Terms";
                     ToolTip = 'Set up the payment terms that you select from customer cards or sales documents to define when the customer must pay, such as within 14 days.';
                 }
@@ -662,8 +680,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Cash Flow Forecasts';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Cash Flow Forecast List";
                     ToolTip = 'Combine various financial data sources to find out when a cash surplus or deficit might happen or whether you should pay down debt, or borrow to meet upcoming expenses.';
                 }
@@ -671,8 +687,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Chart of Cash Flow Accounts';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Chart of Cash Flow Accounts";
                     ToolTip = 'View a chart contain a graphical representation of one or more cash flow accounts and one or more cash flow setups for the included general ledger, purchase, sales, services, or fixed assets accounts.';
                 }
@@ -680,8 +694,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Cash Flow Manual Revenues';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Cash Flow Manual Revenues";
                     ToolTip = 'Record manual revenues, such as rental income, interest from financial assets, or new private capital to be used in cash flow forecasting.';
                 }
@@ -689,8 +701,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Cash Flow Manual Expenses';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Cash Flow Manual Expenses";
                     ToolTip = 'Record manual expenses, such as salaries, interest on credit, or planned investments to be used in cash flow forecasting.';
                 }
@@ -699,8 +709,6 @@ page 9027 "Accountant Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Bank Account Reconciliations';
                     Image = BankAccountRec;
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Bank Acc. Reconciliation List";
                     ToolTip = 'Reconcile bank accounts in your system with bank statements received from your bank.';
                 }
@@ -713,8 +721,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = CostAccounting;
                     Caption = 'Cost Types';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Chart of Cost Types";
                     ToolTip = 'View the chart of cost types with a structure and functionality that resembles the general ledger chart of accounts. You can transfer the general ledger income statement accounts or create your own chart of cost types.';
                 }
@@ -722,8 +728,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = CostAccounting;
                     Caption = 'Cost Centers';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Chart of Cost Centers";
                     ToolTip = 'Manage cost centers, which are departments and profit centers that are responsible for costs and income. Often, there are more cost centers set up in cost accounting than in any dimension that is set up in the general ledger. In the general ledger, usually only the first level cost centers for direct costs and the initial costs are used. In cost accounting, additional cost centers are created for additional allocation levels.';
                 }
@@ -731,8 +735,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = CostAccounting;
                     Caption = 'Cost Objects';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Chart of Cost Objects";
                     ToolTip = 'Set up cost objects, which are products, product groups, or services of a company. These are the finished goods of a company that carry the costs. You can link cost centers to departments and cost objects to projects in your company.';
                 }
@@ -740,8 +742,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = CostAccounting;
                     Caption = 'Cost Allocations';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Cost Allocation Sources";
                     ToolTip = 'Manage allocation rules to allocate costs and revenues between cost types, cost centers, and cost objects. Each allocation consists of an allocation source and one or more allocation targets. For example, all costs for the cost type Electricity and Heating are an allocation source. You want to allocate the costs to the cost centers Workshop, Production, and Sales, which are three allocation targets.';
                 }
@@ -749,8 +749,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = CostAccounting;
                     Caption = 'Cost Budgets';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Cost Budget Names";
                     ToolTip = 'Set up cost accounting budgets that are created based on cost types just as a budget for the general ledger is created based on general ledger accounts. A cost budget is created for a certain period of time, for example, a fiscal year. You can create as many cost budgets as needed. You can create a new cost budget manually, or by importing a cost budget, or by copying an existing cost budget as the budget base.';
                 }
@@ -764,8 +762,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = FixedAssets;
                     Caption = 'Fixed Assets';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Fixed Asset List";
                     ToolTip = 'Manage periodic depreciation of your machinery or machines, keep track of your maintenance costs, manage insurance policies related to fixed assets, and monitor fixed asset statistics.';
                 }
@@ -773,29 +769,23 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = FixedAssets;
                     Caption = 'Fixed Assets G/L Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "General Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Assets),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Assets),
+                                        Recurring = const(false));
                     ToolTip = 'Post fixed asset transactions, such as acquisition and depreciation, in integration with the general ledger. The FA G/L Journal is a general journal, which is integrated into the general ledger.';
                 }
                 action("Fixed Assets Journals")
                 {
                     ApplicationArea = FixedAssets;
                     Caption = 'Fixed Assets Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "FA Journal Batches";
-                    RunPageView = WHERE(Recurring = CONST(false));
+                    RunPageView = where(Recurring = const(false));
                     ToolTip = 'Post fixed asset transactions, such as acquisition and depreciation book without integration to the general ledger.';
                 }
                 action("Fixed Assets Reclass. Journals")
                 {
                     ApplicationArea = FixedAssets;
                     Caption = 'Fixed Assets Reclass. Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "FA Reclass. Journal Batches";
                     ToolTip = 'Transfer, split, or combine fixed assets by preparing reclassification entries to be posted in the fixed asset journal.';
                 }
@@ -803,8 +793,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = FixedAssets;
                     Caption = 'Insurance';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Insurance List";
                     ToolTip = 'Manage insurance policies for fixed assets and monitor insurance coverage.';
                 }
@@ -812,8 +800,6 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = FixedAssets;
                     Caption = 'Insurance Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "Insurance Journal Batches";
                     ToolTip = 'Post entries to the insurance coverage ledger.';
                 }
@@ -821,10 +807,8 @@ page 9027 "Accountant Role Center"
                 {
                     ApplicationArea = FixedAssets;
                     Caption = 'Recurring Fixed Asset Journals';
-                    Promoted = true;
-                    PromotedCategory = Process;
                     RunObject = Page "FA Journal Batches";
-                    RunPageView = WHERE(Recurring = CONST(true));
+                    RunPageView = where(Recurring = const(true));
                     ToolTip = 'Post recurring fixed asset transactions, such as acquisition and depreciation book without integration to the general ledger.';
                 }
             }
@@ -941,9 +925,6 @@ page 9027 "Accountant Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Payment Reconciliation Journals';
                     Image = ApplyEntries;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
                     RunObject = Page "Pmt. Reconciliation Journals";
                     RunPageMode = View;
                     ToolTip = 'Open the list of journals where you can reconcile unpaid documents automatically with their related bank transactions by importing bank a bank statement feed or file.';
@@ -959,8 +940,8 @@ page 9027 "Accountant Role Center"
                     Image = GeneralLedger;
                     RunObject = Page "General Journal Batches";
                     RunPageMode = View;
-                    RunPageView = WHERE("Template Type" = CONST(General),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(General),
+                                        Recurring = const(false));
                     ToolTip = 'Prepare to post any transaction to the company books.';
                 }
                 action("Recurring General Journal")
@@ -970,8 +951,8 @@ page 9027 "Accountant Role Center"
                     Image = GL;
                     RunObject = Page "General Journal Batches";
                     RunPageMode = View;
-                    RunPageView = WHERE("Template Type" = CONST(General),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(General),
+                                        Recurring = const(true));
                     ToolTip = 'Prepare to post any recurring transaction to the company books.';
                 }
             }
@@ -985,8 +966,8 @@ page 9027 "Accountant Role Center"
                     Image = CashReceiptJournal;
                     RunObject = Page "General Journal Batches";
                     RunPageMode = View;
-                    RunPageView = WHERE("Template Type" = CONST("Cash Receipts"),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const("Cash Receipts"),
+                                        Recurring = const(false));
                     ToolTip = 'Register received payments by applying them to the related customer, vendor, or bank ledger entries.';
                 }
             }
@@ -1000,8 +981,8 @@ page 9027 "Accountant Role Center"
                     Image = PaymentJournal;
                     RunObject = Page "General Journal Batches";
                     RunPageMode = View;
-                    RunPageView = WHERE("Template Type" = CONST(Payments),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Payments),
+                                        Recurring = const(false));
                     ToolTip = 'Open the list of payment journals where you can register payments to vendors.';
                 }
                 action("Purchase Journals")
@@ -1011,8 +992,8 @@ page 9027 "Accountant Role Center"
                     Image = Purchasing;
                     RunObject = Page "General Journal Batches";
                     RunPageMode = View;
-                    RunPageView = WHERE("Template Type" = CONST(Purchases),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Purchases),
+                                        Recurring = const(false));
                     ToolTip = 'Open the list of purchase journals where you can batch post purchase transactions to G/L, bank, customer, vendor and fixed assets accounts.';
                 }
                 action("Purchase Credit Memos")
@@ -1037,9 +1018,6 @@ page 9027 "Accountant Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Balance Sheet';
                         Image = "Report";
-                        Promoted = true;
-                        PromotedCategory = "Report";
-                        PromotedIsBig = true;
                         RunObject = Report "Balance Sheet";
                         ToolTip = 'View a report that shows your company''s assets, liabilities, and equity.';
                     }
@@ -1048,9 +1026,6 @@ page 9027 "Accountant Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Income Statement';
                         Image = "Report";
-                        Promoted = true;
-                        PromotedCategory = "Report";
-                        PromotedIsBig = true;
                         RunObject = Report "Income Statement";
                         ToolTip = 'View a report that shows your company''s income and expenses.';
                     }
@@ -1059,9 +1034,6 @@ page 9027 "Accountant Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Statement of Cash Flows';
                         Image = "Report";
-                        Promoted = true;
-                        PromotedCategory = "Report";
-                        PromotedIsBig = true;
                         RunObject = Report "Statement of Cashflows";
                         ToolTip = 'View a financial statement that shows how changes in balance sheet accounts and income affect the company''s cash holdings, displayed for operating, investing, and financing activities respectively.';
                     }
@@ -1070,9 +1042,6 @@ page 9027 "Accountant Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Statement of Retained Earnings';
                         Image = "Report";
-                        Promoted = true;
-                        PromotedCategory = "Report";
-                        PromotedIsBig = true;
                         RunObject = Report "Retained Earnings Statement";
                         ToolTip = 'View a report that shows your company''s changes in retained earnings for a specified period by reconciling the beginning and ending retained earnings for the period, using information such as net income from the other financial statements.';
                     }

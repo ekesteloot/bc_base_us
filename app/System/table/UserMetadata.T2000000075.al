@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace System.Environment.Configuration;
+
+using System.Reflection;
+using System.Security.AccessControl;
+
 table 2000000075 "User Metadata"
 {
     Caption = 'User Metadata';
@@ -18,7 +27,7 @@ table 2000000075 "User Metadata"
         }
         field(6; "User ID"; Code[50])
         {
-            CalcFormula = Lookup (User."User Name" WHERE("User Security ID" = FIELD("User SID")));
+            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("User SID")));
             Caption = 'User ID';
             FieldClass = FlowField;
         }
@@ -29,7 +38,7 @@ table 2000000075 "User Metadata"
         }
         field(12; Description; Text[250])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
+            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Page),
                                                                            "Object ID" = FIELD("Page ID")));
             Caption = 'Description';
             FieldClass = FlowField;

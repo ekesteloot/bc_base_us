@@ -1,3 +1,21 @@
+namespace Microsoft.Manufacturing.StandardCost;
+
+using Microsoft.AssemblyMgt.Document;
+using Microsoft.AssemblyMgt.History;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.BOM;
+using Microsoft.InventoryMgt.Costing;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.MachineCenter;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
+using Microsoft.ProjectMgt.Resources.Resource;
+
 codeunit 5812 "Calculate Standard Cost"
 {
 
@@ -652,7 +670,7 @@ codeunit 5812 "Calculate Standard Cost"
         end;
     end;
 
-    local procedure CalcRtngCostPerUnit(Type: Enum "Capacity Type Routing"; No: Code[20]; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Option Time,Unit)
+    local procedure CalcRoutingCostPerUnit(Type: Enum "Capacity Type Routing"; No: Code[20]; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type")
     var
         WorkCenter: Record "Work Center";
         MachineCenter: Record "Machine Center";
@@ -666,11 +684,14 @@ codeunit 5812 "Calculate Standard Cost"
         end;
 
         IsHandled := false;
+#if not CLEAN23
         OnCalcRtngCostPerUnitOnBeforeCalc(Type.AsInteger(), DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter, IsHandled);
+#endif
+        OnCalcRoutingCostPerUnitOnBeforeCalc(Type, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter, IsHandled);
         if IsHandled then
             exit;
 
-        CostCalcMgt.RoutingCostPerUnit(
+        CostCalcMgt.CalcRoutingCostPerUnit(
             Type, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, WorkCenter, MachineCenter);
     end;
 
@@ -966,7 +987,7 @@ codeunit 5812 "Calculate Standard Cost"
         IndirCostPct: Decimal;
         OvhdRate: Decimal;
         CostTime: Decimal;
-        UnitCostCalculation: Option;
+        UnitCostCalculation: Enum "Unit Cost Calculation Type";
     begin
         OnBeforeCalcRtngLineCost(RoutingLine, MfgItemQtyBase);
         with RoutingLine do begin
@@ -974,10 +995,9 @@ codeunit 5812 "Calculate Standard Cost"
                 WorkCenter.Get("No.");
 
             UnitCost := "Unit Cost per";
-            CalcRtngCostPerUnit(
-                Type, "No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation);
+            CalcRoutingCostPerUnit(Type, "No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation);
             CostTime :=
-              CostCalculationMgt.CalcCostTime(
+              CostCalculationMgt.CalculateCostTime(
                 MfgItemQtyBase,
                 "Setup Time", "Setup Time Unit of Meas. Code",
                 "Run Time", "Run Time Unit of Meas. Code", "Lot Size",
@@ -1117,8 +1137,16 @@ codeunit 5812 "Calculate Standard Cost"
     begin
     end;
 
+#if not CLEAN23
+    [Obsolete('Replaced by event OnCalcRoutingCostPerUnitOnBeforeCalc()', '23.0')]
     [IntegrationEvent(false, false)]
     local procedure OnCalcRtngCostPerUnitOnBeforeCalc(Type: Option "Work Center","Machine Center"; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Option Time,Unit; WorkCenter: Record "Work Center"; MachineCenter: Record "Machine Center"; var IsHandled: Boolean)
+    begin
+    end;
+#endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcRoutingCostPerUnitOnBeforeCalc(Type: Enum "Capacity Type Routing"; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type"; WorkCenter: Record "Work Center"; MachineCenter: Record "Machine Center"; var IsHandled: Boolean)
     begin
     end;
 

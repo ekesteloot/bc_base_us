@@ -1,7 +1,11 @@
+namespace Microsoft.ServiceMgt.Reports;
+
+using Microsoft.ServiceMgt.Item;
+
 report 5935 "Service Items"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './ServiceMgt/ServiceItems.rdlc';
+    RDLCLayout = './ServiceMgt/Reports/ServiceItems.rdlc';
     ApplicationArea = Service;
     Caption = 'Service Items';
     UsageCategory = ReportsAndAnalysis;
@@ -11,7 +15,7 @@ report 5935 "Service Items"
         dataitem("Service Item"; "Service Item")
         {
             CalcFields = "No. of Active Contracts";
-            DataItemTableView = SORTING("Customer No.", "Ship-to Code", "Item No.", "Serial No.");
+            DataItemTableView = sorting("Customer No.", "Ship-to Code", "Item No.", "Serial No.");
             RequestFilterFields = "Customer No.", "Ship-to Code";
             column(TodayFormatted; Format(Today, 0, 4))
             {

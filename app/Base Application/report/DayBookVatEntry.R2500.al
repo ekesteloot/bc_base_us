@@ -10,7 +10,7 @@ report 2500 "Day Book VAT Entry"
     {
         dataitem(ReqVATEntry; "VAT Entry")
         {
-            DataItemTableView = SORTING(Type, Closed, "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT Reporting Date");
+            DataItemTableView = sorting(Type, Closed, "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT Reporting Date");
             RequestFilterFields = Type, "VAT Reporting Date";
 
             trigger OnPreDataItem()
@@ -20,7 +20,7 @@ report 2500 "Day Book VAT Entry"
         }
         dataitem(Date; Date)
         {
-            DataItemTableView = SORTING("Period Type", "Period Start") WHERE("Period Type" = CONST(Date));
+            DataItemTableView = sorting("Period Type", "Period Start") where("Period Type" = const(Date));
             column(FORMAT_TODAY_0_4_; Format(Today, 0, 4))
             {
             }
@@ -145,7 +145,7 @@ report 2500 "Day Book VAT Entry"
             }
             dataitem("Integer"; "Integer")
             {
-                DataItemTableView = SORTING(Number);
+                DataItemTableView = sorting(Number);
                 column(VAT_Entry__FIELDNAME__VAT_Date__________FORMAT_Date__Period_Start__0_4_; "VAT Entry".FieldCaption("VAT Reporting Date") + ' ' + Format(Date."Period Start", 0, 4))
                 {
                 }
@@ -154,7 +154,7 @@ report 2500 "Day Book VAT Entry"
                 }
                 dataitem("VAT Entry"; "VAT Entry")
                 {
-                    DataItemTableView = SORTING("Document No.", "VAT Reporting Date");
+                    DataItemTableView = sorting("Document No.", "VAT Reporting Date");
                     column(FIELDNAME_Type__________FORMAT_Type_; FieldCaption(Type) + ' ' + Format(Type))
                     {
                     }

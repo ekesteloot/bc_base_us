@@ -1,7 +1,9 @@
+namespace Microsoft.FixedAssets.Insurance;
+
 report 5620 "Insurance - Analysis"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './FinancialMgt/FixedAssets/InsuranceAnalysis.rdlc';
+    RDLCLayout = './FixedAssets/Insurance/InsuranceAnalysis.rdlc';
     ApplicationArea = FixedAssets;
     Caption = 'Fixed Asset Insurance Analysis';
     UsageCategory = ReportsAndAnalysis;
@@ -119,7 +121,7 @@ report 5620 "Insurance - Analysis"
                     {
                         ApplicationArea = FixedAssets;
                         Caption = 'Print per Insurance No.';
-                        ToolTip = 'Specifies if you want the report to print information separately for each insurance number.';
+                        ToolTip = 'Specifies if you want the report to show amounts for each insurance policy.';
                     }
                 }
             }

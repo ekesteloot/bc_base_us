@@ -7,7 +7,7 @@ report 9200 "Void/Transmit Elec. Pmnts"
     {
         dataitem("Gen. Journal Line"; "Gen. Journal Line")
         {
-            DataItemTableView = SORTING("Journal Template Name", "Journal Batch Name", "Line No.") WHERE("Document Type" = FILTER(Payment | Refund), "Bank Payment Type" = FILTER("Electronic Payment" | "Electronic Payment-IAT"), "Exported to Payment File" = CONST(true), "Check Transmitted" = CONST(false));
+            DataItemTableView = sorting("Journal Template Name", "Journal Batch Name", "Line No.") where("Document Type" = filter(Payment | Refund), "Bank Payment Type" = filter("Electronic Payment" | "Electronic Payment-IAT"), "Exported to Payment File" = const(true), "Check Transmitted" = const(false));
 
             trigger OnAfterGetRecord()
             var

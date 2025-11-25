@@ -1,3 +1,12 @@
+namespace Microsoft.FixedAssets.Posting;
+
+using Microsoft.FinancialMgt.Analysis;
+using Microsoft.FinancialMgt.GeneralLedger.Preview;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.FixedAssets.Journal;
+using Microsoft.FixedAssets.Ledger;
+using Microsoft.Foundation.NoSeries;
+
 codeunit 5633 "FA Jnl.-Post Batch"
 {
     Permissions = TableData "FA Journal Batch" = rimd;
@@ -192,7 +201,7 @@ codeunit 5633 "FA Jnl.-Post Batch"
             if PreviewMode then
                 GenJnlPostPreview.ThrowError();
 
-            if not SuppressCommit then    
+            if not SuppressCommit then
                 Commit();
             Clear(FAJnlCheckLine);
             Clear(FAJnlPostLine);

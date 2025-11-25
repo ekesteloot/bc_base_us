@@ -1,3 +1,9 @@
+﻿namespace Microsoft.ServiceMgt.Loaner;
+
+using Microsoft.Sales.Customer;
+using Microsoft.ServiceMgt.Document;
+using Microsoft.ServiceMgt.Item;
+
 table 5914 "Loaner Entry"
 {
     Caption = 'Loaner Entry';

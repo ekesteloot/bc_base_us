@@ -30,7 +30,7 @@ table 130 "Incoming Document"
         }
         field(5; "Created By User Name"; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("Created By User ID")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("Created By User ID")));
             Caption = 'Created By User Name';
             Editable = false;
             FieldClass = FlowField;
@@ -54,7 +54,7 @@ table 130 "Incoming Document"
         }
         field(9; "Released By User Name"; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("Released By User ID")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("Released By User ID")));
             Caption = 'Released By User Name';
             Editable = false;
             FieldClass = FlowField;
@@ -73,7 +73,7 @@ table 130 "Incoming Document"
         }
         field(12; "Last Modified By User Name"; Code[50])
         {
-            CalcFormula = Lookup(User."User Name" WHERE("User Security ID" = FIELD("Last Modified By User ID")));
+            CalcFormula = Lookup(User."User Name" where("User Security ID" = field("Last Modified By User ID")));
             Caption = 'Last Modified By User Name';
             Editable = false;
             FieldClass = FlowField;
@@ -213,7 +213,7 @@ table 130 "Incoming Document"
         }
         field(39; "OCR Service Doc. Template Name"; Text[50])
         {
-            CalcFormula = Lookup("OCR Service Document Template".Name WHERE(Code = FIELD("OCR Service Doc. Template Code")));
+            CalcFormula = Lookup("OCR Service Document Template".Name where(Code = field("OCR Service Doc. Template Code")));
             Caption = 'OCR Service Doc. Template Name';
             Editable = false;
             FieldClass = FlowField;
@@ -258,19 +258,19 @@ table 130 "Incoming Document"
         }
         field(51; "Amount Excl. VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Excl. VAT';
         }
         field(52; "Amount Incl. VAT"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Incl. VAT';
         }
         field(53; "VAT Amount"; Decimal)
         {
-            AutoFormatExpression = "Currency Code";
+            AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'VAT Amount';
         }
@@ -306,9 +306,9 @@ table 130 "Incoming Document"
             var
                 JobQueueEntry: Record "Job Queue Entry";
             begin
-                if "Job Queue Status" = "Job Queue Status"::" " then
+                if Rec."Job Queue Status" = Rec."Job Queue Status"::" " then
                     exit;
-                JobQueueEntry.ShowStatusMsg("Job Queue Entry ID");
+                JobQueueEntry.ShowStatusMsg(Rec."Job Queue Entry ID");
             end;
         }
         field(161; "Job Queue Entry ID"; Guid)
@@ -366,7 +366,7 @@ table 130 "Incoming Document"
         if not IncomingDocumentAttachment.IsEmpty() then
             IncomingDocumentAttachment.DeleteAll();
 
-        ActivityLog.SetRange("Record ID", RecordId);
+        ActivityLog.SetRange("Record ID", Rec.RecordId);
         if not ActivityLog.IsEmpty() then
             ActivityLog.DeleteAll();
 
@@ -453,7 +453,7 @@ table 130 "Incoming Document"
         if IsHandled then
             exit;
 
-        ApprovalsMgmt.DeleteApprovalEntries(RecordId);
+        ApprovalsMgmt.DeleteApprovalEntries(Rec.RecordId);
     end;
 
     [Scope('OnPrem')]
@@ -548,7 +548,7 @@ table 130 "Incoming Document"
             exit;
         end;
 
-        ErrorMessage.SetContext(RecordId);
+        ErrorMessage.SetContext(Rec.RecordId);
         if ErrorMessage.HasErrors(false) then begin
             SetProcessFailed('');
             exit;
@@ -731,7 +731,7 @@ table 130 "Incoming Document"
 
         CreateWithDataExchange("Document Type"::Journal);
 
-        ErrorMessage.SetContext(RecordId);
+        ErrorMessage.SetContext(Rec.RecordId);
         if not ErrorMessage.HasErrors(false) then
             OnAfterCreateGenJnlLineFromIncomingDocSuccess(Rec)
         else
@@ -771,17 +771,17 @@ table 130 "Incoming Document"
         Modify();
     end;
 
-    local procedure RemoveIncomingDocumentEntryNoFromUnpostedDocument()
+    procedure RemoveIncomingDocumentEntryNoFromUnpostedDocument()
     var
         SalesHeader: Record "Sales Header";
         DataTypeManagement: Codeunit "Data Type Management";
         RelatedRecordRecordRef: RecordRef;
         RelatedRecordFieldRef: FieldRef;
-        RelatedRecord: Variant;
+        RelatedRecordVariant: Variant;
     begin
-        if not GetUnpostedRecord(RelatedRecord) then
+        if not GetUnpostedRecord(RelatedRecordVariant) then
             exit;
-        RelatedRecordRecordRef.GetTable(RelatedRecord);
+        RelatedRecordRecordRef.GetTable(RelatedRecordVariant);
         DataTypeManagement.FindFieldByName(
           RelatedRecordRecordRef, RelatedRecordFieldRef, SalesHeader.FieldName("Incoming Document Entry No."));
         RelatedRecordFieldRef.Value := 0;
@@ -1283,7 +1283,7 @@ table 130 "Incoming Document"
         end;
 
         if ErrorMsg <> '' then begin
-            ErrorMessage.SetContext(RecordId);
+            ErrorMessage.SetContext(Rec.RecordId);
             ErrorMessage.LogSimpleMessage(ErrorMessage."Message Type"::Error, ErrorMsg);
         end;
 
@@ -1346,9 +1346,9 @@ table 130 "Incoming Document"
     var
         ErrorMessage: Record "Error Message";
     begin
-        ErrorMessage.SetRange("Context Record ID", RecordId);
+        ErrorMessage.SetRange("Context Record ID", Rec.RecordId);
         ErrorMessage.DeleteAll();
-        TempErrorMessage.SetRange("Context Record ID", RecordId);
+        TempErrorMessage.SetRange("Context Record ID", Rec.RecordId);
         TempErrorMessage.DeleteAll();
     end;
 

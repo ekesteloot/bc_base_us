@@ -1,3 +1,15 @@
+namespace Microsoft.InventoryMgt.Counting.History;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.FinancialMgt.GeneralLedger.Setup;
+using Microsoft.InventoryMgt.Counting.Journal;
+using Microsoft.InventoryMgt.Counting.Tracking;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Ledger;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.WarehouseMgt.Structure;
+
 table 5880 "Pstd. Phys. Invt. Order Line"
 {
     Caption = 'Pstd. Phys. Invt. Order Line';
@@ -28,7 +40,7 @@ table 5880 "Pstd. Phys. Invt. Order Line"
         field(21; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(22; "Location Code"; Code[10])
         {
@@ -38,7 +50,7 @@ table 5880 "Pstd. Phys. Invt. Order Line"
         field(23; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
-            TableRelation = Bin.Code WHERE("Location Code" = FIELD("Location Code"));
+            TableRelation = Bin.Code where("Location Code" = field("Location Code"));
         }
         field(30; Description; Text[100])
         {
@@ -71,8 +83,8 @@ table 5880 "Pstd. Phys. Invt. Order Line"
         }
         field(52; "Qty. Exp. Item Tracking (Base)"; Decimal)
         {
-            CalcFormula = Sum ("Pstd. Exp. Phys. Invt. Track"."Quantity (Base)" WHERE("Order No" = FIELD("Document No."),
-                                                                                      "Order Line No." = FIELD("Line No.")));
+            CalcFormula = sum("Pstd. Exp. Phys. Invt. Track"."Quantity (Base)" where("Order No" = field("Document No."),
+                                                                                      "Order Line No." = field("Line No.")));
             Caption = 'Qty. Exp. Item Tracking (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -87,8 +99,6 @@ table 5880 "Pstd. Phys. Invt. Order Line"
             Caption = 'Last Item Ledger Entry No.';
             Editable = false;
             TableRelation = "Item Ledger Entry";
-            //This property is currently not supported
-            //TestTableRelation = false;
         }
         field(60; "Unit Amount"; Decimal)
         {
@@ -202,7 +212,7 @@ table 5880 "Pstd. Phys. Invt. Order Line"
 
             trigger OnLookup()
             begin
-                ShowDimensions();
+                Rec.ShowDimensions();
             end;
         }
         field(5704; "Item Category Code"; Code[20])

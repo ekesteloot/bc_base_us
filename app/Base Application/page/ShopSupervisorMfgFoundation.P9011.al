@@ -1,3 +1,28 @@
+﻿namespace Microsoft.Manufacturing.RoleCenters;
+
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Journal;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Reports;
+using Microsoft.InventoryMgt.Requisition;
+using Microsoft.InventoryMgt.Tracking;
+using Microsoft.InventoryMgt.Transfer;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Journal;
+using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Reports;
+using Microsoft.Manufacturing.Routing;
+using Microsoft.Manufacturing.Setup;
+using Microsoft.Manufacturing.StandardCost;
+using Microsoft.Manufacturing.WorkCenter;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
+using Microsoft.Shared.Navigate;
+using Microsoft.WarehouseMgt.Activity;
+using System.Security.User;
+using System.Threading;
+
 page 9011 "Shop Supervisor Mfg Foundation"
 {
     Caption = 'Shop Supervisor - Manufacturing Foundation';
@@ -142,7 +167,7 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 ApplicationArea = Manufacturing;
                 Caption = 'Produced';
                 RunObject = Page "Item List";
-                RunPageView = WHERE("Replenishment System" = CONST("Prod. Order"));
+                RunPageView = where("Replenishment System" = const("Prod. Order"));
                 ToolTip = 'View the list of production items.';
             }
             action(ItemsRawMaterials)
@@ -150,9 +175,9 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 ApplicationArea = Manufacturing;
                 Caption = 'Raw Materials';
                 RunObject = Page "Item List";
-                RunPageView = WHERE("Low-Level Code" = FILTER(> 0),
-                                    "Replenishment System" = CONST(Purchase),
-                                    "Production BOM No." = FILTER(= ''));
+                RunPageView = where("Low-Level Code" = filter(> 0),
+                                    "Replenishment System" = const(Purchase),
+                                    "Production BOM No." = filter(= ''));
                 ToolTip = 'View the list of items that are not bills of material.';
             }
             action("Stockkeeping Units")
@@ -176,7 +201,7 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 ApplicationArea = Manufacturing;
                 Caption = 'Under Development';
                 RunObject = Page "Production BOM List";
-                RunPageView = WHERE(Status = CONST("Under Development"));
+                RunPageView = where(Status = const("Under Development"));
                 ToolTip = 'View the list of production BOMs that are not yet certified.';
             }
             action(ProductionBOMCertified)
@@ -184,7 +209,7 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 ApplicationArea = Manufacturing;
                 Caption = 'Certified';
                 RunObject = Page "Production BOM List";
-                RunPageView = WHERE(Status = CONST(Certified));
+                RunPageView = where(Status = const(Certified));
                 ToolTip = 'View the list of certified production BOMs.';
             }
             action("Work Centers")
@@ -250,8 +275,8 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 ApplicationArea = Planning;
                 Caption = 'Subcontracting Worksheets';
                 RunObject = Page "Req. Wksh. Names";
-                RunPageView = WHERE("Template Type" = CONST("For. Labor"),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const("For. Labor"),
+                                    Recurring = const(false));
                 ToolTip = 'Calculate the needed production supply, find the production orders that have material ready to send to a subcontractor, and automatically create purchase orders for subcontracted operations from production order routings.';
             }
             action(RequisitionWorksheets)
@@ -259,8 +284,8 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 ApplicationArea = Planning;
                 Caption = 'Requisition Worksheets';
                 RunObject = Page "Req. Wksh. Names";
-                RunPageView = WHERE("Template Type" = CONST("Req."),
-                                    Recurring = CONST(false));
+                RunPageView = where("Template Type" = const("Req."),
+                                    Recurring = const(false));
                 ToolTip = 'Calculate a supply plan to fulfill item demand with purchases or transfers.';
             }
         }
@@ -275,8 +300,8 @@ page 9011 "Shop Supervisor Mfg Foundation"
                     ApplicationArea = Manufacturing;
                     Caption = 'Revaluation Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Revaluation),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Revaluation),
+                                        Recurring = const(false));
                     ToolTip = 'Change the inventory value of items, for example after doing a physical inventory.';
                 }
                 action(ConsumptionJournals)
@@ -284,8 +309,8 @@ page 9011 "Shop Supervisor Mfg Foundation"
                     ApplicationArea = Manufacturing;
                     Caption = 'Consumption Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Consumption),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Consumption),
+                                        Recurring = const(false));
                     ToolTip = 'Post the consumption of material as operations are performed.';
                 }
                 action(OutputJournals)
@@ -293,8 +318,8 @@ page 9011 "Shop Supervisor Mfg Foundation"
                     ApplicationArea = Manufacturing;
                     Caption = 'Output Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Output),
-                                        Recurring = CONST(false));
+                    RunPageView = where("Template Type" = const(Output),
+                                        Recurring = const(false));
                     ToolTip = 'Post finished end items and time spent in production. ';
                 }
                 action(RecurringConsumptionJournals)
@@ -302,8 +327,8 @@ page 9011 "Shop Supervisor Mfg Foundation"
                     ApplicationArea = Manufacturing;
                     Caption = 'Recurring Consumption Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Consumption),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(Consumption),
+                                        Recurring = const(true));
                     ToolTip = 'Post the consumption of material as operations are performed.';
                 }
                 action(RecurringOutputJournals)
@@ -311,8 +336,8 @@ page 9011 "Shop Supervisor Mfg Foundation"
                     ApplicationArea = Manufacturing;
                     Caption = 'Recurring Output Journals';
                     RunObject = Page "Item Journal Batches";
-                    RunPageView = WHERE("Template Type" = CONST(Output),
-                                        Recurring = CONST(true));
+                    RunPageView = where("Template Type" = const(Output),
+                                        Recurring = const(true));
                     ToolTip = 'View all recurring output journals.';
                 }
             }

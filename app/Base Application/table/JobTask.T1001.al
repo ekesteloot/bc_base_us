@@ -109,7 +109,7 @@ table 1001 "Job Task"
         field(9; "WIP Method"; Code[20])
         {
             Caption = 'WIP Method';
-            TableRelation = "Job WIP Method".Code WHERE(Valid = CONST(true));
+            TableRelation = "Job WIP Method".Code where(Valid = const(true));
 
             trigger OnValidate()
             begin
@@ -121,11 +121,11 @@ table 1001 "Job Task"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Job Planning Line"."Total Cost (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                            "Job Task No." = FIELD("Job Task No."),
-                                                                            "Job Task No." = FIELD(FILTER(Totaling)),
-                                                                            "Schedule Line" = CONST(true),
-                                                                            "Planning Date" = FIELD("Planning Date Filter")));
+            CalcFormula = sum("Job Planning Line"."Total Cost (LCY)" where("Job No." = field("Job No."),
+                                                                            "Job Task No." = field("Job Task No."),
+                                                                            "Job Task No." = field(FILTER(Totaling)),
+                                                                            "Schedule Line" = const(true),
+                                                                            "Planning Date" = field("Planning Date Filter")));
             Caption = 'Budget (Total Cost)';
             Editable = false;
             FieldClass = FlowField;
@@ -134,11 +134,11 @@ table 1001 "Job Task"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Job Planning Line"."Line Amount (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                             "Job Task No." = FIELD("Job Task No."),
-                                                                             "Job Task No." = FIELD(FILTER(Totaling)),
-                                                                             "Schedule Line" = CONST(true),
-                                                                             "Planning Date" = FIELD("Planning Date Filter")));
+            CalcFormula = sum("Job Planning Line"."Line Amount (LCY)" where("Job No." = field("Job No."),
+                                                                             "Job Task No." = field("Job Task No."),
+                                                                             "Job Task No." = field(FILTER(Totaling)),
+                                                                             "Schedule Line" = const(true),
+                                                                             "Planning Date" = field("Planning Date Filter")));
             Caption = 'Budget (Total Price)';
             Editable = false;
             FieldClass = FlowField;
@@ -147,11 +147,11 @@ table 1001 "Job Task"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Job Ledger Entry"."Total Cost (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                           "Job Task No." = FIELD("Job Task No."),
-                                                                           "Job Task No." = FIELD(FILTER(Totaling)),
-                                                                           "Entry Type" = CONST(Usage),
-                                                                           "Posting Date" = FIELD("Posting Date Filter")));
+            CalcFormula = sum("Job Ledger Entry"."Total Cost (LCY)" where("Job No." = field("Job No."),
+                                                                           "Job Task No." = field("Job Task No."),
+                                                                           "Job Task No." = field(FILTER(Totaling)),
+                                                                           "Entry Type" = const(Usage),
+                                                                           "Posting Date" = field("Posting Date Filter")));
             Caption = 'Actual (Total Cost)';
             Editable = false;
             FieldClass = FlowField;
@@ -160,11 +160,11 @@ table 1001 "Job Task"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Job Ledger Entry"."Line Amount (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                            "Job Task No." = FIELD("Job Task No."),
-                                                                            "Job Task No." = FIELD(FILTER(Totaling)),
-                                                                            "Entry Type" = CONST(Usage),
-                                                                            "Posting Date" = FIELD("Posting Date Filter")));
+            CalcFormula = sum("Job Ledger Entry"."Line Amount (LCY)" where("Job No." = field("Job No."),
+                                                                            "Job Task No." = field("Job Task No."),
+                                                                            "Job Task No." = field(FILTER(Totaling)),
+                                                                            "Entry Type" = const(Usage),
+                                                                            "Posting Date" = field("Posting Date Filter")));
             Caption = 'Actual (Total Price)';
             Editable = false;
             FieldClass = FlowField;
@@ -173,11 +173,11 @@ table 1001 "Job Task"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Job Planning Line"."Total Cost (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                            "Job Task No." = FIELD("Job Task No."),
-                                                                            "Job Task No." = FIELD(FILTER(Totaling)),
-                                                                            "Contract Line" = CONST(true),
-                                                                            "Planning Date" = FIELD("Planning Date Filter")));
+            CalcFormula = sum("Job Planning Line"."Total Cost (LCY)" where("Job No." = field("Job No."),
+                                                                            "Job Task No." = field("Job Task No."),
+                                                                            "Job Task No." = field(FILTER(Totaling)),
+                                                                            "Contract Line" = const(true),
+                                                                            "Planning Date" = field("Planning Date Filter")));
             Caption = 'Billable (Total Cost)';
             Editable = false;
             FieldClass = FlowField;
@@ -186,11 +186,11 @@ table 1001 "Job Task"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Job Planning Line"."Line Amount (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                             "Job Task No." = FIELD("Job Task No."),
-                                                                             "Job Task No." = FIELD(FILTER(Totaling)),
-                                                                             "Contract Line" = CONST(true),
-                                                                             "Planning Date" = FIELD("Planning Date Filter")));
+            CalcFormula = sum("Job Planning Line"."Line Amount (LCY)" where("Job No." = field("Job No."),
+                                                                             "Job Task No." = field("Job Task No."),
+                                                                             "Job Task No." = field(FILTER(Totaling)),
+                                                                             "Contract Line" = const(true),
+                                                                             "Planning Date" = field("Planning Date Filter")));
             Caption = 'Billable (Total Price)';
             Editable = false;
             FieldClass = FlowField;
@@ -199,11 +199,11 @@ table 1001 "Job Task"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = - Sum("Job Ledger Entry"."Line Amount (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                             "Job Task No." = FIELD("Job Task No."),
-                                                                             "Job Task No." = FIELD(FILTER(Totaling)),
-                                                                             "Entry Type" = CONST(Sale),
-                                                                             "Posting Date" = FIELD("Posting Date Filter")));
+            CalcFormula = - sum("Job Ledger Entry"."Line Amount (LCY)" where("Job No." = field("Job No."),
+                                                                             "Job Task No." = field("Job Task No."),
+                                                                             "Job Task No." = field(FILTER(Totaling)),
+                                                                             "Entry Type" = const(Sale),
+                                                                             "Posting Date" = field("Posting Date Filter")));
             Caption = 'Invoiced (Total Price)';
             Editable = false;
             FieldClass = FlowField;
@@ -212,11 +212,11 @@ table 1001 "Job Task"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = - Sum("Job Ledger Entry"."Total Cost (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                            "Job Task No." = FIELD("Job Task No."),
-                                                                            "Job Task No." = FIELD(FILTER(Totaling)),
-                                                                            "Entry Type" = CONST(Sale),
-                                                                            "Posting Date" = FIELD("Posting Date Filter")));
+            CalcFormula = - sum("Job Ledger Entry"."Total Cost (LCY)" where("Job No." = field("Job No."),
+                                                                            "Job Task No." = field("Job Task No."),
+                                                                            "Job Task No." = field(FILTER(Totaling)),
+                                                                            "Entry Type" = const(Sale),
+                                                                            "Posting Date" = field("Posting Date Filter")));
             Caption = 'Invoiced (Total Cost)';
             Editable = false;
             FieldClass = FlowField;
@@ -234,9 +234,7 @@ table 1001 "Job Task"
         field(21; Totaling; Text[250])
         {
             Caption = 'Totaling';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
-            //This property is currently not supported
-            //TestTableRelation = false;
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -299,43 +297,43 @@ table 1001 "Job Task"
         {
             CaptionClass = '1,1,1';
             Caption = 'Global Dimension 1 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                Rec.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
             end;
         }
         field(61; "Global Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,1,2';
             Caption = 'Global Dimension 2 Code';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2),
-                                                          Blocked = CONST(false));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2),
+                                                          Blocked = const(false));
 
             trigger OnValidate()
             begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
+                Rec.ValidateShortcutDimCode(2, "Global Dimension 2 Code");
             end;
         }
         field(62; "Outstanding Orders"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Sum("Purchase Line"."Outstanding Amt. Ex. VAT (LCY)" WHERE("Document Type" = CONST(Order),
-                                                                                      "Job No." = FIELD("Job No."),
-                                                                                      "Job Task No." = FIELD("Job Task No."),
-                                                                                      "Job Task No." = FIELD(FILTER(Totaling))));
+            CalcFormula = sum("Purchase Line"."Outstanding Amt. Ex. VAT (LCY)" where("Document Type" = const(Order),
+                                                                                      "Job No." = field("Job No."),
+                                                                                      "Job Task No." = field("Job Task No."),
+                                                                                      "Job Task No." = field(FILTER(Totaling))));
             Caption = 'Outstanding Orders';
             FieldClass = FlowField;
         }
         field(63; "Amt. Rcd. Not Invoiced"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
-            CalcFormula = Sum("Purchase Line"."A. Rcd. Not Inv. Ex. VAT (LCY)" WHERE("Document Type" = CONST(Order),
-                                                                                      "Job No." = FIELD("Job No."),
-                                                                                      "Job Task No." = FIELD("Job Task No."),
-                                                                                      "Job Task No." = FIELD(FILTER(Totaling))));
+            CalcFormula = sum("Purchase Line"."A. Rcd. Not Inv. Ex. VAT (LCY)" where("Document Type" = const(Order),
+                                                                                      "Job No." = field("Job No."),
+                                                                                      "Job Task No." = field("Job Task No."),
+                                                                                      "Job Task No." = field(FILTER(Totaling))));
             Caption = 'Amt. Rcd. Not Invoiced';
             FieldClass = FlowField;
         }
@@ -343,11 +341,11 @@ table 1001 "Job Task"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Job Planning Line"."Remaining Total Cost (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                                      "Job Task No." = FIELD("Job Task No."),
-                                                                                      "Job Task No." = FIELD(FILTER(Totaling)),
-                                                                                      "Schedule Line" = CONST(true),
-                                                                                      "Planning Date" = FIELD("Planning Date Filter")));
+            CalcFormula = sum("Job Planning Line"."Remaining Total Cost (LCY)" where("Job No." = field("Job No."),
+                                                                                      "Job Task No." = field("Job Task No."),
+                                                                                      "Job Task No." = field(FILTER(Totaling)),
+                                                                                      "Schedule Line" = const(true),
+                                                                                      "Planning Date" = field("Planning Date Filter")));
             Caption = 'Remaining (Total Cost)';
             Editable = false;
             FieldClass = FlowField;
@@ -356,27 +354,27 @@ table 1001 "Job Task"
         {
             AutoFormatType = 1;
             BlankZero = true;
-            CalcFormula = Sum("Job Planning Line"."Remaining Line Amount (LCY)" WHERE("Job No." = FIELD("Job No."),
-                                                                                       "Job Task No." = FIELD("Job Task No."),
-                                                                                       "Job Task No." = FIELD(FILTER(Totaling)),
-                                                                                       "Schedule Line" = CONST(true),
-                                                                                       "Planning Date" = FIELD("Planning Date Filter")));
+            CalcFormula = sum("Job Planning Line"."Remaining Line Amount (LCY)" where("Job No." = field("Job No."),
+                                                                                       "Job Task No." = field("Job Task No."),
+                                                                                       "Job Task No." = field(FILTER(Totaling)),
+                                                                                       "Schedule Line" = const(true),
+                                                                                       "Planning Date" = field("Planning Date Filter")));
             Caption = 'Remaining (Total Price)';
             Editable = false;
             FieldClass = FlowField;
         }
         field(66; "Start Date"; Date)
         {
-            CalcFormula = Min("Job Planning Line"."Planning Date" WHERE("Job No." = FIELD("Job No."),
-                                                                         "Job Task No." = FIELD("Job Task No.")));
+            CalcFormula = min("Job Planning Line"."Planning Date" where("Job No." = field("Job No."),
+                                                                         "Job Task No." = field("Job Task No.")));
             Caption = 'Start Date';
             Editable = false;
             FieldClass = FlowField;
         }
         field(67; "End Date"; Date)
         {
-            CalcFormula = Max("Job Planning Line"."Planning Date" WHERE("Job No." = FIELD("Job No."),
-                                                                         "Job Task No." = FIELD("Job Task No.")));
+            CalcFormula = max("Job Planning Line"."Planning Date" where("Job No." = field("Job No."),
+                                                                         "Job Task No." = field("Job Task No.")));
             Caption = 'End Date';
             Editable = false;
             FieldClass = FlowField;
@@ -572,15 +570,18 @@ table 1001 "Job Task"
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         JobTask2: Record "Job Task";
+        IsHandled: Boolean;
     begin
-        OnBeforeValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode, JobTask2);
-
-        DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
-        if JobTask2.Get("Job No.", "Job Task No.") then begin
-            DimMgt.SaveJobTaskDim("Job No.", "Job Task No.", FieldNumber, ShortcutDimCode);
-            Modify();
-        end else
-            DimMgt.SaveJobTaskTempDim(FieldNumber, ShortcutDimCode);
+        IsHandled := false;
+        OnBeforeValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode, JobTask2, IsHandled);
+        if not IsHandled then begin
+            DimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
+            if JobTask2.Get("Job No.", "Job Task No.") then begin
+                DimMgt.SaveJobTaskDim("Job No.", "Job Task No.", FieldNumber, ShortcutDimCode);
+                Modify();
+            end else
+                DimMgt.SaveJobTaskTempDim(FieldNumber, ShortcutDimCode);
+        end;
 
         OnAfterValidateShortcutDimCode(Rec, xRec, FieldNumber, ShortcutDimCode);
     end;
@@ -639,7 +640,7 @@ table 1001 "Job Task"
 
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateShortcutDimCode(var JobTask: Record "Job Task"; var xJobTask: Record "Job Task"; FieldNumber: Integer; var ShortcutDimCode: Code[20]; JobTask2: Record "Job Task")
+    local procedure OnBeforeValidateShortcutDimCode(var JobTask: Record "Job Task"; var xJobTask: Record "Job Task"; FieldNumber: Integer; var ShortcutDimCode: Code[20]; JobTask2: Record "Job Task"; var IsHandled: Boolean)
     begin
     end;
 

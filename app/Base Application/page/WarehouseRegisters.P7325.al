@@ -1,3 +1,7 @@
+namespace Microsoft.WarehouseMgt.Ledger;
+
+using System.Security.User;
+
 page 7325 "Warehouse Registers"
 {
     ApplicationArea = Warehouse;
@@ -53,7 +57,7 @@ page 7325 "Warehouse Registers"
                     var
                         UserMgt: Codeunit "User Management";
                     begin
-                        UserMgt.DisplayUserInformation("User ID");
+                        UserMgt.DisplayUserInformation(Rec."User ID");
                     end;
                 }
                 field("Journal Batch Name"; Rec."Journal Batch Name")
@@ -98,7 +102,7 @@ page 7325 "Warehouse Registers"
                     var
                         WhseEntry: Record "Warehouse Entry";
                     begin
-                        WhseEntry.SetRange("Entry No.", "From Entry No.", "To Entry No.");
+                        WhseEntry.SetRange("Entry No.", Rec."From Entry No.", Rec."To Entry No.");
                         PAGE.Run(PAGE::"Warehouse Entries", WhseEntry);
                     end;
                 }

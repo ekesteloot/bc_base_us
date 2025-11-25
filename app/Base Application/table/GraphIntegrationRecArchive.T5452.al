@@ -27,7 +27,7 @@ table 5452 "Graph Integration Rec. Archive"
         }
         field(6; "Table ID"; Integer)
         {
-            CalcFormula = Lookup("Integration Record"."Table ID" WHERE("Integration ID" = FIELD("Integration ID")));
+            CalcFormula = Lookup("Integration Record"."Table ID" where("Integration ID" = field("Integration ID")));
             Caption = 'Table ID';
             FieldClass = FlowField;
         }

@@ -1,3 +1,5 @@
+namespace Microsoft.Purchases.Document;
+
 page 178 "Standard Vendor Purchase Codes"
 {
     Caption = 'Recurring Purchase Lines';
@@ -18,7 +20,7 @@ page 178 "Standard Vendor Purchase Codes"
                     ToolTip = 'Specifies the number of the vendor to which the standard purchase code is assigned.';
                     Visible = false;
                 }
-                field("Code"; Code)
+                field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a standard purchase code from the Standard Purchase Code table.';
@@ -79,7 +81,7 @@ page 178 "Standard Vendor Purchase Codes"
                     Caption = 'Card';
                     Image = EditLines;
                     RunObject = Page "Standard Purchase Code Card";
-                    RunPageLink = Code = FIELD(Code);
+                    RunPageLink = Code = field(Code);
                     Scope = Repeater;
                     ShortCutKey = 'Shift+F7';
                     ToolTip = 'Specifies a standard purchase code from the Standard Purchase Code table.';

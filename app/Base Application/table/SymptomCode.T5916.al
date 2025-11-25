@@ -1,3 +1,5 @@
+namespace Microsoft.ServiceMgt.Maintenance;
+
 table 5916 "Symptom Code"
 {
     Caption = 'Symptom Code';

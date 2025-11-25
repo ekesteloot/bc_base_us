@@ -7,7 +7,7 @@ report 6655 "Batch Post Sales Return Orders"
     {
         dataitem("Sales Header"; "Sales Header")
         {
-            DataItemTableView = SORTING("Document Type", "No.") WHERE("Document Type" = CONST("Return Order"));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Return Order"));
             RequestFilterFields = "No.", Status;
             RequestFilterHeading = 'Sales Return Order';
 
@@ -81,7 +81,7 @@ report 6655 "Batch Post Sales Return Orders"
                         begin
                             if ReplacePostingDate then
                                 Message(Text003);
-                            
+
                             if VATReportingDateMgt.IsVATDateUsageSetToPostingDate() then
                                 ReplaceVATDateReq := ReplacePostingDate;
                             UpdateVATDate();
@@ -187,17 +187,16 @@ report 6655 "Batch Post Sales Return Orders"
         VATReportingDateMgt: Codeunit "VAT Reporting Date Mgt";
         Text003: Label 'The exchange rate associated with the new posting date on the sales header will apply to the sales lines.';
         PrintDoc: Boolean;
-        [InDataSet]
         PrintDocVisible: Boolean;
         VATDateEnabled: Boolean;
         PostInvoiceEditable: Boolean;
 
     protected var
-        PostingDateReq, VATDateReq: Date;
+        PostingDateReq, VATDateReq : Date;
         ReceiveReq: Boolean;
         InvReq: Boolean;
         ReplacePostingDate: Boolean;
-        ReplaceDocumentDate, ReplaceVATDateReq: Boolean;
+        ReplaceDocumentDate, ReplaceVATDateReq : Boolean;
         CalcInvDisc: Boolean;
 
     local procedure UpdateVATDate()

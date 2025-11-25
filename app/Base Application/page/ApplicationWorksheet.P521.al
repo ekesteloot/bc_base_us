@@ -1,3 +1,12 @@
+namespace Microsoft.InventoryMgt.Ledger;
+
+using Microsoft.FinancialMgt.Dimension;
+using Microsoft.InventoryMgt.Item;
+using Microsoft.InventoryMgt.Location;
+using Microsoft.InventoryMgt.Posting;
+using Microsoft.InventoryMgt.Setup;
+using System.Text;
+
 page 521 "Application Worksheet"
 {
     AdditionalSearchTerms = 'undo application';
@@ -29,8 +38,8 @@ page 521 "Application Worksheet"
                         FilterTokens: Codeunit "Filter Tokens";
                     begin
                         FilterTokens.MakeDateFilter(DateFilter);
-                        SetFilter("Posting Date", DateFilter);
-                        DateFilter := GetFilter("Posting Date");
+                        Rec.SetFilter("Posting Date", DateFilter);
+                        DateFilter := Rec.GetFilter("Posting Date");
                         DateFilterOnAfterValidate();
                     end;
                 }
@@ -65,8 +74,8 @@ page 521 "Application Worksheet"
 
                     trigger OnValidate()
                     begin
-                        SetFilter("Document No.", DocumentFilter);
-                        DocumentFilter := GetFilter("Document No.");
+                        Rec.SetFilter("Document No.", DocumentFilter);
+                        DocumentFilter := Rec.GetFilter("Document No.");
                         DocumentFilterOnAfterValidate();
                     end;
                 }
@@ -90,8 +99,8 @@ page 521 "Application Worksheet"
 
                     trigger OnValidate()
                     begin
-                        SetFilter("Location Code", LocationFilter);
-                        LocationFilter := GetFilter("Location Code");
+                        Rec.SetFilter("Location Code", LocationFilter);
+                        LocationFilter := Rec.GetFilter("Location Code");
                         LocationFilterOnAfterValidate();
                     end;
                 }
@@ -201,19 +210,19 @@ page 521 "Application Worksheet"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the adjusted cost, in LCY, of the quantity posting.';
                 }
-                field(GetUnitCostLCY; GetUnitCostLCY())
+                field(GetUnitCostLCY; Rec.GetUnitCostLCY())
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Unit Cost(LCY)';
                     ToolTip = 'Specifies the cost of one unit of the item. ';
                     Visible = false;
                 }
-                field(Open; Open)
+                field(Open; Rec.Open)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the entry has been fully applied to.';
                 }
-                field(Positive; Positive)
+                field(Positive; Rec.Positive)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the item in the item ledge entry is positive.';
@@ -242,7 +251,7 @@ page 521 "Application Worksheet"
             part(Control1903523907; "Item Application FactBox")
             {
                 ApplicationArea = Basic, Suite;
-                SubPageLink = "Entry No." = FIELD("Entry No.");
+                SubPageLink = "Entry No." = field("Entry No.");
                 Visible = false;
             }
         }
@@ -269,7 +278,7 @@ page 521 "Application Worksheet"
                         Clear(ApplicationsForm);
                         ApplicationsForm.SetRecordToShow(Rec, Apply, true);
                         ApplicationsForm.Run();
-                        InsertUnapplyItem("Item No.");
+                        InsertUnapplyItem(Rec."Item No.");
                         CurrPage.Update();
                     end;
                 }
@@ -308,7 +317,7 @@ page 521 "Application Worksheet"
 
                     trigger OnAction()
                     begin
-                        ShowDimensions();
+                        Rec.ShowDimensions();
                         CurrPage.SaveRecord();
                     end;
                 }
@@ -318,8 +327,8 @@ page 521 "Application Worksheet"
                     Caption = '&Value Entries';
                     Image = ValueLedger;
                     RunObject = Page "Value Entries";
-                    RunPageLink = "Item Ledger Entry No." = FIELD("Entry No.");
-                    RunPageView = SORTING("Item Ledger Entry No.");
+                    RunPageLink = "Item Ledger Entry No." = field("Entry No.");
+                    RunPageView = sorting("Item Ledger Entry No.");
                     ShortCutKey = 'Ctrl+F7';
                     ToolTip = 'View the history of posted amounts that affect the value of the item. Value entries are created for every transaction with the item.';
                 }
@@ -333,7 +342,7 @@ page 521 "Application Worksheet"
 
                     trigger OnAction()
                     begin
-                        ShowReservationEntries(true);
+                        Rec.ShowReservationEntries(true);
                     end;
                 }
             }
@@ -432,7 +441,7 @@ page 521 "Application Worksheet"
     var
         Found: Boolean;
     begin
-        Found := Find(Which);
+        Found := Rec.Find(Which);
         if not Found then;
         exit(Found);
     end;
@@ -444,12 +453,12 @@ page 521 "Application Worksheet"
 
         InventoryPeriod.IsValidDate(InventoryOpenedFrom);
         if InventoryOpenedFrom <> 0D then
-            if GetFilter("Posting Date") = '' then
-                SetFilter("Posting Date", '%1..', CalcDate('<+1D>', InventoryOpenedFrom))
+            if Rec.GetFilter("Posting Date") = '' then
+                Rec.SetFilter("Posting Date", '%1..', CalcDate('<+1D>', InventoryOpenedFrom))
             else
-                if GetFilter("Posting Date") <> StrSubstNo('%1..', CalcDate('<+1D>', InventoryOpenedFrom)) then
-                    SetFilter("Posting Date",
-                      StrSubstNo('%2&%1..', CalcDate('<+1D>', InventoryOpenedFrom), GetFilter("Posting Date")));
+                if Rec.GetFilter("Posting Date") <> StrSubstNo('%1..', CalcDate('<+1D>', InventoryOpenedFrom)) then
+                    Rec.SetFilter("Posting Date",
+                      StrSubstNo('%2&%1..', CalcDate('<+1D>', InventoryOpenedFrom), Rec.GetFilter("Posting Date")));
 
         UpdateFilterFields();
     end;
@@ -486,10 +495,10 @@ page 521 "Application Worksheet"
 
     local procedure UpdateFilterFields()
     begin
-        ItemFilter := GetFilter("Item No.");
-        LocationFilter := GetFilter("Location Code");
-        DateFilter := GetFilter("Posting Date");
-        DocumentFilter := GetFilter("Document No.");
+        ItemFilter := Rec.GetFilter("Item No.");
+        LocationFilter := Rec.GetFilter("Location Code");
+        DateFilter := Rec.GetFilter("Posting Date");
+        DocumentFilter := Rec.GetFilter("Document No.");
     end;
 
     local procedure Reapplyall()
@@ -526,8 +535,8 @@ page 521 "Application Worksheet"
 
     local procedure ItemFilterOnAfterValidate()
     begin
-        SetFilter("Item No.", ItemFilter);
-        ItemFilter := GetFilter("Item No.");
+        Rec.SetFilter("Item No.", ItemFilter);
+        ItemFilter := Rec.GetFilter("Item No.");
         CurrPage.Update();
     end;
 

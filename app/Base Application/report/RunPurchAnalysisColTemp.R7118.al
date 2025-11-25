@@ -1,3 +1,7 @@
+namespace Microsoft.Purchases.Analysis;
+
+using Microsoft.InventoryMgt.Analysis;
+
 report 7118 "Run Purch. Analysis Col. Temp."
 {
     ApplicationArea = PurchaseAnalysis;

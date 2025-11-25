@@ -1,3 +1,5 @@
+namespace Microsoft.ProjectMgt.RoleCenters;
+
 profile "PROJECTS"
 {
     Enabled = true;

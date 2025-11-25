@@ -1,10 +1,19 @@
+namespace Microsoft.Purchases.Pricing;
+
+#if not CLEAN21
+using Microsoft.Pricing.Calculation;
+#endif
+using Microsoft.Pricing.PriceList;
+using Microsoft.Pricing.Source;
+using Microsoft.ProjectMgt.Jobs.Pricing;
+
 page 7018 "Purchase Price List"
 {
     Caption = 'Purchase Price List';
     PageType = ListPlus;
     RefreshOnActivate = true;
     SourceTable = "Price List Header";
-    SourceTableView = WHERE("Price Type" = CONST(Purchase));
+    SourceTableView = where("Price Type" = const(Purchase));
 
     layout
     {
@@ -254,7 +263,7 @@ page 7018 "Purchase Price List"
             {
                 ApplicationArea = Basic, Suite;
                 Editable = PriceListIsEditable;
-                SubPageLink = "Price List Code" = FIELD(Code);
+                SubPageLink = "Price List Code" = field(Code);
             }
         }
         area(factboxes)
@@ -360,6 +369,7 @@ page 7018 "Purchase Price List"
         FeaturePriceCalculation.FailIfFeatureDisabled();
     end;
 #endif
+
     trigger OnOpenPage()
     var
         PriceListLine: Record "Price List Line";
@@ -479,26 +489,19 @@ page 7018 "Purchase Price List"
         JobSourceType: Enum "Job Price Source Type";
         SourceType: Enum "Purchase Price Source Type";
         ViewAmountType: Enum "Price Amount Type";
-        [InDataSet]
+
+    protected var
         CodeIsEditable: Boolean;
-        [InDataSet]
         IsJobGroup: Boolean;
-        [InDataSet]
         ParentSourceNoEnabled: Boolean;
-        [InDataSet]
         ParentSourceNoVisible: Boolean;
-        [InDataSet]
         SourceNoEnabled: Boolean;
-        [InDataSet]
         PriceListIsEditable: Boolean;
-        [InDataSet]
         CopyLinesEnabled: Boolean;
-        [InDataSet]
         ViewGroupIsVisible: Boolean;
-        [InDataSet]
         UseCustomLookup: Boolean;
 
-    local procedure SetSourceNoEnabled()
+    protected procedure SetSourceNoEnabled()
     var
         PriceSource: Record "Price Source";
     begin
@@ -508,9 +511,9 @@ page 7018 "Purchase Price List"
         ParentSourceNoVisible := ParentSourceNoEnabled and not UseCustomLookup;
     end;
 
-    local procedure ValidateSourceType(SourceType: Integer)
+    protected procedure ValidateSourceType(SourceType2: Integer)
     begin
-        Rec.Validate("Source Type", SourceType);
+        Rec.Validate("Source Type", SourceType2);
         SetSourceNoEnabled();
         CurrPage.SaveRecord();
     end;

@@ -1,3 +1,8 @@
+namespace Microsoft.ServiceMgt.Document;
+
+using Microsoft.ServiceMgt.Maintenance;
+using System.Utilities;
+
 table 5928 "Service Status Priority Setup"
 {
     Caption = 'Service Status Priority Setup';
